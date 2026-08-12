@@ -1,0 +1,75 @@
+name: Configure FIEZEL Core Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/configure-core.yml'
+
+jobs:
+  configure:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[configure-core]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      FIEZEL_CORE_WORKER_URL: https://fiezel-core.puter.work
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate required secrets without printing values
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
+        shell: bash
+        run: |
+          test -n "$PUTER_AUTH_TOKEN" || { echo 'Missing PUTER_AUTH_TOKEN'; exit 2; }
+          test -n "$VAPID_PUBLIC_KEY" || { echo 'Missing VAPID_PUBLIC_KEY'; exit 2; }
+          test -n "$FIEZEL_REMINDER_CRON_TOKEN" || { echo 'Missing FIEZEL_REMINDER_CRON_TOKEN'; exit 2; }
+          test ${#VAPID_PUBLIC_KEY} -ge 80 || { echo 'VAPID_PUBLIC_KEY too short'; exit 2; }
+          test ${#FIEZEL_REMINDER_CRON_TOKEN} -ge 32 || { echo 'FIEZEL_REMINDER_CRON_TOKEN too short'; exit 2; }
+          echo 'Required Core configuration secrets are present.'
+
+      - name: Install pinned Puter SDK for authenticated owner request
+        run: npm install --no-save --ignore-scripts --no-audit --no-fund @heyputer/puter.js@2.5.4
+
+      - name: Configure Worker owner KV
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { init } from '@heyputer/puter.js/src/init.cjs';
+          const base = process.env.FIEZEL_CORE_WORKER_URL.replace(/\/$/, '');
+          const publicKey = process.env.VAPID_PUBLIC_KEY || '';
+          const cronToken = process.env.FIEZEL_REMINDER_CRON_TOKEN || '';
+          if (!/^https:\/\/[a-z0-9-]+\.puter\.work$/i.test(base)) throw new Error('Invalid Core Worker URL');
+          if (!/^[A-Za-z0-9_-]{80,120}$/.test(publicKey)) throw new Error('Invalid VAPID public key shape');
+          if (cronToken.length < 32 || cronToken.length > 256) throw new Error('Invalid cron token length');
+          const puter = init(process.env.PUTER_AUTH_TOKEN);
+          const configured = await puter.workers.exec(`${base}/api/admin/configure`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vapidPublicKey: publicKey, cronToken })
+          });
+          const configuredBody = await configured.json().catch(() => ({}));
+          if (!configured.ok || configuredBody.configured !== true) {
+            throw new Error(`Owner configure failed: HTTP ${configured.status} ${JSON.stringify(configuredBody)}`);
+          }
+          const statusRes = await puter.workers.exec(`${base}/api/admin/status`, { cache: 'no-store' });
+          const status = await statusRes.json().catch(() => ({}));
+          if (!statusRes.ok || status.configured !== true || status.vapidPublicKey !== publicKey) {
+            throw new Error(`Owner status mismatch: HTTP ${statusRes.status}`);
+          }
+          console.log(JSON.stringify({ status: 'CONFIGURED', worker: base, pushPublicKeyConfigured: true, subscriptions: Number(status.subscriptions || 0) }));
+          NODE
+
+      - name: Core live smoke
+        run: node core-live-smoke.mjs "$FIEZEL_CORE_WORKER_URL"
