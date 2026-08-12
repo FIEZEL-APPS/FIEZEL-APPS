@@ -1,12 +1,15 @@
 name: FIEZEL Remote Push Reminders
 
-# Scheduled dispatch is intentionally disabled until the real-device closed-app
-# Web Push proof passes. Keep workflow_dispatch for a controlled one-shot test.
 on:
+  schedule:
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 jobs:
   dispatch:
+    # Keep the hourly schedule contract, but fail closed until real-device proof
+    # is complete and the operator explicitly enables scheduled delivery.
+    if: github.event_name == 'workflow_dispatch' || vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
