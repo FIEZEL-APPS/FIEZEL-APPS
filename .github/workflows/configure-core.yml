@@ -1,5 +1,6 @@
 name: Configure FIEZEL Core Worker
 
+# Resume trigger: verified deployment continuation; no workflow logic change.
 on:
   workflow_dispatch:
   push:
