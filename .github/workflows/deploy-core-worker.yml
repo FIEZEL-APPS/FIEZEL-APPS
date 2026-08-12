@@ -16,19 +16,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      # Retained only because core-deploy-preflight.mjs currently checks CLI availability.
+      # The actual deployment no longer uses the CLI WebSocket path that failed previously.
       - run: npm install -g @heyputer/cli@0.1.2
       - run: node --check fiezel-core-worker.js
       - name: Core deployment preflight
         env:
           PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
         run: node core-deploy-preflight.mjs
-      - name: Deploy Core Worker
-        env:
-          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
-          CI: 'true'
-        run: puter worker deploy ./fiezel-core-worker.js "${{ inputs.worker_name }}"
-      - name: Read-only worker inventory
-        env:
-          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
-          CI: 'true'
-        run: puter worker get "${{ inputs.worker_name }}"
+      - name: Deploy Core Worker with official Puter action
+        id: puter_worker
+        uses: HeyPuter/puter-worker-deploy-action@3ea96548afcf0815fd2338f58ebc2032050bfd9d # v1.0.1
+        with:
+          worker_name: ${{ inputs.worker_name }}
+          source_path: fiezel-core-worker.js
+          puter_path: ~/Workers/${{ inputs.worker_name }}
+          puter_token: ${{ secrets.PUTER_AUTH_TOKEN }}
+      - name: Confirm deployed Worker URL
+        run: |
+          test -n "${{ steps.puter_worker.outputs.worker_url }}"
+          echo "Core Worker deployed successfully. URL: ${{ steps.puter_worker.outputs.worker_url }}"
