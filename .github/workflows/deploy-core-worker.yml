@@ -6,8 +6,13 @@ on:
         description: Puter Worker name
         required: true
         default: fiezel-core
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-core-worker.yml'
 jobs:
   deploy:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,13 +29,22 @@ jobs:
         env:
           PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
         run: node core-deploy-preflight.mjs
+      - name: Resolve Worker name
+        id: worker
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "name=${{ inputs.worker_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=fiezel-core" >> "$GITHUB_OUTPUT"
+          fi
       - name: Deploy Core Worker with official Puter action
         id: puter_worker
         uses: HeyPuter/puter-worker-deploy-action@3ea96548afcf0815fd2338f58ebc2032050bfd9d # v1.0.1
         with:
-          worker_name: ${{ inputs.worker_name }}
+          worker_name: ${{ steps.worker.outputs.name }}
           source_path: fiezel-core-worker.js
-          puter_path: ~/Workers/${{ inputs.worker_name }}
+          puter_path: ~/Workers/${{ steps.worker.outputs.name }}
           puter_token: ${{ secrets.PUTER_AUTH_TOKEN }}
       - name: Confirm deployed Worker URL
         run: |
