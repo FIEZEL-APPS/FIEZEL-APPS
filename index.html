@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#57a8df">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, dan tes diagnostik CEFR.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./favicon-64.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <title>FIEZEL | Adaptive English</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="scene-day">
+  <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
+    <div class="sky-light"></div>
+    <span id="globalCelestial" class="global-celestial sun" data-kind="sun"><i data-lucide="sun"></i></span>
+  </div>
+  <main class="app">
+    <header class="topbar">
+      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home">
+        <span class="brand">FIE<span>ZEL</span></span>
+        <span class="brand-edition">Personal English OS</span>
+      </button>
+      <div class="topbar-actions">
+        <button type="button" class="icon-button" id="soundtrackToggle" onclick="toggleSoundtrack()" aria-label="Atur soundtrack" aria-pressed="false"><i data-lucide="volume-2"></i></button>
+        <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan"><i data-lucide="sliders-horizontal"></i></button>
+        <div class="version" id="version"></div>
+      </div>
+    </header>
+    <div id="app" aria-live="polite"></div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
+
+  <div id="welcome" class="welcome notification-gate" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+    <div class="welcome-panel notification-panel">
+      <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
+      <div class="welcome-mark">FIEZEL REMINDER · WAJIB NYALA</div>
+      <h2 id="welcomeTitle">Oii Jahran, nyalain notifikasi dulu 👀</h2>
+      <p id="notificationGateBody">Biar FIEZEL bisa nyolek kalau lu kelamaan nggak belajar, target harian belum beres, atau ada materi yang waktunya direview.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Statusnya harus <b>Allow / Izinkan</b>. Kalau ditolak atau dicabut, FIEZEL belum bisa dibuka.</span></div>
+      <p id="notificationGateStatus" class="notification-status" role="status">Memeriksa izin notifikasi…</p>
+      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()">Aktifkan notifikasi <i data-lucide="bell-ring"></i></button>
+      <p id="notificationGateHelp" class="notification-help">Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL">
+    <div class="modal-panel" id="modalPanel"></div>
+  </div>
+
+  <nav class="bottomnav" aria-label="Navigasi utama">
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i data-lucide="house"></i><span>Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="chart-no-axes-combined"></i><span>Peta</span></button>
+  </nav>
+
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="./lucide.min.js"></script>
+  <script src="./version.js"></script>
+  <script src="./report-config.js"></script>
+  <script src="./core-config.js"></script>
+  <script src="./content-canary.js"></script>
+  <script src="./content-promotion.js"></script>
+  <script src="./content-canary-config.js"></script>
+  <script src="./app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+  </script>
+</body>
+</html>

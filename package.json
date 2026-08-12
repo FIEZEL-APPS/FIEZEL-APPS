@@ -1,0 +1,15 @@
+{
+  "name": "fiezel-push-ops",
+  "private": true,
+  "version": "5.17.0",
+  "dependencies": {
+    "web-push": "3.6.7"
+  },
+  "scripts": {
+    "push:dispatch": "node push-dispatcher.mjs",
+    "push:secrets": "node generate-push-secrets.mjs",
+    "core:preflight": "node core-deploy-preflight.mjs",
+    "core:smoke": "node core-live-smoke.mjs",
+    "core:activate": "node core-activate.mjs"
+  }
+}

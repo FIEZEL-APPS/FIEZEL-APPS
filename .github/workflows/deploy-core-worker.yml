@@ -1,0 +1,34 @@
+name: Deploy FIEZEL Core Worker
+on:
+  workflow_dispatch:
+    inputs:
+      worker_name:
+        description: Puter Worker name
+        required: true
+        default: fiezel-core
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install -g @heyputer/cli@0.1.2
+      - run: node --check fiezel-core-worker.js
+      - name: Core deployment preflight
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+        run: node core-deploy-preflight.mjs
+      - name: Deploy Core Worker
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+          CI: 'true'
+        run: puter worker deploy ./fiezel-core-worker.js "${{ inputs.worker_name }}"
+      - name: Read-only worker inventory
+        env:
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+          CI: 'true'
+        run: puter worker get "${{ inputs.worker_name }}"

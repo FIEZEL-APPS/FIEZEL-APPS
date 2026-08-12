@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>FIEZEL Creator Hub Setup</title>
+  <style>
+    :root{color-scheme:light;--ink:#11172a;--muted:#6a6e7d;--line:#dfddd6;--accent:#6f5de3;--paper:#fffefa;--bg:#f3f1eb}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px;background:radial-gradient(circle at 10% 0,rgba(111,93,227,.14),transparent 28rem),var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    main{max-width:820px;margin:5vh auto}.brand{font-weight:900;letter-spacing:-.05em}.brand span{color:var(--accent)}
+    .panel{margin-top:22px;padding:clamp(26px,6vw,54px);border:1px solid var(--line);border-radius:26px;background:rgba(255,254,250,.95);box-shadow:0 28px 80px rgba(16,22,41,.12)}
+    .kicker{font-size:.68rem;letter-spacing:.16em;color:var(--accent);font-weight:800}.panel h1{font-size:clamp(2.1rem,6vw,4.2rem);line-height:1;letter-spacing:-.055em;margin:14px 0 18px}.lead{max-width:640px;color:var(--muted);font-size:1rem;line-height:1.7}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:30px 0}.step{padding:16px;border-top:2px solid var(--line)}.step b{display:block;font-size:.78rem}.step span{display:block;color:var(--muted);font-size:.72rem;line-height:1.45;margin-top:5px}
+    button,a.button{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border:1px solid #0b1020;border-radius:13px;background:#0b1020;color:white;font:inherit;font-size:.9rem;font-weight:700;text-decoration:none;cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+    .status{display:none;margin-top:22px;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:#f7f5ef;color:var(--muted);line-height:1.55}.status.show{display:block}.status.ok{border-color:#b9d9cd;background:#edf7f2;color:#205f4d}.status.error{border-color:#e2b8c0;background:#fbf0f2;color:#933c4f}
+    .endpoint{display:block;margin-top:9px;color:inherit;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.78rem}
+    .result-actions{display:none;gap:9px;flex-wrap:wrap;margin-top:12px}.result-actions.show{display:flex}.result-actions button,.result-actions a{background:white;color:var(--ink);border-color:var(--line)}
+    .privacy{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.76rem;line-height:1.6}
+    @media(max-width:650px){body{padding:14px}.panel{border-radius:21px}.steps{grid-template-columns:1fr}.step{padding:12px 0}}
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">FIE<span>ZEL</span> · Creator Hub</div>
+    <section class="panel">
+      <div class="kicker">ONE-CLICK SECURE SETUP</div>
+      <h1>Aktifkan laporan Jahran.</h1>
+      <p class="lead">Halaman ini memasang Puter Worker milik creator, mengunci penyimpanan laporan di akun creator, lalu menyambungkan endpoint ke FIEZEL pada perangkat ini. Tidak ada API key atau password yang ditaruh di source code.</p>
+      <div class="steps">
+        <div class="step"><b>01 · Login creator</b><span>Puter mengingat sesi browser. Login tidak diminta di setiap kunjungan.</span></div>
+        <div class="step"><b>02 · Deploy Worker</b><span>Collector tervalidasi disimpan sebagai resource milik creator.</span></div>
+        <div class="step"><b>03 · Consent Jahran</b><span>Aktifkan persetujuan dari Settings FIEZEL sebelum laporan dikirim.</span></div>
+      </div>
+      <button type="button" id="deploy">Pasang Creator Hub</button>
+      <div id="status" class="status" role="status" aria-live="polite"></div>
+      <div id="actions" class="result-actions">
+        <button type="button" id="copy">Salin endpoint</button>
+        <a class="button" href="./creator-report-dashboard.html">Buka dashboard</a>
+        <a class="button" href="./index.html">Kembali ke FIEZEL</a>
+      </div>
+      <p class="privacy">Worker hanya menerima caller yang terautentikasi, terikat ke akun learner pertama, menyimpan field agregat yang sudah di-whitelist, dan menolak isi jawaban mentah maupun payload arbitrer.</p>
+    </section>
+  </main>
+  <script src="https://js.puter.com/v2/"></script>
+  <script>
+    (function(){
+      var WORKER_NAME=localStorage.getItem('fiezel-creator-worker-name')||'';
+      var SOURCE_PATH='fiezel-creator-hub-worker.js';
+      var endpoint='';
+      var deploy=document.getElementById('deploy');
+      var status=document.getElementById('status');
+      var actions=document.getElementById('actions');
+      function show(message,type){
+        status.className='status show '+(type||'');
+        status.textContent=message;
+      }
+      function saveEndpoint(url){
+        var current={};
+        try{current=JSON.parse(localStorage.getItem('fiezel-v4-state')||'{}')}catch{}
+        current.preferences=Object.assign({haptics:true,soundtrack:true,motion:true,reportConsent:false},current.preferences||{},{reportEndpoint:url});
+        current.reportMeta=Object.assign({lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]},current.reportMeta||{},{lastStatus:'ready'});
+        localStorage.setItem('fiezel-v4-state',JSON.stringify(current));
+        localStorage.setItem('fiezel-creator-endpoint',url);
+      }
+      deploy.addEventListener('click',async function(){
+        deploy.disabled=true;actions.classList.remove('show');show('Membuka sesi creator…');
+        try{
+          if(!puter.auth.isSignedIn())await puter.auth.signIn();
+          show('Menulis Worker tervalidasi ke cloud creator…');
+          var creator=await puter.auth.getUser();
+          var creatorIds=[creator.uuid,creator.id,creator.username].filter(Boolean).map(String);
+          if(!creatorIds.length)throw new Error('Identitas creator tidak tersedia.');
+          var source=await fetch('./fiezel-report-worker.js').then(function(r){if(!r.ok)throw new Error('Source Worker tidak ditemukan.');return r.text()});
+          source=source.replace("['__FIEZEL_CREATOR_ID__']",JSON.stringify(creatorIds));
+          await puter.fs.write(SOURCE_PATH,source,{overwrite:true});
+          var workers=await puter.workers.list();
+          var worker=WORKER_NAME?workers.find(function(x){return x.name===WORKER_NAME}):workers.find(function(x){return /^fiezel-creator-hub-[a-z0-9]+$/i.test(x.name)});
+          if(worker)WORKER_NAME=worker.name;
+          if(!worker){
+            show('Membuat Creator Hub baru…');
+            WORKER_NAME='fiezel-creator-hub-'+Math.random().toString(36).slice(2,10);
+            worker=await puter.workers.create(WORKER_NAME,SOURCE_PATH);
+          }
+          endpoint=String(worker.url||'').replace(/\/+$/,'');
+          if(!/^https:\/\/[^/]+\.puter\.work$/i.test(endpoint))throw new Error('URL Worker tidak valid: '+endpoint);
+          saveEndpoint(endpoint);
+          localStorage.setItem('fiezel-creator-worker-name',WORKER_NAME);
+          status.className='status show ok';
+          status.innerHTML='Creator Hub aktif dan tersambung pada perangkat ini.<span class="endpoint"></span>';
+          status.querySelector('.endpoint').textContent=endpoint;
+          actions.classList.add('show');
+        }catch(error){
+          show('Setup belum selesai: '+String(error&&error.message||error),'error');
+        }finally{deploy.disabled=false;deploy.textContent=endpoint?'Perbarui Creator Hub':'Coba lagi'}
+      });
+      document.getElementById('copy').addEventListener('click',async function(){
+        if(!endpoint)return;
+        try{await navigator.clipboard.writeText(endpoint);show('Endpoint disalin. Aktifkan consent pada Settings FIEZEL.','ok')}catch{show('Salin endpoint ini secara manual: '+endpoint,'ok')}
+      });
+    })();
+  </script>
+</body>
+</html>

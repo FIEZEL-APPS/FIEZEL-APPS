@@ -1,0 +1,54 @@
+name: FIEZEL Quality Gate
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: Syntax
+        run: |
+          for file in *.js; do node --check "$file"; done
+          for file in *.mjs; do node --check "$file"; done
+      - name: Core validation
+        run: |
+          node validator.js
+          node regression-test.js
+          node content-audit.js
+          node content-qa-agent.js
+          node content-qa-agent-test.js
+          node content-patch-gate-test.js
+          node content-canary-test.js
+          node content-promotion-test.js
+          node content-adoption-evidence-test.js
+          node content-evidence-origin-test.js
+          node content-adoption-rehearsal-test.js
+          node content-adoption-test.js
+          node product-audit.js
+          node runtime-stage8-test.js
+          node ai-integration-test.js
+          node experience-integration-test.js
+          node lesson-experience-test.js
+          node ui-structure-test.js
+          node grammar-quality-audit.js
+          node notification-reminder-test.js
+          node remote-push-test.js
+          node core-brain-test.js
+          node core-worker-contract-test.js
+          node learner-evidence-test.js
+          node alrs-behavior-test.js
+          node adaptive-policy-test.js
+          node policy-outcome-test.js
+          node pwa-cache-test.js
+          node http-smoke-test.js
