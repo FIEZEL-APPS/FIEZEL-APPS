@@ -4,15 +4,12 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/push-reminders.yml'
 
 jobs:
   dispatch:
-    # Keep schedule fail-closed; allow one-time subscription preflight via explicit marker.
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[push-preflight]')) || (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true')
+    # Keep the hourly schedule contract, but fail closed until real-device proof
+    # is complete and the operator explicitly enables scheduled delivery.
+    if: github.event_name == 'workflow_dispatch' || vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -21,29 +18,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Preflight subscription status
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[push-preflight]')
-        env:
-          FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
-          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
-        shell: bash
-        run: |
-          node --input-type=module <<'NODE'
-          const base = String(process.env.FIEZEL_CORE_WORKER_URL || '').replace(/\/$/, '');
-          const res = await fetch(`${base}/api/admin/status`, {
-            headers: { 'puter-auth': process.env.PUTER_AUTH_TOKEN || '', 'Cache-Control': 'no-store' }
-          });
-          const body = await res.json().catch(() => ({}));
-          if (!res.ok) throw new Error(`admin status HTTP ${res.status}`);
-          const subscriptions = Number(body.subscriptions || 0);
-          console.log(JSON.stringify({configured: body.configured === true, subscriptions}));
-          if (body.configured !== true) throw new Error('Core is not configured');
-          if (subscriptions < 1) throw new Error('No registered push subscription');
-          NODE
       - run: npm install --ignore-scripts --no-audit --no-fund
-        if: github.event_name != 'push'
       - run: node push-dispatcher.mjs
-        if: github.event_name != 'push'
         env:
           FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
           FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
