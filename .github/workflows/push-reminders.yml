@@ -4,12 +4,15 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/push-reminders.yml'
 
 jobs:
   dispatch:
-    # Keep the hourly schedule contract, but fail closed until real-device proof
-    # is complete and the operator explicitly enables scheduled delivery.
-    if: github.event_name == 'workflow_dispatch' || vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true'
+    # Keep schedule fail-closed; allow one explicit closed-app proof trigger.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[closed-app-proof]')) || (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,7 +22,32 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Closed-app neutral push proof
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[closed-app-proof]')
+        env:
+          FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
+          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import webpush from 'web-push';
+          const base=String(process.env.FIEZEL_CORE_WORKER_URL||'').replace(/\/$/,'');
+          const auth={Authorization:`Bearer ${process.env.FIEZEL_REMINDER_CRON_TOKEN}`,'Content-Type':'application/json'};
+          const dueRes=await fetch(`${base}/api/reminders/due`,{method:'POST',headers:auth});
+          if(!dueRes.ok)throw new Error(`due endpoint HTTP ${dueRes.status}`);
+          const payload=await dueRes.json();
+          const item=(payload.due||[])[0];
+          if(!item?.subscription)throw new Error('No eligible subscription available for proof');
+          webpush.setVapidDetails(process.env.VAPID_SUBJECT,process.env.VAPID_PUBLIC_KEY,process.env.VAPID_PRIVATE_KEY);
+          const proof={kind:'proof',title:'FIEZEL · Remote Push Test ✅',body:'Closed-app remote push proof berhasil.',url:'./',tag:'fiezel-remote-proof',meta:{proof:true}};
+          await webpush.sendNotification(item.subscription,JSON.stringify(proof),{TTL:300,urgency:'high',topic:'fiezel-remote-proof'});
+          console.log(JSON.stringify({proofSent:1,policyAcked:false}));
+          NODE
       - run: node push-dispatcher.mjs
+        if: github.event_name != 'push'
         env:
           FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
           FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
