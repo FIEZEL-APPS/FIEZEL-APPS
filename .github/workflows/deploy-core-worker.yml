@@ -30,7 +30,16 @@ jobs:
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"[deploy-core-proof]"* ]]; then
-            cat fiezel-core-worker.js fiezel-core-worker-proof-route.js > fiezel-core-worker-deploy.js
+            node --input-type=module <<'NODE'
+            import fs from 'node:fs';
+            const base=fs.readFileSync('fiezel-core-worker.js','utf8');
+            const proof=fs.readFileSync('fiezel-core-worker-proof-route.js','utf8').trim();
+            const marker="router.post('/api/reminders/due'";
+            if(!base.includes(marker)) throw new Error('Core reminder route insertion marker missing');
+            const next=base.replace(marker, `${proof}\n${marker}`);
+            fs.writeFileSync('fiezel-core-worker-deploy.js',next);
+            console.log(JSON.stringify({proofRouteInserted:next.includes("router.post('/api/reminders/proof'"),markerPreserved:next.includes(marker)}));
+            NODE
           else
             cp fiezel-core-worker.js fiezel-core-worker-deploy.js
           fi
