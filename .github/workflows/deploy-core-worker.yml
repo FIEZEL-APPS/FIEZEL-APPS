@@ -11,9 +11,10 @@ on:
     paths:
       - '.github/workflows/deploy-core-worker.yml'
       - 'fiezel-core-worker.js'
+      - 'fiezel-core-worker-proof-route.js'
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]')
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]') || contains(github.event.head_commit.message, '[deploy-core-proof]')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,7 +26,15 @@ jobs:
       # Retained only because core-deploy-preflight.mjs currently checks CLI availability.
       # The actual deployment no longer uses the CLI WebSocket path that failed previously.
       - run: npm install -g @heyputer/cli@0.1.2
-      - run: node --check fiezel-core-worker.js
+      - name: Prepare guarded deploy source
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"[deploy-core-proof]"* ]]; then
+            cat fiezel-core-worker.js fiezel-core-worker-proof-route.js > fiezel-core-worker-deploy.js
+          else
+            cp fiezel-core-worker.js fiezel-core-worker-deploy.js
+          fi
+          node --check fiezel-core-worker-deploy.js
       - name: Core deployment preflight
         env:
           PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
@@ -44,7 +53,7 @@ jobs:
         uses: HeyPuter/puter-worker-deploy-action@3ea96548afcf0815fd2338f58ebc2032050bfd9d # v1.0.1
         with:
           worker_name: ${{ steps.worker.outputs.name }}
-          source_path: fiezel-core-worker.js
+          source_path: fiezel-core-worker-deploy.js
           puter_path: ~/Workers/${{ steps.worker.outputs.name }}
           puter_token: ${{ secrets.PUTER_AUTH_TOKEN }}
       - name: Confirm deployed Worker URL
