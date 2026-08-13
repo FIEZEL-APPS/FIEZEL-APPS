@@ -23,6 +23,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Preflight subscription status
+        env:
+          FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
+          PUTER_AUTH_TOKEN: ${{ secrets.PUTER_AUTH_TOKEN }}
+        run: |
+          node --input-type=module <<'NODE'
+          const base = String(process.env.FIEZEL_CORE_WORKER_URL || '').replace(/\/$/, '');
+          const res = await fetch(`${base}/api/admin/status`, {
+            headers: { 'puter-auth': process.env.PUTER_AUTH_TOKEN || '', 'Cache-Control': 'no-store' }
+          });
+          const body = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(`admin status HTTP ${res.status}`);
+          console.log(JSON.stringify({configured: body.configured === true, subscriptions: Number(body.subscriptions || 0)}));
+          NODE
       - run: npm install --ignore-scripts --no-audit --no-fund
       - run: node push-dispatcher.mjs
         env:
