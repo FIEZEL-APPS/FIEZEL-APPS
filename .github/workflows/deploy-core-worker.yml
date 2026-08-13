@@ -10,6 +10,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/deploy-core-worker.yml'
+      - 'fiezel-core-worker.js'
 jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]')
