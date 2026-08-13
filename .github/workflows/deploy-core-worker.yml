@@ -12,6 +12,7 @@ on:
       - '.github/workflows/deploy-core-worker.yml'
       - 'fiezel-core-worker.js'
       - 'fiezel-core-worker-proof-route.js'
+      - 'core-proof-build.mjs'
 jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]') || contains(github.event.head_commit.message, '[deploy-core-proof]')
@@ -23,23 +24,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      # Retained only because core-deploy-preflight.mjs currently checks CLI availability.
-      # The actual deployment no longer uses the CLI WebSocket path that failed previously.
       - run: npm install -g @heyputer/cli@0.1.2
       - name: Prepare guarded deploy source
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"[deploy-core-proof]"* ]]; then
-            node --input-type=module <<'NODE'
-            import fs from 'node:fs';
-            const base=fs.readFileSync('fiezel-core-worker.js','utf8');
-            const proof=fs.readFileSync('fiezel-core-worker-proof-route.js','utf8').trim();
-            const marker="router.post('/api/reminders/due'";
-            if(!base.includes(marker)) throw new Error('Core reminder route insertion marker missing');
-            const next=base.replace(marker, `${proof}\n${marker}`);
-            fs.writeFileSync('fiezel-core-worker-deploy.js',next);
-            console.log(JSON.stringify({proofRouteInserted:next.includes("router.post('/api/reminders/proof'"),markerPreserved:next.includes(marker)}));
-            NODE
+            node core-proof-build.mjs
           else
             cp fiezel-core-worker.js fiezel-core-worker-deploy.js
           fi
