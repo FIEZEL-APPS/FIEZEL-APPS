@@ -14,6 +14,7 @@ const checks={
   ownerOnlyConfig:worker.includes('isOwner(user)')&&worker.includes("/api/admin/configure"),
   schedulerAuth:worker.includes('cronAuthorized')&&worker.includes("/api/reminders/due")&&worker.includes("/api/reminders/ack"),
   webPushDispatcher:dispatcher.includes('webpush.sendNotification')&&dispatcher.includes('VAPID_PRIVATE_KEY')&&dispatcher.includes('FIEZEL_REMINDER_CRON_TOKEN'),
+  newUserInactivityGuard:dispatcher.includes('looksUninitialized')&&dispatcher.includes("notification.kind==='inactivity_7'")&&dispatcher.includes("meta.trigger==='inactive_7_plus_days'")&&dispatcher.includes('suppressed++'),
   hourlySchedule:workflow.includes("cron: '17 * * * *'")&&workflow.includes('workflow_dispatch:'),
   secretsNotRuntime:!app.includes('VAPID_PRIVATE_KEY')&&!worker.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('VAPID_PRIVATE_KEY')&&!cfg.includes('FIEZEL_REMINDER_CRON_TOKEN')&&!cfg.includes('PUTER_AUTH_TOKEN'),
   coreDeploymentConfig:cfg.includes("aiGateway:'core-only'")&&deploymentConfigValid,
