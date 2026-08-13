@@ -1,4 +1,4 @@
-// closed-app proof trigger v1
+// closed-app proof trigger v2 — one-time iPhone delivery proof
 import webpush from 'web-push';
 const required=['FIEZEL_CORE_WORKER_URL','FIEZEL_REMINDER_CRON_TOKEN','VAPID_PUBLIC_KEY','VAPID_PRIVATE_KEY','VAPID_SUBJECT'];
 for(const k of required)if(!process.env[k])throw new Error(`Missing ${k}`);
