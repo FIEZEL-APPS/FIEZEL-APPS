@@ -3,9 +3,9 @@
  * Never put VAPID private keys, cron tokens, or Puter auth tokens here.
  */
 self.FIEZEL_CORE_CONFIG=Object.freeze({
-  workerUrl:'',
+  workerUrl:'https://fiezel-core.puter.work',
   protocolVersion:'1.7',
   aiGateway:'core-only',
   remotePushRequired:true,
-  deploymentState:'unconfigured'
+  deploymentState:'validated'
 });
