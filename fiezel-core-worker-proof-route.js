@@ -1,5 +1,6 @@
 
 // Temporary deployment-only proof route. This file is concatenated only for an explicitly marked Core proof deploy.
+// proof deploy trigger v1
 router.post('/api/reminders/proof',async({request})=>{
   if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);
   const rows=await me.puter.kv.list({pattern:USER_PREFIX+'*',returnValues:true});
