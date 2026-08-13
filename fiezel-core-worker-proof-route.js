@@ -1,6 +1,6 @@
 
 // Temporary deployment-only proof route. This file is inserted only for an explicitly marked Core proof deploy.
-// proof deploy trigger v4 — propagation-aware live smoke
+// proof deploy trigger v5 — overwrite original bound Worker source path
 router.post('/api/reminders/proof',async({request})=>{
   if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);
   const rows=await me.puter.kv.list({pattern:USER_PREFIX+'*',returnValues:true});
