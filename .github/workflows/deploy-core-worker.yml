@@ -59,3 +59,11 @@ jobs:
         run: |
           test -n "${{ steps.puter_worker.outputs.worker_url }}"
           echo "Core Worker deployed successfully. URL: ${{ steps.puter_worker.outputs.worker_url }}"
+      - name: Proof route live smoke
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-core-proof]')
+        env:
+          WORKER_URL: ${{ steps.puter_worker.outputs.worker_url }}
+          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
+        shell: bash
+        run: |
+          node --input-type=module -e "const base=String(process.env.WORKER_URL||'').replace(/\/$/,'');const res=await fetch(base+'/api/reminders/proof',{method:'POST',headers:{Authorization:'Bearer '+process.env.FIEZEL_REMINDER_CRON_TOKEN}});const body=await res.json().catch(()=>({}));if(!res.ok)throw new Error('Proof route smoke failed: HTTP '+res.status);if(Number(body.count||0)<1)throw new Error('Proof route live but no registered subscription');console.log(JSON.stringify({proofRoute:'LIVE',subscriptionsAvailable:Number(body.count||0)}));"
