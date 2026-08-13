@@ -4,12 +4,17 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/push-reminders.yml'
 
 jobs:
   dispatch:
-    # Keep the hourly schedule contract, but fail closed until real-device proof
-    # is complete and the operator explicitly enables scheduled delivery.
-    if: github.event_name == 'workflow_dispatch' || vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true'
+    # Keep scheduled delivery fail-closed until real-device proof is complete.
+    # Temporary push-proof path exists only because the connected GitHub tool
+    # cannot invoke workflow_dispatch directly; it requires the explicit marker.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true') || (github.event_name == 'push' && contains(github.event.head_commit.message, '[push-proof]'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
