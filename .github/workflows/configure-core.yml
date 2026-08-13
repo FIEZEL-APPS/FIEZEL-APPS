@@ -1,6 +1,6 @@
 name: Configure FIEZEL Core Worker
 
-# Resume trigger: verified deployment continuation; targeted transport recovery.
+# Resume trigger: verified deployment continuation; targeted transport recovery; deploy-authorized run 2026-08-13.
 on:
   workflow_dispatch:
   push:
