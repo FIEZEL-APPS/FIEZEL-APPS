@@ -56,7 +56,15 @@
     }
 
     function stop() { if (source) { try { source.stop(); } catch (_) {} source = null; } }
-    return Object.freeze({ play, stop });
+    function warm() {
+      if (!AudioContextCtor) return false;
+      try {
+        if (!context) context = new AudioContextCtor();
+        if (context.state === 'suspended' && typeof context.resume === 'function') { try { context.resume().catch(() => {}); } catch (_) {} }
+        return true;
+      } catch (_) { return false; }
+    }
+    return Object.freeze({ play, stop, warm });
   }
 
   return Object.freeze({ createPlayer, pickSamples, pickSampleRate });

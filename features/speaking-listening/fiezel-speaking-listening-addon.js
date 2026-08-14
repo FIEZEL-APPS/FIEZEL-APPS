@@ -120,7 +120,7 @@
   class TTSService{
     constructor(config){this.config=config}
     stop(){try{global.speechSynthesis?.cancel()}catch{}}
-    play(text,options={}){if(!capabilities().tts)return Promise.reject(new Error('tts_unavailable'));this.stop();return new Promise((resolve,reject)=>{let done=false;const finish=(fn,v)=>{if(done)return;done=true;fn(v)};try{const u=new global.SpeechSynthesisUtterance(String(text||''));u.lang=this.config.language;u.rate=clamp(options.rate??this.config.ttsRate,.55,1.3);u.onend=()=>finish(resolve,{provider:'browser-speech-synthesis'});u.onerror=()=>finish(reject,new Error('tts_failed'));setTimeout(()=>finish(resolve,{provider:'browser-speech-synthesis'}),12000);setTimeout(()=>{if(done)return;try{global.speechSynthesis.speak(u)}catch(e){finish(reject,e)}},60)}catch(e){finish(reject,e)}})}
+    play(text,options={}){if(!capabilities().tts)return Promise.reject(new Error('tts_unavailable'));this.stop();return new Promise((resolve,reject)=>{let done=false;const finish=(fn,v)=>{if(done)return;done=true;fn(v)};try{const u=new global.SpeechSynthesisUtterance(String(text||''));u.lang=this.config.language;u.rate=clamp(options.rate??this.config.ttsRate,.55,1.3);u.onend=()=>finish(resolve,{provider:'browser-speech-synthesis'});u.onerror=()=>finish(reject,new Error('tts_failed'));setTimeout(()=>finish(resolve,{provider:'browser-speech-synthesis'}),12000);global.speechSynthesis.speak(u)}catch(e){finish(reject,e)}})}
   }
 
   class RecognitionService{
