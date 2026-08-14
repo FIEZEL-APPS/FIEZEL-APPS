@@ -1,1 +1,1 @@
-self.FIEZEL_VERSION='5.18.0';
+self.FIEZEL_VERSION='5.19.0';
