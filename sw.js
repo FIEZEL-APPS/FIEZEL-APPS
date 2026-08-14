@@ -14,7 +14,14 @@ self.addEventListener('notificationclick',e=>{e.notification.close();const url=e
 
 self.addEventListener('push',event=>{
   let payload={title:'FIEZEL · Reminder belajar',body:'Jahran, waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};
-  try{if(event.data){const parsed=event.data.json();if(parsed&&typeof parsed==='object')payload={...payload,...parsed}}catch{try{payload.body=event.data?.text?.()||payload.body}catch{}}
+  try{
+    if(event.data){
+      const parsed=event.data.json();
+      if(parsed&&typeof parsed==='object')payload={...payload,...parsed};
+    }
+  }catch{
+    try{payload.body=event.data?.text?.()||payload.body}catch{}
+  }
   const options={body:String(payload.body||'').slice(0,280),tag:String(payload.tag||'fiezel-remote').slice(0,64),renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:payload.url||'./'}};
   event.waitUntil(self.registration.showNotification(String(payload.title||'FIEZEL').slice(0,80),options));
 });
