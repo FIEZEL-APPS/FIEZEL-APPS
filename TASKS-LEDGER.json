@@ -1,6 +1,6 @@
-{
+﻿{
   "protocol_version": "v1",
-  "updated": "2026-08-14T19:51:00+07:00",
+  "updated": "2026-08-14T21:02:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -159,7 +159,7 @@
       "status": "blocked",
       "owner": "owner",
       "evidence": "TIDAK ADA bukti device; user belum mengirim diagnostics localStorage fiezel-neural-voice-diagnostics-v1",
-      "note": "Hipotesis utama (analisis coordinator): aset 113MB > quota CacheStorage iOS (~50MB) + fetch no-store + init timeout 20s. Butuh: 1) diagnostics device, 2) jika terkonfirmasi quota: migrasi ke IndexedDB"
+      "note": "Hipotesis utama (analisis coordinator): aset 113MB > quota CacheStorage iOS (~50MB) + fetch no-store + init timeout 20s. Butuh: 1) diagnostics device, 2) jika terkonfirmasi quota: migrasi ke IndexedDB. UPDATE M-016 (scan GitHub 2026-08-14): hipotesis DIKONFIRMASI dengan koreksi — timeout 20s hanya membungkus adapter.initialize, bukan fase download (blocker kuota muncul via storagePreflight storage_insufficient atau cache.put storage_quota); COI via SW hanya efektif setelah SW aktif (load ke-2) karena main belum punya client refresh; semua aset produksi utuh == HEAD; branch kandidat fix (A) sudah di main, (B) tidak menyentuh blocker quota."
     },
     {
       "id": "T-006",
@@ -167,7 +167,7 @@
       "status": "blocked",
       "owner": "owner",
       "evidence": "",
-      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Instruksi ekstraksi sudah diberikan ke owner. Tanpa ini, T-007 TIDAK boleh dikerjakan."
+      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Instruksi ekstraksi sudah diberikan ke owner. Tanpa ini, T-007 TIDAK boleh dikerjakan. UPDATE M-016: kode diagnostics tetap aktif di HEAD (3 penulis: bootstrap/ios-cache/audibility); scan GitHub tidak bisa menggantikan bukti device ini."
     },
     {
       "id": "T-007",
@@ -175,7 +175,7 @@
       "status": "pending",
       "owner": "unassigned",
       "evidence": "",
-      "note": "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk"
+      "note": "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk. UPDATE M-016: desain T-010/baa804e tetap satu-satunya jalur yang menyentuh root cause (quota); branch A/B yang belum merge TIDAK menyentuh quota."
     },
     {
       "id": "T-008",
@@ -183,7 +183,7 @@
       "status": "done",
       "owner": "coordinator-1",
       "evidence": "main 14b1100 + 1f19930; 14b1100 QG FAIL (94724561223/31786847825, TypeError body.classList.toggle) -> diperbaiki 1f19930 QG SUCCESS 31787384948; Pages deployed. TERVERIFIKASI LIVE di produksi (M-009/agent-1): https://fiezel-apps.github.io/FIEZEL-APPS/ app.js 178839B sha256 79F7F2C0..C4B2 IDENTIK dgn HEAD, notificationsRequired() hanya true jika flag===true, lockAppForNotifications langsung unlock saat default; SW_REV=neural-voice-ux-fix-20260814-1.",
-      "note": "Flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default off). Re-enable: set true (index.html/console) tanpa ubah kode. Next: retest owner di iPhone (lihat analysis/device-retest-checklist.md) — app harus terbuka langsung tanpa gate notifikasi."
+      "note": "Flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default off). Re-enable: set true (index.html/console) tanpa ubah kode. Next: retest owner di iPhone (lihat analysis/device-retest-checklist.md) â€” app harus terbuka langsung tanpa gate notifikasi."
     },
     {
       "id": "T-009",
@@ -233,7 +233,7 @@
       "title": "Integrasi FIEZEL-Orkestrasi-Protokol-Pelengkap (scope-lock, context-injection, checklist verifier 6 poin, kriteria selesai)",
       "status": "done",
       "owner": "agent-5",
-      "evidence": "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format §3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
+      "evidence": "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format Â§3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
       "note": "Dokumen owner disalin verbatim; tidak ada perubahan source FIEZEL; verifier menemukan & dikoreksi inkonsistensi header (v1 -> v1.2)"
     },
     {
@@ -243,12 +243,20 @@
       "owner": "owner",
       "evidence": "Instruksi verbal owner: 'aku ingin kamu yang memberi tugas kepada mereka, berupa fix dan lain lain' setelah scan 'Reconfigurasi Orchestration FIEZEL' selesai. coordinator-1 (sesi ses_0034e69d) berwenang menugaskan agent-1..15 dengan format scope-lock (protokol v1.2).",
       "note": "coordinator-1 juga memverifikasi pertanyaan terbuka scan (lihat Temp\\opencode\\coordinator-1-findings.md): (1) fix 0094db0 = 7cbf183 + 2417549; (2) fa2ecbc == 4685d94 (diff kosong, cherry-pick CONFIRMED); (3) branch berbahaya jika di-merge: neural-voice-coi-repair-20260814, ios-neural-voice-5.19.1, derive-adoption-target-version (index.html kehilangan ios-cache-fix.js + audibility-fix.js)."
+    },
+    {
+      "id": "T-017",
+      "title": "Scan GitHub menyeluruh: masalah neural voice belum berfungsi",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-016: 4 worker paralel (SCAN-NV-01..04) + verifier VERIFY-SCAN-001 (STATUS VERIFIED, checklist 6 poin, 5 gate neural lokal PASS, regresi PASS). Temuan: (1) prod == HEAD utk SEMUA file neural (sha256 penuh, model fbae9257.., wasm c46655e8..); (2) branch agent/ios-neural-voice-5.19.1 SUDAH penuh di main (git diff fa2ecbc..branch kosong) - JANGAN merge; (3) branch neural-voice-coi-repair-20260814: COI sudah ada di main (9045b34 + CORP wrapper js.puter.com), branch tanpa CORP + tanpa 2 script fix - JANGAN merge mentah, hanya adaptasi refreshWindowClients + cross-origin-isolation-test.js; (4) COI via SW hanya efektif load ke-2 (main tanpa client refresh); (5) timeout 20s hanya membungkus adapter.initialize, BUKAN fase download; blocker tetap quota (119.274.361B > CacheStorage iOS ~50MB) + no-store fetch; (6) quality.yml HEAD 35 script, 5 gate neural, 0 gate COI khusus",
+      "note": "Tidak ada perubahan source; temuan selaras dgn verifikasi coordinator-1 (T-016). Path penyelesaian: T-006 diagnostics device (masih blocked) -> T-007 migrasi IndexedDB (desain siap T-010/baa804e)."
     }
   ],
-  "last_report": {
+"last_report": {
     "by": "agent-5 (Main Coordinator)",
-    "time": "2026-08-14T19:51:00+07:00",
-    "summary": "INTEGRASI PROTOKOL PELENGKAP (M-015/T-015): FIEZEL-Orkestrasi-Protokol-Pelengkap.md (dari owner, verbatim, 267 baris) di root repo; AGENTS-COORDINATION.md v1.2 (header dikoreksi, rujukan wajib 4 titik kontrol); verifier.md runtime kini wajib checklist 6 poin (DIFF/EVIDENCE/OBJECTIVE/REGRESSION/FORBIDDEN/CI) + output VERIFIED/REFUTED/UNVERIFIED; prompt agent-5 = scope-lock + context-injection + kriteria selesai §4; prompt agent-1..4 & squad-member = tolak task tanpa scope-lock, patuh files_allowed, larang 'sekalian dibenerin'. Validasi runtime: TEST A verifier (checklist 6 poin, VERIFIED, format §3) + TEST B worker agent-2 (scope-lock dipatuhi, read-only) — keduanya via Task tool. NEXT: tugas user berikutnya (retest iPhone T-013/T-006, lalu T-007) berjalan dengan protokol pelengkap aktif."
+    "time": "2026-08-14T21:02:00+07:00",
+    "summary": "SCAN GITHUB MENYELURUH (M-016/T-017): 4 worker paralel + verifier VERIFIED 5/5. Jawaban 'kenapa neural voice belum berfungsi': (1) blocker utama = quota — aset 119.274.361B (100% CacheStorage) vs quota CacheStorage iOS ~50MB, fetch klien no-store; timeout 20s BUKAN blocker download (hanya membungkus adapter.initialize); (2) COI (prasyarat WASM threaded) sudah di main via SW namun hanya efektif load ke-2 (main belum punya client refresh); (3) produksi == HEAD untuk SEMUA file neural (sha256 penuh, aset utuh, MIME benar); (4) branch ios-neural-voice-5.19.1 SUDAH di main (fa2ecbc) — jangan merge; branch neural-voice-coi-repair hanya layak diadaptasi (refreshWindowClients + gate COI), jangan merge mentah (hilang CORP wrapper + 2 script fix). Path penyelesaian: T-006 diagnostics device (blocked, menunggu owner) -> T-007 migrasi IndexedDB (desain siap). Rekomendasi lanjut ke owner: kirim diagnostics fiezel-neural-voice-diagnostics-v1; opsional adopsi client-refresh + gate COI."
   },
   "missions": [
     {
@@ -306,6 +314,14 @@
       "status": "done",
       "title": "Integrasi Protokol Pelengkap ke sistem orchestration",
       "note": "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)"
+    },
+    {
+      "id": "M-016",
+      "task_ref": "T-017",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Scan GitHub menyeluruh masalah neural voice (4 worker paralel + verifier)",
+      "note": "SCAN-NV-01 agent-1 (branch/CI/workflow), SCAN-NV-02 agent-2 (audit kode HEAD), SCAN-NV-03 agent-3 (deep-dive 2 branch belum-merge), SCAN-NV-04 agent-4 (audit produksi Pages + MIME + hash); verifier VERIFY-SCAN-001 VERIFIED 5/5 klaim (gate neural lokal PASS, regresi PASS, CI SUCCESS). Kesimpulan: blocker = quota CacheStorage iOS ~50MB vs 119.274.361B + no-store; COI hanya efektif load ke-2; branch A sudah di main, branch B butuh adaptasi; solusi tetap T-007 IndexedDB setelah T-006 diagnostics device."
     }
   ]
 }
