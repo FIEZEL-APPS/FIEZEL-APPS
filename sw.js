@@ -1,6 +1,6 @@
 importScripts('./version.js');
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='neural-voice-ux-fix-20260814-1';
+const SW_REV='neural-voice-coi-client-refresh-20260814-1';
 const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kokoro-');
 
@@ -49,9 +49,28 @@ async function fetchCrossOriginWithCorp(request){
   return new Response(response.body,{status:200,statusText:'OK',headers});
 }
 
+// --- Client refresh after COI activation ---
+// COOP/COEP are only observed once the top-level document is loaded through
+// this service worker. A PWA tab that was opened BEFORE the (new) SW took
+// control stays at self.crossOriginIsolated === false even after activate,
+// because the running document was fetched without the isolation headers.
+// Reloading every open window client through the (now isolated) navigation
+// path is what makes crossOriginIsolated actually take effect for those
+// tabs without requiring a manual pull-to-refresh.
+// Every failure is swallowed: clients that reject navigate (e.g. some
+// embedded webviews) simply stay on their current (non-isolated) state and
+// the app's existing non-neural fallbacks keep working.
+async function refreshWindowClients(){
+  const list=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  await Promise.all(list.map(client=>{
+    if(typeof client.navigate!=='function')return null;
+    return client.navigate(client.url).catch(()=>null);
+  }));
+}
+
 const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(shellRequests())).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()).then(refreshWindowClients)));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);
