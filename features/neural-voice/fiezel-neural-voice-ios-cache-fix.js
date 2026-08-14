@@ -18,8 +18,18 @@
   // priming doesn't finish in time, we give up on the head-start and let
   // the normal prepare()/warmAssets() flow (which already retries and
   // surfaces errors to the UI) do the actual work instead.
+  // [DOC-SYNC-M017-20260814] PRIME_TIMEOUT_MS default = 45000 ms = 45 detik.
+  // Dokumentasi di FIEZEL-Orkestrasi-Protokol-Pelengkap.md (fix_applied_this_round)
+  // sudah diselaraskan ke "45 detik (45.000 ms)" pada 2026-08-14 (sebelumnya
+  // tertulis "25 detik"). Nilai runtime TIDAK diubah di sini.
   const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||45000;
   const PRIME_ASSET_COUNT=Number(runtime.assetCount)||13;
+  // [DOC-SYNC-M017-20260814] PRIME_TOTAL_BYTES fallback (119.796.601 B) hanya
+  // dipakai saat runtime.totalBytes tidak tersedia. Angka terverifikasi dari
+  // manifest asli (fiezel-neural-voice-bootstrap.js:17-31, 13 aset):
+  // total = 119.274.361 B. Selisih +522.240 B = ukuran satu voice .bin
+  // (af_heart/af_bella/dll, masing-masing 522.240 B). Efeknya kosmetik
+  // (hanya progress bar), bukan logika priming. Sumber: analysis/idb-migration-design.md.
   const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119796601;
   let primePromise=null;
 

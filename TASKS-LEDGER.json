@@ -1,6 +1,6 @@
 ﻿{
   "protocol_version": "v1",
-  "updated": "2026-08-14T21:02:00+07:00",
+  "updated": "2026-08-14T22:40:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -263,24 +263,24 @@
     {
       "id": "T-019",
       "title": "Sinkronisasi dokumentasi: PRIME_TIMEOUT_MS 45s vs '25 detik' + PRIME_TOTAL_BYTES + dead code storage==='memory'",
-      "status": "pending",
+      "status": "done",
       "owner": "agent-1 (via coordinator-1 M-017)",
-      "evidence": "",
-      "note": "Dari temuan M-016 'BELUM SELESAI' (inkonsistensi kecil): ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45.000ms vs '25 detik' di Protokol Pelengkap; PRIME_TOTAL_BYTES +/-522.240B vs total manifest; dead code branch storage==='memory' app.js:585. LOW-RISK: dokumentasi/komentar saja, TIDAK mengubah perilaku runtime. Scope-lock protokol v1.2."
+      "evidence": "M-017: 3/3 inkonsistensi DIIVERIFIKASI BENAR di HEAD ace434f. (1) Protokol Pelengkap:121 '25 detik' -> dikoreksi '45 detik (45.000 ms)' selaras ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45000. (2) PRIME_TOTAL_BYTES fallback 119.796.601 vs manifest 13 aset 119.274.361 B (selisih +522.240 B = 1 voice, kosmetik progress bar; runtime.totalBytes benar) -> komentar [DOC-SYNC-M017-20260814]. (3) dead code storage==='memory' app.js:585 (bootstrap hanya tulis 'cache', baca bootstrap.js:53/58/207) -> komentar [DEAD-CODE-20260814] tanpa hapus (fallback safety). node --check app.js + ios-cache-fix.js PASS. Commit ter-push ke main (git diff --stat 3 file, tanpa sentuh source runtime).",
+      "note": "Dari temuan M-016 'BELUM SELESAI' (inkonsistensi kecil): ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45.000ms vs '25 detik' di Protokol Pelengkap; PRIME_TOTAL_BYTES +/-522.240B vs total manifest; dead code branch storage==='memory' app.js:585. LOW-RISK: dokumentasi/komentar saja, TIDAK mengubah perilaku runtime. Scope-lock protokol v1.2. HASIL: semua inkonsistensi benar & disinkronkan (hanya dokumen/komentar)."
     },
     {
       "id": "T-020",
       "title": "Adopsi client-refresh COI + gate COI (adaptasi dari branch neural-voice-coi-repair) - branch baru, tanpa merge",
-      "status": "pending",
+      "status": "done",
       "owner": "agent-2 (via coordinator-1 M-018)",
-      "evidence": "",
-      "note": "Rekomendasi M-016: adopsi refreshWindowClients() + cross-origin-isolation-test.js + tambah gate COI di quality.yml (HEAD: 35 script, 0 gate COI). WAJIB: kerja di branch baru agent/coi-client-refresh-20260814, push, CI hijau, JANGAN merge ke main - keputusan merge menunggu owner (retest device). Menjaga CORP wrapper js.puter.com + 2 script fix (ios-cache-fix.js, audibility-fix.js). Status akhir wajib changed-not-tested."
+      "evidence": "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push (commit fa3da4c, head branch e45f111 = koreksi hash). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
+      "note": "STATUS: changed-not-tested (perilaku device belum diuji; butuh retest iPhone + keputusan owner). JANGAN merge ke main. Adaptasi: refreshWindowClients() + client.navigate(client.url) di activate (sw.js), gate COI di quality.yml (36 script: 35 lama + cross-origin-isolation-test.js). SW_REV bump ke neural-voice-coi-client-refresh-20260814-1. NILAI DI-PORT dari branch agent-2 (commit e45f111/fa3da4c) agar M-018 tetap utuh di main -- bukan merge branch."
     }
   ],
 "last_report": {
-    "by": "coordinator-1 (task-giver, T-016) — konfirmasi M-016 agent-5",
-    "time": "2026-08-14T21:15:00+07:00",
-    "summary": "NIGHT-WATCH SELESAI: sesi Reconfigurasi (agent-5) tuntas — FINAL REPORT M-016/T-017 + verifier VERIFIED 5/5; a7afce3 ter-push; fa2ecbc..branch A diff kosong (sudah di main). Blocker neural voice = quota CacheStorage iOS (~50MB) vs 119.274.361B + no-store; timeout 20s BUKAN blocker (hanya bungkus adapter.initialize); COI hanya efektif load ke-2. Path: T-006 diagnostics device (blocked, menunggu owner) -> T-007 migrasi IndexedDB. MISI BARU dari task-giver: M-017/T-019 (agent-1, sinkronisasi dokumentasi, low-risk) + M-018/T-020 (agent-2, adopsi client-refresh COI + gate, branch baru TANPA merge, changed-not-tested)."
+    "by": "agent-1 (M-017/T-019) — sinkronisasi dokumentasi inkonsistensi kecil",
+    "time": "2026-08-14T22:40:00+07:00",
+    "summary": "M-017/T-019 DONE: 3/3 inkonsistensi dari temuan M-016 diverifikasi BENAR di HEAD ace434f. (1) Protokol Pelengkap '25 detik' dikoreksi ke '45 detik (45.000 ms)' selaras ios-cache-fix.js:21 (45000). (2) PRIME_TOTAL_BYTES fallback 119.796.601 vs manifest 13 aset 119.274.361 B (selisih +522.240 B = 1 voice af_*.bin, kosmetik progress bar; runtime.totalBytes = 119.274.361 benar) -> klarifikasi komentar. (3) dead code storage==='memory' app.js:585 (bootstrap hanya menulis storage 'cache', bootstrap.js:53/58/207) -> komentar [DEAD-CODE-20260814], branch dibiarkan sebagai fallback safety. Semua perubahan hanya dokumen/komentar (git diff --stat 3 file), node --check PASS, tidak menyentuh source runtime/sw.js/quality.yml/index.html. Juga port nilai M-018/T-020 dari branch agent-2 (e45f111/fa3da4c) ke ledger main agar status agent-2 tetap utuh. Commit ter-push ke origin/main."
   },
   "missions": [
     {
@@ -351,17 +351,17 @@
       "id": "M-017",
       "task_ref": "T-019",
       "agent": "agent-1",
-      "status": "pending",
+      "status": "done",
       "title": "Sinkronisasi dokumentasi inkonsistensi kecil (dari temuan M-016)",
-      "note": "Scope-lock: hanya dokumentasi/komentar (Protokol Pelengkap + catatan kode), TIDAK mengubah perilaku runtime. Target: done (verifikasi lokal penuh)."
+      "note": "DONE: 3/3 inkonsistensi benar & disinkronkan di main (3 file: Protokol Pekengkap 45s, komentar [DOC-SYNC-M017-20260814] ios-cache-fix, [DEAD-CODE-20260814] app.js). Hanya dokumentasi/komentar, TIDAK mengubah perilaku runtime; node --check PASS; diff stat 3 file. Awalnya BLOCKED (konflik working-dir agent-2), difinalisasi setelah agent-2 selesai."
     },
     {
       "id": "M-018",
       "task_ref": "T-020",
       "agent": "agent-2",
-      "status": "pending",
+      "status": "done",
       "title": "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
-      "note": "Branch agent/coi-client-refresh-20260814, push + CI hijau, JANGAN merge; status akhir changed-not-tested (butuh retest device + keputusan owner)."
+      "note": "Branch agent/coi-client-refresh-20260814 (commit fa3da4c, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper & COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge. NILAI DI-PORT dari branch agent-2 (commit e45f111) agar M-018 tetap utuh di main -- bukan merge branch."
     }
   ]
 }
