@@ -5,7 +5,7 @@
   const STATUS_KEY='fiezel-neural-voice-v1';
   const rootUrl=new URL('../../',document.currentScript?.src||location.href);
   const absolute=path=>new URL(String(path).replace(/^\.\//,''),rootUrl).href;
-  const version=String(root.FIEZEL_VERSION||'5.18.0');
+  const version=String(root.FIEZEL_VERSION||'5.19.0');
   const cacheName=`fiezel-v${version}`;
   const assets=Object.freeze([
     {path:'vendor/kokoro-js/kokoro.web.js',bytes:2135645},
