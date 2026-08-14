@@ -81,7 +81,10 @@
       const response=await cache.match(url);
       if(!response)return{url,valid:false,length:0};
       const length=Number(response.headers?.get?.('content-length')||0);
-      if(length&&length!==item.bytes)return{url,valid:false,length};
+      const isLarge=item.bytes>=LARGE_ASSET_STREAM_THRESHOLD;
+      // For streamed large assets, a CDN may preserve encoded transfer Content-Length.
+      // Cache presence is the reliable low-memory signal; cache.put rejects an incomplete body stream.
+      if(!isLarge&&length&&length!==item.bytes)return{url,valid:false,length};
       return{url,valid:true,length};
     }catch{return{url,valid:false,length:0}}
   }
@@ -109,8 +112,8 @@
     return true;
   }
   async function putFetchedAsset(cache,item,url,fetched){
-    const length=Number(fetched.headers?.get?.('content-length')||0);
-    if(length&&length!==item.bytes)throw new Error(`Voice asset size mismatch: ${item.path}`);
+    // Do not validate the network Content-Length. With gzip/brotli it may describe
+    // encoded transfer bytes instead of the decoded response body.
     if(item.bytes>=LARGE_ASSET_STREAM_THRESHOLD){
       await cache.put(url,fetched);
     }else{
