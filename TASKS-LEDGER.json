@@ -1,0 +1,71 @@
+{
+  "protocol_version": "v1",
+  "updated": "2026-08-14T15:45:00+07:00",
+  "agents": [
+    { "id": "coordinator-1", "session": "ses_0034e69d3ffes3kjiFLNDzYXUZ", "role": "coordinator/observer", "directory": "Temp\\opencode\\FIEZEL-APPS-clone" },
+    { "id": "executor-1", "session": "ses_0027db319ffeiu7OrUF1qbWBH8", "role": "implementer (fix live)", "directory": "Temp\\opencode\\FIEZEL-APPS" }
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "title": "COI (COOP/COEP) via SW",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 5ca5592 + 42b4ebb, Quality Gate SUCCESS (31784357531), Pages deployed",
+      "note": "crossOriginIsolated=true di device; ort multi-thread aktif"
+    },
+    {
+      "id": "T-002",
+      "title": "Audibility-first browser TTS",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 78f0c18; user mengkonfirmasi suara browser TTS pulih",
+      "note": "Terbukti di device (konfirmasi user)"
+    },
+    {
+      "id": "T-003",
+      "title": "iOS CacheStorage compatibility layer",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 25a0abd..fbc99c5, CI SUCCESS",
+      "note": "Masih menulis ke CacheStorage (quota iOS ~50MB) - diduga blocker neural. Belum diverifikasi device."
+    },
+    {
+      "id": "T-004",
+      "title": "Voice UX feedback + prewarm",
+      "status": "done",
+      "owner": "executor-1",
+      "evidence": "main 9871687 + merge 42b4ebb, CI SUCCESS 31784357531",
+      "note": "Belum diverifikasi device"
+    },
+    {
+      "id": "T-005",
+      "title": "Neural voice audible di device (goal utama)",
+      "status": "blocked",
+      "owner": "owner",
+      "evidence": "TIDAK ADA bukti device; user belum mengirim diagnostics localStorage fiezel-neural-voice-diagnostics-v1",
+      "note": "Hipotesis utama (analisis coordinator): aset 113MB > quota CacheStorage iOS (~50MB) + fetch no-store + init timeout 20s. Butuh: 1) diagnostics device, 2) jika terkonfirmasi quota: migrasi ke IndexedDB"
+    },
+    {
+      "id": "T-006",
+      "title": "Baca diagnostics dari device (bukti emas)",
+      "status": "pending",
+      "owner": "unassigned",
+      "evidence": "",
+      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Perlu instruksi ekstraksi yang jelas untuk owner"
+    },
+    {
+      "id": "T-007",
+      "title": "Migrasi aset neural ke IndexedDB jika T-003/T-005 terkonfirmasi",
+      "status": "pending",
+      "owner": "unassigned",
+      "evidence": "",
+      "note": "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk"
+    }
+  ],
+  "last_report": {
+    "by": "coordinator-1",
+    "time": "2026-08-14T15:45:00+07:00",
+    "summary": "Protokol koordinasi v1 dibuat. Agent executor-1 aktif (terakhir: merge 42b4ebb voice UX + prewarm, CI SUCCESS). Langkah kritis berikutnya: dapatkan diagnostics dari device (T-006)."
+  }
+}
