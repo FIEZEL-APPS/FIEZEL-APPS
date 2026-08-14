@@ -273,14 +273,14 @@
       "title": "Adopsi client-refresh COI + gate COI (adaptasi dari branch neural-voice-coi-repair) - branch baru, tanpa merge",
       "status": "done",
       "owner": "agent-2 (via coordinator-1 M-018)",
-      "evidence": "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push, commit 1f8abf9; CI QG SUCCESS (cek run id via gh). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS (neural-voice 38/0, ios-wasm-module, ios-cache-compat, neural-voice-http, neural-voice-audibility) + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
+      "evidence": "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push (commit fa3da4c, head branch), CI QG SUCCESS (cek run id via gh). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS (neural-voice 38/0, ios-wasm-module, ios-cache-compat, neural-voice-http, neural-voice-audibility) + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
       "note": "STATUS: changed-not-tested (perilaku device belum diuji; butuh retest iPhone + keputusan owner). JANGAN merge ke main. Adaptasi: refreshWindowClients() + client.navigate(client.url) di activate (sw.js), gate COI di quality.yml (36 script: 35 lama + cross-origin-isolation-test.js). SW_REV bump ke neural-voice-coi-client-refresh-20260814-1."
     }
   ],
   "last_report": {
     "by": "agent-2 (M-018) — adopsi client-refresh COI + gate COI",
     "time": "2026-08-14T22:30:00+07:00",
-    "summary": "M-018/T-020 DONE (changed-not-tested): branch agent/coi-client-refresh-20260814 ter-push (commit 1f8abf9 dari ace434f), CI QG SUCCESS. Adaptasi dari branch neural-voice-coi-repair TANPA mengikuti kesalahan branch: CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS sw.js UTUH; index.html TIDAK kehilangan ios-cache-fix.js + audibility-fix.js (terverifikasi). sw.js: refreshWindowClients() + activate .then(refreshWindowClients) + SW_REV bump. File baru cross-origin-isolation-test.js (6 grup assert COI/CORP/client-refresh/bootstrap). quality.yml: gate COI ke-36. Gate lokal: COI PASS + 5 gate neural PASS + regression PASS. JANGAN merge ke main - keputusan merge milik owner (retest iPhone)."
+    "summary": "M-018/T-020 DONE (changed-not-tested): branch agent/coi-client-refresh-20260814 ter-push (commit fa3da4c dari ace434f), CI QG SUCCESS. Adaptasi dari branch neural-voice-coi-repair TANPA mengikuti kesalahan branch: CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS sw.js UTUH; index.html TIDAK kehilangan ios-cache-fix.js + audibility-fix.js (terverifikasi). sw.js: refreshWindowClients() + activate .then(refreshWindowClients) + SW_REV bump. File baru cross-origin-isolation-test.js (6 grup assert COI/CORP/client-refresh/bootstrap). quality.yml: gate COI ke-36. Gate lokal: COI PASS + 5 gate neural PASS + regression PASS. JANGAN merge ke main - keputusan merge milik owner (retest iPhone)."
   },
   "missions": [
     {
@@ -361,7 +361,7 @@
       "agent": "agent-2",
       "status": "done",
       "title": "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
-      "note": "Branch agent/coi-client-refresh-20260814 (commit 1f8abf9, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper & COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge."
+      "note": "Branch agent/coi-client-refresh-20260814 (commit fa3da4c, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper & COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge."
     }
   ]
 }
