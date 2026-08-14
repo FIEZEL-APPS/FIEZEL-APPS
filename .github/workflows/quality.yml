@@ -55,5 +55,6 @@ jobs:
           node speaking-listening-test.js
           node neural-voice-test.js
           node ios-wasm-module-test.js
+          node ios-cache-compat-test.js
           node neural-voice-http-test.js
           node neural-voice-audibility-test.js
