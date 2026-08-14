@@ -14,6 +14,19 @@
     return text;
   }
 
+  function normalizeWasmPath(value, runtimeOrigin) {
+    const text = String(value || '').trim();
+    if (!text) throw new Error('wasmBasePath is required');
+    if (/^https?:\/\//i.test(text)) {
+      const expectedOrigin = String(runtimeOrigin || '').trim();
+      if (!expectedOrigin) throw new Error('runtimeOrigin is required for an absolute wasmBasePath');
+      const parsed = new URL(text);
+      if (parsed.origin !== expectedOrigin) throw new Error('wasmBasePath must be same-origin/local');
+      return parsed.href;
+    }
+    return assertLocalPath(text, 'wasmBasePath');
+  }
+
   function createKokoroAdapter(options) {
     options = options || {};
     const KokoroTTS = options.KokoroTTS;
@@ -28,7 +41,7 @@
     const modelId = assertLocalPath(options.modelId || 'kokoro-model', 'modelId');
     const localModelPath = assertLocalPath(options.localModelPath || './vendor/', 'localModelPath');
     const voiceBaseUrl = assertLocalPath(options.voiceBaseUrl || './vendor/kokoro-model/voices', 'voiceBaseUrl');
-    const wasmBasePath = assertLocalPath(options.wasmBasePath || './vendor/kokoro-js/wasm/', 'wasmBasePath');
+    const wasmBasePath = normalizeWasmPath(options.wasmBasePath || './vendor/kokoro-js/wasm/', options.runtimeOrigin);
     const dtype = String(options.dtype || 'q8');
     const device = String(options.device || 'wasm');
     let instancePromise = null;
@@ -67,5 +80,5 @@
     });
   }
 
-  return Object.freeze({ createKokoroAdapter, assertLocalPath });
+  return Object.freeze({ createKokoroAdapter, assertLocalPath, normalizeWasmPath });
 });
