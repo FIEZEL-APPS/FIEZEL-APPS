@@ -65,10 +65,10 @@
     {
       "id": "T-008",
       "title": "Nonaktifkan gate notifikasi wajib saat masuk (Safari/PWA issue)",
-      "status": "in_progress",
+      "status": "done",
       "owner": "coordinator-1",
-      "evidence": "",
-      "note": "Owner: Safari tidak bisa requestPermission kecuali PWA terinstal. Desain: flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default false=off); re-enable = set true tanpa hapus kode. Implementer subagent dikirim; verifier menyusul; CI gate wajib hijau."
+      "evidence": "main 14b1100 + 1f19930; Quality Gate SUCCESS 31787384948; Pages deployed. Implementer subagent (ses_0007f478) eksekusi; verifier subagent (ses_0007c031) 7 suite PASS + test default-off PASS. Harness fix: toggle() ditambah ke 4 mock body.classList.",
+      "note": "Flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default off). Re-enable: set true (index.html/console) tanpa ubah kode. Next: retest owner di iPhone — app harus terbuka langsung tanpa gate notifikasi."
     }
   ],
   "last_report": {
