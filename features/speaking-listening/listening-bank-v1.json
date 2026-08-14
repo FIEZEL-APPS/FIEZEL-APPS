@@ -1,0 +1,992 @@
+{
+  "schema": "fiezel-listening-bank-v1",
+  "version": 2,
+  "status": "reviewed_release_seed",
+  "count": 36,
+  "items": [
+    {
+      "id": "listen_0001",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "gist",
+      "script": "I usually walk to school with my cousin.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The speaker says they usually walk to school."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What is the speaker mainly talking about?",
+      "options": [
+        "Going to school",
+        "Cooking dinner",
+        "Buying clothes",
+        "Playing a game"
+      ],
+      "answerIndex": 0,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0002",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "detail",
+      "script": "The library closes at five o’clock on Friday.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The script states “closes at five o’clock”."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "When does the library close on Friday?",
+      "options": [
+        "At three",
+        "At four",
+        "At five",
+        "At six"
+      ],
+      "answerIndex": 2,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0003",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "gist",
+      "script": "Mina has a small cat, and it sleeps near her desk.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The message is about Mina’s cat."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Which topic best matches the message?",
+      "options": [
+        "A pet at home",
+        "A school test",
+        "A bus trip",
+        "A sports match"
+      ],
+      "answerIndex": 0,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0004",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "detail",
+      "script": "Please put the blue notebook next to the laptop.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The instruction says “next to the laptop”."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Where should the notebook go?",
+      "options": [
+        "Under the chair",
+        "Next to the laptop",
+        "Inside the bag",
+        "Near the window"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0005",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "dictation",
+      "script": "My brother drinks milk every morning.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The target sentence is short, common, and concrete."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "My brother drinks milk every morning.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.72
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0006",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A1",
+      "mode": "dictation",
+      "script": "We study English after lunch.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The target sentence uses familiar A1 vocabulary and simple present."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "We study English after lunch.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.72
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0007",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "gist",
+      "script": "I missed the first bus, so I took the next one and arrived ten minutes late.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The speaker directly says they missed the first bus."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Why was the speaker late?",
+      "options": [
+        "The bus broke down",
+        "They missed the first bus",
+        "They forgot the address",
+        "The road was closed"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0008",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "detail",
+      "script": "The science club meets in Room 12 every Wednesday after school.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The location is explicitly Room 12."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Where does the science club meet?",
+      "options": [
+        "Room 10",
+        "Room 11",
+        "Room 12",
+        "The library"
+      ],
+      "answerIndex": 2,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0009",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "gist",
+      "script": "Dita wants to save money, so she brings lunch from home instead of buying food at school.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "Bringing lunch from home is explained as a way to save money."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What is Dita trying to do?",
+      "options": [
+        "Save money",
+        "Learn to cook professionally",
+        "Skip lunch",
+        "Meet a teacher"
+      ],
+      "answerIndex": 0,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0010",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "detail",
+      "script": "Turn left at the pharmacy, then walk past the bank. The café is on your right.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The direction says to walk past the bank."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What should you pass before reaching the café?",
+      "options": [
+        "A school",
+        "A bank",
+        "A station",
+        "A park"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0011",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "dictation",
+      "script": "I forgot my umbrella, but the rain stopped quickly.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices a simple contrast with “but”."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "I forgot my umbrella, but the rain stopped quickly.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.74
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0012",
+      "schema": "fiezel-listening-item-v1",
+      "level": "A2",
+      "mode": "dictation",
+      "script": "Our teacher gave us extra time to finish the project.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence uses common school-context language."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "Our teacher gave us extra time to finish the project.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.74
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0013",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "gist",
+      "script": "I used to avoid speaking in class because I was afraid of making mistakes. Now I try to answer at least once in every lesson.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The speaker now tries to answer at least once each lesson."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What change has the speaker made?",
+      "options": [
+        "They stopped attending class",
+        "They speak more often in class",
+        "They study only at home",
+        "They avoid difficult lessons"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0014",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "detail",
+      "script": "The workshop starts at nine, but registration opens thirty minutes earlier near the main entrance.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Thirty minutes before 9:00 is 8:30."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "When does registration open?",
+      "options": [
+        "8:00",
+        "8:30",
+        "9:00",
+        "9:30"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0015",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "gist",
+      "script": "The team tested two versions of the website. Users completed tasks faster on the simpler design, so the team kept that version.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "Task completion was faster on the simpler design."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Why did the team keep the simpler design?",
+      "options": [
+        "It was cheaper to print",
+        "Users completed tasks faster",
+        "It had more colors",
+        "The manager preferred it without testing"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0016",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "detail",
+      "script": "Rafi can join the meeting online if he cannot reach the office before four.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The condition is explicitly stated."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Under what condition can Rafi join online?",
+      "options": [
+        "If the meeting is canceled",
+        "If he cannot reach the office before four",
+        "If he finishes before lunch",
+        "If the office closes early"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0017",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "dictation",
+      "script": "Although the task looked difficult, we finished it before the deadline.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices concession and past tense."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "Although the task looked difficult, we finished it before the deadline.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.77
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0018",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B1",
+      "mode": "dictation",
+      "script": "The new study method helped me remember vocabulary for longer.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence is relevant to learner strategy and B1 comprehension."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "The new study method helped me remember vocabulary for longer.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.77
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0019",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "gist",
+      "script": "The city introduced a bike-sharing program to reduce short car trips. Early data shows strong use near universities, but usage remains low in outer districts.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The report contrasts uptake across two areas."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What is the main contrast in the report?",
+      "options": [
+        "Weekday and weekend prices",
+        "High use near universities and low use in outer districts",
+        "New bikes and old bikes",
+        "Tourists and local students"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0020",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "detail",
+      "script": "Applicants must submit the form by Monday, while supporting documents may arrive up to two days later.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Only supporting documents receive the two-day extension."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What may be submitted after Monday?",
+      "options": [
+        "The application form",
+        "Supporting documents",
+        "The payment",
+        "The interview request"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0021",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "gist",
+      "script": "Nadia initially chose the faster solution, but after reviewing the security risks, she recommended the slower approach for the production system.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "Security risk review changed the recommendation."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Why did Nadia change her recommendation?",
+      "options": [
+        "The faster solution was too expensive",
+        "She reviewed security risks",
+        "The slower approach looked nicer",
+        "The client canceled the project"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0022",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "detail",
+      "script": "The lecture was moved from Hall A to Hall C because the original room could not accommodate the larger audience.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Capacity is the stated reason."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Why was the lecture moved?",
+      "options": [
+        "Hall A had no projector",
+        "The audience was larger than Hall A could hold",
+        "Hall C was closer to the entrance",
+        "The speaker requested a smaller room"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0023",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "dictation",
+      "script": "The proposal was revised after several reviewers raised concerns about its assumptions.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices passive voice and academic vocabulary."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "The proposal was revised after several reviewers raised concerns about its assumptions.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.8
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0024",
+      "schema": "fiezel-listening-item-v1",
+      "level": "B2",
+      "mode": "dictation",
+      "script": "If the evidence remains inconsistent, the team will postpone the final decision.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices a conditional with cautious decision-making."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "If the evidence remains inconsistent, the team will postpone the final decision.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.8
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0025",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "gist",
+      "script": "The policy appears efficient when judged by average response time, yet that metric hides substantial variation between user groups. A more cautious evaluation would examine distributional effects before declaring success.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The central warning is that the average masks variation."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What is the speaker’s main caution?",
+      "options": [
+        "Average response time is always useless",
+        "A single average can hide differences between groups",
+        "The policy has already failed",
+        "User groups should never be compared"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0026",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "detail",
+      "script": "The committee endorsed the pilot on the condition that an independent review be completed before any nationwide rollout.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "The endorsement is conditional on an independent review."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What must happen before nationwide rollout?",
+      "options": [
+        "A marketing campaign",
+        "An independent review",
+        "A new committee election",
+        "A budget cut"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0027",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "gist",
+      "script": "While the model predicts short-term demand accurately, its assumptions about long-term behavior are largely untested. Treating the forecast as a strategic certainty would therefore be premature.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "Long-term assumptions lack sufficient testing."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Why should the forecast be treated cautiously?",
+      "options": [
+        "It cannot predict short-term demand",
+        "Its long-term assumptions are largely untested",
+        "The data is entirely missing",
+        "The model was built for another language"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0028",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "detail",
+      "script": "The grant covers tuition and required course fees, but it does not include housing, travel, or personal expenses.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Required course fees are explicitly included."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Which cost is covered by the grant?",
+      "options": [
+        "Housing",
+        "Travel",
+        "Required course fees",
+        "Personal expenses"
+      ],
+      "answerIndex": 2,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0029",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "dictation",
+      "script": "The conclusion is plausible, but the available evidence does not establish a causal relationship.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence distinguishes plausibility from causal proof."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "The conclusion is plausible, but the available evidence does not establish a causal relationship.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.82
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0030",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C1",
+      "mode": "dictation",
+      "script": "Researchers should report uncertainty explicitly rather than presenting estimates as exact facts.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices academic register and epistemic caution."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "Researchers should report uncertainty explicitly rather than presenting estimates as exact facts.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.82
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0031",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "gist",
+      "script": "The argument is rhetorically persuasive because it frames inaction as costly, but its evidential basis is thinner than the confidence of its language suggests. The distinction matters: urgency can justify attention without justifying certainty.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The speaker separates a reason for attention from a reason for certainty."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What distinction is the speaker emphasizing?",
+      "options": [
+        "Urgency and certainty are not the same",
+        "Persuasive writing never uses evidence",
+        "Inaction is always the best choice",
+        "Confidence guarantees accuracy"
+      ],
+      "answerIndex": 0,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0032",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "detail",
+      "script": "The board approved the acquisition in principle, subject to regulatory clearance and a final review of liabilities discovered during due diligence.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Both conditions are stated at the end of the sentence."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "What two conditions remain?",
+      "options": [
+        "A staff vote and a new product launch",
+        "Regulatory clearance and liability review",
+        "A price increase and customer survey",
+        "A marketing plan and office move"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0033",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "gist",
+      "script": "The historian does not reject the conventional account outright; instead, she argues that it overstates the role of individual leaders and understates the institutional constraints shaping their choices.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "main idea",
+        "evidence": "The revision changes the balance of explanatory emphasis."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "How does the historian revise the conventional account?",
+      "options": [
+        "She replaces it with a biography",
+        "She shifts emphasis from individuals toward institutional constraints",
+        "She says leaders had no influence at all",
+        "She focuses only on dates"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "af_nicole",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0034",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "detail",
+      "script": "The memorandum recommends immediate disclosure only if the omission is material; otherwise, it advises documenting the issue and correcting it in the next scheduled report.",
+      "voiceLang": "en-US",
+      "maxReplays": 2,
+      "pedagogy": {
+        "focus": "specific detail",
+        "evidence": "Materiality is the threshold for immediate disclosure."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "When is immediate disclosure recommended?",
+      "options": [
+        "Whenever any typo appears",
+        "Only when the omission is material",
+        "After the next scheduled report",
+        "Only if a customer complains"
+      ],
+      "answerIndex": 1,
+      "scoring": {
+        "metric": "exact_choice"
+      },
+      "voice": "am_michael",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0035",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "dictation",
+      "script": "A robust interpretation should survive reasonable changes in the assumptions on which the analysis depends.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence tests dense academic syntax without obscure vocabulary."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "A robust interpretation should survive reasonable changes in the assumptions on which the analysis depends.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.84
+      },
+      "voice": "bf_emma",
+      "audioProfile": "listening"
+    },
+    {
+      "id": "listen_0036",
+      "schema": "fiezel-listening-item-v1",
+      "level": "C2",
+      "mode": "dictation",
+      "script": "The apparent contradiction disappears once the two claims are understood as operating at different levels of analysis.",
+      "voiceLang": "en-US",
+      "maxReplays": 3,
+      "pedagogy": {
+        "focus": "accurate decoding and word segmentation",
+        "evidence": "The sentence practices abstract analytical language."
+      },
+      "privacy": {
+        "rawLearnerResponseRequiredForPersistence": false
+      },
+      "question": "Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.",
+      "answerText": "The apparent contradiction disappears once the two claims are understood as operating at different levels of analysis.",
+      "scoring": {
+        "metric": "token_f1",
+        "threshold": 0.84
+      },
+      "voice": "bm_george",
+      "audioProfile": "listening"
+    }
+  ]
+}

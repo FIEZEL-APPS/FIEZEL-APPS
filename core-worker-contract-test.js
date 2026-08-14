@@ -8,13 +8,13 @@ const kv={
   list:async({pattern='',returnValues=false}={})=>{const prefix=pattern.replace('*','');return[...store.entries()].filter(([k])=>k.startsWith(prefix)).map(([key,value])=>returnValues?{key,value}:{key})}
 };
 const me={puter:{kv,auth:{getUser:async()=>({uuid:'owner-uuid',username:'owner'})}}};
-const context={router,me,Response,Intl,Date,Math,console};
+const context={router,me,Response,Intl,Date,Math,console,crypto:require('crypto').webcrypto,TextEncoder,TextDecoder};
 vm.createContext(context);vm.runInContext(source,context,{filename:'fiezel-core-worker.js'});
 const assert=(v,m)=>{if(!v)throw new Error(m)};
 const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.toLowerCase()]||headers[k]||''}});
 (async()=>{
   const health=await routes.GET.get('/health')({request:req()});
-  assert(health.status==='ok'&&health.protocol==='1.7'&&health.aiGateway==='core-only'&&health.capabilities.includes('learner-evidence-v1')&&health.capabilities.includes('adaptive-policy-v1')&&health.capabilities.includes('policy-outcome-v1')&&health.capabilities.includes('context-coach-v1')&&health.capabilities.includes('content-qa-v1')&&health.capabilities.includes('guarded-content-patch-v1')&&health.capabilities.includes('alrs'),'health/core-only protocol 1.7 capabilities failed');
+  assert(health.status==='ok'&&health.protocol==='1.7'&&health.aiGateway==='core-only'&&health.capabilities.includes('learner-evidence-v1')&&health.capabilities.includes('adaptive-policy-v1')&&health.capabilities.includes('policy-outcome-v1')&&health.capabilities.includes('context-coach-v1')&&health.capabilities.includes('content-qa-v1')&&health.capabilities.includes('guarded-content-patch-v1')&&health.capabilities.includes('content-self-refine-v1')&&health.capabilities.includes('evolution-config-v1')&&health.capabilities.includes('alrs'),'health/core-only protocol 1.7 capabilities failed');
 
   const unauth=await routes.POST.get('/api/ai/chat')({request:req({prompt:'hi'}),user:null});
   assert(unauth instanceof Response&&unauth.status===401,'unauthenticated AI was not rejected');
@@ -26,7 +26,7 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
   const coach=await routes.POST.get('/api/coach/context')({request:req({snapshot:{adaptiveReady:true,totalAttempts:80,estimatedLevel:'B1',domains:{grammar:{attempts:30,accuracy:45}}},evidence:{behavior:{consistency14d:60},memory:{},skills:{weakest:[{skill:'present_perfect',type:'grammar',attempts:10,accuracy:40,errorRate:60,recurringErrors:3}]}},outcomes:[]}),user});
   assert(coach.text==='aman'&&coach.protocol==='1.7'&&coach.via==='fiezel-core-worker-context-coach','context-aware coach endpoint failed');
   let ownerPromptSeen='';
-  const ownerUser={puter:{auth:{getUser:async()=>({uuid:'owner-uuid',username:'owner'})},ai:{chat:async(msgs,opt)=>{modelSeen=opt.model;ownerPromptSeen=JSON.stringify(msgs);return{message:{content:JSON.stringify(msgs).includes('guarded content patch candidate')?JSON.stringify({replacement:{meaning:'hampir',example:"It's almost midnight, so we should leave soon.",meanings:[{id:'meaning_00208_01',meaning:'hampir'}],examples:[{en:"It's almost midnight, so we should leave soon.",id:'Sekarang hampir tengah malam.'}],synonyms:['nearly'],antonyms:[],collocations:['almost done'],topic:'general',status:'complete',needsReviewReason:[]},rationale:'Expand context without changing sense.'}):'review-aman'}}}}}};
+  const ownerUser={puter:{auth:{getUser:async()=>({uuid:'owner-uuid',username:'owner'})},ai:{chat:async(msgs,opt)=>{modelSeen=opt.model;ownerPromptSeen=JSON.stringify(msgs);const asks=JSON.stringify(msgs);return{message:{content:asks.includes('guarded content patch candidate')||asks.includes('self-refinement content patch candidate')?JSON.stringify({replacement:{meaning:'hampir',example:"It's almost midnight, so we should leave soon.",meanings:[{id:'meaning_00208_01',meaning:'hampir'}],examples:[{en:"It's almost midnight, so we should leave soon.",id:'Sekarang hampir tengah malam.'}],synonyms:['nearly'],antonyms:[],collocations:['almost done'],topic:'general',status:'complete',needsReviewReason:[]},rationale:'Expand context without changing sense.'}):'review-aman'}}}}}};
   const learnerQa=await routes.POST.get('/api/content/qa/review')({request:req({candidate:{schema:'fiezel-content-qa-v1',domain:'grammar',itemId:'TA-001',category:'repetition',severity:'review',message:'candidate'}}),user});
   assert(learnerQa instanceof Response&&learnerQa.status===403,'non-owner content QA review was not rejected');
   const qa=await routes.POST.get('/api/content/qa/review')({request:req({candidate:{schema:'fiezel-content-qa-v1',domain:'grammar',itemId:'TA-001',category:'weak_explanation',severity:'review',message:'Rule explanation needs review',sample:{stem:'Choose the best form.',options:['a','b','c','d'],answer:'b',explanation:'short'},rawHistory:['SHOULD_NOT_SURVIVE'],learnerEvidence:{selectedAnswer:'SHOULD_NOT_SURVIVE'}}}),user:ownerUser});
@@ -39,6 +39,63 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
   assert(!routes.POST.has('/api/content/patch/apply')&&!routes.POST.has('/api/content/patch/publish'),'mutation/publish endpoint must not exist');
   const badQa=await routes.POST.get('/api/content/qa/review')({request:req({candidate:{schema:'wrong',domain:'grammar'}}),user:ownerUser});
   assert(badQa instanceof Response&&badQa.status===400,'invalid content QA candidate was accepted');
+
+  const ac=require('./fiezel-autonomy-config.js');
+  const pl=require('./fiezel-prompt-library.js');
+  const PARITY=[
+    {autonomyLevel:'advisory'},
+    {autonomyLevel:'bogus'},
+    {autonomyLevel:'canary',autoCanonicalAdoption:true},
+    {autonomyLevel:'full'},
+    {autonomyLevel:'full',ownerApproved:true,ownerRef:'0c8af70c-4d1d-4e4b-b187-abcc42acda8d',approvedAt:'2026-08-14T00:00:00Z',autoCanonicalAdoption:true},
+    {autonomyLevel:'full',ownerApproved:true,ownerRef:'not-a-uuid',approvedAt:'2026-08-14T00:00:00Z'},
+    {autonomyLevel:'full',halt:true,ownerApproved:true,ownerRef:'0c8af70c-4d1d-4e4b-b187-abcc42acda8d',approvedAt:'2026-08-14T00:00:00Z'},
+    {autonomyLevel:'canary',thresholds:{minCanaryAccuracy:99,maxCanaryRegressionPp:-5}}
+  ];
+  for(const input of PARITY){
+    const expected=ac.sanitizeConfig(input),actual=context.evolutionSanitizeConfig(input);
+    assert(JSON.stringify(actual)===JSON.stringify(expected),'evolution config parity failed for '+JSON.stringify(input));
+  }
+  assert(context.evolutionEffectiveLevel({autonomyLevel:'full',halt:true})==='halt'&&ac.effectiveLevel({autonomyLevel:'full',halt:true})==='halt','evolution effective level parity failed');
+  const libraryJson=JSON.parse(fs.readFileSync(path.join(__dirname,'fiezel-prompt-library.json'),'utf8'));
+  assert(JSON.stringify(context.evolutionEmbeddedLibrary())===JSON.stringify(libraryJson),'embedded prompt library drifted from fiezel-prompt-library.json');
+  const rp=context.evolutionRenderPrompt(context.evolutionEmbeddedLibrary(),'vocabulary','expand_context',{word:'develop',cefr:'B1',example:'The app helps you develop new skills.'});
+  const rp2=pl.renderPrompt(libraryJson,'vocabulary','expand_context',{word:'develop',cefr:'B1',example:'The app helps you develop new skills.'});
+  assert(rp.ok&&rp.prompt===rp2.prompt,'evolution render parity failed');
+
+  const nonOwnerEvo=await routes.POST.get('/api/evolution/config')({request:req({autonomyLevel:'advisory'}),user});
+  assert(nonOwnerEvo instanceof Response&&nonOwnerEvo.status===403,'non-owner evolution config was not rejected');
+  const badEvoCfg=await routes.POST.get('/api/evolution/config')({request:req({autonomyLevel:'otonom'}),user:ownerUser});
+  assert(badEvoCfg instanceof Response&&badEvoCfg.status===400,'invalid evolution config was accepted');
+  const evoCfg=await routes.POST.get('/api/evolution/config')({request:req({autonomyLevel:'full',ownerApproved:true,ownerRef:'0c8af70c-4d1d-4e4b-b187-abcc42acda8d',approvedAt:'2026-08-14T00:00:00Z',autoCanonicalAdoption:true}),user:ownerUser});
+  assert(evoCfg.stored===true&&evoCfg.autonomyLevel==='full'&&evoCfg.protocol==='1.7','evolution config store failed');
+
+  const nonOwnerRefine=await routes.POST.get('/api/content/self-refine')({request:req({insight:{},source:{}}),user});
+  assert(nonOwnerRefine instanceof Response&&nonOwnerRefine.status===403,'non-owner self-refine was not rejected');
+
+  store.delete('fiezel_push_v1_ai_rate_owner-uuid');
+  const refine=await routes.POST.get('/api/content/self-refine')({request:req({insight:{schema:'fiezel-meta-insight-v1',id:'ins-001',domain:'vocabulary',itemId:'vocab_00006',category:'context_thin',finding:'Vocabulary example is too thin',templateId:'expand_context'},source:{domain:'vocabulary',itemId:'vocab_00006',sourceVersion:'5.17.0',sourceSha256:'a'.repeat(64),item:{id:'vocab_00006',word:'almost',level:'A1',partOfSpeech:'adverb',cefr:'A1',meaning:'hampir',example:"It's almost midnight."}}}),user:ownerUser});
+  assert(refine.candidate?.schema==='fiezel-content-patch-v1'&&refine.candidate.patchId.startsWith('sr-')&&refine.authority==='candidate-only'&&refine.gateStatus==='UNVERIFIED_LOCAL_GATES_REQUIRED'&&refine.autonomyLevel==='full'&&refine.via==='fiezel-core-worker-content-self-refine'&&refine.protocol==='1.7','self-refine candidate endpoint failed');
+  assert(refine.ledgerSeq===1,'self-refine ledger append failed');
+
+  const status=await routes.GET.get('/api/evolution/status')({request:req(),user:ownerUser});
+  assert(status.configured===true&&status.autonomyLevel==='full'&&status.ledger.count===1&&status.ledger.chainOk===true&&status.protocol==='1.7','evolution status failed');
+  const tamper=store.get('fiezel_push_v1_evolution_ledger');tamper.entries[0].decision='promote';
+  const tamperedStatus=await routes.GET.get('/api/evolution/status')({request:req(),user:ownerUser});
+  assert(tamperedStatus.ledger.chainOk===false&&tamperedStatus.ledger.count===1,'ledger tamper not detected');
+
+  const holdCfg=await routes.POST.get('/api/evolution/config')({request:req({autonomyLevel:'advisory'}),user:ownerUser});
+  assert(holdCfg.stored===true&&holdCfg.autonomyLevel==='advisory','advisory config store failed');
+  store.delete('fiezel_push_v1_ai_rate_owner-uuid');
+  const holdRefine=await routes.POST.get('/api/content/self-refine')({request:req({insight:{schema:'fiezel-meta-insight-v1',id:'ins-002',domain:'vocabulary',itemId:'vocab_00006',category:'context_thin',finding:'x',templateId:'expand_context'},source:{domain:'vocabulary',itemId:'vocab_00006',sourceVersion:'5.17.0',sourceSha256:'a'.repeat(64),item:{id:'vocab_00006',cefr:'A1',meaning:'hampir',example:"It's almost midnight."}}}),user:ownerUser});
+  assert(holdRefine.hold===true&&holdRefine.reason==='advisory_mode_no_refine'&&holdRefine.authority==='advisory-only','advisory self-refine did not hold: '+JSON.stringify(holdRefine));
+
+  const haltCfg=await routes.POST.get('/api/evolution/config')({request:req({autonomyLevel:'full',halt:true,ownerApproved:true,ownerRef:'0c8af70c-4d1d-4e4b-b187-abcc42acda8d',approvedAt:'2026-08-14T00:00:00Z'}),user:ownerUser});
+  assert(haltCfg.stored===true&&haltCfg.halt===true,'halt config store failed');
+  store.delete('fiezel_push_v1_ai_rate_owner-uuid');
+  const haltRefine=await routes.POST.get('/api/content/self-refine')({request:req({insight:{},source:{}}),user:ownerUser});
+  assert(haltRefine instanceof Response&&haltRefine.status===503,'halt config did not block self-refine');
+
   for(let i=2;i<40;i++){
     const r=await routes.POST.get('/api/ai/chat')({request:req({prompt:'x'}),user});
     assert(r.text==='aman','rate limit fired too early');

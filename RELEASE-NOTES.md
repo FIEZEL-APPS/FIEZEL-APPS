@@ -1,71 +1,65 @@
-# FIEZEL 5.17.0 — Production Evidence Origin Verification / Operator Adoption Rehearsal
+# FIEZEL 5.18.0 — Speaking, Listening, dan Local Neural Voice
 
 ## Version decision
 
-**5.16.0 → 5.17.0 (MINOR).** Build menambah capability release/security backward-compatible. Learner storage schema, canonical IDs, grammar schema, practice blueprint, Core protocol, dan learner-facing workflow tidak berubah.
+**5.17.0 → 5.18.0 (MINOR).** Build menambah domain belajar dan runtime voice baru secara backward-compatible. Canonical learner state `fiezel-v4-state`, canonical content IDs, grammar schema, practice blueprint, Core protocol, serta backend namespace lama tetap dipertahankan.
 
 ## Added
 
-- `content-evidence-origin.js` — Ed25519 Production Evidence Origin verifier.
-- `content-evidence-origin-test.js` — controlled signature/tamper/trust failure probes.
-- `CONTENT-EVIDENCE-ORIGIN.md` dan `CONTENT-EVIDENCE-ORIGIN-PROOF.json`.
-- `content-adoption-rehearsal.js` — operator staging/rollback rehearsal.
-- `content-adoption-rehearsal-test.js` dan `CONTENT-ADOPTION-REHEARSAL.md`.
-- `CONTENT-ADOPTION-REHEARSAL-PROOF.json`.
-- `PRODUCTION-ORIGIN-OWNER-ACTION.md` untuk dependency/operator boundary yang tidak boleh dipalsukan AI.
-- CI, Product Audit, Release Audit, handoff v1.8, dan packaging coverage untuk origin/rehearsal tooling.
+- Skills Lab route dan kartu Home untuk Speaking + Listening tanpa menambah bottom navigation keenam.
+- 36 Listening items dan 36 Speaking items, enam item per level per domain.
+- Isolated aggregate evidence store `fiezel-sl-v1-state`.
+- Explicit neural voice preparation UI dengan progress asset.
+- Patched Kokoro.js 1.2.1 browser bundle, q8 ONNX model, enam locked voices, ONNX Runtime Web WASM, dan dependency licenses.
+- Source lock berisi immutable upstream commits, asset sizes, dan SHA-256.
+- Gate baru: `speaking-listening-test.js`, `neural-voice-test.js`, dan `neural-voice-http-test.js`.
 
-## Security contract
+## Repairs from audit
 
-- Evidence origin memakai Ed25519.
-- Signed payload mengunci Evidence Attestation digest, source/candidate/source-item/config identity, canary ID, observation end, origin/export/exporter/key identity, environment, dan issued-at.
-- Trust policy operator diberikan terpisah dari untrusted adoption request; self-supplied trust root ditolak.
-- Public-key fingerprint, key/policy validity, signature age, clock skew, dan production environment diverifikasi fail-closed.
-- Private signing key tidak disimpan atau dibutuhkan di source.
-- Signature **tidak menggantikan owner approval**.
+- Memperbaiki beberapa sample Speaking yang gagal memenuhi scoring target miliknya sendiri.
+- Mengganti open-response keyword scoring dengan concept-group coverage yang menerima wording alternatif terkontrol.
+- Mengunci kontrol jawaban Listening sampai audio sukses, sehingga item tidak dapat dinilai tanpa stimulus.
+- Memastikan raw audio/transcript/dictation tidak masuk persistent state.
+- Menambahkan lifecycle cleanup ketika pengguna meninggalkan Skills Lab.
+- Menghapus implicit service-worker caching untuk neural assets besar; hanya explicit user opt-in yang dapat mengisinya.
+- Membatalkan stale `prepared` state jika cache perangkat tidak lagi lengkap.
+- Membatasi fallback offline hanya untuk navigasi, sehingga request binary yang gagal tidak menerima `index.html`.
+- Memperbaiki release-audit temp routing agar portabel pada environment tanpa `/tmp`.
 
-## Canonical Adoption changes
+## Automated evidence
 
-Canonical Adoption 5.17 sekarang memerlukan:
-
-1. valid Guarded Patch candidate + canary config;
-2. verified Adoption Evidence Attestation;
-3. verified signed production origin terhadap operator trust policy terpisah;
-4. stable promotion + extended evidence thresholds;
-5. no prior rollback;
-6. Release Audit/Product Audit/Content QA boundary;
-7. explicit `owner-release` approval.
-
-Adoption manifest mengikat origin envelope digest, origin/key ID, trust-policy ID/digest, serta evidence attestation digest.
-
-## Controlled proof boundary
-
-Local proofs menggunakan synthetic aggregate evidence dan ephemeral Ed25519 key. Mereka membuktikan verifier/staging/rollback contract saja dan mencatat:
-
-- `productionOriginClaimed:false`;
-- `realProductionEvidenceUsed:false`;
-- `productionRehearsalPerformed:false`;
-- `actualCanonicalAdoptionPerformed:false`.
-
-## Canonical content / compatibility
-
-- Vocabulary: 1.765.
-- Grammar: 129 × 25 = 3.225 runtime questions.
-- Reading: 300 / 1.500 questions.
-- Grammar schema: `2.0.0`.
-- Practice blueprint: `focused-25-v1`.
-- Core protocol: `1.7`.
-- Release Shadow/Canary config: OFF.
-- Canonical Content QA: **0 blocker / 61 review**.
-
-## Source quality
-
-- Full source suite: **31/31 PASS**.
-- Product Audit: **47 PASS / 0 FAIL**.
+- Release Audit: **145 PASS / 0 FAIL**.
+- Product Audit: **49 PASS / 0 FAIL**.
 - Grammar Quality: **24 PASS / 0 FAIL**.
-- Release Audit: **127 PASS / 0 FAIL**.
-- Grammar runtime: **3.225 questions; 0 cross-lesson duplicates; 0 focus leaks**.
+- Speaking + Listening: **25 PASS / 0 FAIL**.
+- Neural Voice: **26 PASS / 0 FAIL**.
+- Grammar runtime: 3.225 questions; 0 cross-lesson duplicates; 0 focus leaks.
+- Content QA: 0 blocker / 61 bounded review candidates.
+- Model HTTP: exact HEAD sizes and 1.024-byte Range response PASS.
 
-## Owner action still required
+## Remaining promotion gate
 
-Real production rehearsal belum dijalankan karena workspace tidak memiliki signed production learner evidence, operator trust policy nyata, signing service/private key, atau real owner review approval. Bila file berada di sistem privat/URL berautentikasi, owner harus mengekspor/download file lalu melampirkannya. AI tidak boleh mengarang atau menyimpan credential/private key produksi.
+Source and asset closure sudah PASS, tetapi `realDeviceGate` tetap `PENDING`. Build tidak boleh dipromosikan sebagai production-ready sampai cold start, peak memory, latency, offline synthesis, audio unlock, interruption, dan zero cross-origin runtime trace terbukti pada perangkat target.
+
+## Autonomous Brain (evolution loop)
+
+Menambahkan modul otonom yang berjalan di memori tanpa menyentuh canonical sampai bukti lolos:
+
+- `fiezel-meta-learning.js` — insight dari leaderboard aggregate (weak accuracy, trend, retention risk) tanpa raw answers.
+- `fiezel-prompt-library.js` + `fiezel-prompt-library.json` — template prompt per domain (grammar/vocabulary/reading/listening/speaking), slot render, secret scan, bounds.
+- `fiezel-evolution-ledger.js` — hash-chained append-only log (genesis/append/verify/prune) dengan 10 event.
+- `fiezel-autonomy-config.js` — level otonomi advisory/canary/full; fail-closed; `halt` darurat; level full wajib `ownerApproved + ownerRef + approvedAt` eksplisit.
+- `fiezel-self-refine.js` — orkestrator candidate-only: insight → prompt → AI → `content-patch-gate` → `content-promotion` → `adoptionReady` (hanya di level full + auto-adopt + evidence).
+- `fiezel-evolution-loop.js` — loop end-to-end (max 8 insight/siklus) + ledger.
+- **Core Worker 5.18.0**: endpoint `POST /api/evolution/config`, `GET /api/evolution/status`, `POST /api/content/self-refine` (owner-only, candidate-only, `gateStatus: UNVERIFIED_LOCAL_GATES_REQUIRED`, ledger hash-chain di KV, advisory hold). Library prompt di-embed agar worker self-contained; parity dengan file JSON diverifikasi test.
+- Konfigurasi owner: `fiezel-autonomy-config.example.json` (template). File live `fiezel-autonomy-config.json` di-gitignore.
+
+Evidence: 98/98 assertion modul baru + contract test evolution endpoints PASS.
+
+## App-update notification
+
+Saat build baru tiba di perangkat user (PWA yang sudah terpasang), FIEZEL memberi tahu sekali per versi:
+
+- Toast in-app `FIEZEL telah diperbarui ke v5.18.0` pada pembukaan pertama versi baru.
+- Jika izin notifikasi sudah granted, sistem juga menampilkan notifikasi `FIEZEL diperbarui`.
+- Tidak berulang untuk versi yang sama (`fiezel.seenAppVersion`).

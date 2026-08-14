@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#57a8df">
-  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, dan tes diagnostik CEFR.">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="./manifest.json">
@@ -12,6 +12,7 @@
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <title>FIEZEL | Adaptive English</title>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
 </head>
 <body class="scene-day">
   <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
@@ -69,6 +70,13 @@
   <script src="./content-canary.js"></script>
   <script src="./content-promotion.js"></script>
   <script src="./content-canary-config.js"></script>
+  <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
+  <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+  <script src="./features/neural-voice/fiezel-neural-voice.js"></script>
+  <script src="./features/neural-voice/fiezel-web-audio-player.js"></script>
+  <script src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
+  <script src="./features/speaking-listening/speaking-listening-config.js"></script>
+  <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

@@ -13,6 +13,9 @@ check(/id="answerBurst"/.test(html)&&/\.answer-burst/.test(css)&&/circle-check-b
 check(/function startSoundtrack/.test(app)&&/playAmbientChord/.test(app)&&/visibilitychange/.test(app),'Persistent soundtrack lifecycle missing');
 check(/document\.startViewTransition/.test(app)&&/\.reduce-motion \*/.test(css),'Motion system or reduced-motion control missing');
 check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.test(css),'Premium launcher surface missing');
+check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
+check(/prepareNeuralVoice/.test(app)&&/FiezelVoiceRuntime\.speak/.test(app)&&/Siapkan suara offline/.test(app),'Explicit local neural voice opt-in or runtime routing missing');
+check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
 check(/requestRequiredNotificationPermission/.test(app)&&/notificationPermission\(\)/.test(app)&&/notification-locked/.test(css)&&/id="notificationGateButton"/.test(html),'Mandatory notification permission gate missing');
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');

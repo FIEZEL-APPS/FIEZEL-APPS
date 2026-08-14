@@ -1,0 +1,44 @@
+'use strict';
+const assert=require('assert');
+const fs=require('fs');
+const path=require('path');
+const crypto=require('crypto');
+const child=require('child_process');
+const root=__dirname;
+const feature=path.join(root,'features','speaking-listening');
+const runtime=require(path.join(feature,'fiezel-speaking-listening-addon.js'));
+const listening=JSON.parse(fs.readFileSync(path.join(feature,'listening-bank-v1.json'),'utf8'));
+const speaking=JSON.parse(fs.readFileSync(path.join(feature,'speaking-bank-v1.json'),'utf8'));
+const runtimeText=fs.readFileSync(path.join(feature,'fiezel-speaking-listening-addon.js'),'utf8');
+let pass=0;
+function test(name,fn){fn();pass++;console.log('PASS',name)}
+function hash(file){return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}
+const levels=['A1','A2','B1','B2','C1','C2'];
+const voices=['af_nicole','am_michael','bf_emma','bm_george'];
+
+test('runtime schema',()=>assert.equal(runtime.schema,'fiezel-speaking-listening-addon-v1'));
+test('listening bank reviewed v2 seed',()=>assert.deepStrictEqual([listening.schema,listening.version,listening.status,listening.count],['fiezel-listening-bank-v1',2,'reviewed_release_seed',36]));
+test('speaking bank reviewed v2 seed',()=>assert.deepStrictEqual([speaking.schema,speaking.version,speaking.status,speaking.count],['fiezel-speaking-bank-v1',2,'reviewed_release_seed',36]));
+test('all IDs unique',()=>assert.equal(new Set([...listening.items,...speaking.items].map(item=>item.id)).size,72));
+test('six items per level per domain',()=>{for(const level of levels){assert.equal(listening.items.filter(item=>item.level===level).length,6);assert.equal(speaking.items.filter(item=>item.level===level).length,6)}});
+test('two items per listening mode and level',()=>{for(const level of levels)for(const mode of ['gist','detail','dictation'])assert.equal(listening.items.filter(item=>item.level===level&&item.mode===mode).length,2)});
+test('two items per speaking mode and level',()=>{for(const level of levels)for(const mode of ['repeat_target','guided_response','roleplay'])assert.equal(speaking.items.filter(item=>item.level===level&&item.mode===mode).length,2)});
+test('listening voices use locked pool',()=>assert.ok(listening.items.every(item=>voices.includes(item.voice)&&item.audioProfile==='listening')));
+test('listening MCQ answer integrity',()=>assert.ok(listening.items.filter(item=>item.mode!=='dictation').every(item=>item.options.length===4&&new Set(item.options).size===4&&Number.isInteger(item.answerIndex)&&item.answerIndex>=0&&item.answerIndex<4)));
+test('dictation target integrity',()=>assert.ok(listening.items.filter(item=>item.mode==='dictation').every(item=>item.answerText===item.script&&item.scoring.metric==='token_f1')));
+test('raw listening response persistence forbidden',()=>assert.ok(listening.items.every(item=>item.privacy.rawLearnerResponseRequiredForPersistence===false)));
+test('repeat targets use token F1',()=>assert.ok(speaking.items.filter(item=>item.mode==='repeat_target').every(item=>item.targetText&&item.scoring.metric==='token_f1')));
+test('open speaking items use concept groups',()=>assert.ok(speaking.items.filter(item=>item.mode!=='repeat_target').every(item=>item.scoring.metric==='target_concept_coverage'&&item.scoring.minimumWords>=4&&item.targetConcepts.length>=2&&item.targetConcepts.every(group=>Array.isArray(group)&&group.length))));
+test('all supplied speaking samples meet their own target',()=>{for(const item of speaking.items){const result=runtime.scoreSpeaking(item,item.sampleAnswer);assert.equal(result.passed,true,`${item.id} sample scored ${result.score}`)}});
+test('guided alternative phrasing is accepted',()=>assert.equal(runtime.scoreSpeaking(speaking.items.find(item=>item.id==='speak_0003'),'I love fried rice since it tastes good.').passed,true));
+test('roleplay alternative phrasing is accepted',()=>assert.equal(runtime.scoreSpeaking(speaking.items.find(item=>item.id==='speak_0011'),'Could you say that again, please?').passed,true));
+test('irrelevant short speech fails coverage',()=>assert.equal(runtime.scoreSpeaking(speaking.items.find(item=>item.id==='speak_0027'),'I do not know.').passed,false));
+test('speaking result disclaims pronunciation',()=>assert.ok(speaking.items.every(item=>runtime.scoreSpeaking(item,item.sampleAnswer).claim==='spoken_production_coverage_not_pronunciation')));
+test('automatic listening stays locked until audio succeeds',()=>assert.ok(runtimeText.includes('<fieldset class="fsl-work" data-work disabled>')&&runtimeText.includes("querySelector('[data-work]').disabled=false")));
+test('external TTS dependency is lifecycle checked',()=>assert.ok(runtimeText.includes("typeof this.options.tts.play==='function'")&&runtimeText.includes("typeof this.options.tts.stop==='function'")));
+test('canonical learner state is never referenced',()=>assert.ok(!runtimeText.includes('fiezel-v4-state')));
+test('raw transcript and audio persistence stay disabled',()=>{const cfg=runtime.__test.mergeConfig({persistRawAudio:true,persistRawTranscript:true});assert.equal(cfg.persistRawAudio,false);assert.equal(cfg.persistRawTranscript,false)});
+test('capability metadata is bounded and sanitized',()=>{const capabilityEvents={};for(let i=0;i<30;i++)capabilityEvents['capability-'+i]={status:'x'.repeat(100),at:Number.MAX_SAFE_INTEGER,raw:'forbidden'};const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[],capabilityEvents},120);assert.ok(Object.keys(clean.capabilityEvents).length<=12);assert.ok(Object.values(clean.capabilityEvents).every(value=>Object.keys(value).sort().join(',')==='at,status'&&value.status.length<=40))});
+test('state sanitizer strips raw media claims',()=>{const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[{domain:'speaking',itemId:'x',level:'B1',mode:'roleplay',score:88,passed:true,responseMs:1000,rawAudioStored:true,rawTranscriptStored:true,transcript:'secret'}]},120);assert.equal(clean.events[0].rawAudioStored,false);assert.equal(clean.events[0].rawTranscriptStored,false);assert.ok(!JSON.stringify(clean).includes('secret'))});
+test('data rebuild is idempotent',()=>{const files=[path.join(feature,'listening-bank-v1.json'),path.join(feature,'speaking-bank-v1.json')],before=files.map(hash);child.execFileSync(process.execPath,[path.join(root,'rebuild-speaking-listening-data.js')],{stdio:'ignore'});assert.deepStrictEqual(files.map(hash),before)});
+console.log(`FIEZEL Speaking + Listening: PASS ${pass}/0`);
