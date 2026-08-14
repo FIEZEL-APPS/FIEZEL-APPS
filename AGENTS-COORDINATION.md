@@ -48,10 +48,29 @@ satu unit kerja. Ini satu-satunya sumber kebenaran tentang siapa mengerjakan apa
 ## Peran
 
 - **Owner** (manusia): pengambil keputusan akhir; hanya memperhatikan.
-- **Coordinator**: memetakan tugas, memantau CI/ledger, menegakkan protokol.
-- **Implementer**: menulis/mengubah kode aplikasi.
-- **Verifier**: menjalankan test, memeriksa CI, memvalidasi klaim.
+- **Main Coordinator (Agent 5)**: menerima task user, menganalisis, membagi pekerjaan
+  ke worker pool (agent-1..4), meminta verifikasi ke verifier, menangani failure/
+  remediation loop, dan memberi final report. Satu-satunya yang mendelegasikan.
+- **Coordinator** (observer): memetakan tugas, memantau CI/ledger, menegakkan protokol.
+- **Implementer / Worker (agent-1..4)**: menulis/mengubah kode aplikasi dalam scope
+  yang didelegasikan Agent 5. Tidak boleh mendelegasikan ke agent lain (depth 1).
+- **Verifier**: menjalankan test, memeriksa CI, memvalidasi klaim (read-only).
 - **Observer**: memantau repo/CI/sesi dan melaporkan perubahan.
+
+## Orkestrasi (Agent 5 sebagai Main Coordinator)
+
+Hierarki tetap depth 1:
+
+```
+Agent 5 (Main Coordinator)
+├── worker pool: agent-1 .. agent-4   (implementasi dalam scope)
+└── verifier                          (verifikasi read-only, verdict VERIFIED/REFUTED/UNVERIFIED)
+```
+
+Alur: USER → Agent 5 → ANALYZE → PLAN → DELEGATE (worker) → TEST → VERIFIER →
+PASS/DONE atau FAIL → kembali ke WORKER → perbaikan → test → verifikasi ulang → DONE.
+Agent 5 tidak menyatakan selesai hanya karena worker melapor "done"; wajib ada
+verifikasi + bukti (test lokal/CI/evidence device).
 
 ## Area Kerja Saat Ini
 
@@ -63,4 +82,6 @@ satu unit kerja. Ini satu-satunya sumber kebenaran tentang siapa mengerjakan apa
 | SW / COI | sw.js | lihat ledger |
 | UI/UX voice | app.js | lihat ledger |
 
-Versi protokol ini: v1 (2026-08-14). Perubahan protokol hanya oleh Coordinator dengan persetujuan Owner.
+Versi protokol ini: v1.1 (2026-08-14). v1.1: Agent 5 ditetapkan sebagai Main Coordinator
+(worker pool agent-1..4 + verifier, depth 1); protokol squad v1 tetap berlaku. Perubahan
+protokol hanya oleh Coordinator dengan persetujuan Owner.
