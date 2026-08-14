@@ -2,23 +2,123 @@
   "protocol_version": "v1",
   "updated": "2026-08-14T19:51:00+07:00",
   "agents": [
-    { "id": "coordinator-1", "session": "ses_0034e69d3ffes3kjiFLNDzYXUZ", "role": "coordinator/observer", "directory": "Temp\\opencode\\FIEZEL-APPS-clone" },
-    { "id": "executor-1", "session": "ses_0027db319ffeiu7OrUF1qbWBH8", "role": "implementer (fix live)", "directory": "Temp\\opencode\\FIEZEL-APPS" },
-    { "id": "agent-1", "session": "ses_000325795ffePUB0VTxSfBE64V", "role": "squad (verifikasi produksi)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-1/deepseek-v4-flash-free" },
-    { "id": "agent-2", "session": "ses_000323295ffeEWAlY1ruQ0zNRr", "role": "squad (desain IndexedDB)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
-    { "id": "agent-3", "session": "ses_000321c1cffengK0Als7R81yNI", "role": "squad (audit T-005/T-006)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
-    { "id": "agent-4", "session": "ses_000320968ffe6hUykdumYrGPiS", "role": "squad (rekonsiliasi ledger)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
-    { "id": "agent-5", "session": "ses_00031f177ffen91yZn7TRaD6Gf", "role": "Main Coordinator / worker pool lead", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" },
-    { "id": "agent-6", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-1/deepseek-v4-flash-free" },
-    { "id": "agent-7", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
-    { "id": "agent-8", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
-    { "id": "agent-9", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
-    { "id": "agent-10", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" },
-    { "id": "agent-11", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-1/deepseek-v4-flash-free" },
-    { "id": "agent-12", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
-    { "id": "agent-13", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
-    { "id": "agent-14", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
-    { "id": "agent-15", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" }
+    {
+      "id": "coordinator-1",
+      "session": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
+      "role": "coordinator/observer",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone"
+    },
+    {
+      "id": "executor-1",
+      "session": "ses_0027db319ffeiu7OrUF1qbWBH8",
+      "role": "implementer (fix live)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS"
+    },
+    {
+      "id": "agent-1",
+      "session": "ses_000325795ffePUB0VTxSfBE64V",
+      "role": "squad (verifikasi produksi)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-2",
+      "session": "ses_000323295ffeEWAlY1ruQ0zNRr",
+      "role": "squad (desain IndexedDB)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-3",
+      "session": "ses_000321c1cffengK0Als7R81yNI",
+      "role": "squad (audit T-005/T-006)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-4",
+      "session": "ses_000320968ffe6hUykdumYrGPiS",
+      "role": "squad (rekonsiliasi ledger)",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-5",
+      "session": "ses_00031f177ffen91yZn7TRaD6Gf",
+      "role": "Main Coordinator / worker pool lead",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-6",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-7",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-8",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-9",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-10",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-11",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-1/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-12",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-2/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-13",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-3/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-14",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-4/deepseek-v4-flash-free"
+    },
+    {
+      "id": "agent-15",
+      "session": "tbd",
+      "role": "worker",
+      "directory": "Temp\\opencode\\FIEZEL-APPS-clone",
+      "model": "zen-agent-5/deepseek-v4-flash-free"
+    }
   ],
   "tasks": [
     {
@@ -135,6 +235,14 @@
       "owner": "agent-5",
       "evidence": "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format §3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
       "note": "Dokumen owner disalin verbatim; tidak ada perubahan source FIEZEL; verifier menemukan & dikoreksi inkonsistensi header (v1 -> v1.2)"
+    },
+    {
+      "id": "T-016",
+      "title": "coordinator-1 jadi task-giver pool (instruksi owner 20:34)",
+      "status": "done",
+      "owner": "owner",
+      "evidence": "Instruksi verbal owner: 'aku ingin kamu yang memberi tugas kepada mereka, berupa fix dan lain lain' setelah scan 'Reconfigurasi Orchestration FIEZEL' selesai. coordinator-1 (sesi ses_0034e69d) berwenang menugaskan agent-1..15 dengan format scope-lock (protokol v1.2).",
+      "note": "coordinator-1 juga memverifikasi pertanyaan terbuka scan (lihat Temp\\opencode\\coordinator-1-findings.md): (1) fix 0094db0 = 7cbf183 + 2417549; (2) fa2ecbc == 4685d94 (diff kosong, cherry-pick CONFIRMED); (3) branch berbahaya jika di-merge: neural-voice-coi-repair-20260814, ios-neural-voice-5.19.1, derive-adoption-target-version (index.html kehilangan ios-cache-fix.js + audibility-fix.js)."
     }
   ],
   "last_report": {
@@ -143,12 +251,61 @@
     "summary": "INTEGRASI PROTOKOL PELENGKAP (M-015/T-015): FIEZEL-Orkestrasi-Protokol-Pelengkap.md (dari owner, verbatim, 267 baris) di root repo; AGENTS-COORDINATION.md v1.2 (header dikoreksi, rujukan wajib 4 titik kontrol); verifier.md runtime kini wajib checklist 6 poin (DIFF/EVIDENCE/OBJECTIVE/REGRESSION/FORBIDDEN/CI) + output VERIFIED/REFUTED/UNVERIFIED; prompt agent-5 = scope-lock + context-injection + kriteria selesai §4; prompt agent-1..4 & squad-member = tolak task tanpa scope-lock, patuh files_allowed, larang 'sekalian dibenerin'. Validasi runtime: TEST A verifier (checklist 6 poin, VERIFIED, format §3) + TEST B worker agent-2 (scope-lock dipatuhi, read-only) — keduanya via Task tool. NEXT: tugas user berikutnya (retest iPhone T-013/T-006, lalu T-007) berjalan dengan protokol pelengkap aktif."
   },
   "missions": [
-    { "id": "M-009", "task_ref": "T-009", "agent": "agent-1", "status": "done", "title": "Verifikasi T-008 di produksi (Pages live)", "note": "TERBUKTI LIVE: app.js produksi identik hash dengan HEAD; flag default off ada" },
-    { "id": "M-010", "task_ref": "T-010", "agent": "agent-2", "status": "done", "title": "Desain migrasi IndexedDB (prep T-007)", "note": "baa804e: analysis/idb-migration-design.md, 4 fase, StorageBackend IDB + fallback CacheStorage" },
-    { "id": "M-011", "task_ref": "T-011", "agent": "agent-3", "status": "done", "title": "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD", "note": "Hipotesis konfirm; instruksi ekstraksi via Mac Web Inspector + bookmarklet tanpa Mac; bukti Website Data" },
-    { "id": "M-012", "task_ref": "T-012", "agent": "agent-4", "status": "done", "title": "Rekonsiliasi ledger vs git/CI realita", "note": "11 hash OK; koreksi evidence T-008 diterapkan; CI run terverifikasi via GitHub API" },
-    { "id": "M-013", "task_ref": "T-013", "agent": "agent-5", "status": "done", "title": "Checklist retest owner di iPhone", "note": "09518cd: analysis/device-retest-checklist.md; QG SUCCESS 31793320647" },
-    { "id": "M-014", "task_ref": "T-014", "agent": "agent-5", "status": "done", "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator", "note": "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -> agent-5; protokol v1.1" },
-    { "id": "M-015", "task_ref": "T-015", "agent": "agent-5", "status": "done", "title": "Integrasi Protokol Pelengkap ke sistem orchestration", "note": "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)" }
+    {
+      "id": "M-009",
+      "task_ref": "T-009",
+      "agent": "agent-1",
+      "status": "done",
+      "title": "Verifikasi T-008 di produksi (Pages live)",
+      "note": "TERBUKTI LIVE: app.js produksi identik hash dengan HEAD; flag default off ada"
+    },
+    {
+      "id": "M-010",
+      "task_ref": "T-010",
+      "agent": "agent-2",
+      "status": "done",
+      "title": "Desain migrasi IndexedDB (prep T-007)",
+      "note": "baa804e: analysis/idb-migration-design.md, 4 fase, StorageBackend IDB + fallback CacheStorage"
+    },
+    {
+      "id": "M-011",
+      "task_ref": "T-011",
+      "agent": "agent-3",
+      "status": "done",
+      "title": "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD",
+      "note": "Hipotesis konfirm; instruksi ekstraksi via Mac Web Inspector + bookmarklet tanpa Mac; bukti Website Data"
+    },
+    {
+      "id": "M-012",
+      "task_ref": "T-012",
+      "agent": "agent-4",
+      "status": "done",
+      "title": "Rekonsiliasi ledger vs git/CI realita",
+      "note": "11 hash OK; koreksi evidence T-008 diterapkan; CI run terverifikasi via GitHub API"
+    },
+    {
+      "id": "M-013",
+      "task_ref": "T-013",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Checklist retest owner di iPhone",
+      "note": "09518cd: analysis/device-retest-checklist.md; QG SUCCESS 31793320647"
+    },
+    {
+      "id": "M-014",
+      "task_ref": "T-014",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator",
+      "note": "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -> agent-5; protokol v1.1"
+    },
+    {
+      "id": "M-015",
+      "task_ref": "T-015",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Integrasi Protokol Pelengkap ke sistem orchestration",
+      "note": "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)"
+    }
   ]
 }
