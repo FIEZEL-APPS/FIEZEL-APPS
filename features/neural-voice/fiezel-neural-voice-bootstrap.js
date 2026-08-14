@@ -10,6 +10,9 @@
   const LARGE_ASSET_STREAM_THRESHOLD=8*1024*1024;
   const STORAGE_RESERVE_BYTES=24*1024*1024;
   const DOWNLOAD_ATTEMPTS=2;
+  const NEURAL_TTS_TIMEOUT_MS=20000;
+  const BROWSER_TTS_TIMEOUT_MS=12000;
+  const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
   const assets=Object.freeze([
     {path:'vendor/kokoro-js/kokoro.web.js',bytes:2135645},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',bytes:44484},
@@ -26,7 +29,7 @@
     {path:'vendor/kokoro-model/voices/bm_george.bin',bytes:522240}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
-  let phase='idle',lastError='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,verifiedForSession=false,lastStorageEstimate=null;
+  let phase='idle',lastError='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared;
 
   function readStatus(){
     try{
@@ -41,9 +44,18 @@
     return value;
   }
   function preparedStorage(){return phase==='cached'||phase==='ready'?(storage||readStatus().storage):''}
+  async function refreshPreparedFlag(){
+    if(readStatus().prepared){preparedFlag=true;return true}
+    if(!('caches'in root)){preparedFlag=false;return false}
+    try{
+      const cache=await caches.open(cacheName);
+      if(await cache.match(absolute(PREPARED_MARKER_KEY))){preparedFlag=true;return true}
+    }catch{}
+    preparedFlag=false;return false;
+  }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,storageEstimate:lastStorageEstimate});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,storageEstimate:lastStorageEstimate});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -178,7 +190,9 @@
     }
     storage='cache';
     if(!(await verifyCachedAssets()))throw new Error('Offline voice cache verification failed');
-    writeStatus(true,'cache');verifiedForSession=true;phase='cached';emit({completed,completedBytes,current:'',storageEstimate:lastStorageEstimate},onProgress);return status();
+    writeStatus(true,'cache');preparedFlag=true;verifiedForSession=true;phase='cached';
+    try{await cache.put(absolute(PREPARED_MARKER_KEY),new Response('1',{headers:{'Content-Type':'text/plain'}}))}catch{}
+    emit({completed,completedBytes,current:'',storageEstimate:lastStorageEstimate},onProgress);return status();
   }
   async function initialize(){
     if(service)return service;
@@ -209,26 +223,42 @@
   }
   async function prepare(options={}){
     if(preparePromise)return preparePromise;
-    preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();return status()})().catch(error=>{phase='error';lastError=errorText(error);storage='';writeStatus(false);throw error}).finally(()=>{preparePromise=null});
+    preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();return status()})().catch(error=>{phase='error';lastError=errorText(error);storage='';preparedFlag=false;writeStatus(false);throw error}).finally(()=>{preparePromise=null});
     return preparePromise;
   }
   function browserSpeak(text,options={}){
     if(!root.speechSynthesis||!root.SpeechSynthesisUtterance)return Promise.reject(new Error('Browser TTS unavailable'));
-    root.speechSynthesis.cancel();
-    return new Promise((resolve,reject)=>{const utterance=new root.SpeechSynthesisUtterance(String(text||''));utterance.lang=options.lang||'en-US';utterance.rate=Number(options.speed||options.rate||.88);utterance.onend=()=>resolve({provider:'browser-speech-synthesis'});utterance.onerror=event=>reject(new Error(event?.error||'Browser TTS failed'));root.speechSynthesis.speak(utterance)});
+    return new Promise(resolve=>{
+      let done=false;
+      const finish=()=>{if(done)return;done=true;resolve({provider:'browser-speech-synthesis'})};
+      const utterance=new root.SpeechSynthesisUtterance(String(text||''));
+      utterance.lang=options.lang||'en-US';utterance.rate=Number(options.speed||options.rate||.88);
+      utterance.onend=finish;utterance.onerror=finish;
+      setTimeout(finish,BROWSER_TTS_TIMEOUT_MS);
+      setTimeout(()=>{if(done)return;try{root.speechSynthesis.speak(utterance)}catch{finish()}},60);
+    });
   }
   async function speak(text,options={}){
-    if(!readStatus().prepared)return browserSpeak(text,options);
+    if(!readStatus().prepared&&!preparedFlag)return browserSpeak(text,options);
     if(!verifiedForSession){
-      if(!(await verifyCachedAssets())){writeStatus(false);phase='idle';return browserSpeak(text,options)}
+      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return browserSpeak(text,options)}
       verifiedForSession=true;
     }
-    try{
+    const timeout=Symbol('fiezel-tts-timeout');
+    const neural=async()=>{
       const local=await initialize();
-      return await local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:true});
-    }catch(error){lastError=errorText(error);return browserSpeak(text,options)}
+      return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:true});
+    };
+    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
+    if(result===null||result===timeout){
+      lastError=result===timeout?'neural_tts_timeout':lastError;
+      try{service?.stop?.()}catch{}
+      return browserSpeak(text,options);
+    }
+    return result;
   }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
 
-  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,speak,stop,verifyCachedAssets,storageEstimate:()=>storageEstimate(false),assets:()=>assets.map(item=>({...item})),totalBytes});
+  if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag();
+  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),assets:()=>assets.map(item=>({...item})),totalBytes});
 })(typeof globalThis!=='undefined'?globalThis:this);
