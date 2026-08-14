@@ -69,7 +69,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   }
   const moduleStub={KokoroTTS:{from_pretrained:async()=>({generate:async()=>({data:new Float32Array([0]),sampling_rate:24000}),voices:{}})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
   function makeContext(caches,fetchFn,navigatorStorage){
-    const ctx={console,FIEZEL_VERSION:'5.19.0',location:{href:'http://localhost/'},document:{currentScript:{src:'http://localhost/features/neural-voice/fiezel-neural-voice-bootstrap.js'}},isSecureContext:true,localStorage,caches,fetch:fetchFn,Response:function(buffer,options){this.buffer=buffer;this.headers={get:n=>{const h=options?.headers||{};return h[n]||h[String(n).toLowerCase()]||h['Content-Length']||null}}},CustomEvent:function(type){this.type=type},dispatchEvent(){},navigator:{storage:navigatorStorage},__fiezelDynamicImport:async()=>moduleStub,FiezelNeuralVoiceConfig:config,FiezelKokoroAdapter:adapterApi,FiezelNeuralVoice:core,FiezelWebAudioPlayer:player,URL,Promise,setTimeout:(fn)=>{fn();return 0}};
+    const ctx={console,FIEZEL_VERSION:'5.19.0',location:{href:'http://localhost/'},document:{currentScript:{src:'http://localhost/features/neural-voice/fiezel-neural-voice-bootstrap.js'}},isSecureContext:true,localStorage,caches,fetch:fetchFn,Response:function(buffer,options){this.buffer=buffer;this.headers={get:n=>{const h=options?.headers||{};return h[n]||h[String(n).toLowerCase()]||h['Content-Length']||null}}},CustomEvent:function(type){this.type=type},dispatchEvent(){},navigator:{storage:navigatorStorage},__fiezelDynamicImport:async()=>moduleStub,FiezelNeuralVoiceConfig:config,FiezelKokoroAdapter:adapterApi,FiezelNeuralVoice:core,FiezelWebAudioPlayer:player,URL,Promise,setTimeout,clearTimeout};
     return ctx;
   }
 
@@ -110,10 +110,33 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     const ctx=makeContext(caches,fetchFn,storage);
     ctx.__fiezelDynamicImport=async()=>hangStub;
     ctx.speechSynthesis={speak(){}};ctx.SpeechSynthesisUtterance=function(){};
+    ctx.FIEZEL_TTS_TIMEOUT_MS=60;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;ctx.FIEZEL_INIT_TIMEOUT_MS=50;
     vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-speak-timeout.js'});
     const result=await ctx.FiezelVoiceRuntime.speak('hello world');
     assert.equal(result.provider,'browser-speech-synthesis');
     assert.match(ctx.FiezelVoiceRuntime.status().error,/timed out|timeout/);
+  });
+
+  await test('prepare rejects on init timeout, keeps prepared state, and retry skips re-download',async()=>{
+    const vm=require('vm');
+    const caches=makeCaches();const fetchFn=makeFetch();
+    const storage={estimate:async()=>({usage:0,quota:1024*1024*1024}),persisted:async()=>true,persist:async()=>true};
+    const hangStub={KokoroTTS:{from_pretrained:async()=>new Promise(()=>{})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
+    const ctx=makeContext(caches,fetchFn,storage);
+    ctx.__fiezelDynamicImport=async()=>hangStub;
+    ctx.FIEZEL_INIT_TIMEOUT_MS=80;ctx.FIEZEL_TTS_TIMEOUT_MS=60;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;
+    vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-init-timeout.js'});
+    let firstRejected=false;
+    try{await ctx.FiezelVoiceRuntime.prepare()}catch(error){firstRejected=true;assert.match(String(error?.message||error),/timed out|timeout/)}
+    assert.equal(firstRejected,true);
+    const afterFirst=ctx.FiezelVoiceRuntime.status();
+    assert.equal(afterFirst.prepared,true,'prepared must survive init failure when assets are cached');
+    assert.equal(afterFirst.assetsCached,true);assert.equal(afterFirst.storage,'cache');
+    const callsAfterFirst=fetchFn.calls.length;
+    let secondRejected=false;
+    try{await ctx.FiezelVoiceRuntime.prepare()}catch{secondRejected=true}
+    assert.equal(secondRejected,true);
+    assert.equal(fetchFn.calls.length,callsAfterFirst,'retry must not re-download valid cached assets');
   });
 
   await test('cache marker keeps prepared state when localStorage is cleared',async()=>{
