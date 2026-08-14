@@ -44,7 +44,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('production claim remains false pending device gates',()=>assert.deepStrictEqual([lock.promotion.sourceAndAssetClosure,lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS','PENDING',false]));
   const bundle=await import('./vendor/kokoro-js/kokoro.web.js');
   await test('browser bundle exports patched controls',()=>assert.ok(bundle.KokoroTTS&&bundle.env&&bundle.setVoiceDataUrl&&'allowRemoteModels'in bundle.env&&'allowLocalModels'in bundle.env&&'localModelPath'in bundle.env&&'wasmPaths'in bundle.env));
-  await test('bootstrap streams large assets instead of buffering the model',()=>assert.ok(bootstrap.includes('LARGE_ASSET_STREAM_THRESHOLD')&&bootstrap.includes('await cache.put(url,fetched)')&&bootstrap.includes('await fetched.arrayBuffer()')));
+  await test('bootstrap streams large assets instead of buffering the model',()=>assert.ok(bootstrap.includes('LARGE_ASSET_STREAM_THRESHOLD')&&bootstrap.includes('new Response(fetched.body')&&bootstrap.includes('await fetched.arrayBuffer()')));
   await test('bootstrap does not claim a memory-only offline install',()=>assert.ok(!bootstrap.includes('memoryAssets')&&!bootstrap.includes("storage=usedMemory?'memory':'cache'")));
   await test('bootstrap uses Storage API preflight when available',()=>assert.ok(bootstrap.includes("manager.estimate")&&bootstrap.includes("manager.persist")&&bootstrap.includes('storage_insufficient')));
 
