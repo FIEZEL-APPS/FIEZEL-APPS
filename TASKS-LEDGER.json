@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1",
-  "updated": "2026-08-14T19:35:00+07:00",
+  "updated": "2026-08-14T19:51:00+07:00",
   "agents": [
     { "id": "coordinator-1", "session": "ses_0034e69d3ffes3kjiFLNDzYXUZ", "role": "coordinator/observer", "directory": "Temp\\opencode\\FIEZEL-APPS-clone" },
     { "id": "executor-1", "session": "ses_0027db319ffeiu7OrUF1qbWBH8", "role": "implementer (fix live)", "directory": "Temp\\opencode\\FIEZEL-APPS" },
@@ -117,12 +117,20 @@
       "owner": "agent-5",
       "evidence": "M-014: global opencode.jsonc (agent-5 Main Coordinator + agent-1..4 worker pool), agent/verifier.md + agent/squad-member.md, command/squad.md (agent build->agent-5), fiezel-analysis/opencode.json (default_agent=agent-5, subagent_depth=1), .opencode/agents vestigial dipindah ke Temp\\opencode\\FIEZEL-ORCH-BACKUP-20260814; AGENTS-COORDINATION.md v1.1; TEST 3 worker + TEST 4 verifier + TEST 5 failure-loop dijalankan via Task tool",
       "note": "Hanya konfigurasi orchestration yang diubah; tidak ada file source FIEZEL yang disentuh; backup lengkap sebelum perubahan"
+    },
+    {
+      "id": "T-015",
+      "title": "Integrasi FIEZEL-Orkestrasi-Protokol-Pelengkap (scope-lock, context-injection, checklist verifier 6 poin, kriteria selesai)",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "M-015: FIEZEL-Orkestrasi-Protokol-Pelengkap.md (267 baris, verbatim dari owner) di root repo; AGENTS-COORDINATION.md v1.2; verifier.md runtime = checklist 6 poin wajib; prompt agent-5 + agent-1..4 + squad-member = enforcement scope-lock/context-injection; TEST A verifier checklist (VERIFIED, format §3) + TEST B worker scope-lock (done, patuh files_allowed) via Task tool",
+      "note": "Dokumen owner disalin verbatim; tidak ada perubahan source FIEZEL; verifier menemukan & dikoreksi inkonsistensi header (v1 -> v1.2)"
     }
   ],
   "last_report": {
     "by": "agent-5 (Main Coordinator)",
-    "time": "2026-08-14T19:35:00+07:00",
-    "summary": "RECONFIGURASI ORCHESTRATION (M-014/T-014): Agent 5 kini Main Coordinator. Perubahan: global opencode.jsonc (agent-5 = Main Coordinator, agent-1..4 = worker pool, model/provider tidak diubah), agent/verifier.md (read-only, verdict VERIFIED/REFUTED/UNVERIFIED), agent/squad-member.md, command/squad.md (agent build->agent-5), fiezel-analysis/opencode.json (default_agent=agent-5, subagent_depth=1), sistem duplikat .opencode/agents (orchestrator/analyst/developer/reviewer/tester) dipindah ke FIEZEL-ORCH-BACKUP-20260814 karena tidak terdaftar di runtime; AGENTS-COORDINATION.md v1.1. Validasi runtime: TEST 3 (delegasi worker), TEST 4 (verifier), TEST 5 (failure loop) via Task tool. Tugas user berikutnya (retest iPhone T-013/T-006, lalu T-007) tetap berjalan di bawah koordinasi Agent 5."
+    "time": "2026-08-14T19:51:00+07:00",
+    "summary": "INTEGRASI PROTOKOL PELENGKAP (M-015/T-015): FIEZEL-Orkestrasi-Protokol-Pelengkap.md (dari owner, verbatim, 267 baris) di root repo; AGENTS-COORDINATION.md v1.2 (header dikoreksi, rujukan wajib 4 titik kontrol); verifier.md runtime kini wajib checklist 6 poin (DIFF/EVIDENCE/OBJECTIVE/REGRESSION/FORBIDDEN/CI) + output VERIFIED/REFUTED/UNVERIFIED; prompt agent-5 = scope-lock + context-injection + kriteria selesai §4; prompt agent-1..4 & squad-member = tolak task tanpa scope-lock, patuh files_allowed, larang 'sekalian dibenerin'. Validasi runtime: TEST A verifier (checklist 6 poin, VERIFIED, format §3) + TEST B worker agent-2 (scope-lock dipatuhi, read-only) — keduanya via Task tool. NEXT: tugas user berikutnya (retest iPhone T-013/T-006, lalu T-007) berjalan dengan protokol pelengkap aktif."
   },
   "missions": [
     { "id": "M-009", "task_ref": "T-009", "agent": "agent-1", "status": "done", "title": "Verifikasi T-008 di produksi (Pages live)", "note": "TERBUKTI LIVE: app.js produksi identik hash dengan HEAD; flag default off ada" },
@@ -130,6 +138,7 @@
     { "id": "M-011", "task_ref": "T-011", "agent": "agent-3", "status": "done", "title": "Audit kesiapan T-006 + re-verifikasi hipotesis T-005 di HEAD", "note": "Hipotesis konfirm; instruksi ekstraksi via Mac Web Inspector + bookmarklet tanpa Mac; bukti Website Data" },
     { "id": "M-012", "task_ref": "T-012", "agent": "agent-4", "status": "done", "title": "Rekonsiliasi ledger vs git/CI realita", "note": "11 hash OK; koreksi evidence T-008 diterapkan; CI run terverifikasi via GitHub API" },
     { "id": "M-013", "task_ref": "T-013", "agent": "agent-5", "status": "done", "title": "Checklist retest owner di iPhone", "note": "09518cd: analysis/device-retest-checklist.md; QG SUCCESS 31793320647" },
-    { "id": "M-014", "task_ref": "T-014", "agent": "agent-5", "status": "done", "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator", "note": "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -> agent-5; protokol v1.1" }
+    { "id": "M-014", "task_ref": "T-014", "agent": "agent-5", "status": "done", "title": "Reconfigurasi orchestration: Agent 5 = Main Coordinator", "note": "Satu sistem orchestration bersih: worker pool agent-1..4 + verifier read-only di bawah Agent 5; sistem duplikat .opencode/agents dipindah ke backup; default_agent=agent-5; /squad -> agent-5; protokol v1.1" },
+    { "id": "M-015", "task_ref": "T-015", "agent": "agent-5", "status": "done", "title": "Integrasi Protokol Pelengkap ke sistem orchestration", "note": "Scope-lock + context-injection + checklist verifier 6 poin + kriteria selesai kini wajib di runtime (prompt agent-5/agent-1..4, verifier.md, squad-member.md); tervalidasi via Task tool (TEST A + TEST B)" }
   ]
 }
