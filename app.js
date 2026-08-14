@@ -1,5 +1,5 @@
 /* FIEZEL — local-first adaptive English engine */
-const APP_VERSION=self.FIEZEL_VERSION||'5.18.0';
+const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
 const USER_NAME='Jahran';
 const LEARNER_STAGE=Object.freeze({school:'SMA',gradeLabel:'kelas 1 SMA',semester:1,schoolYear:'2026/2027',nextYearGoal:'kelas 2',examGoal:'IELTS dan TOEFL'});
 const NOTIFICATION_REMINDER_INTERVAL_MS=30*60*1000;
@@ -382,7 +382,7 @@ async function load(){const root=document.baseURI;const get=async f=>{const r=aw
     G=buckets;
   }
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
-  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startWelcomeExperience()}
+  backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startWelcomeExperience();startUpdateWatcher()}
 function refreshIcons(){try{window.lucide?.createIcons({attrs:{'stroke-width':1.8,'aria-hidden':'true'}})}catch{}}
 function updateExperienceControls(){const b=$('soundtrackToggle');if(!b)return;const on=!!state.preferences?.soundtrack;b.setAttribute?.('aria-pressed',String(on));b.classList?.toggle('active',on);b.innerHTML=`<i data-lucide="${on?'volume-2':'volume-x'}"></i>`}
 function hexRgb(value){const hex=String(value).replace('#','');return{r:parseInt(hex.slice(0,2),16),g:parseInt(hex.slice(2,4),16),b:parseInt(hex.slice(4,6),16)}}
@@ -474,15 +474,37 @@ async function showStudyNotification(kind,body){
 }
 function notifyAppUpdateIfNew(){
   const KEY='fiezel.seenAppVersion';let seen='';try{seen=String(localStorage.getItem(KEY)||'')}catch{}
-  if(seen===APP_VERSION)return;
+  if(seen===APP_VERSION)return false;
   try{localStorage.setItem(KEY,APP_VERSION)}catch{}
-  const body=`FIEZEL v${APP_VERSION} sudah terpasang dan siap dipakai.`;
-  showToast(`FIEZEL telah diperbarui ke v${APP_VERSION}.`);
-  if(notificationPermission()==='granted'){
-    const options={body,tag:'fiezel-app-updated',renotify:false,icon:'./apple-touch-icon.png',badge:'./favicon-64.png',data:{url:'./'}};
-    try{if(navigator?.serviceWorker?.ready){navigator.serviceWorker.ready.then(reg=>reg.showNotification('FIEZEL diperbarui',options)).catch(()=>{try{new Notification('FIEZEL diperbarui',options)}catch{}})}else new Notification('FIEZEL diperbarui',options)}catch{}
-  }
   return true
+}
+const FIEZEL_UPDATE_CHECK_MS=30*60*1000;
+let updateWatcherStarted=false,updateReloadBound=false;
+async function fetchRemoteVersion(){
+  try{const r=await fetch('./VERSION.json',{cache:'no-store'});if(!r.ok)return '';const v=await r.json();return String(v?.version||'')}catch{return ''}
+}
+function applySilentUpdate(){
+  try{
+    if(typeof navigator?.serviceWorker?.getRegistration!=='function')return;
+    if(!updateReloadBound){updateReloadBound=true;navigator.serviceWorker.addEventListener('controllerchange',()=>{try{if(sessionStorage.getItem('fiezel-apply-update')==='1'){sessionStorage.removeItem('fiezel-apply-update');location.reload()}}catch{}})}
+    navigator.serviceWorker.getRegistration().then(reg=>{if(!reg)return;try{sessionStorage.setItem('fiezel-apply-update','1')}catch{}reg.update().catch(()=>{try{sessionStorage.removeItem('fiezel-apply-update')}catch{}})}).catch(()=>{})
+  }catch{}
+}
+async function checkForSilentUpdate(force=false){
+  if(!force&&typeof navigator.onLine==='boolean'&&!navigator.onLine)return false;
+  const remote=await fetchRemoteVersion();
+  if(!remote||remote===APP_VERSION)return false;
+  applySilentUpdate();return true
+}
+function startUpdateWatcher(){
+  if(updateWatcherStarted||typeof navigator?.serviceWorker==='undefined')return;
+  updateWatcherStarted=true;
+  checkForSilentUpdate(true);
+  const t=setInterval(()=>checkForSilentUpdate(),FIEZEL_UPDATE_CHECK_MS);t?.unref?.();
+  document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible')checkForSilentUpdate()});
+  if(typeof navigator.permissions?.query==='function'){
+    navigator.permissions.query({name:'periodic-background-sync'}).then(status=>{if(status?.state==='granted'&&typeof navigator.serviceWorker.getRegistration==='function'){navigator.serviceWorker.getRegistration().then(reg=>{reg?.periodicSync?.register?.('fiezel-update-check',{minInterval:6*60*60*1000}).catch(()=>{})}).catch(()=>{})}}).catch(()=>{})
+  }
 }
 function buildALRSContext(now=Date.now()){
   const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),today:studyDayKey(now),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}

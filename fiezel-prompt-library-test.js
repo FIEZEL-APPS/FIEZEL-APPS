@@ -1,6 +1,8 @@
 const path=require('path');
+const fs=require('fs');
 const {validateLibrary,renderPrompt,loadLibrary}=require('./fiezel-prompt-library.js');
 const LIB=loadLibrary(path.join(__dirname,'fiezel-prompt-library.json'));
+const expectedVersion=JSON.parse(fs.readFileSync(path.join(__dirname,'VERSION.json'),'utf8')).version;
 let pass=0,fail=0;
 function check(name,ok,details){if(ok){pass++}else{fail++;console.error(`FAIL ${name}: ${details}`)}}
 {
@@ -8,7 +10,7 @@ function check(name,ok,details){if(ok){pass++}else{fail++;console.error(`FAIL ${
   const v=validateLibrary(LIB);
   check('library valid',v.ok,JSON.stringify(v.errors));
   check('all domains present',['grammar','vocabulary','reading','listening','speaking'].every(d=>LIB.prompts[d]),Object.keys(LIB.prompts).join(','));
-  check('schema pinned',LIB.schema==='fiezel-prompt-library-v1'&&LIB.version==='5.18.0',LIB.schema);
+  check('schema pinned',LIB.schema==='fiezel-prompt-library-v1'&&LIB.version===expectedVersion,LIB.schema);
 }
 {
   const r=renderPrompt(LIB,'vocabulary','expand_context',{word:'develop',cefr:'B1',example:'The app helps you develop new skills.'});

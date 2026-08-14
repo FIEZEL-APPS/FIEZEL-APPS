@@ -255,7 +255,7 @@ for(const [id,option,whyFails] of languageRepairs){
   distractor.whyFails=whyFails;
 }
 
-data.version='5.18.0';
+data.version=require('./VERSION.json').version;
 data.schemaVersion='2.0.0';
 data.practiceBlueprintVersion='focused-25-v1';
 data.count=data.templates.length;
