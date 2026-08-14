@@ -36,6 +36,8 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('voice service rejects empty input',()=>assert.throws(()=>core.normalizeText('',100),'empty'));
   await test('voice service bounds input',()=>assert.throws(()=>core.normalizeText('x'.repeat(101),100),'bounded'));
   await test('web audio accepts Kokoro Float32 payload',()=>assert.ok(player.pickSamples({data:new Float32Array([0,.1])}) instanceof Float32Array));
+  await test('player warm is safe without Web Audio API',()=>assert.equal(player.createPlayer({}).warm(),false));
+  await test('player warm creates and resumes a suspended context',()=>{let resumed=0;const env={AudioContext:function(){this.state='suspended';this.resume=()=>{resumed++;return Promise.resolve()}}};assert.equal(player.createPlayer(env).warm(),true);assert.equal(resumed,1)});
   await test('bootstrap uses dynamic same-origin vendor import',()=>assert.ok(bootstrap.includes("absolute('vendor/kokoro-js/kokoro.web.js')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
   await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)return browserSpeak")));
   await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf("writeStatus(true,'cache')")));
@@ -137,6 +139,25 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     try{await ctx.FiezelVoiceRuntime.prepare()}catch{secondRejected=true}
     assert.equal(secondRejected,true);
     assert.equal(fetchFn.calls.length,callsAfterFirst,'retry must not re-download valid cached assets');
+  });
+
+  await test('speak falls back fast after a failed init without re-attempting per item',async()=>{
+    const vm=require('vm');
+    const caches=makeCaches();const fetchFn=makeFetch();
+    const storage={estimate:async()=>({usage:0,quota:1024*1024*1024}),persisted:async()=>true,persist:async()=>true};
+    localStorageData['fiezel-neural-voice-v1']=JSON.stringify({schema:'fiezel-neural-voice-status-v1',version:'5.19.0',prepared:true,storage:'cache',preparedAt:0});
+    for(const [path,size] of fakeAssets)caches._store.set('http://localhost/'+path,{headers:{get:n=>String(n).toLowerCase()==='content-length'?String(size):null}});
+    const hangStub={KokoroTTS:{from_pretrained:async()=>new Promise(()=>{})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
+    const ctx=makeContext(caches,fetchFn,storage);
+    let imports=0;ctx.__fiezelDynamicImport=async()=>{imports++;return hangStub};
+    ctx.speechSynthesis={speak(){}};ctx.SpeechSynthesisUtterance=function(){};
+    ctx.FIEZEL_TTS_TIMEOUT_MS=60;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;ctx.FIEZEL_INIT_TIMEOUT_MS=50;
+    vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-fast-fallback.js'});
+    const first=await ctx.FiezelVoiceRuntime.speak('hello world');
+    assert.equal(first.provider,'browser-speech-synthesis');assert.equal(imports,1);
+    const second=await ctx.FiezelVoiceRuntime.speak('second item');
+    assert.equal(second.provider,'browser-speech-synthesis');
+    assert.equal(imports,1,'failed init must not be re-attempted on every speak');
   });
 
   await test('cache marker keeps prepared state when localStorage is cleared',async()=>{
