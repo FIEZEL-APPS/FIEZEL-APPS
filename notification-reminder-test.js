@@ -11,7 +11,7 @@ const notifications=[];const Notification=function(title,options){notifications.
 const fetch=async u=>{const file=String(u).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const noopTimer=()=>({unref(){}});
 const navigator={vibrate(){return true}};
-const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}}};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
+const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:true};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
 vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(async()=>{
   try{
