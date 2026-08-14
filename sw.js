@@ -1,6 +1,6 @@
 importScripts('./version.js');
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='neural-voice-coi-fix-20260814-1';
+const SW_REV='neural-voice-coi-fix-20260814-2';
 const COOP='same-origin';
 const COEP='require-corp';
 const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
@@ -15,8 +15,16 @@ function withIsolationHeaders(response){
   return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
 }
 
+async function refreshWindowClients(){
+  const list=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+  await Promise.all(list.map(client=>{
+    if(typeof client.navigate!=='function')return null;
+    return client.navigate(client.url).catch(()=>null);
+  }));
+}
+
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(shellRequests())).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()).then(refreshWindowClients)));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   if(new URL(e.request.url).pathname.toLowerCase().endsWith('/version.json')){
