@@ -10,7 +10,22 @@
   const absolute=path=>new URL(String(path).replace(/^\.\//,''),rootUrl).href;
   const WASM={path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019,mime:'application/wasm'};
   const MODEL={path:'vendor/kokoro-model/onnx/model_quantized.onnx',bytes:92361116};
+  // Regression fix: the original patch had no ceiling on how long priming
+  // could take. On a slow/stalled connection, fetch()/cache.add() for the
+  // 21MB WASM and 92MB model can hang indefinitely with zero feedback --
+  // this was reported as "Siapkan suara offline" getting stuck forever
+  // with the button never re-enabling. PRIME_TIMEOUT_MS caps that: if
+  // priming doesn't finish in time, we give up on the head-start and let
+  // the normal prepare()/warmAssets() flow (which already retries and
+  // surfaces errors to the UI) do the actual work instead.
+  const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||25000;
   let primePromise=null;
+
+  function withTimeout(promise,ms,label){
+    let timer=null;
+    const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(`${label}_timeout`)),ms)});
+    return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+  }
 
   function diag(entry){
     try{
@@ -82,7 +97,14 @@
   function prepare(options={}){
     if(primePromise)return primePromise;
     primePromise=(async()=>{
-      await primeLargeAssets();
+      try{
+        await withTimeout(primeLargeAssets(),PRIME_TIMEOUT_MS,'ios_prime');
+      }catch(error){
+        // Priming is a best-effort head start, not a requirement -- if it
+        // stalls or times out, fall through to the normal prepare() flow
+        // below instead of leaving the caller waiting forever.
+        diag({phase:'prime_timeout_or_error',error:String(error?.message||error)});
+      }
       return runtime.prepare(options);
     })().finally(()=>{primePromise=null});
     return primePromise;
