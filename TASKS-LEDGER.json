@@ -49,10 +49,10 @@
     {
       "id": "T-006",
       "title": "Baca diagnostics dari device (bukti emas)",
-      "status": "pending",
-      "owner": "unassigned",
+      "status": "blocked",
+      "owner": "owner",
       "evidence": "",
-      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Perlu instruksi ekstraksi yang jelas untuk owner"
+      "note": "localStorage key: fiezel-neural-voice-diagnostics-v1. Instruksi ekstraksi sudah diberikan ke owner. Tanpa ini, T-007 TIDAK boleh dikerjakan."
     },
     {
       "id": "T-007",
@@ -65,7 +65,7 @@
   ],
   "last_report": {
     "by": "coordinator-1",
-    "time": "2026-08-14T15:45:00+07:00",
-    "summary": "Protokol koordinasi v1 dibuat. Agent executor-1 aktif (terakhir: merge 42b4ebb voice UX + prewarm, CI SUCCESS). Langkah kritis berikutnya: dapatkan diagnostics dari device (T-006)."
+    "time": "2026-08-14T16:10:00+07:00",
+    "summary": "Verifier subagent (delegated live) mengkonfirmasi hipotesis T-005 pada HEAD c0e4061: (a) masih 100% CacheStorage tanpa IndexedDB [bootstrap:93, ios-cache-fix:93], (b) fetch no-store masih ada [bootstrap:175], (c) init timeout 20s masih ada [bootstrap:15,242-243]. Semua CONFIRMED. Rewrite 9871687 hanya UX (progress + prewarm) dan tidak mengubah mekanisme kegagalan. T-006 (diagnostics device) tetap satu-satunya gerbang bukti sebelum T-007 IndexedDB."
   }
 }
