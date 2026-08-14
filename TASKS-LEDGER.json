@@ -8,7 +8,17 @@
     { "id": "agent-2", "session": "ses_000323295ffeEWAlY1ruQ0zNRr", "role": "squad (desain IndexedDB)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
     { "id": "agent-3", "session": "ses_000321c1cffengK0Als7R81yNI", "role": "squad (audit T-005/T-006)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
     { "id": "agent-4", "session": "ses_000320968ffe6hUykdumYrGPiS", "role": "squad (rekonsiliasi ledger)", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
-    { "id": "agent-5", "session": "ses_00031f177ffen91yZn7TRaD6Gf", "role": "Main Coordinator / worker pool lead", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" }
+    { "id": "agent-5", "session": "ses_00031f177ffen91yZn7TRaD6Gf", "role": "Main Coordinator / worker pool lead", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" },
+    { "id": "agent-6", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-1/deepseek-v4-flash-free" },
+    { "id": "agent-7", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
+    { "id": "agent-8", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
+    { "id": "agent-9", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
+    { "id": "agent-10", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" },
+    { "id": "agent-11", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-1/deepseek-v4-flash-free" },
+    { "id": "agent-12", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-2/deepseek-v4-flash-free" },
+    { "id": "agent-13", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-3/deepseek-v4-flash-free" },
+    { "id": "agent-14", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-4/deepseek-v4-flash-free" },
+    { "id": "agent-15", "session": "tbd", "role": "worker", "directory": "Temp\\opencode\\FIEZEL-APPS-clone", "model": "zen-agent-5/deepseek-v4-flash-free" }
   ],
   "tasks": [
     {
