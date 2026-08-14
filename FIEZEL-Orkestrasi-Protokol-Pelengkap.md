@@ -118,7 +118,10 @@ root_cause_context:
     - "Menambah langkah caching baru tanpa timeout eksplisit"
   fix_applied_this_round: >
     sw.js sudah disuntik header COOP/COEP + pembungkusan CORP untuk
-    js.puter.com. ios-cache-fix.js sudah diberi timeout 25 detik.
+    js.puter.com. ios-cache-fix.js sudah diberi timeout 45 detik
+    (PRIME_TIMEOUT_MS = 45.000 ms; lihat fiezel-neural-voice-ios-cache-fix.js:21).
+    Catatan sinkronisasi M-017/T-019 (2026-08-14): teks sebelumnya menyebut
+    "25 detik" — dikoreksi agar selaras dengan kode (45.000 ms).
     STATUS: BELUM ADA KONFIRMASI TERUJI dari user di device asli.
 ```
 
