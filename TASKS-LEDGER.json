@@ -251,12 +251,36 @@
       "owner": "agent-5",
       "evidence": "M-016: 4 worker paralel (SCAN-NV-01..04) + verifier VERIFY-SCAN-001 (STATUS VERIFIED, checklist 6 poin, 5 gate neural lokal PASS, regresi PASS). Temuan: (1) prod == HEAD utk SEMUA file neural (sha256 penuh, model fbae9257.., wasm c46655e8..); (2) branch agent/ios-neural-voice-5.19.1 SUDAH penuh di main (git diff fa2ecbc..branch kosong) - JANGAN merge; (3) branch neural-voice-coi-repair-20260814: COI sudah ada di main (9045b34 + CORP wrapper js.puter.com), branch tanpa CORP + tanpa 2 script fix - JANGAN merge mentah, hanya adaptasi refreshWindowClients + cross-origin-isolation-test.js; (4) COI via SW hanya efektif load ke-2 (main tanpa client refresh); (5) timeout 20s hanya membungkus adapter.initialize, BUKAN fase download; blocker tetap quota (119.274.361B > CacheStorage iOS ~50MB) + no-store fetch; (6) quality.yml HEAD 35 script, 5 gate neural, 0 gate COI khusus",
       "note": "Tidak ada perubahan source; temuan selaras dgn verifikasi coordinator-1 (T-016). Path penyelesaian: T-006 diagnostics device (masih blocked) -> T-007 migrasi IndexedDB (desain siap T-010/baa804e)."
+    },
+    {
+      "id": "T-018",
+      "title": "Night-watch coordinator-1 atas sesi Reconfigurasi (M-016) + konfirmasi final",
+      "status": "done",
+      "owner": "coordinator-1",
+      "evidence": "coordinator-1 memantau ses_fffbfda0 (agent-5) 20:37-21:00 via nightwatch.py (polling DB): parent mengeluarkan FINAL REPORT M-016/T-017 (teks penuh 4684 char, 20:46) + verifier VERIFY-SCAN-001 retry VERIFIED 5/5 klaim; commit a7afce3 ter-push (log terverifikasi); git diff fa2ecbc..origin/agent/ios-neural-voice-5.19.1 = kosong (branch A sudah di main, DIKONFIRMASI ulang); branch --contains fa2ecbc menampilkan main. Ledger T-017/M-016 konsisten, clone bersih.",
+      "note": "Sesi Reconfigurasi SELESAI tuntas malam ini. Tidak ada regresi baru dari scan (read-only)."
+    },
+    {
+      "id": "T-019",
+      "title": "Sinkronisasi dokumentasi: PRIME_TIMEOUT_MS 45s vs '25 detik' + PRIME_TOTAL_BYTES + dead code storage==='memory'",
+      "status": "pending",
+      "owner": "agent-1 (via coordinator-1 M-017)",
+      "evidence": "",
+      "note": "Dari temuan M-016 'BELUM SELESAI' (inkonsistensi kecil): ios-cache-fix.js:21 PRIME_TIMEOUT_MS=45.000ms vs '25 detik' di Protokol Pelengkap; PRIME_TOTAL_BYTES +/-522.240B vs total manifest; dead code branch storage==='memory' app.js:585. LOW-RISK: dokumentasi/komentar saja, TIDAK mengubah perilaku runtime. Scope-lock protokol v1.2."
+    },
+    {
+      "id": "T-020",
+      "title": "Adopsi client-refresh COI + gate COI (adaptasi dari branch neural-voice-coi-repair) - branch baru, tanpa merge",
+      "status": "pending",
+      "owner": "agent-2 (via coordinator-1 M-018)",
+      "evidence": "",
+      "note": "Rekomendasi M-016: adopsi refreshWindowClients() + cross-origin-isolation-test.js + tambah gate COI di quality.yml (HEAD: 35 script, 0 gate COI). WAJIB: kerja di branch baru agent/coi-client-refresh-20260814, push, CI hijau, JANGAN merge ke main - keputusan merge menunggu owner (retest device). Menjaga CORP wrapper js.puter.com + 2 script fix (ios-cache-fix.js, audibility-fix.js). Status akhir wajib changed-not-tested."
     }
   ],
 "last_report": {
-    "by": "agent-5 (Main Coordinator)",
-    "time": "2026-08-14T21:02:00+07:00",
-    "summary": "SCAN GITHUB MENYELURUH (M-016/T-017): 4 worker paralel + verifier VERIFIED 5/5. Jawaban 'kenapa neural voice belum berfungsi': (1) blocker utama = quota — aset 119.274.361B (100% CacheStorage) vs quota CacheStorage iOS ~50MB, fetch klien no-store; timeout 20s BUKAN blocker download (hanya membungkus adapter.initialize); (2) COI (prasyarat WASM threaded) sudah di main via SW namun hanya efektif load ke-2 (main belum punya client refresh); (3) produksi == HEAD untuk SEMUA file neural (sha256 penuh, aset utuh, MIME benar); (4) branch ios-neural-voice-5.19.1 SUDAH di main (fa2ecbc) — jangan merge; branch neural-voice-coi-repair hanya layak diadaptasi (refreshWindowClients + gate COI), jangan merge mentah (hilang CORP wrapper + 2 script fix). Path penyelesaian: T-006 diagnostics device (blocked, menunggu owner) -> T-007 migrasi IndexedDB (desain siap). Rekomendasi lanjut ke owner: kirim diagnostics fiezel-neural-voice-diagnostics-v1; opsional adopsi client-refresh + gate COI."
+    "by": "coordinator-1 (task-giver, T-016) — konfirmasi M-016 agent-5",
+    "time": "2026-08-14T21:15:00+07:00",
+    "summary": "NIGHT-WATCH SELESAI: sesi Reconfigurasi (agent-5) tuntas — FINAL REPORT M-016/T-017 + verifier VERIFIED 5/5; a7afce3 ter-push; fa2ecbc..branch A diff kosong (sudah di main). Blocker neural voice = quota CacheStorage iOS (~50MB) vs 119.274.361B + no-store; timeout 20s BUKAN blocker (hanya bungkus adapter.initialize); COI hanya efektif load ke-2. Path: T-006 diagnostics device (blocked, menunggu owner) -> T-007 migrasi IndexedDB. MISI BARU dari task-giver: M-017/T-019 (agent-1, sinkronisasi dokumentasi, low-risk) + M-018/T-020 (agent-2, adopsi client-refresh COI + gate, branch baru TANPA merge, changed-not-tested)."
   },
   "missions": [
     {
@@ -322,6 +346,22 @@
       "status": "done",
       "title": "Scan GitHub menyeluruh masalah neural voice (4 worker paralel + verifier)",
       "note": "SCAN-NV-01 agent-1 (branch/CI/workflow), SCAN-NV-02 agent-2 (audit kode HEAD), SCAN-NV-03 agent-3 (deep-dive 2 branch belum-merge), SCAN-NV-04 agent-4 (audit produksi Pages + MIME + hash); verifier VERIFY-SCAN-001 VERIFIED 5/5 klaim (gate neural lokal PASS, regresi PASS, CI SUCCESS). Kesimpulan: blocker = quota CacheStorage iOS ~50MB vs 119.274.361B + no-store; COI hanya efektif load ke-2; branch A sudah di main, branch B butuh adaptasi; solusi tetap T-007 IndexedDB setelah T-006 diagnostics device."
+    },
+    {
+      "id": "M-017",
+      "task_ref": "T-019",
+      "agent": "agent-1",
+      "status": "pending",
+      "title": "Sinkronisasi dokumentasi inkonsistensi kecil (dari temuan M-016)",
+      "note": "Scope-lock: hanya dokumentasi/komentar (Protokol Pelengkap + catatan kode), TIDAK mengubah perilaku runtime. Target: done (verifikasi lokal penuh)."
+    },
+    {
+      "id": "M-018",
+      "task_ref": "T-020",
+      "agent": "agent-2",
+      "status": "pending",
+      "title": "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
+      "note": "Branch agent/coi-client-refresh-20260814, push + CI hijau, JANGAN merge; status akhir changed-not-tested (butuh retest device + keputusan owner)."
     }
   ]
 }
