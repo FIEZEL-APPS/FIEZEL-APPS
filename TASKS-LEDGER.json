@@ -61,6 +61,14 @@
       "owner": "unassigned",
       "evidence": "",
       "note": "Solusi paling mungkin untuk blocker 113MB. Jangan dikerjakan sebelum T-006 bukti masuk"
+    },
+    {
+      "id": "T-008",
+      "title": "Nonaktifkan gate notifikasi wajib saat masuk (Safari/PWA issue)",
+      "status": "in_progress",
+      "owner": "coordinator-1",
+      "evidence": "",
+      "note": "Owner: Safari tidak bisa requestPermission kecuali PWA terinstal. Desain: flag dinamis globalThis.FIEZEL_REQUIRE_NOTIFICATIONS (default false=off); re-enable = set true tanpa hapus kode. Implementer subagent dikirim; verifier menyusul; CI gate wajib hijau."
     }
   ],
   "last_report": {
