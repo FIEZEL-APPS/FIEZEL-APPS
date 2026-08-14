@@ -52,19 +52,21 @@
   }
 
   function createBrowserFallback(env) {
+    const BROWSER_FALLBACK_TIMEOUT_MS=12000;
     return {
       async speak(text, options) {
         if (!canUseSpeechSynthesis(env)) throw new Error('Browser TTS unavailable');
-        env.speechSynthesis.cancel();
-        await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+          let done = false;
+          const finish = () => { if (done) return; done = true; resolve({ provider: 'browser-speech-synthesis' }); };
           const u = new env.SpeechSynthesisUtterance(text);
           u.lang = options && options.lang ? options.lang : 'en-US';
           u.rate = options && typeof options.rate === 'number' ? options.rate : 1;
-          u.onend = resolve;
-          u.onerror = (e) => reject(new Error((e && e.error) || 'Browser TTS failed'));
-          env.speechSynthesis.speak(u);
+          u.onend = finish;
+          u.onerror = () => finish();
+          setTimeout(finish, BROWSER_FALLBACK_TIMEOUT_MS);
+          setTimeout(() => { if (done) return; try { env.speechSynthesis.speak(u); } catch (error) { reject(error); } }, 60);
         });
-        return { provider: 'browser-speech-synthesis' };
       },
       stop() {
         if (canUseSpeechSynthesis(env)) env.speechSynthesis.cancel();

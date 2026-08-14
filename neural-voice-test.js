@@ -37,7 +37,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('voice service bounds input',()=>assert.throws(()=>core.normalizeText('x'.repeat(101),100),'bounded'));
   await test('web audio accepts Kokoro Float32 payload',()=>assert.ok(player.pickSamples({data:new Float32Array([0,.1])}) instanceof Float32Array));
   await test('bootstrap uses dynamic same-origin vendor import',()=>assert.ok(bootstrap.includes("absolute('vendor/kokoro-js/kokoro.web.js')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
-  await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared)return browserSpeak")));
+  await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)return browserSpeak")));
   await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf("writeStatus(true,'cache')")));
   await test('stale prepared state fails closed to browser TTS',()=>assert.ok(bootstrap.includes('if(!(await verifyCachedAssets())){writeStatus(false)')));
   await test('bootstrap contains no vendor endpoint or credential',()=>assert.ok(!/https?:\/\//i.test(bootstrap)&&!/(?:api[_-]?key|bearer\s+[a-z0-9._-]{12,}|sk-[a-z0-9_-]{12,})/i.test(bootstrap)));
@@ -98,6 +98,34 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     const ctx=makeContext(caches,fetchFn,storage);vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-preflight.js'});
     let rejected=false;try{await ctx.FiezelVoiceRuntime.prepare()}catch(error){rejected=true;assert.match(String(error?.message||error),/Penyimpanan tidak cukup/)}
     assert.equal(rejected,true);assert.equal(fetchFn.calls.length,0,'preflight should fail before network download');
+  });
+
+  await test('speak falls back to browser TTS when the neural backend times out',async()=>{
+    const vm=require('vm');
+    const caches=makeCaches();const fetchFn=makeFetch();
+    const storage={estimate:async()=>({usage:0,quota:1024*1024*1024}),persisted:async()=>true,persist:async()=>true};
+    localStorageData['fiezel-neural-voice-v1']=JSON.stringify({schema:'fiezel-neural-voice-status-v1',version:'5.19.0',prepared:true,storage:'cache',preparedAt:0});
+    for(const [path,size] of fakeAssets)caches._store.set('http://localhost/'+path,{headers:{get:n=>String(n).toLowerCase()==='content-length'?String(size):null}});
+    const hangStub={KokoroTTS:{from_pretrained:async()=>new Promise(()=>{})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
+    const ctx=makeContext(caches,fetchFn,storage);
+    ctx.__fiezelDynamicImport=async()=>hangStub;
+    ctx.speechSynthesis={speak(){}};ctx.SpeechSynthesisUtterance=function(){};
+    vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-speak-timeout.js'});
+    const result=await ctx.FiezelVoiceRuntime.speak('hello world');
+    assert.equal(result.provider,'browser-speech-synthesis');
+    assert.match(ctx.FiezelVoiceRuntime.status().error,/timed out|timeout/);
+  });
+
+  await test('cache marker keeps prepared state when localStorage is cleared',async()=>{
+    const vm=require('vm');
+    const caches=makeCaches();const fetchFn=makeFetch();
+    const storage={estimate:async()=>({usage:0,quota:1024*1024*1024}),persisted:async()=>true,persist:async()=>true};
+    const ctx=makeContext(caches,fetchFn,storage);vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-marker.js'});
+    const prepared=await ctx.FiezelVoiceRuntime.prepare();
+    assert.equal(prepared.prepared,true);
+    delete localStorageData['fiezel-neural-voice-v1'];
+    await ctx.FiezelVoiceRuntime.refreshPreparedFlag();
+    assert.equal(ctx.FiezelVoiceRuntime.status().prepared,true);
   });
 
   console.log(`FIEZEL Neural Voice: PASS ${pass}/0`);
