@@ -54,4 +54,5 @@ jobs:
           node http-smoke-test.js
           node speaking-listening-test.js
           node neural-voice-test.js
+          node ios-wasm-module-test.js
           node neural-voice-http-test.js
