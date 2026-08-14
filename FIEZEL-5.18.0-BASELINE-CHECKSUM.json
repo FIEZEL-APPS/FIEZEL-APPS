@@ -1,0 +1,735 @@
+﻿{
+    "schema":  "fiezel-baseline-checksum-v1",
+    "version":  "5.18.0",
+    "source":  "FIEZEL-5.18.0-FULL (ZIP tree)",
+    "files":  145,
+    "totalBytes":  123050589,
+    "generatedAt":  "2026-08-13T20.55.08Z",
+    "entries":  [
+                    {
+                        "path":  ".github/workflows/configure-core.yml",
+                        "sha256":  "19D58A44D25370009837D425E770A50AFD717442B79397F06B2142AB3AEC3688",
+                        "bytes":  4008
+                    },
+                    {
+                        "path":  ".github/workflows/deploy-core-worker.yml",
+                        "sha256":  "F5CDDE62F40E40C96C475B70A919197096F093262B6A200E49517293D6AA5765",
+                        "bytes":  3705
+                    },
+                    {
+                        "path":  ".github/workflows/push-reminders.yml",
+                        "sha256":  "1403063CA572DA3C69F6048283F555CFE748A5B2A0F2DF38A53D78A285097FBF",
+                        "bytes":  1742
+                    },
+                    {
+                        "path":  ".github/workflows/quality.yml",
+                        "sha256":  "87682A4B855D08E356021244F8E00C1563F439103AF9BEC9D1AC931507CB6581",
+                        "bytes":  1867
+                    },
+                    {
+                        "path":  ".gitignore",
+                        "sha256":  "C56C49D6E988B24AB33527684D60BE9186B2202B3563EFE1297DFBC2F679482B",
+                        "bytes":  460
+                    },
+                    {
+                        "path":  "adaptive-policy-test.js",
+                        "sha256":  "C10D4B2180365F980C4B87B4A8DC7A84F9660657C637510D98EE9F3AFC3899E3",
+                        "bytes":  4654
+                    },
+                    {
+                        "path":  "ai-integration-test.js",
+                        "sha256":  "3E8D775B8860552109E984725A938E05BBDBBEC4531A1A1F97793F8282039CD0",
+                        "bytes":  6507
+                    },
+                    {
+                        "path":  "alrs-behavior-test.js",
+                        "sha256":  "6DC6BD0DCD369051FDBC95764A1CC6FFB3ABAE170BC883F4E2BBE47FFFD3640D",
+                        "bytes":  2672
+                    },
+                    {
+                        "path":  "app.js",
+                        "sha256":  "FF8067B69229F7BE06403299D50ED9D941A8912D78DCA3F8EBD06D177C57C775",
+                        "bytes":  174494
+                    },
+                    {
+                        "path":  "apple-touch-icon.png",
+                        "sha256":  "BCBEFC5BF2117D42BC6C09E61E26D8F4681CB6692664F40F21260385F7E6212F",
+                        "bytes":  1533
+                    },
+                    {
+                        "path":  "audit-harness.html",
+                        "sha256":  "C4698ED63412E05B0F207DEDE81196749B473BE672E434B793649607AB8F7E45",
+                        "bytes":  1678
+                    },
+                    {
+                        "path":  "AUDIT-REPORT.json",
+                        "sha256":  "998A73975398B269E4096012AECB3B414C1603A7BD6311EB03669AC876DAB0D2",
+                        "bytes":  723
+                    },
+                    {
+                        "path":  "content-adoption.js",
+                        "sha256":  "B84E94E376AA887AF243FBA9D4D0BA13E88A2E0A9BB042B583CAFFDE5A4D4E58",
+                        "bytes":  14189
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION.md",
+                        "sha256":  "EF68264537050DC52C8AD504CEBA58D993CBCE3A5ED1B720C5C98E5671C8EEFF",
+                        "bytes":  3464
+                    },
+                    {
+                        "path":  "content-adoption-evidence.js",
+                        "sha256":  "897BA7F3B19DA2F17D9EC93EF92EE009F0CF7774828813C68AA01E6EADC9EADF",
+                        "bytes":  10897
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION-EVIDENCE.md",
+                        "sha256":  "515EE1086ACCC130AF338FABD984C6D8A52E0ADDE1B8745D27E2AC624BA54C23",
+                        "bytes":  3128
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION-EVIDENCE-PROOF.json",
+                        "sha256":  "6B3F5099C9293C232D6533E56ED5A4D0CEE5C2DC04DB56AED01AD7129A3D44DA",
+                        "bytes":  546
+                    },
+                    {
+                        "path":  "content-adoption-evidence-test.js",
+                        "sha256":  "FEE92235CCFC7854ADA8F04768A78852FCE0D562F833DE7152FD99A2756B9CC0",
+                        "bytes":  5333
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION-PROOF.json",
+                        "sha256":  "520E083129D82EBDB2C6DF2CD0295D43DA6E1509C7988F4D4A3CC1894CA342CE",
+                        "bytes":  1822
+                    },
+                    {
+                        "path":  "content-adoption-rehearsal.js",
+                        "sha256":  "11DCCE2E819388AC290B6BCDCE5098563C92C542E5327FD923A339A317B9AA5E",
+                        "bytes":  3984
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION-REHEARSAL.md",
+                        "sha256":  "53786AA2A2B0ED8554D7AB34A903570DD7818525E59AA80F3C4CE383811DB59D",
+                        "bytes":  1082
+                    },
+                    {
+                        "path":  "CONTENT-ADOPTION-REHEARSAL-PROOF.json",
+                        "sha256":  "84E1DA31DC93C90F0E70683F43EF10A1BB697818BCB65E0D76CC278C0EBE7D82",
+                        "bytes":  532
+                    },
+                    {
+                        "path":  "content-adoption-rehearsal-test.js",
+                        "sha256":  "6DF326460E89D0B0D64C1947B23491635A6D662D6CBDB034EDF88D4DF3046B35",
+                        "bytes":  5800
+                    },
+                    {
+                        "path":  "content-adoption-test.js",
+                        "sha256":  "5144617B2A8916C4A53A3316045DAFA2C024E1575C1A710D0BF7AFD38CDF18AF",
+                        "bytes":  10643
+                    },
+                    {
+                        "path":  "content-audit.js",
+                        "sha256":  "43EC8C74AEF2A95B0D296D0F4647677EF5BC7AEC07F46BE3A322997C22FEF630",
+                        "bytes":  3338
+                    },
+                    {
+                        "path":  "content-canary.js",
+                        "sha256":  "2A466CB6F77DAE8895A6E50FB78CFCB6D2566057C48C34B1D29D83EB3C562F0C",
+                        "bytes":  15641
+                    },
+                    {
+                        "path":  "CONTENT-CANARY.md",
+                        "sha256":  "366C6BD5ADA7A34FB721E7CE57AFBD7F5B2CE40005319AF1712C853BEC79FA79",
+                        "bytes":  2313
+                    },
+                    {
+                        "path":  "content-canary-config.js",
+                        "sha256":  "7D41D11B3CE09C0112E96CAB5DA6CC2E90D9A965F3DECD76EB483EFFAD7D30C5",
+                        "bytes":  474
+                    },
+                    {
+                        "path":  "content-canary-config-builder.js",
+                        "sha256":  "3718FB98CDC5E252C640839C549067C1926E96FA75B1A95B8973A690552E581B",
+                        "bytes":  3415
+                    },
+                    {
+                        "path":  "CONTENT-CANARY-PROOF.json",
+                        "sha256":  "55AFB467CBAAA633D62F657941211F2619969690E9BFDA31440D8188E557AA9F",
+                        "bytes":  614
+                    },
+                    {
+                        "path":  "content-canary-test.js",
+                        "sha256":  "5FB48869C3907C2550859E50ADD2F6050649B5B60FD50E98D1294C1B534AAB83",
+                        "bytes":  5225
+                    },
+                    {
+                        "path":  "content-evidence-origin.js",
+                        "sha256":  "658983124D690D7AEA69C747D20B0DA27483226746C7422F517B9F5201079886",
+                        "bytes":  10920
+                    },
+                    {
+                        "path":  "CONTENT-EVIDENCE-ORIGIN.md",
+                        "sha256":  "5018FC7B74422F37F0AF545E51A3F995A97E081D86AA88CF0599C321297BEEE3",
+                        "bytes":  2740
+                    },
+                    {
+                        "path":  "CONTENT-EVIDENCE-ORIGIN-PROOF.json",
+                        "sha256":  "434DD9FE1BE41039F4E88D310CA32835941B4E6E6DDD06B54CC7CFD2FBB921B0",
+                        "bytes":  645
+                    },
+                    {
+                        "path":  "content-evidence-origin-test.js",
+                        "sha256":  "8FDD7BA4BFCECA9BAA0BD79C0A0E9698625F158F3E28E7463043516C3329B3B9",
+                        "bytes":  6251
+                    },
+                    {
+                        "path":  "content-patch-gate.js",
+                        "sha256":  "1C20C1ABA8504CD25D79C05AD0058C72AF69C9E71DDFCD9FDCF9E04E3C80E271",
+                        "bytes":  13851
+                    },
+                    {
+                        "path":  "content-patch-gate-test.js",
+                        "sha256":  "BD3F4C57E454976C6E26A542609B800AE0F85C92A48888C19BFF3D6C1C491331",
+                        "bytes":  3096
+                    },
+                    {
+                        "path":  "content-promotion.js",
+                        "sha256":  "D658E3E6181ABE44545E63E7A589F128D71693AD2213442449FCA8033B1FA21B",
+                        "bytes":  5032
+                    },
+                    {
+                        "path":  "CONTENT-PROMOTION.md",
+                        "sha256":  "B18B67AC71510AEBBC797209E09C0A671986F20EE70AE8242319EF06B554F0A0",
+                        "bytes":  2747
+                    },
+                    {
+                        "path":  "CONTENT-PROMOTION-PROOF.json",
+                        "sha256":  "ACE24A524842F064A6732DE942A15912B5D6EE28923D353B323A2AF9ECB14F34",
+                        "bytes":  721
+                    },
+                    {
+                        "path":  "content-promotion-test.js",
+                        "sha256":  "0884542D3BFB1B32B76F6959006512C055EDBD80C58A731DFEC3B6FE5C8AEC42",
+                        "bytes":  5637
+                    },
+                    {
+                        "path":  "content-qa-agent.js",
+                        "sha256":  "E61B735B0015D283B4C1C31552717AD8726488E6B1AFEEB9703698439204CB5F",
+                        "bytes":  11032
+                    },
+                    {
+                        "path":  "content-qa-agent-test.js",
+                        "sha256":  "9BEB2EF9B2763683752C48159A4F7543850AC1BE099C7D5088624DC8AF8CA538",
+                        "bytes":  2406
+                    },
+                    {
+                        "path":  "CONTENT-QA-REPORT.json",
+                        "sha256":  "B30A04D90D4CECA2E88EDFCCD1BE833F72536BDF3328F8BEB0332BFB9289D221",
+                        "bytes":  31314
+                    },
+                    {
+                        "path":  "core-activate.mjs",
+                        "sha256":  "1B1DD3B335B12FDF6ACB3FDB7FB53718079E639A004304289EBF6AA9273F31FC",
+                        "bytes":  1668
+                    },
+                    {
+                        "path":  "core-brain-test.js",
+                        "sha256":  "C5EBB3D4B1B1141E7F35489F19B73131E451A03D82E78F6590E62C18EF31A93D",
+                        "bytes":  2710
+                    },
+                    {
+                        "path":  "core-config.js",
+                        "sha256":  "27AE3FABE6DC3782401E81D19237A58951921EAAC7F22D22E781288AA5892561",
+                        "bytes":  419
+                    },
+                    {
+                        "path":  "core-deploy-preflight.mjs",
+                        "sha256":  "0C0EDD8B279D59AC44B4EFD7CC7F5BF52C4412AF1BA3DC874103324B5F546C4B",
+                        "bytes":  2140
+                    },
+                    {
+                        "path":  "core-live-smoke.mjs",
+                        "sha256":  "CA2D064ABF707E35D093E3618B38BC5B74FB43B349FC68F14A89F41DDD10190B",
+                        "bytes":  1196
+                    },
+                    {
+                        "path":  "core-proof-build.mjs",
+                        "sha256":  "DD3C6382BC259C38DD06B4B8301BC47E605E36BBE81DAD4CA1C0F4786E82513B",
+                        "bytes":  734
+                    },
+                    {
+                        "path":  "core-worker-contract-test.js",
+                        "sha256":  "4252B02E2C0F09AC33405E1A122714AF6B862AFF8CCF443D309A8B1C9B7A281C",
+                        "bytes":  12175
+                    },
+                    {
+                        "path":  "creator-push-setup.html",
+                        "sha256":  "94E9E16576115241CDB3921BA1E3323BD9B1CAA98F843FE52CD7F06FF24DC551",
+                        "bytes":  1936
+                    },
+                    {
+                        "path":  "creator-report-dashboard.html",
+                        "sha256":  "565E1C7B519B98CF306CF89429647FB40E1F92DD1D55775385FE41049A8CE450",
+                        "bytes":  12106
+                    },
+                    {
+                        "path":  "creator-report-setup.html",
+                        "sha256":  "B81AE10EB306A2CE00D8B86D1F06BFF888BF9C280D9AA39E7371F1DF3B436F8B",
+                        "bytes":  7894
+                    },
+                    {
+                        "path":  "CREATOR-REPORT-SETUP.md",
+                        "sha256":  "10E75651FDD54F86FE9851266A409C391B55C39911F1560BE96E72546B2DADEF",
+                        "bytes":  2359
+                    },
+                    {
+                        "path":  "DEPLOYMENT-CHECKLIST.md",
+                        "sha256":  "7CFBF03F5A5772382E3B28ABC3BF02B20CECE5234E5ABF6A4007FC26E0D7EDBD",
+                        "bytes":  2020
+                    },
+                    {
+                        "path":  "experience-integration-test.js",
+                        "sha256":  "2540F23BA5F30197DA8B8308E98A13656F454FCD2EE79A7B28EE5850EB95B26C",
+                        "bytes":  5420
+                    },
+                    {
+                        "path":  "favicon-64.png",
+                        "sha256":  "E100C5CE8CB1BFB3488EE62920E50A4B95EA673A101F98FE3570EC0C2D006CD5",
+                        "bytes":  554
+                    },
+                    {
+                        "path":  "features/neural-voice/fiezel-kokoro-adapter.js",
+                        "sha256":  "469DD8AA383B84B180F3C37AE70C7EDC75C49A45262F4D078D8AAC289473FDFE",
+                        "bytes":  3233
+                    },
+                    {
+                        "path":  "features/neural-voice/fiezel-neural-voice.js",
+                        "sha256":  "97A775DBABAC02BE6DAAC5C348326B2DEBA93B89D8FD2B69CA117F2F86195712",
+                        "bytes":  5462
+                    },
+                    {
+                        "path":  "features/neural-voice/fiezel-neural-voice-bootstrap.js",
+                        "sha256":  "9B941D13706689D5FD2686BF46E88ACFDDCC40D92C0E8FD8C2E8D0CA426FD799",
+                        "bytes":  7544
+                    },
+                    {
+                        "path":  "features/neural-voice/fiezel-neural-voice-config.js",
+                        "sha256":  "EAEC91C5D3605688248CC1E66492954430F1428BB3D335ABBFDBBDBB064AF35B",
+                        "bytes":  1877
+                    },
+                    {
+                        "path":  "features/neural-voice/fiezel-web-audio-player.js",
+                        "sha256":  "F76A023B22A490E79801184D3A9059DC0D6680C131BB90652037EBADE95737B2",
+                        "bytes":  2429
+                    },
+                    {
+                        "path":  "features/speaking-listening/fiezel-speaking-listening-addon.js",
+                        "sha256":  "7775364BFA847910DDEDE13C39C2D026B8257C754F52862E41C3A14C3BEFACFA",
+                        "bytes":  25633
+                    },
+                    {
+                        "path":  "features/speaking-listening/listening-bank-v1.json",
+                        "sha256":  "2B643155F0ABDE63B8EB54E7F382404E7F961B9BB8C83551BBF5D952F6CCD4BC",
+                        "bytes":  32518
+                    },
+                    {
+                        "path":  "features/speaking-listening/speaking-bank-v1.json",
+                        "sha256":  "EA7FBA78C04186DEBFFD48984FBE0132915BCA7F67C0FCE55C6694228090BCA6",
+                        "bytes":  36633
+                    },
+                    {
+                        "path":  "features/speaking-listening/speaking-listening-addon.css",
+                        "sha256":  "D487852DABEBF7FD61511C1D4CDB1825A4C413D632CF1D4A9E68C8A3B2997F23",
+                        "bytes":  2648
+                    },
+                    {
+                        "path":  "features/speaking-listening/speaking-listening-config.js",
+                        "sha256":  "DC6D8D7304F75EB44045301CF49257D2D9FAB83972E2D1B5AD996CBD490B672D",
+                        "bytes":  426
+                    },
+                    {
+                        "path":  "FIEZEL-5.18.0-EXECUTION-CHECKPOINT.json",
+                        "sha256":  "57DE104066854A7F0A74976B6EBA161705A39A042149D55E21206EC0B97E27FF",
+                        "bytes":  585
+                    },
+                    {
+                        "path":  "FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md",
+                        "sha256":  "04FF65BB83110DFC898B614287E20359706E5353165113AB9294EE44DB1C34ED",
+                        "bytes":  67636
+                    },
+                    {
+                        "path":  "FIEZEL-5.18.0-SOURCE-SUITE.json",
+                        "sha256":  "1B16B37795C224E562179F3BDEB12FF6EC56E4877AE0A68AF8601F293F4F5A91",
+                        "bytes":  519
+                    },
+                    {
+                        "path":  "FIEZEL-5.18.0-SUITE-RERUN.jsonl",
+                        "sha256":  "3F02210830081EC8F66A666B861E50244CC8C1F44F3B2B8B49CF3FF2E959AA3A",
+                        "bytes":  3557
+                    },
+                    {
+                        "path":  "fiezel-core-worker.js",
+                        "sha256":  "71D1B6CF8A70C68941EEC61E6969B0BE61BA3EA53DCE048D146051D1D4601A27",
+                        "bytes":  40877
+                    },
+                    {
+                        "path":  "fiezel-core-worker-proof-route.js",
+                        "sha256":  "5329B9D7889877025482E7CF62C529D0E68993BD9B65A5C485D6FBEF8CAD2FEE",
+                        "bytes":  872
+                    },
+                    {
+                        "path":  "FIEZEL-PRODUCT-ROADMAP-2026-2027.md",
+                        "sha256":  "D10ACDF21941B19CC100C6F5C3023B7BC24E5D109BDF3F78753C1DBB6D59DB75",
+                        "bytes":  5238
+                    },
+                    {
+                        "path":  "fiezel-report-worker.js",
+                        "sha256":  "ABF9E23C934E2500AB3AB3837678FC3BE0739DB7D6220507EC039A4859DA30A3",
+                        "bytes":  7047
+                    },
+                    {
+                        "path":  "FILE-MANIFEST.txt",
+                        "sha256":  "B1D80D862D29ABFB6779476922F164E53C6302A55288EC74F20D774646AE831D",
+                        "bytes":  13614
+                    },
+                    {
+                        "path":  "FINAL-AUDIT-REPORT.json",
+                        "sha256":  "5FB8141B23DE35EF2FF5F90D343162458A6F04AB5E8BDE28CAFF77C8CB7AF66C",
+                        "bytes":  31201
+                    },
+                    {
+                        "path":  "FINAL-AUDIT-REPORT.md",
+                        "sha256":  "CEDA7C9661A3528EEFDE5A7605B63B62BD265CC773CC5218F2F74BCA00B90453",
+                        "bytes":  2526
+                    },
+                    {
+                        "path":  "generate-push-secrets.mjs",
+                        "sha256":  "AE17459A18695D111DF7468233DA1CF01D927BCBF69295B9A9E1385A48DF35FA",
+                        "bytes":  587
+                    },
+                    {
+                        "path":  "GITHUB-UPLOAD-MANIFEST.md",
+                        "sha256":  "D873D70FD6A8F1AA976B394AD2DD464544F6F747692E89FF592A13F7554673F8",
+                        "bytes":  970
+                    },
+                    {
+                        "path":  "grammar-quality-audit.js",
+                        "sha256":  "18A9659E02B9C39FFA84591E17514C1E52C73026AC941255744B60F6FB256DED",
+                        "bytes":  14167
+                    },
+                    {
+                        "path":  "GRAMMAR-QUALITY-REPORT.json",
+                        "sha256":  "34A912B11FD07F7EE787FCDD46465975F79FB4104340E32D15F52D9D84B0D8F7",
+                        "bytes":  6768
+                    },
+                    {
+                        "path":  "grammar-templates.json",
+                        "sha256":  "AC17FF65254765EC1A3FC955E470891F0F3E12F646B470E7A526EAEBEDDA3B0C",
+                        "bytes":  314123
+                    },
+                    {
+                        "path":  "http-smoke-test.js",
+                        "sha256":  "FA847A42C6A1189DEF6277DAC74A934329FF0C2719FDC9835098B9F0B25E0763",
+                        "bytes":  2186
+                    },
+                    {
+                        "path":  "index.html",
+                        "sha256":  "8D4090B331E9D0838A6AB3A25F3DE445316FA35368B8554C934DB4FDC99014F5",
+                        "bytes":  5500
+                    },
+                    {
+                        "path":  "instagram.svg",
+                        "sha256":  "5F79FD91A912F916606CD348AC72B32AD9292F91B8DBE4BDC68BEE2ED1258F6C",
+                        "bytes":  314
+                    },
+                    {
+                        "path":  "learner-evidence-test.js",
+                        "sha256":  "C1410F339AB95DC18277CA1EF6847402C436566E91E88D1F5669170FB885EF56",
+                        "bytes":  4098
+                    },
+                    {
+                        "path":  "lesson-experience-test.js",
+                        "sha256":  "A7766A11DD9B98E235EB257B47683211B01A85337578E5B6A8F7DCC80D120B50",
+                        "bytes":  7643
+                    },
+                    {
+                        "path":  "lucide.min.js",
+                        "sha256":  "5394B9D0725AE5823FBE94687E2DDD19D8A9826E7C09DC21EA4161411C2AD16F",
+                        "bytes":  8714
+                    },
+                    {
+                        "path":  "LUCIDE-LICENSE.txt",
+                        "sha256":  "B495047BD93A9B06913511076F504DABA17D5BBEB3E0650F3BB53A4220329C57",
+                        "bytes":  3208
+                    },
+                    {
+                        "path":  "manifest.json",
+                        "sha256":  "3ED9273A02264D0A19E7BBBA77369E5520133E12FC3A0CEB93F4112494F7A6EF",
+                        "bytes":  538
+                    },
+                    {
+                        "path":  "neural-voice-http-test.js",
+                        "sha256":  "A985CDEBA181B92DF321BC95897E686346608BD6E1739606CD9AB087D7447E4B",
+                        "bytes":  3969
+                    },
+                    {
+                        "path":  "NEURAL-VOICE-SOURCE-LOCK.json",
+                        "sha256":  "718857F8C0CF6FFC19569E9A7F80251D99BDCEF1F9BF60DF5884CBFB2B231CDD",
+                        "bytes":  2452
+                    },
+                    {
+                        "path":  "neural-voice-test.js",
+                        "sha256":  "8633FAA2BEE98DCEB46E076EA13E8129D2E2EC98BDD467A71ED43FC41B81E1BB",
+                        "bytes":  6417
+                    },
+                    {
+                        "path":  "notification-reminder-test.js",
+                        "sha256":  "32408EA08CD15066E4E86B9050B66C158A6C5EA940FAE996CD6B9A3C558D4ED6",
+                        "bytes":  4027
+                    },
+                    {
+                        "path":  "package.json",
+                        "sha256":  "51CA99BF90B91E646C25B1921C3F06BAB01B9F133CC4F2D1E7D7440ADED411FB",
+                        "bytes":  394
+                    },
+                    {
+                        "path":  "policy-outcome-test.js",
+                        "sha256":  "80C6C857B75007D250E096FDD1369B79CEB8035D568131D07A57DFF9AB51ED6C",
+                        "bytes":  5599
+                    },
+                    {
+                        "path":  "product-audit.js",
+                        "sha256":  "921C96C7EEE72A0505E1BADEB244CDD2DCB839EB09127751117145764939A05D",
+                        "bytes":  13463
+                    },
+                    {
+                        "path":  "PRODUCTION-ORIGIN-OWNER-ACTION.md",
+                        "sha256":  "7DB13284CCFB4A5FF307A095F7344F024325B54407E97C5E53E13B5C1464CE72",
+                        "bytes":  2095
+                    },
+                    {
+                        "path":  "push-dispatcher.mjs",
+                        "sha256":  "272A956FD0CD2EB801773EFAC6F48E1503A0099236E8B4A27383FCBC04885AEA",
+                        "bytes":  2024
+                    },
+                    {
+                        "path":  "push-proof-dispatcher.mjs",
+                        "sha256":  "0CFAC0B2C0BB862604F5C542A8A0FD30AAA9B66D8A1002CAF7E06824627F0A5C",
+                        "bytes":  1443
+                    },
+                    {
+                        "path":  "PUSH-SETUP.md",
+                        "sha256":  "0874B9759AAFAD0B10DE17ADC35D07340488617B86DC474AA823E12BA7295910",
+                        "bytes":  2514
+                    },
+                    {
+                        "path":  "pwa-cache-test.js",
+                        "sha256":  "88AF16877C35C0C00CC0B24BD8D11AD38D13EDBE12A410DC7929D8A1AE6C88C2",
+                        "bytes":  2232
+                    },
+                    {
+                        "path":  "QUALITY-GATE-EVIDENCE.json",
+                        "sha256":  "A58418D3594C5E470E62516BA494F21829D7C72DF73B3A1C5A1F7F419DF9ABB2",
+                        "bytes":  518
+                    },
+                    {
+                        "path":  "reading-bank.json",
+                        "sha256":  "F399C98A975807F1E4509AF976409F0DC502256F36B47CD9FCEB871DEE0DE25B",
+                        "bytes":  1248785
+                    },
+                    {
+                        "path":  "README.md",
+                        "sha256":  "F1656B2977637FBA203E7BEE15D5A3BD997876D8E696186AF1B96D6030258FC9",
+                        "bytes":  2465
+                    },
+                    {
+                        "path":  "rebuild-grammar-data.js",
+                        "sha256":  "1C7630E9473CDEA26EB290BD813DAA0C43112A959D61E7679103C94A19D2CBFF",
+                        "bytes":  31968
+                    },
+                    {
+                        "path":  "rebuild-speaking-listening-data.js",
+                        "sha256":  "E33415EC4F29AAD0CF7CFF2B29A060B2729CB4F57A1FABB69A040D8230067701",
+                        "bytes":  4440
+                    },
+                    {
+                        "path":  "regression-test.js",
+                        "sha256":  "2B12684F854967C12FCB33DD0EEA4DE95DF71FFC93328D4A45DAD89E522A050B",
+                        "bytes":  11542
+                    },
+                    {
+                        "path":  "release-audit.py",
+                        "sha256":  "584D856178D8776A4B1103182F3C8E6677D0E342A005521809AC959B3EFED9FA",
+                        "bytes":  39454
+                    },
+                    {
+                        "path":  "RELEASE-NOTES.md",
+                        "sha256":  "780B96BB96519559CC5866F7130DDD3E6FB502D604F29D6C597A41D56FA67BC0",
+                        "bytes":  2611
+                    },
+                    {
+                        "path":  "remote-push-test.js",
+                        "sha256":  "4154160C34F9C2572344863B9ECB60C0746519EAC55B3DF8BFC57A8D63170C7B",
+                        "bytes":  3388
+                    },
+                    {
+                        "path":  "report-config.js",
+                        "sha256":  "6240BB7B2DE6B4E16978CCEDCC1FFDEAC00A77A475F16FE52C84F39920742965",
+                        "bytes":  32
+                    },
+                    {
+                        "path":  "ROADMAP.md",
+                        "sha256":  "571FDBEFFD5543A916D3851F650DAEB2D7ADB035726AB6E785C96EB1DF38B942",
+                        "bytes":  2542
+                    },
+                    {
+                        "path":  "runtime-stage8-test.js",
+                        "sha256":  "C6068CB2B4D9F236ACED99F7EF1F2C35D415279987074EA70E9DCB7415363E2F",
+                        "bytes":  4376
+                    },
+                    {
+                        "path":  "SECURITY-SCAN.json",
+                        "sha256":  "4F1667AD9A5B1F8C98A6498A57923D7B21F5C43656C69A3D473FFBCE1CC2F042",
+                        "bytes":  709
+                    },
+                    {
+                        "path":  "speaking-listening-test.js",
+                        "sha256":  "EA53DD87AEF61F00C4F24D991131B5CBB74CC1CDE0C55305B2103435A4CCD3F6",
+                        "bytes":  6534
+                    },
+                    {
+                        "path":  "STAGE8-PRODUCT-AUDIT.json",
+                        "sha256":  "C5071E5F6F54F867C6DE8AD04FD4FD1E40AE7C264EFF120685D6E041691D88CB",
+                        "bytes":  8697
+                    },
+                    {
+                        "path":  "style.css",
+                        "sha256":  "BB12195A3AB43BF4F1E887047334FF602FC161117E177998FCC06348CD465B9D",
+                        "bytes":  38034
+                    },
+                    {
+                        "path":  "sw.js",
+                        "sha256":  "E04944DE4CBBC21675776CF64D02735705020EC9A52854AB919A0501EAD0AF6C",
+                        "bytes":  2911
+                    },
+                    {
+                        "path":  "THIRD-PARTY-LICENSES.md",
+                        "sha256":  "8A09B12A095ECDDF0DE513B854A9C570B92B8FFDD0C6E041141B49C6B2A83E8F",
+                        "bytes":  2272
+                    },
+                    {
+                        "path":  "ui-structure-test.js",
+                        "sha256":  "66BEC6262185193368455B35A0B5011F17D9174E657677A1EAA7B1419C87753D",
+                        "bytes":  3286
+                    },
+                    {
+                        "path":  "validator.js",
+                        "sha256":  "B7385322C92C30A5E67A4B4ECBABD95ECAA24D8773E584B1CF19B620A1BAE10D",
+                        "bytes":  3749
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/kokoro.web.js",
+                        "sha256":  "1E74A84D3EF0D2CE4AC4893F47040EFB3FC07FACA9A8F2E8F2BFCE58D329A9CD",
+                        "bytes":  2135645
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/LICENSE",
+                        "sha256":  "C71D239DF91726FC519C6EB72D318EC65820627232B2F796219E87DCF35D0AB4",
+                        "bytes":  11357
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/licenses/HUGGINGFACE-TRANSFORMERS-APACHE-2.0.txt",
+                        "sha256":  "CFC7749B96F63BD31C3C42B5C471BF756814053E847C10F3EB003417BC523D30",
+                        "bytes":  11358
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/licenses/ONNXRUNTIME-MIT.txt",
+                        "sha256":  "2F07C72751AED99790B8A4869CF2311DF85A860B22DED05FA22803587A48922C",
+                        "bytes":  1073
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/licenses/PHONEMIZER-APACHE-2.0.txt",
+                        "sha256":  "C71D239DF91726FC519C6EB72D318EC65820627232B2F796219E87DCF35D0AB4",
+                        "bytes":  11357
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
+                        "sha256":  "08FB86EC433C78BFB032C5D84A68B8E8E5A8D81268FA39E24314179A5767A5B9",
+                        "bytes":  44484
+                    },
+                    {
+                        "path":  "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm",
+                        "sha256":  "C46655E8A94AFC45338D4CB2B840475F88E5012D524509916E505079C00BFA39",
+                        "bytes":  21596019
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/config.json",
+                        "sha256":  "074EC379E939BA4560A6FDB4922080D07D4EB023685A6DC1C466EA533F806FA7",
+                        "bytes":  45
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/LICENSE",
+                        "sha256":  "C71D239DF91726FC519C6EB72D318EC65820627232B2F796219E87DCF35D0AB4",
+                        "bytes":  11357
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/onnx/model_quantized.onnx",
+                        "sha256":  "FBAE9257E1E05FFC727E951EF9B9C98418E6D79F1C9B6B13BD59F5C9028A1478",
+                        "bytes":  92361116
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/tokenizer.json",
+                        "sha256":  "EE32D55ECEF2735BA42173B22ACF4F35930650CC2005096D3F0B26922FA579F5",
+                        "bytes":  3498
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/tokenizer_config.json",
+                        "sha256":  "E02F8BD9576B2FE15A51DA8AAF7157FFD91C582F927DCB87E73B97464ED4FC86",
+                        "bytes":  114
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/af_bella.bin",
+                        "sha256":  "F69D836209B78EB8C66E75E3CDA491E26EA838A3674257E9D4E5703CBAF55C8B",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/af_heart.bin",
+                        "sha256":  "D583CCFF3CDCA2F7FAE535CB998AC07E9FCB90F09737B9A41FA2734EC44A8F0B",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/af_nicole.bin",
+                        "sha256":  "CD2191AB31B914ED7B318416B0E4440FDF392DDAD9106A060819AA600A64F59A",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/am_michael.bin",
+                        "sha256":  "1D1F21DD8DA39C30705CD4C75D039D265E9BC4A2A93ED09BC9E1B1225EB95BA1",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/bf_emma.bin",
+                        "sha256":  "669FE0647F9DD04FCAB92F1439A40EEB4C8B4AB1F82E4996FE3D918CE4A63B73",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "vendor/kokoro-model/voices/bm_george.bin",
+                        "sha256":  "C4B235A4C1F2CD3B939FED08B899CE9385638B763F7B73A59616C4FC9BD6C9BC",
+                        "bytes":  522240
+                    },
+                    {
+                        "path":  "version.js",
+                        "sha256":  "3FBCF217759D476E2D66022156D6B2DCAFC7702377B1B17AC992BD322F4F89C5",
+                        "bytes":  30
+                    },
+                    {
+                        "path":  "VERSION.json",
+                        "sha256":  "BCE1380B9F6A64FC1050E7EE1DDE5154818A1852FCB955E75761F87231355A7A",
+                        "bytes":  21
+                    },
+                    {
+                        "path":  "vocabulary-master.json",
+                        "sha256":  "2482DAB7460C8092BB31D52BDFAEE05B6CBA0D8A46C294BBB9D25245A8798EF0",
+                        "bytes":  1157636
+                    }
+                ]
+}

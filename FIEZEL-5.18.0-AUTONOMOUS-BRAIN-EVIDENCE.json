@@ -1,0 +1,108 @@
+﻿{
+    "schema":  "fiezel-autonomous-brain-integration-evidence-v1",
+    "version":  "5.18.0",
+    "generatedAt":  "2026-08-13T22.45.11Z",
+    "summary":  "Autonomous Brain modules (design v1) implemented and fully verified in the 5.18.0 source-of-truth tree. Canonical content untouched (all baseline hashes MATCH).",
+    "designDoc":  "FIEZEL-AUTONOMOUS-BRAIN-DESIGN-v1.md",
+    "ownerDecisions":  {
+                           "scope":  "keduanya (design doc + implementasi komponen pertama)",
+                           "autonomyLevel":  "autonomous_penuh (auto-promote + auto-canonical-adopt hanya via konfigurasi eksplisit owner)",
+                           "invariants":  [
+                                              "canonical immutable saat runtime",
+                                              "fail-closed: config absent/invalid -\u003e advisory/halt",
+                                              "aggregate-only privacy, no secrets, bounded inputs",
+                                              "VERSION tetap 5.18.0; EXTERNAL_ACTION NONE"
+                                          ]
+                       },
+    "modules":  [
+                    {
+                        "module":  "fiezel-meta-learning.js",
+                        "schema":  "fiezel-meta-insights-v1",
+                        "function":  "deriveInsights/analyze dari leaderboard aggregate -\u003e insight (weak_accuracy, trend_down, retention_risk, review_queue) tanpa raw answers",
+                        "test":  "fiezel-meta-learning-test.js",
+                        "result":  "14 PASS / 0 FAIL"
+                    },
+                    {
+                        "module":  "fiezel-prompt-library.js + fiezel-prompt-library.json",
+                        "schema":  "fiezel-prompt-library-v1",
+                        "function":  "library template per domain (grammar/vocabulary/reading/listening/speaking), slot render, secret scan, bounds",
+                        "test":  "fiezel-prompt-library-test.js",
+                        "result":  "21 PASS / 0 FAIL"
+                    },
+                    {
+                        "module":  "fiezel-evolution-ledger.js",
+                        "schema":  "fiezel-evolution-ledger-entry-v1",
+                        "function":  "hash-chained WAL (genesis, append, verifyChain, prune re-chain), events: insight/candidate_requested/candidate_created/gate_result/canary_started/promotion_result/adoption_result/rollback/halt/config_change",
+                        "test":  "fiezel-evolution-ledger-test.js",
+                        "result":  "16 PASS / 0 FAIL"
+                    },
+                    {
+                        "module":  "fiezel-autonomy-config.js",
+                        "schema":  "fiezel-autonomy-config-v1",
+                        "function":  "levels advisory/canary/full; full wajib ownerApproved + ownerRef UUID + approvedAt ISO; halt mematikan; fail-closed; thresholds disanitasi",
+                        "test":  "fiezel-autonomy-config-test.js",
+                        "result":  "18 PASS / 0 FAIL"
+                    },
+                    {
+                        "module":  "fiezel-self-refine.js",
+                        "schema":  "fiezel-self-refine-v1",
+                        "function":  "orchestrator candidate-only: insight -\u003e prompt -\u003e aiGenerate/aiOutput -\u003e candidate -\u003e content-patch-gate -\u003e content-promotion -\u003e adoptionReady (hanya di level full + autoCanonicalAdoption + evidence promote)",
+                        "test":  "fiezel-self-refine-test.js",
+                        "result":  "19 PASS / 0 FAIL"
+                    },
+                    {
+                        "module":  "fiezel-evolution-loop.js",
+                        "schema":  "fiezel-evolution-loop-v1",
+                        "function":  "loop end-to-end: meta insights -\u003e refine per insight (max 8) -\u003e ledger gate_result entries -\u003e chainIntegrity",
+                        "test":  "fiezel-evolution-loop-test.js",
+                        "result":  "10 PASS / 0 FAIL"
+                    }
+                ],
+    "newTestAssertions":  "98 PASS / 0 FAIL",
+    "suite":  {
+                  "commandCount":  38,
+                  "pass":  38,
+                  "fail":  0,
+                  "note":  "regression-test.js lulus saat dijalankan standalone (timeout batch karena CPU contention); evidence JSON diperbarui."
+              },
+    "canonicalIntegrity":  {
+                               "grammar-templates.json":  "MATCH ac17ff652547...",
+                               "vocabulary-master.json":  "MATCH 2482dab7460c...",
+                               "reading-bank.json":  "MATCH f399c98a9758...",
+                               "model_quantized.onnx":  "MATCH fbae9257e1e0...",
+                               "kokoro.web.js":  "MATCH 1e74a84d3ef0...",
+                               "VERSION.json":  "MATCH bce1380b9f6a..."
+                           },
+    "coreWorkerIntegration":  {
+                                  "status":  "COMPLETE",
+                                  "file":  "fiezel-core-worker.js",
+                                  "test":  "core-worker-contract-test.js",
+                                  "result":  "PASS",
+                                  "endpoints":  [
+                                                    "POST /api/evolution/config (owner-only; sanitize + store; full wajib ownerApproved/ownerRef/approvedAt; invalid -\u003e 400)",
+                                                    "GET /api/evolution/status (owner-only; config + ledger hash-chain verify + tail 10; tamper terdeteksi chainOk=false)",
+                                                    "POST /api/content/self-refine (owner-only; advisory -\u003e hold advisory-only; halt -\u003e 503; canary/full -\u003e candidate-only gateStatus UNVERIFIED_LOCAL_GATES_REQUIRED; AI rate limit; ledger append candidate_created)"
+                                                ],
+                                  "healthCapabilities":  [
+                                                             "content-self-refine-v1",
+                                                             "evolution-config-v1"
+                                                         ],
+                                  "parityChecks":  [
+                                                       "sanitize/effectiveLevel render parity vs fiezel-autonomy-config.js (8 input)",
+                                                       "embedded prompt library vs fiezel-prompt-library.json IDENTICAL",
+                                                       "prompt render parity vs fiezel-prompt-library.js"
+                                                   ],
+                                  "notes":  [
+                                                "Ledger disimpan di KV key fiezel_push_v1_evolution_ledger; config di fiezel_push_v1_evolution_config",
+                                                "Kandidat patch hanya disimpan di memori + ledger; canonical tidak pernah disentuh runtime",
+                                                "Library prompt di-embed agar worker self-contained tanpa fs"
+                                            ]
+                              },
+    "noExternalAction":  true,
+    "nextSteps":  [
+                      "Rerun suite penuh dari FULL-RUN tree setelah integrasi worker",
+                      "Update checkpoint + salin artifact ke New folder",
+                      "Final report 5.18.0; push GitHub menunggu konfirmasi eksplisit owner",
+                      "R1 real-device gate tetap BLOCKED_OWNER_ACTION_REQUIRED"
+                  ]
+}

@@ -20,13 +20,17 @@ setTimeout(async()=>{
     Notification.permission='granted';await context.requestRequiredNotificationPermission();
     assert(!bodyClasses.contains('notification-locked'),'granted permission did not unlock the application');
     assert(/launcher-shell/.test(element('app').innerHTML),'Home did not render after notification permission became granted');
+    assert(notifications.length===1&&notifications[0].title==='FIEZEL diperbarui','app update notification missing on new version');
+    assert(store['fiezel.seenAppVersion']==='5.18.0','seen app version was not persisted');
+    context.notifyAppUpdateIfNew();
+    assert(notifications.length===1,'app update notification repeated on same version');
     const st=context.__getFiezelState();st.totalAnswered=1;st.history=[{type:'grammar',skill:'test',ok:true,at:Date.now()-4*86400000}];st.daily={date:'',attempts:0,count:0,meaningful:false};st.reminderMeta={lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1};
     await context.__fiezelAudit.checkStudyReminders(true);
-    assert(notifications.length===1,`expected one inactivity notification, got ${notifications.length}`);
-    assert(/FIEZEL/.test(notifications[0]?.title||''),'inactivity reminder title missing');
+    assert(notifications.length===2,`expected one inactivity notification, got ${notifications.length}`);
+    assert(/FIEZEL/.test(notifications[1]?.title||''),'inactivity reminder title missing');
     const m=context.__fiezelAudit.selectLoginMessage();assert(m&&m.headline&&m.lead,'login reminder did not return headline + lead');
     assert(store['fiezel-last-login-message']!=null,'login reminder index was not persisted to avoid immediate repetition');
   }catch(e){failures.push(e.stack||String(e))}
   if(failures.length){console.error('FIEZEL notification reminder: FAIL');failures.forEach(x=>console.error('- '+x));process.exitCode=1;return}
-  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedLocksApp:true,grantedUnlocksApp:true,inactivityNotification:true,rotatingLoginMessage:true}));
+  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedLocksApp:true,grantedUnlocksApp:true,inactivityNotification:true,rotatingLoginMessage:true,updateNotification:true,updateNoRepeat:true}));
 },260);

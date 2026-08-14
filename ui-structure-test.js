@@ -12,8 +12,11 @@ check((html.match(/class="nav(?: active)?"/g)||[]).length===5,'Bottom navigation
 check((html.match(/data-lucide=/g)||[]).length>=9,'Core chrome must use the local icon system.');
 check(/aria-label="Buka pengaturan"/.test(html)&&/aria-label="Atur soundtrack"/.test(html),'Icon-only topbar controls need accessible names.');
 check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
+check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');
+check(html.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')<html.indexOf('./app.js')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('./app.js'),'Feature runtimes must load before app.js.');
 check(/id="globalSky"/.test(html)&&/id="globalCelestial"/.test(html)&&/\.global-sky/.test(css)&&/\.sky-light/.test(css),'Full-viewport celestial atmosphere is incomplete.');
 check(/grid-template-columns:minmax\(0,1\.42fr\)/.test(css),'Desktop launcher layout is missing.');
+check(/\.learning-launcher\{display:grid;grid-template-columns:repeat\(4,1fr\)/.test(css),'Desktop learning launcher must expose four feature cards.');
 check(/@media\(max-width:860px\)/.test(css)&&/@media\(max-width:640px\)/.test(css),'Tablet and mobile breakpoints are missing.');
 check(/\.launcher-shell\{grid-template-columns:1fr/.test(css),'Launcher does not collapse to one column.');
 check(/\.learning-launcher\{grid-template-columns:1fr\}/.test(css),'Learning launcher does not collapse for mobile.');

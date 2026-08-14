@@ -11,8 +11,17 @@ GRAMMAR-QUALITY-REPORT.json
 STAGE8-PRODUCT-AUDIT.json
 AUDIT-REPORT.json
 visual-checks/
+.audit-tmp/
+CONTENT-QA-REPORT.json
+CONTENT-CANARY-PROOF.json
+CONTENT-PROMOTION-PROOF.json
+CONTENT-ADOPTION-EVIDENCE-PROOF.json
+CONTENT-EVIDENCE-ORIGIN-PROOF.json
+CONTENT-ADOPTION-REHEARSAL-PROOF.json
+CONTENT-ADOPTION-PROOF.json
 
 .env
 .env.*
 push-secrets*.json
 push-secrets*.txt
+fiezel-autonomy-config.json

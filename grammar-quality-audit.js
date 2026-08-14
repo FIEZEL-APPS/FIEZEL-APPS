@@ -22,7 +22,7 @@ const signature=q=>`${norm(q.question)}||${q.options.map(norm).sort().join('|')}
 const requiredTemplateStrings=['id','family','subskill','cefr','questionType','pedagogicalObjective','misconceptionTargeted','reasoningOperation','stem'];
 const requiredExplanationStrings=['whyCorrect','rule','whyOthersFail','howToAvoid','memoryCue'];
 
-check('Grammar data version',grammar.version==='5.17.0'&&grammar.schemaVersion==='2.0.0'&&grammar.practiceBlueprintVersion==='focused-25-v1',`version=${grammar.version} schema=${grammar.schemaVersion} blueprint=${grammar.practiceBlueprintVersion}`);
+check('Grammar data version',grammar.version==='5.18.0'&&grammar.schemaVersion==='2.0.0'&&grammar.practiceBlueprintVersion==='focused-25-v1',`version=${grammar.version} schema=${grammar.schemaVersion} blueprint=${grammar.practiceBlueprintVersion}`);
 check('Grammar lesson inventory',grammar.count===129&&grammar.templates.length===129,`declared=${grammar.count} actual=${grammar.templates.length}`);
 const ids=grammar.templates.map(x=>x.id),skills=grammar.templates.map(x=>x.subskill);
 check('Unique lesson identities',new Set(ids).size===129&&new Set(skills).size===129,`ids=${new Set(ids).size} subskills=${new Set(skills).size}`);
@@ -86,7 +86,7 @@ const seededMath=Object.create(Math);
 seededMath.random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/0x100000000};
 class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';this.destination={}}createGain(){return{gain:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){}},connect(){}}}createOscillator(){return{type:'sine',frequency:{value:0,setValueAtTime(){}},connect(){},start(){},stop(){}}}resume(){this.state='running'}suspend(){this.state='suspended'}close(){this.state='closed'}}
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math:seededMath,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
-context.window=context;context.self=context;context.FIEZEL_VERSION='5.17.0';context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
+context.window=context;context.self=context;context.FIEZEL_VERSION='5.18.0';context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
 vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
 
 setTimeout(()=>{

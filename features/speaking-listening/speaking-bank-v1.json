@@ -1,0 +1,1343 @@
+{
+  "schema": "fiezel-speaking-bank-v1",
+  "version": 2,
+  "status": "reviewed_release_seed",
+  "count": 36,
+  "items": [
+    {
+      "id": "speak_0001",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
+      "sampleAnswer": "I study English every day.",
+      "requiredKeywords": [
+        "study",
+        "English",
+        "day"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.68
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "I study English every day."
+    },
+    {
+      "id": "speak_0002",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
+      "sampleAnswer": "My school is near my house.",
+      "requiredKeywords": [
+        "school",
+        "near",
+        "house"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.68
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "My school is near my house."
+    },
+    {
+      "id": "speak_0003",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: sebutkan satu makanan yang kamu suka dan alasan sederhana.",
+      "sampleAnswer": "I like noodles because they are tasty.",
+      "requiredKeywords": [
+        "like",
+        "because"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.68,
+        "minimumWords": 4
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "like",
+          "love",
+          "enjoy",
+          "favorite"
+        ],
+        [
+          "because",
+          "since"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0004",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: perkenalkan nama dan kegiatan sekolahmu secara singkat.",
+      "sampleAnswer": "My name is Jahran. I am a high school student.",
+      "requiredKeywords": [
+        "name",
+        "student"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.68,
+        "minimumWords": 4
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "name",
+          "called",
+          "im",
+          "i am"
+        ],
+        [
+          "student",
+          "school",
+          "study"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0005",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "roleplay",
+      "instruction": "Kamu sedang di toko. Minta satu botol air dengan sopan.",
+      "sampleAnswer": "Can I have a bottle of water, please?",
+      "requiredKeywords": [
+        "water",
+        "please"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.68,
+        "minimumWords": 4
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "water"
+        ],
+        [
+          "please",
+          "could i",
+          "can i",
+          "may i"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0006",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A1",
+      "mode": "roleplay",
+      "instruction": "Kamu bertemu teman baru. Tanyakan dari mana dia berasal.",
+      "sampleAnswer": "Where are you from?",
+      "requiredKeywords": [
+        "where",
+        "from"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.68,
+        "minimumWords": 4
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "where"
+        ],
+        [
+          "from",
+          "come from"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0007",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan intonasi natural.",
+      "sampleAnswer": "I missed the bus because I left home too late.",
+      "requiredKeywords": [
+        "missed",
+        "bus",
+        "because",
+        "late"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "I missed the bus because I left home too late."
+    },
+    {
+      "id": "speak_0008",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan intonasi natural.",
+      "sampleAnswer": "We are planning to visit the museum this weekend.",
+      "requiredKeywords": [
+        "planning",
+        "visit",
+        "museum",
+        "weekend"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.7
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "We are planning to visit the museum this weekend."
+    },
+    {
+      "id": "speak_0009",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: ceritakan apa yang biasanya kamu lakukan setelah pulang sekolah.",
+      "sampleAnswer": "I usually rest for a while, then I do my homework.",
+      "requiredKeywords": [
+        "usually",
+        "after"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7,
+        "minimumWords": 6
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "usually",
+          "normally",
+          "often",
+          "after school"
+        ],
+        [
+          "homework",
+          "rest",
+          "study",
+          "play",
+          "practice",
+          "help",
+          "eat",
+          "sleep"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0010",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan satu rencana untuk akhir pekan.",
+      "sampleAnswer": "This weekend, I am going to practice coding and meet my friends.",
+      "requiredKeywords": [
+        "going",
+        "weekend"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7,
+        "minimumWords": 6
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "going to",
+          "plan",
+          "planning",
+          "will"
+        ],
+        [
+          "weekend",
+          "saturday",
+          "sunday"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0011",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "roleplay",
+      "instruction": "Kamu tidak mengerti instruksi guru. Minta guru mengulanginya dengan sopan.",
+      "sampleAnswer": "Could you repeat that, please?",
+      "requiredKeywords": [
+        "repeat",
+        "please"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7,
+        "minimumWords": 6
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "repeat",
+          "say that again",
+          "explain again"
+        ],
+        [
+          "please",
+          "could you",
+          "can you"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0012",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "A2",
+      "mode": "roleplay",
+      "instruction": "Kamu menelepon klinik. Tanyakan apakah ada jadwal kosong besok pagi.",
+      "sampleAnswer": "Is there an appointment available tomorrow morning?",
+      "requiredKeywords": [
+        "appointment",
+        "tomorrow",
+        "morning"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.7,
+        "minimumWords": 6
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "appointment",
+          "available",
+          "opening"
+        ],
+        [
+          "tomorrow"
+        ],
+        [
+          "morning",
+          "a m"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0013",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan ritme yang stabil.",
+      "sampleAnswer": "Although I was nervous, I answered the question in front of the class.",
+      "requiredKeywords": [
+        "although",
+        "nervous",
+        "answered",
+        "class"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.72
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "Although I was nervous, I answered the question in front of the class."
+    },
+    {
+      "id": "speak_0014",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan ritme yang stabil.",
+      "sampleAnswer": "The new study routine helps me remember difficult words for longer.",
+      "requiredKeywords": [
+        "routine",
+        "remember",
+        "difficult",
+        "longer"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.72
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "The new study routine helps me remember difficult words for longer."
+    },
+    {
+      "id": "speak_0015",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan satu kebiasaan belajar yang ingin kamu perbaiki dan kenapa.",
+      "sampleAnswer": "I want to review vocabulary more regularly because I forget words when I wait too long.",
+      "requiredKeywords": [
+        "want",
+        "because",
+        "review"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.72,
+        "minimumWords": 8
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "want to",
+          "need to",
+          "would like to"
+        ],
+        [
+          "because",
+          "since"
+        ],
+        [
+          "review",
+          "practice",
+          "study",
+          "routine"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0016",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: ceritakan pengalaman ketika kamu menyelesaikan tugas yang awalnya terasa sulit.",
+      "sampleAnswer": "At first the project looked difficult, but I divided it into smaller tasks and finished it on time.",
+      "requiredKeywords": [
+        "difficult",
+        "but",
+        "finished"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.72,
+        "minimumWords": 8
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "difficult",
+          "hard",
+          "challenging"
+        ],
+        [
+          "but",
+          "however",
+          "although"
+        ],
+        [
+          "finished",
+          "completed",
+          "managed"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0017",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "roleplay",
+      "instruction": "Temanmu mengajak pergi saat kamu harus belajar. Tolak dengan sopan dan tawarkan waktu lain.",
+      "sampleAnswer": "I cannot go tonight because I need to study, but we can meet tomorrow.",
+      "requiredKeywords": [
+        "cannot",
+        "because",
+        "tomorrow"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.72,
+        "minimumWords": 8
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "cannot",
+          "cant",
+          "unable",
+          "not able"
+        ],
+        [
+          "because",
+          "need to",
+          "have to"
+        ],
+        [
+          "tomorrow",
+          "another time",
+          "later"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0018",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B1",
+      "mode": "roleplay",
+      "instruction": "Dalam kerja kelompok, minta teman menjelaskan alasan di balik pilihannya.",
+      "sampleAnswer": "Can you explain why you chose that option?",
+      "requiredKeywords": [
+        "explain",
+        "why",
+        "chose"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.72,
+        "minimumWords": 8
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "explain",
+          "tell me"
+        ],
+        [
+          "why",
+          "reason"
+        ],
+        [
+          "chose",
+          "choose",
+          "choice",
+          "decision"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0019",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini tanpa terburu-buru.",
+      "sampleAnswer": "The team changed its recommendation after reviewing the security risks more carefully.",
+      "requiredKeywords": [
+        "team",
+        "recommendation",
+        "reviewing",
+        "security",
+        "risks"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.74
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "The team changed its recommendation after reviewing the security risks more carefully."
+    },
+    {
+      "id": "speak_0020",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini tanpa terburu-buru.",
+      "sampleAnswer": "If the evidence remains inconsistent, we should delay the decision until we know more.",
+      "requiredKeywords": [
+        "evidence",
+        "inconsistent",
+        "delay",
+        "decision"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.74
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "If the evidence remains inconsistent, we should delay the decision until we know more."
+    },
+    {
+      "id": "speak_0021",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: bandingkan belajar sendiri dengan belajar bersama teman, lalu pilih mana yang lebih cocok untukmu.",
+      "sampleAnswer": "Studying alone helps me focus, while studying with friends is useful for discussion. I prefer studying alone because I concentrate better on difficult topics.",
+      "requiredKeywords": [
+        "while",
+        "prefer",
+        "because"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.74,
+        "minimumWords": 10
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "while",
+          "whereas",
+          "compared with",
+          "but"
+        ],
+        [
+          "prefer",
+          "better for me",
+          "more suitable"
+        ],
+        [
+          "because",
+          "since",
+          "helps me"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0022",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan satu risiko menggunakan AI untuk belajar dan cara menguranginya.",
+      "sampleAnswer": "One risk is accepting an incorrect answer too quickly, so I should verify important information with reliable sources.",
+      "requiredKeywords": [
+        "risk",
+        "verify",
+        "source"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.74,
+        "minimumWords": 10
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "risk",
+          "problem",
+          "danger"
+        ],
+        [
+          "verify",
+          "check",
+          "confirm"
+        ],
+        [
+          "source",
+          "sources",
+          "reference",
+          "references"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0023",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "roleplay",
+      "instruction": "Kamu terlambat mengirim tugas karena masalah teknis. Jelaskan situasi dan minta perpanjangan waktu singkat.",
+      "sampleAnswer": "I had a technical problem and could not submit the file on time. Could I have a short extension, please?",
+      "requiredKeywords": [
+        "technical",
+        "submit",
+        "extension"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.74,
+        "minimumWords": 10
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "technical",
+          "computer",
+          "internet",
+          "system"
+        ],
+        [
+          "submit",
+          "send",
+          "upload"
+        ],
+        [
+          "extension",
+          "more time",
+          "extra time"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0024",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "B2",
+      "mode": "roleplay",
+      "instruction": "Dalam rapat, kamu tidak setuju dengan ide teman. Sampaikan keberatan tanpa terdengar menyerang.",
+      "sampleAnswer": "I see the advantage, but I am concerned that this approach may create a security risk.",
+      "requiredKeywords": [
+        "but",
+        "concerned",
+        "risk"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.74,
+        "minimumWords": 10
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "but",
+          "however",
+          "although"
+        ],
+        [
+          "concerned",
+          "worry",
+          "concern"
+        ],
+        [
+          "risk",
+          "problem",
+          "issue"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0025",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan penekanan logis pada bagian kontras.",
+      "sampleAnswer": "The result is encouraging, but it should not be treated as conclusive evidence.",
+      "requiredKeywords": [
+        "encouraging",
+        "but",
+        "conclusive",
+        "evidence"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.76
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "The result is encouraging, but it should not be treated as conclusive evidence."
+    },
+    {
+      "id": "speak_0026",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini dengan penekanan logis pada bagian kontras.",
+      "sampleAnswer": "A strong average can still conceal substantial differences between individual groups.",
+      "requiredKeywords": [
+        "average",
+        "conceal",
+        "differences",
+        "groups"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.76
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "A strong average can still conceal substantial differences between individual groups."
+    },
+    {
+      "id": "speak_0027",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan mengapa korelasi tidak selalu menunjukkan hubungan sebab-akibat.",
+      "sampleAnswer": "Correlation shows that two variables move together, but another factor may influence both of them, so correlation alone does not establish causation.",
+      "requiredKeywords": [
+        "correlation",
+        "causation",
+        "factor"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.76,
+        "minimumWords": 12
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "correlation"
+        ],
+        [
+          "causation",
+          "cause and effect",
+          "causal"
+        ],
+        [
+          "factor",
+          "variable",
+          "confounder"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0028",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: beri argumen singkat apakah sekolah sebaiknya mengizinkan AI generatif untuk tugas tertentu.",
+      "sampleAnswer": "Schools can allow generative AI for brainstorming and feedback if students still explain their reasoning and verify factual claims.",
+      "requiredKeywords": [
+        "allow",
+        "if",
+        "verify"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.76,
+        "minimumWords": 12
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "allow",
+          "permit"
+        ],
+        [
+          "if",
+          "provided that",
+          "as long as"
+        ],
+        [
+          "verify",
+          "check",
+          "explain",
+          "reasoning"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0029",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "roleplay",
+      "instruction": "Kamu sedang presentasi. Seorang audiens menantang asumsi utama analisismu. Akui batasan dan jelaskan langkah verifikasi berikutnya.",
+      "sampleAnswer": "That is a fair concern. The assumption has not been fully tested, so I would run a sensitivity analysis before making a stronger claim.",
+      "requiredKeywords": [
+        "concern",
+        "assumption",
+        "tested",
+        "analysis"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.76,
+        "minimumWords": 12
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "concern",
+          "limitation",
+          "point"
+        ],
+        [
+          "assumption"
+        ],
+        [
+          "test",
+          "tested",
+          "verify",
+          "validation"
+        ],
+        [
+          "analysis",
+          "sensitivity",
+          "robustness"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0030",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C1",
+      "mode": "roleplay",
+      "instruction": "Dalam diskusi beasiswa, tanyakan secara spesifik apakah biaya hidup termasuk dalam pendanaan.",
+      "sampleAnswer": "Could you clarify whether the scholarship covers living expenses in addition to tuition and course fees?",
+      "requiredKeywords": [
+        "clarify",
+        "scholarship",
+        "living",
+        "tuition"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.76,
+        "minimumWords": 12
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "clarify",
+          "confirm",
+          "tell me"
+        ],
+        [
+          "scholarship",
+          "funding",
+          "grant"
+        ],
+        [
+          "living",
+          "housing",
+          "expenses"
+        ],
+        [
+          "tuition",
+          "course fees",
+          "fees"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0031",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini sambil mempertahankan phrasing yang jelas.",
+      "sampleAnswer": "Urgency may justify immediate attention without justifying absolute confidence in the proposed solution.",
+      "requiredKeywords": [
+        "urgency",
+        "attention",
+        "without",
+        "confidence"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.78
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "Urgency may justify immediate attention without justifying absolute confidence in the proposed solution."
+    },
+    {
+      "id": "speak_0032",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "repeat_target",
+      "instruction": "Baca kalimat ini sambil mempertahankan phrasing yang jelas.",
+      "sampleAnswer": "The apparent contradiction disappears once the claims are evaluated at different levels of analysis.",
+      "requiredKeywords": [
+        "contradiction",
+        "claims",
+        "different",
+        "levels",
+        "analysis"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "token_f1",
+        "threshold": 0.78
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "controlled spoken production"
+      },
+      "targetText": "The apparent contradiction disappears once the claims are evaluated at different levels of analysis."
+    },
+    {
+      "id": "speak_0033",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan kapan argumen yang persuasif secara retoris tetap lemah secara evidensial.",
+      "sampleAnswer": "An argument can be rhetorically persuasive when it uses vivid framing or urgency, yet remain evidentially weak if its central claims rely on selective or insufficient data.",
+      "requiredKeywords": [
+        "persuasive",
+        "evidence",
+        "data"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.78,
+        "minimumWords": 14
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "persuasive",
+          "rhetorical"
+        ],
+        [
+          "evidence",
+          "evidential",
+          "evidentially",
+          "support"
+        ],
+        [
+          "data",
+          "sources",
+          "claims"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0034",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "guided_response",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan bagaimana kamu akan mengevaluasi kebijakan yang terlihat berhasil berdasarkan satu metrik rata-rata.",
+      "sampleAnswer": "I would examine the distribution behind the average, compare outcomes across relevant subgroups, and test whether the result remains robust under alternative specifications.",
+      "requiredKeywords": [
+        "average",
+        "subgroups",
+        "robust"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.78,
+        "minimumWords": 14
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "guided spontaneous production"
+      },
+      "targetConcepts": [
+        [
+          "average",
+          "mean"
+        ],
+        [
+          "subgroup",
+          "subgroups",
+          "groups",
+          "distribution"
+        ],
+        [
+          "robust",
+          "sensitivity",
+          "alternative"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0035",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "roleplay",
+      "instruction": "Sebagai reviewer, sampaikan bahwa kesimpulan penulis masuk akal tetapi terlalu pasti dibanding kekuatan buktinya.",
+      "sampleAnswer": "The conclusion is plausible, but the current evidence does not support the level of certainty used in the manuscript. I suggest narrowing the claim or adding stronger validation.",
+      "requiredKeywords": [
+        "plausible",
+        "evidence",
+        "certainty",
+        "claim"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.78,
+        "minimumWords": 14
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "plausible",
+          "reasonable"
+        ],
+        [
+          "evidence",
+          "support"
+        ],
+        [
+          "certainty",
+          "certain",
+          "confidence"
+        ],
+        [
+          "claim",
+          "conclusion"
+        ]
+      ]
+    },
+    {
+      "id": "speak_0036",
+      "schema": "fiezel-speaking-item-v1",
+      "level": "C2",
+      "mode": "roleplay",
+      "instruction": "Dalam rapat, bedakan dengan jelas antara kebutuhan bertindak cepat dan kepastian bahwa satu solusi tertentu pasti benar.",
+      "sampleAnswer": "I agree that the issue requires prompt action, but urgency does not prove that this particular solution is correct. We should act while preserving room to revise the decision as evidence improves.",
+      "requiredKeywords": [
+        "urgency",
+        "prove",
+        "solution",
+        "evidence"
+      ],
+      "scoring": {
+        "claim": "spoken_production_coverage_not_pronunciation",
+        "metric": "target_concept_coverage",
+        "threshold": 0.78,
+        "minimumWords": 14
+      },
+      "privacy": {
+        "persistRawAudio": false,
+        "persistRawTranscript": false
+      },
+      "pedagogy": {
+        "focus": "functional spoken interaction"
+      },
+      "targetConcepts": [
+        [
+          "urgency",
+          "urgent",
+          "quickly",
+          "prompt"
+        ],
+        [
+          "prove",
+          "certain",
+          "certainty"
+        ],
+        [
+          "solution",
+          "approach"
+        ],
+        [
+          "evidence",
+          "information"
+        ]
+      ]
+    }
+  ]
+}
