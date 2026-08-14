@@ -52,6 +52,18 @@
   }
   function delay(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
   function errorText(error){return String(error?.message||error?.name||error||'unknown error')}
+  function requiredContentType(item){
+    if(/\.(?:mjs|js)$/i.test(item.path))return'text/javascript; charset=utf-8';
+    if(/\.wasm$/i.test(item.path))return'application/wasm';
+    return'';
+  }
+  function cachedContentTypeIsValid(item,value){
+    const mime=String(value||'').split(';',1)[0].trim().toLowerCase();
+    if(!mime)return true;
+    if(/\.(?:mjs|js)$/i.test(item.path))return['text/javascript','application/javascript','text/ecmascript','application/ecmascript'].includes(mime);
+    if(/\.wasm$/i.test(item.path))return mime==='application/wasm';
+    return true;
+  }
 
   async function storageEstimate(requestPersistence=false){
     const manager=root.navigator?.storage;
@@ -79,14 +91,16 @@
     const url=absolute(item.path);
     try{
       const response=await cache.match(url);
-      if(!response)return{url,valid:false,length:0};
+      if(!response)return{url,valid:false,length:0,contentType:''};
       const length=Number(response.headers?.get?.('content-length')||0);
+      const contentType=String(response.headers?.get?.('content-type')||'');
       const isLarge=item.bytes>=LARGE_ASSET_STREAM_THRESHOLD;
+      if(!cachedContentTypeIsValid(item,contentType))return{url,valid:false,length,contentType,reason:'mime'};
       // For streamed large assets, a CDN may preserve encoded transfer Content-Length.
       // Cache presence is the reliable low-memory signal; cache.put rejects an incomplete body stream.
-      if(!isLarge&&length&&length!==item.bytes)return{url,valid:false,length};
-      return{url,valid:true,length};
-    }catch{return{url,valid:false,length:0}}
+      if(!isLarge&&length&&length!==item.bytes)return{url,valid:false,length,contentType,reason:'size'};
+      return{url,valid:true,length,contentType};
+    }catch{return{url,valid:false,length:0,contentType:''}}
   }
   async function storagePreflight(cache){
     const states=[];
@@ -112,17 +126,18 @@
     return true;
   }
   async function putFetchedAsset(cache,item,url,fetched){
-    // Do not validate the network Content-Length. With gzip/brotli it may describe
-    // encoded transfer bytes instead of the decoded response body.
+    // Module scripts and streaming WebAssembly need deterministic MIME types in Cache Storage.
+    // Safari rejects an ESM import when a cached .mjs response is application/octet-stream.
+    const contentType=requiredContentType(item)||fetched.headers?.get?.('content-type')||'application/octet-stream';
     if(item.bytes>=LARGE_ASSET_STREAM_THRESHOLD){
-      await cache.put(url,fetched);
+      await cache.put(url,new Response(fetched.body,{status:fetched.status||200,statusText:fetched.statusText||'',headers:{'Content-Type':contentType}}));
     }else{
       const buffer=await fetched.arrayBuffer();
       if(buffer.byteLength!==item.bytes)throw new Error(`Voice asset size mismatch: ${item.path}`);
-      await cache.put(url,new Response(buffer,{headers:{'Content-Type':fetched.headers?.get?.('content-type')||'application/octet-stream','Content-Length':String(buffer.byteLength)}}));
+      await cache.put(url,new Response(buffer,{headers:{'Content-Type':contentType,'Content-Length':String(buffer.byteLength)}}));
     }
     const stored=await cachedAssetState(cache,item);
-    if(!stored.valid)throw new Error(`Offline voice cache verification failed: ${item.path}`);
+    if(!stored.valid)throw new Error(`Offline voice cache verification failed: ${item.path}${stored.reason==='mime'?' (MIME)':''}`);
   }
   async function downloadAsset(cache,item){
     const url=absolute(item.path);
@@ -180,7 +195,8 @@
         modelId:root.FiezelNeuralVoiceConfig.modelId,
         localModelPath:'./vendor/',
         voiceBaseUrl:'./vendor/kokoro-model/voices',
-        wasmBasePath:'./vendor/kokoro-js/wasm/',
+        wasmBasePath:absolute('vendor/kokoro-js/wasm/'),
+        runtimeOrigin:new URL(rootUrl).origin,
         dtype:root.FiezelNeuralVoiceConfig.dtype,
         device:root.FiezelNeuralVoiceConfig.device
       });
