@@ -23,37 +23,44 @@
     {path:'vendor/kokoro-model/voices/bm_george.bin',bytes:522240}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
-  let phase='idle',lastError='',service=null,adapter=null,preparePromise=null,initializePromise=null,verifiedForSession=false;
+  const memoryAssets=new Map();
+  let phase='idle',lastError='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,verifiedForSession=false;
 
   function readStatus(){
     try{
       const value=JSON.parse(root.localStorage?.getItem(STATUS_KEY)||'null');
       if(value?.schema===STATUS_SCHEMA&&value.version===version&&value.prepared===true)return value;
     }catch{}
-    return{schema:STATUS_SCHEMA,version,prepared:false,preparedAt:0};
+    return{schema:STATUS_SCHEMA,version,prepared:false,storage:'',preparedAt:0};
   }
-  function writeStatus(prepared){
-    const value={schema:STATUS_SCHEMA,version,prepared:prepared===true,preparedAt:prepared?Date.now():0};
+  function writeStatus(prepared,storageMode){
+    const value={schema:STATUS_SCHEMA,version,prepared:prepared===true,storage:prepared?String(storageMode||storage||'cache'):'',preparedAt:prepared?Date.now():0};
     try{root.localStorage?.setItem(STATUS_KEY,JSON.stringify(value))}catch{}
     return value;
   }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared,ready:!!service,error:lastError,totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false});
   }
+  function preparedStorage(){return phase==='cached'||phase==='ready'?(storage||readStatus().storage):''}
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
     if(typeof callback==='function')callback(payload);
     root.dispatchEvent?.(new CustomEvent('fiezel-neural-voice-progress',{detail:payload}));
   }
   async function verifyCachedAssets(){
-    if(!('caches'in root))return false;
-    const cache=await caches.open(cacheName);
     for(const item of assets){
-      const response=await cache.match(absolute(item.path));
-      if(!response)return false;
-      const length=Number(response.headers.get('content-length')||0);
-      if(length&&length!==item.bytes)return false;
+      const url=absolute(item.path);
+      let found=false,length=0;
+      if('caches'in root){
+        try{
+          const cache=await caches.open(cacheName);
+          const response=await cache.match(url);
+          if(response){found=true;length=Number(response.headers.get('content-length')||0)}
+        }catch{}
+      }
+      if(!found&&memoryAssets.has(url)){found=true;length=memoryAssets.get(url).bytes}
+      if(!found||(length&&length!==item.bytes))return false;
     }
     return true;
   }
@@ -61,21 +68,31 @@
     if(!root.isSecureContext&&!/^https?:\/\/(?:localhost|127\.0\.0\.1)(?::\d+)?\//.test(location.href))throw new Error('Secure context required for offline voice assets');
     if(!('caches'in root))throw new Error('Cache Storage is unavailable');
     const cache=await caches.open(cacheName);
-    let completedBytes=0,completed=0;
+    let completedBytes=0,completed=0,usedMemory=false;
     phase='downloading';lastError='';emit({completed,completedBytes,current:''},onProgress);
     for(const item of assets){
-      const url=absolute(item.path),cached=await cache.match(url);
-      if(!cached){
-        const response=await fetch(url,{cache:'no-store',credentials:'same-origin'});
-        if(!response.ok)throw new Error(`Voice asset failed: ${item.path} (${response.status})`);
-        const length=Number(response.headers.get('content-length')||0);
+      const url=absolute(item.path);
+      let haveAsset=false;
+      try{haveAsset=!!(await cache.match(url))}catch{}
+      if(!haveAsset&&memoryAssets.has(url)){haveAsset=true;usedMemory=true}
+      if(!haveAsset){
+        const fetched=await fetch(url,{cache:'no-store',credentials:'same-origin'});
+        if(!fetched.ok)throw new Error(`Voice asset failed: ${item.path} (${fetched.status})`);
+        const length=Number(fetched.headers.get('content-length')||0);
         if(length&&length!==item.bytes)throw new Error(`Voice asset size mismatch: ${item.path}`);
-        await cache.put(url,response.clone());
+        const buffer=await fetched.arrayBuffer();
+        if(buffer.byteLength!==item.bytes)throw new Error(`Voice asset size mismatch: ${item.path}`);
+        try{
+          await cache.put(url,new Response(buffer,{headers:{'Content-Type':fetched.headers.get('content-type')||'application/octet-stream','Content-Length':String(buffer.byteLength)}}));
+        }catch(cacheError){
+          memoryAssets.set(url,{buffer,bytes:item.bytes});usedMemory=true;lastError=String(cacheError?.name||cacheError?.message||cacheError);
+        }
       }
       completed++;completedBytes+=item.bytes;emit({completed,completedBytes,current:item.path},onProgress);
     }
+    storage=usedMemory?'memory':'cache';
     if(!(await verifyCachedAssets()))throw new Error('Offline voice cache verification failed');
-    writeStatus(true);verifiedForSession=true;phase='cached';emit({completed,completedBytes,current:''},onProgress);return status();
+    writeStatus(true,storage);verifiedForSession=true;phase='cached';emit({completed,completedBytes,current:''},onProgress);return status();
   }
   async function initialize(){
     if(service)return service;
@@ -83,7 +100,8 @@
     initializePromise=(async()=>{
       if(!root.FiezelNeuralVoiceConfig||!root.FiezelKokoroAdapter||!root.FiezelNeuralVoice||!root.FiezelWebAudioPlayer)throw new Error('Neural voice runtime modules are missing');
       phase='initializing';lastError='';
-      const kokoro=await import(absolute('vendor/kokoro-js/kokoro.web.js'));
+      const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
+      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js'));
       adapter=root.FiezelKokoroAdapter.createKokoroAdapter({
         KokoroTTS:kokoro.KokoroTTS,
         kokoroEnv:kokoro.env,

@@ -19,7 +19,7 @@
 | Grammar Quality | 24 PASS / 0 FAIL | 3.225 questions, 0 cross duplicates, 0 focus leaks |
 | Content QA | PASS | 0 blocker, 61 bounded review candidates |
 | Speaking + Listening | 25 PASS / 0 FAIL | inventory, scoring, privacy, audio lock, lifecycle |
-| Neural Voice | 26 PASS / 0 FAIL | immutable source/assets, local routing, licenses, opt-in cache |
+| Neural Voice | 28 PASS / 0 FAIL | immutable source/assets, local routing, licenses, opt-in cache, buffered cache put, memory fallback |
 | Neural HTTP | PASS | model/WASM exact size and model Range request |
 | PWA | PASS | feature precache, cache invalidation, heavy-asset exclusion, navigation-only fallback |
 | Full legacy regression | 32/32 commands PASS | exit code 0 for every command |
