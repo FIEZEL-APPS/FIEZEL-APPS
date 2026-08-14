@@ -293,6 +293,8 @@
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
 
   diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),cacheAvailable:('caches'in root)});
-  if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag();
+  if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
+    if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'})).catch(()=>{});
+  });
   root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes});
 })(typeof globalThis!=='undefined'?globalThis:this);

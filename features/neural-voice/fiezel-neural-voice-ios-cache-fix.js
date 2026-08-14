@@ -18,13 +18,21 @@
   // priming doesn't finish in time, we give up on the head-start and let
   // the normal prepare()/warmAssets() flow (which already retries and
   // surfaces errors to the UI) do the actual work instead.
-  const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||25000;
+  const PRIME_TIMEOUT_MS=Number(root.FIEZEL_IOS_PRIME_TIMEOUT_MS)||45000;
+  const PRIME_ASSET_COUNT=Number(runtime.assetCount)||13;
+  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119796601;
   let primePromise=null;
 
   function withTimeout(promise,ms,label){
     let timer=null;
     const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error(`${label}_timeout`)),ms)});
     return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+  }
+
+  function reportProgress(progress,onProgress){
+    const payload=Object.freeze({...progress,totalBytes:PRIME_TOTAL_BYTES,assetCount:PRIME_ASSET_COUNT});
+    if(typeof onProgress==='function')onProgress(payload);
+    try{if(typeof CustomEvent!=='undefined'&&root.dispatchEvent)root.dispatchEvent(new CustomEvent('fiezel-neural-voice-progress',{detail:payload}))}catch{}
   }
 
   function diag(entry){
@@ -80,17 +88,24 @@
     return true;
   }
 
-  async function primeLargeAssets(){
+  async function primeLargeAssets(onProgress){
     if(!root.caches)return false;
     const cache=await root.caches.open(cacheName);
+    let completed=0,completedBytes=0;
+    const done=(item)=>{
+      completed++;completedBytes+=item.bytes;
+      reportProgress({phase:'downloading',completed,completedBytes,current:item.path},onProgress);
+    };
     // WebKit is more reliable when the 21 MB WASM is fully materialized before cache.put.
     if(!(await has(cache,absolute(WASM.path)))){
       try{await cacheBuffered(cache,WASM)}catch(error){diag({phase:'wasm_prime_failed',error:String(error?.message||error)})}
     }
+    done(WASM);
     // Let CacheStorage own the 92 MB model transfer instead of wrapping a live JS ReadableStream.
     if(!(await has(cache,absolute(MODEL.path)))){
       try{await cacheBrowserManaged(cache,MODEL)}catch(error){diag({phase:'model_prime_failed',error:String(error?.message||error)})}
     }
+    done(MODEL);
     return true;
   }
 
@@ -98,7 +113,7 @@
     if(primePromise)return primePromise;
     primePromise=(async()=>{
       try{
-        await withTimeout(primeLargeAssets(),PRIME_TIMEOUT_MS,'ios_prime');
+        await withTimeout(primeLargeAssets(options.onProgress),PRIME_TIMEOUT_MS,'ios_prime');
       }catch(error){
         // Priming is a best-effort head start, not a requirement -- if it
         // stalls or times out, fall through to the normal prepare() flow
