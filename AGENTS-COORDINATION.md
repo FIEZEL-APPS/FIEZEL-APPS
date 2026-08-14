@@ -1,4 +1,4 @@
-# FIEZEL Agent Coordination Protocol (v1)
+# FIEZEL Agent Coordination Protocol (v1.2)
 
 Semua agent opencode yang bekerja pada repo ini WAJIB baca file ini SEBELUM
 melakukan tindakan apa pun, dan WAJIB update `TASKS-LEDGER.json` setelah selesai
@@ -72,6 +72,34 @@ PASS/DONE atau FAIL → kembali ke WORKER → perbaikan → test → verifikasi 
 Agent 5 tidak menyatakan selesai hanya karena worker melapor "done"; wajib ada
 verifikasi + bukti (test lokal/CI/evidence device).
 
+## Protokol Pelengkap (WAJIB dibaca semua agent)
+
+`FIEZEL-Orkestrasi-Protokol-Pelengkap.md` (root repo) melengkapi protokol ini dan
+WAJIB dibaca ulang di setiap sesi baru sebelum memproses request FIEZEL. Empat
+titik kontrol wajib:
+
+1. **SCOPE-LOCK** — setiap delegasi Agent 5 → worker wajib memakai format
+   `scope.files_allowed / files_forbidden / objective / forbidden_actions /
+   done_when / evidence_required`. Task tanpa field lengkap DITOLAK oleh worker.
+   Worker berhenti & lapor jika menemukan kebutuhan di luar scope — dilarang
+   "sekalian dibenerin". Agent 5 wajib cek overlap scope antar worker di tahap
+   PLANNING, bukan menyerahkannya ke INTEGRATE.
+2. **CONTEXT-INJECTION** — jika root cause sudah diketahui (CONFIRMED/SUSPECTED),
+   Agent 5 wajib menyuntikkan blok `root_cause_context` (summary, evidence,
+   previously_attempted_fixes, do_not_repeat) ke worker. Worker dilarang
+   re-investigasi dari nol; jika meragukan, ajukan ke Agent 5 SEBELUM ganti
+   pendekatan.
+3. **CHECKLIST VERIFIER (6 poin)** — verifier wajib menjalankan satu per satu:
+   DIFF CHECK (perubahan hanya di files_allowed), EVIDENCE CHECK (bukti eksekusi
+   nyata), OBJECTIVE CHECK (done_when tercapai satu per satu), REGRESSION CHECK
+   (fitur yang sudah berhasil tetap jalan), FORBIDDEN-ACTION CHECK (larangan
+   dilanggar = REFUTED otomatis), CI CHECK (hijau, tidak di-skip). Output hanya
+   VERIFIED / REFUTED / UNVERIFIED.
+4. **KRITERIA SELESAI Agent 5** — sebelum FINAL REPORT: SEMUA subtask VERIFIED
+   (bukan sebagian), status tiap gejala disebutkan terpisah, regresi yang
+   ditemukan verifier dilaporkan eksplisit, dan laporan membedakan "lolos test
+   otomatis" vs "perlu konfirmasi manual di device".
+
 ## Area Kerja Saat Ini
 
 | Area | File utama | Status |
@@ -82,6 +110,8 @@ verifikasi + bukti (test lokal/CI/evidence device).
 | SW / COI | sw.js | lihat ledger |
 | UI/UX voice | app.js | lihat ledger |
 
-Versi protokol ini: v1.1 (2026-08-14). v1.1: Agent 5 ditetapkan sebagai Main Coordinator
-(worker pool agent-1..4 + verifier, depth 1); protokol squad v1 tetap berlaku. Perubahan
+Versi protokol ini: v1.2 (2026-08-14). v1.1: Agent 5 ditetapkan sebagai Main Coordinator
+(worker pool agent-1..4 + verifier, depth 1); protokol squad v1 tetap berlaku. v1.2:
+FIEZEL-Orkestrasi-Protokol-Pelengkap.md ditetapkan sebagai bacaan wajib (scope-lock,
+context-injection, checklist verifier 6 poin, kriteria selesai). Perubahan
 protokol hanya oleh Coordinator dengan persetujuan Owner.
