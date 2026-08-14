@@ -38,11 +38,31 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('web audio accepts Kokoro Float32 payload',()=>assert.ok(player.pickSamples({data:new Float32Array([0,.1])}) instanceof Float32Array));
   await test('bootstrap uses dynamic same-origin vendor import',()=>assert.ok(bootstrap.includes("absolute('vendor/kokoro-js/kokoro.web.js')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
   await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared)return browserSpeak")));
-  await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf('writeStatus(true)')));
+  await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf('writeStatus(true')));
   await test('stale prepared state fails closed to browser TTS',()=>assert.ok(bootstrap.includes('if(!(await verifyCachedAssets())){writeStatus(false)')));
   await test('bootstrap contains no vendor endpoint or credential',()=>assert.ok(!/https?:\/\//i.test(bootstrap)&&!/(?:api[_-]?key|bearer\s+[a-z0-9._-]{12,}|sk-[a-z0-9_-]{12,})/i.test(bootstrap)));
   await test('production claim remains false pending device gates',()=>assert.deepStrictEqual([lock.promotion.sourceAndAssetClosure,lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS','PENDING',false]));
   const bundle=await import('./vendor/kokoro-js/kokoro.web.js');
   await test('browser bundle exports patched controls',()=>assert.ok(bundle.KokoroTTS&&bundle.env&&bundle.setVoiceDataUrl&&'allowRemoteModels'in bundle.env&&'allowLocalModels'in bundle.env&&'localModelPath'in bundle.env&&'wasmPaths'in bundle.env));
+  await test('bootstrap buffers bodies before cache.put (Safari streaming-safe)',()=>assert.ok(bootstrap.includes('await fetched.arrayBuffer()')&&bootstrap.includes('new Response(buffer')));
+  await test('bootstrap falls back to memory when cache quota is exceeded',async()=>{
+    const vm=require('vm');
+    const fakeAssets=[['vendor/kokoro-js/kokoro.web.js',2135645],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',44484],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',21596019],['vendor/kokoro-model/config.json',45],['vendor/kokoro-model/tokenizer.json',3498],['vendor/kokoro-model/tokenizer_config.json',114],['vendor/kokoro-model/onnx/model_quantized.onnx',92361116],['vendor/kokoro-model/voices/af_heart.bin',522240],['vendor/kokoro-model/voices/af_bella.bin',522240],['vendor/kokoro-model/voices/af_nicole.bin',522240],['vendor/kokoro-model/voices/am_michael.bin',522240],['vendor/kokoro-model/voices/bf_emma.bin',522240],['vendor/kokoro-model/voices/bm_george.bin',522240]];
+    const sizes=Object.fromEntries(fakeAssets);
+    const localStorageData={};const localStorage={getItem:k=>localStorageData[k]??null,setItem:(k,v)=>localStorageData[k]=String(v)};
+    function makeFetch(){return async url=>{const match=fakeAssets.find(([p])=>String(url).endsWith(p));const key=match?match[0]:null;const len=sizes[key];if(!len)throw new Error('unexpected asset '+String(url));return{ok:true,headers:{get:n=>{n=String(n).toLowerCase();if(n==='content-length')return String(len);if(n==='content-type')return 'application/octet-stream';return null}},arrayBuffer:async()=>new ArrayBuffer(len)}}}
+    function makeCaches(putThrows){const store=new Map();return{open:async()=>({match:async url=>store.get(String(url))||null,put:async(url,response)=>{if(putThrows){const e=new Error('quota');e.name='QuotaExceededError';throw e}store.set(String(url),{headers:{get:n=>n.toLowerCase()==='content-length'?String(sizes[String(url).split('/').pop()]||0):null}})}})}};
+    const moduleStub={KokoroTTS:{from_pretrained:async()=>({generate:async()=>({data:new Float32Array([0]),sampling_rate:24000}),voices:{}})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
+    function makeContext(caches){const ctx={console,FIEZEL_VERSION:'5.18.0',location:{href:'http://localhost/'},document:{currentScript:{src:'http://localhost/features/neural-voice/fiezel-neural-voice-bootstrap.js'}},isSecureContext:true,localStorage,caches,fetch:makeFetch(),Response:function(){},CustomEvent:function(type){this.type=type},dispatchEvent(){},__fiezelDynamicImport:async()=>moduleStub,FiezelNeuralVoiceConfig:config,FiezelKokoroAdapter:adapterApi,FiezelNeuralVoice:core,FiezelWebAudioPlayer:player,URL,Promise,setTimeout};return ctx}
+    const memoryCtx=makeContext(makeCaches(true));vm.createContext(memoryCtx);vm.runInContext(bootstrap,memoryCtx,{filename:'bootstrap-memory.js'});
+    const memoryStatus=await memoryCtx.FiezelVoiceRuntime.prepare();
+    assert.equal(memoryStatus.prepared,true,'memory fallback did not complete prepare');
+    assert.equal(memoryStatus.storage,'memory','memory fallback storage mode not reported');
+    assert.equal(await memoryCtx.FiezelVoiceRuntime.verifyCachedAssets(),true,'memory fallback verification failed');
+    const cacheCtx=makeContext(makeCaches(false));vm.createContext(cacheCtx);vm.runInContext(bootstrap,cacheCtx,{filename:'bootstrap-cache.js'});
+    const cacheStatus=await cacheCtx.FiezelVoiceRuntime.prepare();
+    assert.equal(cacheStatus.prepared,true,'cache mode did not complete prepare');
+    assert.equal(cacheStatus.storage,'cache','cache mode storage not reported');
+  });
   console.log(`FIEZEL Neural Voice: PASS ${pass}/0`);
 })().catch(error=>{console.error('FIEZEL Neural Voice: FAIL',error.stack||error);process.exit(1)});

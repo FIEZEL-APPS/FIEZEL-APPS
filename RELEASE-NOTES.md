@@ -25,6 +25,8 @@
 - Membatalkan stale `prepared` state jika cache perangkat tidak lagi lengkap.
 - Membatasi fallback offline hanya untuk navigasi, sehingga request binary yang gagal tidak menerima `index.html`.
 - Memperbaiki release-audit temp routing agar portabel pada environment tanpa `/tmp`.
+- Memperbaiki kegagalan persiapan neural voice pada device dengan Cache Storage terbatas (mis. iOS Safari): body aset di-buffer penuh sebelum `cache.put` (Safari streaming-safe), dan bila kuota cache menolak, aset diunduh ke memori dengan mode `memory` — UI menampilkan peringatan "mode memori" plus saran memasang ke Layar Utama agar tersimpan permanen.
+- Menambahkan 2 assertion bootstrap (buffered body + memory fallback); gate audit disesuaikan ke **28 assertion neural voice**.
 
 ## Automated evidence
 
@@ -32,7 +34,7 @@
 - Product Audit: **49 PASS / 0 FAIL**.
 - Grammar Quality: **24 PASS / 0 FAIL**.
 - Speaking + Listening: **25 PASS / 0 FAIL**.
-- Neural Voice: **26 PASS / 0 FAIL**.
+- Neural Voice: **28 PASS / 0 FAIL**.
 - Grammar runtime: 3.225 questions; 0 cross-lesson duplicates; 0 focus leaks.
 - Content QA: 0 blocker / 61 bounded review candidates.
 - Model HTTP: exact HEAD sizes and 1.024-byte Range response PASS.

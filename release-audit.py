@@ -169,7 +169,7 @@ check('HTTP release smoke test',http_smoke_run.returncode==0 and 'FIEZEL HTTP sm
 speaking_listening_run=subprocess.run(['node',str(ROOT/'speaking-listening-test.js')],capture_output=True,text=True)
 check('Speaking and Listening gate',speaking_listening_run.returncode==0 and 'FIEZEL Speaking + Listening: PASS 25/0' in speaking_listening_run.stdout,speaking_listening_run.stdout.strip()[-800:] or speaking_listening_run.stderr.strip()[-800:])
 neural_voice_run=subprocess.run(['node',str(ROOT/'neural-voice-test.js')],capture_output=True,text=True)
-check('Local neural voice gate',neural_voice_run.returncode==0 and 'FIEZEL Neural Voice: PASS 26/0' in neural_voice_run.stdout,neural_voice_run.stdout.strip()[-800:] or neural_voice_run.stderr.strip()[-800:])
+check('Local neural voice gate',neural_voice_run.returncode==0 and 'FIEZEL Neural Voice: PASS 28/0' in neural_voice_run.stdout,neural_voice_run.stdout.strip()[-800:] or neural_voice_run.stderr.strip()[-800:])
 neural_http_run=subprocess.run(['node',str(ROOT/'neural-voice-http-test.js')],capture_output=True,text=True)
 check('Neural voice HTTP and Range gate',neural_http_run.returncode==0 and 'FIEZEL neural voice HTTP: PASS' in neural_http_run.stdout,neural_http_run.stdout.strip()[-800:] or neural_http_run.stderr.strip()[-800:])
 notification_run=subprocess.run(['node',str(ROOT/'notification-reminder-test.js')],capture_output=True,text=True)
