@@ -1,0 +1,48 @@
+name: MASTER Authority Guard
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  authority:
+    name: MASTER-only authority
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce sole execution identity
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          ACTOR: ${{ github.actor }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          set -euo pipefail
+          OWNER='FIEZEL-APPS'
+
+          if [[ "$EVENT_NAME" == 'push' ]]; then
+            if [[ "$ACTOR" != "$OWNER" ]]; then
+              echo "BLOCKED: main write actor '$ACTOR' is not MASTER owner '$OWNER'."
+              exit 1
+            fi
+            echo "PASS: main write actor is MASTER owner '$OWNER'."
+            exit 0
+          fi
+
+          if [[ "$EVENT_NAME" == 'pull_request' ]]; then
+            if [[ "$PR_AUTHOR" != "$OWNER" ]]; then
+              echo "BLOCKED: PR author '$PR_AUTHOR' is advisory-only and has no execution authority."
+              exit 1
+            fi
+            echo "PASS: PR execution candidate was opened by MASTER owner '$OWNER'."
+            exit 0
+          fi
+
+          echo "BLOCKED: unsupported authority event '$EVENT_NAME'."
+          exit 1
