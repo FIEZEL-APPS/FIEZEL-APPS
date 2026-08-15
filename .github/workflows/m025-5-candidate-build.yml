@@ -23,18 +23,37 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Build source-derived candidate without repository writes
+      - name: Build and verify source-derived candidate without repository writes
         shell: bash
         run: |
           set +e
           bash tools/rebuild-neural-vendor.sh
           rc=$?
           set -e
+
+          mkdir -p .vendor-repro
           echo "baseline_compare_exit=$rc" | tee -a .vendor-repro/candidate-report.txt
+          test "$rc" -ne 0
           test -s .vendor-repro/kokoro.web.js
-          sha256sum .vendor-repro/kokoro.web.js | tee -a .vendor-repro/candidate-report.txt
-          stat -c 'candidateSize=%s' .vendor-repro/kokoro.web.js | tee -a .vendor-repro/candidate-report.txt
-          echo 'Candidate build produced; mismatch with m025-4 lock is expected until MASTER advances the locked bundle.' | tee -a .vendor-repro/candidate-report.txt
+
+          expected_sha="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.bundle.sha256")"
+          expected_size="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.bundle.sizeBytes")"
+          candidate_state="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.state")"
+          runtime_promoted="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.provenance.runtimePromoted")"
+          actual_sha="$(sha256sum .vendor-repro/kokoro.web.js | awk '{print $1}')"
+          actual_size="$(stat -c '%s' .vendor-repro/kokoro.web.js)"
+
+          printf 'candidateState=%s\nruntimePromoted=%s\nexpectedCandidateSha256=%s\nactualCandidateSha256=%s\nexpectedCandidateSize=%s\nactualCandidateSize=%s\n' \
+            "$candidate_state" "$runtime_promoted" "$expected_sha" "$actual_sha" "$expected_size" "$actual_size" \
+            | tee -a .vendor-repro/candidate-report.txt
+
+          test "$candidate_state" = 'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED'
+          test "$runtime_promoted" = 'false'
+          test "$actual_sha" = "$expected_sha"
+          test "$actual_size" = "$expected_size"
+
+          echo 'Candidate bytes match the staged m025-5 lock; mismatch with the m025-4 runtime lock remains an intentional promotion barrier.' \
+            | tee -a .vendor-repro/candidate-report.txt
       - name: Upload candidate artifact
         uses: actions/upload-artifact@v4
         with:
