@@ -23,12 +23,31 @@
     "phonemizerRepository": "xenova/phonemizer.js",
     "phonemizerCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
-    "onnxruntimeCommit": "89f8206ba4f1c22c39e0297fb55272e8ce8cd7d0"
+    "onnxruntimeCommit": "89f8206ba4f1c22c39e0297fb55272e8ce8cd7d0",
+    "phonemizerSourceOverride": {
+      "path": "vendor/kokoro-js/source-overrides/phonemizer.js",
+      "sha256": "f66f5ec5b406e3829b9f0add6eb5743446414f1c370f35ef17b4a247301834fb",
+      "sourceRepository": "xenova/phonemizer.js",
+      "sourceCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
+      "purpose": "m025-4 phase-only eSpeak lifecycle diagnostics; no prompt, phoneme, token, or external error-message payloads"
+    }
   },
   "runtime": {
-    "bundle": {"path":"vendor/kokoro-js/kokoro.web.js","sizeBytes":2135645,"sha256":"1e74a84d3ef0d2ce4ac4893f47040efb3fc07faca9a8f2e8f2bfce58d329a9cd"},
-    "wasmModule": {"path":"vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs","sizeBytes":44484,"sha256":"08fb86ec433c78bfb032c5d84a68b8e8e5a8d81268fa39e24314179a5767a5b9"},
-    "wasmBinary": {"path":"vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm","sizeBytes":21596019,"sha256":"c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"}
+    "bundle": {
+      "path": "vendor/kokoro-js/kokoro.web.js",
+      "sizeBytes": 2136409,
+      "sha256": "2551a7e181b2359b6148a2f1b842f75537639ad5f46071b3db48483bb9762d61"
+    },
+    "wasmModule": {
+      "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
+      "sizeBytes": 44484,
+      "sha256": "08fb86ec433c78bfb032c5d84a68b8e8e5a8d81268fa39e24314179a5767a5b9"
+    },
+    "wasmBinary": {
+      "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm",
+      "sizeBytes": 21596019,
+      "sha256": "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"
+    }
   },
   "model": {
     "repository": "onnx-community/Kokoro-82M-v1.0-ONNX",
@@ -40,12 +59,30 @@
     "sha256": "fbae9257e1e05ffc727e951ef9b9c98418e6d79f1c9b6b13bd59f5c9028a1478"
   },
   "voices": [
-    {"id":"af_heart","sha256":"d583ccff3cdca2f7fae535cb998ac07e9fcb90f09737b9a41fa2734ec44a8f0b"},
-    {"id":"af_bella","sha256":"f69d836209b78eb8c66e75e3cda491e26ea838a3674257e9d4e5703cbaf55c8b"},
-    {"id":"af_nicole","sha256":"cd2191ab31b914ed7b318416b0e4440fdf392ddad9106a060819aa600a64f59a"},
-    {"id":"am_michael","sha256":"1d1f21dd8da39c30705cd4c75d039d265e9bc4a2a93ed09bc9e1b1225eb95ba1"},
-    {"id":"bf_emma","sha256":"669fe0647f9dd04fcab92f1439a40eeb4c8b4ab1f82e4996fe3d918ce4a63b73"},
-    {"id":"bm_george","sha256":"c4b235a4c1f2cd3b939fed08b899ce9385638b763f7b73a59616c4fc9bd6c9bc"}
+    {
+      "id": "af_heart",
+      "sha256": "d583ccff3cdca2f7fae535cb998ac07e9fcb90f09737b9a41fa2734ec44a8f0b"
+    },
+    {
+      "id": "af_bella",
+      "sha256": "f69d836209b78eb8c66e75e3cda491e26ea838a3674257e9d4e5703cbaf55c8b"
+    },
+    {
+      "id": "af_nicole",
+      "sha256": "cd2191ab31b914ed7b318416b0e4440fdf392ddad9106a060819aa600a64f59a"
+    },
+    {
+      "id": "am_michael",
+      "sha256": "1d1f21dd8da39c30705cd4c75d039d265e9bc4a2a93ed09bc9e1b1225eb95ba1"
+    },
+    {
+      "id": "bf_emma",
+      "sha256": "669fe0647f9dd04fcab92f1439a40eeb4c8b4ab1f82e4996fe3d918ce4a63b73"
+    },
+    {
+      "id": "bm_george",
+      "sha256": "c4b235a4c1f2cd3b939fed08b899ce9385638b763f7b73a59616c4fc9bd6c9bc"
+    }
   ],
   "policy": {
     "paidRuntime": false,
