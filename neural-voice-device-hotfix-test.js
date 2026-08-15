@@ -1,7 +1,10 @@
 const fs=require('fs');
 const path=require('path');
 const assert=require('assert');
+const crypto=require('crypto');
 const read=p=>fs.readFileSync(path.join(__dirname,p),'utf8');
+const readBuf=p=>fs.readFileSync(path.join(__dirname,p));
+const sha256=value=>crypto.createHash('sha256').update(value).digest('hex');
 const boot=read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
 const adapter=read('features/neural-voice/fiezel-kokoro-adapter.js');
 const aud=read('features/neural-voice/fiezel-neural-voice-audibility-fix.js');
@@ -37,6 +40,7 @@ assert.ok(!phon.includes('error.message'),'eSpeak probe must not persist externa
 assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'m025-4 must import the versioned vendor URL');
 assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'m025-4 SW must pre-cache the versioned vendor URL');
 assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependencies.phonemizerSourceOverride.path==='vendor/kokoro-js/source-overrides/phonemizer.js','m025-4 source lock must record the phonemizer override');
+assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-4 source override bytes must match the source-lock SHA-256');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must remain unchanged');
 assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_neural_start'"),'init and neural speech timing must be diagnosed separately');
 assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'generation timeout must live in the voice service');
