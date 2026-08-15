@@ -7,7 +7,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // JANGAN naikkan version.js bersamaan: nama CACHE terikat ke FIEZEL_VERSION, dan
 // activate menghapus semua cache fiezel-* yang bukan CACHE -- termasuk 113 MB aset
 // neural voice yang menumpang di cache yang sama.
-const SW_REV='m021-corp-wrapper-20260815-1';
+const SW_REV='m023-device-hotfix-20260815-1';
 const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-diag-panel.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kokoro-');
 
@@ -28,7 +28,7 @@ const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kok
 // worker first attempts a readable CORS fetch; if that is unavailable it
 // passes the opaque response through unchanged and lets the browser enforce
 // COEP. Opaque bodies are never reconstructed as synthetic 200 responses.
-const COOP_COEP_HEADERS={'Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'require-corp'};
+const COOP_COEP_HEADERS={'Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'credentialless'};
 function withCoopCoep(response){
   if(!response)return response;
   const headers=new Headers(response.headers);
@@ -82,10 +82,9 @@ self.addEventListener('fetch',e=>{
   const requestUrl=new URL(e.request.url);
   if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request)).catch(()=>caches.match(e.request)));return}
   if(requestUrl.origin!==self.location.origin){
-    // Third-party resource (e.g. js.puter.com): only no-cors traffic enters
-    // the CORS-first compatibility path. Existing CORS-mode API requests pass
-    // through untouched so Authorization/puter-auth headers are preserved.
-    if(e.request.mode==='no-cors')e.respondWith(fetchCrossOriginWithCorp(e.request).catch(()=>fetch(e.request,{mode:'no-cors'})));
+    // Third-party SDK/API traffic is deliberately left to the browser. The
+    // document uses COEP: credentialless, so no-cors resources such as Puter.js
+    // can load without the service worker reconstructing or proxying opaque bodies.
     return;
   }
   e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy))}return r}).catch(error=>{if(e.request.mode==='navigate')return caches.match('./index.html');throw error})).then(r=>r&&(e.request.mode==='navigate'||/\.(?:m?js)$/i.test(requestUrl.pathname))?withCoopCoep(r):r));

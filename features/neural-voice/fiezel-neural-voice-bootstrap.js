@@ -10,7 +10,7 @@
   const LARGE_ASSET_STREAM_THRESHOLD=8*1024*1024;
   const STORAGE_RESERVE_BYTES=24*1024*1024;
   const DOWNLOAD_ATTEMPTS=2;
-  const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||20000;
+  const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?12000:20000);
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
@@ -30,7 +30,7 @@
     {path:'vendor/kokoro-model/voices/bm_george.bin',bytes:522240}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
-  let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false;
+  let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
   function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
   function warmAudioGesture(){
     try{
@@ -59,7 +59,7 @@
     try{root.localStorage?.setItem(STATUS_KEY,JSON.stringify(value))}catch{}
     return value;
   }
-  function preparedStorage(){return (phase==='cached'||phase==='ready'||phase==='error')?(storage||readStatus().storage):''}
+  function preparedStorage(){const stored=readStatus();return (stored.prepared||preparedFlag)?(storage||stored.storage||'cache'):''}
   async function refreshPreparedFlag(){
     if(readStatus().prepared){preparedFlag=true;return true}
     if(!('caches'in root)){preparedFlag=false;return false}
@@ -75,7 +75,7 @@
     // lastFallbackReason = kenapa fallback terakhir terjadi; sebelumnya alasannya
     // hanya masuk localStorage lewat diag() dan tak pernah terlihat dari status().
     const timeoutMs=Math.max(NEURAL_TTS_TIMEOUT_MS,INITIALIZE_TIMEOUT_MS);
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason,wasmPolicy});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -222,12 +222,16 @@
       phase='initializing';lastError='';
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
       const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js'));
-      if(root.crossOriginIsolated!==true){
-        try{
-          const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
-          if(wasmEnv&&typeof wasmEnv==='object')wasmEnv.numThreads=1;
-        }catch{}
-      }
+      try{
+        const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
+        const appleStandalone=root.navigator?.standalone===true;
+        if(wasmEnv&&typeof wasmEnv==='object'){
+          if(appleStandalone||root.crossOriginIsolated!==true)wasmEnv.numThreads=1;
+          if(appleStandalone)wasmEnv.proxy=true;
+          wasmPolicy=appleStandalone?'apple-standalone-single-thread-proxy':(root.crossOriginIsolated===true?'auto-threaded':'single-thread');
+          diag({phase:'wasm_policy',policy:wasmPolicy,numThreads:Number(wasmEnv.numThreads||0),proxy:!!wasmEnv.proxy});
+        }
+      }catch{}
       adapter=root.FiezelKokoroAdapter.createKokoroAdapter({
         KokoroTTS:kokoro.KokoroTTS,
         kokoroEnv:kokoro.env,
@@ -272,7 +276,7 @@
   }
   async function prepare(options={}){
     if(preparePromise)return preparePromise;
-    initFailedThisSession=false;warmAudioGesture();
+    initFailedThisSession=false;initTimedOutThisSession=false;circuitOpen=false;lastFallbackReason='';lastError='';warmAudioGesture();
     preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();diag({phase:'prepared'});return status()})().catch(error=>{if(!(backendInitPromise&&initTimedOutThisSession))phase='error';lastError=errorText(error);diag({phase:'prepare_error',error:lastError});if(!assetsCached){storage='';preparedFlag=false;writeStatus(false)}throw error}).finally(()=>{preparePromise=null});
     return preparePromise;
   }
@@ -294,6 +298,7 @@
   }
   async function ensureReady(){
     warmAudioGesture();
+    if(circuitOpen)throw new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`);
     if(service)return status();
     if(initTimedOutThisSession&&backendInitPromise)throw new Error('Neural voice initialization is still running');
     initFailedThisSession=false;
@@ -307,32 +312,44 @@
   }
   async function speak(text,options={}){
     warmAudioGesture();
-    if(!readStatus().prepared&&!preparedFlag)return browserSpeak(text,options);
-    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return browserSpeak(text,options);
+    const allowFallback=options.allowFallback!==false;
+    const fallbackOrThrow=async(error)=>{
+      if(!allowFallback)throw error;
+      return browserSpeak(text,options);
+    };
+    if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak(text,options);
+    if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared');
+    if(circuitOpen)return fallbackOrThrow(new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`));
+    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return fallbackOrThrow(new Error(lastError||'Neural voice initialization is still running'));
     if(!verifiedForSession){
-      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return browserSpeak(text,options)}
+      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
       verifiedForSession=true;
     }
     const timeout=Symbol('fiezel-tts-timeout');
+    let neuralError=null;
     const neural=async()=>{
       const local=await initialize();
-      return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:true});
+      return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
     };
-    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
+    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;neuralError=error;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
     if(result===null||result===timeout){
       lastError=result===timeout?'neural_tts_timeout':lastError;
+      const shouldOpenCircuit=!!service;
       lastFallbackReason=lastError;
-      diag({phase:'speak_fallback',reason:lastError});
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit});
+      circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
       try{service?.stop?.()}catch{}
-      return browserSpeak(text,options);
+      return fallbackOrThrow(neuralError||new Error(lastError));
     }
+    circuitOpen=false;audibleVerified=true;lastError='';lastFallbackReason='';phase='ready';
+    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||options.voice||'')});
     return result;
   }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
 
   diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),cacheAvailable:('caches'in root)});
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
-    if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'})).catch(()=>{});
-  });
+    if(prepared){phase='cached';diag({phase:'prepared_idle'});}
+  }).catch(()=>{});
   root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
 })(typeof globalThis!=='undefined'?globalThis:this);

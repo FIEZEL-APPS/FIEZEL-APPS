@@ -117,10 +117,10 @@ const pass=name=>console.log(`PASS ${name}`);
   pass('iOS priming checks quota and verifies storage before progress success');
 
   const sw=read('sw.js');
-  assert.ok(sw.includes("fetch(request.url,{mode:'cors',credentials:'omit'})"),'third-party wrapper must attempt readable CORS response first');
-  assert.ok(sw.includes("return fetch(request,{mode:'no-cors',credentials:'omit'})"),'CORS failure must pass through the opaque network response');
+  assert.ok(sw.includes("'Cross-Origin-Embedder-Policy':'credentialless'"),'COEP must allow third-party no-cors SDK loading without opaque reconstruction');
+  assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'),'third-party traffic must bypass service-worker response synthesis');
   assert.ok(!/fetch\(request[^\n]*mode:'no-cors'[\s\S]{0,700}new Response\(response\.body/.test(sw),'must never reconstruct an opaque no-cors body as synthetic 200');
-  pass('service worker does not synthesize empty 200 responses from opaque bodies');
+  pass('service worker leaves Puter traffic to browser under credentialless COEP');
 
   const workflow=read('.github/workflows/quality.yml');
   assert.ok(workflow.includes('node neural-voice-fix-test.js'));
