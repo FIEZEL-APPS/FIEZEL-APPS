@@ -51,6 +51,31 @@ jobs:
           test "$actual_sha" = "$expected_sha"
           test "$actual_size" = "$expected_size"
 
+          # Semantic guard: the exact m025-5 bundle must visibly carry the
+          # Safari ReadableStream async-iterator compatibility implementation.
+          # Historical clean-room m025-4 has zero occurrences of the explicit
+          # ReadableStream prototype guard and zero releaseLock() occurrences.
+          node <<'NODE'
+          const fs = require('fs');
+          const bundle = fs.readFileSync('.vendor-repro/kokoro.web.js', 'utf8');
+          const count = needle => bundle.split(needle).length - 1;
+          const asyncIteratorGuards = count('ReadableStream.prototype[Symbol.asyncIterator]');
+          const releaseLocks = count('releaseLock()');
+          if (asyncIteratorGuards !== 2) {
+            throw new Error(`m025-5 Safari guard drift: expected 2 ReadableStream.prototype[Symbol.asyncIterator] occurrences, got ${asyncIteratorGuards}`);
+          }
+          if (releaseLocks !== 1) {
+            throw new Error(`m025-5 Safari guard drift: expected 1 releaseLock() occurrence, got ${releaseLocks}`);
+          }
+          if (!bundle.includes('ReadableStream.prototype[Symbol.asyncIterator]=async function*()')) {
+            throw new Error('m025-5 Safari guard missing async-generator assignment');
+          }
+          if (!bundle.includes('this.getReader()')) {
+            throw new Error('m025-5 Safari guard missing getReader() path');
+          }
+          console.log(`m025-5 Safari semantic guard PASS: asyncIteratorGuards=${asyncIteratorGuards} releaseLocks=${releaseLocks}`);
+          NODE
+
           if [[ "$runtime_promoted" == 'false' ]]; then
             test "$candidate_state" = 'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED'
             test "$rc" -ne 0
