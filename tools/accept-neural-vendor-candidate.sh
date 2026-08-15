@@ -6,6 +6,7 @@ LOCK="$ROOT/NEURAL-VOICE-SOURCE-LOCK.json"
 OVERRIDE_REL="vendor/kokoro-js/source-overrides/phonemizer.js"
 OVERRIDE="$ROOT/$OVERRIDE_REL"
 OUT="$ROOT/.vendor-repro/kokoro.web.js"
+BOOT="$ROOT/features/neural-voice/fiezel-neural-voice-bootstrap.js"
 BUNDLE_REL="$(node -e "const x=require(process.argv[1]);process.stdout.write(x.runtime.bundle.path)" "$LOCK")"
 BUNDLE="$ROOT/$BUNDLE_REL"
 
@@ -48,6 +49,18 @@ lock.runtime.bundle.sha256=bundleSha;
 lock.runtime.bundle.sizeBytes=Number(bundleSize);
 fs.writeFileSync(lockPath,JSON.stringify(lock,null,2)+'\n');
 NODE
+
+python3 - "$BOOT" "$NEW_SIZE" <<'PY'
+from pathlib import Path
+import re, sys
+p=Path(sys.argv[1]); size=sys.argv[2]; s=p.read_text()
+pattern=r"\{path:'vendor/kokoro-js/kokoro\.web\.js\?nv=m025-4',bytes:\d+\}"
+replacement="{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-4',bytes:"+size+"}"
+new,count=re.subn(pattern,replacement,s,count=1)
+if count!=1:
+    raise SystemExit(f'CANDIDATE FAIL: expected one m025-4 bootstrap vendor-size anchor, got {count}')
+p.write_text(new)
+PY
 
 # The accepted candidate must immediately reproduce from source and the updated lock.
 rm -rf "$ROOT/.vendor-repro"
