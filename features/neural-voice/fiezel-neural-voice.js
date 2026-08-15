@@ -90,6 +90,8 @@
     let generation = 0;
     let requestSequence = 0;
     let activeStop = null;
+    let activeInference = null;
+    let activeInferenceMeta = null;
     function diag(entry) {
       try {
         const key = 'fiezel-neural-voice-diagnostics-v1';
@@ -98,6 +100,7 @@
         env.localStorage && env.localStorage.setItem(key, JSON.stringify(list.slice(-200)));
       } catch (_) {}
     }
+    diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
 
     function stop() {
       generation += 1;
@@ -130,17 +133,53 @@
           const chunk = chunks[chunkIndex];
           if (callGeneration !== generation) throw new Error('TTS request superseded');
           const generateStartedAt = Date.now();
+          if (activeInference) {
+            diag({
+              phase: 'generate_busy', requestId, chunkIndex, voice,
+              activeRequestId: activeInferenceMeta && activeInferenceMeta.requestId || '',
+              activeChunkIndex: activeInferenceMeta && activeInferenceMeta.chunkIndex,
+              activeElapsedMs: activeInferenceMeta && activeInferenceMeta.startedAt ? Date.now() - activeInferenceMeta.startedAt : null
+            });
+            const error = new Error('neural_generation_busy');
+            error.code = 'neural_generation_busy';
+            throw error;
+          }
           diag({ phase: 'generate_start', requestId, chunkIndex, voice, chars: chunk.length, timeoutMs: generationTimeoutMs || null });
           let timer = null;
+          let didTimeOut = false;
           let audio;
+          const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 }));
+          activeInference = generated;
+          activeInferenceMeta = { requestId, chunkIndex, voice, startedAt: generateStartedAt };
+          generated.then(
+            value => {
+              const samples = value && (value.audio || value.data);
+              if (didTimeOut) {
+                diag({ phase: 'generate_late_ready', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, samples: samples && typeof samples.length === 'number' ? samples.length : null });
+              }
+              if (activeInference === generated) {
+                activeInference = null;
+                activeInferenceMeta = null;
+              }
+            },
+            error => {
+              if (didTimeOut) {
+                diag({ phase: 'generate_late_error', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, error: String(error && (error.message || error.name) || error) });
+              }
+              if (activeInference === generated) {
+                activeInference = null;
+                activeInferenceMeta = null;
+              }
+            }
+          );
           if (generationTimeoutMs > 0) {
             const timedOut = Symbol('neural-generation-timeout');
-            const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 }));
             const result = await Promise.race([
               generated,
               new Promise(resolve => { timer = setTimeout(() => resolve(timedOut), generationTimeoutMs); })
             ]).finally(() => { if (timer) clearTimeout(timer); });
             if (result === timedOut) {
+              didTimeOut = true;
               diag({ phase: 'generate_timeout', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, timeoutMs: generationTimeoutMs });
               const error = new Error('neural_generation_timeout');
               error.code = 'neural_generation_timeout';
@@ -148,7 +187,7 @@
             }
             audio = result;
           } else {
-            audio = await adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 });
+            audio = await generated;
           }
           const samples = audio && (audio.audio || audio.data);
           diag({ phase: 'generate_ready', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, samples: samples && typeof samples.length === 'number' ? samples.length : null });

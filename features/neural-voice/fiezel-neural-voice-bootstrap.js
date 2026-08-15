@@ -333,9 +333,10 @@
       result=await local.speak(text,{voice,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
     }catch(error){
       lastError=errorText(error);lastFallbackReason=lastError;
-      const shouldOpenCircuit=!!service;
+      const generationBusy=lastError==='neural_generation_busy';
+      const shouldOpenCircuit=!!service&&!generationBusy;
       diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
-      circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
+      circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';else if(service)phase='ready';
       try{service?.stop?.()}catch{}
       return fallbackOrThrow(error);
     }
