@@ -50,11 +50,11 @@ assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neura
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(sw.includes("const SW_REV='m025-3-"),'m025-3 product deploy must force a matching shell refresh');
-// m025-4 diagnostic-only scope keeps DIAG_BUILD at m025-3; advancing it to
-// m025-4 with the matching SW_REV is a deploy-scope change (fiezel-diag-panel.js
-// and sw.js are outside files_allowed here), so A7 is expected to flag it.
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-3';"),'diagnostics build must stay m025-3 until the deploy-scope bump');
+assert.ok(sw.includes("const SW_REV='m025-4-"),'m025-4 product deploy must force a matching shell refresh');
+// m025-4 deploy-scope promotion (T-026-B1): DIAG_BUILD and SW_REV advance in
+// lockstep with the pre-tokenizer probe set so the exact-head A7 boundary
+// (base=3 head=4 expected=4) is satisfied.
+assert.ok(diag.includes("var DIAG_BUILD = 'm025-4';"),'diagnostics build must advance exactly to m025-4');
 assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
