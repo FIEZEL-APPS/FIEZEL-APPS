@@ -239,3 +239,57 @@ di-refresh); TIDAK HIJAU untuk klaim audibility/rilis neural voice di device.**
 Sesi ini berjalan sebagai `zen-agent-3/deepseek-v4-flash-free` sesuai identitas agent-3 di
 ledger. Ledger (modifikasi sesi lain, tidak saya validasi isi) mencantumkan target
 `opencode-go/kimi-k3` untuk agent-1..15. Konfigurasi model bukan scope audit ini.
+
+---
+
+## 10. REMEDIASI T-024-A3-R1 (2026-08-15) — Owner-device acceptance checklist
+
+> **physical_release_gate: UNVERIFIED** — status ini DIPERTAHANKAN secara jujur.
+> Remediasi ini TIDAK menciptakan, mengubah, atau menggantikan bukti device apa pun:
+> automated CI yang hijau (QG, A6/A7, Pages) **tidak dapat mensubstitusi** audibility
+> fisik Apple standalone. **Release tetap di-hold** sampai bukti device nyata masuk.
+
+### 10.1 Alasan remediasi (dari verifier VERIFY-T024-001)
+
+Verifier VERIFY-T024-001 (2026-08-15) mengembalikan: keempat klaim automated
+**VERIFIED**, tetapi `physical_release_gate: UNVERIFIED` karena tidak ada
+owner-device diagnostics. Section ini menutup celah bukti dengan checklist
+acceptance eksplisit untuk owner di bawah — tanpa menebak status device.
+
+### 10.2 Checklist acceptance device (SEMUA item wajib terpenuhi oleh owner)
+
+**A. localStorage key eksak (satu-satunya sumber diagnostics yang valid):**
+
+```
+fiezel-neural-voice-diagnostics-v1
+```
+
+**B. Bukti policy/stage direct-WASM (dari payload diagnostics di atas):**
+
+- `wasm_policy = apple-standalone-single-thread-direct` (bukan `default`, bukan `-proxy`)
+- `numThreads: 1` dan `proxy: false`
+- Stage instance: `adapter_instance_start` → `adapter_instance_ready` (tanpa `adapter_instance_error`)
+- Stage generate untuk satu request neural: `adapter_generate_enter` → `adapter_generate_invoke`
+  → `adapter_generate_dispatched` → `adapter_generate_resolved` (tanpa `adapter_generate_error`)
+
+**C. Konfirmasi audible playback (fisik, oleh owner di device Apple):**
+
+- Suara neural benar-benar terdengar dari speaker/earphone device Apple pada satu
+  sesi play penuh — bukan sekadar status init/ready/instance, dan bukan browser TTS.
+
+**D. Owner sign-off fields (wajib diisi owner, bukan agent):**
+
+- tanggal & waktu capture diagnostics
+- model device + versi iOS
+- apakah PWA ditutup & dibuka ulang sebelum capture (tanpa clear data): ya/tidak
+- hasil audible playback: TERDENGAR / TIDAK TERDENGAR
+- verdict owner untuk release gate: READY / NOT READY
+
+### 10.3 Hasil remediasi
+
+- Hanya file audit ini yang berubah (`git diff --name-only` = satu file:
+  `analysis/neural-voice-a3-gate-audit.md`); `git diff --check` bersih.
+- `physical_release_gate` tetap **UNVERIFIED** dan release tetap **di-hold** sampai
+  checklist §10.2 terpenuhi dengan bukti device nyata (jalur T-005/T-006 → T-007).
+- Tidak ada kode/test/workflow/ledger/config/vendor yang disentuh; tidak ada bukti
+  device yang dibuat-buat; tidak ada klaim audibility/rilis baru.
