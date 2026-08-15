@@ -64,6 +64,7 @@ jobs:
           node neural-voice-http-test.js
           node neural-voice-audibility-test.js
           node diag-panel-test.js
+          node diag-search-test.js
           node neural-voice-fix-test.js
           node sw-corp-test.js
           node neural-voice-product-repair-test.js
