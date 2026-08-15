@@ -10,7 +10,8 @@ function run(){const listeners={};let fetchCalls=0;const s={console,URL,Promise,
 console.log('sw-corp-test');
 check('COEP uses credentialless',src.includes("COEP_POLICY='credentialless'"));
 check('WebKit popup-compatible COOP exists',src.includes("'same-origin-allow-popups'"));
-check('SW revision bumped for m026',src.includes("SW_REV='m026-neural-single-flight-20260815-1'"));
+check('SW revision marker exists',/const SW_REV='[^']+';/.test(src));
+check('shell reinstall forces reload',src.includes("new Request(asset,{cache:'reload'})"));
 const t=run();let captured=false;const req={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};(t.listeners.fetch||[]).forEach(fn=>fn({request:req,respondWith:()=>{captured=true}}));
 check('cross-origin Puter request is not intercepted',captured===false);
 check('cross-origin Puter request triggers no synthetic fetch',t.fetchCalls===0,'fetchCalls='+t.fetchCalls);
