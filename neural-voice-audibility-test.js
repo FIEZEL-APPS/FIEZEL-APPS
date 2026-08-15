@@ -7,10 +7,10 @@ const patch=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-ne
 
 function makeContext({ready=false,prepared=true,errorMode=false}={}){
   const events=[];
-  let prepareCalls=0,originalSpeakCalls=0,originalStopCalls=0,cancelCalls=0;
+  let ensureReadyCalls=0,originalSpeakCalls=0,originalStopCalls=0,cancelCalls=0;
   const runtime={
     status:()=>({ready,prepared}),
-    prepare:async()=>{prepareCalls++;ready=true;events.push('prepare')},
+    ensureReady:async()=>{ensureReadyCalls++;ready=true;events.push('ensure-ready');return{ready:true,prepared}},
     speak:async()=>{originalSpeakCalls++;events.push('original-speak');return{provider:'neural'}},
     stop:()=>{originalStopCalls++;events.push('original-stop')}
   };
@@ -35,21 +35,19 @@ function makeContext({ready=false,prepared=true,errorMode=false}={}){
     localStorage:{getItem:k=>localStorageData[k]??null,setItem:(k,v)=>{localStorageData[k]=String(v)}}
   };
   vm.createContext(ctx);vm.runInContext(patch,ctx,{filename:'audibility-fix.js'});
-  return{ctx,events,get prepareCalls(){return prepareCalls},get originalSpeakCalls(){return originalSpeakCalls},get originalStopCalls(){return originalStopCalls},get cancelCalls(){return cancelCalls}};
+  return{ctx,events,get ensureReadyCalls(){return ensureReadyCalls},get originalSpeakCalls(){return originalSpeakCalls},get originalStopCalls(){return originalStopCalls},get cancelCalls(){return cancelCalls}};
 }
 
 (async()=>{
   {
     const t=makeContext({ready:false,prepared:true});
     assert.equal(t.ctx.__fiezelTtsUnlocked,true,'silent bootstrap warmup must be disabled');
-    const p=t.ctx.FiezelVoiceRuntime.speak('hello',{lang:'en-US'});
-    assert.ok(t.events.includes('browser-speak'),'browser TTS must be enqueued synchronously on cold neural state');
-    assert.equal(t.prepareCalls,0,'neural warmup must wait until audible fallback finishes');
-    const result=await p;
-    assert.equal(result.provider,'browser-speech-synthesis');
-    await new Promise(r=>setTimeout(r,10));
-    assert.equal(t.prepareCalls,1,'prepared neural engine may warm after browser audio completes');
-    assert.ok(t.events.indexOf('browser-speak')<t.events.indexOf('prepare'),'audibility must precede neural warmup');
+    const result=await t.ctx.FiezelVoiceRuntime.speak('hello',{lang:'en-US'});
+    assert.equal(result.provider,'neural','prepared cold launch must resume neural before fallback');
+    assert.equal(t.ensureReadyCalls,1,'prepared neural engine must run the no-download ensureReady path');
+    assert.equal(t.originalSpeakCalls,1,'speech must be retried through neural after resume');
+    assert.ok(!t.events.includes('browser-speak'),'browser TTS must not preempt a prepared neural runtime');
+    assert.ok(t.events.indexOf('ensure-ready')<t.events.indexOf('original-speak'),'runtime must become ready before neural speech');
   }
   {
     const t=makeContext({ready:true,prepared:true});
@@ -61,7 +59,7 @@ function makeContext({ready=false,prepared=true,errorMode=false}={}){
   {
     const t=makeContext({ready:false,prepared:false,errorMode:true});
     await assert.rejects(()=>t.ctx.FiezelVoiceRuntime.speak('hello'),/browser_tts_synthesis-failed/);
-    assert.equal(t.prepareCalls,0,'unprepared neural engine must not start background preparation');
+    assert.equal(t.ensureReadyCalls,0,'unprepared neural engine must not start neural initialization');
   }
   {
     const t=makeContext({ready:false,prepared:false});

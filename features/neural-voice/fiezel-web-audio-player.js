@@ -22,33 +22,53 @@
   function createPlayer(env) {
     env = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     const AudioContextCtor = env.AudioContext || env.webkitAudioContext;
-    let context = null;
     let source = null;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Satu AudioContext per env, bukan per pemanggilan createPlayer().
+    // warmWebAudio() di audibility-fix memanggil createPlayer(root) BARU pada
+    // setiap speak() dan browserSpeakImmediate(); warmAudioGesture() dan
+    // initialize() di bootstrap juga. Sebelum ini tiap player memegang context
+    // lokalnya sendiri, jadi satu sesi bicara bisa membuat beberapa AudioContext.
+    // WebKit membatasi jumlah AudioContext hidup per halaman -- begitu batas
+    // tercapai konstruktornya melempar dan seluruh jalur audio mati, termasuk
+    // fallback browser. Menyimpannya di env membuat semua pemanggil berbagi satu.
+    function ensureContext() {
+      if (!AudioContextCtor) return null;
+      if (!env.__fiezelWebAudioContext) env.__fiezelWebAudioContext = new AudioContextCtor();
+      return env.__fiezelWebAudioContext;
+    }
+
+    async function resumeContext() {
+      const current = ensureContext();
+      if (current && current.state === 'suspended' && typeof current.resume === 'function') {
+        try { await Promise.race([current.resume(), delay(2500)]); } catch (_) {}
+      }
+      return current;
+    }
 
     async function play(rawAudio) {
       if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
       const samples = pickSamples(rawAudio);
       if (!samples || !samples.length) throw new Error('Unsupported Kokoro audio payload');
       const sampleRate = pickSampleRate(rawAudio);
-      if (!context) context = new AudioContextCtor();
-      if (context.state === 'suspended' && typeof context.resume === 'function') {
-        try { await Promise.race([context.resume(), delay(2000)]); } catch (_) {}
-      }
+      const current = await resumeContext();
+      if (!current) throw new Error('Web Audio API unavailable');
       if (source) { try { source.stop(); } catch (_) {} }
 
-      const buffer = context.createBuffer(1, samples.length, sampleRate);
+      const buffer = current.createBuffer(1, samples.length, sampleRate);
       buffer.copyToChannel(samples, 0);
-      const localSource = context.createBufferSource();
+      const localSource = current.createBufferSource();
       source = localSource;
       localSource.buffer = buffer;
-      localSource.connect(context.destination);
+      localSource.connect(current.destination);
       let resolveDone;
       const done = new Promise((resolve) => { resolveDone = resolve; });
       const finish = () => { if (source === localSource) source = null; resolveDone(); };
       localSource.onended = finish;
+      try { localSource.start(); }
+      catch (error) { if (source === localSource) source = null; throw error; }
       setTimeout(finish, Math.max(1000, Math.round((samples.length / sampleRate) * 1000) + 2500));
-      try { localSource.start(); } catch (_) {}
       return {
         done,
         stop() { try { localSource.stop(); } catch (_) {} }
@@ -59,8 +79,8 @@
     function warm() {
       if (!AudioContextCtor) return false;
       try {
-        if (!context) context = new AudioContextCtor();
-        if (context.state === 'suspended' && typeof context.resume === 'function') { try { context.resume().catch(() => {}); } catch (_) {} }
+        const current = ensureContext();
+        if (current && current.state === 'suspended' && typeof current.resume === 'function') { try { current.resume().catch(() => {}); } catch (_) {} }
         return true;
       } catch (_) { return false; }
     }

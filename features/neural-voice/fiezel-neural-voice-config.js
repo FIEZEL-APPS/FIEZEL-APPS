@@ -38,7 +38,15 @@
     voices: Object.freeze({
       fiezelPrimary: 'af_heart',
       fiezelAlternate: 'af_bella',
-      listeningPool: Object.freeze(['af_nicole', 'am_michael', 'bf_emma', 'bm_george'])
+      listeningPool: Object.freeze(['af_nicole', 'am_michael', 'bf_emma', 'bm_george']),
+      catalog: Object.freeze([
+        Object.freeze({ id: 'af_heart', label: 'Heart', locale: 'en-US' }),
+        Object.freeze({ id: 'af_bella', label: 'Bella', locale: 'en-US' }),
+        Object.freeze({ id: 'af_nicole', label: 'Nicole', locale: 'en-US' }),
+        Object.freeze({ id: 'am_michael', label: 'Michael', locale: 'en-US' }),
+        Object.freeze({ id: 'bf_emma', label: 'Emma', locale: 'en-GB' }),
+        Object.freeze({ id: 'bm_george', label: 'George', locale: 'en-GB' })
+      ])
     }),
     limits: Object.freeze({
       maxInputChars: 3600,

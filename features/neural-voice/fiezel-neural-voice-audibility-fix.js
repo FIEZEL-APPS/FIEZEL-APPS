@@ -86,15 +86,18 @@
     const state=runtime.status?.()||{};
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
-      const audible=browserSpeakImmediate(text,options);
-      if(state.prepared&&typeof runtime.prepare==='function'){
-        audible.finally(()=>{
-          setTimeout(()=>{
-            runtime.prepare().then(()=>diag({phase:'neural_warm_ready'})).catch(error=>diag({phase:'neural_warm_error',error:String(error?.message||error)}));
-          },0);
-        }).catch(()=>{});
+      if(state.prepared&&typeof runtime.ensureReady==='function'){
+        try{
+          await runtime.ensureReady();
+          const warmed=runtime.status?.()||{};
+          if(warmed.ready){
+            const result=await runtime.speak(text,options);
+            diag({phase:'neural_resume_success',provider:String(result?.provider||'neural')});
+            return result;
+          }
+        }catch(error){diag({phase:'neural_resume_error',error:String(error?.message||error)})}
       }
-      return audible;
+      return browserSpeakImmediate(text,options);
     }
     try{return await runtime.speak(text,options)}
     catch(error){

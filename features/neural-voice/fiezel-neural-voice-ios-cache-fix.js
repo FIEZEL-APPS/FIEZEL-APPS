@@ -30,8 +30,8 @@
   // total = 119.274.361 B. Selisih +522.240 B = ukuran satu voice .bin
   // (af_heart/af_bella/dll, masing-masing 522.240 B). Efeknya kosmetik
   // (hanya progress bar), bukan logika priming. Sumber: analysis/idb-migration-design.md.
-  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119796601;
-  let primePromise=null;
+  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119274361;
+  let primePromise=null,primeTask=null;
 
   function withTimeout(promise,ms,label){
     let timer=null;
@@ -50,7 +50,7 @@
       const key='fiezel-neural-voice-diagnostics-v1';
       const list=JSON.parse(root.localStorage?.getItem(key)||'[]');
       list.push({t:Date.now(),v:version,patch:'ios-cache-v1',...entry});
-      root.localStorage?.setItem(key,JSON.stringify(list.slice(-40)));
+      root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)));
     }catch{}
   }
 
@@ -98,9 +98,27 @@
     return true;
   }
 
+  async function primeStoragePreflight(cache){
+    const candidates=typeof runtime.assets==='function'?runtime.assets():[WASM,MODEL];
+    let missingBytes=0;
+    for(const item of candidates){
+      if(!(await has(cache,absolute(item.path))))missingBytes+=Number(item.bytes)||0;
+    }
+    const estimate=typeof runtime.storageEstimate==='function'?await runtime.storageEstimate():null;
+    const available=Number.isFinite(Number(estimate?.available))?Number(estimate.available):null;
+    const reserve=Math.min(24*1024*1024,Math.ceil(missingBytes*.20));
+    if(available!==null&&available<missingBytes+reserve){
+      const error=new Error(`Penyimpanan tidak cukup untuk suara offline. Butuh sekitar ${Math.ceil((missingBytes+reserve)/1000000)} MB ruang origin, tersedia sekitar ${Math.floor(available/1000000)} MB.`);
+      error.code='storage_insufficient';
+      throw error;
+    }
+    return{missingBytes,available,reserve};
+  }
+
   async function primeLargeAssets(onProgress){
     if(!root.caches)return false;
     const cache=await root.caches.open(cacheName);
+    await primeStoragePreflight(cache);
     let completed=0,completedBytes=0;
     const done=(item)=>{
       completed++;completedBytes+=item.bytes;
@@ -108,27 +126,40 @@
     };
     // WebKit is more reliable when the 21 MB WASM is fully materialized before cache.put.
     if(!(await has(cache,absolute(WASM.path)))){
-      try{await cacheBuffered(cache,WASM)}catch(error){diag({phase:'wasm_prime_failed',error:String(error?.message||error)})}
+      try{await cacheBuffered(cache,WASM)}catch(error){diag({phase:'wasm_prime_failed',error:String(error?.message||error)});throw error}
     }
+    if(!(await has(cache,absolute(WASM.path))))throw new Error(`WASM priming verification failed: ${WASM.path}`);
     done(WASM);
     // Let CacheStorage own the 92 MB model transfer instead of wrapping a live JS ReadableStream.
     if(!(await has(cache,absolute(MODEL.path)))){
-      try{await cacheBrowserManaged(cache,MODEL)}catch(error){diag({phase:'model_prime_failed',error:String(error?.message||error)})}
+      try{await cacheBrowserManaged(cache,MODEL)}catch(error){diag({phase:'model_prime_failed',error:String(error?.message||error)});throw error}
     }
+    if(!(await has(cache,absolute(MODEL.path))))throw new Error(`Model priming verification failed: ${MODEL.path}`);
     done(MODEL);
     return true;
+  }
+
+  function getPrimeTask(onProgress){
+    if(!primeTask){
+      const task=primeLargeAssets(onProgress);
+      primeTask=task.finally(()=>{primeTask=null});
+    }
+    return primeTask;
   }
 
   function prepare(options={}){
     if(primePromise)return primePromise;
     primePromise=(async()=>{
       try{
-        await withTimeout(primeLargeAssets(options.onProgress),PRIME_TIMEOUT_MS,'ios_prime');
+        // Jangan memulai runtime.prepare() saat prime masih berjalan. Promise.race
+        // tidak membatalkan cache.add/fetch yang kalah; memulai jalur kedua setelah
+        // timeout dapat menggandakan transfer 113 MB dan dua writer ke cache yang
+        // sama. Timeout sekarang fail-closed ke UI, sementara task prime tunggal
+        // tetap dilacak dan dapat disambung oleh retry berikutnya.
+        await withTimeout(getPrimeTask(options.onProgress),PRIME_TIMEOUT_MS,'ios_prime');
       }catch(error){
-        // Priming is a best-effort head start, not a requirement -- if it
-        // stalls or times out, fall through to the normal prepare() flow
-        // below instead of leaving the caller waiting forever.
         diag({phase:'prime_timeout_or_error',error:String(error?.message||error)});
+        throw error;
       }
       return runtime.prepare(options);
     })().finally(()=>{primePromise=null});
