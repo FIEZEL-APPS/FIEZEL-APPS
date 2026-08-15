@@ -7,11 +7,21 @@
     "commit": "d4ef0569c79046dfd77fbb128502546a3afe5bef",
     "license": "Apache-2.0",
     "build": "patched-source-rollup",
-    "buildRepair": "Terser maxWorkers=1 for deterministic Node 24 build completion"
+    "buildRepair": "Terser maxWorkers=1 for deterministic Node 24 build completion",
+    "sourcePatches": [
+      {
+        "name": "fiezel-integration",
+        "path": "vendor/kokoro-js/source-overrides/fiezel-integration.patch",
+        "sha256": "35d4138e67c6dff5707b26893ac75589308b786c91d5b64bfc301834e81f917c",
+        "purpose": "Expose allowRemoteModels, allowLocalModels, localModelPath, and setVoiceDataUrl for same-origin offline FIEZEL integration"
+      }
+    ]
   },
   "dependencies": {
     "@huggingface/transformers": "3.5.1",
     "phonemizer": "1.2.1",
+    "phonemizerRepository": "xenova/phonemizer.js",
+    "phonemizerCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
     "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
     "onnxruntimeCommit": "89f8206ba4f1c22c39e0297fb55272e8ce8cd7d0"
   },

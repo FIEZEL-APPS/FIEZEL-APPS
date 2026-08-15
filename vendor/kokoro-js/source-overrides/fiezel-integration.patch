@@ -1,0 +1,43 @@
+diff --git a/kokoro.js/src/kokoro.js b/kokoro.js/src/kokoro.js
+--- a/kokoro.js/src/kokoro.js
++++ b/kokoro.js/src/kokoro.js
+@@ -1,7 +1,7 @@
+ import { env as hf, StyleTextToSpeech2Model, AutoTokenizer, Tensor, RawAudio } from "@huggingface/transformers";
+ import { phonemize } from "./phonemize.js";
+ import { TextSplitterStream } from "./splitter.js";
+-import { getVoiceData, VOICES } from "./voices.js";
++import { getVoiceData, VOICES, setVoiceDataUrl } from "./voices.js";
+ 
+ const STYLE_DIM = 256;
+ const SAMPLE_RATE = 24000;
+@@ -151,6 +151,24 @@ export class KokoroTTS {
+ }
+ 
+ export const env = {
++  set allowRemoteModels(value) {
++    hf.allowRemoteModels = Boolean(value);
++  },
++  get allowRemoteModels() {
++    return hf.allowRemoteModels;
++  },
++  set allowLocalModels(value) {
++    hf.allowLocalModels = Boolean(value);
++  },
++  get allowLocalModels() {
++    return hf.allowLocalModels;
++  },
++  set localModelPath(value) {
++    hf.localModelPath = value;
++  },
++  get localModelPath() {
++    return hf.localModelPath;
++  },
+   set cacheDir(value) {
+     hf.cacheDir = value
+   },
+@@ -164,4 +182,4 @@ export const env = {
+   },
+ };
+ 
+-export { TextSplitterStream };
++export { TextSplitterStream, setVoiceDataUrl };
