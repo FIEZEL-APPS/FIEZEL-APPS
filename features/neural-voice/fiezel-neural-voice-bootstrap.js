@@ -221,8 +221,8 @@
         const appleStandalone=root.navigator?.standalone===true;
         if(wasmEnv&&typeof wasmEnv==='object'){
           if(appleStandalone||root.crossOriginIsolated!==true)wasmEnv.numThreads=1;
-          if(appleStandalone)wasmEnv.proxy=true;
-          wasmPolicy=appleStandalone?'apple-standalone-single-thread-proxy':(root.crossOriginIsolated===true?'auto-threaded':'single-thread');
+          if(appleStandalone)wasmEnv.proxy=false;
+          wasmPolicy=appleStandalone?'apple-standalone-single-thread-direct':(root.crossOriginIsolated===true?'auto-threaded':'single-thread');
           diag({phase:'wasm_policy',policy:wasmPolicy,numThreads:Number(wasmEnv.numThreads||0),proxy:!!wasmEnv.proxy});
         }
       }catch{}
@@ -236,7 +236,8 @@
         wasmBasePath:absolute('vendor/kokoro-js/wasm/'),
         runtimeOrigin:new URL(rootUrl).origin,
         dtype:root.FiezelNeuralVoiceConfig.dtype,
-        device:root.FiezelNeuralVoiceConfig.device
+        device:root.FiezelNeuralVoiceConfig.device,
+        onStage:entry=>diag(entry)
       });
       await adapter.initialize();
       const player=root.FiezelWebAudioPlayer.createPlayer(root);
