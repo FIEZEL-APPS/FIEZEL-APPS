@@ -117,16 +117,19 @@ const pass=name=>console.log(`PASS ${name}`);
   pass('iOS priming checks quota and verifies storage before progress success');
 
   const sw=read('sw.js');
-  assert.ok(sw.includes("'Cross-Origin-Embedder-Policy':'credentialless'"),'COEP must allow third-party no-cors SDK loading without opaque reconstruction');
+  assert.ok(sw.includes("COEP_POLICY='credentialless'"),'COEP must allow third-party no-cors SDK loading without opaque reconstruction');
   assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'),'third-party traffic must bypass service-worker response synthesis');
+  assert.ok(sw.includes("'same-origin-allow-popups'"),'WebKit navigation must preserve cross-origin auth popup opener');
   assert.ok(!/fetch\(request[^\n]*mode:'no-cors'[\s\S]{0,700}new Response\(response\.body/.test(sw),'must never reconstruct an opaque no-cors body as synthetic 200');
-  pass('service worker leaves Puter traffic to browser under credentialless COEP');
+  pass('service worker leaves Puter traffic to browser under popup-compatible credentialless policy');
 
   const workflow=read('.github/workflows/quality.yml');
   assert.ok(workflow.includes('node neural-voice-fix-test.js'));
   assert.ok(workflow.includes('node sw-corp-test.js'));
-  assert.ok(workflow.includes('node neural-voice-product-repair-test.js'),'new product repair gate must run in CI');
-  pass('quality workflow includes all neural repair gates');
+  assert.ok(workflow.includes('node neural-voice-product-repair-test.js'),'product repair gate must run in CI');
+  assert.ok(workflow.includes('node neural-voice-generation-timeout-test.js'),'m025 generation regression must run in CI');
+  assert.ok(workflow.includes('node puter-auth-coop-test.js'),'m025 Puter auth regression must run in CI');
+  pass('quality workflow includes neural repair and m025 gates');
 
   console.log('FIEZEL neural voice product repair: ALL GATES PASS');
 })().catch(error=>{console.error(error&&error.stack||error);process.exit(1)});
