@@ -57,10 +57,6 @@
       async speak(text, options) {
         if (!canUseSpeechSynthesis(env)) throw new Error('Browser TTS unavailable');
         return new Promise((resolve, reject) => {
-          // Sebelumnya onerror dan timeout memanggil resolve, jadi ucapan yang tidak
-          // pernah berbunyi tetap dilaporkan sukses dan tidak masuk diagnostics.
-          // Sekarang setiap jalur terminal lewat settle() bersama, dan kegagalan
-          // ditolak dengan alasan yang bisa dibaca.
           let done = false;
           let started = false;
           const settle = (fn, value) => { if (done) return; done = true; fn(value); };
@@ -90,7 +86,9 @@
     const maxChars = config.limits && config.limits.maxInputChars || 3600;
     const targetWords = config.limits && config.limits.targetChunkWords || 140;
     const hardWords = config.limits && config.limits.hardChunkWords || 190;
+    const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
     let generation = 0;
+    let requestSequence = 0;
     let activeStop = null;
     function diag(entry) {
       try {
@@ -114,6 +112,7 @@
       speakOptions = speakOptions || {};
       const text = normalizeText(input, maxChars);
       const callGeneration = ++generation;
+      const requestId = 'nv-' + Date.now().toString(36) + '-' + (++requestSequence).toString(36);
       const voice = speakOptions.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
       const chunks = splitIntoChunks(text, targetWords, hardWords);
 
@@ -127,33 +126,52 @@
 
       const outputs = [];
       try {
-        for (const chunk of chunks) {
+        for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex += 1) {
+          const chunk = chunks[chunkIndex];
           if (callGeneration !== generation) throw new Error('TTS request superseded');
           const generateStartedAt = Date.now();
-          diag({ phase: 'generate_start', voice, chars: chunk.length });
-          const audio = await adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 });
+          diag({ phase: 'generate_start', requestId, chunkIndex, voice, chars: chunk.length, timeoutMs: generationTimeoutMs || null });
+          let timer = null;
+          let audio;
+          if (generationTimeoutMs > 0) {
+            const timedOut = Symbol('neural-generation-timeout');
+            const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 }));
+            const result = await Promise.race([
+              generated,
+              new Promise(resolve => { timer = setTimeout(() => resolve(timedOut), generationTimeoutMs); })
+            ]).finally(() => { if (timer) clearTimeout(timer); });
+            if (result === timedOut) {
+              diag({ phase: 'generate_timeout', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, timeoutMs: generationTimeoutMs });
+              const error = new Error('neural_generation_timeout');
+              error.code = 'neural_generation_timeout';
+              throw error;
+            }
+            audio = result;
+          } else {
+            audio = await adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 });
+          }
           const samples = audio && (audio.audio || audio.data);
-          diag({ phase: 'generate_ready', voice, elapsedMs: Date.now() - generateStartedAt, samples: samples && typeof samples.length === 'number' ? samples.length : null });
+          diag({ phase: 'generate_ready', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, samples: samples && typeof samples.length === 'number' ? samples.length : null });
           if (callGeneration !== generation) throw new Error('TTS request superseded');
           outputs.push(audio);
           if (typeof playAudio === 'function') {
             const playbackStartedAt = Date.now();
-            diag({ phase: 'playback_start', voice });
+            diag({ phase: 'playback_start', requestId, chunkIndex, voice });
             const playback = await playAudio(audio, { signalGeneration: callGeneration });
             activeStop = playback && typeof playback.stop === 'function' ? playback.stop : null;
             if (playback && playback.done && typeof playback.done.then === 'function') await playback.done;
-            diag({ phase: 'playback_done', voice, elapsedMs: Date.now() - playbackStartedAt });
+            diag({ phase: 'playback_done', requestId, chunkIndex, voice, elapsedMs: Date.now() - playbackStartedAt });
             activeStop = null;
             if (callGeneration !== generation) throw new Error('TTS request superseded');
           }
         }
-        return { provider: adapter.kind || 'neural-local', voice, chunks: chunks.length, outputs };
+        return { provider: adapter.kind || 'neural-local', voice, chunks: chunks.length, outputs, requestId };
       } catch (error) {
-        diag({ phase: 'voice_service_error', voice, error: String(error && (error.message || error.name) || error) });
+        diag({ phase: 'voice_service_error', requestId, voice, error: String(error && (error.message || error.name) || error) });
         if (callGeneration !== generation) throw error;
         if (speakOptions.allowFallback !== false && config.fallback && config.fallback.browserSpeechSynthesis) {
           const fallbackResult = await fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
-          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: chunks.length, outputs };
+          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: chunks.length, outputs, requestId };
         }
         throw error;
       }
