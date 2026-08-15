@@ -1,0 +1,70 @@
+name: FIEZEL m025-4 Candidate Generator
+
+on:
+  push:
+    branches:
+      - 'master/m025-4-espeak-phase-probe'
+    paths:
+      - 'vendor/kokoro-js/source-overrides/phonemizer.js'
+      - 'tools/apply-m025-4-product-patch.py'
+      - 'tools/accept-neural-vendor-candidate.sh'
+      - '.github/workflows/m025-4-candidate-generator.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fiezel-m025-4-candidate-generator
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master/m025-4-espeak-phase-probe
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Apply guarded m025-4 shell and diagnostics patch
+        run: python3 tools/apply-m025-4-product-patch.py
+      - name: Build and accept source-derived neural vendor candidate
+        run: bash tools/accept-neural-vendor-candidate.sh
+      - name: Run targeted m025-4 verifier
+        run: node neural-voice-device-hotfix-test.js
+      - name: Verify generated change set
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add \
+            vendor/kokoro-js/kokoro.web.js \
+            NEURAL-VOICE-SOURCE-LOCK.json \
+            features/neural-voice/fiezel-neural-voice-bootstrap.js \
+            features/neural-voice/fiezel-diag-panel.js \
+            sw.js \
+            neural-voice-device-hotfix-test.js
+          mapfile -t files < <(git diff --cached --name-only | sort)
+          expected=(
+            'NEURAL-VOICE-SOURCE-LOCK.json'
+            'features/neural-voice/fiezel-diag-panel.js'
+            'features/neural-voice/fiezel-neural-voice-bootstrap.js'
+            'neural-voice-device-hotfix-test.js'
+            'sw.js'
+            'vendor/kokoro-js/kokoro.web.js'
+          )
+          mapfile -t expected_sorted < <(printf '%s\n' "${expected[@]}" | sort)
+          if [[ "${files[*]}" != "${expected_sorted[*]}" ]]; then
+            printf 'Unexpected generated files:\n'; printf '  %s\n' "${files[@]}"; exit 1
+          fi
+          git diff --cached --check
+      - name: Commit generated candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'm025-4: generate source-derived eSpeak phase probe candidate'
+          git push origin HEAD:master/m025-4-espeak-phase-probe
