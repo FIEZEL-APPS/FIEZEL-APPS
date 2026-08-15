@@ -1,6 +1,6 @@
 {
     "protocol_version":  "v1",
-    "updated":  "2026-08-15T17:10:00+07:00",
+    "updated":  "2026-08-15T22:40:00+07:00",
     "agents":  [
                    {
                        "id":  "coordinator-1",
@@ -299,6 +299,14 @@
                       "evidence":  "agent-5 (takeover OWNER 2026-08-15, MASTER/squad tidak aktif): (1) fiezel-web-audio-player.js +close() (stop source + close shared AudioContext + env.__fiezelWebAudioContext=null), API Object.freeze({play,stop,warm,close}) ADDITIVE; (2) fiezel-neural-voice-bootstrap.js +release() (service.stop + speechSynthesis.cancel + FiezelWebAudioPlayer.createPlayer(root).close() + playerRef/service/adapter=null + phase=idle + diag released, re-init on-demand via speak/ensureReady), diekspos di FiezelVoiceRuntime (speak,stop,release) ADDITIVE; (3) app.js visibilitychange handler: hidden -> tambah FiezelVoiceRuntime.release() (masih suspend musicCtx/fxCtx), visible -> resume normal; (4) neural-voice-fix-test.js section 6 (13 check T-023, total 42/42 PASS); node --check PASS (97 file); neural-voice-test.js PASS 39/0; Quality Gate penuh lokal 46/46 script PASS (termasuk remote-push-test.js 16/16 dgn rfc8030TopicSanitized, regression-test.js hang di node v24/Windows = isu lingkungan, PASS di CI node 22); verifier VERIFY-TAKEOVER-001: diff/evidence/regression/forbidden PASS, objective+CI FAIL hanya karena kode belum di-commit; DIPERBAIKI: commit 7 file + CI QG hijau untuk kode T-023 + push fix (lihat evidence verifikasi ulang). KONTRAK PUBLIK TIDAK BERUBAH (hanya bertambah).",
                       "title":  "Fix tab lifecycle: tab FIEZEL stuck/force-close saat pindah tab (release neural voice + AudioContext saat hidden)",
                       "status":  "done"
+                  },
+                  {
+                      "id":  "T-024",
+                      "title":  "A3 controlled Apple standalone direct single-thread WASM (proxy=false) + adapter bounded stage diagnostics",
+                      "status":  "done",
+                      "owner":  "agent-1",
+                      "note":  "PR #23 (agent/a3-webkit-direct-wasm, head ffb9f01) sudah di-merge ke main b0ab5ff; kandidat A3 di-port/diulang di branch agent/a3-webkit-direct-wasm-t024 (commit 97cd608, 3 file: fiezel-kokoro-adapter.js +50/-3, fiezel-neural-voice-bootstrap.js +7/-2, neural-voice-device-hotfix-test.js +12/-1). Root cause tetap SUSPECTED (proxy-worker round trip); eksperimen direct-WASM ini BUKAN fix device terkonfirmasi. TIDAK mengubah timeout/SW/COI/Puter/cache/UI/kontrak publik; hanya kebijakan WASM Apple standalone + diagnostik aditif.",
+                      "evidence": "commit 97cd608 branch agent/a3-webkit-direct-wasm-t024; CI QG 31890775901 SUCCESS (headSha 97cd608, node 22). Lokal (node v24.19.0): neural-voice-device-hotfix-test.js PASS; node --check 3 file PASS; neural-voice-test.js PASS 39/0; neural-voice-audibility-test.js PASS; validator.js PASS; neural-voice-fix-test.js PASS; neural-voice-single-flight-test.js PASS; neural-voice-timeout-phase-test.js PASS; neural-voice-generation-timeout-test.js PASS; neural-voice-diagnostics-retention-test.js PASS; ios-wasm-module-test.js PASS; ios-cache-compat-test.js PASS; neural-voice-http-test.js PASS; sw-corp-test.js PASS; neural-voice-product-repair-test.js PASS; diag-panel-test.js PASS; puter-auth-coop-test.js PASS; puter-auth-diagnostics-test.js PASS; http-smoke-test.js PASS; pwa-cache-test.js PASS. regression-test.js hang di node v24/Windows = isu lingkungan (PASS di CI node 22). git diff --check bersih. Kebijakan: appleStandalone -> numThreads=1, proxy=false, policy 'apple-standalone-single-thread-direct' + diag wasm_policy; non-Apple/COI (auto-threaded/single-thread) tidak berubah. Adapter: stage() bounded (adapter_instance_start/ready/error, adapter_generate_enter/invoke/dispatched/resolved/error) via onStage; errorKind (code/name, tanpa error.message / prompt text). Perlu konfirmasi manual di device Apple (audibility belum diklaim)."
                   }
               ],
     "last_report":  {
