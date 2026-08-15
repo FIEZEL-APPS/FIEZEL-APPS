@@ -32,28 +32,43 @@ jobs:
           set -e
 
           mkdir -p .vendor-repro
-          echo "baseline_compare_exit=$rc" | tee -a .vendor-repro/candidate-report.txt
-          test "$rc" -ne 0
+          echo "runtime_compare_exit=$rc" | tee -a .vendor-repro/candidate-report.txt
           test -s .vendor-repro/kokoro.web.js
 
           expected_sha="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.bundle.sha256")"
           expected_size="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.bundle.sizeBytes")"
           candidate_state="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.state")"
           runtime_promoted="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.provenance.runtimePromoted")"
+          runtime_sha="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').runtime.bundle.sha256")"
+          runtime_size="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').runtime.bundle.sizeBytes")"
           actual_sha="$(sha256sum .vendor-repro/kokoro.web.js | awk '{print $1}')"
           actual_size="$(stat -c '%s' .vendor-repro/kokoro.web.js)"
 
-          printf 'candidateState=%s\nruntimePromoted=%s\nexpectedCandidateSha256=%s\nactualCandidateSha256=%s\nexpectedCandidateSize=%s\nactualCandidateSize=%s\n' \
-            "$candidate_state" "$runtime_promoted" "$expected_sha" "$actual_sha" "$expected_size" "$actual_size" \
+          printf 'candidateState=%s\nruntimePromoted=%s\nruntimeSha256=%s\nruntimeSize=%s\nexpectedCandidateSha256=%s\nactualCandidateSha256=%s\nexpectedCandidateSize=%s\nactualCandidateSize=%s\n' \
+            "$candidate_state" "$runtime_promoted" "$runtime_sha" "$runtime_size" "$expected_sha" "$actual_sha" "$expected_size" "$actual_size" \
             | tee -a .vendor-repro/candidate-report.txt
 
-          test "$candidate_state" = 'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED'
-          test "$runtime_promoted" = 'false'
           test "$actual_sha" = "$expected_sha"
           test "$actual_size" = "$expected_size"
 
-          echo 'Candidate bytes match the staged m025-5 lock; mismatch with the m025-4 runtime lock remains an intentional promotion barrier.' \
-            | tee -a .vendor-repro/candidate-report.txt
+          if [[ "$runtime_promoted" == 'false' ]]; then
+            test "$candidate_state" = 'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED'
+            test "$rc" -ne 0
+            test "$runtime_sha" != "$expected_sha"
+            test "$runtime_size" != "$expected_size"
+            echo 'Candidate bytes match the staged m025-5 lock; mismatch with the m025-4 runtime lock remains an intentional promotion barrier.' \
+              | tee -a .vendor-repro/candidate-report.txt
+          elif [[ "$runtime_promoted" == 'true' ]]; then
+            test "$candidate_state" != 'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED'
+            test "$rc" -eq 0
+            test "$runtime_sha" = "$expected_sha"
+            test "$runtime_size" = "$expected_size"
+            echo 'Promoted runtime reproduces byte-for-byte from the locked m025-5 source candidate.' \
+              | tee -a .vendor-repro/candidate-report.txt
+          else
+            echo "Candidate runtimePromoted must be boolean, got: $runtime_promoted" >&2
+            exit 1
+          fi
       - name: Upload candidate artifact
         uses: actions/upload-artifact@v4
         with:
