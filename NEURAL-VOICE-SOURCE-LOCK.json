@@ -44,7 +44,7 @@
     {"id":"af_bella","sha256":"f69d836209b78eb8c66e75e3cda491e26ea838a3674257e9d4e5703cbaf55c8b"},
     {"id":"af_nicole","sha256":"cd2191ab31b914ed7b318416b0e4440fdf392ddad9106a060819aa600a64f59a"},
     {"id":"am_michael","sha256":"1d1f21dd8da39c30705cd4c75d039d265e9bc4a2a93ed09bc9e1b1225eb95ba1"},
-    {"id":"bf_emma","sha256":"669fe0647f9dd04fcab92f1439a40eeb4c4ab1f82e4996fe3d918ce4a63b73"},
+    {"id":"bf_emma","sha256":"669fe0647f9dd04fcab92f1439a40eeb4c8b4ab1f82e4996fe3d918ce4a63b73"},
     {"id":"bm_george","sha256":"c4b235a4c1f2cd3b939fed08b899ce9385638b763f7b73a59616c4fc9bd6c9bc"}
   ],
   "policy": {
