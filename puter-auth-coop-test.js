@@ -47,7 +47,7 @@ async function navigationHeaders(userAgent){
   const puterRequest={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};
   for(const fn of t.listeners.fetch||[])fn({request:puterRequest,respondWith:()=>{intercepted=true}});
   assert.equal(intercepted,false,'third-party Puter SDK traffic must remain outside the service worker');
-  assert.ok(src.includes("SW_REV='m025-neural-puter-observability-20260815-1'"));
-  assert.ok(fs.readFileSync(path.join(__dirname,'version.js'),'utf8').includes("'5.19.0'"),'m025 must preserve the neural cache version');
+  assert.ok(src.includes("SW_REV='m026-neural-single-flight-20260815-1'"));
+  assert.ok(fs.readFileSync(path.join(__dirname,'version.js'),'utf8').includes("'5.19.0'"),'m026 must preserve the neural cache version');
   console.log('FIEZEL Puter auth/COOP regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
