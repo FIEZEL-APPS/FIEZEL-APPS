@@ -22,6 +22,7 @@ EXPECTED_SHA="$(read_lock runtime.bundle.sha256)"
 EXPECTED_SIZE="$(read_lock runtime.bundle.sizeBytes)"
 PHONEMIZER_VERSION="$(read_lock dependencies.phonemizer)"
 COMMITTED_BUNDLE="$ROOT/$(read_lock runtime.bundle.path)"
+INTEGRATION_PATCH="$ROOT/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
 
 if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
   echo "REPRO FAIL: unexpected provider repository: $PROVIDER_REPO" >&2
@@ -29,6 +30,10 @@ if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
 fi
 if [[ "$PHONEMIZER_VERSION" != "1.2.1" ]]; then
   echo "REPRO FAIL: unexpected phonemizer lock: $PHONEMIZER_VERSION" >&2
+  exit 1
+fi
+if [[ ! -f "$INTEGRATION_PATCH" ]]; then
+  echo "REPRO FAIL: historical FIEZEL Kokoro integration patch is missing" >&2
   exit 1
 fi
 
@@ -47,6 +52,10 @@ fi
 echo "[repro] cloning $PROVIDER_REPO@$PROVIDER_COMMIT"
 git clone --quiet "https://github.com/${PROVIDER_REPO}.git" "$WORK_DIR/kokoro"
 git -C "$WORK_DIR/kokoro" checkout --quiet "$PROVIDER_COMMIT"
+
+echo "[repro] replaying historical FIEZEL Kokoro integration patch"
+git -C "$WORK_DIR/kokoro" apply --check "$INTEGRATION_PATCH"
+git -C "$WORK_DIR/kokoro" apply "$INTEGRATION_PATCH"
 
 cd "$WORK_DIR/kokoro/kokoro.js"
 npm ci --ignore-scripts
@@ -100,12 +109,14 @@ cp dist/kokoro.web.js "$OUT_DIR/kokoro.web.js"
 
 BUILT_SHA="$(sha256sum "$OUT_DIR/kokoro.web.js" | awk '{print $1}')"
 BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
+PATCH_SHA="$(sha256sum "$INTEGRATION_PATCH" | awk '{print $1}')"
 {
   echo "provider=$PROVIDER_REPO"
   echo "providerCommit=$PROVIDER_COMMIT"
   echo "node=$(node --version)"
   echo "npm=$(npm --version)"
   echo "phonemizer=$INSTALLED_PHONEMIZER"
+  echo "integrationPatchSha256=$PATCH_SHA"
   echo "expectedSha256=$EXPECTED_SHA"
   echo "expectedSize=$EXPECTED_SIZE"
   echo "committedSha256=$COMMITTED_SHA"
