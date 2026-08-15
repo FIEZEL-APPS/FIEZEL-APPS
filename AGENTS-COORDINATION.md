@@ -63,7 +63,7 @@ Hierarki tetap depth 1:
 
 ```
 Agent 5 (Main Coordinator)
-├── worker pool: agent-1 .. agent-4   (implementasi dalam scope)
+├── worker pool: agent-1 .. agent-15   (implementasi dalam scope)
 └── verifier                          (verifikasi read-only, verdict VERIFIED/REFUTED/UNVERIFIED)
 ```
 
@@ -71,6 +71,29 @@ Alur: USER → Agent 5 → ANALYZE → PLAN → DELEGATE (worker) → TEST → V
 PASS/DONE atau FAIL → kembali ke WORKER → perbaikan → test → verifikasi ulang → DONE.
 Agent 5 tidak menyatakan selesai hanya karena worker melapor "done"; wajib ada
 verifikasi + bukti (test lokal/CI/evidence device).
+
+## Worker Pool — 15 Agent (instruksi owner 2026-08-14 ~21:20)
+
+SELURUH 15 agent WAJIB ikut serta agar projek berjalan lancar (instruksi owner
+disampaikan lintas sesi ke coordinator-1 via ledger T-021/M-019). Pemetaan zen key:
+
+| Agent | Zen key | Agent | Zen key |
+|-------|---------|-------|---------|
+| agent-1 | zen-agent-1 | agent-9 | zen-agent-4 |
+| agent-2 | zen-agent-2 | agent-10 | zen-agent-5 |
+| agent-3 | zen-agent-3 | agent-11 | zen-agent-1 |
+| agent-4 | zen-agent-4 | agent-12 | zen-agent-2 |
+| agent-5 (Main Coordinator) | zen-agent-5 | agent-13 | zen-agent-3 |
+| agent-6 | zen-agent-1 | agent-14 | zen-agent-4 |
+| agent-7 | zen-agent-2 | agent-15 | zen-agent-5 |
+| agent-8 | zen-agent-3 | | |
+
+**Aturan keras SATU CLONE PER AGENT (insiden M-017 BLOCKED, 2026-08-14):**
+dua sesi agent yang berbagi satu working directory = konflik working tree dan
+memblokir sesi lain. Setiap agent WAJIB bekerja di clone sendiri
+`Temp\opencode\FIEZEL-APPS-clone-w<N>` (buat baru jika belum ada, jangan pernah
+memakai clone agent lain). `Temp\opencode\FIEZEL-APPS-clone` adalah working tree
+koordinator/task-giver — worker DILARANG menulis di sana.
 
 ## Protokol Pelengkap (WAJIB dibaca semua agent)
 
@@ -100,6 +123,21 @@ titik kontrol wajib:
    ditemukan verifier dilaporkan eksplisit, dan laporan membedakan "lolos test
    otomatis" vs "perlu konfirmasi manual di device".
 
+## Pesan lintas sesi (agent-5 → coordinator-1, 2026-08-14 ~21:20)
+
+Dari Agent 5 / Main Coordinator untuk coordinator-1 (task-giver) — instruksi owner:
+
+1. **Gunakan SELURUH 15 agent** (agent-1..15) untuk setiap gelombang kerja; jangan
+   hanya mengandalkan sebagian kecil pool. Latihan partisipasi 15-agent pertama
+   sudah dijalankan Agent 5 (T-021/M-019) sebagai bukti semua agent responsif.
+2. **Pisahkan clone per agent** (aturan emas #3): insiden M-017 BLOCKED terjadi
+   karena agent-1 & agent-2 berbagi `FIEZEL-APPS-clone`. Worker baru WAJIB clone
+   sendiri (`FIEZEL-APPS-clone-w<N>`) sebelum mulai.
+3. **Pertahankan format scope-lock** (protokol pelengkap §1) untuk semua delegasi,
+   termasuk dari coordinator-1.
+4. Temuan scan M-016 (Agent 5) sudah selaras dengan verifikasi coordinator-1
+   (T-016); lanjutkan roadmap: T-006 diagnostics device → T-007 IndexedDB.
+
 ## Area Kerja Saat Ini
 
 | Area | File utama | Status |
@@ -110,8 +148,8 @@ titik kontrol wajib:
 | SW / COI | sw.js | lihat ledger |
 | UI/UX voice | app.js | lihat ledger |
 
-Versi protokol ini: v1.2 (2026-08-14). v1.1: Agent 5 ditetapkan sebagai Main Coordinator
-(worker pool agent-1..4 + verifier, depth 1); protokol squad v1 tetap berlaku. v1.2:
-FIEZEL-Orkestrasi-Protokol-Pelengkap.md ditetapkan sebagai bacaan wajib (scope-lock,
-context-injection, checklist verifier 6 poin, kriteria selesai). Perubahan
+Versi protokol ini: v1.3 (2026-08-14). v1.2: FIEZEL-Orkestrasi-Protokol-Pelengkap.md
+ditetapkan sebagai bacaan wajib. v1.3: worker pool diperluas ke 15 agent (zen key
+dipakai ulang); aturan keras satu-clone-per-agent (insiden M-017 BLOCKED); pesan
+lintas sesi ke coordinator-1 (instruksi owner: seluruh 15 agent ikut serta). Perubahan
 protokol hanya oleh Coordinator dengan persetujuan Owner.

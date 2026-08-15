@@ -37,7 +37,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
 
-  <div id="welcome" class="welcome notification-gate" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+  <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
     <div class="welcome-panel notification-panel">
       <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
       <div class="welcome-mark">FIEZEL REMINDER · WAJIB NYALA</div>
@@ -77,6 +77,8 @@
   <script src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
   <script src="./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js"></script>
   <script src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
+  <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada. -->
+  <script src="./features/neural-voice/fiezel-diag-panel.js"></script>
   <script src="./features/speaking-listening/speaking-listening-config.js"></script>
   <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>

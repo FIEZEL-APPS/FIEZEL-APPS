@@ -58,3 +58,4 @@ jobs:
           node ios-cache-compat-test.js
           node neural-voice-http-test.js
           node neural-voice-audibility-test.js
+          node diag-panel-test.js

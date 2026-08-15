@@ -50,25 +50,30 @@ Lakukan urutan ini:
 
 ### 2b. Bila masih tampak perilaku lama / gate masih muncul (troubleshooting)
 
-Hapus data website Safari untuk situs ini (jarang perlu):
+> ### 🛑 JANGAN LAKUKAN INI
+>
+> Versi sebelumnya dokumen ini menyuruh menghapus Data Situs Web dan memasang ulang
+> ikon Layar Utama. **Kedua langkah itu menghapus `localStorage`**, termasuk key
+> `fiezel-neural-voice-diagnostics-v1` yang justru diminta di Bagian 4 dokumen yang
+> sama. Kalau hilang, T-006 harus mulai dari reproduksi kegagalan dari nol.
+>
+> Jadi: **jangan** hapus ikon FIEZEL dari Layar Utama. **Jangan** Pengaturan → Safari →
+> Hapus Riwayat dan Data Situs Web. **Jangan** Data Situs Web → Hapus. **Jangan**
+> pasang ulang PWA. Semua ini hanya boleh setelah diagnostics berhasil dikirim, dan
+> hanya atas persetujuan coordinator.
 
-1. Pengaturan → Safari → Lanjutan → **Data Situs Web**.
-2. Cari `fitrajft-ux.github.io` (atau entri "FIEZEL") → geser ke kiri → **Hapus** → konfirmasi.
-   > ⚠️ **Penting**: langkah ini menghapus data belajar lokal (progres tersimpan di
-   > localStorage Safari). Lakukan **hanya** jika "buka 2x" tidak cukup, dan lebih baik
-   > minta konfirmasi coordinator dulu jika progres dianggap berharga.
-3. Tutup Safari **total** (geser ke atas dari bawah → geser ke atas kartu Safari, buang).
-4. Buka Safari lagi → buka URL FIEZEL.
+Kalau versi lama masih dilayani, penyebabnya hampir selalu service worker yang belum
+install ulang. Urutan yang benar dan aman:
 
-Jika aplikasi dipasang ke **Layar Utama** (ikon "FIEZEL" di home screen):
--hapus ikon lama (tekan lama ikon → **Hapus** → Hapus dari Layar Utama),
--lalu pasang ulang dari Safari (tombol **Bagikan** → **Ke Layar Utama**).
+1. Buka FIEZEL dari ikon Layar Utama.
+2. Tutup penuh: geser ke atas ke app switcher, buang kartu FIEZEL.
+3. Buka lagi. Biasanya cukup sekali — `sw.js` memakai `skipWaiting()` + `clients.claim()`.
+4. Kalau setelah **3** kali masih versi lama, **berhenti dan laporkan**. Service worker
+   yang tidak meng-update adalah temuan tersendiri, bukan sesuatu yang diselesaikan
+   dengan memasang ulang aplikasi.
 
-Jika **MASIH** muncul gate setelah semua langkah di atas:
-- **Foto layar gate-nya** (screenshot),
-- Catat langkah troubleshooting yang sudah dicoba,
-- Catat versi iOS & versi aplikasi,
-- Laporkan sebagai **TIDAK LOLOS** (template di Bagian 5).
+Kalau gate notifikasi masih muncul: foto layarnya, catat versi iOS dan versi aplikasi,
+lalu laporkan sebagai TIDAK LOLOS.
 
 **Hasil T-008** (diisi di laporan):
 - [ ] Aplikasi terbuka langsung ke Home — TANPA gate notifikasi (YA / TIDAK)
@@ -126,63 +131,50 @@ Data diagnostics tersimpan di localStorage dengan key
 (`bootstrap_loaded`, `prepare_error`, `init_error`, `speak_fallback`, `prepared`, dst).
 Key ini juga bisa dibaca lewat `FiezelVoiceRuntime.diagnostics()`.
 
-### Cara 1 — DENGAN Mac (direkomendasikan; satu-satunya cara menyalin JSON penuh)
+### Cara 1 — Panel Diagnostics di dalam aplikasi (utama, tanpa Mac)
 
-1. **Di Mac**: buka Safari → menu **Safari** → **Pengaturan** → tab **Lanjutan** →
-   centang **"Tampilkan menu Pengembang"** (Show Develop menu).
-2. **Hubungkan iPhone** ke Mac:
-   - Via kabel USB, atau
-   - Via Wi-Fi (kedua perangkat di jaringan yang sama; pastikan di iPhone:
-     Pengaturan → Safari → Lanjutan → **Web Inspector** **aktif** — biasanya otomatis aktif).
-3. Di iPhone, **buka aplikasi FIEZEL**.
-4. Di Mac Safari, menu **Pengembang** (Develop) → pilih nama **iPhone** → pilih
-   halaman FIEZEL. Jendela **Web Inspector** terbuka.
-5. Buka tab **"Konsol"** (Console). Di kolom input bawah, ketik lalu Enter:
+Sejak build `m019-1`, aplikasi bisa mengekspor diagnostiknya sendiri. Ini cara yang
+dipakai owner, karena Safari di iPhone tidak punya konsol dan storage PWA Layar Utama
+terisolasi dari tab Safari biasa.
+
+1. Buka FIEZEL dari ikon Layar Utama (bukan tab Safari — datanya beda container).
+2. Tombol hitam **Diagnostics** ada di kanan atas. Ketuk.
+3. Cek baris pertama JSON: `"diagBuild": "m019-1"`. Kalau tombolnya tidak ada,
+   ikuti urutan cold launch di Bagian 2b.
+4. Ketuk **Kirim** → pilih Notes/WhatsApp → kirim isinya ke coordinator.
+   - Kalau share sheet gagal, tombol berubah jadi "Tersalin" → langsung tempel.
+   - Kalau dua-duanya gagal, tahan di dalam kotak teks → Select All → Copy.
+   - **Kirim ringkas** hanya mengirim `target` + `storageEstimate`. Pakai ini kalau
+     payload penuh terlalu besar untuk share sheet.
+
+Yang ikut terkirim selain isi key: `storageEstimate` (kuota & pemakaian asli device),
+`cacheInventory` (aset kokoro mana yang benar-benar tersimpan beserta ukuran dan MIME),
+`crossOriginIsolated`, `swController`, dan `puterLoaded`.
+
+Panel ini read-only: tidak menulis atau menghapus apa pun di localStorage,
+CacheStorage, maupun IndexedDB.
+
+### Cara 2 — Mac + Safari Web Inspector (opsional, kalau kebetulan ada Mac)
+
+1. **iPhone**: Pengaturan → Safari → Lanjutan → **Web Inspector** aktif.
+2. **Mac**: Safari → Pengaturan → Lanjutan → tampilkan menu **Develop**.
+3. Sambungkan kabel, ketuk **Trust**, buka FIEZEL di iPhone.
+4. Mac Safari → Develop → nama iPhone → pilih entri **PWA**-nya, bukan tab Safari.
+5. Tab Console:
 
    ```js
-   JSON.stringify(FiezelVoiceRuntime.diagnostics(), null, 2)
+   copy(JSON.stringify(FiezelVoiceRuntime.diagnostics(), null, 2))
    ```
 
-   Salin seluruh hasil JSON (tampil berformat rapi).
+Kalau iPhone tidak muncul di daftar: buka kunci HP, cabut-pasang kabel, pastikan bukan
+Private Browsing.
 
-6. Opsional, untuk info status tambahan:
+### Yang sudah tidak berlaku
 
-   ```js
-   FiezelVoiceRuntime.status()
-   localStorage.getItem('fiezel-neural-voice-diagnostics-v1')
-   ```
-
-7. Tempel hasil JSON ke pesan laporan (Bagian 5).
-
-### Cara 2 — TANPA Mac (keterangan JUJUR)
-
-Safari di iPhone **tidak menyediakan konsol pengembang** sendiri; konsol hanya bisa
-dibuka lewat Web Inspector dari Mac. Pada rilis ini, aplikasi **tidak menyediakan halaman
-debug internal** untuk menyalin JSON diagnostics dari dalam aplikasi (sudah dicek di kode
-5.19.0). **Kesimpulan jujur: tanpa Mac, owner tidak bisa menyalin JSON penuh dari iPhone.**
-
-Alternatif yang masuk akal (pilih salah satu):
-
-- **Opsi A — bukti parsial (bisa langsung, tanpa Mac):**
-  - Screenshot kartu suara neural di Skills Lab (label status + teks `Status:` jika ada),
-  - Screenshot pesan error/notif "Persiapan gagal ..." bila muncul,
-  - Screenshot hasil uji suara (Bagian 3).
-  - Kirim sebagai bukti interim. Ini **tidak menggantikan** JSON penuh, tapi membantu analisis.
-
-- **Opsi B — pinjam Mac**, lalu lakukan Cara 1 di atas (30–60 menit). Ini satu-satunya
-  jalur untuk mendapat JSON diagnostics yang sah dari iPhone.
-
-- **Opsi C — cross-check saja di laptop (BUKAN bukti iPhone):**
-  Buka URL yang sama di Chrome/Edge di laptop. Adanya catatan: diagnostics/lokalStorage
-  **tersimpan per-perangkat** — data di laptop **bukan** data iPhone, jadi **tidak boleh**
-  diklaim sebagai bukti device iPhone. Hanya berguna melihat perilaku versi 5.19.0 secara umum.
-
-**Keputusan yang jujur untuk laporan:** jika tidak ada Mac sama sekali, kirim hasil
-Opsi A sebagai bukti parsial **dan** tulis eksplisit: *"T-006 belum bisa diekstrak penuh
-tanpa Mac"*, agar coordinator memutuskan langkah berikut (menunggu Mac, menerima bukti
-parsial, atau jalur alternatif lain).
-
----
+Versi lama dokumen ini menyatakan tanpa Mac owner tidak bisa menyalin JSON penuh, dan
+aplikasi tidak punya halaman debug internal. Keduanya sudah tidak benar sejak panel
+Diagnostics ada. Bookmarklet tetap tidak bisa dipakai: hanya jalan di tab Safari, yang
+container storage-nya berbeda dari PWA Layar Utama.
 
 ## 5. Format laporan ke coordinator
 

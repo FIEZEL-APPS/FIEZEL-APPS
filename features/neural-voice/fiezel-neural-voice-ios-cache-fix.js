@@ -30,7 +30,7 @@
   // total = 119.274.361 B. Selisih +522.240 B = ukuran satu voice .bin
   // (af_heart/af_bella/dll, masing-masing 522.240 B). Efeknya kosmetik
   // (hanya progress bar), bukan logika priming. Sumber: analysis/idb-migration-design.md.
-  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119796601;
+  const PRIME_TOTAL_BYTES=Number(runtime.totalBytes)||119274361;
   let primePromise=null;
 
   function withTimeout(promise,ms,label){
@@ -50,7 +50,7 @@
       const key='fiezel-neural-voice-diagnostics-v1';
       const list=JSON.parse(root.localStorage?.getItem(key)||'[]');
       list.push({t:Date.now(),v:version,patch:'ios-cache-v1',...entry});
-      root.localStorage?.setItem(key,JSON.stringify(list.slice(-40)));
+      root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)));
     }catch{}
   }
 

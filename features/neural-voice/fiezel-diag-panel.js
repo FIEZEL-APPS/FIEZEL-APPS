@@ -1,0 +1,287 @@
+(function(root){
+  'use strict';
+
+  // FIEZEL diagnostics exporter (M-019)
+  //
+  // Tujuan: owner memakai FIEZEL dari ikon Home Screen (PWA standalone) dan tidak
+  // punya Mac. Storage container standalone iOS terpisah dari tab Safari, dan tanpa
+  // Mac tidak ada Web Inspector, jadi tidak ada cara membaca localStorage dari luar.
+  // Panel ini membuat app mengekspor datanya sendiri.
+  //
+  // KONTRAK READ-ONLY: file ini tidak boleh menulis atau menghapus apa pun di
+  // localStorage, CacheStorage, atau IndexedDB. Yang dipakai hanya getItem,
+  // Object.keys, caches.keys, cache.keys, cache.match (header saja, body tidak
+  // pernah dibaca supaya 92 MB model tidak masuk memori).
+  //
+  // DIAG_BUILD adalah penanda manual. Repo ini tidak punya build step, jadi tidak
+  // ada tempat menyuntik commit sha otomatis. Naikkan angkanya setiap kali panel
+  // ini di-deploy — inilah cara owner membedakan "build baru sudah aktif" dari
+  // "build lama masih dilayani service worker".
+  var DIAG_BUILD = 'm019-1';
+
+  var KEY = 'fiezel-neural-voice-diagnostics-v1';
+  var Z = 2147483000; // di atas .answer-burst (130) dan .notification-gate (100)
+
+  if (!root.document || root.__fiezelDiagPanel) return;
+  root.__fiezelDiagPanel = true;
+
+  function safe(fn, fallback) {
+    try { return fn(); }
+    catch (error) { return arguments.length > 1 ? fallback : 'ERR: ' + String(error && error.message || error); }
+  }
+
+  function collectSync() {
+    return {
+      diagBuild: DIAG_BUILD,
+      appVersion: safe(function(){ return String(root.FIEZEL_VERSION || '(tidak ada)'); }),
+      capturedAt: new Date().toISOString(),
+      origin: safe(function(){ return location.origin; }),
+      href: safe(function(){ return location.href; }),
+      standalone: safe(function(){
+        return (root.navigator && root.navigator.standalone === true) ||
+               !!(root.matchMedia && root.matchMedia('(display-mode: standalone)').matches);
+      }),
+      userAgent: safe(function(){ return root.navigator.userAgent; }),
+      crossOriginIsolated: safe(function(){ return root.crossOriginIsolated === true; }),
+      puterLoaded: safe(function(){ return typeof root.puter !== 'undefined' && !!(root.puter && root.puter.workers); }),
+      localStorageKeys: safe(function(){ return Object.keys(root.localStorage); }, []),
+      target: safe(function(){ return root.localStorage.getItem(KEY); }, null),
+      runtimeStatus: safe(function(){
+        return (root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.status)
+          ? root.FiezelVoiceRuntime.status() : '(FiezelVoiceRuntime tidak ada)';
+      }),
+      swController: safe(function(){
+        var c = root.navigator.serviceWorker && root.navigator.serviceWorker.controller;
+        return c ? { scriptURL: c.scriptURL, state: c.state } : null;
+      }),
+      storageEstimate: '(memuat)',
+      cacheInventory: '(memuat)'
+    };
+  }
+
+  function addStorageEstimate(dump) {
+    var manager = root.navigator && root.navigator.storage;
+    if (!manager || typeof manager.estimate !== 'function') {
+      dump.storageEstimate = '(navigator.storage.estimate tidak tersedia)';
+      return Promise.resolve();
+    }
+    return manager.estimate().then(function(est){
+      dump.storageEstimate = {
+        quota: est && est.quota,
+        usage: est && est.usage,
+        available: (est && typeof est.quota === 'number' && typeof est.usage === 'number')
+          ? est.quota - est.usage : null,
+        usageDetails: (est && est.usageDetails) || null
+      };
+    }).catch(function(error){
+      dump.storageEstimate = 'ERR: ' + String(error && error.message || error);
+    });
+  }
+
+  function inspectCache(name) {
+    return root.caches.open(name).then(function(cache){
+      return cache.keys().then(function(requests){
+        var neural = requests.filter(function(r){ return r.url.indexOf('/vendor/kokoro-') !== -1; });
+        return neural.reduce(function(chain, request){
+          return chain.then(function(list){
+            return cache.match(request).then(function(response){
+              list.push({
+                asset: request.url.replace(/^.*\/vendor\//, 'vendor/'),
+                contentLength: response ? response.headers.get('content-length') : null,
+                contentType: response ? response.headers.get('content-type') : null
+              });
+              return list;
+            });
+          });
+        }, Promise.resolve([])).then(function(neuralAssets){
+          return { name: name, entryCount: requests.length, neuralAssets: neuralAssets };
+        });
+      });
+    });
+  }
+
+  function addCacheInventory(dump) {
+    if (!root.caches) {
+      dump.cacheInventory = '(CacheStorage tidak tersedia)';
+      return Promise.resolve();
+    }
+    return root.caches.keys().then(function(names){
+      return names.reduce(function(chain, name){
+        return chain.then(function(list){
+          return inspectCache(name).then(function(info){ list.push(info); return list; })
+            .catch(function(error){
+              list.push({ name: name, error: String(error && error.message || error) });
+              return list;
+            });
+        });
+      }, Promise.resolve([]));
+    }).then(function(list){
+      dump.cacheInventory = list;
+    }).catch(function(error){
+      dump.cacheInventory = 'ERR: ' + String(error && error.message || error);
+    });
+  }
+
+  function addRuntimeDiagnostics(dump) {
+    // FiezelVoiceRuntime.diagnostics() memparse key yang sama dengan `target`.
+    // Disimpan terpisah supaya kalau salah satu gagal parse, yang lain tetap ada.
+    dump.runtimeDiagnostics = safe(function(){
+      return (root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.diagnostics)
+        ? root.FiezelVoiceRuntime.diagnostics() : '(FiezelVoiceRuntime tidak ada)';
+    });
+  }
+
+  function serialize(value) {
+    try { return JSON.stringify(value, null, 2); }
+    catch (error) { return 'Gagal membentuk JSON: ' + String(error && error.message || error); }
+  }
+
+  function build() {
+    var host = root.document.createElement('div');
+    host.id = 'fiezelDiagHost';
+    host.setAttribute('data-diag-build', DIAG_BUILD);
+
+    var style = root.document.createElement('style');
+    style.textContent = [
+      '#fiezelDiagHost{position:fixed;z-index:' + Z + ';}',
+      '#fiezelDiagOpen{position:fixed;z-index:' + Z + ';',
+      'right:calc(12px + env(safe-area-inset-right));',
+      'top:calc(12px + env(safe-area-inset-top));',
+      'padding:9px 13px;border:1px solid #11172a;border-radius:11px;',
+      'background:#11172a;color:#fff;font:600 13px/1 -apple-system,system-ui,sans-serif;}',
+      '#fiezelDiagSheet{position:fixed;inset:0;z-index:' + (Z + 1) + ';display:none;',
+      'flex-direction:column;gap:9px;background:#fff;',
+      'padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));}',
+      '#fiezelDiagSheet.open{display:flex;}',
+      '#fiezelDiagSheet h2{margin:0;font:700 15px/1.3 -apple-system,system-ui,sans-serif;color:#11172a;}',
+      '#fiezelDiagSheet p{margin:0;font:400 12px/1.5 -apple-system,system-ui,sans-serif;color:#5f6c80;}',
+      '#fiezelDiagText{flex:1;width:100%;min-height:0;box-sizing:border-box;padding:9px;',
+      'border:1px solid #dfddd6;border-radius:10px;background:#fbfbf9;color:#11172a;',
+      'font:400 11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;-webkit-user-select:text;user-select:text;}',
+      '#fiezelDiagBar{display:flex;flex-wrap:wrap;gap:7px;}',
+      '#fiezelDiagBar button{flex:1 1 auto;padding:11px 13px;border-radius:11px;',
+      'border:1px solid #dfddd6;background:#fff;color:#11172a;',
+      'font:600 13px/1 -apple-system,system-ui,sans-serif;}',
+      '#fiezelDiagBar button.primary{border-color:#11172a;background:#11172a;color:#fff;}'
+    ].join('');
+
+    var open = root.document.createElement('button');
+    open.id = 'fiezelDiagOpen';
+    open.type = 'button';
+    open.textContent = 'Diagnostics';
+
+    var sheet = root.document.createElement('div');
+    sheet.id = 'fiezelDiagSheet';
+
+    var heading = root.document.createElement('h2');
+    heading.textContent = 'Diagnostics · ' + DIAG_BUILD;
+
+    var note = root.document.createElement('p');
+    note.textContent = 'Kirim isi kotak ini ke coordinator. Kalau tombol kirim tidak jalan, tahan di dalam kotak lalu pilih Select All dan Copy.';
+
+    var text = root.document.createElement('textarea');
+    text.id = 'fiezelDiagText';
+    text.readOnly = true;
+    text.spellcheck = false;
+
+    var bar = root.document.createElement('div');
+    bar.id = 'fiezelDiagBar';
+
+    var send = root.document.createElement('button');
+    send.type = 'button';
+    send.className = 'primary';
+    send.textContent = 'Kirim';
+
+    var sendTarget = root.document.createElement('button');
+    sendTarget.type = 'button';
+    sendTarget.textContent = 'Kirim ringkas';
+
+    var close = root.document.createElement('button');
+    close.type = 'button';
+    close.textContent = 'Tutup';
+
+    bar.appendChild(send);
+    bar.appendChild(sendTarget);
+    bar.appendChild(close);
+    sheet.appendChild(heading);
+    sheet.appendChild(note);
+    sheet.appendChild(text);
+    sheet.appendChild(bar);
+    host.appendChild(style);
+    host.appendChild(open);
+    host.appendChild(sheet);
+
+    return { host: host, open: open, sheet: sheet, text: text, send: send, sendTarget: sendTarget, close: close };
+  }
+
+  function share(button, label, payload) {
+    var original = button.textContent;
+    function done(message) {
+      button.textContent = message;
+      setTimeout(function(){ button.textContent = original; }, 2600);
+    }
+    if (root.navigator && typeof root.navigator.share === 'function') {
+      root.navigator.share({ title: 'FIEZEL diagnostics ' + DIAG_BUILD, text: payload })
+        .then(function(){ done('Terkirim'); })
+        .catch(function(){ copy(button, done, payload); });
+      return;
+    }
+    copy(button, done, payload);
+  }
+
+  function copy(button, done, payload) {
+    if (root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText) {
+      root.navigator.clipboard.writeText(payload)
+        .then(function(){ done('Tersalin'); })
+        .catch(function(){ done('Salin manual dari kotak'); });
+      return;
+    }
+    done('Salin manual dari kotak');
+  }
+
+  function mount() {
+    var ui = build();
+    var body = root.document.body;
+    if (!body) return;
+    body.appendChild(ui.host);
+
+    var dump = null;
+
+    function refresh() {
+      dump = collectSync();
+      addRuntimeDiagnostics(dump);
+      ui.text.value = serialize(dump);
+      Promise.all([addStorageEstimate(dump), addCacheInventory(dump)]).then(function(){
+        ui.text.value = serialize(dump);
+      });
+    }
+
+    ui.open.addEventListener('click', function(){
+      refresh();
+      ui.sheet.classList.add('open');
+    });
+    ui.close.addEventListener('click', function(){
+      ui.sheet.classList.remove('open');
+    });
+    ui.send.addEventListener('click', function(){
+      share(ui.send, 'Kirim', ui.text.value);
+    });
+    ui.sendTarget.addEventListener('click', function(){
+      var slim = {
+        diagBuild: DIAG_BUILD,
+        appVersion: dump && dump.appVersion,
+        capturedAt: dump && dump.capturedAt,
+        standalone: dump && dump.standalone,
+        target: dump && dump.target,
+        storageEstimate: dump && dump.storageEstimate
+      };
+      share(ui.sendTarget, 'Kirim ringkas', serialize(slim));
+    });
+  }
+
+  if (root.document.readyState === 'loading') {
+    root.document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this);
