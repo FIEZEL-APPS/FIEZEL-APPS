@@ -1,4 +1,5 @@
 from pathlib import Path
+
 p=Path('features/neural-voice/fiezel-neural-voice-bootstrap.js')
 s=p.read_text()
 old="""      lastFallbackReason=lastError;
@@ -19,3 +20,14 @@ if s.count(old_guard)!=1:
     raise SystemExit(f'prepared guard fixup expected 1 match, got {s.count(old_guard)}')
 s=s.replace(old_guard,new_guard,1)
 p.write_text(s)
+
+# The old static assertion assumed every unprepared call must browser-fallback.
+# The hotfix intentionally adds a neural-only mode (allowFallback:false), so the
+# permanent regression gate must assert both sides of the new contract.
+t=Path('neural-voice-test.js')
+ts=t.read_text()
+old_test='''  await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)return browserSpeak")));'''
+new_test='''  await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak")&&bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')")));'''
+if ts.count(old_test)!=1:
+    raise SystemExit(f'legacy neural opt-in assertion expected 1 match, got {ts.count(old_test)}')
+t.write_text(ts.replace(old_test,new_test,1))
