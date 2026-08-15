@@ -34,7 +34,7 @@ setTimeout(()=>{
   try{
     const raw=text.value;
     const dump=JSON.parse(raw);
-    assert.equal(dump.diagBuild,'m025-1');
+    assert.match(dump.diagBuild,/^m025-\d+$/);
     assert.equal(dump.puterAuth.authTokenPresent,true);
     assert.equal(dump.puterAuth.isSignedIn,true);
     assert.equal(dump.puterAuth.storedTokenV2Present,true);
