@@ -10,10 +10,22 @@ diff --git a/kokoro.js/src/kokoro.js b/kokoro.js/src/kokoro.js
  
  const STYLE_DIM = 256;
  const SAMPLE_RATE = 24000;
-@@ -151,6 +151,12 @@ export class KokoroTTS {
+@@ -151,6 +151,24 @@ export class KokoroTTS {
  }
  
  export const env = {
++  set allowRemoteModels(value) {
++    hf.allowRemoteModels = Boolean(value);
++  },
++  get allowRemoteModels() {
++    return hf.allowRemoteModels;
++  },
++  set allowLocalModels(value) {
++    hf.allowLocalModels = Boolean(value);
++  },
++  get allowLocalModels() {
++    return hf.allowLocalModels;
++  },
 +  set localModelPath(value) {
 +    hf.localModelPath = value;
 +  },
@@ -23,7 +35,7 @@ diff --git a/kokoro.js/src/kokoro.js b/kokoro.js/src/kokoro.js
    set cacheDir(value) {
      hf.cacheDir = value
    },
-@@ -164,4 +170,4 @@ export const env = {
+@@ -164,4 +182,4 @@ export const env = {
    },
  };
  
