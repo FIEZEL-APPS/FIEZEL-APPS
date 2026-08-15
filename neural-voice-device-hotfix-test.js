@@ -13,7 +13,9 @@ assert.ok(boot.includes("wasmEnv.numThreads=1"),'Apple policy must disable WASM 
 assert.ok(boot.includes("wasmEnv.proxy=true"),'Apple policy must offload WASM work to proxy worker');
 assert.ok(boot.includes("apple-standalone-single-thread-proxy"));
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must allow slower device inference');
-assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_generate_start'"),'init and speech timing must be diagnosed separately');
+assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_neural_start'"),'init and neural speech timing must be diagnosed separately');
+assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'generation timeout must live in the voice service');
+assert.ok(!boot.includes("const timeout=Symbol('fiezel-tts-timeout')"),'playback must not be subject to the generation timeout');
 assert.ok(boot.includes('initialized:!!service'));
 assert.ok(boot.includes('audibleVerified'));
 assert.ok(boot.includes('circuitOpen'));
@@ -21,11 +23,13 @@ assert.ok(boot.includes("allowFallback:false"),'inner neural service must never 
 assert.ok(boot.includes("const shouldOpenCircuit=!!service")&&boot.includes("circuitOpen=shouldOpenCircuit;audibleVerified=false"),'speech failure with initialized service must open circuit without blocking late init adoption');
 assert.ok(aud.includes("runtime.speak(text,{...options,allowFallback:false})"),'audibility layer must call base runtime neural-only');
 assert.ok(aud.includes("if(neuralOnly)throw error"),'neural-only UI test must never be masked by browser TTS');
+assert.ok(aud.includes('DIAG_LIMIT=200')&&aud.includes('slice(-DIAG_LIMIT)'),'audibility writes must preserve the shared trace');
 assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neural-only');
-assert.ok(sw.includes("'Cross-Origin-Embedder-Policy':'credentialless'"));
+assert.ok(sw.includes("COEP_POLICY='credentialless'"));
+assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(diag.includes("var DIAG_BUILD = 'm024-1'"));
-assert.ok(diag.includes('puterWorkersLoaded'));
+assert.ok(diag.includes("var DIAG_BUILD = 'm025-1'"));
+assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
-console.log('FIEZEL neural device hotfix: PASS');
+console.log('FIEZEL neural device hotfix m025: PASS');
