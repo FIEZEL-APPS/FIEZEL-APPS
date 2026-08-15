@@ -1,4 +1,6 @@
 name: Deploy FIEZEL Core Worker
+
+# MASTER-ONLY: deployment is manual-only and owner-actor gated.
 on:
   workflow_dispatch:
     inputs:
@@ -6,19 +8,14 @@ on:
         description: Puter Worker name
         required: true
         default: fiezel-core
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/deploy-core-worker.yml'
-      - 'fiezel-core-worker.js'
-      - 'fiezel-core-worker-proof-route.js'
-      - 'core-proof-build.mjs'
+
+permissions:
+  contents: read
+
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[deploy-core]') || contains(github.event.head_commit.message, '[deploy-core-proof]')
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,11 +25,7 @@ jobs:
       - name: Prepare guarded deploy source
         shell: bash
         run: |
-          if [ "${{ github.event_name }}" = "push" ] && [[ "${{ github.event.head_commit.message }}" == *"[deploy-core-proof]"* ]]; then
-            node core-proof-build.mjs
-          else
-            cp fiezel-core-worker.js fiezel-core-worker-deploy.js
-          fi
+          cp fiezel-core-worker.js fiezel-core-worker-deploy.js
           mkdir -p .deploy-core
           cp fiezel-core-worker-deploy.js .deploy-core/fiezel-core-worker.js
           node --check .deploy-core/fiezel-core-worker.js
@@ -43,12 +36,7 @@ jobs:
       - name: Resolve Worker name
         id: worker
         shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "name=${{ inputs.worker_name }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "name=fiezel-core" >> "$GITHUB_OUTPUT"
-          fi
+        run: echo "name=${{ inputs.worker_name }}" >> "$GITHUB_OUTPUT"
       - name: Deploy Core Worker with official Puter action
         id: puter_worker
         uses: HeyPuter/puter-worker-deploy-action@3ea96548afcf0815fd2338f58ebc2032050bfd9d # v1.0.1
@@ -63,11 +51,3 @@ jobs:
         run: |
           test -n "${{ steps.puter_worker.outputs.worker_url }}"
           echo "Core Worker deployed successfully. URL: ${{ steps.puter_worker.outputs.worker_url }}"
-      - name: Proof route live smoke
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[deploy-core-proof]')
-        env:
-          WORKER_URL: ${{ steps.puter_worker.outputs.worker_url }}
-          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
-        shell: bash
-        run: |
-          node --input-type=module -e "const base=String(process.env.WORKER_URL||'').replace(/\/$/,'');let lastStatus=0,lastCount=0;for(let attempt=1;attempt<=7;attempt++){const res=await fetch(base+'/api/reminders/proof',{method:'POST',headers:{Authorization:'Bearer '+process.env.FIEZEL_REMINDER_CRON_TOKEN}});const body=await res.json().catch(()=>({}));lastStatus=res.status;lastCount=Number(body.count||0);if(res.ok&&lastCount>=1){console.log(JSON.stringify({proofRoute:'LIVE',subscriptionsAvailable:lastCount,attempt}));process.exit(0)}if(attempt<7)await new Promise(r=>setTimeout(r,5000))}throw new Error('Proof route smoke failed after propagation window: HTTP '+lastStatus+' count '+lastCount);"
