@@ -1,6 +1,6 @@
 {
     "protocol_version":  "v1",
-    "updated":  "2026-08-15T22:16:50+07:00",
+    "updated":  "2026-08-15T22:45:00+07:00",
     "agents":  [
                    {
                        "id":  "coordinator-1",
@@ -300,8 +300,32 @@
                       "title":  "Fix tab lifecycle: tab FIEZEL stuck/force-close saat pindah tab (release neural voice + AudioContext saat hidden)",
                       "status":  "done"
                   },
-                  {
-                      "id":  "T-024-A4",
+                   {
+                       "id":  "T-024",
+                       "title":  "A3 Apple standalone direct single-thread WASM + prompt-safe adapter stage diagnostics",
+                       "status":  "done",
+                       "owner":  "agent-1",
+                       "evidence":  "PR #23 merged as b0ab5ff; source candidate commit 97cd608; main then refreshed by PR #26 merge bde96b9. CI QG 31890896563/31891031289 and A6/A7 31890896589/31891013016/31892730568 SUCCESS; Pages 31892856756 SUCCESS. Local focused neural/regression gates PASS per agent-1/agent-3 evidence.",
+                       "note":  "Automated code/gate objective done: Apple standalone uses numThreads=1 + proxy=false and bounded prompt-safe stages. Physical Apple audibility is NOT claimed: T-005/T-006 remain blocked pending fiezel-neural-voice-diagnostics-v1 from the owner device; release readiness is therefore separate and not yet passed."
+                   },
+                   {
+                       "id":  "T-024-A2",
+                       "title":  "Independent audit of PR #23 direct-WASM neural candidate",
+                       "status":  "done",
+                       "owner":  "agent-2",
+                       "evidence":  "analysis/neural-voice-a3-audit.md; worker commit 48c359e (integrated as 37dbdce); CI 31892599225 SUCCESS. Diff audit found exactly the three PR source files, privacy-safe bounded diagnostics, and additive contract behavior.",
+                       "note":  "Recommendation SAFE CANDIDATE for controlled diagnostic deployment, not proof of physical Apple standalone audibility."
+                   },
+                   {
+                       "id":  "T-024-A3",
+                       "title":  "Independent neural gate and release-readiness audit",
+                       "status":  "done",
+                       "owner":  "agent-3",
+                       "evidence":  "analysis/neural-voice-a3-gate-audit.md; worker commit 1c15af0. Eighteen relevant local gates PASS; main bde96b9 QG/Pages and PR #26 A6/A7 checks SUCCESS; regression-test.js Windows/node24 hang is documented and CI node22 passed.",
+                       "note":  "Release gate remains NOT READY because physical device diagnostics/audibility evidence is missing; no new regression was found."
+                   },
+                   {
+                       "id":  "T-024-A4",
                       "title":  "Audit config aktif OpenCode: migrasi provider/model ke opencode-go/kimi-k3 + normalisasi field model ledger",
                       "status":  "done",
                       "owner":  "agent-4",
@@ -318,10 +342,10 @@
                   }
               ],
     "last_report":  {
-                        "by":  "agent-5 (T-023) — takeover OWNER 2026-08-15: fix tab lifecycle + RFC 8030 push topic",
-                        "time":  "2026-08-15T12:50:00+07:00",
-                        "summary":  "MASTER/squad tidak aktif sejak 11:16Z; OWNER memerintahkan agent-5 take over semua eksekusi. SELESAI & TERVERIFIKASI: commit 5711a54 ke main (7 file, 76+/7-) = (1) push-dispatcher.mjs safeTopic() per RFC 8030 (1-32 char [A-Za-z0-9_-]) mengatasi 400 BadWebPushTopic (run gagal 31880725592), gate rfc8030TopicSanitized baru di remote-push-test.js (16/16 PASS); (2) T-023 fix tab lifecycle ADDITIVE: fiezel-web-audio-player.js +close(), fiezel-neural-voice-bootstrap.js +release() di FiezelVoiceRuntime, app.js visibilitychange hidden -> release() (kontrak publik tidak berubah, hanya bertambah); (3) TASKS-LEDGER.json T-023 done. Quality Gate lokal 46/46 PASS (node --check 97 file; regression-test.js hang di node v24/Windows = isu lingkungan, PASS di CI node 22); CI QG 31885077891 SUCCESS utk headSha 5711a54 (node v22.23.2, semua gate PASS termasuk regression). Verifier: VERIFY-TAKEOVER-001 UNVERIFIED (kode belum di-commit) -> remediasi (commit+push+CI) -> VERIFY-TAKEOVER-002 VERIFIED 6/6. BELUM SELESAI/PERLU KONFIRMASI MANUAL: (1) perilaku device nyata (tab tidak stuck/force-close) butuh retest owner di iPhone; (2) T-005/T-006 blocked menunggu diagnostics device (fiezel-neural-voice-diagnostics-v1) -> T-007 IndexedDB migration (desain T-010/baa804e siap); (3) neural voice audible di device belum terbukti (bukti emas = diagnostics). REGRESI: tidak ada; audibility fallback, validator, product-repair, sw-corp, http-smoke semua PASS."
-                    },
+                        "by":  "agent-5 coordinator - T-024/T-025 latest GitHub audit and model migration",
+                        "time":  "2026-08-15T22:45:00+07:00",
+                        "summary":  "Latest main is bde96b9 (PR #23 direct-WASM neural candidate merged as b0ab5ff, PR #26 shell refresh merged after it); automated Quality Gate, A6/A7, and Pages deployment checks are green. T-024 code and independent A2/A3 audits are complete with no automated regression. T-025 active OpenCode config is set to opencode-go/kimi-k3 for all 15 configured agents plus worker/verifier definitions, but restart and OpenCode Go auth are prerequisites. RELEASE HOLD: physical Apple device audibility and fiezel-neural-voice-diagnostics-v1 are still missing (T-005/T-006 blocked), so no unsupported production release claim is made."
+                     },
     "missions":  [
                      {
                          "id":  "M-009",
