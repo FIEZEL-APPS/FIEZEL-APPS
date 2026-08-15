@@ -9,6 +9,7 @@ on:
       - 'vendor/kokoro-js/source-overrides/**'
       - 'vendor/kokoro-js/source-patches/**'
       - 'tools/rebuild-neural-vendor.sh'
+      - 'tools/promote-m0255-runtime.mjs'
       - '.github/workflows/m025-5-candidate-build.yml'
 
 permissions:
