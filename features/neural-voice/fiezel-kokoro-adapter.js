@@ -5,6 +5,58 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  const READABLE_STREAM_COMPAT_KEY = '__fiezelReadableStreamAsyncIteratorCompatV1';
+
+  function installReadableStreamAsyncIteratorCompat() {
+    const runtime = typeof globalThis !== 'undefined' && globalThis ? globalThis : {};
+    const prior = runtime[READABLE_STREAM_COMPAT_KEY];
+    if (prior && typeof prior.mode === 'string') return prior;
+
+    let mode = 'unavailable';
+    try {
+      const Stream = runtime.ReadableStream;
+      const iteratorSymbol = runtime.Symbol && runtime.Symbol.asyncIterator;
+      if (typeof Stream === 'function' && Stream.prototype && iteratorSymbol) {
+        if (typeof Stream.prototype[iteratorSymbol] === 'function') {
+          mode = 'native';
+        } else {
+          Object.defineProperty(Stream.prototype, iteratorSymbol, {
+            configurable: true,
+            writable: true,
+            value: async function* () {
+              const reader = this.getReader();
+              try {
+                while (true) {
+                  const result = await reader.read();
+                  if (result.done) return;
+                  yield result.value;
+                }
+              } finally {
+                reader.releaseLock();
+              }
+            }
+          });
+          mode = 'polyfill';
+        }
+      }
+    } catch (_) {
+      mode = 'error';
+    }
+
+    const state = Object.freeze({ mode });
+    try {
+      Object.defineProperty(runtime, READABLE_STREAM_COMPAT_KEY, {
+        configurable: true,
+        value: state
+      });
+    } catch (_) {
+      try { runtime[READABLE_STREAM_COMPAT_KEY] = state; } catch (__) {}
+    }
+    return state;
+  }
+
+  const readableStreamCompat = installReadableStreamAsyncIteratorCompat();
+
   function assertLocalPath(value, name) {
     const text = String(value || '').trim();
     if (!text) throw new Error(name + ' is required');
@@ -51,6 +103,8 @@
       if (!onStage) return;
       try { onStage(Object.freeze({ phase, ...(detail || {}) })); } catch (_) {}
     }
+
+    stage('espeak_stream_async_iterator_compat', { mode: readableStreamCompat.mode });
 
     function errorKind(error) {
       return String(error && (error.code || error.name) || 'error').slice(0, 80);
