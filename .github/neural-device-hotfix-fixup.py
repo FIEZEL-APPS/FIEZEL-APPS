@@ -6,8 +6,8 @@ old="""      lastFallbackReason=lastError;
       circuitOpen=true;audibleVerified=false;phase='error';
       diag({phase:'speak_fallback',reason:lastError,circuitOpen:true});
 """
-new="""      lastFallbackReason=lastError;
-      const shouldOpenCircuit=!!service;
+new="""      const shouldOpenCircuit=!!service;
+      lastFallbackReason=lastError;
       diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
 """
