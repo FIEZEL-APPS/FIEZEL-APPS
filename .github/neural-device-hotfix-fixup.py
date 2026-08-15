@@ -43,3 +43,14 @@ new_hot="assert.ok(boot.includes(\"const shouldOpenCircuit=!!service\")&&boot.in
 if hs.count(old_hot)!=1:
     raise SystemExit(f'hotfix circuit assertion expected 1 match, got {hs.count(old_hot)}')
 h.write_text(hs.replace(old_hot,new_hot,1))
+
+# release-audit.py previously hardcoded the pre-hotfix fallback guard. The new
+# contract is stronger: ordinary calls may browser-fallback, while neural-only
+# calls fail closed and never trigger a hidden model download.
+r=Path('release-audit.py')
+rs=r.read_text()
+old_audit="check('Neural voice explicit opt-in','prepareNeuralVoice' in app and 'if(!readStatus().prepared&&!preparedFlag)return browserSpeak' in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text() and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered and excluded from implicit service-worker caching')"
+new_audit="check('Neural voice explicit opt-in','prepareNeuralVoice' in app and 'if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak' in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text() and \"if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')\" in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text() and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered; ordinary calls may fallback while neural-only calls fail closed, and heavy assets remain excluded from implicit service-worker caching')"
+if rs.count(old_audit)!=1:
+    raise SystemExit(f'release audit opt-in gate expected 1 match, got {rs.count(old_audit)}')
+r.write_text(rs.replace(old_audit,new_audit,1))
