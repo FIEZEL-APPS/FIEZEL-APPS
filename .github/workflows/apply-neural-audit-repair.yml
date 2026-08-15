@@ -36,8 +36,6 @@ jobs:
           echo "3e524cfa37fa6ded34413d03ec1bef0e071c1ac4aef4da36d08cdb30baf0f76e  /tmp/fiezel-repair/repair.patch" | sha256sum -c -
           sed -n 's#^diff --git a/\([^ ]*\) b/.*#\1#p' /tmp/fiezel-repair/repair.patch | sort -u > /tmp/fiezel-repair/patch-files.txt
           test -s /tmp/fiezel-repair/patch-files.txt
-          echo 'Authoritative patch files:'
-          cat /tmp/fiezel-repair/patch-files.txt
 
       - name: Apply patch and resolve only known conflicts
         shell: bash
@@ -47,18 +45,15 @@ jobs:
           git apply --3way /tmp/fiezel-repair/repair.patch
           apply_rc=$?
           set -e
-
           conflicts="$(git diff --name-only --diff-filter=U | sort)"
           expected_conflicts="$(printf '%s\n' \
             '.github/workflows/quality.yml' \
             'features/neural-voice/fiezel-neural-voice-bootstrap.js' \
             'features/neural-voice/fiezel-neural-voice-ios-cache-fix.js' \
             'sw.js' | sort)"
-
           if [ "$apply_rc" -ne 0 ]; then
             if [ "$conflicts" != "$expected_conflicts" ]; then
-              echo 'Unexpected three-way conflicts; refusing automatic resolution.'
-              printf 'Expected:\n%s\nActual:\n%s\n' "$expected_conflicts" "$conflicts"
+              printf 'Unexpected conflicts. Expected:\n%s\nActual:\n%s\n' "$expected_conflicts" "$conflicts"
               exit 1
             fi
             git checkout --theirs -- \
@@ -72,34 +67,77 @@ jobs:
               features/neural-voice/fiezel-neural-voice-ios-cache-fix.js \
               sw.js
           fi
-
           if git diff --name-only --diff-filter=U | grep -q .; then
-            echo 'Unmerged paths remain; refusing commit.'
-            git diff --name-only --diff-filter=U
-            exit 1
+            echo 'Unmerged paths remain'; git diff --name-only --diff-filter=U; exit 1
           fi
           git reset
 
-      - name: Verify scope equals authoritative patch
+      - name: Restore final diagnostics and PWA metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 \
+            "https://raw.githubusercontent.com/fitrajft-ux/fiezel-neural-voice-audit-2026-08-15/main/candidate/features/neural-voice/fiezel-diag-panel.js" \
+            --output features/neural-voice/fiezel-diag-panel.js
+          echo "abc48c214c55d4cd1a3e8f1130b78b448cae7d0b0d076b2294dcc4516e6d4774  features/neural-voice/fiezel-diag-panel.js" | sha256sum -c -
+
+          test "$(git rev-parse origin/m019-diag-panel:diag-panel-test.js)" = "51d6747a6eff59e9b9937543e8af5d3785352c45"
+          git show origin/m019-diag-panel:diag-panel-test.js > diag-panel-test.js
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          index = Path('index.html')
+          text = index.read_text()
+          script = '  <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada. -->\n  <script src="./features/neural-voice/fiezel-diag-panel.js"></script>\n'
+          if 'fiezel-diag-panel.js' not in text:
+              anchor = '  <script src="./features/speaking-listening/speaking-listening-config.js"></script>\n'
+              if anchor not in text:
+                  raise SystemExit('index diagnostics insertion anchor missing')
+              text = text.replace(anchor, script + anchor, 1)
+              index.write_text(text)
+
+          manifest = Path('manifest.json')
+          data = json.loads(manifest.read_text())
+          data['version'] = '5.19.0'
+          manifest.write_text(json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n')
+
+          quality = Path('.github/workflows/quality.yml')
+          q = quality.read_text()
+          if 'node diag-panel-test.js' not in q:
+              anchor = '          node neural-voice-audibility-test.js\n'
+              if anchor not in q:
+                  raise SystemExit('quality diagnostics insertion anchor missing')
+              q = q.replace(anchor, anchor + '          node diag-panel-test.js\n', 1)
+              quality.write_text(q)
+          PY
+
+          printf '%s\n' \
+            'diag-panel-test.js' \
+            'features/neural-voice/fiezel-diag-panel.js' \
+            'index.html' \
+            'manifest.json' \
+            > /tmp/fiezel-repair/recovery-files.txt
+          cat /tmp/fiezel-repair/patch-files.txt /tmp/fiezel-repair/recovery-files.txt | sort -u > /tmp/fiezel-repair/allowed-files.txt
+
+      - name: Verify exact repair scope
         shell: bash
         run: |
           set -euo pipefail
           { git diff --name-only HEAD; git ls-files --others --exclude-standard; } | sort -u > /tmp/fiezel-repair/actual-files.txt
           grep -v '^\.github/workflows/apply-neural-audit-repair\.yml$' /tmp/fiezel-repair/actual-files.txt > /tmp/fiezel-repair/actual-repair-files.txt || true
-          echo 'Actual repair files:'
+          echo 'Actual repair scope:'
           cat /tmp/fiezel-repair/actual-repair-files.txt
-          unexpected="$(comm -23 /tmp/fiezel-repair/actual-repair-files.txt /tmp/fiezel-repair/patch-files.txt || true)"
-          if [ -n "$unexpected" ]; then
-            echo 'Changes outside authoritative patch detected:'
-            printf '%s\n' "$unexpected"
-            exit 1
-          fi
-          missing="$(comm -23 /tmp/fiezel-repair/patch-files.txt /tmp/fiezel-repair/actual-repair-files.txt || true)"
-          if [ -n "$missing" ]; then
-            echo 'Patch paths with no resulting diff (allowed only when repository already matches):'
-            printf '%s\n' "$missing"
-          fi
+          unexpected="$(comm -23 /tmp/fiezel-repair/actual-repair-files.txt /tmp/fiezel-repair/allowed-files.txt || true)"
+          if [ -n "$unexpected" ]; then echo 'Unexpected changes:'; printf '%s\n' "$unexpected"; exit 1; fi
           git diff --exit-code HEAD -- version.js VERSION.json
+          python3 - <<'PY'
+          import json
+          assert json.load(open('manifest.json'))['version'] == '5.19.0'
+          PY
+          grep -q 'fiezel-diag-panel.js' index.html
+          grep -q 'node diag-panel-test.js' .github/workflows/quality.yml
 
       - name: Validate mandatory gates
         shell: bash
@@ -107,10 +145,7 @@ jobs:
           set -euo pipefail
           for f in *.js; do node --check "$f"; done
           for f in features/neural-voice/*.js; do node --check "$f"; done
-          if grep -rn '^\s*}){' features/ *.js; then
-            echo 'broken-pattern gate failed'
-            exit 1
-          fi
+          if grep -rn '^\s*}){' features/ *.js; then echo 'broken-pattern gate failed'; exit 1; fi
           node neural-voice-fix-test.js
           if [ -f neural-voice-selector-test.js ]; then node neural-voice-selector-test.js; fi
           if [ -f neural-voice-product-repair-test.js ]; then node neural-voice-product-repair-test.js; fi
@@ -118,23 +153,19 @@ jobs:
           node neural-voice-test.js
           node ios-cache-compat-test.js
           node sw-corp-test.js
-          if [ -f diag-panel-test.js ]; then node diag-panel-test.js; fi
+          node diag-panel-test.js
           python3 release-audit.py
 
-      - name: Commit authoritative repair to candidate branch
+      - name: Commit validated candidate
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --pathspec-from-file=/tmp/fiezel-repair/patch-files.txt
+          git add --pathspec-from-file=/tmp/fiezel-repair/allowed-files.txt
           staged="$(git diff --cached --name-only | sort -u)"
-          unexpected="$(comm -23 <(printf '%s\n' "$staged") /tmp/fiezel-repair/patch-files.txt || true)"
-          if [ -n "$unexpected" ]; then
-            echo 'Unexpected staged paths; refusing commit:'
-            printf '%s\n' "$unexpected"
-            exit 1
-          fi
-          git diff --cached --quiet && { echo 'No repair changes to commit'; exit 0; }
+          unexpected="$(comm -23 <(printf '%s\n' "$staged") /tmp/fiezel-repair/allowed-files.txt || true)"
+          if [ -n "$unexpected" ]; then echo 'Unexpected staged paths:'; printf '%s\n' "$unexpected"; exit 1; fi
+          git diff --cached --quiet && { echo 'No candidate changes'; exit 0; }
           git commit -m "Apply final audited neural voice repair"
           git push origin HEAD:agent/neural-voice-final-20260815
