@@ -1,0 +1,45 @@
+name: FIEZEL m025-5 Read-only Candidate Build
+
+on:
+  push:
+    branches:
+      - master/m025-5-safari-phonemizer-compat
+    paths:
+      - 'NEURAL-VOICE-SOURCE-LOCK.json'
+      - 'vendor/kokoro-js/source-overrides/**'
+      - 'vendor/kokoro-js/source-patches/**'
+      - 'tools/rebuild-neural-vendor.sh'
+      - '.github/workflows/m025-5-candidate-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-candidate:
+    name: Build m025-5 vendor candidate (read-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Build source-derived candidate without repository writes
+        shell: bash
+        run: |
+          set +e
+          bash tools/rebuild-neural-vendor.sh
+          rc=$?
+          set -e
+          echo "baseline_compare_exit=$rc" | tee -a .vendor-repro/candidate-report.txt
+          test -s .vendor-repro/kokoro.web.js
+          sha256sum .vendor-repro/kokoro.web.js | tee -a .vendor-repro/candidate-report.txt
+          stat -c 'candidateSize=%s' .vendor-repro/kokoro.web.js | tee -a .vendor-repro/candidate-report.txt
+          echo 'Candidate build produced; mismatch with m025-4 lock is expected until MASTER advances the locked bundle.' | tee -a .vendor-repro/candidate-report.txt
+      - name: Upload candidate artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: m025-5-vendor-candidate-${{ github.sha }}
+          path: .vendor-repro/
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 3
