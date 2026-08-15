@@ -30,8 +30,8 @@
     {path:'vendor/kokoro-model/voices/bm_george.bin',bytes:522240}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
-  let phase='idle',lastError='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false;
-  function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-20)))}catch{}}
+  let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false;
+  function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
   function warmAudioGesture(){
     try{
       if(!playerRef&&root.FiezelWebAudioPlayer)playerRef=root.FiezelWebAudioPlayer.createPlayer(root);
@@ -71,7 +71,11 @@
   }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate});
+    // timeoutMs = ambang efektif terlama sebelum jatuh ke suara browser.
+    // lastFallbackReason = kenapa fallback terakhir terjadi; sebelumnya alasannya
+    // hanya masuk localStorage lewat diag() dan tak pernah terlihat dari status().
+    const timeoutMs=Math.max(NEURAL_TTS_TIMEOUT_MS,INITIALIZE_TIMEOUT_MS);
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -210,10 +214,10 @@
     try{await cache.put(absolute(PREPARED_MARKER_KEY),new Response('1',{headers:{'Content-Type':'text/plain'}}))}catch{}
     emit({completed,completedBytes,current:'',storageEstimate:lastStorageEstimate},onProgress);return status();
   }
-  async function initialize(){
-    if(service)return service;
-    if(initializePromise)return initializePromise;
-    initializePromise=(async()=>{
+  function startBackendInitialize(){
+    if(service)return Promise.resolve(service);
+    if(backendInitPromise)return backendInitPromise;
+    backendInitPromise=(async()=>{
       if(!root.FiezelNeuralVoiceConfig||!root.FiezelKokoroAdapter||!root.FiezelNeuralVoice||!root.FiezelWebAudioPlayer)throw new Error('Neural voice runtime modules are missing');
       phase='initializing';lastError='';
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
@@ -236,42 +240,75 @@
         dtype:root.FiezelNeuralVoiceConfig.dtype,
         device:root.FiezelNeuralVoiceConfig.device
       });
-      const timedOut=Symbol('fiezel-init-timeout');
-      let adapterError=null;
-      const adapterPromise=adapter.initialize().catch(error=>{adapterError=error;return null});
-      const adapterResult=await Promise.race([adapterPromise,delay(INITIALIZE_TIMEOUT_MS).then(()=>timedOut)]);
-      if(adapterResult===timedOut)throw new Error(`Neural voice init timed out after ${Math.max(1,Math.round(INITIALIZE_TIMEOUT_MS/1000))}s`);
-      if(adapterResult===null)throw adapterError;
+      await adapter.initialize();
       const player=root.FiezelWebAudioPlayer.createPlayer(root);
       service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play});
-      phase='ready';return service;
-    })().catch(error=>{phase='error';lastError=errorText(error);initializePromise=null;service=null;initFailedThisSession=true;diag({phase:'init_error',error:lastError});throw error});
+      phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;diag({phase:'init_ready'});return service;
+    })().catch(error=>{phase='error';lastError=errorText(error);service=null;adapter=null;initFailedThisSession=true;initTimedOutThisSession=false;diag({phase:'init_error',error:lastError});throw error}).finally(()=>{backendInitPromise=null});
+    return backendInitPromise;
+  }
+  async function initialize(){
+    if(service)return service;
+    if(initializePromise)return initializePromise;
+    initializePromise=(async()=>{
+      const timedOut=Symbol('fiezel-init-timeout');
+      let backendError=null;
+      // Timeout membatasi berapa lama satu caller menunggu, bukan membatalkan
+      // Kokoro/ONNX yang sudah berjalan. Task backend disimpan terpisah agar
+      // penyelesaian terlambat tetap diadopsi dan retry tidak membuat session
+      // model kedua di memori.
+      const observed=startBackendInitialize().catch(error=>{backendError=error;return null});
+      const result=await Promise.race([observed,delay(INITIALIZE_TIMEOUT_MS).then(()=>timedOut)]);
+      if(result===timedOut){
+        initTimedOutThisSession=true;
+        lastError=`Neural voice init timed out after ${Math.max(1,Math.round(INITIALIZE_TIMEOUT_MS/1000))}s`;
+        diag({phase:'init_timeout',error:lastError});
+        throw new Error(lastError);
+      }
+      if(result===null)throw backendError;
+      return result;
+    })().finally(()=>{initializePromise=null});
     return initializePromise;
   }
   async function prepare(options={}){
     if(preparePromise)return preparePromise;
     initFailedThisSession=false;warmAudioGesture();
-    preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();diag({phase:'prepared'});return status()})().catch(error=>{phase='error';lastError=errorText(error);diag({phase:'prepare_error',error:lastError});if(!assetsCached){storage='';preparedFlag=false;writeStatus(false)}throw error}).finally(()=>{preparePromise=null});
+    preparePromise=(async()=>{await warmAssets(options.onProgress);await initialize();diag({phase:'prepared'});return status()})().catch(error=>{if(!(backendInitPromise&&initTimedOutThisSession))phase='error';lastError=errorText(error);diag({phase:'prepare_error',error:lastError});if(!assetsCached){storage='';preparedFlag=false;writeStatus(false)}throw error}).finally(()=>{preparePromise=null});
     return preparePromise;
   }
   function browserSpeak(text,options={}){
     if(!root.speechSynthesis||!root.SpeechSynthesisUtterance){diag({phase:'tts_unavailable'});return Promise.reject(new Error('Browser TTS unavailable'))}
-    return new Promise(resolve=>{
-      let done=false;
-      const finish=()=>{if(done)return;done=true;speechActive=false;resolve({provider:'browser-speech-synthesis'})};
+    return new Promise((resolve,reject)=>{
+      let done=false,started=false,timer=null;
+      const settle=(ok,value)=>{if(done)return;done=true;if(timer)clearTimeout(timer);speechActive=false;ok?resolve(value):reject(value)};
       const utterance=new root.SpeechSynthesisUtterance(String(text||''));
       utterance.lang=options.lang||'en-US';utterance.rate=Number(options.speed||options.rate||.88);
-      utterance.onend=finish;utterance.onerror=finish;
+      utterance.onstart=()=>{started=true};
+      utterance.onend=()=>settle(true,{provider:'browser-speech-synthesis',started:true});
+      utterance.onerror=event=>settle(false,new Error(`browser_tts_${String(event?.error||'error')}`));
       if(speechActive){try{root.speechSynthesis.cancel()}catch{}}
       speechActive=true;
-      setTimeout(finish,BROWSER_TTS_TIMEOUT_MS);
-      try{root.speechSynthesis.speak(utterance)}catch{finish()}
+      timer=setTimeout(()=>settle(false,new Error(started?'browser_tts_timeout':'browser_tts_not_started')),BROWSER_TTS_TIMEOUT_MS);
+      try{root.speechSynthesis.speak(utterance)}catch(error){settle(false,error)}
     });
+  }
+  async function ensureReady(){
+    warmAudioGesture();
+    if(service)return status();
+    if(initTimedOutThisSession&&backendInitPromise)throw new Error('Neural voice initialization is still running');
+    initFailedThisSession=false;
+    if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared');
+    if(!verifiedForSession){
+      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';throw new Error('Offline voice cache verification failed')}
+      verifiedForSession=true;
+    }
+    await initialize();
+    return status();
   }
   async function speak(text,options={}){
     warmAudioGesture();
     if(!readStatus().prepared&&!preparedFlag)return browserSpeak(text,options);
-    if(initFailedThisSession)return browserSpeak(text,options);
+    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return browserSpeak(text,options);
     if(!verifiedForSession){
       if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return browserSpeak(text,options)}
       verifiedForSession=true;
@@ -281,9 +318,10 @@
       const local=await initialize();
       return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:true});
     };
-    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
+    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
     if(result===null||result===timeout){
       lastError=result===timeout?'neural_tts_timeout':lastError;
+      lastFallbackReason=lastError;
       diag({phase:'speak_fallback',reason:lastError});
       try{service?.stop?.()}catch{}
       return browserSpeak(text,options);
@@ -296,5 +334,5 @@
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
     if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'})).catch(()=>{});
   });
-  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes});
+  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
 })(typeof globalThis!=='undefined'?globalThis:this);

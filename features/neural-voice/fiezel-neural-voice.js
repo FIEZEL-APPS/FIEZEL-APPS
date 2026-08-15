@@ -57,15 +57,21 @@
       async speak(text, options) {
         if (!canUseSpeechSynthesis(env)) throw new Error('Browser TTS unavailable');
         return new Promise((resolve, reject) => {
+          // Sebelumnya onerror dan timeout memanggil resolve, jadi ucapan yang tidak
+          // pernah berbunyi tetap dilaporkan sukses dan tidak masuk diagnostics.
+          // Sekarang setiap jalur terminal lewat settle() bersama, dan kegagalan
+          // ditolak dengan alasan yang bisa dibaca.
           let done = false;
-          const finish = () => { if (done) return; done = true; resolve({ provider: 'browser-speech-synthesis' }); };
+          let started = false;
+          const settle = (fn, value) => { if (done) return; done = true; fn(value); };
           const u = new env.SpeechSynthesisUtterance(text);
           u.lang = options && options.lang ? options.lang : 'en-US';
           u.rate = options && typeof options.rate === 'number' ? options.rate : 1;
-          u.onend = finish;
-          u.onerror = () => finish();
-          setTimeout(finish, BROWSER_FALLBACK_TIMEOUT_MS);
-          setTimeout(() => { if (done) return; try { env.speechSynthesis.speak(u); } catch (error) { reject(error); } }, 60);
+          u.onstart = () => { started = true; };
+          u.onend = () => settle(resolve, { provider: 'browser-speech-synthesis', started: true });
+          u.onerror = (event) => settle(reject, new Error('browser_tts_' + String(event && event.error ? event.error : 'error')));
+          setTimeout(() => settle(reject, new Error(started ? 'browser_tts_timeout' : 'browser_tts_not_started')), BROWSER_FALLBACK_TIMEOUT_MS);
+          setTimeout(() => { if (done) return; try { env.speechSynthesis.speak(u); } catch (error) { settle(reject, error); } }, 60);
         });
       },
       stop() {
@@ -105,7 +111,8 @@
 
       if (!adapter) {
         if (config.fallback && config.fallback.browserSpeechSynthesis) {
-          return fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
+          const fallbackResult = await fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
+          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: 1, outputs: [] };
         }
         throw new Error('Neural voice adapter unavailable');
       }
@@ -129,7 +136,8 @@
       } catch (error) {
         if (callGeneration !== generation) throw error;
         if (speakOptions.allowFallback !== false && config.fallback && config.fallback.browserSpeechSynthesis) {
-          return fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
+          const fallbackResult = await fallback.speak(text, { lang: speakOptions.lang || 'en-US', rate: speakOptions.speed || 1 });
+          return { ...fallbackResult, provider: 'browser-speech-synthesis', voice, chunks: chunks.length, outputs };
         }
         throw error;
       }

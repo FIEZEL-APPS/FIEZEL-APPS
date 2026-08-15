@@ -111,7 +111,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     const hangStub={KokoroTTS:{from_pretrained:async()=>new Promise(()=>{})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
     const ctx=makeContext(caches,fetchFn,storage);
     ctx.__fiezelDynamicImport=async()=>hangStub;
-    ctx.speechSynthesis={speak(){}};ctx.SpeechSynthesisUtterance=function(){};
+    ctx.speechSynthesis={speak(utterance){setTimeout(()=>{utterance.onstart?.();utterance.onend?.()},0)}};ctx.SpeechSynthesisUtterance=function(){};
     ctx.FIEZEL_TTS_TIMEOUT_MS=60;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;ctx.FIEZEL_INIT_TIMEOUT_MS=50;
     vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-speak-timeout.js'});
     const result=await ctx.FiezelVoiceRuntime.speak('hello world');
@@ -150,7 +150,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     const hangStub={KokoroTTS:{from_pretrained:async()=>new Promise(()=>{})},env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}};
     const ctx=makeContext(caches,fetchFn,storage);
     let imports=0;ctx.__fiezelDynamicImport=async()=>{imports++;return hangStub};
-    ctx.speechSynthesis={speak(){}};ctx.SpeechSynthesisUtterance=function(){};
+    ctx.speechSynthesis={speak(utterance){setTimeout(()=>{utterance.onstart?.();utterance.onend?.()},0)}};ctx.SpeechSynthesisUtterance=function(){};
     ctx.FIEZEL_TTS_TIMEOUT_MS=60;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;ctx.FIEZEL_INIT_TIMEOUT_MS=50;
     vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-fast-fallback.js'});
     const first=await ctx.FiezelVoiceRuntime.speak('hello world');
@@ -158,6 +158,36 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
     const second=await ctx.FiezelVoiceRuntime.speak('second item');
     assert.equal(second.provider,'browser-speech-synthesis');
     assert.equal(imports,1,'failed init must not be re-attempted on every speak');
+  });
+
+  await test('late ONNX init is adopted without duplicate model initialization',async()=>{
+    const vm=require('vm');
+    const caches=makeCaches();const fetchFn=makeFetch();
+    const storage={estimate:async()=>({usage:0,quota:1024*1024*1024}),persisted:async()=>true,persist:async()=>true};
+    localStorageData['fiezel-neural-voice-v1']=JSON.stringify({schema:'fiezel-neural-voice-status-v1',version:'5.19.0',prepared:true,storage:'cache',preparedAt:0});
+    for(const [assetPath,size] of fakeAssets)caches._store.set('http://localhost/'+assetPath,{headers:{get:n=>String(n).toLowerCase()==='content-length'?String(size):null}});
+    let resolveInit,imports=0,fromPretrainedCalls=0;
+    const delayedStub={
+      KokoroTTS:{from_pretrained:()=>{fromPretrainedCalls++;return new Promise(resolve=>{resolveInit=()=>resolve({generate:async()=>({data:new Float32Array([0,.1]),sampling_rate:24000}),voices:{af_heart:{}}})})}},
+      env:{allowRemoteModels:false,allowLocalModels:true,localModelPath:'./vendor/',wasmPaths:'./vendor/kokoro-js/wasm/'},setVoiceDataUrl:()=>{}
+    };
+    const ctx=makeContext(caches,fetchFn,storage);
+    ctx.__fiezelDynamicImport=async()=>{imports++;return delayedStub};
+    ctx.FiezelWebAudioPlayer={createPlayer:()=>({warm:()=>true,play:async()=>({done:Promise.resolve(),stop(){}})})};
+    ctx.speechSynthesis={speak(utterance){setTimeout(()=>{utterance.onstart?.();utterance.onend?.()},0)},cancel(){}};ctx.SpeechSynthesisUtterance=function(){};
+    ctx.FIEZEL_INIT_TIMEOUT_MS=30;ctx.FIEZEL_TTS_TIMEOUT_MS=45;ctx.FIEZEL_BROWSER_TTS_TIMEOUT_MS=120;
+    vm.createContext(ctx);vm.runInContext(bootstrap,ctx,{filename:'bootstrap-late-init.js'});
+    const first=await ctx.FiezelVoiceRuntime.speak('first');
+    assert.equal(first.provider,'browser-speech-synthesis');
+    assert.equal(imports,1);assert.equal(fromPretrainedCalls,1);assert.equal(ctx.FiezelVoiceRuntime.status().ready,false);
+    const second=await ctx.FiezelVoiceRuntime.speak('second');
+    assert.equal(second.provider,'browser-speech-synthesis','timed-out backend may continue while speech falls back quickly');
+    assert.equal(imports,1,'second speech must not import/start another runtime');assert.equal(fromPretrainedCalls,1,'second speech must not create another model session');
+    resolveInit();await new Promise(resolve=>setTimeout(resolve,10));
+    assert.equal(ctx.FiezelVoiceRuntime.status().ready,true,'late backend completion must be adopted into ready state');
+    const third=await ctx.FiezelVoiceRuntime.speak('third');
+    assert.equal(third.provider,'kokoro-local','subsequent speech must use the adopted neural backend');
+    assert.equal(imports,1);assert.equal(fromPretrainedCalls,1);
   });
 
   await test('cache marker keeps prepared state when localStorage is cleared',async()=>{

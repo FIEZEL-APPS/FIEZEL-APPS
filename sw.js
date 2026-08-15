@@ -1,7 +1,14 @@
 importScripts('./version.js');
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='neural-voice-ux-fix-20260814-1';
-const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
+// SW_REV tidak dibaca kode mana pun. Fungsinya hanya mengubah byte sw.js supaya
+// browser mendeteksi service worker baru dan menjalankan install ulang. Itu perlu
+// karena fetch handler di bawah cache-first untuk semua same-origin, jadi file baru
+// TIDAK akan pernah dilayani sampai install memanggil addAll dengan cache:'reload'.
+// JANGAN naikkan version.js bersamaan: nama CACHE terikat ke FIEZEL_VERSION, dan
+// activate menghapus semua cache fiezel-* yang bukan CACHE -- termasuk 113 MB aset
+// neural voice yang menumpang di cache yang sama.
+const SW_REV='m021-corp-wrapper-20260815-1';
+const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-diag-panel.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kokoro-');
 
 // --- Cross-origin isolation (COOP/COEP) injection ---
@@ -15,13 +22,12 @@ const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kok
 // credentialless is not supported on Safari, which FIEZEL specifically
 // targets (see fiezel-neural-voice-ios-cache-fix.js).
 //
-// require-corp blocks cross-origin no-cors subresources unless they send
-// a Cross-Origin-Resource-Policy header. FIEZEL loads https://js.puter.com
-// as its backend SDK and does not control that header on Puter's CDN, so
-// cross-origin no-cors GET requests are re-fetched here in no-cors mode and
-// re-wrapped with a synthetic CORP header before being handed back to the
-// page. This is a standard, well-documented pattern for enabling COEP
-// without cooperation from third-party hosts.
+// require-corp blocks cross-origin no-cors subresources unless the upstream
+// response opts in through CORP (or the request succeeds through CORS). FIEZEL
+// loads https://js.puter.com as its backend SDK. For no-cors requests the
+// worker first attempts a readable CORS fetch; if that is unavailable it
+// passes the opaque response through unchanged and lets the browser enforce
+// COEP. Opaque bodies are never reconstructed as synthetic 200 responses.
 const COOP_COEP_HEADERS={'Cross-Origin-Opener-Policy':'same-origin','Cross-Origin-Embedder-Policy':'require-corp'};
 function withCoopCoep(response){
   if(!response)return response;
@@ -37,16 +43,35 @@ function guessContentType(url){
   return'';
 }
 async function fetchCrossOriginWithCorp(request){
-  // Cross-origin no-cors fetch: response is "opaque" (status 0, headers
-  // unreadable), but its body stream can still be piped into a fresh
-  // Response where we set our own headers -- that's what lets us attach a
-  // synthetic CORP header the third-party server never sent.
-  const response=await fetch(request,{mode:'no-cors',credentials:'omit'});
-  const headers=new Headers();
-  headers.set('Cross-Origin-Resource-Policy','cross-origin');
-  const guessed=guessContentType(new URL(request.url));
-  if(guessed)headers.set('Content-Type',guessed);
-  return new Response(response.body,{status:200,statusText:'OK',headers});
+  // KOREKSI: versi sebelumnya mengambil dalam mode no-cors lalu menyalurkan
+  // response.body ke Response baru. Itu tidak bisa bekerja. Menurut spesifikasi
+  // Fetch, opaque filtered response punya status 0, header list kosong, dan
+  // **body null**. Jadi `new Response(response.body, {status:200})` menghasilkan
+  // respons 200 OK dengan BODY KOSONG. Untuk https://js.puter.com/v2/ artinya
+  // SDK Puter dimuat sebagai skrip kosong dan `puter` menjadi undefined, yang
+  // mematikan fitur AI, Creator Hub, dan core worker exec -- tapi hanya dari
+  // load kedua ke atas, karena pada load pertama belum ada SW yang mengontrol.
+  //
+  // Satu-satunya cara membaca body cross-origin adalah lewat CORS. Coba itu
+  // dulu; kalau server mengirim Access-Control-Allow-Origin, body-nya terbaca
+  // dan bisa dibungkus ulang dengan CORP sintetis.
+  try{
+    const cors=await fetch(request.url,{mode:'cors',credentials:'omit'});
+    if(cors&&cors.ok&&cors.type!=='opaque'){
+      const headers=new Headers(cors.headers);
+      headers.set('Cross-Origin-Resource-Policy','cross-origin');
+      if(!headers.get('Content-Type')){
+        const guessed=guessContentType(new URL(request.url));
+        if(guessed)headers.set('Content-Type',guessed);
+      }
+      return new Response(cors.body,{status:cors.status,statusText:cors.statusText,headers});
+    }
+  }catch{}
+  // Server tidak mengirim header CORS. Tidak ada cara sah membaca body-nya, jadi
+  // teruskan apa adanya dan biarkan browser yang memutuskan. Kalau COEP memblokir,
+  // itu kegagalan yang terlihat -- jauh lebih baik daripada skrip kosong ber-200
+  // yang tampak berhasil.
+  return fetch(request,{mode:'no-cors',credentials:'omit'});
 }
 
 const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
@@ -57,12 +82,9 @@ self.addEventListener('fetch',e=>{
   const requestUrl=new URL(e.request.url);
   if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request)).catch(()=>caches.match(e.request)));return}
   if(requestUrl.origin!==self.location.origin){
-    // Third-party resource (e.g. js.puter.com): can't control its headers,
-    // so re-wrap it with a synthetic CORP header so COEP:require-corp
-    // doesn't block it. Only no-cors traffic is rewritten -- CORS-mode
-    // requests (app <-> fiezel-core worker API calls) pass through
-    // untouched so their Authorization/puter-auth headers are preserved,
-    // and COEP already permits CORS responses without a CORP header.
+    // Third-party resource (e.g. js.puter.com): only no-cors traffic enters
+    // the CORS-first compatibility path. Existing CORS-mode API requests pass
+    // through untouched so Authorization/puter-auth headers are preserved.
     if(e.request.mode==='no-cors')e.respondWith(fetchCrossOriginWithCorp(e.request).catch(()=>fetch(e.request,{mode:'no-cors'})));
     return;
   }

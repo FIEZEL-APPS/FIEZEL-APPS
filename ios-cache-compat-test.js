@@ -61,5 +61,47 @@ assert.ok(patch.includes('await cache.add(request)'),'large model must use brows
   assert.equal(fetchCalls,1,'second prepare must reuse cached WASM');
   assert.equal(addCalls,1,'second prepare must reuse cached model');
   assert.equal(originalPrepareCalls,2,'wrapped prepare remains reusable');
+
+
+  // Timeout must not start a second 113 MB download path while cache.add is
+  // still running. Promise.race does not cancel the losing promise.
+  {
+    let stalledAddCalls=0,stalledOriginalPrepareCalls=0;
+    const wasmUrl='https://example.test/FIEZEL-APPS/vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm';
+    const stalledEntries=new Map([[wasmUrl,new Response(new Uint8Array([1]),{status:200,headers:{'Content-Type':'application/wasm'}})]]);
+    const stalledCache={
+      async match(input){const key=typeof input==='string'?input:input.url;return stalledEntries.get(key)||null},
+      async put(input,response){const key=typeof input==='string'?input:input.url;stalledEntries.set(key,response)},
+      async add(){stalledAddCalls++;return new Promise(()=>{})}
+    };
+    const stalledContext={
+      console,URL,Request,Response,Headers,setTimeout,clearTimeout,Promise,
+      FIEZEL_VERSION:'5.19.0',FIEZEL_IOS_PRIME_TIMEOUT_MS:20,
+      location:{href:'https://example.test/FIEZEL-APPS/index.html'},
+      document:{currentScript:{src:'https://example.test/FIEZEL-APPS/features/neural-voice/fiezel-neural-voice-ios-cache-fix.js'}},
+      localStorage:{getItem:()=>null,setItem:()=>{}},
+      caches:{open:async()=>stalledCache},
+      FiezelVoiceRuntime:Object.freeze({
+        totalBytes:119274361,assetCount:13,
+        assets:()=>[
+          {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019},
+          {path:'vendor/kokoro-model/onnx/model_quantized.onnx',bytes:92361116}
+        ],
+        storageEstimate:async()=>({available:1024*1024*1024}),
+        status:()=>Object.freeze({prepared:false,ready:false}),
+        prepare:async()=>{stalledOriginalPrepareCalls++;return{prepared:true}},
+        speak:async()=>({provider:'original'}),stop:()=>{}
+      })
+    };
+    stalledContext.globalThis=stalledContext;
+    vm.createContext(stalledContext);vm.runInContext(patch,stalledContext,{filename:'ios-cache-timeout.js'});
+    await assert.rejects(()=>stalledContext.FiezelVoiceRuntime.prepare(),/ios_prime_timeout/);
+    assert.equal(stalledOriginalPrepareCalls,0,'timeout must not start the normal downloader concurrently');
+    assert.equal(stalledAddCalls,1,'first attempt starts exactly one browser-managed model transfer');
+    await assert.rejects(()=>stalledContext.FiezelVoiceRuntime.prepare(),/ios_prime_timeout/);
+    assert.equal(stalledOriginalPrepareCalls,0,'retry while prime is pending must still avoid concurrent normal download');
+    assert.equal(stalledAddCalls,1,'retry must reuse the in-flight prime task instead of starting a duplicate 92 MB transfer');
+  }
+
   console.log('FIEZEL iOS CacheStorage compatibility: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
