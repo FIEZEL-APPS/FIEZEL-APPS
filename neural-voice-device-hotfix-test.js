@@ -36,7 +36,7 @@ assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neura
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-1'"));
+assert.ok(/var DIAG_BUILD = 'm025-\d+';/.test(diag),'diagnostics build must follow m025-N sequence');
 assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
