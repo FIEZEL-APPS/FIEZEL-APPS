@@ -31,6 +31,7 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
       config:config(),adapter,env,generationTimeoutMs:200,
       playAudio:async()=>{playCalls++;return{done:Promise.resolve(),stop(){}}}
     });
+    assert.ok(diagnostics(env).some(x=>x.phase==='single_flight_ready'&&x.patch==='m026-single-flight-v1'),'m026 runtime marker must be exported');
 
     const first=service.speak('first request',{allowFallback:false})
       .then(()=>({kind:'resolved'})).catch(error=>({kind:'rejected',error}));
