@@ -52,8 +52,8 @@
       try { onStage(Object.freeze({ phase, ...(detail || {}) })); } catch (_) {}
     }
 
-    function errorText(error) {
-      return String(error && (error.message || error.name) || error || 'unknown error').slice(0, 240);
+    function errorKind(error) {
+      return String(error && (error.code || error.name) || 'error').slice(0, 80);
     }
 
     async function getInstance() {
@@ -73,7 +73,7 @@
           })
           .catch((error) => {
             instancePromise = null;
-            stage('adapter_instance_error', { elapsedMs: Date.now() - startedAt, error: errorText(error) });
+            stage('adapter_instance_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
             throw error;
           });
       }
@@ -100,7 +100,7 @@
         });
         return value;
       } catch (error) {
-        stage('adapter_generate_error', { voice, elapsedMs: Date.now() - startedAt, error: errorText(error) });
+        stage('adapter_generate_error', { voice, elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
         throw error;
       }
     }
