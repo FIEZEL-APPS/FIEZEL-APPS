@@ -19,6 +19,11 @@ new_guard="""if(!readStatus().prepared&&!preparedFlag&&allowFallback)return brow
 if s.count(old_guard)!=1:
     raise SystemExit(f'prepared guard fixup expected 1 match, got {s.count(old_guard)}')
 s=s.replace(old_guard,new_guard,1)
+old_storage="function preparedStorage(){return (phase==='cached'||phase==='ready'||phase==='error')?(storage||readStatus().storage):''}"
+new_storage="function preparedStorage(){const stored=readStatus();return (stored.prepared||preparedFlag)?(storage||stored.storage||'cache'):''}"
+if s.count(old_storage)!=1:
+    raise SystemExit(f'prepared storage fixup expected 1 match, got {s.count(old_storage)}')
+s=s.replace(old_storage,new_storage,1)
 p.write_text(s)
 
 # The old static assertion assumed every unprepared call must browser-fallback.
