@@ -95,14 +95,17 @@ async function main() {
   console.log('\n2 — lastFallbackReason terdeklarasi (regresi patch asli)');
   {
     const src = read(BOOTSTRAP);
+    const voiceSrc = read(VOICE);
     check('ada deklarasi let/var/const untuk lastFallbackReason',
       /(?:let|var|const)[^;\n]*\blastFallbackReason\b/.test(src));
     check('lastFallbackReason dipakai di status()',
-      /storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason/.test(src));
+      /initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy/.test(src));
     check('lastFallbackReason ditulis di jalur catch neural()',
       /lastError=errorText\(error\);lastFallbackReason=lastError/.test(src));
-    check('lastFallbackReason ditulis di jalur timeout',
-      /lastFallbackReason=lastError;\s*\n\s*diag\(\{phase:'speak_fallback'/.test(src));
+    check('generation timeout eksplisit dan diarahkan ke catch neural()',
+      voiceSrc.includes("new Error('neural_generation_timeout')") &&
+      voiceSrc.includes("phase: 'generate_timeout'") &&
+      /catch\(error\)\{\s*lastError=errorText\(error\);lastFallbackReason=lastError;/.test(src));
 
     // Simulasi semantik strict-mode: variabel yang dipakai tapi tak dideklarasikan
     // melempar ReferenceError. Ini yang membuat patch asli mematikan suara.
