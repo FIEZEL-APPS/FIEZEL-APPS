@@ -32,6 +32,7 @@
     const KokoroTTS = options.KokoroTTS;
     const kokoroEnv = options.kokoroEnv;
     const setVoiceDataUrl = options.setVoiceDataUrl;
+    const onStage = typeof options.onStage === 'function' ? options.onStage : null;
     if (!KokoroTTS || typeof KokoroTTS.from_pretrained !== 'function') throw new Error('KokoroTTS implementation is required');
     if (!kokoroEnv || typeof kokoroEnv !== 'object') throw new Error('Patched kokoro env export is required');
     if (typeof setVoiceDataUrl !== 'function') throw new Error('setVoiceDataUrl export is required');
@@ -46,6 +47,15 @@
     const device = String(options.device || 'wasm');
     let instancePromise = null;
 
+    function stage(phase, detail) {
+      if (!onStage) return;
+      try { onStage(Object.freeze({ phase, ...(detail || {}) })); } catch (_) {}
+    }
+
+    function errorText(error) {
+      return String(error && (error.message || error.name) || error || 'unknown error').slice(0, 240);
+    }
+
     async function getInstance() {
       if (!instancePromise) {
         kokoroEnv.allowRemoteModels = false;
@@ -53,18 +63,46 @@
         kokoroEnv.localModelPath = localModelPath;
         kokoroEnv.wasmPaths = wasmBasePath;
         setVoiceDataUrl(voiceBaseUrl);
-        instancePromise = Promise.resolve(KokoroTTS.from_pretrained(modelId, { dtype, device })).catch((error) => {
-          instancePromise = null;
-          throw error;
-        });
+        const startedAt = Date.now();
+        stage('adapter_instance_start', { dtype, device });
+        instancePromise = Promise.resolve()
+          .then(() => KokoroTTS.from_pretrained(modelId, { dtype, device }))
+          .then((value) => {
+            stage('adapter_instance_ready', { elapsedMs: Date.now() - startedAt });
+            return value;
+          })
+          .catch((error) => {
+            instancePromise = null;
+            stage('adapter_instance_error', { elapsedMs: Date.now() - startedAt, error: errorText(error) });
+            throw error;
+          });
       }
       return instancePromise;
     }
 
     async function generate(text, generationOptions) {
-      const tts = await getInstance();
       const opts = generationOptions || {};
-      return tts.generate(text, { voice: opts.voice, speed: typeof opts.speed === 'number' ? opts.speed : 1 });
+      const voice = String(opts.voice || '');
+      const speed = typeof opts.speed === 'number' ? opts.speed : 1;
+      const startedAt = Date.now();
+      stage('adapter_generate_enter', { voice });
+      const tts = await getInstance();
+      stage('adapter_generate_invoke', { voice, elapsedMs: Date.now() - startedAt });
+      try {
+        const generated = Promise.resolve(tts.generate(text, { voice: opts.voice, speed }));
+        stage('adapter_generate_dispatched', { voice, elapsedMs: Date.now() - startedAt });
+        const value = await generated;
+        const samples = value && (value.audio || value.data);
+        stage('adapter_generate_resolved', {
+          voice,
+          elapsedMs: Date.now() - startedAt,
+          samples: samples && typeof samples.length === 'number' ? samples.length : null
+        });
+        return value;
+      } catch (error) {
+        stage('adapter_generate_error', { voice, elapsedMs: Date.now() - startedAt, error: errorText(error) });
+        throw error;
+      }
     }
 
     async function listVoices() {
