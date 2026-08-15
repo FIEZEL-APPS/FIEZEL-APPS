@@ -10,6 +10,10 @@ const core=require(path.join(root,'features','neural-voice','fiezel-neural-voice
 const adapterApi=require(path.join(root,'features','neural-voice','fiezel-kokoro-adapter.js'));
 const player=require(path.join(root,'features','neural-voice','fiezel-web-audio-player.js'));
 const bootstrap=fs.readFileSync(path.join(root,'features','neural-voice','fiezel-neural-voice-bootstrap.js'),'utf8');
+const vendorAssetMatch=bootstrap.match(/\{path:'(vendor\/kokoro-js\/kokoro\.web\.js(?:\?[^']*)?)',bytes:(\d+)\}/);
+assert.ok(vendorAssetMatch,'bootstrap must declare a local Kokoro vendor asset');
+const runtimeVendorPath=vendorAssetMatch[1];
+const runtimeVendorBytes=Number(vendorAssetMatch[2]);
 let pass=0;
 async function test(name,fn){await fn();pass++;console.log('PASS',name)}
 function file(rel){return path.join(root,rel)}
@@ -38,7 +42,8 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('web audio accepts Kokoro Float32 payload',()=>assert.ok(player.pickSamples({data:new Float32Array([0,.1])}) instanceof Float32Array));
   await test('player warm is safe without Web Audio API',()=>assert.equal(player.createPlayer({}).warm(),false));
   await test('player warm creates and resumes a suspended context',()=>{let resumed=0;const env={AudioContext:function(){this.state='suspended';this.resume=()=>{resumed++;return Promise.resolve()}}};assert.equal(player.createPlayer(env).warm(),true);assert.equal(resumed,1)});
-  await test('bootstrap uses dynamic same-origin vendor import',()=>assert.ok(bootstrap.includes("absolute('vendor/kokoro-js/kokoro.web.js')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
+  await test('bootstrap uses dynamic same-origin vendor import',()=>assert.ok(bootstrap.includes(`absolute('${runtimeVendorPath}')`)&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
+  await test('bootstrap vendor asset size matches source lock',()=>assert.equal(runtimeVendorBytes,lock.runtime.bundle.sizeBytes));
   await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak")&&bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')")));
   await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf("writeStatus(true,'cache')")));
   await test('stale prepared state fails closed to browser TTS',()=>assert.ok(bootstrap.includes('if(!(await verifyCachedAssets())){writeStatus(false)')));
@@ -50,7 +55,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('bootstrap does not claim a memory-only offline install',()=>assert.ok(!bootstrap.includes('memoryAssets')&&!bootstrap.includes("storage=usedMemory?'memory':'cache'")));
   await test('bootstrap uses Storage API preflight when available',()=>assert.ok(bootstrap.includes("manager.estimate")&&bootstrap.includes("manager.persist")&&bootstrap.includes('storage_insufficient')));
 
-  const fakeAssets=[['vendor/kokoro-js/kokoro.web.js',2135645],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',44484],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',21596019],['vendor/kokoro-model/config.json',45],['vendor/kokoro-model/tokenizer.json',3498],['vendor/kokoro-model/tokenizer_config.json',114],['vendor/kokoro-model/onnx/model_quantized.onnx',92361116],['vendor/kokoro-model/voices/af_heart.bin',522240],['vendor/kokoro-model/voices/af_bella.bin',522240],['vendor/kokoro-model/voices/af_nicole.bin',522240],['vendor/kokoro-model/voices/am_michael.bin',522240],['vendor/kokoro-model/voices/bf_emma.bin',522240],['vendor/kokoro-model/voices/bm_george.bin',522240]];
+  const fakeAssets=[[runtimeVendorPath,runtimeVendorBytes],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',44484],['vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',21596019],['vendor/kokoro-model/config.json',45],['vendor/kokoro-model/tokenizer.json',3498],['vendor/kokoro-model/tokenizer_config.json',114],['vendor/kokoro-model/onnx/model_quantized.onnx',92361116],['vendor/kokoro-model/voices/af_heart.bin',522240],['vendor/kokoro-model/voices/af_bella.bin',522240],['vendor/kokoro-model/voices/af_nicole.bin',522240],['vendor/kokoro-model/voices/am_michael.bin',522240],['vendor/kokoro-model/voices/bf_emma.bin',522240],['vendor/kokoro-model/voices/bm_george.bin',522240]];
   const sizes=Object.fromEntries(fakeAssets);
   const localStorageData={};
   const localStorage={getItem:k=>localStorageData[k]??null,setItem:(k,v)=>localStorageData[k]=String(v),removeItem:k=>delete localStorageData[k]};
