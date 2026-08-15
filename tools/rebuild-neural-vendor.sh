@@ -21,19 +21,29 @@ PROVIDER_COMMIT="$(read_lock provider.commit)"
 EXPECTED_SHA="$(read_lock runtime.bundle.sha256)"
 EXPECTED_SIZE="$(read_lock runtime.bundle.sizeBytes)"
 PHONEMIZER_VERSION="$(read_lock dependencies.phonemizer)"
+PHONEMIZER_REPO="$(read_lock dependencies.phonemizerRepository)"
+PHONEMIZER_COMMIT="$(read_lock dependencies.phonemizerCommit)"
 COMMITTED_BUNDLE="$ROOT/$(read_lock runtime.bundle.path)"
-INTEGRATION_PATCH="$ROOT/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
+INTEGRATION_PATCH_REL="$(read_lock provider.sourcePatches.0.path)"
+INTEGRATION_PATCH_EXPECTED_SHA="$(read_lock provider.sourcePatches.0.sha256)"
+INTEGRATION_PATCH="$ROOT/$INTEGRATION_PATCH_REL"
 
 if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
   echo "REPRO FAIL: unexpected provider repository: $PROVIDER_REPO" >&2
   exit 1
 fi
-if [[ "$PHONEMIZER_VERSION" != "1.2.1" ]]; then
-  echo "REPRO FAIL: unexpected phonemizer lock: $PHONEMIZER_VERSION" >&2
+if [[ "$PHONEMIZER_VERSION" != "1.2.1" || "$PHONEMIZER_REPO" != "xenova/phonemizer.js" ]]; then
+  echo "REPRO FAIL: unexpected phonemizer provenance: version=$PHONEMIZER_VERSION repo=$PHONEMIZER_REPO" >&2
   exit 1
 fi
 if [[ ! -f "$INTEGRATION_PATCH" ]]; then
-  echo "REPRO FAIL: historical FIEZEL Kokoro integration patch is missing" >&2
+  echo "REPRO FAIL: source-locked FIEZEL Kokoro integration patch is missing: $INTEGRATION_PATCH_REL" >&2
+  exit 1
+fi
+PATCH_SHA="$(sha256sum "$INTEGRATION_PATCH" | awk '{print $1}')"
+if [[ "$PATCH_SHA" != "$INTEGRATION_PATCH_EXPECTED_SHA" ]]; then
+  echo "REPRO FAIL: FIEZEL integration patch hash differs from source lock" >&2
+  echo "expected=$INTEGRATION_PATCH_EXPECTED_SHA actual=$PATCH_SHA" >&2
   exit 1
 fi
 
@@ -53,7 +63,7 @@ echo "[repro] cloning $PROVIDER_REPO@$PROVIDER_COMMIT"
 git clone --quiet "https://github.com/${PROVIDER_REPO}.git" "$WORK_DIR/kokoro"
 git -C "$WORK_DIR/kokoro" checkout --quiet "$PROVIDER_COMMIT"
 
-echo "[repro] replaying historical FIEZEL Kokoro integration patch"
+echo "[repro] replaying source-locked FIEZEL Kokoro integration patch"
 git -C "$WORK_DIR/kokoro" apply --check "$INTEGRATION_PATCH"
 git -C "$WORK_DIR/kokoro" apply "$INTEGRATION_PATCH"
 
@@ -82,9 +92,8 @@ PY
 # the current baseline; m025-4 may add it only after baseline reproduction PASS.
 OVERRIDE="$ROOT/vendor/kokoro-js/source-overrides/phonemizer.js"
 if [[ -f "$OVERRIDE" ]]; then
-  PHONEMIZER_COMMIT="6835144b7ee9043129222549c1ed2f6a27216278"
-  echo "[repro] applying source-derived phonemizer override from $PHONEMIZER_COMMIT"
-  git clone --quiet https://github.com/xenova/phonemizer.js.git "$WORK_DIR/phonemizer"
+  echo "[repro] applying source-derived phonemizer override from $PHONEMIZER_REPO@$PHONEMIZER_COMMIT"
+  git clone --quiet "https://github.com/${PHONEMIZER_REPO}.git" "$WORK_DIR/phonemizer"
   git -C "$WORK_DIR/phonemizer" checkout --quiet "$PHONEMIZER_COMMIT"
   cp "$OVERRIDE" "$WORK_DIR/phonemizer/src/phonemizer.js"
   cd "$WORK_DIR/phonemizer"
@@ -109,13 +118,15 @@ cp dist/kokoro.web.js "$OUT_DIR/kokoro.web.js"
 
 BUILT_SHA="$(sha256sum "$OUT_DIR/kokoro.web.js" | awk '{print $1}')"
 BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
-PATCH_SHA="$(sha256sum "$INTEGRATION_PATCH" | awk '{print $1}')"
 {
   echo "provider=$PROVIDER_REPO"
   echo "providerCommit=$PROVIDER_COMMIT"
   echo "node=$(node --version)"
   echo "npm=$(npm --version)"
   echo "phonemizer=$INSTALLED_PHONEMIZER"
+  echo "phonemizerRepository=$PHONEMIZER_REPO"
+  echo "phonemizerCommit=$PHONEMIZER_COMMIT"
+  echo "integrationPatch=$INTEGRATION_PATCH_REL"
   echo "integrationPatchSha256=$PATCH_SHA"
   echo "expectedSha256=$EXPECTED_SHA"
   echo "expectedSize=$EXPECTED_SIZE"
