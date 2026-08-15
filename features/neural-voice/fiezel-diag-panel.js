@@ -9,18 +9,17 @@
   // Panel ini membuat app mengekspor datanya sendiri.
   //
   // KONTRAK READ-ONLY: file ini tidak boleh menulis atau menghapus apa pun di
-  // localStorage, CacheStorage, atau IndexedDB. Yang dipakai hanya getItem,
-  // Object.keys, caches.keys, cache.keys, cache.match (header saja, body tidak
-  // pernah dibaca supaya 92 MB model tidak masuk memori).
+  // localStorage, CacheStorage, atau IndexedDB. Nilai token autentikasi tidak pernah
+  // diekspor; panel hanya mencatat presence boolean dan origin non-secret.
   //
   // DIAG_BUILD adalah penanda manual. Repo ini tidak punya build step, jadi tidak
   // ada tempat menyuntik commit sha otomatis. Naikkan angkanya setiap kali panel
   // ini di-deploy — inilah cara owner membedakan "build baru sudah aktif" dari
   // "build lama masih dilayani service worker".
-  var DIAG_BUILD = 'm024-1';
+  var DIAG_BUILD = 'm025-1';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
-  var Z = 2147483000; // di atas .answer-burst (130) dan .notification-gate (100)
+  var Z = 2147483000;
 
   if (!root.document || root.__fiezelDiagPanel) return;
   root.__fiezelDiagPanel = true;
@@ -28,6 +27,35 @@
   function safe(fn, fallback) {
     try { return fn(); }
     catch (error) { return arguments.length > 1 ? fallback : 'ERR: ' + String(error && error.message || error); }
+  }
+
+  function collectPuterAuth() {
+    return safe(function(){
+      var puter = root.puter || null;
+      var auth = puter && puter.auth;
+      var signedIn = null;
+      if (auth && typeof auth.isSignedIn === 'function') {
+        var value = auth.isSignedIn();
+        if (typeof value === 'boolean') signedIn = value;
+      }
+      return {
+        env: puter && puter.env != null ? String(puter.env) : null,
+        authTokenPresent: !!(puter && puter.authToken),
+        isSignedIn: signedIn,
+        storedTokenV2Present: !!root.localStorage.getItem('puter.auth.token.v2'),
+        storedTokenOrigin: root.localStorage.getItem('puter.auth.token.origin.v2') || null,
+        apiOrigin: puter && puter.APIOrigin ? String(puter.APIOrigin) : null,
+        defaultGUIOrigin: puter && puter.defaultGUIOrigin ? String(puter.defaultGUIOrigin) : null
+      };
+    }, {
+      env: null,
+      authTokenPresent: false,
+      isSignedIn: null,
+      storedTokenV2Present: false,
+      storedTokenOrigin: null,
+      apiOrigin: null,
+      defaultGUIOrigin: null
+    });
   }
 
   function collectSync() {
@@ -45,6 +73,7 @@
       crossOriginIsolated: safe(function(){ return root.crossOriginIsolated === true; }),
       puterLoaded: safe(function(){ return typeof root.puter !== 'undefined' && !!root.puter; }),
       puterWorkersLoaded: safe(function(){ return !!(root.puter && root.puter.workers); }),
+      puterAuth: collectPuterAuth(),
       localStorageKeys: safe(function(){ return Object.keys(root.localStorage); }, []),
       target: safe(function(){ return root.localStorage.getItem(KEY); }, null),
       runtimeStatus: safe(function(){
@@ -124,8 +153,6 @@
   }
 
   function addRuntimeDiagnostics(dump) {
-    // FiezelVoiceRuntime.diagnostics() memparse key yang sama dengan `target`.
-    // Disimpan terpisah supaya kalau salah satu gagal parse, yang lain tetap ada.
     dump.runtimeDiagnostics = safe(function(){
       return (root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.diagnostics)
         ? root.FiezelVoiceRuntime.diagnostics() : '(FiezelVoiceRuntime tidak ada)';
@@ -273,6 +300,7 @@
         appVersion: dump && dump.appVersion,
         capturedAt: dump && dump.capturedAt,
         standalone: dump && dump.standalone,
+        puterAuth: dump && dump.puterAuth,
         target: dump && dump.target,
         storageEstimate: dump && dump.storageEstimate
       };

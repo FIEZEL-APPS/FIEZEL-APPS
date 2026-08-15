@@ -5,6 +5,7 @@
   if(!runtime||runtime.__audibilityPatched)return;
 
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
+  const DIAG_LIMIT=200;
   let browserActive=false;
   let activeUtterance=null;
 
@@ -13,7 +14,7 @@
       const key='fiezel-neural-voice-diagnostics-v1';
       const list=JSON.parse(root.localStorage?.getItem(key)||'[]');
       list.push({t:Date.now(),v:String(root.FIEZEL_VERSION||''),patch:'audibility-v1',...entry});
-      root.localStorage?.setItem(key,JSON.stringify(list.slice(-30)));
+      root.localStorage?.setItem(key,JSON.stringify(list.slice(-DIAG_LIMIT)));
     }catch{}
   }
 
