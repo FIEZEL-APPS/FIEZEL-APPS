@@ -70,6 +70,7 @@ jobs:
           node neural-voice-device-hotfix-test.js
           node neural-voice-timeout-phase-test.js
           node neural-voice-generation-timeout-test.js
+          node neural-voice-single-flight-test.js
           node neural-voice-diagnostics-retention-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
