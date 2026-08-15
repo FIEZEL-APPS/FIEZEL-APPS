@@ -1,0 +1,280 @@
+from pathlib import Path
+import re
+
+
+def replace_once(path, old, new, label):
+    p = Path(path)
+    s = p.read_text()
+    count = s.count(old)
+    if count != 1:
+        raise SystemExit(f'{label}: expected 1 match, got {count}')
+    p.write_text(s.replace(old, new, 1))
+
+
+def regex_once(path, pattern, repl, label, flags=0):
+    p = Path(path)
+    s = p.read_text()
+    out, n = re.subn(pattern, repl, s, count=1, flags=flags)
+    if n != 1:
+        raise SystemExit(f'{label}: expected 1 regex match, got {n}')
+    p.write_text(out)
+
+
+boot = 'features/neural-voice/fiezel-neural-voice-bootstrap.js'
+aud = 'features/neural-voice/fiezel-neural-voice-audibility-fix.js'
+app = 'app.js'
+sw = 'sw.js'
+diag = 'features/neural-voice/fiezel-diag-panel.js'
+
+replace_once(
+    boot,
+    "const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||20000;",
+    "const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?12000:20000);",
+    'apple neural timeout',
+)
+
+replace_once(
+    boot,
+    "let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false;",
+    "let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';",
+    'runtime state',
+)
+
+replace_once(
+    boot,
+    "return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,ready:!!service,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason});",
+    "return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason,wasmPolicy});",
+    'honest status',
+)
+
+old_wasm = """      if(root.crossOriginIsolated!==true){
+        try{
+          const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
+          if(wasmEnv&&typeof wasmEnv==='object')wasmEnv.numThreads=1;
+        }catch{}
+      }
+"""
+new_wasm = """      try{
+        const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
+        const appleStandalone=root.navigator?.standalone===true;
+        if(wasmEnv&&typeof wasmEnv==='object'){
+          if(appleStandalone||root.crossOriginIsolated!==true)wasmEnv.numThreads=1;
+          if(appleStandalone)wasmEnv.proxy=true;
+          wasmPolicy=appleStandalone?'apple-standalone-single-thread-proxy':(root.crossOriginIsolated===true?'auto-threaded':'single-thread');
+          diag({phase:'wasm_policy',policy:wasmPolicy,numThreads:Number(wasmEnv.numThreads||0),proxy:!!wasmEnv.proxy});
+        }
+      }catch{}
+"""
+replace_once(boot, old_wasm, new_wasm, 'Apple WASM policy')
+
+replace_once(
+    boot,
+    "    initFailedThisSession=false;warmAudioGesture();",
+    "    initFailedThisSession=false;initTimedOutThisSession=false;circuitOpen=false;lastFallbackReason='';lastError='';warmAudioGesture();",
+    'explicit prepare resets circuit',
+)
+
+replace_once(
+    boot,
+    "  async function ensureReady(){\n    warmAudioGesture();\n    if(service)return status();",
+    "  async function ensureReady(){\n    warmAudioGesture();\n    if(circuitOpen)throw new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`);\n    if(service)return status();",
+    'ensureReady circuit',
+)
+
+speak_pattern = r"  async function speak\(text,options=\{\}\)\{[\s\S]*?\n  \}\n  function stop\(\)"
+speak_repl = """  async function speak(text,options={}){
+    warmAudioGesture();
+    const allowFallback=options.allowFallback!==false;
+    const fallbackOrThrow=async(error)=>{
+      if(!allowFallback)throw error;
+      return browserSpeak(text,options);
+    };
+    if(!readStatus().prepared&&!preparedFlag)return fallbackOrThrow(new Error('Neural voice assets are not prepared'));
+    if(circuitOpen)return fallbackOrThrow(new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`));
+    if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return fallbackOrThrow(new Error(lastError||'Neural voice initialization is still running'));
+    if(!verifiedForSession){
+      if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
+      verifiedForSession=true;
+    }
+    const timeout=Symbol('fiezel-tts-timeout');
+    let neuralError=null;
+    const neural=async()=>{
+      const local=await initialize();
+      return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
+    };
+    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;neuralError=error;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
+    if(result===null||result===timeout){
+      lastError=result===timeout?'neural_tts_timeout':lastError;
+      lastFallbackReason=lastError;
+      circuitOpen=true;audibleVerified=false;phase='error';
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:true});
+      try{service?.stop?.()}catch{}
+      return fallbackOrThrow(neuralError||new Error(lastError));
+    }
+    circuitOpen=false;audibleVerified=true;lastError='';lastFallbackReason='';phase='ready';
+    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||options.voice||'')});
+    return result;
+  }
+  function stop()"""
+regex_once(boot, speak_pattern, speak_repl, 'single-owner fallback/circuit', re.M)
+
+old_start = """  if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
+    if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'})).catch(()=>{});
+  });
+"""
+new_start = """  if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
+    if(prepared){phase='cached';diag({phase:'prepared_idle'});}
+  }).catch(()=>{});
+"""
+replace_once(boot, old_start, new_start, 'remove eager startup prewarm')
+
+aud_pattern = r"  async function speak\(text,options=\{\}\)\{[\s\S]*?\n  \}\n\n  function stop\(\)"
+aud_repl = """  async function speak(text,options={}){
+    warmWebAudio();
+    const state=runtime.status?.()||{};
+    const neuralOnly=options.allowFallback===false;
+    if(state.circuitOpen){
+      diag({phase:'circuit_open',reason:String(state.lastFallbackReason||state.error||'previous_failure')});
+      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
+      return browserSpeakImmediate(text,options);
+    }
+    if(!state.ready){
+      diag({phase:'audibility_first',prepared:!!state.prepared});
+      if(state.prepared&&typeof runtime.ensureReady==='function'){
+        try{
+          await runtime.ensureReady();
+          const warmed=runtime.status?.()||{};
+          if(warmed.ready){
+            try{return await runtime.speak(text,{...options,allowFallback:false})}
+            catch(error){
+              diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+              if(neuralOnly)throw error;
+              return browserSpeakImmediate(text,options);
+            }
+          }
+        }catch(error){
+          diag({phase:'neural_resume_error',error:String(error?.message||error)});
+          if(neuralOnly)throw error;
+        }
+      }
+      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
+      return browserSpeakImmediate(text,options);
+    }
+    try{return await runtime.speak(text,{...options,allowFallback:false})}
+    catch(error){
+      diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+      if(neuralOnly)throw error;
+      return browserSpeakImmediate(text,options);
+    }
+  }
+
+  function stop()"""
+regex_once(aud, aud_pattern, aud_repl, 'audibility single fallback owner', re.M)
+
+replace_once(
+    app,
+    "result=await runtime.speak('Hello. This is your selected FIEZEL neural voice.',{voice,lang:voice.startsWith('b')?'en-GB':'en-US',speed:.92});",
+    "result=await runtime.speak('Hello. This is your selected FIEZEL neural voice.',{voice,lang:voice.startsWith('b')?'en-GB':'en-US',speed:.92,allowFallback:false});",
+    'neural-only UI test',
+)
+
+replace_once(
+    app,
+    "label=status.ready?'Suara neural lokal siap':status.prepared?'Aset tersimpan, inisialisasi belum aktif':'Belum disiapkan'",
+    "label=status.circuitOpen?'Neural dihentikan setelah timeout':status.ready?'Suara neural lokal siap':status.prepared?'Aset tersimpan, inisialisasi belum aktif':'Belum disiapkan'",
+    'circuit UI label',
+)
+
+replace_once(sw, "const SW_REV='m021-corp-wrapper-20260815-1';", "const SW_REV='m023-device-hotfix-20260815-1';", 'SW rev')
+replace_once(sw, "'Cross-Origin-Embedder-Policy':'require-corp'", "'Cross-Origin-Embedder-Policy':'credentialless'", 'COEP credentialless')
+old_cross = """  if(requestUrl.origin!==self.location.origin){
+    // Third-party resource (e.g. js.puter.com): only no-cors traffic enters
+    // the CORS-first compatibility path. Existing CORS-mode API requests pass
+    // through untouched so Authorization/puter-auth headers are preserved.
+    if(e.request.mode==='no-cors')e.respondWith(fetchCrossOriginWithCorp(e.request).catch(()=>fetch(e.request,{mode:'no-cors'})));
+    return;
+  }
+"""
+new_cross = """  if(requestUrl.origin!==self.location.origin){
+    // Third-party SDK/API traffic is deliberately left to the browser. The
+    // document uses COEP: credentialless, so no-cors resources such as Puter.js
+    // can load without the service worker reconstructing or proxying opaque bodies.
+    return;
+  }
+"""
+replace_once(sw, old_cross, new_cross, 'Puter passthrough')
+
+replace_once(diag, "var DIAG_BUILD = 'm022-1';", "var DIAG_BUILD = 'm023-1';", 'diag build')
+replace_once(
+    diag,
+    "puterLoaded: safe(function(){ return typeof root.puter !== 'undefined' && !!(root.puter && root.puter.workers); }),",
+    "puterLoaded: safe(function(){ return typeof root.puter !== 'undefined' && !!root.puter; }),\n      puterWorkersLoaded: safe(function(){ return !!(root.puter && root.puter.workers); }),",
+    'Puter diagnostics',
+)
+
+Path('sw-corp-test.js').write_text("""const fs=require('fs');
+const vm=require('vm');
+const path=require('path');
+let failures=0;
+const check=(label,ok,detail)=>{if(ok)console.log('  ok   '+label);else{failures++;console.log('  FAIL '+label+(detail?' — '+detail:''))}};
+const src=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+class H{constructor(init){this.m=new Map(Object.entries(init||{}).map(([k,v])=>[k.toLowerCase(),v]))}get(k){return this.m.get(String(k).toLowerCase())||null}set(k,v){this.m.set(String(k).toLowerCase(),v)}}
+class R{constructor(body,init={}){this.body=body;this.status=init.status??200;this.statusText=init.statusText||'';this.headers=init.headers instanceof H?init.headers:new H(init.headers);this.ok=this.status>=200&&this.status<300}}
+function run(){const listeners={};let fetchCalls=0;const s={console,URL,Promise,Symbol,setTimeout,clearTimeout,Headers:H,Response:R,fetch:()=>{fetchCalls++;return Promise.resolve(new R('x'))},caches:{open:()=>Promise.resolve({addAll:()=>Promise.resolve(),put:()=>Promise.resolve(),match:()=>Promise.resolve()}),keys:()=>Promise.resolve([]),delete:()=>Promise.resolve(true),match:()=>Promise.resolve()},clients:{matchAll:()=>Promise.resolve([])},importScripts:()=>{s.self.FIEZEL_VERSION='5.19.0'},self:null};s.self=s;s.globalThis=s;s.location={origin:'https://fitrajft-ux.github.io'};s.registration={showNotification:()=>{},update:()=>Promise.resolve()};s.addEventListener=(n,f)=>(listeners[n]=listeners[n]||[]).push(f);vm.createContext(s);vm.runInContext(src,s);return{listeners,get fetchCalls(){return fetchCalls}}}
+console.log('sw-corp-test');
+check('COEP uses credentialless',src.includes(\"'Cross-Origin-Embedder-Policy':'credentialless'\"));
+check('SW revision bumped for device hotfix',src.includes(\"SW_REV='m023-device-hotfix-20260815-1'\"));
+const t=run();let captured=false;const req={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};(t.listeners.fetch||[]).forEach(fn=>fn({request:req,respondWith:()=>{captured=true}}));
+check('cross-origin Puter request is not intercepted',captured===false);
+check('cross-origin Puter request triggers no synthetic fetch',t.fetchCalls===0,'fetchCalls='+t.fetchCalls);
+check('opaque synthetic 200 regression remains absent',!/new Response\\(response\\.body,\\{status:200/.test(src));
+check('version remains 5.19.0',fs.readFileSync(path.join(__dirname,'version.js'),'utf8').includes(\"'5.19.0'\"));
+if(failures){console.log(failures+' gate GAGAL');process.exit(1)}console.log('semua gate sw-corp LOLOS');
+""")
+
+Path('neural-voice-device-hotfix-test.js').write_text("""const fs=require('fs');
+const path=require('path');
+const assert=require('assert');
+const read=p=>fs.readFileSync(path.join(__dirname,p),'utf8');
+const boot=read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
+const aud=read('features/neural-voice/fiezel-neural-voice-audibility-fix.js');
+const app=read('app.js');
+const sw=read('sw.js');
+const diag=read('features/neural-voice/fiezel-diag-panel.js');
+assert.ok(boot.includes(\"diag({phase:'prepared_idle'})\"),'prepared startup must remain idle');
+assert.ok(!boot.includes(\"if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'}))\"),'startup must not prewarm Kokoro');
+assert.ok(boot.includes(\"wasmEnv.numThreads=1\"),'Apple policy must disable WASM multithreading');
+assert.ok(boot.includes(\"wasmEnv.proxy=true\"),'Apple policy must offload WASM work to proxy worker');
+assert.ok(boot.includes(\"apple-standalone-single-thread-proxy\"));
+assert.ok(boot.includes('initialized:!!service'));
+assert.ok(boot.includes('audibleVerified'));
+assert.ok(boot.includes('circuitOpen'));
+assert.ok(boot.includes(\"allowFallback:false\"),'inner neural service must never own browser fallback');
+assert.ok(boot.includes(\"circuitOpen=true;audibleVerified=false\"),'neural timeout/failure must open circuit');
+assert.ok(aud.includes(\"runtime.speak(text,{...options,allowFallback:false})\"),'audibility layer must call base runtime neural-only');
+assert.ok(aud.includes(\"if(neuralOnly)throw error\"),'neural-only UI test must never be masked by browser TTS');
+assert.ok(app.includes(\"speed:.92,allowFallback:false\"),'Tes suara must be neural-only');
+assert.ok(sw.includes(\"'Cross-Origin-Embedder-Policy':'credentialless'\"));
+assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
+assert.ok(diag.includes(\"var DIAG_BUILD = 'm023-1'\"));
+assert.ok(diag.includes('puterWorkersLoaded'));
+assert.ok(read('version.js').includes(\"'5.19.0'\"));
+assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
+console.log('FIEZEL neural device hotfix: PASS');
+""")
+
+prod = Path('neural-voice-product-repair-test.js')
+s = prod.read_text()
+old = """  assert.ok(sw.includes(\"fetch(request.url,{mode:'cors',credentials:'omit'})\"),'third-party wrapper must attempt readable CORS response first');
+  assert.ok(sw.includes(\"return fetch(request,{mode:'no-cors',credentials:'omit'})\"),'CORS failure must pass through the opaque network response');
+  assert.ok(!/fetch\\(request[^\\n]*mode:'no-cors'[\\s\\S]{0,700}new Response\\(response\\.body/.test(sw),'must never reconstruct an opaque no-cors body as synthetic 200');
+  pass('service worker does not synthesize empty 200 responses from opaque bodies');
+"""
+new = """  assert.ok(sw.includes(\"'Cross-Origin-Embedder-Policy':'credentialless'\"),'COEP must allow third-party no-cors SDK loading without opaque reconstruction');
+  assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'),'third-party traffic must bypass service-worker response synthesis');
+  assert.ok(!/fetch\\(request[^\\n]*mode:'no-cors'[\\s\\S]{0,700}new Response\\(response\\.body/.test(sw),'must never reconstruct an opaque no-cors body as synthetic 200');
+  pass('service worker leaves Puter traffic to browser under credentialless COEP');
+"""
+if s.count(old) != 1:
+    raise SystemExit('product repair SW block not found exactly once')
+prod.write_text(s.replace(old, new, 1))
