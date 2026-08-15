@@ -84,6 +84,12 @@
   async function speak(text,options={}){
     warmWebAudio();
     const state=runtime.status?.()||{};
+    const neuralOnly=options.allowFallback===false;
+    if(state.circuitOpen){
+      diag({phase:'circuit_open',reason:String(state.lastFallbackReason||state.error||'previous_failure')});
+      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
+      return browserSpeakImmediate(text,options);
+    }
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
       if(state.prepared&&typeof runtime.ensureReady==='function'){
@@ -91,17 +97,25 @@
           await runtime.ensureReady();
           const warmed=runtime.status?.()||{};
           if(warmed.ready){
-            const result=await runtime.speak(text,options);
-            diag({phase:'neural_resume_success',provider:String(result?.provider||'neural')});
-            return result;
+            try{return await runtime.speak(text,{...options,allowFallback:false})}
+            catch(error){
+              diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+              if(neuralOnly)throw error;
+              return browserSpeakImmediate(text,options);
+            }
           }
-        }catch(error){diag({phase:'neural_resume_error',error:String(error?.message||error)})}
+        }catch(error){
+          diag({phase:'neural_resume_error',error:String(error?.message||error)});
+          if(neuralOnly)throw error;
+        }
       }
+      if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
       return browserSpeakImmediate(text,options);
     }
-    try{return await runtime.speak(text,options)}
+    try{return await runtime.speak(text,{...options,allowFallback:false})}
     catch(error){
       diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+      if(neuralOnly)throw error;
       return browserSpeakImmediate(text,options);
     }
   }
