@@ -31,15 +31,15 @@
       "sourceCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
       "purpose": "m025-4 phase-only eSpeak lifecycle diagnostics; no prompt, phoneme, token, or external error-message payloads"
     },
-    "phonemizerSafariPatch": {
-      "path": "vendor/kokoro-js/source-patches/phonemizer-safari-readable-stream.patch",
-      "sha256": "84217f72084e87122097e82d7293ef8d9878e6129d9fcfa95333d66e4820a138",
+    "phonemizerSafariUpstreamFix": {
       "sourceRepository": "xenova/phonemizer.js",
       "baseCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
       "headCommit": "6cef703722c7e867029665df9c85ccaadc4ef19c",
       "upstreamPullRequest": 4,
+      "sourcePath": "src/espeakng.worker.js",
+      "sourceBlobGitSha": "3c2cc8ca249d5b8011b67b7c4041567dae184e94",
       "upstreamStatusAtAdoption": "open-unmerged",
-      "purpose": "m025-5 Safari ReadableStream async-iterator compatibility in eSpeak worker; source-derived from upstream PR #4"
+      "purpose": "m025-5 Safari ReadableStream async-iterator compatibility in the eSpeak worker, consumed directly from the exact upstream PR head rather than a hand-authored patch"
     }
   },
   "runtime": {
