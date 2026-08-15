@@ -4,35 +4,24 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - 'push-proof-dispatcher.mjs'
+
+permissions:
+  contents: read
 
 jobs:
   dispatch:
-    # Scheduled delivery remains fail-closed. Push execution is limited to explicit closed-app proof commits.
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[closed-app-proof]')) || (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true')
+    # Scheduled product delivery may continue within its bounded runtime contract.
+    # Manual execution is MASTER-only. Repository pushes never dispatch reminders.
+    if: (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux')
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Closed-app remote push proof
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[closed-app-proof]')
-        run: node push-proof-dispatcher.mjs
-        env:
-          FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
-          FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
-          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
-          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
-      - run: node push-dispatcher.mjs
-        if: github.event_name != 'push'
+      - name: Dispatch bounded remote reminders
+        run: node push-dispatcher.mjs
         env:
           FIEZEL_CORE_WORKER_URL: ${{ secrets.FIEZEL_CORE_WORKER_URL }}
           FIEZEL_REMINDER_CRON_TOKEN: ${{ secrets.FIEZEL_REMINDER_CRON_TOKEN }}
