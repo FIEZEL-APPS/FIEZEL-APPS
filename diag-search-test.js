@@ -5,6 +5,9 @@ const path=require('path');
 const vm=require('vm');
 
 const source=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-diag-panel.js'),'utf8');
+const buildMatch=source.match(/var DIAG_BUILD = '(m025-\d+)'/);
+assert.ok(buildMatch,'Diagnostics source must expose an m025-N build marker');
+const expectedBuild=buildMatch[1];
 
 function element(tag){
   return{
@@ -25,7 +28,7 @@ function find(node,id){
 
 const body=element('body');
 const diag=[
-  {phase:'wasm_policy',policy:'apple-standalone-single-thread-direct',numThreads:1,proxy:false},
+  {phase:'wasm_policy',policy:'apple-standalone-single-thread-direct-default',numThreads:1,proxy:false},
   {phase:'adapter_generate_dispatched',requestId:'a'},
   {phase:'adapter_generate_resolved',requestId:'a'},
   {phase:'adapter_generate_dispatched',requestId:'b'}
@@ -42,7 +45,7 @@ const ctx={
   // visible occurrences by design.
   localStorage:{getItem:()=>null},
   FIEZEL_VERSION:'5.19.0',
-  FiezelVoiceRuntime:{status:()=>({wasmPolicy:'apple-standalone-single-thread-direct'}),diagnostics:()=>diag}
+  FiezelVoiceRuntime:{status:()=>({wasmPolicy:'apple-standalone-single-thread-direct-default'}),diagnostics:()=>diag}
 };
 ctx.globalThis=ctx;
 vm.createContext(ctx);
@@ -54,12 +57,12 @@ const text=find(body,'fiezelDiagText');
 const search=find(body,'fiezelDiagSearch');
 const count=find(body,'fiezelDiagSearchCount');
 const searchBar=find(body,'fiezelDiagSearchBar');
-assert.ok(host&&open&&text&&search&&count&&searchBar,'m025-2 search controls must mount');
-assert.equal(host.dataset['data-diag-build'],'m025-2');
+assert.ok(host&&open&&text&&search&&count&&searchBar,`${expectedBuild} search controls must mount`);
+assert.equal(host.dataset['data-diag-build'],expectedBuild);
 
 open.listeners.click();
 const before=text.value;
-assert.ok(before.includes('"diagBuild": "m025-2"'),'export must identify m025-2');
+assert.ok(before.includes(`"diagBuild": "${expectedBuild}"`),'export must identify the current Diagnostics build');
 assert.ok(before.includes('adapter_generate_dispatched'));
 
 search.value='adapter_generate_dispatched';
@@ -85,4 +88,4 @@ search.value='not-present-sentinel';
 search.listeners.input();
 assert.equal(count.textContent,'0 hasil');
 
-console.log('FIEZEL diagnostics m025-2 search regression: PASS');
+console.log(`FIEZEL diagnostics ${expectedBuild} search regression: PASS`);
