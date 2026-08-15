@@ -100,6 +100,7 @@
         env.localStorage && env.localStorage.setItem(key, JSON.stringify(list.slice(-200)));
       } catch (_) {}
     }
+    diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
 
     function stop() {
       generation += 1;
