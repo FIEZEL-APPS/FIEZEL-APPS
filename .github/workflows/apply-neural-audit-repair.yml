@@ -35,12 +35,21 @@ jobs:
           gzip -dc /tmp/fiezel-repair/repair.patch.gz > /tmp/fiezel-repair/repair.patch
           echo "3e524cfa37fa6ded34413d03ec1bef0e071c1ac4aef4da36d08cdb30baf0f76e  /tmp/fiezel-repair/repair.patch" | sha256sum -c -
 
-      - name: Check and apply patch
+      - name: Three-way apply against current repository history
         shell: bash
         run: |
           set -euo pipefail
-          git apply --check /tmp/fiezel-repair/repair.patch
-          git apply /tmp/fiezel-repair/repair.patch
+          if ! git apply --3way /tmp/fiezel-repair/repair.patch; then
+            echo 'three-way apply failed; refusing forced overwrite'
+            git status --short
+            git diff --name-only --diff-filter=U || true
+            exit 1
+          fi
+          if git diff --name-only --diff-filter=U | grep -q .; then
+            echo 'unmerged paths remain; refusing commit'
+            git diff --name-only --diff-filter=U
+            exit 1
+          fi
 
       - name: Validate mandatory gates
         shell: bash
@@ -52,7 +61,7 @@ jobs:
             echo 'broken-pattern gate failed'
             exit 1
           fi
-          git diff --exit-code -- version.js VERSION.json
+          git diff --exit-code HEAD -- version.js VERSION.json
           node neural-voice-fix-test.js
           node neural-voice-selector-test.js
           node neural-voice-audibility-test.js
