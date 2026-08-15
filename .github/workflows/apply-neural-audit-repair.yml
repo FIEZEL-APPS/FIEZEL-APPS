@@ -1,0 +1,91 @@
+name: Apply audited neural voice repair
+
+on:
+  push:
+    branches:
+      - agent/neural-voice-final-20260815
+    paths:
+      - .github/workflows/apply-neural-audit-repair.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout candidate branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: agent/neural-voice-final-20260815
+
+      - name: Reconstruct authoritative audit patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/fiezel-repair
+          for n in 00 01 02 03 04 05; do
+            curl --fail --location --retry 3 \
+              "https://raw.githubusercontent.com/fitrajft-ux/fiezel-neural-voice-audit-2026-08-15/main/repair/parts/repair.patch.gz.part${n}" \
+              --output "/tmp/fiezel-repair/repair.patch.gz.part${n}"
+          done
+          cat /tmp/fiezel-repair/repair.patch.gz.part* > /tmp/fiezel-repair/repair.patch.gz
+          echo "ca1a1ba775cff188c74a6f1b11ad89263a4e8fc50ef64b4f728ad38ff1b6f870  /tmp/fiezel-repair/repair.patch.gz" | sha256sum -c -
+          gzip -dc /tmp/fiezel-repair/repair.patch.gz > /tmp/fiezel-repair/repair.patch
+          echo "3e524cfa37fa6ded34413d03ec1bef0e071c1ac4aef4da36d08cdb30baf0f76e  /tmp/fiezel-repair/repair.patch" | sha256sum -c -
+
+      - name: Check and apply patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git apply --check /tmp/fiezel-repair/repair.patch
+          git apply /tmp/fiezel-repair/repair.patch
+
+      - name: Validate mandatory gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          for f in *.js; do node --check "$f"; done
+          for f in features/neural-voice/*.js; do node --check "$f"; done
+          if grep -rn '^\s*}){' features/ *.js; then
+            echo 'broken-pattern gate failed'
+            exit 1
+          fi
+          git diff --exit-code -- version.js VERSION.json
+          node neural-voice-fix-test.js
+          node neural-voice-selector-test.js
+          node neural-voice-audibility-test.js
+          node neural-voice-test.js
+          node ios-cache-compat-test.js
+          node sw-corp-test.js
+
+      - name: Commit audited repair to candidate branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- \
+            .github/workflows/quality.yml \
+            analysis/device-retest-checklist.md \
+            app.js \
+            features/neural-voice/fiezel-diag-panel.js \
+            features/neural-voice/fiezel-neural-voice-audibility-fix.js \
+            features/neural-voice/fiezel-neural-voice-bootstrap.js \
+            features/neural-voice/fiezel-neural-voice-config.js \
+            features/neural-voice/fiezel-neural-voice-ios-cache-fix.js \
+            features/neural-voice/fiezel-neural-voice.js \
+            features/neural-voice/fiezel-web-audio-player.js \
+            ios-cache-compat-test.js \
+            neural-voice-audibility-test.js \
+            neural-voice-test.js \
+            release-audit.py \
+            style.css \
+            sw.js \
+            neural-voice-fix-test.js \
+            neural-voice-selector-test.js \
+            sw-corp-test.js
+          git diff --cached --quiet && { echo 'No repair changes to commit'; exit 0; }
+          git commit -m "Apply final audited neural voice repair"
+          git push origin HEAD:agent/neural-voice-final-20260815
