@@ -1,6 +1,6 @@
 {
     "protocol_version":  "v1",
-    "updated":  "2026-08-15T17:10:00+07:00",
+    "updated":  "2026-08-15T22:16:50+07:00",
     "agents":  [
                    {
                        "id":  "coordinator-1",
@@ -19,105 +19,105 @@
                        "session":  "ses_000325795ffePUB0VTxSfBE64V",
                        "role":  "squad (verifikasi produksi)",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-1/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-2",
                        "session":  "ses_000323295ffeEWAlY1ruQ0zNRr",
                        "role":  "squad (desain IndexedDB)",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-2/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-3",
                        "session":  "ses_000321c1cffengK0Als7R81yNI",
                        "role":  "squad (audit T-005/T-006)",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-3/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-4",
                        "session":  "ses_000320968ffe6hUykdumYrGPiS",
                        "role":  "squad (rekonsiliasi ledger)",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-4/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-5",
                        "session":  "ses_00031f177ffen91yZn7TRaD6Gf",
                        "role":  "Main Coordinator / worker pool lead",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-5/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-6",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-1/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-7",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-2/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-8",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-3/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-9",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-4/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-10",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-5/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-11",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-1/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-12",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-2/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-13",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-3/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-14",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-4/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    },
                    {
                        "id":  "agent-15",
                        "session":  "tbd",
                        "role":  "worker",
                        "directory":  "Temp\\opencode\\FIEZEL-APPS-clone",
-                       "model":  "zen-agent-5/deepseek-v4-flash-free"
+                        "model":  "opencode-go/kimi-k3"
                    }
                ],
     "tasks":  [
@@ -299,6 +299,22 @@
                       "evidence":  "agent-5 (takeover OWNER 2026-08-15, MASTER/squad tidak aktif): (1) fiezel-web-audio-player.js +close() (stop source + close shared AudioContext + env.__fiezelWebAudioContext=null), API Object.freeze({play,stop,warm,close}) ADDITIVE; (2) fiezel-neural-voice-bootstrap.js +release() (service.stop + speechSynthesis.cancel + FiezelWebAudioPlayer.createPlayer(root).close() + playerRef/service/adapter=null + phase=idle + diag released, re-init on-demand via speak/ensureReady), diekspos di FiezelVoiceRuntime (speak,stop,release) ADDITIVE; (3) app.js visibilitychange handler: hidden -> tambah FiezelVoiceRuntime.release() (masih suspend musicCtx/fxCtx), visible -> resume normal; (4) neural-voice-fix-test.js section 6 (13 check T-023, total 42/42 PASS); node --check PASS (97 file); neural-voice-test.js PASS 39/0; Quality Gate penuh lokal 46/46 script PASS (termasuk remote-push-test.js 16/16 dgn rfc8030TopicSanitized, regression-test.js hang di node v24/Windows = isu lingkungan, PASS di CI node 22); verifier VERIFY-TAKEOVER-001: diff/evidence/regression/forbidden PASS, objective+CI FAIL hanya karena kode belum di-commit; DIPERBAIKI: commit 7 file + CI QG hijau untuk kode T-023 + push fix (lihat evidence verifikasi ulang). KONTRAK PUBLIK TIDAK BERUBAH (hanya bertambah).",
                       "title":  "Fix tab lifecycle: tab FIEZEL stuck/force-close saat pindah tab (release neural voice + AudioContext saat hidden)",
                       "status":  "done"
+                  },
+                  {
+                      "id":  "T-024-A4",
+                      "title":  "Audit config aktif OpenCode: migrasi provider/model ke opencode-go/kimi-k3 + normalisasi field model ledger",
+                      "status":  "done",
+                      "owner":  "agent-4",
+                      "evidence":  "analysis/agent-model-config-audit.md (baru) + TASKS-LEDGER.json (metadata). Bukti config aktif: opencode.jsonc top-level model+small_model=enabled_providers=['opencode-go']+15/15 agent model='opencode-go/kimi-k3'; agent/verifier.md + agent/squad-member.md model='opencode-go/kimi-k3'; command/squad.md agent=agent-5. Validasi nyata (node v24.19.0): STRICT-JSON OK opencode.jsonc (tanpa komentar/trailing comma) + TASKS-LEDGER.json agents=17 tasks=23 missions=12. Model slug diverifikasi di models.dev: provider opencode-go (env OPENCODE_API_KEY, api opencode.ai/zen/go/v1) memuat model kimi-k3. Ledger: 15 field model agen dinormalisasi zen-agent-N/deepseek-v4-flash-free -> opencode-go/kimi-k3; coordinator-1/executor-1 tetap tanpa field model. PRASYARAT JUJUR: OPENCODE_API_KEY ABSENT di shell audit; perubahan config butuh RESTART proses OpenCode yang sudah berjalan (tidak diklaim sudah aktif).",
+                      "note":  "Scope-lock T-024-A4: hanya analysis/agent-model-config-audit.md + TASKS-LEDGER.json yang diubah; tidak menyentuh config global, agent markdown, source/neural voice/SW/app/CI/vendor. Riwayat task/mission/last_report lama tidak ditulis ulang."
+                  },
+                  {
+                      "id":  "T-025",
+                      "title":  "Migrasi config aktif OpenCode ke OpenCode Go Kimi K3 (opencode-go/kimi-k3) — dicatat di ledger",
+                      "status":  "done",
+                      "owner":  "agent-5",
+                      "evidence":  "Config aktif C:\\Users\\WINDOWS\\.config\\opencode\\opencode.jsonc telah dimigrasi & divalidasi Agent 5 di luar repo (root_cause_context CONFIRMED): model+small_model='opencode-go/kimi-k3', enabled_providers=['opencode-go'], 15 agen (agent-1..15) semuanya 'opencode-go/kimi-k3'. Catatan ledger: T-024-A4 memverifikasi selector, jumlah agen (15), dan file aktif; slug kimi-k3 tervalidasi via models.dev (provider opencode-go). PRASYARAT: env OPENCODE_API_KEY belum terlihat di shell audit; sesi OpenCode yang sedang berjalan belum otomatis berpindah model (butuh restart).",
+                      "note":  "Entri pencatatan migrasi di ledger (bukan perubahan config; config global di luar scope repo). Entri lama di T-014/T-015 yang menyebut zen/deepseek adalah riwayat sesi lama dan TIDAK ditulis ulang."
                   }
               ],
     "last_report":  {
