@@ -21,7 +21,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Apply bounded device hotfix
-        run: python .github/neural-device-hotfix.py
+        run: |
+          python .github/neural-device-hotfix.py
+          python .github/neural-device-hotfix-fixup.py
       - name: Validate targeted neural hotfix
         run: |
           node --check features/neural-voice/fiezel-neural-voice-bootstrap.js
