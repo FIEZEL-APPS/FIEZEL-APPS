@@ -36,7 +36,11 @@ const ctx={
   location:{origin:'https://fiezel-apps.github.io',href:'https://fiezel-apps.github.io/FIEZEL-APPS/'},
   navigator:{userAgent:'iPhone',standalone:true},
   matchMedia:()=>({matches:true}),
-  localStorage:{getItem:k=>k==='fiezel-neural-voice-diagnostics-v1'?JSON.stringify(diag):null},
+  // Keep the raw localStorage target absent so this test measures exactly the
+  // two runtimeDiagnostics occurrences. Real exports may legitimately contain
+  // the same phase in both target and runtimeDiagnostics; search counts all
+  // visible occurrences by design.
+  localStorage:{getItem:()=>null},
   FIEZEL_VERSION:'5.19.0',
   FiezelVoiceRuntime:{status:()=>({wasmPolicy:'apple-standalone-single-thread-direct'}),diagnostics:()=>diag}
 };
