@@ -1,19 +1,16 @@
 name: Configure FIEZEL Core Worker
 
-# Resume trigger: verified deployment continuation; targeted transport recovery; deploy-authorized run 2026-08-13.
+# MASTER-ONLY: configuration is never triggered by a repository push.
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/configure-core.yml'
+
+permissions:
+  contents: read
 
 jobs:
   configure:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[configure-core]')
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     env:
       FIEZEL_CORE_WORKER_URL: https://fiezel-core.puter.work
     steps:
