@@ -76,6 +76,17 @@
     }
 
     function stop() { if (source) { try { source.stop(); } catch (_) {} source = null; } }
+    // T-023 lifecycle: release the shared AudioContext so a hidden/backgrounded
+    // tab does not keep the neural-voice audio graph alive (WebKit caps live
+    // contexts; close() allows re-init on next speak()).
+    function close() {
+      stop();
+      const current = env.__fiezelWebAudioContext;
+      if (current) {
+        try { if (typeof current.close === 'function') current.close(); } catch (_) {}
+        env.__fiezelWebAudioContext = null;
+      }
+    }
     function warm() {
       if (!AudioContextCtor) return false;
       try {
@@ -84,7 +95,7 @@
         return true;
       } catch (_) { return false; }
     }
-    return Object.freeze({ play, stop, warm });
+    return Object.freeze({ play, stop, warm, close });
   }
 
   return Object.freeze({ createPlayer, pickSamples, pickSampleRate });
