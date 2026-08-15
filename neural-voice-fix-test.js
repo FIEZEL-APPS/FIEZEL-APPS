@@ -35,10 +35,11 @@ function loadModule(rel, extraGlobals) {
 
 // --- AudioContext tiruan yang menghitung instansiasi -------------------------
 function makeAudioEnv() {
-  const env = { created: 0 };
+  const env = { created: 0, closed: 0 };
   env.AudioContext = function () {
     env.created++;
     this.state = 'suspended';
+    this.close = () => { env.closed++; this.state = 'closed'; return Promise.resolve(); };
     this.resume = () => { this.state = 'running'; return Promise.resolve(); };
     this.createBuffer = () => ({ copyToChannel() {} });
     this.createBufferSource = () => ({ connect() {}, start() {}, stop() {}, onended: null });
@@ -183,6 +184,45 @@ async function main() {
       (bootstrap.match(/async function speak\(/g) || []).length === 1);
     check('version.js tidak ikut diubah oleh perbaikan ini',
       read('version.js').indexOf("'5.19.0'") !== -1);
+  }
+
+  console.log('\n6 — T-023 lifecycle release/close (ADDITIVE)');
+  {
+    const playerSrc = read(PLAYER);
+    check('player mengekspos close() di API publik',
+      /Object\.freeze\(\{ play, stop, warm, close \}\)/.test(playerSrc));
+    check('close() menutup konteks bersama via env.__fiezelWebAudioContext',
+      /env\.__fiezelWebAudioContext\s*=\s*null/.test(playerSrc));
+
+    const { api } = loadModule(PLAYER);
+    const env = makeAudioEnv();
+    const p1 = api.createPlayer(env);
+    p1.warm();
+    check('sebelum close: 1 konteks dibuat', env.created === 1);
+    p1.close();
+    check('close() menutup konteks bersama', env.closed === 1, 'closed=' + env.closed);
+    check('close() menghapus referensi konteks dari env', !env.__fiezelWebAudioContext);
+    const p2 = api.createPlayer(env);
+    p2.warm();
+    check('setelah close: warm() membuat konteks baru (re-init on demand)',
+      env.created === 2, 'created=' + env.created);
+    check('player baru tetap bisa stop() setelah close', typeof p2.stop === 'function');
+
+    const bootstrap = read(BOOTSTRAP);
+    check('bootstrap mengekspos release() di FiezelVoiceRuntime',
+      /speak,stop,release,verifyCachedAssets/.test(bootstrap));
+    check('release() memanggil stop service + cancel browser TTS',
+      /function release\(\)\{[\s\S]*?service\?\.stop\?\.\(\)[\s\S]*?speechSynthesis\?\.cancel\?\.\(\)/.test(bootstrap));
+    check('release() menutup player via FiezelWebAudioPlayer.createPlayer().close()',
+      /FiezelWebAudioPlayer\?\.createPlayer\?\.\(root\)\?\.close\?\.\(\)/.test(bootstrap));
+    check('release() melepas service/adapter/playerRef agar memori WASM bisa di-GC',
+      /playerRef=null;service=null;adapter=null;/.test(bootstrap));
+    check('release() mengembalikan status() dan mencatat diag released',
+      /diag\(\{phase:'released'\}\);[\s\S]*?return status\(\);/.test(bootstrap));
+
+    const appSrc = read('app.js');
+    check('app.js lifecycle handler memanggil FiezelVoiceRuntime.release saat hidden',
+      /visibilityState==='hidden'[\s\S]*?FiezelVoiceRuntime\.release\(\)/.test(appSrc));
   }
 
   console.log('');

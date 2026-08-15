@@ -345,10 +345,24 @@
     return result;
   }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
+  // T-023 lifecycle: bebaskan sesi neural + WebAudio saat tab tidak terlihat agar
+  // tab tidak dipaksa mati oleh browser (WASM 92MB+21MB + AudioContext tetap hidup
+  // saat hidden). ADDITIVE — kontrak publik tidak berubah; init ulang on-demand
+  // terjadi otomatis lewat speak()/ensureReady() berikutnya.
+  function release(){
+    try{service?.stop?.()}catch{}
+    try{root.speechSynthesis?.cancel?.()}catch{}
+    speechActive=false;
+    try{root.FiezelWebAudioPlayer?.createPlayer?.(root)?.close?.()}catch{}
+    playerRef=null;service=null;adapter=null;
+    phase='idle';lastError='';audibleVerified=false;
+    diag({phase:'released'});
+    return status();
+  }
 
   diag({phase:'bootstrap_loaded',crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),cacheAvailable:('caches'in root)});
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
     if(prepared){phase='cached';diag({phase:'prepared_idle'});}
   }).catch(()=>{});
-  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
+  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,release,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
 })(typeof globalThis!=='undefined'?globalThis:this);
