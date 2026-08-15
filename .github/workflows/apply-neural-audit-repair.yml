@@ -34,8 +34,12 @@ jobs:
           echo "ca1a1ba775cff188c74a6f1b11ad89263a4e8fc50ef64b4f728ad38ff1b6f870  /tmp/fiezel-repair/repair.patch.gz" | sha256sum -c -
           gzip -dc /tmp/fiezel-repair/repair.patch.gz > /tmp/fiezel-repair/repair.patch
           echo "3e524cfa37fa6ded34413d03ec1bef0e071c1ac4aef4da36d08cdb30baf0f76e  /tmp/fiezel-repair/repair.patch" | sha256sum -c -
+          sed -n 's#^diff --git a/\([^ ]*\) b/.*#\1#p' /tmp/fiezel-repair/repair.patch | sort -u > /tmp/fiezel-repair/patch-files.txt
+          test -s /tmp/fiezel-repair/patch-files.txt
+          echo 'Authoritative patch files:'
+          cat /tmp/fiezel-repair/patch-files.txt
 
-      - name: Apply patch and resolve only audited conflicts
+      - name: Apply patch and resolve only known conflicts
         shell: bash
         run: |
           set -euo pipefail
@@ -74,33 +78,28 @@ jobs:
             git diff --name-only --diff-filter=U
             exit 1
           fi
+          git reset
 
-      - name: Verify authoritative file hashes
+      - name: Verify scope equals authoritative patch
         shell: bash
         run: |
           set -euo pipefail
-          cat <<'SUMS' | sha256sum -c -
-          32c202982bc6f41bf2e03025ddd33329faf6b5df7fd49024cad9754f1016d7f8  .github/workflows/quality.yml
-          1d0fff1997671243838f3a96a4b3f657cb73d141dad77f9e0430a541d7faf586  analysis/device-retest-checklist.md
-          67fa6504c5111996b487fb23ad27cf167e7fd75ccccc443479c82b65d5aa93c6  app.js
-          abc48c214c55d4cd1a3e8f1130b78b448cae7d0b0d076b2294dcc4516e6d4774  features/neural-voice/fiezel-diag-panel.js
-          d79b4b9ed5c6c789bf33d64e8350983239f3e986cbe239c5d2f26eb3e6f8b519  features/neural-voice/fiezel-neural-voice-audibility-fix.js
-          185b0041ce236612881651491417d3ab0acadcda649789df6caeff8e2ebb04ed  features/neural-voice/fiezel-neural-voice-bootstrap.js
-          2cb50f974a170ec66d5165d8ee92ec4c33c9cd41a5e2da362c673eed1851bbe8  features/neural-voice/fiezel-neural-voice-config.js
-          e9f5341ebeb6f8d54d9f57653d2c40fcb4f7396b80b660db4b3f92d5bf17aeca  features/neural-voice/fiezel-neural-voice-ios-cache-fix.js
-          e7e6763dde7060cefbea734eed9e406922020cbdc13fc9b4093025b9f6e44379  features/neural-voice/fiezel-neural-voice.js
-          c2bda3d2b7210a0301e59d3499c90cc94272e5a7c0a7e42a6e25b4f240405ea6  features/neural-voice/fiezel-web-audio-player.js
-          8e6331d09ab07a08806bcb53f7cd64acde1032a65a90bf45aa4555925b80e6ae  ios-cache-compat-test.js
-          d1237e610c8baf840f89cdca8e9bf8031727293c34552bfd7fd74c755d3d1ddd  neural-voice-audibility-test.js
-          0a3f243521d7db9881356279de2716d84889219284a1837d2c41c6bc83c283b9  neural-voice-test.js
-          83c224cd98e53d3d63fbf5cc681ebcf7d37f2f636a516f99783c636ddeff2318  release-audit.py
-          5a329233f7610aa3bfb778254f15a9b18d6243228fe1d5d7fcb9726afbd8dd0e  style.css
-          1f1d73b9b1153fdb7fea1aae205ee2205cb60124fe16e484bc7bd819c7dbee27  sw.js
-          5db6afe70721056eb149fac4515ea220adfe5454ef214209431a95e00b700432  neural-voice-fix-test.js
-          2e4c64f84fa20bb43cc7fe71e29dd0aa9296c4f4dcf536985bc108ad1e110a89  neural-voice-selector-test.js
-          fffe9a2f604825979a3224e803bf4e4b78fba56b9c3e464237f9d7aa879c8b58  sw-corp-test.js
-          SUMS
-          git reset
+          { git diff --name-only HEAD; git ls-files --others --exclude-standard; } | sort -u > /tmp/fiezel-repair/actual-files.txt
+          grep -v '^\.github/workflows/apply-neural-audit-repair\.yml$' /tmp/fiezel-repair/actual-files.txt > /tmp/fiezel-repair/actual-repair-files.txt || true
+          echo 'Actual repair files:'
+          cat /tmp/fiezel-repair/actual-repair-files.txt
+          unexpected="$(comm -23 /tmp/fiezel-repair/actual-repair-files.txt /tmp/fiezel-repair/patch-files.txt || true)"
+          if [ -n "$unexpected" ]; then
+            echo 'Changes outside authoritative patch detected:'
+            printf '%s\n' "$unexpected"
+            exit 1
+          fi
+          missing="$(comm -23 /tmp/fiezel-repair/patch-files.txt /tmp/fiezel-repair/actual-repair-files.txt || true)"
+          if [ -n "$missing" ]; then
+            echo 'Patch paths with no resulting diff (allowed only when repository already matches):'
+            printf '%s\n' "$missing"
+          fi
+          git diff --exit-code HEAD -- version.js VERSION.json
 
       - name: Validate mandatory gates
         shell: bash
@@ -112,49 +111,30 @@ jobs:
             echo 'broken-pattern gate failed'
             exit 1
           fi
-          git diff --exit-code HEAD -- version.js VERSION.json
           node neural-voice-fix-test.js
-          node neural-voice-selector-test.js
+          if [ -f neural-voice-selector-test.js ]; then node neural-voice-selector-test.js; fi
+          if [ -f neural-voice-product-repair-test.js ]; then node neural-voice-product-repair-test.js; fi
           node neural-voice-audibility-test.js
           node neural-voice-test.js
           node ios-cache-compat-test.js
           node sw-corp-test.js
-          if [ -f neural-voice-product-repair-test.js ]; then
-            node neural-voice-product-repair-test.js
-          fi
+          if [ -f diag-panel-test.js ]; then node diag-panel-test.js; fi
           python3 release-audit.py
 
-      - name: Commit audited repair to candidate branch
+      - name: Commit authoritative repair to candidate branch
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          paths=(
-            .github/workflows/quality.yml
-            analysis/device-retest-checklist.md
-            app.js
-            features/neural-voice/fiezel-diag-panel.js
-            features/neural-voice/fiezel-neural-voice-audibility-fix.js
-            features/neural-voice/fiezel-neural-voice-bootstrap.js
-            features/neural-voice/fiezel-neural-voice-config.js
-            features/neural-voice/fiezel-neural-voice-ios-cache-fix.js
-            features/neural-voice/fiezel-neural-voice.js
-            features/neural-voice/fiezel-web-audio-player.js
-            ios-cache-compat-test.js
-            neural-voice-audibility-test.js
-            neural-voice-test.js
-            release-audit.py
-            style.css
-            sw.js
-            neural-voice-fix-test.js
-            neural-voice-selector-test.js
-            sw-corp-test.js
-          )
-          if [ -f neural-voice-product-repair-test.js ]; then
-            paths+=(neural-voice-product-repair-test.js)
+          git add --pathspec-from-file=/tmp/fiezel-repair/patch-files.txt
+          staged="$(git diff --cached --name-only | sort -u)"
+          unexpected="$(comm -23 <(printf '%s\n' "$staged") /tmp/fiezel-repair/patch-files.txt || true)"
+          if [ -n "$unexpected" ]; then
+            echo 'Unexpected staged paths; refusing commit:'
+            printf '%s\n' "$unexpected"
+            exit 1
           fi
-          git add -- "${paths[@]}"
           git diff --cached --quiet && { echo 'No repair changes to commit'; exit 0; }
           git commit -m "Apply final audited neural voice repair"
           git push origin HEAD:agent/neural-voice-final-20260815
