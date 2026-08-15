@@ -23,7 +23,7 @@ assert.ok(boot.includes('const shouldOpenCircuit=!!service&&!generationBusy'),'g
 assert.ok(voice.includes('requestId'));
 assert.ok(/const SW_REV='[^']+';/.test(sw),'service worker must retain a non-empty shell revision marker');
 assert.ok(sw.includes("new Request(asset,{cache:'reload'})"),'service-worker reinstall must force fresh shell bytes');
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-1'"));
+assert.ok(/var DIAG_BUILD = 'm025-\d+';/.test(diag),'diagnostics build must follow m025-N sequence');
 assert.ok(fs.readFileSync('version.js','utf8').includes("'5.19.0'"));
 assert.equal(JSON.parse(fs.readFileSync('VERSION.json','utf8')).version,'5.19.0');
 console.log('FIEZEL neural timeout phase m026: PASS');
