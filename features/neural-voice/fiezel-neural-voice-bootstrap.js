@@ -10,7 +10,7 @@
   const LARGE_ASSET_STREAM_THRESHOLD=8*1024*1024;
   const STORAGE_RESERVE_BYTES=24*1024*1024;
   const DOWNLOAD_ATTEMPTS=2;
-  const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
+  const NEURAL_GENERATION_TIMEOUT_MS=Number(root.FIEZEL_GENERATION_TIMEOUT_MS)||Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
@@ -71,11 +71,7 @@
   }
   function status(){
     const stored=readStatus();
-    // timeoutMs = ambang efektif terlama sebelum jatuh ke suara browser.
-    // lastFallbackReason = kenapa fallback terakhir terjadi; sebelumnya alasannya
-    // hanya masuk localStorage lewat diag() dan tak pernah terlihat dari status().
-    const timeoutMs=Math.max(NEURAL_TTS_TIMEOUT_MS,INITIALIZE_TIMEOUT_MS);
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs,lastFallbackReason,wasmPolicy});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -128,8 +124,6 @@
       const contentType=String(response.headers?.get?.('content-type')||'');
       const isLarge=item.bytes>=LARGE_ASSET_STREAM_THRESHOLD;
       if(!cachedContentTypeIsValid(item,contentType))return{url,valid:false,length,contentType,reason:'mime'};
-      // For streamed large assets, a CDN may preserve encoded transfer Content-Length.
-      // Cache presence is the reliable low-memory signal; cache.put rejects an incomplete body stream.
       if(!isLarge&&length&&length!==item.bytes)return{url,valid:false,length,contentType,reason:'size'};
       return{url,valid:true,length,contentType};
     }catch{return{url,valid:false,length:0,contentType:''}}
@@ -158,8 +152,6 @@
     return true;
   }
   async function putFetchedAsset(cache,item,url,fetched){
-    // Module scripts and streaming WebAssembly need deterministic MIME types in Cache Storage.
-    // Safari rejects an ESM import when a cached .mjs response is application/octet-stream.
     const contentType=requiredContentType(item)||fetched.headers?.get?.('content-type')||'application/octet-stream';
     if(item.bytes>=LARGE_ASSET_STREAM_THRESHOLD){
       await cache.put(url,new Response(fetched.body,{status:fetched.status||200,statusText:fetched.statusText||'',headers:{'Content-Type':contentType}}));
@@ -248,7 +240,7 @@
       });
       await adapter.initialize();
       const player=root.FiezelWebAudioPlayer.createPlayer(root);
-      service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play});
+      service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
       phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;diag({phase:'init_ready',elapsedMs:Date.now()-initStartedAt});return service;
     })().catch(error=>{phase='error';lastError=errorText(error);service=null;adapter=null;initFailedThisSession=true;initTimedOutThisSession=false;diag({phase:'init_error',error:lastError});throw error}).finally(()=>{backendInitPromise=null});
     return backendInitPromise;
@@ -259,10 +251,6 @@
     initializePromise=(async()=>{
       const timedOut=Symbol('fiezel-init-timeout');
       let backendError=null;
-      // Timeout membatasi berapa lama satu caller menunggu, bukan membatalkan
-      // Kokoro/ONNX yang sudah berjalan. Task backend disimpan terpisah agar
-      // penyelesaian terlambat tetap diadopsi dan retry tidak membuat session
-      // model kedua di memori.
       const observed=startBackendInitialize().catch(error=>{backendError=error;return null});
       const result=await Promise.race([observed,delay(INITIALIZE_TIMEOUT_MS).then(()=>timedOut)]);
       if(result===timedOut){
@@ -337,24 +325,22 @@
       diag({phase:'speak_init_error',error:lastError,elapsedMs:Date.now()-speakInitStartedAt});
       return fallbackOrThrow(error);
     }
-    const timeout=Symbol('fiezel-tts-timeout');
-    let neuralError=null;
     const voice=options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary;
-    const generationStartedAt=Date.now();
-    diag({phase:'speak_generate_start',voice:String(voice),timeoutMs:NEURAL_TTS_TIMEOUT_MS});
-    const neural=()=>local.speak(text,{voice,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
-    const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;neuralError=error;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
-    if(result===null||result===timeout){
-      lastError=result===timeout?'neural_tts_timeout':lastError;
+    const neuralStartedAt=Date.now();
+    diag({phase:'speak_neural_start',voice:String(voice),generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
+    let result;
+    try{
+      result=await local.speak(text,{voice,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
+    }catch(error){
+      lastError=errorText(error);lastFallbackReason=lastError;
       const shouldOpenCircuit=!!service;
-      lastFallbackReason=lastError;
-      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,elapsedMs:Date.now()-generationStartedAt,voice:String(voice)});
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
       try{service?.stop?.()}catch{}
-      return fallbackOrThrow(neuralError||new Error(lastError));
+      return fallbackOrThrow(error);
     }
     circuitOpen=false;audibleVerified=true;lastError='';lastFallbackReason='';phase='ready';
-    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||voice||''),elapsedMs:Date.now()-generationStartedAt});
+    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||voice||''),requestId:String(result?.requestId||''),elapsedMs:Date.now()-neuralStartedAt});
     return result;
   }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
