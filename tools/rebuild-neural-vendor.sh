@@ -27,11 +27,11 @@ COMMITTED_BUNDLE="$ROOT/$(read_lock runtime.bundle.path)"
 INTEGRATION_PATCH_REL="$(read_lock provider.sourcePatches.0.path)"
 INTEGRATION_PATCH_EXPECTED_SHA="$(read_lock provider.sourcePatches.0.sha256)"
 INTEGRATION_PATCH="$ROOT/$INTEGRATION_PATCH_REL"
-SAFARI_PATCH_REL="$(read_lock dependencies.phonemizerSafariPatch.path)"
-SAFARI_PATCH_EXPECTED_SHA="$(read_lock dependencies.phonemizerSafariPatch.sha256)"
-SAFARI_PATCH_BASE="$(read_lock dependencies.phonemizerSafariPatch.baseCommit)"
-SAFARI_PATCH_HEAD="$(read_lock dependencies.phonemizerSafariPatch.headCommit)"
-SAFARI_PATCH="$ROOT/$SAFARI_PATCH_REL"
+SAFARI_FIX_PATH="$(read_lock dependencies.phonemizerSafariUpstreamFix.sourcePath)"
+SAFARI_FIX_BLOB="$(read_lock dependencies.phonemizerSafariUpstreamFix.sourceBlobGitSha)"
+SAFARI_FIX_BASE="$(read_lock dependencies.phonemizerSafariUpstreamFix.baseCommit)"
+SAFARI_FIX_HEAD="$(read_lock dependencies.phonemizerSafariUpstreamFix.headCommit)"
+SAFARI_FIX_PR="$(read_lock dependencies.phonemizerSafariUpstreamFix.upstreamPullRequest)"
 
 if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
   echo "REPRO FAIL: unexpected provider repository: $PROVIDER_REPO" >&2
@@ -41,8 +41,12 @@ if [[ "$PHONEMIZER_VERSION" != "1.2.1" || "$PHONEMIZER_REPO" != "xenova/phonemiz
   echo "REPRO FAIL: unexpected phonemizer provenance: version=$PHONEMIZER_VERSION repo=$PHONEMIZER_REPO" >&2
   exit 1
 fi
-if [[ "$SAFARI_PATCH_BASE" != "$PHONEMIZER_COMMIT" ]]; then
-  echo "REPRO FAIL: Safari patch base must equal pinned phonemizer commit" >&2
+if [[ "$SAFARI_FIX_BASE" != "$PHONEMIZER_COMMIT" ]]; then
+  echo "REPRO FAIL: Safari upstream fix base must equal pinned phonemizer commit" >&2
+  exit 1
+fi
+if [[ "$SAFARI_FIX_PATH" != "src/espeakng.worker.js" ]]; then
+  echo "REPRO FAIL: Safari upstream fix must be scoped to src/espeakng.worker.js" >&2
   exit 1
 fi
 if [[ ! -f "$INTEGRATION_PATCH" ]]; then
@@ -53,16 +57,6 @@ PATCH_SHA="$(sha256sum "$INTEGRATION_PATCH" | awk '{print $1}')"
 if [[ "$PATCH_SHA" != "$INTEGRATION_PATCH_EXPECTED_SHA" ]]; then
   echo "REPRO FAIL: FIEZEL integration patch hash differs from source lock" >&2
   echo "expected=$INTEGRATION_PATCH_EXPECTED_SHA actual=$PATCH_SHA" >&2
-  exit 1
-fi
-if [[ ! -f "$SAFARI_PATCH" ]]; then
-  echo "REPRO FAIL: source-locked Safari phonemizer patch is missing: $SAFARI_PATCH_REL" >&2
-  exit 1
-fi
-SAFARI_PATCH_SHA="$(sha256sum "$SAFARI_PATCH" | awk '{print $1}')"
-if [[ "$SAFARI_PATCH_SHA" != "$SAFARI_PATCH_EXPECTED_SHA" ]]; then
-  echo "REPRO FAIL: Safari phonemizer patch hash differs from source lock" >&2
-  echo "expected=$SAFARI_PATCH_EXPECTED_SHA actual=$SAFARI_PATCH_SHA" >&2
   exit 1
 fi
 
@@ -107,16 +101,44 @@ if s.count(needle) != 1:
 p.write_text(s.replace(needle, replacement))
 PY
 
-# Source-derived phonemizer override + narrowly scoped upstream Safari compatibility
-# patch. Both are hash-locked and applied against the exact pinned phonemizer commit.
+# Source-derived phonemizer override + exact upstream Safari worker fix.
+# The Safari bytes are consumed from the exact PR head and verified by commit,
+# changed-path closure, and Git blob SHA. No hand-authored patch is replayed.
 OVERRIDE="$ROOT/vendor/kokoro-js/source-overrides/phonemizer.js"
 if [[ -f "$OVERRIDE" ]]; then
   echo "[repro] applying source-derived phonemizer override from $PHONEMIZER_REPO@$PHONEMIZER_COMMIT"
   git clone --quiet "https://github.com/${PHONEMIZER_REPO}.git" "$WORK_DIR/phonemizer"
   git -C "$WORK_DIR/phonemizer" checkout --quiet "$PHONEMIZER_COMMIT"
-  echo "[repro] applying Safari ReadableStream compatibility patch source-derived from upstream head $SAFARI_PATCH_HEAD"
-  git -C "$WORK_DIR/phonemizer" apply --check "$SAFARI_PATCH"
-  git -C "$WORK_DIR/phonemizer" apply "$SAFARI_PATCH"
+
+  echo "[repro] fetching exact upstream Safari PR #$SAFARI_FIX_PR head $SAFARI_FIX_HEAD"
+  git -C "$WORK_DIR/phonemizer" fetch --quiet --no-tags origin "refs/pull/${SAFARI_FIX_PR}/head"
+  FETCHED_HEAD="$(git -C "$WORK_DIR/phonemizer" rev-parse FETCH_HEAD)"
+  if [[ "$FETCHED_HEAD" != "$SAFARI_FIX_HEAD" ]]; then
+    echo "REPRO FAIL: upstream PR head drifted" >&2
+    echo "expected=$SAFARI_FIX_HEAD actual=$FETCHED_HEAD" >&2
+    exit 1
+  fi
+  if ! git -C "$WORK_DIR/phonemizer" merge-base --is-ancestor "$SAFARI_FIX_BASE" "$SAFARI_FIX_HEAD"; then
+    echo "REPRO FAIL: Safari fix head is not descended from the pinned phonemizer base" >&2
+    exit 1
+  fi
+
+  CHANGED_FILES="$(git -C "$WORK_DIR/phonemizer" diff --name-only "$SAFARI_FIX_BASE" "$SAFARI_FIX_HEAD")"
+  if [[ "$CHANGED_FILES" != "$SAFARI_FIX_PATH" ]]; then
+    echo "REPRO FAIL: upstream Safari fix changed unexpected paths" >&2
+    printf 'expected=%s\nactual=%s\n' "$SAFARI_FIX_PATH" "$CHANGED_FILES" >&2
+    exit 1
+  fi
+
+  ACTUAL_SAFARI_BLOB="$(git -C "$WORK_DIR/phonemizer" rev-parse "$SAFARI_FIX_HEAD:$SAFARI_FIX_PATH")"
+  if [[ "$ACTUAL_SAFARI_BLOB" != "$SAFARI_FIX_BLOB" ]]; then
+    echo "REPRO FAIL: upstream Safari worker blob differs from source lock" >&2
+    echo "expected=$SAFARI_FIX_BLOB actual=$ACTUAL_SAFARI_BLOB" >&2
+    exit 1
+  fi
+
+  echo "[repro] materializing exact upstream worker blob $SAFARI_FIX_BLOB"
+  git -C "$WORK_DIR/phonemizer" show "$SAFARI_FIX_HEAD:$SAFARI_FIX_PATH" > "$WORK_DIR/phonemizer/$SAFARI_FIX_PATH"
   cp "$OVERRIDE" "$WORK_DIR/phonemizer/src/phonemizer.js"
   cd "$WORK_DIR/phonemizer"
   npm ci --ignore-scripts
@@ -150,10 +172,11 @@ BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
   echo "phonemizerCommit=$PHONEMIZER_COMMIT"
   echo "integrationPatch=$INTEGRATION_PATCH_REL"
   echo "integrationPatchSha256=$PATCH_SHA"
-  echo "safariPatch=$SAFARI_PATCH_REL"
-  echo "safariPatchSha256=$SAFARI_PATCH_SHA"
-  echo "safariPatchBase=$SAFARI_PATCH_BASE"
-  echo "safariPatchHead=$SAFARI_PATCH_HEAD"
+  echo "safariUpstreamPr=$SAFARI_FIX_PR"
+  echo "safariUpstreamBase=$SAFARI_FIX_BASE"
+  echo "safariUpstreamHead=$SAFARI_FIX_HEAD"
+  echo "safariUpstreamPath=$SAFARI_FIX_PATH"
+  echo "safariUpstreamBlob=$SAFARI_FIX_BLOB"
   echo "expectedSha256=$EXPECTED_SHA"
   echo "expectedSize=$EXPECTED_SIZE"
   echo "committedSha256=$COMMITTED_SHA"
