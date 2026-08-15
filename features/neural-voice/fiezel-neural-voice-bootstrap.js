@@ -15,7 +15,7 @@
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
   const assets=Object.freeze([
-    {path:'vendor/kokoro-js/kokoro.web.js',bytes:2135645},
+    {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-4',bytes:2136409},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',bytes:44484},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019},
     {path:'vendor/kokoro-model/config.json',bytes:45},
@@ -32,6 +32,8 @@
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
   let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
   function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
+  const VENDOR_STAGE_PHASES=new Set(['espeak_module_loaded','espeak_worker_promise_create','espeak_runtime_already_ready','espeak_runtime_wait','espeak_runtime_ready','espeak_worker_construct_enter','espeak_worker_construct_ready','espeak_initcache_enter','espeak_list_voices_enter','espeak_list_voices_return','espeak_initcache_ready','espeak_phonemize_enter','espeak_worker_await_ready','espeak_initcache_await_ready','espeak_set_voice_enter','espeak_set_voice_return','espeak_synthesize_enter','espeak_synthesize_return','espeak_synthesize_error']);
+  root.__fiezelNeuralVendorStage=entry=>{try{const vendorPhase=String(entry?.phase||'');if(VENDOR_STAGE_PHASES.has(vendorPhase))diag({phase:vendorPhase})}catch{}};
   function warmAudioGesture(){
     try{
       if(!playerRef&&root.FiezelWebAudioPlayer)playerRef=root.FiezelWebAudioPlayer.createPlayer(root);
@@ -215,7 +217,7 @@
       const initStartedAt=Date.now();
       diag({phase:'init_start'});
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
-      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js'));
+      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js?nv=m025-4'));
       try{
         const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
         const appleStandalone=root.navigator?.standalone===true;
