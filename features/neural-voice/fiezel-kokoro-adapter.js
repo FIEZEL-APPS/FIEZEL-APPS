@@ -56,6 +56,90 @@
       return String(error && (error.code || error.name) || 'error').slice(0, 80);
     }
 
+    function effectiveWasmPolicy() {
+      const runtime = typeof globalThis !== 'undefined' ? globalThis : {};
+      const standalone = runtime.navigator?.standalone === true || !!runtime.matchMedia?.('(display-mode: standalone)')?.matches;
+      const isolated = runtime.crossOriginIsolated === true;
+      if (standalone && !isolated && device === 'wasm') {
+        return Object.freeze({
+          policy: 'apple-standalone-single-thread-direct-default',
+          numThreads: 1,
+          proxy: false,
+          source: 'onnxruntime-web-1.22-runtime-default',
+          readBack: false
+        });
+      }
+      return Object.freeze({
+        policy: isolated ? 'onnxruntime-default-isolated' : 'onnxruntime-default-single-thread',
+        numThreads: isolated ? null : 1,
+        proxy: false,
+        source: 'onnxruntime-web-1.22-runtime-default',
+        readBack: false
+      });
+    }
+
+    function tokenCount(value) {
+      const dims = value && value.input_ids && value.input_ids.dims;
+      if (!dims || typeof dims.length !== 'number' || dims.length < 1) return null;
+      const last = Number(dims[dims.length - 1]);
+      return Number.isFinite(last) ? last : null;
+    }
+
+    function instrumentInstance(tts) {
+      if (!tts || tts.__fiezelStageProbeV1) return tts;
+      let tokenizer = false;
+      let model = false;
+
+      if (typeof Proxy === 'function' && typeof tts.tokenizer === 'function') {
+        const originalTokenizer = tts.tokenizer;
+        tts.tokenizer = new Proxy(originalTokenizer, {
+          apply(target, thisArg, args) {
+            const startedAt = Date.now();
+            stage('adapter_tokenizer_enter');
+            try {
+              const value = Reflect.apply(target, thisArg, args);
+              stage('adapter_tokenizer_resolved', { elapsedMs: Date.now() - startedAt, tokenCount: tokenCount(value) });
+              return value;
+            } catch (error) {
+              stage('adapter_tokenizer_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
+              throw error;
+            }
+          }
+        });
+        tokenizer = true;
+      }
+
+      if (typeof Proxy === 'function' && typeof tts.model === 'function') {
+        const originalModel = tts.model;
+        tts.model = new Proxy(originalModel, {
+          apply(target, thisArg, args) {
+            const startedAt = Date.now();
+            stage('adapter_model_enter');
+            let result;
+            try {
+              result = Reflect.apply(target, thisArg, args);
+              stage('adapter_model_dispatched', { elapsedMs: Date.now() - startedAt });
+            } catch (error) {
+              stage('adapter_model_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
+              throw error;
+            }
+            return Promise.resolve(result).then((value) => {
+              stage('adapter_model_resolved', { elapsedMs: Date.now() - startedAt });
+              return value;
+            }, (error) => {
+              stage('adapter_model_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
+              throw error;
+            });
+          }
+        });
+        model = true;
+      }
+
+      try { Object.defineProperty(tts, '__fiezelStageProbeV1', { value: true, configurable: false }); } catch (_) {}
+      stage('adapter_stage_probe_ready', { tokenizer, model });
+      return tts;
+    }
+
     async function getInstance() {
       if (!instancePromise) {
         kokoroEnv.allowRemoteModels = false;
@@ -63,11 +147,13 @@
         kokoroEnv.localModelPath = localModelPath;
         kokoroEnv.wasmPaths = wasmBasePath;
         setVoiceDataUrl(voiceBaseUrl);
+        stage('wasm_policy', effectiveWasmPolicy());
         const startedAt = Date.now();
         stage('adapter_instance_start', { dtype, device });
         instancePromise = Promise.resolve()
           .then(() => KokoroTTS.from_pretrained(modelId, { dtype, device }))
           .then((value) => {
+            instrumentInstance(value);
             stage('adapter_instance_ready', { elapsedMs: Date.now() - startedAt });
             return value;
           })
