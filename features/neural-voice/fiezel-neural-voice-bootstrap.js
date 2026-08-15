@@ -10,7 +10,7 @@
   const LARGE_ASSET_STREAM_THRESHOLD=8*1024*1024;
   const STORAGE_RESERVE_BYTES=24*1024*1024;
   const DOWNLOAD_ATTEMPTS=2;
-  const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?12000:20000);
+  const NEURAL_TTS_TIMEOUT_MS=Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
@@ -220,6 +220,8 @@
     backendInitPromise=(async()=>{
       if(!root.FiezelNeuralVoiceConfig||!root.FiezelKokoroAdapter||!root.FiezelNeuralVoice||!root.FiezelWebAudioPlayer)throw new Error('Neural voice runtime modules are missing');
       phase='initializing';lastError='';
+      const initStartedAt=Date.now();
+      diag({phase:'init_start'});
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
       const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js'));
       try{
@@ -247,7 +249,7 @@
       await adapter.initialize();
       const player=root.FiezelWebAudioPlayer.createPlayer(root);
       service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play});
-      phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;diag({phase:'init_ready'});return service;
+      phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;diag({phase:'init_ready',elapsedMs:Date.now()-initStartedAt});return service;
     })().catch(error=>{phase='error';lastError=errorText(error);service=null;adapter=null;initFailedThisSession=true;initTimedOutThisSession=false;diag({phase:'init_error',error:lastError});throw error}).finally(()=>{backendInitPromise=null});
     return backendInitPromise;
   }
@@ -325,24 +327,34 @@
       if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
       verifiedForSession=true;
     }
+    let local;
+    const speakInitStartedAt=Date.now();
+    try{
+      local=await initialize();
+      diag({phase:'speak_init_ready',elapsedMs:Date.now()-speakInitStartedAt});
+    }catch(error){
+      lastError=errorText(error);lastFallbackReason=lastError;audibleVerified=false;
+      diag({phase:'speak_init_error',error:lastError,elapsedMs:Date.now()-speakInitStartedAt});
+      return fallbackOrThrow(error);
+    }
     const timeout=Symbol('fiezel-tts-timeout');
     let neuralError=null;
-    const neural=async()=>{
-      const local=await initialize();
-      return local.speak(text,{voice:options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
-    };
+    const voice=options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary;
+    const generationStartedAt=Date.now();
+    diag({phase:'speak_generate_start',voice:String(voice),timeoutMs:NEURAL_TTS_TIMEOUT_MS});
+    const neural=()=>local.speak(text,{voice,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
     const result=await Promise.race([neural().catch(error=>{lastError=errorText(error);lastFallbackReason=lastError;neuralError=error;return null}),delay(NEURAL_TTS_TIMEOUT_MS).then(()=>timeout)]);
     if(result===null||result===timeout){
       lastError=result===timeout?'neural_tts_timeout':lastError;
       const shouldOpenCircuit=!!service;
       lastFallbackReason=lastError;
-      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit});
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,elapsedMs:Date.now()-generationStartedAt,voice:String(voice)});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
       try{service?.stop?.()}catch{}
       return fallbackOrThrow(neuralError||new Error(lastError));
     }
     circuitOpen=false;audibleVerified=true;lastError='';lastFallbackReason='';phase='ready';
-    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||options.voice||'')});
+    diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||voice||''),elapsedMs:Date.now()-generationStartedAt});
     return result;
   }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}

@@ -17,7 +17,7 @@
   // ada tempat menyuntik commit sha otomatis. Naikkan angkanya setiap kali panel
   // ini di-deploy — inilah cara owner membedakan "build baru sudah aktif" dari
   // "build lama masih dilayani service worker".
-  var DIAG_BUILD = 'm023-1';
+  var DIAG_BUILD = 'm024-1';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000; // di atas .answer-burst (130) dan .notification-gate (100)

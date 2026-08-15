@@ -63,3 +63,4 @@ jobs:
           node sw-corp-test.js
           node neural-voice-product-repair-test.js
           node neural-voice-device-hotfix-test.js
+          node neural-voice-timeout-phase-test.js

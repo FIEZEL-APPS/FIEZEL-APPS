@@ -12,6 +12,8 @@ assert.ok(!boot.includes("if(prepared)initialize().then(()=>diag({phase:'prewarm
 assert.ok(boot.includes("wasmEnv.numThreads=1"),'Apple policy must disable WASM multithreading');
 assert.ok(boot.includes("wasmEnv.proxy=true"),'Apple policy must offload WASM work to proxy worker');
 assert.ok(boot.includes("apple-standalone-single-thread-proxy"));
+assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must allow slower device inference');
+assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_generate_start'"),'init and speech timing must be diagnosed separately');
 assert.ok(boot.includes('initialized:!!service'));
 assert.ok(boot.includes('audibleVerified'));
 assert.ok(boot.includes('circuitOpen'));
@@ -22,7 +24,7 @@ assert.ok(aud.includes("if(neuralOnly)throw error"),'neural-only UI test must ne
 assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neural-only');
 assert.ok(sw.includes("'Cross-Origin-Embedder-Policy':'credentialless'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(diag.includes("var DIAG_BUILD = 'm023-1'"));
+assert.ok(diag.includes("var DIAG_BUILD = 'm024-1'"));
 assert.ok(diag.includes('puterWorkersLoaded'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
