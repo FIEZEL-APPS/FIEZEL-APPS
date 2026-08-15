@@ -12,11 +12,10 @@
   // localStorage, CacheStorage, atau IndexedDB. Nilai token autentikasi tidak pernah
   // diekspor; panel hanya mencatat presence boolean dan origin non-secret.
   //
-  // DIAG_BUILD adalah penanda manual. Repo ini tidak punya build step, jadi tidak
-  // ada tempat menyuntik commit sha otomatis. Naikkan angkanya setiap kali panel
-  // ini di-deploy — inilah cara owner membedakan "build baru sudah aktif" dari
-  // "build lama masih dilayani service worker".
-  var DIAG_BUILD = 'm025-1';
+  // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
+  // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
+  // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
+  var DIAG_BUILD = 'm025-2';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -164,6 +163,21 @@
     catch (error) { return 'Gagal membentuk JSON: ' + String(error && error.message || error); }
   }
 
+  function findMatches(value, query) {
+    var matches = [];
+    var needle = String(query || '').toLowerCase();
+    if (!needle) return matches;
+    var haystack = String(value || '').toLowerCase();
+    var from = 0;
+    while (from <= haystack.length) {
+      var found = haystack.indexOf(needle, from);
+      if (found < 0) break;
+      matches.push(found);
+      from = found + Math.max(needle.length, 1);
+    }
+    return matches;
+  }
+
   function build() {
     var host = root.document.createElement('div');
     host.id = 'fiezelDiagHost';
@@ -183,6 +197,14 @@
       '#fiezelDiagSheet.open{display:flex;}',
       '#fiezelDiagSheet h2{margin:0;font:700 15px/1.3 -apple-system,system-ui,sans-serif;color:#11172a;}',
       '#fiezelDiagSheet p{margin:0;font:400 12px/1.5 -apple-system,system-ui,sans-serif;color:#5f6c80;}',
+      '#fiezelDiagSearchBar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}',
+      '#fiezelDiagSearch{flex:1 1 180px;min-width:0;box-sizing:border-box;padding:10px 11px;',
+      'border:1px solid #cfd5df;border-radius:10px;background:#fff;color:#11172a;',
+      'font:500 13px/1.2 -apple-system,system-ui,sans-serif;}',
+      '#fiezelDiagSearchCount{min-width:52px;text-align:center;color:#5f6c80;',
+      'font:600 11px/1.2 -apple-system,system-ui,sans-serif;}',
+      '#fiezelDiagSearchBar button{padding:10px 11px;border-radius:10px;border:1px solid #dfddd6;',
+      'background:#fff;color:#11172a;font:600 12px/1 -apple-system,system-ui,sans-serif;}',
       '#fiezelDiagText{flex:1;width:100%;min-height:0;box-sizing:border-box;padding:9px;',
       'border:1px solid #dfddd6;border-radius:10px;background:#fbfbf9;color:#11172a;',
       'font:400 11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;-webkit-user-select:text;user-select:text;}',
@@ -205,7 +227,34 @@
     heading.textContent = 'Diagnostics · ' + DIAG_BUILD;
 
     var note = root.document.createElement('p');
-    note.textContent = 'Kirim isi kotak ini ke coordinator. Kalau tombol kirim tidak jalan, tahan di dalam kotak lalu pilih Select All dan Copy.';
+    note.textContent = 'Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu.';
+
+    var searchBar = root.document.createElement('div');
+    searchBar.id = 'fiezelDiagSearchBar';
+
+    var search = root.document.createElement('input');
+    search.id = 'fiezelDiagSearch';
+    search.type = 'search';
+    search.placeholder = 'Cari: wasm_policy, timeout, adapter...';
+    search.autocomplete = 'off';
+    search.spellcheck = false;
+
+    var searchCount = root.document.createElement('span');
+    searchCount.id = 'fiezelDiagSearchCount';
+    searchCount.textContent = 'Cari';
+
+    var previous = root.document.createElement('button');
+    previous.type = 'button';
+    previous.textContent = '↑ Sebelumnya';
+
+    var next = root.document.createElement('button');
+    next.type = 'button';
+    next.textContent = '↓ Berikutnya';
+
+    searchBar.appendChild(search);
+    searchBar.appendChild(searchCount);
+    searchBar.appendChild(previous);
+    searchBar.appendChild(next);
 
     var text = root.document.createElement('textarea');
     text.id = 'fiezelDiagText';
@@ -233,13 +282,18 @@
     bar.appendChild(close);
     sheet.appendChild(heading);
     sheet.appendChild(note);
+    sheet.appendChild(searchBar);
     sheet.appendChild(text);
     sheet.appendChild(bar);
     host.appendChild(style);
     host.appendChild(open);
     host.appendChild(sheet);
 
-    return { host: host, open: open, sheet: sheet, text: text, send: send, sendTarget: sendTarget, close: close };
+    return {
+      host: host, open: open, sheet: sheet, text: text,
+      search: search, searchCount: searchCount, previous: previous, next: next,
+      send: send, sendTarget: sendTarget, close: close
+    };
   }
 
   function share(button, label, payload) {
@@ -274,13 +328,54 @@
     body.appendChild(ui.host);
 
     var dump = null;
+    var matches = [];
+    var matchIndex = -1;
+
+    function selectMatch(index) {
+      var query = String(ui.search.value || '').trim();
+      if (!query) {
+        matches = [];
+        matchIndex = -1;
+        ui.searchCount.textContent = 'Cari';
+        return;
+      }
+      matches = findMatches(ui.text.value, query);
+      if (!matches.length) {
+        matchIndex = -1;
+        ui.searchCount.textContent = '0 hasil';
+        return;
+      }
+      matchIndex = ((index % matches.length) + matches.length) % matches.length;
+      ui.searchCount.textContent = (matchIndex + 1) + '/' + matches.length;
+      var start = matches[matchIndex];
+      safe(function(){
+        if (typeof ui.text.focus === 'function') ui.text.focus();
+        if (typeof ui.text.setSelectionRange === 'function') ui.text.setSelectionRange(start, start + query.length);
+      });
+    }
+
+    function refreshSearch() {
+      var query = String(ui.search.value || '').trim();
+      if (!query) {
+        matches = [];
+        matchIndex = -1;
+        ui.searchCount.textContent = 'Cari';
+        return;
+      }
+      selectMatch(0);
+    }
+
+    function setText() {
+      ui.text.value = serialize(dump);
+      refreshSearch();
+    }
 
     function refresh() {
       dump = collectSync();
       addRuntimeDiagnostics(dump);
-      ui.text.value = serialize(dump);
+      setText();
       Promise.all([addStorageEstimate(dump), addCacheInventory(dump)]).then(function(){
-        ui.text.value = serialize(dump);
+        setText();
       });
     }
 
@@ -291,6 +386,14 @@
     ui.close.addEventListener('click', function(){
       ui.sheet.classList.remove('open');
     });
+    ui.search.addEventListener('input', refreshSearch);
+    ui.search.addEventListener('keydown', function(event){
+      if (!event || event.key !== 'Enter') return;
+      if (event.preventDefault) event.preventDefault();
+      selectMatch(matchIndex + (event.shiftKey ? -1 : 1));
+    });
+    ui.previous.addEventListener('click', function(){ selectMatch(matchIndex - 1); });
+    ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
     ui.send.addEventListener('click', function(){
       share(ui.send, 'Kirim', ui.text.value);
     });
