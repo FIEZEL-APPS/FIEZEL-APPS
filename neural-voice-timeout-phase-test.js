@@ -21,7 +21,8 @@ assert.ok(voice.includes("phase: 'single_flight_ready'")&&voice.includes("patch:
 assert.ok(boot.includes("const generationBusy=lastError==='neural_generation_busy'"),'bootstrap must identify transient generation busy');
 assert.ok(boot.includes('const shouldOpenCircuit=!!service&&!generationBusy'),'generation busy must not permanently open neural circuit');
 assert.ok(voice.includes('requestId'));
-assert.ok(sw.includes("SW_REV='m026-neural-single-flight-20260815-1'"));
+assert.ok(/const SW_REV='[^']+';/.test(sw),'service worker must retain a non-empty shell revision marker');
+assert.ok(sw.includes("new Request(asset,{cache:'reload'})"),'service-worker reinstall must force fresh shell bytes');
 assert.ok(diag.includes("var DIAG_BUILD = 'm025-1'"));
 assert.ok(fs.readFileSync('version.js','utf8').includes("'5.19.0'"));
 assert.equal(JSON.parse(fs.readFileSync('VERSION.json','utf8')).version,'5.19.0');
