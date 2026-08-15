@@ -7,11 +7,12 @@ old="""      lastFallbackReason=lastError;
       diag({phase:'speak_fallback',reason:lastError,circuitOpen:true});
 """
 new="""      lastFallbackReason=lastError;
-      diag({phase:'speak_fallback',reason:lastError,circuitOpen:true});
-      circuitOpen=true;audibleVerified=false;phase='error';
+      const shouldOpenCircuit=!!service;
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit});
+      circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';
 """
 if s.count(old)!=1:
-    raise SystemExit(f'legacy-gate fixup expected 1 match, got {s.count(old)}')
+    raise SystemExit(f'circuit fixup expected 1 match, got {s.count(old)}')
 s=s.replace(old,new,1)
 old_guard="if(!readStatus().prepared&&!preparedFlag)return fallbackOrThrow(new Error('Neural voice assets are not prepared'));"
 new_guard="""if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak(text,options);
@@ -26,9 +27,7 @@ if s.count(old_storage)!=1:
 s=s.replace(old_storage,new_storage,1)
 p.write_text(s)
 
-# The old static assertion assumed every unprepared call must browser-fallback.
-# The hotfix intentionally adds a neural-only mode (allowFallback:false), so the
-# permanent regression gate must assert both sides of the new contract.
+# Update legacy/new tests to match the intentional neural-only contract.
 t=Path('neural-voice-test.js')
 ts=t.read_text()
 old_test='''  await test('bootstrap does not silently download before opt-in',()=>assert.ok(bootstrap.includes("if(!readStatus().prepared&&!preparedFlag)return browserSpeak")));'''
@@ -36,3 +35,11 @@ new_test='''  await test('bootstrap does not silently download before opt-in',()
 if ts.count(old_test)!=1:
     raise SystemExit(f'legacy neural opt-in assertion expected 1 match, got {ts.count(old_test)}')
 t.write_text(ts.replace(old_test,new_test,1))
+
+h=Path('neural-voice-device-hotfix-test.js')
+hs=h.read_text()
+old_hot="assert.ok(boot.includes(\"circuitOpen=true;audibleVerified=false\"),'neural timeout/failure must open circuit');"
+new_hot="assert.ok(boot.includes(\"const shouldOpenCircuit=!!service\")&&boot.includes(\"circuitOpen=shouldOpenCircuit;audibleVerified=false\"),'speech failure with initialized service must open circuit without blocking late init adoption');"
+if hs.count(old_hot)!=1:
+    raise SystemExit(f'hotfix circuit assertion expected 1 match, got {hs.count(old_hot)}')
+h.write_text(hs.replace(old_hot,new_hot,1))
