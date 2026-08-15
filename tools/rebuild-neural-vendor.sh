@@ -33,7 +33,7 @@ if [[ "$PHONEMIZER_VERSION" != "1.2.1" ]]; then
 fi
 
 mkdir -p "$OUT_DIR"
-rm -f "$OUT_DIR/kokoro.web.js" "$OUT_DIR/repro-report.txt"
+rm -f "$OUT_DIR/kokoro.web.js" "$OUT_DIR/repro-report.txt" "$OUT_DIR/diff-summary.txt"
 
 COMMITTED_SHA="$(sha256sum "$COMMITTED_BUNDLE" | awk '{print $1}')"
 COMMITTED_SIZE="$(stat -c '%s' "$COMMITTED_BUNDLE")"
@@ -104,6 +104,7 @@ BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
   echo "provider=$PROVIDER_REPO"
   echo "providerCommit=$PROVIDER_COMMIT"
   echo "node=$(node --version)"
+  echo "npm=$(npm --version)"
   echo "phonemizer=$INSTALLED_PHONEMIZER"
   echo "expectedSha256=$EXPECTED_SHA"
   echo "expectedSize=$EXPECTED_SIZE"
@@ -111,14 +112,55 @@ BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
   echo "committedSize=$COMMITTED_SIZE"
   echo "builtSha256=$BUILT_SHA"
   echo "builtSize=$BUILT_SIZE"
+  echo "sizeDelta=$((BUILT_SIZE - COMMITTED_SIZE))"
 } | tee "$OUT_DIR/repro-report.txt"
 
-if [[ "$BUILT_SHA" != "$EXPECTED_SHA" || "$BUILT_SIZE" != "$EXPECTED_SIZE" ]]; then
+if [[ "$BUILT_SHA" != "$EXPECTED_SHA" || "$BUILT_SIZE" != "$EXPECTED_SIZE" ]] || ! cmp -s "$OUT_DIR/kokoro.web.js" "$COMMITTED_BUNDLE"; then
+  python3 - "$COMMITTED_BUNDLE" "$OUT_DIR/kokoro.web.js" "$OUT_DIR/diff-summary.txt" <<'PY'
+from pathlib import Path
+import sys
+
+committed = Path(sys.argv[1]).read_bytes()
+built = Path(sys.argv[2]).read_bytes()
+out = Path(sys.argv[3])
+limit = min(len(committed), len(built))
+prefix = 0
+while prefix < limit and committed[prefix] == built[prefix]:
+    prefix += 1
+suffix = 0
+while suffix < limit - prefix and committed[-1-suffix] == built[-1-suffix]:
+    suffix += 1
+
+def snippet(data, center, radius=320):
+    start = max(0, center - radius)
+    end = min(len(data), center + radius)
+    return data[start:end].decode('utf-8', errors='backslashreplace').replace('\n', '\\n')
+
+lines = [
+    f'committedBytes={len(committed)}',
+    f'builtBytes={len(built)}',
+    f'lengthDelta={len(built)-len(committed)}',
+    f'commonPrefixBytes={prefix}',
+    f'commonSuffixBytes={suffix}',
+    f'committedChangedSpan={prefix}:{len(committed)-suffix}',
+    f'builtChangedSpan={prefix}:{len(built)-suffix}',
+    '',
+    '--- committed around first divergence ---',
+    snippet(committed, prefix),
+    '',
+    '--- rebuilt around first divergence ---',
+    snippet(built, prefix),
+    '',
+    '--- committed around end divergence ---',
+    snippet(committed, max(prefix, len(committed)-suffix)),
+    '',
+    '--- rebuilt around end divergence ---',
+    snippet(built, max(prefix, len(built)-suffix)),
+]
+out.write_text('\n'.join(lines), encoding='utf-8')
+print('\n'.join(lines[:7]))
+PY
   echo "REPRO FAIL: clean-room build differs from the locked committed bundle" >&2
-  exit 1
-fi
-if ! cmp -s "$OUT_DIR/kokoro.web.js" "$COMMITTED_BUNDLE"; then
-  echo "REPRO FAIL: hash metadata matched unexpectedly but bundle bytes differ" >&2
   exit 1
 fi
 
