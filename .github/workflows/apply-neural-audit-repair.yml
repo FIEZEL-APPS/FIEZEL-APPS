@@ -156,16 +156,26 @@ jobs:
           node diag-panel-test.js
           python3 release-audit.py
 
-      - name: Commit validated candidate
+      - name: Publish validated non-workflow candidate
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --pathspec-from-file=/tmp/fiezel-repair/allowed-files.txt
+
+          cp .github/workflows/quality.yml validated-quality.yml.txt
+          grep -v '^\.github/workflows/quality\.yml$' /tmp/fiezel-repair/allowed-files.txt > /tmp/fiezel-repair/push-files.txt
+          printf '%s\n' 'validated-quality.yml.txt' >> /tmp/fiezel-repair/push-files.txt
+          sort -u -o /tmp/fiezel-repair/push-files.txt /tmp/fiezel-repair/push-files.txt
+
+          git add --pathspec-from-file=/tmp/fiezel-repair/push-files.txt
           staged="$(git diff --cached --name-only | sort -u)"
-          unexpected="$(comm -23 <(printf '%s\n' "$staged") /tmp/fiezel-repair/allowed-files.txt || true)"
+          unexpected="$(comm -23 <(printf '%s\n' "$staged") /tmp/fiezel-repair/push-files.txt || true)"
           if [ -n "$unexpected" ]; then echo 'Unexpected staged paths:'; printf '%s\n' "$unexpected"; exit 1; fi
+          if git diff --cached --name-only | grep -q '^\.github/workflows/'; then
+            echo 'Workflow path unexpectedly staged; refusing push.'
+            exit 1
+          fi
           git diff --cached --quiet && { echo 'No candidate changes'; exit 0; }
-          git commit -m "Apply final audited neural voice repair"
+          git commit -m "Apply validated neural voice repair source"
           git push origin HEAD:agent/neural-voice-final-20260815
