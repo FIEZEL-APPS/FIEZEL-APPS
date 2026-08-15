@@ -4,12 +4,13 @@ const path=require('path');
 let failures=0;
 const check=(label,ok,detail)=>{if(ok)console.log('  ok   '+label);else{failures++;console.log('  FAIL '+label+(detail?' — '+detail:''))}};
 const src=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
-class H{constructor(init){this.m=new Map(Object.entries(init||{}).map(([k,v])=>[k.toLowerCase(),v]))}get(k){return this.m.get(String(k).toLowerCase())||null}set(k,v){this.m.set(String(k).toLowerCase(),v)}}
-class R{constructor(body,init={}){this.body=body;this.status=init.status??200;this.statusText=init.statusText||'';this.headers=init.headers instanceof H?init.headers:new H(init.headers);this.ok=this.status>=200&&this.status<300}}
+class H{constructor(init){this.m=init instanceof H?new Map(init.m):new Map(Object.entries(init||{}).map(([k,v])=>[k.toLowerCase(),v]))}get(k){return this.m.get(String(k).toLowerCase())||null}set(k,v){this.m.set(String(k).toLowerCase(),v)}}
+class R{constructor(body,init={}){this.body=body;this.status=init.status??200;this.statusText=init.statusText||'';this.headers=init.headers instanceof H?init.headers:new H(init.headers);this.ok=this.status>=200&&this.status<300}clone(){return new R(this.body,{status:this.status,statusText:this.statusText,headers:this.headers})}}
 function run(){const listeners={};let fetchCalls=0;const s={console,URL,Promise,Symbol,setTimeout,clearTimeout,Headers:H,Response:R,fetch:()=>{fetchCalls++;return Promise.resolve(new R('x'))},caches:{open:()=>Promise.resolve({addAll:()=>Promise.resolve(),put:()=>Promise.resolve(),match:()=>Promise.resolve()}),keys:()=>Promise.resolve([]),delete:()=>Promise.resolve(true),match:()=>Promise.resolve()},clients:{matchAll:()=>Promise.resolve([])},importScripts:()=>{s.self.FIEZEL_VERSION='5.19.0'},self:null};s.self=s;s.globalThis=s;s.location={origin:'https://fiezel-apps.github.io'};s.registration={showNotification:()=>{},update:()=>Promise.resolve()};s.addEventListener=(n,f)=>(listeners[n]=listeners[n]||[]).push(f);vm.createContext(s);vm.runInContext(src,s);return{listeners,get fetchCalls(){return fetchCalls}}}
 console.log('sw-corp-test');
-check('COEP uses credentialless',src.includes("'Cross-Origin-Embedder-Policy':'credentialless'"));
-check('SW revision bumped for device hotfix',src.includes("SW_REV='m024-neural-timeout-phase-20260815-1'"));
+check('COEP uses credentialless',src.includes("COEP_POLICY='credentialless'"));
+check('WebKit popup-compatible COOP exists',src.includes("'same-origin-allow-popups'"));
+check('SW revision bumped for m025',src.includes("SW_REV='m025-neural-puter-observability-20260815-1'"));
 const t=run();let captured=false;const req={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};(t.listeners.fetch||[]).forEach(fn=>fn({request:req,respondWith:()=>{captured=true}}));
 check('cross-origin Puter request is not intercepted',captured===false);
 check('cross-origin Puter request triggers no synthetic fetch',t.fetchCalls===0,'fetchCalls='+t.fetchCalls);
