@@ -27,6 +27,11 @@ COMMITTED_BUNDLE="$ROOT/$(read_lock runtime.bundle.path)"
 INTEGRATION_PATCH_REL="$(read_lock provider.sourcePatches.0.path)"
 INTEGRATION_PATCH_EXPECTED_SHA="$(read_lock provider.sourcePatches.0.sha256)"
 INTEGRATION_PATCH="$ROOT/$INTEGRATION_PATCH_REL"
+SAFARI_PATCH_REL="$(read_lock dependencies.phonemizerSafariPatch.path)"
+SAFARI_PATCH_EXPECTED_SHA="$(read_lock dependencies.phonemizerSafariPatch.sha256)"
+SAFARI_PATCH_BASE="$(read_lock dependencies.phonemizerSafariPatch.baseCommit)"
+SAFARI_PATCH_HEAD="$(read_lock dependencies.phonemizerSafariPatch.headCommit)"
+SAFARI_PATCH="$ROOT/$SAFARI_PATCH_REL"
 
 if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
   echo "REPRO FAIL: unexpected provider repository: $PROVIDER_REPO" >&2
@@ -34,6 +39,10 @@ if [[ "$PROVIDER_REPO" != "hexgrad/kokoro" ]]; then
 fi
 if [[ "$PHONEMIZER_VERSION" != "1.2.1" || "$PHONEMIZER_REPO" != "xenova/phonemizer.js" ]]; then
   echo "REPRO FAIL: unexpected phonemizer provenance: version=$PHONEMIZER_VERSION repo=$PHONEMIZER_REPO" >&2
+  exit 1
+fi
+if [[ "$SAFARI_PATCH_BASE" != "$PHONEMIZER_COMMIT" ]]; then
+  echo "REPRO FAIL: Safari patch base must equal pinned phonemizer commit" >&2
   exit 1
 fi
 if [[ ! -f "$INTEGRATION_PATCH" ]]; then
@@ -44,6 +53,16 @@ PATCH_SHA="$(sha256sum "$INTEGRATION_PATCH" | awk '{print $1}')"
 if [[ "$PATCH_SHA" != "$INTEGRATION_PATCH_EXPECTED_SHA" ]]; then
   echo "REPRO FAIL: FIEZEL integration patch hash differs from source lock" >&2
   echo "expected=$INTEGRATION_PATCH_EXPECTED_SHA actual=$PATCH_SHA" >&2
+  exit 1
+fi
+if [[ ! -f "$SAFARI_PATCH" ]]; then
+  echo "REPRO FAIL: source-locked Safari phonemizer patch is missing: $SAFARI_PATCH_REL" >&2
+  exit 1
+fi
+SAFARI_PATCH_SHA="$(sha256sum "$SAFARI_PATCH" | awk '{print $1}')"
+if [[ "$SAFARI_PATCH_SHA" != "$SAFARI_PATCH_EXPECTED_SHA" ]]; then
+  echo "REPRO FAIL: Safari phonemizer patch hash differs from source lock" >&2
+  echo "expected=$SAFARI_PATCH_EXPECTED_SHA actual=$SAFARI_PATCH_SHA" >&2
   exit 1
 fi
 
@@ -88,13 +107,16 @@ if s.count(needle) != 1:
 p.write_text(s.replace(needle, replacement))
 PY
 
-# Optional source-derived phonemizer override. It is intentionally absent on
-# the current baseline; m025-4 may add it only after baseline reproduction PASS.
+# Source-derived phonemizer override + narrowly scoped upstream Safari compatibility
+# patch. Both are hash-locked and applied against the exact pinned phonemizer commit.
 OVERRIDE="$ROOT/vendor/kokoro-js/source-overrides/phonemizer.js"
 if [[ -f "$OVERRIDE" ]]; then
   echo "[repro] applying source-derived phonemizer override from $PHONEMIZER_REPO@$PHONEMIZER_COMMIT"
   git clone --quiet "https://github.com/${PHONEMIZER_REPO}.git" "$WORK_DIR/phonemizer"
   git -C "$WORK_DIR/phonemizer" checkout --quiet "$PHONEMIZER_COMMIT"
+  echo "[repro] applying Safari ReadableStream compatibility patch source-derived from upstream head $SAFARI_PATCH_HEAD"
+  git -C "$WORK_DIR/phonemizer" apply --check "$SAFARI_PATCH"
+  git -C "$WORK_DIR/phonemizer" apply "$SAFARI_PATCH"
   cp "$OVERRIDE" "$WORK_DIR/phonemizer/src/phonemizer.js"
   cd "$WORK_DIR/phonemizer"
   npm ci --ignore-scripts
@@ -128,6 +150,10 @@ BUILT_SIZE="$(stat -c '%s' "$OUT_DIR/kokoro.web.js")"
   echo "phonemizerCommit=$PHONEMIZER_COMMIT"
   echo "integrationPatch=$INTEGRATION_PATCH_REL"
   echo "integrationPatchSha256=$PATCH_SHA"
+  echo "safariPatch=$SAFARI_PATCH_REL"
+  echo "safariPatchSha256=$SAFARI_PATCH_SHA"
+  echo "safariPatchBase=$SAFARI_PATCH_BASE"
+  echo "safariPatchHead=$SAFARI_PATCH_HEAD"
   echo "expectedSha256=$EXPECTED_SHA"
   echo "expectedSize=$EXPECTED_SIZE"
   echo "committedSha256=$COMMITTED_SHA"
