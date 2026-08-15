@@ -3,6 +3,7 @@ const path=require('path');
 const assert=require('assert');
 const read=p=>fs.readFileSync(path.join(__dirname,p),'utf8');
 const boot=read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
+const adapter=read('features/neural-voice/fiezel-kokoro-adapter.js');
 const aud=read('features/neural-voice/fiezel-neural-voice-audibility-fix.js');
 const app=read('app.js');
 const sw=read('sw.js');
@@ -10,8 +11,15 @@ const diag=read('features/neural-voice/fiezel-diag-panel.js');
 assert.ok(boot.includes("diag({phase:'prepared_idle'})"),'prepared startup must remain idle');
 assert.ok(!boot.includes("if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'}))"),'startup must not prewarm Kokoro');
 assert.ok(boot.includes("wasmEnv.numThreads=1"),'Apple policy must disable WASM multithreading');
-assert.ok(boot.includes("wasmEnv.proxy=true"),'Apple policy must offload WASM work to proxy worker');
-assert.ok(boot.includes("apple-standalone-single-thread-proxy"));
+assert.ok(boot.includes("wasmEnv.proxy=false"),'Apple policy must avoid the proxy-worker roundtrip while keeping WASM single-threaded');
+assert.ok(boot.includes("apple-standalone-single-thread-direct"));
+assert.ok(boot.includes('onStage:entry=>diag(entry)'),'adapter stages must feed bounded runtime diagnostics');
+for(const phase of ['adapter_instance_start','adapter_instance_ready','adapter_generate_enter','adapter_generate_invoke','adapter_generate_dispatched','adapter_generate_resolved','adapter_generate_error']){
+  assert.ok(adapter.includes(`stage('${phase}'`),`missing adapter diagnostic stage ${phase}`);
+}
+assert.ok(!adapter.includes("stage('adapter_generate_enter', { text"),'adapter diagnostics must never include prompt text');
+assert.ok(adapter.includes('function errorKind(error)'),'adapter diagnostics must reduce errors to non-message kind');
+assert.ok(!adapter.includes('error.message'),'adapter stage diagnostics must not persist external error messages that could echo prompt text');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must allow slower device inference');
 assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_neural_start'"),'init and neural speech timing must be diagnosed separately');
 assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'generation timeout must live in the voice service');
