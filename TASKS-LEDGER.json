@@ -275,12 +275,28 @@
       "owner": "agent-2 (via coordinator-1 M-018)",
       "evidence": "M-018: branch agent/coi-client-refresh-20260814 (dari origin/main ace434f) ter-push (commit fa3da4c, head branch e45f111 = koreksi hash). Gate lokal: cross-origin-isolation-test.js PASS + 5 gate neural PASS + regression PASS. index.html TIDAK diubah (ios-cache-fix.js + audibility-fix.js terverifikasi masih ada). CORP wrapper fetchCrossOriginWithCorp + COOP_COEP_HEADERS di sw.js utuh.",
       "note": "STATUS: changed-not-tested (perilaku device belum diuji; butuh retest iPhone + keputusan owner). JANGAN merge ke main. Adaptasi: refreshWindowClients() + client.navigate(client.url) di activate (sw.js), gate COI di quality.yml (36 script: 35 lama + cross-origin-isolation-test.js). SW_REV bump ke neural-voice-coi-client-refresh-20260814-1. NILAI DI-PORT dari branch agent-2 (commit e45f111/fa3da4c) agar M-018 tetap utuh di main -- bukan merge branch."
+    },
+    {
+      "id": "T-021",
+      "title": "M-019: deploy diag-panel build (panel Diagnostics read-only)",
+      "status": "changed-not-tested",
+      "owner": "agent-1 (via gelombang pagi 2026-08-15)",
+      "evidence": "branch origin/m019-diag-panel @ 6a6d37b (2026-08-15 08:18:43, 12 file +611/-81): fiezel-diag-panel.js (baru 287 baris), diag-panel-test.js (baru 203 baris), sw.js +11, index.html +4, quality.yml +1, bootstrap/ios-cache/audibility sinkronisasi kecil, AGENTS-COORDINATION.md +48, device-retest-checklist.md +124/-...; sesi kerja: LEDGER-DRAFT T-021 (@agent-7 08:10), CLAIMS-AUDIT (@agent-2 08:11), REG-DIFF (@agent-4 08:18), DEPLOY-PREP (@agent-1 08:20), GATE-DRY-RUN full suite lokal (@agent-6 09:33-09:39, semua gate PASS)",
+      "note": "BELUM di-merge ke main (main masih 588320f). TIDAK ada entri ini di ledger main sebelumnya - ditambahkan agent-5 (T-022) berdasarkan bukti git. Keputusan merge menunggu GATE-DRY-RUN tuntas + retest device."
+    },
+    {
+      "id": "T-022",
+      "title": "Update repo dengan handoff neural voice (instruksi owner 2026-08-15 pagi)",
+      "status": "done",
+      "owner": "agent-5",
+      "evidence": "commit [5.19.0] T-022: FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md (baru, handoff v1.0: status T-001..T-007, root cause CONFIRMED quota 119.274.361B > ~50MB, status branch m019-diag-panel + fix-coi-opaque-response, langkah berikut, catatan sesi) + TASKS-LEDGER.json (T-021/M-019 + T-022); verifier VERIFY-HANDOFF-001 (checklist 6 poin)",
+      "note": "Permintaan owner sama sudah dicoba sesi lain 08:06 (ses_ffd109383ffeglFg0r5xbt, 13 pesan) tanpa commit - difinalisasi agent-5. AGENTS-COORDINATION.md uncommitted (v1.3) di working tree koordinator TIDAK ikut di-commit (di luar scope)."
     }
   ],
 "last_report": {
-    "by": "agent-1 (M-017/T-019) — sinkronisasi dokumentasi inkonsistensi kecil",
-    "time": "2026-08-14T22:40:00+07:00",
-    "summary": "M-017/T-019 DONE: 3/3 inkonsistensi dari temuan M-016 diverifikasi BENAR di HEAD ace434f. (1) Protokol Pelengkap '25 detik' dikoreksi ke '45 detik (45.000 ms)' selaras ios-cache-fix.js:21 (45000). (2) PRIME_TOTAL_BYTES fallback 119.796.601 vs manifest 13 aset 119.274.361 B (selisih +522.240 B = 1 voice af_*.bin, kosmetik progress bar; runtime.totalBytes = 119.274.361 benar) -> klarifikasi komentar. (3) dead code storage==='memory' app.js:585 (bootstrap hanya menulis storage 'cache', bootstrap.js:53/58/207) -> komentar [DEAD-CODE-20260814], branch dibiarkan sebagai fallback safety. Semua perubahan hanya dokumen/komentar (git diff --stat 3 file), node --check PASS, tidak menyentuh source runtime/sw.js/quality.yml/index.html. Juga port nilai M-018/T-020 dari branch agent-2 (e45f111/fa3da4c) ke ledger main agar status agent-2 tetap utuh. Commit ter-push ke origin/main."
+    "by": "agent-5 (T-022) — handoff neural voice + status sesi pagi 2026-08-15",
+    "time": "2026-08-15T09:50:00+07:00",
+    "summary": "T-022 DONE: FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md di-commit ke main + ledger diperbarui (T-021/M-019 diag-panel dari branch origin/m019-diag-panel @ 6a6d37b yang BELUM tercatat di ledger main, T-022 handoff). Status sesi lain pagi ini: gelombang kerja 05:20-09:39 (latihan 15-agent slices, M-019 deploy prep 08:10-08:20, COI opaque fix branch 08:34, GATE-DRY-RUN full suite lokal @agent-6 masih berjalan 09:39 dengan semua gate PASS 09:33-09:37). Sesi 'Update repo handoff neural voice' 08:06 (ses_ffd109383ffeglFg0r5xbt) tidak menghasilkan commit - handoff difinalisasi agent-5. Blocker utama tetap T-006 (diagnostics device dari owner) -> T-007 (migrasi IndexedDB, desain T-010/baa804e siap)."
   },
   "missions": [
     {
@@ -362,6 +378,22 @@
       "status": "done",
       "title": "Adopsi client-refresh COI + gate COI di branch baru (tanpa merge)",
       "note": "Branch agent/coi-client-refresh-20260814 (commit fa3da4c, dari ace434f) ter-push, CI hijau. sw.js: +refreshWindowClients + activate .then(refreshWindowClients) + SW_REV bump; CORP wrapper & COI injection utuh. File baru cross-origin-isolation-test.js (gate CI). quality.yml: +gate COI (36 script). index.html TANPA perubahan (2 script fix terverifikasi ada). STATUS: changed-not-tested - butuh retest device + keputusan owner; JANGAN merge. NILAI DI-PORT dari branch agent-2 (commit e45f111) agar M-018 tetap utuh di main -- bukan merge branch."
+    },
+    {
+      "id": "M-019",
+      "task_ref": "T-021",
+      "agent": "agent-1 (gelombang pagi 2026-08-15)",
+      "status": "changed-not-tested",
+      "title": "Deploy diag-panel build (panel Diagnostics read-only)",
+      "note": "origin/m019-diag-panel @ 6a6d37b (08:18:43). Panel Diagnostics read-only (fiezel-diag-panel.js 287 baris + diag-panel-test.js 203 baris), SW_REV bump, riwayat diag 200, versi 5.19.0, gate notifikasi tersembunyi. BELUM di-merge ke main. GATE-DRY-RUN lokal (@agent-6) semua PASS 09:33-09:37."
+    },
+    {
+      "id": "M-020",
+      "task_ref": "T-022",
+      "agent": "agent-5",
+      "status": "done",
+      "title": "Handoff neural voice 5.19.0 + rekonsiliasi ledger (T-021/M-019 dari branch)",
+      "note": "FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md v1.0 di-commit ke main + ledger T-021/M-019 (yang hanya ada di branch) dicatat + T-022. Verifier VERIFY-HANDOFF-001. Permintaan owner yang sama (08:06) tidak selesai di sesi lain - difinalisasi di sini."
     }
   ]
 }
