@@ -18,9 +18,14 @@ jobs:
       - name: Install pinned push dependency
         run: npm install --ignore-scripts
       - name: Syntax
+        shell: bash
         run: |
-          for file in *.js; do node --check "$file"; done
-          for file in *.mjs; do node --check "$file"; done
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -type f \( -name '*.js' -o -name '*.mjs' \) \
+            -not -path './node_modules/*' \
+            -not -path './vendor/*' \
+            -print0)
       - name: Core validation
         run: |
           node validator.js
@@ -64,3 +69,7 @@ jobs:
           node neural-voice-product-repair-test.js
           node neural-voice-device-hotfix-test.js
           node neural-voice-timeout-phase-test.js
+          node neural-voice-generation-timeout-test.js
+          node neural-voice-diagnostics-retention-test.js
+          node puter-auth-coop-test.js
+          node puter-auth-diagnostics-test.js
