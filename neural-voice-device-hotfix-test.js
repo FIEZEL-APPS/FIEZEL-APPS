@@ -57,9 +57,9 @@ assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neura
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(sw.includes("const SW_REV='m025-5-"),'m025-5 product deploy must force a matching shell refresh');
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-5';"),'diagnostics build must advance exactly to m025-5');
+assert.ok(sw.includes("const SW_REV='m025-6-"),'m025-6 app deploy must force a matching shell refresh while keeping the m025-5 vendor');
+assert.ok(diag.includes("var DIAG_BUILD = 'm025-6';"),'diagnostics build must advance exactly to m025-6 for this product deploy');
 assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
-console.log('FIEZEL neural device hotfix m025-5: PASS');
+console.log('FIEZEL neural device hotfix m025-5 vendor / m025-6 deploy: PASS');

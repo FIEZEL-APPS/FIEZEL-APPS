@@ -86,5 +86,104 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     assert.equal(generateCalls,2);
   }
 
+  {
+    const env=makeEnv();
+    let generateCalls=0;
+    let inFlight=0;
+    let maxInFlight=0;
+    let playCalls=0;
+    let firstPlaybackStartedResolve;
+    let firstPlaybackRelease;
+    const firstPlaybackStarted=new Promise(resolve=>{firstPlaybackStartedResolve=resolve});
+    const firstPlaybackDone=new Promise(resolve=>{firstPlaybackRelease=resolve});
+    const cfg=config();
+    cfg.limits={...cfg.limits,targetChunkWords:2,hardChunkWords:2};
+    const adapter={kind:'neural-test',generate:async()=>{
+      generateCalls++;
+      inFlight++;
+      maxInFlight=Math.max(maxInFlight,inFlight);
+      await sleep(5);
+      inFlight--;
+      return audio();
+    }};
+    const service=core.createVoiceService({
+      config:cfg,adapter,env,generationTimeoutMs:200,
+      playAudio:async()=>{
+        playCalls++;
+        if(playCalls===1){
+          firstPlaybackStartedResolve();
+          return{done:firstPlaybackDone,stop(){}};
+        }
+        return{done:Promise.resolve(),stop(){}};
+      }
+    });
+
+    const speaking=service.speak('one two three four.',{allowFallback:false});
+    await firstPlaybackStarted;
+    await sleep(20);
+    assert.equal(generateCalls,2,'next chunk generation must begin while current chunk playback is still active');
+    assert.equal(playCalls,1,'next chunk playback must wait for current playback completion');
+    assert.equal(maxInFlight,1,'pipeline must preserve exactly one active neural inference');
+
+    firstPlaybackRelease();
+    const result=await speaking;
+    assert.equal(result.chunks,2);
+    assert.equal(generateCalls,2,'pipeline must call adapter.generate exactly once per chunk');
+    assert.equal(playCalls,2,'both chunks must play exactly once and in order');
+  }
+
+  {
+    const env=makeEnv();
+    const cfg=config();
+    cfg.limits={...cfg.limits,targetChunkWords:2,hardChunkWords:2};
+    let generateCalls=0;
+    let playCalls=0;
+    let secondGenerateStartedResolve;
+    let releaseSecondGenerate;
+    let releaseFirstPlayback;
+    const secondGenerateStarted=new Promise(resolve=>{secondGenerateStartedResolve=resolve});
+    const secondGenerateGate=new Promise(resolve=>{releaseSecondGenerate=resolve});
+    const firstPlaybackDone=new Promise(resolve=>{releaseFirstPlayback=resolve});
+    const adapter={kind:'neural-test',generate:async()=>{
+      generateCalls++;
+      if(generateCalls===2){
+        secondGenerateStartedResolve();
+        await secondGenerateGate;
+      }
+      return audio();
+    }};
+    const service=core.createVoiceService({
+      config:cfg,adapter,env,generationTimeoutMs:200,
+      playAudio:async()=>{
+        playCalls++;
+        if(playCalls===1)return{done:firstPlaybackDone,stop(){releaseFirstPlayback()}};
+        return{done:Promise.resolve(),stop(){}};
+      }
+    });
+
+    const pipelined=service.speak('one two three four.',{allowFallback:false})
+      .then(()=>({kind:'resolved'})).catch(error=>({kind:'rejected',error}));
+    await secondGenerateStarted;
+    assert.equal(playCalls,1,'second chunk must not play while first playback is active');
+    service.stop();
+    const stopped=await pipelined;
+    assert.equal(stopped.kind,'rejected','stopped pipelined request must reject as superseded');
+    assert.match(String(stopped.error&&stopped.error.message||stopped.error),/TTS request superseded/);
+
+    const blocked=await service.speak('fresh now.',{allowFallback:false})
+      .then(()=>({kind:'resolved'})).catch(error=>({kind:'rejected',error}));
+    assert.equal(blocked.kind,'rejected','new request must remain blocked while superseded prefetched inference is unresolved');
+    assert.match(String(blocked.error&&blocked.error.message||blocked.error),/neural_generation_busy/);
+    assert.equal(generateCalls,2,'blocked request must not start hidden inference or retry');
+
+    releaseSecondGenerate();
+    await sleep(10);
+    assert.equal(playCalls,1,'superseded prefetched chunk must never reach playback after it resolves');
+    const fresh=await service.speak('fresh now.',{allowFallback:false});
+    assert.equal(fresh.provider,'neural-test');
+    assert.equal(generateCalls,3,'fresh request may start only after superseded inference settles');
+    assert.equal(playCalls,2,'only the fresh request may add playback after supersede');
+  }
+
   console.log('FIEZEL neural single-flight regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
