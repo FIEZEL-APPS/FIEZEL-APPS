@@ -45,6 +45,20 @@
     return target;
   }
 
+  function openSkills(){
+    var app=doc.getElementById('app');
+    if(app)app.classList.add('skills-loading');
+    try{
+      if(typeof root.go==='function')root.go('skills');
+    }finally{
+      if(app&&typeof root.requestAnimationFrame==='function'){
+        root.requestAnimationFrame(function(){root.requestAnimationFrame(function(){app.classList.remove('skills-loading');});});
+      }else if(app){
+        root.setTimeout(function(){app.classList.remove('skills-loading');},80);
+      }
+    }
+  }
+
   function ensureSkillsNav(){
     var nav=doc.querySelector('.bottomnav');
     if(!nav)return;
@@ -61,7 +75,7 @@
     label.textContent='Skills';
     button.appendChild(icon);
     button.appendChild(label);
-    button.addEventListener('click',function(){if(typeof root.go==='function')root.go('skills');});
+    button.addEventListener('click',openSkills);
     nav.appendChild(button);
     try{root.lucide&&root.lucide.createIcons&&root.lucide.createIcons();}catch(_){ }
   }
@@ -115,7 +129,7 @@
     }
   }
 
-  root.FiezelHomeRedesign=Object.freeze({humanizeText:humanizeText,renderInlineRichText:renderInlineRichText,enhance:enhanceHome});
+  root.FiezelHomeRedesign=Object.freeze({humanizeText:humanizeText,renderInlineRichText:renderInlineRichText,enhance:enhanceHome,openSkills:openSkills});
   if(doc.readyState==='loading')doc.addEventListener('DOMContentLoaded',start,{once:true});
   else start();
 })(typeof globalThis!=='undefined'?globalThis:this);
