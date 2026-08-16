@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  transport-exact-vendor-blob:
+  transport-promotion-blobs:
     if: github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
@@ -19,6 +19,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
 
       - name: Install deterministic delta tool
         run: sudo apt-get update -qq && sudo apt-get install -y -qq zstd
@@ -34,20 +38,54 @@ jobs:
           test "$blob" = "7c8f6353f98fb1516286db20f914b2cdc5537e16"
           printf 'EXACT_VENDOR_BLOB=%s\n' "$blob" >> "$GITHUB_ENV"
 
-      - name: Transport exact blob into GitHub object storage only
+      - name: Apply exact atomic promotion only in runner workspace
         shell: bash
         run: |
           set -euo pipefail
-          test "$EXACT_VENDOR_BLOB" = "7c8f6353f98fb1516286db20f914b2cdc5537e16"
-          tag="m0255-transport-${GITHUB_SHA:0:12}"
-          git update-ref "refs/tags/$tag" "$EXACT_VENDOR_BLOB"
-          git push origin "refs/tags/$tag:refs/tags/$tag"
-          printf 'transportTag=%s\nblob=%s\n' "$tag" "$EXACT_VENDOR_BLOB"
+          node tools/promote-m0255-runtime.mjs /tmp/m0255-kokoro.web.js --apply
+          git diff --name-only | sort > /tmp/promoted-files.txt
+          cat > /tmp/expected-promoted-files.txt <<'EOF'
+          NEURAL-VOICE-SOURCE-LOCK.json
+          features/neural-voice/fiezel-diag-panel.js
+          features/neural-voice/fiezel-neural-voice-bootstrap.js
+          neural-voice-device-hotfix-test.js
+          sw.js
+          vendor/kokoro-js/kokoro.web.js
+          EOF
+          sort -o /tmp/expected-promoted-files.txt /tmp/expected-promoted-files.txt
+          diff -u /tmp/expected-promoted-files.txt /tmp/promoted-files.txt
+          git diff --check
+          node neural-voice-m0255-promotion-test.js
 
-      - name: Assert branch itself was not mutated
+      - name: Materialize exact Git blobs and transport by disposable tags only
+        shell: bash
+        run: |
+          set -euo pipefail
+          short="${GITHUB_SHA:0:12}"
+          declare -A paths=(
+            [vendor]="vendor/kokoro-js/kokoro.web.js"
+            [lock]="NEURAL-VOICE-SOURCE-LOCK.json"
+            [bootstrap]="features/neural-voice/fiezel-neural-voice-bootstrap.js"
+            [diag]="features/neural-voice/fiezel-diag-panel.js"
+            [sw]="sw.js"
+            [test]="neural-voice-device-hotfix-test.js"
+          )
+          for key in vendor lock bootstrap diag sw test; do
+            path="${paths[$key]}"
+            blob="$(git hash-object -w "$path")"
+            if [[ "$key" == vendor ]]; then
+              test "$blob" = "7c8f6353f98fb1516286db20f914b2cdc5537e16"
+            fi
+            tag="m0255-transport-${key}-${short}"
+            git update-ref "refs/tags/$tag" "$blob"
+            git push origin "refs/tags/$tag:refs/tags/$tag"
+            printf 'PROMOTION_BLOB key=%s path=%s blob=%s tag=%s\n' "$key" "$path" "$blob" "$tag"
+          done
+
+      - name: Assert candidate branch itself was not mutated
         shell: bash
         run: |
           set -euo pipefail
           remote_head="$(git ls-remote origin refs/heads/master/m025-5-safari-phonemizer-compat | awk '{print $1}')"
           test "$remote_head" = "$GITHUB_SHA"
-          echo "Branch unchanged; transport tag only."
+          echo "Branch unchanged; disposable object-transport tags only."
