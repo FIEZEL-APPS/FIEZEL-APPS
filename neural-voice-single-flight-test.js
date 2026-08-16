@@ -122,21 +122,21 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     const generatedTexts=[];
     const adapter={kind:'neural-test',generate:async text=>{generatedTexts.push(text);return audio()}};
     const service=core.createVoiceService({
-      config:config(),adapter,env,generationTimeoutMs:200,appleHardChunkChars:240,
+      config:config(),adapter,env,generationTimeoutMs:200,
       playAudio:async()=>({done:Promise.resolve(),stop(){}})
     });
     const longText=Array.from({length:120},(_,i)=>`word${i}`).join(' ')+'.';
     const result=await service.speak(longText,{allowFallback:false});
-    assert.ok(result.chunks>=3,'Apple standalone long input must be split into additional bounded chunks');
+    assert.ok(result.chunks>=8,'Apple standalone long input must be split into substantially smaller inference slices');
     assert.equal(generatedTexts.length,result.chunks);
-    assert.ok(generatedTexts.every(text=>text.length<=240),`Apple adapter input must stay <=240 chars, got ${generatedTexts.map(x=>x.length).join(',')}`);
+    assert.ok(generatedTexts.every(text=>text.length<=80),`Apple adapter input must stay <=80 chars, got ${generatedTexts.map(x=>x.length).join(',')}`);
     const log=diagnostics(env);
     const policy=log.find(x=>x.phase==='chunk_policy_ready');
-    assert.ok(policy&&policy.policy==='apple-standalone-char-cap-v1','Apple char-cap policy must be explicitly observable');
-    assert.equal(policy.hardChunkChars,240);
+    assert.ok(policy&&policy.policy==='apple-standalone-inference-slice-v2','Apple inference-slice policy must be explicitly observable');
+    assert.equal(policy.hardChunkChars,80);
     const plan=log.find(x=>x.phase==='chunk_plan');
     assert.ok(plan&&plan.chunkCount===result.chunks);
-    assert.ok(plan.maxChunkChars<=240,'chunk plan must expose the bounded maximum without logging text');
+    assert.ok(plan.maxChunkChars<=80,'chunk plan must expose the bounded maximum without logging text');
   }
 
   {
