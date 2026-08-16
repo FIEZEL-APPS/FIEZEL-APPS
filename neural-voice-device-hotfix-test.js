@@ -22,10 +22,10 @@ assert.ok(boot.includes('onStage:entry=>diag(entry)'),'adapter stages must feed 
 for(const phase of ['wasm_policy','adapter_instance_start','adapter_stage_probe_ready','adapter_instance_ready','adapter_generate_enter','adapter_generate_invoke','adapter_generate_dispatched','adapter_tokenizer_enter','adapter_tokenizer_resolved','adapter_tokenizer_error','adapter_model_enter','adapter_model_dispatched','adapter_model_resolved','adapter_model_error','adapter_generate_resolved','adapter_generate_error']){
   assert.ok(adapter.includes(`stage('${phase}'`),`missing adapter diagnostic stage ${phase}`);
 }
-assert.ok(adapter.includes("apple-standalone-single-thread-direct-default"),'m025-4 must label the pinned ORT default policy without pretending read-back verification');
+assert.ok(adapter.includes("apple-standalone-single-thread-direct-default"),'m025-5 must label the pinned ORT default policy without pretending read-back verification');
 assert.ok(adapter.includes("source: 'onnxruntime-web-1.22-runtime-default'"),'effective policy must identify its pinned runtime basis');
 assert.ok(adapter.includes('readBack: false'),'effective default diagnostics must not claim a setter/read-back verification that the Kokoro wrapper cannot expose');
-assert.ok(adapter.includes("typeof tts.tokenizer === 'function'")&&adapter.includes("typeof tts.model === 'function'"),'m025-4 must instrument tokenizer and model call boundaries');
+assert.ok(adapter.includes("typeof tts.tokenizer === 'function'")&&adapter.includes("typeof tts.model === 'function'"),'m025-5 must instrument tokenizer and model call boundaries');
 assert.ok(!adapter.includes("stage('adapter_generate_enter', { text"),'adapter diagnostics must never include prompt text');
 assert.ok(!adapter.includes('phonemes'),'adapter diagnostics must not persist phoneme content');
 assert.ok(adapter.includes('tokenCount'),'tokenizer diagnostics may report count only, never token content');
@@ -37,10 +37,10 @@ for(const phase of ['espeak_module_loaded','espeak_worker_promise_create','espea
 }
 assert.ok(!/stage\("[^"]+",/.test(phon),'eSpeak probe must emit phase names only');
 assert.ok(!phon.includes('error.message'),'eSpeak probe must not persist external error messages');
-assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'m025-4 must import the versioned vendor URL');
-assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'m025-4 SW must pre-cache the versioned vendor URL');
-assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependencies.phonemizerSourceOverride.path==='vendor/kokoro-js/source-overrides/phonemizer.js','m025-4 source lock must record the phonemizer override');
-assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-4 source override bytes must match the source-lock SHA-256');
+assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'m025-5 must import the versioned vendor URL');
+assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'m025-5 SW must pre-cache the versioned vendor URL');
+assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependencies.phonemizerSourceOverride.path==='vendor/kokoro-js/source-overrides/phonemizer.js','m025-5 source lock must record the phonemizer override');
+assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-5 source override bytes must match the source-lock SHA-256');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must remain unchanged');
 assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_neural_start'"),'init and neural speech timing must be diagnosed separately');
 assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'generation timeout must live in the voice service');
@@ -57,9 +57,9 @@ assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neura
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(sw.includes("const SW_REV='m025-4-"),'m025-4 product deploy must force a matching shell refresh');
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-4';"),'diagnostics build must advance exactly to m025-4');
+assert.ok(sw.includes("const SW_REV='m025-5-"),'m025-5 product deploy must force a matching shell refresh');
+assert.ok(diag.includes("var DIAG_BUILD = 'm025-5';"),'diagnostics build must advance exactly to m025-5');
 assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
-console.log('FIEZEL neural device hotfix m025-4: PASS');
+console.log('FIEZEL neural device hotfix m025-5: PASS');
