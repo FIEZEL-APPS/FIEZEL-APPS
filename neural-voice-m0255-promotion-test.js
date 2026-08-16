@@ -59,7 +59,11 @@ if(!runtimePromoted){
   assert.ok(!boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'promoted bootstrap must not retain the old versioned vendor URL');
   assert.ok(boot.includes("{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-5',bytes:2136684}"),'promoted bootstrap must use the exact m025-5 asset size');
   assert.ok(diagBuild>=5,'post-promotion Diagnostics must never regress below the m025-5 vendor adoption build');
-  assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'post-promotion SW must keep precaching the exact m025-5 vendor URL');
+  if(diagBuild>=16){
+    assert.ok(!sw.includes("'./vendor/kokoro-js/kokoro.web.js?nv=m025-5'"),'m025-16+ shell releases must not pre-cache the neural-owned m025-5 runtime URL');
+  }else{
+    assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'pre-m025-16 promoted releases must keep the historical m025-5 SW precache contract');
+  }
   assert.ok(!sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'post-promotion SW must not precache the old vendor URL');
   assert.equal(swBuild,diagBuild,'later app deploys may advance beyond m025-5, but SW and Diagnostics build identities must remain coherent');
 }
