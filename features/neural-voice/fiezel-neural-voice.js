@@ -15,7 +15,42 @@
     return text;
   }
 
-  function splitIntoChunks(text, targetWords, hardWords) {
+  function splitByHardChars(chunks, hardChars) {
+    const limit = Number(hardChars) > 0 ? Math.floor(Number(hardChars)) : 0;
+    if (!limit) return chunks;
+    const bounded = [];
+    for (const rawChunk of chunks) {
+      const chunk = String(rawChunk || '').trim();
+      if (!chunk) continue;
+      if (chunk.length <= limit) {
+        bounded.push(chunk);
+        continue;
+      }
+      const words = chunk.split(/\s+/);
+      let current = [];
+      let currentLength = 0;
+      function flush() {
+        if (current.length) bounded.push(current.join(' '));
+        current = [];
+        currentLength = 0;
+      }
+      for (const word of words) {
+        if (word.length > limit) {
+          flush();
+          for (let i = 0; i < word.length; i += limit) bounded.push(word.slice(i, i + limit));
+          continue;
+        }
+        const added = current.length ? 1 + word.length : word.length;
+        if (current.length && currentLength + added > limit) flush();
+        current.push(word);
+        currentLength += currentLength ? 1 + word.length : word.length;
+      }
+      flush();
+    }
+    return bounded;
+  }
+
+  function splitIntoChunks(text, targetWords, hardWords, hardChars) {
     const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
     const chunks = [];
     let current = [];
@@ -44,7 +79,7 @@
       if (count >= hardWords) flush();
     }
     flush();
-    return chunks;
+    return splitByHardChars(chunks, hardChars);
   }
 
   function canUseSpeechSynthesis(env) {
@@ -86,6 +121,8 @@
     const maxChars = config.limits && config.limits.maxInputChars || 3600;
     const targetWords = config.limits && config.limits.targetChunkWords || 140;
     const hardWords = config.limits && config.limits.hardChunkWords || 190;
+    const appleStandalone = env && env.navigator && env.navigator.standalone === true;
+    const appleHardChunkChars = appleStandalone ? Math.max(160, Math.min(320, Number(options.appleHardChunkChars) || 240)) : 0;
     const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
     const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
     let generation = 0;
@@ -102,6 +139,7 @@
       } catch (_) {}
     }
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
+    diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-char-cap-v1' : 'default', hardChunkChars: appleHardChunkChars || null });
 
     function stop() {
       generation += 1;
@@ -118,7 +156,8 @@
       const callGeneration = ++generation;
       const requestId = 'nv-' + Date.now().toString(36) + '-' + (++requestSequence).toString(36);
       const voice = speakOptions.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
-      const chunks = splitIntoChunks(text, targetWords, hardWords);
+      const chunks = splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+      diag({ phase: 'chunk_plan', requestId, chunkCount: chunks.length, hardChunkChars: appleHardChunkChars || null, maxChunkChars: chunks.reduce((max, chunk) => Math.max(max, chunk.length), 0) });
 
       if (!adapter) {
         if (config.fallback && config.fallback.browserSpeechSynthesis) {
@@ -199,7 +238,11 @@
           audio = await generated;
         }
         const samples = audio && (audio.audio || audio.data);
-        diag({ phase: 'generate_ready', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, samples: samples && typeof samples.length === 'number' ? samples.length : null });
+        const generateElapsedMs = Date.now() - generateStartedAt;
+        if (generationTimeoutMs > 0 && generateElapsedMs > generationTimeoutMs) {
+          diag({ phase: 'generate_completed_over_budget', requestId, chunkIndex, elapsedMs: generateElapsedMs, timeoutMs: generationTimeoutMs });
+        }
+        diag({ phase: 'generate_ready', requestId, chunkIndex, voice, elapsedMs: generateElapsedMs, samples: samples && typeof samples.length === 'number' ? samples.length : null });
         if (callGeneration !== generation) throw new Error('TTS request superseded');
         return audio;
       }
@@ -248,7 +291,7 @@
       }
     }
 
-    return Object.freeze({ speak, stop, splitIntoChunks: (text) => splitIntoChunks(text, targetWords, hardWords) });
+    return Object.freeze({ speak, stop, splitIntoChunks: (text) => splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars) });
   }
 
   return Object.freeze({ normalizeText, splitIntoChunks, createVoiceService });

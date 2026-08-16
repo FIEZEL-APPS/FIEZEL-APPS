@@ -110,6 +110,49 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     assert.equal(watchdog.expectedDelayMs,5);
     assert.ok(watchdog.observedDelayMs>=30,`blocking generate must produce a materially delayed watchdog callback, got ${watchdog.observedDelayMs}`);
     assert.ok(!log.some(x=>x.phase==='generate_timeout'),'blocked event loop should expose the current timeout-starvation behavior rather than fabricate a timeout');
+    const overBudget=log.find(x=>x.phase==='generate_completed_over_budget');
+    assert.ok(overBudget,'synchronous completion past the configured timeout must be observable without relying on the watchdog task');
+    assert.ok(overBudget.elapsedMs>=30);
+    assert.equal(overBudget.timeoutMs,20);
+  }
+
+  {
+    const env=makeEnv();
+    env.navigator={standalone:true};
+    const generatedTexts=[];
+    const adapter={kind:'neural-test',generate:async text=>{generatedTexts.push(text);return audio()}};
+    const service=core.createVoiceService({
+      config:config(),adapter,env,generationTimeoutMs:200,appleHardChunkChars:240,
+      playAudio:async()=>({done:Promise.resolve(),stop(){}})
+    });
+    const longText=Array.from({length:120},(_,i)=>`word${i}`).join(' ')+'.';
+    const result=await service.speak(longText,{allowFallback:false});
+    assert.ok(result.chunks>=3,'Apple standalone long input must be split into additional bounded chunks');
+    assert.equal(generatedTexts.length,result.chunks);
+    assert.ok(generatedTexts.every(text=>text.length<=240),`Apple adapter input must stay <=240 chars, got ${generatedTexts.map(x=>x.length).join(',')}`);
+    const log=diagnostics(env);
+    const policy=log.find(x=>x.phase==='chunk_policy_ready');
+    assert.ok(policy&&policy.policy==='apple-standalone-char-cap-v1','Apple char-cap policy must be explicitly observable');
+    assert.equal(policy.hardChunkChars,240);
+    const plan=log.find(x=>x.phase==='chunk_plan');
+    assert.ok(plan&&plan.chunkCount===result.chunks);
+    assert.ok(plan.maxChunkChars<=240,'chunk plan must expose the bounded maximum without logging text');
+  }
+
+  {
+    const env=makeEnv();
+    const generatedTexts=[];
+    const adapter={kind:'neural-test',generate:async text=>{generatedTexts.push(text);return audio()}};
+    const service=core.createVoiceService({
+      config:config(),adapter,env,generationTimeoutMs:200,
+      playAudio:async()=>({done:Promise.resolve(),stop(){}})
+    });
+    const longSentence=Array.from({length:80},(_,i)=>`item${i}`).join(' ')+'.';
+    const expected=core.splitIntoChunks(longSentence,140,190);
+    const result=await service.speak(longSentence,{allowFallback:false});
+    assert.equal(result.chunks,expected.length,'non-Apple splitter behavior must remain unchanged');
+    assert.deepEqual(generatedTexts,expected,'non-Apple adapter inputs must match existing sentence/word splitter');
+    assert.ok(diagnostics(env).some(x=>x.phase==='chunk_policy_ready'&&x.policy==='default'&&x.hardChunkChars===null));
   }
 
   {
