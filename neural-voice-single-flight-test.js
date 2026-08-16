@@ -89,6 +89,32 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
   {
     const env=makeEnv();
     let generateCalls=0;
+    const adapter={kind:'neural-test',generate:()=>{
+      generateCalls++;
+      const blockedUntil=Date.now()+45;
+      while(Date.now()<blockedUntil){}
+      return audio();
+    }};
+    const service=core.createVoiceService({
+      config:config(),adapter,env,generationTimeoutMs:20,eventLoopWatchdogMs:5,
+      playAudio:async()=>({done:Promise.resolve(),stop(){}})
+    });
+
+    const result=await service.speak('blocking request',{allowFallback:false});
+    assert.equal(result.provider,'neural-test','blocking generate stub should still resolve under the current non-preemptive timer semantics');
+    assert.equal(generateCalls,1);
+    await sleep(10);
+    const log=diagnostics(env);
+    const watchdog=log.find(x=>x.phase==='generate_event_loop_watchdog');
+    assert.ok(watchdog,'event-loop watchdog marker must be emitted');
+    assert.equal(watchdog.expectedDelayMs,5);
+    assert.ok(watchdog.observedDelayMs>=30,`blocking generate must produce a materially delayed watchdog callback, got ${watchdog.observedDelayMs}`);
+    assert.ok(!log.some(x=>x.phase==='generate_timeout'),'blocked event loop should expose the current timeout-starvation behavior rather than fabricate a timeout');
+  }
+
+  {
+    const env=makeEnv();
+    let generateCalls=0;
     let inFlight=0;
     let maxInFlight=0;
     let playCalls=0;
