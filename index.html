@@ -101,7 +101,11 @@
       function deferAutomaticReport(task) {
         return new Promise(resolve => {
           setTimeout(() => {
-            Promise.resolve().then(task).then(resolve, () => resolve(false));
+            try {
+              Promise.resolve(task()).then(resolve, () => resolve(false));
+            } catch {
+              resolve(false);
+            }
           }, 0);
         });
       }
