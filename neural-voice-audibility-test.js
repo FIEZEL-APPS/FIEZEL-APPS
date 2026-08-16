@@ -5,11 +5,12 @@ const vm=require('vm');
 const path=require('path');
 const patch=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-neural-voice-audibility-fix.js'),'utf8');
 
-function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0}={}){
+function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,withUi=false}={}){
   const events=[];
-  let ensureReadyCalls=0,originalSpeakCalls=0,originalStopCalls=0,cancelCalls=0;
+  let ensureReadyCalls=0,prepareCalls=0,originalSpeakCalls=0,originalStopCalls=0,cancelCalls=0;
   const runtime={
     status:()=>({ready,prepared}),
+    prepare:async()=>{prepareCalls++;events.push('prepare');return{ready,prepared}},
     ensureReady:async()=>{
       ensureReadyCalls++;
       events.push('ensure-ready-start');
@@ -33,6 +34,17 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0}
     }
   };
   const localStorageData={};
+  const documentEvents={};
+  const ui=withUi?{
+    prepareButton:{id:'prepareNeuralVoice',disabled:false,innerHTML:'Siapkan suara offline'},
+    testButton:{id:'testNeuralVoice',disabled:false,innerHTML:'Tes suara'},
+    hint:{id:'neuralVoiceProgress',textContent:'Model tersimpan lokal. Siapkan suara offline.'}
+  }:null;
+  const document=withUi?{
+    readyState:'complete',documentElement:{},body:{},
+    getElementById:id=>id==='prepareNeuralVoice'?ui.prepareButton:id==='testNeuralVoice'?ui.testButton:id==='neuralVoiceProgress'?ui.hint:null,
+    addEventListener:(name,fn,capture)=>{(documentEvents[name]||(documentEvents[name]=[])).push({fn,capture:!!capture})}
+  }:undefined;
   const ctx={
     console,setTimeout,clearTimeout,Date,Promise,
     FIEZEL_VERSION:'5.19.0',FiezelVoiceRuntime:runtime,
@@ -41,8 +53,16 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0}
     SpeechSynthesisUtterance:function(text){this.text=text},
     localStorage:{getItem:k=>localStorageData[k]??null,setItem:(k,v)=>{localStorageData[k]=String(v)}}
   };
+  if(document)ctx.document=document;
   vm.createContext(ctx);vm.runInContext(patch,ctx,{filename:'audibility-fix.js'});
-  return{ctx,events,get ensureReadyCalls(){return ensureReadyCalls},get originalSpeakCalls(){return originalSpeakCalls},get originalStopCalls(){return originalStopCalls},get cancelCalls(){return cancelCalls}};
+  return{
+    ctx,events,ui,documentEvents,
+    get ensureReadyCalls(){return ensureReadyCalls},
+    get prepareCalls(){return prepareCalls},
+    get originalSpeakCalls(){return originalSpeakCalls},
+    get originalStopCalls(){return originalStopCalls},
+    get cancelCalls(){return cancelCalls}
+  };
 }
 
 (async()=>{
@@ -95,12 +115,37 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0}
     assert.equal(t.cancelCalls,0,'cold idle stop must not call speechSynthesis.cancel');
   }
 
-  // Persisted-cache UX must stop telling an already-prepared user to download
-  // offline voice again. The patch owns this narrow compatibility correction
-  // without changing the large app.js surface.
-  assert.ok(patch.includes('Aktifkan suara neural'),'prepared UI must distinguish activation from offline download');
-  assert.ok(patch.includes("prepareNeuralVoice"),'patch must target the existing Skills Lab prepare control');
-  assert.ok(patch.includes('stopImmediatePropagation'),'cached-state activation must bypass the legacy prepare/download handler');
+  // Execute the persisted Skills Lab UI path, not merely source-string checks.
+  // A cached reload must identify the assets as already stored, start exactly one
+  // background activation, and consume the legacy "prepare/download" click before
+  // the app's old target handler can run.
+  {
+    const t=makeContext({ready:false,prepared:true,ensureDelayMs:40,withUi:true});
+    assert.match(t.ui.prepareButton.innerHTML,/Aktifkan suara neural/,'cached reload must not render Siapkan suara offline as the required action');
+    assert.equal(t.ui.testButton.disabled,true,'strict neural test stays disabled while the cold service warms');
+    assert.match(t.ui.hint.textContent,/sudah tersimpan/i,'cached reload copy must explicitly recognize persisted offline assets');
+    assert.equal(t.ensureReadyCalls,1,'mounting cached Skills Lab controls should start one background readiness attempt');
+    assert.equal(t.prepareCalls,0,'cached mount must never invoke runtime.prepare or redownload assets');
+
+    let prevented=false,stopped=false;
+    const event={
+      target:{closest:selector=>selector==='#prepareNeuralVoice'?t.ui.prepareButton:null},
+      preventDefault:()=>{prevented=true},
+      stopImmediatePropagation:()=>{stopped=true}
+    };
+    for(const entry of t.documentEvents.click||[])entry.fn(event);
+    assert.equal(prevented,true,'cached activation click must prevent legacy default handling');
+    assert.equal(stopped,true,'cached activation click must stop the legacy prepare/download target handler');
+    assert.equal(t.ensureReadyCalls,1,'cached activation click must coalesce with existing background readiness');
+    assert.equal(t.prepareCalls,0,'cached activation click must not call runtime.prepare or fetch assets again');
+
+    await new Promise(resolve=>setTimeout(resolve,55));
+    assert.match(t.ui.prepareButton.innerHTML,/Suara neural aktif/,'UI must transition to ready after background activation');
+    assert.equal(t.ui.prepareButton.disabled,true,'ready state must not offer another prepare action');
+    assert.equal(t.ui.testButton.disabled,false,'strict neural test becomes available only after readiness');
+    assert.equal(t.prepareCalls,0,'the entire cached activation path must remain download-free');
+  }
+
   assert.ok(patch.includes('background_ready'),'background readiness must be explicitly diagnosed');
 
   console.log('FIEZEL neural voice audibility + persisted UX regression: PASS');
