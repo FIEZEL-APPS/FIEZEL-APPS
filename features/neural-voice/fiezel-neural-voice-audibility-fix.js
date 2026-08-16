@@ -6,6 +6,7 @@
 
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const DIAG_LIMIT=200;
+  const READINESS_PATCH='m025-13-readiness-v1';
   let browserActive=false;
   let activeUtterance=null;
 
@@ -23,6 +24,41 @@
       const player=root.FiezelWebAudioPlayer?.createPlayer?.(root);
       player?.warm?.();
     }catch{}
+  }
+
+  function readinessErrorCode(error){
+    const value=String(error?.message||error?.name||error||'').toLowerCase();
+    if(value.includes('assets are not prepared'))return'assets_not_prepared';
+    if(value.includes('cache verification failed'))return'cache_verification_failed';
+    if(value.includes('initialization is still running'))return'init_still_running';
+    if(value.includes('init timed out')||value.includes('initialization timed out'))return'init_timeout';
+    if(value.includes('neural_circuit_open'))return'circuit_open';
+    return'other';
+  }
+
+  async function ensureReady(){
+    // Keep the user-gesture-sensitive WebAudio resume in the synchronous click turn,
+    // before any CacheStorage await. m025-12 awaited refresh in the probe first.
+    warmWebAudio();
+    const before=runtime.status?.()||{};
+    diag({patch:READINESS_PATCH,phase:'ensure_ready_enter',prepared:!!before.prepared,ready:!!before.ready});
+    try{
+      if(typeof runtime.refreshPreparedFlag==='function'){
+        diag({patch:READINESS_PATCH,phase:'ensure_ready_refresh_enter'});
+        const refreshed=await runtime.refreshPreparedFlag();
+        const afterRefresh=runtime.status?.()||{};
+        diag({patch:READINESS_PATCH,phase:'ensure_ready_refresh_ready',prepared:!!afterRefresh.prepared,refreshed:!!refreshed});
+      }
+      diag({patch:READINESS_PATCH,phase:'ensure_ready_base_enter'});
+      const result=await runtime.ensureReady();
+      const after=runtime.status?.()||{};
+      diag({patch:READINESS_PATCH,phase:'ensure_ready_ready',prepared:!!after.prepared,ready:!!after.ready});
+      return result;
+    }catch(error){
+      const after=runtime.status?.()||{};
+      diag({patch:READINESS_PATCH,phase:'ensure_ready_error',code:readinessErrorCode(error),prepared:!!after.prepared,ready:!!after.ready});
+      throw error;
+    }
   }
 
   function pickVoice(lang){
@@ -95,7 +131,7 @@
       diag({phase:'audibility_first',prepared:!!state.prepared});
       if(state.prepared&&typeof runtime.ensureReady==='function'){
         try{
-          await runtime.ensureReady();
+          await ensureReady();
           const warmed=runtime.status?.()||{};
           if(warmed.ready){
             try{return await runtime.speak(text,{...options,allowFallback:false})}
@@ -136,6 +172,6 @@
 
   // Prevent the bootstrap's zero-volume speech warmup from occupying Safari's speech queue.
   root.__fiezelTtsUnlocked=true;
-  root.FiezelVoiceRuntime=Object.freeze({...runtime,status,speak,stop,browserSpeakImmediate,__audibilityPatched:true});
+  root.FiezelVoiceRuntime=Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true});
   diag({phase:'audibility_patch_loaded'});
 })(typeof globalThis!=='undefined'?globalThis:this);
