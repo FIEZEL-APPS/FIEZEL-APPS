@@ -121,6 +121,10 @@
     });
   }
 
+  function setHtml(node,value){if(node&&String(node.innerHTML||'')!==value)node.innerHTML=value}
+  function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
+  function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
+
   function syncPersistedReadyUi(){
     try{
       const doc=root.document;
@@ -134,22 +138,27 @@
         // Verification is authoritative. If a stale marker is invalidated, return
         // the UI to the real one-time download state instead of pretending the
         // cached activation path still exists.
-        prepareButton.disabled=false;
-        prepareButton.innerHTML='<i data-lucide="download"></i> Siapkan suara offline';
-        if(testButton)testButton.disabled=true;
-        if(hint)hint.textContent='Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal.';
+        setDisabled(prepareButton,false);
+        setHtml(prepareButton,'<i data-lucide="download"></i> Siapkan suara offline');
+        setDisabled(testButton,true);
+        setText(hint,'Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal.');
         return;
       }
       if(state.ready){
-        prepareButton.disabled=true;
-        prepareButton.innerHTML='<i data-lucide="badge-check"></i> Suara neural aktif';
-        if(testButton)testButton.disabled=false;
-        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural/i.test(String(hint.textContent||'')))hint.textContent='Aset suara offline tersimpan. Mesin neural aktif dan siap dipakai.';
+        setDisabled(prepareButton,true);
+        setHtml(prepareButton,'<i data-lucide="badge-check"></i> Suara neural aktif');
+        setDisabled(testButton,false);
+        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline tersimpan. Mesin neural aktif dan siap dipakai.');
+      }else if(backgroundReadyPromise){
+        setDisabled(prepareButton,true);
+        setHtml(prepareButton,'<i data-lucide="loader-circle"></i> Mengaktifkan neural…');
+        setDisabled(testButton,true);
+        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; latihan Listening tetap dapat langsung bersuara selama pemanasan.');
       }else{
-        prepareButton.disabled=false;
-        prepareButton.innerHTML='<i data-lucide="zap"></i> Aktifkan suara neural';
-        if(testButton)testButton.disabled=true;
-        if(hint&&/Model tersimpan|Mengunduh aset suara|Menyiapkan mesin suara|Aset suara offline/i.test(String(hint.textContent||'')))hint.textContent='Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; latihan Listening tetap dapat langsung bersuara selama pemanasan.';
+        setDisabled(prepareButton,false);
+        setHtml(prepareButton,'<i data-lucide="zap"></i> Aktifkan suara neural');
+        setDisabled(testButton,true);
+        if(hint&&/Model tersimpan|Mengunduh aset suara|Menyiapkan mesin suara|Aset suara offline/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Aktifkan mesin neural tanpa mengunduh ulang aset.');
       }
     }catch{}
   }
@@ -162,14 +171,15 @@
     backgroundReadyPromise=ensureReady().then(result=>{
       const after=runtime.status?.()||{};
       diag({patch:UX_PATCH,phase:'background_ready',prepared:!!after.prepared,ready:!!after.ready});
-      syncPersistedReadyUi();
       return result;
     }).catch(error=>{
       const after=runtime.status?.()||{};
       diag({patch:UX_PATCH,phase:'background_ready_error',code:readinessErrorCode(error),prepared:!!after.prepared,ready:!!after.ready});
-      syncPersistedReadyUi();
       throw error;
-    }).finally(()=>{backgroundReadyPromise=null});
+    }).finally(()=>{
+      backgroundReadyPromise=null;
+      syncPersistedReadyUi();
+    });
     // A background warm must never become an unhandled rejection when ordinary
     // audio already completed through the bounded browser bridge.
     backgroundReadyPromise.catch(()=>{});
@@ -183,7 +193,10 @@
       syncPersistedReadyUi();
       const prepareButton=typeof doc.getElementById==='function'?doc.getElementById('prepareNeuralVoice'):null;
       const state=runtime.status?.()||{};
-      if(prepareButton&&state.prepared&&!state.ready)primeBackgroundReady().catch(()=>{});
+      if(prepareButton&&state.prepared&&!state.ready&&!backgroundReadyPromise){
+        primeBackgroundReady().catch(()=>{});
+        syncPersistedReadyUi();
+      }
     };
     doc.addEventListener('click',event=>{
       let button=null;
@@ -194,10 +207,10 @@
       // Cached assets already exist. Do not allow the legacy app handler to send
       // this user back through the download/prepare ritual.
       try{event.preventDefault?.();event.stopImmediatePropagation?.()}catch{}
-      button.disabled=true;
-      button.innerHTML='<i data-lucide="loader-circle"></i> Mengaktifkan neural…';
       diag({patch:UX_PATCH,phase:'prepared_activation_click'});
-      primeBackgroundReady().then(()=>syncPersistedReadyUi()).catch(()=>syncPersistedReadyUi());
+      const warming=primeBackgroundReady();
+      syncPersistedReadyUi();
+      warming.catch(()=>{});
     },true);
     if(typeof root.MutationObserver==='function'){
       try{
