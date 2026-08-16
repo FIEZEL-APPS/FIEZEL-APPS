@@ -4,6 +4,7 @@ const fs=require('fs');
 const vm=require('vm');
 const path=require('path');
 const patch=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-neural-voice-audibility-fix.js'),'utf8');
+const adapterSource=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-kokoro-adapter.js'),'utf8');
 
 function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,ensureError=false,invalidatePrepared=false,withUi=false}={}){
   const events=[];
@@ -42,9 +43,9 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
   const documentEvents={};
   const mutationCallbacks=[];
   const ui=withUi?{
-    prepareButton:{id:'prepareNeuralVoice',disabled:false,innerHTML:'Siapkan suara offline'},
-    testButton:{id:'testNeuralVoice',disabled:false,innerHTML:'Tes suara'},
-    hint:{id:'neuralVoiceProgress',textContent:'Model tersimpan lokal. Siapkan suara offline.'}
+    prepareButton:{id:'prepareNeuralVoice',disabled:false,innerHTML:'Siapkan suara offline',dataset:{}},
+    testButton:{id:'testNeuralVoice',disabled:false,innerHTML:'Tes suara',dataset:{}},
+    hint:{id:'neuralVoiceProgress',textContent:'Model tersimpan lokal. Siapkan suara offline.',dataset:{}}
   }:null;
   const document=withUi?{
     readyState:'complete',documentElement:{},body:{},
@@ -74,7 +75,60 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
   };
 }
 
+async function adapterProxyObservation({standalone}){
+  const stages=[];
+  const ctx={console,URL,Promise,Date,setTimeout,clearTimeout};
+  ctx.navigator={standalone:!!standalone};
+  ctx.crossOriginIsolated=false;
+  vm.createContext(ctx);
+  vm.runInContext(adapterSource,ctx,{filename:'fiezel-kokoro-adapter.js'});
+  const wasm={numThreads:1,proxy:false};
+  const env={
+    allowRemoteModels:true,
+    allowLocalModels:true,
+    localModelPath:'',
+    wasmPaths:'',
+    backends:{onnx:{wasm}}
+  };
+  let proxyAtSessionCreation=null;
+  const KokoroTTS={
+    from_pretrained:async()=>{
+      proxyAtSessionCreation=wasm.proxy;
+      return{
+        tokenizer:()=>({input_ids:{dims:[1,1]}}),
+        model:()=>Promise.resolve({}),
+        generate:async()=>({audio:new Float32Array(1)}),
+        voices:{af_heart:{}}
+      };
+    }
+  };
+  const adapter=ctx.FiezelKokoroAdapter.createKokoroAdapter({
+    KokoroTTS,kokoroEnv:env,setVoiceDataUrl:()=>{},
+    modelId:'kokoro-model',localModelPath:'./vendor/',voiceBaseUrl:'./vendor/kokoro-model/voices',
+    wasmBasePath:'./vendor/kokoro-js/wasm/',dtype:'q8',device:'wasm',onStage:entry=>stages.push(entry)
+  });
+  await adapter.initialize();
+  return{proxyAtSessionCreation,wasm,stages};
+}
+
 (async()=>{
+  // Physical m025-17 evidence shows model latency and event-loop watchdog delay are
+  // effectively the same 10-16 s interval. Apple standalone must therefore use the
+  // shipped ORT proxy worker before the session is created; chunking alone is not a
+  // responsiveness boundary. Keep single-thread WASM because the document is not
+  // crossOriginIsolated, but move that one thread off the UI thread.
+  {
+    const apple=await adapterProxyObservation({standalone:true});
+    assert.equal(apple.proxyAtSessionCreation,true,'Apple standalone ORT proxy must be enabled before Kokoro session creation');
+    assert.equal(apple.wasm.proxy,true,'Apple standalone must retain proxy-worker execution after adapter initialization');
+    assert.equal(apple.wasm.numThreads,1,'Apple standalone remains single-threaded inside the worker');
+    assert.ok(apple.stages.some(entry=>entry.phase==='wasm_policy'&&entry.proxy===true),'diagnostics must report the effective proxy-worker policy');
+
+    const web=await adapterProxyObservation({standalone:false});
+    assert.equal(web.proxyAtSessionCreation,false,'non-standalone runtime must preserve direct/default ORT execution');
+    assert.equal(web.wasm.proxy,false,'non-standalone proxy policy must not change');
+  }
+
   // P0 #48 UX contract: an already-downloaded but cold runtime must not hold the
   // first ordinary Listening utterance behind model initialization. Neural warms
   // in parallel; browser speech is a bounded audible bridge for that cold start.
@@ -163,6 +217,47 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
     assert.equal(t.prepareCalls,0,'the entire cached activation path must remain download-free');
   }
 
+  // Source-proven m025-17 blocker: when automatic activation fails but the cache is
+  // still valid, observer-driven DOM refresh must become quiescent. It must not
+  // silently launch another ~20 s initialize attempt. A deliberate button click is
+  // allowed to retry once because that is explicit user intent.
+  {
+    const t=makeContext({ready:false,prepared:true,ensureDelayMs:5,ensureError:true,invalidatePrepared:false,withUi:true});
+    assert.equal(t.ensureReadyCalls,1,'cached mount starts one automatic activation attempt');
+    await new Promise(resolve=>setTimeout(resolve,15));
+    assert.ok(t.events.includes('ensure-error'),'automatic activation failure must be observed');
+    for(const callback of t.mutationCallbacks)for(let i=0;i<5;i++)callback([]);
+    await new Promise(resolve=>setTimeout(resolve,2));
+    assert.equal(t.ensureReadyCalls,1,'failed automatic activation must not re-arm through MutationObserver refresh');
+    assert.equal(t.prepareCalls,0,'quiescent failure path must remain download-free');
+
+    let prevented=false,stopped=false;
+    const event={
+      target:{closest:selector=>selector==='#prepareNeuralVoice'?t.ui.prepareButton:null},
+      preventDefault:()=>{prevented=true},
+      stopImmediatePropagation:()=>{stopped=true}
+    };
+    for(const entry of t.documentEvents.click||[])entry.fn(event);
+    assert.equal(prevented,true);
+    assert.equal(stopped,true);
+    assert.equal(t.ensureReadyCalls,2,'explicit cached activation click may retry after automatic failure');
+    assert.equal(t.prepareCalls,0,'manual cached retry must still avoid runtime.prepare/redownload');
+    await new Promise(resolve=>setTimeout(resolve,10));
+  }
+
+  // Source-proven m025-17 blocker: Lucide hydrates <i data-lucide> into <svg>.
+  // MutationObserver refresh must recognize the semantic render state and leave the
+  // hydrated SVG intact instead of rewriting raw innerHTML back to <i> forever.
+  {
+    const t=makeContext({ready:false,prepared:true,ensureDelayMs:40,withUi:true});
+    assert.equal(t.ui.prepareButton.dataset.fiezelNeuralUxKey,'warming','render state must be tracked independently from Lucide child markup');
+    const hydrated='<svg data-lucide="loader-circle"></svg> Mengaktifkan neural…';
+    t.ui.prepareButton.innerHTML=hydrated;
+    for(const callback of t.mutationCallbacks)callback([]);
+    assert.equal(t.ui.prepareButton.innerHTML,hydrated,'observer refresh must preserve Lucide-hydrated markup for the same semantic state');
+    await new Promise(resolve=>setTimeout(resolve,45));
+  }
+
   // A persisted marker is not permission to lie. If cache verification invalidates
   // prepared state, the compatibility UI must fall back to the genuine one-time
   // download path rather than leaving an "activate cached" label behind.
@@ -179,7 +274,8 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
   }
 
   assert.ok(patch.includes('background_ready'),'background readiness must be explicitly diagnosed');
-  assert.ok(patch.includes("String(node.innerHTML||'')!==value"),'UI sync must avoid self-triggering MutationObserver churn');
+  assert.ok(patch.includes('fiezelNeuralUxKey'),'UI sync must use semantic render keys so Lucide hydration is mutation-safe');
+  assert.ok(patch.includes('automaticReadyAttempted'),'persisted-ready auto activation must remember a failed attempt until the prepared/cold epoch changes');
 
-  console.log('FIEZEL neural voice audibility + persisted UX regression: PASS');
+  console.log('FIEZEL neural voice audibility + m025-18 worker/quiescence regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
