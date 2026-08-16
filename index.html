@@ -84,6 +84,60 @@
   <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>
   <script>
+    /* FIEZEL_REPORT_GESTURE_ISOLATION_START */
+    (() => {
+      const baseFlushReportQueue = flushReportQueue;
+      const baseSendCreatorReport = sendCreatorReport;
+      const baseMaybeSendAccessReport = maybeSendAccessReport;
+
+      function creatorReportAuthReadyForAutomatic() {
+        try {
+          return typeof puter !== 'undefined' && !!puter?.authToken && puter?.auth?.isSignedIn?.() === true;
+        } catch {
+          return false;
+        }
+      }
+
+      function deferAutomaticReport(task) {
+        return new Promise(resolve => {
+          setTimeout(() => {
+            try {
+              Promise.resolve(task()).then(resolve, () => resolve(false));
+            } catch {
+              resolve(false);
+            }
+          }, 0);
+        });
+      }
+
+      flushReportQueue = function({ allowInteractiveAuth = false } = {}) {
+        if (allowInteractiveAuth) return baseFlushReportQueue();
+        if (!creatorReportAuthReadyForAutomatic()) return Promise.resolve(false);
+        return deferAutomaticReport(() => baseFlushReportQueue());
+      };
+
+      sendCreatorReport = async function(reason = 'manual', force = false, { allowInteractiveAuth = (reason === 'manual' || reason === 'consent_enabled') } = {}) {
+        if (allowInteractiveAuth) return baseSendCreatorReport(reason, force);
+        if (!creatorReportAuthReadyForAutomatic()) {
+          if (!state.preferences?.reportConsent || !validReportEndpoint(state.preferences?.reportEndpoint)) return false;
+          if (!force && state.totalAnswered <= Number(state.reportMeta?.lastSentAnswered || 0)) return false;
+          queueCreatorReport(buildCreatorReport(reason));
+          return false;
+        }
+        return deferAutomaticReport(() => baseSendCreatorReport(reason, force));
+      };
+
+      maybeSendAccessReport = function({ allowInteractiveAuth = false } = {}) {
+        if (allowInteractiveAuth) return baseMaybeSendAccessReport();
+        if (!creatorReportAuthReadyForAutomatic()) return Promise.resolve(false);
+        return deferAutomaticReport(() => baseMaybeSendAccessReport());
+      };
+
+      globalThis.creatorReportAuthReadyForAutomatic = creatorReportAuthReadyForAutomatic;
+    })();
+    /* FIEZEL_REPORT_GESTURE_ISOLATION_END */
+  </script>
+  <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }

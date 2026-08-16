@@ -1,3 +1,4 @@
+require('./app-report-control-path-test.js');
 const fs=require('fs'),path=require('path');
 const root=__dirname;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
