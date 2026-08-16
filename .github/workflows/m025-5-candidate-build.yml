@@ -103,3 +103,129 @@ jobs:
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 3
+
+  promoted-preflight:
+    name: Simulate atomic m025-5 promotion (read-only)
+    needs: build-candidate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Download exact candidate produced by this head
+        uses: actions/download-artifact@v4
+        with:
+          name: m025-5-vendor-candidate-${{ github.sha }}
+          path: .candidate-artifact
+      - name: Detect committed promotion state
+        id: state
+        shell: bash
+        run: |
+          echo "runtime_promoted=$(node -p "String(require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.provenance.runtimePromoted)")" >> "$GITHUB_OUTPUT"
+      - name: Apply exact candidate only inside the ephemeral runner workspace
+        if: steps.state.outputs.runtime_promoted == 'false'
+        run: node tools/promote-m0255-runtime.mjs .candidate-artifact/kokoro.web.js --apply
+      - name: Verify atomic six-file promotion scope
+        if: steps.state.outputs.runtime_promoted == 'false'
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --name-only | sort > /tmp/promoted-files.txt
+          cat > /tmp/expected-promoted-files.txt <<'EOF'
+          NEURAL-VOICE-SOURCE-LOCK.json
+          features/neural-voice/fiezel-diag-panel.js
+          features/neural-voice/fiezel-neural-voice-bootstrap.js
+          neural-voice-device-hotfix-test.js
+          sw.js
+          vendor/kokoro-js/kokoro.web.js
+          EOF
+          sort -o /tmp/expected-promoted-files.txt /tmp/expected-promoted-files.txt
+          diff -u /tmp/expected-promoted-files.txt /tmp/promoted-files.txt
+          git diff --check
+      - name: Verify promoted release markers against current main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --no-tags
+          base_diag="$(git show origin/main:features/neural-voice/fiezel-diag-panel.js | sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" | head -n1)"
+          head_diag="$(sed -nE "s/.*var DIAG_BUILD = 'm025-([0-9]+)'.*/\1/p" features/neural-voice/fiezel-diag-panel.js | head -n1)"
+          test -n "$base_diag"
+          test -n "$head_diag"
+          test "$head_diag" -eq "$((base_diag + 1))"
+          grep -F "const SW_REV='m025-${head_diag}-" sw.js >/dev/null
+      - name: Prove strict clean-room reproduction in the promoted state
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tools/rebuild-neural-vendor.sh
+          node neural-voice-m0255-promotion-test.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned push dependency
+        run: npm install --ignore-scripts
+      - name: Syntax in simulated promoted state
+        shell: bash
+        run: |
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find . -type f \( -name '*.js' -o -name '*.mjs' \) \
+            -not -path './node_modules/*' \
+            -not -path './vendor/*' \
+            -print0)
+      - name: Full Quality core validation in simulated promoted state
+        run: |
+          node validator.js
+          node regression-test.js
+          node content-audit.js
+          node content-qa-agent.js
+          node content-qa-agent-test.js
+          node content-patch-gate-test.js
+          node content-canary-test.js
+          node content-promotion-test.js
+          node content-adoption-evidence-test.js
+          node content-evidence-origin-test.js
+          node content-adoption-rehearsal-test.js
+          node content-adoption-test.js
+          node product-audit.js
+          node runtime-stage8-test.js
+          node ai-integration-test.js
+          node experience-integration-test.js
+          node lesson-experience-test.js
+          node ui-structure-test.js
+          node grammar-quality-audit.js
+          node notification-reminder-test.js
+          node remote-push-test.js
+          node core-brain-test.js
+          node core-worker-contract-test.js
+          node learner-evidence-test.js
+          node alrs-behavior-test.js
+          node adaptive-policy-test.js
+          node policy-outcome-test.js
+          node pwa-cache-test.js
+          node http-smoke-test.js
+          node speaking-listening-test.js
+          node neural-voice-test.js
+          node ios-wasm-module-test.js
+          node ios-cache-compat-test.js
+          node neural-voice-http-test.js
+          node neural-voice-audibility-test.js
+          node diag-panel-test.js
+          node diag-search-test.js
+          node neural-voice-fix-test.js
+          node sw-corp-test.js
+          node neural-voice-product-repair-test.js
+          node neural-voice-device-hotfix-test.js
+          node neural-voice-m0255-promotion-test.js
+          node neural-voice-timeout-phase-test.js
+          node neural-voice-generation-timeout-test.js
+          node neural-voice-single-flight-test.js
+          node neural-voice-diagnostics-retention-test.js
+          node puter-auth-coop-test.js
+          node puter-auth-diagnostics-test.js
