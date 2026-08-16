@@ -12,6 +12,10 @@ const boot=read('features/neural-voice/fiezel-neural-voice-bootstrap.js');
 const diag=read('features/neural-voice/fiezel-diag-panel.js');
 const sw=read('sw.js');
 const candidate=lock.candidate;
+const diagBuildMatch=diag.match(/var DIAG_BUILD = 'm025-(\d+)'/);
+const swBuildMatch=sw.match(/const SW_REV='m025-(\d+)-/);
+const diagBuild=diagBuildMatch?Number(diagBuildMatch[1]):null;
+const swBuild=swBuildMatch?Number(swBuildMatch[1]):null;
 
 assert.ok(candidate,'m025-5 candidate lock must exist');
 assert.equal(candidate.id,'m025-5','candidate identity must remain m025-5');
@@ -25,6 +29,8 @@ assert.equal(lock.dependencies.phonemizerSafariUpstreamFix.headCommit,'6cef70372
 assert.equal(lock.dependencies.phonemizerSafariUpstreamFix.sourcePath,'src/espeakng.worker.js','Safari fix scope must remain the eSpeak worker only');
 assert.equal(lock.dependencies.phonemizerSafariUpstreamFix.sourceBlobGitSha,'3c2cc8ca249d5b8011b67b7c4041567dae184e94','Safari worker blob must remain exact');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'Apple standalone generation timeout must remain 30s');
+assert.ok(Number.isInteger(diagBuild),'Diagnostics build must remain parseable');
+assert.ok(Number.isInteger(swBuild),'SW release build must remain parseable');
 
 const runtimePromoted=candidate.provenance.runtimePromoted===true;
 const actualBundle=readBuf(candidate.bundle.path);
@@ -40,9 +46,9 @@ if(!runtimePromoted){
   assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'blocked state must keep bootstrap on m025-4');
   assert.ok(!boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'blocked state must not expose an m025-5 vendor URL');
   assert.ok(boot.includes("{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-4',bytes:2136409}"),'blocked state must keep m025-4 asset size');
-  assert.ok(diag.includes("var DIAG_BUILD = 'm025-4';"),'blocked state must keep m025-4 diagnostics identity');
+  assert.equal(diagBuild,4,'blocked state must keep m025-4 diagnostics identity');
   assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'blocked state must keep m025-4 SW vendor precache');
-  assert.ok(sw.includes("const SW_REV='m025-4-"),'blocked state must keep m025-4 SW revision');
+  assert.equal(swBuild,4,'blocked state must keep m025-4 SW revision');
 }else{
   assert.notEqual(candidate.state,'SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED','promoted runtime must advance candidate state');
   assert.equal(lock.runtime.bundle.sha256,candidate.bundle.sha256,'promotion must atomically advance runtime SHA to the proven candidate');
@@ -52,10 +58,10 @@ if(!runtimePromoted){
   assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'promoted bootstrap must use m025-5 vendor URL');
   assert.ok(!boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'promoted bootstrap must not retain the old versioned vendor URL');
   assert.ok(boot.includes("{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-5',bytes:2136684}"),'promoted bootstrap must use the exact m025-5 asset size');
-  assert.ok(diag.includes("var DIAG_BUILD = 'm025-5';"),'promoted diagnostics identity must be m025-5');
-  assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'promoted SW must precache m025-5 vendor URL');
-  assert.ok(!sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'promoted SW must not precache the old vendor URL');
-  assert.ok(sw.includes("const SW_REV='m025-5-"),'promoted SW revision must advance coherently to m025-5');
+  assert.ok(diagBuild>=5,'post-promotion Diagnostics must never regress below the m025-5 vendor adoption build');
+  assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'post-promotion SW must keep precaching the exact m025-5 vendor URL');
+  assert.ok(!sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-4"),'post-promotion SW must not precache the old vendor URL');
+  assert.equal(swBuild,diagBuild,'later app deploys may advance beyond m025-5, but SW and Diagnostics build identities must remain coherent');
 }
 
-console.log(`FIEZEL m025-5 atomic promotion contract: PASS (${runtimePromoted?'promoted':'blocked'})`);
+console.log(`FIEZEL m025-5 atomic vendor promotion contract: PASS (${runtimePromoted?'promoted':'blocked'}, deploy=m025-${diagBuild})`);
