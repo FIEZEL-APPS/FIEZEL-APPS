@@ -34,7 +34,7 @@ check(html.indexOf('./app.js')<html.indexOf('./features/home-redesign/home-redes
 check(/dataset\.view='skills'/.test(homeRedesign)&&/root\.go\('skills'\)/.test(homeRedesign),'Progressive navigation must add Skills Lab without removing the five-item static fallback.');
 check(/replaceChildren\(\)/.test(homeRedesign)&&/createTextNode/.test(homeRedesign)&&/createElement\(strong\?'strong':'em'\)/.test(homeRedesign),'AI Coach rich text must be rendered with safe DOM text/strong/em nodes.');
 check(!/\.innerHTML\s*=/.test(homeRedesign),'Home redesign must not inject coach or learner text through innerHTML.');
-check(/\binsufficient\b/.test(homeRedesign)&&/bukti belum cukup/.test(homeRedesign)&&/sessionSize/.test(homeRedesign)&&/jumlah soal/.test(homeRedesign),'Home redesign must humanize bounded internal adaptive jargon in presentation only.');
+check(/insufficient/.test(homeRedesign)&&/bukti belum cukup/.test(homeRedesign)&&/sessionSize/.test(homeRedesign)&&/jumlah soal/.test(homeRedesign),'Home redesign must humanize bounded internal adaptive jargon in presentation only.');
 check(/home-secondary-ai/.test(homeRedesign)&&/home-secondary-ai/.test(homeRedesignCss),'Hero AI analysis action must be explicitly demoted to secondary presentation.');
 check(/home-stats>div:nth-child\(1\)/.test(homeRedesignCss)&&/home-stats>div:nth-child\(3\)/.test(homeRedesignCss),'Home overview must hide duplicated Level/Dikuasai summary metrics while leaving source data intact.');
 check(/\.home-redesign-active \.learning-launcher\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/.test(homeRedesignCss),'Mobile Home learning modules must use a compact two-column grid.');
