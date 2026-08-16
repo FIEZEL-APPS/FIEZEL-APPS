@@ -1,15 +1,15 @@
 importScripts('./version.js');
+// CACHE is the stable runtime/data cache used by neural preparation. Do not bind
+// mutable application-shell generations to it: prepared neural assets must survive
+// a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-// SW_REV tidak dibaca kode mana pun. Fungsinya hanya mengubah byte sw.js supaya
-// browser mendeteksi service worker baru dan menjalankan install ulang. Itu perlu
-// karena fetch handler di bawah cache-first untuk semua same-origin, jadi file baru
-// TIDAK akan pernah dilayani sampai install memanggil addAll dengan cache:'reload'.
-// JANGAN naikkan version.js bersamaan: nama CACHE terikat ke FIEZEL_VERSION, dan
-// activate menghapus semua cache fiezel-* yang bukan CACHE -- termasuk 113 MB aset
-// neural voice yang menumpang di cache yang sama.
-const SW_REV='m025-15-cache-integrity-repair-20260817-1';
-const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./vendor/kokoro-js/kokoro.web.js?nv=m025-5','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-diag-panel.js','./features/neural-voice/fiezel-pipeline-device-probe.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
+const SW_REV='m025-16-release-coherence-20260817-1';
+const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
+const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-diag-panel.js','./features/neural-voice/fiezel-pipeline-device-probe.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kokoro-');
+const shellScope=String(self.registration?.scope||`${self.location.origin}/`);
+const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).href));
+const isShellRequest=request=>request?.mode==='navigate'||shellUrls.has(new URL(request.url).href);
 
 // Cross-origin policy is intentionally engine-aware. Chromium-family browsers can
 // keep COOP:same-origin and use the isolation-capable Puter auth path. WebKit uses
@@ -29,19 +29,37 @@ function withCoopCoep(response,request){
 }
 
 const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(shellRequests())).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+// Do not skipWaiting here. A new release is allowed to activate only after clients
+// using the previous worker are gone, preventing a controller-generation swap in
+// the middle of a live installed-PWA document.
+self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>c.addAll(shellRequests()))));
+// Because activation is no longer forced over live old clients, stale dedicated
+// shell caches can be removed here. The stable neural/runtime CACHE is preserved.
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE).map(k=>caches.delete(k))))));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);
-  if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request)).catch(()=>caches.match(e.request)));return}
+  if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request,{cacheName:SHELL_CACHE})).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE})));return}
   if(requestUrl.origin!==self.location.origin){
     // Third-party SDK/API traffic is deliberately left to the browser. The
     // document uses COEP: credentialless, so no-cors resources such as Puter.js
     // can load without the service worker reconstructing or proxying opaque bodies.
     return;
   }
-  e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy))}return r}).catch(error=>{if(e.request.mode==='navigate')return caches.match('./index.html');throw error})).then(r=>r&&(e.request.mode==='navigate'||/\.(?:m?js)$/i.test(requestUrl.pathname))?withCoopCoep(r,e.request):r));
+  let responsePromise;
+  if(isNeuralAsset(e.request)){
+    // Neural runtime/model/voice assets are owned by the neural prepare layer and
+    // stay in the stable runtime cache. A shell release never precaches/rewrites them.
+    responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request));
+  }else if(isShellRequest(e.request)){
+    // Current worker generation serves only its own revisioned shell cache. Missing
+    // shell bytes are refetched into this generation, never borrowed from legacy
+    // shell entries that still happen to exist in the stable runtime cache.
+    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy))}return r})).catch(error=>{if(e.request.mode==='navigate')return caches.match('./index.html',{cacheName:SHELL_CACHE});throw error});
+  }else{
+    responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy))}return r}));
+  }
+  e.respondWith(responsePromise.then(r=>r&&(e.request.mode==='navigate'||/\.(?:m?js)$/i.test(requestUrl.pathname))?withCoopCoep(r,e.request):r));
 });
 
 self.addEventListener('periodicsync',e=>{if(e.tag==='fiezel-update-check')e.waitUntil(self.registration.update().catch(()=>{}))});
