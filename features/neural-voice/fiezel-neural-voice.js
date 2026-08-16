@@ -87,6 +87,7 @@
     const targetWords = config.limits && config.limits.targetChunkWords || 140;
     const hardWords = config.limits && config.limits.hardChunkWords || 190;
     const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
+    const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
     let generation = 0;
     let requestSequence = 0;
     let activeStop = null;
@@ -143,6 +144,16 @@
           throw error;
         }
         diag({ phase: 'generate_start', requestId, chunkIndex, voice, chars: chunk.length, timeoutMs: generationTimeoutMs || null });
+        const watchdogScheduledAt = Date.now();
+        setTimeout(() => {
+          const callbackAt = Date.now();
+          diag({
+            phase: 'generate_event_loop_watchdog', requestId, chunkIndex,
+            scheduledAt: watchdogScheduledAt,
+            expectedDelayMs: eventLoopWatchdogMs,
+            observedDelayMs: callbackAt - watchdogScheduledAt
+          });
+        }, eventLoopWatchdogMs);
         let timer = null;
         let didTimeOut = false;
         let audio;
