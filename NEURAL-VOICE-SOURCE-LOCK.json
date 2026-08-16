@@ -44,7 +44,7 @@
   },
   "candidate": {
     "id": "m025-5",
-    "state": "SOURCE_CANDIDATE_PROVEN / PROMOTION_BLOCKED",
+    "state": "RUNTIME_CANDIDATE_PROMOTED / DEVICE_GATE_PENDING",
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
       "sizeBytes": 2136684,
@@ -54,14 +54,14 @@
       "buildSourceCommit": "f4325324cad4f8dd1877743bd5e1e47fccbe9809",
       "successfulIndependentBuilds": 2,
       "byteIdentical": true,
-      "runtimePromoted": false
+      "runtimePromoted": true
     }
   },
   "runtime": {
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
-      "sizeBytes": 2136409,
-      "sha256": "2551a7e181b2359b6148a2f1b842f75537639ad5f46071b3db48483bb9762d61"
+      "sizeBytes": 2136684,
+      "sha256": "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
     },
     "wasmModule": {
       "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
