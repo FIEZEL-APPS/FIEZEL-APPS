@@ -142,6 +142,7 @@ jobs:
       - name: Release-safety regressions
         run: |
           node pwa-cache-test.js
+          node pwa-release-coherence-test.js
           node sw-corp-test.js
           node puter-auth-coop-test.js
           node diag-search-test.js
