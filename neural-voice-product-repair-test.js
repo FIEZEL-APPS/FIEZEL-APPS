@@ -62,20 +62,30 @@ const pass=name=>console.log(`PASS ${name}`);
     FiezelVoiceRuntime:runtime,
     FiezelWebAudioPlayer:{createPlayer:()=>({warm:()=>true})},
     localStorage:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,value)},
-    speechSynthesis:{paused:false,getVoices:()=>[],speak:()=>{browserSpeakCalls++},cancel:()=>{}},
+    speechSynthesis:{
+      paused:false,
+      getVoices:()=>[],
+      speak:utterance=>{browserSpeakCalls++;utterance.onstart?.();utterance.onend?.()},
+      cancel:()=>{}
+    },
     SpeechSynthesisUtterance,
     FIEZEL_VERSION:'test',
     setTimeout,clearTimeout,Date,JSON,Object,String,Number,Promise,Error
   };
   context.globalThis=context;
   vm.runInNewContext(audibilitySource,context,{filename:'fiezel-neural-voice-audibility-fix.js'});
-  const result=await context.FiezelVoiceRuntime.speak('hello',{voice:'af_bella'});
-  assert.strictEqual(ensureReadyCalls,1,'prepared cold-launch path must resume neural runtime');
-  assert.strictEqual(neuralSpeakCalls,1,'prepared cold-launch path must attempt neural speech');
-  assert.strictEqual(browserSpeakCalls,0,'browser TTS must not preempt a prepared neural runtime');
-  assert.strictEqual(result.provider,'kokoro-local');
-  assert.strictEqual(result.voice,'af_bella');
-  pass('prepared cold launch resumes neural before browser fallback');
+  const coldResult=await context.FiezelVoiceRuntime.speak('hello',{voice:'af_bella'});
+  assert.strictEqual(ensureReadyCalls,1,'prepared cold-launch path must start neural readiness in background');
+  assert.strictEqual(neuralSpeakCalls,0,'cold bridge must not double-play neural while first audio is bridged');
+  assert.strictEqual(browserSpeakCalls,1,'prepared cold launch must provide immediate audible bridge');
+  assert.strictEqual(coldResult.provider,'browser-speech-synthesis');
+  await Promise.resolve();
+  const warmResult=await context.FiezelVoiceRuntime.speak('hello again',{voice:'af_bella'});
+  assert.strictEqual(warmResult.provider,'kokoro-local','once background readiness completes, Kokoro must resume as primary provider');
+  assert.strictEqual(warmResult.voice,'af_bella');
+  assert.strictEqual(neuralSpeakCalls,1,'ready follow-up must use neural speech');
+  assert.strictEqual(browserSpeakCalls,1,'ready follow-up must not use a second browser bridge');
+  pass('prepared cold launch bridges first audio while neural warms, then returns to Kokoro');
 
   const webAudio=require('./features/neural-voice/fiezel-web-audio-player.js');
   let contexts=0;
