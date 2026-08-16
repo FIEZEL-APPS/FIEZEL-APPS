@@ -48,7 +48,21 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('bootstrap verifies complete cache before ready flag',()=>assert.ok(bootstrap.indexOf('verifyCachedAssets()')<bootstrap.indexOf("writeStatus(true,'cache')")));
   await test('stale prepared state fails closed to browser TTS',()=>assert.ok(bootstrap.includes('if(!(await verifyCachedAssets())){writeStatus(false)')));
   await test('bootstrap contains no vendor endpoint or credential',()=>assert.ok(!/https?:\/\//i.test(bootstrap)&&!/(?:api[_-]?key|bearer\s+[a-z0-9._-]{12,}|sk-[a-z0-9_-]{12,})/i.test(bootstrap)));
-  await test('production claim remains false pending device gates',()=>assert.deepStrictEqual([lock.promotion.sourceAndAssetClosure,lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS','PENDING',false]));
+  await test('physical Apple production gate is evidence-backed',()=>{
+    assert.deepStrictEqual([lock.promotion.sourceAndAssetClosure,lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS','PASS',true]);
+    const evidence=lock.promotion.physicalEvidence;
+    assert.ok(evidence&&typeof evidence==='object','physical evidence required for production claim');
+    assert.equal(evidence.environment,'Apple standalone PWA');
+    assert.equal(evidence.terminalPhase,'speak_neural_success');
+    assert.equal(evidence.requestId,'nv-msvtu4mc-1');
+    assert.equal(evidence.voice,'af_heart');
+    assert.equal(evidence.tokenCount,53);
+    assert.equal(evidence.samples,92400);
+    assert.equal(evidence.capturedAtAsiaJakarta,'2026-08-16T20:15:00.344+07:00');
+    for(const key of ['modelElapsedMs','generationElapsedMs','playbackElapsedMs','totalElapsedMs'])assert.ok(Number.isInteger(evidence[key])&&evidence[key]>0,key);
+    assert.ok(evidence.totalElapsedMs>=evidence.generationElapsedMs);
+    assert.ok(!('prompt' in evidence)&&!('phonemes' in evidence)&&!('tokens' in evidence)&&!('errorMessage' in evidence),'physical evidence must remain bounded and private');
+  });
   const bundle=await import('./vendor/kokoro-js/kokoro.web.js');
   await test('browser bundle exports patched controls',()=>assert.ok(bundle.KokoroTTS&&bundle.env&&bundle.setVoiceDataUrl&&'allowRemoteModels'in bundle.env&&'allowLocalModels'in bundle.env&&'localModelPath'in bundle.env&&'wasmPaths'in bundle.env));
   await test('bootstrap streams large assets instead of buffering the model',()=>assert.ok(bootstrap.includes('LARGE_ASSET_STREAM_THRESHOLD')&&bootstrap.includes('new Response(fetched.body')&&bootstrap.includes('await fetched.arrayBuffer()')));
