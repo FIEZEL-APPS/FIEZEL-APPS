@@ -32,6 +32,23 @@
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
   let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
   function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
+  function installBootstrapLifecycleDiagnostics(){
+    if(root.navigator?.standalone!==true||root.__fiezelNeuralBootstrapLifecycleDiagInstalled)return;
+    root.__fiezelNeuralBootstrapLifecycleDiagInstalled=true;
+    try{
+      const doc=root.document;
+      if(doc&&typeof doc.addEventListener==='function'){
+        doc.addEventListener('visibilitychange',()=>diag({phase:'bootstrap_lifecycle_visibilitychange',visibilityState:String(doc.visibilityState||'unknown')}));
+      }
+      if(typeof root.addEventListener==='function'){
+        root.addEventListener('pagehide',event=>diag({phase:'bootstrap_lifecycle_pagehide',persisted:Boolean(event&&event.persisted)}));
+        root.addEventListener('pageshow',event=>diag({phase:'bootstrap_lifecycle_pageshow',persisted:Boolean(event&&event.persisted)}));
+        root.addEventListener('beforeunload',()=>diag({phase:'bootstrap_lifecycle_beforeunload'}));
+      }
+      diag({phase:'bootstrap_lifecycle_watch_ready'});
+    }catch{}
+  }
+  installBootstrapLifecycleDiagnostics();
   const VENDOR_STAGE_PHASES=new Set(['espeak_module_loaded','espeak_worker_promise_create','espeak_runtime_already_ready','espeak_runtime_wait','espeak_runtime_ready','espeak_worker_construct_enter','espeak_worker_construct_ready','espeak_initcache_enter','espeak_list_voices_enter','espeak_list_voices_return','espeak_initcache_ready','espeak_phonemize_enter','espeak_worker_await_ready','espeak_initcache_await_ready','espeak_set_voice_enter','espeak_set_voice_return','espeak_synthesize_enter','espeak_synthesize_return','espeak_synthesize_error']);
   root.__fiezelNeuralVendorStage=entry=>{try{const vendorPhase=String(entry?.phase||'');if(VENDOR_STAGE_PHASES.has(vendorPhase))diag({phase:vendorPhase})}catch{}};
   function warmAudioGesture(){
