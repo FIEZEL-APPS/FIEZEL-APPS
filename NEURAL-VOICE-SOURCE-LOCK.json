@@ -30,13 +30,38 @@
       "sourceRepository": "xenova/phonemizer.js",
       "sourceCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
       "purpose": "m025-4 phase-only eSpeak lifecycle diagnostics; no prompt, phoneme, token, or external error-message payloads"
+    },
+    "phonemizerSafariUpstreamFix": {
+      "sourceRepository": "xenova/phonemizer.js",
+      "baseCommit": "6835144b7ee9043129222549c1ed2f6a27216278",
+      "headCommit": "6cef703722c7e867029665df9c85ccaadc4ef19c",
+      "upstreamPullRequest": 4,
+      "sourcePath": "src/espeakng.worker.js",
+      "sourceBlobGitSha": "3c2cc8ca249d5b8011b67b7c4041567dae184e94",
+      "upstreamStatusAtAdoption": "open-unmerged",
+      "purpose": "m025-5 Safari ReadableStream async-iterator compatibility in the eSpeak worker, consumed directly from the exact upstream PR head rather than a hand-authored patch"
+    }
+  },
+  "candidate": {
+    "id": "m025-5",
+    "state": "RUNTIME_CANDIDATE_PROMOTED / DEVICE_GATE_PENDING",
+    "bundle": {
+      "path": "vendor/kokoro-js/kokoro.web.js",
+      "sizeBytes": 2136684,
+      "sha256": "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
+    },
+    "provenance": {
+      "buildSourceCommit": "f4325324cad4f8dd1877743bd5e1e47fccbe9809",
+      "successfulIndependentBuilds": 2,
+      "byteIdentical": true,
+      "runtimePromoted": true
     }
   },
   "runtime": {
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
-      "sizeBytes": 2136409,
-      "sha256": "2551a7e181b2359b6148a2f1b842f75537639ad5f46071b3db48483bb9762d61"
+      "sizeBytes": 2136684,
+      "sha256": "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
     },
     "wasmModule": {
       "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
