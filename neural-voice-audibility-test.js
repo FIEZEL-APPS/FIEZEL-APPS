@@ -5,7 +5,7 @@ const vm=require('vm');
 const path=require('path');
 const patch=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-neural-voice-audibility-fix.js'),'utf8');
 
-function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,withUi=false}={}){
+function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,ensureError=false,invalidatePrepared=false,withUi=false}={}){
   const events=[];
   let ensureReadyCalls=0,prepareCalls=0,originalSpeakCalls=0,originalStopCalls=0,cancelCalls=0;
   const runtime={
@@ -15,6 +15,11 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
       ensureReadyCalls++;
       events.push('ensure-ready-start');
       if(ensureDelayMs)await new Promise(resolve=>setTimeout(resolve,ensureDelayMs));
+      if(ensureError){
+        if(invalidatePrepared)prepared=false;
+        events.push('ensure-error');
+        throw new Error('Offline voice cache verification failed');
+      }
       ready=true;
       events.push('ensure-ready');
       return{ready:true,prepared};
@@ -144,6 +149,21 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
     assert.equal(t.ui.prepareButton.disabled,true,'ready state must not offer another prepare action');
     assert.equal(t.ui.testButton.disabled,false,'strict neural test becomes available only after readiness');
     assert.equal(t.prepareCalls,0,'the entire cached activation path must remain download-free');
+  }
+
+  // A persisted marker is not permission to lie. If cache verification invalidates
+  // prepared state, the compatibility UI must fall back to the genuine one-time
+  // download path rather than leaving an "activate cached" label behind.
+  {
+    const t=makeContext({ready:false,prepared:true,ensureDelayMs:10,ensureError:true,invalidatePrepared:true,withUi:true});
+    assert.equal(t.ensureReadyCalls,1,'stale prepared marker must be verified once');
+    await new Promise(resolve=>setTimeout(resolve,25));
+    assert.ok(t.events.includes('ensure-error'),'verification failure must be observed');
+    assert.match(t.ui.prepareButton.innerHTML,/Siapkan suara offline/,'invalid cache must restore the true preparation action');
+    assert.equal(t.ui.prepareButton.disabled,false,'invalid cache must allow the real repair action');
+    assert.equal(t.ui.testButton.disabled,true,'strict neural test must stay disabled when cache is invalid');
+    assert.match(t.ui.hint.textContent,/belum lengkap/i,'invalid cache copy must explain that offline assets require repair');
+    assert.equal(t.prepareCalls,0,'verification itself must not silently trigger a redownload');
   }
 
   assert.ok(patch.includes('background_ready'),'background readiness must be explicitly diagnosed');
