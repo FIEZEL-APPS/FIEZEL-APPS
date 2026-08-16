@@ -15,7 +15,7 @@
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
   const assets=Object.freeze([
-    {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-4',bytes:2136409},
+    {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-5',bytes:2136684},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',bytes:44484},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019},
     {path:'vendor/kokoro-model/config.json',bytes:45},
@@ -217,7 +217,7 @@
       const initStartedAt=Date.now();
       diag({phase:'init_start'});
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
-      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js?nv=m025-4'));
+      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js?nv=m025-5'));
       try{
         const wasmEnv=kokoro.env?.backends?.onnx?.wasm;
         const appleStandalone=root.navigator?.standalone===true;
