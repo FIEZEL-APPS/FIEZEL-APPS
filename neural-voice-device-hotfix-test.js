@@ -49,7 +49,7 @@ for(const phase of ['espeak_module_loaded','espeak_worker_promise_create','espea
 assert.ok(!/stage\("[^"]+",/.test(phon),'eSpeak probe must emit phase names only');
 assert.ok(!phon.includes('error.message'),'eSpeak probe must not persist external error messages');
 assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'m025-5 must import the versioned vendor URL');
-assert.ok(sw.includes("./vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'m025-5 SW must pre-cache the versioned vendor URL');
+assert.ok(!sw.includes("'./vendor/kokoro-js/kokoro.web.js?nv=m025-5'"),'m025-16 SW install must not own/pre-cache the versioned neural runtime URL');
 assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependencies.phonemizerSourceOverride.path==='vendor/kokoro-js/source-overrides/phonemizer.js','m025-5 source lock must record the phonemizer override');
 assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-5 source override bytes must match the source-lock SHA-256');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must remain unchanged');
