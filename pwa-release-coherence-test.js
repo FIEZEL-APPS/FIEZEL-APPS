@@ -4,6 +4,9 @@ const fs=require('fs');
 const path=require('path');
 const vm=require('vm');
 const src=fs.readFileSync(path.join(__dirname,'sw.js'),'utf8');
+const swRevMatch=src.match(/const SW_REV='([^']+)'/);
+assert.ok(swRevMatch,'SW_REV must remain parseable for release coherence');
+const expectedShellName=`fiezel-shell-${swRevMatch[1]}`;
 
 class HeadersMock{
   constructor(init){
@@ -90,8 +93,8 @@ async function dispatchFetch(t,request){
   const neuralBefore=runtimeBefore.get(neuralKey);
 
   await dispatchExtendable(t.listeners,'install');
-  const shellName=t.openCalls.find(name=>name.startsWith('fiezel-shell-m025-16-'));
-  assert.ok(shellName,'install must create a revisioned m025-16 shell cache');
+  const shellName=t.openCalls.find(name=>name===expectedShellName);
+  assert.ok(shellName,'install must create the shell cache for the exact current SW revision');
   assert.notEqual(shellName,t.runtimeName,'shell cache must be separate from stable neural/runtime cache');
   assert.strictEqual(t.stores.get(t.runtimeName),runtimeBefore,'install must not replace the stable runtime cache object');
   assert.strictEqual(t.stores.get(t.runtimeName).get(neuralKey),neuralBefore,'install must not rewrite prepared neural runtime bytes/metadata');

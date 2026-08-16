@@ -7,8 +7,11 @@
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const DIAG_LIMIT=200;
   const READINESS_PATCH='m025-13-readiness-v1';
+  const UX_PATCH='m025-17-persisted-ready-ux-v1';
   let browserActive=false;
   let activeUtterance=null;
+  let backgroundReadyPromise=null;
+  let uxObserver=null;
 
   function diag(entry){
     try{
@@ -118,6 +121,107 @@
     });
   }
 
+  function setHtml(node,value){if(node&&String(node.innerHTML||'')!==value)node.innerHTML=value}
+  function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
+  function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
+
+  function syncPersistedReadyUi(){
+    try{
+      const doc=root.document;
+      if(!doc||typeof doc.getElementById!=='function')return;
+      const prepareButton=doc.getElementById('prepareNeuralVoice');
+      if(!prepareButton)return;
+      const testButton=doc.getElementById('testNeuralVoice');
+      const hint=doc.getElementById('neuralVoiceProgress');
+      const state=runtime.status?.()||{};
+      if(!state.prepared){
+        // Verification is authoritative. If a stale marker is invalidated, return
+        // the UI to the real one-time download state instead of pretending the
+        // cached activation path still exists.
+        setDisabled(prepareButton,false);
+        setHtml(prepareButton,'<i data-lucide="download"></i> Siapkan suara offline');
+        setDisabled(testButton,true);
+        setText(hint,'Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal.');
+        return;
+      }
+      if(state.ready){
+        setDisabled(prepareButton,true);
+        setHtml(prepareButton,'<i data-lucide="badge-check"></i> Suara neural aktif');
+        setDisabled(testButton,false);
+        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline tersimpan. Mesin neural aktif dan siap dipakai.');
+      }else if(backgroundReadyPromise){
+        setDisabled(prepareButton,true);
+        setHtml(prepareButton,'<i data-lucide="loader-circle"></i> Mengaktifkan neural…');
+        setDisabled(testButton,true);
+        if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; latihan Listening tetap dapat langsung bersuara selama pemanasan.');
+      }else{
+        setDisabled(prepareButton,false);
+        setHtml(prepareButton,'<i data-lucide="zap"></i> Aktifkan suara neural');
+        setDisabled(testButton,true);
+        if(hint&&/Model tersimpan|Mengunduh aset suara|Menyiapkan mesin suara|Aset suara offline/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Aktifkan mesin neural tanpa mengunduh ulang aset.');
+      }
+    }catch{}
+  }
+
+  function primeBackgroundReady(){
+    const state=runtime.status?.()||{};
+    if(!state.prepared||state.ready||typeof runtime.ensureReady!=='function')return Promise.resolve(state);
+    if(backgroundReadyPromise)return backgroundReadyPromise;
+    diag({patch:UX_PATCH,phase:'background_ready_start',prepared:true});
+    backgroundReadyPromise=ensureReady().then(result=>{
+      const after=runtime.status?.()||{};
+      diag({patch:UX_PATCH,phase:'background_ready',prepared:!!after.prepared,ready:!!after.ready});
+      return result;
+    }).catch(error=>{
+      const after=runtime.status?.()||{};
+      diag({patch:UX_PATCH,phase:'background_ready_error',code:readinessErrorCode(error),prepared:!!after.prepared,ready:!!after.ready});
+      throw error;
+    }).finally(()=>{
+      backgroundReadyPromise=null;
+      syncPersistedReadyUi();
+    });
+    // A background warm must never become an unhandled rejection when ordinary
+    // audio already completed through the bounded browser bridge.
+    backgroundReadyPromise.catch(()=>{});
+    return backgroundReadyPromise;
+  }
+
+  function installPersistedReadyUx(){
+    const doc=root.document;
+    if(!doc||typeof doc.addEventListener!=='function')return;
+    const refresh=()=>{
+      syncPersistedReadyUi();
+      const prepareButton=typeof doc.getElementById==='function'?doc.getElementById('prepareNeuralVoice'):null;
+      const state=runtime.status?.()||{};
+      if(prepareButton&&state.prepared&&!state.ready&&!backgroundReadyPromise){
+        primeBackgroundReady().catch(()=>{});
+        syncPersistedReadyUi();
+      }
+    };
+    doc.addEventListener('click',event=>{
+      let button=null;
+      try{button=event?.target?.closest?.('#prepareNeuralVoice')||null}catch{}
+      if(!button)return;
+      const state=runtime.status?.()||{};
+      if(!state.prepared||state.ready)return;
+      // Cached assets already exist. Do not allow the legacy app handler to send
+      // this user back through the download/prepare ritual.
+      try{event.preventDefault?.();event.stopImmediatePropagation?.()}catch{}
+      diag({patch:UX_PATCH,phase:'prepared_activation_click'});
+      const warming=primeBackgroundReady();
+      syncPersistedReadyUi();
+      warming.catch(()=>{});
+    },true);
+    if(typeof root.MutationObserver==='function'){
+      try{
+        uxObserver=new root.MutationObserver(refresh);
+        uxObserver.observe(doc.documentElement||doc.body,{childList:true,subtree:true});
+      }catch{}
+    }
+    if(String(doc.readyState||'')==='loading')root.addEventListener?.('DOMContentLoaded',refresh,{once:true});
+    else refresh();
+  }
+
   async function speak(text,options={}){
     warmWebAudio();
     const state=runtime.status?.()||{};
@@ -130,8 +234,16 @@
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
       if(state.prepared&&typeof runtime.ensureReady==='function'){
+        const warming=primeBackgroundReady();
+        if(!neuralOnly){
+          // m025-17 UX: do not make the first Listening audio wait tens of seconds
+          // for a cold in-memory Kokoro service after a reload. The cached model is
+          // activated in parallel; the bridge is used only until neural is ready.
+          diag({patch:UX_PATCH,phase:'cold_bridge_browser',prepared:true});
+          return browserSpeakImmediate(text,options);
+        }
         try{
-          await ensureReady();
+          await warming;
           const warmed=runtime.status?.()||{};
           if(warmed.ready){
             try{return await runtime.speak(text,{...options,allowFallback:false})}
@@ -168,10 +280,11 @@
     if(state.ready){try{runtime.stop?.()}catch{}}
   }
 
-  function status(){return Object.freeze({...runtime.status?.(),audibilityPatch:'v1'})}
+  function status(){return Object.freeze({...runtime.status?.(),audibilityPatch:'v1',persistedReadyUxPatch:'m025-17'})}
 
   // Prevent the bootstrap's zero-volume speech warmup from occupying Safari's speech queue.
   root.__fiezelTtsUnlocked=true;
   root.FiezelVoiceRuntime=Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true});
+  installPersistedReadyUx();
   diag({phase:'audibility_patch_loaded'});
 })(typeof globalThis!=='undefined'?globalThis:this);
