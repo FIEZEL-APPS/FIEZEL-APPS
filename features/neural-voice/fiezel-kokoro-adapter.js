@@ -171,6 +171,9 @@
         kokoroEnv.wasmPaths = wasmBasePath;
         setVoiceDataUrl(voiceBaseUrl);
         const policy = applyAppleStandaloneWorkerPolicy();
+        try {
+          if (typeof globalThis !== 'undefined') globalThis.__fiezelNeuralWasmPolicy = policy.policy;
+        } catch (_) {}
         stage('wasm_policy', policy);
         const startedAt = Date.now();
         stage('adapter_instance_start', { dtype, device });
