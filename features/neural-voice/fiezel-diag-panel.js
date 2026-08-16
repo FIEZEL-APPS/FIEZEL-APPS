@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-7';
+  var DIAG_BUILD = 'm025-8';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -237,7 +237,6 @@
     search.placeholder = 'Cari: wasm_policy, timeout, adapter...';
     search.autocomplete = 'off';
     search.spellcheck = false;
-
     var searchCount = root.document.createElement('span');
     searchCount.id = 'fiezelDiagSearchCount';
     searchCount.textContent = 'Cari';
