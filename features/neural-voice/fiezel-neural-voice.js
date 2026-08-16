@@ -122,7 +122,7 @@
     const targetWords = config.limits && config.limits.targetChunkWords || 140;
     const hardWords = config.limits && config.limits.hardChunkWords || 190;
     const appleStandalone = env && env.navigator && env.navigator.standalone === true;
-    const appleHardChunkChars = appleStandalone ? Math.max(160, Math.min(320, Number(options.appleHardChunkChars) || 240)) : 0;
+    const appleHardChunkChars = appleStandalone ? Math.max(64, Math.min(128, Number(options.appleHardChunkChars) || 80)) : 0;
     const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
     const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
     let generation = 0;
@@ -139,7 +139,7 @@
       } catch (_) {}
     }
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
-    diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-char-cap-v1' : 'default', hardChunkChars: appleHardChunkChars || null });
+    diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default', hardChunkChars: appleHardChunkChars || null });
 
     function stop() {
       generation += 1;
