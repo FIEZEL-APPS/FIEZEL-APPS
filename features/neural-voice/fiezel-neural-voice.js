@@ -140,6 +140,31 @@
     }
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
     diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default', hardChunkChars: appleHardChunkChars || null });
+    diag({ phase: 'prefetch_policy_ready', policy: appleStandalone ? 'apple-standalone-macrotask-yield-v1' : 'default' });
+
+    if (appleStandalone && !env.__fiezelNeuralLifecycleDiagInstalled) {
+      try {
+        env.__fiezelNeuralLifecycleDiagInstalled = true;
+        const doc = env.document;
+        if (doc && typeof doc.addEventListener === 'function') {
+          doc.addEventListener('visibilitychange', () => {
+            diag({ phase: 'lifecycle_visibilitychange', visibilityState: String(doc.visibilityState || 'unknown') });
+          });
+        }
+        if (typeof env.addEventListener === 'function') {
+          env.addEventListener('pagehide', event => {
+            diag({ phase: 'lifecycle_pagehide', persisted: Boolean(event && event.persisted) });
+          });
+          env.addEventListener('pageshow', event => {
+            diag({ phase: 'lifecycle_pageshow', persisted: Boolean(event && event.persisted) });
+          });
+          env.addEventListener('beforeunload', () => {
+            diag({ phase: 'lifecycle_beforeunload' });
+          });
+        }
+        diag({ phase: 'lifecycle_watch_ready' });
+      } catch (_) {}
+    }
 
     function stop() {
       generation += 1;
@@ -268,6 +293,12 @@
             const playback = await playAudio(audio, { signalGeneration: callGeneration });
             activeStop = playback && typeof playback.stop === 'function' ? playback.stop : null;
             if (chunkIndex + 1 < chunks.length) {
+              if (appleStandalone) {
+                const yieldStartedAt = Date.now();
+                await new Promise(resolve => setTimeout(resolve, 0));
+                diag({ phase: 'prefetch_event_loop_yield', requestId, fromChunkIndex: chunkIndex, nextChunkIndex: chunkIndex + 1, elapsedMs: Date.now() - yieldStartedAt });
+                if (callGeneration !== generation) throw new Error('TTS request superseded');
+              }
               prefetched = generateChunk(chunkIndex + 1).then(
                 value => ({ ok: true, value }),
                 error => ({ ok: false, error })
