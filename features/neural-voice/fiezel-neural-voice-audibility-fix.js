@@ -130,7 +130,16 @@
       const testButton=doc.getElementById('testNeuralVoice');
       const hint=doc.getElementById('neuralVoiceProgress');
       const state=runtime.status?.()||{};
-      if(!state.prepared)return;
+      if(!state.prepared){
+        // Verification is authoritative. If a stale marker is invalidated, return
+        // the UI to the real one-time download state instead of pretending the
+        // cached activation path still exists.
+        prepareButton.disabled=false;
+        prepareButton.innerHTML='<i data-lucide="download"></i> Siapkan suara offline';
+        if(testButton)testButton.disabled=true;
+        if(hint)hint.textContent='Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal.';
+        return;
+      }
       if(state.ready){
         prepareButton.disabled=true;
         prepareButton.innerHTML='<i data-lucide="badge-check"></i> Suara neural aktif';
@@ -188,10 +197,7 @@
       button.disabled=true;
       button.innerHTML='<i data-lucide="loader-circle"></i> Mengaktifkan neural…';
       diag({patch:UX_PATCH,phase:'prepared_activation_click'});
-      primeBackgroundReady().then(()=>syncPersistedReadyUi()).catch(()=>{
-        button.disabled=false;
-        button.innerHTML='<i data-lucide="zap"></i> Aktifkan suara neural';
-      });
+      primeBackgroundReady().then(()=>syncPersistedReadyUi()).catch(()=>syncPersistedReadyUi());
     },true);
     if(typeof root.MutationObserver==='function'){
       try{
