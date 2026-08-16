@@ -1,0 +1,53 @@
+name: m025-5 MASTER Exact Blob Transport
+
+on:
+  push:
+    branches:
+      - master/m025-5-safari-phonemizer-compat
+    paths:
+      - .github/workflows/m025-5-master-blob-transport.yml
+
+permissions:
+  contents: write
+
+jobs:
+  transport-exact-vendor-blob:
+    if: github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact candidate head
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install deterministic delta tool
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq zstd
+
+      - name: Reconstruct and verify exact m025-5 vendor
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/materialize-m0255-vendor.sh ./vendor/kokoro-js/kokoro.web.js /tmp/m0255-kokoro.web.js
+          test "$(sha256sum /tmp/m0255-kokoro.web.js | awk '{print $1}')" = "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
+          test "$(stat -c '%s' /tmp/m0255-kokoro.web.js)" = "2136684"
+          blob="$(git hash-object -w /tmp/m0255-kokoro.web.js)"
+          test "$blob" = "7c8f6353f98fb1516286db20f914b2cdc5537e16"
+          printf 'EXACT_VENDOR_BLOB=%s\n' "$blob" >> "$GITHUB_ENV"
+
+      - name: Transport exact blob into GitHub object storage only
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$EXACT_VENDOR_BLOB" = "7c8f6353f98fb1516286db20f914b2cdc5537e16"
+          tag="m0255-transport-${GITHUB_SHA:0:12}"
+          git update-ref "refs/tags/$tag" "$EXACT_VENDOR_BLOB"
+          git push origin "refs/tags/$tag:refs/tags/$tag"
+          printf 'transportTag=%s\nblob=%s\n' "$tag" "$EXACT_VENDOR_BLOB"
+
+      - name: Assert branch itself was not mutated
+        shell: bash
+        run: |
+          set -euo pipefail
+          remote_head="$(git ls-remote origin refs/heads/master/m025-5-safari-phonemizer-compat | awk '{print $1}')"
+          test "$remote_head" = "$GITHUB_SHA"
+          echo "Branch unchanged; transport tag only."
