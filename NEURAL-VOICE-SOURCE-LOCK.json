@@ -44,7 +44,7 @@
   },
   "candidate": {
     "id": "m025-5",
-    "state": "RUNTIME_CANDIDATE_PROMOTED / DEVICE_GATE_PENDING",
+    "state": "RELEASED / PHYSICAL_APPLE_PASS",
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
       "sizeBytes": 2136684,
@@ -119,7 +119,20 @@
   },
   "promotion": {
     "sourceAndAssetClosure": "PASS",
-    "realDeviceGate": "PENDING",
-    "productionClaim": false
+    "realDeviceGate": "PASS",
+    "productionClaim": true,
+    "physicalEvidence": {
+      "environment": "Apple standalone PWA",
+      "capturedAtAsiaJakarta": "2026-08-16T20:15:00.344+07:00",
+      "requestId": "nv-msvtu4mc-1",
+      "voice": "af_heart",
+      "terminalPhase": "speak_neural_success",
+      "tokenCount": 53,
+      "samples": 92400,
+      "modelElapsedMs": 14723,
+      "generationElapsedMs": 14972,
+      "playbackElapsedMs": 3858,
+      "totalElapsedMs": 18840
+    }
   }
 }
