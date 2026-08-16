@@ -10,6 +10,7 @@ on:
       - 'vendor/kokoro-js/source-patches/**'
       - 'tools/rebuild-neural-vendor.sh'
       - 'tools/promote-m0255-runtime.mjs'
+      - 'tools/materialize-m0255-vendor.sh'
       - '.github/workflows/m025-5-candidate-build.yml'
 
 permissions:
@@ -94,6 +95,22 @@ jobs:
           else
             echo "Candidate runtimePromoted must be boolean, got: $runtime_promoted" >&2
             exit 1
+          fi
+      - name: Verify permanent transport delta reconstructs the same exact candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          runtime_promoted="$(node -p "String(require('./NEURAL-VOICE-SOURCE-LOCK.json').candidate.provenance.runtimePromoted)")"
+          if [[ "$runtime_promoted" == 'false' ]]; then
+            bash tools/materialize-m0255-vendor.sh \
+              vendor/kokoro-js/kokoro.web.js \
+              .vendor-repro/delta-materialized-kokoro.web.js
+            cmp .vendor-repro/kokoro.web.js .vendor-repro/delta-materialized-kokoro.web.js
+            echo 'Permanent m025-4 -> m025-5 transport delta reconstructs source-build candidate byte-for-byte.' \
+              | tee -a .vendor-repro/candidate-report.txt
+          else
+            echo 'Runtime already promoted; transport delta remains historical recovery evidence and is intentionally not applied to an m025-5 base.' \
+              | tee -a .vendor-repro/candidate-report.txt
           fi
       - name: Upload candidate artifact
         uses: actions/upload-artifact@v4
