@@ -134,9 +134,12 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     const policy=log.find(x=>x.phase==='chunk_policy_ready');
     assert.ok(policy&&policy.policy==='apple-standalone-inference-slice-v2','Apple inference-slice policy must be explicitly observable');
     assert.equal(policy.hardChunkChars,80);
+    const prefetchPolicy=log.find(x=>x.phase==='prefetch_policy_ready');
+    assert.ok(prefetchPolicy&&prefetchPolicy.policy==='apple-standalone-macrotask-yield-v1','Apple prefetch yield policy must be observable');
     const plan=log.find(x=>x.phase==='chunk_plan');
     assert.ok(plan&&plan.chunkCount===result.chunks);
     assert.ok(plan.maxChunkChars<=80,'chunk plan must expose the bounded maximum without logging text');
+    assert.equal(log.filter(x=>x.phase==='prefetch_event_loop_yield').length,result.chunks-1,'Apple path must yield once before every next prefetched inference');
   }
 
   {
@@ -153,6 +156,8 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     assert.equal(result.chunks,expected.length,'non-Apple splitter behavior must remain unchanged');
     assert.deepEqual(generatedTexts,expected,'non-Apple adapter inputs must match existing sentence/word splitter');
     assert.ok(diagnostics(env).some(x=>x.phase==='chunk_policy_ready'&&x.policy==='default'&&x.hardChunkChars===null));
+    assert.ok(diagnostics(env).some(x=>x.phase==='prefetch_policy_ready'&&x.policy==='default'));
+    assert.ok(!diagnostics(env).some(x=>x.phase==='prefetch_event_loop_yield'),'non-Apple path must not add Apple-specific event-loop yields');
   }
 
   {
@@ -199,6 +204,53 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     assert.equal(result.chunks,2);
     assert.equal(generateCalls,2,'pipeline must call adapter.generate exactly once per chunk');
     assert.equal(playCalls,2,'both chunks must play exactly once and in order');
+    assert.ok(!diagnostics(env).some(x=>x.phase==='prefetch_event_loop_yield'),'non-Apple overlap path must remain free of Apple yield scheduling');
+  }
+
+  {
+    const env=makeEnv();
+    env.navigator={standalone:true};
+    const cfg=config();
+    cfg.limits={...cfg.limits,targetChunkWords:2,hardChunkWords:2};
+    let generateCalls=0;
+    let playCalls=0;
+    let browserTurnObserved=false;
+    let secondGenerateStartedResolve;
+    let firstPlaybackRelease;
+    const secondGenerateStarted=new Promise(resolve=>{secondGenerateStartedResolve=resolve});
+    const firstPlaybackDone=new Promise(resolve=>{firstPlaybackRelease=resolve});
+    const adapter={kind:'neural-test',generate:async()=>{
+      generateCalls++;
+      if(generateCalls===2){
+        assert.equal(browserTurnObserved,true,'Apple prefetch must yield a browser task turn before dispatching the next inference');
+        secondGenerateStartedResolve();
+      }
+      return audio();
+    }};
+    const service=core.createVoiceService({
+      config:cfg,adapter,env,generationTimeoutMs:200,
+      playAudio:async()=>{
+        playCalls++;
+        if(playCalls===1){
+          setTimeout(()=>{browserTurnObserved=true},0);
+          return{done:firstPlaybackDone,stop(){}};
+        }
+        return{done:Promise.resolve(),stop(){}};
+      }
+    });
+
+    const speaking=service.speak('one two three four.',{allowFallback:false});
+    await secondGenerateStarted;
+    assert.equal(playCalls,1,'Apple yield must preserve inference/playback overlap and strict playback order');
+    assert.equal(generateCalls,2,'Apple next inference must start after exactly one yielded task turn');
+    const yieldEvent=diagnostics(env).find(x=>x.phase==='prefetch_event_loop_yield');
+    assert.ok(yieldEvent,'Apple yielded prefetch must be observable');
+    assert.equal(yieldEvent.fromChunkIndex,0);
+    assert.equal(yieldEvent.nextChunkIndex,1);
+    firstPlaybackRelease();
+    const result=await speaking;
+    assert.equal(result.chunks,2);
+    assert.equal(playCalls,2);
   }
 
   {
