@@ -82,8 +82,11 @@ assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neura
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
-assert.ok(sw.includes("const SW_REV='m025-13-readiness-trace-"),'m025-13 readiness deploy must force a matching shell refresh while keeping the m025-5 vendor/cache namespace');
-assert.ok(diag.includes("var DIAG_BUILD = 'm025-13';"),'diagnostics build must advance exactly to m025-13 for readiness tracing deploy');
+const diagBuildMatch=diag.match(/var DIAG_BUILD = 'm025-(\d+)';/);
+const swBuildMatch=sw.match(/const SW_REV='m025-(\d+)-/);
+assert.ok(diagBuildMatch&&swBuildMatch,'release build markers must remain parseable');
+assert.equal(swBuildMatch[1],diagBuildMatch[1],'Diagnostics and SW release markers must remain on the same m025 build');
+assert.ok(Number(diagBuildMatch[1])>=13,'release build marker must not regress below the m025-13 readiness baseline');
 assert.ok(diag.includes('puterWorkersLoaded')&&diag.includes('puterAuth'));
 const watchdogStart=coreSrc.indexOf("phase: 'generate_event_loop_watchdog'");
 assert.ok(watchdogStart>=0,'m025-13 must retain the bounded event-loop watchdog phase');
@@ -134,4 +137,4 @@ assert.ok(!probeSrc.includes('localStorage'),'device probe must not persist its 
 assert.ok(!probeSrc.includes('speechSynthesis'),'device probe must not invoke browser speech directly');
 assert.ok(read('version.js').includes("'5.19.0'"));
 assert.equal(JSON.parse(read('VERSION.json')).version,'5.19.0');
-console.log('FIEZEL neural device hotfix m025-5 vendor / m025-13 readiness trace deploy: PASS');
+console.log('FIEZEL neural device hotfix m025-5 vendor / readiness + release-marker invariants: PASS');
