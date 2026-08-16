@@ -17,7 +17,6 @@
   async function run(env){
     const runtime=env&&env.FiezelVoiceRuntime;
     if(!runtime||typeof runtime.speak!=='function')throw new Error('neural_runtime_unavailable');
-    if(typeof runtime.refreshPreparedFlag==='function')await runtime.refreshPreparedFlag();
     if(typeof runtime.ensureReady==='function')await runtime.ensureReady();
     return runtime.speak(PROBE_TEXT,{voice:'af_heart',lang:'en-US',speed:.92,allowFallback:false});
   }
