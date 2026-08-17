@@ -389,7 +389,8 @@
     try{root.FiezelWebAudioPlayer?.createPlayer?.(root)?.close?.()}catch{}
     playerRef=null;service=null;adapter=null;
     phase='idle';lastError='';lastFallbackReason='';circuitOpen=false;audibleVerified=false;
-    diag({phase:'released',circuitReset:true});
+    diag({phase:'released'});
+    diag({phase:'release_circuit_reset'});
     return status();
   }
 
