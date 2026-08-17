@@ -128,8 +128,8 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
 
   // --- release markers ----------------------------------------------------------
   assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-31'/);
-  assert.match(SW, /SW_REV='m025-31-two-english-voices-20260818-1'/);
+    /DIAG_BUILD\s*=\s*'m025-32'/);
+  assert.match(SW, /SW_REV='m025-32-indonesian-optional-20260818-1'/);
 
   console.log('FIEZEL m025-26 sherpa VITS engine regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });

@@ -81,5 +81,6 @@ jobs:
           node neural-voice-m02522-real-wasm-proxy-test.js
           node neural-voice-m02524-proxy-timeout-recovery-test.js
           node neural-voice-m02526-sherpa-engine-test.js
+          node neural-voice-m02532-indonesian-optional-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
