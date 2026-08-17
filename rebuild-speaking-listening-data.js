@@ -7,7 +7,8 @@ const listeningPath=path.join(feature,'listening-bank-v1.json');
 const speakingPath=path.join(feature,'speaking-bank-v1.json');
 const listening=JSON.parse(fs.readFileSync(listeningPath,'utf8'));
 const speaking=JSON.parse(fs.readFileSync(speakingPath,'utf8'));
-const voices=['af_nicole','am_michael','bf_emma','bm_george'];
+// m025-31: OWNER reduced the English catalog to Bella and Heart.
+const voices=['af_bella','af_heart'];
 const minimumWords={A1:4,A2:6,B1:8,B2:10,C1:12,C2:14};
 const concepts={
   speak_0003:[['like','love','enjoy','favorite'],['because','since']],

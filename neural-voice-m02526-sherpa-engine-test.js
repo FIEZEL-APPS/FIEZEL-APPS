@@ -85,9 +85,10 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
 
   // Executable: the voice map must be six distinct speaker ids with bella default.
   const mod = require('./' + ADAPTER_PATH);
+  // m025-31: OWNER reduced the English catalog to Bella and Heart.
   const sids = Object.values(mod.VOICE_SIDS);
-  assert.strictEqual(sids.length, 6, 'six voices');
-  assert.strictEqual(new Set(sids).size, 6, 'speaker ids must be distinct');
+  assert.strictEqual(sids.length, 2, 'two English voices');
+  assert.strictEqual(new Set(sids).size, 2, 'speaker ids must be distinct');
   assert.strictEqual(mod.DEFAULT_VOICE, 'af_bella', 'OWNER set bella as default');
   assert.strictEqual(mod.VOICE_SIDS.af_bella, 0, 'bella maps to the proven default speaker');
   assert.match(CONFIG, /fiezelPrimary:\s*'af_bella'/, 'config default must agree with the adapter');
@@ -127,8 +128,8 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
 
   // --- release markers ----------------------------------------------------------
   assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-30'/);
-  assert.match(SW, /SW_REV='m025-30-voice-rate-control-20260818-1'/);
+    /DIAG_BUILD\s*=\s*'m025-31'/);
+  assert.match(SW, /SW_REV='m025-31-two-english-voices-20260818-1'/);
 
   console.log('FIEZEL m025-26 sherpa VITS engine regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
