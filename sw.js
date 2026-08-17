@@ -3,7 +3,7 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='m025-21-apple-webgpu-rollback-20260817-1';
+const SW_REV='m025-22-startup-navigation-recovery-20260817-1';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 const ASSETS=['./','./index.html','./style.css','./version.js','./report-config.js','./core-config.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-kokoro-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-diag-panel.js','./features/neural-voice/fiezel-pipeline-device-probe.js','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json'];
 const isNeuralAsset=request=>new URL(request.url).pathname.includes('/vendor/kokoro-');
@@ -47,15 +47,29 @@ self.addEventListener('fetch',e=>{
     return;
   }
   let responsePromise;
-  if(isNeuralAsset(e.request)){
+  if(e.request.mode==='navigate'){
+    // Installed-PWA startup is recovery-first: validate a fresh network document
+    // before trusting the revisioned shell entry. A blank/stale cached navigation
+    // can therefore self-heal online; offline launch still falls back to the exact
+    // current generation's index.html and never borrows legacy runtime-shell bytes.
+    const freshRequest=new Request(e.request,{cache:'reload'});
+    responsePromise=fetch(freshRequest).then(r=>{
+      if(r&&r.ok){
+        const copy=r.clone();
+        caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));
+        return r;
+      }
+      return caches.match('./index.html',{cacheName:SHELL_CACHE}).then(c=>c||r);
+    }).catch(()=>caches.match('./index.html',{cacheName:SHELL_CACHE}));
+  }else if(isNeuralAsset(e.request)){
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.
     responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request));
   }else if(isShellRequest(e.request)){
-    // Current worker generation serves only its own revisioned shell cache. Missing
-    // shell bytes are refetched into this generation, never borrowed from legacy
-    // shell entries that still happen to exist in the stable runtime cache.
-    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy))}return r})).catch(error=>{if(e.request.mode==='navigate')return caches.match('./index.html',{cacheName:SHELL_CACHE});throw error});
+    // Non-navigation shell assets remain cache-first within this exact generation.
+    // Missing shell bytes are refetched into this generation, never borrowed from
+    // legacy shell entries that still happen to exist in the stable runtime cache.
+    responsePromise=caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy))}return r}));
   }else{
     responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request).then(r=>{if(r&&r.ok&&!isNeuralAsset(e.request)){const copy=r.clone();caches.open(CACHE).then(cache=>cache.put(e.request,copy))}return r}));
   }
