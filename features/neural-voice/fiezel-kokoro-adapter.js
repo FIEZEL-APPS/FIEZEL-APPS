@@ -80,7 +80,7 @@
           numThreads,
           proxy,
           source: 'onnxruntime-web-1.22-runtime-default',
-          readBack: !!wasm,
+          readBack: false,
           supersedes: 'apple-standalone-single-thread-direct-default'
         });
       }
@@ -89,7 +89,7 @@
         numThreads,
         proxy,
         source: 'onnxruntime-web-1.22-runtime-default',
-        readBack: !!wasm
+        readBack: false
       });
     }
 
