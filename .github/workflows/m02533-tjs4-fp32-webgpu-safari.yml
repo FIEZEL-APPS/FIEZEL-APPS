@@ -1,0 +1,206 @@
+name: m025-33 TJS4 fp32 WebGPU Safari qualification
+
+on:
+  push:
+    branches:
+      - master/perf67-m02533-tjs4-fp32-webgpu
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safari26:
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Record Apple runner
+        run: |
+          set -euo pipefail
+          sw_vers
+          /usr/bin/safaridriver --version
+          /usr/bin/arch
+
+      - name: Build source-pinned Kokoro with TJS4 and exact ORT
+        run: |
+          set -euo pipefail
+          PROVIDER_COMMIT="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').provider.commit")"
+          mkdir -p .m02533/runtime .m02533/work
+          git clone --quiet https://github.com/hexgrad/kokoro.git .m02533/work/kokoro
+          git -C .m02533/work/kokoro checkout --quiet "$PROVIDER_COMMIT"
+          git -C .m02533/work/kokoro apply --check "$PWD/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
+          git -C .m02533/work/kokoro apply "$PWD/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
+          cd .m02533/work/kokoro/kokoro.js
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('package.json','utf8'));
+          p.dependencies['@huggingface/transformers']='4.2.0';
+          p.dependencies.phonemizer='1.2.1';
+          p.overrides={...(p.overrides||{}),'onnxruntime-web':'1.26.0-dev.20260416-b7804b056c'};
+          fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');
+          NODE
+          rm -f package-lock.json
+          npm install --ignore-scripts --no-audit --no-fund
+          TJS="$(node -p "require('./node_modules/@huggingface/transformers/package.json').version")"
+          ORT="$(node -p "require('./node_modules/onnxruntime-web/package.json').version")"
+          echo "transformers=$TJS" | tee "$GITHUB_WORKSPACE/.m02533/runtime/runtime-build.txt"
+          echo "onnxruntime-web=$ORT" | tee -a "$GITHUB_WORKSPACE/.m02533/runtime/runtime-build.txt"
+          echo "provider=$PROVIDER_COMMIT" | tee -a "$GITHUB_WORKSPACE/.m02533/runtime/runtime-build.txt"
+          test "$TJS" = '4.2.0'
+          test "$ORT" = '1.26.0-dev.20260416-b7804b056c'
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('rollup.config.js')
+          s=p.read_text()
+          needle='terser({ format: { comments: false } })'
+          if needle in s:
+              s=s.replace(needle,'terser({ maxWorkers: 1, format: { comments: false } })',1)
+              p.write_text(s)
+          PY
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          cp .m02533/work/kokoro/kokoro.js/dist/kokoro.web.js .m02533/runtime/kokoro.web.js
+          mkdir -p .m02533/runtime/wasm
+          find .m02533/work/kokoro/kokoro.js/node_modules -type f \( -name 'ort-wasm*.wasm' -o -name 'ort-wasm*.mjs' \) -print | sort | tee .m02533/runtime/wasm-source-list.txt
+          while IFS= read -r f; do cp "$f" .m02533/runtime/wasm/; done < .m02533/runtime/wasm-source-list.txt
+          sha256sum .m02533/runtime/kokoro.web.js .m02533/runtime/wasm/* | sort | tee .m02533/runtime/SHA256SUMS
+
+      - name: Fetch immutable fp32 model artifact
+        run: |
+          set -euo pipefail
+          REV='1939ad2a8e416c0acfeecc08a694d14ef25f2231'
+          URL="https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/${REV}/onnx/model.onnx?download=true"
+          mkdir -p vendor/kokoro-model/onnx
+          curl --fail --location --retry 3 --retry-all-errors --output vendor/kokoro-model/onnx/model.onnx "$URL"
+          test -s vendor/kokoro-model/onnx/model.onnx
+          stat -f '%z' vendor/kokoro-model/onnx/model.onnx | tee m02533-fp32-size.txt
+          shasum -a 256 vendor/kokoro-model/onnx/model.onnx | tee m02533-fp32-sha256.txt
+          printf '%s\n' "$REV" | tee m02533-model-revision.txt
+
+      - name: Create benchmark page
+        run: |
+          cat > .m02533-bench.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-33 TJS4 fp32 WebGPU</title>
+          <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script type="module">
+          const q=new URL(location.href).searchParams;
+          const mode=q.get('mode')||'current-q8-wasm';
+          const isGpu=mode==='tjs4-fp32-webgpu';
+          const events=[]; window.__benchResult=null; window.__benchStatus='boot';
+          const finish=x=>{window.__benchResult=x;window.__benchStatus=x.success?'done':'error'};
+          const text='The learner explains the main idea clearly and gives one example.';
+          function stats(out){
+            const a=out?.audio??out?.data??null;
+            if(!a||typeof a.length!=='number')return{samples:0,finite:false,rms:null,peak:null};
+            let sum=0,peak=0,finite=true;
+            for(let i=0;i<a.length;i++){
+              const v=Number(a[i]);
+              if(!Number.isFinite(v)){finite=false;break;}
+              sum+=v*v; const av=Math.abs(v); if(av>peak)peak=av;
+            }
+            return{samples:a.length,finite,rms:finite&&a.length?Math.sqrt(sum/a.length):null,peak:finite?peak:null};
+          }
+          try{
+            const mod=isGpu
+              ? await import('./.m02533/runtime/kokoro.web.js?v=4.2.0-fp32')
+              : await import('./vendor/kokoro-js/kokoro.web.js?nv=m025-22');
+            const dtype=isGpu?'fp32':'q8', device=isGpu?'webgpu':'wasm';
+            if(!isGpu&&mod.env.wasmEnv){mod.env.wasmEnv.numThreads=1;mod.env.wasmEnv.proxy=true;}
+            const gpuAvailable=!!navigator.gpu;
+            if(isGpu&&!gpuAvailable)throw new Error('navigator.gpu unavailable in Safari benchmark');
+            const runtime={navigator:{standalone:true,gpu:navigator.gpu||null},crossOriginIsolated:false,matchMedia(){return{matches:true}}};
+            const adapter=FiezelKokoroAdapter.createKokoroAdapter({KokoroTTS:mod.KokoroTTS,kokoroEnv:mod.env,setVoiceDataUrl:mod.setVoiceDataUrl,
+              modelId:'kokoro-model',localModelPath:'./vendor/',voiceBaseUrl:'./vendor/kokoro-model/voices',
+              wasmBasePath:isGpu?(location.origin+'/.m02533/runtime/wasm/'):(location.origin+'/vendor/kokoro-js/wasm/'),runtimeOrigin:location.origin,
+              runtime,dtype,device,onStage:e=>events.push({t:performance.now(),...e})});
+            window.__benchStatus='init'; const i0=performance.now(); await adapter.initialize(); const initMs=Math.round(performance.now()-i0);
+            const backend=adapter.getBackendState();
+            if(isGpu&&backend.device!=='webgpu')throw new Error('WebGPU backend not active: '+JSON.stringify(backend));
+            const rows=[];
+            for(let n=0;n<3;n++){
+              window.__benchStatus='generate-'+(n+1);
+              const before=events.length,t0=performance.now();
+              const out=await adapter.generate(text,{voice:'af_heart',speed:1});
+              const slice=events.slice(before),s=stats(out);
+              rows.push({iteration:n+1,elapsedMs:Math.round(performance.now()-t0),modelMs:slice.find(e=>e.phase==='adapter_model_resolved')?.elapsedMs??null,
+                tokenCount:slice.find(e=>e.phase==='adapter_tokenizer_resolved')?.tokenCount??null,...s});
+            }
+            const warm=rows.slice(1).map(r=>Number(r.modelMs)||999999);
+            finish({success:true,mode,dtype,device,gpuAvailable,userAgent:navigator.userAgent,initMs,rows,warmMax:Math.max(...warm),backend,
+              capability:events.filter(e=>e.phase==='adapter_backend_capability'),attempts:events.filter(e=>e.phase==='adapter_backend_attempt'),errors:events.filter(e=>e.phase==='adapter_backend_error')});
+          }catch(error){finish({success:false,mode,gpuAvailable:!!navigator.gpu,status:window.__benchStatus,error:String(error?.stack||error),events});}
+          </script>
+          HTML
+
+      - name: Start server and SafariDriver
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/m02533-http.log 2>&1 &
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 >/tmp/m02533-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02533-status.json 2>/dev/null && break; sleep 1; done
+
+      - name: Run current control and TJS4 fp32 WebGPU
+        run: |
+          set -euo pipefail
+          run_one(){
+            mode="$1"; out="m02533-${mode}.json"
+            sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+            sid="$(echo "$sj"|jq -r '.value.sessionId // .sessionId // empty')"; test -n "$sid"
+            curl -fsS -H 'Content-Type: application/json' -d "{\"url\":\"http://127.0.0.1:8000/.m02533-bench.html?mode=${mode}\"}" "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+            result=''
+            for i in {1..180}; do
+              resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return window.__benchResult||null;","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+              result="$(echo "$resp"|jq -c '.value // empty' 2>/dev/null || true)"
+              [ -n "$result" ] && [ "$result" != null ] && break
+              sleep 1
+            done
+            curl -sS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+            if [ -z "$result" ]; then result="{\"success\":false,\"mode\":\"${mode}\",\"error\":\"no_terminal_result\"}"; fi
+            echo "$result"|jq .|tee "$out"
+          }
+          run_one current-q8-wasm
+          run_one tjs4-fp32-webgpu
+          jq -s '.' m02533-current-q8-wasm.json m02533-tjs4-fp32-webgpu.json | tee m02533-summary.json
+          test "$(jq -r '.success' m02533-current-q8-wasm.json)" = true
+          test "$(jq -r '.success' m02533-tjs4-fp32-webgpu.json)" = true
+          CONTROL_SAMPLES="$(jq -r '.rows[1].samples' m02533-current-q8-wasm.json)"
+          GPU_SAMPLES="$(jq -r '.rows[1].samples' m02533-tjs4-fp32-webgpu.json)"
+          jq -n --argjson a "$GPU_SAMPLES" --argjson b "$CONTROL_SAMPLES" '$a / $b' | tee m02533-duration-ratio.txt
+          RATIO="$(cat m02533-duration-ratio.txt)"
+          GPU_WARM_MAX="$(jq -r '.warmMax' m02533-tjs4-fp32-webgpu.json)"
+          GPU_FINITE="$(jq -r '[.rows[].finite] | all' m02533-tjs4-fp32-webgpu.json)"
+          GPU_RMS_OK="$(jq -r '[.rows[].rms > 0.0001] | all' m02533-tjs4-fp32-webgpu.json)"
+          GPU_BACKEND="$(jq -r '.backend.device' m02533-tjs4-fp32-webgpu.json)"
+          echo "tjs4_fp32_webgpu_warm_max_ms=$GPU_WARM_MAX duration_ratio=$RATIO finite=$GPU_FINITE rms_ok=$GPU_RMS_OK backend=$GPU_BACKEND"
+          test "$GPU_BACKEND" = webgpu
+          test "$GPU_FINITE" = true
+          test "$GPU_RMS_OK" = true
+          awk -v r="$RATIO" 'BEGIN{exit !(r>=0.80 && r<=1.20)}'
+          test "$GPU_WARM_MAX" -le 5000
+
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02533-tjs4-fp32-webgpu-${{ github.sha }}
+          path: |
+            m02533-current-q8-wasm.json
+            m02533-tjs4-fp32-webgpu.json
+            m02533-summary.json
+            m02533-duration-ratio.txt
+            m02533-fp32-size.txt
+            m02533-fp32-sha256.txt
+            m02533-model-revision.txt
+            .m02533/runtime/runtime-build.txt
+            .m02533/runtime/SHA256SUMS
+            .m02533/runtime/wasm-source-list.txt
+            /tmp/m02533-http.log
+            /tmp/m02533-safaridriver.log
+          if-no-files-found: warn
+          retention-days: 30
