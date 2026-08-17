@@ -1,0 +1,90 @@
+{
+  "schema": "fiezel-classroom-lessons-v1",
+  "version": "1.0.0",
+  "voiceContract": {
+    "speech": "en-US neural",
+    "subtitle": "id-ID running subtitle",
+    "note": "Fiezel explains in English; Indonesian runs as comprehension scaffolding, per the Classroom design."
+  },
+  "categories": [
+    { "id": "grammar", "label": "Grammar", "hint": "Present Perfect, Tenses", "icon": "braces" },
+    { "id": "vocabulary", "label": "Vocabulary", "hint": "Word family, Collocation", "icon": "book-a" },
+    { "id": "reading", "label": "Reading", "hint": "Main idea, Evidence", "icon": "book-open-text" },
+    { "id": "listening", "label": "Listening", "hint": "Gist, Detail", "icon": "headphones" },
+    { "id": "speaking", "label": "Speaking", "hint": "Response practice", "icon": "mic" },
+    { "id": "exam", "label": "Exam Prep", "hint": "IELTS / TOEFL", "icon": "graduation-cap" }
+  ],
+  "lessons": [
+    {
+      "id": "grammar_present_perfect",
+      "category": "grammar",
+      "topic": "Present Perfect",
+      "level": "B1",
+      "board": { "title": "Present Perfect", "formula": "Subject + have / has + V3", "examples": ["I have finished my homework.", "She has visited Singapore."] },
+      "segments": [
+        { "en": "Let's look at the present perfect.", "id": "Mari kita lihat present perfect." },
+        { "en": "The basic pattern is subject, have or has,", "id": "Polanya adalah subjek, have atau has," },
+        { "en": "then the past participle, the third form of the verb.", "id": "lalu past participle atau kata kerja bentuk ketiga." },
+        { "en": "We use it when the time is not important, only the result.", "id": "Kita memakainya saat waktunya tidak penting, hanya hasilnya." }
+      ],
+      "questions": [
+        {
+          "prompt": "Which sentence is correct?",
+          "options": ["I have went to school.", "I have gone to school.", "I has gone to school."],
+          "answerIndex": 1,
+          "explain": { "en": "Gone is the past participle. Went is the simple past, so it cannot follow have.", "id": "Gone adalah past participle. Went itu simple past, jadi tidak bisa mengikuti have." },
+          "remediate": { "en": "Remember: have or has is always followed by the third form.", "id": "Ingat: have atau has selalu diikuti bentuk ketiga." }
+        },
+        {
+          "prompt": "Complete: She ___ finished her project.",
+          "options": ["have", "has", "having"],
+          "answerIndex": 1,
+          "explain": { "en": "She is third person singular, so we use has.", "id": "She itu orang ketiga tunggal, jadi memakai has." },
+          "remediate": { "en": "He, she and it always take has, not have.", "id": "He, she, dan it selalu memakai has, bukan have." }
+        }
+      ]
+    },
+    {
+      "id": "vocabulary_word_family",
+      "category": "vocabulary",
+      "topic": "Word Family",
+      "level": "B1",
+      "board": { "title": "Word Family", "formula": "decide → decision → decisive", "examples": ["We decided quickly.", "It was a decisive moment."] },
+      "segments": [
+        { "en": "A word family is one root in different forms.", "id": "Word family adalah satu akar kata dalam bentuk berbeda." },
+        { "en": "Decide is the verb, decision is the noun, decisive is the adjective.", "id": "Decide itu kata kerja, decision kata benda, decisive kata sifat." },
+        { "en": "Knowing the family lets you say the same idea in many ways.", "id": "Menguasai satu keluarga kata membuatmu bisa mengungkapkan ide yang sama dengan banyak cara." }
+      ],
+      "questions": [
+        {
+          "prompt": "Choose the noun form of 'decide'.",
+          "options": ["decisive", "decision", "decidedly"],
+          "answerIndex": 1,
+          "explain": { "en": "Decision is the noun. Decisive is an adjective.", "id": "Decision adalah kata benda. Decisive adalah kata sifat." },
+          "remediate": { "en": "Nouns often end in -sion or -tion.", "id": "Kata benda sering berakhiran -sion atau -tion." }
+        }
+      ]
+    },
+    {
+      "id": "reading_main_idea",
+      "category": "reading",
+      "topic": "Main Idea",
+      "level": "B1",
+      "board": { "title": "Main Idea", "formula": "Topic + what the writer says about it", "examples": ["Look for the repeated idea.", "Ignore single examples."] },
+      "segments": [
+        { "en": "The main idea is what the whole paragraph is about.", "id": "Main idea adalah inti dari keseluruhan paragraf." },
+        { "en": "It is not one detail or one example.", "id": "Itu bukan satu detail atau satu contoh saja." },
+        { "en": "Ask yourself: which sentence could summarise all the others?", "id": "Tanyakan: kalimat mana yang bisa merangkum semuanya?" }
+      ],
+      "questions": [
+        {
+          "prompt": "The main idea of a paragraph is usually:",
+          "options": ["one small detail", "the idea all sentences support", "the last example"],
+          "answerIndex": 1,
+          "explain": { "en": "Every other sentence supports the main idea.", "id": "Semua kalimat lain mendukung main idea." },
+          "remediate": { "en": "If a sentence only appears once and adds a fact, it is a detail.", "id": "Kalau sebuah kalimat cuma muncul sekali dan menambah fakta, itu detail." }
+        }
+      ]
+    }
+  ]
+}
