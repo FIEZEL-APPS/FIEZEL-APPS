@@ -12,8 +12,8 @@
       {
         "name": "fiezel-integration",
         "path": "vendor/kokoro-js/source-overrides/fiezel-integration.patch",
-        "sha256": "35d4138e67c6dff5707b26893ac75589308b786c91d5b64bfc301834e81f917c",
-        "purpose": "Expose allowRemoteModels, allowLocalModels, localModelPath, and setVoiceDataUrl for same-origin offline FIEZEL integration"
+        "sha256": "1ea14d0a25ee97dd61713af393d500bb40fad77ce12458efd13e3f540d4d2184",
+        "purpose": "Expose same-origin model routing, setVoiceDataUrl, and the real Transformers/ORT WASM env for bounded Apple standalone proxy control"
       }
     ]
   },
