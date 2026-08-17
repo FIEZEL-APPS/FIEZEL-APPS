@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   extract:
@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master/perf67-m02525-runtime-matrix
 
       - name: Extract source-locked ORT package
         shell: bash
@@ -53,6 +55,22 @@ jobs:
           test "$(sha256sum .m02525/out/ort-wasm-simd-threaded.wasm | cut -d' ' -f1)" != "$(sha256sum .m02525/out/ort-wasm-simd-threaded.jsep.wasm | cut -d' ' -f1)"
           cat .m02525/out/MANIFEST.txt
           cat .m02525/out/SHA256SUMS
+
+      - name: Vendor exact standard non-JSEP pair on experiment branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp .m02525/out/ort-wasm-simd-threaded.mjs vendor/kokoro-js/wasm/ort-wasm-simd-threaded.mjs
+          cp .m02525/out/ort-wasm-simd-threaded.wasm vendor/kokoro-js/wasm/ort-wasm-simd-threaded.wasm
+          git add vendor/kokoro-js/wasm/ort-wasm-simd-threaded.mjs vendor/kokoro-js/wasm/ort-wasm-simd-threaded.wasm
+          if git diff --cached --quiet; then
+            echo 'Exact standard non-JSEP pair already vendored.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'vendor: add exact ORT non-JSEP pair for m025-25'
+          git push origin HEAD:master/perf67-m02525-runtime-matrix
 
       - name: Upload exact non-JSEP bootstrap artifact
         uses: actions/upload-artifact@v4
