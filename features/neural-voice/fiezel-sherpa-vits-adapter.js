@@ -59,6 +59,13 @@
     var env = opts.env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var onStage = typeof opts.onStage === 'function' ? opts.onStage : null;
     var basePath = String(opts.basePath || RUNTIME_BASE);
+    // m025-32: the adapter is language-agnostic. A second bundle (Indonesian) reuses
+    // this exact worker protocol with a different base path, model and speaker map.
+    var expectedSpeakers = Number.isFinite(Number(opts.expectedSpeakers)) ? Number(opts.expectedSpeakers) : EXPECTED_SPEAKERS;
+    var modelId = String(opts.modelId || MODEL_ID);
+    var voiceSids = opts.voiceSids || VOICE_SIDS;
+    var defaultVoice = String(opts.defaultVoice || DEFAULT_VOICE);
+    var kind = String(opts.kind || 'sherpa-vits-local');
 
     var worker = null;
     var readyPromise = null;
@@ -82,9 +89,9 @@
     }
 
     function resolveSid(voice) {
-      var key = String(voice || DEFAULT_VOICE);
-      if (Object.prototype.hasOwnProperty.call(VOICE_SIDS, key)) return VOICE_SIDS[key];
-      return VOICE_SIDS[DEFAULT_VOICE];
+      var key = String(voice || defaultVoice);
+      if (Object.prototype.hasOwnProperty.call(voiceSids, key)) return voiceSids[key];
+      return voiceSids[defaultVoice];
     }
 
     // Reject a late/duplicate settle instead of silently dropping it, so a stale worker
@@ -102,7 +109,7 @@
         numSpeakers = Number(data.numSpeakers) || 0;
         modelType = Number(data.modelType);
         backendState = Object.freeze({ id: 'sherpa-vits-wasm-worker', device: 'wasm-simd-worker', dtype: 'fp32' });
-        stage('adapter_backend_ready', backendDetail({ numSpeakers: numSpeakers, modelType: modelType, model: MODEL_ID }));
+        stage('adapter_backend_ready', backendDetail({ numSpeakers: numSpeakers, modelType: modelType, model: modelId }));
         return;
       }
       if (data.type === 'sherpa-onnx-tts-result') {
@@ -123,7 +130,7 @@
         var Ctor = env.Worker;
         if (typeof Ctor !== 'function') { reject(new Error('sherpa_worker_unavailable')); return; }
         var startedAt = Date.now();
-        stage('adapter_instance_start', { architecture: ARCHITECTURE, model: MODEL_ID, device: 'wasm-simd-worker' });
+        stage('adapter_instance_start', { architecture: ARCHITECTURE, model: modelId, device: 'wasm-simd-worker' });
         try {
           worker = new Ctor(basePath + WORKER_FILE);
         } catch (error) { reject(error); return; }
@@ -134,7 +141,7 @@
           handleMessage(event);
           if (!settled && data.type === 'sherpa-onnx-tts-ready') {
             settled = true;
-            if (numSpeakers !== EXPECTED_SPEAKERS) {
+            if (numSpeakers !== expectedSpeakers) {
               reject(new Error('sherpa_speaker_count_mismatch:' + numSpeakers));
               return;
             }
@@ -163,7 +170,7 @@
 
     function generate(text, generationOptions) {
       var options = generationOptions || {};
-      var voice = String(options.voice || DEFAULT_VOICE);
+      var voice = String(options.voice || defaultVoice);
       var requested = typeof options.speed === 'number' && options.speed > 0 ? options.speed : 1;
       // The product's speed 1 means "natural", not "engine default". Callers keep
       // relative control: 1.1 is still 10% faster than natural.
@@ -199,7 +206,7 @@
       });
     }
 
-    function listVoices() { return Promise.resolve(Object.keys(VOICE_SIDS)); }
+    function listVoices() { return Promise.resolve(Object.keys(voiceSids)); }
 
     function stop() {
       if (pending) settlePending('reject', new Error('neural_generation_stopped'));
@@ -214,11 +221,11 @@
     }
 
     var api = Object.freeze({
-      kind: 'sherpa-vits-local',
+      kind: kind,
       architecture: ARCHITECTURE,
-      modelId: MODEL_ID,
-      voiceSids: VOICE_SIDS,
-      defaultVoice: DEFAULT_VOICE,
+      modelId: modelId,
+      voiceSids: voiceSids,
+      defaultVoice: defaultVoice,
       initialize: initialize,
       generate: generate,
       listVoices: listVoices,
