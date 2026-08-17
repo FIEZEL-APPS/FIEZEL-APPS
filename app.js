@@ -539,8 +539,8 @@ function stopSoundtrack(){if(musicTimer)clearInterval(musicTimer);musicTimer=nul
 function toggleSoundtrack(){state.preferences.soundtrack=!state.preferences.soundtrack;save();if(state.preferences.soundtrack){const ok=startSoundtrack();showToast(ok?'Soundtrack fokus aktif':'Ketuk sekali lagi jika audio masih diblokir browser')}else{stopSoundtrack();showToast('Soundtrack fokus dimatikan')}haptic('confirm');enhanceUI()}
 function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 let speakingListeningController=null,speakingListeningMountToken=0;
-function render(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
-const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress']);
+function render(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
+const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom']);
 function go(v){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false)document.startViewTransition(swap);else swap();return true} window.go=go;
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><span class="section-kicker">FIEZEL WORKSPACE</span><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
@@ -601,6 +601,68 @@ function neuralVoiceStatusMarkup(){const runtime=self.FiezelVoiceRuntime,status=
 function updateNeuralVoiceProgress(progress){const text=$('neuralVoiceProgress');if(!text)return;const done=Math.round(Number(progress?.completedBytes||0)/1000000),total=Math.round(Number(progress?.totalBytes||0)/1000000);text.textContent=progress?.phase==='downloading'?`Mengunduh aset ${progress.completed||0}/${progress.assetCount||0} · ${done}/${total} MB${progress.current?' · '+progress.current:''}`:'Menyiapkan mesin suara lokal…'}
 async function prepareNeuralVoice(){const button=$('prepareNeuralVoice'),runtime=self.FiezelVoiceRuntime;if(!button||!runtime)return;button.disabled=true;button.innerHTML='Menyiapkan…';const hint=$('neuralVoiceProgress');if(hint)hint.textContent='Mengunduh aset suara… (satu kali saja, sekitar 119 MB). Jangan tutup halaman ini.';try{await runtime.prepare({onProgress:updateNeuralVoiceProgress});const text=$('neuralVoiceProgress');if(text)text.textContent='Suara neural lokal siap dan aset sudah diverifikasi.';button.innerHTML='<i data-lucide="badge-check"></i> Suara siap';const testButton=$('testNeuralVoice');if(testButton)testButton.disabled=false;const st=runtime.status();/*[DEAD-CODE-20260814] Branch storage==='memory' tidak pernah aktif: fiezel-neural-voice-bootstrap.js hanya menulis storage==='cache' (baris 58 & 207; readStatus juga hanya menerima 'cache'), dan ios-cache-fix.js status() mewarisi runtime.status() tanpa nilai 'memory'. Branch ini sengaja DIBIARKAN (tidak dihapus) sebagai fallback safety jika runtime pihak ketiga/versi lama mengembalikan storage==='memory' (mis. mode memori tanpa CacheStorage). Jangan dihapus tanpa persetujuan owner. M-017/T-019 2026-08-14.*/if(st.storage==='memory'){if(text)text.textContent+=' Penyimpanan browser terbatas - mode memori aktif, aset diunduh ulang tiap sesi. Pasang FIEZEL ke Layar Utama agar tersimpan permanen.';showToast('Suara neural siap (mode memori). Pasang ke Layar Utama agar permanen.')}else showToast('Suara neural lokal siap.');haptic('success')}catch(error){const text=$('neuralVoiceProgress'),detail=runtime.status().error||String(error?.message||error);if(text)text.textContent=`Persiapan gagal: ${detail}. Browser TTS tetap digunakan.`;button.disabled=false;button.innerHTML='<i data-lucide="download"></i> Coba lagi';showToast(`Model neural belum siap (${detail}). Browser TTS tetap digunakan.`)}enhanceUI()}
 async function testNeuralVoice(){const button=$('testNeuralVoice'),runtime=self.FiezelVoiceRuntime;if(!button||!runtime)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{if(runtime.status?.().prepared&&runtime.status?.().ready!==true&&typeof runtime.ensureReady==='function')await runtime.ensureReady();const voice=neuralVoiceFor({}),result=await runtime.speak('Hello. This is your selected FIEZEL neural voice.',{voice,lang:voice.startsWith('b')?'en-GB':'en-US',speed:selectedNeuralRate(),allowFallback:false});if(hint)hint.textContent=`Tes selesai · provider ${String(result?.provider||'unknown')} · voice ${String(result?.voice||voice)}.`;showToast(result?.provider==='kokoro-local'?'Neural voice terdengar.':'Neural belum aktif; fallback browser dipakai.')}catch(error){if(hint)hint.textContent=`Tes suara gagal: ${String(error?.message||error)}.`;showToast('Tes suara gagal. Buka Diagnostics untuk detail.')}finally{button.disabled=false;enhanceUI()}}
+
+// m025-33 FIEZEL Classroom: Category -> Topic -> Classroom. Fiezel speaks English with
+// the mandatory neural engine; the Indonesian line is authored subtitle text, so the
+// lesson works fully even when the optional Indonesian bundle is not downloaded.
+let classroomSession=null,classroomPack=null,classroomSpeaking=false;
+async function loadClassroomPack(){if(classroomPack)return classroomPack;const r=await fetch('./features/classroom/classroom-lessons-v1.json',{credentials:'same-origin'});if(!r.ok)throw new Error('classroom_pack_unavailable');classroomPack=await r.json();return classroomPack}
+function classroomSubtitle(text){const el=$('classroomSubtitle');if(el)el.textContent=text||''}
+async function classroomSpeak(en,id){classroomSubtitle(id);const rt=self.FiezelVoiceRuntime;if(!rt?.speak)return;if(classroomSpeaking)return;classroomSpeaking=true;try{await rt.speak(en,{voice:neuralVoiceFor({}),speed:selectedNeuralRate(),lang:'en-US',allowFallback:false})}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=`Suara neural belum siap: ${String(e?.message||e)}. Subtitle tetap jalan.`}finally{classroomSpeaking=false}}
+async function classroom(){
+  setApp('<section class="fade classroom-page"><div class="card">Memuat Classroom…</div></section>');
+  let pack;try{pack=await loadClassroomPack()}catch(e){setApp(`<section class="fade classroom-page"><div class="card"><b>Classroom belum dapat dimuat.</b><p class="muted">${esc(e?.message||e)}</p></div></section>`);return}
+  if(!self.FiezelClassroom){setApp('<section class="fade classroom-page"><div class="card"><b>Classroom runtime tidak tersedia.</b></div></section>');return}
+  if(!classroomSession)classroomSession=self.FiezelClassroom.createSession(pack);
+  renderClassroom();
+}
+function renderClassroom(){
+  const s=classroomSession,snap=s.snapshot();
+  let body='';
+  if(snap.phase==='category'){
+    body=`<div class="classroom-grid">${s.categories().map(c=>`<button class="classroom-cat" data-cat="${esc(c.id)}"><i data-lucide="${esc(c.icon)}"></i><b>${esc(c.label)}</b><small>${esc(c.hint)}</small></button>`).join('')}</div>`;
+  }else if(snap.phase==='topic'){
+    const list=s.lessonsIn(snap.categoryId);
+    body=list.length?`<div class="classroom-grid">${list.map(l=>`<button class="classroom-cat" data-lesson="${esc(l.id)}"><b>${esc(l.topic)}</b><small>${esc(l.level)}</small></button>`).join('')}</div>`:'<div class="card">Topik untuk kategori ini belum tersedia.</div>';
+    body+='<div class="classroom-actions"><button data-back="category">Kembali</button></div>';
+  }else if(snap.phase==='teach'){
+    const seg=s.currentSegment();
+    body=`<article class="classroom-board"><span class="section-kicker">${esc(snap.categoryId.toUpperCase())} · ${esc(snap.topic)}</span><h2>${esc(snap.board.title)}</h2><p class="classroom-formula">${esc(snap.board.formula)}</p><ul>${snap.board.examples.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></article>
+    <article class="classroom-subtitle-card"><span class="section-kicker">FIEZEL SPEAKING (EN)</span><p class="classroom-en">${esc(seg?seg.en:'')}</p><p id="classroomSubtitle" class="classroom-id">${esc(seg?seg.id:'')}</p><p id="classroomVoiceNote" class="muted"></p></article>
+    <div class="classroom-actions"><button data-replay="1"><i data-lucide="volume-2"></i> Ulangi suara</button><button class="primary" data-next="1">${snap.segmentIndex<snap.segmentCount-1?'Lanjut':'Mulai latihan'} <i data-lucide="arrow-right"></i></button></div>
+    <p class="muted">Bagian ${snap.segmentIndex+1} dari ${snap.segmentCount}</p>`;
+  }else if(snap.phase==='quiz'){
+    const q=s.currentQuestion();
+    body=`<article class="classroom-board"><span class="section-kicker">LATIHAN · ${esc(snap.topic)}</span><h2>${esc(q.prompt)}</h2></article>
+    <div class="classroom-options">${q.options.map((o,i)=>`<button class="classroom-option" data-opt="${i}">${esc(o)}</button>`).join('')}</div>
+    <article class="classroom-subtitle-card"><p class="classroom-en" id="classroomFeedbackEn"></p><p id="classroomSubtitle" class="classroom-id"></p><p id="classroomVoiceNote" class="muted"></p></article>
+    <p class="muted">Soal ${snap.questionIndex+1} dari ${snap.questionCount}${snap.remediating?' · coba lagi setelah penjelasan':''}</p>`;
+  }else{
+    body=`<article class="classroom-board"><span class="section-kicker">SELESAI · ${esc(snap.topic)}</span><h2>Skor ${snap.scorePercent}%</h2><p>${snap.correct} benar dari ${snap.questionCount} soal.</p></article>
+    <div class="classroom-actions"><button class="primary" data-restart="1">Pilih topik lain</button></div>`;
+  }
+  setApp(`<section class="fade classroom-page"><div class="section-head"><div><span class="section-kicker">FIEZEL CLASSROOM</span><h1>Belajar dengan suara Inggris + subtitle Indonesia</h1><p>Pilih materi dulu, lalu Fiezel menerangkan.</p></div></div>${body}</section>`);
+  wireClassroom();
+}
+function wireClassroom(){
+  const s=classroomSession;
+  document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{s.chooseCategory(b.dataset.cat);renderClassroom()}));
+  document.querySelectorAll('[data-lesson]').forEach(b=>b.addEventListener('click',()=>{s.chooseLesson(b.dataset.lesson);renderClassroom();const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)}));
+  document.querySelector('[data-back="category"]')?.addEventListener('click',()=>{s.reset();renderClassroom()});
+  document.querySelector('[data-replay]')?.addEventListener('click',()=>{const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)});
+  document.querySelector('[data-next]')?.addEventListener('click',()=>{s.nextSegment();renderClassroom();const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)});
+  document.querySelector('[data-restart]')?.addEventListener('click',()=>{s.reset();renderClassroom()});
+  document.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{
+    const {result}=s.answer(Number(b.dataset.opt));
+    const en=$('classroomFeedbackEn');if(en)en.textContent=result.feedback.en;
+    classroomSubtitle(result.feedback.id);
+    classroomSpeak(result.feedback.en,result.feedback.id);
+    b.classList.add(result.correct?'is-correct':'is-wrong');
+    document.querySelectorAll('[data-opt]').forEach(x=>{x.disabled=true});
+    setTimeout(()=>{renderClassroom();if(s.snapshot().phase==='quiz'&&!s.snapshot().remediating){}},1400);
+  }));
+  enhanceUI();
+}
 async function skillsLab(){const token=speakingListeningMountToken;setApp(`<section class="fade skills-page"><div class="section-head"><div><span class="section-kicker">FIEZEL WORKSPACE</span><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi, privasi ketat, serta suara lokal opsional.</p></div></div>${neuralVoiceStatusMarkup()}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralVoiceSelect')?.addEventListener('change',event=>setNeuralVoicePreference(event.currentTarget.value));$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('prepareIndonesianVoice')?.addEventListener('click',prepareIndonesianVoice);$('testIndonesianVoice')?.addEventListener('click',testIndonesianVoice);enhanceUI();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceRuntime?.speak?.(text,{...options,speed:options.speed??selectedNeuralRate(),voice:neuralVoiceFor(options)})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceRuntime?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,tts});if(token!==speakingListeningMountToken||state.view!=='skills'){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
 async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan adaptif terbuka setelah diagnosis FIEZEL selesai.');return}const policy=await resolveAdaptivePolicy();const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');recordAdaptivePolicy(policy);showToast(`${policy.title} · ${count} soal`);quizLoop({type:'adaptive',count,pool,factory:x=>x,preserveOrder:true,policy})}
 function vocab(){const counts=Object.fromEntries(LEVELS.map(l=>[l,0]));V.forEach(v=>counts[v.level]=(counts[v.level]||0)+1);shell('Vocabulary Hub',`${V.length.toLocaleString()} kata aktif dan sudah melewati filter QA.`,`<div class="toolbar"><button class="primary" onclick="startVocabQuiz()"><i data-lucide="circle-play"></i> Uji Vocabulary</button><button onclick="reviewVocab()"><i data-lucide="history"></i> Review Due (${Object.values(state.vocab).filter(x=>x.nextReview&&x.nextReview<=Date.now()&&x.mastery<80).length})</button></div><div class="grid">${LEVELS.map(l=>card(`<div class="row"><b>${l}</b><span>${counts[l]||0} kata</span></div><p class="muted">${Object.entries(state.vocab).filter(([id,x])=>V.find(v=>v.id===id)?.level===l&&x.mastery>=80).length} mastered</p>${counts[l]?`<button onclick="flashcards('${l}')">Buka flashcards <i data-lucide="arrow-right"></i></button>`:'<p class="muted">Belum tersedia</p>'}`)).join('')}</div>`)}

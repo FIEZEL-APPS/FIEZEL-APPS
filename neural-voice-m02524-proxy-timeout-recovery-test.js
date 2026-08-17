@@ -96,8 +96,8 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   // Release identity must advance exactly one build from m025-23.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-32'/);
-  assert.match(sw,/SW_REV='m025-32-indonesian-optional-20260818-1'/);
+  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-33'/);
+  assert.match(sw,/SW_REV='m025-33-classroom-20260818-1'/);
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});

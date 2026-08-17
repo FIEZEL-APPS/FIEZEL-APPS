@@ -543,3 +543,22 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 /* m025-32 Indonesian optional voice block */
 .indonesian-voice-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#e6ebf2)}
 .indonesian-voice-block p{margin:.35rem 0 0;color:var(--muted,#5f6c80);line-height:1.5}
+
+/* m025-33 FIEZEL Classroom */
+.classroom-page{display:grid;gap:14px}
+.classroom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#e6ebf2);background:var(--panel,#fff);color:var(--text,#11172a);min-height:88px}
+.classroom-cat small{color:var(--muted,#5f6c80)}
+.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#11172a);border:1px solid var(--line,#e6ebf2)}
+.classroom-board h2{margin:.2rem 0 .5rem}
+.classroom-formula{font:600 1.05rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#eef3fa)}
+.classroom-board ul{margin:.6rem 0 0;padding-left:1.1rem;line-height:1.6}
+.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#11172a);border:1px solid var(--line,#e6ebf2)}
+.classroom-en{font-weight:650;line-height:1.5;margin:.3rem 0}
+.classroom-id{color:var(--accent,#3d7de0);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
+.classroom-options{display:grid;gap:9px}
+.classroom-option{text-align:left;padding:14px;border-radius:14px;min-height:48px}
+.classroom-option.is-correct{border-color:var(--green,#1f9d6f);background:var(--green-soft,#e7f8f1)}
+.classroom-option.is-wrong{border-color:var(--red,#e0526f);background:var(--red-soft,#fdeef1)}
+.classroom-actions{display:flex;flex-wrap:wrap;gap:9px}
+.classroom-actions button{min-height:46px;padding:0 16px;border-radius:14px}
