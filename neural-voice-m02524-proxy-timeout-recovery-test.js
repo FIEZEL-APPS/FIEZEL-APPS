@@ -60,6 +60,22 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
     assert.equal(seen[0].speed,1);
   }
 
+  // A hard timeout elsewhere must be classified as transient rather than becoming
+  // the page-lifetime circuit brick seen in m025-23. Lifecycle release must also
+  // clear a previously opened circuit.
+  const bootstrap=fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstrap.js','utf8');
+  assert.match(bootstrap,/generationTimeout=lastError==='neural_generation_timeout'/);
+  assert.match(bootstrap,/shouldOpenCircuit=!!service&&!generationBusy&&!generationTimeout/);
+  assert.match(bootstrap,/lastFallbackReason='';circuitOpen=false;audibleVerified=false/);
+  assert.match(bootstrap,/__fiezelNeuralWasmPolicy=wasmPolicy/,'core service must receive the effective proxy policy before construction');
+
+  // Browser speech used because neural failed must be explicitly surfaced to the
+  // visible neural status UI instead of masquerading as successful neural output.
+  const audibility=fs.readFileSync('features/neural-voice/fiezel-neural-voice-audibility-fix.js','utf8');
+  assert.match(audibility,/function showFallbackNotice\(reason\)/);
+  assert.match(audibility,/Suara neural sedang bermasalah\. Audio sementara memakai suara perangkat/);
+  assert.match(audibility,/phase:'fallback_notice'/);
+
   // Release identity must advance exactly one build from m025-23.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
