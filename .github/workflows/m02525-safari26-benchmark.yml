@@ -1,0 +1,195 @@
+name: m025-25 Safari 26 benchmark
+
+on:
+  push:
+    branches:
+      - master/perf67-m02525-runtime-matrix
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safari26:
+    runs-on: macos-26
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record Apple runner and Safari facts
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers
+          uname -a
+          /usr/bin/safaridriver --version
+          /usr/bin/arch
+
+      - name: Create exact-repo neural benchmark page
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .m02525-safari-bench.html <<'HTML'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>m025-25 Safari benchmark</title>
+          <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script type="module">
+          const params = new URL(location.href).searchParams;
+          const variant = params.get('variant') || 'standard';
+          const events = [];
+          window.__benchStatus = 'boot';
+          window.__benchResult = null;
+          const finish = value => { window.__benchResult = value; window.__benchStatus = value.success ? 'done' : 'error'; };
+          try {
+            const mod = await import('./vendor/kokoro-js/kokoro.web.js?nv=m025-22');
+            if (!mod.KokoroTTS || !mod.env || !mod.setVoiceDataUrl) throw new Error('kokoro facade exports missing');
+            // Keep the current m025-24 safety policy for both differential arms.
+            if (mod.env.wasmEnv) {
+              mod.env.wasmEnv.numThreads = 1;
+              mod.env.wasmEnv.proxy = true;
+            }
+            const applePolicy = variant === 'standard';
+            const runtime = {
+              navigator: { standalone: applePolicy, gpu: navigator.gpu || null },
+              crossOriginIsolated: false,
+              matchMedia() { return { matches: applePolicy }; }
+            };
+            const origin = location.origin;
+            const adapter = FiezelKokoroAdapter.createKokoroAdapter({
+              KokoroTTS: mod.KokoroTTS,
+              kokoroEnv: mod.env,
+              setVoiceDataUrl: mod.setVoiceDataUrl,
+              modelId: 'kokoro-model',
+              localModelPath: './vendor/',
+              voiceBaseUrl: './vendor/kokoro-model/voices',
+              wasmBasePath: origin + '/vendor/kokoro-js/wasm/',
+              runtimeOrigin: origin,
+              runtime,
+              dtype: 'q8',
+              device: 'wasm',
+              onStage(entry) { events.push({ t: Date.now(), ...entry }); }
+            });
+            window.__benchStatus = 'initializing';
+            const initStart = performance.now();
+            await adapter.initialize();
+            const initMs = performance.now() - initStart;
+            const text = 'The learner explains the main idea clearly and supports it with one example.';
+            window.__benchStatus = 'generate-1';
+            const firstStart = performance.now();
+            const first = await adapter.generate(text, { voice: 'af_heart', speed: 1 });
+            const firstMs = performance.now() - firstStart;
+            window.__benchStatus = 'generate-2';
+            const secondStart = performance.now();
+            const second = await adapter.generate(text, { voice: 'af_heart', speed: 1 });
+            const secondMs = performance.now() - secondStart;
+            const modelMs = events.filter(x => x.phase === 'adapter_model_resolved').map(x => x.elapsedMs);
+            const generateMs = events.filter(x => x.phase === 'adapter_generate_resolved').map(x => x.elapsedMs);
+            const artifactEvents = events.filter(x => x.phase === 'wasm_artifact_variant');
+            const policyEvents = events.filter(x => x.phase === 'wasm_policy');
+            finish({
+              success: true,
+              variant,
+              userAgent: navigator.userAgent,
+              crossOriginIsolated: globalThis.crossOriginIsolated === true,
+              initMs: Math.round(initMs),
+              firstMs: Math.round(firstMs),
+              secondMs: Math.round(secondMs),
+              modelMs,
+              generateMs,
+              firstSamples: first?.audio?.length ?? first?.data?.length ?? null,
+              secondSamples: second?.audio?.length ?? second?.data?.length ?? null,
+              artifactEvents,
+              policyEvents,
+              backendState: adapter.getBackendState(),
+              eventCount: events.length
+            });
+          } catch (error) {
+            finish({ success: false, variant, status: window.__benchStatus, error: String(error?.stack || error), events });
+          }
+          </script>
+          HTML
+
+      - name: Start local exact-SHA server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/m02525-http.log 2>&1 &
+          echo $! > /tmp/m02525-http.pid
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 > /tmp/m02525-safaridriver.log 2>&1 &
+          echo $! > /tmp/m02525-safaridriver.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4444/status >/tmp/m02525-safari-status.json 2>/dev/null; then break; fi
+            sleep 1
+          done
+          cat /tmp/m02525-safari-status.json
+
+      - name: Run standard non-JSEP candidate in Safari 26
+        shell: bash
+        run: |
+          set -euo pipefail
+          create_session() {
+            curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session
+          }
+          SESSION_JSON="$(create_session)"
+          echo "$SESSION_JSON" > /tmp/m02525-session-standard.json
+          SESSION_ID="$(echo "$SESSION_JSON" | jq -r '.value.sessionId // .sessionId // empty')"
+          test -n "$SESSION_ID"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/.m02525-safari-bench.html?variant=standard"}' "http://127.0.0.1:4444/session/$SESSION_ID/url" >/dev/null
+          RESULT=''
+          for i in {1..240}; do
+            RESP="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$SESSION_ID/execute/sync" || true)"
+            if [ -n "$RESP" ]; then
+              echo "$RESP" | jq -c '.value' > /tmp/m02525-progress-standard.json || true
+              RESULT="$(echo "$RESP" | jq -c '.value.result // empty' 2>/dev/null || true)"
+              if [ -n "$RESULT" ] && [ "$RESULT" != 'null' ]; then break; fi
+            fi
+            sleep 1
+          done
+          curl -sS -X DELETE "http://127.0.0.1:4444/session/$SESSION_ID" >/dev/null || true
+          test -n "$RESULT"
+          echo "$RESULT" | jq . | tee m02525-safari26-standard.json
+          test "$(echo "$RESULT" | jq -r '.success')" = true
+          test "$(echo "$RESULT" | jq -r '.artifactEvents[-1].variant')" = 'standard-non-jsep'
+          MAX_MODEL="$(echo "$RESULT" | jq '[.modelMs[]] | max')"
+          echo "standard_max_model_ms=$MAX_MODEL"
+          test "$MAX_MODEL" -le 5000
+
+      - name: Run JSEP control in a fresh Safari session
+        if: always()
+        shell: bash
+        run: |
+          set -u
+          SESSION_JSON="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session || true)"
+          SESSION_ID="$(echo "$SESSION_JSON" | jq -r '.value.sessionId // .sessionId // empty' 2>/dev/null || true)"
+          if [ -z "$SESSION_ID" ]; then
+            printf '%s\n' '{"success":false,"variant":"jsep","error":"session_creation_failed"}' | tee m02525-safari26-jsep.json
+            exit 0
+          fi
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/.m02525-safari-bench.html?variant=jsep"}' "http://127.0.0.1:4444/session/$SESSION_ID/url" >/dev/null || true
+          RESULT=''
+          for i in {1..240}; do
+            RESP="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$SESSION_ID/execute/sync" 2>/dev/null || true)"
+            RESULT="$(echo "$RESP" | jq -c '.value.result // empty' 2>/dev/null || true)"
+            if [ -n "$RESULT" ] && [ "$RESULT" != 'null' ]; then break; fi
+            sleep 1
+          done
+          curl -sS -X DELETE "http://127.0.0.1:4444/session/$SESSION_ID" >/dev/null || true
+          if [ -z "$RESULT" ]; then RESULT='{"success":false,"variant":"jsep","error":"no_terminal_result_within_240s"}'; fi
+          echo "$RESULT" | jq . | tee m02525-safari26-jsep.json
+
+      - name: Preserve benchmark diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02525-safari26-benchmark-${{ github.sha }}
+          path: |
+            m02525-safari26-standard.json
+            m02525-safari26-jsep.json
+            /tmp/m02525-progress-standard.json
+            /tmp/m02525-safaridriver.log
+            /tmp/m02525-http.log
+            /tmp/m02525-safari-status.json
+          if-no-files-found: warn
+          retention-days: 30
