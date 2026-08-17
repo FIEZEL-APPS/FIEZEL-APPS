@@ -4,15 +4,16 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#57a8df">
-  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
+  <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, Classroom, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" href="./favicon-64.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <title>FIEZEL | Adaptive English</title>
+  <title>FIEZEL | Personal English OS</title>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
+  <link rel="stylesheet" href="./features/ui/fiezel-owner-redesign-v1.css">
 </head>
 <body class="scene-day">
   <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
@@ -21,7 +22,7 @@
   </div>
   <main class="app">
     <header class="topbar">
-      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Home">
+      <button type="button" class="brand-button" onclick="go('home')" aria-label="Kembali ke Today">
         <span class="brand">FIE<span>ZEL</span></span>
         <span class="brand-edition">Personal English OS</span>
       </button>
@@ -55,11 +56,11 @@
   </div>
 
   <nav class="bottomnav" aria-label="Navigasi utama">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i data-lucide="house"></i><span>Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="chart-no-axes-combined"></i><span>Peta</span></button>
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Today" aria-current="page"><i data-lucide="sunrise"></i><span>Today</span></button>
+    <button type="button" class="nav" data-view="learn" onclick="go('learn')" aria-label="Learn"><i data-lucide="library"></i><span>Learn</span></button>
+    <button type="button" class="nav" data-view="classroom" onclick="go('classroom')" aria-label="Classroom"><i data-lucide="presentation"></i><span>Classroom</span></button>
+    <button type="button" class="nav" data-view="practice" onclick="go('practice')" aria-label="Practice"><i data-lucide="audio-waveform"></i><span>Practice</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Journey"><i data-lucide="route"></i><span>Journey</span></button>
   </nav>
 
   <script src="https://js.puter.com/v2/"></script>
@@ -91,6 +92,7 @@
   <script src="./features/speaking-listening/speaking-listening-config.js"></script>
   <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>
+  <script src="./features/ui/fiezel-owner-redesign-v1.js"></script>
   <script>
     /* FIEZEL_REPORT_GESTURE_ISOLATION_START */
     (() => {
