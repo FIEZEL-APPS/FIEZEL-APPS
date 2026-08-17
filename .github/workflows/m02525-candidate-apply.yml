@@ -60,16 +60,6 @@ jobs:
               sw = sw.replace(old_sw, new_sw, 1)
           sw_path.write_text(sw)
 
-          quality_path = Path('.github/workflows/quality.yml')
-          quality = quality_path.read_text()
-          line = '          node neural-voice-m02525-safari-nonjsep-test.js\n'
-          anchor = '          node neural-voice-m02524-proxy-timeout-recovery-test.js\n'
-          if line not in quality:
-              if quality.count(anchor) != 1:
-                  raise SystemExit('quality anchor mismatch')
-              quality = quality.replace(anchor, anchor + line, 1)
-          quality_path.write_text(quality)
-
           lock_path = Path('NEURAL-VOICE-SOURCE-LOCK.json')
           lock = json.loads(lock_path.read_text())
           lock['candidate']['id'] = 'm025-25'
@@ -117,13 +107,7 @@ jobs:
           node pwa-release-coherence-test.js
           node diag-panel-test.js
 
-      - name: Remove temporary branch-only assembler/bootstrap workflows
-        shell: bash
-        run: |
-          set -euo pipefail
-          git rm -f .github/workflows/m02525-candidate-apply.yml .github/workflows/m02525-ort-nonjsep-bootstrap.yml
-
-      - name: Publish assembled candidate commit
+      - name: Publish assembled non-workflow candidate commit
         shell: bash
         run: |
           set -euo pipefail
@@ -133,8 +117,7 @@ jobs:
                   vendor/kokoro-js/wasm/ort-wasm-simd-threaded.mjs \
                   vendor/kokoro-js/wasm/ort-wasm-simd-threaded.wasm \
                   neural-voice-m02525-safari-nonjsep-test.js \
-                  NEURAL-VOICE-SOURCE-LOCK.json \
-                  .github/workflows/quality.yml sw.js
+                  NEURAL-VOICE-SOURCE-LOCK.json sw.js
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git commit -m 'm025-25: select non-JSEP ORT WASM on Apple standalone'
