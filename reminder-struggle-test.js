@@ -89,10 +89,12 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.ok(/struggling:\[/.test(app), 'title pool exists');
     // Two pools share the key: a one-line title pool and a multi-line body pool. The
     // body is the one that opens on its own line.
-    const NL = String.fromCharCode(10);
-    const bodyStart = app.indexOf('  struggling:[' + NL);
+    // Normalise line endings first: this repo checks out CRLF on Windows and LF in CI,
+    // so anchoring on a raw newline would pass in one place and fail in the other.
+    const flat = app.split('\r\n').join('\n');
+    const bodyStart = flat.indexOf('  struggling:[\n');
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
-    const body = app.slice(bodyStart, app.indexOf('  starter:[' + NL));
+    const body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
     assert.ok(body.split("',").length >= 3, 'several rotating messages');
     // Frame the miss as the material not sticking yet, and point back to the topic.
     // The core-brain validator also rejects shaming vocabulary outright.
