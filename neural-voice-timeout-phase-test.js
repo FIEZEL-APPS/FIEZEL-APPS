@@ -19,7 +19,10 @@ assert.ok(voice.includes("phase: 'generate_busy'")&&voice.includes('neural_gener
 assert.ok(voice.includes("phase: 'generate_late_ready'")&&voice.includes("phase: 'generate_late_error'"),'m026 must expose late underlying inference settlement');
 assert.ok(voice.includes("phase: 'single_flight_ready'")&&voice.includes("patch: 'm026-single-flight-v1'"),'m026 runtime marker must be diagnostic-visible');
 assert.ok(boot.includes("const generationBusy=lastError==='neural_generation_busy'"),'bootstrap must identify transient generation busy');
-assert.ok(boot.includes('const shouldOpenCircuit=!!service&&!generationBusy'),'generation busy must not permanently open neural circuit');
+// m025-29: busy is now one of several transient causes, so assert it is inside the
+// transient set rather than pinning it as the first operand of the old expression.
+assert.ok(boot.includes('const transientFailure=generationBusy||'),'generation busy must remain transient');
+assert.ok(boot.includes('const shouldOpenCircuit=!!service&&!transientFailure'),'generation busy must not permanently open neural circuit');
 assert.ok(voice.includes('requestId'));
 assert.ok(/const SW_REV='[^']+';/.test(sw),'service worker must retain a non-empty shell revision marker');
 assert.ok(sw.includes("new Request(asset,{cache:'reload'})"),'service-worker reinstall must force fresh shell bytes');
