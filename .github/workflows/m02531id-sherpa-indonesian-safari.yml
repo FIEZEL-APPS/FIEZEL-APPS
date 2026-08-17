@@ -34,8 +34,8 @@ jobs:
           set -euo pipefail
           MODEL='vits-piper-id_ID-news_tts-medium'
           URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL}.tar.bz2"
-          EXPECTED_TAR='10dc268f3e371696d721486123e2705a9fc1faa113491979fde4d88dba1f1b1c'
-          EXPECTED_ONNX='8cce84cee4060bc3c2194bf95d33253c48dc8ff15e197b3b7a00b334ee0017f4'
+          # Published sha256 of the release asset, from the GitHub releases API digest field.
+          EXPECTED_TAR='634b0169fe41c368e9fafe128f30647f9e0301e852ce503cd78146db524f1f12'
           curl --fail --location --retry 4 --retry-all-errors --output "${MODEL}.tar.bz2" "$URL"
           ACTUAL_TAR="$(shasum -a 256 "${MODEL}.tar.bz2" | awk '{print $1}')"
           test "$ACTUAL_TAR" = "$EXPECTED_TAR"
@@ -50,12 +50,11 @@ jobs:
           cp "${MODEL}/tokens.txt" .m02531id-sherpa/wasm/tts/assets/tokens.txt
           cp -R "${MODEL}/espeak-ng-data" .m02531id-sherpa/wasm/tts/assets/espeak-ng-data
           ACTUAL_ONNX="$(shasum -a 256 .m02531id-sherpa/wasm/tts/assets/model.onnx | awk '{print $1}')"
-          test "$ACTUAL_ONNX" = "$EXPECTED_ONNX"
           printf '%s  model.onnx\n' "$ACTUAL_ONNX" | tee m02531id-model-onnx-sha256.txt
           stat --printf='%s\n' .m02531id-sherpa/wasm/tts/assets/model.onnx | tee m02531id-model-onnx-size.txt
           printf '%s\n' "$MODEL" | tee m02531id-model-name.txt
           cat > m02531id-catalog.json <<'JSON'
-          {"contract":"explicit-replacement-catalog-v1","legacyKokoroAlias":false,"candidates":[{"name":"local-1","sid":0},{"name":"local-2","sid":180},{"name":"local-3","sid":360},{"name":"local-4","sid":540},{"name":"local-5","sid":720},{"name":"local-6","sid":903}]}
+          {"contract":"indonesian-single-speaker-v1","legacyKokoroAlias":false,"candidates":[{"name":"id-1","sid":0}]}
           JSON
 
       - name: Install pinned Emscripten 4.0.23
