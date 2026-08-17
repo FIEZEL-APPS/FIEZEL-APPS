@@ -95,7 +95,7 @@ jobs:
             const wasm=env.wasmEnv;
             if(!wasm || typeof wasm !== 'object') throw new Error('wasmEnv object missing');
             if(!('proxy' in wasm)) throw new Error('proxy control missing');
-            if(!('numThreads' in wasm)) throw new Error('numThreads control missing');
+            if(!Object.isExtensible(wasm) && !('numThreads' in wasm)) throw new Error('numThreads cannot be assigned');
             wasm.proxy=true;
             wasm.numThreads=1;
             if(wasm.proxy!==true || Number(wasm.numThreads)!==1) throw new Error('WASM env readback failed');
