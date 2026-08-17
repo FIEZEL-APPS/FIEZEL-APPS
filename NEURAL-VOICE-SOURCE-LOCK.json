@@ -12,8 +12,8 @@
       {
         "name": "fiezel-integration",
         "path": "vendor/kokoro-js/source-overrides/fiezel-integration.patch",
-        "sha256": "35d4138e67c6dff5707b26893ac75589308b786c91d5b64bfc301834e81f917c",
-        "purpose": "Expose allowRemoteModels, allowLocalModels, localModelPath, and setVoiceDataUrl for same-origin offline FIEZEL integration"
+        "sha256": "a8a8163ecde6216685a09a52861e373d33b8be67031d675be31f9c50390f3444",
+        "purpose": "Expose same-origin model routing, setVoiceDataUrl, and the real Transformers/ORT WASM env for bounded Apple standalone proxy control"
       }
     ]
   },
@@ -43,25 +43,27 @@
     }
   },
   "candidate": {
-    "id": "m025-5",
-    "state": "RELEASED / PHYSICAL_APPLE_PASS",
+    "id": "m025-22",
+    "state": "MACHINE_VERIFIED / PHYSICAL_PENDING",
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
-      "sizeBytes": 2136684,
-      "sha256": "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
+      "sizeBytes": 2136728,
+      "sha256": "91d849dc97a2e43edab1e576721792211bc240da4d086591d42b5356959dc32f"
     },
     "provenance": {
-      "buildSourceCommit": "f4325324cad4f8dd1877743bd5e1e47fccbe9809",
-      "successfulIndependentBuilds": 2,
+      "buildSourceCommit": "86fd2ff698a1d2d3978959927ec6240dd6b5c4db",
+      "successfulIndependentBuilds": 4,
       "byteIdentical": true,
-      "runtimePromoted": true
+      "runtimePromoted": true,
+      "browserWasmEnvAuditRun": 31989178039,
+      "browserWasmEnvReadBack": true
     }
   },
   "runtime": {
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
-      "sizeBytes": 2136684,
-      "sha256": "f4329122c16919d170cb88d071b7d22066a4567d4f76feec2d3273412be145ad"
+      "sizeBytes": 2136728,
+      "sha256": "91d849dc97a2e43edab1e576721792211bc240da4d086591d42b5356959dc32f"
     },
     "wasmModule": {
       "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs",
@@ -119,9 +121,17 @@
   },
   "promotion": {
     "sourceAndAssetClosure": "PASS",
-    "realDeviceGate": "PASS",
-    "productionClaim": true,
-    "physicalEvidence": {
+    "realDeviceGate": "PENDING",
+    "productionClaim": false,
+    "machineEvidence": {
+      "expectedRedQualityRun": 31988377543,
+      "browserWasmEnvAuditRun": 31989178039,
+      "deterministicVendorSha256": "91d849dc97a2e43edab1e576721792211bc240da4d086591d42b5356959dc32f",
+      "deterministicVendorSizeBytes": 2136728,
+      "proxyReadBack": true,
+      "numThreadsReadBack": 1
+    },
+    "historicalPhysicalBaselineM0255": {
       "environment": "Apple standalone PWA",
       "capturedAtAsiaJakarta": "2026-08-16T20:15:00.344+07:00",
       "requestId": "nv-msvtu4mc-1",

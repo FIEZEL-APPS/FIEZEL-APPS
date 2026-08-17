@@ -21,8 +21,8 @@ const sourceLock=JSON.parse(read('NEURAL-VOICE-SOURCE-LOCK.json'));
 assert.ok(boot.includes("diag({phase:'prepared_idle'})"),'prepared startup must remain idle');
 assert.ok(!boot.includes("if(prepared)initialize().then(()=>diag({phase:'prewarm_ready'}))"),'startup must not prewarm Kokoro');
 assert.ok(boot.includes("wasmEnv.numThreads=1"),'Apple policy must disable WASM multithreading when the env is directly exposed');
-assert.ok(boot.includes("wasmEnv.proxy=false"),'Apple policy must avoid the proxy-worker roundtrip when the env is directly exposed');
-assert.ok(boot.includes("apple-standalone-single-thread-direct"));
+assert.ok(boot.includes("wasmEnv.proxy=true"),'Apple standalone policy must enable the real ORT proxy worker before session creation');
+assert.ok(boot.includes("apple-standalone-single-thread-proxy-worker"));
 assert.ok(boot.includes('onStage:entry=>diag(entry)'),'adapter stages must feed bounded runtime diagnostics');
 for(const phase of ['bootstrap_lifecycle_watch_ready','bootstrap_lifecycle_visibilitychange','bootstrap_lifecycle_pagehide','bootstrap_lifecycle_pageshow','bootstrap_lifecycle_beforeunload'])assert.ok(boot.includes(`phase:'${phase}'`),`m025-13 must retain bootstrap lifecycle diagnostic ${phase}`);
 const bootstrapLifecycleStart=boot.indexOf('function installBootstrapLifecycleDiagnostics()');
@@ -33,9 +33,9 @@ assert.ok(!/(?:\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(bootstr
 for(const phase of ['wasm_policy','adapter_instance_start','adapter_stage_probe_ready','adapter_instance_ready','adapter_generate_enter','adapter_generate_invoke','adapter_generate_dispatched','adapter_tokenizer_enter','adapter_tokenizer_resolved','adapter_tokenizer_error','adapter_model_enter','adapter_model_dispatched','adapter_model_resolved','adapter_model_error','adapter_generate_resolved','adapter_generate_error']){
   assert.ok(adapter.includes(`stage('${phase}'`),`missing adapter diagnostic stage ${phase}`);
 }
-assert.ok(adapter.includes("apple-standalone-single-thread-direct-default"),'m025-5 must label the pinned ORT default policy without pretending read-back verification');
+assert.ok(adapter.includes("apple-standalone-single-thread-proxy-worker"),'m025-22 must label the real Apple ORT proxy-worker policy');
 assert.ok(adapter.includes("source: 'onnxruntime-web-1.22-runtime-default'"),'effective policy must identify its pinned runtime basis');
-assert.ok(adapter.includes('readBack: false'),'effective default diagnostics must not claim a setter/read-back verification that the Kokoro wrapper cannot expose');
+assert.ok(adapter.includes('readBack: !!wasm'),'m025-22 diagnostics must report whether the real source-derived WASM env is available for readback');
 assert.ok(adapter.includes("typeof tts.tokenizer === 'function'")&&adapter.includes("typeof tts.model === 'function'"),'m025-5 must instrument tokenizer and model call boundaries');
 assert.ok(!adapter.includes("stage('adapter_generate_enter', { text"),'adapter diagnostics must never include prompt text');
 assert.ok(!adapter.includes('phonemes'),'adapter diagnostics must not persist phoneme content');
@@ -48,8 +48,8 @@ for(const phase of ['espeak_module_loaded','espeak_worker_promise_create','espea
 }
 assert.ok(!/stage\("[^"]+",/.test(phon),'eSpeak probe must emit phase names only');
 assert.ok(!phon.includes('error.message'),'eSpeak probe must not persist external error messages');
-assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'m025-5 must import the versioned vendor URL');
-assert.ok(!sw.includes("'./vendor/kokoro-js/kokoro.web.js?nv=m025-5'"),'m025-16 SW install must not own/pre-cache the versioned neural runtime URL');
+assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-22"),'m025-22 must import the fresh source-derived vendor URL');
+assert.ok(!sw.includes("'./vendor/kokoro-js/kokoro.web.js?nv=m025-22'"),'shell SW must not own/pre-cache the m025-22 neural runtime URL');
 assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependencies.phonemizerSourceOverride.path==='vendor/kokoro-js/source-overrides/phonemizer.js','m025-5 source lock must record the phonemizer override');
 assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-5 source override bytes must match the source-lock SHA-256');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must remain unchanged');
