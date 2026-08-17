@@ -26,10 +26,11 @@ jobs:
           adapter=Path('features/neural-voice/fiezel-kokoro-adapter.js').read_text()
           required=[
             "vendor/kokoro-js/kokoro.web.js?nv=m025-22",
-            "const wasmEnv=kokoro.env?.wasmEnv",
+            "wasmEnv=kokoro.env?.wasmEnv",
             "wasmEnv.proxy=true",
             "wasmEnv.numThreads=1",
             "readBack:true",
+            "Apple neural WASM proxy policy did not apply",
           ]
           for value in required:
             if value not in bootstrap:
