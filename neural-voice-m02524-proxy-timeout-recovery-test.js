@@ -19,9 +19,9 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
 
 (async()=>{
   // m025-23 regression reproducer: once ORT proxy-worker makes the document event
-  // loop responsive, the old 30s hard timer wins Promise.race while inference is
-  // still running. For Apple proxy-worker this must be a budget signal, not an
-  // abandonment of valid neural output.
+  // loop responsive, the old hard timer wins while inference is still running.
+  // Apple proxy-worker must retain the neural result and report an over-budget
+  // condition instead of abandoning the request into browser fallback/circuit-open.
   {
     const env=makeEnv({standalone:true,policy:'apple-standalone-single-thread-proxy-worker'});
     let calls=0;
@@ -31,13 +31,14 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
     assert.equal(result.provider,'neural-test');
     assert.equal(calls,1,'proxy over-budget path must not retry or duplicate inference');
     const log=diagnostics(env);
+    assert.ok(log.some(x=>x.phase==='generation_timeout_policy_ready'&&x.policy==='proxy-worker-soft-budget-v1'));
     assert.ok(log.some(x=>x.phase==='generate_budget_exceeded'),'proxy over-budget inference must be explicitly diagnosed');
+    assert.ok(log.some(x=>x.phase==='generate_budget_recovered'),'proxy over-budget completion must be explicit');
     assert.ok(log.some(x=>x.phase==='generate_ready'),'late-but-valid proxy inference must still be consumed');
     assert.ok(!log.some(x=>x.phase==='generate_timeout'),'proxy budget must not be mislabeled as hard cancellation');
   }
 
-  // Preserve the existing hard timeout contract outside the Apple proxy-worker
-  // path. This prevents the P0 recovery from silently removing all hang bounds.
+  // Preserve the hard timeout contract outside the Apple proxy-worker path.
   {
     const env=makeEnv();
     const adapter={kind:'neural-test',generate:async()=>new Promise(()=>{})};
@@ -46,12 +47,18 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
     assert.ok(diagnostics(env).some(x=>x.phase==='generate_timeout'));
   }
 
-  // Bootstrap must treat a hard generation timeout as transient. The underlying
-  // inference promise can still be active after Promise.race, so permanent circuit
-  // latching converts one timeout into a page-lifetime brick as observed on m025-23.
-  const bootstrap=fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstrap.js','utf8');
-  assert.match(bootstrap,/generationTimeout\s*=\s*lastError==='neural_generation_timeout'/,'bootstrap must classify neural_generation_timeout explicitly');
-  assert.match(bootstrap,/shouldOpenCircuit\s*=\s*!!service&&!generationBusy&&!generationTimeout/,'generation timeout must not permanently open circuit');
+  // The implementation must keep the default requested voice/speed propagation
+  // unchanged while changing timeout semantics only for the proven proxy policy.
+  {
+    const env=makeEnv({standalone:true,policy:'apple-standalone-single-thread-proxy-worker'});
+    const seen=[];
+    const adapter={kind:'neural-test',generate:async(text,opts)=>{seen.push(opts);return{data:new Float32Array([0]),sampling_rate:24000}}};
+    const service=core.createVoiceService({config:config(),adapter,env,generationTimeoutMs:20});
+    await service.speak('voice contract',{allowFallback:false,voice:'af_heart'});
+    assert.equal(seen.length,1);
+    assert.equal(seen[0].voice,'af_heart');
+    assert.equal(seen[0].speed,1);
+  }
 
   // Release identity must advance exactly one build from m025-23.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
