@@ -11,10 +11,15 @@ const pass=name=>console.log(`PASS ${name}`);
 
 (async()=>{
   const config=require('./features/neural-voice/fiezel-neural-voice-config.js');
-  const expected=['af_heart','af_bella','af_nicole','am_michael','bf_emma','bm_george'];
+  // m025-26: bella leads the catalog because OWNER made it the default voice.
+  const expected=['af_bella','af_heart','af_nicole','am_michael','bf_emma','bm_george'];
   assert.deepStrictEqual(config.voices.catalog.map(item=>item.id),expected);
+  assert.strictEqual(config.voices.fiezelPrimary,'af_bella');
+  // Voices are no longer per-file: the sherpa engine carries every speaker inside its
+  // single .data payload, so assert each id resolves to a speaker instead of a .bin.
+  const sherpa=require('./features/neural-voice/fiezel-sherpa-vits-adapter.js');
   for(const id of expected){
-    assert.ok(fs.existsSync(path.join(root,'vendor','kokoro-model','voices',`${id}.bin`)),`missing bundled voice ${id}`);
+    assert.ok(Object.prototype.hasOwnProperty.call(sherpa.VOICE_SIDS,id),`missing speaker mapping for ${id}`);
   }
   pass('voice catalog exposes all six bundled Kokoro voices');
 
