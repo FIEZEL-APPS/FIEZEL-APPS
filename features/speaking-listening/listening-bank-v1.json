@@ -30,7 +30,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -59,7 +59,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -88,7 +88,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -117,7 +117,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -141,7 +141,7 @@
         "metric": "token_f1",
         "threshold": 0.72
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -165,7 +165,7 @@
         "metric": "token_f1",
         "threshold": 0.72
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -194,7 +194,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -223,7 +223,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -252,7 +252,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -281,7 +281,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -305,7 +305,7 @@
         "metric": "token_f1",
         "threshold": 0.74
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -329,7 +329,7 @@
         "metric": "token_f1",
         "threshold": 0.74
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -358,7 +358,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -387,7 +387,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -416,7 +416,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -445,7 +445,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -469,7 +469,7 @@
         "metric": "token_f1",
         "threshold": 0.77
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -493,7 +493,7 @@
         "metric": "token_f1",
         "threshold": 0.77
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -522,7 +522,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -551,7 +551,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -580,7 +580,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -609,7 +609,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -633,7 +633,7 @@
         "metric": "token_f1",
         "threshold": 0.8
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -657,7 +657,7 @@
         "metric": "token_f1",
         "threshold": 0.8
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -686,7 +686,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -715,7 +715,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -744,7 +744,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -773,7 +773,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -797,7 +797,7 @@
         "metric": "token_f1",
         "threshold": 0.82
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -821,7 +821,7 @@
         "metric": "token_f1",
         "threshold": 0.82
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -850,7 +850,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -879,7 +879,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -908,7 +908,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "af_nicole",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -937,7 +937,7 @@
       "scoring": {
         "metric": "exact_choice"
       },
-      "voice": "am_michael",
+      "voice": "af_heart",
       "audioProfile": "listening"
     },
     {
@@ -961,7 +961,7 @@
         "metric": "token_f1",
         "threshold": 0.84
       },
-      "voice": "bf_emma",
+      "voice": "af_bella",
       "audioProfile": "listening"
     },
     {
@@ -985,7 +985,7 @@
         "metric": "token_f1",
         "threshold": 0.84
       },
-      "voice": "bm_george",
+      "voice": "af_heart",
       "audioProfile": "listening"
     }
   ]
