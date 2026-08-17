@@ -1,0 +1,166 @@
+name: m025-26 Transformers.js 4.2 Safari matrix
+
+on:
+  push:
+    branches:
+      - master/perf67-m02526-tjs4-matrix
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safari26:
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Record Apple runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers
+          uname -a
+          /usr/bin/safaridriver --version
+          /usr/bin/arch
+
+      - name: Build source-pinned Kokoro against Transformers.js 4.2.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          PROVIDER_COMMIT="$(node -p "require('./NEURAL-VOICE-SOURCE-LOCK.json').provider.commit")"
+          mkdir -p .m02526/runtime .m02526/work
+          git clone --quiet https://github.com/hexgrad/kokoro.git .m02526/work/kokoro
+          git -C .m02526/work/kokoro checkout --quiet "$PROVIDER_COMMIT"
+          git -C .m02526/work/kokoro apply --check "$PWD/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
+          git -C .m02526/work/kokoro apply "$PWD/vendor/kokoro-js/source-overrides/fiezel-integration.patch"
+          cd .m02526/work/kokoro/kokoro.js
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('package.json','utf8'));
+          p.dependencies['@huggingface/transformers']='4.2.0';
+          p.dependencies.phonemizer='1.2.1';
+          fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\n');
+          NODE
+          rm -f package-lock.json
+          npm install --ignore-scripts --no-audit --no-fund
+          node -e "const p=require('./node_modules/@huggingface/transformers/package.json'); console.log('transformers='+p.version); console.log('dependencies='+JSON.stringify(p.dependencies||{}))"
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('rollup.config.js')
+          s=p.read_text()
+          needle='terser({ format: { comments: false } })'
+          if needle in s:
+              s=s.replace(needle,'terser({ maxWorkers: 1, format: { comments: false } })',1)
+              p.write_text(s)
+          PY
+          npm run build
+          cd "$GITHUB_WORKSPACE"
+          cp .m02526/work/kokoro/kokoro.js/dist/kokoro.web.js .m02526/runtime/kokoro.web.js
+          mkdir -p .m02526/runtime/wasm
+          find .m02526/work/kokoro/kokoro.js/node_modules -type f \( -name 'ort-wasm*.wasm' -o -name 'ort-wasm*.mjs' \) -print | sort | tee .m02526/runtime/wasm-source-list.txt
+          while IFS= read -r f; do cp "$f" .m02526/runtime/wasm/; done < .m02526/runtime/wasm-source-list.txt
+          test -s .m02526/runtime/kokoro.web.js
+          test -n "$(find .m02526/runtime/wasm -type f -name '*.wasm' -print -quit)"
+          sha256sum .m02526/runtime/kokoro.web.js .m02526/runtime/wasm/* | sort | tee .m02526/runtime/SHA256SUMS
+          ls -lh .m02526/runtime .m02526/runtime/wasm
+
+      - name: Create exact-repo Safari benchmark page
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .m02526-bench.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-26 runtime matrix</title>
+          <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script type="module">
+          const q=new URL(location.href).searchParams;
+          const device=q.get('device')||'wasm';
+          const events=[];
+          window.__benchStatus='boot'; window.__benchResult=null;
+          const finish=x=>{window.__benchResult=x;window.__benchStatus=x.success?'done':'error'};
+          try {
+            const mod=await import('./.m02526/runtime/kokoro.web.js?v=4.2.0');
+            const wasmBase=location.origin+'/.m02526/runtime/wasm/';
+            if (!mod.KokoroTTS || !mod.env || !mod.setVoiceDataUrl) throw new Error('patched Kokoro exports missing');
+            if (mod.env.wasmEnv && device==='wasm') { mod.env.wasmEnv.numThreads=1; mod.env.wasmEnv.proxy=true; }
+            if (mod.env.wasmEnv && device==='webgpu') { mod.env.wasmEnv.proxy=false; mod.env.wasmEnv.numThreads=1; }
+            const runtime={navigator:{standalone:device==='wasm',gpu:navigator.gpu||null},crossOriginIsolated:false,matchMedia(){return{matches:device==='wasm'}}};
+            const adapter=FiezelKokoroAdapter.createKokoroAdapter({
+              KokoroTTS:mod.KokoroTTS,kokoroEnv:mod.env,setVoiceDataUrl:mod.setVoiceDataUrl,
+              modelId:'kokoro-model',localModelPath:'./vendor/',voiceBaseUrl:'./vendor/kokoro-model/voices',
+              wasmBasePath:wasmBase,runtimeOrigin:location.origin,runtime,dtype:'q8',device,
+              onStage:e=>events.push({t:Date.now(),...e})
+            });
+            window.__benchStatus='initializing'; const i0=performance.now(); await adapter.initialize(); const initMs=performance.now()-i0;
+            const text='The learner explains the main idea clearly and supports it with one example.';
+            const times=[]; const samples=[];
+            for(let n=0;n<2;n++){
+              window.__benchStatus='generate-'+(n+1); const t0=performance.now();
+              const audio=await adapter.generate(text,{voice:'af_heart',speed:1}); times.push(Math.round(performance.now()-t0));
+              samples.push(audio?.audio?.length??audio?.data?.length??null);
+            }
+            finish({success:true,device,userAgent:navigator.userAgent,navigatorGpu:!!navigator.gpu,crossOriginIsolated:globalThis.crossOriginIsolated===true,
+              initMs:Math.round(initMs),times,samples,modelMs:events.filter(e=>e.phase==='adapter_model_resolved').map(e=>e.elapsedMs),
+              generateMs:events.filter(e=>e.phase==='adapter_generate_resolved').map(e=>e.elapsedMs),backend:adapter.getBackendState(),
+              policy:events.filter(e=>e.phase==='wasm_policy'),capability:events.filter(e=>e.phase==='adapter_backend_capability'),eventCount:events.length});
+          } catch(error){finish({success:false,device,status:window.__benchStatus,error:String(error?.stack||error),events});}
+          </script>
+          HTML
+
+      - name: Start local server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/m02526-http.log 2>&1 &
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 > /tmp/m02526-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02526-status.json 2>/dev/null && break; sleep 1; done
+          cat /tmp/m02526-status.json
+
+      - name: Run runtime matrix in fresh Safari sessions
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_one(){
+            local device="$1" out="m02526-safari26-${1}.json"
+            local sj sid resp result=''
+            sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+            sid="$(echo "$sj"|jq -r '.value.sessionId // .sessionId // empty')"; test -n "$sid"
+            curl -fsS -H 'Content-Type: application/json' -d "{\"url\":\"http://127.0.0.1:8000/.m02526-bench.html?device=$device\"}" "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+            for i in {1..240}; do
+              resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+              result="$(echo "$resp"|jq -c '.value.result // empty' 2>/dev/null || true)"
+              [ -n "$result" ] && [ "$result" != null ] && break
+              sleep 1
+            done
+            curl -sS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+            if [ -z "$result" ]; then result="{\"success\":false,\"device\":\"$device\",\"error\":\"no_terminal_result_within_240s\"}"; fi
+            echo "$result"|jq .|tee "$out"
+          }
+          run_one wasm
+          run_one webgpu || true
+          WASM_MAX="$(jq '[.modelMs[]?] | if length==0 then 999999 else max end' m02526-safari26-wasm.json)"
+          GPU_MAX="$(jq '[.modelMs[]?] | if length==0 then 999999 else max end' m02526-safari26-webgpu.json)"
+          echo "wasm_max_model_ms=$WASM_MAX"
+          echo "webgpu_max_model_ms=$GPU_MAX"
+          if [ "$WASM_MAX" -le 5000 ] || [ "$GPU_MAX" -le 5000 ]; then echo 'MACHINE_LATENCY_CANDIDATE=PASS'; else echo 'MACHINE_LATENCY_CANDIDATE=FAIL'; exit 1; fi
+
+      - name: Preserve runtime matrix evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02526-transformers4-safari26-${{ github.sha }}
+          path: |
+            m02526-safari26-wasm.json
+            m02526-safari26-webgpu.json
+            .m02526/runtime/SHA256SUMS
+            .m02526/runtime/wasm-source-list.txt
+            /tmp/m02526-http.log
+            /tmp/m02526-safaridriver.log
+            /tmp/m02526-status.json
+          if-no-files-found: warn
+          retention-days: 30
