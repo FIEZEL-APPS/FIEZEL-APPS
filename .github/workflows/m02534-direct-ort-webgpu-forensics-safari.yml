@@ -177,10 +177,11 @@ jobs:
           }
           </script>
           HTML
-          python3 - <<PY
+          ORT_ENTRY="$ENTRY" python3 - <<'PY'
+          import os
           from pathlib import Path
           p=Path('.m02534-bench.html')
-          p.write_text(p.read_text().replace('__ORT_ENTRY__', ${ENTRY@Q}))
+          p.write_text(p.read_text().replace('__ORT_ENTRY__', os.environ['ORT_ENTRY']))
           PY
 
       - name: Start same-origin server and SafariDriver
