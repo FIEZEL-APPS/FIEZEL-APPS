@@ -127,9 +127,16 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
     'no en-GB locale may be advertised for an en_US-only model');
 
   // --- release markers ----------------------------------------------------------
-  assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-35'/);
-  assert.match(SW, /SW_REV='m025-35-struggle-reminder-20260818-1'/);
+  // Keep this historical m025-26 engine regression valid across later releases.
+  // The invariant is that Diagnostics and service-worker shell identify the same
+  // current product build, never that production must remain frozen at one old N.
+  const diag = fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8');
+  const diagBuild = diag.match(/DIAG_BUILD\s*=\s*'m025-(\d+)'/);
+  const swBuild = SW.match(/SW_REV='m025-(\d+)-/);
+  assert.ok(diagBuild, 'Diagnostics deployment marker must exist');
+  assert.ok(swBuild, 'Service-worker deployment marker must exist');
+  assert.strictEqual(swBuild[1], diagBuild[1], 'DIAG_BUILD and SW_REV must identify the same product build');
+  assert.ok(Number(diagBuild[1]) >= 26, 'later releases must not regress behind the m025-26 engine boundary');
 
   console.log('FIEZEL m025-26 sherpa VITS engine regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
