@@ -1,0 +1,87 @@
+name: m025-22 Source-Derived Proxy Candidate
+on:
+  push:
+    branches:
+      - master/perf39-real-wasm-proxy-m02522
+    paths:
+      - '.github/workflows/m025-22-candidate-build.yml'
+      - 'NEURAL-VOICE-SOURCE-LOCK.json'
+      - 'vendor/kokoro-js/source-overrides/fiezel-integration.patch'
+permissions:
+  contents: read
+jobs:
+  candidate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Patch candidate runtime sources without touching branch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          bootstrap=Path('features/neural-voice/fiezel-neural-voice-bootstrap.js')
+          text=bootstrap.read_text()
+          replacements={
+            "vendor/kokoro-js/kokoro.web.js?nv=m025-5":"vendor/kokoro-js/kokoro.web.js?nv=m025-22",
+            "const wasmEnv=kokoro.env?.backends?.onnx?.wasm;":"const wasmEnv=kokoro.env?.wasmEnv;",
+            "if(appleStandalone)wasmEnv.proxy=false;":"if(appleStandalone)wasmEnv.proxy=true;",
+            "apple-standalone-single-thread-direct":"apple-standalone-single-thread-proxy-worker",
+          }
+          for old,new in replacements.items():
+            if old not in text:
+              raise SystemExit(f'bootstrap replacement source missing: {old}')
+            text=text.replace(old,new)
+          bootstrap.write_text(text)
+
+          adapter=Path('features/neural-voice/fiezel-kokoro-adapter.js')
+          text=adapter.read_text()
+          old="wasm: kokoroEnv?.backends?.onnx?.wasm || null"
+          if old not in text:
+            raise SystemExit('adapter legacy WASM facade path missing')
+          text=text.replace(old,"wasm: kokoroEnv?.wasmEnv || null")
+          text=text.replace("readBack: false", "readBack: !!wasm")
+          adapter.write_text(text)
+          PY
+      - name: Build pinned vendor candidate clean-room
+        shell: bash
+        run: |
+          set +e
+          bash tools/rebuild-neural-vendor.sh
+          rc=$?
+          set -e
+          test -f .vendor-repro/kokoro.web.js
+          echo "rebuild_exit=$rc"
+          # Runtime lock still points to the released m025-5 bytes at this candidate stage,
+          # so a nonzero final comparison is expected; source/build failures are caught below.
+          test "$rc" -ne 0
+      - name: Verify actual candidate bundle exposes real WASM env
+        shell: bash
+        run: |
+          cp .vendor-repro/kokoro.web.js .vendor-repro/kokoro.web.mjs
+          node --input-type=module - <<'NODE'
+          const mod=await import(new URL('./.vendor-repro/kokoro.web.mjs', import.meta.url));
+          if(!mod.env?.wasmEnv) throw new Error('candidate missing env.wasmEnv');
+          if(!('proxy' in mod.env.wasmEnv)) throw new Error('candidate WASM env missing proxy');
+          if(!('numThreads' in mod.env.wasmEnv)) throw new Error('candidate WASM env missing numThreads');
+          mod.env.wasmEnv.proxy=true;
+          mod.env.wasmEnv.numThreads=1;
+          if(mod.env.wasmEnv.proxy!==true || Number(mod.env.wasmEnv.numThreads)!==1) throw new Error('candidate WASM env readback failed');
+          console.log('candidate real WASM env readback: PASS');
+          NODE
+          rm .vendor-repro/kokoro.web.mjs
+      - name: Record candidate integrity
+        shell: bash
+        run: |
+          sha256sum .vendor-repro/kokoro.web.js | tee .vendor-repro/kokoro.web.js.sha256
+          wc -c < .vendor-repro/kokoro.web.js | tr -d ' ' | tee .vendor-repro/kokoro.web.js.size
+          cp features/neural-voice/fiezel-neural-voice-bootstrap.js .vendor-repro/fiezel-neural-voice-bootstrap.js
+          cp features/neural-voice/fiezel-kokoro-adapter.js .vendor-repro/fiezel-kokoro-adapter.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: m025-22-proxy-candidate-${{ github.sha }}
+          path: .vendor-repro/
+          retention-days: 3
