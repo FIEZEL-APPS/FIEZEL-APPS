@@ -1,12 +1,13 @@
 'use strict';
-// m025-33 Classroom regression: subject routing, tutor state machine, and the
-// English-voice / Indonesian-subtitle contract.
+// OWNER Classroom regression: subject routing, tutor state machine, and Indonesian
+// neural tutor narration while English remains the target-language lesson content.
 const assert = require('assert');
 const fs = require('fs');
 
 const C = require('./features/classroom/fiezel-classroom.js');
 const pack = require('./features/classroom/classroom-lessons-v1.json');
 const app = fs.readFileSync('app.js', 'utf8');
+const ui = fs.readFileSync('features/ui/fiezel-owner-redesign-v1.js', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 
@@ -14,26 +15,25 @@ let pass = 0;
 const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
 
 (async () => {
-  test('pack schema and shape', () => {
+  test('pack schema, categories and OWNER voice contract', () => {
     assert.strictEqual(pack.schema, 'fiezel-classroom-lessons-v1');
     assert.ok(pack.categories.length >= 6, 'six subject categories from the design');
     assert.ok(pack.lessons.length >= 1);
+    assert.strictEqual(pack.voiceContract.speech, 'id-ID neural tutor');
+    assert.strictEqual(pack.voiceContract.targetLanguage, 'en');
   });
 
-  // Every authored line must carry both languages, or a learner hits a blank subtitle
-  // mid-explanation with no way to recover.
-  test('every segment and feedback has English speech and Indonesian subtitle', () => {
+  test('every teaching and feedback unit has English target plus Indonesian tutor line', () => {
     for (const lesson of pack.lessons) {
       assert.ok(lesson.segments.length > 0, `${lesson.id} has segments`);
       for (const seg of lesson.segments) {
-        assert.ok(seg.en && seg.en.trim(), `${lesson.id} segment missing en`);
-        assert.ok(seg.id && seg.id.trim(), `${lesson.id} segment missing id subtitle`);
+        assert.ok(seg.en && seg.en.trim(), `${lesson.id} segment missing English target`);
+        assert.ok(seg.id && seg.id.trim(), `${lesson.id} segment missing Indonesian tutor line`);
       }
       for (const q of lesson.questions) {
-        assert.ok(q.explain.en && q.explain.id, `${lesson.id} explain needs both languages`);
-        assert.ok(q.remediate.en && q.remediate.id, `${lesson.id} remediate needs both languages`);
-        assert.ok(Number.isInteger(q.answerIndex) && q.options[q.answerIndex],
-          `${lesson.id} answerIndex must point at a real option`);
+        assert.ok(q.explain.en && q.explain.id, `${lesson.id} explain needs target + tutor languages`);
+        assert.ok(q.remediate.en && q.remediate.id, `${lesson.id} remediate needs target + tutor languages`);
+        assert.ok(Number.isInteger(q.answerIndex) && q.options[q.answerIndex], `${lesson.id} answerIndex must point at a real option`);
         assert.strictEqual(new Set(q.options).size, q.options.length, `${lesson.id} options must be distinct`);
       }
     }
@@ -66,7 +66,7 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.strictEqual(s.snapshot().phase, 'quiz');
   });
 
-  test('a wrong answer remediates and retries without scoring', () => {
+  test('a wrong answer remediates in Indonesian and retries without scoring', () => {
     const s = C.createSession(pack);
     s.chooseLesson('grammar_present_perfect');
     while (s.snapshot().phase === 'teach') s.nextSegment();
@@ -76,7 +76,7 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.strictEqual(first.result.correct, false);
     assert.strictEqual(first.result.retry, true, 'first miss must offer a retry');
     assert.strictEqual(first.result.advanced, false, 'first miss must not skip the question');
-    assert.strictEqual(first.result.feedback.id, q.remediate.id, 'remediation shown in Indonesian');
+    assert.strictEqual(first.result.feedback.id, q.remediate.id, 'tutor remediation must be Indonesian');
     const second = s.answer(q.answerIndex);
     assert.strictEqual(second.result.advanced, true);
     assert.strictEqual(second.snapshot.correct, 0, 'a retry must not earn the point');
@@ -91,7 +91,7 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     s.answer(wrongIndex);
     const second = s.answer(wrongIndex);
     assert.strictEqual(second.result.advanced, true, 'second miss must advance, not trap the learner');
-    assert.strictEqual(second.result.feedback.en, q.explain.en, 'second miss reveals the explanation');
+    assert.strictEqual(second.result.feedback.id, q.explain.id, 'second miss reveals Indonesian tutor explanation');
   });
 
   test('a clean run scores 100 and finishes', () => {
@@ -114,25 +114,21 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.throws(() => C.createSession({ schema: 'wrong' }), /classroom_pack_invalid/);
   });
 
-  test('classroom is reachable and its assets are cached', () => {
-    assert.ok(app.includes("'classroom'"), 'classroom must be a valid view');
-    assert.ok(app.includes("if(state.view==='classroom')classroom();"), 'router must render classroom');
+  test('Classroom is a first-class primary destination and assets remain cached', () => {
+    assert.ok(app.includes("'classroom'"), 'legacy router still knows Classroom');
     assert.ok(index.includes('features/classroom/fiezel-classroom.js'), 'engine must be loaded');
-    // Bottom nav is contractually exactly five destinations, so Classroom is reached
-    // from Home rather than becoming a sixth tab.
-    assert.ok(app.includes("onclick=\"go('classroom')\""), 'Home must offer a Classroom entry point');
-    assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5, 'bottom nav stays at five destinations');
-    assert.ok(sw.includes('./features/classroom/classroom-lessons-v1.json'), 'lesson pack must be precached for offline use');
+    assert.ok(index.includes('data-view="classroom"'), 'Classroom must be a primary nav entry');
+    assert.strictEqual((index.match(/class="nav/g) || []).length, 5, 'bottom nav stays exactly five destinations');
+    assert.ok(sw.includes('./features/classroom/classroom-lessons-v1.json'), 'lesson pack must stay precached for offline use');
   });
 
-  // The Indonesian bundle is optional, so Classroom must never require it: subtitles
-  // are authored text, not synthesized speech.
-  test('subtitles never depend on the optional Indonesian voice bundle', () => {
-    const engine = fs.readFileSync('features/classroom/fiezel-classroom.js', 'utf8');
-    assert.ok(!/FiezelIndonesianVoice/.test(engine), 'engine must not reference the Indonesian bundle');
-    const slice = app.slice(app.indexOf('async function classroomSpeak'), app.indexOf('async function classroom()'));
-    assert.ok(!/FiezelIndonesianVoice/.test(slice), 'classroom speech must not require the Indonesian bundle');
-    assert.ok(/allowFallback:false/.test(slice), 'classroom speech must stay neural-only');
+  test('OWNER layer replaces English tutor speech with Indonesian neural-only narration', () => {
+    assert.ok(index.indexOf('fiezel-owner-redesign-v1.js') > index.indexOf('./app.js'), 'owner override must load after legacy app');
+    assert.ok(/FiezelIndonesianVoice/.test(ui), 'Classroom must call Indonesian neural bundle');
+    assert.ok(/lang:'id-ID'/.test(ui), 'tutor narration must declare id-ID');
+    assert.ok(/allowFallback:false/.test(ui), 'tutor narration must stay neural-only');
+    assert.ok(/root\.classroomSpeak=ownerClassroomSpeak/.test(ui), 'owner layer must replace legacy Classroom speech boundary');
+    assert.ok(!/speechSynthesis|SpeechSynthesisUtterance/.test(ui), 'owner Classroom layer must not use browser TTS');
   });
 
   console.log(`FIEZEL Classroom: PASS ${pass}/0`);
