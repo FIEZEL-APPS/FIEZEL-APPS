@@ -535,3 +535,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:.59rem;padding:8px 2px}
   .welcome-panel,.modal-panel{padding:26px 20px;border-radius:22px}.modal{padding:12px}.setting-row{grid-template-columns:auto 1fr auto}.practice-contract{align-items:stretch;flex-direction:column}.practice-contract button{width:100%}.lesson-card-foot{align-items:flex-start;flex-direction:column}.lesson-card-foot button{width:100%}
 }
+
+/* m025-30 neural voice rate control */
+.neural-voice-choice input[type="range"]{width:100%;accent-color:var(--accent,#3d7de0);height:28px}
+.neural-voice-choice input[type="range"]:disabled{opacity:.5}
