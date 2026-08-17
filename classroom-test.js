@@ -118,7 +118,10 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.ok(app.includes("'classroom'"), 'classroom must be a valid view');
     assert.ok(app.includes("if(state.view==='classroom')classroom();"), 'router must render classroom');
     assert.ok(index.includes('features/classroom/fiezel-classroom.js'), 'engine must be loaded');
-    assert.ok(index.includes('data-view="classroom"'), 'classroom must have a nav entry');
+    // Bottom nav is contractually exactly five destinations, so Classroom is reached
+    // from Home rather than becoming a sixth tab.
+    assert.ok(app.includes("onclick=\"go('classroom')\""), 'Home must offer a Classroom entry point');
+    assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5, 'bottom nav stays at five destinations');
     assert.ok(sw.includes('./features/classroom/classroom-lessons-v1.json'), 'lesson pack must be precached for offline use');
   });
 
