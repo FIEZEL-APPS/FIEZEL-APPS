@@ -1,6 +1,6 @@
 'use strict';
-// m025-35 Classroom v3 regression: adaptive human tutor, shared language bundle,
-// interrupt/resume, strategy switching, release coherence, and UI integration.
+// m025-36 Classroom v3 regression: adaptive human tutor, Indonesian neural tutor,
+// English target content, interrupt/resume, strategy switching, and UI integration.
 const assert = require('assert');
 const fs = require('fs');
 
@@ -134,14 +134,19 @@ test('clean run completes and writes bounded learner evidence', () => {
   assert.ok(!('transcript' in evidence));
 });
 
-test('Classroom shares the Indonesian language bundle but keeps English as teaching speech', () => {
-  assert.ok(/FiezelIndonesianVoice/.test(tutorSource), 'shared bundle must reuse existing Indonesian runtime');
+test('Classroom uses Indonesian neural tutor while English remains target content', () => {
+  assert.ok(/FiezelIndonesianVoice/.test(tutorSource), 'Classroom must reuse the existing Indonesian neural runtime');
   assert.ok(/fiezel-learning-bundle-v1/.test(tutorSource));
-  assert.ok(/classroomSpeech:\s*'en-US neural'/.test(tutorSource));
-  assert.ok(/classroomSubtitle:\s*'id-ID semantic'/.test(tutorSource));
-  assert.ok(/lang:\s*'en-US'/.test(tutorSource), 'Classroom spoken language stays English');
-  assert.ok(/allowFallback:\s*false/.test(tutorSource), 'neural speech must not silently become robot TTS');
+  assert.ok(/classroomSpeech:\s*'id-ID neural tutor'/.test(tutorSource));
+  assert.ok(/targetLanguage:\s*'en-US'/.test(tutorSource));
+  assert.ok(/lang:\s*'id-ID'/.test(tutorSource), 'Classroom spoken tutor language must be Indonesian');
+  assert.ok(/FiezelIndonesianVoice\.speak/.test(tutorSource), 'Tutor speech must call the Indonesian neural bundle');
+  assert.ok(/pair\.id\s*\|\|\s*pair\.idText/.test(tutorSource), 'Tutor must speak the Indonesian authored line');
+  assert.ok(/allowFallback:\s*false/.test(tutorSource), 'neural tutor must not silently become browser TTS');
+  assert.ok(!/SpeechSynthesisUtterance|speechSynthesis\.speak/.test(tutorSource), 'Tutor v3 must not use browser TTS');
   assert.ok(!/MediaRecorder/.test(tutorSource), 'Tutor v3 must not persist raw learner audio');
+  assert.strictEqual(pack.voiceContract.speech, 'id-ID neural tutor');
+  assert.strictEqual(pack.voiceContract.targetLanguage, 'en');
 });
 
 test('human-tutor controls are implemented in the product sidecar', () => {
