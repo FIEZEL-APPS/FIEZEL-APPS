@@ -66,7 +66,7 @@
         appleStandalone: standalone,
         isolated: runtime.crossOriginIsolated === true,
         webgpuAvailable: !!runtime.navigator?.gpu,
-        wasm: kokoroEnv?.backends?.onnx?.wasm || null
+        wasm: kokoroEnv?.wasmEnv || null
       };
     }
 
@@ -80,7 +80,7 @@
           numThreads,
           proxy,
           source: 'onnxruntime-web-1.22-runtime-default',
-          readBack: false,
+          readBack: !!wasm,
           supersedes: 'apple-standalone-single-thread-direct-default'
         });
       }
@@ -89,16 +89,16 @@
         numThreads,
         proxy,
         source: 'onnxruntime-web-1.22-runtime-default',
-        readBack: false
+        readBack: !!wasm
       });
     }
 
     function applyAppleStandaloneWorkerPolicy(candidateDevice) {
       const { appleStandalone, isolated, wasm } = runtimePolicyContext();
       if (!wasm || candidateDevice !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy(candidateDevice);
-      // Best-effort compatibility only. The pinned FIEZEL Kokoro facade currently
-      // does not expose env.backends. m025-21 therefore keeps this diagnostic policy
-      // bounded and does not treat it as acceleration or a release-success signal.
+      // m025-22: wasmEnv is the source-derived Transformers/ORT WASM environment,
+      // not a fabricated facade shape. Apply the single-thread proxy policy before
+      // Kokoro creates the ONNX session, then report the values read back from it.
       wasm.numThreads = 1;
       wasm.proxy = true;
       return effectiveWasmPolicy(candidateDevice);
@@ -114,12 +114,11 @@
         configuredDevice: device,
         dtype,
         autoWebGpuSuppressed,
-        rollbackBuild: autoWebGpuSuppressed ? 'm025-21' : null
+        stabilizationBuild: 'm025-22'
       });
-      // m025-21 emergency stabilization: never auto-promote a configured WASM
-      // backend to WebGPU merely because navigator.gpu exists. The physical m025-20
-      // Apple standalone path regressed latency, audio fidelity, and stability.
-      // Explicitly configured devices remain respected; only automatic promotion is removed.
+      // m025-21+ stabilization: never auto-promote a configured WASM backend to
+      // WebGPU merely because navigator.gpu exists. Explicit device configuration
+      // remains respected; m025-22 only repairs the real WASM proxy binding.
       return [Object.freeze({ id: `configured-${device}-${dtype}`, device, dtype })];
     }
 
