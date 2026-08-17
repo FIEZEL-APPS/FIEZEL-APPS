@@ -1,0 +1,328 @@
+name: m025-36 sherpa Kokoro WASM Safari benchmark
+
+on:
+  push:
+    branches:
+      - master/perf67-m02536-sherpa-kokoro-wasm
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_wasm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Source-lock sherpa-onnx v1.13.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4; do
+            rm -rf .m02536-sherpa
+            if git -c http.version=HTTP/1.1 clone --depth 1 --branch v1.13.5 https://github.com/k2-fsa/sherpa-onnx.git .m02536-sherpa; then break; fi
+            sleep $((attempt * 3))
+          done
+          test -d .m02536-sherpa/.git
+          test "$(git -C .m02536-sherpa describe --tags --exact-match)" = "v1.13.5"
+          test "$(git -C .m02536-sherpa rev-parse HEAD)" = "3dc7c569f31ca2cd4a20ed6f7db780327e6714c5"
+          git -C .m02536-sherpa rev-parse HEAD | tee m02536-sherpa-head.txt
+
+      - name: Stage official Kokoro int8 multi-lang v1.0
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODEL='kokoro-int8-multi-lang-v1_0'
+          URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL}.tar.bz2"
+          EXPECTED='75654a84864be26f345f020f4070c2c019e96dd1b7f9bf6e2ffd59efac6aa5a3'
+          curl --fail --location --retry 4 --retry-all-errors --output "${MODEL}.tar.bz2" "$URL"
+          ACTUAL="$(shasum -a 256 "${MODEL}.tar.bz2" | awk '{print $1}')"
+          printf '%s  %s\n' "$ACTUAL" "${MODEL}.tar.bz2" | tee m02536-model-tar-sha256.txt
+          test "$ACTUAL" = "$EXPECTED"
+          tar xf "${MODEL}.tar.bz2"
+          ROOT="$MODEL"
+          MODEL_FILE="$(find "$ROOT" -maxdepth 2 -type f \( -name 'model.int8.onnx' -o -name 'model.onnx' \) | head -n1)"
+          VOICES_FILE="$(find "$ROOT" -maxdepth 2 -type f -name 'voices.bin' | head -n1)"
+          TOKENS_FILE="$(find "$ROOT" -maxdepth 2 -type f -name 'tokens.txt' | head -n1)"
+          ESPEAK_DIR="$(find "$ROOT" -maxdepth 2 -type d -name 'espeak-ng-data' | head -n1)"
+          LEXICON_US="$(find "$ROOT" -maxdepth 2 -type f -name 'lexicon-us-en.txt' | head -n1)"
+          test -s "$MODEL_FILE"; test -s "$VOICES_FILE"; test -s "$TOKENS_FILE"; test -d "$ESPEAK_DIR"; test -s "$LEXICON_US"
+          rm -rf .m02536-sherpa/wasm/tts/assets/*
+          cp "$MODEL_FILE" .m02536-sherpa/wasm/tts/assets/model.onnx
+          cp "$VOICES_FILE" .m02536-sherpa/wasm/tts/assets/voices.bin
+          cp "$TOKENS_FILE" .m02536-sherpa/wasm/tts/assets/tokens.txt
+          cp "$LEXICON_US" .m02536-sherpa/wasm/tts/assets/lexicon-us-en.txt
+          cp -R "$ESPEAK_DIR" .m02536-sherpa/wasm/tts/assets/espeak-ng-data
+          shasum -a 256 .m02536-sherpa/wasm/tts/assets/model.onnx | tee m02536-model-onnx-sha256.txt
+          shasum -a 256 .m02536-sherpa/wasm/tts/assets/voices.bin | tee m02536-voices-sha256.txt
+          shasum -a 256 .m02536-sherpa/wasm/tts/assets/tokens.txt | tee m02536-tokens-sha256.txt
+          shasum -a 256 .m02536-sherpa/wasm/tts/assets/lexicon-us-en.txt | tee m02536-lexicon-us-sha256.txt
+          cat > m02536-voice-map.json <<'JSON'
+          {"model":"kokoro-int8-multi-lang-v1_0","numSpeakers":53,"required":{"af_bella":2,"af_heart":3,"af_nicole":6,"am_michael":16,"bf_emma":21,"bm_george":26}}
+          JSON
+
+      - name: Patch worker to explicit Kokoro config
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.m02536-sherpa/wasm/tts/sherpa-onnx-tts.worker.js')
+          s=p.read_text()
+          old='tts = createOfflineTts(self.Module);'
+          new="""tts = createOfflineTts(self.Module, {
+                offlineTtsModelConfig: {
+                  offlineTtsKokoroModelConfig: {
+                    model: './model.onnx', voices: './voices.bin', tokens: './tokens.txt',
+                    dataDir: './espeak-ng-data', lexicon: './lexicon-us-en.txt',
+                    lang: 'en-us', lengthScale: 1.0,
+                  },
+                  numThreads: 1, debug: 0, provider: 'cpu',
+                },
+                maxNumSentences: 1,
+                silenceScale: 0.2,
+              });"""
+          assert s.count(old)==1, s.count(old)
+          s=s.replace(old,new)
+          s=s.replace('numSpeakers: tts.numSpeakers,\n      });','numSpeakers: tts.numSpeakers,\n        sampleRate: tts.sampleRate,\n        explicitModel: "kokoro-int8-multi-lang-v1_0",\n      });',1)
+          s=s.replace('sampleRate: sampleRate,\n        },','sampleRate: sampleRate,\n          sid: Number(sid || 0),\n          speed: Number(speed || 1.0),\n        },',1)
+          p.write_text(s)
+          PY
+          grep -F 'offlineTtsKokoroModelConfig' .m02536-sherpa/wasm/tts/sherpa-onnx-tts.worker.js
+
+      - name: Install pinned Emscripten 4.0.23
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4; do
+            rm -rf .m02536-emsdk
+            if git -c http.version=HTTP/1.1 clone --depth 1 --branch 4.0.23 https://github.com/emscripten-core/emsdk.git .m02536-emsdk; then break; fi
+            sleep $((attempt * 3))
+          done
+          test -d .m02536-emsdk/.git
+          cd .m02536-emsdk
+          ./emsdk install 4.0.23
+          ./emsdk activate 4.0.23
+          source ./emsdk_env.sh
+          emcc --version | tee ../m02536-emcc-version.txt
+
+      - name: Pin exact build dependencies with retry
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$GITHUB_WORKSPACE/.m02536-deps"
+          mkdir -p "$ROOT"
+
+          clone_tag_exact() {
+            repo="$1"; tag="$2"; sha="$3"; dir="$4"
+            for attempt in 1 2 3 4; do
+              rm -rf "$dir"
+              if git -c http.version=HTTP/1.1 clone --depth 1 --branch "$tag" "https://github.com/${repo}.git" "$dir"; then break; fi
+              sleep $((attempt * 3))
+            done
+            test -d "$dir/.git"
+            test "$(git -C "$dir" rev-parse HEAD)" = "$sha"
+          }
+
+          fetch_sha_exact() {
+            repo="$1"; sha="$2"; dir="$3"
+            rm -rf "$dir"; git init "$dir"; git -C "$dir" remote add origin "https://github.com/${repo}.git"
+            ok=0
+            for attempt in 1 2 3 4; do
+              if git -C "$dir" -c http.version=HTTP/1.1 fetch --depth 1 origin "$sha"; then ok=1; break; fi
+              sleep $((attempt * 3))
+            done
+            test "$ok" = 1
+            git -C "$dir" checkout --detach FETCH_HEAD
+            test "$(git -C "$dir" rev-parse HEAD)" = "$sha"
+          }
+
+          clone_tag_exact csukuangfj/kaldi-native-fbank v1.22.3 b09e686fe2084732ddd30d1ef80acfc0f13eaf01 "$ROOT/kaldi-native-fbank"
+          fetch_sha_exact mborgerding/kissfft febd4caeed32e33ad8b2e0bb5ea77542c40f18ec "$ROOT/kissfft"
+          clone_tag_exact k2-fsa/kaldi-decoder v0.3.0 62fda2d74246a90db9570e46fb16b012f813fae7 "$ROOT/kaldi-decoder"
+          clone_tag_exact k2-fsa/kaldifst v1.8.0 ab5bdd013bdf13921e6aeee77db5722ebf9955fb "$ROOT/kaldifst"
+          clone_tag_exact csukuangfj/openfst v1.8.5-2026-07-09 f702a6317d600ac953fdbb4978674c3a28b6115c "$ROOT/openfst"
+          clone_tag_exact pkufool/simple-sentencepiece v0.7 62dd423df1d51da5ea06f1c3a046fc04f01b4f39 "$ROOT/simple-sentencepiece"
+          clone_tag_exact nlohmann/json v3.12.0 55f93686c01528224f448c19128836e7df245f72 "$ROOT/json"
+          fetch_sha_exact csukuangfj/espeak-ng ed530aa113046142eb5115cf2fc9157854d0ffe1 "$ROOT/espeak-ng"
+          fetch_sha_exact csukuangfj/piper-phonemize f3ff95afc03640bc1399e113e83361192a2fafb4 "$ROOT/piper-phonemize"
+
+          {
+            for d in kaldi-native-fbank kissfft kaldi-decoder kaldifst openfst simple-sentencepiece json espeak-ng piper-phonemize; do
+              printf '%s %s\n' "$d" "$(git -C "$ROOT/$d" rev-parse HEAD)"
+            done
+          } | tee m02536-dependency-locks.txt
+
+      - name: Build sherpa-onnx WASM Kokoro TTS
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .m02536-emsdk/emsdk_env.sh
+          EMSCRIPTEN="$GITHUB_WORKSPACE/.m02536-emsdk/upstream/emscripten"
+          SRC="$GITHUB_WORKSPACE/.m02536-sherpa"
+          DEPS="$GITHUB_WORKSPACE/.m02536-deps"
+          BUILD="$SRC/build-wasm-simd-tts"
+          mkdir -p "$BUILD"; cd "$BUILD"
+          cmake \
+            -DCMAKE_INSTALL_PREFIX=./install \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake" \
+            -DSHERPA_ONNX_ENABLE_PYTHON=OFF \
+            -DSHERPA_ONNX_ENABLE_TESTS=OFF \
+            -DSHERPA_ONNX_ENABLE_CHECK=OFF \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DSHERPA_ONNX_ENABLE_PORTAUDIO=OFF \
+            -DSHERPA_ONNX_ENABLE_JNI=OFF \
+            -DSHERPA_ONNX_ENABLE_C_API=ON \
+            -DSHERPA_ONNX_ENABLE_WEBSOCKET=OFF \
+            -DSHERPA_ONNX_ENABLE_GPU=OFF \
+            -DSHERPA_ONNX_ENABLE_WASM=ON \
+            -DSHERPA_ONNX_ENABLE_WASM_TTS=ON \
+            -DSHERPA_ONNX_ENABLE_BINARY=OFF \
+            -DSHERPA_ONNX_ENABLE_SPEAKER_DIARIZATION=OFF \
+            -DSHERPA_ONNX_LINK_LIBSTDCPP_STATICALLY=OFF \
+            -DFETCHCONTENT_SOURCE_DIR_KALDI_NATIVE_FBANK="$DEPS/kaldi-native-fbank" \
+            -DFETCHCONTENT_SOURCE_DIR_KISSFFT="$DEPS/kissfft" \
+            -DFETCHCONTENT_SOURCE_DIR_KALDI_DECODER="$DEPS/kaldi-decoder" \
+            -DFETCHCONTENT_SOURCE_DIR_KALDIFST="$DEPS/kaldifst" \
+            -DFETCHCONTENT_SOURCE_DIR_OPENFST="$DEPS/openfst" \
+            -DFETCHCONTENT_SOURCE_DIR_SIMPLE-SENTENCEPIECE="$DEPS/simple-sentencepiece" \
+            -DFETCHCONTENT_SOURCE_DIR_JSON="$DEPS/json" \
+            -DFETCHCONTENT_SOURCE_DIR_ESPEAK_NG="$DEPS/espeak-ng" \
+            -DFETCHCONTENT_SOURCE_DIR_PIPER_PHONEMIZE="$DEPS/piper-phonemize" \
+            "$SRC"
+          cmake --build . --parallel 2
+          cmake --install .
+          cd "$GITHUB_WORKSPACE"
+          OUT='.m02536-sherpa/build-wasm-simd-tts/install/bin/wasm/tts'
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.js"
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.wasm"
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.data"
+          test -s "$OUT/sherpa-onnx-tts.worker.js"
+          grep -F 'offlineTtsKokoroModelConfig' "$OUT/sherpa-onnx-tts.worker.js"
+          du -sk "$OUT" | tee m02536-runtime-kib.txt
+          find "$OUT" -maxdepth 1 -type f -print0 | sort -z | xargs -0 shasum -a 256 | tee m02536-runtime-sha256.txt
+
+      - name: Package exact benchmark substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p m02536-bundle/provenance
+          cp -R .m02536-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/. m02536-bundle/
+          cp m02536-*.txt m02536-voice-map.json m02536-bundle/provenance/
+          find m02536-bundle -maxdepth 2 -type f -printf '%P %s\n' | sort | tee m02536-bundle/provenance/file-sizes.txt
+
+      - name: Upload built Kokoro WASM substrate
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02536-sherpa-kokoro-substrate-${{ github.sha }}
+          path: m02536-bundle
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 1
+
+  safari26:
+    needs: build_wasm
+    runs-on: macos-26
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record Apple Safari substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers | tee m02536-sw-vers.txt
+          /usr/bin/safaridriver --version | tee m02536-safaridriver-version.txt
+          arch="$(/usr/bin/arch)"; echo "$arch" | tee m02536-arch.txt; test "$arch" = arm64
+
+      - name: Download exact built Kokoro WASM substrate
+        uses: actions/download-artifact@v4
+        with:
+          name: m02536-sherpa-kokoro-substrate-${{ github.sha }}
+          path: m02536-bundle
+
+      - name: Create named-voice worker benchmark page
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > m02536-bundle/bench.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-36</title><script>
+          (()=>{
+            const start=performance.now();
+            const voices=[['af_heart',3],['af_bella',2],['af_nicole',6],['am_michael',16],['bf_emma',21],['bm_george',26]];
+            const r={success:false,architecture:'sherpa-onnx-v1.13.5-kokoro-int8-wasm-worker',backend:'wasm-simd-worker',model:'kokoro-int8-multi-lang-v1_0',speed:1,userAgent:navigator.userAgent,crossOriginIsolated:self.crossOriginIsolated===true,speechSynthesisTouched:false,generations:[],voiceGenerations:[],rawGenerations:[],voiceMap:Object.fromEntries(voices)};
+            window.__benchStatus='boot'; window.__benchResult=null;
+            let last=performance.now(),maxDrift=0,ticks=0; const timer=setInterval(()=>{const n=performance.now();maxDrift=Math.max(maxDrift,n-last-100);last=n;ticks++},100);
+            const finish=(ok,e)=>{clearInterval(timer);r.success=ok;r.totalMs=Math.round(performance.now()-start);r.eventLoop={maxTickDriftMs:Math.round(Math.max(0,maxDrift)),tickCount:ticks};if(e)r.error={name:String(e.name||'Error'),message:String(e.message||e),stack:String(e.stack||'')};window.__benchStatus=ok?'done':'error';window.__benchResult=r};
+            const timeout=(p,ms,l)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(l+' timeout '+ms+'ms')),ms))]);
+            const analyze=(a,sr,ms,x)=>{let nf=0,finite=0,peak=0,ss=0,min=Infinity,max=-Infinity;for(const raw of a){const v=Number(raw);if(!Number.isFinite(v)){nf++;continue}finite++;peak=Math.max(peak,Math.abs(v));min=Math.min(min,v);max=Math.max(max,v);ss+=v*v}const d=sr>0?a.length/sr:0;const r6=v=>Math.round(v*1e6)/1e6;return {...x,generationMs:Math.round(ms),sampleRate:Number(sr),sampleCount:a.length,duration:d,durationSec:Math.round(d*1000)/1000,realtimeFactor:d>0?Math.round((ms/1000/d)*1000)/1000:null,nonFinite:nf,nonFiniteCount:nf,finite:nf===0&&finite===a.length,finiteCount:finite,min:finite?r6(min):null,max:finite?r6(max):null,peak:r6(peak),rms:finite?r6(Math.sqrt(ss/finite)):0}};
+            const sane=(m,l)=>{if(m.nonFiniteCount||!(m.sampleRate>0&&m.sampleCount>m.sampleRate*.2)||!(m.peak>.0001&&m.rms>.00001)||!(m.durationSec>.2&&m.durationSec<30))throw new Error('bad audio '+l)};
+            (async()=>{
+              const w=new Worker('sherpa-onnx-tts.worker.js'); let resolveReady,rejectReady,pending=null; const ready=new Promise((a,b)=>{resolveReady=a;rejectReady=b});
+              w.onerror=e=>{const er=new Error('worker '+String(e.message||'error'));if(pending){const p=pending;pending=null;p.reject(er)}else rejectReady(er)};
+              w.onmessage=e=>{const d=e.data||{};if(d.type==='sherpa-onnx-tts-ready'){r.readyMs=Math.round(performance.now()-start);r.modelType=Number(d.modelType);r.numSpeakers=Number(d.numSpeakers);r.sampleRate=Number(d.sampleRate);r.explicitModel=String(d.explicitModel||'');resolveReady()}else if(d.type==='error'){const er=new Error(String(d.message||'worker error'));if(pending){const p=pending;pending=null;p.reject(er)}else rejectReady(er)}else if(d.type==='sherpa-onnx-tts-result'&&pending){const p=pending;pending=null;p.resolve(d)}};
+              await timeout(ready,240000,'ready'); if(r.explicitModel!=='kokoro-int8-multi-lang-v1_0')throw new Error('wrong model acknowledgement'); if(r.numSpeakers!==53)throw new Error('expected 53 speakers, got '+r.numSpeakers);
+              const gen=async(name,sid,text,phase)=>{const t0=performance.now();const a=await timeout(new Promise((res,rej)=>{if(pending)return rej(new Error('duplicate pending'));pending={resolve:res,reject:rej};w.postMessage({type:'generate',text,sid,speed:1.0})}),180000,phase+' '+name);if(Number(a.sid)!==sid||Number(a.speed)!==1)throw new Error('sid/speed echo mismatch '+name);const m=analyze(a.samples,a.sampleRate,performance.now()-t0,{voice:name,sid,phase,speed:1});r.rawGenerations.push(m);if(phase==='first'&&name==='af_heart')r.firstRawGeneration=m;sane(m,name);return m};
+              const text='Local neural speech must remain clear, natural, responsive, and fully offline.';
+              r.generations.push(await gen('af_heart',3,text,'first')); r.generations.push(await gen('af_heart',3,text,'warm-1')); r.generations.push(await gen('af_heart',3,text,'warm-2'));
+              for(const [name,sid] of voices)r.voiceGenerations.push(await gen(name,sid,'This is the local FIEZEL voice identity validation sentence.','voice-map'));
+              const warm=r.generations.slice(1).map(x=>x.generationMs).sort((a,b)=>a-b);r.firstGenerationMs=r.generations[0].generationMs;r.warmMedianMs=Math.round((warm[0]+warm[1])/2);r.worstRealtimeFactor=Math.max(...r.generations.concat(r.voiceGenerations).map(x=>x.realtimeFactor||Infinity));r.performanceClass=r.warmMedianMs<=5000?'PERFORMANCE_TARGET_MET':r.warmMedianMs>8000?'PERFORMANCE_HARD_FAIL':'INTERMEDIATE_PERFORMANCE';r.voiceIdentityContract=voices.every(([n,s])=>r.voiceGenerations.some(g=>g.voice===n&&g.sid===s&&g.speed===1));w.terminate();finish(true)
+            })().catch(e=>finish(false,e));
+          })();
+          </script>
+          HTML
+
+      - name: Start local server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd m02536-bundle; python3 -u -m http.server 8000 --bind 127.0.0.1 >/tmp/m02536-http.log 2>&1 & cd "$GITHUB_WORKSPACE"
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8000/bench.html >/dev/null 2>&1 && break; sleep 1; done
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 >/tmp/m02536-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02536-status.json 2>/dev/null && break; sleep 1; done
+          cat /tmp/m02536-status.json
+
+      - name: Run Safari Kokoro named-voice benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+          sid="$(echo "$sj" | jq -r '.value.sessionId // .sessionId // empty')"; test -n "$sid"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/bench.html"}' "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+          result=''
+          for i in {1..900}; do
+            resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+            status="$(echo "$resp" | jq -r '.value.status // empty' 2>/dev/null || true)"
+            if [[ "$status" == done || "$status" == error ]]; then result="$(echo "$resp" | jq -c '.value.result')"; break; fi
+            sleep 1
+          done
+          curl -fsS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+          test -n "$result"; echo "$result" | jq . | tee m02536-safari-result.json
+          jq -e '.success==true and .architecture=="sherpa-onnx-v1.13.5-kokoro-int8-wasm-worker" and .backend=="wasm-simd-worker" and .speed==1 and .speechSynthesisTouched==false' m02536-safari-result.json >/dev/null
+          jq -e '.explicitModel=="kokoro-int8-multi-lang-v1_0" and .numSpeakers==53 and .voiceIdentityContract==true and (.voiceGenerations|length)==6' m02536-safari-result.json >/dev/null
+          jq -e '[.voiceGenerations[].voice]|sort==["af_bella","af_heart","af_nicole","am_michael","bf_emma","bm_george"]' m02536-safari-result.json >/dev/null
+          jq -e '[.voiceGenerations[].nonFiniteCount]|all(.==0)' m02536-safari-result.json >/dev/null
+          jq -e '[.voiceGenerations[].rms]|all(.>0.00001)' m02536-safari-result.json >/dev/null
+          jq -e '.eventLoop.maxTickDriftMs < 2000' m02536-safari-result.json >/dev/null
+          jq '{readyMs,firstGenerationMs,warmMedianMs,worstRealtimeFactor,performanceClass,numSpeakers,eventLoop,voiceMap,voiceGenerations,firstRawGeneration}' m02536-safari-result.json | tee m02536-decision-summary.json
+
+      - name: Upload Safari benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02536-sherpa-kokoro-safari-${{ github.sha }}
+          path: |
+            m02536-safari-result.json
+            m02536-decision-summary.json
+            m02536-sw-vers.txt
+            m02536-safaridriver-version.txt
+            m02536-arch.txt
+            m02536-bundle/provenance
+            /tmp/m02536-http.log
+            /tmp/m02536-safaridriver.log
+          if-no-files-found: warn
+          retention-days: 30
