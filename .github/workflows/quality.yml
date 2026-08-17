@@ -80,5 +80,6 @@ jobs:
           node neural-voice-m02521-apple-webgpu-rollback-test.js
           node neural-voice-m02522-real-wasm-proxy-test.js
           node neural-voice-m02524-proxy-timeout-recovery-test.js
+          node neural-voice-m02525-apple-inference-unviable-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
