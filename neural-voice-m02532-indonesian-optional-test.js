@@ -76,8 +76,8 @@ const boot = fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstra
 
   // --- 6. release markers ---------------------------------------------------------
   assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-34'/);
-  assert.match(sw, /SW_REV='m025-34-universal-diagnostic-20260818-1'/);
+    /DIAG_BUILD\s*=\s*'m025-35'/);
+  assert.match(sw, /SW_REV='m025-35-struggle-reminder-20260818-1'/);
 
   console.log('FIEZEL m025-32 Indonesian optional bundle regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
