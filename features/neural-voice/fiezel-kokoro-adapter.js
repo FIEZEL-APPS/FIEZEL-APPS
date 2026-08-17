@@ -97,9 +97,8 @@
       const { appleStandalone, isolated, wasm } = runtimePolicyContext();
       if (!wasm || candidateDevice !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy(candidateDevice);
       // Best-effort compatibility only. The pinned FIEZEL Kokoro facade currently
-      // does not expose env.backends, so m025-20 never relies on this object to
-      // establish acceleration. Apple acceleration is selected through the real
-      // Kokoro/Transformers `device: webgpu` backend contract below.
+      // does not expose env.backends. m025-21 therefore keeps this diagnostic policy
+      // bounded and does not treat it as acceleration or a release-success signal.
       wasm.numThreads = 1;
       wasm.proxy = true;
       return effectiveWasmPolicy(candidateDevice);
@@ -107,19 +106,20 @@
 
     function backendCandidates() {
       const capability = runtimePolicyContext();
+      const autoWebGpuSuppressed = device === 'wasm' && capability.appleStandalone && capability.webgpuAvailable;
       stage('adapter_backend_capability', {
         appleStandalone: capability.appleStandalone,
         webgpuAvailable: capability.webgpuAvailable,
         isolated: capability.isolated,
         configuredDevice: device,
-        dtype
+        dtype,
+        autoWebGpuSuppressed,
+        rollbackBuild: autoWebGpuSuppressed ? 'm025-21' : null
       });
-      if (device === 'wasm' && capability.appleStandalone && capability.webgpuAvailable) {
-        return [
-          Object.freeze({ id: 'apple-webgpu-q8', device: 'webgpu', dtype }),
-          Object.freeze({ id: 'wasm-q8-fallback', device: 'wasm', dtype })
-        ];
-      }
+      // m025-21 emergency stabilization: never auto-promote a configured WASM
+      // backend to WebGPU merely because navigator.gpu exists. The physical m025-20
+      // Apple standalone path regressed latency, audio fidelity, and stability.
+      // Explicitly configured devices remain respected; only automatic promotion is removed.
       return [Object.freeze({ id: `configured-${device}-${dtype}`, device, dtype })];
     }
 
