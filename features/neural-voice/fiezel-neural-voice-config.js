@@ -40,12 +40,15 @@
       fiezelAlternate: 'af_heart',
       listeningPool: Object.freeze(['af_nicole', 'am_michael', 'bf_emma', 'bm_george']),
       catalog: Object.freeze([
-        Object.freeze({ id: 'af_heart', label: 'Heart', locale: 'en-US' }),
+        // m025-26: every slot is en-US. The sherpa VITS model has no en-GB speakers, so
+        // Emma and George keep their ids and their place in the list, but are labelled
+        // truthfully rather than promising a British accent the audio does not deliver.
         Object.freeze({ id: 'af_bella', label: 'Bella', locale: 'en-US' }),
+        Object.freeze({ id: 'af_heart', label: 'Heart', locale: 'en-US' }),
         Object.freeze({ id: 'af_nicole', label: 'Nicole', locale: 'en-US' }),
         Object.freeze({ id: 'am_michael', label: 'Michael', locale: 'en-US' }),
-        Object.freeze({ id: 'bf_emma', label: 'Emma', locale: 'en-GB' }),
-        Object.freeze({ id: 'bm_george', label: 'George', locale: 'en-GB' })
+        Object.freeze({ id: 'bf_emma', label: 'Emma', locale: 'en-US' }),
+        Object.freeze({ id: 'bm_george', label: 'George', locale: 'en-US' })
       ])
     }),
     limits: Object.freeze({
