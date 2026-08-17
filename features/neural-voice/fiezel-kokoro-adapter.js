@@ -45,11 +45,7 @@
     const wasmBasePath = normalizeWasmPath(options.wasmBasePath || './vendor/kokoro-js/wasm/', options.runtimeOrigin);
     const dtype = String(options.dtype || 'q8');
     const device = String(options.device || 'wasm');
-    const runtime = options.runtime && typeof options.runtime === 'object'
-      ? options.runtime
-      : (typeof globalThis !== 'undefined' ? globalThis : {});
     let instancePromise = null;
-    let backendState = Object.freeze({ id: 'uninitialized', device: '', dtype: '' });
 
     function stage(phase, detail) {
       if (!onStage) return;
@@ -61,20 +57,20 @@
     }
 
     function runtimePolicyContext() {
+      const runtime = typeof globalThis !== 'undefined' ? globalThis : {};
       const standalone = runtime.navigator?.standalone === true || !!runtime.matchMedia?.('(display-mode: standalone)')?.matches;
       return {
         appleStandalone: standalone,
         isolated: runtime.crossOriginIsolated === true,
-        webgpuAvailable: !!runtime.navigator?.gpu,
         wasm: kokoroEnv?.backends?.onnx?.wasm || null
       };
     }
 
-    function effectiveWasmPolicy(candidateDevice) {
+    function effectiveWasmPolicy() {
       const { appleStandalone, isolated, wasm } = runtimePolicyContext();
       const numThreads = Number.isFinite(Number(wasm?.numThreads)) ? Number(wasm.numThreads) : (isolated ? null : 1);
       const proxy = wasm?.proxy === true;
-      if (appleStandalone && !isolated && candidateDevice === 'wasm') {
+      if (appleStandalone && !isolated && device === 'wasm') {
         return Object.freeze({
           policy: proxy ? 'apple-standalone-single-thread-proxy-worker' : 'apple-standalone-single-thread-direct-default',
           numThreads,
@@ -93,43 +89,17 @@
       });
     }
 
-    function applyAppleStandaloneWorkerPolicy(candidateDevice) {
+    function applyAppleStandaloneWorkerPolicy() {
       const { appleStandalone, isolated, wasm } = runtimePolicyContext();
-      if (!wasm || candidateDevice !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy(candidateDevice);
-      // Best-effort compatibility only. The pinned FIEZEL Kokoro facade currently
-      // does not expose env.backends, so m025-20 never relies on this object to
-      // establish acceleration. Apple acceleration is selected through the real
-      // Kokoro/Transformers `device: webgpu` backend contract below.
+      if (!wasm || device !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy();
+      // m025-18: physical m025-17 evidence showed each 49-79 char model call
+      // blocking the document event loop for the full ~10-16 s inference interval.
+      // ORT's shipped proxy worker keeps the same single WASM inference thread while
+      // moving that blocking run off the PWA document/UI thread. This is not WASM
+      // multithreading and does not require crossOriginIsolated.
       wasm.numThreads = 1;
       wasm.proxy = true;
-      return effectiveWasmPolicy(candidateDevice);
-    }
-
-    function backendCandidates() {
-      const capability = runtimePolicyContext();
-      stage('adapter_backend_capability', {
-        appleStandalone: capability.appleStandalone,
-        webgpuAvailable: capability.webgpuAvailable,
-        isolated: capability.isolated,
-        configuredDevice: device,
-        dtype
-      });
-      if (device === 'wasm' && capability.appleStandalone && capability.webgpuAvailable) {
-        return [
-          Object.freeze({ id: 'apple-webgpu-q8', device: 'webgpu', dtype }),
-          Object.freeze({ id: 'wasm-q8-fallback', device: 'wasm', dtype })
-        ];
-      }
-      return [Object.freeze({ id: `configured-${device}-${dtype}`, device, dtype })];
-    }
-
-    function backendDetail(extra) {
-      return {
-        backendId: backendState.id,
-        backendDevice: backendState.device,
-        backendDtype: backendState.dtype,
-        ...(extra || {})
-      };
+      return effectiveWasmPolicy();
     }
 
     function tokenCount(value) {
@@ -149,13 +119,13 @@
         tts.tokenizer = new Proxy(originalTokenizer, {
           apply(target, thisArg, args) {
             const startedAt = Date.now();
-            stage('adapter_tokenizer_enter', backendDetail());
+            stage('adapter_tokenizer_enter');
             try {
               const value = Reflect.apply(target, thisArg, args);
-              stage('adapter_tokenizer_resolved', backendDetail({ elapsedMs: Date.now() - startedAt, tokenCount: tokenCount(value) }));
+              stage('adapter_tokenizer_resolved', { elapsedMs: Date.now() - startedAt, tokenCount: tokenCount(value) });
               return value;
             } catch (error) {
-              stage('adapter_tokenizer_error', backendDetail({ elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) }));
+              stage('adapter_tokenizer_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
               throw error;
             }
           }
@@ -168,20 +138,20 @@
         tts.model = new Proxy(originalModel, {
           apply(target, thisArg, args) {
             const startedAt = Date.now();
-            stage('adapter_model_enter', backendDetail());
+            stage('adapter_model_enter');
             let result;
             try {
               result = Reflect.apply(target, thisArg, args);
-              stage('adapter_model_dispatched', backendDetail({ elapsedMs: Date.now() - startedAt }));
+              stage('adapter_model_dispatched', { elapsedMs: Date.now() - startedAt });
             } catch (error) {
-              stage('adapter_model_error', backendDetail({ elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) }));
+              stage('adapter_model_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
               throw error;
             }
             return Promise.resolve(result).then((value) => {
-              stage('adapter_model_resolved', backendDetail({ elapsedMs: Date.now() - startedAt }));
+              stage('adapter_model_resolved', { elapsedMs: Date.now() - startedAt });
               return value;
             }, (error) => {
-              stage('adapter_model_error', backendDetail({ elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) }));
+              stage('adapter_model_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
               throw error;
             });
           }
@@ -190,89 +160,36 @@
       }
 
       try { Object.defineProperty(tts, '__fiezelStageProbeV1', { value: true, configurable: false }); } catch (_) {}
-      stage('adapter_stage_probe_ready', backendDetail({ tokenizer, model }));
+      stage('adapter_stage_probe_ready', { tokenizer, model });
       return tts;
-    }
-
-    async function initializeCandidate(candidate, startedAt) {
-      if (candidate.device === 'wasm') {
-        const policy = applyAppleStandaloneWorkerPolicy(candidate.device);
-        try {
-          if (typeof globalThis !== 'undefined') globalThis.__fiezelNeuralWasmPolicy = policy.policy;
-        } catch (_) {}
-        stage('wasm_policy', policy);
-      }
-      stage('adapter_backend_attempt', {
-        id: candidate.id,
-        device: candidate.device,
-        dtype: candidate.dtype
-      });
-      try {
-        const value = await KokoroTTS.from_pretrained(modelId, { dtype: candidate.dtype, device: candidate.device });
-        backendState = Object.freeze({ id: candidate.id, device: candidate.device, dtype: candidate.dtype });
-        instrumentInstance(value);
-        stage('adapter_backend_ready', {
-          id: candidate.id,
-          device: candidate.device,
-          dtype: candidate.dtype,
-          elapsedMs: Date.now() - startedAt
-        });
-        return value;
-      } catch (error) {
-        stage('adapter_backend_error', {
-          id: candidate.id,
-          device: candidate.device,
-          dtype: candidate.dtype,
-          elapsedMs: Date.now() - startedAt,
-          errorKind: errorKind(error)
-        });
-        throw error;
-      }
-    }
-
-    async function initializeBackends() {
-      kokoroEnv.allowRemoteModels = false;
-      if ('allowLocalModels' in kokoroEnv) kokoroEnv.allowLocalModels = true;
-      kokoroEnv.localModelPath = localModelPath;
-      kokoroEnv.wasmPaths = wasmBasePath;
-      setVoiceDataUrl(voiceBaseUrl);
-
-      const candidates = backendCandidates();
-      const startedAt = Date.now();
-      stage('adapter_instance_start', { dtype, device, candidateCount: candidates.length });
-      let lastError = null;
-      for (let index = 0; index < candidates.length; index++) {
-        const candidate = candidates[index];
-        try {
-          const value = await initializeCandidate(candidate, startedAt);
-          stage('adapter_instance_ready', backendDetail({ elapsedMs: Date.now() - startedAt }));
-          return value;
-        } catch (error) {
-          lastError = error;
-          const next = candidates[index + 1];
-          if (next) {
-            stage('adapter_backend_fallback', {
-              fromId: candidate.id,
-              fromDevice: candidate.device,
-              toId: next.id,
-              toDevice: next.device,
-              dtype: next.dtype,
-              errorKind: errorKind(error)
-            });
-          }
-        }
-      }
-      throw lastError || new Error('Neural backend initialization failed');
     }
 
     async function getInstance() {
       if (!instancePromise) {
-        instancePromise = initializeBackends().catch((error) => {
-          instancePromise = null;
-          backendState = Object.freeze({ id: 'uninitialized', device: '', dtype: '' });
-          stage('adapter_instance_error', { errorKind: errorKind(error) });
-          throw error;
-        });
+        kokoroEnv.allowRemoteModels = false;
+        if ('allowLocalModels' in kokoroEnv) kokoroEnv.allowLocalModels = true;
+        kokoroEnv.localModelPath = localModelPath;
+        kokoroEnv.wasmPaths = wasmBasePath;
+        setVoiceDataUrl(voiceBaseUrl);
+        const policy = applyAppleStandaloneWorkerPolicy();
+        try {
+          if (typeof globalThis !== 'undefined') globalThis.__fiezelNeuralWasmPolicy = policy.policy;
+        } catch (_) {}
+        stage('wasm_policy', policy);
+        const startedAt = Date.now();
+        stage('adapter_instance_start', { dtype, device });
+        instancePromise = Promise.resolve()
+          .then(() => KokoroTTS.from_pretrained(modelId, { dtype, device }))
+          .then((value) => {
+            instrumentInstance(value);
+            stage('adapter_instance_ready', { elapsedMs: Date.now() - startedAt });
+            return value;
+          })
+          .catch((error) => {
+            instancePromise = null;
+            stage('adapter_instance_error', { elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
+            throw error;
+          });
       }
       return instancePromise;
     }
@@ -282,22 +199,22 @@
       const voice = String(opts.voice || '');
       const speed = typeof opts.speed === 'number' ? opts.speed : 1;
       const startedAt = Date.now();
-      stage('adapter_generate_enter', backendDetail({ voice }));
+      stage('adapter_generate_enter', { voice });
       const tts = await getInstance();
-      stage('adapter_generate_invoke', backendDetail({ voice, elapsedMs: Date.now() - startedAt }));
+      stage('adapter_generate_invoke', { voice, elapsedMs: Date.now() - startedAt });
       try {
         const generated = Promise.resolve(tts.generate(text, { voice: opts.voice, speed }));
-        stage('adapter_generate_dispatched', backendDetail({ voice, elapsedMs: Date.now() - startedAt }));
+        stage('adapter_generate_dispatched', { voice, elapsedMs: Date.now() - startedAt });
         const value = await generated;
         const samples = value && (value.audio || value.data);
-        stage('adapter_generate_resolved', backendDetail({
+        stage('adapter_generate_resolved', {
           voice,
           elapsedMs: Date.now() - startedAt,
           samples: samples && typeof samples.length === 'number' ? samples.length : null
-        }));
+        });
         return value;
       } catch (error) {
-        stage('adapter_generate_error', backendDetail({ voice, elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) }));
+        stage('adapter_generate_error', { voice, elapsedMs: Date.now() - startedAt, errorKind: errorKind(error) });
         throw error;
       }
     }
@@ -311,8 +228,7 @@
 
     return Object.freeze({
       kind: 'kokoro-local', modelId, localModelPath, voiceBaseUrl, wasmBasePath, dtype, device,
-      initialize: getInstance, generate, listVoices,
-      getBackendState: () => backendState
+      initialize: getInstance, generate, listVoices
     });
   }
 
