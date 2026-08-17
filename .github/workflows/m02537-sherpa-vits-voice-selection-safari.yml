@@ -272,7 +272,7 @@ jobs:
           curl -fsS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
           test -n "$result"; echo "$result" | jq . | tee m02537-safari-result.json
           jq -e '.success==true and .legacyKokoroAlias==false and .numSpeakers==904 and .uniqueWaveforms==true and .performanceClass=="SUB_REALTIME_CATALOG_PASS"' m02537-safari-result.json >/dev/null
-          jq -e '(.voiceGenerations|length)==6 and [.voiceGenerations[].nonFiniteCount]|all(.==0)' m02537-safari-result.json >/dev/null
+          jq -e '(.voiceGenerations|length)==6 and ([.voiceGenerations[].nonFiniteCount]|all(.==0))' m02537-safari-result.json >/dev/null
           jq -e '[.voiceGenerations[].rms]|all(.>0.00001)' m02537-safari-result.json >/dev/null
           jq '{readyMs,firstGenerationMs,warmMedianMs,worstRealtimeFactor,performanceClass,numSpeakers,legacyKokoroAlias,catalog,uniqueWaveforms,minEnvelopeDistance,pairwiseEnvelope,eventLoop,voiceGenerations}' m02537-safari-result.json | tee m02537-decision-summary.json
 
