@@ -72,7 +72,9 @@
   function capabilities(){
     const Recognition=global.SpeechRecognition||global.webkitSpeechRecognition;
     return Object.freeze({
-      tts:!!(global.speechSynthesis&&global.SpeechSynthesisUtterance),
+      // m025-28: audio capability means the neural runtime is usable. Browser
+      // SpeechSynthesis presence is irrelevant: it is never used for listening.
+      tts:!!(global.FiezelVoiceRuntime&&typeof global.FiezelVoiceRuntime.speak==='function'),
       neuralVoice:global.FiezelVoiceRuntime?.status?.().ready===true,
       speechRecognition:typeof Recognition==='function',
       mediaRecorder:typeof global.MediaRecorder==='function'&&!!global.navigator?.mediaDevices?.getUserMedia,
@@ -119,8 +121,25 @@
 
   class TTSService{
     constructor(config){this.config=config}
-    stop(){try{global.speechSynthesis?.cancel()}catch{}}
-    play(text,options={}){if(!capabilities().tts)return Promise.reject(new Error('tts_unavailable'));this.stop();return new Promise((resolve,reject)=>{let done=false;const finish=(fn,v)=>{if(done)return;done=true;fn(v)};try{const u=new global.SpeechSynthesisUtterance(String(text||''));u.lang=this.config.language;u.rate=clamp(options.rate??this.config.ttsRate,.55,1.3);u.onend=()=>finish(resolve,{provider:'browser-speech-synthesis'});u.onerror=()=>finish(reject,new Error('tts_failed'));setTimeout(()=>finish(resolve,{provider:'browser-speech-synthesis'}),12000);global.speechSynthesis.speak(u)}catch(e){finish(reject,e)}})}
+    stop(){try{global.FiezelVoiceRuntime?.stop?.()}catch{}try{global.speechSynthesis?.cancel()}catch{}}
+    // m025-28: listening used to call SpeechSynthesisUtterance directly, so it never
+    // touched the neural engine at all -- every listening item was browser TTS by
+    // construction. That is also why longer scripts failed: B2 scripts run ~155 chars
+    // against A1's ~40, and iOS SpeechSynthesis routinely stalls on the longer ones,
+    // tripping the internal timeout and locking the item. Route listening through the
+    // same neural runtime as the rest of the app, and never substitute browser TTS.
+    play(text,options={}){
+      const runtime=global.FiezelVoiceRuntime;
+      if(!runtime||typeof runtime.speak!=='function')return Promise.reject(new Error('neural_runtime_unavailable'));
+      this.stop();
+      const status=typeof runtime.status==='function'?runtime.status():null;
+      if(status&&!status.prepared)return Promise.reject(new Error('neural_voice_not_downloaded'));
+      const rate=clamp(options.rate??this.config.ttsRate,.55,1.3);
+      // allowFallback:false is the whole point: a listening item must be neural or
+      // explicitly unavailable, never silently degraded to a robot voice.
+      return runtime.speak(String(text||''),{voice:options.voice,speed:rate,lang:this.config.language,allowFallback:false})
+        .then(result=>({provider:String(result&&result.provider||'sherpa-vits-local')}));
+    }
   }
 
   class RecognitionService{
@@ -150,7 +169,7 @@
     open(domain,level){if(!['listening','speaking'].includes(domain))throw new Error('invalid_domain');this.domain=domain;this.level=LEVELS.includes(level)?level:this.level;this.items=this.repo.for(domain,this.level);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.renderSession();return this}
     exit(){this.tts.stop();this.recognition.stop();this.recorder.destroy();this.ephemeralTranscript='';if(typeof this.options.onExit==='function')this.options.onExit();else this.renderHub()}
     emitEvidence(){const evidence=this.store.evidence();if(typeof this.options.onAggregateEvidence==='function')this.options.onAggregateEvidence(evidence);return evidence}
-    renderHub(){if(!this.root)return;const c=capabilities(),ev=this.store.evidence();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>Dengar lalu pahami</h2><p>Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">Mulai Listening</button></div></article><article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>Ucapkan dan respons</h2><p>${c.speechRecognition?'Speech recognition tersedia untuk target-language coverage.':'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.'}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">Mulai Speaking</button></div></article></div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?'neural-ready path':'browser path'}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
+    renderHub(){if(!this.root)return;const c=capabilities(),ev=this.store.evidence();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>Dengar lalu pahami</h2><p>Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">Mulai Listening</button></div></article><article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>Ucapkan dan respons</h2><p>${c.speechRecognition?'Speech recognition tersedia untuk target-language coverage.':'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.'}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">Mulai Speaking</button></div></article></div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?'neural ready':'neural belum diunduh'}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
       this.root.querySelectorAll?.('[data-open]').forEach(b=>b.addEventListener('click',()=>this.renderLevelPicker(b.getAttribute('data-open'))))
     }
     renderLevelPicker(domain){if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}

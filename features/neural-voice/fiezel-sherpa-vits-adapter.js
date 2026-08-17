@@ -44,16 +44,16 @@
   });
   var DEFAULT_VOICE = 'af_bella';
 
-  // Natural speaking-rate calibration, measured from OWNER device evidence (m025-26
-  // capture 2026-08-17T18:22:59Z, Apple standalone). At engine speed 1.0 this model
-  // produced ~78 characters (~14 words) per ~3.9s of audio across seven consecutive
-  // chunks -- about 215 words/minute. Conversational English sits near 140-160 wpm,
-  // so 1.0 is materially faster than natural and too fast to follow for a learner.
-  //
-  // 0.70 lands the delivery near 150 wpm: natural native pace rather than a slowed,
-  // droning read. This scales the engine rate only; it does not change latency, since
-  // generation cost tracks token count rather than playback duration.
-  var NATURAL_SPEED = 0.70;
+  // Natural speaking-rate calibration, set from OWNER physical listening across three
+  // builds rather than from a formula:
+  //   1.00 (m025-26) -> ~215 wpm, too fast to follow, but preferred over the next try
+  //   0.70 (m025-27) -> ~150 wpm, rejected as "slow motion"
+  //   0.85 (m025-28) -> ~183 wpm, between the two, leaning toward the faster one
+  // OWNER asked for a rate below the first and above the second, closer to the first.
+  // 183 wpm is brisk-but-natural: above conversational average, below the original.
+  // This scales playback duration only; generation cost tracks token count, so the
+  // responsiveness OWNER asked me to preserve is unaffected.
+  var NATURAL_SPEED = 0.85;
   // Guard rails so a caller cannot request an unintelligible or absurd rate.
   var MIN_ENGINE_SPEED = 0.4;
   var MAX_ENGINE_SPEED = 1.6;
