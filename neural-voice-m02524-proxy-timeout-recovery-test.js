@@ -1,0 +1,86 @@
+'use strict';
+const assert=require('assert');
+const fs=require('fs');
+const core=require('./features/neural-voice/fiezel-neural-voice.js');
+
+const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function makeEnv({standalone=false,policy=''}={}){
+  const data={};
+  return{
+    FIEZEL_VERSION:'5.19.0',
+    navigator:{standalone},
+    __fiezelNeuralWasmPolicy:policy,
+    localStorage:{getItem:k=>data[k]??null,setItem:(k,v)=>{data[k]=String(v)}},
+    _data:data
+  };
+}
+function diagnostics(env){return JSON.parse(env._data['fiezel-neural-voice-diagnostics-v1']||'[]')}
+function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars:3600,targetChunkWords:140,hardChunkWords:190},fallback:{browserSpeechSynthesis:false}}}
+
+(async()=>{
+  // m025-23 regression reproducer: once ORT proxy-worker makes the document event
+  // loop responsive, the old hard timer wins while inference is still running.
+  // Apple proxy-worker must retain the neural result and report an over-budget
+  // condition instead of abandoning the request into browser fallback/circuit-open.
+  {
+    const env=makeEnv({standalone:true,policy:'apple-standalone-single-thread-proxy-worker'});
+    let calls=0;
+    const adapter={kind:'neural-test',generate:async()=>{calls++;await sleep(45);return{data:new Float32Array([0,.1]),sampling_rate:24000}}};
+    const service=core.createVoiceService({config:config(),adapter,env,generationTimeoutMs:20});
+    const result=await service.speak('hello proxy worker',{allowFallback:false});
+    assert.equal(result.provider,'neural-test');
+    assert.equal(calls,1,'proxy over-budget path must not retry or duplicate inference');
+    const log=diagnostics(env);
+    assert.ok(log.some(x=>x.phase==='generation_timeout_policy_ready'&&x.policy==='proxy-worker-soft-budget-v1'));
+    assert.ok(log.some(x=>x.phase==='generate_budget_exceeded'),'proxy over-budget inference must be explicitly diagnosed');
+    assert.ok(log.some(x=>x.phase==='generate_budget_recovered'),'proxy over-budget completion must be explicit');
+    assert.ok(log.some(x=>x.phase==='generate_ready'),'late-but-valid proxy inference must still be consumed');
+    assert.ok(!log.some(x=>x.phase==='generate_timeout'),'proxy budget must not be mislabeled as hard cancellation');
+  }
+
+  // Preserve the hard timeout contract outside the Apple proxy-worker path.
+  {
+    const env=makeEnv();
+    const adapter={kind:'neural-test',generate:async()=>new Promise(()=>{})};
+    const service=core.createVoiceService({config:config(),adapter,env,generationTimeoutMs:20});
+    await assert.rejects(()=>service.speak('hello',{allowFallback:false}),/neural_generation_timeout/);
+    assert.ok(diagnostics(env).some(x=>x.phase==='generate_timeout'));
+  }
+
+  // The implementation must keep the default requested voice/speed propagation
+  // unchanged while changing timeout semantics only for the proven proxy policy.
+  {
+    const env=makeEnv({standalone:true,policy:'apple-standalone-single-thread-proxy-worker'});
+    const seen=[];
+    const adapter={kind:'neural-test',generate:async(text,opts)=>{seen.push(opts);return{data:new Float32Array([0]),sampling_rate:24000}}};
+    const service=core.createVoiceService({config:config(),adapter,env,generationTimeoutMs:20});
+    await service.speak('voice contract',{allowFallback:false,voice:'af_heart'});
+    assert.equal(seen.length,1);
+    assert.equal(seen[0].voice,'af_heart');
+    assert.equal(seen[0].speed,1);
+  }
+
+  // A hard timeout elsewhere must be classified as transient rather than becoming
+  // the page-lifetime circuit brick seen in m025-23. Lifecycle release must also
+  // clear a previously opened circuit.
+  const bootstrap=fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstrap.js','utf8');
+  assert.match(bootstrap,/generationTimeout=lastError==='neural_generation_timeout'/);
+  assert.match(bootstrap,/shouldOpenCircuit=!!service&&!generationBusy&&!generationTimeout/);
+  assert.match(bootstrap,/lastFallbackReason='';circuitOpen=false;audibleVerified=false/);
+  assert.match(bootstrap,/__fiezelNeuralWasmPolicy=wasmPolicy/,'core service must receive the effective proxy policy before construction');
+
+  // Browser speech used because neural failed must be explicitly surfaced to the
+  // visible neural status UI instead of masquerading as successful neural output.
+  const audibility=fs.readFileSync('features/neural-voice/fiezel-neural-voice-audibility-fix.js','utf8');
+  assert.match(audibility,/function showFallbackNotice\(reason\)/);
+  assert.match(audibility,/Suara neural sedang bermasalah\. Audio sementara memakai suara perangkat/);
+  assert.match(audibility,/phase:'fallback_notice'/);
+
+  // Release identity must advance exactly one build from m025-23.
+  const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
+  const sw=fs.readFileSync('sw.js','utf8');
+  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-24'/);
+  assert.match(sw,/SW_REV='m025-24-proxy-timeout-recovery-20260817-1'/);
+
+  console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
+})().catch(error=>{console.error(error.stack||error);process.exitCode=1});

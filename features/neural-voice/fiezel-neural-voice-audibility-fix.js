@@ -140,6 +140,15 @@
   }
   function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
   function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
+  function showFallbackNotice(reason){
+    const detail=String(reason||'neural_unavailable');
+    diag({phase:'fallback_notice',reason:detail});
+    try{
+      const hint=root.document?.getElementById?.('neuralVoiceProgress');
+      if(hint)setText(hint,'Suara neural sedang bermasalah. Audio sementara memakai suara perangkat; coba lagi setelah mesin neural siap.');
+      root.dispatchEvent?.(new CustomEvent('fiezel-neural-voice-degraded',{detail:{reason:detail,provider:'browser-speech-synthesis'}}));
+    }catch{}
+  }
 
   function syncPersistedReadyUi(){
     try{
@@ -252,15 +261,17 @@
     const state=runtime.status?.()||{};
     const neuralOnly=options.allowFallback===false;
     if(state.circuitOpen){
-      diag({phase:'circuit_open',reason:String(state.lastFallbackReason||state.error||'previous_failure')});
+      const reason=String(state.lastFallbackReason||state.error||'previous_failure');
+      diag({phase:'circuit_open',reason});
       if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
+      showFallbackNotice(reason);
       return browserSpeakImmediate(text,options);
     }
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
       if(state.prepared&&typeof runtime.ensureReady==='function'){
         // A user-requested utterance is explicit intent and may retry even when the
-        // background automatic attempt for this prepared/cold epoch already failed.
+        // background automatic attempt for this prepared+cold epoch already failed.
         const warming=primeBackgroundReady({automatic:false});
         if(!neuralOnly){
           // m025-17+ UX: do not make the first Listening audio wait tens of seconds
@@ -275,14 +286,18 @@
           if(warmed.ready){
             try{return await runtime.speak(text,{...options,allowFallback:false})}
             catch(error){
-              diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+              const reason=String(error?.message||error);
+              diag({phase:'neural_throw_fallback',error:reason});
               if(neuralOnly)throw error;
+              showFallbackNotice(reason);
               return browserSpeakImmediate(text,options);
             }
           }
         }catch(error){
-          diag({phase:'neural_resume_error',error:String(error?.message||error)});
+          const reason=String(error?.message||error);
+          diag({phase:'neural_resume_error',error:reason});
           if(neuralOnly)throw error;
+          showFallbackNotice(reason);
         }
       }
       if(neuralOnly)return runtime.speak(text,{...options,allowFallback:false});
@@ -290,8 +305,10 @@
     }
     try{return await runtime.speak(text,{...options,allowFallback:false})}
     catch(error){
-      diag({phase:'neural_throw_fallback',error:String(error?.message||error)});
+      const reason=String(error?.message||error);
+      diag({phase:'neural_throw_fallback',error:reason});
       if(neuralOnly)throw error;
+      showFallbackNotice(reason);
       return browserSpeakImmediate(text,options);
     }
   }
