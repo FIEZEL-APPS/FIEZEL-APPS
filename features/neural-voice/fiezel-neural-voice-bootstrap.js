@@ -13,41 +13,24 @@
   const NEURAL_GENERATION_TIMEOUT_MS=Number(root.FIEZEL_GENERATION_TIMEOUT_MS)||Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
-  // m025-25: Apple standalone WASM Kokoro inference is evidence-blocked.
-  // Physical m025-24 capture (2026-08-17T16:40:43Z, Safari 26.5 standalone) recorded three
-  // consecutive WebKit content-process terminations during adapter_model_dispatched: zero
-  // speak_neural_success, no generate_timeout, no circuit latch, and a fresh document load
-  // (pageshow persisted:false) 19-42s after dispatch. A 49-char chunk never completed within
-  // the 30s soft budget. The m025-24 timeout/circuit repair behaves correctly and is simply
-  // not the failure mode -- the process dies before any JS-side policy can run, so no timeout,
-  // chunk, or circuit tuning can reach it. Dispatching again just reproduces the blackout and
-  // reload loop, so refuse the dispatch and degrade explicitly and visibly instead.
-  const APPLE_INFERENCE_BLOCK_POLICY='apple-wasm-inference-unviable-v1';
-  const APPLE_INFERENCE_BLOCK_REASON='apple_wasm_inference_unviable';
-  function appleStandaloneContext(){
-    return root.navigator?.standalone===true||!!root.matchMedia?.('(display-mode: standalone)')?.matches;
-  }
-  // Escape hatch is explicit and opt-in only: it exists so a successor engine or a bounded
-  // experiment can re-enable dispatch deliberately. It never engages by default.
-  function appleWasmInferenceBlocked(){
-    if(root.FIEZEL_APPLE_WASM_INFERENCE==='force')return false;
-    return appleStandaloneContext()&&root.crossOriginIsolated!==true;
-  }
+  // m025-26 replaces the m025-25 Apple dispatch block. m025-25 refused Kokoro inference on
+  // Apple standalone because it killed the WebKit content process (OWNER capture
+  // 2026-08-17T16:40:43Z: three consecutive process deaths, zero successes, >30s for a
+  // 49-char chunk). The sherpa VITS worker engine removes that failure mode at the source,
+  // so neural dispatch is live again everywhere and no browser-TTS substitution remains.
+  const NEURAL_ENGINE_ID='sherpa-vits-local';
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
+  // m025-26 sherpa VITS asset set. One press of the download button fetches exactly
+  // these, they land in the stable neural cache, and nothing re-downloads them on
+  // reload or on a later shell release. Every speaker lives inside the single .data
+  // payload, so switching voice never triggers another download.
+  // 110,142,279 bytes total, replacing the 119,331,411-byte Kokoro set.
   const assets=Object.freeze([
-    {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728},
-    {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',bytes:44484},
-    {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019},
-    {path:'vendor/kokoro-model/config.json',bytes:45},
-    {path:'vendor/kokoro-model/tokenizer.json',bytes:3498},
-    {path:'vendor/kokoro-model/tokenizer_config.json',bytes:114},
-    {path:'vendor/kokoro-model/onnx/model_quantized.onnx',bytes:92361116},
-    {path:'vendor/kokoro-model/voices/af_heart.bin',bytes:522240},
-    {path:'vendor/kokoro-model/voices/af_bella.bin',bytes:522240},
-    {path:'vendor/kokoro-model/voices/af_nicole.bin',bytes:522240},
-    {path:'vendor/kokoro-model/voices/am_michael.bin',bytes:522240},
-    {path:'vendor/kokoro-model/voices/bf_emma.bin',bytes:522240},
-    {path:'vendor/kokoro-model/voices/bm_george.bin',bytes:522240}
+    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.js',bytes:109876},
+    {path:'vendor/sherpa-vits/sherpa-onnx-tts.js',bytes:33227},
+    {path:'vendor/sherpa-vits/sherpa-onnx-tts.worker.js',bytes:2677},
+    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.wasm',bytes:13474025},
+    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data',bytes:96522474}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
   let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
@@ -110,7 +93,7 @@
   }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,appleInferenceBlocked:appleWasmInferenceBlocked(),appleInferencePolicy:APPLE_INFERENCE_BLOCK_POLICY});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -249,10 +232,30 @@
     if(service)return Promise.resolve(service);
     if(backendInitPromise)return backendInitPromise;
     backendInitPromise=(async()=>{
-      if(!root.FiezelNeuralVoiceConfig||!root.FiezelKokoroAdapter||!root.FiezelNeuralVoice||!root.FiezelWebAudioPlayer)throw new Error('Neural voice runtime modules are missing');
+      if(!root.FiezelNeuralVoiceConfig||!root.FiezelNeuralVoice||!root.FiezelWebAudioPlayer)throw new Error('Neural voice runtime modules are missing');
       phase='initializing';lastError='';
       const initStartedAt=Date.now();
       diag({phase:'init_start'});
+      // m025-26: sherpa VITS runs the whole model inside a dedicated Worker, so the main
+      // thread never owns a long WASM call. That is the structural reason it does not
+      // starve the event loop or get the content process killed the way Kokoro did.
+      // No dynamic import, no ORT env negotiation, no proxy/readBack handshake.
+      if(root.FiezelSherpaVitsAdapter){
+        adapter=root.FiezelSherpaVitsAdapter.createSherpaVitsAdapter({
+          env:root,
+          basePath:absolute('vendor/sherpa-vits/'),
+          onStage:entry=>diag(entry)
+        });
+        await adapter.initialize();
+        const sherpaPlayer=root.FiezelWebAudioPlayer.createPlayer(root);
+        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
+        playerRef=sherpaPlayer;
+        wasmPolicy='sherpa-vits-wasm-worker';
+        phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;
+        diag({phase:'init_ready',engine:'sherpa-vits-local',elapsedMs:Date.now()-initStartedAt});
+        return service;
+      }
+      if(!root.FiezelKokoroAdapter)throw new Error('Neural voice runtime modules are missing');
       const dynamicImport=typeof root.__fiezelDynamicImport==='function'?root.__fiezelDynamicImport:(url)=>import(url);
       const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokoro.web.js?nv=m025-22'));
       const appleStandalone=root.navigator?.standalone===true||!!root.matchMedia?.('(display-mode: standalone)')?.matches;
@@ -363,11 +366,9 @@
     if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared');
     if(circuitOpen)return fallbackOrThrow(new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`));
     if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return fallbackOrThrow(new Error(lastError||'Neural voice initialization is still running'));
-    if(appleWasmInferenceBlocked()){
-      lastError=APPLE_INFERENCE_BLOCK_REASON;lastFallbackReason=lastError;audibleVerified=false;
-      diag({phase:'speak_neural_blocked',policy:APPLE_INFERENCE_BLOCK_POLICY,reason:lastError,voice:String(options.voice||root.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'')});
-      return fallbackOrThrow(new Error(lastError));
-    }
+    // m025-26 removes the m025-25 Apple dispatch block. That block existed only because
+    // Kokoro q8 killed the WebKit content process; the sherpa VITS worker engine that
+    // replaces it is proven sub-realtime on the same Safari, so neural runs again here.
     if(!verifiedForSession){
       if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
       verifiedForSession=true;
