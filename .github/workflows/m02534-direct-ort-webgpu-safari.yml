@@ -1,0 +1,200 @@
+name: m025-34 direct ORT WebGPU Safari boundary
+
+on:
+  push:
+    branches:
+      - master/perf67-m02534-direct-ort-webgpu
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safari26:
+    runs-on: macos-26-arm64
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record Apple runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers
+          /usr/bin/safaridriver --version
+          /usr/bin/arch
+
+      - name: Stage exact ORT-Web 1.26 WebGPU runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          ORT_VERSION='1.26.0-dev.20260416-b7804b056c'
+          mkdir -p .m02534/npm .m02534/runtime
+          cd .m02534/npm
+          npm init -y >/dev/null 2>&1
+          npm install --ignore-scripts --no-audit --no-fund "onnxruntime-web@${ORT_VERSION}"
+          ACTUAL="$(node -p "require('./node_modules/onnxruntime-web/package.json').version")"
+          test "$ACTUAL" = "$ORT_VERSION"
+          DIST='node_modules/onnxruntime-web/dist'
+          if [ -f "$DIST/ort.webgpu.min.mjs" ]; then
+            cp "$DIST/ort.webgpu.min.mjs" ../runtime/ort.webgpu.mjs
+          elif [ -f "$DIST/ort.webgpu.mjs" ]; then
+            cp "$DIST/ort.webgpu.mjs" ../runtime/ort.webgpu.mjs
+          else
+            echo 'ORT WebGPU ESM bundle not found' >&2
+            find "$DIST" -maxdepth 1 -type f -print | sort >&2
+            exit 1
+          fi
+          find "$DIST" -maxdepth 1 -type f \( -name 'ort-wasm*.wasm' -o -name 'ort-wasm*.mjs' \) -print | sort | tee ../runtime/wasm-source-list.txt
+          while IFS= read -r f; do cp "$f" ../runtime/; done < ../runtime/wasm-source-list.txt
+          printf '%s\n' "$ACTUAL" | tee ../runtime/ort-version.txt
+          cd "$GITHUB_WORKSPACE"
+          shasum -a 256 .m02534/runtime/* | sort | tee .m02534/runtime/SHA256SUMS
+
+      - name: Fetch immutable fp32 model artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          REV='1939ad2a8e416c0acfeecc08a694d14ef25f2231'
+          URL="https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/${REV}/onnx/model.onnx?download=true"
+          mkdir -p vendor/kokoro-model/onnx
+          curl --fail --location --retry 3 --retry-all-errors --output vendor/kokoro-model/onnx/model.onnx "$URL"
+          test -s vendor/kokoro-model/onnx/model.onnx
+          stat -f '%z' vendor/kokoro-model/onnx/model.onnx | tee m02534-fp32-size.txt
+          shasum -a 256 vendor/kokoro-model/onnx/model.onnx | tee m02534-fp32-sha256.txt
+          printf '%s\n' "$REV" | tee m02534-model-revision.txt
+
+      - name: Create direct ORT-Web boundary page
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .m02534-direct-ort.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-34 direct ORT WebGPU boundary</title>
+          <script type="module">
+          window.__benchResult=null;
+          window.__benchStatus='boot';
+          const events=[];
+          const now=()=>Math.round(performance.now());
+          const cleanError=e=>({name:String(e?.name||'Error'),message:String(e?.message||e||''),stack:String(e?.stack||'')});
+          const finish=x=>{window.__benchResult=x;window.__benchStatus=x.success?'done':'error'};
+          addEventListener('error',e=>events.push({kind:'window-error',t:now(),message:String(e.message||''),error:cleanError(e.error)}));
+          addEventListener('unhandledrejection',e=>events.push({kind:'unhandledrejection',t:now(),error:cleanError(e.reason)}));
+          const result={success:false,userAgent:navigator.userAgent,secureContext:isSecureContext,gpuAvailable:!!navigator.gpu,events};
+          try {
+            window.__benchStatus='request-adapter';
+            if(!navigator.gpu) throw new Error('navigator.gpu unavailable');
+            const a0=performance.now();
+            const adapter=await navigator.gpu.requestAdapter();
+            result.adapterMs=Math.round(performance.now()-a0);
+            result.adapterPresent=!!adapter;
+            if(!adapter) throw new Error('navigator.gpu.requestAdapter returned null');
+            try {
+              const info=adapter.info||null;
+              result.adapterInfo=info?{vendor:String(info.vendor||''),architecture:String(info.architecture||''),device:String(info.device||''),description:String(info.description||'')}:null;
+            } catch(e) { result.adapterInfoError=cleanError(e); }
+            result.adapterFeatures=Array.from(adapter.features||[]).map(String).sort();
+            result.adapterLimits={maxBufferSize:Number(adapter.limits?.maxBufferSize||0),maxStorageBufferBindingSize:Number(adapter.limits?.maxStorageBufferBindingSize||0)};
+
+            window.__benchStatus='request-device';
+            const d0=performance.now();
+            const device=await adapter.requestDevice();
+            result.deviceMs=Math.round(performance.now()-d0);
+            result.devicePresent=!!device;
+            if(!device) throw new Error('adapter.requestDevice returned null');
+            if(device.addEventListener){
+              device.addEventListener('uncapturederror',e=>events.push({kind:'gpu-uncapturederror',t:now(),error:cleanError(e.error)}));
+            }
+            if(device.lost&&typeof device.lost.then==='function'){
+              device.lost.then(info=>events.push({kind:'gpu-device-lost',t:now(),reason:String(info?.reason||''),message:String(info?.message||'')}));
+            }
+
+            window.__benchStatus='import-ort';
+            const mod=await import('./.m02534/runtime/ort.webgpu.mjs?exact=1.26.0-dev.20260416-b7804b056c');
+            const ort=(mod.default&&mod.default.InferenceSession)?mod.default:mod;
+            if(!ort?.InferenceSession) throw new Error('ORT InferenceSession export missing');
+            if(ort.env?.wasm){
+              ort.env.wasm.wasmPaths=location.origin+'/.m02534/runtime/';
+              ort.env.wasm.numThreads=1;
+              ort.env.wasm.proxy=false;
+            }
+            result.ortExports=Object.keys(ort).sort();
+
+            window.__benchStatus='ort-session-create';
+            const s0=performance.now();
+            const session=await ort.InferenceSession.create('./vendor/kokoro-model/onnx/model.onnx',{
+              executionProviders:['webgpu'],
+              graphOptimizationLevel:'all'
+            });
+            result.sessionCreateMs=Math.round(performance.now()-s0);
+            result.inputNames=Array.from(session.inputNames||[]);
+            result.outputNames=Array.from(session.outputNames||[]);
+            result.success=true;
+            result.boundary='DIRECT_ORT_WEBGPU_SESSION_PASS';
+            result.status='session-created';
+            finish(result);
+          } catch(error) {
+            result.error=cleanError(error);
+            result.status=window.__benchStatus;
+            result.boundary='DIRECT_ORT_WEBGPU_SESSION_FAIL';
+            finish(result);
+          }
+          </script>
+          HTML
+
+      - name: Start server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/m02534-http.log 2>&1 &
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 >/tmp/m02534-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02534-status.json 2>/dev/null && break; sleep 1; done
+          cat /tmp/m02534-status.json
+
+      - name: Run direct ORT-Web WebGPU boundary classifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+          sid="$(echo "$sj"|jq -r '.value.sessionId // .sessionId // empty')"
+          test -n "$sid"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/.m02534-direct-ort.html"}' "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+          result=''
+          for i in {1..180}; do
+            resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+            echo "$resp" | jq -c '.value.status // empty' 2>/dev/null | tee m02534-last-status.txt >/dev/null || true
+            result="$(echo "$resp"|jq -c '.value.result // empty' 2>/dev/null || true)"
+            [ -n "$result" ] && [ "$result" != null ] && break
+            sleep 1
+          done
+          curl -sS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+          if [ -z "$result" ]; then
+            result='{"success":false,"boundary":"DIRECT_ORT_WEBGPU_NO_TERMINAL_RESULT","error":{"name":"Timeout","message":"no terminal result within 180s"}}'
+          fi
+          echo "$result" | jq . | tee m02534-direct-ort-result.json
+          echo "boundary=$(echo "$result"|jq -r '.boundary')"
+          echo "gpu_available=$(echo "$result"|jq -r '.gpuAvailable // false')"
+          echo "adapter_ms=$(echo "$result"|jq -r '.adapterMs // null')"
+          echo "device_ms=$(echo "$result"|jq -r '.deviceMs // null')"
+          echo "session_create_ms=$(echo "$result"|jq -r '.sessionCreateMs // null')"
+          test "$(echo "$result"|jq -r '.success')" = true
+
+      - name: Preserve boundary evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02534-direct-ort-webgpu-${{ github.sha }}
+          path: |
+            m02534-direct-ort-result.json
+            m02534-last-status.txt
+            m02534-fp32-size.txt
+            m02534-fp32-sha256.txt
+            m02534-model-revision.txt
+            .m02534/runtime/ort-version.txt
+            .m02534/runtime/SHA256SUMS
+            .m02534/runtime/wasm-source-list.txt
+            /tmp/m02534-http.log
+            /tmp/m02534-safaridriver.log
+            /tmp/m02534-status.json
+          if-no-files-found: warn
+          retention-days: 30
