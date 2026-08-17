@@ -77,5 +77,6 @@ jobs:
           node neural-voice-single-flight-test.js
           node neural-voice-diagnostics-retention-test.js
           node neural-voice-m02520-webgpu-acceleration-test.js
+          node neural-voice-m02521-apple-webgpu-rollback-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
