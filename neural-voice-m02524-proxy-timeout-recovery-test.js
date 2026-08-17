@@ -76,11 +76,20 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   assert.match(audibility,/Suara neural sedang bermasalah\. Audio sementara memakai suara perangkat/);
   assert.match(audibility,/phase:'fallback_notice'/);
 
-  // Release identity must advance exactly one build from m025-23.
+  // m025-24 is a behavioral safety floor, not a permanent release marker. Successor
+  // builds must preserve this timeout/circuit behavior while advancing DIAG/SW in
+  // lockstep. This prevents the historical regression test from blocking every
+  // correctly-versioned successor while still rejecting a downgrade or split marker.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-24'/);
-  assert.match(sw,/SW_REV='m025-24-proxy-timeout-recovery-20260817-1'/);
+  const diagMatch=diag.match(/DIAG_BUILD\s*=\s*'m025-(\d+)'/);
+  const swMatch=sw.match(/SW_REV='m025-(\d+)-/);
+  assert.ok(diagMatch,'diagnostic release marker must exist');
+  assert.ok(swMatch,'service-worker release marker must exist');
+  const diagBuild=Number(diagMatch[1]);
+  const swBuild=Number(swMatch[1]);
+  assert.ok(diagBuild>=24,'m025-24 safety regression must never validate a pre-m025-24 release marker');
+  assert.equal(swBuild,diagBuild,'DIAG_BUILD and SW_REV must remain on the same successor build');
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
