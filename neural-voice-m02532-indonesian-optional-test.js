@@ -75,9 +75,15 @@ const boot = fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstra
   assert.notStrictEqual(english.voiceSids, indo.voiceSids);
 
   // --- 6. release markers ---------------------------------------------------------
-  assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-34'/);
-  assert.match(sw, /SW_REV='m025-34-universal-diagnostic-20260818-1'/);
+  // This m025-32 regression protects the optional Indonesian bundle across future
+  // releases. Deployment identity must stay coherent, not frozen to the old release.
+  const diag = fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8');
+  const diagBuild = diag.match(/DIAG_BUILD\s*=\s*'m025-(\d+)'/);
+  const swBuild = sw.match(/SW_REV='m025-(\d+)-/);
+  assert.ok(diagBuild, 'Diagnostics deployment marker must exist');
+  assert.ok(swBuild, 'Service-worker deployment marker must exist');
+  assert.strictEqual(swBuild[1], diagBuild[1], 'DIAG_BUILD and SW_REV must identify the same product build');
+  assert.ok(Number(diagBuild[1]) >= 32, 'later releases must not regress behind the m025-32 Indonesian boundary');
 
   console.log('FIEZEL m025-32 Indonesian optional bundle regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
