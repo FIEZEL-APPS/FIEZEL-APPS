@@ -59,6 +59,7 @@
     <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
     <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
     <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
+    <button type="button" class="nav" data-view="classroom" onclick="go('classroom')" aria-label="Classroom"><i data-lucide="presentation"></i><span>Class</span></button>
     <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="chart-no-axes-combined"></i><span>Peta</span></button>
   </nav>
 
@@ -83,6 +84,7 @@
   <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada. -->
   <script src="./features/neural-voice/fiezel-diag-panel.js"></script>
   <script src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
+  <script src="./features/classroom/fiezel-classroom.js"></script>
   <script src="./features/speaking-listening/speaking-listening-config.js"></script>
   <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>
