@@ -18,6 +18,8 @@
     {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.mjs',bytes:44484},
     {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm',bytes:21596019},
+    {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.mjs',bytes:20856},
+    {path:'vendor/kokoro-js/wasm/ort-wasm-simd-threaded.wasm',bytes:11133407},
     {path:'vendor/kokoro-model/config.json',bytes:45},
     {path:'vendor/kokoro-model/tokenizer.json',bytes:3498},
     {path:'vendor/kokoro-model/tokenizer_config.json',bytes:114},

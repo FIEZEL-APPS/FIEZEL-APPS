@@ -43,8 +43,8 @@
     }
   },
   "candidate": {
-    "id": "m025-22",
-    "state": "MACHINE_VERIFIED / PHYSICAL_PENDING",
+    "id": "m025-25",
+    "state": "MACHINE_CANDIDATE / PHYSICAL_PENDING",
     "bundle": {
       "path": "vendor/kokoro-js/kokoro.web.js",
       "sizeBytes": 2136728,
@@ -57,6 +57,17 @@
       "runtimePromoted": true,
       "browserWasmEnvAuditRun": 31989178039,
       "browserWasmEnvReadBack": true
+    },
+    "wasmExperiment": {
+      "reason": "Safari/WebKit 26 JSEP differential on the pinned ORT CPU/WASM backend",
+      "productionBackend": "wasm",
+      "dtype": "q8",
+      "appleStandaloneVariant": "standard-non-jsep",
+      "controlVariant": "jsep/runtime-default",
+      "timeoutChanged": false,
+      "modelChanged": false,
+      "voiceChanged": false,
+      "webgpuEnabled": false
     }
   },
   "runtime": {
@@ -74,6 +85,18 @@
       "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm",
       "sizeBytes": 21596019,
       "sha256": "c46655e8a94afc45338d4cb2b840475f88e5012d524509916e505079c00bfa39"
+    },
+    "standardWasmModule": {
+      "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.mjs",
+      "sizeBytes": 20856,
+      "sha256": "43c25054b6b9ac000f786c65545ff83a45f871e0e310e8c2f4d48a363bb66db4",
+      "source": "npm:onnxruntime-web@1.22.0-dev.20250409-89f8206ba4"
+    },
+    "standardWasmBinary": {
+      "path": "vendor/kokoro-js/wasm/ort-wasm-simd-threaded.wasm",
+      "sizeBytes": 11133407,
+      "sha256": "f061472c6e77d6d50d079aacdc0ff9b63fee287ddd2cbf46cf62438d3891de2b",
+      "source": "npm:onnxruntime-web@1.22.0-dev.20250409-89f8206ba4"
     }
   },
   "model": {
@@ -129,7 +152,10 @@
       "deterministicVendorSha256": "91d849dc97a2e43edab1e576721792211bc240da4d086591d42b5356959dc32f",
       "deterministicVendorSizeBytes": 2136728,
       "proxyReadBack": true,
-      "numThreadsReadBack": 1
+      "numThreadsReadBack": 1,
+      "m02525StandardWasmModuleSha256": "43c25054b6b9ac000f786c65545ff83a45f871e0e310e8c2f4d48a363bb66db4",
+      "m02525StandardWasmBinarySha256": "f061472c6e77d6d50d079aacdc0ff9b63fee287ddd2cbf46cf62438d3891de2b",
+      "m02525BootstrapRun": 31997363002
     },
     "historicalPhysicalBaselineM0255": {
       "environment": "Apple standalone PWA",
