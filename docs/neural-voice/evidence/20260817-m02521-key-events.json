@@ -1,0 +1,98 @@
+{
+  "source": {
+    "filename": "m025-021 (2).txt",
+    "sha256": "8132dd0cb86e4ea710b14f34a72467e760384ff3feec97495c78bee0adf85a4a",
+    "sizeBytes": 61418,
+    "note": "Key-event extraction from owner-supplied diagnostic. Preserve original hash when comparing future copies."
+  },
+  "capture": {
+    "diagBuild": "m025-21",
+    "appVersion": "5.19.0",
+    "capturedAt": "2026-08-17T02:52:19.614Z",
+    "origin": "https://fitrajft-ux.github.io",
+    "href": "https://fitrajft-ux.github.io/FIEZEL-APPS/",
+    "standalone": true,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+    "crossOriginIsolated": false,
+    "storageUsageBytes": 232048717,
+    "storageQuotaBytes": 38654705664
+  },
+  "backendCapability": {
+    "phase": "adapter_backend_capability",
+    "appleStandalone": true,
+    "webgpuAvailable": true,
+    "isolated": false,
+    "configuredDevice": "wasm",
+    "dtype": "q8",
+    "autoWebGpuSuppressed": true,
+    "rollbackBuild": "m025-21"
+  },
+  "wasmPolicy": {
+    "phase": "wasm_policy",
+    "policy": "apple-standalone-single-thread-direct-default",
+    "numThreads": 1,
+    "proxy": false,
+    "source": "onnxruntime-web-1.22-runtime-default",
+    "readBack": false
+  },
+  "observedRuns": [
+    {
+      "requestId": "nv-mswmua8e-1",
+      "chunkIndex": 0,
+      "chars": 80,
+      "tokenCount": 82,
+      "watchdogObservedDelayMs": 1738,
+      "modelElapsedMs": 93634,
+      "generateElapsedMs": 95480,
+      "configuredTimeoutMs": 30000,
+      "terminalPhase": "generate_completed_over_budget"
+    },
+    {
+      "requestId": "nv-mswmyyh1-1",
+      "chunkIndex": 0,
+      "chars": 80,
+      "tokenCount": 82,
+      "watchdogObservedDelayMs": 1358,
+      "modelElapsedMs": 54731,
+      "generateElapsedMs": 56241,
+      "configuredTimeoutMs": 30000,
+      "terminalPhase": "generate_completed_over_budget"
+    }
+  ],
+  "initialization": [
+    {
+      "adapterInstanceElapsedMs": 16183,
+      "initReadyElapsedMs": 18687
+    },
+    {
+      "adapterInstanceElapsedMs": 10983,
+      "initReadyElapsedMs": 11265,
+      "recoverySequence": "background_ready_start -> background_ready"
+    }
+  ],
+  "lifecycleEvidence": {
+    "bootstrapLoadedOccurrencesInCapturedHistory": 3,
+    "fullInitStartOccurrencesInCapturedHistory": 2,
+    "pageshowPersistedValuesObserved": [false],
+    "interpretation": "Repeated bootstrap/re-entry is proven. Model reinitialization on every same-document speech request is NOT proven by this capture."
+  },
+  "cacheInventoryHighlights": {
+    "runtimeCache": "fiezel-v5.19.0",
+    "runtimeCacheEntryCount": 53,
+    "shellCachesPresent": [
+      "fiezel-shell-m025-19-diagnostics-url-privacy-20260817-1",
+      "fiezel-shell-m025-20-apple-webgpu-q8-20260817-1",
+      "fiezel-shell-m025-21-apple-webgpu-rollback-20260817-1"
+    ],
+    "vendorVariantsPresentInRuntimeCache": [
+      "vendor/kokoro-js/kokoro.web.js",
+      "vendor/kokoro-js/kokoro.web.js?nv=m025-4",
+      "vendor/kokoro-js/kokoro.web.js?nv=m025-5"
+    ],
+    "note": "Presence in cache inventory does not prove simultaneous execution or duplicate model initialization."
+  },
+  "securityNote": {
+    "puterAuthTokenValueIncluded": false,
+    "diagnosticOnlyReportsPresence": true
+  }
+}
