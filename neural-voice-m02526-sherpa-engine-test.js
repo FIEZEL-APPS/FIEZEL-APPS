@@ -97,8 +97,11 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
   // range that is comprehensible for a learner without sounding slowed down.
   const MEASURED_WPM_AT_1 = 215;
   const shippedWpm = MEASURED_WPM_AT_1 * mod.NATURAL_SPEED;
-  assert.ok(shippedWpm >= 135 && shippedWpm <= 165,
-    `shipped rate ${Math.round(shippedWpm)} wpm must sit in the natural 135-165 band`);
+  // OWNER heard 215 wpm (too fast) and 150 wpm ("slow motion") and chose a rate
+  // between them, nearer the faster end. Band, not constant, so it cannot drift back
+  // to either rejected extreme.
+  assert.ok(shippedWpm > 165 && shippedWpm < 200,
+    `shipped rate ${Math.round(shippedWpm)} wpm must sit between the two rejected rates`);
   assert.ok(mod.NATURAL_SPEED < 1,
     'engine default is faster than natural speech and must be scaled down');
 
@@ -124,8 +127,8 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
 
   // --- release markers ----------------------------------------------------------
   assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-27'/);
-  assert.match(SW, /SW_REV='m025-27-natural-speaking-rate-20260818-1'/);
+    /DIAG_BUILD\s*=\s*'m025-28'/);
+  assert.match(SW, /SW_REV='m025-28-listening-neural-route-20260818-1'/);
 
   console.log('FIEZEL m025-26 sherpa VITS engine regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
