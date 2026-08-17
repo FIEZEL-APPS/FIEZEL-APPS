@@ -78,7 +78,9 @@ assert.ok(readinessBlock.includes('code:readinessErrorCode(error)'),'readiness f
 assert.ok(!readinessBlock.includes('error:String'),'m025-13 readiness diagnostics must not persist raw error messages');
 assert.ok(!/(?:\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(readinessBlock),'m025-13 readiness diagnostics must not persist learner text or credential material');
 assert.ok(aud.includes('Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true})'),'m025-13 wrapped ensureReady must be the public runtime method');
-assert.ok(app.includes("speed:.92,allowFallback:false"),'Tes suara must be neural-only');
+// m025-30: the rate is now a learner preference rather than a hardcoded 0.92. What
+// must hold is that the voice test stays neural-only, so pin allowFallback:false.
+assert.ok(app.includes("speed:selectedNeuralRate(),allowFallback:false"),'Tes suara must be neural-only');
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));
