@@ -1,0 +1,1 @@
+10dc268f3e371696d721486123e2705a9fc1faa113491979fde4d88dba1f1b1c  vits-piper-en_US-libritts_r-medium.tar.bz2
