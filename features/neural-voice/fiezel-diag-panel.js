@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-22';
+  var DIAG_BUILD = 'm025-21';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -347,51 +347,71 @@
       ui.searchCount.textContent = (matchIndex + 1) + '/' + matches.length;
       var start = matches[matchIndex];
       safe(function(){
-        if (typeof ui.text.focus === 'function') ui.text.focus({ preventScroll: true });
+        if (typeof ui.text.focus === 'function') ui.text.focus();
         if (typeof ui.text.setSelectionRange === 'function') ui.text.setSelectionRange(start, start + query.length);
       });
     }
 
-    function refreshSearch() { selectMatch(0); }
-    ui.search.addEventListener('input', refreshSearch);
-    ui.search.addEventListener('search', refreshSearch);
-    ui.search.addEventListener('keydown', function(event){
-      if (event.key !== 'Enter') return;
-      safe(function(){ event.preventDefault(); });
-      if (event.shiftKey) selectMatch(matchIndex - 1);
-      else selectMatch(matchIndex + 1);
-    });
-    ui.previous.addEventListener('click', function(){ selectMatch(matchIndex - 1); });
-    ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
+    function refreshSearch() {
+      var query = String(ui.search.value || '').trim();
+      if (!query) {
+        matches = [];
+        matchIndex = -1;
+        ui.searchCount.textContent = 'Cari';
+        return;
+      }
+      selectMatch(0);
+    }
+
+    function setText() {
+      ui.text.value = serialize(dump);
+      refreshSearch();
+    }
 
     function refresh() {
       dump = collectSync();
       addRuntimeDiagnostics(dump);
-      ui.text.value = serialize(dump);
-      refreshSearch();
-      return Promise.all([addStorageEstimate(dump), addCacheInventory(dump)]).then(function(){
-        addRuntimeDiagnostics(dump);
-        ui.text.value = serialize(dump);
-        refreshSearch();
-        return dump;
+      setText();
+      Promise.all([addStorageEstimate(dump), addCacheInventory(dump)]).then(function(){
+        setText();
       });
     }
 
     ui.open.addEventListener('click', function(){
-      ui.sheet.classList.add('open');
       refresh();
+      ui.sheet.classList.add('open');
     });
-    ui.close.addEventListener('click', function(){ ui.sheet.classList.remove('open'); });
+    ui.close.addEventListener('click', function(){
+      ui.sheet.classList.remove('open');
+    });
+    ui.search.addEventListener('input', refreshSearch);
+    ui.search.addEventListener('keydown', function(event){
+      if (!event || event.key !== 'Enter') return;
+      if (event.preventDefault) event.preventDefault();
+      selectMatch(matchIndex + (event.shiftKey ? -1 : 1));
+    });
+    ui.previous.addEventListener('click', function(){ selectMatch(matchIndex - 1); });
+    ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
     ui.send.addEventListener('click', function(){
-      var payload = ui.text.value || serialize(dump || collectSync());
-      share(ui.send, 'full', payload);
+      share(ui.send, 'Kirim', ui.text.value);
     });
     ui.sendTarget.addEventListener('click', function(){
-      var target = (dump && dump.target) || safe(function(){ return root.localStorage.getItem(KEY); }, null);
-      share(ui.sendTarget, 'target', target || '(belum ada diagnostics neural voice)');
+      var slim = {
+        diagBuild: DIAG_BUILD,
+        appVersion: dump && dump.appVersion,
+        capturedAt: dump && dump.capturedAt,
+        standalone: dump && dump.standalone,
+        puterAuth: dump && dump.puterAuth,
+        target: dump && dump.target,
+        storageEstimate: dump && dump.storageEstimate
+      };
+      share(ui.sendTarget, 'Kirim ringkas', serialize(slim));
     });
   }
 
-  if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', mount, { once: true });
-  else mount();
-})(typeof window !== 'undefined' ? window : globalThis);
+  if (root.document.readyState === 'loading') {
+    root.document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this);
