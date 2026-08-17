@@ -89,7 +89,7 @@ async function adapterProxyObservation({standalone=false,displayModeStandalone=f
     allowLocalModels:true,
     localModelPath:'',
     wasmPaths:'',
-    backends:{onnx:{wasm}}
+    wasmEnv:wasm
   };
   let proxyAtSessionCreation=null;
   const KokoroTTS={
@@ -106,7 +106,7 @@ async function adapterProxyObservation({standalone=false,displayModeStandalone=f
   const adapter=ctx.FiezelKokoroAdapter.createKokoroAdapter({
     KokoroTTS,kokoroEnv:env,setVoiceDataUrl:()=>{},
     modelId:'kokoro-model',localModelPath:'./vendor/',voiceBaseUrl:'./vendor/kokoro-model/voices',
-    wasmBasePath:'./vendor/kokoro-js/wasm/',dtype:'q8',device:'wasm',onStage:entry=>stages.push(entry)
+    wasmBasePath:'./vendor/kokoro-js/wasm/',dtype:'q8',device:'wasm',runtime:ctx,onStage:entry=>stages.push(entry)
   });
   await adapter.initialize();
   return{proxyAtSessionCreation,wasm,stages};
