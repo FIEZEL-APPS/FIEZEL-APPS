@@ -38,19 +38,11 @@ jobs:
           test "$ACTUAL" = "$ORT_VERSION"
           cd "$GITHUB_WORKSPACE"
           cp -R .m02534/pkg/node_modules/onnxruntime-web/dist .m02534/runtime/ort-dist
-          if [ -f .m02534/runtime/ort-dist/ort.webgpu.mjs ]; then
-            ENTRY='ort.webgpu.mjs'
-          elif [ -f .m02534/runtime/ort-dist/ort.webgpu.min.mjs ]; then
-            ENTRY='ort.webgpu.min.mjs'
-          else
-            ENTRY="$(find .m02534/runtime/ort-dist -maxdepth 1 -type f -name 'ort.webgpu*.mjs' -print | sort | head -1 | xargs basename)"
-          fi
-          test -n "$ENTRY"
-          printf '%s\n' "$ENTRY" | tee m02534-ort-entry.txt
+          test -f .m02534/runtime/ort-dist/ort.webgpu.mjs
+          test -f .m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.mjs
+          test -f .m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.wasm
           printf 'onnxruntime-web=%s\n' "$ACTUAL" | tee m02534-runtime.txt
-          sha256sum ".m02534/runtime/ort-dist/$ENTRY" | tee m02534-ort-entry-sha256.txt
-          find .m02534/runtime/ort-dist -maxdepth 1 -type f \( -name 'ort-wasm*.wasm' -o -name 'ort-wasm*.mjs' \) -print | sort | tee m02534-ort-artifacts.txt
-          while IFS= read -r f; do sha256sum "$f"; done < m02534-ort-artifacts.txt | tee m02534-ort-artifacts-sha256.txt
+          sha256sum .m02534/runtime/ort-dist/ort.webgpu.mjs .m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.mjs .m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.wasm | tee m02534-ort-sha256.txt
 
       - name: Fetch immutable fp32 Kokoro model
         run: |
@@ -64,75 +56,60 @@ jobs:
           stat -f '%z' vendor/kokoro-model/onnx/model.onnx | tee m02534-model-size.txt
           shasum -a 256 vendor/kokoro-model/onnx/model.onnx | tee m02534-model-sha256.txt
 
-      - name: Create direct ORT WebGPU forensic page
+      - name: Create refined direct ORT forensic page
         run: |
-          set -euo pipefail
-          ENTRY="$(cat m02534-ort-entry.txt)"
           cat > .m02534-bench.html <<'HTML'
-          <!doctype html><meta charset="utf-8"><title>m025-34 direct ORT WebGPU forensics</title>
+          <!doctype html><meta charset="utf-8"><title>m025-34 refined WebGPU forensics</title>
           <script type="module">
-          const started=performance.now();
-          const captured=[];
-          window.__benchResult=null;
-          window.__benchStatus='boot';
-          const safe=(v)=>{try{if(typeof v==='string')return v;return JSON.stringify(v)}catch{return String(v)}};
-          const ser=(e)=>{
-            if(e==null)return null;
-            const out={type:Object.prototype.toString.call(e),name:e?.name??null,message:e?.message??String(e),stack:e?.stack??null};
-            try{if(e?.cause!==undefined)out.cause=safe(e.cause)}catch{}
-            try{
-              for(const k of Object.getOwnPropertyNames(e)){
-                if(k in out)continue;
-                try{
-                  const v=e[k];
-                  out[k]=(v==null||['string','number','boolean'].includes(typeof v))?v:safe(v);
-                }catch{}
-              }
-            }catch{}
-            return out;
-          };
+          const started=performance.now(), captured=[];
+          window.__benchResult=null; window.__benchStatus='boot';
+          const safe=v=>{try{return typeof v==='string'?v:JSON.stringify(v)}catch{return String(v)}};
+          const ser=e=>e==null?null:{name:e?.name??null,message:e?.message??String(e),stack:e?.stack??null,type:Object.prototype.toString.call(e)};
           for(const level of ['log','warn','error']){
             const orig=console[level].bind(console);
             console[level]=(...args)=>{captured.push({kind:'console-'+level,t:Math.round(performance.now()-started),args:args.map(safe)});orig(...args)};
           }
-          addEventListener('error',e=>captured.push({kind:'window-error',t:Math.round(performance.now()-started),message:e.message,filename:e.filename,lineno:e.lineno,colno:e.colno,error:ser(e.error)}));
+          addEventListener('error',e=>captured.push({kind:'window-error',t:Math.round(performance.now()-started),message:e.message,error:ser(e.error)}));
           addEventListener('unhandledrejection',e=>captured.push({kind:'unhandledrejection',t:Math.round(performance.now()-started),reason:ser(e.reason)}));
-          const finish=(x)=>{window.__benchResult={harnessSuccess:true,elapsedMs:Math.round(performance.now()-started),captured,...x};window.__benchStatus='done'};
-          const gpuProbe={available:!!navigator.gpu,requestDeviceHook:false,uncaptured:[]};
-          try{
-            const p=globalThis.GPUAdapter?.prototype;
-            if(p?.requestDevice){
-              const original=p.requestDevice;
-              p.requestDevice=async function(...args){
-                const device=await original.apply(this,args);
-                try{device.addEventListener?.('uncapturederror',ev=>{const item={kind:'gpu-uncaptured',t:Math.round(performance.now()-started),error:ser(ev.error)};gpuProbe.uncaptured.push(item);captured.push(item)})}catch{}
-                return device;
-              };
-              gpuProbe.requestDeviceHook=true;
-            }
-          }catch(e){gpuProbe.hookError=ser(e)}
+          const finish=x=>{window.__benchResult={harnessSuccess:true,elapsedMs:Math.round(performance.now()-started),captured,...x};window.__benchStatus='done'};
+          const gpu={available:!!navigator.gpu,adapters:{}};
+          const resources={};
+          const moduleImports={};
+          async function probeAdapter(label,options){
+            try{
+              const a=await navigator.gpu.requestAdapter(options);
+              const r={available:!!a};
+              if(a){
+                try{r.features=[...a.features].sort()}catch{}
+                try{const d=await a.requestDevice();r.device=true;try{r.deviceFeatures=[...d.features].sort()}catch{};try{d.destroy?.()}catch{}}catch(e){r.device=false;r.deviceError=ser(e)}
+              }
+              gpu.adapters[label]=r;
+            }catch(e){gpu.adapters[label]={available:false,error:ser(e)}}
+          }
+          async function head(path){
+            try{const r=await fetch(path,{method:'HEAD',cache:'no-store'});resources[path]={ok:r.ok,status:r.status,type:r.headers.get('content-type'),length:r.headers.get('content-length')}}catch(e){resources[path]={ok:false,error:ser(e)}}
+          }
+          async function importProbe(label,path){
+            try{const m=await import(path);moduleImports[label]={success:true,exports:Object.keys(m).sort()}}catch(e){moduleImports[label]={success:false,error:ser(e)}}
+          }
           try{
             if(!navigator.gpu)throw new Error('navigator.gpu unavailable');
-            window.__benchStatus='gpu-probe';
-            const adapter=await navigator.gpu.requestAdapter({powerPreference:'high-performance'});
-            gpuProbe.adapter=!!adapter;
-            if(adapter){
-              try{gpuProbe.features=[...adapter.features].sort()}catch{}
-              try{
-                const limits={};
-                for(const k of Object.keys(adapter.limits||{})){const v=adapter.limits[k];if(typeof v==='number')limits[k]=v}
-                gpuProbe.limits=limits;
-              }catch{}
-              try{
-                const device=await adapter.requestDevice();
-                gpuProbe.device=true;
-                try{gpuProbe.deviceFeatures=[...device.features].sort()}catch{}
-                try{device.destroy?.()}catch{}
-              }catch(e){gpuProbe.device=false;gpuProbe.deviceError=ser(e)}
-            }
+            window.__benchStatus='gpu-probes';
+            await probeAdapter('default',undefined);
+            await probeAdapter('low-power',{powerPreference:'low-power'});
+            await probeAdapter('high-performance',{powerPreference:'high-performance'});
+
+            window.__benchStatus='resource-preflight';
+            await head('./.m02534/runtime/ort-dist/ort.webgpu.mjs');
+            await head('./.m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.mjs');
+            await head('./.m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.wasm');
+            await head('./vendor/kokoro-model/onnx/model.onnx');
+
+            window.__benchStatus='jsep-direct-import';
+            await importProbe('jsep','./.m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.mjs');
 
             window.__benchStatus='ort-import';
-            const ort=await import('./.m02534/runtime/ort-dist/__ORT_ENTRY__');
+            const ort=await import('./.m02534/runtime/ort-dist/ort.webgpu.mjs');
             try{ort.env.logLevel='verbose'}catch{}
             try{ort.env.debug=true}catch{}
             try{ort.env.wasm.numThreads=1}catch{}
@@ -140,49 +117,22 @@ jobs:
             try{ort.env.wasm.wasmPaths='./.m02534/runtime/ort-dist/'}catch{}
 
             window.__benchStatus='session-create';
-            const sessionStart=performance.now();
+            const t0=performance.now();
             let session=null,sessionSuccess=false,sessionError=null,sessionTimedOut=false,inputNames=null,outputNames=null;
-            const createPromise=ort.InferenceSession.create('./vendor/kokoro-model/onnx/model.onnx',{
-              executionProviders:['webgpu'],
-              graphOptimizationLevel:'all'
-            });
-            const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(Object.assign(new Error('direct_ort_session_create_timeout_120s'),{name:'ForensicTimeoutError'})),120000));
             try{
-              session=await Promise.race([createPromise,timeoutPromise]);
-              sessionSuccess=true;
-              try{inputNames=session.inputNames}catch{}
-              try{outputNames=session.outputNames}catch{}
-            }catch(e){
-              sessionError=ser(e);
-              sessionTimedOut=e?.name==='ForensicTimeoutError';
-            }
-            const sessionMs=Math.round(performance.now()-sessionStart);
-            try{await session?.release?.()}catch(e){captured.push({kind:'session-release-error',error:ser(e)})}
-            await new Promise(r=>setTimeout(r,500));
-            finish({
-              userAgent:navigator.userAgent,
-              crossOriginIsolated:globalThis.crossOriginIsolated,
-              gpuProbe,
-              sessionTerminal:true,
-              sessionSuccess,
-              sessionTimedOut,
-              sessionMs,
-              sessionError,
-              inputNames,
-              outputNames,
-              ortExports:Object.keys(ort).sort()
-            });
-          }catch(e){
-            finish({userAgent:navigator.userAgent,crossOriginIsolated:globalThis.crossOriginIsolated,gpuProbe,sessionTerminal:true,sessionSuccess:false,sessionTimedOut:false,sessionMs:null,sessionError:ser(e),fatalStage:window.__benchStatus});
-          }
+              session=await Promise.race([
+                ort.InferenceSession.create('./vendor/kokoro-model/onnx/model.onnx',{executionProviders:['webgpu'],graphOptimizationLevel:'all'}),
+                new Promise((_,reject)=>setTimeout(()=>reject(Object.assign(new Error('direct_ort_session_create_timeout_120s'),{name:'ForensicTimeoutError'})),120000))
+              ]);
+              sessionSuccess=true; inputNames=session.inputNames; outputNames=session.outputNames;
+            }catch(e){sessionError=ser(e);sessionTimedOut=e?.name==='ForensicTimeoutError'}
+            const sessionMs=Math.round(performance.now()-t0);
+            try{await session?.release?.()}catch(e){captured.push({kind:'release-error',error:ser(e)})}
+            await new Promise(r=>setTimeout(r,300));
+            finish({userAgent:navigator.userAgent,crossOriginIsolated:globalThis.crossOriginIsolated,gpu,resources,moduleImports,sessionTerminal:true,sessionSuccess,sessionTimedOut,sessionMs,sessionError,inputNames,outputNames});
+          }catch(e){finish({userAgent:navigator.userAgent,crossOriginIsolated:globalThis.crossOriginIsolated,gpu,resources,moduleImports,sessionTerminal:true,sessionSuccess:false,sessionTimedOut:false,sessionMs:null,sessionError:ser(e),fatalStage:window.__benchStatus})}
           </script>
           HTML
-          ORT_ENTRY="$ENTRY" python3 - <<'PY'
-          import os
-          from pathlib import Path
-          p=Path('.m02534-bench.html')
-          p.write_text(p.read_text().replace('__ORT_ENTRY__', os.environ['ORT_ENTRY']))
-          PY
 
       - name: Start same-origin server and SafariDriver
         run: |
@@ -191,14 +141,17 @@ jobs:
           sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
           /usr/bin/safaridriver --port 4444 >/tmp/m02534-safaridriver.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02534-status.json 2>/dev/null && break; sleep 1; done
-          curl -fsS http://127.0.0.1:8000/.m02534-bench.html >/dev/null
+          {
+            curl -sSI http://127.0.0.1:8000/.m02534/runtime/ort-dist/ort.webgpu.mjs
+            curl -sSI http://127.0.0.1:8000/.m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.mjs
+            curl -sSI http://127.0.0.1:8000/.m02534/runtime/ort-dist/ort-wasm-simd-threaded.jsep.wasm
+          } | tee m02534-http-preflight.txt
 
-      - name: Capture direct ORT WebGPU terminal classification
+      - name: Capture refined terminal classification
         run: |
           set -euo pipefail
           SJ="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
-          SID="$(echo "$SJ"|jq -r '.value.sessionId // .sessionId // empty')"
-          test -n "$SID"
+          SID="$(echo "$SJ"|jq -r '.value.sessionId // .sessionId // empty')"; test -n "$SID"
           curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/.m02534-bench.html"}' "http://127.0.0.1:4444/session/$SID/url" >/dev/null
           RESULT=''
           for i in {1..180}; do
@@ -210,10 +163,9 @@ jobs:
           curl -sS -X DELETE "http://127.0.0.1:4444/session/$SID" >/dev/null || true
           test -n "$RESULT"
           echo "$RESULT" | jq . | tee m02534-direct-ort.json
-          jq -e '.harnessSuccess == true and .sessionTerminal == true' m02534-direct-ort.json >/dev/null
-          jq -e '.gpuProbe.available == true' m02534-direct-ort.json >/dev/null
-          jq -e '(.sessionSuccess == true) or (.sessionError != null) or (.sessionTimedOut == true)' m02534-direct-ort.json >/dev/null
-          jq '{sessionSuccess,sessionTimedOut,sessionMs,sessionError,gpuProbe:{available:.gpuProbe.available,adapter:.gpuProbe.adapter,device:.gpuProbe.device,requestDeviceHook:.gpuProbe.requestDeviceHook,uncaptured:.gpuProbe.uncaptured},captured}' m02534-direct-ort.json | tee m02534-classification.json
+          jq -e '.harnessSuccess == true and .sessionTerminal == true and .gpu.available == true' m02534-direct-ort.json >/dev/null
+          jq '{gpu,resources,moduleImports,sessionSuccess,sessionTimedOut,sessionMs,sessionError,captured}' m02534-direct-ort.json | tee m02534-classification.json
+          cat /tmp/m02534-http.log | tail -100 | tee m02534-http-tail.txt
 
       - name: Preserve forensic evidence
         if: always()
@@ -225,13 +177,12 @@ jobs:
             m02534-classification.json
             m02534-runner.txt
             m02534-runtime.txt
-            m02534-ort-entry.txt
-            m02534-ort-entry-sha256.txt
-            m02534-ort-artifacts.txt
-            m02534-ort-artifacts-sha256.txt
+            m02534-ort-sha256.txt
             m02534-model-revision.txt
             m02534-model-size.txt
             m02534-model-sha256.txt
+            m02534-http-preflight.txt
+            m02534-http-tail.txt
             /tmp/m02534-http.log
             /tmp/m02534-safaridriver.log
           if-no-files-found: warn
