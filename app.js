@@ -6,6 +6,9 @@ const NOTIFICATION_REMINDER_INTERVAL_MS=30*60*1000;
 const ALRS_MIN_GAP_MS=18*60*60*1000;
 const ALRS_QUIET_START_HOUR=22;
 const ALRS_QUIET_END_HOUR=8;
+// Four misses in a row is a pattern, not bad luck; below that a nudge would be noise.
+const ALRS_STRUGGLE_THRESHOLD=4;
+const ALRS_STRUGGLE_MIN_GAP_MS=2*60*60*1000;
 const ALRS_EVIDENCE_LOG_LIMIT=30;
 const LEARNER_EVIDENCE_WINDOW_DAYS=14;
 const ADAPTIVE_POLICY_SCHEMA='fiezel-adaptive-policy-v1';
@@ -82,6 +85,7 @@ const LOGIN_MESSAGES=[
 ];
 const REMINDER_TITLES={
   starter:['FIEZEL · Oii Jahran 👀','FIEZEL · Gas dikit, bro','FIEZEL · Jangan ghosting 😭'],
+  struggling:['FIEZEL · Nyangkut di situ ya?','FIEZEL · Break dulu, terus balik','FIEZEL · Kita ulang pelan-pelan'],
   inactivity_1:['FIEZEL · Bro, kemarin kosong 👀','FIEZEL · Balik tipis dulu','FIEZEL · Ritme jangan putus'],
   inactivity_2:['FIEZEL · Dua hari nih 😭','FIEZEL · Comeback sekarang','FIEZEL · Jangan jadi pola'],
   inactivity_3:['FIEZEL · Woy, 3 hari 😭','FIEZEL · Comeback time','FIEZEL · Ritme lu kangen'],
@@ -91,6 +95,11 @@ const REMINDER_TITLES={
   positive:['FIEZEL · W, bro 🔥','FIEZEL · Ritme lu bagus','FIEZEL · Keep it going']
 };
 const REMINDER_MESSAGES={
+  struggling:[
+    'Salah beberapa kali berturut-turut itu tanda materinya belum nempel, bukan tanda lu bodoh. Ulang topiknya pelan-pelan.',
+    'Jahran, berhenti nebak. Balik ke penjelasan dulu, baru lanjut soal.',
+    'Pola salahnya keliatan di satu skill. Kita bedah topik itu dulu, jangan lanjut ngebut.'
+  ],
   starter:[
     'Oii Jahran, hari ini masih kosong 👀 Lima soal dulu, habis itu bebas.',
     'Bro, FIEZEL belum dapet receipt belajar hari ini. Gas satu sesi pendek.',
@@ -279,7 +288,11 @@ function scheduleNext(b,ok,ms,confidence){
   b.nextReview=Date.now()+interval*86400000;b.lastSeen=Date.now();b.lastWrong=ok?b.lastWrong:Date.now();b.lapses=(b.lapses||0)+(ok?0:1);
   if(b.mastery>=MASTERY_THRESHOLD)b.nextReview=0;
 }
-function updateMastery(bucket,key,ok,ms=6000,confidence=null){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lastSeen:0,lastWrong:0};b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence);state[bucket][key]=b;save()}
+function updateMastery(bucket,key,ok,ms=6000,confidence=null){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lastSeen:0,lastWrong:0};b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;
+  // m025-35: a teacher notices a run of misses. Tracked here because every answer in
+  // the app passes through updateMastery, so no call site can forget to report.
+  state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
+  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence);state[bucket][key]=b;save()}
 function markMastered(bucket,key){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.nextReview=0;b.stability=Math.max(30,b.stability||1);state[bucket][key]=b;save()}
 function dailyBrief(){const due=dueItems();const profile=getDiagnosticProfile();const weak=Object.entries(profile.weakSkills).sort((a,b)=>b[1].score-a[1].score)[0]?.[0];return {review:due.length,weak:weak||'Belum ada pola',goal:state.adaptiveReady?'12 soal adaptif':'Mulai diagnostik'} }
 function getDiagnosticProfile(){
@@ -508,12 +521,21 @@ function startUpdateWatcher(){
   }
 }
 function buildALRSContext(now=Date.now()){
-  const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),today:studyDayKey(now),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}
+  const evidence=buildLearnerEvidenceModel(now),last=lastLearningAt(),daysInactive=last?Math.max(0,Math.floor((now-last)/86400000)):999;return{now,hour:studyHour(now),today:studyDayKey(now),consecutiveWrong:Number(state.consecutiveWrong||0),totalAnswered:Number(state.totalAnswered||0),todayAttempts:Number(state.daily?.date===studyDayKey(now)?state.daily?.attempts||0:0),streakDays:Number(state.streak||0),daysInactive,dueReviews:evidence.memory.dueReviews,maxForgettingRisk:evidence.memory.maxForgettingRisk,consistency14d:evidence.behavior.consistency14d,abandonmentRate:evidence.behavior.abandonmentRate,recurringErrorSkills:evidence.skills.recurringErrorSkills}
 }
 function selectALRSDecision(ctx,meta={},force=false){
-  if(!ctx)return null;if(!force&&(ctx.hour<ALRS_QUIET_END_HOUR||ctx.hour>=ALRS_QUIET_START_HOUR))return null;if(!force&&Number(meta.lastNotificationAt||0)&&ctx.now-Number(meta.lastNotificationAt)<ALRS_MIN_GAP_MS)return null;if(!force&&meta.lastNotificationDay===ctx.today)return null;
-  let kind='',trigger='';if(ctx.totalAnswered===0&&ctx.hour>=15){kind='starter';trigger='no_learning_evidence'}else if(ctx.daysInactive>=7){kind='inactivity_7';trigger='inactive_7_plus_days'}else if(ctx.daysInactive>=3){kind='inactivity_3';trigger='inactive_3_plus_days'}else if(ctx.daysInactive>=2){kind='inactivity_2';trigger='inactive_2_days'}else if(ctx.daysInactive>=1&&ctx.hour>=18){kind='inactivity_1';trigger='inactive_1_day'}else if(ctx.dueReviews>0&&ctx.maxForgettingRisk>=60&&ctx.hour>=16){kind='due_review';trigger='high_forgetting_risk'}else if(ctx.todayAttempts<MEANINGFUL_ATTEMPTS&&ctx.hour>=20){kind='daily_goal';trigger='daily_minimum_not_met'}else if(ctx.todayAttempts===0&&ctx.hour>=17){kind='starter';trigger='today_empty'}else if(ctx.todayAttempts>=MEANINGFUL_ATTEMPTS&&[3,7,14,30,60,100].includes(ctx.streakDays)&&ctx.hour>=19&&meta.lastPositiveDay!==ctx.today){kind='positive';trigger='streak_milestone'}
-  return kind?{kind,trigger,evidence:{daysInactive:ctx.daysInactive,dueReviews:ctx.dueReviews,maxForgettingRisk:ctx.maxForgettingRisk,todayAttempts:ctx.todayAttempts,streakDays:ctx.streakDays,consistency14d:ctx.consistency14d,abandonmentRate:ctx.abandonmentRate,recurringErrorSkills:ctx.recurringErrorSkills}}:null
+  if(!ctx)return null;
+  // Quiet hours always hold, even for a struggle alert: a teacher does not phone at 3am.
+  if(!force&&(ctx.hour<ALRS_QUIET_END_HOUR||ctx.hour>=ALRS_QUIET_START_HOUR))return null;
+  // m025-35: a run of misses is the most actionable signal we have, so it is allowed
+  // past the once-per-day cap that exists to stop nudge spam. It keeps its own,
+  // shorter gap so it still cannot repeat endlessly during one bad session.
+  const struggling=Number(ctx.consecutiveWrong||0)>=ALRS_STRUGGLE_THRESHOLD;
+  const minGap=struggling?ALRS_STRUGGLE_MIN_GAP_MS:ALRS_MIN_GAP_MS;
+  if(!force&&Number(meta.lastNotificationAt||0)&&ctx.now-Number(meta.lastNotificationAt)<minGap)return null;
+  if(!force&&!struggling&&meta.lastNotificationDay===ctx.today)return null;
+  let kind='',trigger='';if(struggling){kind='struggling';trigger='consecutive_wrong_answers'}else if(ctx.totalAnswered===0&&ctx.hour>=15){kind='starter';trigger='no_learning_evidence'}else if(ctx.daysInactive>=7){kind='inactivity_7';trigger='inactive_7_plus_days'}else if(ctx.daysInactive>=3){kind='inactivity_3';trigger='inactive_3_plus_days'}else if(ctx.daysInactive>=2){kind='inactivity_2';trigger='inactive_2_days'}else if(ctx.daysInactive>=1&&ctx.hour>=18){kind='inactivity_1';trigger='inactive_1_day'}else if(ctx.dueReviews>0&&ctx.maxForgettingRisk>=60&&ctx.hour>=16){kind='due_review';trigger='high_forgetting_risk'}else if(ctx.todayAttempts<MEANINGFUL_ATTEMPTS&&ctx.hour>=20){kind='daily_goal';trigger='daily_minimum_not_met'}else if(ctx.todayAttempts===0&&ctx.hour>=17){kind='starter';trigger='today_empty'}else if(ctx.todayAttempts>=MEANINGFUL_ATTEMPTS&&[3,7,14,30,60,100].includes(ctx.streakDays)&&ctx.hour>=19&&meta.lastPositiveDay!==ctx.today){kind='positive';trigger='streak_milestone'}
+  return kind?{kind,trigger,evidence:{consecutiveWrong:ctx.consecutiveWrong,daysInactive:ctx.daysInactive,dueReviews:ctx.dueReviews,maxForgettingRisk:ctx.maxForgettingRisk,todayAttempts:ctx.todayAttempts,streakDays:ctx.streakDays,consistency14d:ctx.consistency14d,abandonmentRate:ctx.abandonmentRate,recurringErrorSkills:ctx.recurringErrorSkills}}:null
 }
 function appendALRSEvidenceLog(entry){const meta=state.reminderMeta||{};meta.evidenceLog=[...(Array.isArray(meta.evidenceLog)?meta.evidenceLog:[]),entry].slice(-ALRS_EVIDENCE_LOG_LIMIT);state.reminderMeta=meta}
 async function checkStudyReminders(force=false){
