@@ -56,26 +56,50 @@
       return String(error && (error.code || error.name) || 'error').slice(0, 80);
     }
 
-    function effectiveWasmPolicy() {
+    function runtimePolicyContext() {
       const runtime = typeof globalThis !== 'undefined' ? globalThis : {};
       const standalone = runtime.navigator?.standalone === true || !!runtime.matchMedia?.('(display-mode: standalone)')?.matches;
-      const isolated = runtime.crossOriginIsolated === true;
-      if (standalone && !isolated && device === 'wasm') {
+      return {
+        appleStandalone: standalone,
+        isolated: runtime.crossOriginIsolated === true,
+        wasm: kokoroEnv?.backends?.onnx?.wasm || null
+      };
+    }
+
+    function effectiveWasmPolicy() {
+      const { appleStandalone, isolated, wasm } = runtimePolicyContext();
+      const numThreads = Number.isFinite(Number(wasm?.numThreads)) ? Number(wasm.numThreads) : (isolated ? null : 1);
+      const proxy = wasm?.proxy === true;
+      if (appleStandalone && !isolated && device === 'wasm') {
         return Object.freeze({
-          policy: 'apple-standalone-single-thread-direct-default',
-          numThreads: 1,
-          proxy: false,
+          policy: proxy ? 'apple-standalone-single-thread-proxy-worker' : 'apple-standalone-single-thread-direct-default',
+          numThreads,
+          proxy,
           source: 'onnxruntime-web-1.22-runtime-default',
-          readBack: false
+          readBack: false,
+          supersedes: 'apple-standalone-single-thread-direct-default'
         });
       }
       return Object.freeze({
         policy: isolated ? 'onnxruntime-default-isolated' : 'onnxruntime-default-single-thread',
-        numThreads: isolated ? null : 1,
-        proxy: false,
+        numThreads,
+        proxy,
         source: 'onnxruntime-web-1.22-runtime-default',
         readBack: false
       });
+    }
+
+    function applyAppleStandaloneWorkerPolicy() {
+      const { appleStandalone, isolated, wasm } = runtimePolicyContext();
+      if (!wasm || device !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy();
+      // m025-18: physical m025-17 evidence showed each 49-79 char model call
+      // blocking the document event loop for the full ~10-16 s inference interval.
+      // ORT's shipped proxy worker keeps the same single WASM inference thread while
+      // moving that blocking run off the PWA document/UI thread. This is not WASM
+      // multithreading and does not require crossOriginIsolated.
+      wasm.numThreads = 1;
+      wasm.proxy = true;
+      return effectiveWasmPolicy();
     }
 
     function tokenCount(value) {
@@ -147,7 +171,11 @@
         kokoroEnv.localModelPath = localModelPath;
         kokoroEnv.wasmPaths = wasmBasePath;
         setVoiceDataUrl(voiceBaseUrl);
-        stage('wasm_policy', effectiveWasmPolicy());
+        const policy = applyAppleStandaloneWorkerPolicy();
+        try {
+          if (typeof globalThis !== 'undefined') globalThis.__fiezelNeuralWasmPolicy = policy.policy;
+        } catch (_) {}
+        stage('wasm_policy', policy);
         const startedAt = Date.now();
         stage('adapter_instance_start', { dtype, device });
         instancePromise = Promise.resolve()
