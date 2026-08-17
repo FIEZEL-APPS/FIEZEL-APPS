@@ -78,7 +78,10 @@ jobs:
         run: |
           set -euo pipefail
           run_one(){
-            local threads="$1" proxy="$2"; local label="t${threads}-p${proxy}" out="m02528-${label}.json" sj sid resp result=''
+            local threads="$1" proxy="$2"
+            local label="t${threads}-p${proxy}"
+            local out="m02528-${label}.json"
+            local sj sid resp result=''
             sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
             sid="$(echo "$sj"|jq -r '.value.sessionId // .sessionId // empty')"; test -n "$sid"
             curl -fsS -H 'Content-Type: application/json' -d "{\"url\":\"http://127.0.0.1:8000/.m02528-bench.html?threads=$threads&proxy=$proxy\"}" "http://127.0.0.1:4444/session/$sid/url" >/dev/null
