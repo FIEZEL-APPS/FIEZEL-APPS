@@ -17,67 +17,44 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Patch candidate runtime sources without touching branch
+      - name: Verify final runtime source contract
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-
-          bootstrap=Path('features/neural-voice/fiezel-neural-voice-bootstrap.js')
-          text=bootstrap.read_text()
-          replacements={
-            "vendor/kokoro-js/kokoro.web.js?nv=m025-5":"vendor/kokoro-js/kokoro.web.js?nv=m025-22",
-            "const wasmEnv=kokoro.env?.backends?.onnx?.wasm;":"const wasmEnv=kokoro.env?.wasmEnv;",
-            "if(appleStandalone)wasmEnv.proxy=false;":"if(appleStandalone)wasmEnv.proxy=true;",
-            "apple-standalone-single-thread-direct":"apple-standalone-single-thread-proxy-worker",
-          }
-          for old,new in replacements.items():
-            if new in text:
-              continue
-            if old not in text:
-              raise SystemExit(f'bootstrap replacement source missing: {old}')
-            text=text.replace(old,new)
-          bootstrap.write_text(text)
-
-          adapter=Path('features/neural-voice/fiezel-kokoro-adapter.js')
-          text=adapter.read_text()
-          old="wasm: kokoroEnv?.backends?.onnx?.wasm || null"
-          new="wasm: kokoroEnv?.wasmEnv || null"
-          if new not in text:
-            if old not in text:
-              raise SystemExit('adapter WASM binding source missing')
-            text=text.replace(old,new)
-          if "readBack: !!wasm" not in text:
-            text=text.replace("readBack: false", "readBack: !!wasm")
-          adapter.write_text(text)
+          bootstrap=Path('features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text()
+          adapter=Path('features/neural-voice/fiezel-kokoro-adapter.js').read_text()
+          required=[
+            "vendor/kokoro-js/kokoro.web.js?nv=m025-22",
+            "const wasmEnv=kokoro.env?.wasmEnv",
+            "wasmEnv.proxy=true",
+            "wasmEnv.numThreads=1",
+            "readBack:true",
+          ]
+          for value in required:
+            if value not in bootstrap:
+              raise SystemExit(f'bootstrap final contract missing: {value}')
+          if "kokoro.web.js?nv=m025-5" in bootstrap or "env?.backends?.onnx?.wasm" in bootstrap:
+            raise SystemExit('bootstrap retains stale m025-5/fabricated WASM path')
+          if "wasm: kokoroEnv?.wasmEnv || null" not in adapter:
+            raise SystemExit('adapter is not bound to source-derived wasmEnv')
           PY
-      - name: Build pinned vendor candidate clean-room
-        shell: bash
-        run: |
-          set +e
-          bash tools/rebuild-neural-vendor.sh
-          rc=$?
-          set -e
-          test -f .vendor-repro/kokoro.web.js
-          echo "rebuild_exit=$rc"
-          # Runtime lock still points to released bytes at candidate stage.
-          # A nonzero final byte comparison is expected; earlier source/build errors
-          # are distinguished because they do not leave the candidate bundle.
-          test "$rc" -ne 0
+      - name: Rebuild pinned vendor and require byte-identical runtime closure
+        run: bash tools/rebuild-neural-vendor.sh
       - name: Record candidate integrity
         shell: bash
         run: |
           sha256sum .vendor-repro/kokoro.web.js | tee .vendor-repro/kokoro.web.js.sha256
           wc -c < .vendor-repro/kokoro.web.js | tr -d ' ' | tee .vendor-repro/kokoro.web.js.size
-          cp features/neural-voice/fiezel-neural-voice-bootstrap.js .vendor-repro/fiezel-neural-voice-bootstrap.js
-          cp features/neural-voice/fiezel-kokoro-adapter.js .vendor-repro/fiezel-kokoro-adapter.js
+          grep -F '91d849dc97a2e43edab1e576721792211bc240da4d086591d42b5356959dc32f' .vendor-repro/kokoro.web.js.sha256
+          grep -Fx '2136728' .vendor-repro/kokoro.web.js.size
       - uses: actions/upload-artifact@v4
         with:
-          name: m025-22-proxy-candidate-${{ github.sha }}
+          name: m025-22-final-closure-${{ github.sha }}
           path: .vendor-repro/
           include-hidden-files: true
           retention-days: 3
-      - name: Verify actual candidate bundle exposes real WASM env in browser runtime
+      - name: Verify actual rebuilt bundle exposes real WASM env in browser runtime
         shell: bash
         run: |
           chrome="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
