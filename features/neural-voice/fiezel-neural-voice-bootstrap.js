@@ -393,8 +393,18 @@
       lastError=errorText(error);lastFallbackReason=lastError;
       const generationBusy=lastError==='neural_generation_busy';
       const generationTimeout=lastError==='neural_generation_timeout';
-      const shouldOpenCircuit=!!service&&!generationBusy&&!generationTimeout;
-      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,transient:generationBusy||generationTimeout,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
+      // m025-29: supersession and explicit stop are NORMAL control flow, not engine
+      // faults. OWNER cache-0 capture recorded circuitOpen=true with reason
+      // "TTS request superseded" -- switching listening item A1 to A2 cancels the
+      // in-flight request, which was being classified as a hard failure and latched the
+      // circuit for the page lifetime. Every later request then failed closed and the
+      // app degraded to browser TTS until a reload, which is exactly the "A1 works, A2
+      // goes back to browser TTS, fixed only after several reloads" report.
+      const generationSuperseded=/superseded/i.test(lastError);
+      const generationStopped=lastError==='neural_generation_stopped';
+      const transientFailure=generationBusy||generationTimeout||generationSuperseded||generationStopped;
+      const shouldOpenCircuit=!!service&&!transientFailure;
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,transient:transientFailure,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';else if(service)phase='ready';
       try{service?.stop?.()}catch{}
       return fallbackOrThrow(error);

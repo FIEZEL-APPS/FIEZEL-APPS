@@ -65,7 +65,24 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   // clear a previously opened circuit.
   const bootstrap=fs.readFileSync('features/neural-voice/fiezel-neural-voice-bootstrap.js','utf8');
   assert.match(bootstrap,/generationTimeout=lastError==='neural_generation_timeout'/);
-  assert.match(bootstrap,/shouldOpenCircuit=!!service&&!generationBusy&&!generationTimeout/);
+  // m025-29: assert the invariant, not the literal expression. Busy and timeout must
+  // stay transient (the original m025-24 guarantee), and supersession/stop joined them
+  // because cancelling an in-flight request by switching item is normal control flow,
+  // not an engine fault. Only a real fault may latch the circuit.
+  assert.match(bootstrap,/shouldOpenCircuit=!!service&&!transientFailure/);
+  assert.match(bootstrap,/const transientFailure=generationBusy\|\|generationTimeout\|\|generationSuperseded\|\|generationStopped/);
+  const classify=err=>{
+    const busy=err==='neural_generation_busy';
+    const timeout=err==='neural_generation_timeout';
+    const superseded=/superseded/i.test(err);
+    const stopped=err==='neural_generation_stopped';
+    return !(busy||timeout||superseded||stopped);
+  };
+  assert.equal(classify('neural_generation_timeout'),false,'timeout must stay transient');
+  assert.equal(classify('neural_generation_busy'),false,'busy must stay transient');
+  assert.equal(classify('TTS request superseded'),false,'switching item must not latch the circuit');
+  assert.equal(classify('neural_generation_stopped'),false,'explicit stop must not latch the circuit');
+  assert.equal(classify('sherpa_worker_failed:boom'),true,'a real engine fault must still latch');
   assert.match(bootstrap,/lastFallbackReason='';circuitOpen=false;audibleVerified=false/);
   assert.match(bootstrap,/__fiezelNeuralWasmPolicy=wasmPolicy/,'core service must receive the effective proxy policy before construction');
 
@@ -79,8 +96,8 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   // Release identity must advance exactly one build from m025-23.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-28'/);
-  assert.match(sw,/SW_REV='m025-28-listening-neural-route-20260818-1'/);
+  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-29'/);
+  assert.match(sw,/SW_REV='m025-29-circuit-supersede-fix-20260818-1'/);
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
