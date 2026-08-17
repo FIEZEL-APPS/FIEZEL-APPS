@@ -29,8 +29,10 @@ function load(){
   const stores=new Map();
   const deleted=[];
   const openCalls=[];
+  const fetchCalls=[];
   let skipWaitingCalls=0;
   let claimCalls=0;
+  let networkMode='ok';
   const abs=value=>new URL(typeof value==='string'?value:value.url,scope).href;
   const runtimeName='fiezel-v5.19.0';
   const oldShellName='fiezel-shell-m025-15-cache-integrity-repair-20260817-1';
@@ -47,11 +49,16 @@ function load(){
     put:async(request,response)=>{const store=stores.get(name)||new Map();stores.set(name,store);store.set(abs(request),response)},
     match:async request=>(stores.get(name)||new Map()).get(abs(request))||null
   });
+  const RequestMock=class RequestMock{constructor(value,options={}){this.url=abs(value);this.cache=options.cache||'default';this.method=typeof value==='object'&&value.method?value.method:'GET';this.mode=typeof value==='object'&&value.mode?value.mode:options.mode||'same-origin'}};
   const sandbox={
     console,URL,Promise,Symbol,setTimeout,clearTimeout,
-    Headers:HeadersMock,Response:ResponseMock,
-    Request:class RequestMock{constructor(value,options={}){this.url=abs(value);this.cache=options.cache||'default'}},
-    fetch:async request=>new ResponseMock('network:'+abs(request)),
+    Headers:HeadersMock,Response:ResponseMock,Request:RequestMock,
+    fetch:async request=>{
+      fetchCalls.push({url:abs(request),cache:request&&request.cache||'default',mode:request&&request.mode||null});
+      if(networkMode==='throw')throw new Error('offline');
+      if(networkMode==='bad')return new ResponseMock('network-bad',{status:503});
+      return new ResponseMock('network:'+abs(request));
+    },
     caches:{
       open:async name=>{openCalls.push(name);if(!stores.has(name))stores.set(name,new Map());return cacheFor(name)},
       keys:async()=>Array.from(stores.keys()),
@@ -73,7 +80,7 @@ function load(){
   sandbox.skipWaiting=async()=>{skipWaitingCalls++};
   sandbox.addEventListener=(name,fn)=>(listeners[name]=listeners[name]||[]).push(fn);
   vm.createContext(sandbox);vm.runInContext(src,sandbox,{filename:'sw.js'});
-  return{listeners,stores,deleted,openCalls,runtimeName,oldShellName,abs,get skipWaitingCalls(){return skipWaitingCalls},get claimCalls(){return claimCalls}};
+  return{listeners,stores,deleted,openCalls,fetchCalls,runtimeName,oldShellName,abs,setNetworkMode:v=>{networkMode=v},get skipWaitingCalls(){return skipWaitingCalls},get claimCalls(){return claimCalls}};
 }
 async function dispatchExtendable(listeners,name){
   let pending=Promise.resolve();
@@ -109,10 +116,19 @@ async function dispatchFetch(t,request){
   assert.ok(t.stores.has(shellName),'activate must retain current revisioned shell cache');
 
   const nav={url:t.abs('./'),method:'GET',mode:'navigate'};
+  t.stores.get(shellName).set(t.abs('./'),new ResponseMock(''));
   const navResponse=await dispatchFetch(t,nav);
-  assert.ok(navResponse&&String(navResponse.body).startsWith('shell:'),'current worker navigation must come from its current shell generation, not legacy runtime shell bytes');
+  assert.ok(navResponse&&String(navResponse.body).startsWith('network:'),'online startup must prefer a freshly validated network document over a blank/stale shell entry');
+  const navFetch=t.fetchCalls.find(call=>call.url===t.abs('./'));
+  assert.ok(navFetch,'startup navigation must hit the network');
+  assert.equal(navFetch.cache,'reload','startup navigation must bypass stale HTTP cache');
   assert.equal(navResponse.headers.get('Cross-Origin-Opener-Policy'),'same-origin-allow-popups','WebKit navigation COOP compatibility must be preserved');
   assert.equal(navResponse.headers.get('Cross-Origin-Embedder-Policy'),'credentialless','COEP must remain credentialless');
+  assert.ok(String(t.stores.get(shellName).get(t.abs('./')).body).startsWith('network:'),'successful network startup must refresh the current shell navigation entry');
+
+  t.setNetworkMode('throw');
+  const offlineNav=await dispatchFetch(t,nav);
+  assert.ok(offlineNav&&String(offlineNav.body).startsWith('shell:'),'offline startup must fall back to current revisioned index.html');
 
   const neural={url:neuralKey,method:'GET',mode:'same-origin'};
   const neuralResponse=await dispatchFetch(t,neural);
