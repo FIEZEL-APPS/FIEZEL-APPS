@@ -75,10 +75,11 @@ function makeContext({ready=false,prepared=true,errorMode=false,ensureDelayMs=0,
   };
 }
 
-async function adapterProxyObservation({standalone}){
+async function adapterProxyObservation({standalone=false,displayModeStandalone=false}={}){
   const stages=[];
   const ctx={console,URL,Promise,Date,setTimeout,clearTimeout};
   ctx.navigator={standalone:!!standalone};
+  ctx.matchMedia=query=>({matches:query==='(display-mode: standalone)'&&!!displayModeStandalone});
   ctx.crossOriginIsolated=false;
   vm.createContext(ctx);
   vm.runInContext(adapterSource,ctx,{filename:'fiezel-kokoro-adapter.js'});
@@ -124,7 +125,10 @@ async function adapterProxyObservation({standalone}){
     assert.equal(apple.wasm.numThreads,1,'Apple standalone remains single-threaded inside the worker');
     assert.ok(apple.stages.some(entry=>entry.phase==='wasm_policy'&&entry.proxy===true),'diagnostics must report the effective proxy-worker policy');
 
-    const web=await adapterProxyObservation({standalone:false});
+    const displayMode=await adapterProxyObservation({displayModeStandalone:true});
+    assert.equal(displayMode.proxyAtSessionCreation,true,'display-mode standalone must receive the same worker isolation when navigator.standalone is unavailable');
+
+    const web=await adapterProxyObservation();
     assert.equal(web.proxyAtSessionCreation,false,'non-standalone runtime must preserve direct/default ORT execution');
     assert.equal(web.wasm.proxy,false,'non-standalone proxy policy must not change');
   }
