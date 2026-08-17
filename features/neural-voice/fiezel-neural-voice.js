@@ -125,6 +125,7 @@
     const appleHardChunkChars = appleStandalone ? Math.max(64, Math.min(128, Number(options.appleHardChunkChars) || 80)) : 0;
     const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
     const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
+    const proxyWorkerBudgetOnly = appleStandalone && String(env && env.__fiezelNeuralWasmPolicy || '') === 'apple-standalone-single-thread-proxy-worker';
     let generation = 0;
     let requestSequence = 0;
     let activeStop = null;
@@ -141,6 +142,7 @@
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
     diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default', hardChunkChars: appleHardChunkChars || null });
     diag({ phase: 'prefetch_policy_ready', policy: appleStandalone ? 'apple-standalone-macrotask-yield-v1' : 'default' });
+    diag({ phase: 'generation_timeout_policy_ready', policy: proxyWorkerBudgetOnly ? 'proxy-worker-soft-budget-v1' : 'hard-timeout-v1', timeoutMs: generationTimeoutMs || null });
 
     if (appleStandalone && !env.__fiezelNeuralLifecycleDiagInstalled) {
       try {
@@ -207,7 +209,7 @@
           error.code = 'neural_generation_busy';
           throw error;
         }
-        diag({ phase: 'generate_start', requestId, chunkIndex, voice, chars: chunk.length, timeoutMs: generationTimeoutMs || null });
+        diag({ phase: 'generate_start', requestId, chunkIndex, voice, chars: chunk.length, timeoutMs: generationTimeoutMs || null, timeoutPolicy: proxyWorkerBudgetOnly ? 'soft-budget' : 'hard' });
         const watchdogScheduledAt = Date.now();
         setTimeout(() => {
           const callbackAt = Date.now();
@@ -245,7 +247,21 @@
             }
           }
         );
-        if (generationTimeoutMs > 0) {
+        if (generationTimeoutMs > 0 && proxyWorkerBudgetOnly) {
+          let budgetExceeded = false;
+          timer = setTimeout(() => {
+            budgetExceeded = true;
+            diag({ phase: 'generate_budget_exceeded', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, budgetMs: generationTimeoutMs, action: 'await_worker_result' });
+          }, generationTimeoutMs);
+          try {
+            audio = await generated;
+          } finally {
+            if (timer) clearTimeout(timer);
+          }
+          if (budgetExceeded) {
+            diag({ phase: 'generate_budget_recovered', requestId, chunkIndex, voice, elapsedMs: Date.now() - generateStartedAt, budgetMs: generationTimeoutMs });
+          }
+        } else if (generationTimeoutMs > 0) {
           const timedOut = Symbol('neural-generation-timeout');
           const result = await Promise.race([
             generated,
