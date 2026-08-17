@@ -94,7 +94,10 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
     const body = app.slice(bodyStart, app.indexOf('  starter:[' + NL));
     assert.ok(body.split("',").length >= 3, 'several rotating messages');
-    assert.ok(/bukan tanda lu bodoh/.test(body), 'framing must not shame the learner');
+    // Frame the miss as the material not sticking yet, and point back to the topic.
+    // The core-brain validator also rejects shaming vocabulary outright.
+    assert.ok(/belum nempel/.test(body), 'framing must blame the material, not the learner');
+    assert.ok(!/(bodoh|goblok|malas)/i.test(body), 'no shaming vocabulary');
   });
 
   console.log(`FIEZEL reminder struggle trigger: PASS ${pass}/0`);
