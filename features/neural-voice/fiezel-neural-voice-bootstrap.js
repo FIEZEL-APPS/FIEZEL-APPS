@@ -251,6 +251,7 @@
           throw new Error('Apple neural WASM proxy policy did not apply');
         }
         wasmPolicy=appleStandalone?'apple-standalone-single-thread-proxy-worker':(root.crossOriginIsolated===true?'auto-threaded':'single-thread');
+        try{root.__fiezelNeuralWasmPolicy=wasmPolicy}catch{}
         diag({phase:'wasm_policy',policy:wasmPolicy,numThreads:threadsReadBack,proxy:proxyReadBack,readBack:true});
       }else if(appleStandalone){
         diag({phase:'wasm_policy_error',policy:'apple-standalone-single-thread-proxy-worker',errorKind:'wasm_env_missing'});
@@ -365,8 +366,9 @@
     }catch(error){
       lastError=errorText(error);lastFallbackReason=lastError;
       const generationBusy=lastError==='neural_generation_busy';
-      const shouldOpenCircuit=!!service&&!generationBusy;
-      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
+      const generationTimeout=lastError==='neural_generation_timeout';
+      const shouldOpenCircuit=!!service&&!generationBusy&&!generationTimeout;
+      diag({phase:'speak_fallback',reason:lastError,circuitOpen:shouldOpenCircuit,transient:generationBusy||generationTimeout,elapsedMs:Date.now()-neuralStartedAt,voice:String(voice)});
       circuitOpen=shouldOpenCircuit;audibleVerified=false;if(circuitOpen)phase='error';else if(service)phase='ready';
       try{service?.stop?.()}catch{}
       return fallbackOrThrow(error);
@@ -386,8 +388,8 @@
     speechActive=false;
     try{root.FiezelWebAudioPlayer?.createPlayer?.(root)?.close?.()}catch{}
     playerRef=null;service=null;adapter=null;
-    phase='idle';lastError='';audibleVerified=false;
-    diag({phase:'released'});
+    phase='idle';lastError='';lastFallbackReason='';circuitOpen=false;audibleVerified=false;
+    diag({phase:'released',circuitReset:true});
     return status();
   }
 
