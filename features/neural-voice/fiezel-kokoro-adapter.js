@@ -5,6 +5,9 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  const STANDARD_WASM_MJS = 'ort-wasm-simd-threaded.mjs';
+  const STANDARD_WASM_BINARY = 'ort-wasm-simd-threaded.wasm';
+
   function assertLocalPath(value, name) {
     const text = String(value || '').trim();
     if (!text) throw new Error(name + ' is required');
@@ -25,6 +28,11 @@
       return parsed.href;
     }
     return assertLocalPath(text, 'wasmBasePath');
+  }
+
+  function joinWasmAsset(basePath, fileName) {
+    const base = String(basePath || '');
+    return (base.endsWith('/') ? base : base + '/') + String(fileName || '');
   }
 
   function createKokoroAdapter(options) {
@@ -96,12 +104,38 @@
     function applyAppleStandaloneWorkerPolicy(candidateDevice) {
       const { appleStandalone, isolated, wasm } = runtimePolicyContext();
       if (!wasm || candidateDevice !== 'wasm' || !appleStandalone || isolated) return effectiveWasmPolicy(candidateDevice);
-      // m025-22: wasmEnv is the source-derived Transformers/ORT WASM environment,
-      // not a fabricated facade shape. Apply the single-thread proxy policy before
-      // Kokoro creates the ONNX session, then report the values read back from it.
       wasm.numThreads = 1;
       wasm.proxy = true;
       return effectiveWasmPolicy(candidateDevice);
+    }
+
+    function applyWasmArtifactPolicy(candidateDevice) {
+      const { appleStandalone } = runtimePolicyContext();
+      if (candidateDevice === 'wasm' && appleStandalone) {
+        const mjs = joinWasmAsset(wasmBasePath, STANDARD_WASM_MJS);
+        const wasm = joinWasmAsset(wasmBasePath, STANDARD_WASM_BINARY);
+        // Safari/WebKit 26 differential: keep the exact pinned ORT version and CPU/WASM
+        // backend, but explicitly select the regular non-JSEP build. JSEP remains in
+        // the repository for non-Apple/control paths and provenance comparison.
+        kokoroEnv.wasmPaths = Object.freeze({ mjs, wasm });
+        const detail = Object.freeze({
+          variant: 'standard-non-jsep',
+          mjsFile: STANDARD_WASM_MJS,
+          wasmFile: STANDARD_WASM_BINARY,
+          appleStandalone: true
+        });
+        stage('wasm_artifact_variant', detail);
+        return detail;
+      }
+      kokoroEnv.wasmPaths = wasmBasePath;
+      const detail = Object.freeze({
+        variant: 'runtime-default-jsep-compatible',
+        mjsFile: '',
+        wasmFile: '',
+        appleStandalone: false
+      });
+      stage('wasm_artifact_variant', detail);
+      return detail;
     }
 
     function backendCandidates() {
@@ -114,11 +148,8 @@
         configuredDevice: device,
         dtype,
         autoWebGpuSuppressed,
-        stabilizationBuild: 'm025-22'
+        stabilizationBuild: 'm025-25'
       });
-      // m025-21+ stabilization: never auto-promote a configured WASM backend to
-      // WebGPU merely because navigator.gpu exists. Explicit device configuration
-      // remains respected; m025-22 only repairs the real WASM proxy binding.
       return [Object.freeze({ id: `configured-${device}-${dtype}`, device, dtype })];
     }
 
@@ -195,6 +226,7 @@
 
     async function initializeCandidate(candidate, startedAt) {
       if (candidate.device === 'wasm') {
+        applyWasmArtifactPolicy(candidate.device);
         const policy = applyAppleStandaloneWorkerPolicy(candidate.device);
         try {
           if (typeof globalThis !== 'undefined') globalThis.__fiezelNeuralWasmPolicy = policy.policy;
@@ -233,7 +265,6 @@
       kokoroEnv.allowRemoteModels = false;
       if ('allowLocalModels' in kokoroEnv) kokoroEnv.allowLocalModels = true;
       kokoroEnv.localModelPath = localModelPath;
-      kokoroEnv.wasmPaths = wasmBasePath;
       setVoiceDataUrl(voiceBaseUrl);
 
       const candidates = backendCandidates();
