@@ -92,6 +92,25 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
   assert.strictEqual(mod.VOICE_SIDS.af_bella, 0, 'bella maps to the proven default speaker');
   assert.match(CONFIG, /fiezelPrimary:\s*'af_bella'/, 'config default must agree with the adapter');
 
+  // --- natural speaking rate (OWNER: too fast to follow at engine default) -------
+  // Device evidence measured ~215 wpm at engine speed 1.0. Keep the shipped rate in a
+  // range that is comprehensible for a learner without sounding slowed down.
+  const MEASURED_WPM_AT_1 = 215;
+  const shippedWpm = MEASURED_WPM_AT_1 * mod.NATURAL_SPEED;
+  assert.ok(shippedWpm >= 135 && shippedWpm <= 165,
+    `shipped rate ${Math.round(shippedWpm)} wpm must sit in the natural 135-165 band`);
+  assert.ok(mod.NATURAL_SPEED < 1,
+    'engine default is faster than natural speech and must be scaled down');
+
+  // Requested speed stays relative to natural, and is clamped to intelligible bounds.
+  const engineSpeed = r => Math.min(mod.MAX_ENGINE_SPEED,
+    Math.max(mod.MIN_ENGINE_SPEED, mod.NATURAL_SPEED * r));
+  assert.strictEqual(engineSpeed(1), mod.NATURAL_SPEED, 'speed 1 must mean natural');
+  assert.ok(engineSpeed(1.2) > engineSpeed(1), 'higher requested speed must still be faster');
+  assert.ok(engineSpeed(0.8) < engineSpeed(1), 'lower requested speed must still be slower');
+  assert.ok(engineSpeed(99) <= mod.MAX_ENGINE_SPEED, 'absurd rates must clamp');
+  assert.ok(engineSpeed(0.001) >= mod.MIN_ENGINE_SPEED, 'unintelligibly slow rates must clamp');
+
   // Config catalog and adapter map must not drift apart, or a listed voice resolves
   // silently to the default and the user hears the wrong speaker.
   const catalogIds = [...CONFIG.matchAll(/id:\s*'([a-z]{2}_[a-z]+)'/g)].map(m => m[1]);
@@ -105,8 +124,8 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
 
   // --- release markers ----------------------------------------------------------
   assert.match(fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8'),
-    /DIAG_BUILD\s*=\s*'m025-26'/);
-  assert.match(SW, /SW_REV='m025-26-sherpa-vits-engine-20260818-1'/);
+    /DIAG_BUILD\s*=\s*'m025-27'/);
+  assert.match(SW, /SW_REV='m025-27-natural-speaking-rate-20260818-1'/);
 
   console.log('FIEZEL m025-26 sherpa VITS engine regression: PASS');
 })().catch(error => { console.error(error.stack || error); process.exitCode = 1; });

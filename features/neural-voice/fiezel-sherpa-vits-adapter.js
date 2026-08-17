@@ -44,6 +44,20 @@
   });
   var DEFAULT_VOICE = 'af_bella';
 
+  // Natural speaking-rate calibration, measured from OWNER device evidence (m025-26
+  // capture 2026-08-17T18:22:59Z, Apple standalone). At engine speed 1.0 this model
+  // produced ~78 characters (~14 words) per ~3.9s of audio across seven consecutive
+  // chunks -- about 215 words/minute. Conversational English sits near 140-160 wpm,
+  // so 1.0 is materially faster than natural and too fast to follow for a learner.
+  //
+  // 0.70 lands the delivery near 150 wpm: natural native pace rather than a slowed,
+  // droning read. This scales the engine rate only; it does not change latency, since
+  // generation cost tracks token count rather than playback duration.
+  var NATURAL_SPEED = 0.70;
+  // Guard rails so a caller cannot request an unintelligible or absurd rate.
+  var MIN_ENGINE_SPEED = 0.4;
+  var MAX_ENGINE_SPEED = 1.6;
+
   function createSherpaVitsAdapter(options) {
     var opts = options || {};
     var env = opts.env || (typeof globalThis !== 'undefined' ? globalThis : {});
@@ -154,10 +168,13 @@
     function generate(text, generationOptions) {
       var options = generationOptions || {};
       var voice = String(options.voice || DEFAULT_VOICE);
-      var speed = typeof options.speed === 'number' && options.speed > 0 ? options.speed : 1;
+      var requested = typeof options.speed === 'number' && options.speed > 0 ? options.speed : 1;
+      // The product's speed 1 means "natural", not "engine default". Callers keep
+      // relative control: 1.1 is still 10% faster than natural.
+      var speed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, NATURAL_SPEED * requested));
       var sid = resolveSid(voice);
       var startedAt = Date.now();
-      stage('adapter_generate_enter', backendDetail({ voice: voice, sid: sid }));
+      stage('adapter_generate_enter', backendDetail({ voice: voice, sid: sid, requestedSpeed: requested, engineSpeed: speed }));
       return initialize().then(function () {
         // The worker protocol carries exactly one in-flight generation. Fail closed on a
         // second request rather than interleaving and returning another request's audio.
@@ -216,5 +233,5 @@
     return api;
   }
 
-  return Object.freeze({ createSherpaVitsAdapter: createSherpaVitsAdapter, VOICE_SIDS: VOICE_SIDS, DEFAULT_VOICE: DEFAULT_VOICE, MODEL_ID: MODEL_ID });
+  return Object.freeze({ createSherpaVitsAdapter: createSherpaVitsAdapter, VOICE_SIDS: VOICE_SIDS, DEFAULT_VOICE: DEFAULT_VOICE, MODEL_ID: MODEL_ID, NATURAL_SPEED: NATURAL_SPEED, MIN_ENGINE_SPEED: MIN_ENGINE_SPEED, MAX_ENGINE_SPEED: MAX_ENGINE_SPEED });
 }));
