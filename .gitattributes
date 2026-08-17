@@ -1,0 +1,7 @@
+# Vendored neural runtimes are byte-exact, source-locked artifacts. Checksums are
+# asserted in CI, so no platform may rewrite their line endings on checkout.
+vendor/** -text
+*.wasm binary
+*.data binary
+*.onnx binary
+*.bin binary

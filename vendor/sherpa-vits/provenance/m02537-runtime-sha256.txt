@@ -1,0 +1,7 @@
+f27f5c88328dba7b9dc791b84e016af6cbad1d0949b1514418b8ee5b1d1d0521  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/app-tts.js
+3cdaedf4161dc357ace575e54df19440f8243147004436b137aab10c4cf2910a  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/index.html
+b9cb4782010b22d64be31298a3e407170d2b8f5def471ea6011c42a921577e8f  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/sherpa-onnx-tts.js
+1c491271f3c145bf257b71aa9b51178883039c003ab8f16eb40a10857fcea247  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/sherpa-onnx-tts.worker.js
+555e80071d639a4e5026d473f1028eefb402786d92dbc6ef1368af2491236a6b  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/sherpa-onnx-wasm-main-tts.data
+b63b742118357973865b4adccdc800dc6b7268934b85c7f91dea66caf4efad17  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/sherpa-onnx-wasm-main-tts.js
+9fa0755d9dd5cc6cb7b5dfbb681fdafa2d46a44074431a51ccd83f93575627b3  .m02537-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/sherpa-onnx-wasm-main-tts.wasm
