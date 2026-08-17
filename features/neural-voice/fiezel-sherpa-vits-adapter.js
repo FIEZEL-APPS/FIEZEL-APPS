@@ -36,11 +36,7 @@
   // one as en-GB would be a lie the audio does not support.
   var VOICE_SIDS = Object.freeze({
     af_bella: 0,
-    af_heart: 180,
-    af_nicole: 360,
-    am_michael: 540,
-    bf_emma: 720,
-    bm_george: 903
+    af_heart: 180
   });
   var DEFAULT_VOICE = 'af_bella';
 

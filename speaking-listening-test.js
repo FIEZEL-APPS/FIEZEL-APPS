@@ -14,7 +14,8 @@ let pass=0;
 function test(name,fn){fn();pass++;console.log('PASS',name)}
 function hash(file){return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}
 const levels=['A1','A2','B1','B2','C1','C2'];
-const voices=['af_nicole','am_michael','bf_emma','bm_george'];
+// m025-31: OWNER reduced the English catalog to Bella and Heart.
+const voices=['af_bella','af_heart'];
 
 test('runtime schema',()=>assert.equal(runtime.schema,'fiezel-speaking-listening-addon-v1'));
 test('listening bank reviewed v2 seed',()=>assert.deepStrictEqual([listening.schema,listening.version,listening.status,listening.count],['fiezel-listening-bank-v1',2,'reviewed_release_seed',36]));

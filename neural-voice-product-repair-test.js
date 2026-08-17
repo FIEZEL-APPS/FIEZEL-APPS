@@ -12,7 +12,7 @@ const pass=name=>console.log(`PASS ${name}`);
 (async()=>{
   const config=require('./features/neural-voice/fiezel-neural-voice-config.js');
   // m025-26: bella leads the catalog because OWNER made it the default voice.
-  const expected=['af_bella','af_heart','af_nicole','am_michael','bf_emma','bm_george'];
+  const expected=['af_bella','af_heart'];
   assert.deepStrictEqual(config.voices.catalog.map(item=>item.id),expected);
   assert.strictEqual(config.voices.fiezelPrimary,'af_bella');
   // Voices are no longer per-file: the sherpa engine carries every speaker inside its
@@ -21,7 +21,7 @@ const pass=name=>console.log(`PASS ${name}`);
   for(const id of expected){
     assert.ok(Object.prototype.hasOwnProperty.call(sherpa.VOICE_SIDS,id),`missing speaker mapping for ${id}`);
   }
-  pass('voice catalog exposes all six bundled Kokoro voices');
+  pass('voice catalog exposes the two English voices OWNER kept');
 
   const app=read('app.js');
   assert.ok(app.includes("neuralVoice:'auto'"),'preferences must persist a neural voice choice');
@@ -43,11 +43,11 @@ const pass=name=>console.log(`PASS ${name}`);
   const prefContext={state:{preferences:{neuralVoice:'auto'}},self:{FiezelNeuralVoiceConfig:config},save:()=>{saveCalls++},showToast:()=>{}};
   prefContext.globalThis=prefContext;
   vm.createContext(prefContext);vm.runInContext(helperSource,prefContext,{filename:'app-neural-voice-helpers.js'});
-  prefContext.setNeuralVoicePreference('bf_emma');
-  assert.strictEqual(prefContext.selectedNeuralVoice(),'bf_emma');
-  assert.strictEqual(prefContext.neuralVoiceFor({voice:'am_michael'}),'bf_emma','fixed preference must override exercise-authored voice');
+  prefContext.setNeuralVoicePreference('af_heart');
+  assert.strictEqual(prefContext.selectedNeuralVoice(),'af_heart');
+  assert.strictEqual(prefContext.neuralVoiceFor({voice:'af_bella'}),'af_heart','fixed preference must override exercise-authored voice');
   prefContext.setNeuralVoicePreference('auto');
-  assert.strictEqual(prefContext.neuralVoiceFor({voice:'am_michael'}),'am_michael','auto must preserve authored listening variation');
+  assert.strictEqual(prefContext.neuralVoiceFor({voice:'af_bella'}),'af_bella','auto must preserve authored listening variation');
   prefContext.setNeuralVoicePreference('not-a-real-voice');
   assert.strictEqual(prefContext.selectedNeuralVoice(),'auto','invalid stored voice must fail closed to auto');
   assert.strictEqual(saveCalls,3,'each preference change must be persisted');
