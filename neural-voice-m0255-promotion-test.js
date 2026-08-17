@@ -50,10 +50,13 @@ assert.equal(lock.runtime.bundle.sha256,candidate.bundle.sha256,'runtime SHA mus
 assert.equal(lock.runtime.bundle.sizeBytes,candidate.bundle.sizeBytes,'runtime size must atomically equal the proven candidate');
 assert.equal(actualSha,candidate.bundle.sha256,'repository vendor must equal the proven candidate bytes');
 assert.equal(actualSize,candidate.bundle.sizeBytes,'repository vendor size must equal the proven candidate size');
-assert.ok(boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-22"),'bootstrap must use the m025-22 vendor URL');
+// m025-26: Kokoro is no longer the active engine, so the bootstrap no longer declares
+// its runtime URL. The Kokoro source-lock integrity checks above still apply to the
+// vendored bytes; what moves here is only which engine the bootstrap actually loads.
 assert.ok(!boot.includes("vendor/kokoro-js/kokoro.web.js?nv=m025-5"),'bootstrap must not retain the old m025-5 vendor URL');
-assert.ok(boot.includes("{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728}"),'bootstrap must use the exact m025-22 asset size');
+assert.ok(boot.includes("vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data"),'bootstrap must declare the active sherpa engine runtime');
 assert.ok(!sw.includes("'./vendor/kokoro-js/kokoro.web.js?nv=m025-22'"),'m025-16+ shell releases must not pre-cache the neural-owned runtime URL');
+assert.ok(!sw.includes("'./vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data'"),'shell releases must not pre-cache the neural-owned engine payload');
 assert.equal(swBuild,diagBuild,'SW and Diagnostics build identities must remain coherent');
 
 assert.equal(lock.promotion.sourceAndAssetClosure,'PASS','m025-22 source/asset closure must be machine-proven');
