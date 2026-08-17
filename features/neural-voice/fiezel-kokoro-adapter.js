@@ -58,8 +58,9 @@
 
     function runtimePolicyContext() {
       const runtime = typeof globalThis !== 'undefined' ? globalThis : {};
+      const standalone = runtime.navigator?.standalone === true || !!runtime.matchMedia?.('(display-mode: standalone)')?.matches;
       return {
-        appleStandalone: runtime.navigator?.standalone === true,
+        appleStandalone: standalone,
         isolated: runtime.crossOriginIsolated === true,
         wasm: kokoroEnv?.backends?.onnx?.wasm || null
       };
