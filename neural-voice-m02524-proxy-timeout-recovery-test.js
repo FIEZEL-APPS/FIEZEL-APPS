@@ -93,11 +93,11 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   assert.match(audibility,/Suara neural sedang bermasalah\. Audio sementara memakai suara perangkat/);
   assert.match(audibility,/phase:'fallback_notice'/);
 
-  // Release identity must advance exactly one build from m025-23.
+  // Release identity advances exactly one product build for the OWNER redesign.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-34'/);
-  assert.match(sw,/SW_REV='m025-34-universal-diagnostic-20260818-1'/);
+  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-35'/);
+  assert.match(sw,/SW_REV='m025-35-owner-classroom-ui-20260818-1'/);
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
