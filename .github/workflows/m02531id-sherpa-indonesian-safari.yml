@@ -2,7 +2,6 @@ name: m025-31id sherpa VITS Indonesian voice benchmark
 on:
   push:
     branches: [master/m02531-indonesian-voice]
-      - master/perf67-m02531id-sherpa-vits-voice-selection
   workflow_dispatch:
 
 permissions:
