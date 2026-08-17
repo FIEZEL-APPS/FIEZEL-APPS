@@ -32,6 +32,8 @@ jobs:
             "apple-standalone-single-thread-direct":"apple-standalone-single-thread-proxy-worker",
           }
           for old,new in replacements.items():
+            if new in text:
+              continue
             if old not in text:
               raise SystemExit(f'bootstrap replacement source missing: {old}')
             text=text.replace(old,new)
@@ -40,10 +42,13 @@ jobs:
           adapter=Path('features/neural-voice/fiezel-kokoro-adapter.js')
           text=adapter.read_text()
           old="wasm: kokoroEnv?.backends?.onnx?.wasm || null"
-          if old not in text:
-            raise SystemExit('adapter legacy WASM facade path missing')
-          text=text.replace(old,"wasm: kokoroEnv?.wasmEnv || null")
-          text=text.replace("readBack: false", "readBack: !!wasm")
+          new="wasm: kokoroEnv?.wasmEnv || null"
+          if new not in text:
+            if old not in text:
+              raise SystemExit('adapter WASM binding source missing')
+            text=text.replace(old,new)
+          if "readBack: !!wasm" not in text:
+            text=text.replace("readBack: false", "readBack: !!wasm")
           adapter.write_text(text)
           PY
       - name: Build pinned vendor candidate clean-room
@@ -55,24 +60,10 @@ jobs:
           set -e
           test -f .vendor-repro/kokoro.web.js
           echo "rebuild_exit=$rc"
-          # Runtime lock still points to the released m025-5 bytes at this candidate stage,
-          # so a nonzero final comparison is expected; source/build failures are caught below.
+          # Runtime lock still points to released bytes at candidate stage.
+          # A nonzero final byte comparison is expected; earlier source/build errors
+          # are distinguished because they do not leave the candidate bundle.
           test "$rc" -ne 0
-      - name: Verify actual candidate bundle exposes real WASM env
-        shell: bash
-        run: |
-          cp .vendor-repro/kokoro.web.js .vendor-repro/kokoro.web.mjs
-          node --input-type=module - <<'NODE'
-          const mod=await import(new URL('./.vendor-repro/kokoro.web.mjs', import.meta.url));
-          if(!mod.env?.wasmEnv) throw new Error('candidate missing env.wasmEnv');
-          if(!('proxy' in mod.env.wasmEnv)) throw new Error('candidate WASM env missing proxy');
-          if(!('numThreads' in mod.env.wasmEnv)) throw new Error('candidate WASM env missing numThreads');
-          mod.env.wasmEnv.proxy=true;
-          mod.env.wasmEnv.numThreads=1;
-          if(mod.env.wasmEnv.proxy!==true || Number(mod.env.wasmEnv.numThreads)!==1) throw new Error('candidate WASM env readback failed');
-          console.log('candidate real WASM env readback: PASS');
-          NODE
-          rm .vendor-repro/kokoro.web.mjs
       - name: Record candidate integrity
         shell: bash
         run: |
@@ -85,3 +76,35 @@ jobs:
           name: m025-22-proxy-candidate-${{ github.sha }}
           path: .vendor-repro/
           retention-days: 3
+      - name: Verify actual candidate bundle exposes real WASM env
+        shell: bash
+        run: |
+          cp .vendor-repro/kokoro.web.js .vendor-repro/kokoro.web.mjs
+          node --input-type=module - <<'NODE'
+          let mod;
+          try {
+            mod=await import(new URL('./.vendor-repro/kokoro.web.mjs', import.meta.url));
+          } catch (error) {
+            console.error('CANDIDATE_IMPORT_ERROR', error?.name || '', error?.message || String(error));
+            process.exit(18);
+          }
+          console.log('envKeys=' + Object.keys(mod.env || {}).join(','));
+          const descriptor=Object.getOwnPropertyDescriptor(mod.env || {}, 'wasmEnv');
+          console.log('wasmEnvDescriptor=' + Boolean(descriptor) + ',getter=' + typeof descriptor?.get);
+          let wasm;
+          try {
+            wasm=mod.env?.wasmEnv;
+          } catch (error) {
+            console.error('WASM_ENV_GETTER_ERROR', error?.name || '', error?.message || String(error));
+            process.exit(17);
+          }
+          if(!wasm || typeof wasm !== 'object') throw new Error('candidate missing env.wasmEnv object');
+          console.log('wasmKeys=' + Object.keys(wasm).join(','));
+          if(!('proxy' in wasm)) throw new Error('candidate WASM env missing proxy');
+          if(!('numThreads' in wasm)) throw new Error('candidate WASM env missing numThreads');
+          wasm.proxy=true;
+          wasm.numThreads=1;
+          if(wasm.proxy!==true || Number(wasm.numThreads)!==1) throw new Error('candidate WASM env readback failed');
+          console.log('candidate real WASM env readback: PASS');
+          NODE
+          rm .vendor-repro/kokoro.web.mjs
