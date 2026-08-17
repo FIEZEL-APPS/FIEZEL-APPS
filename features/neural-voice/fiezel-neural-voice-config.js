@@ -36,8 +36,8 @@
       sameOriginStaticAssetBootstrapAllowed: true
     }),
     voices: Object.freeze({
-      fiezelPrimary: 'af_heart',
-      fiezelAlternate: 'af_bella',
+      fiezelPrimary: 'af_bella',
+      fiezelAlternate: 'af_heart',
       listeningPool: Object.freeze(['af_nicole', 'am_michael', 'bf_emma', 'bm_george']),
       catalog: Object.freeze([
         Object.freeze({ id: 'af_heart', label: 'Heart', locale: 'en-US' }),

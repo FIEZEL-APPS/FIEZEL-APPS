@@ -79,8 +79,8 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   // Release identity must advance exactly one build from m025-23.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-24'/);
-  assert.match(sw,/SW_REV='m025-24-proxy-timeout-recovery-20260817-1'/);
+  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-25'/);
+  assert.match(sw,/SW_REV='m025-25-apple-inference-unviable-20260817-1'/);
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
