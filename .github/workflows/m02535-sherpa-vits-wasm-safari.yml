@@ -1,0 +1,342 @@
+name: m025-35 sherpa VITS WASM Safari benchmark
+
+on:
+  push:
+    branches:
+      - master/perf67-m02535-sherpa-vits-wasm
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_wasm:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Source-lock sherpa-onnx v1.13.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch v1.13.5 https://github.com/k2-fsa/sherpa-onnx.git .m02535-sherpa
+          cd .m02535-sherpa
+          test "$(git describe --tags --exact-match)" = "v1.13.5"
+          git rev-parse HEAD | tee ../m02535-sherpa-head.txt
+          git status --porcelain=v1
+
+      - name: Stage official Piper/VITS English model
+        shell: bash
+        run: |
+          set -euo pipefail
+          MODEL='vits-piper-en_US-libritts_r-medium'
+          URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/${MODEL}.tar.bz2"
+          curl --fail --location --retry 3 --retry-all-errors --output "${MODEL}.tar.bz2" "$URL"
+          shasum -a 256 "${MODEL}.tar.bz2" | tee m02535-model-tar-sha256.txt
+          stat --printf='%s\n' "${MODEL}.tar.bz2" | tee m02535-model-tar-size.txt
+          tar xf "${MODEL}.tar.bz2"
+          test -s "${MODEL}/en_US-libritts_r-medium.onnx"
+          test -s "${MODEL}/tokens.txt"
+          test -d "${MODEL}/espeak-ng-data"
+          rm -rf .m02535-sherpa/wasm/tts/assets/*
+          mv "${MODEL}/en_US-libritts_r-medium.onnx" .m02535-sherpa/wasm/tts/assets/model.onnx
+          mv "${MODEL}/tokens.txt" .m02535-sherpa/wasm/tts/assets/tokens.txt
+          mv "${MODEL}/espeak-ng-data" .m02535-sherpa/wasm/tts/assets/espeak-ng-data
+          shasum -a 256 .m02535-sherpa/wasm/tts/assets/model.onnx | tee m02535-model-onnx-sha256.txt
+          stat --printf='%s\n' .m02535-sherpa/wasm/tts/assets/model.onnx | tee m02535-model-onnx-size.txt
+          printf '%s\n' "$MODEL" | tee m02535-model-name.txt
+
+      - name: Install pinned Emscripten 4.0.23
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 4.0.23 https://github.com/emscripten-core/emsdk.git .m02535-emsdk
+          cd .m02535-emsdk
+          ./emsdk install 4.0.23
+          ./emsdk activate 4.0.23
+          source ./emsdk_env.sh
+          emcc --version | tee ../m02535-emcc-version.txt
+
+      - name: Build sherpa-onnx WASM TTS
+        shell: bash
+        run: |
+          set -euo pipefail
+          source .m02535-emsdk/emsdk_env.sh
+          cd .m02535-sherpa
+          ./build-wasm-simd-tts.sh
+          cd "$GITHUB_WORKSPACE"
+          OUT='.m02535-sherpa/build-wasm-simd-tts/install/bin/wasm/tts'
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.js"
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.wasm"
+          test -s "$OUT/sherpa-onnx-wasm-main-tts.data"
+          test -s "$OUT/sherpa-onnx-tts.worker.js"
+          du -sk "$OUT" | tee m02535-runtime-kib.txt
+          find "$OUT" -maxdepth 1 -type f -print0 | sort -z | xargs -0 shasum -a 256 | tee m02535-runtime-sha256.txt
+
+      - name: Package benchmark substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p m02535-bundle/provenance
+          cp -R .m02535-sherpa/build-wasm-simd-tts/install/bin/wasm/tts/. m02535-bundle/
+          cp m02535-sherpa-head.txt m02535-model-name.txt m02535-model-tar-sha256.txt m02535-model-tar-size.txt m02535-model-onnx-sha256.txt m02535-model-onnx-size.txt m02535-emcc-version.txt m02535-runtime-kib.txt m02535-runtime-sha256.txt m02535-bundle/provenance/
+          find m02535-bundle -maxdepth 2 -type f -printf '%P %s\n' | sort | tee m02535-bundle/provenance/file-sizes.txt
+
+      - name: Upload built WASM substrate
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02535-sherpa-wasm-substrate-${{ github.sha }}
+          path: m02535-bundle
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 1
+
+  safari26:
+    needs: build_wasm
+    runs-on: macos-26
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Record Apple Safari substrate
+        shell: bash
+        run: |
+          set -euo pipefail
+          sw_vers | tee m02535-sw-vers.txt
+          /usr/bin/safaridriver --version | tee m02535-safaridriver-version.txt
+          arch="$(/usr/bin/arch)"
+          echo "$arch" | tee m02535-arch.txt
+          test "$arch" = arm64
+
+      - name: Download exact built WASM substrate
+        uses: actions/download-artifact@v4
+        with:
+          name: m02535-sherpa-wasm-substrate-${{ github.sha }}
+          path: m02535-bundle
+
+      - name: Create worker benchmark page
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > m02535-bundle/bench.html <<'HTML'
+          <!doctype html>
+          <meta charset="utf-8">
+          <title>m025-35 sherpa VITS WASM worker benchmark</title>
+          <script>
+          (() => {
+            const started = performance.now();
+            const result = {
+              success: false,
+              architecture: 'sherpa-onnx-v1.13.5-vits-piper-wasm-worker',
+              backend: 'wasm-simd-worker',
+              streaming: false,
+              userAgent: navigator.userAgent,
+              crossOriginIsolated: self.crossOriginIsolated === true,
+              workerAvailable: typeof Worker === 'function',
+              generations: [],
+              events: []
+            };
+            window.__benchStatus = 'boot';
+            window.__benchResult = null;
+
+            let lastTick = performance.now();
+            let maxTickDriftMs = 0;
+            let tickCount = 0;
+            const tick = setInterval(() => {
+              const now = performance.now();
+              const drift = Math.max(0, now - lastTick - 100);
+              if (drift > maxTickDriftMs) maxTickDriftMs = drift;
+              lastTick = now;
+              tickCount++;
+            }, 100);
+
+            const cleanError = e => ({
+              name: String(e && e.name || 'Error'),
+              message: String(e && e.message || e || ''),
+              stack: String(e && e.stack || '')
+            });
+            const finish = (ok, error) => {
+              clearInterval(tick);
+              result.success = !!ok;
+              result.totalMs = Math.round(performance.now() - started);
+              result.eventLoop = { maxTickDriftMs: Math.round(maxTickDriftMs), tickCount };
+              if (error) result.error = cleanError(error);
+              window.__benchStatus = ok ? 'done' : 'error';
+              window.__benchResult = result;
+            };
+            const timeout = (promise, ms, label) => Promise.race([
+              promise,
+              new Promise((_, reject) => setTimeout(() => reject(new Error(label + ' timeout after ' + ms + 'ms')), ms))
+            ]);
+            const analyze = (samples, sampleRate, generationMs) => {
+              let finiteCount = 0;
+              let nonFiniteCount = 0;
+              let peak = 0;
+              let sumSq = 0;
+              for (let i = 0; i < samples.length; i++) {
+                const v = Number(samples[i]);
+                if (!Number.isFinite(v)) { nonFiniteCount++; continue; }
+                finiteCount++;
+                const a = Math.abs(v);
+                if (a > peak) peak = a;
+                sumSq += v * v;
+              }
+              const durationSec = sampleRate > 0 ? samples.length / sampleRate : 0;
+              const rms = finiteCount ? Math.sqrt(sumSq / finiteCount) : 0;
+              return {
+                generationMs: Math.round(generationMs),
+                sampleRate: Number(sampleRate),
+                sampleCount: samples.length,
+                durationSec: Math.round(durationSec * 1000) / 1000,
+                realtimeFactor: durationSec > 0 ? Math.round((generationMs / 1000 / durationSec) * 1000) / 1000 : null,
+                finiteCount,
+                nonFiniteCount,
+                peak: Math.round(peak * 1e6) / 1e6,
+                rms: Math.round(rms * 1e6) / 1e6
+              };
+            };
+
+            (async () => {
+              if (typeof Worker !== 'function') throw new Error('Worker unavailable');
+              window.__benchStatus = 'worker-start';
+              const worker = new Worker('sherpa-onnx-tts.worker.js');
+              let readyResolve, readyReject;
+              const readyPromise = new Promise((resolve, reject) => { readyResolve = resolve; readyReject = reject; });
+              let pending = null;
+
+              worker.onerror = e => {
+                const err = new Error('worker error: ' + String(e.message || 'unknown'));
+                result.events.push({type:'worker-error', message:err.message, atMs:Math.round(performance.now()-started)});
+                if (pending) { const p = pending; pending = null; p.reject(err); }
+                else readyReject(err);
+              };
+              worker.onmessage = e => {
+                const d = e.data || {};
+                if (d.type === 'sherpa-onnx-tts-progress') {
+                  result.events.push({type:'runtime-progress', status:String(d.status || ''), atMs:Math.round(performance.now()-started)});
+                  return;
+                }
+                if (d.type === 'sherpa-onnx-tts-generation-progress') {
+                  result.events.push({type:'generation-progress', progress:Number(d.progress || 0), atMs:Math.round(performance.now()-started)});
+                  return;
+                }
+                if (d.type === 'sherpa-onnx-tts-ready') {
+                  result.readyMs = Math.round(performance.now() - started);
+                  result.modelType = Number(d.modelType);
+                  result.numSpeakers = Number(d.numSpeakers);
+                  readyResolve();
+                  return;
+                }
+                if (d.type === 'error') {
+                  const err = new Error(String(d.message || 'worker reported error'));
+                  if (pending) { const p = pending; pending = null; p.reject(err); }
+                  else readyReject(err);
+                  return;
+                }
+                if (d.type === 'sherpa-onnx-tts-result' && pending) {
+                  const p = pending;
+                  pending = null;
+                  p.resolve(d);
+                }
+              };
+
+              await timeout(readyPromise, 180000, 'worker ready');
+              window.__benchStatus = 'ready';
+
+              const texts = [
+                'Local neural speech benchmark for responsive audio.',
+                'Local neural speech benchmark for responsive audio.',
+                'Local neural speech benchmark for responsive audio.'
+              ];
+              for (let i = 0; i < texts.length; i++) {
+                window.__benchStatus = 'generate-' + (i + 1);
+                const t0 = performance.now();
+                const audio = await timeout(new Promise((resolve, reject) => {
+                  if (pending) return reject(new Error('duplicate pending generation'));
+                  pending = {resolve, reject};
+                  worker.postMessage({type:'generate', text:texts[i], sid:0, speed:1.0});
+                }), 180000, 'generation ' + (i + 1));
+                const m = analyze(audio.samples, audio.sampleRate, performance.now() - t0);
+                m.index = i + 1;
+                m.textLength = texts[i].length;
+                result.generations.push(m);
+                if (m.nonFiniteCount !== 0) throw new Error('non-finite audio at generation ' + (i + 1));
+                if (!(m.sampleRate > 0 && m.sampleCount > m.sampleRate * 0.2)) throw new Error('empty/short audio at generation ' + (i + 1));
+                if (!(m.peak > 0.0001 && m.rms > 0.00001)) throw new Error('silent audio at generation ' + (i + 1));
+                if (!(m.durationSec > 0.2 && m.durationSec < 30)) throw new Error('implausible audio duration at generation ' + (i + 1));
+              }
+              const warm = result.generations.slice(1).map(x => x.generationMs).sort((a,b)=>a-b);
+              result.firstGenerationMs = result.generations[0].generationMs;
+              result.warmMedianMs = warm.length === 2 ? Math.round((warm[0] + warm[1]) / 2) : warm[0];
+              result.worstRealtimeFactor = Math.max(...result.generations.map(x => x.realtimeFactor || Infinity));
+              result.performanceClass = result.warmMedianMs < 10000 ? 'BEATS_SAME_FAMILY_WARM_ENVELOPE' : 'NO_MATERIAL_WARM_LATENCY_GAIN';
+              worker.terminate();
+              finish(true);
+            })().catch(err => finish(false, err));
+          })();
+          </script>
+          HTML
+
+      - name: Start local server and SafariDriver
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd m02535-bundle
+          python3 -u -m http.server 8000 --bind 127.0.0.1 >/tmp/m02535-http.log 2>&1 &
+          cd "$GITHUB_WORKSPACE"
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8000/bench.html >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:8000/bench.html >/dev/null
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 >/tmp/m02535-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02535-status.json 2>/dev/null && break; sleep 1; done
+          cat /tmp/m02535-status.json
+
+      - name: Run Safari worker TTS benchmark
+        shell: bash
+        run: |
+          set -euo pipefail
+          sj="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+          sid="$(echo "$sj" | jq -r '.value.sessionId // .sessionId // empty')"
+          test -n "$sid"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/bench.html"}' "http://127.0.0.1:4444/session/$sid/url" >/dev/null
+          result=''
+          for i in {1..720}; do
+            resp="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return {status:window.__benchStatus||null,result:window.__benchResult||null};","args":[]}' "http://127.0.0.1:4444/session/$sid/execute/sync" 2>/dev/null || true)"
+            status="$(echo "$resp" | jq -r '.value.status // empty' 2>/dev/null || true)"
+            printf '%s\n' "$status" > m02535-last-status.txt
+            result="$(echo "$resp" | jq -c '.value.result // empty' 2>/dev/null || true)"
+            [ -n "$result" ] && [ "$result" != null ] && break
+            sleep 1
+          done
+          curl -sS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
+          if [ -z "$result" ]; then
+            result='{"success":false,"architecture":"sherpa-onnx-v1.13.5-vits-piper-wasm-worker","error":{"name":"Timeout","message":"no terminal benchmark result within 720s"}}'
+          fi
+          echo "$result" | jq . | tee m02535-result.json
+          echo "success=$(echo "$result" | jq -r '.success')"
+          echo "ready_ms=$(echo "$result" | jq -r '.readyMs // null')"
+          echo "first_generation_ms=$(echo "$result" | jq -r '.firstGenerationMs // null')"
+          echo "warm_median_ms=$(echo "$result" | jq -r '.warmMedianMs // null')"
+          echo "worst_rtf=$(echo "$result" | jq -r '.worstRealtimeFactor // null')"
+          echo "performance_class=$(echo "$result" | jq -r '.performanceClass // null')"
+          echo "event_loop_max_drift_ms=$(echo "$result" | jq -r '.eventLoop.maxTickDriftMs // null')"
+          test "$(echo "$result" | jq -r '.success')" = true
+
+      - name: Preserve benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02535-sherpa-vits-safari-${{ github.sha }}
+          path: |
+            m02535-result.json
+            m02535-last-status.txt
+            m02535-sw-vers.txt
+            m02535-safaridriver-version.txt
+            m02535-arch.txt
+            m02535-bundle/provenance
+            /tmp/m02535-http.log
+            /tmp/m02535-safaridriver.log
+            /tmp/m02535-status.json
+          if-no-files-found: warn
+          retention-days: 30
