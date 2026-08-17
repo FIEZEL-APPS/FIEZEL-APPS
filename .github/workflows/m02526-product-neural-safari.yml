@@ -91,6 +91,15 @@ jobs:
               await speak('warm-2','A second sentence to confirm stable warm latency.');
               const after=rt.status();
               r.circuitOpen=after.circuitOpen;r.lastFallbackReason=after.lastFallbackReason;r.readyAfter=after.ready;
+              // Direct proof of download-once: sum bytes actually pulled over the network
+              // for the engine payload this visit. A timing ratio only hints; transferSize
+              // states it. A cache-served asset reports transferSize 0.
+              try{
+                const eng=performance.getEntriesByType('resource').filter(e=>e.name.indexOf('/vendor/sherpa-vits/')!==-1);
+                r.engineRequests=eng.length;
+                r.engineTransferBytes=eng.reduce((s,e)=>s+(Number(e.transferSize)||0),0);
+                r.engineDecodedBytes=eng.reduce((s,e)=>s+(Number(e.decodedBodySize)||0),0);
+              }catch(_){r.engineTransferBytes=null}
               finish(true);
             })().catch(e=>finish(false,e));
           })();
@@ -151,10 +160,13 @@ jobs:
           # download-once: second visit must not re-run the download path
           jq -e '.prepared==true and .storage=="cache"' m02526-run2.json >/dev/null
           r1="$(jq -r '.prepareMs' m02526-run1.json)"; r2="$(jq -r '.prepareMs' m02526-run2.json)"
-          echo "prepareMs cold=$r1 cached=$r2"
-          # A cached prepare is a verification pass, not a 100MB fetch. Require it to be
-          # both far faster than the cold download and fast in absolute terms.
-          jq -e --argjson a "$r1" --argjson b "$r2" -n '$b < ($a/4) and $b < 20000' >/dev/null
+          b1="$(jq -r '.engineTransferBytes' m02526-run1.json)"; b2="$(jq -r '.engineTransferBytes' m02526-run2.json)"
+          echo "prepareMs cold=$r1 cached=$r2 | engine bytes over network: cold=$b1 cached=$b2"
+          # The decisive check is bytes, not milliseconds. The first visit must actually
+          # pull the ~110MB engine; the second must pull essentially nothing because the
+          # payload is served from the stable neural cache.
+          jq -e '.engineTransferBytes > 90000000' m02526-run1.json >/dev/null
+          jq -e '.engineTransferBytes < 1000000' m02526-run2.json >/dev/null
           echo "ALL OWNER ACCEPTANCE PROPERTIES PASS"
 
       - name: Upload product neural evidence
