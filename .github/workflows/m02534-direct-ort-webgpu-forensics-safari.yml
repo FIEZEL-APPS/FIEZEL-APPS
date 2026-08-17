@@ -114,7 +114,7 @@ jobs:
             try{ort.env.debug=true}catch{}
             try{ort.env.wasm.numThreads=1}catch{}
             try{ort.env.wasm.proxy=false}catch{}
-            try{ort.env.wasm.wasmPaths='./.m02534/runtime/ort-dist/'}catch{}
+            try{ort.env.wasm.wasmPaths=location.origin+'/.m02534/runtime/ort-dist/'}catch{}
 
             window.__benchStatus='session-create';
             const t0=performance.now();
