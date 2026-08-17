@@ -1,0 +1,96 @@
+name: m025-29 chunk scaling Safari
+
+on:
+  push:
+    branches:
+      - master/perf67-m02529-chunk-scaling
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safari26:
+    runs-on: macos-26
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Record Apple runner
+        run: |
+          set -euo pipefail
+          sw_vers
+          /usr/bin/safaridriver --version
+          /usr/bin/arch
+      - name: Create benchmark page
+        run: |
+          cat > .m02529-bench.html <<'HTML'
+          <!doctype html><meta charset="utf-8"><title>m025-29 scaling</title>
+          <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script type="module">
+          const events=[]; window.__benchResult=null; window.__benchStatus='boot';
+          const finish=x=>{window.__benchResult=x;window.__benchStatus=x.success?'done':'error'};
+          const cases=[
+            'Hi there today.',
+            'The learner explains it.',
+            'The learner explains one clear idea.',
+            'The learner explains one clear idea with evidence.',
+            'The learner explains the main idea clearly and gives one example.',
+            'The learner explains the main idea clearly and supports it with one useful example.'
+          ];
+          try{
+            const mod=await import('./vendor/kokoro-js/kokoro.web.js?nv=m025-22');
+            mod.env.wasmEnv.numThreads=1; mod.env.wasmEnv.proxy=true;
+            const runtime={navigator:{standalone:true,gpu:navigator.gpu||null},crossOriginIsolated:false,matchMedia(){return{matches:true}}};
+            const adapter=FiezelKokoroAdapter.createKokoroAdapter({KokoroTTS:mod.KokoroTTS,kokoroEnv:mod.env,setVoiceDataUrl:mod.setVoiceDataUrl,
+              modelId:'kokoro-model',localModelPath:'./vendor/',voiceBaseUrl:'./vendor/kokoro-model/voices',wasmBasePath:location.origin+'/vendor/kokoro-js/wasm/',runtimeOrigin:location.origin,
+              runtime,dtype:'q8',device:'wasm',onStage:e=>events.push({t:Date.now(),...e})});
+            const i0=performance.now(); await adapter.initialize(); const initMs=Math.round(performance.now()-i0);
+            const rows=[];
+            for(const text of cases){
+              window.__benchStatus='case-'+text.length;
+              const before=events.length,t0=performance.now();
+              const out=await adapter.generate(text,{voice:'af_heart',speed:1});
+              const slice=events.slice(before);
+              rows.push({chars:text.length,elapsedMs:Math.round(performance.now()-t0),modelMs:slice.find(e=>e.phase==='adapter_model_resolved')?.elapsedMs??null,
+                tokenCount:slice.find(e=>e.phase==='adapter_tokenizer_resolved')?.tokenCount??null,samples:out?.audio?.length??out?.data?.length??null});
+            }
+            finish({success:true,userAgent:navigator.userAgent,initMs,rows,backend:adapter.getBackendState(),artifact:events.filter(e=>e.phase==='wasm_artifact_variant'),policy:events.filter(e=>e.phase==='wasm_policy')});
+          }catch(error){finish({success:false,status:window.__benchStatus,error:String(error?.stack||error),events});}
+          </script>
+          HTML
+      - name: Start server and SafariDriver
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/m02529-http.log 2>&1 &
+          sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
+          /usr/bin/safaridriver --port 4444 >/tmp/m02529-safaridriver.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02529-status.json 2>/dev/null && break; sleep 1; done
+      - name: Run scaling profile
+        run: |
+          set -euo pipefail
+          SJ="$(curl -fsS -H 'Content-Type: application/json' -d '{"capabilities":{"alwaysMatch":{"browserName":"safari"}}}' http://127.0.0.1:4444/session)"
+          SID="$(echo "$SJ"|jq -r '.value.sessionId // .sessionId // empty')"; test -n "$SID"
+          curl -fsS -H 'Content-Type: application/json' -d '{"url":"http://127.0.0.1:8000/.m02529-bench.html"}' "http://127.0.0.1:4444/session/$SID/url" >/dev/null
+          RESULT=''
+          for i in {1..240}; do
+            RESP="$(curl -fsS -H 'Content-Type: application/json' -d '{"script":"return window.__benchResult||null;","args":[]}' "http://127.0.0.1:4444/session/$SID/execute/sync" 2>/dev/null || true)"
+            RESULT="$(echo "$RESP"|jq -c '.value // empty' 2>/dev/null || true)"
+            [ -n "$RESULT" ] && [ "$RESULT" != null ] && break
+            sleep 1
+          done
+          curl -sS -X DELETE "http://127.0.0.1:4444/session/$SID" >/dev/null || true
+          test -n "$RESULT"
+          echo "$RESULT"|jq .|tee m02529-scaling.json
+          test "$(echo "$RESULT"|jq -r '.success')" = true
+          jq -e '.rows | length == 6' m02529-scaling.json >/dev/null
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m02529-chunk-scaling-${{ github.sha }}
+          path: |
+            m02529-scaling.json
+            /tmp/m02529-http.log
+            /tmp/m02529-safaridriver.log
+          if-no-files-found: warn
+          retention-days: 30
