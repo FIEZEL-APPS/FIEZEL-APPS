@@ -84,5 +84,6 @@ jobs:
           node neural-voice-m02532-indonesian-optional-test.js
           node classroom-test.js
           node diagnostic-scanner-test.js
+          node reminder-struggle-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
