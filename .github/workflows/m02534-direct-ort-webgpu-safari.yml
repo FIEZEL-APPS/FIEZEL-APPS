@@ -78,12 +78,20 @@ jobs:
           const events=[];
           const now=()=>Math.round(performance.now());
           const cleanError=e=>({name:String(e?.name||'Error'),message:String(e?.message||e||''),stack:String(e?.stack||'')});
+          const markStage=async name=>{
+            window.__benchStatus=name;
+            try {
+              await fetch('/.m02534-stage?name='+encodeURIComponent(name)+'&t='+Date.now(),{cache:'no-store'});
+            } catch(e) {
+              events.push({kind:'stage-beacon-error',t:now(),stage:name,error:cleanError(e)});
+            }
+          };
           const finish=x=>{window.__benchResult=x;window.__benchStatus=x.success?'done':'error'};
           addEventListener('error',e=>events.push({kind:'window-error',t:now(),message:String(e.message||''),error:cleanError(e.error)}));
           addEventListener('unhandledrejection',e=>events.push({kind:'unhandledrejection',t:now(),error:cleanError(e.reason)}));
           const result={success:false,userAgent:navigator.userAgent,secureContext:isSecureContext,gpuAvailable:!!navigator.gpu,events};
           try {
-            window.__benchStatus='request-adapter';
+            await markStage('request-adapter');
             if(!navigator.gpu) throw new Error('navigator.gpu unavailable');
             const a0=performance.now();
             const adapter=await navigator.gpu.requestAdapter();
@@ -97,7 +105,7 @@ jobs:
             result.adapterFeatures=Array.from(adapter.features||[]).map(String).sort();
             result.adapterLimits={maxBufferSize:Number(adapter.limits?.maxBufferSize||0),maxStorageBufferBindingSize:Number(adapter.limits?.maxStorageBufferBindingSize||0)};
 
-            window.__benchStatus='request-device';
+            await markStage('request-device');
             const d0=performance.now();
             const device=await adapter.requestDevice();
             result.deviceMs=Math.round(performance.now()-d0);
@@ -110,7 +118,7 @@ jobs:
               device.lost.then(info=>events.push({kind:'gpu-device-lost',t:now(),reason:String(info?.reason||''),message:String(info?.message||'')}));
             }
 
-            window.__benchStatus='import-ort';
+            await markStage('import-ort');
             const mod=await import('./.m02534/runtime/ort.webgpu.mjs?exact=1.26.0-dev.20260416-b7804b056c');
             const ort=(mod.default&&mod.default.InferenceSession)?mod.default:mod;
             if(!ort?.InferenceSession) throw new Error('ORT InferenceSession export missing');
@@ -121,7 +129,7 @@ jobs:
             }
             result.ortExports=Object.keys(ort).sort();
 
-            window.__benchStatus='ort-session-create';
+            await markStage('ort-session-create');
             const s0=performance.now();
             const session=await ort.InferenceSession.create('./vendor/kokoro-model/onnx/model.onnx',{
               executionProviders:['webgpu'],
@@ -133,11 +141,13 @@ jobs:
             result.success=true;
             result.boundary='DIRECT_ORT_WEBGPU_SESSION_PASS';
             result.status='session-created';
+            await markStage('session-created');
             finish(result);
           } catch(error) {
             result.error=cleanError(error);
             result.status=window.__benchStatus;
             result.boundary='DIRECT_ORT_WEBGPU_SESSION_FAIL';
+            try { await markStage('caught-error'); } catch (_) {}
             finish(result);
           }
           </script>
@@ -147,7 +157,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/m02534-http.log 2>&1 &
+          python3 -u -m http.server 8000 --bind 127.0.0.1 >/tmp/m02534-http.log 2>&1 &
+          for i in {1..30}; do curl -fsS http://127.0.0.1:8000/.m02534-direct-ort.html >/dev/null 2>&1 && break; sleep 1; done
+          curl -fsS http://127.0.0.1:8000/.m02534-direct-ort.html >/dev/null
           sudo /usr/bin/safaridriver --enable || /usr/bin/safaridriver --enable || true
           /usr/bin/safaridriver --port 4444 >/tmp/m02534-safaridriver.log 2>&1 &
           for i in {1..30}; do curl -fsS http://127.0.0.1:4444/status >/tmp/m02534-status.json 2>/dev/null && break; sleep 1; done
@@ -171,11 +183,13 @@ jobs:
           done
           curl -sS -X DELETE "http://127.0.0.1:4444/session/$sid" >/dev/null || true
           if [ -z "$result" ]; then
-            result='{"success":false,"boundary":"DIRECT_ORT_WEBGPU_NO_TERMINAL_RESULT","error":{"name":"Timeout","message":"no terminal result within 180s"}}'
+            stage="$(grep -Eo 'GET /\.m02534-stage\?name=[^& ]+' /tmp/m02534-http.log | tail -1 | sed -E 's/.*name=//' || true)"
+            result="$(jq -cn --arg stage "$stage" '{success:false,boundary:"DIRECT_ORT_WEBGPU_NO_TERMINAL_RESULT",observedStage:(if $stage=="" then null else $stage end),error:{name:"Timeout",message:"no terminal result within 180s"}}')"
           fi
           echo "$result" | jq . | tee m02534-direct-ort-result.json
           echo "boundary=$(echo "$result"|jq -r '.boundary')"
-          echo "gpu_available=$(echo "$result"|jq -r '.gpuAvailable // false')"
+          echo "observed_stage=$(echo "$result"|jq -r '.observedStage // .status // null')"
+          echo "gpu_available=$(echo "$result"|jq -r '.gpuAvailable // null')"
           echo "adapter_ms=$(echo "$result"|jq -r '.adapterMs // null')"
           echo "device_ms=$(echo "$result"|jq -r '.deviceMs // null')"
           echo "session_create_ms=$(echo "$result"|jq -r '.sessionCreateMs // null')"
