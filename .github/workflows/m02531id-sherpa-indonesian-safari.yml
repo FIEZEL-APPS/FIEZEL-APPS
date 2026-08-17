@@ -49,7 +49,11 @@ jobs:
           cp "${MODEL}/id_ID-news_tts-medium.onnx" .m02531id-sherpa/wasm/tts/assets/model.onnx
           cp "${MODEL}/tokens.txt" .m02531id-sherpa/wasm/tts/assets/tokens.txt
           cp -R "${MODEL}/espeak-ng-data" .m02531id-sherpa/wasm/tts/assets/espeak-ng-data
+          # Observed on the first successful build (run 32070723011) and pinned here, so a
+          # silently reissued release cannot change the model underneath us.
+          EXPECTED_ONNX='3c2e55d7b8485b9c132383f07e6fc6807b54ed8d6f4a8f54d1d4d4740d2b54ff'
           ACTUAL_ONNX="$(shasum -a 256 .m02531id-sherpa/wasm/tts/assets/model.onnx | awk '{print $1}')"
+          test "$ACTUAL_ONNX" = "$EXPECTED_ONNX"
           printf '%s  model.onnx\n' "$ACTUAL_ONNX" | tee m02531id-model-onnx-sha256.txt
           stat --printf='%s\n' .m02531id-sherpa/wasm/tts/assets/model.onnx | tee m02531id-model-onnx-size.txt
           printf '%s\n' "$MODEL" | tee m02531id-model-name.txt
