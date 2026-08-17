@@ -51,7 +51,10 @@ function fakeTts(generateCalls) {
   assert.ok(bootstrap.includes("wasmEnv.proxy=true"), 'Apple standalone bootstrap must enable ORT proxy before Kokoro session creation');
   assert.ok(bootstrap.includes("wasmEnv.numThreads=1"), 'Apple standalone bootstrap must keep single-thread WASM before Kokoro session creation');
   assert.ok(bootstrap.includes("kokoro.web.js?nv=m025-22"), 'm025-22 must use a fresh vendor URL so the stable neural cache cannot serve the old m025-5 bundle');
-  assert.ok(bootstrap.includes("{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728}"), 'bootstrap asset contract must match exact m025-22 vendor bytes');
+  // m025-26: the Kokoro proxy policy above is retained for the non-sherpa path, but the
+  // download manifest now carries the active sherpa engine, so the Kokoro bundle is no
+  // longer a declared asset. Pin the active engine payload instead.
+  assert.ok(bootstrap.includes("{path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data',bytes:96522474}"), 'bootstrap asset contract must match exact sherpa engine payload bytes');
   assert.ok(bootstrap.includes("throw new Error('Apple neural WASM proxy policy did not apply')"), 'Apple standalone must fail closed when proxy readback is false');
   assert.ok(bootstrap.includes("readBack:true"), 'bootstrap diagnostics must record real proxy readback');
 
