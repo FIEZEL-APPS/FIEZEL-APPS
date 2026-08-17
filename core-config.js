@@ -2,6 +2,11 @@
  * workerUrl remains empty in distributable source until an operator-owned Puter Worker is deployed.
  * Never put VAPID private keys, cron tokens, or Puter auth tokens here.
  */
+// m025-34: the mandatory notification gate reads this flag. The gate UI and lock
+// logic already existed but the flag was never set outside tests, so the gate rendered
+// and then let everyone through. OWNER requires it enforced: no entry until the browser
+// permission is actually 'granted'.
+self.FIEZEL_REQUIRE_NOTIFICATIONS=true;
 self.FIEZEL_CORE_CONFIG=Object.freeze({
   workerUrl:'https://fiezel-core.puter.work',
   protocolVersion:'1.7',

@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-33';
+  var DIAG_BUILD = 'm025-34';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -275,11 +275,24 @@
     close.type = 'button';
     close.textContent = 'Tutup';
 
+    // m025-34: per-module badges so the user sees which module is broken without
+    // reading raw JSON, and a plain-text summary they can paste straight into a chat.
+    var badges = root.document.createElement('div');
+    badges.id = 'fiezelDiagBadges';
+    badges.style.cssText = 'margin:2px 0;line-height:1.9;';
+    badges.textContent = 'Menjalankan scan modul…';
+
+    var copySummary = root.document.createElement('button');
+    copySummary.type = 'button';
+    copySummary.textContent = 'Copy ringkasan';
+
+    bar.appendChild(copySummary);
     bar.appendChild(send);
     bar.appendChild(sendTarget);
     bar.appendChild(close);
     sheet.appendChild(heading);
     sheet.appendChild(note);
+    sheet.appendChild(badges);
     sheet.appendChild(searchBar);
     sheet.appendChild(text);
     sheet.appendChild(bar);
@@ -290,7 +303,8 @@
     return {
       host: host, open: open, sheet: sheet, text: text,
       search: search, searchCount: searchCount, previous: previous, next: next,
-      send: send, sendTarget: sendTarget, close: close
+      send: send, sendTarget: sendTarget, close: close,
+      badges: badges, copySummary: copySummary
     };
   }
 
@@ -368,11 +382,45 @@
       refreshSearch();
     }
 
+    // m025-34: the button now scans every module, not just Neural Voice. The scan is
+    // additive -- the existing TTS payload is preserved so older evidence stays readable.
+    function runUniversalScan() {
+      var bus = root.FiezelDiagnosticBus;
+      if (!bus) { dump.universal = { error: 'diagnostic bus tidak tersedia' }; return Promise.resolve(); }
+      return bus.getFullReport({
+        diagBuild: DIAG_BUILD,
+        appVersion: String(root.FIEZEL_VERSION || ''),
+        standalone: dump.standalone,
+        userAgent: dump.userAgent
+      }).then(function(report){
+        dump.universal = report;
+        dump.universalSummary = bus.summaryText(report);
+        renderBadges(report);
+      }).catch(function(error){
+        dump.universal = { error: String(error && error.message || error) };
+      });
+    }
+
+    function renderBadges(report) {
+      if (!ui.badges) return;
+      var health = report.moduleHealth || {};
+      var keys = Object.keys(health).sort();
+      if (!keys.length) { ui.badges.textContent = 'Tidak ada modul terdaftar.'; return; }
+      ui.badges.innerHTML = keys.map(function(key){
+        var st = health[key].status;
+        var color = st === 'pass' ? '#1f9d6f' : st === 'warn' ? '#c98a1b' : st === 'skip' ? '#748096' : '#e0526f';
+        var label = st === 'pass' ? 'OK' : st === 'warn' ? 'WARN' : st === 'skip' ? 'SKIP' : 'FAIL';
+        return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 8px;border-radius:999px;'
+          + 'background:' + color + ';color:#fff;font:600 11px/1.4 -apple-system,system-ui,sans-serif;">'
+          + label + ' ' + key + '</span>';
+      }).join('');
+    }
+
     function refresh() {
       dump = collectSync();
       addRuntimeDiagnostics(dump);
       setText();
-      Promise.all([addStorageEstimate(dump), addCacheInventory(dump)]).then(function(){
+      Promise.all([addStorageEstimate(dump), addCacheInventory(dump), runUniversalScan()]).then(function(){
         setText();
       });
     }
@@ -394,6 +442,11 @@
     ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
     ui.send.addEventListener('click', function(){
       share(ui.send, 'Kirim', ui.text.value);
+    });
+    ui.copySummary.addEventListener('click', function(){
+      // Human-readable digest, not JSON: this is the paste-into-chat path.
+      var text = dump.universalSummary || 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.';
+      copy(ui.copySummary, function(label){ ui.copySummary.textContent = label; setTimeout(function(){ ui.copySummary.textContent = 'Copy ringkasan'; }, 1800); }, text);
     });
     ui.sendTarget.addEventListener('click', function(){
       var slim = {
