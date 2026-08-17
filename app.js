@@ -96,7 +96,7 @@ const REMINDER_TITLES={
 };
 const REMINDER_MESSAGES={
   struggling:[
-    'Salah beberapa kali berturut-turut itu tanda materinya belum nempel, bukan tanda lu bodoh. Ulang topiknya pelan-pelan.',
+    'Salah beberapa kali berturut-turut itu tanda materinya belum nempel. Ulang topiknya pelan-pelan, jangan dikebut.',
     'Jahran, berhenti nebak. Balik ke penjelasan dulu, baru lanjut soal.',
     'Pola salahnya keliatan di satu skill. Kita bedah topik itu dulu, jangan lanjut ngebut.'
   ],
