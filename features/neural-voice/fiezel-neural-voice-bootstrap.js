@@ -13,6 +13,26 @@
   const NEURAL_GENERATION_TIMEOUT_MS=Number(root.FIEZEL_GENERATION_TIMEOUT_MS)||Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
+  // m025-25: Apple standalone WASM Kokoro inference is evidence-blocked.
+  // Physical m025-24 capture (2026-08-17T16:40:43Z, Safari 26.5 standalone) recorded three
+  // consecutive WebKit content-process terminations during adapter_model_dispatched: zero
+  // speak_neural_success, no generate_timeout, no circuit latch, and a fresh document load
+  // (pageshow persisted:false) 19-42s after dispatch. A 49-char chunk never completed within
+  // the 30s soft budget. The m025-24 timeout/circuit repair behaves correctly and is simply
+  // not the failure mode -- the process dies before any JS-side policy can run, so no timeout,
+  // chunk, or circuit tuning can reach it. Dispatching again just reproduces the blackout and
+  // reload loop, so refuse the dispatch and degrade explicitly and visibly instead.
+  const APPLE_INFERENCE_BLOCK_POLICY='apple-wasm-inference-unviable-v1';
+  const APPLE_INFERENCE_BLOCK_REASON='apple_wasm_inference_unviable';
+  function appleStandaloneContext(){
+    return root.navigator?.standalone===true||!!root.matchMedia?.('(display-mode: standalone)')?.matches;
+  }
+  // Escape hatch is explicit and opt-in only: it exists so a successor engine or a bounded
+  // experiment can re-enable dispatch deliberately. It never engages by default.
+  function appleWasmInferenceBlocked(){
+    if(root.FIEZEL_APPLE_WASM_INFERENCE==='force')return false;
+    return appleStandaloneContext()&&root.crossOriginIsolated!==true;
+  }
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
   const assets=Object.freeze([
     {path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728},
@@ -90,7 +110,7 @@
   }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,appleInferenceBlocked:appleWasmInferenceBlocked(),appleInferencePolicy:APPLE_INFERENCE_BLOCK_POLICY});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -343,6 +363,11 @@
     if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared');
     if(circuitOpen)return fallbackOrThrow(new Error(`neural_circuit_open:${lastFallbackReason||lastError||'previous_failure'}`));
     if(initFailedThisSession||(initTimedOutThisSession&&backendInitPromise))return fallbackOrThrow(new Error(lastError||'Neural voice initialization is still running'));
+    if(appleWasmInferenceBlocked()){
+      lastError=APPLE_INFERENCE_BLOCK_REASON;lastFallbackReason=lastError;audibleVerified=false;
+      diag({phase:'speak_neural_blocked',policy:APPLE_INFERENCE_BLOCK_POLICY,reason:lastError,voice:String(options.voice||root.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'')});
+      return fallbackOrThrow(new Error(lastError));
+    }
     if(!verifiedForSession){
       if(!(await verifyCachedAssets())){writeStatus(false);preparedFlag=false;phase='idle';return fallbackOrThrow(new Error('Offline voice cache verification failed'))}
       verifiedForSession=true;
