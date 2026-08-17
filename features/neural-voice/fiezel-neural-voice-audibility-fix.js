@@ -7,10 +7,11 @@
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const DIAG_LIMIT=200;
   const READINESS_PATCH='m025-13-readiness-v1';
-  const UX_PATCH='m025-17-persisted-ready-ux-v1';
+  const UX_PATCH='m025-18-persisted-ready-ux-v1';
   let browserActive=false;
   let activeUtterance=null;
   let backgroundReadyPromise=null;
+  let automaticReadyAttempted=false;
   let uxObserver=null;
 
   function diag(entry){
@@ -121,7 +122,22 @@
     });
   }
 
-  function setHtml(node,value){if(node&&String(node.innerHTML||'')!==value)node.innerHTML=value}
+  function currentRenderKey(node){
+    if(!node)return'';
+    try{return String(node.dataset?.fiezelNeuralUxKey||node.getAttribute?.('data-fiezel-neural-ux-key')||'')}catch{return''}
+  }
+  function setRenderKey(node,key){
+    if(!node)return;
+    try{
+      if(node.dataset)node.dataset.fiezelNeuralUxKey=key;
+      else node.setAttribute?.('data-fiezel-neural-ux-key',key);
+    }catch{}
+  }
+  function setHtml(node,key,value){
+    if(!node||currentRenderKey(node)===key)return;
+    setRenderKey(node,key);
+    node.innerHTML=value;
+  }
   function setText(node,value){if(node&&String(node.textContent||'')!==value)node.textContent=value}
   function setDisabled(node,value){if(node&&node.disabled!==!!value)node.disabled=!!value}
 
@@ -139,42 +155,45 @@
         // the UI to the real one-time download state instead of pretending the
         // cached activation path still exists.
         setDisabled(prepareButton,false);
-        setHtml(prepareButton,'<i data-lucide="download"></i> Siapkan suara offline');
+        setHtml(prepareButton,'unprepared','<i data-lucide="download"></i> Siapkan suara offline');
         setDisabled(testButton,true);
         setText(hint,'Aset suara offline belum lengkap. Siapkan sekali untuk mengunduh dan memverifikasi model lokal.');
         return;
       }
       if(state.ready){
         setDisabled(prepareButton,true);
-        setHtml(prepareButton,'<i data-lucide="badge-check"></i> Suara neural aktif');
+        setHtml(prepareButton,'ready','<i data-lucide="badge-check"></i> Suara neural aktif');
         setDisabled(testButton,false);
         if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline tersimpan. Mesin neural aktif dan siap dipakai.');
       }else if(backgroundReadyPromise){
         setDisabled(prepareButton,true);
-        setHtml(prepareButton,'<i data-lucide="loader-circle"></i> Mengaktifkan neural…');
+        setHtml(prepareButton,'warming','<i data-lucide="loader-circle"></i> Mengaktifkan neural…');
         setDisabled(testButton,true);
         if(hint&&/Model tersimpan|Aset suara offline|Mengaktifkan mesin neural|Mengunduh aset suara|Menyiapkan mesin suara/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Mesin neural sedang diaktifkan di latar; latihan Listening tetap dapat langsung bersuara selama pemanasan.');
       }else{
         setDisabled(prepareButton,false);
-        setHtml(prepareButton,'<i data-lucide="zap"></i> Aktifkan suara neural');
+        setHtml(prepareButton,'cached-cold','<i data-lucide="zap"></i> Aktifkan suara neural');
         setDisabled(testButton,true);
         if(hint&&/Model tersimpan|Mengunduh aset suara|Menyiapkan mesin suara|Aset suara offline/i.test(String(hint.textContent||'')))setText(hint,'Aset suara offline sudah tersimpan. Aktifkan mesin neural tanpa mengunduh ulang aset.');
       }
     }catch{}
   }
 
-  function primeBackgroundReady(){
+  function primeBackgroundReady(options={}){
+    const automatic=options.automatic===true;
     const state=runtime.status?.()||{};
     if(!state.prepared||state.ready||typeof runtime.ensureReady!=='function')return Promise.resolve(state);
     if(backgroundReadyPromise)return backgroundReadyPromise;
-    diag({patch:UX_PATCH,phase:'background_ready_start',prepared:true});
+    if(automatic&&automaticReadyAttempted)return Promise.resolve(state);
+    if(automatic)automaticReadyAttempted=true;
+    diag({patch:UX_PATCH,phase:'background_ready_start',prepared:true,automatic});
     backgroundReadyPromise=ensureReady().then(result=>{
       const after=runtime.status?.()||{};
-      diag({patch:UX_PATCH,phase:'background_ready',prepared:!!after.prepared,ready:!!after.ready});
+      diag({patch:UX_PATCH,phase:'background_ready',prepared:!!after.prepared,ready:!!after.ready,automatic});
       return result;
     }).catch(error=>{
       const after=runtime.status?.()||{};
-      diag({patch:UX_PATCH,phase:'background_ready_error',code:readinessErrorCode(error),prepared:!!after.prepared,ready:!!after.ready});
+      diag({patch:UX_PATCH,phase:'background_ready_error',code:readinessErrorCode(error),prepared:!!after.prepared,ready:!!after.ready,automatic});
       throw error;
     }).finally(()=>{
       backgroundReadyPromise=null;
@@ -190,11 +209,16 @@
     const doc=root.document;
     if(!doc||typeof doc.addEventListener!=='function')return;
     const refresh=()=>{
+      const state=runtime.status?.()||{};
+      // One automatic attempt belongs to one continuous prepared+cold epoch. A
+      // verified unprepared state or a successfully ready state closes that epoch.
+      // A failure that remains prepared+cold deliberately keeps the latch set so
+      // MutationObserver/Lucide DOM activity cannot re-arm hidden init attempts.
+      if(!state.prepared||state.ready)automaticReadyAttempted=false;
       syncPersistedReadyUi();
       const prepareButton=typeof doc.getElementById==='function'?doc.getElementById('prepareNeuralVoice'):null;
-      const state=runtime.status?.()||{};
-      if(prepareButton&&state.prepared&&!state.ready&&!backgroundReadyPromise){
-        primeBackgroundReady().catch(()=>{});
+      if(prepareButton&&state.prepared&&!state.ready&&!backgroundReadyPromise&&!automaticReadyAttempted){
+        primeBackgroundReady({automatic:true}).catch(()=>{});
         syncPersistedReadyUi();
       }
     };
@@ -205,10 +229,11 @@
       const state=runtime.status?.()||{};
       if(!state.prepared||state.ready)return;
       // Cached assets already exist. Do not allow the legacy app handler to send
-      // this user back through the download/prepare ritual.
+      // this user back through the download/prepare ritual. An explicit click may
+      // retry a failed automatic activation, but still never calls runtime.prepare().
       try{event.preventDefault?.();event.stopImmediatePropagation?.()}catch{}
       diag({patch:UX_PATCH,phase:'prepared_activation_click'});
-      const warming=primeBackgroundReady();
+      const warming=primeBackgroundReady({automatic:false});
       syncPersistedReadyUi();
       warming.catch(()=>{});
     },true);
@@ -234,9 +259,11 @@
     if(!state.ready){
       diag({phase:'audibility_first',prepared:!!state.prepared});
       if(state.prepared&&typeof runtime.ensureReady==='function'){
-        const warming=primeBackgroundReady();
+        // A user-requested utterance is explicit intent and may retry even when the
+        // background automatic attempt for this prepared/cold epoch already failed.
+        const warming=primeBackgroundReady({automatic:false});
         if(!neuralOnly){
-          // m025-17 UX: do not make the first Listening audio wait tens of seconds
+          // m025-17+ UX: do not make the first Listening audio wait tens of seconds
           // for a cold in-memory Kokoro service after a reload. The cached model is
           // activated in parallel; the bridge is used only until neural is ready.
           diag({patch:UX_PATCH,phase:'cold_bridge_browser',prepared:true});
@@ -280,7 +307,11 @@
     if(state.ready){try{runtime.stop?.()}catch{}}
   }
 
-  function status(){return Object.freeze({...runtime.status?.(),audibilityPatch:'v1',persistedReadyUxPatch:'m025-17'})}
+  function status(){
+    const base=runtime.status?.()||{};
+    const wasmPolicy=String(root.__fiezelNeuralWasmPolicy||base.wasmPolicy||'default');
+    return Object.freeze({...base,wasmPolicy,audibilityPatch:'v1',persistedReadyUxPatch:'m025-18'});
+  }
 
   // Prevent the bootstrap's zero-volume speech warmup from occupying Safari's speech queue.
   root.__fiezelTtsUnlocked=true;
