@@ -1,7 +1,7 @@
 from pathlib import Path
 
-p = Path('features/neural-voice/fiezel-neural-voice-bootstrap.js')
-text = p.read_text()
+bootstrap = Path('features/neural-voice/fiezel-neural-voice-bootstrap.js')
+text = bootstrap.read_text()
 text = text.replace(
     "{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-5',bytes:2136684}",
     "{path:'vendor/kokoro-js/kokoro.web.js?nv=m025-22',bytes:2136728}",
@@ -41,11 +41,10 @@ new = """      const kokoro=await dynamicImport(absolute('vendor/kokoro-js/kokor
         throw new Error('Apple neural WASM proxy environment is unavailable');
       }
 """
-if old not in text:
-    if new not in text:
-        raise SystemExit('bootstrap legacy policy block not found')
-else:
+if old in text:
     text = text.replace(old, new)
+elif new not in text:
+    raise SystemExit('bootstrap policy block is neither legacy nor m025-22')
 
 if "kokoro.web.js?nv=m025-5" in text:
     raise SystemExit('stale m025-5 vendor URL remains in bootstrap')
@@ -55,5 +54,24 @@ if "bytes:2136728" not in text:
     raise SystemExit('new vendor byte contract missing')
 if "wasmEnv.proxy=true" not in text or "readBack:true" not in text:
     raise SystemExit('fail-closed proxy/readback contract missing')
+bootstrap.write_text(text)
 
-p.write_text(text)
+diag = Path('features/neural-voice/fiezel-diag-panel.js')
+diag_text = diag.read_text()
+if "var DIAG_BUILD = 'm025-22';" not in diag_text:
+    if "var DIAG_BUILD = 'm025-21';" not in diag_text:
+        raise SystemExit('unexpected Diagnostics build marker')
+    diag_text = diag_text.replace("var DIAG_BUILD = 'm025-21';", "var DIAG_BUILD = 'm025-22';")
+diag.write_text(diag_text)
+
+sw = Path('sw.js')
+sw_text = sw.read_text()
+new_rev = "const SW_REV='m025-22-real-wasm-proxy-20260817-1';"
+if new_rev not in sw_text:
+    old_rev = "const SW_REV='m025-21-apple-webgpu-rollback-20260817-1';"
+    if old_rev not in sw_text:
+        raise SystemExit('unexpected service-worker release marker')
+    sw_text = sw_text.replace(old_rev, new_rev)
+if 'skipWaiting(' in sw_text:
+    raise SystemExit('m025-22 must not introduce eager service-worker takeover')
+sw.write_text(sw_text)
