@@ -12,7 +12,7 @@
       {
         "name": "fiezel-integration",
         "path": "vendor/kokoro-js/source-overrides/fiezel-integration.patch",
-        "sha256": "1ea14d0a25ee97dd61713af393d500bb40fad77ce12458efd13e3f540d4d2184",
+        "sha256": "a8a8163ecde6216685a09a52861e373d33b8be67031d675be31f9c50390f3444",
         "purpose": "Expose same-origin model routing, setVoiceDataUrl, and the real Transformers/ORT WASM env for bounded Apple standalone proxy control"
       }
     ]
