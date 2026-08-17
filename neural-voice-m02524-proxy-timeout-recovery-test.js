@@ -93,11 +93,17 @@ function config(){return{voices:{fiezelPrimary:'af_heart'},limits:{maxInputChars
   assert.match(audibility,/Suara neural sedang bermasalah\. Audio sementara memakai suara perangkat/);
   assert.match(audibility,/phase:'fallback_notice'/);
 
-  // Release identity must advance exactly one build from m025-23.
+  // Historical m025-24 timeout behavior must remain valid across later product releases.
+  // Deployment identity is therefore checked for current coherence, not frozen to the
+  // release number that happened to exist when this regression was first authored.
   const diag=fs.readFileSync('features/neural-voice/fiezel-diag-panel.js','utf8');
   const sw=fs.readFileSync('sw.js','utf8');
-  assert.match(diag,/DIAG_BUILD\s*=\s*'m025-34'/);
-  assert.match(sw,/SW_REV='m025-34-universal-diagnostic-20260818-1'/);
+  const diagBuild=diag.match(/DIAG_BUILD\s*=\s*'m025-(\d+)'/);
+  const swBuild=sw.match(/SW_REV='m025-(\d+)-/);
+  assert.ok(diagBuild,'Diagnostics deployment marker must exist');
+  assert.ok(swBuild,'Service-worker deployment marker must exist');
+  assert.equal(swBuild[1],diagBuild[1],'DIAG_BUILD and SW_REV must identify the same product build');
+  assert.ok(Number(diagBuild[1])>=24,'later releases must not regress behind the m025-24 boundary');
 
   console.log('FIEZEL m025-24 proxy timeout recovery regression: PASS');
 })().catch(error=>{console.error(error.stack||error);process.exitCode=1});
