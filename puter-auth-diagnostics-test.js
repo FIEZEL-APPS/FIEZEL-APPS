@@ -15,7 +15,11 @@ const body=element('body');
 const ctx={
   console,Promise,JSON,Date,Object,String,setTimeout,
   document:{readyState:'complete',body,createElement:element,addEventListener(){}},
-  location:{origin:'https://fitrajft-ux.github.io',href:'https://fitrajft-ux.github.io/FIEZEL-APPS/'},
+  location:{
+    origin:'https://fitrajft-ux.github.io',
+    pathname:'/FIEZEL-APPS/',
+    href:'https://fitrajft-ux.github.io/FIEZEL-APPS/?auth=SENTINEL-URL-QUERY#SENTINEL-URL-HASH'
+  },
   navigator:{userAgent:'iPhone',standalone:true},
   matchMedia:()=>({matches:true}),
   localStorage:{getItem:k=>store[k]??null},
@@ -41,8 +45,11 @@ setTimeout(()=>{
     assert.equal(dump.puterAuth.storedTokenOrigin,'https://fitrajft-ux.github.io');
     assert.equal(dump.puterAuth.apiOrigin,'https://api.puter.com');
     assert.equal(dump.puterAuth.defaultGUIOrigin,'https://puter.com');
+    assert.equal(dump.href,'https://fitrajft-ux.github.io/FIEZEL-APPS/','diagnostics href must export origin + pathname only');
     assert.ok(!raw.includes('SENTINEL-STORED-TOKEN'),'stored token content must never be exported');
     assert.ok(!raw.includes('SENTINEL-RUNTIME-TOKEN'),'runtime token content must never be exported');
+    assert.ok(!raw.includes('SENTINEL-URL-QUERY'),'URL query content must never be exported');
+    assert.ok(!raw.includes('SENTINEL-URL-HASH'),'URL hash content must never be exported');
     console.log('FIEZEL Puter auth diagnostics secrecy regression: PASS');
   }catch(error){console.error(error.stack||error);process.exitCode=1}
 },0);
