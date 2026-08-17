@@ -75,3 +75,58 @@ if new_rev not in sw_text:
 if 'skipWaiting(' in sw_text:
     raise SystemExit('m025-22 must not introduce eager service-worker takeover')
 sw.write_text(sw_text)
+
+gate = Path('neural-voice-test.js')
+gate_text = gate.read_text()
+old_gate = """  await test('physical Apple production gate is evidence-backed',()=>{
+    assert.deepStrictEqual([lock.promotion.sourceAndAssetClosure,lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS','PASS',true]);
+    const evidence=lock.promotion.physicalEvidence;
+    assert.ok(evidence&&typeof evidence==='object','physical evidence required for production claim');
+    assert.equal(evidence.environment,'Apple standalone PWA');
+    assert.equal(evidence.terminalPhase,'speak_neural_success');
+    assert.equal(evidence.requestId,'nv-msvtu4mc-1');
+    assert.equal(evidence.voice,'af_heart');
+    assert.equal(evidence.tokenCount,53);
+    assert.equal(evidence.samples,92400);
+    assert.equal(evidence.capturedAtAsiaJakarta,'2026-08-16T20:15:00.344+07:00');
+    for(const key of ['modelElapsedMs','generationElapsedMs','playbackElapsedMs','totalElapsedMs'])assert.ok(Number.isInteger(evidence[key])&&evidence[key]>0,key);
+    assert.ok(evidence.totalElapsedMs>=evidence.generationElapsedMs);
+    assert.ok(!('prompt' in evidence)&&!('phonemes' in evidence)&&!('tokens' in evidence)&&!('errorMessage' in evidence),'physical evidence must remain bounded and private');
+  });
+"""
+new_gate = """  await test('physical Apple production gate is state-aware and evidence-backed',()=>{
+    assert.equal(lock.promotion.sourceAndAssetClosure,'PASS');
+    const pending=String(lock.candidate?.state||'').includes('PHYSICAL_PENDING');
+    if(pending){
+      assert.equal(lock.promotion.realDeviceGate,'PENDING','machine-verified candidate must not fabricate a physical PASS');
+      assert.equal(lock.promotion.productionClaim,false,'machine-verified candidate must not claim production success before Apple acceptance');
+      assert.ok(!lock.promotion.physicalEvidence,'pending candidate must not carry synthetic current physical evidence');
+      const historical=lock.promotion.historicalPhysicalBaselineM0255;
+      assert.ok(historical&&typeof historical==='object','historical released Apple baseline must remain preserved');
+      assert.equal(historical.environment,'Apple standalone PWA');
+      assert.equal(historical.terminalPhase,'speak_neural_success');
+      assert.equal(historical.requestId,'nv-msvtu4mc-1');
+      assert.equal(historical.voice,'af_heart');
+      assert.equal(historical.tokenCount,53);
+      assert.equal(historical.samples,92400);
+      assert.equal(historical.capturedAtAsiaJakarta,'2026-08-16T20:15:00.344+07:00');
+      for(const key of ['modelElapsedMs','generationElapsedMs','playbackElapsedMs','totalElapsedMs'])assert.ok(Number.isInteger(historical[key])&&historical[key]>0,key);
+      assert.ok(historical.totalElapsedMs>=historical.generationElapsedMs);
+      assert.ok(!('prompt' in historical)&&!('phonemes' in historical)&&!('tokens' in historical)&&!('errorMessage' in historical),'historical physical evidence must remain bounded and private');
+      return;
+    }
+    assert.deepStrictEqual([lock.promotion.realDeviceGate,lock.promotion.productionClaim],['PASS',true]);
+    const evidence=lock.promotion.physicalEvidence;
+    assert.ok(evidence&&typeof evidence==='object','physical evidence required for production claim');
+    assert.equal(evidence.environment,'Apple standalone PWA');
+    assert.equal(evidence.terminalPhase,'speak_neural_success');
+    for(const key of ['modelElapsedMs','generationElapsedMs','playbackElapsedMs','totalElapsedMs'])assert.ok(Number.isInteger(evidence[key])&&evidence[key]>0,key);
+    assert.ok(evidence.totalElapsedMs>=evidence.generationElapsedMs);
+    assert.ok(!('prompt' in evidence)&&!('phonemes' in evidence)&&!('tokens' in evidence)&&!('errorMessage' in evidence),'physical evidence must remain bounded and private');
+  });
+"""
+if old_gate in gate_text:
+    gate_text = gate_text.replace(old_gate, new_gate)
+elif new_gate not in gate_text:
+    raise SystemExit('stale physical gate invariant block not found')
+gate.write_text(gate_text)
