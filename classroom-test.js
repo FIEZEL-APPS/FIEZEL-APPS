@@ -10,6 +10,7 @@ const app = fs.readFileSync('app.js', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const tutorSource = fs.readFileSync('features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
+const voiceFix = fs.readFileSync('features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js', 'utf8');
 const tutorCss = fs.readFileSync('features/tutor-classroom/tutor-v3.css', 'utf8');
 const diag = fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8');
 
@@ -134,19 +135,19 @@ test('clean run completes and writes bounded learner evidence', () => {
   assert.ok(!('transcript' in evidence));
 });
 
-test('Classroom uses Indonesian neural tutor while English remains target content', () => {
-  assert.ok(/FiezelIndonesianVoice/.test(tutorSource), 'Classroom must reuse the existing Indonesian neural runtime');
-  assert.ok(/fiezel-learning-bundle-v1/.test(tutorSource));
-  assert.ok(/classroomSpeech:\s*'id-ID neural tutor'/.test(tutorSource));
-  assert.ok(/targetLanguage:\s*'en-US'/.test(tutorSource));
-  assert.ok(/lang:\s*'id-ID'/.test(tutorSource), 'Classroom spoken tutor language must be Indonesian');
-  assert.ok(/FiezelIndonesianVoice\.speak/.test(tutorSource), 'Tutor speech must call the Indonesian neural bundle');
-  assert.ok(/pair\.id\s*\|\|\s*pair\.idText/.test(tutorSource), 'Tutor must speak the Indonesian authored line');
-  assert.ok(/allowFallback:\s*false/.test(tutorSource), 'neural tutor must not silently become browser TTS');
-  assert.ok(!/SpeechSynthesisUtterance|speechSynthesis\.speak/.test(tutorSource), 'Tutor v3 must not use browser TTS');
+test('Classroom correction routes authored Indonesian tutor line to Indonesian neural bundle', () => {
+  assert.ok(/FiezelIndonesianVoice/.test(voiceFix), 'correction must reuse the existing Indonesian neural runtime');
+  assert.ok(/FiezelIndonesianVoice\.speak|indo\.speak/.test(voiceFix), 'Classroom correction must call Indonesian neural speak');
+  assert.ok(/lang:\s*'id-ID'/.test(voiceFix), 'Classroom spoken tutor language must be Indonesian');
+  assert.ok(/allowFallback:\s*false/.test(voiceFix), 'neural tutor must never silently become browser TTS');
+  assert.ok(/tutorSubtitle/.test(voiceFix), 'spoken tutor text must come from the authored Indonesian pair');
+  assert.ok(/classroomSpeech:\s*'id-ID neural tutor'/.test(voiceFix));
+  assert.ok(/targetLanguage:\s*'en-US'/.test(voiceFix));
+  assert.ok(!/SpeechSynthesisUtterance|speechSynthesis\.speak/.test(voiceFix), 'correction must not use browser TTS');
   assert.ok(!/MediaRecorder/.test(tutorSource), 'Tutor v3 must not persist raw learner audio');
   assert.strictEqual(pack.voiceContract.speech, 'id-ID neural tutor');
   assert.strictEqual(pack.voiceContract.targetLanguage, 'en');
+  assert.ok(/pair\.en/.test(tutorSource), 'English teaching copy remains authored target-language content in Tutor v3');
 });
 
 test('human-tutor controls are implemented in the product sidecar', () => {
@@ -165,22 +166,25 @@ test('UI layer is coherent, responsive, and reduced-motion aware', () => {
   assert.ok(tutorCss.includes('@media (min-width:1000px)'));
 });
 
-test('integration preserves five primary destinations and loads v3 after app.js', () => {
+test('integration preserves five primary destinations and loads Indonesian correction after v3', () => {
   assert.ok(app.includes("'classroom'"), 'Classroom remains a valid canonical app view');
   assert.ok(app.includes("onclick=\"go('classroom')\""), 'Home keeps a Classroom entry point');
   assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5, 'primary navigation stays at five destinations');
   assert.ok(index.includes('./features/tutor-classroom/tutor-v3.css'));
   assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
+  assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js'));
   assert.ok(index.indexOf('./features/tutor-classroom/fiezel-tutor-v3.js') > index.indexOf('./app.js'), 'v3 sidecar installs after canonical app.js');
-  assert.ok(index.includes('./features/diagnostics/fiezel-diagnostic-bus.js'), 'm025-34 diagnostics integration is preserved');
+  assert.ok(index.indexOf('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js') > index.indexOf('./features/tutor-classroom/fiezel-tutor-v3.js'), 'OWNER voice correction must load after Tutor v3');
+  assert.ok(index.includes('./features/diagnostics/fiezel-diagnostic-bus.js'), 'universal diagnostics integration is preserved');
 });
 
-test('PWA release coherence is m025-35 and caches Tutor v3 assets', () => {
-  assert.ok(sw.includes("const SW_REV='m025-35-"));
+test('PWA release coherence advances to m025-36 and caches Tutor correction', () => {
+  assert.ok(sw.includes("const SW_REV='m025-36-"));
   assert.ok(sw.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
   assert.ok(sw.includes('./features/tutor-classroom/tutor-v3.css'));
-  assert.ok(sw.includes('./features/diagnostics/fiezel-diagnostic-register.js'), 'new main diagnostics assets stay cached');
-  assert.ok(/var DIAG_BUILD = 'm025-35'/.test(diag));
+  assert.ok(sw.includes('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js'));
+  assert.ok(sw.includes('./features/diagnostics/fiezel-diagnostic-register.js'), 'diagnostics assets stay cached');
+  assert.ok(/var DIAG_BUILD = 'm025-36'/.test(diag));
 });
 
-console.log(`FIEZEL Classroom v3: PASS ${pass}/${pass}`);
+console.log(`FIEZEL Classroom v3 m025-36: PASS ${pass}/${pass}`);
