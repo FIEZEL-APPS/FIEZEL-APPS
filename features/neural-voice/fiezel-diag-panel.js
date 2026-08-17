@@ -279,7 +279,9 @@
     // reading raw JSON, and a plain-text summary they can paste straight into a chat.
     var badges = root.document.createElement('div');
     badges.id = 'fiezelDiagBadges';
-    badges.style.cssText = 'margin:2px 0;line-height:1.9;';
+    // The diagnostics harness renders this panel against a minimal DOM stub, so style
+    // may be absent. Presentation is optional; the badges themselves are not.
+    if (badges.style) badges.style.cssText = 'margin:2px 0;line-height:1.9;';
     badges.textContent = 'Menjalankan scan modul…';
 
     var copySummary = root.document.createElement('button');
