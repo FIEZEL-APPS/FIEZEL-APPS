@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   safari26:
-    runs-on: macos-26-arm64
+    runs-on: macos-26
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,9 @@ jobs:
           set -euo pipefail
           sw_vers
           /usr/bin/safaridriver --version
-          /usr/bin/arch
+          arch="$(/usr/bin/arch)"
+          echo "$arch"
+          test "$arch" = arm64
 
       - name: Stage exact ORT-Web 1.26 WebGPU runtime
         shell: bash
