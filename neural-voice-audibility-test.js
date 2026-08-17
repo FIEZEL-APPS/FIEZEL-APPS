@@ -89,7 +89,7 @@ async function adapterProxyObservation({standalone=false,displayModeStandalone=f
     allowLocalModels:true,
     localModelPath:'',
     wasmPaths:'',
-    backends:{onnx:{wasm}}
+    wasmEnv:wasm
   };
   let proxyAtSessionCreation=null;
   const KokoroTTS={
