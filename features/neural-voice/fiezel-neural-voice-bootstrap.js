@@ -18,19 +18,29 @@
   // 2026-08-17T16:40:43Z: three consecutive process deaths, zero successes, >30s for a
   // 49-char chunk). The sherpa VITS worker engine removes that failure mode at the source,
   // so neural dispatch is live again everywhere and no browser-TTS substitution remains.
-  const NEURAL_ENGINE_ID='sherpa-vits-local';
+  const NEURAL_ENGINE_ID='supertonic-3';
   const PREPARED_MARKER_KEY='fiezel-neural-voice-prepared-v1';
-  // m025-26 sherpa VITS asset set. One press of the download button fetches exactly
+  // m025-42 Supertonic 3 asset set. One press of the download button fetches exactly
   // these, they land in the stable neural cache, and nothing re-downloads them on
   // reload or on a later shell release. Every speaker lives inside the single .data
   // payload, so switching voice never triggers another download.
-  // 110,142,279 bytes total, replacing the 119,331,411-byte Kokoro set.
+  //
+  // 158,889,523 bytes total. That is BIGGER than the 110,142,279-byte English Piper set
+  // it replaces, but this one model also replaces the separate 94,558,999-byte
+  // Indonesian bundle, so the learner downloads ~46 MB LESS in total and both languages
+  // now speak with the same voice family.
   const assets=Object.freeze([
-    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.js',bytes:109876},
-    {path:'vendor/sherpa-vits/sherpa-onnx-tts.js',bytes:33227},
-    {path:'vendor/sherpa-vits/sherpa-onnx-tts.worker.js',bytes:2677},
-    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.wasm',bytes:13474025},
-    {path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data',bytes:96522474}
+    {path:'vendor/supertonic-3/sherpa-onnx-wasm-main-tts.js',bytes:79421},
+    {path:'vendor/supertonic-3/sherpa-onnx-tts.js',bytes:33227},
+    {path:'vendor/supertonic-3/sherpa-onnx-tts.worker.js',bytes:4709},
+    {path:'vendor/supertonic-3/sherpa-onnx-wasm-main-tts.wasm',bytes:13476398},
+    {path:'vendor/supertonic-3/duration_predictor.int8.onnx',bytes:3700147},
+    {path:'vendor/supertonic-3/text_encoder.int8.onnx',bytes:36416150},
+    {path:'vendor/supertonic-3/vector_estimator.int8.onnx',bytes:78400833},
+    {path:'vendor/supertonic-3/vocoder.int8.onnx',bytes:25991073},
+    {path:'vendor/supertonic-3/tts.json',bytes:8253},
+    {path:'vendor/supertonic-3/unicode_indexer.bin',bytes:262144},
+    {path:'vendor/supertonic-3/voice.bin',bytes:517168}
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
   let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
@@ -243,16 +253,34 @@
       if(root.FiezelSherpaVitsAdapter){
         adapter=root.FiezelSherpaVitsAdapter.createSherpaVitsAdapter({
           env:root,
-          basePath:absolute('vendor/sherpa-vits/'),
+          basePath:absolute('vendor/supertonic-3/'),
+          // m025-42: one multilingual model serves both languages. English lines run
+          // through this bootstrap, Indonesian ones through fiezel-supertonic-voice.js;
+          // both share the vendored bundle, so the second language costs no download.
+          expectedSpeakers:10,
+          modelId:'supertonic-3-int8-2026-05-11',
+          voiceSids:root.FiezelVoicePersona?root.FiezelVoicePersona.voiceSids():undefined,
+          defaultVoice:'id_natural',
+          kind:'supertonic-3',
+          generationLang:'en',
+          personas:root.FiezelVoicePersona||null,
+          usePersona:!!root.FiezelVoicePersona,
+          // Supertonic emits real breath pauses (0.5-0.7s measured); the synthetic
+          // silence the Piper path needed would double them.
+          padBetweenPhrases:false,
+          // 1.0 is already a natural rate for this model; 0.85 was a Piper calibration.
+          naturalSpeed:1,
+          // 4 denoising steps: measured faster AND more expressive than the default 5.
+          generationSteps:4,
           onStage:entry=>diag(entry)
         });
         await adapter.initialize();
         const sherpaPlayer=root.FiezelWebAudioPlayer.createPlayer(root);
         service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
         playerRef=sherpaPlayer;
-        wasmPolicy='sherpa-vits-wasm-worker';
+        wasmPolicy='supertonic-3-wasm-worker';
         phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;
-        diag({phase:'init_ready',engine:'sherpa-vits-local',elapsedMs:Date.now()-initStartedAt});
+        diag({phase:'init_ready',engine:'supertonic-3',elapsedMs:Date.now()-initStartedAt});
         return service;
       }
       if(!root.FiezelKokoroAdapter)throw new Error('Neural voice runtime modules are missing');

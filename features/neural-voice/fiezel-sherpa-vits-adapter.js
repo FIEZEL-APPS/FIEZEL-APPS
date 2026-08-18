@@ -71,6 +71,27 @@
     var kind = String(opts.kind || 'sherpa-vits-local');
     // m025-37: prosody shaping. Optional so the adapter still works standalone in tests.
     var prosody = opts.prosody || (typeof root !== 'undefined' && root && root.FiezelProsody) || null;
+    // m025-42 Supertonic. Three differences from the Piper bundles, all optional so the
+    // Piper path is byte-for-byte unchanged:
+    //   generationLang - Supertonic is one multilingual model, so every request must
+    //                    name its language; Piper bakes the language into the model.
+    //   persona        - the speaker/speed/pitch triple OWNER chose per line type.
+    //   padSilence     - Supertonic already emits 0.5-0.7s at a sentence boundary
+    //                    (measured), so the synthetic gap would be a DOUBLE pause.
+    var generationLang = opts.generationLang ? String(opts.generationLang) : '';
+    // Flow-matching denoising steps. Measured on the vendored model, one line, 1 thread:
+    //   steps 1-3 -> 2.4-4x faster but the words break down (ASR word error 1.00/0.55/0.27)
+    //   steps 4   -> word error 0.000, RTF 0.250, pitch range 18.3 semitones
+    //   steps 5   -> word error 0.000, RTF 0.331, pitch range 14.1 semitones  (engine default)
+    //   steps 6-8 -> slower AND progressively flatter (12.6 -> 8.7 semitones)
+    // So 4 is not a quality/speed trade at all: it is faster and more expressive than
+    // the default. Below 4 is a cliff, not a dial - never lower this to buy speed.
+    var generationSteps = Number(opts.generationSteps) > 0 ? Math.floor(Number(opts.generationSteps)) : 0;
+    var personas = opts.personas || (typeof root !== 'undefined' && root && root.FiezelVoicePersona) || null;
+    var usePersona = opts.usePersona === true && !!personas;
+    var padBetweenPhrases = opts.padBetweenPhrases !== false;
+    // Supertonic is calibrated at 1.0 = natural; Piper needed 0.85 (see NATURAL_SPEED).
+    var naturalSpeed = Number(opts.naturalSpeed) > 0 ? Number(opts.naturalSpeed) : NATURAL_SPEED;
 
     var worker = null;
     var readyPromise = null;
@@ -181,7 +202,19 @@
       return new Promise(function (resolve, reject) {
         pending = { resolve: resolve, reject: reject };
         try {
-          worker.postMessage({ type: 'generate', text: unit, sid: sid, speed: speed });
+          // generateWithConfig is the only path that carries `extra`, and `extra.lang`
+          // is how a multilingual model is told which language this line is. The
+          // vendored worker has handled both message types since m025-26, so this is
+          // a message-shape choice, not a worker change.
+          worker.postMessage(generationLang
+            ? {
+              type: 'generateWithConfig',
+              text: unit,
+              genConfig: generationSteps
+                ? { sid: sid, speed: speed, numSteps: generationSteps, extra: { lang: generationLang } }
+                : { sid: sid, speed: speed, extra: { lang: generationLang } }
+            }
+            : { type: 'generate', text: unit, sid: sid, speed: speed });
         } catch (error) { pending = null; reject(error); }
       });
     }
@@ -203,10 +236,18 @@
       var requested = typeof options.speed === 'number' && options.speed > 0 ? options.speed : 1;
       // The product's speed 1 means "natural", not "engine default". Callers keep
       // relative control: 1.1 is still 10% faster than natural.
-      var speed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, NATURAL_SPEED * requested));
-      var sid = resolveSid(voice);
+      var speed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, naturalSpeed * requested));
+      // m025-42: the persona decides WHO speaks this line and in which register.
+      // A praise line and an explanation are different speakers on purpose - that
+      // alternation is what stops a long lesson from flattening into one voice.
+      var persona = usePersona ? personas.resolve(text, options.intent) : null;
+      var sid = persona ? persona.sid : resolveSid(voice);
+      var personaBase = persona ? { speed: persona.speed, pitch: persona.pitch } : null;
       var startedAt = Date.now();
-      stage('adapter_generate_enter', backendDetail({ voice: voice, sid: sid, requestedSpeed: requested, engineSpeed: speed, lang: lang || null }));
+      stage('adapter_generate_enter', backendDetail({
+        voice: voice, sid: sid, requestedSpeed: requested, engineSpeed: speed,
+        lang: lang || generationLang || null, persona: persona ? persona.id : null
+      }));
       return initialize().then(function () {
         // The worker protocol carries exactly one in-flight generation. Fail closed on a
         // second request rather than interleaving and returning another request's audio.
@@ -234,7 +275,9 @@
         function step(index) {
           if (index >= units.length) return null;
           var unit = units[index];
-          var shape = prosody && prosody.contour ? prosody.contour(unit, index, units.length) : { speed: 1, pitch: 1 };
+          var shape = prosody && prosody.contour
+            ? prosody.contour(unit, index, units.length, personaBase)
+            : (personaBase || { speed: 1, pitch: 1 });
           var unitSpeed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, speed * shape.speed));
           stage('adapter_generate_invoke', backendDetail({
             voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
@@ -249,7 +292,7 @@
             if (prosody && prosody.resample) samples = prosody.resample(samples, shape.pitch);
             // Real trailing silence, so consecutive phrases land as separate breath groups
             // instead of being butted together into one continuous stream.
-            if (prosody && prosody.padSilence && options.pad !== false) {
+            if (prosody && prosody.padSilence && options.pad !== false && padBetweenPhrases) {
               var gap = prosody.pauseAfter ? prosody.pauseAfter(unit, lang) : 0;
               samples = prosody.padSilence(samples, rate, gap);
             }
@@ -269,7 +312,10 @@
               voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
               samples: audio.length, sampleRate: rate, phrases: units.length
             }));
-            return { audio: audio, sampling_rate: rate, voice: voice, sid: sid };
+            return {
+              audio: audio, sampling_rate: rate, voice: voice, sid: sid,
+              persona: persona ? persona.id : null
+            };
           })
           .catch(function (error) { generating = false; throw error; });
       });
