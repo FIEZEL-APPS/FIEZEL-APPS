@@ -156,9 +156,16 @@
   function adaptive(snapshot, targets) {
     var out = [];
     if (!snapshot) return [f('ADAPTIVE_UNAVAILABLE', 'warning', 'State adaptive tidak terbaca.')];
-    var level = String(snapshot.level || '');
-    if (level && targets.validLevels.indexOf(level) === -1) {
-      out.push(f('ADAPTIVE_INVALID_LEVEL', 'error', 'Level aktif di luar A1-C2: ' + level));
+    // state.level is a 1-based index into the CEFR ladder (LEVELS[state.level-1]), not a
+    // CEFR string. An earlier revision compared it to 'A1'-'C2' and reported every
+    // healthy install as failing; a scanner that cries wolf is worse than none.
+    var levels = targets.validLevels;
+    var raw = snapshot.level;
+    if (raw !== '' && raw != null) {
+      var asIndex = Number(raw);
+      var known = (Number.isInteger(asIndex) && asIndex >= 1 && asIndex <= levels.length) ||
+                  levels.indexOf(String(raw)) !== -1;
+      if (!known) out.push(f('ADAPTIVE_INVALID_LEVEL', 'error', 'Level aktif di luar jangkauan A1-C2: ' + String(raw)));
     }
     if (snapshot.stuck === true) out.push(f('ADAPTIVE_STUCK', 'error', 'State machine adaptive terdeteksi macet.'));
     return out;

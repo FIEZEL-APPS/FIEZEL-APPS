@@ -26,16 +26,31 @@
       if (!baseRuntime || typeof baseRuntime.speak !== 'function') throw new Error('neural_runtime_missing');
       return baseRuntime.speak(text, opts);
     }
-    var indo = root.FiezelIndonesianVoice;
-    if (!indo || typeof indo.speak !== 'function') throw new Error('indonesian_bundle_module_missing');
     var spoken = tutorText(text);
     if (!spoken) return { provider: 'indonesian-neural-local', skipped: true };
-    return indo.speak(spoken, {
-      speed: typeof opts.speed === 'number' ? opts.speed : 1,
-      lang: 'id-ID',
-      allowFallback: false
-    });
+    var indo = root.FiezelIndonesianVoice;
+    var indoReady = false;
+    try { indoReady = !!(indo && typeof indo.speak === 'function' && indo.status && indo.status().prepared); } catch (_) { indoReady = false; }
+    if (indoReady) {
+      try {
+        return await indo.speak(spoken, {
+          speed: typeof opts.speed === 'number' ? opts.speed : 1,
+          lang: 'id-ID',
+          allowFallback: false
+        });
+      } catch (error) {
+        // Fall through to the mandatory engine rather than leaving Classroom mute.
+        try { root.console && root.console.warn && root.console.warn('indonesian tutor voice failed, using base engine', error); } catch (_) {}
+      }
+    }
+    // m025-39: the Indonesian bundle is an OPTIONAL 94MB download. Requiring it here made
+    // Classroom speech fail outright for anyone who had not fetched it, which is what
+    // OWNER hit as "reload Classroom selalu gagal". English neural is mandatory and
+    // always present, so it is the correct floor. Browser TTS is never used.
+    if (!baseRuntime || typeof baseRuntime.speak !== 'function') throw new Error('neural_runtime_missing');
+    return baseRuntime.speak(spoken, Object.assign({}, opts, { allowFallback: false }));
   }
+
   function classroomStop(){
     if (classroomActive()) {
       try { root.FiezelIndonesianVoice && root.FiezelIndonesianVoice.stop && root.FiezelIndonesianVoice.stop(); } catch (_) {}
@@ -84,17 +99,56 @@
     });
   }
 
+  // Writes must be idempotent. This callback runs from a MutationObserver watching #app
+  // with subtree:true, so an unconditional textContent assignment re-enters the observer
+  // and the pair loops without end. That loop is what made every session render slow.
+  function setTextIfChanged(node, value){
+    if (!node) return false;
+    if (String(node.textContent || '') === value) return false;
+    node.textContent = value;
+    return true;
+  }
+
+  var observer = null;
+  var scheduled = false;
+
   function correctVisibleContract(){
     if (!classroomActive()) return;
+    // Detach while writing, so our own edits cannot feed back into the observer even if
+    // a future edit here becomes non-idempotent.
+    var wasObserving = !!observer;
+    if (wasObserving) { try { observer.disconnect(); } catch (_) {} }
     try {
-      var bundleCopy = root.document.querySelector('.tutor-bundle p');
-      if (bundleCopy) bundleCopy.textContent = 'Classroom memakai suara tutor neural Indonesia. English tetap menjadi materi target, contoh, prompt, dan latihan.';
-      root.document.querySelectorAll('.tutor-caption span').forEach(function(label){ label.textContent = 'PENJELASAN TUTOR · INDONESIA'; });
+      setTextIfChanged(root.document.querySelector('.tutor-bundle p'),
+        'Classroom memakai suara tutor neural Indonesia. English tetap menjadi materi target, contoh, prompt, dan latihan.');
+      root.document.querySelectorAll('.tutor-caption span').forEach(function(label){
+        setTextIfChanged(label, 'PENJELASAN TUTOR · INDONESIA');
+      });
       var state = root.document.getElementById('tutorVoiceState');
-      if (state && /ready/i.test(state.textContent || '')) state.textContent = 'Tutor neural Indonesia siap. Tanyakan kapan pun ada yang belum jelas.';
+      if (state && /ready/i.test(state.textContent || '')) {
+        setTextIfChanged(state, 'Tutor neural Indonesia siap. Tanyakan kapan pun ada yang belum jelas.');
+      }
     } catch (_) {}
+    if (wasObserving) observe();
   }
-  var app = root.document.getElementById('app');
-  if (app && root.MutationObserver) new MutationObserver(correctVisibleContract).observe(app, { childList: true, subtree: true });
+
+  // Coalesce bursts: a single render replaces the whole subtree and emits many records,
+  // and running the pass per record was pure waste.
+  function scheduleCorrection(){
+    if (scheduled) return;
+    scheduled = true;
+    var run = function(){ scheduled = false; correctVisibleContract(); };
+    if (typeof root.requestAnimationFrame === 'function') root.requestAnimationFrame(run);
+    else setTimeout(run, 16);
+  }
+
+  function observe(){
+    var app = root.document.getElementById('app');
+    if (!app || !root.MutationObserver) return;
+    if (!observer) observer = new root.MutationObserver(scheduleCorrection);
+    try { observer.observe(app, { childList: true, subtree: true }); } catch (_) {}
+  }
+
+  observe();
   correctVisibleContract();
 })(typeof globalThis !== 'undefined' ? globalThis : window);
