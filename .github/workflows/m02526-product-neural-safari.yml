@@ -31,13 +31,19 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cd vendor/sherpa-vits
-          shasum -a 256 sherpa-onnx-wasm-main-tts.data sherpa-onnx-wasm-main-tts.wasm \
-            sherpa-onnx-wasm-main-tts.js sherpa-onnx-tts.js sherpa-onnx-tts.worker.js \
+          # m025-44: the shipped English engine is supertonic-3 (m025-42 replaced the
+          # sherpa-vits substrate). The proof follows the engine the product actually
+          # loads; pinning it to a retired vendor path proves nothing about the build.
+          cd vendor/supertonic-3
+          shasum -a 256 sherpa-onnx-wasm-main-tts.wasm sherpa-onnx-wasm-main-tts.js \
+            sherpa-onnx-tts.js sherpa-onnx-tts.worker.js \
+            vector_estimator.int8.onnx vocoder.int8.onnx \
             | tee ../../m02526-runtime-sha256.txt
-          # Must equal the manifest recorded when this substrate was built in m025-37.
-          grep -q '555e80071d639a4e5026d473f1028eefb402786d92dbc6ef1368af2491236a6b' ../../m02526-runtime-sha256.txt
-          grep -q '9fa0755d9dd5cc6cb7b5dfbb681fdafa2d46a44074431a51ccd83f93575627b3' ../../m02526-runtime-sha256.txt
+          # Must equal the manifest recorded when this substrate was vendored.
+          grep -q '325adfe564122ca2766fe0902b22c780f61a362f5d36b0c364b1c3e34db932fe' ../../m02526-runtime-sha256.txt
+          grep -q '6ded938a274ad01f2d786ceda2dfcac49dd5e3ffffe1dc81fed9e3a13b70eaa3' ../../m02526-runtime-sha256.txt
+          grep -q '20cd86fa5c6effedfda0e7cffe5b0569ca401c440a0c3a1d72bf39286c0db3fd' ../../m02526-runtime-sha256.txt
+          grep -q 'e923d60f53f95eb1ce235f1dc33ec56d9c057823c96fa6f8acf98f32b0da6152' ../../m02526-runtime-sha256.txt
 
       - name: Create product-runtime probe page
         shell: bash
@@ -48,6 +54,7 @@ jobs:
           <script>window.FIEZEL_VERSION='5.19.0';</script>
           <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
           <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script src="./features/neural-voice/fiezel-voice-persona.js"></script>
           <script src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
           <script src="./features/neural-voice/fiezel-neural-voice.js"></script>
           <script src="./features/neural-voice/fiezel-web-audio-player.js"></script>
@@ -95,7 +102,7 @@ jobs:
               // for the engine payload this visit. A timing ratio only hints; transferSize
               // states it. A cache-served asset reports transferSize 0.
               try{
-                const eng=performance.getEntriesByType('resource').filter(e=>e.name.indexOf('/vendor/sherpa-vits/')!==-1);
+                const eng=performance.getEntriesByType('resource').filter(e=>e.name.indexOf('/vendor/supertonic-3/')!==-1);
                 r.engineRequests=eng.length;
                 r.engineTransferBytes=eng.reduce((s,e)=>s+(Number(e.transferSize)||0),0);
                 r.engineDecodedBytes=eng.reduce((s,e)=>s+(Number(e.decodedBodySize)||0),0);
@@ -149,7 +156,7 @@ jobs:
           jq -e '.success==true' m02526-run1.json >/dev/null
           jq -e '.usedBrowserTts==false' m02526-run1.json >/dev/null
           jq -e '.usedBrowserTts==false' m02526-run2.json >/dev/null
-          jq -e '.engine=="sherpa-vits-local"' m02526-run1.json >/dev/null
+          jq -e '.engine=="supertonic-3"' m02526-run1.json >/dev/null
           jq -e '(.plays|length)==3' m02526-run1.json >/dev/null
           jq -e '[.plays[].provider]|all(.!="browser-speech-synthesis")' m02526-run1.json >/dev/null
           # no latched failure state
