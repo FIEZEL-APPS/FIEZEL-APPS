@@ -89,5 +89,6 @@ jobs:
           node tutor-classroom-regression-test.js
           node m02542-experience-test.js
           node library-test.js
+          node neural-voice-m02542-persona-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js

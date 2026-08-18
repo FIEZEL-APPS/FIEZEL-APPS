@@ -144,5 +144,44 @@
       "playbackElapsedMs": 3858,
       "totalElapsedMs": 18840
     }
-  }
+  },
+  "activeEngine": {
+    "id": "supertonic-3",
+    "milestone": "m025-42",
+    "path": "vendor/supertonic-3/",
+    "model": "sherpa-onnx-supertonic-3-tts-int8-2026-05-11",
+    "runtimeSource": "k2-fsa/sherpa-onnx v1.13.6 built with emscripten 4.0.23",
+    "buildScript": "tools/build-supertonic-wasm.sh",
+    "provenance": "vendor/supertonic-3/provenance/m02542-build.json",
+    "checksums": "vendor/supertonic-3/provenance/SHA256SUMS.txt",
+    "languages": [
+      "id",
+      "en"
+    ],
+    "speakers": 10,
+    "sampleRate": 44100,
+    "denoisingSteps": 4,
+    "totalBytes": 158889523,
+    "replacesBundles": {
+      "vendor/sherpa-vits": 110142279,
+      "vendor/sherpa-vits-id": 94558999
+    },
+    "licence": {
+      "sampleCode": "MIT",
+      "modelWeights": "OpenRAIL-M",
+      "paid": false
+    },
+    "deviceGate": "PENDING"
+  },
+  "retired": [
+    {
+      "id": "sherpa-vits-piper",
+      "retiredAt": "m025-42",
+      "paths": [
+        "vendor/sherpa-vits/",
+        "vendor/sherpa-vits-id/"
+      ],
+      "reason": "English libritts_r and Indonesian news_tts are single-register Piper models; the Indonesian one is a news-reader corpus, which is the structural cause of the flat delivery OWNER reported. Kept in the tree for one release as a rollback path; delete once the device gate passes."
+    }
+  ]
 }
