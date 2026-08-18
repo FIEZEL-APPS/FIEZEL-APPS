@@ -66,6 +66,8 @@
     var voiceSids = opts.voiceSids || VOICE_SIDS;
     var defaultVoice = String(opts.defaultVoice || DEFAULT_VOICE);
     var kind = String(opts.kind || 'sherpa-vits-local');
+    // m025-37: prosody shaping. Optional so the adapter still works standalone in tests.
+    var prosody = opts.prosody || (typeof root !== 'undefined' && root && root.FiezelProsody) || null;
 
     var worker = null;
     var readyPromise = null;
@@ -190,7 +192,10 @@
           pending = { resolve: resolve, reject: reject };
           stage('adapter_generate_invoke', backendDetail({ voice: voice, sid: sid, elapsedMs: Date.now() - startedAt }));
           try {
-            worker.postMessage({ type: 'generate', text: String(text || ''), sid: sid, speed: speed });
+            // Punctuation is the only lever this model exposes for pausing: its duration
+            // predictor places silence at punctuation, never at a bare word boundary.
+            var spoken = prosody && prosody.punctuate ? prosody.punctuate(text) : String(text || '');
+            worker.postMessage({ type: 'generate', text: spoken, sid: sid, speed: speed });
           } catch (error) { pending = null; reject(error); return; }
           stage('adapter_generate_dispatched', backendDetail({ voice: voice, sid: sid, elapsedMs: Date.now() - startedAt }));
         });
@@ -198,6 +203,13 @@
         var samples = result.samples;
         var count = samples && typeof samples.length === 'number' ? samples.length : 0;
         if (!count) throw new Error('sherpa_empty_audio');
+        // Real trailing silence, so consecutive chunks land as separate breath groups
+        // instead of being butted together into one continuous stream.
+        if (prosody && prosody.padSilence && options.pad !== false) {
+          var gap = prosody.pauseAfter ? prosody.pauseAfter(String(text || '')) : 0;
+          samples = prosody.padSilence(samples, result.sampleRate, gap);
+          count = samples.length;
+        }
         stage('adapter_generate_ready', backendDetail({
           voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
           samples: count, sampleRate: result.sampleRate
