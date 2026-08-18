@@ -270,8 +270,11 @@
           padBetweenPhrases:false,
           // 1.0 is already a natural rate for this model; 0.85 was a Piper calibration.
           naturalSpeed:1,
-          // 4 denoising steps: measured faster AND more expressive than the default 5.
-          generationSteps:4,
+          // m025-44: 3 denoising steps. 4 was measured faster and more expressive than
+          // the engine default of 5, but on the Safari 26 arm64 device proof it left warm
+          // generations at 5.3-6.2s, over the 6s interactive budget. Generation cost is
+          // near-linear in steps, so this buys back about a quarter of it.
+          generationSteps:3,
           onStage:entry=>diag(entry)
         });
         await adapter.initialize();
