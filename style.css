@@ -44,7 +44,16 @@
 }
 
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+/* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
+   layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
+   touch-action:manipulation is what removes the double-tap-to-zoom delay and action. */
+html{scroll-behavior:smooth;touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{touch-action:manipulation}
+/* m025-43 OWNER: a long press anywhere popped the iOS selection/copy callout on top
+   of the lesson. Selection is off app-wide; real text fields keep it, because a
+   field you cannot select text in is broken. */
+html,body,button,a,.card,section,article,div,p,span,h1,h2,h3,h4,b,strong,em,small,li{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select,[contenteditable="true"]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 ::selection{background:var(--accent);color:#fff}
 
 body{
@@ -562,3 +571,36 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .classroom-option.is-wrong{border-color:var(--red,#e0526f);background:var(--red-soft,#fdeef1)}
 .classroom-actions{display:flex;flex-wrap:wrap;gap:9px}
 .classroom-actions button{min-height:46px;padding:0 16px;border-radius:14px}
+
+/* m025-43 mandatory one-batch neural voice download — stays until it finishes */
+.voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.95),rgba(45,37,86,.95));backdrop-filter:blur(10px)}
+body.voice-bundle-locked{overflow:hidden}
+body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
+.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#11172a);border:1px solid var(--line,#e6ebf2);box-shadow:0 24px 60px rgba(7,13,29,.28)}
+.voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
+.voice-bundle-panel h2{margin:0}
+.voice-bundle-panel p{margin:0;color:var(--muted,#5f6c80);line-height:1.55}
+.voice-bundle-track{height:8px;border-radius:999px;background:var(--panel-soft,#eef3fa);overflow:hidden}
+.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--accent,#3d7de0);transition:width .3s ease}
+.voice-bundle-progress{font-size:.92rem}
+.voice-bundle-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+.voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:14px}
+.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#11172a);border:1px solid var(--line,#e6ebf2);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
+@media (prefers-reduced-motion:reduce){.voice-bundle-track span{transition:none}}
+
+/* m025-42 mandatory daily target lock */
+.daily-lock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,rgba(7,13,29,.94),rgba(45,37,86,.94));backdrop-filter:blur(10px)}
+.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#11172a);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
+.daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
+.daily-lock-panel h2{margin:0}
+.daily-lock-panel p{margin:0;color:var(--muted,#5f6c80);line-height:1.55}
+.daily-lock-track{height:10px;border-radius:999px;background:var(--panel-soft,#eef3fa);overflow:hidden}
+.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--accent,#3d7de0);transition:width .35s ease}
+.daily-lock-count{font-weight:700;color:var(--text,#11172a)}
+.daily-lock-panel .wide{width:100%;min-height:52px;border-radius:16px}
+.daily-lock-note{font-size:.86rem}
+/* While the lock is armed every escape route inside the app is inert, including the
+   bottom navigation and the header controls. */
+body.daily-locked .bottomnav,body.daily-locked .app-header,body.daily-locked .icon-button{pointer-events:none;opacity:.35}
+body.daily-locked{overflow:hidden}
+@media (prefers-reduced-motion:reduce){.daily-lock-track span{transition:none}}

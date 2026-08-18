@@ -743,12 +743,17 @@
       });
       root.document.querySelectorAll('[data-micro]').forEach(function (b) {
         b.addEventListener('click', function () {
-          var out = session.answerMicro(Number(b.dataset.micro)); save(); renderTeach(false); speak(out.feedback, 1);
+          var out = session.answerMicro(Number(b.dataset.micro)); save();
+          try { if (typeof root.answerFeedbackSignal === 'function') root.answerFeedbackSignal(!!out.correct); } catch (_) {}
+          renderTeach(false); speak(out.feedback, 1);
         });
       });
       root.document.querySelectorAll('[data-quiz]').forEach(function (b) {
         b.addEventListener('click', function () {
           var out = session.answerQuiz(Number(b.dataset.quiz)); save();
+          // m025-43: Classroom answers were silent - no buzz, no tone. They now go through
+          // the same feedback path as every other question in the app.
+          try { if (typeof root.answerFeedbackSignal === 'function') root.answerFeedbackSignal(!!(out.result && out.result.correct)); } catch (_) {}
           if (out.snapshot.phase === 'summary') renderSummary(); else renderQuiz();
           speak(out.result.feedback, 1);
         });
@@ -823,6 +828,14 @@
     }
 
     root.classroom = classroomV3;
+
+    // m025-42: the press-to-talk layer answers about the lesson actually on screen, so
+    // the live checkpoint is exposed rather than duplicated there.
+    root.__fiezelTutorContext = function () {
+      if (!session) return {};
+      try { return { lesson: session.lesson(), beat: session.currentBeat(), snapshot: session.snapshot() }; }
+      catch (_) { return {}; }
+    };
 
     var observer = new MutationObserver(function () {
       var app = mount();
