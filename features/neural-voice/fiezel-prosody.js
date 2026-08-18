@@ -26,16 +26,45 @@
 
   var PAUSE_MS = Object.freeze({ clause: 200, sentence: 500 });
 
+  // m025-41 OWNER correction: the Indonesian tutor sounded flat and browser-like. The
+  // cause was structural rather than model quality - every marker below was English, so
+  // an Indonesian line reached the duration predictor with no clause punctuation at all
+  // and was spoken as one unbroken, level stream. Rhythm is language specific, so the
+  // markers are now a per-language profile and Indonesian has its own.
+  //
   // Conjunctions and discourse markers that begin a new breath group in speech. A comma
   // before these is what a human would naturally pause at.
   // Deliberately conservative. Words like "when", "if", "so" and "then" usually begin a
   // restrictive clause that speech runs straight into; forcing a comma there produced a
   // chopped, listing delivery in testing. Only markers that reliably open a new breath
   // group are listed.
-  var CLAUSE_LEADS = ['but', 'because', 'although', 'though', 'whereas', 'unless', 'so that'];
-  // Introductory adverbials: speech pauses just after these, not before.
-  var INTRO_MARKERS = ['however', 'therefore', 'for example', 'for instance', 'in fact',
-    'of course', 'first', 'second', 'finally', 'meanwhile', 'instead'];
+  var PROFILES = Object.freeze({
+    en: Object.freeze({
+      clauseLeads: ['but', 'because', 'although', 'though', 'whereas', 'unless', 'so that'],
+      // Introductory adverbials: speech pauses just after these, not before.
+      introMarkers: ['however', 'therefore', 'for example', 'for instance', 'in fact',
+        'of course', 'first', 'second', 'finally', 'meanwhile', 'instead']
+    }),
+    id: Object.freeze({
+      // Indonesian equivalents, held to the same conservative bar: only markers that
+      // reliably open a new breath group. "yang", "kalau" and "saat" are restrictive and
+      // are deliberately absent, exactly as "when" and "if" are on the English side.
+      clauseLeads: ['tetapi', 'tapi', 'karena', 'walaupun', 'meskipun', 'padahal',
+        'sedangkan', 'sehingga', 'supaya', 'agar'],
+      introMarkers: ['namun', 'jadi', 'nah', 'oke', 'misalnya', 'contohnya',
+        'sebenarnya', 'sekarang', 'pertama', 'kedua', 'ketiga', 'terakhir', 'akhirnya',
+        'selain itu', 'oleh karena itu', 'dengan kata lain']
+    })
+  });
+
+  // Pitch and rate movement are bounded on purpose: past roughly 7% a resampled phrase
+  // stops reading as intonation and starts reading as a different speaker.
+  var CONTOUR_MIN = 0.93;
+  var CONTOUR_MAX = 1.07;
+
+  function profileFor(lang) {
+    return /^id/i.test(String(lang || '')) ? PROFILES.id : PROFILES.en;
+  }
 
   function escapeRe(value) { return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
@@ -43,16 +72,17 @@
    * Adds the punctuation the duration predictor needs, without changing the words.
    * Never inserts next to punctuation that already exists, so re-running is a no-op.
    */
-  function punctuate(text) {
+  function punctuate(text, lang) {
+    var profile = profileFor(lang);
     var out = String(text == null ? '' : text).replace(/\s+/g, ' ').trim();
     if (!out) return '';
 
-    INTRO_MARKERS.forEach(function (marker) {
+    profile.introMarkers.forEach(function (marker) {
       var re = new RegExp('(^|[.!?]\\s+)(' + escapeRe(marker) + ')\\s+(?![,;:])', 'gi');
       out = out.replace(re, function (_m, lead, word) { return lead + word + ', '; });
     });
 
-    CLAUSE_LEADS.forEach(function (lead) {
+    profile.clauseLeads.forEach(function (lead) {
       // Require a real preceding clause (a few words) so short phrases are not chopped.
       var re = new RegExp('(\\w[\\w\'-]*(?:\\s+[\\w\'-]+){2,})\\s+(' + escapeRe(lead) + ')\\s+', 'gi');
       out = out.replace(re, function (match, before, word) {
@@ -72,9 +102,9 @@
    * if a sentence is still too long. Never splits mid-phrase: that is what produced a
    * chunk boundary with no punctuation, and therefore no pause, in the first place.
    */
-  function phrases(text, maxChars) {
+  function phrases(text, maxChars, lang) {
     var limit = Number(maxChars) > 0 ? Number(maxChars) : 200;
-    var source = punctuate(text);
+    var source = punctuate(text, lang);
     if (!source) return [];
     var sentences = source.match(/[^.!?…]+[.!?…]+|\S[^.!?…]*$/g) || [source];
     var out = [];
@@ -114,11 +144,76 @@
     return out;
   }
 
+  function clampContour(value) {
+    return Math.round(Math.min(CONTOUR_MAX, Math.max(CONTOUR_MIN, value)) * 1000) / 1000;
+  }
+
+  /**
+   * The intonation contour for one phrase inside an utterance.
+   *
+   * OWNER's second correction was that the delivery is "datar terus" - level from the
+   * first word to the last. A VITS duration predictor has no pitch input, so movement
+   * cannot be requested; like the pauses above it has to be produced. Two levers:
+   *
+   *   speed - passed to the engine, so the phrase is genuinely spoken faster or slower.
+   *   pitch - a resample factor applied to the returned samples, which moves the whole
+   *           phrase up or down the way a speaker's register moves between breath groups.
+   *
+   * The shape is the ordinary declarative contour both languages share: a phrase that
+   * continues stays up, a question rises further, and the final phrase falls and slows,
+   * which is what a listener hears as "finished". Mid-utterance phrases alternate by a
+   * hair so a long lesson never settles into a monotone.
+   */
+  function contour(phrase, index, total) {
+    var text = String(phrase == null ? '' : phrase).trim();
+    var i = Number(index) > 0 ? Math.floor(Number(index)) : 0;
+    var n = Number(total) > 0 ? Math.floor(Number(total)) : 1;
+    var last = i >= n - 1;
+    var speed = 1;
+    var pitch = 1;
+    if (/\?$/.test(text)) { pitch = 1.045; speed = 1.02; }
+    else if (/!$/.test(text)) { pitch = 1.035; speed = 1.02; }
+    else if (/[,;:]$/.test(text)) { pitch = 1.025; speed = 1.01; }
+    else if (last) { pitch = 0.975; speed = 0.97; }
+    else { pitch = i % 2 ? 0.99 : 1.012; }
+    // An opening phrase sits slightly higher, the way a speaker starts a new thought.
+    if (i === 0 && n > 1 && !/\?$/.test(text)) pitch += 0.008;
+    return { speed: clampContour(speed), pitch: clampContour(pitch) };
+  }
+
+  /**
+   * Linear-interpolation resample. A factor above 1 shortens and raises the phrase, below
+   * 1 lengthens and lowers it - one tape-speed move, so formants shift with the pitch and
+   * the result still sounds like the same speaker rather than a vocoder artefact. Kept
+   * small by clampContour for exactly that reason.
+   */
+  function resample(samples, factor, Ctor) {
+    var Arr = Ctor || (typeof Float32Array !== 'undefined' ? Float32Array : null);
+    var rate = Number(factor);
+    if (!Arr || !samples || !samples.length || !(rate > 0) || rate === 1) return samples;
+    var length = Math.max(1, Math.round(samples.length / rate));
+    var out = new Arr(length);
+    for (var i = 0; i < length; i++) {
+      var at = i * rate;
+      var low = Math.floor(at);
+      var high = low + 1 < samples.length ? low + 1 : samples.length - 1;
+      var frac = at - low;
+      out[i] = samples[low] * (1 - frac) + samples[high] * frac;
+    }
+    return out;
+  }
+
   return Object.freeze({
     PAUSE_MS: PAUSE_MS,
+    PROFILES: PROFILES,
+    CONTOUR_MIN: CONTOUR_MIN,
+    CONTOUR_MAX: CONTOUR_MAX,
+    profileFor: profileFor,
     punctuate: punctuate,
     phrases: phrases,
     pauseAfter: pauseAfter,
-    padSilence: padSilence
+    padSilence: padSilence,
+    contour: contour,
+    resample: resample
   });
 }));

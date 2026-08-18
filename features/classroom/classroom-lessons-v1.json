@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-classroom-lessons-v1",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "voiceContract": {
     "speech": "id-ID neural tutor",
     "targetLanguage": "en",
@@ -8,40 +8,2087 @@
     "note": "Fiezel mengajar dalam bahasa Indonesia melalui bundle neural Indonesia. Bahasa Inggris tetap menjadi materi target, contoh, prompt, dan latihan. Tidak ada browser-TTS fallback."
   },
   "categories": [
-    { "id": "grammar", "label": "Grammar", "hint": "Present Perfect, Tenses", "icon": "braces" },
-    { "id": "vocabulary", "label": "Vocabulary", "hint": "Word family, Collocation", "icon": "book-a" },
-    { "id": "reading", "label": "Reading", "hint": "Main idea, Evidence", "icon": "book-open-text" },
-    { "id": "listening", "label": "Listening", "hint": "Gist, Detail", "icon": "headphones" },
-    { "id": "speaking", "label": "Speaking", "hint": "Response practice", "icon": "mic" },
-    { "id": "exam", "label": "Exam Prep", "hint": "IELTS / TOEFL", "icon": "graduation-cap" }
+    {
+      "id": "grammar",
+      "label": "Grammar",
+      "hint": "To be, tenses, articles",
+      "icon": "braces"
+    },
+    {
+      "id": "vocabulary",
+      "label": "Vocabulary",
+      "hint": "Numbers, family, food, jobs",
+      "icon": "book-a"
+    },
+    {
+      "id": "reading",
+      "label": "Reading",
+      "hint": "Profiles, signs, timetables",
+      "icon": "book-open-text"
+    },
+    {
+      "id": "listening",
+      "label": "Listening",
+      "hint": "Numbers, directions, instructions",
+      "icon": "headphones"
+    },
+    {
+      "id": "speaking",
+      "label": "Speaking",
+      "hint": "Introductions, ordering, asking",
+      "icon": "mic"
+    },
+    {
+      "id": "exam",
+      "label": "Exam Prep",
+      "hint": "TOEFL / IELTS orientation",
+      "icon": "graduation-cap"
+    }
   ],
   "lessons": [
+    {
+      "id": "grammar_a1_articles",
+      "category": "grammar",
+      "topic": "Articles a / an / the",
+      "level": "A1",
+      "board": {
+        "title": "Articles",
+        "formula": "a + consonant sound · an + vowel sound · the = known",
+        "examples": [
+          "I have a pen.",
+          "She is an engineer.",
+          "The pen is on the table."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I have a pen. She is an engineer.",
+          "id": "A dan an dipakai untuk benda tunggal yang belum tentu diketahui pendengar."
+        },
+        {
+          "en": "A book, a car, an apple, an hour.",
+          "id": "Pilih an kalau kata berikutnya dimulai bunyi vokal. Yang menentukan bunyinya, bukan hurufnya."
+        },
+        {
+          "en": "The pen is on the table.",
+          "id": "The dipakai kalau pendengar sudah tahu benda mana yang dimaksud."
+        },
+        {
+          "en": "I bought a book. The book is about English.",
+          "id": "Pola yang sering muncul: sebutkan pertama dengan a, sesudah itu pakai the."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She is ___ engineer.",
+          "options": [
+            "a",
+            "an",
+            "the"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Engineer starts with a vowel sound, so we use an.",
+            "id": "Engineer diawali bunyi vokal, jadi memakai an."
+          },
+          "remediate": {
+            "en": "Listen to the first sound, not the first letter.",
+            "id": "Dengarkan bunyi pertamanya, bukan huruf pertamanya."
+          }
+        },
+        {
+          "prompt": "Complete: I bought a book. ___ book is new.",
+          "options": [
+            "A",
+            "An",
+            "The"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "The book is already known from the first sentence, so it takes the.",
+            "id": "Bukunya sudah diketahui dari kalimat pertama, jadi memakai the."
+          },
+          "remediate": {
+            "en": "Second mention of the same thing takes the.",
+            "id": "Penyebutan kedua untuk benda yang sama memakai the."
+          }
+        },
+        {
+          "prompt": "Which is correct?",
+          "options": [
+            "an university",
+            "a university",
+            "the a university"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "University starts with a you sound, which is a consonant sound, so a is correct.",
+            "id": "University diawali bunyi you yang termasuk bunyi konsonan, jadi a yang benar."
+          },
+          "remediate": {
+            "en": "Say the word aloud and listen to its first sound.",
+            "id": "Ucapkan katanya dan dengarkan bunyi pertamanya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_can",
+      "category": "grammar",
+      "topic": "Can and Can't",
+      "level": "A1",
+      "board": {
+        "title": "Can",
+        "formula": "can + base verb · cannot / can't + base verb",
+        "examples": [
+          "I can swim.",
+          "She can't drive.",
+          "Can you help me?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "I can swim. She can speak English.",
+          "id": "Can dipakai untuk menyatakan kemampuan."
+        },
+        {
+          "en": "Can is always followed by the base verb.",
+          "id": "Setelah can, kata kerja selalu bentuk dasar. Tidak ada tambahan s dan tidak ada to."
+        },
+        {
+          "en": "She cannot drive. She can't drive.",
+          "id": "Bentuk negatifnya cannot, atau disingkat can't."
+        },
+        {
+          "en": "Can you help me, please?",
+          "id": "Can juga dipakai untuk meminta tolong dengan sopan."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She can ___ English.",
+          "options": [
+            "speaks",
+            "speak",
+            "to speak"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "After can the verb has no s and no to.",
+            "id": "Setelah can, kata kerja tanpa s dan tanpa to."
+          },
+          "remediate": {
+            "en": "Can is a helper, so the main verb stays plain.",
+            "id": "Can adalah kata bantu, jadi kata kerja utamanya tetap polos."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "He cans swim.",
+            "He can swim.",
+            "He can to swim."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Can never takes s and is never followed by to.",
+            "id": "Can tidak pernah memakai s dan tidak pernah diikuti to."
+          },
+          "remediate": {
+            "en": "Modal verbs do not change with the subject.",
+            "id": "Kata kerja modal tidak berubah mengikuti subjek."
+          }
+        },
+        {
+          "prompt": "What does I can't cook mean?",
+          "options": [
+            "I am able to cook.",
+            "I am not able to cook.",
+            "I want to cook."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Can't is the negative of can: not able.",
+            "id": "Can't adalah bentuk negatif dari can: tidak bisa."
+          },
+          "remediate": {
+            "en": "Can't is a short form of cannot.",
+            "id": "Can't adalah singkatan dari cannot."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_have_got",
+      "category": "grammar",
+      "topic": "Have got / Has got",
+      "level": "A1",
+      "board": {
+        "title": "Have got",
+        "formula": "I / you / we / they have got · he / she / it has got",
+        "examples": [
+          "I have got two sisters.",
+          "She has got a new phone.",
+          "Have you got a pen?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "I have got two sisters. She has got a new phone.",
+          "id": "Have got dipakai untuk kepemilikan, dan sangat umum dalam percakapan."
+        },
+        {
+          "en": "He, she and it use has got.",
+          "id": "Sama seperti tadi, orang ketiga tunggal memakai bentuk berbeda, yaitu has."
+        },
+        {
+          "en": "I have not got a car. She has not got time.",
+          "id": "Bentuk negatifnya menyisipkan not di antara have dan got."
+        },
+        {
+          "en": "Have you got a pen? Has he got a car?",
+          "id": "Untuk bertanya, pindahkan have atau has ke depan subjek."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She ___ got a new phone.",
+          "options": [
+            "have",
+            "has",
+            "is"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "She takes has got.",
+            "id": "She memakai has got."
+          },
+          "remediate": {
+            "en": "He, she and it always take has.",
+            "id": "He, she, dan it selalu memakai has."
+          }
+        },
+        {
+          "prompt": "Which question is correct?",
+          "options": [
+            "You have got a pen?",
+            "Have you got a pen?",
+            "Do you have got a pen?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Have moves in front of the subject to ask.",
+            "id": "Have pindah ke depan subjek untuk bertanya."
+          },
+          "remediate": {
+            "en": "Do is not used together with have got.",
+            "id": "Do tidak dipakai bersama have got."
+          }
+        },
+        {
+          "prompt": "Complete: They ___ got any money.",
+          "options": [
+            "has not",
+            "have not",
+            "not have"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "They is plural, so have not got is correct.",
+            "id": "They itu jamak, jadi have not got yang benar."
+          },
+          "remediate": {
+            "en": "Not sits between have and got.",
+            "id": "Not berada di antara have dan got."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_past_simple",
+      "category": "grammar",
+      "topic": "Past Simple (regular verbs)",
+      "level": "A1",
+      "board": {
+        "title": "Past Simple",
+        "formula": "verb + ed · did not + base verb",
+        "examples": [
+          "I worked yesterday.",
+          "She studied last night.",
+          "I did not go."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I worked yesterday. She studied last night.",
+          "id": "Past simple dipakai untuk kejadian yang sudah selesai di masa lampau."
+        },
+        {
+          "en": "Most regular verbs just add ed.",
+          "id": "Sebagian besar kata kerja beraturan hanya menambahkan ed."
+        },
+        {
+          "en": "Study becomes studied. Stop becomes stopped.",
+          "id": "Ada penyesuaian ejaan: y berubah jadi ied, dan konsonan akhir kadang digandakan."
+        },
+        {
+          "en": "I did not work. Did you work yesterday?",
+          "id": "Dalam bentuk negatif dan pertanyaan, did yang membawa masa lampau, jadi kata kerjanya kembali ke bentuk dasar."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "What is the past of study?",
+          "options": [
+            "studyed",
+            "studied",
+            "studying"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Consonant plus y becomes ied.",
+            "id": "Konsonan lalu y berubah menjadi ied."
+          },
+          "remediate": {
+            "en": "Change y to i before ed.",
+            "id": "Ubah y menjadi i sebelum ed."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "I did not worked.",
+            "I did not work.",
+            "I not worked."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Did already marks the past, so the verb stays in the base form.",
+            "id": "Did sudah menandai masa lampau, jadi kata kerjanya tetap bentuk dasar."
+          },
+          "remediate": {
+            "en": "Only one word carries the past tense.",
+            "id": "Hanya satu kata yang membawa penanda lampau."
+          }
+        },
+        {
+          "prompt": "Complete: They ___ football yesterday.",
+          "options": [
+            "play",
+            "played",
+            "plays"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Yesterday signals the past, so we add ed.",
+            "id": "Kata yesterday menandakan lampau, jadi tambahkan ed."
+          },
+          "remediate": {
+            "en": "Look for a past time word in the sentence.",
+            "id": "Cari kata penanda waktu lampau dalam kalimatnya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_past_be",
+      "category": "grammar",
+      "topic": "Past of To Be (was / were)",
+      "level": "A1",
+      "board": {
+        "title": "Was · Were",
+        "formula": "I / he / she / it was · you / we / they were",
+        "examples": [
+          "I was at home.",
+          "They were late.",
+          "Was she happy?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "I was at home yesterday. They were at school.",
+          "id": "Was dan were adalah bentuk lampau dari to be."
+        },
+        {
+          "en": "I was, he was, she was, it was. You were, we were, they were.",
+          "id": "I dan orang ketiga tunggal memakai was. Sisanya memakai were."
+        },
+        {
+          "en": "I was not tired. They were not late.",
+          "id": "Bentuk negatifnya menambahkan not sesudah was atau were."
+        },
+        {
+          "en": "Was she happy? Were you at home?",
+          "id": "Untuk bertanya, pindahkan was atau were ke depan subjek."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: They ___ at school yesterday.",
+          "options": [
+            "was",
+            "were",
+            "are"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "They is plural, so were is correct.",
+            "id": "They itu jamak, jadi were yang benar."
+          },
+          "remediate": {
+            "en": "Plural subjects take were.",
+            "id": "Subjek jamak memakai were."
+          }
+        },
+        {
+          "prompt": "Complete: She ___ very tired last night.",
+          "options": [
+            "were",
+            "was",
+            "is"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "She takes was in the past.",
+            "id": "She memakai was untuk bentuk lampau."
+          },
+          "remediate": {
+            "en": "I, he, she and it take was.",
+            "id": "I, he, she, dan it memakai was."
+          }
+        },
+        {
+          "prompt": "Which question is correct?",
+          "options": [
+            "You were at home?",
+            "Were you at home?",
+            "Did you were at home?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Were moves in front of the subject.",
+            "id": "Were pindah ke depan subjek."
+          },
+          "remediate": {
+            "en": "Did is never used together with was or were.",
+            "id": "Did tidak pernah dipakai bersama was atau were."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_plurals",
+      "category": "grammar",
+      "topic": "Plural Nouns",
+      "level": "A1",
+      "board": {
+        "title": "Plurals",
+        "formula": "book → books · box → boxes · child → children",
+        "examples": [
+          "one book, two books",
+          "one box, two boxes",
+          "one child, two children"
+        ]
+      },
+      "segments": [
+        {
+          "en": "One book, two books. One car, two cars.",
+          "id": "Bentuk jamak paling umum hanya menambahkan huruf s."
+        },
+        {
+          "en": "One box, two boxes. One watch, two watches.",
+          "id": "Kalau kata berakhir dengan s, x, ch, sh, atau o, tambahkan es."
+        },
+        {
+          "en": "City becomes cities. Baby becomes babies.",
+          "id": "Kalau berakhir konsonan lalu y, ubah y menjadi i lalu tambahkan es."
+        },
+        {
+          "en": "Man becomes men. Child becomes children.",
+          "id": "Beberapa kata tidak beraturan dan harus dihafal."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "What is the plural of box?",
+          "options": [
+            "boxs",
+            "boxes",
+            "boxies"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Words ending in x take es.",
+            "id": "Kata yang berakhir x memakai es."
+          },
+          "remediate": {
+            "en": "After s, x, ch and sh we add es.",
+            "id": "Setelah s, x, ch, dan sh kita tambahkan es."
+          }
+        },
+        {
+          "prompt": "What is the plural of city?",
+          "options": [
+            "citys",
+            "cities",
+            "cityes"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Consonant plus y becomes ies.",
+            "id": "Konsonan lalu y berubah menjadi ies."
+          },
+          "remediate": {
+            "en": "Change y to i, then add es.",
+            "id": "Ubah y menjadi i, lalu tambahkan es."
+          }
+        },
+        {
+          "prompt": "What is the plural of child?",
+          "options": [
+            "childs",
+            "childes",
+            "children"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "Child is irregular: the plural is children.",
+            "id": "Child tidak beraturan: bentuk jamaknya children."
+          },
+          "remediate": {
+            "en": "Some very common nouns do not follow the s rule.",
+            "id": "Beberapa kata benda umum tidak mengikuti aturan s."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_prepositions_place",
+      "category": "grammar",
+      "topic": "Prepositions of Place",
+      "level": "A1",
+      "board": {
+        "title": "In · On · At (place)",
+        "formula": "in a space · on a surface · at a point",
+        "examples": [
+          "The keys are in the bag.",
+          "The book is on the table.",
+          "I am at the bus stop."
+        ]
+      },
+      "segments": [
+        {
+          "en": "The keys are in the bag.",
+          "id": "In dipakai untuk sesuatu yang berada di dalam ruang atau wadah."
+        },
+        {
+          "en": "The book is on the table.",
+          "id": "On dipakai untuk sesuatu yang menempel pada permukaan."
+        },
+        {
+          "en": "I am at the bus stop. She is at school.",
+          "id": "At dipakai untuk satu titik atau tempat kegiatan."
+        },
+        {
+          "en": "In the room, on the wall, at the door.",
+          "id": "Ingat tiga gambarannya: di dalam, di permukaan, dan di satu titik."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: The book is ___ the table.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "A table is a surface, so we use on.",
+            "id": "Meja adalah permukaan, jadi memakai on."
+          },
+          "remediate": {
+            "en": "Ask if it is inside, on a surface, or at a point.",
+            "id": "Tanyakan apakah di dalam, di permukaan, atau di satu titik."
+          }
+        },
+        {
+          "prompt": "Complete: My phone is ___ my bag.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "A bag is a container, so we use in.",
+            "id": "Tas adalah wadah, jadi memakai in."
+          },
+          "remediate": {
+            "en": "Inside something is always in.",
+            "id": "Berada di dalam sesuatu selalu memakai in."
+          }
+        },
+        {
+          "prompt": "Complete: I am waiting ___ the bus stop.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "A bus stop is treated as a point, so we use at.",
+            "id": "Halte dianggap satu titik, jadi memakai at."
+          },
+          "remediate": {
+            "en": "A specific meeting point takes at.",
+            "id": "Titik pertemuan yang spesifik memakai at."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_prepositions_time",
+      "category": "grammar",
+      "topic": "Prepositions of Time",
+      "level": "A1",
+      "board": {
+        "title": "In · On · At (time)",
+        "formula": "in months/years · on days/dates · at clock times",
+        "examples": [
+          "in July, in 2026",
+          "on Monday, on 3 May",
+          "at seven o'clock, at night"
+        ]
+      },
+      "segments": [
+        {
+          "en": "In July, in 2026, in the morning.",
+          "id": "In dipakai untuk bulan, tahun, dan bagian hari."
+        },
+        {
+          "en": "On Monday, on 3 May, on my birthday.",
+          "id": "On dipakai untuk hari dan tanggal."
+        },
+        {
+          "en": "At seven o'clock, at night, at the weekend.",
+          "id": "At dipakai untuk jam dan beberapa ungkapan tetap."
+        },
+        {
+          "en": "Notice: in the morning, but at night.",
+          "id": "Perhatikan satu pengecualian penting: in the morning, tetapi at night."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: The class starts ___ eight o'clock.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "Clock times take at.",
+            "id": "Waktu jam memakai at."
+          },
+          "remediate": {
+            "en": "A clock time is always at.",
+            "id": "Waktu jam selalu memakai at."
+          }
+        },
+        {
+          "prompt": "Complete: My birthday is ___ May.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Months take in.",
+            "id": "Nama bulan memakai in."
+          },
+          "remediate": {
+            "en": "Months and years take in.",
+            "id": "Bulan dan tahun memakai in."
+          }
+        },
+        {
+          "prompt": "Complete: We have English ___ Monday.",
+          "options": [
+            "in",
+            "on",
+            "at"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Days of the week take on.",
+            "id": "Nama hari memakai on."
+          },
+          "remediate": {
+            "en": "Days and dates take on.",
+            "id": "Hari dan tanggal memakai on."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_present_continuous",
+      "category": "grammar",
+      "topic": "Present Continuous",
+      "level": "A1",
+      "board": {
+        "title": "Present Continuous",
+        "formula": "am / is / are + verb-ing",
+        "examples": [
+          "I am studying now.",
+          "She is cooking dinner.",
+          "They are not sleeping."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I am studying now. She is cooking dinner.",
+          "id": "Present continuous dipakai untuk kejadian yang sedang berlangsung sekarang."
+        },
+        {
+          "en": "The pattern is be plus verb plus ing.",
+          "id": "Polanya adalah to be, lalu kata kerja ditambah ing. Keduanya harus ada."
+        },
+        {
+          "en": "I work every day, but today I am studying.",
+          "id": "Bandingkan dengan present simple: work adalah kebiasaan, am studying adalah sekarang."
+        },
+        {
+          "en": "Are you listening? She is not sleeping.",
+          "id": "Bertanya dan menyangkal dilakukan lewat to be, bukan lewat kata kerja utama."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She ___ dinner now.",
+          "options": [
+            "cook",
+            "is cooking",
+            "cooks"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Now signals an action in progress, so we use is cooking.",
+            "id": "Kata now menandakan aksi yang sedang berjalan, jadi memakai is cooking."
+          },
+          "remediate": {
+            "en": "Present continuous always needs be plus ing.",
+            "id": "Present continuous selalu butuh to be dan ing."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "I studying now.",
+            "I am studying now.",
+            "I am study now."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Both parts are required: am and studying.",
+            "id": "Kedua bagian wajib ada: am dan studying."
+          },
+          "remediate": {
+            "en": "Do not drop be, and do not drop ing.",
+            "id": "Jangan menghilangkan to be, dan jangan menghilangkan ing."
+          }
+        },
+        {
+          "prompt": "Which sentence describes a habit, not now?",
+          "options": [
+            "He is reading a book.",
+            "He reads every night.",
+            "He is not reading."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Present simple describes a habit; continuous describes right now.",
+            "id": "Present simple menggambarkan kebiasaan; continuous menggambarkan saat ini."
+          },
+          "remediate": {
+            "en": "Ask yourself: every day, or at this moment?",
+            "id": "Tanyakan pada dirimu: setiap hari, atau saat ini?"
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_present_simple",
+      "category": "grammar",
+      "topic": "Present Simple",
+      "level": "A1",
+      "board": {
+        "title": "Present Simple",
+        "formula": "I / you / we / they work · he / she / it works",
+        "examples": [
+          "I work in Bandung.",
+          "She works in a bank.",
+          "He does not work on Sunday."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I work in Bandung. She works in a bank.",
+          "id": "Present simple dipakai untuk kebiasaan dan fakta."
+        },
+        {
+          "en": "He, she and it add s to the verb.",
+          "id": "Jebakan terbesarnya ada di orang ketiga tunggal: kata kerjanya ditambah s."
+        },
+        {
+          "en": "He does not work on Sunday. They do not work at night.",
+          "id": "Untuk bentuk negatif, pakai do not atau does not, lalu kata kerja dasar tanpa s."
+        },
+        {
+          "en": "Do you work here? Does she work here?",
+          "id": "Untuk bertanya, mulai dengan do atau does. Kata kerjanya kembali ke bentuk dasar."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She ___ in a bank.",
+          "options": [
+            "work",
+            "works",
+            "working"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "She is third person singular, so the verb takes s.",
+            "id": "She itu orang ketiga tunggal, jadi kata kerjanya ditambah s."
+          },
+          "remediate": {
+            "en": "He, she and it add s in the present simple.",
+            "id": "He, she, dan it menambahkan s pada present simple."
+          }
+        },
+        {
+          "prompt": "Complete: He ___ not like coffee.",
+          "options": [
+            "do",
+            "does",
+            "is"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "With he we use does not, and the verb stays in its base form.",
+            "id": "Dengan he kita memakai does not, dan kata kerjanya tetap bentuk dasar."
+          },
+          "remediate": {
+            "en": "Does already carries the s, so the verb does not.",
+            "id": "Does sudah membawa s, jadi kata kerjanya tidak lagi memakai s."
+          }
+        },
+        {
+          "prompt": "Which question is correct?",
+          "options": [
+            "Does she works here?",
+            "Does she work here?",
+            "She does work here?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "After does the verb returns to its base form: work.",
+            "id": "Setelah does, kata kerja kembali ke bentuk dasar: work."
+          },
+          "remediate": {
+            "en": "Never put s on the verb after does.",
+            "id": "Jangan menambahkan s pada kata kerja setelah does."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_pronouns",
+      "category": "grammar",
+      "topic": "Pronouns and Possessives",
+      "level": "A1",
+      "board": {
+        "title": "Pronouns",
+        "formula": "I · you · he · she · it · we · they",
+        "examples": [
+          "I like coffee.",
+          "This is my book.",
+          "That book is hers."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I, you, he, she, it, we, they.",
+          "id": "Ini kata ganti subjek. Dipakai di depan kata kerja."
+        },
+        {
+          "en": "My, your, his, her, its, our, their.",
+          "id": "Ini kata ganti kepemilikan. Selalu diikuti kata benda, misalnya my book."
+        },
+        {
+          "en": "This is my book. This book is mine.",
+          "id": "Perhatikan bedanya. My selalu bersama kata benda, sedangkan mine berdiri sendiri."
+        },
+        {
+          "en": "Her name is Sari. His name is Dani.",
+          "id": "Dalam bahasa Inggris, kepemilikan mengikuti pemiliknya, bukan bendanya."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: ___ name is Sari.",
+          "options": [
+            "She",
+            "Her",
+            "Hers"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Before a noun we use the possessive adjective her.",
+            "id": "Sebelum kata benda kita memakai kata kepemilikan her."
+          },
+          "remediate": {
+            "en": "A word before a noun must be my, your, his, her, our or their.",
+            "id": "Kata sebelum kata benda harus my, your, his, her, our, atau their."
+          }
+        },
+        {
+          "prompt": "Complete: That bag is ___.",
+          "options": [
+            "my",
+            "mine",
+            "me"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "With no noun after it, we use mine.",
+            "id": "Kalau tidak ada kata benda sesudahnya, kita memakai mine."
+          },
+          "remediate": {
+            "en": "My needs a noun; mine stands alone.",
+            "id": "My butuh kata benda; mine berdiri sendiri."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "Me like coffee.",
+            "I like coffee.",
+            "My like coffee."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "The subject of the sentence is I.",
+            "id": "Subjek kalimatnya adalah I."
+          },
+          "remediate": {
+            "en": "Use I as the subject, me as the object.",
+            "id": "Pakai I sebagai subjek, me sebagai objek."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_question_words",
+      "category": "grammar",
+      "topic": "Question Words",
+      "level": "A1",
+      "board": {
+        "title": "Wh- questions",
+        "formula": "what · where · when · who · why · how",
+        "examples": [
+          "Where do you live?",
+          "What is your name?",
+          "How old are you?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "What, where, when, who, why, how.",
+          "id": "Enam kata tanya ini menutup hampir semua kebutuhan percakapan dasar."
+        },
+        {
+          "en": "What is your name? Where do you live?",
+          "id": "What menanyakan benda atau informasi, where menanyakan tempat."
+        },
+        {
+          "en": "When do you study? Who is your teacher? Why are you late?",
+          "id": "When menanyakan waktu, who menanyakan orang, dan why menanyakan alasan."
+        },
+        {
+          "en": "How old are you? How much is it?",
+          "id": "How sering berpasangan dengan kata lain, misalnya how old dan how much."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which question asks about a place?",
+          "options": [
+            "What do you do?",
+            "Where do you live?",
+            "When do you work?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Where asks about place.",
+            "id": "Where menanyakan tempat."
+          },
+          "remediate": {
+            "en": "Match the question word to the information you need.",
+            "id": "Cocokkan kata tanya dengan informasi yang kamu butuhkan."
+          }
+        },
+        {
+          "prompt": "Complete: ___ old are you?",
+          "options": [
+            "What",
+            "How",
+            "Why"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Age is asked with how old.",
+            "id": "Umur ditanyakan dengan how old."
+          },
+          "remediate": {
+            "en": "How combines with other words: how old, how much, how many.",
+            "id": "How berpasangan dengan kata lain: how old, how much, how many."
+          }
+        },
+        {
+          "prompt": "Complete: ___ is your teacher?",
+          "options": [
+            "Who",
+            "Where",
+            "What"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Who asks about a person.",
+            "id": "Who menanyakan orang."
+          },
+          "remediate": {
+            "en": "A person is always who.",
+            "id": "Untuk orang selalu memakai who."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_some_any",
+      "category": "grammar",
+      "topic": "Some, Any and Countable Nouns",
+      "level": "A1",
+      "board": {
+        "title": "Some · Any",
+        "formula": "some in positives · any in negatives and questions",
+        "examples": [
+          "I have some water.",
+          "I don't have any money.",
+          "Do you have any questions?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "I have some water. I have some friends here.",
+          "id": "Some dipakai dalam kalimat positif, untuk jumlah yang tidak disebut pasti."
+        },
+        {
+          "en": "I do not have any money. Do you have any questions?",
+          "id": "Any dipakai dalam kalimat negatif dan pertanyaan."
+        },
+        {
+          "en": "Countable: one book, two books. Uncountable: water, rice, money.",
+          "id": "Kata benda terhitung bisa dihitung satu per satu; kata benda tak terhitung tidak bisa."
+        },
+        {
+          "en": "How many books? How much water?",
+          "id": "Untuk yang terhitung pakai how many, untuk yang tak terhitung pakai how much."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: I don't have ___ money.",
+          "options": [
+            "some",
+            "any",
+            "a"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Negatives take any.",
+            "id": "Kalimat negatif memakai any."
+          },
+          "remediate": {
+            "en": "Some is for positive sentences.",
+            "id": "Some dipakai untuk kalimat positif."
+          }
+        },
+        {
+          "prompt": "Complete: ___ many books do you have?",
+          "options": [
+            "How much",
+            "How many",
+            "How long"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Books are countable, so we use how many.",
+            "id": "Books bisa dihitung, jadi memakai how many."
+          },
+          "remediate": {
+            "en": "Countable nouns take how many.",
+            "id": "Kata benda terhitung memakai how many."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "I have some waters.",
+            "I have some water.",
+            "I have a water."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Water is uncountable, so it has no plural and no a.",
+            "id": "Water tidak terhitung, jadi tanpa bentuk jamak dan tanpa a."
+          },
+          "remediate": {
+            "en": "Uncountable nouns stay singular.",
+            "id": "Kata benda tak terhitung tetap tunggal."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_there_is",
+      "category": "grammar",
+      "topic": "There is / There are",
+      "level": "A1",
+      "board": {
+        "title": "There is · There are",
+        "formula": "There is + singular · There are + plural",
+        "examples": [
+          "There is a book on the desk.",
+          "There are two books here.",
+          "Is there a bank near here?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "There is a book on the desk.",
+          "id": "There is dipakai untuk menyatakan ada, dengan benda tunggal."
+        },
+        {
+          "en": "There are two books on the desk.",
+          "id": "Untuk benda jamak, gunakan there are."
+        },
+        {
+          "en": "There is not any milk. There are not any chairs.",
+          "id": "Bentuk negatifnya menambahkan not, dan sering dipakai bersama any."
+        },
+        {
+          "en": "Is there a bank near here? Are there any questions?",
+          "id": "Untuk bertanya, pindahkan is atau are ke depan there."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: ___ three chairs in the room.",
+          "options": [
+            "There is",
+            "There are",
+            "There be"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Three chairs is plural, so we use there are.",
+            "id": "Three chairs itu jamak, jadi memakai there are."
+          },
+          "remediate": {
+            "en": "Count the noun first, then choose is or are.",
+            "id": "Hitung benda dulu, baru pilih is atau are."
+          }
+        },
+        {
+          "prompt": "Complete: ___ a bank near here?",
+          "options": [
+            "Is there",
+            "There is",
+            "Are there"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Questions move is in front of there.",
+            "id": "Dalam pertanyaan, is pindah ke depan there."
+          },
+          "remediate": {
+            "en": "Ask with Is there or Are there.",
+            "id": "Bertanya dengan Is there atau Are there."
+          }
+        },
+        {
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "There is many people.",
+            "There are many people.",
+            "There have many people."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "People is plural here, so there are is correct.",
+            "id": "People di sini jamak, jadi there are yang benar."
+          },
+          "remediate": {
+            "en": "There have is never used to say something exists.",
+            "id": "There have tidak pernah dipakai untuk menyatakan keberadaan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "grammar_a1_to_be",
+      "category": "grammar",
+      "topic": "Verb To Be (am / is / are)",
+      "level": "A1",
+      "board": {
+        "title": "To be",
+        "formula": "I am · you/we/they are · he/she/it is",
+        "examples": [
+          "I am a student.",
+          "She is my teacher.",
+          "They are from Bandung."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I am a student. She is my teacher. They are from Bandung.",
+          "id": "Kita mulai dari kata kerja paling dasar dalam bahasa Inggris, yaitu to be."
+        },
+        {
+          "en": "I am, you are, he is, she is, it is, we are, they are.",
+          "id": "Bentuknya mengikuti subjek. I memakai am, he, she, dan it memakai is, sisanya memakai are."
+        },
+        {
+          "en": "I am not tired. She is not late.",
+          "id": "Untuk bentuk negatif, tambahkan not sesudah to be. Bukan sebelum."
+        },
+        {
+          "en": "Are you ready? Is she a doctor?",
+          "id": "Untuk bertanya, tukar posisinya. To be pindah ke depan subjek."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: She ___ my sister.",
+          "options": [
+            "am",
+            "is",
+            "are"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "He, she and it always take is.",
+            "id": "He, she, dan it selalu memakai is."
+          },
+          "remediate": {
+            "en": "Look at the subject first, then choose the form of be.",
+            "id": "Lihat subjeknya dulu, baru pilih bentuk to be."
+          }
+        },
+        {
+          "prompt": "Complete: They ___ from Jakarta.",
+          "options": [
+            "is",
+            "are",
+            "am"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "They is plural, so it takes are.",
+            "id": "They itu jamak, jadi memakai are."
+          },
+          "remediate": {
+            "en": "Plural subjects take are.",
+            "id": "Subjek jamak memakai are."
+          }
+        },
+        {
+          "prompt": "Which question is correct?",
+          "options": [
+            "You are ready?",
+            "Are you ready?",
+            "Are ready you?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "In a question be moves in front of the subject: Are you ready?",
+            "id": "Dalam pertanyaan, to be pindah ke depan subjek: Are you ready?"
+          },
+          "remediate": {
+            "en": "Move am, is or are before the subject to ask.",
+            "id": "Pindahkan am, is, atau are ke depan subjek untuk bertanya."
+          }
+        }
+      ]
+    },
     {
       "id": "grammar_present_perfect",
       "category": "grammar",
       "topic": "Present Perfect",
       "level": "B1",
-      "board": { "title": "Present Perfect", "formula": "Subject + have / has + V3", "examples": ["I have finished my homework.", "She has visited Singapore."] },
+      "board": {
+        "title": "Present Perfect",
+        "formula": "Subject + have / has + V3",
+        "examples": [
+          "I have finished my homework.",
+          "She has visited Singapore."
+        ]
+      },
       "segments": [
-        { "en": "Let's look at the present perfect.", "id": "Mari kita lihat present perfect." },
-        { "en": "The basic pattern is subject, have or has,", "id": "Polanya adalah subjek, have atau has," },
-        { "en": "then the past participle, the third form of the verb.", "id": "lalu past participle atau kata kerja bentuk ketiga." },
-        { "en": "We use it when the time is not important, only the result.", "id": "Kita memakainya saat waktunya tidak penting, hanya hasilnya." }
+        {
+          "en": "Let's look at the present perfect.",
+          "id": "Mari kita lihat present perfect."
+        },
+        {
+          "en": "The basic pattern is subject, have or has,",
+          "id": "Polanya adalah subjek, have atau has,"
+        },
+        {
+          "en": "then the past participle, the third form of the verb.",
+          "id": "lalu past participle atau kata kerja bentuk ketiga."
+        },
+        {
+          "en": "We use it when the time is not important, only the result.",
+          "id": "Kita memakainya saat waktunya tidak penting, hanya hasilnya."
+        }
       ],
       "questions": [
         {
           "prompt": "Which sentence is correct?",
-          "options": ["I have went to school.", "I have gone to school.", "I has gone to school."],
+          "options": [
+            "I have went to school.",
+            "I have gone to school.",
+            "I has gone to school."
+          ],
           "answerIndex": 1,
-          "explain": { "en": "Gone is the past participle. Went is the simple past, so it cannot follow have.", "id": "Gone adalah past participle. Went itu simple past, jadi tidak bisa mengikuti have." },
-          "remediate": { "en": "Remember: have or has is always followed by the third form.", "id": "Ingat: have atau has selalu diikuti bentuk ketiga." }
+          "explain": {
+            "en": "Gone is the past participle. Went is the simple past, so it cannot follow have.",
+            "id": "Gone adalah past participle. Went itu simple past, jadi tidak bisa mengikuti have."
+          },
+          "remediate": {
+            "en": "Remember: have or has is always followed by the third form.",
+            "id": "Ingat: have atau has selalu diikuti bentuk ketiga."
+          }
         },
         {
           "prompt": "Complete: She ___ finished her project.",
-          "options": ["have", "has", "having"],
+          "options": [
+            "have",
+            "has",
+            "having"
+          ],
           "answerIndex": 1,
-          "explain": { "en": "She is third person singular, so we use has.", "id": "She itu orang ketiga tunggal, jadi memakai has." },
-          "remediate": { "en": "He, she and it always take has, not have.", "id": "He, she, dan it selalu memakai has, bukan have." }
+          "explain": {
+            "en": "She is third person singular, so we use has.",
+            "id": "She itu orang ketiga tunggal, jadi memakai has."
+          },
+          "remediate": {
+            "en": "He, she and it always take has, not have.",
+            "id": "He, she, dan it selalu memakai has, bukan have."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_clothes",
+      "category": "vocabulary",
+      "topic": "Clothes and Colours",
+      "level": "A1",
+      "board": {
+        "title": "Clothes and colours",
+        "formula": "a red shirt · wear · a pair of",
+        "examples": [
+          "a red shirt",
+          "She is wearing a jacket.",
+          "a pair of shoes"
+        ]
+      },
+      "segments": [
+        {
+          "en": "Shirt, trousers, dress, jacket, shoes.",
+          "id": "Ini nama pakaian yang paling sering dipakai sehari-hari."
+        },
+        {
+          "en": "Red, blue, green, black, white.",
+          "id": "Warna diletakkan sebelum kata bendanya, misalnya a red shirt."
+        },
+        {
+          "en": "She is wearing a blue jacket today.",
+          "id": "Kata kerjanya adalah wear. Untuk sekarang, gunakan is wearing."
+        },
+        {
+          "en": "A pair of shoes, a pair of trousers.",
+          "id": "Benda yang berpasangan dihitung dengan a pair of."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which order is correct?",
+          "options": [
+            "a shirt red",
+            "a red shirt",
+            "red a shirt"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "The colour comes before the noun.",
+            "id": "Warna diletakkan sebelum kata benda."
+          },
+          "remediate": {
+            "en": "Adjective first, then the noun.",
+            "id": "Kata sifat dulu, baru kata benda."
+          }
+        },
+        {
+          "prompt": "Complete: She is ___ a jacket.",
+          "options": [
+            "wearing",
+            "using",
+            "putting"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "For clothes on the body we use wear.",
+            "id": "Untuk pakaian yang sedang dikenakan, kita memakai wear."
+          },
+          "remediate": {
+            "en": "Wear is the verb for clothes.",
+            "id": "Wear adalah kata kerja untuk pakaian."
+          }
+        },
+        {
+          "prompt": "Complete: I bought a ___ of shoes.",
+          "options": [
+            "piece",
+            "pair",
+            "cup"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Shoes come in twos, so we say a pair of shoes.",
+            "id": "Sepatu berpasangan, jadi kita berkata a pair of shoes."
+          },
+          "remediate": {
+            "en": "Two-part items take a pair of.",
+            "id": "Benda berpasangan memakai a pair of."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_daily_routine",
+      "category": "vocabulary",
+      "topic": "Daily Routine",
+      "level": "A1",
+      "board": {
+        "title": "Daily routine",
+        "formula": "get up · have breakfast · go to work",
+        "examples": [
+          "I get up at six.",
+          "I have breakfast at seven.",
+          "I go to bed at ten."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I get up at six o'clock. I have breakfast at seven.",
+          "id": "Rutinitas harian selalu memakai present simple, karena ini kebiasaan."
+        },
+        {
+          "en": "Get up, take a shower, have breakfast, go to work.",
+          "id": "Kata kerja rutinitas biasanya berpasangan dengan kata lain, jadi hafalkan pasangannya."
+        },
+        {
+          "en": "Always, usually, often, sometimes, never.",
+          "id": "Kata keterangan frekuensi ini diletakkan sebelum kata kerja utama."
+        },
+        {
+          "en": "I always get up early. I am never late.",
+          "id": "Perhatikan satu pengecualian: dengan to be, kata frekuensi diletakkan sesudahnya."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: I ___ up at six every day.",
+          "options": [
+            "get",
+            "am getting",
+            "got"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Every day signals a habit, so present simple is correct.",
+            "id": "Every day menandakan kebiasaan, jadi present simple yang benar."
+          },
+          "remediate": {
+            "en": "Habits use the present simple.",
+            "id": "Kebiasaan memakai present simple."
+          }
+        },
+        {
+          "prompt": "Where does always go?",
+          "options": [
+            "I get always up early.",
+            "I always get up early.",
+            "Always I get up early."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Frequency adverbs sit before the main verb.",
+            "id": "Kata keterangan frekuensi berada sebelum kata kerja utama."
+          },
+          "remediate": {
+            "en": "Before the main verb, after be.",
+            "id": "Sebelum kata kerja utama, sesudah to be."
+          }
+        },
+        {
+          "prompt": "Which phrase is correct?",
+          "options": [
+            "make breakfast time",
+            "have breakfast",
+            "do breakfast"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "The fixed phrase is have breakfast.",
+            "id": "Frasa tetapnya adalah have breakfast."
+          },
+          "remediate": {
+            "en": "Learn routine verbs together with their partner word.",
+            "id": "Hafalkan kata kerja rutinitas bersama pasangan katanya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_family",
+      "category": "vocabulary",
+      "topic": "Family and People",
+      "level": "A1",
+      "board": {
+        "title": "Family",
+        "formula": "parents · siblings · relatives",
+        "examples": [
+          "mother, father, parents",
+          "brother, sister, siblings",
+          "aunt, uncle, cousin"
+        ]
+      },
+      "segments": [
+        {
+          "en": "Mother and father together are parents.",
+          "id": "Ibu dan ayah bersama-sama disebut parents."
+        },
+        {
+          "en": "Brother and sister together are siblings.",
+          "id": "Kakak atau adik laki-laki dan perempuan bersama-sama disebut siblings."
+        },
+        {
+          "en": "My father's brother is my uncle. His daughter is my cousin.",
+          "id": "Cousin dipakai untuk sepupu, laki-laki maupun perempuan."
+        },
+        {
+          "en": "This is my wife. This is my husband.",
+          "id": "Untuk pasangan, gunakan wife untuk istri dan husband untuk suami."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Your mother's sister is your…",
+          "options": [
+            "cousin",
+            "aunt",
+            "niece"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Your mother's sister is your aunt.",
+            "id": "Saudara perempuan ibumu adalah aunt."
+          },
+          "remediate": {
+            "en": "Aunt is the sister of a parent.",
+            "id": "Aunt adalah saudara perempuan dari orang tua."
+          }
+        },
+        {
+          "prompt": "Brother and sister together are…",
+          "options": [
+            "parents",
+            "siblings",
+            "relatives"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Siblings covers brothers and sisters.",
+            "id": "Siblings mencakup saudara laki-laki dan perempuan."
+          },
+          "remediate": {
+            "en": "Parents means mother and father.",
+            "id": "Parents berarti ibu dan ayah."
+          }
+        },
+        {
+          "prompt": "Which word means the child of your uncle?",
+          "options": [
+            "cousin",
+            "nephew",
+            "grandchild"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "The child of an uncle or aunt is a cousin.",
+            "id": "Anak dari paman atau bibi adalah cousin."
+          },
+          "remediate": {
+            "en": "Cousin is used for both boys and girls.",
+            "id": "Cousin dipakai untuk laki-laki maupun perempuan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_food",
+      "category": "vocabulary",
+      "topic": "Food and Drink",
+      "level": "A1",
+      "board": {
+        "title": "Food",
+        "formula": "countable food · uncountable food · a cup of…",
+        "examples": [
+          "an apple, two apples",
+          "rice, water, bread",
+          "a cup of tea"
+        ]
+      },
+      "segments": [
+        {
+          "en": "An apple, a banana, two eggs.",
+          "id": "Sebagian makanan bisa dihitung satu per satu."
+        },
+        {
+          "en": "Rice, bread, water, coffee.",
+          "id": "Sebagian lagi tidak bisa dihitung langsung, jadi tidak memakai bentuk jamak."
+        },
+        {
+          "en": "A cup of tea, a glass of water, a bowl of rice.",
+          "id": "Untuk menghitung yang tak terhitung, gunakan wadahnya: a cup of, a glass of, a bowl of."
+        },
+        {
+          "en": "I would like a coffee, please. Can I have the bill?",
+          "id": "Dua kalimat ini paling sering dipakai saat memesan makanan."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which is correct?",
+          "options": [
+            "two rices",
+            "two bowls of rice",
+            "two rice"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Rice is uncountable, so we count the container.",
+            "id": "Rice tidak terhitung, jadi yang dihitung wadahnya."
+          },
+          "remediate": {
+            "en": "Use a cup, glass or bowl to count uncountable food.",
+            "id": "Pakai cup, glass, atau bowl untuk menghitung makanan tak terhitung."
+          }
+        },
+        {
+          "prompt": "Complete: I would like ___ glass of water.",
+          "options": [
+            "a",
+            "an",
+            "some"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Glass starts with a consonant sound, so a is correct.",
+            "id": "Glass diawali bunyi konsonan, jadi a yang benar."
+          },
+          "remediate": {
+            "en": "Choose a or an by the sound of the next word.",
+            "id": "Pilih a atau an berdasarkan bunyi kata berikutnya."
+          }
+        },
+        {
+          "prompt": "Which sentence orders food politely?",
+          "options": [
+            "Give me coffee.",
+            "I would like a coffee, please.",
+            "Coffee now."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Would like plus please is the polite form.",
+            "id": "Would like ditambah please adalah bentuk sopan."
+          },
+          "remediate": {
+            "en": "Polite ordering uses would like, not give me.",
+            "id": "Memesan dengan sopan memakai would like, bukan give me."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_jobs",
+      "category": "vocabulary",
+      "topic": "Jobs and Workplaces",
+      "level": "A1",
+      "board": {
+        "title": "Jobs",
+        "formula": "I am a + job · work as · work in / at",
+        "examples": [
+          "I am a teacher.",
+          "She works as a nurse.",
+          "He works in a bank."
+        ]
+      },
+      "segments": [
+        {
+          "en": "I am a teacher. She is a nurse. He is an engineer.",
+          "id": "Untuk menyebut pekerjaan, gunakan to be lalu a atau an."
+        },
+        {
+          "en": "A doctor works in a hospital. A teacher works in a school.",
+          "id": "Sebutkan tempat kerjanya dengan work in atau work at."
+        },
+        {
+          "en": "She works as a nurse.",
+          "id": "Work as dipakai untuk menyebut peran atau jabatannya."
+        },
+        {
+          "en": "What do you do? I am a student.",
+          "id": "What do you do adalah cara umum menanyakan pekerjaan seseorang."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: I am ___ engineer.",
+          "options": [
+            "a",
+            "an",
+            "the"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Engineer begins with a vowel sound, so an is used.",
+            "id": "Engineer diawali bunyi vokal, jadi memakai an."
+          },
+          "remediate": {
+            "en": "Job words after be always need a or an.",
+            "id": "Kata pekerjaan setelah to be selalu butuh a atau an."
+          }
+        },
+        {
+          "prompt": "Where does a nurse work?",
+          "options": [
+            "in a hospital",
+            "in a bank",
+            "in a garage"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "A nurse works in a hospital.",
+            "id": "Perawat bekerja di rumah sakit."
+          },
+          "remediate": {
+            "en": "Match the job to its usual workplace.",
+            "id": "Cocokkan pekerjaan dengan tempat kerjanya yang biasa."
+          }
+        },
+        {
+          "prompt": "What does What do you do? ask about?",
+          "options": [
+            "your name",
+            "your job",
+            "your address"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "It asks about your job.",
+            "id": "Pertanyaan itu menanyakan pekerjaanmu."
+          },
+          "remediate": {
+            "en": "It is the standard way to ask about work.",
+            "id": "Itu cara baku untuk menanyakan pekerjaan."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_numbers_time",
+      "category": "vocabulary",
+      "topic": "Numbers, Time and Dates",
+      "level": "A1",
+      "board": {
+        "title": "Numbers and time",
+        "formula": "thirteen ≠ thirty · half past · on 3 May",
+        "examples": [
+          "thirteen / thirty",
+          "It is half past seven.",
+          "My birthday is on 3 May."
+        ]
+      },
+      "segments": [
+        {
+          "en": "One, two, three… thirteen, fourteen, fifteen.",
+          "id": "Kita mulai dari angka, karena hampir semua percakapan dasar memakainya."
+        },
+        {
+          "en": "Thirteen and thirty sound similar but are very different numbers.",
+          "id": "Hati-hati dengan pasangan teen dan ty. Thirteen tiga belas, thirty tiga puluh. Tekanannya berbeda."
+        },
+        {
+          "en": "It is seven o'clock. It is half past seven. It is a quarter to eight.",
+          "id": "Untuk jam, pakai o'clock, half past untuk lewat tiga puluh menit, dan quarter untuk lima belas menit."
+        },
+        {
+          "en": "My birthday is on the third of May, nineteen ninety-nine.",
+          "id": "Tanggal dibaca dengan bilangan tingkat, dan tahun dibaca berpasangan."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which number is 30?",
+          "options": [
+            "thirteen",
+            "thirty",
+            "third"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Thirty is 30; thirteen is 13.",
+            "id": "Thirty itu 30; thirteen itu 13."
+          },
+          "remediate": {
+            "en": "Listen to the ending: teen or ty.",
+            "id": "Dengarkan akhirannya: teen atau ty."
+          }
+        },
+        {
+          "prompt": "What time is 7:30?",
+          "options": [
+            "half past seven",
+            "seven past half",
+            "a quarter to seven"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Thirty minutes after seven is half past seven.",
+            "id": "Tiga puluh menit setelah pukul tujuh adalah half past seven."
+          },
+          "remediate": {
+            "en": "Half past means thirty minutes after the hour.",
+            "id": "Half past berarti tiga puluh menit setelah jam itu."
+          }
+        },
+        {
+          "prompt": "Which date is correct?",
+          "options": [
+            "on 3 May",
+            "in 3 May",
+            "at 3 May"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Dates take on.",
+            "id": "Tanggal memakai on."
+          },
+          "remediate": {
+            "en": "Days and dates always take on.",
+            "id": "Hari dan tanggal selalu memakai on."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_places",
+      "category": "vocabulary",
+      "topic": "Places in Town and Directions",
+      "level": "A1",
+      "board": {
+        "title": "Places and directions",
+        "formula": "go straight · turn left · next to",
+        "examples": [
+          "The bank is next to the school.",
+          "Go straight, then turn left.",
+          "It is opposite the market."
+        ]
+      },
+      "segments": [
+        {
+          "en": "Bank, market, hospital, school, station, post office.",
+          "id": "Ini tempat-tempat yang paling sering muncul saat bertanya arah."
+        },
+        {
+          "en": "Go straight. Turn left. Turn right.",
+          "id": "Tiga perintah arah ini sudah cukup untuk sebagian besar situasi."
+        },
+        {
+          "en": "The bank is next to the school, opposite the market.",
+          "id": "Next to berarti di sebelah, opposite berarti di seberang."
+        },
+        {
+          "en": "Excuse me, where is the station?",
+          "id": "Kalimat ini pembuka yang sopan saat bertanya arah kepada orang asing."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "What does next to mean?",
+          "options": [
+            "in front of",
+            "beside",
+            "far from"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Next to means beside, right at the side.",
+            "id": "Next to berarti di sebelah, tepat di sampingnya."
+          },
+          "remediate": {
+            "en": "Next to is about position at the side.",
+            "id": "Next to berkaitan dengan posisi di samping."
+          }
+        },
+        {
+          "prompt": "Complete: Go ___, then turn left.",
+          "options": [
+            "straight",
+            "strange",
+            "street"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Go straight means continue forward.",
+            "id": "Go straight berarti terus lurus ke depan."
+          },
+          "remediate": {
+            "en": "Straight means without turning.",
+            "id": "Straight berarti tanpa berbelok."
+          }
+        },
+        {
+          "prompt": "Which question asks for a place politely?",
+          "options": [
+            "Where station?",
+            "Excuse me, where is the station?",
+            "Station where you?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Excuse me opens the question politely and the word order is correct.",
+            "id": "Excuse me membuka pertanyaan dengan sopan dan urutan katanya benar."
+          },
+          "remediate": {
+            "en": "Keep the order: where is the plus place.",
+            "id": "Pertahankan urutannya: where is the lalu tempatnya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vocab_a1_weather",
+      "category": "vocabulary",
+      "topic": "Weather and Seasons",
+      "level": "A1",
+      "board": {
+        "title": "Weather",
+        "formula": "It is + adjective · rainy season",
+        "examples": [
+          "It is hot today.",
+          "It is raining.",
+          "the rainy season"
+        ]
+      },
+      "segments": [
+        {
+          "en": "It is hot. It is cold. It is windy.",
+          "id": "Untuk cuaca, kalimat selalu dimulai dengan it is."
+        },
+        {
+          "en": "It is raining now. It rains a lot in December.",
+          "id": "Rain bisa menjadi kata kerja. Sekarang memakai is raining, kebiasaan memakai rains."
+        },
+        {
+          "en": "Sunny, cloudy, rainy, windy.",
+          "id": "Akhiran y mengubah kata benda cuaca menjadi kata sifat."
+        },
+        {
+          "en": "In Indonesia there are two seasons: the dry season and the rainy season.",
+          "id": "Di Indonesia ada dua musim, jadi kosakata inilah yang paling sering kamu butuhkan."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Complete: ___ hot today.",
+          "options": [
+            "It is",
+            "There is",
+            "He is"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Weather sentences begin with it is.",
+            "id": "Kalimat cuaca dimulai dengan it is."
+          },
+          "remediate": {
+            "en": "Weather always uses it as the subject.",
+            "id": "Cuaca selalu memakai it sebagai subjek."
+          }
+        },
+        {
+          "prompt": "Which word describes a day with a lot of sun?",
+          "options": [
+            "rainy",
+            "sunny",
+            "windy"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Sunny describes a lot of sun.",
+            "id": "Sunny menggambarkan banyak sinar matahari."
+          },
+          "remediate": {
+            "en": "Add y to the weather noun to describe the day.",
+            "id": "Tambahkan y pada kata benda cuaca untuk menggambarkan harinya."
+          }
+        },
+        {
+          "prompt": "Complete: It ___ a lot in December.",
+          "options": [
+            "rain",
+            "rains",
+            "raining"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "It is third person singular, so the verb takes s.",
+            "id": "It itu orang ketiga tunggal, jadi kata kerjanya ditambah s."
+          },
+          "remediate": {
+            "en": "A repeated fact uses the present simple.",
+            "id": "Fakta yang berulang memakai present simple."
+          }
         }
       ]
     },
@@ -50,19 +2097,389 @@
       "category": "vocabulary",
       "topic": "Word Family",
       "level": "B1",
-      "board": { "title": "Word Family", "formula": "decide → decision → decisive", "examples": ["We decided quickly.", "It was a decisive moment."] },
+      "board": {
+        "title": "Word Family",
+        "formula": "decide → decision → decisive",
+        "examples": [
+          "We decided quickly.",
+          "It was a decisive moment."
+        ]
+      },
       "segments": [
-        { "en": "A word family is one root in different forms.", "id": "Word family adalah satu akar kata dalam bentuk berbeda." },
-        { "en": "Decide is the verb, decision is the noun, decisive is the adjective.", "id": "Decide itu kata kerja, decision kata benda, decisive kata sifat." },
-        { "en": "Knowing the family lets you say the same idea in many ways.", "id": "Menguasai satu keluarga kata membuatmu bisa mengungkapkan ide yang sama dengan banyak cara." }
+        {
+          "en": "A word family is one root in different forms.",
+          "id": "Word family adalah satu akar kata dalam bentuk berbeda."
+        },
+        {
+          "en": "Decide is the verb, decision is the noun, decisive is the adjective.",
+          "id": "Decide itu kata kerja, decision kata benda, decisive kata sifat."
+        },
+        {
+          "en": "Knowing the family lets you say the same idea in many ways.",
+          "id": "Menguasai satu keluarga kata membuatmu bisa mengungkapkan ide yang sama dengan banyak cara."
+        }
       ],
       "questions": [
         {
           "prompt": "Choose the noun form of 'decide'.",
-          "options": ["decisive", "decision", "decidedly"],
+          "options": [
+            "decisive",
+            "decision",
+            "decidedly"
+          ],
           "answerIndex": 1,
-          "explain": { "en": "Decision is the noun. Decisive is an adjective.", "id": "Decision adalah kata benda. Decisive adalah kata sifat." },
-          "remediate": { "en": "Nouns often end in -sion or -tion.", "id": "Kata benda sering berakhiran -sion atau -tion." }
+          "explain": {
+            "en": "Decision is the noun. Decisive is an adjective.",
+            "id": "Decision adalah kata benda. Decisive adalah kata sifat."
+          },
+          "remediate": {
+            "en": "Nouns often end in -sion or -tion.",
+            "id": "Kata benda sering berakhiran -sion atau -tion."
+          }
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_profile",
+      "category": "reading",
+      "topic": "Reading a Personal Profile",
+      "level": "A1",
+      "board": {
+        "title": "Personal profile",
+        "formula": "name · age · job · city",
+        "examples": [
+          "My name is Rina.",
+          "I am twenty-two.",
+          "I work in a hospital."
+        ]
+      },
+      "segments": [
+        {
+          "en": "My name is Rina. I am twenty-two years old. I live in Bandung and I work in a hospital.",
+          "id": "Teks profil selalu berisi empat informasi: nama, umur, tempat tinggal, dan pekerjaan."
+        },
+        {
+          "en": "Read for the four facts first, not for every word.",
+          "id": "Baca untuk mencari empat fakta itu dulu, jangan menerjemahkan setiap kata."
+        },
+        {
+          "en": "I live in Bandung tells you the city. I work in a hospital tells you the job.",
+          "id": "Kata live menandai tempat tinggal, dan kata work menandai pekerjaan."
+        },
+        {
+          "en": "She is a nurse, so she works in a hospital.",
+          "id": "Kadang jawabannya tidak tertulis langsung, tetapi bisa disimpulkan dari kata kuncinya."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Rina says: I work in a hospital. What is her job probably?",
+          "options": [
+            "a teacher",
+            "a nurse",
+            "a driver"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "A hospital worker in an A1 text is usually a nurse or a doctor.",
+            "id": "Orang yang bekerja di rumah sakit dalam teks A1 biasanya perawat atau dokter."
+          },
+          "remediate": {
+            "en": "Use the workplace to guess the job.",
+            "id": "Gunakan tempat kerjanya untuk menebak pekerjaannya."
+          }
+        },
+        {
+          "prompt": "Which word tells you the city?",
+          "options": [
+            "work",
+            "live",
+            "old"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Live in plus a place names the city.",
+            "id": "Live in ditambah nama tempat menunjukkan kotanya."
+          },
+          "remediate": {
+            "en": "Look for live in when a question asks about place.",
+            "id": "Cari kata live in kalau pertanyaannya soal tempat."
+          }
+        },
+        {
+          "prompt": "How old is Rina?",
+          "options": [
+            "twelve",
+            "twenty",
+            "twenty-two"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "The text says twenty-two years old.",
+            "id": "Teksnya menyebut twenty-two years old."
+          },
+          "remediate": {
+            "en": "Numbers in a profile answer the age question.",
+            "id": "Angka dalam profil menjawab pertanyaan umur."
+          }
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_message",
+      "category": "reading",
+      "topic": "Short Messages and Emails",
+      "level": "A1",
+      "board": {
+        "title": "Short messages",
+        "formula": "Hi … · Can you … ? · See you",
+        "examples": [
+          "Hi Dani,",
+          "Can you come at 4?",
+          "See you, Rina"
+        ]
+      },
+      "segments": [
+        {
+          "en": "Hi Dani, can you come to my house at four? See you, Rina.",
+          "id": "Pesan pendek punya tiga bagian: sapaan, isi, dan penutup."
+        },
+        {
+          "en": "The middle line always carries the request or the information.",
+          "id": "Bagian tengah selalu berisi permintaan atau informasi utamanya."
+        },
+        {
+          "en": "Can you come at four? is a request, not a fact.",
+          "id": "Kalimat tanya dengan can you adalah permintaan, bukan pernyataan."
+        },
+        {
+          "en": "See you, Best regards, Thanks.",
+          "id": "Penutup pesan bisa santai seperti see you, atau lebih formal seperti best regards."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Hi Dani, can you come at four? What is Rina doing?",
+          "options": [
+            "inviting",
+            "refusing",
+            "apologising"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Can you come is an invitation or request.",
+            "id": "Can you come adalah undangan atau permintaan."
+          },
+          "remediate": {
+            "en": "Look at the middle line to find the purpose.",
+            "id": "Lihat bagian tengah untuk menemukan tujuannya."
+          }
+        },
+        {
+          "prompt": "Which is the closing of a message?",
+          "options": [
+            "Hi Dani",
+            "Can you come?",
+            "See you, Rina"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "See you plus the name closes the message.",
+            "id": "See you ditambah nama adalah penutup pesan."
+          },
+          "remediate": {
+            "en": "The closing is the last line with the sender's name.",
+            "id": "Penutup adalah baris terakhir dengan nama pengirim."
+          }
+        },
+        {
+          "prompt": "Which reply accepts the invitation?",
+          "options": [
+            "Sorry, I can't.",
+            "Yes, see you at four.",
+            "Where do you live?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Yes plus the time accepts the invitation.",
+            "id": "Yes ditambah waktunya berarti menerima undangan."
+          },
+          "remediate": {
+            "en": "An acceptance repeats the time.",
+            "id": "Jawaban menerima biasanya mengulang waktunya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_signs",
+      "category": "reading",
+      "topic": "Signs and Notices",
+      "level": "A1",
+      "board": {
+        "title": "Signs",
+        "formula": "no + verb-ing · open / closed · push / pull",
+        "examples": [
+          "No smoking",
+          "Open 8 a.m. - 5 p.m.",
+          "Push / Pull"
+        ]
+      },
+      "segments": [
+        {
+          "en": "No smoking. No parking. No entry.",
+          "id": "Papan larangan sering memakai pola no ditambah kata kerja ing."
+        },
+        {
+          "en": "Open 8 a.m. to 5 p.m. Closed on Sunday.",
+          "id": "Papan jam buka memakai open dan closed dengan waktu di belakangnya."
+        },
+        {
+          "en": "Push. Pull. Exit. Entrance.",
+          "id": "Empat kata di pintu ini wajib kamu kenali: dorong, tarik, keluar, masuk."
+        },
+        {
+          "en": "Out of order means the machine does not work.",
+          "id": "Out of order berarti alatnya sedang rusak, bukan berarti tidak rapi."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "What does No parking mean?",
+          "options": [
+            "Park here.",
+            "Do not park here.",
+            "Parking is free."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "No plus verb-ing is a prohibition.",
+            "id": "No ditambah kata kerja ing adalah larangan."
+          },
+          "remediate": {
+            "en": "No at the start of a sign means do not.",
+            "id": "No di awal papan berarti jangan."
+          }
+        },
+        {
+          "prompt": "A shop sign says Closed on Sunday. When can you visit?",
+          "options": [
+            "Sunday",
+            "Monday",
+            "any day"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Closed on Sunday means it is open on the other days.",
+            "id": "Closed on Sunday berarti buka pada hari lainnya."
+          },
+          "remediate": {
+            "en": "Read what the sign excludes.",
+            "id": "Baca hari apa yang dikecualikan papan itu."
+          }
+        },
+        {
+          "prompt": "What does Out of order mean?",
+          "options": [
+            "It is broken.",
+            "It is free.",
+            "It is new."
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Out of order means it is not working.",
+            "id": "Out of order berarti sedang tidak berfungsi."
+          },
+          "remediate": {
+            "en": "It is a fixed phrase about machines.",
+            "id": "Itu frasa tetap tentang mesin atau alat."
+          }
+        }
+      ]
+    },
+    {
+      "id": "reading_a1_schedule",
+      "category": "reading",
+      "topic": "Timetables and Schedules",
+      "level": "A1",
+      "board": {
+        "title": "Timetables",
+        "formula": "departs · arrives · platform",
+        "examples": [
+          "The train departs at 07:15.",
+          "It arrives at 09:40.",
+          "Platform 3"
+        ]
+      },
+      "segments": [
+        {
+          "en": "The train departs at seven fifteen and arrives at nine forty.",
+          "id": "Dalam jadwal, kata kuncinya adalah departs untuk berangkat dan arrives untuk tiba."
+        },
+        {
+          "en": "Departs means leaves. Arrives means comes.",
+          "id": "Dua kata ini sering tertukar, padahal artinya berlawanan."
+        },
+        {
+          "en": "Read the row first, then the column.",
+          "id": "Cara membaca tabel: temukan barisnya dulu, baru kolom waktunya."
+        },
+        {
+          "en": "Platform 3, gate 12, seat 14A.",
+          "id": "Angka tempat juga penting: platform untuk kereta, gate untuk pesawat."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "The train departs at 07:15. What does departs mean?",
+          "options": [
+            "arrives",
+            "leaves",
+            "stops"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Departs means leaves.",
+            "id": "Departs berarti berangkat."
+          },
+          "remediate": {
+            "en": "Departure is the start of a journey.",
+            "id": "Departure adalah awal perjalanan."
+          }
+        },
+        {
+          "prompt": "Departs 07:15, arrives 09:40. How long is the journey?",
+          "options": [
+            "one hour 25 minutes",
+            "two hours 25 minutes",
+            "three hours"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "From 07:15 to 09:40 is two hours and twenty-five minutes.",
+            "id": "Dari 07:15 sampai 09:40 adalah dua jam dua puluh lima menit."
+          },
+          "remediate": {
+            "en": "Count the full hours first, then the minutes.",
+            "id": "Hitung jam penuhnya dulu, baru menitnya."
+          }
+        },
+        {
+          "prompt": "Where do you wait for a train?",
+          "options": [
+            "at the gate",
+            "on the platform",
+            "in the seat"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Trains are boarded from a platform.",
+            "id": "Kereta dinaiki dari platform."
+          },
+          "remediate": {
+            "en": "Gate is for planes, platform is for trains.",
+            "id": "Gate untuk pesawat, platform untuk kereta."
+          }
         }
       ]
     },
@@ -71,21 +2488,755 @@
       "category": "reading",
       "topic": "Main Idea",
       "level": "B1",
-      "board": { "title": "Main Idea", "formula": "Topic + what the writer says about it", "examples": ["Look for the repeated idea.", "Ignore single examples."] },
+      "board": {
+        "title": "Main Idea",
+        "formula": "Topic + what the writer says about it",
+        "examples": [
+          "Look for the repeated idea.",
+          "Ignore single examples."
+        ]
+      },
       "segments": [
-        { "en": "The main idea is what the whole paragraph is about.", "id": "Main idea adalah inti dari keseluruhan paragraf." },
-        { "en": "It is not one detail or one example.", "id": "Itu bukan satu detail atau satu contoh saja." },
-        { "en": "Ask yourself: which sentence could summarise all the others?", "id": "Tanyakan: kalimat mana yang bisa merangkum semuanya?" }
+        {
+          "en": "The main idea is what the whole paragraph is about.",
+          "id": "Main idea adalah inti dari keseluruhan paragraf."
+        },
+        {
+          "en": "It is not one detail or one example.",
+          "id": "Itu bukan satu detail atau satu contoh saja."
+        },
+        {
+          "en": "Ask yourself: which sentence could summarise all the others?",
+          "id": "Tanyakan: kalimat mana yang bisa merangkum semuanya?"
+        }
       ],
       "questions": [
         {
           "prompt": "The main idea of a paragraph is usually:",
-          "options": ["one small detail", "the idea all sentences support", "the last example"],
+          "options": [
+            "one small detail",
+            "the idea all sentences support",
+            "the last example"
+          ],
           "answerIndex": 1,
-          "explain": { "en": "Every other sentence supports the main idea.", "id": "Semua kalimat lain mendukung main idea." },
-          "remediate": { "en": "If a sentence only appears once and adds a fact, it is a detail.", "id": "Kalau sebuah kalimat cuma muncul sekali dan menambah fakta, itu detail." }
+          "explain": {
+            "en": "Every other sentence supports the main idea.",
+            "id": "Semua kalimat lain mendukung main idea."
+          },
+          "remediate": {
+            "en": "If a sentence only appears once and adds a fact, it is a detail.",
+            "id": "Kalau sebuah kalimat cuma muncul sekali dan menambah fakta, itu detail."
+          }
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_instructions",
+      "category": "listening",
+      "topic": "Classroom and Everyday Instructions",
+      "level": "A1",
+      "board": {
+        "title": "Instructions",
+        "formula": "imperative verb first · please",
+        "examples": [
+          "Open your book.",
+          "Listen and repeat.",
+          "Please write your name."
+        ]
+      },
+      "segments": [
+        {
+          "en": "Open your book. Close the door. Listen and repeat.",
+          "id": "Kalimat instruksi selalu dimulai dengan kata kerja dasar, tanpa subjek."
+        },
+        {
+          "en": "There is no subject, so the first word is the action.",
+          "id": "Karena tidak ada subjek, kata pertamanya adalah aksinya. Itu kunci menyimaknya."
+        },
+        {
+          "en": "Please write your name at the top.",
+          "id": "Kata please membuatnya lebih sopan, tetapi strukturnya tetap sama."
+        },
+        {
+          "en": "Don't write on this page.",
+          "id": "Untuk larangan, tambahkan don't di depan kata kerjanya."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "You hear: Open your book. What kind of sentence is it?",
+          "options": [
+            "a question",
+            "an instruction",
+            "a fact"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "A verb at the start with no subject is an instruction.",
+            "id": "Kata kerja di awal tanpa subjek berarti instruksi."
+          },
+          "remediate": {
+            "en": "No subject plus base verb equals an imperative.",
+            "id": "Tanpa subjek ditambah kata kerja dasar berarti kalimat perintah."
+          }
+        },
+        {
+          "prompt": "Which sentence is a prohibition?",
+          "options": [
+            "Write your name.",
+            "Don't write here.",
+            "Please write here."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Don't plus verb forbids the action.",
+            "id": "Don't ditambah kata kerja melarang tindakan itu."
+          },
+          "remediate": {
+            "en": "Prohibitions start with don't.",
+            "id": "Larangan dimulai dengan don't."
+          }
+        },
+        {
+          "prompt": "You hear: Listen and repeat. What do you do second?",
+          "options": [
+            "listen",
+            "repeat",
+            "write"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "And joins two steps in order: listen first, repeat second.",
+            "id": "Kata and menyambung dua langkah berurutan: menyimak dulu, lalu mengulang."
+          },
+          "remediate": {
+            "en": "Follow the order of the verbs you hear.",
+            "id": "Ikuti urutan kata kerja yang kamu dengar."
+          }
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_numbers",
+      "category": "listening",
+      "topic": "Listening for Numbers and Prices",
+      "level": "A1",
+      "board": {
+        "title": "Numbers you hear",
+        "formula": "teen vs ty · price · phone number",
+        "examples": [
+          "fifteen / fifty",
+          "It's twenty thousand rupiah.",
+          "0812 3456 7890"
+        ]
+      },
+      "segments": [
+        {
+          "en": "Fifteen and fifty. Sixteen and sixty.",
+          "id": "Kesalahan menyimak paling sering di A1 adalah pasangan teen dan ty."
+        },
+        {
+          "en": "In fifteen the stress is at the end. In fifty the stress is at the front.",
+          "id": "Bedanya ada di tekanan. Fifteen ditekan di belakang, fifty ditekan di depan."
+        },
+        {
+          "en": "It is twenty thousand rupiah. That is fifty thousand.",
+          "id": "Untuk harga, dengarkan angka besarnya dulu, baru satuannya."
+        },
+        {
+          "en": "Phone numbers are read digit by digit.",
+          "id": "Nomor telepon dibaca satu per satu, bukan sebagai bilangan besar."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "You hear FIF-teen. Which number is it?",
+          "options": [
+            "15",
+            "50",
+            "5"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Stress at the end means the teen number, 15.",
+            "id": "Tekanan di belakang berarti angka teen, yaitu 15."
+          },
+          "remediate": {
+            "en": "Listen to which part is louder and longer.",
+            "id": "Dengarkan bagian mana yang lebih keras dan panjang."
+          }
+        },
+        {
+          "prompt": "How is the phone number 0812 read?",
+          "options": [
+            "eight hundred twelve",
+            "zero eight one two",
+            "eighty-twelve"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Phone numbers are read digit by digit.",
+            "id": "Nomor telepon dibaca digit per digit."
+          },
+          "remediate": {
+            "en": "Never group phone digits into big numbers.",
+            "id": "Jangan menggabungkan digit telepon menjadi bilangan besar."
+          }
+        },
+        {
+          "prompt": "You hear: It's fifty thousand. What is the price?",
+          "options": [
+            "15,000",
+            "50,000",
+            "5,000"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Fifty is 50, so the price is 50,000.",
+            "id": "Fifty itu 50, jadi harganya 50.000."
+          },
+          "remediate": {
+            "en": "Decide teen or ty first, then add the unit.",
+            "id": "Tentukan teen atau ty dulu, baru tambahkan satuannya."
+          }
+        }
+      ]
+    },
+    {
+      "id": "listening_a1_directions",
+      "category": "listening",
+      "topic": "Listening to Directions",
+      "level": "A1",
+      "board": {
+        "title": "Directions you hear",
+        "formula": "go straight · turn · it's on your left",
+        "examples": [
+          "Go straight for 200 metres.",
+          "Turn right at the corner.",
+          "It's on your left."
+        ]
+      },
+      "segments": [
+        {
+          "en": "Go straight for two hundred metres, then turn right at the corner.",
+          "id": "Saat menyimak arah, tandai kata kerja perintahnya, bukan seluruh kalimat."
+        },
+        {
+          "en": "Go, turn, take, cross.",
+          "id": "Empat kata kerja ini yang membawa instruksi utamanya."
+        },
+        {
+          "en": "It is on your left, next to the bank.",
+          "id": "Kalimat terakhir biasanya menyebut posisi akhirnya."
+        },
+        {
+          "en": "If you miss it, ask: Sorry, could you repeat that?",
+          "id": "Kalau tertinggal, mintalah pengulangan dengan could you repeat that."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "You hear: Turn right at the corner. What do you do?",
+          "options": [
+            "stop",
+            "turn right",
+            "go back"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "The instruction verb is turn, and the direction is right.",
+            "id": "Kata kerja perintahnya turn, dan arahnya right."
+          },
+          "remediate": {
+            "en": "Catch the verb first, then the direction word.",
+            "id": "Tangkap kata kerjanya dulu, baru kata arahnya."
+          }
+        },
+        {
+          "prompt": "Which sentence tells you the final position?",
+          "options": [
+            "Go straight.",
+            "It's on your left.",
+            "Cross the road."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "On your left describes where the place finally is.",
+            "id": "On your left menjelaskan posisi akhir tempatnya."
+          },
+          "remediate": {
+            "en": "Position phrases start with on, next to or opposite.",
+            "id": "Frasa posisi dimulai dengan on, next to, atau opposite."
+          }
+        },
+        {
+          "prompt": "How do you ask someone to repeat?",
+          "options": [
+            "Say again you.",
+            "Could you repeat that, please?",
+            "What you say now?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Could you repeat that, please? is the standard request.",
+            "id": "Could you repeat that, please? adalah permintaan bakunya."
+          },
+          "remediate": {
+            "en": "Polite requests use could you.",
+            "id": "Permintaan sopan memakai could you."
+          }
+        }
+      ]
+    },
+    {
+      "id": "speaking_a1_asking",
+      "category": "speaking",
+      "topic": "Asking for Help and Information",
+      "level": "A1",
+      "board": {
+        "title": "Asking politely",
+        "formula": "Excuse me · Could you… · Sorry, I don't understand",
+        "examples": [
+          "Excuse me, where is the bank?",
+          "Could you help me, please?",
+          "Sorry, I don't understand."
+        ]
+      },
+      "segments": [
+        {
+          "en": "Excuse me, where is the bank?",
+          "id": "Excuse me adalah pembuka yang aman untuk bertanya kepada orang asing."
+        },
+        {
+          "en": "Could you help me, please? Could you speak more slowly?",
+          "id": "Could you membuat permintaan terdengar sopan, lebih halus daripada can you."
+        },
+        {
+          "en": "Sorry, I don't understand. Could you repeat that?",
+          "id": "Dua kalimat ini menyelamatkanmu saat percakapan terasa terlalu cepat."
+        },
+        {
+          "en": "Thank you. You're welcome.",
+          "id": "Selalu tutup dengan terima kasih, dan kenali jawabannya you're welcome."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "How do you start a question to a stranger?",
+          "options": [
+            "Hey you.",
+            "Excuse me.",
+            "Listen."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Excuse me is the polite opener.",
+            "id": "Excuse me adalah pembuka yang sopan."
+          },
+          "remediate": {
+            "en": "Openers matter as much as the question itself.",
+            "id": "Kalimat pembuka sama pentingnya dengan pertanyaannya."
+          }
+        },
+        {
+          "prompt": "What do you say if the speaker is too fast?",
+          "options": [
+            "Speak now.",
+            "Could you speak more slowly, please?",
+            "I no understand you."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Could you plus please is the polite request form.",
+            "id": "Could you ditambah please adalah bentuk permintaan yang sopan."
+          },
+          "remediate": {
+            "en": "Use could you for every polite request.",
+            "id": "Pakai could you untuk setiap permintaan sopan."
+          }
+        },
+        {
+          "prompt": "Someone says Thank you. What is the standard reply?",
+          "options": [
+            "You're welcome.",
+            "Yes please.",
+            "Not at all times."
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "You're welcome is the standard reply.",
+            "id": "You're welcome adalah jawaban bakunya."
+          },
+          "remediate": {
+            "en": "Learn the pair: thank you and you're welcome.",
+            "id": "Hafalkan pasangannya: thank you dan you're welcome."
+          }
+        }
+      ]
+    },
+    {
+      "id": "speaking_a1_introduction",
+      "category": "speaking",
+      "topic": "Introducing Yourself",
+      "level": "A1",
+      "board": {
+        "title": "Self introduction",
+        "formula": "name · origin · job · nice to meet you",
+        "examples": [
+          "My name is Jahran.",
+          "I'm from Bandung.",
+          "Nice to meet you."
+        ]
+      },
+      "segments": [
+        {
+          "en": "Hello, my name is Jahran. I'm from Bandung. I'm a student.",
+          "id": "Perkenalan A1 punya tiga kalimat inti: nama, asal, dan pekerjaan."
+        },
+        {
+          "en": "Say the three sentences in that order every time.",
+          "id": "Ucapkan ketiganya dalam urutan yang sama setiap kali, supaya menjadi refleks."
+        },
+        {
+          "en": "Nice to meet you. Nice to meet you too.",
+          "id": "Penutupnya nice to meet you, dan jawabannya menambahkan kata too."
+        },
+        {
+          "en": "And you? What about you?",
+          "id": "Setelah memperkenalkan diri, kembalikan pertanyaannya supaya percakapan berlanjut."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which sentence introduces your origin?",
+          "options": [
+            "I'm a student.",
+            "I'm from Bandung.",
+            "I'm fine."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "From plus a place gives your origin.",
+            "id": "From ditambah nama tempat menyebut asalmu."
+          },
+          "remediate": {
+            "en": "Origin always uses from.",
+            "id": "Asal selalu memakai from."
+          }
+        },
+        {
+          "prompt": "Someone says Nice to meet you. What do you reply?",
+          "options": [
+            "Nice to meet you too.",
+            "Yes, I am.",
+            "You are welcome."
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "The standard reply adds too.",
+            "id": "Jawaban bakunya menambahkan kata too."
+          },
+          "remediate": {
+            "en": "Mirror the greeting and add too.",
+            "id": "Ulangi sapaannya dan tambahkan too."
+          }
+        },
+        {
+          "prompt": "How do you return the question politely?",
+          "options": [
+            "And you?",
+            "You too what?",
+            "Say me."
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "And you? passes the turn back.",
+            "id": "And you? mengembalikan giliran bicara."
+          },
+          "remediate": {
+            "en": "A short return question keeps the conversation going.",
+            "id": "Pertanyaan balik yang pendek membuat percakapan berlanjut."
+          }
+        }
+      ]
+    },
+    {
+      "id": "speaking_a1_ordering",
+      "category": "speaking",
+      "topic": "Ordering Food and Drink",
+      "level": "A1",
+      "board": {
+        "title": "Ordering",
+        "formula": "I'd like… · Can I have… · How much is it?",
+        "examples": [
+          "I'd like a coffee, please.",
+          "Can I have the bill?",
+          "How much is it?"
+        ]
+      },
+      "segments": [
+        {
+          "en": "I'd like a coffee, please. Can I have some water?",
+          "id": "Dua pola ini sudah cukup untuk memesan apa pun dengan sopan."
+        },
+        {
+          "en": "I'd like is short for I would like.",
+          "id": "I'd like adalah singkatan dari I would like, dan terdengar lebih sopan daripada I want."
+        },
+        {
+          "en": "How much is it? Can I have the bill, please?",
+          "id": "Untuk menanyakan harga pakai how much, dan untuk minta tagihan pakai the bill."
+        },
+        {
+          "en": "For here or to take away?",
+          "id": "Petugas sering menanyakan ini. Artinya makan di tempat atau dibawa pulang."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "Which sentence is the most polite order?",
+          "options": [
+            "I want coffee.",
+            "I'd like a coffee, please.",
+            "Coffee!"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "I'd like plus please is the polite standard.",
+            "id": "I'd like ditambah please adalah bentuk sopan yang baku."
+          },
+          "remediate": {
+            "en": "I want sounds direct and impolite in a shop.",
+            "id": "I want terdengar terlalu langsung dan kurang sopan di toko."
+          }
+        },
+        {
+          "prompt": "How do you ask the price?",
+          "options": [
+            "How many is it?",
+            "How much is it?",
+            "How long is it?"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Price is uncountable, so we ask how much.",
+            "id": "Harga tidak terhitung, jadi kita bertanya how much."
+          },
+          "remediate": {
+            "en": "How many counts items, how much asks price.",
+            "id": "How many menghitung benda, how much menanyakan harga."
+          }
+        },
+        {
+          "prompt": "What does to take away mean?",
+          "options": [
+            "eat in the shop",
+            "take the food out",
+            "pay later"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "To take away means to take the food out of the shop.",
+            "id": "To take away berarti makanannya dibawa keluar."
+          },
+          "remediate": {
+            "en": "For here means eating in the shop.",
+            "id": "For here berarti makan di tempat."
+          }
+        }
+      ]
+    },
+    {
+      "id": "exam_a1_question_types",
+      "category": "exam",
+      "topic": "First Exam Question Types",
+      "level": "A1",
+      "board": {
+        "title": "Question types",
+        "formula": "multiple choice · gap fill · true / false / not given",
+        "examples": [
+          "Choose A, B or C.",
+          "Complete the gap.",
+          "True, False or Not Given"
+        ]
+      },
+      "segments": [
+        {
+          "en": "Multiple choice, gap fill, and true, false or not given.",
+          "id": "Tiga bentuk soal ini yang paling awal kamu temui di kedua tes."
+        },
+        {
+          "en": "In multiple choice, read every option before you answer.",
+          "id": "Dalam pilihan ganda, baca semua pilihan dulu. Pilihan pertama sering sengaja dibuat menggoda."
+        },
+        {
+          "en": "In a gap fill, check the word class the gap needs.",
+          "id": "Dalam isian, periksa jenis kata yang dibutuhkan: kata benda, kata kerja, atau kata sifat."
+        },
+        {
+          "en": "Not given means the text simply does not say.",
+          "id": "Not given berarti teksnya memang tidak menyebutkan, bukan berarti salah. Ini jebakan paling umum."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "In a true, false or not given task, the text does not mention the fact. The answer is…",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "If the text does not say it, the answer is Not Given.",
+            "id": "Kalau teksnya tidak menyebutkan, jawabannya Not Given."
+          },
+          "remediate": {
+            "en": "False means the text says the opposite.",
+            "id": "False berarti teksnya menyatakan sebaliknya."
+          }
+        },
+        {
+          "prompt": "What should you do first in a multiple choice question?",
+          "options": [
+            "Answer immediately.",
+            "Read all the options.",
+            "Skip it."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "Reading every option prevents the trap answer.",
+            "id": "Membaca semua pilihan mencegah terjebak pilihan pengecoh."
+          },
+          "remediate": {
+            "en": "The first option is often deliberately attractive.",
+            "id": "Pilihan pertama sering sengaja dibuat menarik."
+          }
+        },
+        {
+          "prompt": "In a gap fill, what do you check before writing?",
+          "options": [
+            "the word class",
+            "the page number",
+            "your name"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "en": "Check whether the gap needs a noun, a verb or an adjective.",
+            "id": "Periksa apakah isiannya butuh kata benda, kata kerja, atau kata sifat."
+          },
+          "remediate": {
+            "en": "Grammar decides which word can fit the gap.",
+            "id": "Tata bahasa menentukan kata mana yang cocok untuk isian itu."
+          }
+        }
+      ]
+    },
+    {
+      "id": "exam_a1_orientation",
+      "category": "exam",
+      "topic": "TOEFL and IELTS: How the Tests Work",
+      "level": "A1",
+      "board": {
+        "title": "Exam orientation",
+        "formula": "4 skills: listening · reading · writing · speaking",
+        "examples": [
+          "TOEFL iBT is computer based.",
+          "IELTS has an interview.",
+          "Both test four skills."
+        ]
+      },
+      "segments": [
+        {
+          "en": "TOEFL and IELTS both test four skills: listening, reading, writing and speaking.",
+          "id": "Kedua tes ini menguji empat keterampilan yang sama. Itu sebabnya A1 pun sudah relevan."
+        },
+        {
+          "en": "TOEFL iBT is taken on a computer. IELTS speaking is a face to face interview.",
+          "id": "Bedanya ada di formatnya. TOEFL lewat komputer, sedangkan speaking IELTS berupa wawancara langsung."
+        },
+        {
+          "en": "Scores are bands or points, not pass or fail.",
+          "id": "Tidak ada lulus atau gagal. Yang ada adalah skor, jadi tugasmu menaikkan skornya."
+        },
+        {
+          "en": "Your A1 foundation decides how fast you can move up.",
+          "id": "Fondasi A1 inilah yang menentukan seberapa cepat kamu bisa naik ke tingkat berikutnya."
+        }
+      ],
+      "questions": [
+        {
+          "prompt": "How many skills do TOEFL and IELTS test?",
+          "options": [
+            "two",
+            "three",
+            "four"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "en": "Both test listening, reading, writing and speaking.",
+            "id": "Keduanya menguji listening, reading, writing, dan speaking."
+          },
+          "remediate": {
+            "en": "Count the four skills.",
+            "id": "Hitung keempat keterampilannya."
+          }
+        },
+        {
+          "prompt": "Which test has a face to face speaking interview?",
+          "options": [
+            "TOEFL iBT",
+            "IELTS",
+            "neither"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "IELTS speaking is an interview with an examiner.",
+            "id": "Speaking IELTS berupa wawancara dengan penguji."
+          },
+          "remediate": {
+            "en": "TOEFL speaking is recorded on a computer.",
+            "id": "Speaking TOEFL direkam lewat komputer."
+          }
+        },
+        {
+          "prompt": "Can you fail TOEFL or IELTS?",
+          "options": [
+            "Yes, always.",
+            "No, you receive a score.",
+            "Only in speaking."
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "en": "There is no pass or fail; you receive a score.",
+            "id": "Tidak ada lulus atau gagal; kamu menerima skor."
+          },
+          "remediate": {
+            "en": "Institutions set the score they require.",
+            "id": "Institusi yang menetapkan skor minimum yang dibutuhkan."
+          }
         }
       ]
     }
-  ]
+  ],
+  "curriculum": {
+    "foundation": "A1",
+    "note": "Prototype scope: the A1 track is complete across every subject, because the product goal is a learner who can reach TOEFL / IELTS preparation. Higher levels are added on top of a finished A1, never instead of it.",
+    "levels": [
+      "A1",
+      "B1"
+    ],
+    "lessonsByLevel": {
+      "A1": 35,
+      "B1": 3
+    },
+    "lessonsByCategory": {
+      "grammar": 16,
+      "vocabulary": 9,
+      "reading": 5,
+      "listening": 3,
+      "speaking": 3,
+      "exam": 2
+    }
+  }
 }

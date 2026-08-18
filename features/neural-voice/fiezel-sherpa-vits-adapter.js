@@ -53,6 +53,9 @@
   // Guard rails so a caller cannot request an unintelligible or absurd rate.
   var MIN_ENGINE_SPEED = 0.4;
   var MAX_ENGINE_SPEED = 1.6;
+  // A breath group, not a paragraph. Longer units are split again at clause punctuation
+  // by the prosody module, so no phrase is ever cut mid-thought.
+  var PHRASE_MAX_CHARS = 160;
 
   function createSherpaVitsAdapter(options) {
     var opts = options || {};
@@ -72,6 +75,8 @@
     var worker = null;
     var readyPromise = null;
     var pending = null;
+    // True for the whole multi-phrase sequence of one generate() call.
+    var generating = false;
     var backendState = Object.freeze({ id: 'uninitialized', device: '', dtype: '' });
     var numSpeakers = 0;
     var modelType = null;
@@ -170,57 +175,110 @@
       return readyPromise;
     }
 
+    // One worker round trip. The single-flight guard above this stays authoritative;
+    // this helper only owns the request/response pair.
+    function synthesize(unit, sid, speed) {
+      return new Promise(function (resolve, reject) {
+        pending = { resolve: resolve, reject: reject };
+        try {
+          worker.postMessage({ type: 'generate', text: unit, sid: sid, speed: speed });
+        } catch (error) { pending = null; reject(error); }
+      });
+    }
+
+    function concatSamples(parts, Ctor) {
+      if (parts.length === 1) return parts[0];
+      var total = 0;
+      parts.forEach(function (part) { total += part.length; });
+      var out = new Ctor(total);
+      var at = 0;
+      parts.forEach(function (part) { out.set(part, at); at += part.length; });
+      return out;
+    }
+
     function generate(text, generationOptions) {
       var options = generationOptions || {};
       var voice = String(options.voice || defaultVoice);
+      var lang = String(options.lang || '');
       var requested = typeof options.speed === 'number' && options.speed > 0 ? options.speed : 1;
       // The product's speed 1 means "natural", not "engine default". Callers keep
       // relative control: 1.1 is still 10% faster than natural.
       var speed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, NATURAL_SPEED * requested));
       var sid = resolveSid(voice);
       var startedAt = Date.now();
-      stage('adapter_generate_enter', backendDetail({ voice: voice, sid: sid, requestedSpeed: requested, engineSpeed: speed }));
+      stage('adapter_generate_enter', backendDetail({ voice: voice, sid: sid, requestedSpeed: requested, engineSpeed: speed, lang: lang || null }));
       return initialize().then(function () {
         // The worker protocol carries exactly one in-flight generation. Fail closed on a
         // second request rather than interleaving and returning another request's audio.
-        if (pending) {
+        // m025-41: a request now spans several worker calls, so the guard covers the whole
+        // phrase sequence, not just one postMessage.
+        if (pending || generating) {
           var busy = new Error('neural_generation_busy');
           stage('adapter_generate_busy', backendDetail({ voice: voice, sid: sid }));
           throw busy;
         }
-        return new Promise(function (resolve, reject) {
-          pending = { resolve: resolve, reject: reject };
-          stage('adapter_generate_invoke', backendDetail({ voice: voice, sid: sid, elapsedMs: Date.now() - startedAt }));
-          try {
-            // Punctuation is the only lever this model exposes for pausing: its duration
-            // predictor places silence at punctuation, never at a bare word boundary.
-            var spoken = prosody && prosody.punctuate ? prosody.punctuate(text) : String(text || '');
-            worker.postMessage({ type: 'generate', text: spoken, sid: sid, speed: speed });
-          } catch (error) { pending = null; reject(error); return; }
-          stage('adapter_generate_dispatched', backendDetail({ voice: voice, sid: sid, elapsedMs: Date.now() - startedAt }));
-        });
-      }).then(function (result) {
-        var samples = result.samples;
-        var count = samples && typeof samples.length === 'number' ? samples.length : 0;
-        if (!count) throw new Error('sherpa_empty_audio');
-        // Real trailing silence, so consecutive chunks land as separate breath groups
-        // instead of being butted together into one continuous stream.
-        if (prosody && prosody.padSilence && options.pad !== false) {
-          var gap = prosody.pauseAfter ? prosody.pauseAfter(String(text || '')) : 0;
-          samples = prosody.padSilence(samples, result.sampleRate, gap);
-          count = samples.length;
+        // Punctuation is the only lever this model exposes for pausing: its duration
+        // predictor places silence at punctuation, never at a bare word boundary. The
+        // language decides which markers apply, so an Indonesian line is shaped by
+        // Indonesian rules instead of being left unpunctuated and level.
+        var spoken = prosody && prosody.punctuate ? prosody.punctuate(text, lang) : String(text || '');
+        // m025-41: synthesize phrase by phrase. One call for the whole line gives the
+        // engine no chance to vary register between breath groups, which is precisely the
+        // flat delivery OWNER reported. Splitting is at punctuation only, never mid-phrase.
+        var units = prosody && prosody.phrases ? prosody.phrases(spoken, PHRASE_MAX_CHARS, lang) : [];
+        if (!units.length) units = [spoken];
+        generating = true;
+        var parts = [];
+        var rate = 0;
+
+        function step(index) {
+          if (index >= units.length) return null;
+          var unit = units[index];
+          var shape = prosody && prosody.contour ? prosody.contour(unit, index, units.length) : { speed: 1, pitch: 1 };
+          var unitSpeed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, speed * shape.speed));
+          stage('adapter_generate_invoke', backendDetail({
+            voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
+            phraseIndex: index, phraseCount: units.length, phraseSpeed: unitSpeed, phrasePitch: shape.pitch
+          }));
+          return synthesize(unit, sid, unitSpeed).then(function (result) {
+            var samples = result.samples;
+            if (!samples || !samples.length) throw new Error('sherpa_empty_audio');
+            rate = result.sampleRate || rate;
+            // Pitch movement between breath groups: the model has no pitch input, so the
+            // register shift is applied to the samples it returned.
+            if (prosody && prosody.resample) samples = prosody.resample(samples, shape.pitch);
+            // Real trailing silence, so consecutive phrases land as separate breath groups
+            // instead of being butted together into one continuous stream.
+            if (prosody && prosody.padSilence && options.pad !== false) {
+              var gap = prosody.pauseAfter ? prosody.pauseAfter(unit, lang) : 0;
+              samples = prosody.padSilence(samples, rate, gap);
+            }
+            parts.push(samples);
+            return step(index + 1);
+          });
         }
-        stage('adapter_generate_ready', backendDetail({
-          voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
-          samples: count, sampleRate: result.sampleRate
-        }));
-        return { audio: samples, sampling_rate: result.sampleRate, voice: voice, sid: sid };
+
+        return Promise.resolve()
+          .then(function () { return step(0); })
+          .then(function () {
+            generating = false;
+            if (!parts.length) throw new Error('sherpa_empty_audio');
+            var Ctor = parts[0].constructor;
+            var audio = concatSamples(parts, Ctor);
+            stage('adapter_generate_ready', backendDetail({
+              voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
+              samples: audio.length, sampleRate: rate, phrases: units.length
+            }));
+            return { audio: audio, sampling_rate: rate, voice: voice, sid: sid };
+          })
+          .catch(function (error) { generating = false; throw error; });
       });
     }
 
     function listVoices() { return Promise.resolve(Object.keys(voiceSids)); }
 
     function stop() {
+      generating = false;
       if (pending) settlePending('reject', new Error('neural_generation_stopped'));
     }
 

@@ -563,26 +563,43 @@
         inner + '</section>';
     }
 
+    // m025-41 OWNER correction: opening the Classroom tab must land ON the subjects, not
+    // on a bundle-download interstitial. The subject grid is therefore the first thing in
+    // the markup, and the optional Indonesian bundle card is demoted below it.
     function renderCategory() {
       var cats = session.categories();
       var cards = cats.map(function (c) {
-        var available = session.lessonsIn(c.id).length;
+        var lessons = session.lessonsIn(c.id);
+        var a1 = lessons.filter(function (l) { return String(l.level || '').toUpperCase() === 'A1'; }).length;
+        var detail = lessons.length
+          ? lessons.length + ' lesson' + (lessons.length === 1 ? '' : 's') + (a1 ? ' · ' + a1 + ' × A1' : '')
+          : (c.id === 'listening' || c.id === 'speaking' ? 'route to Skills Lab' : 'roadmap');
         return '<button type="button" class="tutor-subject" data-category="' + esc(c.id) + '">' +
           '<span class="tutor-subject-icon"><i data-lucide="' + esc(c.icon || 'book-open') + '"></i></span>' +
-          '<span><b>' + esc(c.label) + '</b><small>' + esc(c.hint || '') + '</small><em>' +
-          (available ? available + ' classroom lesson' : (c.id === 'listening' || c.id === 'speaking' ? 'route to Skills Lab' : 'roadmap')) +
+          '<span><b>' + esc(c.label) + '</b><small>' + esc(c.hint || '') + '</small><em>' + detail +
           '</em></span><i data-lucide="arrow-up-right"></i></button>';
       }).join('');
       mount().innerHTML = shell(
-        bundleCard() +
-        '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn, Jahran?</h2><p>One clear objective at a time. Fiezel remembers the checkpoint, not raw audio.</p></section>' +
-        '<div class="tutor-subject-grid">' + cards + '</div></div>', session.snapshot());
+        '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn, Jahran?</h2>' +
+        '<p>Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah.</p></section>' +
+        '<div class="tutor-subject-grid">' + cards + '</div></div>' +
+        bundleCard(), session.snapshot());
       wire();
+    }
+
+    var LEVEL_ORDER = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+    function levelRank(level) {
+      var at = LEVEL_ORDER.indexOf(String(level || '').toUpperCase());
+      return at === -1 ? LEVEL_ORDER.length : at;
     }
 
     function renderTopics() {
       var snap = session.snapshot();
-      var lessons = session.lessonsIn(snap.categoryId);
+      // The A1 track is the foundation the learner is meant to finish first, so the
+      // ladder is presented in CEFR order rather than in authoring order.
+      var lessons = session.lessonsIn(snap.categoryId).slice().sort(function (a, b) {
+        return levelRank(a.level) - levelRank(b.level) || String(a.topic).localeCompare(String(b.topic));
+      });
       var items = lessons.map(function (l) {
         return '<button type="button" class="tutor-topic" data-lesson="' + esc(l.id) + '"><span>' +
           '<small>' + esc(l.level || '') + '</small><b>' + esc(l.topic) + '</b><em>Open micro-lesson</em></span><i data-lucide="arrow-right"></i></button>';

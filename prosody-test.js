@@ -5,36 +5,79 @@ const assert = require('assert');
 const fs = require('fs');
 
 const P = require('./features/neural-voice/fiezel-prosody.js');
+const Adapter = require('./features/neural-voice/fiezel-sherpa-vits-adapter.js');
 const adapterSrc = fs.readFileSync('features/neural-voice/fiezel-sherpa-vits-adapter.js', 'utf8');
 
+// A stand-in for the sherpa worker: it records what the adapter asked it to speak and
+// answers with one second of audio, so prosody can be asserted on behaviour rather than
+// on the shape of the source file.
+function fakeEngine(sampleRate) {
+  const posted = [];
+  class FakeWorker {
+    constructor() {
+      this.onmessage = null;
+      this.onerror = null;
+      setTimeout(() => {
+        if (this.onmessage) this.onmessage({ data: { type: 'sherpa-onnx-tts-ready', numSpeakers: 1, modelType: 0 } });
+      }, 0);
+    }
+    postMessage(message) {
+      posted.push(message);
+      setTimeout(() => {
+        if (this.onmessage) {
+          this.onmessage({
+            data: {
+              type: 'sherpa-onnx-tts-result',
+              samples: new Float32Array(sampleRate).fill(0.25),
+              sampleRate
+            }
+          });
+        }
+      }, 0);
+    }
+    terminate() {}
+  }
+  const adapter = Adapter.createSherpaVitsAdapter({
+    env: { Worker: FakeWorker },
+    basePath: 'vendor/test/',
+    expectedSpeakers: 1,
+    modelId: 'test-model',
+    voiceSids: { test_voice: 0 },
+    defaultVoice: 'test_voice',
+    kind: 'sherpa-vits-test',
+    prosody: P
+  });
+  return { adapter, posted };
+}
+
 let pass = 0;
-const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
+const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name); };
 
 (async () => {
-  test('pause timings sit in the natural speech range', () => {
+  await test('pause timings sit in the natural speech range', () => {
     assert.ok(P.PAUSE_MS.clause >= 120 && P.PAUSE_MS.clause <= 280, 'clause pause is a beat, not a gap');
     assert.ok(P.PAUSE_MS.sentence >= 350 && P.PAUSE_MS.sentence <= 700, 'sentence pause is a breath');
     assert.ok(P.PAUSE_MS.sentence > P.PAUSE_MS.clause, 'a sentence end must outlast a clause break');
   });
 
-  test('a clause boundary gains the punctuation the model needs', () => {
+  await test('a clause boundary gains the punctuation the model needs', () => {
     const out = P.punctuate('A word family is one root in different forms but knowing the family helps');
     assert.ok(/forms, but/.test(out), 'comma inserted before the contrast marker');
   });
 
-  test('restrictive clauses are left alone', () => {
+  await test('restrictive clauses are left alone', () => {
     // These were the over-punctuation cases: forcing a pause here sounds chopped.
     const out = P.punctuate('You can use it when the time is not important so the result matters');
     assert.ok(!/it, when/.test(out), 'no comma before a restrictive when-clause');
     assert.ok(!/important, so/.test(out), 'no comma before a bare so-clause');
   });
 
-  test('short phrases are never chopped', () => {
+  await test('short phrases are never chopped', () => {
     assert.strictEqual(P.punctuate('I have gone but'), 'I have gone but.',
       'too few preceding words to justify a break');
   });
 
-  test('existing punctuation is respected and the pass is idempotent', () => {
+  await test('existing punctuation is respected and the pass is idempotent', () => {
     const already = 'A word family is one root, but knowing it helps.';
     assert.strictEqual(P.punctuate(already), already, 'no double punctuation');
     const once = P.punctuate('Decide is the verb decision is the noun although decisive is the adjective');
@@ -42,18 +85,18 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.ok(!/,,|, ,/.test(once), 'no doubled commas');
   });
 
-  test('a terminal mark is always present for the final fall in intonation', () => {
+  await test('a terminal mark is always present for the final fall in intonation', () => {
     assert.ok(/[.!?…]$/.test(P.punctuate('Halo Jahran ini suara neural')), 'sentence mark added');
     assert.strictEqual(P.punctuate('Sudah selesai!'), 'Sudah selesai!', 'existing mark preserved');
   });
 
-  test('words are never altered, only separated', () => {
+  await test('words are never altered, only separated', () => {
     const input = 'Decide is the verb decision is the noun although decisive is the adjective';
     const words = s => s.replace(/[.,;:!?…]/g, '').split(/\s+/).filter(Boolean);
     assert.deepStrictEqual(words(P.punctuate(input)), words(input), 'no word added, dropped or changed');
   });
 
-  test('splitting happens at phrase boundaries, never mid-phrase', () => {
+  await test('splitting happens at phrase boundaries, never mid-phrase', () => {
     const long = 'This is the first sentence of the lesson. This is the second sentence which is here to make the text longer.';
     const parts = P.phrases(long, 80);
     assert.ok(parts.length >= 2, 'split into speakable units');
@@ -62,13 +105,13 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     });
   });
 
-  test('empty and whitespace input degrade quietly', () => {
+  await test('empty and whitespace input degrade quietly', () => {
     assert.strictEqual(P.punctuate(''), '');
     assert.strictEqual(P.punctuate(null), '');
     assert.deepStrictEqual(P.phrases('   ', 80), []);
   });
 
-  test('silence padding adds exactly the requested duration', () => {
+  await test('silence padding adds exactly the requested duration', () => {
     const samples = new Float32Array([0.5, -0.5, 0.5]);
     const padded = P.padSilence(samples, 1000, 200);
     assert.strictEqual(padded.length, samples.length + 200, '200ms at 1000Hz is 200 samples');
@@ -78,20 +121,80 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.strictEqual(P.padSilence(null, 1000, 200), null, 'no audio, nothing to pad');
   });
 
-  test('sentence ends get the longer pause, clause ends the shorter', () => {
+  await test('sentence ends get the longer pause, clause ends the shorter', () => {
     assert.strictEqual(P.pauseAfter('This is done.'), P.PAUSE_MS.sentence);
     assert.strictEqual(P.pauseAfter('one root,'), P.PAUSE_MS.clause);
   });
 
-  test('the adapter punctuates before synthesis and pads after it', () => {
-    assert.ok(/prosody\.punctuate\(text\)/.test(adapterSrc), 'text is shaped before it reaches the worker');
+  await test('the adapter punctuates before synthesis and pads after it', () => {
+    assert.ok(/prosody\.punctuate\(text, lang\)/.test(adapterSrc), 'text is shaped before it reaches the worker');
     assert.ok(/prosody\.padSilence\(samples/.test(adapterSrc), 'audio is padded after generation');
-    // Shaping must happen before postMessage, or the model never sees the punctuation.
-    const shapeAt = adapterSrc.indexOf('prosody.punctuate(text)');
-    const sendAt = adapterSrc.indexOf("worker.postMessage({ type: 'generate'");
-    assert.ok(shapeAt > -1 && sendAt > -1 && shapeAt < sendAt, 'punctuation must precede dispatch');
     // Prosody is optional so the engine still runs if the module is absent.
     assert.ok(/opts\.prosody \|\|/.test(adapterSrc), 'prosody is injectable and optional');
+  });
+
+  // ---- m025-41: Indonesian rhythm and intonation, asserted through the adapter ------
+
+  await test('an Indonesian line gets Indonesian clause punctuation, not English', () => {
+    const line = 'Kita memakai pola ini karena hasilnya masih terasa sekarang';
+    assert.ok(/ini, karena/.test(P.punctuate(line, 'id-ID')), 'id profile breaks before karena');
+    assert.strictEqual(P.punctuate(line, 'en-US'), line + '.', 'en profile leaves the same line alone');
+    assert.ok(/^Namun, /.test(P.punctuate('Namun bentuk ketiga tetap dipakai', 'id-ID')),
+      'an Indonesian discourse marker pauses after itself');
+    // The restrictive bar is the same as English: no comma where speech runs straight on.
+    assert.ok(!/, kalau|, yang|, saat/.test(P.punctuate('Pakai bentuk ini kalau hasilnya yang penting saat ini', 'id-ID')),
+      'restrictive Indonesian clauses are left alone');
+  });
+
+  await test('intonation moves across an utterance instead of staying level', () => {
+    const units = ['Mari kita lihat polanya,', 'lalu kita coba contohnya,', 'dan sekarang selesai.'];
+    const shapes = units.map((u, i) => P.contour(u, i, units.length));
+    assert.ok(shapes.every(s => s.pitch >= P.CONTOUR_MIN && s.pitch <= P.CONTOUR_MAX), 'contour stays inside its bounds');
+    assert.ok(new Set(shapes.map(s => s.pitch)).size > 1, 'pitch must not be identical across the utterance');
+    const last = shapes[shapes.length - 1];
+    assert.ok(last.pitch < 1 && last.speed < 1, 'the closing phrase falls and slows');
+    assert.ok(P.contour('Apa maksudnya?', 0, 2).pitch > 1, 'a question rises');
+    assert.ok(P.contour('lalu bentuk ketiga,', 0, 3).pitch > 1, 'a continuing phrase stays up');
+  });
+
+  await test('resampling shifts a phrase without changing its content', () => {
+    const samples = new Float32Array(1000).fill(0.5);
+    const higher = P.resample(samples, 1.05);
+    const lower = P.resample(samples, 0.95);
+    assert.ok(higher.length < samples.length, 'a higher register is a shorter phrase');
+    assert.ok(lower.length > samples.length, 'a lower register is a longer phrase');
+    assert.ok(higher.every(v => Math.abs(v - 0.5) < 1e-6), 'interpolation must not distort the signal');
+    assert.strictEqual(P.resample(samples, 1), samples, 'no shift is a no-op');
+    assert.strictEqual(P.resample(null, 1.05), null, 'no audio, nothing to shift');
+  });
+
+  await test('the adapter speaks phrase by phrase, shaped and padded, in one flight', async () => {
+    const rate = 1000;
+    const { adapter, posted } = fakeEngine(rate);
+    const result = await adapter.generate(
+      'Mari kita lihat polanya. Polanya adalah subjek dan kata kerja walaupun bentuknya berubah',
+      { voice: 'test_voice', speed: 1, lang: 'id-ID' });
+    assert.ok(posted.length >= 2, 'a two-sentence line is synthesized as separate breath groups');
+    posted.forEach(m => assert.ok(/[.,;:!?…]$/.test(m.text), `each unit ends on punctuation: "${m.text}"`));
+    assert.ok(posted.some(m => /, walaupun/.test(m.text)), 'the Indonesian clause break reached the engine');
+    assert.ok(new Set(posted.map(m => m.speed)).size > 1, 'phrase rate varies across the utterance');
+    // Every phrase is one second of audio plus its own pause, so the result must be
+    // longer than the raw synthesis alone.
+    assert.ok(result.audio.length > posted.length * rate, 'silence between breath groups is real audio');
+    assert.strictEqual(result.sampling_rate, rate);
+  });
+
+  await test('a second generation while one is in flight still fails closed', async () => {
+    const { adapter } = fakeEngine(1000);
+    const first = adapter.generate('Satu. Dua. Tiga.', { voice: 'test_voice', lang: 'id-ID' });
+    await assert.rejects(
+      () => adapter.generate('Empat.', { voice: 'test_voice', lang: 'id-ID' }),
+      /neural_generation_busy/,
+      'the busy guard must span the whole phrase sequence, not one worker call');
+    await first;
+    // The guard must clear afterwards, or the voice dies for the rest of the session.
+    const again = await adapter.generate('Lima.', { voice: 'test_voice', lang: 'id-ID' });
+    assert.ok(again.audio.length > 0, 'the adapter is usable again once the sequence finishes');
   });
 
   console.log(`FIEZEL prosody: PASS ${pass}/0`);

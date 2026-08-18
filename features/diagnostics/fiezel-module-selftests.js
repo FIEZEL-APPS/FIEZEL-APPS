@@ -128,20 +128,183 @@
     return out;
   }
 
-  function classroom(pack) {
+  // m025-41: the pack is no longer three demo lessons, so structural validity is not
+  // enough on its own. A curriculum with holes in it is a product defect the learner
+  // meets as "materinya kurang", and the scanner now names it before they do.
+  function classroom(pack, targets) {
     var out = [];
     if (!pack) return [f('CLASSROOM_UNAVAILABLE', 'error', 'Lesson pack Classroom tidak dapat dibaca.')];
     var lessons = pack.lessons || [];
     if (!lessons.length) return [f('CLASSROOM_EMPTY', 'error', 'Tidak ada lesson.', 0)];
-    var missingSubtitle = 0, badAnswer = 0;
+    var missingSubtitle = 0, badAnswer = 0, thinLesson = 0, noQuestions = 0, badLevel = 0;
+    var seen = Object.create(null), dupes = 0;
+    var validLevels = (targets && targets.validLevels) || null;
+    var rules = (targets && targets.classroom) || null;
     lessons.forEach(function (l) {
-      (l.segments || []).forEach(function (s) { if (!s || !s.en || !s.id) missingSubtitle++; });
-      (l.questions || []).forEach(function (q) {
+      var segments = (l && l.segments) || [];
+      var questions = (l && l.questions) || [];
+      segments.forEach(function (s) { if (!s || !s.en || !s.id) missingSubtitle++; });
+      questions.forEach(function (q) {
         if (!q || !Array.isArray(q.options) || !q.options[q.answerIndex]) badAnswer++;
       });
+      if (l && l.id) { if (seen[l.id]) dupes++; else seen[l.id] = 1; }
+      if (validLevels && l && l.level && validLevels.indexOf(String(l.level)) === -1) badLevel++;
+      if (rules && segments.length < rules.minSegmentsPerLesson) thinLesson++;
+      if (rules && questions.length < rules.minQuestionsPerLesson) noQuestions++;
     });
     if (missingSubtitle) out.push(f('CLASSROOM_MISSING_SUBTITLE', 'error', 'Segmen tanpa teks Inggris/Indonesia.', missingSubtitle));
     if (badAnswer) out.push(f('CLASSROOM_BAD_ANSWER', 'error', 'Soal dengan answerIndex tidak valid.', badAnswer));
+    if (dupes) out.push(f('CLASSROOM_DUPLICATE_ID', 'error', 'Lesson dengan id ganda.', dupes));
+    if (badLevel) out.push(f('CLASSROOM_INVALID_LEVEL', 'error', 'Lesson dengan level di luar A1-C2.', badLevel));
+    if (thinLesson) out.push(f('CLASSROOM_THIN_LESSON', 'warning', 'Lesson dengan segmen terlalu sedikit.', thinLesson));
+    if (noQuestions) out.push(f('CLASSROOM_NO_QUESTIONS', 'error', 'Lesson tanpa soal latihan.', noQuestions));
+    if (!rules) return out;
+
+    var byCategory = Object.create(null);
+    var foundation = 0;
+    lessons.forEach(function (l) {
+      var cat = l && l.category;
+      if (cat) byCategory[cat] = (byCategory[cat] || 0) + 1;
+      if (l && String(l.level) === rules.foundationLevel) foundation++;
+    });
+    var emptyCategories = rules.requiredCategories.filter(function (c) { return !byCategory[c]; });
+    var thinCategories = rules.requiredCategories.filter(function (c) {
+      return byCategory[c] && byCategory[c] < rules.minLessonsPerCategory;
+    });
+    if (emptyCategories.length) {
+      out.push(f('CLASSROOM_CATEGORY_EMPTY', 'error', 'Subject tanpa materi: ' + emptyCategories.join(', '), emptyCategories.length));
+    }
+    if (thinCategories.length) {
+      out.push(f('CLASSROOM_CATEGORY_THIN', 'warning', 'Subject dengan materi di bawah minimum: ' + thinCategories.join(', '), thinCategories.length));
+    }
+    if (foundation < rules.minFoundationLessons) {
+      out.push(f('CLASSROOM_FOUNDATION_INCOMPLETE', 'error',
+        'Materi ' + rules.foundationLevel + ' baru ' + foundation + ', target ' + rules.minFoundationLessons + '.', foundation));
+    }
+    return out;
+  }
+
+  /**
+   * m025-41 prosody self-test.
+   *
+   * OWNER reported the Indonesian tutor as flat and browser-like twice. Both times the
+   * evidence was audio, which nothing in CI can hear. These three properties are the
+   * measurable part of that complaint: Indonesian must get Indonesian clause punctuation,
+   * the contour must actually move across an utterance, and the closing phrase must fall.
+   */
+  function prosody(module, targets) {
+    var out = [];
+    if (!module) return [f('PROSODY_UNAVAILABLE', 'error', 'Modul prosody tidak dimuat; suara akan datar.')];
+    var required = ['punctuate', 'phrases', 'pauseAfter', 'padSilence', 'contour', 'resample'];
+    var missing = required.filter(function (name) { return typeof module[name] !== 'function'; });
+    if (missing.length) {
+      return [f('PROSODY_API_INCOMPLETE', 'error', 'Fungsi prosody hilang: ' + missing.join(', '), missing.length)];
+    }
+    var languages = (targets && targets.prosody && targets.prosody.languages) || [];
+    if (languages.indexOf('id') !== -1) {
+      var shaped = module.punctuate('Kita memakai pola ini karena hasilnya masih terasa sekarang', 'id-ID');
+      if (!/,/.test(shaped)) {
+        out.push(f('PROSODY_ID_NOT_SHAPED', 'error', 'Kalimat Indonesia tidak mendapat jeda klausa; suara akan terdengar datar.'));
+      }
+    }
+    var units = ['Mari kita lihat polanya,', 'lalu kita coba contohnya,', 'dan sekarang selesai.'];
+    var shapes = units.map(function (u, i) { return module.contour(u, i, units.length); });
+    var pitches = shapes.map(function (x) { return Number(x && x.pitch); });
+    var spread = Math.max.apply(null, pitches) - Math.min.apply(null, pitches);
+    var minSpread = (targets && targets.prosody && targets.prosody.minContourSpread) || 0;
+    if (!(spread > minSpread)) {
+      out.push(f('PROSODY_CONTOUR_FLAT', 'error', 'Intonasi tidak bergerak antar frasa (spread ' + spread + ').'));
+    }
+    var closing = shapes[shapes.length - 1];
+    if (!(closing.pitch < 1 && closing.speed <= 1)) {
+      out.push(f('PROSODY_NO_FINAL_FALL', 'warning', 'Frasa penutup tidak turun; kalimat terdengar menggantung.'));
+    }
+    return out;
+  }
+
+  /**
+   * The Indonesian bundle is an optional 94MB download, so "not downloaded" is a normal
+   * state and never a failure. A bundle that is half-installed, drifted in asset count,
+   * or reporting an error is a different matter: that is the state that produced a mute
+   * Classroom, and it is reported.
+   */
+  function indonesianVoice(status, targets) {
+    var out = [];
+    if (!status) return [f('ID_VOICE_MODULE_MISSING', 'warning', 'Modul suara Indonesia tidak dimuat.')];
+    if (!status.prepared) {
+      out.push(f('ID_VOICE_NOT_DOWNLOADED', 'warning', 'Paket suara Indonesia belum diunduh (opsional).'));
+    }
+    if (status.prepared && !status.ready) {
+      out.push(f('ID_VOICE_NOT_READY', 'warning', 'Paket terunduh tetapi runtime belum siap.'));
+    }
+    var expected = (targets && targets.indonesianVoice && targets.indonesianVoice.expectedAssetCount) || null;
+    if (expected && Number(status.assetCount) !== expected) {
+      out.push(f('ID_VOICE_ASSET_COUNT', 'error', 'Jumlah aset ' + status.assetCount + ', target ' + expected + '.', Number(status.assetCount)));
+    }
+    if (status.error) out.push(f('ID_VOICE_ERROR', 'error', 'Kesalahan terakhir: ' + String(status.error)));
+    return out;
+  }
+
+  /**
+   * Module wiring. Two of the three fatal outages this app has shipped were a global that
+   * silently failed to install, so absence is checked directly instead of being inferred
+   * from a downstream symptom.
+   */
+  function runtime(probe) {
+    var out = [];
+    if (!probe) return [f('RUNTIME_UNAVAILABLE', 'error', 'Probe runtime tidak tersedia.')];
+    var modules = probe.modules || {};
+    var missing = Object.keys(modules).filter(function (name) { return !modules[name]; });
+    if (missing.length) {
+      out.push(f('RUNTIME_MODULE_MISSING', 'error', 'Modul tidak termuat: ' + missing.join(', '), missing.length));
+    }
+    // OWNER's standing rule: neural or nothing. A browser-TTS path in the live runtime is
+    // a fatal product defect, not a graceful degradation.
+    if (probe.browserTtsWired) {
+      out.push(f('RUNTIME_BROWSER_TTS_WIRED', 'fatal', 'Runtime memakai browser SpeechSynthesis; kontraknya neural-only.'));
+    }
+    if (probe.frozenRuntimeProxied) {
+      out.push(f('RUNTIME_FROZEN_PROXY', 'fatal', 'Runtime beku dibungkus Proxy; setiap panggilan speak akan melempar TypeError.'));
+    }
+    if (Array.isArray(probe.missingViews) && probe.missingViews.length) {
+      out.push(f('RUNTIME_VIEW_MISSING', 'error', 'Destinasi navigasi hilang: ' + probe.missingViews.join(', '), probe.missingViews.length));
+    }
+    return out;
+  }
+
+  /** Corrupt saved state is invisible until a screen renders blank; this names it. */
+  function storage(probe, targets) {
+    var out = [];
+    if (!probe) return [f('STORAGE_UNAVAILABLE', 'warning', 'Probe storage tidak tersedia.')];
+    if (!probe.available) return [f('STORAGE_BLOCKED', 'error', 'localStorage tidak dapat diakses.')];
+    var corrupt = probe.corruptKeys || [];
+    if (corrupt.length) {
+      out.push(f('STORAGE_CORRUPT_JSON', 'error', 'State tersimpan tidak dapat dibaca: ' + corrupt.join(', '), corrupt.length));
+    }
+    var max = (targets && targets.storage && targets.storage.maxUsedPercent) || 0;
+    if (max && Number(probe.usedPercent) > max) {
+      out.push(f('STORAGE_NEAR_QUOTA', 'warning', 'Pemakaian storage ' + probe.usedPercent + '%, batas ' + max + '%.', Number(probe.usedPercent)));
+    }
+    return out;
+  }
+
+  /**
+   * What the learner actually sees. A blank #app and a render that takes seconds are both
+   * defects OWNER has hit and neither leaves a console error behind.
+   */
+  function ui(probe, targets) {
+    var out = [];
+    if (!probe) return [f('UI_UNAVAILABLE', 'warning', 'Probe UI tidak tersedia.')];
+    if (!probe.mounted) return [f('UI_NOT_MOUNTED', 'error', 'Container #app tidak ditemukan.')];
+    if (probe.empty) out.push(f('UI_EMPTY_RENDER', 'error', 'Layar aktif kosong: ' + String(probe.view || 'unknown') + '.'));
+    var expected = (targets && targets.ui && targets.ui.primaryDestinations) || 0;
+    if (expected && Number(probe.destinations) !== expected) {
+      out.push(f('UI_DESTINATION_COUNT', 'error', 'Destinasi utama ' + probe.destinations + ', target ' + expected + '.', Number(probe.destinations)));
+    }
+    var maxRender = (targets && targets.ui && targets.ui.maxRenderMs) || 0;
+    if (maxRender && Number(probe.lastRenderMs) > maxRender) {
+      out.push(f('UI_SLOW_RENDER', 'warning', 'Render terakhir ' + probe.lastRenderMs + 'ms, batas ' + maxRender + 'ms.', Number(probe.lastRenderMs)));
+    }
     return out;
   }
 
@@ -173,6 +336,8 @@
 
   return Object.freeze({
     vocabulary: vocabulary, reading: reading, grammar: grammar, leveltest: leveltest,
-    bank: bank, neuralVoice: neuralVoice, classroom: classroom, chat: chat, adaptive: adaptive
+    bank: bank, neuralVoice: neuralVoice, classroom: classroom, chat: chat, adaptive: adaptive,
+    prosody: prosody, indonesianVoice: indonesianVoice, runtime: runtime,
+    storage: storage, ui: ui
   });
 }));

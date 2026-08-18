@@ -51,7 +51,98 @@
   dataTest('speaking', './features/speaking-listening/speaking-bank-v1.json', function (d) {
     return tests.bank((d && (d.items || d)) || null, targets.speaking.minItems, 'SPEAKING');
   });
-  dataTest('classroom', './features/classroom/classroom-lessons-v1.json', function (d) { return tests.classroom(d); });
+  dataTest('classroom', './features/classroom/classroom-lessons-v1.json', function (d) { return tests.classroom(d, targets); });
+
+  // m025-41: the layers that actually broke in production are probed directly. Every
+  // probe is wrapped, because the one thing a scanner may never do is fail with the app.
+
+  bus.registerSelfTest('prosody', function () {
+    return { findings: tests.prosody(root.FiezelProsody || null, targets) };
+  });
+
+  bus.registerSelfTest('indonesianVoice', function () {
+    var status = null;
+    try {
+      status = root.FiezelIndonesianVoice && root.FiezelIndonesianVoice.status
+        ? root.FiezelIndonesianVoice.status() : null;
+    } catch (_) {}
+    return { findings: tests.indonesianVoice(status, targets) };
+  });
+
+  // The globals every screen depends on. Absence is checked directly rather than being
+  // inferred later from a blank screen or a silent voice.
+  var REQUIRED_MODULES = ['FiezelDiagnosticBus', 'FiezelClassroom', 'FiezelTutorV3', 'FiezelProsody',
+    'FiezelVoiceRuntime', 'FiezelNeuralVoiceConfig', 'FiezelSherpaVitsAdapter', 'FiezelWebAudioPlayer'];
+  var VIEWS = ['home', 'vocab', 'grammar', 'reading', 'skills', 'test', 'progress', 'classroom'];
+
+  bus.registerSelfTest('runtime', function () {
+    var probe = { modules: {}, browserTtsWired: false, frozenRuntimeProxied: false, missingViews: [] };
+    REQUIRED_MODULES.forEach(function (name) { probe.modules[name] = !!root[name]; });
+    try {
+      // m025-40 was exactly this: a Proxy over the frozen runtime made every property
+      // read throw, so the app lost all speech at once. Read the member the way a caller
+      // would, and report the throw instead of waiting for a user to hear silence.
+      var runtime = root.FiezelVoiceRuntime;
+      if (runtime) { void runtime.speak; void runtime.stop; }
+    } catch (_) { probe.frozenRuntimeProxied = true; }
+    try {
+      var log = JSON.parse(root.localStorage.getItem('fiezel-neural-voice-diagnostics-v1') || '[]');
+      probe.browserTtsWired = log.some(function (entry) {
+        return entry && String(entry.provider || '') === 'browser-speech-synthesis';
+      });
+    } catch (_) {}
+    try {
+      var reachable = typeof root.go === 'function';
+      if (reachable) {
+        probe.missingViews = VIEWS.filter(function (view) {
+          return !root.document.querySelector('[data-view="' + view + '"]') &&
+                 !root.document.querySelector('[onclick*="go(\'' + view + '\')"]');
+        });
+      }
+    } catch (_) {}
+    return { findings: tests.runtime(probe) };
+  });
+
+  // Saved state that no longer parses renders as a blank or stuck screen, with nothing in
+  // the console to explain it.
+  var STATE_KEYS = ['fiezel-tutor-v3-session', 'fiezel-tutor-v3-evidence', 'fiezel-state',
+    'fiezel-indonesian-voice-v1', 'fiezel-neural-voice-diagnostics-v1'];
+
+  bus.registerSelfTest('storage', function () {
+    var probe = { available: false, corruptKeys: [], usedPercent: 0 };
+    try {
+      root.localStorage.setItem('fiezel-diag-probe', '1');
+      root.localStorage.removeItem('fiezel-diag-probe');
+      probe.available = true;
+    } catch (_) { return { findings: tests.storage(probe, targets) }; }
+    var bytes = 0;
+    STATE_KEYS.forEach(function (key) {
+      var raw = null;
+      try { raw = root.localStorage.getItem(key); } catch (_) { return; }
+      if (raw == null) return;
+      bytes += raw.length;
+      try { JSON.parse(raw); } catch (_) { probe.corruptKeys.push(key); }
+    });
+    // 5MB is the ordinary localStorage budget; the number is a ratio, not a threshold,
+    // so the target file still owns the limit that matters.
+    probe.usedPercent = Math.round((bytes / (5 * 1024 * 1024)) * 100);
+    return { findings: tests.storage(probe, targets) };
+  });
+
+  bus.registerSelfTest('ui', function () {
+    var probe = { mounted: false, empty: true, view: '', destinations: 0, lastRenderMs: 0 };
+    try {
+      var app = root.document.getElementById('app');
+      probe.mounted = !!app;
+      probe.empty = !app || !String(app.innerHTML || '').trim();
+      probe.view = String((root.__getFiezelState && root.__getFiezelState().view) || '');
+      probe.destinations = root.document.querySelectorAll('.nav').length + 1;
+      probe.lastRenderMs = Number(root.__fiezelLastRenderMs || 0);
+    } catch (error) {
+      return { findings: [bus.finding('UI_PROBE_FAILED', 'error', String((error && error.message) || error))] };
+    }
+    return { findings: tests.ui(probe, targets) };
+  });
 
   bus.registerSelfTest('leveltest', function () {
     var count = null;
