@@ -170,9 +170,10 @@
         padBetweenPhrases: false,
         // 1.0 is already natural for this model - the 0.85 calibration belonged to Piper.
         naturalSpeed: 1,
-        // 4 denoising steps: measured faster AND more expressive than the engine's
-        // default of 5. See the adapter for the full step-by-step measurement.
-        generationSteps: 4,
+        // m025-44: 3 denoising steps, matching the English path. Both languages share
+        // one model, so they must share the step count or the two voices drift apart in
+        // both timing and texture.
+        generationSteps: 3,
         onStage: function (entry) { diag(Object.assign({ lang: key }, entry)); }
       });
       await adapter.initialize();
