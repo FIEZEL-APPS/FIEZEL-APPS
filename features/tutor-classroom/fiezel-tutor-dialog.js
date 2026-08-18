@@ -240,19 +240,30 @@
     });
   }
 
-  /** The prompt handed to the Core AI gateway when it is reachable. */
+  /**
+   * The prompt handed to the Core AI gateway.
+   *
+   * m025-43: this used to instruct the model to answer about the open lesson, which made
+   * every reply orbit the same subject - OWNER's "gagal jika disebut AI". The lesson is
+   * now optional background only, and the model is explicitly told to answer ANY question,
+   * including ones with nothing to do with English.
+   */
   function aiPrompt(text, context) {
     var ctx = lessonContext(context && context.lesson, context && context.beat);
     return [
-      'Kamu adalah FIEZEL, tutor bahasa Inggris untuk pelajar Indonesia level ' + (ctx.level || 'A1') + '.',
-      'Jawab dalam bahasa Indonesia yang hangat dan wajar, seperti guru yang sedang bicara, bukan seperti daftar aturan.',
-      'Maksimal 3 kalimat. Sertakan satu contoh kalimat bahasa Inggris jika relevan.',
+      'Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia milik Jahran.',
+      'Jawab pertanyaan APA PUN yang ditanyakan, termasuk yang tidak berhubungan dengan pelajaran bahasa Inggris.',
+      'Jangan menolak pertanyaan hanya karena berada di luar materi, dan jangan mengalihkan balik ke materi kecuali memang diminta.',
+      'Gaya bicara hangat dan wajar seperti orang yang sedang menjelaskan langsung, bukan daftar aturan.',
+      'Maksimal 4 kalimat. Kalau pertanyaannya tentang bahasa Inggris, sertakan satu contoh kalimat.',
+      'Kalau kamu tidak tahu jawabannya, katakan tidak tahu dengan jujur.',
       'Jangan mengulang kalimat pembuka yang sama setiap jawaban.',
       '',
-      'Materi yang sedang dibuka: ' + ctx.topic + (ctx.formula ? ' (pola: ' + ctx.formula + ')' : ''),
-      ctx.beatEn ? 'Kalimat yang barusan diajarkan: ' + ctx.beatEn : '',
+      ctx.topic && ctx.topic !== 'materi ini'
+        ? 'Konteks opsional, hanya dipakai bila relevan - materi yang sedang dibuka: ' + ctx.topic + (ctx.formula ? ' (pola: ' + ctx.formula + ')' : '')
+        : '',
       '',
-      'Pertanyaan murid: ' + String(text || '')
+      'Pertanyaan: ' + String(text || '')
     ].filter(Boolean).join('\n');
   }
 
