@@ -87,5 +87,6 @@ jobs:
           node reminder-struggle-test.js
           node prosody-test.js
           node tutor-classroom-regression-test.js
+          node m02542-experience-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js

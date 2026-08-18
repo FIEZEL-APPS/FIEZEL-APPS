@@ -824,6 +824,14 @@
 
     root.classroom = classroomV3;
 
+    // m025-42: the press-to-talk layer answers about the lesson actually on screen, so
+    // the live checkpoint is exposed rather than duplicated there.
+    root.__fiezelTutorContext = function () {
+      if (!session) return {};
+      try { return { lesson: session.lesson(), beat: session.currentBeat(), snapshot: session.snapshot() }; }
+      catch (_) { return {}; }
+    };
+
     var observer = new MutationObserver(function () {
       var app = mount();
       if (!app) return;
