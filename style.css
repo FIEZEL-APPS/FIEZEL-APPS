@@ -604,3 +604,49 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 body.daily-locked .bottomnav,body.daily-locked .app-header,body.daily-locked .icon-button{pointer-events:none;opacity:.35}
 body.daily-locked{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.daily-lock-track span{transition:none}}
+
+/* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
+.library-page{display:grid;gap:14px}
+.library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
+.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#e6ebf2);background:var(--panel,#fff);color:var(--text,#11172a);border-left:4px solid var(--book-accent,#3d7de0)}
+.library-cover{font-size:2rem;line-height:1}
+.library-meta{display:grid;gap:3px}
+.library-meta b{font-size:1.02rem}
+.library-meta small{color:var(--muted,#5f6c80)}
+.library-meta em{color:var(--muted,#5f6c80);font-style:normal;line-height:1.45}
+.library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#eef3fa);color:var(--muted,#5f6c80);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
+.library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--panel-soft,#eef3fa);overflow:hidden}
+.library-progress span{display:block;height:100%;background:var(--book-accent,#3d7de0)}
+.library-reader{padding-bottom:190px}
+.library-reader-head{display:flex;gap:12px;align-items:flex-start}
+.library-back{min-height:44px;padding:0 14px;border-radius:12px}
+.library-note{margin:0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#eef3fa);color:var(--muted,#5f6c80);font-size:.88rem;line-height:1.5}
+.library-text{display:grid;gap:2px}
+.library-chapter{margin:16px 0 6px;font-size:1.05rem}
+.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#11172a);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
+.library-sentence[data-active]{background:var(--panel-soft,#eef3fa);box-shadow:inset 3px 0 0 var(--accent,#3d7de0)}
+.library-translation{position:sticky;bottom:150px;display:grid;gap:5px;padding:13px;border-radius:16px;background:var(--panel,#fff);border:1px solid var(--line,#e6ebf2);box-shadow:0 12px 30px rgba(7,13,29,.14)}
+.library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
+.library-translation-en{margin:0;font-weight:650;line-height:1.5}
+.library-translation-id{margin:0;color:var(--accent,#3d7de0);font-weight:600;line-height:1.5}
+.library-translation-actions{display:flex;gap:8px;flex-wrap:wrap}
+.library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
+.library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(246,248,251,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#e6ebf2)}
+.library-progress-line{height:5px;border-radius:999px;background:var(--panel-soft,#eef3fa);overflow:hidden}
+.library-progress-line span{display:block;height:100%;background:var(--accent,#3d7de0);transition:width .25s ease}
+.library-status{margin:0;font-size:.84rem;color:var(--muted,#5f6c80)}
+.library-controls{display:flex;gap:8px;align-items:center}
+.library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
+.library-controls .primary{flex:1}
+.library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
+.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#11172a)}
+.library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
+.library-ask-panel h2{margin:0}
+.library-ask-quote{margin:0;padding:9px 11px;border-radius:12px;background:var(--panel-soft,#eef3fa);line-height:1.5}
+.library-ask-panel textarea{width:100%;padding:11px;border-radius:13px;border:1px solid var(--line,#e6ebf2);font:inherit;resize:vertical}
+.library-ask-actions{display:flex;gap:8px;justify-content:flex-end}
+.library-ask-actions button{min-height:46px;padding:0 16px;border-radius:13px}
+.library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#3d7de0);font-weight:600}
+.library-ask-answer:empty{display:none}
+@media (max-width:620px){.library-sentence{font-size:1.02rem}.library-translation{bottom:158px}}
+@media (prefers-reduced-motion:reduce){.library-progress-line span{transition:none}}
