@@ -82,6 +82,10 @@
   function aiAnswer(question) {
     var dialog = root.FiezelTutorDialog;
     if (!dialog || typeof root.askFiezelAI !== 'function') return Promise.resolve(null);
+    // m025-43 OWNER: "hanya tergantung konteks subjek saja, jadi ini gagal jika disebut
+    // AI". Correct - the prompt used to frame every question as a question ABOUT the open
+    // lesson. It is now an open-domain prompt: the lesson is optional background, and any
+    // question is fair game.
     var prompt = dialog.aiPrompt(question, lessonContext());
     var timeout = new Promise(function (resolve) { setTimeout(function () { resolve(null); }, AI_TIMEOUT_MS); });
     var request = Promise.resolve()
@@ -99,8 +103,22 @@
     return aiAnswer(question).then(function (aiText) {
       if (aiText) return { id: aiText, en: '', intent: 'ai', source: 'core-ai' };
       var local = localAnswer(question);
-      return { id: local.id, en: local.en, intent: local.intent, source: 'local' };
+      // Being honest about the limit is part of the answer: an off-topic question with no
+      // gateway gets the local reply AND the reason it is not the full model.
+      var offline = local.intent === 'open' || local.intent === 'unknown';
+      var note = offline ? ' ' + unavailableReason() : '';
+      return { id: local.id + note, en: local.en, intent: local.intent, source: 'local' };
     });
+  }
+
+  /** Why the full model did not answer, in one sentence the learner can act on. */
+  function unavailableReason() {
+    try {
+      if (typeof root.puter === 'undefined') return 'Untuk pertanyaan bebas di luar materi, FIEZEL AI perlu koneksi internet.';
+      var signedIn = root.puter && root.puter.auth && root.puter.auth.isSignedIn && root.puter.auth.isSignedIn();
+      if (!signedIn) return 'Untuk pertanyaan bebas di luar materi, login Puter dulu lewat menu pengaturan.';
+    } catch (_) {}
+    return 'Untuk pertanyaan bebas di luar materi, FIEZEL AI perlu koneksi internet.';
   }
 
   // ---- UI ----------------------------------------------------------------------
@@ -110,8 +128,10 @@
     var dock = doc.createElement('div');
     dock.id = 'tutorTalkDock';
     dock.className = 'tutor-talk-dock';
+    // m025-43 OWNER: the chat log covered the lesson. The button keeps one short status
+    // line and nothing else - the answer is spoken, and its text goes to the tutor's own
+    // subtitle line, which is already part of the lesson layout.
     dock.innerHTML =
-      '<div id="tutorTalkLog" class="tutor-talk-log" role="status" aria-live="polite"></div>' +
       '<button type="button" id="tutorTalkButton" class="tutor-talk-button" aria-label="Tekan lalu bicara ke Fiezel">' +
       '<span class="tutor-talk-ring"></span><i data-lucide="mic"></i></button>' +
       '<p class="tutor-talk-hint" id="tutorTalkHint">Tekan lalu bicara</p>';
@@ -139,15 +159,10 @@
     if (name) button.classList.add(name);
   }
 
-  function log(role, text) {
-    var box = doc.getElementById('tutorTalkLog');
-    if (!box) return;
-    var line = doc.createElement('p');
-    line.className = 'tutor-talk-line tutor-talk-' + role;
-    line.textContent = (role === 'you' ? 'Kamu: ' : 'Fiezel: ') + String(text || '');
-    box.appendChild(line);
-    while (box.children.length > 6) box.removeChild(box.firstChild);
-    box.scrollTop = box.scrollHeight;
+  /** The answer text lands in the lesson's existing subtitle line, not in a chat box. */
+  function showAnswer(text) {
+    var subtitle = doc.getElementById('tutorSubtitle');
+    if (subtitle) subtitle.textContent = String(text || '');
   }
 
   // ---- interaction --------------------------------------------------------------
@@ -155,15 +170,14 @@
   function handleQuestion(question) {
     var text = String(question || '').trim();
     if (!text) { setHint('Belum ada suara yang tertangkap'); return; }
-    log('you', text);
     busy = true;
     setState('is-thinking');
     setHint('Fiezel sedang menjawab…');
     answer(text).then(function (reply) {
       busy = false;
       setState('');
-      log('fiezel', reply.id);
-      setHint('Tekan lalu bicara');
+      showAnswer(reply.id);
+      setHint(reply.source === 'core-ai' ? 'Dijawab FIEZEL AI' : 'Tekan lalu bicara');
       return speak(reply.id);
     }).catch(function () {
       busy = false;

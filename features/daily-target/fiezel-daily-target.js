@@ -170,6 +170,9 @@
         return st;
       }
       armed = true;
+      // The mandatory voice download owns the screen until it finishes; stacking a second
+      // blocking sheet on top of it would trap the learner behind two locks.
+      if (doc.getElementById('voiceBundleSheet')) return st;
       // While the learner is actually answering, the sheet must not cover the question.
       // It returns the moment they stop, which is what makes the lock hold.
       if (!working) open();
@@ -227,6 +230,16 @@
         });
       }
       return status();
+    }
+
+    // m025-43: OWNER saw no target popup at all. app.js called start() from
+    // unlockAppAfterNotification, which runs while app.js is still parsing - this file is
+    // a later <script>, so the global did not exist yet and the optional call silently did
+    // nothing. The lock now arms itself; app.js calling start() again is harmless.
+    if (doc.readyState === 'loading' && typeof doc.addEventListener === 'function') {
+      doc.addEventListener('DOMContentLoaded', function () { target.setTimeout(start, 1200); });
+    } else if (typeof target.setTimeout === 'function') {
+      target.setTimeout(start, 1200);
     }
 
     target.FiezelDailyTarget = Object.freeze({
