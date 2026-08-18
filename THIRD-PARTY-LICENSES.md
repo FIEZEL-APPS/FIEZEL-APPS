@@ -52,3 +52,29 @@ Bundled transitively inside the reviewed Kokoro browser build. License: Apache-2
 ## ONNX Runtime Web 1.22.0-dev.20250409-89f8206ba4
 
 Bundled runtime/WASM dependency. License: MIT. Exact notice: `vendor/kokoro-js/licenses/ONNXRUNTIME-MIT.txt`.
+
+## Supertonic 3 (m025-42 active speech engine)
+
+Bundled at `vendor/supertonic-3/`: the WASM runtime compiled from `k2-fsa/sherpa-onnx`
+v1.13.6 (emscripten 4.0.23) plus the int8 model files from the sherpa-onnx release
+`sherpa-onnx-supertonic-3-tts-int8-2026-05-11`.
+
+- **Sample code / runtime**: MIT. Exact text: `vendor/supertonic-3/LICENSE`
+  (Supertone Inc. 2025, shipped inside the release archive).
+- **Model weights**: OpenRAIL-M, per the upstream model card at
+  `supertone-inc/supertonic`. Free of charge; the licence adds use-restrictions
+  (no illegal or harmful use) rather than fees.
+- **Cost**: none. Inference is fully on-device — no API key, no metered billing, no
+  cross-origin inference. This is the same zero-cost policy the retired engines ran
+  under, re-verified in `NEURAL-VOICE-SOURCE-LOCK.json`.
+- **sherpa-onnx** itself: Apache-2.0 (`k2-fsa/sherpa-onnx`).
+
+Per-file SHA-256 values: `vendor/supertonic-3/provenance/SHA256SUMS.txt`.
+Build provenance and the exact deviations from the upstream build script:
+`vendor/supertonic-3/provenance/m02542-build.json` and `tools/build-supertonic-wasm.sh`.
+
+### Retired with m025-42
+
+`vendor/sherpa-vits/` (Piper `en_US-libritts_r-medium`) and `vendor/sherpa-vits-id/`
+(Piper `id_ID-news_tts-medium`) are no longer loaded by the app. They remain in the
+tree for one release as a rollback path and are removed once the device gate passes.

@@ -50,7 +50,7 @@ function verifyAsset(asset){assert.ok(fs.existsSync(file(asset.path)),asset.path
   await test('web audio accepts Kokoro Float32 payload',()=>assert.ok(player.pickSamples({data:new Float32Array([0,.1])}) instanceof Float32Array));
   await test('player warm is safe without Web Audio API',()=>assert.equal(player.createPlayer({}).warm(),false));
   await test('player warm creates and resumes a suspended context',()=>{let resumed=0;const env={AudioContext:function(){this.state='suspended';this.resume=()=>{resumed++;return Promise.resolve()}}};assert.equal(player.createPlayer(env).warm(),true);assert.equal(resumed,1)});
-  await test('bootstrap loads the engine runtime same-origin',()=>assert.ok(bootstrap.includes("absolute('vendor/sherpa-vits/')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
+  await test('bootstrap loads the engine runtime same-origin',()=>assert.ok(bootstrap.includes("absolute('vendor/supertonic-3/')")&&bootstrap.includes("credentials:'same-origin'")&&bootstrap.includes("cache:'no-store'")));
   // Declared bytes must equal the vendored files. A mismatch makes the prepare layer
   // report a bad download and refetch, which is exactly the repeated-download failure.
   await test('declared asset sizes match the vendored files',()=>{for(const [rel,bytes] of declaredAssets)assert.equal(fs.statSync(file(rel)).size,bytes,rel)});

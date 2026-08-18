@@ -54,7 +54,12 @@ function fakeTts(generateCalls) {
   // m025-26: the Kokoro proxy policy above is retained for the non-sherpa path, but the
   // download manifest now carries the active sherpa engine, so the Kokoro bundle is no
   // longer a declared asset. Pin the active engine payload instead.
-  assert.ok(bootstrap.includes("{path:'vendor/sherpa-vits/sherpa-onnx-wasm-main-tts.data',bytes:96522474}"), 'bootstrap asset contract must match exact sherpa engine payload bytes');
+  // m025-42: the model is no longer packaged into a single .data (it would be 145 MB,
+  // over the remote's 100 MB per-file limit), so the pinned payload is the largest
+  // real asset plus the runtime binary. Exact bytes still matter: a drift here is what
+  // makes the prepare layer re-download forever.
+  assert.ok(bootstrap.includes("{path:'vendor/supertonic-3/vector_estimator.int8.onnx',bytes:78400833}"), 'bootstrap asset contract must match exact engine payload bytes');
+  assert.ok(bootstrap.includes("{path:'vendor/supertonic-3/sherpa-onnx-wasm-main-tts.wasm',bytes:13476398}"), 'bootstrap asset contract must match the exact runtime binary bytes');
   assert.ok(bootstrap.includes("throw new Error('Apple neural WASM proxy policy did not apply')"), 'Apple standalone must fail closed when proxy readback is false');
   assert.ok(bootstrap.includes("readBack:true"), 'bootstrap diagnostics must record real proxy readback');
 
