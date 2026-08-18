@@ -1,0 +1,1315 @@
+{
+  "schema": "fiezel-library-v1",
+  "version": "1.0.0",
+  "contract": {
+    "audiobook": "neural-tts",
+    "translation": "authored per sentence",
+    "offline": true,
+    "copyright": "Only public-domain tales are retold in full. Titles still in copyright ship as FIEZEL's own graded retelling; no original text is reproduced."
+  },
+  "books": [
+    {
+      "id": "three_little_pigs",
+      "title": "The Three Little Pigs",
+      "kind": "tale",
+      "level": "A1",
+      "minutes": 6,
+      "cover": {
+        "emoji": "🐷",
+        "accent": "#e0526f"
+      },
+      "source": "FIEZEL retelling of a traditional English folk tale (public domain).",
+      "about": {
+        "en": "Three pigs build three houses. Only one house is strong enough.",
+        "id": "Tiga babi membangun tiga rumah. Hanya satu rumah yang cukup kuat."
+      },
+      "chapters": [
+        {
+          "title": "Three Houses",
+          "sentences": [
+            {
+              "en": "Once upon a time, there were three little pigs.",
+              "id": "Pada suatu waktu, ada tiga babi kecil."
+            },
+            {
+              "en": "They left home to build their own houses.",
+              "id": "Mereka meninggalkan rumah untuk membangun rumah sendiri."
+            },
+            {
+              "en": "The first pig was in a hurry.",
+              "id": "Babi pertama sedang terburu-buru."
+            },
+            {
+              "en": "He built his house with straw.",
+              "id": "Dia membangun rumahnya dengan jerami."
+            },
+            {
+              "en": "It took him only one hour.",
+              "id": "Dia hanya butuh satu jam."
+            },
+            {
+              "en": "The second pig built his house with sticks.",
+              "id": "Babi kedua membangun rumahnya dengan ranting."
+            },
+            {
+              "en": "It took him one day.",
+              "id": "Dia butuh satu hari."
+            },
+            {
+              "en": "The third pig was slow and careful.",
+              "id": "Babi ketiga lambat dan berhati-hati."
+            },
+            {
+              "en": "He built his house with bricks.",
+              "id": "Dia membangun rumahnya dengan batu bata."
+            },
+            {
+              "en": "It took him many weeks.",
+              "id": "Dia butuh berminggu-minggu."
+            },
+            {
+              "en": "His brothers laughed at him.",
+              "id": "Saudara-saudaranya menertawakannya."
+            },
+            {
+              "en": "\"Your work is too slow,\" they said.",
+              "id": "\"Kerjamu terlalu lambat,\" kata mereka."
+            }
+          ]
+        },
+        {
+          "title": "The Wolf",
+          "sentences": [
+            {
+              "en": "One evening, a hungry wolf came to the village.",
+              "id": "Suatu sore, seekor serigala yang lapar datang ke desa."
+            },
+            {
+              "en": "He knocked on the straw house.",
+              "id": "Dia mengetuk rumah jerami."
+            },
+            {
+              "en": "\"Little pig, little pig, let me come in!\"",
+              "id": "\"Babi kecil, babi kecil, biarkan aku masuk!\""
+            },
+            {
+              "en": "\"No, not by the hair on my chin!\"",
+              "id": "\"Tidak, sama sekali tidak!\""
+            },
+            {
+              "en": "So the wolf blew the straw house down.",
+              "id": "Maka serigala itu meniup rumah jerami sampai roboh."
+            },
+            {
+              "en": "The first pig ran to his brother's house.",
+              "id": "Babi pertama lari ke rumah saudaranya."
+            },
+            {
+              "en": "The wolf followed him.",
+              "id": "Serigala itu mengikutinya."
+            },
+            {
+              "en": "He blew the house of sticks down too.",
+              "id": "Dia juga meniup rumah ranting sampai roboh."
+            },
+            {
+              "en": "Both pigs ran to the brick house.",
+              "id": "Kedua babi lari ke rumah batu bata."
+            },
+            {
+              "en": "Their hearts were beating fast.",
+              "id": "Jantung mereka berdebar kencang."
+            }
+          ]
+        },
+        {
+          "title": "The Strong House",
+          "sentences": [
+            {
+              "en": "The wolf blew and blew at the brick house.",
+              "id": "Serigala meniup dan meniup rumah batu bata itu."
+            },
+            {
+              "en": "The house did not move.",
+              "id": "Rumah itu tidak bergerak."
+            },
+            {
+              "en": "He tried again, but he only became tired.",
+              "id": "Dia mencoba lagi, tetapi dia hanya menjadi lelah."
+            },
+            {
+              "en": "Then he climbed onto the roof.",
+              "id": "Lalu dia memanjat ke atap."
+            },
+            {
+              "en": "He wanted to come down the chimney.",
+              "id": "Dia ingin turun lewat cerobong asap."
+            },
+            {
+              "en": "The third pig put a big pot of water on the fire.",
+              "id": "Babi ketiga menaruh panci besar berisi air di atas api."
+            },
+            {
+              "en": "The wolf fell into the hot water and ran away.",
+              "id": "Serigala jatuh ke air panas lalu lari."
+            },
+            {
+              "en": "He never came back to the village.",
+              "id": "Dia tidak pernah kembali ke desa itu."
+            },
+            {
+              "en": "The three pigs lived together in the strong house.",
+              "id": "Ketiga babi tinggal bersama di rumah yang kuat itu."
+            },
+            {
+              "en": "Good work takes time, but it keeps you safe.",
+              "id": "Pekerjaan yang baik butuh waktu, tetapi menjagamu tetap aman."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ugly_duckling",
+      "title": "The Ugly Duckling",
+      "kind": "tale",
+      "level": "A2",
+      "minutes": 7,
+      "cover": {
+        "emoji": "🦢",
+        "accent": "#3d7de0"
+      },
+      "source": "FIEZEL retelling of Hans Christian Andersen's 1843 tale (public domain).",
+      "about": {
+        "en": "A bird grows up believing he is ugly, until he sees what he really is.",
+        "id": "Seekor burung tumbuh dengan percaya dirinya jelek, sampai dia melihat dirinya yang sebenarnya."
+      },
+      "chapters": [
+        {
+          "title": "The Strange Egg",
+          "sentences": [
+            {
+              "en": "On a quiet farm, a mother duck sat on her eggs.",
+              "id": "Di sebuah peternakan yang tenang, induk bebek mengerami telurnya."
+            },
+            {
+              "en": "One egg was bigger than the others.",
+              "id": "Satu telur lebih besar daripada yang lain."
+            },
+            {
+              "en": "The small eggs opened first.",
+              "id": "Telur-telur kecil menetas lebih dulu."
+            },
+            {
+              "en": "Five yellow ducklings came out.",
+              "id": "Lima anak bebek kuning keluar."
+            },
+            {
+              "en": "At last the big egg opened.",
+              "id": "Akhirnya telur besar itu menetas."
+            },
+            {
+              "en": "A grey bird came out, and he was large and clumsy.",
+              "id": "Seekor burung abu-abu keluar, dan dia besar serta canggung."
+            },
+            {
+              "en": "\"He is not like us,\" the other ducks said.",
+              "id": "\"Dia tidak seperti kita,\" kata bebek-bebek lain."
+            },
+            {
+              "en": "They called him the ugly duckling.",
+              "id": "Mereka memanggilnya anak bebek yang jelek."
+            }
+          ]
+        },
+        {
+          "title": "A Hard Winter",
+          "sentences": [
+            {
+              "en": "The other animals pushed him away.",
+              "id": "Hewan-hewan lain mengusirnya."
+            },
+            {
+              "en": "Even his brothers and sisters laughed at him.",
+              "id": "Bahkan saudara-saudaranya menertawakannya."
+            },
+            {
+              "en": "One morning he left the farm alone.",
+              "id": "Suatu pagi dia meninggalkan peternakan sendirian."
+            },
+            {
+              "en": "He walked through fields and hid in tall grass.",
+              "id": "Dia berjalan melewati ladang dan bersembunyi di rumput tinggi."
+            },
+            {
+              "en": "Autumn came, and the wind grew cold.",
+              "id": "Musim gugur datang, dan anginnya menjadi dingin."
+            },
+            {
+              "en": "He slept near a frozen lake.",
+              "id": "Dia tidur di dekat danau yang membeku."
+            },
+            {
+              "en": "He was hungry and very lonely.",
+              "id": "Dia lapar dan sangat kesepian."
+            },
+            {
+              "en": "But every morning he stood up and walked again.",
+              "id": "Tetapi setiap pagi dia bangkit dan berjalan lagi."
+            }
+          ]
+        },
+        {
+          "title": "The Water Mirror",
+          "sentences": [
+            {
+              "en": "Spring came, and the ice melted.",
+              "id": "Musim semi datang, dan esnya mencair."
+            },
+            {
+              "en": "He saw three beautiful white birds on the water.",
+              "id": "Dia melihat tiga burung putih yang indah di atas air."
+            },
+            {
+              "en": "They were swans, and he was afraid of them.",
+              "id": "Mereka adalah angsa, dan dia takut kepada mereka."
+            },
+            {
+              "en": "\"They will laugh at me too,\" he thought.",
+              "id": "\"Mereka pasti juga akan menertawakanku,\" pikirnya."
+            },
+            {
+              "en": "He looked down at the water.",
+              "id": "Dia menunduk melihat air."
+            },
+            {
+              "en": "In the water he saw a white swan.",
+              "id": "Di dalam air dia melihat seekor angsa putih."
+            },
+            {
+              "en": "The swan in the water was him.",
+              "id": "Angsa di dalam air itu adalah dirinya."
+            },
+            {
+              "en": "He had never been an ugly duckling.",
+              "id": "Dia tidak pernah menjadi anak bebek yang jelek."
+            },
+            {
+              "en": "He had only been young, and in the wrong place.",
+              "id": "Dia hanya masih kecil, dan berada di tempat yang salah."
+            },
+            {
+              "en": "The three swans came near and welcomed him.",
+              "id": "Ketiga angsa itu mendekat dan menyambutnya."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boy_who_cried_wolf",
+      "title": "The Boy Who Cried Wolf",
+      "kind": "tale",
+      "level": "A1",
+      "minutes": 5,
+      "cover": {
+        "emoji": "🐺",
+        "accent": "#c98a1b"
+      },
+      "source": "FIEZEL retelling of Aesop's fable (public domain).",
+      "about": {
+        "en": "A shepherd boy lies for fun, and learns what a lie costs.",
+        "id": "Seorang anak gembala berbohong untuk bersenang-senang, dan belajar harga sebuah kebohongan."
+      },
+      "chapters": [
+        {
+          "title": "The First Joke",
+          "sentences": [
+            {
+              "en": "A boy took care of sheep on a hill.",
+              "id": "Seorang anak menjaga domba di sebuah bukit."
+            },
+            {
+              "en": "Every day was the same, and he was bored.",
+              "id": "Setiap hari sama saja, dan dia bosan."
+            },
+            {
+              "en": "One afternoon he had an idea.",
+              "id": "Suatu siang dia punya ide."
+            },
+            {
+              "en": "He ran down to the village and shouted.",
+              "id": "Dia berlari ke desa dan berteriak."
+            },
+            {
+              "en": "\"Wolf! A wolf is eating the sheep!\"",
+              "id": "\"Serigala! Ada serigala memakan domba!\""
+            },
+            {
+              "en": "The villagers left their work and ran up the hill.",
+              "id": "Warga desa meninggalkan pekerjaan dan berlari ke bukit."
+            },
+            {
+              "en": "There was no wolf.",
+              "id": "Tidak ada serigala."
+            },
+            {
+              "en": "The boy laughed at them.",
+              "id": "Anak itu menertawakan mereka."
+            }
+          ]
+        },
+        {
+          "title": "The Same Joke Again",
+          "sentences": [
+            {
+              "en": "Two days later he did the same thing.",
+              "id": "Dua hari kemudian dia melakukan hal yang sama."
+            },
+            {
+              "en": "\"Wolf! Help me, please!\" he shouted.",
+              "id": "\"Serigala! Tolong aku!\" teriaknya."
+            },
+            {
+              "en": "The villagers ran up the hill again.",
+              "id": "Warga desa berlari ke bukit lagi."
+            },
+            {
+              "en": "Again there was no wolf.",
+              "id": "Lagi-lagi tidak ada serigala."
+            },
+            {
+              "en": "This time nobody laughed.",
+              "id": "Kali ini tidak ada yang tertawa."
+            },
+            {
+              "en": "\"Do not lie to us,\" an old woman said.",
+              "id": "\"Jangan berbohong kepada kami,\" kata seorang perempuan tua."
+            },
+            {
+              "en": "The boy only smiled and went back to his sheep.",
+              "id": "Anak itu hanya tersenyum dan kembali ke dombanya."
+            }
+          ]
+        },
+        {
+          "title": "The Real Wolf",
+          "sentences": [
+            {
+              "en": "One evening a real wolf came out of the forest.",
+              "id": "Suatu sore, serigala sungguhan keluar dari hutan."
+            },
+            {
+              "en": "The sheep ran in every direction.",
+              "id": "Domba-domba lari ke segala arah."
+            },
+            {
+              "en": "The boy shouted as loudly as he could.",
+              "id": "Anak itu berteriak sekeras-kerasnya."
+            },
+            {
+              "en": "\"Wolf! Please, this time it is true!\"",
+              "id": "\"Serigala! Kali ini sungguhan!\""
+            },
+            {
+              "en": "The villagers heard him, but nobody came.",
+              "id": "Warga desa mendengarnya, tetapi tidak ada yang datang."
+            },
+            {
+              "en": "\"He is lying again,\" they said.",
+              "id": "\"Dia berbohong lagi,\" kata mereka."
+            },
+            {
+              "en": "The boy lost many sheep that night.",
+              "id": "Malam itu anak itu kehilangan banyak domba."
+            },
+            {
+              "en": "A liar is not believed, even when he tells the truth.",
+              "id": "Pembohong tidak dipercaya, bahkan saat dia berkata jujur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lion_and_mouse",
+      "title": "The Lion and the Mouse",
+      "kind": "tale",
+      "level": "A1",
+      "minutes": 4,
+      "cover": {
+        "emoji": "🦁",
+        "accent": "#1f9d6f"
+      },
+      "source": "FIEZEL retelling of Aesop's fable (public domain).",
+      "about": {
+        "en": "A small mouse helps a great lion, and size stops meaning much.",
+        "id": "Seekor tikus kecil menolong singa besar, dan ukuran tidak lagi berarti banyak."
+      },
+      "chapters": [
+        {
+          "title": "A Small Mistake",
+          "sentences": [
+            {
+              "en": "A lion was sleeping under a tree.",
+              "id": "Seekor singa sedang tidur di bawah pohon."
+            },
+            {
+              "en": "A little mouse ran across his nose.",
+              "id": "Seekor tikus kecil berlari melewati hidungnya."
+            },
+            {
+              "en": "The lion woke up and caught her.",
+              "id": "Singa itu terbangun dan menangkapnya."
+            },
+            {
+              "en": "\"Please let me go,\" the mouse said.",
+              "id": "\"Tolong lepaskan aku,\" kata tikus itu."
+            },
+            {
+              "en": "\"One day I will help you.\"",
+              "id": "\"Suatu hari aku akan menolongmu.\""
+            },
+            {
+              "en": "The lion laughed for a long time.",
+              "id": "Singa itu tertawa lama sekali."
+            },
+            {
+              "en": "\"How can a mouse help a lion?\" he said.",
+              "id": "\"Bagaimana seekor tikus bisa menolong singa?\" katanya."
+            },
+            {
+              "en": "But he opened his paw and let her go.",
+              "id": "Tetapi dia membuka cakarnya dan melepaskannya."
+            }
+          ]
+        },
+        {
+          "title": "The Net",
+          "sentences": [
+            {
+              "en": "A week later, hunters came to the forest.",
+              "id": "Seminggu kemudian, pemburu datang ke hutan."
+            },
+            {
+              "en": "They caught the lion in a strong net.",
+              "id": "Mereka menangkap singa itu dengan jaring yang kuat."
+            },
+            {
+              "en": "He pulled and pulled, but he could not move.",
+              "id": "Dia menarik dan menarik, tetapi tidak bisa bergerak."
+            },
+            {
+              "en": "His roar filled the whole forest.",
+              "id": "Aumannya memenuhi seluruh hutan."
+            },
+            {
+              "en": "The little mouse heard him and came running.",
+              "id": "Tikus kecil itu mendengarnya dan datang berlari."
+            },
+            {
+              "en": "She began to cut the ropes with her teeth.",
+              "id": "Dia mulai memotong tali dengan giginya."
+            },
+            {
+              "en": "She worked all night without stopping.",
+              "id": "Dia bekerja sepanjang malam tanpa berhenti."
+            },
+            {
+              "en": "In the morning the lion was free.",
+              "id": "Pagi harinya singa itu bebas."
+            },
+            {
+              "en": "\"You were right,\" he said quietly.",
+              "id": "\"Kamu benar,\" katanya pelan."
+            },
+            {
+              "en": "No kindness is ever too small.",
+              "id": "Tidak ada kebaikan yang terlalu kecil."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hansel_and_gretel",
+      "title": "Hansel and Gretel",
+      "kind": "tale",
+      "level": "A2",
+      "minutes": 8,
+      "cover": {
+        "emoji": "🍬",
+        "accent": "#6b4df0"
+      },
+      "source": "FIEZEL retelling of the Brothers Grimm tale (public domain).",
+      "about": {
+        "en": "A brother and sister are lost in a forest, and must think their way home.",
+        "id": "Kakak beradik tersesat di hutan, dan harus berpikir untuk bisa pulang."
+      },
+      "chapters": [
+        {
+          "title": "Into the Forest",
+          "sentences": [
+            {
+              "en": "Hansel and Gretel lived near a great forest.",
+              "id": "Hansel dan Gretel tinggal di dekat hutan besar."
+            },
+            {
+              "en": "Their family was very poor that year.",
+              "id": "Keluarga mereka sangat miskin tahun itu."
+            },
+            {
+              "en": "There was almost no bread in the house.",
+              "id": "Hampir tidak ada roti di rumah."
+            },
+            {
+              "en": "One night Hansel heard the adults talking.",
+              "id": "Suatu malam Hansel mendengar orang dewasa berbicara."
+            },
+            {
+              "en": "They planned to leave the children in the forest.",
+              "id": "Mereka berencana meninggalkan anak-anak di hutan."
+            },
+            {
+              "en": "Hansel did not cry.",
+              "id": "Hansel tidak menangis."
+            },
+            {
+              "en": "He went outside and filled his pockets with small white stones.",
+              "id": "Dia keluar dan mengisi sakunya dengan batu putih kecil."
+            },
+            {
+              "en": "In the morning the family walked deep into the forest.",
+              "id": "Pagi harinya keluarga itu berjalan jauh ke dalam hutan."
+            },
+            {
+              "en": "Hansel dropped one stone every few steps.",
+              "id": "Hansel menjatuhkan satu batu setiap beberapa langkah."
+            },
+            {
+              "en": "That night the moon made the stones shine like silver.",
+              "id": "Malam itu bulan membuat batu-batu itu bersinar seperti perak."
+            },
+            {
+              "en": "The children followed them all the way home.",
+              "id": "Anak-anak mengikutinya sampai ke rumah."
+            }
+          ]
+        },
+        {
+          "title": "The House of Sweets",
+          "sentences": [
+            {
+              "en": "The second time, Hansel had no stones.",
+              "id": "Kali kedua, Hansel tidak punya batu."
+            },
+            {
+              "en": "He used pieces of bread instead.",
+              "id": "Dia memakai potongan roti sebagai gantinya."
+            },
+            {
+              "en": "But the birds ate every piece.",
+              "id": "Tetapi burung-burung memakan semua potongan itu."
+            },
+            {
+              "en": "Now the children were truly lost.",
+              "id": "Sekarang anak-anak itu benar-benar tersesat."
+            },
+            {
+              "en": "They walked for two days.",
+              "id": "Mereka berjalan selama dua hari."
+            },
+            {
+              "en": "Then they saw a small house between the trees.",
+              "id": "Lalu mereka melihat rumah kecil di antara pepohonan."
+            },
+            {
+              "en": "The walls were made of bread and cake.",
+              "id": "Dindingnya terbuat dari roti dan kue."
+            },
+            {
+              "en": "The windows were made of clear sugar.",
+              "id": "Jendelanya terbuat dari gula bening."
+            },
+            {
+              "en": "They were so hungry that they began to eat.",
+              "id": "Mereka begitu lapar sampai mulai memakannya."
+            },
+            {
+              "en": "An old woman opened the door and smiled at them.",
+              "id": "Seorang perempuan tua membuka pintu dan tersenyum kepada mereka."
+            }
+          ]
+        },
+        {
+          "title": "Thinking Their Way Out",
+          "sentences": [
+            {
+              "en": "The old woman was a witch.",
+              "id": "Perempuan tua itu adalah penyihir."
+            },
+            {
+              "en": "She locked Hansel in a small room.",
+              "id": "Dia mengurung Hansel di kamar kecil."
+            },
+            {
+              "en": "She made Gretel work in the kitchen.",
+              "id": "Dia menyuruh Gretel bekerja di dapur."
+            },
+            {
+              "en": "Every day she asked Hansel to show his finger.",
+              "id": "Setiap hari dia meminta Hansel menunjukkan jarinya."
+            },
+            {
+              "en": "She wanted to know if he was fat enough.",
+              "id": "Dia ingin tahu apakah Hansel sudah cukup gemuk."
+            },
+            {
+              "en": "Hansel showed her a thin bone instead.",
+              "id": "Hansel malah menunjukkan tulang yang kurus."
+            },
+            {
+              "en": "The witch had weak eyes and believed him.",
+              "id": "Penyihir itu rabun dan mempercayainya."
+            },
+            {
+              "en": "One morning she asked Gretel to look inside the oven.",
+              "id": "Suatu pagi dia menyuruh Gretel melihat ke dalam oven."
+            },
+            {
+              "en": "Gretel understood the trick.",
+              "id": "Gretel mengerti tipuan itu."
+            },
+            {
+              "en": "\"I do not know how,\" she said. \"Please show me.\"",
+              "id": "\"Aku tidak tahu caranya,\" katanya. \"Tolong tunjukkan.\""
+            },
+            {
+              "en": "The witch leaned in, and Gretel closed the door.",
+              "id": "Penyihir itu mencondongkan badan, dan Gretel menutup pintunya."
+            },
+            {
+              "en": "She freed her brother at once.",
+              "id": "Dia langsung membebaskan kakaknya."
+            },
+            {
+              "en": "They filled their pockets with the witch's treasure.",
+              "id": "Mereka mengisi saku dengan harta penyihir itu."
+            },
+            {
+              "en": "A white duck carried them across the wide river.",
+              "id": "Seekor bebek putih membawa mereka menyeberangi sungai lebar."
+            },
+            {
+              "en": "Their father cried when he saw them at the door.",
+              "id": "Ayah mereka menangis saat melihat mereka di depan pintu."
+            },
+            {
+              "en": "They were never hungry again.",
+              "id": "Mereka tidak pernah kelaparan lagi."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "little_prince_guide",
+      "title": "The Little Prince",
+      "kind": "guide",
+      "level": "A2",
+      "minutes": 8,
+      "cover": {
+        "emoji": "🌹",
+        "accent": "#c98a1b"
+      },
+      "author": "Antoine de Saint-Exupéry (1943)",
+      "source": "FIEZEL graded retelling. The original text is still in copyright and is not included.",
+      "about": {
+        "en": "A pilot meets a small prince from another planet, and learns to see again.",
+        "id": "Seorang pilot bertemu pangeran kecil dari planet lain, dan belajar melihat kembali."
+      },
+      "chapters": [
+        {
+          "title": "The Pilot in the Desert",
+          "sentences": [
+            {
+              "en": "A pilot lands his broken plane in the middle of a desert.",
+              "id": "Seorang pilot mendaratkan pesawatnya yang rusak di tengah gurun."
+            },
+            {
+              "en": "He is alone, and he has water for only eight days.",
+              "id": "Dia sendirian, dan air minumnya hanya cukup untuk delapan hari."
+            },
+            {
+              "en": "In the morning a small boy wakes him up.",
+              "id": "Pada pagi hari seorang anak laki-laki kecil membangunkannya."
+            },
+            {
+              "en": "The boy asks him to draw a sheep.",
+              "id": "Anak itu memintanya menggambar seekor domba."
+            },
+            {
+              "en": "The pilot is surprised, because there is no village for many kilometres.",
+              "id": "Pilot itu terkejut, karena tidak ada desa sejauh berkilo-kilometer."
+            },
+            {
+              "en": "Slowly, the boy tells him where he comes from.",
+              "id": "Perlahan, anak itu menceritakan dari mana asalnya."
+            },
+            {
+              "en": "He is a prince from a very small planet.",
+              "id": "Dia adalah pangeran dari sebuah planet yang sangat kecil."
+            }
+          ]
+        },
+        {
+          "title": "The Rose and the Journey",
+          "sentences": [
+            {
+              "en": "On his planet there is one flower, a rose.",
+              "id": "Di planetnya ada satu bunga, yaitu sebuah mawar."
+            },
+            {
+              "en": "The rose is proud, and sometimes difficult.",
+              "id": "Mawar itu sombong, dan kadang sulit."
+            },
+            {
+              "en": "The prince loves her, but he does not understand her.",
+              "id": "Pangeran itu menyayanginya, tetapi tidak memahaminya."
+            },
+            {
+              "en": "So he leaves his planet and travels to others.",
+              "id": "Maka dia meninggalkan planetnya dan pergi ke planet-planet lain."
+            },
+            {
+              "en": "He meets a king who wants to rule everything.",
+              "id": "Dia bertemu raja yang ingin memerintah segalanya."
+            },
+            {
+              "en": "He meets a man who only wants to be admired.",
+              "id": "Dia bertemu orang yang hanya ingin dikagumi."
+            },
+            {
+              "en": "He meets a businessman who counts stars and calls them his own.",
+              "id": "Dia bertemu pengusaha yang menghitung bintang dan menyebutnya miliknya."
+            },
+            {
+              "en": "Every adult he meets is busy with something that means nothing.",
+              "id": "Setiap orang dewasa yang ditemuinya sibuk dengan hal yang tidak berarti."
+            }
+          ]
+        },
+        {
+          "title": "The Fox and the Secret",
+          "sentences": [
+            {
+              "en": "On Earth, the prince meets a fox.",
+              "id": "Di Bumi, pangeran itu bertemu seekor rubah."
+            },
+            {
+              "en": "The fox asks the prince to tame him, slowly and patiently.",
+              "id": "Rubah itu meminta pangeran menjinakkannya, perlahan dan sabar."
+            },
+            {
+              "en": "They meet at the same hour every day.",
+              "id": "Mereka bertemu pada jam yang sama setiap hari."
+            },
+            {
+              "en": "Little by little, they become important to each other.",
+              "id": "Sedikit demi sedikit, mereka menjadi penting bagi satu sama lain."
+            },
+            {
+              "en": "The fox teaches him that time makes love real.",
+              "id": "Rubah itu mengajarinya bahwa waktu membuat cinta menjadi nyata."
+            },
+            {
+              "en": "He also teaches him to look with the heart, not only with the eyes.",
+              "id": "Dia juga mengajarinya melihat dengan hati, bukan hanya dengan mata."
+            },
+            {
+              "en": "Now the prince understands his rose.",
+              "id": "Sekarang pangeran itu memahami mawarnya."
+            },
+            {
+              "en": "She is special because she is the one he cared for.",
+              "id": "Mawar itu istimewa karena dialah yang pangeran rawat."
+            }
+          ]
+        },
+        {
+          "title": "Going Home",
+          "sentences": [
+            {
+              "en": "The prince misses his planet and his flower.",
+              "id": "Pangeran itu merindukan planet dan bunganya."
+            },
+            {
+              "en": "He decides to go back, even though the way home is hard.",
+              "id": "Dia memutuskan untuk kembali, meskipun jalan pulangnya berat."
+            },
+            {
+              "en": "The pilot repairs his plane on the same day.",
+              "id": "Pilot itu memperbaiki pesawatnya pada hari yang sama."
+            },
+            {
+              "en": "They say goodbye under the stars.",
+              "id": "Mereka berpisah di bawah bintang-bintang."
+            },
+            {
+              "en": "After that, the pilot looks at the sky differently.",
+              "id": "Setelah itu, pilot itu memandang langit dengan cara berbeda."
+            },
+            {
+              "en": "Somewhere up there, a small boy is taking care of one rose.",
+              "id": "Di suatu tempat di atas sana, seorang anak kecil sedang merawat satu mawar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "charlottes_web_guide",
+      "title": "Charlotte's Web",
+      "kind": "guide",
+      "level": "A2",
+      "minutes": 7,
+      "cover": {
+        "emoji": "🕸️",
+        "accent": "#1f9d6f"
+      },
+      "author": "E. B. White (1952)",
+      "source": "FIEZEL graded retelling. The original text is still in copyright and is not included.",
+      "about": {
+        "en": "A spider saves a pig's life with nothing but words.",
+        "id": "Seekor laba-laba menyelamatkan nyawa seekor babi hanya dengan kata-kata."
+      },
+      "chapters": [
+        {
+          "title": "The Smallest Pig",
+          "sentences": [
+            {
+              "en": "A girl named Fern sees her father carrying an axe.",
+              "id": "Seorang gadis bernama Fern melihat ayahnya membawa kapak."
+            },
+            {
+              "en": "One piglet was born very small and weak.",
+              "id": "Salah satu anak babi lahir sangat kecil dan lemah."
+            },
+            {
+              "en": "On the farm, a weak piglet is usually not kept.",
+              "id": "Di peternakan, anak babi yang lemah biasanya tidak dipelihara."
+            },
+            {
+              "en": "Fern begs her father to let the piglet live.",
+              "id": "Fern memohon kepada ayahnya agar anak babi itu dibiarkan hidup."
+            },
+            {
+              "en": "She feeds him from a bottle and calls him Wilbur.",
+              "id": "Dia memberinya susu dari botol dan menamainya Wilbur."
+            },
+            {
+              "en": "Later Wilbur is sold to her uncle's farm down the road.",
+              "id": "Kemudian Wilbur dijual ke peternakan pamannya di ujung jalan."
+            }
+          ]
+        },
+        {
+          "title": "A Voice in the Barn",
+          "sentences": [
+            {
+              "en": "In the barn, Wilbur is lonely and afraid.",
+              "id": "Di kandang, Wilbur kesepian dan takut."
+            },
+            {
+              "en": "One night a quiet voice says hello from above.",
+              "id": "Suatu malam sebuah suara pelan menyapa dari atas."
+            },
+            {
+              "en": "It is a grey spider named Charlotte.",
+              "id": "Itu adalah laba-laba abu-abu bernama Charlotte."
+            },
+            {
+              "en": "She lives in a web near the door.",
+              "id": "Dia tinggal di jaring dekat pintu."
+            },
+            {
+              "en": "An old sheep tells Wilbur the truth about winter.",
+              "id": "Seekor domba tua memberi tahu Wilbur kebenaran tentang musim dingin."
+            },
+            {
+              "en": "Pigs on this farm do not usually live past Christmas.",
+              "id": "Babi di peternakan ini biasanya tidak hidup sampai lewat Natal."
+            },
+            {
+              "en": "Wilbur begins to cry.",
+              "id": "Wilbur mulai menangis."
+            },
+            {
+              "en": "\"I will save you,\" Charlotte says.",
+              "id": "\"Aku akan menyelamatkanmu,\" kata Charlotte."
+            }
+          ]
+        },
+        {
+          "title": "Words in the Web",
+          "sentences": [
+            {
+              "en": "The next morning there are words in Charlotte's web.",
+              "id": "Pagi berikutnya ada kata-kata di jaring Charlotte."
+            },
+            {
+              "en": "The words describe Wilbur, and the farmer reads them.",
+              "id": "Kata-kata itu menggambarkan Wilbur, dan petani itu membacanya."
+            },
+            {
+              "en": "People come from far away to see the pig.",
+              "id": "Orang-orang datang dari jauh untuk melihat babi itu."
+            },
+            {
+              "en": "Nobody thinks of eating a famous pig.",
+              "id": "Tidak ada yang berpikir memakan babi yang terkenal."
+            },
+            {
+              "en": "Charlotte writes new words again and again.",
+              "id": "Charlotte menulis kata-kata baru berulang kali."
+            },
+            {
+              "en": "At the county fair, Wilbur wins a special prize.",
+              "id": "Di pekan raya, Wilbur memenangkan hadiah istimewa."
+            },
+            {
+              "en": "His life is safe now.",
+              "id": "Nyawanya sekarang aman."
+            }
+          ]
+        },
+        {
+          "title": "What Charlotte Leaves",
+          "sentences": [
+            {
+              "en": "Charlotte is very tired after the fair.",
+              "id": "Charlotte sangat lelah setelah pekan raya."
+            },
+            {
+              "en": "Spiders do not live long, and she knows it.",
+              "id": "Laba-laba tidak hidup lama, dan dia tahu itu."
+            },
+            {
+              "en": "She makes one last thing: a small sac of eggs.",
+              "id": "Dia membuat satu hal terakhir: kantung kecil berisi telur."
+            },
+            {
+              "en": "Wilbur carries the sac home carefully in his mouth.",
+              "id": "Wilbur membawa kantung itu pulang dengan hati-hati di mulutnya."
+            },
+            {
+              "en": "Charlotte dies alone at the empty fairground.",
+              "id": "Charlotte mati sendirian di arena pekan raya yang sudah sepi."
+            },
+            {
+              "en": "In spring, hundreds of baby spiders come out.",
+              "id": "Pada musim semi, ratusan bayi laba-laba keluar."
+            },
+            {
+              "en": "Most fly away, but three of them stay with Wilbur.",
+              "id": "Sebagian besar terbang pergi, tetapi tiga di antaranya tinggal bersama Wilbur."
+            },
+            {
+              "en": "A true friend can change a whole life.",
+              "id": "Sahabat sejati bisa mengubah seluruh hidup seseorang."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "giving_tree_guide",
+      "title": "The Giving Tree",
+      "kind": "guide",
+      "level": "A1",
+      "minutes": 5,
+      "cover": {
+        "emoji": "🌳",
+        "accent": "#1f9d6f"
+      },
+      "author": "Shel Silverstein (1964)",
+      "source": "FIEZEL graded retelling. The original text is still in copyright and is not included.",
+      "about": {
+        "en": "A tree gives everything to a boy, across a whole lifetime.",
+        "id": "Sebuah pohon memberikan segalanya kepada seorang anak, sepanjang hidupnya."
+      },
+      "chapters": [
+        {
+          "title": "The Boy and the Tree",
+          "sentences": [
+            {
+              "en": "There was a tree, and she loved a little boy.",
+              "id": "Ada sebuah pohon, dan dia menyayangi seorang anak kecil."
+            },
+            {
+              "en": "Every day the boy came to play.",
+              "id": "Setiap hari anak itu datang bermain."
+            },
+            {
+              "en": "He climbed her trunk and swung from her branches.",
+              "id": "Dia memanjat batangnya dan berayun di dahannya."
+            },
+            {
+              "en": "He ate her apples and slept in her shade.",
+              "id": "Dia memakan apelnya dan tidur di bawah naungannya."
+            },
+            {
+              "en": "The boy loved the tree very much.",
+              "id": "Anak itu sangat menyayangi pohon itu."
+            },
+            {
+              "en": "And the tree was happy.",
+              "id": "Dan pohon itu bahagia."
+            }
+          ]
+        },
+        {
+          "title": "Growing Up, Coming Back",
+          "sentences": [
+            {
+              "en": "Time passed, and the boy grew older.",
+              "id": "Waktu berlalu, dan anak itu tumbuh besar."
+            },
+            {
+              "en": "He came back one day and said he wanted money.",
+              "id": "Suatu hari dia kembali dan berkata dia ingin uang."
+            },
+            {
+              "en": "The tree gave him her apples to sell.",
+              "id": "Pohon itu memberikan apel-apelnya untuk dijual."
+            },
+            {
+              "en": "Years later he came back and said he wanted a house.",
+              "id": "Bertahun-tahun kemudian dia kembali dan berkata dia ingin rumah."
+            },
+            {
+              "en": "The tree gave him her branches.",
+              "id": "Pohon itu memberikan dahan-dahannya."
+            },
+            {
+              "en": "Later he came back and said he wanted a boat.",
+              "id": "Kemudian dia kembali dan berkata dia ingin perahu."
+            },
+            {
+              "en": "The tree gave him her trunk.",
+              "id": "Pohon itu memberikan batangnya."
+            },
+            {
+              "en": "Each time, the tree was happy.",
+              "id": "Setiap kali, pohon itu bahagia."
+            },
+            {
+              "en": "But each time, a little less.",
+              "id": "Tetapi setiap kali, sedikit berkurang."
+            }
+          ]
+        },
+        {
+          "title": "The Last Visit",
+          "sentences": [
+            {
+              "en": "Many years later, the boy came back as an old man.",
+              "id": "Bertahun-tahun kemudian, anak itu kembali sebagai orang tua."
+            },
+            {
+              "en": "The tree had nothing left to give.",
+              "id": "Pohon itu tidak punya apa-apa lagi untuk diberikan."
+            },
+            {
+              "en": "\"I am only an old stump now,\" she said.",
+              "id": "\"Sekarang aku hanya tunggul tua,\" katanya."
+            },
+            {
+              "en": "\"I do not need much,\" the old man answered.",
+              "id": "\"Aku tidak butuh banyak,\" jawab orang tua itu."
+            },
+            {
+              "en": "\"I am tired. I only want a quiet place to sit.\"",
+              "id": "\"Aku lelah. Aku hanya ingin tempat tenang untuk duduk.\""
+            },
+            {
+              "en": "So he sat down on the old stump.",
+              "id": "Maka dia duduk di atas tunggul tua itu."
+            },
+            {
+              "en": "And the tree was happy.",
+              "id": "Dan pohon itu bahagia."
+            },
+            {
+              "en": "Readers still argue about this ending.",
+              "id": "Pembaca masih memperdebatkan akhir cerita ini."
+            },
+            {
+              "en": "Is it love, or is it something else?",
+              "id": "Apakah ini cinta, atau sesuatu yang lain?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "matilda_guide",
+      "title": "Matilda",
+      "kind": "guide",
+      "level": "B1",
+      "minutes": 8,
+      "cover": {
+        "emoji": "📚",
+        "accent": "#6b4df0"
+      },
+      "author": "Roald Dahl (1988)",
+      "source": "FIEZEL graded retelling. The original text is still in copyright and is not included.",
+      "about": {
+        "en": "A brilliant girl with careless parents finds her own power in books.",
+        "id": "Seorang gadis cerdas dengan orang tua yang acuh menemukan kekuatannya di dalam buku."
+      },
+      "chapters": [
+        {
+          "title": "A Girl Who Reads",
+          "sentences": [
+            {
+              "en": "Matilda Wormwood learns to read when she is three years old.",
+              "id": "Matilda Wormwood belajar membaca saat berumur tiga tahun."
+            },
+            {
+              "en": "Her parents watch television and think books are useless.",
+              "id": "Orang tuanya menonton televisi dan menganggap buku tidak berguna."
+            },
+            {
+              "en": "Her father sells old cars and cheats his customers.",
+              "id": "Ayahnya menjual mobil bekas dan menipu pelanggannya."
+            },
+            {
+              "en": "Nobody in the house notices how clever she is.",
+              "id": "Tidak ada di rumah itu yang menyadari betapa cerdasnya dia."
+            },
+            {
+              "en": "So Matilda walks to the library alone.",
+              "id": "Maka Matilda berjalan sendiri ke perpustakaan."
+            },
+            {
+              "en": "By the age of five she has read many grown-up books.",
+              "id": "Pada usia lima tahun dia sudah membaca banyak buku orang dewasa."
+            },
+            {
+              "en": "When her father is cruel, she answers with small clever tricks.",
+              "id": "Saat ayahnya kejam, dia membalas dengan tipuan-tipuan kecil yang cerdik."
+            }
+          ]
+        },
+        {
+          "title": "School",
+          "sentences": [
+            {
+              "en": "At school, Matilda meets Miss Honey.",
+              "id": "Di sekolah, Matilda bertemu Miss Honey."
+            },
+            {
+              "en": "Miss Honey is gentle, and she sees the truth at once.",
+              "id": "Miss Honey lembut, dan dia langsung melihat kenyataannya."
+            },
+            {
+              "en": "This child is far ahead of the whole class.",
+              "id": "Anak ini jauh melampaui seluruh kelas."
+            },
+            {
+              "en": "But the head teacher is Miss Trunchbull.",
+              "id": "Tetapi kepala sekolahnya adalah Miss Trunchbull."
+            },
+            {
+              "en": "She is huge, loud and frightening.",
+              "id": "Dia besar, keras, dan menakutkan."
+            },
+            {
+              "en": "She punishes children for almost nothing.",
+              "id": "Dia menghukum anak-anak nyaris tanpa alasan."
+            },
+            {
+              "en": "Miss Honey asks her to move Matilda to a higher class.",
+              "id": "Miss Honey memintanya memindahkan Matilda ke kelas yang lebih tinggi."
+            },
+            {
+              "en": "Miss Trunchbull refuses without listening.",
+              "id": "Miss Trunchbull menolak tanpa mendengarkan."
+            }
+          ]
+        },
+        {
+          "title": "The Power",
+          "sentences": [
+            {
+              "en": "One day, in a moment of anger, something strange happens.",
+              "id": "Suatu hari, dalam kemarahan, sesuatu yang aneh terjadi."
+            },
+            {
+              "en": "Matilda moves a glass of water without touching it.",
+              "id": "Matilda menggerakkan gelas air tanpa menyentuhnya."
+            },
+            {
+              "en": "She practises secretly until she can control it.",
+              "id": "Dia berlatih diam-diam sampai bisa mengendalikannya."
+            },
+            {
+              "en": "Miss Honey tells Matilda about her own childhood.",
+              "id": "Miss Honey menceritakan masa kecilnya sendiri kepada Matilda."
+            },
+            {
+              "en": "Her aunt took her house and her money, and that aunt is Miss Trunchbull.",
+              "id": "Bibinya mengambil rumah dan uangnya, dan bibi itu adalah Miss Trunchbull."
+            },
+            {
+              "en": "Matilda decides to use her power for her teacher.",
+              "id": "Matilda memutuskan memakai kekuatannya untuk gurunya."
+            }
+          ]
+        },
+        {
+          "title": "A Fair Ending",
+          "sentences": [
+            {
+              "en": "In class, a piece of chalk begins to write by itself.",
+              "id": "Di kelas, sebatang kapur mulai menulis sendiri."
+            },
+            {
+              "en": "It writes a message in the voice of Miss Honey's dead father.",
+              "id": "Kapur itu menulis pesan dengan suara ayah Miss Honey yang telah meninggal."
+            },
+            {
+              "en": "It tells Miss Trunchbull to give everything back.",
+              "id": "Pesan itu menyuruh Miss Trunchbull mengembalikan semuanya."
+            },
+            {
+              "en": "Miss Trunchbull is terrified and leaves for good.",
+              "id": "Miss Trunchbull ketakutan dan pergi untuk selamanya."
+            },
+            {
+              "en": "Miss Honey gets her house and her life back.",
+              "id": "Miss Honey mendapatkan kembali rumah dan hidupnya."
+            },
+            {
+              "en": "Matilda's parents must suddenly leave the country.",
+              "id": "Orang tua Matilda tiba-tiba harus meninggalkan negara itu."
+            },
+            {
+              "en": "Matilda asks to stay with Miss Honey instead.",
+              "id": "Matilda meminta untuk tinggal bersama Miss Honey."
+            },
+            {
+              "en": "Her parents agree without arguing, and drive away.",
+              "id": "Orang tuanya setuju tanpa berdebat, lalu pergi."
+            },
+            {
+              "en": "For the first time, Matilda lives with someone who sees her.",
+              "id": "Untuk pertama kalinya, Matilda tinggal bersama orang yang benar-benar melihatnya."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
