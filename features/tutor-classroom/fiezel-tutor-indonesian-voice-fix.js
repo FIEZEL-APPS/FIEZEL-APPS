@@ -58,15 +58,25 @@
     try { if (baseRuntime && typeof baseRuntime.stop === 'function') return baseRuntime.stop(); } catch (_) {}
   }
 
+  // m025-40: this was a Proxy over baseRuntime. FiezelVoiceRuntime is Object.freeze'd, so
+  // every property is non-writable and non-configurable, and a Proxy `get` trap MUST then
+  // return the target's own value. Returning a replacement for `speak` violated that
+  // invariant, so EVERY speak call threw a TypeError: English voice, Classroom audio and
+  // Listening all died at once. Diagnostic 39 recorded nine fatal
+  // UNHANDLED_PROMISE_REJECTION entries carrying exactly that message.
+  //
+  // A frozen object cannot be proxied with substituted members, so copy its surface into
+  // a new object and override there. No invariant to violate.
   if (baseRuntime) {
     try {
-      root.FiezelVoiceRuntime = new Proxy(baseRuntime, {
-        get: function(target, prop, receiver){
-          if (prop === 'speak') return classroomSpeak;
-          if (prop === 'stop') return classroomStop;
-          return Reflect.get(target, prop, receiver);
-        }
-      });
+      // Same idiom every other neural patch layer uses (ios-cache-fix,
+      // cache-integrity-repair, audibility-fix): spread the current runtime and freeze
+      // the override. Consistent, and immune to the frozen-target invariant.
+      root.FiezelVoiceRuntime = Object.freeze(Object.assign({}, baseRuntime, {
+        speak: classroomSpeak,
+        stop: classroomStop,
+        __tutorIndonesianPatched: true
+      }));
     } catch (_) {}
   }
 

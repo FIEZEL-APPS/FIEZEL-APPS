@@ -99,5 +99,44 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.ok(selftests.adaptive({ level: 1, stuck: true }, targets).map(f => f.code).includes('ADAPTIVE_STUCK'));
   });
 
+
+  // ---- defect 4 (m025-40): a Proxy over the frozen runtime killed ALL speech --------
+  test('the mechanism: proxying a frozen object with substituted members throws', () => {
+    const frozen = Object.freeze({ speak: function () { return 'base'; } });
+    const proxied = new Proxy(frozen, {
+      get(t, p, r) { if (p === 'speak') return function () { return 'other'; }; return Reflect.get(t, p, r); }
+    });
+    assert.throws(() => proxied.speak,
+      /non-configurable|read-only/i,
+      'a get trap must return the frozen target value, so substitution is a hard TypeError');
+    // The supported idiom: copy the surface, override on the copy.
+    const wrapped = Object.freeze(Object.assign({}, frozen, { speak: function () { return 'other'; } }));
+    assert.strictEqual(wrapped.speak(), 'other', 'spread-and-freeze substitutes cleanly');
+  });
+
+  test('the tutor patch never proxies the runtime', () => {
+    assert.ok(!/new Proxy\s*\(\s*baseRuntime/.test(fix),
+      'FiezelVoiceRuntime is frozen; proxying it breaks every speak call app-wide');
+    assert.ok(/Object\.freeze\(Object\.assign\(\{\}, baseRuntime/.test(fix),
+      'must use the spread-and-freeze idiom the other neural patch layers use');
+  });
+
+  test('the override preserves the rest of the runtime surface', () => {
+    // A wrapper that forgets a member silently removes capability from every caller.
+    const base = Object.freeze({
+      schema: 's', speak() { return 'b'; }, stop() { return 'bs'; },
+      status() { return { prepared: true }; }, prepare() { return 'p'; },
+      ensureReady() { return 'e'; }, totalBytes: 7
+    });
+    const patched = Object.freeze(Object.assign({}, base, { speak: () => 'c', stop: () => 'cs' }));
+    Object.keys(base).forEach(key => {
+      assert.ok(key in patched, 'member ' + key + ' must survive the override');
+    });
+    assert.strictEqual(patched.prepare(), 'p');
+    assert.strictEqual(patched.ensureReady(), 'e');
+    assert.strictEqual(patched.totalBytes, 7);
+    assert.strictEqual(patched.speak(), 'c');
+  });
+
   console.log(`FIEZEL tutor classroom regression: PASS ${pass}/0`);
 })().catch(e => { console.error(e.stack || e); process.exitCode = 1; });
