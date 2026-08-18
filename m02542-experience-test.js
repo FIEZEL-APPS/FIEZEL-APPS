@@ -11,6 +11,7 @@ const zoom = require('./features/ui/fiezel-zoom-lock.js');
 const gate = require('./features/neural-voice/fiezel-voice-bundle-gate.js');
 const daily = require('./features/daily-target/fiezel-daily-target.js');
 const dialog = require('./features/tutor-classroom/fiezel-tutor-dialog.js');
+const music = require('./features/audio/fiezel-soundtrack.js');
 
 const index = fs.readFileSync('index.html', 'utf8');
 const css = fs.readFileSync('style.css', 'utf8');
@@ -21,6 +22,7 @@ const dailySrc = fs.readFileSync('features/daily-target/fiezel-daily-target.js',
 const chatSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-voice-chat.js', 'utf8');
 const tutorSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
 const tutorCss = fs.readFileSync('features/tutor-classroom/tutor-v3.css', 'utf8');
+const dialogSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-dialog.js', 'utf8');
 
 let pass = 0;
 const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
@@ -72,12 +74,16 @@ test('the zoom lock is loaded and precached, and never blocks single-finger inpu
 
 // ---- 4. one-batch voice download ---------------------------------------------------
 
-test('the download prompt appears only when a bundle is genuinely missing', () => {
+test('the download is mandatory: the sheet stays until both bundles exist', () => {
   assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false }), true, 'fresh install asks');
   assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: false }), true, 'half installed still asks');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: true }), false, 'never again once both exist');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, downloading: true }), false, 'no second prompt mid-download');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, dismissed: true }), false, 'respects "later" for the session');
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: true }), false, 'gone for good once both exist');
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, downloading: true }), true,
+    'the sheet remains on screen while the download runs');
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, dismissed: true }), true,
+    'there is no dismissal path any more');
+  assert.ok(!/voiceBundleLater|Nanti saja/.test(gateSrc), 'the "later" button must not exist');
+  assert.match(gateSrc, /voice-bundle-locked/, 'the app is held while a bundle is missing');
 });
 
 test('progress is reported as one number across both bundles', () => {
@@ -87,11 +93,10 @@ test('progress is reported as one number across both bundles', () => {
   assert.strictEqual(gate.progressOf([{ completed: 9, total: 5 }]).percent, 100, 'progress never exceeds 100%');
 });
 
-test('the batch is one download, sequential, and survives the sheet being closed', () => {
+test('the batch is one download, sequential, and reports progress in place', () => {
   assert.match(gateSrc, /prepareEnglish\(\)\s*\n?\s*\.then\(function \(\) \{ return prepareIndonesian\(\); \}\)/,
     'English then Indonesian, never raced');
-  assert.match(gateSrc, /voice-bundle-pill/, 'a progress pill remains after the sheet closes');
-  assert.ok(!/activeRun = null;[\s\S]{0,80}return;\s*\}\s*downloading = false/.test(gateSrc));
+  assert.match(gateSrc, /voiceBundleBar/, 'progress is shown on the sheet itself');
   // A stored completion flag must never outlive the assets it claims exist.
   assert.match(gateSrc, /completed: english && indonesian && readFlag\(\)/,
     'the "never again" flag is only trusted while both engines report prepared');
@@ -199,6 +204,11 @@ test('the round button exists, answers by voice, and never falls back to browser
   assert.match(tutorCss, /\.tutor-talk-dock\{[^}]*left:50%/, 'and centred');
   assert.match(chatSrc, /SpeechRecognition \|\| root\.webkitSpeechRecognition/, 'speech input where the platform has it');
   assert.match(chatSrc, /openTypeSheet/, 'and a typing fallback where it does not, so the button is never dead');
+  // OWNER: the chat log covered the lesson. It must be gone, and the answer goes to the
+  // tutor's own subtitle line instead.
+  assert.ok(!/tutorTalkLog/.test(chatSrc), 'no chat box may cover the material');
+  assert.ok(!/tutor-talk-log/.test(tutorCss), 'and no styles for one may linger');
+  assert.match(chatSrc, /function showAnswer/, 'the answer lands in the lesson subtitle');
   assert.ok(!/speechSynthesis|SpeechSynthesisUtterance/.test(chatSrc), 'browser TTS is never used');
   assert.match(chatSrc, /allowFallback: false/, 'neural only, both paths');
   // AI first, local engine second: an offline learner must still get an answer.
@@ -214,4 +224,84 @@ test('the round button exists, answers by voice, and never falls back to browser
     'the engine must load before the layer that consumes it');
 });
 
-console.log(`FIEZEL m025-42 experience batch: PASS ${pass}/${pass}`);
+
+// ---- m025-43 OWNER repair batch ----------------------------------------------------
+
+test('both gates start themselves, because the app.js call site runs too early', () => {
+  // The original call sat inside unlockAppAfterNotification, which executes while app.js
+  // is still parsing - every <script> after it was undefined, so the optional call was a
+  // silent no-op. That is why OWNER saw no popup at all.
+  assert.match(gateSrc, /DOMContentLoaded/, 'the voice gate arms itself');
+  assert.match(gateSrc, /setInterval\(function \(\) \{/, 'and keeps checking');
+  assert.match(dailySrc, /DOMContentLoaded/, 'the daily target arms itself');
+  assert.ok(app.indexOf('FiezelVoiceBundleGate?.maybePrompt') > -1, 'app.js still nudges it, harmlessly');
+  // Two blocking sheets must never stack.
+  assert.match(dailySrc, /voiceBundleSheet/, 'the target sheet waits for the mandatory download');
+});
+
+test('long press can no longer select or copy the interface', () => {
+  assert.match(css, /-webkit-touch-callout:none/, 'the iOS copy callout is disabled');
+  assert.match(css, /user-select:none/, 'selection is off for the interface');
+  assert.match(css, /input,textarea,select,\[contenteditable="true"\]\{-webkit-user-select:text/,
+    'real text fields keep selection, or typing breaks');
+});
+
+test('wrong answers buzz hard and sound wrong, everywhere', () => {
+  assert.match(app, /error:\[90,60,90,60,140\]/, 'a wrong answer is a long, unmistakable pattern');
+  assert.ok(!/error:\[28,45,28\]/.test(app), 'the old 28ms flutter is gone');
+  // A stored preference that was never written must not read as "off".
+  assert.match(app, /function feedbackSoundsOn\(\)\{return state\.preferences\?\.feedbackSounds!==false\}/,
+    'only an explicit false disables sound');
+  assert.match(app, /state\.preferences\?\.haptics===false/, 'same for haptics');
+  assert.match(app, /bindAudioUnlockGestures/, 'the audio context is resumed on the first gesture');
+  assert.match(app, /window\.answerFeedbackSignal=answerFeedbackSignal/, 'other layers can fire the same feedback');
+  assert.match(tutorSrc, /answerFeedbackSignal/, 'Classroom answers are no longer silent');
+  // iOS has no Vibration API at all; the code must say so rather than pretend.
+  assert.match(app, /iOS Safari has NO Vibration API/, 'the platform limit is documented where it bites');
+});
+
+test('the soundtrack is an arrangement, not a chord ping', () => {
+  assert.ok(music.BPM > 0 && music.BAR > 0, 'it has tempo');
+  assert.ok(music.PROGRESSION.length >= 4, 'and a chord progression');
+  const plan = music.barPlan(0, 0);
+  const voices = new Set(plan.notes.map(n => n.voice));
+  for (const voice of ['pad', 'bass', 'arp', 'hat', 'kick']) {
+    assert.ok(voices.has(voice), `the arrangement must include ${voice}`);
+  }
+  assert.ok(plan.notes.length >= 15, 'a bar carries real note density');
+  // Notes are placed on the audio clock, in order, inside the bar.
+  const times = plan.notes.map(n => n.at);
+  assert.ok(Math.min(...times) >= 0 && Math.max(...times) < music.BAR, 'every note lands inside its bar');
+  assert.strictEqual(music.chordAt(4).name, music.PROGRESSION[0].name, 'the progression loops');
+  const second = music.barPlan(1, music.BAR);
+  assert.notStrictEqual(second.chord, plan.chord, 'consecutive bars change chord');
+  assert.match(app, /FiezelSoundtrack\?\.create/, 'app.js uses the engine');
+  assert.ok(!/playAmbientChord/.test(app), 'the old three-oscillator ping is gone');
+  assert.ok(index.includes('./features/audio/fiezel-soundtrack.js'), 'loaded by the document');
+  assert.ok(sw.includes('./features/audio/fiezel-soundtrack.js'), 'precached');
+});
+
+test('Fiezel AI answers anything, and says plainly when it cannot', () => {
+  const prompt = dialog.aiPrompt('siapa penemu listrik?', { lesson: LESSON, beat: BEAT });
+  assert.ok(/APA PUN/.test(prompt), 'the model is told to answer any question');
+  assert.ok(/Jangan menolak pertanyaan hanya karena berada di luar materi/.test(prompt),
+    'and told not to deflect back to the lesson');
+  assert.ok(/Konteks opsional/.test(prompt), 'the lesson is background, not the subject');
+  assert.ok(!/Kamu adalah FIEZEL, tutor bahasa Inggris untuk pelajar Indonesia level/.test(dialogSrc),
+    'the lesson-locked persona is gone');
+  // Offline honesty: an off-topic question without the gateway says why.
+  assert.match(chatSrc, /function unavailableReason/, 'the reason is surfaced to the learner');
+  assert.match(chatSrc, /login Puter dulu/, 'and it names the actual fix');
+});
+
+test('Speaking and Listening no longer carries an optional voice setup', () => {
+  const skills = app.slice(app.indexOf('async function skillsLab'), app.indexOf('async function startAdaptive'));
+  assert.ok(!/neuralVoiceStatusMarkup\(\)/.test(skills), 'the optional card is out of Skills Lab');
+  assert.ok(!/prepareIndonesianVoice\)/.test(skills), 'and so are its buttons');
+  // Nothing is lost: the same controls now live in Settings, where setup belongs.
+  const settings = app.slice(app.indexOf('function openSettings()'), app.indexOf('function saveSettings()'));
+  assert.ok(/neuralVoiceStatusMarkup\(\)/.test(settings), 'the controls moved to Settings');
+  assert.ok(/prepareNeuralVoice/.test(settings), 'with their handlers');
+});
+
+console.log(`FIEZEL m025-42/43 experience batch: PASS ${pass}/${pass}`);
