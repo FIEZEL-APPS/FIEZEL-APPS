@@ -103,6 +103,48 @@ test('Classroom speaks authored Indonesian tutor line through neural-only bundle
   assert.ok(/pair\.en/.test(tutorSource), 'English remains authored target-language content');
   assert.ok(!/MediaRecorder/.test(tutorSource));
 });
+// ---- m025-41 OWNER corrections ---------------------------------------------------
+
+test('opening Classroom lands on the subjects, not on a download interstitial', () => {
+  const grid = tutorSource.indexOf('tutor-subject-grid');
+  const bundle = tutorSource.indexOf('bundleCard()', tutorSource.indexOf('function renderCategory'));
+  assert.ok(grid > -1 && bundle > -1, 'both the grid and the bundle card must exist');
+  assert.ok(grid < bundle, 'the subject grid must be rendered before the optional bundle card');
+  assert.strictEqual(Tutor.createSession(pack).snapshot().phase, 'category',
+    'a fresh session opens on the subject list');
+});
+
+test('the A1 foundation is complete across every subject', () => {
+  const A1 = pack.lessons.filter(l => l.level === 'A1');
+  assert.ok(A1.length >= 24, `A1 track must be complete, found ${A1.length}`);
+  for (const category of pack.categories.map(c => c.id)) {
+    const inCategory = A1.filter(l => l.category === category);
+    assert.ok(inCategory.length >= 2, `${category} must carry A1 material, found ${inCategory.length}`);
+  }
+  // Every lesson must be playable end to end, or a learner meets a dead subject.
+  for (const lesson of pack.lessons) {
+    assert.ok(lesson.segments.length >= 3, `${lesson.id} needs teaching beats`);
+    assert.ok(lesson.questions.length >= 1, `${lesson.id} needs practice`);
+    for (const q of lesson.questions) {
+      assert.ok(q.options[q.answerIndex], `${lesson.id} has an unanswerable question`);
+      assert.ok(q.explain.id && q.remediate.id, `${lesson.id} must explain in Indonesian`);
+    }
+  }
+  assert.strictEqual(new Set(pack.lessons.map(l => l.id)).size, pack.lessons.length, 'lesson ids are unique');
+});
+
+test('every A1 lesson is reachable through the session state machine', () => {
+  for (const lesson of pack.lessons) {
+    const s = Tutor.createSession(pack);
+    s.chooseCategory(lesson.category);
+    s.chooseLesson(lesson.id);
+    const snap = s.snapshot();
+    assert.strictEqual(snap.phase, 'teach', `${lesson.id} must open its classroom`);
+    assert.ok(snap.beatCount >= 3, `${lesson.id} must have teaching beats`);
+    assert.ok(s.currentBeat().idText, `${lesson.id} must carry the spoken Indonesian line`);
+  }
+});
+
 test('human-tutor controls remain intact', () => {
   for (const marker of ['Ask Fiezel', 'I don’t get it', 'Slower', 'Replay', 'Back to the exact lesson checkpoint']) assert.ok(tutorSource.includes(marker));
   assert.ok(tutorSource.includes('data-route-skills')); assert.ok(tutorSource.includes('tutor-board'));

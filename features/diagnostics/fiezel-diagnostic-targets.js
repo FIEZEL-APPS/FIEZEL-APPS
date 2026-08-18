@@ -18,6 +18,25 @@
     listening: Object.freeze({ minItems: 30 }),
     speaking: Object.freeze({ minItems: 30 }),
     neuralVoice: Object.freeze({ expectedAssetCount: 5 }),
+    // m025-41: the Indonesian bundle is optional, so its absence is never a failure -
+    // but a half-installed or drifted bundle is exactly the state that produced silent
+    // Classroom audio, and that must be visible.
+    indonesianVoice: Object.freeze({ expectedAssetCount: 5 }),
+    // The prototype contract OWNER set: A1 complete across every subject before any
+    // higher level is worth counting.
+    classroom: Object.freeze({
+      foundationLevel: 'A1',
+      requiredCategories: Object.freeze(['grammar', 'vocabulary', 'reading', 'listening', 'speaking', 'exam']),
+      minFoundationLessons: 24,
+      minLessonsPerCategory: 2,
+      minSegmentsPerLesson: 3,
+      minQuestionsPerLesson: 1
+    }),
+    // A contour that never moves is the flat delivery OWNER rejected; it is measurable,
+    // so the scanner measures it rather than waiting for a human to listen.
+    prosody: Object.freeze({ languages: Object.freeze(['en', 'id']), minContourSpread: 0.01 }),
+    storage: Object.freeze({ maxUsedPercent: 90 }),
+    ui: Object.freeze({ primaryDestinations: 5, maxRenderMs: 1200 }),
     validLevels: Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'])
   });
 }));
