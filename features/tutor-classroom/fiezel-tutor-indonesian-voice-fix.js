@@ -43,10 +43,14 @@
         try { root.console && root.console.warn && root.console.warn('indonesian tutor voice failed, using base engine', error); } catch (_) {}
       }
     }
-    // m025-39: the Indonesian bundle is an OPTIONAL 94MB download. Requiring it here made
-    // Classroom speech fail outright for anyone who had not fetched it, which is what
-    // OWNER hit as "reload Classroom selalu gagal". English neural is mandatory and
-    // always present, so it is the correct floor. Browser TTS is never used.
+    // m025-42: Indonesian and English are now ONE bundle, so this branch is reached only
+    // before the shared voice pack is prepared (or if its worker failed to start). The
+    // fallback stays exactly as m025-39 left it: fall through to the base runtime rather
+    // than leaving Classroom mute, and never to browser TTS.
+    //
+    // m025-39 (historical): the Indonesian bundle was an OPTIONAL 94MB download, and
+    // requiring it here made Classroom speech fail outright for anyone who had not
+    // fetched it - what OWNER hit as "reload Classroom selalu gagal".
     if (!baseRuntime || typeof baseRuntime.speak !== 'function') throw new Error('neural_runtime_missing');
     return baseRuntime.speak(spoken, Object.assign({}, opts, { allowFallback: false }));
   }

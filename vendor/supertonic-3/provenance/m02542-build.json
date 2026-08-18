@@ -1,0 +1,92 @@
+{
+  "schema": "fiezel-supertonic-build-provenance-v1",
+  "milestone": "m025-42",
+  "builtAt": "2026-08-18",
+  "runtime": {
+    "source": "https://github.com/k2-fsa/sherpa-onnx",
+    "tag": "v1.13.6",
+    "commit": "1cb484a",
+    "toolchain": "emscripten 4.0.23",
+    "buildScript": "tools/build-supertonic-wasm.sh",
+    "deviationsFromUpstream": [
+      {
+        "change": "removed --preload-file",
+        "why": "the packaged .data is 145,298,516 B, over the 100 MB per-file limit of the git remote this project deploys from, and it forces a single 145 MB allocation at startup",
+        "consequence": "the seven model files ship as ordinary static assets and are written into MEMFS by vendor/supertonic-3/sherpa-onnx-tts.worker.js"
+      },
+      {
+        "change": "added 'FS' to EXPORTED_RUNTIME_METHODS",
+        "why": "required by the change above so the worker can write the model files itself"
+      },
+      {
+        "change": "CMake asset guard accepts assets/tts.json",
+        "why": "the guard only recognised tokens.txt / lm_flow.int8.onnx; Supertonic has neither"
+      }
+    ]
+  },
+  "model": {
+    "name": "Supertonic 3",
+    "release": "sherpa-onnx-supertonic-3-tts-int8-2026-05-11",
+    "source": "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2",
+    "archiveBytes": 128774318,
+    "quantization": "int8",
+    "upstreamProject": "https://github.com/supertone-inc/supertonic",
+    "speakers": 10,
+    "sampleRate": 44100,
+    "languages": 31,
+    "languagesUsed": ["id", "en"],
+    "licence": {
+      "sampleCode": "MIT (LICENSE file shipped in the release archive, Supertone Inc. 2025)",
+      "modelWeights": "OpenRAIL-M per the upstream model card",
+      "cost": "free; no API key, no runtime billing, inference is fully on-device",
+      "note": "the archive ships an MIT LICENSE covering the code; the weights are stated as OpenRAIL-M by upstream. Both are free to use; OpenRAIL-M adds use-restrictions only (no illegal or harmful use), which do not affect a language-learning app."
+    }
+  },
+  "assets": {
+    "sherpa-onnx-wasm-main-tts.js": 79421,
+    "sherpa-onnx-wasm-main-tts.wasm": 13476398,
+    "sherpa-onnx-tts.js": 33227,
+    "sherpa-onnx-tts.worker.js": 4709,
+    "duration_predictor.int8.onnx": 3700147,
+    "text_encoder.int8.onnx": 36416150,
+    "vector_estimator.int8.onnx": 78400833,
+    "vocoder.int8.onnx": 25991073,
+    "tts.json": 8253,
+    "unicode_indexer.bin": 262144,
+    "voice.bin": 517168,
+    "totalBytes": 158889523,
+    "largestFileBytes": 78400833,
+    "replaces": {
+      "vendor/sherpa-vits": 110142279,
+      "vendor/sherpa-vits-id": 94558999,
+      "combinedBytes": 204701278,
+      "savedBytes": 45811755
+    }
+  },
+  "verification": {
+    "bundleLoadedAndSynthesized": true,
+    "how": "the vendored .wasm/.js were loaded outside a browser, the seven model files written into MEMFS exactly as the worker does, and three lines generated through generateWithConfig",
+    "numSpeakersReadBack": 10,
+    "sampleRateReadBack": 44100,
+    "finiteAudio": true,
+    "casesGenerated": ["id / persona ajar / sid 2", "id / persona hype / sid 5", "en / persona hype / sid 5"],
+    "wasmRealtimeFactorSteadyState": {
+      "numSteps4": [0.989, 0.971],
+      "numSteps5_engineDefault": [1.187, 1.159],
+      "environment": "x86_64 container, single thread, shared CPU - NOT a device measurement",
+      "warning": "this is at or above realtime. The retired Piper engine measured 0.347 on Safari 26 arm64. Device measurement is a release gate, not a formality."
+    },
+    "denoisingStepCalibration": {
+      "measuredOn": "vendored model, one Indonesian praise line, single thread",
+      "steps1": { "rtf": 0.094, "asrWordError": 1.0 },
+      "steps2": { "rtf": 0.148, "asrWordError": 0.545 },
+      "steps3": { "rtf": 0.198, "asrWordError": 0.273 },
+      "steps4": { "rtf": 0.25, "asrWordError": 0.0, "pitchRangeSemitones": 18.3 },
+      "steps5": { "rtf": 0.331, "asrWordError": 0.0, "pitchRangeSemitones": 14.1, "note": "engine default" },
+      "steps6": { "rtf": 0.364, "asrWordError": 0.0, "pitchRangeSemitones": 12.6 },
+      "steps8": { "rtf": 0.486, "asrWordError": 0.0, "pitchRangeSemitones": 8.7 },
+      "chosen": 4,
+      "why": "faster AND more expressive than the default; below 4 the words break down, so it is a cliff rather than a dial"
+    }
+  }
+}
