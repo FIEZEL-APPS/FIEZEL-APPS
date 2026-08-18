@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#57a8df">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -92,12 +92,18 @@
   <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada. -->
   <script src="./features/neural-voice/fiezel-diag-panel.js"></script>
   <script src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
+  <script src="./features/ui/fiezel-zoom-lock.js"></script>
+  <script src="./features/audio/fiezel-soundtrack.js"></script>
+  <script src="./features/neural-voice/fiezel-voice-bundle-gate.js"></script>
   <script src="./features/classroom/fiezel-classroom.js"></script>
   <script src="./features/speaking-listening/speaking-listening-config.js"></script>
   <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script src="./app.js"></script>
   <script src="./features/tutor-classroom/fiezel-tutor-v3.js"></script>
   <script src="./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js"></script>
+  <script src="./features/tutor-classroom/fiezel-tutor-dialog.js"></script>
+  <script src="./features/tutor-classroom/fiezel-tutor-voice-chat.js"></script>
+  <script src="./features/daily-target/fiezel-daily-target.js"></script>
   <script>
     /* FIEZEL_REPORT_GESTURE_ISOLATION_START */
     (() => {

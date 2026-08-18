@@ -55,7 +55,10 @@ setTimeout(()=>{try{
 
   assert(context.playFeedbackSound('success')===true,'correct-answer sound did not start');
   assert(context.playFeedbackSound('error')===true,'wrong-answer sound did not start');
-  assert(oscillatorStarts===5,`feedback sound produced ${oscillatorStarts}/5 expected tones`);
+  // m025-43: OWNER could not hear the answer feedback. Both cues are now longer and
+  // fuller - a four-note rise for correct, a three-note fall for wrong - so the count
+  // moved from 5 to 7 deliberately.
+  assert(oscillatorStarts===7,`feedback sound produced ${oscillatorStarts}/7 expected tones`);
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
