@@ -41,7 +41,10 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
     'no Kokoro asset may remain in the download manifest; it would be downloaded and never used');
   const declared = [...assetBlock.matchAll(/path:'([^']+)',bytes:(\d+)/g)]
     .map(m => ({ path: m[1], bytes: Number(m[2]) }));
-  assert.strictEqual(declared.length, 5, 'sherpa runtime is exactly five files');
+  // m025-42: four runtime files plus the seven model files the worker writes into
+  // MEMFS. See vendor/supertonic-3/provenance/m02542-build.json for why they are not
+  // packaged into one .data.
+  assert.strictEqual(declared.length, 11, 'engine runtime is exactly eleven files');
 
   // Declared byte counts must match the vendored files exactly, or the prepare layer
   // will report a size mismatch and re-download on every attempt.

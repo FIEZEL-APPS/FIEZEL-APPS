@@ -51,9 +51,16 @@
       // are deliberately absent, exactly as "when" and "if" are on the English side.
       clauseLeads: ['tetapi', 'tapi', 'karena', 'walaupun', 'meskipun', 'padahal',
         'sedangkan', 'sehingga', 'supaya', 'agar'],
+      // m025-42: the tutor now speaks a casual register, so the markers that open a
+      // breath group in casual Indonesian are listed alongside the formal ones. Same
+      // conservative bar as before - each of these reliably starts a new breath group
+      // when a person says it, which is why a comma after it sounds like speech
+      // rather than like a list.
       introMarkers: ['namun', 'jadi', 'nah', 'oke', 'misalnya', 'contohnya',
         'sebenarnya', 'sekarang', 'pertama', 'kedua', 'ketiga', 'terakhir', 'akhirnya',
-        'selain itu', 'oleh karena itu', 'dengan kata lain']
+        'selain itu', 'oleh karena itu', 'dengan kata lain',
+        'yuk', 'gas', 'terus', 'abis itu', 'jadinya', 'soalnya', 'makanya',
+        'pokoknya', 'intinya', 'gini', 'gitu']
     })
   });
 
@@ -164,7 +171,24 @@
    * which is what a listener hears as "finished". Mid-utterance phrases alternate by a
    * hair so a long lesson never settles into a monotone.
    */
-  function contour(phrase, index, total) {
+  // m025-42: with a persona base the product is deliberately above the old ceiling
+  // (hype sits at pitch 1.05 before the sentence shape is applied at all), so the
+  // combined value gets its own wider guard rail. Beyond these the measured pitch
+  // range starts COLLAPSING rather than widening, so this is a hard stop, not a taste.
+  var PERSONA_SPEED_MAX = 1.24;
+  var PERSONA_PITCH_MAX = 1.10;
+  var PERSONA_PITCH_MIN = 0.90;
+
+  function clampPersona(value, min, max) {
+    return Math.round(Math.min(max, Math.max(min, value)) * 1000) / 1000;
+  }
+
+  /**
+   * @param {object} [base] optional persona baseline {speed, pitch}. When given, the
+   *   sentence shape below is applied ON TOP of it, so a praise line keeps its brighter
+   *   register while still falling at the end the way a finished sentence does.
+   */
+  function contour(phrase, index, total, base) {
     var text = String(phrase == null ? '' : phrase).trim();
     var i = Number(index) > 0 ? Math.floor(Number(index)) : 0;
     var n = Number(total) > 0 ? Math.floor(Number(total)) : 1;
@@ -178,6 +202,14 @@
     else { pitch = i % 2 ? 0.99 : 1.012; }
     // An opening phrase sits slightly higher, the way a speaker starts a new thought.
     if (i === 0 && n > 1 && !/\?$/.test(text)) pitch += 0.008;
+    if (base && (Number(base.speed) > 0 || Number(base.pitch) > 0)) {
+      var baseSpeed = Number(base.speed) > 0 ? Number(base.speed) : 1;
+      var basePitch = Number(base.pitch) > 0 ? Number(base.pitch) : 1;
+      return {
+        speed: clampPersona(baseSpeed * clampContour(speed), 0.6, PERSONA_SPEED_MAX),
+        pitch: clampPersona(basePitch * clampContour(pitch), PERSONA_PITCH_MIN, PERSONA_PITCH_MAX)
+      };
+    }
     return { speed: clampContour(speed), pitch: clampContour(pitch) };
   }
 
@@ -208,6 +240,9 @@
     PROFILES: PROFILES,
     CONTOUR_MIN: CONTOUR_MIN,
     CONTOUR_MAX: CONTOUR_MAX,
+    PERSONA_SPEED_MAX: PERSONA_SPEED_MAX,
+    PERSONA_PITCH_MAX: PERSONA_PITCH_MAX,
+    PERSONA_PITCH_MIN: PERSONA_PITCH_MIN,
     profileFor: profileFor,
     punctuate: punctuate,
     phrases: phrases,
