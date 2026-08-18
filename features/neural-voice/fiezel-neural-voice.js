@@ -223,7 +223,7 @@
         let timer = null;
         let didTimeOut = false;
         let audio;
-        const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1 }));
+        const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }));
         activeInference = generated;
         activeInferenceMeta = { requestId, chunkIndex, voice, startedAt: generateStartedAt };
         generated.then(
