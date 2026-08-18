@@ -1,10 +1,11 @@
 {
   "schema": "fiezel-classroom-lessons-v1",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "voiceContract": {
-    "speech": "en-US neural",
-    "subtitle": "id-ID running subtitle",
-    "note": "Fiezel explains in English; Indonesian runs as comprehension scaffolding, per the Classroom design."
+    "speech": "id-ID neural tutor",
+    "targetLanguage": "en",
+    "transcript": "id-ID tutor transcript",
+    "note": "Fiezel mengajar dalam bahasa Indonesia melalui bundle neural Indonesia. Bahasa Inggris tetap menjadi materi target, contoh, prompt, dan latihan. Tidak ada browser-TTS fallback."
   },
   "categories": [
     { "id": "grammar", "label": "Grammar", "hint": "Present Perfect, Tenses", "icon": "braces" },
