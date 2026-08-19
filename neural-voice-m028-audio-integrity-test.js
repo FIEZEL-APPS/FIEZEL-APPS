@@ -83,6 +83,8 @@ assert.match(playerSource, /AudioWorkletNode/, 'player must instantiate AudioWor
 assert.match(playerSource, /contextRate\s*===\s*sampleRate/, 'player must require exact source/context rate before worklet routing');
 assert.match(playerSource, /sampleRate,\s*\n\s*samples:/, 'source sample rate must ride with every worklet enqueue');
 assert.match(playerSource, /__fiezelPcmPlaybackEpoch/, 'player must keep a shared playback epoch across player instances');
+assert.match(playerSource, /const sharedRuntime = env\.__fiezelPcmWorkletRuntime;[\s\S]{0,220}workletRuntimes\.add\(sharedRuntime\)/,
+  'a new non-continuous player must clear the shared worklet, not only its closure-local queue');
 assert.match(playerSource, /message\.type === 'error'[^\n]*entry\.finish\(true\)/,
   'worklet error and done messages must both settle exactly once through the pending map');
 assert.match(playerSource, /createBufferSource\(/, 'legacy AudioBufferSourceNode rollback path must remain');
