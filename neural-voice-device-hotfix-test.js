@@ -78,8 +78,6 @@ assert.ok(readinessBlock.includes('code:readinessErrorCode(error)'),'readiness f
 assert.ok(!readinessBlock.includes('error:String'),'m025-13 readiness diagnostics must not persist raw error messages');
 assert.ok(!/(?:\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(readinessBlock),'m025-13 readiness diagnostics must not persist learner text or credential material');
 assert.ok(aud.includes('Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true})'),'m025-13 wrapped ensureReady must be the public runtime method');
-// m025-30: the rate is now a learner preference rather than a hardcoded 0.92. What
-// must hold is that the voice test stays neural-only, so pin allowFallback:false.
 assert.ok(app.includes("speed:selectedNeuralRate(),allowFallback:false"),'Tes suara must be neural-only');
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
@@ -123,9 +121,9 @@ assert.equal(probe.PROBE_WORD_COUNT,160,'device probe text must remain exactly 1
 const probeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190);
 assert.equal(probeChunks.length,2,'baseline splitter must still deterministically produce two natural chunks without Apple char-cap context');
 assert.deepEqual(probeChunks.map(x=>x.trim().split(/\s+/).length),[76,84],'baseline device-probe sentence boundaries must remain stable');
-const appleProbeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190,80);
-assert.ok(appleProbeChunks.length>=8,'Apple physical probe must remain decomposed into materially smaller inference slices');
-assert.ok(appleProbeChunks.every(x=>x.length<=80),`Apple physical probe chunks must stay <=80 chars, got ${appleProbeChunks.map(x=>x.length).join(',')}`);
+const appleProbeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190,32);
+assert.ok(appleProbeChunks.length>=20,'Apple physical probe must remain decomposed into materially smaller inference slices');
+assert.ok(appleProbeChunks.every(x=>x.length<=32),`Apple physical probe chunks must stay <=32 chars, got ${appleProbeChunks.map(x=>x.length).join(',')}`);
 assert.equal(appleProbeChunks.join(' ').replace(/\s+/g,' ').trim(),probe.PROBE_TEXT.replace(/\s+/g,' ').trim(),'Apple slice policy must preserve probe text and ordering');
 const probeRefresh=probeSrc.indexOf("await runtime.refreshPreparedFlag()");
 const probeEnsure=probeSrc.indexOf("await runtime.ensureReady()");
