@@ -1,4 +1,4 @@
-/* M028.2 emergency hotfix: Apple continuity policy + deterministic speech serialization. */
+/* M028.2 emergency hotfix: Apple continuity, PCM-edge integrity, speech serialization. */
 (function(root){
   'use strict';
   if(!root || root.__fiezelM0281PrebootstrapHotfix) return;
@@ -65,9 +65,9 @@
     var patched = Object.assign({}, input);
     var appleStandalone = !!(patched.env && patched.env.navigator && patched.env.navigator.standalone === true);
     if(appleStandalone && patched.streamSentences === true){
-      // m028-50 physical evidence: sentence-at-a-time generation is near realtime and
-      // short chunks can exhaust the audible lead. Until true incremental PCM exists,
-      // keep multiple sentences/clauses in one bounded render on Apple standalone.
+      // m025-50 physical evidence: sentence-at-a-time generation is near realtime and
+      // short chunks can exhaust audible lead. Until true incremental PCM exists, keep
+      // multiple sentences/clauses in one bounded render on Apple standalone.
       patched.streamSentences = false;
       patched.appleHardChunkChars = APPLE_HARD_CHUNK_CHARS;
     }
@@ -76,11 +76,74 @@
     return serializeService(originalCreate.call(neural, patched));
   }
 
+  function installAppleAudioEdgeGuard(){
+    var playerApi = root.FiezelWebAudioPlayer;
+    if(!playerApi || typeof playerApi.createPlayer !== 'function' || playerApi.__m0282AudioEdgePatched) return false;
+    var originalCreatePlayer = playerApi.createPlayer;
+
+    function wrapWorkletCtor(NativeCtor){
+      if(typeof NativeCtor !== 'function') return NativeCtor;
+      return new Proxy(NativeCtor, {
+        construct: function(target, args){
+          var node = Reflect.construct(target, args, target);
+          var port = node && node.port;
+          if(port && typeof port.postMessage === 'function' && !port.__fiezelM0282EdgeWrapped){
+            var originalPost = port.postMessage.bind(port);
+            try { port.__fiezelM0282EdgeWrapped = true; } catch (_) {}
+            port.postMessage = function(message, transfer){
+              var next = message;
+              if(message && message.type === 'enqueue'){
+                next = Object.assign({}, message, {
+                  fadeInFrames: 0,
+                  fadeOutFrames: 0,
+                  edgePolicy: 'model-native'
+                });
+              }
+              // Explicit clear/cancel keeps its original bounded fadeOutFrames.
+              if(arguments.length > 1) return originalPost(next, transfer);
+              return originalPost(next);
+            };
+          }
+          return node;
+        }
+      });
+    }
+
+    function createPlayer(env, options){
+      var target = env || root;
+      var appleStandalone = !!(target && target.navigator && target.navigator.standalone === true);
+      var NativeCtor = target && target.AudioWorkletNode;
+      if(!appleStandalone || typeof NativeCtor !== 'function'){
+        return originalCreatePlayer.call(playerApi, target, options);
+      }
+      var WrappedCtor = wrapWorkletCtor(NativeCtor);
+      var playerEnv = new Proxy(target, {
+        get: function(obj, key){
+          if(key === 'AudioWorkletNode') return WrappedCtor;
+          return obj[key];
+        },
+        set: function(obj, key, value){ obj[key] = value; return true; }
+      });
+      return originalCreatePlayer.call(playerApi, playerEnv, options);
+    }
+
+    root.FiezelWebAudioPlayer = Object.freeze(Object.assign({}, playerApi, {
+      createPlayer: createPlayer,
+      __m0282AudioEdgePatched: true
+    }));
+    return true;
+  }
+
   root.FiezelNeuralVoice = Object.freeze(Object.assign({}, neural, { createVoiceService: createVoiceService }));
+  var edgeInstalled = installAppleAudioEdgeGuard();
   root.__fiezelM0281PrebootstrapHotfix = Object.freeze({
-    schema: 'fiezel-m0282-prebootstrap-integrity-v1',
+    schema: 'fiezel-m0282-prebootstrap-integrity-v2',
     appleHardChunkChars: APPLE_HARD_CHUNK_CHARS,
     appleStreamSentences: false,
+    appleAudioEdgeGuard: edgeInstalled,
+    ordinaryFadeInFrames: 0,
+    ordinaryFadeOutFrames: 0,
+    cancellationFade: 'preserved',
     internalSeamGapMs: 0,
     speechArbitration: 'serialized'
   });
