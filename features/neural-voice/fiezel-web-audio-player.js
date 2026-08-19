@@ -28,6 +28,13 @@
   // callback is a dropout, and a dropout is the crackle in OWNER's report.
   const LATENCY_HINT = 'playback';
 
+  // m026-1: A/B diagnostic is deliberately opt-in. With no query parameter the player
+  // executes the exact m025-48 path and pays no sample-scanning telemetry cost.
+  // `raw` bypasses only conditionSamples(); trimming, fades, scheduling and AudioContext
+  // stay identical, so the listening comparison isolates vocoder PCM vs conditioning.
+  const PCM_DIAGNOSTIC_PARAM = 'fiezelPcmMode';
+  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned']);
+
   // Conditioning thresholds. Each one is deliberately conservative: audio that is already
   // clean must come back untouched, so nothing here can dull a good render.
   const PEAK_CEILING = 0.97;         // WebAudio clips at 1.0; this keeps true-peak headroom
@@ -51,6 +58,53 @@
   function pickSampleRate(rawAudio) {
     const n = Number(rawAudio && (rawAudio.sampling_rate || rawAudio.sample_rate || rawAudio.sampleRate));
     return Number.isFinite(n) && n >= 8000 && n <= 192000 ? n : 24000;
+  }
+
+  function pcmDiagnosticMode(env, settings) {
+    const explicit = settings && String(settings.pcmDiagnosticMode || '').toLowerCase();
+    if (PCM_DIAGNOSTIC_MODES.includes(explicit)) return explicit;
+    try {
+      const search = env && env.location && typeof env.location.search === 'string' ? env.location.search : '';
+      if (!search) return '';
+      const Params = env.URLSearchParams || (typeof URLSearchParams !== 'undefined' ? URLSearchParams : null);
+      if (!Params) return '';
+      const value = String(new Params(search).get(PCM_DIAGNOSTIC_PARAM) || '').toLowerCase();
+      return PCM_DIAGNOSTIC_MODES.includes(value) ? value : '';
+    } catch (_) { return ''; }
+  }
+
+  function analyzeSamples(samples) {
+    if (!samples || !samples.length) {
+      return Object.freeze({ samples: 0, finite: 0, nonFinite: 0, clipped: 0, peak: 0, rms: 0, mean: 0, impulses: 0 });
+    }
+    let finite = 0;
+    let nonFinite = 0;
+    let clipped = 0;
+    let peak = 0;
+    let sum = 0;
+    let sumSquares = 0;
+    for (let i = 0; i < samples.length; i += 1) {
+      const value = Number(samples[i]);
+      if (!Number.isFinite(value)) { nonFinite += 1; continue; }
+      finite += 1;
+      sum += value;
+      sumSquares += value * value;
+      const magnitude = value < 0 ? -value : value;
+      if (magnitude > peak) peak = magnitude;
+      if (magnitude > 1) clipped += 1;
+    }
+    const mean = finite ? sum / finite : 0;
+    const rms = finite ? Math.sqrt(sumSquares / finite) : 0;
+    return Object.freeze({
+      samples: samples.length,
+      finite,
+      nonFinite,
+      clipped,
+      peak,
+      rms,
+      mean,
+      impulses: nonFinite ? null : findImpulses(samples).length
+    });
   }
 
   // Samples above unity clip inside WebAudio, and clipping is heard as crackle. NaN or
@@ -236,6 +290,7 @@
     const settings = playerOptions || {};
     const preferredRate = Number(settings.sampleRate) > 0 ? Number(settings.sampleRate) : PREFERRED_SAMPLE_RATE;
     const AudioContextCtor = env.AudioContext || env.webkitAudioContext;
+    const diagnosticMode = pcmDiagnosticMode(env, settings);
     let source = null;
     let sourceGain = null;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -247,6 +302,19 @@
     function sink() {
       const module = env.FiezelVoiceDiagnostics;
       return module && typeof module.begin === 'function' ? module : null;
+    }
+
+    function recordDiagnostic(entry) {
+      const trace = env.FiezelVoiceDiagnostics;
+      if (!trace || typeof trace.record !== 'function') return false;
+      try {
+        return trace.record(Object.assign({
+          t: Date.now(),
+          v: String(env.FIEZEL_VERSION || '5.19.0'),
+          phase: 'pcm_ab_playback',
+          diagnosticMode
+        }, entry || {}), env);
+      } catch (_) { return false; }
     }
 
     // Satu AudioContext per env, bukan per pemanggilan createPlayer().
@@ -375,10 +443,23 @@
       if (!samples || !samples.length) throw new Error('Unsupported Kokoro audio payload');
       const sampleRate = pickSampleRate(rawAudio);
       if (opts.trim) samples = trimSilence(samples, sampleRate);
-      samples = conditionSamples(samples);
+      const rawStats = diagnosticMode ? analyzeSamples(samples) : null;
+      if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
+      const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
       const current = await resumeContext();
       if (!current) throw new Error('Web Audio API unavailable');
+
+      if (diagnosticMode) {
+        recordDiagnostic({
+          sourceSampleRate: sampleRate,
+          contextSampleRate: Number(current.sampleRate) || null,
+          resamplingExpected: Number(current.sampleRate) > 0 && Number(current.sampleRate) !== sampleRate,
+          trimmed: opts.trim === true,
+          raw: rawStats,
+          rendered: renderedStats
+        });
+      }
 
       const now = contextTime(current);
       const continuous = opts.continuous === true;
@@ -450,6 +531,7 @@
         done,
         startsAt: startAt,
         endsAt: entry.endsAt,
+        diagnosticMode,
         stop() {
           if (entry.settled) return;
           entry.settled = true;
@@ -497,9 +579,13 @@
     createPlayer,
     pickSamples,
     pickSampleRate,
+    pcmDiagnosticMode,
+    analyzeSamples,
     guardClipping,
     conditionSamples,
     trimSilence,
+    PCM_DIAGNOSTIC_PARAM,
+    PCM_DIAGNOSTIC_MODES,
     PREFERRED_SAMPLE_RATE,
     LATENCY_HINT,
     PEAK_CEILING,
