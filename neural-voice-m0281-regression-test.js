@@ -53,9 +53,9 @@ async function main(){
   const bootstrap=index.indexOf('fiezel-neural-voice-bootstrap.js');
   const guard=index.indexOf('fiezel-m0281-runtime-guard.js');
   const audibility=index.indexOf('fiezel-neural-voice-audibility-fix.js');
-  const tutor=index.indexOf('fiezel-tutor-v3.js');
+  const tutorIndex=index.indexOf('fiezel-tutor-v3.js');
   assert(pre>0&&pre<bootstrap,'prebootstrap hotfix must load before bootstrap');
-  assert(guard>audibility&&guard<tutor,'runtime guard must capture final base runtime before tutor override');
+  assert(guard>audibility&&guard<tutorIndex,'runtime guard must capture final base runtime before tutor override');
   console.log('PASS M028.1 seam/arbitration/shared-prepare/Classroom regression');
 }
 main().catch(error=>{console.error(error);process.exit(1);});
