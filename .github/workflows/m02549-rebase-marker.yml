@@ -33,12 +33,12 @@ jobs:
           git diff --check
           grep -q "DIAG_BUILD = 'm025-49'" features/neural-voice/fiezel-diag-panel.js
           grep -q "SW_REV='m025-49-" sw.js
-      - name: Commit marker-only correction
+      - name: Commit rebased release correction
         shell: bash
         run: |
           set -euo pipefail
           git config user.name 'fitrajft-ux'
           git config user.email 'fitrajft@gmail.com'
-          git add features/neural-voice/fiezel-diag-panel.js sw.js
-          git commit -m 'm025-49: advance release markers over T-026 baseline'
+          git add features/neural-voice/fiezel-diag-panel.js sw.js neural-voice-m02549-puter-test.js
+          git commit -m 'm025-49: advance release boundary over T-026 baseline'
           git push origin HEAD:claude/neural-voice-crackin-delayed-259tmj
