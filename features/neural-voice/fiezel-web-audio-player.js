@@ -202,6 +202,7 @@
     let source = null;
     let sourceGain = null;
     let queued = [];
+    let activePlaybackEpoch = 0;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     function playbackEpoch() {
@@ -209,15 +210,17 @@
     }
 
     function reservePlaybackEpoch(continuous) {
-      let epoch = playbackEpoch();
-      if (!continuous || !epoch) epoch += 1;
+      if (continuous && activePlaybackEpoch > 0) return activePlaybackEpoch;
+      const epoch = playbackEpoch() + 1;
       env.__fiezelPcmPlaybackEpoch = epoch;
+      activePlaybackEpoch = epoch;
       return epoch;
     }
 
     function advancePlaybackEpoch() {
-      const epoch = playbackEpoch() + 1;
+      const epoch = Math.max(playbackEpoch(), activePlaybackEpoch) + 1;
       env.__fiezelPcmPlaybackEpoch = epoch;
+      activePlaybackEpoch = 0;
       return epoch;
     }
 
@@ -535,9 +538,7 @@
       if (!continuous) stopAll(current, epoch);
 
       if (pcmWorklet) {
-        if (epoch < playbackEpoch()) {
-          throw new Error('TTS playback superseded');
-        }
+        if (epoch < playbackEpoch()) throw new Error('TTS playback superseded');
         if (diagnosticMode) recordDiagnostic({ playbackPath: 'audio-worklet', sourceSampleRate: sampleRate, contextSampleRate: contextRate });
         return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0, epoch);
       }
