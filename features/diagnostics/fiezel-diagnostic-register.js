@@ -92,12 +92,13 @@
       });
     } catch (_) {}
     try {
-      var reachable = typeof root.go === 'function';
-      if (reachable) {
-        probe.missingViews = VIEWS.filter(function (view) {
-          return !root.document.querySelector('[data-view="' + view + '"]') &&
-                 !root.document.querySelector('[onclick*="go(\'' + view + '\')"]');
-        });
+      // m025-45: this used to hunt the DOM for a button per view and reported "test" as
+      // missing on every healthy install - the placement screen opens from a Home card
+      // that reads startAdaptive() once the learner is assessed. A destination is missing
+      // when the router does not know it, not when no button happens to be on screen.
+      var known = root.__fiezelValidViews ? root.__fiezelValidViews() : null;
+      if (Array.isArray(known) && known.length) {
+        probe.missingViews = VIEWS.filter(function (view) { return known.indexOf(view) === -1; });
       }
     } catch (_) {}
     return { findings: tests.runtime(probe) };
@@ -136,7 +137,9 @@
       probe.mounted = !!app;
       probe.empty = !app || !String(app.innerHTML || '').trim();
       probe.view = String((root.__getFiezelState && root.__getFiezelState().view) || '');
-      probe.destinations = root.document.querySelectorAll('.nav').length + 1;
+      // The Home button carries the .nav class too, so the old "+ 1" counted it twice
+      // and every healthy install reported 6 destinations against a target of 5.
+      probe.destinations = root.document.querySelectorAll('.bottomnav .nav').length;
       probe.lastRenderMs = Number(root.__fiezelLastRenderMs || 0);
     } catch (error) {
       return { findings: [bus.finding('UI_PROBE_FAILED', 'error', String((error && error.message) || error))] };

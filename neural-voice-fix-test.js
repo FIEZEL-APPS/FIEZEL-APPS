@@ -209,8 +209,10 @@ async function main() {
     check('player baru tetap bisa stop() setelah close', typeof p2.stop === 'function');
 
     const bootstrap = read(BOOTSTRAP);
+    // m025-45: the invariant is that release() is on the runtime surface, not the exact
+    // order of the neighbouring members - prefetch was added between stop and release.
     check('bootstrap mengekspos release() di FiezelVoiceRuntime',
-      /speak,stop,release,verifyCachedAssets/.test(bootstrap));
+      /FiezelVoiceRuntime=Object\.freeze\(\{[\s\S]{0,200}?,release,/.test(bootstrap));
     check('release() memanggil stop service + cancel browser TTS',
       /function release\(\)\{[\s\S]*?service\?\.stop\?\.\(\)[\s\S]*?speechSynthesis\?\.cancel\?\.\(\)/.test(bootstrap));
     check('release() menutup player via FiezelWebAudioPlayer.createPlayer().close()',

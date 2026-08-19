@@ -52,15 +52,35 @@
 
   // ---- narration ----------------------------------------------------------------
 
-  function speak(text) {
-    var runtime = root.FiezelVoiceRuntime;
-    if (!runtime || typeof runtime.speak !== 'function') return Promise.reject(new Error('neural_runtime_missing'));
+  function narrationOptions() {
     var speed = 1;
     try { speed = typeof root.selectedNeuralRate === 'function' ? Number(root.selectedNeuralRate()) || 1 : 1; } catch (_) {}
     var voice;
     try { voice = typeof root.neuralVoiceFor === 'function' ? root.neuralVoiceFor({}) : undefined; } catch (_) {}
     // The books are English; narration is never routed through the Indonesian tutor voice.
-    return runtime.speak(text, { voice: voice, lang: 'en-US', speed: speed, allowFallback: false });
+    return { voice: voice, lang: 'en-US', speed: speed, allowFallback: false };
+  }
+
+  function speak(text) {
+    var runtime = root.FiezelVoiceRuntime;
+    if (!runtime || typeof runtime.speak !== 'function') return Promise.reject(new Error('neural_runtime_missing'));
+    return runtime.speak(text, narrationOptions());
+  }
+
+  /**
+   * m025-45: the silence between sentences was the next one being generated only after
+   * the current finished - 1.4 to 2.7s of nothing on OWNER's device. Warming it while the
+   * current sentence is still playing removes that wait. Best effort by construction: the
+   * runtime refuses to warm while a generation is in flight, and a failed warm just means
+   * the normal path generates as before.
+   */
+  function warmNext() {
+    var runtime = root.FiezelVoiceRuntime;
+    if (!runtime || typeof runtime.prefetch !== 'function') return;
+    var snap = session.snapshot();
+    var upcoming = session.sentences()[snap.sentenceIndex + 1];
+    if (!upcoming) return;
+    try { runtime.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
   }
 
   function stopNarration() {
@@ -84,8 +104,12 @@
       var sentence = session.current();
       if (!sentence) break;
       highlight(sentence.index, true);
+      // Warm the next line first: the runtime declines while a generation is running, so
+      // this lands during playback, which is exactly the window we want to use.
+      var speaking = speak(sentence.en);
+      warmNext();
       try {
-        await speak(sentence.en);
+        await speaking;
       } catch (error) {
         narrating = false;
         session.pause();
@@ -146,7 +170,6 @@
       '<h1>' + esc(snap.title || '') + '</h1></div></div>' +
       (summary.original ? '' : '<p class="library-note">' + esc(summary.source) + '</p>') +
       '<div class="library-text" id="libraryText">' + body + '</div>' +
-      '<div class="library-translation" id="libraryTranslation" hidden></div>' +
       '<div class="library-dock">' +
       '<div class="library-progress-line"><span id="libraryBar" style="width:' + snap.percent + '%"></span></div>' +
       '<p class="library-status" id="libraryStatus">Ketuk kalimat untuk arti, atau putar audiobook.</p>' +
@@ -160,6 +183,7 @@
 
   function renderShelf() {
     stopNarration();
+    closeTranslation();
     session.close();
     var node = mount();
     if (!node) return;
@@ -242,23 +266,48 @@
     var picked = session.select(index);
     saveProgress();
     highlight(index, false);
-    var panel = doc.getElementById('libraryTranslation');
-    if (panel && picked) {
-      panel.hidden = false;
-      panel.innerHTML = '<span class="library-translation-mark">TERJEMAHAN</span>' +
-        '<p class="library-translation-en">' + esc(picked.en) + '</p>' +
-        '<p class="library-translation-id">' + esc(picked.id) + '</p>' +
-        '<div class="library-translation-actions">' +
-        '<button type="button" id="librarySpeakOne"><i data-lucide="volume-2"></i> Dengar</button>' +
-        '<button type="button" id="libraryAskOne"><i data-lucide="message-circle-question"></i> Tanya Fiezel</button>' +
-        '</div>';
-      var listen = doc.getElementById('librarySpeakOne');
-      if (listen) listen.addEventListener('click', function () { stopNarration(); speak(picked.en).catch(function () {}); });
-      var ask = doc.getElementById('libraryAskOne');
-      if (ask) ask.addEventListener('click', openAsk);
-      icons();
-    }
+    showTranslation(picked);
     renderProgress();
+  }
+
+  function closeTranslation() {
+    var existing = doc.getElementById('libraryTranslation');
+    if (existing && existing.remove) existing.remove();
+  }
+
+  /**
+   * m025-45 OWNER: the translation must float in the middle of the screen, not sit in a
+   * strip next to the play button. It is a light overlay rather than a modal: the book
+   * stays visible behind it, and tapping anywhere outside dismisses it.
+   */
+  function showTranslation(picked) {
+    closeTranslation();
+    if (!picked) return;
+    var layer = doc.createElement('div');
+    layer.id = 'libraryTranslation';
+    layer.className = 'library-translation-layer';
+    layer.setAttribute('role', 'dialog');
+    layer.setAttribute('aria-label', 'Terjemahan kalimat');
+    layer.innerHTML = '<div class="library-translation-card">' +
+      '<span class="library-translation-mark">TERJEMAHAN</span>' +
+      '<p class="library-translation-en">' + esc(picked.en) + '</p>' +
+      '<p class="library-translation-id">' + esc(picked.id) + '</p>' +
+      '<div class="library-translation-actions">' +
+      '<button type="button" id="librarySpeakOne"><i data-lucide="volume-2"></i> Dengar</button>' +
+      '<button type="button" id="libraryAskOne"><i data-lucide="message-circle-question"></i> Tanya Fiezel</button>' +
+      '<button type="button" id="libraryCloseOne" aria-label="Tutup terjemahan"><i data-lucide="x"></i></button>' +
+      '</div></div>';
+    doc.body.appendChild(layer);
+    layer.addEventListener('click', function (event) {
+      if (event.target === layer) closeTranslation();
+    });
+    var listen = doc.getElementById('librarySpeakOne');
+    if (listen) listen.addEventListener('click', function () { stopNarration(); speak(picked.en).catch(function () {}); });
+    var ask = doc.getElementById('libraryAskOne');
+    if (ask) ask.addEventListener('click', openAsk);
+    var close = doc.getElementById('libraryCloseOne');
+    if (close) close.addEventListener('click', closeTranslation);
+    icons();
   }
 
   function step(direction) {
@@ -269,6 +318,7 @@
   }
 
   function togglePlay() {
+    closeTranslation();
     if (narrating) { stopNarration(); setStatus('Dijeda.'); return; }
     setStatus('Membacakan…');
     narrate();

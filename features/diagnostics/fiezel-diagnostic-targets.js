@@ -17,11 +17,14 @@
     leveltest: Object.freeze({ totalQuestions: 150 }),
     listening: Object.freeze({ minItems: 30 }),
     speaking: Object.freeze({ minItems: 30 }),
-    neuralVoice: Object.freeze({ expectedAssetCount: 5 }),
+    // m025-45: Supertonic 3 ships 11 files (wasm + js + worker + four int8 models +
+    // tokenizer data). The count exists to catch a drifted manifest, so it has to
+    // track the engine actually shipped.
+    neuralVoice: Object.freeze({ expectedAssetCount: 11 }),
     // m025-41: the Indonesian bundle is optional, so its absence is never a failure -
     // but a half-installed or drifted bundle is exactly the state that produced silent
     // Classroom audio, and that must be visible.
-    indonesianVoice: Object.freeze({ expectedAssetCount: 5 }),
+    indonesianVoice: Object.freeze({ expectedAssetCount: 11 }),
     // The prototype contract OWNER set: A1 complete across every subject before any
     // higher level is worth counting.
     classroom: Object.freeze({
