@@ -472,7 +472,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .live-signal{width:7px;height:7px;border-radius:50%;background:#8fd8b8;box-shadow:0 0 0 6px rgba(143,216,184,.1);animation:signalPulse 2.4s ease-in-out infinite}
 .launcher-greeting{color:var(--gold);font:500 1rem Georgia,"Times New Roman",serif;font-style:italic;margin:30px 0 8px}
 .launcher-copy h1{font-size:clamp(2.5rem,5.7vw,5rem);line-height:.98;letter-spacing:-.06em;margin:0;max-width:850px;font-weight:760}.launcher-copy h1.login-message{font-size:clamp(2.15rem,4.5vw,4.25rem);line-height:1.02}
-.launcher-copy h1 span{color:#9e94ea}
+.launcher-copy h1 span{color:#e8a3ad}
 .launcher-lead{font-size:1rem;line-height:1.7;color:#cdbcc1;max-width:680px;margin:22px 0 0}.learner-stage{display:flex;align-items:center;gap:8px;margin:13px 0 0;color:#c0aeb3;font-size:.72rem}.learner-stage svg{width:16px;height:16px;color:#d8b36b}
 .launcher-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
 .launcher-actions .luxe{background:#f7f6f1;color:#1d1114;border-color:#f7f6f1}
@@ -732,3 +732,24 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 /* The sky is a clock, not wallpaper: it stays, but it stops competing with the text. */
 .sky-light{opacity:.72}
 .global-celestial{opacity:.9}
+
+/* --------------------------------------------------------------------------
+   m025-46 fix: text on glass must follow the material, not the light theme.
+   The mission panel and the stat strip used to be near-opaque cream cards with
+   dark type. Turning them into glass made them follow the sky, but their labels
+   still came from the light-theme tokens, so at night they sank into their own
+   background. Caught by rendering the page, not by any assertion.
+   -------------------------------------------------------------------------- */
+.card,.launcher-shell,.coach-preview,.launch-card,.mission-panel,.home-stats,.home-stats>div{color:var(--glass-text)}
+.card h1,.card h2,.card h3,.card b,.card strong,
+.mission-panel h3,.home-stats strong,.launch-card b{color:var(--glass-text)}
+.card p.muted,.card .muted,.mission-panel p,.home-stats small,
+.launch-card small,.coach-preview p,.coach-preview small{color:var(--glass-muted)}
+
+/* Headings sitting straight on the sky take the ambient colour, which already
+   tracks the phase - otherwise they are dark type on a dark sky after sunset. */
+.section-head h1,.home-section-head h2,.home-section-head h3{color:var(--ambient-text)}
+.section-head p{color:var(--ambient-muted)}
+
+/* The stat labels were the last capitals left on Home. */
+.home-stats small,.stats small{text-transform:none;letter-spacing:.01em;font-size:.7rem}
