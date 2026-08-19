@@ -55,6 +55,7 @@ jobs:
           node alrs-behavior-test.js
           node adaptive-policy-test.js
           node policy-outcome-test.js
+          node personal-journey-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
           node pwa-startup-white-screen-recovery-test.js
