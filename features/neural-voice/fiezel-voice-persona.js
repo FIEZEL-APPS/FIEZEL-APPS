@@ -35,13 +35,24 @@
 
   var DEFAULT_PERSONA = 'ajar';
 
+  var HYPE_INTENTS = ['hype', 'pujian', 'sapaan', 'transisi',
+    'praise', 'greeting', 'encourage', 'celebrate', 'welcome'];
+  var AJAR_INTENTS = ['ajar', 'penjelasan', 'instruksi',
+    'explain', 'teach', 'instruct', 'correction', 'koreksi'];
+
   // Words that mark a line as praise/greeting rather than teaching. Kept short and
   // unambiguous: a false positive only swaps the speaker, but a marker that also
   // appears mid-explanation would swap it constantly, which reads as unstable.
   var HYPE_MARKERS = [
     'keren', 'mantap', 'hebat', 'bagus', 'gas', 'yeay', 'wih', 'sip', 'top',
     'selamat', 'halo', 'haloo', 'hai', 'hei', 'yuk', 'ayo', 'semangat',
-    'nice', 'good job', 'well done', 'awesome'
+    'nice', 'good job', 'well done', 'awesome',
+    // m025-48. One utterance is now rendered one SENTENCE at a time, so the register is
+    // resolved per sentence rather than once for a whole paragraph - a praise line
+    // inside an explanation finally gets to be spoken by the praise voice. That makes
+    // the marker list worth completing with the words this tutor actually uses.
+    'wah', 'yes', 'asik', 'asyik', 'wow', 'jago', 'pinter', 'pintar',
+    'tepat', 'betul', 'bener banget', 'luar biasa', 'lanjut'
   ];
 
   function escapeRe(value) { return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
@@ -54,8 +65,11 @@
    */
   function resolve(text, intent) {
     var explicit = String(intent || '').toLowerCase();
-    if (explicit === 'hype' || explicit === 'pujian' || explicit === 'sapaan' || explicit === 'transisi') return PERSONAS.hype;
-    if (explicit === 'ajar' || explicit === 'penjelasan' || explicit === 'instruksi') return PERSONAS.ajar;
+    // English intent names are accepted alongside the Indonesian ones: callers name their
+    // intents in whichever language their module is written in, and a name that does not
+    // resolve silently costs the line its register.
+    if (HYPE_INTENTS.indexOf(explicit) >= 0) return PERSONAS.hype;
+    if (AJAR_INTENTS.indexOf(explicit) >= 0) return PERSONAS.ajar;
     var line = String(text == null ? '' : text).trim();
     if (!line) return PERSONAS[DEFAULT_PERSONA];
     // A short exclamation is hype even without a listed marker: "Bener banget!"
@@ -93,6 +107,8 @@
   }
 
   return Object.freeze({
+    HYPE_INTENTS: Object.freeze(HYPE_INTENTS.slice()),
+    AJAR_INTENTS: Object.freeze(AJAR_INTENTS.slice()),
     MAX_SPEED: MAX_SPEED,
     MAX_PITCH: MAX_PITCH,
     PERSONAS: PERSONAS,

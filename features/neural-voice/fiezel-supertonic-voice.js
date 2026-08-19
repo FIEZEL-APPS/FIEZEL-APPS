@@ -62,11 +62,28 @@
 
   function diag(entry) {
     try {
+      var record = Object.assign({ t: Date.now(), v: version, engine: 'supertonic-3' }, entry);
+      var sink = root.FiezelVoiceDiagnostics;
+      if (sink && typeof sink.record === 'function') { sink.record(record, root); return; }
       var key = 'fiezel-neural-voice-diagnostics-v1';
       var list = JSON.parse(root.localStorage.getItem(key) || '[]');
-      list.push(Object.assign({ t: Date.now(), v: version, engine: 'supertonic-3' }, entry));
+      list.push(record);
       root.localStorage.setItem(key, JSON.stringify(list.slice(-200)));
     } catch (_) {}
+  }
+
+  var SPEECH_DEFAULTS = Object.freeze({ streamSentences: true, streamMaxWords: 26, silenceScale: 0.4 });
+  function speechSettings() {
+    var config = root.FiezelNeuralVoiceConfig;
+    var speech = config && config.speech ? config.speech : null;
+    return {
+      streamSentences: speech && typeof speech.streamSentences === 'boolean'
+        ? speech.streamSentences : SPEECH_DEFAULTS.streamSentences,
+      streamMaxWords: speech && Number(speech.streamMaxWords) > 0
+        ? Number(speech.streamMaxWords) : SPEECH_DEFAULTS.streamMaxWords,
+      silenceScale: speech && Number(speech.silenceScale) > 0
+        ? Number(speech.silenceScale) : SPEECH_DEFAULTS.silenceScale
+    };
   }
 
   function normalizeLang(lang) {
@@ -176,16 +193,34 @@
         generationSteps: 4,
         // Same reason as the English path: this engine needs no synthetic pitch contour.
         usePitchContour: false,
+        // m025-48: the contour is off, so per-sentence delivery is shaped through the
+        // engine's own rate instead of by resampling its output.
+        useEmotion: true,
+        // m025-48: restore audible breaths at the punctuation prosody inserts.
+        silenceScale: speechSettings().silenceScale,
+        // m025-48: passed explicitly. The adapter's own fallback for this was reading a
+        // variable that does not exist in its scope, so prosody has been null on every
+        // device since it was introduced - which is why the Indonesian line reached the
+        // duration predictor with no clause commas and no terminal mark.
+        prosody: root.FiezelProsody || null,
         onStage: function (entry) { diag(Object.assign({ lang: key }, entry)); }
       });
       await adapter.initialize();
       var player = root.FiezelWebAudioPlayer.createPlayer(root);
+      var settings = speechSettings();
       var service = root.FiezelNeuralVoice.createVoiceService({
         config: root.FiezelNeuralVoiceConfig,
         adapter: adapter,
         env: root,
         playAudio: player.play,
-        generationTimeoutMs: 30000
+        generationTimeoutMs: 30000,
+        // m025-48: sentence-at-a-time rendering and playback. This is what removes the
+        // wait before the first word and what puts the pause between two sentences under
+        // prosody's control instead of leaving it to whatever each render happens to
+        // carry at its edges.
+        streamSentences: settings.streamSentences,
+        streamMaxWords: settings.streamMaxWords,
+        prosody: root.FiezelProsody || null
       });
       adapters[key] = adapter;
       services[key] = service;
