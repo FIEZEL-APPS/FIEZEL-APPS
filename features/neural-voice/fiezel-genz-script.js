@@ -72,6 +72,111 @@
 
   function escapeRe(value) { return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
+  /**
+   * m025-48 spoken numbers.
+   *
+   * The engine is a character model with no rule FSTs configured (see the worker's
+   * `ruleFsts: ''`), so a digit reaches it as a digit and is read on whatever the
+   * training data suggests. In an Indonesian line that is a coin toss, and the two
+   * shapes this content actually contains are the ones most likely to lose it:
+   * "50.000", where the dot is a thousands separator and not a decimal point, and
+   * "07:15", which is a clock time rather than two numbers.
+   *
+   * A tutor that says "lima puluh ribu" is not a nicer version of one that says the
+   * digits - it is the difference between a person and a form reader. So numbers are
+   * spelled out here, in the spoken-script layer, where the written lesson text is left
+   * exactly as authored.
+   */
+  var NUM_UNITS = ['nol', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh',
+    'delapan', 'sembilan', 'sepuluh', 'sebelas'];
+
+  function numberWords(value) {
+    var n = Math.floor(Number(value));
+    if (!Number.isFinite(n) || n < 0) return String(value);
+    if (n < 12) return NUM_UNITS[n];
+    if (n < 20) return NUM_UNITS[n - 10] + ' belas';
+    if (n < 100) return joinWords(NUM_UNITS[Math.floor(n / 10)] + ' puluh', n % 10);
+    if (n < 200) return joinWords('seratus', n % 100);
+    if (n < 1000) return joinWords(numberWords(Math.floor(n / 100)) + ' ratus', n % 100);
+    if (n < 2000) return joinWords('seribu', n % 1000);
+    if (n < 1e6) return joinWords(numberWords(Math.floor(n / 1000)) + ' ribu', n % 1000);
+    if (n < 1e9) return joinWords(numberWords(Math.floor(n / 1e6)) + ' juta', n % 1e6);
+    if (n < 1e12) return joinWords(numberWords(Math.floor(n / 1e9)) + ' miliar', n % 1e9);
+    return digitWords(String(n));
+  }
+  function joinWords(head, rest) { return rest ? head + ' ' + numberWords(rest) : head; }
+
+  /** Digit by digit, the way a person reads a phone number or a code. */
+  function digitWords(text) {
+    return String(text).split('').map(function (ch) {
+      return /[0-9]/.test(ch) ? NUM_UNITS[Number(ch)] : ch;
+    }).join(' ').replace(/\s+/g, ' ').trim();
+  }
+
+  // Written short forms nobody pronounces letter by letter.
+  var ABBREVIATIONS = Object.freeze([
+    ['dll', 'dan lain-lain'],
+    ['dsb', 'dan sebagainya'],
+    ['dgn', 'dengan'],
+    ['tsb', 'tersebut'],
+    ['yg', 'yang'],
+    ['utk', 'untuk'],
+    ['krn', 'karena'],
+    ['sbg', 'sebagai'],
+    ['tdk', 'nggak'],
+    ['jgn', 'jangan']
+  ]);
+
+  /** Indonesian reading of the numbers and short forms inside one spoken line. */
+  function verbalize(text) {
+    var out = String(text == null ? '' : text);
+    if (!out.trim()) return '';
+
+    ABBREVIATIONS.forEach(function (pair) {
+      // The dot is left in place: in "... dll." it is also the sentence's full stop, and
+      // swallowing it costs the line its final fall in intonation.
+      var re = new RegExp('(^|[^\\w-])' + escapeRe(pair[0]) + '(?![\\w-])', 'gi');
+      out = out.replace(re, function (_m, lead) { return lead + pair[1]; });
+    });
+
+    // A clock time is two numbers with a relationship, not two numbers.
+    out = out.replace(/(^|[^\d])([01]?\d|2[0-3]):([0-5]\d)(?!\d)/g, function (_m, lead, hh, mm) {
+      var minute = Number(mm);
+      var spoken = numberWords(Number(hh));
+      return lead + (minute ? spoken + ' lewat ' + numberWords(minute) : spoken + ' tepat');
+    });
+
+    // "ke-3" is an ordinal and joins its number into one word: ketiga, not "ke tiga".
+    out = out.replace(/\bke-(\d+)\b/g, function (_m, digits) {
+      var n = Number(digits);
+      if (n === 1) return 'pertama';
+      return 'ke' + numberWords(n).replace(/\s+/g, ' ');
+    });
+
+    out = out.replace(/(\d[\d.,]*)\s*%/g, function (_m, number) { return readNumber(number) + ' persen'; });
+
+    // Every remaining run of digits, longest shapes first so a grouped thousand is not
+    // read as three separate numbers.
+    out = out.replace(/\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?/g, function (match) {
+      return readNumber(match);
+    });
+
+    return out.replace(/\s+/g, ' ').trim();
+  }
+
+  function readNumber(token) {
+    var text = String(token).trim();
+    var parts = text.split(',');
+    var whole = parts[0].replace(/\./g, '');
+    var spoken;
+    // A leading zero is never a quantity - it is a code, a phone number or a room.
+    if (/^0\d/.test(whole)) spoken = digitWords(whole);
+    else if (whole.length > 12) spoken = digitWords(whole);
+    else spoken = numberWords(Number(whole));
+    if (parts.length > 1 && parts[1]) spoken += ' koma ' + digitWords(parts[1]);
+    return spoken;
+  }
+
   // "sangat mudah" -> "gampang banget", not "banget gampang": in casual Indonesian the
   // intensifier follows the word it intensifies. A flat word-for-word dictionary gets
   // this backwards, so intensifiers are their own rule.
@@ -151,7 +256,7 @@
     var line = String(text == null ? '' : text);
     if (!line.trim()) return '';
     if (!/^id/i.test(String(lang || 'id'))) return line.replace(/\s+/g, ' ').trim();
-    return pronounceable(casualize(line));
+    return pronounceable(verbalize(casualize(line)));
   }
 
   /** Deterministic-but-rotating pick, so a session never repeats twice in a row. */
@@ -169,7 +274,10 @@
     CASUAL: CASUAL,
     OPENERS: OPENERS,
     PRAISES: PRAISES,
+    ABBREVIATIONS: ABBREVIATIONS,
     casualize: casualize,
+    verbalize: verbalize,
+    numberWords: numberWords,
     moveIntensifier: moveIntensifier,
     pronounceable: pronounceable,
     speakable: speakable,
