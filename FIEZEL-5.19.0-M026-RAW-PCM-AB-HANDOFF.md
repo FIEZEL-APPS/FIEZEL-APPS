@@ -35,15 +35,17 @@ scope:
     - features/neural-voice/fiezel-neural-voice-bootstrap.js
     - fiezel-core-worker.js
 objective: >
-  Membuat A/B diagnostic yang dapat membedakan apakah crackle/static sudah ada pada
-  raw PCM keluaran vocoder atau muncul/bertambah pada conditioning/WebAudio playback,
-  tanpa mengubah perilaku playback normal.
+  Membuat raw-vs-conditioned PCM A/B diagnostic yang mengukur integritas PCM sebelum
+  conditioning dan mengisolasi efek conditionSamples(), sebagai evidence untuk milestone
+  berikutnya yang akan mengidentifikasi model/vocoder vs playback, tanpa mengubah perilaku
+  playback normal.
 forbidden_actions:
   - Jangan mengganti model atau vocoder.
   - Jangan mengubah generationSteps, speaker/persona, prosody atau silenceScale.
   - Jangan mengubah kontrak FiezelVoiceRuntime.
   - Jangan mengimplementasikan true PCM streaming/ring buffer pada milestone ini.
   - Jangan mengklaim crackle sudah diperbaiki tanpa bukti perangkat fisik.
+  - Jangan mengklaim raw-vs-conditioned A/B sendiri membypass WebAudio; kedua mode masih memakai player yang sama.
   - Pada fiezel-diag-panel.js hanya DIAG_BUILD yang boleh berubah.
   - Pada sw.js hanya SW_REV yang boleh berubah.
 done_when:
@@ -58,7 +60,7 @@ evidence_required:
   - Diff hanya pada files_allowed.
   - Output test neural-voice-m026-raw-pcm-ab-test.js.
   - Regression/quality gate hijau.
-  - Untuk menentukan root cause: dua hasil listening pada device yang sama, raw dan conditioned.
+  - Physical A/B raw vs conditioned pada device yang sama sebelum root-cause status boleh dinaikkan.
 ```
 
 ### Scope amendment setelah verifier A7
@@ -94,7 +96,7 @@ root_cause_context:
     - attempt: m025-48 conditioning + deeper AudioContext buffer + 44.1 kHz preference
       result: Machine-verified; physical listening masih gagal menurut owner.
   do_not_repeat:
-    - Menambah filter audio baru sebelum mengetahui raw PCM sudah rusak atau belum.
+    - Menambah filter audio baru sebelum mengetahui karakter raw PCM.
     - Menurunkan generationSteps di bawah 4 untuk mengejar performa.
     - Menambah worker/model instance kedua pada iOS.
 ```
@@ -129,6 +131,8 @@ Kedua mode diagnostik mencatat event `phase: "pcm_ab_playback"` dengan:
 
 Tidak ada raw audio, teks pelajaran, prompt, atau rekaman pengguna yang disimpan oleh telemetry ini.
 
+Batas inferensi wajib: mode `raw` di sini berarti **raw terhadap `conditionSamples()`**, bukan raw terhadap seluruh output device. Mode `raw` dan `conditioned` sama-sama melewati WebAudio, fade, scheduling, dan output hardware. Karena itu T-026 adalah tahap pengumpulan A/B evidence; keputusan model-vs-playback adalah milestone berikutnya.
+
 ## 4. PHYSICAL A/B GATE
 
 Gunakan perangkat, volume, speaker/headphone, teks, voice, dan kondisi baterai yang sama.
@@ -139,22 +143,26 @@ Gunakan perangkat, volume, speaker/headphone, teks, voice, dan kondisi baterai y
 4. Ulangi persis dengan `?fiezelPcmMode=conditioned`.
 5. Catat penilaian: `bersih`, `sedikit pecah`, atau `pecah berat` untuk masing-masing mode.
 
-Interpretasi:
+Interpretasi yang diizinkan:
 
-- RAW pecah + CONDITIONED pecah -> sumber utama berada sebelum conditioning; fokus milestone berikut pada model/vocoder/generation output.
-- RAW bersih + CONDITIONED pecah -> conditioning adalah tersangka utama.
-- RAW bersih + CONDITIONED bersih tetapi produksi normal pecah -> fokus pada resource contention/timing/playback scheduling di kondisi produk nyata.
-- RAW pecah, CONDITIONED jauh lebih bersih -> conditioning membantu tetapi sumber cacat tetap berada pada raw inference.
-- `sourceSampleRate=44100`, `contextSampleRate!=44100` -> resampling device nyata dan harus ikut investigasi playback.
+- RAW bersih + CONDITIONED pecah -> `conditionSamples()` menjadi tersangka kuat; milestone identifikasi harus mengaudit transformasi conditioning.
+- RAW pecah + CONDITIONED jauh lebih bersih -> conditioning membantu; raw PCM memang mengandung anomali yang terukur/terdengar, tetapi shared WebAudio path belum otomatis bebas dari kontribusi.
+- RAW pecah + CONDITIONED pecah -> **INCONCLUSIVE model-vs-playback** karena keduanya masih memakai WebAudio. Gunakan telemetry: nonFinite/clipped/impulses pada raw memperkuat hipotesis source PCM; raw metrics bersih memperkuat kebutuhan independent playback reference.
+- RAW bersih + CONDITIONED bersih tetapi produksi normal pecah -> fokus milestone identifikasi pada contention/timing/scheduling kondisi produk nyata.
+- `sourceSampleRate=44100`, `contextSampleRate!=44100` -> resampling device nyata terkonfirmasi dan harus ikut audit playback.
+
+Tidak boleh menulis `CONFIRMED: vocoder` hanya karena kedua mode terdengar pecah.
 
 ## 5. HANDOFF KE MILESTONE BERIKUT
 
-T-026 tidak boleh ditutup sebagai `done` hanya dengan CI. Karena objective akhirnya adalah identifikasi crackle pada device, setelah CI hijau status yang jujur adalah `changed-not-tested` atau `blocked` sampai physical A/B masuk.
+T-026 tidak boleh ditutup sebagai `done` hanya dengan CI. Setelah machine gate hijau, status yang jujur adalah `changed-not-tested` sampai physical A/B masuk.
 
-Setelah physical A/B:
+Setelah physical A/B, buka milestone **identifikasi model vs playback** dengan context injection dari event `pcm_ab_playback`:
 
-- jika raw PCM terbukti cacat -> buat task baru untuk `audio integrity / vocoder reference A/B`;
-- jika raw PCM bersih -> buat task baru untuk `playback integrity / underrun & scheduling instrumentation`;
+- jika conditioning jelas memperburuk output -> audit/repair conditioning lebih dulu;
+- jika raw metrics menunjukkan non-finite/clipping/impulse dan gejala raw terdengar -> buat reference comparison untuk model/vocoder;
+- jika raw dan conditioned sama-sama pecah namun metrics raw bersih -> buat independent raw-WAV/media playback reference yang mem-bypass FIEZEL WebAudio scheduling agar model-vs-playback dapat diputuskan tanpa tebakan;
+- jika ada sample-rate mismatch -> masukkan resampling path sebagai tersangka eksplisit;
 - hanya setelah audio integrity tervalidasi lanjut ke `true PCM streaming + ring buffer`;
 - setelah long-text stress test lulus baru `Local Qwen` boleh diintegrasikan.
 
