@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T10:15:00+07:00",
+  "updated": "2026-08-19T15:16:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -313,6 +313,14 @@
       "owner": "master (single-agent)",
       "status": "done",
       "evidence": "Redesign ini SEBELUMNYA hanya mockup di kanvas desain, belum pernah masuk aplikasi. Kunci yang ditemukan lebih dulu lewat pembacaan gerbang: launcher-shell, coach-preview, learning-launcher, learner-stage, login-message, dan seluruh sistem langit global-sky/sky-light/scene-night DIKUNCI oleh experience-integration-test, product-audit, ui-structure-test, dan lesson-experience-test. Karena itu matahari/bulan beranimasi TIDAK dimatikan seperti usulan desain awal - hanya ditenangkan (sky-light opacity .72). Perubahan: (1) blok :root KEDUA di style.css ternyata palet hidup aplikasi (aksen indigo #6f5de3, --black navy #0b1020) - blok pertama praktis mati untuk aksen; keduanya kini maroon #8C2233/#6D1926 dengan netral hangat; (2) lapisan Liquid Glass: tiga bobot material yang membalik mengikuti fase langit, tab bar kapsul mengambang, sheet blur berat, ramp tipografi large-title, target sentuh >=44px; (3) SCENE_STOPS dihangatkan - langit tetap jam siang/malam, birunya hilang; (4) kepadatan teks: 10 kicker HURUF BESAR dihapus app-wide, badge kepercayaan, strip privasi, tagline enam kartu, dan baris \"Personal English OS\" di topbar dibuang (Home 5749 -> 4691 karakter); (5) biru sisa di features/tutor-classroom/tutor-v3.css (html.fiezel-ui-v6 .primary gradient navy yang menimpa SETIAP tombol utama), speaking-listening-addon.css, dan fiezel-library-ui.js ikut disapu. regression-test.js: penanda daily brief dipindah dari string salinan \"RINGKASAN HARI INI\" ke penanda struktural (function dailyBrief + mission-ring + MEANINGFUL_ATTEMPTS) - lebih ketat, bukan lebih longgar, karena struktur tidak patah oleh perubahan bahasa. Verifikasi: 66/66 test lokal tanpa silent-exit, syntax bersih, DAN render nyata lewat Chromium headless - itu yang menangkap tombol biru yang lolos dari 66 test."
+    },
+    {
+      "id": "T-026",
+      "title": "m026-1: raw PCM A/B diagnostic untuk neural voice crackle/static",
+      "owner": "agent-5 (coordinator, current session)",
+      "status": "in_progress",
+      "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
+      "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
     }
   ],
   "last_report": {
