@@ -338,74 +338,135 @@
   function mount() {
     var ui = build();
     var body = root.document.body;
+    if (!body) return;
     body.appendChild(ui.host);
-    var searchState = { query: '', matches: [], index: -1 };
 
-    function applySearch(resetIndex) {
-      var value = ui.text.value || '';
-      var query = ui.search.value || '';
-      searchState.query = query;
-      searchState.matches = findMatches(value, query);
-      if (resetIndex) searchState.index = searchState.matches.length ? 0 : -1;
-      else if (searchState.index >= searchState.matches.length) searchState.index = searchState.matches.length ? searchState.matches.length - 1 : -1;
-      ui.searchCount.textContent = searchState.matches.length
-        ? String(searchState.index + 1) + '/' + String(searchState.matches.length)
-        : (query ? '0 hasil' : 'Cari');
-      if (searchState.index >= 0) {
-        var start = searchState.matches[searchState.index];
-        try { ui.text.focus(); ui.text.setSelectionRange(start, start + query.length); } catch (_) {}
+    var dump = null;
+    var matches = [];
+    var matchIndex = -1;
+
+    function selectMatch(index) {
+      var query = String(ui.search.value || '').trim();
+      if (!query) {
+        matches = [];
+        matchIndex = -1;
+        ui.searchCount.textContent = 'Cari';
+        return;
       }
+      matches = findMatches(ui.text.value, query);
+      if (!matches.length) {
+        matchIndex = -1;
+        ui.searchCount.textContent = '0 hasil';
+        return;
+      }
+      matchIndex = ((index % matches.length) + matches.length) % matches.length;
+      ui.searchCount.textContent = (matchIndex + 1) + '/' + matches.length;
+      var start = matches[matchIndex];
+      safe(function(){
+        if (typeof ui.text.focus === 'function') ui.text.focus();
+        if (typeof ui.text.setSelectionRange === 'function') ui.text.setSelectionRange(start, start + query.length);
+      });
     }
 
-    function moveSearch(delta) {
-      if (!searchState.matches.length) { applySearch(true); return; }
-      searchState.index = (searchState.index + delta + searchState.matches.length) % searchState.matches.length;
-      applySearch(false);
+    function refreshSearch() {
+      var query = String(ui.search.value || '').trim();
+      if (!query) {
+        matches = [];
+        matchIndex = -1;
+        ui.searchCount.textContent = 'Cari';
+        return;
+      }
+      selectMatch(0);
     }
 
-    function collect() {
-      var dump = collectSync();
-      addRuntimeDiagnostics(dump);
-      return Promise.all([addStorageEstimate(dump), addCacheInventory(dump)])
-        .then(function(){ return dump; });
+    function setText() {
+      ui.text.value = serialize(dump);
+      refreshSearch();
     }
 
-    function render() {
-      ui.text.value = 'Memuat diagnostics…';
-      return collect().then(function(dump){
-        ui.text.value = serialize(dump);
-        applySearch(true);
-        return dump;
+    // m025-34: the button now scans every module, not just Neural Voice. The scan is
+    // additive -- the existing TTS payload is preserved so older evidence stays readable.
+    function runUniversalScan() {
+      var bus = root.FiezelDiagnosticBus;
+      if (!bus) { dump.universal = { error: 'diagnostic bus tidak tersedia' }; return Promise.resolve(); }
+      return bus.getFullReport({
+        diagBuild: DIAG_BUILD,
+        appVersion: String(root.FIEZEL_VERSION || ''),
+        standalone: dump.standalone,
+        userAgent: dump.userAgent
+      }).then(function(report){
+        dump.universal = report;
+        dump.universalSummary = bus.summaryText(report);
+        renderBadges(report);
       }).catch(function(error){
-        ui.text.value = serialize({ error: String(error && error.message || error) });
-        applySearch(true);
-        return null;
+        dump.universal = { error: String(error && error.message || error) };
+      });
+    }
+
+    function renderBadges(report) {
+      if (!ui.badges) return;
+      var health = report.moduleHealth || {};
+      var keys = Object.keys(health).sort();
+      if (!keys.length) { ui.badges.textContent = 'Tidak ada modul terdaftar.'; return; }
+      ui.badges.innerHTML = keys.map(function(key){
+        var st = health[key].status;
+        var color = st === 'pass' ? '#1f9d6f' : st === 'warn' ? '#c98a1b' : st === 'skip' ? '#748096' : '#e0526f';
+        var label = st === 'pass' ? 'OK' : st === 'warn' ? 'WARN' : st === 'skip' ? 'SKIP' : 'FAIL';
+        return '<span style="display:inline-block;margin:2px 4px 2px 0;padding:3px 8px;border-radius:999px;'
+          + 'background:' + color + ';color:#fff;font:600 11px/1.4 -apple-system,system-ui,sans-serif;">'
+          + label + ' ' + key + '</span>';
+      }).join('');
+    }
+
+    function refresh() {
+      dump = collectSync();
+      addRuntimeDiagnostics(dump);
+      setText();
+      Promise.all([addStorageEstimate(dump), addCacheInventory(dump), runUniversalScan()]).then(function(){
+        setText();
       });
     }
 
     ui.open.addEventListener('click', function(){
+      refresh();
       ui.sheet.classList.add('open');
-      render();
     });
-    ui.close.addEventListener('click', function(){ ui.sheet.classList.remove('open'); });
-    ui.search.addEventListener('input', function(){ applySearch(true); });
-    ui.previous.addEventListener('click', function(){ moveSearch(-1); });
-    ui.next.addEventListener('click', function(){ moveSearch(1); });
-    ui.send.addEventListener('click', function(){ share(ui.send, 'full', ui.text.value || ''); });
-    ui.sendTarget.addEventListener('click', function(){
-      var raw = safe(function(){ return root.localStorage.getItem(KEY); }, null);
-      share(ui.sendTarget, 'target', raw || '(diagnostics target kosong)');
+    ui.close.addEventListener('click', function(){
+      ui.sheet.classList.remove('open');
+    });
+    ui.search.addEventListener('input', refreshSearch);
+    ui.search.addEventListener('keydown', function(event){
+      if (!event || event.key !== 'Enter') return;
+      if (event.preventDefault) event.preventDefault();
+      selectMatch(matchIndex + (event.shiftKey ? -1 : 1));
+    });
+    ui.previous.addEventListener('click', function(){ selectMatch(matchIndex - 1); });
+    ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
+    ui.send.addEventListener('click', function(){
+      share(ui.send, 'Kirim', ui.text.value);
     });
     ui.copySummary.addEventListener('click', function(){
-      var summary = [
-        'FIEZEL diagnostics ' + DIAG_BUILD,
-        'runtime=' + String(safe(function(){ return root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.status ? JSON.stringify(root.FiezelVoiceRuntime.status()) : 'none'; })),
-        'target=' + String(safe(function(){ return root.localStorage.getItem(KEY); }, null) || '(kosong)')
-      ].join('\n');
-      share(ui.copySummary, 'summary', summary);
+      // Human-readable digest, not JSON: this is the paste-into-chat path.
+      var text = dump.universalSummary || 'Ringkasan belum siap. Tutup lalu buka lagi Diagnostics.';
+      copy(ui.copySummary, function(label){ ui.copySummary.textContent = label; setTimeout(function(){ ui.copySummary.textContent = 'Copy ringkasan'; }, 1800); }, text);
+    });
+    ui.sendTarget.addEventListener('click', function(){
+      var slim = {
+        diagBuild: DIAG_BUILD,
+        appVersion: dump && dump.appVersion,
+        capturedAt: dump && dump.capturedAt,
+        standalone: dump && dump.standalone,
+        puterAuth: dump && dump.puterAuth,
+        target: dump && dump.target,
+        storageEstimate: dump && dump.storageEstimate
+      };
+      share(ui.sendTarget, 'Kirim ringkas', serialize(slim));
     });
   }
 
-  if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', mount);
-  else mount();
-}(typeof globalThis !== 'undefined' ? globalThis : this));
+  if (root.document.readyState === 'loading') {
+    root.document.addEventListener('DOMContentLoaded', mount);
+  } else {
+    mount();
+  }
+})(typeof globalThis !== 'undefined' ? globalThis : this);
