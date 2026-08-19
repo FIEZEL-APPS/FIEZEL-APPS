@@ -1,0 +1,58 @@
+name: M028.2 Production Deploy Smoke
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify deployed Pages bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://fitrajft-ux.github.io/FIEZEL-APPS'
+          rev='a5f6c4d0c2936aff4de5ec03deddf2a90dce9838'
+          ok=0
+          for attempt in $(seq 1 18); do
+            echo "Production probe attempt ${attempt}"
+            q="m0282=${rev}-${attempt}"
+            if curl --fail --silent --show-error --location --max-time 20 -H 'Cache-Control: no-cache' "${base}/sw.js?${q}" -o /tmp/live-sw.js \
+              && grep -Fq "m025-51-seam-buffer-integrity-20260819-1" /tmp/live-sw.js \
+              && grep -Fq "fiezel-m0281-prebootstrap-hotfix.js" /tmp/live-sw.js \
+              && grep -Fq "fiezel-m0281-runtime-guard.js" /tmp/live-sw.js \
+              && curl --fail --silent --show-error --location --max-time 20 -H 'Cache-Control: no-cache' "${base}/features/neural-voice/fiezel-diag-panel.js?${q}" -o /tmp/live-diag.js \
+              && grep -Eq "DIAG_BUILD[[:space:]]*=[[:space:]]*['\"]m025-51['\"]" /tmp/live-diag.js \
+              && curl --fail --silent --show-error --location --max-time 20 -H 'Cache-Control: no-cache' "${base}/features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js?${q}" -o /tmp/live-pre.js \
+              && grep -Fq "fiezel-m0282-prebootstrap-integrity-v2" /tmp/live-pre.js \
+              && grep -Fq "APPLE_HARD_CHUNK_CHARS = 128" /tmp/live-pre.js \
+              && grep -Fq "appleStreamSentences: false" /tmp/live-pre.js \
+              && grep -Fq "ordinaryFadeInFrames: 0" /tmp/live-pre.js \
+              && grep -Fq "ordinaryFadeOutFrames: 0" /tmp/live-pre.js \
+              && curl --fail --silent --show-error --location --max-time 20 -H 'Cache-Control: no-cache' "${base}/features/neural-voice/fiezel-m0281-runtime-guard.js?${q}" -o /tmp/live-guard.js \
+              && grep -Fq "fiezel-m0282-runtime-guard-v2" /tmp/live-guard.js \
+              && grep -Fq "verificationComplete" /tmp/live-guard.js \
+              && grep -Fq "generationDeferred" /tmp/live-guard.js \
+              && grep -Fq "secondWorkerOnPrepare: false" /tmp/live-guard.js; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          if [[ "$ok" != 1 ]]; then
+            echo 'Production Pages did not expose the complete M028.2 release bytes.' >&2
+            echo 'Observed SW marker:' >&2
+            grep -E "SW_REV|m025-" /tmp/live-sw.js 2>/dev/null | head -n 4 || true
+            exit 1
+          fi
+          echo "M0282_PRODUCTION_DEPLOYED_SHA=${rev}"
+          grep -F "m025-51-seam-buffer-integrity-20260819-1" /tmp/live-sw.js | head -n 1
+          grep -E "DIAG_BUILD[[:space:]]*=" /tmp/live-diag.js | head -n 1
+          grep -F "fiezel-m0282-prebootstrap-integrity-v2" /tmp/live-pre.js | tail -n 1
+          grep -F "APPLE_HARD_CHUNK_CHARS = 128" /tmp/live-pre.js | head -n 1
+          grep -F "appleStreamSentences: false" /tmp/live-pre.js | head -n 1
+          grep -F "ordinaryFadeOutFrames: 0" /tmp/live-pre.js | head -n 1
+          grep -F "fiezel-m0282-runtime-guard-v2" /tmp/live-guard.js | tail -n 1
+          grep -F "verificationComplete" /tmp/live-guard.js | head -n 1
+          grep -F "generationDeferred" /tmp/live-guard.js | head -n 1
+          grep -F "secondWorkerOnPrepare: false" /tmp/live-guard.js | head -n 1
