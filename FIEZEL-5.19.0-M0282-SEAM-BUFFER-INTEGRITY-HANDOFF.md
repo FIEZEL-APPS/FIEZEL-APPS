@@ -1,6 +1,6 @@
 # FIEZEL 5.19.0 — M028.2 Seam / Buffer Integrity Handoff
 
-Status: CLAIMED / IMPLEMENTATION STARTING AFTER SCOPE AMENDMENT
+Status: CLAIMED / IMPLEMENTATION IN PROGRESS
 
 Baseline: `main@5338ada261f8541a11929f36147df1b1cb12438a` (M028.1 production).
 Branch: `agent/m0282-seam-buffer-integrity`.
@@ -21,21 +21,21 @@ OWNER physical retest on m025-50 standalone Safari reports:
 3. Sentence-at-a-time rendering resets Supertonic context at each chunk and then reconstructs cadence with scheduler seams. Until true incremental PCM exists, physical continuity takes priority over first-word latency.
 4. M028.1 Indonesian prepare guard intentionally avoids a second WASM worker but leaves Indonesian generation `ready=false`. Consumers must treat shared bundle/base-runtime verification as a terminal preparation state without falsely claiming Indonesian generation readiness.
 
-## Scope lock — amended before runtime mutation
+## Scope lock — amended before each new mutation class
 
 Allowed runtime scope:
-- `features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js`: Apple standalone stream/hard-chunk policy only.
-- NEW `features/neural-voice/fiezel-m0282-audioedge-hotfix.js`: additive Apple-standalone AudioWorklet message wrapper only; ordinary enqueue edge fades may be removed, explicit clear/cancel fade must pass through unchanged.
-- `index.html`: only load the bounded M028.2 audio-edge layer after `fiezel-web-audio-player.js` and before bootstrap/service creation.
+- `features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js`: Apple standalone stream/hard-chunk policy **and** bounded Apple AudioWorklet message wrapper. The wrapper may zero ordinary `enqueue` edge fades but must pass explicit `clear`/cancel fades unchanged.
 - `features/neural-voice/fiezel-m0281-runtime-guard.js`: Indonesian preparation/verification status contract only; no second-worker initialization.
-- `features/neural-voice/fiezel-voice-bundle-gate.js` only if needed to make shared preparation terminal/non-stuck without claiming Indonesian generation readiness.
+- `features/neural-voice/fiezel-voice-bundle-gate.js` only if focused evidence proves it can remain locked after shared verification.
 - focused M028.2 regression test(s).
 - `.github/workflows/quality.yml` only to register focused tests.
 - `features/neural-voice/fiezel-diag-panel.js` release marker only.
-- `sw.js` release marker and new shell-asset coherence only.
+- `sw.js` release marker only; no new shell asset is required because the repaired prebootstrap layer is already part of the shell.
 - this handoff artifact; Control Bus comments.
 
-Explicitly NOT modifying the large base `fiezel-web-audio-player.js` in this hotfix. The additive wrapper targets the exact affected production path: Apple standalone AudioWorklet. The legacy AudioBufferSource rollback path remains unchanged and is not claimed fixed by M028.2.
+Implementation note: a temporary unreferenced `features/neural-voice/fiezel-m0282-audioedge-hotfix.js` staging file was created after the first scope amendment, but it was never wired into `index.html` or production load order. It will be removed before candidate verification. The edge logic is co-located in the already-loaded prebootstrap hotfix to reduce release surface. Therefore `index.html` remains unchanged.
+
+Explicitly NOT modifying the large base `fiezel-web-audio-player.js` in this hotfix. The wrapper targets the exact affected production path: Apple standalone AudioWorklet. The legacy AudioBufferSource rollback path remains unchanged and is not claimed fixed by M028.2.
 
 Forbidden:
 - `vendor/supertonic-3/*`
@@ -73,7 +73,7 @@ C. Indonesian verification:
 - worklet wrapper rewrites only ordinary enqueue edge fades to zero; `clear.fadeOutFrames` is unchanged.
 - wrapper is Apple-standalone-only and preserves the exact player object returned by the base implementation.
 - Indonesian prepare resolves without invoking original Indonesian prepare/initializer; `ready` remains false while verification fields truthfully report shared preparation/base readiness.
-- bundle gate accepts verified shared preparation as terminal and can close; no infinite prepared-but-verifying lock.
+- existing voice-bundle gate already keys completion on `prepared`, so it must remain terminal with the M028.2 status contract; change it only if focused test disproves this.
 - existing M028/M028.1 tests remain green except assertions explicitly superseded by this handoff.
 - exact release marker coherence plus Quality, Safari, A6/A7, A9-A14, MASTER Authority all PASS on exact head.
 
