@@ -180,7 +180,10 @@ function context({online=true, signedIn=true, cloudFails=false}={}) {
   });
 
   await test('service worker revisions and caches both new sidecars',()=>{
-    assert.match(sw,/const SW_REV='m025-48-/);
+    // main advanced to m025-48 through T-026 while this PR was open; A7 therefore
+    // requires this candidate to be m025-49. Pin the candidate boundary here while
+    // pwa/A7 tests independently verify exact +1 coherence against main.
+    assert.match(sw,/const SW_REV='m025-49-/);
     assert.ok(sw.includes('fiezel-puter-tts-provider.js'));
     assert.ok(sw.includes('fiezel-tutor-core-ai.js'));
   });
