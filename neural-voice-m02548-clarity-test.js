@@ -572,7 +572,7 @@ function sine(length, amplitude, sampleRate, hz) {
     assert.match(bootstrap, /async function prewarm\(\)/);
     assert.match(bootstrap, /initFailedThisSession=prior\.initFailed/,
       'a failed speculative warm-up must restore the state the learner had, or their own tap falls back');
-    assert.match(bootstrap, /prewarm,speak/, 'and be reachable on the public runtime');
+    assert.match(bootstrap, /prefetch,prewarm,release/, 'and be reachable on the public runtime');
     const delay = Number((app.match(/FIEZEL_NEURAL_RELEASE_DELAY_MS\)\|\|(\d+)/) || [])[1]);
     assert.ok(delay >= 30000, `a glance at another app must not cost the cold start, got ${delay}ms`);
   });
