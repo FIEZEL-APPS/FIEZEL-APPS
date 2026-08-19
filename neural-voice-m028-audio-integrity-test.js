@@ -126,8 +126,16 @@ assert.match(voiceSource, /apple-standalone-inference-slice-v3/, 'Apple policy i
 
 // 4. Release and shell coherence.
 assert.match(swSource, /fiezel-pcm-renderer-worklet\.js/, 'worklet must be in service-worker shell assets');
-assert.match(diagSource, /DIAG_BUILD\s*=\s*['"]m025-49['"]/, 'M028 candidate must advance diagnostics to m025-49');
-assert.match(swSource, /SW_REV\s*=\s*['"]m025-49-/, 'M028 SW revision must carry matching m025-49 build');
+// m028-2: A7 and A11 require DIAG_BUILD to advance exactly +1 on every product deploy,
+// so pinning a literal build number here makes this test fail on the NEXT product change
+// rather than on a real defect. The invariant that actually matters is the one A11
+// enforces: the two markers agree. Pinned to the current build, and checked for agreement.
+const diagBuild = /DIAG_BUILD\s*=\s*['"]m025-(\d+)['"]/.exec(diagSource);
+const swBuild = /SW_REV\s*=\s*['"]m025-(\d+)-/.exec(swSource);
+assert.ok(diagBuild, 'DIAG_BUILD must remain parseable as m025-N');
+assert.ok(swBuild, 'SW_REV must remain parseable as m025-N-');
+assert.equal(swBuild[1], diagBuild[1], 'SW_REV build must match DIAG_BUILD, or the shell serves stale bytes');
+assert.ok(Number(diagBuild[1]) >= 50, 'M028 candidate must be at or past the m025-50 lead-in-trim build');
 assert.match(qualitySource, /permissions:\s*\n\s*contents:\s*read/, 'Quality must remain read-only and never implement/push source');
 assert.doesNotMatch(qualitySource, /git\s+push|contents:\s*write|Apply M028 in-scope implementation/,
   'Quality Gate must not mutate or push the candidate branch');
