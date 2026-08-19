@@ -78,8 +78,6 @@ assert.ok(readinessBlock.includes('code:readinessErrorCode(error)'),'readiness f
 assert.ok(!readinessBlock.includes('error:String'),'m025-13 readiness diagnostics must not persist raw error messages');
 assert.ok(!/(?:\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(readinessBlock),'m025-13 readiness diagnostics must not persist learner text or credential material');
 assert.ok(aud.includes('Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true})'),'m025-13 wrapped ensureReady must be the public runtime method');
-// m025-30: the rate is now a learner preference rather than a hardcoded 0.92. What
-// must hold is that the voice test stays neural-only, so pin allowFallback:false.
 assert.ok(app.includes("speed:selectedNeuralRate(),allowFallback:false"),'Tes suara must be neural-only');
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
@@ -97,8 +95,8 @@ assert.ok(watchdogEnd>watchdogStart,'watchdog block must remain bounded and sche
 const watchdogBlock=coreSrc.slice(watchdogStart,watchdogEnd);
 for(const field of ['requestId','chunkIndex','scheduledAt','expectedDelayMs','observedDelayMs'])assert.ok(watchdogBlock.includes(field),`watchdog timing metadata missing ${field}`);
 assert.ok(!/(?:\bvoice\b|\bchars\b|\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(watchdogBlock),'watchdog diagnostics must contain timing/request metadata only');
-assert.ok(coreSrc.includes("policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default'"),'m025-13 must retain the effective Apple inference-slice policy');
-assert.ok(coreSrc.includes('const appleHardChunkChars = appleStandalone ? Math.max(64, Math.min(128, Number(options.appleHardChunkChars) || 80)) : 0;'),'m025-13 Apple hard chunk cap must remain at 80 chars and narrowly bounded');
+assert.ok(coreSrc.includes("policy: appleStandalone ? 'apple-standalone-inference-slice-v3' : 'default'"),'M028 must retain the effective Apple inference-slice-v3 policy');
+assert.ok(coreSrc.includes('const appleHardChunkChars = appleStandalone ? Math.max(16, Math.min(128, Number(options.appleHardChunkChars) || 32)) : 0;'),'M028 Apple hard chunk cap must remain at 32 chars and narrowly bounded');
 assert.ok(coreSrc.includes("phase: 'chunk_plan'")&&coreSrc.includes('maxChunkChars'),'m025-13 must expose chunk-count/max-char metadata without text content');
 assert.ok(coreSrc.includes("phase: 'generate_completed_over_budget'"),'m025-13 must retain synchronous diagnosis for non-preemptive generation past budget');
 assert.ok(coreSrc.includes("phase: 'prefetch_policy_ready'")&&coreSrc.includes("apple-standalone-macrotask-yield-v1"),'m025-13 must retain the Apple prefetch-yield policy');
@@ -123,9 +121,9 @@ assert.equal(probe.PROBE_WORD_COUNT,160,'device probe text must remain exactly 1
 const probeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190);
 assert.equal(probeChunks.length,2,'baseline splitter must still deterministically produce two natural chunks without Apple char-cap context');
 assert.deepEqual(probeChunks.map(x=>x.trim().split(/\s+/).length),[76,84],'baseline device-probe sentence boundaries must remain stable');
-const appleProbeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190,80);
-assert.ok(appleProbeChunks.length>=8,'Apple physical probe must remain decomposed into materially smaller inference slices');
-assert.ok(appleProbeChunks.every(x=>x.length<=80),`Apple physical probe chunks must stay <=80 chars, got ${appleProbeChunks.map(x=>x.length).join(',')}`);
+const appleProbeChunks=core.splitIntoChunks(probe.PROBE_TEXT,140,190,32);
+assert.ok(appleProbeChunks.length>=20,'Apple physical probe must remain decomposed into materially smaller inference slices');
+assert.ok(appleProbeChunks.every(x=>x.length<=32),`Apple physical probe chunks must stay <=32 chars, got ${appleProbeChunks.map(x=>x.length).join(',')}`);
 assert.equal(appleProbeChunks.join(' ').replace(/\s+/g,' ').trim(),probe.PROBE_TEXT.replace(/\s+/g,' ').trim(),'Apple slice policy must preserve probe text and ordering');
 const probeRefresh=probeSrc.indexOf("await runtime.refreshPreparedFlag()");
 const probeEnsure=probeSrc.indexOf("await runtime.ensureReady()");
