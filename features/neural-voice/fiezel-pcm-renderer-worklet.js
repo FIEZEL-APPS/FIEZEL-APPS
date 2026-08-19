@@ -163,7 +163,7 @@ class FiezelPcmRendererProcessor extends AudioWorkletProcessor {
         this.current = null;
         this.offset = 0;
       } else if (this.offset >= entry.samples.length) {
-        this.finishEntry(entry, false);
+        this.finishEntry(entry, entry.cancelled);
         this.current = null;
         this.offset = 0;
       }
