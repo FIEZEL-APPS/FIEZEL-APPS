@@ -753,3 +753,28 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 /* The stat labels were the last capitals left on Home. */
 .home-stats small,.stats small{text-transform:none;letter-spacing:.01em;font-size:.7rem}
+
+/* R2 Personal Learning Journey. Memakai token yang sama dengan home-overview supaya panel ini
+   terbaca sebagai bagian dari Home, bukan tempelan. */
+.journey-week{color:var(--muted);font-size:.7rem;letter-spacing:.04em}
+.journey-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.journey-mission,.journey-today,.journey-goal{padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(255,254,250,.9);color:var(--text)}
+.journey-mission small,.journey-today small,.journey-goal small{display:block;color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em}
+.journey-mission h3{margin:8px 0 6px;font-size:1.05rem;text-transform:capitalize}
+.journey-target{margin:6px 0 0;font-size:.78rem;color:var(--text)}
+.journey-why,.journey-note{margin:8px 0 0;color:var(--muted);font-size:.74rem;line-height:1.55}
+.journey-blocks{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.journey-block{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}
+.journey-block b{font-size:.8rem}.journey-block span{color:var(--muted);font-size:.72rem;line-height:1.5}
+.journey-block-review{border-color:var(--accent)}
+.journey-recovery{margin:8px 0 0;font-size:.74rem;color:var(--accent)}
+.journey-today button{margin-top:12px;width:100%}
+.journey-skills{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:20px;background:rgba(255,254,250,.9);overflow:hidden;margin-bottom:14px}
+.journey-skill{padding:16px 12px;border-right:1px solid var(--line);display:grid;gap:6px}
+.journey-skill:last-child{border-right:0}
+.journey-skill b{font-size:.78rem}.journey-skill span{color:var(--muted);font-size:.72rem}
+.journey-skill.is-unmeasured span{font-style:italic}
+.journey-goal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:.74rem}
+.journey-goal-chip.is-active{border-color:var(--accent);color:var(--accent)}
+@media(max-width:760px){.journey-panel{grid-template-columns:1fr}.journey-skills{grid-template-columns:repeat(2,1fr)}.journey-skill{border-bottom:1px solid var(--line)}}
