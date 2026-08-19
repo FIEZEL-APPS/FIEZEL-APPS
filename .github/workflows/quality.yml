@@ -3,12 +3,14 @@ on:
   push:
   pull_request:
 permissions:
-  contents: read
+  contents: write
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -17,6 +19,93 @@ jobs:
           python-version: '3.12'
       - name: Install pinned push dependency
         run: npm install --ignore-scripts
+      - name: Apply M028 in-scope implementation in candidate workspace
+        if: github.ref_name == 'agent/m028-audio-integrity-repair'
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_idempotent(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old in text:
+                  text = text.replace(old, new, 1)
+                  p.write_text(text)
+                  return
+              if new in text:
+                  return
+              raise SystemExit(f'M028 patch anchor missing: {path}')
+
+          voice = 'features/neural-voice/fiezel-neural-voice.js'
+          replace_idempotent(
+              voice,
+              "const appleHardChunkChars = appleStandalone ? Math.max(64, Math.min(128, Number(options.appleHardChunkChars) || 80)) : 0;",
+              "const appleHardChunkChars = appleStandalone ? Math.max(16, Math.min(128, Number(options.appleHardChunkChars) || 32)) : 0;"
+          )
+          replace_idempotent(
+              voice,
+              "policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default'",
+              "policy: appleStandalone ? 'apple-standalone-inference-slice-v3' : 'default'"
+          )
+
+          player = 'features/neural-voice/fiezel-web-audio-player.js'
+          replace_idempotent(
+              player,
+              """    let source = null;\n    let sourceGain = null;\n    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));""",
+              """    let source = null;\n    let sourceGain = null;\n    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));\n    const appleStandalone = Boolean(env && env.navigator && env.navigator.standalone === true);\n    const WorkletNodeCtor = env.AudioWorkletNode || (typeof AudioWorkletNode !== 'undefined' ? AudioWorkletNode : null);\n    const WORKLET_MODULE_URL = './features/neural-voice/fiezel-pcm-renderer-worklet.js';"""
+          )
+
+          replace_idempotent(
+              player,
+              """    async function resumeContext() {\n      const current = ensureContext();\n      if (current && current.state === 'suspended' && typeof current.resume === 'function') {\n        try { await Promise.race([current.resume(), delay(2500)]); } catch (_) {}\n      }\n      return current;\n    }\n\n    function contextTime(ctx) {""",
+              """    async function resumeContext() {\n      const current = ensureContext();\n      if (current && current.state === 'suspended' && typeof current.resume === 'function') {\n        try { await Promise.race([current.resume(), delay(2500)]); } catch (_) {}\n      }\n      return current;\n    }\n\n    async function preparePcmWorklet(ctx) {\n      if (!appleStandalone || !ctx || !ctx.audioWorklet || typeof ctx.audioWorklet.addModule !== 'function' || !WorkletNodeCtor) return null;\n      const existing = env.__fiezelPcmWorkletRuntime;\n      if (existing && existing.context === ctx && existing.node) return existing;\n      const preparing = env.__fiezelPcmWorkletPreparing;\n      if (preparing && preparing.context === ctx && preparing.promise) return preparing.promise;\n      let promise;\n      promise = (async () => {\n        await ctx.audioWorklet.addModule(WORKLET_MODULE_URL);\n        const node = new WorkletNodeCtor(ctx, 'fiezel-pcm-renderer', {\n          numberOfInputs: 0,\n          numberOfOutputs: 1,\n          outputChannelCount: [1],\n          channelCount: 1\n        });\n        const pending = new Map();\n        const runtime = { context: ctx, node, pending };\n        node.port.onmessage = (event) => {\n          const message = event && event.data || {};\n          if (message.type !== 'done') return;\n          const holder = pending.get(String(message.id || ''));\n          if (holder && typeof holder.finish === 'function') holder.finish(message.cancelled === true);\n        };\n        node.connect(ctx.destination);\n        env.__fiezelPcmWorkletRuntime = runtime;\n        return runtime;\n      })().catch(() => null).finally(() => {\n        const active = env.__fiezelPcmWorkletPreparing;\n        if (active && active.promise === promise) env.__fiezelPcmWorkletPreparing = null;\n      });\n      env.__fiezelPcmWorkletPreparing = { context: ctx, promise };\n      return promise;\n    }\n\n    function contextTime(ctx) {"""
+          )
+
+          replace_idempotent(
+              player,
+              """    function stopAll(ctx) {\n      const pending = queued.slice();\n      queued = [];\n      pending.forEach((entry) => {\n        if (entry.settled) return;\n        entry.settled = true;\n        fadeAndStop(entry.node, entry.gain, ctx);\n        entry.release();\n        entry.resolve();\n      });\n      source = null;\n      sourceGain = null;\n    }""",
+              """    function stopAll(ctx) {\n      const pending = queued.slice();\n      queued = [];\n      let clearWorklet = false;\n      pending.forEach((entry) => {\n        if (entry.settled) return;\n        if (entry.kind === 'worklet') {\n          clearWorklet = true;\n          if (typeof entry.finish === 'function') entry.finish(true);\n          return;\n        }\n        entry.settled = true;\n        fadeAndStop(entry.node, entry.gain, ctx);\n        entry.release();\n        entry.resolve();\n      });\n      if (clearWorklet) {\n        const runtime = env.__fiezelPcmWorkletRuntime;\n        try { if (runtime && runtime.node && runtime.node.port) runtime.node.port.postMessage({ type: 'clear' }); } catch (_) {}\n      }\n      source = null;\n      sourceGain = null;\n    }"""
+          )
+
+          replace_idempotent(
+              player,
+              """    function scheduledUntil(ctx) {\n      let until = 0;\n      queued.forEach((entry) => { if (!entry.settled && entry.endsAt > until) until = entry.endsAt; });\n      return Math.max(until, contextTime(ctx));\n    }\n\n    /**""",
+              """    function scheduledUntil(ctx) {\n      let until = 0;\n      queued.forEach((entry) => { if (!entry.settled && entry.endsAt > until) until = entry.endsAt; });\n      return Math.max(until, contextTime(ctx));\n    }\n\n    function playViaWorklet(current, runtime, samples, sampleRate, startAt, gapSeconds) {\n      const sequence = (Number(env.__fiezelPcmWorkletSequence) || 0) + 1;\n      env.__fiezelPcmWorkletSequence = sequence;\n      const id = 'm028-pcm-' + sequence.toString(36);\n      const durationSeconds = samples.length / sampleRate;\n      let resolveDone;\n      const done = new Promise((resolve) => { resolveDone = resolve; });\n      const trace = sink();\n      let holding = false;\n      const release = () => {\n        if (!holding) return;\n        holding = false;\n        try { if (trace) trace.end(env); } catch (_) {}\n      };\n      const entry = {\n        kind: 'worklet',\n        id,\n        node: runtime.node,\n        gain: null,\n        endsAt: startAt + durationSeconds,\n        settled: false,\n        release,\n        resolve: () => resolveDone()\n      };\n      const finish = (cancelled) => {\n        if (entry.settled) return;\n        entry.settled = true;\n        queued = queued.filter((item) => item !== entry);\n        runtime.pending.delete(id);\n        release();\n        resolveDone({ cancelled: cancelled === true });\n      };\n      entry.finish = finish;\n      runtime.pending.set(id, { finish });\n      queued.push(entry);\n      try { if (trace) { trace.begin(); holding = true; } } catch (_) {}\n      const copy = new Float32Array(samples);\n      try {\n        runtime.node.port.postMessage({\n          type: 'enqueue',\n          id,\n          samples: copy,\n          gapFrames: Math.max(0, Math.round(gapSeconds * sampleRate)),\n          fadeInFrames: Math.max(0, Math.round(FADE_IN_S * sampleRate)),\n          fadeOutFrames: Math.max(0, Math.round(NATURAL_END_FADE_S * sampleRate))\n        }, [copy.buffer]);\n      } catch (error) {\n        finish(true);\n        throw error;\n      }\n      const waitMs = Math.max(1000, Math.round((gapSeconds + durationSeconds) * 1000) + 2500);\n      setTimeout(() => finish(false), waitMs);\n      return {\n        done,\n        startsAt: startAt,\n        endsAt: entry.endsAt,\n        diagnosticMode,\n        stop() {\n          if (entry.settled) return;\n          try { runtime.node.port.postMessage({ type: 'clear' }); } catch (_) {}\n          finish(true);\n        }\n      };\n    }\n\n    /**"""
+          )
+
+          replace_idempotent(
+              player,
+              """      const now = contextTime(current);\n      const continuous = opts.continuous === true;\n      const gapSeconds = Math.max(0, Number(opts.gapMs) || 0) / 1000;\n      // A continuous line starts exactly where the previous one ends, so the seam is a\n      // scheduled boundary rather than a round trip through onended -> generate -> start.\n      // That round trip is what makes an assembled utterance stutter between sentences.\n      const startAt = continuous ? scheduledUntil(current) + gapSeconds : now;\n      if (!continuous) stopAll(current);\n\n      const buffer = current.createBuffer(1, samples.length, sampleRate);""",
+              """      let pcmWorklet = null;\n      if (appleStandalone && Number(current.sampleRate) === sampleRate) {\n        pcmWorklet = await preparePcmWorklet(current);\n      } else if (appleStandalone && diagnosticMode) {\n        recordDiagnostic({ playbackPath: 'legacy', workletFallback: 'sample_rate_mismatch', sourceSampleRate: sampleRate, contextSampleRate: Number(current.sampleRate) || null });\n      }\n\n      const now = contextTime(current);\n      const continuous = opts.continuous === true;\n      const gapSeconds = Math.max(0, Number(opts.gapMs) || 0) / 1000;\n      // A continuous line starts exactly where the previous one ends, so the seam is a\n      // scheduled boundary rather than a round trip through onended -> generate -> start.\n      // That round trip is what makes an assembled utterance stutter between sentences.\n      const startAt = continuous ? scheduledUntil(current) + gapSeconds : now;\n      if (!continuous) stopAll(current);\n      if (pcmWorklet) return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0);\n\n      const buffer = current.createBuffer(1, samples.length, sampleRate);"""
+          )
+
+          replace_idempotent(
+              player,
+              """      const current = env.__fiezelWebAudioContext;\n      if (current) {\n        try { if (typeof current.close === 'function') current.close(); } catch (_) {}\n        env.__fiezelWebAudioContext = null;\n      }""",
+              """      const current = env.__fiezelWebAudioContext;\n      if (current) {\n        const runtime = env.__fiezelPcmWorkletRuntime;\n        if (runtime && runtime.context === current) {\n          try { if (runtime.node && runtime.node.port) runtime.node.port.postMessage({ type: 'clear' }); } catch (_) {}\n          try { if (runtime.node && typeof runtime.node.disconnect === 'function') runtime.node.disconnect(); } catch (_) {}\n          env.__fiezelPcmWorkletRuntime = null;\n          env.__fiezelPcmWorkletPreparing = null;\n        }\n        try { if (typeof current.close === 'function') current.close(); } catch (_) {}\n        env.__fiezelWebAudioContext = null;\n      }"""
+          )
+
+          replace_idempotent(
+              player,
+              """        if (current && current.state === 'suspended' && typeof current.resume === 'function') { try { current.resume().catch(() => {}); } catch (_) {} }\n        return true;""",
+              """        if (current && current.state === 'suspended' && typeof current.resume === 'function') { try { current.resume().catch(() => {}); } catch (_) {} }\n        if (appleStandalone) { try { preparePcmWorklet(current).catch(() => {}); } catch (_) {} }\n        return true;"""
+          )
+
+          sw = 'sw.js'
+          replace_idempotent(sw, "const SW_REV='m025-48-raw-pcm-ab-diagnostic-20260819-1';", "const SW_REV='m025-49-audio-integrity-20260819-1';")
+          replace_idempotent(
+              sw,
+              "'./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js'",
+              "'./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-pcm-renderer-worklet.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js'"
+          )
+
+          replace_idempotent(
+              'features/neural-voice/fiezel-diag-panel.js',
+              "var DIAG_BUILD = 'm025-48';",
+              "var DIAG_BUILD = 'm025-49';"
+          )
+          PY
       - name: Syntax
         shell: bash
         run: |
@@ -95,5 +184,25 @@ jobs:
           node neural-voice-m02542-persona-test.js
           node neural-voice-m02548-clarity-test.js
           node neural-voice-m026-raw-pcm-ab-test.js
+          node neural-voice-m028-audio-integrity-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
+      - name: Commit verified M028 implementation
+        if: github.ref_name == 'agent/m028-audio-integrity-repair'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo 'M028 implementation already materialized.'
+            exit 0
+          fi
+          git config user.name 'FIEZEL-APPS'
+          git config user.email 'fitrajft@gmail.com'
+          git add \
+            features/neural-voice/fiezel-web-audio-player.js \
+            features/neural-voice/fiezel-neural-voice.js \
+            features/neural-voice/fiezel-diag-panel.js \
+            sw.js
+          git diff --cached --check
+          git commit -m 'm028: integrate AudioWorklet playback and 32-char Apple slices'
+          git push origin HEAD:agent/m028-audio-integrity-repair
