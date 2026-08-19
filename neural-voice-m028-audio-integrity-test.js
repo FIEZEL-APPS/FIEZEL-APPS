@@ -173,7 +173,12 @@ assert.equal(Player.trimSilence(shaped, 44100).length, bothEdges.length,
 assert.equal(Player.trimSilence(shaped, 44100, { head: false, tail: false }), shaped,
   'asking for no trim returns the buffer by identity');
 
-assert.match(voiceSource, /trim: joined, trimHead: true/,
-  'the streaming path must always drop the engine lead-in, joined or not');
+// m028-4: both edges on every line. A standalone sentence used to keep its 636ms tail on
+// the m025-47 reasoning that it spaced the next Library sentence; measured, that is dead
+// air rather than a governed pause, and it is what OWNER hears as a book that never joins.
+assert.match(voiceSource, /gapMs, trim: true \}/,
+  'the streaming path must trim both edges, joined or not');
+assert.doesNotMatch(voiceSource, /trim: joined/,
+  'trimming must no longer be conditional on the line being joined');
 
 console.log('M028 audio integrity focused acceptance PASS');

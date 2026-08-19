@@ -537,11 +537,17 @@
             // between two sentences instead of governing it.
             const joined = chunks.length > 1;
             const playback = await playAudio(audio, streamSentences
-              // m028-2: `trim` still governs the seam and stays tied to `joined`, but the
-              // engine's lead-in silence is dead air on every line, joined or not.
-              // Measured on the shipped engine it is 215-557ms, and on a single-chunk
-              // reply it was played in full before the learner heard anything.
-              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined, trimHead: true }
+              // m028-4: both edges, always.
+              //
+              // m025-47 tied trimming to `joined` and kept a standalone line's tail on the
+              // reasoning that it spaces one Library sentence from the next. Measured on
+              // the shipped engine that "spacing" is 636ms of model-decided silence, on
+              // top of a lead-in of 401ms and the main-thread round trip the Library pays
+              // between sentences - which is what OWNER reports as a book that never joins
+              // up. The tail is not a governed pause; it is dead air that happens to sit
+              // where a pause belongs. Removing it makes the gap the round trip alone, and
+              // leaves the pause something we can set deliberately rather than inherit.
+              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: true }
               : { signalGeneration: callGeneration });
             scheduled.push({ playback, chunkIndex, startedAt: playbackStartedAt });
             activeStop = stopScheduled;
