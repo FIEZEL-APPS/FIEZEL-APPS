@@ -127,6 +127,7 @@
     const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
     const proxyWorkerBudgetOnly = appleStandalone && String(env && env.__fiezelNeuralWasmPolicy || '') === 'apple-standalone-single-thread-proxy-worker';
     let generation = 0;
+    let stopEpoch = 0;
     let requestSequence = 0;
     let activeStop = null;
     let activeInference = null;
@@ -151,7 +152,7 @@
     }
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
     diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default', hardChunkChars: appleHardChunkChars || null });
-    diag({ phase: 'prefetch_policy_ready', policy: appleStandalone ? 'apple-standalone-macrotask-yield-v1' : 'default' });
+    diag({ phase: 'prefetch_policy_ready', policy: 'm02547-deferred-reservation-v1' });
     diag({ phase: 'generation_timeout_policy_ready', policy: proxyWorkerBudgetOnly ? 'proxy-worker-soft-budget-v1' : 'hard-timeout-v1', timeoutMs: generationTimeoutMs || null });
 
     if (appleStandalone && !env.__fiezelNeuralLifecycleDiagInstalled) {
@@ -180,6 +181,7 @@
 
     function stop() {
       generation += 1;
+      stopEpoch += 1;
       // Anything warmed for the request being cancelled is now stale.
       dropWarm();
       if (typeof activeStop === 'function') {
@@ -195,14 +197,18 @@
 
     function warmKey(text, options) {
       const o = options || {};
-      return [text, o.voice || '', o.speed || 1, o.lang || ''].join('\u0000');
+      return [text, o.voice || '', o.speed || 1, o.lang || '', o.intent || ''].join('\u0000');
     }
 
     function dropWarm() { warmed = null; }
 
     /**
-     * Generates one utterance ahead of time. Resolves false whenever warming is not
-     * safe or not useful; callers treat it as best-effort and never depend on it.
+     * Generates one utterance ahead of time. m025-47 deliberately yields one macrotask
+     * before reserving the engine. The product wraps speak() in two async readiness
+     * layers; without this yield Library prefetch(N+1) could enter the engine queue before
+     * speak(N) had reached the already-ready service. That inverted the queue, destroyed
+     * the N+1 warm entry on the next loop, and made a sentence transition pay for two
+     * generations (the observed 10-15 second gap).
      */
     async function prefetch(input, speakOptions) {
       const options = speakOptions || {};
@@ -213,12 +219,30 @@
       // Multi-chunk text already prefetches internally once it starts playing.
       if (chunks.length !== 1) return false;
       const voice = options.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
-      const key = warmKey(text, { ...options, voice });
+      const resolvedOptions = { ...options, voice };
+      const key = warmKey(text, resolvedOptions);
       if (warmed && warmed.key === key) return true;
+      const epoch = stopEpoch;
+      await new Promise(resolve => setTimeout(resolve, 0));
+      if (epoch !== stopEpoch) {
+        diag({ phase: 'prefetch_cancelled_before_reserve', voice, chars: text.length });
+        return false;
+      }
+      if (warmed) {
+        if (warmed.key === key) return true;
+        // Never evict an unconsumed next-line warm entry. A caller asking for another
+        // line can retry after the current speak() consumes or drops this reservation.
+        diag({ phase: 'prefetch_skip_occupied', voice, chars: text.length });
+        return false;
+      }
       const startedAt = Date.now();
       diag({ phase: 'prefetch_start', chars: text.length, voice });
-      const pending = runOnEngine(() => adapter.generate(text, { voice, speed: options.speed || 1, lang: options.lang || '' }))
-        .then(value => ({ ok: true, value }), error => ({ ok: false, error }));
+      const pending = runOnEngine(() => adapter.generate(text, {
+        voice,
+        speed: options.speed || 1,
+        lang: options.lang || '',
+        intent: options.intent || ''
+      })).then(value => ({ ok: true, value }), error => ({ ok: false, error }));
       warmed = { key, pending };
       const outcome = await pending;
       if (!outcome.ok) {
@@ -231,11 +255,15 @@
       return true;
     }
 
-    /** Consumes a warm entry if it matches, so speak() plays with no generation wait. */
+    /** Consumes a warm entry if it matches; a mismatch is stale and is discarded. */
     async function takeWarm(text, options) {
       if (!warmed) return null;
       const key = warmKey(text, options);
-      if (warmed.key !== key) return null;
+      if (warmed.key !== key) {
+        diag({ phase: 'prefetch_miss_drop_stale' });
+        warmed = null;
+        return null;
+      }
       const entry = warmed;
       warmed = null;
       const outcome = await entry.pending;
@@ -290,7 +318,12 @@
         let timer = null;
         let didTimeOut = false;
         let audio;
-        const generated = runOnEngine(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }));
+        const generated = runOnEngine(() => adapter.generate(chunk, {
+          voice,
+          speed: speakOptions.speed || 1,
+          lang: speakOptions.lang || '',
+          intent: speakOptions.intent || ''
+        }));
         activeInference = generated;
         activeInferenceMeta = { requestId, chunkIndex, voice, startedAt: generateStartedAt };
         generated.then(
@@ -366,7 +399,12 @@
             if (!outcome.ok) throw outcome.error;
             audio = outcome.value;
           } else {
-            const warmAudio = chunkIndex === 0 ? await takeWarm(chunks[0], { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }) : null;
+            const warmAudio = chunkIndex === 0 ? await takeWarm(chunks[0], {
+              voice,
+              speed: speakOptions.speed || 1,
+              lang: speakOptions.lang || '',
+              intent: speakOptions.intent || ''
+            }) : null;
             if (warmAudio) {
               diag({ phase: 'prefetch_hit', requestId, chunkIndex, voice });
               audio = warmAudio;
