@@ -1,9 +1,9 @@
 # FIEZEL 5.19.0 — M028 Audio Integrity Repair Handoff
 
-Tanggal: 2026-08-19 WIB  
-Task: T-028  
-Branch: `agent/m028-audio-integrity-repair`  
-Baseline: `main` @ `3c9e125570d6393488291fdc3c8cfa16065c085f`  
+Tanggal: 2026-08-19 WIB
+Task: T-028
+Branch: `agent/m028-audio-integrity-repair`
+Baseline: `main` @ `eb2278e3a6aed4b711c84dc2cb706218cc39492b`
 Status: `in_progress`
 
 ## 1. CONTEXT INJECTION WAJIB
