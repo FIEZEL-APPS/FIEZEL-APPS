@@ -47,8 +47,10 @@ jobs:
           cat > m02547-probe.html <<'HTML'
           <!doctype html><meta charset="utf-8"><title>m025-47 neural library Safari gate</title>
           <script>window.FIEZEL_VERSION='5.19.0';</script>
+          <script src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
           <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
           <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+          <script src="./features/neural-voice/fiezel-prosody.js"></script>
           <script src="./features/neural-voice/fiezel-voice-persona.js"></script>
           <script src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
           <script src="./features/neural-voice/fiezel-neural-voice.js"></script>

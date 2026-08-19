@@ -82,6 +82,57 @@
     return splitByHardChars(chunks, hardChars);
   }
 
+  /**
+   * m025-48 streaming plan — the reason a long line used to start late.
+   *
+   * splitIntoChunks above packs up to targetChunkWords (140) into ONE chunk, and a chunk
+   * is generated in full before a single sample of it is played. At the measured
+   * realtime factor of 0.25 a 140-word chunk is roughly fifty seconds of speech and
+   * therefore twelve seconds of silence before the first word. Nothing downstream can
+   * recover that: the wait is structural, not slow inference.
+   *
+   * The plan below emits one SENTENCE per chunk instead. Time-to-first-word becomes the
+   * cost of sentence one (typically under a second), every later sentence is rendered
+   * while its predecessor plays, and - because the player schedules them contiguously -
+   * the learner hears one continuous line rather than a sequence of restarts.
+   *
+   * It is opt-in. splitIntoChunks keeps its exact behaviour, because the Apple slice
+   * policy and the fixed device-probe evidence are both defined in terms of it.
+   */
+  function planStream(text, options) {
+    const opts = options || {};
+    const maxWords = Number(opts.maxWords) > 0 ? Math.floor(Number(opts.maxWords)) : 26;
+    const hardChars = Number(opts.hardChars) > 0 ? Math.floor(Number(opts.hardChars)) : 0;
+    const sentences = String(text || '').match(/[^.!?…]+[.!?…]+|[^.!?…]+$/g) || [String(text || '')];
+    const planned = [];
+    for (const raw of sentences) {
+      const sentence = raw.trim().replace(/\s+/g, ' ');
+      if (!sentence) continue;
+      if (sentence.split(/\s+/).length <= maxWords) { planned.push(sentence); continue; }
+      // Too long to keep as one breath. Break at clause punctuation, which is where a
+      // speaker would breathe anyway, so the seam lands on a pause instead of mid-phrase.
+      const parts = sentence.split(/(?<=[,;:])\s+/);
+      let buffer = '';
+      for (const part of parts) {
+        const merged = buffer ? buffer + ' ' + part : part;
+        if (buffer && merged.split(/\s+/).length > maxWords) { planned.push(buffer); buffer = part; }
+        else buffer = merged;
+      }
+      if (buffer.trim()) planned.push(buffer.trim());
+    }
+    // A run-on with no clause punctuation at all has no natural seam to use. Rather than
+    // pay the original latency for it, cut it on words once it is more than twice a
+    // breath group long - a rare, already-unnatural input, handled rather than ignored.
+    const shaped = [];
+    for (const unit of planned) {
+      const words = unit.split(/\s+/);
+      if (words.length <= maxWords * 2) { shaped.push(unit); continue; }
+      for (let i = 0; i < words.length; i += maxWords) shaped.push(words.slice(i, i + maxWords).join(' '));
+    }
+    const bounded = splitByHardChars(shaped, hardChars);
+    return bounded.length ? bounded : [String(text || '').trim()].filter(Boolean);
+  }
+
   function canUseSpeechSynthesis(env) {
     return Boolean(env && env.speechSynthesis && env.SpeechSynthesisUtterance);
   }
@@ -126,6 +177,36 @@
     const generationTimeoutMs = Number(options.generationTimeoutMs) > 0 ? Number(options.generationTimeoutMs) : 0;
     const eventLoopWatchdogMs = Number(options.eventLoopWatchdogMs) > 0 ? Number(options.eventLoopWatchdogMs) : 250;
     const proxyWorkerBudgetOnly = appleStandalone && String(env && env.__fiezelNeuralWasmPolicy || '') === 'apple-standalone-single-thread-proxy-worker';
+    // m025-48. Opt-in, because splitIntoChunks is the definition of the Apple slice
+    // policy and of the fixed device-probe evidence; an engine asks for streaming, it is
+    // never imposed on one.
+    const streamSentences = options.streamSentences === true;
+    const streamMaxWords = Number(options.streamMaxWords) > 0 ? Math.floor(Number(options.streamMaxWords)) : 26;
+    // How many rendered lines may sit in the schedule at once. Two is what makes the
+    // seam gapless (the next line is queued while the current one plays) without letting
+    // a fast engine buffer a whole chapter of PCM into memory.
+    const SCHEDULE_DEPTH = 2;
+    const prosody = options.prosody || (env && env.FiezelProsody) || null;
+    function planChunks(text) {
+      return streamSentences
+        ? planStream(text, { maxWords: streamMaxWords, hardChars: appleHardChunkChars })
+        : splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+    }
+    /**
+     * Silence to leave before a line, decided by how the previous one ended.
+     *
+     * Measured on the SHAPED text, because that is what was spoken: the engine receives
+     * the punctuated form, so a line the shaping pass turned into a question has to be
+     * given the pause a question earns, not the one its unmarked source text would.
+     */
+    function gapBefore(previousChunk, lang) {
+      if (!streamSentences || !previousChunk) return 0;
+      if (prosody && typeof prosody.gapAfter === 'function') {
+        const spoken = typeof prosody.punctuate === 'function' ? prosody.punctuate(previousChunk, lang) : previousChunk;
+        return prosody.gapAfter(spoken, lang);
+      }
+      return /[.!?…]\s*$/.test(previousChunk) ? 300 : 170;
+    }
     let generation = 0;
     let stopEpoch = 0;
     let requestSequence = 0;
@@ -142,11 +223,17 @@
       return started;
     }
     let activeInferenceMeta = null;
+    // m025-48: the sink buffers while audio is scheduled, so this trace no longer
+    // stalls the main thread inside a render quantum. Absent the module (tests, older
+    // shells) the original synchronous write is used unchanged.
     function diag(entry) {
       try {
+        const record = { t: Date.now(), v: String(env.FIEZEL_VERSION || '5.19.0'), ...entry };
+        const sink = env.FiezelVoiceDiagnostics;
+        if (sink && typeof sink.record === 'function') { sink.record(record, env); return; }
         const key = 'fiezel-neural-voice-diagnostics-v1';
         const list = JSON.parse(env.localStorage && env.localStorage.getItem(key) || '[]');
-        list.push({ t: Date.now(), v: String(env.FIEZEL_VERSION || '5.19.0'), ...entry });
+        list.push(record);
         env.localStorage && env.localStorage.setItem(key, JSON.stringify(list.slice(-200)));
       } catch (_) {}
     }
@@ -215,7 +302,7 @@
       if (!adapter) return false;
       const text = normalizeText(input, maxChars);
       if (!text) return false;
-      const chunks = splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+      const chunks = planChunks(text);
       // Multi-chunk text already prefetches internally once it starts playing.
       if (chunks.length !== 1) return false;
       const voice = options.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
@@ -241,7 +328,8 @@
         voice,
         speed: options.speed || 1,
         lang: options.lang || '',
-        intent: options.intent || ''
+        intent: options.intent || '',
+        position: { index: 0, total: chunks.length }
       })).then(value => ({ ok: true, value }), error => ({ ok: false, error }));
       warmed = { key, pending };
       const outcome = await pending;
@@ -278,7 +366,7 @@
       const callGeneration = ++generation;
       const requestId = 'nv-' + Date.now().toString(36) + '-' + (++requestSequence).toString(36);
       const voice = speakOptions.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
-      const chunks = splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+      const chunks = planChunks(text);
       diag({ phase: 'chunk_plan', requestId, chunkCount: chunks.length, hardChunkChars: appleHardChunkChars || null, maxChunkChars: chunks.reduce((max, chunk) => Math.max(max, chunk.length), 0) });
 
       if (!adapter) {
@@ -322,7 +410,10 @@
           voice,
           speed: speakOptions.speed || 1,
           lang: speakOptions.lang || '',
-          intent: speakOptions.intent || ''
+          intent: speakOptions.intent || '',
+          // Where this sentence sits in the utterance. Delivery is not a property of a
+          // sentence alone: the same words open a thought differently than they close one.
+          position: { index: chunkIndex, total: chunks.length }
         }));
         activeInference = generated;
         activeInferenceMeta = { requestId, chunkIndex, voice, startedAt: generateStartedAt };
@@ -390,6 +481,24 @@
 
       const outputs = [];
       let prefetched = null;
+      // Lines handed to the player and not yet finished. Streaming keeps up to
+      // SCHEDULE_DEPTH of them, so stopping has to reach the queued ones too - they are
+      // audio the learner has not heard yet.
+      const scheduled = [];
+      function stopScheduled() {
+        const pending = scheduled.splice(0, scheduled.length);
+        pending.forEach(entry => {
+          try { if (entry.playback && typeof entry.playback.stop === 'function') entry.playback.stop(); } catch (_) {}
+        });
+      }
+      async function drainScheduled(keep, id, activeVoice) {
+        while (scheduled.length > keep) {
+          const entry = scheduled.shift();
+          const playback = entry.playback;
+          if (playback && playback.done && typeof playback.done.then === 'function') await playback.done;
+          diag({ phase: 'playback_done', requestId: id, chunkIndex: entry.chunkIndex, voice: activeVoice, elapsedMs: Date.now() - entry.startedAt });
+        }
+      }
       try {
         for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex += 1) {
           let audio;
@@ -417,8 +526,21 @@
           if (typeof playAudio === 'function') {
             const playbackStartedAt = Date.now();
             diag({ phase: 'playback_start', requestId, chunkIndex, voice });
-            const playback = await playAudio(audio, { signalGeneration: callGeneration });
-            activeStop = playback && typeof playback.stop === 'function' ? playback.stop : null;
+            // Streaming hands the player the seam it needs: join this line onto the one
+            // already scheduled, after exactly the pause the previous sentence earned,
+            // with the engine's own lead-in and tail-out trimmed so that pause is the
+            // only silence between them.
+            const gapMs = gapBefore(chunks[chunkIndex - 1], speakOptions.lang || '');
+            // Trimming exists to control a SEAM. A line rendered on its own has none, so
+            // it is played exactly as the model delivered it - the Library reads one
+            // sentence per call, and cutting its tail there would take away the pause
+            // between two sentences instead of governing it.
+            const joined = chunks.length > 1;
+            const playback = await playAudio(audio, streamSentences
+              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined }
+              : { signalGeneration: callGeneration });
+            scheduled.push({ playback, chunkIndex, startedAt: playbackStartedAt });
+            activeStop = stopScheduled;
             if (chunkIndex + 1 < chunks.length) {
               if (appleStandalone) {
                 const yieldStartedAt = Date.now();
@@ -431,12 +553,18 @@
                 error => ({ ok: false, error })
               );
             }
-            if (playback && playback.done && typeof playback.done.then === 'function') await playback.done;
-            diag({ phase: 'playback_done', requestId, chunkIndex, voice, elapsedMs: Date.now() - playbackStartedAt });
-            activeStop = null;
+            // Non-streaming keeps its original shape: one line at a time, the next one
+            // generated during it. Streaming instead lets the NEXT line be scheduled
+            // while this one is still audible - waiting for it to finish first is the
+            // round trip that puts a hole between two sentences - and only blocks once
+            // the schedule is SCHEDULE_DEPTH lines deep.
+            if (!streamSentences) await drainScheduled(0, requestId, voice);
+            else if (scheduled.length >= SCHEDULE_DEPTH) await drainScheduled(SCHEDULE_DEPTH - 1, requestId, voice);
             if (callGeneration !== generation) throw new Error('TTS request superseded');
           }
         }
+        if (typeof playAudio === 'function') await drainScheduled(0, requestId, voice);
+        activeStop = null;
         return { provider: adapter.kind || 'neural-local', voice, chunks: chunks.length, outputs, requestId };
       } catch (error) {
         diag({ phase: 'voice_service_error', requestId, voice, error: String(error && (error.message || error.name) || error) });
@@ -449,7 +577,7 @@
       }
     }
 
-    return Object.freeze({ speak, stop, prefetch, splitIntoChunks: (text) => splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars) });
+    return Object.freeze({ speak, stop, prefetch, splitIntoChunks: (text) => planChunks(text) });
   }
 
   return Object.freeze({ normalizeText, splitIntoChunks, createVoiceService });
