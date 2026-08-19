@@ -22,6 +22,7 @@
   var doc = root.document;
   var PROGRESS_KEY = 'fiezel-library-progress-v1';
   var pack = null;
+  var packPromise = null;
   var session = null;
   var narrating = false;
   var narrationToken = 0;
@@ -43,11 +44,19 @@
 
   async function ensurePack() {
     if (pack) return pack;
-    var response = await root.fetch('./features/library/library-books-v1.json', { credentials: 'same-origin' });
-    if (!response || !response.ok) throw new Error('library_pack_unavailable');
-    pack = await response.json();
-    session = root.FiezelLibrary.createSession(pack, readProgress());
-    return pack;
+    if (packPromise) return packPromise;
+    packPromise = (async function () {
+      var response = await root.fetch('./features/library/library-books-v1.json', { credentials: 'same-origin' });
+      if (!response || !response.ok) throw new Error('library_pack_unavailable');
+      var loaded = await response.json();
+      if (!root.FiezelLibrary) throw new Error('library_runtime_missing');
+      var loadedSession = root.FiezelLibrary.createSession(loaded, readProgress());
+      pack = loaded;
+      session = loadedSession;
+      return pack;
+    })();
+    try { return await packPromise; }
+    finally { packPromise = null; }
   }
 
   // ---- narration ----------------------------------------------------------------
@@ -68,19 +77,21 @@
   }
 
   /**
-   * m025-45: the silence between sentences was the next one being generated only after
-   * the current finished - 1.4 to 2.7s of nothing on OWNER's device. Warming it while the
-   * current sentence is still playing removes that wait. Best effort by construction: the
-   * runtime refuses to warm while a generation is in flight, and a failed warm just means
-   * the normal path generates as before.
+   * m025-47: prefetch is intentionally deferred by one task. The public runtime has
+   * readiness/audibility wrappers around the core service; issuing N+1 in the same JS
+   * turn as speak(N) allowed N+1 to reserve the single-flight engine before N reached it.
+   * That is the exact queue inversion behind the 10-15 second sentence gap.
    */
-  function warmNext() {
-    var runtime = root.FiezelVoiceRuntime;
-    if (!runtime || typeof runtime.prefetch !== 'function') return;
-    var snap = session.snapshot();
-    var upcoming = session.sentences()[snap.sentenceIndex + 1];
-    if (!upcoming) return;
-    try { runtime.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
+  function warmNext(token) {
+    setTimeout(function () {
+      if (!narrating || token !== narrationToken || !session) return;
+      var runtime = root.FiezelVoiceRuntime;
+      if (!runtime || typeof runtime.prefetch !== 'function') return;
+      var snap = session.snapshot();
+      var upcoming = session.sentences()[snap.sentenceIndex + 1];
+      if (!upcoming) return;
+      try { runtime.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
+    }, 0);
   }
 
   function stopNarration() {
@@ -104,10 +115,8 @@
       var sentence = session.current();
       if (!sentence) break;
       highlight(sentence.index, true);
-      // Warm the next line first: the runtime declines while a generation is running, so
-      // this lands during playback, which is exactly the window we want to use.
       var speaking = speak(sentence.en);
-      warmNext();
+      warmNext(token);
       try {
         await speaking;
       } catch (error) {
@@ -230,16 +239,21 @@
     highlight(snap.sentenceIndex, true);
   }
 
+  // m025-47: only touch the old active line and the new one. The previous implementation
+  // scanned every sentence button on every narration tick and then started a smooth-scroll
+  // animation. Long books paid that DOM cost hundreds of times while the audio worker was
+  // also busy. A direct numeric selector makes the work O(1) and auto-scroll does not keep
+  // an animation alive between consecutive sentences.
   function highlight(index, scroll) {
-    var nodes = doc.querySelectorAll('[data-sentence]');
-    nodes.forEach(function (node) {
-      if (Number(node.dataset.sentence) === Number(index)) {
-        node.setAttribute('data-active', '1');
-        if (scroll && node.scrollIntoView) {
-          try { node.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
-        }
-      } else node.removeAttribute('data-active');
-    });
+    var wanted = Number(index);
+    var active = doc.querySelector('[data-sentence][data-active="1"]');
+    if (active && Number(active.dataset.sentence) !== wanted) active.removeAttribute('data-active');
+    var node = doc.querySelector('[data-sentence="' + wanted + '"]');
+    if (!node) return;
+    node.setAttribute('data-active', '1');
+    if (scroll && node.scrollIntoView) {
+      try { node.scrollIntoView({ block: 'center', behavior: 'auto' }); } catch (_) {}
+    }
   }
 
   function updatePlayButton() {
@@ -417,12 +431,25 @@
     node.innerHTML = '<section class="fade library-page"><div class="card">Memuat perpustakaan…</div></section>';
     try {
       await ensurePack();
-      if (!root.FiezelLibrary) throw new Error('library_runtime_missing');
       renderShelf();
     } catch (error) {
       node.innerHTML = '<section class="fade library-page"><div class="card"><b>Perpustakaan belum bisa dimuat.</b>' +
         '<p class="muted">' + esc((error && error.message) || error) + '</p></div></section>';
     }
+  }
+
+  // Load the small authored book index while the launcher is idle. It remains a normal
+  // fetch backed by the service-worker cache; this only moves JSON parse/session setup
+  // away from the user's navigation tap. A single shared promise prevents duplicate work.
+  function schedulePackWarm() {
+    var run = function () { ensurePack().catch(function () {}); };
+    try {
+      if (typeof root.requestIdleCallback === 'function') {
+        root.requestIdleCallback(run, { timeout: 1800 });
+      } else {
+        setTimeout(run, 900);
+      }
+    } catch (_) { setTimeout(run, 900); }
   }
 
   root.library = library;
@@ -443,4 +470,5 @@
     stop: stopNarration,
     isNarrating: function () { return narrating; }
   });
+  schedulePackWarm();
 }(typeof globalThis !== 'undefined' ? globalThis : this));
