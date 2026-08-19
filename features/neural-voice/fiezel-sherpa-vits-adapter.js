@@ -94,6 +94,14 @@
     var personas = opts.personas || (typeof root !== 'undefined' && root && root.FiezelVoicePersona) || null;
     var usePersona = opts.usePersona === true && !!personas;
     var padBetweenPhrases = opts.padBetweenPhrases !== false;
+    // m025-47: Supertonic already models punctuation and breath pauses itself. Splitting
+    // one sentence into several independent worker renders adds repeated inference cost
+    // and creates a waveform seam when those renders are joined. Unless an engine opts
+    // in explicitly, the Supertonic capability combination below therefore stays as one
+    // continuous render. Piper keeps the legacy phrase shaping path unchanged.
+    var segmentPhrases = Object.prototype.hasOwnProperty.call(opts, 'segmentPhrases')
+      ? opts.segmentPhrases !== false
+      : !(generationLang && padBetweenPhrases === false && usePitchContour === false);
     // Supertonic is calibrated at 1.0 = natural; Piper needed 0.85 (see NATURAL_SPEED).
     var naturalSpeed = Number(opts.naturalSpeed) > 0 ? Number(opts.naturalSpeed) : NATURAL_SPEED;
 
@@ -223,13 +231,36 @@
       });
     }
 
-    function concatSamples(parts, Ctor) {
+    // Joining independently rendered waveforms at a raw sample boundary can create a
+    // step discontinuity. Engines with synthetic silence already meet at zero; engines
+    // without that padding get a tiny 6ms equal-power-like linear overlap instead.
+    function concatSamples(parts, Ctor, rate, smoothBoundary) {
       if (parts.length === 1) return parts[0];
-      var total = 0;
-      parts.forEach(function (part) { total += part.length; });
+      var overlapTarget = smoothBoundary ? Math.max(1, Math.round((Number(rate) || 24000) * 0.006)) : 0;
+      var total = parts[0].length;
+      for (var i = 1; i < parts.length; i++) {
+        var overlap = Math.min(overlapTarget, parts[i - 1].length, parts[i].length);
+        total += parts[i].length - overlap;
+      }
       var out = new Ctor(total);
-      var at = 0;
-      parts.forEach(function (part) { out.set(part, at); at += part.length; });
+      out.set(parts[0], 0);
+      var at = parts[0].length;
+      for (var partIndex = 1; partIndex < parts.length; partIndex++) {
+        var part = parts[partIndex];
+        var blend = Math.min(overlapTarget, at, part.length);
+        if (blend > 0) {
+          for (var j = 0; j < blend; j++) {
+            var mix = (j + 1) / (blend + 1);
+            var outIndex = at - blend + j;
+            out[outIndex] = out[outIndex] * (1 - mix) + part[j] * mix;
+          }
+          out.set(part.subarray(blend), at);
+          at += part.length - blend;
+        } else {
+          out.set(part, at);
+          at += part.length;
+        }
+      }
       return out;
     }
 
@@ -267,10 +298,10 @@
         // language decides which markers apply, so an Indonesian line is shaped by
         // Indonesian rules instead of being left unpunctuated and level.
         var spoken = prosody && prosody.punctuate ? prosody.punctuate(text, lang) : String(text || '');
-        // m025-41: synthesize phrase by phrase. One call for the whole line gives the
-        // engine no chance to vary register between breath groups, which is precisely the
-        // flat delivery OWNER reported. Splitting is at punctuation only, never mid-phrase.
-        var units = prosody && prosody.phrases ? prosody.phrases(spoken, PHRASE_MAX_CHARS, lang) : [];
+        // Piper still benefits from explicit phrase shaping. Supertonic does not: it owns
+        // its punctuation/prosody natively, and a single render is both faster and free of
+        // artificial waveform joins.
+        var units = segmentPhrases && prosody && prosody.phrases ? prosody.phrases(spoken, PHRASE_MAX_CHARS, lang) : [];
         if (!units.length) units = [spoken];
         generating = true;
         var parts = [];
@@ -310,10 +341,11 @@
             generating = false;
             if (!parts.length) throw new Error('sherpa_empty_audio');
             var Ctor = parts[0].constructor;
-            var audio = concatSamples(parts, Ctor);
+            var audio = concatSamples(parts, Ctor, rate, !padBetweenPhrases);
             stage('adapter_generate_ready', backendDetail({
               voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
-              samples: audio.length, sampleRate: rate, phrases: units.length
+              samples: audio.length, sampleRate: rate, phrases: units.length,
+              segmented: units.length > 1
             }));
             return {
               audio: audio, sampling_rate: rate, voice: voice, sid: sid,
