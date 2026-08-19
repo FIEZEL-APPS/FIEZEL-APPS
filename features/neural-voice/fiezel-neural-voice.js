@@ -537,7 +537,11 @@
             // between two sentences instead of governing it.
             const joined = chunks.length > 1;
             const playback = await playAudio(audio, streamSentences
-              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined }
+              // m028-2: `trim` still governs the seam and stays tied to `joined`, but the
+              // engine's lead-in silence is dead air on every line, joined or not.
+              // Measured on the shipped engine it is 215-557ms, and on a single-chunk
+              // reply it was played in full before the learner heard anything.
+              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined, trimHead: true }
               : { signalGeneration: callGeneration });
             scheduled.push({ playback, chunkIndex, startedAt: playbackStartedAt });
             activeStop = stopScheduled;
