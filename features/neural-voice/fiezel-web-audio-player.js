@@ -388,6 +388,8 @@
         entry.release();
         entry.resolve();
       });
+      const sharedRuntime = env.__fiezelPcmWorkletRuntime;
+      if (sharedRuntime && (!ctx || sharedRuntime.context === ctx)) workletRuntimes.add(sharedRuntime);
       workletRuntimes.forEach((runtime) => {
         try {
           runtime.node.port.postMessage({
