@@ -27,13 +27,14 @@ Allowed runtime scope:
 - `features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js`: Apple standalone stream/hard-chunk policy **and** bounded Apple AudioWorklet message wrapper. The wrapper may zero ordinary `enqueue` edge fades but must pass explicit `clear`/cancel fades unchanged.
 - `features/neural-voice/fiezel-m0281-runtime-guard.js`: Indonesian preparation/verification status contract only; no second-worker initialization.
 - `features/neural-voice/fiezel-voice-bundle-gate.js` only if focused evidence proves it can remain locked after shared verification.
-- focused M028.2 regression test(s).
+- NEW focused M028.2 regression test(s).
+- `neural-voice-m0281-regression-test.js`: only assertions directly superseded by M028.2 Apple policy (80-char sentence-streaming -> 128-char non-sentence-streamed). Arbitration, no-second-worker, truthful Indonesian `ready=false`, and Classroom safety assertions are immutable.
 - `.github/workflows/quality.yml` only to register focused tests.
 - `features/neural-voice/fiezel-diag-panel.js` release marker only.
 - `sw.js` release marker only; no new shell asset is required because the repaired prebootstrap layer is already part of the shell.
 - this handoff artifact; Control Bus comments.
 
-Implementation note: a temporary unreferenced `features/neural-voice/fiezel-m0282-audioedge-hotfix.js` staging file was created after the first scope amendment, but it was never wired into `index.html` or production load order. It will be removed before candidate verification. The edge logic is co-located in the already-loaded prebootstrap hotfix to reduce release surface. Therefore `index.html` remains unchanged.
+Implementation note: a temporary unreferenced `features/neural-voice/fiezel-m0282-audioedge-hotfix.js` staging file was created after the first scope amendment, but it was never wired into `index.html` or production load order and has been deleted. Edge logic is co-located in the already-loaded prebootstrap hotfix to reduce release surface. `index.html` remains unchanged.
 
 Explicitly NOT modifying the large base `fiezel-web-audio-player.js` in this hotfix. The wrapper targets the exact affected production path: Apple standalone AudioWorklet. The legacy AudioBufferSource rollback path remains unchanged and is not claimed fixed by M028.2.
 
@@ -74,7 +75,7 @@ C. Indonesian verification:
 - wrapper is Apple-standalone-only and preserves the exact player object returned by the base implementation.
 - Indonesian prepare resolves without invoking original Indonesian prepare/initializer; `ready` remains false while verification fields truthfully report shared preparation/base readiness.
 - existing voice-bundle gate already keys completion on `prepared`, so it must remain terminal with the M028.2 status contract; change it only if focused test disproves this.
-- existing M028/M028.1 tests remain green except assertions explicitly superseded by this handoff.
+- existing M028/M028.1 tests remain green except the explicitly superseded Apple policy assertions above.
 - exact release marker coherence plus Quality, Safari, A6/A7, A9-A14, MASTER Authority all PASS on exact head.
 
 ## Physical exit boundary
