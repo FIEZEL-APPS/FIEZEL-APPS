@@ -18,10 +18,14 @@ scope:
     - neural-voice-m026-raw-pcm-ab-test.js
     - .github/workflows/quality.yml
     - FIEZEL-5.19.0-M026-RAW-PCM-AB-HANDOFF.md
+    - features/neural-voice/fiezel-diag-panel.js
+    - sw.js
   functions_allowed:
     - pcmDiagnosticMode()
     - analyzeSamples()
     - createPlayer()/play() diagnostic-only branch
+    - DIAG_BUILD release marker only
+    - SW_REV release marker only
   files_forbidden:
     - NEURAL-VOICE-SOURCE-LOCK.json
     - vendor/supertonic-3/*
@@ -40,12 +44,15 @@ forbidden_actions:
   - Jangan mengubah kontrak FiezelVoiceRuntime.
   - Jangan mengimplementasikan true PCM streaming/ring buffer pada milestone ini.
   - Jangan mengklaim crackle sudah diperbaiki tanpa bukti perangkat fisik.
+  - Pada fiezel-diag-panel.js hanya DIAG_BUILD yang boleh berubah.
+  - Pada sw.js hanya SW_REV yang boleh berubah.
 done_when:
   - Mode default menjalankan jalur m025-48 yang sama dan tidak menambah sample-scan telemetry.
   - Mode raw melewati conditionSamples() saja; trim/fade/scheduling tetap identik.
   - Mode conditioned menjalankan conditionSamples() seperti produksi sekarang.
   - Diagnostic event mencatat raw/rendered PCM metrics dan source/context sample rate.
   - Automated gate membuktikan pemisahan raw vs conditioned dan default non-regression.
+  - A7 release boundary lolos dengan DIAG_BUILD naik tepat +1 dan SW_REV sinkron.
   - CI branch hijau.
 evidence_required:
   - Diff hanya pada files_allowed.
@@ -53,6 +60,19 @@ evidence_required:
   - Regression/quality gate hijau.
   - Untuk menentukan root cause: dua hasil listening pada device yang sama, raw dan conditioned.
 ```
+
+### Scope amendment setelah verifier A7
+
+Implementasi awal sengaja tidak menyentuh release markers. A7 Automated Release Safety kemudian menolak candidate dengan bukti konkret:
+
+`A7 FAIL: product deploy must increment Diagnostics m025-N exactly +1 (base=47 head=47 expected=48)`
+
+Sesuai protokol, pekerjaan dihentikan sebelum menyentuh file di luar scope. Amendment ini menambahkan hanya dua dependency release-coherence:
+
+- `features/neural-voice/fiezel-diag-panel.js`: `DIAG_BUILD` `m025-47` -> `m025-48`, tanpa perubahan fungsi/panel lain.
+- `sw.js`: hanya `SW_REV` diubah ke prefix `m025-48-...`, tanpa perubahan cache policy, fetch handler, COOP/COEP, atau daftar asset.
+
+Amendment ini bukan pelebaran objective; ini remediation wajib agar product change memenuhi verifier A7.
 
 ## 2. ROOT-CAUSE CONTEXT
 
