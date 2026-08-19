@@ -124,10 +124,10 @@ assert.match(voiceSource, /Math\.max\(16,\s*Math\.min\(128,\s*Number\(options\.a
   'source must carry the effective 32-char Apple default with a floor low enough to allow it');
 assert.match(voiceSource, /apple-standalone-inference-slice-v3/, 'Apple policy identifier must advance with the new effective cap');
 
-// 4. Release and shell coherence.
+// 4. Release and shell coherence. M028 runtime invariants remain; release identity advances with M028.1.
 assert.match(swSource, /fiezel-pcm-renderer-worklet\.js/, 'worklet must be in service-worker shell assets');
-assert.match(diagSource, /DIAG_BUILD\s*=\s*['"]m025-49['"]/, 'M028 candidate must advance diagnostics to m025-49');
-assert.match(swSource, /SW_REV\s*=\s*['"]m025-49-/, 'M028 SW revision must carry matching m025-49 build');
+assert.match(diagSource, /DIAG_BUILD\s*=\s*['"]m025-50['"]/, 'M028.1 candidate must advance diagnostics to m025-50');
+assert.match(swSource, /SW_REV\s*=\s*['"]m025-50-/, 'M028.1 SW revision must carry matching m025-50 build');
 assert.match(qualitySource, /permissions:\s*\n\s*contents:\s*read/, 'Quality must remain read-only and never implement/push source');
 assert.doesNotMatch(qualitySource, /git\s+push|contents:\s*write|Apply M028 in-scope implementation/,
   'Quality Gate must not mutate or push the candidate branch');
