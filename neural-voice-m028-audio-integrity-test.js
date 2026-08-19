@@ -74,6 +74,8 @@ assert.ok(workletMessages.some(m => m.type === 'done' && m.id === 'stale' && m.c
 processor.handleMessage({ type: 'enqueue', id: 'invalid', epoch: 2, sampleRate: 44100, samples: new Float32Array(0) });
 assert.ok(workletMessages.some(m => m.type === 'error' && m.id === 'invalid' && m.reason === 'invalid_pcm'),
   'invalid PCM must be terminally reported to the player settlement map');
+assert.match(workletSource, /finishEntry\(entry, entry\.cancelled\)/,
+  'a cancellation that reaches natural sample end must still report cancelled');
 
 // 2. Player integration must be Apple-standalone-only, persistent, and rollback-safe.
 assert.match(playerSource, /fiezel-pcm-renderer-worklet\.js/, 'player must load the PCM worklet module');
@@ -92,6 +94,8 @@ assert.match(playerSource, /const sharedRuntime = env\.__fiezelPcmWorkletRuntime
   'a new non-continuous player must clear the shared worklet, not only its closure-local queue');
 assert.match(playerSource, /message\.type === 'error'[^\n]*entry\.finish\(true\)/,
   'worklet error and done messages must both settle exactly once through the pending map');
+assert.match(playerSource, /const pending = Array\.from\(runtime\.pending\.values\(\)\);[\s\S]{0,180}entry\.finish\(true\)/,
+  'close/failure must settle pending work before disconnecting the shared worklet');
 assert.match(playerSource, /createBufferSource\(/, 'legacy AudioBufferSourceNode rollback path must remain');
 assert.match(playerSource, /Object\.freeze\(\{\s*play,\s*stop,\s*warm,\s*close\s*\}\)/,
   'public player API must remain exactly play/stop/warm/close');
