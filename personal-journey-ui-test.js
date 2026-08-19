@@ -80,12 +80,18 @@ setTimeout(() => {
     }
   });
 
-  test('skill yang belum diukur ditulis "Belum diukur", bukan angka', () => {
+  test('skill tanpa angka ditulis apa adanya, bukan 0%', () => {
     assert.ok(/Listening/.test(markup) && /Speaking/.test(markup), 'lima skill tampil');
     const unmeasured = markup.match(/is-unmeasured/g) || [];
-    assert.strictEqual(unmeasured.length, 2, 'listening dan speaking belum terukur di R2');
-    assert.ok(/Belum diukur/.test(markup));
+    assert.strictEqual(unmeasured.length, 2, 'listening dan speaking belum masuk peta di R2');
+    // "Belum terhubung", bukan "Belum diukur": latihan Speaking/Listening memang sudah
+    // tercatat di fiezel-sl-v1-state, hanya belum diproyeksikan (itu pekerjaan R3).
+    assert.ok(/Belum terhubung/.test(markup));
     assert.ok(!/Listening<\/b><span>0%/.test(markup), 'skill tanpa bukti tidak boleh tampil 0%');
+    for (const row of built.mission.skillMap) {
+      if (row.status === 'measured') continue;
+      assert.ok(markup.indexOf(row.label) !== -1);
+    }
   });
 
   test('tidak ada klaim skor ujian di layar', () => {

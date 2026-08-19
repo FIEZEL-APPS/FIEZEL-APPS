@@ -678,10 +678,13 @@ function setGoalProfile(value){const journey=self.FiezelPersonalJourney;if(!jour
 window.setGoalProfile=setGoalProfile;
 const JOURNEY_BLOCK_LABELS={review:'Review wajib',focus:'Fokus',transfer:'Transfer'};
 function journeySkillRowMarkup(row){
-  // Skill tanpa bukti ditulis apa adanya. Menampilkan 0% untuk skill yang belum pernah
-  // diukur akan terbaca sebagai "kamu payah" padahal FIEZEL memang belum pernah mengukurnya.
-  const value=row.status==='not_measured'?'Belum diukur':`${row.accuracy==null?'—':row.accuracy+'%'}`;
-  return `<div class="journey-skill ${row.status==='not_measured'?'is-unmeasured':''}"><b>${esc(row.label)}</b><span>${esc(value)}</span></div>`;
+  // Tiga keadaan, bukan dua. Menampilkan 0% untuk skill yang belum pernah diukur terbaca
+  // sebagai "kamu payah" padahal FIEZEL memang belum mengukurnya; dan Speaking/Listening
+  // bukan "belum diukur" - latihannya sudah tercatat, hanya belum masuk peta ini (R3).
+  const value=row.status==='pending_r3'?'Belum terhubung'
+    :row.status==='not_measured'?'Belum diukur'
+    :`${row.accuracy==null?'—':row.accuracy+'%'}`;
+  return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span></div>`;
 }
 function journeyMarkup(now=Date.now()){
   const built=buildPersonalJourney(now);if(!built)return'';
