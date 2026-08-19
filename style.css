@@ -625,11 +625,15 @@ body.daily-locked{overflow:hidden}
 .library-chapter{margin:16px 0 6px;font-size:1.05rem}
 .library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#11172a);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
 .library-sentence[data-active]{background:var(--panel-soft,#eef3fa);box-shadow:inset 3px 0 0 var(--accent,#3d7de0)}
-.library-translation{position:sticky;bottom:150px;display:grid;gap:5px;padding:13px;border-radius:16px;background:var(--panel,#fff);border:1px solid var(--line,#e6ebf2);box-shadow:0 12px 30px rgba(7,13,29,.14)}
+/* m025-45: the translation floats in the middle of the screen. The book stays visible
+   behind it and a tap outside dismisses it - a reader, not a modal. */
+.library-translation-layer{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:20px;background:rgba(7,13,29,.28);backdrop-filter:blur(2px)}
+.library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:22px;background:var(--panel,#fff);border:1px solid var(--line,#e6ebf2);box-shadow:0 26px 60px rgba(7,13,29,.32)}
 .library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
 .library-translation-en{margin:0;font-weight:650;line-height:1.5}
 .library-translation-id{margin:0;color:var(--accent,#3d7de0);font-weight:600;line-height:1.5}
-.library-translation-actions{display:flex;gap:8px;flex-wrap:wrap}
+.library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
 .library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(246,248,251,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#e6ebf2)}
 .library-progress-line{height:5px;border-radius:999px;background:var(--panel-soft,#eef3fa);overflow:hidden}
@@ -648,5 +652,5 @@ body.daily-locked{overflow:hidden}
 .library-ask-actions button{min-height:46px;padding:0 16px;border-radius:13px}
 .library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#3d7de0);font-weight:600}
 .library-ask-answer:empty{display:none}
-@media (max-width:620px){.library-sentence{font-size:1.02rem}.library-translation{bottom:158px}}
+@media (max-width:620px){.library-sentence{font-size:1.02rem}}
 @media (prefers-reduced-motion:reduce){.library-progress-line span{transition:none}}
