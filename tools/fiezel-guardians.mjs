@@ -73,8 +73,8 @@ function report(title, classification = '') {
 
 function selfTest() {
   const secretSamples = [
-    '+const key="ghp_abcdefghijklmnopqrstuvwxyz1234567890";',
-    '+-----BEGIN PRIVATE KEY-----',
+    '+const key="' + 'gh' + 'p_' + 'abcdefghijklmnopqrstuvwxyz1234567890' + '";',
+    '+-----BEGIN ' + 'PRIVATE KEY-----',
   ];
   const patterns = secretPatterns();
   if (!secretSamples.every((s) => patterns.some((p) => p.test(s)))) throw new Error('secret pattern self-test failed');
