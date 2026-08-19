@@ -21,4 +21,12 @@ replace_once(
     "const SW_REV='m025-48-puter-tts-core-ai-20260819-1';",
     "const SW_REV='m025-49-puter-tts-core-ai-20260819-1';"
 )
-print('m025-49 release markers applied over current main')
+replace_once(
+    'neural-voice-m02549-puter-test.js',
+    "    assert.match(sw,/const SW_REV='m025-48-/);",
+    "    // main advanced to m025-48 through T-026 while this PR was open; A7 therefore\n"
+    "    // requires this candidate to be m025-49. Pin the candidate boundary here while\n"
+    "    // pwa/A7 tests independently verify exact +1 coherence against main.\n"
+    "    assert.match(sw,/const SW_REV='m025-49-/);"
+)
+print('m025-49 release markers and rebased release assertion applied')
