@@ -29,6 +29,7 @@ Allowed runtime scope:
 - `features/neural-voice/fiezel-voice-bundle-gate.js` only if focused evidence proves it can remain locked after shared verification.
 - NEW focused M028.2 regression test(s).
 - `neural-voice-m0281-regression-test.js`: only assertions directly superseded by M028.2 Apple policy (80-char sentence-streaming -> 128-char non-sentence-streamed). Arbitration, no-second-worker, truthful Indonesian `ready=false`, and Classroom safety assertions are immutable.
+- `neural-voice-m028-audio-integrity-test.js`: **only** the two release-identity assertions superseded by M028.2 (`DIAG_BUILD` / `SW_REV` m025-50 -> m025-51) and their labels/comments. All M028 worklet registration, sample-rate defense, epoch/cancellation, player integration, Apple core slice, SCHEDULE_DEPTH, API-contract, and ScriptProcessor prohibitions remain immutable.
 - `.github/workflows/quality.yml` only to register focused tests.
 - `features/neural-voice/fiezel-diag-panel.js` release marker only.
 - `sw.js` release marker only; no new shell asset is required because the repaired prebootstrap layer is already part of the shell.
@@ -75,7 +76,7 @@ C. Indonesian verification:
 - wrapper is Apple-standalone-only and preserves the exact player object returned by the base implementation.
 - Indonesian prepare resolves without invoking original Indonesian prepare/initializer; `ready` remains false while verification fields truthfully report shared preparation/base readiness.
 - existing voice-bundle gate already keys completion on `prepared`, so it must remain terminal with the M028.2 status contract; change it only if focused test disproves this.
-- existing M028/M028.1 tests remain green except the explicitly superseded Apple policy assertions above.
+- existing M028/M028.1 tests remain green except the explicitly superseded Apple policy/release-identity assertions above.
 - exact release marker coherence plus Quality, Safari, A6/A7, A9-A14, MASTER Authority all PASS on exact head.
 
 ## Physical exit boundary
