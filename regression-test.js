@@ -27,7 +27,10 @@ assert(/flash-inner/.test(app)&&/rotateY/.test(css),'3D flip implementation miss
 assert(!/id="previous"/.test(app)&&!/id="next"/.test(app.split('function flashcards')[1]?.split('function reviewVocab')[0]||''),'flashcards still expose previous/next buttons');
 assert(/function getDiagnosticProfile/.test(app)&&/weakTargets/.test(app),'adaptive diagnostic profile missing');
 assert(/function setConfidence/.test(app)&&/confidenceHistory/.test(app),'confidence calibration missing');
-assert(/function dailyBrief/.test(app)&&/RINGKASAN HARI INI/.test(app),'daily learning brief missing');
+// m025-46: the brief is pinned by what renders it, not by a shouting copy string.
+// The all-caps kicker was removed as a design decision; the ring, the target and the
+// function are the feature. This is a stricter marker than the label it replaces.
+assert(/function dailyBrief/.test(app)&&/mission-ring/.test(app)&&/MEANINGFUL_ATTEMPTS/.test(app),'daily learning brief missing');
 assert(/Peta Belajar & Lab/.test(app)&&/Lab Kesalahan/.test(app)&&/Linimasa Kelemahan/.test(app),'learning map/labs missing');
 assert(/Jaringan Kekeliruan Kosakata/.test(app)&&/Peta Skill Reading/.test(app),'skill/confusion maps missing');
 assert(/Laporan Diagnostik/.test(app)&&/Dibuat oleh Fitrarustqi/.test(app),'diagnostic/creator product surface missing');

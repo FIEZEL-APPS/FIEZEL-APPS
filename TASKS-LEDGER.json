@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T09:40:00+07:00",
+  "updated": "2026-08-19T10:15:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -306,12 +306,19 @@
       "owner": "master (single-agent, wewenang tunggal dari OWNER)",
       "status": "done",
       "evidence": "Bukti masuk: Diag_45.txt (Safari 26 macOS) - 12 generasi/1 sukses, RTF ~1.03, satu chunk 5.6 detik dipotong di 631ms dan satu lagi di 2787ms, fatal ReferenceError musicCtx. PENTING: sebagian analisis awal saya sudah dikerjakan lebih dulu dan lebih baik di commit 95b8406 (prosody.resample sebagai penyebab cracking sebenarnya, antrean engine, warm cache Library, generationSteps 3->4). Kontribusi saya dipangkas agar hanya yang belum tercakup: (1) gain ramp 18ms sebelum stop + fade-in 6ms di fiezel-web-audio-player.js - pemotongan di tengah gelombang adalah diskontinuitas langkah, dan itulah bunyi kliknya; (2) guard clipping di atas unity (skala, bukan kompresi); (3) musicCtx dihapus - soundtrack sudah memegang context sendiri, variabelnya tidak pernah ada; (4) LOGIN_MESSAGES 36 -> 66, semua unik. Cache ucapan versi saya SENGAJA DIBUANG karena runOnEngine + warm cache di 95b8406 sudah menangani kebutuhan yang sama dan terintegrasi dengan Library; dua cache bersaing di satu service adalah risiko. Verifikasi: 66/66 test lokal lulus tanpa silent-exit, syntax gate bersih, neural-voice-playback-fade-test.js (9 assertion) baru dan terdaftar di quality.yml. Bukti perangkat pada basis sebelumnya (run 32206561010, commit 48637d5): first 5545ms, warm-1 3259ms, warm-2 5844ms, engine 158.897.832 byte sekali unduh lalu 300 byte, browser TTS tidak pernah bicara."
+    },
+    {
+      "id": "T-025",
+      "title": "m025-46: redesign UI ke maroon + Liquid Glass, dan turunkan kepadatan teks",
+      "owner": "master (single-agent)",
+      "status": "done",
+      "evidence": "Redesign ini SEBELUMNYA hanya mockup di kanvas desain, belum pernah masuk aplikasi. Kunci yang ditemukan lebih dulu lewat pembacaan gerbang: launcher-shell, coach-preview, learning-launcher, learner-stage, login-message, dan seluruh sistem langit global-sky/sky-light/scene-night DIKUNCI oleh experience-integration-test, product-audit, ui-structure-test, dan lesson-experience-test. Karena itu matahari/bulan beranimasi TIDAK dimatikan seperti usulan desain awal - hanya ditenangkan (sky-light opacity .72). Perubahan: (1) blok :root KEDUA di style.css ternyata palet hidup aplikasi (aksen indigo #6f5de3, --black navy #0b1020) - blok pertama praktis mati untuk aksen; keduanya kini maroon #8C2233/#6D1926 dengan netral hangat; (2) lapisan Liquid Glass: tiga bobot material yang membalik mengikuti fase langit, tab bar kapsul mengambang, sheet blur berat, ramp tipografi large-title, target sentuh >=44px; (3) SCENE_STOPS dihangatkan - langit tetap jam siang/malam, birunya hilang; (4) kepadatan teks: 10 kicker HURUF BESAR dihapus app-wide, badge kepercayaan, strip privasi, tagline enam kartu, dan baris \"Personal English OS\" di topbar dibuang (Home 5749 -> 4691 karakter); (5) biru sisa di features/tutor-classroom/tutor-v3.css (html.fiezel-ui-v6 .primary gradient navy yang menimpa SETIAP tombol utama), speaking-listening-addon.css, dan fiezel-library-ui.js ikut disapu. regression-test.js: penanda daily brief dipindah dari string salinan \"RINGKASAN HARI INI\" ke penanda struktural (function dailyBrief + mission-ring + MEANINGFUL_ATTEMPTS) - lebih ketat, bukan lebih longgar, karena struktur tidak patah oleh perubahan bahasa. Verifikasi: 66/66 test lokal tanpa silent-exit, syntax bersih, DAN render nyata lewat Chromium headless - itu yang menangkap tombol biru yang lolos dari 66 test."
     }
   ],
   "last_report": {
-    "by": "master (single-agent) — m025-45b",
-    "time": "2026-08-19T09:40:00+07:00",
-    "summary": "Dua catatan untuk OWNER. (1) Pekerjaan paralel mendarat di main saat sesi ini berjalan (95b8406, 7d5df80) dan beririsan berat; kontribusi sesi ini dibangun ulang di atasnya dan dipangkas ke bagian yang benar-benar belum ada, bukan ditimpakan. (2) Runner test bisa membaca test async yang menggantung sebagai lolos, karena Node keluar dengan kode 0 begitu event loop kosong - satu test sempat lolos palsu di sesi ini. Verifikasi sekarang memakai pemeriksaan keluaran tambahan. Belum terbukti: kualitas audio di perangkat. Tidak ada gate di repo ini yang mengukur keterpahaman suara; hanya telinga Jahran yang bisa memastikan cracking benar-benar hilang."
+    "by": "master (single-agent) — m025-46",
+    "time": "2026-08-19T10:15:00+07:00",
+    "summary": "Redesign masuk aplikasi. Dua pelajaran untuk dicatat. (1) Suite tidak melihat warna: tombol utama seluruh aplikasi masih biru setelah 66 test hijau, dan hanya ketahuan setelah halaman benar-benar dirender. (2) Ada overflow horizontal yang memotong panel di sisi kanan pada 393px MAUPUN 430px - dibuktikan ADA JUGA di build sebelum redesign, jadi bukan regresi, tapi nyata di produksi sekarang dan belum diperbaiki."
   },
   "missions": [
     {

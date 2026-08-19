@@ -16,7 +16,7 @@ html.fiezel-ui-v6 .launch-card:hover{transform:translateY(-3px);box-shadow:0 16p
 html.fiezel-ui-v6 .launch-card .launch-icon{border-radius:15px}
 html.fiezel-ui-v6 .privacy-strip{border-radius:20px}
 html.fiezel-ui-v6 button{border-radius:13px}
-html.fiezel-ui-v6 .primary{background:linear-gradient(135deg,#1e3154,#111a2c);border-color:transparent}
+html.fiezel-ui-v6 .primary{background:linear-gradient(135deg,#4a1a26,#241016);border-color:transparent}
 .classroom-v3{color:var(--ui-text);animation:uiEnter .28s ease both}
 .tutor-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin:4px 0 14px}
 .tutor-head h1{margin:.15rem 0 .3rem;font-size:clamp(2rem,5vw,3.1rem);letter-spacing:-.055em}
@@ -43,7 +43,7 @@ html.fiezel-ui-v6 .primary{background:linear-gradient(135deg,#1e3154,#111a2c);bo
 .tutor-formula{display:inline-block;max-width:100%;padding:12px 15px;margin-bottom:14px;border-radius:14px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12);font:700 clamp(.95rem,2.5vw,1.18rem)/1.4 ui-monospace,SFMono-Regular,Menlo,monospace}
 .tutor-board ul{display:grid;gap:6px;padding-left:20px;margin:0;color:#dce8f9;line-height:1.45}
 .tutor-voice-copy,.tutor-check,.tutor-inline-feedback{padding:19px 20px;border:1px solid var(--ui-line);border-radius:20px;background:var(--ui-surface-strong)}.tutor-voice-copy p{font-size:1.04rem;line-height:1.65;margin:.45rem 0 0}.tutor-check h3,.tutor-check h2{margin:.42rem 0 12px;letter-spacing:-.02em}
-.tutor-options{display:grid;gap:8px}.tutor-options button{text-align:left;background:#fbfcff;padding:14px 15px}.tutor-options button:hover{border-color:#a9c1ea;background:#fff}
+.tutor-options{display:grid;gap:8px}.tutor-options button{text-align:left;background:#fbfcff;padding:14px 15px}.tutor-options button:hover{border-color:#e4bcc3;background:#fff}
 .tutor-inline-feedback{border-left:4px solid var(--ui-indigo);background:#faf9ff}.tutor-inline-feedback b{display:block;line-height:1.5}.tutor-inline-feedback p{margin:.35rem 0 0;color:var(--ui-muted);line-height:1.55}.tutor-next-row{display:flex;justify-content:flex-end}
 .tutor-teacher{position:sticky;top:94px;padding:19px;border:1px solid var(--ui-line);border-radius:24px;background:rgba(255,255,255,.91);box-shadow:0 14px 38px rgba(29,49,78,.08)}
 .tutor-avatar{width:54px;height:54px;display:grid;place-items:center;margin-bottom:13px;border-radius:18px;background:linear-gradient(145deg,#2b6bd8,#6659db);color:#fff;font-weight:900;font-size:1.25rem;box-shadow:0 10px 24px rgba(50,91,190,.24)}
@@ -53,7 +53,7 @@ html.fiezel-ui-v6 .primary{background:linear-gradient(135deg,#1e3154,#111a2c);bo
 .tutor-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0;text-align:left}.tutor-summary-grid>div{padding:16px;border-radius:18px;background:#f7f9fc;border:1px solid var(--ui-line)}.tutor-summary-grid b,.tutor-summary-grid span{display:block}.tutor-summary-grid span{color:var(--ui-muted);font-size:.78rem;margin-top:5px}
 .tutor-ask-sheet{position:fixed;inset:0;z-index:500;display:grid;place-items:end center;padding:18px;background:rgba(11,18,31,.42);backdrop-filter:blur(9px)}
 .tutor-ask-panel{width:min(680px,100%);padding:22px;border-radius:24px;background:#fff;box-shadow:0 30px 90px rgba(6,13,25,.32);animation:sheetUp .28s cubic-bezier(.2,.8,.2,1) both}.tutor-ask-panel h2{margin:.35rem 0 .2rem}.tutor-ask-panel p{color:var(--ui-muted);margin:.2rem 0 14px}.tutor-ask-panel textarea{width:100%;resize:vertical;min-height:90px;padding:13px;border:1px solid #cad5e5;border-radius:14px;font:inherit;outline:none}.tutor-ask-panel textarea:focus{border-color:var(--ui-accent);box-shadow:0 0 0 3px rgba(40,103,216,.12)}.tutor-ask-panel>div{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
-.tutor-loading,.tutor-error{padding:35px;border-radius:26px;background:#fff}.tutor-skeleton{height:140px;border-radius:22px;background:linear-gradient(90deg,#eef2f7,#f8faff,#eef2f7);background-size:220% 100%;animation:shimmer 1.2s linear infinite}
+.tutor-loading,.tutor-error{padding:35px;border-radius:26px;background:#fff}.tutor-skeleton{height:140px;border-radius:22px;background:linear-gradient(90deg,#f2ebec,#f8faff,#f2ebec);background-size:220% 100%;animation:shimmer 1.2s linear infinite}
 html.fiezel-ui-v6 body.scene-dusk .topbar,html.fiezel-ui-v6 body.scene-night .topbar{background:rgba(247,249,253,.82)}html.fiezel-ui-v6 body.scene-dusk .section-head h1,html.fiezel-ui-v6 body.scene-night .section-head h1{color:#f8faff}
 @media (min-width:1000px){html.fiezel-ui-v6 .app{padding-left:118px;padding-bottom:38px}html.fiezel-ui-v6 .bottomnav{left:20px;top:50%;bottom:auto;transform:translateY(-50%);width:78px;padding:8px;grid-template-columns:1fr;gap:5px;border-radius:24px;background:rgba(255,255,255,.90);box-shadow:0 18px 55px rgba(29,49,78,.12)}html.fiezel-ui-v6 .nav{min-height:62px;display:grid;place-items:center;gap:3px;padding:8px 5px}html.fiezel-ui-v6 .nav span{font-size:.6rem}html.fiezel-ui-v6 .launch-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){.tutor-subject-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.tutor-classroom-grid{grid-template-columns:1fr}.tutor-teacher{position:relative;top:auto;display:grid;grid-template-columns:58px 1fr;gap:10px}.tutor-teacher-actions,.tutor-caption{grid-column:1/-1}}
@@ -64,20 +64,20 @@ html.fiezel-ui-v6 body.scene-dusk .topbar,html.fiezel-ui-v6 body.scene-night .to
 /* m025-42 press-to-talk dock: one round button, centred, always reachable in Classroom */
 .tutor-talk-dock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0));z-index:55;display:grid;justify-items:center;gap:6px;pointer-events:none}
 .tutor-talk-dock>*{pointer-events:auto}
-.tutor-talk-button{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:none;color:#fff;background:linear-gradient(160deg,#3d7de0,#6b4df0);box-shadow:0 16px 36px rgba(61,125,224,.42);position:relative}
+.tutor-talk-button{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;border:none;color:#fff;background:linear-gradient(160deg,#8C2233,#b8455a);box-shadow:0 16px 36px rgba(140,34,51,.42);position:relative}
 .tutor-talk-button i{width:28px;height:28px}
-.tutor-talk-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(61,125,224,.5);opacity:0}
+.tutor-talk-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(140,34,51,.5);opacity:0}
 .tutor-talk-button.is-listening{background:linear-gradient(160deg,#e0526f,#f0844d)}
 .tutor-talk-button.is-listening .tutor-talk-ring{opacity:1;animation:tutorTalkPulse 1.4s ease-out infinite}
-.tutor-talk-button.is-thinking{background:linear-gradient(160deg,#1f9d6f,#3d7de0)}
-.tutor-talk-hint{margin:0;font:600 .78rem/1.3 -apple-system,system-ui,sans-serif;color:var(--text,#11172a);background:var(--panel,#fff);padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e6ebf2)}
+.tutor-talk-button.is-thinking{background:linear-gradient(160deg,#1f9d6f,#8C2233)}
+.tutor-talk-hint{margin:0;font:600 .78rem/1.3 -apple-system,system-ui,sans-serif;color:var(--text,#1d1114);background:var(--panel,#fff);padding:4px 10px;border-radius:999px;border:1px solid var(--line,#e9dfe1)}
 @keyframes tutorTalkPulse{0%{transform:scale(1);opacity:.65}100%{transform:scale(1.35);opacity:0}}
-.tutor-talk-sheet{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
-.tutor-talk-panel{width:min(480px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#11172a)}
-.tutor-talk-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#3d7de0)}
+.tutor-talk-sheet{position:fixed;inset:0;z-index:75;display:grid;place-items:center;padding:16px;background:rgba(26,12,18,.5)}
+.tutor-talk-panel{width:min(480px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#1d1114)}
+.tutor-talk-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#8C2233)}
 .tutor-talk-panel h2{margin:0}
-.tutor-talk-panel p{margin:0;color:var(--muted,#5f6c80);line-height:1.5}
-.tutor-talk-panel textarea{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line,#e6ebf2);font:inherit;resize:vertical}
+.tutor-talk-panel p{margin:0;color:var(--muted,#6b5a60);line-height:1.5}
+.tutor-talk-panel textarea{width:100%;padding:12px;border-radius:14px;border:1px solid var(--line,#e9dfe1);font:inherit;resize:vertical}
 .tutor-talk-actions{display:flex;gap:9px;justify-content:flex-end}
 .tutor-talk-actions button{min-height:48px;padding:0 18px;border-radius:14px}
 body.daily-locked .tutor-talk-dock{display:none}
