@@ -572,7 +572,7 @@
         return true;
       } catch (_) { return false; }
     }
-    return Object.freeze({ play, stop, warm, close, diagnosticMode: function () { return diagnosticMode; } });
+    return Object.freeze({ play, stop, warm, close });
   }
 
   return Object.freeze({
