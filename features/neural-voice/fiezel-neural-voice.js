@@ -152,7 +152,7 @@
     }
     diag({ phase: 'single_flight_ready', patch: 'm026-single-flight-v1' });
     diag({ phase: 'chunk_policy_ready', policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default', hardChunkChars: appleHardChunkChars || null });
-    diag({ phase: 'prefetch_policy_ready', policy: 'm02547-deferred-reservation-v1' });
+    diag({ phase: 'prefetch_policy_ready', policy: appleStandalone ? 'apple-standalone-macrotask-yield-v1+m02547-deferred-reservation-v1' : 'm02547-deferred-reservation-v1' });
     diag({ phase: 'generation_timeout_policy_ready', policy: proxyWorkerBudgetOnly ? 'proxy-worker-soft-budget-v1' : 'hard-timeout-v1', timeoutMs: generationTimeoutMs || null });
 
     if (appleStandalone && !env.__fiezelNeuralLifecycleDiagInstalled) {
