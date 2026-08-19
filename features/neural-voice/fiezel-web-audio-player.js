@@ -637,6 +637,11 @@
       const current = env.__fiezelWebAudioContext;
       const runtime = env.__fiezelPcmWorkletRuntime;
       if (runtime && (!current || runtime.context === current)) {
+        const pending = Array.from(runtime.pending.values());
+        runtime.pending.clear();
+        pending.forEach((entry) => {
+          try { entry.finish(true); } catch (_) {}
+        });
         try { if (runtime.node && typeof runtime.node.disconnect === 'function') runtime.node.disconnect(); } catch (_) {}
         env.__fiezelPcmWorkletRuntime = null;
         env.__fiezelPcmWorkletPreparing = null;
