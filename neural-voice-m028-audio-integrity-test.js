@@ -84,8 +84,10 @@ assert.match(playerSource, /audioWorklet[^\n]*addModule|addModule[^\n]*audioWork
 assert.match(playerSource, /AudioWorkletNode/, 'player must instantiate AudioWorkletNode');
 assert.match(playerSource, /contextRate\s*===\s*sampleRate/, 'player must require exact source/context rate before worklet routing');
 assert.match(playerSource, /sampleRate,\s*\n\s*samples:/, 'source sample rate must ride with every worklet enqueue');
-assert.match(playerSource, /__fiezelPcmPlaybackEpoch/, 'player must keep a shared playback epoch across player instances');
-assert.match(playerSource, /let activePlaybackEpoch = 0;/, 'each player must bind continuous chunks to its own active utterance epoch');
+assert.match(playerSource, /__fiezelPcmPlaybackEpoch/, 'player must keep a shared playback epoch across Apple player instances');
+assert.match(playerSource, /function playbackEpoch\(\) \{\s*if \(!appleStandalone\) return 0;/,
+  'epoch arbitration must be inert outside Apple standalone so legacy non-Apple playback stays unchanged');
+assert.match(playerSource, /let activePlaybackEpoch = 0;/, 'each Apple player must bind continuous chunks to its own active utterance epoch');
 assert.match(playerSource, /if \(continuous && activePlaybackEpoch > 0\) return activePlaybackEpoch;/,
   'continuous chunks must retain their original utterance epoch instead of adopting a newer global epoch');
 assert.match(playerSource, /epoch < playbackEpoch\(\)/,
