@@ -12,6 +12,7 @@
   // the way in removes the matching onset click.
   const FADE_OUT_S = 0.018;
   const FADE_IN_S = 0.006;
+  const NATURAL_END_FADE_S = 0.008;
   const FADE_OUT_MS = Math.ceil(FADE_OUT_S * 1000) + 8;
 
   function pickSamples(rawAudio) {
@@ -28,19 +29,26 @@
     return Number.isFinite(n) && n >= 8000 && n <= 192000 ? n : 24000;
   }
 
-  // Samples above unity clip inside WebAudio, and clipping is heard as crackle. The
-  // engine's output is normally inside range, so this only ever acts as a guard: it
-  // scales the whole buffer, it never compresses or changes the shape.
+  // Samples above unity clip inside WebAudio, and clipping is heard as crackle. NaN or
+  // Infinity is worse: a malformed worker sample can poison the AudioBuffer even though
+  // a peak scan never sees it. Finite in-range audio is returned by identity; only a
+  // damaged/out-of-range buffer is copied and conditioned.
   function guardClipping(samples) {
     let peak = 0;
+    let hasNonFinite = false;
     for (let i = 0; i < samples.length; i += 1) {
-      const v = samples[i] < 0 ? -samples[i] : samples[i];
+      const sample = Number(samples[i]);
+      if (!Number.isFinite(sample)) { hasNonFinite = true; continue; }
+      const v = sample < 0 ? -sample : sample;
       if (v > peak) peak = v;
     }
-    if (!(peak > 1)) return samples;
-    const scale = 0.98 / peak;
+    if (!hasNonFinite && !(peak > 1)) return samples;
+    const scale = peak > 1 ? 0.98 / peak : 1;
     const out = new Float32Array(samples.length);
-    for (let i = 0; i < samples.length; i += 1) out[i] = samples[i] * scale;
+    for (let i = 0; i < samples.length; i += 1) {
+      const sample = Number(samples[i]);
+      out[i] = Number.isFinite(sample) ? sample * scale : 0;
+    }
     return out;
   }
 
@@ -96,6 +104,26 @@
       return false;
     }
 
+    // Natural completion used to rely on the model ending exactly on zero. Most lines do,
+    // but one non-zero tail sample is enough to click when AudioBufferSourceNode falls to
+    // digital silence. Schedule a tiny end ramp as insurance; supersession cancels it and
+    // installs the longer explicit-stop fade below.
+    function scheduleNaturalEndFade(node, ctx, durationSeconds) {
+      if (!node || !node.gain || !(durationSeconds > FADE_IN_S + NATURAL_END_FADE_S)) return false;
+      const param = node.gain;
+      const now = ctx && typeof ctx.currentTime === 'number' ? ctx.currentTime : 0;
+      const endAt = now + durationSeconds;
+      const fadeAt = endAt - NATURAL_END_FADE_S;
+      try {
+        if (typeof param.setValueAtTime === 'function' && typeof param.linearRampToValueAtTime === 'function') {
+          param.setValueAtTime(1, fadeAt);
+          param.linearRampToValueAtTime(0, endAt);
+          return true;
+        }
+      } catch (_) {}
+      return false;
+    }
+
     // Fade the node out, then stop it once the ramp has run. Stopping immediately is
     // what produced the click; stopping late enough for the ramp to finish is what
     // removes it. The stop is still guarded because a source may already have ended.
@@ -127,6 +155,7 @@
         localSource.connect(localGain);
         localGain.connect(current.destination);
         rampGain(localGain, current, 0, 1, FADE_IN_S);
+        scheduleNaturalEndFade(localGain, current, samples.length / sampleRate);
       } else {
         localSource.connect(current.destination);
       }

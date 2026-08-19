@@ -112,15 +112,19 @@ function fakeService(options) {
     assert.strictEqual(calls.length, 2, 'after stop the line is generated fresh');
   });
 
-  await test('the library warms the next sentence while the current one plays', () => {
-    assert.match(libSrc, /function warmNext\(\)/, 'the reader warms ahead');
+  await test('the library warms the next sentence after the live line has first claim on the engine', () => {
+    assert.match(libSrc, /function warmNext\(token\)/, 'the reader warms ahead with cancellation identity');
     assert.match(libSrc, /runtime\.prefetch\(upcoming\.en/, 'it warms the NEXT sentence');
-    // Order matters: speak first, then warm, so the warm request lands during playback.
+    const warm = libSrc.slice(libSrc.indexOf('function warmNext(token)'), libSrc.indexOf('\n  function stopNarration'));
+    assert.match(warm, /setTimeout\(function \(\)/,
+      'warming crosses a task boundary so public async wrappers cannot invert the engine queue');
+    // Order still matters inside the loop: the requested line is dispatched first, then
+    // speculative work is scheduled, and playback remains the window that hides warming.
     const loop = libSrc.slice(libSrc.indexOf('async function narrate'));
-    assert.ok(loop.indexOf('var speaking = speak(sentence.en)') < loop.indexOf('warmNext()'),
-      'playback starts before warming, or the warm would block the line being read');
-    assert.ok(loop.indexOf('warmNext()') < loop.indexOf('await speaking'),
-      'and the warm is issued before waiting on playback');
+    assert.ok(loop.indexOf('var speaking = speak(sentence.en)') < loop.indexOf('warmNext(token)'),
+      'the requested sentence dispatches before speculative warming');
+    assert.ok(loop.indexOf('warmNext(token)') < loop.indexOf('await speaking'),
+      'warming is scheduled before waiting for playback to complete');
     assert.match(bootSrc, /prefetch,/, 'the runtime exposes it');
   });
 
