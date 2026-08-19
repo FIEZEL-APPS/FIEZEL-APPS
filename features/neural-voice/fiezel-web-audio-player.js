@@ -204,6 +204,23 @@
     let queued = [];
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+    function playbackEpoch() {
+      return Math.max(0, Math.floor(Number(env.__fiezelPcmPlaybackEpoch) || 0));
+    }
+
+    function reservePlaybackEpoch(continuous) {
+      let epoch = playbackEpoch();
+      if (!continuous || !epoch) epoch += 1;
+      env.__fiezelPcmPlaybackEpoch = epoch;
+      return epoch;
+    }
+
+    function advancePlaybackEpoch() {
+      const epoch = playbackEpoch() + 1;
+      env.__fiezelPcmPlaybackEpoch = epoch;
+      return epoch;
+    }
+
     function sink() {
       const module = env.FiezelVoiceDiagnostics;
       return module && typeof module.begin === 'function' ? module : null;
@@ -355,7 +372,7 @@
       return promise;
     }
 
-    function stopAll(ctx) {
+    function stopAll(ctx, epoch) {
       const pending = queued.slice();
       const workletRuntimes = new Set();
       queued = [];
@@ -375,6 +392,7 @@
         try {
           runtime.node.port.postMessage({
             type: 'clear',
+            epoch: Math.max(playbackEpoch(), Math.floor(Number(epoch) || 0)),
             fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * Number(ctx && ctx.sampleRate || PREFERRED_SAMPLE_RATE)))
           });
         } catch (_) {}
@@ -389,7 +407,7 @@
       return Math.max(until, contextTime(ctx));
     }
 
-    function playViaWorklet(current, runtime, samples, sampleRate, startAt, gapSeconds) {
+    function playViaWorklet(current, runtime, samples, sampleRate, startAt, gapSeconds, epoch) {
       const sequence = (Number(env.__fiezelPcmWorkletSequence) || 0) + 1;
       env.__fiezelPcmWorkletSequence = sequence;
       const id = 'm028-pcm-' + sequence.toString(36);
@@ -407,6 +425,7 @@
       const entry = {
         kind: 'worklet',
         id,
+        epoch,
         runtime,
         node: runtime.node,
         gain: null,
@@ -434,6 +453,8 @@
         runtime.node.port.postMessage({
           type: 'enqueue',
           id,
+          epoch,
+          sampleRate,
           samples: transferable,
           gapFrames: Math.max(0, Math.round(gapSeconds * sampleRate)),
           fadeInFrames: Math.max(1, Math.round(FADE_IN_S * sampleRate)),
@@ -453,9 +474,11 @@
         diagnosticMode,
         stop() {
           if (entry.settled) return;
+          const stopEpoch = advancePlaybackEpoch();
           try {
             runtime.node.port.postMessage({
               type: 'clear',
+              epoch: stopEpoch,
               fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * sampleRate))
             });
           } catch (_) {}
@@ -467,6 +490,8 @@
     async function play(rawAudio, options) {
       const opts = options || {};
       if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
+      const continuous = opts.continuous === true;
+      const epoch = reservePlaybackEpoch(continuous);
       let samples = pickSamples(rawAudio);
       if (!samples || !samples.length) throw new Error('Unsupported Kokoro audio payload');
       const sampleRate = pickSampleRate(rawAudio);
@@ -503,16 +528,19 @@
       }
 
       const now = contextTime(current);
-      const continuous = opts.continuous === true;
       const gapSeconds = Math.max(0, Number(opts.gapMs) || 0) / 1000;
       const startAt = continuous ? scheduledUntil(current) + gapSeconds : now;
-      if (!continuous) stopAll(current);
+      if (!continuous) stopAll(current, epoch);
 
       if (pcmWorklet) {
+        if (epoch < playbackEpoch()) {
+          throw new Error('TTS playback superseded');
+        }
         if (diagnosticMode) recordDiagnostic({ playbackPath: 'audio-worklet', sourceSampleRate: sampleRate, contextSampleRate: contextRate });
-        return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0);
+        return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0, epoch);
       }
 
+      if (epoch < playbackEpoch()) throw new Error('TTS playback superseded');
       const buffer = current.createBuffer(1, samples.length, sampleRate);
       buffer.copyToChannel(samples, 0);
       const localSource = current.createBufferSource();
@@ -541,6 +569,7 @@
       };
       const entry = {
         kind: 'legacy',
+        epoch,
         node: localSource,
         gain: localGain,
         endsAt: startAt + durationSeconds,
@@ -568,6 +597,7 @@
         diagnosticMode,
         stop() {
           if (entry.settled) return;
+          advancePlaybackEpoch();
           entry.settled = true;
           queued = queued.filter((item) => item !== entry);
           if (source === localSource) { source = null; sourceGain = null; }
@@ -580,11 +610,22 @@
 
     function stop() {
       const ctx = env.__fiezelWebAudioContext;
-      if (queued.length) { stopAll(ctx); return; }
+      const epoch = advancePlaybackEpoch();
+      if (queued.length) { stopAll(ctx, epoch); return; }
       if (source) {
         fadeAndStop(source, sourceGain, ctx);
         source = null;
         sourceGain = null;
+      }
+      const runtime = env.__fiezelPcmWorkletRuntime;
+      if (runtime && runtime.node && runtime.node.port) {
+        try {
+          runtime.node.port.postMessage({
+            type: 'clear',
+            epoch,
+            fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * Number(ctx && ctx.sampleRate || PREFERRED_SAMPLE_RATE)))
+          });
+        } catch (_) {}
       }
     }
 
@@ -593,12 +634,6 @@
       const current = env.__fiezelWebAudioContext;
       const runtime = env.__fiezelPcmWorkletRuntime;
       if (runtime && (!current || runtime.context === current)) {
-        try {
-          if (runtime.node && runtime.node.port) runtime.node.port.postMessage({
-            type: 'clear',
-            fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * Number(current && current.sampleRate || PREFERRED_SAMPLE_RATE)))
-          });
-        } catch (_) {}
         try { if (runtime.node && typeof runtime.node.disconnect === 'function') runtime.node.disconnect(); } catch (_) {}
         env.__fiezelPcmWorkletRuntime = null;
         env.__fiezelPcmWorkletPreparing = null;
