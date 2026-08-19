@@ -1,0 +1,48 @@
+name: M028 Production Deploy Smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/m028-deploy-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify deployed Pages bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://fitrajft-ux.github.io/FIEZEL-APPS'
+          rev='a0f9dc04784e3420971049c16f7fcde9f78f4f6c'
+          ok=0
+          for attempt in $(seq 1 18); do
+            echo "Production probe attempt ${attempt}"
+            if curl --fail --silent --show-error --location --max-time 20 \
+              -H 'Cache-Control: no-cache' \
+              "${base}/sw.js?m028=${rev}-${attempt}" -o /tmp/live-sw.js \
+              && grep -Fq "m025-49-audio-integrity-20260819-1" /tmp/live-sw.js \
+              && grep -Fq "features/neural-voice/fiezel-pcm-renderer-worklet.js" /tmp/live-sw.js \
+              && curl --fail --silent --show-error --location --max-time 20 \
+                -H 'Cache-Control: no-cache' \
+                "${base}/features/neural-voice/fiezel-pcm-renderer-worklet.js?m028=${rev}-${attempt}" -o /tmp/live-worklet.js \
+              && grep -Fq "registerProcessor('fiezel-pcm-renderer'" /tmp/live-worklet.js; then
+              ok=1
+              break
+            fi
+            sleep 10
+          done
+          if [[ "${ok}" != 1 ]]; then
+            echo 'Production Pages did not expose the M028 release bytes.' >&2
+            echo 'Observed sw.js header:' >&2
+            head -n 12 /tmp/live-sw.js 2>/dev/null || true
+            exit 1
+          fi
+          echo "M028_PRODUCTION_DEPLOYED_SHA=${rev}"
+          grep -F "m025-49-audio-integrity-20260819-1" /tmp/live-sw.js | head -n 1
+          grep -F "registerProcessor('fiezel-pcm-renderer'" /tmp/live-worklet.js | tail -n 1
