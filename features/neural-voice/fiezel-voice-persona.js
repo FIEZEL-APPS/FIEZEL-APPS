@@ -1,15 +1,22 @@
 /**
- * m025-42 voice persona — the tutor's two speaking registers.
+ * m025-42 voice persona — the tutor's two speaking registers, now on ONE voice.
  *
  * OWNER listened to the m025-42 audition kit and picked two deliveries by name:
  *
  *   R2-sid2_GENZ-energetic_S2_ajar  -> sid 2, speed 1.12, pitch 1.03   (explaining)
  *   R2-sid5_GENZ-max_S4_pujian      -> sid 5, speed 1.18, pitch 1.05   (praise / hype)
  *
- * Those exact numbers are the product decision, so they are stated here once and
- * nothing else is allowed to invent its own. The two personas are deliberately
- * different speakers: a lesson that never changes voice is the "bosan" OWNER asked
- * us to fix, and switching register at a praise line is what a human tutor does.
+ * Those exact speeds are the product decision, so they are stated here once and
+ * nothing else is allowed to invent its own.
+ *
+ * m028-3: OWNER has since removed sid 5 — the male voice — leaving a single female
+ * voice (#12 comments 5341955364, 5342087389). A VOICE is a speaker id, so what was
+ * removed is the speaker: both registers now speak as sid 2. The register itself is
+ * kept, because the reason for it survives the change - a lesson delivered at one
+ * unvarying rate is the "bosan" OWNER asked us to fix, and lifting the delivery at a
+ * praise line is what a human tutor does. It is now a change of pace, not of person.
+ *
+ * sid 5 must not reappear here. Reintroducing it would restore the removed voice.
  *
  * Measured note kept as a warning, not a rule to re-derive: pushing beyond roughly
  * speed 1.18 / pitch 1.05 COMPRESSES the contour instead of energising it (the
@@ -30,7 +37,8 @@
     // Penjelasan: the register a learner hears most, so it is the calmer of the two.
     ajar: Object.freeze({ id: 'ajar', sid: 2, speed: 1.12, pitch: 1.03, label: 'Tutor ceria' }),
     // Sapaan, pujian, transisi: short lines, allowed to be brighter and faster.
-    hype: Object.freeze({ id: 'hype', sid: 5, speed: 1.18, pitch: 1.05, label: 'Tutor hype' })
+    // m028-3: same speaker as `ajar` by OWNER decision; only the delivery lifts.
+    hype: Object.freeze({ id: 'hype', sid: 2, speed: 1.18, pitch: 1.05, label: 'Tutor hype' })
   });
 
   var DEFAULT_PERSONA = 'ajar';
@@ -100,6 +108,8 @@
     return Object.freeze({
       // Product-facing ids. id_natural is retained so stored learner preferences
       // and the Indonesian bundle contract keep resolving after the engine change.
+      // All three resolve to the single remaining voice, so a learner whose stored
+      // preference is `tutor_hype` keeps working instead of landing on a removed speaker.
       id_natural: PERSONAS.ajar.sid,
       tutor_ajar: PERSONAS.ajar.sid,
       tutor_hype: PERSONAS.hype.sid

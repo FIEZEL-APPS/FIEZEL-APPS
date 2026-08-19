@@ -4,7 +4,9 @@
 //
 // OWNER's choice, verbatim from the audition kit:
 //   R2-sid2_GENZ-energetic_S2_ajar  -> explaining lines: sid 2, speed 1.12, pitch 1.03
-//   R2-sid5_GENZ-max_S4_pujian      -> praise lines:     sid 5, speed 1.18, pitch 1.05
+//   R2-sid5_GENZ-max_S4_pujian      -> praise lines:     speed 1.18, pitch 1.05
+// m028-3: OWNER removed sid 5 (the male voice). Both registers now speak as sid 2, so the
+// praise line is a change of pace rather than a change of person.
 const assert = require('assert');
 const fs = require('fs');
 
@@ -26,7 +28,27 @@ test('the two personas keep the exact numbers OWNER approved', () => {
     { sid: 2, speed: 1.12, pitch: 1.03 });
   assert.deepStrictEqual(
     { sid: Persona.PERSONAS.hype.sid, speed: Persona.PERSONAS.hype.speed, pitch: Persona.PERSONAS.hype.pitch },
-    { sid: 5, speed: 1.18, pitch: 1.05 });
+    { sid: 2, speed: 1.18, pitch: 1.05 });
+});
+
+// m028-3: OWNER removed sid 5, the male voice, leaving one female voice.
+// This is a product decision, so it is pinned rather than left to be re-derived.
+test('only one Indonesian voice remains, and it is not sid 5', () => {
+  const sids = Object.keys(Persona.PERSONAS).map((key) => Persona.PERSONAS[key].sid);
+  assert.ok(sids.length >= 2, 'both delivery registers must still exist');
+  assert.strictEqual(new Set(sids).size, 1, 'every persona must speak as the same single voice');
+  assert.ok(!sids.includes(5), 'sid 5 is the removed voice and must not reappear');
+
+  const map = Persona.voiceSids();
+  const mapped = new Set(Object.keys(map).map((key) => map[key]));
+  assert.strictEqual(mapped.size, 1, 'every product voice id must resolve to the one remaining voice');
+  assert.ok(!mapped.has(5), 'no stored preference may resolve to the removed voice');
+  // A learner whose saved preference is tutor_hype must keep working.
+  assert.strictEqual(map.tutor_hype, map.id_natural);
+  assert.strictEqual(map.tutor_ajar, map.id_natural);
+
+  const source = require('fs').readFileSync('./features/neural-voice/fiezel-voice-persona.js', 'utf8');
+  assert.ok(!/sid:\s*5\b/.test(source), 'the persona table must not declare sid 5');
 });
 
 test('praise and greeting lines route to the hype persona', () => {
@@ -188,7 +210,7 @@ async function asyncTest(name, fn) {
     assert.strictEqual(enSteps, idSteps, 'English and Indonesian must ask for the same steps');
   });
 
-  await asyncTest('a praise line is spoken by the hype speaker, an explanation by the other', async () => {
+  await asyncTest('a praise line and an explanation are spoken by the SAME single voice', async () => {
     const hype = fakeEngine({ generationLang: 'id', usePersona: true, padBetweenPhrases: false, naturalSpeed: 1 });
     await hype.adapter.generate('Wih, keren banget!', { lang: 'id-ID' });
     assert.strictEqual(hype.posted[0].genConfig.sid, Persona.PERSONAS.hype.sid);
