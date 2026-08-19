@@ -90,6 +90,7 @@ jobs:
           node m02542-experience-test.js
           node library-test.js
           node m02545-repair-test.js
+          node neural-voice-playback-fade-test.js
           node neural-voice-m02542-persona-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
