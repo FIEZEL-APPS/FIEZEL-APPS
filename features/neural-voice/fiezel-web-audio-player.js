@@ -5,46 +5,24 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // m025-45: a bare source.stop() in the middle of a waveform is a step discontinuity,
-  // and a step discontinuity is a click. Every superseded line used to end on one -
-  // the device diagnostic shows a 5.6s chunk cut at 631ms and another at 2787ms, each
-  // one an audible pop. An 18ms ramp removes the click without eating speech; 6ms on
-  // the way in removes the matching onset click.
   const FADE_OUT_S = 0.018;
   const FADE_IN_S = 0.006;
   const NATURAL_END_FADE_S = 0.008;
   const FADE_OUT_MS = Math.ceil(FADE_OUT_S * 1000) + 8;
-
-  // m025-48. The engine renders at 44.1 kHz (vendor/supertonic-3/tts.json: ae.sample_rate).
-  // Asking the context for that rate means the common case plays the PCM the model
-  // produced, sample for sample, with no rate conversion between the vocoder and the
-  // speaker. When the device cannot open a context at that rate the constructor throws
-  // and we fall back, so this is a preference, never a requirement.
   const PREFERRED_SAMPLE_RATE = 44100;
-  // 'playback' asks for the largest render buffer the platform is willing to give.
-  // Speech here is always pre-rendered - there is no live input to keep in sync with -
-  // so the ~200ms of extra output latency buys the one thing that matters: a buffer deep
-  // enough that a main-thread hiccup no longer starves the audio callback. A starved
-  // callback is a dropout, and a dropout is the crackle in OWNER's report.
   const LATENCY_HINT = 'playback';
-
-  // m026-1: A/B diagnostic is deliberately opt-in. With no query parameter the player
-  // executes the exact m025-48 path and pays no sample-scanning telemetry cost.
-  // `raw` bypasses only conditionSamples(); trimming, fades, scheduling and AudioContext
-  // stay identical, so the listening comparison isolates vocoder PCM vs conditioning.
   const PCM_DIAGNOSTIC_PARAM = 'fiezelPcmMode';
   const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned']);
+  const PCM_WORKLET_MODULE_URL = './features/neural-voice/fiezel-pcm-renderer-worklet.js';
 
-  // Conditioning thresholds. Each one is deliberately conservative: audio that is already
-  // clean must come back untouched, so nothing here can dull a good render.
-  const PEAK_CEILING = 0.97;         // WebAudio clips at 1.0; this keeps true-peak headroom
-  const DC_LIMIT = 0.003;            // below this an offset is inaudible and not worth a copy
-  const DC_BLOCKS = 8;               // a real offset holds across the whole line, a waveform does not
-  const IMPULSE_MIN_JUMP = 0.25;     // a spike smaller than this is ordinary waveform
-  const IMPULSE_RATIO = 6;           // how far above its own neighbourhood a sample must stand
-  const IMPULSE_WINDOW = 20;         // samples either side that define "its own neighbourhood"
-  const SILENCE_FLOOR = 0.0025;      // model-emitted lead-in/tail-out is below this
-  const TRIM_KEEP_S = 0.012;         // leave a little air so a trim never clips a plosive
+  const PEAK_CEILING = 0.97;
+  const DC_LIMIT = 0.003;
+  const DC_BLOCKS = 8;
+  const IMPULSE_MIN_JUMP = 0.25;
+  const IMPULSE_RATIO = 6;
+  const IMPULSE_WINDOW = 20;
+  const SILENCE_FLOOR = 0.0025;
+  const TRIM_KEEP_S = 0.012;
 
   function pickSamples(rawAudio) {
     if (!rawAudio) return null;
@@ -89,7 +67,7 @@
       finite += 1;
       sum += value;
       sumSquares += value * value;
-      const magnitude = value < 0 ? -value : value;
+      const magnitude = Math.abs(value);
       if (magnitude > peak) peak = magnitude;
       if (magnitude > 1) clipped += 1;
     }
@@ -107,18 +85,13 @@
     });
   }
 
-  // Samples above unity clip inside WebAudio, and clipping is heard as crackle. NaN or
-  // Infinity is worse: a malformed worker sample can poison the AudioBuffer even though
-  // a peak scan never sees it. Finite in-range audio is returned by identity; only a
-  // damaged/out-of-range buffer is copied and conditioned.
   function guardClipping(samples) {
     let peak = 0;
     let hasNonFinite = false;
     for (let i = 0; i < samples.length; i += 1) {
       const sample = Number(samples[i]);
       if (!Number.isFinite(sample)) { hasNonFinite = true; continue; }
-      const v = sample < 0 ? -sample : sample;
-      if (v > peak) peak = v;
+      peak = Math.max(peak, Math.abs(sample));
     }
     if (!hasNonFinite && !(peak > 1)) return samples;
     const scale = peak > 1 ? 0.98 / peak : 1;
@@ -130,28 +103,6 @@
     return out;
   }
 
-  /**
-   * m025-48 conditioning, the three defects an int8 vocoder actually ships.
-   *
-   * guardClipping above only ever reacted to a peak strictly above 1.0. That covers a
-   * blown buffer and nothing else, and the crackle OWNER can still hear is not a blown
-   * buffer - it is smaller and structural:
-   *
-   *   1. DC offset. A quantised decoder tail rarely sits on zero. A constant offset costs
-   *      headroom, and every start and stop of an offset waveform is a step, which is the
-   *      click the fades were added to hide rather than remove.
-   *   2. Isolated impulses. int8 weights occasionally produce a single sample that is
-   *      nowhere near its neighbours. One sample is a full-band transient - the textbook
-   *      definition of a click - and it survives every fade because it is nowhere near
-   *      an edge. It is detected here by the only property that separates it from real
-   *      speech: its two neighbours agree with each other and disagree with it.
-   *   3. No headroom. A render peaking at 0.999 has no room for the reconstruction
-   *      overshoot that any later resampling stage introduces, so it clips downstream of
-   *      us where nothing can guard it.
-   *
-   * Audio with none of these is returned by identity, so a clean render is never copied,
-   * never rescaled and never dulled.
-   */
   function conditionSamples(samples) {
     if (!samples || !samples.length) return samples;
     const length = samples.length;
@@ -162,8 +113,7 @@
       const value = Number(samples[i]);
       if (!Number.isFinite(value)) { hasNonFinite = true; continue; }
       sum += value;
-      const magnitude = value < 0 ? -value : value;
-      if (magnitude > peak) peak = magnitude;
+      peak = Math.max(peak, Math.abs(value));
     }
     const offset = hasNonFinite ? 0 : sum / length;
     const impulses = hasNonFinite ? [] : findImpulses(samples);
@@ -176,33 +126,16 @@
       const value = Number(samples[i]);
       out[i] = Number.isFinite(value) ? value - (needsOffset ? offset : 0) : 0;
     }
-    // Repaired from the original neighbours, so two impulses close together cannot chain
-    // into a smoothed run of real audio.
     impulses.forEach((index) => { out[index] = (out[index - 1] + out[index + 1]) / 2; });
     let repairedPeak = 0;
-    for (let i = 0; i < length; i += 1) {
-      const magnitude = out[i] < 0 ? -out[i] : out[i];
-      if (magnitude > repairedPeak) repairedPeak = magnitude;
-    }
+    for (let i = 0; i < length; i += 1) repairedPeak = Math.max(repairedPeak, Math.abs(out[i]));
     if (repairedPeak > PEAK_CEILING) {
-      // A single linear scale, so the waveform is attenuated and never reshaped: a
-      // dynamics processor here would change the voice, which is not what we are fixing.
       const scale = PEAK_CEILING / repairedPeak;
       for (let i = 0; i < length; i += 1) out[i] *= scale;
     }
     return out;
   }
 
-  /**
-   * Distinguishes an offset from an average.
-   *
-   * The mean of any short window of speech is non-zero simply because the window does not
-   * contain a whole number of cycles - a 220 Hz tone measured over 2048 samples averages
-   * to about 0.008 while sitting perfectly on zero. Subtracting that is not a repair, and
-   * treating it as one would copy and shift every buffer that passes through here. A real
-   * DC offset is the one that holds its sign and size across the whole line, so that is
-   * what is tested.
-   */
   function isSustainedOffset(samples, offset) {
     const size = Math.floor(samples.length / DC_BLOCKS);
     if (size < 8) return false;
@@ -217,25 +150,10 @@
     return true;
   }
 
-  /**
-   * How far a sample sits from the straight line between its neighbours. Zero for a ramp,
-   * proportional to the signal for a smooth waveform, enormous for a single bad sample.
-   */
   function deviation(samples, i) {
-    const value = samples[i] - (samples[i - 1] + samples[i + 1]) / 2;
-    return value < 0 ? -value : value;
+    return Math.abs(samples[i] - (samples[i - 1] + samples[i + 1]) / 2);
   }
 
-  /**
-   * Finds the samples that are artefacts rather than audio.
-   *
-   * "Far from its neighbours" alone is not enough to tell the two apart: at 6 kHz a
-   * full-amplitude waveform turns around in seven samples, so the sample at its own peak
-   * is legitimately far from the line between the two beside it. What separates a click is
-   * that it stands far above ITS OWN neighbourhood - the surrounding samples are behaving
-   * while it is not - and that it is the peak of that disturbance rather than one of the
-   * two samples the disturbance drags with it.
-   */
   function findImpulses(samples) {
     const found = [];
     const last = samples.length - 2;
@@ -249,27 +167,15 @@
       let sum = 0;
       let count = 0;
       for (let k = from; k <= to; k += 1) {
-        // i and the two samples the spike drags with it say nothing about the neighbourhood.
         if (k >= i - 1 && k <= i + 1) continue;
         sum += deviation(samples, k);
         count += 1;
       }
-      if (!count) continue;
-      if (magnitude > IMPULSE_RATIO * (sum / count)) found.push(i);
+      if (count && magnitude > IMPULSE_RATIO * (sum / count)) found.push(i);
     }
     return found;
   }
 
-  /**
-   * Drops the silence the model puts either side of a render.
-   *
-   * Only used when one utterance is played as a sequence of separately rendered
-   * sentences. Each render carries its own lead-in and tail-out, so butting two of them
-   * together produces a double pause: the model's tail, then the model's head, then
-   * whatever gap the sentence actually calls for. Trimming both edges puts that timing
-   * back under prosody's control, which is what makes the rhythm sound spoken rather
-   * than assembled.
-   */
   function trimSilence(samples, sampleRate) {
     if (!samples || !samples.length) return samples;
     const rate = Number(sampleRate) > 0 ? Number(sampleRate) : PREFERRED_SAMPLE_RATE;
@@ -291,13 +197,12 @@
     const preferredRate = Number(settings.sampleRate) > 0 ? Number(settings.sampleRate) : PREFERRED_SAMPLE_RATE;
     const AudioContextCtor = env.AudioContext || env.webkitAudioContext;
     const diagnosticMode = pcmDiagnosticMode(env, settings);
+    const appleStandalone = Boolean(env && env.navigator && env.navigator.standalone === true);
+    const WorkletNodeCtor = env.AudioWorkletNode || (typeof AudioWorkletNode !== 'undefined' ? AudioWorkletNode : null);
     let source = null;
     let sourceGain = null;
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    // Everything currently scheduled, in the order it will be heard. A queued line is
-    // audio the learner has not heard yet, so stop() has to reach it too.
     let queued = [];
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     function sink() {
       const module = env.FiezelVoiceDiagnostics;
@@ -317,21 +222,12 @@
       } catch (_) { return false; }
     }
 
-    // Satu AudioContext per env, bukan per pemanggilan createPlayer().
-    // warmWebAudio() di audibility-fix memanggil createPlayer(root) BARU pada
-    // setiap speak() dan browserSpeakImmediate(); warmAudioGesture() dan
-    // initialize() di bootstrap juga. Sebelum ini tiap player memegang context
-    // lokalnya sendiri, jadi satu sesi bicara bisa membuat beberapa AudioContext.
-    // WebKit membatasi jumlah AudioContext hidup per halaman -- begitu batas
-    // tercapai konstruktornya melempar dan seluruh jalur audio mati, termasuk
-    // fallback browser. Menyimpannya di env membuat semua pemanggil berbagi satu.
     function constructContext() {
-      // Options first, bare constructor last: an engine that rejects either the rate or
-      // the latency hint must still end up with a working context rather than no audio.
       try { return new AudioContextCtor({ latencyHint: LATENCY_HINT, sampleRate: preferredRate }); } catch (_) {}
       try { return new AudioContextCtor({ latencyHint: LATENCY_HINT }); } catch (_) {}
       return new AudioContextCtor();
     }
+
     function ensureContext() {
       if (!AudioContextCtor) return null;
       if (!env.__fiezelWebAudioContext) env.__fiezelWebAudioContext = constructContext();
@@ -355,8 +251,6 @@
       try { return ctx.createGain(); } catch (_) { return null; }
     }
 
-    // Ramps when the context supports scheduling, assigns when it does not, so a
-    // stub context (tests, exotic WebViews) still plays instead of throwing.
     function rampGain(node, ctx, from, to, seconds, at) {
       if (!node || !node.gain) return false;
       const param = node.gain;
@@ -373,10 +267,6 @@
       return false;
     }
 
-    // Natural completion used to rely on the model ending exactly on zero. Most lines do,
-    // but one non-zero tail sample is enough to click when AudioBufferSourceNode falls to
-    // digital silence. Schedule a tiny end ramp as insurance; supersession cancels it and
-    // installs the longer explicit-stop fade below.
     function scheduleNaturalEndFade(node, ctx, durationSeconds, startAt) {
       if (!node || !node.gain || !(durationSeconds > FADE_IN_S + NATURAL_END_FADE_S)) return false;
       const param = node.gain;
@@ -393,49 +283,187 @@
       return false;
     }
 
-    // Fade the node out, then stop it once the ramp has run. Stopping immediately is
-    // what produced the click; stopping late enough for the ramp to finish is what
-    // removes it. The stop is still guarded because a source may already have ended.
     function fadeAndStop(node, gain, ctx) {
       if (!node) return;
-      const ramped = rampGain(gain, ctx, gain && gain.gain && typeof gain.gain.value === 'number' ? gain.gain.value : 1, 0, FADE_OUT_S);
+      const value = gain && gain.gain && typeof gain.gain.value === 'number' ? gain.gain.value : 1;
+      const ramped = rampGain(gain, ctx, value, 0, FADE_OUT_S);
       if (!ramped) { try { node.stop(); } catch (_) {} return; }
       setTimeout(() => { try { node.stop(); } catch (_) {} }, FADE_OUT_MS);
     }
 
-    /** Fades out and forgets every line that is playing or waiting its turn. */
+    function finishLegacyEntry(entry) {
+      if (!entry || entry.settled) return;
+      entry.settled = true;
+      queued = queued.filter((item) => item !== entry);
+      if (source === entry.node) { source = null; sourceGain = null; }
+      entry.release();
+      entry.resolve();
+    }
+
+    function failWorkletRuntime(runtime, reason) {
+      if (!runtime || runtime.failed) return;
+      runtime.failed = true;
+      const pending = Array.from(runtime.pending.values());
+      runtime.pending.clear();
+      pending.forEach((entry) => {
+        try { entry.finish(true); } catch (_) {}
+      });
+      try { if (runtime.node && typeof runtime.node.disconnect === 'function') runtime.node.disconnect(); } catch (_) {}
+      if (env.__fiezelPcmWorkletRuntime === runtime) env.__fiezelPcmWorkletRuntime = null;
+      env.__fiezelPcmWorkletFailedContext = runtime.context;
+      if (diagnosticMode) recordDiagnostic({ playbackPath: 'legacy', workletFallback: String(reason || 'processor_error') });
+    }
+
+    async function preparePcmWorklet(ctx) {
+      if (!appleStandalone || !ctx || !ctx.audioWorklet || typeof ctx.audioWorklet.addModule !== 'function' || !WorkletNodeCtor) return null;
+      if (env.__fiezelPcmWorkletFailedContext === ctx) return null;
+      const existing = env.__fiezelPcmWorkletRuntime;
+      if (existing && existing.context === ctx && existing.node && !existing.failed) return existing;
+      const preparing = env.__fiezelPcmWorkletPreparing;
+      if (preparing && preparing.context === ctx && preparing.promise) return preparing.promise;
+
+      let promise;
+      promise = (async () => {
+        await ctx.audioWorklet.addModule(PCM_WORKLET_MODULE_URL);
+        const node = new WorkletNodeCtor(ctx, 'fiezel-pcm-renderer', {
+          numberOfInputs: 0,
+          numberOfOutputs: 1,
+          outputChannelCount: [1],
+          channelCount: 1
+        });
+        const runtime = { context: ctx, node, pending: new Map(), failed: false };
+        node.port.onmessage = (event) => {
+          const message = event && event.data || {};
+          const id = String(message.id || '');
+          const entry = runtime.pending.get(id);
+          if (!entry) return;
+          if (message.type === 'done') entry.finish(message.cancelled === true);
+          else if (message.type === 'error') entry.finish(true);
+        };
+        try { node.onprocessorerror = () => failWorkletRuntime(runtime, 'processor_error'); } catch (_) {}
+        node.connect(ctx.destination);
+        env.__fiezelPcmWorkletRuntime = runtime;
+        return runtime;
+      })().catch(() => {
+        env.__fiezelPcmWorkletFailedContext = ctx;
+        return null;
+      }).finally(() => {
+        const active = env.__fiezelPcmWorkletPreparing;
+        if (active && active.promise === promise) env.__fiezelPcmWorkletPreparing = null;
+      });
+      env.__fiezelPcmWorkletPreparing = { context: ctx, promise };
+      return promise;
+    }
+
     function stopAll(ctx) {
       const pending = queued.slice();
+      const workletRuntimes = new Set();
       queued = [];
       pending.forEach((entry) => {
         if (entry.settled) return;
+        if (entry.kind === 'worklet') {
+          workletRuntimes.add(entry.runtime);
+          entry.finish(true);
+          return;
+        }
         entry.settled = true;
         fadeAndStop(entry.node, entry.gain, ctx);
         entry.release();
         entry.resolve();
       });
+      workletRuntimes.forEach((runtime) => {
+        try {
+          runtime.node.port.postMessage({
+            type: 'clear',
+            fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * Number(ctx && ctx.sampleRate || PREFERRED_SAMPLE_RATE)))
+          });
+        } catch (_) {}
+      });
       source = null;
       sourceGain = null;
     }
 
-    /** Context time at which everything already queued finishes. */
     function scheduledUntil(ctx) {
       let until = 0;
       queued.forEach((entry) => { if (!entry.settled && entry.endsAt > until) until = entry.endsAt; });
       return Math.max(until, contextTime(ctx));
     }
 
-    /**
-     * @param {object} rawAudio  PCM from the engine.
-     * @param {object} [options]
-     *   options.continuous  join this line onto whatever is still scheduled instead of
-     *                       superseding it, so a multi-sentence utterance is one
-     *                       uninterrupted stream rather than a series of restarts;
-     *   options.gapMs       the silence to leave before it, which is how prosody sets
-     *                       the length of a breath between sentences;
-     *   options.trim        drop the model's own lead-in/tail-out first, so that gap is
-     *                       the only pause the listener hears.
-     */
+    function playViaWorklet(current, runtime, samples, sampleRate, startAt, gapSeconds) {
+      const sequence = (Number(env.__fiezelPcmWorkletSequence) || 0) + 1;
+      env.__fiezelPcmWorkletSequence = sequence;
+      const id = 'm028-pcm-' + sequence.toString(36);
+      const durationSeconds = samples.length / sampleRate;
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const trace = sink();
+      let holding = false;
+      let timer = null;
+      const release = () => {
+        if (!holding) return;
+        holding = false;
+        try { if (trace) trace.end(env); } catch (_) {}
+      };
+      const entry = {
+        kind: 'worklet',
+        id,
+        runtime,
+        node: runtime.node,
+        gain: null,
+        endsAt: startAt + durationSeconds,
+        settled: false,
+        release,
+        resolve: () => resolveDone()
+      };
+      const finish = (cancelled) => {
+        if (entry.settled) return;
+        entry.settled = true;
+        if (timer) clearTimeout(timer);
+        queued = queued.filter((item) => item !== entry);
+        runtime.pending.delete(id);
+        release();
+        resolveDone({ cancelled: cancelled === true });
+      };
+      entry.finish = finish;
+      runtime.pending.set(id, entry);
+      queued.push(entry);
+      try { if (trace) { trace.begin(); holding = true; } } catch (_) {}
+
+      const transferable = new Float32Array(samples);
+      try {
+        runtime.node.port.postMessage({
+          type: 'enqueue',
+          id,
+          samples: transferable,
+          gapFrames: Math.max(0, Math.round(gapSeconds * sampleRate)),
+          fadeInFrames: Math.max(1, Math.round(FADE_IN_S * sampleRate)),
+          fadeOutFrames: Math.max(1, Math.round(NATURAL_END_FADE_S * sampleRate))
+        }, [transferable.buffer]);
+      } catch (error) {
+        finish(true);
+        failWorkletRuntime(runtime, 'post_message_failed');
+        throw error;
+      }
+      const waitMs = Math.max(1000, Math.round((startAt - contextTime(current) + durationSeconds) * 1000) + 2500);
+      timer = setTimeout(() => finish(false), waitMs);
+      return {
+        done,
+        startsAt: startAt,
+        endsAt: entry.endsAt,
+        diagnosticMode,
+        stop() {
+          if (entry.settled) return;
+          try {
+            runtime.node.port.postMessage({
+              type: 'clear',
+              fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * sampleRate))
+            });
+          } catch (_) {}
+          finish(true);
+        }
+      };
+    }
+
     async function play(rawAudio, options) {
       const opts = options || {};
       if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
@@ -450,25 +478,40 @@
       const current = await resumeContext();
       if (!current) throw new Error('Web Audio API unavailable');
 
+      const contextRate = Number(current.sampleRate) || null;
       if (diagnosticMode) {
         recordDiagnostic({
           sourceSampleRate: sampleRate,
-          contextSampleRate: Number(current.sampleRate) || null,
-          resamplingExpected: Number(current.sampleRate) > 0 && Number(current.sampleRate) !== sampleRate,
+          contextSampleRate: contextRate,
+          resamplingExpected: contextRate > 0 && contextRate !== sampleRate,
           trimmed: opts.trim === true,
           raw: rawStats,
           rendered: renderedStats
         });
       }
 
+      let pcmWorklet = null;
+      if (appleStandalone && contextRate === sampleRate) {
+        pcmWorklet = await preparePcmWorklet(current);
+      } else if (appleStandalone && diagnosticMode) {
+        recordDiagnostic({
+          playbackPath: 'legacy',
+          workletFallback: contextRate && contextRate !== sampleRate ? 'sample_rate_mismatch' : 'worklet_unavailable',
+          sourceSampleRate: sampleRate,
+          contextSampleRate: contextRate
+        });
+      }
+
       const now = contextTime(current);
       const continuous = opts.continuous === true;
       const gapSeconds = Math.max(0, Number(opts.gapMs) || 0) / 1000;
-      // A continuous line starts exactly where the previous one ends, so the seam is a
-      // scheduled boundary rather than a round trip through onended -> generate -> start.
-      // That round trip is what makes an assembled utterance stutter between sentences.
       const startAt = continuous ? scheduledUntil(current) + gapSeconds : now;
       if (!continuous) stopAll(current);
+
+      if (pcmWorklet) {
+        if (diagnosticMode) recordDiagnostic({ playbackPath: 'audio-worklet', sourceSampleRate: sampleRate, contextSampleRate: contextRate });
+        return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0);
+      }
 
       const buffer = current.createBuffer(1, samples.length, sampleRate);
       buffer.copyToChannel(samples, 0);
@@ -497,6 +540,7 @@
         try { if (trace) trace.end(env); } catch (_) {}
       };
       const entry = {
+        kind: 'legacy',
         node: localSource,
         gain: localGain,
         endsAt: startAt + durationSeconds,
@@ -504,19 +548,9 @@
         release,
         resolve: () => resolveDone()
       };
-      const finish = () => {
-        if (entry.settled) return;
-        entry.settled = true;
-        queued = queued.filter((item) => item !== entry);
-        if (source === localSource) { source = null; sourceGain = null; }
-        release();
-        resolveDone();
-      };
+      const finish = () => finishLegacyEntry(entry);
       localSource.onended = finish;
       queued.push(entry);
-      // The trace is held from here until this line is done: every diagnostic written
-      // while a buffer is on the wire would otherwise be a synchronous storage write on
-      // the thread that has to keep the audio callback fed.
       try { if (trace) { trace.begin(); holding = true; } } catch (_) {}
       try {
         if (continuous && startAt > now) localSource.start(startAt);
@@ -553,25 +587,43 @@
         sourceGain = null;
       }
     }
-    // T-023 lifecycle: release the shared AudioContext so a hidden/backgrounded
-    // tab does not keep the neural-voice audio graph alive (WebKit caps live
-    // contexts; close() allows re-init on next speak()).
+
     function close() {
       stop();
       const current = env.__fiezelWebAudioContext;
+      const runtime = env.__fiezelPcmWorkletRuntime;
+      if (runtime && (!current || runtime.context === current)) {
+        try {
+          if (runtime.node && runtime.node.port) runtime.node.port.postMessage({
+            type: 'clear',
+            fadeOutFrames: Math.max(1, Math.round(FADE_OUT_S * Number(current && current.sampleRate || PREFERRED_SAMPLE_RATE)))
+          });
+        } catch (_) {}
+        try { if (runtime.node && typeof runtime.node.disconnect === 'function') runtime.node.disconnect(); } catch (_) {}
+        env.__fiezelPcmWorkletRuntime = null;
+        env.__fiezelPcmWorkletPreparing = null;
+        env.__fiezelPcmWorkletFailedContext = null;
+      }
       if (current) {
         try { if (typeof current.close === 'function') current.close(); } catch (_) {}
         env.__fiezelWebAudioContext = null;
       }
     }
+
     function warm() {
       if (!AudioContextCtor) return false;
       try {
         const current = ensureContext();
-        if (current && current.state === 'suspended' && typeof current.resume === 'function') { try { current.resume().catch(() => {}); } catch (_) {} }
+        if (current && current.state === 'suspended' && typeof current.resume === 'function') {
+          try { current.resume().catch(() => {}); } catch (_) {}
+        }
+        if (appleStandalone) {
+          try { preparePcmWorklet(current).catch(() => {}); } catch (_) {}
+        }
         return true;
       } catch (_) { return false; }
     }
+
     return Object.freeze({ play, stop, warm, close });
   }
 
