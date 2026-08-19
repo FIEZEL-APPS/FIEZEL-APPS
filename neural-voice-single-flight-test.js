@@ -127,18 +127,18 @@ function audio(){return{data:new Float32Array([0,.1]),sampling_rate:24000}}
     });
     const longText=Array.from({length:120},(_,i)=>`word${i}`).join(' ')+'.';
     const result=await service.speak(longText,{allowFallback:false});
-    assert.ok(result.chunks>=8,'Apple standalone long input must be split into substantially smaller inference slices');
+    assert.ok(result.chunks>=20,'Apple standalone long input must be split into substantially smaller inference slices');
     assert.equal(generatedTexts.length,result.chunks);
-    assert.ok(generatedTexts.every(text=>text.length<=80),`Apple adapter input must stay <=80 chars, got ${generatedTexts.map(x=>x.length).join(',')}`);
+    assert.ok(generatedTexts.every(text=>text.length<=32),`Apple adapter input must stay <=32 chars, got ${generatedTexts.map(x=>x.length).join(',')}`);
     const log=diagnostics(env);
     const policy=log.find(x=>x.phase==='chunk_policy_ready');
-    assert.ok(policy&&policy.policy==='apple-standalone-inference-slice-v2','Apple inference-slice policy must be explicitly observable');
-    assert.equal(policy.hardChunkChars,80);
+    assert.ok(policy&&policy.policy==='apple-standalone-inference-slice-v3','Apple inference-slice policy must be explicitly observable');
+    assert.equal(policy.hardChunkChars,32);
     const prefetchPolicy=log.find(x=>x.phase==='prefetch_policy_ready');
     assert.ok(prefetchPolicy&&prefetchPolicy.policy==='apple-standalone-macrotask-yield-v1','Apple prefetch yield policy must be observable');
     const plan=log.find(x=>x.phase==='chunk_plan');
     assert.ok(plan&&plan.chunkCount===result.chunks);
-    assert.ok(plan.maxChunkChars<=80,'chunk plan must expose the bounded maximum without logging text');
+    assert.ok(plan.maxChunkChars<=32,'chunk plan must expose the bounded maximum without logging text');
     assert.equal(log.filter(x=>x.phase==='prefetch_event_loop_yield').length,result.chunks-1,'Apple path must yield once before every next prefetched inference');
   }
 
