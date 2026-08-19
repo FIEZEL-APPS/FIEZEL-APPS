@@ -449,17 +449,16 @@ function sine(length, amplitude, sampleRate, hz) {
       }
       terminate() {}
     }
-    const personas = require('./features/neural-voice/fiezel-voice-persona.js');
     const adapter = Adapter.createSherpaVitsAdapter({
       env: { Worker: FakeWorker },
       basePath: 'vendor/test/',
       expectedSpeakers: 10,
       modelId: 'test-model',
-      voiceSids: personas.voiceSids(),
+      voiceSids: { id_natural: 2, tutor_ajar: 2, tutor_hype: 2 },
       defaultVoice: 'id_natural',
       generationLang: 'id',
-      personas,
-      usePersona: true,
+      personas: null,
+      usePersona: false,
       padBetweenPhrases: false,
       usePitchContour: false,
       naturalSpeed: 1,

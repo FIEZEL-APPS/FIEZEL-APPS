@@ -270,12 +270,14 @@
           // both share the vendored bundle, so the second language costs no download.
           expectedSpeakers:10,
           modelId:'supertonic-3-int8-2026-05-11',
-          voiceSids:root.FiezelVoicePersona?root.FiezelVoicePersona.voiceSids():undefined,
+          // m028-3: see fiezel-supertonic-voice.js. An omitted map falls back to the
+          // adapter's {af_bella:0, af_heart:180}, where 'id_natural' resolves to undefined.
+          voiceSids:{id_natural:2,tutor_ajar:2,tutor_hype:2},
           defaultVoice:'id_natural',
           kind:'supertonic-3',
           generationLang:'en',
-          personas:root.FiezelVoicePersona||null,
-          usePersona:!!root.FiezelVoicePersona,
+          personas:null,
+          usePersona:false,
           // Supertonic emits real breath pauses (0.5-0.7s measured); the synthetic
           // silence the Piper path needed would double them.
           padBetweenPhrases:false,
