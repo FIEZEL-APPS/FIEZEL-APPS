@@ -1,0 +1,92 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+
+const root = __dirname;
+const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+
+const playerSource = read('features/neural-voice/fiezel-web-audio-player.js');
+const voiceSource = read('features/neural-voice/fiezel-neural-voice.js');
+const workletSource = read('features/neural-voice/fiezel-pcm-renderer-worklet.js');
+const swSource = read('sw.js');
+const diagSource = read('features/neural-voice/fiezel-diag-panel.js');
+const qualitySource = read('.github/workflows/quality.yml');
+
+// 1. Worklet registration and full-chunk PCM queue contract.
+let Processor = null;
+const workletMessages = [];
+class FakeAudioWorkletProcessor {
+  constructor() {
+    this.port = {
+      onmessage: null,
+      postMessage(message) { workletMessages.push(message); }
+    };
+  }
+}
+vm.runInNewContext(workletSource, {
+  AudioWorkletProcessor: FakeAudioWorkletProcessor,
+  registerProcessor(name, klass) {
+    assert.equal(name, 'fiezel-pcm-renderer');
+    Processor = klass;
+  },
+  Float32Array,
+  Number,
+  Math,
+  String
+});
+assert.equal(typeof Processor, 'function', 'PCM renderer worklet must register');
+const processor = new Processor();
+processor.handleMessage({
+  type: 'enqueue', id: 'a', samples: new Float32Array([1, 1, 1, 1]),
+  gapFrames: 1, fadeInFrames: 2, fadeOutFrames: 2
+});
+const out = new Float32Array(8);
+assert.equal(processor.process([], [[out]]), true);
+assert.equal(out[0], 0, 'requested gap must render silence');
+assert.ok(out[1] > 0 && out[1] < 1, 'worklet applies fade-in on render thread');
+assert.ok(workletMessages.some(m => m.type === 'done' && m.id === 'a'), 'worklet resolves completed chunk');
+processor.handleMessage({ type: 'enqueue', id: 'b', samples: new Float32Array([0.1, 0.2]) });
+processor.handleMessage({ type: 'clear' });
+assert.ok(workletMessages.some(m => m.type === 'done' && m.id === 'b' && m.cancelled === true), 'clear cancels queued work');
+
+// 2. Player integration must be Apple-standalone-only, warmed/persistent, and rollback-safe.
+assert.match(playerSource, /fiezel-pcm-renderer-worklet\.js/, 'player must load the PCM worklet module');
+assert.match(playerSource, /navigator[^\n]*standalone|standalone[^\n]*navigator/, 'worklet routing must be scoped to Apple standalone');
+assert.match(playerSource, /audioWorklet[^\n]*addModule|addModule[^\n]*audioWorklet/, 'player must prepare AudioWorklet module');
+assert.match(playerSource, /AudioWorkletNode/, 'player must instantiate AudioWorkletNode');
+assert.match(playerSource, /sampleRate[^\n]*(?:===|!==)[^\n]*sampleRate|sourceSampleRate|sample_rate_mismatch/i,
+  'sample-rate mismatch must be explicitly guarded');
+assert.match(playerSource, /createBufferSource\(/, 'legacy AudioBufferSourceNode rollback path must remain');
+assert.match(playerSource, /Object\.freeze\(\{\s*play,\s*stop,\s*warm,\s*close\s*\}\)/,
+  'public player API must remain exactly play/stop/warm/close');
+
+// 3. Apple standalone inference slice default becomes 32 chars; non-Apple has no hard cap.
+const voice = require('./features/neural-voice/fiezel-neural-voice.js');
+const config = {
+  limits: { maxInputChars: 3600, targetChunkWords: 140, hardChunkWords: 190 },
+  fallback: { browserSpeechSynthesis: false },
+  voices: { fiezelPrimary: 'test' }
+};
+const appleService = voice.createVoiceService({ config, env: { navigator: { standalone: true } } });
+const appleChunks = appleService.splitIntoChunks('Satu kalimat yang sengaja dibuat cukup panjang untuk membuktikan bahwa batas karakter Apple standalone benar benar turun menjadi tiga puluh dua karakter.');
+assert.ok(appleChunks.length > 1, 'Apple long input should be sliced');
+assert.ok(Math.max(...appleChunks.map(x => x.length)) <= 32, 'Apple default hard cap must be <=32 chars');
+const normalService = voice.createVoiceService({ config, env: { navigator: { standalone: false } } });
+const normalChunks = normalService.splitIntoChunks('This ordinary non Apple sentence is intentionally longer than thirty two characters but should keep the normal chunk policy unchanged.');
+assert.ok(normalChunks.some(x => x.length > 32), 'non-Apple policy must not inherit the 32-char cap');
+assert.match(voiceSource, /appleHardChunkChars[\s\S]{0,180}(?:32)/, 'source must carry the 32-char Apple default');
+
+// 4. Release and shell coherence.
+assert.match(swSource, /fiezel-pcm-renderer-worklet\.js/, 'worklet must be in service-worker shell assets');
+assert.match(diagSource, /DIAG_BUILD\s*=\s*['"]m025-49['"]/, 'M028 candidate must advance diagnostics to m025-49');
+assert.match(swSource, /SW_REV\s*=\s*['"]m025-49-/, 'M028 SW revision must carry matching m025-49 build');
+assert.match(qualitySource, /node neural-voice-m028-audio-integrity-test\.js/, 'focused M028 test must run in Quality');
+
+// 5. Scope-lock / architecture invariants visible in implementation source.
+assert.match(voiceSource, /SCHEDULE_DEPTH\s*=\s*2/, 'bounded schedule depth must remain 2');
+assert.doesNotMatch(playerSource, /FiezelVoiceRuntime\s*=/, 'player must not mutate FiezelVoiceRuntime contract');
+
+console.log('M028 audio integrity focused acceptance PASS');
