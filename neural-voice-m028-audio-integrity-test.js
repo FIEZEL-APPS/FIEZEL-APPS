@@ -126,8 +126,16 @@ assert.match(voiceSource, /apple-standalone-inference-slice-v3/, 'Apple policy i
 
 // 4. Release and shell coherence. M028 runtime invariants remain; release identity advances with M028.2.
 assert.match(swSource, /fiezel-pcm-renderer-worklet\.js/, 'worklet must be in service-worker shell assets');
-assert.match(diagSource, /DIAG_BUILD\s*=\s*['"]m025-51['"]/, 'M028.2 candidate must advance diagnostics to m025-51');
-assert.match(swSource, /SW_REV\s*=\s*['"]m025-51-/, 'M028.2 SW revision must carry matching m025-51 build');
+// The M028.2 requirement is a FLOOR, not a fixed value: diagnostics must have advanced to
+// m025-51 or beyond, and the shell must carry the same build. Pinning it to exactly m025-51
+// made every later release fail this gate for a reason that has nothing to do with audio
+// integrity. Regressing below the floor, or letting the two markers drift apart, still fails.
+const diagBuildMatch = diagSource.match(/DIAG_BUILD\s*=\s*['"]m025-(\d+)['"]/);
+assert.ok(diagBuildMatch, 'DIAG_BUILD must stay parseable as m025-N');
+assert.ok(Number(diagBuildMatch[1]) >= 51,
+  `M028.2 candidate must keep diagnostics at m025-51 or later (found m025-${diagBuildMatch[1]})`);
+assert.match(swSource, new RegExp(`SW_REV\\s*=\\s*['"]m025-${diagBuildMatch[1]}-`),
+  'SW revision must carry the same build as DIAG_BUILD');
 assert.match(qualitySource, /permissions:\s*\n\s*contents:\s*read/, 'Quality must remain read-only and never implement/push source');
 assert.doesNotMatch(qualitySource, /git\s+push|contents:\s*write|Apply M028 in-scope implementation/,
   'Quality Gate must not mutate or push the candidate branch');
