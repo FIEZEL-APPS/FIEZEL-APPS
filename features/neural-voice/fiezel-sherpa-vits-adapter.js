@@ -69,6 +69,10 @@
     var voiceSids = opts.voiceSids || VOICE_SIDS;
     var defaultVoice = String(opts.defaultVoice || DEFAULT_VOICE);
     var kind = String(opts.kind || 'sherpa-vits-local');
+    // m025-45: pitch contour is a REPAIR for an engine with no intonation of its own.
+    // Supertonic has one, so resampling its output only adds interpolation noise - the
+    // "cracking" OWNER reported. Engines declare whether they need it.
+    var usePitchContour = opts.usePitchContour !== false;
     // m025-37: prosody shaping. Optional so the adapter still works standalone in tests.
     var prosody = opts.prosody || (typeof root !== 'undefined' && root && root.FiezelProsody) || null;
     // m025-42 Supertonic. Three differences from the Piper bundles, all optional so the
@@ -275,7 +279,7 @@
         function step(index) {
           if (index >= units.length) return null;
           var unit = units[index];
-          var shape = prosody && prosody.contour
+          var shape = (usePitchContour && prosody && prosody.contour)
             ? prosody.contour(unit, index, units.length, personaBase)
             : (personaBase || { speed: 1, pitch: 1 });
           var unitSpeed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, speed * shape.speed));
@@ -287,9 +291,8 @@
             var samples = result.samples;
             if (!samples || !samples.length) throw new Error('sherpa_empty_audio');
             rate = result.sampleRate || rate;
-            // Pitch movement between breath groups: the model has no pitch input, so the
-            // register shift is applied to the samples it returned.
-            if (prosody && prosody.resample) samples = prosody.resample(samples, shape.pitch);
+            // Pitch movement between breath groups, for engines that produce none.
+            if (usePitchContour && prosody && prosody.resample) samples = prosody.resample(samples, shape.pitch);
             // Real trailing silence, so consecutive phrases land as separate breath groups
             // instead of being butted together into one continuous stream.
             if (prosody && prosody.padSilence && options.pad !== false && padBetweenPhrases) {

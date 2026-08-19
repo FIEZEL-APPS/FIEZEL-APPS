@@ -270,11 +270,13 @@
           padBetweenPhrases:false,
           // 1.0 is already a natural rate for this model; 0.85 was a Piper calibration.
           naturalSpeed:1,
-          // m025-44: 3 denoising steps. 4 was measured faster and more expressive than
-          // the engine default of 5, but on the Safari 26 arm64 device proof it left warm
-          // generations at 5.3-6.2s, over the 6s interactive budget. Generation cost is
-          // near-linear in steps, so this buys back about a quarter of it.
-          generationSteps:3,
+          // m025-45: back to 4 denoising steps. 3 bought about 11% of the time back and
+          // cost more than that in audio quality - OWNER heard the result immediately.
+          // The gap between sentences is solved by prefetching the next one instead.
+          generationSteps:4,
+          // Supertonic has its own intonation; resampling it only adds interpolation
+          // noise, which is the "cracking" OWNER reported in m025-44.
+          usePitchContour:false,
           onStage:entry=>diag(entry)
         });
         await adapter.initialize();
@@ -465,5 +467,13 @@
   if(typeof Promise!=='undefined'&&root.caches)refreshPreparedFlag().then(prepared=>{
     if(prepared){phase='cached';diag({phase:'prepared_idle'});}
   }).catch(()=>{});
-  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,release,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
+  // m025-45: best-effort warm-up for the next utterance. Never throws and never blocks
+  // playback - a caller that ignores it behaves exactly as before.
+  async function prefetch(text,options={}){
+    try{
+      if(!service||typeof service.prefetch!=='function')return false;
+      return await service.prefetch(text,options);
+    }catch{return false}
+  }
+  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,prefetch,release,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
 })(typeof globalThis!=='undefined'?globalThis:this);

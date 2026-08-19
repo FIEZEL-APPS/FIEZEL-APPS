@@ -130,6 +130,16 @@
     let requestSequence = 0;
     let activeStop = null;
     let activeInference = null;
+    // m025-45: every adapter.generate goes through this queue. The engine is
+    // single-flight, so a warm request issued while a sentence is playing must WAIT
+    // for the live generation rather than race it into a busy error - and waiting is
+    // free, because playback is what fills that time.
+    let engineQueue = Promise.resolve();
+    function runOnEngine(task) {
+      const started = engineQueue.then(task, task);
+      engineQueue = started.then(() => {}, () => {});
+      return started;
+    }
     let activeInferenceMeta = null;
     function diag(entry) {
       try {
@@ -170,6 +180,8 @@
 
     function stop() {
       generation += 1;
+      // Anything warmed for the request being cancelled is now stale.
+      dropWarm();
       if (typeof activeStop === 'function') {
         try { activeStop(); } catch (_) {}
       }
@@ -177,7 +189,62 @@
       fallback.stop();
     }
 
+    // m025-45 cross-call warm cache. One entry is enough: the Library warms exactly the
+    // next sentence, and holding more would pin megabytes of PCM for no benefit.
+    let warmed = null;
+
+    function warmKey(text, options) {
+      const o = options || {};
+      return [text, o.voice || '', o.speed || 1, o.lang || ''].join('\u0000');
+    }
+
+    function dropWarm() { warmed = null; }
+
+    /**
+     * Generates one utterance ahead of time. Resolves false whenever warming is not
+     * safe or not useful; callers treat it as best-effort and never depend on it.
+     */
+    async function prefetch(input, speakOptions) {
+      const options = speakOptions || {};
+      if (!adapter) return false;
+      const text = normalizeText(input, maxChars);
+      if (!text) return false;
+      const chunks = splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+      // Multi-chunk text already prefetches internally once it starts playing.
+      if (chunks.length !== 1) return false;
+      const voice = options.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
+      const key = warmKey(text, { ...options, voice });
+      if (warmed && warmed.key === key) return true;
+      const startedAt = Date.now();
+      diag({ phase: 'prefetch_start', chars: text.length, voice });
+      const pending = runOnEngine(() => adapter.generate(text, { voice, speed: options.speed || 1, lang: options.lang || '' }))
+        .then(value => ({ ok: true, value }), error => ({ ok: false, error }));
+      warmed = { key, pending };
+      const outcome = await pending;
+      if (!outcome.ok) {
+        // A failed warm must leave no trace: the next speak() regenerates normally.
+        if (warmed && warmed.key === key) warmed = null;
+        diag({ phase: 'prefetch_failed', elapsedMs: Date.now() - startedAt, error: String(outcome.error && outcome.error.message || outcome.error) });
+        return false;
+      }
+      diag({ phase: 'prefetch_ready', elapsedMs: Date.now() - startedAt });
+      return true;
+    }
+
+    /** Consumes a warm entry if it matches, so speak() plays with no generation wait. */
+    async function takeWarm(text, options) {
+      if (!warmed) return null;
+      const key = warmKey(text, options);
+      if (warmed.key !== key) return null;
+      const entry = warmed;
+      warmed = null;
+      const outcome = await entry.pending;
+      return outcome.ok ? outcome.value : null;
+    }
+
     async function speak(input, speakOptions) {
+      // speak('halo') with no options is a supported call - the fallback path and several
+      // callers rely on it, so the default must be restored before anything reads it.
       speakOptions = speakOptions || {};
       const text = normalizeText(input, maxChars);
       const callGeneration = ++generation;
@@ -223,7 +290,7 @@
         let timer = null;
         let didTimeOut = false;
         let audio;
-        const generated = Promise.resolve().then(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }));
+        const generated = runOnEngine(() => adapter.generate(chunk, { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }));
         activeInference = generated;
         activeInferenceMeta = { requestId, chunkIndex, voice, startedAt: generateStartedAt };
         generated.then(
@@ -299,7 +366,13 @@
             if (!outcome.ok) throw outcome.error;
             audio = outcome.value;
           } else {
-            audio = await generateChunk(chunkIndex);
+            const warmAudio = chunkIndex === 0 ? await takeWarm(chunks[0], { voice, speed: speakOptions.speed || 1, lang: speakOptions.lang || '' }) : null;
+            if (warmAudio) {
+              diag({ phase: 'prefetch_hit', requestId, chunkIndex, voice });
+              audio = warmAudio;
+            } else {
+              audio = await generateChunk(chunkIndex);
+            }
           }
           if (callGeneration !== generation) throw new Error('TTS request superseded');
           outputs.push(audio);
@@ -338,7 +411,7 @@
       }
     }
 
-    return Object.freeze({ speak, stop, splitIntoChunks: (text) => splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars) });
+    return Object.freeze({ speak, stop, prefetch, splitIntoChunks: (text) => splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars) });
   }
 
   return Object.freeze({ normalizeText, splitIntoChunks, createVoiceService });
