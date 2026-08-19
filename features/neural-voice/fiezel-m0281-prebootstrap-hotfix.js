@@ -1,25 +1,21 @@
-/* M028.1 emergency hotfix: seam policy + deterministic speech serialization. */
+/* M028.2 emergency hotfix: Apple continuity policy + deterministic speech serialization. */
 (function(root){
   'use strict';
   if(!root || root.__fiezelM0281PrebootstrapHotfix) return;
   var neural = root.FiezelNeuralVoice;
   if(!neural || typeof neural.createVoiceService !== 'function') return;
   var originalCreate = neural.createVoiceService;
-  var APPLE_HARD_CHUNK_CHARS = 80;
+  var APPLE_HARD_CHUNK_CHARS = 128;
 
   function normalizedLine(value){ return String(value == null ? '' : value).replace(/\s+/g,' ').trim(); }
 
   function seamProsody(base){
     if(!base) return base;
     var copy = Object.assign({}, base);
-    // createVoiceService uses punctuate() only to classify the seam before the next
-    // rendered chunk. Artificial hard slices must stay unpunctuated here; otherwise an
-    // internal 32/80-char cut is promoted to a full sentence and receives a 420ms stop.
     copy.punctuate = function(text){ return normalizedLine(text); };
     copy.gapAfter = function(text, lang){
       var line = normalizedLine(text);
       if(!line) return 0;
-      // No explicit punctuation at the source boundary => this is an internal seam.
       if(!/[.!?…,;:]$/.test(line)) return 0;
       if(typeof base.gapAfter === 'function') return Math.max(0, Number(base.gapAfter(line, lang)) || 0);
       return /[.!?…]$/.test(line) ? 300 : 140;
@@ -47,7 +43,6 @@
         return inner.speak(text, options);
       });
       chain = run.then(function(value){ pending = Math.max(0, pending - 1); return value; }, function(error){ pending = Math.max(0, pending - 1); throw error; });
-      // Keep the internal queue alive after either outcome while returning the real result.
       chain = chain.catch(function(){});
       return run;
     }
@@ -69,7 +64,11 @@
     var input = options || {};
     var patched = Object.assign({}, input);
     var appleStandalone = !!(patched.env && patched.env.navigator && patched.env.navigator.standalone === true);
-    if(appleStandalone && patched.streamSentences === true && !Object.prototype.hasOwnProperty.call(patched, 'appleHardChunkChars')) {
+    if(appleStandalone && patched.streamSentences === true){
+      // m028-50 physical evidence: sentence-at-a-time generation is near realtime and
+      // short chunks can exhaust the audible lead. Until true incremental PCM exists,
+      // keep multiple sentences/clauses in one bounded render on Apple standalone.
+      patched.streamSentences = false;
       patched.appleHardChunkChars = APPLE_HARD_CHUNK_CHARS;
     }
     var baseProsody = patched.prosody || (patched.env && patched.env.FiezelProsody) || root.FiezelProsody || null;
@@ -79,8 +78,9 @@
 
   root.FiezelNeuralVoice = Object.freeze(Object.assign({}, neural, { createVoiceService: createVoiceService }));
   root.__fiezelM0281PrebootstrapHotfix = Object.freeze({
-    schema: 'fiezel-m0281-prebootstrap-hotfix-v1',
+    schema: 'fiezel-m0282-prebootstrap-integrity-v1',
     appleHardChunkChars: APPLE_HARD_CHUNK_CHARS,
+    appleStreamSentences: false,
     internalSeamGapMs: 0,
     speechArbitration: 'serialized'
   });
