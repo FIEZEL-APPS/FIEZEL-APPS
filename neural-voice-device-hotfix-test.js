@@ -97,8 +97,8 @@ assert.ok(watchdogEnd>watchdogStart,'watchdog block must remain bounded and sche
 const watchdogBlock=coreSrc.slice(watchdogStart,watchdogEnd);
 for(const field of ['requestId','chunkIndex','scheduledAt','expectedDelayMs','observedDelayMs'])assert.ok(watchdogBlock.includes(field),`watchdog timing metadata missing ${field}`);
 assert.ok(!/(?:\bvoice\b|\bchars\b|\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(watchdogBlock),'watchdog diagnostics must contain timing/request metadata only');
-assert.ok(coreSrc.includes("policy: appleStandalone ? 'apple-standalone-inference-slice-v2' : 'default'"),'m025-13 must retain the effective Apple inference-slice policy');
-assert.ok(coreSrc.includes('const appleHardChunkChars = appleStandalone ? Math.max(64, Math.min(128, Number(options.appleHardChunkChars) || 80)) : 0;'),'m025-13 Apple hard chunk cap must remain at 80 chars and narrowly bounded');
+assert.ok(coreSrc.includes("policy: appleStandalone ? 'apple-standalone-inference-slice-v3' : 'default'"),'M028 must retain the effective Apple inference-slice-v3 policy');
+assert.ok(coreSrc.includes('const appleHardChunkChars = appleStandalone ? Math.max(16, Math.min(128, Number(options.appleHardChunkChars) || 32)) : 0;'),'M028 Apple hard chunk cap must remain at 32 chars and narrowly bounded');
 assert.ok(coreSrc.includes("phase: 'chunk_plan'")&&coreSrc.includes('maxChunkChars'),'m025-13 must expose chunk-count/max-char metadata without text content');
 assert.ok(coreSrc.includes("phase: 'generate_completed_over_budget'"),'m025-13 must retain synchronous diagnosis for non-preemptive generation past budget');
 assert.ok(coreSrc.includes("phase: 'prefetch_policy_ready'")&&coreSrc.includes("apple-standalone-macrotask-yield-v1"),'m025-13 must retain the Apple prefetch-yield policy');
