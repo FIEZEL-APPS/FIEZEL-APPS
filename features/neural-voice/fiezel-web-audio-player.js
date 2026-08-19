@@ -206,10 +206,12 @@
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     function playbackEpoch() {
+      if (!appleStandalone) return 0;
       return Math.max(0, Math.floor(Number(env.__fiezelPcmPlaybackEpoch) || 0));
     }
 
     function reservePlaybackEpoch(continuous) {
+      if (!appleStandalone) return 0;
       if (continuous && activePlaybackEpoch > 0) return activePlaybackEpoch;
       const epoch = playbackEpoch() + 1;
       env.__fiezelPcmPlaybackEpoch = epoch;
@@ -218,6 +220,7 @@
     }
 
     function advancePlaybackEpoch() {
+      if (!appleStandalone) { activePlaybackEpoch = 0; return 0; }
       const epoch = Math.max(playbackEpoch(), activePlaybackEpoch) + 1;
       env.__fiezelPcmPlaybackEpoch = epoch;
       activePlaybackEpoch = 0;
