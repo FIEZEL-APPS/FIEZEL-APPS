@@ -22,6 +22,7 @@ Allowed runtime scope:
 - Supertonic preparation/worker ownership safety
 - Classroom neural routing safety rollback
 - focused M028.1 regression tests
+- `neural-voice-m028-audio-integrity-test.js` only for the superseded release-marker assertion (`m025-49 -> m025-50`); all M028 runtime assertions remain immutable
 - `.github/workflows/quality.yml` only to register focused tests
 - `index.html` only to load the two bounded hotfix layers
 - `features/neural-voice/fiezel-diag-panel.js` release marker only
