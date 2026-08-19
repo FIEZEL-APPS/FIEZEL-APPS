@@ -10,11 +10,14 @@ async function main(){
     stop(){order.push('stop');},async prefetch(){return true;},splitIntoChunks(){return[];}
   };
   const prosody={gapAfter:t=>/[.]$/.test(t)?420:200,punctuate:t=>String(t)+'.'};
-  const env={console,setTimeout,clearTimeout,Promise,globalThis:null,FiezelProsody:prosody,FiezelNeuralVoice:Object.freeze({createVoiceService:o=>{createdOpts=o;return Object.freeze(inner)},normalizeText:x=>x,splitIntoChunks:x=>[x]})};
+  const env={console,setTimeout,clearTimeout,Promise,globalThis:null,FiezelProsody:prosody,
+    FiezelWebAudioPlayer:Object.freeze({createPlayer:()=>Object.freeze({play(){},stop(){},warm(){},close(){}})}),
+    FiezelNeuralVoice:Object.freeze({createVoiceService:o=>{createdOpts=o;return Object.freeze(inner)},normalizeText:x=>x,splitIntoChunks:x=>[x]})};
   env.globalThis=env;
   vm.runInNewContext(fs.readFileSync('features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js','utf8'),env);
   const svc=env.FiezelNeuralVoice.createVoiceService({env:{navigator:{standalone:true},FiezelProsody:prosody},streamSentences:true,prosody});
-  assert.equal(createdOpts.appleHardChunkChars,80,'Apple emergency slice must roll back 32 -> 80 chars');
+  assert.equal(createdOpts.appleHardChunkChars,128,'M028.2 Apple integrity cap must be 128 chars');
+  assert.equal(createdOpts.streamSentences,false,'M028.2 Apple integrity rollback must disable sentence streaming');
   assert.equal(createdOpts.prosody.punctuate('internal slice','en'),'internal slice','seam classifier must not invent terminal punctuation');
   assert.equal(createdOpts.prosody.gapAfter('internal slice','en'),0,'internal hard split must not receive sentence pause');
   assert.equal(createdOpts.prosody.gapAfter('real sentence.','en'),420,'real punctuation keeps prosody gap');
@@ -27,7 +30,7 @@ async function main(){
   const stable=Object.freeze({
     speak:(text,o)=>{stableCalls.push({text,o});return Promise.resolve({provider:'stable'});},
     stop:()=>{stableCalls.push({stop:true});},
-    prepare:()=>Promise.resolve({}),status:()=>({prepared:true,assetsCached:true})
+    prepare:()=>Promise.resolve({}),status:()=>({prepared:true,assetsCached:true,ready:true,audibleVerified:true})
   });
   const tutor={speak:(text,o)=>Promise.resolve({provider:'tutor',text,o}),stop(){},status:stable.status};
   const root={console,Promise,document:{getElementById:()=>({querySelector:s=>s==='.classroom-v3'?{}:null})},FiezelVoiceRuntime:stable,
@@ -37,7 +40,10 @@ async function main(){
   vm.runInNewContext(fs.readFileSync('features/neural-voice/fiezel-m0281-runtime-guard.js','utf8'),root);
   const status=root.FiezelIndonesianVoice.status();
   assert.equal(status.prepared,true,'shared base bundle must count as prepared');
-  assert.equal(status.ready,false,'shared cache must not fabricate Indonesian worker readiness');
+  assert.equal(status.ready,false,'shared runtime must not fabricate Indonesian generation readiness');
+  assert.equal(status.sharedRuntimeReady,true,'M028.2 must expose shared base runtime readiness');
+  assert.equal(status.verificationComplete,true,'shared prepared+ready base must terminate Indonesian verification');
+  assert.equal(status.generationDeferred,true,'Indonesian generation remains explicitly deferred');
   await root.FiezelIndonesianVoice.prepare();
   assert.equal(originalIndoPrepare,0,'prepare must not instantiate second Indonesian Supertonic worker when shared bundle exists');
   root.FiezelVoiceRuntime=Object.freeze(Object.assign({},tutor,{__tutorIndonesianPatched:true}));
@@ -56,6 +62,6 @@ async function main(){
   const tutorIndex=index.indexOf('fiezel-tutor-v3.js');
   assert(pre>0&&pre<bootstrap,'prebootstrap hotfix must load before bootstrap');
   assert(guard>audibility&&guard<tutorIndex,'runtime guard must capture final base runtime before tutor override');
-  console.log('PASS M028.1 seam/arbitration/shared-prepare/Classroom regression');
+  console.log('PASS M028.2 Apple continuity/arbitration/shared-verification/Classroom regression');
 }
 main().catch(error=>{console.error(error);process.exit(1);});
