@@ -1,6 +1,6 @@
 # FIEZEL 5.19.0 — M028.2 Seam / Buffer Integrity Handoff
 
-Status: CLAIMED / IMPLEMENTATION NOT STARTED
+Status: CLAIMED / IMPLEMENTATION STARTING AFTER SCOPE AMENDMENT
 
 Baseline: `main@5338ada261f8541a11929f36147df1b1cb12438a` (M028.1 production).
 Branch: `agent/m0282-seam-buffer-integrity`.
@@ -16,23 +16,26 @@ OWNER physical retest on m025-50 standalone Safari reports:
 
 ## Evidence-backed failure model
 
-1. M028 player sends a natural fade-in and fade-out for every PCM chunk. The worklet therefore drives every chunk tail toward zero and the following head up from zero. That is destructive at natural word/sentence endings and matches the OWNER report that endings sound cut/cracked.
-2. m025-50 trace contains short Apple chunks under the 80-character cap. For several requests, the next chunk's generation completes after the prior chunk's nominal PCM duration, leaving an inference underrun window before the next chunk can begin. This is a structural sentence-buffering problem, not a model-download failure.
-3. Sentence-at-a-time rendering resets Supertonic context at every chunk and then adds scheduler-controlled seams. For this emergency integrity rollback, continuity/intonation takes priority over first-word latency until true incremental PCM streaming exists.
-4. M028.1 Indonesian prepare guard bypasses Indonesian initialization to avoid a second WASM worker, but its returned `ready` remains tied to the uninitialized Indonesian service. The UI/diagnostic can therefore remain `prepared=true` / `ready=false` indefinitely.
+1. M028 Apple AudioWorklet applies a natural fade-in/fade-out to every completed PCM chunk. Normal speech boundaries are therefore forced toward zero even though the model already emitted its own tail. This matches the OWNER report that endings sound cut/cracked.
+2. m025-50 trace contains short Apple chunks under the 80-character cap. Several transitions have the next generation complete after the prior PCM's nominal duration, leaving structural inference underrun windows despite successful generation.
+3. Sentence-at-a-time rendering resets Supertonic context at each chunk and then reconstructs cadence with scheduler seams. Until true incremental PCM exists, physical continuity takes priority over first-word latency.
+4. M028.1 Indonesian prepare guard intentionally avoids a second WASM worker but leaves Indonesian generation `ready=false`. Consumers must treat shared bundle/base-runtime verification as a terminal preparation state without falsely claiming Indonesian generation readiness.
 
-## Scope lock
+## Scope lock — amended before runtime mutation
 
 Allowed runtime scope:
-- `features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js`: Apple standalone integrity rollback only (sentence-streaming policy / hard-chunk policy).
-- `features/neural-voice/fiezel-web-audio-player.js`: natural-edge playback envelope only; cancellation fade remains intact.
-- `features/neural-voice/fiezel-m0281-runtime-guard.js`: Indonesian verification/status state-machine only; no second-worker initialization.
-- `features/neural-voice/fiezel-voice-bundle-gate.js` only if needed to make preparation/verification terminal and non-stuck without claiming Indonesian generation readiness.
-- focused new M028.2 regression test(s).
+- `features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js`: Apple standalone stream/hard-chunk policy only.
+- NEW `features/neural-voice/fiezel-m0282-audioedge-hotfix.js`: additive Apple-standalone AudioWorklet message wrapper only; ordinary enqueue edge fades may be removed, explicit clear/cancel fade must pass through unchanged.
+- `index.html`: only load the bounded M028.2 audio-edge layer after `fiezel-web-audio-player.js` and before bootstrap/service creation.
+- `features/neural-voice/fiezel-m0281-runtime-guard.js`: Indonesian preparation/verification status contract only; no second-worker initialization.
+- `features/neural-voice/fiezel-voice-bundle-gate.js` only if needed to make shared preparation terminal/non-stuck without claiming Indonesian generation readiness.
+- focused M028.2 regression test(s).
 - `.github/workflows/quality.yml` only to register focused tests.
 - `features/neural-voice/fiezel-diag-panel.js` release marker only.
-- `sw.js` release marker / shell coherence only.
+- `sw.js` release marker and new shell-asset coherence only.
 - this handoff artifact; Control Bus comments.
+
+Explicitly NOT modifying the large base `fiezel-web-audio-player.js` in this hotfix. The additive wrapper targets the exact affected production path: Apple standalone AudioWorklet. The legacy AudioBufferSource rollback path remains unchanged and is not claimed fixed by M028.2.
 
 Forbidden:
 - `vendor/supertonic-3/*`
@@ -40,37 +43,38 @@ Forbidden:
 - `generationSteps` changes
 - persona tuning, pitch tuning, speaker/SID changes
 - Puter/Core/Auth/Push changes
-- true incremental PCM streaming / ring buffer implementation (M029 remains frozen)
+- true incremental PCM streaming / ring buffer implementation
 - Local Qwen work
 - re-enable a second Supertonic worker merely to make Indonesian `ready=true`
-- claim Indonesian neural speech is verified when only shared assets/base runtime are verified
+- claim Indonesian neural speech is generation-ready when only shared assets/base runtime are verified
 - claim physical audio PASS from machine tests
 
 ## Intended bounded repair
 
 A. Apple standalone audio integrity rollback:
-- disable sentence-at-a-time streaming for Supertonic service creation on Apple standalone;
-- use a larger bounded hard chunk so multiple short sentences/clauses are rendered together, reducing independent-generation boundaries and providing enough PCM lead for prefetch;
-- keep non-Apple policy unchanged.
+- when Supertonic requests sentence streaming on Apple standalone, override it to non-sentence-streamed bounded chunks;
+- raise Apple hard chunk cap to 128 chars (existing core maximum), reducing independent inference boundaries and giving prefetch longer audible lead;
+- keep non-Apple policy unchanged and keep service-level serialization.
 
-B. Playback edge integrity:
-- do not apply a natural fade-to-zero to ordinary completed PCM; preserve model output through the final sample;
-- keep fade-out for explicit stop/cancel only;
-- preserve public player API exactly `play/stop/warm/close`.
+B. Apple worklet edge integrity:
+- ordinary `enqueue`: `fadeInFrames=0`, `fadeOutFrames=0`, preserving model-native PCM edges;
+- explicit `clear`/cancel: preserve the existing bounded fade-out unchanged;
+- preserve FiezelWebAudioPlayer public contract and shared runtime ownership.
 
 C. Indonesian verification:
-- separate `shared assets/base runtime verified` from `Indonesian generation ready`;
-- preparation/verification must always settle and release any blocking UI;
-- do not start a second Indonesian Supertonic worker in this hotfix.
+- expose explicit `sharedBundlePrepared`, `sharedRuntimeReady`, `verificationComplete`, `generationDeferred`, and `preparationOwner` state;
+- keep `ready` truthful (no second Indonesian service == no Indonesian generation-ready claim);
+- `prepare()` must resolve terminally from the verified shared runtime when assets/base runtime are ready, without invoking original Indonesian initializer;
+- mandatory bundle UI must not remain locked solely because Indonesian generation is intentionally deferred.
 
 ## Machine gates
 
-- focused test demonstrates Apple service is no longer sentence-streamed and uses the bounded integrity chunk policy; non-Apple remains unchanged.
-- worklet enqueue for ordinary playback receives zero natural fade-out; cancellation still carries a bounded fade-out.
-- legacy AudioBufferSource path does not schedule natural fade-to-zero on ordinary completion.
-- Indonesian prepare/verification resolves terminally without starting original Indonesian initializer; status does not falsely claim generation readiness.
-- voice bundle/settings gate cannot remain locked solely because shared assets are already prepared while Indonesian generation is intentionally deferred.
-- existing M028/M028.1 regression tests remain green except assertions explicitly superseded by this handoff.
+- focused test proves Apple service request becomes `streamSentences=false`, `appleHardChunkChars=128`; non-Apple remains unchanged.
+- worklet wrapper rewrites only ordinary enqueue edge fades to zero; `clear.fadeOutFrames` is unchanged.
+- wrapper is Apple-standalone-only and preserves the exact player object returned by the base implementation.
+- Indonesian prepare resolves without invoking original Indonesian prepare/initializer; `ready` remains false while verification fields truthfully report shared preparation/base readiness.
+- bundle gate accepts verified shared preparation as terminal and can close; no infinite prepared-but-verifying lock.
+- existing M028/M028.1 tests remain green except assertions explicitly superseded by this handoff.
 - exact release marker coherence plus Quality, Safari, A6/A7, A9-A14, MASTER Authority all PASS on exact head.
 
 ## Physical exit boundary
