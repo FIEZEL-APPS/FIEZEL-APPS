@@ -44,7 +44,18 @@
   ]);
   const totalBytes=assets.reduce((sum,item)=>sum+item.bytes,0);
   let phase='idle',lastError='',lastFallbackReason='',storage='',service=null,adapter=null,preparePromise=null,initializePromise=null,backendInitPromise=null,verifiedForSession=false,lastStorageEstimate=null,preparedFlag=readStatus().prepared,assetsCached=false,playerRef=null,speechActive=false,initFailedThisSession=false,initTimedOutThisSession=false,circuitOpen=false,audibleVerified=false,wasmPolicy='default';
-  function diag(entry){try{const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push({t:Date.now(),v:version,...entry});root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
+  function diag(entry){try{const record={t:Date.now(),v:version,...entry};const sink=root.FiezelVoiceDiagnostics;if(sink&&typeof sink.record==='function'){sink.record(record,root);return}const key='fiezel-neural-voice-diagnostics-v1';const list=JSON.parse(root.localStorage?.getItem(key)||'[]');list.push(record);root.localStorage?.setItem(key,JSON.stringify(list.slice(-200)))}catch{}}
+  // m025-48 delivery settings, read from the one config both engines share so the
+  // English and Indonesian voices can never drift apart.
+  const SPEECH_DEFAULTS={streamSentences:true,streamMaxWords:26,silenceScale:0.4};
+  function speechSettings(){
+    const speech=root.FiezelNeuralVoiceConfig&&root.FiezelNeuralVoiceConfig.speech;
+    return {
+      streamSentences:speech&&typeof speech.streamSentences==='boolean'?speech.streamSentences:SPEECH_DEFAULTS.streamSentences,
+      streamMaxWords:speech&&Number(speech.streamMaxWords)>0?Number(speech.streamMaxWords):SPEECH_DEFAULTS.streamMaxWords,
+      silenceScale:speech&&Number(speech.silenceScale)>0?Number(speech.silenceScale):SPEECH_DEFAULTS.silenceScale
+    };
+  }
   function installBootstrapLifecycleDiagnostics(){
     if(root.navigator?.standalone!==true||root.__fiezelNeuralBootstrapLifecycleDiagInstalled)return;
     root.__fiezelNeuralBootstrapLifecycleDiagInstalled=true;
@@ -277,11 +288,21 @@
           // Supertonic has its own intonation; resampling it only adds interpolation
           // noise, which is the "cracking" OWNER reported in m025-44.
           usePitchContour:false,
+          // m025-48: with the contour off, delivery moves through the engine's own rate,
+          // per sentence, instead of through a resampler.
+          useEmotion:true,
+          // m025-48: the vendored glue's 0.2 fallback spent every inserted comma at a
+          // fifth of its length. Both languages share this value or they drift apart.
+          silenceScale:speechSettings().silenceScale,
+          // m025-48: passed explicitly - the adapter's fallback for this resolved a
+          // variable that is not in its scope, so shaping never ran on a device.
+          prosody:root.FiezelProsody||null,
           onStage:entry=>diag(entry)
         });
         await adapter.initialize();
         const sherpaPlayer=root.FiezelWebAudioPlayer.createPlayer(root);
-        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
+        const speech=speechSettings();
+        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,streamSentences:speech.streamSentences,streamMaxWords:speech.streamMaxWords,prosody:root.FiezelProsody||null});
         playerRef=sherpaPlayer;
         wasmPolicy='supertonic-3-wasm-worker';
         phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;
@@ -446,6 +467,28 @@
     diag({phase:'speak_neural_success',provider:String(result?.provider||'neural'),voice:String(result?.voice||voice||''),requestId:String(result?.requestId||''),elapsedMs:Date.now()-neuralStartedAt});
     return result;
   }
+  // m025-48 speculative warm-up. Building the engine while the launcher is idle is what
+  // takes the worker start-up off the learner's first tap - but a speculative attempt must
+  // never be able to make that tap WORSE. initialize() latches failure state that speak()
+  // reads (initFailedThisSession, circuitOpen, phase), so on failure the exact prior state
+  // is restored and the learner's own request starts from a clean engine. No audio gesture
+  // is warmed here either: this runs outside a user gesture and has no business creating
+  // an AudioContext.
+  async function prewarm(){
+    if(service)return true;
+    if(!readStatus().prepared&&!preparedFlag)return false;
+    const prior={initFailed:initFailedThisSession,initTimedOut:initTimedOutThisSession,circuit:circuitOpen,phase,error:lastError,fallbackReason:lastFallbackReason};
+    try{
+      await initialize();
+      diag({phase:'prewarm_ready'});
+      return true;
+    }catch(error){
+      initFailedThisSession=prior.initFailed;initTimedOutThisSession=prior.initTimedOut;circuitOpen=prior.circuit;
+      phase=prior.phase;lastError=prior.error;lastFallbackReason=prior.fallbackReason;
+      diag({phase:'prewarm_failed',error:errorText(error)});
+      return false;
+    }
+  }
   function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
   // T-023 lifecycle: bebaskan sesi neural + WebAudio saat tab tidak terlihat agar
   // tab tidak dipaksa mati oleh browser (WASM 92MB+21MB + AudioContext tetap hidup
@@ -475,5 +518,5 @@
       return await service.prefetch(text,options);
     }catch{return false}
   }
-  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,speak,stop,prefetch,release,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
+  root.FiezelVoiceRuntime=Object.freeze({schema:STATUS_SCHEMA,status,prepare,ensureReady,prewarm,speak,stop,prefetch,release,verifyCachedAssets,refreshPreparedFlag,storageEstimate:()=>storageEstimate(false),diagnostics:()=>{try{return JSON.parse(root.localStorage?.getItem('fiezel-neural-voice-diagnostics-v1')||'[]')}catch{return[]}},assets:()=>assets.map(item=>({...item})),totalBytes,assetCount:assets.length});
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -973,7 +973,44 @@ document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.clas
 let reportGestureRetryAt=0;
 document.addEventListener?.('click',e=>{const el=e.target?.closest?.('button,a,[role="button"]');if(!el||el.disabled)return;if(!el.classList?.contains?.('option'))haptic(el.classList?.contains?.('nav')?'navigate':el.classList?.contains?.('primary')?'confirm':'tap');if(state.reportMeta?.queue?.length&&Date.now()-reportGestureRetryAt>5000){reportGestureRetryAt=Date.now();flushReportQueue()}},{capture:true});
 document.addEventListener?.('pointerdown',()=>{unlockFeedbackAudio();if(state.preferences?.soundtrack)startSoundtrack()},{once:true,passive:true});
-document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='hidden'){soundtrackEngine?.context?.()?.suspend?.();fxCtx?.suspend?.();if(window.FiezelVoiceRuntime&&typeof window.FiezelVoiceRuntime.release==='function'){try{window.FiezelVoiceRuntime.release()}catch{}}}else{if(state.preferences?.soundtrack)soundtrackEngine?.resume?.();if(state.preferences?.feedbackSounds)fxCtx?.resume?.()}});
+// m025-48. Releasing the neural engine the instant the tab hides was costing the learner
+// the whole cold start again: the release tears down a 143 MB WASM model plus its worker
+// and the shared AudioContext, and the next speak() then pays several seconds of
+// re-initialisation before the first word. Any glance at another app - a notification, a
+// dictionary, the lock screen - was enough to trigger it. The memory that release buys
+// back only matters when the tab STAYS hidden, so it now waits, and coming back cancels
+// it. FIEZEL_NEURAL_RELEASE_DELAY_MS is the seam a test uses instead of real waiting.
+const NEURAL_RELEASE_DELAY_MS=Number(window.FIEZEL_NEURAL_RELEASE_DELAY_MS)||90000;
+let neuralReleaseTimer=null;
+function cancelNeuralRelease(){if(neuralReleaseTimer){clearTimeout(neuralReleaseTimer);neuralReleaseTimer=null}}
+// Stopping is immediate and always right: a hidden tab must not keep talking. Only the
+// teardown is deferred.
+function silenceNeuralVoice(){try{window.FiezelVoiceRuntime?.stop?.()}catch{}try{window.FiezelSupertonicVoice?.stop?.()}catch{}}
+document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='hidden'){soundtrackEngine?.context?.()?.suspend?.();fxCtx?.suspend?.();silenceNeuralVoice();scheduleNeuralRelease()}else{cancelNeuralRelease();if(state.preferences?.soundtrack)soundtrackEngine?.resume?.();if(state.preferences?.feedbackSounds)fxCtx?.resume?.();warmNeuralVoice()}});
+function scheduleNeuralRelease(){
+  cancelNeuralRelease();
+  neuralReleaseTimer=setTimeout(()=>{
+    neuralReleaseTimer=null;
+    if(document.visibilityState!=='hidden')return;
+    if(window.FiezelVoiceRuntime&&typeof window.FiezelVoiceRuntime.release==='function'){try{window.FiezelVoiceRuntime.release()}catch{}}
+    try{window.FiezelSupertonicVoice?.release?.()}catch{}
+  },NEURAL_RELEASE_DELAY_MS);
+}
+// A prepared engine that has not been initialised is several seconds of silence waiting
+// to happen on the first tap. Building it while the launcher is idle moves that cost off
+// the learner's critical path entirely. prewarm() is the speculative entry point: it does
+// nothing when the voice pack has not been downloaded, and it restores the runtime's prior
+// state if it fails, so a background attempt can never send the learner's own tap to
+// browser TTS.
+function warmNeuralVoice(){
+  const runtime=window.FiezelVoiceRuntime;
+  if(!runtime||typeof runtime.prewarm!=='function')return;
+  try{if(runtime.status?.().ready)return}catch{}
+  const run=()=>{if(document.visibilityState==='hidden')return;try{runtime.prewarm()?.catch?.(()=>{})}catch{}};
+  if(typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:4000});
+  else setTimeout(run,1200);
+}
+warmNeuralVoice();
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.toggleSoundtrack=toggleSoundtrack;window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));

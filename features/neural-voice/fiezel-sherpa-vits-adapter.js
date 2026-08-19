@@ -74,7 +74,18 @@
     // "cracking" OWNER reported. Engines declare whether they need it.
     var usePitchContour = opts.usePitchContour !== false;
     // m025-37: prosody shaping. Optional so the adapter still works standalone in tests.
-    var prosody = opts.prosody || (typeof root !== 'undefined' && root && root.FiezelProsody) || null;
+    //
+    // m025-48 defect: the fallback below used to read `root`, and `root` does not exist
+    // in this scope. The UMD wrapper takes it as a parameter, but this factory is written
+    // as an ARGUMENT to that wrapper, so its scope chain skips the wrapper's parameters
+    // entirely and `root` was a free global that nothing ever defines. `typeof` then hid
+    // it: the expression evaluated to null in every browser, in every release. Every
+    // caller in the tree relied on that fallback, so punctuate() - the whole reason the
+    // Indonesian line gets clause commas and a terminal mark - had never once run on a
+    // device. The tests passed because each one injects prosody explicitly.
+    // `env` is the real global here (the engines pass env: root), so the fallback now
+    // resolves through it, and both engines pass prosody outright as well.
+    var prosody = opts.prosody || (env && env.FiezelProsody) || null;
     // m025-42 Supertonic. Three differences from the Piper bundles, all optional so the
     // Piper path is byte-for-byte unchanged:
     //   generationLang - Supertonic is one multilingual model, so every request must
@@ -91,7 +102,20 @@
     // So 4 is not a quality/speed trade at all: it is faster and more expressive than
     // the default. Below 4 is a cliff, not a dial - never lower this to buy speed.
     var generationSteps = Number(opts.generationSteps) > 0 ? Math.floor(Number(opts.generationSteps)) : 0;
-    var personas = opts.personas || (typeof root !== 'undefined' && root && root.FiezelVoicePersona) || null;
+    // m025-48. The generation config has carried a silence_scale field all along and this
+    // adapter never set one, so every render used the vendored glue's fallback of 0.2 -
+    // silence tokens shortened to a fifth of what the duration predictor asked for. That
+    // is the mechanism behind "kata-katanya nyambung terus": the commas prosody works so
+    // hard to insert were reaching the model and then being spent at 20% value.
+    //
+    // It only governs silence INSIDE a rendered line. Sentence boundaries are the
+    // player's business now - it trims each render's own lead-in and tail-out and
+    // schedules the next line after a measured gap - so raising this lengthens breaths
+    // within a sentence without touching the space between two of them.
+    var silenceScale = Number(opts.silenceScale) > 0 ? Number(opts.silenceScale) : 0;
+    // Same broken-scope fallback as prosody above; personas happened to survive only
+    // because every caller passes them explicitly.
+    var personas = opts.personas || (env && env.FiezelVoicePersona) || null;
     var usePersona = opts.usePersona === true && !!personas;
     var padBetweenPhrases = opts.padBetweenPhrases !== false;
     // m025-47: Supertonic already models punctuation and breath pauses itself. Splitting
@@ -104,6 +128,14 @@
       : !(generationLang && padBetweenPhrases === false && usePitchContour === false);
     // Supertonic is calibrated at 1.0 = natural; Piper needed 0.85 (see NATURAL_SPEED).
     var naturalSpeed = Number(opts.naturalSpeed) > 0 ? Number(opts.naturalSpeed) : NATURAL_SPEED;
+    // m025-48. Turning the pitch resampler off in m025-45 removed the interpolation
+    // noise, but it also removed the only thing that made one sentence sound different
+    // from the next: with usePitchContour false the persona's `pitch` is never read, so
+    // the two registers differed by speaker id and nothing else, and inside a register
+    // every sentence was delivered identically. Rate is the cue that survives - it is the
+    // engine's own timing rather than an effect applied to its output - so delivery is
+    // shaped there instead, per sentence, from what the sentence is doing.
+    var useEmotion = opts.useEmotion !== false;
 
     var worker = null;
     var readyPromise = null;
@@ -218,14 +250,11 @@
           // is how a multilingual model is told which language this line is. The
           // vendored worker has handled both message types since m025-26, so this is
           // a message-shape choice, not a worker change.
+          var genConfig = { sid: sid, speed: speed, extra: { lang: generationLang } };
+          if (generationSteps) genConfig.numSteps = generationSteps;
+          if (silenceScale) genConfig.silenceScale = silenceScale;
           worker.postMessage(generationLang
-            ? {
-              type: 'generateWithConfig',
-              text: unit,
-              genConfig: generationSteps
-                ? { sid: sid, speed: speed, numSteps: generationSteps, extra: { lang: generationLang } }
-                : { sid: sid, speed: speed, extra: { lang: generationLang } }
-            }
+            ? { type: 'generateWithConfig', text: unit, genConfig: genConfig }
             : { type: 'generate', text: unit, sid: sid, speed: speed });
         } catch (error) { pending = null; reject(error); }
       });
@@ -262,6 +291,29 @@
         }
       }
       return out;
+    }
+
+    /**
+     * Delivery for one line when the engine owns its own intonation: the persona's
+     * baseline register, moved by what this particular sentence is doing.
+     */
+    function deliveryFor(unit, base, generationOptions, lang) {
+      var baseSpeed = base && Number(base.speed) > 0 ? Number(base.speed) : 1;
+      var basePitch = base && Number(base.pitch) > 0 ? Number(base.pitch) : 1;
+      if (!useEmotion || !prosody || typeof prosody.emotion !== 'function') {
+        return { speed: baseSpeed, pitch: basePitch };
+      }
+      var options = generationOptions || {};
+      var mood = prosody.emotion(unit, options.intent, lang || generationLang, options.position);
+      var moved = baseSpeed * (mood && Number(mood.speed) > 0 ? Number(mood.speed) : 1);
+      // The persona ceiling exists because the measured pitch range COLLAPSES past it;
+      // a sentence shape must never be the thing that pushes a register through it.
+      var ceiling = prosody.PERSONA_SPEED_MAX || 1.24;
+      return {
+        speed: Math.min(ceiling, Math.max(0.6, moved)),
+        pitch: basePitch,
+        emotion: mood ? mood.id : null
+      };
     }
 
     function generate(text, generationOptions) {
@@ -312,11 +364,12 @@
           var unit = units[index];
           var shape = (usePitchContour && prosody && prosody.contour)
             ? prosody.contour(unit, index, units.length, personaBase)
-            : (personaBase || { speed: 1, pitch: 1 });
+            : deliveryFor(unit, personaBase, options, lang);
           var unitSpeed = Math.min(MAX_ENGINE_SPEED, Math.max(MIN_ENGINE_SPEED, speed * shape.speed));
           stage('adapter_generate_invoke', backendDetail({
             voice: voice, sid: sid, elapsedMs: Date.now() - startedAt,
-            phraseIndex: index, phraseCount: units.length, phraseSpeed: unitSpeed, phrasePitch: shape.pitch
+            phraseIndex: index, phraseCount: units.length, phraseSpeed: unitSpeed, phrasePitch: shape.pitch,
+            emotion: shape.emotion || null, silenceScale: silenceScale || null
           }));
           return synthesize(unit, sid, unitSpeed).then(function (result) {
             var samples = result.samples;
