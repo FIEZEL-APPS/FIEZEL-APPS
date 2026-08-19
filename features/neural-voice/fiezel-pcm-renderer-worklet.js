@@ -6,23 +6,44 @@ class FiezelPcmRendererProcessor extends AudioWorkletProcessor {
     this.current = null;
     this.offset = 0;
     this.gapFrames = 0;
+    this.epoch = 0;
     this.port.onmessage = (event) => this.handleMessage(event && event.data || {});
   }
 
   handleMessage(data) {
     if (data.type === 'clear') {
+      const nextEpoch = Math.max(this.epoch, Math.floor(Number(data.epoch) || 0));
+      this.epoch = nextEpoch;
       this.cancelQueued();
       this.cancelCurrent(Math.max(1, Math.floor(Number(data.fadeOutFrames) || 1)));
       return;
     }
     if (data.type !== 'enqueue') return;
+
+    const id = String(data.id || '');
+    const incomingEpoch = Math.max(0, Math.floor(Number(data.epoch) || 0));
+    if (incomingEpoch < this.epoch) {
+      this.port.postMessage({ type: 'done', id, cancelled: true, reason: 'stale_epoch' });
+      return;
+    }
+    if (incomingEpoch > this.epoch) this.epoch = incomingEpoch;
+
+    const sourceRate = Math.max(0, Math.floor(Number(data.sampleRate) || 0));
+    const renderRate = typeof sampleRate === 'number' ? Math.max(0, Math.floor(Number(sampleRate) || 0)) : 0;
+    if (sourceRate && renderRate && sourceRate !== renderRate) {
+      this.port.postMessage({ type: 'error', id, reason: 'sample_rate_mismatch' });
+      return;
+    }
+
     const samples = data.samples;
     if (!(samples instanceof Float32Array) || !samples.length) {
-      this.port.postMessage({ type: 'error', id: data.id || '', reason: 'invalid_pcm' });
+      this.port.postMessage({ type: 'error', id, reason: 'invalid_pcm' });
       return;
     }
     this.queue.push({
-      id: String(data.id || ''), samples,
+      id,
+      epoch: incomingEpoch,
+      samples,
       gapFrames: Math.max(0, Math.floor(Number(data.gapFrames) || 0)),
       fadeInFrames: Math.max(0, Math.floor(Number(data.fadeInFrames) || 0)),
       fadeOutFrames: Math.max(0, Math.floor(Number(data.fadeOutFrames) || 0)),
