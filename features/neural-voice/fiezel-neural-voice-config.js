@@ -50,6 +50,22 @@
       hardChunkWords: 190,
       maxQueueItems: 12
     }),
+    // m025-48 delivery settings. One place, because the English bootstrap and the
+    // Indonesian shim build separate engines over the same model and any drift between
+    // them is heard immediately as two different voices.
+    speech: Object.freeze({
+      // Render and play one sentence at a time: the learner hears sentence one while
+      // sentence two is still being generated, instead of waiting for the whole passage.
+      streamSentences: true,
+      // A breath group. Longer sentences are split again at clause punctuation.
+      streamMaxWords: 26,
+      // Length of the silence the model places at punctuation INSIDE a line, as a
+      // multiple of what its duration predictor asked for. The vendored glue falls back
+      // to 0.2, which is what made clause commas nearly inaudible; 0.4 restores the
+      // breath without turning a comma into a full stop. Sentence-to-sentence spacing is
+      // not affected - the player owns that (FiezelProsody.GAP_MS).
+      silenceScale: 0.4
+    }),
     fallback: Object.freeze({
       browserSpeechSynthesis: true,
       reason: 'Emergency-only fallback if local neural runtime cannot initialize.'
