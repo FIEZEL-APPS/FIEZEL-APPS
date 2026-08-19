@@ -58,6 +58,7 @@ files_allowed:
   - features/neural-voice/fiezel-neural-voice.js
   - neural-voice-m028-audio-integrity-test.js
   - neural-voice-device-hotfix-test.js
+  - neural-voice-single-flight-test.js
   - .github/workflows/quality.yml
   - sw.js
   - features/neural-voice/fiezel-diag-panel.js
@@ -79,6 +80,8 @@ forbidden_actions:
 ```
 
 `neural-voice-device-hotfix-test.js` ditambahkan ke `files_allowed` setelah A6 membuktikan test legacy masih mematok policy `apple-standalone-inference-slice-v2` dan hard cap 80 karakter. Perubahan pada file itu dibatasi hanya pada dua assertion yang secara eksplisit superseded oleh keputusan T-028 menjadi policy v3 / 32 karakter; watchdog, prefetch-yield, lifecycle, privacy, dan invariant lain tetap tidak berubah.
+
+`neural-voice-single-flight-test.js` juga termasuk scope karena test tersebut menguji Apple single-flight/prefetch pipeline pada effective hard cap dan policy identifier. Adaptasinya hanya memindahkan ekspektasi Apple dari 80/v2 menjadi 32/v3 serta jumlah slice minimum yang konsekuen; single active inference, overlap generation/playback, supersession, timeout, dan non-Apple behavior tetap wajib sama.
 
 ## 4. IMPLEMENTATION PLAN
 
