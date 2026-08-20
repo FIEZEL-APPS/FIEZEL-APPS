@@ -8,7 +8,13 @@ const start=boot.indexOf("const speakInitStartedAt=Date.now()");
 const init=boot.indexOf("local=await initialize()",start);
 const neural=boot.indexOf("result=await local.speak",init);
 assert.ok(start>=0&&init>start&&neural>init,'initialize must complete before neural service speech starts');
-assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'bootstrap must pass generation timeout into the voice service');
+// m025-72: the budget is now computed at call time because it scales with the diagnostic
+// denoising step count - 16 steps overran the fixed 30 s budget on device and the request
+// was cancelled before the audio existed. The invariant this guards is unchanged and still
+// the point: a voice service created without a generation timeout can hang forever.
+assert.ok(/generationTimeoutMs:neuralGenerationTimeoutMs\(\)/.test(boot),'bootstrap must pass generation timeout into the voice service');
+assert.ok(/const neuralGenerationTimeoutMs=\(\)=>/.test(boot),'the budget must come from one shared helper, not a literal at each call site');
+assert.ok(/NEURAL_GENERATION_TIMEOUT_BASE_MS=Number\(/.test(boot),'the base budget must still be configurable and defaulted');
 assert.ok(!boot.includes("const timeout=Symbol('fiezel-tts-timeout')"),'bootstrap must not impose a whole-speech timeout');
 assert.ok(!boot.includes('Promise.race([neural()'),'bootstrap must not race playback against the generation timeout');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"));

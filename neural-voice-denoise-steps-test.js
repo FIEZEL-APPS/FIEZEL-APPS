@@ -99,6 +99,44 @@ test('kedua bahasa selalu meminta jumlah langkah yang sama', () => {
   }
 });
 
+test('anggaran waktu ikut naik bersama langkah, kalau tidak 16 pasti gagal', () => {
+  // Bukti perangkat m025-71: pada 16 langkah suaranya GAGAL dimuat. Sebabnya aritmetika -
+  // anggaran standalone 30 detik, sementara empat kali lipat langkah menembusnya dan
+  // permintaannya dibatalkan sebelum selesai.
+  const env = storeEnv();
+  assert.strictEqual(player.denoiseTimeoutMs(30000, env), 30000, 'tanpa override, anggaran tidak berubah sama sekali');
+  player.setDenoiseSteps(4, env);
+  assert.strictEqual(player.denoiseTimeoutMs(30000, env), 30000, '4 langkah adalah default, bukan kenaikan');
+  player.setDenoiseSteps(8, env);
+  assert.strictEqual(player.denoiseTimeoutMs(30000, env), 60000);
+  player.setDenoiseSteps(16, env);
+  assert.strictEqual(player.denoiseTimeoutMs(30000, env), 120000);
+  // Batas atas supaya satu potongan tidak pernah menggantung perangkat tanpa akhir.
+  assert.strictEqual(player.denoiseTimeoutMs(200000, env), 240000);
+  // Anggaran nol berarti "tidak ada batas" di mesin, dan itu tidak boleh diubah menjadi angka.
+  assert.strictEqual(player.denoiseTimeoutMs(0, env), 0);
+});
+
+test('bootstrap benar-benar memakai anggaran terskala, bukan konstanta lama', () => {
+  const boot = fs.readFileSync('./features/neural-voice/fiezel-neural-voice-bootstrap.js', 'utf8');
+  assert.ok(/neuralGenerationTimeoutMs\(\)/.test(boot), 'anggaran dihitung saat dipakai');
+  const stale = boot.split(String.fromCharCode(10)).filter(line => /NEURAL_GENERATION_TIMEOUT_MS/.test(line) && !/BASE_MS/.test(line));
+  assert.strictEqual(stale.length, 0, 'tidak boleh ada sisa pemakaian konstanta lama: ' + stale.join(' | ').slice(0, 160));
+  assert.ok(/denoiseTimeoutMs/.test(boot), 'anggaran diambil dari helper bersama');
+  assert.ok(/catch\(_\)\{return NEURAL_GENERATION_TIMEOUT_BASE_MS\}/.test(boot),
+    'kegagalan membaca override harus jatuh ke anggaran dasar, bukan menghapus batas');
+});
+
+test('panel menahan uji yang akan batal diam-diam', () => {
+  // m025-71: mode PCM masih NADA UJI saat langkah diuji, jadi yang terdengar nada buatan -
+  // bukan suara model - dan ketiga langkah "terdengar mulus" tanpa satu pun benar-benar diuji.
+  const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
+  assert.ok(/uji langkah ini tidak sah/.test(panel), 'harus memperingatkan saat mode PCM masih aktif');
+  assert.ok(/Tekan PCM: Normal dulu/.test(panel), 'peringatannya harus menyebut jalan keluarnya');
+  assert.ok(/KEMBALIKAN SEMUA KE NORMAL/.test(panel), 'harus ada satu tombol untuk membersihkan semua setelan');
+  assert.ok(/langkah denoising: /.test(panel), 'status langkah aktif ikut ditampilkan');
+});
+
 test('panel menyediakan pilihannya dan menyebut konsekuensinya', () => {
   const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
   for (const label of ['LANGKAH: 4 (default)', 'LANGKAH: 8', 'LANGKAH: 16']) {
