@@ -55,6 +55,7 @@ vm.createContext(context);
 for (const file of [
   'features/speaking-listening/speaking-listening-config.js',
   'features/skills-evidence/fiezel-skills-evidence.js',
+  'features/academic-readiness/fiezel-academic-readiness.js',
   'features/personal-journey/fiezel-personal-journey.js',
   'app.js'
 ]) vm.runInContext(fs.readFileSync(path.join(root, file), 'utf8'), context);
@@ -132,6 +133,33 @@ setTimeout(() => {
     const rusak = A.unifiedSkillsMarkup(NOW);
     assert.ok(typeof rusak === 'string' && rusak.length > 0);
     assert.ok(/Belum ada latihan tercatat/.test(rusak));
+  });
+
+  test('kartu kesiapan akademik R4 tampil dari bukti nyata', () => {
+    const markup = A.academicReadinessMarkup(NOW);
+    assert.ok(/Prasyarat fondasi akademik/.test(markup));
+    assert.ok(/Jalur reading akademik/.test(markup));
+    assert.ok(/Lab komunikasi beasiswa/.test(markup));
+    // State uji hanya punya bukti grammar, jadi sebagian besar prasyarat belum terukur -
+    // dan itu harus tertulis sebagai "Belum terukur", bukan "Belum terpenuhi".
+    assert.ok(/Belum terukur/.test(markup));
+    assert.ok(/bacaan bertema sains/.test(markup), 'jalur reading memakai bank yang benar-benar ada');
+  });
+
+  test('kartu kesiapan tidak menjanjikan skor ujian', () => {
+    const markup = A.academicReadinessMarkup(NOW);
+    assert.ok(/tidak memprediksi skor/i.test(markup), 'penyangkalan tampil di layar');
+    assert.ok(!/\bband\b|\b[4-9]\.[05]\b/i.test(markup));
+    assert.ok(/tidak akan melabeli ulang/i.test(markup), 'jalur kosakata jujur soal konten yang belum ada');
+  });
+
+  test('halaman tetap hidup kalau modul R4 tidak termuat', () => {
+    const backup = context.FiezelAcademicReadiness;
+    context.FiezelAcademicReadiness = undefined;
+    try {
+      const markup = A.academicReadinessMarkup(NOW);
+      assert.ok(/belum tersedia/i.test(markup), 'pesan jelas, bukan crash');
+    } finally { context.FiezelAcademicReadiness = backup; }
   });
 
   console.log('');
