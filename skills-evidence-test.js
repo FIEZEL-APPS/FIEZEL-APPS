@@ -76,8 +76,9 @@ test('tanpa jumlah bank, coverage tidak ditebak', () => {
 });
 
 test('replay count dinyatakan tidak terukur, bukan nol', () => {
-  // `replays` dihitung di controller latihan tetapi tidak pernah disimpan ke event, jadi
-  // angka apa pun di sini akan karangan.
+  // Fixture ini memakai bentuk event LAMA, dari sebelum sidecar menyimpan `replays`. Untuk
+  // event seperti itu tidak ada angka yang jujur, jadi jawabannya tetap "belum terukur".
+  // Bentuk event baru diuji terpisah di bawah.
   assert.strictEqual(projection.domains.listening.replayCount, null);
   assert.ok(projection.domains.listening.unmeasurable.includes('replayCount'));
   assert.ok(projection.domains.speaking.unmeasurable.includes('replayCount'));
@@ -92,6 +93,47 @@ function stringValues(value, out) {
   else if (value && typeof value === 'object') for (const key of Object.keys(value)) stringValues(value[key], rows);
   return rows;
 }
+
+test('replay yang benar-benar tercatat dilaporkan, bukan disembunyikan', () => {
+  // Sidecar kini menyimpan `replays` pada event. Selama datanya ada, angkanya nyata dan boleh
+  // ditampilkan.
+  const dengan = skills.projectSkillsEvidence({
+    state: {
+      schema: 'fiezel-sl-v1',
+      events: [event({ id: 'r1', replays: 2 }), event({ id: 'r2', replays: 0 }), event({ id: 'r3', replays: 1 })]
+    }, now: NOW
+  });
+  assert.strictEqual(dengan.domains.listening.replayCount, 3, 'total pengulangan dijumlahkan');
+  assert.strictEqual(dengan.domains.listening.replayAverage, 1, 'rata-rata per latihan');
+  assert.strictEqual(dengan.domains.listening.replayEvidence, 3, 'berapa event yang membawa datanya');
+  assert.ok(!dengan.domains.listening.unmeasurable.includes('replayCount'));
+});
+
+test('event lama tanpa replay tetap dinyatakan belum terukur, bukan nol', () => {
+  // Nol berarti murid tidak pernah mengulang audio. Tidak tahu berarti kita tidak tahu, dan
+  // menuliskannya sebagai nol akan membuat laporan berbohong tentang event lama.
+  const lama = skills.projectSkillsEvidence({ state, now: NOW });
+  assert.strictEqual(lama.domains.listening.replayCount, null);
+  assert.strictEqual(lama.domains.listening.replayEvidence, 0);
+  assert.ok(lama.domains.listening.unmeasurable.includes('replayCount'));
+});
+
+test('replay campuran hanya menghitung event yang membawa datanya', () => {
+  const campur = skills.projectSkillsEvidence({
+    state: { schema: 'fiezel-sl-v1', events: [event({ id: 'a', replays: 4 }), event({ id: 'b' })] }, now: NOW
+  });
+  assert.strictEqual(campur.domains.listening.attempts, 2);
+  assert.strictEqual(campur.domains.listening.replayEvidence, 1, 'hanya satu event yang punya datanya');
+  assert.strictEqual(campur.domains.listening.replayCount, 4);
+  assert.ok(!campur.domains.listening.unmeasurable.includes('replayCount'));
+});
+
+test('replay tidak wajar dibatasi, bukan diteruskan apa adanya', () => {
+  const aneh = skills.projectSkillsEvidence({
+    state: { schema: 'fiezel-sl-v1', events: [event({ id: 'x', replays: 9999 }), event({ id: 'y', replays: -5 })] }, now: NOW
+  });
+  assert.strictEqual(aneh.domains.listening.replayCount, 20, '20 + 0 setelah dibatasi');
+});
 
 test('skor latihan tidak pernah disebut skor pengucapan', () => {
   assert.strictEqual(projection.terminology.pronunciationScore, false, 'penyangkalan eksplisit');
