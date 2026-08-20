@@ -269,6 +269,27 @@
     } catch (_) { return 0; }
   }
 
+  /**
+   * Anggaran waktu generate yang ikut naik bersama langkah denoising.
+   *
+   * Bukti m025-71 dari perangkat OWNER: pada 16 langkah, suaranya GAGAL dimuat. Sebabnya
+   * aritmetika sederhana - anggaran standalone 30 detik, sementara 4 langkah saja sudah
+   * memakan sekitar 6 detik untuk potongan pendek dan jauh lebih lama untuk potongan panjang.
+   * Empat kali lipat langkah menembus anggaran itu, lalu permintaannya dibatalkan.
+   *
+   * Jadi anggaran diskalakan sebanding, dan hanya ketika override diagnostik aktif. Produksi
+   * pada 4 langkah tetap memakai anggaran yang sama persis seperti hari ini.
+   */
+  function denoiseTimeoutMs(baseMs, env, now) {
+    var base = Number(baseMs) > 0 ? Number(baseMs) : 0;
+    if (!base) return base;
+    var steps = denoiseSteps(env, now);
+    if (!steps || steps <= DENOISE_STEPS_DEFAULT) return base;
+    var scaled = Math.round(base * (steps / DENOISE_STEPS_DEFAULT));
+    // Batas atas supaya satu potongan tidak pernah menggantung perangkat tanpa akhir.
+    return Math.min(scaled, 240000);
+  }
+
   function setDenoiseSteps(steps, env, now) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var value = Number(steps);
@@ -1099,6 +1120,7 @@
     buildReferenceTone,
     denoiseSteps,
     effectiveDenoiseSteps,
+    denoiseTimeoutMs,
     setDenoiseSteps,
     DENOISE_STEPS_DEFAULT,
     DENOISE_STEPS_ALLOWED,
