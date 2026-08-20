@@ -45,7 +45,7 @@ forbidden:
 
 ## YANG BELUM SELESAI DI SLICE INI
 
-- **Jumlah bank soal belum tersedia sinkron di `app.js`**, sehingga coverage target masih `unmeasurable` di produk. Bank ada di `listening-bank-v1.json` / `speaking-bank-v1.json` dan dimuat async oleh addon. Slice berikutnya: sediakan jumlahnya (mis. konstanta terverifikasi gate atau cache dari addon), lalu coverage otomatis hidup tanpa mengubah modul.
+- ~~Jumlah bank soal belum tersedia sinkron di `app.js`~~ — **SELESAI di m025-55.** Penyebutnya kini konstanta `bankCounts` di `speaking-listening-config.js`, dan `skills-evidence-test.js` membandingkannya langsung ke isi bank soal, sehingga konstanta itu tidak bisa diam-diam basi. Peta skill menampilkan cakupan sebagai baris terpisah dari nilai; kalau penyebut tidak diketahui, barisnya tidak muncul sama sekali.
 - **Dashboard R3 penuh** (membedakan skor latihan, cakupan target, dan yang belum dapat diukur secara visual) belum dibuat; peta skill R2 sudah menampilkan tiga keadaan itu untuk lima skill.
 - **Shadow evaluation** sebelum domain policy baru: belum ada domain policy baru yang diusulkan, jadi belum berlaku.
 
