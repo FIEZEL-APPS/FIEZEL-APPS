@@ -27,6 +27,20 @@
         continue;
       }
       const words = chunk.split(/\s+/);
+      // m025-73: potongannya DISEIMBANGKAN, tidak sekadar diisi sampai penuh lalu menyisakan
+      // ekor pendek.
+      //
+      // Bukti perangkat OWNER pada m025-72: teks berisi tanda petik membuat suara terjeda
+      // sekitar 10 detik, dan pada 8 langkah menjadi hampir 20 detik — tepat dua kali lipat,
+      // yaitu waktu generate. Penyebabnya bukan tanda petiknya, melainkan ekor pendek yang
+      // dihasilkan pemotongan serakah: satu potongan seperti "serempak." hanya berbunyi
+      // setengah detik tetapi tetap menuntut satu putaran generate penuh, dan prefetch tidak
+      // mungkin menyembunyikan enam detik di balik setengah detik pemutaran.
+      //
+      // Membagi rata menghilangkan ekor itu: setiap potongan berdurasi mirip, sehingga
+      // pemutaran satu potongan punya cukup waktu untuk menutupi pembuatan potongan berikutnya.
+      const pieces = Math.max(1, Math.ceil(chunk.length / limit));
+      const target = Math.ceil(chunk.length / pieces);
       let current = [];
       let currentLength = 0;
       function flush() {
@@ -41,7 +55,9 @@
           continue;
         }
         const added = current.length ? 1 + word.length : word.length;
-        if (current.length && currentLength + added > limit) flush();
+        // Batas keras tetap dihormati; target hanya menentukan kapan sebaiknya berpindah,
+        // sehingga sisa terakhir tidak pernah tertinggal sebagai serpihan.
+        if (current.length && (currentLength + added > limit || currentLength >= target)) flush();
         current.push(word);
         currentLength += currentLength ? 1 + word.length : word.length;
       }
@@ -51,7 +67,10 @@
   }
 
   function splitIntoChunks(text, targetWords, hardWords, hardChars) {
-    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+    // m025-73: tanda kutip dan kurung penutup ikut bersama kalimatnya. Tanpa ini, `dunia."`
+    // terbelah menjadi `dunia.` lalu `"`, dan tanda petik yatim itu diserahkan ke mesin
+    // sebagai token tersendiri - persis pada teks bertanda petik yang OWNER laporkan.
+    const sentences = text.match(/[^.!?]+[.!?]+["'”’)\]]*|[^.!?]+$/g) || [text];
     const chunks = [];
     let current = [];
     let count = 0;
