@@ -41,6 +41,7 @@ jobs:
           node content-adoption-rehearsal-test.js
           node content-adoption-test.js
           node content-adoption-receipt-test.js
+          node continuity-test.js
           node product-audit.js
           node runtime-stage8-test.js
           node ai-integration-test.js
