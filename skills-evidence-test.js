@@ -171,6 +171,38 @@ test('pembacaan storage tidak pernah melempar', () => {
   assert.strictEqual(skills.readSidecarState(env).schema, 'fiezel-sl-v1');
 });
 
+test('penyebut coverage di config tidak boleh basi terhadap bank soal', () => {
+  // app.js merender Home secara sinkron dan tidak bisa menunggu bank dimuat, jadi jumlahnya
+  // disimpan sebagai konstanta di config. Gate ini yang membuat konstanta itu tetap jujur:
+  // begitu bank soal berubah dan konstanta tidak, coverage akan salah dan test ini gagal.
+  const fs = require('fs');
+  const source = fs.readFileSync('./features/speaking-listening/speaking-listening-config.js', 'utf8');
+  const declared = {};
+  const block = source.match(/bankCounts:Object\.freeze\(\{([^}]*)\}\)/);
+  assert.ok(block, 'config wajib mendeklarasikan bankCounts');
+  for (const pair of block[1].split(',')) {
+    const [k, v] = pair.split(':').map(x => x.trim());
+    if (k) declared[k] = Number(v);
+  }
+  for (const domain of skills.DOMAINS) {
+    const bank = JSON.parse(fs.readFileSync(`./features/speaking-listening/${domain}-bank-v1.json`, 'utf8'));
+    assert.strictEqual(bank.count, bank.items.length, `${domain}: count bank tidak cocok dengan isinya`);
+    assert.strictEqual(declared[domain], bank.count,
+      `${domain}: config menyebut ${declared[domain]} item, bank berisi ${bank.count}`);
+  }
+});
+
+test('dengan penyebut nyata, coverage terukur dan tetap bukan nilai', () => {
+  const p = skills.projectSkillsEvidence({ state, now: NOW, bankCounts: { listening: 36, speaking: 36 } });
+  const cov = p.domains.listening.targetCoverage;
+  assert.strictEqual(cov.measured, true);
+  assert.strictEqual(cov.itemsAvailable, 36);
+  assert.strictEqual(cov.percent, 6, '2 dari 36 item');
+  assert.ok(!p.domains.listening.unmeasurable.includes('targetCoverage'));
+  // Coverage rendah tidak boleh menurunkan skor latihan, dan sebaliknya.
+  assert.strictEqual(p.domains.listening.practiceScore, 60);
+});
+
 console.log('');
 if (failures) { console.error('FIEZEL skills evidence: FAIL (' + failures + ')'); process.exit(1); }
 console.log('FIEZEL skills evidence: PASS');

@@ -778,3 +778,4 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:.74rem}
 .journey-goal-chip.is-active{border-color:var(--accent);color:var(--accent)}
 @media(max-width:760px){.journey-panel{grid-template-columns:1fr}.journey-skills{grid-template-columns:repeat(2,1fr)}.journey-skill{border-bottom:1px solid var(--line)}}
+.journey-skill small{color:var(--muted);font-size:.66rem;letter-spacing:.01em}
