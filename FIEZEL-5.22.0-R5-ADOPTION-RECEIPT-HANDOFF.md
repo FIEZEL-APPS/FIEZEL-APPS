@@ -3,7 +3,9 @@
 Tanggal: 2026-08-20 WIB
 Lane: R5 (roadmap `FIEZEL-PRODUCT-ROADMAP-2026-2027.md`)
 Base: `main@3e0075a` (R4 slice pertama)
-Rilis: **tidak ada perubahan runtime produk** — ini tooling release-time, jadi `DIAG_BUILD`/`SW_REV` sengaja TIDAK dinaikkan. Nomor m025-58 tetap bebas untuk lane audio.
+Rilis: `DIAG_BUILD=m025-58`, `SW_REV=m025-58-adoption-receipt-20260820-1`.
+
+Catatan koreksi: slice ini semula dikirim tanpa menaikkan marker, dengan alasan tidak ada perubahan runtime produk. A7 dan A11 menolaknya dengan bukti eksplisit (`base=57 head=57 expected=58`) — verifier memperlakukan perubahan berkas repo di luar dokumen sebagai product deploy, dan aturan itu yang berlaku, bukan penilaian saya. Marker dinaikkan. Konsekuensinya nomor m025-58 terpakai di sini, sehingga **alokasi bebas berikutnya untuk lane audio adalah m025-59.**
 Otoritas: OWNER memerintahkan roadmap dilanjutkan sampai ter-deploy.
 
 ## KENAPA INI YANG DIKERJAKAN LEBIH DULU
