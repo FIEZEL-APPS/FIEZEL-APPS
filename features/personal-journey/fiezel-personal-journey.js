@@ -128,8 +128,26 @@
     var weakest = (evidence.skills && evidence.skills.weakest) || [];
     var topRisks = (evidence.memory && evidence.memory.topRisks) || [];
 
+    var spoken = (evidence.skills && evidence.skills.spoken) || null;
+
     return SKILLS.map(function (skill) {
       if (MEASURED_SKILLS.indexOf(skill) === -1) {
+        // R3 memproyeksikan bukti agregat Speaking/Listening ke Learner Evidence. Kalau
+        // proyeksinya ada dan berisi, skill ini terukur seperti yang lain; kalau belum,
+        // statusnya tetap menunggu proyeksi - bukan diklaim tidak punya bukti.
+        var row = spoken && spoken[skill];
+        if (row && row.attempts > 0) {
+          return {
+            skill: skill, label: SKILL_LABELS[skill], status: 'measured',
+            attempts: row.attempts,
+            // practiceScore, bukan skor pengucapan. Namanya dijaga sampai ke layar.
+            accuracy: row.practiceScore == null ? null : clamp(row.practiceScore, 0, 100),
+            mastery: row.completionRate == null ? null : clamp(row.completionRate, 0, 100),
+            riskCount: 0,
+            targetCoverage: row.targetCoverage || null,
+            basis: row.attempts + ' latihan tercatat pada skill ini.'
+          };
+        }
         return {
           skill: skill, label: SKILL_LABELS[skill], status: 'pending_r3',
           attempts: null, accuracy: null, mastery: null, riskCount: 0,
