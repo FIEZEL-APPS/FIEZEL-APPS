@@ -93,6 +93,29 @@ test('Listening/Speaking berstatus menunggu R3, bukan diklaim tanpa bukti', () =
   assert.ok(!/belum ada bukti/i.test(byName.speaking.basis));
 });
 
+test('proyeksi R3 membuat Speaking/Listening terukur di peta skill', () => {
+  const denganSpoken = {
+    ...evidence,
+    skills: {
+      ...evidence.skills,
+      spoken: {
+        schema: 'fiezel-skills-evidence-v1', version: 1,
+        listening: { status: 'measured', attempts: 6, practiceScore: 72, completionRate: 67, targetCoverage: { measured: true, percent: 25 } },
+        speaking: { status: 'not_measured', attempts: 0, practiceScore: null, completionRate: null, targetCoverage: { measured: false, percent: null } }
+      }
+    }
+  };
+  const m = journey.buildWeeklyMission({ evidence: denganSpoken, policy, snapshot, now: NOW });
+  const byName = Object.fromEntries(m.skillMap.map(r => [r.skill, r]));
+  assert.strictEqual(byName.listening.status, 'measured');
+  assert.strictEqual(byName.listening.attempts, 6);
+  assert.strictEqual(byName.listening.accuracy, 72, 'skor latihan, bukan skor pengucapan');
+  assert.strictEqual(byName.listening.targetCoverage.percent, 25);
+  // Speaking punya proyeksi tetapi belum ada latihan: tetap tidak boleh diklaim 0%.
+  assert.strictEqual(byName.speaking.status, 'pending_r3');
+  assert.strictEqual(byName.speaking.accuracy, null);
+});
+
 test('identitas misi terkunci ke minggu, perubahan isi terlihat lewat revision', () => {
   // Bukti baru di tengah minggu tidak boleh diam-diam melahirkan misi baru.
   const policyBerubah = { ...policy, mode: 'review', targetSkill: 'reading_inference', primaryDomain: 'reading' };
