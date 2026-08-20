@@ -238,3 +238,43 @@ Uji yang batal diam-diam lebih berbahaya daripada uji yang gagal terang-terangan
 6. Selesai: tekan **KEMBALIKAN SEMUA KE NORMAL**.
 
 Yang dilaporkan: nomor `diagBuild`, tiga penilaian bersih/pecah, dan berapa lama menunggu di masing-masing.
+
+---
+
+# LANJUTAN m025-73 — Serpihan potongan: penyebab jeda yang OWNER rasakan
+
+Release: `DIAG_BUILD=m025-73`, `SW_REV=m025-73-balanced-chunks-20260820-1`
+
+## LAPORAN OWNER PADA m025-72
+
+| Setelan | Kualitas | Jeda |
+|---|---|---|
+| Normal (4 langkah) | lumayan bersih | teks bertanda petik terjeda ~10 detik |
+| **8 langkah** | **bersih sekali** | banyak jeda; teks bertanda petik hampir 20 detik |
+| 16 langkah | gagal memuat | — |
+
+OWNER lebih memilih versi normal, dengan satu keluhan tersisa: jeda.
+
+## DUA KESIMPULAN YANG BISA DIAMBIL LANGSUNG
+
+**Langkah denoising memang memperbaiki kualitas.** "Bersih sekali" pada 8 langkah adalah jawaban atas pertanyaan yang dikejar sejak m025-45: cacatnya di PCM model, dan menaikkan langkah memperbaikinya tanpa aset baru. Harganya waktu.
+
+**Jedanya bukan soal tanda petik.** 10 detik pada 4 langkah dan 20 detik pada 8 langkah adalah tepat dua kali lipat — itu tanda tangan satu putaran generate, bukan tanda baca yang membuat mesin berhenti.
+
+## PENYEBABNYA: SERPIHAN POTONGAN
+
+Pemotongan lama serakah: isi sampai batas 128 karakter, lalu sisanya jadi potongan tersendiri. Pada teks acuan, hasilnya **128 karakter lalu 9 karakter** — potongan `serempak.` yang hanya berbunyi setengah detik tetapi tetap menuntut satu putaran generate penuh. Prefetch tidak mungkin menyembunyikan enam detik pembuatan di balik setengah detik pemutaran, jadi jeda itu terdengar utuh.
+
+Tanda petik hanya menggeser letak potongannya sehingga serpihan itu muncul — itulah kenapa OWNER mengaitkannya dengan tanda petik.
+
+Sekarang potongannya dibagi rata: teks yang sama menjadi **69 dan 68 karakter**. Batas keras 128 tetap dihormati.
+
+## SATU DEFECT LAGI YANG DITEMUKAN GATE SENDIRI
+
+Pemisah kalimat memutus tanda kutip penutup dari kalimatnya: `dunia."` terbelah menjadi `dunia.` lalu `"`, dan tanda petik yatim itu diserahkan ke mesin sebagai token tersendiri. Sekarang kutip dan kurung penutup ikut bersama kalimatnya.
+
+## YANG BELUM SELESAI
+
+**16 langkah masih gagal** meski anggaran waktu sudah dinaikkan ke 120 detik di m025-72. Berarti ada batas lain yang belum ikut — kemungkinan besar gerbang kesiapan atau circuit breaker di lapisan bootstrap, bukan anggaran generate. Karena 8 langkah sudah "bersih sekali", ini bukan penghalang untuk perbaikan kualitas, tetapi tetap harus dijelaskan sebelum ditutup.
+
+**Keputusan default 8 langkah ditahan dulu.** Kualitasnya lebih baik, tetapi harganya waktu, dan jeda adalah keluhan utama OWNER. Urutannya: hilangkan dulu jeda strukturalnya, baru timbang menaikkan langkah — kalau tidak, perbaikan kualitas akan langsung terasa sebagai kemunduran.
