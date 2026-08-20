@@ -755,6 +755,7 @@ function unifiedSkillsMarkup(now=Date.now()){
       `<div><b>Cakupan target</b><br>${esc(coverage)}</div>`+
       `<div><b>Latihan tercatat</b><br>${row.attempts}</div>`+
       `<div><b>Kecepatan respons</b><br>${esc(latency)}</div>`+
+      `<div><b>Pengulangan audio</b><br>${row.replayCount==null?'Belum terukur':`${row.replayCount}x total · rata-rata ${row.replayAverage}x`}</div>`+
       `<div><b>Belum dapat diukur</b><br>${unknown?esc(unknown):'—'}</div></div>`;
   }).join('<hr>');
   return rows+'<p class="muted">Skor latihan dan cakupan target adalah dua hal berbeda: yang satu seberapa baik hasilnya, yang lain seberapa banyak materinya sudah disentuh. FIEZEL tidak menilai pengucapan, dan tidak menyimpan rekaman suara atau transkrip.</p>';
