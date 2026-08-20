@@ -18,7 +18,16 @@
   // elemen <audio> biasa, melewati AudioContext, worklet, penjadwalan, dan fade sepenuhnya.
   // Bersih di sini + pecah di mode normal = cacatnya ada di jalur pemutaran FIEZEL.
   // Pecah di keduanya = cacatnya bukan di penjadwalan kita.
-  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref']);
+  // m025-68: `plainbuffer` adalah arm yang lahir dari bukti, bukan dari dugaan.
+  //
+  // Telemetri m025-67 menunjukkan iOS menolak elemen media dengan NotAllowedError pada
+  // ke-13 percobaan, jadi arm `wavref` tidak bisa diandalkan di perangkat itu. Yang masih
+  // bisa dipakai adalah AudioContext yang SUDAH terbuka kuncinya oleh alur normal aplikasi.
+  //
+  // `plainbuffer` memutar PCM yang sama lewat AudioBufferSourceNode polos langsung ke
+  // destination: tanpa AudioWorklet, tanpa fade masuk/keluar, tanpa penjadwalan seam, tanpa
+  // epoch. Itu tepat memisahkan tiga tersangka utama yang tersisa dari PCM-nya sendiri.
+  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref', 'plainbuffer']);
   // Parameter URL tidak bisa dipakai di perangkat yang punya cacatnya. FIEZEL mewajibkan
   // notifikasi, dan iOS hanya memberi Notification API ke aplikasi layar-utama, sehingga tab
   // Safari - satu-satunya tempat parameter bisa diketik - berhenti di gerbang notifikasi.
@@ -143,6 +152,34 @@
       target.__fiezelWavRefPrimed = false;
       return Promise.resolve(false);
     }
+  }
+
+  /**
+   * Memasang pembuka-kunci sekali-pakai pada gesture APA PUN di halaman.
+   *
+   * Bukti m025-67: elemen media ditolak 13 dari 13 kali dengan NotAllowedError, dan
+   * `referencePrimed` tercatat false - membuka kunci hanya lewat tombol mode ternyata rapuh,
+   * karena mode bertahan 24 jam sementara tombolnya mungkin ditekan di sesi atau build lain.
+   * Sentuhan pertama pada apa pun sesudah aplikasi terbuka jauh lebih andal.
+   */
+  function armReferenceUnlock(env) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    if (target.__fiezelWavRefUnlockArmed) return false;
+    const doc = target.document;
+    if (!doc || typeof doc.addEventListener !== 'function') return false;
+    target.__fiezelWavRefUnlockArmed = true;
+    const once = function () {
+      try { primeReferenceElement(target); } catch (_) {}
+      try {
+        doc.removeEventListener('touchend', once, true);
+        doc.removeEventListener('click', once, true);
+      } catch (_) {}
+    };
+    try {
+      doc.addEventListener('touchend', once, true);
+      doc.addEventListener('click', once, true);
+    } catch (_) { return false; }
+    return true;
   }
 
   function encodeWav(samples, sampleRate) {
@@ -623,6 +660,68 @@
      * Ini satu-satunya cara memisahkan "modelnya yang cacat" dari "pemutaran kita yang cacat"
      * di perangkat nyata, dan itulah pertanyaan yang tiga rilis terakhir tidak bisa jawab.
      */
+    /**
+     * Pembanding di dalam Web Audio, tetapi tanpa lapisan yang dicurigai: worklet, fade, dan
+     * penjadwalan seam. Satu buffer, satu source, langsung ke destination, mulai sekarang.
+     *
+     * Kalau arm ini bersih sementara Normal pecah, cacatnya ada di lapisan yang dilewati -
+     * dan daftar tersangkanya tinggal tiga. Kalau arm ini juga pecah, ketiganya tidak bersalah
+     * dan yang tersisa adalah PCM atau output perangkat.
+     */
+    async function playViaPlainBuffer(samples, sampleRate, rawStats, renderedStats, opts) {
+      const current = await resumeContext();
+      if (!current || typeof current.createBufferSource !== 'function' || typeof current.createBuffer !== 'function') {
+        recordDiagnostic({ playbackPath: 'plain_buffer', referenceFallback: 'audio_context_unavailable' });
+        return null;
+      }
+      let node = null;
+      try {
+        const rate = Number(sampleRate) || PREFERRED_SAMPLE_RATE;
+        const buffer = current.createBuffer(1, samples.length, rate);
+        if (typeof buffer.copyToChannel === 'function') buffer.copyToChannel(samples, 0, 0);
+        else buffer.getChannelData(0).set(samples);
+        node = current.createBufferSource();
+        node.buffer = buffer;
+        node.connect(current.destination);
+      } catch (error) {
+        recordDiagnostic({
+          playbackPath: 'plain_buffer',
+          referenceFallback: String((error && error.name) || 'buffer_failed').slice(0, 40)
+        });
+        return null;
+      }
+
+      let settled = false;
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const finish = () => { if (settled) return; settled = true; resolveDone(); };
+      node.onended = finish;
+      const durationSeconds = samples.length / (Number(sampleRate) || PREFERRED_SAMPLE_RATE);
+      recordDiagnostic({
+        playbackPath: 'plain_buffer',
+        sourceSampleRate: sampleRate,
+        contextSampleRate: Number(current.sampleRate) || null,
+        resamplingExpected: Number(current.sampleRate) > 0 && Number(current.sampleRate) !== sampleRate,
+        trimmed: opts.trim === true,
+        raw: rawStats,
+        rendered: renderedStats,
+        bypassed: 'worklet,fade,seam_scheduling'
+      });
+      try { node.start(); } catch (error) {
+        finish();
+        recordDiagnostic({ playbackPath: 'plain_buffer', referenceFallback: 'start_failed' });
+        return null;
+      }
+      setTimeout(finish, Math.max(1000, Math.round(durationSeconds * 1000) + 2500));
+      return {
+        done,
+        startsAt: contextTime(current),
+        endsAt: contextTime(current) + durationSeconds,
+        diagnosticMode,
+        stop() { try { node.stop(); } catch (_) {} finish(); }
+      };
+    }
+
     async function playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts) {
       const AudioCtor = env.Audio || (typeof Audio !== 'undefined' ? Audio : null);
       const BlobCtor = env.Blob || (typeof Blob !== 'undefined' ? Blob : null);
@@ -697,6 +796,10 @@
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
+      if (diagnosticMode === 'plainbuffer') {
+        const plain = await playViaPlainBuffer(samples, sampleRate, rawStats, renderedStats, opts);
+        if (plain) return plain;
+      }
       if (diagnosticMode === 'wavref') {
         // Kalau pembanding gagal dipakai (iOS memblokir play() di luar gesture, atau elemen
         // media tidak tersedia), JANGAN melempar. Melempar membuat runtime suara mengira
@@ -878,6 +981,7 @@
     pcmDiagnosticMode,
     setPcmDiagnosticMode,
     primeReferenceElement,
+    armReferenceUnlock,
     readStoredPcmMode,
     encodeWav,
     analyzeSamples,
