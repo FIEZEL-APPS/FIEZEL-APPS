@@ -60,7 +60,33 @@ async function main(){
   assert.equal(messages[0].message.fadeInFrames,265,'non-Apple player must remain untouched');
   assert.equal(messages[0].message.fadeOutFrames,353,'non-Apple player must remain untouched');
 
-  // 3) Indonesian verification must terminate from shared readiness without a second worker.
+
+  // 3) Audiobook prefetch must still reach the inner warm cache while a serialized speak is playing.
+  let resolveSpeak;
+  const warmCalls=[];
+  const serialRoot={console,Promise,setTimeout,clearTimeout,
+    FiezelNeuralVoice:Object.freeze({
+      createVoiceService:()=>Object.freeze({
+        speak:()=>new Promise(resolve=>{resolveSpeak=resolve;}),
+        stop(){},
+        prefetch:(text,options)=>{warmCalls.push({text,options});return Promise.resolve(true);}
+      }),
+      normalizeText:x=>x,
+      splitIntoChunks:x=>[x]
+    })};
+  serialRoot.globalThis=serialRoot;
+  vm.runInNewContext(preSource,serialRoot);
+  const serialized=serialRoot.FiezelNeuralVoice.createVoiceService({env:{navigator:{standalone:false}}});
+  const speaking=serialized.speak('Current sentence.');
+  assert.equal(await serialized.prefetch('Next sentence.',{voice:'test'}),true,
+    'warm-up must not be blocked for the whole playback lifetime of serialized speak()');
+  assert.deepEqual(warmCalls.map(x=>x.text),['Next sentence.']);
+  resolveSpeak({provider:'done'});
+  await speaking;
+  assert.doesNotMatch(preSource,/pending\s*>\s*0\s*\|\|\s*typeof inner\.prefetch/,
+    'the emergency serializer must not starve audiobook next-line prefetch');
+
+  // 4) Indonesian verification must terminate from shared readiness without a second worker.
   let originalPrepareCalls=0;
   let timer=null;
   const stable=Object.freeze({
@@ -89,13 +115,13 @@ async function main(){
   assert.equal(originalPrepareCalls,0,'shared verification must not create Indonesian Supertonic worker');
   if(timer) timer();
 
-  // 4) Mandatory voice gate completion is based on prepared state, not generation-ready.
+  // 5) Mandatory voice gate completion is based on prepared state, not generation-ready.
   assert.match(bundleSource,/return\s+!\(s\.englishPrepared\s*&&\s*s\.indonesianPrepared\)/,
     'voice bundle sheet must close when both shared bundles are prepared');
   assert.doesNotMatch(bundleSource,/function indonesianPrepared\(\)[\s\S]{0,260}\.ready/,
     'bundle preparation gate must not wait for Indonesian generation ready');
 
-  // 5) No dead staging module or extra load-order mutation may remain.
+  // 6) No dead staging module or extra load-order mutation may remain.
   assert.equal(fs.existsSync('features/neural-voice/fiezel-m0282-audioedge-hotfix.js'),false,'unwired staging module must be removed');
   assert.doesNotMatch(indexSource,/fiezel-m0282-audioedge-hotfix\.js/,'index must not carry an extra hotfix script');
   assert.match(preSource,/fiezel-m0282-prebootstrap-integrity-v2/);
