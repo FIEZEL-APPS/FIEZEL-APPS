@@ -108,3 +108,43 @@ Selain itu, pembuka kunci elemen media kini dipasang pada **sentuhan apa pun** d
 | pecah | pecah | ketiganya tidak bersalah; tersisa PCM itu sendiri atau output perangkat |
 
 Kalau WAV REF akhirnya berbunyi (panel menulis SIAP), ia tetap pembanding terkuat karena keluar dari Web Audio sepenuhnya.
+
+---
+
+# LANJUTAN m025-69 — Nada uji, dan penyempitan tersangka setelah m025-68
+
+Release: `DIAG_BUILD=m025-69`, `SW_REV=m025-69-tone-reference-arm-20260820-1`
+
+## HASIL UJI m025-68 (OWNER, perangkat nyata)
+
+Teks pendek, arm Normal vs PLAIN BUFFER: **hasilnya sama persis** — "sedikit pecah", jeda 8 detik pada keduanya. Arm-nya terbukti benar-benar berjalan: 2 rekaman `playbackPath: plain_buffer` dengan `bypassed: worklet,fade,seam_scheduling`.
+
+Teks panjang: **Normal justru LEBIH BERSIH** daripada PLAIN BUFFER, dan jedanya hanya di awal bacaan.
+
+## APA YANG DICORET, DAN APA YANG JUSTRU TERBUKTI BERGUNA
+
+Dicoret sebagai penyebab crackle, karena melewatinya tidak mengubah apa pun:
+
+- AudioWorklet
+- fade masuk/keluar
+- penjadwalan seam
+
+Dari telemetri yang sama, juga dicoret: sambungan antar potongan (`chunkCount: 1` — satu permintaan satu potongan), `trimmed: false`, resampling (44100 = 44100), dan clipping (0 sampel pada rekaman itu, puncak 0,535 dan 0,301).
+
+**Terbukti berguna, dan tidak boleh dibuang:** penjadwalan seam. Pada teks panjang, membuangnya membuat suara lebih buruk — persis yang OWNER dengar. Arm PLAIN BUFFER sengaja membuangnya; degradasi itu hasil yang diharapkan, bukan cacat baru.
+
+**Jeda sudah jauh membaik:** dari median 13 detik di m025-66 menjadi sebagian besar 0–1 ms, dengan sisa jeda hanya di awal bacaan (waktu generate potongan pertama, ~6 detik). Perbaikan prefetch m025-66 bekerja.
+
+## TERSANGKA YANG TERSISA: DUA
+
+1. PCM yang dihasilkan model.
+2. Tahap keluaran audio perangkat/PWA.
+
+`toneref` memisahkan keduanya. Ia memutar sinyal yang dibuat FIEZEL sendiri — nada 150 Hz dengan harmonik dan amplop suku kata, puncak 0,50, deterministik — lewat jalur buffer polos yang sama. Model tidak dilibatkan sama sekali.
+
+| Nada uji | Kesimpulan |
+|---|---|
+| terdengar **pecah** | keluaran perangkat/PWA yang bermasalah; model dan kode kita tidak bersalah |
+| terdengar **bersih** | jalur keluaran sehat, jadi cacatnya ada pada PCM yang dihasilkan model |
+
+Gate mengunci nada ini deterministik, tidak pernah mendekati clipping, dan benar-benar tidak berasal dari PCM model (diuji dengan memberi PCM model yang diam total).
