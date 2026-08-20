@@ -54,7 +54,13 @@ assert.ok(sourceLock.dependencies.phonemizerSourceOverride&&sourceLock.dependenc
 assert.equal(sha256(readBuf(sourceLock.dependencies.phonemizerSourceOverride.path)),sourceLock.dependencies.phonemizerSourceOverride.sha256,'m025-5 source override bytes must match the source-lock SHA-256');
 assert.ok(boot.includes("root.navigator?.standalone===true?30000:20000"),'standalone neural generation timeout must remain unchanged');
 assert.ok(boot.includes("phase:'speak_init_ready'")&&boot.includes("phase:'speak_neural_start'"),'init and neural speech timing must be diagnosed separately');
-assert.ok(boot.includes('generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS'),'generation timeout must live in the voice service');
+// m025-72: the budget is computed at call time because it scales with the diagnostic
+// denoising step count - at 16 steps the fixed 30 s budget cancelled the request before the
+// audio existed, which OWNER experienced as audio that never arrived. The guarded invariant
+// is unchanged: the timeout must be handed to the voice service, and the standalone base
+// budget above must stay 30 s for production.
+assert.ok(/generationTimeoutMs:neuralGenerationTimeoutMs\(\)/.test(boot),'generation timeout must live in the voice service');
+assert.ok(/const neuralGenerationTimeoutMs=\(\)=>/.test(boot),'the budget must come from one shared helper');
 assert.ok(!boot.includes("const timeout=Symbol('fiezel-tts-timeout')"),'playback must not be subject to the generation timeout');
 assert.ok(boot.includes('initialized:!!service'));
 assert.ok(boot.includes('audibleVerified'));
