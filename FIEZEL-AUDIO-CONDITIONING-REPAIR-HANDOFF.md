@@ -199,3 +199,42 @@ Versi pertama hanya memasang override pada jalur Supertonic. `neural-voice-m0254
 Dengar teks yang sama pada 4 (default), lalu 8, lalu 16 langkah. Nilai dua hal terpisah: bersih/pecahnya, dan berapa lama menunggu sebelum suara mulai. Langkah lebih tinggi berarti suara lebih halus tetapi generate lebih lama — dan jeda awal itu yang paling terasa.
 
 Kalau 8 atau 16 terdengar jelas lebih bersih, perbaikannya jelas dan tinggal menimbang harga waktunya. Kalau tidak ada bedanya sama sekali, tuas ini habis, dan tersisa satu jalan: mengganti vocoder int8 dengan presisi lebih tinggi — dan itu keputusan aset yang butuh persetujuan OWNER karena menambah unduhan.
+
+---
+
+# LANJUTAN m025-72 — Anggaran waktu untuk langkah tinggi, dan penjaga uji yang batal
+
+Release: `DIAG_BUILD=m025-72`, `SW_REV=m025-72-steps-timeout-budget-20260820-1`
+
+## LAPORAN OWNER PADA m025-71
+
+> "tidak ada bedanya semua mulus, tapi 16 tidak memuat unduhan atau gagal"
+
+Dua hal, dan keduanya punya penjelasan konkret.
+
+## 1. "16 gagal" — aritmetika, bukan misteri
+
+Anggaran waktu generate pada mode standalone adalah **30 detik**. Pada 4 langkah, satu potongan pendek sudah memakan sekitar 6 detik, dan potongan panjang jauh lebih lama. Menaikkan langkah empat kali lipat menembus anggaran itu, permintaannya dibatalkan, lalu kegagalannya muncul sebagai suara yang tidak jadi.
+
+m025-72 membuat anggaran ikut naik sebanding dengan langkah: 8 langkah menjadi 60 detik, 16 langkah menjadi 120 detik, dengan batas atas 240 detik supaya satu potongan tidak pernah menggantung perangkat tanpa akhir. **Tanpa override diagnostik, anggarannya sama persis seperti sebelumnya** — produksi tidak ikut berubah.
+
+## 2. "Semua mulus" — kemungkinan besar uji yang batal diam-diam
+
+Mode PCM bertahan 24 jam. Kalau mode masih **NADA UJI** saat langkah diuji, yang terdengar adalah nada buatan — bukan suara model — sehingga ketiga langkah akan terdengar mulus tanpa satu pun benar-benar diuji. Itu konsisten dengan laporan "semua mulus" tepat setelah uji nada.
+
+Uji yang batal diam-diam lebih berbahaya daripada uji yang gagal terang-terangan, karena hasilnya terlihat seperti jawaban. Karena itu m025-72 menambahkan:
+
+- **peringatan otomatis**: menekan tombol langkah saat mode PCM diagnostik masih aktif akan menampilkan "uji langkah ini tidak sah — tekan PCM: Normal dulu";
+- **status lengkap** di panel: mode PCM aktif DAN langkah denoising aktif, ditulis berdampingan;
+- **satu tombol `KEMBALIKAN SEMUA KE NORMAL`** yang membersihkan mode PCM dan langkah sekaligus.
+
+## CARA MENGULANG UJI LANGKAH DENGAN BENAR
+
+1. Buka Diagnostics, tekan **KEMBALIKAN SEMUA KE NORMAL**, tutup aplikasi sepenuhnya, buka lagi.
+2. Pastikan panel menulis **"Mode PCM aktif: produksi normal · langkah denoising: 4 (default)"**.
+3. Dengarkan teks acuan. Nilai bersih/pecahnya.
+4. Tekan **LANGKAH: 8**, tutup-buka, dengarkan teks yang sama.
+5. Tekan **LANGKAH: 16**, tutup-buka, dengarkan teks yang sama. Sekarang seharusnya tidak gagal lagi, tetapi menunggunya lebih lama.
+6. Selesai: tekan **KEMBALIKAN SEMUA KE NORMAL**.
+
+Yang dilaporkan: nomor `diagBuild`, tiga penilaian bersih/pecah, dan berapa lama menunggu di masing-masing.
