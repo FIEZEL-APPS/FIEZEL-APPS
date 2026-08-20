@@ -860,6 +860,45 @@ function confirmRestore(){
   showToast('Progres digabungkan.');
   render();
 }
+// R6 install/update health check. Pertanyaan yang dijawabnya sederhana tetapi selama ini
+// hanya bisa ditebak: apakah yang berjalan benar-benar build yang sudah dirilis, atau shell
+// lama yang masih dipegang service worker. Penilaiannya ada di features/health.
+const HEALTH_SEVERITY_LABELS={ok:'Aman',info:'Catatan',warn:'Perlu perhatian',blocker:'Harus ditangani'};
+function installHealthModule(){return self.FiezelInstallHealth||null}
+async function readInstallHealth(now=Date.now()){
+  const mod=installHealthModule();if(!mod)return null;
+  const diagBuild=self.FIEZEL_PAGE_BUILD||null;
+  const swRev=await askServiceWorkerRevision();
+  const env=await mod.readEnvironment(self,{diagBuild,swRev});
+  return mod.evaluateHealth({...env,now});
+}
+/** Menanyakan revisi shell ke service worker yang aktif; diam-diam menyerah bila tidak dijawab. */
+function askServiceWorkerRevision(timeoutMs=1500){
+  return new Promise(resolve=>{
+    const container=self.navigator?.serviceWorker,worker=container?.controller;
+    if(!container||!worker||typeof MessageChannel!=='function')return resolve(null);
+    let settled=false;
+    const done=value=>{if(!settled){settled=true;resolve(value)}};
+    try{
+      const channel=new MessageChannel();
+      channel.port1.onmessage=event=>done(event?.data?.swRev||null);
+      worker.postMessage({type:'FIEZEL_HEALTH_PING'},[channel.port2]);
+      setTimeout(()=>done(null),timeoutMs);
+    }catch(_){done(null)}
+  });
+}
+function installHealthReportMarkup(report){
+  if(!report)return '<p class="muted">Pemeriksaan instalasi belum tersedia.</p>';
+  const rows=report.findings.map(f=>`<div class="row health-${esc(f.severity)}"><span><b>${esc(f.label)}</b><br><small class="muted">${esc(f.detail)}</small>${f.remedy?`<br><small>${esc(f.remedy)}</small>`:''}</span><b>${esc(HEALTH_SEVERITY_LABELS[f.severity]||f.severity)}</b></div>`).join('');
+  const status=report.status==='healthy'?'Instalasi sehat':report.status==='degraded'?'Ada yang perlu diperhatikan':'Ada yang harus ditangani';
+  return `<p><b>${esc(status)}</b></p>${rows}<p class="muted">Pemeriksaan ini hanya melihat keadaan pemasangan aplikasi. Tidak ada riwayat jawaban atau isi belajar yang dibaca.</p>`;
+}
+async function refreshInstallHealth(){
+  const el=$('installHealth');if(!el)return;
+  try{el.innerHTML=installHealthReportMarkup(await readInstallHealth())}
+  catch(_){el.innerHTML='<p class="muted">Pemeriksaan instalasi tidak bisa diselesaikan di perangkat ini.</p>'}
+}
+window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstallHealth};
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
@@ -1127,12 +1166,13 @@ function progress(){
  ${card(`<h3>Laporan Diagnostik</h3>${diagHtml}`)}
  ${card(`<h3>Adaptive Policy Engine</h3>${(()=>{const p=buildAdaptivePolicy();return `<div class="diag-grid"><div><b>Mode</b><br>${esc(p.mode)}</div><div><b>Fokus</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain))}</div><div><b>Session</b><br>${p.sessionSize} soal · ±${p.estimatedMinutes} menit</div><div><b>Difficulty</b><br>${esc(p.difficultyBand)} · target ${p.targetDifficulty}</div><div><b>Review share</b><br>${Math.round(p.reviewShare*100)}%</div><div><b>Pace</b><br>${esc(p.pace)}</div></div><p>${esc(p.summary)}</p><p class="muted">Policy bersifat deterministik dan dapat diaudit. AI Coach hanya menjelaskan plan; tidak boleh menimpa keputusan policy.</p>`})()}`)}
  ${card(`<h3>Policy Outcome Evaluation</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>Belum ada sesi adaptive yang punya outcome terukur.</p>';return `<div class="diag-grid"><div><b>Status</b><br>${esc(o.status)}</div><div><b>Score</b><br>${Math.round(o.score)}/100</div><div><b>Completion</b><br>${Math.round(o.completionRate)}%</div><div><b>Akurasi</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>Target hit</b><br>${Math.round(o.targetAdherence)}%</div><div><b>Rekomendasi</b><br>${esc(o.recommendation)}</div></div><p class="muted">Outcome ini menjadi evidence policy berikutnya. Raw jawaban tidak dikirim ke Core.</p>`})()}`)}
+ ${card(`<h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div>`)}
  ${card(`<h3>Peta Kesiapan Akademik</h3>${academicReadinessMarkup()}`)}
  ${card(`<h3>Bukti Skill Terpadu</h3>${unifiedSkillsMarkup()}`)}
  ${card(`<h3>Learner Evidence Model</h3><div class="diag-grid"><div><b>Konsistensi 14 hari</b><br>${evidence.behavior.consistency14d}% · ${evidence.behavior.activeDays14} hari aktif</div><div><b>Kecepatan respons</b><br>${evidence.behavior.medianResponseMs==null?'Belum terbaca':Math.round(evidence.behavior.medianResponseMs/100)/10+' detik median'}</div><div><b>Kalibrasi keyakinan</b><br>${evidence.confidence.gap==null?'Belum cukup bukti':'selisih '+evidence.confidence.gap+'%'}</div><div><b>Session abandonment</b><br>${evidence.behavior.abandonmentRate}% dari ${evidence.behavior.sessions30d} sesi</div><div><b>Waktu belajar dominan</b><br>${esc(evidence.behavior.preferredStudyWindow)}</div><div><b>Risiko lupa tertinggi</b><br>${evidence.memory.maxForgettingRisk}% · ${evidence.memory.highRiskCount} high-risk</div></div><p class="muted">Model ini memakai agregat perilaku dan hasil belajar. Raw answer history tidak dikirim ke Core Brain.</p>`)}
  </div>
  ${card(`<div class="row"><b>Dibuat oleh Fitrarustqi</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
- <button class="danger" onclick="resetProgress()">Reset progres</button>`)
+ <button class="danger" onclick="resetProgress()">Reset progres</button>`);setTimeout(refreshInstallHealth,0)
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
 function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${Math.random().toString(36).slice(2)}`}}
@@ -1213,6 +1253,6 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.toggleSoundtrack=toggleSoundtrack;window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));

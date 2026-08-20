@@ -43,6 +43,7 @@ jobs:
           node content-adoption-receipt-test.js
           node continuity-test.js
           node backup-ui-test.js
+          node install-health-test.js
           node product-audit.js
           node runtime-stage8-test.js
           node ai-integration-test.js
