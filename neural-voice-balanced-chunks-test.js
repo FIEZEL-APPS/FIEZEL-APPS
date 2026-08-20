@@ -113,6 +113,49 @@ test('isi teks tidak berubah, hanya tempat memotongnya', () => {
   }
 });
 
+test('potongan pembuka dipendekkan supaya kata pertama cepat terdengar', () => {
+  // Bukti perangkat OWNER pada m025-73: jeda tanda petik jauh membaik, tetapi jeda SAAT MULAI
+  // MEMBACA masih sangat lama. Jeda lain bisa bersembunyi di balik pemutaran potongan
+  // sebelumnya; potongan pertama tidak punya apa pun untuk bersembunyi, jadi waktu sampai kata
+  // pertama sama dengan waktu membuat potongan pertama.
+  const parts = chunks(kutipan);
+  const lead = Math.max(24, Math.round(APPLE_LIMIT / 3));
+  const withLead = Array.from(nv.withFastLeadIn(parts, lead, APPLE_LIMIT));
+  assert.ok(withLead[0].length <= lead, `pembuka ${withLead[0].length} karakter, seharusnya <= ${lead}`);
+  assert.ok(withLead[0].length > 10, 'pembuka tetap satu frasa yang wajar, bukan sepotong kata');
+  assert.ok(/[a-z0-9]/i.test(withLead[0]), 'pembuka harus punya isi yang bisa dibunyikan');
+});
+
+test('sisa potongan pembuka tidak menjadi serpihan baru', () => {
+  // Memendekkan pembuka tidak boleh menghidupkan lagi cacat yang dibereskan m025-73.
+  const lead = Math.max(24, Math.round(APPLE_LIMIT / 3));
+  for (const text of [kutipan, judul]) {
+    const withLead = Array.from(nv.withFastLeadIn(chunks(text), lead, APPLE_LIMIT));
+    for (const part of withLead.slice(1)) {
+      assert.ok(part.length > 20, `serpihan sepanjang ${part.length} karakter muncul lagi`);
+      assert.ok(part.length <= APPLE_LIMIT, `potongan ${part.length} melewati batas`);
+    }
+  }
+});
+
+test('pembuka cepat tidak mengubah isi teks sama sekali', () => {
+  const normalise = value => value.replace(/\s+/g, ' ').trim();
+  const lead = Math.max(24, Math.round(APPLE_LIMIT / 3));
+  for (const text of [kutipan, judul]) {
+    const parts = chunks(text);
+    const withLead = Array.from(nv.withFastLeadIn(parts, lead, APPLE_LIMIT));
+    assert.strictEqual(normalise(withLead.join(' ')), normalise(parts.join(' ')));
+  }
+});
+
+test('teks yang sudah pendek tidak dipecah lagi oleh pembuka cepat', () => {
+  const pendek = ['Halo, apa kabar?'];
+  assert.strictEqual(nv.withFastLeadIn(pendek, 43, APPLE_LIMIT), pendek, 'dikembalikan apa adanya');
+  assert.strictEqual(nv.withFastLeadIn([], 43, APPLE_LIMIT).length, 0);
+  const tanpaBatas = chunks(kutipan);
+  assert.strictEqual(nv.withFastLeadIn(tanpaBatas, 0, APPLE_LIMIT), tanpaBatas, 'tanpa lead-in, tidak ada yang berubah');
+});
+
 console.log('');
 if (failures) { console.error('FIEZEL balanced chunks: FAIL (' + failures + ')'); process.exit(1); }
 console.log('FIEZEL balanced chunks: PASS');
