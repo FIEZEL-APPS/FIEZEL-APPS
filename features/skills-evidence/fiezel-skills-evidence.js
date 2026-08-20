@@ -92,13 +92,15 @@
   }
 
   function summarize(events, available) {
-    var scores = [], times = [], levels = {};
+    var scores = [], times = [], levels = {}, replayRows = [];
     for (var i = 0; i < events.length; i++) {
       var e = events[i];
       scores.push(clamp(e.score, 0, 100));
       var ms = clamp(e.responseMs, 0, 600000);
       if (ms) times.push(ms);
       var level = String(e.level || 'A1');
+      var replays = clamp(e.replays, 0, 20);
+      if (replays !== null) replayRows.push(replays);
       var bucket = levels[level] || (levels[level] = { attempts: 0, passed: 0, scoreSum: 0 });
       bucket.attempts++;
       if (e.passed) bucket.passed++;
@@ -107,11 +109,14 @@
 
     var attempts = events.length;
     var passed = events.filter(function (e) { return !!e.passed; }).length;
-    // Apa yang memang tidak bisa dijawab dari state, dinyatakan terbuka. `replays` dihitung
-    // di controller latihan tetapi tidak pernah ikut disimpan ke event, jadi replay count
-    // tidak dapat diturunkan dari bukti yang ada - dan mengarangnya lebih buruk daripada
-    // mengakuinya.
-    var unmeasurable = ['replayCount'];
+    // m025-65: `replays` kini benar-benar disimpan pada event oleh sidecar, jadi replay count
+    // bukan lagi hal yang tidak terukur - SELAMA event-nya memang membawanya. Event lama dari
+    // sebelum perubahan itu tidak punya field ini, dan untuk event seperti itu jawabannya tetap
+    // "belum terukur", bukan nol. Nol berarti murid tidak pernah mengulang audio; tidak tahu
+    // berarti kita tidak tahu.
+    var replayTotal = replayRows.length ? replayRows.reduce(function (a, b) { return a + b; }, 0) : null;
+    var unmeasurable = [];
+    if (!replayRows.length) unmeasurable.push('replayCount');
     if (!available) unmeasurable.push('targetCoverage');
 
     return {
@@ -122,7 +127,9 @@
       // serta tidak boleh ditampilkan sebagai - skor pengucapan.
       practiceScore: attempts ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / attempts) : null,
       medianResponseMs: median(times),
-      replayCount: null,
+      replayCount: replayTotal,
+      replayAverage: replayRows.length ? Math.round(replayTotal / replayRows.length * 10) / 10 : null,
+      replayEvidence: replayRows.length,
       targetCoverage: coverageFor(events, available),
       byLevel: Object.keys(levels).sort().reduce(function (acc, key) {
         var b = levels[key];
