@@ -87,7 +87,7 @@
   function sanitizeState(raw,limit){
     const s=freshState();if(!raw||raw.schema!==STATE_SCHEMA)return s;
     const cleanEvents=(Array.isArray(raw.events)?raw.events:[]).slice(-limit).map(e=>({
-      id:String(e.id||'').slice(0,80),at:Number(e.at||0),domain:e.domain==='speaking'?'speaking':'listening',itemId:String(e.itemId||'').slice(0,80),level:LEVELS.includes(e.level)?e.level:'A1',mode:String(e.mode||'').slice(0,40),score:clamp(e.score,0,100),passed:!!e.passed,responseMs:clamp(e.responseMs,0,600000),metric:String(e.metric||'').slice(0,40),rawAudioStored:false,rawTranscriptStored:false
+      id:String(e.id||'').slice(0,80),at:Number(e.at||0),domain:e.domain==='speaking'?'speaking':'listening',itemId:String(e.itemId||'').slice(0,80),level:LEVELS.includes(e.level)?e.level:'A1',mode:String(e.mode||'').slice(0,40),score:clamp(e.score,0,100),passed:!!e.passed,responseMs:clamp(e.responseMs,0,600000),metric:String(e.metric||'').slice(0,40),replays:clamp(e.replays,0,20),rawAudioStored:false,rawTranscriptStored:false
     }));
     s.events=cleanEvents;s.updatedAt=Number(raw.updatedAt||0);s.capabilityEvents={};
     const capabilityRows=raw.capabilityEvents&&typeof raw.capabilityEvents==='object'?Object.entries(raw.capabilityEvents).slice(-12):[];
@@ -99,15 +99,15 @@
     constructor(config){this.config=config;this.storage=global.localStorage||null;this.state=this.load()}
     load(){try{return sanitizeState(JSON.parse(this.storage?.getItem(this.config.storageKey)||'null'),this.config.aggregateEventLimit)}catch{return freshState()}}
     save(){this.state.updatedAt=now();try{this.storage?.setItem(this.config.storageKey,JSON.stringify(this.state))}catch{}return this.state}
-    record(domain,item,result,responseMs){
+    record(domain,item,result,responseMs,replays){
       if(!['listening','speaking'].includes(domain))throw new Error('invalid_domain');
-      const event={id:`sl-${now()}-${Math.random().toString(36).slice(2,8)}`,at:now(),domain,itemId:String(item.id||'').slice(0,80),level:LEVELS.includes(item.level)?item.level:'A1',mode:String(item.mode||'').slice(0,40),score:clamp(result.score,0,100),passed:!!result.passed,responseMs:clamp(responseMs,0,600000),metric:String(result.metric||'').slice(0,40),rawAudioStored:false,rawTranscriptStored:false};
+      const event={id:`sl-${now()}-${Math.random().toString(36).slice(2,8)}`,at:now(),domain,itemId:String(item.id||'').slice(0,80),level:LEVELS.includes(item.level)?item.level:'A1',mode:String(item.mode||'').slice(0,40),score:clamp(result.score,0,100),passed:!!result.passed,responseMs:clamp(responseMs,0,600000),metric:String(result.metric||'').slice(0,40),replays:clamp(replays,0,20),rawAudioStored:false,rawTranscriptStored:false};
       this.state.events=[...(this.state.events||[]),event].slice(-this.config.aggregateEventLimit);
       const es=this.state.events.filter(e=>e.domain===domain);this.state[domain]={attempts:es.length,passed:es.filter(e=>e.passed).length,scoreSum:es.reduce((n,e)=>n+e.score,0)};this.save();return event
     }
     noteCapability(name,status){const key=String(name||'').slice(0,40);if(!key)return;const next={...(this.state.capabilityEvents||{}),[key]:{status:String(status||'').slice(0,40),at:now()}};this.state.capabilityEvents=Object.fromEntries(Object.entries(next).slice(-12));this.save()}
     evidence(){
-      const events=this.state.events||[],summarize=domain=>{const es=events.filter(e=>e.domain===domain),scores=es.map(e=>e.score),times=es.map(e=>e.responseMs).filter(Boolean);const byMode={};for(const e of es){const b=byMode[e.mode]||{attempts:0,passed:0,scoreSum:0};b.attempts++;if(e.passed)b.passed++;b.scoreSum+=e.score;byMode[e.mode]=b}return{attempts:es.length,passRate:es.length?Math.round(es.filter(e=>e.passed).length/es.length*100):null,averageScore:scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null,medianResponseMs:median(times),byMode:Object.fromEntries(Object.entries(byMode).map(([k,b])=>[k,{attempts:b.attempts,passRate:b.attempts?Math.round(b.passed/b.attempts*100):null,averageScore:b.attempts?Math.round(b.scoreSum/b.attempts):null}]))}}
+      const events=this.state.events||[],summarize=domain=>{const es=events.filter(e=>e.domain===domain),scores=es.map(e=>e.score),times=es.map(e=>e.responseMs).filter(Boolean),replayRows=es.map(e=>Number(e.replays)).filter(n=>Number.isFinite(n));const byMode={};for(const e of es){const b=byMode[e.mode]||{attempts:0,passed:0,scoreSum:0};b.attempts++;if(e.passed)b.passed++;b.scoreSum+=e.score;byMode[e.mode]=b}return{attempts:es.length,replays:replayRows.length?replayRows.reduce((a,b)=>a+b,0):null,replayRate:replayRows.length?Math.round(replayRows.reduce((a,b)=>a+b,0)/replayRows.length*10)/10:null,passRate:es.length?Math.round(es.filter(e=>e.passed).length/es.length*100):null,averageScore:scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length):null,medianResponseMs:median(times),byMode:Object.fromEntries(Object.entries(byMode).map(([k,b])=>[k,{attempts:b.attempts,passRate:b.attempts?Math.round(b.passed/b.attempts*100):null,averageScore:b.attempts?Math.round(b.scoreSum/b.attempts):null}]))}}
       return{schema:EVIDENCE_SCHEMA,generatedAt:new Date().toISOString(),privacy:{rawAudioIncluded:false,rawTranscriptIncluded:false,rawAnswerTextIncluded:false},domains:{listening:summarize('listening'),speaking:summarize('speaking')},capabilities:capabilities()}
     }
     reset(){this.state=freshState();try{this.storage?.removeItem(this.config.storageKey)}catch{}return this.state}
@@ -185,7 +185,7 @@
     }
     setFeedback(text){const el=this.root?.querySelector?.('[data-feedback]');if(el)el.innerHTML=`<div class="fsl-feedback">${esc(text)}</div>`}
     finishItem(item,result,prefix=''){
-      const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms);this.emitEvidence();const label=result.passed?'Lolos target item':'Belum mencapai target item';const note=this.domain==='speaking'?`Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation.`:`Skor ${result.score}%.`;
+      const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?'Lolos target item':'Belum mencapai target item';const note=this.domain==='speaking'?`Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation.`:`Skor ${result.score}%.`;
       const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>Script:</b> ${esc(item.script)}</p>`:`<p><b>Contoh respons:</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>Lanjut</button></div></div>`;
       this.root.querySelectorAll('button').forEach(b=>{if(!b.hasAttribute('data-next')&&!b.hasAttribute('data-exit'))b.disabled=true});this.root.querySelector('[data-next]')?.addEventListener('click',()=>{this.ephemeralTranscript='';this.index++;this.renderSession()})
     }
