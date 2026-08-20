@@ -69,3 +69,42 @@ Pada m025-67, urutan sama, catat `DIAG_BUILD` dari Diagnostics:
 3. **RAW** dan **CONDITIONED** — sekarang keduanya seharusnya jauh lebih mirip, karena bedanya tinggal NaN/DC/headroom. Kalau masih berbeda jauh, berarti masih ada transformasi lain yang belum ketahuan.
 
 Laporkan juga jeda antar kalimat secara terpisah dari pecah/bersih.
+
+
+---
+
+# LANJUTAN m025-68 — Arm PLAIN BUFFER, dan koreksi atas m025-67
+
+Release: `DIAG_BUILD=m025-68`, `SW_REV=m025-68-plain-buffer-arm-20260820-1`
+
+## KOREKSI ATAS ALASAN m025-67
+
+Empat dump Diagnostics dari uji m025-66 membantah sebagian alasan saya sendiri:
+
+- `impulses: 0` pada SETIAP rekaman A/B di perangkat;
+- `conditionSamples()` hanya mengubah PCM pada **1 dari 19** rekaman.
+
+Jadi perbedaan yang OWNER dengar antara RAW dan CONDITIONED **bukan** akibat conditioning. Mekanisme yang saya buktikan di unit test nyata, tetapi tidak pernah aktif pada PCM perangkat ini. m025-67 tetap dipertahankan karena membuang transformasi yang memang bisa merusak ucapan dan tidak menghilangkan satu pun perlindungan yang penting — tetapi ia **bukan obatnya**, dan tidak boleh dicatat sebagai perbaikan crackle.
+
+## TEMUAN TERUKUR DARI DUMP m025-66
+
+1. **PCM model melewati batas penuh**: puncak 1.0783 (15 sampel clipped) dan 1.2227 (28 sampel clipped). Di mode RAW, PCM itu masuk WebAudio tanpa penahan dan terpotong keras.
+2. **Dead air punya ukuran**: jeda `playback_done` → `playback_start` median **13,0 detik**, maksimum 32,4 detik, tetapi **0–1 ms** ketika prefetch berhasil. Durasi generate 6,1 / 27,7 / 49,9 detik. Jadi jeda itu adalah waktu generate telanjang, dan prefetch tidak mungkin mengejar karena satu potongan butuh lebih lama dibuat daripada potongan sebelumnya diputar. Ini mengarah ke M028.2 yang menaikkan cap potongan Apple 32 → 128 karakter.
+3. **Dicoret dengan bukti**: tidak ada resampling (44100 = 44100), tidak ada NaN/Infinity, dan event loop tidak terblokir (`expectedDelayMs: 250` vs `observedDelayMs: 251` — meleset 1 ms, telemetri rutin).
+
+## KENAPA ARM BARU DIBUTUHKAN
+
+Dump `Wav ref 67` menunjukkan perbaikan gesture belum cukup: `referencePrimed: false` dan **13 dari 13** percobaan ditolak `NotAllowedError`. Sisi baiknya terbukti: **tidak ada lagi `voice_service_error`, tidak ada circuit breaker, tidak ada perintah unduh ulang** — jatuh-balik bekerja seperti dirancang.
+
+Tetapi pembanding yang tidak pernah berbunyi tidak menjawab apa pun. Karena itu m025-68 menambah **`plainbuffer`**: PCM yang sama, lewat `AudioBufferSourceNode` polos langsung ke destination — tanpa AudioWorklet, tanpa fade, tanpa penjadwalan seam. AudioContext-nya sudah terbuka oleh alur normal aplikasi, jadi arm ini tidak punya masalah gesture sama sekali.
+
+Selain itu, pembuka kunci elemen media kini dipasang pada **sentuhan apa pun** di halaman, bukan hanya tombol mode — sebab mode bertahan 24 jam sementara tombolnya bisa saja ditekan di sesi atau build lain. Panel juga menyatakan apakah pemutar pembanding SIAP atau BELUM.
+
+## CARA MEMBACA HASIL m025-68
+
+| Normal | PLAIN BUFFER | Kesimpulan |
+|---|---|---|
+| pecah | **bersih** | cacat ada di worklet, fade, atau penjadwalan seam — ketiganya yang dilewati arm ini |
+| pecah | pecah | ketiganya tidak bersalah; tersisa PCM itu sendiri atau output perangkat |
+
+Kalau WAV REF akhirnya berbunyi (panel menulis SIAP), ia tetap pembanding terkuat karena keluar dari Web Audio sepenuhnya.
