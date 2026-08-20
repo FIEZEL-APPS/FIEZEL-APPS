@@ -56,6 +56,7 @@ jobs:
           node adaptive-policy-test.js
           node policy-outcome-test.js
           node personal-journey-test.js
+          node personal-journey-ui-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
           node pwa-startup-white-screen-recovery-test.js
