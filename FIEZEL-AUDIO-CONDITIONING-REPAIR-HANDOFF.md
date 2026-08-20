@@ -148,3 +148,17 @@ Dari telemetri yang sama, juga dicoret: sambungan antar potongan (`chunkCount: 1
 | terdengar **bersih** | jalur keluaran sehat, jadi cacatnya ada pada PCM yang dihasilkan model |
 
 Gate mengunci nada ini deterministik, tidak pernah mendekati clipping, dan benar-benar tidak berasal dari PCM model (diuji dengan memberi PCM model yang diam total).
+
+---
+
+# LANJUTAN m025-70 — Nada uji dibuat rata
+
+Release: `DIAG_BUILD=m025-70`, `SW_REV=m025-70-steady-tone-20260820-1`
+
+Pada uji m025-69, OWNER melaporkan: "tidak ada suara, hanya ada suara mesin seperti beep beep beep beep."
+
+Itu berarti arm-nya bekerja — yang terdengar memang nada buatan, bukan suara model. Tetapi desainnya keliru untuk tugasnya: amplop suku kata 3 Hz membuat nada berdenyut tiga kali per detik, dan denyut itu justru menyamarkan hal yang sedang dinilai, yaitu ada atau tidaknya bunyi retak. Pertanyaan "apakah pecah" jadi sulit dijawab oleh siapa pun.
+
+m025-70 membuang amplop itu. Nadanya kini rata sepanjang tiga detik, dengan pelembut 50 ms hanya di awal dan akhir supaya ujungnya sendiri tidak berbunyi klik yang bisa disalahartikan sebagai cacat. Gate mengunci kerataannya: selisih RMS antar jendela 100 ms di bagian tengah harus di bawah 0,01, dan sinyalnya wajib mulai serta berakhir dari senyap.
+
+Dengan nada rata, penilaiannya menjadi sederhana: nada mulus berarti jalur keluaran sehat, dan bunyi kasar, serak, atau berdesir yang menempel pada nada berarti keluaran perangkat yang bermasalah.
