@@ -307,6 +307,51 @@ test('pembuka kunci dipasang pada sentuhan mana pun, bukan hanya tombol mode', (
   assert.strictEqual(player.armReferenceUnlock({}), false, 'tanpa document tidak melempar');
 });
 
+test('nada uji tidak pernah menyentuh PCM model', async () => {
+  // m025-68 sudah mencoret jalur pemutaran kita. Yang tersisa: PCM model, atau keluaran
+  // perangkat. Nada ini dibuat FIEZEL sendiri, jadi kalau ia pun pecah, modelnya tidak bersalah.
+  const buffers = [];
+  const env = storeEnv({
+    navigator: {},
+    AudioContext: function () {
+      this.sampleRate = 44100; this.state = 'running'; this.currentTime = 0; this.destination = { id: 'dest' };
+      this.resume = async () => {};
+      this.createBuffer = (ch, len, rate) => {
+        const data = new Float32Array(len);
+        buffers.push(data);
+        return { length: len, sampleRate: rate, numberOfChannels: ch, getChannelData: () => data, copyToChannel: (src) => data.set(src) };
+      };
+      this.createBufferSource = () => ({ buffer: null, connect() {}, start() {}, stop() {}, onended: null });
+    },
+    FiezelVoiceDiagnostics: { record: entry => { (env._diag = env._diag || []).push(entry); return true; }, begin() {}, end() {} }
+  });
+  player.setPcmDiagnosticMode('toneref', env);
+  // PCM "model" di sini sengaja diam total; kalau nada uji berasal darinya, hasilnya juga diam.
+  const handle = await player.createPlayer(env, {}).play({ audio: new Float32Array(44100), sampling_rate: 44100 }, {});
+  assert.strictEqual(handle.diagnosticMode, 'toneref');
+  const played = buffers[buffers.length - 1];
+  let peak = 0;
+  for (let i = 0; i < played.length; i++) peak = Math.max(peak, Math.abs(played[i]));
+  assert.ok(peak > 0.3, `yang diputar harus nada buatan, bukan PCM model yang diam: peak ${peak}`);
+  const record = env._diag.find(e => e.syntheticReference === true);
+  assert.ok(record, 'telemetri menandai arm ini sebagai sinyal buatan');
+  assert.strictEqual(record.playbackPath, 'plain_buffer');
+});
+
+test('nada uji deterministik, aman, dan tidak pernah mendekati clipping', () => {
+  const a = player.buildReferenceTone(44100, 3);
+  const b = player.buildReferenceTone(44100, 3);
+  assert.strictEqual(a.length, 44100 * 3);
+  assert.deepStrictEqual(Array.from(a.slice(0, 50)), Array.from(b.slice(0, 50)), 'dua panggilan menghasilkan sinyal identik');
+  let peak = 0, nonFinite = 0;
+  for (let i = 0; i < a.length; i++) { const v = a[i]; if (!Number.isFinite(v)) nonFinite++; peak = Math.max(peak, Math.abs(v)); }
+  assert.strictEqual(nonFinite, 0);
+  assert.ok(peak <= 0.55, `nada uji tidak boleh mendekati batas: ${peak.toFixed(3)}`);
+  assert.ok(peak > 0.35, 'tetap cukup keras untuk dinilai telinga');
+  // Sample rate lain tetap menghasilkan durasi yang benar.
+  assert.strictEqual(player.buildReferenceTone(24000, 2).length, 48000);
+});
+
 test('panel memperingatkan bila pembanding tidak bisa dibuka', () => {
   const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
   assert.ok(/primeReferenceElement\(root\)/.test(panel), 'tombol WAV REF membuka kunci di dalam gesture');
@@ -330,7 +375,7 @@ test('jalur produksi normal tidak tersentuh sama sekali', () => {
 
 test('panel Diagnostics menyediakan keempat mode dan menyebut mode yang aktif', () => {
   const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
-  for (const label of ['PCM: Normal', 'PCM: RAW', 'PCM: CONDITIONED', 'PCM: WAV REF', 'PCM: PLAIN BUFFER']) {
+  for (const label of ['PCM: Normal', 'PCM: RAW', 'PCM: CONDITIONED', 'PCM: WAV REF', 'PCM: PLAIN BUFFER', 'PCM: NADA UJI']) {
     assert.ok(panel.indexOf(label) !== -1, `tombol ${label} hilang`);
   }
   assert.ok(/Mode PCM aktif: /.test(panel), 'panel menyebut mode yang benar-benar aktif');
