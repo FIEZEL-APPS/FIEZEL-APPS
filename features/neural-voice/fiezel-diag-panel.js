@@ -57,13 +57,34 @@
     });
   }
 
+  // Hanya flag milik FIEZEL yang dibaca apa adanya; parameter lain kehilangan nilainya, karena
+  // dump ini ditempel ke chat dan redirect autentikasi bisa menaruh token di query.
+  function safeSearch() {
+    var search = String(location.search || '');
+    if (!search || search === '?') return '';
+    return '?' + search.replace(/^\?/, '').split('&').filter(Boolean).map(function (pair) {
+      var eq = pair.indexOf('=');
+      var key = eq === -1 ? pair : pair.slice(0, eq);
+      var value = eq === -1 ? '' : pair.slice(eq + 1);
+      if (/^fiezel/i.test(key)) return eq === -1 ? key : key + '=' + value;
+      return key + '=(redacted)';
+    }).join('&');
+  }
+
   function collectSync() {
     return {
       diagBuild: DIAG_BUILD,
       appVersion: safe(function(){ return String(root.FIEZEL_VERSION || '(tidak ada)'); }),
       capturedAt: new Date().toISOString(),
       origin: safe(function(){ return location.origin; }),
-      href: safe(function(){ return String(location.origin || '') + String(location.pathname || ''); }),
+      href: safe(function(){ return String(location.origin || '') + String(location.pathname || '') + safeSearch(); }),
+      // Mode yang BENAR-BENAR dipakai jalur audio, ditanyakan ke player, bukan diparse ulang
+      // di sini. Inilah field yang menjawab "arm A/B-nya benar-benar jalan atau tidak".
+      pcmMode: safe(function(){
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.pcmDiagnosticMode !== 'function') return '(player tidak tersedia)';
+        return player.pcmDiagnosticMode(root, {}) || '(produksi normal)';
+      }),
       standalone: safe(function(){
         return (root.navigator && root.navigator.standalone === true) ||
                !!(root.matchMedia && root.matchMedia('(display-mode: standalone)').matches);
@@ -288,6 +309,47 @@
     copySummary.type = 'button';
     copySummary.textContent = 'Copy ringkasan';
 
+    // m025-64: saklar A/B pemutaran. Ini harus ada DI SINI karena bentuk URL-nya tidak bisa
+    // dipakai di iOS: notifikasi wajib di produk ini, dan iOS hanya memberi Notification API
+    // ke aplikasi layar-utama, sehingga tab Safari - satu-satunya tempat parameter bisa
+    // diketik - berhenti di gerbang notifikasi. Tanpa saklar ini, A/B-nya tidak pernah bisa
+    // dijalankan di perangkat yang justru punya cacatnya.
+    var pcmState = root.document.createElement('div');
+    pcmState.id = 'fiezelDiagPcmState';
+    if (pcmState.style) pcmState.style.cssText = 'font:600 12px/1.6 -apple-system,system-ui,sans-serif;';
+
+    var pcmBar = root.document.createElement('div');
+    pcmBar.id = 'fiezelDiagPcmBar';
+    if (pcmBar.style) pcmBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin:2px 0;';
+
+    function pcmButton(label, mode) {
+      var button = root.document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', function () {
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.setPcmDiagnosticMode !== 'function') {
+          pcmState.textContent = 'Mode PCM: modul player tidak tersedia.';
+          return;
+        }
+        player.setPcmDiagnosticMode(mode, root);
+        // Mode dibaca saat player dibuat, jadi sesi yang sedang berjalan masih memakai mode
+        // lama. Mengatakannya adalah beda antara uji yang sah dan uji yang diam-diam batal.
+        pcmState.textContent = 'Mode PCM tersimpan: ' + (mode || 'produksi normal') +
+          '. Tutup FIEZEL sepenuhnya lalu buka lagi, baru mainkan suaranya.';
+      });
+      return button;
+    }
+
+    var pcmNormal = pcmButton('PCM: Normal', '');
+    var pcmRaw = pcmButton('PCM: RAW', 'raw');
+    var pcmConditioned = pcmButton('PCM: CONDITIONED', 'conditioned');
+    var pcmWavRef = pcmButton('PCM: WAV REF', 'wavref');
+    pcmBar.appendChild(pcmNormal);
+    pcmBar.appendChild(pcmRaw);
+    pcmBar.appendChild(pcmConditioned);
+    pcmBar.appendChild(pcmWavRef);
+
     bar.appendChild(copySummary);
     bar.appendChild(send);
     bar.appendChild(sendTarget);
@@ -295,6 +357,8 @@
     sheet.appendChild(heading);
     sheet.appendChild(note);
     sheet.appendChild(badges);
+    sheet.appendChild(pcmState);
+    sheet.appendChild(pcmBar);
     sheet.appendChild(searchBar);
     sheet.appendChild(text);
     sheet.appendChild(bar);
@@ -306,7 +370,9 @@
       host: host, open: open, sheet: sheet, text: text,
       search: search, searchCount: searchCount, previous: previous, next: next,
       send: send, sendTarget: sendTarget, close: close,
-      badges: badges, copySummary: copySummary
+      badges: badges, copySummary: copySummary,
+      pcmState: pcmState, pcmBar: pcmBar,
+      pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned, pcmWavRef: pcmWavRef
     };
   }
 
@@ -427,8 +493,23 @@
       });
     }
 
+    // Mode yang benar-benar akan dipakai jalur audio, ditampilkan begitu panel dibuka. Uji
+    // yang diam-diam berjalan di arm yang salah persis yang membuat percobaan sebelumnya sia-sia.
+    function showPcmState() {
+      if (!ui.pcmState) return;
+      var mode = '';
+      try {
+        var player = root.FiezelWebAudioPlayer;
+        mode = player && typeof player.pcmDiagnosticMode === 'function' ? player.pcmDiagnosticMode(root, {}) : '';
+      } catch (_) { mode = ''; }
+      ui.pcmState.textContent = mode
+        ? 'Mode PCM aktif: ' + mode.toUpperCase() + ' (otomatis kembali normal dalam 24 jam)'
+        : 'Mode PCM aktif: produksi normal';
+    }
+
     ui.open.addEventListener('click', function(){
       refresh();
+      showPcmState();
       ui.sheet.classList.add('open');
     });
     ui.close.addEventListener('click', function(){
