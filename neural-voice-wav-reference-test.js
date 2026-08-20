@@ -348,6 +348,21 @@ test('nada uji deterministik, aman, dan tidak pernah mendekati clipping', () => 
   assert.strictEqual(nonFinite, 0);
   assert.ok(peak <= 0.55, `nada uji tidak boleh mendekati batas: ${peak.toFixed(3)}`);
   assert.ok(peak > 0.35, 'tetap cukup keras untuk dinilai telinga');
+
+  // m025-70: nada harus RATA. Pada m025-69 amplop 3 Hz membuatnya terdengar "beep beep beep",
+  // dan denyut itu menyamarkan hal yang justru sedang dinilai - ada tidaknya bunyi retak.
+  const win = 4410, rms = [];
+  for (let start = win * 3; start < a.length - win * 3; start += win) {
+    let energy = 0;
+    for (let i = start; i < start + win; i++) energy += a[i] * a[i];
+    rms.push(Math.sqrt(energy / win));
+  }
+  const spread = Math.max(...rms) - Math.min(...rms);
+  assert.ok(spread < 0.01, `level nada harus rata, selisih RMS ${spread.toFixed(4)}`);
+  // Ujungnya tetap dilembutkan supaya awal dan akhir tidak berbunyi klik yang bisa
+  // disalahartikan sebagai cacat.
+  assert.ok(Math.abs(a[0]) < 0.01, 'awal nada dimulai dari senyap');
+  assert.ok(Math.abs(a[a.length - 1]) < 0.01, 'akhir nada turun ke senyap');
   // Sample rate lain tetap menghasilkan durasi yang benar.
   assert.strictEqual(player.buildReferenceTone(24000, 2).length, 48000);
 });
