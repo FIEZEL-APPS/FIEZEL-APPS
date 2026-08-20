@@ -100,15 +100,21 @@ function sine(length, amplitude, sampleRate, hz) {
     assert.ok(Math.abs(mean) < 0.002, `offset must be gone, got ${mean}`);
   });
 
-  await test('an isolated impulse is interpolated away - one sample IS a click', () => {
+  // m025-67 REVERSAL, on device evidence. This case previously asserted that an isolated
+  // spike is interpolated away, on the assumption that one sample IS a click. OWNER's
+  // physical A/B at m025-66 refuted it: with conditioning off (RAW) the audio was "pecah
+  // sedang", with conditioning on (CONDITIONED) it was "pecah berat" - the repair was making
+  // things worse. The mechanism is in neural-voice-conditioning-repair-test.js: ordinary
+  // plosive attacks match the impulse signature, so the "repair" was deleting consonants and
+  // inserting a fresh discontinuity of its own. The assertion is inverted deliberately, not
+  // weakened: the waveform must now be preserved exactly.
+  await test('an isolated spike is preserved - a consonant attack is not a click', () => {
     const samples = sine(2048, 0.3, 44100, 180);
     const at = 1000;
-    const neighbourhood = [samples[at - 1], samples[at + 1]];
     samples[at] = 0.95;
     const out = Player.conditionSamples(samples);
-    const expected = (neighbourhood[0] + neighbourhood[1]) / 2;
-    assert.ok(Math.abs(out[at] - expected) < 1e-6,
-      `the spike must be replaced by its neighbours, got ${out[at]}`);
+    assert.strictEqual(out, samples, 'a healthy waveform must come back untouched');
+    assert.strictEqual(out[at], samples[at], 'the spike must survive, it may be a consonant');
     assert.ok(Math.abs(out[at - 40] - samples[at - 40]) < 1e-6, 'the rest of the waveform is untouched');
   });
 
