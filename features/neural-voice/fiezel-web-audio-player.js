@@ -12,7 +12,20 @@
   const PREFERRED_SAMPLE_RATE = 44100;
   const LATENCY_HINT = 'playback';
   const PCM_DIAGNOSTIC_PARAM = 'fiezelPcmMode';
-  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned']);
+  // m025-64: `wavref` menambah pembanding yang selama ini hilang. `raw` dan `conditioned`
+  // sama-sama melewati WebAudio, jadi ketika keduanya terdengar pecah, keduanya tidak bisa
+  // memisahkan model dari jalur pemutaran. `wavref` memutar PCM yang persis sama lewat
+  // elemen <audio> biasa, melewati AudioContext, worklet, penjadwalan, dan fade sepenuhnya.
+  // Bersih di sini + pecah di mode normal = cacatnya ada di jalur pemutaran FIEZEL.
+  // Pecah di keduanya = cacatnya bukan di penjadwalan kita.
+  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref']);
+  // Parameter URL tidak bisa dipakai di perangkat yang punya cacatnya. FIEZEL mewajibkan
+  // notifikasi, dan iOS hanya memberi Notification API ke aplikasi layar-utama, sehingga tab
+  // Safari - satu-satunya tempat parameter bisa diketik - berhenti di gerbang notifikasi.
+  // Karena itu mode juga bisa disimpan, dan itulah yang membuat A/B ini bisa dijalankan.
+  const PCM_DIAGNOSTIC_STORAGE_KEY = 'fiezel-pcm-mode-v1';
+  // Mode diagnostik tidak boleh hidup lebih lama daripada pengujian yang membutuhkannya.
+  const PCM_DIAGNOSTIC_TTL_MS = 24 * 60 * 60 * 1000;
   const PCM_WORKLET_MODULE_URL = './features/neural-voice/fiezel-pcm-renderer-worklet.js';
 
   const PEAK_CEILING = 0.97;
@@ -38,17 +51,77 @@
     return Number.isFinite(n) && n >= 8000 && n <= 192000 ? n : 24000;
   }
 
-  function pcmDiagnosticMode(env, settings) {
+  /** Mode tersimpan, diabaikan bila kedaluwarsa atau isinya tidak dikenal. */
+  function readStoredPcmMode(env, now) {
+    try {
+      const store = env && env.localStorage;
+      if (!store || typeof store.getItem !== 'function') return '';
+      const raw = JSON.parse(store.getItem(PCM_DIAGNOSTIC_STORAGE_KEY) || 'null');
+      if (!raw || !PCM_DIAGNOSTIC_MODES.includes(String(raw.mode || '').toLowerCase())) return '';
+      const at = Number(raw.at) || 0;
+      const clock = Number(now) || Date.now();
+      if (!at || clock - at > PCM_DIAGNOSTIC_TTL_MS) return '';
+      return String(raw.mode).toLowerCase();
+    } catch (_) { return ''; }
+  }
+
+  /** Menulis atau menghapus mode. Nilai yang bukan mode dikenal berarti kembali ke produksi. */
+  function setPcmDiagnosticMode(mode, env, now) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    const value = String(mode || '').toLowerCase();
+    try {
+      const store = target.localStorage;
+      if (!store || typeof store.setItem !== 'function') return '';
+      if (!PCM_DIAGNOSTIC_MODES.includes(value)) {
+        if (typeof store.removeItem === 'function') store.removeItem(PCM_DIAGNOSTIC_STORAGE_KEY);
+        else store.setItem(PCM_DIAGNOSTIC_STORAGE_KEY, 'null');
+        return '';
+      }
+      store.setItem(PCM_DIAGNOSTIC_STORAGE_KEY, JSON.stringify({ mode: value, at: Number(now) || Date.now() }));
+      return value;
+    } catch (_) { return ''; }
+  }
+
+  /**
+   * Urutan penentuan: opsi eksplisit mengalahkan URL, URL mengalahkan mode tersimpan. Dengan
+   * begitu pemanggilan langsung dan tab Safari berparameter tetap berperilaku seperti dulu.
+   */
+  function pcmDiagnosticMode(env, settings, now) {
     const explicit = settings && String(settings.pcmDiagnosticMode || '').toLowerCase();
     if (PCM_DIAGNOSTIC_MODES.includes(explicit)) return explicit;
     try {
+      // Tanpa URL yang membawa mode, penentuan JATUH KE mode tersimpan - bukan berhenti di
+      // sini. Sebelumnya baris ini keluar lebih awal, sehingga mode tersimpan tidak pernah
+      // terbaca dan saklar di dalam aplikasi tidak berpengaruh sama sekali.
       const search = env && env.location && typeof env.location.search === 'string' ? env.location.search : '';
-      if (!search) return '';
-      const Params = env.URLSearchParams || (typeof URLSearchParams !== 'undefined' ? URLSearchParams : null);
-      if (!Params) return '';
-      const value = String(new Params(search).get(PCM_DIAGNOSTIC_PARAM) || '').toLowerCase();
-      return PCM_DIAGNOSTIC_MODES.includes(value) ? value : '';
-    } catch (_) { return ''; }
+      const Params = env && (env.URLSearchParams || (typeof URLSearchParams !== 'undefined' ? URLSearchParams : null));
+      if (search && Params) {
+        const value = String(new Params(search).get(PCM_DIAGNOSTIC_PARAM) || '').toLowerCase();
+        if (PCM_DIAGNOSTIC_MODES.includes(value)) return value;
+      }
+    } catch (_) {}
+    return readStoredPcmMode(env, now);
+  }
+
+  /**
+   * Membungkus PCM menjadi WAV 16-bit. Dipakai HANYA oleh mode wavref; jalur produksi tidak
+   * pernah menyentuh fungsi ini.
+   */
+  function encodeWav(samples, sampleRate) {
+    const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || 24000)));
+    const frames = samples.length;
+    const buffer = new ArrayBuffer(44 + frames * 2);
+    const view = new DataView(buffer);
+    const ascii = (offset, text) => { for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i)); };
+    ascii(0, 'RIFF'); view.setUint32(4, 36 + frames * 2, true); ascii(8, 'WAVE');
+    ascii(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, rate, true); view.setUint32(28, rate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+    ascii(36, 'data'); view.setUint32(40, frames * 2, true);
+    for (let i = 0; i < frames; i++) {
+      const clamped = Math.max(-1, Math.min(1, Number(samples[i]) || 0));
+      view.setInt16(44 + i * 2, Math.round(clamped * 32767), true);
+    }
+    return buffer;
   }
 
   function analyzeSamples(samples) {
@@ -495,9 +568,62 @@
       };
     }
 
+    /**
+     * Pembanding pemutaran: PCM yang sama, tanpa AudioContext, worklet, penjadwalan, atau fade.
+     * Ini satu-satunya cara memisahkan "modelnya yang cacat" dari "pemutaran kita yang cacat"
+     * di perangkat nyata, dan itulah pertanyaan yang tiga rilis terakhir tidak bisa jawab.
+     */
+    async function playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts) {
+      const AudioCtor = env.Audio || (typeof Audio !== 'undefined' ? Audio : null);
+      const BlobCtor = env.Blob || (typeof Blob !== 'undefined' ? Blob : null);
+      const urls = env.URL || (typeof URL !== 'undefined' ? URL : null);
+      if (!AudioCtor || !BlobCtor || !urls || typeof urls.createObjectURL !== 'function') {
+        throw new Error('media_element_reference_unavailable');
+      }
+      const wav = encodeWav(samples, sampleRate);
+      const url = urls.createObjectURL(new BlobCtor([wav], { type: 'audio/wav' }));
+      const element = new AudioCtor();
+      element.src = url;
+      element.preload = 'auto';
+      let settled = false;
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const cleanup = () => {
+        if (settled) return;
+        settled = true;
+        try { if (typeof urls.revokeObjectURL === 'function') urls.revokeObjectURL(url); } catch (_) {}
+        resolveDone();
+      };
+      element.onended = cleanup;
+      element.onerror = cleanup;
+      recordDiagnostic({
+        playbackPath: 'media_element',
+        sourceSampleRate: sampleRate,
+        contextSampleRate: null,
+        resamplingExpected: false,
+        trimmed: opts.trim === true,
+        raw: rawStats,
+        rendered: renderedStats,
+        wavBytes: wav.byteLength
+      });
+      try { await element.play(); } catch (error) { cleanup(); throw error; }
+      return {
+        done,
+        startsAt: 0,
+        endsAt: samples.length / (Number(sampleRate) || 24000),
+        diagnosticMode,
+        stop() {
+          try { element.pause(); } catch (_) {}
+          cleanup();
+        }
+      };
+    }
+
     async function play(rawAudio, options) {
       const opts = options || {};
-      if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
+      // Pembanding WAV memang harus bisa berjalan tanpa Web Audio sama sekali; kalau ia masih
+      // menuntut AudioContext, ia bukan pembanding independen.
+      if (!AudioContextCtor && diagnosticMode !== 'wavref') throw new Error('Web Audio API unavailable');
       const continuous = opts.continuous === true;
       const epoch = reservePlaybackEpoch(continuous);
       let samples = pickSamples(rawAudio);
@@ -508,6 +634,7 @@
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
+      if (diagnosticMode === 'wavref') return playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts);
       const current = await resumeContext();
       if (!current) throw new Error('Web Audio API unavailable');
 
@@ -678,12 +805,17 @@
     pickSamples,
     pickSampleRate,
     pcmDiagnosticMode,
+    setPcmDiagnosticMode,
+    readStoredPcmMode,
+    encodeWav,
     analyzeSamples,
     guardClipping,
     conditionSamples,
     trimSilence,
     PCM_DIAGNOSTIC_PARAM,
     PCM_DIAGNOSTIC_MODES,
+    PCM_DIAGNOSTIC_STORAGE_KEY,
+    PCM_DIAGNOSTIC_TTL_MS,
     PREFERRED_SAMPLE_RATE,
     LATENCY_HINT,
     PEAK_CEILING,
