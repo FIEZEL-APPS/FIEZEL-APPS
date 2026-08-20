@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-71';
+  var DIAG_BUILD = 'm025-72';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -378,11 +378,37 @@
           return;
         }
         player.setDenoiseSteps(steps, root);
+        // Penjaga yang lahir dari kegagalan nyata: pada m025-71 mode PCM masih NADA UJI saat
+        // langkah diuji, sehingga yang terdengar adalah nada buatan - bukan suara model - dan
+        // ketiga langkah "terdengar mulus" tanpa satu pun benar-benar diuji. Uji yang batal
+        // diam-diam lebih buruk daripada uji yang gagal terang-terangan.
+        var activeMode = '';
+        try {
+          activeMode = typeof player.pcmDiagnosticMode === 'function' ? player.pcmDiagnosticMode(root, {}) : '';
+        } catch (_) { activeMode = ''; }
+        var warning = activeMode
+          ? ' PERINGATAN: mode PCM masih ' + activeMode.toUpperCase() +
+            ', jadi yang terdengar BUKAN suara model dan uji langkah ini tidak sah. Tekan PCM: Normal dulu.'
+          : '';
         pcmState.textContent = 'Langkah denoising tersimpan: ' + (steps || 'default 4') +
-          '. Tutup FIEZEL sepenuhnya lalu buka lagi. Angka lebih tinggi berarti suara lebih halus tetapi lebih lama dibuat.';
+          '. Tutup FIEZEL sepenuhnya lalu buka lagi. Angka lebih tinggi berarti suara lebih halus tetapi lebih lama dibuat.' + warning;
       });
       return button;
     }
+
+    // Satu tombol untuk mengembalikan SEMUA setelan diagnostik. Tanpa ini, mode yang tertinggal
+    // dari uji sebelumnya akan diam-diam merusak uji berikutnya - dan itu sudah terjadi sekali.
+    var resetAll = root.document.createElement('button');
+    resetAll.type = 'button';
+    resetAll.textContent = 'KEMBALIKAN SEMUA KE NORMAL';
+    resetAll.addEventListener('click', function () {
+      var player = root.FiezelWebAudioPlayer;
+      if (!player) { pcmState.textContent = 'Modul player tidak tersedia.'; return; }
+      try { player.setPcmDiagnosticMode('', root); } catch (_) {}
+      try { player.setDenoiseSteps(0, root); } catch (_) {}
+      pcmState.textContent = 'Semua setelan diagnostik dikembalikan: mode PCM normal, langkah denoising 4. ' +
+        'Tutup FIEZEL sepenuhnya lalu buka lagi.';
+    });
 
     var stepsDefault = stepButton('LANGKAH: 4 (default)', 0);
     var steps8 = stepButton('LANGKAH: 8', 8);
@@ -396,6 +422,7 @@
     pcmBar.appendChild(stepsDefault);
     pcmBar.appendChild(steps8);
     pcmBar.appendChild(steps16);
+    pcmBar.appendChild(resetAll);
 
     bar.appendChild(copySummary);
     bar.appendChild(send);
@@ -421,7 +448,7 @@
       pcmState: pcmState, pcmBar: pcmBar,
       pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned,
       pcmWavRef: pcmWavRef, pcmPlain: pcmPlain, pcmTone: pcmTone,
-      stepsDefault: stepsDefault, steps8: steps8, steps16: steps16
+      stepsDefault: stepsDefault, steps8: steps8, steps16: steps16, resetAll: resetAll
     };
   }
 
@@ -556,9 +583,15 @@
       var lockNote = mode === 'wavref'
         ? (root.__fiezelWavRefPrimed === true ? ' · pemutar pembanding SIAP' : ' · pemutar pembanding BELUM terbuka, sentuh layar sekali lalu buka panel lagi')
         : '';
-      ui.pcmState.textContent = mode
+      var steps = 0;
+      try {
+        var stepPlayer = root.FiezelWebAudioPlayer;
+        steps = stepPlayer && typeof stepPlayer.denoiseSteps === 'function' ? stepPlayer.denoiseSteps(root) : 0;
+      } catch (_) { steps = 0; }
+      var stepNote = steps ? ' · langkah denoising: ' + steps : ' · langkah denoising: 4 (default)';
+      ui.pcmState.textContent = (mode
         ? 'Mode PCM aktif: ' + mode.toUpperCase() + lockNote + ' (otomatis kembali normal dalam 24 jam)'
-        : 'Mode PCM aktif: produksi normal';
+        : 'Mode PCM aktif: produksi normal') + stepNote;
     }
 
     // Pasang pembuka-kunci elemen pembanding pada sentuhan berikutnya di mana pun. Ini yang
