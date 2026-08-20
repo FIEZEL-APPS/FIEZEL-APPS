@@ -278,3 +278,34 @@ Pemisah kalimat memutus tanda kutip penutup dari kalimatnya: `dunia."` terbelah 
 **16 langkah masih gagal** meski anggaran waktu sudah dinaikkan ke 120 detik di m025-72. Berarti ada batas lain yang belum ikut — kemungkinan besar gerbang kesiapan atau circuit breaker di lapisan bootstrap, bukan anggaran generate. Karena 8 langkah sudah "bersih sekali", ini bukan penghalang untuk perbaikan kualitas, tetapi tetap harus dijelaskan sebelum ditutup.
 
 **Keputusan default 8 langkah ditahan dulu.** Kualitasnya lebih baik, tetapi harganya waktu, dan jeda adalah keluhan utama OWNER. Urutannya: hilangkan dulu jeda strukturalnya, baru timbang menaikkan langkah — kalau tidak, perbaikan kualitas akan langsung terasa sebagai kemunduran.
+
+---
+
+# LANJUTAN m025-74 — Pembuka cepat untuk jeda awal
+
+Release: `DIAG_BUILD=m025-74`, `SW_REV=m025-74-fast-lead-in-20260820-1`
+
+## LAPORAN OWNER PADA m025-73
+
+- Jeda saat tanda petik: **jauh lebih mendingan** — perbaikan serpihan potongan m025-73 bekerja.
+- Jeda **saat mulai membaca**: masih sangat lama.
+- Pengamatan OWNER: setiap akhir paragraf audiobook ada titik, dan di situlah delay terasa.
+
+## MENIMBANG PENGAMATAN OWNER
+
+Titik memang memisahkan kalimat, dan pemisahan itu memang menentukan letak potongan. Tetapi telemetri m025-68 menunjukkan sebagian besar jeda antar potongan sudah 0–1 ms; yang tersisa muncul ketika pembuatan potongan berikutnya tidak selesai sebelum potongan sekarang habis diputar. Jadi titik bukan penyebabnya, melainkan penentu letak batas — dan yang menentukan terdengar atau tidaknya jeda adalah perbandingan antara waktu membuat potongan berikutnya dan lama memutar potongan sekarang.
+
+Karena itu perbaikannya bukan menghapus batas kalimat, melainkan memastikan setiap potongan cukup panjang untuk menutupi pembuatan penerusnya — yang sudah dikerjakan m025-73 — dan memperpendek potongan yang tidak punya penutup sama sekali.
+
+## JEDA AWAL: SATU-SATUNYA YANG TIDAK BISA DISEMBUNYIKAN
+
+Potongan pertama tidak punya apa pun untuk bersembunyi. Waktu sampai kata pertama SAMA DENGAN waktu membuat potongan pertama. Selama potongan pembuka berukuran penuh 128 karakter, penantian awal tetap sepanjang satu putaran generate penuh.
+
+m025-74 memendekkan potongan pembuka menjadi sekitar sepertiga batas (43 karakter), sementara potongan berikutnya kembali berukuran penuh. Karena waktu generate tumbuh mengikuti panjang teks, penantian awal ikut memendek kira-kira sebanding.
+
+Contoh nyata pada teks acuan: `75, 74` menjadi `43, 106`. Sisa potongan pembuka disatukan dengan potongan berikutnya bila muat, supaya perbaikan ini tidak menghidupkan lagi serpihan yang baru dibereskan m025-73.
+
+## YANG MASIH TERBUKA
+
+- **16 langkah masih gagal**, meski anggaran sudah 120 detik. Batas lain yang belum ikut.
+- **8 langkah sebagai default**: keputusan OWNER, ditahan sampai jeda benar-benar terkendali.
