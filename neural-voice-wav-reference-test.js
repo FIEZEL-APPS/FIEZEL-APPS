@@ -157,19 +157,87 @@ test('menghentikan pembanding tidak menggantung janji selesainya', async () => {
   assert.ok(true, 'done selesai setelah stop');
 });
 
-test('lingkungan tanpa elemen media menolak dengan jelas, bukan diam', async () => {
-  const env = storeEnv({ navigator: {} });
+test('pembanding yang gagal jatuh ke jalur normal, tidak merusak suara', async () => {
+  // Uji fisik m025-66: arm WAV REF bisu total dan aplikasi malah menyuruh mengunduh ulang
+  // suara yang sudah ada. Penyebabnya pembanding melempar error, lalu runtime suara
+  // menyimpulkan asetnya belum siap. Kegagalan pembanding tidak boleh pernah terlihat
+  // seperti suara yang rusak.
+  const diag = [];
+  let started = 0;
+  const env = storeEnv({
+    navigator: {},
+    AudioContext: function () {
+      this.sampleRate = 24000; this.state = 'running'; this.currentTime = 0;
+      this.destination = {}; this.resume = async () => {};
+      this.createBufferSource = () => ({ buffer: null, connect() {}, start() { started++; }, stop() {}, onended: null });
+      this.createBuffer = (ch, len, rate) => ({ length: len, sampleRate: rate, getChannelData: () => new Float32Array(len), copyToChannel() {} });
+      this.createGain = () => ({ gain: { value: 1, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {} }, connect() {} });
+    },
+    FiezelVoiceDiagnostics: { record: entry => { diag.push(entry); return true; }, begin() {}, end() {} }
+  });
   player.setPcmDiagnosticMode('wavref', env);
-  await assert.rejects(
-    () => player.createPlayer(env, {}).play({ audio: new Float32Array(240), sampling_rate: 24000 }, {}),
-    /media_element_reference_unavailable/
-  );
+  const handle = await player.createPlayer(env, {}).play({ audio: new Float32Array(2400).fill(0.2), sampling_rate: 24000 }, {});
+  assert.ok(handle, 'pemutaran tetap berhasil lewat jalur normal');
+  assert.ok(started > 0, 'jalur Web Audio biasa dipakai sebagai cadangan');
+  const fallback = diag.find(e => e.referenceFallback);
+  assert.ok(fallback, 'alasan kegagalan pembanding tercatat, bukan hilang diam-diam');
+  assert.strictEqual(fallback.referenceFallback, 'media_element_unavailable');
+});
+
+test('elemen pembanding dibuka kuncinya di dalam gesture pengguna', async () => {
+  // iOS hanya mengizinkan play() pada elemen yang pernah diputar saat gesture. Elemen yang
+  // baru dibuat beberapa detik kemudian - setelah generate selesai - akan ditolak.
+  const plays = [];
+  const env = storeEnv({
+    Audio: function () {
+      this.play = async () => { plays.push(this.src); };
+      this.pause = () => { this.paused = true; };
+    }
+  });
+  assert.strictEqual(await player.primeReferenceElement(env), true);
+  assert.strictEqual(env.__fiezelWavRefPrimed, true);
+  assert.strictEqual(plays.length, 1);
+  assert.ok(/^data:audio\/wav;base64,/.test(plays[0]), 'yang diputar saat membuka kunci adalah WAV diam');
+  assert.ok(env.__fiezelWavRefElement, 'elemennya disimpan untuk dipakai ulang');
+  // Perangkat yang menolak sekalipun tidak boleh melempar.
+  const menolak = storeEnv({ Audio: function () { this.play = async () => { throw new Error('NotAllowedError'); }; this.pause = () => {}; } });
+  assert.strictEqual(await player.primeReferenceElement(menolak), false);
+  assert.strictEqual(menolak.__fiezelWavRefPrimed, false);
+  assert.strictEqual(await player.primeReferenceElement({}), false, 'tanpa Audio pun tidak melempar');
+});
+
+test('pemutaran pembanding memakai elemen yang sudah dibuka kuncinya', async () => {
+  const plays = [];
+  const env = storeEnv({
+    Audio: function () { this.play = async () => { plays.push(this.src); }; this.pause = () => {}; },
+    Blob: function (parts) { this.size = parts[0].byteLength; },
+    URL: { createObjectURL: () => 'blob:ref', revokeObjectURL() {} },
+    navigator: {},
+    FiezelVoiceDiagnostics: { record: entry => { env._diag = entry; return true; }, begin() {}, end() {} }
+  });
+  await player.primeReferenceElement(env);
+  const unlocked = env.__fiezelWavRefElement;
+  player.setPcmDiagnosticMode('wavref', env);
+  await player.createPlayer(env, {}).play({ audio: new Float32Array(240).fill(0.2), sampling_rate: 24000 }, {});
+  assert.strictEqual(env.__fiezelWavRefElement, unlocked, 'elemen yang sama dipakai ulang');
+  assert.strictEqual(plays[plays.length - 1], 'blob:ref');
+  assert.strictEqual(env._diag.referencePrimed, true, 'laporan menyebut pembandingnya benar-benar siap');
+});
+
+test('panel memperingatkan bila pembanding tidak bisa dibuka', () => {
+  const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
+  assert.ok(/primeReferenceElement\(root\)/.test(panel), 'tombol WAV REF membuka kunci di dalam gesture');
+  assert.ok(/PERINGATAN: pemutar pembanding TIDAK bisa dibuka/.test(panel),
+    'kegagalan harus terlihat, karena arm yang diam-diam jatuh ke jalur normal akan menyesatkan penguji');
 });
 
 test('jalur produksi normal tidak tersentuh sama sekali', () => {
   const source = fs.readFileSync('./features/neural-voice/fiezel-web-audio-player.js', 'utf8');
   // Cabang pembanding hanya boleh dimasuki lewat mode diagnostik.
-  assert.ok(/if \(diagnosticMode === 'wavref'\) return playViaMediaElement/.test(source));
+  assert.ok(/if \(diagnosticMode === 'wavref'\) \{[\s\S]{0,600}playViaMediaElement/.test(source),
+    'cabang pembanding hanya dimasuki lewat mode diagnostik');
+  assert.ok(/if \(reference\) return reference;/.test(source),
+    'pembanding yang gagal jatuh ke jalur normal, bukan melempar');
   // conditionSamples tetap berjalan di mode normal seperti sebelumnya.
   assert.ok(/if \(diagnosticMode !== 'raw'\) samples = conditionSamples\(samples\);/.test(source));
   // encodeWav tidak pernah dipanggil di luar pembanding.

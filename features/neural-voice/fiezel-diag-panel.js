@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-66';
+  var DIAG_BUILD = 'm025-67';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -335,8 +335,20 @@
         player.setPcmDiagnosticMode(mode, root);
         // Mode dibaca saat player dibuat, jadi sesi yang sedang berjalan masih memakai mode
         // lama. Mengatakannya adalah beda antara uji yang sah dan uji yang diam-diam batal.
-        pcmState.textContent = 'Mode PCM tersimpan: ' + (mode || 'produksi normal') +
+        var note = 'Mode PCM tersimpan: ' + (mode || 'produksi normal') +
           '. Tutup FIEZEL sepenuhnya lalu buka lagi, baru mainkan suaranya.';
+        pcmState.textContent = note;
+        // Klik ini adalah gesture pengguna - satu-satunya kesempatan membuka kunci elemen
+        // media di iOS. Tanpa ini pembanding WAV tidak akan berbunyi sama sekali.
+        if (mode === 'wavref' && typeof player.primeReferenceElement === 'function') {
+          try {
+            player.primeReferenceElement(root).then(function (ready) {
+              pcmState.textContent = ready
+                ? note + ' Pemutar pembanding siap.'
+                : note + ' PERINGATAN: pemutar pembanding TIDAK bisa dibuka di perangkat ini, jadi arm WAV REF akan jatuh ke jalur normal. Laporkan ini apa adanya.';
+            });
+          } catch (_) {}
+        }
       });
       return button;
     }

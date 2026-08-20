@@ -107,6 +107,7 @@ jobs:
           node neural-voice-m02548-clarity-test.js
           node neural-voice-m026-raw-pcm-ab-test.js
           node neural-voice-wav-reference-test.js
+          node neural-voice-conditioning-repair-test.js
           node neural-voice-m028-audio-integrity-test.js
           node neural-voice-m0281-regression-test.js
           node neural-voice-m0282-seam-buffer-integrity-test.js
