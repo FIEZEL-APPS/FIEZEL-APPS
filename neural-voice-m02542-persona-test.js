@@ -4,7 +4,9 @@
 //
 // OWNER's choice, verbatim from the audition kit:
 //   R2-sid2_GENZ-energetic_S2_ajar  -> explaining lines: sid 2, speed 1.12, pitch 1.03
-//   R2-sid5_GENZ-max_S4_pujian      -> praise lines:     sid 5, speed 1.18, pitch 1.05
+//   R2-sid5_GENZ-max_S4_pujian      -> praise lines:     speed 1.18, pitch 1.05
+// m028-3: OWNER removed sid 5 (the male voice). Both registers now speak as sid 2, so the
+// praise line is a change of pace rather than a change of person.
 const assert = require('assert');
 const fs = require('fs');
 
@@ -36,6 +38,7 @@ test('the persona module is gone from the product', () => {
 });
 
 test('every Indonesian entry point pins the one remaining voice explicitly', () => {
+  // Both callers must state the map themselves. Omitting it is the silent-wrong-voice bug.
   const supertonic = fs.readFileSync('./features/neural-voice/fiezel-supertonic-voice.js', 'utf8');
   const bootstrap = fs.readFileSync('./features/neural-voice/fiezel-neural-voice-bootstrap.js', 'utf8');
   [['supertonic', supertonic], ['bootstrap', bootstrap]].forEach(([name, src]) => {
