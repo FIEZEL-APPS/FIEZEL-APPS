@@ -162,3 +162,40 @@ Itu berarti arm-nya bekerja — yang terdengar memang nada buatan, bukan suara m
 m025-70 membuang amplop itu. Nadanya kini rata sepanjang tiga detik, dengan pelembut 50 ms hanya di awal dan akhir supaya ujungnya sendiri tidak berbunyi klik yang bisa disalahartikan sebagai cacat. Gate mengunci kerataannya: selisih RMS antar jendela 100 ms di bagian tengah harus di bawah 0,01, dan sinyalnya wajib mulai serta berakhir dari senyap.
 
 Dengan nada rata, penilaiannya menjadi sederhana: nada mulus berarti jalur keluaran sehat, dan bunyi kasar, serak, atau berdesir yang menempel pada nada berarti keluaran perangkat yang bermasalah.
+
+---
+
+# LANJUTAN m025-71 — Investigasi selesai, tersangkanya tinggal satu
+
+Release: `DIAG_BUILD=m025-71`, `SW_REV=m025-71-denoise-steps-arm-20260820-1`
+
+## RANTAI BUKTI YANG SUDAH LENGKAP
+
+| Uji | Hasil | Yang tercoret |
+|---|---|---|
+| m025-66 RAW vs CONDITIONED | impuls 0, 18/19 no-op | conditioning bukan penyebab |
+| m025-68 PLAIN BUFFER vs Normal | terdengar sama persis | worklet, fade, penjadwalan seam bukan penyebab |
+| telemetri m025-68 | chunkCount 1, trimmed false, 44100=44100, clipped 0 | sambungan potongan, trim, resampling, clipping |
+| **m025-70 NADA UJI** | **"mulus sekali"** | **keluaran audio perangkat SEHAT** |
+
+Nada rata buatan FIEZEL sendiri, lewat jalur pemutaran yang sama, terdengar mulus sempurna. Itu membuktikan AudioContext, jalur buffer, dan keluaran perangkat tidak cacat.
+
+**Kesimpulan: cacatnya ada pada PCM yang dihasilkan model.** Lima rilis sebelumnya menebak jalur pemutaran, dan semuanya keliru sasaran.
+
+Satu hal lagi yang terbukti dari uji yang sama: penjadwalan seam BERGUNA. Pada teks panjang, membuangnya membuat suara lebih buruk. Bagian itu tidak boleh disentuh.
+
+## KENAPA LANGKAH DENOISING
+
+Modelnya int8 seluruhnya — `duration_predictor`, `text_encoder`, `vector_estimator`, dan `vocoder` semuanya int8 — dan denoising-nya hanya **4 langkah**. Pada model flow/diffusion, jumlah langkah menentukan seberapa bersih laten sebelum vocoder bekerja. Empat langkah adalah nilai yang dipilih m025-45 demi kecepatan, bukan demi kualitas.
+
+Menaikkan langkah adalah tuas termurah yang tersedia: tanpa aset baru, tanpa mengubah kontrak, tanpa mengunduh model lain, dan bisa dibatalkan seketika. Karena itu ia dipasang sebagai mode diagnostik lebih dulu — bukan sebagai perubahan produksi.
+
+## SATU BUG YANG DITANGKAP GATE SAAT MENULIS SLICE INI
+
+Versi pertama hanya memasang override pada jalur Supertonic. `neural-voice-m02542-persona-test.js` menolaknya: satu model melayani Inggris dan Indonesia, jadi selisih jumlah langkah di antara keduanya langsung terdengar sebagai dua suara berbeda. Sekarang kedua pintu masuk membaca helper yang sama, dan gate baru mengunci invarian itu.
+
+## UJI BERIKUTNYA
+
+Dengar teks yang sama pada 4 (default), lalu 8, lalu 16 langkah. Nilai dua hal terpisah: bersih/pecahnya, dan berapa lama menunggu sebelum suara mulai. Langkah lebih tinggi berarti suara lebih halus tetapi generate lebih lama — dan jeda awal itu yang paling terasa.
+
+Kalau 8 atau 16 terdengar jelas lebih bersih, perbaikannya jelas dan tinggal menimbang harga waktunya. Kalau tidak ada bedanya sama sekali, tuas ini habis, dan tersisa satu jalan: mengganti vocoder int8 dengan presisi lebih tinggi — dan itu keputusan aset yang butuh persetujuan OWNER karena menambah unduhan.
