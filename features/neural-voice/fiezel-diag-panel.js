@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-67';
+  var DIAG_BUILD = 'm025-68';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -357,10 +357,12 @@
     var pcmRaw = pcmButton('PCM: RAW', 'raw');
     var pcmConditioned = pcmButton('PCM: CONDITIONED', 'conditioned');
     var pcmWavRef = pcmButton('PCM: WAV REF', 'wavref');
+    var pcmPlain = pcmButton('PCM: PLAIN BUFFER', 'plainbuffer');
     pcmBar.appendChild(pcmNormal);
     pcmBar.appendChild(pcmRaw);
     pcmBar.appendChild(pcmConditioned);
     pcmBar.appendChild(pcmWavRef);
+    pcmBar.appendChild(pcmPlain);
 
     bar.appendChild(copySummary);
     bar.appendChild(send);
@@ -384,7 +386,8 @@
       send: send, sendTarget: sendTarget, close: close,
       badges: badges, copySummary: copySummary,
       pcmState: pcmState, pcmBar: pcmBar,
-      pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned, pcmWavRef: pcmWavRef
+      pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned,
+      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain
     };
   }
 
@@ -514,10 +517,23 @@
         var player = root.FiezelWebAudioPlayer;
         mode = player && typeof player.pcmDiagnosticMode === 'function' ? player.pcmDiagnosticMode(root, {}) : '';
       } catch (_) { mode = ''; }
+      // Untuk arm yang memakai elemen media, status kuncinya ditampilkan juga - arm yang
+      // diam-diam jatuh ke jalur normal akan menyesatkan penguji.
+      var lockNote = mode === 'wavref'
+        ? (root.__fiezelWavRefPrimed === true ? ' · pemutar pembanding SIAP' : ' · pemutar pembanding BELUM terbuka, sentuh layar sekali lalu buka panel lagi')
+        : '';
       ui.pcmState.textContent = mode
-        ? 'Mode PCM aktif: ' + mode.toUpperCase() + ' (otomatis kembali normal dalam 24 jam)'
+        ? 'Mode PCM aktif: ' + mode.toUpperCase() + lockNote + ' (otomatis kembali normal dalam 24 jam)'
         : 'Mode PCM aktif: produksi normal';
     }
+
+    // Pasang pembuka-kunci elemen pembanding pada sentuhan berikutnya di mana pun. Ini yang
+    // membuat arm WAV REF punya peluang berbunyi di iOS tanpa bergantung pada tombol mana
+    // yang ditekan, atau pada sesi mana modenya disimpan.
+    try {
+      var unlockPlayer = root.FiezelWebAudioPlayer;
+      if (unlockPlayer && typeof unlockPlayer.armReferenceUnlock === 'function') unlockPlayer.armReferenceUnlock(root);
+    } catch (_) {}
 
     ui.open.addEventListener('click', function(){
       refresh();
