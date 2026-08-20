@@ -284,7 +284,10 @@
           // m025-45: back to 4 denoising steps. 3 bought about 11% of the time back and
           // cost more than that in audio quality - OWNER heard the result immediately.
           // The gap between sentences is solved by prefetching the next one instead.
-          generationSteps:4,
+          // m025-71: satu sumber kebenaran dengan jalur Indonesia. Override diagnostik dibaca
+          // dari player supaya kedua bahasa selalu memakai jumlah langkah yang sama; selisih
+          // di antara keduanya langsung terdengar sebagai dua suara berbeda.
+          generationSteps:(function(){try{var p=self.FiezelWebAudioPlayer;return p&&typeof p.effectiveDenoiseSteps==='function'?p.effectiveDenoiseSteps(self):4}catch(_){return 4}})(), // generationSteps:4 default
           // Supertonic has its own intonation; resampling it only adds interpolation
           // noise, which is the "cracking" OWNER reported in m025-44.
           usePitchContour:false,

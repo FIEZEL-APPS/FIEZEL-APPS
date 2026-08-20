@@ -231,6 +231,60 @@
     return out;
   }
 
+  // m025-71: jumlah langkah denoising sebagai mode diagnostik.
+  //
+  // Setelah m025-70, jalur keluaran perangkat terbukti sehat - nada rata buatan sendiri
+  // terdengar mulus sekali di perangkat OWNER. Semua lapisan pemutar kita juga sudah dicoret
+  // satu per satu. Yang tersisa adalah PCM yang dihasilkan model, dan model ini int8 penuh
+  // dengan vocoder int8 serta hanya 4 langkah denoising.
+  //
+  // Menaikkan langkah adalah tuas paling murah yang tersedia: tidak menambah aset, tidak
+  // mengubah kontrak, dan bisa dikembalikan seketika. Nilainya disimpan supaya bisa dipilih
+  // dari dalam aplikasi terpasang, sama seperti mode PCM.
+  var DENOISE_STEPS_KEY = 'fiezel-denoise-steps-v1';
+  var DENOISE_STEPS_ALLOWED = Object.freeze([4, 8, 16]);
+  var DENOISE_STEPS_TTL_MS = 24 * 60 * 60 * 1000;
+
+  // Default produksi, satu tempat untuk KEDUA pintu masuk. Satu model melayani dua bahasa,
+  // jadi selisih langkah di antara keduanya akan langsung terdengar sebagai dua suara berbeda.
+  var DENOISE_STEPS_DEFAULT = 4;
+
+  /** Langkah yang benar-benar dipakai: override diagnostik bila ada, kalau tidak default produksi. */
+  function effectiveDenoiseSteps(env, now) {
+    var override = denoiseSteps(env, now);
+    return override > 0 ? override : DENOISE_STEPS_DEFAULT;
+  }
+
+  function denoiseSteps(env, now) {
+    try {
+      var store = env && env.localStorage;
+      if (!store || typeof store.getItem !== 'function') return 0;
+      var raw = JSON.parse(store.getItem(DENOISE_STEPS_KEY) || 'null');
+      var steps = raw && Number(raw.steps);
+      if (!DENOISE_STEPS_ALLOWED.includes(steps)) return 0;
+      var at = Number(raw.at) || 0;
+      var clock = Number(now) || Date.now();
+      if (!at || clock - at > DENOISE_STEPS_TTL_MS) return 0;
+      return steps;
+    } catch (_) { return 0; }
+  }
+
+  function setDenoiseSteps(steps, env, now) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var value = Number(steps);
+    try {
+      var store = target.localStorage;
+      if (!store || typeof store.setItem !== 'function') return 0;
+      if (!DENOISE_STEPS_ALLOWED.includes(value)) {
+        if (typeof store.removeItem === 'function') store.removeItem(DENOISE_STEPS_KEY);
+        else store.setItem(DENOISE_STEPS_KEY, 'null');
+        return 0;
+      }
+      store.setItem(DENOISE_STEPS_KEY, JSON.stringify({ steps: value, at: Number(now) || Date.now() }));
+      return value;
+    } catch (_) { return 0; }
+  }
+
   function encodeWav(samples, sampleRate) {
     const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || 24000)));
     const frames = samples.length;
@@ -1043,6 +1097,12 @@
     readStoredPcmMode,
     encodeWav,
     buildReferenceTone,
+    denoiseSteps,
+    effectiveDenoiseSteps,
+    setDenoiseSteps,
+    DENOISE_STEPS_DEFAULT,
+    DENOISE_STEPS_ALLOWED,
+    DENOISE_STEPS_KEY,
     analyzeSamples,
     guardClipping,
     conditionSamples,

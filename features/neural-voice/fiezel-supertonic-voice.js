@@ -190,7 +190,16 @@
         // m025-45: 4 denoising steps, matching the English path. Both languages share one
         // model, so they must share the step count or the two voices drift apart in both
         // timing and texture.
-        generationSteps: 4,
+        // m025-71: 4 tetap default produksi. Override diagnostik dibaca dari player supaya
+        // OWNER bisa mendengar 8 atau 16 langkah di perangkat tanpa build baru; nilainya
+        // hangus sendiri dalam 24 jam.
+        generationSteps: (function () {
+          try {
+            var player = root.FiezelWebAudioPlayer;
+            return player && typeof player.effectiveDenoiseSteps === 'function'
+              ? player.effectiveDenoiseSteps(root) : 4;
+          } catch (_) { return 4; }
+        })(), // generationSteps: 4 default produksi, dijaga sama untuk kedua bahasa
         // Same reason as the English path: this engine needs no synthetic pitch contour.
         usePitchContour: false,
         // m025-48: the contour is off, so per-sentence delivery is shaped through the
