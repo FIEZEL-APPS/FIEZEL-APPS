@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-70';
+  var DIAG_BUILD = 'm025-71';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -80,6 +80,11 @@
       href: safe(function(){ return String(location.origin || '') + String(location.pathname || '') + safeSearch(); }),
       // Mode yang BENAR-BENAR dipakai jalur audio, ditanyakan ke player, bukan diparse ulang
       // di sini. Inilah field yang menjawab "arm A/B-nya benar-benar jalan atau tidak".
+      denoiseSteps: safe(function(){
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.denoiseSteps !== 'function') return '(player tidak tersedia)';
+        return player.denoiseSteps(root) || 4;
+      }),
       pcmMode: safe(function(){
         var player = root.FiezelWebAudioPlayer;
         if (!player || typeof player.pcmDiagnosticMode !== 'function') return '(player tidak tersedia)';
@@ -359,12 +364,38 @@
     var pcmWavRef = pcmButton('PCM: WAV REF', 'wavref');
     var pcmPlain = pcmButton('PCM: PLAIN BUFFER', 'plainbuffer');
     var pcmTone = pcmButton('PCM: NADA UJI (bukan suara model)', 'toneref');
+
+    // m025-71: kualitas model. Setelah jalur keluaran dan seluruh lapisan pemutar dicoret,
+    // yang tersisa adalah PCM dari model - dan langkah denoising adalah tuas termurah yang ada.
+    function stepButton(label, steps) {
+      var button = root.document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', function () {
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.setDenoiseSteps !== 'function') {
+          pcmState.textContent = 'Langkah denoising: modul player tidak tersedia.';
+          return;
+        }
+        player.setDenoiseSteps(steps, root);
+        pcmState.textContent = 'Langkah denoising tersimpan: ' + (steps || 'default 4') +
+          '. Tutup FIEZEL sepenuhnya lalu buka lagi. Angka lebih tinggi berarti suara lebih halus tetapi lebih lama dibuat.';
+      });
+      return button;
+    }
+
+    var stepsDefault = stepButton('LANGKAH: 4 (default)', 0);
+    var steps8 = stepButton('LANGKAH: 8', 8);
+    var steps16 = stepButton('LANGKAH: 16', 16);
     pcmBar.appendChild(pcmNormal);
     pcmBar.appendChild(pcmRaw);
     pcmBar.appendChild(pcmConditioned);
     pcmBar.appendChild(pcmWavRef);
     pcmBar.appendChild(pcmPlain);
     pcmBar.appendChild(pcmTone);
+    pcmBar.appendChild(stepsDefault);
+    pcmBar.appendChild(steps8);
+    pcmBar.appendChild(steps16);
 
     bar.appendChild(copySummary);
     bar.appendChild(send);
@@ -389,7 +420,8 @@
       badges: badges, copySummary: copySummary,
       pcmState: pcmState, pcmBar: pcmBar,
       pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned,
-      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain, pcmTone: pcmTone
+      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain, pcmTone: pcmTone,
+      stepsDefault: stepsDefault, steps8: steps8, steps16: steps16
     };
   }
 
