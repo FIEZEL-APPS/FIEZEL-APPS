@@ -267,8 +267,14 @@
     }
 
     function stop() {
+      // m025-52 investigation: a superseded request that already finished generating
+      // (audio thrown away, per voice_service_error/"TTS request superseded") had no
+      // trace of WHAT called stop() - generation just changed between two log lines
+      // with nothing in between. This line is the only cost of closing that gap.
+      const previousGeneration = generation;
       generation += 1;
       stopEpoch += 1;
+      diag({ phase: 'runtime_stop', previousGeneration, generation, hadActiveStop: typeof activeStop === 'function' });
       // Anything warmed for the request being cancelled is now stale.
       dropWarm();
       if (typeof activeStop === 'function') {
