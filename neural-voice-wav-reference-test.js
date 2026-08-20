@@ -224,6 +224,89 @@ test('pemutaran pembanding memakai elemen yang sudah dibuka kuncinya', async () 
   assert.strictEqual(env._diag.referencePrimed, true, 'laporan menyebut pembandingnya benar-benar siap');
 });
 
+test('arm plainbuffer memutar lewat buffer polos, melewati worklet dan fade', async () => {
+  // Bukti m025-67: iOS menolak elemen media 13 dari 13 kali (NotAllowedError), jadi arm
+  // wavref tidak bisa diandalkan di perangkat itu. AudioContext-nya sendiri SUDAH terbuka
+  // oleh alur normal aplikasi, jadi arm ini bisa berjalan tanpa masalah gesture - dan ia
+  // tetap memisahkan tiga tersangka: worklet, fade, dan penjadwalan seam.
+  const started = [];
+  const connected = [];
+  const env = storeEnv({
+    navigator: {},
+    AudioContext: function () {
+      this.sampleRate = 44100; this.state = 'running'; this.currentTime = 0; this.destination = { id: 'dest' };
+      this.resume = async () => {};
+      this.createBuffer = (ch, len, rate) => {
+        const data = new Float32Array(len);
+        return { length: len, sampleRate: rate, numberOfChannels: ch, getChannelData: () => data, copyToChannel: (src) => data.set(src) };
+      };
+      this.createBufferSource = () => ({
+        buffer: null, onended: null,
+        connect(target) { connected.push(target && target.id); },
+        start() { started.push(true); }, stop() {}
+      });
+      this.audioWorklet = { addModule: async () => { throw new Error('worklet must not be used by this arm'); } };
+    },
+    FiezelVoiceDiagnostics: { record: entry => { (env._diag = env._diag || []).push(entry); return true; }, begin() {}, end() {} }
+  });
+  player.setPcmDiagnosticMode('plainbuffer', env);
+  const handle = await player.createPlayer(env, {}).play({ audio: new Float32Array(4410).fill(0.3), sampling_rate: 44100 }, {});
+  assert.strictEqual(handle.diagnosticMode, 'plainbuffer');
+  assert.strictEqual(started.length, 1, 'satu source diputar');
+  assert.deepStrictEqual(connected, ['dest'], 'tersambung langsung ke destination, tanpa gain atau fade di antaranya');
+  const record = env._diag.find(e => e.playbackPath === 'plain_buffer');
+  assert.ok(record, 'jalur yang dipakai tercatat');
+  assert.strictEqual(record.bypassed, 'worklet,fade,seam_scheduling', 'laporan menyebut apa yang dilewati');
+  assert.strictEqual(record.contextSampleRate, 44100);
+  assert.strictEqual(record.resamplingExpected, false);
+});
+
+test('plainbuffer yang gagal pun tidak merusak suara', async () => {
+  const env = storeEnv({
+    navigator: {},
+    AudioContext: function () {
+      this.sampleRate = 44100; this.state = 'running'; this.currentTime = 0; this.destination = {};
+      this.resume = async () => {};
+      // Gagal HANYA pada percobaan pembanding; jalur normal sesudahnya harus tetap bisa jalan,
+      // karena itulah inti jaminannya: arm diagnostik yang gagal tidak boleh membisukan suara.
+      let calls = 0;
+      this.createBuffer = (ch, len, rate) => {
+        calls += 1;
+        if (calls === 1) throw new Error('QuotaExceededError');
+        const data = new Float32Array(len);
+        return { length: len, sampleRate: rate, numberOfChannels: ch, getChannelData: () => data, copyToChannel: (src) => data.set(src) };
+      };
+      this.createBufferSource = () => ({ buffer: null, connect() {}, start() {}, stop() {}, onended: null });
+      this.createGain = () => ({ gain: { value: 1, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {} }, connect() {} });
+    },
+    FiezelVoiceDiagnostics: { record: entry => { (env._diag = env._diag || []).push(entry); return true; }, begin() {}, end() {} }
+  });
+  player.setPcmDiagnosticMode('plainbuffer', env);
+  const player2 = player.createPlayer(env, {});
+  await assert.doesNotReject(() => player2.play({ audio: new Float32Array(441).fill(0.1), sampling_rate: 44100 }, {}));
+  assert.ok(env._diag.some(e => e.referenceFallback), 'alasan kegagalan tercatat, lalu jatuh ke jalur normal');
+});
+
+test('pembuka kunci dipasang pada sentuhan mana pun, bukan hanya tombol mode', () => {
+  // referencePrimed: false di m025-67 terjadi karena membuka kunci hanya lewat tombol mode:
+  // modenya bertahan 24 jam sementara tombolnya bisa ditekan di sesi atau build lain.
+  const listeners = [];
+  const env = storeEnv({
+    document: {
+      addEventListener: (type, fn, capture) => listeners.push({ type, fn, capture }),
+      removeEventListener: (type) => listeners.splice(listeners.findIndex(l => l.type === type), 1)
+    },
+    Audio: function () { this.play = async () => {}; this.pause = () => {}; }
+  });
+  assert.strictEqual(player.armReferenceUnlock(env), true);
+  assert.deepStrictEqual(listeners.map(l => l.type).sort(), ['click', 'touchend']);
+  assert.strictEqual(player.armReferenceUnlock(env), false, 'tidak dipasang dua kali');
+  // Sentuhan pertama membuka kunci lalu melepas dirinya sendiri.
+  listeners[0].fn();
+  assert.ok(env.__fiezelWavRefElement, 'elemen dibuat pada gesture');
+  assert.strictEqual(player.armReferenceUnlock({}), false, 'tanpa document tidak melempar');
+});
+
 test('panel memperingatkan bila pembanding tidak bisa dibuka', () => {
   const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
   assert.ok(/primeReferenceElement\(root\)/.test(panel), 'tombol WAV REF membuka kunci di dalam gesture');
@@ -247,7 +330,7 @@ test('jalur produksi normal tidak tersentuh sama sekali', () => {
 
 test('panel Diagnostics menyediakan keempat mode dan menyebut mode yang aktif', () => {
   const panel = fs.readFileSync('./features/neural-voice/fiezel-diag-panel.js', 'utf8');
-  for (const label of ['PCM: Normal', 'PCM: RAW', 'PCM: CONDITIONED', 'PCM: WAV REF']) {
+  for (const label of ['PCM: Normal', 'PCM: RAW', 'PCM: CONDITIONED', 'PCM: WAV REF', 'PCM: PLAIN BUFFER']) {
     assert.ok(panel.indexOf(label) !== -1, `tombol ${label} hilang`);
   }
   assert.ok(/Mode PCM aktif: /.test(panel), 'panel menyebut mode yang benar-benar aktif');
