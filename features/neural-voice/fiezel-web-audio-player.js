@@ -107,6 +107,44 @@
    * Membungkus PCM menjadi WAV 16-bit. Dipakai HANYA oleh mode wavref; jalur produksi tidak
    * pernah menyentuh fungsi ini.
    */
+  // WAV diam sangat pendek, dipakai untuk "membuka kunci" elemen media di dalam gesture
+  // pengguna. iOS hanya mengizinkan play() pada elemen yang pernah diputar saat gesture;
+  // elemen yang baru dibuat beberapa detik kemudian - setelah generate selesai - akan ditolak.
+  var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQAAAAA=';
+
+  /**
+   * Menyiapkan elemen pembanding DI DALAM gesture pengguna, lalu menyimpannya untuk dipakai
+   * ulang. Tanpa ini, mode wavref tidak akan pernah berbunyi di iOS - dan itulah yang terjadi
+   * pada uji fisik m025-66: pembandingnya bisu, lalu aplikasi mengira asetnya belum siap.
+   */
+  function primeReferenceElement(env) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    const AudioCtor = target.Audio || (typeof Audio !== 'undefined' ? Audio : null);
+    if (!AudioCtor) return Promise.resolve(false);
+    let element = target.__fiezelWavRefElement;
+    try {
+      if (!element) {
+        element = new AudioCtor();
+        element.preload = 'auto';
+        target.__fiezelWavRefElement = element;
+      }
+      element.src = SILENT_WAV;
+      const started = element.play();
+      const settle = started && typeof started.then === 'function' ? started : Promise.resolve();
+      return settle.then(function () {
+        try { element.pause(); } catch (_) {}
+        target.__fiezelWavRefPrimed = true;
+        return true;
+      }, function () {
+        target.__fiezelWavRefPrimed = false;
+        return false;
+      });
+    } catch (_) {
+      target.__fiezelWavRefPrimed = false;
+      return Promise.resolve(false);
+    }
+  }
+
   function encodeWav(samples, sampleRate) {
     const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || 24000)));
     const frames = samples.length;
@@ -189,17 +227,29 @@
       peak = Math.max(peak, Math.abs(value));
     }
     const offset = hasNonFinite ? 0 : sum / length;
-    const impulses = hasNonFinite ? [] : findImpulses(samples);
     const needsOffset = !hasNonFinite && Math.abs(offset) > DC_LIMIT && isSustainedOffset(samples, offset);
     const needsHeadroom = peak > PEAK_CEILING;
-    if (!hasNonFinite && !needsOffset && !needsHeadroom && !impulses.length) return samples;
+    if (!hasNonFinite && !needsOffset && !needsHeadroom) return samples;
 
     const out = new Float32Array(length);
     for (let i = 0; i < length; i += 1) {
       const value = Number(samples[i]);
       out[i] = Number.isFinite(value) ? value - (needsOffset ? offset : 0) : 0;
     }
-    impulses.forEach((index) => { out[index] = (out[index - 1] + out[index + 1]) / 2; });
+    // m025-67: perbaikan impuls DIHAPUS, atas bukti perangkat dan bukti unit.
+    //
+    // Bukti perangkat (OWNER, m025-66): RAW - yaitu conditioning dimatikan - terdengar
+    // "pecah sedang", sedangkan CONDITIONED terdengar "pecah berat". Conditioning MEMPERBURUK.
+    //
+    // Bukti mekanisme (lihat gate): pada sinyal ucapan biasa dengan enam transien plosif
+    // normal, findImpulses() menandai keenamnya lalu menimpa sampelnya dengan rata-rata
+    // tetangga - menggeser satu sampel sampai 0,60 dan menurunkan puncak dari 0,45 ke 0,30.
+    // Itu memenggal letupan konsonan (t, k, p) dan justru menyisipkan diskontinuitas baru,
+    // persis pada batas kata dan kalimat tempat OWNER mendengar bunyi retak.
+    //
+    // Yang tersisa di sini semuanya aman dan tidak menyentuh bentuk gelombang ucapan:
+    // NaN/Infinity dinolkan, offset DC yang benar-benar bertahan dibuang, dan headroom
+    // dijaga bila puncaknya melewati batas.
     let repairedPeak = 0;
     for (let i = 0; i < length; i += 1) repairedPeak = Math.max(repairedPeak, Math.abs(out[i]));
     if (repairedPeak > PEAK_CEILING) {
@@ -578,11 +628,13 @@
       const BlobCtor = env.Blob || (typeof Blob !== 'undefined' ? Blob : null);
       const urls = env.URL || (typeof URL !== 'undefined' ? URL : null);
       if (!AudioCtor || !BlobCtor || !urls || typeof urls.createObjectURL !== 'function') {
-        throw new Error('media_element_reference_unavailable');
+        recordDiagnostic({ playbackPath: 'media_element', referenceFallback: 'media_element_unavailable' });
+        return null;
       }
       const wav = encodeWav(samples, sampleRate);
       const url = urls.createObjectURL(new BlobCtor([wav], { type: 'audio/wav' }));
-      const element = new AudioCtor();
+      // Pakai ulang elemen yang sudah dibuka kuncinya saat pengguna menekan tombol mode.
+      const element = env.__fiezelWavRefElement || new AudioCtor();
       element.src = url;
       element.preload = 'auto';
       let settled = false;
@@ -604,9 +656,20 @@
         trimmed: opts.trim === true,
         raw: rawStats,
         rendered: renderedStats,
-        wavBytes: wav.byteLength
+        wavBytes: wav.byteLength,
+        referencePrimed: env.__fiezelWavRefPrimed === true
       });
-      try { await element.play(); } catch (error) { cleanup(); throw error; }
+      try {
+        await element.play();
+      } catch (error) {
+        // iOS menolak play() pada elemen yang dibuat di luar jendela gesture pengguna.
+        cleanup();
+        recordDiagnostic({
+          playbackPath: 'media_element',
+          referenceFallback: String((error && error.name) || 'play_rejected').slice(0, 40)
+        });
+        return null;
+      }
       return {
         done,
         startsAt: 0,
@@ -634,7 +697,15 @@
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
-      if (diagnosticMode === 'wavref') return playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts);
+      if (diagnosticMode === 'wavref') {
+        // Kalau pembanding gagal dipakai (iOS memblokir play() di luar gesture, atau elemen
+        // media tidak tersedia), JANGAN melempar. Melempar membuat runtime suara mengira
+        // asetnya belum siap dan menyuruh pengguna mengunduh ulang suara yang sudah ada -
+        // itu yang terjadi pada uji fisik m025-66. Jatuh balik ke jalur normal, dan catat
+        // alasannya supaya arm yang gagal terlihat jelas di Diagnostics.
+        const reference = await playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts);
+        if (reference) return reference;
+      }
       const current = await resumeContext();
       if (!current) throw new Error('Web Audio API unavailable');
 
@@ -806,6 +877,7 @@
     pickSampleRate,
     pcmDiagnosticMode,
     setPcmDiagnosticMode,
+    primeReferenceElement,
     readStoredPcmMode,
     encodeWav,
     analyzeSamples,
