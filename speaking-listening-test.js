@@ -42,4 +42,40 @@ test('raw transcript and audio persistence stay disabled',()=>{const cfg=runtime
 test('capability metadata is bounded and sanitized',()=>{const capabilityEvents={};for(let i=0;i<30;i++)capabilityEvents['capability-'+i]={status:'x'.repeat(100),at:Number.MAX_SAFE_INTEGER,raw:'forbidden'};const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[],capabilityEvents},120);assert.ok(Object.keys(clean.capabilityEvents).length<=12);assert.ok(Object.values(clean.capabilityEvents).every(value=>Object.keys(value).sort().join(',')==='at,status'&&value.status.length<=40))});
 test('state sanitizer strips raw media claims',()=>{const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[{domain:'speaking',itemId:'x',level:'B1',mode:'roleplay',score:88,passed:true,responseMs:1000,rawAudioStored:true,rawTranscriptStored:true,transcript:'secret'}]},120);assert.equal(clean.events[0].rawAudioStored,false);assert.equal(clean.events[0].rawTranscriptStored,false);assert.ok(!JSON.stringify(clean).includes('secret'))});
 test('data rebuild is idempotent',()=>{const files=[path.join(feature,'listening-bank-v1.json'),path.join(feature,'speaking-bank-v1.json')],before=files.map(hash);child.execFileSync(process.execPath,[path.join(root,'rebuild-speaking-listening-data.js')],{stdio:'ignore'});assert.deepStrictEqual(files.map(hash),before)});
+// m025-65: replay pengguna kini benar-benar disimpan pada event. Sebelumnya controller
+// menghitungnya lalu membuangnya, sehingga R3 harus melaporkan replay sebagai "belum terukur"
+// - bukan karena tidak diketahui aplikasi, melainkan karena tidak pernah dicatat.
+test('replay pengguna tercatat pada event, bukan dibuang',()=>{
+  const store=new runtime.__test.StateStore(runtime.__test.mergeConfig({}));
+  store.state=runtime.__test.freshState();
+  const item={id:'lis_0001',level:'A2',mode:'gist'};
+  store.record('listening',item,{score:70,passed:true,metric:'keyword_coverage'},8000,3);
+  const event=store.state.events[store.state.events.length-1];
+  assert.equal(event.replays,3);
+  const evidence=store.evidence();
+  assert.equal(evidence.domains.listening.replays,3);
+  assert.equal(evidence.domains.listening.replayRate,3);
+});
+
+test('replay yang tidak wajar dibatasi sebelum disimpan',()=>{
+  const store=new runtime.__test.StateStore(runtime.__test.mergeConfig({}));
+  store.state=runtime.__test.freshState();
+  const item={id:'lis_0002',level:'A2',mode:'gist'};
+  store.record('listening',item,{score:50,passed:false,metric:'keyword_coverage'},5000,9999);
+  store.record('listening',item,{score:50,passed:false,metric:'keyword_coverage'},5000,-4);
+  assert.equal(store.state.events[0].replays,20);
+  assert.equal(store.state.events[1].replays,0);
+});
+
+test('sanitizer mempertahankan replay dan tetap membatasinya',()=>{
+  const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[
+    {domain:'listening',itemId:'x',level:'A2',mode:'gist',score:60,passed:true,responseMs:5000,replays:2},
+    {domain:'listening',itemId:'y',level:'A2',mode:'gist',score:60,passed:true,responseMs:5000,replays:500}
+  ]},120);
+  assert.equal(clean.events[0].replays,2);
+  assert.equal(clean.events[1].replays,20);
+});
+
+test('pemanggil meneruskan jumlah replay yang benar-benar terjadi',()=>assert.ok(runtimeText.includes('this.store.record(this.domain,item,result,ms,this.replays)')));
+
 console.log(`FIEZEL Speaking + Listening: PASS ${pass}/0`);
