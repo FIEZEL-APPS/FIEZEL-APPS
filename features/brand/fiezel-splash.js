@@ -61,10 +61,17 @@
 
   function markup(env, options) {
     var mascot = env && env.FiezelMascot;
-    var figure = mascot && typeof mascot.svg === 'function'
-      ? mascot.svg({ pose: 'wave', size: (options && options.size) || 180, decorative: true })
+    // Logo dan maskot keduanya karya asli dari handoff; teks wordmark hanya dipakai bila
+    // gambarnya belum tersedia, supaya splash tidak pernah kosong.
+    // Tanda F saja, tanpa huruf: wordmark-nya sudah ditulis sebagai teks di bawah ini, jadi
+    // memakai gambar berhuruf hanya menggandakan kata yang sama dan mengunci ukurannya.
+    var logo = mascot && typeof mascot.markup === 'function'
+      ? mascot.markup({ pose: 'mark', width: 76, decorative: true }) : '';
+    var figure = mascot && typeof mascot.markup === 'function'
+      ? mascot.markup({ pose: 'hero', width: (options && options.width) || 210, decorative: true })
       : '';
-    return '<p class="fiezel-splash-word">' + COPY.word + '</p>'
+    return logo
+      + '<p class="fiezel-splash-word">' + COPY.word + '</p>'
       + '<p class="fiezel-splash-tag">' + COPY.tagline + '</p>'
       + figure
       + '<div class="fiezel-splash-bubble">' + COPY.bubble + '</div>'
