@@ -43,7 +43,7 @@ Kalau OWNER ingin sync otomatis, itu keputusan terpisah yang butuh consent ekspl
 
 ## LANJUTAN
 
-1. **UI backup/restore** di Pengaturan: tombol ekspor (unduh berkas), impor (pilih berkas + passphrase), tampilkan `previewRestore()`, lalu konfirmasi eksplisit sebelum `mergeProgress()` dijalankan dan disimpan.
+1. ~~UI backup/restore di Pengaturan~~ - **SELESAI di m025-60.** Bagian "Backup dan pemulihan" di Pengaturan: kata sandi, tombol buat berkas (unduh), pilih berkas, ringkasan pratinjau, lalu tombol konfirmasi terpisah sebelum penggabungan dijalankan. Dua hal yang ditemukan gate saat menyambungkannya, dan keduanya perilaku aplikasi yang benar, bukan bug: `save()` menghitung ulang streak dari hari belajar bermakna sehingga streak tidak bisa dibawa lintas perangkat, dan sesi yang terputus dicatat oleh pemulihan sesi milik aplikasi sendiri saat state dimuat. Sesi yang SEDANG berjalan tidak ikut ke berkas; riwayat sesi yang sudah berakhir ikut, karena dari situlah tingkat sesi-tak-selesai dihitung.
 2. Install/update health check (butir R6 berikutnya).
 3. Observability tanpa raw answer history.
 4. Accessibility pass: keyboard, screen reader, reduced motion, caption, contrast, touch target.

@@ -783,3 +783,5 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .readiness-block h4{margin:0 0 8px;font-size:.86rem}
 .readiness-met{color:var(--accent)}
 .readiness-unknown,.readiness-not_met{color:var(--muted)}
+.backup-settings .backup-actions{margin-top:10px}
+.backup-settings #backupPreview:empty{display:none}
