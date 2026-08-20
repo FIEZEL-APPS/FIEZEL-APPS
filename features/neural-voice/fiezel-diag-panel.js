@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-68';
+  var DIAG_BUILD = 'm025-69';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -358,11 +358,13 @@
     var pcmConditioned = pcmButton('PCM: CONDITIONED', 'conditioned');
     var pcmWavRef = pcmButton('PCM: WAV REF', 'wavref');
     var pcmPlain = pcmButton('PCM: PLAIN BUFFER', 'plainbuffer');
+    var pcmTone = pcmButton('PCM: NADA UJI (bukan suara model)', 'toneref');
     pcmBar.appendChild(pcmNormal);
     pcmBar.appendChild(pcmRaw);
     pcmBar.appendChild(pcmConditioned);
     pcmBar.appendChild(pcmWavRef);
     pcmBar.appendChild(pcmPlain);
+    pcmBar.appendChild(pcmTone);
 
     bar.appendChild(copySummary);
     bar.appendChild(send);
@@ -387,7 +389,7 @@
       badges: badges, copySummary: copySummary,
       pcmState: pcmState, pcmBar: pcmBar,
       pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned,
-      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain
+      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain, pcmTone: pcmTone
     };
   }
 

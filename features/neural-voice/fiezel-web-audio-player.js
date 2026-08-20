@@ -27,7 +27,18 @@
   // `plainbuffer` memutar PCM yang sama lewat AudioBufferSourceNode polos langsung ke
   // destination: tanpa AudioWorklet, tanpa fade masuk/keluar, tanpa penjadwalan seam, tanpa
   // epoch. Itu tepat memisahkan tiga tersangka utama yang tersisa dari PCM-nya sendiri.
-  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref', 'plainbuffer']);
+  // m025-69: `toneref` memutar sinyal yang DIBUAT FIEZEL SENDIRI, bukan keluaran model.
+  //
+  // Bukti m025-68 sudah mencoret jalur pemutaran kita: arm PLAIN BUFFER melewati worklet,
+  // fade, dan penjadwalan seam, dan OWNER mendengar hasil yang sama persis dengan mode normal.
+  // Telemetri juga mencatat chunkCount 1 (tidak ada sambungan antar potongan), trimmed false,
+  // 44100 = 44100 (tidak ada resampling), dan tanpa clipping pada rekaman itu.
+  //
+  // Yang tersisa hanya dua: PCM dari modelnya, atau tahap keluaran perangkat. Nada buatan ini
+  // memisahkan keduanya, karena ia tidak pernah menyentuh model:
+  //   terdengar pecah  -> masalahnya di keluaran perangkat/PWA, bukan di model dan bukan di kita
+  //   terdengar bersih -> jalur keluarannya sehat, jadi cacatnya ada pada PCM yang dihasilkan model
+  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref', 'plainbuffer', 'toneref']);
   // Parameter URL tidak bisa dipakai di perangkat yang punya cacatnya. FIEZEL mewajibkan
   // notifikasi, dan iOS hanya memberi Notification API ke aplikasi layar-utama, sehingga tab
   // Safari - satu-satunya tempat parameter bisa diketik - berhenti di gerbang notifikasi.
@@ -180,6 +191,35 @@
       doc.addEventListener('click', once, true);
     } catch (_) { return false; }
     return true;
+  }
+
+  /**
+   * Sinyal referensi deterministik, panjang tetap, tanpa model sama sekali.
+   *
+   * Bentuknya sengaja menyerupai ucapan pada pita frekuensi yang sama - nada dasar 150 Hz
+   * dengan beberapa harmonik dan amplop suku kata - supaya kalau ada cacat pada keluaran
+   * perangkat, cacat itu terdengar dengan cara yang sama seperti pada suara asli. Level
+   * dijaga di 0,5 supaya tidak pernah mendekati clipping.
+   */
+  function buildReferenceTone(sampleRate, seconds) {
+    const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || PREFERRED_SAMPLE_RATE)));
+    const total = Math.max(1, Math.round(rate * (Number(seconds) || 3)));
+    const out = new Float32Array(total);
+    for (let i = 0; i < total; i += 1) {
+      const t = i / rate;
+      // Amplop suku kata ~3 per detik, tidak pernah benar-benar nol supaya diamnya tidak
+      // disalahartikan sebagai potongan.
+      const envelope = 0.55 + 0.45 * Math.sin(2 * Math.PI * 3 * t - Math.PI / 2);
+      const voiced = Math.sin(2 * Math.PI * 150 * t)
+        + 0.5 * Math.sin(2 * Math.PI * 300 * t)
+        + 0.25 * Math.sin(2 * Math.PI * 600 * t)
+        + 0.12 * Math.sin(2 * Math.PI * 1200 * t);
+      // Pembagi ini dikalibrasi ke puncak nyata ~0,5, bukan ke jumlah koefisien harmonik:
+      // harmonik tidak pernah memuncak bersamaan, jadi memakai 1,87 membuat nadanya terlalu
+      // pelan untuk dinilai telinga.
+      out[i] = 0.5 * envelope * (voiced / 1.25);
+    }
+    return out;
   }
 
   function encodeWav(samples, sampleRate) {
@@ -705,7 +745,8 @@
         trimmed: opts.trim === true,
         raw: rawStats,
         rendered: renderedStats,
-        bypassed: 'worklet,fade,seam_scheduling'
+        bypassed: 'worklet,fade,seam_scheduling',
+        syntheticReference: diagnosticMode === 'toneref'
       });
       try { node.start(); } catch (error) {
         finish();
@@ -796,6 +837,14 @@
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
+      if (diagnosticMode === 'toneref') {
+        // PCM model diganti sepenuhnya; yang diputar adalah sinyal buatan sendiri.
+        const toneRate = Number(sampleRate) || PREFERRED_SAMPLE_RATE;
+        const tone = buildReferenceTone(toneRate, 3);
+        const toneStats = analyzeSamples(tone);
+        const played = await playViaPlainBuffer(tone, toneRate, toneStats, toneStats, opts);
+        if (played) return played;
+      }
       if (diagnosticMode === 'plainbuffer') {
         const plain = await playViaPlainBuffer(samples, sampleRate, rawStats, renderedStats, opts);
         if (plain) return plain;
@@ -984,6 +1033,7 @@
     armReferenceUnlock,
     readStoredPcmMode,
     encodeWav,
+    buildReferenceTone,
     analyzeSamples,
     guardClipping,
     conditionSamples,
