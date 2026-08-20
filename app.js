@@ -651,6 +651,7 @@ function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolic
   </div>
   <div class="home-stats"><div>${stat('Level',level)}</div><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Dikuasai',mastered)}</div><div>${stat('Runtun',state.streak+' hari')}</div></div>
 </div>
+${journeyMarkup()}
 <div class="home-section-head"><div><h2>Pilih fokus hari ini</h2></div><button class="text-button" onclick="go('progress')">Lihat peta belajar <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
   <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i data-lucide="book-a"></i></span><span><small>${V.length.toLocaleString()} kata</small><b>Vocabulary</b></span><i data-lucide="arrow-up-right"></i></button>
@@ -660,6 +661,60 @@ function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolic
   <button class="launch-card skills-launch" onclick="go('skills')"><span class="launch-icon"><i data-lucide="audio-waveform"></i></span><span><small>72 latihan · A1–C2</small><b>Speaking + Listening</b></span><i data-lucide="arrow-up-right"></i></button>
 </div>
 </section>`)}
+// R2 Personal Learning Journey. The plan itself is decided by features/personal-journey,
+// which is pure and deterministic; app.js only supplies evidence and renders the result.
+// Nothing here may re-decide priority, because the roadmap requires the ordering to stay
+// auditable and reproducible.
+function buildPersonalJourney(now=Date.now()){
+  const journey=self.FiezelPersonalJourney;if(!journey)return null;
+  try{
+    const snapshot=buildLearningSnapshot(),evidence=buildLearnerEvidenceModel(now),policy=buildAdaptivePolicy(now);
+    const mission=journey.buildWeeklyMission({evidence,policy,snapshot,now,goal:state.preferences?.goalProfile});
+    const plan=journey.buildTodayPlan({mission,evidence,policy,now,lastLearningAt:lastLearningAt(),interruptedSession:!!state.activeSession});
+    return{mission,plan};
+  }catch(_){return null}
+}
+function setGoalProfile(value){const journey=self.FiezelPersonalJourney;if(!journey)return;const goal=journey.buildGoalProfile(value).id;state.preferences={...state.preferences,goalProfile:goal};save();render();showToast(`Tujuan belajar: ${journey.buildGoalProfile(goal).label}`)}
+window.setGoalProfile=setGoalProfile;
+const JOURNEY_BLOCK_LABELS={review:'Review wajib',focus:'Fokus',transfer:'Transfer'};
+function journeySkillRowMarkup(row){
+  // Tiga keadaan, bukan dua. Menampilkan 0% untuk skill yang belum pernah diukur terbaca
+  // sebagai "kamu payah" padahal FIEZEL memang belum mengukurnya; dan Speaking/Listening
+  // bukan "belum diukur" - latihannya sudah tercatat, hanya belum masuk peta ini (R3).
+  const value=row.status==='pending_r3'?'Belum terhubung'
+    :row.status==='not_measured'?'Belum diukur'
+    :`${row.accuracy==null?'—':row.accuracy+'%'}`;
+  return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span></div>`;
+}
+function journeyMarkup(now=Date.now()){
+  const built=buildPersonalJourney(now);if(!built)return'';
+  const{mission,plan}=built,goals=self.FiezelPersonalJourney.GOAL_IDS.map(id=>self.FiezelPersonalJourney.buildGoalProfile(id));
+  const focus=mission.focusSkill?mission.focusSkill.replace(/_/g,' '):mission.focusDomain;
+  const blocks=plan.blocks.map(b=>`<li class="journey-block journey-block-${esc(b.kind)}"><b>${esc(JOURNEY_BLOCK_LABELS[b.kind]||b.kind)} · ${b.questions} soal</b><span>${esc(b.why)}</span></li>`).join('');
+  return `<div class="home-section-head"><div><h2>Perjalanan belajar minggu ini</h2></div><span class="journey-week">${esc(mission.weekStart)} – ${esc(mission.weekEnd)}</span></div>
+<div class="journey-panel">
+  <div class="journey-mission">
+    <small>MISI MINGGU INI · ${esc(mission.mode.toUpperCase())}</small>
+    <h3>Fokus: ${esc(focus)}</h3>
+    <p class="journey-target">${mission.sessionsTarget} sesi · ${mission.questionsTarget} soal · ${mission.mustReview} review wajib${mission.reviewBacklog?` · ${mission.reviewBacklog} review menyusul`:''}</p>
+    <p class="journey-why">${esc(mission.rationale.explanation)}</p>
+  </div>
+  <div class="journey-today">
+    <small>RENCANA HARI INI · ${esc(plan.date)}</small>
+    <ul class="journey-blocks">${blocks}</ul>
+    <p class="journey-target">${plan.questionsTarget} soal · sekitar ${plan.minutesTarget} menit · pace ${esc(plan.pace)}</p>
+    ${plan.recovery.needed?`<p class="journey-recovery">Sesi comeback: sengaja dipendekkan supaya selesai${plan.recovery.daysAway?`, setelah ${plan.recovery.daysAway} hari tidak belajar`:''}.</p>`:''}
+    <button class="primary luxe" onclick="${state.adaptiveReady?'startAdaptive()':"go('test')"}">Mulai rencana hari ini <i data-lucide="arrow-up-right"></i></button>
+  </div>
+</div>
+<div class="journey-skills">${mission.skillMap.map(journeySkillRowMarkup).join('')}</div>
+<div class="journey-goal">
+  <small>TUJUAN BELAJAR</small>
+  <div class="journey-goal-row">${goals.map(g=>`<button class="journey-goal-chip${g.id===mission.goalProfile.id?' is-active':''}" onclick="setGoalProfile('${esc(g.id)}')">${esc(g.label)}</button>`).join('')}</div>
+  <p class="journey-why">${esc(mission.goalProfile.prerequisites.join(' · '))}</p>
+  <p class="journey-note">${esc(mission.goalProfile.note)}</p>
+</div>`;
+}
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
@@ -1011,6 +1066,6 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.toggleSoundtrack=toggleSoundtrack;window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));
