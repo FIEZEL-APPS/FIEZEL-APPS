@@ -53,7 +53,11 @@
     }
 
     function prefetch(text, options){
-      if(pending > 0 || typeof inner.prefetch !== 'function') return Promise.resolve(false);
+      // Speculative audiobook warm-up must be allowed while the current sentence is
+      // playing. The wrapped core service already serializes adapter.generate calls, so
+      // blocking here starves the one-entry warm cache and forces every sentence change
+      // to wait for a fresh render after playback ends.
+      if(typeof inner.prefetch !== 'function') return Promise.resolve(false);
       try { return Promise.resolve(inner.prefetch(text, options)); } catch (_) { return Promise.resolve(false); }
     }
 
