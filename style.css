@@ -118,6 +118,13 @@ button:hover{transform:translateY(-1px);border-color:#e7cdd2;box-shadow:var(--sh
 button:active{transform:translateY(0) scale(.97);transition-duration:.08s}
 button:disabled{opacity:.42;cursor:not-allowed;transform:none;box-shadow:none}
 button:focus-visible{outline:3px solid rgba(140,34,51,.32);outline-offset:2px}
+/* m025-63 accessibility pass. Sebelumnya hanya tombol yang punya cincin fokus, sehingga
+   pengguna keyboard kehilangan jejak begitu berpindah ke tautan atau kolom isian. */
+a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:3px solid rgba(140,34,51,.32);outline-offset:2px}
+/* Ukuran sentuh minimum ditegaskan, bukan hanya kebetulan hasil padding: satu perubahan
+   ukuran huruf tidak boleh diam-diam menyusutkan sasaran sentuh di bawah 44px. */
+button,.nav,input[type="url"],input[type="text"],input[type="password"],input[type="email"],input[type="number"],select{min-height:44px}
+input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 .app{max-width:800px;margin:auto;padding:20px 18px calc(118px + env(safe-area-inset-bottom));position:relative;z-index:2}
 
