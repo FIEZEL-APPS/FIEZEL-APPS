@@ -58,6 +58,7 @@ jobs:
           node personal-journey-test.js
           node personal-journey-ui-test.js
           node skills-evidence-test.js
+          node skills-dashboard-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
           node pwa-startup-white-screen-recovery-test.js
