@@ -1,50 +1,65 @@
-# FIEZEL — Maskot Vektor dan Splash Handoff
+# FIEZEL — Maskot Resmi dan Splash Handoff
 
 Tanggal: 2026-08-21 WIB
 Lane: brand / redesign
-Release: `DIAG_BUILD=m025-75`, `SW_REV=m025-75-brand-mascot-vector-20260821-1`
-Base: `main@78e99be`
-Sumber: sheet karakter FIEZEL + `FIEZEL_Complete_Design_Specification.pdf`
+Release: `DIAG_BUILD=m025-76`, `SW_REV=m025-76-official-artwork-20260821-1`
+Sumber: `FIEZEL_Design_Handoff_Detail.pdf` (sheet karakter resmi)
+
+## KOREKSI ATAS m025-75
+
+m025-75 menuliskan ulang karakter ini sebagai jalur SVG buatan sendiri. **OWNER menolaknya, dan penolakan itu benar.** Ilustrasi bergaya lukis dengan bulu, gradasi, dan garis tangan tidak bisa disamai oleh jalur yang ditulis manual; hasil yang "mirip-mirip" justru merusak merek. Satu-satunya yang bisa persis adalah pikselnya sendiri.
+
+m025-76 membuang SVG itu sepenuhnya dan memakai **karya aslinya**, dipotong langsung dari sheet di PDF.
 
 ## APA YANG DIKERJAKAN
 
-Sheet karakternya adalah render 3D berbulu. Vektor tidak bisa dan tidak seharusnya meniru bulu itu helai per helai — yang ditiru adalah **ciri pengenalnya**, karena itulah yang membuat sebuah karakter tetap dikenali pada 24 piksel maupun 240 piksel.
+Delapan aset PNG berlatar transparan, semuanya potongan nyata dari sheet:
 
-Ciri yang dipegang, semuanya ada dan dikunci gate:
+| Aset | Ukuran | Isi |
+|---|---|---|
+| `fiezel-hero.png` | 240×311 | maskot melambai (wink + paw wave) |
+| `fiezel-belajar.png` | 78×87 | membaca dengan kacamata |
+| `fiezel-semangat.png` | 73×95 | memegang pensil |
+| `fiezel-coding.png` | 70×88 | di depan laptop |
+| `fiezel-pencapaian.png` | 78×99 | membawa piala |
+| `fiezel-istirahat.png` | 73×66 | beristirahat |
+| `fiezel-mark.png` | 92×106 | tanda F dengan bintang emas |
+| `fiezel-icon.png` | 64×64 | ikon aplikasi (wajah maskot) |
 
-- telinga kiri terlipat, asimetris terhadap telinga kanan;
-- bandana merah dengan liontin huruf F emas;
-- ekor lebat berujung krem;
-- mata amber besar dengan kilau;
-- bintang emas kecil di dekat telinga.
+Total 267 KB, semuanya masuk shell offline.
 
-Warna diambil langsung dari spesifikasi (`#7a1e2e`, `#4a1119`, `#fdf3e2`, `#d9a441`, `#f3e0e0`), bukan dikira-kira dari gambar, dan gate menahannya tetap sama.
+**Seluruh teks anotasi sheet dibuang**: judul baris (`ACTIVITIES / POSES`), keterangan pose (`Belajar`, `Semangat!`), `WARNA PALET`, dan `APP ICON VARIATIONS`. Potongan pertama sempat membawanya ikut — OWNER menolak, dan memang benar: itu catatan untuk desainer, bukan bagian karakter.
 
-## LIMA POSE, SATU MARKUP
+Untuk `fiezel-mark.png` dipilih **tanda F saja tanpa huruf**, karena wordmark "FIEZEL" sudah ditulis sebagai teks di splash. Memakai gambar berhuruf hanya menggandakan kata yang sama dan mengunci ukurannya.
 
-`wave` (splash), `study`, `cheer`, `sleep`, `idle`. Semuanya memakai markup yang sama; yang membedakan hanya kelas CSS. Bagian yang bergerak — telinga, ekor, tangan, kelopak mata, bintang — adalah elemen tersendiri, jadi animasi cukup menggerakkan bagiannya tanpa menggambar ulang karakternya.
+## CARA LATAR DIANGKAT
 
-## KENAPA CSS, BUKAN SMIL
+Flood fill dari tepi, bukan color-key global. Dada dan moncong karakter ini berwarna krem yang sama dengan latar sheet; color-key global akan melubangi karakternya sendiri. Warna latar diambil dari warna yang paling sering muncul di tepi potongan, bukan dari satu piksel pojok — pojok bisa jatuh tepat di garis bingkai kartu, dan satu piksel yang salah membuat seluruh latar gagal terangkat.
 
-Animasi ditulis sebagai `@keyframes` CSS. Alasannya bukan selera: blok `prefers-reduced-motion` global yang sudah ada di `style.css` memangkas durasi setiap animasi CSS, sehingga maskot ini otomatis ikut diam ketika pengguna meminta kurangi-gerak. SMIL tidak tunduk pada aturan itu, dan gate menolak kalau `<animate>` masuk ke berkas maskot.
+ImageMagick tidak tersedia di mesin ini, jadi pemotongnya ditulis sendiri di Node (`scratchpad/pngtool.mjs`).
 
-## SPLASH: STEP 0 SPESIFIKASI
+## SOAL LOTTIE
 
-Wordmark, tagline, maskot melambai, gelembung ucapan `"Hai! Aku temanmu belajar di FIEZEL. Yuk, siap-siap!"`, dan satu tombol `Mulai kenalan`. Tayang 2,5 detik sesuai rentang 2–3 detik yang diminta.
+Lottie tidak dipakai, dan ini alasannya. Lottie unggul bila animasinya berasal dari **vektor sejati** — di situ ia ringan dan tajam di semua ukuran. Yang kita punya adalah ilustrasi raster, dan Lottie yang membungkus PNG hanya menambah pustaka pemutar (ratusan KB) untuk gerakan yang sudah bisa dilakukan CSS tanpa tambahan apa pun.
 
-Tiga batas yang dijaga, semuanya sudah dibayar mahal di produk ini:
+Lottie baru masuk akal setelah ada berkas master AI/EPS/SVG. Kalau master itu ada, saya bisa langsung memakainya — dan pada saat itu Lottie memang pilihan yang tepat untuk gerakan per-bagian (telinga, ekor, kedipan).
 
-1. **Tidak pernah menghalangi gerbang notifikasi.** Splash dipanggil SETELAH gerbang lolos, bukan sebelumnya. Notifikasi wajib di FIEZEL, dan sapaan tidak boleh berdiri di depan syarat masuk. Ia juga menutup diri lewat pewaktu DAN lewat sentuhan, jadi tidak ada keadaan di mana ia tertinggal menutupi layar — gate memeriksa kedua jalan keluar itu ada.
-2. **Sekali sehari.** Splash yang muncul setiap kali membuka aplikasi berubah dari sambutan menjadi penghalang.
-3. **Tunduk pada kurangi-gerak.** Maskotnya tetap tampil, hanya diam.
+## ANIMASI SEKARANG
+
+Karena asetnya gambar utuh, yang dianimasikan gambar utuhnya: `hero` mengambang pelan, `semangat` melompat kecil, `pencapaian` bergoyang, `belajar`/`coding`/`istirahat` bernapas. Semuanya CSS, sehingga otomatis ikut diam ketika perangkat meminta kurangi-gerak.
+
+Aturan produksi handoff dijaga gate: tidak direntangkan (tinggi selalu dihitung dari rasio asli), tidak diwarnai ulang (tidak ada `filter`/`hue-rotate`), tidak dicerminkan.
+
+## BATAS YANG HARUS DIKETAHUI
+
+Aset ini **raster**, bukan vektor. Sumber di PDF terbatas — hero hanya 286 px pada kualitas tertinggi yang tersedia. Untuk layar 3x dan ikon aplikasi 1024×1024, dibutuhkan berkas master. Handoff itu sendiri sudah memintanya di halaman logo: *"Untuk produksi, logo/icon sebaiknya tersedia sebagai SVG/PDF vector."*
 
 ## GATE
 
-`node brand-mascot-test.js` — 15 kasus: palet sesuai spesifikasi, semua ciri pengenal ada, `viewBox` tetap dan tanpa aset luar, id gradien tidak bertabrakan saat dua maskot tampil bersamaan, pose asing jatuh ke `idle`, judul yang disuntikkan tidak bisa menyuntik markup, maskot dekoratif tidak dibacakan dua kali pembaca layar, animasi berupa CSS sehingga tunduk pada kurangi-gerak, isi splash sesuai Step 0, tayang sekali sehari, selalu punya jalan keluar, menutup dua kali aman, tanpa modul maskot tidak merusak apa pun, penyimpanan yang menolak tidak menghalangi splash, dan tombolnya memenuhi ukuran sentuh 44px.
+`node brand-mascot-test.js` — 17 kasus, termasuk: maskot wajib berupa aset gambar dan **tidak boleh** kembali menjadi jalur SVG buatan sendiri, setiap aset benar-benar ada dan bukan berkas kosong, dimensi terdaftar cocok dengan berkas PNG-nya, semua aset ikut ke shell offline, rasio asli dipertahankan, tidak ada teks anotasi yang terbawa, animasi tetap CSS, dan splash selalu punya jalan keluar.
 
-## YANG BELUM DIKERJAKAN, DAN KEPUTUSAN YANG MENUNGGU OWNER
+## LANJUTAN
 
-- **Nama maskot.** Spesifikasi menyebut **"Percik"**; sheet karakter dan aplikasi memakai **FIEZEL**. Kode ini menyebutnya "maskot FIEZEL" secara netral sampai OWNER memutuskan. Sekali diputuskan, namanya muncul di teks yang dibaca murid, jadi lebih baik benar sejak awal.
-- **Onboarding 6 langkah** (carousel fitur, pemilihan tujuan, placement test, dan seterusnya) belum dibuat — slice ini berhenti di Step 0. Maskot dan poseknya sudah siap dipakai di langkah-langkah berikutnya tanpa tambahan aset.
-- **Ikon aplikasi berbasis maskot** (sheet menunjukkan dua varian) belum dibuat; itu perlu PNG berukuran tetap, bukan SVG inline.
-- Tipografi Fredoka dan Plus Jakarta Sans belum dipasang; teks masih memakai fallback sistem. Memuatnya berarti menambah aset font ke shell offline — keputusan ukuran unduhan, jadi ditahan sampai OWNER menyetujui.
+1. Berkas master (AI/EPS/SVG) untuk vektor sejati dan ikon 1024×1024.
+2. Onboarding 6 langkah — pose sudah siap dipakai, tanpa aset tambahan.
+3. Nama maskot: spesifikasi menyebut "Percik", sheet dan aplikasi menyebut FIEZEL.
