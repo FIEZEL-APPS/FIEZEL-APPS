@@ -207,9 +207,18 @@
     const out = new Float32Array(total);
     for (let i = 0; i < total; i += 1) {
       const t = i / rate;
-      // Amplop suku kata ~3 per detik, tidak pernah benar-benar nol supaya diamnya tidak
-      // disalahartikan sebagai potongan.
-      const envelope = 0.55 + 0.45 * Math.sin(2 * Math.PI * 3 * t - Math.PI / 2);
+      // m025-70: amplop suku kata 3 Hz DIHAPUS. Pada uji m025-69 OWNER mendengarnya sebagai
+      // "beep beep beep", dan denyut itu menyulitkan tugas sebenarnya: menilai ada tidaknya
+      // bunyi retak. Nada rata membuat retakan sekecil apa pun langsung terdengar, karena
+      // tidak ada perubahan level yang bisa menyamarkannya.
+      //
+      // Yang tersisa hanya pelembut di ujung: naik 50 ms di awal dan turun 50 ms di akhir,
+      // supaya awal dan akhirnya sendiri tidak menimbulkan klik yang bisa disalahartikan
+      // sebagai cacat.
+      const edge = Math.min(0.05, (total / rate) / 4);
+      const fadeIn = Math.min(1, t / edge);
+      const fadeOut = Math.min(1, (total / rate - t) / edge);
+      const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
       const voiced = Math.sin(2 * Math.PI * 150 * t)
         + 0.5 * Math.sin(2 * Math.PI * 300 * t)
         + 0.25 * Math.sin(2 * Math.PI * 600 * t)
