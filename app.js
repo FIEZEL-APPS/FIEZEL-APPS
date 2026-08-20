@@ -353,9 +353,11 @@ function withSpokenSkills(model,now){
   const projector=self.FiezelSkillsEvidence;if(!projector)return model;
   try{
     const state=projector.readSidecarState(self);
-    // Jumlah bank soal belum tersedia secara sinkron di sini, jadi coverage sengaja tidak
-    // dihitung. Modul menandainya sebagai tidak terukur, bukan mengarang penyebut.
-    return projector.mergeIntoLearnerEvidence(model,projector.projectSkillsEvidence({state,now}));
+    // Penyebut cakupan target datang dari config sidecar, yang dijaga gate agar tetap sama
+    // dengan jumlah item di bank soal. Kalau config tidak ada, coverage tetap tidak dihitung
+    // - modul menandainya tidak terukur, bukan mengarang penyebut.
+    const bankCounts=self.FIEZEL_SPEAKING_LISTENING_CONFIG?.bankCounts||null;
+    return projector.mergeIntoLearnerEvidence(model,projector.projectSkillsEvidence({state,now,bankCounts}));
   }catch(_){return model}
 }
 function remoteLearnerEvidenceSnapshot(now=Date.now()){const e=buildLearnerEvidenceModel(now);return{schema:e.schema,generatedAt:e.generatedAt,behavior:{activeDays14:e.behavior.activeDays14,consistency14d:e.behavior.consistency14d,streakDays:e.behavior.streakDays,todayAttempts:e.behavior.todayAttempts,abandonmentRate:e.behavior.abandonmentRate,medianResponseMs:e.behavior.medianResponseMs,preferredStudyWindow:e.behavior.preferredStudyWindow},confidence:{evidence:e.confidence.evidence,gap:e.confidence.gap},memory:{dueReviews:e.memory.dueReviews,maxForgettingRisk:e.memory.maxForgettingRisk,highRiskCount:e.memory.highRiskCount},skills:{measured:e.skills.measured,recurringErrorSkills:e.skills.recurringErrorSkills,weakest:e.skills.weakest.slice(0,3).map(x=>({skill:x.skill,type:x.type,attempts:x.attempts,accuracy:x.accuracy,errorRate:x.errorRate,recurringErrors:x.recurringErrors}))},privacy:e.privacy}}
@@ -696,7 +698,12 @@ function journeySkillRowMarkup(row){
   const value=row.status==='pending_r3'?'Belum terhubung'
     :row.status==='not_measured'?'Belum diukur'
     :`${row.accuracy==null?'—':row.accuracy+'%'}`;
-  return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span></div>`;
+  // Cakupan target ditampilkan terpisah dari nilai, dan hanya kalau penyebutnya diketahui.
+  // Menggabungkan keduanya jadi satu angka adalah cara tercepat membuat murid mengira
+  // "baru 6% materi disentuh" berarti "nilaimu 6".
+  const coverage=row.targetCoverage&&row.targetCoverage.measured
+    ? `<small>cakupan ${row.targetCoverage.percent}%</small>` : '';
+  return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span>${coverage}</div>`;
 }
 function journeyMarkup(now=Date.now()){
   const built=buildPersonalJourney(now);if(!built)return'';

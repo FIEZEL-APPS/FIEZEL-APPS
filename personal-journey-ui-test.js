@@ -127,6 +127,25 @@ setTimeout(() => {
     } finally { context.FiezelPersonalJourney = backup; }
   });
 
+  test('cakupan target tampil terpisah dari nilai, dan hanya kalau terukur', () => {
+    // Home tanpa bukti Speaking/Listening: tidak boleh ada baris cakupan sama sekali.
+    assert.ok(!/cakupan/.test(markup), 'jangan tampilkan cakupan yang penyebutnya tidak diketahui');
+    const spoken = {
+      schema: 'fiezel-skills-evidence-v1', version: 1,
+      listening: { status: 'measured', attempts: 4, practiceScore: 68, completionRate: 75, targetCoverage: { measured: true, percent: 11, itemsAttempted: 4, itemsAvailable: 36 } },
+      speaking: { status: 'not_measured', attempts: 0, practiceScore: null, completionRate: null, targetCoverage: { measured: false, percent: null } }
+    };
+    const journey = context.FiezelPersonalJourney;
+    const m = journey.buildWeeklyMission({
+      evidence: { skills: { spoken } }, policy: {}, snapshot: {}, now
+    });
+    const row = m.skillMap.find(r => r.skill === 'listening');
+    assert.strictEqual(row.status, 'measured');
+    assert.strictEqual(row.accuracy, 68, 'skor latihan');
+    assert.strictEqual(row.targetCoverage.percent, 11, 'cakupan berdiri sendiri, bukan nilai');
+    assert.notStrictEqual(row.accuracy, row.targetCoverage.percent);
+  });
+
   test('markup panel tidak membocorkan jawaban atau riwayat mentah', () => {
     assert.ok(!/selectedAnswer|wrongAnswers|transcript/i.test(markup));
   });
