@@ -182,10 +182,46 @@
     })();
     /* FIEZEL_REPORT_GESTURE_ISOLATION_END */
   </script>
+  <script src="./features/ui/fiezel-dark-mode.js"></script>
+  <script src="./features/ui/fiezel-ab-testing.js"></script>
+  <script src="./features/ui/skeleton-helpers.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
+
+    /* Inject dark mode toggle ke settings modal */
+    const originalOpenSettings = window.openSettings;
+    window.openSettings = function() {
+      originalOpenSettings.call(this);
+      setTimeout(() => {
+        const settingsList = document.querySelector('.settings-list');
+        if (settingsList && !document.getElementById('settingDarkMode')) {
+          const darkModeToggle = document.createElement('label');
+          darkModeToggle.className = 'setting-row';
+          darkModeToggle.id = 'settingDarkMode';
+          darkModeToggle.innerHTML = `
+            <span class="setting-icon"><i data-lucide="moon"></i></span>
+            <span>
+              <b>Mode gelap</b>
+              <small>Ikuti preferensi sistem atau atur manual</small>
+            </span>
+            <input id="settingDarkModeToggle" type="checkbox" ${window.FiezelUI?.getCurrentTheme() === 'dark' ? 'checked' : ''}>
+          `;
+          settingsList.insertBefore(darkModeToggle, settingsList.firstChild);
+
+          document.getElementById('settingDarkModeToggle').addEventListener('change', (e) => {
+            window.FiezelUI?.toggleDarkMode();
+            e.target.checked = window.FiezelUI?.getCurrentTheme() === 'dark';
+          });
+
+          /* Re-enhance Lucide icons */
+          if (window.lucide) {
+            lucide.createIcons();
+          }
+        }
+      }, 100);
+    };
   </script>
 </body>
 </html>
