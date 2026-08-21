@@ -29,6 +29,25 @@
  * - Browser memblokir audio sebelum ada sentuhan pengguna. Konteks dibuat malas pada bunyi
  *   pertama dan kegagalan ditelan diam-diam - antarmuka tidak pernah rusak hanya karena
  *   suaranya tidak boleh berbunyi.
+ *
+ * m025-84 OWNER: "sfx sounds muncul belakangan saat user menekan tombol apapun di menu".
+ *
+ * Ini bukan bunyi yang dipanggil telat - ini bunyi splash yang TERANTRE, lalu tumpah
+ * sekaligus di sentuhan pertama. Mekanismenya persis:
+ *
+ *   1. Splash memanggil playMotif() tanpa sentuhan pengguna. AudioContext yang lahir di
+ *      sana berada dalam keadaan `suspended`.
+ *   2. Pada keadaan `suspended`, ctx.currentTime BEKU. schedule() menghitung t0 =
+ *      currentTime + 0.005 = 0.005 detik dan memanggil osc.start(0.005).
+ *   3. Web Audio tidak membuang jadwal yang lewat - ia menahannya. Motifnya menunggu.
+ *   4. Pengguna menekan tombol apa pun di menu. ensureContext() memanggil ctx.resume(),
+ *      jam mulai berjalan dari ~0, dan SELURUH motif splash - tiga nada plus sub-bass 1,05
+ *      detik - berbunyi di detik itu, di layar yang salah.
+ *
+ * Perbaikannya satu kalimat: JANGAN PERNAH menjadwalkan ke konteks yang belum berjalan.
+ * Bunyi yang tidak bisa berbunyi sekarang tidak diantre - ia ditolak (`false`) atau, khusus
+ * motif splash, "disiagakan" dengan tenggat yang terikat pada umur splash lewat windowMs.
+ * Lewat tenggat itu ia dibuang. Tidak ada jalan lagi bagi bunyi splash untuk muncul di menu.
  */
 (function (root, factory) {
   var api = factory();
@@ -69,6 +88,15 @@
   var DECAY_FLOOR = 0.015; // exp(-4.2): titik akhir peluruhan eksponensial
 
   var ctx = null, master = null, tailIn = null, noiseBuf = null, enabled = true;
+  // Motif yang menunggu izin audio. { notes, level, opts, expiresAt } - dan expiresAt-lah
+  // yang membuat bug di header tidak bisa terulang: lewat tenggat, ia dibuang.
+  var pending = null;
+  var unlockBound = false;
+  // Berapa lama sebuah SFX transisi masih relevan setelah diminta. Sentuhan pertama membuka
+  // audio lewat resume() yang asinkron; menjadwalkan hasilnya setelah jeda ini berarti bunyi
+  // yang tidak lagi menyertai apa pun.
+  var GESTURE_GRACE_MS = 350;
+  var DEFAULT_MOTIF_WINDOW_MS = 2600;
 
   function preferencesAllow(env) {
     try {
@@ -201,6 +229,85 @@
     return ensureContext(env);
   }
 
+  /** Satu-satunya keadaan di mana menjadwalkan bunyi berarti membunyikannya sekarang. */
+  function running() { return !!ctx && ctx.state === 'running'; }
+
+  function resumeContext() {
+    try {
+      if (ctx && ctx.state !== 'running' && typeof ctx.resume === 'function') return ctx.resume();
+    } catch (_) { /* resume yang ditolak bukan kegagalan antarmuka */ }
+    return null;
+  }
+
+  /**
+   * Apakah dokumen ini pernah disentuh pengguna. Kalau jawabannya pasti "belum", membuat
+   * AudioContext hanya melahirkan konteks `suspended` - persis benda yang bug di header
+   * tumbuh di dalamnya. Browser tanpa API ini menjawab null: kita tidak menebak.
+   */
+  function userActivated(env) {
+    try {
+      var ua = env && env.navigator && env.navigator.userActivation;
+      if (ua && typeof ua.hasBeenActive === 'boolean') return ua.hasBeenActive;
+    } catch (_) {}
+    return null;
+  }
+
+  /**
+   * Memasang pembuka audio sekali pakai pada sentuhan pertama di dokumen. Fase CAPTURE
+   * dipakai supaya ia berjalan sebelum handler tombol aplikasi: dengan begitu SFX tombol
+   * pertama pun punya peluang berbunyi, bukan hanya tombol kedua dan seterusnya.
+   */
+  function bindUnlock(env) {
+    if (unlockBound) return;
+    var doc = env && env.document;
+    if (!doc || typeof doc.addEventListener !== 'function') return;
+    unlockBound = true;
+    var types = ['pointerdown', 'touchend', 'mousedown', 'keydown'];
+    function unlock() {
+      if (!ensureContext(env)) { detach(); return; }
+      var p = resumeContext();
+      if (p && typeof p.then === 'function') p.then(function () { firePending(env); }, function () {});
+      else firePending(env);
+      if (running()) detach();
+    }
+    function detach() {
+      for (var i = 0; i < types.length; i++) {
+        try { doc.removeEventListener(types[i], unlock, true); } catch (_) {}
+      }
+      unlockBound = false;
+    }
+    for (var i = 0; i < types.length; i++) {
+      try { doc.addEventListener(types[i], unlock, true); } catch (_) {}
+    }
+  }
+
+  function now() { return Date.now(); }
+
+  /** Menyiagakan motif dengan TENGGAT. Tanpa tenggat ini, ia jadi bunyi liar di menu. */
+  function armMotif(env, windowMs) {
+    pending = { notes: MOTIF, level: 0.52, opts: { sub: [N.F2, 0.210, 1.05] }, expiresAt: now() + windowMs };
+    bindUnlock(env);
+  }
+
+  /**
+   * Membunyikan motif yang disiagakan, kalau masih dalam tenggat DAN audio benar-benar
+   * sudah berjalan. Di luar itu ia dibuang - tidak pernah ditunda lagi ke kesempatan
+   * berikutnya, karena "kesempatan berikutnya" itulah bug yang diperbaiki di sini.
+   */
+  function firePending(env) {
+    if (!pending) return false;
+    if (now() > pending.expiresAt) { pending = null; return false; }
+    if (!ensureContext(env)) { pending = null; return false; }
+    if (!running()) { resumeContext(); return false; }
+    var armed = pending;
+    pending = null;
+    try { schedule(armed.notes, armed.level, armed.opts); return true; }
+    catch (_) { return false; }
+  }
+
+  /** Membuang motif yang disiagakan. Dipanggil splash saat menutup. */
+  function cancelPending() { pending = null; return true; }
+
   /**
    * Membunyikan satu SFX transisi. Selalu aman dipanggil: nama asing, audio terblokir,
    * preferensi mati, atau kurangi-gerak semuanya berakhir sebagai `false`.
@@ -216,19 +323,55 @@
     // dikali 0.3 (turun 70%, sisa 30%) - motif pembuka splash TIDAK ikut turun, sebab
     // keluhannya khusus soal SFX tekan tombol yang terus-menerus terdengar tiap ketukan,
     // bukan sapaan satu kali di splash.
-    try { schedule(voice, 0.102); return true; } catch (_) { return false; }
+    if (running()) {
+      try { schedule(voice, 0.102); return true; } catch (_) { return false; }
+    }
+    // Konteks belum berjalan: menjadwalkan di sini berarti menitipkan bunyi ke masa depan
+    // yang tidak diketahui. Yang dilakukan hanyalah membuka audio, lalu membunyikan voice
+    // ini HANYA kalau izinnya turun dalam hitungan milidetik - selebihnya bunyi ini hilang,
+    // dan itu jawaban yang benar untuk sebuah SFX transisi.
+    var deadline = now() + GESTURE_GRACE_MS;
+    var resumed = resumeContext();
+    if (resumed && typeof resumed.then === 'function') {
+      resumed.then(function () {
+        if (!running() || now() > deadline) return;
+        try { schedule(voice, 0.102); } catch (_) {}
+      }, function () {});
+    }
+    bindUnlock(target);
+    return false;
   }
 
   /**
    * Motif merek penuh untuk splash. Berbunyi juga saat kurangi-gerak aktif: ini sapaan
    * sekali per peluncuran, bukan bunyi berulang, dan ia menggantikan animasi yang justru
    * dimatikan di modus itu.
+   *
+   * `options.windowMs` adalah umur splash yang memanggilnya. Di dalam jendela itu motif
+   * boleh menunggu izin audio; di luarnya ia dibuang. Itulah pagar yang membuat motif
+   * splash tidak bisa lagi muncul sebagai kejutan di layar menu.
    */
-  function playMotif(env) {
+  function playMotif(env, options) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
-    if (!ready(target, true)) return false;
-    try { schedule(MOTIF, 0.52, { sub: [N.F2, 0.210, 1.05] }); return true; }
-    catch (_) { return false; }
+    var opts = options || {};
+    var windowMs = Number(opts.windowMs);
+    if (!isFinite(windowMs) || windowMs < 0) windowMs = DEFAULT_MOTIF_WINDOW_MS;
+    cancelPending();
+    if (!enabled) return false;
+    if (!preferencesAllow(target)) return false;
+    // Dokumen yang belum pernah disentuh PASTI diblokir. Konteksnya tidak dibuat sama
+    // sekali di sini - hanya disiagakan sampai sentuhan pertama, atau sampai tenggatnya
+    // lewat, mana yang lebih dulu.
+    if (userActivated(target) === false) { armMotif(target, windowMs); return false; }
+    if (!ensureContext(target)) return false;
+    if (running()) {
+      try { schedule(MOTIF, 0.52, { sub: [N.F2, 0.210, 1.05] }); return true; }
+      catch (_) { return false; }
+    }
+    armMotif(target, windowMs);
+    var resumed = resumeContext();
+    if (resumed && typeof resumed.then === 'function') resumed.then(function () { firePending(target); }, function () {});
+    return false;
   }
 
   function setEnabled(v) { enabled = v !== false; return enabled; }
@@ -240,7 +383,12 @@
     names: function () { return Object.keys(VOICES); },
     play: play,
     playMotif: playMotif,
+    cancelPending: cancelPending,
+    pendingMotif: function () { return pending ? { expiresAt: pending.expiresAt } : null; },
+    contextState: function () { return ctx ? String(ctx.state) : 'none'; },
     setEnabled: setEnabled,
-    isEnabled: function () { return enabled; }
+    isEnabled: function () { return enabled; },
+    // Hanya untuk pengujian: mengembalikan modul ke keadaan sebelum konteks apa pun dibuat.
+    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; }
   };
 });

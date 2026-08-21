@@ -21,6 +21,11 @@
 
   var doc = root.document;
   var PROGRESS_KEY = 'fiezel-library-progress-v1';
+  // m025-84: pembaca buku persis layar yang disebut owner - "dari menu terus menuju ke fitur
+  // audiobook, ketika ingin kembali dan swipe back, itu tidak berfungsi". Ia bukan view
+  // tersendiri di app.js (state.view tetap 'library'), jadi tanpa entri riwayatnya sendiri ia
+  // tidak akan pernah terlihat oleh gestur kembali. Nama lapisan ini yang dipegang riwayat.
+  var READER_LAYER = 'library-reader';
   var pack = null;
   var packPromise = null;
   var session = null;
@@ -211,7 +216,7 @@
       button.addEventListener('click', function () { onSentence(Number(button.dataset.sentence)); });
     });
     node.querySelectorAll('[data-shelf]').forEach(function (button) {
-      button.addEventListener('click', renderShelf);
+      button.addEventListener('click', backToShelf);
     });
     node.querySelectorAll('[data-step]').forEach(function (button) {
       button.addEventListener('click', function () { step(Number(button.dataset.step)); });
@@ -267,9 +272,31 @@
 
   // ---- interaction ----------------------------------------------------------------
 
+  /**
+   * Dipanggil oleh riwayat saat tekanan kembali sampai di lapisan pembaca. Menutup saja -
+   * TIDAK menyentuh riwayat lagi, karena entrinya sudah diambil oleh jalur itu. False berarti
+   * pembacanya memang sudah tidak di layar, sehingga tekanan kembali tidak terbuang di sini.
+   */
+  function closeReaderLayer() {
+    if (!doc.querySelector('.library-reader')) return false;
+    renderShelf();
+    return true;
+  }
+
+  /** Tombol "← Rak buku": tutup seketika, lalu buang entri riwayatnya supaya tetap sejajar. */
+  function backToShelf() {
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.dismiss === 'function') { try { nav.dismiss(READER_LAYER); } catch (_) {} }
+    renderShelf();
+  }
+
   function openBook(bookId) {
     try { session.open(bookId); } catch (_) { return; }
     renderReader();
+    var nav = root.FiezelBackNav;
+    if (nav && typeof nav.pushLayer === 'function') {
+      try { nav.pushLayer({ id: READER_LAYER, close: closeReaderLayer }); } catch (_) {}
+    }
     var progress = session.progressFor(bookId);
     if (progress.percent) setStatus('Lanjut dari kalimat ' + (session.snapshot().sentenceIndex + 1) + '.');
   }
