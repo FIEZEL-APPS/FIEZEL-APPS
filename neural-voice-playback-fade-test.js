@@ -132,7 +132,12 @@ const tone = (samples) => ({ data: Float32Array.from(samples), sampling_rate: 44
     const headlines = bank.match(/headline:'([^']*)'/g) || [];
     assert.ok(headlines.length >= 60, `the bank must stay varied, got ${headlines.length} messages`);
     assert.strictEqual(new Set(headlines).size, headlines.length, 'no two daily messages may be identical');
-    assert.ok(bank.includes('Jahran'), 'the bank speaks to Jahran by name');
+    // m025-80: Audit UX Bagian 6 melarang nama murid dipaku di kode. Bank pesan kini
+    // menyimpan token {name} yang diganti di titik render dari state.userName, jadi
+    // assertion dibalik: yang dijaga bukan lagi keberadaan satu nama tertentu, melainkan
+    // bahwa banknya MEMANG dipersonalisasi dan tidak ada nama yang tertinggal dipaku.
+    assert.ok(bank.includes('{name}'), 'the bank must personalise through the {name} token');
+    assert.ok(!/Jahran/.test(bank), 'no learner name may remain hardcoded in the bank');
   });
 
   if (failures) { console.error(`\nFIEZEL playback fade + message bank: ${failures} FAILED`); process.exit(1); }
