@@ -1011,10 +1011,22 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
 // m025-80 AUDIT (Bagian 1): apa pun yang terjadi setelah splash ditentukan oleh pemanggil,
 // bukan dipaku di sini. Boot memakainya untuk menyambung ke perkenalan lalu gerbang; sapaan
 // harian memakai perilaku bawaan yang hanya menoleh ke perkenalan.
+// m025-84: splash sekarang sudah ada di layar sejak frame pertama (markup statisnya di
+// index.html). Setiap jalan keluar dari fungsi ini WAJIB lewat dismissBootSplash(): kalau
+// modul splash hilang atau melempar, elemen statis itu akan tetap menutupi seluruh layar
+// dan aplikasi terkunci di balik layar sambutan yang tidak pernah menutup.
+function dismissBootSplash(){
+  try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
+  try{
+    self.__fiezelBootSplash?.dismiss?.();
+    return true
+  }catch(_){return false}
+}
+window.dismissBootSplash=dismissBootSplash;
 function showBrandSplash(now=Date.now(),afterSplash=null){
   const done=typeof afterSplash==='function'?afterSplash:(at=>{showOnboarding(at)});
   const splash=self.FiezelSplash;
-  if(!splash||typeof splash.show!=='function'){done(now);return null}
+  if(!splash||typeof splash.show!=='function'){dismissBootSplash();done(now);return null}
   try{
     // m025-80 OWNER: "yang aku harapkan setiap kali buka apps itu adalah splash". Sapaan
     // merek dulu dibatasi sekali sehari lewat seenToday(); pemanggil dari boot sekarang
@@ -1024,9 +1036,9 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
     const shown=splash.show(self,{now,force:typeof afterSplash==='function',onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
-    if(!shown||shown.shown!==true)done(now);
+    if(!shown||shown.shown!==true){dismissBootSplash();done(now)}
     return shown
-  }catch(_){done(now);return null}
+  }catch(_){dismissBootSplash();done(now);return null}
 }
 window.showBrandSplash=showBrandSplash;
 // Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
@@ -1415,4 +1427,7 @@ function warmNeuralVoice(){
 warmNeuralVoice();
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
-load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));
+// m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
+// galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
+// hanya melihat layar sambutan yang menggantung selamanya.
+load().catch(e=>{dismissBootSplash();setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`)});
