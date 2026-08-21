@@ -56,35 +56,71 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var N = Object.freeze({
-    F2: 87.31, F3: 174.61, A3: 220.00, D4: 293.66,
-    F4: 349.23, A4: 440.00, C5: 523.25, D5: 587.33, F5: 698.46
+  // Koreografi adalah SATU-SATUNYA sumber ritme; lihat features/brand/fiezel-choreography.js
+  // untuk alasan lengkapnya. Dimuat lebih dulu di index.html. Fallback di bawah hanya untuk
+  // lingkungan uji Node yang memuat modul ini sendirian - bukan jalur produksi.
+  var CHOREO = (function () {
+    try {
+      var g = typeof globalThis !== 'undefined' ? globalThis : null;
+      if (g && g.FiezelChoreography) return g.FiezelChoreography;
+      if (typeof require === 'function') return require('../brand/fiezel-choreography.js');
+    } catch (_) {}
+    return null;
+  })();
+
+  var N = Object.freeze(CHOREO ? CHOREO.PITCH : {
+    F2: 87.31, F3: 174.61, C4: 261.63, F4: 349.23, A4: 440.00, C5: 523.25, G5: 783.99
   });
 
-  // Motif merek. [nada, mulai (detik), panjang (detik)]
-  var MOTIF = Object.freeze([
-    [N.F4, 0.000, 0.34],
-    [N.A4, 0.105, 0.34],
-    [N.D5, 0.210, 1.15]
-  ]);
+  /**
+   * Motif merek: akor F mayor add9 yang diurai naik, satu nada per ketukan visual.
+   * Bentuknya [nada, mulai (detik), panjang (detik), peran] - dan ketiganya diturunkan dari
+   * tabel koreografi, tidak ditulis ulang di sini. Panjang tiap nada sengaja MEMBESAR ke
+   * atas: nada rendah dipukul pendek supaya tidak menutupi, nada tinggi dibiarkan
+   * menggantung supaya ekornya masih hidup saat gerakan terakhir selesai.
+   */
+  function motifFromChoreography() {
+    if (!CHOREO || typeof CHOREO.audioBeats !== 'function') {
+      return [[N.F4, 0.000, 0.34], [N.A4, 0.105, 0.34], [N.C5, 0.210, 1.15]];
+    }
+    var beats = CHOREO.audioBeats();
+    var endsAt = CHOREO.motionEndsAt() / 1000;
+    var out = [];
+    for (var i = 0; i < beats.length; i++) {
+      var b = beats[i];
+      // Setiap nada harus MASIH berbunyi saat gerakan berakhir, ditambah ekor ruang.
+      // Inilah yang menutup 950 milidetik senyap yang dilaporkan owner: bukan dengan
+      // menambah nada, melainkan dengan membiarkan nada yang ada bertahan.
+      var dur = Math.max(0.28, (endsAt - b.at) + 0.45);
+      out.push([b.freq, b.at, dur, b.role]);
+    }
+    return out;
+  }
 
-  // SFX transisi — semuanya potongan dari MOTIF.
+  var MOTIF = Object.freeze(motifFromChoreography());
+
+  // SFX transisi. Semuanya nada dari akor pembuka yang sama, jadi setiap ketukan di dalam
+  // aplikasi terdengar sebagai kutipan dari sapaan pembukanya - bukan bunyi lain yang
+  // kebetulan hidup di produk yang sama.
   var VOICES = Object.freeze({
-    tap:       [[N.A4, 0.000, 0.15]],                          // satu nada tengah motif
-    toggle:    [[N.F4, 0.000, 0.17]],                          // nada jangkar motif
-    nav:       [[N.F4, 0.000, 0.20], [N.A4, 0.075, 0.26]],     // dua langkah pertama
-    open:      [[N.A4, 0.000, 0.20], [N.D5, 0.075, 0.30]],     // lompatan penutup motif
-    close:     [[N.D5, 0.000, 0.18], [N.A4, 0.075, 0.26]],     // lompatan itu dibalik
-    celebrate: [[N.F4, 0.000, 0.26], [N.A4, 0.090, 0.26],
-                [N.D5, 0.180, 0.34], [N.F5, 0.290, 0.85]]      // motif + oktaf penutup
+    tap:       [[N.C5, 0.000, 0.15]],                          // kuint akor, nada paling netral
+    toggle:    [[N.F4, 0.000, 0.17]],                          // tonika
+    nav:       [[N.F4, 0.000, 0.20], [N.C5, 0.070, 0.28]],     // tonika -> kuint: gerak
+    open:      [[N.A4, 0.000, 0.20], [N.G5, 0.070, 0.34]],     // terts -> add9: membuka
+    close:     [[N.G5, 0.000, 0.18], [N.A4, 0.070, 0.28]],     // dibalik: menutup
+    celebrate: [[N.F4, 0.000, 0.26], [N.A4, 0.080, 0.26],
+                [N.C5, 0.160, 0.34], [N.G5, 0.250, 0.90]]      // akor penuh, diurai
   });
 
   // Susunan parsial satu bilah. Perbandingan inilah yang membuatnya berbunyi berkayu-
   // berlogam alih-alih seperti bip: [pengali frekuensi, kekerasan, pengali panjang].
-  // 4.19x sengaja TAKLARAS - itu kilau logam yang cepat hilang.
-  var PARTIALS = [[1.00, 1.00, 1.00], [2.00, 0.26, 0.72],
-                  [3.00, 0.13, 0.50], [4.19, 0.07, 0.26]];
+  // 2.76x dan 5.40x sengaja TAKLARAS - itu perbandingan bilah logam yang dipukul, dan
+  // itulah yang membedakan bunyi "mahal" dari osilator yang dinyalakan. Parsial atas
+  // meluruh jauh lebih cepat daripada dasarnya, persis seperti benda nyata.
+  var PARTIALS = [[1.00, 1.00, 1.00], [2.00, 0.30, 0.62],
+                  [2.76, 0.15, 0.34], [3.00, 0.11, 0.44], [5.40, 0.05, 0.16]];
   var DETUNE = 1.0029;   // +5 sen, lapisan kehangatan
+  var SPREAD = 0.34;     // lebar stereo lapisan laras-lepas
   var DECAY_FLOOR = 0.015; // exp(-4.2): titik akhir peluruhan eksponensial
 
   var ctx = null, master = null, tailIn = null, noiseBuf = null, enabled = true;
@@ -132,14 +168,14 @@
       // dipukul di dalam ruangan, bukan di ruang hampa - itu yang membuatnya terdengar
       // mahal, dan jauh lebih murah daripada menjadwalkan salinan nada berulang kali.
       tailIn = ctx.createGain();
-      tailIn.gain.value = 0.34;
+      tailIn.gain.value = 0.42;
       var delay = ctx.createDelay(0.5);
-      delay.delayTime.value = 0.085;
+      delay.delayTime.value = 0.112;
       var damp = ctx.createBiquadFilter();
       damp.type = 'lowpass';
-      damp.frequency.value = 3200;
+      damp.frequency.value = 2600;
       var fb = ctx.createGain();
-      fb.gain.value = 0.30;
+      fb.gain.value = 0.38;
       tailIn.connect(delay);
       delay.connect(damp);
       damp.connect(fb);
@@ -159,6 +195,16 @@
   }
 
   /** Ketukan palu: derau sangat pendek. Otak mengenali serangan sebelum mengenali nada. */
+  /** Menyalurkan satu suara ke master lewat panner, kalau browsernya punya. */
+  function pan(node, amount) {
+    try {
+      if (!amount || typeof ctx.createStereoPanner !== 'function') { node.connect(master); return; }
+      var p = ctx.createStereoPanner();
+      p.pan.value = Math.max(-1, Math.min(1, amount));
+      node.connect(p); p.connect(master);
+    } catch (_) { try { node.connect(master); } catch (__) {} }
+  }
+
   function strike(at, level) {
     var src = ctx.createBufferSource();
     src.buffer = noiseBuf;
@@ -173,8 +219,49 @@
     src.start(at); src.stop(at + 0.02);
   }
 
-  /** Satu bilah dipukul: empat parsial, dua lapisan laras, lengkung nada saat serangan. */
-  function mallet(freq, at, dur, level) {
+  /**
+   * Napas pembuka: derau yang disaring sangat rendah, naik lalu hilang. Nyaris tidak
+   * terdengar sebagai bunyi - ia terasa sebagai ruangan yang membuka sesaat sebelum nada
+   * pertama. Tanpa ini nada pertama datang dari kesenyapan mutlak dan terdengar "dicolok".
+   */
+  function breath(at, dur, level) {
+    var src = ctx.createBufferSource();
+    src.buffer = noiseBuf;
+    src.loop = true;
+    var lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(220, at);
+    lp.frequency.exponentialRampToValueAtTime(900, at + dur * 0.7);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.linearRampToValueAtTime(level, at + dur * 0.45);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    src.connect(lp); lp.connect(g); g.connect(master);
+    src.start(at); src.stop(at + dur + 0.02);
+  }
+
+  /**
+   * Kilau: satu parsial tinggi yang MELUNCUR naik selama sapuan emas di logo berjalan.
+   * Gerakan dan bunyi menempuh arah yang sama pada rentang waktu yang sama - itulah yang
+   * membuat sapuan itu terasa berbunyi, bukan sekadar ditemani bunyi.
+   */
+  function shimmer(freq, at, dur, level) {
+    var osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq * 2, at);
+    osc.frequency.exponentialRampToValueAtTime(freq * 3, at + dur * 0.55);
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.linearRampToValueAtTime(level, at + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+    osc.connect(g);
+    pan(g, 0.22);
+    try { g.connect(tailIn); } catch (_) {}
+    osc.start(at); osc.stop(at + dur + 0.05);
+  }
+
+  /** Satu bilah dipukul: lima parsial, dua lapisan laras yang dilebarkan ke kiri-kanan. */
+  function mallet(freq, at, dur, level, spread) {
+    var width = typeof spread === 'number' ? spread : 0;
     for (var p = 0; p < PARTIALS.length; p++) {
       var mult = PARTIALS[p][0], amp = PARTIALS[p][1] * level, dscale = PARTIALS[p][2];
       for (var k = 0; k < 2; k++) {
@@ -194,7 +281,10 @@
         g.gain.exponentialRampToValueAtTime(a * DECAY_FLOOR, at + d); // peluruhan eksponensial
         g.gain.linearRampToValueAtTime(0.0001, at + d + 0.02);
         osc.connect(g);
-        g.connect(master);
+        // Dua lapisan laras dilempar ke sisi berlawanan. Lebar stereo inilah yang paling
+        // murah membuat bunyi terdengar mahal - dan pada mono ia runtuh jadi bunyi yang
+        // sama, jadi tidak ada yang hilang di pengeras suara ponsel.
+        pan(g, k ? width : -width);
         if (p === 0 && k === 0) g.connect(tailIn);   // hanya dasar yang masuk ekor ruang
         osc.start(at);
         osc.stop(at + d + 0.05);
@@ -202,23 +292,34 @@
     }
   }
 
+  /**
+   * Menjadwalkan sederet nada. `notes` boleh membawa peran di indeks ke-4; peran itulah
+   * yang memutuskan sebuah ketukan dibunyikan sebagai pukulan, sebagai bobot rendah, atau
+   * sebagai kilau yang meluncur. Tanpa peran, semuanya dipukul biasa - itu jalur SFX
+   * transisi, yang memang harus seragam dan pendek.
+   */
   function schedule(notes, level, opts) {
     var t0 = ctx.currentTime + 0.005;
+    var wide = !!(opts && opts.wide);
     for (var i = 0; i < notes.length; i++) {
-      var freq = notes[i][0], at = t0 + notes[i][1], dur = notes[i][2];
-      mallet(freq, at, dur, level);
-      strike(at, level * 0.30);
-    }
-    if (opts && opts.sub) {
-      // Nada rendah di bawah pendaratan: bobot tanpa menambah nada baru ke motif.
-      var osc = ctx.createOscillator(), g = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(opts.sub[0], t0 + opts.sub[1]);
-      g.gain.setValueAtTime(0.0001, t0 + opts.sub[1]);
-      g.gain.linearRampToValueAtTime(level * 0.34, t0 + opts.sub[1] + 0.012);
-      g.gain.exponentialRampToValueAtTime(0.0001, t0 + opts.sub[1] + opts.sub[2]);
-      osc.connect(g); g.connect(master);
-      osc.start(t0 + opts.sub[1]); osc.stop(t0 + opts.sub[1] + opts.sub[2] + 0.02);
+      var freq = notes[i][0], at = t0 + notes[i][1], dur = notes[i][2], role = notes[i][3];
+      var width = wide ? SPREAD * (0.35 + 0.65 * (i / Math.max(1, notes.length - 1))) : 0;
+      if (role === 'sub') {
+        // Jangkar rendah: dipukul pelan, tanpa parsial atas, ditemani napas.
+        mallet(freq, at, dur, level * 0.78, 0);
+        breath(at, Math.min(dur, 0.55), level * 0.10);
+        continue;
+      }
+      if (role === 'shimmer') {
+        mallet(freq, at, dur, level * 0.72, width);
+        shimmer(freq, at, Math.min(dur, 0.9), level * 0.13);
+        strike(at, level * 0.18);
+        continue;
+      }
+      mallet(freq, at, dur, level * (role === 'add9' ? 0.62 : 1), width);
+      // Nada add9 sengaja paling pelan. Ia nada warna, bukan nada pengumuman; kalau
+      // dibunyikan sekeras yang lain, akornya berubah dari "mewah" jadi "ramai".
+      strike(at, level * (role === 'add9' ? 0.16 : 0.30));
     }
   }
 
@@ -285,7 +386,7 @@
 
   /** Menyiagakan motif dengan TENGGAT. Tanpa tenggat ini, ia jadi bunyi liar di menu. */
   function armMotif(env, windowMs) {
-    pending = { notes: MOTIF, level: 0.52, opts: { sub: [N.F2, 0.210, 1.05] }, expiresAt: now() + windowMs };
+    pending = { notes: MOTIF, level: 0.52, opts: { wide: true }, expiresAt: now() + windowMs };
     bindUnlock(env);
   }
 
@@ -365,7 +466,7 @@
     if (userActivated(target) === false) { armMotif(target, windowMs); return false; }
     if (!ensureContext(target)) return false;
     if (running()) {
-      try { schedule(MOTIF, 0.52, { sub: [N.F2, 0.210, 1.05] }); return true; }
+      try { schedule(MOTIF, 0.52, { wide: true }); return true; }
       catch (_) { return false; }
     }
     armMotif(target, windowMs);

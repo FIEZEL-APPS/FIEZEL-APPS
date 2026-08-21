@@ -500,7 +500,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      di dalam .fiezel-splash/.fiezel-ob, sehingga setiap dialog sistem - termasuk gerbang
      izin - jatuh ke font bawaan OS dan membocorkan kesan "campur aduk" yang ditandai
      audit. Berkas fontnya sudah ada di assets/fonts dan dimuat lewat @font-face di bawah. */
-  --fz-heading:'FZ Fredoka',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  /* m025-86: satu wajah display, satu wajah teks. Serif display dipakai HANYA di ukuran
+     besar - wordmark, judul layar, judul dialog. Di ukuran kecil serif kontras-tinggi
+     kehilangan keterbacaan di layar ponsel, jadi judul kecil tetap memakai sans. */
+  --fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;
+  --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 
@@ -557,7 +561,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
    dan toast - bukan hanya di splash/onboarding seperti sebelumnya (Audit Roadmap #4). */
 body{background:var(--sky-bottom);font-family:var(--fz-body)}
-h1,h2,h3,h4,.brand,.welcome-mark,.modal-mark,.section-head h1{font-family:var(--fz-heading)}
+h1,h2,h3,h4,.welcome-mark,.modal-mark{font-family:var(--fz-heading)}
+/* Ukuran display: serif, berat 400, jarak huruf sedikit dirapatkan. Kerapatan negatif pada
+   ukuran besar adalah yang membedakan judul yang "disetel" dari judul yang sekadar dibesarkan. */
+.brand,.section-head h1,.welcome-panel h2,.modal-panel h2,.fiezel-title{
+  font-family:var(--fz-display);font-weight:400;letter-spacing:-.015em}
 
 .app{max-width:1120px;padding:22px 24px calc(126px + env(safe-area-inset-bottom))}
 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:650}
@@ -923,12 +931,8 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
    splash dan onboarding adalah lapisan tersendiri sehingga aman dilingkupi sendiri.
    ======================================================================================== */
 
-@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:500;font-display:swap;
-  src:url('./assets/fonts/Fredoka-500.woff2') format('woff2')}
-@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:600;font-display:swap;
-  src:url('./assets/fonts/Fredoka-600.woff2') format('woff2')}
-@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:700;font-display:swap;
-  src:url('./assets/fonts/Fredoka-700.woff2') format('woff2')}
+@font-face{font-family:'FZ Instrument Serif';font-style:normal;font-weight:400;font-display:swap;
+  src:url('./assets/fonts/InstrumentSerif-400.woff2') format('woff2')}
 @font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:400;font-display:swap;
   src:url('./assets/fonts/PlusJakartaSans-400.woff2') format('woff2')}
 @font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:500;font-display:swap;
@@ -942,7 +946,8 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   --fz-bg:#efe3d3; --fz-paper:#fdf3e2; --fz-ink:#2c1b1c; --fz-ink-muted:#6e5a4f;
   --fz-accent:#7a1e2e; --fz-accent-deep:#4a1119; --fz-gold:#d9a441; --fz-soft:#f3e0e0;
   --fz-line:#ecdec0;
-  --fz-heading:'FZ Fredoka',-apple-system,'Segoe UI',sans-serif;
+  --fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;
+  --fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
 }
 
@@ -1089,7 +1094,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 /* Batang emas naik seperti gelombang suara yang bereaksi pada nada. */
 @keyframes fz-logo-bar{
   0%{opacity:0;transform:scaleY(.08)}
-  62%{opacity:1;transform:scaleY(1.14)}
+  70%{opacity:1;transform:scaleY(1.035)}
   100%{opacity:1;transform:scaleY(1)}
 }
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
@@ -1101,11 +1106,11 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
      nada 3 (D5, 210ms) -> dua batang emas naik; inilah gelombang suara yang bereaksi
    Sebelum perbaikan ini batang emas baru bergerak di 520/620 ms - melodinya sudah habis
    sebelum bagian yang menggambarkan bunyi itu sempat bergerak sama sekali. */
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) 0s both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .105s both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .155s both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .21s both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .25s both}
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b2,110ms) both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b3,165ms) both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b4,250ms) both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b5,310ms) both}
 
 /* Kilau emas menyapu logo sekali, tepat setelah kedua batang berdiri. */
 @keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
@@ -1113,19 +1118,23 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-logo-stage::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);
-  animation:fz-logo-sheen .8s ease-out .42s both;
+  animation:fz-logo-sheen .9s cubic-bezier(.3,.7,.3,1) var(--fz-b6,480ms) both;
 }
 
 @keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+@keyframes fz-splash-settle{
+  from{opacity:0;transform:translateY(15px);letter-spacing:.34em}
+  to{opacity:1;transform:none;letter-spacing:.16em}
+}
 .fiezel-splash-brand .fiezel-splash-word{
-  font-family:var(--fz-heading);font-weight:700;font-size:2.15rem;
+  font-family:var(--fz-display);font-weight:400;font-size:2.45rem;
   letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;
-  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .54s both;
+  animation:fz-splash-settle .52s cubic-bezier(.22,.8,.28,1) var(--fz-b7,620ms) both;
 }
 .fiezel-splash-brand .fiezel-splash-tag{
   font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;
   text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;
-  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .68s both;
+  animation:fz-splash-rise .52s cubic-bezier(.22,.8,.28,1) var(--fz-b8,800ms) both;
 }
 /* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
 .fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,
