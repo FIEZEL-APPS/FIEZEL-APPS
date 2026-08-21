@@ -203,7 +203,9 @@ test('CSS kritis adalah salinan APA ADANYA dari style.css, bukan desain kedua ya
   const compactCritical = squeeze(critical);
   const compactCss = cssNorm(css);
   // Setiap aturan splash yang disalin harus masih ada persis seperti itu di style.css.
-  const rules = critical.split('\n').map(x => x.trim()).filter(Boolean)
+  // Komentar dan aturan khusus-boot bukan salinan dari style.css, jadi tidak dibandingkan.
+  const rules = critical.replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n').map(x => x.trim()).filter(Boolean)
     .filter(x => !x.startsWith('html.fz-booting') && !x.startsWith('#fiezelBootSplash'));
   assert.ok(rules.length >= 25, 'salinan kritis harus mencakup seluruh koreografi splash, bukan sepotong');
   const drifted = rules.filter(rule => !compactCss.includes(cssNorm(rule)));

@@ -46,6 +46,7 @@ jobs:
           node install-health-test.js
           node onboarding-test.js
           node splash-first-paint-test.js
+          node splash-choreography-test.js
           node observability-privacy-test.js
           node a11y-test.js
           node product-audit.js

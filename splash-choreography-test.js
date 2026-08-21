@@ -1,0 +1,198 @@
+/**
+ * FIEZEL m025-86 — gerak dan bunyi berbagi SATU jam.
+ *
+ * OWNER: "yang aku inginkan adalah sfx nya mengikuti ritme animasi ... animasinya harus
+ * lebih eksklusif dan harus selaras dengan ritme animasinya."
+ *
+ * Sebelum rilis ini ritmenya ditulis dua kali - sebagai jeda animasi di style.css dan
+ * sebagai waktu nada di fiezel-ui-sfx.js - tanpa apa pun yang menjaga keduanya tetap sama.
+ * Pengukuran pada m025-84 menemukan lima dari delapan ketukan visual berjalan tanpa bunyi
+ * sama sekali, dan 950 milidetik terakhir pembukaan sepenuhnya senyap.
+ *
+ * Berkas ini menutup celah itu secara struktural, bukan dengan mencocokkan angka sekali:
+ *
+ *   1. Tabel ketukan hidup di features/brand/fiezel-choreography.js dan HANYA di sana.
+ *   2. style.css membaca jeda animasinya lewat var(--fz-bN) - bukan angka.
+ *   3. index.html menyalin nilainya sebagai default (splash frame-pertama bergerak sebelum
+ *      JavaScript jalan), dan salinan itu dibandingkan di sini.
+ *   4. Setiap ketukan yang menggerakkan sesuatu wajib punya nada, dan bunyinya wajib masih
+ *      hidup saat gerakan terakhir selesai.
+ *
+ * Kalau salah satu bergeser sendiri, berkas ini gagal dan menyebut ketukan mana.
+ */
+'use strict';
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+
+const root = __dirname;
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
+const choreo = require('./features/brand/fiezel-choreography.js');
+const sfx = require('./features/audio/fiezel-ui-sfx.js');
+
+let failures = 0;
+function test(name, fn) {
+  try { fn(); console.log('ok - ' + name); }
+  catch (e) { failures++; console.error('FAIL - ' + name + '\n    ' + (e && e.message)); }
+}
+const squeeze = s => String(s).replace(/\s+/g, '');
+
+/* ---------------- satu jam ---------------- */
+
+test('setiap ketukan yang menggerakkan sesuatu punya jeda, durasi, dan penjelasan', () => {
+  assert.ok(choreo.BEATS.length >= 8, 'pembukaan harus punya minimal delapan ketukan');
+  const seen = new Set();
+  let last = -1;
+  for (const b of choreo.BEATS) {
+    assert.ok(/^--fz-b\d+$/.test(b.css), b.id + ': nama custom property tidak sesuai pola');
+    assert.ok(Number.isFinite(b.at) && b.at >= 0, b.id + ': jeda harus angka');
+    assert.ok(Number.isFinite(b.dur) && b.dur > 0, b.id + ': durasi harus angka positif');
+    assert.ok(b.moves && b.moves.length > 8, b.id + ': setiap ketukan harus menyebut APA yang bergerak');
+    assert.ok(b.at > last, b.id + ': ketukan harus urut menaik');
+    assert.ok(!seen.has(b.css), b.css + ' dipakai dua kali');
+    seen.add(b.css);
+    last = b.at;
+  }
+});
+
+test('jarak antarketukan TIMPANG, bukan rata - jarak rata terdengar seperti bip', () => {
+  const gaps = choreo.BEATS.slice(1).map((b, i) => b.at - choreo.BEATS[i].at);
+  assert.ok(new Set(gaps).size >= gaps.length - 1,
+    'hampir semua jarak sama; ritmenya jadi metronom, bukan gerakan: ' + gaps.join(','));
+});
+
+test('CSS membaca jeda dari jam bersama, bukan dari angka yang ditulis ulang', () => {
+  for (const b of choreo.BEATS) {
+    if (b.id === 'b8') continue; // tagline dirujuk lewat rise, diperiksa terpisah di bawah
+    assert.ok(new RegExp('var\\(' + b.css + '\\b').test(css),
+      b.css + ' tidak pernah dipakai di style.css - jeda ketukan ini pasti masih berupa angka');
+  }
+  assert.ok(/var\(--fz-b8\b/.test(css), '--fz-b8 harus dipakai untuk tagline');
+  // Tidak boleh ada lagi jeda animasi berupa angka pada elemen splash.
+  // Hanya aturan yang BERANIMASI yang dinilai; .fz-f/.fz-bar juga dipakai untuk
+  // transform-box dan tidak punya jeda apa pun untuk digeser.
+  const splashRules = (css.match(/\.fiezel-logo \.fz-[a-z0-9]+\{[^}]*\}/g) || [])
+    .filter(r => /animation:/.test(r));
+  assert.strictEqual(splashRules.length, 5, 'harus ada lima bagian logo yang beranimasi');
+  for (const rule of splashRules) {
+    assert.ok(/var\(--fz-b/.test(rule),
+      'jeda masih ditulis sebagai angka, jadi bisa bergeser lepas dari bunyinya: ' + rule.slice(0, 90));
+  }
+});
+
+test('durasi animasi di CSS sama dengan durasi di jam bersama', () => {
+  const want = Object.fromEntries(choreo.BEATS.map(b => [b.css, b.dur]));
+  const rules = css.match(/[^{}]+\{[^}]*var\(--fz-b\d+[^}]*\}/g) || [];
+  assert.ok(rules.length >= 6, 'aturan beranimasi yang memakai ketukan tidak ditemukan');
+  for (const rule of rules) {
+    const beat = rule.match(/var\((--fz-b\d+)/)[1];
+    const dur = rule.match(/animation:[^;}]*?\s(\.?\d+(?:\.\d+)?)s\s/);
+    assert.ok(dur, beat + ': durasi animasi tidak terbaca');
+    const ms = Math.round(parseFloat(dur[1]) * 1000);
+    assert.strictEqual(ms, want[beat],
+      `${beat}: durasi CSS ${ms}ms tidak sama dengan jam bersama ${want[beat]}ms`);
+  }
+});
+
+test('salinan ketukan di index.html tidak menyimpang dari jam bersama', () => {
+  const block = /<style id="fiezelBootCritical">([\s\S]*?)<\/style>/.exec(html);
+  assert.ok(block, 'CSS kritis splash harus ada di <head>');
+  assert.ok(squeeze(block[1]).includes(squeeze('#fiezelBootSplash{' + choreo.cssDefaults() + '}')),
+    'default ketukan di index.html berbeda dari features/brand/fiezel-choreography.js.\n' +
+    '    Harus: #fiezelBootSplash{' + choreo.cssDefaults() + '}');
+});
+
+/* ---------------- bunyi mengikuti gerak ---------------- */
+
+test('AKAR KELUHAN: tidak ada lagi ketukan visual yang berjalan tanpa bunyi', () => {
+  const audioAt = new Set(sfx.MOTIF.map(n => Math.round(n[1] * 1000)));
+  const silent = choreo.BEATS.filter(b => b.pitch !== null && !audioAt.has(b.at));
+  assert.deepStrictEqual(silent.map(b => `${b.id}@${b.at}ms (${b.moves})`), [],
+    'ketukan berikut bergerak tanpa dibunyikan');
+});
+
+test('bunyi masih hidup saat gerakan terakhir selesai - tidak ada ekor senyap', () => {
+  const endsAt = choreo.motionEndsAt() / 1000;
+  const soundEndsAt = Math.max(...sfx.MOTIF.map(n => n[1] + n[2]));
+  assert.ok(soundEndsAt >= endsAt,
+    `bunyi berhenti di ${(soundEndsAt * 1000).toFixed(0)}ms padahal gerak baru selesai di ` +
+    `${(endsAt * 1000).toFixed(0)}ms - itulah jeda senyap yang dilaporkan owner`);
+});
+
+test('motif adalah akor F mayor add9 yang diurai naik, bukan melodi lepas', () => {
+  const freqs = sfx.MOTIF.map(n => n[0]);
+  for (let i = 1; i < freqs.length; i++) {
+    assert.ok(freqs[i] > freqs[i - 1], 'motif harus naik terus; nada ke-' + i + ' turun');
+  }
+  const P = choreo.PITCH;
+  assert.deepStrictEqual(freqs, [P.F2, P.F3, P.C4, P.F4, P.A4, P.C5, P.G5]);
+});
+
+test('terts besar jatuh TEPAT saat batang emas naik - warna layar dan warna akor bertemu', () => {
+  const gold = choreo.BEATS.find(b => /emas kedua/.test(b.moves));
+  assert.ok(gold, 'ketukan batang emas kedua harus ada');
+  assert.strictEqual(gold.pitch, choreo.PITCH.A4, 'batang emas kedua harus membawa terts besar');
+  assert.strictEqual(gold.role, 'colour');
+});
+
+test('SFX transisi semuanya nada dari akor pembuka yang sama', () => {
+  const chord = new Set(Object.values(choreo.PITCH));
+  for (const name of sfx.names()) {
+    for (const note of sfx.VOICES[name]) {
+      assert.ok(chord.has(note[0]),
+        `${name} memakai ${note[0]} Hz yang bukan nada akor pembuka - bunyinya jadi produk lain`);
+    }
+  }
+});
+
+test('nada penutup adalah kesembilan, bukan tonika - sapaan yang menggantung', () => {
+  const last = sfx.MOTIF[sfx.MOTIF.length - 1];
+  assert.strictEqual(last[0], choreo.PITCH.G5);
+  assert.strictEqual(last[3], 'add9');
+});
+
+/* ---------------- tipografi ---------------- */
+
+test('wajah bulat pensiun dari chrome aplikasi', () => {
+  assert.ok(!/Fredoka/.test(css), 'style.css masih merujuk Fredoka');
+  assert.ok(!/Fredoka/.test(html), 'index.html masih merujuk Fredoka');
+  assert.ok(!fs.existsSync(path.join(root, 'assets/fonts/Fredoka-700.woff2')),
+    'berkas Fredoka masih ada; ia akan ikut ter-precache tanpa dirujuk siapa pun');
+});
+
+test('serif display dipakai di ukuran besar saja, dengan berat yang benar-benar ada', () => {
+  assert.ok(/--fz-display:'FZ Instrument Serif'/.test(css), 'token display harus ada');
+  assert.ok(fs.existsSync(path.join(root, 'assets/fonts/InstrumentSerif-400.woff2')), 'berkas font display harus ada');
+  const rule = /\.brand,\.section-head h1,[^{]*\{([^}]*)\}/.exec(css);
+  assert.ok(rule, 'aturan display tidak ditemukan');
+  assert.ok(/font-weight:400/.test(rule[1]),
+    'berkasnya hanya punya berat 400; meminta berat lain membuat browser menebalkannya sendiri');
+  assert.ok(!/var\(--fz-display\)[^}]*font-weight:[5-9]00/.test(css), 'ada pemakaian display dengan berat palsu');
+});
+
+test('font display ikut ter-precache dan di-preload, jadi wordmark tidak berkedip', () => {
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  assert.ok(sw.includes("'./assets/fonts/InstrumentSerif-400.woff2'"), 'font display harus masuk precache');
+  assert.ok(!sw.includes('Fredoka'), 'sw.js masih memprecache font yang sudah dilepas');
+  assert.ok(/rel="preload"[^>]*InstrumentSerif-400\.woff2/.test(html), 'font display harus di-preload');
+});
+
+test('modul koreografi dimuat sebelum yang membacanya', () => {
+  const c = html.indexOf('./features/brand/fiezel-choreography.js');
+  const s = html.indexOf('./features/audio/fiezel-ui-sfx.js');
+  const b = html.indexOf('./features/brand/fiezel-splash.js');
+  assert.ok(c > 0 && s > 0 && b > 0, 'ketiga modul harus dimuat');
+  assert.ok(c < s && c < b, 'koreografi harus dimuat lebih dulu; kalau tidak, keduanya jatuh ke fallback');
+  const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
+  assert.ok(sw.includes("'./features/brand/fiezel-choreography.js'"), 'koreografi harus masuk precache');
+});
+
+process.on('exit', () => {
+  if (failures) {
+    console.error('FIEZEL m025-86 koreografi splash: FAIL (' + failures + ')');
+    process.exitCode = 1;
+  } else {
+    console.log('FIEZEL m025-86 koreografi splash: PASS');
+  }
+});
