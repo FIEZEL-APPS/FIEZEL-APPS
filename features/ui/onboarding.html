@@ -160,20 +160,38 @@
 
   /* ---------- placement test (step 3) ---------- */
   .quiz-progress { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); letter-spacing: 0.06em; text-transform: uppercase; }
+
+  /* ---------- reactive mini-face ---------- */
+  .rx-face { width: 46px; height: 46px; flex: none; transition: transform 0.25s cubic-bezier(.34,1.56,.64,1); }
+  .rx-face svg { width: 100%; height: 100%; }
+  .rx-face .rx-happy, .rx-face .rx-oops { display: none; }
+  .rx-face.happy { transform: scale(1.12) rotate(-4deg); }
+  .rx-face.happy .rx-neutral { display: none; }
+  .rx-face.happy .rx-happy { display: block; }
+  .rx-face.oops { transform: scale(0.94) rotate(3deg); }
+  .rx-face.oops .rx-neutral { display: none; }
+  .rx-face.oops .rx-oops { display: block; }
+  .rx-row { display: flex; align-items: center; gap: 10px; }
+  .rx-bubble { flex: 1; font-size: 0.78rem; font-weight: 700; color: var(--ink-soft); }
+
+  /* ---------- pencil-pose mascot (personalization) ---------- */
+  .pencil-mascot { width: 108px; height: 108px; margin: 0 auto; }
   .quiz-card { width: 100%; border: 1.5px solid var(--line); border-radius: 18px; padding: 18px; background: var(--paper); box-shadow: var(--shadow-card); }
   .quiz-q { font-weight: 700; font-size: 1rem; margin: 0 0 14px; text-align: center; }
   .quiz-opt { all: unset; box-sizing: border-box; display: block; width: 100%; padding: 11px 14px; margin-bottom: 8px; border: 2px solid var(--line); border-radius: 13px; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; text-align: left; }
   .quiz-opt:last-child { margin-bottom: 0; }
-  .quiz-opt.correct { border-color: var(--gold); background: var(--gold-soft); }
+  .quiz-opt.correct { border-color: var(--gold); background: var(--gold-soft); animation: pickPop 0.32s cubic-bezier(.34,1.56,.64,1); }
+  .quiz-opt.wrong-pick { border-color: var(--accent); background: var(--accent-soft); animation: shakeX 0.36s ease; }
+  @keyframes shakeX { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
   .quiz-opt.dim { opacity: 0.45; }
 
   /* ---------- schedule (step 4) ---------- */
   .day-row { display: flex; gap: 6px; }
   .day-chip { all: unset; cursor: pointer; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font-size: 0.74rem; font-weight: 700; border: 2px solid var(--line); color: var(--ink-soft); transition: all 0.15s ease; }
-  .day-chip.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .day-chip.selected { background: var(--accent); border-color: var(--accent); color: #fff; animation: pickPop 0.32s cubic-bezier(.34,1.56,.64,1); }
   .time-row { display: flex; gap: 8px; }
   .time-chip { all: unset; cursor: pointer; padding: 9px 14px; border-radius: 12px; border: 2px solid var(--line); font-weight: 700; font-size: 0.82rem; color: var(--ink-soft); transition: all 0.15s ease; }
-  .time-chip.selected { border-color: var(--gold); background: var(--gold-soft); color: var(--ink); }
+  .time-chip.selected { border-color: var(--gold); background: var(--gold-soft); color: var(--ink); animation: pickPop 0.32s cubic-bezier(.34,1.56,.64,1); }
   .notif-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 13px 15px; border-radius: 15px; background: var(--accent-soft); border: 1px solid var(--line); }
   .notif-toggle span { font-size: 0.84rem; font-weight: 700; }
   .switch { all: unset; width: 42px; height: 24px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background 0.2s ease; flex: none; }
@@ -220,7 +238,7 @@
   /* ---------- personalization ---------- */
   .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
   .pz-chip { all: unset; cursor: pointer; padding: 10px 15px; border-radius: 999px; border: 2px solid var(--line); font-weight: 700; font-size: 0.82rem; color: var(--ink-soft); background: var(--paper); transition: all 0.15s ease; }
-  .pz-chip.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+  .pz-chip.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); animation: pickPop 0.32s cubic-bezier(.34,1.56,.64,1); }
 
   /* ---------- first lesson (mini demo) ---------- */
   .flashcard { width: 100%; aspect-ratio: 5/3; border-radius: 20px; background: var(--paper); border: 1.5px solid var(--line); box-shadow: var(--shadow-card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; perspective: 800px; }
@@ -459,6 +477,63 @@
       <!-- 5. Personalization -->
       <section class="step" data-step="4">
         <div class="step-body">
+          <div class="mascot-holder pencil-mascot">
+            <div class="mascot-shadow"></div>
+            <svg class="mascot" viewBox="0 0 200 230" fill="none">
+              <ellipse cx="100" cy="222" rx="70" ry="18" fill="#7a1e2e" opacity="0.15"/>
+              <g class="mascot-tail">
+                <path d="M156,190 Q186,178 190,150 Q192,132 178,124 Q186,140 180,156 Q174,176 150,186 Z" fill="#7a1e2e"/>
+                <path d="M178,124 Q186,140 180,156 Q176,172 160,182" stroke="#fdf3e2" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+              </g>
+              <ellipse cx="100" cy="206" rx="74" ry="42" fill="#7a1e2e"/>
+              <ellipse cx="100" cy="212" rx="48" ry="30" fill="#fdf3e2"/>
+              <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+              <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+              <g class="mascot-ear-r">
+                <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                <path class="mascot-star" d="M158,32 Q160,39 166,42 Q160,45 158,52 Q156,45 150,42 Q156,39 158,32 Z" fill="#d9a441"/>
+              </g>
+              <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+              <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+              <path d="M54,96 Q72,88 88,95" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+              <path d="M112,95 Q128,88 146,96" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+              <g class="mascot-eye mascot-eye-l">
+                <ellipse cx="72" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="73" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="73" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="74" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="69" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="78" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
+              </g>
+              <g class="mascot-eye mascot-eye-r">
+                <ellipse cx="128" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="127" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="127" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="126" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="122" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="131" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
+              </g>
+              <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+              <path d="M100,139 Q100,148 88,150 Q76,151 70,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M100,139 Q100,148 112,150 Q124,151 130,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M92,146 Q100,156 108,146 Q100,152 92,146 Z" fill="#e2586b"/>
+              <path d="M52,158 Q100,180 148,158 L131,198 Q100,210 69,198 Z" fill="#7a1e2e"/>
+              <circle cx="100" cy="184" r="12" fill="#d9a441"/>
+              <text x="100" y="189" text-anchor="middle" class="charm-f">F</text>
+              <!-- left paw waving -->
+              <ellipse cx="58" cy="220" rx="18" ry="22" fill="#fdf3e2"/>
+              <!-- right arm holding pencil -->
+              <path d="M146,190 Q172,180 176,150" stroke="#7a1e2e" stroke-width="16" stroke-linecap="round" fill="none"/>
+              <circle cx="177" cy="145" r="12" fill="#fdf3e2"/>
+              <g transform="rotate(28 177 145) translate(0,-2)">
+                <rect x="171" y="70" width="12" height="70" rx="2" fill="#eec25c"/>
+                <rect x="171" y="70" width="12" height="10" fill="#d95c5c"/>
+                <polygon points="171,140 183,140 177,154" fill="#e8c99a"/>
+                <polygon points="174,148 180,148 177,154" fill="#2c1b1c"/>
+              </g>
+            </svg>
+          </div>
           <h2 class="headline">Cerita dikit soal kamu</h2>
           <p class="sub" style="margin-bottom:2px;">Kenapa kamu mau belajar Inggris?</p>
           <div class="chip-grid" id="motivGrid">
@@ -482,6 +557,37 @@
         <div class="step-body">
           <h2 class="headline">Tes penempatan singkat</h2>
           <p class="sub">Kerjakan santai aja, ini bukan ujian — cuma buat Percik kenal kemampuanmu.</p>
+          <div class="rx-row">
+            <div class="rx-face" id="quizRxFace">
+              <svg viewBox="22 10 156 168" fill="none">
+                <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+                <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+                <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+                <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+                <g class="rx-neutral">
+                  <ellipse cx="72" cy="115" rx="17" ry="18" fill="#ffffff"/><circle cx="73" cy="118" r="13" fill="#e8b960"/><circle cx="74" cy="120" r="6.5" fill="#2c1b1c"/><circle cx="69" cy="113" r="3" fill="#ffffff"/>
+                  <ellipse cx="128" cy="115" rx="17" ry="18" fill="#ffffff"/><circle cx="127" cy="118" r="13" fill="#e8b960"/><circle cx="126" cy="120" r="6.5" fill="#2c1b1c"/><circle cx="122" cy="113" r="3" fill="#ffffff"/>
+                  <path d="M100,139 Q100,146 90,148" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                  <path d="M100,139 Q100,146 110,148" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="rx-happy">
+                  <path d="M58,116 Q72,124 86,116" stroke="#4a1119" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path d="M114,116 Q128,124 142,116" stroke="#4a1119" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path d="M82,142 Q100,162 118,142 Q100,148 82,142 Z" fill="#4a1119"/>
+                  <path d="M90,146 Q100,156 110,146" stroke="#e2586b" stroke-width="6" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="rx-oops">
+                  <ellipse cx="72" cy="115" rx="19" ry="21" fill="#ffffff"/><circle cx="72" cy="116" r="14" fill="#e8b960"/><circle cx="72" cy="117" r="7" fill="#2c1b1c"/><circle cx="67" cy="110" r="3" fill="#ffffff"/>
+                  <ellipse cx="128" cy="115" rx="19" ry="21" fill="#ffffff"/><circle cx="128" cy="116" r="14" fill="#e8b960"/><circle cx="128" cy="117" r="7" fill="#2c1b1c"/><circle cx="123" cy="110" r="3" fill="#ffffff"/>
+                  <ellipse cx="100" cy="145" rx="7" ry="9" fill="#4a1119"/>
+                </g>
+                <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+              </svg>
+            </div>
+            <span class="rx-bubble" id="quizRxBubble">Ayo dijawab santai aja&hellip;</span>
+          </div>
           <div class="quiz-progress">Soal 1 / 6</div>
           <div class="quiz-card" id="quizCard">
             <p class="quiz-q">"She ___ to the market every morning."</p>
@@ -549,6 +655,37 @@
             <button class="quiz-opt" data-correct="false">Rumah</button>
             <button class="quiz-opt" data-correct="true">Perjalanan</button>
             <button class="quiz-opt" data-correct="false">Makanan</button>
+          </div>
+          <div class="rx-row" id="lessonRxRow" style="display:none;">
+            <div class="rx-face" id="lessonRxFace">
+              <svg viewBox="22 10 156 168" fill="none">
+                <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+                <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+                <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+                <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+                <g class="rx-neutral">
+                  <ellipse cx="72" cy="115" rx="17" ry="18" fill="#ffffff"/><circle cx="73" cy="118" r="13" fill="#e8b960"/><circle cx="74" cy="120" r="6.5" fill="#2c1b1c"/><circle cx="69" cy="113" r="3" fill="#ffffff"/>
+                  <ellipse cx="128" cy="115" rx="17" ry="18" fill="#ffffff"/><circle cx="127" cy="118" r="13" fill="#e8b960"/><circle cx="126" cy="120" r="6.5" fill="#2c1b1c"/><circle cx="122" cy="113" r="3" fill="#ffffff"/>
+                  <path d="M100,139 Q100,146 90,148" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                  <path d="M100,139 Q100,146 110,148" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="rx-happy">
+                  <path d="M58,116 Q72,124 86,116" stroke="#4a1119" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path d="M114,116 Q128,124 142,116" stroke="#4a1119" stroke-width="4" stroke-linecap="round" fill="none"/>
+                  <path d="M82,142 Q100,162 118,142 Q100,148 82,142 Z" fill="#4a1119"/>
+                  <path d="M90,146 Q100,156 110,146" stroke="#e2586b" stroke-width="6" stroke-linecap="round" fill="none"/>
+                </g>
+                <g class="rx-oops">
+                  <ellipse cx="72" cy="115" rx="19" ry="21" fill="#ffffff"/><circle cx="72" cy="116" r="14" fill="#e8b960"/><circle cx="72" cy="117" r="7" fill="#2c1b1c"/><circle cx="67" cy="110" r="3" fill="#ffffff"/>
+                  <ellipse cx="128" cy="115" rx="19" ry="21" fill="#ffffff"/><circle cx="128" cy="116" r="14" fill="#e8b960"/><circle cx="128" cy="117" r="7" fill="#2c1b1c"/><circle cx="123" cy="110" r="3" fill="#ffffff"/>
+                  <ellipse cx="100" cy="145" rx="7" ry="9" fill="#4a1119"/>
+                </g>
+                <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+              </svg>
+            </div>
+            <span class="rx-bubble" id="lessonRxBubble">Yuk coba jawab!</span>
           </div>
         </div>
         <div class="cta-row"><button class="btn btn-primary" data-next id="lessonNext" disabled>Lanjut</button></div>
@@ -781,11 +918,19 @@
   });
 
   // ---- step 5: placement question ----
+  const quizRxFace = document.getElementById('quizRxFace');
+  const quizRxBubble = document.getElementById('quizRxBubble');
   document.querySelectorAll('#quizCard .quiz-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       const opts = Array.from(document.querySelectorAll('#quizCard .quiz-opt'));
-      opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o !== opt) o.classList.add('dim'); });
+      const isRight = opt.dataset.correct === 'true';
+      opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o === opt) o.classList.add('wrong-pick'); else o.classList.add('dim'); });
       document.getElementById('quizNext').disabled = false;
+      if (quizRxFace) {
+        quizRxFace.classList.remove('happy', 'oops');
+        quizRxFace.classList.add(isRight ? 'happy' : 'oops');
+        quizRxBubble.textContent = isRight ? 'Betul! Kamu jago.' : 'Hampir! Lanjut aja, santai.';
+      }
     });
   });
 
@@ -798,13 +943,22 @@
       flashcard.querySelector('.fc-word').textContent = 'Journey = Perjalanan';
       flashcard.querySelector('.fc-hint').textContent = 'Sekarang coba jawab ini';
       document.getElementById('fcOpts').style.display = 'flex';
+      document.getElementById('lessonRxRow').style.display = 'flex';
     });
   }
+  const lessonRxFace = document.getElementById('lessonRxFace');
+  const lessonRxBubble = document.getElementById('lessonRxBubble');
   document.querySelectorAll('#fcOpts .quiz-opt').forEach(opt => {
     opt.addEventListener('click', () => {
       const opts = Array.from(document.querySelectorAll('#fcOpts .quiz-opt'));
-      opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o !== opt) o.classList.add('dim'); });
+      const isRight = opt.dataset.correct === 'true';
+      opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o === opt) o.classList.add('wrong-pick'); else o.classList.add('dim'); });
       document.getElementById('lessonNext').disabled = false;
+      if (lessonRxFace) {
+        lessonRxFace.classList.remove('happy', 'oops');
+        lessonRxFace.classList.add(isRight ? 'happy' : 'oops');
+        lessonRxBubble.textContent = isRight ? 'Yes! Pelajaran pertama sukses.' : 'Gapapa, ini baru latihan pertama.';
+      }
     });
   });
 
