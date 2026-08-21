@@ -58,81 +58,20 @@
       + '</svg>';
   }
 
-  // Nada pembuka merek. m025-80 OWNER: "simple tapi eksklusif, authentic seperti suara khas
-  // Duolingo" - jadi bukan pembuka sinematik, melainkan motif pendek yang gampang diingat:
-  // DUA nada bel naik satu kuint, F4 lalu C5. F dipilih karena itu huruf mereknya sendiri.
+  // Nada pembuka merek.
   //
-  // Karakter "bel" datang dari satu nada dasar sinus plus satu harmonik oktaf yang jauh
-  // lebih pelan dan meluruh lebih cepat - itulah yang membedakan bunyi bel dari bip sinus
-  // polos, tanpa perlu berkas audio sama sekali. Seluruh motif selesai di bawah satu detik.
+  // m025-81 OWNER: "nadanya kurang dapat dan tidak membuat user akan mengingat". Versi
+  // sebelumnya - dua nada sinus F4->C5 - digantikan motif merek F4 -> A4 -> D5 dengan
+  // timbre bilah dipukul. Sintesisnya TIDAK lagi tinggal di berkas ini: ia dipindah ke
+  // features/audio/fiezel-ui-sfx.js supaya sapaan pembuka dan seluruh SFX transisi
+  // benar-benar memakai satu mesin yang sama, dan tidak bisa melenceng satu sama lain
+  // seiring waktu. Modul itu dimuat lebih dulu di index.html.
   //
-  // Dua hal yang sengaja dijaga: (1) browser memblokir audio sebelum ada sentuhan pengguna,
-  // jadi kegagalan di sini normal dan ditelan diam-diam - splash tetap jalan tanpa suara;
-  // (2) preferensi murid dihormati, kalau suara dimatikan nada ini tidak berbunyi.
+  // Kegagalan ditelan diam-diam: browser memblokir audio sebelum ada sentuhan pengguna,
+  // dan splash harus tetap tampil utuh tanpa bunyi.
   function playChime(env) {
-    try {
-      var prefs = env && env.__getFiezelState && env.__getFiezelState();
-      prefs = prefs && prefs.preferences;
-      if (prefs && prefs.feedbackSounds === false && prefs.soundtrack === false) return false;
-      var Ctx = env.AudioContext || env.webkitAudioContext;
-      if (!Ctx) return false;
-      var ctx = new Ctx();
-      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume();
-
-      var t0 = ctx.currentTime + 0.05;
-      var master = ctx.createGain();
-      master.gain.value = 0.30;
-      master.connect(ctx.destination);
-
-      // Satu nada bel: dasar + harmonik oktaf yang lebih pelan dan lebih cepat hilang.
-      function bell(freq, at, dur) {
-        [[freq, 1.0, dur], [freq * 2, 0.28, dur * 0.55]].forEach(function (p) {
-          var osc = ctx.createOscillator(), g = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(p[0], t0 + at);
-          g.gain.setValueAtTime(0.0001, t0 + at);
-          g.gain.exponentialRampToValueAtTime(p[1], t0 + at + 0.012); // serangan tajam
-          g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + p[2]); // luruh panjang
-          osc.connect(g); g.connect(master);
-          osc.start(t0 + at); osc.stop(t0 + at + p[2] + 0.02);
-        });
-      }
-
-      bell(349.23, 0.00, 0.62); // F4
-      bell(523.25, 0.15, 0.78); // C5 - kuint naik, nada penutup dibiarkan lebih panjang
-
-      if (typeof env.setTimeout === 'function') {
-        env.setTimeout(function () { try { ctx.close(); } catch (_) {} }, 1400);
-      }
-      return true;
-    } catch (_) { return false; }
-  }
-
-  function dayKey(now) {
-    // Hari WIB, sama seperti modul perjalanan belajar, supaya "sekali sehari" berarti hal yang
-    // sama di seluruh aplikasi.
-    return new Date(Number(now) + 7 * 3600000).toISOString().slice(0, 10);
-  }
-
-  function seenToday(env, now) {
-    try {
-      var store = env && env.localStorage;
-      if (!store || typeof store.getItem !== 'function') return false;
-      return String(store.getItem(STORAGE_KEY) || '') === dayKey(now);
-    } catch (_) { return false; }
-  }
-
-  function markSeen(env, now) {
-    try {
-      var store = env && env.localStorage;
-      if (store && typeof store.setItem === 'function') store.setItem(STORAGE_KEY, dayKey(now));
-    } catch (_) { /* penyimpanan penuh tidak boleh menggagalkan pembukaan aplikasi */ }
-  }
-
-  function prefersReducedMotion(env) {
-    try {
-      return !!(env && env.matchMedia && env.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (_) { return false; }
+    try { return env && env.FiezelUiSfx ? env.FiezelUiSfx.playMotif(env) === true : false; }
+    catch (_) { return false; }
   }
 
   // m025-80 OWNER: maskot dikeluarkan dari splash. Yang tampil sekarang hanya logo yang
@@ -170,9 +109,8 @@
     host.setAttribute('role', 'dialog');
     host.setAttribute('aria-label', 'Selamat datang di FIEZEL');
     host.innerHTML = markup();
-    // Nada pembuka menyusul animasi logo. Kurangi-gerak juga berarti kurangi kejutan, jadi
-    // saat modus itu aktif splash tampil diam tanpa bunyi.
-    if (!prefersReducedMotion(target) && opts.silent !== true) playChime(target);
+    // Nada pembuka menyusul animasi logo.
+    if (opts.silent !== true) playChime(target);
 
     var closed = false;
     var timer = null;
