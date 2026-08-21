@@ -200,6 +200,12 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 .pill,.notice{display:inline-block;border:1px solid #f3dfe3;border-radius:999px;padding:5px 11px;color:var(--accent-strong);background:var(--accent-soft);font-size:.7rem;font-weight:600}
 
+/* m025-85: Peta Belajar tab switcher - keeps the 17 sections that used to be one
+   long scroll grouped and reachable without turning this into a separate route. */
+.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:.82rem;font-weight:650;white-space:nowrap}
+.progress-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
 .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .word{font-size:2.6rem;margin:6px 0;font-weight:800;letter-spacing:-.03em}
 .phonetic{color:var(--muted-soft)}
