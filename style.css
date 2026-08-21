@@ -338,6 +338,22 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .notification-status{margin:10px 0 0!important;padding:10px 12px;border-radius:12px;background:#f5f3ec;color:var(--muted)!important;font-size:.76rem!important;font-weight:700}
 .notification-status.success{background:#edf8f3;color:#277f68!important}.notification-status.error{background:#fff0f2;color:#b04b5f!important}
 .notification-help{font-size:.72rem!important;margin:12px 0 0!important}.notification-panel .primary[disabled]{opacity:.72;cursor:not-allowed;transform:none}
+/* ---------- Puter account gate: the second mandatory step, styled as a distinct,
+   exclusive moment (dark/gold) rather than a repeat of the warm notification panel. ---------- */
+.auth-locked .app,.auth-locked .bottomnav{visibility:hidden;pointer-events:none;user-select:none}
+.auth-gate{z-index:150;background:radial-gradient(120% 120% at 50% -10%,#3a1620 0%,var(--black) 62%);backdrop-filter:blur(18px)}
+.auth-panel{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(216,179,107,.3);box-shadow:0 40px 120px rgba(0,0,0,.5)}
+.auth-panel .welcome-icon{background:rgba(216,179,107,.16);color:var(--gold)}
+.auth-panel .welcome-mark{color:var(--gold);letter-spacing:.14em;font-size:.72rem;text-transform:uppercase}
+.auth-panel h2,.auth-panel p{color:#fbf3e6}
+.auth-panel p{color:rgba(251,243,230,.72)}
+.auth-panel .notification-status{background:rgba(255,255,255,.08);color:rgba(251,243,230,.86)!important}
+.auth-panel .notification-status.success{background:rgba(39,130,104,.28);color:#8be8c8!important}
+.auth-panel .notification-status.error{background:rgba(224,82,111,.24);color:#ffb3c2!important}
+.auth-panel .notification-help{color:rgba(251,243,230,.55)!important}
+.auth-panel .primary{background:var(--gold);border-color:var(--gold);color:#2c1b0d;font-weight:800;box-shadow:0 12px 30px rgba(216,179,107,.35)}
+.auth-panel .primary:hover{background:#e2c184}
+.auth-panel .primary[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 .welcome-mark,.modal-mark{font-weight:900;letter-spacing:-.06em;font-size:1.02rem;color:var(--black)}
 .welcome-panel h2,.modal-panel h2{font-size:1.9rem;letter-spacing:-.03em;margin:12px 0 8px;font-weight:800}
 .welcome-panel p,.modal-panel p{color:var(--muted);line-height:1.6;font-size:.92rem}
