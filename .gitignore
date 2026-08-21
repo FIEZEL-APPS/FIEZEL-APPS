@@ -25,3 +25,7 @@ CONTENT-ADOPTION-PROOF.json
 push-secrets*.json
 push-secrets*.txt
 fiezel-autonomy-config.json
+
+# Worktree sementara milik agent. Pernah ikut ter-commit sebagai gitlink (mode 160000)
+# pada merge m025-85, yang membuat kloning baru melihat submodule rusak.
+.claude/worktrees/
