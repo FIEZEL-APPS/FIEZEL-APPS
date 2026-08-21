@@ -16,8 +16,9 @@ dilanjutkan dari nol oleh siapa pun tanpa mengulang investigasinya.
 2. > "dan tidak ada sistem swipe back, misalnya dari menu terus menuju ke fitur audiobook,
    > ketika ingin kembali dan swipe back, itu tidak berfungsi"
 
-**Status:** #1 sudah diinvestigasi tuntas — akar masalahnya ditemukan dan diverifikasi,
-perbaikannya BELUM diterapkan. #2 sedang dikerjakan di worktree terpisah.
+**Status:** SELESAI. #1 diperbaiki dan dirilis pada **m025-87** (PR #131). #2 diperbaiki dan
+dirilis pada m025-84 (PR #128). Dokumen ini dipertahankan sebagai catatan akar masalah dan
+sebagai daftar hal yang SENGAJA ditinggalkan - lihat bagian 7.
 
 ---
 
@@ -102,6 +103,14 @@ Di mode gelap pada jam pakai normal (05:00–19:00), halaman jadi `#F9F6F8` seme
 `--text` adalah `#fdf4f6`. **Itu persis "warna tulisan dan background sama".**
 
 ### 1.3 AKAR C — 15 dari 32 token gelap adalah kode mati
+
+> **Koreksi (m025-87).** Bagian di bawah menyebut token scene menang karena "lebih spesifik
+> untuk segala isi `<body>`". Itu keliru dan perlu diluruskan supaya orang berikutnya tidak
+> salah memperbaikinya: selektornya `.scene-day`/`.scene-dawn`, dan keduanya menang **bukan
+> karena spesifisitas melainkan karena PEWARISAN** - mereka duduk di `<body>` sementara
+> palet gelap duduk di `<html>`, jadi segala isi body mewarisi nilai body.
+> `:root[data-theme="dark"]` justru lebih spesifik dan tetap kalah. Perbaikannya tetap sama
+> (kembaran bertema untuk `.scene-*`), hanya alasannya yang berbeda.
 
 Token gelap ini dideklarasikan tapi **tidak pernah berlaku**, karena dibayangi
 `body.scene-*` (`style.css:95-100`) atau inline style `app.js:478`:
@@ -312,3 +321,35 @@ PR #128 (`m025-84`) — dua bug boot yang dilaporkan sebelumnya:
 - SFX splash yang bocor ke menu → tidak ada lagi penjadwalan ke AudioContext `suspended`.
 
 Suite lokal 89/89 lulus, ditambah regresi `splash-first-paint-test.js` (21 pemeriksaan).
+
+
+---
+
+## 7. Hasil akhir dan yang sengaja ditinggalkan (m025-87)
+
+Diperbaiki: 12 token permukaan baru dengan nilai terang identik dengan literal yang
+digantikannya, kembaran gelapnya di kedua blok gelap, `--ui-*` mendapat palet gelap, dan
+`.scene-day`/`.scene-dawn` mendapat kembaran bertema. Tombol non-primary naik dari **1,08:1
+ke 16,44:1**.
+
+Satu hal yang tidak ada di rencana enam langkah dan baru terlihat setelah diukur:
+`app.js:478` menulis `--sky-top`/`--sky-bottom` sebagai **inline style** di
+`documentElement`, digerakkan jam dan tidak pernah sadar tema. Inline style tidak bisa
+dikalahkan dari stylesheet, tetapi opacity lapisannya bisa - `.global-sky` karena itu
+diredam khusus di tema gelap.
+
+Gerbang barunya `contrast-test.js`: 46 pasang x 3 keadaan = 138 rasio WCAG, tanpa browser,
+latar dibaca dari deklarasi yang menang di berkas. Diuji-mutasi terhadap ketiga akar.
+
+**Sengaja ditinggalkan, dan ini penting untuk pekerjaan berikutnya:**
+
+1. **`--ui-muted` 4,38:1 di mode TERANG** pada tint dingin Classroom (sebelumnya 4,36:1).
+   Memperbaikinya berarti menggelapkan token mode terang, yang dilarang syarat "mode terang
+   tidak boleh berubah". `.tutor-summary-grid span` dikecualikan dari daftar pasangan
+   dengan komentar yang menyebut alasannya.
+2. **Mode terang di malam hari belum dimodelkan.** Saat senja/malam token kaca membalik
+   jadi gelap sementara `--text`/`--muted` tetap versi terang. Yang paling keras:
+   `tutor-v3.css` memaksa topbar terang di senja/malam sementara `.brand-button` memakai
+   `--ambient-text` yang `#fdf4f6` setelah matahari terbenam - **wordmark FIEZEL sekitar
+   1,03:1 di mode terang setelah pukul 16:00.** Setiap perbaikan di sana mengubah tampilan
+   mode terang, jadi ia pantas jadi keputusan desain tersendiri, bukan diselipkan.
