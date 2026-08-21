@@ -512,6 +512,36 @@ function lockAppForNotifications(status=notificationPermission()){
   if(!notificationsRequired()){unlockAppAfterNotification();return false}appUnlocked=false;document.body?.classList?.add?.('notification-locked');stopSoundtrack();if(reminderTimer&&typeof clearInterval==='function')clearInterval(reminderTimer);reminderTimer=null;setNotificationGateState(status);
 }
 function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
+// m025-79: a second mandatory gate, Puter account sign-in, sits right after the
+// notification gate clears. It reuses the same lock/overlay pattern (a body class that
+// hides .app/.bottomnav, plus a full-screen panel) and aiErrorMessage() for failure copy,
+// so sign-in errors read the same way AI errors already do elsewhere in the app.
+function puterAuthAvailable(){return typeof puter!=='undefined'&&!!puter?.auth}
+function puterSignedIn(){try{return puterAuthAvailable()&&puter.auth.isSignedIn?.()===true}catch{return false}}
+function setAuthGateState(status,detail){
+  const gate=$('authGate'),button=$('authGateButton'),stateText=$('authGateStatus');if(!gate)return;
+  gate.classList.remove('hidden');(window.requestAnimationFrame||setTimeout)(()=>gate.classList.add('show'));
+  if(status==='signed_in'){stateText.textContent='Akun tersambung. Membuka FIEZEL…';stateText.className='notification-status success';button.disabled=true;button.innerHTML='<i data-lucide="circle-check-big"></i> Tersambung'}
+  else if(status==='pending'){stateText.textContent='Menghubungkan ke Puter…';stateText.className='notification-status';button.disabled=true;button.innerHTML='Menghubungkan… <i data-lucide="loader-circle"></i>'}
+  else if(status==='error'){stateText.textContent=aiErrorMessage(detail);stateText.className='notification-status error';button.disabled=false;button.innerHTML='Coba lagi <i data-lucide="refresh-cw"></i>'}
+  else{stateText.textContent='Satu akun untuk membuka Core Brain, AI tutor, dan progres belajar Jahran.';stateText.className='notification-status';button.disabled=false;button.innerHTML='Masuk dengan Puter <i data-lucide="log-in"></i>'}
+  refreshIcons()
+}
+function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
+function completeAuthGate(){document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast('Akun FIEZEL tersambung.')}
+let authRetryBound=false;
+function presentPuterAuthGateIfNeeded(){
+  if(!puterAuthAvailable()||puterSignedIn())return false;
+  document.body?.classList?.add?.('auth-locked');setAuthGateState('idle');
+  if(!authRetryBound){authRetryBound=true;document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'&&document.body?.classList?.contains('auth-locked')&&puterSignedIn())completeAuthGate()})}
+  return true
+}
+async function attemptPuterSignIn(){
+  if(!puterAuthAvailable())return false;
+  setAuthGateState('pending');
+  try{await puter.auth.signIn();if(puterSignedIn()){completeAuthGate();return true}setAuthGateState('error',{message:'Login belum selesai. Coba lagi.'});return false}
+  catch(error){setAuthGateState('error',error);return false}
+}
 function lastLearningAt(){
   const historyAt=(state.history||[]).reduce((m,x)=>Math.max(m,Number(x?.at)||0),0);const sessionAt=(state.sessionHistory||[]).reduce((m,x)=>Math.max(m,Date.parse(x?.at||'')||0),0);return Math.max(historyAt,sessionAt)
 }
@@ -612,6 +642,8 @@ try{self.FiezelDailyTarget?.start?.()}catch{}const reports=setTimeout(async()=>{
 // m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
 // straight into the real placement quiz once the gate clears - see afterOnboardingExit().
 if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
+// m025-79: the Puter account gate is the next mandatory step once notifications clear.
+presentPuterAuthGateIfNeeded();
 return true
 }
 async function requestRequiredNotificationPermission(){
