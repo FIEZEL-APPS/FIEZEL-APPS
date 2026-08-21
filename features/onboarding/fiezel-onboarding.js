@@ -37,7 +37,7 @@
  *    semuanya.
  * 2. SEKALI SAJA, bukan sekali sehari. Sapaan yang terus datang berubah jadi penghalang.
  * 3. TIDAK MENYENTUH KEADAAN APLIKASI SENDIRI. Modul ini hanya membaca modul murni sejenis
- *    (`env.FiezelMascot`, `env.FiezelPersonalJourney`) dan memanggil balik
+ *    (`env.FiezelPersonalJourney`) dan memanggil balik
  *    (`onGoal`, `onPlacement`, `onFinish`) yang diberikan pemanggil, sehingga bisa diuji
  *    tanpa aplikasi dan tidak bisa diam-diam merusak state belajar.
  */
@@ -57,7 +57,7 @@
 
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
-      pose: 'belajar',
+      art: 'book-a',
       title: 'Apa aja yang bisa kamu latih?',
       body: 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
       items: Object.freeze([
@@ -66,7 +66,7 @@
       ])
     }),
     Object.freeze({
-      pose: 'mengintip',
+      art: 'audio-lines',
       title: 'Apa aja yang bisa kamu latih?',
       body: 'Suara neural, bukan robot — kedengeran kayak orang beneran ngomong.',
       items: Object.freeze([
@@ -141,10 +141,17 @@
       + '</div>';
   }
 
-  function art(env, pose, width) {
-    var mascot = env && env.FiezelMascot;
-    return mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: pose, width: width || 220, decorative: true }) : '';
+  // m025-80 OWNER: "maskot hilangkan saja". Setiap langkah dulu memakai satu pose maskot;
+  // sekarang memakai satu lambang ikonik di atas piringan lembut. Tiap langkah tetap punya
+  // gambar yang berbeda supaya perkenalan tidak terasa berulang, dan bentuknya sejalur
+  // dengan ikon Lucide yang sudah dipakai di seluruh aplikasi - satu gaya, bukan campuran.
+  function art(env, icon, width) {
+    var size = Number(width) || 200;
+    // Dekorasi murni: judul dan isi langkah sudah membawa maknanya, jadi lambang ini
+    // disembunyikan dari pembaca layar supaya tidak dibacakan dua kali.
+    return '<div class="fiezel-step-art" style="--fz-art:' + size + 'px" aria-hidden="true">'
+      + '<i data-lucide="' + escapeHtml(String(icon || 'sparkles')) + '"></i>'
+      + '</div>';
   }
 
   function btn(label, attr, variant) {
@@ -163,7 +170,7 @@
     }).join('');
     var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
     return topbar(false)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, slide.pose, 200) + '</div></div>'
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, slide.art, 200) + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="1">'
       + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
       + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
@@ -194,7 +201,7 @@
       return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
     return topbar(false)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'semangat', 180) + '</div></div>'
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'sparkles', 180) + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="2">'
       + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
@@ -210,7 +217,7 @@
   // ---------------------------------------------------------------------------------------
   function placementMarkup(env) {
     return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'menulis', 200) + '</div></div>'
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'book-open-text', 200) + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
       + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
@@ -225,7 +232,7 @@
   // ---------------------------------------------------------------------------------------
   function scheduleMarkup(env) {
     return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'jadwal', 200) + '</div></div>'
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'clock-3', 200) + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
@@ -249,7 +256,7 @@
       confetti = '<div class="fiezel-confetti" aria-hidden="true">' + pieces + '</div>';
     }
     return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'pencapaian', 220) + '</div></div>'
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'trophy', 220) + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">Siap belajar bersama Percik!</h2>'
       + '<div class="fiezel-summary-card">'
@@ -276,7 +283,7 @@
     var now = Number(opts.now) || 0;
     var doc = target.document;
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
-    if (!target.FiezelMascot) return { shown: false, reason: 'mascot_unavailable' };
+    // m025-80: syarat FiezelMascot dilepas bersama maskotnya sendiri.
     if (opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
 
     var host = doc.createElement('div');
