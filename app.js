@@ -43,7 +43,7 @@ const SCENE_STOPS=[
   {minute:1440,top:'#140a12',bottom:'#2c1622'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
-const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT};
+const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,examTrack:''};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
   {headline:'Oii Jahran, target kuliah luar negeri lu keren. Tapi hari ini udah belajar belum? 👀',lead:'Beasiswa sama kampus IT impian nggak kebangun dari niat doang. Gas 10–15 menit dulu, kecil tapi nyata.'},
@@ -906,10 +906,39 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
 // depan syarat masuk. Modulnya sendiri menutup diri lewat pewaktu dan lewat sentuhan.
 function showBrandSplash(now=Date.now()){
   const splash=self.FiezelSplash;
-  if(!splash||typeof splash.show!=='function')return null;
-  try{return splash.show(self,{now})}catch(_){return null}
+  if(!splash||typeof splash.show!=='function'){showOnboarding(now);return null}
+  try{
+    const shown=splash.show(self,{now,onClose:()=>showOnboarding(Date.now())});
+    // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
+    // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
+    if(!shown||shown.shown!==true)showOnboarding(now);
+    return shown
+  }catch(_){showOnboarding(now);return null}
 }
 window.showBrandSplash=showBrandSplash;
+// Perkenalan enam langkah (Step 1-6 sheet handoff). Dijalankan setelah splash, yang berarti
+// juga setelah gerbang notifikasi lolos. Modulnya sendiri yang memutuskan sudah pernah
+// selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar ada.
+function showOnboarding(now=Date.now()){
+  const onboarding=self.FiezelOnboarding;
+  if(!onboarding||typeof onboarding.show!=='function')return null;
+  try{
+    return onboarding.show(self,{now,
+      onGoal:({track,goal,label})=>{
+        const journey=self.FiezelPersonalJourney;
+        const id=journey?journey.buildGoalProfile(goal).id:goal;
+        // Prasyarat kemampuan IELTS dan TOEFL memang satu profil, jadi keduanya menulis
+        // `exam_foundation`. Yang membedakan tersimpan terpisah sebagai `examTrack` dan
+        // itulah yang dipakai untuk label yang dilihat murid. Tidak ada prediksi skor.
+        state.preferences={...state.preferences,goalProfile:id,examTrack:String(track||'')};
+        save();render();showToast(`Tujuan belajar: Fondasi ${label}`)
+      },
+      onPlacement:()=>startPlacement(),
+      onFinish:()=>go('home')
+    })
+  }catch(_){return null}
+}
+window.showOnboarding=showOnboarding;
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
@@ -1264,6 +1293,6 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.toggleSoundtrack=toggleSoundtrack;window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));
