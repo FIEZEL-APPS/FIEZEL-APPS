@@ -11,9 +11,6 @@ check(/function buildLearningSnapshot/.test(app)&&/function askCoachAI/.test(app
 check(/function haptic/.test(app)&&/navigator\.vibrate/.test(app)&&/document\.addEventListener\?\.\('click'/.test(app),'Global haptic system missing');
 check(/function playFeedbackSound/.test(app)&&/function answerFeedbackSignal/.test(app)&&/feedbackSounds:true/.test(app),'Correct/wrong answer sound feedback missing');
 check(/id="answerBurst"/.test(html)&&/\.answer-burst/.test(css)&&/circle-check-big/.test(app)&&/circle-x/.test(app),'Animated answer popup missing');
-// m025-43: the soundtrack is a real arrangement in features/audio/fiezel-soundtrack.js
-// now, so the check is on the lifecycle it must keep, not on the old ping function.
-check(/function startSoundtrack/.test(app)&&/FiezelSoundtrack/.test(app)&&/visibilitychange/.test(app),'Persistent soundtrack lifecycle missing');
 check(/document\.startViewTransition/.test(app)&&/\.reduce-motion \*/.test(css),'Motion system or reduced-motion control missing');
 check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.test(css),'Premium launcher surface missing');
 check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
@@ -45,4 +42,4 @@ if(failures.length){
   process.exit(1);
 }
 console.log('FIEZEL experience integration: PASS');
-console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,soundtrack:true,motion:true,creatorHub:true,rotatingLoginReminder:true,mandatoryNotifications:true,studyReminderEngine:true,apiKeyBundled:false}));
+console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,mandatoryNotifications:true,studyReminderEngine:true,apiKeyBundled:false}));

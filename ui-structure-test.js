@@ -10,7 +10,7 @@ const check=(ok,message)=>{if(!ok)failures.push(message)};
 
 check((html.match(/class="nav(?: active)?"/g)||[]).length===5,'Bottom navigation must contain exactly five primary destinations.');
 check((html.match(/data-lucide=/g)||[]).length>=9,'Core chrome must use the local icon system.');
-check(/aria-label="Buka pengaturan"/.test(html)&&/aria-label="Atur soundtrack"/.test(html),'Icon-only topbar controls need accessible names.');
+check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
 check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
 check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');
 check(html.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')<html.indexOf('./app.js')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('./app.js'),'Feature runtimes must load before app.js.');
