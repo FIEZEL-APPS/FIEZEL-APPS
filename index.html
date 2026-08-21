@@ -123,18 +123,25 @@ html.fz-booting body{overflow:hidden}
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- Audit UX Bagian 3 + Roadmap #3: nada suportif, tanpa kata "wajib" / "belum bisa
-       dibuka", dan tanpa menyapa nama murid di layar sistem. Gerbang ini tetap berjalan
-       di UJUNG alur perkenalan, bukan sebagai layar pertama. -->
-  <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+  <!-- Undangan notifikasi, bukan gerbang. Sampai m025-87 panel ini adalah syarat masuk:
+       aria-modal, tanpa satu pun tombol yang bisa menutupnya, di atas .app yang disembunyikan
+       .notification-locked - dan karena satu-satunya render() pada jalur boot berada di balik
+       izin itu, menolaknya berarti kehilangan aplikasinya, bukan pengingatnya.
+
+       m025-88 membaliknya: ruang belajar dibuka lebih dulu, panel ini menyusul di atasnya,
+       dan "Nanti saja" adalah jalan keluar yang sungguhan (dismissWelcome() mencatat
+       penolakan supaya tidak menagih lagi selama tiga hari). aria-modal DILEPAS karena
+       klaimnya sekarang tidak benar - ada halaman hidup di belakangnya. -->
+  <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
     <div class="welcome-panel notification-panel">
       <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
       <div class="welcome-mark">FIEZEL REMINDER</div>
-      <h2 id="welcomeTitle">Satu langkah lagi</h2>
+      <h2 id="welcomeTitle">Mau diingatkan?</h2>
       <p id="notificationGateBody">Aktifkan notifikasi supaya FIEZEL bisa mengingatkan saat target harian belum selesai atau ada materi yang waktunya diulang.</p>
-      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Pilih <b>Allow / Izinkan</b> saat browser bertanya. Pengingatnya bisa diatur ulang kapan saja lewat Pengaturan.</span></div>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Pilih <b>Allow / Izinkan</b> saat browser bertanya. Pengingatnya bisa dimatikan atau dinyalakan lagi kapan saja lewat Pengaturan.</span></div>
       <p id="notificationGateStatus" class="notification-status" role="status">Memeriksa izin notifikasi…</p>
       <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()">Aktifkan notifikasi <i data-lucide="bell-ring"></i></button>
+      <button id="notificationGateLater" type="button" class="ghost wide" onclick="dismissWelcome()">Nanti saja</button>
       <p id="notificationGateHelp" class="notification-help">Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
     </div>
   </div>

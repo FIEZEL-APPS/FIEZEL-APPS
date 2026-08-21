@@ -55,6 +55,11 @@
   // apa adanya karena ini standar eksternal, bukan logika produk yang bisa berubah diam-diam.
   var CEFR_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
 
+  // Langkah terakhir (ringkasan). Ditulis sekali supaya penjepit di goStep() dan pemeriksaan
+  // "sudah di ujung" di tombol lewati-langkah tidak bisa lagi menyimpang satu sama lain -
+  // ketidaksamaan itulah yang membuat tombol di langkah 5 mati diam-diam sampai m025-88.
+  var LAST_STEP = 5;
+
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
       art: 'book-a',
@@ -236,7 +241,12 @@
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
-      + '<p class="fiezel-note">Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>'
+      // m025-88: kalimat ini dulu berbunyi "Notifikasi belajar: Aktif." - diucapkan pada
+      // langkah 4, padahal izin notifikasi baru DIMINTA setelah perkenalan selesai. Kalau
+      // murid menolaknya di dialog browser sesaat kemudian, perkenalan sudah terlanjur
+      // menjanjikan sesuatu yang tidak terjadi. Sekarang kalimatnya menyebut apa yang
+      // memang belum terjadi, dan menyebut bahwa ia boleh ditolak.
+      + '<p class="fiezel-note">Nanti aku minta izin notifikasi sebentar - boleh kamu tolak, dan semua materi tetap terbuka. Kalau diizinkan, waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>'
       + btn('Lanjut', 'data-ob-advance')
       + '</div>';
   }
@@ -262,7 +272,7 @@
       + '<div class="fiezel-summary-card">'
       + '<div class="fiezel-summary-row"><b>Tujuan</b><span>' + escapeHtml(goalLabel) + '</span></div>'
       + '<div class="fiezel-summary-row"><b>Perkiraan level</b><span>' + escapeHtml(selectedLevel || 'Belum dipilih') + '</span></div>'
-      + '<div class="fiezel-summary-row"><b>Pengingat</b><span>Aktif</span></div>'
+      + '<div class="fiezel-summary-row"><b>Pengingat</b><span>Ditanyakan sebentar lagi</span></div>'
       + '<div class="fiezel-summary-row"><b>Streak</b><span>0 hari · mulai sekarang!</span></div>'
       + '</div>'
       + btn('Mulai Belajar', 'data-ob-primary')
@@ -312,6 +322,20 @@
       bind();
     }
 
+    /**
+     * Mengakhiri perkenalan DAN menyerahkan kendali kembali ke pemanggil - keduanya, lewat
+     * satu jalan.
+     *
+     * m025-88: penyerahan kendali dulu ditulis terpisah di setiap pemanggil, dan satu
+     * pemanggil melewatkannya - tombol "Lewati" di kanan atas hanya memanggil finish('skip'),
+     * tanpa callback. Akibatnya bukan sekadar satu callback yang hilang: afterOnboardingExit()
+     * tidak pernah berjalan, dan satu-satunya render() di jalur boot berada di dalamnya, jadi
+     * murid yang menekan "Lewati" ditinggal di cangkang aplikasi dengan #app KOSONG - topbar
+     * dan navigasi bawah tanpa isi - sampai ia memuat ulang halaman sendiri.
+     *
+     * Karena itu pemberitahuan sekarang menjadi tanggung jawab finish() sendiri: selama
+     * setiap jalan keluar lewat sini, tidak ada lagi jalan keluar yang bisa lupa memanggilnya.
+     */
     function finish(via) {
       if (closed) return;
       closed = true;
@@ -319,23 +343,25 @@
       try { host.classList.add('is-leaving'); } catch (_) {}
       if (typeof target.setTimeout === 'function') target.setTimeout(remove, 260);
       else remove();
+      // Tes penempatan mengambil alih seluruh layar, jadi ia punya jalur lanjutannya sendiri;
+      // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
+      var handler = via === 'placement' ? opts.onPlacement : opts.onFinish;
+      if (typeof handler === 'function') {
+        try { handler({ goal: selectedGoal, level: selectedLevel, via: via }); } catch (_) {}
+      }
     }
     function remove() {
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
 
     function goStep(next) {
-      step = Math.min(5, Math.max(1, next));
+      step = Math.min(LAST_STEP, Math.max(1, next));
       paint();
     }
 
     function advance() {
       if (step === 1 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
-      if (step === 5) {
-        finish('finish');
-        if (typeof opts.onFinish === 'function') { try { opts.onFinish({ goal: selectedGoal, level: selectedLevel }); } catch (_) {} }
-        return;
-      }
+      if (step === LAST_STEP) { finish('finish'); return; }
       if (step === 2 && selectedGoal && typeof opts.onGoal === 'function') {
         try { opts.onGoal({ goal: selectedGoal, level: selectedLevel }); } catch (_) {}
       }
@@ -351,7 +377,6 @@
       // Tes penempatan mengambil alih seluruh layar. Onboarding harus SELESAI dulu, bukan
       // menunggu di belakangnya - lapisan yang tertinggal di atas kuis adalah jebakan.
       finish('placement');
-      if (typeof opts.onPlacement === 'function') { try { opts.onPlacement({ goal: selectedGoal, level: selectedLevel }); } catch (_) {} }
     }
 
     function bind() {
@@ -361,7 +386,14 @@
         var skipAll = host.querySelector('[data-ob-skip]');
         if (skipAll) skipAll.addEventListener('click', function () { finish('skip'); });
         var stepSkip = host.querySelector('[data-ob-step-skip]');
-        if (stepSkip) stepSkip.addEventListener('click', function () { goStep(step + 1); });
+        if (stepSkip) stepSkip.addEventListener('click', function () {
+          // Di langkah terakhir tidak ada langkah berikutnya untuk dilewati: goStep(6)
+          // dijepit kembali ke 5 dan hanya mengecat ulang layar yang sama, jadi tombolnya
+          // mati persis di tempat ia paling terbaca sebagai jalan keluar - tepat di sebelah
+          // "Mulai Belajar". Di sana "Lewati" berarti mengakhiri perkenalan.
+          if (step >= LAST_STEP) { finish('skip'); return; }
+          goStep(step + 1);
+        });
         var adv = host.querySelector('[data-ob-advance]');
         if (adv && !adv.hasAttribute('disabled')) adv.addEventListener('click', advance);
         var primary = host.querySelector('[data-ob-primary]');

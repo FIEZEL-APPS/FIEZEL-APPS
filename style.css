@@ -350,7 +350,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   transform:translateY(16px) scale(.96);transition:transform .45s var(--ease-spring);
 }
 .welcome.show .welcome-panel,.modal.show .modal-panel{transform:none}
-.notification-locked .app,.notification-locked .bottomnav{visibility:hidden;pointer-events:none;user-select:none}
+/* m025-88: kelas pengunci notifikasi dihapus, bukan dikosongkan. Aturannya dulu menyembunyikan
+   .app dan .bottomnav sekaligus lewat visibility:hidden - itulah separuh mekanisme yang
+   mengubah panel di bawah ini dari undangan menjadi dinding. Separuh lainnya ada di app.js,
+   tempat satu-satunya render() pada jalur boot duduk di balik izin yang sama. */
 .notification-gate{display:grid;place-items:center;opacity:1;pointer-events:auto;background:rgba(26,12,18,.82);backdrop-filter:blur(18px)}
 .notification-gate.hidden{display:none}.notification-gate.show{opacity:1}
 .notification-panel{box-shadow:0 28px 90px rgba(0,0,0,.28)}
@@ -359,6 +362,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .notification-status{margin:10px 0 0!important;padding:10px 12px;border-radius:12px;background:var(--surface-warm);color:var(--muted)!important;font-size:.76rem!important;font-weight:700}
 .notification-status.success{background:#edf8f3;color:#277f68!important}.notification-status.error{background:#fff0f2;color:#b04b5f!important}
 .notification-help{font-size:.72rem!important;margin:12px 0 0!important}.notification-panel .primary[disabled]{opacity:.72;cursor:not-allowed;transform:none}
+/* "Nanti saja". Sengaja tenang - ia jalan keluar, bukan tawaran tandingan - tapi tetap
+   setinggi target sentuh 44px supaya jalan keluarnya bisa benar-benar dikenai jari. */
+.notification-panel .ghost.wide{display:block;width:100%;min-height:44px;margin-top:10px;padding:12px 16px;border:0;border-radius:14px;background:transparent;color:var(--muted);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.notification-panel .ghost.wide:hover{background:var(--surface-warm);color:var(--text)}
 /* ---------- Gerbang akun Puter, digubah mengikuti Audit UX Bagian 3 ----------
    Bentuknya sekarang mengikuti layar Apple Sign-In: latar tenang satu warna, lambang
    merek di atas, judul besar berjarak lega, SATU tombol utama penuh lebar berbentuk

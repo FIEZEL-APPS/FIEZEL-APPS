@@ -15,11 +15,17 @@ const context={console,document,localStorage,Notification,navigator,fetch,locati
 vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(async()=>{
   try{
-    assert(bodyClasses.contains('notification-locked'),'denied permission must lock the application');
-    assert(!/launcher-shell/.test(element('app').innerHTML),'Home rendered before notification permission was granted');
-    assert(/tetap terkunci|ditolak/i.test(element('notificationGateStatus').textContent),'denied permission status is not visible');
+    // m025-88 membalik ketiga pemeriksaan ini, dan pembalikannya memang inti rilis tersebut.
+    // Sebelumnya: izin ditolak -> .notification-locked dipasang, Home tidak pernah dicat, dan
+    // panel berbunyi "FIEZEL tetap terkunci". Karena izin yang sudah ditolak tidak bisa
+    // diminta ulang dari dalam halaman, keadaan itu tidak punya jalan keluar sama sekali -
+    // satu ketukan "jangan" pada dialog browser mengubah aplikasinya menjadi layar mati.
+    assert(!bodyClasses.contains('notification-locked'),'a denied permission must no longer lock the application');
+    assert(/launcher-shell/.test(element('app').innerHTML),'Home must render even when notifications are denied');
+    assert(!element('welcome').classList.contains('show'),'a denied permission cannot be answered by a panel - the browser will not ask again');
     Notification.permission='granted';await context.requestRequiredNotificationPermission();
     assert(!bodyClasses.contains('notification-locked'),'granted permission did not unlock the application');
+    assert(/Notifikasi aktif/i.test(element('notificationGateStatus').textContent),'granting must confirm in the panel before it leaves');
     assert(/launcher-shell/.test(element('app').innerHTML),'Home did not render after notification permission became granted');
     assert(notifications.length===0,'app update must stay silent, no update notification shown');
     assert(store['fiezel.seenAppVersion']===expectedVersion,'seen app version was not persisted');
@@ -33,5 +39,5 @@ setTimeout(async()=>{
     assert(store['fiezel-last-login-message']!=null,'login reminder index was not persisted to avoid immediate repetition');
   }catch(e){failures.push(e.stack||String(e))}
   if(failures.length){console.error('FIEZEL notification reminder: FAIL');failures.forEach(x=>console.error('- '+x));process.exitCode=1;return}
-  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedLocksApp:true,grantedUnlocksApp:true,inactivityNotification:true,rotatingLoginMessage:true,silentUpdate:true,updateNoRepeat:true}));
+  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedKeepsAppOpen:true,grantedUnlocksApp:true,inactivityNotification:true,rotatingLoginMessage:true,silentUpdate:true,updateNoRepeat:true}));
 },260);

@@ -188,6 +188,44 @@ test('melewati (global) di langkah mana pun langsung menutup dan tidak kembali m
   assert.strictEqual(again.reason, 'completed');
 });
 
+// m025-88: gate untuk dua jalan keluar yang MENUTUP lapisan tapi tidak pernah menyerahkan
+// kendali kembali. Keduanya lolos dari gate lama karena gate itu hanya memeriksa bahwa
+// perkenalan berhenti menghadang - bukan bahwa aplikasinya benar-benar dilanjutkan. Di
+// aplikasi, satu-satunya render() pada jalur boot ada di balik callback ini, jadi jalan
+// keluar yang diam meninggalkan murid di cangkang kosong sampai ia memuat ulang sendiri.
+test('melewati (global) menyerahkan kendali kembali, bukan sekadar menutup lapisan', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true,
+    onFinish: d => calls.push(['finish', d && d.via]),
+    onPlacement: () => calls.push(['placement']) });
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
+  assert.deepStrictEqual(calls, [['finish', 'skip']],
+    'tombol Lewati harus memanggil onFinish tepat sekali - tanpa itu alur pembukaan berhenti diam-diam');
+});
+
+test('"Lewati" di langkah terakhir mengakhiri perkenalan, bukan mengecat ulang layar yang sama', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true, onFinish: d => calls.push(d && d.via) });
+  advanceTo(run, 5);
+  run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+  assert.deepStrictEqual(calls, ['skip'],
+    'di langkah terakhir tidak ada langkah berikutnya: goStep(6) dijepit kembali ke 5 dan tombolnya mati');
+  assert.strictEqual(onboarding.completed(env), true);
+});
+
+test('tes penempatan memberi tahu onPlacement tepat sekali, bukan dua kali', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true,
+    onPlacement: () => calls.push('placement'), onFinish: () => calls.push('finish') });
+  advanceTo(run, 3);
+  run.element.querySelector('[data-ob-primary]').listeners.click[0]();
+  assert.deepStrictEqual(calls, ['placement'],
+    'jalur tes penempatan tidak boleh ikut memanggil onFinish - itu akan menjalankan dua lanjutan sekaligus');
+});
+
 test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke langkah 2', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
@@ -361,11 +399,10 @@ test('aplikasi menyambungkan splash -> onboarding -> gerbang notifikasi -> tes p
     'perkiraan self-report tidak boleh menimpa state.level - itu milik tes penempatan asli');
 });
 
-test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi tetap wajib', () => {
-  // OWNER: "ubah notification gate di akhir flow". Notifikasi tetap wajib di produk ini;
-  // yang berubah hanya URUTANNYA. Murid baru (perkenalan belum selesai) melihat
-  // splash+onboarding dulu; murid lama tetap diperiksa gerbangnya di awal boot, sama
-  // seperti sebelumnya.
+test('undangan notifikasi tetap di ujung alur, dan tidak lagi mengunci aplikasi', () => {
+  // OWNER: "ubah notification gate di akhir flow". Urutannya dipegang di sini. Sifatnya
+  // berubah pada m025-88: panel yang sama sekarang undangan, bukan syarat masuk - lihat
+  // pemeriksaan di bawah.
   const flat = app.replace(/\s/g, '');
   assert.ok(/functionstartWelcomeExperience\(\)\{/.test(flat), 'titik masuk boot harus tetap ada');
   assert.ok(/onboardingDone=self\.FiezelOnboarding\?\.completed\?\.\(self\)!==false/.test(flat),
@@ -380,10 +417,32 @@ test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi teta
     'perkenalan hanya menahan gerbang kalau ia benar-benar tampil');
   assert.ok(/returnstartNotificationGate\(\)/.test(flat),
     'gerbang notifikasi tetap dijalankan di ujung sapaan, bukan dihapus');
-  // Gerbang itu sendiri (isi startNotificationGate) tidak boleh berubah perilakunya -
-  // notifikasi tetap wajib dengan cara yang persis sama, hanya dipindah posisinya.
-  assert.ok(/functionstartNotificationGate\(\)\{/.test(flat), 'logika gerbang asli harus tetap ada, hanya berganti nama');
-  assert.ok(/lockAppForNotifications\(permission\)/.test(flat), 'penguncian aplikasi tanpa izin tetap terjadi');
+  assert.ok(/functionstartNotificationGate\(\)\{/.test(flat), 'titik masuk gerbang harus tetap ada');
+
+  // m025-88. Sampai m025-87 baris berikutnya berbunyi "penguncian aplikasi tanpa izin tetap
+  // terjadi" - dan memang begitu: lockAppForNotifications() memasang .notification-locked,
+  // yang menyembunyikan .app dan .bottomnav, sementara satu-satunya render() pada jalur boot
+  // duduk di balik izin yang sama. Menolak notifikasi karena itu tidak menghilangkan
+  // pengingat melainkan APLIKASINYA, dan izin yang sudah ditolak tidak bisa diminta ulang
+  // dari dalam halaman - jadi keadaan itu tidak punya jalan keluar sama sekali.
+  // Dicek sebagai DEFINISI dan sebagai PEMASANGAN kelas, bukan sebagai kata di mana saja:
+  // penjelasan mengapa penguncian itu dibuang justru harus boleh menyebut namanya.
+  assert.ok(!/functionlockAppForNotifications/.test(flat), 'penguncian aplikasi karena notifikasi tidak boleh kembali');
+  assert.ok(!/classList\?\.add\?\.\('notification-locked'\)/.test(flat), 'kelas pengunci tidak boleh dipasang lagi di mana pun');
+  assert.ok(/openApp\(\);if\(permission==='granted'\)returnacceptNotifications\(\)/.test(flat),
+    'aplikasi harus dibuka LEBIH DULU, sebelum izin apa pun menentukan apa yang terjadi');
+  assert.ok(/functiondismissWelcome\(\)\{snoozeNotificationInvite\(\);hideNotificationGate\(\);returntrue\}/.test(flat),
+    '"Nanti saja" harus benar-benar menutup undangan dan diingat');
+  assert.ok(/permission!=='default'/.test(flat),
+    'izin yang sudah ditolak tidak boleh dijawab dengan panel - browser tidak akan bertanya lagi');
+
+  const html = fs.readFileSync('./index.html', 'utf8');
+  const panel = html.slice(html.indexOf('id="welcome"'), html.indexOf('id="authGate"'));
+  assert.ok(/id="notificationGateLater"[^>]*onclick="dismissWelcome\(\)"/.test(panel),
+    'undangan wajib punya jalan keluar yang terlihat, bukan hanya tombol menerima');
+  assert.ok(!/aria-modal/.test(panel),
+    'klaim aria-modal tidak lagi benar: ada ruang belajar hidup di belakang undangan');
+  assert.ok(!/\.notification-locked\s+\.app/.test(css), 'aturan pengunci harus ikut hilang dari style.css');
 });
 
 test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', () => {

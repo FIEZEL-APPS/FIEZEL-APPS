@@ -17,7 +17,10 @@ check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(
 check(/prepareNeuralVoice/.test(app)&&/FiezelVoiceRuntime\.speak/.test(app)&&/Siapkan suara offline/.test(app),'Explicit local neural voice opt-in or runtime routing missing');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
-check(/requestRequiredNotificationPermission/.test(app)&&/notificationPermission\(\)/.test(app)&&/notification-locked/.test(css)&&/id="notificationGateButton"/.test(html),'Mandatory notification permission gate missing');
+// m025-88: undangan, bukan gerbang. Yang diperiksa berubah dari "aplikasinya tersembunyi
+// sampai izin turun" menjadi "ada cara menerima DAN ada cara menolak" - kelas pengunci
+// .notification-locked justru tidak boleh ada lagi di style.css.
+check(/requestRequiredNotificationPermission/.test(app)&&/notificationPermission\(\)/.test(app)&&!/\.notification-locked\s+\.app/.test(css)&&/id="notificationGateButton"/.test(html)&&/id="notificationGateLater"/.test(html),'Notification invitation missing an accept or a decline path');
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');
 check(/function getCelestialState/.test(app)&&/function getScenePalette/.test(app)&&/SUNRISE_MINUTE/.test(app)&&/global-sky/.test(css)&&/sky-light/.test(css)&&/id="globalSky"/.test(html),'Full-screen real-time sun/moon cycle missing');
 check(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:GRAMMAR_SESSION_SIZE/.test(app),'Grammar lesson contract is not fixed at 25 questions');
@@ -42,4 +45,4 @@ if(failures.length){
   process.exit(1);
 }
 console.log('FIEZEL experience integration: PASS');
-console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,mandatoryNotifications:true,studyReminderEngine:true,apiKeyBundled:false}));
+console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,notificationInvitation:true,studyReminderEngine:true,apiKeyBundled:false}));
