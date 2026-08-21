@@ -12,7 +12,6 @@
  */
 const assert = require('assert');
 const fs = require('fs');
-const mascot = require('./features/brand/fiezel-mascot.js');
 const splash = require('./features/brand/fiezel-splash.js');
 const journey = require('./features/personal-journey/fiezel-personal-journey.js');
 const onboarding = require('./features/onboarding/fiezel-onboarding.js');
@@ -79,7 +78,6 @@ function fakeEnv(over) {
     },
     setTimeout: (fn) => { fn(); return 1; },
     clearTimeout: () => {},
-    FiezelMascot: mascot,
     FiezelPersonalJourney: journey,
     _body: body, _store: store
   }, over || {});
@@ -295,12 +293,15 @@ test('confetti ringkas dan tunduk pada kurangi-gerak', () => {
   assert.ok(!/fiezel-confetti/.test(reduced), 'kurangi-gerak harus mematikan confetti, bukan hanya memperlambatnya');
 });
 
-test('tanpa modul maskot, perkenalan tidak tampil dan tidak merusak apa pun', () => {
+// m025-80 OWNER: "maskot hilangkan saja". Perkenalan menggambar lambangnya sendiri dari
+// ikon Lucide, jadi tidak ada lagi modul gambar yang bisa membatalkan tampilnya.
+test('perkenalan tampil tanpa bergantung pada modul gambar apa pun', () => {
   const env = fakeEnv({ FiezelMascot: undefined });
   const run = onboarding.show(env, { now: NOW });
-  assert.strictEqual(run.shown, false);
-  assert.strictEqual(run.reason, 'mascot_unavailable');
-  assert.strictEqual(env._body.children.length, 0);
+  assert.strictEqual(run.shown, true);
+  assert.strictEqual(env._body.children.length, 1);
+  assert.ok(/fiezel-step-art/.test(env._body.children[0].innerHTML),
+    'setiap langkah harus punya lambang penggantinya');
 });
 
 test('tanpa modul perjalanan belajar, kartu tujuan kosong tapi tidak melempar', () => {
@@ -341,7 +342,12 @@ test('maskot dalam onboarding dekoratif, tidak dibacakan dua kali oleh pembaca l
 });
 
 test('aplikasi menyambungkan splash -> onboarding -> gerbang notifikasi -> tes penempatan asli, level self-report terpisah dari state.level', () => {
-  assert.ok(/onClose:\(\)=>showOnboarding/.test(app.replace(/\s/g, '')), 'onboarding harus menyambung dari penutupan splash');
+  // m025-80: splash tidak lagi memaku langkah berikutnya di dalam dirinya. Pemanggil yang
+  // menentukan lewat callback afterSplash, dan boot menyambungkannya ke showOnboarding lalu
+  // gerbang notifikasi - jadi yang diperiksa sekarang rantai itu, bukan literal onClose.
+  const flatApp = app.replace(/\s/g, '');
+  assert.ok(/onClose:\(\)=>done\(Date\.now\(\)\)/.test(flatApp), 'splash harus memanggil balik pemanggilnya saat menutup');
+  assert.ok(/showOnboarding\(at\)\?\.shown===true/.test(flatApp), 'boot harus menyambung penutupan splash ke onboarding');
   assert.ok(/onPlacement:\(\)=>afterOnboardingExit\('placement'\)/.test(app.replace(/\s/g, '')),
     'tombol tes harus melalui afterOnboardingExit, bukan langsung startPlacement - gerbang notifikasi harus tetap diperiksa dulu');
   assert.ok(/onFinish:\(\)=>afterOnboardingExit\('home'\)/.test(app.replace(/\s/g, '')),
@@ -364,9 +370,16 @@ test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi teta
   assert.ok(/functionstartWelcomeExperience\(\)\{/.test(flat), 'titik masuk boot harus tetap ada');
   assert.ok(/onboardingDone=self\.FiezelOnboarding\?\.completed\?\.\(self\)!==false/.test(flat),
     'harus memeriksa apakah perkenalan sudah selesai untuk memutuskan urutan');
-  assert.ok(/if\(!onboardingDone\)returnshowBrandSplash\(\)/.test(flat),
-    'murid baru harus melihat splash dulu, sebelum gerbang notifikasi');
-  assert.ok(/returnstartNotificationGate\(\)/.test(flat), 'murid lama tetap langsung ke gerbang, seperti sebelumnya');
+  // m025-80 OWNER: sebelumnya HANYA murid baru yang melihat splash; murid lama ditabrak
+  // gerbang notifikasi di detik pertama boot - persis pola yang ditandai audit UX sebagai
+  // penyebab kesan "app abal-abal". Sekarang splash adalah layar pertama untuk SEMUA murid,
+  // dan gerbangnya menyusul lewat callback di ujung sapaan itu.
+  assert.ok(/returnshowBrandSplash\(Date\.now\(\),at=>\{/.test(flat),
+    'splash harus jadi layar pertama untuk semua murid, bukan hanya murid baru');
+  assert.ok(/if\(!onboardingDone&&showOnboarding\(at\)\?\.shown===true\)returnnull/.test(flat),
+    'perkenalan hanya menahan gerbang kalau ia benar-benar tampil');
+  assert.ok(/returnstartNotificationGate\(\)/.test(flat),
+    'gerbang notifikasi tetap dijalankan di ujung sapaan, bukan dihapus');
   // Gerbang itu sendiri (isi startNotificationGate) tidak boleh berubah perilakunya -
   // notifikasi tetap wajib dengan cara yang persis sama, hanya dipindah posisinya.
   assert.ok(/functionstartNotificationGate\(\)\{/.test(flat), 'logika gerbang asli harus tetap ada, hanya berganti nama');
@@ -377,12 +390,17 @@ test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', (
   const flat = css.replace(/\s*\n\s*/g, '');
   assert.ok(/\.fiezel-btn\{[^}]*min-height:44px/.test(flat), 'tombol dasar harus 44px');
   const brand = css.slice(css.indexOf('FIEZEL brand: Percik'));
-  assert.ok(!/filter:|hue-rotate|scaleX\(|scaleY\(/.test(brand), 'maskot tidak boleh diwarnai ulang atau direntangkan');
+  // m025-80: aturan lama "maskot tidak boleh diwarnai ulang atau direntangkan" sudah tidak
+  // punya sasaran - maskotnya dihapus. Yang dijaga sekarang: lambang langkah tetap ikon
+  // vektor dari set yang sama, dan tidak ada aset raster maskot yang diam-diam kembali.
+  assert.ok(/\.fiezel-step-art\{/.test(brand.replace(/\s+/g, '')),
+    'lambang langkah harus punya gayanya sendiri');
+  assert.ok(!/fiezel-mascot|fiezel-hero\.png|fiezel-belajar\.png|fiezel-mengintip\.png/.test(css),
+    'aset maskot tidak boleh dirujuk lagi dari stylesheet');
 });
 
-test('gate maskot dan onboarding sudah terdaftar di CI', () => {
+test('gate onboarding sudah terdaftar di CI', () => {
   const workflow = fs.readFileSync('./.github/workflows/quality.yml', 'utf8');
-  assert.ok(/node brand-mascot-test\.js/.test(workflow));
   assert.ok(/node onboarding-test\.js/.test(workflow));
 });
 
