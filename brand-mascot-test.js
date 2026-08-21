@@ -18,74 +18,104 @@ function test(name, fn) {
 
 const css = fs.readFileSync('./style.css', 'utf8');
 
-test('warna maskot diambil dari spesifikasi, bukan dikira-kira', () => {
-  // Nilai ini ada di FIEZEL_Complete_Design_Specification. Kalau merek berubah, ia harus
-  // berubah di satu tempat dan gate ini yang menahannya tetap sinkron.
-  assert.strictEqual(mascot.PALETTE.maroon, '#7a1e2e');
-  assert.strictEqual(mascot.PALETTE.maroonDark, '#4a1119');
-  assert.strictEqual(mascot.PALETTE.cream, '#fdf3e2');
+test('palet mengikuti handoff resmi', () => {
+  assert.strictEqual(mascot.PALETTE.primary, '#7a1e2e');
+  assert.strictEqual(mascot.PALETTE.deep, '#4a1119');
+  assert.strictEqual(mascot.PALETTE.cream, '#fdf3e8');
   assert.strictEqual(mascot.PALETTE.gold, '#d9a441');
-  assert.strictEqual(mascot.PALETTE.blush, '#f3e0e0');
 });
 
-test('ciri pengenal karakter benar-benar ada di vektornya', () => {
-  const svg = mascot.svg({ pose: 'wave' });
-  // Ini yang membuat karakternya dikenali; kalau salah satu hilang, yang tersisa hanya
-  // "kucing merah" generik.
-  assert.ok(/class="fzm-ear-left"/.test(svg), 'telinga terlipat');
-  assert.ok(/class="fzm-ear-right"/.test(svg), 'telinga tegak');
-  assert.ok(/class="fzm-tail"/.test(svg), 'ekor lebat');
-  assert.ok(/class="fzm-star"/.test(svg), 'bintang emas');
-  assert.ok(/class="fzm-bandana"/.test(svg), 'bandana');
-  assert.ok(/>F<\/text>/.test(svg), 'liontin huruf F');
-  assert.ok(/class="fzm-lids"/.test(svg), 'kelopak mata terpisah supaya bisa berkedip');
+test('maskot memakai KARYA ASLI, bukan gambar ulang', () => {
+  // Versi m025-75 menuliskan ulang karakter ini sebagai jalur SVG buatan sendiri dan ditolak
+  // OWNER. Gate ini menahan agar jalan itu tidak diambil lagi: yang boleh tampil hanyalah
+  // berkas gambar dari sheet handoff.
+  const html = mascot.markup({ pose: 'hero' });
+  assert.ok(/^<img /.test(html), 'maskot harus berupa gambar aset, bukan markup gambar tangan');
+  assert.ok(!/<path|<svg|<circle|<ellipse/.test(html), 'tidak boleh ada jalur SVG buatan sendiri');
+  assert.ok(/src="\.\/assets\/brand\/fiezel-hero\.png"/.test(html));
 });
 
-test('SVG bisa dipakai di banyak ukuran tanpa jadi kabur', () => {
-  const svg = mascot.svg({ size: 48 });
-  assert.ok(/viewBox="0 0 240 240"/.test(svg), 'viewBox tetap, itu inti vektor');
-  assert.ok(/width="48" height="48"/.test(svg));
-  assert.ok(!/<image|xlink:href|url\(http/.test(svg), 'tidak boleh menarik aset dari luar');
+test('setiap aset yang didaftarkan benar-benar ada dan bukan berkas kosong', () => {
+  for (const file of mascot.files()) {
+    const path = './' + file.replace(/^\.\//, '');
+    assert.ok(fs.existsSync(path), 'aset hilang: ' + file);
+    const size = fs.statSync(path).size;
+    assert.ok(size > 4000, `aset ${file} hanya ${size} byte - kemungkinan besar rusak atau kosong`);
+  }
 });
 
-test('id gradien tidak bertabrakan saat dua maskot tampil bersamaan', () => {
-  // Dua SVG dengan id sama akan saling mencuri gradien - salah satunya berubah warna.
-  const a = mascot.svg({ pose: 'wave', idPrefix: 'a' });
-  const b = mascot.svg({ pose: 'study', idPrefix: 'b' });
-  assert.ok(a.indexOf('id="a-fur"') !== -1 && b.indexOf('id="b-fur"') !== -1);
-  assert.strictEqual(a.indexOf('id="b-fur"'), -1);
+test('ukuran yang didaftarkan cocok dengan dimensi berkas sebenarnya', () => {
+  // Rasio dipakai untuk memesan ruang sebelum gambar termuat. Kalau angkanya melenceng dari
+  // berkasnya, layar akan tersentak saat gambar masuk.
+  for (const [pose, art] of Object.entries(mascot.POSES)) {
+    const buf = fs.readFileSync('./assets/brand/' + art.file);
+    assert.strictEqual(buf.toString('ascii', 12, 16), 'IHDR', pose + ': bukan PNG yang sah');
+    assert.strictEqual(buf.readUInt32BE(16), art.width, pose + ': lebar tidak cocok');
+    assert.strictEqual(buf.readUInt32BE(20), art.height, pose + ': tinggi tidak cocok');
+  }
 });
 
-test('pose asing jatuh ke idle, bukan menghasilkan kelas ngawur', () => {
-  assert.strictEqual(mascot.normalizePose('ngawur'), 'idle');
-  assert.strictEqual(mascot.normalizePose('CHEER'), 'cheer');
-  assert.ok(/fiezel-mascot-idle/.test(mascot.svg({ pose: '<script>' })));
-  assert.ok(!/<script>/.test(mascot.svg({ pose: '<script>' })), 'pose tidak boleh bocor ke markup');
+test('aset ikut dibawa ke shell offline', () => {
+  // Maskot yang hilang saat offline membuat splash tampil kosong justru pada saat aplikasi
+  // paling perlu terlihat utuh.
+  const sw = fs.readFileSync('./sw.js', 'utf8');
+  for (const file of mascot.files()) {
+    assert.ok(sw.indexOf(file.replace('./', './')) !== -1, 'belum masuk daftar cache: ' + file);
+  }
 });
 
-test('judul yang disuntikkan pengguna tidak bisa menyuntik markup', () => {
-  const svg = mascot.svg({ title: '"><script>alert(1)</script>' });
-  assert.ok(!/<script>/.test(svg), 'markup asing harus lolos escape');
-  assert.ok(/aria-label="/.test(svg));
+test('rasio asli dipertahankan, sesuai aturan produksi handoff', () => {
+  // Handoff melarang merentangkan karakter ini. Tingginya karena itu selalu dihitung, tidak
+  // pernah diminta terpisah.
+  const html = mascot.markup({ pose: 'hero', width: 120 });
+  const w = Number(/width="(\d+)"/.exec(html)[1]);
+  const h = Number(/height="(\d+)"/.exec(html)[1]);
+  const art = mascot.POSES.hero;
+  assert.strictEqual(w, 120);
+  assert.strictEqual(h, Math.round(120 * (art.height / art.width)));
+  assert.ok(Math.abs((w / h) - (art.width / art.height)) < 0.01, 'rasio berubah - karakter terentang');
+});
+
+test('pose asing jatuh ke hero, bukan menghasilkan tautan rusak', () => {
+  assert.strictEqual(mascot.normalizePose('ngawur'), 'hero');
+  assert.strictEqual(mascot.normalizePose('CODING'), 'coding');
+  const html = mascot.markup({ pose: '../../etc/passwd' });
+  assert.ok(/fiezel-hero\.png/.test(html), 'jalur asing tidak boleh sampai ke src');
+});
+
+test('teks alternatif yang disuntikkan tidak bisa menyuntik markup', () => {
+  const html = mascot.markup({ alt: '"><script>alert(1)</script>' });
+  assert.ok(!/<script>/.test(html));
 });
 
 test('maskot dekoratif tidak dibacakan dua kali oleh pembaca layar', () => {
-  // Di splash, teksnya sudah menjelaskan segalanya; gambarnya tidak perlu ikut dibacakan.
-  const decorative = mascot.svg({ decorative: true });
-  assert.ok(/aria-hidden="true"/.test(decorative));
-  assert.ok(!/<title>/.test(decorative));
-  const meaningful = mascot.svg({ title: 'Maskot FIEZEL melambai' });
-  assert.ok(/role="img"/.test(meaningful) && /<title>/.test(meaningful));
+  const decorative = mascot.markup({ decorative: true });
+  assert.ok(/aria-hidden="true"/.test(decorative) && /alt=""/.test(decorative));
+  const meaningful = mascot.markup({ pose: 'belajar' });
+  assert.ok(/alt="Maskot FIEZEL sedang membaca"/.test(meaningful), meaningful);
 });
 
-test('animasi berhenti saat perangkat meminta kurangi gerak', () => {
-  // Blok global di style.css memangkas durasi semua animasi; gate ini memastikan animasi
-  // maskot memang animasi CSS, sehingga ikut terpangkas - bukan SMIL yang lolos dari aturan itu.
-  assert.ok(/@keyframes fzm-tail/.test(css) && /@keyframes fzm-wave/.test(css));
-  assert.ok(/prefers-reduced-motion:reduce\)\s*\{\s*\*\{[^}]*animation-duration/.test(css.replace(/\s*\n\s*/g, '')),
+test('animasi tetap CSS supaya tunduk pada kurangi-gerak', () => {
+  assert.ok(/@keyframes fzm-float/.test(css) && /@keyframes fzm-hop/.test(css));
+  const flat = css.replace(/\s+/g, ' ');
+  assert.ok(flat.indexOf('prefers-reduced-motion:reduce){ *{') !== -1 || /prefers-reduced-motion: ?reduce\)\s*\{\s*\*/.test(flat),
     'blok global kurangi-gerak harus tetap ada');
-  const svg = mascot.svg({ pose: 'wave' });
-  assert.ok(!/<animate|<animateTransform/.test(svg), 'animasi SMIL tidak tunduk pada kurangi-gerak');
+  // Handoff melarang mewarnai ulang dan merentangkan; animasi hanya boleh menggeser,
+  // memiringkan sedikit, dan menskala seragam.
+  const brand = css.slice(css.indexOf('FIEZEL brand: maskot resmi'));
+  assert.ok(!/filter:|hue-rotate|scaleX\(|scaleY\(/.test(brand), 'maskot tidak boleh diwarnai ulang atau direntangkan');
+});
+
+test('tidak ada teks anotasi sheet yang ikut terbawa ke aset', () => {
+  // Potongan awal sempat membawa keterangan seperti "Belajar" dan judul baris
+  // "ACTIVITIES / POSES" ke dalam gambar. OWNER menolaknya, dan memang benar: itu catatan
+  // untuk desainer, bukan bagian karakter. Ukuran aset yang rapat adalah buktinya - potongan
+  // yang masih memuat keterangan selalu jauh lebih tinggi daripada karakternya.
+  for (const [pose, art] of Object.entries(mascot.POSES)) {
+    if (pose === 'hero' || pose === 'mark' || pose === 'icon') continue;
+    const ratio = art.height / art.width;
+    assert.ok(ratio < 1.6, `${pose} terlalu jangkung (${art.width}x${art.height}) - kemungkinan masih membawa teks keterangan`);
+  }
 });
 
 test('splash menampilkan isi yang diminta spesifikasi Step 0', () => {
