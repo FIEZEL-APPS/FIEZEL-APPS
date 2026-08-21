@@ -738,7 +738,7 @@ function render(){const __renderStartedAt=Date.now();try{return renderInner()}fi
 function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
 const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom','library']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
-// m025-85: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
+// m025-84: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
 // seluruh aplikasi hidup di SATU entri riwayat - gestur swipe-back tidak punya tujuan dan
 // tombol kembali sistem justru menutup PWA. Sekarang setiap navigasi maju mendorong satu
 // entri (lihat features/ui/fiezel-back-nav.js). Entri didorong SEBELUM swap dijalankan,
@@ -1369,7 +1369,7 @@ let modalEpoch=0,aiRequestSeq=0,modalCloseTimer=null,modalOpen=false;
 // m025-80 OWNER: SFX transisi antarmuka. Dibungkus supaya modul yang belum termuat atau
 // audio yang diblokir browser tidak pernah bisa menjatuhkan navigasi.
 function uiSfx(name){try{return self.FiezelUiSfx?.play?.(name,self)===true}catch{return false}}
-// m025-85: modal adalah lapisan DI ATAS view, jadi ia mendapat entri riwayatnya sendiri dan
+// m025-84: modal adalah lapisan DI ATAS view, jadi ia mendapat entri riwayatnya sendiri dan
 // tekanan kembali menutupnya lebih dulu, baru sesudahnya memindahkan view. Hanya modal yang
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
 // openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
@@ -1449,7 +1449,7 @@ function warmNeuralVoice(){
 warmNeuralVoice();
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
-// m025-85: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
+// m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){
   try{
