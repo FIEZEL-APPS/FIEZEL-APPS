@@ -1,6 +1,6 @@
 # FIEZEL — Audit kontras universal + swipe-back (handoff m025-85)
 
-**Tanggal:** 2026-08-21 · **Build saat audit:** m025-84 · **Cabang:** `claude/splash-white-flash-sfx-y3hx7e`
+**Tanggal:** 2026-08-21 · **Build saat audit:** m025-84 · **Rilis kontras berikutnya:** m025-85 · **Cabang:** `claude/splash-white-flash-sfx-y3hx7e`
 
 Dokumen ini adalah **temuan lengkap**, bukan ringkasan. Ditulis supaya pekerjaan bisa
 dilanjutkan dari nol oleh siapa pun tanpa mengulang investigasinya.
@@ -282,7 +282,7 @@ Playwright); pakai `contrast-test.js` statis (langkah 5) sebagai gerbang CI.
 
 ---
 
-## 5. Bug #2 — swipe-back
+## 5. Bug #2 — swipe-back (dirilis bersama m025-84)
 
 **Akar masalah:** `app.js:739-741`. `function go(v)` hanya mengubah `state.view` lalu
 render ulang. Tidak pernah ada `history.pushState`, jadi riwayat browser cuma punya satu
@@ -299,7 +299,9 @@ menyediakan swipe-back di mode standalone) — dengan syarat batal kalau gestur 
 dalam elemen yang bisa digulir horizontal, dan tidak boleh membuat murid lolos dari
 gerbang notifikasi/akun.
 
-**Status saat laporan ini ditulis: belum selesai, belum digabung.**
+**Pembaruan:** sudah selesai dan digabung ke PR #128, berangkat sebagai bagian dari rilis
+`m025-84` yang sama - bukan rilis terpisah, karena gate A7/A11 menuntut penanda naik tepat +1
+dari `main`. Nomor `m025-85` disediakan untuk perbaikan kontras di dokumen ini.
 
 ---
 

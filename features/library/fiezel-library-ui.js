@@ -21,7 +21,7 @@
 
   var doc = root.document;
   var PROGRESS_KEY = 'fiezel-library-progress-v1';
-  // m025-85: pembaca buku persis layar yang disebut owner - "dari menu terus menuju ke fitur
+  // m025-84: pembaca buku persis layar yang disebut owner - "dari menu terus menuju ke fitur
   // audiobook, ketika ingin kembali dan swipe back, itu tidak berfungsi". Ia bukan view
   // tersendiri di app.js (state.view tetap 'library'), jadi tanpa entri riwayatnya sendiri ia
   // tidak akan pernah terlihat oleh gestur kembali. Nama lapisan ini yang dipegang riwayat.
