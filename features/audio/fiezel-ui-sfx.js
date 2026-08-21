@@ -212,7 +212,11 @@
     // Kurangi-gerak adalah permintaan untuk lebih sedikit kejutan sensorik; bunyi transisi
     // termasuk di dalamnya.
     if (!ready(target, false)) return false;
-    try { schedule(voice, 0.34); return true; } catch (_) { return false; }
+    // OWNER: "sfx saat menekan tombol itu terlalu keras, turunkan 70%". Level lama 0.34
+    // dikali 0.3 (turun 70%, sisa 30%) - motif pembuka splash TIDAK ikut turun, sebab
+    // keluhannya khusus soal SFX tekan tombol yang terus-menerus terdengar tiap ketukan,
+    // bukan sapaan satu kali di splash.
+    try { schedule(voice, 0.102); return true; } catch (_) { return false; }
   }
 
   /**

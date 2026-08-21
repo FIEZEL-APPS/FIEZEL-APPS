@@ -3,7 +3,7 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='m025-82-merge-audit-ux-with-perf-20260821-1';
+const SW_REV='m025-83-puter-login-coop-fix-20260821-1';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -24,15 +24,24 @@ const shellScope=String(self.registration?.scope||`${self.location.origin}/`);
 const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).href));
 const isShellRequest=request=>request?.mode==='navigate'||shellUrls.has(new URL(request.url).href);
 
-// Cross-origin policy is intentionally engine-aware. Chromium-family browsers can
-// keep COOP:same-origin and use the isolation-capable Puter auth path. WebKit uses
-// Puter's popup/postMessage auth path on the affected PWA, so navigation responses
-// use same-origin-allow-popups to preserve the opener relationship. COEP remains
-// credentialless, and third-party Puter traffic is never reconstructed by this SW.
-const workerUa=String(self.navigator?.userAgent||'');
-const WEBKIT_POPUP_COMPAT=/AppleWebKit/i.test(workerUa)&&!/(?:Chrome|Chromium|Edg|OPR|SamsungBrowser)\//i.test(workerUa);
+// m025-83 OWNER: "puter jangan dialihkan ke web lagi, itu sangat mengganggu". This USED to
+// be engine-aware: Chromium got strict COOP:same-origin (crossOriginIsolated=true, so the
+// neural voice WASM runtime could run multi-threaded), WebKit got same-origin-allow-popups
+// (preserving the Puter sign-in popup's window.opener channel). The theory was that Chromium
+// had an "isolation-capable" Puter auth path that didn't need the opener - it doesn't. Strict
+// COOP:same-origin severs window.opener for ANY cross-origin popup regardless of engine, so
+// on Chromium (the majority of installs) the Puter sign-in popup could never message its
+// result back to the app and fell through to a full top-level navigation instead - exactly
+// the "redirected to the web" escape the owner is reporting. Login now wins over the
+// multi-thread optimization: every engine gets same-origin-allow-popups on navigation, so
+// the popup's opener channel survives and sign-in can complete without leaving the app.
+// This is a safe trade, not a regression risk: fiezel-neural-voice-bootstrap.js already
+// treats crossOriginIsolated as optional (`numThreads=1`/`wasmPolicy='single-thread'` when
+// it's false) because WebKit has run without it since m025-79 - Chromium now takes the same
+// already-proven fallback path instead of a new, untested one. COEP stays credentialless,
+// and third-party Puter traffic is never reconstructed by this SW.
 const COEP_POLICY='credentialless';
-function openerPolicyFor(request){return request?.mode==='navigate'&&WEBKIT_POPUP_COMPAT?'same-origin-allow-popups':'same-origin'}
+function openerPolicyFor(request){return request?.mode==='navigate'?'same-origin-allow-popups':'same-origin'}
 function withCoopCoep(response,request){
   if(!response)return response;
   const headers=new Headers(response.headers);
