@@ -1,30 +1,34 @@
 /**
- * FIEZEL — SFX transisi antarmuka.
+ * FIEZEL — identitas bunyi: motif merek dan SFX transisi.
  *
- * m025-80 OWNER: "short UI transition SFX yang sangat elegan dan harus authentic fiezel".
+ * m025-81 OWNER: "nadanya kurang dapat dan tidak membuat user akan mengingat, karena tidak
+ * khas dan tidak bagus."
  *
- * "Authentic FIEZEL" di sini bukan selera, melainkan aturan yang bisa diperiksa: setiap
- * bunyi di modul ini dibangun dari DNA yang sama dengan nada pembuka merek di
- * fiezel-splash.js, sehingga seluruh aplikasi terdengar seperti satu alat, bukan kumpulan
- * bip yang kebetulan berkumpul.
+ * Versi sebelumnya memakai F4->C5: kuint naik polos, interval paling umum di antarmuka
+ * mana pun, dibunyikan dengan sinus murni. Tidak ada kontur, tidak ada ritme, tidak ada
+ * timbre - tidak ada yang bisa diingat. Versi ini dirancang dari motif, bukan dari nada
+ * lepas, dengan tiga hal yang membuat sebuah motif melekat:
  *
- * Tiga aturan DNA itu:
+ * 1. KONTUR. Motifnya F4 -> A4 -> D5: terts besar naik, lalu kuart naik; rentang totalnya
+ *    sekst besar. Nada penutup D adalah derajat KEENAM dari F mayor, bukan tonika - jadi
+ *    ia berbunyi terbuka dan menggantung, seperti kalimat yang belum selesai. Itu disengaja:
+ *    aplikasi belajar tidak sedang mengucapkan titik. F dipilih sebagai pusat karena F
+ *    adalah huruf mereknya sendiri.
+ * 2. RITME TIMPANG. Dua langkah cepat lalu satu pendaratan panjang - "ta-ta-TAAA".
+ *    Jarak yang rata terdengar seperti bip; jarak yang timpang bisa ditirukan orang.
+ * 3. TIMBRE BERTUBUH. Bukan sinus murni: ada ketukan palu di serangan, harmonik ketiga
+ *    yang memberi kesan kayu, satu parsial taklaras untuk kilau logam, lapisan yang sedikit
+ *    dilaraskan-lepas untuk kehangatan, dan lengkung nada kecil saat dipukul - seperti bilah
+ *    yang benar-benar dipukul, bukan osilator yang dinyalakan.
  *
- * 1. SATU TIMBRE. Semua memakai "bel" yang sama: satu sinus dasar plus satu harmonik oktaf
- *    yang jauh lebih pelan dan meluruh lebih cepat. Itulah yang membedakan bunyi bel dari
- *    bip sinus polos, dan itu pula yang dipakai nada pembuka.
- * 2. SATU TANGGA NADA. F mayor — F, A, C — dengan F sebagai pusat, karena F adalah huruf
- *    mereknya sendiri. Tidak ada nada di luar tangga ini, jadi dua bunyi yang kebetulan
- *    bertumpuk tidak akan pernah sumbang.
- * 3. PENDEK DAN LEMBUT. Transisi antarmuka terjadi puluhan kali per sesi; bunyi yang
- *    panjang atau keras berubah dari elegan menjadi mengganggu pada kali kesepuluh. Semua
- *    di bawah 220ms, serangannya diayun (bukan dipatuk) supaya tidak terdengar mengklik.
+ * Setiap SFX transisi adalah POTONGAN dari motif itu, bukan bunyi baru. Jadi seluruh
+ * aplikasi terdengar sebagai kutipan dari satu kalimat yang sama.
  *
  * Dua batas yang dijaga:
- * - Preferensi murid dihormati. `feedbackSounds: false` mematikan seluruh modul ini.
- * - Browser memblokir audio sebelum ada sentuhan pengguna. Konteks karena itu dibuat malas
- *   pada bunyi pertama dan kegagalan ditelan diam-diam - antarmuka tidak pernah rusak
- *   hanya karena suaranya tidak boleh berbunyi.
+ * - Preferensi murid dihormati; `feedbackSounds: false` mematikan seluruh modul ini.
+ * - Browser memblokir audio sebelum ada sentuhan pengguna. Konteks dibuat malas pada bunyi
+ *   pertama dan kegagalan ditelan diam-diam - antarmuka tidak pernah rusak hanya karena
+ *   suaranya tidak boleh berbunyi.
  */
 (function (root, factory) {
   var api = factory();
@@ -33,45 +37,46 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // Tangga nada F mayor. Nama dipakai di definisi bunyi supaya niatnya terbaca sebagai
-  // musik, bukan sebagai angka ajaib.
   var N = Object.freeze({
-    F3: 174.61, A3: 220.00, C4: 261.63,
-    F4: 349.23, A4: 440.00, C5: 523.25,
-    F5: 698.46, A5: 880.00
+    F2: 87.31, F3: 174.61, A3: 220.00, D4: 293.66,
+    F4: 349.23, A4: 440.00, C5: 523.25, D5: 587.33, F5: 698.46
   });
 
-  /**
-   * Resep bunyi. Setiap entri: daftar [nada, jeda detik, panjang detik, kekerasan].
-   * Semuanya selesai di bawah 220ms kecuali `celebrate`, yang memang ditandai sebagai
-   * momen, bukan transisi.
-   */
+  // Motif merek. [nada, mulai (detik), panjang (detik)]
+  var MOTIF = Object.freeze([
+    [N.F4, 0.000, 0.34],
+    [N.A4, 0.105, 0.34],
+    [N.D5, 0.210, 1.15]
+  ]);
+
+  // SFX transisi — semuanya potongan dari MOTIF.
   var VOICES = Object.freeze({
-    // Sentuhan ringan — satu ketuk bel tinggi yang nyaris tidak terasa.
-    tap:       [[N.C5, 0.000, 0.075, 0.16]],
-    // Pindah halaman — kuint naik, gema kecil dari nada pembuka merek.
-    nav:       [[N.F4, 0.000, 0.110, 0.20], [N.C5, 0.050, 0.130, 0.17]],
-    // Panel/lembar terbuka — naik, terbuka.
-    open:      [[N.A4, 0.000, 0.110, 0.19], [N.F5, 0.055, 0.150, 0.16]],
-    // Panel/lembar tertutup — kebalikannya, turun dan mereda.
-    close:     [[N.F5, 0.000, 0.100, 0.16], [N.A4, 0.055, 0.140, 0.14]],
-    // Sakelar — satu nada tengah, netral.
-    toggle:    [[N.A4, 0.000, 0.090, 0.17]],
-    // Momen kecil (target harian tercapai, langkah selesai) — trinada F mayor naik.
-    celebrate: [[N.F4, 0.000, 0.150, 0.20], [N.A4, 0.070, 0.170, 0.18], [N.C5, 0.140, 0.240, 0.16]]
+    tap:       [[N.A4, 0.000, 0.15]],                          // satu nada tengah motif
+    toggle:    [[N.F4, 0.000, 0.17]],                          // nada jangkar motif
+    nav:       [[N.F4, 0.000, 0.20], [N.A4, 0.075, 0.26]],     // dua langkah pertama
+    open:      [[N.A4, 0.000, 0.20], [N.D5, 0.075, 0.30]],     // lompatan penutup motif
+    close:     [[N.D5, 0.000, 0.18], [N.A4, 0.075, 0.26]],     // lompatan itu dibalik
+    celebrate: [[N.F4, 0.000, 0.26], [N.A4, 0.090, 0.26],
+                [N.D5, 0.180, 0.34], [N.F5, 0.290, 0.85]]      // motif + oktaf penutup
   });
 
-  var ctx = null;
-  var bus = null;
-  var enabled = true;
+  // Susunan parsial satu bilah. Perbandingan inilah yang membuatnya berbunyi berkayu-
+  // berlogam alih-alih seperti bip: [pengali frekuensi, kekerasan, pengali panjang].
+  // 4.19x sengaja TAKLARAS - itu kilau logam yang cepat hilang.
+  var PARTIALS = [[1.00, 1.00, 1.00], [2.00, 0.26, 0.72],
+                  [3.00, 0.13, 0.50], [4.19, 0.07, 0.26]];
+  var DETUNE = 1.0029;   // +5 sen, lapisan kehangatan
+  var DECAY_FLOOR = 0.015; // exp(-4.2): titik akhir peluruhan eksponensial
+
+  var ctx = null, master = null, tailIn = null, noiseBuf = null, enabled = true;
 
   function preferencesAllow(env) {
     try {
-      var state = env && typeof env.__getFiezelState === 'function' ? env.__getFiezelState() : null;
-      var prefs = state && state.preferences;
-      // Bunyi transisi ikut sakelar "Suara jawaban" yang sudah ada, bukan sakelar baru:
-      // menambah satu sakelar lagi untuk hal sejenis hanya memperumit Pengaturan.
-      return !prefs || prefs.feedbackSounds !== false;
+      var s = env && typeof env.__getFiezelState === 'function' ? env.__getFiezelState() : null;
+      var p = s && s.preferences;
+      // Ikut sakelar "Suara jawaban" yang sudah ada - menambah sakelar baru untuk hal
+      // sejenis hanya memperumit Pengaturan.
+      return !p || p.feedbackSounds !== false;
     } catch (_) { return true; }
   }
 
@@ -90,66 +95,147 @@
       var Ctx = env.AudioContext || env.webkitAudioContext;
       if (!Ctx) return false;
       ctx = new Ctx();
-      bus = ctx.createGain();
-      // Kepala volume dijaga rendah: ini lapisan latar, bukan bunyi utama.
-      bus.gain.value = 0.5;
-      bus.connect(ctx.destination);
-      return true;
-    } catch (_) { return false; }
-  }
 
-  /**
-   * Satu ketuk bel: sinus dasar + harmonik oktaf yang lebih pelan dan lebih cepat hilang.
-   * Serangannya diayun 8ms, bukan seketika - itu yang membuat bunyinya terdengar diayun,
-   * bukan diklik.
-   */
-  function bell(freq, at, dur, level) {
-    [[freq, level, dur], [freq * 2, level * 0.26, dur * 0.5]].forEach(function (p) {
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(p[0], at);
-      gain.gain.setValueAtTime(0.0001, at);
-      gain.gain.exponentialRampToValueAtTime(Math.max(p[1], 0.0002), at + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, at + p[2]);
-      osc.connect(gain);
-      gain.connect(bus);
-      osc.start(at);
-      osc.stop(at + p[2] + 0.02);
-    });
-  }
+      master = ctx.createGain();
+      master.gain.value = 0.5;
+      master.connect(ctx.destination);
 
-  /**
-   * Membunyikan satu SFX. Selalu aman dipanggil: nama asing, audio terblokir, preferensi
-   * mati, atau kurangi-gerak semuanya berakhir sebagai `false`, bukan sebagai kesalahan.
-   */
-  function play(name, env) {
-    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
-    if (!enabled) return false;
-    var voice = VOICES[name];
-    if (!voice) return false;
-    // Kurangi-gerak adalah permintaan untuk lebih sedikit kejutan sensorik; bunyi transisi
-    // termasuk di dalamnya. Umpan balik jawaban di app.js tetap berjalan - itu informasi,
-    // bukan hiasan.
-    if (reducedMotion(target)) return false;
-    if (!preferencesAllow(target)) return false;
-    if (!ensureContext(target)) return false;
-    try {
-      var t0 = ctx.currentTime + 0.005;
-      for (var i = 0; i < voice.length; i++) {
-        bell(voice[i][0], t0 + voice[i][1], voice[i][2], voice[i][3]);
+      // Ekor ruang: satu simpul tunda dengan umpan balik teredam. Memberi kesan bilah
+      // dipukul di dalam ruangan, bukan di ruang hampa - itu yang membuatnya terdengar
+      // mahal, dan jauh lebih murah daripada menjadwalkan salinan nada berulang kali.
+      tailIn = ctx.createGain();
+      tailIn.gain.value = 0.34;
+      var delay = ctx.createDelay(0.5);
+      delay.delayTime.value = 0.085;
+      var damp = ctx.createBiquadFilter();
+      damp.type = 'lowpass';
+      damp.frequency.value = 3200;
+      var fb = ctx.createGain();
+      fb.gain.value = 0.30;
+      tailIn.connect(delay);
+      delay.connect(damp);
+      damp.connect(fb);
+      fb.connect(delay);      // lingkar umpan balik
+      delay.connect(master);
+
+      // Derau untuk ketukan palu, dibuat sekali lalu dipakai ulang.
+      var len = Math.floor(ctx.sampleRate * 0.02);
+      noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var d = noiseBuf.getChannelData(0), prev = 0;
+      for (var i = 0; i < len; i++) {
+        prev = prev * 0.72 + (Math.random() * 2 - 1) * 0.28; // tapis lolos-bawah sederhana
+        d[i] = prev;
       }
       return true;
     } catch (_) { return false; }
   }
 
-  function setEnabled(value) { enabled = value !== false; return enabled; }
+  /** Ketukan palu: derau sangat pendek. Otak mengenali serangan sebelum mengenali nada. */
+  function strike(at, level) {
+    var src = ctx.createBufferSource();
+    src.buffer = noiseBuf;
+    var bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 2400;
+    bp.Q.value = 0.9;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(level, at);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + 0.014);
+    src.connect(bp); bp.connect(g); g.connect(master);
+    src.start(at); src.stop(at + 0.02);
+  }
+
+  /** Satu bilah dipukul: empat parsial, dua lapisan laras, lengkung nada saat serangan. */
+  function mallet(freq, at, dur, level) {
+    for (var p = 0; p < PARTIALS.length; p++) {
+      var mult = PARTIALS[p][0], amp = PARTIALS[p][1] * level, dscale = PARTIALS[p][2];
+      for (var k = 0; k < 2; k++) {
+        var detune = k ? DETUNE : 1;
+        var a = k ? amp * 0.62 : amp;
+        var d = dur * dscale;
+        if (a < 0.0005) continue;
+        var osc = ctx.createOscillator();
+        var g = ctx.createGain();
+        osc.type = 'sine';
+        var f = freq * mult * detune;
+        // Lengkung nada: mulai ~1,2% di atas lalu turun dalam 40 ms - seperti bilah nyata.
+        osc.frequency.setValueAtTime(f * 1.012, at);
+        osc.frequency.exponentialRampToValueAtTime(f, at + 0.040);
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.linearRampToValueAtTime(a, at + 0.004);            // serangan cepat
+        g.gain.exponentialRampToValueAtTime(a * DECAY_FLOOR, at + d); // peluruhan eksponensial
+        g.gain.linearRampToValueAtTime(0.0001, at + d + 0.02);
+        osc.connect(g);
+        g.connect(master);
+        if (p === 0 && k === 0) g.connect(tailIn);   // hanya dasar yang masuk ekor ruang
+        osc.start(at);
+        osc.stop(at + d + 0.05);
+      }
+    }
+  }
+
+  function schedule(notes, level, opts) {
+    var t0 = ctx.currentTime + 0.005;
+    for (var i = 0; i < notes.length; i++) {
+      var freq = notes[i][0], at = t0 + notes[i][1], dur = notes[i][2];
+      mallet(freq, at, dur, level);
+      strike(at, level * 0.30);
+    }
+    if (opts && opts.sub) {
+      // Nada rendah di bawah pendaratan: bobot tanpa menambah nada baru ke motif.
+      var osc = ctx.createOscillator(), g = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(opts.sub[0], t0 + opts.sub[1]);
+      g.gain.setValueAtTime(0.0001, t0 + opts.sub[1]);
+      g.gain.linearRampToValueAtTime(level * 0.34, t0 + opts.sub[1] + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + opts.sub[1] + opts.sub[2]);
+      osc.connect(g); g.connect(master);
+      osc.start(t0 + opts.sub[1]); osc.stop(t0 + opts.sub[1] + opts.sub[2] + 0.02);
+    }
+  }
+
+  function ready(env, ignoreMotion) {
+    if (!enabled) return false;
+    if (!ignoreMotion && reducedMotion(env)) return false;
+    if (!preferencesAllow(env)) return false;
+    return ensureContext(env);
+  }
+
+  /**
+   * Membunyikan satu SFX transisi. Selalu aman dipanggil: nama asing, audio terblokir,
+   * preferensi mati, atau kurangi-gerak semuanya berakhir sebagai `false`.
+   */
+  function play(name, env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var voice = VOICES[name];
+    if (!voice) return false;
+    // Kurangi-gerak adalah permintaan untuk lebih sedikit kejutan sensorik; bunyi transisi
+    // termasuk di dalamnya.
+    if (!ready(target, false)) return false;
+    try { schedule(voice, 0.34); return true; } catch (_) { return false; }
+  }
+
+  /**
+   * Motif merek penuh untuk splash. Berbunyi juga saat kurangi-gerak aktif: ini sapaan
+   * sekali per peluncuran, bukan bunyi berulang, dan ia menggantikan animasi yang justru
+   * dimatikan di modus itu.
+   */
+  function playMotif(env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    if (!ready(target, true)) return false;
+    try { schedule(MOTIF, 0.52, { sub: [N.F2, 0.210, 1.05] }); return true; }
+    catch (_) { return false; }
+  }
+
+  function setEnabled(v) { enabled = v !== false; return enabled; }
 
   return {
     NOTES: N,
+    MOTIF: MOTIF,
     VOICES: VOICES,
     names: function () { return Object.keys(VOICES); },
     play: play,
+    playMotif: playMotif,
     setEnabled: setEnabled,
     isEnabled: function () { return enabled; }
   };
