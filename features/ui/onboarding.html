@@ -95,25 +95,28 @@
   }
 
   /* ---------- mascot: Percik the cat ---------- */
-  .mascot-holder { position: relative; width: 148px; height: 148px; flex: none; }
+  .mascot-holder { position: relative; width: 148px; height: 168px; flex: none; }
   .mascot-shadow { position: absolute; bottom: -4px; left: 50%; width: 78px; height: 14px; margin-left: -39px; background: radial-gradient(ellipse, rgba(44,27,28,0.2), transparent 70%); animation: shadowPulse 2.6s ease-in-out infinite; }
   :root:not([data-theme="light"]) .mascot-shadow { @media (prefers-color-scheme: dark) { background: radial-gradient(ellipse, rgba(0,0,0,0.5), transparent 70%); } }
   :root[data-theme="dark"] .mascot-shadow { background: radial-gradient(ellipse, rgba(0,0,0,0.5), transparent 70%); }
-  .mascot { width: 100%; height: 100%; animation: mascotFloat 2.8s ease-in-out infinite; transform-origin: 50% 100%; }
+  .mascot { width: 100%; height: 100%; overflow: visible; animation: mascotFloat 2.8s ease-in-out infinite; transform-origin: 50% 100%; }
   @keyframes mascotFloat { 0%, 100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-8px) rotate(1.2deg); } }
   @keyframes shadowPulse { 0%, 100% { transform: scaleX(1); opacity: 0.7; } 50% { transform: scaleX(0.82); opacity: 0.4; } }
-  .mascot-eye { animation: blink 4.5s ease-in-out infinite; }
-  .mascot-eye-l { transform-origin: 78px 110px; }
-  .mascot-eye-r { transform-origin: 122px 110px; animation-delay: 0.05s; }
+  .mascot-eye { animation: blink 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .mascot-eye-r { animation-delay: 0.12s; }
   @keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.12); } }
-  .fold-ear { animation: earWiggle 3.4s ease-in-out infinite; transform-origin: 150px 64px; }
-  @keyframes earWiggle { 0%, 78%, 100% { transform: rotate(-20deg); } 84% { transform: rotate(-29deg); } 90% { transform: rotate(-15deg); } }
-  .mascot-star { animation: starTwinkle 2.2s ease-in-out infinite; transform-origin: center; }
+  .mascot.sleeping .mascot-eye { animation: none; transform: scaleY(0.14); }
+  .mascot.sleeping .mascot-arm, .mascot.sleeping .mascot-star { display: none; }
+  .mascot-ear-r { animation: earWiggle 3.6s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+  @keyframes earWiggle { 0%, 78%, 100% { transform: rotate(0deg); } 84% { transform: rotate(-9deg); } 90% { transform: rotate(5deg); } }
+  .mascot-star { animation: starTwinkle 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
   @keyframes starTwinkle { 0%, 100% { transform: scale(0.85) rotate(-6deg); opacity: 0.75; } 50% { transform: scale(1.08) rotate(6deg); opacity: 1; } }
-  .mascot-arm { animation: wave 0.9s ease-in-out 3, none; transform-origin: 50px 188px; }
+  .mascot-arm { animation: wave 0.9s ease-in-out 3, none; transform-box: fill-box; transform-origin: top right; }
   .wave-loop .mascot-arm { animation: wave 0.9s ease-in-out infinite; }
   @keyframes wave { 0%, 100% { transform: rotate(0deg); } 30% { transform: rotate(-22deg); } 60% { transform: rotate(-6deg); } }
-  .charm-f { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 13px; fill: #4a1119; }
+  .mascot-tail { animation: tailSway 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: top left; }
+  @keyframes tailSway { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(6deg); } }
+  .charm-f { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 12px; fill: #4a1119; }
 
   /* ---------- splash (step 0) ---------- */
   .logo-mark { width: 210px; opacity: 0; animation: wmIn 0.6s cubic-bezier(.22,1,.36,1) forwards; }
@@ -199,6 +202,51 @@
   .btn-primary:disabled:active { transform: none; box-shadow: var(--shadow-btn); }
   .btn-ghost { background: transparent; color: var(--ink-soft); font-weight: 600; padding: 6px; font-size: 0.82rem; }
 
+  /* ---------- app init (step 0) ---------- */
+  .init-logo { width: 150px; opacity: 0; animation: wmIn 0.6s cubic-bezier(.22,1,.36,1) forwards; }
+  .init-bar { width: 140px; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .init-bar-fill { height: 100%; width: 0%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--gold)); animation: initLoad 1.6s cubic-bezier(.4,0,.2,1) forwards 0.3s; }
+  @keyframes initLoad { to { width: 100%; } }
+  .init-tip { font-size: 0.74rem; color: var(--ink-soft); text-align: center; opacity: 0; animation: chipIn 0.4s ease forwards 0.5s; }
+
+  /* ---------- first-launch check ---------- */
+  .check-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .check-card { all: unset; box-sizing: border-box; width: 100%; display: flex; align-items: center; gap: 12px; padding: 15px 16px; border: 2px solid var(--line); border-radius: 16px; background: var(--paper); cursor: pointer; transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease; text-align: left; }
+  .check-card:active { transform: scale(0.98); }
+  .check-card .cc-ic { font-size: 1.4rem; }
+  .check-card .cc-t { font-weight: 700; font-size: 0.9rem; color: var(--ink); display: block; }
+  .check-card .cc-d { font-size: 0.74rem; color: var(--muted); }
+
+  /* ---------- personalization ---------- */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
+  .pz-chip { all: unset; cursor: pointer; padding: 10px 15px; border-radius: 999px; border: 2px solid var(--line); font-weight: 700; font-size: 0.82rem; color: var(--ink-soft); background: var(--paper); transition: all 0.15s ease; }
+  .pz-chip.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+
+  /* ---------- first lesson (mini demo) ---------- */
+  .flashcard { width: 100%; aspect-ratio: 5/3; border-radius: 20px; background: var(--paper); border: 1.5px solid var(--line); box-shadow: var(--shadow-card); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; cursor: pointer; perspective: 800px; }
+  .flashcard .fc-word { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.5rem; color: var(--accent); }
+  .flashcard .fc-hint { font-size: 0.76rem; color: var(--muted); }
+  .flashcard.flipped .fc-word { color: var(--gold); }
+  .fc-opts { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+  /* ---------- home preview ---------- */
+  .home-preview { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  .home-top { display: flex; align-items: center; gap: 12px; }
+  .home-avatar { width: 52px; height: 52px; flex: none; border-radius: 50%; background: var(--accent-soft); overflow: hidden; display: grid; place-items: center; }
+  .home-avatar svg { width: 62px; height: 62px; }
+  .hg-hi { margin: 0; font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 1.02rem; color: var(--ink); }
+  .hg-sub { margin: 2px 0 0; font-size: 0.78rem; color: var(--ink-soft); }
+  .home-stat-row { display: flex; gap: 8px; }
+  .home-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 14px; background: var(--accent-soft); border: 1px solid var(--line); }
+  .home-stat .hs-ic { font-size: 1.1rem; }
+  .home-stat .hs-n { font-weight: 700; font-size: 1rem; color: var(--ink); }
+  .home-stat .hs-l { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+  .home-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .home-card { display: flex; flex-direction: column; gap: 3px; padding: 13px 12px; border-radius: 14px; background: var(--paper); border: 1.5px solid var(--line); }
+  .home-card .hc-ic { font-size: 1.2rem; }
+  .home-card .hc-t { font-weight: 700; font-size: 0.82rem; color: var(--ink); }
+  .home-card .hc-d { font-size: 0.68rem; color: var(--muted); }
+
   .skip { position: absolute; top: 46px; right: 20px; z-index: 10; }
   .rail { position: absolute; top: 46px; left: 20px; z-index: 10; }
   .rail button { all: unset; cursor: pointer; color: var(--ink-soft); display: grid; place-items: center; width: 26px; height: 26px; }
@@ -206,7 +254,7 @@
 </style>
 
 <div class="stage-wrap">
-  <p class="caption">FIEZEL onboarding v2 &middot; built from <b>internal design brief</b> &middot; Percik the cat, 6-step flow</p>
+  <p class="caption">FIEZEL onboarding v3 &middot; vectorized from <b>character reference</b> &middot; Percik, full app-init&rarr;home flow</p>
 
   <div class="phone">
     <div class="notch"></div>
@@ -216,8 +264,52 @@
 
     <div class="steps">
 
-      <!-- 1. Splash & sambutan -->
+      <!-- 1. App init -->
       <section class="step active" data-step="0">
+        <div class="step-body">
+          <svg class="init-logo" viewBox="0 0 340 112">
+            <text x="170" y="66" text-anchor="middle" class="logo-word">FIEZEL</text>
+            <path class="mascot-star" d="M23 16 Q25.5 22.5 32 25 Q25.5 27.5 23 34 Q20.5 27.5 14 25 Q20.5 22.5 23 16 Z" fill="#d9a441"/>
+            <path d="M64 82 Q170 100 296 76" stroke="#7a1e2e" stroke-width="5" stroke-linecap="round" fill="none"/>
+          </svg>
+          <div class="mascot-holder">
+            <div class="mascot-shadow"></div>
+            <svg class="mascot sleeping" viewBox="0 0 200 230" fill="none">
+              <ellipse cx="100" cy="222" rx="70" ry="18" fill="#7a1e2e" opacity="0.15"/>
+              <g class="mascot-tail">
+                <path d="M156,190 Q186,178 190,150 Q192,132 178,124 Q186,140 180,156 Q174,176 150,186 Z" fill="#7a1e2e"/>
+                <path d="M178,124 Q186,140 180,156 Q176,172 160,182" stroke="#fdf3e2" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+              </g>
+              <ellipse cx="100" cy="206" rx="74" ry="42" fill="#7a1e2e"/>
+              <ellipse cx="100" cy="212" rx="48" ry="30" fill="#fdf3e2"/>
+              <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+              <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+              <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+              <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+              <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+              <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+              <g class="mascot-eye"><ellipse cx="72" cy="115" rx="19" ry="20" fill="#ffffff"/><circle cx="73" cy="119" r="15" fill="#e8b960"/></g>
+              <g class="mascot-eye"><ellipse cx="128" cy="115" rx="19" ry="20" fill="#ffffff"/><circle cx="127" cy="119" r="15" fill="#e8b960"/></g>
+              <path d="M60,116 Q72,122 84,116" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M116,116 Q128,122 140,116" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+              <path d="M90,144 Q100,150 110,144" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M52,158 Q100,180 148,158 L131,198 Q100,210 69,198 Z" fill="#7a1e2e"/>
+              <circle cx="100" cy="184" r="12" fill="#d9a441"/>
+              <text x="100" y="189" text-anchor="middle" class="charm-f">F</text>
+              <ellipse cx="60" cy="220" rx="20" ry="24" fill="#fdf3e2"/>
+              <ellipse cx="140" cy="220" rx="20" ry="24" fill="#fdf3e2"/>
+              <text x="34" y="112" font-size="15" fill="#6e5a4f" opacity="0.65">z</text>
+              <text x="24" y="92" font-size="19" fill="#6e5a4f" opacity="0.55">Z</text>
+            </svg>
+          </div>
+          <div class="init-bar"><div class="init-bar-fill"></div></div>
+          <p class="init-tip">Menyiapkan pengalaman belajarmu&hellip;</p>
+        </div>
+      </section>
+
+      <!-- 2. Splash & sambutan -->
+      <section class="step" data-step="1">
         <div class="step-body">
           <svg class="logo-mark" viewBox="0 0 340 112">
             <text x="170" y="66" text-anchor="middle" class="logo-word">FIEZEL</text>
@@ -227,102 +319,88 @@
           </svg>
           <div class="mascot-holder splash-mascot wave-loop">
             <div class="mascot-shadow"></div>
-            <svg class="mascot" viewBox="0 0 200 220" fill="none">
-              <!-- Shadow -->
-              <ellipse cx="100" cy="212" rx="68" ry="32" fill="#7a1e2e" opacity="0.15"/>
+            <svg class="mascot" viewBox="0 0 200 230" fill="none">
+              <ellipse cx="100" cy="222" rx="70" ry="18" fill="#7a1e2e" opacity="0.15"/>
 
-              <!-- Body: fluffy round shape -->
-              <ellipse cx="100" cy="125" rx="62" ry="68" fill="#7a1e2e"/>
+              <!-- tail -->
+              <g class="mascot-tail">
+                <path d="M156,190 Q186,178 190,150 Q192,132 178,124 Q186,140 180,156 Q174,176 150,186 Z" fill="#7a1e2e"/>
+                <path d="M178,124 Q186,140 180,156 Q176,172 160,182" stroke="#fdf3e2" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+              </g>
 
-              <!-- Left ear (back) -->
-              <ellipse cx="55" cy="55" rx="24" ry="32" fill="#7a1e2e"/>
+              <!-- body -->
+              <ellipse cx="100" cy="206" rx="74" ry="42" fill="#7a1e2e"/>
+              <ellipse cx="100" cy="212" rx="48" ry="30" fill="#fdf3e2"/>
 
-              <!-- Right ear (folded) - asymmetric -->
-              <ellipse class="fold-ear" cx="155" cy="48" rx="20" ry="28" transform="rotate(-25 155 48)" fill="#7a1e2e"/>
-              <ellipse class="fold-ear" cx="158" cy="52" rx="11" ry="16" transform="rotate(-25 158 52)" fill="#e7b7bb" opacity="0.8"/>
+              <!-- left ear -->
+              <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+              <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
 
-              <!-- Bandana (red/pink band across top and sides) -->
-              <path d="M 40 80 Q 30 70 35 55 Q 50 45 70 42 Q 100 38 130 42 Q 150 45 165 55 Q 170 70 160 80 Q 145 85 100 87 Q 55 85 40 80 Z" fill="#d9576a"/>
-              <path d="M 40 80 Q 30 70 35 55 Q 50 45 70 42 Q 100 38 130 42 Q 150 45 165 55 Q 170 70 160 80 Q 145 85 100 87 Q 55 85 40 80 Z" fill="#e8707a" opacity="0.3"/>
+              <!-- right ear (asymmetric: star clip) -->
+              <g class="mascot-ear-r">
+                <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                <path class="mascot-star" d="M158,32 Q160,39 166,42 Q160,45 158,52 Q156,45 150,42 Q156,39 158,32 Z" fill="#d9a441"/>
+              </g>
 
-              <!-- Bandana shine/highlight -->
-              <path d="M 55 52 Q 75 48 100 47 Q 120 48 140 52" stroke="#ffffff" stroke-width="2" opacity="0.35" stroke-linecap="round" fill="none"/>
+              <!-- head fur -->
+              <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
 
-              <!-- Chest/belly area (lighter) -->
-              <ellipse cx="100" cy="145" rx="50" ry="52" fill="#ffffff"/>
+              <!-- face blaze (jagged) -->
+              <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
 
-              <!-- Left eye (bigger, more expressive) -->
+              <!-- eyebrows -->
+              <path d="M54,96 Q72,88 88,95" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+              <path d="M112,95 Q128,88 146,96" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+
+              <!-- left eye -->
               <g class="mascot-eye mascot-eye-l">
-                <!-- Outer white of eye -->
-                <ellipse cx="72" cy="110" rx="18" ry="20" fill="#ffffff"/>
-                <!-- Iris - amber/golden -->
-                <circle cx="74" cy="114" r="14" fill="#e8b960"/>
-                <!-- Inner circle for depth -->
-                <circle cx="74" cy="114" r="11" fill="#d9a441"/>
-                <!-- Pupil -->
-                <circle cx="75" cy="115" r="7" fill="#2c1b1c"/>
-                <!-- Light reflection 1 -->
-                <circle cx="71" cy="111" r="3" fill="#ffffff"/>
-                <!-- Light reflection 2 -->
-                <circle cx="78" cy="119" r="1.5" fill="#ffffff" opacity="0.7"/>
+                <ellipse cx="72" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="73" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="73" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="74" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="69" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="78" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
               </g>
 
-              <!-- Right eye (bigger, more expressive) -->
+              <!-- right eye -->
               <g class="mascot-eye mascot-eye-r">
-                <!-- Outer white of eye -->
-                <ellipse cx="128" cy="110" rx="18" ry="20" fill="#ffffff"/>
-                <!-- Iris - amber/golden -->
-                <circle cx="126" cy="114" r="14" fill="#e8b960"/>
-                <!-- Inner circle for depth -->
-                <circle cx="126" cy="114" r="11" fill="#d9a441"/>
-                <!-- Pupil -->
-                <circle cx="125" cy="115" r="7" fill="#2c1b1c"/>
-                <!-- Light reflection 1 -->
-                <circle cx="129" cy="111" r="3" fill="#ffffff"/>
-                <!-- Light reflection 2 -->
-                <circle cx="122" cy="119" r="1.5" fill="#ffffff" opacity="0.7"/>
+                <ellipse cx="128" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="127" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="127" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="126" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="122" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="131" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
               </g>
 
-              <!-- Left eyebrow -->
-              <path d="M 58 98 Q 72 92 86 96" stroke="#4a1119" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+              <!-- nose -->
+              <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
 
-              <!-- Right eyebrow -->
-              <path d="M 114 96 Q 128 92 142 98" stroke="#4a1119" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+              <!-- mouth -->
+              <path d="M100,139 Q100,148 88,150 Q76,151 70,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M100,139 Q100,148 112,150 Q124,151 130,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M92,146 Q100,156 108,146 Q100,152 92,146 Z" fill="#e2586b"/>
 
-              <!-- Nose -->
-              <ellipse cx="100" cy="130" rx="6" ry="5" fill="#c97a8a"/>
+              <!-- bandana -->
+              <path d="M52,158 Q100,180 148,158 L131,198 Q100,210 69,198 Z" fill="#7a1e2e"/>
+              <path d="M60,163 Q100,182 140,163" stroke="#e07a86" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5"/>
+              <circle cx="100" cy="184" r="12" fill="#d9a441"/>
+              <ellipse cx="97" cy="181" rx="4" ry="3" fill="#f0cf83" opacity="0.7"/>
+              <text x="100" y="189" text-anchor="middle" class="charm-f">F</text>
 
-              <!-- Mouth - cute smile -->
-              <path d="M 100 135 Q 90 142 82 140" stroke="#4a1119" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-              <path d="M 100 135 Q 110 142 118 140" stroke="#4a1119" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <!-- paws -->
+              <ellipse cx="60" cy="220" rx="20" ry="24" fill="#fdf3e2"/>
+              <ellipse cx="140" cy="220" rx="20" ry="24" fill="#fdf3e2"/>
+              <path d="M52,222 Q60,218 68,222" stroke="#e5b7a8" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+              <path d="M132,222 Q140,218 148,222" stroke="#e5b7a8" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
 
-              <!-- Whiskers left -->
-              <path d="M 55 125 L 35 123" stroke="#4a1119" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
-              <path d="M 50 135 L 28 138" stroke="#4a1119" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
-
-              <!-- Whiskers right -->
-              <path d="M 145 125 L 165 123" stroke="#4a1119" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
-              <path d="M 150 135 L 172 138" stroke="#4a1119" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
-
-              <!-- Left front paw -->
-              <ellipse cx="70" cy="180" rx="16" ry="20" fill="#7a1e2e"/>
-              <ellipse cx="68" cy="185" rx="8" ry="10" fill="#e7b7bb"/>
-
-              <!-- Right front paw -->
-              <ellipse cx="130" cy="180" rx="16" ry="20" fill="#7a1e2e"/>
-              <ellipse cx="132" cy="185" rx="8" ry="10" fill="#e7b7bb"/>
-
-              <!-- Bandana charm (gold circle with F) -->
-              <circle cx="100" cy="60" r="13" fill="#d9a441"/>
-              <!-- Charm shine -->
-              <ellipse cx="98" cy="57" rx="4" ry="3" fill="#f0c970" opacity="0.6"/>
-              <!-- F text on charm -->
-              <text x="100" y="67" text-anchor="middle" class="charm-f" font-size="14">F</text>
-
-              <!-- Left arm (waving) -->
+              <!-- waving arm -->
               <g class="mascot-arm">
-                <path d="M 45 140 Q 25 130 18 145" stroke="#7a1e2e" stroke-width="13" stroke-linecap="round" fill="none"/>
-                <circle cx="16" cy="148" r="10" fill="#e7b7bb"/>
+                <path d="M54,180 Q18,172 14,118" stroke="#7a1e2e" stroke-width="17" stroke-linecap="round" fill="none"/>
+                <circle cx="13" cy="112" r="14" fill="#fdf3e2"/>
+                <ellipse cx="8" cy="106" rx="2.6" ry="3.4" fill="#e5b7a8"/>
+                <ellipse cx="15" cy="102" rx="2.6" ry="3.4" fill="#e5b7a8"/>
+                <ellipse cx="21" cy="107" rx="2.6" ry="3.4" fill="#e5b7a8"/>
               </g>
             </svg>
           </div>
@@ -331,8 +409,26 @@
         <div class="cta-row"><button class="btn btn-primary" data-next>Mulai kenalan</button></div>
       </section>
 
-      <!-- 2. Kenalan singkat -->
-      <section class="step" data-step="1">
+      <!-- 3. First-launch check -->
+      <section class="step" data-step="2">
+        <div class="step-body">
+          <h2 class="headline">Kamu baru di sini?</h2>
+          <p class="sub">Biar Percik nyiapin jalur yang pas buat kamu.</p>
+          <div class="check-grid">
+            <button class="check-card" data-next id="checkNew">
+              <span class="cc-ic">🌱</span>
+              <span><span class="cc-t">Baru pertama kali</span><span class="cc-d">Mulai dari perkenalan lengkap</span></span>
+            </button>
+            <button class="check-card" id="checkReturning">
+              <span class="cc-ic">👋</span>
+              <span><span class="cc-t">Sudah pernah pakai FIEZEL</span><span class="cc-d">Langsung ke beranda</span></span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Onboarding: kenalan singkat -->
+      <section class="step" data-step="3">
         <div class="step-body">
           <h2 class="headline">Apa aja yang bisa kamu latih?</h2>
           <div class="carousel-track" id="carouselTrack">
@@ -360,8 +456,45 @@
         <div class="cta-row"><button class="btn btn-primary" data-next>Lanjut</button></div>
       </section>
 
-      <!-- 3. Pilih tujuan belajar -->
-      <section class="step" data-step="2">
+      <!-- 5. Personalization -->
+      <section class="step" data-step="4">
+        <div class="step-body">
+          <h2 class="headline">Cerita dikit soal kamu</h2>
+          <p class="sub" style="margin-bottom:2px;">Kenapa kamu mau belajar Inggris?</p>
+          <div class="chip-grid" id="motivGrid">
+            <button class="pz-chip" data-motiv="karier">💼 Karier</button>
+            <button class="pz-chip" data-motiv="sekolah">🎓 Sekolah/kuliah</button>
+            <button class="pz-chip" data-motiv="travel">✈️ Travel</button>
+            <button class="pz-chip" data-motiv="hobi">🎬 Hobi/hiburan</button>
+          </div>
+          <p class="sub" style="margin-bottom:2px;margin-top:6px;">Seberapa jauh pengalamanmu?</p>
+          <div class="chip-grid" id="expGrid">
+            <button class="pz-chip" data-exp="pemula">🌱 Pemula banget</button>
+            <button class="pz-chip" data-exp="dasar">📘 Sudah tau dasar</button>
+            <button class="pz-chip" data-exp="lancar">💬 Lumayan lancar</button>
+          </div>
+        </div>
+        <div class="cta-row"><button class="btn btn-primary" data-next id="pzNext" disabled>Lanjut</button></div>
+      </section>
+
+      <!-- 6. Placement test -->
+      <section class="step" data-step="5">
+        <div class="step-body">
+          <h2 class="headline">Tes penempatan singkat</h2>
+          <p class="sub">Kerjakan santai aja, ini bukan ujian — cuma buat Percik kenal kemampuanmu.</p>
+          <div class="quiz-progress">Soal 1 / 6</div>
+          <div class="quiz-card" id="quizCard">
+            <p class="quiz-q">"She ___ to the market every morning."</p>
+            <button class="quiz-opt" data-correct="false">go</button>
+            <button class="quiz-opt" data-correct="true">goes</button>
+            <button class="quiz-opt" data-correct="false">going</button>
+          </div>
+        </div>
+        <div class="cta-row"><button class="btn btn-primary" data-next id="quizNext" disabled>Lanjut</button></div>
+      </section>
+
+      <!-- 7. Goal setup: target + jadwal -->
+      <section class="step" data-step="6">
         <div class="step-body">
           <h2 class="headline">Mau kejar target apa dulu?</h2>
           <p class="sub" style="margin-bottom:2px;">Percik atur jalur belajar sesuai ini.</p>
@@ -380,31 +513,7 @@
             <button class="score-chip" data-score="80">80</button>
             <button class="score-chip" data-score="100">100+</button>
           </div>
-        </div>
-        <div class="cta-row"><button class="btn btn-primary" data-next id="targetNext" disabled>Lanjut</button></div>
-      </section>
-
-      <!-- 4. Tes penempatan singkat -->
-      <section class="step" data-step="3">
-        <div class="step-body">
-          <h2 class="headline">Tes penempatan singkat</h2>
-          <p class="sub">Kerjakan santai aja, ini bukan ujian — cuma buat Percik kenal kemampuanmu.</p>
-          <div class="quiz-progress">Soal 1 / 6</div>
-          <div class="quiz-card" id="quizCard">
-            <p class="quiz-q">"She ___ to the market every morning."</p>
-            <button class="quiz-opt" data-correct="false">go</button>
-            <button class="quiz-opt" data-correct="true">goes</button>
-            <button class="quiz-opt" data-correct="false">going</button>
-          </div>
-        </div>
-        <div class="cta-row"><button class="btn btn-primary" data-next id="quizNext" disabled>Lanjut</button></div>
-      </section>
-
-      <!-- 5. Atur jadwal & pengingat -->
-      <section class="step" data-step="4">
-        <div class="step-body">
-          <h2 class="headline">Atur jadwal belajarmu</h2>
-          <p class="sub" style="margin-bottom:2px;">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>
+          <p class="sub" style="margin-bottom:2px;margin-top:8px;">Kapan mau belajar?</p>
           <div class="day-row" id="dayRow">
             <button class="day-chip" data-day="Sen">S</button>
             <button class="day-chip" data-day="Sel">S</button>
@@ -424,42 +533,144 @@
             <button class="switch" id="notifSwitch" aria-label="Aktifkan notifikasi"></button>
           </div>
         </div>
-        <div class="cta-row"><button class="btn btn-primary" data-next>Lanjut</button></div>
+        <div class="cta-row"><button class="btn btn-primary" data-next id="targetNext" disabled>Lanjut</button></div>
       </section>
 
-      <!-- 6. Ringkasan & mulai -->
-      <section class="step" data-step="5">
+      <!-- 8. First lesson (mini demo) -->
+      <section class="step" data-step="7">
+        <div class="step-body">
+          <h2 class="headline">Coba pelajaran pertamamu</h2>
+          <p class="sub" style="margin-bottom:2px;">Ketuk kartunya buat lihat artinya.</p>
+          <div class="flashcard" id="flashcard">
+            <span class="fc-word">Journey</span>
+            <span class="fc-hint">Ketuk untuk lihat arti</span>
+          </div>
+          <div class="fc-opts" id="fcOpts" style="display:none;">
+            <button class="quiz-opt" data-correct="false">Rumah</button>
+            <button class="quiz-opt" data-correct="true">Perjalanan</button>
+            <button class="quiz-opt" data-correct="false">Makanan</button>
+          </div>
+        </div>
+        <div class="cta-row"><button class="btn btn-primary" data-next id="lessonNext" disabled>Lanjut</button></div>
+      </section>
+
+      <!-- 9. Celebration -->
+      <section class="step" data-step="8">
         <div class="step-body">
           <div class="mascot-holder">
             <div class="mascot-shadow"></div>
-            <svg class="mascot" viewBox="0 0 200 200" fill="none" style="animation-duration:1.1s;">
-              <ellipse cx="100" cy="222" rx="70" ry="34" fill="#7a1e2e"/>
-              <polygon points="48,72 34,18 74,58" fill="#7a1e2e"/>
-              <polygon points="52,64 44,32 66,58" fill="#e7b7bb"/>
-              <ellipse cx="150" cy="64" rx="20" ry="13" transform="rotate(-20 150 64)" fill="#4a1119"/>
-              <ellipse cx="150" cy="64" rx="11" ry="6" transform="rotate(-20 150 64)" fill="#e7b7bb" opacity="0.85"/>
-              <path d="M174 32 Q177 39.5 184 42 Q177 44.5 174 52 Q171 44.5 164 42 Q171 39.5 174 32 Z" fill="#d9a441"/>
-              <circle cx="100" cy="112" r="64" fill="#7a1e2e"/>
-              <ellipse cx="100" cy="132" rx="48" ry="42" fill="#ffffff"/>
-              <path d="M64 112 Q78 98 92 112" stroke="#4a1119" stroke-width="5" stroke-linecap="round" fill="none"/>
-              <path d="M108 112 Q122 98 136 112" stroke="#4a1119" stroke-width="5" stroke-linecap="round" fill="none"/>
-              <polygon points="94,138 106,138 100,146" fill="#e7899a"/>
-              <path d="M80 150 Q100 172 120 150 Q100 162 80 150 Z" fill="#4a1119"/>
-              <polygon points="66,168 134,168 100,196" fill="#4a1119"/>
-              <circle cx="100" cy="176" r="10" fill="#d9a441"/>
-              <text x="100" y="181" text-anchor="middle" class="charm-f">F</text>
+            <svg class="mascot" viewBox="0 0 200 230" fill="none" style="animation-duration:1.1s;">
+              <ellipse cx="100" cy="222" rx="70" ry="18" fill="#7a1e2e" opacity="0.15"/>
+              <g class="mascot-tail">
+                <path d="M156,190 Q186,178 190,150 Q192,132 178,124 Q186,140 180,156 Q174,176 150,186 Z" fill="#7a1e2e"/>
+                <path d="M178,124 Q186,140 180,156 Q176,172 160,182" stroke="#fdf3e2" stroke-width="6" stroke-linecap="round" fill="none" opacity="0.9"/>
+              </g>
+              <ellipse cx="100" cy="206" rx="74" ry="42" fill="#7a1e2e"/>
+              <ellipse cx="100" cy="212" rx="48" ry="30" fill="#fdf3e2"/>
+              <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+              <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+              <g class="mascot-ear-r">
+                <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                <path class="mascot-star" d="M158,32 Q160,39 166,42 Q160,45 158,52 Q156,45 150,42 Q156,39 158,32 Z" fill="#d9a441"/>
+              </g>
+              <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+              <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+              <path d="M54,96 Q72,88 88,95" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+              <path d="M112,95 Q128,88 146,96" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.75"/>
+              <g class="mascot-eye mascot-eye-l">
+                <ellipse cx="72" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="73" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="73" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="74" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="69" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="78" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
+              </g>
+              <g class="mascot-eye mascot-eye-r">
+                <ellipse cx="128" cy="115" rx="19" ry="20" fill="#ffffff"/>
+                <circle cx="127" cy="119" r="15" fill="#e8b960"/>
+                <circle cx="127" cy="119" r="11" fill="#d9a441"/>
+                <circle cx="126" cy="121" r="7.5" fill="#2c1b1c"/>
+                <circle cx="122" cy="114" r="3.4" fill="#ffffff"/>
+                <circle cx="131" cy="126" r="1.6" fill="#ffffff" opacity="0.8"/>
+              </g>
+              <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+              <path d="M100,139 Q102,150 92,153 Q80,155 72,146" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M100,139 Q98,150 108,153 Q120,155 128,146" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <path d="M84,144 Q100,166 116,144 Q100,148 84,144 Z" fill="#4a1119"/>
+              <path d="M92,148 Q100,160 108,148" stroke="#e2586b" stroke-width="7" stroke-linecap="round" fill="none"/>
+              <path d="M52,158 Q100,180 148,158 L131,198 Q100,210 69,198 Z" fill="#7a1e2e"/>
+              <path d="M60,163 Q100,182 140,163" stroke="#e07a86" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.5"/>
+              <circle cx="100" cy="184" r="12" fill="#d9a441"/>
+              <ellipse cx="97" cy="181" rx="4" ry="3" fill="#f0cf83" opacity="0.7"/>
+              <text x="100" y="189" text-anchor="middle" class="charm-f">F</text>
+              <ellipse cx="140" cy="220" rx="20" ry="24" fill="#fdf3e2"/>
+              <path d="M132,222 Q140,218 148,222" stroke="#e5b7a8" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
+              <!-- left arm holding trophy -->
+              <path d="M45,190 Q18,182 14,160" stroke="#7a1e2e" stroke-width="15" stroke-linecap="round" fill="none"/>
+              <circle cx="13" cy="156" r="12" fill="#fdf3e2"/>
+              <g transform="translate(-2,96)">
+                <rect x="6" y="58" width="18" height="7" rx="2" fill="#4a1119"/>
+                <rect x="9" y="51" width="12" height="9" fill="#d9a441"/>
+                <path d="M6,20 h18 v16 a9 9 0 0 1 -18 0 z" fill="#eec25c"/>
+                <path d="M6,23 q-9,0 -9,10 q0,9 9,7" stroke="#eec25c" stroke-width="3" fill="none"/>
+                <path d="M24,23 q9,0 9,10 q0,9 -9,7" stroke="#eec25c" stroke-width="3" fill="none"/>
+                <path d="M15,24 l2,4.5 h4.5 l-3.6,3.2 1.4,4.5 -4.3,-2.8 -4.3,2.8 1.4,-4.5 -3.6,-3.2 h4.5 z" fill="#fff3d1" opacity="0.85"/>
+              </g>
             </svg>
           </div>
-          <h1 class="headline">Semua siap!</h1>
-          <p class="sub">Yuk mulai langkah pertamamu.</p>
+          <h1 class="headline">Kamu keren banget!</h1>
+          <p class="sub">Latihan pertama kelar. Ini baru permulaan.</p>
           <div class="summary-card">
             <div class="summary-row"><span class="ic">📊</span><dl class="tx"><dt>Level awal</dt><dd id="sumLevel">B1</dd></dl></div>
             <div class="summary-row"><span class="ic">🎯</span><dl class="tx"><dt>Target</dt><dd id="sumTarget">&mdash;</dd></dl></div>
             <div class="summary-row"><span class="ic">🗓️</span><dl class="tx"><dt>Jadwal</dt><dd id="sumSchedule">&mdash;</dd></dl></div>
           </div>
-          <span class="streak-pill">🔥 Mulai streak hari ini</span>
+          <span class="streak-pill">🔥 Streak hari ke-1 dimulai</span>
         </div>
-        <div class="cta-row"><button class="btn btn-primary" id="finishBtn">Mulai belajar</button></div>
+        <div class="cta-row"><button class="btn btn-primary" data-next>Lihat beranda</button></div>
+      </section>
+
+      <!-- 10. Home preview -->
+      <section class="step" data-step="9">
+        <div class="step-body">
+          <div class="home-preview">
+            <div class="home-top">
+              <div class="home-avatar">
+                <svg viewBox="22 10 156 168" fill="none">
+                  <path d="M58,80 Q40,54 35,17 Q56,40 91,64 Q75,76 58,80 Z" fill="#7a1e2e"/>
+                  <path d="M60,71 Q49,53 45,29 Q59,44 79,59 Q69,67 60,71 Z" fill="#f6c9cf"/>
+                  <path d="M142,80 Q160,54 165,17 Q144,40 109,64 Q125,76 142,80 Z" fill="#7a1e2e"/>
+                  <path d="M140,71 Q151,53 155,29 Q141,44 121,59 Q131,67 140,71 Z" fill="#f6c9cf"/>
+                  <path class="mascot-star" d="M158,32 Q160,39 166,42 Q160,45 158,52 Q156,45 150,42 Q156,39 158,32 Z" fill="#d9a441"/>
+                  <path d="M100,48 C140,48 172,76 172,118 C172,160 140,190 100,190 C60,190 28,160 28,118 C28,76 60,48 100,48 Z" fill="#7a1e2e"/>
+                  <path d="M66,152 Q38,140 40,110 Q42,88 60,76 Q70,68 80,64 L84,45 L90,62 L96,44 L100,60 L104,44 L110,62 L116,45 L120,64 Q130,68 140,76 Q158,88 160,110 Q162,140 134,152 Q118,166 100,166 Q82,166 66,152 Z" fill="#fdf3e2"/>
+                  <g class="mascot-eye"><ellipse cx="72" cy="115" rx="19" ry="20" fill="#ffffff"/><circle cx="73" cy="119" r="15" fill="#e8b960"/><circle cx="73" cy="119" r="11" fill="#d9a441"/><circle cx="74" cy="121" r="7.5" fill="#2c1b1c"/><circle cx="69" cy="114" r="3.4" fill="#ffffff"/></g>
+                  <g class="mascot-eye"><ellipse cx="128" cy="115" rx="19" ry="20" fill="#ffffff"/><circle cx="127" cy="119" r="15" fill="#e8b960"/><circle cx="127" cy="119" r="11" fill="#d9a441"/><circle cx="126" cy="121" r="7.5" fill="#2c1b1c"/><circle cx="122" cy="114" r="3.4" fill="#ffffff"/></g>
+                  <path d="M100,128 Q106,128 106,133 Q106,138 100,139 Q94,138 94,133 Q94,128 100,128 Z" fill="#e2586b"/>
+                  <path d="M100,139 Q100,148 88,150 Q76,151 70,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                  <path d="M100,139 Q100,148 112,150 Q124,151 130,143" stroke="#4a1119" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </svg>
+              </div>
+              <div class="home-greet">
+                <p class="hg-hi">Halo, Sobat Fiezel!</p>
+                <p class="hg-sub">Siap lanjut belajar hari ini?</p>
+              </div>
+            </div>
+            <div class="home-stat-row">
+              <div class="home-stat"><span class="hs-ic">🔥</span><span class="hs-n">1</span><span class="hs-l">Streak</span></div>
+              <div class="home-stat"><span class="hs-ic">⭐</span><span class="hs-n">20</span><span class="hs-l">XP</span></div>
+              <div class="home-stat"><span class="hs-ic">📊</span><span class="hs-n" id="homeLevel">B1</span><span class="hs-l">Level</span></div>
+            </div>
+            <div class="home-cards">
+              <div class="home-card"><span class="hc-ic">🔤</span><span class="hc-t">Kosakata</span><span class="hc-d">5 kartu baru</span></div>
+              <div class="home-card"><span class="hc-ic">🧩</span><span class="hc-t">Grammar</span><span class="hc-d">Lanjut lesson 2</span></div>
+              <div class="home-card"><span class="hc-ic">📖</span><span class="hc-t">Reading</span><span class="hc-d">Cerita baru siap</span></div>
+              <div class="home-card"><span class="hc-ic">🎧</span><span class="hc-t">Listening</span><span class="hc-d">Latihan suara neural</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="cta-row"><button class="btn btn-primary" id="finishBtn">Masuk ke FIEZEL</button></div>
       </section>
 
     </div>
@@ -472,7 +683,7 @@
 <script>
   const steps = Array.from(document.querySelectorAll('.step'));
   const total = steps.length;
-  const captions = ['Splash & sambutan', 'Kenalan singkat', 'Pilih tujuan', 'Tes penempatan', 'Jadwal & pengingat', 'Ringkasan & mulai'];
+  const captions = ['App init', 'Splash & sambutan', 'First-launch check', 'Kenalan singkat', 'Personalisasi', 'Tes penempatan', 'Target & jadwal', 'Pelajaran pertama', 'Perayaan', 'Beranda'];
   const dotsWrap = document.getElementById('dots');
   captions.forEach(() => dotsWrap.appendChild(document.createElement('span')));
   const dots = Array.from(dotsWrap.children);
@@ -488,6 +699,13 @@
     skipBtn.style.display = current < total - 1 ? 'block' : 'none';
   }
 
+  // ---- step 0: app init -> auto-advance to splash ----
+  setTimeout(() => { if (current === 0) goTo(1); }, 2200);
+
+  // ---- step 2: first-launch check ----
+  const checkReturning = document.getElementById('checkReturning');
+  if (checkReturning) checkReturning.addEventListener('click', () => goTo(total - 1));
+
   function goTo(index) {
     if (index === current || index < 0 || index > total - 1) return;
     const dir = index > current ? 1 : -1;
@@ -498,7 +716,7 @@
     to.classList.add('active');
     current = index;
     updateChrome();
-    if (index === total - 1) setTimeout(burstConfetti, 200);
+    if (index === total - 2) setTimeout(burstConfetti, 200);
   }
 
   document.querySelectorAll('[data-next]').forEach(btn => btn.addEventListener('click', () => goTo(current + 1)));
@@ -518,7 +736,27 @@
   document.getElementById('slideNext').addEventListener('click', () => showSlide(slideIdx + 1));
   document.getElementById('slidePrev').addEventListener('click', () => showSlide(slideIdx - 1));
 
-  // ---- step 3: target + score ----
+  // ---- step 4: personalization ----
+  let chosenMotiv = null, chosenExp = null;
+  function checkPz() { document.getElementById('pzNext').disabled = !(chosenMotiv && chosenExp); }
+  document.querySelectorAll('#motivGrid .pz-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#motivGrid .pz-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      chosenMotiv = chip.dataset.motiv;
+      checkPz();
+    });
+  });
+  document.querySelectorAll('#expGrid .pz-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('#expGrid .pz-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      chosenExp = chip.dataset.exp;
+      checkPz();
+    });
+  });
+
+  // ---- step 6: target + score ----
   let chosenTarget = null, chosenScore = null;
   document.querySelectorAll('#targetGrid .goal-card').forEach(card => {
     card.addEventListener('click', () => {
@@ -542,16 +780,35 @@
     });
   });
 
-  // ---- step 4: placement question ----
-  document.querySelectorAll('.quiz-opt').forEach(opt => {
+  // ---- step 5: placement question ----
+  document.querySelectorAll('#quizCard .quiz-opt').forEach(opt => {
     opt.addEventListener('click', () => {
-      const opts = Array.from(document.querySelectorAll('.quiz-opt'));
+      const opts = Array.from(document.querySelectorAll('#quizCard .quiz-opt'));
       opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o !== opt) o.classList.add('dim'); });
       document.getElementById('quizNext').disabled = false;
     });
   });
 
-  // ---- step 5: schedule ----
+  // ---- step 7: first lesson flashcard ----
+  const flashcard = document.getElementById('flashcard');
+  if (flashcard) {
+    flashcard.addEventListener('click', () => {
+      if (flashcard.classList.contains('flipped')) return;
+      flashcard.classList.add('flipped');
+      flashcard.querySelector('.fc-word').textContent = 'Journey = Perjalanan';
+      flashcard.querySelector('.fc-hint').textContent = 'Sekarang coba jawab ini';
+      document.getElementById('fcOpts').style.display = 'flex';
+    });
+  }
+  document.querySelectorAll('#fcOpts .quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const opts = Array.from(document.querySelectorAll('#fcOpts .quiz-opt'));
+      opts.forEach(o => { o.disabled = true; if (o.dataset.correct === 'true') o.classList.add('correct'); else if (o !== opt) o.classList.add('dim'); });
+      document.getElementById('lessonNext').disabled = false;
+    });
+  });
+
+  // ---- step 6: schedule ----
   const selectedDays = new Set();
   document.querySelectorAll('.day-chip').forEach(chip => {
     chip.addEventListener('click', () => {
