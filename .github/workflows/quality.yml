@@ -48,6 +48,7 @@ jobs:
           node splash-first-paint-test.js
           node observability-privacy-test.js
           node a11y-test.js
+          node contrast-test.js
           node product-audit.js
           node runtime-stage8-test.js
           node ai-integration-test.js
