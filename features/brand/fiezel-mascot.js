@@ -48,13 +48,21 @@
   // keluar: yang tersisa hanya karakter dan tanda mereknya, dengan latar transparan.
   var POSES = Object.freeze({
     hero: { file: 'fiezel-hero.png', width: 240, height: 311, label: 'Maskot FIEZEL melambai' },
-    belajar: { file: 'fiezel-belajar.png', width: 78, height: 87, label: 'Maskot FIEZEL sedang membaca' },
+    belajar: { file: 'fiezel-belajar.png', width: 170, height: 180, label: 'Maskot FIEZEL sedang membaca' },
     semangat: { file: 'fiezel-semangat.png', width: 73, height: 95, label: 'Maskot FIEZEL memegang pensil' },
     coding: { file: 'fiezel-coding.png', width: 70, height: 88, label: 'Maskot FIEZEL di depan laptop' },
     pencapaian: { file: 'fiezel-pencapaian.png', width: 78, height: 99, label: 'Maskot FIEZEL membawa piala' },
     istirahat: { file: 'fiezel-istirahat.png', width: 73, height: 66, label: 'Maskot FIEZEL beristirahat' },
     mark: { file: 'fiezel-mark.png', width: 92, height: 106, label: 'Tanda F FIEZEL' },
-    icon: { file: 'fiezel-icon.png', width: 64, height: 64, label: 'Ikon FIEZEL' }
+    icon: { file: 'fiezel-icon.png', width: 64, height: 64, label: 'Ikon FIEZEL' },
+    // Pose berikut dipotong dari baris ONBOARDING SCREENS pada sheet yang sama. Baris itu
+    // menggambar karakternya jauh lebih besar daripada baris ACTIVITIES, jadi inilah sumber
+    // paling tajam yang tersedia untuk kartu onboarding - dan `belajar` di atas ikut naik ke
+    // sana karena alasan yang sama.
+    mengintip: { file: 'fiezel-mengintip.png', width: 96, height: 71, label: 'Maskot FIEZEL mengintip' },
+    menulis: { file: 'fiezel-menulis.png', width: 170, height: 159, label: 'Maskot FIEZEL mengerjakan soal' },
+    jadwal: { file: 'fiezel-jadwal.png', width: 147, height: 163, label: 'Maskot FIEZEL membawa jam dan kalender' },
+    siap: { file: 'fiezel-siap.png', width: 174, height: 180, label: 'Maskot FIEZEL bersorak' }
   });
 
   var DEFAULT_POSE = 'hero';
