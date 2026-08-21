@@ -118,6 +118,13 @@ button:hover{transform:translateY(-1px);border-color:#e7cdd2;box-shadow:var(--sh
 button:active{transform:translateY(0) scale(.97);transition-duration:.08s}
 button:disabled{opacity:.42;cursor:not-allowed;transform:none;box-shadow:none}
 button:focus-visible{outline:3px solid rgba(140,34,51,.32);outline-offset:2px}
+/* m025-63 accessibility pass. Sebelumnya hanya tombol yang punya cincin fokus, sehingga
+   pengguna keyboard kehilangan jejak begitu berpindah ke tautan atau kolom isian. */
+a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:3px solid rgba(140,34,51,.32);outline-offset:2px}
+/* Ukuran sentuh minimum ditegaskan, bukan hanya kebetulan hasil padding: satu perubahan
+   ukuran huruf tidak boleh diam-diam menyusutkan sasaran sentuh di bawah 44px. */
+button,.nav,input[type="url"],input[type="text"],input[type="password"],input[type="email"],input[type="number"],select{min-height:44px}
+input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 .app{max-width:800px;margin:auto;padding:20px 18px calc(118px + env(safe-area-inset-bottom));position:relative;z-index:2}
 
@@ -753,3 +760,106 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 /* The stat labels were the last capitals left on Home. */
 .home-stats small,.stats small{text-transform:none;letter-spacing:.01em;font-size:.7rem}
+
+/* R2 Personal Learning Journey. Memakai token yang sama dengan home-overview supaya panel ini
+   terbaca sebagai bagian dari Home, bukan tempelan. */
+.journey-week{color:var(--muted);font-size:.7rem;letter-spacing:.04em}
+.journey-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.journey-mission,.journey-today,.journey-goal{padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(255,254,250,.9);color:var(--text)}
+.journey-mission small,.journey-today small,.journey-goal small{display:block;color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em}
+.journey-mission h3{margin:8px 0 6px;font-size:1.05rem;text-transform:capitalize}
+.journey-target{margin:6px 0 0;font-size:.78rem;color:var(--text)}
+.journey-why,.journey-note{margin:8px 0 0;color:var(--muted);font-size:.74rem;line-height:1.55}
+.journey-blocks{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.journey-block{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:14px}
+.journey-block b{font-size:.8rem}.journey-block span{color:var(--muted);font-size:.72rem;line-height:1.5}
+.journey-block-review{border-color:var(--accent)}
+.journey-recovery{margin:8px 0 0;font-size:.74rem;color:var(--accent)}
+.journey-today button{margin-top:12px;width:100%}
+.journey-skills{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line);border-radius:20px;background:rgba(255,254,250,.9);overflow:hidden;margin-bottom:14px}
+.journey-skill{padding:16px 12px;border-right:1px solid var(--line);display:grid;gap:6px}
+.journey-skill:last-child{border-right:0}
+.journey-skill b{font-size:.78rem}.journey-skill span{color:var(--muted);font-size:.72rem}
+.journey-skill.is-unmeasured span{font-style:italic}
+.journey-goal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:.74rem}
+.journey-goal-chip.is-active{border-color:var(--accent);color:var(--accent)}
+@media(max-width:760px){.journey-panel{grid-template-columns:1fr}.journey-skills{grid-template-columns:repeat(2,1fr)}.journey-skill{border-bottom:1px solid var(--line)}}
+.journey-skill small{color:var(--muted);font-size:.66rem;letter-spacing:.01em}
+.readiness-block{margin-bottom:14px}
+.readiness-block h4{margin:0 0 8px;font-size:.86rem}
+.readiness-met{color:var(--accent)}
+.readiness-unknown,.readiness-not_met{color:var(--muted)}
+.backup-settings .backup-actions{margin-top:10px}
+.backup-settings #backupPreview:empty{display:none}
+
+/* ---------- FIEZEL brand: maskot resmi + splash ---------- */
+/* Maskotnya adalah karya asli dari handoff, jadi yang dianimasikan adalah GAMBAR UTUH -
+   bukan bagian-bagiannya. Handoff melarang merentangkan dan mewarnai ulang karakter ini,
+   sehingga gerakannya dibatasi pada geser, miring kecil, dan skala seragam. */
+.fiezel-mascot{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none}
+.fiezel-mascot-hero{animation:fzm-float 4.2s ease-in-out infinite}
+.fiezel-mascot-semangat{animation:fzm-hop 1.3s ease-in-out infinite}
+.fiezel-mascot-pencapaian{animation:fzm-cheer 1.8s ease-in-out infinite}
+.fiezel-mascot-istirahat{animation:fzm-breathe 4.6s ease-in-out infinite}
+.fiezel-mascot-belajar,.fiezel-mascot-coding,.fiezel-mascot-menulis{animation:fzm-breathe 5.4s ease-in-out infinite}
+.fiezel-mascot-siap{animation:fzm-hop 1.5s ease-in-out infinite}
+.fiezel-mascot-jadwal{animation:fzm-cheer 2.2s ease-in-out infinite}
+/* Pose ini memang digambar terpotong di bawah - pada sheet ia mengintip dari balik tombol.
+   Gerakannya karena itu naik-turun kecil, seperti sedang menyembul. */
+.fiezel-mascot-mengintip{animation:fzm-peek 3.4s ease-in-out infinite}
+
+@keyframes fzm-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-1.2deg)}}
+@keyframes fzm-peek{0%,100%{transform:translateY(4px)}50%{transform:translateY(-2px)}}
+@keyframes fzm-hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-9px)}}
+@keyframes fzm-cheer{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes fzm-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+
+/* Splash: Step 0 spesifikasi - logo, maskot, gelembung ucapan, satu CTA. */
+.fiezel-splash{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:24px;background:var(--bg,#fdf3e8);text-align:center;
+  animation:fzm-splash-in .4s var(--ease,ease-out) both}
+.fiezel-splash[hidden]{display:none}
+.fiezel-splash.is-leaving{animation:fzm-splash-out .32s ease-in both}
+.fiezel-splash-word{font-weight:700;font-size:2.4rem;letter-spacing:.02em;color:#7a1e2e;margin:0}
+.fiezel-splash-tag{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#6e5a4f;margin:0}
+.fiezel-splash-bubble{position:relative;max-width:19rem;background:#fff;border:1px solid #ecdec0;border-radius:16px;
+  padding:12px 16px;color:#2c1b1c;font-size:.86rem;line-height:1.5;box-shadow:0 4px 14px rgba(74,17,25,.12)}
+.fiezel-splash-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;
+  transform:translateX(-50%) rotate(45deg);background:#fff;border-right:1px solid #ecdec0;border-bottom:1px solid #ecdec0}
+.fiezel-splash-cta{min-height:44px;background:#7a1e2e;color:#fff;border:0;border-radius:14px;padding:13px 22px;
+  font-weight:650;font-size:.92rem}
+@keyframes fzm-splash-in{from{opacity:0}to{opacity:1}}
+@keyframes fzm-splash-out{from{opacity:1}to{opacity:0}}
+
+/* Onboarding enam langkah (Step 1-6 sheet handoff). Kartunya meniru desain: lencana angka,
+   judul, kalimat, maskot, tombol, titik langkah. Yang tidak ditiru adalah warna latar layar
+   penuh - di sini krem yang sama dipakai supaya kartunya menyatu dengan splash sebelumnya. */
+.fiezel-ob{position:fixed;inset:0;z-index:2147481900;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:var(--bg,#fdf3e8);animation:fzm-ob-in .34s var(--ease,ease-out) both}
+.fiezel-ob.is-leaving{animation:fzm-ob-out .26s ease-in both}
+.fiezel-ob-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
+  width:min(22rem,100%);max-height:100%;overflow-y:auto;background:#fff;border:1px solid #ecdec0;border-radius:24px;
+  padding:26px 22px 18px;box-shadow:0 10px 30px rgba(74,17,25,.14)}
+.fiezel-ob-badge{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#7a1e2e;
+  color:#fff;font-weight:700;font-size:.86rem}
+.fiezel-ob-title{margin:0;font-size:1.18rem;line-height:1.3;color:#7a1e2e}
+.fiezel-ob-body{margin:0;font-size:.86rem;line-height:1.55;color:#4a1119;max-width:17rem}
+.fiezel-ob-art{display:flex;justify-content:center;min-height:96px;align-items:flex-end}
+.fiezel-ob-note{margin:0;font-size:.72rem;line-height:1.5;color:#6e5a4f;max-width:17rem}
+.fiezel-ob-cta{min-height:44px;width:min(15rem,100%);background:#7a1e2e;color:#fff;border:0;border-radius:14px;
+  padding:13px 22px;font-weight:650;font-size:.92rem}
+.fiezel-ob-tracks{display:flex;flex-direction:column;gap:10px;width:min(15rem,100%)}
+.fiezel-ob-track{min-height:44px;border-radius:14px;padding:12px 20px;font-weight:650;font-size:.92rem;
+  background:#fff;color:#7a1e2e;border:1px solid #7a1e2e}
+.fiezel-ob-track.is-primary{background:#7a1e2e;color:#fff;border-color:#7a1e2e}
+.fiezel-ob-dots{display:flex;gap:6px;margin-top:2px}
+.fiezel-ob-dot{width:7px;height:7px;border-radius:50%;background:#e3cdb4}
+.fiezel-ob-dot.is-active{background:#7a1e2e}
+/* Jalan keluar selalu ada, di setiap langkah. Gerbang notifikasi ada di bawah lapisan ini. */
+.fiezel-ob-skip{min-height:44px;background:none;border:0;color:#6e5a4f;font-size:.8rem;text-decoration:underline}
+@keyframes fzm-ob-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fzm-ob-out{from{opacity:1}to{opacity:0}}
+/* Tombol kedua ("Nanti saja"). Tanpa jalur ini, murid yang belum punya target ujian atau
+   belum mau mengerjakan tes penempatan tidak akan pernah sampai ke langkah 5 dan 6. */
+.fiezel-ob-secondary{min-height:44px;background:none;border:0;color:#7a1e2e;font-size:.86rem;font-weight:600}

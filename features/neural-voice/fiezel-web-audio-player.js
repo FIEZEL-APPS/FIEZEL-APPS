@@ -12,7 +12,40 @@
   const PREFERRED_SAMPLE_RATE = 44100;
   const LATENCY_HINT = 'playback';
   const PCM_DIAGNOSTIC_PARAM = 'fiezelPcmMode';
-  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned']);
+  // m025-64: `wavref` menambah pembanding yang selama ini hilang. `raw` dan `conditioned`
+  // sama-sama melewati WebAudio, jadi ketika keduanya terdengar pecah, keduanya tidak bisa
+  // memisahkan model dari jalur pemutaran. `wavref` memutar PCM yang persis sama lewat
+  // elemen <audio> biasa, melewati AudioContext, worklet, penjadwalan, dan fade sepenuhnya.
+  // Bersih di sini + pecah di mode normal = cacatnya ada di jalur pemutaran FIEZEL.
+  // Pecah di keduanya = cacatnya bukan di penjadwalan kita.
+  // m025-68: `plainbuffer` adalah arm yang lahir dari bukti, bukan dari dugaan.
+  //
+  // Telemetri m025-67 menunjukkan iOS menolak elemen media dengan NotAllowedError pada
+  // ke-13 percobaan, jadi arm `wavref` tidak bisa diandalkan di perangkat itu. Yang masih
+  // bisa dipakai adalah AudioContext yang SUDAH terbuka kuncinya oleh alur normal aplikasi.
+  //
+  // `plainbuffer` memutar PCM yang sama lewat AudioBufferSourceNode polos langsung ke
+  // destination: tanpa AudioWorklet, tanpa fade masuk/keluar, tanpa penjadwalan seam, tanpa
+  // epoch. Itu tepat memisahkan tiga tersangka utama yang tersisa dari PCM-nya sendiri.
+  // m025-69: `toneref` memutar sinyal yang DIBUAT FIEZEL SENDIRI, bukan keluaran model.
+  //
+  // Bukti m025-68 sudah mencoret jalur pemutaran kita: arm PLAIN BUFFER melewati worklet,
+  // fade, dan penjadwalan seam, dan OWNER mendengar hasil yang sama persis dengan mode normal.
+  // Telemetri juga mencatat chunkCount 1 (tidak ada sambungan antar potongan), trimmed false,
+  // 44100 = 44100 (tidak ada resampling), dan tanpa clipping pada rekaman itu.
+  //
+  // Yang tersisa hanya dua: PCM dari modelnya, atau tahap keluaran perangkat. Nada buatan ini
+  // memisahkan keduanya, karena ia tidak pernah menyentuh model:
+  //   terdengar pecah  -> masalahnya di keluaran perangkat/PWA, bukan di model dan bukan di kita
+  //   terdengar bersih -> jalur keluarannya sehat, jadi cacatnya ada pada PCM yang dihasilkan model
+  const PCM_DIAGNOSTIC_MODES = Object.freeze(['raw', 'conditioned', 'wavref', 'plainbuffer', 'toneref']);
+  // Parameter URL tidak bisa dipakai di perangkat yang punya cacatnya. FIEZEL mewajibkan
+  // notifikasi, dan iOS hanya memberi Notification API ke aplikasi layar-utama, sehingga tab
+  // Safari - satu-satunya tempat parameter bisa diketik - berhenti di gerbang notifikasi.
+  // Karena itu mode juga bisa disimpan, dan itulah yang membuat A/B ini bisa dijalankan.
+  const PCM_DIAGNOSTIC_STORAGE_KEY = 'fiezel-pcm-mode-v1';
+  // Mode diagnostik tidak boleh hidup lebih lama daripada pengujian yang membutuhkannya.
+  const PCM_DIAGNOSTIC_TTL_MS = 24 * 60 * 60 * 1000;
   const PCM_WORKLET_MODULE_URL = './features/neural-voice/fiezel-pcm-renderer-worklet.js';
 
   const PEAK_CEILING = 0.97;
@@ -38,17 +71,256 @@
     return Number.isFinite(n) && n >= 8000 && n <= 192000 ? n : 24000;
   }
 
-  function pcmDiagnosticMode(env, settings) {
+  /** Mode tersimpan, diabaikan bila kedaluwarsa atau isinya tidak dikenal. */
+  function readStoredPcmMode(env, now) {
+    try {
+      const store = env && env.localStorage;
+      if (!store || typeof store.getItem !== 'function') return '';
+      const raw = JSON.parse(store.getItem(PCM_DIAGNOSTIC_STORAGE_KEY) || 'null');
+      if (!raw || !PCM_DIAGNOSTIC_MODES.includes(String(raw.mode || '').toLowerCase())) return '';
+      const at = Number(raw.at) || 0;
+      const clock = Number(now) || Date.now();
+      if (!at || clock - at > PCM_DIAGNOSTIC_TTL_MS) return '';
+      return String(raw.mode).toLowerCase();
+    } catch (_) { return ''; }
+  }
+
+  /** Menulis atau menghapus mode. Nilai yang bukan mode dikenal berarti kembali ke produksi. */
+  function setPcmDiagnosticMode(mode, env, now) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    const value = String(mode || '').toLowerCase();
+    try {
+      const store = target.localStorage;
+      if (!store || typeof store.setItem !== 'function') return '';
+      if (!PCM_DIAGNOSTIC_MODES.includes(value)) {
+        if (typeof store.removeItem === 'function') store.removeItem(PCM_DIAGNOSTIC_STORAGE_KEY);
+        else store.setItem(PCM_DIAGNOSTIC_STORAGE_KEY, 'null');
+        return '';
+      }
+      store.setItem(PCM_DIAGNOSTIC_STORAGE_KEY, JSON.stringify({ mode: value, at: Number(now) || Date.now() }));
+      return value;
+    } catch (_) { return ''; }
+  }
+
+  /**
+   * Urutan penentuan: opsi eksplisit mengalahkan URL, URL mengalahkan mode tersimpan. Dengan
+   * begitu pemanggilan langsung dan tab Safari berparameter tetap berperilaku seperti dulu.
+   */
+  function pcmDiagnosticMode(env, settings, now) {
     const explicit = settings && String(settings.pcmDiagnosticMode || '').toLowerCase();
     if (PCM_DIAGNOSTIC_MODES.includes(explicit)) return explicit;
     try {
+      // Tanpa URL yang membawa mode, penentuan JATUH KE mode tersimpan - bukan berhenti di
+      // sini. Sebelumnya baris ini keluar lebih awal, sehingga mode tersimpan tidak pernah
+      // terbaca dan saklar di dalam aplikasi tidak berpengaruh sama sekali.
       const search = env && env.location && typeof env.location.search === 'string' ? env.location.search : '';
-      if (!search) return '';
-      const Params = env.URLSearchParams || (typeof URLSearchParams !== 'undefined' ? URLSearchParams : null);
-      if (!Params) return '';
-      const value = String(new Params(search).get(PCM_DIAGNOSTIC_PARAM) || '').toLowerCase();
-      return PCM_DIAGNOSTIC_MODES.includes(value) ? value : '';
-    } catch (_) { return ''; }
+      const Params = env && (env.URLSearchParams || (typeof URLSearchParams !== 'undefined' ? URLSearchParams : null));
+      if (search && Params) {
+        const value = String(new Params(search).get(PCM_DIAGNOSTIC_PARAM) || '').toLowerCase();
+        if (PCM_DIAGNOSTIC_MODES.includes(value)) return value;
+      }
+    } catch (_) {}
+    return readStoredPcmMode(env, now);
+  }
+
+  /**
+   * Membungkus PCM menjadi WAV 16-bit. Dipakai HANYA oleh mode wavref; jalur produksi tidak
+   * pernah menyentuh fungsi ini.
+   */
+  // WAV diam sangat pendek, dipakai untuk "membuka kunci" elemen media di dalam gesture
+  // pengguna. iOS hanya mengizinkan play() pada elemen yang pernah diputar saat gesture;
+  // elemen yang baru dibuat beberapa detik kemudian - setelah generate selesai - akan ditolak.
+  var SILENT_WAV = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQAAAAA=';
+
+  /**
+   * Menyiapkan elemen pembanding DI DALAM gesture pengguna, lalu menyimpannya untuk dipakai
+   * ulang. Tanpa ini, mode wavref tidak akan pernah berbunyi di iOS - dan itulah yang terjadi
+   * pada uji fisik m025-66: pembandingnya bisu, lalu aplikasi mengira asetnya belum siap.
+   */
+  function primeReferenceElement(env) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    const AudioCtor = target.Audio || (typeof Audio !== 'undefined' ? Audio : null);
+    if (!AudioCtor) return Promise.resolve(false);
+    let element = target.__fiezelWavRefElement;
+    try {
+      if (!element) {
+        element = new AudioCtor();
+        element.preload = 'auto';
+        target.__fiezelWavRefElement = element;
+      }
+      element.src = SILENT_WAV;
+      const started = element.play();
+      const settle = started && typeof started.then === 'function' ? started : Promise.resolve();
+      return settle.then(function () {
+        try { element.pause(); } catch (_) {}
+        target.__fiezelWavRefPrimed = true;
+        return true;
+      }, function () {
+        target.__fiezelWavRefPrimed = false;
+        return false;
+      });
+    } catch (_) {
+      target.__fiezelWavRefPrimed = false;
+      return Promise.resolve(false);
+    }
+  }
+
+  /**
+   * Memasang pembuka-kunci sekali-pakai pada gesture APA PUN di halaman.
+   *
+   * Bukti m025-67: elemen media ditolak 13 dari 13 kali dengan NotAllowedError, dan
+   * `referencePrimed` tercatat false - membuka kunci hanya lewat tombol mode ternyata rapuh,
+   * karena mode bertahan 24 jam sementara tombolnya mungkin ditekan di sesi atau build lain.
+   * Sentuhan pertama pada apa pun sesudah aplikasi terbuka jauh lebih andal.
+   */
+  function armReferenceUnlock(env) {
+    const target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    if (target.__fiezelWavRefUnlockArmed) return false;
+    const doc = target.document;
+    if (!doc || typeof doc.addEventListener !== 'function') return false;
+    target.__fiezelWavRefUnlockArmed = true;
+    const once = function () {
+      try { primeReferenceElement(target); } catch (_) {}
+      try {
+        doc.removeEventListener('touchend', once, true);
+        doc.removeEventListener('click', once, true);
+      } catch (_) {}
+    };
+    try {
+      doc.addEventListener('touchend', once, true);
+      doc.addEventListener('click', once, true);
+    } catch (_) { return false; }
+    return true;
+  }
+
+  /**
+   * Sinyal referensi deterministik, panjang tetap, tanpa model sama sekali.
+   *
+   * Bentuknya sengaja menyerupai ucapan pada pita frekuensi yang sama - nada dasar 150 Hz
+   * dengan beberapa harmonik dan amplop suku kata - supaya kalau ada cacat pada keluaran
+   * perangkat, cacat itu terdengar dengan cara yang sama seperti pada suara asli. Level
+   * dijaga di 0,5 supaya tidak pernah mendekati clipping.
+   */
+  function buildReferenceTone(sampleRate, seconds) {
+    const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || PREFERRED_SAMPLE_RATE)));
+    const total = Math.max(1, Math.round(rate * (Number(seconds) || 3)));
+    const out = new Float32Array(total);
+    for (let i = 0; i < total; i += 1) {
+      const t = i / rate;
+      // m025-70: amplop suku kata 3 Hz DIHAPUS. Pada uji m025-69 OWNER mendengarnya sebagai
+      // "beep beep beep", dan denyut itu menyulitkan tugas sebenarnya: menilai ada tidaknya
+      // bunyi retak. Nada rata membuat retakan sekecil apa pun langsung terdengar, karena
+      // tidak ada perubahan level yang bisa menyamarkannya.
+      //
+      // Yang tersisa hanya pelembut di ujung: naik 50 ms di awal dan turun 50 ms di akhir,
+      // supaya awal dan akhirnya sendiri tidak menimbulkan klik yang bisa disalahartikan
+      // sebagai cacat.
+      const edge = Math.min(0.05, (total / rate) / 4);
+      const fadeIn = Math.min(1, t / edge);
+      const fadeOut = Math.min(1, (total / rate - t) / edge);
+      const envelope = Math.max(0, Math.min(fadeIn, fadeOut));
+      const voiced = Math.sin(2 * Math.PI * 150 * t)
+        + 0.5 * Math.sin(2 * Math.PI * 300 * t)
+        + 0.25 * Math.sin(2 * Math.PI * 600 * t)
+        + 0.12 * Math.sin(2 * Math.PI * 1200 * t);
+      // Pembagi ini dikalibrasi ke puncak nyata ~0,5, bukan ke jumlah koefisien harmonik:
+      // harmonik tidak pernah memuncak bersamaan, jadi memakai 1,87 membuat nadanya terlalu
+      // pelan untuk dinilai telinga.
+      out[i] = 0.5 * envelope * (voiced / 1.25);
+    }
+    return out;
+  }
+
+  // m025-71: jumlah langkah denoising sebagai mode diagnostik.
+  //
+  // Setelah m025-70, jalur keluaran perangkat terbukti sehat - nada rata buatan sendiri
+  // terdengar mulus sekali di perangkat OWNER. Semua lapisan pemutar kita juga sudah dicoret
+  // satu per satu. Yang tersisa adalah PCM yang dihasilkan model, dan model ini int8 penuh
+  // dengan vocoder int8 serta hanya 4 langkah denoising.
+  //
+  // Menaikkan langkah adalah tuas paling murah yang tersedia: tidak menambah aset, tidak
+  // mengubah kontrak, dan bisa dikembalikan seketika. Nilainya disimpan supaya bisa dipilih
+  // dari dalam aplikasi terpasang, sama seperti mode PCM.
+  var DENOISE_STEPS_KEY = 'fiezel-denoise-steps-v1';
+  var DENOISE_STEPS_ALLOWED = Object.freeze([4, 8, 16]);
+  var DENOISE_STEPS_TTL_MS = 24 * 60 * 60 * 1000;
+
+  // Default produksi, satu tempat untuk KEDUA pintu masuk. Satu model melayani dua bahasa,
+  // jadi selisih langkah di antara keduanya akan langsung terdengar sebagai dua suara berbeda.
+  var DENOISE_STEPS_DEFAULT = 4;
+
+  /** Langkah yang benar-benar dipakai: override diagnostik bila ada, kalau tidak default produksi. */
+  function effectiveDenoiseSteps(env, now) {
+    var override = denoiseSteps(env, now);
+    return override > 0 ? override : DENOISE_STEPS_DEFAULT;
+  }
+
+  function denoiseSteps(env, now) {
+    try {
+      var store = env && env.localStorage;
+      if (!store || typeof store.getItem !== 'function') return 0;
+      var raw = JSON.parse(store.getItem(DENOISE_STEPS_KEY) || 'null');
+      var steps = raw && Number(raw.steps);
+      if (!DENOISE_STEPS_ALLOWED.includes(steps)) return 0;
+      var at = Number(raw.at) || 0;
+      var clock = Number(now) || Date.now();
+      if (!at || clock - at > DENOISE_STEPS_TTL_MS) return 0;
+      return steps;
+    } catch (_) { return 0; }
+  }
+
+  /**
+   * Anggaran waktu generate yang ikut naik bersama langkah denoising.
+   *
+   * Bukti m025-71 dari perangkat OWNER: pada 16 langkah, suaranya GAGAL dimuat. Sebabnya
+   * aritmetika sederhana - anggaran standalone 30 detik, sementara 4 langkah saja sudah
+   * memakan sekitar 6 detik untuk potongan pendek dan jauh lebih lama untuk potongan panjang.
+   * Empat kali lipat langkah menembus anggaran itu, lalu permintaannya dibatalkan.
+   *
+   * Jadi anggaran diskalakan sebanding, dan hanya ketika override diagnostik aktif. Produksi
+   * pada 4 langkah tetap memakai anggaran yang sama persis seperti hari ini.
+   */
+  function denoiseTimeoutMs(baseMs, env, now) {
+    var base = Number(baseMs) > 0 ? Number(baseMs) : 0;
+    if (!base) return base;
+    var steps = denoiseSteps(env, now);
+    if (!steps || steps <= DENOISE_STEPS_DEFAULT) return base;
+    var scaled = Math.round(base * (steps / DENOISE_STEPS_DEFAULT));
+    // Batas atas supaya satu potongan tidak pernah menggantung perangkat tanpa akhir.
+    return Math.min(scaled, 240000);
+  }
+
+  function setDenoiseSteps(steps, env, now) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var value = Number(steps);
+    try {
+      var store = target.localStorage;
+      if (!store || typeof store.setItem !== 'function') return 0;
+      if (!DENOISE_STEPS_ALLOWED.includes(value)) {
+        if (typeof store.removeItem === 'function') store.removeItem(DENOISE_STEPS_KEY);
+        else store.setItem(DENOISE_STEPS_KEY, 'null');
+        return 0;
+      }
+      store.setItem(DENOISE_STEPS_KEY, JSON.stringify({ steps: value, at: Number(now) || Date.now() }));
+      return value;
+    } catch (_) { return 0; }
+  }
+
+  function encodeWav(samples, sampleRate) {
+    const rate = Math.max(8000, Math.min(192000, Math.round(Number(sampleRate) || 24000)));
+    const frames = samples.length;
+    const buffer = new ArrayBuffer(44 + frames * 2);
+    const view = new DataView(buffer);
+    const ascii = (offset, text) => { for (let i = 0; i < text.length; i++) view.setUint8(offset + i, text.charCodeAt(i)); };
+    ascii(0, 'RIFF'); view.setUint32(4, 36 + frames * 2, true); ascii(8, 'WAVE');
+    ascii(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+    view.setUint32(24, rate, true); view.setUint32(28, rate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+    ascii(36, 'data'); view.setUint32(40, frames * 2, true);
+    for (let i = 0; i < frames; i++) {
+      const clamped = Math.max(-1, Math.min(1, Number(samples[i]) || 0));
+      view.setInt16(44 + i * 2, Math.round(clamped * 32767), true);
+    }
+    return buffer;
   }
 
   function analyzeSamples(samples) {
@@ -116,17 +388,29 @@
       peak = Math.max(peak, Math.abs(value));
     }
     const offset = hasNonFinite ? 0 : sum / length;
-    const impulses = hasNonFinite ? [] : findImpulses(samples);
     const needsOffset = !hasNonFinite && Math.abs(offset) > DC_LIMIT && isSustainedOffset(samples, offset);
     const needsHeadroom = peak > PEAK_CEILING;
-    if (!hasNonFinite && !needsOffset && !needsHeadroom && !impulses.length) return samples;
+    if (!hasNonFinite && !needsOffset && !needsHeadroom) return samples;
 
     const out = new Float32Array(length);
     for (let i = 0; i < length; i += 1) {
       const value = Number(samples[i]);
       out[i] = Number.isFinite(value) ? value - (needsOffset ? offset : 0) : 0;
     }
-    impulses.forEach((index) => { out[index] = (out[index - 1] + out[index + 1]) / 2; });
+    // m025-67: perbaikan impuls DIHAPUS, atas bukti perangkat dan bukti unit.
+    //
+    // Bukti perangkat (OWNER, m025-66): RAW - yaitu conditioning dimatikan - terdengar
+    // "pecah sedang", sedangkan CONDITIONED terdengar "pecah berat". Conditioning MEMPERBURUK.
+    //
+    // Bukti mekanisme (lihat gate): pada sinyal ucapan biasa dengan enam transien plosif
+    // normal, findImpulses() menandai keenamnya lalu menimpa sampelnya dengan rata-rata
+    // tetangga - menggeser satu sampel sampai 0,60 dan menurunkan puncak dari 0,45 ke 0,30.
+    // Itu memenggal letupan konsonan (t, k, p) dan justru menyisipkan diskontinuitas baru,
+    // persis pada batas kata dan kalimat tempat OWNER mendengar bunyi retak.
+    //
+    // Yang tersisa di sini semuanya aman dan tidak menyentuh bentuk gelombang ucapan:
+    // NaN/Infinity dinolkan, offset DC yang benar-benar bertahan dibuang, dan headroom
+    // dijaga bila puncaknya melewati batas.
     let repairedPeak = 0;
     for (let i = 0; i < length; i += 1) repairedPeak = Math.max(repairedPeak, Math.abs(out[i]));
     if (repairedPeak > PEAK_CEILING) {
@@ -513,9 +797,138 @@
       };
     }
 
+    /**
+     * Pembanding pemutaran: PCM yang sama, tanpa AudioContext, worklet, penjadwalan, atau fade.
+     * Ini satu-satunya cara memisahkan "modelnya yang cacat" dari "pemutaran kita yang cacat"
+     * di perangkat nyata, dan itulah pertanyaan yang tiga rilis terakhir tidak bisa jawab.
+     */
+    /**
+     * Pembanding di dalam Web Audio, tetapi tanpa lapisan yang dicurigai: worklet, fade, dan
+     * penjadwalan seam. Satu buffer, satu source, langsung ke destination, mulai sekarang.
+     *
+     * Kalau arm ini bersih sementara Normal pecah, cacatnya ada di lapisan yang dilewati -
+     * dan daftar tersangkanya tinggal tiga. Kalau arm ini juga pecah, ketiganya tidak bersalah
+     * dan yang tersisa adalah PCM atau output perangkat.
+     */
+    async function playViaPlainBuffer(samples, sampleRate, rawStats, renderedStats, opts) {
+      const current = await resumeContext();
+      if (!current || typeof current.createBufferSource !== 'function' || typeof current.createBuffer !== 'function') {
+        recordDiagnostic({ playbackPath: 'plain_buffer', referenceFallback: 'audio_context_unavailable' });
+        return null;
+      }
+      let node = null;
+      try {
+        const rate = Number(sampleRate) || PREFERRED_SAMPLE_RATE;
+        const buffer = current.createBuffer(1, samples.length, rate);
+        if (typeof buffer.copyToChannel === 'function') buffer.copyToChannel(samples, 0, 0);
+        else buffer.getChannelData(0).set(samples);
+        node = current.createBufferSource();
+        node.buffer = buffer;
+        node.connect(current.destination);
+      } catch (error) {
+        recordDiagnostic({
+          playbackPath: 'plain_buffer',
+          referenceFallback: String((error && error.name) || 'buffer_failed').slice(0, 40)
+        });
+        return null;
+      }
+
+      let settled = false;
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const finish = () => { if (settled) return; settled = true; resolveDone(); };
+      node.onended = finish;
+      const durationSeconds = samples.length / (Number(sampleRate) || PREFERRED_SAMPLE_RATE);
+      recordDiagnostic({
+        playbackPath: 'plain_buffer',
+        sourceSampleRate: sampleRate,
+        contextSampleRate: Number(current.sampleRate) || null,
+        resamplingExpected: Number(current.sampleRate) > 0 && Number(current.sampleRate) !== sampleRate,
+        trimmed: opts.trim === true,
+        raw: rawStats,
+        rendered: renderedStats,
+        bypassed: 'worklet,fade,seam_scheduling',
+        syntheticReference: diagnosticMode === 'toneref'
+      });
+      try { node.start(); } catch (error) {
+        finish();
+        recordDiagnostic({ playbackPath: 'plain_buffer', referenceFallback: 'start_failed' });
+        return null;
+      }
+      setTimeout(finish, Math.max(1000, Math.round(durationSeconds * 1000) + 2500));
+      return {
+        done,
+        startsAt: contextTime(current),
+        endsAt: contextTime(current) + durationSeconds,
+        diagnosticMode,
+        stop() { try { node.stop(); } catch (_) {} finish(); }
+      };
+    }
+
+    async function playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts) {
+      const AudioCtor = env.Audio || (typeof Audio !== 'undefined' ? Audio : null);
+      const BlobCtor = env.Blob || (typeof Blob !== 'undefined' ? Blob : null);
+      const urls = env.URL || (typeof URL !== 'undefined' ? URL : null);
+      if (!AudioCtor || !BlobCtor || !urls || typeof urls.createObjectURL !== 'function') {
+        recordDiagnostic({ playbackPath: 'media_element', referenceFallback: 'media_element_unavailable' });
+        return null;
+      }
+      const wav = encodeWav(samples, sampleRate);
+      const url = urls.createObjectURL(new BlobCtor([wav], { type: 'audio/wav' }));
+      // Pakai ulang elemen yang sudah dibuka kuncinya saat pengguna menekan tombol mode.
+      const element = env.__fiezelWavRefElement || new AudioCtor();
+      element.src = url;
+      element.preload = 'auto';
+      let settled = false;
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const cleanup = () => {
+        if (settled) return;
+        settled = true;
+        try { if (typeof urls.revokeObjectURL === 'function') urls.revokeObjectURL(url); } catch (_) {}
+        resolveDone();
+      };
+      element.onended = cleanup;
+      element.onerror = cleanup;
+      recordDiagnostic({
+        playbackPath: 'media_element',
+        sourceSampleRate: sampleRate,
+        contextSampleRate: null,
+        resamplingExpected: false,
+        trimmed: opts.trim === true,
+        raw: rawStats,
+        rendered: renderedStats,
+        wavBytes: wav.byteLength,
+        referencePrimed: env.__fiezelWavRefPrimed === true
+      });
+      try {
+        await element.play();
+      } catch (error) {
+        // iOS menolak play() pada elemen yang dibuat di luar jendela gesture pengguna.
+        cleanup();
+        recordDiagnostic({
+          playbackPath: 'media_element',
+          referenceFallback: String((error && error.name) || 'play_rejected').slice(0, 40)
+        });
+        return null;
+      }
+      return {
+        done,
+        startsAt: 0,
+        endsAt: samples.length / (Number(sampleRate) || 24000),
+        diagnosticMode,
+        stop() {
+          try { element.pause(); } catch (_) {}
+          cleanup();
+        }
+      };
+    }
+
     async function play(rawAudio, options) {
       const opts = options || {};
-      if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
+      // Pembanding WAV memang harus bisa berjalan tanpa Web Audio sama sekali; kalau ia masih
+      // menuntut AudioContext, ia bukan pembanding independen.
+      if (!AudioContextCtor && diagnosticMode !== 'wavref') throw new Error('Web Audio API unavailable');
       const continuous = opts.continuous === true;
       const epoch = reservePlaybackEpoch(continuous);
       let samples = pickSamples(rawAudio);
@@ -531,6 +944,27 @@
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
+      if (diagnosticMode === 'toneref') {
+        // PCM model diganti sepenuhnya; yang diputar adalah sinyal buatan sendiri.
+        const toneRate = Number(sampleRate) || PREFERRED_SAMPLE_RATE;
+        const tone = buildReferenceTone(toneRate, 3);
+        const toneStats = analyzeSamples(tone);
+        const played = await playViaPlainBuffer(tone, toneRate, toneStats, toneStats, opts);
+        if (played) return played;
+      }
+      if (diagnosticMode === 'plainbuffer') {
+        const plain = await playViaPlainBuffer(samples, sampleRate, rawStats, renderedStats, opts);
+        if (plain) return plain;
+      }
+      if (diagnosticMode === 'wavref') {
+        // Kalau pembanding gagal dipakai (iOS memblokir play() di luar gesture, atau elemen
+        // media tidak tersedia), JANGAN melempar. Melempar membuat runtime suara mengira
+        // asetnya belum siap dan menyuruh pengguna mengunduh ulang suara yang sudah ada -
+        // itu yang terjadi pada uji fisik m025-66. Jatuh balik ke jalur normal, dan catat
+        // alasannya supaya arm yang gagal terlihat jelas di Diagnostics.
+        const reference = await playViaMediaElement(samples, sampleRate, rawStats, renderedStats, opts);
+        if (reference) return reference;
+      }
       const current = await resumeContext();
       if (!current) throw new Error('Web Audio API unavailable');
 
@@ -701,12 +1135,27 @@
     pickSamples,
     pickSampleRate,
     pcmDiagnosticMode,
+    setPcmDiagnosticMode,
+    primeReferenceElement,
+    armReferenceUnlock,
+    readStoredPcmMode,
+    encodeWav,
+    buildReferenceTone,
+    denoiseSteps,
+    effectiveDenoiseSteps,
+    denoiseTimeoutMs,
+    setDenoiseSteps,
+    DENOISE_STEPS_DEFAULT,
+    DENOISE_STEPS_ALLOWED,
+    DENOISE_STEPS_KEY,
     analyzeSamples,
     guardClipping,
     conditionSamples,
     trimSilence,
     PCM_DIAGNOSTIC_PARAM,
     PCM_DIAGNOSTIC_MODES,
+    PCM_DIAGNOSTIC_STORAGE_KEY,
+    PCM_DIAGNOSTIC_TTL_MS,
     PREFERRED_SAMPLE_RATE,
     LATENCY_HINT,
     PEAK_CEILING,

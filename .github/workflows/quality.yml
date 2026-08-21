@@ -40,6 +40,14 @@ jobs:
           node content-evidence-origin-test.js
           node content-adoption-rehearsal-test.js
           node content-adoption-test.js
+          node content-adoption-receipt-test.js
+          node continuity-test.js
+          node backup-ui-test.js
+          node install-health-test.js
+          node brand-mascot-test.js
+          node onboarding-test.js
+          node observability-privacy-test.js
+          node a11y-test.js
           node product-audit.js
           node runtime-stage8-test.js
           node ai-integration-test.js
@@ -56,6 +64,10 @@ jobs:
           node adaptive-policy-test.js
           node policy-outcome-test.js
           node personal-journey-test.js
+          node personal-journey-ui-test.js
+          node skills-evidence-test.js
+          node skills-dashboard-test.js
+          node academic-readiness-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
           node pwa-startup-white-screen-recovery-test.js
@@ -96,6 +108,10 @@ jobs:
           node neural-voice-m02542-persona-test.js
           node neural-voice-m02548-clarity-test.js
           node neural-voice-m026-raw-pcm-ab-test.js
+          node neural-voice-wav-reference-test.js
+          node neural-voice-conditioning-repair-test.js
+          node neural-voice-denoise-steps-test.js
+          node neural-voice-balanced-chunks-test.js
           node neural-voice-m028-audio-integrity-test.js
           node neural-voice-m0281-regression-test.js
           node neural-voice-m0282-seam-buffer-integrity-test.js

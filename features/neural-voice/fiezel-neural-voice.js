@@ -27,6 +27,20 @@
         continue;
       }
       const words = chunk.split(/\s+/);
+      // m025-73: potongannya DISEIMBANGKAN, tidak sekadar diisi sampai penuh lalu menyisakan
+      // ekor pendek.
+      //
+      // Bukti perangkat OWNER pada m025-72: teks berisi tanda petik membuat suara terjeda
+      // sekitar 10 detik, dan pada 8 langkah menjadi hampir 20 detik — tepat dua kali lipat,
+      // yaitu waktu generate. Penyebabnya bukan tanda petiknya, melainkan ekor pendek yang
+      // dihasilkan pemotongan serakah: satu potongan seperti "serempak." hanya berbunyi
+      // setengah detik tetapi tetap menuntut satu putaran generate penuh, dan prefetch tidak
+      // mungkin menyembunyikan enam detik di balik setengah detik pemutaran.
+      //
+      // Membagi rata menghilangkan ekor itu: setiap potongan berdurasi mirip, sehingga
+      // pemutaran satu potongan punya cukup waktu untuk menutupi pembuatan potongan berikutnya.
+      const pieces = Math.max(1, Math.ceil(chunk.length / limit));
+      const target = Math.ceil(chunk.length / pieces);
       let current = [];
       let currentLength = 0;
       function flush() {
@@ -41,7 +55,9 @@
           continue;
         }
         const added = current.length ? 1 + word.length : word.length;
-        if (current.length && currentLength + added > limit) flush();
+        // Batas keras tetap dihormati; target hanya menentukan kapan sebaiknya berpindah,
+        // sehingga sisa terakhir tidak pernah tertinggal sebagai serpihan.
+        if (current.length && (currentLength + added > limit || currentLength >= target)) flush();
         current.push(word);
         currentLength += currentLength ? 1 + word.length : word.length;
       }
@@ -50,8 +66,53 @@
     return bounded;
   }
 
+  /**
+   * m025-74: potongan PERTAMA dibuat pendek, sisanya tetap seperti biasa.
+   *
+   * Bukti perangkat OWNER pada m025-73: jeda saat tanda petik sudah jauh membaik, tetapi jeda
+   * SAAT MULAI MEMBACA masih sangat lama. Itu bukan cacat tersembunyi, melainkan aritmetika
+   * yang tersisa: setiap jeda lain bisa disembunyikan di balik pemutaran potongan sebelumnya,
+   * sedangkan potongan pertama tidak punya apa pun untuk bersembunyi. Waktu sampai kata
+   * pertama SAMA DENGAN waktu membuat potongan pertama.
+   *
+   * Karena waktu generate tumbuh mengikuti panjang teks, memendekkan potongan pembuka
+   * memendekkan penantian itu secara langsung. Potongan berikutnya kembali berukuran penuh,
+   * dan selama pembuka masih berbunyi, potongan kedua sudah selesai dibuat.
+   */
+  function withFastLeadIn(chunks, leadInChars, hardCap) {
+    const limit = Number(leadInChars) > 0 ? Math.floor(Number(leadInChars)) : 0;
+    if (!limit || !chunks || !chunks.length) return chunks;
+    const first = String(chunks[0] || '');
+    if (first.length <= limit) return chunks;
+    const words = first.split(/\s+/);
+    let head = '';
+    let index = 0;
+    while (index < words.length) {
+      const candidate = head ? head + ' ' + words[index] : words[index];
+      // Berhenti begitu melewati batas, tetapi jangan pernah menghasilkan pembuka kosong.
+      if (head && candidate.length > limit) break;
+      head = candidate;
+      index += 1;
+    }
+    const tail = words.slice(index).join(' ').trim();
+    if (!head || !tail) return chunks;
+    const rest = Array.prototype.slice.call(chunks, 1);
+    // Sisa potongan pembuka jangan sampai menjadi serpihan baru - itu justru cacat yang
+    // dibereskan m025-73. Kalau muat, ia disatukan dengan potongan berikutnya; batas keras
+    // tetap dihormati, dan kalau tidak muat ia berdiri sendiri seperti apa adanya.
+    const capacity = Number(hardCap) > 0 ? Math.floor(Number(hardCap)) : 0;
+    if (rest.length && capacity) {
+      const merged = tail + ' ' + rest[0];
+      if (merged.length <= capacity) return [head, merged].concat(rest.slice(1));
+    }
+    return [head, tail].concat(rest);
+  }
+
   function splitIntoChunks(text, targetWords, hardWords, hardChars) {
-    const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text];
+    // m025-73: tanda kutip dan kurung penutup ikut bersama kalimatnya. Tanpa ini, `dunia."`
+    // terbelah menjadi `dunia.` lalu `"`, dan tanda petik yatim itu diserahkan ke mesin
+    // sebagai token tersendiri - persis pada teks bertanda petik yang OWNER laporkan.
+    const sentences = text.match(/[^.!?]+[.!?]+["'”’)\]]*|[^.!?]+$/g) || [text];
     const chunks = [];
     let current = [];
     let count = 0;
@@ -187,10 +248,15 @@
     // a fast engine buffer a whole chapter of PCM into memory.
     const SCHEDULE_DEPTH = 2;
     const prosody = options.prosody || (env && env.FiezelProsody) || null;
+    // Panjang potongan pembuka: cukup untuk satu frasa wajar, cukup pendek supaya kata pertama
+    // terdengar dalam sekitar sepertiga waktu potongan penuh.
+    const leadInChars = appleHardChunkChars ? Math.max(24, Math.round(appleHardChunkChars / 3)) : 0;
     function planChunks(text) {
-      return streamSentences
+      const planned = streamSentences
         ? planStream(text, { maxWords: streamMaxWords, hardChars: appleHardChunkChars })
         : splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
+      // Hanya potongan pembuka yang dipendekkan; sisanya dibiarkan apa adanya.
+      return withFastLeadIn(planned, leadInChars, appleHardChunkChars);
     }
     /**
      * Silence to leave before a line, decided by how the previous one ended.
@@ -596,5 +662,5 @@
     return Object.freeze({ speak, stop, prefetch, splitIntoChunks: (text) => planChunks(text) });
   }
 
-  return Object.freeze({ normalizeText, splitIntoChunks, createVoiceService });
+  return Object.freeze({ normalizeText, splitIntoChunks, withFastLeadIn, createVoiceService });
 });

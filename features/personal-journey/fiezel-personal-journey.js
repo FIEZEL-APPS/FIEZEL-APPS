@@ -112,8 +112,14 @@
   }
 
   /**
-   * Skill map lima skill. Skill tanpa bukti TIDAK ditebak; statusnya `not_measured` supaya
-   * dashboard bisa membedakan "lemah" dari "belum pernah diukur".
+   * Skill map lima skill. Skill tanpa bukti TIDAK ditebak, sehingga dashboard bisa membedakan
+   * "lemah" dari "belum terukur".
+   *
+   * Listening/Speaking memakai status `pending_r3`, bukan `not_measured`. Bedanya penting dan
+   * bukan sekadar kata: `fiezel-sl-v1-state` SUDAH menyimpan bukti agregat untuk kedua skill
+   * itu, hanya belum diproyeksikan ke Learner Evidence (itu pekerjaan R3). Menulis "belum ada
+   * bukti" akan menjadi klaim yang salah terhadap murid yang sudah mengerjakan latihan
+   * Speaking/Listening.
    */
   function buildSkillMap(input) {
     var evidence = (input && input.evidence) || {};
@@ -122,12 +128,30 @@
     var weakest = (evidence.skills && evidence.skills.weakest) || [];
     var topRisks = (evidence.memory && evidence.memory.topRisks) || [];
 
+    var spoken = (evidence.skills && evidence.skills.spoken) || null;
+
     return SKILLS.map(function (skill) {
       if (MEASURED_SKILLS.indexOf(skill) === -1) {
+        // R3 memproyeksikan bukti agregat Speaking/Listening ke Learner Evidence. Kalau
+        // proyeksinya ada dan berisi, skill ini terukur seperti yang lain; kalau belum,
+        // statusnya tetap menunggu proyeksi - bukan diklaim tidak punya bukti.
+        var row = spoken && spoken[skill];
+        if (row && row.attempts > 0) {
+          return {
+            skill: skill, label: SKILL_LABELS[skill], status: 'measured',
+            attempts: row.attempts,
+            // practiceScore, bukan skor pengucapan. Namanya dijaga sampai ke layar.
+            accuracy: row.practiceScore == null ? null : clamp(row.practiceScore, 0, 100),
+            mastery: row.completionRate == null ? null : clamp(row.completionRate, 0, 100),
+            riskCount: 0,
+            targetCoverage: row.targetCoverage || null,
+            basis: row.attempts + ' latihan tercatat pada skill ini.'
+          };
+        }
         return {
-          skill: skill, label: SKILL_LABELS[skill], status: 'not_measured',
-          attempts: 0, accuracy: null, mastery: null, riskCount: 0,
-          basis: 'Belum ada bukti terukur di FIEZEL untuk skill ini.'
+          skill: skill, label: SKILL_LABELS[skill], status: 'pending_r3',
+          attempts: null, accuracy: null, mastery: null, riskCount: 0,
+          basis: 'Latihan Speaking/Listening tercatat terpisah dan belum masuk peta ini.'
         };
       }
       // Snapshot memakai nama `vocabulary`, riwayat jawaban memakai type `vocab`.
@@ -200,10 +224,15 @@
     var sessions = realisticSessions(evidence);
     var memory = evidence.memory || {};
 
-    // Review wajib: jatuh tempo nyata, dibatasi supaya satu minggu tidak berubah jadi antrian
-    // hukuman. Sisanya tetap tercatat sebagai backlog, bukan dihapus.
+    // Review wajib: jatuh tempo nyata, dibatasi oleh kapasitas review sesi-sesi minggu ini
+    // SENDIRI. buildTodayPlan menjamin review tidak pernah lebih dari setengah sesi, jadi
+    // kapasitas mingguan yang jujur adalah sessions * floor(sessionSize / 2). Batas lama
+    // (sessions * 4) bisa menjanjikan lebih banyak review daripada yang mungkin dijadwalkan
+    // — misi yang mustahil diselesaikan tanpa melanggar aturan setengah-sesi itu sendiri.
+    // Sisanya tetap tercatat sebagai backlog, bukan dihapus.
     var dueReviews = clamp(memory.dueReviews, 0, 1e5);
-    var mustReview = clamp(dueReviews, 0, sessions * 4);
+    var weeklyReviewCapacity = sessions * Math.floor(sessionSize / 2);
+    var mustReview = clamp(dueReviews, 0, weeklyReviewCapacity);
 
     var skillMap = buildSkillMap({ evidence: evidence, snapshot: snapshot });
     var goal = buildGoalProfile(options.goal);
@@ -212,7 +241,15 @@
     return {
       schema: SCHEMA,
       kind: 'weekly-mission',
-      missionId: 'wm-' + toDayKey(start) + '-' + mode + '-' + safeFocus,
+      // Identitas misi dikunci ke minggu belajarnya saja. Sebelumnya `mode` dan fokus ikut
+      // masuk ke id, sehingga bukti baru di tengah minggu diam-diam melahirkan misi "baru"
+      // dan progres minggu berjalan kehilangan kaitannya.
+      missionId: 'wm-' + toDayKey(start),
+      // Isi misi memang dihitung ulang dari bukti terkini - modul ini stateless dan itu
+      // disengaja. Karena itu perubahan isi harus TERLIHAT, bukan senyap: revision berubah
+      // ketika fokus atau mode berubah, sehingga UI dan audit bisa membedakan "misi yang
+      // sama, target bergeser" dari "minggu baru".
+      missionRevision: mode + '-' + safeFocus,
       weekStart: toDayKey(start),
       weekEnd: toDayKey(start + 6 * DAY_MS),
       generatedAt: new Date(now).toISOString(),

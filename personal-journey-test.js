@@ -77,11 +77,89 @@ test('target mingguan realistis: tidak melompat jauh dari ritme nyata', () => {
 test('skill map tidak menebak skill yang belum pernah diukur', () => {
   const byName = Object.fromEntries(mission.skillMap.map(r => [r.skill, r]));
   assert.strictEqual(mission.skillMap.length, 5);
-  assert.strictEqual(byName.listening.status, 'not_measured');
-  assert.strictEqual(byName.speaking.status, 'not_measured');
   assert.strictEqual(byName.listening.accuracy, null, 'skill tanpa bukti tidak boleh punya angka');
   assert.strictEqual(byName.grammar.status, 'measured');
   assert.strictEqual(byName.grammar.accuracy, 40);
+});
+
+test('Listening/Speaking berstatus menunggu R3, bukan diklaim tanpa bukti', () => {
+  const byName = Object.fromEntries(mission.skillMap.map(r => [r.skill, r]));
+  // fiezel-sl-v1-state sudah menyimpan bukti agregat untuk kedua skill ini; yang belum ada
+  // adalah proyeksinya ke Learner Evidence. Mengklaim "belum ada bukti" akan salah terhadap
+  // murid yang sudah mengerjakan latihannya.
+  assert.strictEqual(byName.listening.status, 'pending_r3');
+  assert.strictEqual(byName.speaking.status, 'pending_r3');
+  assert.strictEqual(byName.listening.attempts, null, 'jangan menyatakan 0 percobaan yang tidak diketahui');
+  assert.ok(!/belum ada bukti/i.test(byName.speaking.basis));
+});
+
+test('proyeksi R3 membuat Speaking/Listening terukur di peta skill', () => {
+  const denganSpoken = {
+    ...evidence,
+    skills: {
+      ...evidence.skills,
+      spoken: {
+        schema: 'fiezel-skills-evidence-v1', version: 1,
+        listening: { status: 'measured', attempts: 6, practiceScore: 72, completionRate: 67, targetCoverage: { measured: true, percent: 25 } },
+        speaking: { status: 'not_measured', attempts: 0, practiceScore: null, completionRate: null, targetCoverage: { measured: false, percent: null } }
+      }
+    }
+  };
+  const m = journey.buildWeeklyMission({ evidence: denganSpoken, policy, snapshot, now: NOW });
+  const byName = Object.fromEntries(m.skillMap.map(r => [r.skill, r]));
+  assert.strictEqual(byName.listening.status, 'measured');
+  assert.strictEqual(byName.listening.attempts, 6);
+  assert.strictEqual(byName.listening.accuracy, 72, 'skor latihan, bukan skor pengucapan');
+  assert.strictEqual(byName.listening.targetCoverage.percent, 25);
+  // Speaking punya proyeksi tetapi belum ada latihan: tetap tidak boleh diklaim 0%.
+  assert.strictEqual(byName.speaking.status, 'pending_r3');
+  assert.strictEqual(byName.speaking.accuracy, null);
+});
+
+test('identitas misi terkunci ke minggu, perubahan isi terlihat lewat revision', () => {
+  // Bukti baru di tengah minggu tidak boleh diam-diam melahirkan misi baru.
+  const policyBerubah = { ...policy, mode: 'review', targetSkill: 'reading_inference', primaryDomain: 'reading' };
+  const geser = journey.buildWeeklyMission({ evidence, policy: policyBerubah, snapshot, now: NOW + 2 * DAY, goal: 'exam_foundation' });
+  assert.strictEqual(geser.missionId, mission.missionId, 'satu minggu, satu identitas misi');
+  assert.notStrictEqual(geser.missionRevision, mission.missionRevision, 'pergeseran fokus harus terlihat');
+  // Minggu berikutnya tetap misi yang berbeda.
+  const mingguDepan = journey.buildWeeklyMission({ evidence, policy, snapshot, now: NOW + 7 * DAY, goal: 'exam_foundation' });
+  assert.notStrictEqual(mingguDepan.missionId, mission.missionId);
+});
+
+test('review wajib mingguan tidak pernah melebihi kapasitas sesinya sendiri', () => {
+  // Kasus dari audit: sesi pendek + antrian review besar. Batas lama menjanjikan 16 review
+  // wajib padahal empat sesi berisi 4 soal hanya sanggup menjadwalkan 8 tanpa melanggar
+  // aturan setengah-sesi di buildTodayPlan.
+  const padat = {
+    ...evidence,
+    behavior: { ...evidence.behavior, activeDays14: 6, abandonmentRate: 20 },
+    memory: { ...evidence.memory, dueReviews: 400 }
+  };
+  const kecil = { ...policy, sessionSize: 4 };
+  const m = journey.buildWeeklyMission({ evidence: padat, policy: kecil, snapshot, now: NOW });
+  const kapasitas = m.sessionsTarget * Math.floor(4 / 2);
+  assert.strictEqual(m.mustReview, kapasitas, 'review wajib dibatasi kapasitas nyata');
+  assert.strictEqual(m.reviewBacklog, 400 - kapasitas, 'sisanya tetap tercatat, tidak hilang');
+
+  // Properti yang harus berlaku untuk seluruh rentang, bukan satu contoh: jumlah review wajib
+  // harian yang benar-benar bisa dijadwalkan minimal sama dengan janji mingguan.
+  for (let size = 4; size <= 20; size++) {
+    for (let due = 0; due <= 60; due += 7) {
+      const mm = journey.buildWeeklyMission({
+        evidence: { ...padat, memory: { ...padat.memory, dueReviews: due } },
+        policy: { ...policy, sessionSize: size }, snapshot, now: NOW
+      });
+      const pp = journey.buildTodayPlan({
+        mission: mm, evidence: { ...padat, memory: { ...padat.memory, dueReviews: due } },
+        policy: { ...policy, sessionSize: size }, now: NOW
+      });
+      assert.ok(mm.mustReview <= mm.sessionsTarget * Math.floor(size / 2),
+        `janji mingguan melebihi kapasitas pada sessionSize=${size} due=${due}`);
+      assert.ok(pp.mandatoryReview <= Math.floor(pp.questionsTarget / 2),
+        `rencana harian melanggar batas setengah sesi pada sessionSize=${size} due=${due}`);
+    }
+  }
 });
 
 test('goal profile menyebut prasyarat dan tidak pernah memprediksi skor', () => {

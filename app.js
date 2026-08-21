@@ -43,7 +43,7 @@ const SCENE_STOPS=[
   {minute:1440,top:'#140a12',bottom:'#2c1622'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
-const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT};
+const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,examTrack:''};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
   {headline:'Oii Jahran, target kuliah luar negeri lu keren. Tapi hari ini udah belajar belum? 👀',lead:'Beasiswa sama kampus IT impian nggak kebangun dari niat doang. Gas 10–15 menit dulu, kecil tapi nyata.'},
@@ -344,7 +344,21 @@ function buildLearnerEvidenceModel(now=Date.now()){
   const sessions=(state.sessionHistory||[]).filter(s=>{const t=Date.parse(s?.at||'');return t&&now-t<=30*86400000}),abandoned=sessions.filter(s=>s.abandoned===true||s.completed===false).length,abandonmentRate=sessions.length?Math.round(abandoned/sessions.length*100):0;
   const hours={};for(const h of recent30){const hour=studyHour(h.at),label=studyWindowLabel(hour);hours[label]=(hours[label]||0)+1}const preferredWindow=Object.entries(hours).sort((a,b)=>b[1]-a[1])[0]?.[0]||'belum terbaca';
   const recurring=skillEvidence.filter(x=>x.recurringErrors>=2),avgResponseMs=medianNumber(recent30.map(h=>h.ms));
-  return{schema:'fiezel-learner-evidence-v1',generatedAt:new Date(now).toISOString(),windowDays:LEARNER_EVIDENCE_WINDOW_DAYS,learner:USER_NAME,behavior:{activeDays14,consistency14d,streakDays:Number(state.streak||0),todayAttempts:Number(state.daily?.attempts||0),sessions30d:sessions.length,abandonedSessions30d:abandoned,abandonmentRate,medianResponseMs:avgResponseMs,preferredStudyWindow:preferredWindow},confidence:{evidence:confRows.length,gap:confidenceGap,levels:conf},memory:{dueReviews:memory.filter(x=>x.due).length,maxForgettingRisk:memory[0]?.risk||0,highRiskCount:memory.filter(x=>x.risk>=60).length,topRisks:memory.slice(0,5)},skills:{measured:skillEvidence.length,recurringErrorSkills:recurring.length,weakest:skillEvidence.slice(0,8)},privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}
+  const model={schema:'fiezel-learner-evidence-v1',generatedAt:new Date(now).toISOString(),windowDays:LEARNER_EVIDENCE_WINDOW_DAYS,learner:USER_NAME,behavior:{activeDays14,consistency14d,streakDays:Number(state.streak||0),todayAttempts:Number(state.daily?.attempts||0),sessions30d:sessions.length,abandonedSessions30d:abandoned,abandonmentRate,medianResponseMs:avgResponseMs,preferredStudyWindow:preferredWindow},confidence:{evidence:confRows.length,gap:confidenceGap,levels:conf},memory:{dueReviews:memory.filter(x=>x.due).length,maxForgettingRisk:memory[0]?.risk||0,highRiskCount:memory.filter(x=>x.risk>=60).length,topRisks:memory.slice(0,5)},skills:{measured:skillEvidence.length,recurringErrorSkills:recurring.length,weakest:skillEvidence.slice(0,8)},privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}};return withSpokenSkills(model,now)
+}
+// R3: Speaking/Listening tercatat di sidecar fiezel-sl-v1-state, terpisah dari state utama.
+// Tanpa langkah ini Learner Evidence tidak pernah melihatnya, dan peta skill melaporkan dua
+// skill sebagai belum terhubung padahal muridnya sudah berlatih. Proyeksinya agregat saja.
+function withSpokenSkills(model,now){
+  const projector=self.FiezelSkillsEvidence;if(!projector)return model;
+  try{
+    const state=projector.readSidecarState(self);
+    // Penyebut cakupan target datang dari config sidecar, yang dijaga gate agar tetap sama
+    // dengan jumlah item di bank soal. Kalau config tidak ada, coverage tetap tidak dihitung
+    // - modul menandainya tidak terukur, bukan mengarang penyebut.
+    const bankCounts=self.FIEZEL_SPEAKING_LISTENING_CONFIG?.bankCounts||null;
+    return projector.mergeIntoLearnerEvidence(model,projector.projectSkillsEvidence({state,now,bankCounts}));
+  }catch(_){return model}
 }
 function remoteLearnerEvidenceSnapshot(now=Date.now()){const e=buildLearnerEvidenceModel(now);return{schema:e.schema,generatedAt:e.generatedAt,behavior:{activeDays14:e.behavior.activeDays14,consistency14d:e.behavior.consistency14d,streakDays:e.behavior.streakDays,todayAttempts:e.behavior.todayAttempts,abandonmentRate:e.behavior.abandonmentRate,medianResponseMs:e.behavior.medianResponseMs,preferredStudyWindow:e.behavior.preferredStudyWindow},confidence:{evidence:e.confidence.evidence,gap:e.confidence.gap},memory:{dueReviews:e.memory.dueReviews,maxForgettingRisk:e.memory.maxForgettingRisk,highRiskCount:e.memory.highRiskCount},skills:{measured:e.skills.measured,recurringErrorSkills:e.skills.recurringErrorSkills,weakest:e.skills.weakest.slice(0,3).map(x=>({skill:x.skill,type:x.type,attempts:x.attempts,accuracy:x.accuracy,errorRate:x.errorRate,recurringErrors:x.recurringErrors}))},privacy:e.privacy}}
 function policyOutcomeSessionRows(session){const start=Date.parse(session?.startedAt||'')||0,end=Date.parse(session?.at||'')||Date.now();return(state.history||[]).filter(h=>Number(h?.at||0)>=start&&Number(h?.at||0)<=end)}
@@ -587,7 +601,7 @@ function startReminderEngine(){
   if(reminderTimer&&typeof clearInterval==='function')clearInterval(reminderTimer);if(typeof setInterval==='function'){reminderTimer=setInterval(()=>checkStudyReminders(false),NOTIFICATION_REMINDER_INTERVAL_MS);reminderTimer?.unref?.()}const first=setTimeout(()=>checkStudyReminders(false),12000);first?.unref?.();
 }
 function unlockAppAfterNotification(){
-  if(notificationsRequired()&&notificationPermission()!=='granted'){lockAppForNotifications();return false}if(appUnlocked)return true;appUnlocked=true;document.body?.classList?.remove?.('notification-locked');setNotificationGateState('granted');notifyAppUpdateIfNew();render();startReminderEngine();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}setTimeout(hideNotificationGate,220);// m025-42: the third install prompt. It runs after the notification gate clears so the
+  if(notificationsRequired()&&notificationPermission()!=='granted'){lockAppForNotifications();return false}if(appUnlocked)return true;appUnlocked=true;document.body?.classList?.remove?.('notification-locked');setNotificationGateState('granted');notifyAppUpdateIfNew();render();startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}setTimeout(hideNotificationGate,220);// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-43: the gates used to be called straight from here, but this runs while app.js
 // is still parsing, before the later <script> tags exist - so the daily-target call hit
@@ -622,7 +636,8 @@ function render(){const __renderStartedAt=Date.now();try{return renderInner()}fi
 // which is how OWNER experienced the Classroom regression before any error was logged.
 function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
 const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom','library']);
-function go(v){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false)document.startViewTransition(swap);else swap();return true} window.go=go;
+function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
+function go(v){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
 function stat(a,b){return `<small>${a}</small><strong>${b}</strong>`}
@@ -651,6 +666,7 @@ function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolic
   </div>
   <div class="home-stats"><div>${stat('Level',level)}</div><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Dikuasai',mastered)}</div><div>${stat('Runtun',state.streak+' hari')}</div></div>
 </div>
+${journeyMarkup()}
 <div class="home-section-head"><div><h2>Pilih fokus hari ini</h2></div><button class="text-button" onclick="go('progress')">Lihat peta belajar <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
   <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i data-lucide="book-a"></i></span><span><small>${V.length.toLocaleString()} kata</small><b>Vocabulary</b></span><i data-lucide="arrow-up-right"></i></button>
@@ -660,6 +676,269 @@ function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolic
   <button class="launch-card skills-launch" onclick="go('skills')"><span class="launch-icon"><i data-lucide="audio-waveform"></i></span><span><small>72 latihan · A1–C2</small><b>Speaking + Listening</b></span><i data-lucide="arrow-up-right"></i></button>
 </div>
 </section>`)}
+// R2 Personal Learning Journey. The plan itself is decided by features/personal-journey,
+// which is pure and deterministic; app.js only supplies evidence and renders the result.
+// Nothing here may re-decide priority, because the roadmap requires the ordering to stay
+// auditable and reproducible.
+function buildPersonalJourney(now=Date.now()){
+  const journey=self.FiezelPersonalJourney;if(!journey)return null;
+  try{
+    const snapshot=buildLearningSnapshot(),evidence=buildLearnerEvidenceModel(now),policy=buildAdaptivePolicy(now);
+    const mission=journey.buildWeeklyMission({evidence,policy,snapshot,now,goal:state.preferences?.goalProfile});
+    const plan=journey.buildTodayPlan({mission,evidence,policy,now,lastLearningAt:lastLearningAt(),interruptedSession:!!state.activeSession});
+    return{mission,plan};
+  }catch(_){return null}
+}
+function setGoalProfile(value){const journey=self.FiezelPersonalJourney;if(!journey)return;const goal=journey.buildGoalProfile(value).id;state.preferences={...state.preferences,goalProfile:goal};save();render();showToast(`Tujuan belajar: ${journey.buildGoalProfile(goal).label}`)}
+window.setGoalProfile=setGoalProfile;
+const JOURNEY_BLOCK_LABELS={review:'Review wajib',focus:'Fokus',transfer:'Transfer'};
+function journeySkillRowMarkup(row){
+  // Tiga keadaan, bukan dua. Menampilkan 0% untuk skill yang belum pernah diukur terbaca
+  // sebagai "kamu payah" padahal FIEZEL memang belum mengukurnya; dan Speaking/Listening
+  // bukan "belum diukur" - latihannya sudah tercatat, hanya belum masuk peta ini (R3).
+  const value=row.status==='pending_r3'?'Belum terhubung'
+    :row.status==='not_measured'?'Belum diukur'
+    :`${row.accuracy==null?'—':row.accuracy+'%'}`;
+  // Cakupan target ditampilkan terpisah dari nilai, dan hanya kalau penyebutnya diketahui.
+  // Menggabungkan keduanya jadi satu angka adalah cara tercepat membuat murid mengira
+  // "baru 6% materi disentuh" berarti "nilaimu 6".
+  const coverage=row.targetCoverage&&row.targetCoverage.measured
+    ? `<small>cakupan ${row.targetCoverage.percent}%</small>` : '';
+  return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span>${coverage}</div>`;
+}
+function journeyMarkup(now=Date.now()){
+  const built=buildPersonalJourney(now);if(!built)return'';
+  const{mission,plan}=built,goals=self.FiezelPersonalJourney.GOAL_IDS.map(id=>self.FiezelPersonalJourney.buildGoalProfile(id));
+  const focus=mission.focusSkill?mission.focusSkill.replace(/_/g,' '):mission.focusDomain;
+  const blocks=plan.blocks.map(b=>`<li class="journey-block journey-block-${esc(b.kind)}"><b>${esc(JOURNEY_BLOCK_LABELS[b.kind]||b.kind)} · ${b.questions} soal</b><span>${esc(b.why)}</span></li>`).join('');
+  return `<div class="home-section-head"><div><h2>Perjalanan belajar minggu ini</h2></div><span class="journey-week">${esc(mission.weekStart)} – ${esc(mission.weekEnd)}</span></div>
+<div class="journey-panel">
+  <div class="journey-mission">
+    <small>MISI MINGGU INI · ${esc(mission.mode.toUpperCase())}</small>
+    <h3>Fokus: ${esc(focus)}</h3>
+    <p class="journey-target">${mission.sessionsTarget} sesi · ${mission.questionsTarget} soal · ${mission.mustReview} review wajib${mission.reviewBacklog?` · ${mission.reviewBacklog} review menyusul`:''}</p>
+    <p class="journey-why">${esc(mission.rationale.explanation)}</p>
+  </div>
+  <div class="journey-today">
+    <small>RENCANA HARI INI · ${esc(plan.date)}</small>
+    <ul class="journey-blocks">${blocks}</ul>
+    <p class="journey-target">${plan.questionsTarget} soal · sekitar ${plan.minutesTarget} menit · pace ${esc(plan.pace)}</p>
+    ${plan.recovery.needed?`<p class="journey-recovery">Sesi comeback: sengaja dipendekkan supaya selesai${plan.recovery.daysAway?`, setelah ${plan.recovery.daysAway} hari tidak belajar`:''}.</p>`:''}
+    <button class="primary luxe" onclick="${state.adaptiveReady?'startAdaptive()':"go('test')"}">Mulai rencana hari ini <i data-lucide="arrow-up-right"></i></button>
+  </div>
+</div>
+<div class="journey-skills">${mission.skillMap.map(journeySkillRowMarkup).join('')}</div>
+<div class="journey-goal">
+  <small>TUJUAN BELAJAR</small>
+  <div class="journey-goal-row">${goals.map(g=>`<button class="journey-goal-chip${g.id===mission.goalProfile.id?' is-active':''}" onclick="setGoalProfile('${esc(g.id)}')">${esc(g.label)}</button>`).join('')}</div>
+  <p class="journey-why">${esc(mission.goalProfile.prerequisites.join(' · '))}</p>
+  <p class="journey-note">${esc(mission.goalProfile.note)}</p>
+</div>`;
+}
+// R3 dashboard. Tugasnya satu: memisahkan tiga hal yang mudah tertukar dan berbahaya kalau
+// tertukar - skor latihan, cakupan target, dan yang memang belum dapat diukur. Ketiganya
+// ditulis sebagai kolom terpisah dengan label sendiri, bukan diringkas jadi satu angka.
+const UNMEASURABLE_LABELS={replayCount:'jumlah pengulangan audio',targetCoverage:'cakupan target'};
+function unifiedSkillsMarkup(now=Date.now()){
+  const spoken=buildLearnerEvidenceModel(now)?.skills?.spoken;
+  if(!spoken)return '<p class="muted">Bukti Speaking dan Listening belum tersambung ke peta ini.</p>';
+  const rows=[['Listening',spoken.listening],['Speaking',spoken.speaking]].map(([label,row])=>{
+    if(!row||!row.attempts)return `<div class="row"><span>${esc(label)}</span><span class="muted">Belum ada latihan tercatat</span></div>`;
+    const coverage=row.targetCoverage&&row.targetCoverage.measured
+      ? `${row.targetCoverage.percent}% (${row.targetCoverage.itemsAttempted} dari ${row.targetCoverage.itemsAvailable} materi)`
+      : 'Belum dapat diukur';
+    const latency=row.medianResponseMs==null?'Belum terbaca':Math.round(row.medianResponseMs/100)/10+' detik median';
+    // Yang tidak bisa dijawab dari bukti yang ada disebut namanya, bukan disembunyikan.
+    const unknown=(row.unmeasurable||[]).map(k=>UNMEASURABLE_LABELS[k]||k).join(', ');
+    return `<div class="diag-grid"><div><b>${esc(label)} · skor latihan</b><br>${row.practiceScore==null?'—':row.practiceScore+'%'}</div>`+
+      `<div><b>Kelengkapan</b><br>${row.completionRate==null?'—':row.completionRate+'% selesai'}</div>`+
+      `<div><b>Cakupan target</b><br>${esc(coverage)}</div>`+
+      `<div><b>Latihan tercatat</b><br>${row.attempts}</div>`+
+      `<div><b>Kecepatan respons</b><br>${esc(latency)}</div>`+
+      `<div><b>Pengulangan audio</b><br>${row.replayCount==null?'Belum terukur':`${row.replayCount}x total · rata-rata ${row.replayAverage}x`}</div>`+
+      `<div><b>Belum dapat diukur</b><br>${unknown?esc(unknown):'—'}</div></div>`;
+  }).join('<hr>');
+  return rows+'<p class="muted">Skor latihan dan cakupan target adalah dua hal berbeda: yang satu seberapa baik hasilnya, yang lain seberapa banyak materinya sudah disentuh. FIEZEL tidak menilai pengucapan, dan tidak menyimpan rekaman suara atau transkrip.</p>';
+}
+// R4 Academic and Scholarship Readiness. Semua status berasal dari bukti belajar yang sudah
+// ada; modulnya yang memutuskan, app.js hanya menyediakan bukti dan merendernya.
+const READINESS_STATUS_LABELS={met:'Sudah terpenuhi',not_met:'Belum terpenuhi',unknown:'Belum terukur'};
+function academicReadinessMarkup(now=Date.now()){
+  const academic=self.FiezelAcademicReadiness;
+  if(!academic)return '<p class="muted">Peta kesiapan akademik belum tersedia.</p>';
+  try{
+    const snapshot=buildLearningSnapshot(),evidence=buildLearnerEvidenceModel(now);
+    const foundation=academic.buildFoundationMap({snapshot,evidence,now});
+    const path=academic.buildAcademicReadingPath({bankTopics:R.map(r=>({topic:r.topic,level:r.level})),snapshot,now});
+    const lab=academic.buildScholarshipLab({snapshot,now});
+    const vocabPathway=academic.buildVocabularyPathway({vocabTopics:[...new Set(V.map(x=>x.topic).filter(Boolean))],now});
+    // "Belum terukur" ditulis berbeda dari "belum terpenuhi", karena keduanya memang berbeda:
+    // yang satu berarti FIEZEL belum pernah mengukur, yang lain berarti buktinya sudah ada.
+    const reqs=foundation.requirements.map(r=>`<div class="row"><span>${esc(r.label)}</span><b class="readiness-${esc(r.status)}">${esc(READINESS_STATUS_LABELS[r.status]||r.status)}</b></div><p class="muted">${esc(r.basis)}</p>`).join('');
+    const stages=path.stages.map(s=>`<div class="row"><span>${esc(s.level)}</span><span>${s.items?`${s.items} bacaan · ${esc(s.topics.join(', '))}`:'Menunggu konten'}</span></div>`).join('');
+    const tasks=lab.tasks.map(t=>`<div class="row"><span>${esc(t.label)}</span><span class="muted">${esc(t.practises.join(' · '))}</span></div>`).join('');
+    return `<div class="readiness-block"><h4>Prasyarat fondasi akademik</h4>${reqs}`+
+      `<p class="muted">${esc(foundation.note)}</p></div>`+
+      `<div class="readiness-block"><h4>Jalur reading akademik</h4>${stages}<p class="muted">${path.totalItems} bacaan bertema sains, lingkungan, dan teknologi dari bank yang sudah ada.</p></div>`+
+      `<div class="readiness-block"><h4>Lab komunikasi beasiswa</h4>${tasks}</div>`+
+      `<div class="readiness-block"><h4>Jalur kosakata IT dan kampus</h4><p class="muted">${esc(vocabPathway.note)}</p></div>`;
+  }catch(_){return '<p class="muted">Peta kesiapan akademik belum bisa ditampilkan.</p>'}
+}
+// R6 backup dan pemulihan. Logikanya ada di features/continuity; di sini hanya jembatan ke
+// state, berkas, dan layar. Satu aturan yang dijaga di lapisan ini: tidak ada penggabungan
+// tanpa pengguna melihat pratinjaunya lebih dulu.
+let pendingRestorePayload=null;
+function continuityModule(){return self.FiezelContinuity||null}
+function buildBackupFile(now=Date.now()){const c=continuityModule();if(!c)return null;return{payload:c.buildBackupPayload({state,now}),filename:`fiezel-backup-${new Date(now).toISOString().slice(0,10)}.json`}}
+function previewRestoreForState(payload){const c=continuityModule();if(!c)return null;return c.previewRestore(payload,state)}
+/** Menerapkan hasil gabungan ke state. Hanya dipanggil setelah pengguna menyetujui pratinjau. */
+function applyRestore(payload){
+  const c=continuityModule();if(!c)return{ok:false,reason:'module_unavailable'};
+  if(!payload||payload.schema!==c.BACKUP_SCHEMA)return{ok:false,reason:'invalid_payload'};
+  const before={answered:state.totalAnswered||0,history:(state.history||[]).length};
+  const merged=c.mergeProgress(state,payload);
+  // View, sesi aktif, preferensi, dan endpoint laporan sengaja tidak ikut: itu milik perangkat
+  // ini, bukan milik berkas backup.
+  state={...state,...merged};
+  save();
+  return{ok:true,before,after:{answered:state.totalAnswered,history:(state.history||[]).length}};
+}
+window.__fiezelBackup={buildBackupFile,previewRestoreForState,applyRestore};
+function continuitySettingsMarkup(){
+  if(!continuityModule())return '';
+  return `<div class="report-settings backup-settings"><div class="row"><div><b>Backup dan pemulihan</b><p class="muted">Berkas terenkripsi yang kamu simpan sendiri. FIEZEL tidak mengirimnya ke mana pun.</p></div></div>`+
+    `<label class="endpoint-label">Kata sandi backup (minimal 8 karakter)<input id="backupPassphrase" type="password" autocomplete="new-password" placeholder="Kata sandi untuk membuka berkas ini"></label>`+
+    `<p class="muted">Kalau kata sandi ini hilang, backup tidak bisa dibuka lagi. FIEZEL tidak menyimpan salinannya.</p>`+
+    `<div class="modal-actions backup-actions"><button id="backupExport" type="button">Buat berkas backup</button><button id="backupPick" type="button">Pilih berkas backup</button></div>`+
+    `<input id="backupFile" type="file" accept="application/json,.json" style="display:none">`+
+    `<p id="backupState" class="report-state">Status: belum ada berkas dipilih.</p>`+
+    `<div id="backupPreview"></div></div>`;
+}
+function setBackupState(message){const el=$('backupState');if(el)el.textContent='Status: '+message}
+async function runBackupExport(){
+  const c=continuityModule(),pass=$('backupPassphrase')?.value||'';
+  if(!c)return;
+  if(pass.length<8){setBackupState('kata sandi minimal 8 karakter.');return}
+  try{
+    const file=buildBackupFile();
+    const envelope=await c.encryptBackup(file.payload,pass);
+    const blob=new Blob([JSON.stringify(envelope,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob),a=document.createElement('a');
+    a.href=url;a.download=file.filename;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},0);
+    setBackupState(`berkas ${file.filename} dibuat. Simpan di tempat yang kamu percaya.`);
+  }catch(e){setBackupState(`gagal membuat backup (${e.message}).`)}
+}
+async function runBackupImport(file){
+  const c=continuityModule(),pass=$('backupPassphrase')?.value||'';
+  if(!c||!file)return;
+  try{
+    const envelope=JSON.parse(await file.text());
+    const payload=await c.decryptBackup(envelope,pass);
+    pendingRestorePayload=payload;
+    const preview=previewRestoreForState(payload);
+    const el=$('backupPreview');
+    if(el)el.innerHTML=`<div class="diag-grid"><div><b>Dibuat</b><br>${esc(String(preview.createdAt).slice(0,10))}</div>`+
+      `<div><b>Jawaban baru</b><br>${preview.historyRowsNew}</div>`+
+      `<div><b>Sudah ada</b><br>${preview.historyRowsAlreadyPresent}</div>`+
+      `<div><b>Materi bentrok</b><br>${preview.itemsShared}</div>`+
+      `<div><b>Hanya di perangkat ini</b><br>${preview.itemsOnlyLocal}</div>`+
+      `<div><b>Hanya di backup</b><br>${preview.itemsOnlyBackup}</div></div>`+
+      `<p class="muted">Progres di perangkat ini tidak dibuang. Materi yang ada di kedua sisi diambil yang paling maju.</p>`+
+      `<div class="modal-actions"><button class="primary" id="backupConfirm" type="button">Gabungkan sekarang</button></div>`;
+    $('backupConfirm')?.addEventListener('click',confirmRestore);
+    setBackupState('berkas terbaca. Periksa ringkasan sebelum menggabungkan.');
+  }catch(e){
+    pendingRestorePayload=null;
+    setBackupState(e.message==='wrong_passphrase_or_corrupt'?'kata sandi salah atau berkas rusak.':`berkas tidak bisa dibaca (${e.message}).`);
+  }
+}
+function confirmRestore(){
+  const result=applyRestore(pendingRestorePayload);
+  if(!result.ok){setBackupState('pemulihan dibatalkan: berkas tidak sah.');return}
+  pendingRestorePayload=null;
+  const el=$('backupPreview');if(el)el.innerHTML='';
+  setBackupState(`selesai. Riwayat ${result.before.history} menjadi ${result.after.history} jawaban.`);
+  showToast('Progres digabungkan.');
+  render();
+}
+// R6 install/update health check. Pertanyaan yang dijawabnya sederhana tetapi selama ini
+// hanya bisa ditebak: apakah yang berjalan benar-benar build yang sudah dirilis, atau shell
+// lama yang masih dipegang service worker. Penilaiannya ada di features/health.
+const HEALTH_SEVERITY_LABELS={ok:'Aman',info:'Catatan',warn:'Perlu perhatian',blocker:'Harus ditangani'};
+function installHealthModule(){return self.FiezelInstallHealth||null}
+async function readInstallHealth(now=Date.now()){
+  const mod=installHealthModule();if(!mod)return null;
+  const diagBuild=self.FIEZEL_PAGE_BUILD||null;
+  const swRev=await askServiceWorkerRevision();
+  const env=await mod.readEnvironment(self,{diagBuild,swRev});
+  return mod.evaluateHealth({...env,now});
+}
+/** Menanyakan revisi shell ke service worker yang aktif; diam-diam menyerah bila tidak dijawab. */
+function askServiceWorkerRevision(timeoutMs=1500){
+  return new Promise(resolve=>{
+    const container=self.navigator?.serviceWorker,worker=container?.controller;
+    if(!container||!worker||typeof MessageChannel!=='function')return resolve(null);
+    let settled=false;
+    const done=value=>{if(!settled){settled=true;resolve(value)}};
+    try{
+      const channel=new MessageChannel();
+      channel.port1.onmessage=event=>done(event?.data?.swRev||null);
+      worker.postMessage({type:'FIEZEL_HEALTH_PING'},[channel.port2]);
+      setTimeout(()=>done(null),timeoutMs);
+    }catch(_){done(null)}
+  });
+}
+function installHealthReportMarkup(report){
+  if(!report)return '<p class="muted">Pemeriksaan instalasi belum tersedia.</p>';
+  const rows=report.findings.map(f=>`<div class="row health-${esc(f.severity)}"><span><b>${esc(f.label)}</b><br><small class="muted">${esc(f.detail)}</small>${f.remedy?`<br><small>${esc(f.remedy)}</small>`:''}</span><b>${esc(HEALTH_SEVERITY_LABELS[f.severity]||f.severity)}</b></div>`).join('');
+  const status=report.status==='healthy'?'Instalasi sehat':report.status==='degraded'?'Ada yang perlu diperhatikan':'Ada yang harus ditangani';
+  return `<p><b>${esc(status)}</b></p>${rows}<p class="muted">Pemeriksaan ini hanya melihat keadaan pemasangan aplikasi. Tidak ada riwayat jawaban atau isi belajar yang dibaca.</p>`;
+}
+async function refreshInstallHealth(){
+  const el=$('installHealth');if(!el)return;
+  try{el.innerHTML=installHealthReportMarkup(await readInstallHealth())}
+  catch(_){el.innerHTML='<p class="muted">Pemeriksaan instalasi tidak bisa diselesaikan di perangkat ini.</p>'}
+}
+window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstallHealth};
+// Splash pembuka (Step 0 spesifikasi desain). Dipanggil SETELAH gerbang notifikasi lolos,
+// bukan sebelumnya: notifikasi wajib di produk ini, dan sapaan tidak boleh pernah berdiri di
+// depan syarat masuk. Modulnya sendiri menutup diri lewat pewaktu dan lewat sentuhan.
+function showBrandSplash(now=Date.now()){
+  const splash=self.FiezelSplash;
+  if(!splash||typeof splash.show!=='function'){showOnboarding(now);return null}
+  try{
+    const shown=splash.show(self,{now,onClose:()=>showOnboarding(Date.now())});
+    // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
+    // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
+    if(!shown||shown.shown!==true)showOnboarding(now);
+    return shown
+  }catch(_){showOnboarding(now);return null}
+}
+window.showBrandSplash=showBrandSplash;
+// Perkenalan enam langkah (Step 1-6 sheet handoff). Dijalankan setelah splash, yang berarti
+// juga setelah gerbang notifikasi lolos. Modulnya sendiri yang memutuskan sudah pernah
+// selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar ada.
+function showOnboarding(now=Date.now()){
+  const onboarding=self.FiezelOnboarding;
+  if(!onboarding||typeof onboarding.show!=='function')return null;
+  try{
+    return onboarding.show(self,{now,
+      onGoal:({track,goal,label})=>{
+        const journey=self.FiezelPersonalJourney;
+        const id=journey?journey.buildGoalProfile(goal).id:goal;
+        // Prasyarat kemampuan IELTS dan TOEFL memang satu profil, jadi keduanya menulis
+        // `exam_foundation`. Yang membedakan tersimpan terpisah sebagai `examTrack` dan
+        // itulah yang dipakai untuk label yang dilihat murid. Tidak ada prediksi skor.
+        state.preferences={...state.preferences,goalProfile:id,examTrack:String(track||'')};
+        save();render();showToast(`Tujuan belajar: Fondasi ${label}`)
+      },
+      onPlacement:()=>startPlacement(),
+      onFinish:()=>go('home')
+    })
+  }catch(_){return null}
+}
+window.showOnboarding=showOnboarding;
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
@@ -927,10 +1206,13 @@ function progress(){
  ${card(`<h3>Laporan Diagnostik</h3>${diagHtml}`)}
  ${card(`<h3>Adaptive Policy Engine</h3>${(()=>{const p=buildAdaptivePolicy();return `<div class="diag-grid"><div><b>Mode</b><br>${esc(p.mode)}</div><div><b>Fokus</b><br>${esc(p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain))}</div><div><b>Session</b><br>${p.sessionSize} soal · ±${p.estimatedMinutes} menit</div><div><b>Difficulty</b><br>${esc(p.difficultyBand)} · target ${p.targetDifficulty}</div><div><b>Review share</b><br>${Math.round(p.reviewShare*100)}%</div><div><b>Pace</b><br>${esc(p.pace)}</div></div><p>${esc(p.summary)}</p><p class="muted">Policy bersifat deterministik dan dapat diaudit. AI Coach hanya menjelaskan plan; tidak boleh menimpa keputusan policy.</p>`})()}`)}
  ${card(`<h3>Policy Outcome Evaluation</h3>${(()=>{const o=state.policyOutcomeMeta?.last;if(!o)return '<p>Belum ada sesi adaptive yang punya outcome terukur.</p>';return `<div class="diag-grid"><div><b>Status</b><br>${esc(o.status)}</div><div><b>Score</b><br>${Math.round(o.score)}/100</div><div><b>Completion</b><br>${Math.round(o.completionRate)}%</div><div><b>Akurasi</b><br>${o.accuracy==null?'-':Math.round(o.accuracy)+'%'}</div><div><b>Target hit</b><br>${Math.round(o.targetAdherence)}%</div><div><b>Rekomendasi</b><br>${esc(o.recommendation)}</div></div><p class="muted">Outcome ini menjadi evidence policy berikutnya. Raw jawaban tidak dikirim ke Core.</p>`})()}`)}
+ ${card(`<h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div>`)}
+ ${card(`<h3>Peta Kesiapan Akademik</h3>${academicReadinessMarkup()}`)}
+ ${card(`<h3>Bukti Skill Terpadu</h3>${unifiedSkillsMarkup()}`)}
  ${card(`<h3>Learner Evidence Model</h3><div class="diag-grid"><div><b>Konsistensi 14 hari</b><br>${evidence.behavior.consistency14d}% · ${evidence.behavior.activeDays14} hari aktif</div><div><b>Kecepatan respons</b><br>${evidence.behavior.medianResponseMs==null?'Belum terbaca':Math.round(evidence.behavior.medianResponseMs/100)/10+' detik median'}</div><div><b>Kalibrasi keyakinan</b><br>${evidence.confidence.gap==null?'Belum cukup bukti':'selisih '+evidence.confidence.gap+'%'}</div><div><b>Session abandonment</b><br>${evidence.behavior.abandonmentRate}% dari ${evidence.behavior.sessions30d} sesi</div><div><b>Waktu belajar dominan</b><br>${esc(evidence.behavior.preferredStudyWindow)}</div><div><b>Risiko lupa tertinggi</b><br>${evidence.memory.maxForgettingRisk}% · ${evidence.memory.highRiskCount} high-risk</div></div><p class="muted">Model ini memakai agregat perilaku dan hasil belajar. Raw answer history tidak dikirim ke Core Brain.</p>`)}
  </div>
  ${card(`<div class="row"><b>Dibuat oleh Fitrarustqi</b><a href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener noreferrer" class="creator-link"><img src="./instagram.svg" alt="Instagram" width="22" height="22"> @fitrarustqi</a></div>`)}
- <button class="danger" onclick="resetProgress()">Reset progres</button>`)
+ <button class="danger" onclick="resetProgress()">Reset progres</button>`);setTimeout(refreshInstallHealth,0)
 }
 function validReportEndpoint(value){try{const u=new URL(String(value||'').trim());return u.protocol==='https:'&&u.hostname.endsWith('.puter.work')}catch{return false}}
 function reportId(){try{return crypto.randomUUID()}catch{return`${Date.now()}-${Math.random().toString(36).slice(2)}`}}
@@ -941,7 +1223,7 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row required-setting"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Notifikasi belajar ${notificationsRequired()?'wajib':'opsional'}</b><small>${notificationPermission()==='granted'?(notificationsRequired()?'Aktif — syarat penggunaan FIEZEL terpenuhi':'Aktif — pengingat belajar berjalan'):(notificationsRequired()?'Tidak aktif — aplikasi akan dikunci':'Tidak aktif — pengingat belajar tidak berjalan')}</small></span><input type="checkbox" checked disabled aria-label="Notifikasi wajib aktif"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="audio-lines"></i></span><span><b>Soundtrack fokus</b><small>Musik ambient generatif yang tetap berjalan saat navigasi</small></span><input id="settingSoundtrack" type="checkbox" ${p.soundtrack?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div>${neuralVoiceStatusMarkup()}<div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralVoiceSelect')?.addEventListener('change',event=>setNeuralVoicePreference(event.currentTarget.value));$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('prepareIndonesianVoice')?.addEventListener('click',prepareIndonesianVoice);$('testIndonesianVoice')?.addEventListener('click',testIndonesianVoice);enhanceUI()}
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row required-setting"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Notifikasi belajar ${notificationsRequired()?'wajib':'opsional'}</b><small>${notificationPermission()==='granted'?(notificationsRequired()?'Aktif — syarat penggunaan FIEZEL terpenuhi':'Aktif — pengingat belajar berjalan'):(notificationsRequired()?'Tidak aktif — aplikasi akan dikunci':'Tidak aktif — pengingat belajar tidak berjalan')}</small></span><input type="checkbox" checked disabled aria-label="Notifikasi wajib aktif"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="audio-lines"></i></span><span><b>Soundtrack fokus</b><small>Musik ambient generatif yang tetap berjalan saat navigasi</small></span><input id="settingSoundtrack" type="checkbox" ${p.soundtrack?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div>${neuralVoiceStatusMarkup()}${continuitySettingsMarkup()}<div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralVoiceSelect')?.addEventListener('change',event=>setNeuralVoicePreference(event.currentTarget.value));$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('prepareIndonesianVoice')?.addEventListener('click',prepareIndonesianVoice);$('testIndonesianVoice')?.addEventListener('click',testIndonesianVoice);enhanceUI()}
 function saveSettings(){const oldSound=!!state.preferences.soundtrack,endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast('Gunakan URL HTTPS dengan domain .puter.work');answerFeedbackSignal(false);return}state.preferences={...state.preferences,haptics:$('settingHaptics').checked,feedbackSounds:$('settingFeedbackSounds').checked,soundtrack:$('settingSoundtrack').checked,motion:$('settingMotion').checked,reportConsent:consent,reportEndpoint:endpoint};state.reportMeta.lastStatus=consent?(endpoint?'ready':'not_configured'):'disabled';save();closeModal();if(oldSound&&!state.preferences.soundtrack)stopSoundtrack();if(!oldSound&&state.preferences.soundtrack)startSoundtrack();render();haptic('confirm');playFeedbackSound('tap');if(consent&&endpoint){showToast('Creator Hub aktif. Mengirim laporan awal.');sendCreatorReport('consent_enabled',true).then(maybeSendAccessReport)}else showToast('Pengaturan pengalaman tersimpan')}
 const FIEZEL_AI_TIMEOUT_MS=30000; // AI model is owned and enforced server-side by Core Brain
 const NATURAL_AI_STYLE='Gunakan Bahasa Indonesia yang jernih dan terasa seperti mentor sedang menjelaskan langsung kepada siswa. Pakai kalimat pendek. Hindari gaya buku teks, definisi panjang, dan istilah grammar yang tidak dijelaskan. Jika perlu menyebut istilah Inggris, langsung terangkan artinya dengan kata sederhana. Beri satu contoh yang dekat dengan kehidupan sehari-hari. Jangan memakai Markdown, judul formal, atau daftar berpoin.';
@@ -1011,6 +1293,6 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.toggleSoundtrack=toggleSoundtrack;window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));

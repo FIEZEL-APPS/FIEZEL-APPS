@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-54';
+  var DIAG_BUILD = 'm025-77';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -57,13 +57,39 @@
     });
   }
 
+  // Hanya flag milik FIEZEL yang dibaca apa adanya; parameter lain kehilangan nilainya, karena
+  // dump ini ditempel ke chat dan redirect autentikasi bisa menaruh token di query.
+  function safeSearch() {
+    var search = String(location.search || '');
+    if (!search || search === '?') return '';
+    return '?' + search.replace(/^\?/, '').split('&').filter(Boolean).map(function (pair) {
+      var eq = pair.indexOf('=');
+      var key = eq === -1 ? pair : pair.slice(0, eq);
+      var value = eq === -1 ? '' : pair.slice(eq + 1);
+      if (/^fiezel/i.test(key)) return eq === -1 ? key : key + '=' + value;
+      return key + '=(redacted)';
+    }).join('&');
+  }
+
   function collectSync() {
     return {
       diagBuild: DIAG_BUILD,
       appVersion: safe(function(){ return String(root.FIEZEL_VERSION || '(tidak ada)'); }),
       capturedAt: new Date().toISOString(),
       origin: safe(function(){ return location.origin; }),
-      href: safe(function(){ return String(location.origin || '') + String(location.pathname || ''); }),
+      href: safe(function(){ return String(location.origin || '') + String(location.pathname || '') + safeSearch(); }),
+      // Mode yang BENAR-BENAR dipakai jalur audio, ditanyakan ke player, bukan diparse ulang
+      // di sini. Inilah field yang menjawab "arm A/B-nya benar-benar jalan atau tidak".
+      denoiseSteps: safe(function(){
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.denoiseSteps !== 'function') return '(player tidak tersedia)';
+        return player.denoiseSteps(root) || 4;
+      }),
+      pcmMode: safe(function(){
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.pcmDiagnosticMode !== 'function') return '(player tidak tersedia)';
+        return player.pcmDiagnosticMode(root, {}) || '(produksi normal)';
+      }),
       standalone: safe(function(){
         return (root.navigator && root.navigator.standalone === true) ||
                !!(root.matchMedia && root.matchMedia('(display-mode: standalone)').matches);
@@ -288,6 +314,116 @@
     copySummary.type = 'button';
     copySummary.textContent = 'Copy ringkasan';
 
+    // m025-64: saklar A/B pemutaran. Ini harus ada DI SINI karena bentuk URL-nya tidak bisa
+    // dipakai di iOS: notifikasi wajib di produk ini, dan iOS hanya memberi Notification API
+    // ke aplikasi layar-utama, sehingga tab Safari - satu-satunya tempat parameter bisa
+    // diketik - berhenti di gerbang notifikasi. Tanpa saklar ini, A/B-nya tidak pernah bisa
+    // dijalankan di perangkat yang justru punya cacatnya.
+    var pcmState = root.document.createElement('div');
+    pcmState.id = 'fiezelDiagPcmState';
+    if (pcmState.style) pcmState.style.cssText = 'font:600 12px/1.6 -apple-system,system-ui,sans-serif;';
+
+    var pcmBar = root.document.createElement('div');
+    pcmBar.id = 'fiezelDiagPcmBar';
+    if (pcmBar.style) pcmBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;margin:2px 0;';
+
+    function pcmButton(label, mode) {
+      var button = root.document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', function () {
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.setPcmDiagnosticMode !== 'function') {
+          pcmState.textContent = 'Mode PCM: modul player tidak tersedia.';
+          return;
+        }
+        player.setPcmDiagnosticMode(mode, root);
+        // Mode dibaca saat player dibuat, jadi sesi yang sedang berjalan masih memakai mode
+        // lama. Mengatakannya adalah beda antara uji yang sah dan uji yang diam-diam batal.
+        var note = 'Mode PCM tersimpan: ' + (mode || 'produksi normal') +
+          '. Tutup FIEZEL sepenuhnya lalu buka lagi, baru mainkan suaranya.';
+        pcmState.textContent = note;
+        // Klik ini adalah gesture pengguna - satu-satunya kesempatan membuka kunci elemen
+        // media di iOS. Tanpa ini pembanding WAV tidak akan berbunyi sama sekali.
+        if (mode === 'wavref' && typeof player.primeReferenceElement === 'function') {
+          try {
+            player.primeReferenceElement(root).then(function (ready) {
+              pcmState.textContent = ready
+                ? note + ' Pemutar pembanding siap.'
+                : note + ' PERINGATAN: pemutar pembanding TIDAK bisa dibuka di perangkat ini, jadi arm WAV REF akan jatuh ke jalur normal. Laporkan ini apa adanya.';
+            });
+          } catch (_) {}
+        }
+      });
+      return button;
+    }
+
+    var pcmNormal = pcmButton('PCM: Normal', '');
+    var pcmRaw = pcmButton('PCM: RAW', 'raw');
+    var pcmConditioned = pcmButton('PCM: CONDITIONED', 'conditioned');
+    var pcmWavRef = pcmButton('PCM: WAV REF', 'wavref');
+    var pcmPlain = pcmButton('PCM: PLAIN BUFFER', 'plainbuffer');
+    var pcmTone = pcmButton('PCM: NADA UJI (bukan suara model)', 'toneref');
+
+    // m025-71: kualitas model. Setelah jalur keluaran dan seluruh lapisan pemutar dicoret,
+    // yang tersisa adalah PCM dari model - dan langkah denoising adalah tuas termurah yang ada.
+    function stepButton(label, steps) {
+      var button = root.document.createElement('button');
+      button.type = 'button';
+      button.textContent = label;
+      button.addEventListener('click', function () {
+        var player = root.FiezelWebAudioPlayer;
+        if (!player || typeof player.setDenoiseSteps !== 'function') {
+          pcmState.textContent = 'Langkah denoising: modul player tidak tersedia.';
+          return;
+        }
+        player.setDenoiseSteps(steps, root);
+        // Penjaga yang lahir dari kegagalan nyata: pada m025-71 mode PCM masih NADA UJI saat
+        // langkah diuji, sehingga yang terdengar adalah nada buatan - bukan suara model - dan
+        // ketiga langkah "terdengar mulus" tanpa satu pun benar-benar diuji. Uji yang batal
+        // diam-diam lebih buruk daripada uji yang gagal terang-terangan.
+        var activeMode = '';
+        try {
+          activeMode = typeof player.pcmDiagnosticMode === 'function' ? player.pcmDiagnosticMode(root, {}) : '';
+        } catch (_) { activeMode = ''; }
+        var warning = activeMode
+          ? ' PERINGATAN: mode PCM masih ' + activeMode.toUpperCase() +
+            ', jadi yang terdengar BUKAN suara model dan uji langkah ini tidak sah. Tekan PCM: Normal dulu.'
+          : '';
+        pcmState.textContent = 'Langkah denoising tersimpan: ' + (steps || 'default 4') +
+          '. Tutup FIEZEL sepenuhnya lalu buka lagi. Angka lebih tinggi berarti suara lebih halus tetapi lebih lama dibuat.' + warning;
+      });
+      return button;
+    }
+
+    // Satu tombol untuk mengembalikan SEMUA setelan diagnostik. Tanpa ini, mode yang tertinggal
+    // dari uji sebelumnya akan diam-diam merusak uji berikutnya - dan itu sudah terjadi sekali.
+    var resetAll = root.document.createElement('button');
+    resetAll.type = 'button';
+    resetAll.textContent = 'KEMBALIKAN SEMUA KE NORMAL';
+    resetAll.addEventListener('click', function () {
+      var player = root.FiezelWebAudioPlayer;
+      if (!player) { pcmState.textContent = 'Modul player tidak tersedia.'; return; }
+      try { player.setPcmDiagnosticMode('', root); } catch (_) {}
+      try { player.setDenoiseSteps(0, root); } catch (_) {}
+      pcmState.textContent = 'Semua setelan diagnostik dikembalikan: mode PCM normal, langkah denoising 4. ' +
+        'Tutup FIEZEL sepenuhnya lalu buka lagi.';
+    });
+
+    var stepsDefault = stepButton('LANGKAH: 4 (default)', 0);
+    var steps8 = stepButton('LANGKAH: 8', 8);
+    var steps16 = stepButton('LANGKAH: 16', 16);
+    pcmBar.appendChild(pcmNormal);
+    pcmBar.appendChild(pcmRaw);
+    pcmBar.appendChild(pcmConditioned);
+    pcmBar.appendChild(pcmWavRef);
+    pcmBar.appendChild(pcmPlain);
+    pcmBar.appendChild(pcmTone);
+    pcmBar.appendChild(stepsDefault);
+    pcmBar.appendChild(steps8);
+    pcmBar.appendChild(steps16);
+    pcmBar.appendChild(resetAll);
+
     bar.appendChild(copySummary);
     bar.appendChild(send);
     bar.appendChild(sendTarget);
@@ -295,6 +431,8 @@
     sheet.appendChild(heading);
     sheet.appendChild(note);
     sheet.appendChild(badges);
+    sheet.appendChild(pcmState);
+    sheet.appendChild(pcmBar);
     sheet.appendChild(searchBar);
     sheet.appendChild(text);
     sheet.appendChild(bar);
@@ -306,7 +444,11 @@
       host: host, open: open, sheet: sheet, text: text,
       search: search, searchCount: searchCount, previous: previous, next: next,
       send: send, sendTarget: sendTarget, close: close,
-      badges: badges, copySummary: copySummary
+      badges: badges, copySummary: copySummary,
+      pcmState: pcmState, pcmBar: pcmBar,
+      pcmNormal: pcmNormal, pcmRaw: pcmRaw, pcmConditioned: pcmConditioned,
+      pcmWavRef: pcmWavRef, pcmPlain: pcmPlain, pcmTone: pcmTone,
+      stepsDefault: stepsDefault, steps8: steps8, steps16: steps16, resetAll: resetAll
     };
   }
 
@@ -427,8 +569,42 @@
       });
     }
 
+    // Mode yang benar-benar akan dipakai jalur audio, ditampilkan begitu panel dibuka. Uji
+    // yang diam-diam berjalan di arm yang salah persis yang membuat percobaan sebelumnya sia-sia.
+    function showPcmState() {
+      if (!ui.pcmState) return;
+      var mode = '';
+      try {
+        var player = root.FiezelWebAudioPlayer;
+        mode = player && typeof player.pcmDiagnosticMode === 'function' ? player.pcmDiagnosticMode(root, {}) : '';
+      } catch (_) { mode = ''; }
+      // Untuk arm yang memakai elemen media, status kuncinya ditampilkan juga - arm yang
+      // diam-diam jatuh ke jalur normal akan menyesatkan penguji.
+      var lockNote = mode === 'wavref'
+        ? (root.__fiezelWavRefPrimed === true ? ' · pemutar pembanding SIAP' : ' · pemutar pembanding BELUM terbuka, sentuh layar sekali lalu buka panel lagi')
+        : '';
+      var steps = 0;
+      try {
+        var stepPlayer = root.FiezelWebAudioPlayer;
+        steps = stepPlayer && typeof stepPlayer.denoiseSteps === 'function' ? stepPlayer.denoiseSteps(root) : 0;
+      } catch (_) { steps = 0; }
+      var stepNote = steps ? ' · langkah denoising: ' + steps : ' · langkah denoising: 4 (default)';
+      ui.pcmState.textContent = (mode
+        ? 'Mode PCM aktif: ' + mode.toUpperCase() + lockNote + ' (otomatis kembali normal dalam 24 jam)'
+        : 'Mode PCM aktif: produksi normal') + stepNote;
+    }
+
+    // Pasang pembuka-kunci elemen pembanding pada sentuhan berikutnya di mana pun. Ini yang
+    // membuat arm WAV REF punya peluang berbunyi di iOS tanpa bergantung pada tombol mana
+    // yang ditekan, atau pada sesi mana modenya disimpan.
+    try {
+      var unlockPlayer = root.FiezelWebAudioPlayer;
+      if (unlockPlayer && typeof unlockPlayer.armReferenceUnlock === 'function') unlockPlayer.armReferenceUnlock(root);
+    } catch (_) {}
+
     ui.open.addEventListener('click', function(){
       refresh();
+      showPcmState();
       ui.sheet.classList.add('open');
     });
     ui.close.addEventListener('click', function(){

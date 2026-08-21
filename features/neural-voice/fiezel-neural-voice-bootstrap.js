@@ -10,7 +10,12 @@
   const LARGE_ASSET_STREAM_THRESHOLD=8*1024*1024;
   const STORAGE_RESERVE_BYTES=24*1024*1024;
   const DOWNLOAD_ATTEMPTS=2;
-  const NEURAL_GENERATION_TIMEOUT_MS=Number(root.FIEZEL_GENERATION_TIMEOUT_MS)||Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
+  const NEURAL_GENERATION_TIMEOUT_BASE_MS=Number(root.FIEZEL_GENERATION_TIMEOUT_MS)||Number(root.FIEZEL_TTS_TIMEOUT_MS)||(root.navigator?.standalone===true?30000:20000);
+  // m025-72: anggaran waktu generate mengikuti langkah denoising. Bukti perangkat OWNER pada
+  // m025-71: pada 16 langkah suaranya GAGAL dimuat, dan sebabnya aritmetika - anggaran 30 detik
+  // sementara empat kali lipat langkah menembusnya, lalu permintaannya dibatalkan. Tanpa
+  // override diagnostik, nilainya sama persis seperti sebelumnya.
+  const neuralGenerationTimeoutMs=()=>{try{const p=root.FiezelWebAudioPlayer;return p&&typeof p.denoiseTimeoutMs==='function'?p.denoiseTimeoutMs(NEURAL_GENERATION_TIMEOUT_BASE_MS,root):NEURAL_GENERATION_TIMEOUT_BASE_MS}catch(_){return NEURAL_GENERATION_TIMEOUT_BASE_MS}};
   const BROWSER_TTS_TIMEOUT_MS=Number(root.FIEZEL_BROWSER_TTS_TIMEOUT_MS)||12000;
   const INITIALIZE_TIMEOUT_MS=Number(root.FIEZEL_INIT_TIMEOUT_MS)||20000;
   // m025-26 replaces the m025-25 Apple dispatch block. m025-25 refused Kokoro inference on
@@ -114,7 +119,7 @@
   }
   function status(){
     const stored=readStatus();
-    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:NEURAL_GENERATION_TIMEOUT_MS,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
+    return Object.freeze({schema:STATUS_SCHEMA,version,phase,prepared:stored.prepared||preparedFlag,assetsCached:stored.prepared||preparedFlag,initialized:!!service,ready:!!service&&!circuitOpen,audibleVerified,circuitOpen,error:lastError,storage:preparedStorage(),totalBytes,assetCount:assets.length,zeroPaidRuntime:true,crossOriginInference:false,crossOriginIsolated:!!root.crossOriginIsolated,speechSynthesis:!!(root.speechSynthesis&&root.SpeechSynthesisUtterance),storageEstimate:lastStorageEstimate,timeoutMs:neuralGenerationTimeoutMs(),generationTimeoutMs:neuralGenerationTimeoutMs(),initializeTimeoutMs:INITIALIZE_TIMEOUT_MS,lastFallbackReason,wasmPolicy,engine:NEURAL_ENGINE_ID,engineModel:root.FiezelSherpaVitsAdapter?.MODEL_ID||''});
   }
   function emit(progress,callback){
     const payload=Object.freeze({...progress,totalBytes,assetCount:assets.length,phase});
@@ -286,7 +291,10 @@
           // m025-45: back to 4 denoising steps. 3 bought about 11% of the time back and
           // cost more than that in audio quality - OWNER heard the result immediately.
           // The gap between sentences is solved by prefetching the next one instead.
-          generationSteps:4,
+          // m025-71: satu sumber kebenaran dengan jalur Indonesia. Override diagnostik dibaca
+          // dari player supaya kedua bahasa selalu memakai jumlah langkah yang sama; selisih
+          // di antara keduanya langsung terdengar sebagai dua suara berbeda.
+          generationSteps:(function(){try{var p=self.FiezelWebAudioPlayer;return p&&typeof p.effectiveDenoiseSteps==='function'?p.effectiveDenoiseSteps(self):4}catch(_){return 4}})(), // generationSteps:4 default
           // Supertonic has its own intonation; resampling it only adds interpolation
           // noise, which is the "cracking" OWNER reported in m025-44.
           usePitchContour:false,
@@ -304,7 +312,7 @@
         await adapter.initialize();
         const sherpaPlayer=root.FiezelWebAudioPlayer.createPlayer(root);
         const speech=speechSettings();
-        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS,streamSentences:speech.streamSentences,streamMaxWords:speech.streamMaxWords,prosody:root.FiezelProsody||null});
+        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:neuralGenerationTimeoutMs(),streamSentences:speech.streamSentences,streamMaxWords:speech.streamMaxWords,prosody:root.FiezelProsody||null});
         playerRef=sherpaPlayer;
         wasmPolicy='supertonic-3-wasm-worker';
         phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;
@@ -351,7 +359,7 @@
       });
       await adapter.initialize();
       const player=root.FiezelWebAudioPlayer.createPlayer(root);
-      service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play,generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
+      service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:player.play,generationTimeoutMs:neuralGenerationTimeoutMs()});
       phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;diag({phase:'init_ready',elapsedMs:Date.now()-initStartedAt});return service;
     })().catch(error=>{phase='error';lastError=errorText(error);service=null;adapter=null;initFailedThisSession=true;initTimedOutThisSession=false;diag({phase:'init_error',error:lastError});throw error}).finally(()=>{backendInitPromise=null});
     return backendInitPromise;
@@ -441,7 +449,7 @@
     }
     const voice=options.voice||root.FiezelNeuralVoiceConfig.voices.fiezelPrimary;
     const neuralStartedAt=Date.now();
-    diag({phase:'speak_neural_start',voice:String(voice),generationTimeoutMs:NEURAL_GENERATION_TIMEOUT_MS});
+    diag({phase:'speak_neural_start',voice:String(voice),generationTimeoutMs:neuralGenerationTimeoutMs()});
     let result;
     try{
       result=await local.speak(text,{voice,speed:options.speed||options.rate||1,lang:options.lang||'en-US',allowFallback:false});
