@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="fz-booting">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -11,11 +11,92 @@
   <link rel="icon" href="./favicon-64.png">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <title>FIEZEL | Adaptive English</title>
+  <!-- m025-84 OWNER: "sebelum muncul splash ada jeda sekitar kurang lebih 3 detik dan
+       muncul layar putih seluruh layar". Layar putih itu adalah body kosong: `body{background:
+       var(--sky-bottom)}` = #fdf6f5, ditahan selama ~50 berkas skrip (termasuk js.puter.com dari
+       jaringan) dieksekusi DAN ~2,7 MB JSON konten diunduh app.js, sebab showBrandSplash()
+       dipanggil di UJUNG load(). Splash tidak dipercepat - ia dipindah ke frame pertama:
+       markupnya statis di bawah, di ATAS seluruh berkas skrip, dan CSS kritisnya di sini supaya
+       cat pertama browser sudah berupa splash, bukan putih.
+
+       Aturan splash di bawah disalin APA ADANYA dari style.css (selector dan nilai identik),
+       jadi begitu style.css tiba tidak ada satu piksel pun yang berubah di layar.
+       splash-first-paint-test.js membandingkan keduanya dan gagal kalau salah satunya
+       bergeser sendiri. -->
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/Fredoka-700.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/PlusJakartaSans-400.woff2" crossorigin>
+  <style id="fiezelBootCritical">
+html.fz-booting,html.fz-booting body{background:#0B0709}
+html.fz-booting body{overflow:hidden}
+#fiezelBootSplash:not(.is-leaving){animation:none}
+.fiezel-splash,.fiezel-ob{--fz-bg:#efe3d3;--fz-paper:#fdf3e2;--fz-ink:#2c1b1c;--fz-ink-muted:#6e5a4f;--fz-accent:#7a1e2e;--fz-accent-deep:#4a1119;--fz-gold:#d9a441;--fz-soft:#f3e0e0;--fz-line:#ecdec0;--fz-heading:'FZ Fredoka',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
+.fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
+.fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
+@keyframes fzm-page-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes fzm-page-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-16px)}}
+.fiezel-splash-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
+.fiezel-splash-dark{background:#0B0709;padding-top:0}
+.fiezel-splash-brand{background:radial-gradient(circle at 30% 18%,#241A1D 0%,#140E10 55%,#070405 100%);position:relative;overflow:hidden;gap:0}
+@keyframes fz-splash-halo{0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)} 50%{opacity:.42;transform:translate(-50%,-50%) scale(1.12)}}
+.fiezel-splash-brand::before{content:"";position:absolute;left:50%;top:44%;width:min(78vw,440px);aspect-ratio:1;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(221,181,95,.42) 0%,rgba(221,181,95,0) 68%);animation:fz-splash-halo 3.4s ease-in-out infinite}
+.fiezel-splash-brand>*{position:relative;z-index:1}
+.fiezel-logo-stage{display:inline-grid;place-items:center;margin-bottom:26px;overflow:hidden}
+.fiezel-logo-stage{position:relative}
+.fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
+@keyframes fz-logo-stem{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+@keyframes fz-logo-arm{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+@keyframes fz-logo-bar{0%{opacity:0;transform:scaleY(.08)} 62%{opacity:1;transform:scaleY(1.14)} 100%{opacity:1;transform:scaleY(1)}}
+.fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) 0s both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) .105s both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) .155s both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .21s both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .25s both}
+@keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+.fiezel-logo-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);animation:fz-logo-sheen .8s ease-out .42s both}
+@keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+.fiezel-splash-brand .fiezel-splash-word{font-family:var(--fz-heading);font-weight:700;font-size:2.15rem;letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .54s both}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .68s both}
+.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,.fiezel-splash-still .fiezel-splash-word,.fiezel-splash-still .fiezel-splash-tag,.fiezel-splash-still .fiezel-splash-brand::before,.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
+.fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
+  </style>
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
 </head>
 <body class="scene-day">
+  <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
+       features/brand/fiezel-splash.js mengadopsi elemen ini lewat [data-fiezel-boot-splash]
+       alih-alih membuat lapisan kedua, jadi animasi yang sudah berjalan diteruskan, bukan
+       diulang dari awal setelah boot selesai. -->
+  <div id="fiezelBootSplash" class="fiezel-splash fiezel-splash-dark" data-fiezel-boot-splash role="dialog" aria-label="Selamat datang di FIEZEL"><div class="fiezel-splash-body fiezel-splash-brand"><div class="fiezel-logo-stage"><svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzsIvory" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient><linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F7E3AE"/><stop offset="45%" stop-color="#DDB55F"/><stop offset="100%" stop-color="#B0812A"/></linearGradient></defs><g fill="url(#fzsIvory)"><rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/><rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/><rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/></g><g fill="url(#fzsGold)"><rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/><rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/></g></svg></div><p class="fiezel-splash-word">FIEZEL</p><p class="fiezel-splash-tag">ADAPTIVE ENGLISH</p></div></div>
+  <script>
+    /* Stempel waktu cat pertama + jaring pengaman. Stempelnya dipakai fiezel-splash.js untuk
+       menghitung SISA waktu tayang: tanpa itu splash akan tampil selama boot DITAMBAH 2,6
+       detik penuh. Jaring pengamannya menutup satu-satunya cara layar ini bisa mengurung
+       murid: kalau app.js gagal dimuat atau melempar sebelum sempat mengadopsi splash, tidak
+       ada lagi yang akan menutupnya. */
+    (function () {
+      var doc = document, el = doc.getElementById('fiezelBootSplash');
+      if (!el) return;
+      try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) el.className += ' fiezel-splash-still'; } catch (e) {}
+      var startedAt = 0;
+      try { startedAt = (window.performance && typeof performance.now === 'function') ? performance.now() : 0; } catch (e) {}
+      window.__fiezelBootSplashAt = startedAt;
+      var timer = 0;
+      function dismiss() {
+        if (timer) { clearTimeout(timer); timer = 0; }
+        try { doc.documentElement.classList.remove('fz-booting'); } catch (e) {}
+        try { el.setAttribute('data-fiezel-boot-claimed', 'disposed'); } catch (e) {}
+        try { if (el.parentNode) el.parentNode.removeChild(el); } catch (e) {}
+      }
+      timer = setTimeout(function () {
+        try { if (el.getAttribute('data-fiezel-boot-claimed')) return; } catch (e) {}
+        dismiss();
+      }, 15000);
+      window.__fiezelBootSplash = { at: startedAt, dismiss: dismiss };
+    })();
+  </script>
   <div id="globalSky" class="global-sky phase-day" aria-hidden="true">
     <div class="sky-light"></div>
     <span id="globalCelestial" class="global-celestial sun" data-kind="sun"><i data-lucide="sun"></i></span>
@@ -115,6 +196,7 @@
   <script src="./features/neural-voice/fiezel-diag-panel.js"></script>
   <script src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
   <script src="./features/ui/fiezel-zoom-lock.js"></script>
+  <script src="./features/ui/fiezel-back-nav.js"></script>
   <script src="./features/audio/fiezel-ui-sfx.js"></script>
   <script src="./features/neural-voice/fiezel-voice-bundle-gate.js"></script>
   <script src="./features/library/fiezel-library.js"></script>

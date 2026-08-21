@@ -738,7 +738,16 @@ function render(){const __renderStartedAt=Date.now();try{return renderInner()}fi
 function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
 const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom','library']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
-function go(v){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}uiSfx('nav');const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+// m025-84: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
+// seluruh aplikasi hidup di SATU entri riwayat - gestur swipe-back tidak punya tujuan dan
+// tombol kembali sistem justru menutup PWA. Sekarang setiap navigasi maju mendorong satu
+// entri (lihat features/ui/fiezel-back-nav.js). Entri didorong SEBELUM swap dijalankan,
+// karena yang disimpannya adalah view ASAL sebagai tujuan kembali. Jalur kembali memanggil
+// fungsi yang sama dengan {viaHistory:true}: transisi, uiSfx('nav'), preferensi motion, dan
+// prefers-reduced-motion di bawah ini berlaku persis sama, tetapi TIDAK ada entri kedua
+// yang didorong - itulah yang mencegah gelung back->push->back.
+function go(v,opts){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}uiSfx('nav');if(opts?.viaHistory!==true)pushBackNavView(v);const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
 function stat(a,b){return `<small>${a}</small><strong>${b}</strong>`}
@@ -1011,10 +1020,22 @@ window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstal
 // m025-80 AUDIT (Bagian 1): apa pun yang terjadi setelah splash ditentukan oleh pemanggil,
 // bukan dipaku di sini. Boot memakainya untuk menyambung ke perkenalan lalu gerbang; sapaan
 // harian memakai perilaku bawaan yang hanya menoleh ke perkenalan.
+// m025-84: splash sekarang sudah ada di layar sejak frame pertama (markup statisnya di
+// index.html). Setiap jalan keluar dari fungsi ini WAJIB lewat dismissBootSplash(): kalau
+// modul splash hilang atau melempar, elemen statis itu akan tetap menutupi seluruh layar
+// dan aplikasi terkunci di balik layar sambutan yang tidak pernah menutup.
+function dismissBootSplash(){
+  try{if(self.FiezelSplash?.disposeBootSplash?.(self))return true}catch(_){}
+  try{
+    self.__fiezelBootSplash?.dismiss?.();
+    return true
+  }catch(_){return false}
+}
+window.dismissBootSplash=dismissBootSplash;
 function showBrandSplash(now=Date.now(),afterSplash=null){
   const done=typeof afterSplash==='function'?afterSplash:(at=>{showOnboarding(at)});
   const splash=self.FiezelSplash;
-  if(!splash||typeof splash.show!=='function'){done(now);return null}
+  if(!splash||typeof splash.show!=='function'){dismissBootSplash();done(now);return null}
   try{
     // m025-80 OWNER: "yang aku harapkan setiap kali buka apps itu adalah splash". Sapaan
     // merek dulu dibatasi sekali sehari lewat seenToday(); pemanggil dari boot sekarang
@@ -1024,9 +1045,9 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
     const shown=splash.show(self,{now,force:typeof afterSplash==='function',onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
     // bersamanya - murid baru yang membuka aplikasi untuk kedua kalinya tetap perlu dituntun.
-    if(!shown||shown.shown!==true)done(now);
+    if(!shown||shown.shown!==true){dismissBootSplash();done(now)}
     return shown
-  }catch(_){done(now);return null}
+  }catch(_){dismissBootSplash();done(now);return null}
 }
 window.showBrandSplash=showBrandSplash;
 // Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
@@ -1344,12 +1365,25 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
 function saveSettings(){const endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast('Gunakan URL HTTPS dengan domain .puter.work');answerFeedbackSignal(false);return}state.preferences={...state.preferences,haptics:$('settingHaptics').checked,feedbackSounds:$('settingFeedbackSounds').checked,motion:$('settingMotion').checked,reportConsent:consent,reportEndpoint:endpoint};state.reportMeta.lastStatus=consent?(endpoint?'ready':'not_configured'):'disabled';save();closeModal();render();haptic('confirm');playFeedbackSound('tap');if(consent&&endpoint){showToast('Creator Hub aktif. Mengirim laporan awal.');sendCreatorReport('consent_enabled',true).then(maybeSendAccessReport)}else showToast('Pengaturan pengalaman tersimpan')}
 const FIEZEL_AI_TIMEOUT_MS=30000; // AI model is owned and enforced server-side by Core Brain
 const NATURAL_AI_STYLE='Gunakan Bahasa Indonesia yang jernih dan terasa seperti mentor sedang menjelaskan langsung kepada siswa. Pakai kalimat pendek. Hindari gaya buku teks, definisi panjang, dan istilah grammar yang tidak dijelaskan. Jika perlu menyebut istilah Inggris, langsung terangkan artinya dengan kata sederhana. Beri satu contoh yang dekat dengan kehidupan sehari-hari. Jangan memakai Markdown, judul formal, atau daftar berpoin.';
-let modalEpoch=0,aiRequestSeq=0,modalCloseTimer=null;
+let modalEpoch=0,aiRequestSeq=0,modalCloseTimer=null,modalOpen=false;
 // m025-80 OWNER: SFX transisi antarmuka. Dibungkus supaya modul yang belum termuat atau
 // audio yang diblokir browser tidak pernah bisa menjatuhkan navigasi.
 function uiSfx(name){try{return self.FiezelUiSfx?.play?.(name,self)===true}catch{return false}}
-function openModal(html){uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');$('modalPanel').innerHTML=html;modal.classList.remove('hidden');enhanceUI();(window.requestAnimationFrame||setTimeout)(()=>modal.classList.add('show'));return modalEpoch}
-function closeModal(){uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320)}
+// m025-84: modal adalah lapisan DI ATAS view, jadi ia mendapat entri riwayatnya sendiri dan
+// tekanan kembali menutupnya lebih dulu, baru sesudahnya memindahkan view. Hanya modal yang
+// benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
+// openSettings hanya menukar isi panel yang sama, dan tiga entri untuk satu dialog akan
+// membuang dua tekanan kembali pada layar yang sudah tidak ada.
+function openModal(html){const wasOpen=modalOpen;modalOpen=true;uiSfx('open');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');$('modalPanel').innerHTML=html;modal.classList.remove('hidden');enhanceUI();(window.requestAnimationFrame||setTimeout)(()=>modal.classList.add('show'));if(!wasOpen)try{self.FiezelBackNav?.pushLayer?.({id:'modal',close:closeModalNow})}catch{}return modalEpoch}
+// Penutup mentah. Ini yang dipegang riwayat, jadi ia TIDAK BOLEH menyentuh riwayat lagi -
+// kalau ia melakukannya, satu tekanan kembali akan memakan dua entri. Mengembalikan false
+// bila memang tidak ada modal terbuka, supaya jalur kembali tahu tekanan itu belum terpakai
+// dan boleh meneruskannya ke lapisan di bawahnya.
+function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close');modalEpoch++;clearTimeout(modalCloseTimer);const modal=$('modal');modal.classList.remove('show');modalCloseTimer=setTimeout(()=>modal.classList.add('hidden'),320);return true}
+// Ditutup oleh aplikasi sendiri (tombol Batal/Tutup/Escape): layarnya berubah seketika, dan
+// entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
+// sudah tidak ada.
+function closeModal(){try{self.FiezelBackNav?.dismiss?.('modal')}catch{}return closeModalNow()}
 function aiErrorMessage(err){const code=String(err?.error||err?.code||'').toLowerCase();if(code==='popup_blocked')return'Popup login Puter diblokir browser. Izinkan popup untuk situs ini, lalu coba lagi.';if(code==='auth_window_closed')return'Login Puter dibatalkan. Coba lagi dan selesaikan proses login.';if(err?.name==='TimeoutError'||code==='timeout')return`Permintaan AI melewati batas waktu ${FIEZEL_AI_TIMEOUT_MS/1000} detik. Periksa koneksi, lalu coba lagi.`;const raw=err?.message||err?.msg||err?.error_description||err?.error||err;if(typeof raw==='string'&&raw.trim())return raw;try{const text=JSON.stringify(raw);return text&&text!=='{}'?text:'Layanan AI tidak tersedia.'}catch{return'Layanan AI tidak tersedia.'}}
 async function askFiezelAI(prompt){
   if(CORE_AI_GATEWAY!=='core-only')throw new Error('Konfigurasi AI FIEZEL tidak valid.');
@@ -1415,4 +1449,32 @@ function warmNeuralVoice(){
 warmNeuralVoice();
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
-load().catch(e=>setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`));
+// m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
+// load() supaya navigasi pertama pun sudah terekam di riwayat.
+function installBackNav(){
+  try{
+    return self.FiezelBackNav?.install?.(self,{
+      currentView:()=>state.view,
+      knownView:v=>VALID_VIEWS.has(v),
+      homeView:'home',
+      // Perpindahan view dikembalikan ke go() supaya kembali memakai transisi, bunyi, dan
+      // aturan kurangi-gerak yang persis sama dengan maju - hanya tanpa entri baru.
+      applyView:v=>go(v,{viaHistory:true}),
+      // Gerbang notifikasi dan gerbang akun Puter adalah syarat masuk FIEZEL. Selama salah
+      // satunya - atau splash/perkenalan - menutupi layar, tidak ada tekanan kembali yang
+      // boleh mengubah apa pun di belakangnya.
+      locked:()=>{
+        try{
+          if(document.body?.classList?.contains?.('notification-locked'))return true;
+          if(document.body?.classList?.contains?.('auth-locked'))return true;
+          return !!document.querySelector?.('.fiezel-splash,.fiezel-ob');
+        }catch{return false}
+      }
+    })||null
+  }catch{return null}
+}
+installBackNav();
+// m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
+// galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
+// hanya melihat layar sambutan yang menggantung selamanya.
+load().catch(e=>{dismissBootSplash();setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`)});
