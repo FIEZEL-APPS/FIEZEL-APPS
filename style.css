@@ -1199,3 +1199,112 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   background: linear-gradient(90deg, transparent, var(--accent), transparent);
   animation: shimmer 1.5s infinite;
 }
+
+/* ========== MICRO-ANIMATIONS FOR TRANSITIONS & INTERACTIONS ========== */
+/* Page view transitions */
+::view-transition-old(root) {
+  animation: pageOut 0.4s var(--ease) forwards;
+}
+
+::view-transition-new(root) {
+  animation: pageIn 0.4s var(--ease) forwards;
+}
+
+@keyframes pageOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Card entrance animation */
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card.animate-in {
+  animation: cardSlideIn 0.35s var(--ease) both;
+}
+
+/* Staggered card animations */
+.cards-container .card:nth-child(1) { animation-delay: 0.05s; }
+.cards-container .card:nth-child(2) { animation-delay: 0.1s; }
+.cards-container .card:nth-child(3) { animation-delay: 0.15s; }
+.cards-container .card:nth-child(n+4) { animation-delay: 0.2s; }
+
+/* Modal/Dialog entrance */
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal {
+  animation: modalAppear 0.3s var(--ease-spring) both;
+}
+
+/* Button press animation (tactile feedback) */
+@keyframes buttonPress {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+}
+
+button:active {
+  animation: buttonPress 0.1s ease-out;
+}
+
+/* Fade in for content reveal */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.content-reveal {
+  animation: fadeIn 0.35s var(--ease);
+}
+
+/* Bounce for success states */
+@keyframes successBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.success-state {
+  animation: successBounce 0.4s var(--ease-spring);
+}
+
+/* Shake for error states */
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.error-state {
+  animation: errorShake 0.3s ease;
+}
+
+/* Respects prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
