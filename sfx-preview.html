@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL &middot; Audisi bunyi</title>
+<link rel="stylesheet" href="./style.css">
+<style>
+  body{margin:0;padding:26px 20px 60px;background:var(--bg);font-family:var(--fz-body);color:var(--text)}
+  .wrap{max-width:580px;margin:auto}
+  h1{font-family:var(--fz-heading);font-size:1.6rem;letter-spacing:-.02em;margin:0 0 6px}
+  .lead{color:var(--muted);font-size:.9rem;line-height:1.6;margin:0 0 18px}
+  .note{background:var(--panel-soft);border:1px solid var(--line);border-radius:14px;
+        padding:12px 14px;font-size:.8rem;line-height:1.55;color:var(--muted);margin:0 0 22px}
+  .row{display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+       border-radius:16px;padding:14px 16px}
+  .hero{border-color:var(--accent);margin-bottom:18px}
+  .list{display:grid;gap:10px}
+  .meta{flex:1;min-width:0}
+  .meta b{font-size:.95rem;display:block}
+  .meta small{color:var(--muted);font-size:.78rem;line-height:1.5;display:block;margin-top:3px}
+  .notes{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.68rem;
+         color:var(--muted-soft);letter-spacing:.03em;margin-top:5px;display:block}
+  button{min-width:96px;min-height:44px;border-radius:999px;background:var(--black);
+         color:#fff;border:0;font-weight:650;font-size:.85rem;cursor:pointer}
+  button:active{transform:scale(.97)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Audisi bunyi FIEZEL</h1>
+  <p class="lead">Setiap SFX di bawah adalah <b>potongan dari motif pembuka</b>, bukan bunyi
+    baru &mdash; jadi seluruh aplikasi terdengar sebagai kutipan dari satu kalimat yang sama.</p>
+  <p class="note">Browser memblokir audio sampai ada sentuhan pertama &mdash; tekan tombol mana
+    pun untuk membukanya. Kalau tidak terdengar, periksa volume dan pastikan tab ini tidak
+    dibisukan.</p>
+
+  <div class="row hero">
+    <span class="meta">
+      <b>Motif pembuka merek</b>
+      <small>F &rarr; A &rarr; D: terts besar naik, lalu kuart. Berakhir di derajat keenam,
+        bukan tonika, sehingga terdengar terbuka &mdash; bukan sedang mengucapkan titik.
+        Ritmenya timpang: dua langkah cepat, satu pendaratan panjang.</small>
+      <span class="notes" id="motif-notes"></span>
+    </span>
+    <button type="button" id="motif">Putar</button>
+  </div>
+
+  <div class="list" id="list"></div>
+</div>
+
+<script src="./features/audio/fiezel-ui-sfx.js"></script>
+<script>
+  var DESC = {
+    tap:       ['Sentuhan', 'Nada tengah motif, satu ketuk. Untuk tekanan tombol ringan.'],
+    toggle:    ['Sakelar', 'Nada jangkar motif — netral, tidak menghakimi hidup atau mati.'],
+    nav:       ['Pindah halaman', 'Dua langkah pertama motif: F → A, terts besar naik.'],
+    open:      ['Panel terbuka', 'Lompatan penutup motif: A → D, kuart naik.'],
+    close:     ['Panel tertutup', 'Lompatan itu dibalik: D → A, turun lalu mereda.'],
+    celebrate: ['Momen kecil', 'Motif penuh ditambah oktaf penutup. Untuk target tercapai, bukan transisi.']
+  };
+
+  var NAME_OF = {};
+  Object.keys(FiezelUiSfx.NOTES).forEach(function (k) {
+    NAME_OF[FiezelUiSfx.NOTES[k].toFixed(2)] = k;
+  });
+  function label(v) { return NAME_OF[v[0].toFixed(2)] || v[0]; }
+  function lengthMs(v) {
+    var last = v[v.length - 1];
+    return Math.round((last[1] + last[2]) * 1000);
+  }
+
+  document.getElementById('motif-notes').textContent =
+    FiezelUiSfx.MOTIF.map(label).join(' → ') + ' · '
+    + lengthMs(FiezelUiSfx.MOTIF) + ' ms · playMotif';
+  document.getElementById('motif').addEventListener('click', function () {
+    FiezelUiSfx.playMotif(window);
+  });
+
+  var list = document.getElementById('list');
+  FiezelUiSfx.names().forEach(function (name) {
+    var d = DESC[name] || [name, ''];
+    var v = FiezelUiSfx.VOICES[name];
+    var row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = '<span class="meta"><b>' + d[0] + '</b><small>' + d[1] + '</small>'
+      + '<span class="notes">' + v.map(label).join(' → ')
+      + ' · ' + lengthMs(v) + ' ms · ' + name + '</span></span>';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Putar';
+    btn.addEventListener('click', function () { FiezelUiSfx.play(name, window); });
+    row.appendChild(btn);
+    list.appendChild(row);
+  });
+</script>
+</body>
+</html>
