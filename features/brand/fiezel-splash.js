@@ -105,6 +105,10 @@
       closed = true;
       if (timer && target.clearTimeout) target.clearTimeout(timer);
       markSeen(target, now);
+      // Pemanggil perlu tahu KAPAN sapaan selesai, bukan menebaknya dengan pewaktu kedua:
+      // splash bisa ditutup lebih awal oleh sentuhan, dan tebakan akan meleset setiap kali
+      // itu terjadi. Dipanggil sebelum animasi keluar supaya langkah berikutnya menyambung.
+      if (typeof opts.onClose === 'function') { try { opts.onClose({ via: 'close' }); } catch (_) {} }
       try { host.classList.add('is-leaving'); } catch (_) {}
       // Dilepas setelah animasi keluar; kalau timer tidak tersedia, dilepas seketika, karena
       // splash yang tertinggal di layar jauh lebih buruk daripada transisi yang terpotong.
