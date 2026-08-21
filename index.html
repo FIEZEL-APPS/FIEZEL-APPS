@@ -50,6 +50,18 @@
     </div>
   </div>
 
+  <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
+    <div class="welcome-panel auth-panel">
+      <div class="welcome-icon"><i data-lucide="sparkles"></i></div>
+      <div class="welcome-mark">FIEZEL ACCOUNT</div>
+      <h2 id="authGateTitle">Masuk untuk membuka FIEZEL</h2>
+      <p id="authGateBody">Satu akun Puter menyambungkan Core Brain, AI tutor, dan progres belajar Jahran di satu tempat.</p>
+      <p id="authGateStatus" class="notification-status" role="status">Memeriksa status akun…</p>
+      <button id="authGateButton" type="button" class="primary wide" onclick="attemptPuterSignIn()">Masuk dengan Puter <i data-lucide="log-in"></i></button>
+      <p id="authGateHelp" class="notification-help">Browser akan membuka jendela login Puter. Selesaikan proses untuk melanjutkan.</p>
+    </div>
+  </div>
+
   <div id="modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Dialog FIEZEL">
     <div class="modal-panel" id="modalPanel"></div>
   </div>
