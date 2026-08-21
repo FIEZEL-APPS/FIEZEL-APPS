@@ -793,73 +793,187 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .backup-settings .backup-actions{margin-top:10px}
 .backup-settings #backupPreview:empty{display:none}
 
-/* ---------- FIEZEL brand: maskot resmi + splash ---------- */
-/* Maskotnya adalah karya asli dari handoff, jadi yang dianimasikan adalah GAMBAR UTUH -
-   bukan bagian-bagiannya. Handoff melarang merentangkan dan mewarnai ulang karakter ini,
-   sehingga gerakannya dibatasi pada geser, miring kecil, dan skala seragam. */
+
+/* ========================================================================================
+   FIEZEL brand: Percik + splash + onboarding
+   Sumber warna dan tipografi: FIEZEL_Complete_Design_Specification.pdf, bagian 2 dan 15.
+   Token di bawah SENGAJA dinamai --fz-* dan dilingkupi ke elemen `.fiezel-*` saja - ini
+   BUKAN skema warna aplikasi (yang tetap --accent:#8C2233 dkk di :root atas). Menyamakan
+   keduanya berarti mengecat ulang puluhan layar lain yang tidak diminta pada redesign ini;
+   splash dan onboarding adalah lapisan tersendiri sehingga aman dilingkupi sendiri.
+   ======================================================================================== */
+
+@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:500;font-display:swap;
+  src:url('./assets/fonts/Fredoka-500.woff2') format('woff2')}
+@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:600;font-display:swap;
+  src:url('./assets/fonts/Fredoka-600.woff2') format('woff2')}
+@font-face{font-family:'FZ Fredoka';font-style:normal;font-weight:700;font-display:swap;
+  src:url('./assets/fonts/Fredoka-700.woff2') format('woff2')}
+@font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:400;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-400.woff2') format('woff2')}
+@font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:500;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-500.woff2') format('woff2')}
+@font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:600;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-600.woff2') format('woff2')}
+@font-face{font-family:'FZ Plus Jakarta Sans';font-style:normal;font-weight:700;font-display:swap;
+  src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
+
+.fiezel-splash,.fiezel-ob{
+  --fz-bg:#efe3d3; --fz-paper:#fdf3e2; --fz-ink:#2c1b1c; --fz-ink-muted:#6e5a4f;
+  --fz-accent:#7a1e2e; --fz-accent-deep:#4a1119; --fz-gold:#d9a441; --fz-soft:#f3e0e0;
+  --fz-line:#ecdec0; --fz-error:#d9576a;
+  --fz-heading:'FZ Fredoka',-apple-system,'Segoe UI',sans-serif;
+  --fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
+}
+
+/* ---------- Percik: animasi gambar utuh ----------
+   Spesifikasi (bagian 15) menggambarkan percik-mascot.svg dengan bagian tubuh terkelompok
+   terpisah - mata, telinga, tangan - supaya masing-masing bisa dianimasikan sendiri (kedip,
+   telinga bergoyang, lambaian per-tangan). Aset yang kita punya adalah gambar utuh yang
+   sudah digabung (lihat fiezel-mascot.js), jadi SETIAP animasi di bawah menggerakkan
+   seluruh gambar - tidak pernah satu bagian saja. Ini pengganti yang paling jujur yang bisa
+   dibuat dari raster; bukan penggantian diam-diam untuk spesifikasi yang lebih kaya. */
 .fiezel-mascot{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none}
-.fiezel-mascot-hero{animation:fzm-float 4.2s ease-in-out infinite}
+/* "Floating/Bobbing": translateY 0->-8px->0, 2.8s, plus miring -1.2..1.2deg (bagian 14). */
+.fiezel-mascot-hero{animation:fzm-float 2.8s ease-in-out infinite}
 .fiezel-mascot-semangat{animation:fzm-hop 1.3s ease-in-out infinite}
 .fiezel-mascot-pencapaian{animation:fzm-cheer 1.8s ease-in-out infinite}
 .fiezel-mascot-istirahat{animation:fzm-breathe 4.6s ease-in-out infinite}
 .fiezel-mascot-belajar,.fiezel-mascot-coding,.fiezel-mascot-menulis{animation:fzm-breathe 5.4s ease-in-out infinite}
-.fiezel-mascot-siap{animation:fzm-hop 1.5s ease-in-out infinite}
 .fiezel-mascot-jadwal{animation:fzm-cheer 2.2s ease-in-out infinite}
-/* Pose ini memang digambar terpotong di bawah - pada sheet ia mengintip dari balik tombol.
-   Gerakannya karena itu naik-turun kecil, seperti sedang menyembul. */
+/* Pose ini dipotong menyembul dari balik tombol pada sheet lama; gerakannya karena itu
+   naik-turun kecil, bukan mengambang penuh. */
 .fiezel-mascot-mengintip{animation:fzm-peek 3.4s ease-in-out infinite}
 
-@keyframes fzm-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-1.2deg)}}
+@keyframes fzm-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-1.2deg)}}
 @keyframes fzm-peek{0%,100%{transform:translateY(4px)}50%{transform:translateY(-2px)}}
 @keyframes fzm-hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-9px)}}
 @keyframes fzm-cheer{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
 @keyframes fzm-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
+/* Star/Charm Twinkle (bagian 14): scale .85->1.08, rotate +-6deg, opacity .75->1, 2.2s. */
+@keyframes fzm-twinkle{0%,100%{transform:scale(.85) rotate(-6deg);opacity:.75}50%{transform:scale(1.08) rotate(6deg);opacity:1}}
+.fiezel-star{display:inline-block;animation:fzm-twinkle 2.2s ease-in-out infinite}
 
-/* Splash: Step 0 spesifikasi - logo, maskot, gelembung ucapan, satu CTA. */
-.fiezel-splash{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:14px;padding:24px;background:var(--bg,#fdf3e8);text-align:center;
-  animation:fzm-splash-in .4s var(--ease,ease-out) both}
+/* ---------- Lapisan penuh layar (splash dan onboarding) ----------
+   Versi sebelumnya menaruh kartu kecil terapung di tengah layar kosong - OWNER menandainya
+   "tidak penuh layar, terlalu kecil". Perbaikannya: latar krem menutupi SELURUH viewport,
+   maskotnya besar di area atas, dan lembar konten (--fz-paper) menempel di tepi bawah layar
+   selebar penuh dengan sudut atas membulat - pola "bottom sheet" yang dipakai onboarding
+   mobile modern, dan CTA-nya selalu terjangkau ibu jari tanpa harus scroll ke tengah. */
+.fiezel-splash,.fiezel-ob{
+  position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;
+  background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);
+  padding-top:max(18px,env(safe-area-inset-top));
+  animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both;
+}
+.fiezel-ob{z-index:2147481900}
 .fiezel-splash[hidden]{display:none}
-.fiezel-splash.is-leaving{animation:fzm-splash-out .32s ease-in both}
-.fiezel-splash-word{font-weight:700;font-size:2.4rem;letter-spacing:.02em;color:#7a1e2e;margin:0}
-.fiezel-splash-tag{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#6e5a4f;margin:0}
-.fiezel-splash-bubble{position:relative;max-width:19rem;background:#fff;border:1px solid #ecdec0;border-radius:16px;
-  padding:12px 16px;color:#2c1b1c;font-size:.86rem;line-height:1.5;box-shadow:0 4px 14px rgba(74,17,25,.12)}
-.fiezel-splash-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;
-  transform:translateX(-50%) rotate(45deg);background:#fff;border-right:1px solid #ecdec0;border-bottom:1px solid #ecdec0}
-.fiezel-splash-cta{min-height:44px;background:#7a1e2e;color:#fff;border:0;border-radius:14px;padding:13px 22px;
-  font-weight:650;font-size:.92rem}
-@keyframes fzm-splash-in{from{opacity:0}to{opacity:1}}
-@keyframes fzm-splash-out{from{opacity:1}to{opacity:0}}
+.fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
+/* Page In/Out (bagian 14): fade + slide, 400ms masuk / 300ms keluar. */
+@keyframes fzm-page-in{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes fzm-page-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-16px)}}
 
-/* Onboarding enam langkah (Step 1-6 sheet handoff). Kartunya meniru desain: lencana angka,
-   judul, kalimat, maskot, tombol, titik langkah. Yang tidak ditiru adalah warna latar layar
-   penuh - di sini krem yang sama dipakai supaya kartunya menyatu dengan splash sebelumnya. */
-.fiezel-ob{position:fixed;inset:0;z-index:2147481900;display:flex;align-items:center;justify-content:center;
-  padding:20px;background:var(--bg,#fdf3e8);animation:fzm-ob-in .34s var(--ease,ease-out) both}
-.fiezel-ob.is-leaving{animation:fzm-ob-out .26s ease-in both}
-.fiezel-ob-card{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;
-  width:min(22rem,100%);max-height:100%;overflow-y:auto;background:#fff;border:1px solid #ecdec0;border-radius:24px;
-  padding:26px 22px 18px;box-shadow:0 10px 30px rgba(74,17,25,.14)}
-.fiezel-ob-badge{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#7a1e2e;
-  color:#fff;font-weight:700;font-size:.86rem}
-.fiezel-ob-title{margin:0;font-size:1.18rem;line-height:1.3;color:#7a1e2e}
-.fiezel-ob-body{margin:0;font-size:.86rem;line-height:1.55;color:#4a1119;max-width:17rem}
-.fiezel-ob-art{display:flex;justify-content:center;min-height:96px;align-items:flex-end}
-.fiezel-ob-note{margin:0;font-size:.72rem;line-height:1.5;color:#6e5a4f;max-width:17rem}
-.fiezel-ob-cta{min-height:44px;width:min(15rem,100%);background:#7a1e2e;color:#fff;border:0;border-radius:14px;
-  padding:13px 22px;font-weight:650;font-size:.92rem}
-.fiezel-ob-tracks{display:flex;flex-direction:column;gap:10px;width:min(15rem,100%)}
-.fiezel-ob-track{min-height:44px;border-radius:14px;padding:12px 20px;font-weight:650;font-size:.92rem;
-  background:#fff;color:#7a1e2e;border:1px solid #7a1e2e}
-.fiezel-ob-track.is-primary{background:#7a1e2e;color:#fff;border-color:#7a1e2e}
-.fiezel-ob-dots{display:flex;gap:6px;margin-top:2px}
-.fiezel-ob-dot{width:7px;height:7px;border-radius:50%;background:#e3cdb4}
-.fiezel-ob-dot.is-active{background:#7a1e2e}
-/* Jalan keluar selalu ada, di setiap langkah. Gerbang notifikasi ada di bawah lapisan ini. */
-.fiezel-ob-skip{min-height:44px;background:none;border:0;color:#6e5a4f;font-size:.8rem;text-decoration:underline}
-@keyframes fzm-ob-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-@keyframes fzm-ob-out{from{opacity:1}to{opacity:0}}
-/* Tombol kedua ("Nanti saja"). Tanpa jalur ini, murid yang belum punya target ujian atau
-   belum mau mengerjakan tes penempatan tidak akan pernah sampai ke langkah 5 dan 6. */
-.fiezel-ob-secondary{min-height:44px;background:none;border:0;color:#7a1e2e;font-size:.86rem;font-weight:600}
+.fiezel-topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:4px 18px;min-height:40px}
+/* Back selalu ada dari langkah 1+, Skip selalu ada - keduanya ukuran sentuh penuh
+   walau tampilannya ringan, karena ini SATU-SATUNYA jalan keluar dari lapisan penuh layar. */
+.fiezel-back,.fiezel-skip{min-height:44px;min-width:44px;display:inline-flex;align-items:center;
+  gap:4px;background:none;border:0;color:var(--fz-ink-muted);font-family:var(--fz-body);
+  font-size:.8rem;font-weight:600;padding:0 6px}
+.fiezel-back[hidden],.fiezel-skip[hidden]{visibility:hidden}
+.fiezel-skip{text-decoration:underline;margin-left:auto}
+
+.fiezel-stage{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;
+  justify-content:flex-end;min-height:0;padding:6px 20px 0;text-align:center}
+.fiezel-stage-art{display:flex;align-items:flex-end;justify-content:center;flex:1 1 auto;
+  min-height:64px;width:100%}
+.fiezel-stage-art img{max-height:38vh;width:auto}
+
+.fiezel-sheet{position:relative;flex:0 0 auto;width:100%;background:var(--fz-paper);
+  border-top-left-radius:28px;border-top-right-radius:28px;
+  border:1px solid var(--fz-line);border-bottom:0;
+  box-shadow:0 -8px 24px rgba(74,17,25,.12);
+  padding:22px 22px max(22px,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+
+.fiezel-badge{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
+  background:var(--fz-accent);color:#fff;font-family:var(--fz-heading);font-weight:600;font-size:.82rem}
+.fiezel-title{margin:0;font-family:var(--fz-heading);font-weight:600;font-size:1.32rem;
+  line-height:1.28;color:var(--fz-accent)}
+.fiezel-body{margin:0;font-size:.9rem;line-height:1.55;color:var(--fz-ink);max-width:24rem}
+.fiezel-note{margin:0;font-size:.74rem;line-height:1.5;color:var(--fz-ink-muted);max-width:24rem}
+
+/* Component Styling Guidelines (bagian 2): Primary/Secondary/Ghost. */
+.fiezel-btn{min-height:44px;font-family:var(--fz-body);font-weight:650;font-size:.92rem;
+  border-radius:14px;padding:13px 20px;width:min(21rem,100%);
+  transition:transform .12s ease-out,box-shadow .12s ease-out,opacity .12s ease-out}
+.fiezel-btn-primary{background:var(--fz-accent);color:#fff;border:0;box-shadow:0 4px 0 var(--fz-accent-deep)}
+.fiezel-btn-primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--fz-accent-deep)}
+.fiezel-btn-secondary{background:var(--fz-soft);color:var(--fz-accent);border:1px solid var(--fz-gold)}
+.fiezel-btn-secondary:active{transform:translateY(2px)}
+.fiezel-btn-ghost{background:transparent;color:var(--fz-ink-muted);border:0;box-shadow:none;
+  font-size:.84rem;width:auto}
+.fiezel-btn[disabled]{opacity:.4;pointer-events:none}
+
+.fiezel-dots{display:flex;gap:6px;margin-top:2px}
+.fiezel-dot{width:7px;height:7px;border-radius:50%;background:var(--fz-line)}
+.fiezel-dot.is-active{background:var(--fz-accent)}
+
+/* ---------- Splash (Step 0) ---------- */
+.fiezel-splash-body{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:24px;text-align:center}
+.fiezel-splash-word{font-family:var(--fz-heading);font-weight:700;font-size:2.6rem;
+  letter-spacing:.01em;color:var(--fz-accent);margin:0;display:flex;align-items:center;gap:8px}
+.fiezel-splash-tag{font-family:var(--fz-body);font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--fz-ink-muted);margin:0}
+.fiezel-splash-bubble{position:relative;max-width:20rem;background:#fff;border:1px solid var(--fz-line);
+  border-radius:16px;padding:12px 16px;color:var(--fz-ink);font-size:.86rem;line-height:1.5;
+  box-shadow:0 4px 14px rgba(74,17,25,.12)}
+.fiezel-splash-bubble::after{content:"";position:absolute;left:50%;bottom:-9px;width:16px;height:16px;
+  transform:translateX(-50%) rotate(45deg);background:#fff;border-right:1px solid var(--fz-line);
+  border-bottom:1px solid var(--fz-line)}
+
+/* ---------- Feature Carousel (Step 1) ---------- */
+.fiezel-carousel-track{display:flex;flex-direction:column;gap:10px;width:100%;text-align:left}
+.fiezel-carousel-item{display:flex;align-items:center;gap:10px;background:var(--fz-bg);
+  border:1px solid var(--fz-line);border-radius:12px;padding:10px 12px;font-size:.86rem}
+.fiezel-carousel-item i{flex:0 0 auto;color:var(--fz-accent)}
+.fiezel-carousel-arrows{display:flex;align-items:center;gap:14px;justify-content:center}
+.fiezel-carousel-arrow{min-height:40px;min-width:40px;border-radius:50%;background:var(--fz-soft);
+  color:var(--fz-accent);border:0;display:grid;place-items:center}
+.fiezel-carousel-arrow[disabled]{opacity:.35}
+
+/* ---------- Goal Selection (Step 2) ---------- */
+.fiezel-goal-grid{display:flex;flex-direction:column;gap:8px;width:100%}
+/* Card Selection (bagian 14): border->gold, bg->soft, scale 1->1.035->1, 300-400ms. */
+.fiezel-goal-card{display:flex;flex-direction:column;gap:2px;text-align:left;width:100%;
+  border:1px solid var(--fz-line);border-radius:12px;padding:11px 14px;background:#fff;
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1),border-color .3s,background .3s}
+.fiezel-goal-card b{font-family:var(--fz-heading);font-weight:600;font-size:.88rem;color:var(--fz-ink)}
+.fiezel-goal-card span{font-size:.76rem;color:var(--fz-ink-muted)}
+.fiezel-goal-card.is-selected{border:2px solid var(--fz-gold);background:var(--fz-soft);
+  transform:scale(1.02)}
+.fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
+.fiezel-level-chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--fz-line);
+  background:#fff;color:var(--fz-ink);font-family:var(--fz-body);font-weight:650;font-size:.82rem}
+.fiezel-level-chip.is-selected{border:2px solid var(--fz-gold);background:var(--fz-soft);color:var(--fz-accent)}
+
+/* ---------- Summary (Step 5) ---------- */
+.fiezel-summary-card{width:100%;background:var(--fz-bg);border:1px solid var(--fz-line);
+  border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;text-align:left}
+.fiezel-summary-row{display:flex;justify-content:space-between;gap:10px;font-size:.82rem}
+.fiezel-summary-row b{color:var(--fz-ink)}
+.fiezel-summary-row span{color:var(--fz-ink-muted);text-align:right}
+
+/* Confetti kecil, CSS murni, berhenti di bawah kurangi-gerak lewat blok global di atas. */
+.fiezel-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit}
+.fiezel-confetti i{position:absolute;top:-10px;width:6px;height:6px;border-radius:1px;
+  background:var(--fz-gold);animation:fzm-confetti 1.6s ease-in both}
+.fiezel-confetti i:nth-child(2n){background:var(--fz-accent)}
+.fiezel-confetti i:nth-child(3n){background:#fff;border:1px solid var(--fz-gold)}
+@keyframes fzm-confetti{to{transform:translateY(120px) rotate(220deg);opacity:0}}
+
+/* ---------- Kurangi-gerak: splash dan onboarding tunduk pada blok global juga,
+   ditambah override lokal untuk memastikan lambaian/kedip-setara berhenti total. ---------- */
+.fiezel-splash-still .fiezel-mascot,.fiezel-ob-still .fiezel-mascot,
+.fiezel-splash-still .fiezel-star,.fiezel-ob-still .fiezel-star{animation:none}
