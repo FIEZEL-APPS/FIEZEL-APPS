@@ -11,7 +11,6 @@ const zoom = require('./features/ui/fiezel-zoom-lock.js');
 const gate = require('./features/neural-voice/fiezel-voice-bundle-gate.js');
 const daily = require('./features/daily-target/fiezel-daily-target.js');
 const dialog = require('./features/tutor-classroom/fiezel-tutor-dialog.js');
-const music = require('./features/audio/fiezel-soundtrack.js');
 
 const index = fs.readFileSync('index.html', 'utf8');
 const css = fs.readFileSync('style.css', 'utf8');
@@ -258,27 +257,6 @@ test('wrong answers buzz hard and sound wrong, everywhere', () => {
   assert.match(tutorSrc, /answerFeedbackSignal/, 'Classroom answers are no longer silent');
   // iOS has no Vibration API at all; the code must say so rather than pretend.
   assert.match(app, /iOS Safari has NO Vibration API/, 'the platform limit is documented where it bites');
-});
-
-test('the soundtrack is an arrangement, not a chord ping', () => {
-  assert.ok(music.BPM > 0 && music.BAR > 0, 'it has tempo');
-  assert.ok(music.PROGRESSION.length >= 4, 'and a chord progression');
-  const plan = music.barPlan(0, 0);
-  const voices = new Set(plan.notes.map(n => n.voice));
-  for (const voice of ['pad', 'bass', 'arp', 'hat', 'kick']) {
-    assert.ok(voices.has(voice), `the arrangement must include ${voice}`);
-  }
-  assert.ok(plan.notes.length >= 15, 'a bar carries real note density');
-  // Notes are placed on the audio clock, in order, inside the bar.
-  const times = plan.notes.map(n => n.at);
-  assert.ok(Math.min(...times) >= 0 && Math.max(...times) < music.BAR, 'every note lands inside its bar');
-  assert.strictEqual(music.chordAt(4).name, music.PROGRESSION[0].name, 'the progression loops');
-  const second = music.barPlan(1, music.BAR);
-  assert.notStrictEqual(second.chord, plan.chord, 'consecutive bars change chord');
-  assert.match(app, /FiezelSoundtrack\?\.create/, 'app.js uses the engine');
-  assert.ok(!/playAmbientChord/.test(app), 'the old three-oscillator ping is gone');
-  assert.ok(index.includes('./features/audio/fiezel-soundtrack.js'), 'loaded by the document');
-  assert.ok(sw.includes('./features/audio/fiezel-soundtrack.js'), 'precached');
 });
 
 test('Fiezel AI answers anything, and says plainly when it cannot', () => {

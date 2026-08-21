@@ -58,7 +58,7 @@
       function saveEndpoint(url){
         var current={};
         try{current=JSON.parse(localStorage.getItem('fiezel-v4-state')||'{}')}catch{}
-        current.preferences=Object.assign({haptics:true,soundtrack:true,motion:true,reportConsent:false},current.preferences||{},{reportEndpoint:url});
+        current.preferences=Object.assign({haptics:true,motion:true,reportConsent:false},current.preferences||{},{reportEndpoint:url});
         current.reportMeta=Object.assign({lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]},current.reportMeta||{},{lastStatus:'ready'});
         localStorage.setItem('fiezel-v4-state',JSON.stringify(current));
         localStorage.setItem('fiezel-creator-endpoint',url);
