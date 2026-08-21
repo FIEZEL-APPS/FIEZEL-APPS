@@ -243,6 +243,12 @@
       host.innerHTML = markup();
     }
 
+    // Ketukan koreografi dipasang sebagai custom property. CSS membaca jeda animasinya dari
+    // sini, dan fiezel-ui-sfx.js menjadwalkan nadanya dari tabel yang sama - jadi gerak dan
+    // bunyi tidak bisa lagi bergeser sendiri-sendiri. index.html menuliskan nilai yang sama
+    // sebagai default supaya splash frame-pertama tetap bergerak sebelum JavaScript jalan.
+    try { if (target.FiezelChoreography) target.FiezelChoreography.applyTo(host); } catch (_) {}
+
     // Sisa waktu tayang. Untuk splash yang diadopsi, waktu yang sudah dipakai boot ikut
     // dihitung supaya sapaan tidak menjadi VISIBLE_MS DITAMBAH lamanya boot.
     var visibleMs = Number(opts.visibleMs) > 0 ? Number(opts.visibleMs) : VISIBLE_MS;

@@ -78,3 +78,20 @@ Build provenance and the exact deviations from the upstream build script:
 `vendor/sherpa-vits/` (Piper `en_US-libritts_r-medium`) and `vendor/sherpa-vits-id/`
 (Piper `id_ID-news_tts-medium`) are no longer loaded by the app. They remain in the
 tree for one release as a rollback path and are removed once the device gate passes.
+
+## Font antarmuka
+
+FIEZEL membundel dua wajah huruf sebagai berkas `.woff2` di `assets/fonts/`, dipasang
+lewat `@font-face` di `style.css`. Keduanya berlisensi SIL Open Font License 1.1, yang
+mengizinkan pembundelan dan redistribusi selama pemberitahuan lisensinya dipertahankan.
+
+- **Instrument Serif** — dipakai pada ukuran display (wordmark, judul layar, judul dialog).
+  Proyek: https://github.com/Instrument/instrument-serif
+- **Plus Jakarta Sans** — dipakai untuk teks tubuh dan judul kecil.
+  Proyek: https://github.com/tokotype/PlusJakartaSans
+
+Teks lisensi OFL 1.1: https://openfontlicense.org/
+
+m025-86: Fredoka dilepas dari bundel. Wajah bulatnya terbaca "ramah/mainan", sedangkan
+arah desain yang diminta pemilik adalah kesan eksklusif; berkasnya ikut dihapus supaya
+tidak tertinggal sebagai muatan precache yang tidak dirujuk siapa pun.
