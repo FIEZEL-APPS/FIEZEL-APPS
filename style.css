@@ -261,7 +261,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* ---------- bottom nav ---------- */
 .bottomnav{
   position:fixed;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(560px,calc(100% - 24px));
-  padding:7px;background:rgba(255,255,255,.86);backdrop-filter:blur(20px) saturate(1.6);
+  padding:7px;background:rgba(255,255,255,.86);
   border:1px solid rgba(239,231,232,.9);border-radius:22px;
   display:grid;grid-template-columns:repeat(5,1fr);gap:4px;z-index:40;
   box-shadow:0 16px 40px rgba(40,20,26,.10);
@@ -463,7 +463,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 
 .topbar{
   position:sticky;top:0;z-index:35;margin:0 -10px 24px;padding:12px 10px;
-  background:var(--chrome-bg);backdrop-filter:blur(20px) saturate(1.25);border-radius:0 0 18px 18px;
+  background:var(--chrome-bg);border-radius:0 0 18px 18px;
 }
 .brand-button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px 2px;box-shadow:none;color:var(--ambient-text)}
 .brand-button:hover{transform:none;border-color:transparent;box-shadow:none}
@@ -485,7 +485,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1.42fr) minmax(300px,.72fr);gap:36px;
   grid-template-rows:1fr;
   min-height:500px;padding:clamp(34px,5vw,62px);border-radius:30px;color:#f8f8fb;
-  background:linear-gradient(135deg,var(--launcher-start) 0%,rgba(21,26,56,.72) 56%,var(--launcher-end) 132%);backdrop-filter:blur(10px) saturate(1.1);
+  background:linear-gradient(135deg,var(--launcher-start) 0%,rgba(21,26,56,.72) 56%,var(--launcher-end) 132%);
   box-shadow:0 34px 80px rgba(10,14,31,.2);
 }
 .launcher-shell::after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-170px;top:-180px;background:rgba(216,179,107,.16);filter:blur(2px);pointer-events:none}
@@ -505,7 +505,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .launcher-trust{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;color:#9fa3b6;font-size:.72rem}
 .launcher-trust span{display:flex;align-items:center;gap:7px}.launcher-trust svg{width:15px}
 
-.coach-preview{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;padding:25px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.075);backdrop-filter:blur(12px);border-radius:22px}
+.coach-preview{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;padding:25px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.075);border-radius:22px}
 .coach-head{display:flex;align-items:center;gap:11px}.coach-head>div{display:grid;gap:3px}.coach-head small{color:#c0aeb3;font-size:.6rem;letter-spacing:.14em}.coach-head b{font-size:.86rem}
 .coach-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:#171d31;background:#d8b36b}.coach-icon svg{width:21px;height:21px}
 .coach-level{display:flex;justify-content:space-between;align-items:end;margin:34px 0 22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
@@ -706,8 +706,7 @@ body.daily-locked{overflow:hidden}
    ========================================================================== */
 
 .card,.launcher-shell,.coach-preview,.launch-card,.mission-panel,.home-stats>div{
-  background:var(--glass-thin);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  background:var(--glass-thick);
   border:.5px solid var(--glass-edge);
   color:var(--glass-text);
   box-shadow:0 1px 1px rgba(40,20,26,.03),0 8px 24px rgba(40,20,26,.07);
@@ -736,8 +735,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 /* The tab bar floats as one capsule of glass. */
 .bottomnav{
-  background:var(--glass-regular);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  background:var(--glass-thick);
   border:.5px solid var(--glass-edge);border-radius:30px;padding:6px;
   box-shadow:0 1px 1px rgba(40,20,26,.05),0 14px 34px rgba(40,20,26,.14);
 }
