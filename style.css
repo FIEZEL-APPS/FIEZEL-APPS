@@ -54,6 +54,54 @@
   --glass-blur-heavy:blur(40px) saturate(180%);
 }
 
+/* Dark mode support: respects system preference and overrides with explicit toggle */
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --sky-top:#2a1f23;
+    --sky-bottom:#1a0f14;
+    --scene-light:rgba(180,69,90,.28);
+    --ambient-text:#fdf4f6;
+    --ambient-muted:#d8c5ca;
+    --chrome-bg:rgba(30,18,23,.68);
+    --launcher-start:rgba(20,8,12,.82);
+    --launcher-end:rgba(50,22,32,.80);
+    --bg:#1a0f14;
+    --panel:#1e1418;
+    --panel-soft:#2a1f24;
+    --line:#3a2d32;
+    --line-soft:#2f2228;
+    --text:#fdf4f6;
+    --muted:#d5c2c7;
+    --muted-soft:#c9b5bb;
+    --accent-soft:#4a2e35;
+    --green-soft:#1a3a2e;
+    --red-soft:#3a1e28;
+  }
+}
+
+/* Explicit dark mode override (when user toggles) */
+:root[data-theme="dark"] {
+  --sky-top:#2a1f23;
+  --sky-bottom:#1a0f14;
+  --scene-light:rgba(180,69,90,.28);
+  --ambient-text:#fdf4f6;
+  --ambient-muted:#d8c5ca;
+  --chrome-bg:rgba(30,18,23,.68);
+  --launcher-start:rgba(20,8,12,.82);
+  --launcher-end:rgba(50,22,32,.80);
+  --bg:#1a0f14;
+  --panel:#1e1418;
+  --panel-soft:#2a1f24;
+  --line:#3a2d32;
+  --line-soft:#2f2228;
+  --text:#fdf4f6;
+  --muted:#d5c2c7;
+  --muted-soft:#c9b5bb;
+  --accent-soft:#4a2e35;
+  --green-soft:#1a3a2e;
+  --red-soft:#3a1e28;
+}
+
 *{box-sizing:border-box}
 /* m025-42: one scale, always. The viewport tag alone is ignored by iOS Safari, so the
    layout is pinned here as well and the gestures are refused in fiezel-zoom-lock.js.
@@ -837,7 +885,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash,.fiezel-ob{
   --fz-bg:#efe3d3; --fz-paper:#fdf3e2; --fz-ink:#2c1b1c; --fz-ink-muted:#6e5a4f;
   --fz-accent:#7a1e2e; --fz-accent-deep:#4a1119; --fz-gold:#d9a441; --fz-soft:#f3e0e0;
-  --fz-line:#ecdec0; --fz-error:#d9576a;
+  --fz-line:#ecdec0;
   --fz-heading:'FZ Fredoka',-apple-system,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
 }
@@ -993,3 +1041,161 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
    ditambah override lokal untuk memastikan lambaian/kedip-setara berhenti total. ---------- */
 .fiezel-splash-still .fiezel-mascot,.fiezel-ob-still .fiezel-mascot,
 .fiezel-splash-still .fiezel-star,.fiezel-ob-still .fiezel-star{animation:none}
+
+/* ========== SKELETON LOADING STATES (Polished, Premium Feel) ========== */
+/* Shimmer animation: Creates the premium "loading" feel like Spotify/Duolingo */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--panel) 25%, var(--panel-soft) 50%, var(--panel) 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+  border-radius: var(--radius-md);
+  height: 16px;
+}
+
+/* Skeleton card (useful for lists/grids) */
+.skeleton-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.skeleton-card .skeleton { margin-bottom: 12px; }
+.skeleton-card .skeleton:last-child { margin-bottom: 0; }
+
+/* Skeleton variants for different sizes */
+.skeleton-text { height: 16px; }
+.skeleton-title { height: 24px; margin-bottom: 8px; }
+.skeleton-subtitle { height: 14px; width: 60%; margin-bottom: 16px; }
+.skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; display: inline-block; }
+.skeleton-line { height: 12px; margin-bottom: 8px; }
+.skeleton-line:last-child { margin-bottom: 0; }
+
+/* Skeleton grid (for grid layouts) */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.skeleton-grid .skeleton-card {
+  padding: 16px;
+  margin-bottom: 0;
+}
+
+/* Loading state wrapper */
+.loading-state {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Prevent FOUC (Flash Of Unstyled Content) */
+[data-loading="true"] { visibility: hidden; }
+[data-loading="false"] { visibility: visible; }
+
+/* ========== EMPTY STATES (Friendly, Encouraging) ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  min-height: 300px;
+  background: linear-gradient(135deg, var(--panel-soft) 0%, var(--panel) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  margin: 20px 0;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
+}
+
+.empty-state-icon svg {
+  width: 100%;
+  height: 100%;
+  color: var(--accent-soft);
+  opacity: 0.8;
+}
+
+.empty-state h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  max-width: 280px;
+}
+
+.empty-state .primary {
+  margin-top: 8px;
+}
+
+/* Variant: minimal empty state (for small containers) */
+.empty-state-minimal {
+  padding: 24px 16px;
+  min-height: auto;
+  background: transparent;
+  border: 1px dashed var(--line-soft);
+}
+
+.empty-state-minimal h2 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.empty-state-minimal p {
+  font-size: 0.8rem;
+}
+
+/* Variant: inline empty message (for grid cells) */
+.empty-inline {
+  padding: 12px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  background: var(--panel-soft);
+  border-radius: var(--radius-md);
+}
+
+/* Progress indicator during load */
+.loading-progress {
+  height: 2px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.loading-progress::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: shimmer 1.5s infinite;
+}
