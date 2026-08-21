@@ -37,28 +37,34 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
 
-  <div id="welcome" class="welcome notification-gate" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
+  <!-- Audit UX Bagian 3 + Roadmap #3: nada suportif, tanpa kata "wajib" / "belum bisa
+       dibuka", dan tanpa menyapa nama murid di layar sistem. Gerbang ini tetap berjalan
+       di UJUNG alur perkenalan, bukan sebagai layar pertama. -->
+  <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
     <div class="welcome-panel notification-panel">
       <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
-      <div class="welcome-mark">FIEZEL REMINDER · WAJIB NYALA</div>
-      <h2 id="welcomeTitle">Oii Jahran, nyalain notifikasi dulu 👀</h2>
-      <p id="notificationGateBody">Biar FIEZEL bisa nyolek kalau lu kelamaan nggak belajar, target harian belum beres, atau ada materi yang waktunya direview.</p>
-      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Statusnya harus <b>Allow / Izinkan</b>. Kalau ditolak atau dicabut, FIEZEL belum bisa dibuka.</span></div>
+      <div class="welcome-mark">FIEZEL REMINDER</div>
+      <h2 id="welcomeTitle">Satu langkah lagi</h2>
+      <p id="notificationGateBody">Aktifkan notifikasi supaya FIEZEL bisa mengingatkan saat target harian belum selesai atau ada materi yang waktunya diulang.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Pilih <b>Allow / Izinkan</b> saat browser bertanya. Pengingatnya bisa diatur ulang kapan saja lewat Pengaturan.</span></div>
       <p id="notificationGateStatus" class="notification-status" role="status">Memeriksa izin notifikasi…</p>
       <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()">Aktifkan notifikasi <i data-lucide="bell-ring"></i></button>
       <p id="notificationGateHelp" class="notification-help">Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
     </div>
   </div>
 
+  <!-- Audit UX Bagian 3: layar masuk bergaya Apple Sign-In - satu lambang merek di atas,
+       judul besar, satu tombol utama penuh lebar, sisanya lapang. Tidak ada elemen bawaan
+       browser yang terlihat dan tidak ada nama murid di layar sistem. -->
   <div id="authGate" class="welcome auth-gate hidden" role="dialog" aria-modal="true" aria-labelledby="authGateTitle" aria-describedby="authGateBody">
     <div class="welcome-panel auth-panel">
-      <div class="welcome-icon"><i data-lucide="sparkles"></i></div>
-      <div class="welcome-mark">FIEZEL ACCOUNT</div>
-      <h2 id="authGateTitle">Masuk untuk membuka FIEZEL</h2>
-      <p id="authGateBody">Satu akun Puter menyambungkan Core Brain, AI tutor, dan progres belajar Jahran di satu tempat.</p>
-      <p id="authGateStatus" class="notification-status" role="status">Memeriksa status akun…</p>
-      <button id="authGateButton" type="button" class="primary wide" onclick="attemptPuterSignIn()">Masuk dengan Puter <i data-lucide="log-in"></i></button>
-      <p id="authGateHelp" class="notification-help">Browser akan membuka jendela login Puter. Selesaikan proses untuk melanjutkan.</p>
+      <img class="auth-mark" src="./assets/brand/fiezel-icon-192.png" alt="" width="72" height="72" decoding="async">
+      <h2 id="authGateTitle">Masuk ke FIEZEL</h2>
+      <p id="authGateBody">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
+      <p id="authGateStatus" class="auth-status" role="status">Memeriksa status akun…</p>
+      <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span>Lanjutkan dengan Puter</span></button>
+      <p id="authGateHelp" class="auth-help">Jendela login Puter akan terbuka di tab baru. Selesaikan prosesnya untuk melanjutkan.</p>
+      <p class="auth-legal">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
     </div>
   </div>
 
@@ -71,7 +77,10 @@
     <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
     <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
     <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="chart-no-axes-combined"></i><span>Peta</span></button>
+    <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
+         "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
+         yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="route"></i><span>Peta</span></button>
   </nav>
 
   <script src="https://js.puter.com/v2/"></script>
@@ -108,6 +117,7 @@
   <script src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
   <script src="./features/ui/fiezel-zoom-lock.js"></script>
   <script src="./features/audio/fiezel-soundtrack.js"></script>
+  <script src="./features/audio/fiezel-ui-sfx.js"></script>
   <script src="./features/neural-voice/fiezel-voice-bundle-gate.js"></script>
   <script src="./features/library/fiezel-library.js"></script>
   <script src="./features/library/fiezel-library-ui.js"></script>
@@ -124,7 +134,6 @@
   <script src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
   <script src="./features/continuity/fiezel-continuity.js"></script>
   <script src="./features/health/fiezel-install-health.js"></script>
-  <script src="./features/brand/fiezel-mascot.js"></script>
   <script src="./features/brand/fiezel-splash.js"></script>
   <script src="./features/onboarding/fiezel-onboarding.js"></script>
   <script src="./features/personal-journey/fiezel-personal-journey.js"></script>
