@@ -41,7 +41,11 @@ async function navigationHeaders(userAgent){
   assert.equal(safariHeaders.get('Cross-Origin-Opener-Policy'),'same-origin-allow-popups','WebKit navigation must preserve the Puter popup opener channel');
   assert.equal(safariHeaders.get('Cross-Origin-Embedder-Policy'),'credentialless');
   const chromeHeaders=await navigationHeaders(chrome);
-  assert.equal(chromeHeaders.get('Cross-Origin-Opener-Policy'),'same-origin','Chromium must retain the isolation-capable opener policy');
+  // m025-83: strict COOP:same-origin on Chromium severed window.opener for the Puter
+  // sign-in popup and sent the majority of installs through a full-page escape instead of
+  // completing inline - see the OWNER note above openerPolicyFor() in sw.js. Chromium now
+  // gets the same opener-preserving policy as WebKit; there is no engine split left to test.
+  assert.equal(chromeHeaders.get('Cross-Origin-Opener-Policy'),'same-origin-allow-popups','Chromium navigation must also preserve the Puter popup opener channel');
 
   const t=load(safari);let intercepted=false;
   const puterRequest={url:'https://js.puter.com/v2/',method:'GET',mode:'no-cors'};
