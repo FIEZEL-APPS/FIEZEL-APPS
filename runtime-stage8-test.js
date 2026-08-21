@@ -14,7 +14,12 @@ const seeded={version:runtimeVersion,userName:'Jahran',view:'progress',level:3,p
 localStorage.setItem('fiezel-v4-state',JSON.stringify(seeded));
 const code=fs.readFileSync(path.join(root,'app.js'),'utf8');vm.runInNewContext(code,context,{filename:'app.js'});
 setTimeout(()=>{
-  context.go('progress');const html=els.app.innerHTML;
+  // m025-85: Peta Belajar is now tabbed (Ringkasan/Analisis/Adaptive Engine/Kesiapan
+  // & Skills) instead of one long scroll, so the sections this test checks are spread
+  // across tabs rather than all present in a single render. Concatenate every tab's
+  // HTML to keep checking the same underlying data/content.
+  context.go('progress');
+  const html=['overview','analysis','adaptive','readiness'].map(tab=>{context.switchProgressTab(tab);return els.app.innerHTML}).join('\n');
   const checks={
     learningMap:html.includes('Peta Belajar'),timeline:html.includes('Linimasa Kelemahan')&&html.includes(new Date(now).toISOString().slice(0,10)),smartReview:html.includes('Ulangan Pintar')&&html.includes('risiko lupa'),confidence:html.includes('Kalibrasi Keyakinan'),errorPatterns:html.includes('Pola Kesalahan')&&html.includes('Subject verb agreement'),confusionNetwork:html.includes('Jaringan Kekeliruan Kosakata'),readingMap:html.includes('Peta Skill Reading'),diagnostic:html.includes('Laporan Diagnostik'),creator:html.includes('instagram.svg')&&html.includes('@fitrarustqi'),
     adaptiveReady:context.__getFiezelState().adaptiveReady===true,meaningfulStreak:context.__getFiezelState().streak>=1,reviewDue:context.__getFiezelState().grammar.present_simple.nextReview<=Date.now()&&context.__getFiezelState().grammar.present_simple.mastery<80
