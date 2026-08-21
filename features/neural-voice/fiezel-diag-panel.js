@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-81';
+  var DIAG_BUILD = 'm025-82';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -211,11 +211,13 @@
     var style = root.document.createElement('style');
     style.textContent = [
       '#fiezelDiagHost{position:fixed;z-index:' + Z + ';}',
-      '#fiezelDiagOpen{position:fixed;z-index:' + Z + ';',
-      'right:calc(12px + env(safe-area-inset-right));',
-      'top:calc(12px + env(safe-area-inset-top));',
-      'padding:9px 13px;border:1px solid #11172a;border-radius:11px;',
-      'background:#11172a;color:#fff;font:600 13px/1 -apple-system,system-ui,sans-serif;}',
+      // m025-82 OWNER: tombol ini dulu pil mengambang permanen di kanan atas dan mengganggu
+      // tampilan. Sekarang disembunyikan visual (bukan display:none, supaya .click() lewat
+      // gesture rahasia tetap bekerja di semua browser) dan dibuka lewat tap 5x di brand-button
+      // pada topbar (lihat armSecretDiagnosticsGesture). Tetap mengambang di luar app.js supaya
+      // jalur ini masih hidup kalau app.js crash — hanya cara memicunya yang berubah.
+      '#fiezelDiagOpen{position:fixed;width:1px;height:1px;padding:0;margin:-1px;',
+      'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}',
       '#fiezelDiagSheet{position:fixed;inset:0;z-index:' + (Z + 1) + ';display:none;',
       'flex-direction:column;gap:9px;background:#fff;',
       'padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));}',
@@ -477,6 +479,29 @@
     done('Salin manual dari kotak');
   }
 
+  // m025-82 OWNER: satu-satunya cara membuka Diagnostics sekarang. Menyasar .brand-button
+  // di topbar karena itu markup statis di index.html — sudah ada di DOM sebelum script ini
+  // jalan dan tidak bergantung pada app.js berhasil render, jadi jalur diagnostik tetap
+  // hidup walau app.js crash. Tap-count direset kalau jeda antar-tap melebihi WINDOW_MS.
+  function armSecretDiagnosticsGesture(openButton) {
+    safe(function () {
+      var trigger = root.document.querySelector('.brand-button');
+      if (!trigger) return;
+      var TAPS_NEEDED = 5, WINDOW_MS = 1800;
+      var taps = 0, resetTimer = null;
+      trigger.addEventListener('click', function () {
+        taps++;
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(function () { taps = 0; }, WINDOW_MS);
+        if (taps >= TAPS_NEEDED) {
+          taps = 0;
+          clearTimeout(resetTimer);
+          openButton.click();
+        }
+      });
+    });
+  }
+
   function mount() {
     var ui = build();
     var body = root.document.body;
@@ -607,6 +632,7 @@
       showPcmState();
       ui.sheet.classList.add('open');
     });
+    armSecretDiagnosticsGesture(ui.open);
     ui.close.addEventListener('click', function(){
       ui.sheet.classList.remove('open');
     });

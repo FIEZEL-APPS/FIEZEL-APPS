@@ -338,21 +338,58 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .notification-status{margin:10px 0 0!important;padding:10px 12px;border-radius:12px;background:#f5f3ec;color:var(--muted)!important;font-size:.76rem!important;font-weight:700}
 .notification-status.success{background:#edf8f3;color:#277f68!important}.notification-status.error{background:#fff0f2;color:#b04b5f!important}
 .notification-help{font-size:.72rem!important;margin:12px 0 0!important}.notification-panel .primary[disabled]{opacity:.72;cursor:not-allowed;transform:none}
-/* ---------- Puter account gate: the second mandatory step, styled as a distinct,
-   exclusive moment (dark/gold) rather than a repeat of the warm notification panel. ---------- */
+/* ---------- Gerbang akun Puter, digubah mengikuti Audit UX Bagian 3 ----------
+   Bentuknya sekarang mengikuti layar Apple Sign-In: latar tenang satu warna, lambang
+   merek di atas, judul besar berjarak lega, SATU tombol utama penuh lebar berbentuk
+   pil, lalu keterangan kecil yang diam. Tidak ada ikon dekoratif, tidak ada kartu
+   bergradien, tidak ada elemen bawaan browser yang terlihat - kelapangan yang membawa
+   kesan mahal, bukan ornamen. */
 .auth-locked .app,.auth-locked .bottomnav{visibility:hidden;pointer-events:none;user-select:none}
-.auth-gate{z-index:150;background:radial-gradient(120% 120% at 50% -10%,#3a1620 0%,var(--black) 62%);backdrop-filter:blur(18px)}
-.auth-panel{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(216,179,107,.3);box-shadow:0 40px 120px rgba(0,0,0,.5)}
-.auth-panel .welcome-icon{background:rgba(216,179,107,.16);color:var(--gold)}
-.auth-panel .welcome-mark{color:var(--gold);letter-spacing:.14em;font-size:.72rem;text-transform:uppercase}
-.auth-panel h2,.auth-panel p{color:#fbf3e6}
-.auth-panel p{color:rgba(251,243,230,.72)}
-.auth-panel .notification-status{background:rgba(255,255,255,.08);color:rgba(251,243,230,.86)!important}
-.auth-panel .notification-status.success{background:rgba(39,130,104,.28);color:#8be8c8!important}
-.auth-panel .notification-status.error{background:rgba(224,82,111,.24);color:#ffb3c2!important}
-.auth-panel .notification-help{color:rgba(251,243,230,.55)!important}
-.auth-panel .primary{background:var(--gold);border-color:var(--gold);color:#2c1b0d;font-weight:800;box-shadow:0 12px 30px rgba(216,179,107,.35)}
-.auth-panel .primary:hover{background:#e2c184}
+.auth-gate{z-index:150;background:var(--bg);backdrop-filter:none}
+.auth-gate .auth-panel{
+  width:min(400px,100%);
+  padding:44px 34px 36px;
+  border:1px solid var(--line);
+  border-radius:26px;
+  background:var(--panel);
+  box-shadow:var(--shadow-lg);
+  text-align:center;
+}
+.auth-gate .auth-mark{display:block;width:72px;height:72px;margin:0 auto 26px;border-radius:20px;object-fit:contain}
+.auth-gate .auth-panel h2{
+  margin:0 0 10px;
+  font-family:var(--fz-heading);
+  font-size:1.62rem;line-height:1.2;letter-spacing:-.03em;font-weight:700;
+  color:var(--text);
+}
+.auth-gate .auth-panel #authGateBody{
+  margin:0 auto 26px;max-width:19rem;
+  color:var(--muted);font-size:.88rem;line-height:1.6;
+}
+/* Status dirancang sebagai komponen sendiri, bukan alert bawaan browser (Bagian 3). */
+.auth-gate .auth-status{
+  margin:0 0 16px;padding:10px 14px;border-radius:12px;
+  background:var(--panel-soft);color:var(--muted);
+  font-size:.76rem;font-weight:700;line-height:1.45;
+}
+.auth-gate .auth-status.success{background:var(--green-soft);color:var(--green)}
+.auth-gate .auth-status.error{background:var(--red-soft);color:var(--red)}
+/* Satu tombol, penuh lebar, tinggi 52px - hierarki tombol Apple: yang utama tidak
+   berbagi panggung dengan apa pun. */
+.auth-gate .auth-primary{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  width:100%;min-height:52px;padding:0 20px;
+  border:0;border-radius:999px;
+  background:var(--black);color:#fff;
+  font-family:var(--fz-body);font-size:.96rem;font-weight:650;letter-spacing:-.01em;
+  box-shadow:0 10px 26px rgba(140,34,51,.24);
+}
+.auth-gate .auth-primary:hover{background:var(--accent-strong);border-color:transparent;box-shadow:0 14px 32px rgba(140,34,51,.3)}
+.auth-gate .auth-primary svg{width:19px;height:19px}
+.auth-gate .auth-primary[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.auth-gate .auth-help{margin:18px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55}
+.auth-gate .auth-legal{margin:14px 0 0;color:var(--muted-soft);font-size:.68rem;line-height:1.5}
+@media (max-width:420px){.auth-gate .auth-panel{padding:36px 24px 30px;border-radius:22px}.auth-gate .auth-mark{width:60px;height:60px;margin-bottom:20px}}
 .auth-panel .primary[disabled]{opacity:.6;cursor:not-allowed;transform:none}
 .welcome-mark,.modal-mark{font-weight:900;letter-spacing:-.06em;font-size:1.02rem;color:var(--black)}
 .welcome-panel h2,.modal-panel h2{font-size:1.9rem;letter-spacing:-.03em;margin:12px 0 8px;font-weight:800}
@@ -452,9 +489,69 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --shadow-sm:0 8px 24px rgba(40,20,26,.05);
   --shadow-md:0 20px 50px rgba(40,20,26,.09);
   --shadow-lg:0 34px 90px rgba(28,10,16,.22);
+  /* Audit UX Bagian 5 + Roadmap #4: satu font display untuk judul, satu font teks untuk
+     tubuh, dan keduanya dinaikkan ke lingkup global. Sebelum ini kedua token hanya hidup
+     di dalam .fiezel-splash/.fiezel-ob, sehingga setiap dialog sistem - termasuk gerbang
+     izin - jatuh ke font bawaan OS dan membocorkan kesan "campur aduk" yang ditandai
+     audit. Berkas fontnya sudah ada di assets/fonts dan dimuat lewat @font-face di bawah. */
+  --fz-heading:'FZ Fredoka',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
 
-body{background:var(--sky-bottom)}
+/* ==========================================================================
+   Mode gelap (Audit UX Bagian 5)
+   Diletakkan TEPAT setelah palet v6 supaya cascade-nya terbaca lurus: palet terang
+   dulu, lalu penimpaan gelap. Nilainya diturunkan dari v6, bukan dari blok v5 di
+   kepala berkas. Dua selektor dipakai karena keduanya menangani kasus berbeda:
+   media query melayani preferensi sistem, atribut data-theme melayani sakelar manual
+   di Pengaturan - dan atribut harus tetap menang di kedua arah.
+   ========================================================================== */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --sky-top:#2a1a20;--sky-bottom:#150c11;--scene-light:rgba(184,69,90,.20);
+    --ambient-text:#fdf4f6;--ambient-muted:#cbb3ba;
+    --chrome-bg:rgba(28,16,21,.74);--launcher-start:rgba(14,6,10,.86);--launcher-end:rgba(56,26,36,.80);
+    --bg:#150c11;--panel:#1e1418;--panel-soft:#281a20;--line:#3a2a30;--line-soft:#2e2027;
+    --text:#fdf4f6;--muted:#c3aeb5;--muted-soft:#a38f96;
+    --accent:#e0708a;--accent-strong:#f093a8;--accent-soft:#3a1f27;
+    --black:#8C2233;--gold:#e3c07d;
+    --green:#4fc79b;--green-soft:#16302a;--red:#f08098;--red-soft:#3a1c24;
+    --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);
+    --glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12);
+  }
+}
+:root[data-theme="dark"]{
+  --sky-top:#2a1a20;--sky-bottom:#150c11;--scene-light:rgba(184,69,90,.20);
+  --ambient-text:#fdf4f6;--ambient-muted:#cbb3ba;
+  --chrome-bg:rgba(28,16,21,.74);--launcher-start:rgba(14,6,10,.86);--launcher-end:rgba(56,26,36,.80);
+  --bg:#150c11;--panel:#1e1418;--panel-soft:#281a20;--line:#3a2a30;--line-soft:#2e2027;
+  --text:#fdf4f6;--muted:#c3aeb5;--muted-soft:#a38f96;
+  --accent:#e0708a;--accent-strong:#f093a8;--accent-soft:#3a1f27;
+  --black:#8C2233;--gold:#e3c07d;
+  --green:#4fc79b;--green-soft:#16302a;--red:#f08098;--red-soft:#3a1c24;
+  --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);
+  --glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12);
+}
+/* --black memikul dua peran di berkas ini: permukaan tombol utama (teksnya dipaku #fff)
+   dan warna teks pada beberapa label. Di mode gelap satu nilai tidak bisa melayani
+   keduanya - marun 8C2233 memberi kontras 7,3:1 untuk teks putih di atas tombol, tetapi
+   terlalu gelap sebagai teks di atas panel gelap. Dua pemakaian teks itu dialihkan ke
+   aksen terang di sini, bukan dengan mengorbankan tombolnya. */
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .nav.active{color:var(--accent-strong)}
+  :root:not([data-theme="light"]) .welcome-mark,
+  :root:not([data-theme="light"]) .modal-mark{color:var(--ambient-text)}
+  :root:not([data-theme="light"]) .instagram-mark{border-color:var(--accent-strong)}
+}
+:root[data-theme="dark"] .nav.active{color:var(--accent-strong)}
+:root[data-theme="dark"] .welcome-mark,
+:root[data-theme="dark"] .modal-mark{color:var(--ambient-text)}
+:root[data-theme="dark"] .instagram-mark{border-color:var(--accent-strong)}
+
+/* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
+   dan toast - bukan hanya di splash/onboarding seperti sebelumnya (Audit Roadmap #4). */
+body{background:var(--sky-bottom);font-family:var(--fz-body)}
+h1,h2,h3,h4,.brand,.welcome-mark,.modal-mark,.section-head h1{font-family:var(--fz-heading)}
 
 .app{max-width:1120px;padding:22px 24px calc(126px + env(safe-area-inset-bottom))}
 button{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:650}
@@ -553,7 +650,10 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 
 .welcome-icon{width:54px;height:54px;display:grid;place-items:center;margin:0 auto 16px;border-radius:17px;background:var(--accent-soft);color:var(--accent-strong)}.welcome-icon svg{width:25px;height:25px}
 .welcome-mark,.modal-mark{font-size:.65rem;letter-spacing:.16em;color:var(--accent-strong)}
-.welcome-panel,.modal-panel{width:min(520px,100%);border-color:rgba(223,221,214,.92);background:rgba(255,254,250,.98);color:var(--text)}
+/* Audit UX Bagian 5: warna panel diambil dari token, bukan dipaku. Nilai lamanya
+   rgba(255,254,250,.98) - putih hangat - membuat SETIAP modal dan gerbang tetap terang
+   di mode gelap, sehingga teksnya nyaris hilang. */
+.welcome-panel,.modal-panel{width:min(520px,100%);border-color:var(--line);background:var(--panel);color:var(--text)}
 .modal-panel{max-height:min(760px,88vh);overflow:auto}
 
 .bottomnav{width:min(620px,calc(100% - 24px));padding:7px;border-color:rgba(223,221,214,.82);background:rgba(255,254,250,.88);box-shadow:0 20px 50px rgba(17,23,42,.13);color:var(--text)}
@@ -835,35 +935,12 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash,.fiezel-ob{
   --fz-bg:#efe3d3; --fz-paper:#fdf3e2; --fz-ink:#2c1b1c; --fz-ink-muted:#6e5a4f;
   --fz-accent:#7a1e2e; --fz-accent-deep:#4a1119; --fz-gold:#d9a441; --fz-soft:#f3e0e0;
-  --fz-line:#ecdec0; --fz-error:#d9576a;
+  --fz-line:#ecdec0;
   --fz-heading:'FZ Fredoka',-apple-system,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
 }
 
-/* ---------- Percik: animasi gambar utuh ----------
-   Spesifikasi (bagian 15) menggambarkan percik-mascot.svg dengan bagian tubuh terkelompok
-   terpisah - mata, telinga, tangan - supaya masing-masing bisa dianimasikan sendiri (kedip,
-   telinga bergoyang, lambaian per-tangan). Aset yang kita punya adalah gambar utuh yang
-   sudah digabung (lihat fiezel-mascot.js), jadi SETIAP animasi di bawah menggerakkan
-   seluruh gambar - tidak pernah satu bagian saja. Ini pengganti yang paling jujur yang bisa
-   dibuat dari raster; bukan penggantian diam-diam untuk spesifikasi yang lebih kaya. */
-.fiezel-mascot{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none}
-/* "Floating/Bobbing": translateY 0->-8px->0, 2.8s, plus miring -1.2..1.2deg (bagian 14). */
-.fiezel-mascot-hero{animation:fzm-float 2.8s ease-in-out infinite}
-.fiezel-mascot-semangat{animation:fzm-hop 1.3s ease-in-out infinite}
-.fiezel-mascot-pencapaian{animation:fzm-cheer 1.8s ease-in-out infinite}
-.fiezel-mascot-istirahat{animation:fzm-breathe 4.6s ease-in-out infinite}
-.fiezel-mascot-belajar,.fiezel-mascot-coding,.fiezel-mascot-menulis{animation:fzm-breathe 5.4s ease-in-out infinite}
-.fiezel-mascot-jadwal{animation:fzm-cheer 2.2s ease-in-out infinite}
-/* Pose ini dipotong menyembul dari balik tombol pada sheet lama; gerakannya karena itu
-   naik-turun kecil, bukan mengambang penuh. */
-.fiezel-mascot-mengintip{animation:fzm-peek 3.4s ease-in-out infinite}
 
-@keyframes fzm-float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-1.2deg)}}
-@keyframes fzm-peek{0%,100%{transform:translateY(4px)}50%{transform:translateY(-2px)}}
-@keyframes fzm-hop{0%,100%{transform:translateY(0)}45%{transform:translateY(-9px)}}
-@keyframes fzm-cheer{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
-@keyframes fzm-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025)}}
 /* Star/Charm Twinkle (bagian 14): scale .85->1.08, rotate +-6deg, opacity .75->1, 2.2s. */
 @keyframes fzm-twinkle{0%,100%{transform:scale(.85) rotate(-6deg);opacity:.75}50%{transform:scale(1.08) rotate(6deg);opacity:1}}
 .fiezel-star{display:inline-block;animation:fzm-twinkle 2.2s ease-in-out infinite}
@@ -902,6 +979,26 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-stage-art{display:flex;align-items:flex-end;justify-content:center;flex:1 1 auto;
   min-height:64px;width:100%}
 .fiezel-stage-art img{max-height:38vh;width:auto}
+
+/* Lambang langkah perkenalan (m025-80 OWNER: maskot dihilangkan).
+   Satu ikon besar di atas piringan lembut bercincin emas tipis - cukup untuk menahan
+   komposisi yang dulu diisi maskot, tanpa menambah gaya gambar baru ke dalam produk. */
+.fiezel-step-art{
+  --fz-art:200px;
+  width:var(--fz-art);height:var(--fz-art);
+  display:grid;place-items:center;align-self:center;
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 28%,rgba(217,164,65,.20) 0%,rgba(122,30,46,.10) 62%,transparent 78%);
+  box-shadow:inset 0 0 0 1px rgba(217,164,65,.32);
+}
+.fiezel-step-art svg{
+  width:46%;height:46%;
+  color:var(--fz-accent,#7a1e2e);
+  /* Goresan dipertebal dari 1,5: pada piringan sebesar ini goresan tipis terbaca kurus
+     dan generik, sementara lambang ini harus memikul ruang yang dulu diisi maskot. */
+  stroke-width:1.75;
+}
+@media (max-height:700px){.fiezel-step-art{--fz-art:150px}}
 
 .fiezel-sheet{position:relative;flex:0 0 auto;width:100%;background:var(--fz-paper);
   border-top-left-radius:28px;border-top-right-radius:28px;
@@ -947,6 +1044,90 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   transform:translateX(-50%) rotate(45deg);background:#fff;border-right:1px solid var(--fz-line);
   border-bottom:1px solid var(--fz-line)}
 
+/* ==========================================================================
+   Sapaan pembuka bermerek (m025-80 OWNER)
+   Maskot dilepas dari layar ini; yang tampil hanya logo yang dianimasikan di atas
+   bidang gelap - bidang yang sama dengan ikon aplikasi, jadi ikon di home screen dan
+   layar pertama terbaca sebagai satu benda.
+   Sekuensnya sengaja disamakan dengan nada pembuka di fiezel-splash.js: huruf F masuk
+   pada nada pertama (0ms), dua batang emas naik pada nada kedua (150ms), wordmark
+   menyusul setelah keduanya berdiri. Semuanya selesai di ~1,3 detik, jauh sebelum splash
+   menutup diri di 2,6 detik.
+   ========================================================================== */
+.fiezel-splash-dark{background:#0B0709;padding-top:0}
+.fiezel-splash-brand{
+  background:radial-gradient(circle at 30% 18%,#241A1D 0%,#140E10 55%,#070405 100%);
+  position:relative;overflow:hidden;gap:0;
+}
+/* Cahaya emas di belakang logo, berdenyut pelan supaya layar tidak terasa beku. */
+@keyframes fz-splash-halo{
+  0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:.42;transform:translate(-50%,-50%) scale(1.12)}
+}
+.fiezel-splash-brand::before{
+  content:"";position:absolute;left:50%;top:44%;width:min(78vw,440px);aspect-ratio:1;
+  border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(221,181,95,.42) 0%,rgba(221,181,95,0) 68%);
+  animation:fz-splash-halo 3.4s ease-in-out infinite;
+}
+.fiezel-splash-brand>*{position:relative;z-index:1}
+/* inline-grid supaya lebar kotak ini persis selebar logo - kilau di bawah memakai inset:0,
+   dan kalau kotaknya selebar layar sapuannya ikut melebar ke seluruh layar. */
+.fiezel-logo-stage{display:inline-grid;place-items:center;margin-bottom:26px;overflow:hidden}
+.fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
+
+/* Huruf F: tiga batang yang masing-masing tumbuh dari titik jangkarnya, bukan sekadar
+   muncul - batang tegak memanjang ke bawah, dua lengan memanjang ke kanan. */
+@keyframes fz-logo-stem{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
+@keyframes fz-logo-arm{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+/* Batang emas naik seperti gelombang suara yang bereaksi pada nada. */
+@keyframes fz-logo-bar{
+  0%{opacity:0;transform:scaleY(.08)}
+  62%{opacity:1;transform:scaleY(1.14)}
+  100%{opacity:1;transform:scaleY(1)}
+}
+.fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
+/* m025-82: jeda di bawah TIDAK boleh diubah tanpa mengubah MOTIF di
+   features/audio/fiezel-ui-sfx.js juga - keduanya satu koreografi.
+   Motif berbunyi di 0 / 105 / 210 ms, dan setiap ketukan visual mendarat di nadanya:
+     nada 1 (F4, 0ms)   -> batang tegak huruf F tumbuh
+     nada 2 (A4, 105ms) -> dua lengan huruf F memanjang
+     nada 3 (D5, 210ms) -> dua batang emas naik; inilah gelombang suara yang bereaksi
+   Sebelum perbaikan ini batang emas baru bergerak di 520/620 ms - melodinya sudah habis
+   sebelum bagian yang menggambarkan bunyi itu sempat bergerak sama sekali. */
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) 0s both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .105s both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .155s both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .21s both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .25s both}
+
+/* Kilau emas menyapu logo sekali, tepat setelah kedua batang berdiri. */
+@keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+.fiezel-logo-stage{position:relative}
+.fiezel-logo-stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);
+  animation:fz-logo-sheen .8s ease-out .42s both;
+}
+
+@keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+.fiezel-splash-brand .fiezel-splash-word{
+  font-family:var(--fz-heading);font-weight:700;font-size:2.15rem;
+  letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;
+  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .54s both;
+}
+.fiezel-splash-brand .fiezel-splash-tag{
+  font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;
+  text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;
+  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .68s both;
+}
+/* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
+.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,
+.fiezel-splash-still .fiezel-splash-word,.fiezel-splash-still .fiezel-splash-tag,
+.fiezel-splash-still .fiezel-splash-brand::before,
+.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
+.fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
+
 /* ---------- Feature Carousel (Step 1) ---------- */
 .fiezel-carousel-track{display:flex;flex-direction:column;gap:10px;width:100%;text-align:left}
 .fiezel-carousel-item{display:flex;align-items:center;gap:10px;background:var(--fz-bg);
@@ -989,5 +1170,271 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 /* ---------- Kurangi-gerak: splash dan onboarding tunduk pada blok global juga,
    ditambah override lokal untuk memastikan lambaian/kedip-setara berhenti total. ---------- */
-.fiezel-splash-still .fiezel-mascot,.fiezel-ob-still .fiezel-mascot,
 .fiezel-splash-still .fiezel-star,.fiezel-ob-still .fiezel-star{animation:none}
+
+/* ========== SKELETON LOADING STATES (Polished, Premium Feel) ========== */
+/* Shimmer animation: Creates the premium "loading" feel like Spotify/Duolingo */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, var(--panel) 25%, var(--panel-soft) 50%, var(--panel) 75%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+  border-radius: var(--radius-md);
+  height: 16px;
+}
+
+/* Skeleton card (useful for lists/grids) */
+.skeleton-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+
+.skeleton-card .skeleton { margin-bottom: 12px; }
+.skeleton-card .skeleton:last-child { margin-bottom: 0; }
+
+/* Skeleton variants for different sizes */
+.skeleton-text { height: 16px; }
+.skeleton-title { height: 24px; margin-bottom: 8px; }
+.skeleton-subtitle { height: 14px; width: 60%; margin-bottom: 16px; }
+.skeleton-avatar { width: 48px; height: 48px; border-radius: 50%; display: inline-block; }
+.skeleton-line { height: 12px; margin-bottom: 8px; }
+.skeleton-line:last-child { margin-bottom: 0; }
+
+/* Skeleton grid (for grid layouts) */
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.skeleton-grid .skeleton-card {
+  padding: 16px;
+  margin-bottom: 0;
+}
+
+/* Loading state wrapper */
+.loading-state {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Prevent FOUC (Flash Of Unstyled Content) */
+[data-loading="true"] { visibility: hidden; }
+[data-loading="false"] { visibility: visible; }
+
+/* ========== EMPTY STATES (Friendly, Encouraging) ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  min-height: 300px;
+  background: linear-gradient(135deg, var(--panel-soft) 0%, var(--panel) 100%);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  margin: 20px 0;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
+}
+
+.empty-state-icon svg {
+  width: 100%;
+  height: 100%;
+  color: var(--accent-soft);
+  opacity: 0.8;
+}
+
+.empty-state h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.empty-state p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 0 20px;
+  max-width: 280px;
+}
+
+.empty-state .primary {
+  margin-top: 8px;
+}
+
+/* Variant: minimal empty state (for small containers) */
+.empty-state-minimal {
+  padding: 24px 16px;
+  min-height: auto;
+  background: transparent;
+  border: 1px dashed var(--line-soft);
+}
+
+.empty-state-minimal h2 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.empty-state-minimal p {
+  font-size: 0.8rem;
+}
+
+/* Variant: inline empty message (for grid cells) */
+.empty-inline {
+  padding: 12px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+  background: var(--panel-soft);
+  border-radius: var(--radius-md);
+}
+
+/* Progress indicator during load */
+.loading-progress {
+  height: 2px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.loading-progress::after {
+  content: "";
+  display: block;
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+/* ========== MICRO-ANIMATIONS FOR TRANSITIONS & INTERACTIONS ========== */
+/* Page view transitions */
+::view-transition-old(root) {
+  animation: pageOut 0.4s var(--ease) forwards;
+}
+
+::view-transition-new(root) {
+  animation: pageIn 0.4s var(--ease) forwards;
+}
+
+@keyframes pageOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes pageIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Card entrance animation */
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card.animate-in {
+  animation: cardSlideIn 0.35s var(--ease) both;
+}
+
+/* Staggered card animations */
+.cards-container .card:nth-child(1) { animation-delay: 0.05s; }
+.cards-container .card:nth-child(2) { animation-delay: 0.1s; }
+.cards-container .card:nth-child(3) { animation-delay: 0.15s; }
+.cards-container .card:nth-child(n+4) { animation-delay: 0.2s; }
+
+/* Modal/Dialog entrance */
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal {
+  animation: modalAppear 0.3s var(--ease-spring) both;
+}
+
+/* Button press animation (tactile feedback) */
+@keyframes buttonPress {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.97); }
+}
+
+button:active {
+  animation: buttonPress 0.1s ease-out;
+}
+
+/* Fade in for content reveal */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.content-reveal {
+  animation: fadeIn 0.35s var(--ease);
+}
+
+/* Bounce for success states */
+@keyframes successBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.success-state {
+  animation: successBounce 0.4s var(--ease-spring);
+}
+
+/* Shake for error states */
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.error-state {
+  animation: errorShake 0.3s ease;
+}
+
+/* Respects prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
