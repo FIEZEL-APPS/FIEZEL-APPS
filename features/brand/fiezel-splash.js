@@ -74,6 +74,33 @@
     catch (_) { return false; }
   }
 
+  function dayKey(now) {
+    // Hari WIB, sama seperti modul perjalanan belajar, supaya "sekali sehari" berarti hal yang
+    // sama di seluruh aplikasi.
+    return new Date(Number(now) + 7 * 3600000).toISOString().slice(0, 10);
+  }
+
+  function seenToday(env, now) {
+    try {
+      var store = env && env.localStorage;
+      if (!store || typeof store.getItem !== 'function') return false;
+      return String(store.getItem(STORAGE_KEY) || '') === dayKey(now);
+    } catch (_) { return false; }
+  }
+
+  function markSeen(env, now) {
+    try {
+      var store = env && env.localStorage;
+      if (store && typeof store.setItem === 'function') store.setItem(STORAGE_KEY, dayKey(now));
+    } catch (_) { /* penyimpanan penuh tidak boleh menggagalkan pembukaan aplikasi */ }
+  }
+
+  function prefersReducedMotion(env) {
+    try {
+      return !!(env && env.matchMedia && env.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (_) { return false; }
+  }
+
   // m025-80 OWNER: maskot dikeluarkan dari splash. Yang tampil sekarang hanya logo yang
   // dianimasikan, wordmark, dan tagline - satu bidang gelap yang tenang, seperti pembuka
   // aplikasi kelas atas. Gelembung ucapan dan tombol ajakan ikut dilepas: splash menutup
