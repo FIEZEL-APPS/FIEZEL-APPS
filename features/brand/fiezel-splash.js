@@ -136,8 +136,6 @@
     host.setAttribute('role', 'dialog');
     host.setAttribute('aria-label', 'Selamat datang di FIEZEL');
     host.innerHTML = markup();
-    // Nada pembuka menyusul animasi logo.
-    if (opts.silent !== true) playChime(target);
 
     var closed = false;
     var timer = null;
@@ -167,6 +165,13 @@
     } catch (_) { /* tanpa listener, pewaktu di bawah tetap menutupnya */ }
 
     try { doc.body.appendChild(host); } catch (_) { return { shown: false, reason: 'append_failed' }; }
+    // Nada pembuka menyusul animasi logo. Dibunyikan SETELAH host masuk DOM, bukan sebelum:
+    // jadwal Web Audio mulai berjalan begitu playChime() dipanggil (lihat schedule() di
+    // fiezel-ui-sfx.js, t0 = ctx.currentTime + 0.005s), sedangkan animasi CSS baru mulai
+    // begitu elemen benar-benar ada di render tree. Memanggilnya lebih dulu membuat bunyi
+    // mendahului gerakan logo walau hanya beberapa milidetik - cukup untuk terasa "tidak
+    // sinkron" pada transisi yang jaraknya sendiri cuma seperseratus detik.
+    if (opts.silent !== true) playChime(target);
 
     if (typeof target.setTimeout === 'function') {
       timer = target.setTimeout(close, Number(opts.visibleMs) > 0 ? Number(opts.visibleMs) : VISIBLE_MS);
