@@ -1089,11 +1089,19 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   100%{opacity:1;transform:scaleY(1)}
 }
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .46s cubic-bezier(.22,.8,.28,1) .05s both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm  .40s cubic-bezier(.22,.8,.28,1) .22s both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm  .40s cubic-bezier(.22,.8,.28,1) .32s both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .52s cubic-bezier(.34,1.5,.5,1) .52s both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .52s cubic-bezier(.34,1.5,.5,1) .62s both}
+/* m025-82: jeda di bawah TIDAK boleh diubah tanpa mengubah MOTIF di
+   features/audio/fiezel-ui-sfx.js juga - keduanya satu koreografi.
+   Motif berbunyi di 0 / 105 / 210 ms, dan setiap ketukan visual mendarat di nadanya:
+     nada 1 (F4, 0ms)   -> batang tegak huruf F tumbuh
+     nada 2 (A4, 105ms) -> dua lengan huruf F memanjang
+     nada 3 (D5, 210ms) -> dua batang emas naik; inilah gelombang suara yang bereaksi
+   Sebelum perbaikan ini batang emas baru bergerak di 520/620 ms - melodinya sudah habis
+   sebelum bagian yang menggambarkan bunyi itu sempat bergerak sama sekali. */
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) 0s both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .105s both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm  .34s cubic-bezier(.22,.8,.28,1) .155s both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .21s both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.34,1.5,.5,1) .25s both}
 
 /* Kilau emas menyapu logo sekali, tepat setelah kedua batang berdiri. */
 @keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
@@ -1101,19 +1109,19 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-logo-stage::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);
-  animation:fz-logo-sheen .85s ease-out 1.02s both;
+  animation:fz-logo-sheen .8s ease-out .42s both;
 }
 
 @keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
 .fiezel-splash-brand .fiezel-splash-word{
   font-family:var(--fz-heading);font-weight:700;font-size:2.15rem;
   letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;
-  animation:fz-splash-rise .5s cubic-bezier(.22,.8,.28,1) .92s both;
+  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .54s both;
 }
 .fiezel-splash-brand .fiezel-splash-tag{
   font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;
   text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;
-  animation:fz-splash-rise .5s cubic-bezier(.22,.8,.28,1) 1.06s both;
+  animation:fz-splash-rise .48s cubic-bezier(.22,.8,.28,1) .68s both;
 }
 /* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
 .fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,
