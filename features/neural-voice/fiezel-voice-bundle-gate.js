@@ -150,9 +150,11 @@
       sheet.setAttribute('aria-label', 'Unduh suara neural FIEZEL');
       sheet.innerHTML =
         '<div class="voice-bundle-panel">' +
-        '<div class="voice-bundle-mark">FIEZEL NEURAL VOICE · WAJIB</div>' +
-        '<h2>Unduh suara FIEZEL dulu</h2>' +
-        '<p>Satu batch untuk suara Inggris dan Indonesia. FIEZEL mengajar dengan suara, jadi paket ini wajib ada sebelum aplikasi bisa dipakai. Sekali unduh, setelah itu jalan penuh tanpa internet.</p>' +
+        // Audit UX Roadmap #3: nada suportif, tanpa kata "wajib" dan tanpa ancaman
+        // "sebelum aplikasi bisa dipakai". Manfaatnya yang dijelaskan, bukan syaratnya.
+        '<div class="voice-bundle-mark">FIEZEL NEURAL VOICE</div>' +
+        '<h2>Siapkan suara FIEZEL</h2>' +
+        '<p>Satu paket berisi suara Inggris dan Indonesia. FIEZEL mengajar lewat suara, jadi paket ini disiapkan sekali di awal — setelah itu semuanya jalan penuh tanpa internet.</p>' +
         '<div class="voice-bundle-track"><span id="voiceBundleBar" style="width:' + st.progress.percent + '%"></span></div>' +
         '<p id="voiceBundleProgress" class="voice-bundle-progress">Sekitar 210 MB sekali unduh. Jangan tutup aplikasi sampai selesai.</p>' +
         '<div class="voice-bundle-actions">' +
@@ -235,10 +237,18 @@
       if (!shouldPrompt(status())) { closeSheet(); return false; }
       // Never stack on top of the notification gate: that gate is the first prompt and
       // this one is the third.
+      //
+      // m025-80 AUDIT (Bagian 1 + Roadmap #1): the same rule now covers the brand splash
+      // and the onboarding flow. Both mount as full-screen overlays, and this sheet used
+      // to open straight on top of them - so a new learner met a mandatory download
+      // prompt while still being introduced to the app. Every gate waits for the
+      // introduction to finish; only the order changed, not whether the gate runs.
       var gateOpen = false;
       try {
         var welcome = doc.getElementById('welcome');
-        gateOpen = !!(welcome && !welcome.classList.contains('hidden') && doc.body.classList.contains('notification-locked'));
+        gateOpen = !!(welcome && !welcome.classList.contains('hidden') && doc.body.classList.contains('notification-locked'))
+          || !!doc.querySelector('.fiezel-splash:not([hidden]), .fiezel-ob')
+          || !!doc.body.classList.contains('auth-locked');
       } catch (_) {}
       if (gateOpen) return false;
       // Rebuilding an open sheet every tick would drop the button's handler mid-tap and
