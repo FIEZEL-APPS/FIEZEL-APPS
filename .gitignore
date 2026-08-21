@@ -29,3 +29,6 @@ fiezel-autonomy-config.json
 # Worktree sementara milik agent. Pernah ikut ter-commit sebagai gitlink (mode 160000)
 # pada merge m025-85, yang membuat kloning baru melihat submodule rusak.
 .claude/worktrees/
+
+# Preview-server config lokal per sesi (port bisa beda-beda antar sesi/agent).
+.claude/launch.json
