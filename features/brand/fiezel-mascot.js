@@ -1,26 +1,40 @@
 /**
- * FIEZEL — maskot resmi.
+ * FIEZEL — maskot resmi (Percik).
  *
- * Modul ini memakai KARYA ASLI dari `FIEZEL_Design_Handoff_Detail.pdf`, dipotong langsung
- * dari sheet-nya, bukan digambar ulang.
+ * m025-78: OWNER mengirim tujuh gambar produksi baru (`D:\png`) - kualitas jauh di atas
+ * potongan sheet PDF yang dipakai m025-76/77, latar sudah transparan, dan menyertakan
+ * pose yang sebelumnya harus digambar ulang dengan tangan. Enam pose dan tiga ukuran ikon
+ * aplikasi di bawah berasal dari situ. Empat pose (`hero`, `belajar`, `mark`, `mengintip`)
+ * TIDAK ada penggantinya di kiriman baru, jadi tetap memakai potongan sheet PDF lama -
+ * kualitasnya tidak seragam dengan yang lain, dan itu ditulis di sini supaya tidak
+ * dilupakan, bukan disembunyikan. Kalau OWNER mengirim penggantinya, keempatnya tinggal
+ * diganti tanpa mengubah API modul ini.
  *
- * Versi sebelumnya (m025-75) mencoba menuliskan ulang karakter ini sebagai jalur SVG buatan
- * sendiri. OWNER menolaknya, dan penolakan itu benar: ilustrasi bergaya lukis dengan bulu,
- * gradasi, dan garis tangan tidak bisa disamai dengan jalur yang ditulis manual, dan hasil
- * yang "mirip-mirip" justru merusak merek. Yang bisa persis hanyalah pikselnya sendiri.
+ * Proses aset baru: potong rapat (trim latar transparan), perkecil dengan Lanczos-3
+ * (bukan bilinear - tepi ilustrasi bergaris tetap tegas, bukan lembek) dengan alpha
+ * dikalikan dulu sebelum diskalakan supaya warna piksel transparan tidak merembes ke
+ * tepi karakter, lalu dipalet 256 warna (PNG-8) karena ilustrasi ini bidang warna rata -
+ * bentuk yang paling rugi disimpan sebagai RGBA penuh. Hasilnya turun tujuh kali lipat
+ * dari sumbernya tanpa kehilangan yang terlihat mata, dan seluruh aset ini ikut ke shell
+ * offline sehingga ukurannya dibayar ulang oleh setiap pemasangan.
  *
- * Konsekuensi yang harus diketahui, bukan disembunyikan:
+ * Konsekuensi yang harus tetap diketahui:
  *
- * - Aset ini RASTER, bukan vektor. Sumber di PDF berukuran terbatas (hero 286 px pada
- *   kualitas tertinggi yang tersedia), jadi pada layar 3x ia akan terlihat sedikit lembut
- *   bila ditampilkan jauh lebih besar dari ukuran tayang yang direncanakan.
- * - Untuk vektor sejati dan ikon 1024x1024, dibutuhkan berkas master (AI/EPS/SVG) - dan
- *   handoff itu sendiri sudah memintanya pada halaman logo. Sampai master itu ada, ini
- *   adalah kemiripan paling tinggi yang mungkin: karyanya sendiri.
+ * - Aset ini RASTER, bukan vektor. Spesifikasi desain (`FIEZEL_Complete_Design_Specification.pdf`,
+ *   bagian 15) menggambarkan `percik-mascot.svg` dengan bagian tubuh terkelompok terpisah
+ *   (mata, telinga, tangan) supaya bisa dianimasikan sendiri-sendiri - kedip mata, telinga
+ *   bergoyang, tangan melambai per bagian. Yang kita punya adalah gambar utuh yang sudah
+ *   digabung, jadi animasi di sini SELALU menggerakkan seluruh gambar (mengambang, miring,
+ *   memantul, menskala), tidak pernah bagian tunggal. Ini didokumentasikan lagi di
+ *   `style.css`, bukan diam-diam dilewati.
+ * - Untuk ikon aplikasi 1024x1024 dan animasi per-bagian yang sesungguhnya, dibutuhkan
+ *   berkas master vektor (AI/EPS/SVG). Sampai itu ada, `fiezel-icon-512.png` (512x512,
+ *   dipotong penuh bidang tanpa transparansi, aman jadi ikon maskable) adalah yang
+ *   paling tinggi resolusinya yang tersedia.
  *
- * Aturan produksi dari handoff yang dijaga di sini: jangan merentangkan, jangan mewarnai
- * ulang, jangan mencerminkan, jangan memotong wajah. Karena itu gambar selalu ditampilkan
- * dengan rasio aslinya dan tanpa filter warna.
+ * Aturan produksi yang dijaga di sini: jangan merentangkan, jangan mewarnai ulang, jangan
+ * mencerminkan, jangan memotong wajah. Karena itu gambar selalu ditampilkan dengan rasio
+ * aslinya dan tanpa filter warna.
  */
 (function (root, factory) {
   var api = factory();
@@ -29,40 +43,38 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  // Palet resmi handoff. Dipakai UI di sekitar maskot; maskotnya sendiri tidak pernah diwarnai
-  // ulang oleh kode.
+  // Palet resmi dari FIEZEL_Complete_Design_Specification.pdf, bagian 2 (Color Palette).
+  // Dipakai UI di sekitar maskot; maskotnya sendiri tidak pernah diwarnai ulang oleh kode.
   var PALETTE = Object.freeze({
+    bg: '#efe3d3',
     primary: '#7a1e2e',
     deep: '#4a1119',
-    cream: '#fdf3e8',
+    paper: '#fdf3e2',
+    cream: '#fdf3e2',
     gold: '#d9a441',
+    soft: '#f3e0e0',
+    line: '#ecdec0',
+    ink: '#2c1b1c',
+    inkMuted: '#6e5a4f',
     white: '#ffffff'
   });
 
   var BASE = './assets/brand/';
 
-  // Setiap pose adalah potongan nyata dari sheet, dengan ukuran aslinya. Rasio disimpan supaya
-  // markup bisa memesan ruang sebelum gambar termuat - tanpa itu layar akan tersentak.
-  //
-  // Semua teks anotasi dari sheet (judul baris, keterangan pose, "WARNA PALET") sudah dipotong
-  // keluar: yang tersisa hanya karakter dan tanda mereknya, dengan latar transparan.
   var POSES = Object.freeze({
-    hero: { file: 'fiezel-hero.png', width: 240, height: 311, label: 'Maskot FIEZEL melambai' },
-    belajar: { file: 'fiezel-belajar.png', width: 170, height: 180, label: 'Maskot FIEZEL sedang membaca' },
-    semangat: { file: 'fiezel-semangat.png', width: 73, height: 95, label: 'Maskot FIEZEL memegang pensil' },
-    coding: { file: 'fiezel-coding.png', width: 70, height: 88, label: 'Maskot FIEZEL di depan laptop' },
-    pencapaian: { file: 'fiezel-pencapaian.png', width: 78, height: 99, label: 'Maskot FIEZEL membawa piala' },
-    istirahat: { file: 'fiezel-istirahat.png', width: 73, height: 66, label: 'Maskot FIEZEL beristirahat' },
+    // --- Kiriman baru (m025-78), langsung dari D:\png ---
+    semangat: { file: 'fiezel-semangat.png', width: 620, height: 712, label: 'Percik melambai sambil memegang pensil' },
+    coding: { file: 'fiezel-coding.png', width: 620, height: 737, label: 'Percik berlatih di depan laptop' },
+    istirahat: { file: 'fiezel-istirahat.png', width: 620, height: 492, label: 'Percik tidur nyenyak di atas bantal' },
+    jadwal: { file: 'fiezel-jadwal.png', width: 620, height: 703, label: 'Percik membawa jam dan kalender' },
+    pencapaian: { file: 'fiezel-pencapaian.png', width: 620, height: 808, label: 'Percik membawa piala kemenangan' },
+    menulis: { file: 'fiezel-menulis.png', width: 620, height: 828, label: 'Percik mengerjakan soal' },
+    icon: { file: 'fiezel-icon-512.png', width: 512, height: 512, label: 'Ikon FIEZEL' },
+    // --- Potongan sheet PDF lama (m025-76/77) - belum ada penggantinya ---
+    hero: { file: 'fiezel-hero.png', width: 240, height: 311, label: 'Percik melambai menyapa' },
+    belajar: { file: 'fiezel-belajar.png', width: 170, height: 180, label: 'Percik sedang membaca' },
     mark: { file: 'fiezel-mark.png', width: 92, height: 106, label: 'Tanda F FIEZEL' },
-    icon: { file: 'fiezel-icon.png', width: 64, height: 64, label: 'Ikon FIEZEL' },
-    // Pose berikut dipotong dari baris ONBOARDING SCREENS pada sheet yang sama. Baris itu
-    // menggambar karakternya jauh lebih besar daripada baris ACTIVITIES, jadi inilah sumber
-    // paling tajam yang tersedia untuk kartu onboarding - dan `belajar` di atas ikut naik ke
-    // sana karena alasan yang sama.
-    mengintip: { file: 'fiezel-mengintip.png', width: 96, height: 71, label: 'Maskot FIEZEL mengintip' },
-    menulis: { file: 'fiezel-menulis.png', width: 170, height: 159, label: 'Maskot FIEZEL mengerjakan soal' },
-    jadwal: { file: 'fiezel-jadwal.png', width: 147, height: 163, label: 'Maskot FIEZEL membawa jam dan kalender' },
-    siap: { file: 'fiezel-siap.png', width: 174, height: 180, label: 'Maskot FIEZEL bersorak' }
+    mengintip: { file: 'fiezel-mengintip.png', width: 96, height: 71, label: 'Percik mengintip' }
   });
 
   var DEFAULT_POSE = 'hero';
@@ -80,7 +92,7 @@
 
   /**
    * Markup satu maskot. Lebar boleh diatur; tingginya selalu mengikuti rasio asli, karena
-   * handoff melarang merentangkan karakter ini.
+   * aturan produksi melarang merentangkan karakter ini.
    */
   function markup(options) {
     var opts = options || {};

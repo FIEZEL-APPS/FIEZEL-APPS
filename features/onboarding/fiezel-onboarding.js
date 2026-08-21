@@ -1,25 +1,43 @@
 /**
- * FIEZEL — onboarding enam langkah (Step 1-6 pada sheet `FIEZEL_Design_Handoff_Detail.pdf`).
+ * FIEZEL — onboarding lima langkah (Step 1-5 pada `FIEZEL_Complete_Design_Specification.pdf`,
+ * bagian 3). Step 0 (splash) hidup terpisah di `fiezel-splash.js`.
  *
- * Salinan teks di sini diambil apa adanya dari sheet. Yang TIDAK diambil apa adanya adalah
- * janji yang tidak dipegang produk, dan bedanya ditulis terbuka:
+ * m025-78: dibangun ulang dari nol mengikuti spesifikasi lengkap, menggantikan versi m025-77
+ * yang mengikuti sheet PDF berbeda (IELTS/TOEFL, tes 150 soal sebagai satu-satunya jalan).
+ * Salinan teks di sini diambil sedekat mungkin dari spesifikasi. Empat tempat TIDAK diikuti
+ * persis, dan bedanya ditulis terbuka karena setiap penyimpangan dari spesifikasi harus
+ * bisa dijelaskan, bukan disembunyikan di balik tampilan yang meyakinkan:
  *
- * - Sheet menulis "Tes penempatan singkat". Tes penempatan FIEZEL berisi 150 soal, dan itu
- *   tidak singkat. Judulnya tetap seperti desain, tetapi jumlah soal yang sebenarnya
- *   disebutkan di kartunya. Menyebut 150 soal "singkat" adalah kebohongan kecil yang akan
- *   ditagih murid pada soal ke-30.
- * - Langkah 5 tidak memasang pemilih jam. FIEZEL belum punya jadwal yang diatur pengguna:
- *   pengingatnya dipilih mesin ALRS dari bukti belajar, dan target harian dihitung dari
- *   bukti juga. Memasang pemilih jam yang tidak tersambung ke apa pun hanya akan menjadi
- *   tombol palsu. Yang ditampilkan adalah apa yang benar-benar terjadi.
+ * 1. GOAL SELECTION memakai profil tujuan ASLI aplikasi (Sekolah/IT/Beasiswa/Fondasi
+ *    IELTS-TOEFL dari `FiezelPersonalJourney`), bukan "Travel/Work/Fun" seperti di
+ *    spesifikasi. Tiga kategori itu tidak berkaitan dengan apa pun di produk - menampilkannya
+ *    berarti mengumpulkan pilihan yang tidak akan pernah dipakai. Profil asli sudah py
+ *    prasyarat kemampuan yang benar-benar dipakai R2-R4.
+ * 2. LEVEL REVEAL adalah SELF-REPORT, bukan hasil pengukuran. Spesifikasi memintanya tampil
+ *    "after goal select" tanpa menjelaskan dari mana angkanya - produk ini tidak punya cara
+ *    menaksir level sebelum ada bukti jawaban. Karena itu diberi label eksplisit "perkiraan
+ *    awal", disimpan terpisah dari `state.level` (yang hanya diisi tes penempatan asli), dan
+ *    boleh dilewati.
+ * 3. PLACEMENT TEST mengarah ke tes 150 soal yang sungguhan ada di produk, bukan "4-5
+ *    pertanyaan cepat" seperti di spesifikasi. Membangun mesin kuis terpisah yang lebih
+ *    ringan adalah fitur baru sendiri, bukan pekerjaan desain ulang - jumlah soal yang
+ *    sebenarnya karena itu dituliskan di kartu, sama seperti m025-77.
+ * 4. SCHEDULE SETUP tidak memasang pemilih hari/jam. FIEZEL belum punya jadwal yang diatur
+ *    pengguna: pengingatnya dipilih mesin ALRS dari bukti belajar. Memasang pemilih yang
+ *    tidak tersambung ke apa pun hanya akan menjadi tombol palsu - alasan yang sama yang
+ *    sudah dipegang sejak m025-77. Pertanyaan spesifikasi "Kapan kamu ingin belajar?"
+ *    dijawab jujur: dengan cara ALRS sebenarnya bekerja.
  *
  * Tiga batas yang dijaga, sama seperti splash dan dengan alasan yang sama:
  *
- * 1. TIDAK PERNAH MENGURUNG. Setiap langkah punya "Lewati dulu", dan melewati berarti
- *    selesai - onboarding tidak akan kembali menghadang. Notifikasi wajib di produk ini dan
- *    gerbangnya ada di bawah lapisan ini; apa pun yang bisa tertinggal di layar adalah bug.
+ * 1. TIDAK PERNAH MENGURUNG. Tombol "Lewati" di kanan atas selalu ada dan mengakhiri seluruh
+ *    perkenalan (bukan hanya satu langkah) - gerbang notifikasi ada di bawah lapisan ini dan
+ *    notifikasi wajib di produk ini. Langkah dengan aksi berat (pilih tujuan, tes penempatan)
+ *    JUGA mendapat "Lewati langkah ini" supaya menunda satu langkah tidak memaksa mengakhiri
+ *    semuanya.
  * 2. SEKALI SAJA, bukan sekali sehari. Sapaan yang terus datang berubah jadi penghalang.
- * 3. TIDAK MENYENTUH KEADAAN APLIKASI SENDIRI. Modul ini hanya memanggil balik
+ * 3. TIDAK MENYENTUH KEADAAN APLIKASI SENDIRI. Modul ini hanya membaca modul murni sejenis
+ *    (`env.FiezelMascot`, `env.FiezelPersonalJourney`) dan memanggil balik
  *    (`onGoal`, `onPlacement`, `onFinish`) yang diberikan pemanggil, sehingga bisa diuji
  *    tanpa aplikasi dan tidak bisa diam-diam merusak state belajar.
  */
@@ -32,64 +50,36 @@
 
   var STORAGE_KEY = 'fiezel-onboarding-v1';
 
-  // Nilai `goal` di sini adalah profil tujuan yang BENAR-BENAR dikenal modul perjalanan
-  // belajar. IELTS dan TOEFL sama-sama memetakan ke `exam_foundation` karena prasyarat
-  // kemampuannya memang satu; yang membedakan keduanya adalah `track`, dan track itu dipakai
-  // untuk label yang dilihat murid. FIEZEL tidak pernah memprediksi skor keduanya.
-  var TRACKS = Object.freeze({
-    ielts: { id: 'ielts', label: 'IELTS', goal: 'exam_foundation', icon: 'bar-chart-3' },
-    toefl: { id: 'toefl', label: 'TOEFL', goal: 'exam_foundation', icon: 'headphones' }
-  });
+  // Kerangka CEFR standar (bagian 2 spesifikasi: "CEFR Leveling: A1 hingga B2, dan beyond").
+  // Aplikasi sendiri memakai enam tingkat ini (lihat LEVELS di app.js); didaftarkan di sini
+  // apa adanya karena ini standar eksternal, bukan logika produk yang bisa berubah diam-diam.
+  var CEFR_LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
 
-  var STEPS = Object.freeze([
+  var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
-      index: 1, pose: 'hero', poseWidth: 180,
-      title: 'Selamat datang di FIEZEL!',
-      body: 'Hai! Aku temanmu belajar di FIEZEL. Yuk, siap-siap!',
-      action: 'next', cta: 'Lanjut'
+      pose: 'belajar',
+      title: 'Apa aja yang bisa kamu latih?',
+      body: 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
+      items: Object.freeze([
+        { icon: 'book-a', label: 'Kosakata (Vocabulary)' },
+        { icon: 'spell-check-2', label: 'Grammar (Grammar Patterns)' }
+      ])
     }),
     Object.freeze({
-      index: 2, pose: 'belajar', poseWidth: 170,
-      title: 'Belajar jadi lebih seru',
-      body: 'Latihan kosakata, grammar, reading, dan listening semua ada di sini!',
-      action: 'next', cta: 'Lanjut'
-    }),
-    Object.freeze({
-      index: 3, pose: 'mengintip', poseWidth: 120,
-      title: 'Pilih tujuan belajarmu',
-      body: 'Mau kejar target IELTS atau TOEFL dulu nih?',
-      action: 'track', secondary: 'Nanti saja',
-      // Catatan yang tidak boleh hilang dari layar ini: roadmap melarang prediksi skor.
-      note: 'FIEZEL tidak memprediksi skor. Yang ditampilkan hanya prasyarat kemampuan.'
-    }),
-    Object.freeze({
-      index: 4, pose: 'menulis', poseWidth: 170,
-      title: 'Tes penempatan singkat',
-      body: 'Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.',
-      action: 'placement', cta: 'Mulai tes penempatan', secondary: 'Nanti saja',
-      // Angka yang sebenarnya, bukan kesan yang enak didengar.
-      note: 'Isinya 150 soal dan bisa kamu hentikan kapan saja.'
-    }),
-    Object.freeze({
-      index: 5, pose: 'jadwal', poseWidth: 150,
-      title: 'Atur jadwal & pengingat',
-      body: 'Aku ingetin kamu belajar ya, biar streak-nya nggak putus.',
-      action: 'next', cta: 'Siap',
-      note: 'Pengingat sudah aktif. Waktunya aku pilih dari kebiasaan belajarmu, bukan dari jam tetap.'
-    }),
-    Object.freeze({
-      index: 6, pose: 'siap', poseWidth: 170,
-      title: 'Semua siap!',
-      body: 'Yuk mulai langkah pertamamu. Kamu bisa!',
-      action: 'finish', cta: 'Mulai Belajar'
+      pose: 'mengintip',
+      title: 'Apa aja yang bisa kamu latih?',
+      body: 'Suara neural, bukan robot — kedengeran kayak orang beneran ngomong.',
+      items: Object.freeze([
+        { icon: 'book-open', label: 'Reading (Reading Comprehension)' },
+        { icon: 'headphones', label: 'Listening (Listening with Neural Voice)' }
+      ])
     })
   ]);
 
-  var SKIP_LABEL = 'Lewati dulu';
-
-  function normalizeTrack(value) {
-    var key = String(value || '').toLowerCase();
-    return Object.prototype.hasOwnProperty.call(TRACKS, key) ? TRACKS[key] : null;
+  function prefersReducedMotion(env) {
+    try {
+      return !!(env && env.matchMedia && env.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    } catch (_) { return false; }
   }
 
   function readRecord(env) {
@@ -115,15 +105,10 @@
         done: true,
         at: Number(detail && detail.at) || 0,
         via: String((detail && detail.via) || 'finish'),
-        track: String((detail && detail.track) || '')
+        goal: String((detail && detail.goal) || ''),
+        level: String((detail && detail.level) || '')
       }));
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
-  }
-
-  function prefersReducedMotion(env) {
-    try {
-      return !!(env && env.matchMedia && env.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    } catch (_) { return false; }
   }
 
   function escapeHtml(value) {
@@ -132,56 +117,149 @@
     });
   }
 
-  function dotsMarkup(active) {
-    var out = '';
-    for (var i = 0; i < STEPS.length; i++) {
-      out += '<span class="fiezel-ob-dot' + (i === active ? ' is-active' : '') + '"></span>';
-    }
-    return '<div class="fiezel-ob-dots" aria-hidden="true">' + out + '</div>';
+  /** Daftar tujuan belajar ASLI aplikasi, dibaca dari FiezelPersonalJourney bila tersedia. */
+  function goalOptions(env) {
+    var journey = env && env.FiezelPersonalJourney;
+    if (!journey || typeof journey.buildGoalProfile !== 'function' || !Array.isArray(journey.GOAL_IDS)) return [];
+    return journey.GOAL_IDS.map(function (id) {
+      var profile = journey.buildGoalProfile(id);
+      return { id: profile.id, label: profile.label, description: (profile.prerequisites || []).join(' · ') };
+    });
   }
 
-  /**
-   * Tombol satu langkah.
-   *
-   * `data-ob-advance` SELALU berarti "maju satu langkah", dan `data-ob-primary` berarti
-   * "kerjakan aksi langkah ini". Pemisahan itu bukan gaya penulisan: tanpa tombol maju
-   * tersendiri, murid yang belum mau mengerjakan tes penempatan atau belum punya target ujian
-   * tidak akan pernah sampai ke langkah 5 dan 6 - satu-satunya jalannya adalah keluar.
-   */
-  function actionsMarkup(step) {
+  function dots(count, active) {
     var out = '';
-    if (step.action === 'track') {
-      out += '<div class="fiezel-ob-tracks">'
-        + '<button type="button" class="fiezel-ob-track is-primary" data-ob-track="ielts">' + escapeHtml(TRACKS.ielts.label) + '</button>'
-        + '<button type="button" class="fiezel-ob-track" data-ob-track="toefl">' + escapeHtml(TRACKS.toefl.label) + '</button>'
-        + '</div>';
-    } else if (step.action === 'next') {
-      out += '<button type="button" class="fiezel-ob-cta" data-ob-advance>' + escapeHtml(step.cta) + '</button>';
-    } else {
-      out += '<button type="button" class="fiezel-ob-cta" data-ob-primary>' + escapeHtml(step.cta) + '</button>';
-    }
-    if (step.secondary) {
-      out += '<button type="button" class="fiezel-ob-secondary" data-ob-advance>' + escapeHtml(step.secondary) + '</button>';
-    }
-    return out;
+    for (var i = 0; i < count; i++) out += '<span class="fiezel-dot' + (i === active ? ' is-active' : '') + '"></span>';
+    return '<div class="fiezel-dots" aria-hidden="true">' + out + '</div>';
   }
 
-  /** Markup satu langkah. Murni: tidak menyentuh DOM, sehingga gate bisa memeriksanya utuh. */
-  function stepMarkup(env, index) {
-    var step = STEPS[Math.min(Math.max(0, Number(index) || 0), STEPS.length - 1)];
+  function topbar(showBack) {
+    return '<div class="fiezel-topbar">'
+      + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
+      + '<i data-lucide="chevron-left"></i>Kembali</button>'
+      + '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>'
+      + '</div>';
+  }
+
+  function art(env, pose, width) {
     var mascot = env && env.FiezelMascot;
-    var art = mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: step.pose, width: step.poseWidth, decorative: true })
-      : '';
-    return '<div class="fiezel-ob-card" data-ob-step="' + step.index + '">'
-      + '<span class="fiezel-ob-badge">' + step.index + '</span>'
-      + '<h2 class="fiezel-ob-title">' + escapeHtml(step.title) + '</h2>'
-      + '<p class="fiezel-ob-body">' + escapeHtml(step.body) + '</p>'
-      + '<div class="fiezel-ob-art fiezel-ob-art-' + step.pose + '">' + art + '</div>'
-      + actionsMarkup(step)
-      + (step.note ? '<p class="fiezel-ob-note">' + escapeHtml(step.note) + '</p>' : '')
-      + dotsMarkup(step.index - 1)
-      + '<button type="button" class="fiezel-ob-skip" data-ob-skip>' + escapeHtml(SKIP_LABEL) + '</button>'
+    return mascot && typeof mascot.markup === 'function'
+      ? mascot.markup({ pose: pose, width: width || 220, decorative: true }) : '';
+  }
+
+  function btn(label, attr, variant) {
+    return '<button type="button" class="fiezel-btn fiezel-btn-' + (variant || 'primary') + '" ' + attr + '>'
+      + escapeHtml(label) + '</button>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 1: Feature Carousel
+  // ---------------------------------------------------------------------------------------
+  function carouselMarkup(env, slideIndex) {
+    var slide = CAROUSEL_SLIDES[slideIndex];
+    var items = slide.items.map(function (it) {
+      return '<div class="fiezel-carousel-item"><i data-lucide="' + escapeHtml(it.icon) + '"></i>'
+        + '<span>' + escapeHtml(it.label) + '</span></div>';
+    }).join('');
+    var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
+    return topbar(false)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, slide.pose, 200) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="1">'
+      + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
+      + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
+      + '<div class="fiezel-carousel-track">' + items + '</div>'
+      + '<div class="fiezel-carousel-arrows">'
+      + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-prev' + (slideIndex === 0 ? ' disabled' : '') + '>'
+      + '<i data-lucide="chevron-left"></i></button>'
+      + dots(CAROUSEL_SLIDES.length, slideIndex)
+      + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-next' + (isLast ? ' disabled' : '') + '>'
+      + '<i data-lucide="chevron-right"></i></button>'
+      + '</div>'
+      + btn('Lanjut', 'data-ob-advance')
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 2: Goal Selection + CEFR self-report
+  // ---------------------------------------------------------------------------------------
+  function goalMarkup(env, selectedGoal, selectedLevel) {
+    var goals = goalOptions(env);
+    var cards = goals.map(function (g) {
+      var selected = g.id === selectedGoal;
+      return '<button type="button" class="fiezel-goal-card' + (selected ? ' is-selected' : '') + '" data-ob-goal="' + escapeHtml(g.id) + '">'
+        + '<b>' + escapeHtml(g.label) + '</b><span>' + escapeHtml(g.description) + '</span></button>';
+    }).join('');
+    var levelRow = selectedGoal ? '<div class="fiezel-level-row">' + CEFR_LEVELS.map(function (lv) {
+      var selected = lv === selectedLevel;
+      return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
+    }).join('') + '</div>' : '';
+    return topbar(false)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'semangat', 180) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="2">'
+      + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
+      + '<div class="fiezel-goal-grid">' + cards + '</div>'
+      + (selectedGoal ? '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>' + levelRow
+        + '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>' : '')
+      + btn('Lanjut', 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
+      + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 3: Placement (mengarah ke tes 150 soal yang sungguhan, bukan versi 4-5 soal palsu)
+  // ---------------------------------------------------------------------------------------
+  function placementMarkup(env) {
+    return topbar(true)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'menulis', 200) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="3">'
+      + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
+      + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
+      + '<p class="fiezel-note">Isinya 150 soal dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>'
+      + btn('Mulai tes penempatan', 'data-ob-primary')
+      + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 4: Schedule & Reminders (jujur soal cara ALRS bekerja, bukan pemilih jam palsu)
+  // ---------------------------------------------------------------------------------------
+  function scheduleMarkup(env) {
+    return topbar(true)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'jadwal', 200) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="4">'
+      + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
+      + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
+      + '<p class="fiezel-note">Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>'
+      + btn('Lanjut', 'data-ob-advance')
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 5: Summary & Ready
+  // ---------------------------------------------------------------------------------------
+  function summaryMarkup(env, selectedGoal, selectedLevel, reduceMotion) {
+    var goals = goalOptions(env);
+    var goalLabel = (goals.filter(function (g) { return g.id === selectedGoal; })[0] || {}).label || 'Belum dipilih';
+    var confetti = '';
+    if (!reduceMotion) {
+      var pieces = '';
+      for (var i = 0; i < 10; i++) {
+        pieces += '<i style="left:' + (8 + i * 9) + '%;animation-delay:' + (i * 0.08).toFixed(2) + 's"></i>';
+      }
+      confetti = '<div class="fiezel-confetti" aria-hidden="true">' + pieces + '</div>';
+    }
+    return topbar(true)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'pencapaian', 220) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="5">'
+      + '<h2 class="fiezel-title">Siap belajar bersama Percik!</h2>'
+      + '<div class="fiezel-summary-card">'
+      + '<div class="fiezel-summary-row"><b>Tujuan</b><span>' + escapeHtml(goalLabel) + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>Perkiraan level</b><span>' + escapeHtml(selectedLevel || 'Belum dipilih') + '</span></div>'
+      + '<div class="fiezel-summary-row"><b>Pengingat</b><span>Aktif</span></div>'
+      + '<div class="fiezel-summary-row"><b>Streak</b><span>0 hari · mulai sekarang!</span></div>'
+      + '</div>'
+      + btn('Mulai Belajar', 'data-ob-primary')
+      + btn('Lewati', 'data-ob-step-skip', 'ghost')
       + '</div>';
   }
 
@@ -189,7 +267,7 @@
    * Menampilkan onboarding. Mengembalikan `{shown, reason}` supaya pemanggil dan gate tahu
    * apa yang terjadi, bukan menebaknya dari efek samping.
    *
-   * @param {object} env global tempat DOM dan modul maskot berada
+   * @param {object} env global tempat DOM, modul maskot, dan modul perjalanan belajar berada
    * @param {{now?:number, force?:boolean, onGoal?:Function, onPlacement?:Function, onFinish?:Function}} options
    */
   function show(env, options) {
@@ -203,79 +281,108 @@
 
     var host = doc.createElement('div');
     host.className = 'fiezel-ob';
-    if (prefersReducedMotion(target)) host.className += ' fiezel-ob-still';
+    var reduceMotion = prefersReducedMotion(target);
+    if (reduceMotion) host.className += ' fiezel-ob-still';
     host.setAttribute('role', 'dialog');
     host.setAttribute('aria-modal', 'true');
     host.setAttribute('aria-label', 'Perkenalan FIEZEL');
 
-    var index = 0;
-    var chosenTrack = '';
+    var step = 1;
+    var slide = 0;
+    var selectedGoal = '';
+    var selectedLevel = '';
     var closed = false;
 
     function paint() {
-      host.innerHTML = stepMarkup(target, index);
+      var html;
+      if (step === 1) html = carouselMarkup(target, slide);
+      else if (step === 2) html = goalMarkup(target, selectedGoal, selectedLevel);
+      else if (step === 3) html = placementMarkup(target);
+      else if (step === 4) html = scheduleMarkup(target);
+      else html = summaryMarkup(target, selectedGoal, selectedLevel, reduceMotion);
+      host.innerHTML = html;
+      try { target.lucide && target.lucide.createIcons && target.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true' } }); } catch (_) {}
       bind();
     }
 
     function finish(via) {
       if (closed) return;
       closed = true;
-      markCompleted(target, { at: now, via: via, track: chosenTrack });
+      markCompleted(target, { at: now, via: via, goal: selectedGoal, level: selectedLevel });
       try { host.classList.add('is-leaving'); } catch (_) {}
       if (typeof target.setTimeout === 'function') target.setTimeout(remove, 260);
       else remove();
     }
-
     function remove() {
       try { if (host.parentNode) host.parentNode.removeChild(host); } catch (_) {}
     }
 
-    function advance() {
-      if (index >= STEPS.length - 1) {
-        finish('finish');
-        if (typeof opts.onFinish === 'function') { try { opts.onFinish({ track: chosenTrack }); } catch (_) {} }
-        return;
-      }
-      index += 1;
+    function goStep(next) {
+      step = Math.min(5, Math.max(1, next));
       paint();
     }
 
-    function chooseTrack(value) {
-      var track = normalizeTrack(value);
-      if (!track) return;
-      chosenTrack = track.id;
-      if (typeof opts.onGoal === 'function') {
-        try { opts.onGoal({ track: track.id, label: track.label, goal: track.goal }); } catch (_) {}
+    function advance() {
+      if (step === 1 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
+      if (step === 5) {
+        finish('finish');
+        if (typeof opts.onFinish === 'function') { try { opts.onFinish({ goal: selectedGoal, level: selectedLevel }); } catch (_) {} }
+        return;
       }
-      advance();
+      if (step === 2 && selectedGoal && typeof opts.onGoal === 'function') {
+        try { opts.onGoal({ goal: selectedGoal, level: selectedLevel }); } catch (_) {}
+      }
+      goStep(step + 1);
     }
 
-    function startPlacement() {
+    function back() {
+      if (step === 1 && slide > 0) { slide -= 1; paint(); return; }
+      goStep(step - 1);
+    }
+
+    function startPlacementNow() {
       // Tes penempatan mengambil alih seluruh layar. Onboarding harus SELESAI dulu, bukan
       // menunggu di belakangnya - lapisan yang tertinggal di atas kuis adalah jebakan.
       finish('placement');
-      if (typeof opts.onPlacement === 'function') { try { opts.onPlacement({ track: chosenTrack }); } catch (_) {} }
+      if (typeof opts.onPlacement === 'function') { try { opts.onPlacement({ goal: selectedGoal, level: selectedLevel }); } catch (_) {} }
     }
 
     function bind() {
       try {
-        var advanceBtn = host.querySelector ? host.querySelector('[data-ob-advance]') : null;
-        if (advanceBtn) advanceBtn.addEventListener('click', advance);
-        var primary = host.querySelector ? host.querySelector('[data-ob-primary]') : null;
-        if (primary) {
-          primary.addEventListener('click', STEPS[index].action === 'placement' ? startPlacement : advance);
-        }
-        var skip = host.querySelector ? host.querySelector('[data-ob-skip]') : null;
-        if (skip) skip.addEventListener('click', function () { finish('skip'); });
-        var tracks = host.querySelectorAll ? host.querySelectorAll('[data-ob-track]') : [];
-        for (var i = 0; i < tracks.length; i++) {
+        var backBtn = host.querySelector('[data-ob-back]');
+        if (backBtn) backBtn.addEventListener('click', back);
+        var skipAll = host.querySelector('[data-ob-skip]');
+        if (skipAll) skipAll.addEventListener('click', function () { finish('skip'); });
+        var stepSkip = host.querySelector('[data-ob-step-skip]');
+        if (stepSkip) stepSkip.addEventListener('click', function () { goStep(step + 1); });
+        var adv = host.querySelector('[data-ob-advance]');
+        if (adv && !adv.hasAttribute('disabled')) adv.addEventListener('click', advance);
+        var primary = host.querySelector('[data-ob-primary]');
+        if (primary) primary.addEventListener('click', step === 3 ? startPlacementNow : advance);
+        var prev = host.querySelector('[data-ob-carousel-prev]');
+        if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', back);
+        var nxt = host.querySelector('[data-ob-carousel-next]');
+        if (nxt && !nxt.hasAttribute('disabled')) nxt.addEventListener('click', advance);
+        var goalButtons = host.querySelectorAll('[data-ob-goal]');
+        for (var i = 0; i < goalButtons.length; i++) {
           (function (button) {
             button.addEventListener('click', function () {
-              chooseTrack(button.getAttribute ? button.getAttribute('data-ob-track') : '');
+              selectedGoal = button.getAttribute('data-ob-goal') || '';
+              paint();
             });
-          })(tracks[i]);
+          })(goalButtons[i]);
         }
-      } catch (_) { /* tanpa listener, tombol lewati di markup tetap ada untuk pemuatan ulang */ }
+        var levelButtons = host.querySelectorAll('[data-ob-level]');
+        for (var j = 0; j < levelButtons.length; j++) {
+          (function (button) {
+            button.addEventListener('click', function () {
+              var value = button.getAttribute('data-ob-level') || '';
+              selectedLevel = selectedLevel === value ? '' : value;
+              paint();
+            });
+          })(levelButtons[j]);
+        }
+      } catch (_) { /* tanpa listener, tombol lewati global tetap ada lewat markup */ }
     }
 
     paint();
@@ -285,18 +392,22 @@
       shown: true,
       element: host,
       close: function () { finish('close'); },
-      stepIndex: function () { return index; }
+      stepIndex: function () { return step; },
+      slideIndex: function () { return slide; }
     };
   }
 
   return {
     STORAGE_KEY: STORAGE_KEY,
-    STEPS: STEPS,
-    TRACKS: TRACKS,
-    SKIP_LABEL: SKIP_LABEL,
-    normalizeTrack: normalizeTrack,
+    CEFR_LEVELS: CEFR_LEVELS,
+    CAROUSEL_SLIDES: CAROUSEL_SLIDES,
+    goalOptions: goalOptions,
+    carouselMarkup: carouselMarkup,
+    goalMarkup: goalMarkup,
+    placementMarkup: placementMarkup,
+    scheduleMarkup: scheduleMarkup,
+    summaryMarkup: summaryMarkup,
     completed: completed,
-    stepMarkup: stepMarkup,
     show: show
   };
 });
