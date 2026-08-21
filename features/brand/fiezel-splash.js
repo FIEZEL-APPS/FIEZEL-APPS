@@ -1,16 +1,19 @@
 /**
- * FIEZEL — splash pembuka (Step 0 pada FIEZEL_Complete_Design_Specification).
+ * FIEZEL — splash pembuka (Step 0 pada FIEZEL_Complete_Design_Specification.pdf).
  *
- * Isinya persis yang diminta spesifikasi: wordmark dengan bintang berkelip, maskot melambai,
- * gelembung ucapan, dan satu tombol ajakan. Tayang 2,5 detik lalu menutup sendiri, atau
+ * m025-78: direstyle penuh layar mengikuti spesifikasi lengkap (bagian 2 dan 14) - token
+ * warna/tipografi persis, Percik ditampilkan besar, bintang F berkelip (bagian 14: "Star
+ * Twinkle"). Isinya sendiri tidak berubah dari spesifikasi: wordmark, maskot melambai,
+ * gelembung ucapan, satu tombol ajakan. Tayang 2,5 detik lalu menutup sendiri, atau
  * langsung ditutup begitu disentuh.
  *
  * Tiga batas yang dijaga di sini, dan semuanya punya alasan yang sudah dibayar mahal di
  * produk ini:
  *
  * 1. TIDAK PERNAH MENGHALANGI GERBANG NOTIFIKASI. Notifikasi wajib di FIEZEL, dan gerbangnya
- *    adalah syarat masuk. Splash menutup dirinya sendiri lewat pewaktu DAN lewat sentuhan,
- *    jadi tidak ada keadaan di mana ia tertinggal menutupi layar.
+ *    adalah syarat masuk - splash baru dipanggil SETELAH gerbang itu lolos. Splash menutup
+ *    dirinya sendiri lewat pewaktu DAN lewat sentuhan, jadi tidak ada keadaan di mana ia
+ *    tertinggal menutupi layar.
  * 2. SEKALI PER HARI. Splash yang muncul setiap kali membuka aplikasi berubah dari sambutan
  *    menjadi penghalang.
  * 3. MENGHORMATI KURANGI-GERAK. Kalau perangkat meminta kurangi gerak, animasinya tidak
@@ -27,7 +30,7 @@
   var VISIBLE_MS = 2500;
   var COPY = Object.freeze({
     word: 'FIEZEL',
-    tagline: 'Your smart learning companion',
+    tagline: 'YOUR SMART LEARNING COMPANION',
     bubble: 'Hai! Aku temanmu belajar di FIEZEL. Yuk, siap-siap!',
     cta: 'Mulai kenalan'
   });
@@ -61,21 +64,20 @@
 
   function markup(env, options) {
     var mascot = env && env.FiezelMascot;
-    // Logo dan maskot keduanya karya asli dari handoff; teks wordmark hanya dipakai bila
-    // gambarnya belum tersedia, supaya splash tidak pernah kosong.
-    // Tanda F saja, tanpa huruf: wordmark-nya sudah ditulis sebagai teks di bawah ini, jadi
-    // memakai gambar berhuruf hanya menggandakan kata yang sama dan mengunci ukurannya.
+    // Logo dan maskot keduanya karya asli; teks wordmark hanya dipakai bila gambarnya belum
+    // tersedia, supaya splash tidak pernah kosong.
     var logo = mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: 'mark', width: 76, decorative: true }) : '';
+      ? mascot.markup({ pose: 'mark', width: 64, decorative: true, className: 'fiezel-star' }) : '';
     var figure = mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: 'hero', width: (options && options.width) || 210, decorative: true })
+      ? mascot.markup({ pose: 'hero', width: (options && options.width) || 220, decorative: true })
       : '';
-    return logo
-      + '<p class="fiezel-splash-word">' + COPY.word + '</p>'
+    return '<div class="fiezel-splash-body">'
+      + '<p class="fiezel-splash-word">' + logo + COPY.word + '</p>'
       + '<p class="fiezel-splash-tag">' + COPY.tagline + '</p>'
-      + figure
+      + '<div class="fiezel-stage-art">' + figure + '</div>'
       + '<div class="fiezel-splash-bubble">' + COPY.bubble + '</div>'
-      + '<button type="button" class="fiezel-splash-cta" data-splash-cta>' + COPY.cta + '</button>';
+      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-splash-cta>' + COPY.cta + '</button>'
+      + '</div>';
   }
 
   /**

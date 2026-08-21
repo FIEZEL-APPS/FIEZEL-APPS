@@ -43,7 +43,7 @@ const SCENE_STOPS=[
   {minute:1440,top:'#140a12',bottom:'#2c1622'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
-const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,examTrack:''};
+const defaultPreferences={haptics:true,feedbackSounds:true,soundtrack:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:''};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
   {headline:'Oii Jahran, target kuliah luar negeri lu keren. Tapi hari ini udah belajar belum? 👀',lead:'Beasiswa sama kampus IT impian nggak kebangun dari niat doang. Gas 10–15 menit dulu, kecil tapi nyata.'},
@@ -608,13 +608,44 @@ function unlockAppAfterNotification(){
 // an undefined global and did nothing. Both gates now self-start; this only nudges them.
 const voiceGate=setTimeout(()=>{try{self.FiezelVoiceBundleGate?.maybePrompt?.()}catch{}},1200);voiceGate?.unref?.();bindAudioUnlockGestures();// m025-42: the mandatory daily target arms itself only once the learner qualifies
 // (notifications granted + assessed), which is checked inside the module.
-try{self.FiezelDailyTarget?.start?.()}catch{}const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();return true
+try{self.FiezelDailyTarget?.start?.()}catch{}const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();
+// m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
+// straight into the real placement quiz once the gate clears - see afterOnboardingExit().
+if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
+return true
 }
 async function requestRequiredNotificationPermission(){
   if(!notificationsSupported()){lockAppForNotifications('unsupported');return false}let permission=Notification.permission;if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}if(permission==='granted'){haptic('confirm');unlockAppAfterNotification();if(state.preferences.soundtrack)startSoundtrack();showToast('Notifikasi belajar aktif.')}else lockAppForNotifications(permission);return permission==='granted'
 }
-function startWelcomeExperience(){
+// m025-78: gerbang notifikasi yang SEBENARNYA (memeriksa izin, mengunci/membuka aplikasi).
+// Dulu ini adalah startWelcomeExperience() itu sendiri dan berjalan sebagai hal PERTAMA saat
+// boot - murid baru melihat layar minta izin sebelum tahu FIEZEL itu apa. Sekarang fungsi
+// ini dipindah ke UJUNG alur perkenalan (lihat startWelcomeExperience di bawah); isinya
+// sendiri TIDAK berubah sama sekali, notifikasi tetap wajib dengan cara yang persis sama.
+function startNotificationGate(){
   const permission=notificationPermission();if(!notificationsRequired()||permission==='granted')return unlockAppAfterNotification();lockAppForNotifications(permission);if(!notificationRetryBound){notificationRetryBound=true;window.addEventListener?.('focus',()=>{if(notificationPermission()==='granted')unlockAppAfterNotification();else if(!appUnlocked)setNotificationGateState(notificationPermission())});document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'){if(notificationPermission()==='granted'){if(!appUnlocked)unlockAppAfterNotification();else checkStudyReminders(false)}else lockAppForNotifications(notificationPermission())}})}return false
+}
+// m025-78 OWNER: "ubah notification gate di akhir flow" - pindahkan gerbang notifikasi ke
+// ujung perkenalan, bukan sebelum sapaan pertama. Murid baru (perkenalan belum selesai)
+// sekarang melihat splash+onboarding DULU, baru gerbang notifikasi di ujungnya. Murid lama
+// (perkenalan sudah pernah selesai) tidak berubah sama sekali: gerbang tetap hal pertama
+// yang diperiksa setiap boot, persis seperti sebelumnya.
+//
+// Notifikasi tetap WAJIB baik di jalur baru maupun lama - yang berubah hanya URUTANNYA,
+// bukan apakah gerbangnya ada. showBrandSplash()/showOnboarding() aman dipanggil dari
+// jalur mana pun karena keduanya sudah menjaga diri sendiri (sekali per hari / sekali
+// selesai) lewat pemeriksaan di dalam modulnya masing-masing.
+let pendingAfterGate=null;
+function afterOnboardingExit(action){
+  if(action==='placement')pendingAfterGate='placement';
+  if(appUnlocked){if(action==='placement')startPlacement();else go('home');return}
+  startNotificationGate()
+}
+function startWelcomeExperience(){
+  let onboardingDone=true;
+  try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
+  if(!onboardingDone)return showBrandSplash();
+  return startNotificationGate()
 }
 function dismissWelcome(){return notificationPermission()==='granted'?unlockAppAfterNotification():false}
 // m025-43 OWNER: the old loop was three oscillators every 5.8s - a chord ping, not
@@ -901,9 +932,12 @@ async function refreshInstallHealth(){
   catch(_){el.innerHTML='<p class="muted">Pemeriksaan instalasi tidak bisa diselesaikan di perangkat ini.</p>'}
 }
 window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstallHealth};
-// Splash pembuka (Step 0 spesifikasi desain). Dipanggil SETELAH gerbang notifikasi lolos,
-// bukan sebelumnya: notifikasi wajib di produk ini, dan sapaan tidak boleh pernah berdiri di
-// depan syarat masuk. Modulnya sendiri menutup diri lewat pewaktu dan lewat sentuhan.
+// Splash pembuka (Step 0 spesifikasi desain).
+// m025-78 OWNER: gerbang notifikasi dipindah ke UJUNG alur ini, jadi splash sekarang
+// tampil PERTAMA untuk murid baru - lihat startWelcomeExperience(). Untuk murid lama
+// (perkenalan sudah selesai) fungsi ini tetap dipanggil dari ekor
+// unlockAppAfterNotification() seperti sebelumnya, sebagai sapaan sekali sehari.
+// Modulnya sendiri menutup diri lewat pewaktu dan lewat sentuhan.
 function showBrandSplash(now=Date.now()){
   const splash=self.FiezelSplash;
   if(!splash||typeof splash.show!=='function'){showOnboarding(now);return null}
@@ -916,25 +950,29 @@ function showBrandSplash(now=Date.now()){
   }catch(_){showOnboarding(now);return null}
 }
 window.showBrandSplash=showBrandSplash;
-// Perkenalan enam langkah (Step 1-6 sheet handoff). Dijalankan setelah splash, yang berarti
-// juga setelah gerbang notifikasi lolos. Modulnya sendiri yang memutuskan sudah pernah
-// selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar ada.
+// Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
+// Dijalankan setelah splash menutup diri. Gerbang notifikasi ada di UJUNG jalur ini
+// (afterOnboardingExit -> startNotificationGate), bukan sebelum langkah pertama - lihat
+// catatan m025-78 di startWelcomeExperience(). Modulnya sendiri yang memutuskan sudah
+// pernah selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar
+// ada - goal ASLI dari FiezelPersonalJourney, tes penempatan yang sungguhan 150 soal, level
+// self-report yang tidak menimpa state.level.
 function showOnboarding(now=Date.now()){
   const onboarding=self.FiezelOnboarding;
   if(!onboarding||typeof onboarding.show!=='function')return null;
   try{
     return onboarding.show(self,{now,
-      onGoal:({track,goal,label})=>{
+      onGoal:({goal,level})=>{
         const journey=self.FiezelPersonalJourney;
         const id=journey?journey.buildGoalProfile(goal).id:goal;
-        // Prasyarat kemampuan IELTS dan TOEFL memang satu profil, jadi keduanya menulis
-        // `exam_foundation`. Yang membedakan tersimpan terpisah sebagai `examTrack` dan
-        // itulah yang dipakai untuk label yang dilihat murid. Tidak ada prediksi skor.
-        state.preferences={...state.preferences,goalProfile:id,examTrack:String(track||'')};
-        save();render();showToast(`Tujuan belajar: Fondasi ${label}`)
+        const label=journey?journey.buildGoalProfile(goal).label:goal;
+        // `selfAssessedLevel` adalah perkiraan MURID SENDIRI, bukan hasil pengukuran - karena
+        // itu tidak pernah menyentuh state.level, yang hanya diisi tes penempatan asli.
+        state.preferences={...state.preferences,goalProfile:id,selfAssessedLevel:String(level||'')};
+        save();render();showToast(`Tujuan belajar: ${label}`)
       },
-      onPlacement:()=>startPlacement(),
-      onFinish:()=>go('home')
+      onPlacement:()=>afterOnboardingExit('placement'),
+      onFinish:()=>afterOnboardingExit('home')
     })
   }catch(_){return null}
 }
