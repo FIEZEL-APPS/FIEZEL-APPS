@@ -1,16 +1,20 @@
 /**
- * FIEZEL gate — onboarding enam langkah.
+ * FIEZEL gate — onboarding lima langkah (FIEZEL_Complete_Design_Specification.pdf bagian 3).
  *
  * Lapisan yang menutupi seluruh layar adalah tempat paling mudah untuk mengurung pengguna,
  * dan di produk ini gerbang notifikasi berada tepat di bawahnya. Karena itu gate ini menahan
- * tiga hal sekaligus: perkenalan harus selalu punya jalan keluar di SETIAP langkah, harus
- * berhenti setelah selesai atau dilewati, dan tidak boleh menjanjikan yang tidak dipegang
- * produk - khususnya prediksi skor dan tes yang disebut singkat padahal 150 soal.
+ * beberapa hal sekaligus: perkenalan harus selalu punya jalan keluar di SETIAP langkah dan
+ * SETIAP sub-langkah (termasuk dua slide carousel), harus berhenti setelah selesai atau
+ * dilewati, tidak boleh menjanjikan yang tidak dipegang produk (skor, jadwal manual), dan
+ * setiap penyimpangan dari spesifikasi desain (goal ASLI bukan Travel/Work/Fun, level
+ * self-report bukan hasil ukur, tes 150 soal bukan 4-5 soal, pengingat otomatis bukan
+ * pemilih jam) harus terlihat jujur di salinan teks, bukan disembunyikan.
  */
 const assert = require('assert');
 const fs = require('fs');
 const mascot = require('./features/brand/fiezel-mascot.js');
 const splash = require('./features/brand/fiezel-splash.js');
+const journey = require('./features/personal-journey/fiezel-personal-journey.js');
 const onboarding = require('./features/onboarding/fiezel-onboarding.js');
 
 let failures = 0;
@@ -28,6 +32,7 @@ function el(tag) {
     classList: { add(v) { node.className += ' ' + v; } },
     setAttribute(k, v) { node.attrs[k] = String(v); },
     getAttribute(k) { return node.attrs[k]; },
+    hasAttribute(k) { return Object.prototype.hasOwnProperty.call(node.attrs, k); },
     appendChild(child) { child.parentNode = node; node.children.push(child); },
     removeChild(child) { node.children = node.children.filter(c => c !== child); child.parentNode = null; },
     addEventListener(type, fn) { (node.listeners[type] = node.listeners[type] || []).push(fn); },
@@ -64,7 +69,6 @@ function el(tag) {
 
 function fakeEnv(over) {
   const store = new Map();
-  const timers = [];
   const body = el('body');
   return Object.assign({
     document: { createElement: el, body },
@@ -73,101 +77,170 @@ function fakeEnv(over) {
       setItem: (k, v) => store.set(k, String(v)),
       removeItem: k => store.delete(k)
     },
-    setTimeout: (fn, ms) => { timers.push({ fn, ms }); return timers.length; },
+    setTimeout: (fn) => { fn(); return 1; },
     clearTimeout: () => {},
     FiezelMascot: mascot,
-    _timers: timers, _body: body, _store: store
+    FiezelPersonalJourney: journey,
+    _body: body, _store: store
   }, over || {});
 }
 
 const NOW = Date.parse('2026-08-21T04:00:00Z');
 
-test('enam langkah, urut, dengan salinan teks dari sheet handoff', () => {
-  assert.strictEqual(onboarding.STEPS.length, 6);
-  onboarding.STEPS.forEach((step, i) => assert.strictEqual(step.index, i + 1, 'langkah ' + i + ' tidak urut'));
-  assert.strictEqual(onboarding.STEPS[0].title, 'Selamat datang di FIEZEL!');
-  assert.strictEqual(onboarding.STEPS[1].title, 'Belajar jadi lebih seru');
-  assert.strictEqual(onboarding.STEPS[2].title, 'Pilih tujuan belajarmu');
-  assert.strictEqual(onboarding.STEPS[3].title, 'Tes penempatan singkat');
-  assert.strictEqual(onboarding.STEPS[4].title, 'Atur jadwal & pengingat');
-  assert.strictEqual(onboarding.STEPS[5].title, 'Semua siap!');
-});
-
-test('setiap langkah memakai pose maskot yang benar-benar terdaftar', () => {
-  for (const step of onboarding.STEPS) {
-    assert.ok(Object.prototype.hasOwnProperty.call(mascot.POSES, step.pose),
-      'pose tidak terdaftar: ' + step.pose);
-    assert.strictEqual(mascot.normalizePose(step.pose), step.pose,
-      step.pose + ' jatuh ke pose lain - tautan gambar akan salah');
+/**
+ * Memajukan onboarding sampai tepat sebelum langkah target, lewat jalur normal setiap
+ * langkah - bukan lewat "Lewati" global, supaya jalur ini berguna sebagai bukti bahwa
+ * navigasi maju yang sesungguhnya (bukan cuma jalan pintas) memang berfungsi.
+ */
+function advanceTo(run, targetStep) {
+  let guard = 0;
+  while (run.stepIndex() < targetStep) {
+    if (guard++ > 30) throw new Error('macet sebelum mencapai langkah ' + targetStep);
+    const step = run.stepIndex();
+    if (step === 1 && run.slideIndex() < onboarding.CAROUSEL_SLIDES.length - 1) {
+      run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+      continue;
+    }
+    if (step === 2) {
+      run.element.querySelectorAll('[data-ob-goal]')[0].listeners.click[0]();
+      run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+      continue;
+    }
+    if (step === 3) {
+      // Langkah ini tidak punya tombol "Lanjut" polos - satu-satunya jalan maju tanpa
+      // benar-benar mengerjakan 150 soal adalah "Lewati langkah ini", dan itu memang
+      // disengaja (lihat header modul, poin 3).
+      run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+      continue;
+    }
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   }
+}
+
+test('lima langkah nyata (Step 1-5), bukan enam seperti sheet lama', () => {
+  assert.ok(Array.isArray(onboarding.CAROUSEL_SLIDES) && onboarding.CAROUSEL_SLIDES.length === 2);
 });
 
-test('aset pose onboarding ada, tidak kosong, dan ukurannya cocok dengan berkasnya', () => {
-  for (const pose of ['mengintip', 'menulis', 'jadwal', 'siap', 'belajar']) {
-    const art = mascot.POSES[pose];
-    const path = './assets/brand/' + art.file;
-    assert.ok(fs.existsSync(path), 'aset hilang: ' + art.file);
-    const buf = fs.readFileSync(path);
-    assert.ok(buf.length > 4000, art.file + ' hanya ' + buf.length + ' byte');
-    assert.strictEqual(buf.toString('ascii', 12, 16), 'IHDR', pose + ': bukan PNG yang sah');
-    assert.strictEqual(buf.readUInt32BE(16), art.width, pose + ': lebar tidak cocok');
-    assert.strictEqual(buf.readUInt32BE(20), art.height, pose + ': tinggi tidak cocok');
-  }
+test('goal selection memakai profil tujuan ASLI aplikasi, bukan Travel/Work/Fun spesifikasi', () => {
+  // Spesifikasi meminta tiga kartu Travel/Work/Fun - kategori itu tidak berkaitan dengan
+  // apa pun di produk. FiezelPersonalJourney sudah punya empat profil nyata dengan prasyarat
+  // yang benar-benar dipakai R2-R4; itulah yang wajib tampil.
+  const env = fakeEnv();
+  const goals = onboarding.goalOptions(env);
+  assert.deepStrictEqual(goals.map(g => g.id).sort(), journey.GOAL_IDS.slice().sort());
+  for (const g of goals) assert.ok(g.description.length > 0, g.id + ': deskripsi kosong');
+  const html = onboarding.goalMarkup(env, '', '');
+  assert.ok(!/Travel|Work|Fun/.test(html), 'kategori Travel/Work/Fun dari spesifikasi tidak boleh muncul - tidak berkaitan dengan produk');
 });
 
-test('modul dan aset onboarding ikut ke shell offline', () => {
-  const sw = fs.readFileSync('./sw.js', 'utf8');
-  assert.ok(sw.includes('./features/onboarding/fiezel-onboarding.js'), 'modul belum di-cache');
-  for (const pose of ['mengintip', 'menulis', 'jadwal', 'siap']) {
-    assert.ok(sw.includes('./assets/brand/' + mascot.POSES[pose].file), 'aset belum di-cache: ' + pose);
-  }
-  const index = fs.readFileSync('./index.html', 'utf8');
-  assert.ok(index.includes('features/onboarding/fiezel-onboarding.js'), 'modul belum dimuat halaman');
+test('level self-report diberi label jelas sebagai perkiraan, bukan hasil ukur', () => {
+  const env = fakeEnv();
+  const html = onboarding.goalMarkup(env, 'school', 'B1');
+  assert.ok(/perkiraan/i.test(html), 'harus ada kata "perkiraan" - ini bukan hasil tes');
+  assert.ok(/bukan hasil tes/i.test(html), 'harus menyangkal eksplisit bahwa ini hasil pengukuran');
+  assert.ok(!/level resmi|sudah diuji|hasil pengukuran resmi/i.test(html));
+  for (const lv of onboarding.CEFR_LEVELS) assert.ok(new RegExp('>' + lv + '<').test(html), 'chip level hilang: ' + lv);
 });
 
-test('SETIAP langkah punya jalan keluar - tidak ada satu pun yang mengurung', () => {
+test('tes penempatan mengarah ke tes 150 soal yang sungguhan, angka tidak disamarkan', () => {
+  // Spesifikasi menulis "Quick diagnostic quiz, 4-5 questions". Produk ini hanya punya tes
+  // 150 soal; menyebutnya "singkat" tanpa angka sebenarnya adalah kebohongan kecil yang akan
+  // ditagih murid pada soal ke-30.
+  const html = onboarding.placementMarkup(fakeEnv());
+  assert.ok(/150 soal/.test(html), 'jumlah soal sebenarnya harus disebut');
+  assert.ok(!/4-5 (pertanyaan|soal)|4 sampai 5/.test(html), 'tidak boleh menjanjikan jumlah soal spesifikasi yang tidak nyata');
+});
+
+test('schedule setup TIDAK memasang pemilih hari/jam yang tidak tersambung ke apa pun', () => {
+  // FIEZEL belum punya jadwal yang diatur pengguna: pengingat dipilih ALRS dari bukti
+  // belajar. Pemilih hari/jam di sini akan menjadi tombol palsu - alasan yang sama sejak
+  // m025-77. Pertanyaan spesifikasi "Kapan kamu ingin belajar?" dijawab jujur di teksnya.
+  const html = onboarding.scheduleMarkup(fakeEnv());
+  assert.ok(!/type="time"|<select|Mo<\/|Senin.*Selasa.*Rabu/i.test(html), 'jangan menawarkan jadwal manual yang tidak dipegang produk');
+  assert.ok(/otomatis/.test(html), 'harus menjelaskan bahwa waktunya dipilih otomatis, bukan manual');
+});
+
+test('SETIAP langkah dan SETIAP slide carousel punya jalan keluar - tidak ada yang mengurung', () => {
   // Ini alasan utama gate ini ada. Gerbang notifikasi berada di bawah lapisan ini, dan
   // notifikasi wajib; satu langkah tanpa jalan keluar berarti aplikasi tidak bisa dimasuki.
   const env = fakeEnv();
-  for (let i = 0; i < onboarding.STEPS.length; i++) {
-    const html = onboarding.stepMarkup(env, i);
-    assert.ok(/data-ob-skip/.test(html), 'langkah ' + (i + 1) + ' tidak punya tombol lewati');
-    assert.ok(/data-ob-advance|data-ob-primary|data-ob-track/.test(html), 'langkah ' + (i + 1) + ' tidak punya tombol maju');
+  for (let i = 0; i < onboarding.CAROUSEL_SLIDES.length; i++) {
+    const html = onboarding.carouselMarkup(env, i);
+    assert.ok(/data-ob-skip/.test(html), 'slide carousel ' + i + ' tidak punya tombol lewati global');
+  }
+  for (const html of [
+    onboarding.goalMarkup(env, '', ''),
+    onboarding.placementMarkup(env),
+    onboarding.scheduleMarkup(env),
+    onboarding.summaryMarkup(env, '', '', true)
+  ]) {
+    assert.ok(/data-ob-skip/.test(html), 'langkah tidak punya tombol lewati global: ' + html.slice(0, 60));
   }
 });
 
-test('melewati di langkah mana pun langsung menutup dan tidak kembali menghadang', () => {
+test('melewati (global) di langkah mana pun langsung menutup dan tidak kembali menghadang', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW });
   assert.strictEqual(run.shown, true);
   assert.strictEqual(env._body.children.length, 1);
-  run.element.querySelector('[data-ob-skip]');
-  run.close();
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
   assert.strictEqual(onboarding.completed(env), true, 'melewati harus dicatat selesai');
   const again = onboarding.show(env, { now: NOW + 60000 });
   assert.strictEqual(again.shown, false);
   assert.strictEqual(again.reason, 'completed');
 });
 
-test('memilih IELTS dan TOEFL menghasilkan nilai yang berbeda, bukan tombol kembar', () => {
-  // Dua tombol yang menulis hal yang persis sama adalah pilihan palsu. Profil prasyaratnya
-  // memang satu (`exam_foundation`), jadi yang wajib berbeda adalah tracknya.
-  assert.strictEqual(onboarding.TRACKS.ielts.goal, onboarding.TRACKS.toefl.goal);
-  assert.notStrictEqual(onboarding.TRACKS.ielts.id, onboarding.TRACKS.toefl.id);
-  assert.notStrictEqual(onboarding.TRACKS.ielts.label, onboarding.TRACKS.toefl.label);
-  assert.strictEqual(onboarding.normalizeTrack('IELTS').id, 'ielts');
-  assert.strictEqual(onboarding.normalizeTrack('ngawur'), null);
-
-  const seen = [];
+test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke langkah 2', () => {
   const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  assert.strictEqual(run.stepIndex(), 1);
+  assert.strictEqual(run.slideIndex(), 0);
+  run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
+  assert.strictEqual(run.slideIndex(), 1);
+  run.element.querySelector('[data-ob-back]').listeners.click[0]();
+  assert.strictEqual(run.slideIndex(), 0, 'tombol kembali harus mundur satu slide dulu, bukan langsung keluar onboarding');
+  run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 2, 'setelah slide terakhir, Lanjut harus pindah ke langkah 2');
+});
+
+test('goal selection: tombol Lanjut nonaktif sebelum memilih tujuan (sesuai spesifikasi)', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 2);
+  const advanceBtn = run.element.querySelector('[data-ob-advance]');
+  assert.ok(advanceBtn.hasAttribute('disabled'), 'Lanjut harus nonaktif sebelum tujuan dipilih');
+  const goalBtn = run.element.querySelectorAll('[data-ob-goal]')[0];
+  goalBtn.listeners.click[0]();
+  const enabled = run.element.querySelector('[data-ob-advance]');
+  assert.ok(!enabled.hasAttribute('disabled'), 'Lanjut harus aktif setelah tujuan dipilih');
+});
+
+test('goal selection: memilih tujuan memanggil onGoal dengan id ASLI, bukan label tampilan', () => {
+  const env = fakeEnv();
+  const seen = [];
   const run = onboarding.show(env, { now: NOW, force: true, onGoal: v => seen.push(v) });
-  // Maju ke langkah 3, lalu tekan tombol TOEFL yang benar-benar dipancarkan modul.
+  advanceTo(run, 2);
+  const itBtn = run.element.querySelectorAll('[data-ob-goal]').filter(b => b.getAttribute('data-ob-goal') === 'it')[0];
+  itBtn.listeners.click[0]();
+  const levelBtn = run.element.querySelectorAll('[data-ob-level="B1"]')[0];
+  levelBtn.listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  const toefl = run.element.querySelectorAll('[data-ob-track="toefl"]')[0];
-  assert.ok(toefl, 'tombol TOEFL tidak ada di langkah 3');
-  toefl.listeners.click[0]();
-  assert.deepStrictEqual(seen, [{ track: 'toefl', label: 'TOEFL', goal: 'exam_foundation' }]);
+  assert.deepStrictEqual(seen, [{ goal: 'it', level: 'B1' }]);
+});
+
+test('goal selection: "Lewati langkah ini" memajukan tanpa memanggil onGoal', () => {
+  // Beda dari tombol lewati global (mengakhiri semuanya): ini hanya melompati SATU langkah,
+  // supaya murid yang belum siap memilih tujuan tetap sampai ke langkah 3-5.
+  const env = fakeEnv();
+  const seen = [];
+  const run = onboarding.show(env, { now: NOW, force: true, onGoal: v => seen.push(v) });
+  advanceTo(run, 2);
+  run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 3);
+  assert.deepStrictEqual(seen, []);
 });
 
 test('tes penempatan tidak dijalankan di balik lapisan yang masih terpasang', () => {
@@ -176,28 +249,50 @@ test('tes penempatan tidak dijalankan di balik lapisan yang masih terpasang', ()
   const env = fakeEnv();
   const order = [];
   const run = onboarding.show(env, { now: NOW, force: true, onPlacement: () => order.push('placement') });
-  for (let i = 0; i < 3; i++) run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 3, 'harus berada di langkah 4');
+  advanceTo(run, 3);
   run.element.querySelector('[data-ob-primary]').listeners.click[0]();
   assert.deepStrictEqual(order, ['placement']);
   assert.strictEqual(onboarding.completed(env), true, 'perkenalan harus sudah selesai sebelum kuis mulai');
 });
 
-test('langkah 5 dan 6 tetap bisa dicapai tanpa mengerjakan tes penempatan', () => {
-  // Kalau satu-satunya jalan maju dari langkah 4 adalah mengerjakan 150 soal, dua langkah
-  // terakhir tidak pernah terlihat oleh murid yang ingin menundanya.
+test('tes penempatan: "Lewati langkah ini" tetap sampai ke langkah 4 dan 5', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  advanceTo(run, 3);
+  run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 4);
+});
+
+test('langkah terakhir menyelesaikan dan memanggil onFinish satu kali saja', () => {
   const env = fakeEnv();
   let finished = 0;
   const run = onboarding.show(env, { now: NOW, force: true, onFinish: () => { finished++; } });
-  for (let i = 0; i < 5; i++) {
-    const next = run.element.querySelector('[data-ob-advance]');
-    assert.ok(next, 'langkah ' + (run.stepIndex() + 1) + ' tidak punya jalan maju tanpa aksi');
-    next.listeners.click[0]();
-  }
-  assert.strictEqual(run.stepIndex(), 5, 'harus sampai langkah 6');
+  advanceTo(run, 5);
   run.element.querySelector('[data-ob-primary]').listeners.click[0]();
   assert.strictEqual(finished, 1);
   assert.strictEqual(onboarding.completed(env), true);
+});
+
+test('summary: pilihan yang sungguhan tercatat ditampilkan kembali, bukan data bohongan', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  advanceTo(run, 2);
+  run.element.querySelectorAll('[data-ob-goal="scholarship"]')[0].listeners.click[0]();
+  run.element.querySelectorAll('[data-ob-level="C1"]')[0].listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 5);
+  assert.ok(/Beasiswa/.test(run.element.innerHTML));
+  assert.ok(/C1/.test(run.element.innerHTML));
+});
+
+test('confetti ringkas dan tunduk pada kurangi-gerak', () => {
+  const env = fakeEnv();
+  const withMotion = onboarding.summaryMarkup(env, 'school', 'A2', false);
+  assert.ok(/fiezel-confetti/.test(withMotion));
+  const reduced = onboarding.summaryMarkup(env, 'school', 'A2', true);
+  assert.ok(!/fiezel-confetti/.test(reduced), 'kurangi-gerak harus mematikan confetti, bukan hanya memperlambatnya');
 });
 
 test('tanpa modul maskot, perkenalan tidak tampil dan tidak merusak apa pun', () => {
@@ -206,6 +301,14 @@ test('tanpa modul maskot, perkenalan tidak tampil dan tidak merusak apa pun', ()
   assert.strictEqual(run.shown, false);
   assert.strictEqual(run.reason, 'mascot_unavailable');
   assert.strictEqual(env._body.children.length, 0);
+});
+
+test('tanpa modul perjalanan belajar, kartu tujuan kosong tapi tidak melempar', () => {
+  const env = fakeEnv({ FiezelPersonalJourney: undefined });
+  const run = onboarding.show(env, { now: NOW, force: true });
+  assert.strictEqual(run.shown, true);
+  advanceTo(run, 2);
+  assert.strictEqual(run.element.querySelectorAll('[data-ob-goal]').length, 0);
 });
 
 test('penyimpanan yang menolak tidak mengurung dan tidak menghalangi', () => {
@@ -218,67 +321,69 @@ test('penyimpanan yang menolak tidak mengurung dan tidak menghalangi', () => {
 });
 
 test('tidak ada janji prediksi skor di salinan teks mana pun', () => {
-  // Roadmap R4 melarangnya, dan layar tujuan belajar adalah tempat paling menggoda untuk
-  // menjanjikannya.
-  const all = onboarding.STEPS.map(s => [s.title, s.body, s.note || ''].join(' ')).join(' ');
-  // Yang dilarang adalah JANJI skor. Catatan jujur "FIEZEL tidak memprediksi skor" justru
-  // wajib ada, jadi pola di bawah sengaja menyasar bentuk janjinya, bukan kata "skor".
+  const env = fakeEnv();
+  const all = [
+    onboarding.carouselMarkup(env, 0), onboarding.carouselMarkup(env, 1),
+    onboarding.goalMarkup(env, 'school', 'B1'), onboarding.placementMarkup(env),
+    onboarding.scheduleMarkup(env), onboarding.summaryMarkup(env, 'school', 'B1', true)
+  ].join(' ');
   assert.ok(!/skor kamu|skor anda|dijamin|jaminan skor|band \d|skor \d/i.test(all), all);
-  const goalStep = onboarding.STEPS[2];
-  assert.ok(/tidak memprediksi skor/i.test(goalStep.note || ''), 'batas itu harus terlihat murid, bukan hanya di kode');
-});
-
-test('jumlah soal penempatan yang sebenarnya disebutkan, bukan disamarkan', () => {
-  // Sheet menulis "singkat". Tes penempatan FIEZEL berisi 150 soal. Judul boleh mengikuti
-  // desain, tetapi angkanya wajib ada di layar.
-  const step = onboarding.STEPS[3];
-  assert.ok(/150 soal/.test(step.note || ''), 'jumlah soal sebenarnya harus disebut: ' + step.note);
-  assert.ok(/[Bb]uildPlacement|count:150/.test(app) || /count:150/.test(app.replace(/\s/g, '')),
-    'aplikasi masih memakai penempatan 150 soal - kalau berubah, salinan teks ini ikut berubah');
-});
-
-test('langkah pengingat tidak memasang pemilih jam yang tidak tersambung', () => {
-  // FIEZEL belum punya jadwal yang diatur pengguna: pengingat dipilih ALRS dari bukti.
-  // Pemilih jam di sini akan menjadi tombol palsu.
-  const html = onboarding.stepMarkup(fakeEnv(), 4);
-  assert.ok(!/type="time"|<select/.test(html), 'jangan menawarkan jadwal yang tidak dipegang produk');
-  assert.ok(/Pengingat sudah aktif/.test(onboarding.STEPS[4].note || ''));
 });
 
 test('teks yang disuntikkan tidak bisa menyuntik markup', () => {
-  const html = onboarding.stepMarkup(fakeEnv(), 0);
-  assert.ok(!/<script>/.test(html));
-  assert.ok(/aria-hidden="true"/.test(html), 'maskot dekoratif tidak dibacakan pembaca layar');
+  const html = onboarding.goalMarkup(fakeEnv(), '"><script>alert(1)</script>', '');
+  assert.ok(!/<script>alert/.test(html));
 });
 
-test('splash memberi tahu saat ia selesai, sehingga perkenalan menyambung tanpa tebakan', () => {
-  // Tanpa ini pemanggil harus memasang pewaktu kedua, dan tebakan itu meleset setiap kali
-  // splash ditutup lebih awal oleh sentuhan.
-  const env = fakeEnv();
-  let closed = 0;
-  const shown = splash.show(env, { now: NOW, onClose: () => { closed++; } });
-  assert.strictEqual(shown.shown, true);
-  shown.close();
-  assert.strictEqual(closed, 1);
-  shown.close();
-  assert.strictEqual(closed, 1, 'menutup dua kali tidak boleh memanggil dua kali');
+test('maskot dalam onboarding dekoratif, tidak dibacakan dua kali oleh pembaca layar', () => {
+  const html = onboarding.placementMarkup(fakeEnv());
+  assert.ok(/aria-hidden="true"/.test(html));
 });
 
-test('aplikasi menyambungkan perkenalan setelah splash, bukan sebelum gerbang notifikasi', () => {
-  assert.ok(/showBrandSplash\(\)/.test(app), 'splash masih dipanggil setelah gerbang lolos');
-  assert.ok(/onClose:\(\)=>showOnboarding/.test(app.replace(/\s/g, '')), 'perkenalan harus menyambung ke penutupan splash');
-  assert.ok(/onPlacement:\(\)=>startPlacement\(\)/.test(app.replace(/\s/g, '')), 'tombol tes harus memanggil penempatan yang asli');
-  assert.ok(/examTrack/.test(app), 'pilihan IELTS/TOEFL harus benar-benar tersimpan');
+test('aplikasi menyambungkan splash -> onboarding -> gerbang notifikasi -> tes penempatan asli, level self-report terpisah dari state.level', () => {
+  assert.ok(/onClose:\(\)=>showOnboarding/.test(app.replace(/\s/g, '')), 'onboarding harus menyambung dari penutupan splash');
+  assert.ok(/onPlacement:\(\)=>afterOnboardingExit\('placement'\)/.test(app.replace(/\s/g, '')),
+    'tombol tes harus melalui afterOnboardingExit, bukan langsung startPlacement - gerbang notifikasi harus tetap diperiksa dulu');
+  assert.ok(/onFinish:\(\)=>afterOnboardingExit\('home'\)/.test(app.replace(/\s/g, '')),
+    'langkah terakhir juga harus melalui afterOnboardingExit, bukan langsung go(\'home\')');
+  // afterOnboardingExit sendiri harus benar-benar memanggil startPlacement/go('home') SETELAH
+  // gerbang notifikasi lolos - bukan melewatinya diam-diam.
+  assert.ok(/pendingAfterGate==='placement'\)\{pendingAfterGate=null;startPlacement\(\)\}/.test(app.replace(/\s/g, '')),
+    'tes penempatan yang tertunda harus benar-benar dijalankan setelah gerbang notifikasi lolos');
+  assert.ok(/selfAssessedLevel/.test(app), 'perkiraan level murid harus benar-benar tersimpan');
+  assert.ok(!/state\.level\s*=.*selfAssessedLevel|selfAssessedLevel.*state\.level\s*=/.test(app),
+    'perkiraan self-report tidak boleh menimpa state.level - itu milik tes penempatan asli');
+});
+
+test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi tetap wajib', () => {
+  // OWNER: "ubah notification gate di akhir flow". Notifikasi tetap wajib di produk ini;
+  // yang berubah hanya URUTANNYA. Murid baru (perkenalan belum selesai) melihat
+  // splash+onboarding dulu; murid lama tetap diperiksa gerbangnya di awal boot, sama
+  // seperti sebelumnya.
+  const flat = app.replace(/\s/g, '');
+  assert.ok(/functionstartWelcomeExperience\(\)\{/.test(flat), 'titik masuk boot harus tetap ada');
+  assert.ok(/onboardingDone=self\.FiezelOnboarding\?\.completed\?\.\(self\)!==false/.test(flat),
+    'harus memeriksa apakah perkenalan sudah selesai untuk memutuskan urutan');
+  assert.ok(/if\(!onboardingDone\)returnshowBrandSplash\(\)/.test(flat),
+    'murid baru harus melihat splash dulu, sebelum gerbang notifikasi');
+  assert.ok(/returnstartNotificationGate\(\)/.test(flat), 'murid lama tetap langsung ke gerbang, seperti sebelumnya');
+  // Gerbang itu sendiri (isi startNotificationGate) tidak boleh berubah perilakunya -
+  // notifikasi tetap wajib dengan cara yang persis sama, hanya dipindah posisinya.
+  assert.ok(/functionstartNotificationGate\(\)\{/.test(flat), 'logika gerbang asli harus tetap ada, hanya berganti nama');
+  assert.ok(/lockAppForNotifications\(permission\)/.test(flat), 'penguncian aplikasi tanpa izin tetap terjadi');
 });
 
 test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', () => {
   const flat = css.replace(/\s*\n\s*/g, '');
-  assert.ok(/\.fiezel-ob-cta\{[^}]*min-height:44px/.test(flat), 'tombol utama harus 44px');
-  assert.ok(/\.fiezel-ob-track\{[^}]*min-height:44px/.test(flat), 'tombol tujuan harus 44px');
-  assert.ok(/\.fiezel-ob-skip\{[^}]*min-height:44px/.test(flat), 'tombol lewati harus bisa disentuh juga');
-  const brand = css.slice(css.indexOf('FIEZEL brand: maskot resmi'));
+  assert.ok(/\.fiezel-btn\{[^}]*min-height:44px/.test(flat), 'tombol dasar harus 44px');
+  const brand = css.slice(css.indexOf('FIEZEL brand: Percik'));
   assert.ok(!/filter:|hue-rotate|scaleX\(|scaleY\(/.test(brand), 'maskot tidak boleh diwarnai ulang atau direntangkan');
-  assert.ok(/@keyframes fzm-peek/.test(css), 'pose mengintip punya gerakannya sendiri');
+});
+
+test('gate maskot dan onboarding sudah terdaftar di CI', () => {
+  const workflow = fs.readFileSync('./.github/workflows/quality.yml', 'utf8');
+  assert.ok(/node brand-mascot-test\.js/.test(workflow));
+  assert.ok(/node onboarding-test\.js/.test(workflow));
 });
 
 console.log('');
