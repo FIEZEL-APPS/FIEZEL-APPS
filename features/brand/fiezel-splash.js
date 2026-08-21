@@ -27,13 +27,86 @@
   'use strict';
 
   var STORAGE_KEY = 'fiezel-splash-seen-v1';
-  var VISIBLE_MS = 2500;
+  var VISIBLE_MS = 2600;
   var COPY = Object.freeze({
     word: 'FIEZEL',
-    tagline: 'YOUR SMART LEARNING COMPANION',
-    bubble: 'Hai! Aku temanmu belajar di FIEZEL. Yuk, siap-siap!',
-    cta: 'Mulai kenalan'
+    tagline: 'ADAPTIVE ENGLISH'
   });
+
+  // m025-80 OWNER: "undo pemakaian maskot saat splash, animasikan aja logo yang aku pilih".
+  // Logo digambar sebagai SVG sebaris - bukan <img> - supaya setiap bagiannya bisa
+  // dianimasikan sendiri: huruf F masuk lebih dulu, dua batang emas menyusul seperti
+  // gelombang suara yang bereaksi pada nada pembuka.
+  function logoMarkup() {
+    return '<svg class="fiezel-logo" viewBox="0 0 512 512" role="img" aria-label="FIEZEL">'
+      + '<defs>'
+      + '<linearGradient id="fzsIvory" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient>'
+      + '<linearGradient id="fzsGold" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="#F7E3AE"/><stop offset="45%" stop-color="#DDB55F"/>'
+      + '<stop offset="100%" stop-color="#B0812A"/></linearGradient>'
+      + '</defs>'
+      + '<g fill="url(#fzsIvory)">'
+      + '<rect class="fz-f fz-f1" x="136" y="148" width="42"  height="216" rx="20"/>'
+      + '<rect class="fz-f fz-f2" x="136" y="148" width="128" height="42"  rx="20"/>'
+      + '<rect class="fz-f fz-f3" x="136" y="230" width="102" height="40"  rx="19"/>'
+      + '</g>'
+      + '<g fill="url(#fzsGold)">'
+      + '<rect class="fz-bar fz-bar1" x="298" y="200" width="34" height="112" rx="17"/>'
+      + '<rect class="fz-bar fz-bar2" x="348" y="166" width="34" height="180" rx="17"/>'
+      + '</g>'
+      + '</svg>';
+  }
+
+  // Nada pembuka merek. m025-80 OWNER: "simple tapi eksklusif, authentic seperti suara khas
+  // Duolingo" - jadi bukan pembuka sinematik, melainkan motif pendek yang gampang diingat:
+  // DUA nada bel naik satu kuint, F4 lalu C5. F dipilih karena itu huruf mereknya sendiri.
+  //
+  // Karakter "bel" datang dari satu nada dasar sinus plus satu harmonik oktaf yang jauh
+  // lebih pelan dan meluruh lebih cepat - itulah yang membedakan bunyi bel dari bip sinus
+  // polos, tanpa perlu berkas audio sama sekali. Seluruh motif selesai di bawah satu detik.
+  //
+  // Dua hal yang sengaja dijaga: (1) browser memblokir audio sebelum ada sentuhan pengguna,
+  // jadi kegagalan di sini normal dan ditelan diam-diam - splash tetap jalan tanpa suara;
+  // (2) preferensi murid dihormati, kalau suara dimatikan nada ini tidak berbunyi.
+  function playChime(env) {
+    try {
+      var prefs = env && env.__getFiezelState && env.__getFiezelState();
+      prefs = prefs && prefs.preferences;
+      if (prefs && prefs.feedbackSounds === false && prefs.soundtrack === false) return false;
+      var Ctx = env.AudioContext || env.webkitAudioContext;
+      if (!Ctx) return false;
+      var ctx = new Ctx();
+      if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume();
+
+      var t0 = ctx.currentTime + 0.05;
+      var master = ctx.createGain();
+      master.gain.value = 0.30;
+      master.connect(ctx.destination);
+
+      // Satu nada bel: dasar + harmonik oktaf yang lebih pelan dan lebih cepat hilang.
+      function bell(freq, at, dur) {
+        [[freq, 1.0, dur], [freq * 2, 0.28, dur * 0.55]].forEach(function (p) {
+          var osc = ctx.createOscillator(), g = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(p[0], t0 + at);
+          g.gain.setValueAtTime(0.0001, t0 + at);
+          g.gain.exponentialRampToValueAtTime(p[1], t0 + at + 0.012); // serangan tajam
+          g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + p[2]); // luruh panjang
+          osc.connect(g); g.connect(master);
+          osc.start(t0 + at); osc.stop(t0 + at + p[2] + 0.02);
+        });
+      }
+
+      bell(349.23, 0.00, 0.62); // F4
+      bell(523.25, 0.15, 0.78); // C5 - kuint naik, nada penutup dibiarkan lebih panjang
+
+      if (typeof env.setTimeout === 'function') {
+        env.setTimeout(function () { try { ctx.close(); } catch (_) {} }, 1400);
+      }
+      return true;
+    } catch (_) { return false; }
+  }
 
   function dayKey(now) {
     // Hari WIB, sama seperti modul perjalanan belajar, supaya "sekali sehari" berarti hal yang
@@ -62,21 +135,15 @@
     } catch (_) { return false; }
   }
 
-  function markup(env, options) {
-    var mascot = env && env.FiezelMascot;
-    // Logo dan maskot keduanya karya asli; teks wordmark hanya dipakai bila gambarnya belum
-    // tersedia, supaya splash tidak pernah kosong.
-    var logo = mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: 'mark', width: 64, decorative: true, className: 'fiezel-star' }) : '';
-    var figure = mascot && typeof mascot.markup === 'function'
-      ? mascot.markup({ pose: 'hero', width: (options && options.width) || 220, decorative: true })
-      : '';
-    return '<div class="fiezel-splash-body">'
-      + '<p class="fiezel-splash-word">' + logo + COPY.word + '</p>'
+  // m025-80 OWNER: maskot dikeluarkan dari splash. Yang tampil sekarang hanya logo yang
+  // dianimasikan, wordmark, dan tagline - satu bidang gelap yang tenang, seperti pembuka
+  // aplikasi kelas atas. Gelembung ucapan dan tombol ajakan ikut dilepas: splash menutup
+  // dirinya sendiri, jadi tidak ada yang perlu ditekan.
+  function markup() {
+    return '<div class="fiezel-splash-body fiezel-splash-brand">'
+      + '<div class="fiezel-logo-stage">' + logoMarkup() + '</div>'
+      + '<p class="fiezel-splash-word">' + COPY.word + '</p>'
       + '<p class="fiezel-splash-tag">' + COPY.tagline + '</p>'
-      + '<div class="fiezel-stage-art">' + figure + '</div>'
-      + '<div class="fiezel-splash-bubble">' + COPY.bubble + '</div>'
-      + '<button type="button" class="fiezel-btn fiezel-btn-primary" data-splash-cta>' + COPY.cta + '</button>'
       + '</div>';
   }
 
@@ -90,15 +157,22 @@
     var now = Number(opts.now) || Date.now();
     var doc = target.document;
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
-    if (!target.FiezelMascot) return { shown: false, reason: 'mascot_unavailable' };
+    // m025-80: syarat FiezelMascot dilepas - splash tidak lagi memakai maskot, jadi modul
+    // yang belum siap tidak boleh lagi membatalkan sapaan pembuka.
     if (opts.force !== true && seenToday(target, now)) return { shown: false, reason: 'seen_today' };
 
     var host = doc.createElement('div');
-    host.className = 'fiezel-splash';
+    // Bidang gelap dipasang di HOST, bukan hanya di anaknya: host punya padding-top untuk
+    // safe-area, dan tanpa ini warna cream bawaan splash lama menyembul sebagai pita di
+    // tepi atas layar.
+    host.className = 'fiezel-splash fiezel-splash-dark';
     if (prefersReducedMotion(target)) host.className += ' fiezel-splash-still';
     host.setAttribute('role', 'dialog');
     host.setAttribute('aria-label', 'Selamat datang di FIEZEL');
-    host.innerHTML = markup(target, opts);
+    host.innerHTML = markup();
+    // Nada pembuka menyusul animasi logo. Kurangi-gerak juga berarti kurangi kejutan, jadi
+    // saat modus itu aktif splash tampil diam tanpa bunyi.
+    if (!prefersReducedMotion(target) && opts.silent !== true) playChime(target);
 
     var closed = false;
     var timer = null;
