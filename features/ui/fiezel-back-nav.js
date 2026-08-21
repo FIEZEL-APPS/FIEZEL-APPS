@@ -1,5 +1,5 @@
 /**
- * FIEZEL — gestur dan tombol "kembali" (m025-85).
+ * FIEZEL — gestur dan tombol "kembali" (m025-84).
  *
  * OWNER: "tidak ada sistem swipe back, misalnya dari menu terus menuju ke fitur audiobook,
  * ketika ingin kembali dan swipe back, itu tidak berfungsi."
