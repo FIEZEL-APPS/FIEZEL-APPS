@@ -203,7 +203,9 @@ test('CSS kritis adalah salinan APA ADANYA dari style.css, bukan desain kedua ya
   const compactCritical = squeeze(critical);
   const compactCss = cssNorm(css);
   // Setiap aturan splash yang disalin harus masih ada persis seperti itu di style.css.
-  const rules = critical.split('\n').map(x => x.trim()).filter(Boolean)
+  // Komentar dan aturan khusus-boot bukan salinan dari style.css, jadi tidak dibandingkan.
+  const rules = critical.replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n').map(x => x.trim()).filter(Boolean)
     .filter(x => !x.startsWith('html.fz-booting') && !x.startsWith('#fiezelBootSplash'));
   assert.ok(rules.length >= 25, 'salinan kritis harus mencakup seluruh koreografi splash, bukan sepotong');
   const drifted = rules.filter(rule => !compactCss.includes(cssNorm(rule)));
@@ -234,7 +236,10 @@ test('jaring pengaman: splash tidak bisa mengurung murid kalau boot gagal', () =
 
 test('splash yang diadopsi memakai SISA waktu, bukan 2,6 detik penuh di atas lamanya boot', () => {
   assert.ok(/window\.__fiezelBootSplashAt = startedAt;/.test(html), 'frame pertama harus mencatat stempel waktunya');
-  const env = fakeEnv({ bootSplash: true, bootElapsedMs: 2400 });
+  // Diturunkan dari konstantanya, bukan angka tetap: durasi tayang naik pada m025-88 dan
+  // angka tetap membuat tes ini menguji hal lain tanpa ada yang sadar.
+  const bootLebihLamaDariSisa = splash.VISIBLE_MS - splash.MIN_TAIL_MS + 600;
+  const env = fakeEnv({ bootSplash: true, bootElapsedMs: bootLebihLamaDariSisa });
   const shown = splash.show(env, { now: NOW, force: true, silent: true });
   assert.strictEqual(shown.shown, true);
   assert.strictEqual(shown.adopted, true, 'splash harus mengadopsi elemen frame-pertama, bukan membuat yang kedua');
