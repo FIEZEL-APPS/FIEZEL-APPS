@@ -100,7 +100,13 @@ setTimeout(() => {
     assert.ok(/Cakupan target/i.test(markup));
     // Keduanya harus muncul sebagai kolom sendiri-sendiri, bukan satu angka gabungan.
     assert.ok(markup.indexOf('60%') !== -1, 'skor latihan listening');
-    assert.ok(/2 dari 36 materi/.test(markup), 'cakupan memakai penyebut bank soal');
+    // m025-108: bank listening diperluas jadi 436, jadi penyebutnya ikut. Yang dijaga
+    // adalah cakupan memakai penyebut bank yang SEBENARNYA, bukan angka tetap - dan
+    // angkanya diambil dari config supaya tes ini tidak ikut basi tiap kali bank tumbuh.
+    const bankCounts = require('./features/speaking-listening/speaking-listening-config.js').bankCounts
+      || (globalThis.FIEZEL_SPEAKING_LISTENING_CONFIG || {}).bankCounts;
+    assert.ok(new RegExp('2 dari ' + bankCounts.listening + ' materi').test(markup),
+      'cakupan memakai penyebut bank soal');
   });
 
   test('yang belum dapat diukur disebut namanya, bukan disembunyikan', () => {
