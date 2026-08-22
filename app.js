@@ -899,6 +899,32 @@ function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div></div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
 function stat(a,b){return `<small>${a}</small><strong>${b}</strong>`}
+// m025-99 (brief redesign 3.7, OWNER mengirim tangkapan layarnya). Dua hal salah sekaligus
+// di kartu AI Coach pada Home, dan keduanya kelalaian m025-97:
+//
+// 1. MARKDOWN MENTAH MASIH TAMPIL DI SINI. m025-97 memasang penerjemah di renderAIResult()
+//    dan renderCoachResult() dengan klaim "seluruh permukaan AI mengalir lewat dua fungsi".
+//    Klaim itu keliru: kartu Home mencetak teks AI langsung lewat esc(), jadi murid membaca
+//    "**A1**" dan "**collect_more_evidence**" apa adanya. Ini permukaan ketiga.
+//
+// 2. SELURUH ANALISIS DITUMPAHKAN UTUH. Brief 3.7 memintanya sebagai ringkasan 2-3 kalimat
+//    dengan detail di balik satu ketukan - dan jalan detail itu sudah ada sejak lama, tombol
+//    "Buka analisis personal" tepat di bawahnya. Yang tampil justru satu paragraf penuh
+//    istilah mesin ("deterministic policy mode", "collect_more_evidence") yang memenuhi
+//    layar lalu terpotong di tengah kalimat.
+//
+// Ringkasannya memotong pada BATAS KALIMAT, bukan pada jumlah karakter: memotong di tengah
+// kata adalah persis kesan "terpotong" yang sedang diperbaiki. Kalau teksnya tidak punya
+// tanda akhir kalimat sama sekali, barulah panjangnya dibatasi - dengan elipsis, supaya
+// terbaca sebagai ringkasan, bukan sebagai kegagalan.
+function coachSummary(text,maxSentences=2){
+  const clean=String(text??'').replace(/\s+/g,' ').trim();
+  if(!clean)return '';
+  const parts=clean.match(/[^.!?]+[.!?]+/g);
+  if(!parts||!parts.length)return clean.length>200?clean.slice(0,197).trimEnd()+'…':clean;
+  const picked=parts.slice(0,maxSentences).join('').trim();
+  return picked||clean;
+}
 function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=state.placementDone?snapshot.estimatedLevel:'A1',mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),coachText=state.coachCache?.text||signal.text,primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
@@ -913,7 +939,7 @@ function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolic
     <div class="coach-head"><span class="coach-icon"><i data-lucide="brain-circuit"></i></span><div><small>FIEZEL AI COACH</small><b>${state.adaptiveReady?'Profil aktif':'Mengumpulkan bukti'}</b></div></div>
     <div class="coach-level"><span>${state.adaptiveReady?'CORE PLAN · '+esc(policy.mode.toUpperCase()):'Estimated level'}</span><strong>${state.adaptiveReady?policy.sessionSize+' soal':esc(level)}</strong></div>
     <h2>${esc(signal.title)}</h2>
-    <p>${esc(coachText)}</p>
+    <div class="coach-body">${renderMarkdown(coachSummary(coachText))}</div>
     <button class="coach-link" onclick="askCoachAI()">Buka analisis personal <i data-lucide="arrow-right"></i></button>
   </aside>
 </div>
