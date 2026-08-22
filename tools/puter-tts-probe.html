@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIEZEL — Probe Puter TTS</title>
+<!--
+  Alat diagnosa sekali pakai, DI LUAR shell PWA (sengaja tidak masuk sw.js precache).
+
+  Tujuannya satu: menjawab pertanyaan yang tidak bisa dijawab dari sandbox CI, karena
+  js.puter.com diblokir di sana. Yaitu:
+
+    1. Apakah puter.ai.txt2speech benar-benar ada di SDK v2?
+    2. Bentuk apa yang dikembalikannya - <audio>, Blob, atau URL?
+    3. Suara/engine apa saja yang benar-benar jalan untuk en-US dan id-ID?
+    4. Berapa latensi sampai bunyi pertama terdengar?
+    5. Bagaimana kualitasnya di telinga OWNER, memakai kalimat asli reading-bank?
+
+  Jawaban dari halaman ini yang menentukan apakah jalur Puter layak menggantikan
+  Kokoro lokal. Jangan bangun apa pun di atas tebakan sebelum ini dijalankan.
+
+  Cara pakai: sajikan lewat http (bukan file://), karena SDK Puter butuh origin nyata.
+      npx serve .     lalu buka /tools/puter-tts-probe.html
+-->
+<style>
+  :root{--bg:#fdf6f5;--ink:#2b2b2b;--muted:#6b6b6b;--line:#e6dcd9;--ok:#1a7f4b;--bad:#b3261e;--card:#fff}
+  @media (prefers-color-scheme:dark){:root{--bg:#1a1618;--ink:#f0e9e7;--muted:#a49c99;--line:#3a3234;--card:#241f21}}
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;background:var(--bg);color:var(--ink);
+       font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  main{max-width:860px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  p.sub{color:var(--muted);margin:0 0 24px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;
+          padding:16px;margin-bottom:16px}
+  h2{font-size:15px;margin:0 0 12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  button{font:inherit;padding:9px 16px;border-radius:8px;border:1px solid var(--line);
+         background:var(--ink);color:var(--bg);cursor:pointer;margin:0 8px 8px 0}
+  button.ghost{background:transparent;color:var(--ink)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  input,select,textarea{font:inherit;padding:8px;border-radius:8px;border:1px solid var(--line);
+        background:var(--bg);color:var(--ink);width:100%;margin-bottom:8px}
+  pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);
+      border-radius:8px;padding:12px;font-size:13px;max-height:340px;overflow:auto;margin:0}
+  .ok{color:var(--ok);font-weight:600}
+  .bad{color:var(--bad);font-weight:600}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .row>*{flex:1;min-width:160px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+</style>
+</head>
+<body>
+<main>
+  <h1>Probe Puter TTS</h1>
+  <p class="sub">Menjawab: apakah Puter bisa menggantikan Kokoro lokal di FIEZEL?</p>
+
+  <section>
+    <h2>1 · SDK &amp; Login</h2>
+    <div class="row">
+      <button id="btnInspect">Periksa SDK</button>
+      <button id="btnLogin" class="ghost">Login Puter</button>
+    </div>
+    <pre id="outSdk">Klik "Periksa SDK" untuk mulai.</pre>
+  </section>
+
+  <section>
+    <h2>2 · Ucapkan satu kalimat</h2>
+    <textarea id="txt" rows="2">Maya led a small study of urban gardening at a neighborhood repair studio.</textarea>
+    <div class="row">
+      <select id="lang">
+        <option value="en-US">en-US (Inggris — suara utama FIEZEL)</option>
+        <option value="id-ID">id-ID (Indonesia — suara tutor)</option>
+        <option value="en-GB">en-GB</option>
+        <option value="en-AU">en-AU</option>
+      </select>
+      <select id="engine">
+        <option value="neural">engine: neural</option>
+        <option value="generative">engine: generative</option>
+        <option value="standard">engine: standard</option>
+        <option value="">engine: (tidak dikirim)</option>
+      </select>
+      <button id="btnSpeak">Ucapkan</button>
+    </div>
+    <pre id="outSpeak">—</pre>
+  </section>
+
+  <section>
+    <h2>3 · Sapu semua kombinasi</h2>
+    <p class="sub" style="margin:0 0 10px">
+      Mencoba tiap bahasa × tiap engine dengan kalimat pendek, lalu melaporkan mana yang hidup
+      dan berapa latensinya. Ini yang menentukan apakah <code>sherpa-vits-id</code> (91 MB) bisa dibuang.
+    </p>
+    <button id="btnSweep">Jalankan sapuan</button>
+    <div id="outSweep"></div>
+  </section>
+
+  <section>
+    <h2>4 · Uji telinga: 5 kalimat berurutan</h2>
+    <p class="sub" style="margin:0 0 10px">
+      Kalimat asli dari <code>reading-bank.json</code>, diputar berurutan seperti saat belajar.
+      Dengarkan khusus <strong>akhir kalimat</strong> dan <strong>sambungan antar kalimat</strong> —
+      dua tempat itulah Kokoro sekarang pecah.
+    </p>
+    <button id="btnEar">Putar 5 kalimat</button>
+    <pre id="outEar">—</pre>
+  </section>
+</main>
+
+<script async src="https://js.puter.com/v2/"></script>
+<script>
+(function(){
+  'use strict';
+
+  var SAMPLES = [
+    'Maya led a small study of urban gardening at a neighborhood repair studio.',
+    'During the first review, the team measured reliability under two conditions.',
+    'The project began with access, because earlier observations suggested that timing might affect it.',
+    'What did the team measure during the first review?',
+    'Well done. You finished this passage.'
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  function show(el, text, cls){
+    el.textContent = text;
+    el.className = cls || '';
+  }
+
+  /** SDK datang async; setiap pemakai menunggu, tidak menebak. Pola yang sama dipakai
+      fiezel-puter-ready.js di aplikasi utama. */
+  function waitForPuter(timeoutMs){
+    return new Promise(function(resolve, reject){
+      var deadline = Date.now() + (timeoutMs || 15000);
+      (function poll(){
+        if (window.puter) return resolve(window.puter);
+        if (Date.now() > deadline) return reject(new Error('SDK Puter tidak termuat dalam 15 detik — cek koneksi atau pemblokir iklan.'));
+        setTimeout(poll, 120);
+      })();
+    });
+  }
+
+  /* ---- 1. Inspeksi SDK ------------------------------------------------ */
+
+  $('btnInspect').onclick = function(){
+    var out = $('outSdk');
+    show(out, 'Menunggu SDK…');
+    waitForPuter().then(function(p){
+      var ai = p.ai || {};
+      var lines = [];
+      lines.push('puter          : ADA');
+      lines.push('puter.ai       : ' + (p.ai ? 'ADA' : 'TIDAK ADA'));
+      lines.push('puter.ai.txt2speech : ' + (typeof ai.txt2speech === 'function' ? 'ADA (fungsi)' : 'TIDAK ADA  <-- penentu'));
+      lines.push('');
+      lines.push('Semua metode di puter.ai:');
+      lines.push('  ' + Object.keys(ai).sort().join(', '));
+      lines.push('');
+      var authed = false;
+      try { authed = !!(p.auth && p.auth.isSignedIn && p.auth.isSignedIn()); } catch(e){}
+      lines.push('Status login  : ' + (authed ? 'SUDAH login' : 'BELUM login (klik Login Puter)'));
+      show(out, lines.join('\n'), typeof ai.txt2speech === 'function' ? 'ok' : 'bad');
+    }).catch(function(e){ show(out, 'GAGAL: ' + e.message, 'bad'); });
+  };
+
+  $('btnLogin').onclick = function(){
+    var out = $('outSdk');
+    waitForPuter().then(function(p){
+      return p.auth.signIn();
+    }).then(function(){
+      show(out, 'Login berhasil. Klik "Periksa SDK" lagi untuk memastikan.', 'ok');
+    }).catch(function(e){ show(out, 'Login gagal: ' + e.message, 'bad'); });
+  };
+
+  /* ---- pemutar ---------------------------------------------------------
+     Bentuk kembalian txt2speech belum pasti (itu salah satu yang diprobe),
+     jadi tangani ketiga kemungkinan dan LAPORKAN yang mana yang datang. */
+
+  function describeResult(r){
+    if (!r) return 'null/undefined';
+    if (r instanceof HTMLAudioElement) return 'HTMLAudioElement';
+    if (typeof Blob !== 'undefined' && r instanceof Blob) return 'Blob (' + r.type + ', ' + r.size + ' byte)';
+    if (typeof r === 'string') return 'string/URL';
+    return typeof r + ' — kunci: ' + Object.keys(r).join(',');
+  }
+
+  function toAudio(r){
+    if (r instanceof HTMLAudioElement) return r;
+    if (typeof Blob !== 'undefined' && r instanceof Blob) return new Audio(URL.createObjectURL(r));
+    if (typeof r === 'string') return new Audio(r);
+    return null;
+  }
+
+  function playAndWait(audio){
+    return new Promise(function(resolve, reject){
+      audio.onended = function(){ resolve(); };
+      audio.onerror = function(){ reject(new Error('pemutaran gagal')); };
+      var p = audio.play();
+      if (p && p.catch) p.catch(reject);
+    });
+  }
+
+  function speak(text, lang, engine){
+    var opts = { language: lang };
+    if (engine) opts.engine = engine;
+    return waitForPuter().then(function(p){
+      if (typeof p.ai.txt2speech !== 'function') throw new Error('puter.ai.txt2speech tidak tersedia di SDK ini');
+      var t0 = performance.now();
+      return p.ai.txt2speech(text, opts).then(function(r){
+        return { result: r, ms: Math.round(performance.now() - t0) };
+      });
+    });
+  }
+
+  /* ---- 2. Satu kalimat ------------------------------------------------ */
+
+  $('btnSpeak').onclick = function(){
+    var out = $('outSpeak');
+    var btn = this;
+    btn.disabled = true;
+    show(out, 'Merender…');
+    speak($('txt').value, $('lang').value, $('engine').value).then(function(res){
+      var audio = toAudio(res.result);
+      var info = 'OK dalam ' + res.ms + ' ms\nBentuk kembalian: ' + describeResult(res.result);
+      if (!audio) { show(out, info + '\nTIDAK bisa diputar — bentuk tak dikenal.', 'bad'); return; }
+      show(out, info + '\nMemutar…', 'ok');
+      return playAndWait(audio).then(function(){
+        show(out, info + '\nSelesai diputar.', 'ok');
+      });
+    }).catch(function(e){
+      show(out, 'GAGAL: ' + e.message, 'bad');
+    }).then(function(){ btn.disabled = false; });
+  };
+
+  /* ---- 3. Sapuan ------------------------------------------------------ */
+
+  $('btnSweep').onclick = function(){
+    var langs = ['en-US','en-GB','en-AU','id-ID'];
+    var engines = ['neural','generative','standard'];
+    var host = $('outSweep');
+    var btn = this;
+    btn.disabled = true;
+    host.innerHTML = '<pre>Menyapu ' + (langs.length*engines.length) + ' kombinasi… ini butuh waktu.</pre>';
+
+    var rows = [];
+    var jobs = [];
+    langs.forEach(function(l){ engines.forEach(function(e){ jobs.push([l,e]); }); });
+
+    // Berurutan, bukan paralel: menghindari rate-limit yang bikin hasil palsu-gagal.
+    var i = 0;
+    (function next(){
+      if (i >= jobs.length) {
+        var html = '<table><tr><th>Bahasa</th><th>Engine</th><th>Hasil</th><th>Latensi</th></tr>';
+        rows.forEach(function(r){
+          html += '<tr><td>'+r.lang+'</td><td>'+r.engine+'</td>'
+               +  '<td class="'+(r.ok?'ok':'bad')+'">'+(r.ok?'HIDUP':'gagal')+'</td>'
+               +  '<td>'+(r.ok? r.ms+' ms' : r.err)+'</td></tr>';
+        });
+        html += '</table>';
+        host.innerHTML = html;
+        btn.disabled = false;
+        return;
+      }
+      var job = jobs[i++];
+      host.querySelector('pre') && (host.querySelector('pre').textContent =
+        'Menguji ' + job[0] + ' / ' + job[1] + '  (' + i + ' dari ' + jobs.length + ')…');
+      speak('Hello, this is a test.', job[0], job[1]).then(function(res){
+        rows.push({ lang: job[0], engine: job[1], ok: true, ms: res.ms });
+      }).catch(function(e){
+        rows.push({ lang: job[0], engine: job[1], ok: false, err: String(e.message).slice(0,80) });
+      }).then(next);
+    })();
+  };
+
+  /* ---- 4. Uji telinga -------------------------------------------------- */
+
+  $('btnEar').onclick = function(){
+    var out = $('outEar');
+    var btn = this;
+    btn.disabled = true;
+    var lang = $('lang').value, engine = $('engine').value;
+    var log = [];
+    var i = 0;
+
+    (function next(){
+      if (i >= SAMPLES.length) {
+        log.push('');
+        log.push('Selesai. Pertanyaannya: apakah akhir kalimat bersih, dan apakah');
+        log.push('jeda antar kalimat terdengar wajar?');
+        show(out, log.join('\n'), 'ok');
+        btn.disabled = false;
+        return;
+      }
+      var s = SAMPLES[i++];
+      log.push('[' + i + '/' + SAMPLES.length + '] ' + s.slice(0,60) + '…');
+      show(out, log.join('\n'));
+      speak(s, lang, engine).then(function(res){
+        log[log.length-1] += '  (' + res.ms + ' ms)';
+        var audio = toAudio(res.result);
+        if (!audio) throw new Error('bentuk kembalian tak bisa diputar');
+        return playAndWait(audio);
+      }).then(next).catch(function(e){
+        log.push('   GAGAL: ' + e.message);
+        show(out, log.join('\n'), 'bad');
+        btn.disabled = false;
+      });
+    })();
+  };
+})();
+</script>
+</body>
+</html>
