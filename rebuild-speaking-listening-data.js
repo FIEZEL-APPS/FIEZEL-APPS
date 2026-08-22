@@ -50,7 +50,10 @@ const sampleRepairs={
 // Susunannya sepenuhnya deterministik: tidak ada pengacakan, sehingga rebuild kedua
 // menghasilkan berkas yang sama persis.
 const listeningGenerate=require(path.join(feature,'listening-generate.js'));
-const listeningSources=Object.assign({},require(path.join(feature,'listening-source-a1-a2.js')));
+const listeningSources=Object.assign({},
+  require(path.join(feature,'listening-source-a1-a2.js')),
+  require(path.join(feature,'listening-source-b1-b2.js')),
+  require(path.join(feature,'listening-source-c1-c2.js')));
 const seedItems=listening.items.filter(item=>!String(item.id||'').startsWith('listen_gen_'));
 const generatedItems=Object.keys(listeningSources).sort().reduce(
   (acc,level)=>acc.concat(listeningGenerate.buildLevel(level,listeningSources[level])),[]);
