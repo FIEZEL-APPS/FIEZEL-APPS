@@ -230,6 +230,70 @@ test('modul koreografi dimuat sebelum yang membacanya', () => {
   assert.ok(sw.includes("'./features/brand/fiezel-choreography.js'"), 'koreografi harus masuk precache');
 });
 
+/* ---------------- m025-90: bunyi yang benar-benar sampai ke telinga ---------------- */
+
+// OWNER: "sfx nya tetap tidak ada bunyi", masih terjadi setelah m025-88 melepas gerbang
+// kurangi-gerak. Mesinnya memang sudah berbunyi; yang tidak ada adalah yang memanggilnya.
+// Gate berikut menjaga bahwa setiap suara yang disintesis benar-benar punya jalan ke telinga,
+// dan bahwa satu sentuhan tidak pernah menghasilkan dua bunyi bertumpuk.
+
+test('setiap suara yang disintesis benar-benar dipakai - tidak ada suara mati', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const sfxSrc = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  const reachable = new Set();
+  for (const m of app.matchAll(/uiSfx\('([a-z]+)'\)/g)) reachable.add(m[1]);
+  // Suara yang dipilih otomatis oleh pendengar terpasang juga terhitung sampai ke telinga.
+  for (const m of sfxSrc.matchAll(/return '([a-z]+)';/g)) if (sfx.VOICES[m[1]]) reachable.add(m[1]);
+  const dead = sfx.names().filter(n => !reachable.has(n));
+  assert.deepStrictEqual(dead, [],
+    'suara ini disintesis tapi tidak pernah dibunyikan dari mana pun: ' + dead.join(', '));
+});
+
+test('kontrol biasa mendapat ketukan, kontrol yang sudah bersuara sendiri dilewati', () => {
+  const el = (tag, attrs) => ({
+    nodeType: 1, tagName: tag, className: (attrs && attrs.cls) || '', parentNode: null,
+    getAttribute: k => (attrs && attrs[k] !== undefined ? attrs[k] : null)
+  });
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', {})), 'tap',
+    'tombol biasa harus berbunyi - inilah 27 dari 43 kontrol Home yang dulu diam');
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', { onclick: "go('vocab')" })), null,
+    'navigasi sudah membunyikan nav dua nada; ketukan di sini akan menggantikannya');
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', { cls: 'nav active' })), null,
+    'tombol navigasi bawah dikenali lewat kelasnya juga');
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', { onclick: 'openSettings()' })), null,
+    'pembuka dialog sudah membunyikan open');
+  assert.strictEqual(sfx.voiceForTarget(el('INPUT', { type: 'checkbox' })), 'toggle');
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', { cls: 'fiezel-level-chip' })), 'toggle',
+    'pilihan yang menyala/mati terdengar sebagai sakelar');
+  assert.strictEqual(sfx.voiceForTarget(el('DIV', {})), null, 'bidang biasa tidak berbunyi');
+  assert.strictEqual(sfx.voiceForTarget(el('BUTTON', { 'data-sfx': 'celebrate' })), 'celebrate',
+    'data-sfx boleh menimpa pilihan otomatis');
+});
+
+test('satu sentuhan menghasilkan satu bunyi, bukan dua yang bertumpuk', () => {
+  const src = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  assert.ok(/var MIN_GAP_MS = \d+;/.test(src), 'jeda minimum antarbunyi harus ada');
+  assert.ok(/now\(\) - lastVoiceAt < MIN_GAP_MS/.test(src),
+    'play() harus menolak bunyi kedua yang datang terlalu rapat');
+  assert.ok(src.indexOf("addEventListener('pointerdown'") > 0 && /}, true\);/.test(src),
+    'pendengar terpasang harus di fase capture supaya tombol pertama pun berbunyi');
+});
+
+test('sesi audio iOS diklaim sebagai playback, bukan ambient', () => {
+  const src = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  assert.ok(/navigator && env\.navigator\.audioSession/.test(src),
+    'tanpa ini Web Audio di iOS memakai sesi ambient dan ikut dibungkam saklar senyap');
+  assert.ok(/session\.type = 'playback'/.test(src));
+  assert.ok(src.indexOf('claimAudioSession(env);') < src.indexOf('if (ctx) {'),
+    'kategori sesi harus diklaim SEBELUM konteks pertama dibuat');
+});
+
+test('pendengar bunyi dipasang saat boot', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.ok(/function installUiSfx\(\)/.test(app), 'pemasang harus ada');
+  assert.ok(/installUiSfx\(\);/.test(app), 'dan benar-benar dipanggil, bukan hanya didefinisikan');
+});
+
 process.on('exit', () => {
   if (failures) {
     console.error('FIEZEL m025-86 koreografi splash: FAIL (' + failures + ')');

@@ -1471,6 +1471,9 @@ function finishQuiz(cfg,score,total){
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
   if(cfg.placement){state.level=accuracy<35?1:accuracy<50?2:accuracy<65?3:accuracy<78?4:accuracy<90?5:6;state.placementDone=true}
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
+  // m025-90: akor merek penuh di satu-satunya tempat yang memang layak merayakan. Suara
+  // `celebrate` sudah disintesis sejak m025-86 tetapi tidak pernah dipanggil dari mana pun.
+  uiSfx('celebrate');
   const outcomeLine=outcome?`<p class="muted">Core menilai strategi sesi ini: <b>${esc(outcome.status)}</b> · outcome score ${Math.round(outcome.score)}/100. ${outcome.status==='positive'?'Strategi ini layak dipertahankan atau dinaikkan pelan-pelan.':outcome.status==='negative'?'Sesi berikutnya akan diperingan atau diturunkan difficulty-nya.':'Core akan pakai hasil ini sebagai evidence untuk policy berikutnya.'}</p>`:'<p class="muted">Progres sudah masuk ke profil skill dan latihan adaptif berikutnya.</p>';
   setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="score">${accuracy}%</div><p>${score} dari ${total} jawaban benar.</p>${outcomeLine}<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi kuat. Profil skill diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
@@ -1592,6 +1595,11 @@ let modalEpoch=0,aiRequestSeq=0,modalCloseTimer=null,modalOpen=false;
 // m025-80 OWNER: SFX transisi antarmuka. Dibungkus supaya modul yang belum termuat atau
 // audio yang diblokir browser tidak pernah bisa menjatuhkan navigasi.
 function uiSfx(name){try{return self.FiezelUiSfx?.play?.(name,self)===true}catch{return false}}
+// m025-90: menyalakan bunyi untuk seluruh kontrol lewat satu pendengar di modul SFX.
+// Sampai rilis ini hanya go(), openModal(), dan closeModalNow() yang berbunyi - dihitung di
+// layar Home saja, 27 dari 43 kontrol yang bisa disentuh tidak mengeluarkan bunyi apa pun,
+// dan tiga dari enam suara yang sudah disintesis tidak pernah dipanggil dari mana pun.
+function installUiSfx(){try{return self.FiezelUiSfx?.install?.(self)===true}catch{return false}}
 // m025-84: modal adalah lapisan DI ATAS view, jadi ia mendapat entri riwayatnya sendiri dan
 // tekanan kembali menutupnya lebih dulu, baru sesudahnya memindahkan view. Hanya modal yang
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
@@ -1708,6 +1716,7 @@ function installBackNav(){
   }catch{return null}
 }
 installBackNav();
+installUiSfx();
 // m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
 // galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
 // hanya melihat layar sambutan yang menggantung selamanya.

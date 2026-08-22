@@ -132,6 +132,11 @@
   // audio lewat resume() yang asinkron; menjadwalkan hasilnya setelah jeda ini berarti bunyi
   // yang tidak lagi menyertai apa pun.
   var GESTURE_GRACE_MS = 350;
+  // Satu sentuhan = satu bunyi. Tanpa jeda ini, tombol yang memicu dua jalur sekaligus
+  // (mis. tombol yang membuka dialog: ketukan + transisi buka) berbunyi dua kali dan
+  // terdengar seperti kesalahan, bukan umpan balik.
+  var MIN_GAP_MS = 110;
+  var lastVoiceAt = 0;
   var DEFAULT_MOTIF_WINDOW_MS = 2600;
 
   function preferencesAllow(env) {
@@ -150,8 +155,29 @@
     } catch (_) { return false; }
   }
 
+  /**
+   * iOS 16.4+ (termasuk iOS 26) memberi halaman kendali atas KATEGORI sesi audionya.
+   * Bawaannya untuk Web Audio adalah sesi "ambient": ia ikut dibungkam saklar senyap fisik,
+   * dan ia mengalah pada audio aplikasi lain. Aplikasi belajar yang seluruh isinya bunyi -
+   * suara neural, umpan balik jawaban, sapaan merek - bukan audio latar; ia "playback".
+   *
+   * Dipasang sekali, sebelum konteks pertama dibuat, dan kegagalannya ditelan: peramban yang
+   * belum punya API ini tidak boleh membuat seluruh SFX gagal.
+   */
+  var audioSessionSet = false;
+  function claimAudioSession(env) {
+    if (audioSessionSet) return false;
+    audioSessionSet = true;
+    try {
+      var session = env && env.navigator && env.navigator.audioSession;
+      if (session && typeof session.type === 'string') { session.type = 'playback'; return true; }
+    } catch (_) { /* kategori sesi bukan syarat berbunyi, hanya syarat terdengar di iOS */ }
+    return false;
+  }
+
   function ensureContext(env) {
     try {
+      claimAudioSession(env);
       if (ctx) {
         if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume();
         return true;
@@ -458,9 +484,12 @@
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
     var voice = VOICES[name];
     if (!voice) return false;
-    // Kurangi-gerak adalah permintaan untuk lebih sedikit kejutan sensorik; bunyi transisi
-    // termasuk di dalamnya.
     if (!ready(target, false)) return false;
+    // Satu sentuhan, satu bunyi. Pemasangan otomatis di install() membunyikan ketukan pada
+    // pointerdown, sementara go()/openModal() membunyikan transisinya beberapa milidetik
+    // kemudian; tanpa jeda ini keduanya terdengar bertumpuk.
+    if (now() - lastVoiceAt < MIN_GAP_MS) return false;
+    lastVoiceAt = now();
     // OWNER: "sfx saat menekan tombol itu terlalu keras, turunkan 70%". Level lama 0.34
     // dikali 0.3 (turun 70%, sisa 30%) - motif pembuka splash TIDAK ikut turun, sebab
     // keluhannya khusus soal SFX tekan tombol yang terus-menerus terdengar tiap ketukan,
@@ -516,6 +545,73 @@
     return false;
   }
 
+  /**
+   * Menyalakan bunyi untuk SELURUH kontrol aplikasi lewat satu pendengar.
+   *
+   * m025-90 OWNER: "sfx nya tetap tidak ada bunyi". Setelah m025-88 melepas kurangi-gerak,
+   * mesinnya memang berbunyi - tetapi hampir tidak ada yang memanggilnya. Dihitung di
+   * layar Home saja: 43 kontrol yang bisa disentuh, dan hanya 16 di antaranya melewati
+   * go()/openSettings() yang membunyikan sesuatu. 27 sisanya - kartu tujuan, tombol AI,
+   * pilihan jawaban, tombol perkenalan, "Nanti saja" - diam sepenuhnya. Tiga dari enam
+   * suara yang sudah disintesis di berkas ini (`tap`, `toggle`, `celebrate`) tidak pernah
+   * dipanggil dari satu baris pun di seluruh repo.
+   *
+   * Jawabannya bukan menempelkan uiSfx() ke seratus tempat - itu akan meleset lagi pada
+   * layar berikutnya yang ditulis. Satu pendengar pada fase CAPTURE di document memilih
+   * suaranya dari elemen yang disentuh, jadi kontrol yang dibuat besok ikut berbunyi tanpa
+   * ada yang perlu ingat memasangnya.
+   *
+   * Yang SENGAJA dilewati: kontrol yang jalur aksinya sudah membunyikan suaranya sendiri
+   * (navigasi lewat go(), pembuka dialog lewat openModal()). Melewatinya di sini menjaga
+   * suara yang lebih kaya - `nav` dua nada, `open` naik, `close` turun - tidak tergantikan
+   * oleh ketukan satu nada.
+   */
+  function voiceForTarget(node) {
+    try {
+      var el = node;
+      for (var hop = 0; el && hop < 4; hop++, el = el.parentNode) {
+        if (!el || el.nodeType !== 1) continue;
+        var explicit = el.getAttribute && el.getAttribute('data-sfx');
+        if (explicit) return VOICES[explicit] ? explicit : null;
+        var tag = String(el.tagName || '').toLowerCase();
+        if (tag === 'input') {
+          var type = String(el.getAttribute('type') || '').toLowerCase();
+          return (type === 'checkbox' || type === 'radio') ? 'toggle' : null;
+        }
+        if (tag === 'a' || tag === 'button' || el.getAttribute('role') === 'button') {
+          // Jalur yang sudah membunyikan suaranya sendiri di app.js dilewati di sini, supaya
+          // suara yang lebih kaya - `nav` dua nada, `open` naik, `close` turun - tidak
+          // tergantikan oleh ketukan satu nada.
+          var onclick = String((el.getAttribute && el.getAttribute('onclick')) || '');
+          if (onclick.indexOf('go(') >= 0 || onclick.indexOf('openSettings(') >= 0) return null;
+          var cls = ' ' + String(el.className || '') + ' ';
+          if (cls.indexOf(' nav ') >= 0) return null;
+          // Pilihan yang menyala/mati terdengar sebagai sakelar, bukan ketukan.
+          if (cls.indexOf('fiezel-level-chip') >= 0 || cls.indexOf('fiezel-goal-card') >= 0
+              || cls.indexOf('progress-tab') >= 0 || cls.indexOf('is-selected') >= 0) return 'toggle';
+          return 'tap';
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  var installed = false;
+  function install(env) {
+    if (installed) return false;
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var doc = target.document;
+    if (!doc || typeof doc.addEventListener !== 'function') return false;
+    installed = true;
+    doc.addEventListener('pointerdown', function (event) {
+      try {
+        var name = voiceForTarget(event && event.target);
+        if (name) play(name, target);
+      } catch (_) { /* bunyi tidak boleh menggagalkan sentuhan */ }
+    }, true);
+    return true;
+  }
+
   function setEnabled(v) { enabled = v !== false; return enabled; }
 
   return {
@@ -524,6 +620,8 @@
     VOICES: VOICES,
     names: function () { return Object.keys(VOICES); },
     play: play,
+    install: install,
+    voiceForTarget: voiceForTarget,
     playMotif: playMotif,
     cancelPending: cancelPending,
     diagnostics: diagnostics,
@@ -532,6 +630,6 @@
     setEnabled: setEnabled,
     isEnabled: function () { return enabled; },
     // Hanya untuk pengujian: mengembalikan modul ke keadaan sebelum konteks apa pun dibuat.
-    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; }
+    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; installed = false; audioSessionSet = false; lastVoiceAt = 0; }
   };
 });
