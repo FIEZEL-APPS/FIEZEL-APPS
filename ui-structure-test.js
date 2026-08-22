@@ -13,7 +13,15 @@ check((html.match(/data-lucide=/g)||[]).length>=9,'Core chrome must use the loca
 check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
 check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
 check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');
-check(html.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')<html.indexOf('./app.js')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('./app.js'),'Feature runtimes must load before app.js.');
+// Runtime fitur tetap DIDEKLARASIKAN sebelum app.js, dan itu masih penting: urutan tulis
+// di dokumen adalah urutan eksekusi baik untuk skrip ber-defer maupun untuk grup malas
+// (pemuat memakai async=false). Yang TIDAK lagi benar adalah "dimuat sebelum app.js":
+// tumpukan suara neural kini diambil setelah layar pertama tercat, lewat
+// type="fiezel/lazy". Karena itu pernyataannya dipecah menjadi dua yang masing-masing
+// benar - deklarasi mendahului app.js, dan yang malas benar-benar ditandai malas.
+check(html.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')<html.indexOf('<script defer src="./app.js">')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('<script defer src="./app.js">'),'Feature runtimes must be declared before app.js.');
+check(/<script type="fiezel\/lazy" data-fiezel-lazy="voice"[^>]*src="\.\/features\/neural-voice\/fiezel-neural-voice-bootstrap\.js"/.test(html),'Neural voice stack must be lazy, not parser-blocking.');
+check(html.includes('<script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>'),'Skills Lab runtime stays eager but deferred.');
 check(/id="globalSky"/.test(html)&&/id="globalCelestial"/.test(html)&&/\.global-sky/.test(css)&&/\.sky-light/.test(css),'Full-viewport celestial atmosphere is incomplete.');
 check(/grid-template-columns:minmax\(0,1\.42fr\)/.test(css),'Desktop launcher layout is missing.');
 check(/\.learning-launcher\{display:grid;grid-template-columns:repeat\(4,1fr\)/.test(css),'Desktop learning launcher must expose four feature cards.');
