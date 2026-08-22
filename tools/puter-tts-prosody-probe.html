@@ -5,33 +5,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FIEZEL — Probe Prosodi Puter TTS</title>
 <!--
-  Probe ronde 2. Ronde 1 (puter-tts-probe.html) sudah menjawab:
-      txt2speech ADA, cracking HILANG, id-ID GAGAL, tapi hasilnya DATAR TANPA PRODOSI.
+  Probe prosodi, revisi 2.
+  ================================================================================
+  Ronde 1 (puter-tts-probe.html): txt2speech ADA, cracking HILANG, id-ID GAGAL,
+  hasilnya bersih tetapi DATAR.
 
-  Datar itu bukan batas keras dari TTS jarak jauh - itu akibat memanggilnya dengan teks
-  telanjang di engine yang paling hemat. Ada tiga tuas yang belum disentuh, dan halaman
-  ini menguji ketiganya secara A/B supaya OWNER bisa MENDENGAR bedanya, bukan menebak:
+  Revisi 1 dijalankan OWNER dan gagal separuh: kandidat teks-telanjang berbunyi,
+  kedua kandidat SSML menggantung tanpa pernah selesai dan tanpa melempar error.
+  Dua kesimpulan, satu tentang Puter dan satu tentang probe ini sendiri:
 
-    1. ENGINE. Polly punya tingkatan ekspresi yang berbeda jauh, bukan sekadar beda
-       kualitas. Ini biasanya tuas terbesar - lebih besar daripada SSML.
-    2. SUARA. Antar suara dalam satu engine pun rentang ekspresinya berbeda jauh.
-    3. SSML. Teks telanjang tidak memberi model satu pun petunjuk di mana harus naik,
-       turun, atau berhenti. SSML memberi petunjuk itu secara eksplisit.
+    1. SSML tampaknya tidak dilayani lapisan Puter, dan cara gagalnya diam -
+       menggantung, bukan menolak. Jadi SSML tidak boleh jadi tumpuan rencana.
+    2. Probe revisi 1 memanggil txt2speech tanpa batas waktu. Satu panggilan yang
+       menggantung membekukan seluruh antrian, sehingga kandidat terakhir tidak
+       pernah kebagian giliran. Alat diagnosa yang bisa menggantung selamanya itu
+       cacat: yang tidak menjawab harus dinyatakan gagal, bukan ditunggu.
 
-  Tuas ke-3 tidak ditulis ulang di sini. SSML-nya dibangkitkan dari FiezelProsody yang
-  sudah ada di aplikasi - modul itu sudah tahu mana pertanyaan, mana klausa, dan berapa
-  jeda yang pantas, untuk en DAN id. Menyalin ulang logikanya berarti dua sumber
-  kebenaran yang akan berbeda diam-diam, persis penyakit yang sedang kita obati.
+  Revisi ini memasang batas waktu keras pada setiap panggilan, lalu menggeser
+  taruhannya ke dua tuas yang TIDAK bergantung pada SSML sama sekali:
 
-  Bagian id-ID terpisah: karena Puter tidak melayaninya, kandidatnya adalah suara bawaan
-  perangkat (speechSynthesis) yang nol unduhan - supaya sherpa-vits-id (91 MB) tetap bisa
-  dibuang tanpa kehilangan suara tutor.
+    - Membentuk teksnya. FiezelProsody.punctuate menyisipkan koma di batas klausa
+      yang tidak bertanda. Ini teks biasa, jadi dijamin dilayani. Terbukti bekerja:
+      "...repair studio because the team wanted better data although..."
+        -> "...repair studio, because the team wanted better data, although..."
+    - Merender per kalimat lalu menjadwalkan jedanya sendiri, memakai
+      FiezelProsody.gapAfter. Prosodi antar kalimat jadi milik kita, bukan milik
+      penyedia - dan ini justru lapisan yang sudah terbukti benar di aplikasi.
+
+  Kandidat SSML tetap ada, tapi turun pangkat jadi diagnosa: dikirim dalam dua
+  ejaan berbeda untuk memastikan yang menggantung memang SSML-nya, bukan cara
+  memanggilnya. Karena ada batas waktu, kegagalannya tidak lagi membekukan apa pun.
 
   Di luar shell PWA dan di luar precache sw.js: alat diagnosa, bukan bagian aplikasi.
 -->
 <style>
-  :root{--bg:#fdf6f5;--ink:#2b2b2b;--muted:#6b6b6b;--line:#e6dcd9;--ok:#1a7f4b;--bad:#b3261e;--card:#fff;--hi:#8b5cf6}
-  @media (prefers-color-scheme:dark){:root{--bg:#1a1618;--ink:#f0e9e7;--muted:#a49c99;--line:#3a3234;--card:#241f21}}
+  :root{--bg:#fdf6f5;--ink:#2b2b2b;--muted:#6b6b6b;--line:#e6dcd9;--ok:#1a7f4b;--bad:#b3261e;--warn:#8a6d00;--card:#fff;--hi:#8b5cf6}
+  @media (prefers-color-scheme:dark){:root{--bg:#1a1618;--ink:#f0e9e7;--muted:#a49c99;--line:#3a3234;--card:#241f21;--warn:#d9b23a}}
   *{box-sizing:border-box}
   body{margin:0;padding:20px;background:var(--bg);color:var(--ink);
        font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
@@ -45,33 +54,35 @@
          background:var(--ink);color:var(--bg);cursor:pointer}
   button.ghost{background:transparent;color:var(--ink)}
   button:disabled{opacity:.4;cursor:not-allowed}
-  textarea,select{font:inherit;padding:9px;border-radius:9px;border:1px solid var(--line);
+  textarea{font:inherit;padding:9px;border-radius:9px;border:1px solid var(--line);
         background:var(--bg);color:var(--ink);width:100%;margin-bottom:10px}
   pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);
-      border-radius:9px;padding:11px;font-size:12.5px;max-height:300px;overflow:auto;margin:10px 0 0}
-  .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
-  .card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+      border-radius:9px;padding:11px;font-size:12.5px;max-height:280px;overflow:auto;margin:10px 0 0}
+  .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}.warn{color:var(--warn);font-weight:600}
+  .card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--card)}
+  .card.diag{opacity:.72}
   .card h3{margin:0 0 2px;font-size:15px}
   .card .why{color:var(--muted);font-size:13px;margin:0 0 10px}
   .card .status{font-size:13px;margin-top:8px;color:var(--muted)}
   .rate{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-  .rate span{font-size:13px;color:var(--muted);margin-right:4px}
+  .rate span{font-size:13px;color:var(--muted);width:100%}
   .rate button{padding:6px 12px;font-size:13px;background:transparent;color:var(--ink)}
   .rate button[aria-pressed="true"]{background:var(--hi);color:#fff;border-color:var(--hi)}
 </style>
 </head>
 <body>
 <main>
-  <h1>Probe Prosodi</h1>
-  <p class="sub">Ronde 1 sudah membuktikan suaranya bersih. Sekarang: bisakah dia terdengar hidup?</p>
+  <h1>Probe Prosodi <span style="font-size:13px;color:var(--muted)">rev 2</span></h1>
+  <p class="sub">Revisi 1 menggantung di SSML. Sekarang tiap panggilan punya batas waktu,
+     dan taruhannya digeser ke tuas yang tidak butuh SSML.</p>
 
   <section>
     <h2>Kalimat uji</h2>
-    <p>Pakai kalimat yang punya pertanyaan dan pujian — di situlah datar paling terasa.</p>
-    <textarea id="txt" rows="3">What did the team measure during the first review? Well done, Jahran. You finished this passage.</textarea>
+    <p>Sengaja ada klausa panjang tanpa koma — di situlah pembentukan teks bekerja.</p>
+    <textarea id="txt" rows="3">What did the team measure during the first review? Maya led a small study of urban gardening at a neighborhood repair studio because the team wanted better data although the budget was small. Well done, Jahran.</textarea>
     <button id="btnRun">Bandingkan semua</button>
     <button id="btnStop" class="ghost">Berhenti</button>
-    <pre id="log">Tekan "Bandingkan semua". Tiap kandidat diputar berurutan — dengarkan, lalu beri nilai.</pre>
+    <pre id="log">Tekan "Bandingkan semua". Yang tidak menjawab dalam 25 detik dinyatakan gagal dan antrian lanjut.</pre>
   </section>
 
   <div id="cards"></div>
@@ -79,7 +90,7 @@
   <section>
     <h2>Suara Indonesia (tanpa unduhan)</h2>
     <p>Puter tidak melayani id-ID. Kandidatnya: suara bawaan perangkatmu — nol unduhan,
-       nol biaya. Kalau ini cukup enak, <code>sherpa-vits-id</code> (91 MB) bisa dibuang.</p>
+       nol biaya. Kalau cukup enak, <code>sherpa-vits-id</code> (91 MB) bisa dibuang.</p>
     <textarea id="txtId" rows="2">Halo Jahran, gimana kabarnya? Mantap, kamu udah selesai satu bacaan.</textarea>
     <button id="btnId">Dengar suara Indonesia</button>
     <pre id="logId">—</pre>
@@ -87,7 +98,7 @@
 
   <section>
     <h2>Ringkasan buat dilaporkan</h2>
-    <p>Setelah semua dinilai, salin isi kotak ini dan kirim ke Claude.</p>
+    <p>Setelah dinilai, salin isi kotak ini dan kirim ke Claude.</p>
     <pre id="summary">Belum ada penilaian.</pre>
   </section>
 </main>
@@ -99,26 +110,27 @@
   'use strict';
 
   var $ = function(id){ return document.getElementById(id); };
+  var CALL_TIMEOUT_MS = 25000;
   var stopped = false;
-
-  /* Kandidat diurutkan dari tuas yang diperkirakan paling besar ke paling kecil, supaya
-     kalau OWNER berhenti di tengah, yang sudah terdengar adalah yang paling menentukan. */
-  var CANDIDATES = [
-    { id:'neural-plain', title:'A · neural, teks telanjang',
-      why:'Ini yang kamu dengar kemarin. Jadi pembanding, bukan kandidat.',
-      engine:'neural', ssml:false },
-    { id:'generative-plain', title:'B · generative, teks telanjang',
-      why:'Engine paling ekspresif. Kalau bedanya besar di sini, ini jawabannya dan SSML cuma pemanis.',
-      engine:'generative', ssml:false },
-    { id:'neural-ssml', title:'C · neural + SSML dari FiezelProsody',
-      why:'Engine sama seperti A, tapi diberi tahu di mana naik, turun, dan berhenti.',
-      engine:'neural', ssml:true },
-    { id:'generative-ssml', title:'D · generative + SSML',
-      why:'Dua tuas sekaligus. Biasanya yang terbaik — kecuali malah jadi berlebihan.',
-      engine:'generative', ssml:true }
-  ];
-
   var scores = {};
+
+  /* Batas waktu keras. Inilah pelajaran revisi 1: panggilan yang menggantung harus
+     menjadi kegagalan yang dilaporkan, bukan penantian tanpa ujung. */
+  function withTimeout(promise, ms, label){
+    return new Promise(function(resolve, reject){
+      var done = false;
+      var timer = setTimeout(function(){
+        if (done) return;
+        done = true;
+        reject(new Error('tidak menjawab dalam ' + Math.round(ms/1000) + ' detik (' + label + ')'));
+      }, ms);
+      promise.then(function(v){
+        if (done) return; done = true; clearTimeout(timer); resolve(v);
+      }, function(e){
+        if (done) return; done = true; clearTimeout(timer); reject(e);
+      });
+    });
+  }
 
   function waitForPuter(ms){
     return new Promise(function(resolve, reject){
@@ -131,47 +143,60 @@
     });
   }
 
-  /* ---- SSML dari FiezelProsody ---------------------------------------
-     Tidak ada aturan prosodi baru di sini. Modul aplikasi yang memutuskan apa itu
-     kalimat, mana yang pertanyaan, dan berapa jeda sesudahnya; fungsi ini hanya
-     menerjemahkan keputusan itu ke tag yang dimengerti Polly. */
+  /* ---- kandidat -------------------------------------------------------
+     Dua kandidat pertama sudah terbukti berbunyi di revisi 1, jadi dipertahankan
+     sebagai dasar pembanding. Dua berikutnya adalah taruhan baru dan keduanya
+     memakai teks biasa, sehingga tidak bisa gagal karena alasan SSML. Dua terakhir
+     hanya diagnosa. */
+  var CANDIDATES = [
+    { id:'a', title:'A · neural, apa adanya', mode:'plain', engine:'neural',
+      why:'Yang kamu dengar pertama kali. Dasar pembanding, bukan kandidat.' },
+
+    { id:'b', title:'B · generative, apa adanya', mode:'plain', engine:'generative',
+      why:'Engine lebih ekspresif. Kalau B jelas lebih hidup dari A, ini tuas terbesarnya.' },
+
+    { id:'c', title:'C · generative + teks dibentuk', mode:'shaped', engine:'generative',
+      why:'Teks biasa, tapi koma disisipkan di batas klausa oleh FiezelProsody. Dijamin dilayani karena bukan SSML.' },
+
+    { id:'d', title:'D · generative + per kalimat, jeda dijadwalkan sendiri', mode:'perSentence', engine:'generative',
+      why:'Tiap kalimat dirender terpisah, jedanya diatur FiezelProsody. Prosodi antar kalimat jadi milik kita, bukan milik penyedia.' },
+
+    { id:'e', title:'E · SSML, dengan penanda', mode:'ssmlFlagged', engine:'neural', diag:true,
+      why:'Diagnosa: apakah SSML memang mati, atau cuma cara memanggilnya yang salah.' },
+
+    { id:'f', title:'F · SSML, tanpa penanda', mode:'ssmlBare', engine:'neural', diag:true,
+      why:'Diagnosa pembanding untuk E. Kalau dua-duanya menggantung, SSML memang tidak dilayani.' }
+  ];
+
+  /* ---- SSML dari FiezelProsody (tetap: modul aplikasi yang memutuskan) ---- */
 
   function esc(s){
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-                    .replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function sentencesOf(text, lang){
+    var P = window.FiezelProsody;
+    if (!P) return [String(text)];
+    return P.phrases(P.punctuate(text, lang), 200);
   }
 
   function buildSsml(text, lang){
     var P = window.FiezelProsody;
     if (!P) return null;
-
-    // punctuate() menyisipkan koma di batas klausa yang tidak bertanda - tanpa itu,
-    // model membaca satu klausa panjang sebagai satu tarikan napas.
-    var shaped = P.punctuate(text, lang);
-    var lines = P.phrases(shaped, 200);
-
+    var lines = sentencesOf(text, lang);
     var parts = lines.map(function(line, i){
-      var isQ = P.isQuestion(line, lang);
-      var isEx = P.isExclamation(line, lang);
-      var gap = P.gapAfter(line, lang);
-
-      // Kontur dibatasi CONTOUR_MIN/MAX di modul aslinya dengan alasan yang sama
-      // berlakunya di sini: lewat beberapa persen, ini berhenti terdengar sebagai
-      // intonasi dan mulai terdengar sebagai penutur yang berbeda.
+      var isQ = P.isQuestion(line, lang), isEx = P.isExclamation(line, lang);
       var pitch = isQ ? '+6%' : (isEx ? '+4%' : '+0%');
       var rate  = isEx ? '+4%' : (isQ ? '+0%' : '-2%');
-
-      var body = '<prosody pitch="' + pitch + '" rate="' + rate + '">' + esc(line) + '</prosody>';
+      var body = '<prosody pitch="'+pitch+'" rate="'+rate+'">' + esc(line) + '</prosody>';
       if (isEx) body = '<emphasis level="moderate">' + body + '</emphasis>';
-
-      var brk = (i < lines.length - 1) ? '<break time="' + gap + 'ms"/>' : '';
+      var brk = (i < lines.length-1) ? '<break time="' + P.gapAfter(line, lang) + 'ms"/>' : '';
       return body + brk;
     });
-
     return '<speak>' + parts.join('') + '</speak>';
   }
 
-  /* ---- pemutaran ------------------------------------------------------ */
+  /* ---- pemutaran ------------------------------------------------------- */
 
   function toAudio(r){
     if (r instanceof HTMLAudioElement) return r;
@@ -188,21 +213,53 @@
     });
   }
 
-  function speak(text, cand, lang){
+  function rawSpeak(payload, opts, label){
     return waitForPuter().then(function(p){
-      var payload = text;
-      var opts = { language: lang, engine: cand.engine };
-      if (cand.ssml) {
-        var s = buildSsml(text, lang);
-        if (!s) throw new Error('FiezelProsody tidak termuat — SSML tidak bisa dibangun');
-        payload = s;
-        // Nama flag SSML belum pasti di lapisan Puter; kirim dua ejaan yang lazim
-        // dan biarkan yang tidak dikenal diabaikan.
-        opts.ssml = true; opts.textType = 'ssml';
-      }
-      var t0 = performance.now();
-      return p.ai.txt2speech(payload, opts).then(function(r){
-        return { result: r, ms: Math.round(performance.now() - t0) };
+      return withTimeout(p.ai.txt2speech(payload, opts), CALL_TIMEOUT_MS, label);
+    });
+  }
+
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  /* Satu kandidat = satu cara memanggil. Dipisah begini supaya tiap mode bisa
+     gagal sendiri-sendiri tanpa menjatuhkan yang lain. */
+  function runCandidate(cand, text, lang){
+    var P = window.FiezelProsody;
+    var base = { language: lang, engine: cand.engine };
+    var t0 = performance.now();
+
+    if (cand.mode === 'perSentence') {
+      var lines = sentencesOf(text, lang);
+      if (!P) return Promise.reject(new Error('FiezelProsody tidak termuat'));
+      var i = 0;
+      return (function step(){
+        if (i >= lines.length) return Promise.resolve({ ms: Math.round(performance.now()-t0), n: lines.length });
+        var line = lines[i++];
+        return rawSpeak(line, base, cand.id).then(function(r){
+          var a = toAudio(r);
+          if (!a) throw new Error('bentuk kembalian tak bisa diputar');
+          return playAndWait(a);
+        }).then(function(){
+          // Jeda yang dijadwalkan sendiri: inilah inti kandidat ini.
+          return sleep(P.gapAfter(line, lang));
+        }).then(step);
+      })();
+    }
+
+    var payload, opts = base;
+    if (cand.mode === 'plain') payload = text;
+    else if (cand.mode === 'shaped') payload = P ? P.punctuate(text, lang) : text;
+    else {
+      payload = buildSsml(text, lang);
+      if (!payload) return Promise.reject(new Error('FiezelProsody tidak termuat — SSML tak bisa dibangun'));
+      if (cand.mode === 'ssmlFlagged') opts = { language: lang, engine: cand.engine, ssml: true, textType: 'ssml' };
+    }
+
+    return rawSpeak(payload, opts, cand.id).then(function(r){
+      var a = toAudio(r);
+      if (!a) throw new Error('bentuk kembalian tak bisa diputar');
+      return playAndWait(a).then(function(){
+        return { ms: Math.round(performance.now()-t0), n: 1 };
       });
     });
   }
@@ -211,17 +268,19 @@
 
   function renderCards(){
     $('cards').innerHTML = CANDIDATES.map(function(c){
-      return '<section class="card" id="card-' + c.id + '">'
+      return '<div class="card' + (c.diag ? ' diag' : '') + '">'
            + '<h3>' + c.title + '</h3>'
            + '<p class="why">' + c.why + '</p>'
            + '<button class="ghost" data-replay="' + c.id + '">Putar ulang</button>'
            + '<div class="status" id="st-' + c.id + '">menunggu…</div>'
-           + '<div class="rate" id="rt-' + c.id + '"><span>Hidup nggak suaranya?</span>'
-           +   '<button data-score="' + c.id + '|datar">Masih datar</button>'
-           +   '<button data-score="' + c.id + '|lumayan">Lumayan</button>'
-           +   '<button data-score="' + c.id + '|hidup">Hidup!</button>'
-           +   '<button data-score="' + c.id + '|lebay">Kelebihan</button>'
-           + '</div></section>';
+           + (c.diag ? '' :
+               '<div class="rate" id="rt-' + c.id + '"><span>Hidup nggak suaranya?</span>'
+             +   '<button data-score="' + c.id + '|datar">Masih datar</button>'
+             +   '<button data-score="' + c.id + '|lumayan">Lumayan</button>'
+             +   '<button data-score="' + c.id + '|hidup">Hidup!</button>'
+             +   '<button data-score="' + c.id + '|lebay">Kelebihan</button>'
+             + '</div>')
+           + '</div>';
     }).join('');
   }
 
@@ -230,45 +289,36 @@
     if (t.dataset && t.dataset.score) {
       var bits = t.dataset.score.split('|');
       scores[bits[0]] = bits[1];
-      var group = $('rt-' + bits[0]);
-      Array.prototype.forEach.call(group.querySelectorAll('button'), function(b){
+      Array.prototype.forEach.call($('rt-'+bits[0]).querySelectorAll('button'), function(b){
         b.setAttribute('aria-pressed', String(b === t));
       });
       updateSummary();
     }
     if (t.dataset && t.dataset.replay) {
-      var cand = CANDIDATES.filter(function(c){ return c.id === t.dataset.replay; })[0];
-      if (cand) runOne(cand);
+      var c = CANDIDATES.filter(function(x){ return x.id === t.dataset.replay; })[0];
+      if (c) runOne(c);
     }
   });
 
   function updateSummary(){
     var lines = CANDIDATES.map(function(c){
-      return c.title.split(' · ')[0] + ' (' + c.engine + (c.ssml ? ' + SSML' : ' polos') + ') : '
-           + (scores[c.id] || 'belum dinilai');
+      return c.title + (c.diag ? '  [diagnosa] ' : '  ') + ': ' + (scores[c.id] || 'belum dinilai');
     });
     lines.push('');
-    lines.push('Suara Indonesia bawaan perangkat: ' + (scores.id || 'belum dinilai'));
+    lines.push('Suara Indonesia bawaan perangkat: ' + (scores.id || 'belum dicoba'));
     $('summary').textContent = lines.join('\n');
   }
 
   function runOne(cand){
     var st = $('st-' + cand.id);
-    st.textContent = 'merender…';
-    st.className = 'status';
-    return speak($('txt').value, cand, 'en-US').then(function(res){
-      var a = toAudio(res.result);
-      if (!a) throw new Error('bentuk kembalian tak bisa diputar');
-      st.textContent = 'memutar… (' + res.ms + ' ms)';
+    st.textContent = 'merender…'; st.className = 'status';
+    return runCandidate(cand, $('txt').value, 'en-US').then(function(res){
+      st.textContent = 'selesai — ' + res.ms + ' ms' + (res.n > 1 ? ' (' + res.n + ' kalimat)' : '');
       st.className = 'status ok';
-      return playAndWait(a).then(function(){
-        st.textContent = 'selesai — ' + res.ms + ' ms';
-      });
     }).catch(function(e){
       st.textContent = 'GAGAL: ' + e.message;
       st.className = 'status bad';
-      scores[cand.id] = 'gagal (' + String(e.message).slice(0,40) + ')';
-      updateSummary();
+      if (!scores[cand.id]) { scores[cand.id] = 'GAGAL — ' + String(e.message).slice(0,60); updateSummary(); }
     });
   }
 
@@ -276,62 +326,54 @@
 
   $('btnRun').onclick = function(){
     stopped = false;
-    var btn = this;
-    btn.disabled = true;
+    var btn = this; btn.disabled = true;
     var i = 0;
     $('log').textContent = 'FiezelProsody: '
-      + (window.FiezelProsody ? 'termuat' : 'TIDAK termuat — kandidat SSML akan gagal')
-      + '\nMemutar berurutan. Dengarkan bedanya.';
+      + (window.FiezelProsody ? 'termuat' : 'TIDAK termuat — C, D, E, F akan gagal')
+      + '\nBatas waktu ' + (CALL_TIMEOUT_MS/1000) + ' detik per panggilan.';
 
     (function next(){
       if (stopped || i >= CANDIDATES.length) {
-        $('log').textContent += stopped ? '\nDihentikan.' : '\nSelesai. Beri nilai tiap kandidat di atas.';
+        $('log').textContent += stopped ? '\nDihentikan.' : '\nSelesai. Beri nilai A sampai D di atas.';
         btn.disabled = false;
         return;
       }
-      runOne(CANDIDATES[i++]).then(function(){
-        setTimeout(next, 700); // jeda supaya telinga bisa memisahkan dua kandidat
-      });
+      runOne(CANDIDATES[i++]).then(function(){ setTimeout(next, 700); });
     })();
   };
 
-  /* ---- Indonesia via suara bawaan perangkat ---------------------------- */
+  /* ---- Indonesia lewat suara bawaan perangkat -------------------------- */
 
   $('btnId').onclick = function(){
     var out = $('logId');
     if (!('speechSynthesis' in window)) {
-      out.textContent = 'Perangkat ini tidak punya speechSynthesis.';
-      out.className = 'bad';
-      return;
+      out.textContent = 'Perangkat ini tidak punya speechSynthesis.'; out.className = 'bad'; return;
     }
     var pick = function(){
       var voices = speechSynthesis.getVoices() || [];
       var id = voices.filter(function(v){ return /^id/i.test(v.lang); });
       if (!id.length) {
-        out.textContent = 'Tidak ada suara id-ID terpasang di perangkat ini.\n'
-          + 'Suara yang ada: ' + voices.map(function(v){return v.lang;}).join(', ');
+        out.textContent = 'Tidak ada suara id-ID di perangkat ini.\nYang tersedia: '
+          + voices.map(function(v){ return v.lang; }).join(', ');
         out.className = 'bad';
-        return;
+        scores.id = 'tidak ada suara id-ID di perangkat';
+        updateSummary(); return;
       }
-      out.textContent = 'Suara id-ID ditemukan: ' + id.map(function(v){return v.name;}).join(', ')
+      out.textContent = 'Ditemukan: ' + id.map(function(v){ return v.name; }).join(', ')
         + '\nMemutar dengan: ' + id[0].name;
       out.className = 'ok';
-
       var P = window.FiezelProsody;
-      var text = P ? P.punctuate($('txtId').value, 'id') : $('txtId').value;
-      var u = new SpeechSynthesisUtterance(text);
-      u.voice = id[0]; u.lang = id[0].lang; u.rate = 1; u.pitch = 1;
+      var u = new SpeechSynthesisUtterance(P ? P.punctuate($('txtId').value, 'id') : $('txtId').value);
+      u.voice = id[0]; u.lang = id[0].lang;
       u.onend = function(){
         out.textContent += '\nSelesai. Cukup enak buat suara tutor?';
-        scores.id = 'sudah didengar — tulis pendapatmu';
+        scores.id = 'sudah didengar (' + id[0].name + ') — tulis pendapatmu';
         updateSummary();
       };
       speechSynthesis.speak(u);
     };
-    if (!speechSynthesis.getVoices().length) {
-      speechSynthesis.onvoiceschanged = pick;
-      setTimeout(pick, 400);
-    } else pick();
+    if (!speechSynthesis.getVoices().length) { speechSynthesis.onvoiceschanged = pick; setTimeout(pick, 400); }
+    else pick();
   };
 
   renderCards();
