@@ -246,7 +246,12 @@
       var gateOpen = false;
       try {
         var welcome = doc.getElementById('welcome');
-        gateOpen = !!(welcome && !welcome.classList.contains('hidden') && doc.body.classList.contains('notification-locked'))
+        // Dulu baris ini juga menuntut kelas 'notification-locked' di <body>. Kelas itu
+        // tidak pernah dipasang lagi sejak notifikasi berhenti menjadi syarat masuk, jadi
+        // syarat gandanya akan selalu salah dan lembar unduhan ini muncul TEPAT di atas
+        // undangan notifikasi - dua lapisan bertumpuk, persis yang aturan ini cegah.
+        // Panel yang terlihat sudah cukup: mengunci atau tidak, ia sedang di layar.
+        gateOpen = !!(welcome && !welcome.classList.contains('hidden'))
           || !!doc.querySelector('.fiezel-splash:not([hidden]), .fiezel-ob')
           || !!doc.body.classList.contains('auth-locked');
       } catch (_) {}
