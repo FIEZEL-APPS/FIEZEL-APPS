@@ -272,6 +272,29 @@
     });
   }
 
+  /**
+   * Merender kalimat berikutnya ke singgah simpan tanpa memutarnya.
+   *
+   * m025-47 mencatat jeda 10-15 detik antar kalimat saat narasi buku, dan sebabnya
+   * bukan kecepatan render melainkan antrian: kalimat berikutnya sempat memesan mesin
+   * sebelum kalimat sekarang sampai. Di sini masalah itu tidak bisa terjadi karena
+   * prefetch tidak menyentuh pemutar sama sekali - ia hanya mengisi singgah simpan,
+   * sehingga speak() berikutnya menemukan audionya sudah ada dan langsung berbunyi.
+   *
+   * Gagalnya selalu diam: ini pekerjaan spekulatif, dan kegagalannya tidak boleh
+   * terlihat oleh pembaca maupun melatch apa pun.
+   */
+  function prefetch(text, options) {
+    var opts = options || {};
+    var value = String(text == null ? '' : text).trim();
+    if (!value || value.length > MAX_CHARS) return Promise.resolve(false);
+    return render(value, {
+      engine: opts.engine || ENGINE,
+      lang: opts.lang || LANG,
+      speed: opts.speed || opts.rate || 1
+    }).then(function () { return true; }).catch(function () { return false; });
+  }
+
   function prepare() { return Promise.resolve(status()); }
   function ensureReady() { return Promise.resolve(status()); }
 
@@ -321,6 +344,7 @@
     prepare: prepare,
     ensureReady: ensureReady,
     speak: speak,
+    prefetch: prefetch,
     stop: stop,
     cacheKey: cacheKey
   });
