@@ -18,11 +18,23 @@ const levels=['A1','A2','B1','B2','C1','C2'];
 const voices=['af_bella','af_heart'];
 
 test('runtime schema',()=>assert.equal(runtime.schema,'fiezel-speaking-listening-addon-v1'));
-test('listening bank reviewed v2 seed',()=>assert.deepStrictEqual([listening.schema,listening.version,listening.status,listening.count],['fiezel-listening-bank-v1',2,'reviewed_release_seed',36]));
+// m025-108: bank diperluas atas permintaan OWNER. Jumlahnya tidak lagi dipatok angka
+// tetap - yang dijaga adalah 36 soal benih tetap utuh dan tiap level yang diperluas
+// benar-benar bertambah 200. Mematok totalnya membuat setiap penambahan level berikutnya
+// gagal tanpa alasan yang berarti.
+test('listening bank identity',()=>assert.deepStrictEqual([listening.schema,listening.version,listening.status],['fiezel-listening-bank-v1',2,'reviewed_release_seed']));
+test('listening count matches items',()=>assert.equal(listening.count,listening.items.length));
+test('36 soal benih tetap utuh',()=>assert.equal(listening.items.filter(i=>!i.id.startsWith('listen_gen_')).length,36));
+test('level yang diperluas mendapat tepat 200 soal baru',()=>{for(const level of ['A1','A2'])assert.equal(listening.items.filter(i=>i.level===level&&i.id.startsWith('listen_gen_')).length,200,level+' tidak mendapat 200 soal')});
+// Naskah ganda membuat pelajar merasa banknya diulang-ulang, dan itu tidak terlihat
+// dari jumlah item mana pun.
+test('tidak ada naskah ganda dalam satu level',()=>{const seen=new Set();for(const i of listening.items){const key=i.level+'|'+i.script.toLowerCase();assert.ok(!seen.has(key),'naskah ganda di '+i.level+': '+i.script);seen.add(key)}});
+// Jawaban benar yang menumpuk di satu posisi bisa ditebak tanpa mendengarkan sama sekali.
+test('posisi jawaban benar tersebar',()=>{const mcq=listening.items.filter(i=>i.mode!=='dictation'),pos=[0,0,0,0];mcq.forEach(i=>pos[i.answerIndex]++);const min=Math.min(...pos),max=Math.max(...pos);assert.ok(min>=max*0.7,'sebaran posisi jawaban timpang: '+pos.join('/'))});
 test('speaking bank reviewed v2 seed',()=>assert.deepStrictEqual([speaking.schema,speaking.version,speaking.status,speaking.count],['fiezel-speaking-bank-v1',2,'reviewed_release_seed',36]));
-test('all IDs unique',()=>assert.equal(new Set([...listening.items,...speaking.items].map(item=>item.id)).size,72));
-test('six items per level per domain',()=>{for(const level of levels){assert.equal(listening.items.filter(item=>item.level===level).length,6);assert.equal(speaking.items.filter(item=>item.level===level).length,6)}});
-test('two items per listening mode and level',()=>{for(const level of levels)for(const mode of ['gist','detail','dictation'])assert.equal(listening.items.filter(item=>item.level===level&&item.mode===mode).length,2)});
+test('all IDs unique',()=>assert.equal(new Set([...listening.items,...speaking.items].map(item=>item.id)).size,listening.items.length+speaking.items.length));
+test('six seed items per level per domain',()=>{for(const level of levels){assert.equal(listening.items.filter(item=>item.level===level&&!item.id.startsWith('listen_gen_')).length,6);assert.equal(speaking.items.filter(item=>item.level===level).length,6)}});
+test('two seed items per listening mode and level',()=>{for(const level of levels)for(const mode of ['gist','detail','dictation'])assert.equal(listening.items.filter(item=>item.level===level&&item.mode===mode&&!item.id.startsWith('listen_gen_')).length,2)});
 test('two items per speaking mode and level',()=>{for(const level of levels)for(const mode of ['repeat_target','guided_response','roleplay'])assert.equal(speaking.items.filter(item=>item.level===level&&item.mode===mode).length,2)});
 test('listening voices use locked pool',()=>assert.ok(listening.items.every(item=>voices.includes(item.voice)&&item.audioProfile==='listening')));
 test('listening MCQ answer integrity',()=>assert.ok(listening.items.filter(item=>item.mode!=='dictation').every(item=>item.options.length===4&&new Set(item.options).size===4&&Number.isInteger(item.answerIndex)&&item.answerIndex>=0&&item.answerIndex<4)));
