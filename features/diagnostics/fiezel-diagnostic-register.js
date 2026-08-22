@@ -186,8 +186,17 @@
       if (root.navigator && root.navigator.serviceWorker && !root.navigator.serviceWorker.controller) {
         findings.push(bus.finding('CORE_SW_UNCONTROLLED', 'warning', 'Halaman belum dikontrol service worker.'));
       }
-      if (root.FIEZEL_REQUIRE_NOTIFICATIONS === true && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
-        findings.push(bus.finding('CORE_NOTIFICATION_NOT_GRANTED', 'warning', 'Notifikasi wajib tetapi izin belum granted: ' + Notification.permission));
+      // Notifikasi TIDAK lagi wajib (OWNER membalik m025-34), jadi izin yang belum granted
+      // bukan cacat - itu pilihan murid yang sah. Yang tetap cacat: murid sudah menyalakan
+      // pengingat di Pengaturan tetapi browser tidak akan pernah mengirimkannya. Itulah
+      // satu-satunya keadaan yang benar-benar diam-diam merugikan, jadi hanya itu dilaporkan.
+      var remindersOn = false;
+      try {
+        var learner = root.__getFiezelState ? root.__getFiezelState() : null;
+        remindersOn = !!(learner && learner.preferences && learner.preferences.reminders === true);
+      } catch (_) {}
+      if (remindersOn && typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+        findings.push(bus.finding('CORE_NOTIFICATION_NOT_GRANTED', 'warning', 'Pengingat dinyalakan murid tetapi izin browser belum granted: ' + Notification.permission));
       }
     } catch (error) {
       findings.push(bus.finding('CORE_PROBE_FAILED', 'error', String((error && error.message) || error)));
