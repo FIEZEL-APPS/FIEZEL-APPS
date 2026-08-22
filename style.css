@@ -1642,3 +1642,21 @@ button:active {
 @media (prefers-reduced-motion:no-preference){
   .fiezel-subtitle{transition:opacity .18s ease}
 }
+
+
+/* m025-105 Tanya FIEZEL. */
+.fiezel-ask-mark{height:20px;width:auto;display:block}
+.ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
+.ask-box input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line,#e6dcd9);
+  border-radius:14px;background:var(--card,#fff);font:inherit;color:inherit;outline:none}
+/* outline dimatikan di atas demi sudut membulat, jadi penanda fokusnya WAJIB ada di
+   sini: tanpa ini pengguna keyboard kehilangan jejak posisinya sama sekali. */
+.ask-box input:focus-visible{outline:2px solid var(--gold,#DDB55F);outline-offset:2px;
+  border-color:var(--gold,#DDB55F)}
+.ask-box button{flex-shrink:0;padding:12px 16px;border-radius:14px}
+.ask-answer{padding:16px;margin-bottom:16px}
+/* Jawaban model datang sebagai satu blok teks; tanpa ini baris barunya hilang dan
+   penjelasan enam kalimat terbaca sebagai satu paragraf padat. */
+.ask-answer p{white-space:pre-wrap}
+.ask-related-title{font-size:13px;text-transform:uppercase;letter-spacing:.06em;
+  opacity:.6;margin:0 0 8px}
