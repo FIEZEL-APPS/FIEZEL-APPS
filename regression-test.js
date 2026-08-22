@@ -58,11 +58,22 @@ function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onc
 const document={baseURI:'http://localhost/',getElementById:element,querySelector(){return null},querySelectorAll(){return []},createElement(){return {className:'',textContent:'',disabled:false,onclick:null,classList:{add(){},remove(){},toggle(){}},append(){},addEventListener(){}}}};
 const store={};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
-const fetch=async url=>{const file=String(url).split('/').pop();return {ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
+// m025-114: stub ini dulu memangkas path menjadi nama berkas saja, jadi bank listening di
+// features/speaking-listening/ tidak akan pernah ditemukan dan tes ikut lulus tanpa pernah
+// memeriksa soal listening. Sekarang seluruh path dipertahankan. app.js memanggil fetch
+// dengan dua bentuk - URL absolut hasil new URL(f, baseURI) dan path relatif './x' - jadi
+// keduanya harus dinormalkan ke path yang sama di dalam repo.
+const fetch=async url=>{
+  const raw=String(url);
+  const rel=(raw.includes('://')?raw.slice(raw.indexOf('://')+3).replace(/^[^/]*/,''):raw).replace(/^\.?\//,'').split('?')[0];
+  const file=path.join(root,rel);
+  if(!rel||!fs.existsSync(file))return{ok:false,status:404,json:async()=>({})};
+  return{ok:true,status:200,json:async()=>JSON.parse(fs.readFileSync(file,'utf8'))};
+};
 const ctx={console,Notification,self:null,document,localStorage,fetch,location:{href:'http://localhost/'},window:{},Date,Math,URL,setTimeout,clearTimeout};
 ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(text){this.text=text};
 vm.createContext(ctx);vm.runInContext(app,ctx,{filename:'app.js'});
-setTimeout(()=>{
+setTimeout(async()=>{
  try{
   const st=ctx.__getFiezelState();
   assert(st.totalAnswered===0&&!st.adaptiveReady,'new user is not cleanly initialized');
@@ -94,14 +105,24 @@ setTimeout(()=>{
   assert(adaptive.some(q=>q.type==='reading'&&q.passage?.text),'adaptive reading question is missing its passage');
   for(const q of adaptive)assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'adaptive answer synchronization failed');
 
-  const placement=ctx.buildPlacement();
-  assert(placement.length===150,`placement runtime produced ${placement.length}/150 questions`);
+  // m025-114: tes penempatan menjadi 25 soal kemampuan dasar - tanpa reading, dengan
+  // listening. Yang dijaga di sini bukan sekadar jumlahnya, melainkan tiga sifat yang kalau
+  // hilang membuat tesnya salah membaca murid: reading benar-benar tidak ada, bobotnya
+  // menurun dari A1 ke C2, dan naskah listening tidak ikut terkirim sebagai teks soal.
+  const placement=await ctx.buildPlacement();
+  assert(placement.length===25,`placement runtime produced ${placement.length}/25 questions`);
   const difficulty=placement.reduce((m,q)=>{m[q.difficulty]=(m[q.difficulty]||0)+1;return m},{});
-  assert([1,2,3,4,5,6].every(n=>difficulty[n]===25),'placement is not balanced 25 questions per level');
+  assert([6,5,4,4,3,3].every((n,i)=>difficulty[i+1]===n),`placement weighting is wrong: ${JSON.stringify(difficulty)}`);
   const types=placement.reduce((m,q)=>{m[q.type]=(m[q.type]||0)+1;return m},{});
-  assert(types.vocab>0&&types.grammar>0&&types.reading>0,'placement blueprint lost a core content type');
-  assert(new Set(placement.map(q=>q.id||q.question)).size===150,'placement contains duplicate question ids');
-  for(const q of placement){assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'placement answer synchronization failed');if(q.type==='reading')assert(q.passage?.text,'placement reading question is missing its passage');}
+  assert(types.vocab>0&&types.grammar>0&&types.listening>0,'placement blueprint lost a core content type');
+  assert(!types.reading,'placement must contain no reading questions');
+  assert(new Set(placement.map(q=>q.id||q.question)).size===25,'placement contains duplicate question ids');
+  for(const q of placement){
+    assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,'placement answer synchronization failed');
+    // Naskah listening harus tetap hanya di q.script. Begitu ia bocor ke q.question, soalnya
+    // bisa dijawab dengan membaca dan tes ini berhenti mengukur listening.
+    if(q.type==='listening'){assert(q.script,'listening question lost its script');assert(!q.question.includes(q.script),'listening script leaked into the visible question');}
+  }
 
   const levelCounts={};
   for(const level of ['A1','A2','B1','B2','C1','C2']){const source=ctx.makeLevelSource(level).map(x=>x.q).filter(Boolean);levelCounts[level]=source.length;assert(source.length>0,`level ${level} has no practice content`);for(const q of source.slice(0,10)){assert(q.options?.length>=2&&q.answerIndex>=0&&q.answerIndex<q.options.length,`level ${level} answer synchronization failed`);if(q.type==='reading')assert(q.passage?.text,`level ${level} reading question missing passage`)}}

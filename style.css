@@ -338,6 +338,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-next{justify-self:end;background:var(--black);color:#fff;border-color:var(--black);min-width:92px}
 .quiz-next:disabled{background:var(--surface-mute);color:var(--muted-soft);border-color:var(--line)}
 
+/* m025-114: soal listening di tes penempatan. Tombolnya harus terbaca sebagai satu-satunya
+   jalan ke soal - naskahnya sengaja tidak pernah dirender, jadi tanpa tombol ini murid
+   hanya melihat pertanyaan tanpa bahan. */
+.quiz-listen{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.quiz-listen-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;min-height:44px;
+  border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--text);
+  font-weight:600;cursor:pointer}
+.quiz-listen-btn:hover:not(:disabled){border-color:var(--gold)}
+.quiz-listen-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.quiz-listen-btn:disabled{opacity:.6;cursor:progress}
+.quiz-listen .muted{font-size:13px}
+
 /* ---------- level grid ---------- */
 .level-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
 .level-card{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:16px;background:var(--surface-solid)}
