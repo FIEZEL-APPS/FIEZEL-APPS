@@ -985,13 +985,25 @@ function journeyMarkup(now=Date.now()){
     <button class="primary luxe" onclick="${state.adaptiveReady?'startAdaptive()':"go('test')"}">Mulai rencana hari ini <i data-lucide="arrow-up-right"></i></button>
   </div>
 </div>
-<div class="journey-skills">${mission.skillMap.map(journeySkillRowMarkup).join('')}</div>
+<!-- m025-98 (brief redesign 3.7): dua blok ini diukur 212px dan 253px di layar 375px, dan
+     keduanya ditumpahkan di Home setiap hari. Peta kemampuan sudah punya halamannya
+     sendiri di tab Peta, dan tujuan belajar adalah kontrol yang dipilih SEKALI lalu jarang
+     diubah - menampilkan empat tombolnya tiap hari membuat Home terbaca sebagai formulir.
+     Keduanya jadi expand/collapse, persis yang diminta brief: yang berkaitan tetap ada,
+     yang belum relevan saat itu tidak ikut memakan layar. Ringkasannya tetap terlihat,
+     jadi tidak ada informasi yang hilang - hanya tidak dibuka bersamaan. -->
+<details class="home-fold">
+  <summary><span>Peta kemampuan</span><i data-lucide="chevron-down"></i></summary>
+  <div class="journey-skills">${mission.skillMap.map(journeySkillRowMarkup).join('')}</div>
+</details>
+<details class="home-fold">
+  <summary><span>Tujuan belajar · ${esc(mission.goalProfile.label)}</span><i data-lucide="chevron-down"></i></summary>
 <div class="journey-goal">
-  <small>TUJUAN BELAJAR</small>
   <div class="journey-goal-row">${goals.map(g=>`<button class="journey-goal-chip${g.id===mission.goalProfile.id?' is-active':''}" onclick="setGoalProfile('${esc(g.id)}')">${esc(g.label)}</button>`).join('')}</div>
   <p class="journey-why">${esc(mission.goalProfile.prerequisites.join(' · '))}</p>
   <p class="journey-note">${esc(mission.goalProfile.note)}</p>
-</div>`;
+</div>
+</details>`;
 }
 // R3 dashboard. Tugasnya satu: memisahkan tiga hal yang mudah tertukar dan berbahaya kalau
 // tertukar - skor latihan, cakupan target, dan yang memang belum dapat diukur. Ketiganya
