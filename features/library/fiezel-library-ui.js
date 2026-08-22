@@ -430,7 +430,7 @@
       if (!answer && dialog) answer = dialog.respond(question, context, memory()).id;
       if (!answer) answer = 'Fiezel belum bisa menjawab pertanyaan itu sekarang.';
       showAskAnswer(answer);
-      return speakIndonesian(answer);
+      return speakAnswer(answer);
     }).catch(function () { showAskAnswer('Fiezel belum bisa menjawab pertanyaan itu sekarang.'); });
   }
 
@@ -440,15 +440,16 @@
     return askMemory || { lastVariant: {}, turns: 0 };
   }
 
-  function speakIndonesian(text) {
-    var indo = root.FiezelIndonesianVoice;
-    var prepared = false;
-    try { prepared = !!(indo && indo.status && indo.status().prepared); } catch (_) {}
-    if (prepared) return indo.speak(text, { lang: 'id-ID', speed: 1, allowFallback: false }).catch(function () {});
-    var runtime = root.FiezelVoiceRuntime;
-    if (!runtime || typeof runtime.speak !== 'function') return Promise.resolve();
-    return runtime.speak(text, { lang: 'id-ID', speed: 1, allowFallback: false }).catch(function () {});
+  /**
+   * m025-95: jawaban Library dibacakan dalam INGGRIS dengan subtitle Indonesia.
+   * Teksnya tidak punya pasangan terjemahan, jadi penerjemah yang menyediakannya.
+   */
+  function speakAnswer(text) {
+    var say = root.FiezelVoiceSay;
+    if (!say || typeof say.say !== 'function') return Promise.resolve(false);
+    return say.say(String(text || ''));
   }
+
 
   // ---- entry point -----------------------------------------------------------------
 

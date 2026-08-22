@@ -48,27 +48,25 @@
 
   // ---- speaking ----------------------------------------------------------------
 
-  function speak(text) {
-    var value = String(text || '').trim();
-    if (!value) return Promise.resolve(false);
-    var indo = root.FiezelIndonesianVoice;
-    var prepared = false;
-    try { prepared = !!(indo && indo.status && indo.status().prepared && typeof indo.speak === 'function'); } catch (_) {}
-    if (prepared) {
-      return indo.speak(value, { speed: 1, lang: 'id-ID', allowFallback: false }).catch(function () { return baseSpeak(value); });
-    }
-    return baseSpeak(value);
-  }
-
-  function baseSpeak(value) {
-    var runtime = root.FiezelVoiceRuntime;
-    if (!runtime || typeof runtime.speak !== 'function') return Promise.resolve(false);
-    return runtime.speak(value, { lang: 'id-ID', speed: 1, allowFallback: false }).catch(function () { return false; });
+  /**
+   * m025-95: tutor bicara INGGRIS dengan subtitle Indonesia, bukan bersuara Indonesia.
+   *
+   * Dialog tutor sudah berpasangan {en, id}, jadi barisnya diambil langsung dari
+   * pasangan itu dan tidak menghabiskan jatah terjemahan.
+   */
+  function speak(reply) {
+    var say = root.FiezelVoiceSay;
+    if (!say || typeof say.say !== 'function') return Promise.resolve(false);
+    if (typeof reply === 'string') return say.say(reply);
+    var en = String((reply && reply.en) || '').trim();
+    var id = String((reply && reply.id) || '').trim();
+    // Tanpa kalimat Inggris tidak ada yang bisa diucapkan; barisnya saja tidak cukup.
+    if (!en) return Promise.resolve(false);
+    return say.say({ en: en, id: id });
   }
 
   function stopSpeaking() {
-    try { root.FiezelIndonesianVoice && root.FiezelIndonesianVoice.stop && root.FiezelIndonesianVoice.stop(); } catch (_) {}
-    try { root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.stop && root.FiezelVoiceRuntime.stop(); } catch (_) {}
+    try { root.FiezelVoiceSay && root.FiezelVoiceSay.stop && root.FiezelVoiceSay.stop(); } catch (_) {}
   }
 
   // ---- answering ---------------------------------------------------------------
@@ -178,7 +176,7 @@
       setState('');
       showAnswer(reply.id);
       setHint(reply.source === 'core-ai' ? 'Dijawab FIEZEL AI' : 'Tekan lalu bicara');
-      return speak(reply.id);
+      return speak(reply);
     }).catch(function () {
       busy = false;
       setState('');
