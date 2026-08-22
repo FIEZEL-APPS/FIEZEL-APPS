@@ -14,6 +14,16 @@ const ADAPTIVE_POLICY_SCHEMA='fiezel-adaptive-policy-v1';
 const POLICY_OUTCOME_SCHEMA='fiezel-policy-outcome-v1';
 const CONTENT_QA_SCHEMA='fiezel-content-qa-v1';
 const SUBTITLE_SCHEMA='fiezel-subtitle-v1';
+const FEEDBACK_SCHEMA='fiezel-feedback-v1';
+const FEEDBACK_KEY=PFX+'feedback';
+const FEEDBACK_MAX=200;
+const FEEDBACK_MAX_TEXT=600;
+const FEEDBACK_MAX_QUERY=80;
+// OWNER memilih feedback terbuka tanpa login. Tanpa identitas pengirim, satu-satunya
+// rem yang tersisa adalah rem global - jadi ia dipasang ketat, dan penyimpanannya
+// berupa cincin: yang terlama terdorong keluar alih-alih tumbuh tanpa batas.
+const FEEDBACK_RATE_PER_HOUR=60;
+const FEEDBACK_RATE_KEY=PFX+'feedback_rate';
 const SUBTITLE_MAX_CHARS=3000;
 const CONTENT_PATCH_SCHEMA='fiezel-content-patch-v1';
 const OUTCOME_PREFIX=PFX+'outcomes_';
@@ -304,6 +314,56 @@ router.post('/api/ai/translate',async({request,user})=>{
     if(!text)return json({error:'empty AI response'},502);
     return {text:text.slice(0,SUBTITLE_MAX_CHARS*2),model:DEFAULT_AI_MODEL,via:'fiezel-core-worker-subtitle',protocol:'1.7',schema:SUBTITLE_SCHEMA};
   }catch(error){return json({error:String(error?.message||'AI service error').slice(0,300)},502)}
+});
+async function allowFeedback(){
+  const now=Date.now(), cur=(await me.puter.kv.get(FEEDBACK_RATE_KEY))||{};
+  const windowStart=Number(cur.windowStart||0); let count=Number(cur.count||0);
+  if(!windowStart||now-windowStart>=60*60*1000){await me.puter.kv.set(FEEDBACK_RATE_KEY,{windowStart:now,count:1},Math.floor((now+2*60*60*1000)/1000));return true}
+  if(count>=FEEDBACK_RATE_PER_HOUR)return false;
+  await me.puter.kv.set(FEEDBACK_RATE_KEY,{windowStart,count:count+1},Math.floor((windowStart+2*60*60*1000)/1000));return true
+}
+/**
+ * Membersihkan teks kiriman anonim.
+ *
+ * Teks ini akan tampil di dasbor OWNER, jadi ia adalah masukan tidak tepercaya yang
+ * berakhir di layar orang lain. Penanda sudut dibuang di sini SEBAGAI LAPIS KEDUA -
+ * dasbor tetap wajib menulisnya lewat textContent, bukan innerHTML - karena satu
+ * pembersih saja terlalu tipis untuk menjaga halaman milik sendiri.
+ */
+function feedbackText(value,limit){
+  return String(value==null?'':value).replace(/[<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,limit)
+}
+router.post('/api/feedback',async({request})=>{
+  // OWNER memilih terbuka: tidak ada pemeriksaan login di sini, dengan sengaja.
+  if(!(await allowFeedback()))return json({error:'feedback rate limit reached; try again later'},429);
+  const body=await request.json().catch(()=>({}));
+  const kind=body.kind==='missing_material'?'missing_material':'note';
+  const message=feedbackText(body.message,FEEDBACK_MAX_TEXT);
+  const query=feedbackText(body.query,FEEDBACK_MAX_QUERY);
+  if(!message&&!query)return json({error:'empty feedback'},400);
+  const entry={schema:FEEDBACK_SCHEMA,id:'fb-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),
+    kind,query,message,at:new Date().toISOString(),build:feedbackText(body.build,40)};
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{items:[]};
+  const items=[...(Array.isArray(stored.items)?stored.items:[]),entry].slice(-FEEDBACK_MAX);
+  await me.puter.kv.set(FEEDBACK_KEY,{schema:FEEDBACK_SCHEMA,updatedAt:entry.at,items});
+  return {stored:true,id:entry.id,protocol:'1.7',schema:FEEDBACK_SCHEMA};
+});
+router.get('/api/feedback/list',async({user})=>{
+  // Hanya OWNER. Kiriman orang lain tidak boleh terbaca oleh pengguna mana pun.
+  if(!(await isOwner(user)))return json({error:'owner authentication required'},403);
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{items:[]};
+  const items=Array.isArray(stored.items)?stored.items:[];
+  // Pencarian nihil yang sama diringkas jadi satu baris berhitung: dua belas orang
+  // mencari "did" jauh lebih berguna dibaca sebagai satu prioritas, bukan dua belas baris.
+  const counts={};
+  items.filter(x=>x&&x.kind==='missing_material'&&x.query).forEach(x=>{counts[x.query]=(counts[x.query]||0)+1});
+  const topQueries=Object.keys(counts).map(q=>({query:q,count:counts[q]})).sort((a,b)=>b.count-a.count).slice(0,30);
+  return {items:items.slice().reverse(),topQueries,count:items.length,protocol:'1.7',schema:FEEDBACK_SCHEMA};
+});
+router.post('/api/feedback/clear',async({user})=>{
+  if(!(await isOwner(user)))return json({error:'owner authentication required'},403);
+  await me.puter.kv.set(FEEDBACK_KEY,{schema:FEEDBACK_SCHEMA,updatedAt:new Date().toISOString(),items:[]});
+  return {cleared:true,protocol:'1.7'};
 });
 router.post('/api/policy/next',async({request,user})=>{
   const info=await callerInfo(user);if(!info?.uuid)return json({error:'Puter authentication required'},401);const body=await request.json().catch(()=>({})),snapshot=boundedPolicySnapshot(body.snapshot||{}),evidence=boundedEvidence(body.evidence||{}),stored=(await me.puter.kv.get(OUTCOME_PREFIX+info.uuid))||{history:[]},outcomes=boundedOutcomeList([...(Array.isArray(stored.history)?stored.history:[]),...(Array.isArray(body.outcomes)?body.outcomes:[])]),policy=deriveAdaptivePolicy({snapshot,evidence,outcomes,now:Date.now()});return {policy,protocol:'1.7',evidenceSchema:evidence.schema,outcomeSchema:POLICY_OUTCOME_SCHEMA};
