@@ -3,7 +3,7 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='m025-104-tur-pengenalan-20260822-1';
+const SW_REV='m025-108-tur-pengenalan-20260822-1';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -102,7 +102,12 @@ self.addEventListener('fetch',e=>{
 
 self.addEventListener('periodicsync',e=>{if(e.tag==='fiezel-update-check')e.waitUntil(self.registration.update().catch(()=>{}))});
 
-self.addEventListener('notificationclick',e=>{e.notification.close();const url=e.notification.data?.url||'./';e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if('focus'in client)return client.focus()}return clients.openWindow?clients.openWindow(url):undefined}))});
+// m025-103: jendela yang sudah terbuka DIARAHKAN, bukan sekadar difokuskan.
+// Sebelumnya tab yang sudah ada selalu menang, jadi notifikasi masukan pengguna yang
+// menunjuk ke dasbor kreator hanya memunculkan aplikasi belajar - kabar sampai, tetapi
+// tujuannya tidak. Untuk pengingat belajar url-nya './' sehingga perilakunya tidak
+// berubah; navigate() juga tidak selalu tersedia, jadi fokus tetap jadi cadangan.
+self.addEventListener('notificationclick',e=>{e.notification.close();const url=e.notification.data?.url||'./';e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if(typeof client.navigate==='function'&&url&&url!=='./'){return client.navigate(url).then(c=>(c&&c.focus?c.focus():client.focus())).catch(()=>client.focus())}if('focus'in client)return client.focus()}return clients.openWindow?clients.openWindow(url):undefined}))});
 
 self.addEventListener('push',event=>{
   let payload={title:'FIEZEL · Reminder belajar',body:'Jahran, waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};
