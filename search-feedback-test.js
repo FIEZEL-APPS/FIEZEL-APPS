@@ -218,6 +218,15 @@ ok(/\.search-hit\{/.test(withoutComments), 'gaya materi terkait hilang dari styl
 // Label di bawah balok emas.
 ok(/class="ask-label"/.test(indexSrc), 'label di bawah balok emas belum ada');
 
+// OWNER melaporkan labelnya mendominasi. Yang menyumbang lebar bukan tinggi hurufnya
+// melainkan kapital, tebal, dan jarak huruf - ketiganya dicabut, dan ketiganya mudah
+// kembali tanpa sengaja saat seseorang merapikan gaya topbar.
+const labelRule = withoutComments.slice(withoutComments.indexOf('.ask-button .ask-label{'),
+  withoutComments.indexOf('.ask-button .ask-label{') + 200);
+ok(/font-size:7px/.test(labelRule), 'ukuran label berubah dari yang OWNER setujui');
+ok(!/text-transform:uppercase/.test(labelRule), 'kapital kembali; labelnya akan melebar lagi');
+ok(!/font-weight:[67]00/.test(labelRule), 'huruf tebal kembali; labelnya akan mendominasi lagi');
+
 /* ---- m025-103 notifikasi masukan ke OWNER ------------------------------ */
 
 // Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
