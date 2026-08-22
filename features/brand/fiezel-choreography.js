@@ -71,16 +71,22 @@
    *
    * Jarak antarketukan sengaja TIDAK rata. Jarak rata terdengar seperti bip dan terlihat
    * seperti daftar; jarak timpang bisa ditirukan orang dan terbaca sebagai gerakan.
+   *
+   * m025-88 OWNER: "animasinya terlalu cepat dan singkat". Seluruh tabel direntangkan
+   * sekitar 1,7x - gerakan kini selesai di 2180ms, bukan 1380ms. Yang membuat pembukaan
+   * terasa mahal bukan jumlah gerakannya melainkan waktu yang diberikan kepada tiap
+   * gerakan untuk mendarat; versi sebelumnya menyelesaikan seluruh susunan sebelum mata
+   * sempat mengikutinya.
    */
   var BEATS = Object.freeze([
-    Object.freeze({ id: 'b1', css: '--fz-b1', at: 0,   dur: 420, pitch: PITCH.F2, role: 'sub',     moves: 'batang tegak huruf F tumbuh ke bawah' }),
-    Object.freeze({ id: 'b2', css: '--fz-b2', at: 110, dur: 340, pitch: PITCH.F3, role: 'strike',  moves: 'lengan atas huruf F memanjang' }),
-    Object.freeze({ id: 'b3', css: '--fz-b3', at: 165, dur: 340, pitch: PITCH.C4, role: 'strike',  moves: 'lengan bawah huruf F memanjang' }),
-    Object.freeze({ id: 'b4', css: '--fz-b4', at: 250, dur: 460, pitch: PITCH.F4, role: 'strike',  moves: 'batang emas pertama naik' }),
-    Object.freeze({ id: 'b5', css: '--fz-b5', at: 310, dur: 460, pitch: PITCH.A4, role: 'colour',  moves: 'batang emas kedua naik' }),
-    Object.freeze({ id: 'b6', css: '--fz-b6', at: 480, dur: 900, pitch: PITCH.C5, role: 'shimmer', moves: 'kilau emas menyapu logo' }),
-    Object.freeze({ id: 'b7', css: '--fz-b7', at: 620, dur: 520, pitch: PITCH.G5, role: 'add9',    moves: 'wordmark FIEZEL naik' }),
-    Object.freeze({ id: 'b8', css: '--fz-b8', at: 800, dur: 520, pitch: null,     role: 'bloom',   moves: 'tagline naik' })
+    Object.freeze({ id: 'b1', css: '--fz-b1', at: 0,    dur: 700,  pitch: PITCH.F2, role: 'sub',     moves: 'batang tegak huruf F tumbuh ke bawah' }),
+    Object.freeze({ id: 'b2', css: '--fz-b2', at: 190,  dur: 560,  pitch: PITCH.F3, role: 'strike',  moves: 'lengan atas huruf F memanjang' }),
+    Object.freeze({ id: 'b3', css: '--fz-b3', at: 285,  dur: 560,  pitch: PITCH.C4, role: 'strike',  moves: 'lengan bawah huruf F memanjang' }),
+    Object.freeze({ id: 'b4', css: '--fz-b4', at: 430,  dur: 760,  pitch: PITCH.F4, role: 'strike',  moves: 'batang emas pertama naik' }),
+    Object.freeze({ id: 'b5', css: '--fz-b5', at: 530,  dur: 760,  pitch: PITCH.A4, role: 'colour',  moves: 'batang emas kedua naik' }),
+    Object.freeze({ id: 'b6', css: '--fz-b6', at: 820,  dur: 1200, pitch: PITCH.C5, role: 'shimmer', moves: 'kilau emas menyapu logo' }),
+    Object.freeze({ id: 'b7', css: '--fz-b7', at: 1060, dur: 820,  pitch: PITCH.G5, role: 'add9',    moves: 'wordmark FIEZEL naik' }),
+    Object.freeze({ id: 'b8', css: '--fz-b8', at: 1360, dur: 820,  pitch: null,     role: 'bloom',   moves: 'tagline naik' })
   ]);
 
   /** Milidetik saat gerakan terakhir selesai. Ekor bunyi tidak boleh berhenti sebelum ini. */
