@@ -24,6 +24,8 @@ const FEEDBACK_MAX_QUERY=80;
 // berupa cincin: yang terlama terdorong keluar alih-alih tumbuh tanpa batas.
 const FEEDBACK_RATE_PER_HOUR=60;
 const FEEDBACK_RATE_KEY=PFX+'feedback_rate';
+const FEEDBACK_NOTIFIED_KEY=PFX+'feedback_notified';
+const FEEDBACK_NOTIFY_KIND='owner_feedback';
 const SUBTITLE_MAX_CHARS=3000;
 const CONTENT_PATCH_SCHEMA='fiezel-content-patch-v1';
 const OUTCOME_PREFIX=PFX+'outcomes_';
@@ -443,11 +445,60 @@ router.post('/api/activity',async({request,user})=>{
   const info=await callerInfo(user);if(!info?.uuid)return json({error:'Puter authentication required'},401);const body=await request.json().catch(()=>({})),key=USER_PREFIX+info.uuid,existing=(await me.puter.kv.get(key))||{};if(!existing.subscription)return json({error:'push subscription required'},409);
   existing.activity=boundedActivity(body.activity);existing.updatedAt=new Date().toISOString();await me.puter.kv.set(key,existing);return {synced:true,protocol:'1.7',evidenceSchema:existing.activity.evidence.schema};
 });
+/**
+ * Satu notifikasi untuk OWNER bila ada masukan yang belum pernah diberitahukan.
+ *
+ * Diringkas menjadi SATU pesan berisi jumlah, bukan satu pesan per masukan: sepuluh
+ * kiriman dalam satu jam akan membuat HP berbunyi sepuluh kali untuk kabar yang sama,
+ * dan notifikasi yang mengganggu akan dimatikan - lalu kabar berikutnya tidak sampai
+ * sama sekali.
+ */
+async function ownerFeedbackNotification(rows,now){
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{};
+  const items=Array.isArray(stored.items)?stored.items:[];
+  if(!items.length)return null;
+  const seen=(await me.puter.kv.get(FEEDBACK_NOTIFIED_KEY))||{};
+  const lastId=String(seen.lastId||'');
+  const at=lastId?items.findIndex(x=>x&&x.id===lastId):-1;
+  // Kiriman yang id-nya tidak ditemukan berarti sudah terdorong keluar cincin; dalam
+  // keadaan itu seluruh isi dianggap baru, karena melewatkan kabar lebih buruk daripada
+  // satu notifikasi berlebih.
+  const fresh=at===-1?items:items.slice(at+1);
+  if(!fresh.length)return null;
+  const owner=await ownerInfo();
+  if(!owner||!owner.uuid)return null;
+  const rec=(await me.puter.kv.get(USER_PREFIX+owner.uuid))||{};
+  if(!rec.subscription)return null;
+  const missing=fresh.filter(x=>x&&x.kind==='missing_material').length;
+  const body=missing===fresh.length
+    ? `${fresh.length} permintaan materi baru dari pengguna.`
+    : `${fresh.length} masukan baru${missing?` (${missing} permintaan materi)`:''}.`;
+  return {id:owner.uuid,subscription:rec.subscription,notification:{
+    kind:FEEDBACK_NOTIFY_KIND,title:'Masukan pengguna FIEZEL',body,tag:'fiezel-feedback',
+    url:'./creator-report-dashboard.html',
+    meta:{count:fresh.length,missingMaterial:missing,lastId:String(fresh[fresh.length-1].id||'')}
+  }};
+}
 router.post('/api/reminders/due',async({request})=>{
   if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const rows=await me.puter.kv.list({pattern:USER_PREFIX+'*',returnValues:true}),now=Date.now(),due=[];
   for(const row of rows.slice(0,MAX_USERS)){const rec=row.value||{};if(!rec.subscription)continue;const reminder=reminderFor(rec,now);if(reminder)due.push({id:row.key.slice(USER_PREFIX.length),subscription:rec.subscription,notification:reminder});if(due.length>=MAX_DUE)break}
+  // m025-103: masukan pengguna ikut menumpang antrian yang sama. Dispatcher, jadwal, dan
+  // kunci VAPID sudah ada dan sudah teruji; membuat jalur push kedua hanya menambah
+  // tempat baru untuk rusak, dan kunci privat itu memang sengaja tidak pernah menyentuh
+  // Worker.
+  const ownerNote=await ownerFeedbackNotification(rows,now);
+  if(ownerNote)due.push(ownerNote);
   return {generatedAt:new Date(now).toISOString(),count:due.length,due};
 });
 router.post('/api/reminders/ack',async({request})=>{
-  if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const body=await request.json().catch(()=>({})),id=String(body.id||''),kind=String(body.kind||'').slice(0,40);if(!/^[A-Za-z0-9_-]{6,128}$/.test(id)||!kind)return json({error:'invalid ack'},400);const key=USER_PREFIX+id,rec=await me.puter.kv.get(key);if(!rec)return json({error:'not found'},404);rec.lastPushAt=Date.now();rec.lastPushDay=dateKeyJakarta();rec.lastPushKind=kind;rec.lastPushStatus=String(body.status||'sent').slice(0,30);if(kind==='positive')rec.lastPositiveDay=rec.lastPushDay;const evidence=body.evidence&&typeof body.evidence==='object'?body.evidence:{};rec.reminderEvidenceLog=[...(Array.isArray(rec.reminderEvidenceLog)?rec.reminderEvidenceLog:[]),{at:rec.lastPushAt,channel:'remote',kind,status:rec.lastPushStatus,evidence}].slice(-ALRS_EVIDENCE_LOG_LIMIT);if(rec.lastPushStatus==='expired')rec.subscription=null;await me.puter.kv.set(key,rec);return {acked:true};
+  if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const body=await request.json().catch(()=>({})),id=String(body.id||''),kind=String(body.kind||'').slice(0,40);if(!/^[A-Za-z0-9_-]{6,128}$/.test(id)||!kind)return json({error:'invalid ack'},400);
+  // m025-103: ack notifikasi masukan TIDAK boleh menyentuh catatan pengingat belajar.
+  // Catatan itu memegang lastPushAt, dan ALRS menolak mengirim pengingat berikutnya
+  // dalam 18 jam sesudahnya - jadi menumpang di sana berarti satu kabar masukan
+  // membungkam pengingat belajar Jahran seharian.
+  if(kind===FEEDBACK_NOTIFY_KIND){
+    const lastId=String((body.evidence&&body.evidence.lastId)||'').slice(0,80);
+    if(lastId)await me.puter.kv.set(FEEDBACK_NOTIFIED_KEY,{lastId,at:new Date().toISOString()});
+    return {acked:true,kind,protocol:'1.7'};
+  }const key=USER_PREFIX+id,rec=await me.puter.kv.get(key);if(!rec)return json({error:'not found'},404);rec.lastPushAt=Date.now();rec.lastPushDay=dateKeyJakarta();rec.lastPushKind=kind;rec.lastPushStatus=String(body.status||'sent').slice(0,30);if(kind==='positive')rec.lastPositiveDay=rec.lastPushDay;const evidence=body.evidence&&typeof body.evidence==='object'?body.evidence:{};rec.reminderEvidenceLog=[...(Array.isArray(rec.reminderEvidenceLog)?rec.reminderEvidenceLog:[]),{at:rec.lastPushAt,channel:'remote',kind,status:rec.lastPushStatus,evidence}].slice(-ALRS_EVIDENCE_LOG_LIMIT);if(rec.lastPushStatus==='expired')rec.subscription=null;await me.puter.kv.set(key,rec);return {acked:true};
 });
