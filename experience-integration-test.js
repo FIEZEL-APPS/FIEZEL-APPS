@@ -14,7 +14,7 @@ check(/id="answerBurst"/.test(html)&&/\.answer-burst/.test(css)&&/circle-check-b
 check(/document\.startViewTransition/.test(app)&&/\.reduce-motion \*/.test(css),'Motion system or reduced-motion control missing');
 check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.test(css),'Premium launcher surface missing');
 check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
-check(/prepareNeuralVoice/.test(app)&&/FiezelVoiceRuntime\.speak/.test(app)&&/Siapkan suara offline/.test(app),'Explicit local neural voice opt-in or runtime routing missing');
+check(/FiezelVoiceSay/.test(app)&&/Simpan untuk offline/.test(app)&&/Tidak ada yang perlu diunduh/.test(app),'m025-96: suara harus lewat pintu bersama, dan unduhan lokal hanya tambahan opsional');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
 // OWNER MEMBALIK m025-34: notifikasi DIUNDANG, tidak diwajibkan. Yang diperiksa sekarang

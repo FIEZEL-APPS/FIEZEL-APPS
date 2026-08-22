@@ -8,7 +8,7 @@ const assert = require('assert');
 const fs = require('fs');
 
 const zoom = require('./features/ui/fiezel-zoom-lock.js');
-const gate = require('./features/neural-voice/fiezel-voice-bundle-gate.js');
+// m025-96: gerbang unduhan dipensiunkan seluruhnya - berkasnya tidak ada lagi.
 const daily = require('./features/daily-target/fiezel-daily-target.js');
 const dialog = require('./features/tutor-classroom/fiezel-tutor-dialog.js');
 
@@ -16,7 +16,6 @@ const index = fs.readFileSync('index.html', 'utf8');
 const css = fs.readFileSync('style.css', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const app = fs.readFileSync('app.js', 'utf8');
-const gateSrc = fs.readFileSync('features/neural-voice/fiezel-voice-bundle-gate.js', 'utf8');
 const dailySrc = fs.readFileSync('features/daily-target/fiezel-daily-target.js', 'utf8');
 const chatSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-voice-chat.js', 'utf8');
 const tutorSrc = fs.readFileSync('features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
@@ -73,35 +72,28 @@ test('the zoom lock is loaded and precached, and never blocks single-finger inpu
 
 // ---- 4. one-batch voice download ---------------------------------------------------
 
-test('m025-95: tidak ada lagi unduhan, jadi sheet tidak pernah muncul', () => {
-  // Suara dirender di server; tembok unduhan di onboarding itulah yang dibuang.
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false }), false, 'fresh install tidak lagi ditahan');
-  // Gerbangnya mati untuk SEMUA masukan: tidak ada lagi keadaan yang bisa menahan
-  // pengguna di layar unduhan, termasuk keadaan setengah terpasang dari versi lama.
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: false }), false, 'setengah terpasang pun tidak ditahan');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: true }), false, 'tidak pernah muncul');
-  assert.strictEqual(gate.shouldPrompt({}), false, 'status kosong pun tidak menahan');
-  assert.ok(!/voiceBundleLater|Nanti saja/.test(gateSrc), 'the "later" button must not exist');
-  assert.match(gateSrc, /voice-bundle-locked/, 'the app is held while a bundle is missing');
+test('m025-96: gerbang unduhan dipensiunkan seluruhnya', () => {
+  // Bukan sekadar dimatikan: berkasnya dihapus, pemicunya dicabut dari app.js, dan
+  // pendaftarannya hilang dari index.html serta sw.js. Modul mati yang masih dimuat
+  // adalah cara termudah sheet wajib itu kembali lewat satu pemanggil yang terlewat.
+  assert.ok(!fs.existsSync('features/neural-voice/fiezel-voice-bundle-gate.js'),
+    'berkas gerbang harus terhapus');
+  assert.ok(!app.includes('FiezelVoiceBundleGate'), 'app.js tidak boleh memicunya lagi');
+  assert.ok(!index.includes('fiezel-voice-bundle-gate.js'), 'index tidak boleh memuatnya');
 });
 
 test('progress is reported as one number across both bundles', () => {
-  assert.deepStrictEqual(gate.progressOf([{ completed: 5, total: 5 }, { completed: 0, total: 5 }]),
-    { completed: 5, total: 10, percent: 50 });
-  assert.deepStrictEqual(gate.progressOf([]), { completed: 0, total: 0, percent: 0 }, 'no data is 0%, never NaN');
-  assert.strictEqual(gate.progressOf([{ completed: 9, total: 5 }]).percent, 100, 'progress never exceeds 100%');
+  // Perhitungan kemajuan unduhan ikut hilang bersama gerbangnya.
 });
 
-test('the batch is one download, sequential, and reports progress in place', () => {
-  assert.match(gateSrc, /prepareEnglish\(\)\s*\n?\s*\.then\(function \(\) \{ return prepareIndonesian\(\); \}\)/,
-    'English then Indonesian, never raced');
-  assert.match(gateSrc, /voiceBundleBar/, 'progress is shown on the sheet itself');
-  // A stored completion flag must never outlive the assets it claims exist.
-  assert.match(gateSrc, /completed: english && indonesian && readFlag\(\)/,
-    'the "never again" flag is only trusted while both engines report prepared');
-  assert.ok(index.includes('./features/neural-voice/fiezel-voice-bundle-gate.js'), 'loaded by the document');
-  assert.ok(sw.includes('./features/neural-voice/fiezel-voice-bundle-gate.js'), 'precached');
-  assert.match(app, /FiezelVoiceBundleGate\?\.maybePrompt/, 'it is the third prompt after the notification gate');
+test('m025-96: gerbang unduhan digantikan pintu bicara bersama', () => {
+  // Prompt ketiga di onboarding - sheet unduhan tanpa tombol "nanti" - dihapus. Suara
+  // dirender di server, jadi tidak ada bundel yang perlu ada sebelum FIEZEL bisa bicara.
+  assert.ok(!index.includes('fiezel-voice-bundle-gate.js'), 'gerbang tidak boleh dimuat lagi');
+  assert.ok(!sw.includes('fiezel-voice-bundle-gate.js'), 'gerbang tidak boleh tersimpan lagi');
+  assert.ok(index.includes('./features/neural-voice/fiezel-voice-say.js'), 'pintu bicara bersama dimuat');
+  assert.ok(sw.includes('./features/neural-voice/fiezel-voice-say.js'), 'pintu bicara bersama tersimpan');
+  assert.ok(!/FiezelVoiceBundleGate/.test(app), 'app.js tidak boleh memicu gerbang yang sudah dihapus');
 });
 
 // ---- 2. mandatory daily target -----------------------------------------------------
@@ -229,14 +221,12 @@ test('the round button exists, answers by voice, and never falls back to browser
 
 // ---- m025-43 OWNER repair batch ----------------------------------------------------
 
-test('both gates start themselves, because the app.js call site runs too early', () => {
+test('daily target tetap menyalakan dirinya sendiri', () => {
   // The original call sat inside unlockAppAfterNotification, which executes while app.js
   // is still parsing - every <script> after it was undefined, so the optional call was a
   // silent no-op. That is why OWNER saw no popup at all.
-  assert.match(gateSrc, /DOMContentLoaded/, 'the voice gate arms itself');
-  assert.match(gateSrc, /setInterval\(function \(\) \{/, 'and keeps checking');
   assert.match(dailySrc, /DOMContentLoaded/, 'the daily target arms itself');
-  assert.ok(app.indexOf('FiezelVoiceBundleGate?.maybePrompt') > -1, 'app.js still nudges it, harmlessly');
+  // m025-96: gerbang suara sudah dihapus, jadi tinggal daily target yang menyalakan diri.
   // Two blocking sheets must never stack.
   assert.match(dailySrc, /voiceBundleSheet/, 'the target sheet waits for the mandatory download');
 });
