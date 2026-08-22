@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FIEZEL — Probe Prosodi Puter TTS</title>
+<!--
+  Probe ronde 2. Ronde 1 (puter-tts-probe.html) sudah menjawab:
+      txt2speech ADA, cracking HILANG, id-ID GAGAL, tapi hasilnya DATAR TANPA PRODOSI.
+
+  Datar itu bukan batas keras dari TTS jarak jauh - itu akibat memanggilnya dengan teks
+  telanjang di engine yang paling hemat. Ada tiga tuas yang belum disentuh, dan halaman
+  ini menguji ketiganya secara A/B supaya OWNER bisa MENDENGAR bedanya, bukan menebak:
+
+    1. ENGINE. Polly punya tingkatan ekspresi yang berbeda jauh, bukan sekadar beda
+       kualitas. Ini biasanya tuas terbesar - lebih besar daripada SSML.
+    2. SUARA. Antar suara dalam satu engine pun rentang ekspresinya berbeda jauh.
+    3. SSML. Teks telanjang tidak memberi model satu pun petunjuk di mana harus naik,
+       turun, atau berhenti. SSML memberi petunjuk itu secara eksplisit.
+
+  Tuas ke-3 tidak ditulis ulang di sini. SSML-nya dibangkitkan dari FiezelProsody yang
+  sudah ada di aplikasi - modul itu sudah tahu mana pertanyaan, mana klausa, dan berapa
+  jeda yang pantas, untuk en DAN id. Menyalin ulang logikanya berarti dua sumber
+  kebenaran yang akan berbeda diam-diam, persis penyakit yang sedang kita obati.
+
+  Bagian id-ID terpisah: karena Puter tidak melayaninya, kandidatnya adalah suara bawaan
+  perangkat (speechSynthesis) yang nol unduhan - supaya sherpa-vits-id (91 MB) tetap bisa
+  dibuang tanpa kehilangan suara tutor.
+
+  Di luar shell PWA dan di luar precache sw.js: alat diagnosa, bukan bagian aplikasi.
+-->
+<style>
+  :root{--bg:#fdf6f5;--ink:#2b2b2b;--muted:#6b6b6b;--line:#e6dcd9;--ok:#1a7f4b;--bad:#b3261e;--card:#fff;--hi:#8b5cf6}
+  @media (prefers-color-scheme:dark){:root{--bg:#1a1618;--ink:#f0e9e7;--muted:#a49c99;--line:#3a3234;--card:#241f21}}
+  *{box-sizing:border-box}
+  body{margin:0;padding:20px;background:var(--bg);color:var(--ink);
+       font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  main{max-width:820px;margin:0 auto}
+  h1{font-size:21px;margin:0 0 4px}
+  p.sub{color:var(--muted);margin:0 0 20px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  h2{font-size:14px;margin:0 0 4px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  h2+p{margin:0 0 14px;color:var(--muted);font-size:13px}
+  button{font:inherit;padding:10px 16px;border-radius:9px;border:1px solid var(--line);
+         background:var(--ink);color:var(--bg);cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink)}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  textarea,select{font:inherit;padding:9px;border-radius:9px;border:1px solid var(--line);
+        background:var(--bg);color:var(--ink);width:100%;margin-bottom:10px}
+  pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);
+      border-radius:9px;padding:11px;font-size:12.5px;max-height:300px;overflow:auto;margin:10px 0 0}
+  .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+  .card{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+  .card h3{margin:0 0 2px;font-size:15px}
+  .card .why{color:var(--muted);font-size:13px;margin:0 0 10px}
+  .card .status{font-size:13px;margin-top:8px;color:var(--muted)}
+  .rate{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .rate span{font-size:13px;color:var(--muted);margin-right:4px}
+  .rate button{padding:6px 12px;font-size:13px;background:transparent;color:var(--ink)}
+  .rate button[aria-pressed="true"]{background:var(--hi);color:#fff;border-color:var(--hi)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Probe Prosodi</h1>
+  <p class="sub">Ronde 1 sudah membuktikan suaranya bersih. Sekarang: bisakah dia terdengar hidup?</p>
+
+  <section>
+    <h2>Kalimat uji</h2>
+    <p>Pakai kalimat yang punya pertanyaan dan pujian — di situlah datar paling terasa.</p>
+    <textarea id="txt" rows="3">What did the team measure during the first review? Well done, Jahran. You finished this passage.</textarea>
+    <button id="btnRun">Bandingkan semua</button>
+    <button id="btnStop" class="ghost">Berhenti</button>
+    <pre id="log">Tekan "Bandingkan semua". Tiap kandidat diputar berurutan — dengarkan, lalu beri nilai.</pre>
+  </section>
+
+  <div id="cards"></div>
+
+  <section>
+    <h2>Suara Indonesia (tanpa unduhan)</h2>
+    <p>Puter tidak melayani id-ID. Kandidatnya: suara bawaan perangkatmu — nol unduhan,
+       nol biaya. Kalau ini cukup enak, <code>sherpa-vits-id</code> (91 MB) bisa dibuang.</p>
+    <textarea id="txtId" rows="2">Halo Jahran, gimana kabarnya? Mantap, kamu udah selesai satu bacaan.</textarea>
+    <button id="btnId">Dengar suara Indonesia</button>
+    <pre id="logId">—</pre>
+  </section>
+
+  <section>
+    <h2>Ringkasan buat dilaporkan</h2>
+    <p>Setelah semua dinilai, salin isi kotak ini dan kirim ke Claude.</p>
+    <pre id="summary">Belum ada penilaian.</pre>
+  </section>
+</main>
+
+<script src="../features/neural-voice/fiezel-prosody.js"></script>
+<script async src="https://js.puter.com/v2/"></script>
+<script>
+(function(){
+  'use strict';
+
+  var $ = function(id){ return document.getElementById(id); };
+  var stopped = false;
+
+  /* Kandidat diurutkan dari tuas yang diperkirakan paling besar ke paling kecil, supaya
+     kalau OWNER berhenti di tengah, yang sudah terdengar adalah yang paling menentukan. */
+  var CANDIDATES = [
+    { id:'neural-plain', title:'A · neural, teks telanjang',
+      why:'Ini yang kamu dengar kemarin. Jadi pembanding, bukan kandidat.',
+      engine:'neural', ssml:false },
+    { id:'generative-plain', title:'B · generative, teks telanjang',
+      why:'Engine paling ekspresif. Kalau bedanya besar di sini, ini jawabannya dan SSML cuma pemanis.',
+      engine:'generative', ssml:false },
+    { id:'neural-ssml', title:'C · neural + SSML dari FiezelProsody',
+      why:'Engine sama seperti A, tapi diberi tahu di mana naik, turun, dan berhenti.',
+      engine:'neural', ssml:true },
+    { id:'generative-ssml', title:'D · generative + SSML',
+      why:'Dua tuas sekaligus. Biasanya yang terbaik — kecuali malah jadi berlebihan.',
+      engine:'generative', ssml:true }
+  ];
+
+  var scores = {};
+
+  function waitForPuter(ms){
+    return new Promise(function(resolve, reject){
+      var end = Date.now() + (ms || 15000);
+      (function poll(){
+        if (window.puter) return resolve(window.puter);
+        if (Date.now() > end) return reject(new Error('SDK Puter tidak termuat.'));
+        setTimeout(poll, 120);
+      })();
+    });
+  }
+
+  /* ---- SSML dari FiezelProsody ---------------------------------------
+     Tidak ada aturan prosodi baru di sini. Modul aplikasi yang memutuskan apa itu
+     kalimat, mana yang pertanyaan, dan berapa jeda sesudahnya; fungsi ini hanya
+     menerjemahkan keputusan itu ke tag yang dimengerti Polly. */
+
+  function esc(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                    .replace(/"/g,'&quot;');
+  }
+
+  function buildSsml(text, lang){
+    var P = window.FiezelProsody;
+    if (!P) return null;
+
+    // punctuate() menyisipkan koma di batas klausa yang tidak bertanda - tanpa itu,
+    // model membaca satu klausa panjang sebagai satu tarikan napas.
+    var shaped = P.punctuate(text, lang);
+    var lines = P.phrases(shaped, 200);
+
+    var parts = lines.map(function(line, i){
+      var isQ = P.isQuestion(line, lang);
+      var isEx = P.isExclamation(line, lang);
+      var gap = P.gapAfter(line, lang);
+
+      // Kontur dibatasi CONTOUR_MIN/MAX di modul aslinya dengan alasan yang sama
+      // berlakunya di sini: lewat beberapa persen, ini berhenti terdengar sebagai
+      // intonasi dan mulai terdengar sebagai penutur yang berbeda.
+      var pitch = isQ ? '+6%' : (isEx ? '+4%' : '+0%');
+      var rate  = isEx ? '+4%' : (isQ ? '+0%' : '-2%');
+
+      var body = '<prosody pitch="' + pitch + '" rate="' + rate + '">' + esc(line) + '</prosody>';
+      if (isEx) body = '<emphasis level="moderate">' + body + '</emphasis>';
+
+      var brk = (i < lines.length - 1) ? '<break time="' + gap + 'ms"/>' : '';
+      return body + brk;
+    });
+
+    return '<speak>' + parts.join('') + '</speak>';
+  }
+
+  /* ---- pemutaran ------------------------------------------------------ */
+
+  function toAudio(r){
+    if (r instanceof HTMLAudioElement) return r;
+    if (typeof Blob !== 'undefined' && r instanceof Blob) return new Audio(URL.createObjectURL(r));
+    if (typeof r === 'string') return new Audio(r);
+    return null;
+  }
+
+  function playAndWait(a){
+    return new Promise(function(res, rej){
+      a.onended = res;
+      a.onerror = function(){ rej(new Error('pemutaran gagal')); };
+      var p = a.play(); if (p && p.catch) p.catch(rej);
+    });
+  }
+
+  function speak(text, cand, lang){
+    return waitForPuter().then(function(p){
+      var payload = text;
+      var opts = { language: lang, engine: cand.engine };
+      if (cand.ssml) {
+        var s = buildSsml(text, lang);
+        if (!s) throw new Error('FiezelProsody tidak termuat — SSML tidak bisa dibangun');
+        payload = s;
+        // Nama flag SSML belum pasti di lapisan Puter; kirim dua ejaan yang lazim
+        // dan biarkan yang tidak dikenal diabaikan.
+        opts.ssml = true; opts.textType = 'ssml';
+      }
+      var t0 = performance.now();
+      return p.ai.txt2speech(payload, opts).then(function(r){
+        return { result: r, ms: Math.round(performance.now() - t0) };
+      });
+    });
+  }
+
+  /* ---- kartu ----------------------------------------------------------- */
+
+  function renderCards(){
+    $('cards').innerHTML = CANDIDATES.map(function(c){
+      return '<section class="card" id="card-' + c.id + '">'
+           + '<h3>' + c.title + '</h3>'
+           + '<p class="why">' + c.why + '</p>'
+           + '<button class="ghost" data-replay="' + c.id + '">Putar ulang</button>'
+           + '<div class="status" id="st-' + c.id + '">menunggu…</div>'
+           + '<div class="rate" id="rt-' + c.id + '"><span>Hidup nggak suaranya?</span>'
+           +   '<button data-score="' + c.id + '|datar">Masih datar</button>'
+           +   '<button data-score="' + c.id + '|lumayan">Lumayan</button>'
+           +   '<button data-score="' + c.id + '|hidup">Hidup!</button>'
+           +   '<button data-score="' + c.id + '|lebay">Kelebihan</button>'
+           + '</div></section>';
+    }).join('');
+  }
+
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if (t.dataset && t.dataset.score) {
+      var bits = t.dataset.score.split('|');
+      scores[bits[0]] = bits[1];
+      var group = $('rt-' + bits[0]);
+      Array.prototype.forEach.call(group.querySelectorAll('button'), function(b){
+        b.setAttribute('aria-pressed', String(b === t));
+      });
+      updateSummary();
+    }
+    if (t.dataset && t.dataset.replay) {
+      var cand = CANDIDATES.filter(function(c){ return c.id === t.dataset.replay; })[0];
+      if (cand) runOne(cand);
+    }
+  });
+
+  function updateSummary(){
+    var lines = CANDIDATES.map(function(c){
+      return c.title.split(' · ')[0] + ' (' + c.engine + (c.ssml ? ' + SSML' : ' polos') + ') : '
+           + (scores[c.id] || 'belum dinilai');
+    });
+    lines.push('');
+    lines.push('Suara Indonesia bawaan perangkat: ' + (scores.id || 'belum dinilai'));
+    $('summary').textContent = lines.join('\n');
+  }
+
+  function runOne(cand){
+    var st = $('st-' + cand.id);
+    st.textContent = 'merender…';
+    st.className = 'status';
+    return speak($('txt').value, cand, 'en-US').then(function(res){
+      var a = toAudio(res.result);
+      if (!a) throw new Error('bentuk kembalian tak bisa diputar');
+      st.textContent = 'memutar… (' + res.ms + ' ms)';
+      st.className = 'status ok';
+      return playAndWait(a).then(function(){
+        st.textContent = 'selesai — ' + res.ms + ' ms';
+      });
+    }).catch(function(e){
+      st.textContent = 'GAGAL: ' + e.message;
+      st.className = 'status bad';
+      scores[cand.id] = 'gagal (' + String(e.message).slice(0,40) + ')';
+      updateSummary();
+    });
+  }
+
+  $('btnStop').onclick = function(){ stopped = true; };
+
+  $('btnRun').onclick = function(){
+    stopped = false;
+    var btn = this;
+    btn.disabled = true;
+    var i = 0;
+    $('log').textContent = 'FiezelProsody: '
+      + (window.FiezelProsody ? 'termuat' : 'TIDAK termuat — kandidat SSML akan gagal')
+      + '\nMemutar berurutan. Dengarkan bedanya.';
+
+    (function next(){
+      if (stopped || i >= CANDIDATES.length) {
+        $('log').textContent += stopped ? '\nDihentikan.' : '\nSelesai. Beri nilai tiap kandidat di atas.';
+        btn.disabled = false;
+        return;
+      }
+      runOne(CANDIDATES[i++]).then(function(){
+        setTimeout(next, 700); // jeda supaya telinga bisa memisahkan dua kandidat
+      });
+    })();
+  };
+
+  /* ---- Indonesia via suara bawaan perangkat ---------------------------- */
+
+  $('btnId').onclick = function(){
+    var out = $('logId');
+    if (!('speechSynthesis' in window)) {
+      out.textContent = 'Perangkat ini tidak punya speechSynthesis.';
+      out.className = 'bad';
+      return;
+    }
+    var pick = function(){
+      var voices = speechSynthesis.getVoices() || [];
+      var id = voices.filter(function(v){ return /^id/i.test(v.lang); });
+      if (!id.length) {
+        out.textContent = 'Tidak ada suara id-ID terpasang di perangkat ini.\n'
+          + 'Suara yang ada: ' + voices.map(function(v){return v.lang;}).join(', ');
+        out.className = 'bad';
+        return;
+      }
+      out.textContent = 'Suara id-ID ditemukan: ' + id.map(function(v){return v.name;}).join(', ')
+        + '\nMemutar dengan: ' + id[0].name;
+      out.className = 'ok';
+
+      var P = window.FiezelProsody;
+      var text = P ? P.punctuate($('txtId').value, 'id') : $('txtId').value;
+      var u = new SpeechSynthesisUtterance(text);
+      u.voice = id[0]; u.lang = id[0].lang; u.rate = 1; u.pitch = 1;
+      u.onend = function(){
+        out.textContent += '\nSelesai. Cukup enak buat suara tutor?';
+        scores.id = 'sudah didengar — tulis pendapatmu';
+        updateSummary();
+      };
+      speechSynthesis.speak(u);
+    };
+    if (!speechSynthesis.getVoices().length) {
+      speechSynthesis.onvoiceschanged = pick;
+      setTimeout(pick, 400);
+    } else pick();
+  };
+
+  renderCards();
+  updateSummary();
+})();
+</script>
+</body>
+</html>
