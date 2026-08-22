@@ -133,3 +133,43 @@ ok(assignments.length === 0,
 ok(/textContent/.test(dashboard), 'dasbor tidak menulis lewat textContent sama sekali');
 
 console.log('m025-102 pencarian + feedback: ' + passed + ' pemeriksaan lolos');
+
+/* ---- m025-103 notifikasi masukan ke OWNER ------------------------------ */
+
+// Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
+// sudah teruji, dan kunci privat itu memang sengaja tidak pernah menyentuh Worker.
+ok(worker.includes('FEEDBACK_NOTIFY_KIND'), 'Worker belum mengenal notifikasi masukan');
+ok(worker.includes('ownerFeedbackNotification'), 'antrian push belum menyertakan masukan');
+
+const dueAt = worker.indexOf("router.post('/api/reminders/due'");
+ok(/ownerFeedbackNotification\(rows,\s*now\)/.test(worker.slice(dueAt, dueAt + 900)),
+  'rute due tidak memanggil pembangun notifikasi masukan');
+
+// Notifikasi hanya untuk OWNER, dan hanya kalau dia memang berlangganan push.
+const notifyAt = worker.indexOf('async function ownerFeedbackNotification');
+const notifyBody = worker.slice(notifyAt, notifyAt + 1600);
+ok(/ownerInfo\(\)/.test(notifyBody), 'notifikasi masukan tidak memastikan penerimanya OWNER');
+ok(/rec\.subscription/.test(notifyBody), 'notifikasi dikirim tanpa memeriksa langganan push');
+
+// Satu pesan berisi jumlah, bukan satu pesan per masukan. Sepuluh kiriman dalam satu jam
+// yang berbunyi sepuluh kali akan membuat notifikasinya dimatikan - lalu kabar
+// berikutnya tidak sampai sama sekali.
+ok(/fresh\.length/.test(notifyBody), 'notifikasi masukan tidak diringkas jadi satu pesan');
+
+// INI YANG PALING PENTING. Catatan pengingat belajar memegang lastPushAt, dan ALRS
+// menolak mengirim pengingat berikutnya dalam 18 jam sesudahnya. Kalau ack masukan
+// menumpang di catatan itu, satu kabar masukan membungkam pengingat belajar seharian.
+const ackAt = worker.indexOf("router.post('/api/reminders/ack'");
+const ackBody = worker.slice(ackAt, ackAt + 1400);
+const guardAt = ackBody.indexOf('kind===FEEDBACK_NOTIFY_KIND');
+ok(guardAt !== -1, 'ack tidak memisahkan notifikasi masukan dari pengingat belajar');
+ok(guardAt < ackBody.indexOf('rec.lastPushAt'),
+  'ack masukan menyentuh lastPushAt; pengingat belajar akan terbungkam 18 jam');
+
+// Notifikasi menunjuk ke dasbor, dan jendela yang sudah terbuka harus DIARAHKAN ke sana.
+ok(/creator-report-dashboard\.html/.test(notifyBody), 'notifikasi tidak menunjuk ke dasbor');
+const swSrc = fs.readFileSync(path.join(__dirname, 'sw.js'), 'utf8');
+ok(/client\.navigate/.test(swSrc),
+  'service worker hanya memfokuskan jendela lama; notifikasi tidak akan sampai ke dasbor');
+
+console.log('m025-103 notifikasi masukan: pemeriksaan lolos');
