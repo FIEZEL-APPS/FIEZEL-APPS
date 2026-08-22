@@ -108,6 +108,15 @@
     });
   }
 
+  /** Menyiapkan kalimat berikutnya lebih awal. Diam bila mesin tidak mendukungnya. */
+  function prefetch(input, options) {
+    var voice = engine();
+    if (!voice || typeof voice.prefetch !== 'function') return Promise.resolve(false);
+    var english = text(typeof input === 'string' ? input : (input && input.en));
+    if (!english) return Promise.resolve(false);
+    return voice.prefetch(english, options || {});
+  }
+
   function stop() {
     var voice = engine();
     if (voice && typeof voice.stop === 'function') { try { voice.stop(); } catch (_) {} }
@@ -128,6 +137,7 @@
   return Object.freeze({
     SCHEMA: SCHEMA,
     say: say,
+    prefetch: prefetch,
     stop: stop,
     status: status
   });

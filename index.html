@@ -225,7 +225,6 @@ html.fz-booting body{overflow:hidden}
        Karena itu Diagnostics TIDAK ikut dimuat malas bersama tumpukan suara lainnya -
        nilainya justru terletak pada tersedia lebih dulu daripada yang ia periksa. -->
   <script defer src="./features/neural-voice/fiezel-diag-panel.js"></script>
-  <script defer src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
   <script defer src="./features/ui/fiezel-zoom-lock.js"></script>
   <script defer src="./features/ui/fiezel-back-nav.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
@@ -245,25 +244,12 @@ html.fz-booting body{overflow:hidden}
        (Nama berkasnya sengaja tidak ditulis di komentar ini: beberapa tes menghitung
        urutan lewat index.html indexOf pada nama berkas, dan penyebutan di komentar akan
        terbaca sebagai posisi pemuatan yang lebih awal daripada tag-nya sendiri.) -->
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-prosody.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-puter-voice.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-subtitle.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-subtitle-translate.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-say.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-persona.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-genz-script.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-web-audio-player.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-supertonic-voice.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js"></script>
-  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
   <!-- Tumpukan tutor/Classroom. data-fiezel-lazy-needs="voice" bukan hiasan: tutor v3
        menimpa runtime suara, jadi grup suara HARUS selesai lebih dulu walaupun murid
        membuka Classroom sebelum gelombang idle sempat jalan. -->
