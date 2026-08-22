@@ -961,6 +961,42 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .home-fold[open]>summary{border-bottom:1px solid var(--line)}
 .home-fold>.journey-skills,.home-fold>.journey-goal{margin:0;padding:14px 16px 16px;border:0;background:transparent}
 
+/* m025-101 — tur pengenalan (coach marks). OWNER: "anggaplah ada user baru... ga ngerti cara
+   pake, seharusnya ada tutorial seperti apps terkenal".
+
+   Sorotannya dibuat dengan SATU box-shadow raksasa, bukan empat panel peredup: satu elemen,
+   satu lapis cat, dan lubangnya selalu pas mengikuti kotak targetnya berapa pun ukurannya.
+   Lubang itu pointer-events:none supaya ia tidak pernah menelan sentuhan - lapisan induknya
+   yang menangkapnya, dan sentuhan di mana pun memajukan tur. */
+/* Baris Pengaturan yang berupa AKSI, bukan sakelar. Bentuknya sengaja sama persis dengan
+   .setting-row supaya daftarnya tetap terbaca satu irama, hanya penutupnya panah alih-alih
+   kotak centang. m025-88 mencatat perkenalan tidak bisa diputar ulang sama sekali; ini
+   jalannya. */
+.setting-row-action{width:100%;text-align:left;border:0;background:transparent;font:inherit;cursor:pointer}
+.setting-row-action>svg:last-child{width:17px;height:17px;color:var(--muted);justify-self:end}
+
+.fz-tour{position:fixed;inset:0;z-index:2147481800;color:var(--glass-text,#fff)}
+.fz-tour-hole{position:fixed;border-radius:18px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(10,5,8,.78),0 0 0 2px rgba(255,255,255,.55) inset;
+  transition:top .26s var(--ease,ease),left .26s var(--ease,ease),width .26s var(--ease,ease),height .26s var(--ease,ease)}
+.fz-tour-card{position:fixed;left:16px;right:16px;padding:20px 20px 16px;border-radius:22px;
+  background:var(--glass-solid,#fff);color:var(--text,#1d1114);box-shadow:0 24px 70px rgba(0,0,0,.34);
+  animation:fz-tour-in .28s cubic-bezier(.22,.8,.28,1) both}
+.fz-tour-card.is-top{top:max(22px,env(safe-area-inset-top))}
+.fz-tour-card.is-bottom{bottom:calc(104px + env(safe-area-inset-bottom))}
+@keyframes fz-tour-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fz-tour-card h2{margin:8px 0 6px;font-size:1.12rem;line-height:1.25;letter-spacing:-.02em}
+.fz-tour-card p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted,#6b5a60)}
+.fz-tour-dots{display:flex;gap:6px}
+.fz-tour-dot{width:6px;height:6px;border-radius:50%;background:var(--line,#e9dfe1)}
+.fz-tour-dot.is-active{background:var(--accent,#8C2233);width:18px;border-radius:3px}
+.fz-tour-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6b5a60);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:14px;background:var(--accent,#8C2233);color:#fff;font:inherit;font-size:.86rem;font-weight:750;cursor:pointer}
+/* Kurangi-gerak: sorotannya tetap ada, hanya perpindahannya yang tidak dianimasikan. */
+.fz-tour-still .fz-tour-hole{transition:none}
+.fz-tour-still .fz-tour-card{animation:none}
+
 /* Tab bar mengapung sebagai satu kapsul.
 
    m025-93 (brief redesign Bab 2, bug kritis #2): OWNER melaporkan "bottom navigation bar
