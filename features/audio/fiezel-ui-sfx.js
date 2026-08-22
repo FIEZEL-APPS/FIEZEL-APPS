@@ -323,11 +323,52 @@
     }
   }
 
+  /**
+   * m025-88 OWNER (iPhone 12, iOS 26, PWA terpasang): "tidak ada suara sfx yang terdengar",
+   * dengan saklar senyap fisik dalam keadaan MATI.
+   *
+   * Sebabnya baris yang baru saja dihapus dari sini: `if (!ignoreMotion && reducedMotion(env))
+   * return false`. Setiap SFX transisi dibisukan ketika perangkat meminta KURANGI GERAK.
+   *
+   * Itu salah kaprah. `prefers-reduced-motion` adalah permintaan tentang GERAKAN - vestibular,
+   * bukan pendengaran. Ia tidak pernah berarti "matikan suara"; platform punya jalur sendiri
+   * untuk itu (saklar senyap, volume, dan di aplikasi ini sakelar "Suara jawaban"). Menyamakan
+   * keduanya membuat murid yang menyalakan Kurangi Gerak - hal yang lumrah di iOS, dan sering
+   * ikut menyala sendiri di Mode Daya Rendah - kehilangan seluruh umpan balik bunyi tanpa
+   * pernah memintanya, dan tanpa ada tempat untuk mengembalikannya.
+   *
+   * Sekarang bunyi hanya tunduk pada dua hal yang memang berhak memutuskannya: sakelar
+   * preferensi murid, dan izin audio dari browser.
+   */
   function ready(env, ignoreMotion) {
     if (!enabled) return false;
-    if (!ignoreMotion && reducedMotion(env)) return false;
     if (!preferencesAllow(env)) return false;
     return ensureContext(env);
+  }
+
+  /**
+   * Keadaan nyata modul ini di perangkat, untuk dibaca lewat panel Diagnostics.
+   *
+   * Ini ada karena satu putaran penuh terbuang untuk menebak kenapa perangkat OWNER bisu:
+   * saklar senyap iOS tidak bisa dideteksi dari web, dan tanpa pembacaan di perangkat
+   * satu-satunya cara maju adalah menanyai pemiliknya satu per satu. Yang bisa dilihat,
+   * sekarang bisa dilihat.
+   */
+  function diagnostics(env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var out = {
+      enabled: enabled,
+      preferensiSuara: preferencesAllow(target),
+      kurangiGerak: reducedMotion(target),
+      pernahDisentuh: userActivated(target),
+      konteks: ctx ? String(ctx.state) : 'belum dibuat',
+      motifDisiagakan: !!pending,
+      webAudioTersedia: !!(target.AudioContext || target.webkitAudioContext),
+      // Tidak bisa dideteksi dari web sama sekali; ditulis eksplisit supaya pembacanya tahu
+      // ini titik buta, bukan sesuatu yang lupa diperiksa.
+      saklarSenyapIOS: 'tidak dapat dideteksi dari web'
+    };
+    return out;
   }
 
   /** Satu-satunya keadaan di mana menjadwalkan bunyi berarti membunyikannya sekarang. */
@@ -485,6 +526,7 @@
     play: play,
     playMotif: playMotif,
     cancelPending: cancelPending,
+    diagnostics: diagnostics,
     pendingMotif: function () { return pending ? { expiresAt: pending.expiresAt } : null; },
     contextState: function () { return ctx ? String(ctx.state) : 'none'; },
     setEnabled: setEnabled,
