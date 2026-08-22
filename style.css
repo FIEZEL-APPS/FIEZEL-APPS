@@ -1561,3 +1561,35 @@ button:active {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* m025-92 subtitle Indonesia di bawah suara Inggris.
+   Setelah suara Indonesia dihapus, baris ini adalah satu-satunya jalur pemahaman
+   bahasa ibu, jadi keterbacaannya diperlakukan sebagai isi - bukan hiasan: latar
+   pekat sendiri supaya kontras tidak bergantung pada apa pun yang ada di belakangnya,
+   dan lebar dibatasi supaya matanya tidak menyeberangi layar tiap baris. */
+.fiezel-subtitle{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  /* Di atas bilah navigasi bawah, dan menghormati area aman iOS. */
+  bottom:calc(88px + env(safe-area-inset-bottom,0px));
+  z-index:70;
+  max-width:min(680px,calc(100vw - 32px));
+  padding:10px 16px;
+  border-radius:12px;
+  background:rgba(20,16,18,.88);
+  color:#fdf6f5;
+  font-size:clamp(15px,4vw,18px);
+  line-height:1.45;
+  text-align:center;
+  text-wrap:balance;
+  pointer-events:none;
+  box-shadow:0 6px 24px rgba(0,0,0,.28);
+}
+.fiezel-subtitle[hidden]{display:none}
+
+/* Pergantian baris dihaluskan, tetapi hanya bagi yang tidak meminta gerak dikurangi. */
+@media (prefers-reduced-motion:no-preference){
+  .fiezel-subtitle{transition:opacity .18s ease}
+}

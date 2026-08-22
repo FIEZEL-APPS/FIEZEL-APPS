@@ -1,11 +1,16 @@
-# FIEZEL — Tahap 1 brief redesign: markdown mentah dan nav pill (handoff m025-93)
+# FIEZEL — Tahap 1 brief redesign: markdown mentah dan nav pill (handoff m025-95)
 
-**Status:** selesai pada m025-93. **Cabang:** `m025-93-tahap1-bug-kritis` · **PR:** #139
-**Penerimaan fisik:** WAIVED_BY_OWNER, dipilih OWNER di sesi kerja m025-93.
+**Status:** selesai pada m025-95. **Cabang:** `m025-93-tahap1-bug-kritis` · **PR:** #139
+**Penerimaan fisik:** WAIVED_BY_OWNER, dipilih OWNER di sesi kerja ini.
 **Sumber:** `FIEZEL_Instruksi_Redesign_Eksklusif` (v2) Bab 2 — dua bug yang brief-nya taruh
 **sebelum styling apa pun**.
 
 ---
+
+> **Catatan nomor rilis.** Pekerjaan ini disiapkan sebagai m025-93, tetapi nomor 93 dan 94
+> keburu dipakai sesi paralel yang mendarat lebih dulu (#143 mesin suara Puter, #144 subtitle
+> Indonesia). Isinya tidak berubah; hanya penandanya dinaikkan ke m025-95 supaya A11 tetap
+> melihat kenaikan tepat +1 dari main.
 
 ## 1. Dua aturan baru
 
