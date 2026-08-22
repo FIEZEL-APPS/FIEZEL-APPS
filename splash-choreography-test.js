@@ -194,6 +194,47 @@ test('modul melaporkan keadaannya sendiri, supaya perangkat tidak perlu ditebak 
     'titik buta harus ditulis eksplisit, bukan dihilangkan seolah sudah diperiksa');
 });
 
+/* ---------------- palet bunyi harus benar-benar tersambung ---------------- */
+
+test('AKAR KELUHAN: setiap bunyi yang dirancang benar-benar dipanggil dari antarmuka', () => {
+  // Kelas bug yang menghabiskan dua putaran penuh: mesin bunyinya benar, nadanya benar,
+  // izin audionya benar - tapi tiga dari enam bunyi tidak pernah dipanggil dari mana pun.
+  // "Tekan tombol apapun di menu" karena itu memang menghasilkan senyap. Tes ini menolak
+  // penambahan bunyi yang tidak punya pemanggil.
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const yatim = sfx.names().filter(n => !new RegExp("uiSfx\\(['\"]" + n + "['\"]").test(app));
+  assert.deepStrictEqual(yatim, [],
+    'bunyi berikut didefinisikan tapi tidak pernah dipanggil dari antarmuka');
+});
+
+test('tombol biasa berbunyi lewat delegasi, bukan lewat kabel satu per satu', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.ok(/function bindUiSfxDelegation\(\)/.test(app), 'harus ada delegasi bunyi ketuk');
+  assert.ok(/bindUiSfxDelegation\(\);/.test(app), 'delegasi harus dipasang saat boot');
+  assert.ok(/addEventListener\('click'/.test(app) && /addEventListener\('change'/.test(app),
+    'ketukan dan perubahan sakelar keduanya harus terjaring');
+});
+
+test('satu ketukan tidak boleh menghasilkan dua bunyi bertumpuk', () => {
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.ok(/SFX_CLAIM_MS/.test(app), 'harus ada pagar waktu klaim');
+  assert.ok(/Date\.now\(\)-lastSfxAt\s*<\s*SFX_CLAIM_MS/.test(app),
+    'bunyi ketuk harus MENGALAH kalau ketukan itu sudah dibunyikan hal yang lebih bermakna');
+  assert.ok(/lastSfxAt\s*=\s*Date\.now\(\)/.test(app),
+    'klaim harus dicatat walau pemutarannya gagal, supaya kegagalan tidak memicu bunyi kedua');
+});
+
+test('keadaan bunyi bisa dibaca pemiliknya di perangkat, bukan hanya dari kode', () => {
+  // m025-88 menambahkan diagnostics() lalu memintanya dibacakan - padahal fungsi itu tidak
+  // tersambung ke layar mana pun. Diagnostik yang tidak bisa dibaca bukan diagnostik.
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  assert.ok(/id="audioDiagText"/.test(app), 'Pengaturan harus punya baris status bunyi');
+  assert.ok(/function audioDiagnosticsText\(\)/.test(app), 'harus ada penerjemah keadaan ke kalimat');
+  assert.ok(/refreshAudioDiagnostics/.test(app), 'baris itu harus diisi saat Pengaturan dibuka');
+  assert.ok(/saklar senyap/i.test(app),
+    'titik buta yang tidak bisa dideteksi dari web harus disebutkan kepada pembacanya');
+});
+
 /* ---------------- tipografi ---------------- */
 
 test('wajah bulat pensiun dari chrome aplikasi', () => {
