@@ -1,3 +1,13 @@
+/*
+ * OWNER MEMBALIK m025-34: notifikasi WAJIB menjadi notifikasi yang DIUNDANG, TIDAK DIPAKSA.
+ *
+ * Berkas ini dulu menjaga kebalikannya. Dua pernyataan pertamanya berbunyi "denied
+ * permission must lock the application" dan "Home rendered before notification permission
+ * was granted" - artinya tes ini ikut MENJAMIN pola yang dinilai OWNER sebagai
+ * dark-pattern. Pernyataannya sekarang dibalik, bukan dihapus: yang dijaga adalah janji
+ * baru - izin yang ditolak TIDAK mengunci apa pun, Home tetap tergambar, dan mesin
+ * pengingat tetap bekerja begitu izinnya benar-benar ada.
+ */
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname,app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const expectedVersion=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
@@ -11,16 +21,26 @@ const notifications=[];const Notification=function(title,options){notifications.
 const fetch=async u=>{const file=String(u).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const noopTimer=()=>({unref(){}});
 const navigator={vibrate(){return true}};
-const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:true};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
+const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:false};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
 vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(async()=>{
   try{
-    assert(bodyClasses.contains('notification-locked'),'denied permission must lock the application');
-    assert(!/launcher-shell/.test(element('app').innerHTML),'Home rendered before notification permission was granted');
-    assert(/tetap terkunci|ditolak/i.test(element('notificationGateStatus').textContent),'denied permission status is not visible');
-    Notification.permission='granted';await context.requestRequiredNotificationPermission();
-    assert(!bodyClasses.contains('notification-locked'),'granted permission did not unlock the application');
-    assert(/launcher-shell/.test(element('app').innerHTML),'Home did not render after notification permission became granted');
+    // WAJIB -> DIUNDANG, TIDAK DIPAKSA: izin 'denied' tidak boleh mengunci apa pun.
+    assert(!bodyClasses.contains('notification-locked'),'izin ditolak TIDAK boleh mengunci aplikasi lagi');
+    assert(/launcher-shell/.test(element('app').innerHTML),'Home harus tergambar walaupun izin notifikasi ditolak');
+    // Panel undangan pun tidak ditawarkan pada izin yang sudah 'denied': browser tidak akan
+    // menampilkan dialognya lagi, jadi tawaran itu hanya akan jadi panel buntu.
+    assert(element('welcome').classList.contains('hidden')||!/terkunci|belum bisa dibuka|wajib/i.test(element('notificationGateBody').textContent),'tidak boleh ada naskah "terkunci"/"wajib" yang tersisa di panel');
+    assert(typeof context.requestStudyNotificationPermission==='function','undangan harus punya jalur menerima');
+    assert(typeof context.declineStudyNotifications==='function','undangan harus punya jalur menolak yang tidak mengunci apa pun');
+    // Menolak lewat "Nanti saja" tetap meninggalkan aplikasi yang utuh dan terpakai.
+    context.declineStudyNotifications();
+    assert(!bodyClasses.contains('notification-locked'),'"Nanti saja" tidak boleh mengunci aplikasi');
+    assert(/launcher-shell/.test(element('app').innerHTML),'Home tetap ada setelah menolak pengingat');
+    // Izin yang kemudian diberikan tetap menyalakan pengingatnya seperti sebelumnya.
+    Notification.permission='granted';await context.requestStudyNotificationPermission();
+    assert(!bodyClasses.contains('notification-locked'),'izin diberikan tetap tidak boleh menyentuh kunci apa pun');
+    assert(context.__getFiezelState().preferences.reminders===true,'izin yang diberikan harus tercatat sebagai preferensi pengingat murid');
     assert(notifications.length===0,'app update must stay silent, no update notification shown');
     assert(store['fiezel.seenAppVersion']===expectedVersion,'seen app version was not persisted');
     context.notifyAppUpdateIfNew();
@@ -29,9 +49,34 @@ setTimeout(async()=>{
     await context.__fiezelAudit.checkStudyReminders(true);
     assert(notifications.length===1,`expected one inactivity notification, got ${notifications.length}`);
     assert(/FIEZEL/.test(notifications[0]?.title||''),'inactivity reminder title missing');
+    // "Tawarkan sekali lagi dengan lembut" tidak boleh berubah menjadi tawaran di setiap
+    // boot - itu dark-pattern yang sama, hanya lebih pelan. Jatahnya dibatasi dua kali
+    // seumur pemasangan, dan izin yang sudah 'denied' tidak ditawari lagi sama sekali
+    // (browser tidak akan menampilkan dialognya untuk kedua kali).
+    delete store['fiezel-reminder-invite-v1'];
+    context.__getFiezelState().preferences.reminders=null;
+    Notification.permission='default';
+    assert(context.shouldInviteNotifications()===true,'izin yang belum diputuskan harus boleh ditawari');
+    context.writeReminderInvite({offers:2});
+    assert(context.shouldInviteNotifications()===false,'jatah tawaran habis harus menutup tawaran berikutnya');
+    context.writeReminderInvite({offers:0});
+    context.__getFiezelState().preferences.reminders=false;
+    assert(context.shouldInviteNotifications()===false,'murid yang mematikan pengingat tidak boleh ditawari lagi');
+    context.__getFiezelState().preferences.reminders=null;
+    Notification.permission='denied';
+    assert(context.shouldInviteNotifications()===false,'izin yang sudah ditolak browser tidak boleh ditawari lagi');
+    // Jalan masuk kembali: Pengaturan menyalakan pengingat dan menyimpannya sebagai
+    // preferensi, bukan sebagai syarat masuk.
+    Notification.permission='granted';
+    await context.toggleStudyReminders({checked:true});
+    assert(context.__getFiezelState().preferences.reminders===true,'Pengaturan harus bisa menyalakan pengingat lagi');
+    await context.toggleStudyReminders({checked:false});
+    assert(context.__getFiezelState().preferences.reminders===false,'Pengaturan harus bisa mematikan pengingat');
+    assert(context.remindersActive()===false,'pengingat yang dimatikan murid tidak boleh dikirim walau izinnya ada');
+    context.__getFiezelState().preferences.reminders=true;
     const m=context.__fiezelAudit.selectLoginMessage();assert(m&&m.headline&&m.lead,'login reminder did not return headline + lead');
     assert(store['fiezel-last-login-message']!=null,'login reminder index was not persisted to avoid immediate repetition');
   }catch(e){failures.push(e.stack||String(e))}
   if(failures.length){console.error('FIEZEL notification reminder: FAIL');failures.forEach(x=>console.error('- '+x));process.exitCode=1;return}
-  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedLocksApp:true,grantedUnlocksApp:true,inactivityNotification:true,rotatingLoginMessage:true,silentUpdate:true,updateNoRepeat:true}));
+  console.log('FIEZEL notification reminder: PASS');console.log(JSON.stringify({deniedNeverLocksApp:true,homeRendersWithoutPermission:true,declineKeepsAppUsable:true,grantedEnablesReminders:true,inviteOfferCapped:true,settingsCanReEnable:true,inactivityNotification:true,rotatingLoginMessage:true,silentUpdate:true,updateNoRepeat:true}));
 },260);
