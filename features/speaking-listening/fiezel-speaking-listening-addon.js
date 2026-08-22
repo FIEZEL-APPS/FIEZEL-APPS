@@ -113,10 +113,41 @@
     reset(){this.state=freshState();try{this.storage?.removeItem(this.config.storageKey)}catch{}return this.state}
   }
 
+  /** Bilangan acak 0..n-1. Memakai crypto bila ada, Math.random bila tidak. */
+  function randomBelow(n){
+    try{
+      const c=global.crypto;
+      if(c&&typeof c.getRandomValues==='function'){
+        const buf=new Uint32Array(1);
+        // Nilai di ekor terakhir dibuang supaya sisa pembagian tidak memihak indeks awal.
+        const limit=Math.floor(0xFFFFFFFF/n)*n;
+        let v;do{c.getRandomValues(buf);v=buf[0]}while(v>=limit);
+        return v%n;
+      }
+    }catch{}
+    return Math.floor(Math.random()*n);
+  }
+  /** Fisher-Yates pada SALINAN: bank soal tidak boleh ikut teracak di tempatnya. */
+  function shuffle(list){
+    const out=list.slice();
+    for(let i=out.length-1;i>0;i--){const j=randomBelow(i+1);const t=out[i];out[i]=out[j];out[j]=t}
+    return out;
+  }
+
   class DataRepository{
     constructor(baseUrl){this.baseUrl=String(baseUrl||'./').replace(/\/?$/,'/');this.listening=[];this.speaking=[]}
     async load(){if(typeof global.fetch!=='function')throw new Error('fetch_unavailable');const [l,s]=await Promise.all([global.fetch(this.baseUrl+'listening-bank-v1.json'),global.fetch(this.baseUrl+'speaking-bank-v1.json')]);if(!l.ok||!s.ok)throw new Error('sidecar_data_load_failed');const lj=await l.json(),sj=await s.json();if(lj.schema!=='fiezel-listening-bank-v1'||sj.schema!=='fiezel-speaking-bank-v1')throw new Error('sidecar_schema_mismatch');if(lj.count!==lj.items?.length||sj.count!==sj.items?.length||new Set(lj.items?.map(x=>x.id)).size!==lj.count||new Set(sj.items?.map(x=>x.id)).size!==sj.count)throw new Error('sidecar_data_integrity_failed');this.listening=lj.items||[];this.speaking=sj.items||[];return this}
-    for(domain,level){const rows=domain==='speaking'?this.speaking:this.listening;return rows.filter(x=>x.level===level)}
+    /**
+     * m025-110: OWNER meminta urutan soal berubah setiap kali sesi dibuka, dan tidak bisa
+     * ditebak. Pengacakan dilakukan DI SINI - saat sesi dimulai - bukan di bank soalnya:
+     * berkas bank harus tetap identik setiap rebuild, dan tes idempotensi akan langsung
+     * merah kalau urutannya digoyang di sumbernya.
+     *
+     * Fisher-Yates dengan crypto bila tersedia. Math.random cukup untuk keperluan ini,
+     * tetapi sumber acak yang lebih baik memang gratis di browser modern - dan urutan
+     * yang bisa diprediksi persis itulah yang OWNER keluhkan.
+     */
+    for(domain,level){const rows=domain==='speaking'?this.speaking:this.listening;return shuffle(rows.filter(x=>x.level===level))}
   }
 
   class TTSService{
@@ -203,6 +234,6 @@
     scoreListening,
     normalizeText,
     getDefaultConfig:()=>({...DEFAULT_CONFIG}),
-    __test:Object.freeze({tokenF1,keywordCoverage,conceptCoverage,sanitizeState,freshState,mergeConfig,StateStore,DataRepository})
+    __test:Object.freeze({tokenF1,keywordCoverage,conceptCoverage,sanitizeState,freshState,mergeConfig,StateStore,DataRepository,shuffle,randomBelow})
   });
 });
