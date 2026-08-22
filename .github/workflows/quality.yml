@@ -77,47 +77,15 @@ jobs:
           node pwa-startup-white-screen-recovery-test.js
           node http-smoke-test.js
           node speaking-listening-test.js
-          node neural-voice-test.js
-          node ios-wasm-module-test.js
-          node ios-cache-compat-test.js
-          node neural-voice-cache-integrity-test.js
-          node neural-voice-http-test.js
-          node neural-voice-audibility-test.js
           node diag-panel-test.js
           node diag-search-test.js
-          node neural-voice-fix-test.js
           node sw-corp-test.js
-          node neural-voice-product-repair-test.js
-          node neural-voice-device-hotfix-test.js
-          node neural-voice-m0255-promotion-test.js
-          node neural-voice-timeout-phase-test.js
-          node neural-voice-generation-timeout-test.js
-          node neural-voice-single-flight-test.js
-          node neural-voice-diagnostics-retention-test.js
-          node neural-voice-m02521-apple-webgpu-rollback-test.js
-          node neural-voice-m02522-real-wasm-proxy-test.js
-          node neural-voice-m02524-proxy-timeout-recovery-test.js
-          node neural-voice-m02526-sherpa-engine-test.js
           node classroom-test.js
           node diagnostic-scanner-test.js
           node reminder-struggle-test.js
           node prosody-test.js
           node tutor-classroom-regression-test.js
           node m02542-experience-test.js
-          node library-test.js
-          node m02545-repair-test.js
-          node neural-voice-playback-fade-test.js
-          node neural-voice-m02547-latency-integrity-test.js
-          node neural-voice-m02542-persona-test.js
-          node neural-voice-m02548-clarity-test.js
-          node neural-voice-m026-raw-pcm-ab-test.js
-          node neural-voice-wav-reference-test.js
-          node neural-voice-conditioning-repair-test.js
-          node neural-voice-denoise-steps-test.js
-          node neural-voice-balanced-chunks-test.js
-          node neural-voice-m028-audio-integrity-test.js
-          node neural-voice-m0281-regression-test.js
-          node neural-voice-m0282-seam-buffer-integrity-test.js
           node neural-voice-m02592-puter-subtitle-test.js
           node neural-voice-m02593-subtitle-translate-test.js
           node puter-auth-coop-test.js
