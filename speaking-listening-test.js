@@ -25,7 +25,7 @@ test('runtime schema',()=>assert.equal(runtime.schema,'fiezel-speaking-listening
 test('listening bank identity',()=>assert.deepStrictEqual([listening.schema,listening.version,listening.status],['fiezel-listening-bank-v1',2,'reviewed_release_seed']));
 test('listening count matches items',()=>assert.equal(listening.count,listening.items.length));
 test('36 soal benih tetap utuh',()=>assert.equal(listening.items.filter(i=>!i.id.startsWith('listen_gen_')).length,36));
-test('level yang diperluas mendapat tepat 200 soal baru',()=>{for(const level of ['A1','A2'])assert.equal(listening.items.filter(i=>i.level===level&&i.id.startsWith('listen_gen_')).length,200,level+' tidak mendapat 200 soal')});
+test('setiap level mendapat tepat 200 soal baru',()=>{for(const level of levels)assert.equal(listening.items.filter(i=>i.level===level&&i.id.startsWith('listen_gen_')).length,200,level+' tidak mendapat 200 soal')});
 // Naskah ganda membuat pelajar merasa banknya diulang-ulang, dan itu tidak terlihat
 // dari jumlah item mana pun.
 test('tidak ada naskah ganda dalam satu level',()=>{const seen=new Set();for(const i of listening.items){const key=i.level+'|'+i.script.toLowerCase();assert.ok(!seen.has(key),'naskah ganda di '+i.level+': '+i.script);seen.add(key)}});
