@@ -152,6 +152,48 @@ test('nada penutup adalah kesembilan, bukan tonika - sapaan yang menggantung', (
   assert.strictEqual(last[3], 'add9');
 });
 
+/* ---------------- kurangi-gerak tidak berarti bisu ---------------- */
+
+test('AKAR KELUHAN iOS: SFX transisi TIDAK lagi dibisukan oleh kurangi-gerak', () => {
+  const src = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  const ready = /function ready\(env[^)]*\)\s*\{([\s\S]*?)\n  \}/.exec(src);
+  assert.ok(ready, 'fungsi ready() tidak ditemukan');
+  assert.ok(!/reducedMotion/.test(ready[1]),
+    'ready() masih membisukan bunyi saat kurangi-gerak aktif.\n' +
+    '    prefers-reduced-motion adalah permintaan tentang GERAKAN, bukan pendengaran.\n' +
+    '    Di iOS ia lumrah dinyalakan - dan ikut menyala sendiri di Mode Daya Rendah -\n' +
+    '    sehingga murid kehilangan seluruh umpan balik bunyi tanpa pernah memintanya.');
+});
+
+test('bunyi hanya tunduk pada sakelar murid dan izin browser', () => {
+  const src = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  const ready = /function ready\(env[^)]*\)\s*\{([\s\S]*?)\n  \}/.exec(src)[1];
+  assert.ok(/preferencesAllow/.test(ready), 'sakelar "Suara jawaban" murid harus tetap berkuasa');
+  assert.ok(/ensureContext/.test(ready), 'izin audio browser harus tetap jadi syarat');
+});
+
+test('kurangi-gerak menyisakan sapaan yang memudar, bukan layar yang langsung jadi', () => {
+  // Sebelumnya seluruh animasi splash di-set animation:none, sehingga logo langsung utuh
+  // dan tidak ada apa pun yang tersusun - persis yang dilaporkan sebagai "terlalu cepat".
+  assert.ok(/@keyframes\s+fz-fade-in\s*\{/.test(css), 'harus ada keyframe memudar untuk modus kurangi-gerak');
+  const still = css.match(/\.fiezel-splash-still[^{]*\{[^}]*\}/g) || [];
+  const logo = still.find(r => /\.fz-f,/.test(r) || /\.fz-f\b/.test(r));
+  assert.ok(logo, 'aturan kurangi-gerak untuk bagian logo tidak ditemukan');
+  assert.ok(/animation-name:fz-fade-in/.test(logo),
+    'bagian logo harus tetap muncul dengan memudar pada ketukan yang sama, bukan dimatikan');
+  assert.ok(/transform:none/.test(logo), 'yang dibuang adalah gerakannya, bukan kemunculannya');
+});
+
+test('modul melaporkan keadaannya sendiri, supaya perangkat tidak perlu ditebak lagi', () => {
+  const d = sfx.diagnostics({});
+  for (const k of ['enabled', 'preferensiSuara', 'kurangiGerak', 'pernahDisentuh', 'konteks',
+                   'webAudioTersedia', 'saklarSenyapIOS']) {
+    assert.ok(k in d, 'diagnostics() harus melaporkan ' + k);
+  }
+  assert.match(String(d.saklarSenyapIOS), /tidak dapat dideteksi/,
+    'titik buta harus ditulis eksplisit, bukan dihilangkan seolah sudah diperiksa');
+});
+
 /* ---------------- tipografi ---------------- */
 
 test('wajah bulat pensiun dari chrome aplikasi', () => {
