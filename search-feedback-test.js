@@ -181,6 +181,43 @@ ok(!/go\('ask'\)[^>]*>\s*<i data-lucide/.test(indexSrc),
 ok(/id="openFeedback"/.test(appSrc), 'tombol kirim masukan belum digambar di pengaturan');
 ok(/\$\('openFeedback'\)/.test(appSrc), 'tombol kirim masukan tidak disambungkan ke apa pun');
 
+/* ---- m025-106 token warna yang dikarang ------------------------------- */
+
+// OWNER: "saat diketik tulisannya tidak kelihatan". Sebabnya var(--card,#fff) - token
+// yang TIDAK PERNAH ADA di style.css, jadi nilainya selalu jatuh ke putih keras
+// sementara warna teksnya ikut halaman. Di mode gelap: teks terang di atas putih.
+//
+// Yang dijaga di sini adalah akarnya, bukan satu kejadiannya: setiap token yang dirujuk
+// harus benar-benar didefinisikan. Nilai cadangan justru membuat cacat ini tak terlihat
+// sampai ada yang melihatnya di mode gelap.
+const css = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
+const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
+//
+// Sebagian token sah diset dari JS atau HTML saat berjalan - --book-accent dipasang per
+// buku, --fz-b* per tema - jadi "harus ada di style.css" adalah aturan yang salah dan
+// akan gagal pada kode yang benar. Yang benar: token harus terdefinisi DI MANA PUN.
+const sources = ['style.css', 'app.js', 'index.html', 'features/library/fiezel-library-ui.js']
+  .map((p) => fs.readFileSync(path.join(__dirname, p), 'utf8')).join('\n');
+const defined = new Set([...sources.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+const referenced = [...withoutComments.matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]);
+const undefinedTokens = [...new Set(referenced)].filter((t) => !defined.has(t));
+ok(undefinedTokens.length === 0,
+  'style.css merujuk token yang tidak pernah didefinisikan: ' + undefinedTokens.join(', '));
+
+// Kotak pertanyaan harus menyebut warna teksnya sendiri. color:inherit di sana berarti
+// ia mewarisi warna halaman, yang belum tentu kontras terhadap latar kotaknya.
+const askBox = withoutComments.slice(withoutComments.indexOf('.ask-box input{'),
+  withoutComments.indexOf('.ask-box input{') + 260);
+ok(/color:var\(--text\)/.test(askBox), 'kotak pertanyaan tidak menetapkan warna teksnya');
+ok(/background:var\(--panel\)/.test(askBox), 'kotak pertanyaan tidak memakai latar panel');
+ok(!/color:inherit/.test(askBox), 'kotak pertanyaan mewarisi warna halaman; kontrasnya tidak dijamin');
+
+// Materi terkait pernah kehilangan gayanya diam-diam saat style.css ditulis ulang.
+ok(/\.search-hit\{/.test(withoutComments), 'gaya materi terkait hilang dari stylesheet');
+
+// Label di bawah balok emas.
+ok(/class="ask-label"/.test(indexSrc), 'label di bawah balok emas belum ada');
+
 /* ---- m025-103 notifikasi masukan ke OWNER ------------------------------ */
 
 // Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
