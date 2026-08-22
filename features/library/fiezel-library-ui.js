@@ -69,16 +69,27 @@
   function narrationOptions() {
     var speed = 1;
     try { speed = typeof root.selectedNeuralRate === 'function' ? Number(root.selectedNeuralRate()) || 1 : 1; } catch (_) {}
-    var voice;
-    try { voice = typeof root.neuralVoiceFor === 'function' ? root.neuralVoiceFor({}) : undefined; } catch (_) {}
-    // The books are English; narration is never routed through the Indonesian tutor voice.
-    return { voice: voice, lang: 'en-US', speed: speed, allowFallback: false };
+    return { speed: speed };
   }
 
-  function speak(text) {
-    var runtime = root.FiezelVoiceRuntime;
-    if (!runtime || typeof runtime.speak !== 'function') return Promise.reject(new Error('neural_runtime_missing'));
-    return runtime.speak(text, narrationOptions());
+  /**
+   * m025-100: narasi buku ikut pintu bicara bersama.
+   *
+   * Sebelumnya jalur ini memanggil FiezelVoiceRuntime langsung, dan itu terlewat saat
+   * m025-95 mengalihkan Library - yang dialihkan hanya tombol tanya, karena narasi
+   * memakai fungsi yang berbeda. Akibatnya menekan "Dengar" masih menuntut unduhan
+   * model, tepat seperti yang OWNER laporkan.
+   *
+   * Buku di library-books-v1.json sudah berpasangan {en, id} per kalimat, jadi subtitle
+   * Indonesianya diambil langsung dari sana. Ini penting bukan sekadar rapi: satu buku
+   * berisi ratusan kalimat, dan menerjemahkannya satu per satu akan menghabiskan jatah
+   * 40 permintaan AI per jam sebelum bab pertama selesai.
+   */
+  function speak(sentence) {
+    var say = root.FiezelVoiceSay;
+    if (!say || typeof say.say !== 'function') return Promise.reject(new Error('voice_door_missing'));
+    if (typeof sentence === 'string') return say.say(sentence, narrationOptions());
+    return say.say({ en: sentence && sentence.en, id: sentence && sentence.id }, narrationOptions());
   }
 
   /**
@@ -90,12 +101,12 @@
   function warmNext(token) {
     setTimeout(function () {
       if (!narrating || token !== narrationToken || !session) return;
-      var runtime = root.FiezelVoiceRuntime;
-      if (!runtime || typeof runtime.prefetch !== 'function') return;
+      var say = root.FiezelVoiceSay;
+      if (!say || typeof say.prefetch !== 'function') return;
       var snap = session.snapshot();
       var upcoming = session.sentences()[snap.sentenceIndex + 1];
       if (!upcoming) return;
-      try { runtime.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
+      try { say.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
     }, 0);
   }
 
@@ -103,7 +114,7 @@
     narrationToken++;
     narrating = false;
     if (session) session.pause();
-    try { root.FiezelVoiceRuntime && root.FiezelVoiceRuntime.stop && root.FiezelVoiceRuntime.stop(); } catch (_) {}
+    try { root.FiezelVoiceSay && root.FiezelVoiceSay.stop && root.FiezelVoiceSay.stop(); } catch (_) {}
     updatePlayButton();
   }
 
@@ -120,14 +131,14 @@
       var sentence = session.current();
       if (!sentence) break;
       highlight(sentence.index, true);
-      var speaking = speak(sentence.en);
+      var speaking = speak(sentence);
       warmNext(token);
       try {
         await speaking;
       } catch (error) {
         narrating = false;
         session.pause();
-        setStatus('Audiobook butuh suara neural. Selesaikan unduhan suara dulu.');
+        setStatus('Suara tidak bisa dimuat. Periksa koneksi lalu tekan putar lagi.');
         updatePlayButton();
         return;
       }
@@ -343,7 +354,7 @@
       if (event.target === layer) closeTranslation();
     });
     var listen = doc.getElementById('librarySpeakOne');
-    if (listen) listen.addEventListener('click', function () { stopNarration(); speak(picked.en).catch(function () {}); });
+    if (listen) listen.addEventListener('click', function () { stopNarration(); speak(picked).catch(function () {}); });
     var ask = doc.getElementById('libraryAskOne');
     if (ask) ask.addEventListener('click', openAsk);
     var close = doc.getElementById('libraryCloseOne');

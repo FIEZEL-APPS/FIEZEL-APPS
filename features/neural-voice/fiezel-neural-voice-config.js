@@ -1,3 +1,19 @@
+/**
+ * m025-100 konfigurasi suara, setelah mesin lokal dihapus.
+ *
+ * Berkas ini dulu memuat seluruh perjanjian mesin di perangkat: jalur vendor, versi
+ * runtime ONNX, dtype, kebijakan nol-biaya, dan batas potongan. Semua itu hilang bersama
+ * modelnya - suara kini dirender di server dan tidak ada satu bita pun yang diunduh.
+ *
+ * Yang tersisa hanyalah bagian yang masih benar-benar dibaca: katalog suara, yang dipakai
+ * app.js untuk menamai suara dan diagnostik untuk melaporkannya. Menyimpan sisanya berarti
+ * memelihara dokumen yang menjanjikan perilaku yang sudah tidak ada - persis bahan bakar
+ * kesalahpahaman yang membuat kartu pengaturan sempat menjual unduhan 119 MB yang tidak
+ * pernah lagi terjadi.
+ *
+ * Kalau mesin lokal suatu saat dikembalikan, VOICE-RECOVERY.md menjelaskan cara memulihkan
+ * berkas ini beserta lapisannya dari riwayat git.
+ */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
@@ -6,69 +22,22 @@
   'use strict';
 
   const config = Object.freeze({
-    schema: 'fiezel-neural-voice-v2',
-    provider: 'kokoro-js-local-patched',
-    providerVersion: '1.2.1',
-    providerSourceCommit: 'd4ef0569c79046dfd77fbb128502546a3afe5bef',
-    transformersVersion: '3.5.1',
-    onnxRuntimeWebVersion: '1.22.0-dev.20250409-89f8206ba4',
-    modelId: 'kokoro-model',
-    dtype: 'q8',
-    device: 'wasm',
-    localRouting: Object.freeze({
-      modelBasePath: './vendor/',
-      voiceBaseUrl: './vendor/kokoro-model/voices',
-      wasmBasePath: './vendor/kokoro-js/wasm/',
-      remoteModelsAllowed: false,
-      remoteVoiceDataAllowed: false,
-      crossOriginRuntimeNetworkAllowed: false,
-      sameOriginStaticAssetBootstrapAllowed: true,
-      offlineAfterWarmRequired: true
-    }),
-    zeroCostPolicy: Object.freeze({
-      paidApiAllowed: false,
-      subscriptionAllowed: false,
-      meteredBillingAllowed: false,
-      vendorApiKeyAllowed: false,
-      remoteInferenceAllowed: false,
-      localInferenceRequired: true,
-      buildTimePublicAssetDownloadAllowed: true,
-      sameOriginStaticAssetBootstrapAllowed: true
-    }),
+    schema: 'fiezel-neural-voice-v3',
+    provider: 'puter-txt2speech',
+    engine: 'generative',
+    lang: 'en-US',
+    requiresDownload: false,
     voices: Object.freeze({
-      fiezelPrimary: 'af_bella',
-      fiezelAlternate: 'af_heart',
-      listeningPool: Object.freeze(['af_bella', 'af_heart']),
+      fiezelPrimary: 'default',
       catalog: Object.freeze([
-        Object.freeze({ id: 'af_bella', label: 'Bella', locale: 'en-US' }),
-        Object.freeze({ id: 'af_heart', label: 'Heart', locale: 'en-US' })
+        Object.freeze({ id: 'default', label: 'FIEZEL', locale: 'en-US' })
       ])
     }),
-    limits: Object.freeze({
-      maxInputChars: 3600,
-      targetChunkWords: 140,
-      hardChunkWords: 190,
-      maxQueueItems: 12
-    }),
-    // m025-48 delivery settings. One place, because the English bootstrap and the
-    // Indonesian shim build separate engines over the same model and any drift between
-    // them is heard immediately as two different voices.
-    speech: Object.freeze({
-      // Render and play one sentence at a time: the learner hears sentence one while
-      // sentence two is still being generated, instead of waiting for the whole passage.
-      streamSentences: true,
-      // A breath group. Longer sentences are split again at clause punctuation.
-      streamMaxWords: 26,
-      // Length of the silence the model places at punctuation INSIDE a line, as a
-      // multiple of what its duration predictor asked for. The vendored glue falls back
-      // to 0.2, which is what made clause commas nearly inaudible; 0.4 restores the
-      // breath without turning a comma into a full stop. Sentence-to-sentence spacing is
-      // not affected - the player owns that (FiezelProsody.GAP_MS).
-      silenceScale: 0.4
-    }),
+    // Cadangan terakhir saat jaringan hilang. Suaranya kalah jauh, tetapi bacaan yang
+    // dibuka tanpa sinyal akan diam sepenuhnya tanpa ini.
     fallback: Object.freeze({
       browserSpeechSynthesis: true,
-      reason: 'Emergency-only fallback if local neural runtime cannot initialize.'
+      reason: 'Dipakai hanya bila render server tidak dapat dicapai.'
     })
   });
 
