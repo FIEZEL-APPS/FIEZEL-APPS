@@ -145,8 +145,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 /* ---------- topbar ---------- */
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;padding-top:2px}
-.brand{font-weight:900;letter-spacing:-.05em;font-size:1.2rem;color:var(--ambient-text)}
-.brand span{color:var(--accent)}
+/* m025-91: wordmark topbar kini SVG, bukan teks. Lebar menggantikan ukuran huruf, dan
+   warnanya datang dari gradien di dalam SVG - bukan dari --ambient-text - sehingga ia tidak
+   lagi ikut menggelap/menerang mengikuti jam seperti teks di sekitarnya. */
+.brand{display:block;width:104px}
+.fiezel-wordmark{display:block;width:100%;height:auto}
 .version{font-size:.68rem;color:var(--muted-soft);font-variant-numeric:tabular-nums}
 
 /* ---------- section head ---------- */
@@ -626,7 +629,7 @@ body{background:var(--sky-bottom);font-family:var(--fz-body)}
 h1,h2,h3,h4,.welcome-mark,.modal-mark{font-family:var(--fz-heading)}
 /* Ukuran display: serif, berat 400, jarak huruf sedikit dirapatkan. Kerapatan negatif pada
    ukuran besar adalah yang membedakan judul yang "disetel" dari judul yang sekadar dibesarkan. */
-.brand,.section-head h1,.welcome-panel h2,.modal-panel h2,.fiezel-title{
+.section-head h1,.welcome-panel h2,.modal-panel h2,.fiezel-title{
   font-family:var(--fz-display);font-weight:400;letter-spacing:-.015em}
 
 .app{max-width:1120px;padding:22px 24px calc(126px + env(safe-area-inset-bottom))}
@@ -640,7 +643,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 }
 .brand-button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px 2px;box-shadow:none;color:var(--ambient-text)}
 .brand-button:hover{transform:none;border-color:transparent;box-shadow:none}
-.brand{font-size:1.25rem}.brand-edition{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:750;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
+.brand{width:112px}.brand-edition{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:750;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
 .topbar-actions{display:flex;align-items:center;gap:8px}
 .icon-button{width:42px;height:42px;padding:0;border-radius:50%;background:rgba(var(--surface-rgb),.78);color:var(--text)}
 .icon-button.active{color:var(--accent-strong);border-color:#cfc8f6;background:var(--accent-soft)}
@@ -1130,7 +1133,13 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-dark{background:#0B0709;padding-top:0}
 .fiezel-splash-brand{
   background:radial-gradient(circle at 30% 18%,#241A1D 0%,#140E10 55%,#070405 100%);
-  position:relative;overflow:hidden;gap:0;
+  position:relative;overflow:hidden;
+  /* m025-91 OWNER: "tulisan fiezel itu diletakkan di bawah lagi seperti duolingo".
+     Baris pertama menyerap seluruh sisa tinggi, jadi tanda terpusat di area atas-tengah;
+     wordmark dan tagline menempel ke bawah lewat padding, bukan lewat angka mati - itu
+     sebabnya susunannya tetap benar dari layar pendek sampai tablet. */
+  display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;
+  gap:0;padding:24px 24px 17vh;
 }
 /* Cahaya emas di belakang logo, berdenyut pelan supaya layar tidak terasa beku. */
 @keyframes fz-splash-halo{
@@ -1138,7 +1147,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   50%{opacity:.42;transform:translate(-50%,-50%) scale(1.12)}
 }
 .fiezel-splash-brand::before{
-  content:"";position:absolute;left:50%;top:44%;width:min(78vw,440px);aspect-ratio:1;
+  content:"";position:absolute;left:50%;top:38%;width:min(78vw,440px);aspect-ratio:1;
   border-radius:50%;pointer-events:none;z-index:0;
   background:radial-gradient(circle,rgba(221,181,95,.42) 0%,rgba(221,181,95,0) 68%);
   animation:fz-splash-halo 3.4s ease-in-out infinite;
@@ -1146,7 +1155,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-brand>*{position:relative;z-index:1}
 /* inline-grid supaya lebar kotak ini persis selebar logo - kilau di bawah memakai inset:0,
    dan kalau kotaknya selebar layar sapuannya ikut melebar ke seluruh layar. */
-.fiezel-logo-stage{display:inline-grid;place-items:center;margin-bottom:26px;overflow:hidden}
+.fiezel-logo-stage{display:inline-grid;place-items:center;overflow:hidden}
 .fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
 
 /* Huruf F: tiga batang yang masing-masing tumbuh dari titik jangkarnya, bukan sekadar
@@ -1185,17 +1194,16 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 @keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
 @keyframes fz-splash-settle{
-  from{opacity:0;transform:translateY(15px);letter-spacing:.34em}
-  to{opacity:1;transform:none;letter-spacing:.16em}
+  from{opacity:0;transform:translateY(15px) scaleX(1.045)}
+  to{opacity:1;transform:none}
 }
 .fiezel-splash-brand .fiezel-splash-word{
-  font-family:var(--fz-display);font-weight:400;font-size:2.45rem;
-  letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;
+  width:min(52vw,238px);margin:0 auto;display:block;
   animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both;
 }
 .fiezel-splash-brand .fiezel-splash-tag{
-  font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;
-  text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;
+  font-family:var(--fz-body);font-size:.62rem;letter-spacing:.30em;
+  text-transform:uppercase;color:rgba(221,181,95,.9);margin:14px 0 0;
   animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both;
 }
 /* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
@@ -1210,7 +1218,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar{
   transform:none!important;animation-name:fz-fade-in!important}
 .fiezel-splash-still .fiezel-splash-word{
-  transform:none!important;letter-spacing:.16em!important;animation-name:fz-fade-in!important}
+  transform:none!important;animation-name:fz-fade-in!important}
 .fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation-name:fz-fade-in!important}
 /* Denyut halo dan sapuan kilau memang gerakan tanpa isi - keduanya tetap dimatikan. */
 .fiezel-splash-still .fiezel-splash-brand::before,
