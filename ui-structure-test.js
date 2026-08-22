@@ -27,7 +27,24 @@ check(/grid-template-columns:minmax\(0,1\.42fr\)/.test(css),'Desktop launcher la
 check(/\.learning-launcher\{display:grid;grid-template-columns:repeat\(4,1fr\)/.test(css),'Desktop learning launcher must expose four feature cards.');
 check(/@media\(max-width:860px\)/.test(css)&&/@media\(max-width:640px\)/.test(css),'Tablet and mobile breakpoints are missing.');
 check(/\.launcher-shell\{grid-template-columns:1fr/.test(css),'Launcher does not collapse to one column.');
-check(/\.learning-launcher\{grid-template-columns:1fr\}/.test(css),'Learning launcher does not collapse for mobile.');
+// m025-98 (brief redesign 3.7). Pemeriksaan ini dulu MENUNTUT grid modul runtuh menjadi satu
+// kolom di ponsel. Itu keputusan yang sengaja pada masanya, tetapi diukur di 375x812 hasilnya
+// adalah blok setinggi 976px - hampir 1,2 layar - untuk enam kartu yang isinya masing-masing
+// tiga kata. Itulah penyumbang terbesar keluhan OWNER "terlalu panjang untuk scroll sampai
+// bawah, dan terlalu banyak tulisan".
+//
+// Yang dijaga sekarang bukan JUMLAH kolomnya melainkan sifat yang sebenarnya dimaksud: grid
+// tetap menyesuaikan diri di ponsel, dan tidak boleh kembali menjadi satu kolom yang membuat
+// Home terbaca sebagai daftar panjang.
+// Ada tiga blok @media(max-width:640px) di berkas ini, jadi mengambil yang pertama saja
+// akan memeriksa blok yang salah. Yang dicari adalah blok mana pun di antaranya yang mengatur
+// grid modul.
+const mobileBlocks=css.split('@media(max-width:640px){').slice(1).map(part=>part.split('@media')[0]);
+const launcherBlock=mobileBlocks.find(b=>b.includes('.learning-launcher{'))||'';
+check(/\.learning-launcher\{grid-template-columns:1fr 1fr/.test(launcherBlock),
+  'Learning launcher must stay a two-column grid on phones - one column made Home 4.7 screens tall.');
+check(!/\.learning-launcher\{grid-template-columns:1fr\}/.test(css),
+  'The single-column collapse must not come back.');
 check(/width:calc\(100% - 16px\)/.test(css),'Mobile bottom navigation lacks a viewport-safe width.');
 check(/max-height:min\(760px,88vh\);overflow:auto/.test(css),'Modal content is not viewport bounded.');
 check(/prefers-reduced-motion:reduce/.test(css)&&/\.reduce-motion \*/.test(css),'Reduced-motion coverage is incomplete.');
