@@ -74,8 +74,8 @@
     return Object.freeze({
       // m025-28: audio capability means the neural runtime is usable. Browser
       // SpeechSynthesis presence is irrelevant: it is never used for listening.
-      tts:!!(global.FiezelVoiceRuntime&&typeof global.FiezelVoiceRuntime.speak==='function'),
-      neuralVoice:global.FiezelVoiceRuntime?.status?.().ready===true,
+      tts:!!(global.FiezelVoiceSay&&typeof global.FiezelVoiceSay.say==='function'),
+      neuralVoice:global.FiezelPuterVoice?.status?.().ready===true,
       speechRecognition:typeof Recognition==='function',
       mediaRecorder:typeof global.MediaRecorder==='function'&&!!global.navigator?.mediaDevices?.getUserMedia,
       secureContext:global.isSecureContext!==false,
@@ -121,24 +121,24 @@
 
   class TTSService{
     constructor(config){this.config=config}
-    stop(){try{global.FiezelVoiceRuntime?.stop?.()}catch{}try{global.speechSynthesis?.cancel()}catch{}}
+    stop(){try{global.FiezelVoiceSay?.stop?.()}catch{}try{global.speechSynthesis?.cancel()}catch{}}
     // m025-28: listening used to call SpeechSynthesisUtterance directly, so it never
     // touched the neural engine at all -- every listening item was browser TTS by
     // construction. That is also why longer scripts failed: B2 scripts run ~155 chars
     // against A1's ~40, and iOS SpeechSynthesis routinely stalls on the longer ones,
     // tripping the internal timeout and locking the item. Route listening through the
     // same neural runtime as the rest of the app, and never substitute browser TTS.
+    // m025-100: jalur ini ikut pintu bicara bersama. Sebelumnya ia memanggil mesin
+    // lokal langsung dan MENOLAK berbunyi bila modelnya belum diunduh - pemeriksaan
+    // yang benar ketika suara memang harus diunduh, dan penghalang murni sesudah
+    // suara pindah ke server. Itu kelas bug yang sama dengan tombol Dengar di Library.
     play(text,options={}){
-      const runtime=global.FiezelVoiceRuntime;
-      if(!runtime||typeof runtime.speak!=='function')return Promise.reject(new Error('neural_runtime_unavailable'));
+      const say=global.FiezelVoiceSay;
+      if(!say||typeof say.say!=='function')return Promise.reject(new Error('voice_door_unavailable'));
       this.stop();
-      const status=typeof runtime.status==='function'?runtime.status():null;
-      if(status&&!status.prepared)return Promise.reject(new Error('neural_voice_not_downloaded'));
       const rate=clamp(options.rate??this.config.ttsRate,.55,1.3);
-      // allowFallback:false is the whole point: a listening item must be neural or
-      // explicitly unavailable, never silently degraded to a robot voice.
-      return runtime.speak(String(text||''),{voice:options.voice,speed:rate,lang:this.config.language,allowFallback:false})
-        .then(result=>({provider:String(result&&result.provider||'sherpa-vits-local')}));
+      return say.say(String(text||''),{speed:rate})
+        .then(ok=>{ if(ok===false)throw new Error('voice_playback_failed'); return {provider:'puter-txt2speech'}; });
     }
   }
 

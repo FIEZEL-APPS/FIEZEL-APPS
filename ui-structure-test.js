@@ -19,8 +19,8 @@ check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeu
 // tumpukan suara neural kini diambil setelah layar pertama tercat, lewat
 // type="fiezel/lazy". Karena itu pernyataannya dipecah menjadi dua yang masing-masing
 // benar - deklarasi mendahului app.js, dan yang malas benar-benar ditandai malas.
-check(html.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')<html.indexOf('<script defer src="./app.js">')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('<script defer src="./app.js">'),'Feature runtimes must be declared before app.js.');
-check(/<script type="fiezel\/lazy" data-fiezel-lazy="voice"[^>]*src="\.\/features\/neural-voice\/fiezel-neural-voice-bootstrap\.js"/.test(html),'Neural voice stack must be lazy, not parser-blocking.');
+check(html.indexOf('./features/neural-voice/fiezel-voice-say.js')<html.indexOf('<script defer src="./app.js">')&&html.indexOf('./features/speaking-listening/fiezel-speaking-listening-addon.js')<html.indexOf('<script defer src="./app.js">'),'Feature runtimes must be declared before app.js.');
+check(/<script type="fiezel\/lazy" data-fiezel-lazy="voice"[^>]*src="\.\/features\/neural-voice\/fiezel-voice-say\.js"/.test(html),'Voice stack must be lazy, not parser-blocking.');
 check(html.includes('<script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>'),'Skills Lab runtime stays eager but deferred.');
 check(/id="globalSky"/.test(html)&&/id="globalCelestial"/.test(html)&&/\.global-sky/.test(css)&&/\.sky-light/.test(css),'Full-viewport celestial atmosphere is incomplete.');
 check(/grid-template-columns:minmax\(0,1\.42fr\)/.test(css),'Desktop launcher layout is missing.');

@@ -108,7 +108,8 @@ test('dua blok inline lama sekarang jadi berkas ber-defer SESUDAH app.js', () =>
 });
 
 test('tumpukan berat ditandai malas, dan tidak diambil browser saat mengurai', () => {
-  assert.ok(lazy.length >= 20, 'grup malas terlalu kecil, ada ' + lazy.length + ' berkas');
+  // m025-100: tumpukan mesin lokal dihapus, jadi grup malas memang jauh lebih kecil.
+  assert.ok(lazy.length >= 6, 'grup malas terlalu kecil, ada ' + lazy.length + ' berkas');
   for (const s of lazy) {
     assert.strictEqual(s.type, 'fiezel/lazy', s.src + ' kehilangan tipe yang membuatnya diabaikan browser');
     assert.ok(!s.defer && !s.async, s.src + ' tidak boleh punya defer/async - ia bukan skrip sungguhan di dokumen');
@@ -121,15 +122,19 @@ test('tumpukan berat ditandai malas, dan tidak diambil browser saat mengurai', (
 test('urutan di dalam grup suara adalah kontrak, bukan selera', () => {
   const voice = lazy.filter(s => s.group === 'voice').map(s => s.src);
   const at = name => voice.findIndex(src => src.endsWith(name));
-  assert.ok(at('fiezel-m0281-prebootstrap-hotfix.js') > -1 && at('fiezel-neural-voice-bootstrap.js') > -1);
-  assert.ok(at('fiezel-m0281-prebootstrap-hotfix.js') < at('fiezel-neural-voice-bootstrap.js'),
-    'tambalan pra-bootstrap harus mendahului bootstrap');
-  // m025-95: penjaga runtime M028.2 dihapus - seluruh isinya adalah verifikasi suara
-  // Indonesia, dan sisanya tidak pernah dipanggil siapa pun.
-  assert.strictEqual(at('fiezel-m0281-runtime-guard.js'), -1,
-    'penjaga runtime yang sudah dihapus tidak boleh dimuat lagi');
-  assert.ok(at('fiezel-voice-diagnostics.js') < at('fiezel-neural-voice.js'),
-    'diagnostik suara harus siap sebelum runtime yang menulis ke dalamnya');
+  // m025-100: yang tersisa di grup suara tinggal empat modul, dan satu-satunya
+  // ketergantungan nyata di antaranya adalah ini: pintu bicara memakai subtitle dan
+  // penerjemah, dan subtitle memakai prosodi untuk memecah kalimat. Memuat pintu lebih
+  // dulu berarti ia menemukan keduanya belum ada dan diam tanpa alasan yang terlihat.
+  assert.ok(at('fiezel-prosody.js') > -1 && at('fiezel-voice-say.js') > -1, 'grup suara tidak lengkap');
+  assert.ok(at('fiezel-prosody.js') < at('fiezel-subtitle.js'),
+    'prosodi harus ada sebelum subtitle yang memakainya');
+  assert.ok(at('fiezel-subtitle.js') < at('fiezel-voice-say.js'),
+    'subtitle harus ada sebelum pintu bicara yang memakainya');
+  assert.ok(at('fiezel-subtitle-translate.js') < at('fiezel-voice-say.js'),
+    'penerjemah harus ada sebelum pintu bicara yang memakainya');
+  assert.ok(at('fiezel-puter-voice.js') < at('fiezel-voice-say.js'),
+    'mesin suara harus ada sebelum pintu bicara yang memakainya');
 });
 
 test('Classroom menunggu grup suara, walaupun murid membukanya lebih dulu', () => {

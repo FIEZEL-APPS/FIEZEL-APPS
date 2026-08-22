@@ -487,22 +487,23 @@
       var subtitle = root.document.getElementById('tutorSubtitle');
       if (subtitle) subtitle.textContent = pair.id || pair.idText || '';
       var note = root.document.getElementById('tutorVoiceState');
-      if (!root.FiezelVoiceRuntime || typeof root.FiezelVoiceRuntime.speak !== 'function') {
-        if (note) note.textContent = 'Neural voice belum siap. Teks pelajaran tetap dapat digunakan.';
+      // m025-100: lewat pintu bicara bersama, bukan mesin lokal.
+      if (!root.FiezelVoiceSay || typeof root.FiezelVoiceSay.say !== 'function') {
+        if (note) note.textContent = 'Suara belum siap. Teks pelajaran tetap dapat digunakan.';
         return;
       }
       voiceBusy = true;
       if (note) note.textContent = 'Fiezel sedang menjelaskan…';
       try {
-        await root.FiezelVoiceRuntime.speak(pair.en, {
-          voice: englishVoice(),
-          lang: 'en-US',
-          speed: Math.max(.55, Math.min(1.25, baseSpeed() * (speedFactor || 1))),
-          allowFallback: false
+        // Subtitle tutor sudah digambar di atas dari pair.id, jadi barisnya dioper
+        // ikut supaya pita subtitle bersama tidak memanggil penerjemah untuk teks
+        // yang terjemahannya sudah ada.
+        await root.FiezelVoiceSay.say({ en: pair.en, id: pair.id || pair.idText || '' }, {
+          speed: Math.max(.55, Math.min(1.25, baseSpeed() * (speedFactor || 1)))
         });
         if (note) note.textContent = 'Siap untuk pertanyaan berikutnya.';
       } catch (error) {
-        if (note) note.textContent = 'Suara neural belum tersedia. Subtitle dan lesson state tetap aman.';
+        if (note) note.textContent = 'Suara tidak berbunyi. Subtitle dan lesson state tetap aman.';
       } finally {
         voiceBusy = false;
       }

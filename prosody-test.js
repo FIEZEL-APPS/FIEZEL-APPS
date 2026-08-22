@@ -5,50 +5,14 @@ const assert = require('assert');
 const fs = require('fs');
 
 const P = require('./features/neural-voice/fiezel-prosody.js');
-const Adapter = require('./features/neural-voice/fiezel-sherpa-vits-adapter.js');
-const adapterSrc = fs.readFileSync('features/neural-voice/fiezel-sherpa-vits-adapter.js', 'utf8');
 
 // A stand-in for the sherpa worker: it records what the adapter asked it to speak and
 // answers with one second of audio, so prosody can be asserted on behaviour rather than
 // on the shape of the source file.
-function fakeEngine(sampleRate) {
-  const posted = [];
-  class FakeWorker {
-    constructor() {
-      this.onmessage = null;
-      this.onerror = null;
-      setTimeout(() => {
-        if (this.onmessage) this.onmessage({ data: { type: 'sherpa-onnx-tts-ready', numSpeakers: 1, modelType: 0 } });
-      }, 0);
-    }
-    postMessage(message) {
-      posted.push(message);
-      setTimeout(() => {
-        if (this.onmessage) {
-          this.onmessage({
-            data: {
-              type: 'sherpa-onnx-tts-result',
-              samples: new Float32Array(sampleRate).fill(0.25),
-              sampleRate
-            }
-          });
-        }
-      }, 0);
-    }
-    terminate() {}
-  }
-  const adapter = Adapter.createSherpaVitsAdapter({
-    env: { Worker: FakeWorker },
-    basePath: 'vendor/test/',
-    expectedSpeakers: 1,
-    modelId: 'test-model',
-    voiceSids: { test_voice: 0 },
-    defaultVoice: 'test_voice',
-    kind: 'sherpa-vits-test',
-    prosody: P
-  });
-  return { adapter, posted };
-}
+// m025-100: mesin lokal dan adapternya dihapus, jadi tiruan pekerjanya ikut pergi.
+// Yang tersisa di berkas ini menguji FiezelProsody itu sendiri - modul yang tetap
+// hidup karena subtitle memakainya untuk memecah kalimat dan menghitung jeda.
+
 
 let pass = 0;
 const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name); };
@@ -126,12 +90,6 @@ const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name)
     assert.strictEqual(P.pauseAfter('one root,'), P.PAUSE_MS.clause);
   });
 
-  await test('the adapter punctuates before synthesis and pads after it', () => {
-    assert.ok(/prosody\.punctuate\(text, lang\)/.test(adapterSrc), 'text is shaped before it reaches the worker');
-    assert.ok(/prosody\.padSilence\(samples/.test(adapterSrc), 'audio is padded after generation');
-    // Prosody is optional so the engine still runs if the module is absent.
-    assert.ok(/opts\.prosody \|\|/.test(adapterSrc), 'prosody is injectable and optional');
-  });
 
   // ---- m025-41: Indonesian rhythm and intonation, asserted through the adapter ------
 
@@ -168,34 +126,7 @@ const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name)
     assert.strictEqual(P.resample(null, 1.05), null, 'no audio, nothing to shift');
   });
 
-  await test('the adapter speaks phrase by phrase, shaped and padded, in one flight', async () => {
-    const rate = 1000;
-    const { adapter, posted } = fakeEngine(rate);
-    const result = await adapter.generate(
-      'Mari kita lihat polanya. Polanya adalah subjek dan kata kerja walaupun bentuknya berubah',
-      { voice: 'test_voice', speed: 1, lang: 'id-ID' });
-    assert.ok(posted.length >= 2, 'a two-sentence line is synthesized as separate breath groups');
-    posted.forEach(m => assert.ok(/[.,;:!?…]$/.test(m.text), `each unit ends on punctuation: "${m.text}"`));
-    assert.ok(posted.some(m => /, walaupun/.test(m.text)), 'the Indonesian clause break reached the engine');
-    assert.ok(new Set(posted.map(m => m.speed)).size > 1, 'phrase rate varies across the utterance');
-    // Every phrase is one second of audio plus its own pause, so the result must be
-    // longer than the raw synthesis alone.
-    assert.ok(result.audio.length > posted.length * rate, 'silence between breath groups is real audio');
-    assert.strictEqual(result.sampling_rate, rate);
-  });
 
-  await test('a second generation while one is in flight still fails closed', async () => {
-    const { adapter } = fakeEngine(1000);
-    const first = adapter.generate('Satu. Dua. Tiga.', { voice: 'test_voice', lang: 'id-ID' });
-    await assert.rejects(
-      () => adapter.generate('Empat.', { voice: 'test_voice', lang: 'id-ID' }),
-      /neural_generation_busy/,
-      'the busy guard must span the whole phrase sequence, not one worker call');
-    await first;
-    // The guard must clear afterwards, or the voice dies for the rest of the session.
-    const again = await adapter.generate('Lima.', { voice: 'test_voice', lang: 'id-ID' });
-    assert.ok(again.audio.length > 0, 'the adapter is usable again once the sequence finishes');
-  });
 
   console.log(`FIEZEL prosody: PASS ${pass}/0`);
 })().catch(e => { console.error(e.stack || e); process.exitCode = 1; });
