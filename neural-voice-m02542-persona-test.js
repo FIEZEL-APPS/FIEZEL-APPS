@@ -232,15 +232,16 @@ async function asyncTest(name, fn) {
     assert.ok(sw.includes('/vendor/supertonic-3/'), 'the service worker must treat the bundle as a neural asset');
   });
 
-  test('the Indonesian bundle now delegates instead of owning a second model', () => {
-    const src = fs.readFileSync('features/neural-voice/fiezel-indonesian-voice.js', 'utf8');
-    assert.ok(src.includes('FiezelSupertonicVoice'), 'must delegate to the bilingual engine');
-    assert.ok(!/MODEL_ID\s*=\s*'vits-piper-id_ID-news_tts-medium'/.test(src),
-      'the news-reader model must no longer be the configured model');
-    assert.ok(!src.includes("BASE = 'vendor/sherpa-vits-id/'"),
-      'the retired Indonesian bundle must not be referenced as a live asset path');
-    assert.ok(src.includes("voiceId: VOICE_ID") && src.includes("'id_natural'"),
-      'the stored learner preference id must keep resolving');
+  test('m025-95: mesin suara Indonesia benar-benar hilang, bukan sekadar tak dipakai', () => {
+    // Modul yang tertinggal tapi tak dipanggil adalah cara termudah fitur ini hidup lagi
+    // diam-diam lewat satu pemanggil yang terlewat.
+    assert.ok(!fs.existsSync('features/neural-voice/fiezel-indonesian-voice.js'),
+      'modul suara Indonesia harus terhapus');
+    assert.ok(!fs.existsSync('vendor/sherpa-vits-id'), 'bundel Indonesia harus terhapus');
+    const index = fs.readFileSync('index.html', 'utf8');
+    assert.ok(!index.includes('fiezel-indonesian-voice.js'), 'index tidak boleh memuatnya');
+    assert.ok(index.includes('fiezel-voice-say.js'),
+      'penggantinya - bicara Inggris dengan subtitle Indonesia - harus dimuat');
   });
 
   if (failures) { console.error('\n' + failures + ' check(s) failed'); process.exit(1); }
