@@ -14,6 +14,18 @@ const ADAPTIVE_POLICY_SCHEMA='fiezel-adaptive-policy-v1';
 const POLICY_OUTCOME_SCHEMA='fiezel-policy-outcome-v1';
 const CONTENT_QA_SCHEMA='fiezel-content-qa-v1';
 const SUBTITLE_SCHEMA='fiezel-subtitle-v1';
+const FEEDBACK_SCHEMA='fiezel-feedback-v1';
+const FEEDBACK_KEY=PFX+'feedback';
+const FEEDBACK_MAX=200;
+const FEEDBACK_MAX_TEXT=600;
+const FEEDBACK_MAX_QUERY=80;
+// OWNER memilih feedback terbuka tanpa login. Tanpa identitas pengirim, satu-satunya
+// rem yang tersisa adalah rem global - jadi ia dipasang ketat, dan penyimpanannya
+// berupa cincin: yang terlama terdorong keluar alih-alih tumbuh tanpa batas.
+const FEEDBACK_RATE_PER_HOUR=60;
+const FEEDBACK_RATE_KEY=PFX+'feedback_rate';
+const FEEDBACK_NOTIFIED_KEY=PFX+'feedback_notified';
+const FEEDBACK_NOTIFY_KIND='owner_feedback';
 const SUBTITLE_MAX_CHARS=3000;
 const CONTENT_PATCH_SCHEMA='fiezel-content-patch-v1';
 const OUTCOME_PREFIX=PFX+'outcomes_';
@@ -305,6 +317,56 @@ router.post('/api/ai/translate',async({request,user})=>{
     return {text:text.slice(0,SUBTITLE_MAX_CHARS*2),model:DEFAULT_AI_MODEL,via:'fiezel-core-worker-subtitle',protocol:'1.7',schema:SUBTITLE_SCHEMA};
   }catch(error){return json({error:String(error?.message||'AI service error').slice(0,300)},502)}
 });
+async function allowFeedback(){
+  const now=Date.now(), cur=(await me.puter.kv.get(FEEDBACK_RATE_KEY))||{};
+  const windowStart=Number(cur.windowStart||0); let count=Number(cur.count||0);
+  if(!windowStart||now-windowStart>=60*60*1000){await me.puter.kv.set(FEEDBACK_RATE_KEY,{windowStart:now,count:1},Math.floor((now+2*60*60*1000)/1000));return true}
+  if(count>=FEEDBACK_RATE_PER_HOUR)return false;
+  await me.puter.kv.set(FEEDBACK_RATE_KEY,{windowStart,count:count+1},Math.floor((windowStart+2*60*60*1000)/1000));return true
+}
+/**
+ * Membersihkan teks kiriman anonim.
+ *
+ * Teks ini akan tampil di dasbor OWNER, jadi ia adalah masukan tidak tepercaya yang
+ * berakhir di layar orang lain. Penanda sudut dibuang di sini SEBAGAI LAPIS KEDUA -
+ * dasbor tetap wajib menulisnya lewat textContent, bukan innerHTML - karena satu
+ * pembersih saja terlalu tipis untuk menjaga halaman milik sendiri.
+ */
+function feedbackText(value,limit){
+  return String(value==null?'':value).replace(/[<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,limit)
+}
+router.post('/api/feedback',async({request})=>{
+  // OWNER memilih terbuka: tidak ada pemeriksaan login di sini, dengan sengaja.
+  if(!(await allowFeedback()))return json({error:'feedback rate limit reached; try again later'},429);
+  const body=await request.json().catch(()=>({}));
+  const kind=body.kind==='missing_material'?'missing_material':'note';
+  const message=feedbackText(body.message,FEEDBACK_MAX_TEXT);
+  const query=feedbackText(body.query,FEEDBACK_MAX_QUERY);
+  if(!message&&!query)return json({error:'empty feedback'},400);
+  const entry={schema:FEEDBACK_SCHEMA,id:'fb-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),
+    kind,query,message,at:new Date().toISOString(),build:feedbackText(body.build,40)};
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{items:[]};
+  const items=[...(Array.isArray(stored.items)?stored.items:[]),entry].slice(-FEEDBACK_MAX);
+  await me.puter.kv.set(FEEDBACK_KEY,{schema:FEEDBACK_SCHEMA,updatedAt:entry.at,items});
+  return {stored:true,id:entry.id,protocol:'1.7',schema:FEEDBACK_SCHEMA};
+});
+router.get('/api/feedback/list',async({user})=>{
+  // Hanya OWNER. Kiriman orang lain tidak boleh terbaca oleh pengguna mana pun.
+  if(!(await isOwner(user)))return json({error:'owner authentication required'},403);
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{items:[]};
+  const items=Array.isArray(stored.items)?stored.items:[];
+  // Pencarian nihil yang sama diringkas jadi satu baris berhitung: dua belas orang
+  // mencari "did" jauh lebih berguna dibaca sebagai satu prioritas, bukan dua belas baris.
+  const counts={};
+  items.filter(x=>x&&x.kind==='missing_material'&&x.query).forEach(x=>{counts[x.query]=(counts[x.query]||0)+1});
+  const topQueries=Object.keys(counts).map(q=>({query:q,count:counts[q]})).sort((a,b)=>b.count-a.count).slice(0,30);
+  return {items:items.slice().reverse(),topQueries,count:items.length,protocol:'1.7',schema:FEEDBACK_SCHEMA};
+});
+router.post('/api/feedback/clear',async({user})=>{
+  if(!(await isOwner(user)))return json({error:'owner authentication required'},403);
+  await me.puter.kv.set(FEEDBACK_KEY,{schema:FEEDBACK_SCHEMA,updatedAt:new Date().toISOString(),items:[]});
+  return {cleared:true,protocol:'1.7'};
+});
 router.post('/api/policy/next',async({request,user})=>{
   const info=await callerInfo(user);if(!info?.uuid)return json({error:'Puter authentication required'},401);const body=await request.json().catch(()=>({})),snapshot=boundedPolicySnapshot(body.snapshot||{}),evidence=boundedEvidence(body.evidence||{}),stored=(await me.puter.kv.get(OUTCOME_PREFIX+info.uuid))||{history:[]},outcomes=boundedOutcomeList([...(Array.isArray(stored.history)?stored.history:[]),...(Array.isArray(body.outcomes)?body.outcomes:[])]),policy=deriveAdaptivePolicy({snapshot,evidence,outcomes,now:Date.now()});return {policy,protocol:'1.7',evidenceSchema:evidence.schema,outcomeSchema:POLICY_OUTCOME_SCHEMA};
 });
@@ -383,11 +445,60 @@ router.post('/api/activity',async({request,user})=>{
   const info=await callerInfo(user);if(!info?.uuid)return json({error:'Puter authentication required'},401);const body=await request.json().catch(()=>({})),key=USER_PREFIX+info.uuid,existing=(await me.puter.kv.get(key))||{};if(!existing.subscription)return json({error:'push subscription required'},409);
   existing.activity=boundedActivity(body.activity);existing.updatedAt=new Date().toISOString();await me.puter.kv.set(key,existing);return {synced:true,protocol:'1.7',evidenceSchema:existing.activity.evidence.schema};
 });
+/**
+ * Satu notifikasi untuk OWNER bila ada masukan yang belum pernah diberitahukan.
+ *
+ * Diringkas menjadi SATU pesan berisi jumlah, bukan satu pesan per masukan: sepuluh
+ * kiriman dalam satu jam akan membuat HP berbunyi sepuluh kali untuk kabar yang sama,
+ * dan notifikasi yang mengganggu akan dimatikan - lalu kabar berikutnya tidak sampai
+ * sama sekali.
+ */
+async function ownerFeedbackNotification(rows,now){
+  const stored=(await me.puter.kv.get(FEEDBACK_KEY))||{};
+  const items=Array.isArray(stored.items)?stored.items:[];
+  if(!items.length)return null;
+  const seen=(await me.puter.kv.get(FEEDBACK_NOTIFIED_KEY))||{};
+  const lastId=String(seen.lastId||'');
+  const at=lastId?items.findIndex(x=>x&&x.id===lastId):-1;
+  // Kiriman yang id-nya tidak ditemukan berarti sudah terdorong keluar cincin; dalam
+  // keadaan itu seluruh isi dianggap baru, karena melewatkan kabar lebih buruk daripada
+  // satu notifikasi berlebih.
+  const fresh=at===-1?items:items.slice(at+1);
+  if(!fresh.length)return null;
+  const owner=await ownerInfo();
+  if(!owner||!owner.uuid)return null;
+  const rec=(await me.puter.kv.get(USER_PREFIX+owner.uuid))||{};
+  if(!rec.subscription)return null;
+  const missing=fresh.filter(x=>x&&x.kind==='missing_material').length;
+  const body=missing===fresh.length
+    ? `${fresh.length} permintaan materi baru dari pengguna.`
+    : `${fresh.length} masukan baru${missing?` (${missing} permintaan materi)`:''}.`;
+  return {id:owner.uuid,subscription:rec.subscription,notification:{
+    kind:FEEDBACK_NOTIFY_KIND,title:'Masukan pengguna FIEZEL',body,tag:'fiezel-feedback',
+    url:'./creator-report-dashboard.html',
+    meta:{count:fresh.length,missingMaterial:missing,lastId:String(fresh[fresh.length-1].id||'')}
+  }};
+}
 router.post('/api/reminders/due',async({request})=>{
   if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const rows=await me.puter.kv.list({pattern:USER_PREFIX+'*',returnValues:true}),now=Date.now(),due=[];
   for(const row of rows.slice(0,MAX_USERS)){const rec=row.value||{};if(!rec.subscription)continue;const reminder=reminderFor(rec,now);if(reminder)due.push({id:row.key.slice(USER_PREFIX.length),subscription:rec.subscription,notification:reminder});if(due.length>=MAX_DUE)break}
+  // m025-103: masukan pengguna ikut menumpang antrian yang sama. Dispatcher, jadwal, dan
+  // kunci VAPID sudah ada dan sudah teruji; membuat jalur push kedua hanya menambah
+  // tempat baru untuk rusak, dan kunci privat itu memang sengaja tidak pernah menyentuh
+  // Worker.
+  const ownerNote=await ownerFeedbackNotification(rows,now);
+  if(ownerNote)due.push(ownerNote);
   return {generatedAt:new Date(now).toISOString(),count:due.length,due};
 });
 router.post('/api/reminders/ack',async({request})=>{
-  if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const body=await request.json().catch(()=>({})),id=String(body.id||''),kind=String(body.kind||'').slice(0,40);if(!/^[A-Za-z0-9_-]{6,128}$/.test(id)||!kind)return json({error:'invalid ack'},400);const key=USER_PREFIX+id,rec=await me.puter.kv.get(key);if(!rec)return json({error:'not found'},404);rec.lastPushAt=Date.now();rec.lastPushDay=dateKeyJakarta();rec.lastPushKind=kind;rec.lastPushStatus=String(body.status||'sent').slice(0,30);if(kind==='positive')rec.lastPositiveDay=rec.lastPushDay;const evidence=body.evidence&&typeof body.evidence==='object'?body.evidence:{};rec.reminderEvidenceLog=[...(Array.isArray(rec.reminderEvidenceLog)?rec.reminderEvidenceLog:[]),{at:rec.lastPushAt,channel:'remote',kind,status:rec.lastPushStatus,evidence}].slice(-ALRS_EVIDENCE_LOG_LIMIT);if(rec.lastPushStatus==='expired')rec.subscription=null;await me.puter.kv.set(key,rec);return {acked:true};
+  if(!(await cronAuthorized(request)))return json({error:'unauthorized'},401);const body=await request.json().catch(()=>({})),id=String(body.id||''),kind=String(body.kind||'').slice(0,40);if(!/^[A-Za-z0-9_-]{6,128}$/.test(id)||!kind)return json({error:'invalid ack'},400);
+  // m025-103: ack notifikasi masukan TIDAK boleh menyentuh catatan pengingat belajar.
+  // Catatan itu memegang lastPushAt, dan ALRS menolak mengirim pengingat berikutnya
+  // dalam 18 jam sesudahnya - jadi menumpang di sana berarti satu kabar masukan
+  // membungkam pengingat belajar Jahran seharian.
+  if(kind===FEEDBACK_NOTIFY_KIND){
+    const lastId=String((body.evidence&&body.evidence.lastId)||'').slice(0,80);
+    if(lastId)await me.puter.kv.set(FEEDBACK_NOTIFIED_KEY,{lastId,at:new Date().toISOString()});
+    return {acked:true,kind,protocol:'1.7'};
+  }const key=USER_PREFIX+id,rec=await me.puter.kv.get(key);if(!rec)return json({error:'not found'},404);rec.lastPushAt=Date.now();rec.lastPushDay=dateKeyJakarta();rec.lastPushKind=kind;rec.lastPushStatus=String(body.status||'sent').slice(0,30);if(kind==='positive')rec.lastPositiveDay=rec.lastPushDay;const evidence=body.evidence&&typeof body.evidence==='object'?body.evidence:{};rec.reminderEvidenceLog=[...(Array.isArray(rec.reminderEvidenceLog)?rec.reminderEvidenceLog:[]),{at:rec.lastPushAt,channel:'remote',kind,status:rec.lastPushStatus,evidence}].slice(-ALRS_EVIDENCE_LOG_LIMIT);if(rec.lastPushStatus==='expired')rec.subscription=null;await me.puter.kv.set(key,rec);return {acked:true};
 });
