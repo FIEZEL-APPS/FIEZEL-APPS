@@ -35,6 +35,31 @@ check(!/[🔊🗣✨💡🏠📚📈]/u.test(app+html),'Runtime UI still uses le
 check(/type="button" id="deploy"/.test(setup)&&/type="button" id="load"/.test(dashboard),'Auxiliary pages contain implicit buttons.');
 check(/<meta name="viewport"/.test(setup)&&/<meta name="viewport"/.test(dashboard),'Auxiliary pages are not mobile-ready.');
 
+// m025-93 (brief redesign Bab 2, bug kritis #2). OWNER: "bottom navigation bar menimpa
+// konten saat scroll - teks/angka terpotong di belakang nav pill".
+//
+// Bukan soal padding: ruang bawah .app sudah 112px + safe-area sementara pill hanya memakan
+// 73px. Yang salah adalah pill-nya tembus pandang - diukur di peramban pada m025-91,
+// background rgba(255,255,255,.74) dengan backdrop-filter:none. m025-81 mencabut blur demi
+// baterai tetapi meninggalkan transparansinya, jadi token kaca berubah menjadi panel bening.
+//
+// Gerbang ini menjaga dua hal sekaligus, dan keduanya perlu: pill tidak boleh kembali
+// memakai token tembus pandang, DAN blur tidak boleh dikembalikan diam-diam sebagai jalan
+// pintas - keputusan baterai m025-81 masih berlaku.
+const navRule=(css.match(/\.bottomnav\{[^}]*\}/g)||[]).join('');
+check(/background:var\(--glass-solid\)/.test(navRule),
+  'Tab bar must use the opaque token; content must never read through it while scrolling.');
+check(!/backdrop-filter/.test(navRule),
+  'Blur must not come back to the tab bar - m025-81 removed it from always-on chrome for battery.');
+check(/--glass-solid:rgba\([^)]*,\.9\d\)/.test(css),
+  'The opaque token must actually be opaque enough that nothing bleeds through.');
+check(/\.nav-scrim\{[^}]*pointer-events:none/.test(css),
+  'The bottom scrim must never swallow taps.');
+check(/\.nav-scrim\{[^}]*z-index:39/.test(css)&&/\.bottomnav\{[\s\S]{0,400}?z-index:40/.test(css),
+  'The scrim must sit under the pill, so the tabs stay crisp on top of it.');
+check(/<div class="nav-scrim" aria-hidden="true"><\/div>/.test(html),
+  'The scrim element must exist and stay decorative.');
+
 if(failures.length){
   console.error('FIEZEL UI structure: FAIL');
   failures.forEach(x=>console.error('- '+x));
