@@ -33,7 +33,7 @@ html.fz-booting body{overflow:hidden}
    features/brand/fiezel-choreography.js; splash-choreography-test.js gagal kalau
    keduanya menyimpang. Ada di sini karena splash frame-pertama bergerak sebelum
    satu baris JavaScript pun sempat berjalan. */
-#fiezelBootSplash{--fz-b1:0ms;--fz-b2:110ms;--fz-b3:165ms;--fz-b4:250ms;--fz-b5:310ms;--fz-b6:480ms;--fz-b7:620ms;--fz-b8:800ms}
+#fiezelBootSplash{--fz-b1:0ms;--fz-b2:190ms;--fz-b3:285ms;--fz-b4:430ms;--fz-b5:530ms;--fz-b6:820ms;--fz-b7:1060ms;--fz-b8:1360ms}
 .fiezel-splash,.fiezel-ob{--fz-bg:#efe3d3;--fz-paper:#fdf3e2;--fz-ink:#2c1b1c;--fz-ink-muted:#6e5a4f;--fz-accent:#7a1e2e;--fz-accent-deep:#4a1119;--fz-gold:#d9a441;--fz-soft:#f3e0e0;--fz-line:#ecdec0;--fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;--fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;--fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif}
 .fiezel-splash,.fiezel-ob{position:fixed;inset:0;z-index:2147482000;display:flex;flex-direction:column;background:var(--fz-bg);font-family:var(--fz-body);color:var(--fz-ink);padding-top:max(18px,env(safe-area-inset-top));animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both}
 .fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
@@ -52,18 +52,22 @@ html.fz-booting body{overflow:hidden}
 @keyframes fz-logo-arm{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
 @keyframes fz-logo-bar{0%{opacity:0;transform:scaleY(.08)} 70%{opacity:1;transform:scaleY(1.035)} 100%{opacity:1;transform:scaleY(1)}}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b2,110ms) both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b3,165ms) both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b4,250ms) both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b5,310ms) both}
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .7s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b2,190ms) both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b3,285ms) both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b4,430ms) both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b5,530ms) both}
 @keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
-.fiezel-logo-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);animation:fz-logo-sheen .9s cubic-bezier(.3,.7,.3,1) var(--fz-b6,480ms) both}
+.fiezel-logo-stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);animation:fz-logo-sheen 1.2s cubic-bezier(.3,.7,.3,1) var(--fz-b6,820ms) both}
 @keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
 @keyframes fz-splash-settle{from{opacity:0;transform:translateY(15px);letter-spacing:.34em} to{opacity:1;transform:none;letter-spacing:.16em}}
-.fiezel-splash-brand .fiezel-splash-word{font-family:var(--fz-display);font-weight:400;font-size:2.45rem;letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;animation:fz-splash-settle .52s cubic-bezier(.22,.8,.28,1) var(--fz-b7,620ms) both}
-.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;animation:fz-splash-rise .52s cubic-bezier(.22,.8,.28,1) var(--fz-b8,800ms) both}
-.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,.fiezel-splash-still .fiezel-splash-word,.fiezel-splash-still .fiezel-splash-tag,.fiezel-splash-still .fiezel-splash-brand::before,.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
+.fiezel-splash-brand .fiezel-splash-word{font-family:var(--fz-display);font-weight:400;font-size:2.45rem;letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both}
+.fiezel-splash-brand .fiezel-splash-tag{font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both}
+@keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
+.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar{transform:none!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fiezel-splash-word{transform:none!important;letter-spacing:.16em!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fiezel-splash-brand::before,.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
 .fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
   </style>
   <link rel="stylesheet" href="./style.css">

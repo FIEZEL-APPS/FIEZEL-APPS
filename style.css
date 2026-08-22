@@ -1168,11 +1168,11 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
      nada 3 (D5, 210ms) -> dua batang emas naik; inilah gelombang suara yang bereaksi
    Sebelum perbaikan ini batang emas baru bergerak di 520/620 ms - melodinya sudah habis
    sebelum bagian yang menggambarkan bunyi itu sempat bergerak sama sekali. */
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .42s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b2,110ms) both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .34s cubic-bezier(.22,.8,.28,1) var(--fz-b3,165ms) both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b4,250ms) both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .46s cubic-bezier(.2,.9,.3,1) var(--fz-b5,310ms) both}
+.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .7s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
+.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b2,190ms) both}
+.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b3,285ms) both}
+.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b4,430ms) both}
+.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b5,530ms) both}
 
 /* Kilau emas menyapu logo sekali, tepat setelah kedua batang berdiri. */
 @keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
@@ -1180,7 +1180,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-logo-stage::after{
   content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);
-  animation:fz-logo-sheen .9s cubic-bezier(.3,.7,.3,1) var(--fz-b6,480ms) both;
+  animation:fz-logo-sheen 1.2s cubic-bezier(.3,.7,.3,1) var(--fz-b6,820ms) both;
 }
 
 @keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
@@ -1191,16 +1191,28 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-brand .fiezel-splash-word{
   font-family:var(--fz-display);font-weight:400;font-size:2.45rem;
   letter-spacing:.16em;color:#FFFBF3;margin:0;display:block;
-  animation:fz-splash-settle .52s cubic-bezier(.22,.8,.28,1) var(--fz-b7,620ms) both;
+  animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both;
 }
 .fiezel-splash-brand .fiezel-splash-tag{
   font-family:var(--fz-body);font-size:.66rem;letter-spacing:.30em;
   text-transform:uppercase;color:rgba(221,181,95,.9);margin:10px 0 0;
-  animation:fz-splash-rise .52s cubic-bezier(.22,.8,.28,1) var(--fz-b8,800ms) both;
+  animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both;
 }
 /* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
-.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar,
-.fiezel-splash-still .fiezel-splash-word,.fiezel-splash-still .fiezel-splash-tag,
+/* Kurangi-gerak dulu berarti animation:none - dan hasilnya seluruh sapaan pembuka lenyap:
+   logo langsung utuh, tidak ada yang tersusun, tidak ada yang mendarat. OWNER melaporkannya
+   sebagai "animasinya terlalu cepat dan singkat", dan memang begitulah rasanya ketika tidak
+   ada animasi sama sekali.
+   Kurangi-gerak meminta lebih sedikit GERAKAN, bukan lebih sedikit pengalaman. Jadi
+   perpindahan, penskalaan, dan sapuan dibuang - yang tersisa muncul dengan memudar, pada
+   KETUKAN YANG SAMA. Susunannya tetap terbaca, tanpa satu piksel pun yang bergerak. */
+@keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
+.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar{
+  transform:none!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fiezel-splash-word{
+  transform:none!important;letter-spacing:.16em!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation-name:fz-fade-in!important}
+/* Denyut halo dan sapuan kilau memang gerakan tanpa isi - keduanya tetap dimatikan. */
 .fiezel-splash-still .fiezel-splash-brand::before,
 .fiezel-splash-still .fiezel-logo-stage::after{animation:none}
 .fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
