@@ -730,7 +730,12 @@ function openApp(){
   // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
   // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
   // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
-  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
+  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();
+  // Layar utama sudah tergambar - INI momen yang benar untuk mengambil tumpukan berat.
+  // Mengambilnya lebih awal (mis. begitu DOM siap) justru merebut pita dari app.js dan
+  // ~2,7 MB JSON kontennya di jaringan seluler, sehingga penghematannya hilang seluruhnya.
+  try{self.FiezelLazy?.start?.()}catch{}
+  startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-43: the gates used to be called straight from here, but this runs while app.js
 // is still parsing, before the later <script> tags exist - so the daily-target call hit

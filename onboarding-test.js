@@ -2,7 +2,7 @@
  * FIEZEL gate — onboarding lima langkah (FIEZEL_Complete_Design_Specification.pdf bagian 3).
  *
  * Lapisan yang menutupi seluruh layar adalah tempat paling mudah untuk mengurung pengguna,
- * dan di produk ini gerbang notifikasi berada tepat di bawahnya. Karena itu gate ini menahan
+ * dan di produk ini tawaran notifikasi berada tepat di bawahnya. Karena itu gate ini menahan
  * beberapa hal sekaligus: perkenalan harus selalu punya jalan keluar di SETIAP langkah dan
  * SETIAP sub-langkah (termasuk dua slide carousel), harus berhenti setelah selesai atau
  * dilewati, tidak boleh menjanjikan yang tidak dipegang produk (skor, jadwal manual), dan
@@ -159,8 +159,10 @@ test('schedule setup TIDAK memasang pemilih hari/jam yang tidak tersambung ke ap
 });
 
 test('SETIAP langkah dan SETIAP slide carousel punya jalan keluar - tidak ada yang mengurung', () => {
-  // Ini alasan utama gate ini ada. Gerbang notifikasi berada di bawah lapisan ini, dan
-  // notifikasi wajib; satu langkah tanpa jalan keluar berarti aplikasi tidak bisa dimasuki.
+  // Ini alasan utama gate ini ada: satu langkah perkenalan tanpa jalan keluar berarti
+  // aplikasi tidak bisa dimasuki. Notifikasi sendiri sudah berhenti menjadi syarat masuk
+  // (OWNER membalik m025-34), jadi perkenalan inilah satu-satunya lapisan yang tersisa
+  // yang benar-benar bisa mengurung - dan justru karena itu ia harus diperiksa.
   const env = fakeEnv();
   for (let i = 0; i < onboarding.CAROUSEL_SLIDES.length; i++) {
     const html = onboarding.carouselMarkup(env, i);
@@ -361,11 +363,11 @@ test('aplikasi menyambungkan splash -> onboarding -> gerbang notifikasi -> tes p
     'perkiraan self-report tidak boleh menimpa state.level - itu milik tes penempatan asli');
 });
 
-test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi tetap wajib', () => {
-  // OWNER: "ubah notification gate di akhir flow". Notifikasi tetap wajib di produk ini;
-  // yang berubah hanya URUTANNYA. Murid baru (perkenalan belum selesai) melihat
-  // splash+onboarding dulu; murid lama tetap diperiksa gerbangnya di awal boot, sama
-  // seperti sebelumnya.
+test('notifikasi di ujung alur: DIUNDANG, TIDAK DIPAKSA - dan tidak dihapus', () => {
+  // Judul tes ini dulu berbunyi "notifikasi tetap wajib". OWNER MEMBALIK keputusan itu
+  // (m025-34): gerbang wajib adalah dark-pattern. Yang dijaga sekarang: tawarannya masih
+  // ada dan masih di UJUNG perkenalan - hanya saja ia tidak lagi menahan apa pun, dan
+  // aplikasi dibuka sebelum tawaran itu muncul, bukan sesudah izin diberikan.
   const flat = app.replace(/\s/g, '');
   assert.ok(/functionstartWelcomeExperience\(\)\{/.test(flat), 'titik masuk boot harus tetap ada');
   assert.ok(/onboardingDone=self\.FiezelOnboarding\?\.completed\?\.\(self\)!==false/.test(flat),
@@ -378,12 +380,24 @@ test('gerbang notifikasi dipindah ke ujung alur, bukan dihapus - notifikasi teta
     'splash harus jadi layar pertama untuk semua murid, bukan hanya murid baru');
   assert.ok(/if\(!onboardingDone&&showOnboarding\(at\)\?\.shown===true\)returnnull/.test(flat),
     'perkenalan hanya menahan gerbang kalau ia benar-benar tampil');
-  assert.ok(/returnstartNotificationGate\(\)/.test(flat),
-    'gerbang notifikasi tetap dijalankan di ujung sapaan, bukan dihapus');
-  // Gerbang itu sendiri (isi startNotificationGate) tidak boleh berubah perilakunya -
-  // notifikasi tetap wajib dengan cara yang persis sama, hanya dipindah posisinya.
-  assert.ok(/functionstartNotificationGate\(\)\{/.test(flat), 'logika gerbang asli harus tetap ada, hanya berganti nama');
-  assert.ok(/lockAppForNotifications\(permission\)/.test(flat), 'penguncian aplikasi tanpa izin tetap terjadi');
+  assert.ok(/returnstartNotificationInvitation\(\)/.test(flat),
+    'tawaran notifikasi tetap dijalankan di ujung sapaan, bukan dihapus');
+  assert.ok(/functionstartNotificationInvitation\(\)\{/.test(flat),
+    'titik masuk di ujung perkenalan harus tetap ada, dengan nama yang jujur');
+  // Inilah pembalikannya, dijaga sebagai pernyataan yang bisa gagal:
+  // 1. tidak ada lagi fungsi pengunci, dan tidak ada lagi yang memasang kelas kuncinya;
+  assert.ok(!/functionlockAppForNotifications/.test(flat),
+    'fungsi pengunci harus hilang, bukan sekadar tidak dipanggil');
+  assert.ok(!/classList\?\.add\?\.\('notification-locked'\)/.test(flat),
+    'tidak ada jalur yang boleh memasang kembali kunci notifikasi di <body>');
+  assert.ok(!/functionnotificationsRequired\(\)/.test(flat),
+    'gagasan "notifikasi wajib" harus hilang dari kode, bukan dinetralkan diam-diam');
+  // 2. aplikasi dibuka LEBIH DULU, lalu tawarannya muncul di atasnya - bukan sebaliknya;
+  assert.ok(/functionstartNotificationInvitation\(\)\{returnopenApp\(\)\}/.test(flat),
+    'ujung perkenalan harus membuka aplikasi, bukan menahannya sampai izin diberikan');
+  // 3. dan menolak adalah jawaban yang sah dengan jalan masuk kembali lewat Pengaturan.
+  assert.ok(/functiondeclineStudyNotifications\(\)\{/.test(flat), 'harus ada jalur menolak yang eksplisit');
+  assert.ok(/settingReminders/.test(app), 'Pengaturan harus punya jalan masuk kembali untuk pengingat');
 });
 
 test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', () => {

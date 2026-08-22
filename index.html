@@ -232,9 +232,14 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./fiezel-lazy-loader.js"></script>
 
   <!-- FIEZEL_LAZY_START — runtime suara neural. Urutan di bawah ini adalah kontrak, bukan
-       selera: fiezel-m0281-prebootstrap-hotfix.js menambal sebelum bootstrap, dan
-       fiezel-m0281-runtime-guard.js merekam runtime yang sudah selesai ditambal. Pemuat
-       menjalankannya dengan async=false sehingga urutan ini tetap berlaku. -->
+       selera: dua berkas m0281 di dalamnya adalah tambalan yang membungkus tetangganya -
+       satu menambal SEBELUM bootstrap, satu merekam runtime SESUDAH semua tambalan
+       terpasang. Pemuat menjalankannya dengan async=false sehingga urutan tulis di bawah
+       ini tetap menjadi urutan eksekusi.
+
+       (Nama berkasnya sengaja tidak ditulis di komentar ini: beberapa tes menghitung
+       urutan lewat index.html indexOf pada nama berkas, dan penyebutan di komentar akan
+       terbaca sebagai posisi pemuatan yang lebih awal daripada tag-nya sendiri.) -->
   <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
