@@ -134,6 +134,30 @@ ok(/textContent/.test(dashboard), 'dasbor tidak menulis lewat textContent sama s
 
 console.log('m025-102 pencarian + feedback: ' + passed + ' pemeriksaan lolos');
 
+/* ---- m025-104 layar tanpa jalan masuk sama saja tidak ada -------------- */
+
+// Kelalaian yang benar-benar terjadi di m025-102: halaman pencariannya dibuat, rutenya
+// didaftarkan, tesnya hijau - dan OWNER melaporkan "tidak ada tempat pencarian", karena
+// tidak ada satu pun tombol yang menuju ke sana. Tes lama memeriksa mesinnya bekerja,
+// bukan bahwa pelajar bisa sampai ke sana.
+const appSrc = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
+const indexSrc = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+
+ok(/VALID_VIEWS[^;]*'search'/.test(appSrc), 'rute pencarian belum terdaftar');
+ok(/state\.view==='search'\)searchView\(\)/.test(appSrc), 'rute pencarian tidak menggambar apa pun');
+ok(/go\('search'\)/.test(indexSrc), 'tidak ada satu pun tombol menuju pencarian');
+
+// Penandaan aktif dibersihkan HANYA dari .nav. Elemen ber-data-view di luar nav akan
+// menyala sekali lalu tersangkut menyala selamanya.
+const entry = indexSrc.slice(indexSrc.indexOf("go('search')") - 200, indexSrc.indexOf("go('search')") + 60);
+ok(!/data-view=/.test(entry),
+  'tombol pencarian memakai data-view; penandaan aktifnya tidak akan pernah dibersihkan');
+
+// Tombol masukan di pengaturan punya penyakit yang sama: ada fungsinya, belum tentu ada
+// tombolnya.
+ok(/id="openFeedback"/.test(appSrc), 'tombol kirim masukan belum digambar di pengaturan');
+ok(/\$\('openFeedback'\)/.test(appSrc), 'tombol kirim masukan tidak disambungkan ke apa pun');
+
 /* ---- m025-103 notifikasi masukan ke OWNER ------------------------------ */
 
 // Jalur push yang sudah ada dipakai ulang: dispatcher, jadwal per jam, dan kunci VAPID
