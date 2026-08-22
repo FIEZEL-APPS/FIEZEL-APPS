@@ -59,7 +59,10 @@ const SCENE_STOPS=[
   {minute:1440,top:'#140a12',bottom:'#2c1622'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
-const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:''};
+// `reminders:null` berarti "murid belum memutuskan" dan itu bukan sama dengan false:
+// hanya keputusan yang sesungguhnya (true/false) yang menutup pintu tawaran. Kalau
+// bawaannya false, murid lama akan kehilangan pengingat yang sudah mereka izinkan.
+const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:''};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
   {headline:'Oii {name}, target kuliah luar negeri lu keren. Tapi hari ini udah belajar belum? 👀',lead:'Beasiswa sama kampus IT impian nggak kebangun dari niat doang. Gas 10–15 menit dulu, kecil tapi nyata.'},
@@ -505,43 +508,84 @@ function feedbackTone(freq,at,duration=.24,type='sine'){if(!fxCtx||!fxGain)retur
 function playFeedbackSound(kind){if(!feedbackSoundsOn()||!unlockFeedbackAudio())return false;try{const now=fxCtx.currentTime+.01;if(kind==='success')[[523.25,0],[659.25,.085],[783.99,.17],[1046.5,.26]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.3,i>1?'triangle':'sine'));else if(kind==='error')[[220,0],[164.81,.14],[110,.28]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.34,i===2?'sawtooth':'triangle'));else feedbackTone(392,now,.12,'sine');return true}catch{return false}}
 function showAnswerBurst(ok){const burst=$('answerBurst');if(!burst)return;clearTimeout(showAnswerBurst.timer);burst.className=`answer-burst ${ok?'success':'error'}`;burst.innerHTML=`<span class="answer-burst-icon"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i></span><strong>${ok?'Benar!':'Belum tepat'}</strong><small>${ok?'Mantap, polanya sudah terbaca.':'Tenang, kita bedah jawabannya.'}</small>`;burst.classList?.remove?.('hidden');refreshIcons();const show=()=>burst.classList?.add?.('show');if(window.requestAnimationFrame)window.requestAnimationFrame(show);else setTimeout(show,16);showAnswerBurst.timer=setTimeout(()=>{burst.classList?.remove?.('show');setTimeout(()=>burst.classList?.add?.('hidden'),320)},1500)}
 function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok)}
-let appUnlocked=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
+let appOpened=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
 function notificationPermission(){return typeof Notification==='undefined'?'unsupported':Notification.permission}
-function notificationsRequired(){return typeof globalThis!=='undefined'&&globalThis.FIEZEL_REQUIRE_NOTIFICATIONS===true}
 function notificationsSupported(){return typeof Notification!=='undefined'&&typeof Notification.requestPermission==='function'}
+// OWNER MEMBALIK m025-34. Dulu ada notificationsRequired() di sini, dan seluruh aplikasi
+// bergantung padanya: izin ditolak = 'notification-locked' di <body> = .app dan .bottomnav
+// disembunyikan = "FIEZEL belum bisa dibuka". OWNER menilai polanya sendiri sebagai
+// kerusakannya - dark-pattern yang membuat app terasa murahan. Fungsi itu HILANG, bukan
+// dinetralkan, supaya tidak ada satu pun pemanggil yang diam-diam masih mengira ada kunci
+// untuk dibuka; yang tersisa adalah undangan yang boleh ditolak.
+//
+// Yang menggantikannya adalah preferensi murid yang sesungguhnya:
+// - preferences.reminders === false  -> murid mematikan pengingat dari Pengaturan.
+// - izin browser 'granted'           -> pengingat benar-benar bisa dikirim.
+// Keduanya harus benar sebelum satu notifikasi pun muncul.
+function remindersWanted(){return state.preferences?.reminders!==false}
+function remindersActive(){return remindersWanted()&&notificationPermission()==='granted'}
+// Buku catatan undangan. Disimpan terpisah dari state belajar karena ini bukan progres:
+// ia hanya menjawab "sudah pernah ditawarkan berapa kali, dan pernah ditolak kapan".
+// Tanpa catatan ini, "tawarkan sekali lagi dengan lembut" akan berubah menjadi tawaran
+// di setiap boot - yaitu dark-pattern yang sama, hanya lebih pelan.
+const REMINDER_INVITE_KEY='fiezel-reminder-invite-v1',REMINDER_INVITE_MAX_OFFERS=2;
+function readReminderInvite(){try{const raw=JSON.parse(localStorage.getItem(REMINDER_INVITE_KEY)||'null');return raw&&typeof raw==='object'?raw:{}}catch{return{}}}
+function writeReminderInvite(patch){try{localStorage.setItem(REMINDER_INVITE_KEY,JSON.stringify({...readReminderInvite(),...patch}))}catch{}return true}
+function reminderInviteOffers(){return Number(readReminderInvite().offers||0)}
+// Undangan hanya layak muncul kalau browser bisa menjawabnya, murid belum memutuskan apa
+// pun, dan jatah tawaran belum habis. 'denied' TIDAK ditawari lagi: browser tidak akan
+// menampilkan dialognya untuk kedua kali, jadi mengulang tawaran hanya akan menghasilkan
+// panel yang tidak bisa berbuat apa-apa. Jalan masuknya kembali ada di Pengaturan.
+function shouldInviteNotifications(){
+  if(!notificationsSupported())return false;
+  if(notificationPermission()!=='default')return false;
+  if(state.preferences?.reminders===false)return false;
+  return reminderInviteOffers()<REMINDER_INVITE_MAX_OFFERS;
+}
 function setNotificationGateState(status){
   const gate=$('welcome'),button=$('notificationGateButton'),body=$('notificationGateBody'),stateText=$('notificationGateStatus'),help=$('notificationGateHelp');if(!gate)return;
   // m025-80 OWNER: "walaupun notifikasi dan puter sudah diaktifkan, setiap kali masuk apps
-  // selalu muncul popup cepat". Penyebabnya di sini: unlockAppAfterNotification() memanggil
-  // fungsi ini dengan status 'granted', dan barisnya dulu SELALU membuka gerbang - lalu
-  // hideNotificationGate() menutupnya lagi 220ms kemudian. Jadi setiap peluncuran dengan
-  // izin yang sudah ada tetap menampilkan kedipan panel. Gerbang yang sedang tersembunyi
-  // dan sudah lolos tidak perlu dibuka sama sekali.
+  // selalu muncul popup cepat". Panel yang sedang tersembunyi dan sudah dijawab tidak perlu
+  // dibuka sama sekali hanya untuk ditutup lagi 220ms kemudian.
   const wasHidden=gate.classList.contains('hidden');
-  if(!(wasHidden&&status==='granted')){
+  if(!(wasHidden&&(status==='granted'||status==='declined'))){
     gate.classList.remove('hidden');(window.requestAnimationFrame||setTimeout)(()=>gate.classList.add('show'));
   }
+  // Naskah di bawah ini adalah inti pembalikan m025-34. Tidak ada lagi "terkunci", "syarat
+  // masuk", atau "belum bisa dibuka": setiap cabang - termasuk ditolak dan tidak didukung -
+  // berakhir dengan murid tetap bisa belajar.
   if(status==='granted'){
-    stateText.textContent='Notifikasi aktif. Membuka ruang belajar…';stateText.className='notification-status success';button.disabled=true;button.innerHTML='<i data-lucide="circle-check-big"></i> Notifikasi aktif';help.textContent='Izin tersimpan di browser ini.';
+    stateText.textContent='Pengingat aktif. Selamat belajar!';stateText.className='notification-status success';button.disabled=true;button.innerHTML='<i data-lucide="circle-check-big"></i> Pengingat aktif';help.textContent='Bisa dimatikan lagi kapan saja lewat Pengaturan.';
   }else if(status==='denied'){
-    stateText.textContent='Izin notifikasi ditolak. FIEZEL tetap terkunci.';stateText.className='notification-status error';button.disabled=false;button.innerHTML='Cek izin lagi <i data-lucide="refresh-cw"></i>';body.textContent='Notifikasi adalah syarat masuk FIEZEL. Aktifkan kembali izin untuk situs ini dari Site settings / ikon gembok browser, lalu kembali ke halaman ini.';help.innerHTML='Setelah mengubah izin menjadi <b>Allow / Izinkan</b>, kembali ke FIEZEL. Aplikasi akan mengecek ulang otomatis.';
+    stateText.textContent='Tidak apa-apa - FIEZEL tetap terbuka seperti biasa.';stateText.className='notification-status';button.disabled=true;button.innerHTML='<i data-lucide="bell-off"></i> Pengingat tidak aktif';body.textContent='Browser ini sudah menolak izin notifikasi untuk FIEZEL, jadi pengingatnya tidak bisa dinyalakan dari sini. Belajar tetap berjalan penuh tanpa itu.';help.innerHTML='Kalau suatu saat ingin dinyalakan, ubah izin situs ini menjadi <b>Allow / Izinkan</b> lewat ikon gembok browser, lalu nyalakan dari Pengaturan.';
   }else if(status==='unsupported'){
-    stateText.textContent='Browser ini tidak menyediakan Notification API yang dibutuhkan.';stateText.className='notification-status error';button.disabled=true;button.textContent='Notifikasi tidak didukung';body.textContent='FIEZEL versi ini mewajibkan notifikasi. Gunakan browser/PWA yang mendukung Web Notifications agar aplikasi dapat dibuka.';help.textContent='Coba browser terbaru atau instal FIEZEL sebagai PWA pada perangkat yang mendukung notifikasi web.';
+    stateText.textContent='Browser ini tidak punya Notification API.';stateText.className='notification-status';button.disabled=true;button.textContent='Pengingat tidak tersedia';body.textContent='Browser ini belum menyediakan Web Notifications, jadi FIEZEL tidak bisa mengirim pengingat di sini. Seluruh materi dan latihannya tetap bisa dipakai.';help.textContent='Memasang FIEZEL sebagai PWA di perangkat yang mendukung notifikasi akan menyalakan pengingatnya.';
+  }else if(status==='declined'){
+    stateText.textContent='Oke, lanjut tanpa pengingat.';stateText.className='notification-status';button.disabled=true;button.innerHTML='<i data-lucide="bell-off"></i> Nanti saja';help.textContent='Pengingatnya menunggu di Pengaturan.';
   }else{
-    stateText.textContent='Izin notifikasi belum diberikan.';stateText.className='notification-status';button.disabled=false;button.innerHTML='Aktifkan notifikasi <i data-lucide="bell-ring"></i>';help.innerHTML='Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.';
+    stateText.textContent='Belajar tetap bisa dimulai tanpa ini.';stateText.className='notification-status';button.disabled=false;button.innerHTML='Ingatkan saya <i data-lucide="bell-ring"></i>';help.textContent='Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.';
   }
   refreshIcons();
-}
-function lockAppForNotifications(status=notificationPermission()){
-  if(!notificationsRequired()){unlockAppAfterNotification();return false}appUnlocked=false;document.body?.classList?.add?.('notification-locked');if(reminderTimer&&typeof clearInterval==='function')clearInterval(reminderTimer);reminderTimer=null;setNotificationGateState(status);
 }
 function hideNotificationGate(){const gate=$('welcome');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
 // m025-79: a second mandatory gate, Puter account sign-in, sits right after the
 // notification gate clears. It reuses the same lock/overlay pattern (a body class that
 // hides .app/.bottomnav, plus a full-screen panel) and aiErrorMessage() for failure copy,
 // so sign-in errors read the same way AI errors already do elsewhere in the app.
+// SDK Puter dimuat async (lihat ./fiezel-puter-ready.js). Dua pemeriksaan di bawah ini
+// tetap sinkron dan tetap menjawab "sekarang" - itu yang dibutuhkan jalur render. Yang
+// TIDAK boleh dilakukan lagi adalah menyimpulkan "Puter tidak tersedia" dari jawaban
+// "belum ada sekarang": setiap jalur yang bisa menunggu, menunggu lewat awaitPuter().
 function puterAuthAvailable(){return typeof puter!=='undefined'&&!!puter?.auth}
 function puterSignedIn(){try{return puterAuthAvailable()&&puter.auth.isSignedIn?.()===true}catch{return false}}
+// Menunggu SDK-nya tiba. Mengembalikan objek puter atau null kalau ia memang tidak akan
+// datang (offline, diblokir, layanan mati) - jadi pemanggil punya jawaban yang pasti,
+// bukan penantian tanpa ujung.
+async function awaitPuter(timeoutMs){
+  if(typeof puter!=='undefined'&&puter)return puter;
+  try{const sdk=await self.FiezelPuterReady?.ready?.(timeoutMs);if(sdk)return sdk}catch{}
+  return typeof puter!=='undefined'&&puter?puter:null
+}
 function setAuthGateState(status,detail){
   const gate=$('authGate'),button=$('authGateButton'),stateText=$('authGateStatus');if(!gate)return;
   // Sama seperti gerbang notifikasi: akun yang sudah tersambung tidak boleh memunculkan
@@ -568,7 +612,14 @@ function presentPuterAuthGateIfNeeded(){
   return true
 }
 async function attemptPuterSignIn(){
-  if(!puterAuthAvailable())return false;
+  // Ini gestur murid yang sesungguhnya, jadi ia tidak boleh gagal diam-diam hanya karena
+  // js.puter.com kebetulan belum tiba. Panelnya berpindah ke 'pending' DULU, lalu SDK-nya
+  // ditunggu; kalau ternyata memang tidak datang, kegagalannya dinamai, bukan disembunyikan.
+  if(!puterAuthAvailable()){
+    setAuthGateState('pending');
+    await awaitPuter();
+    if(!puterAuthAvailable()){setAuthGateState('error',{message:'Layanan akun Puter belum bisa dihubungi. Periksa koneksi lalu coba lagi.'});return false}
+  }
   setAuthGateState('pending');
   try{await puter.auth.signIn();if(puterSignedIn()){completeAuthGate();return true}setAuthGateState('error',{message:'Login belum selesai. Coba lagi.'});return false}
   catch(error){setAuthGateState('error',error);return false}
@@ -582,7 +633,11 @@ function selectLoginMessage(){
 }
 function pushSupported(){return typeof navigator!=='undefined'&&'serviceWorker'in navigator&&typeof PushManager!=='undefined'}
 function base64UrlBytes(value){const pad='='.repeat((4-value.length%4)%4),raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/')),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
-async function coreWorkerExec(path,options={}){if(!CORE_WORKER_URL)throw new Error('core_worker_not_configured');const url=CORE_WORKER_URL+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);throw new Error('puter_workers_unavailable')}
+// Dulu baris terakhirnya langsung melempar 'puter_workers_unavailable' begitu global
+// `puter` tidak terlihat. Dengan SDK yang async, itu berarti setiap panggilan Core Brain
+// pada detik-detik pertama boot - termasuk pendaftaran remote push di ekor openApp() -
+// gagal pada boot yang sebenarnya sehat, hanya lebih lambat. SDK-nya ditunggu dulu.
+async function coreWorkerExec(path,options={}){if(!CORE_WORKER_URL)throw new Error('core_worker_not_configured');const url=CORE_WORKER_URL+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await awaitPuter();if(sdk?.workers?.exec)return sdk.workers.exec(url,options);throw new Error('puter_workers_unavailable')}
 async function coreBrainHealth(){
   if(!CORE_WORKER_URL)return {ok:false,reason:'not_configured'};
   try{const r=await fetch(CORE_WORKER_URL+'/health',{cache:'no-store'});const data=await r.json().catch(()=>({}));if(!r.ok||data?.status!=='ok')return {ok:false,reason:`health_${r.status}`};if(String(data.protocol||'')!==CORE_PROTOCOL_VERSION)return {ok:false,reason:'protocol_mismatch',expected:CORE_PROTOCOL_VERSION,actual:String(data.protocol||'')};return {ok:true,data}}catch(error){return {ok:false,reason:String(error?.message||error)}}
@@ -656,13 +711,26 @@ function selectALRSDecision(ctx,meta={},force=false){
 }
 function appendALRSEvidenceLog(entry){const meta=state.reminderMeta||{};meta.evidenceLog=[...(Array.isArray(meta.evidenceLog)?meta.evidenceLog:[]),entry].slice(-ALRS_EVIDENCE_LOG_LIMIT);state.reminderMeta=meta}
 async function checkStudyReminders(force=false){
-  if(!appUnlocked||notificationPermission()!=='granted')return false;const now=Date.now(),ctx=buildALRSContext(now),meta=state.reminderMeta||{},decision=selectALRSDecision(ctx,meta,force);if(!decision)return false;const pool=REMINDER_MESSAGES[decision.kind]||REMINDER_MESSAGES.starter,picked=pickWithoutImmediateRepeat(pool,meta.lastMessageIndex),sent=await showStudyNotification(decision.kind,picked.value);if(sent){state.reminderMeta={...meta,lastNotificationAt:now,lastNotificationDay:ctx.today,lastNotificationKind:decision.kind,lastMessageIndex:picked.index,lastPositiveDay:decision.kind==='positive'?ctx.today:(meta.lastPositiveDay||''),evidenceLog:Array.isArray(meta.evidenceLog)?meta.evidenceLog:[]};appendALRSEvidenceLog({at:now,channel:'local',kind:decision.kind,trigger:decision.trigger,evidence:decision.evidence});save()}return sent
+  if(!appOpened||!remindersActive())return false;const now=Date.now(),ctx=buildALRSContext(now),meta=state.reminderMeta||{},decision=selectALRSDecision(ctx,meta,force);if(!decision)return false;const pool=REMINDER_MESSAGES[decision.kind]||REMINDER_MESSAGES.starter,picked=pickWithoutImmediateRepeat(pool,meta.lastMessageIndex),sent=await showStudyNotification(decision.kind,picked.value);if(sent){state.reminderMeta={...meta,lastNotificationAt:now,lastNotificationDay:ctx.today,lastNotificationKind:decision.kind,lastMessageIndex:picked.index,lastPositiveDay:decision.kind==='positive'?ctx.today:(meta.lastPositiveDay||''),evidenceLog:Array.isArray(meta.evidenceLog)?meta.evidenceLog:[]};appendALRSEvidenceLog({at:now,channel:'local',kind:decision.kind,trigger:decision.trigger,evidence:decision.evidence});save()}return sent
 }
 function startReminderEngine(){
-  if(reminderTimer&&typeof clearInterval==='function')clearInterval(reminderTimer);if(typeof setInterval==='function'){reminderTimer=setInterval(()=>checkStudyReminders(false),NOTIFICATION_REMINDER_INTERVAL_MS);reminderTimer?.unref?.()}const first=setTimeout(()=>checkStudyReminders(false),12000);first?.unref?.();
+  if(reminderTimer&&typeof clearInterval==='function')clearInterval(reminderTimer);reminderTimer=null;
+  // Mesin pengingat tidak dinyalakan kalau murid mematikannya di Pengaturan atau izinnya
+  // memang tidak ada. Dulu ia selalu berjalan karena izin adalah syarat masuk, jadi
+  // "granted" bisa dianggap pasti; sekarang tidak bisa.
+  if(!remindersActive())return;
+  if(typeof setInterval==='function'){reminderTimer=setInterval(()=>checkStudyReminders(false),NOTIFICATION_REMINDER_INTERVAL_MS);reminderTimer?.unref?.()}const first=setTimeout(()=>checkStudyReminders(false),12000);first?.unref?.();
 }
-function unlockAppAfterNotification(){
-  if(notificationsRequired()&&notificationPermission()!=='granted'){lockAppForNotifications();return false}if(appUnlocked)return true;appUnlocked=true;document.body?.classList?.remove?.('notification-locked');setNotificationGateState('granted');notifyAppUpdateIfNew();render();startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}setTimeout(hideNotificationGate,220);// m025-42: the third install prompt. It runs after the notification gate clears so the
+// Pembuka aplikasi. Ini adalah bekas unlockAppAfterNotification(), dengan satu perbedaan
+// yang menjadi seluruh maksud perubahan ini: ia TIDAK LAGI memeriksa izin notifikasi
+// sebelum bekerja. Aplikasi terbuka karena murid sampai di sini, bukan karena browser
+// mengizinkan sesuatu. Namanya diganti supaya jelas tidak ada lagi kunci yang dibuka.
+function openApp(){
+  if(appOpened)return true;appOpened=true;
+  // Sesi lama bisa saja masih memegang kelas kunci m025-34 di <body> (mis. tab yang dibuka
+  // sebelum rilis ini). Dibersihkan sekali di sini supaya .app/.bottomnav tidak tetap
+  // tersembunyi oleh aturan CSS yang sekarang tidak pernah dipasang lagi.
+  document.body?.classList?.remove?.('notification-locked');notifyAppUpdateIfNew();render();startReminderEngine();showBrandSplash();if(CORE_WORKER_URL){coreBrainHealth().then(health=>{if(!health.ok){if(REMOTE_PUSH_REQUIRED)showToast('Core Brain belum tersambung dengan benar.');return}return ensureRemotePushSubscription().then(result=>{if(result.ok){syncRemoteLearningActivity();showToast('Core Brain + push aktif.')}else if(REMOTE_PUSH_REQUIRED)showToast('Core Brain aktif, tetapi remote push belum tersambung.')})})}// m025-42: the third install prompt. It runs after the notification gate clears so the
 // three popups never stack, and it silences itself for good once both bundles exist.
 // m025-43: the gates used to be called straight from here, but this runs while app.js
 // is still parsing, before the later <script> tags exist - so the daily-target call hit
@@ -673,58 +741,132 @@ try{self.FiezelDailyTarget?.start?.()}catch{}const reports=setTimeout(async()=>{
 // m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
 // straight into the real placement quiz once the gate clears - see afterOnboardingExit().
 if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
-// m025-79: the Puter account gate is the next mandatory step once notifications clear.
-presentPuterAuthGateIfNeeded();
+// Undangan notifikasi jalan lebih dulu, lalu gerbang akun Puter menyusul begitu undangan
+// tidak lagi di layar. Urutannya sengaja sama dengan sebelumnya - yang hilang hanya
+// kemampuan undangan itu untuk menahan apa pun. Kalau tidak ada undangan yang layak
+// tampil, gerbang akun langsung dipasang seperti biasa.
+if(!offerNotificationInvitation('after_onboarding'))armPuterAuthGate();
+// Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
+// 1,2 detik setelah boot karena js.puter.com selalu sudah selesai dieksekusi sebelum
+// app.js sempat berjalan; dengan SDK yang async itu tidak lagi benar. Sekali SDK-nya
+// benar-benar tiba, antrean yang tertahan dikuras satu kali.
+try{self.FiezelPuterReady?.ready?.().then(sdk=>{if(sdk)flushReportQueue()})}catch{}
 return true
 }
-async function requestRequiredNotificationPermission(){
-  if(!notificationsSupported()){lockAppForNotifications('unsupported');return false}let permission=Notification.permission;if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}if(permission==='granted'){haptic('confirm');unlockAppAfterNotification();showToast('Notifikasi belajar aktif.')}else lockAppForNotifications(permission);return permission==='granted'
+// m025-79: gerbang akun Puter tetap wajib dan isinya tidak diubah. Yang berubah hanya
+// caranya menunggu: js.puter.com kini async, jadi `puter` yang belum terlihat pada detik
+// ini BUKAN berarti akun tidak tersedia. Memanggil presentPuterAuthGateIfNeeded() langsung
+// akan membuat gerbangnya diam-diam tidak pernah muncul pada boot yang sehat tetapi lambat
+// - itu justru MELEMAHKAN gerbangnya, bukan mempertahankannya.
+function armPuterAuthGate(){
+  if(puterAuthAvailable())return presentPuterAuthGateIfNeeded();
+  try{self.FiezelPuterReady?.ready?.().then(sdk=>{if(sdk)presentPuterAuthGateIfNeeded()})}catch{}
+  return false
 }
-// m025-78: gerbang notifikasi yang SEBENARNYA (memeriksa izin, mengunci/membuka aplikasi).
-// Dulu ini adalah startWelcomeExperience() itu sendiri dan berjalan sebagai hal PERTAMA saat
-// boot - murid baru melihat layar minta izin sebelum tahu FIEZEL itu apa. Sekarang fungsi
-// ini dipindah ke UJUNG alur perkenalan (lihat startWelcomeExperience di bawah); isinya
-// sendiri TIDAK berubah sama sekali, notifikasi tetap wajib dengan cara yang persis sama.
-function startNotificationGate(){
-  const permission=notificationPermission();if(!notificationsRequired()||permission==='granted')return unlockAppAfterNotification();lockAppForNotifications(permission);if(!notificationRetryBound){notificationRetryBound=true;window.addEventListener?.('focus',()=>{if(notificationPermission()==='granted')unlockAppAfterNotification();else if(!appUnlocked)setNotificationGateState(notificationPermission())});document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'){if(notificationPermission()==='granted'){if(!appUnlocked)unlockAppAfterNotification();else checkStudyReminders(false)}else lockAppForNotifications(notificationPermission())}})}return false
+// Menampilkan undangan notifikasi. Mengembalikan true HANYA kalau panelnya benar-benar
+// muncul, supaya pemanggil tahu apakah ia perlu melanjutkan alur sendiri.
+function offerNotificationInvitation(reason='after_onboarding'){
+  if(!shouldInviteNotifications())return false;
+  writeReminderInvite({offers:reminderInviteOffers()+1,lastOfferAt:Date.now(),lastOfferReason:String(reason)});
+  setNotificationGateState('default');
+  if(!notificationRetryBound){
+    notificationRetryBound=true;
+    // Kembali dari dialog izin browser: kalau ternyata sudah 'granted', panelnya cukup
+    // berterima kasih lalu menutup diri. Tidak ada lagi cabang yang mengunci aplikasi.
+    window.addEventListener?.('focus',()=>{if(notificationPermission()==='granted'&&!notificationInvitationSettled)acceptStudyNotifications()});
+    document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState!=='visible')return;if(notificationPermission()==='granted'&&!notificationInvitationSettled)acceptStudyNotifications();else if(appOpened)checkStudyReminders(false)});
+  }
+  return true
 }
-// m025-78 OWNER: "ubah notification gate di akhir flow" - pindahkan gerbang notifikasi ke
+let notificationInvitationSettled=false;
+// Satu jalan keluar untuk semua jawaban - diterima, ditolak, atau dilewati. Setelah panel
+// pergi, gerbang akun Puter dipasang persis seperti dulu setelah gerbang notifikasi lolos.
+function settleNotificationInvitation(status){
+  if(notificationInvitationSettled)return false;
+  notificationInvitationSettled=true;
+  setNotificationGateState(status);
+  setTimeout(hideNotificationGate,220);
+  armPuterAuthGate();
+  return true
+}
+function acceptStudyNotifications(){
+  state.preferences={...state.preferences,reminders:true};save();
+  writeReminderInvite({acceptedAt:Date.now()});
+  startReminderEngine();
+  settleNotificationInvitation('granted');
+  return true
+}
+// "Nanti saja" adalah jawaban yang sah, bukan kegagalan: tidak ada yang dikunci, tidak ada
+// yang diulang di boot berikutnya. Satu tawaran lembut menyusul setelah sesi pertama
+// selesai (lihat maybeReOfferNotifications) dan sesudah itu diam - Pengaturan yang
+// memegang jalan masuknya kembali.
+function declineStudyNotifications(){
+  writeReminderInvite({declinedAt:Date.now()});
+  haptic('tap');
+  settleNotificationInvitation('declined');
+  return true
+}
+async function requestStudyNotificationPermission(){
+  if(!notificationsSupported()){settleNotificationInvitation('unsupported');return false}
+  let permission=Notification.permission;
+  if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}
+  if(permission==='granted'){haptic('confirm');acceptStudyNotifications();showToast('Pengingat belajar aktif.');return true}
+  // Ditolak di dialog browser: aplikasi tetap terbuka penuh, panelnya menjelaskan itu lalu
+  // menutup diri. Ini persis kalimat OWNER: "tetap bisa dipakai kalau ditolak".
+  settleNotificationInvitation(permission==='denied'?'denied':'declined');
+  return false
+}
+// Tawaran kedua - satu-satunya - pada momen yang wajar: sesi belajar pertama baru saja
+// selesai, jadi murid sudah tahu apa yang akan diingatkan. Dijaga jatah tawaran yang sama,
+// jadi ia tidak akan pernah muncul di boot ketiga.
+function maybeReOfferNotifications(){
+  if(!appOpened)return false;
+  if(!shouldInviteNotifications())return false;
+  const invite=readReminderInvite();
+  if(!Number(invite.declinedAt||0))return false;
+  notificationInvitationSettled=false;
+  return offerNotificationInvitation('after_first_session')
+}
+// m025-78: titik masuk di ujung alur perkenalan. Dulu bernama startNotificationGate() dan
+// benar-benar sebuah gerbang: tanpa izin, aplikasi dikunci di sini. Sekarang ia membuka
+// aplikasi LEBIH DULU, lalu menawarkan pengingat di atasnya. Urutan layarnya tidak berubah
+// (splash -> perkenalan -> tawaran notifikasi -> gerbang akun); yang berubah adalah tidak
+// ada lagi jalan buntu di antaranya.
+function startNotificationInvitation(){
+  return openApp()
+}
+// m025-78 OWNER: "ubah notification gate di akhir flow" - pindahkan tawaran notifikasi ke
 // ujung perkenalan, bukan sebelum sapaan pertama. Murid baru (perkenalan belum selesai)
-// sekarang melihat splash+onboarding DULU, baru gerbang notifikasi di ujungnya. Murid lama
-// (perkenalan sudah pernah selesai) tidak berubah sama sekali: gerbang tetap hal pertama
-// yang diperiksa setiap boot, persis seperti sebelumnya.
+// melihat splash+onboarding DULU, baru tawaran notifikasi di ujungnya.
 //
-// Notifikasi tetap WAJIB baik di jalur baru maupun lama - yang berubah hanya URUTANNYA,
-// bukan apakah gerbangnya ada. showBrandSplash()/showOnboarding() aman dipanggil dari
-// jalur mana pun karena keduanya sudah menjaga diri sendiri (sekali per hari / sekali
-// selesai) lewat pemeriksaan di dalam modulnya masing-masing.
+// showBrandSplash()/showOnboarding() aman dipanggil dari jalur mana pun karena keduanya
+// sudah menjaga diri sendiri (sekali per hari / sekali selesai) lewat pemeriksaan di dalam
+// modulnya masing-masing.
 let pendingAfterGate=null;
 function afterOnboardingExit(action){
   if(action==='placement')pendingAfterGate='placement';
-  if(appUnlocked){if(action==='placement')startPlacement();else go('home');return}
-  startNotificationGate()
+  if(appOpened){if(action==='placement')startPlacement();else go('home');return}
+  startNotificationInvitation()
 }
 // m025-80 AUDIT (Bagian 1 + Bagian 6): kesan pertama harus identitas brand, bukan dialog
 // izin. Sebelum ini hanya murid BARU yang melihat splash; murid lama langsung ditabrak
 // gerbang notifikasi di detik pertama boot - persis pola yang ditandai audit sebagai
 // penyebab utama kesan "app abal-abal". Sekarang splash tampil lebih dulu untuk SEMUA
-// murid, dan gerbangnya menyusul di ujung: splash -> (perkenalan bila belum) -> gerbang.
-// Gerbang notifikasi + akun Puter TETAP WAJIB persis seperti sebelumnya - yang berubah
-// hanya urutannya.
+// murid, dan tawarannya menyusul di ujung: splash -> (perkenalan bila belum) -> tawaran.
 function startWelcomeExperience(){
   let onboardingDone=true;
   try{onboardingDone=self.FiezelOnboarding?.completed?.(self)!==false}catch{}
   return showBrandSplash(Date.now(),at=>{
-    // Perkenalan berakhir di afterOnboardingExit() -> startNotificationGate(). Modulnya
-    // mengembalikan {shown:boolean}; hanya kalau ia benar-benar TAMPIL gerbang ditahan,
-    // sebab jalur keluarnya sendiri yang akan memanggil gerbang itu nanti. Kalau ia
-    // menolak tampil (sudah pernah selesai, maskot belum siap, dst) gerbang dipanggil
-    // langsung dari sini supaya alurnya tidak berhenti di tengah jalan.
+    // Perkenalan berakhir di afterOnboardingExit() -> startNotificationInvitation().
+    // Modulnya mengembalikan {shown:boolean}; hanya kalau ia benar-benar TAMPIL tawaran
+    // ditahan, sebab jalur keluarnya sendiri yang akan memanggilnya nanti. Kalau ia menolak
+    // tampil (sudah pernah selesai, maskot belum siap, dst) tawaran dipanggil langsung dari
+    // sini supaya alurnya tidak berhenti di tengah jalan.
     if(!onboardingDone&&showOnboarding(at)?.shown===true)return null;
-    return startNotificationGate()
+    return startNotificationInvitation()
   })
 }
-function dismissWelcome(){return notificationPermission()==='granted'?unlockAppAfterNotification():false}
+function dismissWelcome(){return declineStudyNotifications()}
 // m025-80: the generative soundtrack (features/audio/fiezel-soundtrack.js) was removed.
 // It ran a continuous Web Audio synthesis graph (12 detuned oscillators for the pad alone,
 // plus convolution reverb and feedback delay) rescheduled every 250ms for as long as the
@@ -1012,10 +1154,10 @@ async function refreshInstallHealth(){
 }
 window.__fiezelHealth={readInstallHealth,installHealthReportMarkup,refreshInstallHealth};
 // Splash pembuka (Step 0 spesifikasi desain).
-// m025-78 OWNER: gerbang notifikasi dipindah ke UJUNG alur ini, jadi splash sekarang
+// m025-78 OWNER: tawaran notifikasi dipindah ke UJUNG alur ini, jadi splash sekarang
 // tampil PERTAMA untuk murid baru - lihat startWelcomeExperience(). Untuk murid lama
-// (perkenalan sudah selesai) fungsi ini tetap dipanggil dari ekor
-// unlockAppAfterNotification() seperti sebelumnya, sebagai sapaan sekali sehari.
+// (perkenalan sudah selesai) fungsi ini tetap dipanggil dari ekor openApp() seperti
+// sebelumnya, sebagai sapaan sekali sehari.
 // Modulnya sendiri menutup diri lewat pewaktu dan lewat sentuhan.
 // m025-80 AUDIT (Bagian 1): apa pun yang terjadi setelah splash ditentukan oleh pemanggil,
 // bukan dipaku di sini. Boot memakainya untuk menyambung ke perkenalan lalu gerbang; sapaan
@@ -1040,7 +1182,7 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
     // m025-80 OWNER: "yang aku harapkan setiap kali buka apps itu adalah splash". Sapaan
     // merek dulu dibatasi sekali sehari lewat seenToday(); pemanggil dari boot sekarang
     // memaksanya tampil di SETIAP peluncuran. Panggilan lain (sapaan harian di ekor
-    // unlockAppAfterNotification) tetap tidak memaksa, jadi tidak pernah ada dua splash
+    // openApp) tetap tidak memaksa, jadi tidak pernah ada dua splash
     // dalam satu peluncuran.
     const shown=splash.show(self,{now,force:typeof afterSplash==='function',onClose:()=>done(Date.now())});
     // Splash yang tidak jadi tampil (sudah disapa hari ini) tidak boleh menelan perkenalan
@@ -1051,8 +1193,8 @@ function showBrandSplash(now=Date.now(),afterSplash=null){
 }
 window.showBrandSplash=showBrandSplash;
 // Perkenalan lima langkah (Step 1-5, FIEZEL_Complete_Design_Specification.pdf bagian 3).
-// Dijalankan setelah splash menutup diri. Gerbang notifikasi ada di UJUNG jalur ini
-// (afterOnboardingExit -> startNotificationGate), bukan sebelum langkah pertama - lihat
+// Dijalankan setelah splash menutup diri. Tawaran notifikasi ada di UJUNG jalur ini
+// (afterOnboardingExit -> startNotificationInvitation), bukan sebelum langkah pertama - lihat
 // catatan m025-78 di startWelcomeExperience(). Modulnya sendiri yang memutuskan sudah
 // pernah selesai atau belum; di sini hanya disambungkan ke bagian aplikasi yang benar-benar
 // ada - goal ASLI dari FiezelPersonalJourney, tes penempatan yang sungguhan 150 soal, level
@@ -1077,6 +1219,15 @@ function showOnboarding(now=Date.now()){
   }catch(_){return null}
 }
 window.showOnboarding=showOnboarding;
+// Runtime suara neural (265 KB, 18 berkas) tidak lagi ikut menahan pengurai dokumen; ia
+// diambil ./fiezel-lazy-loader.js setelah layar pertama tercat. Setiap jalur yang
+// benar-benar MEMBUTUHKAN runtime itu memanggil ini dulu, jadi murid yang lebih cepat
+// daripada gelombang idle tetap mendapat suara - hanya menunggu sebentar, bukan gagal.
+async function ensureVoiceRuntime(){
+  if(self.FiezelVoiceRuntime)return true;
+  try{await self.FiezelLazy?.load?.('voice')}catch{}
+  return !!self.FiezelVoiceRuntime
+}
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
@@ -1110,8 +1261,21 @@ let classroomSession=null,classroomPack=null,classroomSpeaking=false;
 async function loadClassroomPack(){if(classroomPack)return classroomPack;const r=await fetch('./features/classroom/classroom-lessons-v1.json',{credentials:'same-origin'});if(!r.ok)throw new Error('classroom_pack_unavailable');classroomPack=await r.json();return classroomPack}
 function classroomSubtitle(text){const el=$('classroomSubtitle');if(el)el.textContent=text||''}
 async function classroomSpeak(en,id){classroomSubtitle(id);const rt=self.FiezelVoiceRuntime;if(!rt?.speak)return;if(classroomSpeaking)return;classroomSpeaking=true;try{await rt.speak(en,{voice:neuralVoiceFor({}),speed:selectedNeuralRate(),lang:'en-US',allowFallback:false})}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=`Suara neural belum siap: ${String(e?.message||e)}. Subtitle tetap jalan.`}finally{classroomSpeaking=false}}
+// Tumpukan tutor/Classroom (81 KB) juga dimuat malas. Pembungkus ini yang menjembatani
+// dua kenyataan: ./features/tutor-classroom/fiezel-tutor-v3.js MENGGANTI global
+// `classroom` dengan renderernya sendiri saat ia dieksekusi, dan sekarang ia bisa saja
+// belum dieksekusi ketika murid menekan tabnya. Identitas fungsi asli ditangkap di
+// classroomBaseRenderer supaya penyerahan ke renderer tutor tidak pernah berubah menjadi
+// rekursi tak terbatas ke diri sendiri.
 async function classroom(){
   setApp('<section class="fade classroom-page"><div class="card">Memuat Classroom…</div></section>');
+  try{await self.FiezelLazy?.load?.('classroom')}catch{}
+  const current=self.classroom;
+  if(typeof current==='function'&&current!==classroomBaseRenderer)return current();
+  return classroomBaseRenderer()
+}
+const classroomBaseRenderer=classroom;
+async function classroomBase(){
   let pack;try{pack=await loadClassroomPack()}catch(e){setApp(`<section class="fade classroom-page"><div class="card"><b>Classroom belum dapat dimuat.</b><p class="muted">${esc(e?.message||e)}</p></div></section>`);return}
   if(!self.FiezelClassroom){setApp('<section class="fade classroom-page"><div class="card"><b>Classroom runtime tidak tersedia.</b></div></section>');return}
   if(!classroomSession)classroomSession=self.FiezelClassroom.createSession(pack);
@@ -1164,7 +1328,7 @@ function wireClassroom(){
   }));
   enhanceUI();
 }
-async function skillsLab(){const token=speakingListeningMountToken;setApp(`<section class="fade skills-page"><div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara neural sudah wajib diunduh di awal, jadi tidak ada lagi setup di sini.</p></div></div><div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceRuntime?.speak?.(text,{...options,speed:options.speed??selectedNeuralRate(),voice:neuralVoiceFor(options)})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceRuntime?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,tts});if(token!==speakingListeningMountToken||state.view!=='skills'){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
+async function skillsLab(){const token=speakingListeningMountToken;setApp(`<section class="fade skills-page"><div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara neural sudah wajib diunduh di awal, jadi tidak ada lagi setup di sini.</p></div></div><div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceRuntime?.speak?.(text,{...options,speed:options.speed??selectedNeuralRate(),voice:neuralVoiceFor(options)})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceRuntime?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,tts});if(token!==speakingListeningMountToken||state.view!=='skills'){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
 async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan adaptif terbuka setelah diagnosis FIEZEL selesai.');return}const policy=await resolveAdaptivePolicy();const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');recordAdaptivePolicy(policy);showToast(`${policy.title} · ${count} soal`);quizLoop({type:'adaptive',count,pool,factory:x=>x,preserveOrder:true,policy})}
 function vocab(){const counts=Object.fromEntries(LEVELS.map(l=>[l,0]));V.forEach(v=>counts[v.level]=(counts[v.level]||0)+1);shell('Vocabulary Hub',`${V.length.toLocaleString()} kata aktif dan sudah melewati filter QA.`,`<div class="toolbar"><button class="primary" onclick="startVocabQuiz()"><i data-lucide="circle-play"></i> Uji Vocabulary</button><button onclick="reviewVocab()"><i data-lucide="history"></i> Review Due (${Object.values(state.vocab).filter(x=>x.nextReview&&x.nextReview<=Date.now()&&x.mastery<80).length})</button></div><div class="grid">${LEVELS.map(l=>card(`<div class="row"><b>${l}</b><span>${counts[l]||0} kata</span></div><p class="muted">${Object.entries(state.vocab).filter(([id,x])=>V.find(v=>v.id===id)?.level===l&&x.mastery>=80).length} mastered</p>${counts[l]?`<button onclick="flashcards('${l}')">Buka flashcards <i data-lucide="arrow-right"></i></button>`:'<p class="muted">Belum tersedia</p>'}`)).join('')}</div>`)}
 function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceRuntime||browserSupported,stop(){self.FiezelVoiceRuntime?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceRuntime)return self.FiezelVoiceRuntime.speak(text,{lang:'en-US',...options,speed:options.speed??selectedNeuralRate(),voice:neuralVoiceFor(options)});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
@@ -1306,6 +1470,11 @@ function finishQuiz(cfg,score,total){
   setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="score">${accuracy}%</div><p>${score} dari ${total} jawaban benar.</p>${outcomeLine}<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi kuat. Profil skill diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
+  // Momen wajar untuk menawarkan pengingat sekali lagi kepada murid yang tadi memilih
+  // "Nanti saja": sesi belajar baru saja selesai, jadi "target harian" dan "waktunya
+  // diulang" sekarang punya arti yang nyata baginya. Jatah tawaran dijaga di dalam
+  // maybeReOfferNotifications - ini tidak akan pernah menjadi tawaran di setiap sesi.
+  const reoffer=setTimeout(maybeReOfferNotifications,1400);reoffer?.unref?.();
 }
 function skillTimeline(){
  const byDay={};for(const h of state.history||[]){const d=dayKey(h.at);const k=h.skill||h.type||'general';byDay[d]??={};byDay[d][k]??={total:0,correct:0};byDay[d][k].total++;if(h.ok)byDay[d][k].correct++}
@@ -1379,7 +1548,38 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row required-setting"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Notifikasi belajar ${notificationsRequired()?'wajib':'opsional'}</b><small>${notificationPermission()==='granted'?(notificationsRequired()?'Aktif — syarat penggunaan FIEZEL terpenuhi':'Aktif — pengingat belajar berjalan'):(notificationsRequired()?'Tidak aktif — aplikasi akan dikunci':'Tidak aktif — pengingat belajar tidak berjalan')}</small></span><input type="checkbox" checked disabled aria-label="Notifikasi wajib aktif"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div>${neuralVoiceStatusMarkup()}${continuitySettingsMarkup()}<div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralVoiceSelect')?.addEventListener('change',event=>setNeuralVoicePreference(event.currentTarget.value));$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('prepareIndonesianVoice')?.addEventListener('click',prepareIndonesianVoice);$('testIndonesianVoice')?.addEventListener('click',testIndonesianVoice);enhanceUI()}
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+// Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
+// Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
+// padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
+if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
+enhanceUI()}
+// Kalimat status baris pengingat. Ia harus jujur pada TIGA keadaan berbeda yang dulu
+// diringkas menjadi satu "wajib": belum diputuskan, dimatikan murid, dan ditolak browser.
+function reminderSettingHint(){
+  const permission=notificationPermission();
+  if(permission==='unsupported')return 'Browser ini belum mendukung notifikasi web';
+  if(permission==='denied')return 'Izin notifikasi ditolak di browser — ubah lewat ikon gembok, lalu nyalakan di sini';
+  if(permission!=='granted')return 'Mati — nyalakan untuk diingatkan saat target harian atau jadwal pengulangan menunggu';
+  return remindersWanted()?'Aktif — target harian dan jadwal pengulangan akan diingatkan':'Mati — izin sudah ada, pengingatnya sedang dimatikan';
+}
+// Jalan masuk kembali yang dijanjikan panel undangan. Menyalakan dari sini boleh memicu
+// dialog izin browser karena ini benar-benar gestur murid, bukan sesuatu yang muncul
+// sendiri saat aplikasi dibuka.
+async function toggleStudyReminders(input){
+  const wantOn=!!input?.checked;
+  if(!wantOn){state.preferences={...state.preferences,reminders:false};save();startReminderEngine();showToast('Pengingat belajar dimatikan.');return false}
+  if(notificationPermission()!=='granted'){
+    if(!notificationsSupported()){if(input)input.checked=false;showToast('Browser ini belum mendukung notifikasi web.');return false}
+    let permission=Notification.permission;
+    if(permission==='default'){try{permission=await Notification.requestPermission()}catch{permission=Notification.permission}}
+    if(permission!=='granted'){if(input)input.checked=false;showToast('Izin notifikasi belum diberikan. FIEZEL tetap bisa dipakai.');return false}
+  }
+  state.preferences={...state.preferences,reminders:true};save();startReminderEngine();haptic('confirm');showToast('Pengingat belajar aktif.');
+  if(input)input.checked=true;
+  return true
+}
+function bindVoiceSettingControls(){$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralVoiceSelect')?.addEventListener('change',event=>setNeuralVoicePreference(event.currentTarget.value));$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value));$('prepareIndonesianVoice')?.addEventListener('click',prepareIndonesianVoice);$('testIndonesianVoice')?.addEventListener('click',testIndonesianVoice)}
 function saveSettings(){const endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast('Gunakan URL HTTPS dengan domain .puter.work');answerFeedbackSignal(false);return}state.preferences={...state.preferences,haptics:$('settingHaptics').checked,feedbackSounds:$('settingFeedbackSounds').checked,motion:$('settingMotion').checked,reportConsent:consent,reportEndpoint:endpoint};state.reportMeta.lastStatus=consent?(endpoint?'ready':'not_configured'):'disabled';save();closeModal();render();haptic('confirm');playFeedbackSound('tap');if(consent&&endpoint){showToast('Creator Hub aktif. Mengirim laporan awal.');sendCreatorReport('consent_enabled',true).then(maybeSendAccessReport)}else showToast('Pengaturan pengalaman tersimpan')}
 const FIEZEL_AI_TIMEOUT_MS=30000; // AI model is owned and enforced server-side by Core Brain
 const NATURAL_AI_STYLE='Gunakan Bahasa Indonesia yang jernih dan terasa seperti mentor sedang menjelaskan langsung kepada siswa. Pakai kalimat pendek. Hindari gaya buku teks, definisi panjang, dan istilah grammar yang tidak dijelaskan. Jika perlu menyebut istilah Inggris, langsung terangkan artinya dengan kata sederhana. Beri satu contoh yang dekat dengan kehidupan sehari-hari. Jangan memakai Markdown, judul formal, atau daftar berpoin.';
@@ -1465,8 +1665,12 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
+// Pemanasan pertama di atas hampir pasti tidak menemukan apa pun: runtime suara sekarang
+// baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
+// akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
+document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
-window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestRequiredNotificationPermission=requestRequiredNotificationPermission;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
+window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){
@@ -1478,12 +1682,19 @@ function installBackNav(){
       // Perpindahan view dikembalikan ke go() supaya kembali memakai transisi, bunyi, dan
       // aturan kurangi-gerak yang persis sama dengan maju - hanya tanpa entri baru.
       applyView:v=>go(v,{viaHistory:true}),
-      // Gerbang notifikasi dan gerbang akun Puter adalah syarat masuk FIEZEL. Selama salah
-      // satunya - atau splash/perkenalan - menutupi layar, tidak ada tekanan kembali yang
-      // boleh mengubah apa pun di belakangnya.
+      // Selama sebuah lapisan penuh layar menutupi aplikasi - undangan notifikasi, gerbang
+      // akun Puter, splash, atau perkenalan - tidak ada tekanan kembali yang boleh mengubah
+      // apa pun di belakangnya.
+      //
+      // Dulu baris pertama membaca kelas 'notification-locked' di <body>. Kelas itu tidak
+      // pernah dipasang lagi sejak notifikasi berhenti menjadi syarat masuk, jadi ia
+      // diganti dengan pertanyaan yang sebenarnya: apakah panelnya sedang di layar. Panel
+      // undangan memang tidak mengunci aplikasi, tetapi selama ia terbuka ia tetap dialog -
+      // tombol kembali harus menutupnya, bukan menavigasi di belakangnya.
       locked:()=>{
         try{
-          if(document.body?.classList?.contains?.('notification-locked'))return true;
+          const welcome=document.getElementById?.('welcome');
+          if(welcome&&!welcome.classList.contains('hidden'))return true;
           if(document.body?.classList?.contains?.('auth-locked'))return true;
           return !!document.querySelector?.('.fiezel-splash,.fiezel-ob');
         }catch{return false}
