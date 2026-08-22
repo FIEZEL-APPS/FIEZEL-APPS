@@ -1472,6 +1472,10 @@ function finishQuiz(cfg,score,total){
   if(cfg.placement){state.level=accuracy<35?1:accuracy<50?2:accuracy<65?3:accuracy<78?4:accuracy<90?5:6;state.placementDone=true}
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
   const outcomeLine=outcome?`<p class="muted">Core menilai strategi sesi ini: <b>${esc(outcome.status)}</b> · outcome score ${Math.round(outcome.score)}/100. ${outcome.status==='positive'?'Strategi ini layak dipertahankan atau dinaikkan pelan-pelan.':outcome.status==='negative'?'Sesi berikutnya akan diperingan atau diturunkan difficulty-nya.':'Core akan pakai hasil ini sebagai evidence untuk policy berikutnya.'}</p>`:'<p class="muted">Progres sudah masuk ke profil skill dan latihan adaptif berikutnya.</p>';
+  // m025-90: akor penuh dibunyikan di sini, satu-satunya tempat murid benar-benar MELIHAT
+  // sesinya selesai. completeActiveSession() bukan tempatnya - ia fungsi data yang juga
+  // berjalan pada penutupan yang tidak pernah tampil di layar.
+  uiSfx('celebrate');
   setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="score">${accuracy}%</div><p>${score} dari ${total} jawaban benar.</p>${outcomeLine}<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi kuat. Profil skill diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
@@ -1553,7 +1557,7 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="activity"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -1591,7 +1595,82 @@ const NATURAL_AI_STYLE='Gunakan Bahasa Indonesia yang jernih dan terasa seperti 
 let modalEpoch=0,aiRequestSeq=0,modalCloseTimer=null,modalOpen=false;
 // m025-80 OWNER: SFX transisi antarmuka. Dibungkus supaya modul yang belum termuat atau
 // audio yang diblokir browser tidak pernah bisa menjatuhkan navigasi.
-function uiSfx(name){try{return self.FiezelUiSfx?.play?.(name,self)===true}catch{return false}}
+/**
+ * Membacakan keadaan bunyi yang SEBENARNYA di perangkat ini, ke dalam Pengaturan.
+ *
+ * m025-90: pada m025-88 saya menambahkan FiezelUiSfx.diagnostics() lalu meminta owner
+ * "buka Diagnostics dan bacakan" - padahal fungsi itu tidak pernah saya sambungkan ke
+ * layar mana pun. Diagnostik yang tidak bisa dibaca pemiliknya bukan diagnostik.
+ *
+ * Ditulis sebagai kalimat, bukan JSON: yang membacanya adalah murid di layar ponsel, dan
+ * yang dibutuhkannya adalah tahu APA yang harus dilakukan - bukan nama propertinya.
+ */
+function audioDiagnosticsText(){
+  const d=self.FiezelUiSfx?.diagnostics?.(self);
+  if(!d) return 'Modul bunyi belum dimuat.';
+  if(!d.webAudioTersedia) return 'Peramban ini tidak mendukung Web Audio, jadi SFX tidak bisa berbunyi.';
+  if(!d.preferensiSuara) return 'Sakelar "Suara jawaban" di atas sedang mati — nyalakan untuk mendengar SFX.';
+  if(d.konteks==='running') return 'Aktif. Kalau tetap sunyi, periksa saklar senyap di sisi iPhone dan volume dering/media.';
+  if(d.konteks==='belum dibuat') return 'Menunggu sentuhan pertama — iOS baru mengizinkan bunyi setelah kamu menyentuh layar.';
+  if(d.konteks==='suspended') return 'Izin audio belum terbuka (status: suspended). Ketuk sekali lagi di layar ini.';
+  return 'Status audio: '+d.konteks+'.';
+}
+function refreshAudioDiagnostics(){
+  try{
+    const el=$('audioDiagText');
+    if(!el) return false;
+    el.textContent=audioDiagnosticsText();
+    return true;
+  }catch{return false}
+}
+window.audioDiagnosticsText=audioDiagnosticsText;
+
+// m025-90 OWNER (iPhone 12, iOS 26): "sfxnya tetap tidak berbunyi", setelah saklar senyap
+// dipastikan mati dan setelah kurangi-gerak berhenti membisukan bunyi di m025-88.
+//
+// Tebakan saya salah dua kali karena saya memeriksa mesin bunyinya, bukan siapa yang
+// memanggilnya. Setelah dihitung: dari enam bunyi yang dirancang, hanya TIGA yang pernah
+// tersambung - nav (tab bawah), open dan close (modal). `tap`, `toggle`, dan `celebrate`
+// didefinisikan lengkap di features/audio/fiezel-ui-sfx.js dan TIDAK PERNAH DIPANGGIL dari
+// mana pun.
+//
+// Artinya "tekan tombol apapun di menu" memang menghasilkan senyap - bukan karena audio
+// diblokir, melainkan karena tombol-tombol itu tidak pernah diminta berbunyi. Mesinnya
+// benar sejak awal; kabelnya yang tidak pernah dipasang.
+let lastSfxAt = 0;
+function uiSfx(name){
+  try{
+    const ok = self.FiezelUiSfx?.play?.(name,self)===true;
+    lastSfxAt = Date.now();   // dicatat walau gagal: yang penting ketukan ini SUDAH diklaim
+    return ok;
+  }catch{return false}
+}
+// Bunyi ketuk sebagai CADANGAN, bukan tambahan. Ia berbunyi hanya kalau ketukan ini belum
+// dibunyikan oleh sesuatu yang lebih bermakna (pindah halaman, buka/tutup modal). Tanpa
+// pagar ini satu ketukan menghasilkan dua bunyi bertumpuk, dan itu terdengar murah.
+const SFX_CLAIM_MS = 260;
+function bindUiSfxDelegation(){
+  if(!document.addEventListener) return false;
+  // Fase bubble, bukan capture: handler tombolnya sendiri harus sempat berjalan lebih dulu
+  // supaya kita tahu ketukan ini sudah diklaim atau belum.
+  document.addEventListener('click',event=>{
+    try{
+      const el=event.target?.closest?.('button,[role="button"],a.setup-link,a.creator-link');
+      if(!el||el.disabled) return;
+      if(el.closest?.('.bottomnav')) return;               // tab bawah sudah membunyikan nav
+      if(el.dataset?.sfx==='none') return;
+      if(Date.now()-lastSfxAt < SFX_CLAIM_MS) return;      // sudah dibunyikan hal lain
+      uiSfx('tap');
+    }catch{}
+  },false);
+  document.addEventListener('change',event=>{
+    try{
+      const t=event.target;
+      if(t?.type==='checkbox'||t?.type==='radio'||t?.tagName==='SELECT') uiSfx('toggle');
+    }catch{}
+  },false);
+  return true;
+}
 // m025-84: modal adalah lapisan DI ATAS view, jadi ia mendapat entri riwayatnya sendiri dan
 // tekanan kembali menutupnya lebih dulu, baru sesudahnya memindahkan view. Hanya modal yang
 // benar-benar BARU dibuka yang mendorong entri: openSettings -> openReportPreview ->
@@ -1707,6 +1786,7 @@ function installBackNav(){
     })||null
   }catch{return null}
 }
+bindUiSfxDelegation();
 installBackNav();
 // m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
 // galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
