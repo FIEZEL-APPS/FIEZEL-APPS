@@ -1,12 +1,18 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const app=fs.readFileSync(path.join(__dirname,'app.js'),'utf8');
 const html=fs.readFileSync(path.join(__dirname,'index.html'),'utf8');
+// Shim isolasi gestur dulu berupa blok <script> inline di index.html. Ia dipindah ke
+// berkas sendiri karena app.js kini ber-defer dan blok inline TIDAK ikut ditunda: inline
+// akan berjalan sebelum app.js dan meledak di baris pertamanya. Yang diperiksa di sini
+// tetap hal yang sama - hanya sumbernya yang berpindah dari HTML ke berkas itu.
+const shimPath='./features/ui/fiezel-report-gesture-isolation.js';
+const shimFile=fs.readFileSync(path.join(__dirname,'features/ui/fiezel-report-gesture-isolation.js'),'utf8');
 const failures=[];
 const check=(condition,message)=>{if(!condition)failures.push(message)};
 
 const capture=app.match(/document\.addEventListener\?\.\('click',e=>\{([\s\S]*?)\},\{capture:true\}\);/);
 const postUnlock=app.match(/const reports=setTimeout\(async\(\)=>\{([\s\S]*?)\},1200\);/);
-const shimMatch=html.match(/\/\* FIEZEL_REPORT_GESTURE_ISOLATION_START \*\/([\s\S]*?)\/\* FIEZEL_REPORT_GESTURE_ISOLATION_END \*\//);
+const shimMatch=shimFile.match(/\/\* FIEZEL_REPORT_GESTURE_ISOLATION_START \*\/([\s\S]*?)\/\* FIEZEL_REPORT_GESTURE_ISOLATION_END \*\//);
 check(!!capture,'Global capture click handler not found');
 check(!!postUnlock,'Post-unlock automatic report timer not found');
 check(!!shimMatch,'Creator Report gesture-isolation shim not found after app.js');
@@ -100,9 +106,15 @@ async function main(){
     check(postReady.accessCalls===1,'Deferred post-unlock daily report must remain deliverable with restored auth');
   }
 
-  check(/<script src="\.\/app\.js"><\/script>[\s\S]*FIEZEL_REPORT_GESTURE_ISOLATION_START/.test(html),'Gesture isolation must load after classic app.js');
-  check(/creatorReportAuthReadyForAutomatic/.test(html)&&/puter\?\.authToken/.test(html),'Automatic report guard must require an existing Puter auth token');
-  check(/allowInteractiveAuth/.test(html),'Automatic/manual report policy flag missing');
+  // Urutan yang menjadi seluruh alasan shim ini ada: ia HARUS dieksekusi setelah app.js.
+  // Dengan defer, urutan tulis di dokumen = urutan eksekusi, jadi posisi tag sudah cukup
+  // untuk membuktikannya - selama keduanya sama-sama ber-defer, yang juga diperiksa.
+  check(html.indexOf('<script defer src="./app.js"></script>')>-1,'app.js must stay a deferred classic script');
+  const shimTag='<script defer src="'+shimPath+'"></script>';
+  check(html.indexOf(shimTag)>html.indexOf('<script defer src="./app.js"></script>'),'Gesture isolation must load after classic app.js');
+  check(new RegExp('<script defer src="'+shimPath.replace(/[.\/]/g,'\\$&')+'"><\\/script>').test(html),'Gesture isolation must be deferred, never inline - inline runs before app.js');
+  check(/creatorReportAuthReadyForAutomatic/.test(shimFile)&&/puter\?\.authToken/.test(shimFile),'Automatic report guard must require an existing Puter auth token');
+  check(/allowInteractiveAuth/.test(shimFile),'Automatic/manual report policy flag missing');
 
   if(failures.length){
     console.error('FIEZEL app report control path: FAIL');
