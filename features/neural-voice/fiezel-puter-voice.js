@@ -202,10 +202,19 @@
     return true;
   }
 
-  function play(blob, mine, onProgress) {
+  function play(blob, mine, onProgress, speed) {
     return new Promise(function (resolve, reject) {
       var objectUrl = URL.createObjectURL(blob);
       var audio = new Audio(objectUrl);
+
+      // m025-96: kecepatan bicara diterapkan di pemutar, bukan dikirim ke penyedia.
+      // Puter tidak menerimanya, dan tanpa baris ini penggeser kecepatan di pengaturan
+      // menjadi kendali yang tidak mengendalikan apa pun - kalibrasi yang OWNER susun
+      // lintas tiga build akan hilang diam-diam. Dibatasi karena di luar rentang ini
+      // suaranya berhenti terdengar sebagai orang berbicara.
+      var rate = Number(speed);
+      if (rate > 0) audio.playbackRate = Math.min(1.6, Math.max(0.6, rate));
+
       current = { audio: audio, token: mine, objectUrl: objectUrl };
 
       function cleanup() {
@@ -293,7 +302,7 @@
 
     return render(value, settings).then(function (blob) {
       if (mine !== token) return false;   // sudah disalip; bukan galat
-      return play(blob, mine, opts.onProgress);
+      return play(blob, mine, opts.onProgress, settings.speed);
     }).catch(function (e) {
       state.speaking = false;
       if (isSuperseded(e) || mine !== token) return false;
