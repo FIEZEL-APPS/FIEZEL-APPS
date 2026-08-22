@@ -37,7 +37,11 @@ check('ALRS evidence log privacy',app.includes('appendALRSEvidenceLog')&&app.inc
 check('Learning map',app.includes('Peta Belajar')&&app.includes('mapCards'),'Peta Belajar surface exists.');
 check('Puter AI entry point',index.includes('https://js.puter.com/v2/')&&index.includes('./core-config.js')&&app.includes("coreWorkerExec('/api/ai/chat'")&&!app.includes('puter.ai.chat('),'AI uses authenticated Puter Worker only; direct client AI bypass is absent.');
 check('AI learning surfaces',app.includes('aiExplainBtn')&&app.includes('aiWord')&&app.includes('openAILoading'),'Quiz and flashcard AI actions include a loading state.');
-check('AI output safety',app.includes("esc(text).replace(/\\n/g,'<br>')")&&app.includes('esc(aiErrorMessage(err))'),'AI result and normalized error content are escaped before rendering.');
+// m025-93: sama seperti di regression-test.js - yang dijaga sifatnya, bukan bentuk
+// implementasinya. Teks model masuk lewat renderMarkdown(), dan penerjemah itu meng-esc
+// SETIAP baris sebelum mengubah penanda menjadi tag; urutan itulah yang membuat markup
+// dari model tidak mungkin lolos - dibuktikan runtime di ai-integration-test.js.
+check('AI output safety',app.includes('${renderMarkdown(text)}')&&app.includes('const line=esc(raw)')&&app.includes('esc(aiErrorMessage(err))'),'AI result and normalized error content are escaped before rendering.');
 check('AI resilience',app.includes('FIEZEL_AI_TIMEOUT_MS=30000')&&app.includes('currentAIRequest(id,epoch)')&&app.includes('id="aiRetry"'),'AI requests have a timeout, stale-response guard, and retry action.');
 check('AI learner profile',app.includes('buildLearningSnapshot')&&app.includes('aiProfileContext')&&app.includes('askCoachAI'),'AI Coach uses aggregate learner evidence and exposes a personal plan.');
 check('Premium launcher',app.includes('launcher-shell')&&css.includes('.launcher-shell')&&css.includes('.coach-preview'),'Home includes the new premium personal launcher and AI Coach preview.');

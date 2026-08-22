@@ -21,6 +21,21 @@ setTimeout(async()=>{try{
   assert(app.includes("CORE_AI_GATEWAY!=='core-only'"),'core-only AI policy gate missing');
   context.renderAIResult('<img src=x>','<script>alert(1)</script>\nAman');
   assert(!elements.modalPanel.innerHTML.includes('<script>')&&elements.modalPanel.innerHTML.includes('&lt;script&gt;'),'AI result can inject HTML');
+  // m025-93 (brief redesign Bab 2, bug kritis #1): teks model datang dalam Markdown dan dulu
+  // dicetak apa adanya - murid membaca "**tebal**" sebagai tanda baca. Yang dijaga di sini
+  // bukan hanya bahwa penandanya diterjemahkan, melainkan URUTANNYA: esc() dulu, baru penanda
+  // jadi tag. Pemeriksaan XSS di atas dan yang di bawah memakai jalur yang sama persis, jadi
+  // membalik urutan itu akan langsung terlihat sebagai lubang, bukan sebagai gaya tulisan.
+  context.renderAIResult('Uji',['**tebal** dan *miring*','- butir satu','- butir dua','','1. urut satu'].join(String.fromCharCode(10)));
+  const md=elements.modalPanel.innerHTML;
+  assert(md.includes('<strong>tebal</strong>'),'markdown tebal masih dicetak sebagai tanda bintang');
+  assert(md.includes('<em>miring</em>'),'markdown miring tidak diterjemahkan');
+  assert(md.includes('<ul>')&&(md.match(/<li>/g)||[]).length>=3,'daftar markdown masih jadi baris teks bertanda hubung');
+  assert(md.includes('<ol>'),'daftar bernomor tidak diterjemahkan');
+  assert(!md.includes('**'),'masih ada penanda markdown mentah yang lolos ke layar');
+  context.renderAIResult('Uji','**<img src=x onerror=alert(1)>**');
+  assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),
+    'markdown tidak boleh membuka jalan bagi markup dari model');
   context.renderAIError('<svg onload=x>',{message:'<img src=x onerror=x>'});
   assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),'AI error can inject HTML');
   context.renderAIError('Login',{error:'popup_blocked',msg:'blocked'},()=>{});

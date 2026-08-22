@@ -15,7 +15,12 @@ assert(/async function askFiezelAI/.test(app)&&/coreWorkerExec\('\/api\/ai\/chat
 assert(/function openAILoading/.test(app)&&/function renderAIResult/.test(app)&&/function renderAIError/.test(app),'AI modal states missing');
 assert(/id="aiExplainBtn"/.test(app)&&/id="aiWord"/.test(app),'AI entry buttons missing');
 assert(/window\.explainWithAI=explainWithAI/.test(app)&&/window\.explainWordWithAI=explainWordWithAI/.test(app),'AI handlers are not exposed');
-assert(/esc\(text\)\.replace/.test(app)&&/esc\(aiErrorMessage\(err\)\)/.test(app),'AI response or error is not escaped');
+// m025-93: pemeriksaan ini dulu memaku BENTUK implementasinya - literal
+// esc(text).replace(...) - bukan sifat yang dijaganya. Ketika teks AI mulai
+// diterjemahkan dari Markdown, bentuk itu berubah walau keamanannya justru naik.
+// Yang diperiksa sekarang adalah sifatnya: teks model TIDAK PERNAH disisipkan mentah,
+// dan penerjemahnya meng-esc SETIAP baris sebelum menyentuh satu penanda pun.
+assert(/\$\{renderMarkdown\(text\)\}/.test(app)&&/const line=esc\(raw\)/.test(app)&&/esc\(aiErrorMessage\(err\)\)/.test(app),'AI response or error is not escaped');
 assert(/FIEZEL_AI_TIMEOUT_MS=30000/.test(app)&&/currentAIRequest\(id,epoch\)/.test(app)&&/id="aiRetry"/.test(app),'AI resilience guards are missing');
 assert(/q\.explain\?\.avoid/.test(app)&&/q\.explain\?\.memory/.test(app)&&/distractor-breakdown/.test(app),'natural feedback dropped explanation fields');
 assert(/\.ai-btn/.test(css)&&/@keyframes aiBounce/.test(css),'AI visual states missing');
