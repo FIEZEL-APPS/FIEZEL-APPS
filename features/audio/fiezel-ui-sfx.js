@@ -150,8 +150,40 @@
     } catch (_) { return false; }
   }
 
+  /**
+   * m025-92: KATEGORI sesi audio, bukan izin audio.
+   *
+   * iOS 16.4+ (termasuk iOS 26 yang dipakai OWNER) memberi halaman kendali atas kategori
+   * sesi audionya lewat `navigator.audioSession`. Bawaan untuk Web Audio adalah **ambient**,
+   * dan kategori itu membawa dua sifat yang salah untuk aplikasi ini: ia ikut dibungkam
+   * saklar senyap fisik, dan ia mengalah kalau aplikasi lain sedang memutar audio.
+   *
+   * FIEZEL bukan audio latar. Suara neural adalah materi belajarnya, umpan balik jawaban
+   * bagian dari penilaian, dan sapaan merek adalah identitasnya - semuanya "playback".
+   *
+   * Ini BUKAN perbaikan untuk keluhan "tidak ada bunyi" pada m025-90; OWNER sudah memastikan
+   * saklar senyapnya MATI saat itu, dan akar keluhan itu memang suara yang tidak punya
+   * pemanggil (#135). Yang diperbaiki di sini adalah kategori yang memang salah sejak awal,
+   * dan yang menggigit pada keadaan yang belum pernah diuji: saklar senyap menyala, atau ada
+   * audio aplikasi lain sedang berjalan.
+   *
+   * Diklaim SEKALI, sebelum konteks pertama dibuat, dan kegagalannya ditelan - peramban yang
+   * belum punya API ini tidak boleh membuat seluruh SFX gagal.
+   */
+  var audioSessionClaimed = false;
+  function claimAudioSession(env) {
+    if (audioSessionClaimed) return false;
+    audioSessionClaimed = true;
+    try {
+      var session = env && env.navigator && env.navigator.audioSession;
+      if (session && typeof session.type === 'string') { session.type = 'playback'; return true; }
+    } catch (_) { /* kategori sesi bukan syarat berbunyi, hanya syarat terdengar di iOS */ }
+    return false;
+  }
+
   function ensureContext(env) {
     try {
+      claimAudioSession(env);
       if (ctx) {
         if (ctx.state === 'suspended' && typeof ctx.resume === 'function') ctx.resume();
         return true;
@@ -366,7 +398,16 @@
       webAudioTersedia: !!(target.AudioContext || target.webkitAudioContext),
       // Tidak bisa dideteksi dari web sama sekali; ditulis eksplisit supaya pembacanya tahu
       // ini titik buta, bukan sesuatu yang lupa diperiksa.
-      saklarSenyapIOS: 'tidak dapat dideteksi dari web'
+      saklarSenyapIOS: 'tidak dapat dideteksi dari web',
+      // m025-92: kategori sesi BISA dibaca, tidak seperti saklar senyap. Kalau di perangkat
+      // ia terbaca 'ambient' padahal sudah diklaim, artinya peramban menolak klaimnya - dan
+      // itu keterangan yang jauh lebih berguna daripada menebak lagi.
+      sesiAudio: (function () {
+        try {
+          var s = target.navigator && target.navigator.audioSession;
+          return s && typeof s.type === 'string' ? s.type : 'tidak didukung peramban ini';
+        } catch (_) { return 'tidak terbaca'; }
+      })()
     };
     return out;
   }
@@ -532,6 +573,6 @@
     setEnabled: setEnabled,
     isEnabled: function () { return enabled; },
     // Hanya untuk pengujian: mengembalikan modul ke keadaan sebelum konteks apa pun dibuat.
-    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; }
+    __reset: function () { ctx = null; master = null; tailIn = null; noiseBuf = null; pending = null; unlockBound = false; enabled = true; audioSessionClaimed = false; }
   };
 });
