@@ -313,6 +313,19 @@ test('dua batang emas cukup lebar untuk bertahan sampai ukuran topbar', () => {
   assert.strictEqual(xs[1] - xs[0] - 26, 22, 'celah antarbatang harus 22');
 });
 
+/* ---------------- m025-92: sesi audio iOS ---------------- */
+
+test('sesi audio iOS diklaim sebagai playback, bukan ambient', () => {
+  const src = fs.readFileSync(path.join(root, 'features/audio/fiezel-ui-sfx.js'), 'utf8');
+  assert.ok(/navigator && env\.navigator\.audioSession/.test(src),
+    'tanpa klaim ini Web Audio di iOS memakai sesi ambient: ikut dibungkam saklar senyap dan mengalah pada audio aplikasi lain');
+  assert.ok(/session\.type = 'playback'/.test(src));
+  assert.ok(src.indexOf('claimAudioSession(env);') < src.indexOf('var Ctx = env.AudioContext'),
+    'kategori sesi harus diklaim SEBELUM konteks pertama dibuat');
+  assert.ok(/sesiAudio:/.test(src),
+    'kategori sesi harus bisa dibaca dari panel Diagnostics - ia satu-satunya bagian sesi audio iOS yang memang terbaca dari web');
+});
+
 process.on('exit', () => {
   if (failures) {
     console.error('FIEZEL m025-86 koreografi splash: FAIL (' + failures + ')');
