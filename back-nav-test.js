@@ -432,7 +432,13 @@ test('pembaca perpustakaan mendaftarkan lapisannya sendiri', () => {
 });
 
 test('gerbang wajib disebut namanya pada pemasangan', () => {
-  assert.ok(/notification-locked/.test(app) && /auth-locked/.test(app));
+  // Dulu baris ini menuntut kelas 'notification-locked'. Kelas itu tidak pernah dipasang
+  // lagi sejak notifikasi berhenti menjadi syarat masuk (OWNER membalik m025-34), jadi
+  // memeriksanya berarti memeriksa kunci yang tidak ada. Yang dijaga sekarang adalah
+  // pertanyaan yang sebenarnya: selama panel undangan terbuka, tekanan kembali harus
+  // menutupnya, bukan menavigasi di belakangnya - dan gerbang akun tetap seperti dulu.
+  assert.ok(/getElementById\?\.\('welcome'\)/.test(app), 'panel undangan yang terbuka harus dihitung sebagai lapisan');
+  assert.ok(/auth-locked/.test(app), 'gerbang akun Puter tetap dihitung sebagai lapisan');
   assert.ok(/locked:\(\)=>\{/.test(app), 'pemasangan harus menyerahkan pemeriksaan gerbang ke aplikasi');
   assert.ok(/knownView:v=>VALID_VIEWS\.has\(v\)/.test(app), 'tujuan kembali diverifikasi ke daftar view sah');
 });
