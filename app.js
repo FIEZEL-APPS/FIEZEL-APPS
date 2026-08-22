@@ -880,11 +880,99 @@ function dismissWelcome(){return declineStudyNotifications()}
 // heat on every login. See OWNER report: phone gets hot while FIEZEL is open, every time.
 function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 let speakingListeningController=null,speakingListeningMountToken=0;
+
+/* ---- m025-102 pencarian materi + feedback ---------------------------------------
+ * OWNER: pelajar mengetik topik yang tidak dia mengerti - misalnya "did" - dan sistem
+ * melemparnya ke materi terkait. Kalau materinya memang belum ada, barulah tombol
+ * feedback muncul, sudah terisi kata yang dicari.
+ *
+ * Indeksnya dibangun sekali lalu disimpan di memori. Membangunnya ulang tiap ketikan
+ * akan membekukan layar pada bank sebesar ini.
+ */
+let searchIndexCache=null;
+async function ensureSearchIndex(){
+  if(searchIndexCache)return searchIndexCache;
+  if(!self.FiezelSearch)return null;
+  try{
+    const [g,v,r]=await Promise.all([
+      fetch('./grammar-templates.json',{credentials:'same-origin'}).then(x=>x.json()),
+      fetch('./vocabulary-master.json',{credentials:'same-origin'}).then(x=>x.json()),
+      fetch('./reading-bank.json',{credentials:'same-origin'}).then(x=>x.json())
+    ]);
+    searchIndexCache=self.FiezelSearch.buildIndex({grammar:g,vocabulary:v,reading:r});
+    return searchIndexCache;
+  }catch{return null}
+}
+function searchView(){
+  const q=esc(state.searchQuery||'');
+  setApp(`<section class="fade search-page"><div class="section-head"><div><h1>Cari materi</h1><p>Ketik topik yang belum kamu mengerti. Boleh Indonesia atau Inggris - misalnya <b>did</b>, <b>kalau</b>, atau <b>passive voice</b>.</p></div></div>
+<label class="search-box"><i data-lucide="search"></i><input id="searchInput" type="search" value="${q}" placeholder="did, kata kerja bantu, sudah…" autocomplete="off" enterkeyhint="search"></label>
+<div id="searchResults"><p class="muted">Mulai ketik untuk mencari.</p></div></section>`);
+  enhanceUI();
+  const input=$('searchInput');
+  if(!input)return;
+  let timer=null;
+  const run=()=>{const value=input.value;state.searchQuery=value;clearTimeout(timer);timer=setTimeout(()=>runSearch(value),160)};
+  input.addEventListener('input',run);
+  input.focus();
+  if(q)runSearch(input.value);
+}
+async function runSearch(query){
+  const host=$('searchResults');if(!host)return;
+  const text=String(query||'').trim();
+  if(!text){host.innerHTML='<p class="muted">Mulai ketik untuk mencari.</p>';return}
+  const index=await ensureSearchIndex();
+  if(!index){host.innerHTML='<p class="muted">Indeks materi belum siap. Coba lagi sebentar lagi.</p>';return}
+  const found=self.FiezelSearch.search(index,text);
+  if(found.empty){
+    // Nihil bukan jalan buntu: di sinilah feedback punya alasan untuk ada, dan kata yang
+    // dicari sudah dibawa serta supaya OWNER tidak menerima keluhan tanpa konteks.
+    host.innerHTML=`<div class="card search-empty"><b>Belum ada materi untuk "${esc(text)}".</b><p class="muted">Kirim ini ke pengembang supaya materinya dibuatkan. Tidak ada data pribadi yang ikut terkirim.</p><button class="primary" id="searchReport"><i data-lucide="send"></i> Minta materi ini</button></div>`;
+    enhanceUI();
+    $('searchReport')?.addEventListener('click',()=>sendFeedback({kind:'missing_material',query:text}));
+    return;
+  }
+  host.innerHTML=found.results.map(r=>`<button class="search-hit" data-view="${esc(r.view)}"><span class="search-hit-title">${esc(r.title)}</span><span class="search-hit-view">${esc(r.view)}</span></button>`).join('');
+  enhanceUI();
+  host.querySelectorAll('.search-hit').forEach(btn=>btn.addEventListener('click',()=>{
+    const view=btn.getAttribute('data-view');
+    if(VALID_VIEWS.has(view))go(view);
+  }));
+}
+/**
+ * Mengirim feedback ke Worker.
+ *
+ * OWNER memilih terbuka tanpa login, jadi tidak ada identitas yang ikut - dan justru
+ * karena itu yang dikirim dibatasi ketat pada kata yang dicari dan kalimat yang ditulis
+ * sendiri. Jawaban, riwayat belajar, dan endpoint tidak pernah ikut; observability-
+ * privacy-test.js menjaga batas itu untuk seluruh aplikasi.
+ */
+async function sendFeedback(payload){
+  const body={kind:payload?.kind||'note',query:String(payload?.query||'').slice(0,80),
+    message:String(payload?.message||'').slice(0,600),build:String(self.FIEZEL_PAGE_BUILD||'')};
+  if(!body.query&&!body.message){showToast('Tulis dulu pesannya.');return false}
+  try{
+    const response=await coreWorkerExec('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(response&&response.ok===false)throw new Error('feedback_rejected');
+    showToast('Terkirim. Terima kasih!');haptic('success');return true;
+  }catch(error){showToast('Gagal mengirim. Coba lagi nanti.');return false}
+}
+function openFeedback(prefill){
+  openModal(`<div class="modal-mark">FIEZEL</div><h2>Kirim masukan</h2><p>Materi yang belum ada, soal yang keliru, atau apa pun yang mengganggu. Tidak ada data belajarmu yang ikut terkirim.</p><label class="endpoint-label">Pesan<textarea id="feedbackText" rows="5" placeholder="Contoh: belum ada materi tentang passive voice bentuk lampau.">${esc(prefill||'')}</textarea></label><div class="modal-actions"><button id="feedbackCancel">Batal</button><button class="primary" id="feedbackSend">Kirim</button></div>`);
+  $('feedbackCancel').onclick=closeModal;
+  $('feedbackSend').onclick=async()=>{
+    const btn=$('feedbackSend');btn.disabled=true;
+    const okSent=await sendFeedback({kind:'note',message:$('feedbackText')?.value||''});
+    btn.disabled=false;
+    if(okSent)closeModal();
+  };
+  enhanceUI();
+}
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
-const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom','library']);
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='search')searchView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();window.scrollTo(0,0)}
+const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','test','progress','classroom','library','search']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
 // m025-84: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
 // seluruh aplikasi hidup di SATU entri riwayat - gestur swipe-back tidak punya tujuan dan
@@ -1614,7 +1702,7 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="activity"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman Jahran</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="activity"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, Jahran, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Masukan untuk pengembang</h3><p class="muted">Materi yang belum ada atau apa pun yang mengganggu. Terkirim tanpa data belajarmu.</p><button id="openFeedback"><i data-lucide="message-square-plus"></i> Kirim masukan</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
