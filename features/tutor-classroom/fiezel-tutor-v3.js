@@ -24,6 +24,45 @@
     try { var out = JSON.parse(raw); return out && typeof out === 'object' ? out : fallback; }
     catch (_) { return fallback; }
   }
+  /**
+   * m025-114: nama murid dibaca dari state aplikasi, bukan dipaku di naskah. Kosong berarti
+   * naskahnya berjalan tanpa vokatif - kalimatnya tetap utuh, hanya tidak menyapa nama.
+   */
+  function learnerName(root) {
+    var target = root || (typeof globalThis !== 'undefined' ? globalThis : null);
+    try {
+      var state = target && typeof target.__getFiezelState === 'function' ? target.__getFiezelState() : null;
+      var stored = String((state && state.userName) || '').trim();
+      if (stored) return stored;
+    } catch (_) { /* jatuh ke sapaan cadangan aplikasi di bawah */ }
+    // Sapaan cadangan milik app.js selalu mengembalikan sesuatu yang bisa dibaca, sehingga
+    // kalimat contoh tidak pernah berakhir menggantung seperti "My name is ." pada jendela
+    // sempit sebelum jawaban murid tiba.
+    try { if (target && typeof target.learnerName === 'function') return String(target.learnerName() || '').trim(); }
+    catch (_) { return ''; }
+    return '';
+  }
+
+  function personalizePack(value) {
+    var name = learnerName(root);
+    var walk = function (node) {
+      // Tanpa nama, token dibuang BESERTA spasi di depannya - "Okay {name}, ..." harus
+      // menjadi "Okay, ...", bukan "Okay , ..." apalagi "Okay {name}, ...".
+      if (typeof node === 'string') {
+        return name ? node.replace(/\{name\}/g, name)
+          : node.replace(/\s*\{name\}/g, '').replace(/\s+([,.!?])/g, '$1').replace(/\s{2,}/g, ' ');
+      }
+      if (Array.isArray(node)) return node.map(walk);
+      if (node && typeof node === 'object') {
+        var out = {};
+        for (var key in node) if (Object.prototype.hasOwnProperty.call(node, key)) out[key] = walk(node[key]);
+        return out;
+      }
+      return node;
+    };
+    return walk(value);
+  }
+
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
       return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
@@ -72,8 +111,8 @@
     return [
       {
         id: 'intuition',
-        en: "Okay, Jahran. Forget the grammar name for a second. Compare these: I lost my key yesterday, and I've lost my key.",
-        idText: "Oke, Jahran. Lupakan dulu nama grammarnya. Bandingkan: I lost my key yesterday, dan I've lost my key.",
+        en: "Okay" + (learnerName() ? ', ' + learnerName() : '') + ". Forget the grammar name for a second. Compare these: I lost my key yesterday, and I've lost my key.",
+        idText: "Oke" + (learnerName() ? ', ' + learnerName() : '') + ". Lupakan dulu nama grammarnya. Bandingkan: I lost my key yesterday, dan I've lost my key.",
         board: {
           kicker: 'LOOK FIRST',
           title: 'Past event vs result now',
@@ -463,7 +502,10 @@
       if (pack) return pack;
       var response = await root.fetch('./features/classroom/classroom-lessons-v1.json', { credentials: 'same-origin' });
       if (!response || !response.ok) throw new Error('tutor_pack_unavailable');
-      pack = await response.json();
+      // m025-114: bank materi menyimpan token {name}, bukan nama sungguhan. Diganti sekali
+      // di sini karena paketnya di-cache - satu penelusuran, dan tidak ada titik render
+      // yang bisa lupa memanggilnya.
+      pack = personalizePack(await response.json());
       var saved = readLocal(SESSION_KEY, null);
       var evidence = readLocal(EVIDENCE_KEY, evidenceDefault());
       session = createSession(pack, saved, evidence);
@@ -584,7 +626,7 @@
           '</em></span><i data-lucide="arrow-up-right"></i></button>';
       }).join('');
       mount().innerHTML = shell(
-        '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn, Jahran?</h2>' +
+        '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn' + (learnerName(root) ? ', ' + esc(learnerName(root)) : '') + '?</h2>' +
         '<p>Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah.</p></section>' +
         '<div class="tutor-subject-grid">' + cards + '</div></div>' +
         bundleCard(), session.snapshot());
@@ -737,13 +779,54 @@
       sheet.querySelector('textarea').focus();
     }
 
+    /**
+     * m025-114 (OWNER: masuk ke dalam folder lalu swipe back "malah stuck screen").
+     *
+     * Classroom adalah folder berlapis - subject, lalu topik, lalu pelajaran - dan
+     * ketiganya digambar di dalam SATU view app.js. Tanpa pendaftaran ini, tekanan kembali
+     * dari dalam sebuah pelajaran mengambil entri view Classroom dan melempar murid keluar
+     * dari seluruh Classroom sekaligus. app.js menyediakan FiezelStage di atas modul
+     * back-nav; dipakai lewat pengait opsional supaya berkas ini tetap bisa dimuat dan
+     * diuji sendirian.
+     */
+    function pushStage(kind, restore) {
+      try { return root.FiezelStage && root.FiezelStage.enter(kind, restore) === true; }
+      catch (_) { return false; }
+    }
+    function popAllStages() {
+      try { return root.FiezelStage ? root.FiezelStage.leaveAll() === true : false; }
+      catch (_) { return false; }
+    }
+
     function wire() {
       try { if (root.lucide && root.lucide.createIcons) root.lucide.createIcons(); } catch (_) {}
       root.document.querySelectorAll('[data-category]').forEach(function (b) {
-        b.addEventListener('click', function () { stopVoice(); session.chooseCategory(b.dataset.category); save(); render(); });
+        b.addEventListener('click', function () {
+          stopVoice();
+          var cat = b.dataset.category;
+          session.chooseCategory(cat); save();
+          pushStage('tutor-topic', function () {
+            stopVoice(); session.reset();
+            try { session.chooseCategory(cat); } catch (_) {}
+            save(); render();
+          });
+          render();
+        });
       });
       root.document.querySelectorAll('[data-lesson]').forEach(function (b) {
-        b.addEventListener('click', function () { stopVoice(); session.chooseLesson(b.dataset.lesson); save(); renderTeach(true); });
+        b.addEventListener('click', function () {
+          stopVoice();
+          var from = session.snapshot().categoryId;
+          var lesson = b.dataset.lesson;
+          session.chooseLesson(lesson); save();
+          pushStage('tutor-lesson', function () {
+            stopVoice(); session.reset();
+            if (from) { try { session.chooseCategory(from); } catch (_) {} }
+            try { session.chooseLesson(lesson); } catch (_) {}
+            save(); render();
+          });
+          renderTeach(true);
+        });
       });
       root.document.querySelectorAll('[data-micro]').forEach(function (b) {
         b.addEventListener('click', function () {
@@ -771,7 +854,9 @@
         });
       });
       root.document.querySelectorAll('[data-tutor-home]').forEach(function (b) {
-        b.addEventListener('click', function () { stopVoice(); session.reset(); save(); renderCategory(); });
+        // Kembali ke akar Classroom membuang SELURUH stage yang menumpuk di dalamnya,
+        // supaya tekanan kembali berikutnya tidak jatuh pada folder yang sudah ditinggalkan.
+        b.addEventListener('click', function () { stopVoice(); popAllStages(); session.reset(); save(); renderCategory(); });
       });
       root.document.querySelectorAll('[data-tutor-ask]').forEach(function (b) { b.addEventListener('click', askDialog); });
       root.document.querySelectorAll('[data-tutor-confused]').forEach(function (b) {
