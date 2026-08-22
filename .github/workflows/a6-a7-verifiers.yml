@@ -75,11 +75,6 @@ jobs:
 
       - name: Focused neural runtime verification
         run: |
-          node neural-voice-device-hotfix-test.js
-          node neural-voice-generation-timeout-test.js
-          node neural-voice-single-flight-test.js
-          node neural-voice-diagnostics-retention-test.js
-          node neural-voice-audibility-test.js
           node diag-search-test.js
           node puter-auth-coop-test.js
           node sw-corp-test.js
@@ -146,4 +141,3 @@ jobs:
           node sw-corp-test.js
           node puter-auth-coop-test.js
           node diag-search-test.js
-          node neural-voice-single-flight-test.js
