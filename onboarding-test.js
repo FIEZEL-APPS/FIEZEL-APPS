@@ -140,12 +140,16 @@ test('level self-report diberi label jelas sebagai perkiraan, bukan hasil ukur',
   for (const lv of onboarding.CEFR_LEVELS) assert.ok(new RegExp('>' + lv + '<').test(html), 'chip level hilang: ' + lv);
 });
 
-test('tes penempatan mengarah ke tes 150 soal yang sungguhan, angka tidak disamarkan', () => {
-  // Spesifikasi menulis "Quick diagnostic quiz, 4-5 questions". Produk ini hanya punya tes
-  // 150 soal; menyebutnya "singkat" tanpa angka sebenarnya adalah kebohongan kecil yang akan
-  // ditagih murid pada soal ke-30.
+test('tes penempatan menyebut jumlah soal yang sungguhan, angka tidak disamarkan', () => {
+  // Spesifikasi menulis "Quick diagnostic quiz, 4-5 questions". Produk ini punya tes 25 soal
+  // (m025-114, sebelumnya 150); menyebutnya "singkat" tanpa angka sebenarnya adalah kebohongan
+  // kecil yang akan ditagih murid di tengah jalan. Angkanya dibaca dari sumbernya supaya tes
+  // ini tidak perlu ikut diedit setiap kali jumlah soalnya berubah.
+  const targets = require('fs').readFileSync('./features/diagnostics/fiezel-diagnostic-targets.js', 'utf8');
+  const declared = /totalQuestions:\s*(\d+)/.exec(targets);
+  assert.ok(declared, 'jumlah soal resmi tidak terbaca dari diagnostic targets');
   const html = onboarding.placementMarkup(fakeEnv());
-  assert.ok(/150 soal/.test(html), 'jumlah soal sebenarnya harus disebut');
+  assert.ok(new RegExp(declared[1] + ' soal').test(html), `jumlah soal sebenarnya (${declared[1]}) harus disebut`);
   assert.ok(!/4-5 (pertanyaan|soal)|4 sampai 5/.test(html), 'tidak boleh menjanjikan jumlah soal spesifikasi yang tidak nyata');
 });
 

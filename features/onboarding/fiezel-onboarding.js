@@ -3,7 +3,7 @@
  * bagian 3). Step 0 (splash) hidup terpisah di `fiezel-splash.js`.
  *
  * m025-78: dibangun ulang dari nol mengikuti spesifikasi lengkap, menggantikan versi m025-77
- * yang mengikuti sheet PDF berbeda (IELTS/TOEFL, tes 150 soal sebagai satu-satunya jalan).
+ * yang mengikuti sheet PDF berbeda (IELTS/TOEFL, tes panjang sebagai satu-satunya jalan).
  * Salinan teks di sini diambil sedekat mungkin dari spesifikasi. Empat tempat TIDAK diikuti
  * persis, dan bedanya ditulis terbuka karena setiap penyimpangan dari spesifikasi harus
  * bisa dijelaskan, bukan disembunyikan di balik tampilan yang meyakinkan:
@@ -18,7 +18,7 @@
  *    menaksir level sebelum ada bukti jawaban. Karena itu diberi label eksplisit "perkiraan
  *    awal", disimpan terpisah dari `state.level` (yang hanya diisi tes penempatan asli), dan
  *    boleh dilewati.
- * 3. PLACEMENT TEST mengarah ke tes 150 soal yang sungguhan ada di produk, bukan "4-5
+ * 3. PLACEMENT TEST mengarah ke tes 25 soal yang sungguhan ada di produk, bukan "4-5
  *    pertanyaan cepat" seperti di spesifikasi. Membangun mesin kuis terpisah yang lebih
  *    ringan adalah fitur baru sendiri, bukan pekerjaan desain ulang - jumlah soal yang
  *    sebenarnya karena itu dituliskan di kartu, sama seperti m025-77.
@@ -218,7 +218,7 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 3: Placement (mengarah ke tes 150 soal yang sungguhan, bukan versi 4-5 soal palsu)
+  // Step 3: Placement (mengarah ke tes 25 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
   function placementMarkup(env) {
     return topbar(true)
@@ -226,7 +226,7 @@
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
       + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
-      + '<p class="fiezel-note">Isinya 150 soal dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>'
+      + '<p class="fiezel-note">Isinya 25 soal listening, grammar, dan vocabulary - tanpa teks bacaan - dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>'
       + btn('Mulai tes penempatan', 'data-ob-primary')
       + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
       + '</div>';
