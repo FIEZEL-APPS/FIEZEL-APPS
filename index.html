@@ -127,19 +127,29 @@ html.fz-booting body{overflow:hidden}
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="answerBurst" class="answer-burst hidden" role="status" aria-live="assertive" aria-atomic="true"></div>
 
-  <!-- Audit UX Bagian 3 + Roadmap #3: nada suportif, tanpa kata "wajib" / "belum bisa
-       dibuka", dan tanpa menyapa nama murid di layar sistem. Gerbang ini tetap berjalan
-       di UJUNG alur perkenalan, bukan sebagai layar pertama. -->
+  <!-- Undangan notifikasi - BUKAN gerbang lagi.
+
+       m025-34 memasang gerbang wajib di sini: kalau izin ditolak, layar ini berbunyi
+       "FIEZEL belum bisa dibuka" dan seluruh aplikasi tetap terkunci. OWNER membatalkan
+       keputusan itu: "Ini pola dark-pattern yang justru bikin app terasa murahan, bukan
+       premium - Duolingo/Spotify minta izin notifikasi setelah onboarding, dengan alasan
+       kontekstual, dan tetap bisa dipakai kalau ditolak."
+
+       Yang tersisa adalah undangan: ia tetap muncul di UJUNG perkenalan, menjelaskan apa
+       yang sebenarnya dikerjakan pengingatnya (target harian + jadwal pengulangan), dan
+       menutup diri tanpa menahan apa pun kalau ditolak atau dilewati. Tombol "Nanti saja"
+       adalah jalan keluar yang selalu ada; Pengaturan adalah jalan masuknya kembali. -->
   <div id="welcome" class="welcome notification-gate hidden" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle" aria-describedby="notificationGateBody">
     <div class="welcome-panel notification-panel">
       <div class="welcome-icon"><i data-lucide="bell-ring"></i></div>
       <div class="welcome-mark">FIEZEL REMINDER</div>
-      <h2 id="welcomeTitle">Satu langkah lagi</h2>
-      <p id="notificationGateBody">Aktifkan notifikasi supaya FIEZEL bisa mengingatkan saat target harian belum selesai atau ada materi yang waktunya diulang.</p>
-      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Pilih <b>Allow / Izinkan</b> saat browser bertanya. Pengingatnya bisa diatur ulang kapan saja lewat Pengaturan.</span></div>
-      <p id="notificationGateStatus" class="notification-status" role="status">Memeriksa izin notifikasi…</p>
-      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestRequiredNotificationPermission()">Aktifkan notifikasi <i data-lucide="bell-ring"></i></button>
-      <p id="notificationGateHelp" class="notification-help">Browser akan menampilkan permintaan izin. Pilih <b>Allow / Izinkan</b> untuk melanjutkan.</p>
+      <h2 id="welcomeTitle">Mau diingatkan?</h2>
+      <p id="notificationGateBody">FIEZEL bisa mengetuk pelan saat target harian belum selesai, atau saat ada kata dan pola yang menurut jadwal pengulangan sudah waktunya diulang sebelum sempat lupa.</p>
+      <div class="notification-requirement"><i data-lucide="shield-check"></i><span>Paling banyak satu pengingat sehari dan tidak pernah di jam tidur. Bisa dinyalakan atau dimatikan kapan saja lewat Pengaturan.</span></div>
+      <p id="notificationGateStatus" class="notification-status" role="status">Belajar tetap bisa dimulai tanpa ini.</p>
+      <button id="notificationGateButton" type="button" class="primary wide" onclick="requestStudyNotificationPermission()">Ingatkan saya <i data-lucide="bell-ring"></i></button>
+      <button id="notificationGateSkip" type="button" class="text-button wide" onclick="declineStudyNotifications()">Nanti saja</button>
+      <p id="notificationGateHelp" class="notification-help">Pilih "Nanti saja" dan FIEZEL langsung terbuka. Pengingatnya menunggu di Pengaturan kalau suatu saat dibutuhkan.</p>
     </div>
   </div>
 
@@ -173,155 +183,104 @@ html.fz-booting body{overflow:hidden}
     <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="route"></i><span>Peta</span></button>
   </nav>
 
-  <script src="https://js.puter.com/v2/"></script>
-  <script src="./lucide.min.js"></script>
-  <script src="./version.js"></script>
-  <script src="./report-config.js"></script>
-  <script src="./core-config.js"></script>
-  <script src="./content-canary.js"></script>
-  <script src="./content-promotion.js"></script>
-  <script src="./content-canary-config.js"></script>
-  <script src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
-  <script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
-  <script src="./features/neural-voice/fiezel-prosody.js"></script>
-  <script src="./features/neural-voice/fiezel-voice-persona.js"></script>
-  <script src="./features/neural-voice/fiezel-genz-script.js"></script>
-  <script src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice.js"></script>
-  <script src="./features/neural-voice/fiezel-web-audio-player.js"></script>
-  <script src="./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
-  <script src="./features/neural-voice/fiezel-supertonic-voice.js"></script>
-  <script src="./features/neural-voice/fiezel-indonesian-voice.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js"></script>
-  <script src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
-  <script src="./features/neural-voice/fiezel-m0281-runtime-guard.js"></script>
-  <script src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
-  <script src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
-  <script src="./features/diagnostics/fiezel-module-selftests.js"></script>
-  <script src="./features/diagnostics/fiezel-diagnostic-register.js"></script>
-  <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada. -->
-  <script src="./features/neural-voice/fiezel-diag-panel.js"></script>
-  <script src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
-  <script src="./features/ui/fiezel-zoom-lock.js"></script>
-  <script src="./features/ui/fiezel-back-nav.js"></script>
-  <script src="./features/brand/fiezel-choreography.js"></script>
-  <script src="./features/audio/fiezel-ui-sfx.js"></script>
-  <script src="./features/neural-voice/fiezel-voice-bundle-gate.js"></script>
-  <script src="./features/library/fiezel-library.js"></script>
-  <script src="./features/library/fiezel-library-ui.js"></script>
-  <script src="./features/classroom/fiezel-classroom.js"></script>
-  <script src="./features/speaking-listening/speaking-listening-config.js"></script>
-  <script src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
-  <script src="./app.js"></script>
-  <script src="./features/tutor-classroom/fiezel-tutor-v3.js"></script>
-  <script src="./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js"></script>
-  <script src="./features/tutor-classroom/fiezel-tutor-dialog.js"></script>
-  <script src="./features/tutor-classroom/fiezel-tutor-voice-chat.js"></script>
-  <script src="./features/daily-target/fiezel-daily-target.js"></script>
-  <script src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
-  <script src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
-  <script src="./features/continuity/fiezel-continuity.js"></script>
-  <script src="./features/health/fiezel-install-health.js"></script>
-  <script src="./features/brand/fiezel-splash.js"></script>
-  <script src="./features/onboarding/fiezel-onboarding.js"></script>
-  <script src="./features/personal-journey/fiezel-personal-journey.js"></script>
-  <script>
-    /* FIEZEL_REPORT_GESTURE_ISOLATION_START */
-    (() => {
-      const baseFlushReportQueue = flushReportQueue;
-      const baseSendCreatorReport = sendCreatorReport;
-      const baseMaybeSendAccessReport = maybeSendAccessReport;
+  <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
+       tanpa bundling/lazy-load" dan "kalau Puter down/lambat, splash/loading ikut ketahan".
+       Keduanya benar dan keduanya berasal dari daftar di bawah ini, yang dulu seluruhnya
+       parser-blocking dengan js.puter.com di baris pertama.
 
-      function creatorReportAuthReadyForAutomatic() {
-        try {
-          return typeof puter !== 'undefined' && !!puter?.authToken && puter?.auth?.isSignedIn?.() === true;
-        } catch {
-          return false;
-        }
-      }
+       Tiga aturan sekarang berlaku di sini, dan boot-order-test.js menggagalkan build kalau
+       salah satunya dilanggar:
 
-      function deferAutomaticReport(task) {
-        return new Promise(resolve => {
-          setTimeout(() => {
-            try {
-              Promise.resolve(task()).then(resolve, () => resolve(false));
-            } catch {
-              resolve(false);
-            }
-          }, 0);
-        });
-      }
+       1. js.puter.com `async` - permintaan pihak ketiga tidak boleh berada di jalur kritis
+          sama sekali. Konsekuensinya `puter` bisa datang kapan saja, jadi setiap pemakainya
+          menunggu lewat FiezelPuterReady (./fiezel-puter-ready.js), bukan menebak.
+       2. Semua skrip lokal `defer` - berhenti menahan pengurai, urutan eksekusi tetap sama
+          persis dengan urutan tulisnya. TIDAK BOLEH ada blok <script> inline di bawah sini:
+          blok inline TIDAK ikut ditunda dan akan berjalan sebelum app.js, membaca fungsi
+          yang belum ada. Dua blok inline yang dulu ada di sini karena itu dipindah menjadi
+          ./features/ui/fiezel-report-gesture-isolation.js dan ./features/ui/fiezel-boot-tail.js.
+       3. Tumpukan berat (suara neural 265 KB, tutor/Classroom 81 KB) memakai
+          type="fiezel/lazy" - browser tidak mengambilnya saat mengurai, dan
+          ./fiezel-lazy-loader.js mengangkatnya jadi <script> sungguhan setelah layar
+          pertama tercat, atau lebih awal kalau murid membukanya duluan. -->
+  <script async id="fiezelPuterSdk" src="https://js.puter.com/v2/"></script>
+  <script defer src="./fiezel-puter-ready.js"></script>
+  <script defer src="./lucide.min.js"></script>
+  <script defer src="./version.js"></script>
+  <script defer src="./report-config.js"></script>
+  <script defer src="./core-config.js"></script>
+  <script defer src="./content-canary.js"></script>
+  <script defer src="./content-promotion.js"></script>
+  <script defer src="./content-canary-config.js"></script>
+  <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
+  <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>
+  <script defer src="./features/diagnostics/fiezel-module-selftests.js"></script>
+  <script defer src="./features/diagnostics/fiezel-diagnostic-register.js"></script>
+  <!-- Sengaja dimuat sebelum app.js: kalau app.js throw, tombol Diagnostics tetap ada.
+       Karena itu Diagnostics TIDAK ikut dimuat malas bersama tumpukan suara lainnya -
+       nilainya justru terletak pada tersedia lebih dulu daripada yang ia periksa. -->
+  <script defer src="./features/neural-voice/fiezel-diag-panel.js"></script>
+  <script defer src="./features/neural-voice/fiezel-pipeline-device-probe.js"></script>
+  <script defer src="./features/ui/fiezel-zoom-lock.js"></script>
+  <script defer src="./features/ui/fiezel-back-nav.js"></script>
+  <script defer src="./features/brand/fiezel-choreography.js"></script>
+  <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
+  <script defer src="./features/library/fiezel-library.js"></script>
+  <script defer src="./features/library/fiezel-library-ui.js"></script>
+  <script defer src="./features/speaking-listening/speaking-listening-config.js"></script>
+  <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
+  <script defer src="./fiezel-lazy-loader.js"></script>
 
-      flushReportQueue = function({ allowInteractiveAuth = false } = {}) {
-        if (allowInteractiveAuth) return baseFlushReportQueue();
-        if (!creatorReportAuthReadyForAutomatic()) return Promise.resolve(false);
-        return deferAutomaticReport(() => baseFlushReportQueue());
-      };
+  <!-- FIEZEL_LAZY_START — runtime suara neural. Urutan di bawah ini adalah kontrak, bukan
+       selera: dua berkas m0281 di dalamnya adalah tambalan yang membungkus tetangganya -
+       satu menambal SEBELUM bootstrap, satu merekam runtime SESUDAH semua tambalan
+       terpasang. Pemuat menjalankannya dengan async=false sehingga urutan tulis di bawah
+       ini tetap menjadi urutan eksekusi.
 
-      sendCreatorReport = async function(reason = 'manual', force = false, { allowInteractiveAuth = (reason === 'manual' || reason === 'consent_enabled') } = {}) {
-        if (allowInteractiveAuth) return baseSendCreatorReport(reason, force);
-        if (!creatorReportAuthReadyForAutomatic()) {
-          if (!state.preferences?.reportConsent || !validReportEndpoint(state.preferences?.reportEndpoint)) return false;
-          if (!force && state.totalAnswered <= Number(state.reportMeta?.lastSentAnswered || 0)) return false;
-          queueCreatorReport(buildCreatorReport(reason));
-          return false;
-        }
-        return deferAutomaticReport(() => baseSendCreatorReport(reason, force));
-      };
+       (Nama berkasnya sengaja tidak ditulis di komentar ini: beberapa tes menghitung
+       urutan lewat index.html indexOf pada nama berkas, dan penyebutan di komentar akan
+       terbaca sebagai posisi pemuatan yang lebih awal daripada tag-nya sendiri.) -->
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" data-fiezel-lazy-when="idle" src="./features/neural-voice/fiezel-voice-diagnostics.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-prosody.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-persona.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-genz-script.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-web-audio-player.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-supertonic-voice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-indonesian-voice.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-neural-voice-audibility-fix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-m0281-runtime-guard.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-bundle-gate.js"></script>
+  <!-- Tumpukan tutor/Classroom. data-fiezel-lazy-needs="voice" bukan hiasan: tutor v3
+       menimpa runtime suara, jadi grup suara HARUS selesai lebih dulu walaupun murid
+       membuka Classroom sebelum gelombang idle sempat jalan. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" data-fiezel-lazy-when="idle" data-fiezel-lazy-needs="voice" src="./features/classroom/fiezel-classroom.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-v3.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-dialog.js"></script>
+  <script type="fiezel/lazy" data-fiezel-lazy="classroom" src="./features/tutor-classroom/fiezel-tutor-voice-chat.js"></script>
+  <!-- FIEZEL_LAZY_END -->
 
-      maybeSendAccessReport = function({ allowInteractiveAuth = false } = {}) {
-        if (allowInteractiveAuth) return baseMaybeSendAccessReport();
-        if (!creatorReportAuthReadyForAutomatic()) return Promise.resolve(false);
-        return deferAutomaticReport(() => baseMaybeSendAccessReport());
-      };
-
-      globalThis.creatorReportAuthReadyForAutomatic = creatorReportAuthReadyForAutomatic;
-    })();
-    /* FIEZEL_REPORT_GESTURE_ISOLATION_END */
-  </script>
-  <script src="./features/ui/fiezel-dark-mode.js"></script>
-  <script src="./features/ui/fiezel-ab-testing.js"></script>
-  <script src="./features/ui/skeleton-helpers.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
-
-    /* Inject dark mode toggle ke settings modal */
-    const originalOpenSettings = window.openSettings;
-    window.openSettings = function() {
-      originalOpenSettings.call(this);
-      setTimeout(() => {
-        const settingsList = document.querySelector('.settings-list');
-        if (settingsList && !document.getElementById('settingDarkMode')) {
-          const darkModeToggle = document.createElement('label');
-          darkModeToggle.className = 'setting-row';
-          darkModeToggle.id = 'settingDarkMode';
-          darkModeToggle.innerHTML = `
-            <span class="setting-icon"><i data-lucide="moon"></i></span>
-            <span>
-              <b>Mode gelap</b>
-              <small>Ikuti preferensi sistem atau atur manual</small>
-            </span>
-            <input id="settingDarkModeToggle" type="checkbox" ${window.FiezelUI?.getCurrentTheme() === 'dark' ? 'checked' : ''}>
-          `;
-          settingsList.insertBefore(darkModeToggle, settingsList.firstChild);
-
-          document.getElementById('settingDarkModeToggle').addEventListener('change', (e) => {
-            window.FiezelUI?.toggleDarkMode();
-            e.target.checked = window.FiezelUI?.getCurrentTheme() === 'dark';
-          });
-
-          /* Re-enhance Lucide icons */
-          if (window.lucide) {
-            lucide.createIcons();
-          }
-        }
-      }, 100);
-    };
-  </script>
+  <script defer src="./app.js"></script>
+  <script defer src="./features/daily-target/fiezel-daily-target.js"></script>
+  <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
+  <script defer src="./features/academic-readiness/fiezel-academic-readiness.js"></script>
+  <script defer src="./features/continuity/fiezel-continuity.js"></script>
+  <script defer src="./features/health/fiezel-install-health.js"></script>
+  <script defer src="./features/brand/fiezel-splash.js"></script>
+  <script defer src="./features/onboarding/fiezel-onboarding.js"></script>
+  <script defer src="./features/personal-journey/fiezel-personal-journey.js"></script>
+  <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
+  <script defer src="./features/ui/fiezel-dark-mode.js"></script>
+  <script defer src="./features/ui/fiezel-ab-testing.js"></script>
+  <script defer src="./features/ui/skeleton-helpers.js"></script>
+  <script defer src="./features/ui/fiezel-boot-tail.js"></script>
 </body>
 </html>
