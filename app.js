@@ -611,6 +611,13 @@ function presentPuterAuthGateIfNeeded(){
   if(!authRetryBound){authRetryBound=true;document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'&&document.body?.classList?.contains('auth-locked')&&puterSignedIn())completeAuthGate()})}
   return true
 }
+// Tenggat login. Keadaan 'pending' mematikan tombolnya, dan tidak ada apa pun yang
+// menyalakannya kembali kalau puter.auth.signIn() tidak pernah selesai - jendela login
+// diblokir peramban, atau SDK-nya menggantung setelah terhubung. Yang tersisa adalah gerbang
+// penuh layar bertuliskan "Menghubungkan..." dengan satu-satunya tombolnya mati, dan satu-
+// satunya jalan keluar memuat ulang halaman. Sebuah janji yang tidak pernah selesai bukan
+// alasan untuk mengurung murid.
+const PUTER_SIGNIN_TIMEOUT_MS=45000;
 async function attemptPuterSignIn(){
   // Ini gestur murid yang sesungguhnya, jadi ia tidak boleh gagal diam-diam hanya karena
   // js.puter.com kebetulan belum tiba. Panelnya berpindah ke 'pending' DULU, lalu SDK-nya
@@ -621,8 +628,17 @@ async function attemptPuterSignIn(){
     if(!puterAuthAvailable()){setAuthGateState('error',{message:'Layanan akun Puter belum bisa dihubungi. Periksa koneksi lalu coba lagi.'});return false}
   }
   setAuthGateState('pending');
-  try{await puter.auth.signIn();if(puterSignedIn()){completeAuthGate();return true}setAuthGateState('error',{message:'Login belum selesai. Coba lagi.'});return false}
-  catch(error){setAuthGateState('error',error);return false}
+  try{
+    await Promise.race([
+      puter.auth.signIn(),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Login Puter tidak merespons. Periksa jendela loginnya, atau coba lagi.')),PUTER_SIGNIN_TIMEOUT_MS))
+    ]);
+    if(puterSignedIn()){completeAuthGate();return true}
+    setAuthGateState('error',{message:'Login belum selesai. Coba lagi.'});return false
+  }
+  // Tenggat ditangkap di sini juga, bukan dibiarkan lewat: hasilnya harus sama seperti
+  // kegagalan login lain - tombolnya hidup kembali dan bisa ditekan.
+  catch(error){if(puterSignedIn()){completeAuthGate();return true}setAuthGateState('error',error);return false}
 }
 function lastLearningAt(){
   const historyAt=(state.history||[]).reduce((m,x)=>Math.max(m,Number(x?.at)||0),0);const sessionAt=(state.sessionHistory||[]).reduce((m,x)=>Math.max(m,Date.parse(x?.at||'')||0),0);return Math.max(historyAt,sessionAt)

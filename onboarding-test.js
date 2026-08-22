@@ -190,6 +190,53 @@ test('melewati (global) di langkah mana pun langsung menutup dan tidak kembali m
   assert.strictEqual(again.reason, 'completed');
 });
 
+// Gate untuk dua jalan keluar yang MENUTUP lapisan tapi tidak pernah menyerahkan kendali
+// kembali. Keduanya lolos dari gate lama karena gate itu hanya memeriksa bahwa perkenalan
+// berhenti menghadang - bukan bahwa aplikasinya benar-benar dilanjutkan. Di aplikasi,
+// satu-satunya render() pada jalur boot ada di balik callback ini, jadi jalan keluar yang
+// diam meninggalkan murid di cangkang kosong sampai ia memuat ulang sendiri.
+test('melewati (global) menyerahkan kendali kembali, bukan sekadar menutup lapisan', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true,
+    onFinish: d => calls.push(['finish', d && d.via]),
+    onPlacement: () => calls.push(['placement']) });
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
+  assert.deepStrictEqual(calls, [['finish', 'skip']],
+    'tombol Lewati harus memanggil onFinish tepat sekali - tanpa itu alur pembukaan berhenti diam-diam');
+});
+
+test('"Lewati" di langkah terakhir mengakhiri perkenalan, bukan mengecat ulang layar yang sama', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true, onFinish: d => calls.push(d && d.via) });
+  advanceTo(run, 5);
+  run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
+  assert.deepStrictEqual(calls, ['skip'],
+    'di langkah terakhir tidak ada langkah berikutnya: goStep(6) dijepit kembali ke 5 dan tombolnya mati');
+  assert.strictEqual(onboarding.completed(env), true);
+});
+
+test('tes penempatan memberi tahu onPlacement tepat sekali, bukan dua kali', () => {
+  const env = fakeEnv();
+  const calls = [];
+  const run = onboarding.show(env, { now: NOW, force: true,
+    onPlacement: () => calls.push('placement'), onFinish: () => calls.push('finish') });
+  advanceTo(run, 3);
+  run.element.querySelector('[data-ob-primary]').listeners.click[0]();
+  assert.deepStrictEqual(calls, ['placement'],
+    'jalur tes penempatan tidak boleh ikut memanggil onFinish - itu menjalankan dua lanjutan sekaligus');
+});
+
+test('login Puter yang menggantung tidak boleh mengurung: ada tenggat', () => {
+  const app = fs.readFileSync('./app.js', 'utf8');
+  assert.ok(/const PUTER_SIGNIN_TIMEOUT_MS=\d+;/.test(app),
+    "keadaan 'pending' mematikan tombolnya, jadi janji yang tidak pernah selesai berarti gerbang tanpa jalan keluar");
+  assert.ok(/Promise\.race\(\[[\s\S]{0,200}puter\.auth\.signIn\(\)/.test(app));
+  assert.ok(/catch\(error\)\{if\(puterSignedIn\(\)\)\{completeAuthGate\(\)/.test(app),
+    'tenggat harus ditangkap seperti kegagalan lain supaya tombolnya hidup kembali');
+});
+
 test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke langkah 2', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
