@@ -30,6 +30,7 @@ const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const css = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
 const choreo = require('./features/brand/fiezel-choreography.js');
 const sfx = require('./features/audio/fiezel-ui-sfx.js');
+const splash = require('./features/brand/fiezel-splash.js');
 
 let failures = 0;
 function test(name, fn) {
@@ -247,7 +248,7 @@ test('wajah bulat pensiun dari chrome aplikasi', () => {
 test('serif display dipakai di ukuran besar saja, dengan berat yang benar-benar ada', () => {
   assert.ok(/--fz-display:'FZ Instrument Serif'/.test(css), 'token display harus ada');
   assert.ok(fs.existsSync(path.join(root, 'assets/fonts/InstrumentSerif-400.woff2')), 'berkas font display harus ada');
-  const rule = /\.brand,\.section-head h1,[^{]*\{([^}]*)\}/.exec(css);
+  const rule = /\.section-head h1,\.welcome-panel h2,[^{]*\{([^}]*)\}/.exec(css);
   assert.ok(rule, 'aturan display tidak ditemukan');
   assert.ok(/font-weight:400/.test(rule[1]),
     'berkasnya hanya punya berat 400; meminta berat lain membuat browser menebalkannya sendiri');
@@ -269,6 +270,47 @@ test('modul koreografi dimuat sebelum yang membacanya', () => {
   assert.ok(c < s && c < b, 'koreografi harus dimuat lebih dulu; kalau tidak, keduanya jatuh ke fallback');
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   assert.ok(sw.includes("'./features/brand/fiezel-choreography.js'"), 'koreografi harus masuk precache');
+});
+
+/* ---------------- wordmark dipakai di seluruh aplikasi ---------------- */
+
+test('wordmark dipakai di splash DAN di topbar, bukan teks lagi', () => {
+  // OWNER: "aku mau yang Hero itu dipakai di mana saja."
+  assert.ok(/class="brand"><svg class="fiezel-wordmark"/.test(html),
+    'topbar harus memakai wordmark, bukan teks FIE/ZEL');
+  assert.ok(/fiezel-splash-word"><svg class="fiezel-wordmark"/.test(splash.markup()),
+    'splash harus memakai wordmark, bukan teks');
+  assert.ok(!/>FIE<span>ZEL<\/span></.test(html), 'sisa wordmark berupa teks harus hilang');
+});
+
+test('wordmark di kode identik dengan berkas SVG yang dihasilkan generator', () => {
+  // Dua salinan hanya aman selama ada yang menjaganya tetap sama.
+  const file = fs.readFileSync(path.join(root, 'assets/brand/fiezel-wordmark.svg'), 'utf8');
+  const rects = x => (x.match(/<rect[^>]*>/g) || []);
+  const a = rects(splash.wordmarkMarkup('x')), b = rects(file);
+  assert.strictEqual(a.length, b.length, 'jumlah bentuk berbeda dari berkas SVG');
+  const drift = a.filter((r, i) => r !== b[i]);
+  assert.deepStrictEqual(drift, [], 'bentuk berikut menyimpang dari assets/brand/fiezel-wordmark.svg');
+});
+
+test('id gradien diberi awalan per pemakaian, supaya dua salinan tidak saling menimpa', () => {
+  const a = splash.wordmarkMarkup('aa'), b = splash.wordmarkMarkup('bb');
+  assert.ok(/id="aaIv"/.test(a) && /id="bbIv"/.test(b), 'awalan id harus benar-benar dipakai');
+  assert.ok(!/id="aaIv"/.test(b), 'dua pemakaian tidak boleh berbagi id gradien');
+  // Halaman memuat wordmark dua kali (splash frame-pertama dan topbar): id-nya harus beda.
+  const ids = (html.match(/<linearGradient id="([^"]+)"/g) || []).map(m => m.slice(22, -1));
+  assert.strictEqual(new Set(ids).size, ids.length, 'ada id gradien kembar di index.html: ' + ids.join(','));
+});
+
+test('dua batang emas cukup lebar untuk bertahan sampai ukuran topbar', () => {
+  // Batang 16 dengan celah 10 hanya bertahan di ukuran besar; pada 96px keduanya lumer.
+  // Diuji dengan merender, lalu dilebarkan ke 26 dan 22.
+  const bars = /<g fill="url\(#xGo\)">(.*?)<\/g>/.exec(splash.wordmarkMarkup('x'));
+  assert.ok(bars, 'batang emas tidak ditemukan');
+  const widths = [...bars[1].matchAll(/\swidth="(\d+)"/g)].map(m => Number(m[1]));
+  assert.deepStrictEqual(widths, [26, 26], 'lebar batang emas harus 26; di bawah itu ia lumer di topbar');
+  const xs = [...bars[1].matchAll(/\sx="(\d+)"/g)].map(m => Number(m[1]));
+  assert.strictEqual(xs[1] - xs[0] - 26, 22, 'celah antarbatang harus 22');
 });
 
 process.on('exit', () => {

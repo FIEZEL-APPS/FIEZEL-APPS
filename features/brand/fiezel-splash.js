@@ -201,10 +201,57 @@
   // dianimasikan, wordmark, dan tagline - satu bidang gelap yang tenang, seperti pembuka
   // aplikasi kelas atas. Gelembung ucapan dan tombol ajakan ikut dilepas: splash menutup
   // dirinya sendiri, jadi tidak ada yang perlu ditekan.
+  /**
+   * Wordmark FIEZEL. Digambar dari sistem huruf yang sama dengan logoMarkup() di atas -
+   * monoline 42 unit, ujung membulat penuh - sehingga tanda dan tulisan berasal dari satu
+   * tangan. Sumber tunggalnya tools/build-wordmark.mjs; berkas SVG-nya ada di assets/brand.
+   *
+   * Huruf I adalah motif logo: DUA batang emas dengan tinggi berbeda. Ide OWNER, dan ia
+   * dipakai di SELURUH aplikasi - bukan hanya di ukuran hero - karena lebar batang dan
+   * celahnya (26 dan 22) sudah diuji bertahan sampai 96px, selebar wordmark di topbar.
+   *
+   * `idPrefix` wajib unik per pemakaian dalam satu halaman: id gradien bersifat global di
+   * dokumen, dan dua salinan dengan id sama membuat yang kedua merujuk definisi yang pertama.
+   */
+  function wordmarkMarkup(idPrefix) {
+    var p = String(idPrefix || 'fzw');
+    return '<svg class="fiezel-wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL">'
+      + '<defs>'
+      + '<linearGradient id="' + p + 'Iv" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient>'
+      + '<linearGradient id="' + p + 'Go" x1="0" y1="0" x2="0" y2="1">'
+      + '<stop offset="0%" stop-color="#F7E3AE"/><stop offset="45%" stop-color="#DDB55F"/>'
+      + '<stop offset="100%" stop-color="#B0812A"/></linearGradient>'
+      + '</defs>'
+      + '<g fill="url(#' + p + 'Iv)">'
+      + '<rect x="30" y="30" width="42" height="200" rx="21"/>'
+      + '<rect x="30" y="30" width="144" height="42" rx="21"/>'
+      + '<rect x="30" y="109" width="116" height="42" rx="21"/>'
+      + '<rect x="300" y="30" width="42" height="200" rx="21"/>'
+      + '<rect x="300" y="30" width="144" height="42" rx="21"/>'
+      + '<rect x="300" y="109" width="100" height="42" rx="21"/>'
+      + '<rect x="300" y="188" width="130" height="42" rx="21"/>'
+      + '<rect x="478" y="30" width="150" height="42" rx="21"/>'
+      + '<rect x="478" y="188" width="150" height="42" rx="21"/>'
+      + '<rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/>'
+      + '<rect x="662" y="30" width="42" height="200" rx="21"/>'
+      + '<rect x="662" y="30" width="144" height="42" rx="21"/>'
+      + '<rect x="662" y="109" width="100" height="42" rx="21"/>'
+      + '<rect x="662" y="188" width="130" height="42" rx="21"/>'
+      + '<rect x="840" y="30" width="42" height="200" rx="21"/>'
+      + '<rect x="840" y="188" width="130" height="42" rx="21"/>'
+      + '</g>'
+      + '<g fill="url(#' + p + 'Go)">'
+      + '<rect x="192" y="30" width="26" height="200" rx="13"/>'
+      + '<rect x="240" y="106" width="26" height="124" rx="13"/>'
+      + '</g>'
+      + '</svg>';
+  }
+
   function markup() {
     return '<div class="fiezel-splash-body fiezel-splash-brand">'
       + '<div class="fiezel-logo-stage">' + logoMarkup() + '</div>'
-      + '<p class="fiezel-splash-word">' + COPY.word + '</p>'
+      + '<div class="fiezel-splash-word">' + wordmarkMarkup('fzs') + '</div>'
       + '<p class="fiezel-splash-tag">' + COPY.tagline + '</p>'
       + '</div>';
   }
@@ -324,6 +371,7 @@
     // Diekspor supaya markup statis di index.html bisa diuji identik dengan sumber ini,
     // bukan disalin sekali lalu menyimpang diam-diam pada perubahan berikutnya.
     logoMarkup: logoMarkup,
+    wordmarkMarkup: wordmarkMarkup,
     markup: markup,
     disposeBootSplash: disposeBootSplash,
     show: show
