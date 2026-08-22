@@ -84,7 +84,10 @@ assert.ok(readinessBlock.includes('code:readinessErrorCode(error)'),'readiness f
 assert.ok(!readinessBlock.includes('error:String'),'m025-13 readiness diagnostics must not persist raw error messages');
 assert.ok(!/(?:\btext\b|phoneme|token|url|auth|cookie|credential)/i.test(readinessBlock),'m025-13 readiness diagnostics must not persist learner text or credential material');
 assert.ok(aud.includes('Object.freeze({...runtime,status,ensureReady,speak,stop,browserSpeakImmediate,__audibilityPatched:true})'),'m025-13 wrapped ensureReady must be the public runtime method');
-assert.ok(app.includes("speed:selectedNeuralRate(),allowFallback:false"),'Tes suara must be neural-only');
+// m025-96: tombol tes kini menguji mesin yang benar-benar dipakai murid. Menguji mesin
+// lokal akan melaporkan "suara siap" padahal jalur pelajaran adalah yang lain - laporan
+// yang benar tentang hal yang salah.
+assert.ok(/testNeuralVoice\(\)\{[^}]*FiezelVoiceSay/.test(app),'Tes suara harus menguji pintu bicara yang dipakai pelajaran');
 assert.ok(sw.includes("COEP_POLICY='credentialless'"));
 assert.ok(sw.includes("'same-origin-allow-popups'"));
 assert.ok(sw.includes('Third-party SDK/API traffic is deliberately left to the browser'));

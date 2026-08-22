@@ -25,12 +25,19 @@ const pass=name=>console.log(`PASS ${name}`);
 
   const app=read('app.js');
   assert.ok(app.includes("neuralVoice:'auto'"),'preferences must persist a neural voice choice');
-  assert.ok(app.includes('id="neuralVoiceSelect"'),'Skills Lab must render a voice selector');
-  assert.ok(app.includes('function setNeuralVoicePreference('),'selector must have a persistence handler');
-  assert.ok(app.includes("$('neuralVoiceSelect')?.addEventListener('change'"),'selector change must be wired');
+  // m025-96: pemilih model suara dicabut. Id suaranya milik mesin lokal (af_bella,
+  // af_heart) dan tidak berarti apa-apa bagi mesin yang sekarang dipakai, jadi kendali
+  // itu tidak lagi mengendalikan apa pun - dan kendali mati lebih buruk daripada tidak
+  // ada kendali sama sekali.
+  assert.ok(!app.includes('id="neuralVoiceSelect"'),'pemilih suara yang tidak berfungsi tidak boleh digambar');
   assert.ok(app.includes('function testNeuralVoice('),'UI must expose a voice test action');
-  assert.ok(app.includes('voice:neuralVoiceFor(options)'),'runtime calls must route through the selected voice');
-  assert.ok(app.includes("runtime.speak('Hello. This is your selected FIEZEL neural voice.'"),'test action must invoke the neural runtime');
+  // Kecepatan bicara SEBALIKNYA dipertahankan: kalibrasinya disusun OWNER lintas tiga
+  // build, jadi ia dihidupkan lagi lewat playbackRate di pemutar.
+  assert.ok(app.includes('id="neuralRateInput"'),'penggeser kecepatan harus tetap ada');
+  assert.ok(app.includes('speed:selectedNeuralRate()'),'kecepatan pilihan harus sampai ke mesin');
+  const engine = fs.readFileSync('features/neural-voice/fiezel-puter-voice.js','utf8');
+  assert.ok(/audio\.playbackRate/.test(engine),'kecepatan harus benar-benar diterapkan di pemutar');
+  assert.ok(/say\.say\('Hello Jahran/.test(app),'tombol tes harus memanggil pintu bicara yang dipakai pelajaran');
   pass('product UI exposes and persists neural voice selection');
 
   const helperNames=['neuralVoiceCatalog','selectedNeuralVoice','neuralVoiceFor','setNeuralVoicePreference'];

@@ -5,7 +5,6 @@ const assert=require('assert');
 
 async function main(){
   const preSource=fs.readFileSync('features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js','utf8');
-  const bundleSource=fs.readFileSync('features/neural-voice/fiezel-voice-bundle-gate.js','utf8');
   const indexSource=fs.readFileSync('index.html','utf8');
 
   // 1) Apple standalone creation must roll sentence buffering back to a larger bounded render.
@@ -93,11 +92,12 @@ async function main(){
   assert.doesNotMatch(indexSource,/fiezel-m0281-runtime-guard\.js/,
     'index tidak boleh memuat penjaga yang sudah dihapus');
 
-  // 5) m025-95: gerbang unduhan wajib dimatikan. Suara dirender di server, jadi tidak
-  //    ada bundel yang perlu disiapkan sebelum FIEZEL bisa bicara - dan sheet wajib itu
-  //    persis tembok yang membuat pengguna berhenti di onboarding.
-  assert.match(bundleSource,/function shouldPrompt\(status\) \{[\s\S]*?return false;\n  \}/,
-    'gerbang unduhan harus mati untuk semua masukan');
+  // 5) m025-96: gerbang unduhan tidak lagi dimatikan melainkan DIHAPUS. Suara dirender
+  //    di server, jadi tidak ada bundel yang perlu disiapkan sebelum FIEZEL bisa bicara.
+  assert.equal(fs.existsSync('features/neural-voice/fiezel-voice-bundle-gate.js'),false,
+    'gerbang unduhan harus tetap terhapus');
+  assert.doesNotMatch(indexSource,/fiezel-voice-bundle-gate\.js/,
+    'index tidak boleh memuat gerbang yang sudah dihapus');
 
   // 6) No dead staging module or extra load-order mutation may remain.
   assert.equal(fs.existsSync('features/neural-voice/fiezel-m0282-audioedge-hotfix.js'),false,'unwired staging module must be removed');
