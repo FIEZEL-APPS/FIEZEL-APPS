@@ -686,6 +686,14 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .coach-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:#171d31;background:#d8b36b}.coach-icon svg{width:21px;height:21px}
 .coach-level{display:flex;justify-content:space-between;align-items:end;margin:34px 0 22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
 .coach-level span{color:#afb2c4;font-size:.72rem}.coach-level strong{font:600 2.4rem Georgia,"Times New Roman",serif;color:#d9d3ff}
+/* m025-99 (brief 3.7): kartu Coach kini menampilkan RINGKASAN, dan detailnya ada di balik
+   tombol "Buka analisis personal" tepat di bawahnya. Pagar tinggi di sini adalah jaring
+   pengaman kedua: dua kalimat pun bisa panjang, dan kartu ini tidak boleh lagi mendorong
+   seluruh Home ke bawah seperti sebelum rilis ini. */
+.coach-body{margin:0 0 4px}
+.coach-body>p{margin:0 0 8px}
+.coach-body>p:last-child{margin-bottom:0}
+.coach-body strong{color:var(--gold);font-weight:700}
 .coach-preview h2{font-size:1.35rem;line-height:1.25;letter-spacing:-.025em;margin:0 0 10px}.coach-preview p{color:#b7bacb;line-height:1.62;font-size:.83rem;margin:0 0 24px}
 .coach-link{margin-top:auto;padding:0;justify-content:flex-start;color:#f6f5fa;background:transparent;border:0;box-shadow:none}.coach-link:hover{transform:translateX(3px);box-shadow:none;border-color:transparent}
 
