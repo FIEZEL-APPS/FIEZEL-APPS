@@ -60,11 +60,16 @@ const ADAPTER_PATH = 'features/neural-voice/fiezel-sherpa-vits-adapter.js';
     'no per-voice asset may exist; switching voice must never trigger a download');
 
   // --- 3. no re-download on reload or on a new release --------------------------
-  assert.match(SW, /vendor\/sherpa-vits\//,
-    'service worker must classify the sherpa runtime as a neural asset');
+  // m025-95: vendor/sherpa-vits dan vendor/sherpa-vits-id dihapus - keduanya sudah
+  // pensiun sejak m025-42 dan nol rujukan runtime. Yang benar-benar dimuat engine ini
+  // adalah supertonic-3, jadi itulah yang harus dikenali sw sebagai aset neural.
+  assert.match(SW, /vendor\/supertonic-3\//,
+    'service worker must classify the live neural runtime as a neural asset');
   const neuralMatcher = SW.slice(SW.indexOf('const isNeuralAsset='), SW.indexOf('const shellScope='));
-  assert.match(neuralMatcher, /sherpa-vits/,
-    'isNeuralAsset must match sherpa so it is served from the stable cache');
+  assert.match(neuralMatcher, /supertonic-3/,
+    'isNeuralAsset must match the live runtime so it is served from the stable cache');
+  assert.ok(!/sherpa-vits/.test(neuralMatcher),
+    'jalur vendor yang sudah dihapus tidak boleh disebut lagi');
   // The stable cache must stay bound to app version, never to SW_REV, or every release
   // wipes the 92MB model and forces a fresh download.
   assert.match(SW, /const CACHE=`fiezel-v\$\{self\.FIEZEL_VERSION\}`/,

@@ -5,7 +5,6 @@ const assert=require('assert');
 
 async function main(){
   const preSource=fs.readFileSync('features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js','utf8');
-  const guardSource=fs.readFileSync('features/neural-voice/fiezel-m0281-runtime-guard.js','utf8');
   const bundleSource=fs.readFileSync('features/neural-voice/fiezel-voice-bundle-gate.js','utf8');
   const indexSource=fs.readFileSync('index.html','utf8');
 
@@ -86,47 +85,25 @@ async function main(){
   assert.doesNotMatch(preSource,/pending\s*>\s*0\s*\|\|\s*typeof inner\.prefetch/,
     'the emergency serializer must not starve audiobook next-line prefetch');
 
-  // 4) Indonesian verification must terminate from shared readiness without a second worker.
-  let originalPrepareCalls=0;
-  let timer=null;
-  const stable=Object.freeze({
-    speak:async()=>({provider:'stable'}), stop(){},
-    status:()=>({prepared:true,assetsCached:true,ready:true,audibleVerified:true}),
-    prepare:async()=>({}), ensureReady:async()=>({})
-  });
-  const verifyRoot={console,Promise,FiezelVoiceRuntime:stable,
-    FiezelIndonesianVoice:Object.freeze({
-      status:()=>({prepared:false,ready:false,error:''}),
-      prepare:async()=>{originalPrepareCalls++;return{};},
-      speak:async()=>({provider:'id'})
-    }),
-    document:{getElementById:()=>null},setTimeout:fn=>{timer=fn;return 1;}}
-  verifyRoot.globalThis=verifyRoot;
-  vm.runInNewContext(guardSource,verifyRoot);
-  const idStatus=verifyRoot.FiezelIndonesianVoice.status();
-  assert.equal(idStatus.prepared,true);
-  assert.equal(idStatus.ready,false,'M028.2 must not fabricate Indonesian generation readiness');
-  assert.equal(idStatus.sharedRuntimeReady,true);
-  assert.equal(idStatus.verificationComplete,true);
-  assert.equal(idStatus.generationDeferred,true);
-  assert.equal(idStatus.verificationState,'shared-base-verified');
-  const prepared=await verifyRoot.FiezelIndonesianVoice.prepare();
-  assert.equal(prepared.verificationComplete,true,'prepare must settle as shared verification complete');
-  assert.equal(originalPrepareCalls,0,'shared verification must not create Indonesian Supertonic worker');
-  if(timer) timer();
+  // 4) m025-95: verifikasi suara Indonesia dihapus bersama mesinnya, dan penjaga
+  //    runtime M028.2 ikut dihapus karena seluruh isinya adalah blok itu. Yang dijaga
+  //    sekarang adalah keduanya benar-benar tidak kembali diam-diam.
+  assert.equal(fs.existsSync('features/neural-voice/fiezel-m0281-runtime-guard.js'),false,
+    'penjaga runtime M028.2 harus tetap terhapus');
+  assert.doesNotMatch(indexSource,/fiezel-m0281-runtime-guard\.js/,
+    'index tidak boleh memuat penjaga yang sudah dihapus');
 
-  // 5) Mandatory voice gate completion is based on prepared state, not generation-ready.
-  assert.match(bundleSource,/return\s+!\(s\.englishPrepared\s*&&\s*s\.indonesianPrepared\)/,
-    'voice bundle sheet must close when both shared bundles are prepared');
-  assert.doesNotMatch(bundleSource,/function indonesianPrepared\(\)[\s\S]{0,260}\.ready/,
-    'bundle preparation gate must not wait for Indonesian generation ready');
+  // 5) m025-95: gerbang unduhan wajib dimatikan. Suara dirender di server, jadi tidak
+  //    ada bundel yang perlu disiapkan sebelum FIEZEL bisa bicara - dan sheet wajib itu
+  //    persis tembok yang membuat pengguna berhenti di onboarding.
+  assert.match(bundleSource,/function shouldPrompt\(status\) \{[\s\S]*?return false;\n  \}/,
+    'gerbang unduhan harus mati untuk semua masukan');
 
   // 6) No dead staging module or extra load-order mutation may remain.
   assert.equal(fs.existsSync('features/neural-voice/fiezel-m0282-audioedge-hotfix.js'),false,'unwired staging module must be removed');
   assert.doesNotMatch(indexSource,/fiezel-m0282-audioedge-hotfix\.js/,'index must not carry an extra hotfix script');
   assert.match(preSource,/fiezel-m0282-prebootstrap-integrity-v2/);
-  assert.match(guardSource,/fiezel-m0282-runtime-guard-v2/);
 
-  console.log('PASS M028.2 seam/buffer/PCM-edge/Indonesian-verification integrity');
+  console.log('PASS M028.2 seam/buffer/PCM-edge integrity + m025-95 pembongkaran suara Indonesia');
 }
 main().catch(error=>{console.error(error);process.exit(1);});

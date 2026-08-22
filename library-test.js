@@ -136,7 +136,9 @@ test('Ask Fiezel is on every reading, model first and local second', () => {
   assert.match(ui, /libraryAskOne/, 'and so does a tapped sentence');
   assert.match(ui, /askFiezelAI/, 'the Core AI gateway is tried');
   assert.match(ui, /FiezelTutorDialog/, 'with the local engine behind it');
-  assert.match(ui, /speakIndonesian/, 'the answer is spoken, not only printed');
+  // m025-95: jawaban dibacakan dalam Inggris dengan subtitle Indonesia.
+  assert.match(ui, /speakAnswer/, 'the answer is spoken, not only printed');
+  assert.match(ui, /FiezelVoiceSay/, 'speech goes through the one shared English+subtitle path');
 });
 
 test('the library is wired into the app, precached, and reachable from Home', () => {
