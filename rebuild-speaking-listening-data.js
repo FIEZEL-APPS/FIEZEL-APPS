@@ -40,6 +40,25 @@ const sampleRepairs={
   speak_0010:'This weekend, I am going to practice coding and meet my friends.',
   speak_0021:'Studying alone helps me focus, while studying with friends is useful for discussion. I prefer studying alone because I concentrate better on difficult topics.'
 };
+// m025-108: bank listening diperluas atas permintaan OWNER - 200 soal per level.
+//
+// Item hasil susunan diberi awalan listen_gen_ dan DIBUANG lebih dulu setiap rebuild,
+// lalu disusun ulang dari bahan sumbernya. Tanpa pembuangan itu, menjalankan rebuild dua
+// kali akan menggandakan banknya - dan tes idempotensi akan menangkapnya, tetapi hanya
+// setelah berkasnya terlanjur rusak.
+//
+// Susunannya sepenuhnya deterministik: tidak ada pengacakan, sehingga rebuild kedua
+// menghasilkan berkas yang sama persis.
+const listeningGenerate=require(path.join(feature,'listening-generate.js'));
+const listeningSources=Object.assign({},
+  require(path.join(feature,'listening-source-a1-a2.js')),
+  require(path.join(feature,'listening-source-b1-b2.js')),
+  require(path.join(feature,'listening-source-c1-c2.js')));
+const seedItems=listening.items.filter(item=>!String(item.id||'').startsWith('listen_gen_'));
+const generatedItems=Object.keys(listeningSources).sort().reduce(
+  (acc,level)=>acc.concat(listeningGenerate.buildLevel(level,listeningSources[level])),[]);
+listeningGenerate.assertSound(seedItems.concat(generatedItems));
+listening.items=seedItems.concat(generatedItems);
 listening.version=2;
 listening.status='reviewed_release_seed';
 listening.items=listening.items.map((item,index)=>({...item,voice:voices[index%voices.length],audioProfile:'listening'}));
@@ -55,4 +74,4 @@ listening.count=listening.items.length;
 speaking.count=speaking.items.length;
 fs.writeFileSync(listeningPath,JSON.stringify(listening,null,2)+'\n');
 fs.writeFileSync(speakingPath,JSON.stringify(speaking,null,2)+'\n');
-console.log(JSON.stringify({listening:listening.count,speaking:speaking.count,voices,conceptItems:Object.keys(concepts).length,status:'rebuilt'}));
+console.log(JSON.stringify({listening:listening.count,listeningSeed:seedItems.length,listeningGenerated:generatedItems.length,speaking:speaking.count,voices,conceptItems:Object.keys(concepts).length,status:'rebuilt'}));
