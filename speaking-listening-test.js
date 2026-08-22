@@ -53,6 +53,44 @@ test('canonical learner state is never referenced',()=>assert.ok(!runtimeText.in
 test('raw transcript and audio persistence stay disabled',()=>{const cfg=runtime.__test.mergeConfig({persistRawAudio:true,persistRawTranscript:true});assert.equal(cfg.persistRawAudio,false);assert.equal(cfg.persistRawTranscript,false)});
 test('capability metadata is bounded and sanitized',()=>{const capabilityEvents={};for(let i=0;i<30;i++)capabilityEvents['capability-'+i]={status:'x'.repeat(100),at:Number.MAX_SAFE_INTEGER,raw:'forbidden'};const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[],capabilityEvents},120);assert.ok(Object.keys(clean.capabilityEvents).length<=12);assert.ok(Object.values(clean.capabilityEvents).every(value=>Object.keys(value).sort().join(',')==='at,status'&&value.status.length<=40))});
 test('state sanitizer strips raw media claims',()=>{const clean=runtime.__test.sanitizeState({schema:'fiezel-speaking-listening-state-v1',events:[{domain:'speaking',itemId:'x',level:'B1',mode:'roleplay',score:88,passed:true,responseMs:1000,rawAudioStored:true,rawTranscriptStored:true,transcript:'secret'}]},120);assert.equal(clean.events[0].rawAudioStored,false);assert.equal(clean.events[0].rawTranscriptStored,false);assert.ok(!JSON.stringify(clean).includes('secret'))});
+// m025-110: OWNER meminta urutan soal berubah setiap kali sesi dibuka dan tidak bisa
+// ditebak. Yang dijaga di sini adalah pengacakan itu terjadi DI SESI, bukan di bank -
+// bank harus tetap identik setiap rebuild, dan mengacak sumbernya akan membuat tes
+// idempotensi di bawah merah setiap kali dijalankan.
+test('urutan sesi diacak, bank soal tidak',()=>{
+  const {shuffle}=runtime.__test;
+  const base=Array.from({length:24},(_,i)=>i);
+  const snapshot=base.join(',');
+  const a=shuffle(base),b=shuffle(base);
+  assert.equal(base.join(','),snapshot,'shuffle mengacak larik aslinya, bukan salinannya');
+  assert.notEqual(a.join(','),b.join(','),'dua sesi berturut-turut mendapat urutan sama');
+  assert.equal(a.slice().sort((x,y)=>x-y).join(','),snapshot,'ada soal hilang atau ganda setelah diacak');
+});
+test('pengacakan tidak memihak posisi awal',()=>{
+  // Pengacakan yang memihak membuat soal pertama bisa ditebak, yang persis keluhan OWNER.
+  const {shuffle}=runtime.__test;
+  const base=Array.from({length:10},(_,i)=>i),count={};
+  for(let t=0;t<4000;t++){const s=shuffle(base);count[s[0]]=(count[s[0]]||0)+1}
+  const v=Object.values(count);
+  assert.equal(v.length,10,'tidak semua soal pernah muncul pertama');
+  assert.ok((Math.max(...v)-Math.min(...v))/4000<0.03,'sebaran posisi pertama timpang: '+v.join('/'));
+});
+test('sesi mengambil soal lewat jalur yang diacak',()=>{
+  const src=fs.readFileSync(path.join(feature,'fiezel-speaking-listening-addon.js'),'utf8');
+  assert.ok(/return shuffle\(rows\.filter/.test(src),'pemilih soal sesi tidak mengacak');
+});
+// OWNER: tombol Lanjut terkubur di bawah blok umpan balik dan harus dicari dengan
+// menggulir. Blok itu memuat naskah lengkap, jadi pada soal panjang tombolnya berada
+// jauh di luar layar tepat ketika ia paling dibutuhkan.
+test('tombol Lanjut Skills Lab mengambang, tidak ikut tergulung',()=>{
+  const css=fs.readFileSync(path.join(feature,'speaking-listening-addon.css'),'utf8');
+  assert.ok(/\.fsl-feedback \.fsl-actions\{[^}]*position:fixed/.test(css),
+    'tombol Lanjut tidak mengambang');
+  // Hanya blok umpan balik yang diangkat: .fsl-actions juga dipakai tombol mulai dan
+  // rekam, dan membuat semuanya mengambang akan menutupi soalnya.
+  assert.ok(!/^\.fsl-actions\{[^}]*position:fixed/m.test(css),
+    'seluruh .fsl-actions ikut mengambang dan akan menutupi soal');
+});
 test('data rebuild is idempotent',()=>{const files=[path.join(feature,'listening-bank-v1.json'),path.join(feature,'speaking-bank-v1.json')],before=files.map(hash);child.execFileSync(process.execPath,[path.join(root,'rebuild-speaking-listening-data.js')],{stdio:'ignore'});assert.deepStrictEqual(files.map(hash),before)});
 // m025-65: replay pengguna kini benar-benar disimpan pada event. Sebelumnya controller
 // menghitungnya lalu membuangnya, sehingga R3 harus melaporkan replay sebagai "belum terukur"
