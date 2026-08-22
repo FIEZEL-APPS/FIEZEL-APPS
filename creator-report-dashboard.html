@@ -40,6 +40,7 @@
     <section class="content">
       <article class="panel"><h2>Skill profile terbaru</h2><div id="domains" class="domains"><div class="empty">Belum ada data.</div></div><div id="weak" class="weak"></div></article>
       <article class="panel"><h2>Aktivitas terkini</h2><div id="reports" class="report-list"><div class="empty">Belum ada laporan.</div></div></article>
+      <article class="panel"><h2>Masukan pengguna</h2><div id="feedbackTop" class="weak"></div><div id="feedbackList" class="report-list"><div class="empty">Belum ada masukan.</div></div></article>
     </section>
     <p class="foot">Creator Hub terikat ke akun learner pertama yang mengirim laporan. Dashboard hanya dapat dibuka oleh akun Puter yang memiliki Worker tersebut.</p>
   </main>
@@ -111,10 +112,53 @@
           var data=await response.json();
           if(!response.ok||data.ok===false)throw new Error(data.error||'Creator Hub merespons '+response.status);
           localStorage.setItem('fiezel-creator-endpoint',endpoint);
-          render(data);status.className='status';status.textContent='Sinkron terakhir '+reportDate(new Date().toISOString())+'. Auto-refresh aktif setiap 60 detik.';
+          render(data);loadFeedback(endpoint);status.className='status';status.textContent='Sinkron terakhir '+reportDate(new Date().toISOString())+'. Auto-refresh aktif setiap 60 detik.';
         }catch(error){
           status.className='status error';status.textContent='Laporan tidak dapat dimuat: '+String(error&&error.message||error);
         }finally{loadButton.disabled=false}
+      }
+      /**
+       * m025-102 masukan pengguna.
+       *
+       * OWNER memilih kiriman TERBUKA tanpa login, jadi teks di panel ini datang dari
+       * orang yang tidak dikenali. Karena itu setiap nilainya ditulis lewat textContent
+       * dan tidak pernah lewat innerHTML: masukan tidak tepercaya yang dirender sebagai
+       * markup adalah jalan masuk serangan ke halaman OWNER sendiri. Worker sudah
+       * membuang penanda sudut, tetapi itu jaring kedua - yang menentukan ada di sini.
+       *
+       * Pencarian nihil diringkas jadi baris berhitung lebih dulu, karena "dua belas
+       * orang mencari did" adalah prioritas konten, sedangkan dua belas baris identik
+       * hanyalah kebisingan.
+       */
+      function renderFeedback(data){
+        var top=document.getElementById('feedbackTop');
+        var list=document.getElementById('feedbackList');
+        top.textContent='';list.textContent='';
+        var queries=(data&&data.topQueries)||[];
+        queries.forEach(function(q){
+          var row=document.createElement('div');row.className='weak-row';
+          var name=document.createElement('span');name.textContent=String(q.query||'');
+          var value=document.createElement('span');value.textContent='dicari '+String(q.count||0)+'x, materi belum ada';
+          row.append(name,value);top.append(row);
+        });
+        var items=(data&&data.items)||[];
+        if(!items.length){var empty=document.createElement('div');empty.className='empty';empty.textContent='Belum ada masukan.';list.append(empty);return}
+        items.slice(0,40).forEach(function(item){
+          var row=document.createElement('div');row.className='report-row';
+          var title=document.createElement('span');
+          title.textContent=item.kind==='missing_material'?('Materi diminta: '+String(item.query||'')):String(item.message||'');
+          var time=document.createElement('time');time.textContent=reportDate(item.at);
+          var kind=document.createElement('strong');kind.textContent=item.kind==='missing_material'?'materi':'catatan';
+          row.append(title,time,kind);list.append(row);
+        });
+      }
+      async function loadFeedback(endpoint){
+        try{
+          var response=await puter.workers.exec(endpoint+'/api/feedback/list',{method:'GET'});
+          var data=await response.json();
+          if(!response.ok)return;   // bukan OWNER, atau belum ada apa-apa: diam saja
+          renderFeedback(data);
+        }catch(error){/* panel masukan tidak boleh menjatuhkan laporan utama */}
       }
       loadButton.addEventListener('click',loadReports);
       csvButton.addEventListener('click',function(){
