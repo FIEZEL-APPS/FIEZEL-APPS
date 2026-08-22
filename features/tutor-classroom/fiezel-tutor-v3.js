@@ -508,26 +508,29 @@
       }
     }
 
+    /**
+     * m025-95: suara Indonesia dihapus, jadi paket belajar tidak lagi punya sisi kedua.
+     * Classroom bicara Inggris dengan subtitle Indonesia, dan tidak ada lagi yang perlu
+     * diunduh sebelum ia bisa bersuara.
+     */
     function bundleStatus() {
-      var id = root.FiezelIndonesianVoice && typeof root.FiezelIndonesianVoice.status === 'function'
-        ? root.FiezelIndonesianVoice.status() : { prepared: false, ready: false, error: 'module_missing' };
+      var voice = root.FiezelPuterVoice && typeof root.FiezelPuterVoice.status === 'function'
+        ? root.FiezelPuterVoice.status() : { ready: false, error: 'module_missing' };
       return Object.freeze({
         schema: 'fiezel-learning-bundle-v1',
         classroom: true,
         classroomSpeech: 'en-US neural',
         classroomSubtitle: 'id-ID semantic',
-        indonesianVoicePrepared: !!id.prepared,
-        indonesianVoiceReady: !!id.ready,
-        indonesianModel: id.model || '',
-        error: id.error || ''
+        voiceReady: !!voice.ready,
+        requiresDownload: false,
+        error: voice.error || ''
       });
     }
 
-    async function prepareLearningBundle(onProgress) {
-      if (!root.FiezelIndonesianVoice || typeof root.FiezelIndonesianVoice.prepare !== 'function') {
-        throw new Error('indonesian_bundle_module_missing');
-      }
-      return root.FiezelIndonesianVoice.prepare({ onProgress: onProgress });
+    // Tidak ada lagi yang disiapkan: mesin suara tidak menuntut unduhan. Fungsinya
+    // dipertahankan supaya pemanggil lama tidak melempar, dan langsung selesai.
+    async function prepareLearningBundle() {
+      return bundleStatus();
     }
 
     root.FiezelLearningBundle = Object.freeze({

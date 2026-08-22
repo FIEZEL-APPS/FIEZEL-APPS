@@ -103,3 +103,41 @@ ok(sw.includes('fiezel-puter-voice.js'), 'sw.js belum menyimpan mesin suara Pute
 ok(sw.includes('fiezel-subtitle.js'), 'sw.js belum menyimpan modul subtitle di shell');
 
 console.log('m025-92 puter voice + subtitle: ' + passed + ' pemeriksaan lolos');
+
+/* ---- m025-95 pintu bicara bersama ------------------------------------- */
+
+// Modul ini memuat FiezelSubtitle dan FiezelPuterVoice dari global, jadi keduanya
+// dipasang dulu sebagai tiruan sebelum modulnya dibaca.
+(function () {
+  const say = require('./features/neural-voice/fiezel-voice-say.js');
+  ok(typeof say.say === 'function', 'pintu bicara bersama tidak mengekspos say()');
+  ok(typeof say.stop === 'function', 'pintu bicara bersama tidak mengekspos stop()');
+
+  // Tanpa kalimat Inggris tidak ada yang bisa diucapkan - baris Indonesia saja tidak
+  // cukup, dan memaksakannya akan membuat subtitle muncul tanpa suara apa pun.
+  say.say({ id: 'Halo Jahran.' }).then((r) => {
+    ok(r === false, 'baris Indonesia tanpa kalimat Inggris seharusnya tidak berbunyi');
+  });
+  say.say('').then((r) => { ok(r === false, 'teks kosong seharusnya diam'); });
+
+  const src = fs.readFileSync(path.join(__dirname, 'features/neural-voice/fiezel-voice-say.js'), 'utf8');
+
+  // Dialog tutor sudah berpasangan {en, id}. Kalau pintu ini tetap menerjemahkan
+  // padahal barisnya sudah ada, tiap jawaban tutor memakan satu jatah AI tanpa guna.
+  ok(/if \(ready\)/.test(src) && src.indexOf('if (ready)') < src.indexOf('translate('),
+    'terjemahan harus dilewati ketika baris Indonesia sudah tersedia');
+
+  // Menunggu terjemahan sebelum berbunyi akan menambah jeda di depan setiap kalimat
+  // dan membuat gangguan jaringan terdengar seperti aplikasi menggantung.
+  ok(!/await prepareSubtitle|return prepareSubtitle\([^)]*\)\.then\(function \(\) \{\s*return voice/.test(src),
+    'suara tidak boleh menunggu terjemahan selesai');
+
+  // Satu tempat untuk keputusan bicara: itu seluruh alasan modul ini ada.
+  const chat = fs.readFileSync(path.join(__dirname, 'features/tutor-classroom/fiezel-tutor-voice-chat.js'), 'utf8');
+  const lib = fs.readFileSync(path.join(__dirname, 'features/library/fiezel-library-ui.js'), 'utf8');
+  ok(/FiezelVoiceSay/.test(chat), 'tutor tidak lewat pintu bersama');
+  ok(/FiezelVoiceSay/.test(lib), 'Library tidak lewat pintu bersama');
+  ok(!/FiezelIndonesianVoice/.test(chat + lib), 'masih ada pemanggil mesin Indonesia');
+})();
+
+console.log('m025-95 voice-say: pemeriksaan pintu bicara bersama lolos');

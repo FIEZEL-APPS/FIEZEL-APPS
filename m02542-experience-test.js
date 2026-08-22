@@ -73,14 +73,14 @@ test('the zoom lock is loaded and precached, and never blocks single-finger inpu
 
 // ---- 4. one-batch voice download ---------------------------------------------------
 
-test('the download is mandatory: the sheet stays until both bundles exist', () => {
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false }), true, 'fresh install asks');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: false }), true, 'half installed still asks');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: true }), false, 'gone for good once both exist');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, downloading: true }), true,
-    'the sheet remains on screen while the download runs');
-  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false, dismissed: true }), true,
-    'there is no dismissal path any more');
+test('m025-95: tidak ada lagi unduhan, jadi sheet tidak pernah muncul', () => {
+  // Suara dirender di server; tembok unduhan di onboarding itulah yang dibuang.
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: false, indonesianPrepared: false }), false, 'fresh install tidak lagi ditahan');
+  // Gerbangnya mati untuk SEMUA masukan: tidak ada lagi keadaan yang bisa menahan
+  // pengguna di layar unduhan, termasuk keadaan setengah terpasang dari versi lama.
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: false }), false, 'setengah terpasang pun tidak ditahan');
+  assert.strictEqual(gate.shouldPrompt({ englishPrepared: true, indonesianPrepared: true }), false, 'tidak pernah muncul');
+  assert.strictEqual(gate.shouldPrompt({}), false, 'status kosong pun tidak menahan');
   assert.ok(!/voiceBundleLater|Nanti saja/.test(gateSrc), 'the "later" button must not exist');
   assert.match(gateSrc, /voice-bundle-locked/, 'the app is held while a bundle is missing');
 });
@@ -209,7 +209,10 @@ test('the round button exists, answers by voice, and never falls back to browser
   assert.ok(!/tutor-talk-log/.test(tutorCss), 'and no styles for one may linger');
   assert.match(chatSrc, /function showAnswer/, 'the answer lands in the lesson subtitle');
   assert.ok(!/speechSynthesis|SpeechSynthesisUtterance/.test(chatSrc), 'browser TTS is never used');
-  assert.match(chatSrc, /allowFallback: false/, 'neural only, both paths');
+  // m025-95: pilihan cadangan tidak lagi diputuskan di sini. Mesin Puter tidak punya
+  // jalur cadangan browser sama sekali, dan seluruh keputusan bicara pindah ke satu
+  // pintu bersama - jadi yang dijaga adalah tutor memakai pintu itu, bukan benderanya.
+  assert.match(chatSrc, /FiezelVoiceSay/, 'tutor bicara lewat pintu bersama');
   // AI first, local engine second: an offline learner must still get an answer.
   const answerFn = chatSrc.slice(chatSrc.indexOf('function answer(question)'));
   assert.ok(answerFn.indexOf('aiAnswer(') < answerFn.indexOf('localAnswer('),
