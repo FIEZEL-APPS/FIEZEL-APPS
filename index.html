@@ -173,6 +173,10 @@ html.fz-booting body{overflow:hidden}
     <div class="modal-panel" id="modalPanel"></div>
   </div>
 
+  <!-- Peredup di dasar layar. Konten memudar SEBELUM sampai ke tab bar, jadi tidak ada lagi
+       angka yang terbaca samar di balik pill saat bergulir - lihat .nav-scrim di style.css
+       untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
+  <div class="nav-scrim" aria-hidden="true"></div>
   <nav class="bottomnav" aria-label="Navigasi utama">
     <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i data-lucide="house"></i><span>Home</span></button>
     <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>

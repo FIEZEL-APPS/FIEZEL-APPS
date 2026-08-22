@@ -48,7 +48,7 @@
      stacked on boxes. Three weights only, so surfaces stay comparable. */
   --glass-thin:rgba(255,255,255,.50);
   --glass-regular:rgba(255,255,255,.62);
-  --glass-thick:rgba(255,255,255,.72);
+  --glass-thick:rgba(255,255,255,.72);--glass-solid:rgba(255,255,255,.97);
   --glass-edge:rgba(255,255,255,.85);
   --glass-blur:blur(28px) saturate(180%);
   --glass-blur-heavy:blur(40px) saturate(180%);
@@ -93,11 +93,11 @@ body{
 /* Glass has to invert with the sky, or a white pane at midnight is a lamp in the face.
    Each phase carries its own material weights; every surface below reads them. */
 .scene-day,.scene-dawn{--ambient-text:#1d1114;--ambient-muted:#6b545a;--chrome-bg:rgba(251,246,246,.74);--launcher-start:rgba(29,10,15,.74);--launcher-end:rgba(74,26,38,.70);
-  --glass-thin:rgba(255,255,255,.50);--glass-regular:rgba(255,255,255,.62);--glass-thick:rgba(255,255,255,.74);--glass-edge:rgba(255,255,255,.85);--glass-text:#1b1418;--glass-muted:#6b5a60;--glass-line:rgba(27,20,24,.08)}
+  --glass-thin:rgba(255,255,255,.50);--glass-regular:rgba(255,255,255,.62);--glass-thick:rgba(255,255,255,.74);--glass-solid:rgba(255,255,255,.97);--glass-edge:rgba(255,255,255,.85);--glass-text:#1b1418;--glass-muted:#6b5a60;--glass-line:rgba(27,20,24,.08)}
 .scene-dusk{--ambient-text:#fdf4f4;--ambient-muted:#e8d5d8;--chrome-bg:rgba(47,23,31,.60);--launcher-start:rgba(31,12,18,.77);--launcher-end:rgba(72,38,49,.72);
-  --glass-thin:rgba(56,28,36,.52);--glass-regular:rgba(56,28,36,.64);--glass-thick:rgba(45,22,29,.76);--glass-edge:rgba(255,236,238,.20);--glass-text:#fdf4f4;--glass-muted:#e0c8cd;--glass-line:rgba(255,236,238,.14)}
+  --glass-thin:rgba(56,28,36,.52);--glass-regular:rgba(56,28,36,.64);--glass-thick:rgba(45,22,29,.76);--glass-solid:rgba(45,22,29,.97);--glass-edge:rgba(255,236,238,.20);--glass-text:#fdf4f4;--glass-muted:#e0c8cd;--glass-line:rgba(255,236,238,.14)}
 .scene-night{--ambient-text:#fdf4f6;--ambient-muted:#dfc9cf;--chrome-bg:rgba(26,12,18,.64);--launcher-start:rgba(18,7,11,.84);--launcher-end:rgba(60,26,38,.78);
-  --glass-thin:rgba(38,18,25,.56);--glass-regular:rgba(38,18,25,.68);--glass-thick:rgba(30,14,20,.80);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
+  --glass-thin:rgba(38,18,25,.56);--glass-regular:rgba(38,18,25,.68);--glass-thick:rgba(30,14,20,.80);--glass-solid:rgba(30,14,20,.97);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
 /* m025-85 kontras: blok .scene-* di atas dipasang pada <body>, sedangkan palet gelap
    dipasang pada <html>. Untuk apa pun DI DALAM body, nilai milik body-lah yang diwarisi -
    spesifisitas tidak ikut bicara. Akibatnya 12 token kaca/ambient versi gelap tidak pernah
@@ -108,11 +108,11 @@ body{
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]) body.scene-day,:root:not([data-theme="light"]) body.scene-dawn{
     --ambient-text:#fdf4f6;--ambient-muted:#cbb3ba;--chrome-bg:rgba(28,16,21,.74);--launcher-start:rgba(14,6,10,.86);--launcher-end:rgba(56,26,36,.80);
-    --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
+    --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-solid:rgba(32,17,23,.97);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
 }
 :root[data-theme="dark"] body.scene-day,:root[data-theme="dark"] body.scene-dawn{
   --ambient-text:#fdf4f6;--ambient-muted:#cbb3ba;--chrome-bg:rgba(28,16,21,.74);--launcher-start:rgba(14,6,10,.86);--launcher-end:rgba(56,26,36,.80);
-  --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
+  --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-solid:rgba(32,17,23,.97);--glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12)}
 
 button{
   font:inherit;
@@ -568,7 +568,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
     --accent:#e0708a;--accent-strong:#f093a8;--accent-soft:#3a1f27;
     --black:#8C2233;--gold:#e3c07d;
     --green:#4fc79b;--green-soft:#16302a;--red:#f08098;--red-soft:#3a1c24;
-    --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);
+    --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-solid:rgba(32,17,23,.97);
     --glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12);
     --surface-rgb:32,21,26;--surface-pure-rgb:38,27,33;--bg-rgb:21,12,17;
     --surface-solid:#201519;--surface-tint:#261b21;--surface-warm:#241b1c;--surface-cool:#1a1c24;
@@ -589,7 +589,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --accent:#e0708a;--accent-strong:#f093a8;--accent-soft:#3a1f27;
   --black:#8C2233;--gold:#e3c07d;
   --green:#4fc79b;--green-soft:#16302a;--red:#f08098;--red-soft:#3a1c24;
-  --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);
+  --glass-thin:rgba(40,22,29,.55);--glass-regular:rgba(40,22,29,.68);--glass-thick:rgba(32,17,23,.80);--glass-solid:rgba(32,17,23,.97);
   --glass-edge:rgba(255,232,236,.16);--glass-text:#fdf4f6;--glass-muted:#d8bec5;--glass-line:rgba(255,232,236,.12);
 }
 /* --black memikul dua peran di berkas ini: permukaan tombol utama (teksnya dipaku #fff)
@@ -912,12 +912,38 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .launch-card b{font-size:15px;line-height:20px;font-weight:620;letter-spacing:-.2px}
 .launch-card small{font-size:13px;line-height:17px}
 
-/* The tab bar floats as one capsule of glass. */
+/* Tab bar mengapung sebagai satu kapsul.
+
+   m025-93 (brief redesign Bab 2, bug kritis #2): OWNER melaporkan "bottom navigation bar
+   menimpa konten saat scroll - teks/angka terpotong di belakang nav pill". Ini BUKAN soal
+   padding: ruang bawah .app sudah 112px + safe-area, sementara pill hanya memakan 73px.
+   Yang salah adalah pill-nya sendiri - diukur di peramban pada m025-91:
+
+       background:      rgba(255, 255, 255, 0.74)
+       backdrop-filter: none
+
+   m025-81 mencabut backdrop-filter dari chrome demi baterai, tetapi TRANSPARANSINYA
+   ditinggal. Token --glass-thick dirancang untuk kaca buram; tanpa blur ia hanya panel
+   bening, jadi 26% dari apa pun yang lewat di bawahnya menembus ke atas dan angka yang
+   sedang bergulir terbaca samar di balik pill.
+
+   Blur TIDAK dikembalikan - keputusan baterai m025-81 tetap berlaku. Yang dipakai adalah
+   pola yang sama dengan Spotify/Apple Music: konten diredupkan SEBELUM sampai ke tab bar
+   lewat satu lapisan gradien statis (lihat .nav-scrim), dan pill-nya sendiri dibuat cukup
+   pekat sehingga tidak pernah bisa dibaca tembus. Keduanya nol biaya render. */
 .bottomnav{
-  background:var(--glass-thick);
+  background:var(--glass-solid);
   border:.5px solid var(--glass-edge);border-radius:30px;padding:6px;
   box-shadow:0 1px 1px rgba(40,20,26,.05),0 14px 34px rgba(40,20,26,.14);
 }
+/* Peredup di dasar layar. pointer-events:none supaya ia tidak pernah menelan sentuhan, dan
+   ia duduk DI BAWAH pill (z-index 39 lawan 40) supaya tab tetap tajam di atasnya. */
+.nav-scrim{
+  position:fixed;left:0;right:0;bottom:0;z-index:39;pointer-events:none;
+  height:calc(96px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 34%,rgba(0,0,0,0));
+}
+@media (prefers-reduced-transparency:reduce){.nav-scrim{background:var(--bg)}}
 .nav{min-height:44px;color:var(--glass-muted);border-radius:24px}
 .nav.active{color:var(--accent);background:transparent;transform:none;font-weight:620}
 
