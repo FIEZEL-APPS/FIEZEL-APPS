@@ -10,7 +10,6 @@ const app = fs.readFileSync('app.js', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
 const sw = fs.readFileSync('sw.js', 'utf8');
 const tutorSource = fs.readFileSync('features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
-const voiceFix = fs.readFileSync('features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js', 'utf8');
 const tutorCss = fs.readFileSync('features/tutor-classroom/tutor-v3.css', 'utf8');
 const diag = fs.readFileSync('features/neural-voice/fiezel-diag-panel.js', 'utf8');
 
@@ -90,14 +89,14 @@ test('clean run completes with bounded evidence', () => {
 });
 
 test('Classroom speaks authored Indonesian tutor line through neural-only bundle', () => {
-  assert.ok(/FiezelIndonesianVoice/.test(voiceFix));
-  assert.ok(/indo\.speak|FiezelIndonesianVoice\.speak/.test(voiceFix));
-  assert.ok(/lang:\s*'id-ID'/.test(voiceFix));
-  assert.ok(/allowFallback:\s*false/.test(voiceFix));
-  assert.ok(/tutorSubtitle/.test(voiceFix));
-  assert.ok(/classroomSpeech:\s*'id-ID neural tutor'/.test(voiceFix));
-  assert.ok(/targetLanguage:\s*'en-US'/.test(voiceFix));
-  assert.ok(!/SpeechSynthesisUtterance|speechSynthesis\.speak/.test(voiceFix));
+  // m025-95: Classroom tidak lagi bersuara Indonesia. Yang dijaga sekarang adalah
+  // tutor bicara Inggris lewat satu pintu bersama, dengan subtitle Indonesia diambil
+  // dari pasangan {en, id} milik dialog - bukan dari terjemahan, supaya jatah AI aman.
+  const chat = fs.readFileSync('features/tutor-classroom/fiezel-tutor-voice-chat.js', 'utf8');
+  assert.ok(/FiezelVoiceSay/.test(chat), 'tutor bicara lewat pintu bersama');
+  assert.ok(!/FiezelIndonesianVoice/.test(chat), 'tutor tidak boleh memanggil mesin Indonesia');
+  assert.ok(!/lang:\s*'id-ID'/.test(chat), 'tidak ada lagi permintaan suara id-ID');
+  assert.ok(/reply\.en|input\.en|\.en\b/.test(chat), 'sisi Inggris dialog yang diucapkan');
   assert.strictEqual(pack.voiceContract.speech, 'id-ID neural tutor');
   assert.strictEqual(pack.voiceContract.targetLanguage, 'en');
   assert.ok(/pair\.en/.test(tutorSource), 'English remains authored target-language content');
@@ -157,14 +156,20 @@ test('integration loads correction after Tutor v3 and preserves five primary des
   assert.ok(app.includes("'classroom'")); assert.ok(app.includes("onclick=\"go('classroom')\""));
   assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5);
   assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
-  assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js'));
-  assert.ok(index.indexOf('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js') > index.indexOf('./features/tutor-classroom/fiezel-tutor-v3.js'));
+  // m025-95: tambalan suara Indonesia dihapus; Classroom kini bicara Inggris bersubtitle.
+  assert.ok(!index.includes('fiezel-tutor-indonesian-voice-fix.js'),
+    'tambalan suara Indonesia tidak boleh dimuat lagi');
+  assert.ok(index.includes('./features/neural-voice/fiezel-voice-say.js'),
+    'jalur bicara Inggris + subtitle harus dimuat');
 });
 test('PWA release identity is coherent and caches correction layer', () => {
   const diagBuild = (diag.match(/DIAG_BUILD\s*=\s*'([^']+)'/)||[])[1];
   assert.ok(diagBuild); assert.ok(sw.includes("const SW_REV='" + diagBuild + "-"));
   assert.ok(sw.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
-  assert.ok(sw.includes('./features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js'));
+  assert.ok(!sw.includes('fiezel-tutor-indonesian-voice-fix.js'),
+    'berkas yang sudah dihapus tidak boleh tersisa di daftar shell')
+  assert.ok(sw.includes('./features/neural-voice/fiezel-voice-say.js'),
+    'pintu bicara bersama harus ikut tersimpan di shell');
   assert.ok(sw.includes('./features/tutor-classroom/tutor-v3.css'));
 });
 console.log(`FIEZEL Classroom Indonesian tutor: PASS ${pass}/${pass}`);

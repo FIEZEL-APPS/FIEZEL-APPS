@@ -31,11 +31,11 @@
 
   /** The gate is shown whenever a bundle is genuinely missing. */
   function shouldPrompt(status) {
-    var s = status || {};
-    // m025-43 OWNER: the download is now mandatory. There is no "later" and no session
-    // dismissal - while a bundle is missing the sheet is shown, including while the
-    // download itself runs, because closing it was how a half-installed app happened.
-    return !(s.englishPrepared && s.indonesianPrepared);
+    // m025-95: gerbang ini mati. Suara kini dirender di server lewat Puter, jadi tidak
+    // ada bundel yang perlu diunduh sebelum FIEZEL bisa bicara - dan sheet wajib yang
+    // dulu menahan pengguna di layar unduhan adalah persis tembok yang dibuang.
+    // Fungsinya dipertahankan supaya pemanggil lama tidak melempar.
+    return false;
   }
 
   /** Completed/total across both bundles, as one number the user can read. */

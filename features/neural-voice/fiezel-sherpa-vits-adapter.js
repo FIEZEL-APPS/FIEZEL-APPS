@@ -23,7 +23,11 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  var RUNTIME_BASE = 'vendor/sherpa-vits/';
+  // m025-95: vendor/sherpa-vits dihapus bersama vendor/sherpa-vits-id - keduanya sudah
+  // pensiun sejak m025-42 dan nol rujukan runtime. Kedua pemanggil adapter ini selalu
+  // mengoper basePath sendiri, jadi nilai di bawah hanyalah cadangan; tetapi cadangan
+  // yang menunjuk direktori yang tidak ada adalah ranjau bagi pemanggil berikutnya.
+  var RUNTIME_BASE = 'vendor/supertonic-3/';
   var WORKER_FILE = 'sherpa-onnx-tts.worker.js';
   var EXPECTED_SPEAKERS = 904;
   var MODEL_ID = 'vits-piper-en_US-libritts_r-medium';

@@ -4,7 +4,6 @@
 const assert = require('assert');
 const fs = require('fs');
 
-const fix = fs.readFileSync('features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js', 'utf8');
 const selftests = require('./features/diagnostics/fiezel-module-selftests.js');
 const targets = require('./features/diagnostics/fiezel-diagnostic-targets.js');
 
@@ -12,72 +11,17 @@ let pass = 0;
 const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
 
 (async () => {
-  // ---- defect 1: MutationObserver feedback loop made every render slow -------------
-  test('the mechanism: an unconditional write inside an observer runs away', () => {
-    // Reproduces the shipped behaviour in miniature so the fix is justified by the
-    // mechanism, not by assertion alone.
-    let mutations = 0; let observers = [];
-    const bundle = { _t: 'placeholder',
-      get textContent() { return this._t; },
-      set textContent(v) { this._t = v; mutations++; observers.forEach(cb => cb()); } };
-    const drive = write => {
-      mutations = 0; bundle._t = 'placeholder'; observers = [];
-      let depth = 0, runaway = false;
-      observers.push(() => { if (++depth > 50) { runaway = true; return; } write(); });
-      write();
-      return { mutations, runaway };
-    };
-    const bad = drive(() => { bundle.textContent = 'FIXED'; });
-    const good = drive(() => { if (bundle.textContent !== 'FIXED') bundle.textContent = 'FIXED'; });
-    assert.strictEqual(bad.runaway, true, 'unconditional write must be shown to loop');
-    assert.strictEqual(good.runaway, false, 'guarded write must settle');
-    assert.strictEqual(good.mutations, 1, 'guarded write mutates exactly once');
+  // m025-95: cacat 1 dan 2 hidup di fiezel-tutor-indonesian-voice-fix.js, yang dihapus
+  // bersama seluruh jalur suara Indonesia. Regresinya tidak bisa kembali karena
+  // berkasnya tidak ada - yang dijaga sekarang adalah itu tetap begitu.
+  test('tambalan suara Indonesia tetap terhapus', () => {
+    assert.ok(!fs.existsSync('features/tutor-classroom/fiezel-tutor-indonesian-voice-fix.js'),
+      'berkas tambalan harus tetap tidak ada');
+    const chat = fs.readFileSync('features/tutor-classroom/fiezel-tutor-voice-chat.js', 'utf8');
+    assert.ok(!/FiezelIndonesianVoice/.test(chat), 'tutor tidak boleh memanggil mesin Indonesia');
+    assert.ok(/FiezelVoiceSay/.test(chat), 'tutor bicara lewat pintu bersama Inggris+subtitle');
   });
 
-  test('shipped writes are guarded, so the observer cannot feed itself', () => {
-    assert.ok(/function setTextIfChanged/.test(fix), 'writes go through a change-guarded helper');
-    assert.ok(/if \(String\(node\.textContent \|\| ''\) === value\) return false;/.test(fix),
-      'helper must compare before assigning');
-    // No raw textContent assignment may remain in the observer path.
-    const rawWrites = fix.match(/\.textContent\s*=/g) || [];
-    assert.strictEqual(rawWrites.length, 1,
-      'only the helper may assign textContent; found ' + rawWrites.length + ' assignments');
-  });
-
-  test('the observer is detached while writing and re-attached after', () => {
-    assert.ok(/observer\.disconnect\(\)/.test(fix), 'detach before writing');
-    const disconnectAt = fix.indexOf('observer.disconnect()');
-    const writeAt = fix.indexOf('setTextIfChanged(root.document.querySelector');
-    assert.ok(disconnectAt > -1 && writeAt > -1 && disconnectAt < writeAt,
-      'disconnect must precede the writes');
-    assert.ok(/if \(wasObserving\) observe\(\);/.test(fix), 're-attach after writing');
-  });
-
-  test('observer bursts are coalesced instead of running per record', () => {
-    assert.ok(/function scheduleCorrection/.test(fix), 'callback schedules rather than works inline');
-    assert.ok(/if \(scheduled\) return;/.test(fix), 'repeat records collapse into one pass');
-    assert.ok(/new root\.MutationObserver\(scheduleCorrection\)/.test(fix),
-      'observer must call the coalescing scheduler, not the DOM pass directly');
-  });
-
-  // ---- defect 2: Classroom hard-required the optional 94MB Indonesian bundle --------
-  test('Classroom speech falls back to the mandatory engine when Indonesian is absent', () => {
-    assert.ok(/indoReady/.test(fix), 'readiness of the optional bundle is checked');
-    assert.ok(/status\(\)\.prepared/.test(fix), 'readiness means actually downloaded');
-    assert.ok(/baseRuntime\.speak\(spoken/.test(fix),
-      'must fall through to the mandatory English neural engine');
-    // The old code threw when the module was missing; that is what broke Classroom.
-    assert.ok(!/throw new Error\('indonesian_bundle_module_missing'\)[\s\S]{0,200}classroomStop/.test(fix),
-      'a missing optional bundle must not abort Classroom speech');
-  });
-
-  test('the fallback is neural, never browser TTS', () => {
-    assert.ok(!/SpeechSynthesis/.test(fix), 'browser TTS must not appear in the tutor path');
-    const speakBlock = fix.slice(fix.indexOf('async function classroomSpeak'), fix.indexOf('function classroomStop'));
-    assert.ok(/allowFallback: false/.test(speakBlock), 'fallback path stays neural-only');
-  });
-
-  // ---- defect 3: the scanner reported every healthy install as failing --------------
   test('adaptive accepts the numeric level index the app actually stores', () => {
     // state.level is a 1-based index into LEVELS, resolved as LEVELS[state.level-1].
     [1, 2, 3, 4, 5, 6].forEach(index => {
@@ -114,12 +58,8 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     assert.strictEqual(wrapped.speak(), 'other', 'spread-and-freeze substitutes cleanly');
   });
 
-  test('the tutor patch never proxies the runtime', () => {
-    assert.ok(!/new Proxy\s*\(\s*baseRuntime/.test(fix),
-      'FiezelVoiceRuntime is frozen; proxying it breaks every speak call app-wide');
-    assert.ok(/Object\.freeze\(Object\.assign\(\{\}, baseRuntime/.test(fix),
-      'must use the spread-and-freeze idiom the other neural patch layers use');
-  });
+  // m025-95: tes ini memeriksa idiom di dalam tambalan yang sudah dihapus. Mekanismenya
+  // - bahwa mem-proxy objek beku itu merusak - tetap diuji di tes sebelum dan sesudah ini.
 
   test('the override preserves the rest of the runtime surface', () => {
     // A wrapper that forgets a member silently removes capability from every caller.

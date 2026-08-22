@@ -124,21 +124,21 @@ test('urutan di dalam grup suara adalah kontrak, bukan selera', () => {
   assert.ok(at('fiezel-m0281-prebootstrap-hotfix.js') > -1 && at('fiezel-neural-voice-bootstrap.js') > -1);
   assert.ok(at('fiezel-m0281-prebootstrap-hotfix.js') < at('fiezel-neural-voice-bootstrap.js'),
     'tambalan pra-bootstrap harus mendahului bootstrap');
-  assert.ok(at('fiezel-neural-voice-audibility-fix.js') < at('fiezel-m0281-runtime-guard.js'),
-    'penjaga runtime harus merekam runtime SESUDAH seluruh tambalan terpasang');
+  // m025-95: penjaga runtime M028.2 dihapus - seluruh isinya adalah verifikasi suara
+  // Indonesia, dan sisanya tidak pernah dipanggil siapa pun.
+  assert.strictEqual(at('fiezel-m0281-runtime-guard.js'), -1,
+    'penjaga runtime yang sudah dihapus tidak boleh dimuat lagi');
   assert.ok(at('fiezel-voice-diagnostics.js') < at('fiezel-neural-voice.js'),
     'diagnostik suara harus siap sebelum runtime yang menulis ke dalamnya');
 });
 
 test('Classroom menunggu grup suara, walaupun murid membukanya lebih dulu', () => {
   const classroom = lazy.filter(s => s.group === 'classroom');
-  assert.ok(classroom.length >= 5, 'tumpukan tutor/Classroom tidak lengkap');
+  assert.ok(classroom.length >= 4, 'tumpukan tutor/Classroom tidak lengkap');
   assert.strictEqual(classroom[0].needs, 'voice',
     'tutor v3 menimpa runtime suara; tanpa ketergantungan ini penjaga runtime bisa merekam runtime yang belum utuh');
   const order = classroom.map(s => s.src);
-  assert.ok(order.findIndex(x => x.endsWith('fiezel-tutor-v3.js')) <
-    order.findIndex(x => x.endsWith('fiezel-tutor-indonesian-voice-fix.js')),
-    'perbaikan suara Indonesia menambal tutor v3, jadi ia harus menyusul');
+  // m025-95: tambalan suara Indonesia dihapus bersama mesinnya, jadi urutannya pun hilang.
   assert.ok(order.findIndex(x => x.endsWith('fiezel-tutor-dialog.js')) <
     order.findIndex(x => x.endsWith('fiezel-tutor-voice-chat.js')),
     'mesin dialog harus ada sebelum lapisan bicara memanggilnya');

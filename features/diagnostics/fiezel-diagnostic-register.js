@@ -63,8 +63,8 @@
   bus.registerSelfTest('indonesianVoice', function () {
     var status = null;
     try {
-      status = root.FiezelIndonesianVoice && root.FiezelIndonesianVoice.status
-        ? root.FiezelIndonesianVoice.status() : null;
+      status = root.FiezelPuterVoice && root.FiezelPuterVoice.status
+        ? root.FiezelPuterVoice.status() : null;
     } catch (_) {}
     return { findings: tests.indonesianVoice(status, targets) };
   });
@@ -72,7 +72,8 @@
   // The globals every screen depends on. Absence is checked directly rather than being
   // inferred later from a blank screen or a silent voice.
   var REQUIRED_MODULES = ['FiezelDiagnosticBus', 'FiezelClassroom', 'FiezelTutorV3', 'FiezelProsody',
-    'FiezelVoiceRuntime', 'FiezelNeuralVoiceConfig', 'FiezelSherpaVitsAdapter', 'FiezelWebAudioPlayer'];
+    'FiezelVoiceRuntime', 'FiezelNeuralVoiceConfig', 'FiezelSherpaVitsAdapter', 'FiezelWebAudioPlayer',
+    'FiezelPuterVoice', 'FiezelSubtitle', 'FiezelVoiceSay'];
   var VIEWS = ['home', 'vocab', 'grammar', 'reading', 'skills', 'test', 'progress', 'classroom'];
 
   bus.registerSelfTest('runtime', function () {
@@ -106,8 +107,11 @@
 
   // Saved state that no longer parses renders as a blank or stuck screen, with nothing in
   // the console to explain it.
+  // fiezel-indonesian-voice-v1 tetap diperiksa meski mesinnya sudah dihapus: sisa
+  // datanya masih tertinggal di perangkat yang pernah memasang versi lama, dan simpanan
+  // rusak yang tidak terbaca itulah yang berujung layar kosong tanpa jejak di konsol.
   var STATE_KEYS = ['fiezel-tutor-v3-session', 'fiezel-tutor-v3-evidence', 'fiezel-state',
-    'fiezel-indonesian-voice-v1', 'fiezel-neural-voice-diagnostics-v1'];
+    'fiezel-indonesian-voice-v1', 'fiezel-subtitle-cache-v1', 'fiezel-neural-voice-diagnostics-v1'];
 
   bus.registerSelfTest('storage', function () {
     var probe = { available: false, corruptKeys: [], usedPercent: 0 };
