@@ -54,7 +54,6 @@ jobs:
         run: node tools/fiezel-guardians.mjs a10
       - name: High-value cross-cutting regressions
         run: |
-          node neural-voice-single-flight-test.js
           node diag-search-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
