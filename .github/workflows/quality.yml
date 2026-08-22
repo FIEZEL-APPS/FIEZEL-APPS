@@ -45,6 +45,7 @@ jobs:
           node backup-ui-test.js
           node install-health-test.js
           node onboarding-test.js
+          node tour-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           node splash-choreography-test.js
