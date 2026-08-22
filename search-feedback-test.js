@@ -143,15 +143,38 @@ console.log('m025-102 pencarian + feedback: ' + passed + ' pemeriksaan lolos');
 const appSrc = fs.readFileSync(path.join(__dirname, 'app.js'), 'utf8');
 const indexSrc = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
 
-ok(/VALID_VIEWS[^;]*'search'/.test(appSrc), 'rute pencarian belum terdaftar');
-ok(/state\.view==='search'\)searchView\(\)/.test(appSrc), 'rute pencarian tidak menggambar apa pun');
-ok(/go\('search'\)/.test(indexSrc), 'tidak ada satu pun tombol menuju pencarian');
+ok(/VALID_VIEWS[^;]*'ask'/.test(appSrc), 'rute Tanya FIEZEL belum terdaftar');
+ok(/state\.view==='ask'/.test(appSrc), 'rute Tanya FIEZEL tidak menggambar apa pun');
+ok(/go\('ask'\)/.test(indexSrc), 'tidak ada satu pun tombol menuju Tanya FIEZEL');
+
+// state.view yang tersimpan di perangkat lama masih berisi 'search'. Mencabutnya dari
+// daftar sah membuat aplikasi terbuka di layar kosong bagi siapa pun yang terakhir kali
+// menutupnya di halaman itu.
+ok(/VALID_VIEWS[^;]*'search'/.test(appSrc), "alias 'search' dicabut; perangkat lama akan terbuka kosong");
+ok(/state\.view==='search'\)askView\(\)|state\.view==='ask'\|\|state\.view==='search'/.test(appSrc),
+  "alias 'search' terdaftar tetapi tidak menggambar apa pun");
 
 // Penandaan aktif dibersihkan HANYA dari .nav. Elemen ber-data-view di luar nav akan
 // menyala sekali lalu tersangkut menyala selamanya.
-const entry = indexSrc.slice(indexSrc.indexOf("go('search')") - 200, indexSrc.indexOf("go('search')") + 60);
+const entryAt = indexSrc.indexOf("go('ask')");
+const entry = indexSrc.slice(entryAt - 120, entryAt + 60);
 ok(!/data-view=/.test(entry),
-  'tombol pencarian memakai data-view; penandaan aktifnya tidak akan pernah dibersihkan');
+  'tombol Tanya FIEZEL memakai data-view; penandaan aktifnya tidak akan pernah dibersihkan');
+
+// Ikonnya adalah tanda FIEZEL sendiri, bukan ikon pustaka. Kalau proporsinya digeser ia
+// berhenti menjadi tanda itu dan hanya menjadi dua batang kuning, jadi ukurannya diikat
+// ke wordmark yang menjadi sumbernya.
+const wordmark = fs.readFileSync(path.join(__dirname, 'assets/brand/fiezel-wordmark.svg'), 'utf8');
+const askIcon = fs.readFileSync(path.join(__dirname, 'assets/brand/fiezel-ask.svg'), 'utf8');
+const goldBars = [...wordmark.matchAll(/<rect x="(?:192|240)" y="\d+" width="(\d+)" height="(\d+)" rx="(\d+)"/g)];
+ok(goldBars.length === 2, 'balok emas tidak ditemukan di wordmark, dapat ' + goldBars.length);
+goldBars.forEach((bar) => {
+  ok(askIcon.includes('width="' + bar[1] + '" height="' + bar[2] + '" rx="' + bar[3] + '"'),
+    'balok ikon tidak sebangun dengan wordmark: h' + bar[2]);
+});
+ok(indexSrc.includes('fiezel-ask-mark'), 'topbar tidak memakai ikon balok emas');
+ok(!/go\('ask'\)[^>]*>\s*<i data-lucide/.test(indexSrc),
+  'tombol Tanya FIEZEL memakai ikon pustaka, bukan tanda FIEZEL');
 
 // Tombol masukan di pengaturan punya penyakit yang sama: ada fungsinya, belum tentu ada
 // tombolnya.
