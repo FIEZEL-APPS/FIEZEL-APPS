@@ -18,6 +18,9 @@
 
   var SCHEMA = 'fiezel-lazy-loader-v1';
   var SELECTOR = 'script[type="fiezel/lazy"][data-fiezel-lazy]';
+  // Batas sabar jaring pengaman: kalau app.js belum sampai ke openApp() sesudah ini,
+  // gelombangnya berangkat sendiri daripada tidak berangkat sama sekali.
+  var FALLBACK_DELAY_MS = 8000;
 
   function install(target) {
     var doc = target && target.document;
@@ -133,35 +136,66 @@
       else fn();
     }
 
-    /**
-     * Gelombang idle: grup ber-`data-fiezel-lazy-when="idle"` diambil begitu penyurai
-     * selesai dan layar pertama sudah tercat. Ini yang menjaga "berperilaku sama, hanya
-     * lebih lambat": pada pemakaian normal berkasnya sudah ada jauh sebelum murid
-     * menyentuh tombol suara atau membuka Classroom, sementara load() langsung tetap
-     * tersedia kalau murid lebih cepat dari penjadwalnya.
-     *
-     * Penjadwalnya sengaja TIDAK menunggu event 'load'. Event itu menunggu SELURUH sumber
-     * daya halaman termasuk js.puter.com yang async - jadi menggantungkan gelombang ini
-     * padanya akan mengembalikan tepat penyakit yang sedang diobati: Puter yang lambat
-     * menyandera bagian FIEZEL yang tidak ada hubungannya dengan Puter. Berkas ini sendiri
-     * ber-defer, jadi ia baru berjalan saat DOM siap; sisanya diserahkan ke pewaktu idle
-     * yang punya batas waktu sendiri dan tidak bergantung pada jaringan siapa pun.
-     */
-    function boot() {
-      var idleGroups = [];
+    var waveStarted = false;
+    var fallbackTimer = null;
+
+    function idleGroups() {
+      var out = [];
       nodes().forEach(function (node) {
         var name = node.getAttribute('data-fiezel-lazy') || '';
-        if (!name || idleGroups.indexOf(name) !== -1) return;
-        if ((node.getAttribute('data-fiezel-lazy-when') || 'idle') === 'idle') idleGroups.push(name);
+        if (!name || out.indexOf(name) !== -1) return;
+        if ((node.getAttribute('data-fiezel-lazy-when') || 'idle') === 'idle') out.push(name);
       });
-      if (!idleGroups.length) return;
+      return out;
+    }
+
+    /**
+     * Gelombang malas: grup ber-`data-fiezel-lazy-when="idle"` diambil SETELAH layar utama
+     * benar-benar tergambar. app.js memanggil start() dari openApp(), tepat sesudah
+     * render() - itu momen yang paling jujur untuk "setelah home screen tampil".
+     *
+     * Ini bukan kerapian, ini pengukuran: pada jaringan seluler yang di-throttle, gelombang
+     * yang berangkat lebih awal (mis. digantungkan pada pewaktu idle begitu berkas ini
+     * dieksekusi) MEREBUT PITA dari app.js dan ~2,7 MB JSON kontennya, sehingga seluruh
+     * penghematannya hilang - waktu sampai layar terisi tidak bergerak sama sekali.
+     */
+    function start() {
+      if (waveStarted) return false;
+      waveStarted = true;
+      if (fallbackTimer && typeof target.clearTimeout === 'function') target.clearTimeout(fallbackTimer);
+      fallbackTimer = null;
+      var groups = idleGroups();
+      if (!groups.length) return false;
       whenIdle(function () {
         // Berurutan antar-grup supaya suara (yang dipakai lebih dulu) tidak berebut pita
-        // dengan tumpukan tutor pada jaringan seluler.
-        idleGroups.reduce(function (chain, name) {
+        // dengan tumpukan tutor.
+        groups.reduce(function (chain, name) {
           return chain.then(function () { return load(name); });
         }, Promise.resolve());
       });
+      return true;
+    }
+
+    /**
+     * Jaring pengaman. start() dipanggil app.js, jadi app.js yang gagal memuat atau melempar
+     * sebelum openApp() akan meninggalkan suara dan Classroom tidak pernah terambil sama
+     * sekali. Pewaktu ini memastikan gelombangnya tetap berangkat.
+     *
+     * Sengaja digantungkan pada DOMContentLoaded, BUKAN pada event 'load': 'load' menunggu
+     * seluruh sumber daya termasuk js.puter.com yang async, jadi Puter yang menggantung akan
+     * menyandera bagian FIEZEL yang tidak ada hubungannya dengan Puter - persis penyakit
+     * yang sedang diobati. DOMContentLoaded hanya menunggu rantai defer selesai.
+     */
+    function boot() {
+      if (!idleGroups().length) return;
+      var arm = function () {
+        if (waveStarted || typeof target.setTimeout !== 'function') return;
+        fallbackTimer = target.setTimeout(start, FALLBACK_DELAY_MS);
+        if (fallbackTimer && fallbackTimer.unref) fallbackTimer.unref();
+      };
+      if (doc.readyState === 'loading' && typeof doc.addEventListener === 'function') {
+        doc.addEventListener('DOMContentLoaded', arm, { once: true });
+      } else arm();
     }
 
     var api = Object.freeze({
@@ -170,6 +204,8 @@
       groups: groupNames,
       load: load,
       loaded: loaded,
+      start: start,
+      started: function () { return waveStarted; },
       boot: boot
     });
     target.FiezelLazy = api;
