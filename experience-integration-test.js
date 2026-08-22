@@ -17,7 +17,13 @@ check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(
 check(/prepareNeuralVoice/.test(app)&&/FiezelVoiceRuntime\.speak/.test(app)&&/Siapkan suara offline/.test(app),'Explicit local neural voice opt-in or runtime routing missing');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
-check(/requestRequiredNotificationPermission/.test(app)&&/notificationPermission\(\)/.test(app)&&/notification-locked/.test(css)&&/id="notificationGateButton"/.test(html),'Mandatory notification permission gate missing');
+// OWNER MEMBALIK m025-34: notifikasi DIUNDANG, tidak diwajibkan. Yang diperiksa sekarang
+// adalah undangan yang lengkap - ada tombol menerima, ada tombol menolak, dan tidak ada
+// satu pun jalur yang memasang kunci badan halaman. Dulu baris ini justru menuntut
+// kebalikannya ("Mandatory notification permission gate missing").
+check(/requestStudyNotificationPermission/.test(app)&&/declineStudyNotifications/.test(app)&&/notificationPermission\(\)/.test(app)&&/id="notificationGateButton"/.test(html)&&/id="notificationGateSkip"/.test(html),'Notification invitation (ask + decline) missing');
+check(!/classList\?\.add\?\.\('notification-locked'\)/.test(app),'nothing may lock the app for notifications again');
+check(/\.notification-locked/.test(css),'kelas kunci lama sengaja dibiarkan di stylesheet: sesi lama masih bisa memegangnya sampai halaman dimuat ulang');
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');
 check(/function getCelestialState/.test(app)&&/function getScenePalette/.test(app)&&/SUNRISE_MINUTE/.test(app)&&/global-sky/.test(css)&&/sky-light/.test(css)&&/id="globalSky"/.test(html),'Full-screen real-time sun/moon cycle missing');
 check(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:GRAMMAR_SESSION_SIZE/.test(app),'Grammar lesson contract is not fixed at 25 questions');
@@ -42,4 +48,4 @@ if(failures.length){
   process.exit(1);
 }
 console.log('FIEZEL experience integration: PASS');
-console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,mandatoryNotifications:true,studyReminderEngine:true,apiKeyBundled:false}));
+console.log(JSON.stringify({aiSkillProfile:true,haptics:true,answerSounds:true,answerPopups:true,realtimeSky:true,grammarQuestionsPerLesson:25,naturalIndonesian:true,motion:true,creatorHub:true,rotatingLoginReminder:true,notificationsInvitedNotForced:true,studyReminderEngine:true,apiKeyBundled:false}));

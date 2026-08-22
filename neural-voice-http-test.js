@@ -28,7 +28,13 @@ server.listen(0,'127.0.0.1',async()=>{
     if(responses.some(response=>!response.ok))throw new Error(`small asset status ${responses.map(r=>r.status).join(',')}`);
     const index=await responses[0].text();
     if(!index.includes('./features/speaking-listening/fiezel-speaking-listening-addon.js')||!index.includes('./features/neural-voice/fiezel-neural-voice-bootstrap.js'))throw new Error('feature scripts missing from index');
-    if(index.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')>index.indexOf('./app.js'))throw new Error('voice bootstrap must load before app.js');
+    // Bootstrap suara sekarang dideklarasikan sebagai grup malas (type="fiezel/lazy") dan
+    // baru diambil setelah layar pertama tercat - jadi "dimuat sebelum app.js" tidak lagi
+    // benar. Yang tetap harus benar: ia dideklarasikan sebelum app.js sehingga urutan
+    // eksekusinya pasti, dan ia benar-benar ditandai malas, bukan diam-diam ikut menahan
+    // pengurai dokumen lagi.
+    if(index.indexOf('./features/neural-voice/fiezel-neural-voice-bootstrap.js')>index.indexOf('<script defer src="./app.js">'))throw new Error('voice bootstrap must be declared before app.js');
+    if(!/<script type="fiezel\/lazy" data-fiezel-lazy="voice"[^>]*fiezel-neural-voice-bootstrap\.js/.test(index))throw new Error('voice bootstrap must be lazy, not parser-blocking');
     const modelPath='/vendor/kokoro-model/onnx/model_quantized.onnx',wasmPath='/vendor/kokoro-js/wasm/ort-wasm-simd-threaded.jsep.wasm';
     const [modelHead,wasmHead,modelRange]=await Promise.all([fetch(base+modelPath,{method:'HEAD'}),fetch(base+wasmPath,{method:'HEAD'}),fetch(base+modelPath,{headers:{Range:'bytes=0-1023'}})]);
     if(!modelHead.ok||Number(modelHead.headers.get('content-length'))!==92361116)throw new Error('model HEAD contract failed');
