@@ -183,7 +183,31 @@
       return st;
     }
 
-    /** Leaving the practice screen re-raises the sheet immediately. */
+    /**
+     * Leaving the practice screen re-raises the sheet immediately.
+     *
+     * m025-114 (OWNER: "swipe back masih cacat sistem ... malah stuck screen"). Pembungkus
+     * ini adalah penyebabnya, dan bentuk bugnya persis bug yang paling dijaga oleh
+     * features/ui/fiezel-back-nav.js: gelung back -> push -> back.
+     *
+     * go() di app.js punya DUA parameter: go(view, opts). `opts.viaHistory === true`
+     * menandai bahwa perpindahan ini datang DARI riwayat, dan penanda itulah satu-satunya
+     * hal yang menahan go() supaya tidak mendorong entri riwayat baru. Pembungkus lama
+     * ditulis `function (view)` lalu memanggil `baseGo(view)` - argumen keduanya hilang
+     * di sini. Jadi setiap kali murid menekan kembali, jalur riwayat memanggil
+     * go(v,{viaHistory:true}), pembungkus ini menjatuhkan penandanya, dan go() yang
+     * sesungguhnya mendorong SATU ENTRI BARU untuk sebuah perpindahan MUNDUR.
+     *
+     * Akibatnya bukan sekadar entri berlebih. Riwayat berubah menjadi dua entri yang
+     * saling menunjuk: Home -> Perpustakaan -> kembali menaruh Home di atas, kembali lagi
+     * menaruh Perpustakaan di atas, selamanya. Murid yang masuk ke sebuah folder lalu ingin
+     * keluar tidak akan pernah bisa keluar - layarnya berganti-ganti antara dua halaman yang
+     * sama dan tidak ada tekanan kembali yang membawanya keluar. Itulah "stuck screen" yang
+     * dilaporkan.
+     *
+     * Karena itu pembungkus ini sekarang meneruskan SELURUH argumen apa adanya. Ia
+     * membungkus keputusan "boleh pindah atau tidak", bukan tanda tangan fungsinya.
+     */
     function guardNavigation() {
       var baseGo = target.go;
       if (typeof baseGo !== 'function' || baseGo.__dailyTargetGuarded) return;
@@ -194,27 +218,35 @@
           open();
           return false;
         }
-        return baseGo(view);
+        return baseGo.apply(this, arguments);
       };
       guarded.__dailyTargetGuarded = true;
       target.go = guarded;
     }
 
-    function guardHistory() {
-      if (typeof target.addEventListener !== 'function' || !target.history || typeof target.history.pushState !== 'function') return;
-      try { target.history.pushState({ fiezelDailyLock: true }, ''); } catch (_) {}
-      target.addEventListener('popstate', function () {
-        if (!armed || status().met) return;
-        // Swallow the in-app back gesture by restoring the entry we just consumed.
-        try { target.history.pushState({ fiezelDailyLock: true }, ''); } catch (_) {}
-        working = false;
-        open();
-      });
-    }
+    /**
+     * m025-114: kunci ini TIDAK LAGI memegang riwayat sendiri.
+     *
+     * Versi lama mendorong entri `{fiezelDailyLock:true}` miliknya sendiri saat start() dan
+     * mendorong satu lagi pada setiap popstate. Niatnya benar (tekanan kembali tidak boleh
+     * menembus kunci), tetapi caranya membuat DUA pemilik riwayat hidup berdampingan:
+     * features/ui/fiezel-back-nav.js memegang satu tumpukan yang ia percaya 1:1 dengan
+     * entri yang IA dorong sendiri, sementara berkas ini menyisipkan entri asing ke dalam
+     * riwayat yang sama. Sejak entri asing pertama masuk - 1,2 detik setelah aplikasi
+     * dibuka, tanpa syarat, bahkan ketika kunci tidak pernah menyala - kedalaman tumpukan
+     * tidak lagi sejajar dengan kedalaman riwayat, dan satu tekanan kembali bisa memakan
+     * entri yang tidak diketahui siapa pun. Dari sisi murid: gesturnya jalan, layarnya diam.
+     *
+     * Sekarang kunci ini hanya MENGUMUMKAN dirinya lewat `body.daily-locked` (dipasang oleh
+     * open(), dilepas oleh close()). app.js membacanya di hook `locked` saat memasang
+     * back-nav, dan modul back-nav yang menahan tekanan kembali - satu pemilik riwayat, satu
+     * tumpukan, satu tempat yang menaikkan kembali entrinya. Perilaku yang dijanjikan header
+     * berkas ini ("CAN: block the in-app back gesture") tetap berlaku, hanya tidak lagi
+     * dikerjakan dengan tangan sendiri di belakang punggung modul riwayat.
+     */
 
     function start() {
       guardNavigation();
-      guardHistory();
       refresh();
       if (timer && typeof target.clearInterval === 'function') target.clearInterval(timer);
       if (typeof target.setInterval === 'function') {
