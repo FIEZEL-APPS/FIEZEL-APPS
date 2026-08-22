@@ -2,8 +2,8 @@
  * m025-42 Supertonic 3 — one bilingual engine for the whole tutor.
  *
  * Replaces two separate bundles with one:
- *   vendor/sherpa-vits/     Piper libritts_r  (English, 106 MB)   -> retired
- *   vendor/sherpa-vits-id/  Piper news_tts    (Indonesian, 91 MB) -> retired
+ *   vendor/sherpa-vits/     Piper libritts_r  (English, 106 MB)   -> DIHAPUS m025-95
+ *   vendor/sherpa-vits-id/  Piper news_tts    (Indonesian, 91 MB) -> DIHAPUS m025-95
  *   vendor/supertonic-3/    Supertonic 3 int8 (31 languages, ~153 MB)
  *
  * Why the swap, in one line each - the full measurement set is in issues #74 and #75:

@@ -58,7 +58,7 @@
         // async=false pada skrip yang disisipkan skrip berarti "eksekusi berurutan":
         // browser boleh mengunduh semuanya paralel tetapi menjalankannya sesuai urutan
         // penyisipan. Tanpa ini fiezel-m0281-prebootstrap-hotfix.js bisa menambal runtime
-        // yang belum ada, dan fiezel-m0281-runtime-guard.js bisa merekam runtime yang
+        // yang belum ada, dan penjaga runtime bisa merekam runtime yang
         // belum selesai ditambal - persis kelas kerusakan yang dua berkas itu obati.
         el.async = false;
         el.defer = false;
@@ -90,7 +90,7 @@
       if (promises[key]) return promises[key];
       var placeholders = sourcesFor(key);
       if (!placeholders.length) return (promises[key] = Promise.resolve({ group: key, files: 0, ok: true }));
-      // Ketergantungan antar-grup itu nyata, bukan kerapian: fiezel-m0281-runtime-guard.js
+      // Ketergantungan antar-grup itu nyata, bukan kerapian: penjaga runtime suara
       // harus merekam runtime suara yang sudah selesai ditambal SEBELUM fiezel-tutor-v3.js
       // menimpanya (lihat neural-voice-m0281-regression-test.js). Kalau murid membuka
       // Classroom sebelum gelombang idle selesai, grup suara tetap dijalankan lebih dulu.
