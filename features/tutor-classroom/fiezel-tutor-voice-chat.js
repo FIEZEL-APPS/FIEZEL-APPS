@@ -157,10 +157,31 @@
     if (name) button.classList.add(name);
   }
 
+
+  /**
+   * m025-100: teks model ditulis dalam Markdown. Sampai rilis ini ia dipasang lewat
+   * textContent, jadi murid membaca "**tebal**" apa adanya - bug Bab 2 brief redesign, dan
+   * di sini justru pada permukaan AI yang paling sering dibaca.
+   *
+   * Beralih ke innerHTML membuka permukaan injeksi, jadi syaratnya keras: HANYA lewat
+   * renderMarkdown() milik app.js, yang meng-esc setiap baris SEBELUM mengubah penanda
+   * menjadi tag. Kalau penerjemah itu tidak ada - app.js gagal dimuat, atau modul ini
+   * dipakai di luar aplikasi - kita kembali ke textContent, bukan menulis teks mentah ke
+   * innerHTML. Lebih baik terlihat jelek daripada tidak aman.
+   */
+  function paintModelText(node, text) {
+    if (!node) return false;
+    var md = root && root.renderMarkdown;
+    if (typeof md === 'function') {
+      try { node.innerHTML = md(text); return true; } catch (_) {}
+    }
+    node.textContent = String(text || '');
+    return false;
+  }
+
   /** The answer text lands in the lesson's existing subtitle line, not in a chat box. */
   function showAnswer(text) {
-    var subtitle = doc.getElementById('tutorSubtitle');
-    if (subtitle) subtitle.textContent = String(text || '');
+    paintModelText(doc.getElementById('tutorSubtitle'), text);
   }
 
   // ---- interaction --------------------------------------------------------------
