@@ -28,6 +28,31 @@
   const now=()=>Date.now();
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,Number(n)||0));
   const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  /**
+   * m025-114: bank latihan menyimpan token {name}, bukan nama sungguhan - contoh jawaban
+   * "My name is {name}" harus berbunyi nama MURID INI, bukan nama orang lain yang kebetulan
+   * ada di kode saat bank ini ditulis. Nama dibaca dari aplikasi lewat pengait opsional,
+   * jadi sidecar ini tetap bisa dimuat dan diuji tanpa aplikasi. Tanpa nama, tokennya
+   * dibuang beserta spasi berlebihnya sehingga kalimatnya tetap wajar.
+   */
+  const learnerName=env=>{
+    try{const state=env&&typeof env.__getFiezelState==='function'?env.__getFiezelState():null;const stored=String((state&&state.userName)||'').trim();if(stored)return stored}catch(_){}
+    // Sapaan cadangan milik app.js selalu terisi, jadi contoh jawaban tidak pernah berakhir
+    // menggantung seperti "My name is ." pada jendela sempit sebelum namanya diberikan.
+    try{if(env&&typeof env.learnerName==='function')return String(env.learnerName()||'').trim()}catch(_){}
+    return ''
+  };
+  const personalizeText=(value,name)=>String(value??'').replace(/\s*\{name\}/g,name?' '+name:'').replace(/\s{2,}/g,' ').trim();
+  const personalizeItems=(env,items)=>{
+    const name=learnerName(env);
+    return (Array.isArray(items)?items:[]).map(item=>{
+      if(!item||typeof item!=='object')return item;
+      const out={...item};
+      for(const key of ['prompt','script','targetText','sampleAnswer','translation','hint'])
+        if(typeof out[key]==='string')out[key]=personalizeText(out[key],name);
+      return out
+    })
+  };
   const normalizeText=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[’']/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
   const tokens=s=>normalizeText(s).split(' ').filter(Boolean);
   const median=xs=>{const a=xs.map(Number).filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return null;const m=Math.floor(a.length/2);return a.length%2?a[m]:Math.round((a[m-1]+a[m])/2)};

@@ -2883,14 +2883,14 @@
         "title": "Self introduction",
         "formula": "name · origin · job · nice to meet you",
         "examples": [
-          "My name is Jahran.",
+          "My name is {name}.",
           "I'm from Bandung.",
           "Nice to meet you."
         ]
       },
       "segments": [
         {
-          "en": "Hello, my name is Jahran. I'm from Bandung. I'm a student.",
+          "en": "Hello, my name is {name}. I'm from Bandung. I'm a student.",
           "id": "Perkenalan A1 punya tiga kalimat inti: nama, asal, dan pekerjaan."
         },
         {

@@ -1,6 +1,7 @@
 /**
- * FIEZEL — onboarding lima langkah (Step 1-5 pada `FIEZEL_Complete_Design_Specification.pdf`,
- * bagian 3). Step 0 (splash) hidup terpisah di `fiezel-splash.js`.
+ * FIEZEL — onboarding enam langkah (Step 1-6). Step 0 (splash) hidup terpisah di
+ * `fiezel-splash.js`. Step 2-6 mengikuti Step 1-5 pada
+ * `FIEZEL_Complete_Design_Specification.pdf` bagian 3; Step 1 adalah tambahan m025-114.
  *
  * m025-78: dibangun ulang dari nol mengikuti spesifikasi lengkap, menggantikan versi m025-77
  * yang mengikuti sheet PDF berbeda (IELTS/TOEFL, tes 150 soal sebagai satu-satunya jalan).
@@ -28,13 +29,28 @@
  *    sudah dipegang sejak m025-77. Pertanyaan spesifikasi "Kapan kamu ingin belajar?"
  *    dijawab jujur: dengan cara ALRS sebenarnya bekerja.
  *
+ * m025-114 OWNER: "saat masuk tanya dulu nama mereka di onboarding (WAJIB)". Step 1 sekarang
+ * menanyakan nama murid, dan nama itulah satu-satunya sumber sapaan di seluruh aplikasi -
+ * tidak ada lagi nama yang dipaku di kode sebagai nilai bawaan. Langkah ini adalah SATU-
+ * SATUNYA langkah yang tidak punya "Lewati", dan penyimpangan dari batas nomor 1 di bawah
+ * itu ditulis di sini secara terbuka, bukan disembunyikan:
+ *
+ *   - Yang dijaga batas nomor 1 adalah "tidak ada jalan buntu", bukan "setiap langkah bisa
+ *     dilewati". Step 1 tetap punya jalan keluar dan jalan keluarnya satu ketukan: isi nama,
+ *     tekan Lanjut. Tombolnya menyala begitu ada satu huruf.
+ *   - Melewatinya akan memaksa aplikasi kembali punya nama cadangan yang dipaku di kode -
+ *     persis keadaan yang sedang diperbaiki, dan keadaan yang membuat murid lain disapa
+ *     dengan nama orang lain.
+ *   - Kalau murid menutup aplikasi di sini, perkenalan TIDAK ditandai selesai, jadi
+ *     pertanyaannya datang lagi - bukan mengunci aplikasi selamanya.
+ *
  * Tiga batas yang dijaga, sama seperti splash dan dengan alasan yang sama:
  *
- * 1. TIDAK PERNAH MENGURUNG. Tombol "Lewati" di kanan atas selalu ada dan mengakhiri seluruh
- *    perkenalan (bukan hanya satu langkah) - gerbang notifikasi ada di bawah lapisan ini dan
- *    notifikasi wajib di produk ini. Langkah dengan aksi berat (pilih tujuan, tes penempatan)
- *    JUGA mendapat "Lewati langkah ini" supaya menunda satu langkah tidak memaksa mengakhiri
- *    semuanya.
+ * 1. TIDAK PERNAH MENGURUNG. Tombol "Lewati" di kanan atas ada di setiap langkah kecuali
+ *    Step 1 (lihat catatan m025-114 di atas) dan mengakhiri seluruh perkenalan (bukan hanya
+ *    satu langkah) - gerbang notifikasi ada di bawah lapisan ini dan notifikasi wajib di
+ *    produk ini. Langkah dengan aksi berat (pilih tujuan, tes penempatan) JUGA mendapat
+ *    "Lewati langkah ini" supaya menunda satu langkah tidak memaksa mengakhiri semuanya.
  * 2. SEKALI SAJA, bukan sekali sehari. Sapaan yang terus datang berubah jadi penghalang.
  * 3. TIDAK MENYENTUH KEADAAN APLIKASI SENDIRI. Modul ini hanya membaca modul murni sejenis
  *    (`env.FiezelPersonalJourney`) dan memanggil balik
@@ -57,8 +73,39 @@
 
   // Langkah terakhir (ringkasan). Ditulis sekali supaya penjepit di goStep() dan pemeriksaan
   // "sudah di ujung" pada tombol lewati-langkah tidak bisa menyimpang satu sama lain -
-  // ketidaksamaan itulah yang membuat tombol di langkah 5 mati diam-diam.
-  var LAST_STEP = 5;
+  // ketidaksamaan itulah yang membuat tombol di langkah terakhir mati diam-diam.
+  var LAST_STEP = 6;
+  // Step 1 (m025-114): nama murid. Langkah wajib, dan satu-satunya langkah tanpa "Lewati".
+  var NAME_STEP = 1;
+  // Langkah tes penempatan. Tombol utamanya BUKAN "Lanjut" melainkan "Mulai tes penempatan",
+  // jadi nomornya harus punya nama - angka lepas di dalam bind() adalah persis yang patah
+  // ketika penomoran bergeser.
+  var PLACEMENT_STEP = 4;
+  // Cukup panjang untuk nama panggilan apa pun, cukup pendek untuk muat di sapaan Home
+  // tanpa memotong barisnya. Nama yang lebih panjang dipotong, bukan ditolak - menolak
+  // masukan yang wajar hanya membuat langkah wajib terasa seperti dinding.
+  var NAME_MAX = 24;
+
+  /**
+   * Nama yang bisa dipakai aplikasi, atau string kosong bila belum ada yang bisa dipakai.
+   *
+   * Yang dibuang di sini bukan "karakter yang tidak disukai" melainkan hal-hal yang membuat
+   * sapaan rusak: karakter kendali, kurung sudut (nama masuk ke markup lewat escapeHtml,
+   * tetapi juga ke title dokumen dan notifikasi), dan spasi berlebih. Huruf beraksen, tanda
+   * kutip pada nama seperti O'Neil, dan tanda hubung sengaja DIBIARKAN - itu nama orang.
+   */
+  function normalizeName(value) {
+    var raw = String(value == null ? '' : value);
+    var clean = '';
+    for (var i = 0; i < raw.length; i++) {
+      var code = raw.charCodeAt(i);
+      var ch = raw.charAt(i);
+      if (code < 32 || code === 127) { clean += ' '; continue; }
+      if (ch === '<' || ch === '>') continue;
+      clean += ch;
+    }
+    return clean.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX).trim();
+  }
 
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
@@ -96,20 +143,39 @@
     } catch (_) { return null; }
   }
 
+  /** Nama yang tercatat pada perkenalan sebelumnya, atau '' bila belum pernah ada. */
+  function storedName(env) {
+    var record = readRecord(env);
+    return normalizeName(record && record.name);
+  }
+
   /** Sudah pernah selesai ATAU pernah dilewati. Keduanya berarti jangan menghadang lagi. */
   function completed(env) {
     var record = readRecord(env);
     return !!(record && record.done === true);
   }
 
+  /**
+   * m025-114: murid yang menyelesaikan perkenalan SEBELUM rilis ini tidak pernah ditanya
+   * namanya. Mereka tidak boleh dipaksa mengulang seluruh perkenalan hanya untuk satu
+   * pertanyaan - dan juga tidak boleh dibiarkan disapa dengan nama orang lain. Jawabannya
+   * ada di show(env,{nameOnly:true}): satu langkah saja, lalu selesai.
+   */
+  function needsName(env) {
+    return !storedName(env);
+  }
+
   function markCompleted(env, detail) {
     try {
       var store = env && env.localStorage;
       if (!store || typeof store.setItem !== 'function') return;
+      var previous = readRecord(env) || {};
+      var name = normalizeName((detail && detail.name) || previous.name);
       store.setItem(STORAGE_KEY, JSON.stringify({
         done: true,
         at: Number(detail && detail.at) || 0,
         via: String((detail && detail.via) || 'finish'),
+        name: name,
         goal: String((detail && detail.goal) || ''),
         level: String((detail && detail.level) || '')
       }));
@@ -138,11 +204,12 @@
     return '<div class="fiezel-dots" aria-hidden="true">' + out + '</div>';
   }
 
-  function topbar(showBack) {
+  function topbar(showBack, showSkip) {
     return '<div class="fiezel-topbar">'
       + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
       + '<i data-lucide="chevron-left"></i>Kembali</button>'
-      + '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>'
+      + (showSkip === false ? '<span class="fiezel-skip-spacer" aria-hidden="true"></span>'
+        : '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>')
       + '</div>';
   }
 
@@ -165,7 +232,37 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 1: Feature Carousel
+  // Step 1 (m025-114): nama murid. WAJIB.
+  //
+  // Satu pertanyaan, satu kolom, satu tombol. Tidak ada "Lewati" di sini - lihat catatan di
+  // kepala berkas. Tombol Lanjut dinonaktifkan sampai ada nama yang benar-benar bisa dipakai
+  // (normalizeName mengembalikan sesuatu), sehingga spasi saja tidak lolos.
+  // ---------------------------------------------------------------------------------------
+  function nameMarkup(env, typed) {
+    var clean = normalizeName(typed);
+    return topbar(false, false)
+      // Lambangnya harus ada di lucide.min.js yang benar-benar dikirim (57 ikon, bukan set
+      // penuh). Ikon yang tidak ada tidak melempar - ia hanya menggambar piringan kosong,
+      // dan itu terbaca sebagai gambar yang gagal dimuat.
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'user-round', 180) + '</div></div>'
+      + '<div class="fiezel-sheet" data-ob-step="name">'
+      + '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>'
+      + '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>'
+      + '<label class="fiezel-field"><span>Nama panggilan</span>'
+      + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
+      + ' placeholder="Tulis nama kamu" autocomplete="given-name" autocapitalize="words"'
+      + ' spellcheck="false" enterkeyhint="go" aria-label="Nama panggilan kamu"></label>'
+      // Janji privasi harus benar apa adanya. Nama ini memang tinggal di perangkat, TETAPI
+      // ia ikut ke Core Brain di akun FIEZEL murid sendiri supaya pengingat push bisa
+      // menyapa namanya. Menuliskan "nggak dikirim ke mana-mana" akan menjadi janji yang
+      // dilanggar oleh kode di app.js (remoteActivitySnapshot).
+      + '<p class="fiezel-note">Nama ini disimpan di HP kamu, dan cuma ikut ke akun FIEZEL kamu sendiri supaya pengingat belajar bisa nyapa kamu. Nggak dibagi ke siapa pun.</p>'
+      + btn('Lanjut', 'data-ob-advance' + (clean ? '' : ' disabled'))
+      + '</div>';
+  }
+
+  // ---------------------------------------------------------------------------------------
+  // Step 2: Feature Carousel
   // ---------------------------------------------------------------------------------------
   function carouselMarkup(env, slideIndex) {
     var slide = CAROUSEL_SLIDES[slideIndex];
@@ -176,7 +273,7 @@
     var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
     return topbar(false)
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, slide.art, 200) + '</div></div>'
-      + '<div class="fiezel-sheet" data-ob-step="1">'
+      + '<div class="fiezel-sheet" data-ob-step="2">'
       + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
       + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
       + '<div class="fiezel-carousel-track">' + items + '</div>'
@@ -192,7 +289,7 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 2: Goal Selection + CEFR self-report
+  // Step 3: Goal Selection + CEFR self-report
   // ---------------------------------------------------------------------------------------
   function goalMarkup(env, selectedGoal, selectedLevel) {
     var goals = goalOptions(env);
@@ -207,7 +304,7 @@
     }).join('') + '</div>' : '';
     return topbar(false)
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'sparkles', 180) + '</div></div>'
-      + '<div class="fiezel-sheet" data-ob-step="2">'
+      + '<div class="fiezel-sheet" data-ob-step="3">'
       + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
       + (selectedGoal ? '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>' + levelRow
@@ -218,12 +315,12 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 3: Placement (mengarah ke tes 150 soal yang sungguhan, bukan versi 4-5 soal palsu)
+  // Step 4: Placement (mengarah ke tes 150 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
   function placementMarkup(env) {
     return topbar(true)
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'book-open-text', 200) + '</div></div>'
-      + '<div class="fiezel-sheet" data-ob-step="3">'
+      + '<div class="fiezel-sheet" data-ob-step="4">'
       + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
       + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
       + '<p class="fiezel-note">Isinya 150 soal dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>'
@@ -233,12 +330,12 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 4: Schedule & Reminders (jujur soal cara ALRS bekerja, bukan pemilih jam palsu)
+  // Step 5: Schedule & Reminders (jujur soal cara ALRS bekerja, bukan pemilih jam palsu)
   // ---------------------------------------------------------------------------------------
   function scheduleMarkup(env) {
     return topbar(true)
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'clock-3', 200) + '</div></div>'
-      + '<div class="fiezel-sheet" data-ob-step="4">'
+      + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
       + '<p class="fiezel-note">Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>'
@@ -247,9 +344,10 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 5: Summary & Ready
+  // Step 6: Summary & Ready
   // ---------------------------------------------------------------------------------------
-  function summaryMarkup(env, selectedGoal, selectedLevel, reduceMotion) {
+  function summaryMarkup(env, learnerName, selectedGoal, selectedLevel, reduceMotion) {
+    var name = normalizeName(learnerName);
     var goals = goalOptions(env);
     var goalLabel = (goals.filter(function (g) { return g.id === selectedGoal; })[0] || {}).label || 'Belum dipilih';
     var confetti = '';
@@ -262,9 +360,10 @@
     }
     return topbar(true)
       + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'trophy', 220) + '</div></div>'
-      + '<div class="fiezel-sheet" data-ob-step="5">'
-      + '<h2 class="fiezel-title">Siap belajar bersama Percik!</h2>'
+      + '<div class="fiezel-sheet" data-ob-step="6">'
+      + '<h2 class="fiezel-title">' + (name ? escapeHtml(name) + ', siap belajar bersama Percik!' : 'Siap belajar bersama Percik!') + '</h2>'
       + '<div class="fiezel-summary-card">'
+      + (name ? '<div class="fiezel-summary-row"><b>Nama</b><span>' + escapeHtml(name) + '</span></div>' : '')
       + '<div class="fiezel-summary-row"><b>Tujuan</b><span>' + escapeHtml(goalLabel) + '</span></div>'
       + '<div class="fiezel-summary-row"><b>Perkiraan level</b><span>' + escapeHtml(selectedLevel || 'Belum dipilih') + '</span></div>'
       + '<div class="fiezel-summary-row"><b>Pengingat</b><span>Aktif</span></div>'
@@ -280,7 +379,7 @@
    * apa yang terjadi, bukan menebaknya dari efek samping.
    *
    * @param {object} env global tempat DOM, modul maskot, dan modul perjalanan belajar berada
-   * @param {{now?:number, force?:boolean, onGoal?:Function, onPlacement?:Function, onFinish?:Function}} options
+   * @param {{now?:number, force?:boolean, nameOnly?:boolean, onName?:Function, onGoal?:Function, onPlacement?:Function, onFinish?:Function}} options
    */
   function show(env, options) {
     var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
@@ -289,7 +388,11 @@
     var doc = target.document;
     if (!doc || typeof doc.createElement !== 'function') return { shown: false, reason: 'no_document' };
     // m025-80: syarat FiezelMascot dilepas bersama maskotnya sendiri.
-    if (opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
+    // nameOnly: satu langkah saja, untuk murid yang sudah menyelesaikan perkenalan sebelum
+    // pertanyaan nama ada. Ia tidak pernah ditahan oleh completed().
+    var nameOnly = opts.nameOnly === true;
+    if (!nameOnly && opts.force !== true && completed(target)) return { shown: false, reason: 'completed' };
+    if (nameOnly && !needsName(target)) return { shown: false, reason: 'named' };
 
     var host = doc.createElement('div');
     host.className = 'fiezel-ob';
@@ -301,17 +404,19 @@
 
     var step = 1;
     var slide = 0;
+    var typedName = storedName(target);
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
 
     function paint() {
       var html;
-      if (step === 1) html = carouselMarkup(target, slide);
-      else if (step === 2) html = goalMarkup(target, selectedGoal, selectedLevel);
-      else if (step === 3) html = placementMarkup(target);
-      else if (step === 4) html = scheduleMarkup(target);
-      else html = summaryMarkup(target, selectedGoal, selectedLevel, reduceMotion);
+      if (step === 1) html = nameMarkup(target, typedName);
+      else if (step === 2) html = carouselMarkup(target, slide);
+      else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel);
+      else if (step === 4) html = placementMarkup(target);
+      else if (step === 5) html = scheduleMarkup(target);
+      else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
       host.innerHTML = html;
       try { target.lucide && target.lucide.createIcons && target.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true' } }); } catch (_) {}
       bind();
@@ -333,7 +438,7 @@
     function finish(via) {
       if (closed) return;
       closed = true;
-      markCompleted(target, { at: now, via: via, goal: selectedGoal, level: selectedLevel });
+      markCompleted(target, { at: now, via: via, name: typedName, goal: selectedGoal, level: selectedLevel });
       try { host.classList.add('is-leaving'); } catch (_) {}
       if (typeof target.setTimeout === 'function') target.setTimeout(remove, 260);
       else remove();
@@ -341,7 +446,7 @@
       // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
       var handler = via === 'placement' ? opts.onPlacement : opts.onFinish;
       if (typeof handler === 'function') {
-        try { handler({ goal: selectedGoal, level: selectedLevel, via: via }); } catch (_) {}
+        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via }); } catch (_) {}
       }
     }
     function remove() {
@@ -353,17 +458,36 @@
       paint();
     }
 
+    /** Menyerahkan nama ke aplikasi. Dipanggil sekali, saat langkah nama ditinggalkan. */
+    function commitName() {
+      typedName = normalizeName(typedName);
+      if (!typedName || typeof opts.onName !== 'function') return;
+      try { opts.onName({ name: typedName }); } catch (_) {}
+    }
+
     function advance() {
-      if (step === 1 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
+      if (step === NAME_STEP) {
+        typedName = normalizeName(typedName);
+        // Tombolnya memang sudah nonaktif tanpa nama; penjagaan kedua di sini menutup jalur
+        // Enter pada papan ketik, yang tidak melewati tombol sama sekali.
+        if (!typedName) return;
+        commitName();
+        if (nameOnly) { finish('name'); return; }
+        goStep(step + 1);
+        return;
+      }
+      if (step === 2 && slide < CAROUSEL_SLIDES.length - 1) { slide += 1; paint(); return; }
       if (step === LAST_STEP) { finish('finish'); return; }
-      if (step === 2 && selectedGoal && typeof opts.onGoal === 'function') {
+      if (step === 3 && selectedGoal && typeof opts.onGoal === 'function') {
         try { opts.onGoal({ goal: selectedGoal, level: selectedLevel }); } catch (_) {}
       }
       goStep(step + 1);
     }
 
     function back() {
-      if (step === 1 && slide > 0) { slide -= 1; paint(); return; }
+      if (step === 2 && slide > 0) { slide -= 1; paint(); return; }
+      // Langkah nama tidak punya langkah sebelumnya, dan mundur ke sana dari Step 2 tidak
+      // menghapus nama yang sudah diberikan - kolomnya terisi kembali apa adanya.
       goStep(step - 1);
     }
 
@@ -375,6 +499,28 @@
 
     function bind() {
       try {
+        var nameInput = host.querySelector('[data-ob-name]');
+        if (nameInput) {
+          // Mengecat ulang seluruh langkah pada setiap ketikan akan mencabut fokus papan
+          // ketik di tengah kata. Jadi hanya keadaan TOMBOL yang disegarkan di sini.
+          var sync = function () {
+            typedName = String(nameInput.value == null ? '' : nameInput.value);
+            var next = host.querySelector('[data-ob-advance]');
+            if (!next) return;
+            if (normalizeName(typedName)) next.removeAttribute('disabled');
+            else next.setAttribute('disabled', 'disabled');
+          };
+          nameInput.addEventListener('input', sync);
+          nameInput.addEventListener('change', sync);
+          nameInput.addEventListener('keydown', function (event) {
+            if (event && (event.key === 'Enter' || event.keyCode === 13)) {
+              if (typeof event.preventDefault === 'function') event.preventDefault();
+              sync();
+              advance();
+            }
+          });
+          try { if (typeof nameInput.focus === 'function') nameInput.focus(); } catch (_) {}
+        }
         var backBtn = host.querySelector('[data-ob-back]');
         if (backBtn) backBtn.addEventListener('click', back);
         var skipAll = host.querySelector('[data-ob-skip]');
@@ -387,10 +533,21 @@
           if (step >= LAST_STEP) { finish('skip'); return; }
           goStep(step + 1);
         });
+        // m025-114: pada langkah nama tombol ini LAHIR nonaktif lalu menyala saat murid
+        // mengetik. Memasang listener hanya ketika ia sudah aktif berarti tombol yang
+        // menyala kemudian tidak pernah punya listener - tombol hidup yang tidak melakukan
+        // apa-apa. Listener selalu dipasang; advance() sendiri yang menolak nama kosong,
+        // dan atribut disabled tetap menahan klik di peramban.
         var adv = host.querySelector('[data-ob-advance]');
-        if (adv && !adv.hasAttribute('disabled')) adv.addEventListener('click', advance);
+        if (adv) adv.addEventListener('click', function () {
+          if (adv.hasAttribute('disabled')) return;
+          advance();
+        });
+        // PLACEMENT_STEP, bukan angka lepas: penomoran langkah bergeser saat Step 1 (nama)
+        // ditambahkan, dan angka yang tertinggal di sini akan membuat tombol "Mulai tes
+        // penempatan" diam-diam berubah menjadi tombol "Lanjut" biasa.
         var primary = host.querySelector('[data-ob-primary]');
-        if (primary) primary.addEventListener('click', step === 3 ? startPlacementNow : advance);
+        if (primary) primary.addEventListener('click', step === PLACEMENT_STEP ? startPlacementNow : advance);
         var prev = host.querySelector('[data-ob-carousel-prev]');
         if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', back);
         var nxt = host.querySelector('[data-ob-carousel-next]');
@@ -433,13 +590,21 @@
     STORAGE_KEY: STORAGE_KEY,
     CEFR_LEVELS: CEFR_LEVELS,
     CAROUSEL_SLIDES: CAROUSEL_SLIDES,
+    LAST_STEP: LAST_STEP,
+    NAME_STEP: NAME_STEP,
+    PLACEMENT_STEP: PLACEMENT_STEP,
+    NAME_MAX: NAME_MAX,
+    normalizeName: normalizeName,
     goalOptions: goalOptions,
+    nameMarkup: nameMarkup,
     carouselMarkup: carouselMarkup,
     goalMarkup: goalMarkup,
     placementMarkup: placementMarkup,
     scheduleMarkup: scheduleMarkup,
     summaryMarkup: summaryMarkup,
     completed: completed,
+    storedName: storedName,
+    needsName: needsName,
     show: show
   };
 });

@@ -1,5 +1,6 @@
 /**
- * FIEZEL gate — onboarding lima langkah (FIEZEL_Complete_Design_Specification.pdf bagian 3).
+ * FIEZEL gate — onboarding enam langkah (Step 1 = nama murid, m025-114; Step 2-6 mengikuti
+ * FIEZEL_Complete_Design_Specification.pdf bagian 3).
  *
  * Lapisan yang menutupi seluruh layar adalah tempat paling mudah untuk mengurung pengguna,
  * dan di produk ini tawaran notifikasi berada tepat di bawahnya. Karena itu gate ini menahan
@@ -38,19 +39,26 @@ function el(tag) {
     // Pencari sederhana atas markup yang sedang terpasang. Hasilnya DI-CACHE selama innerHTML
     // tidak berubah - tanpa itu modul memasang listener pada satu objek dan gate memeriksa
     // objek lain, sehingga tombol yang sebenarnya hidup terlihat mati.
+    value: '',
+    focus() { node.focused = true; },
+    removeAttribute(k) { delete node.attrs[k]; },
+    // m025-114: kolom nama membuat gate ini harus melihat <input>, bukan hanya <button>.
+    // Tanpa itu langkah wajib pertama tidak bisa diuji sama sekali - dan langkah yang tidak
+    // bisa diuji adalah langkah yang paling gampang berubah jadi jalan buntu.
     _html: null, _found: null,
     _scan() {
       if (node._html === node.innerHTML && node._found) return node._found;
       node._html = node.innerHTML;
       node._found = [];
-      const re = /<button([^>]*)>/g;
+      const re = /<(button|input)([^>]*?)\/?>/g;
       let m;
       while ((m = re.exec(node.innerHTML))) {
-        const button = el('button');
+        const found = el(m[1]);
         const attrRe = /([a-z][a-z-]*)(?:="([^"]*)")?/g;
         let a;
-        while ((a = attrRe.exec(m[1]))) button.attrs[a[1]] = a[2] === undefined ? '' : a[2];
-        node._found.push(button);
+        while ((a = attrRe.exec(m[2]))) found.attrs[a[1]] = a[2] === undefined ? '' : a[2];
+        if (m[1] === 'input') found.value = found.attrs.value || '';
+        node._found.push(found);
       }
       return node._found;
     },
@@ -90,21 +98,35 @@ const NOW = Date.parse('2026-08-21T04:00:00Z');
  * langkah - bukan lewat "Lewati" global, supaya jalur ini berguna sebagai bukti bahwa
  * navigasi maju yang sesungguhnya (bukan cuma jalan pintas) memang berfungsi.
  */
+/** Mengetik nama pada Step 1 lewat jalur yang sama dengan murid: kolom lalu tombol. */
+function typeName(run, value) {
+  const field = run.element.querySelector('[data-ob-name]');
+  if (!field) throw new Error('kolom nama tidak ada di langkah nama');
+  field.value = value;
+  (field.listeners.input || []).forEach(fn => fn());
+  return field;
+}
+
 function advanceTo(run, targetStep) {
   let guard = 0;
   while (run.stepIndex() < targetStep) {
     if (guard++ > 30) throw new Error('macet sebelum mencapai langkah ' + targetStep);
     const step = run.stepIndex();
-    if (step === 1 && run.slideIndex() < onboarding.CAROUSEL_SLIDES.length - 1) {
+    if (step === 1) {
+      typeName(run, 'Ayu');
       run.element.querySelector('[data-ob-advance]').listeners.click[0]();
       continue;
     }
-    if (step === 2) {
-      run.element.querySelectorAll('[data-ob-goal]')[0].listeners.click[0]();
+    if (step === 2 && run.slideIndex() < onboarding.CAROUSEL_SLIDES.length - 1) {
       run.element.querySelector('[data-ob-advance]').listeners.click[0]();
       continue;
     }
     if (step === 3) {
+      run.element.querySelectorAll('[data-ob-goal]')[0].listeners.click[0]();
+      run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+      continue;
+    }
+    if (step === 4) {
       // Langkah ini tidak punya tombol "Lanjut" polos - satu-satunya jalan maju tanpa
       // benar-benar mengerjakan 150 soal adalah "Lewati langkah ini", dan itu memang
       // disengaja (lihat header modul, poin 3).
@@ -115,8 +137,10 @@ function advanceTo(run, targetStep) {
   }
 }
 
-test('lima langkah nyata (Step 1-5), bukan enam seperti sheet lama', () => {
+test('enam langkah nyata (Step 1 nama + Step 2-6), carousel tetap dua slide', () => {
   assert.ok(Array.isArray(onboarding.CAROUSEL_SLIDES) && onboarding.CAROUSEL_SLIDES.length === 2);
+  assert.strictEqual(onboarding.LAST_STEP, 6);
+  assert.strictEqual(onboarding.NAME_STEP, 1);
 });
 
 test('goal selection memakai profil tujuan ASLI aplikasi, bukan Travel/Work/Fun spesifikasi', () => {
@@ -172,7 +196,7 @@ test('SETIAP langkah dan SETIAP slide carousel punya jalan keluar - tidak ada ya
     onboarding.goalMarkup(env, '', ''),
     onboarding.placementMarkup(env),
     onboarding.scheduleMarkup(env),
-    onboarding.summaryMarkup(env, '', '', true)
+    onboarding.summaryMarkup(env, 'Ayu', '', '', true)
   ]) {
     assert.ok(/data-ob-skip/.test(html), 'langkah tidak punya tombol lewati global: ' + html.slice(0, 60));
   }
@@ -183,6 +207,8 @@ test('melewati (global) di langkah mana pun langsung menutup dan tidak kembali m
   const run = onboarding.show(env, { now: NOW });
   assert.strictEqual(run.shown, true);
   assert.strictEqual(env._body.children.length, 1);
+  // Step 1 (nama) sengaja TIDAK punya "Lewati" - m025-114. Jalan keluarnya adalah menjawab.
+  advanceTo(run, 2);
   run.element.querySelector('[data-ob-skip]').listeners.click[0]();
   assert.strictEqual(onboarding.completed(env), true, 'melewati harus dicatat selesai');
   const again = onboarding.show(env, { now: NOW + 60000 });
@@ -201,6 +227,7 @@ test('melewati (global) menyerahkan kendali kembali, bukan sekadar menutup lapis
   const run = onboarding.show(env, { now: NOW, force: true,
     onFinish: d => calls.push(['finish', d && d.via]),
     onPlacement: () => calls.push(['placement']) });
+  advanceTo(run, 2);
   run.element.querySelector('[data-ob-skip]').listeners.click[0]();
   assert.deepStrictEqual(calls, [['finish', 'skip']],
     'tombol Lewati harus memanggil onFinish tepat sekali - tanpa itu alur pembukaan berhenti diam-diam');
@@ -210,10 +237,10 @@ test('"Lewati" di langkah terakhir mengakhiri perkenalan, bukan mengecat ulang l
   const env = fakeEnv();
   const calls = [];
   const run = onboarding.show(env, { now: NOW, force: true, onFinish: d => calls.push(d && d.via) });
-  advanceTo(run, 5);
+  advanceTo(run, onboarding.LAST_STEP);
   run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
   assert.deepStrictEqual(calls, ['skip'],
-    'di langkah terakhir tidak ada langkah berikutnya: goStep(6) dijepit kembali ke 5 dan tombolnya mati');
+    'di langkah terakhir tidak ada langkah berikutnya: goStep(LAST_STEP+1) dijepit kembali dan tombolnya mati');
   assert.strictEqual(onboarding.completed(env), true);
 });
 
@@ -222,7 +249,7 @@ test('tes penempatan memberi tahu onPlacement tepat sekali, bukan dua kali', () 
   const calls = [];
   const run = onboarding.show(env, { now: NOW, force: true,
     onPlacement: () => calls.push('placement'), onFinish: () => calls.push('finish') });
-  advanceTo(run, 3);
+  advanceTo(run, 4);
   run.element.querySelector('[data-ob-primary]').listeners.click[0]();
   assert.deepStrictEqual(calls, ['placement'],
     'jalur tes penempatan tidak boleh ikut memanggil onFinish - itu menjalankan dua lanjutan sekaligus');
@@ -237,10 +264,11 @@ test('login Puter yang menggantung tidak boleh mengurung: ada tenggat', () => {
     'tenggat harus ditangkap seperti kegagalan lain supaya tombolnya hidup kembali');
 });
 
-test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke langkah 2', () => {
+test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke pemilihan tujuan', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
-  assert.strictEqual(run.stepIndex(), 1);
+  advanceTo(run, 2);
+  assert.strictEqual(run.stepIndex(), 2);
   assert.strictEqual(run.slideIndex(), 0);
   run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
   assert.strictEqual(run.slideIndex(), 1);
@@ -248,15 +276,16 @@ test('carousel: dua slide bisa dijelajah maju-mundur sebelum lanjut ke langkah 2
   assert.strictEqual(run.slideIndex(), 0, 'tombol kembali harus mundur satu slide dulu, bukan langsung keluar onboarding');
   run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 2, 'setelah slide terakhir, Lanjut harus pindah ke langkah 2');
+  assert.strictEqual(run.stepIndex(), 3, 'setelah slide terakhir, Lanjut harus pindah ke pemilihan tujuan');
 });
 
 test('goal selection: tombol Lanjut nonaktif sebelum memilih tujuan (sesuai spesifikasi)', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
+  advanceTo(run, 2);
   run.element.querySelector('[data-ob-carousel-next]').listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 2);
+  assert.strictEqual(run.stepIndex(), 3);
   const advanceBtn = run.element.querySelector('[data-ob-advance]');
   assert.ok(advanceBtn.hasAttribute('disabled'), 'Lanjut harus nonaktif sebelum tujuan dipilih');
   const goalBtn = run.element.querySelectorAll('[data-ob-goal]')[0];
@@ -269,7 +298,7 @@ test('goal selection: memilih tujuan memanggil onGoal dengan id ASLI, bukan labe
   const env = fakeEnv();
   const seen = [];
   const run = onboarding.show(env, { now: NOW, force: true, onGoal: v => seen.push(v) });
-  advanceTo(run, 2);
+  advanceTo(run, 3);
   const itBtn = run.element.querySelectorAll('[data-ob-goal]').filter(b => b.getAttribute('data-ob-goal') === 'it')[0];
   itBtn.listeners.click[0]();
   const levelBtn = run.element.querySelectorAll('[data-ob-level="B1"]')[0];
@@ -284,9 +313,9 @@ test('goal selection: "Lewati langkah ini" memajukan tanpa memanggil onGoal', ()
   const env = fakeEnv();
   const seen = [];
   const run = onboarding.show(env, { now: NOW, force: true, onGoal: v => seen.push(v) });
-  advanceTo(run, 2);
+  advanceTo(run, 3);
   run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 3);
+  assert.strictEqual(run.stepIndex(), 4);
   assert.deepStrictEqual(seen, []);
 });
 
@@ -296,25 +325,25 @@ test('tes penempatan tidak dijalankan di balik lapisan yang masih terpasang', ()
   const env = fakeEnv();
   const order = [];
   const run = onboarding.show(env, { now: NOW, force: true, onPlacement: () => order.push('placement') });
-  advanceTo(run, 3);
+  advanceTo(run, 4);
   run.element.querySelector('[data-ob-primary]').listeners.click[0]();
   assert.deepStrictEqual(order, ['placement']);
   assert.strictEqual(onboarding.completed(env), true, 'perkenalan harus sudah selesai sebelum kuis mulai');
 });
 
-test('tes penempatan: "Lewati langkah ini" tetap sampai ke langkah 4 dan 5', () => {
+test('tes penempatan: "Lewati langkah ini" tetap sampai ke langkah jadwal dan ringkasan', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
-  advanceTo(run, 3);
+  advanceTo(run, 4);
   run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 4);
+  assert.strictEqual(run.stepIndex(), 5);
 });
 
 test('langkah terakhir menyelesaikan dan memanggil onFinish satu kali saja', () => {
   const env = fakeEnv();
   let finished = 0;
   const run = onboarding.show(env, { now: NOW, force: true, onFinish: () => { finished++; } });
-  advanceTo(run, 5);
+  advanceTo(run, onboarding.LAST_STEP);
   run.element.querySelector('[data-ob-primary]').listeners.click[0]();
   assert.strictEqual(finished, 1);
   assert.strictEqual(onboarding.completed(env), true);
@@ -323,22 +352,23 @@ test('langkah terakhir menyelesaikan dan memanggil onFinish satu kali saja', () 
 test('summary: pilihan yang sungguhan tercatat ditampilkan kembali, bukan data bohongan', () => {
   const env = fakeEnv();
   const run = onboarding.show(env, { now: NOW, force: true });
-  advanceTo(run, 2);
+  advanceTo(run, 3);
   run.element.querySelectorAll('[data-ob-goal="scholarship"]')[0].listeners.click[0]();
   run.element.querySelectorAll('[data-ob-level="C1"]')[0].listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   run.element.querySelector('[data-ob-step-skip]').listeners.click[0]();
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
-  assert.strictEqual(run.stepIndex(), 5);
+  assert.strictEqual(run.stepIndex(), onboarding.LAST_STEP);
   assert.ok(/Beasiswa/.test(run.element.innerHTML));
   assert.ok(/C1/.test(run.element.innerHTML));
+  assert.ok(/Ayu/.test(run.element.innerHTML), 'nama yang diberikan murid harus ikut terbaca di ringkasan');
 });
 
 test('confetti ringkas dan tunduk pada kurangi-gerak', () => {
   const env = fakeEnv();
-  const withMotion = onboarding.summaryMarkup(env, 'school', 'A2', false);
+  const withMotion = onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', false);
   assert.ok(/fiezel-confetti/.test(withMotion));
-  const reduced = onboarding.summaryMarkup(env, 'school', 'A2', true);
+  const reduced = onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', true);
   assert.ok(!/fiezel-confetti/.test(reduced), 'kurangi-gerak harus mematikan confetti, bukan hanya memperlambatnya');
 });
 
@@ -458,6 +488,112 @@ test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', (
     'lambang langkah harus punya gayanya sendiri');
   assert.ok(!/fiezel-mascot|fiezel-hero\.png|fiezel-belajar\.png|fiezel-mengintip\.png/.test(css),
     'aset maskot tidak boleh dirujuk lagi dari stylesheet');
+});
+
+// ---- m025-114: nama murid (Step 1, WAJIB) --------------------------------------------
+//
+// OWNER: "sekarang Jahran adalah single user, ubah agar appsnya menyesuaikan dengan nama
+// user, misalnya saat masuk tanya dulu nama mereka di onboarding (WAJIB)".
+//
+// Yang dijaga di sini bukan hanya "ada kolom nama", melainkan dua hal yang gampang berbalik
+// jadi bug yang lebih parah daripada bug awalnya: langkah WAJIB yang tidak punya jalan
+// keluar sama sekali (murid terkurung sebelum masuk aplikasi), dan langkah wajib yang
+// ternyata bisa dilewati (aplikasi kembali memakai nama bawaan yang dipaku di kode).
+
+test('Step 1 menanyakan nama, dan itu langkah pertama yang dilihat murid', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+  assert.ok(/data-ob-name/.test(run.element.innerHTML), 'kolom nama harus ada di langkah pertama');
+  assert.ok(/nama/i.test(run.element.innerHTML));
+});
+
+test('nama WAJIB: tanpa nama tidak ada jalan maju, dan tidak ada "Lewati" untuk mengakalinya', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  assert.strictEqual(run.element.querySelector('[data-ob-skip]'), null,
+    'satu-satunya langkah tanpa Lewati - kalau ada, aplikasi kembali punya nama bawaan yang dipaku di kode');
+  assert.strictEqual(run.element.querySelector('[data-ob-step-skip]'), null);
+  assert.ok(run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'));
+  // Spasi saja bukan nama.
+  typeName(run, '   ');
+  assert.ok(run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'),
+    'spasi kosong tidak boleh membuka langkah wajib');
+  assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+});
+
+test('nama WAJIB tetapi TIDAK mengurung: satu huruf sudah membuka jalannya', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  typeName(run, 'A');
+  assert.ok(!run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'),
+    'jalan keluar langkah wajib harus satu ketukan, bukan syarat panjang tertentu');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), 2);
+});
+
+test('nama diserahkan ke aplikasi SEKETIKA, bukan ditahan sampai ujung perkenalan', () => {
+  // Murid yang menutup aplikasi di tengah perkenalan tetap harus punya namanya saat kembali,
+  // dan Home tidak boleh sempat tercat dengan sapaan netral setelah pertanyaannya dijawab.
+  const env = fakeEnv();
+  const seen = [];
+  const run = onboarding.show(env, { now: NOW, force: true, onName: v => seen.push(v.name) });
+  typeName(run, '  Ayu   Lestari ');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.deepStrictEqual(seen, ['Ayu Lestari'], 'nama dinormalkan sebelum diserahkan, spasi ganda dibuang');
+  assert.strictEqual(run.stepIndex(), 2);
+});
+
+test('nama tersimpan dan tidak ditanyakan lagi pada perkenalan berikutnya', () => {
+  const env = fakeEnv();
+  const run = onboarding.show(env, { now: NOW, force: true });
+  typeName(run, 'Ayu');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  run.element.querySelector('[data-ob-skip]').listeners.click[0]();
+  assert.strictEqual(onboarding.storedName(env), 'Ayu');
+  assert.strictEqual(onboarding.needsName(env), false);
+});
+
+test('murid lama yang belum pernah ditanya namanya mendapat SATU langkah, bukan seluruh perkenalan', () => {
+  // Perkenalan sudah selesai sebelum rilis ini, jadi tidak ada nama sama sekali. Memaksa
+  // mereka mengulang lima langkah lain untuk satu pertanyaan adalah hukuman, bukan perbaikan.
+  const env = fakeEnv();
+  env._store.set(onboarding.STORAGE_KEY, JSON.stringify({ done: true, at: NOW, via: 'finish' }));
+  assert.strictEqual(onboarding.completed(env), true);
+  assert.strictEqual(onboarding.needsName(env), true);
+  assert.strictEqual(onboarding.show(env, { now: NOW }).shown, false, 'perkenalan penuh tetap tidak menghadang');
+
+  const names = [];
+  const finished = [];
+  const run = onboarding.show(env, { now: NOW, nameOnly: true, onName: v => names.push(v.name), onFinish: () => finished.push(1) });
+  assert.strictEqual(run.shown, true);
+  assert.strictEqual(run.stepIndex(), onboarding.NAME_STEP);
+  typeName(run, 'Bima');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.deepStrictEqual(names, ['Bima']);
+  assert.deepStrictEqual(finished, [1], 'langkah nama tunggal harus menyerahkan kendali kembali seperti jalan keluar lain');
+  assert.strictEqual(onboarding.storedName(env), 'Bima');
+  assert.strictEqual(onboarding.show(env, { now: NOW, nameOnly: true }).shown, false, 'sekali dijawab, tidak menghadang lagi');
+});
+
+test('nama tidak bisa menyuntik markup dan tidak bisa tumbuh tanpa batas', () => {
+  // Kurung sudut dibuang (nama juga masuk ke title dokumen dan notifikasi, bukan hanya ke
+  // markup yang di-escape), dan sisanya dipotong pada batas panjang - keduanya sekaligus.
+  assert.ok(!/[<>]/.test(onboarding.normalizeName('<img src=x onerror=alert(1)>')));
+  assert.ok(!/[<>]/.test(onboarding.nameMarkup(fakeEnv(), '<b>x</b>').replace(/<[^>]*>/g, '')));
+  assert.strictEqual(onboarding.normalizeName('A'.repeat(200)).length, onboarding.NAME_MAX);
+  // Nama orang tidak boleh dirusak: aksen, kutip, dan tanda hubung dibiarkan apa adanya.
+  assert.strictEqual(onboarding.normalizeName("O'Neil-Ré"), "O'Neil-Ré");
+});
+
+test('aplikasi tidak lagi memaku nama siapa pun sebagai nilai bawaan', () => {
+  assert.ok(/const DEFAULT_USER_NAME='';/.test(app),
+    'nama bawaan yang berisi nama orang berarti murid lain disapa dengan nama orang itu');
+  assert.ok(/const FALLBACK_LEARNER_NAME='[^']+';/.test(app), 'sapaan cadangan harus netral, bukan nama orang');
+  assert.ok(/function setLearnerName\(value\)/.test(app), 'satu pintu masuk nama ke dalam state');
+  assert.ok(/onName:\(\{name\}\)=>/.test(app), 'app.js harus menyambungkan langkah nama ke state');
+  assert.ok(/function askLearnerNameIfMissing/.test(app), 'murid lama tetap harus ditanya sekali');
+  assert.ok(/if\(askLearnerNameIfMissing\(at\)\)return null;/.test(app), 'pertanyaan itu harus berada di jalur boot');
 });
 
 test('gate onboarding sudah terdaftar di CI', () => {

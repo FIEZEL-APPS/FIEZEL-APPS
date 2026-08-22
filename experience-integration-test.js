@@ -36,7 +36,7 @@ check(/sanitizeReport/.test(worker)&&/weakSkills:Array\.isArray/.test(worker)&&/
 check(/CONFIG_LEARNER/.test(worker)&&/boundIds/.test(worker)&&/caller\.identifiers/.test(worker),'Worker is not bound to the first learner account');
 check(/isOwner/.test(worker)&&/Creator account required/.test(worker)&&/me\.puter\.kv/.test(worker),'Owner-only centralized report storage missing');
 check(/puter\.workers\.create/.test(setup)&&/puter\.fs\.write/.test(setup),'One-click Worker deployment missing');
-check(/puter\.workers\.exec/.test(dashboard)&&/fiezel-jahran-report\.csv/.test(dashboard),'Creator dashboard or CSV export missing');
+check(/puter\.workers\.exec/.test(dashboard)&&/fiezel-learning-report\.csv/.test(dashboard),'Creator dashboard or CSV export missing');
 
 const runtime=[html,app,worker,setup,dashboard,read('report-config.js')].join('\n');
 check(!/(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})/.test(runtime),'Secret-like credential found in runtime files');
