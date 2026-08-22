@@ -2,7 +2,12 @@
 
 **Status:** selesai dan dirilis pada m025-88. Melanjutkan daftar "langkah berikutnya" di
 `FIEZEL-M02586-KOREOGRAFI-DAN-IDENTITAS-BUNYI-HANDOFF.md` bagian 8 nomor 2.
-**Cabang:** `m025-88-intro-flow-no-dead-ends`
+**Cabang:** `m025-88-intro-flow-no-dead-ends` · **PR:** #132
+
+**Penerimaan fisik:** WAIVED_BY_OWNER, dipilih OWNER di sesi kerja m025-88 - meneruskan
+instruksi berdirinya "satu masalah selesai langsung deploy, jangan tunggu semua masalah baru
+deploy". Verifikasi dilakukan di peramban desktop (lihat bagian 6); pengujian di perangkat
+menyusul setelah live.
 
 ---
 
@@ -102,7 +107,21 @@ Membalik benderanya saja TIDAK menghasilkan undangan, melainkan menghapus tawara
 | `notification-reminder-test.js` | pemeriksaan penguncian DIBALIK |
 | `experience-integration-test.js` | dari "gerbang wajib" menjadi "ada terima DAN ada tolak" |
 
-## 5. Sengaja ditinggalkan
+## 5. Yang diverifikasi di peramban, bukan hanya dibaca dari kode
+
+Tiga jalan buntu di bagian 2 semuanya dipastikan dengan menjalankan modulnya di peramban,
+sebab dua di antaranya tidak terlihat dari membaca satu berkas:
+
+- `FiezelOnboarding.show()` dengan `onFinish` mata-mata, lalu `[data-ob-skip]` ditekan →
+  daftar panggilan **kosong**. Setelah perbaikan: `[['finish','skip']]`.
+- Maju ke langkah 5, tekan `[data-ob-step-skip]` → `stepIndex()` tetap **5**, `onFinish` tidak
+  terpanggil. Setelah perbaikan: perkenalan berakhir dengan `via:'skip'`.
+- Boot dengan `Notification.permission === "denied"` → sebelum: `#app.innerHTML.length === 0`.
+  Sesudah: Home tercat (13.261 karakter, `launcher-shell` ada), tanpa kelas pengunci.
+- Undangan dipaksa tampil → "Nanti saja" ada, tinggi 44px, menutup panel dan menulis
+  `fiezel-notif-invite-v1`; `notificationInviteSnoozed()` mengembalikan `true`.
+
+## 6. Sengaja ditinggalkan
 
 1. **Gerbang akun Puter tetap wajib.** Yang diperbaiki hanya menggantungnya (bagian 2C).
    Menjadikannya bisa dilewati membalik keputusan m025-79 dan itu keputusan produk
