@@ -723,14 +723,14 @@
         "accent": "#d99a24"
       },
       "author": "Antoine de Saint-Exupéry (1943)",
-      "source": "An original extended FIEZEL retelling inspired by The Little Prince. The original text is still in copyright and is not included.",
+      "source": "An original extended FIEZEL retelling inspired by The Little Prince. The original text is still in copyright and is not reproduced verbatim. Indonesian translation is authored sentence by sentence.",
       "about": {
-        "en": "A lonely pilot meets a young traveler from the stars and slowly learns how attention, friendship, and responsibility give life its meaning.",
-        "id": "Seorang pilot kesepian bertemu pengelana muda dari bintang dan perlahan memahami bahwa perhatian, persahabatan, serta tanggung jawab memberi makna pada kehidupan."
+        "en": "A lonely pilot meets a young traveler from the stars and learns how attention, friendship, and responsibility give life its meaning.",
+        "id": "Seorang pilot kesepian bertemu pengelana muda dari bintang dan memahami bahwa perhatian, persahabatan, serta tanggung jawab memberi makna pada kehidupan."
       },
       "chapters": [
         {
-          "title": "The Pilot Who Remembered How to See",
+          "title": "The Drawing Adults Could Not See",
           "sentences": [
             {
               "en": "Long before he became a pilot, the narrator was a child who loved pictures and wild ideas.",
@@ -836,7 +836,7 @@
           ]
         },
         {
-          "title": "A Visitor at Sunrise",
+          "title": "The Visitor and the Lamb",
           "sentences": [
             {
               "en": "Without explaining who he was, the boy politely asked the pilot to sketch a young lamb.",
@@ -889,7 +889,7 @@
           ]
         },
         {
-          "title": "The Tiny Planet",
+          "title": "Asteroid B-612",
           "sentences": [
             {
               "en": "Over several mornings, the pilot slowly assembled the scattered facts of his visitor's life.",
@@ -942,7 +942,7 @@
           ]
         },
         {
-          "title": "Seeds, Roots, and Responsibility",
+          "title": "The Baobab Seeds",
           "sentences": [
             {
               "en": "Every morning, new shoots appeared in the soil of the boy's planet.",
@@ -975,27 +975,11 @@
             {
               "en": "He also wondered whether the lamb might eat the dangerous shoots and make his work easier.",
               "id": "Dia juga bertanya-tanya apakah domba itu akan memakan tunas berbahaya dan meringankan pekerjaannya."
-            },
-            {
-              "en": "The pilot answered carelessly because his hands were buried inside the stubborn engine.",
-              "id": "Sang pilot menjawab dengan ceroboh karena tangannya sedang sibuk di dalam mesin yang keras kepala."
-            },
-            {
-              "en": "To the boy, however, the question concerned the safety of his entire home.",
-              "id": "Namun bagi sang anak, pertanyaan itu menyangkut keselamatan seluruh rumahnya."
-            },
-            {
-              "en": "He became upset when the pilot treated living things as less urgent than metal and bolts.",
-              "id": "Dia menjadi kesal ketika sang pilot menganggap makhluk hidup kurang mendesak dibandingkan logam dan baut."
-            },
-            {
-              "en": "Their disagreement showed how easily practical pressure can make a person forget what another heart fears.",
-              "id": "Perselisihan mereka menunjukkan betapa tekanan praktis dapat membuat seseorang melupakan ketakutan hati orang lain."
             }
           ]
         },
         {
-          "title": "Evenings of Many Sunsets",
+          "title": "Forty-Four Sunsets",
           "sentences": [
             {
               "en": "The boy loved the gentle ceremony of sunset more than any possession.",
@@ -1048,7 +1032,28 @@
           ]
         },
         {
-          "title": "The Proud and Fragile Flower",
+          "title": "A Question About Flowers",
+          "sentences": [
+            {
+              "en": "The pilot answered carelessly because his hands were buried inside the stubborn engine.",
+              "id": "Sang pilot menjawab dengan ceroboh karena tangannya sedang sibuk di dalam mesin yang keras kepala."
+            },
+            {
+              "en": "To the boy, however, the question concerned the safety of his entire home.",
+              "id": "Namun bagi sang anak, pertanyaan itu menyangkut keselamatan seluruh rumahnya."
+            },
+            {
+              "en": "He became upset when the pilot treated living things as less urgent than metal and bolts.",
+              "id": "Dia menjadi kesal ketika sang pilot menganggap makhluk hidup kurang mendesak dibandingkan logam dan baut."
+            },
+            {
+              "en": "Their disagreement showed how easily practical pressure can make a person forget what another heart fears.",
+              "id": "Perselisihan mereka menunjukkan betapa tekanan praktis dapat membuat seseorang melupakan ketakutan hati orang lain."
+            }
+          ]
+        },
+        {
+          "title": "The Proud and Fragile Rose",
           "sentences": [
             {
               "en": "One unusual seed produced a plant unlike anything the boy had ever seen.",
@@ -1101,7 +1106,7 @@
           ]
         },
         {
-          "title": "Departure Among the Volcanoes",
+          "title": "Leaving the Little Planet",
           "sentences": [
             {
               "en": "Before departing, the boy cleaned his planet with greater care than usual.",
@@ -1154,7 +1159,7 @@
           ]
         },
         {
-          "title": "The King Without a Kingdom",
+          "title": "The King",
           "sentences": [
             {
               "en": "The first neighboring planet held a king dressed for ceremonies that never happened.",
@@ -1207,7 +1212,7 @@
           ]
         },
         {
-          "title": "Adults Trapped by a Single Desire",
+          "title": "The Vain Man",
           "sentences": [
             {
               "en": "On another planet, a proud man waited endlessly for someone to admire him.",
@@ -1220,7 +1225,12 @@
             {
               "en": "The boy quickly discovered that admiration without knowledge of another person feels empty.",
               "id": "Sang anak segera mengetahui bahwa kekaguman tanpa mengenal orang lain terasa kosong."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Drinker",
+          "sentences": [
             {
               "en": "A later world held a man who drank because he felt ashamed of drinking.",
               "id": "Dunia berikutnya dihuni seorang pria yang minum karena merasa malu telah minum."
@@ -1232,7 +1242,12 @@
             {
               "en": "The boy left quietly because some pain closes its door when approached too directly.",
               "id": "Sang anak pergi dengan tenang karena beberapa luka menutup pintunya ketika didekati terlalu langsung."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Businessman",
+          "sentences": [
             {
               "en": "Then he met a businessman who counted stars without ever looking at their beauty.",
               "id": "Kemudian dia bertemu pebisnis yang menghitung bintang tanpa pernah melihat keindahannya."
@@ -1260,7 +1275,7 @@
           ]
         },
         {
-          "title": "The Lamplighter and the Geographer",
+          "title": "The Lamplighter",
           "sentences": [
             {
               "en": "The fifth planet was so small that a lamp and its keeper filled nearly all the space.",
@@ -1285,7 +1300,12 @@
             {
               "en": "Even so, duty without reflection had stolen every chance for rest or change.",
               "id": "Meski demikian, kewajiban tanpa perenungan telah merampas setiap kesempatan untuk beristirahat atau berubah."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Geographer",
+          "sentences": [
             {
               "en": "The next planet belonged to a geographer surrounded by large books and unfinished maps.",
               "id": "Planet berikutnya dimiliki seorang ahli geografi yang dikelilingi buku besar dan peta yang belum selesai."
@@ -1313,7 +1333,7 @@
           ]
         },
         {
-          "title": "Arrival on Earth",
+          "title": "The Great Planet Earth",
           "sentences": [
             {
               "en": "Earth astonished the boy because it contained millions of people performing countless roles.",
@@ -1322,7 +1342,12 @@
             {
               "en": "Yet his first landing place was an empty desert beneath a dark and brilliant sky.",
               "id": "Namun tempat pendaratan pertamanya adalah gurun kosong di bawah langit yang gelap dan terang oleh bintang."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Snake",
+          "sentences": [
             {
               "en": "There he met a slender snake whose quiet confidence made him more dangerous than he appeared.",
               "id": "Di sana dia bertemu ular ramping yang keyakinannya yang tenang membuatnya lebih berbahaya daripada penampilannya."
@@ -1334,7 +1359,12 @@
             {
               "en": "The boy did not fully understand, but he recognized both danger and a strange promise.",
               "id": "Sang anak tidak sepenuhnya memahami, tetapi mengenali bahaya sekaligus janji yang aneh."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Desert Flower",
+          "sentences": [
             {
               "en": "He crossed the desert and found one small flower growing where almost nothing survived.",
               "id": "Dia melintasi gurun dan menemukan satu bunga kecil tumbuh di tempat yang hampir tidak dapat dihuni apa pun."
@@ -1342,7 +1372,12 @@
             {
               "en": "She had seen only a few passing travelers and believed humanity was rare and rootless.",
               "id": "Bunga itu hanya pernah melihat beberapa pengelana dan mengira manusia langka serta tidak berakar."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Echoing Mountain",
+          "sentences": [
             {
               "en": "Higher in the mountains, the boy called out and heard his own words return as echoes.",
               "id": "Di pegunungan yang lebih tinggi, sang anak memanggil dan mendengar kata-katanya sendiri kembali sebagai gema."
@@ -1366,7 +1401,7 @@
           ]
         },
         {
-          "title": "A Garden Full of Roses",
+          "title": "The Garden of Roses",
           "sentences": [
             {
               "en": "After walking for many days, the boy discovered a garden crowded with blooming roses.",
@@ -1419,7 +1454,7 @@
           ]
         },
         {
-          "title": "Lessons from the Fox",
+          "title": "The Fox",
           "sentences": [
             {
               "en": "A fox greeted the boy from a distance but refused to become an instant playmate.",
@@ -1472,7 +1507,7 @@
           ]
         },
         {
-          "title": "Travelers, Trains, and Shortcuts",
+          "title": "The Railway Switchman",
           "sentences": [
             {
               "en": "Later the boy met a railway worker who directed crowded trains toward opposite horizons.",
@@ -1489,7 +1524,12 @@
             {
               "en": "The boy noticed that movement can look like purpose even when no destination satisfies anyone.",
               "id": "Sang anak menyadari bahwa pergerakan dapat tampak seperti tujuan meski tidak ada tujuan akhir yang memuaskan siapa pun."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Merchant",
+          "sentences": [
             {
               "en": "He also met a merchant selling tablets that removed the physical feeling of thirst.",
               "id": "Dia juga bertemu pedagang yang menjual pil untuk menghilangkan rasa haus secara fisik."
@@ -1513,7 +1553,12 @@
             {
               "en": "A shortcut may remove discomfort while also removing the experience that gives relief meaning.",
               "id": "Jalan pintas dapat menghilangkan ketidaknyamanan sekaligus pengalaman yang memberi makna pada kelegaan."
-            },
+            }
+          ]
+        },
+        {
+          "title": "The Search for Water",
+          "sentences": [
             {
               "en": "These meetings prepared him to return to the desert, where water could not be treated as a number.",
               "id": "Pertemuan-pertemuan itu mempersiapkannya kembali ke gurun, tempat air tidak dapat dianggap sekadar angka."
@@ -1521,12 +1566,7 @@
             {
               "en": "There, the pilot's failing supply would turn a simple drink into an unforgettable gift.",
               "id": "Di sana, persediaan sang pilot yang menipis akan mengubah minuman sederhana menjadi hadiah yang tak terlupakan."
-            }
-          ]
-        },
-        {
-          "title": "Searching for Water",
-          "sentences": [
+            },
             {
               "en": "Back beside the broken airplane, the pilot finally used the last of his drinking water.",
               "id": "Kembali di dekat pesawat rusak, sang pilot akhirnya menghabiskan air minumnya yang terakhir."
@@ -1578,7 +1618,7 @@
           ]
         },
         {
-          "title": "The Gift Hidden in a Drink",
+          "title": "The Well",
           "sentences": [
             {
               "en": "The well looked carefully built, with a bucket, rope, and pulley worn smooth by use.",
@@ -1631,7 +1671,7 @@
           ]
         },
         {
-          "title": "The Anniversary in the Desert",
+          "title": "The Return to the Stars",
           "sentences": [
             {
               "en": "After returning to the airplane, the pilot worked urgently and finally restored the engine.",
@@ -1680,12 +1720,7 @@
             {
               "en": "When darkness came, they walked together toward the place chosen for the boy's departure.",
               "id": "Ketika gelap tiba, mereka berjalan bersama menuju tempat yang dipilih untuk keberangkatan sang anak."
-            }
-          ]
-        },
-        {
-          "title": "A Quiet Farewell",
-          "sentences": [
+            },
             {
               "en": "The desert night seemed motionless as the boy and the pilot reached the appointed place.",
               "id": "Malam gurun tampak tidak bergerak ketika sang anak dan sang pilot mencapai tempat yang telah ditentukan."
@@ -1737,7 +1772,7 @@
           ]
         },
         {
-          "title": "The Stars Afterward",
+          "title": "The Stars Afterwards",
           "sentences": [
             {
               "en": "The repaired airplane carried the pilot back to people who were relieved to see him alive.",
