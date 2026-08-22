@@ -713,734 +713,1119 @@
       ]
     },
     {
-      "id": "the_little_prince",
-  "title": "The Little Prince",
-  "kind": "tale",
-  "level": "A2",
-  "minutes": 30,
-  "cover": {
-    "emoji": "🌟",
-    "accent": "#f4c542"
-  },
-  "source": "A simplified bilingual retelling by FIEZEL, based on The Little Prince by Antoine de Saint-Exupéry.",
-  "about": {
-    "en": "A pilot meets a little prince from another planet and learns about love, friendship, and what truly matters.",
-    "id": "Seorang pilot bertemu dengan seorang pangeran kecil dari planet lain dan belajar tentang cinta, persahabatan, serta hal-hal yang benar-benar penting."
-  },
-  "chapters": [
-    {
-      "title": "The First Drawing",
-      "sentences": [
+      "id": "little_prince_guide",
+      "title": "The Little Prince: An Extended Retelling",
+      "kind": "guide",
+      "level": "B1-B2",
+      "minutes": 30,
+      "cover": {
+        "emoji": "🌟",
+        "accent": "#d99a24"
+      },
+      "author": "Antoine de Saint-Exupéry (1943)",
+      "source": "An original extended FIEZEL retelling inspired by The Little Prince. The original text is still in copyright and is not reproduced verbatim. Indonesian translation is authored sentence by sentence.",
+      "about": {
+        "en": "A lonely pilot meets a young traveler from the stars and learns how attention, friendship, and responsibility give life its meaning.",
+        "id": "Seorang pilot kesepian bertemu pengelana muda dari bintang dan memahami bahwa perhatian, persahabatan, serta tanggung jawab memberi makna pada kehidupan."
+      },
+      "chapters": [
         {
-          "en": "When I was six years old, I saw a picture of a snake eating an animal.",
-          "id": "Ketika berusia enam tahun, aku melihat gambar seekor ular yang sedang memakan binatang."
+          "title": "The Drawing Adults Could Not See",
+          "sentences": [
+            {
+              "en": "Long before he became a pilot, the narrator was a child who loved pictures and wild ideas.",
+              "id": "Jauh sebelum menjadi pilot, sang narator adalah anak yang menyukai gambar dan gagasan liar."
+            },
+            {
+              "en": "A book about distant forests once showed him how patiently nature could hide danger.",
+              "id": "Sebuah buku tentang hutan jauh pernah menunjukkan kepadanya bagaimana alam menyembunyikan bahaya dengan sabar."
+            },
+            {
+              "en": "Excited by what he had learned, he drew a giant snake resting after an enormous meal.",
+              "id": "Karena bersemangat oleh pengetahuan barunya, dia menggambar ular raksasa yang beristirahat setelah makan besar."
+            },
+            {
+              "en": "The adults saw only the outside shape and mistook it for an ordinary piece of clothing.",
+              "id": "Orang dewasa hanya melihat bentuk luarnya dan mengiranya sebagai pakaian biasa."
+            },
+            {
+              "en": "He tried again by drawing what was hidden inside, hoping the mystery would become clear.",
+              "id": "Dia mencoba lagi dengan menggambar apa yang tersembunyi di dalamnya, berharap misterinya menjadi jelas."
+            },
+            {
+              "en": "Instead of becoming curious, the adults advised him to study practical subjects and abandon art.",
+              "id": "Alih-alih penasaran, orang dewasa menyuruhnya mempelajari hal praktis dan meninggalkan seni."
+            },
+            {
+              "en": "Their certainty made him doubt the imagination that had once felt natural to him.",
+              "id": "Keyakinan mereka membuatnya meragukan imajinasi yang dahulu terasa alami baginya."
+            },
+            {
+              "en": "He put away his pencils and eventually learned to guide airplanes across countries and oceans.",
+              "id": "Dia menyimpan pensilnya dan akhirnya belajar menerbangkan pesawat melintasi negara serta samudra."
+            },
+            {
+              "en": "Flying taught him geography, weather, machines, and the quiet discipline of staying alive.",
+              "id": "Penerbangan mengajarinya geografi, cuaca, mesin, dan disiplin sunyi untuk bertahan hidup."
+            },
+            {
+              "en": "Yet the people he met usually preferred numbers, status, and respectable conversation.",
+              "id": "Namun orang-orang yang ditemuinya biasanya lebih menyukai angka, status, dan percakapan yang dianggap terhormat."
+            },
+            {
+              "en": "Sometimes he showed them his childhood picture to discover whether they could look beyond appearances.",
+              "id": "Kadang dia menunjukkan gambar masa kecilnya untuk mengetahui apakah mereka mampu melihat melampaui penampilan."
+            },
+            {
+              "en": "When they failed the test, he hid his deeper thoughts and spoke the safe language of grown-ups.",
+              "id": "Saat mereka gagal, dia menyembunyikan pikirannya yang lebih dalam dan memakai bahasa aman orang dewasa."
+            }
+          ]
         },
         {
-          "en": "I drew a snake with an elephant inside it.",
-          "id": "Aku menggambar seekor ular dengan gajah di dalam perutnya."
+          "title": "Alone in the Sahara",
+          "sentences": [
+            {
+              "en": "Years later, an engine failure forced the pilot to land in the vast Sahara Desert.",
+              "id": "Bertahun-tahun kemudian, kerusakan mesin memaksa sang pilot mendarat di Gurun Sahara yang luas."
+            },
+            {
+              "en": "There was no mechanic, passenger, road, village, or radio nearby to rescue him.",
+              "id": "Tidak ada mekanik, penumpang, jalan, desa, ataupun radio di dekatnya untuk menolongnya."
+            },
+            {
+              "en": "He carried only enough water for several days and knew every hour mattered.",
+              "id": "Dia hanya membawa air untuk beberapa hari dan tahu bahwa setiap jam sangat berarti."
+            },
+            {
+              "en": "During daylight he studied the damaged engine and arranged his few tools in the sand.",
+              "id": "Pada siang hari dia memeriksa mesin yang rusak dan menata sedikit perkakasnya di atas pasir."
+            },
+            {
+              "en": "At night the desert became cold, silent, and so wide that the stars seemed unusually near.",
+              "id": "Pada malam hari gurun menjadi dingin, sunyi, dan begitu luas hingga bintang terasa sangat dekat."
+            },
+            {
+              "en": "He slept without shelter, surrounded by distances that no human voice could cross.",
+              "id": "Dia tidur tanpa perlindungan, dikelilingi jarak yang tidak dapat ditembus suara manusia."
+            },
+            {
+              "en": "The practical adult in him counted water, repairs, and the chances of survival.",
+              "id": "Sisi dewasa yang praktis dalam dirinya menghitung air, perbaikan, dan peluang untuk selamat."
+            },
+            {
+              "en": "The forgotten child in him watched the sky and felt the desert waiting for a secret.",
+              "id": "Sisi anak-anak yang terlupakan dalam dirinya memandang langit dan merasa gurun sedang menunggu sebuah rahasia."
+            },
+            {
+              "en": "Before sunrise, a small and perfectly calm voice woke him from an exhausted sleep.",
+              "id": "Menjelang matahari terbit, suara kecil yang sangat tenang membangunkannya dari tidur yang melelahkan."
+            },
+            {
+              "en": "The pilot first believed that heat, fear, or thirst had created the sound.",
+              "id": "Awalnya sang pilot mengira panas, ketakutan, atau rasa haus telah menciptakan suara itu."
+            },
+            {
+              "en": "Then he opened his eyes and saw a golden-haired boy standing several steps away.",
+              "id": "Kemudian dia membuka mata dan melihat anak berambut keemasan berdiri beberapa langkah darinya."
+            },
+            {
+              "en": "The stranger looked neither lost nor frightened, although no settlement existed for hundreds of miles.",
+              "id": "Anak asing itu tampak tidak tersesat ataupun takut, meski tidak ada permukiman dalam jarak ratusan mil."
+            }
+          ]
         },
         {
-          "en": "The grown-ups thought my drawing was a hat.",
-          "id": "Orang-orang dewasa mengira gambarku adalah sebuah topi."
+          "title": "The Visitor and the Lamb",
+          "sentences": [
+            {
+              "en": "Without explaining who he was, the boy politely asked the pilot to sketch a young lamb.",
+              "id": "Tanpa menjelaskan siapa dirinya, anak itu dengan sopan meminta sang pilot menggambar seekor domba muda."
+            },
+            {
+              "en": "The request was so unexpected that the broken airplane disappeared from the pilot's thoughts.",
+              "id": "Permintaan itu begitu tidak terduga hingga pesawat rusak lenyap sejenak dari pikiran sang pilot."
+            },
+            {
+              "en": "He admitted that adults had ended his drawing career when he was still very young.",
+              "id": "Dia mengakui bahwa orang dewasa telah mengakhiri karier menggambarnya ketika dia masih sangat muda."
+            },
+            {
+              "en": "The boy was not interested in excuses and simply repeated what he needed.",
+              "id": "Anak itu tidak tertarik pada alasan dan hanya mengulangi apa yang dia perlukan."
+            },
+            {
+              "en": "The pilot drew several animals, but each one appeared too weak, too old, or quite wrong.",
+              "id": "Sang pilot menggambar beberapa hewan, tetapi masing-masing tampak terlalu lemah, terlalu tua, atau tidak tepat."
+            },
+            {
+              "en": "Growing impatient, he finally drew a simple box and said the desired animal was resting inside.",
+              "id": "Karena mulai tidak sabar, akhirnya dia menggambar kotak sederhana dan berkata hewan yang dimaksud beristirahat di dalamnya."
+            },
+            {
+              "en": "To his surprise, the boy's face brightened as if he had received exactly the right gift.",
+              "id": "Yang mengejutkan, wajah anak itu berseri seolah dia telah menerima hadiah yang benar-benar tepat."
+            },
+            {
+              "en": "The unseen lamb could be healthy, gentle, and young because imagination supplied every missing detail.",
+              "id": "Domba yang tidak terlihat itu bisa sehat, lembut, dan muda karena imajinasi melengkapi setiap detail yang hilang."
+            },
+            {
+              "en": "The pilot realized he had finally met someone who understood a picture without demanding an explanation.",
+              "id": "Sang pilot menyadari akhirnya dia bertemu seseorang yang memahami gambar tanpa menuntut penjelasan."
+            },
+            {
+              "en": "Questions about the boy's home received no direct answer, but his own questions revealed small clues.",
+              "id": "Pertanyaan tentang rumah anak itu tidak mendapat jawaban langsung, tetapi pertanyaannya sendiri memberi petunjuk kecil."
+            },
+            {
+              "en": "He worried about grass, fences, and whether the lamb might wander too far.",
+              "id": "Dia mencemaskan rumput, pagar, dan kemungkinan domba itu berkeliaran terlalu jauh."
+            },
+            {
+              "en": "Those concerns suggested a home so tiny that walking away could become a serious danger.",
+              "id": "Kekhawatiran itu menunjukkan sebuah rumah yang begitu kecil sehingga berjalan terlalu jauh bisa menjadi bahaya besar."
+            }
+          ]
         },
         {
-          "en": "They told me to stop drawing and study useful subjects.",
-          "id": "Mereka menyuruhku berhenti menggambar dan mempelajari mata pelajaran yang berguna."
+          "title": "Asteroid B-612",
+          "sentences": [
+            {
+              "en": "Over several mornings, the pilot slowly assembled the scattered facts of his visitor's life.",
+              "id": "Selama beberapa pagi, sang pilot perlahan menyusun fakta-fakta yang tersebar tentang kehidupan tamunya."
+            },
+            {
+              "en": "The boy came from a wandering rock in space that was scarcely larger than a house.",
+              "id": "Anak itu berasal dari batu pengembara di angkasa yang ukurannya hampir tidak lebih besar daripada rumah."
+            },
+            {
+              "en": "Astronomers had given the rock a number, because adults trusted labels more than wonder.",
+              "id": "Para astronom memberi batu itu sebuah nomor, karena orang dewasa lebih memercayai label daripada rasa takjub."
+            },
+            {
+              "en": "One astronomer announced its discovery while wearing traditional clothes, but nobody respected him.",
+              "id": "Seorang astronom mengumumkan penemuannya dengan pakaian tradisional, tetapi tidak seorang pun menghormatinya."
+            },
+            {
+              "en": "Years later he repeated the same evidence in fashionable clothing, and everyone immediately agreed.",
+              "id": "Bertahun-tahun kemudian dia mengulang bukti yang sama dengan pakaian bergaya, lalu semua orang langsung setuju."
+            },
+            {
+              "en": "The pilot remembered this story whenever adults asked for measurements instead of character.",
+              "id": "Sang pilot mengingat kisah itu setiap kali orang dewasa meminta ukuran dan bukan watak."
+            },
+            {
+              "en": "They wanted a person's age, salary, address, and possessions before deciding whether he mattered.",
+              "id": "Mereka ingin mengetahui usia, gaji, alamat, dan kepemilikan seseorang sebelum memutuskan apakah dia penting."
+            },
+            {
+              "en": "They rarely asked what made someone laugh or what kind of silence made him feel safe.",
+              "id": "Mereka jarang bertanya apa yang membuat seseorang tertawa atau kesunyian seperti apa yang membuatnya merasa aman."
+            },
+            {
+              "en": "On the little planet, the boy could cross from one side to the other in moments.",
+              "id": "Di planet kecil itu, sang anak dapat menyeberang dari satu sisi ke sisi lain dalam beberapa saat."
+            },
+            {
+              "en": "He owned no palace and commanded no servants, yet every corner of the world belonged to his care.",
+              "id": "Dia tidak memiliki istana dan tidak memerintah pelayan, tetapi setiap sudut dunianya berada dalam perawatannya."
+            },
+            {
+              "en": "Three small volcanoes warmed his mornings, although one of them had become quiet long ago.",
+              "id": "Tiga gunung berapi kecil menghangatkan paginya, meskipun salah satunya telah lama menjadi tenang."
+            },
+            {
+              "en": "His daily life was simple, but its small scale made every choice surprisingly important.",
+              "id": "Kehidupan sehari-harinya sederhana, tetapi ukurannya yang kecil membuat setiap pilihan menjadi sangat penting."
+            }
+          ]
         },
         {
-          "en": "So I became a pilot, but I never forgot my drawing.",
-          "id": "Maka aku menjadi seorang pilot, tetapi aku tidak pernah melupakan gambarku."
+          "title": "The Baobab Seeds",
+          "sentences": [
+            {
+              "en": "Every morning, new shoots appeared in the soil of the boy's planet.",
+              "id": "Setiap pagi, tunas baru muncul dari tanah planet sang anak."
+            },
+            {
+              "en": "Some promised harmless flowers, while others carried the beginning of enormous destructive trees.",
+              "id": "Sebagian menjanjikan bunga yang tidak berbahaya, sedangkan yang lain membawa awal pohon perusak yang sangat besar."
+            },
+            {
+              "en": "The dangerous plants looked innocent when they first lifted two leaves toward the light.",
+              "id": "Tanaman berbahaya tampak polos ketika pertama kali mengangkat dua daun ke arah cahaya."
+            },
+            {
+              "en": "If removed early, their roots left the planet without causing serious harm.",
+              "id": "Jika dicabut lebih awal, akarnya meninggalkan planet tanpa menimbulkan kerusakan serius."
+            },
+            {
+              "en": "If ignored, they grew deep, split the ground, and threatened to tear the little world apart.",
+              "id": "Jika diabaikan, tanaman itu tumbuh dalam, membelah tanah, dan mengancam merobek dunia kecil tersebut."
+            },
+            {
+              "en": "The boy therefore cleaned his planet before pleasure, travel, or rest.",
+              "id": "Karena itu sang anak membersihkan planetnya sebelum bersenang-senang, bepergian, atau beristirahat."
+            },
+            {
+              "en": "He learned that discipline often means solving a small problem before it becomes powerful.",
+              "id": "Dia belajar bahwa disiplin sering berarti menyelesaikan masalah kecil sebelum masalah itu menjadi kuat."
+            },
+            {
+              "en": "He also wondered whether the lamb might eat the dangerous shoots and make his work easier.",
+              "id": "Dia juga bertanya-tanya apakah domba itu akan memakan tunas berbahaya dan meringankan pekerjaannya."
+            }
+          ]
+        },
+        {
+          "title": "Forty-Four Sunsets",
+          "sentences": [
+            {
+              "en": "The boy loved the gentle ceremony of sunset more than any possession.",
+              "id": "Sang anak mencintai upacara lembut matahari terbenam lebih daripada kepemilikan apa pun."
+            },
+            {
+              "en": "On Earth, a person must wait until evening or travel west to watch the sun disappear again.",
+              "id": "Di Bumi, seseorang harus menunggu malam atau bergerak ke barat untuk melihat matahari menghilang lagi."
+            },
+            {
+              "en": "On his little planet, he only needed to move his chair a few steps.",
+              "id": "Di planet kecilnya, dia hanya perlu memindahkan kursinya beberapa langkah."
+            },
+            {
+              "en": "The horizon followed him, allowing evening to return whenever he wished.",
+              "id": "Cakrawala mengikutinya, sehingga senja dapat kembali kapan pun dia menginginkannya."
+            },
+            {
+              "en": "One lonely day he watched the sky change color dozens of times.",
+              "id": "Pada suatu hari yang sepi dia menyaksikan langit berubah warna puluhan kali."
+            },
+            {
+              "en": "He did not explain the sadness behind that long sequence of sunsets.",
+              "id": "Dia tidak menjelaskan kesedihan di balik rangkaian panjang matahari terbenam itu."
+            },
+            {
+              "en": "The pilot understood that beauty can become a quiet companion when words are difficult.",
+              "id": "Sang pilot memahami bahwa keindahan dapat menjadi teman yang tenang saat kata-kata terasa sulit."
+            },
+            {
+              "en": "For the boy, sunset required no ownership, calculation, or applause.",
+              "id": "Bagi sang anak, matahari terbenam tidak membutuhkan kepemilikan, perhitungan, ataupun tepuk tangan."
+            },
+            {
+              "en": "It simply asked him to stop, look carefully, and let a moment pass through him.",
+              "id": "Senja hanya memintanya berhenti, memperhatikan, dan membiarkan suatu momen melewati dirinya."
+            },
+            {
+              "en": "That habit separated him from adults who rushed past beauty while counting their schedules.",
+              "id": "Kebiasaan itu membedakannya dari orang dewasa yang melewati keindahan sambil menghitung jadwal."
+            },
+            {
+              "en": "His sadness was real, but it did not make him cynical or unable to wonder.",
+              "id": "Kesedihannya nyata, tetapi tidak membuatnya sinis ataupun kehilangan rasa takjub."
+            },
+            {
+              "en": "The repeated evenings prepared him to notice the fragile beauty that soon arrived on his planet.",
+              "id": "Senja yang berulang mempersiapkannya untuk melihat keindahan rapuh yang segera tiba di planetnya."
+            }
+          ]
+        },
+        {
+          "title": "A Question About Flowers",
+          "sentences": [
+            {
+              "en": "The pilot answered carelessly because his hands were buried inside the stubborn engine.",
+              "id": "Sang pilot menjawab dengan ceroboh karena tangannya sedang sibuk di dalam mesin yang keras kepala."
+            },
+            {
+              "en": "To the boy, however, the question concerned the safety of his entire home.",
+              "id": "Namun bagi sang anak, pertanyaan itu menyangkut keselamatan seluruh rumahnya."
+            },
+            {
+              "en": "He became upset when the pilot treated living things as less urgent than metal and bolts.",
+              "id": "Dia menjadi kesal ketika sang pilot menganggap makhluk hidup kurang mendesak dibandingkan logam dan baut."
+            },
+            {
+              "en": "Their disagreement showed how easily practical pressure can make a person forget what another heart fears.",
+              "id": "Perselisihan mereka menunjukkan betapa tekanan praktis dapat membuat seseorang melupakan ketakutan hati orang lain."
+            }
+          ]
+        },
+        {
+          "title": "The Proud and Fragile Rose",
+          "sentences": [
+            {
+              "en": "One unusual seed produced a plant unlike anything the boy had ever seen.",
+              "id": "Sebuah benih yang tidak biasa menghasilkan tanaman yang berbeda dari apa pun yang pernah dilihat sang anak."
+            },
+            {
+              "en": "The bud prepared itself for many days, arranging every petal in secret.",
+              "id": "Kuncup itu mempersiapkan diri selama berhari-hari, menata setiap kelopak secara diam-diam."
+            },
+            {
+              "en": "When it finally opened, a beautiful flower greeted the morning with complete confidence.",
+              "id": "Ketika akhirnya mekar, bunga yang indah menyambut pagi dengan keyakinan penuh."
+            },
+            {
+              "en": "She enjoyed admiration and often spoke as though the whole planet existed for her comfort.",
+              "id": "Dia menikmati kekaguman dan sering berbicara seolah seluruh planet ada demi kenyamanannya."
+            },
+            {
+              "en": "She requested water, protection from cold air, and a screen against imaginary dangers.",
+              "id": "Dia meminta air, perlindungan dari udara dingin, dan penghalang terhadap bahaya yang dibayangkannya."
+            },
+            {
+              "en": "The boy gladly cared for her, yet her proud words confused and wounded him.",
+              "id": "Sang anak merawatnya dengan senang hati, tetapi kata-katanya yang angkuh membingungkan dan melukainya."
+            },
+            {
+              "en": "Her small thorns looked impressive to her, although they offered almost no real protection.",
+              "id": "Duri-duri kecilnya tampak mengesankan baginya, meskipun hampir tidak memberi perlindungan nyata."
+            },
+            {
+              "en": "Behind the performance, she feared drafts, loneliness, insects, and the possibility of being forgotten.",
+              "id": "Di balik penampilannya, dia takut pada angin, kesepian, serangga, dan kemungkinan dilupakan."
+            },
+            {
+              "en": "Neither of them yet knew how to express affection without hiding behind pride.",
+              "id": "Keduanya belum tahu cara menyampaikan kasih sayang tanpa bersembunyi di balik kebanggaan."
+            },
+            {
+              "en": "The boy listened too closely to her complaints and not closely enough to her actions.",
+              "id": "Sang anak terlalu mendengarkan keluhannya dan kurang memperhatikan tindakannya."
+            },
+            {
+              "en": "He failed to understand that her demands were clumsy attempts to keep him nearby.",
+              "id": "Dia gagal memahami bahwa tuntutannya adalah usaha canggung untuk membuatnya tetap dekat."
+            },
+            {
+              "en": "Unable to solve the distance between them, he began to imagine leaving his little world.",
+              "id": "Karena tidak mampu mengatasi jarak di antara mereka, dia mulai membayangkan meninggalkan dunia kecilnya."
+            }
+          ]
+        },
+        {
+          "title": "Leaving the Little Planet",
+          "sentences": [
+            {
+              "en": "Before departing, the boy cleaned his planet with greater care than usual.",
+              "id": "Sebelum berangkat, sang anak membersihkan planetnya dengan perhatian yang lebih besar daripada biasanya."
+            },
+            {
+              "en": "He removed dangerous shoots and swept each active volcano until its passages were clear.",
+              "id": "Dia mencabut tunas berbahaya dan membersihkan setiap gunung berapi aktif hingga salurannya terbuka."
+            },
+            {
+              "en": "He even cleaned the silent volcano, because a quiet thing may someday awaken.",
+              "id": "Dia bahkan membersihkan gunung berapi yang diam, karena sesuatu yang tenang mungkin suatu hari terbangun."
+            },
+            {
+              "en": "Finally he watered the flower and prepared her glass shelter for the last time.",
+              "id": "Akhirnya dia menyirami bunga itu dan menyiapkan pelindung kacanya untuk terakhir kali."
+            },
+            {
+              "en": "The expected argument did not come, and the flower spoke with surprising honesty.",
+              "id": "Pertengkaran yang diperkirakan tidak terjadi, dan sang bunga berbicara dengan kejujuran yang mengejutkan."
+            },
+            {
+              "en": "She admitted that affection had been hidden beneath her pride and unnecessary drama.",
+              "id": "Dia mengakui bahwa kasih sayang tersembunyi di balik kebanggaan serta dramanya yang tidak perlu."
+            },
+            {
+              "en": "She refused to let him see her cry and asked him not to delay his journey.",
+              "id": "Dia menolak memperlihatkan tangisnya dan meminta sang anak tidak menunda perjalanannya."
+            },
+            {
+              "en": "The boy left with regret, sensing that understanding had arrived only when time was ending.",
+              "id": "Sang anak pergi dengan penyesalan, merasa pemahaman datang justru ketika waktu mereka berakhir."
+            },
+            {
+              "en": "A migrating flock carried him away from the planet and into the darkness between worlds.",
+              "id": "Sekawanan burung yang bermigrasi membawanya meninggalkan planet menuju kegelapan di antara dunia."
+            },
+            {
+              "en": "Behind him remained the flower, the volcanoes, and every task that had shaped his days.",
+              "id": "Di belakangnya tertinggal bunga, gunung berapi, dan setiap tugas yang telah membentuk hari-harinya."
+            },
+            {
+              "en": "Ahead waited planets occupied by adults who had turned one idea into an entire identity.",
+              "id": "Di depan menanti planet-planet yang dihuni orang dewasa yang mengubah satu gagasan menjadi seluruh identitas."
+            },
+            {
+              "en": "He hoped travel would explain both the flower's behavior and the confusion inside his own heart.",
+              "id": "Dia berharap perjalanan akan menjelaskan perilaku bunga sekaligus kebingungan di dalam hatinya."
+            }
+          ]
+        },
+        {
+          "title": "The King",
+          "sentences": [
+            {
+              "en": "The first neighboring planet held a king dressed for ceremonies that never happened.",
+              "id": "Planet tetangga pertama dihuni seorang raja yang berpakaian untuk upacara yang tidak pernah terjadi."
+            },
+            {
+              "en": "He welcomed the boy as a subject, although they had never met and nobody else lived there.",
+              "id": "Dia menyambut sang anak sebagai rakyatnya, meskipun mereka belum pernah bertemu dan tidak ada orang lain di sana."
+            },
+            {
+              "en": "The king believed authority became complete simply because he declared it complete.",
+              "id": "Sang raja percaya kekuasaan menjadi sempurna hanya karena dia menyatakannya demikian."
+            },
+            {
+              "en": "He claimed command over stars, weather, animals, and every action in the universe.",
+              "id": "Dia mengaku memerintah bintang, cuaca, hewan, dan setiap tindakan di alam semesta."
+            },
+            {
+              "en": "Yet he issued orders only after circumstances made obedience certain.",
+              "id": "Namun dia hanya memberi perintah setelah keadaan membuat ketaatan menjadi pasti."
+            },
+            {
+              "en": "He would order sunset near evening and then celebrate his own successful leadership.",
+              "id": "Dia akan memerintahkan matahari terbenam menjelang senja lalu merayakan keberhasilan kepemimpinannya sendiri."
+            },
+            {
+              "en": "The boy saw that reasonable commands can hide a ruler's fear of being ignored.",
+              "id": "Sang anak melihat bahwa perintah yang masuk akal dapat menyembunyikan ketakutan penguasa untuk diabaikan."
+            },
+            {
+              "en": "When he prepared to leave, the king offered titles to make staying sound important.",
+              "id": "Ketika dia bersiap pergi, sang raja menawarkan gelar agar keputusan untuk tinggal terdengar penting."
+            },
+            {
+              "en": "The boy asked whom he could judge on a planet with only one inhabitant.",
+              "id": "Sang anak bertanya siapa yang bisa diadilinya di planet dengan hanya satu penghuni."
+            },
+            {
+              "en": "The king suggested self-judgment, which was wiser than most of his earlier claims.",
+              "id": "Sang raja menyarankan penilaian terhadap diri sendiri, yang lebih bijak daripada sebagian besar ucapannya sebelumnya."
+            },
+            {
+              "en": "Still, wisdom spoken to preserve control did not feel like genuine companionship.",
+              "id": "Namun kebijaksanaan yang diucapkan demi mempertahankan kendali tidak terasa seperti persahabatan sejati."
+            },
+            {
+              "en": "The boy departed, wondering why adults so often confused responsibility with power.",
+              "id": "Sang anak pergi sambil bertanya-tanya mengapa orang dewasa sering mencampuradukkan tanggung jawab dengan kekuasaan."
+            }
+          ]
+        },
+        {
+          "title": "The Vain Man",
+          "sentences": [
+            {
+              "en": "On another planet, a proud man waited endlessly for someone to admire him.",
+              "id": "Di planet lain, seorang pria sombong menunggu tanpa akhir agar seseorang mengaguminya."
+            },
+            {
+              "en": "He heard every greeting as applause and every question as another opportunity for praise.",
+              "id": "Dia mendengar setiap sapaan sebagai tepuk tangan dan setiap pertanyaan sebagai kesempatan memperoleh pujian."
+            },
+            {
+              "en": "The boy quickly discovered that admiration without knowledge of another person feels empty.",
+              "id": "Sang anak segera mengetahui bahwa kekaguman tanpa mengenal orang lain terasa kosong."
+            }
+          ]
+        },
+        {
+          "title": "The Drinker",
+          "sentences": [
+            {
+              "en": "A later world held a man who drank because he felt ashamed of drinking.",
+              "id": "Dunia berikutnya dihuni seorang pria yang minum karena merasa malu telah minum."
+            },
+            {
+              "en": "His sadness moved in a circle that no honest conversation seemed able to break.",
+              "id": "Kesedihannya bergerak dalam lingkaran yang tampaknya tidak mampu diputus oleh percakapan jujur."
+            },
+            {
+              "en": "The boy left quietly because some pain closes its door when approached too directly.",
+              "id": "Sang anak pergi dengan tenang karena beberapa luka menutup pintunya ketika didekati terlalu langsung."
+            }
+          ]
+        },
+        {
+          "title": "The Businessman",
+          "sentences": [
+            {
+              "en": "Then he met a businessman who counted stars without ever looking at their beauty.",
+              "id": "Kemudian dia bertemu pebisnis yang menghitung bintang tanpa pernah melihat keindahannya."
+            },
+            {
+              "en": "The man believed writing a number on paper made every distant light his property.",
+              "id": "Pria itu percaya menuliskan angka di atas kertas menjadikan setiap cahaya jauh sebagai miliknya."
+            },
+            {
+              "en": "He was extremely busy protecting wealth that changed nothing and helped no one.",
+              "id": "Dia sangat sibuk menjaga kekayaan yang tidak mengubah apa pun dan tidak menolong siapa pun."
+            },
+            {
+              "en": "The boy compared this ownership with caring for his flower and cleaning his volcanoes.",
+              "id": "Sang anak membandingkan kepemilikan itu dengan merawat bunganya dan membersihkan gunung berapinya."
+            },
+            {
+              "en": "His work benefited the things he called his, while the businessman's counting benefited nothing.",
+              "id": "Pekerjaannya memberi manfaat pada hal yang disebut miliknya, sedangkan hitungan sang pebisnis tidak memberi manfaat apa pun."
+            },
+            {
+              "en": "The visit taught him that possession without service is merely another form of loneliness.",
+              "id": "Kunjungan itu mengajarinya bahwa kepemilikan tanpa pelayanan hanyalah bentuk lain dari kesepian."
+            }
+          ]
+        },
+        {
+          "title": "The Lamplighter",
+          "sentences": [
+            {
+              "en": "The fifth planet was so small that a lamp and its keeper filled nearly all the space.",
+              "id": "Planet kelima begitu kecil sehingga sebuah lampu dan penjaganya memenuhi hampir seluruh ruang."
+            },
+            {
+              "en": "The lamplighter obeyed an old schedule created when days were much longer.",
+              "id": "Penjaga lampu menaati jadwal lama yang dibuat ketika hari masih jauh lebih panjang."
+            },
+            {
+              "en": "As the planet spun faster, he had to light and extinguish the lamp every minute.",
+              "id": "Saat planet berputar semakin cepat, dia harus menyalakan dan memadamkan lampu setiap menit."
+            },
+            {
+              "en": "He was exhausted, but he never questioned whether the outdated rule still served a purpose.",
+              "id": "Dia kelelahan, tetapi tidak pernah mempertanyakan apakah aturan usang itu masih berguna."
+            },
+            {
+              "en": "The boy respected him because his work concerned something beyond his own importance.",
+              "id": "Sang anak menghormatinya karena pekerjaannya berkaitan dengan sesuatu di luar kepentingan dirinya sendiri."
+            },
+            {
+              "en": "Even so, duty without reflection had stolen every chance for rest or change.",
+              "id": "Meski demikian, kewajiban tanpa perenungan telah merampas setiap kesempatan untuk beristirahat atau berubah."
+            }
+          ]
+        },
+        {
+          "title": "The Geographer",
+          "sentences": [
+            {
+              "en": "The next planet belonged to a geographer surrounded by large books and unfinished maps.",
+              "id": "Planet berikutnya dimiliki seorang ahli geografi yang dikelilingi buku besar dan peta yang belum selesai."
+            },
+            {
+              "en": "He recorded discoveries but never left his desk to examine mountains, rivers, or seas.",
+              "id": "Dia mencatat penemuan tetapi tidak pernah meninggalkan meja untuk memeriksa gunung, sungai, ataupun laut."
+            },
+            {
+              "en": "Explorers supplied facts, and the geographer judged whether their reports deserved belief.",
+              "id": "Para penjelajah memberikan fakta, lalu ahli geografi menilai apakah laporan mereka layak dipercaya."
+            },
+            {
+              "en": "When the boy described his flower, the scholar dismissed flowers as temporary things.",
+              "id": "Ketika sang anak menggambarkan bunganya, ilmuwan itu menganggap bunga sebagai sesuatu yang sementara."
+            },
+            {
+              "en": "The word temporary struck him painfully because his flower had so little protection.",
+              "id": "Kata sementara menyakitinya karena bunganya memiliki perlindungan yang begitu sedikit."
+            },
+            {
+              "en": "The geographer recommended Earth, and the boy continued his journey with growing regret.",
+              "id": "Ahli geografi menyarankan Bumi, dan sang anak melanjutkan perjalanan dengan penyesalan yang semakin besar."
+            }
+          ]
+        },
+        {
+          "title": "The Great Planet Earth",
+          "sentences": [
+            {
+              "en": "Earth astonished the boy because it contained millions of people performing countless roles.",
+              "id": "Bumi membuat sang anak takjub karena dihuni jutaan manusia yang menjalankan peran tak terhitung jumlahnya."
+            },
+            {
+              "en": "Yet his first landing place was an empty desert beneath a dark and brilliant sky.",
+              "id": "Namun tempat pendaratan pertamanya adalah gurun kosong di bawah langit yang gelap dan terang oleh bintang."
+            }
+          ]
+        },
+        {
+          "title": "The Snake",
+          "sentences": [
+            {
+              "en": "There he met a slender snake whose quiet confidence made him more dangerous than he appeared.",
+              "id": "Di sana dia bertemu ular ramping yang keyakinannya yang tenang membuatnya lebih berbahaya daripada penampilannya."
+            },
+            {
+              "en": "The snake spoke in riddles and claimed he could send travelers back to where they began.",
+              "id": "Ular itu berbicara dalam teka-teki dan mengaku dapat mengirim pengelana kembali ke tempat asalnya."
+            },
+            {
+              "en": "The boy did not fully understand, but he recognized both danger and a strange promise.",
+              "id": "Sang anak tidak sepenuhnya memahami, tetapi mengenali bahaya sekaligus janji yang aneh."
+            }
+          ]
+        },
+        {
+          "title": "The Desert Flower",
+          "sentences": [
+            {
+              "en": "He crossed the desert and found one small flower growing where almost nothing survived.",
+              "id": "Dia melintasi gurun dan menemukan satu bunga kecil tumbuh di tempat yang hampir tidak dapat dihuni apa pun."
+            },
+            {
+              "en": "She had seen only a few passing travelers and believed humanity was rare and rootless.",
+              "id": "Bunga itu hanya pernah melihat beberapa pengelana dan mengira manusia langka serta tidak berakar."
+            }
+          ]
+        },
+        {
+          "title": "The Echoing Mountain",
+          "sentences": [
+            {
+              "en": "Higher in the mountains, the boy called out and heard his own words return as echoes.",
+              "id": "Di pegunungan yang lebih tinggi, sang anak memanggil dan mendengar kata-katanya sendiri kembali sebagai gema."
+            },
+            {
+              "en": "He wondered whether people on Earth merely repeated whatever was said to them.",
+              "id": "Dia bertanya-tanya apakah manusia di Bumi hanya mengulangi apa pun yang dikatakan kepada mereka."
+            },
+            {
+              "en": "The mountains looked grand, but they offered no warmth, answer, or companionship.",
+              "id": "Pegunungan tampak megah, tetapi tidak memberikan kehangatan, jawaban, ataupun persahabatan."
+            },
+            {
+              "en": "For the first time, his tiny planet seemed intimate rather than limited.",
+              "id": "Untuk pertama kalinya, planet kecilnya terasa akrab dan bukan terbatas."
+            },
+            {
+              "en": "Its few familiar features held more meaning than Earth's enormous and indifferent landscapes.",
+              "id": "Sedikit hal yang akrab di sana memiliki makna lebih besar daripada bentang Bumi yang luas dan acuh."
+            }
+          ]
+        },
+        {
+          "title": "The Garden of Roses",
+          "sentences": [
+            {
+              "en": "After walking for many days, the boy discovered a garden crowded with blooming roses.",
+              "id": "Setelah berjalan selama berhari-hari, sang anak menemukan taman yang dipenuhi mawar bermekaran."
+            },
+            {
+              "en": "Each flower resembled the one he had believed was unique in the universe.",
+              "id": "Setiap bunga menyerupai bunga yang selama ini dia yakini satu-satunya di alam semesta."
+            },
+            {
+              "en": "The discovery made his private world suddenly seem ordinary and embarrassingly small.",
+              "id": "Penemuan itu membuat dunia pribadinya tiba-tiba terasa biasa dan sangat kecil."
+            },
+            {
+              "en": "He remembered how proudly his flower had described herself as unlike any other.",
+              "id": "Dia teringat betapa bangganya sang bunga menggambarkan dirinya sebagai sosok yang tidak memiliki tandingan."
+            },
+            {
+              "en": "If she was one rose among thousands, perhaps his devotion had been based on a mistake.",
+              "id": "Jika dia hanya satu mawar di antara ribuan, mungkin pengabdiannya didasarkan pada kekeliruan."
+            },
+            {
+              "en": "He also thought of his volcanoes and realized they would never impress a great explorer.",
+              "id": "Dia juga memikirkan gunung berapinya dan menyadari semuanya tidak akan mengesankan penjelajah besar."
+            },
+            {
+              "en": "The boy lay in the grass and cried because comparison had emptied his memories of value.",
+              "id": "Sang anak berbaring di rumput dan menangis karena perbandingan telah mengosongkan nilai dari kenangannya."
+            },
+            {
+              "en": "He had traveled to understand the world, yet the world now made him doubt his own life.",
+              "id": "Dia bepergian untuk memahami dunia, tetapi dunia justru membuatnya meragukan kehidupannya sendiri."
+            },
+            {
+              "en": "Nothing in the garden could explain why one flower's moods mattered more than all the others.",
+              "id": "Tidak ada sesuatu pun di taman yang dapat menjelaskan mengapa suasana satu bunga lebih penting daripada bunga lainnya."
+            },
+            {
+              "en": "The answer would require a new way of measuring worth that numbers and resemblance could not provide.",
+              "id": "Jawabannya membutuhkan cara baru untuk mengukur nilai yang tidak dapat diberikan oleh angka dan kemiripan."
+            },
+            {
+              "en": "At that lowest moment, another creature appeared and asked for neither praise nor ownership.",
+              "id": "Pada saat terendah itu, makhluk lain muncul dan tidak meminta pujian ataupun kepemilikan."
+            },
+            {
+              "en": "The meeting would transform the boy's sadness into a deeper understanding of relationship.",
+              "id": "Pertemuan itu akan mengubah kesedihan sang anak menjadi pemahaman yang lebih dalam tentang hubungan."
+            }
+          ]
+        },
+        {
+          "title": "The Fox",
+          "sentences": [
+            {
+              "en": "A fox greeted the boy from a distance but refused to become an instant playmate.",
+              "id": "Seekor rubah menyapa sang anak dari kejauhan tetapi menolak langsung menjadi teman bermain."
+            },
+            {
+              "en": "He explained that friendship grows through repeated attention rather than sudden enthusiasm.",
+              "id": "Dia menjelaskan bahwa persahabatan tumbuh melalui perhatian berulang dan bukan semangat sesaat."
+            },
+            {
+              "en": "At first they sat far apart, allowing silence to make their presence familiar.",
+              "id": "Pada awalnya mereka duduk berjauhan, membiarkan kesunyian membuat kehadiran masing-masing terasa akrab."
+            },
+            {
+              "en": "Each day the boy returned at the same hour and moved a little closer.",
+              "id": "Setiap hari sang anak kembali pada jam yang sama dan bergerak sedikit lebih dekat."
+            },
+            {
+              "en": "Because the time was expected, anticipation began to brighten the hours before their meeting.",
+              "id": "Karena waktunya dapat diperkirakan, penantian mulai menerangi jam-jam sebelum pertemuan mereka."
+            },
+            {
+              "en": "Ordinary footsteps became meaningful because the fox learned to recognize one particular visitor.",
+              "id": "Langkah kaki biasa menjadi bermakna karena sang rubah belajar mengenali seorang pengunjung tertentu."
+            },
+            {
+              "en": "Golden fields also changed, reminding him of the boy's hair whenever the wind moved the grain.",
+              "id": "Ladang keemasan juga berubah, mengingatkannya pada rambut sang anak setiap kali angin menggerakkan gandum."
+            },
+            {
+              "en": "Their ritual did not make either of them property; it made each one irreplaceable to the other.",
+              "id": "Ritual mereka tidak menjadikan siapa pun sebagai milik; ritual itu membuat mereka tak tergantikan satu sama lain."
+            },
+            {
+              "en": "When departure approached, the fox accepted that joy and grief often come from the same bond.",
+              "id": "Ketika perpisahan mendekat, sang rubah menerima bahwa kegembiraan dan kesedihan sering lahir dari ikatan yang sama."
+            },
+            {
+              "en": "He taught the boy that time freely given to someone creates a responsibility that remains.",
+              "id": "Dia mengajarkan bahwa waktu yang diberikan dengan sukarela kepada seseorang menciptakan tanggung jawab yang tetap tinggal."
+            },
+            {
+              "en": "The boy returned to the rose garden and understood why those flowers were not his flower.",
+              "id": "Sang anak kembali ke taman mawar dan memahami mengapa bunga-bunga itu bukan bunganya."
+            },
+            {
+              "en": "His rose was unique because of shared mornings, arguments, protection, patience, and care.",
+              "id": "Mawarnya unik karena pagi, pertengkaran, perlindungan, kesabaran, dan perhatian yang mereka jalani bersama."
+            }
+          ]
+        },
+        {
+          "title": "The Railway Switchman",
+          "sentences": [
+            {
+              "en": "Later the boy met a railway worker who directed crowded trains toward opposite horizons.",
+              "id": "Kemudian sang anak bertemu petugas kereta yang mengarahkan kereta penuh penumpang menuju cakrawala berlawanan."
+            },
+            {
+              "en": "People rushed past windows, changed places, and often seemed unsure what they were seeking.",
+              "id": "Orang-orang melintas cepat di balik jendela, berpindah tempat, dan sering tidak yakin apa yang mereka cari."
+            },
+            {
+              "en": "Only children pressed their faces to the glass and remained curious about the passing world.",
+              "id": "Hanya anak-anak yang menempelkan wajah ke kaca dan tetap penasaran pada dunia yang berlalu."
+            },
+            {
+              "en": "The boy noticed that movement can look like purpose even when no destination satisfies anyone.",
+              "id": "Sang anak menyadari bahwa pergerakan dapat tampak seperti tujuan meski tidak ada tujuan akhir yang memuaskan siapa pun."
+            }
+          ]
+        },
+        {
+          "title": "The Merchant",
+          "sentences": [
+            {
+              "en": "He also met a merchant selling tablets that removed the physical feeling of thirst.",
+              "id": "Dia juga bertemu pedagang yang menjual pil untuk menghilangkan rasa haus secara fisik."
+            },
+            {
+              "en": "The merchant proudly calculated how many minutes his product saved each week.",
+              "id": "Pedagang itu dengan bangga menghitung berapa menit yang dihemat produknya setiap minggu."
+            },
+            {
+              "en": "The boy wondered why anyone would save time without knowing how to use it well.",
+              "id": "Sang anak bertanya-tanya mengapa seseorang menghemat waktu tanpa mengetahui cara menggunakannya dengan baik."
+            },
+            {
+              "en": "Given an extra hour, he would rather walk slowly toward fresh water.",
+              "id": "Jika mendapat satu jam tambahan, dia lebih memilih berjalan perlahan menuju air segar."
+            },
+            {
+              "en": "A real journey, he felt, includes waiting, effort, landscape, and the joy of arrival.",
+              "id": "Menurutnya perjalanan sejati mencakup penantian, usaha, pemandangan, dan kegembiraan ketika tiba."
+            },
+            {
+              "en": "A shortcut may remove discomfort while also removing the experience that gives relief meaning.",
+              "id": "Jalan pintas dapat menghilangkan ketidaknyamanan sekaligus pengalaman yang memberi makna pada kelegaan."
+            }
+          ]
+        },
+        {
+          "title": "The Search for Water",
+          "sentences": [
+            {
+              "en": "These meetings prepared him to return to the desert, where water could not be treated as a number.",
+              "id": "Pertemuan-pertemuan itu mempersiapkannya kembali ke gurun, tempat air tidak dapat dianggap sekadar angka."
+            },
+            {
+              "en": "There, the pilot's failing supply would turn a simple drink into an unforgettable gift.",
+              "id": "Di sana, persediaan sang pilot yang menipis akan mengubah minuman sederhana menjadi hadiah yang tak terlupakan."
+            },
+            {
+              "en": "Back beside the broken airplane, the pilot finally used the last of his drinking water.",
+              "id": "Kembali di dekat pesawat rusak, sang pilot akhirnya menghabiskan air minumnya yang terakhir."
+            },
+            {
+              "en": "The engine still resisted repair, and the desert offered no visible path toward help.",
+              "id": "Mesin masih sulit diperbaiki, dan gurun tidak menunjukkan jalan menuju pertolongan."
+            },
+            {
+              "en": "The boy listened calmly, then suggested that they search for a well.",
+              "id": "Sang anak mendengarkan dengan tenang, lalu menyarankan agar mereka mencari sebuah sumur."
+            },
+            {
+              "en": "The idea appeared impossible because wells do not usually wait in empty sand without a village.",
+              "id": "Gagasan itu tampak mustahil karena sumur biasanya tidak berada di pasir kosong tanpa desa."
+            },
+            {
+              "en": "Still, remaining beside the airplane promised only thirst, so they began walking after sunset.",
+              "id": "Namun tetap berada di dekat pesawat hanya menjanjikan kehausan, sehingga mereka mulai berjalan setelah senja."
+            },
+            {
+              "en": "Moonlight softened the dunes, and the darkness made every small sound feel important.",
+              "id": "Cahaya bulan melembutkan bukit pasir, dan kegelapan membuat setiap suara kecil terasa penting."
+            },
+            {
+              "en": "The boy said the desert was beautiful because it concealed something life-giving beneath its emptiness.",
+              "id": "Sang anak berkata gurun itu indah karena menyembunyikan sesuatu yang memberi kehidupan di balik kekosongannya."
+            },
+            {
+              "en": "The pilot remembered an old house whose mystery came from stories of hidden treasure.",
+              "id": "Sang pilot teringat rumah tua yang misterinya berasal dari kisah tentang harta tersembunyi."
+            },
+            {
+              "en": "He began to understand that visible surfaces often receive their meaning from what cannot be displayed.",
+              "id": "Dia mulai memahami bahwa permukaan yang terlihat sering memperoleh makna dari sesuatu yang tidak dapat dipamerkan."
+            },
+            {
+              "en": "Near dawn, the boy became tired, and the pilot carried him across the cool sand.",
+              "id": "Menjelang fajar, sang anak menjadi lelah dan sang pilot menggendongnya melintasi pasir yang sejuk."
+            },
+            {
+              "en": "Holding the sleeping traveler, he felt he was protecting a promise rather than merely a body.",
+              "id": "Saat menggendong pengelana yang tertidur, dia merasa sedang melindungi sebuah janji dan bukan sekadar tubuh."
+            },
+            {
+              "en": "When morning arrived, they discovered an old well standing where logic said none should exist.",
+              "id": "Ketika pagi tiba, mereka menemukan sumur tua berdiri di tempat yang menurut logika seharusnya tidak ada."
+            }
+          ]
+        },
+        {
+          "title": "The Well",
+          "sentences": [
+            {
+              "en": "The well looked carefully built, with a bucket, rope, and pulley worn smooth by use.",
+              "id": "Sumur itu dibangun dengan baik, memiliki ember, tali, dan katrol yang menjadi halus karena sering digunakan."
+            },
+            {
+              "en": "No houses surrounded it, yet everything seemed prepared for travelers who arrived in need.",
+              "id": "Tidak ada rumah di sekitarnya, tetapi semuanya tampak disiapkan bagi pengelana yang datang dalam kebutuhan."
+            },
+            {
+              "en": "The boy pulled the rope, and the pulley answered with a long sound in the morning air.",
+              "id": "Sang anak menarik tali, dan katrol menjawab dengan suara panjang di udara pagi."
+            },
+            {
+              "en": "The pilot finished lifting the heavy bucket and held it steady for his friend.",
+              "id": "Sang pilot menyelesaikan tarikan ember yang berat dan memegangnya agar tetap stabil untuk temannya."
+            },
+            {
+              "en": "The water tasted precious because it contained walking, starlight, effort, trust, and shared hope.",
+              "id": "Air itu terasa berharga karena mengandung perjalanan, cahaya bintang, usaha, kepercayaan, dan harapan bersama."
+            },
+            {
+              "en": "It was different from water taken thoughtlessly from a tap or swallowed while rushing elsewhere.",
+              "id": "Air itu berbeda dari air yang diambil tanpa perhatian dari keran atau diminum sambil terburu-buru."
+            },
+            {
+              "en": "The pilot saw that value grows when attention connects ordinary things with a meaningful journey.",
+              "id": "Sang pilot melihat bahwa nilai tumbuh ketika perhatian menghubungkan hal biasa dengan perjalanan yang bermakna."
+            },
+            {
+              "en": "The boy reminded him of the promised muzzle that would keep the lamb from harming the flower.",
+              "id": "Sang anak mengingatkannya pada penutup mulut yang dijanjikan agar domba tidak menyakiti bunga."
+            },
+            {
+              "en": "Although the drawing was simple, the responsibility behind it had become serious.",
+              "id": "Meskipun gambarnya sederhana, tanggung jawab di baliknya telah menjadi serius."
+            },
+            {
+              "en": "The boy then revealed that the next evening marked one year since his arrival on Earth.",
+              "id": "Sang anak kemudian mengungkapkan bahwa malam berikutnya menandai satu tahun sejak kedatangannya di Bumi."
+            },
+            {
+              "en": "He planned to return to the exact place where his journey on the planet had begun.",
+              "id": "Dia berencana kembali ke tempat yang tepat ketika perjalanannya di planet itu bermula."
+            },
+            {
+              "en": "The pilot sensed a hidden decision and felt fear enter a morning that had just brought relief.",
+              "id": "Sang pilot merasakan keputusan tersembunyi dan merasa ketakutan memasuki pagi yang baru saja membawa kelegaan."
+            }
+          ]
+        },
+        {
+          "title": "The Return to the Stars",
+          "sentences": [
+            {
+              "en": "After returning to the airplane, the pilot worked urgently and finally restored the engine.",
+              "id": "Setelah kembali ke pesawat, sang pilot bekerja dengan mendesak dan akhirnya berhasil memperbaiki mesin."
+            },
+            {
+              "en": "The success should have filled him with joy, but the boy had disappeared from the campsite.",
+              "id": "Keberhasilan itu seharusnya membuatnya gembira, tetapi sang anak telah menghilang dari tempat perkemahan."
+            },
+            {
+              "en": "He found his friend near an old wall, speaking quietly to someone hidden below.",
+              "id": "Dia menemukan temannya di dekat dinding tua, berbicara pelan kepada seseorang yang bersembunyi di bawah."
+            },
+            {
+              "en": "The snake's yellow body vanished among the stones before the pilot could reach it.",
+              "id": "Tubuh kuning sang ular menghilang di antara batu sebelum sang pilot dapat mencapainya."
+            },
+            {
+              "en": "The boy looked pale, and his words confirmed that he intended to leave Earth that night.",
+              "id": "Sang anak tampak pucat, dan kata-katanya menegaskan bahwa dia bermaksud meninggalkan Bumi malam itu."
+            },
+            {
+              "en": "He explained that his body was too heavy to carry across the distance between planets.",
+              "id": "Dia menjelaskan bahwa tubuhnya terlalu berat untuk dibawa melintasi jarak antarplanet."
+            },
+            {
+              "en": "The pilot rejected every explanation because none could soften the thought of separation.",
+              "id": "Sang pilot menolak setiap penjelasan karena tidak ada yang dapat melembutkan pikiran tentang perpisahan."
+            },
+            {
+              "en": "The boy tried to comfort him by describing the stars as places where laughter would continue.",
+              "id": "Sang anak mencoba menghiburnya dengan menggambarkan bintang sebagai tempat tawa akan terus hidup."
+            },
+            {
+              "en": "For other people the night sky might remain silent, but shared memory would change it for the pilot.",
+              "id": "Bagi orang lain langit malam mungkin tetap sunyi, tetapi kenangan bersama akan mengubahnya bagi sang pilot."
+            },
+            {
+              "en": "The pilot promised not to abandon him, even when the boy asked to face the final moment alone.",
+              "id": "Sang pilot berjanji tidak meninggalkannya, meski sang anak meminta menghadapi saat terakhir sendirian."
+            },
+            {
+              "en": "Fear remained between them, but so did the trust built through questions, drawings, and water.",
+              "id": "Ketakutan tetap berada di antara mereka, begitu pula kepercayaan yang dibangun melalui pertanyaan, gambar, dan air."
+            },
+            {
+              "en": "When darkness came, they walked together toward the place chosen for the boy's departure.",
+              "id": "Ketika gelap tiba, mereka berjalan bersama menuju tempat yang dipilih untuk keberangkatan sang anak."
+            },
+            {
+              "en": "The desert night seemed motionless as the boy and the pilot reached the appointed place.",
+              "id": "Malam gurun tampak tidak bergerak ketika sang anak dan sang pilot mencapai tempat yang telah ditentukan."
+            },
+            {
+              "en": "The boy worried that his friend would misunderstand what he was about to see.",
+              "id": "Sang anak khawatir temannya akan salah memahami apa yang akan dilihatnya."
+            },
+            {
+              "en": "He compared the body to an empty covering that could be left behind without losing the traveler.",
+              "id": "Dia membandingkan tubuh dengan pembungkus kosong yang dapat ditinggalkan tanpa kehilangan sang pengelana."
+            },
+            {
+              "en": "He spoke of his flower, admitting again that her weakness made his return necessary.",
+              "id": "Dia berbicara tentang bunganya, kembali mengakui bahwa kelemahannya membuat kepulangannya diperlukan."
+            },
+            {
+              "en": "The thought of her alone beneath the stars was stronger than his fear of the snake.",
+              "id": "Bayangan sang bunga sendirian di bawah bintang lebih kuat daripada ketakutannya kepada ular."
+            },
+            {
+              "en": "The pilot had no argument against a responsibility that had finally become clear to them both.",
+              "id": "Sang pilot tidak memiliki bantahan terhadap tanggung jawab yang akhirnya menjadi jelas bagi mereka berdua."
+            },
+            {
+              "en": "A brief yellow movement appeared near the boy's ankle and disappeared almost immediately.",
+              "id": "Gerakan kuning singkat muncul di dekat pergelangan kaki sang anak lalu menghilang hampir seketika."
+            },
+            {
+              "en": "He stood silently for a moment, as though listening to a call from very far away.",
+              "id": "Dia berdiri diam sejenak, seolah mendengarkan panggilan dari tempat yang sangat jauh."
+            },
+            {
+              "en": "Then he fell gently onto the sand without struggle, accusation, or dramatic sound.",
+              "id": "Kemudian dia jatuh perlahan ke atas pasir tanpa perlawanan, tuduhan, ataupun suara dramatis."
+            },
+            {
+              "en": "The pilot remained beside him, unable to decide whether the moment was an ending or a passage.",
+              "id": "Sang pilot tetap berada di sampingnya, tidak mampu memutuskan apakah saat itu merupakan akhir atau perjalanan."
+            },
+            {
+              "en": "By morning the boy's body was gone, leaving no trail across the undisturbed desert.",
+              "id": "Menjelang pagi tubuh sang anak telah tiada, tanpa meninggalkan jejak di gurun yang tidak terusik."
+            },
+            {
+              "en": "Because it had vanished, the pilot allowed hope to stand beside grief rather than replacing it.",
+              "id": "Karena tubuh itu menghilang, sang pilot membiarkan harapan berdiri di samping kesedihan dan bukan menggantikannya."
+            }
+          ]
+        },
+        {
+          "title": "The Stars Afterwards",
+          "sentences": [
+            {
+              "en": "The repaired airplane carried the pilot back to people who were relieved to see him alive.",
+              "id": "Pesawat yang telah diperbaiki membawa sang pilot kembali kepada orang-orang yang lega melihatnya hidup."
+            },
+            {
+              "en": "He told them he was tired because the truth of his sorrow was too difficult to explain.",
+              "id": "Dia mengatakan dirinya lelah karena kenyataan tentang kesedihannya terlalu sulit dijelaskan."
+            },
+            {
+              "en": "Years passed, and memory slowly changed from an open wound into a quiet companion.",
+              "id": "Tahun-tahun berlalu, dan kenangan perlahan berubah dari luka terbuka menjadi teman yang tenang."
+            },
+            {
+              "en": "At night the stars no longer seemed like distant objects measured by astronomers.",
+              "id": "Pada malam hari bintang tidak lagi tampak seperti benda jauh yang diukur para astronom."
+            },
+            {
+              "en": "They carried the possibility of laughter, a small planet, and a flower protected beneath glass.",
+              "id": "Bintang membawa kemungkinan tawa, sebuah planet kecil, dan bunga yang dilindungi di bawah kaca."
+            },
+            {
+              "en": "Still, one mistake troubled the pilot whenever he thought about the lamb.",
+              "id": "Namun satu kesalahan mengganggu sang pilot setiap kali dia memikirkan domba itu."
+            },
+            {
+              "en": "The muzzle he had drawn lacked a proper strap, so it might never have protected the rose.",
+              "id": "Penutup mulut yang digambarnya tidak memiliki tali yang tepat, sehingga mungkin tidak pernah melindungi mawar."
+            },
+            {
+              "en": "Some nights he believed the boy guarded his flower carefully and everything remained well.",
+              "id": "Pada beberapa malam dia percaya sang anak menjaga bunganya dengan hati-hati dan semuanya baik-baik saja."
+            },
+            {
+              "en": "On other nights he imagined one careless moment changing the whole meaning of the sky.",
+              "id": "Pada malam lain dia membayangkan satu saat kelalaian mengubah seluruh makna langit."
+            },
+            {
+              "en": "The uncertainty mattered because love makes distant events important even when they cannot be verified.",
+              "id": "Ketidakpastian itu penting karena kasih sayang membuat peristiwa jauh berarti meski tidak dapat dipastikan."
+            },
+            {
+              "en": "The pilot asked future travelers to watch the desert for a laughing boy with golden hair.",
+              "id": "Sang pilot meminta pengelana masa depan memperhatikan gurun untuk mencari anak tertawa berambut keemasan."
+            },
+            {
+              "en": "His story leaves us with a choice: rush past the world, or care enough to make one part of it unique.",
+              "id": "Kisahnya meninggalkan pilihan: bergegas melewati dunia, atau cukup peduli untuk membuat satu bagiannya menjadi unik."
+            }
+          ]
         }
       ]
     },
-    {
-      "title": "A Sheep in the Desert",
-      "sentences": [
-        {
-          "en": "Years later, my airplane broke down in the Sahara Desert.",
-          "id": "Bertahun-tahun kemudian, pesawatku rusak di Gurun Sahara."
-        },
-        {
-          "en": "I was alone and had only enough water for one week.",
-          "id": "Aku sendirian dan hanya memiliki air yang cukup untuk seminggu."
-        },
-        {
-          "en": "At sunrise, a small boy woke me and asked for a drawing of a sheep.",
-          "id": "Saat matahari terbit, seorang anak kecil membangunkanku dan meminta gambar seekor domba."
-        },
-        {
-          "en": "He rejected my first drawings because each sheep had a problem.",
-          "id": "Ia menolak gambar-gambar pertamaku karena setiap domba yang kugambar memiliki masalah."
-        },
-        {
-          "en": "At last, I drew a box and said the sheep was inside it.",
-          "id": "Akhirnya, aku menggambar sebuah kotak dan berkata bahwa domba itu berada di dalamnya."
-        },
-        {
-          "en": "The little boy smiled because the sheep inside was exactly what he wanted.",
-          "id": "Anak kecil itu tersenyum karena domba di dalam kotak itu persis seperti yang diinginkannya."
-        }
-      ]
-    },
-    {
-      "title": "The Tiny Planet",
-      "sentences": [
-        {
-          "en": "The boy asked many questions but did not often answer mine.",
-          "id": "Anak itu mengajukan banyak pertanyaan, tetapi jarang menjawab pertanyaanku."
-        },
-        {
-          "en": "Little by little, I learned that he came from another planet.",
-          "id": "Sedikit demi sedikit, aku mengetahui bahwa ia berasal dari planet lain."
-        },
-        {
-          "en": "His planet was so small that it was scarcely larger than a house.",
-          "id": "Planetnya begitu kecil sehingga ukurannya hampir tidak lebih besar daripada sebuah rumah."
-        },
-        {
-          "en": "I offered him a string so he could tie up the sheep during the day.",
-          "id": "Aku menawarkan seutas tali agar ia dapat mengikat dombanya pada siang hari."
-        },
-        {
-          "en": "He laughed because the sheep could not go very far on such a small planet.",
-          "id": "Ia tertawa karena domba itu tidak dapat pergi terlalu jauh di planet sekecil itu."
-        }
-      ]
-    },
-    {
-      "title": "Asteroid B-612",
-      "sentences": [
-        {
-          "en": "I believe the little prince came from Asteroid B-612.",
-          "id": "Aku percaya sang pangeran kecil berasal dari Asteroid B-612."
-        },
-        {
-          "en": "A Turkish astronomer discovered it through a telescope.",
-          "id": "Seorang astronom Turki menemukannya dengan menggunakan teleskop."
-        },
-        {
-          "en": "At first, nobody believed him because of his clothes.",
-          "id": "Pada awalnya, tidak ada yang memercayainya karena pakaiannya."
-        },
-        {
-          "en": "Grown-ups often trust numbers and appearances more than important truths.",
-          "id": "Orang dewasa sering lebih memercayai angka dan penampilan daripada kebenaran yang penting."
-        },
-        {
-          "en": "Children care about a person's voice and favorite games, not only numbers.",
-          "id": "Anak-anak peduli pada suara dan permainan kesukaan seseorang, bukan hanya angka."
-        }
-      ]
-    },
-    {
-      "title": "The Baobabs",
-      "sentences": [
-        {
-          "en": "The little prince asked whether sheep ate small plants.",
-          "id": "Sang pangeran kecil bertanya apakah domba memakan tanaman kecil."
-        },
-        {
-          "en": "He was pleased because a sheep could eat young baobab trees.",
-          "id": "Ia senang karena seekor domba dapat memakan pohon baobab yang masih muda."
-        },
-        {
-          "en": "If baobabs grew too large, their roots could break his tiny planet.",
-          "id": "Jika baobab tumbuh terlalu besar, akarnya dapat menghancurkan planet kecilnya."
-        },
-        {
-          "en": "Every morning, he carefully pulled up the small baobab plants.",
-          "id": "Setiap pagi, ia mencabut tanaman-tanaman baobab kecil itu dengan hati-hati."
-        },
-        {
-          "en": "Small problems must be stopped before they become big problems.",
-          "id": "Masalah kecil harus dihentikan sebelum berubah menjadi masalah besar."
-        }
-      ]
-    },
-    {
-      "title": "Forty-Four Sunsets",
-      "sentences": [
-        {
-          "en": "The little prince loved watching the sun go down.",
-          "id": "Sang pangeran kecil suka menyaksikan matahari terbenam."
-        },
-        {
-          "en": "On his tiny planet, he only had to move his chair a few steps.",
-          "id": "Di planetnya yang mungil, ia hanya perlu menggeser kursinya beberapa langkah."
-        },
-        {
-          "en": "Then he could watch another sunset whenever he wished.",
-          "id": "Dengan begitu, ia dapat melihat matahari terbenam lagi kapan pun ia mau."
-        },
-        {
-          "en": "One day, he watched the sunset forty-four times.",
-          "id": "Pada suatu hari, ia menyaksikan matahari terbenam sebanyak empat puluh empat kali."
-        },
-        {
-          "en": "He said people love sunsets when they feel very sad.",
-          "id": "Ia berkata bahwa orang menyukai matahari terbenam ketika merasa sangat sedih."
-        }
-      ]
-    },
-    {
-      "title": "Flowers and Thorns",
-      "sentences": [
-        {
-          "en": "The little prince asked if a sheep could eat a flower with thorns.",
-          "id": "Sang pangeran kecil bertanya apakah domba dapat memakan bunga yang berduri."
-        },
-        {
-          "en": "I was busy fixing my plane and answered without thinking.",
-          "id": "Aku sedang sibuk memperbaiki pesawat dan menjawab tanpa berpikir."
-        },
-        {
-          "en": "He became angry because one special flower lived on his planet.",
-          "id": "Ia menjadi marah karena ada satu bunga istimewa yang hidup di planetnya."
-        },
-        {
-          "en": "If the sheep ate that flower, all the stars would seem dark to him.",
-          "id": "Jika domba memakan bunga itu, semua bintang akan tampak gelap baginya."
-        },
-        {
-          "en": "I held him and promised to protect his flower.",
-          "id": "Aku memeluknya dan berjanji akan melindungi bunganya."
-        }
-      ]
-    },
-    {
-      "title": "The Proud Rose",
-      "sentences": [
-        {
-          "en": "One day, a new seed began to grow on the little prince's planet.",
-          "id": "Pada suatu hari, sebuah benih baru mulai tumbuh di planet sang pangeran kecil."
-        },
-        {
-          "en": "It grew into a beautiful rose that slowly opened.",
-          "id": "Benih itu tumbuh menjadi mawar cantik yang perlahan-lahan mekar."
-        },
-        {
-          "en": "The little prince thought she was beautiful and gave her fresh water.",
-          "id": "Sang pangeran kecil menganggapnya cantik dan memberinya air segar."
-        },
-        {
-          "en": "The rose was proud and often asked him to do difficult things.",
-          "id": "Mawar itu angkuh dan sering memintanya melakukan hal-hal yang menyulitkan."
-        },
-        {
-          "en": "Her words confused the little prince and made him unhappy.",
-          "id": "Kata-katanya membingungkan sang pangeran kecil dan membuatnya tidak bahagia."
-        },
-        {
-          "en": "He was too young to understand that she loved him.",
-          "id": "Ia masih terlalu muda untuk memahami bahwa sang mawar mencintainya."
-        }
-      ]
-    },
-    {
-      "title": "Leaving Home",
-      "sentences": [
-        {
-          "en": "Before leaving, the little prince cleaned his three volcanoes.",
-          "id": "Sebelum pergi, sang pangeran kecil membersihkan ketiga gunung berapinya."
-        },
-        {
-          "en": "He pulled up the last baobab shoots and watered his rose.",
-          "id": "Ia mencabut tunas baobab terakhir dan menyiram mawarnya."
-        },
-        {
-          "en": "The rose said that she loved him and asked him to forgive her.",
-          "id": "Sang mawar mengakui bahwa ia mencintai sang pangeran kecil dan meminta maaf kepadanya."
-        },
-        {
-          "en": "She told him to leave without worrying about her.",
-          "id": "Sang mawar menyuruh sang pangeran kecil pergi tanpa perlu mengkhawatirkan sang mawar."
-        },
-        {
-          "en": "She hid her tears because she was a very proud flower.",
-          "id": "Sang mawar menyembunyikan air matanya karena ia bunga yang sangat angkuh."
-        }
-      ]
-    },
-    {
-      "title": "The King",
-      "sentences": [
-        {
-          "en": "The little prince first visited a planet ruled by a king.",
-          "id": "Sang pangeran kecil pertama-tama mengunjungi sebuah planet yang diperintah seorang raja."
-        },
-        {
-          "en": "The king believed that everyone was his subject.",
-          "id": "Raja itu menganggap semua orang sebagai rakyatnya."
-        },
-        {
-          "en": "He only gave orders that he knew could be obeyed.",
-          "id": "Ia hanya memberikan perintah yang menurutnya dapat dipatuhi."
-        },
-        {
-          "en": "The little prince asked the king to order a sunset.",
-          "id": "Sang pangeran kecil meminta raja memerintahkan matahari agar terbenam."
-        },
-        {
-          "en": "The king said he would order it when the time was right.",
-          "id": "Raja berkata bahwa ia akan memerintahkan matahari terbenam ketika waktunya tepat."
-        },
-        {
-          "en": "The little prince soon decided to continue his journey.",
-          "id": "Sang pangeran kecil segera memutuskan untuk melanjutkan perjalanannya."
-        }
-      ]
-    },
-    {
-      "title": "The Vain Man",
-      "sentences": [
-        {
-          "en": "The second planet belonged to a very vain man.",
-          "id": "Planet kedua dihuni oleh seorang pria yang sangat suka dipuji."
-        },
-        {
-          "en": "He wanted the little prince to clap and admire him.",
-          "id": "Ia ingin sang pangeran kecil bertepuk tangan dan mengaguminya."
-        },
-        {
-          "en": "He believed he was the most handsome and intelligent person there.",
-          "id": "Ia percaya bahwa dirinya adalah orang paling tampan dan cerdas di sana."
-        },
-        {
-          "en": "But he was the only person on the planet.",
-          "id": "Padahal, ia adalah satu-satunya orang di planet itu."
-        },
-        {
-          "en": "The little prince soon became tired of empty praise.",
-          "id": "Sang pangeran kecil segera bosan dengan pujian yang hampa."
-        }
-      ]
-    },
-    {
-      "title": "The Drinker",
-      "sentences": [
-        {
-          "en": "A drinker lived alone on the third planet.",
-          "id": "Seorang peminum tinggal sendirian di planet ketiga."
-        },
-        {
-          "en": "He drank because he wanted to forget his shame.",
-          "id": "Ia minum karena ingin melupakan rasa malunya."
-        },
-        {
-          "en": "He felt ashamed because he drank too much.",
-          "id": "Ia merasa malu karena terlalu banyak minum."
-        },
-        {
-          "en": "The little prince could not understand this sad cycle.",
-          "id": "Sang pangeran kecil tidak dapat memahami siklus menyedihkan itu."
-        },
-        {
-          "en": "He left the planet feeling deeply confused.",
-          "id": "Ia meninggalkan planet itu dengan perasaan sangat bingung."
-        }
-      ]
-    },
-    {
-      "title": "The Businessman",
-      "sentences": [
-        {
-          "en": "On the fourth planet, a businessman counted the stars.",
-          "id": "Di planet keempat, seorang pengusaha menghitung bintang-bintang."
-        },
-        {
-          "en": "He said he owned them because he was the first person to claim them.",
-          "id": "Ia berkata bahwa bintang-bintang itu miliknya karena dialah orang pertama yang mengaku sebagai pemiliknya."
-        },
-        {
-          "en": "He wrote the number on paper and locked it in a drawer.",
-          "id": "Ia menulis angka itu di atas kertas, menyimpan kertas tersebut di dalam laci, lalu mengunci lacinya."
-        },
-        {
-          "en": "The little prince cared for his rose and cleaned his volcanoes.",
-          "id": "Sang pangeran kecil merawat mawarnya dan membersihkan gunung-gunung berapinya."
-        },
-        {
-          "en": "The businessman did not help the stars in any way.",
-          "id": "Pengusaha itu sama sekali tidak membantu bintang-bintang."
-        }
-      ]
-    },
-    {
-      "title": "The Lamplighter",
-      "sentences": [
-        {
-          "en": "The fifth planet was home to a lamplighter and one lamp.",
-          "id": "Di planet kelima, hanya ada seorang penyala lampu dan sebuah lampu."
-        },
-        {
-          "en": "He lit the lamp at sunset and put it out at sunrise.",
-          "id": "Ia menyalakan lampu saat matahari terbenam dan memadamkannya saat matahari terbit."
-        },
-        {
-          "en": "The planet turned faster each year, but his orders never changed.",
-          "id": "Planet itu berputar semakin cepat setiap tahun, tetapi perintahnya tidak pernah berubah."
-        },
-        {
-          "en": "Now he had to light and put out the lamp every minute.",
-          "id": "Kini ia harus menyalakan dan memadamkan lampu setiap menit."
-        },
-        {
-          "en": "The little prince respected him because he cared about his work, not only himself.",
-          "id": "Sang pangeran kecil menghormatinya karena ia peduli pada pekerjaannya, bukan hanya pada dirinya sendiri."
-        }
-      ]
-    },
-    {
-      "title": "The Geographer",
-      "sentences": [
-        {
-          "en": "An old geographer lived on the sixth planet.",
-          "id": "Seorang ahli geografi tua tinggal di planet keenam."
-        },
-        {
-          "en": "He wrote about seas and mountains but never went out to see them himself.",
-          "id": "Ia menulis tentang laut dan gunung, tetapi tidak pernah pergi untuk melihatnya sendiri."
-        },
-        {
-          "en": "He said he did not write about flowers because they did not last forever.",
-          "id": "Ia berkata bahwa ia tidak menulis tentang bunga karena bunga tidak hidup selamanya."
-        },
-        {
-          "en": "The little prince suddenly worried about the rose he had left alone.",
-          "id": "Sang pangeran kecil tiba-tiba mencemaskan mawar yang ditinggalkannya sendirian."
-        },
-        {
-          "en": "The geographer told him to visit the planet Earth.",
-          "id": "Ahli geografi itu menyarankan agar ia mengunjungi planet Bumi."
-        }
-      ]
-    },
-    {
-      "title": "The Planet Earth",
-      "sentences": [
-        {
-          "en": "Earth was much larger than all the planets he had visited.",
-          "id": "Bumi jauh lebih besar daripada semua planet yang pernah dikunjunginya."
-        },
-        {
-          "en": "It was full of kings, workers, businesspeople, and many others.",
-          "id": "Bumi dipenuhi raja, pekerja, pengusaha, dan banyak orang lainnya."
-        },
-        {
-          "en": "Before electricity, thousands of lamplighters worked across the world.",
-          "id": "Sebelum ada listrik, ribuan penyala lampu bekerja di seluruh dunia."
-        },
-        {
-          "en": "From far away, their moving lights looked like a beautiful dance.",
-          "id": "Dari kejauhan, lampu-lampu mereka yang bergerak tampak seperti tarian yang indah."
-        },
-        {
-          "en": "But people lived on only a very small part of the huge Earth.",
-          "id": "Namun manusia hanya tinggal di bagian yang sangat kecil dari Bumi yang luas."
-        }
-      ]
-    },
-    {
-      "title": "The Snake",
-      "sentences": [
-        {
-          "en": "The little prince landed in an empty desert on Earth.",
-          "id": "Sang pangeran kecil mendarat di sebuah gurun kosong di Bumi."
-        },
-        {
-          "en": "There he met a thin yellow snake.",
-          "id": "Di sana, ia bertemu seekor ular kuning yang kurus."
-        },
-        {
-          "en": "The snake said people could feel lonely even among other people.",
-          "id": "Ular itu berkata bahwa manusia dapat merasa kesepian bahkan di tengah orang lain."
-        },
-        {
-          "en": "The snake also said that its bite could send the little prince back to his planet.",
-          "id": "Ular itu juga berkata bahwa gigitannya dapat membawa sang pangeran kecil kembali ke planetnya."
-        },
-        {
-          "en": "The little prince understood that the snake was very dangerous.",
-          "id": "Sang pangeran kecil memahami bahwa ular itu sangat berbahaya."
-        }
-      ]
-    },
-    {
-      "title": "A Desert Flower",
-      "sentences": [
-        {
-          "en": "The little prince found a tiny flower with only three petals.",
-          "id": "Sang pangeran kecil menemukan bunga mungil yang hanya memiliki tiga kelopak."
-        },
-        {
-          "en": "He asked the flower where all the people were.",
-          "id": "Ia bertanya kepada bunga itu di mana semua manusia berada."
-        },
-        {
-          "en": "The flower had once seen a few people passing in the distance.",
-          "id": "Bunga itu pernah melihat beberapa orang melintas di kejauhan."
-        },
-        {
-          "en": "It said the wind carried people around because they had no roots.",
-          "id": "Bunga itu berkata bahwa angin membawa manusia ke mana-mana karena mereka tidak memiliki akar."
-        },
-        {
-          "en": "Then the little prince continued his journey alone.",
-          "id": "Kemudian sang pangeran kecil melanjutkan perjalanannya seorang diri."
-        }
-      ]
-    },
-    {
-      "title": "The Echo",
-      "sentences": [
-        {
-          "en": "The little prince climbed a high mountain to look for people.",
-          "id": "Sang pangeran kecil mendaki gunung tinggi untuk mencari manusia."
-        },
-        {
-          "en": "From the top, he saw only sharp rocks.",
-          "id": "Dari puncaknya, ia hanya melihat bebatuan yang tajam."
-        },
-        {
-          "en": "When he called out, his own words returned as an echo.",
-          "id": "Ketika ia berseru, kata-katanya sendiri kembali sebagai gema."
-        },
-        {
-          "en": "He thought the people of Earth only repeated what they heard.",
-          "id": "Ia mengira manusia di Bumi hanya mengulangi apa yang mereka dengar."
-        },
-        {
-          "en": "He missed his rose because she always spoke first.",
-          "id": "Ia merindukan mawarnya karena sang mawar selalu berbicara lebih dahulu."
-        }
-      ]
-    },
-    {
-      "title": "The Rose Garden",
-      "sentences": [
-        {
-          "en": "After a long walk, the little prince found a garden full of roses.",
-          "id": "Setelah berjalan jauh, sang pangeran kecil menemukan taman yang penuh dengan mawar."
-        },
-        {
-          "en": "They all looked like the rose on his planet.",
-          "id": "Semua mawar itu tampak seperti mawar di planetnya."
-        },
-        {
-          "en": "His rose had told him that she was the only one in the universe.",
-          "id": "Mawarnya pernah berkata bahwa ia satu-satunya mawar di alam semesta."
-        },
-        {
-          "en": "The little prince no longer felt rich or special.",
-          "id": "Sang pangeran kecil tidak lagi merasa kaya atau istimewa."
-        },
-        {
-          "en": "He lay in the grass and cried.",
-          "id": "Ia berbaring di rumput lalu menangis."
-        }
-      ]
-    },
-    {
-      "title": "The Fox",
-      "sentences": [
-        {
-          "en": "A fox appeared and asked the little prince to tame him.",
-          "id": "Seekor rubah muncul dan meminta sang pangeran kecil menjinakkannya."
-        },
-        {
-          "en": "The fox explained that taming meant becoming special to each other.",
-          "id": "Rubah itu menjelaskan bahwa menjinakkan berarti menjadi istimewa bagi satu sama lain."
-        },
-        {
-          "en": "They met at the same time each day and slowly became friends.",
-          "id": "Mereka bertemu pada waktu yang sama setiap hari dan perlahan-lahan menjadi sahabat."
-        },
-        {
-          "en": "The fox taught him that the heart can see what the eyes cannot.",
-          "id": "Rubah itu mengajarinya bahwa hati dapat melihat apa yang tidak dapat dilihat oleh mata."
-        },
-        {
-          "en": "Because he had spent so much time with his rose, she was special to him.",
-          "id": "Karena telah menghabiskan begitu banyak waktu bersama mawarnya, bunga itu menjadi istimewa baginya."
-        },
-        {
-          "en": "He would always need to care for the friend he had made.",
-          "id": "Ia akan selalu perlu menjaga sosok yang telah dijadikannya sahabat."
-        }
-      ]
-    },
-    {
-      "title": "The Railway Switchman",
-      "sentences": [
-        {
-          "en": "The little prince met a train worker who showed fast trains where to go.",
-          "id": "Sang pangeran kecil bertemu petugas kereta yang menunjukkan arah bagi kereta-kereta cepat."
-        },
-        {
-          "en": "Crowds of people rushed from one place to another.",
-          "id": "Kerumunan manusia bergegas dari satu tempat ke tempat lain."
-        },
-        {
-          "en": "Most of them did not know what they were looking for.",
-          "id": "Sebagian besar dari mereka tidak tahu apa yang sedang dicari."
-        },
-        {
-          "en": "Only children pressed their faces to the windows with wonder.",
-          "id": "Hanya anak-anak yang menempelkan wajah ke jendela dengan penuh rasa takjub."
-        },
-        {
-          "en": "The little prince said that only children knew what they were looking for.",
-          "id": "Sang pangeran kecil berkata bahwa hanya anak-anak yang tahu apa yang mereka cari."
-        }
-      ]
-    },
-    {
-      "title": "The Merchant",
-      "sentences": [
-        {
-          "en": "Next, the little prince met a merchant who sold special pills.",
-          "id": "Selanjutnya, sang pangeran kecil bertemu pedagang yang menjual pil khusus."
-        },
-        {
-          "en": "After taking a pill, people did not need to drink water.",
-          "id": "Setelah meminum pil itu, orang tidak perlu minum air."
-        },
-        {
-          "en": "The merchant said they saved fifty-three minutes each week.",
-          "id": "Pedagang itu berkata bahwa pil tersebut menghemat lima puluh tiga menit setiap minggu."
-        },
-        {
-          "en": "The little prince knew exactly how he would use that time.",
-          "id": "Sang pangeran kecil tahu persis bagaimana ia akan menggunakan waktu tersebut."
-        },
-        {
-          "en": "He would walk slowly toward a cool spring of fresh water.",
-          "id": "Ia akan berjalan perlahan menuju mata air segar yang sejuk."
-        }
-      ]
-    },
-    {
-      "title": "Searching for Water",
-      "sentences": [
-        {
-          "en": "By the eighth day in the desert, my drinking water was gone.",
-          "id": "Pada hari kedelapan di gurun, air minumku telah habis."
-        },
-        {
-          "en": "The little prince and I walked through the night to find a well.",
-          "id": "Sang pangeran kecil dan aku berjalan sepanjang malam untuk mencari sumur."
-        },
-        {
-          "en": "He said the desert was beautiful because it hid a well somewhere.",
-          "id": "Ia berkata bahwa gurun itu indah karena menyembunyikan sebuah sumur di suatu tempat."
-        },
-        {
-          "en": "As we walked under the stars, I began to understand the things he said.",
-          "id": "Saat kami berjalan di bawah bintang-bintang, aku mulai memahami hal-hal yang dikatakannya."
-        },
-        {
-          "en": "When he became tired, I carried him in my arms.",
-          "id": "Ketika ia kelelahan, aku menggendongnya."
-        },
-        {
-          "en": "At sunrise, we finally found a well.",
-          "id": "Saat matahari terbit, akhirnya kami menemukan sebuah sumur."
-        }
-      ]
-    },
-    {
-      "title": "The Well",
-      "sentences": [
-        {
-          "en": "The well had a bucket, a rope, and a wheel that seemed to sing.",
-          "id": "Sumur itu memiliki ember, tali, dan roda yang seolah-olah bernyanyi."
-        },
-        {
-          "en": "I pulled up the bucket and gave the little prince a drink.",
-          "id": "Aku menarik ember itu dan memberi sang pangeran kecil minum."
-        },
-        {
-          "en": "The water tasted special because we had walked under the stars and worked hard to find it.",
-          "id": "Air itu terasa istimewa karena kami telah berjalan di bawah bintang-bintang dan berusaha keras menemukannya."
-        },
-        {
-          "en": "He reminded me to draw a muzzle for his sheep.",
-          "id": "Ia mengingatkanku untuk menggambar penutup mulut bagi dombanya."
-        },
-        {
-          "en": "Then I realized that he had a secret plan.",
-          "id": "Kemudian aku menyadari bahwa ia memiliki rencana rahasia."
-        },
-        {
-          "en": "It had been almost one year since he arrived on Earth.",
-          "id": "Hampir satu tahun telah berlalu sejak ia tiba di Bumi."
-        }
-      ]
-    },
-    {
-      "title": "The Return",
-      "sentences": [
-        {
-          "en": "That day, I finally repaired my airplane.",
-          "id": "Hari itu, akhirnya aku berhasil memperbaiki pesawatku."
-        },
-        {
-          "en": "I found the little prince speaking to the yellow snake again.",
-          "id": "Aku menemukan sang pangeran kecil sedang berbicara lagi dengan ular kuning."
-        },
-        {
-          "en": "He planned to return home exactly one year after he arrived.",
-          "id": "Ia berencana pulang tepat satu tahun setelah kedatangannya."
-        },
-        {
-          "en": "He said his body was too heavy to carry so far.",
-          "id": "Ia berkata bahwa tubuhnya terlalu berat untuk dibawa sejauh itu."
-        },
-        {
-          "en": "That night, the snake bit his ankle, and he fell silently.",
-          "id": "Malam itu, ular itu menggigit pergelangan kakinya, lalu sang pangeran kecil jatuh tanpa suara."
-        },
-        {
-          "en": "The next morning, I could not find his body anywhere.",
-          "id": "Keesokan paginya, aku tidak dapat menemukan tubuhnya di mana pun."
-        },
-        {
-          "en": "I believed that he had returned to his star and his rose.",
-          "id": "Aku percaya bahwa ia telah kembali ke bintangnya dan mawarnya."
-        }
-      ]
-    },
-    {
-      "title": "The Laughing Stars",
-      "sentences": [
-        {
-          "en": "Six years have passed, but I still remember the little prince.",
-          "id": "Enam tahun telah berlalu, tetapi aku masih mengingat sang pangeran kecil."
-        },
-        {
-          "en": "At night, the stars sound like millions of tiny bells laughing.",
-          "id": "Pada malam hari, bintang-bintang terdengar seperti jutaan lonceng kecil yang tertawa."
-        },
-        {
-          "en": "Sometimes I worry because I drew the muzzle but forgot to add a strap.",
-          "id": "Terkadang aku khawatir karena telah menggambar penutup mulut itu, tetapi lupa menambahkan talinya."
-        },
-        {
-          "en": "Did the sheep eat the rose, or is she still safe beneath the stars?",
-          "id": "Apakah domba itu telah memakan sang mawar, atau sang mawar masih aman di bawah bintang-bintang?"
-        },
-        {
-          "en": "The answer changes the whole universe for anyone who loves the little prince.",
-          "id": "Jawabannya mengubah seluruh alam semesta bagi siapa pun yang menyayangi sang pangeran kecil."
-        },
-        {
-          "en": "If you ever meet him, please tell me that he has come back.",
-          "id": "Jika kalian bertemu dengannya, tolong beri tahu aku bahwa ia telah kembali."
-        }
-      ]
-    }
-  ]
-}
     {
       "id": "charlottes_web_guide",
       "title": "Charlotte's Web",
