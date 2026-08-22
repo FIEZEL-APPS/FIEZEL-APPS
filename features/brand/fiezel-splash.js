@@ -40,7 +40,10 @@
   'use strict';
 
   var STORAGE_KEY = 'fiezel-splash-seen-v1';
-  var VISIBLE_MS = 2600;
+  // m025-88 OWNER: "animasinya terlalu cepat dan singkat". Gerakan kini selesai di 2180ms
+  // (lihat fiezel-choreography.js), jadi durasi tayang dinaikkan supaya masih tersisa lebih
+  // dari satu detik untuk diam - dan diam itu bagian dari kesan mahal, bukan waktu terbuang.
+  var VISIBLE_MS = 3400;
   // Splash frame-pertama yang dipasang statis di index.html. Atribut inilah kontraknya:
   // selama namanya sama, modul ini mengadopsi elemen itu alih-alih membuat yang kedua.
   var BOOT_ATTR = 'data-fiezel-boot-splash';
@@ -50,7 +53,7 @@
   // Sisa waktu minimum setelah splash diadopsi. Boot yang lambat sudah "memakai" sebagian
   // besar VISIBLE_MS sebelum modul ini sempat berjalan; tanpa lantai ini splash akan
   // menutup tepat di detik app siap dan terbaca sebagai kedipan, bukan sambutan.
-  var MIN_TAIL_MS = 700;
+  var MIN_TAIL_MS = 900;
   var COPY = Object.freeze({
     word: 'FIEZEL',
     tagline: 'ADAPTIVE ENGLISH'
