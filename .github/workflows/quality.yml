@@ -66,6 +66,7 @@ jobs:
           node remote-push-test.js
           node core-brain-test.js
           node core-brain-v2-test.js
+          node tutor-brain-v3-test.js
           node core-worker-contract-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
