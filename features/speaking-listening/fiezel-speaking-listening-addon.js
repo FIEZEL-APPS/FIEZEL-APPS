@@ -25,6 +25,27 @@
     aggregateEventLimit:120
   });
   const LEVELS=Object.freeze(['A1','A2','B1','B2','C1','C2']);
+  const DEFAULT_ACTIVE_LEVEL='A1';
+  const hasOwn=(value,key)=>Object.prototype.hasOwnProperty.call(value||{},key);
+  /**
+   * Normalize the level contract shared by the host application and every skill
+   * sidecar. A bad host value must never widen the bank to all levels, so an
+   * explicitly supplied but invalid value falls back to the safe A1 track.
+   */
+  const normalizeLevel=value=>{
+    const level=String(value??'').trim().toUpperCase();
+    return LEVELS.includes(level)?level:null
+  };
+  function createLevelContract(options,config){
+    const source=options||{},cfg=config||{};
+    const getter=typeof source.getActiveLevel==='function'?source.getActiveLevel:
+      (typeof cfg.getActiveLevel==='function'?cfg.getActiveLevel:null);
+    const explicitlyProvided=hasOwn(source,'activeLevel')||hasOwn(source,'initialLevel')||
+      hasOwn(cfg,'activeLevel')||hasOwn(cfg,'initialLevel')||!!getter;
+    let candidate;
+    try{candidate=getter?getter():source.activeLevel??source.initialLevel??cfg.activeLevel??cfg.initialLevel}catch{}
+    return {external:explicitlyProvided, getter, level:normalizeLevel(candidate)||DEFAULT_ACTIVE_LEVEL};
+  }
   const now=()=>Date.now();
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,Number(n)||0));
   const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
@@ -172,7 +193,7 @@
      * tetapi sumber acak yang lebih baik memang gratis di browser modern - dan urutan
      * yang bisa diprediksi persis itulah yang OWNER keluhkan.
      */
-    for(domain,level){const rows=domain==='speaking'?this.speaking:this.listening;return shuffle(rows.filter(x=>x.level===level))}
+    for(domain,level){const rows=domain==='speaking'?this.speaking:this.listening;const active=normalizeLevel(level)||DEFAULT_ACTIVE_LEVEL;return shuffle(rows.filter(x=>x.level===active))}
   }
 
   class TTSService{
@@ -219,16 +240,19 @@
   function mergeConfig(input){const cfg={...DEFAULT_CONFIG,...(global.FIEZEL_SPEAKING_LISTENING_CONFIG||{}),...(input||{})};cfg.persistRawAudio=false;cfg.persistRawTranscript=false;cfg.aggregateEventLimit=Math.max(20,Math.min(300,Number(cfg.aggregateEventLimit)||120));return cfg}
 
   class Controller{
-    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.level='A1';this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}
+    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}
     async init(){await this.repo.load();return this}
     mount(root){this.root=root||this.root;if(!this.root)throw new Error('mount_root_required');this.renderHub();return this}
-    open(domain,level){if(!['listening','speaking'].includes(domain))throw new Error('invalid_domain');this.domain=domain;this.level=LEVELS.includes(level)?level:this.level;this.items=this.repo.for(domain,this.level);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.renderSession();return this}
+    readActiveLevel(){let candidate;try{candidate=this.levelContract.getter?this.levelContract.getter():null}catch{}const next=normalizeLevel(candidate);if(next&&next!==this.activeLevel){this.activeLevel=next;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}this.level=this.activeLevel;return this.activeLevel}
+    setActiveLevel(level,options={}){const next=normalizeLevel(level);if(!next)throw new Error('invalid_level');this.activeLevel=next;this.level=next;this.levelContract.level=next;this.levelContract.external=true;this.levelContract.getter=null;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';if(options.render!==false&&this.root)this.renderHub();return this.activeLevel}
+    getActiveLevel(){return this.readActiveLevel()}
+    open(domain,level){if(!['listening','speaking'].includes(domain))throw new Error('invalid_domain');this.domain=domain;const active=this.readActiveLevel();const requested=this.levelContract.external?active:(normalizeLevel(level)||active);this.activeLevel=requested;this.level=requested;this.items=this.repo.for(domain,requested);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.renderSession();return this}
     exit(){this.tts.stop();this.recognition.stop();this.recorder.destroy();this.ephemeralTranscript='';if(typeof this.options.onExit==='function')this.options.onExit();else this.renderHub()}
     emitEvidence(){const evidence=this.store.evidence();if(typeof this.options.onAggregateEvidence==='function')this.options.onAggregateEvidence(evidence);return evidence}
-    renderHub(){if(!this.root)return;const c=capabilities(),ev=this.store.evidence();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>Dengar lalu pahami</h2><p>Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">Mulai Listening</button></div></article><article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>Ucapkan dan respons</h2><p>${c.speechRecognition?'Speech recognition tersedia untuk target-language coverage.':'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.'}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">Mulai Speaking</button></div></article></div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?'neural ready':'neural belum diunduh'}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
-      this.root.querySelectorAll?.('[data-open]').forEach(b=>b.addEventListener('click',()=>this.renderLevelPicker(b.getAttribute('data-open'))))
+    renderHub(){if(!this.root)return;const c=capabilities(),ev=this.store.evidence(),active=this.readActiveLevel();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-head"><div><span class="fsl-kicker">FIEZEL SKILLS LAB</span><h1>Speaking + Listening</h1><p>Latihan suara dengan data terisolasi. Speaking mengukur target-language coverage, bukan pronunciation.</p><p class="fsl-level-state">Level aktif: <b>${esc(active)}</b>${this.levelContract.external?' · mengikuti pilihan level utama':''}</p></div></div><div class="fsl-grid"><article class="fsl-card"><span class="fsl-kicker">Listening</span><h2>Dengar lalu pahami</h2><p>Gist, detail, dan dictation. Jawaban baru aktif setelah audio berhasil diputar dan raw dictation tidak disimpan.</p><div class="fsl-actions"><button class="fsl-primary" data-open="listening">Mulai Listening</button></div></article><article class="fsl-card"><span class="fsl-kicker">Speaking</span><h2>Ucapkan dan respons</h2><p>${c.speechRecognition?'Speech recognition tersedia untuk target-language coverage.':'Speech recognition tidak tersedia; mode rekam-dengar mandiri tetap dapat dipakai jika microphone recording tersedia.'}</p><div class="fsl-actions"><button class="fsl-primary" data-open="speaking">Mulai Speaking</button></div></article></div><article class="fsl-card"><span class="fsl-kicker">Capability gate</span><div class="fsl-status">Audio output: <b>${c.neuralVoice?'neural ready':'neural belum diunduh'}</b> · Speech recognition: <b>${c.speechRecognition?'ready':'unavailable'}</b> · Recorder: <b>${c.mediaRecorder?'ready':'unavailable'}</b> · Secure context: <b>${c.secureContext?'yes':'no'}</b></div><p class="fsl-privacy">Browser speech recognition dapat melibatkan layanan pengenal milik browser. FIEZEL tidak menyimpan raw audio, transcript, atau jawaban dictation.</p></article><article class="fsl-card"><span class="fsl-kicker">Evidence lokal</span><p>Listening: <b>${ev.domains.listening.attempts}</b> attempt · average ${ev.domains.listening.averageScore??'-'}%. Speaking: <b>${ev.domains.speaking.attempts}</b> attempt · average ${ev.domains.speaking.averageScore??'-'}%.</p></article></section>`;
+      this.root.querySelectorAll?.('[data-open]').forEach(b=>b.addEventListener('click',()=>this.levelContract.external?this.open(b.getAttribute('data-open')):this.renderLevelPicker(b.getAttribute('data-open'))))
     }
-    renderLevelPicker(domain){if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
+    renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
     current(){return this.items[this.index]||null}
     renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening')this.renderListening(item,progress);else this.renderSpeaking(item,progress)}
     renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p><div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
@@ -259,6 +283,8 @@
     scoreListening,
     normalizeText,
     getDefaultConfig:()=>({...DEFAULT_CONFIG}),
-    __test:Object.freeze({tokenF1,keywordCoverage,conceptCoverage,sanitizeState,freshState,mergeConfig,StateStore,DataRepository,shuffle,randomBelow})
+    LEVELS,
+    normalizeLevel,
+    __test:Object.freeze({tokenF1,keywordCoverage,conceptCoverage,sanitizeState,freshState,mergeConfig,StateStore,DataRepository,Controller,shuffle,randomBelow,createLevelContract})
   });
 });

@@ -6,6 +6,9 @@
     "web-push": "3.6.7"
   },
   "scripts": {
+    "test:grammar-curriculum": "node grammar-curriculum-test.js",
+    "audit:grammar": "node grammar-quality-audit.js",
+    "test:level-contract": "node level-grammar-contract-test.js",
     "push:dispatch": "node push-dispatcher.mjs",
     "push:secrets": "node generate-push-secrets.mjs",
     "core:preflight": "node core-deploy-preflight.mjs",
