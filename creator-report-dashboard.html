@@ -23,7 +23,7 @@
 <body>
   <main>
     <div class="top"><div class="brand">FIE<span>ZEL</span> · Creator Report</div><div class="secure">Owner-only Puter Worker view</div></div>
-    <section class="hero"><small>JAHRAN LEARNING INTELLIGENCE</small><h1>Progress yang bisa ditindaklanjuti.</h1><p>Ringkasan akses dan sesi belajar masuk otomatis setelah consent aktif. Dashboard tidak menerima password, API key, isi jawaban mentah, atau riwayat browser.</p></section>
+    <section class="hero"><small>FIEZEL LEARNING INTELLIGENCE</small><h1>Progress yang bisa ditindaklanjuti.</h1><p>Ringkasan akses dan sesi belajar masuk otomatis setelah consent aktif. Dashboard tidak menerima password, API key, isi jawaban mentah, atau riwayat browser.</p></section>
     <div class="connect">
       <input id="endpoint" type="url" aria-label="Endpoint Puter Worker" placeholder="https://fiezel-creator-hub.puter.work">
       <button type="button" id="load">Muat laporan</button>
@@ -166,7 +166,7 @@
         var cells=[['received_at','reason','level','total_attempts','total_accuracy','streak_days','session_type','session_accuracy']];
         reports.forEach(function(r){var s=r.summary||{},x=r.latestSession||{};cells.push([r.receivedAt||r.createdAt||'',r.reason||'',s.estimatedLevel||'',s.totalAttempts==null?'':s.totalAttempts,s.totalAccuracy==null?'':s.totalAccuracy,s.streakDays==null?'':s.streakDays,x.type||'',x.accuracy==null?'':x.accuracy])});
         var csv=cells.map(function(row){return row.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
-        var url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));var a=document.createElement('a');a.href=url;a.download='fiezel-jahran-report.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);
+        var url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));var a=document.createElement('a');a.href=url;a.download='fiezel-learning-report.csv';a.click();setTimeout(function(){URL.revokeObjectURL(url)},1000);
       });
       if(stored&&validEndpoint(stored))setTimeout(loadReports,400);
       setInterval(function(){if(endpointInput.value&&document.visibilityState!=='hidden')loadReports()},60000);

@@ -244,6 +244,10 @@ html.fz-booting body{overflow:hidden}
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
+  <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
+       sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
+       kebijakan lama sebelum lapisan penalarannya tiba. Berkasnya ~14 KB, murni fungsi. -->
+  <script defer src="./features/brain/fiezel-core-brain.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
