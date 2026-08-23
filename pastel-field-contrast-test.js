@@ -102,7 +102,7 @@ function ratio(a, b) {
  */
 const FROZEN_BY_DESIGN = {
   '--yellow': 'bidang CTA chunky; selalu berpasangan dengan --ink coklat di kedua tema',
-  '--yellow-deep': 'hanya bayangan tombol, tidak pernah menampung teks',
+  '--yellow-deep': 'bayangan tombol dan bidang hover CTA; tintanya diwarisi --ink, 7,93:1',
   '--coral': 'bidang aksi kedua; selalu berpasangan dengan --ink coklat di kedua tema',
   '--coral-deep': 'hanya bayangan tombol, tidak pernah menampung teks',
   '--mint': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
@@ -125,7 +125,11 @@ const NO_TEXT_INSIDE = {
 const INHERITS_FROZEN_INK = {
   '.primary.is-coral': 'mewarisi color:var(--ink) dari button.primary',
   '.primary.is-coral:hover': 'mewarisi color:var(--ink) dari button.primary',
-  '.primary.is-coral:active': 'mewarisi color:var(--ink) dari button.primary'
+  '.primary.is-coral:active': 'mewarisi color:var(--ink) dari button.primary',
+  // m025-120: hover CTA menggelapkan bidangnya saja; tintanya tetap --ink dari aturan
+  // dasar .primary / .auth-primary, yang beku di kedua tema (7,93:1).
+  '.primary:hover': 'mewarisi color:var(--ink) dari .primary',
+  '.auth-gate .auth-primary:hover': 'mewarisi color:var(--ink) dari .auth-gate .auth-primary'
 };
 
 test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya', () => {
@@ -277,6 +281,59 @@ test('tinta brief terbaca di atas setiap warna brief', () => {
     if (r < 4.5) weak.push(token + ' ' + hex + ' = ' + r.toFixed(2) + ':1');
   }
   if (weak.length) throw new Error('di bawah 4,5:1 terhadap tinta brief: ' + weak.join('; '));
+});
+
+/**
+ * m025-120. Keluhan warna KEEMPAT dari OWNER, dan kali ini dua hal sekaligus:
+ *   1. "MODE GELAP ATAU TIDAK GELAP TIDAK BERFUNGSI DI APLIKASI, INTINYA AKU TETAP MAU
+ *      DASAR CREAM"
+ *   2. "UNTUK SEMUA PALET WARNA COKLAT, MINIMALKAN SEMINIMAL MUNGKIN, KARENA KALAU WARNA
+ *      COKLAT TERLALU DOMINAN, AKAN MEMBUAT TAMPILAN KURANG CERIA"
+ *
+ * Keduanya punya satu penyebab yang bisa dijaga secara statis, jadi dijaga di sini.
+ */
+
+const THEME_JS = fs.readFileSync(path.join(__dirname, 'features/ui/fiezel-dark-mode.js'), 'utf8');
+
+test('memilih tema terang benar-benar menyatakan terang', () => {
+  // Aturan gelapnya `:root:not([data-theme="light"])`. Menghapus atributnya karena itu
+  // TIDAK keluar dari mode gelap - ia hanya berhenti melawannya.
+  if (/removeAttribute\(\s*['"]data-theme['"]\s*\)/.test(THEME_JS)) {
+    throw new Error('applyTheme masih menghapus data-theme; di ponsel bermode gelap, '
+      + 'memilih terang tidak mengubah apa pun karena :not([data-theme="light"]) tetap cocok');
+  }
+  if (!/setAttribute\(\s*['"]data-theme['"]\s*,\s*['"]light['"]\s*\)/.test(THEME_JS)) {
+    throw new Error('tidak ada yang memasang data-theme="light" secara eksplisit');
+  }
+});
+
+test('dasar cream tidak tergantung mode perangkat', () => {
+  // OWNER: "INTINYA AKU TETAP MAU DASAR CREAM". Preferensi sistem boleh dibaca, tetapi
+  // tidak boleh menjadi tema awal.
+  const init = /initDarkMode\(\)\s*{[\s\S]*?\n  }/.exec(THEME_JS);
+  if (!init) throw new Error('initDarkMode tidak ditemukan');
+  if (/getSystemPreference\(\)/.test(init[0])) {
+    throw new Error('initDarkMode masih jatuh ke preferensi perangkat; ponsel bermode gelap '
+      + 'akan memaksa aplikasi gelap pada kunjungan pertama, padahal dasarnya harus cream');
+  }
+});
+
+test('coklat hanya jadi tinta dan garis, tidak pernah jadi bidang', () => {
+  // Coklat sebagai LATAR tombol besar adalah cara coklat mendominasi layar. Brief memberi
+  // coklat peran tinta dan outline; bidangnya milik kuning dan koral.
+  const BROWN_FIELD = /(?:^|[;\s{])background(?:-color)?\s*:\s*(?:[^;{}]*\s)?var\(\s*--(?:black|ink)\s*\)/;
+  const offenders = [];
+  for (const file of ['style.css', 'features/tutor-classroom/tutor-v3.css']) {
+    let text;
+    try { text = fs.readFileSync(path.join(__dirname, file), 'utf8'); } catch { continue; }
+    text.split('\n').forEach((line, i) => {
+      if (/^\s*(\/\*|\*)/.test(line)) return;
+      if (BROWN_FIELD.test(line)) offenders.push(file + ':' + (i + 1) + ' ' + line.trim().slice(0, 90));
+    });
+  }
+  if (offenders.length) {
+    throw new Error('coklat dipakai sebagai bidang:\n    ' + offenders.join('\n    '));
+  }
 });
 
 console.log('');
