@@ -492,8 +492,57 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .passage h3{margin:5px 0 8px;font-size:1.02rem}
 .passage p{white-space:pre-wrap}
 .flash-back .muted{margin-top:12px}
-.confidence-box{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface-solid)}
-.confidence-box .actions{margin-top:10px}
+/* ==========================================================================
+   Lembar keyakinan mengambang (m025-132)
+   ==========================================================================
+   OWNER: "saat di panel tadi seberapa yakin? ... buatkan mengambang, tanpa perlu user
+   scroll sampai paling bawah."
+
+   Ia benar, dan letaknya yang lama membuat pertanyaan ini hampir tidak pernah terjawab:
+   kotaknya menempel di DASAR panel umpan balik, di bawah penjelasan jawaban dan tombol
+   "jelaskan lebih sederhana". Di layar ponsel itu berarti murid harus menggulir untuk
+   menemukan pertanyaan yang justru harus dijawab SELAGI perasaannya masih hangat.
+
+   Dan datanya bukan hiasan: kalibrasi keyakinan dipakai penjadwal ulang (scheduleNext)
+   untuk memutuskan kapan materi ini muncul lagi. Pertanyaan yang tidak terjawab bukan
+   sekadar kolom kosong - ia membuat penjadwalannya menebak.
+   -------------------------------------------------------------------------- */
+.confidence-box{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  z-index:42;width:min(520px,calc(100% - 24px));
+  padding:13px 14px;border-radius:20px;
+  border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.97);
+  box-shadow:0 3px 0 var(--ink),0 18px 40px rgba(43,33,24,.22);
+  backdrop-filter:blur(10px);
+}
+.confidence-box>b{display:block;font-size:.86rem;font-weight:750;margin-bottom:9px}
+.confidence-box .actions{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.confidence-box .actions button{
+  flex-direction:column;gap:2px;min-height:56px;padding:8px 4px;
+  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;
+  border-radius:14px;
+}
+.confidence-box .actions button span{
+  font-size:1.05rem;font-weight:850;font-variant-numeric:tabular-nums;line-height:1;
+}
+/* Tiga tingkat, tiga warna - supaya pilihannya terbaca sebagai skala, bukan tiga tombol
+   yang kebetulan bersebelahan. */
+.confidence-box .actions button:nth-child(1){background:var(--coral-soft)}
+.confidence-box .actions button:nth-child(2){background:var(--yellow-soft)}
+.confidence-box .actions button:nth-child(3){background:var(--yellow);color:var(--ink)}
+/* Tinta tombol ketiga dipasang EKSPLISIT. --yellow beku di kedua tema, sementara tinta
+   yang diwarisi ikut berbalik jadi krem di mode gelap - krem di atas kuning, dan itu bug
+   m025-113 dalam bentuk paling kecil. Dua tombol lain aman karena bidang lembutnya memang
+   punya pasangan gelap. */
+
+@media (prefers-reduced-motion:no-preference){
+  .confidence-box{animation:fzConfIn .3s cubic-bezier(.3,1.1,.5,1) both}
+  @keyframes fzConfIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
+  .confidence-box.is-done{animation:fzConfOut .26s var(--ease) both}
+  @keyframes fzConfOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,12px)}}
+}
+.confidence-box.is-done{opacity:0;pointer-events:none}
 .creator-credit{display:flex;align-items:center;gap:9px;margin-top:10px;color:var(--muted);font-size:.82rem}
 .instagram-mark{width:22px;height:22px;border:2px solid var(--black);border-radius:7px;display:inline-grid;place-items:center;font-size:16px;line-height:1}
 .grid>div>h3{margin:4px 2px 12px;font-size:1rem}
