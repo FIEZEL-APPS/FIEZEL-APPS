@@ -11,7 +11,7 @@
  * penuh. Satu-satunya API web yang bisa melakukannya adalah Background Fetch, dan
  * WebKit/iOS tidak memilikinya - murid FIEZEL memakai iPhone dengan PWA dari Safari. Yang
  * bisa dilakukan, dan yang dilakukan berkas ini, adalah membuat penutupan aplikasi TIDAK
- * PERNAH memakan biaya: kemajuan disimpan per POTONGAN 4 MB, bukan per berkas, sehingga
+ * PERNAH memakan biaya: kemajuan disimpan per POTONGAN 20 MB, bukan per berkas, sehingga
  * sesi berikutnya melanjutkan dari potongan terakhir dan tidak pernah mengulang dari nol.
  * Tanpa itu, satu aset 78 MB yang putus di menit terakhir berarti 78 MB terbuang.
  *
@@ -31,12 +31,23 @@
 
   var SCHEMA = 'fiezel-voice-offline-autoload-v1';
   var STATE_KEY = 'fiezel-voice-offline-autoload-v1';
-  // 4 MB. Cukup besar supaya jumlah permintaannya wajar (aset terbesar jadi 20 potongan),
-  // cukup kecil supaya satu potongan yang gagal di jaringan ponsel murah untuk diulang.
-  var CHUNK_BYTES = 4 * 1024 * 1024;
+  // 20 MB atas permintaan OWNER (m025-122); sebelumnya 4 MB.
+  //
+  // Yang ditukar di sini perlu ditulis, karena keduanya nyata. Potongan besar berarti
+  // seluruh 152 MB selesai dalam SATU sesi belajar yang wajar alih-alih beberapa - itu
+  // yang diminta. Harganya: satu potongan yang putus membuang sampai 20 MB, bukan 4 MB,
+  // karena potongan yang belum utuh tidak pernah disimpan.
+  //
+  // Yang TIDAK berubah adalah jaminan intinya: kemajuan tetap disimpan per potongan, jadi
+  // aplikasi yang ditutup di tengah unduhan tetap melanjutkan dari potongan terakhir dan
+  // tidak pernah mengulang dari nol. Aset terbesar (78 MB) kini 4 potongan, bukan 20.
+  var CHUNK_BYTES = 20 * 1024 * 1024;
   // Jeda antar potongan. Unduhan ini TIDAK PERNAH boleh terasa: ia berbagi jaringan dan
-  // CPU dengan pelajaran yang sedang berjalan, dan pelajaran selalu menang.
-  var IDLE_GAP_MS = 1200;
+  // CPU dengan pelajaran yang sedang berjalan, dan pelajaran selalu menang. m025-122:
+  // dinaikkan bersama ukuran potongan - satu tarikan 20 MB memakai pita jauh lebih lama
+  // daripada 4 MB, jadi jeda yang sama akan berarti unduhan ini menguasai jaringan dalam
+  // porsi yang jauh lebih besar daripada sebelumnya.
+  var IDLE_GAP_MS = 3000;
   var RETRY_GAP_MS = 15000;
   var MAX_CONSECUTIVE_FAILURES = 4;
 

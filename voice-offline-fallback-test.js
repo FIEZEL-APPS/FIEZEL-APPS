@@ -44,7 +44,13 @@ test('pengunduh latar tidak punya satu pun jalan ke layar', () => {
 });
 
 test('kemajuan disimpan per potongan, bukan per berkas', () => {
-  if (!/CHUNK_BYTES\s*=\s*\d+\s*\*\s*1024\s*\*\s*1024/.test(AUTOLOAD)) throw new Error('ukuran potongan tidak ditemukan');
+  // Ukuran potongan dipaku ke nilai yang diminta OWNER (m025-122: 20 MB). Yang dijaga
+  // bukan angkanya sebagai selera, melainkan bahwa perubahannya disengaja: menurunkannya
+  // diam-diam memperlambat unduhan, menaikkannya diam-diam memperbesar yang terbuang saat
+  // satu potongan putus.
+  const chunk = /CHUNK_BYTES\s*=\s*(\d+)\s*\*\s*1024\s*\*\s*1024/.exec(AUTOLOAD);
+  if (!chunk) throw new Error('ukuran potongan tidak ditemukan');
+  if (Number(chunk[1]) !== 20) throw new Error('ukuran potongan ' + chunk[1] + ' MB; OWNER menetapkan 20 MB');
   if (!/Range:\s*'bytes='/.test(AUTOLOAD)) throw new Error('tidak ada Range request; unduhan yang putus akan mengulang dari nol');
   if (!AUTOLOAD.includes('partUrl')) throw new Error('potongan tidak disimpan tersendiri, jadi tidak ada yang bisa dilanjutkan');
 });
