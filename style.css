@@ -29,6 +29,7 @@
   --mint-soft:#E9F7F0;
   --teal-pastel:#9FD5CE;
   --lilac:#C9BCE4;
+  --lilac-soft:#F1EDF9;
   --gold:#D9BC7E;
   --sky-top:#FFE9B8;
   --sky-bottom:#FFF9F0;
@@ -599,6 +600,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
     --sky-top:#3E3020;--sky-bottom:#1C160E;--scene-light:rgba(255,224,126,.14);
+    /* m025-117: bidang pastel LEMBUT wajib punya pasangan gelap.
+       Tanpa ini bidangnya beku terang sementara tintanya berbalik jadi terang juga -
+       persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
+       dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
+       berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
+    --cream:#241C13;--cream-deep:#2C2218;
+    --yellow-soft:#3B2F17;--coral-soft:#3C2620;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
@@ -616,6 +624,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 :root[data-theme="dark"]{
     --sky-top:#3E3020;--sky-bottom:#1C160E;--scene-light:rgba(255,224,126,.14);
+    /* m025-117: bidang pastel LEMBUT wajib punya pasangan gelap.
+       Tanpa ini bidangnya beku terang sementara tintanya berbalik jadi terang juga -
+       persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
+       dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
+       berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
+    --cream:#241C13;--cream-deep:#2C2218;
+    --yellow-soft:#3B2F17;--coral-soft:#3C2620;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
@@ -2067,7 +2082,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .launch-icon{background:var(--yellow-soft);color:var(--accent-strong);border:1px solid var(--surface-edge)}
 .grammar-launch .launch-icon{background:var(--coral-soft)}
 .reading-launch .launch-icon{background:var(--mint-soft)}
-.skills-launch .launch-icon{background:#F1EDF9}
+.skills-launch .launch-icon{background:var(--lilac-soft)}
 .launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(51,40,28,.08)}
 .launch-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
 
