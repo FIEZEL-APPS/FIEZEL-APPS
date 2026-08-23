@@ -314,17 +314,45 @@ test('kelahiran logo menunggu splash pergi, bukan menunggu jam', () => {
   }
 });
 
-test('lembar keyakinan mengambang, dan pergi setelah dijawab', () => {
-  // OWNER: "buatkan mengambang, tanpa perlu user scroll sampai paling bawah."
-  if (!/\.confidence-box\{[^}]*position:fixed/.test(CSS)) {
-    throw new Error('kotak keyakinan masih ikut tergulir di dasar panel');
-  }
+test('pertanyaan yakin muncul sebagai popup, dan membawa tombol Lanjutnya sendiri', () => {
+  // OWNER: "mendingan muncul pop up aja di layar dan langsung diikuti tombol next di pop
+  // up itu juga, setelah user menjawab 3 pilihan itu langsung muncul tombol next."
   const app = read('app.js');
-  if (!/dismissConfidenceBox\(\)/.test(app)) {
-    throw new Error('lembar mengambang tidak pernah pergi; ia akan menutupi tombol soal berikutnya');
+  if (!/\.confidence-pop\{[^}]*position:fixed;inset:0/.test(CSS)) {
+    throw new Error('bukan popup; ia masih menempel di aliran halaman');
   }
-  if (!/setConfidence\(value\)\{[\s\S]{0,900}?dismissConfidenceBox\(\)/.test(app)) {
-    throw new Error('penutupan tidak dipanggil dari setConfidence');
+  if (!/function openConfidencePop\(ok\)/.test(app)) throw new Error('popup tidak pernah dibuka');
+  if (!/openConfidencePop\(ok\);/.test(app)) throw new Error('popup tidak dipicu saat jawaban terbuka');
+
+  // Tombol Lanjut TIDAK boleh sudah ada saat popup pertama muncul - itu inti permintaannya.
+  const open = /function openConfidencePop\(ok\)\{[\s\S]*?\n\}/.exec(app);
+  if (!open) throw new Error('openConfidencePop tidak terbaca');
+  if (/confidence-go/.test(open[0])) {
+    throw new Error('tombol Lanjut sudah ada sebelum pilihan diambil; pertanyaannya jadi bisa dilewati begitu saja');
+  }
+  const answered = /function confidencePopAnswered\(value\)\{[\s\S]*?\n\}/.exec(app);
+  if (!answered || !/confidence-go/.test(answered[0])) {
+    throw new Error('tombol Lanjut tidak muncul setelah pilihan diambil');
+  }
+  if (!/setConfidence\(value\)\{[\s\S]{0,900}?confidencePopAnswered\(value\)/.test(app)) {
+    throw new Error('popup tidak pernah tahu pilihannya sudah diambil');
+  }
+});
+
+test('popup keyakinan bukan kurungan', () => {
+  // Batas yang dipegang seluruh aplikasi sejak m025-126: "layar yang menahan alur tanpa
+  // jalan keluar adalah kurungan, bukan pelajaran". Yang ditahan hanya jalan PINTASNYA.
+  const app = read('app.js');
+  if (!/confidence-skip/.test(app)) {
+    throw new Error('tidak ada jalan keluar dari popup tanpa memilih');
+  }
+  // Dan ia harus ikut tertutup saat murid pindah soal atau keluar kuis - popup yang
+  // tertinggal akan menutupi layar berikutnya.
+  if (!/quizExit'\)\.onclick=\(\)=>\{closeConfidencePop\(\)/.test(app)) {
+    throw new Error('popup tidak ditutup saat keluar kuis');
+  }
+  if (!/quizNext'\)\.onclick=\(\)=>\{if\(answer\.locked\)\{closeConfidencePop\(\)/.test(app)) {
+    throw new Error('popup tidak ditutup saat pindah soal');
   }
 });
 
