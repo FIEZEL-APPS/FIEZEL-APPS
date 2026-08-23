@@ -265,12 +265,24 @@ const GRAMMAR_PRACTICE_MODES=[
   'contrast_distractor_1','contrast_distractor_2','contrast_distractor_3',
   'classify_family','locate_decision_cue','teach_back','mastery_check'
 ];
-function friendlySkillName(skill){const s=String(skill||'grammar').replace(/_/g,' ').replace(/\bvs\b/gi,'dan').replace(/\bwith\b/gi,'dengan').replace(/\bwithout\b/gi,'tanpa');return s.charAt(0).toUpperCase()+s.slice(1)}
+// m025-125: judul lesson dibaca dari peta Bahasa Indonesia. Kunci subskill mentah
+// ("present_simple_vs_continuous") dulu tampil apa adanya di layar siswa; penggantian
+// kata per kata hanya dipakai sebagai jaring pengaman untuk skill di luar bank resmi.
+function friendlySkillName(skill){
+  const key=String(skill||'').trim();
+  const mapped=(self.GRAMMAR_SKILL_TITLES_ID||{})[key];
+  if(mapped)return mapped;
+  const s=key.replace(/_/g,' ').replace(/\bvs\b/gi,'dan').replace(/\bwith\b/gi,'dengan').replace(/\bwithout\b/gi,'tanpa')||'grammar';
+  return s.charAt(0).toUpperCase()+s.slice(1);
+}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||'pola grammar'}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?`Petunjuk pentingnya adalah “${hit}”.`:'Petunjuknya ada pada hubungan makna, subjek, dan bentuk kata kerja dalam satu kalimat penuh.'}
 function grammarOptionReason(option,isCorrect,rawReason=''){if(isCorrect)return`“${option}” tepat karena bentuk dan maknanya sama-sama cocok dengan kalimat.`;const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return`“${option}” tidak cocok karena kalimat sudah menunjuk waktu lampau yang jelas dan selesai.`;if(/habit|routine|general truth/.test(raw))return`“${option}” akan memberi kesan kebiasaan atau fakta umum, padahal konteks kalimat meminta makna lain.`;if(/permission/.test(raw))return`“${option}” menyatakan izin, sedangkan maksud kalimat bukan memberi izin.`;if(/obligation|requirement|rule/.test(raw))return`“${option}” belum menyampaikan tingkat kewajiban yang diminta kalimat.`;if(/prohibition/.test(raw))return`“${option}” berarti larangan, bukan kesimpulan atau kemungkinan.`;if(/singular|plural|agreement/.test(raw))return`“${option}” belum cocok dengan jumlah subjek, jadi subject dan verb tidak selaras.`;if(/superlative/.test(raw))return`“${option}” memakai bentuk superlative, padahal cakupan perbandingannya tidak meminta bentuk itu.`;if(/comparative/.test(raw))return`“${option}” belum memakai bentuk perbandingan yang sesuai dengan jumlah hal yang dibandingkan.`;if(/word order|order/.test(raw))return`“${option}” menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.`;if(/infinitive/.test(raw))return`“${option}” memakai bentuk infinitive yang tidak cocok dengan kata kerja atau maksud kalimat.`;if(/gerund/.test(raw))return`“${option}” memakai bentuk -ing dengan makna yang berbeda dari konteks kalimat.`;if(/passive|agent/.test(raw))return`“${option}” belum membentuk kalimat pasif yang tepat atau menambahkan pelaku yang tidak diperlukan.`;if(/article|identif/.test(raw))return`“${option}” tidak cocok dengan apakah benda itu masih umum atau sudah jelas bagi pembaca.`;if(/auxiliary/.test(raw))return`“${option}” memakai auxiliary yang tidak sama dengan tense atau struktur kalimat utama.`;return`“${option}” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat.`}
-function grammarMeta(item){const explanation=item?.[12]||{};return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:String(explanation.rule||item?.[3]||''),whyCorrect:String(explanation.whyCorrect||item?.[7]||''),objective:String(item?.[9]||''),misconception:String(item?.[10]||''),reasoning:String(item?.[11]||''),whyOthers:String(explanation.whyOthersFail||''),avoid:String(explanation.howToAvoid||''),memory:String(explanation.memoryCue||''),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
+// m025-125: setiap field penjelas dibaca dari varian "...Id" lebih dulu. Semua nilai di
+// sini tampil langsung sebagai pilihan jawaban pada mode latihan "aturan mana", "tujuan
+// mana", "pengingat mana", jadi versi Bahasa Inggris hanya boleh jadi cadangan terakhir.
+function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
 function stableGrammarHash(value){let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 function grammarAlternativeMeta(item,field,count=3){const own=grammarMeta(item),pool=GRAMMAR_ITEMS.filter(x=>x.item!==item).map(x=>grammarMeta(x.item)?.[field]).filter(Boolean);const start=pool.length?stableGrammarHash(`${own.id}:${field}`)%pool.length:0,out=[];for(let i=0;i<pool.length&&out.length<count;i++){const value=String(pool[(start+i)%pool.length]||'').trim();if(value&&norm(value)!==norm(own[field])&&!out.some(x=>norm(x)===norm(value)))out.push(value)}const fallback=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];for(const value of fallback)if(out.length<count&&!out.some(x=>norm(x)===norm(value)))out.push(value);return out.slice(0,count)}
 function completeGrammarStem(stem,option){return /_{3,}/.test(stem)?stem.replace(/_{3,}/,option):option}
@@ -295,7 +307,41 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   if(variant===23){const correctSummary=`${meta.objective} ${meta.rule}`.trim(),alternatives=grammarAlternativeMeta(item,'objective',3).map((x,i)=>`${x} ${grammarAlternativeMeta(item,'rule',3)[i]}`.trim());return direct(`Ringkasan ajar mana yang paling tepat untuk menjelaskan lesson ${title} kepada siswa lain?`,[correctSummary,...alternatives],0,'Ringkasan tersebut menyatukan tujuan lesson dan aturan yang benar.');}
   const correctPlan=`${meta.avoid} ${meta.memory}`.trim(),avoid=grammarAlternativeMeta(item,'avoid',3),memory=grammarAlternativeMeta(item,'memory',3);return direct(`Rencana cek mandiri mana yang paling tepat sebelum menuntaskan lesson ${title}?`,[correctPlan,...avoid.map((x,i)=>`${x} ${memory[i]}`.trim())],0,'Rencana ini menggabungkan pencegahan kesalahan dan pengingat yang khusus untuk lesson aktif.');
 }
-function indonesianPartOfSpeech(value){return({noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru'}[String(value||'').toLowerCase()]||String(value||'jenis kata'))}
+const PART_OF_SPEECH_ID={noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan',number:'kata bilangan',article:'kata sandang'};
+function indonesianPartOfSpeech(value){return PART_OF_SPEECH_ID[String(value||'').toLowerCase()]||'jenis kata'}
+// m025-124: soal jenis kata hanya jujur kalau siswa bisa melihat kata itu bekerja di dalam
+// satu kalimat. "dance" sendirian bisa kata benda atau kata kerja, jadi tanpa kalimat contoh
+// yang memuat kata targetnya soal ini mustahil dijawab dan wajib ditolak sejak pembuatan.
+const rxEsc=s=>String(s).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function vocabWordForms(word){
+  const out=new Set();
+  for(const raw of String(word||'').split('/')){
+    const b=raw.trim().toLowerCase();if(!b)continue;
+    out.add(b);
+    if(/\s/.test(b))continue; // frasa dipakai apa adanya, tanpa tebakan infleksi
+    out.add(b+'s');out.add(b+'es');out.add(b+'ed');out.add(b+'ing');out.add(b+'d');
+    if(b.endsWith('y')){const s=b.slice(0,-1);out.add(s+'ies');out.add(s+'ied');out.add(s+'ier');out.add(s+'iest')}
+    if(b.endsWith('e')){const s=b.slice(0,-1);out.add(s+'ing');out.add(s+'ed');out.add(s+'er');out.add(s+'est')}
+    if(/[^aeiou][aeiou][bdgklmnprt]$/.test(b)){const c=b+b.slice(-1);out.add(c+'ing');out.add(c+'ed');out.add(c+'er');out.add(c+'est')}
+    out.add(b+'er');out.add(b+'est');out.add(b+'ly');out.add(b+'ally');
+  }
+  // bentuk terpanjang lebih dulu supaya "studies" menang atas "studie"
+  return [...out].sort((a,b)=>b.length-a.length);
+}
+// Mengembalikan bentuk kata sebagaimana benar-benar tertulis di kalimat contoh, atau null
+// kalau kata targetnya tidak muncul sama sekali di sana.
+function vocabSurfaceForm(v){
+  const example=String(v?.example||'');if(!example)return null;
+  for(const form of vocabWordForms(v?.word)){
+    const m=example.match(new RegExp(`(^|[^A-Za-z])(${rxEsc(form)})([^A-Za-z]|$)`,'i'));
+    if(m)return m[2];
+  }
+  return null;
+}
+function partOfSpeechAskable(v){
+  if(!v||!PART_OF_SPEECH_ID[String(v.partOfSpeech||'').toLowerCase()])return false;
+  return !!vocabSurfaceForm(v);
+}
 function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'informasi yang benar-benar disebutkan',why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
 function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};return{ok:true}}
 
@@ -719,16 +765,21 @@ async function load(){const root=document.baseURI;const get=async f=>{const r=aw
       const opts=Array.isArray(t.options)?t.options:[];
       const idx=Number.isInteger(t.correctIndex)?t.correctIndex:-1;
       const reasons=opts.map((o,i)=>{
-        if(i===idx)return `Correct: ${String(t.explanation?.whyCorrect||'This form matches the grammar and context.')}`;
+        // m025-125: cadangan wajib Bahasa Indonesia. Teks ini tampil langsung sebagai
+        // pilihan pada soal "alasan mana yang tepat", jadi kalimat Inggris di sini akan
+        // muncul di layar siswa sebagai jawaban, bukan sekadar catatan internal.
+        if(i===idx)return String(t.explanation?.whyCorrectId||t.explanation?.whyCorrect||'Bentuk ini cocok dengan aturan grammar sekaligus dengan konteks kalimatnya.');
         const d=(t.distractors||[]).find(x=>String(x.option)===String(o));
-        return d?.whyFails||`“${o}” does not satisfy the grammar rule tested here.`;
+        return String(d?.whyFailsId||d?.whyFails||`“${o}” belum memenuhi aturan grammar yang sedang diuji pada kalimat ini.`);
       });
       const item=[t.stem||'',opts,idx,t.explanation?.rule||t.pedagogicalObjective||skill,reasons,t.cefr||'',t.family||'core_grammar',t.explanation?.whyCorrect||'',t.id||'',t.pedagogicalObjective||'',t.misconceptionTargeted||'',t.reasoningOperation||'',t.explanation||{},t.questionType||'multiple_choice',t.__fiezelCanary||null,
         // m025-118: peta {teks pilihan -> nama miskonsepsi}. Bank soal SUDAH membawanya sejak
         // lama dan selama ini dibuang di sini - hanya whyFails yang lolos. Namanya yang
         // dipakai Tutor Brain untuk mengenali pola keliru yang SAMA di soal yang berbeda;
         // tanpa itu, "sudah dua kali salah karena keyakinan yang sama" mustahil dilihat.
-        Object.fromEntries((t.distractors||[]).filter(x=>x&&x.option).map(x=>[String(x.option),String(x.misconception||'')]))];
+        Object.fromEntries((t.distractors||[]).filter(x=>x&&x.option).map(x=>[String(x.option),String(x.misconceptionId||x.misconception||'')])),
+        // m025-125: slot 16 membawa versi Bahasa Indonesia untuk field di luar `explanation`.
+        {objectiveId:String(t.pedagogicalObjectiveId||''),misconceptionId:String(t.misconceptionTargetedId||''),reasoningId:String(t.reasoningOperationId||'')}];
       (buckets[skill]??=[]).push(item);
       GRAMMAR_ITEMS.push({skill,item,family:item[6],level:item[5]});
     }
@@ -2391,13 +2442,13 @@ function makeVocabQuestion(v,preferType){
   const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:pick(types);
   if(type==='synonym'&&(!v.synonyms?.length||synonymSources.length<3))type='meaning';
   if(type==='context'&&!v.example)type='meaning';
-  if(type==='partOfSpeech'&&!v.partOfSpeech)type='meaning';
+  if(type==='partOfSpeech'&&!partOfSpeechAskable(v))type='meaning';
   let q,options,answer;
   if(type==='context'){options=shuffle([v.meaning,...distractMeaning]);q=`Dalam kalimat “${v.example}”, arti “${v.word}” yang paling pas apa?`;answer=v.meaning}
-  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=['noun','verb','adjective','adverb','preposition','conjunction'].filter(x=>x!==v.partOfSpeech).map(indonesianPartOfSpeech);options=shuffle([correctPos,...pos.slice(0,3)]);q=`Di lesson ini, “${v.word}” termasuk jenis kata apa?`;answer=correctPos}
+  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=shuffle(Object.values(PART_OF_SPEECH_ID).filter(x=>x!==correctPos)),surface=vocabSurfaceForm(v)||v.word,asal=norm(surface)===norm(v.word)?'':` (bentuk dari “${v.word}”)`;options=shuffle([correctPos,...pos.slice(0,3)]);q=`Dalam kalimat “${v.example}”, kata “${surface}”${asal} berperan sebagai jenis kata apa?`;answer=correctPos}
   else if(type==='synonym'){options=shuffle([v.synonyms[0],...synonymSources.slice(0,3)]);q=`Kata mana yang maknanya paling dekat dengan “${v.word}”?`;answer=v.synonyms[0]}
   else{options=shuffle([v.meaning,...distractMeaning]);q=`Arti Bahasa Indonesia yang paling dekat dengan “${v.word}” apa?`;answer=v.meaning}
-  const posLabel=indonesianPartOfSpeech(v.partOfSpeech);const why=type==='context'?`Di kalimat itu, “${v.word}” paling pas dimaknai “${v.meaning}”. Coba lihat tindakan atau situasi di sekeliling katanya.`:type==='partOfSpeech'?`“${v.word}” berfungsi sebagai ${posLabel}. Jenis kata dilihat dari tugasnya di dalam kalimat, bukan hanya dari bentuk katanya.`:type==='synonym'?`“${v.synonyms[0]}” paling dekat maknanya dengan “${v.word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.`:`Intinya, “${v.word}” berarti “${v.meaning}”${v.partOfSpeech?` dan biasanya dipakai sebagai ${posLabel}`:''}.`;
+  const posLabel=indonesianPartOfSpeech(v.partOfSpeech);const why=type==='context'?`Di kalimat itu, “${v.word}” paling pas dimaknai “${v.meaning}”. Coba lihat tindakan atau situasi di sekeliling katanya.`:type==='partOfSpeech'?`Di kalimat “${v.example}”, kata “${vocabSurfaceForm(v)||v.word}” bertugas sebagai ${posLabel}. Jenis kata ditentukan oleh perannya di dalam kalimat, bukan oleh bentuk katanya, karena satu kata yang sama bisa berganti peran di kalimat lain.`:type==='synonym'?`“${v.synonyms[0]}” paling dekat maknanya dengan “${v.word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.`:`Intinya, “${v.word}” berarti “${v.meaning}”${v.partOfSpeech?` dan biasanya dipakai sebagai ${posLabel}`:''}.`;
   const rule=type==='partOfSpeech'?'Lihat fungsi kata di dalam kalimat: apakah ia menamai sesuatu, menyatakan tindakan, menerangkan, atau menghubungkan bagian kalimat.':type==='synonym'?'Kata yang bersinonim punya makna inti yang berdekatan, tetapi belum tentu bisa saling menggantikan di setiap kalimat.':'Jangan menebak dari satu kata saja. Baca konteks lengkap supaya arti yang dipilih tetap masuk akal.';
   return{id:`vocab-${v.id}-${type}-${Date.now()}-${Math.random()}`,type:'vocab',skill:`vocabulary_${type}`,target:v.id,difficulty:LEVELS.indexOf(v.level)+1,canary:v.canary||null,question:q,options,answerIndex:options.indexOf(answer),explain:{why,rule,avoid:`Baca seluruh kalimat, lalu bayangkan situasinya sebelum memilih arti “${v.word}”.`,memory:`Ingat pasangan singkat ini: ${v.word} berarti ${v.meaning}.`,distractor:'Pilihan lain memang terlihat mirip atau berada di level yang sama, tetapi maknanya tidak cocok dengan kata target dalam konteks soal ini.'}}
 }
