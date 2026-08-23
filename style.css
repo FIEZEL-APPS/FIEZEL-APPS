@@ -538,6 +538,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --accent-soft:#FDE3DE;
   --black:#2B2118;
   --gold:#C9A24B;
+  /* m025-127 wordmark topbar. Empat token ini ada karena logonya BUKAN teks: ia SVG dengan
+     gradien di dalamnya, jadi ia tidak ikut --ambient-text dan tidak ikut berbalik di mode
+     gelap. Sampai m025-118 itu benar - topbarnya maroon gelap dan gading di atasnya terbaca.
+     Sejak dasar berubah jadi cream (m025-119/120), gading #FFFBF3 duduk di atas cream
+     #FFF9EE: 1,02:1. Bukan "kurang kontras" - benar-benar tidak terlihat.
+
+     Perannya persis peran yang brief palet berikan: coklat sebagai TINTA untuk hurufnya,
+     terracotta sebagai AKSEN untuk dua balok. Tidak ada warna baru yang ditambahkan. */
+  --wordmark-ink-hi:#2B2118;
+  --wordmark-ink-lo:#4A382A;
+  --wordmark-accent-hi:#C9432F;
+  --wordmark-accent-lo:#A33422;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#C9503A;
@@ -609,6 +621,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
     --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
+    /* m025-127: di topbar gelap peran keduanya bertukar - gading kembali jadi tinta dan
+       emas kembali jadi aksen, persis wordmark aslinya. Yang dijaga bukan warnanya,
+       melainkan bahwa logonya PUNYA pasangan gelap sama sekali. */
+    --wordmark-ink-hi:#FFF6E6;--wordmark-ink-lo:#E8D4B4;
+    --wordmark-accent-hi:#F0C97E;--wordmark-accent-lo:#DCBA72;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
     --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
     --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
@@ -633,6 +650,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
     --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
+    /* m025-127: di topbar gelap peran keduanya bertukar - gading kembali jadi tinta dan
+       emas kembali jadi aksen, persis wordmark aslinya. Yang dijaga bukan warnanya,
+       melainkan bahwa logonya PUNYA pasangan gelap sama sekali. */
+    --wordmark-ink-hi:#FFF6E6;--wordmark-ink-lo:#E8D4B4;
+    --wordmark-accent-hi:#F0C97E;--wordmark-accent-lo:#DCBA72;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
     --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
     --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
@@ -2244,7 +2266,8 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
   font-size:.9rem;line-height:1.55;color:var(--ink)}
 .tutor-report svg{width:16px;height:16px;flex:0 0 auto}
 
-/* m025-126 - kartu konsep (tindakan eteach) dan tawaran berhenti (reathe).
+/* m025-126 - kartu konsep (tindakan 
+eteach) dan tawaran berhenti (reathe).
    Bidangnya memakai --surface-tint (punya pasangan gelap) dengan tinta yang diwarisi,
    sama seperti .tutor-turn - jadi gerbang bidang pastel m025-117 tetap terpenuhi dan
    kartunya ikut berbalik dengan benar di mode gelap. */
