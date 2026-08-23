@@ -110,5 +110,36 @@ check('penjelasan grammar mengutamakan field Bahasa Indonesia',
   /explanation\.ruleId/.test(app) && /explanation\.whyCorrectId/.test(app) && /explanation\.memoryCueId/.test(app),
   'grammarMeta harus membaca varian "...Id" lebih dulu');
 
+// --- 6. seluruh isi bank grammar wajib punya penjelasan Bahasa Indonesia ---
+const missingId = [];
+for (const t of templates) {
+  const ex = t.explanation || {};
+  const pairs = [
+    ['rule', ex.ruleId, ex.rule], ['whyCorrect', ex.whyCorrectId, ex.whyCorrect],
+    ['whyOthersFail', ex.whyOthersFailId, ex.whyOthersFail],
+    ['howToAvoid', ex.howToAvoidId, ex.howToAvoid], ['memoryCue', ex.memoryCueId, ex.memoryCue],
+    ['objective', t.pedagogicalObjectiveId, t.pedagogicalObjective],
+    ['misconception', t.misconceptionTargetedId, t.misconceptionTargeted],
+    ['reasoning', t.reasoningOperationId, t.reasoningOperation],
+  ];
+  for (const [name, id, en] of pairs) if (en && !id) missingId.push(t.id + '.' + name);
+  for (const d of t.distractors || []) {
+    if (d.whyFails && !d.whyFailsId) missingId.push(t.id + '[' + d.option + '].whyFails');
+    if (d.misconception && !d.misconceptionId) missingId.push(t.id + '[' + d.option + '].misconception');
+  }
+}
+check('setiap penjelasan grammar punya versi Bahasa Indonesia',
+  missingId.length === 0, missingId.slice(0, 8).join(', ') + (missingId.length > 8 ? ' (+' + (missingId.length - 8) + ')' : ''));
+
+const coverage = JSON.parse(fs.readFileSync(path.join(ROOT, 'grammar-templates.json'), 'utf8')).indonesianCoverage;
+check('penanda cakupan terjemahan ikut tercatat di bank soal',
+  !!coverage && coverage.translated === coverage.total,
+  coverage ? coverage.translated + '/' + coverage.total : 'tidak ada');
+
+// Terjemahan hidup di berkas terpisah supaya bisa ditinjau; keduanya harus tetap seiring.
+const source = JSON.parse(fs.readFileSync(path.join(ROOT, 'grammar-explanations-id.json'), 'utf8'));
+const orphan = Object.keys(source.templates).filter(k => !templates.some(t => t.id === k));
+check('semua terjemahan menunjuk template yang benar-benar ada', orphan.length === 0, orphan.join(', '));
+
 console.log(failed ? '\nFAILED: ' + failed : '\nPASS');
 process.exit(failed ? 1 : 0);

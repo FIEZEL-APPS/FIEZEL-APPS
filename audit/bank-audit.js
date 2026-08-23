@@ -21,12 +21,27 @@ const read = p => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
 const EN_MARKERS = /\b(the|is|are|was|were|of|that|this|which|because|before|after|and|with|to|from|for|not|does|do|did|has|have|will|would|should|could|it|they|you|when|where|why|how|but|use|used|take|takes|comes|stands|cannot|must)\b/gi;
 const ID_MARKERS = /\b(yang|dan|di|ke|dari|itu|ini|untuk|dengan|pada|adalah|karena|tidak|bukan|kata|kalimat|jawaban|pilihan|soal|bisa|dapat|akan|harus|sudah|saat|waktu|lalu|jika|supaya|agar|makna|arti|bentuk)\b/gi;
 
+// Bentuk Inggris yang memang sedang diajarkan boleh dikutip di dalam kalimat Indonesia
+// ("Must" dan "have to" menyatakan kewajiban). Kutipan dan istilah bentuk grammar dibuang
+// dulu supaya tidak terhitung sebagai bukti bahwa kalimatnya berbahasa Inggris.
+const GRAMMAR_TERMS = /\b(present|past|future|simple|continuous|perfect|progressive|passive|active|gerund|infinitive|participle|modal|conditional|superlative|comparative|subjunctive|auxiliary|clause|tense|aspect)\b/gi;
+
+function stripTargetLanguage(text) {
+  return String(text || '')
+    .replace(/[“"][^”"]*[”"]/g, ' ')   // kutipan bentuk Inggris
+    .replace(/[‘'][^’']*[’']/g, ' ')
+    .replace(GRAMMAR_TERMS, ' ');
+}
+
 function looksEnglish(text) {
-  const s = String(text || '').trim();
+  const s = stripTargetLanguage(text).trim();
   if (s.length < 12) return false;
   const en = (s.match(EN_MARKERS) || []).length;
   const id = (s.match(ID_MARKERS) || []).length;
-  return en >= 2 && en > id;
+  // Satu penanda Indonesia saja sudah cukup membuktikan kalimatnya Indonesia: penjelasan
+  // yang menyebut bentuk Inggris tanpa tanda kutip ("pakai must have, bukan can't have")
+  // tetap kalimat Indonesia, sedangkan kalimat Inggris utuh tidak pernah memuat satu pun.
+  return en >= 2 && id === 0;
 }
 
 const LEAK = [
@@ -62,32 +77,55 @@ for (const v of V) {
 
 // ------------------------------------------------------------------- grammar
 const G = read('grammar-templates.json').templates;
+// Teks Inggris asli sengaja tetap disimpan sebagai rujukan penulis. Yang diperiksa adalah
+// apakah versi Bahasa Indonesia-nya ADA, karena runtime membaca varian "...Id" lebih dulu;
+// selama versi itu ada, siswa tidak pernah melihat kalimat Inggrisnya.
+const TITLES = (() => {
+  try { return require('../grammar-labels-id.js').GRAMMAR_SKILL_TITLES_ID || {}; }
+  catch (e) { return {}; }
+})();
+
 for (const t of G) {
   const ex = t.explanation || {};
   const bag = {
-    rule: ex.rule, whyCorrect: ex.whyCorrect, whyOthersFail: ex.whyOthersFail,
-    howToAvoid: ex.howToAvoid, memoryCue: ex.memoryCue,
-    objective: t.pedagogicalObjective, misconception: t.misconceptionTargeted,
-    reasoning: t.reasoningOperation,
+    rule: [ex.ruleId, ex.rule], whyCorrect: [ex.whyCorrectId, ex.whyCorrect],
+    whyOthersFail: [ex.whyOthersFailId, ex.whyOthersFail],
+    howToAvoid: [ex.howToAvoidId, ex.howToAvoid], memoryCue: [ex.memoryCueId, ex.memoryCue],
+    objective: [t.pedagogicalObjectiveId, t.pedagogicalObjective],
+    misconception: [t.misconceptionTargetedId, t.misconceptionTargeted],
+    reasoning: [t.reasoningOperationId, t.reasoningOperation],
   };
+  // memoryCue dikecualikan dari pemeriksaan bahasa: pengingatnya memang berupa pola Inggris
+  // yang sedang dihafal ("There are + jamak; there is + tunggal"), jadi wajar kalau isinya
+  // didominasi bentuk Inggris. Yang tetap diperiksa adalah keberadaannya.
+  const LANG_EXEMPT = new Set(['memoryCue']);
+
   for (const f of Object.keys(bag)) {
-    if (looksEnglish(bag[f])) {
-      add('grammar', t.id, 'penjelasan-berbahasa-inggris',
-        'field "' + f + '" tampil apa adanya sebagai pilihan/penjelasan untuk siswa', bag[f]);
+    const [id, en] = bag[f];
+    if (!en) continue;
+    if (id && LANG_EXEMPT.has(f)) continue;
+    if (!id) {
+      add('grammar', t.id, 'penjelasan-belum-diterjemahkan',
+        'field "' + f + '" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan', en);
+    } else if (looksEnglish(id)) {
+      add('grammar', t.id, 'terjemahan-masih-berbahasa-inggris',
+        'field "' + f + '" sudah punya varian Indonesia tetapi isinya masih Bahasa Inggris', id);
     }
   }
   for (const d of t.distractors || []) {
-    if (looksEnglish(d.whyFails)) {
-      add('grammar', t.id, 'alasan-distraktor-berbahasa-inggris',
-        'alasan untuk pilihan "' + d.option + '" tampil dalam Bahasa Inggris', d.whyFails);
+    if (d.whyFails && !d.whyFailsId) {
+      add('grammar', t.id, 'alasan-distraktor-belum-diterjemahkan',
+        'alasan untuk pilihan "' + d.option + '" belum punya versi Bahasa Indonesia', d.whyFails);
     }
-    if (looksEnglish(d.misconception)) {
-      add('grammar', t.id, 'label-miskonsepsi-berbahasa-inggris',
-        'label miskonsepsi untuk "' + d.option + '" tampil dalam Bahasa Inggris', d.misconception);
+    if (d.misconception && !d.misconceptionId) {
+      add('grammar', t.id, 'label-miskonsepsi-belum-diterjemahkan',
+        'label miskonsepsi untuk "' + d.option + '" belum punya versi Bahasa Indonesia', d.misconception);
     }
   }
-  add('grammar', t.id, 'judul-lesson-berbahasa-inggris',
-    'nama subskill dipakai langsung sebagai judul lesson di layar siswa', t.subskill);
+  if (!TITLES[t.subskill]) {
+    add('grammar', t.id, 'judul-lesson-berbahasa-inggris',
+      'nama subskill dipakai langsung sebagai judul lesson di layar siswa', t.subskill);
+  }
 }
 
 // ------------------------------------------------------------------- reading

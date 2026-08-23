@@ -63,7 +63,7 @@ Stem sekarang menyandarkan kata pada kalimat contohnya:
   `number` → *kata bilangan*, `article` → *kata sandang*).
 - Distraktor jenis kata kini diacak dari seluruh label, bukan tiga label pertama yang tetap.
 
-### Grammar — judul dan teks cadangan sudah Bahasa Indonesia
+### Grammar — seluruh 129 lesson sudah berbahasa Indonesia
 
 - `grammar-labels-id.js` memetakan **seluruh 129 subskill** ke judul Bahasa Indonesia.
   `present_simple_vs_continuous` menjadi *“Kebiasaan atau sedang berlangsung: present simple
@@ -73,8 +73,17 @@ Stem sekarang menyandarkan kata pada kalimat contohnya:
   the grammar rule tested here.”* — diganti Bahasa Indonesia. Keduanya tampil sebagai
   **pilihan jawaban** pada mode latihan diagnosis distraktor.
 - `grammarMeta()` sekarang membaca varian `...Id` lebih dulu (`ruleId`, `whyCorrectId`,
-  `memoryCueId`, `objectiveId`, dan seterusnya), sehingga penerjemahan isi bank soal
-  berikutnya cukup menambah field data tanpa menyentuh runtime lagi.
+  `memoryCueId`, `objectiveId`, dan seterusnya).
+- **Seluruh 129 template diterjemahkan.** Untuk setiap template: `rule`, `whyCorrect`,
+  `whyOthersFail`, `howToAvoid`, `memoryCue`, `objective`, `misconception`, `reasoning`,
+  ditambah alasan dan label miskonsepsi untuk **setiap** distraktor. Semua teks itu tampil
+  sebagai **pilihan jawaban** pada mode latihan “alasan mana”, “aturan mana”, “label
+  miskonsepsi mana”, dan “pengingat mana” — bukan sebagai catatan internal.
+- Sumber terjemahan disimpan terpisah di `grammar-explanations-id.json` supaya bisa ditinjau
+  sebagai teks, lalu disuntikkan ke bank soal oleh `node audit/merge-grammar-id.js`. Teks
+  Inggris aslinya tidak dihapus; runtime memakainya hanya sebagai cadangan terakhir.
+- Nama bentuk grammar (present perfect, gerund, passive, must have) sengaja dipertahankan di
+  dalam kalimat Indonesia, karena itulah bentuk yang sedang dipelajari.
 
 ### Pagar
 
@@ -85,17 +94,21 @@ di-precache, serta kedua teks cadangan wajib tetap Bahasa Indonesia.
 
 ## Yang belum selesai
 
-Sisa temuan bersifat data, bukan runtime, dan dikerjakan sebagai rilis lanjutan:
+Setelah rilis ini, temuan turun dari **10.545 menjadi 8.950**. Kosakata dan grammar sudah
+bersih; sisanya bersifat data dan dikerjakan sebagai rilis lanjutan:
 
-1. **Terjemahan isi 129 template grammar** (±1.466 kalimat: `ruleId`, `whyCorrectId`,
-   `whyOthersFailId`, `howToAvoidId`, `memoryCueId`, `objectiveId`, `misconceptionId`,
-   `reasoningId`, serta `whyFailsId`/`misconceptionId` tiap distraktor). Runtime sudah siap
-   menerimanya.
-2. **Reading bank ditulis ulang.** 300 bacaan sekarang adalah keluaran generator dengan
+| Bank | Sebelum | Sesudah |
+| --- | --- | --- |
+| Kosakata | 60 | 60 (58 di antaranya hanya catatan bentuk berimbuhan, sudah ditangani runtime) |
+| Grammar | 1.595 | **0** |
+| Reading | 5.550 | 5.550 |
+| Listening | 3.340 | 3.340 |
+
+1. **Reading bank ditulis ulang.** 300 bacaan sekarang adalah keluaran generator dengan
    bocoran template dan kunci jawaban yang tidak ada di dalam teks. Rencananya bank diganti
    dengan bacaan yang benar-benar ditulis dan soal yang jawabannya dapat ditunjuk di dalam
    teks — lebih sedikit bacaan, tetapi setiap soal bisa dijawab.
-3. **Listening**: pertanyaan dan pilihan pemahaman dialihbahasakan, dan setiap butir
+2. **Listening**: pertanyaan dan pilihan pemahaman dialihbahasakan, dan setiap butir
    diberi penjelasan Bahasa Indonesia setelah menjawab.
 
 Jalankan ulang `node audit/bank-audit.js` setiap tahap untuk melihat angka temuan turun.
