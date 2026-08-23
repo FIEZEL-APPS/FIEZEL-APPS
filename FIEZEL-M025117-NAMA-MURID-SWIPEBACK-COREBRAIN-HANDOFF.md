@@ -1,4 +1,4 @@
-# m025-116 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
+# m025-117 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
 
 OWNER (tiga permintaan dalam satu pesan):
 
@@ -238,7 +238,7 @@ kode `brain_optimal_challenge` / `brain_trend_plateau` / `brain_memory_at_risk`.
   (+8) mengunci langkah nama, termasuk bahwa ia wajib **dan** tidak mengurung. Fake DOM-nya
   kini melihat `<input>`, bukan hanya `<button>`.
 - Seluruh gate `quality.yml` hijau, termasuk `library-integrity-test.js` yang datang
-  bersama `main`. Penanda rilis dinaikkan bersama ke `m025-116` (`main` sudah memakai
+  bersama `main`. Penanda rilis dinaikkan bersama ke `m025-117` (`main` sudah memakai
   `m025-114` untuk PR #165).
 
 ---
@@ -247,7 +247,7 @@ kode `brain_optimal_challenge` / `brain_trend_plateau` / `brain_memory_at_risk`.
 
 `main` menyerap dua PR lain saat cabang ini berjalan, dan keduanya mengklaim penanda
 milestone berurutan — #165 mengambil `m025-114`, lalu #163 mengambil `m025-115`. Rilis ini
-karena itu bergeser dua kali dan berakhir di **`m025-116`**; ketiga penandanya tetap
+karena itu bergeser dua kali dan berakhir di **`m025-117`**; ketiga penandanya tetap
 dinaikkan bersama, sesuai ritual.
 
 Penggabungan kedua (#163: tes penempatan 25 soal + bank listening) berkonflik di tiga
