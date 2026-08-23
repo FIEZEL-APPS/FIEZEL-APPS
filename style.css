@@ -2285,3 +2285,146 @@ eteach) dan tawaran berhenti (reathe).
    pada titik ini FIEZEL memang sedang menyarankan berhenti, bukan sekadar mengizinkan. */
 .tutor-breathe{display:flex;flex-wrap:wrap;gap:8px}
 .tutor-breathe .primary{min-height:44px;padding:10px 18px;font-size:.88rem}
+/* ==========================================================================
+   PAW — gerak per halaman (m025-128)
+   ==========================================================================
+   OWNER memilih arah 02, lalu meminta dua hal: "animasinya buatkan lebih eksklusif lagi,
+   dan authentic" dan "animasinya berubah tergantung user masuk ke menu bagian apa".
+
+   APA YANG MEMBUAT GERAK TERASA MURAH, dan karena itu dihindari di seluruh blok ini:
+   amplitudo besar, durasi pendek, easing bawaan, dan gerak yang mengulang persis sejak
+   milidetik pertama. Semua itu menarik perhatian ke DIRINYA. Yang dipakai di sini
+   kebalikannya - amplitudo di bawah 1,6 px, durasi 2,6-5,2 detik, easing yang ditulis
+   sendiri, dan satu gerak masuk sekali-jalan tiap kali halaman berganti supaya loop-nya
+   tidak pernah tertangkap sebagai loop.
+
+   APA YANG MEMBUATNYA OTENTIK, bukan sekadar berbeda-beda. Tiap halaman mendapat gerak
+   yang menggambarkan PEKERJAAN di halaman itu, bukan gerak acak yang kebetulan tidak sama:
+   kosakata mengumpulkan, grammar menelusuri satu pola, membaca mengikuti satu baris,
+   listening berjalan sebagai gelombang, speaking mendorong keluar dari tengah. Tes justru
+   nyaris diam - saat murid sedang diukur, maskot yang bergerak adalah gangguan.
+
+   SATU LAPIS YANG SELALU HIDUP: napas 5,2 detik pada seluruh marka. Gerak per halaman
+   ditumpuk DI ATASNYA lewat elemen yang berbeda (balok, bukan grup), jadi keduanya tidak
+   pernah saling menimpa transform.
+   -------------------------------------------------------------------------- */
+
+.fz-i .fz-paw-bar,.fz-i .fz-paw-pad{fill:var(--fz-i-line,var(--ink));stroke:none}
+
+/* Tiap balok berputar/bergeser dari ALASNYA sendiri, bukan dari pusat kanvas. Tanpa
+   fill-box, transform-origin dihitung terhadap viewBox dan keempat balok bergerak seperti
+   satu papan - persis yang membuat animasi SVG terlihat kaku. */
+.fz-paw-bar{transform-box:fill-box;transform-origin:50% 100%}
+.fz-paw{transform-box:view-box;transform-origin:12px 13px}
+
+@media (prefers-reduced-motion:no-preference){
+
+  /* Lapis dasar: napas. Selalu hidup, di semua halaman, pada GRUP-nya. */
+  .fz-coach-bubble .fz-paw,.fz-coach-avatar .fz-paw{
+    animation:fzPawBreath 5.2s cubic-bezier(.37,0,.24,1) infinite;
+  }
+  @keyframes fzPawBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+  /* Gerak masuk sekali-jalan saat halaman berganti. Inilah yang membuat perpindahan
+     terasa disusun, bukan ditukar: marka mengendap sekali sebelum karakter barunya
+     mengambil alih. */
+  .fz-coach-bubble.is-paw-shift .fz-paw{
+    animation:fzPawSettle .62s cubic-bezier(.34,1.12,.52,1) 1;
+  }
+  @keyframes fzPawSettle{
+    0%{transform:scale(.9) rotate(-5deg)}
+    55%{transform:scale(1.05) rotate(1.5deg)}
+    100%{transform:scale(1) rotate(0)}
+  }
+  .fz-coach-bubble.is-paw-shift .fz-paw-bar{animation:none}
+
+  /* ---- home / ask / search: mengendap bergiliran, tidak menuntut apa pun ---- */
+  [data-fz-scene="home"] .fz-paw-bar{animation:fzPawIdle 4.6s cubic-bezier(.37,0,.24,1) infinite}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(2){animation-delay:.22s}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(3){animation-delay:.44s}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(4){animation-delay:.66s}
+  @keyframes fzPawIdle{0%,72%,100%{transform:scaleY(1)}36%{transform:scaleY(1.07)}}
+
+  /* ---- vocab: mengumpulkan. Balok naik satu per satu lalu DITAHAN sebentar,
+          seperti koin yang dikumpulkan - bukan bolak-balik. ---- */
+  [data-fz-scene="vocab"] .fz-paw-bar{animation:fzPawCollect 4.2s cubic-bezier(.32,1.06,.6,1) infinite}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(2){animation-delay:.3s}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(3){animation-delay:.6s}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(4){animation-delay:.9s}
+  @keyframes fzPawCollect{
+    0%{transform:translateY(1.4px) scaleY(.9)}
+    18%,74%{transform:translateY(0) scaleY(1)}
+    100%{transform:translateY(1.4px) scaleY(.9)}
+  }
+
+  /* ---- grammar: satu pola dulu. Tepat SATU balok meninggi pada satu waktu, berjalan
+          dari kiri ke kanan - kalimat yang diucapkan halaman ini sendiri. ---- */
+  [data-fz-scene="grammar"] .fz-paw-bar{animation:fzPawPattern 4.8s cubic-bezier(.4,0,.2,1) infinite}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(2){animation-delay:1.2s}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(3){animation-delay:2.4s}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(4){animation-delay:3.6s}
+  @keyframes fzPawPattern{
+    0%,50%,100%{transform:scaleY(1);opacity:.72}
+    22%{transform:scaleY(1.16);opacity:1}
+  }
+
+  /* ---- reading / library / classroom: mengikuti satu baris. Sapuan pekat berjalan
+          kiri ke kanan, seperti jari yang menuntun bacaan. ---- */
+  [data-fz-scene="reading"] .fz-paw-bar{animation:fzPawLine 3.8s cubic-bezier(.45,0,.25,1) infinite}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(2){animation-delay:.26s}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(3){animation-delay:.52s}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(4){animation-delay:.78s}
+  @keyframes fzPawLine{0%,58%,100%{opacity:.55}22%{opacity:1}}
+
+  /* ---- listening: gelombang berjalan. Di sinilah bacaan "equalizer" yang tadinya
+          risiko justru menjadi keuntungan - halaman ini memang tentang bunyi. ---- */
+  [data-fz-scene="listening"] .fz-paw-bar{animation:fzPawWave 2.6s cubic-bezier(.37,0,.24,1) infinite}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(2){animation-delay:.17s}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(3){animation-delay:.34s}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(4){animation-delay:.51s}
+  @keyframes fzPawWave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.22)}}
+
+  /* ---- speaking: mendorong keluar dari tengah. Dua balok tengah lebih dulu, lalu
+          dua balok tepi menyusul - suara yang keluar, bukan yang masuk. ---- */
+  [data-fz-scene="speaking"] .fz-paw-bar{animation:fzPawProject 3.1s cubic-bezier(.3,1.1,.6,1) infinite;animation-delay:.28s}
+  [data-fz-scene="speaking"] .fz-paw-bar:nth-child(2),
+  [data-fz-scene="speaking"] .fz-paw-bar:nth-child(3){animation-delay:0s}
+  @keyframes fzPawProject{
+    0%,64%,100%{transform:scaleY(1) translateY(0)}
+    30%{transform:scaleY(1.14) translateY(-.9px)}
+  }
+
+  /* ---- writing: satu goresan. Marka miring sedikit dan balok tertinggi turun -
+          gerak tangan yang menekan pena, bukan denyut. ---- */
+  [data-fz-scene="writing"] .fz-paw-bar:nth-child(3){animation:fzPawStroke 4.4s cubic-bezier(.4,0,.2,1) infinite}
+  @keyframes fzPawStroke{
+    0%,70%,100%{transform:scaleY(1) rotate(0)}
+    26%{transform:scaleY(.82) rotate(-4deg)}
+    44%{transform:scaleY(1.04) rotate(2deg)}
+  }
+
+  /* ---- progress: naik jadi tangga, lalu ditahan lama. Halaman ini tentang hasil yang
+          menumpuk, jadi geraknya berakhir di posisi tinggi - bukan kembali ke nol. ---- */
+  [data-fz-scene="progress"] .fz-paw-bar{animation:fzPawClimb 5s cubic-bezier(.32,1.06,.6,1) infinite}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(2){animation-delay:.24s}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(3){animation-delay:.48s}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(4){animation-delay:.72s}
+  @keyframes fzPawClimb{
+    0%{transform:scaleY(.86)}
+    16%,82%{transform:scaleY(1.1)}
+    100%{transform:scaleY(.86)}
+  }
+
+  /* ---- test / skills: nyaris diam.
+          Ini keputusan, bukan kelalaian. Saat murid sedang diukur, maskot yang bergerak
+          adalah gangguan - jadi yang tersisa hanya napas pada grupnya, dan baloknya
+          benar-benar diam. Halaman inilah yang membuktikan sistem geraknya punya
+          pendapat, bukan sekadar punya variasi. ---- */
+  [data-fz-scene="test"] .fz-paw-bar{animation:none}
+}
+
+/* Gerak mati sepenuhnya bila murid memintanya. Marka tetap utuh dan terbaca; tidak ada
+   satu pun state yang HANYA bisa dibedakan lewat gerak - lihat titik notifikasi. */
+@media (prefers-reduced-motion:reduce){
+  .fz-paw,.fz-paw-bar{animation:none !important}
+}

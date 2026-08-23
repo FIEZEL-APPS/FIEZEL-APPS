@@ -24,6 +24,31 @@
   'use strict';
 
   var ICONS = {
+    /**
+     * m025-128 PAW - maskot pembimbing FIEZEL. Arah 02, dipilih OWNER dari lima arah.
+     *
+     * KENAPA BENTUKNYA BEGINI. Keempat jarinya bukan bulatan melainkan balok bersudut
+     * bulat dengan tinggi berbeda - bentuk yang sudah ada di logotype FIEZEL sendiri (dua
+     * balok emas di antara hurufnya, yang juga jadi ikon "Tanya FIEZEL" di topbar). Itulah
+     * klaim otentisitas yang diminta brief A.3: bentuknya tidak dipinjam dari icon library
+     * mana pun, ia diambil dari wordmark FIEZEL. Sebagai bonus ia terbaca sebagai gelombang
+     * suara naik - Listening dan Speaking - tanpa satu elemen tambahan.
+     *
+     * KENAPA PEKAT, BUKAN DUOTONE seperti ikon lain di berkas ini. PAW bukan ikon UI, ia
+     * MARKA - sekelas wordmark, bukan sekelas tombol. Lagi pula bidangnya duduk di atas
+     * lingkaran --yellow, dan .fz-fill default-nya juga --yellow: duotone di sini berarti
+     * bantalannya hilang. Warnanya tetap tidak dipaku; ia mengikuti --fz-i-line.
+     *
+     * Tiap balok punya kelasnya sendiri karena sistem gerak per-halaman (style.css,
+     * "PAW - gerak per halaman") menggerakkannya satu per satu.
+     */
+    paw: '<g class="fz-paw">' +
+      '<rect class="fz-paw-bar" x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>' +
+      '<path class="fz-paw-pad" d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>' +
+      '</g>',
     /* Tab bar */
     home: '<path class="fz-fill" d="M5 11.2 12 5.4l7 5.8V19a1.2 1.2 0 0 1-1.2 1.2H6.2A1.2 1.2 0 0 1 5 19z"/>' +
       '<path class="fz-line" d="M4 11.6 12 5l8 6.6"/><path class="fz-line" d="M6.2 11.4V19c0 .55.45 1 1 1h9.6c.55 0 1-.45 1-1v-7.6"/>' +
