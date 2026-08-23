@@ -1,4 +1,4 @@
-# m025-127 — Diagnosis miskonsepsi berbahasa Indonesia
+# m025-128 — Diagnosis miskonsepsi berbahasa Indonesia
 
 OWNER bertanya apa kelebihan FIEZEL sekarang, lalu: "berarti kalau PR #171 sudah di merge
 FIEZEL udah bisa pintar mengajar?" Jawaban jujurnya diukur, bukan dikira-kira — dan
@@ -130,8 +130,13 @@ tentang grammar, bukan grammar-nya sendiri. Itu langkah berikutnya, bukan bagian
 
 ## 6. Verifikasi
 
-Seluruh **72 perintah** di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
+Seluruh **73 perintah** di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
 pemeriksaan sintaks seluruh berkas. Gelung tutor diverifikasi di Chromium (emulasi Pixel 5):
 tutor kini menyebut sebab spesifik, seluruhnya Indonesia, tanpa `pageerror`.
 
-Penanda rilis `FIEZEL_PAGE_BUILD` / `DIAG_BUILD` / `SW_REV` ketiganya **m025-127**.
+Penanda rilis `FIEZEL_PAGE_BUILD` / `DIAG_BUILD` / `SW_REV` ketiganya **m025-128**.
+
+Cabang ini dibuat dari m025-126; sementara berjalan, main maju ke m025-127 (#179 kontras logo
+topbar). main sudah disatukan — satu-satunya konflik adalah `SW_REV`, diselesaikan ke
+**m025-128** karena m025-127 sudah dipakai main. Precache berkas diagnosis dan pendaftaran
+gate di `quality.yml` diperiksa masih utuh setelah penyatuan.
