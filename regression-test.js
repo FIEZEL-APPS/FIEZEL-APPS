@@ -6,7 +6,7 @@ const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 const V=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json'),'utf8'));
 const grammarRuntime=gm=>{const out={};for(const t of (gm.templates||[])){const opts=t.options||[];const reasons=opts.map((o,i)=>i===t.correctIndex?'Correct':((t.distractors||[]).find(d=>d.option===o)?.whyFails||'Distractor invalid'));(out[t.subskill]??=[]).push([t.stem,opts,t.correctIndex,t.explanation?.rule||t.pedagogicalObjective,reasons,t.cefr]);}return out};
-const GM=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));const G=grammarRuntime(GM);const R=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json'),'utf8'));
+const CURRICULUM=JSON.parse(fs.readFileSync(path.join(root,'grammar-curriculum-v1.json'),'utf8'));const GM=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));const G=grammarRuntime(GM);const R=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json'),'utf8'));
 const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 
 assert(/const APP_VERSION=self\.FIEZEL_VERSION/.test(app)&&fs.readFileSync(path.join(root,'version.js'),'utf8').includes(`'${VERSION}'`),'runtime version matches VERSION.json');
@@ -48,7 +48,7 @@ assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswer
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
 assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their passage');
 assert(/q\.passage\?card\(.*TEKS BACAAN/s.test(app),'quiz renderer does not show passage with reading question');
-assert(/state\.adaptiveReady=diagnosticEvidenceReady\(state\)/.test(app),'adaptive readiness must be evidence-based');
+assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
 assert(V.length===1765,'active vocabulary master count changed unexpectedly');
 assert(V.filter(v=>v.status==='complete').length===1765,'active vocabulary contains incomplete records');
@@ -112,7 +112,15 @@ setTimeout(async()=>{
   st.adaptiveReady=false; assert(ctx.buildAdaptivePool(12).length===0,'adaptive questions appeared before diagnosis');
   // Simulate a diagnosis/profile with weaknesses across vocabulary, grammar and reading.
   const vv=V.find(x=>x.level==='A1'&&x.status==='complete')||v;
-  const skills=Object.keys(G).slice(0,3); const rrs=R.slice(0,3); const skill=skills[0]; const rr=rrs[0];
+  // m025-140: bukti harus datang dari level yang SEDANG aktif (A1 di sini). Sebelum B-01
+  // ditutup, fixture ini lolos memakai grammar dan reading level apa pun - dan itulah persis
+  // celahnya: 24 jawaban B1 membuka latihan adaptif untuk murid yang memilih A1.
+  // Catatan: binding `let` di dalam vm TIDAK muncul sebagai properti context, jadi daftar
+  // level harus dibaca dari berkas kurikulum, bukan dari ctx.GRAMMAR_ITEMS (yang selalu kosong
+  // dilihat dari luar dan diam-diam menjatuhkan fixture ke skill level lain).
+  const a1Skills=CURRICULUM.lessons.filter(l=>l.level==='A1').map(l=>l.lessonId).filter(x=>G[x]);
+  assert(a1Skills.length>=3,'fixture needs at least three A1 grammar lessons');
+  const skills=a1Skills.slice(0,3); const rrs=R.filter(x=>x.level==='A1').slice(0,3); const skill=skills[0]; const rr=rrs[0];
   st.vocab[vv.id]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};
   for(const sk of skills)st.grammar[sk]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};
   for(const r of rrs)st.reading[r.id]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};

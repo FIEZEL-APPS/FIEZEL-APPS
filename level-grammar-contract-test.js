@@ -216,6 +216,10 @@ for (const match of allSource.matchAll(levelExpression)) {
   const before = allSource.slice(0, match.index);
   const fnMatches = [...before.matchAll(/(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g)];
   const fn = fnMatches.length ? fnMatches[fnMatches.length - 1][1] : 'top-level';
+  // diagnosticReadinessMap menyusun peta readiness SATU per level - iterasi LEVELS di sini
+  // justru kebalikan dari mencampur level, dan tanpa iterasi itu readiness kembali jadi satu
+  // flag global (B-01). Pengecualiannya disebut per nama supaya tetap bisa diaudit.
+  if (fn === 'diagnosticReadinessMap') continue;
   if (!/placement|levelPicker|openLevelPanel|activeLevel|setLevel|chooseLevel|settings/i.test(fn)) crossLevelUses.push(`${fn}:${match[0]}`);
 }
 check('Non-placement learning panels do not use an unscoped cross-level pool', crossLevelUses.length === 0,
