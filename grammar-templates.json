@@ -1504,7 +1504,7 @@
         "whyOthersFail": "'Must sign' is active voice; 'must signed' is missing 'be'; 'must be signing' wrongly uses the -ing form instead of the participle.",
         "howToAvoid": "After any modal in the passive, check for exactly this pattern: modal + be + past participle.",
         "memoryCue": "Modal passive always needs 'be' glued in front of the past participle.",
-        "ruleId": "Pasif bersama modal: modal + be + past participle, misalnya must be signed, can be found, should be checked.",
+        "ruleId": "Kalimat pasif yang memakai modal disusun dengan pola modal + be + past participle, misalnya must be signed, can be found, dan should be checked.",
         "whyCorrectId": "Formulir itu yang dikenai tindakan menandatangani, dan modal “must” menuntut “be + past participle” agar bentuk pasifnya benar.",
         "whyOthersFailId": "“Must sign” masih aktif, “must signed” kehilangan “be”, sedangkan “must be signing” keliru memakai bentuk -ing, bukan past participle.",
         "howToAvoidId": "Setelah modal apa pun dalam kalimat pasif, pastikan polanya persis: modal + be + past participle.",
@@ -6183,17 +6183,23 @@
         {
           "option": "which many",
           "misconception": "Reverses the order of quantifier and relative pronoun.",
-          "whyFails": "The fixed pattern places the quantifier before 'of' and the relative pronoun, not the relative pronoun before the quantifier."
+          "whyFails": "The fixed pattern places the quantifier before 'of' and the relative pronoun, not the relative pronoun before the quantifier.",
+          "whyFailsId": "Pola tetapnya menaruh kata jumlah sebelum “of” dan kata penghubungnya, bukan kata penghubung sebelum kata jumlah.",
+          "misconceptionId": "urutan kata jumlah dan kata penghubungnya dibalik"
         },
         {
           "option": "whom many of",
           "misconception": "Scrambles the word order of the fixed quantifier + of + whom structure.",
-          "whyFails": "This ordering is not a recognized English pattern; the correct sequence is quantifier + of + whom (many of whom), not whom + many of."
+          "whyFails": "This ordering is not a recognized English pattern; the correct sequence is quantifier + of + whom (many of whom), not whom + many of.",
+          "whyFailsId": "Urutan ini bukan pola yang dikenal dalam Bahasa Inggris; rangkaian yang benar adalah kata jumlah + of + whom seperti “many of whom”, bukan “whom many of”.",
+          "misconceptionId": "urutan pola tetap kata jumlah + of + whom diacak"
         },
         {
           "option": "many of them",
           "misconception": "Uses a personal pronoun 'them' instead of a relative pronoun, which cannot join two clauses.",
-          "whyFails": "'Them' is not a relative pronoun and cannot link the second clause grammatically to the first as a single sentence; it would create a comma splice."
+          "whyFails": "'Them' is not a relative pronoun and cannot link the second clause grammatically to the first as a single sentence; it would create a comma splice.",
+          "whyFailsId": "“Them” bukan kata penghubung dan tidak bisa menyambungkan anak kalimat kedua ke anak kalimat pertama dalam satu kalimat; hasilnya justru dua kalimat utuh yang hanya disambung koma.",
+          "misconceptionId": "kata ganti biasa “them” dipakai menggantikan kata penghubung, padahal kata itu tidak bisa menyambung dua anak kalimat"
         }
       ],
       "explanation": {
@@ -6201,8 +6207,16 @@
         "rule": "Quantifier + of + whom/which links a relative clause back to a portion of a previously mentioned group (many of whom, some of which).",
         "whyOthersFail": "Reordering the words breaks the fixed pattern, and 'them' is a personal pronoun that can't function as a clause-linking relative pronoun.",
         "howToAvoid": "Keep the fixed order: quantifier + of + whom (people) / which (things).",
-        "memoryCue": "Many of whom / some of which — quantifier first, then 'of', then the relative pronoun."
-      }
+        "memoryCue": "Many of whom / some of which — quantifier first, then 'of', then the relative pronoun.",
+        "ruleId": "Kata jumlah + of + whom atau which menghubungkan anak kalimat penjelas kembali ke sebagian dari kelompok yang sudah disebut, seperti many of whom dan some of which.",
+        "whyCorrectId": "“Many of whom” memadukan kata jumlah dengan kata penghubung “whom” untuk merujuk kembali ke “volunteers” di dalam anak kalimat penjelas tambahan.",
+        "whyOthersFailId": "Mengacak urutan katanya merusak pola tetapnya, sedangkan “them” adalah kata ganti biasa yang tidak bisa menjadi penghubung antar anak kalimat.",
+        "howToAvoidId": "Jaga urutannya tetap: kata jumlah, lalu of, lalu whom untuk orang atau which untuk benda.",
+        "memoryCueId": "Many of whom dan some of which — kata jumlah dulu, lalu “of”, lalu kata penghubungnya."
+      },
+      "pedagogicalObjectiveId": "Siswa menyusun anak kalimat penjelas tambahan dengan pola kata jumlah + of + kata penghubung, seperti many of whom, untuk merujuk kembali ke satu kelompok",
+      "misconceptionTargetedId": "Siswa memakai kata penghubung biasa lalu menambahkan kalimat berisi kata jumlah secara terpisah, bukan pola gabungan kata jumlah + of + whom atau which",
+      "reasoningOperationId": "kenali bahwa merujuk sebagian dari kelompok jamak yang sudah disebut menuntut pola tetap kata jumlah + of + kata penghubung"
     },
     {
       "id": "b5_018",
@@ -6225,17 +6239,23 @@
         {
           "option": "had; had",
           "misconception": "Uses past simple twice instead of the fixed present perfect + ever pattern.",
-          "whyFails": "Superlative + ever claims typically require present perfect ('have had') to cover the speaker's whole life experience up to now, not a specific past-tense claim."
+          "whyFails": "Superlative + ever claims typically require present perfect ('have had') to cover the speaker's whole life experience up to now, not a specific past-tense claim.",
+          "whyFailsId": "Pernyataan superlative + ever lazimnya menuntut present perfect seperti “have had” untuk mencakup pengalaman sepanjang hidup sampai sekarang, bukan satu waktu lampau tertentu.",
+          "misconceptionId": "past simple dipakai dua kali menggantikan pola tetap present perfect + ever"
         },
         {
           "option": "have; have",
           "misconception": "Repeats the auxiliary 'have' without the required past participle 'had' for the main verb 'eat/have (a meal)'.",
-          "whyFails": "The second slot needs the past participle form of the main verb (had), not a repeated auxiliary without its main verb."
+          "whyFails": "The second slot needs the past participle form of the main verb (had), not a repeated auxiliary without its main verb.",
+          "whyFailsId": "Bagian kedua menuntut bentuk past participle dari kata kerja utamanya, yaitu “had”, bukan pengulangan kata bantu tanpa kata kerja utama.",
+          "misconceptionId": "kata bantu “have” diulang tanpa past participle yang dibutuhkan kata kerja utamanya"
         },
         {
           "option": "did; have",
           "misconception": "Mixes past simple auxiliary 'did' with present perfect 'have', producing an inconsistent structure.",
-          "whyFails": "The fixed pattern uses a single consistent present perfect auxiliary 'have' throughout, not a mix of 'did' and 'have'."
+          "whyFails": "The fixed pattern uses a single consistent present perfect auxiliary 'have' throughout, not a mix of 'did' and 'have'.",
+          "whyFailsId": "Pola tetapnya memakai satu kata bantu present perfect “have” secara konsisten, bukan campuran antara “did” dan “have”.",
+          "misconceptionId": "kata bantu past simple “did” dicampur dengan present perfect “have” sehingga susunannya tidak selaras"
         }
       ],
       "explanation": {
@@ -6243,8 +6263,16 @@
         "rule": "Superlative + [noun] + I have ever + past participle expresses a life-experience-based superlative claim.",
         "whyOthersFail": "Past simple only covers a specific past time, not the person's whole life experience; the other combinations mismatch tense/auxiliary consistently.",
         "howToAvoid": "Whenever 'ever' follows a superlative claim about experience, default to present perfect throughout.",
-        "memoryCue": "Best/worst... I have ever + past participle (not 'did ever')."
-      }
+        "memoryCue": "Best/worst... I have ever + past participle (not 'did ever').",
+        "ruleId": "Bentuk superlative + kata benda + I have ever + past participle menyatakan pernyataan terbaik atau terburuk berdasarkan pengalaman sepanjang hidup.",
+        "whyCorrectId": "“Have ever had” memakai present perfect secara utuh, dan itu cocok dengan pola tetap superlative + ever untuk pengalaman sepanjang hidup.",
+        "whyOthersFailId": "Past simple hanya mencakup satu waktu lampau tertentu, bukan pengalaman sepanjang hidup, sedangkan gabungan lainnya tidak selaras antara tense dan kata bantunya.",
+        "howToAvoidId": "Setiap kali “ever” menyusul pernyataan superlative tentang pengalaman, pakai present perfect di seluruh susunannya.",
+        "memoryCueId": "Best atau worst ... I have ever + past participle, bukan “did ever”."
+      },
+      "pedagogicalObjectiveId": "Siswa memadukan bentuk superlative dengan present perfect dan “ever” untuk menyatakan pengalaman sepanjang hidup",
+      "misconceptionTargetedId": "Siswa memakai past simple setelah susunan superlative + ever, tanpa melihat bahwa pola tetap ini menuntut present perfect",
+      "reasoningOperationId": "kenali bahwa pola tetap superlative + ever menuntut present perfect untuk menyatakan “sepanjang hidup sampai sekarang”"
     },
     {
       "id": "b5_019",
@@ -6267,17 +6295,23 @@
         {
           "option": "Who did break",
           "misconception": "Adds the auxiliary 'did' as if this were an object question, following the standard question-formation rule mechanically.",
-          "whyFails": "Since 'who' is asking about the subject (the one who did the breaking), no auxiliary is needed — the verb follows the question word directly."
+          "whyFails": "Since 'who' is asking about the subject (the one who did the breaking), no auxiliary is needed — the verb follows the question word directly.",
+          "whyFailsId": "Karena “who” menanyakan subjeknya, yaitu pelaku yang memecahkan, tidak dibutuhkan kata bantu apa pun — kata kerjanya langsung menyusul kata tanyanya.",
+          "misconceptionId": "kata bantu “did” ditambahkan seolah ini pertanyaan tentang objek, mengikuti aturan pembentukan pertanyaan secara mekanis"
         },
         {
           "option": "Who did broke",
           "misconception": "Adds 'did' and keeps the past-tense main verb form together.",
-          "whyFails": "Even setting aside that subject questions need no auxiliary, combining 'did' with a past-tense verb ('broke') is a double tense-marking error."
+          "whyFails": "Even setting aside that subject questions need no auxiliary, combining 'did' with a past-tense verb ('broke') is a double tense-marking error.",
+          "whyFailsId": "Terlepas dari bahwa pertanyaan tentang subjek tidak butuh kata bantu, menggabungkan “did” dengan kata kerja lampau “broke” juga menandai lampau dua kali.",
+          "misconceptionId": "“did” ditambahkan sekaligus bentuk lampau kata kerja utamanya dipertahankan"
         },
         {
           "option": "Who does break",
           "misconception": "Uses present-tense auxiliary 'does' for a clearly past-time event ('last night').",
-          "whyFails": "The time marker 'last night' requires past tense, and subject questions in the past need no auxiliary at all — just the past-tense verb."
+          "whyFails": "The time marker 'last night' requires past tense, and subject questions in the past need no auxiliary at all — just the past-tense verb.",
+          "whyFailsId": "Penanda waktu “last night” menuntut bentuk lampau, dan pertanyaan tentang subjek di masa lampau sama sekali tidak butuh kata bantu, cukup kata kerja bentuk lampaunya.",
+          "misconceptionId": "kata bantu bentuk present “does” dipakai untuk kejadian yang jelas lampau"
         }
       ],
       "explanation": {
@@ -6285,8 +6319,16 @@
         "rule": "Subject questions (who/what as subject) use statement word order with no do/does/did auxiliary.",
         "whyOthersFail": "Adding 'did'/'does' wrongly applies the object-question rule; combining 'did' with 'broke' double-marks the past tense.",
         "howToAvoid": "Check if the question word is asking about the subject or object; subject questions skip the auxiliary entirely.",
-        "memoryCue": "Subject questions: Who + verb (no do/did) — 'Who broke it?' not 'Who did break it?'"
-      }
+        "memoryCue": "Subject questions: Who + verb (no do/did) — 'Who broke it?' not 'Who did break it?'",
+        "ruleId": "Pertanyaan tentang subjek dengan who atau what sebagai subjeknya memakai urutan kata pernyataan tanpa kata bantu do, does, atau did.",
+        "whyCorrectId": "“Who broke the window” mempertahankan urutan kata pernyataan karena “who” adalah subjek yang melakukan tindakannya, sehingga tidak butuh kata bantu.",
+        "whyOthersFailId": "Menambahkan did atau does berarti keliru menerapkan aturan pertanyaan tentang objek, sedangkan menggabungkan “did” dengan “broke” menandai lampau dua kali.",
+        "howToAvoidId": "Periksa apakah kata tanyanya menanyakan subjek atau objek; pertanyaan tentang subjek sama sekali melewati kata bantunya.",
+        "memoryCueId": "Pertanyaan tentang subjek: Who + kata kerja tanpa do atau did — “Who broke it?”, bukan “Who did break it?”"
+      },
+      "pedagogicalObjectiveId": "Siswa menyusun pertanyaan tentang subjek dengan who atau what sebagai subjeknya, tanpa menambahkan kata bantu do atau does, berbeda dari pertanyaan tentang objek",
+      "misconceptionTargetedId": "Siswa menambahkan do atau does pada pertanyaan tentang subjek karena menerapkan aturan pertanyaan tentang objek secara berlebihan",
+      "reasoningOperationId": "tentukan apakah kata tanyanya berkedudukan subjek, yang tidak butuh kata bantu, atau objek, yang butuh kata bantu"
     },
     {
       "id": "b5_020",
@@ -6309,17 +6351,23 @@
         {
           "option": "Her hobbies include painting, to hike, and to read.",
           "misconception": "Fixes only two of the three items, still leaving the list form inconsistent overall reasoning.",
-          "whyFails": "Although two items now match (to hike, to read), 'painting' remains a gerund while the others are infinitives, so the list still isn't parallel."
+          "whyFails": "Although two items now match (to hike, to read), 'painting' remains a gerund while the others are infinitives, so the list still isn't parallel.",
+          "whyFailsId": "Walaupun dua bagiannya kini sama, yaitu to hike dan to read, “painting” tetap berbentuk -ing sementara dua lainnya berbentuk to, jadi rangkaiannya belum sejajar.",
+          "misconceptionId": "hanya dua dari tiga bagiannya yang dibetulkan, sehingga bentuk rangkaiannya tetap tidak selaras"
         },
         {
           "option": "Her hobbies include to paint, hiking, and reading.",
           "misconception": "Converts the first item to infinitive while leaving the other two as gerunds.",
-          "whyFails": "This creates the same mismatch problem in reverse: one infinitive item among two gerund items still breaks parallel structure."
+          "whyFails": "This creates the same mismatch problem in reverse: one infinitive item among two gerund items still breaks parallel structure.",
+          "whyFailsId": "Cara ini menimbulkan ketidaksamaan yang sama, hanya terbalik: satu bagian berbentuk to di antara dua bagian berbentuk -ing tetap merusak kesejajarannya.",
+          "misconceptionId": "bagian pertamanya diubah menjadi bentuk to sementara dua lainnya dibiarkan berbentuk -ing"
         },
         {
           "option": "Her hobbies include painting, to hike, and reading.",
           "misconception": "This is the original unedited sentence, left unchanged.",
-          "whyFails": "It still mixes a gerund (painting), an infinitive (to hike), and another gerund (reading), which is the exact error being tested."
+          "whyFails": "It still mixes a gerund (painting), an infinitive (to hike), and another gerund (reading), which is the exact error being tested.",
+          "whyFailsId": "Kalimat ini masih mencampur bentuk -ing pada painting, bentuk to pada to hike, dan bentuk -ing lagi pada reading, dan itulah persis kesalahan yang sedang diuji.",
+          "misconceptionId": "kalimat aslinya dibiarkan apa adanya tanpa perbaikan"
         }
       ],
       "explanation": {
@@ -6327,8 +6375,16 @@
         "rule": "Items joined by 'and'/'or' in a list must share the same grammatical form (parallel structure).",
         "whyOthersFail": "The other options still mix gerunds and infinitives within the same list, breaking parallelism.",
         "howToAvoid": "After writing a list, check that every item has the identical grammatical form as the first item.",
-        "memoryCue": "One list, one form: all -ing, or all to + verb — never mixed."
-      }
+        "memoryCue": "One list, one form: all -ing, or all to + verb — never mixed.",
+        "ruleId": "Bagian-bagian yang disambung “and” atau “or” di dalam satu rangkaian harus berbentuk sama.",
+        "whyCorrectId": "Ketiga bagiannya sama-sama berbentuk -ing, yaitu painting, hiking, dan reading, sehingga rangkaiannya sejajar.",
+        "whyOthersFailId": "Pilihan lainnya masih mencampur bentuk -ing dan bentuk to di dalam satu rangkaian, sehingga kesejajarannya tetap rusak.",
+        "howToAvoidId": "Setelah menulis satu rangkaian, periksa apakah setiap bagiannya berbentuk persis sama dengan bagian yang pertama.",
+        "memoryCueId": "Satu rangkaian, satu bentuk: semuanya -ing, atau semuanya to + kata kerja, jangan dicampur."
+      },
+      "pedagogicalObjectiveId": "Siswa mengenali dan membetulkan kesalahan kesejajaran bentuk pada rangkaian yang disambung “and”, agar semua bagiannya berbentuk sama",
+      "misconceptionTargetedId": "Siswa melewatkan ketidaksamaan bentuk di dalam satu rangkaian selama tiap bagiannya terdengar wajar bila berdiri sendiri",
+      "reasoningOperationId": "periksa apakah setiap bagian di dalam rangkaian itu berbentuk sama, semuanya -ing atau semuanya bentuk to"
     },
     {
       "id": "b5_021",
@@ -6351,17 +6407,23 @@
         {
           "option": "in order to",
           "misconception": "Uses the infinitive-purpose connector before a full clause with a different subject.",
-          "whyFails": "'In order to' must be followed by a bare infinitive with the same subject as the main clause, but here the purpose clause has its own subject ('the other students')."
+          "whyFails": "'In order to' must be followed by a bare infinitive with the same subject as the main clause, but here the purpose clause has its own subject ('the other students').",
+          "whyFailsId": "“In order to” harus diikuti kata kerja dasar dengan subjek yang sama seperti induk kalimatnya, padahal anak kalimat tujuan di sini punya subjek sendiri, yaitu “the other students”.",
+          "misconceptionId": "penghubung tujuan berbentuk to dipakai di depan anak kalimat utuh yang bersubjek berbeda"
         },
         {
           "option": "so as to",
           "misconception": "Uses another infinitive-purpose connector requiring the same subject, mismatching the different-subject clause.",
-          "whyFails": "Like 'in order to', 'so as to' needs a bare infinitive with the same subject as the main clause, not a full clause with a new subject."
+          "whyFails": "Like 'in order to', 'so as to' needs a bare infinitive with the same subject as the main clause, not a full clause with a new subject.",
+          "whyFailsId": "Sama seperti “in order to”, “so as to” menuntut kata kerja dasar dengan subjek yang sama seperti induk kalimatnya, bukan anak kalimat utuh bersubjek baru.",
+          "misconceptionId": "penghubung tujuan berbentuk to lainnya dipakai padahal subjeknya berbeda"
         },
         {
           "option": "for",
           "misconception": "Uses a preposition that cannot introduce a full purpose clause.",
-          "whyFails": "'For' would need to be followed by a noun phrase, not a full clause with subject and modal verb like 'the other students wouldn't hear'."
+          "whyFails": "'For' would need to be followed by a noun phrase, not a full clause with subject and modal verb like 'the other students wouldn't hear'.",
+          "whyFailsId": "“For” harus diikuti frasa benda, bukan anak kalimat utuh berisi subjek dan modal seperti “the other students wouldn’t hear”.",
+          "misconceptionId": "kata depan dipakai padahal kata itu tidak bisa membuka anak kalimat tujuan yang utuh"
         }
       ],
       "explanation": {
@@ -6369,8 +6431,16 @@
         "rule": "So that + full clause (different subject possible); in order to/so as to + bare infinitive (same subject only).",
         "whyOthersFail": "'In order to' and 'so as to' require the same subject and a bare infinitive, not a separate subject and modal; 'for' can't introduce a full clause.",
         "howToAvoid": "Check if the purpose clause has a different subject from the main clause — if so, use 'so that', not 'in order to'.",
-        "memoryCue": "Different subject in the purpose clause = so that; same subject = in order to + infinitive."
-      }
+        "memoryCue": "Different subject in the purpose clause = so that; same subject = in order to + infinitive.",
+        "ruleId": "So that diikuti anak kalimat utuh dan subjeknya boleh berbeda; in order to dan so as to diikuti kata kerja dasar dan subjeknya harus sama.",
+        "whyCorrectId": "“So that” membuka anak kalimat tujuan yang punya subjek sendiri, yaitu “the other students”, dan modalnya sendiri, yaitu “wouldn’t”.",
+        "whyOthersFailId": "“In order to” dan “so as to” menuntut subjek yang sama beserta kata kerja dasar, bukan subjek terpisah dengan modal, sedangkan “for” tidak bisa membuka anak kalimat utuh.",
+        "howToAvoidId": "Periksa apakah anak kalimat tujuannya bersubjek berbeda dari induk kalimatnya; kalau ya, pakai “so that”, bukan “in order to”.",
+        "memoryCueId": "Subjek berbeda di anak kalimat tujuan memakai so that; subjek sama memakai in order to + kata kerja dasar."
+      },
+      "pedagogicalObjectiveId": "Siswa memilih “so that” yang diikuti anak kalimat bermodal, bukan “in order to” yang diikuti kata kerja dasar, ketika yang menyusul berupa anak kalimat dengan subjek berbeda",
+      "misconceptionTargetedId": "Siswa memakai “in order to” di depan anak kalimat utuh yang punya subjek dan modal sendiri, padahal pola itu milik “so that”",
+      "reasoningOperationId": "periksa apakah anak kalimat tujuannya punya subjek sendiri, yang menuntut so that, atau berbagi subjek dengan induk kalimatnya, yang membolehkan in order to + kata kerja dasar"
     },
     {
       "id": "b5_022",
@@ -6393,17 +6463,23 @@
         {
           "option": "What's more",
           "misconception": "Selects a conversational addition phrase instead of a formal conjunctive adverb.",
-          "whyFails": "'What's more' adds information, but its conversational tone does not meet the explicitly academic register required by the prompt."
+          "whyFails": "'What's more' adds information, but its conversational tone does not meet the explicitly academic register required by the prompt.",
+          "whyFailsId": "“What’s more” memang menambahkan keterangan, tetapi nadanya percakapan sehingga tidak memenuhi ragam akademik yang diminta soalnya.",
+          "misconceptionId": "ungkapan penambahan percakapan dipilih menggantikan kata keterangan penghubung yang resmi"
         },
         {
           "option": "Plus",
           "misconception": "Uses a casual spoken connector in a formal academic passage.",
-          "whyFails": "'Plus' is informal and is not the formal conjunctive adverb requested by the question."
+          "whyFails": "'Plus' is informal and is not the formal conjunctive adverb requested by the question.",
+          "whyFailsId": "“Plus” bersifat santai dan bukan kata keterangan penghubung resmi seperti yang diminta soalnya.",
+          "misconceptionId": "penghubung lisan yang santai dipakai di dalam bacaan akademik yang resmi"
         },
         {
           "option": "And",
           "misconception": "Uses a coordinating conjunction instead of the requested conjunctive adverb.",
-          "whyFails": "'And' is a conjunction, not a conjunctive adverb, and therefore fails the explicit grammatical category in the prompt."
+          "whyFails": "'And' is a conjunction, not a conjunctive adverb, and therefore fails the explicit grammatical category in the prompt.",
+          "whyFailsId": "“And” adalah kata sambung, bukan kata keterangan penghubung, sehingga tidak memenuhi jenis kata yang secara tegas diminta soalnya.",
+          "misconceptionId": "kata sambung setara dipakai menggantikan kata keterangan penghubung yang diminta"
         }
       ],
       "explanation": {
@@ -6411,8 +6487,16 @@
         "rule": "Formal conjunctive adverbs of addition include furthermore and moreover; conversational alternatives include plus and what is more.",
         "whyOthersFail": "'What's more' and 'Plus' do not match the requested academic register, while 'And' is not a conjunctive adverb.",
         "howToAvoid": "Check both dimensions named in the prompt: grammatical category and register. A connector can express addition yet still fail one of those constraints.",
-        "memoryCue": "Academic addition adverb: furthermore or moreover."
-      }
+        "memoryCue": "Academic addition adverb: furthermore or moreover.",
+        "ruleId": "Kata keterangan penghubung penambahan yang resmi antara lain furthermore dan moreover, sedangkan padanan percakapannya antara lain plus dan what is more.",
+        "whyCorrectId": "“Furthermore” adalah kata keterangan penghubung yang resmi untuk menambahkan satu butir pendukung di dalam tulisan akademik.",
+        "whyOthersFailId": "“What’s more” dan “Plus” tidak sesuai dengan ragam akademik yang diminta, sedangkan “And” bukan kata keterangan penghubung.",
+        "howToAvoidId": "Periksa dua hal yang disebut soalnya: jenis katanya dan ragam bahasanya. Sebuah penghubung bisa saja bermakna penambahan tetapi tetap gagal pada salah satu syarat itu.",
+        "memoryCueId": "Kata keterangan penambahan untuk ragam akademik: furthermore atau moreover."
+      },
+      "pedagogicalObjectiveId": "Siswa memilih penghubung penambahan yang resmi, yaitu furthermore, sesuai ragam bahasa tulisan akademik, berbeda dari padanannya yang santai",
+      "misconceptionTargetedId": "Siswa memakai penghubung penambahan yang santai seperti also atau plus di dalam konteks akademik yang jelas resmi",
+      "reasoningOperationId": "sesuaikan tingkat keresmian penghubungnya dengan ragam bahasa yang ditandai konteks akademiknya"
     },
     {
       "id": "b5_023",
@@ -6435,17 +6519,23 @@
         {
           "option": "Never I have attended",
           "misconception": "Fronts the negative adverbial without applying the required subject-auxiliary inversion.",
-          "whyFails": "Fronted negative adverbials like 'Never' obligatorily trigger inversion (auxiliary before subject); keeping normal word order after fronting is ungrammatical."
+          "whyFails": "Fronted negative adverbials like 'Never' obligatorily trigger inversion (auxiliary before subject); keeping normal word order after fronting is ungrammatical.",
+          "whyFailsId": "Keterangan negatif yang dimajukan seperti “Never” wajib memicu pembalikan dengan kata bantu mendahului subjek; mempertahankan urutan biasa setelah memajukannya tidak sah.",
+          "misconceptionId": "keterangan negatifnya dimajukan tanpa menerapkan pembalikan subjek dan kata bantu yang diwajibkan"
         },
         {
           "option": "Never I attended",
           "misconception": "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'.",
-          "whyFails": "Besides missing the inversion, present perfect ('have attended') is needed for 'never...before' experience statements, and the auxiliary is absent entirely."
+          "whyFails": "Besides missing the inversion, present perfect ('have attended') is needed for 'never...before' experience statements, and the auxiliary is absent entirely.",
+          "whyFailsId": "Selain kehilangan pembalikannya, pernyataan pengalaman dengan “never ... before” menuntut present perfect berupa “have attended”, sedangkan kata bantunya justru tidak ada.",
+          "misconceptionId": "“Never” dimajukan tanpa kata bantu sama sekali, mengabaikan aturan pembalikan sekaligus kebutuhan “have” bersama “before”"
         },
         {
           "option": "Have never I attended",
           "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence.",
-          "whyFails": "For this emphatic pattern, 'Never' must be the fronted first word, with the auxiliary and subject inverted after it, not 'have' first."
+          "whyFails": "For this emphatic pattern, 'Never' must be the fronted first word, with the auxiliary and subject inverted after it, not 'have' first.",
+          "whyFailsId": "Pada pola penekanan ini, “Never” harus menjadi kata pertama yang dimajukan, lalu kata bantu dan subjeknya dibalik sesudahnya, bukan “have” yang lebih dulu.",
+          "misconceptionId": "“never” ditaruh setelah kata bantunya, bukan di posisi paling depan kalimat"
         }
       ],
       "explanation": {
@@ -6453,8 +6543,16 @@
         "rule": "Fronting negative/restrictive adverbials (never, rarely, not only, seldom) for emphasis requires subject-auxiliary inversion.",
         "whyOthersFail": "Skipping inversion, omitting the auxiliary, or misordering 'never' and 'have' all violate the fixed emphatic inversion pattern.",
         "howToAvoid": "Whenever a negative adverbial is fronted for emphasis, immediately invert with an auxiliary before the subject.",
-        "memoryCue": "Never + auxiliary + subject: 'Never have I...', 'Rarely does she...'."
-      }
+        "memoryCue": "Never + auxiliary + subject: 'Never have I...', 'Rarely does she...'.",
+        "ruleId": "Memajukan keterangan negatif atau pembatas seperti never, rarely, not only, dan seldom demi penekanan mewajibkan pembalikan subjek dan kata bantunya.",
+        "whyCorrectId": "“Never have I attended” memajukan “Never” lalu membalik kata bantu “have” ke depan subjek “I”, dan itulah pola penekanan yang diwajibkan.",
+        "whyOthersFailId": "Melewatkan pembalikannya, menghilangkan kata bantunya, atau salah menyusun letak “never” dan “have” sama-sama melanggar pola pembalikan penekanan yang sudah baku.",
+        "howToAvoidId": "Setiap kali keterangan negatif dimajukan demi penekanan, langsung balikkan dengan kata bantu mendahului subjeknya.",
+        "memoryCueId": "Never + kata bantu + subjek: “Never have I ...”, “Rarely does she ...”."
+      },
+      "pedagogicalObjectiveId": "Siswa menerapkan pembalikan subjek dan kata bantu setelah keterangan negatif dimajukan, seperti Never, Rarely, dan Not only, untuk gaya resmi yang menekankan",
+      "misconceptionTargetedId": "Siswa memajukan keterangan negatifnya demi penekanan tetapi mempertahankan urutan kata pernyataan biasa, tanpa membalik subjek dan kata bantunya",
+      "reasoningOperationId": "kenali bahwa memajukan keterangan negatif atau pembatas demi penekanan mewajibkan pembalikan subjek dan kata bantu"
     },
     {
       "id": "b5_024",
@@ -6477,17 +6575,23 @@
         {
           "option": "Such the impact was",
           "misconception": "Fronts 'such' but fails to invert the verb 'was' before the subject.",
-          "whyFails": "This emphatic pattern requires full inversion of verb and subject after fronted 'such' (Such was the impact), not just fronting 'such' alone."
+          "whyFails": "This emphatic pattern requires full inversion of verb and subject after fronted 'such' (Such was the impact), not just fronting 'such' alone.",
+          "whyFailsId": "Pola penekanan ini menuntut pembalikan penuh antara kata kerja dan subjek setelah “such” dimajukan, yaitu “Such was the impact”, bukan sekadar memajukan “such”.",
+          "misconceptionId": "“such” sudah dimajukan tetapi kata kerja “was” tidak dibalik ke depan subjeknya"
         },
         {
           "option": "The impact such was",
           "misconception": "Keeps normal subject-first order and misplaces 'such' mid-sentence.",
-          "whyFails": "This word order doesn't match any grammatical English pattern; the fixed emphatic structure requires 'Such' to start the sentence, followed immediately by the verb."
+          "whyFails": "This word order doesn't match any grammatical English pattern; the fixed emphatic structure requires 'Such' to start the sentence, followed immediately by the verb.",
+          "whyFailsId": "Urutan kata seperti ini tidak cocok dengan pola Bahasa Inggris mana pun; susunan penekanan yang tetap menuntut “Such” membuka kalimat lalu langsung disusul kata kerjanya.",
+          "misconceptionId": "urutan biasa dengan subjek di depan dipertahankan dan “such” ditaruh di tengah"
         },
         {
           "option": "Was such the impact",
           "misconception": "Treats the sentence as a yes/no question by fronting only the verb.",
-          "whyFails": "This produces question word order, but the sentence is a dramatic statement, not a question; 'such' must be the very first fronted word."
+          "whyFails": "This produces question word order, but the sentence is a dramatic statement, not a question; 'such' must be the very first fronted word.",
+          "whyFailsId": "Susunan ini menghasilkan urutan pertanyaan, padahal kalimatnya sebuah pernyataan dramatis; “such” harus menjadi kata pertama yang dimajukan.",
+          "misconceptionId": "kalimatnya diperlakukan sebagai pertanyaan ya atau tidak dengan memajukan kata kerjanya saja"
         }
       ],
       "explanation": {
@@ -6495,8 +6599,16 @@
         "rule": "Such + was/were + subject + that + result clause is a fixed formal/literary inversion pattern for dramatic emphasis.",
         "whyOthersFail": "Partial fronting, misplaced 'such', or question-style inversion all fail to reproduce this exact fixed emphatic structure.",
         "howToAvoid": "Treat 'Such was/were + subject' as a memorized fixed opening chunk, not something to build word-by-word.",
-        "memoryCue": "Such was the impact that... — 'such' leads, verb follows immediately."
-      }
+        "memoryCue": "Such was the impact that... — 'such' leads, verb follows immediately.",
+        "ruleId": "Such + was atau were + subjek + that + anak kalimat akibat adalah pola pembalikan tetap dalam ragam resmi atau sastra untuk kesan dramatis.",
+        "whyCorrectId": "“Such was the impact” memajukan “such” dengan pembalikan penuh antara kata kerja dan subjeknya, dan itulah pola penekanan sastra yang sudah tetap.",
+        "whyOthersFailId": "Pemajuan yang setengah jalan, letak “such” yang keliru, atau pembalikan bergaya pertanyaan sama-sama gagal menghasilkan susunan penekanan yang tetap ini.",
+        "howToAvoidId": "Perlakukan “Such was” atau “Such were” + subjek sebagai satu bukaan tetap yang dihafal, bukan susunan yang dirakit kata per kata.",
+        "memoryCueId": "Such was the impact that ... — “such” memimpin, kata kerjanya langsung menyusul."
+      },
+      "pedagogicalObjectiveId": "Siswa menyusun pola penekanan Such + be + subjek + that untuk kesan dramatis dalam ragam sastra atau resmi",
+      "misconceptionTargetedId": "Siswa mempertahankan “such” di posisi biasanya sebelum kata benda, bukan memajukan seluruh bagian predikatnya untuk pembalikan yang menekankan",
+      "reasoningOperationId": "kenali pola tetap Such + was atau were + subjek + that + anak kalimat akibat sebagai bentuk lain dari “The impact was such that ...”"
     },
     {
       "id": "A1-003",
@@ -6519,17 +6631,23 @@
         {
           "option": "drink",
           "misconception": "base-form overuse",
-          "whyFails": "The subject is third-person singular."
+          "whyFails": "The subject is third-person singular.",
+          "whyFailsId": "Subjeknya orang ketiga tunggal, jadi kata kerjanya butuh akhiran -s.",
+          "misconceptionId": "bentuk dasar dipakai berlebihan"
         },
         {
           "option": "drinking",
           "misconception": "progressive confusion",
-          "whyFails": "No auxiliary is present and the sentence describes a habit."
+          "whyFails": "No auxiliary is present and the sentence describes a habit.",
+          "whyFailsId": "Tidak ada kata bantu di kalimat ini, dan kalimatnya menggambarkan kebiasaan.",
+          "misconceptionId": "tertukar dengan bentuk berkelanjutan"
         },
         {
           "option": "drank",
           "misconception": "past-tense confusion",
-          "whyFails": "The sentence describes a current routine."
+          "whyFails": "The sentence describes a current routine.",
+          "whyFailsId": "Kalimat ini menggambarkan kebiasaan yang berlaku sekarang.",
+          "misconceptionId": "tertukar dengan bentuk lampau"
         }
       ],
       "explanation": {
@@ -6537,8 +6655,16 @@
         "rule": "Present simple affirmative: he/she/it + base verb + -s/-es.",
         "whyOthersFail": "'Drink' misses third-person -s; 'drinking' needs an auxiliary and describes a different aspect; 'drank' moves the routine into the past.",
         "howToAvoid": "Underline the subject and the routine marker before choosing. With he, she, or it in a present routine, check the verb for -s/-es.",
-        "memoryCue": "He, she, it: the present-simple verb gets -s."
-      }
+        "memoryCue": "He, she, it: the present-simple verb gets -s.",
+        "ruleId": "Present simple bentuk positif: he, she, atau it + kata kerja dasar + akhiran -s atau -es.",
+        "whyCorrectId": "Tindakan yang menjadi kebiasaan dengan subjek orang ketiga tunggal memakai present simple berakhiran -s.",
+        "whyOthersFailId": "“Drink” kehilangan akhiran -s untuk orang ketiga, “drinking” butuh kata bantu dan menggambarkan aspek yang berbeda, sedangkan “drank” memindahkan kebiasaannya ke masa lalu.",
+        "howToAvoidId": "Garis bawahi subjek dan penanda kebiasaannya sebelum memilih. Kalau subjeknya he, she, atau it di dalam kebiasaan masa kini, periksa akhiran -s atau -es pada kata kerjanya.",
+        "memoryCueId": "He, she, dan it: kata kerja present simple-nya berakhiran -s."
+      },
+      "pedagogicalObjectiveId": "Tindakan yang menjadi kebiasaan dengan subjek orang ketiga tunggal memakai present simple berakhiran -s",
+      "misconceptionTargetedId": "bentuk dasar dipakai berlebihan; tertukar dengan bentuk berkelanjutan; tertukar dengan bentuk lampau",
+      "reasoningOperationId": "temukan penanda kebiasaan “every morning” → kenali subjek orang ketiga tunggalnya → tambahkan -s pada kata kerja present simple-nya"
     },
     {
       "id": "A1-004",
@@ -6561,17 +6687,23 @@
         {
           "option": "am",
           "misconception": "first-person be",
-          "whyFails": "am is used with I, not they."
+          "whyFails": "am is used with I, not they.",
+          "whyFailsId": "“Am” dipakai bersama I, bukan bersama they.",
+          "misconceptionId": "bentuk be untuk orang pertama"
         },
         {
           "option": "is",
           "misconception": "singular be",
-          "whyFails": "is is not used with they."
+          "whyFails": "is is not used with they.",
+          "whyFailsId": "“Is” tidak dipakai bersama they.",
+          "misconceptionId": "bentuk be untuk tunggal"
         },
         {
           "option": "be",
           "misconception": "base form",
-          "whyFails": "be is not the finite form needed here."
+          "whyFails": "be is not the finite form needed here.",
+          "whyFailsId": "“Be” bukan bentuk bertense yang dibutuhkan di sini.",
+          "misconceptionId": "bentuk dasar"
         }
       ],
       "explanation": {
@@ -6579,8 +6711,16 @@
         "rule": "Present tense of be: I am; he/she/it is; you/we/they are.",
         "whyOthersFail": "'Am' belongs with I; 'is' belongs with a singular third-person subject; bare 'be' cannot act as the finite present verb here.",
         "howToAvoid": "Say the short pair aloud before completing the sentence: I am, he/she/it is, you/we/they are.",
-        "memoryCue": "They always pairs with are in the present."
-      }
+        "memoryCue": "They always pairs with are in the present.",
+        "ruleId": "Bentuk present dari be: I am; he, she, dan it is; you, we, dan they are.",
+        "whyCorrectId": "Kata ganti they memakai bentuk jamak are.",
+        "whyOthersFailId": "“Am” adalah milik I, “is” adalah milik subjek orang ketiga tunggal, sedangkan “be” telanjang tidak bisa menjadi kata kerja present yang bertense di sini.",
+        "howToAvoidId": "Ucapkan pasangannya dengan lantang sebelum melengkapi kalimatnya: I am, he, she, it is, you, we, they are.",
+        "memoryCueId": "They selalu berpasangan dengan are dalam bentuk present."
+      },
+      "pedagogicalObjectiveId": "Kata ganti they memakai bentuk jamak are",
+      "misconceptionTargetedId": "bentuk be untuk orang pertama; bentuk be untuk tunggal; bentuk dasar",
+      "reasoningOperationId": "cocokkan kata ganti subjek “they” dengan bentuk present dari be → pilih are"
     },
     {
       "id": "A1-005",
@@ -6603,17 +6743,23 @@
         {
           "option": "is",
           "misconception": "singular agreement",
-          "whyFails": "Two books is plural."
+          "whyFails": "Two books is plural.",
+          "whyFailsId": "“Two books” berbentuk jamak.",
+          "misconceptionId": "kesesuaian bentuk tunggal"
         },
         {
           "option": "be",
           "misconception": "base form",
-          "whyFails": "be cannot serve as the finite verb here."
+          "whyFails": "be cannot serve as the finite verb here.",
+          "whyFailsId": "“Be” tidak bisa menjadi kata kerja bertense di sini.",
+          "misconceptionId": "bentuk dasar"
         },
         {
           "option": "was",
           "misconception": "past tense",
-          "whyFails": "The sentence describes the present situation."
+          "whyFails": "The sentence describes the present situation.",
+          "whyFailsId": "Kalimat ini menggambarkan keadaan yang berlaku sekarang.",
+          "misconceptionId": "bentuk lampau"
         }
       ],
       "explanation": {
@@ -6621,8 +6767,16 @@
         "rule": "There are + plural noun; there is + singular noun.",
         "whyOthersFail": "'Is' and 'was' use singular agreement, while bare 'be' is not a finite present verb. The plural phrase 'two books' requires 'are'.",
         "howToAvoid": "Do not make the verb agree with 'there'. Look at the first noun after the verb and decide whether it is singular or plural.",
-        "memoryCue": "There are + plural; there is + singular."
-      }
+        "memoryCue": "There are + plural; there is + singular.",
+        "ruleId": "There are + kata benda jamak; there is + kata benda tunggal.",
+        "whyCorrectId": "Frasa benda jamak “two books” menuntut are.",
+        "whyOthersFailId": "“Is” dan “was” memakai kesesuaian bentuk tunggal, sedangkan “be” telanjang bukan kata kerja present yang bertense. Frasa jamak “two books” menuntut “are”.",
+        "howToAvoidId": "Jangan menyesuaikan kata kerjanya dengan “there”. Lihat kata benda pertama setelah kata kerjanya, lalu tentukan tunggal atau jamak.",
+        "memoryCueId": "There are + jamak; there is + tunggal."
+      },
+      "pedagogicalObjectiveId": "Frasa benda jamak “two books” menuntut are",
+      "misconceptionTargetedId": "kesesuaian bentuk tunggal; bentuk dasar; bentuk lampau",
+      "reasoningOperationId": "lewati kata “there” dan lihat frasa benda yang menyusul → kenali “two books” sebagai jamak → pilih are"
     },
     {
       "id": "A1-006",
@@ -6645,17 +6799,23 @@
         {
           "option": "She",
           "misconception": "subject pronoun",
-          "whyFails": "She cannot directly modify brother."
+          "whyFails": "She cannot directly modify brother.",
+          "whyFailsId": "“She” tidak bisa langsung menerangkan “brother”.",
+          "misconceptionId": "kata ganti subjek"
         },
         {
           "option": "Hers",
           "misconception": "possessive pronoun",
-          "whyFails": "Hers stands alone and is not followed by a noun."
+          "whyFails": "Hers stands alone and is not followed by a noun.",
+          "whyFailsId": "“Hers” berdiri sendiri dan tidak diikuti kata benda.",
+          "misconceptionId": "kata ganti kepemilikan"
         },
         {
           "option": "Him",
           "misconception": "object pronoun",
-          "whyFails": "Him is an object pronoun."
+          "whyFails": "Him is an object pronoun.",
+          "whyFailsId": "“Him” adalah kata ganti objek.",
+          "misconceptionId": "kata ganti objek"
         }
       ],
       "explanation": {
@@ -6663,8 +6823,16 @@
         "rule": "Possessive adjective before a noun: my, your, his, her, its, our, their.",
         "whyOthersFail": "'She' is a subject, 'hers' replaces a noun, and 'him' is an object; only 'her' can directly modify 'brother'.",
         "howToAvoid": "Check whether a noun comes immediately after the blank. If it does, use a possessive adjective such as my, his, her, or their.",
-        "memoryCue": "Her + noun; hers stands alone."
-      }
+        "memoryCue": "Her + noun; hers stands alone.",
+        "ruleId": "Kata kepemilikan sebelum kata benda: my, your, his, her, its, our, dan their.",
+        "whyCorrectId": "Kata “her” menerangkan kata benda “brother” untuk menunjukkan kepemilikan.",
+        "whyOthersFailId": "“She” adalah subjek, “hers” menggantikan kata benda, dan “him” adalah objek; hanya “her” yang bisa langsung menerangkan “brother”.",
+        "howToAvoidId": "Periksa apakah ada kata benda tepat setelah bagian kosongnya. Kalau ada, pakai kata kepemilikan seperti my, his, her, atau their.",
+        "memoryCueId": "Her + kata benda; hers berdiri sendiri."
+      },
+      "pedagogicalObjectiveId": "Kata “her” menerangkan kata benda “brother” untuk menunjukkan kepemilikan",
+      "misconceptionTargetedId": "kata ganti subjek; kata ganti kepemilikan; kata ganti objek",
+      "reasoningOperationId": "kenali Anna sebagai pemiliknya → perhatikan bahwa “brother” berdiri tepat setelah bagian kosongnya → pilih kata kepemilikan her"
     },
     {
       "id": "A1-007",
@@ -6687,17 +6855,23 @@
         {
           "option": "am",
           "misconception": "be verb",
-          "whyFails": "Am does not express ability with the base verb swim."
+          "whyFails": "Am does not express ability with the base verb swim.",
+          "whyFailsId": "“Am” tidak menyatakan kemampuan bersama bentuk dasar “swim”.",
+          "misconceptionId": "kata kerja be"
         },
         {
           "option": "do",
           "misconception": "do auxiliary",
-          "whyFails": "Do does not form an ability statement here."
+          "whyFails": "Do does not form an ability statement here.",
+          "whyFailsId": "“Do” tidak membentuk pernyataan kemampuan di sini.",
+          "misconceptionId": "kata bantu do"
         },
         {
           "option": "have",
           "misconception": "possession",
-          "whyFails": "Have expresses possession or other meanings, not ability."
+          "whyFails": "Have expresses possession or other meanings, not ability.",
+          "whyFailsId": "“Have” menyatakan kepemilikan atau makna lain, bukan kemampuan.",
+          "misconceptionId": "kepemilikan"
         }
       ],
       "explanation": {
@@ -6705,8 +6879,16 @@
         "rule": "Modal can + base verb expresses ability.",
         "whyOthersFail": "'Am' cannot directly precede base 'swim'; 'do' does not express ability; 'have' changes the meaning to possession or experience.",
         "howToAvoid": "When the sentence means 'is able to', use can followed immediately by the base verb, with no 'to' and no -s.",
-        "memoryCue": "Can + base verb: can swim, can drive."
-      }
+        "memoryCue": "Can + base verb: can swim, can drive.",
+        "ruleId": "Modal can + kata kerja dasar menyatakan kemampuan.",
+        "whyCorrectId": "Kata “can” menyatakan kemampuan yang berlaku sekarang.",
+        "whyOthersFailId": "“Am” tidak bisa langsung mendahului bentuk dasar “swim”, “do” tidak menyatakan kemampuan, dan “have” mengubah maknanya menjadi kepemilikan atau pengalaman.",
+        "howToAvoidId": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s.",
+        "memoryCueId": "Can + kata kerja dasar: can swim, can drive."
+      },
+      "pedagogicalObjectiveId": "Kata “can” menyatakan kemampuan yang berlaku sekarang",
+      "misconceptionTargetedId": "kata kerja be; kata bantu do; kepemilikan",
+      "reasoningOperationId": "kenali maknanya sebagai kemampuan masa kini → pilih modal can → biarkan kata kerja swim di belakangnya tetap berbentuk dasar"
     },
     {
       "id": "C2-002",
@@ -6729,17 +6911,23 @@
         {
           "option": "would have started",
           "misconception": "moves the result into the unreal past",
-          "whyFails": "'Would have started' describes a past result, but 'next Monday' places the result in the future."
+          "whyFails": "'Would have started' describes a past result, but 'next Monday' places the result in the future.",
+          "whyFailsId": "“Would have started” menggambarkan akibat di masa lalu, padahal “next Monday” menaruh akibatnya di masa depan.",
+          "misconceptionId": "akibatnya dipindahkan ke masa lalu yang tidak nyata"
         },
         {
           "option": "will start",
           "misconception": "treats the future result as real despite the unreal past condition",
-          "whyFails": "The budget was not approved, so the future start is hypothetical and needs 'would', not 'will'."
+          "whyFails": "The budget was not approved, so the future start is hypothetical and needs 'would', not 'will'.",
+          "whyFailsId": "Anggarannya tidak disetujui, jadi pembangunan di masa depan itu hanya dibayangkan dan menuntut “would”, bukan “will”.",
+          "misconceptionId": "akibat masa depannya diperlakukan nyata walaupun syarat lampaunya tidak nyata"
         },
         {
           "option": "started",
           "misconception": "uses simple past for an explicitly future consequence",
-          "whyFails": "Simple past conflicts with 'next Monday' and fails to mark the hypothetical result."
+          "whyFails": "Simple past conflicts with 'next Monday' and fails to mark the hypothetical result.",
+          "whyFailsId": "Past simple bertabrakan dengan “next Monday” dan gagal menandai bahwa akibatnya hanya dibayangkan.",
+          "misconceptionId": "past simple dipakai untuk akibat yang jelas berada di masa depan"
         }
       ],
       "explanation": {
@@ -6747,8 +6935,16 @@
         "rule": "A mixed conditional may combine if + past perfect for an unreal past cause with would + infinitive/continuous for a present or future result.",
         "whyOthersFail": "'Would have started' puts the result in the past; 'will start' makes it real; 'started' conflicts with the future time marker.",
         "howToAvoid": "Draw two points on a timeline—one for the condition and one for the result—before choosing the verb forms.",
-        "memoryCue": "Past cause, future result: if had done, would be doing."
-      }
+        "memoryCue": "Past cause, future result: if had done, would be doing.",
+        "ruleId": "Mixed conditional bisa memadukan if + past perfect untuk sebab lampau yang tidak nyata dengan would + kata kerja dasar atau bentuk berkelanjutan untuk akibat masa kini atau masa depan.",
+        "whyCorrectId": "Persetujuan yang tidak nyata itu berada di bulan lalu, sedangkan pembangunan yang dibayangkan berada pada Senin depan, dan “would be starting” menjaga hubungan lintas waktu itu.",
+        "whyOthersFailId": "“Would have started” memindahkan akibatnya ke masa lalu, “will start” menjadikannya nyata, dan “started” bertabrakan dengan penanda waktu masa depannya.",
+        "howToAvoidId": "Gambarkan dua titik pada garis waktu, satu untuk syaratnya dan satu untuk akibatnya, sebelum memilih bentuk kata kerjanya.",
+        "memoryCueId": "Sebab lampau dan akibat masa depan: if had done, would be doing."
+      },
+      "pedagogicalObjectiveId": "Menyusun mixed conditional yang keputusan lampaunya tidak nyata dan mengendalikan kejadian masa depan yang dibayangkan",
+      "misconceptionTargetedId": "Siswa memaksa kedua anak kalimatnya berada di kerangka waktu yang sama, sehingga hubungan lampau ke masa depannya hilang",
+      "reasoningOperationId": "tandai syarat tidak nyatanya di masa lalu → tandai akibatnya di masa depan → gabungkan past perfect dengan would be + bentuk -ing"
     },
     {
       "id": "C2-003",
@@ -6771,17 +6967,23 @@
         {
           "option": "must have worked",
           "misconception": "uses a completed-event deduction instead of an ongoing past activity",
-          "whyFails": "The phrase 'at that moment' and the audible activity frame the work as in progress, which requires the progressive form."
+          "whyFails": "The phrase 'at that moment' and the audible activity frame the work as in progress, which requires the progressive form.",
+          "whyFailsId": "Ungkapan “at that moment” dan suara kegiatan yang terdengar membingkai pekerjaannya sedang berlangsung, dan itu menuntut bentuk berkelanjutan.",
+          "misconceptionId": "kesimpulan tentang kejadian tuntas dipakai menggantikan kegiatan lampau yang sedang berlangsung"
         },
         {
           "option": "should work",
           "misconception": "changes evidence-based deduction into present advice or expectation",
-          "whyFails": "'Should work' neither refers to the observed past moment nor expresses a confident deduction from evidence."
+          "whyFails": "'Should work' neither refers to the observed past moment nor expresses a confident deduction from evidence.",
+          "whyFailsId": "“Should work” tidak merujuk pada saat lampau yang diamati dan juga tidak menyatakan kesimpulan yang diyakini dari bukti.",
+          "misconceptionId": "kesimpulan berdasarkan bukti diubah menjadi nasihat atau harapan masa kini"
         },
         {
           "option": "cannot have been working",
           "misconception": "reverses the polarity of the evidence",
-          "whyFails": "The lights and keyboard sounds support, rather than rule out, the conclusion that the team was working."
+          "whyFails": "The lights and keyboard sounds support, rather than rule out, the conclusion that the team was working.",
+          "whyFailsId": "Lampu yang menyala dan suara papan ketik justru mendukung, bukan menutup, kesimpulan bahwa tim itu sedang bekerja.",
+          "misconceptionId": "arah kesimpulan dari buktinya dibalik"
         }
       ],
       "explanation": {
@@ -6789,8 +6991,16 @@
         "rule": "For a strong deduction about an activity in progress at a past time, use must have been + verb-ing.",
         "whyOthersFail": "The simple perfect loses the ongoing viewpoint; 'should' changes the function; 'cannot' contradicts the evidence.",
         "howToAvoid": "Check three layers separately: certainty, time, and whether the activity is complete or in progress.",
-        "memoryCue": "Strong evidence + ongoing past = must have been working."
-      }
+        "memoryCue": "Strong evidence + ongoing past = must have been working.",
+        "ruleId": "Untuk kesimpulan kuat tentang kegiatan yang sedang berlangsung pada satu saat di masa lalu, pakai must have been + kata kerja -ing.",
+        "whyCorrectId": "“Must have been working” memadukan kesimpulan yang kuat, acuan waktu lampau, dan kegiatan yang sedang berlangsung pada pukul sembilan malam.",
+        "whyOthersFailId": "Bentuk perfect sederhana kehilangan sudut pandang yang sedang berlangsung, “should” mengubah fungsinya, dan “cannot” bertentangan dengan buktinya.",
+        "howToAvoidId": "Periksa tiga lapis secara terpisah: tingkat keyakinannya, waktunya, dan apakah kegiatannya sudah tuntas atau masih berlangsung.",
+        "memoryCueId": "Bukti kuat ditambah kegiatan lampau yang sedang berlangsung berarti must have been working."
+      },
+      "pedagogicalObjectiveId": "Memakai modal perfect berbentuk berkelanjutan untuk menyimpulkan bahwa satu kegiatan sedang berlangsung pada satu saat tertentu di masa lalu",
+      "misconceptionTargetedId": "Siswa melihat buktinya di masa lalu tetapi mengabaikan makna “sedang berlangsung saat itu”, lalu memilih bentuk yang menandai tindakan tuntas",
+      "reasoningOperationId": "nilai kekuatan buktinya → temukan titik acuan lampaunya → tandai kegiatan yang disimpulkan itu sebagai sedang berlangsung dengan must have been + bentuk -ing"
     },
     {
       "id": "C2-004",
@@ -6813,17 +7023,23 @@
         {
           "option": "the board understood",
           "misconception": "keeps ordinary statement order after a fronted restrictive phrase",
-          "whyFails": "Fronted 'Only after...' triggers subject-auxiliary inversion, so 'did' must precede 'the board'."
+          "whyFails": "Fronted 'Only after...' triggers subject-auxiliary inversion, so 'did' must precede 'the board'.",
+          "whyFailsId": "“Only after ...” yang dimajukan memicu pembalikan subjek dan kata bantu, jadi “did” harus mendahului “the board”.",
+          "misconceptionId": "urutan pernyataan biasa dipertahankan setelah frasa pembatas dimajukan"
         },
         {
           "option": "understood the board",
           "misconception": "inverts the lexical verb directly",
-          "whyFails": "English requires do-support here; the lexical verb stays in base form after the auxiliary."
+          "whyFails": "English requires do-support here; the lexical verb stays in base form after the auxiliary.",
+          "whyFailsId": "Bahasa Inggris menuntut bantuan “do” di sini; kata kerja utamanya tetap berbentuk dasar setelah kata bantunya.",
+          "misconceptionId": "kata kerja utamanya langsung dibalik"
         },
         {
           "option": "the board did understand",
           "misconception": "adds emphatic do but does not invert it with the subject",
-          "whyFails": "The auxiliary is present but remains after the subject, so the required inversion has not occurred."
+          "whyFails": "The auxiliary is present but remains after the subject, so the required inversion has not occurred.",
+          "whyFailsId": "Kata bantunya memang ada tetapi tetap berdiri setelah subjek, sehingga pembalikan yang diwajibkan belum terjadi.",
+          "misconceptionId": "kata bantu penegas ditambahkan tetapi tidak dibalik dengan subjeknya"
         }
       ],
       "explanation": {
@@ -6831,8 +7047,16 @@
         "rule": "When a restrictive phrase beginning with only is fronted, invert auxiliary and subject in the main clause: Only after X did + subject + base verb.",
         "whyOthersFail": "The alternatives either keep normal order, invert the lexical verb, or fail to move the auxiliary before the subject.",
         "howToAvoid": "Treat fronted 'Only after/by/when...' like a signal to build question-style auxiliary-subject order in the following main clause.",
-        "memoryCue": "Only after... did the subject + base verb."
-      }
+        "memoryCue": "Only after... did the subject + base verb.",
+        "ruleId": "Ketika frasa pembatas yang dibuka “only” dimajukan, balikkan kata bantu dan subjek di induk kalimatnya: Only after X did + subjek + kata kerja dasar.",
+        "whyCorrectId": "“Only after the second audit did the board understand ...” menaruh kata bantu bentuk lampau sebelum subjeknya dengan tepat dan membiarkan “understand” berbentuk dasar.",
+        "whyOthersFailId": "Pilihan lainnya mempertahankan urutan biasa, membalik kata kerja utamanya, atau tidak memindahkan kata bantunya ke depan subjek.",
+        "howToAvoidId": "Perlakukan “Only after”, “Only by”, dan “Only when” yang dimajukan sebagai isyarat untuk menyusun urutan kata bantu dan subjek seperti pada kalimat tanya.",
+        "memoryCueId": "Only after ... did + subjek + kata kerja dasar."
+      },
+      "pedagogicalObjectiveId": "Menerapkan pembalikan subjek dan kata bantu ketika frasa pembatas berawalan “only” dimajukan demi penekanan yang resmi",
+      "misconceptionTargetedId": "Siswa memajukan “only after”, “only by”, atau “only when” tetapi mempertahankan urutan subjek dan kata kerja biasa",
+      "reasoningOperationId": "kenali frasa pembatas berawalan “only” yang dimajukan → tentukan tense-nya → hadirkan kata bantu sebelum subjeknya"
     },
     {
       "id": "C2-005",
@@ -6855,17 +7079,23 @@
         {
           "option": "were",
           "misconception": "makes the verb agree with the nearby plural noun team",
-          "whyFails": "The subject is the entire singular idea 'What the team needed most', so singular 'was' is required."
+          "whyFails": "The subject is the entire singular idea 'What the team needed most', so singular 'was' is required.",
+          "whyFailsId": "Subjeknya adalah seluruh gagasan tunggal “What the team needed most”, jadi yang dibutuhkan bentuk tunggal “was”.",
+          "misconceptionId": "kata kerjanya disesuaikan dengan kata benda jamak terdekat, yaitu team"
         },
         {
           "option": "that was",
           "misconception": "inserts an it-cleft linker into a pseudo-cleft",
-          "whyFails": "A pseudo-cleft links the what-clause directly to its focus with 'be'; it does not add 'that'."
+          "whyFails": "A pseudo-cleft links the what-clause directly to its focus with 'be'; it does not add 'that'.",
+          "whyFailsId": "Pola penekanan dengan what menghubungkan anak kalimatnya langsung ke bagian yang ditonjolkan lewat bentuk be, tanpa menambahkan “that”.",
+          "misconceptionId": "penghubung milik it-cleft disisipkan ke dalam pola anak kalimat what"
         },
         {
           "option": "it was",
           "misconception": "adds a dummy cleft subject and creates two competing subjects",
-          "whyFails": "The what-clause already functions as the subject, so adding 'it' makes the structure ungrammatical."
+          "whyFails": "The what-clause already functions as the subject, so adding 'it' makes the structure ungrammatical.",
+          "whyFailsId": "Anak kalimat what sudah berperan sebagai subjek, jadi menambahkan “it” membuat susunannya tidak sah.",
+          "misconceptionId": "subjek boneka ditambahkan sehingga muncul dua subjek yang saling berebut"
         }
       ],
       "explanation": {
@@ -6873,8 +7103,16 @@
         "rule": "Pseudo-cleft: What + clause + be + focused element. Treat the fused what-clause as a single subject unit.",
         "whyOthersFail": "'Were' follows the wrong noun; 'that was' and 'it was' incorrectly import pieces of an it-cleft.",
         "howToAvoid": "Bracket the whole 'What ...' clause before checking agreement; do not let a noun inside that bracket control the verb.",
-        "memoryCue": "What we needed was X—one what-clause, one singular idea."
-      }
+        "memoryCue": "What we needed was X—one what-clause, one singular idea.",
+        "ruleId": "Pola penekanan dengan what: What + anak kalimat + be + bagian yang ditonjolkan. Perlakukan anak kalimat what itu sebagai satu kesatuan subjek.",
+        "whyCorrectId": "Seluruh anak kalimat what berperan sebagai satu subjek tunggal, dan “was” menghubungkannya langsung dengan bagian yang ditonjolkan, yaitu “a clear decision”.",
+        "whyOthersFailId": "“Were” mengikuti kata benda yang keliru, sedangkan “that was” dan “it was” memasukkan potongan pola it-cleft yang tidak pada tempatnya.",
+        "howToAvoidId": "Kurung dulu seluruh anak kalimat “What ...” sebelum memeriksa kesesuaiannya; jangan biarkan kata benda di dalam kurung itu menentukan kata kerjanya.",
+        "memoryCueId": "What we needed was X — satu anak kalimat what, satu gagasan tunggal."
+      },
+      "pedagogicalObjectiveId": "Menyusun kalimat penekanan dengan anak kalimat what sebagai subjek dan bagian yang ditonjolkan setelah bentuk be",
+      "misconceptionTargetedId": "Siswa mencampur pola it-cleft dengan pola anak kalimat what, atau menyesuaikan kata kerjanya dengan kata benda jamak terdekat, bukan dengan seluruh anak kalimat what-nya",
+      "reasoningOperationId": "kenali anak kalimat what di awal sebagai satu kesatuan subjek → pilih kesesuaian bentuk tunggal → taruh bagian yang ditonjolkan setelah be"
     },
     {
       "id": "C2-006",
@@ -6897,17 +7135,23 @@
         {
           "option": "Reviewed",
           "misconception": "past participle alone",
-          "whyFails": "Reviewed does not clearly mark the active prior action here."
+          "whyFails": "Reviewed does not clearly mark the active prior action here.",
+          "whyFailsId": "“Reviewed” tidak menandai dengan jelas tindakan aktif yang lebih dulu di sini.",
+          "misconceptionId": "past participle sendirian"
         },
         {
           "option": "Having review",
           "misconception": "bare verb",
-          "whyFails": "Having must be followed by the past participle, reviewed."
+          "whyFails": "Having must be followed by the past participle, reviewed.",
+          "whyFailsId": "“Having” harus diikuti past participle, yaitu “reviewed”.",
+          "misconceptionId": "kata kerja dasar"
         },
         {
           "option": "To reviewing",
           "misconception": "gerund mismatch",
-          "whyFails": "To reviewing is not the required participle-clause form."
+          "whyFails": "To reviewing is not the required participle-clause form.",
+          "whyFailsId": "“To reviewing” bukan bentuk anak kalimat participle yang dibutuhkan.",
+          "misconceptionId": "bentuk -ing yang tidak cocok"
         }
       ],
       "explanation": {
@@ -6915,8 +7159,16 @@
         "rule": "Perfect participle clause: having + past participle indicates an earlier completed action.",
         "whyOthersFail": "'Reviewed' suggests a passive relationship; 'having review' lacks the past participle; 'to reviewing' combines incompatible infinitive and gerund forms.",
         "howToAvoid": "Check both subject control and timeline: the understood subject of the participle clause must perform its action, and an earlier completed action takes having + past participle.",
-        "memoryCue": "Earlier active action: having reviewed; earlier passive action: having been reviewed."
-      }
+        "memoryCue": "Earlier active action: having reviewed; earlier passive action: having been reviewed.",
+        "ruleId": "Anak kalimat participle bentuk perfect: having + past participle menandai tindakan yang lebih dulu dan sudah selesai.",
+        "whyCorrectId": "Bentuk having reviewed menunjukkan peninjauannya terjadi sebelum penyelidikan dibuka kembali.",
+        "whyOthersFailId": "“Reviewed” memberi kesan hubungan pasif, “having review” kehilangan bentuk past participle-nya, dan “to reviewing” menggabungkan bentuk to dan bentuk -ing yang tidak bisa disatukan.",
+        "howToAvoidId": "Periksa dua hal: pelakunya dan urutan waktunya. Subjek yang tersirat di anak kalimat participle harus melakukan tindakannya, dan tindakan yang lebih dulu dan sudah selesai memakai having + past participle.",
+        "memoryCueId": "Tindakan aktif yang lebih dulu: having reviewed; tindakan pasif yang lebih dulu: having been reviewed."
+      },
+      "pedagogicalObjectiveId": "Bentuk having reviewed menunjukkan peninjauannya terjadi sebelum penyelidikan dibuka kembali",
+      "misconceptionTargetedId": "past participle sendirian; kata kerja dasar; bentuk -ing yang tidak cocok",
+      "reasoningOperationId": "pastikan komitenya melakukan kedua tindakan itu → tempatkan peninjauannya sebelum pembukaan kembali → tandai tindakan aktif yang lebih dulu dengan having + past participle"
     },
     {
       "id": "C2-007",
@@ -6939,17 +7191,23 @@
         {
           "option": "appeals",
           "misconception": "present mismatch",
-          "whyFails": "The evaluation is framed as a completed judgment in this context."
+          "whyFails": "The evaluation is framed as a completed judgment in this context.",
+          "whyFailsId": "Penilaiannya dibingkai sebagai keputusan yang sudah selesai di konteks ini.",
+          "misconceptionId": "bentuk present yang tidak cocok"
         },
         {
           "option": "appealing",
           "misconception": "participle fragment",
-          "whyFails": "Appealing does not provide the finite clause required after much as."
+          "whyFails": "Appealing does not provide the finite clause required after much as.",
+          "whyFailsId": "“Appealing” tidak menghadirkan anak kalimat bertense yang diwajibkan setelah much as.",
+          "misconceptionId": "penggalan participle"
         },
         {
           "option": "has appeal",
           "misconception": "noun phrase",
-          "whyFails": "Has appeal does not form the required clause."
+          "whyFails": "Has appeal does not form the required clause.",
+          "whyFailsId": "“Has appeal” tidak membentuk anak kalimat yang diwajibkan.",
+          "misconceptionId": "frasa benda"
         }
       ],
       "explanation": {
@@ -6957,14 +7215,22 @@
         "rule": "Much as + subject + verb means although, despite the fact that.",
         "whyOthersFail": "'Appeals' clashes with the completed past frame; 'appealing' leaves the concessive clause without a finite verb; 'has appeal' changes both structure and intended meaning.",
         "howToAvoid": "After 'much as', verify that you have a full subject-plus-finite-verb clause, then align its tense with the surrounding narrative.",
-        "memoryCue": "Much as + subject + finite verb = although."
-      }
+        "memoryCue": "Much as + subject + finite verb = although.",
+        "ruleId": "Much as + subjek + kata kerja berarti walaupun, meskipun kenyataannya demikian.",
+        "whyCorrectId": "Susunan much as + anak kalimat menyatakan pertentangan dan menuntut kata kerja bertense.",
+        "whyOthersFailId": "“Appeals” bertabrakan dengan kerangka lampau yang sudah selesai, “appealing” membuat anak kalimat pertentangannya tanpa kata kerja bertense, dan “has appeal” mengubah susunan sekaligus maknanya.",
+        "howToAvoidId": "Setelah “much as”, pastikan ada anak kalimat utuh berisi subjek dan kata kerja bertense, lalu selaraskan tense-nya dengan alur cerita di sekitarnya.",
+        "memoryCueId": "Much as + subjek + kata kerja bertense berarti walaupun."
+      },
+      "pedagogicalObjectiveId": "Susunan much as + anak kalimat menyatakan pertentangan dan menuntut kata kerja bertense",
+      "misconceptionTargetedId": "bentuk present yang tidak cocok; penggalan participle; frasa benda",
+      "reasoningOperationId": "kenali “much as” sebagai penghubung pertentangan → tuntut anak kalimat bertense sesudahnya → selaraskan kata kerjanya dengan keputusan dewan yang sudah selesai"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 110,
+    "translated": 129,
     "total": 129,
     "updatedAt": "2026-08-23"
   }
