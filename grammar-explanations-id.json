@@ -1201,6 +1201,726 @@
           "whyFails": "“Can” menyatakan kemungkinan atau kemampuan yang umum, bukan tebakan tertentu tentang apa yang sedang terjadi sekarang."
         }
       }
+    },
+    "MO-008": {
+      "objective": "Menegatifkan modal penyesalan dengan benar untuk menegur tindakan yang MEMANG dilakukan padahal seharusnya tidak",
+      "misconception": "Siswa mempertukarkan “shouldn’t have” yang menegur sesuatu yang terjadi dengan “should have” yang menyesali sesuatu yang tidak dilakukan",
+      "reasoning": "tentukan apakah tindakan yang ditegur itu terjadi atau tidak → pilih modal lampau dengan kutub yang tepat",
+      "rule": "Should have + past participle menyesali kebaikan yang tidak jadi dilakukan; shouldn’t have + past participle menegur tindakan nyata yang ternyata keliru.",
+      "whyCorrect": "“Shouldn’t have stayed” menegur tindakan yang memang terjadi, yaitu begadang, dan itulah penyebab kelelahannya hari ini.",
+      "whyOthersFail": "“Should have stayed” membalik maknanya, “should stay” tidak berorientasi ke masa lalu, dan “wouldn’t have stayed” adalah milik kalimat pengandaian, bukan teguran langsung.",
+      "howToAvoid": "Putuskan dulu: tindakannya terjadi atau tidak? Baru pilih should have untuk yang tidak terjadi, dan shouldn’t have untuk yang terjadi.",
+      "memoryCue": "Kelelahan hari ini berarti tadi malam memang begadang, jadi “shouldn’t have”.",
+      "distractors": {
+        "should have stayed": {
+          "misconception": "penanda negatif yang dibutuhkan untuk menegur tindakan keliru justru hilang",
+          "whyFails": "Bentuk ini keliru menyiratkan dia TIDAK begadang, padahal konteksnya menunjukkan dia begadang dan itulah kesalahannya."
+        },
+        "should stay": {
+          "misconception": "modal nasihat bentuk present dipakai menggantikan susunan penyesalan lampau",
+          "whyFails": "Kejadian begadangnya sudah selesai dan sedang dinilai dari belakang, sehingga yang dibutuhkan “should have + past participle”, bukan “should” bentuk present."
+        },
+        "wouldn't have stayed": {
+          "misconception": "anak kalimat hasil third conditional tertukar dengan teguran atas kejadian nyata",
+          "whyFails": "“Wouldn’t have” adalah milik hasil pengandaian, bukan teguran langsung atas tindakan lampau yang nyata terjadi."
+        }
+      }
+    },
+    "CO-006": {
+      "objective": "Mengenali susunan pengandaian formal berbentuk Had + subjek + past participle sebagai padanan dari “If I had known”",
+      "misconception": "Siswa belum mengenali pembalikan kata bantu dan subjek sebagai bentuk formal yang sah, dan mengira “if” harus selalu ada",
+      "reasoning": "kenali urutan kata bantu mendahului subjek tanpa “if” → baca sebagai padanan third conditional yang formal",
+      "rule": "Pembalikan pengandaian formal: Had + subjek + past participle tanpa “if”, sama artinya dengan If + subjek + had + past participle.",
+      "whyCorrect": "“Had I known” adalah bentuk formal terbalik dari “If I had known”, dipakai pada third conditional dalam ragam formal atau sastra.",
+      "whyOthersFail": "Menggabungkan “if” dengan pembalikan berarti menandai pengandaiannya dua kali, “I had” polos tidak membawa penanda pengandaian sama sekali, dan “would” adalah milik induk kalimat.",
+      "howToAvoid": "Kalau kalimat dibuka dengan “Had + subjek” tanpa “if”, bacalah sebagai anak kalimat “if I had ...”.",
+      "memoryCue": "Buang “if”, balik urutannya: “Had I known” sama dengan “If I had known”.",
+      "distractors": {
+        "If had I": {
+          "misconception": "pembalikan formal dan kata sambung “if” dipakai bersamaan",
+          "whyFails": "Pembalikan formal menggantikan “if” sepenuhnya, jadi memakai keduanya sekaligus mubazir dan tidak sah."
+        },
+        "I had": {
+          "misconception": "urutan subjek dan kata kerja tetap biasa sehingga penanda pembalikannya hilang",
+          "whyFails": "Tanpa “if”, urutan biasa “I had known” tidak bisa berdiri sendiri sebagai anak kalimat pengandaian."
+        },
+        "Would I have": {
+          "misconception": "susunan kata bantu milik anak kalimat hasil ditaruh di awal anak kalimat syarat",
+          "whyFails": "“Would” adalah milik anak kalimat hasil seperti “I would have booked”, bukan milik anak kalimat syarat yang menuntut “had”."
+        }
+      }
+    },
+    "CO-007": {
+      "objective": "Membaca “otherwise” sebagai penghubung yang menyimpan syarat tersirat, yaitu “kalau hal itu tidak terjadi”",
+      "misconception": "Siswa menganggap “otherwise” sekadar kata pertentangan seperti “but”, sehingga logika pengandaian yang tersembunyi di dalamnya terlewat",
+      "reasoning": "temukan syarat tidak nyata yang tersirat di balik “otherwise” → pilih bentuk kata kerja yang sejalan dengan syarat itu",
+      "rule": "“Otherwise” bisa menyimpan syarat yang tidak nyata, dan anak kalimat setelahnya memakai bentuk hasil pengandaian sesuai kerangka waktu syarat tersembunyi itu.",
+      "whyCorrect": "“Otherwise” di sini menyimpan makna “kalau jembatannya tidak ditutup”, jadi hasilnya menuntut bentuk third conditional berupa would have been.",
+      "whyOthersFail": "Bentuk masa depan dan masa kini tidak cocok dengan keadaan lampau yang hanya dibayangkan, yang tersirat dari jembatan yang ditutup itu.",
+      "howToAvoid": "Tulis ulang “otherwise” dalam hati menjadi “kalau hal itu tidak terjadi”, lalu periksa bentuk pengandaian mana yang cocok.",
+      "memoryCue": "“Otherwise” adalah “if not” yang tersembunyi, jadi sering menuntut “would have + past participle”.",
+      "distractors": {
+        "will be": {
+          "misconception": "“otherwise” dibaca sekadar penanda pertentangan tentang masa depan",
+          "whyFails": "Kalimatnya menggambarkan hasil lampau yang hanya dibayangkan, bukan kejadian nyata di masa depan."
+        },
+        "was": {
+          "misconception": "syarat yang tersirat diperlakukan sebagai fakta lampau yang nyata",
+          "whyFails": "Past simple akan menyatakan perjalanannya memang lebih singkat, dan itu bertentangan dengan kenyataan jembatan yang ditutup."
+        },
+        "is": {
+          "misconception": "kerangka waktu lampau yang dipasang oleh “was closed” diabaikan",
+          "whyFails": "Bentuk present tidak cocok dengan keadaan lampau yang hanya dibayangkan seperti yang digambarkan kalimat ini."
+        }
+      }
+    },
+    "PA-005": {
+      "objective": "Menyusun kalimat pasif pelaporan tanpa pelaku, untuk menyampaikan anggapan tanpa menyebut sumbernya",
+      "misconception": "Siswa berusaha mempertahankan susunan aktif seperti “they say that”, padahal konteksnya menuntut pola pasif pelaporan tanpa pelaku",
+      "reasoning": "kenali bahwa sumber anggapannya umum atau tidak diketahui → pilih bentuk pasif pelaporan tanpa pelaku",
+      "rule": "Pasif pelaporan tanpa pelaku: It + is atau are + past participle + anak kalimat that, dipakai ketika sumber anggapannya umum atau tidak diketahui.",
+      "whyCorrect": "“It is believed that ...” adalah bentuk baku pasif pelaporan tanpa pelaku untuk menyampaikan anggapan yang luas dianut tetapi tidak bersumber jelas.",
+      "whyOthersFail": "Bentuk aktif “they are believing” salah tense sekaligus memakai subjek yang tidak pernah disebut, “it believes” memberi peran pelaku pada subjek boneka, dan menghilangkan “it” membuat kalimatnya tanpa subjek.",
+      "howToAvoid": "Kalau sebuah anggapan tidak punya penutur yang jelas dan perlu terdengar objektif, pakai “It is said/believed/thought/reported that ...”.",
+      "memoryCue": "Tanpa sumber yang disebut dan bernada resmi: “It is believed that ...”.",
+      "distractors": {
+        "They are believing": {
+          "misconception": "bentuk aktif dengan “they” yang samar dipakai bersama bentuk continuous yang keliru",
+          "whyFails": "“Believe” lazimnya tidak dipakai dalam bentuk continuous untuk anggapan umum, dan “they” tidak pernah disebut di dalam konteksnya."
+        },
+        "It believes": {
+          "misconception": "“it” diperlakukan sebagai subjek pelaku yang bisa meyakini sesuatu",
+          "whyFails": "“It” di sini hanya subjek boneka; kata itu tidak bisa meyakini sesuatu, hanya menjadi subjek bagi susunan pasifnya."
+        },
+        "Is believed": {
+          "misconception": "subjek boneka “it” yang diwajibkan pola ini dihilangkan",
+          "whyFails": "Pola pasif pelaporan tanpa pelaku menuntut “It is believed that ...”; tanpa “it”, kalimatnya kehilangan subjek."
+        }
+      }
+    },
+    "PA-006": {
+      "objective": "Memakai bentuk to pasif, yaitu to be + past participle, setelah kata kerja harapan ketika subjeknya yang dikenai tindakan",
+      "misconception": "Siswa mempertahankan bentuk to aktif setelah “expected to” walaupun subjeknya penerima tindakan, bukan pelakunya",
+      "reasoning": "kenali subjeknya sebagai penerima tindakan → pilih bentuk to pasif",
+      "rule": "Bentuk to pasif adalah to be + past participle, dipakai ketika subjek dari bentuk to itu menerima tindakannya, sering setelah expect, believe, atau report yang diikuti to.",
+      "whyCorrect": "Karena kebijakan itulah yang dikenai tindakan mengumumkan, bentuk to pasif “to be announced” diwajibkan setelah “is expected”.",
+      "whyOthersFail": "Bentuk to aktif keliru menjadikan kebijakannya sebagai pelaku, bentuk -ing tidak cocok dengan pola “expected to”, dan bentuk to pasif berkelanjutan menambahkan makna berjalan yang tidak diperlukan.",
+      "howToAvoid": "Tanyakan: bisakah subjeknya benar-benar melakukan kata kerja ini, atau ia hanya menerimanya? Kebijakan tidak bisa mengumumkan, ia diumumkan.",
+      "memoryCue": "Kebijakan itu diumumkan, bukan mengumumkan: “to be announced”.",
+      "distractors": {
+        "to announce": {
+          "misconception": "bentuk to aktif dipakai padahal subjeknya tidak mungkin melakukan pengumumannya sendiri",
+          "whyFails": "Kebijakan itu tidak mengumumkan dirinya sendiri; ia justru yang diumumkan, jadi bentuk to-nya harus pasif."
+        },
+        "announcing": {
+          "misconception": "bentuk -ing dipakai padahal setelah “expected” yang diminta pola bentuk to",
+          "whyFails": "“Expected” diikuti pelengkap berbentuk to, bukan bentuk -ing, terlepas dari aktif atau pasifnya."
+        },
+        "to be announcing": {
+          "misconception": "aspek berkelanjutan ditambahkan pada bentuk to pasif tanpa perlu",
+          "whyFails": "Bentuk ini keliru menyiratkan proses pengumuman yang berlangsung; satu pengumuman di masa depan cukup dengan bentuk to pasif sederhana."
+        }
+      }
+    },
+    "RS-005": {
+      "objective": "Menggeser keterangan waktu dan tempat dengan benar saat ucapan langsung dilaporkan di waktu atau tempat yang berbeda",
+      "misconception": "Siswa sudah benar memundurkan tense-nya tetapi lupa bahwa kata seperti today dan here juga harus ikut bergeser mengikuti konteks pelaporan yang baru",
+      "reasoning": "temukan kata waktu atau tempat di dalam ucapan yang dikutip → ubah menjadi padanan yang cocok dengan konteks pelaporannya",
+      "rule": "Di dalam kalimat pelaporan, keterangan waktu dan tempat ikut bergeser: today menjadi that day, here menjadi there, tomorrow menjadi the next day, dan yesterday menjadi the day before.",
+      "whyCorrect": "“That day” menunjuk kembali dengan tepat ke hari yang dimaksud Maria, yaitu Senin, dilihat dari sudut pandang pelaporan yang lebih belakangan.",
+      "whyOthersFail": "“Today” dan “tomorrow” terikat pada saat ucapan aslinya dan menjadi keliru begitu waktunya berlalu, sedangkan “the day” susunannya belum lengkap.",
+      "howToAvoid": "Setiap kali memundurkan kata kerja di kalimat pelaporan, periksa juga setiap kata waktu dan tempat apakah perlu ikut bergeser.",
+      "memoryCue": "Kata kerjanya mundur, “today” pun ikut menjadi “that day”.",
+      "distractors": {
+        "today": {
+          "misconception": "kata waktu aslinya dibiarkan utuh padahal waktu pelaporannya sudah berbeda",
+          "whyFails": "“Today” hanya masuk akal pada hari Senin saat ia benar-benar berbicara; sepekan kemudian kata itu justru menunjuk hari pelaporannya."
+        },
+        "tomorrow": {
+          "misconception": "kata “today” aslinya dibaca seolah menunjuk hari setelah ia berbicara",
+          "whyFails": "Maria mengatakan “today”, yang berarti hari yang sama saat ia berbicara, yaitu Senin, bukan keesokan harinya."
+        },
+        "the day": {
+          "misconception": "pergeserannya belum lengkap karena kata penunjuknya hilang",
+          "whyFails": "“The day” saja bukan keterangan waktu yang utuh di sini; bentuk gesernya butuh “that day” agar menunjuk kembali ke hari Senin itu."
+        }
+      }
+    },
+    "RS-006": {
+      "objective": "Melaporkan kalimat first conditional dengan memundurkan tense pada kedua anak kalimatnya secara serempak",
+      "misconception": "Siswa tidak memundurkan apa pun pada pengandaian yang dilaporkan, atau justru memundurkan kedua anak kalimatnya sampai menjadi third conditional",
+      "reasoning": "kenali jenis pengandaian aslinya → terapkan pola pemunduran yang tepat untuk pengandaian yang dilaporkan",
+      "rule": "First conditional yang dilaporkan: pola if + present + will berubah menjadi if + past simple + would, dengan hubungan makna yang sama, hanya mundur satu langkah.",
+      "whyCorrect": "First conditional yang dilaporkan menggeser “rains” menjadi “rained” dan “will cancel” menjadi “would cancel”, sehingga makna syarat nyata untuk masa depan tetap terjaga, hanya mundur satu langkah.",
+      "whyOthersFail": "Tanpa pemunduran, aturan pelaporan diabaikan; pemunduran penuh sampai third conditional mengubah syarat nyata menjadi pengandaian mustahil; sedangkan pemunduran separuh merusak keselarasan tense antar anak kalimat.",
+      "howToAvoid": "Mundurkan first conditional satu tingkat pada kedua anak kalimatnya sekaligus: present menjadi past, will menjadi would.",
+      "memoryCue": "First conditional yang dilaporkan: kedua anak kalimatnya mundur bersama-sama.",
+      "distractors": {
+        "rains / will cancel": {
+          "misconception": "first conditional dibiarkan tanpa pemunduran sama sekali di kalimat pelaporan",
+          "whyFails": "Kalimat pelaporan umumnya menuntut pemunduran pada anak kalimat syarat dan anak kalimat hasilnya, dari present dan will menjadi past dan would."
+        },
+        "had rained / would have cancelled": {
+          "misconception": "first conditional dimundurkan berlebihan sampai menjadi bentuk third conditional",
+          "whyFails": "Kalimat aslinya adalah first conditional yang nyata tentang masa depan, bukan pengandaian lampau, jadi tidak seharusnya menjadi “had rained / would have cancelled”."
+        },
+        "rained / will cancel": {
+          "misconception": "hanya anak kalimat syaratnya yang dimundurkan, anak kalimat hasilnya dibiarkan",
+          "whyFails": "Kedua anak kalimat pada first conditional yang dilaporkan biasanya mundur bersama; memundurkan salah satu saja membuat tense-nya tidak selaras."
+        }
+      }
+    },
+    "AR-004": {
+      "objective": "Memakai “the” di depan bentuk superlative dan kata benda yang hanya satu-satunya, berbeda dari kata benda biasa yang baru disebut dan menuntut a atau an",
+      "misconception": "Siswa memakai a atau an untuk kata benda bersuperlative atau yang hanya satu-satunya, seolah itu penyebutan pertama yang biasa",
+      "reasoning": "kenali bentuk superlative atau kata benda yang hanya satu-satunya → pilih kata sandang tertentu",
+      "rule": "Pakai “the” di depan kata sifat bentuk superlative seperti the tallest, the best, dan the most famous, serta di depan kata benda lain yang hanya satu-satunya.",
+      "whyCorrect": "Kata sifat bentuk superlative menunjuk satu hal yang unik di dalam kategorinya, dan Bahasa Inggris menandainya dengan “the”.",
+      "whyOthersFail": "“A” dan “an” memperkenalkan satu dari sekian kemungkinan, dan itu bertentangan dengan makna superlative yang menyatakan hanya ada satu; sedangkan menghilangkan kata sandangnya bukan bentuk yang baku.",
+      "howToAvoid": "Setiap kali melihat akhiran -est atau kata “most”, siapkan “the” tepat di depannya.",
+      "memoryCue": "Superlative berarti hanya ada satu, jadi memakai “the”.",
+      "distractors": {
+        "a": {
+          "misconception": "frasa bersuperlative diperlakukan sebagai penyebutan pertama yang biasa",
+          "whyFails": "Bentuk superlative menggambarkan satu hal yang unik lewat “tallest”, dan itu selalu menuntut “the”, bukan “a”."
+        },
+        "an": {
+          "misconception": "kesalahan yang sama seperti “a”, ditambah kebingungan soal bunyi vokal",
+          "whyFails": "Bentuk superlative menuntut kata sandang tertentu, tidak peduli bunyi kata setelahnya, jadi “an” tetap jenis kata sandang yang keliru di sini."
+        },
+        "(no article)": {
+          "misconception": "frasa yang berdampingan dengan nama diri dikira tidak pernah memakai kata sandang",
+          "whyFails": "Sekalipun berdampingan dengan nama diri Mount Everest, frasa “tallest mountain” tetap butuh “the” karena menyebut satu hal yang unik."
+        }
+      }
+    },
+    "AR-005": {
+      "objective": "Memasangkan kata penunjuk dengan jumlah bendanya dan dengan jaraknya, dekat atau jauh",
+      "misconception": "Siswa mencocokkan kata penunjuk dengan jaraknya tetapi melupakan jumlahnya, atau sebaliknya",
+      "reasoning": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya",
+      "rule": "Kata penunjuk memadukan jumlah dan jarak: this untuk tunggal dekat, that untuk tunggal jauh, these untuk jamak dekat, dan those untuk jamak jauh.",
+      "whyCorrect": "“Those” berbentuk jamak dan menunjuk jarak jauh, sehingga cocok dengan kata benda jamak “books” sekaligus dengan petunjuk jarak “over there”.",
+      "whyOthersFail": "Setiap pilihan lain hanya benar pada salah satu dari dua ciri itu, jumlah atau jaraknya, tidak keduanya.",
+      "howToAvoid": "Periksa dua hal secara terpisah: kata bendanya tunggal atau jamak, dan letaknya dekat atau jauh.",
+      "memoryCue": "Jamak dan jauh berarti “those”.",
+      "distractors": {
+        "this": {
+          "misconception": "kata penunjuk tunggal dekat dipakai untuk kata benda jamak yang letaknya jauh",
+          "whyFails": "“Books” berbentuk jamak dan “over there” menandakan jarak, sedangkan “this” bersifat tunggal dan dekat."
+        },
+        "that": {
+          "misconception": "jaraknya sudah cocok tetapi jumlahnya diabaikan",
+          "whyFails": "“That” memang menandakan jarak tetapi berbentuk tunggal, padahal “books” menuntut kata penunjuk jamak."
+        },
+        "these": {
+          "misconception": "jumlahnya sudah cocok tetapi petunjuk jaraknya diabaikan",
+          "whyFails": "“These” sudah cocok dengan kata benda jamaknya tetapi keliru menandakan kedekatan, dan itu bertentangan dengan “over there”."
+        }
+      }
+    },
+    "PR-004": {
+      "objective": "Memilih partikel yang tepat untuk phrasal verb yang maknanya berubah total bila partikelnya diganti",
+      "misconception": "Siswa mengira partikel setelah kata kerja dasar bisa saling menggantikan, tanpa menyadari bahwa pilihan partikel mengubah maknanya sepenuhnya",
+      "reasoning": "cocokkan makna yang dimaksud, yaitu menunda → pilih partikel yang menghasilkan makna itu bersama kata kerja ini",
+      "rule": "Partikel pada phrasal verb tidak bisa saling menggantikan; kata kerja dasar yang sama dengan partikel berbeda bisa menghasilkan makna yang sama sekali tidak berhubungan.",
+      "whyCorrect": "“Put off” khusus berarti menunda sesuatu ke waktu yang lebih belakangan, dan itu cocok dengan “until next Thursday”.",
+      "whyOthersFail": "Setiap partikel lainnya memang membentuk phrasal verb yang sah, tetapi maknanya berbeda sama sekali dan tidak cocok untuk rapat yang dijadwal ulang.",
+      "howToAvoid": "Hafalkan phrasal verb sebagai satu kesatuan utuh, misalnya put off berarti menunda, bukan sebagai kata kerja dasar ditambah partikel apa saja.",
+      "memoryCue": "“Put off” sebuah rapat berarti mendorongnya lebih jauh ke depan.",
+      "distractors": {
+        "down": {
+          "misconception": "“put down” tertukar dengan “put off”",
+          "whyFails": "“Put down” berarti meletakkan, menuliskan, atau merendahkan seseorang, dan tidak satu pun cocok dengan “until next Thursday”."
+        },
+        "up": {
+          "misconception": "“put up” tertukar dengan “put off”",
+          "whyFails": "“Put up” berarti mendirikan atau memasang sesuatu, atau bersabar menghadapi keadaan, bukan menunda rapat ke tanggal berikutnya."
+        },
+        "away": {
+          "misconception": "“put away” tertukar dengan “put off”",
+          "whyFails": "“Put away” berarti menyimpan atau merapikan sesuatu, dan itu tidak cocok dengan menjadwal ulang rapat ke waktu mendatang."
+        }
+      }
+    },
+    "PR-005": {
+      "objective": "Memasangkan kata depan gerak dengan bentuk lintasannya: ruang tertutup, permukaan datar terbuka, atau jalur memanjang",
+      "misconception": "Siswa menganggap through, across, dan along sama-sama berarti “ke arah”, tanpa memperhatikan bentuk ruang yang dilalui",
+      "reasoning": "kenali bentuk ruang yang tersirat dari kata bendanya → pilih kata depan gerak yang cocok",
+      "rule": "Through berarti menembus ruang tertutup; across berarti menyeberangi permukaan datar terbuka; along berarti menyusuri panjangnya sesuatu; over berarti melintas di atasnya.",
+      "whyCorrect": "“Through” menggambarkan gerak masuk lalu keluar di sisi lain sebuah ruang tiga dimensi yang tertutup, dan itu cocok dengan terowongan.",
+      "whyOthersFail": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan terowongan yang tertutup.",
+      "howToAvoid": "Bayangkan bentuk ruangnya: tertutup dan tiga dimensi menandakan “through”.",
+      "memoryCue": "Terowongan punya bagian dalam, jadi dilewati “through”.",
+      "distractors": {
+        "across": {
+          "misconception": "kata depan untuk permukaan datar terbuka dipakai untuk ruang tertutup tiga dimensi",
+          "whyFails": "“Across” menggambarkan gerak di atas permukaan datar seperti jalan atau lapangan, bukan gerak di dalam ruang tertutup seperti terowongan."
+        },
+        "along": {
+          "misconception": "kata depan untuk menyusuri garis memanjang dipakai untuk gerak di dalam ruang tertutup",
+          "whyFails": "“Along” menggambarkan gerak menyusuri panjangnya sesuatu seperti jalan setapak atau sungai, bukan menembus bagian dalam ruang tertutup."
+        },
+        "over": {
+          "misconception": "kata depan untuk melintas di atas dipakai untuk gerak di dalam ruangnya",
+          "whyFails": "“Over” menyiratkan gerak melewati bagian atas sesuatu, padahal terowongan itu dimasuki dan ditembus, bukan dilewati dari atas."
+        }
+      }
+    },
+    "GI-004": {
+      "objective": "Membedakan try + bentuk -ing yang berarti mencoba satu cara dari try + bentuk to yang berarti berusaha melakukan sesuatu yang sulit",
+      "misconception": "Siswa mengira “try” selalu diikuti pola yang sama, tanpa melihat apakah maksudnya berusaha keras atau mencoba satu cara",
+      "reasoning": "tentukan apakah konteksnya menyiratkan kesulitan atau percobaan satu cara → pilih pola kata kerjanya",
+      "rule": "Try + bentuk -ing berarti mencoba satu tindakan sebagai kemungkinan jalan keluar; try + bentuk to berarti berusaha melakukan sesuatu yang sulit atau menantang.",
+      "whyCorrect": "“Try restarting” berarti mencoba memulai ulang sebagai kemungkinan jalan keluar, dan itu cocok dengan saran untuk mengatasi berkas yang tidak mau terbuka.",
+      "whyOthersFail": "“Try to restart” menyiratkan memulai ulang itu sendiri sulit dilakukan, bentuk dasar tidak sah setelah “try”, dan bentuk -ing perfect keliru menyiratkan tindakannya sudah selesai.",
+      "howToAvoid": "Tanyakan: ini disodorkan sebagai kemungkinan jalan keluar yang dicoba, atau sebagai tugas sulit yang harus diperjuangkan?",
+      "memoryCue": "Saran mengatasi masalah memakai “try -ing”.",
+      "distractors": {
+        "to restart": {
+          "misconception": "“try to” yang berarti berusaha keras dipakai padahal maksudnya mencoba satu cara",
+          "whyFails": "“Try to restart” akan menyiratkan memulai ulang itu tantangan yang sulit, padahal kalimatnya menyarankan jalan keluar yang mudah untuk dicoba."
+        },
+        "restart": {
+          "misconception": "bentuk dasar dipakai setelah “try” padahal itu bukan pola yang sah",
+          "whyFails": "“Try” menuntut pelengkap berbentuk -ing atau berbentuk to, tidak pernah bentuk dasar."
+        },
+        "having restarted": {
+          "misconception": "bentuk -ing perfect dipakai sehingga tindakannya seolah sudah selesai",
+          "whyFails": "Kalimatnya menyarankan tindakan yang dicoba sekarang, bukan menunjuk sesuatu yang sudah terlanjur dilakukan."
+        }
+      }
+    },
+    "GI-005": {
+      "objective": "Melengkapi susunan too atau enough + kata sifat dengan bentuk to yang tepat beserta urutan katanya",
+      "misconception": "Siswa memakai bentuk -ing setelah too atau enough + kata sifat, atau menaruh “enough” di posisi yang keliru terhadap kata sifatnya",
+      "reasoning": "kenali susunan too atau enough + kata sifat → lengkapi dengan bentuk to pada urutan yang benar",
+      "rule": "Pola too + kata sifat + (for seseorang) + bentuk to menyatakan bahwa sesuatu terlalu bersifat demikian sehingga satu tindakan tidak mungkin dilakukan.",
+      "whyCorrect": "“Too hot to drink” memakai pola baku too + kata sifat + bentuk to untuk menunjukkan kadar yang menghalangi sebuah tindakan.",
+      "whyOthersFail": "Bentuk -ing tidak cocok pada pola tetap ini, “for drinking” menaruh kata depan yang hanya boleh berdiri di depan kata benda, sedangkan bentuk dasar menghilangkan “to” yang diwajibkan.",
+      "howToAvoid": "Hafalkan kerangkanya apa adanya: too + kata sifat + to + kata kerja.",
+      "memoryCue": "Too hot to drink — setelah “too + kata sifat” selalu menyusul “to”.",
+      "distractors": {
+        "drinking": {
+          "misconception": "bentuk -ing dipakai padahal susunan too atau enough + kata sifat menuntut bentuk to",
+          "whyFails": "Pola “too + kata sifat” dilengkapi bentuk to, bukan bentuk -ing, untuk menyatakan akibat dari kadar yang berlebihan itu."
+        },
+        "for drinking": {
+          "misconception": "kata depan disisipkan tanpa perlu sebelum bentuk kata kerjanya",
+          "whyFails": "Pola too + kata sifat + bentuk to tidak memakai “for” di depan kata kerjanya; “for” hanya dipakai di depan kata benda atau kata ganti pelaku, bukan di depan kata kerjanya."
+        },
+        "drink": {
+          "misconception": "bentuk dasar dipakai menggantikan bentuk to yang diwajibkan",
+          "whyFails": "Susunan too dan enough khusus menuntut “to” sebelum kata kerja dasarnya, bukan bentuk dasar telanjang."
+        }
+      }
+    },
+    "RC-004": {
+      "objective": "Mengenali pola formal yang memajukan kata depan di depan whom atau which, berbeda dari pola santai yang meninggalkannya di akhir anak kalimat",
+      "misconception": "Siswa mengira “who” bisa menyusul kata depan yang dimajukan sama seperti “whom”, tanpa memisahkan bentuk subjek dan bentuk objek dalam ragam formal",
+      "reasoning": "kenali penanda ragam formalnya → pilih kata penghubung bentuk objek yang cocok dengan kata depan yang dimajukan",
+      "rule": "Dalam Bahasa Inggris formal, kata depan yang dimajukan harus diikuti “whom” sebagai bentuk objek untuk orang, bukan “who” sebagai bentuk subjek; ragam santai justru meninggalkan kata depannya di akhir anak kalimat bersama “who”.",
+      "whyCorrect": "“With whom” adalah susunan formal yang benar: kata depan diikuti kata penghubung bentuk objek “whom”, dipakai untuk orang dalam ragam formal.",
+      "whyOthersFail": "“With who” memasangkan kata depan yang dimajukan dengan bentuk subjek, “who with” adalah pola santai yang meninggalkan kata depannya di akhir, dan “which” disediakan untuk bukan orang.",
+      "howToAvoid": "Setiap kali kata depan berdiri persis di depan kata penghubung, gantilah menjadi “whom” untuk orang.",
+      "memoryCue": "Kata depan di depan menuntut “whom”, bukan “who”.",
+      "distractors": {
+        "with who": {
+          "misconception": "bentuk subjek “who” dipakai setelah kata depan yang dimajukan, padahal yang diminta bentuk objek",
+          "whyFails": "Kata depan yang berdiri persis di depan kata penghubung harus diikuti bentuk objek “whom”, bukan bentuk subjek “who”."
+        },
+        "who with": {
+          "misconception": "pola santai yang meninggalkan kata depan di akhir dipakai padahal yang diminta ragam formal",
+          "whyFails": "Kalimatnya sendiri meminta ungkapan formal dengan kata depan di depan, sedangkan meninggalkan “with” di akhir adalah pola santai."
+        },
+        "which": {
+          "misconception": "kata penghubung untuk bukan orang dipakai untuk orang",
+          "whyFails": "“Which” merujuk pada benda, bukan orang, sedangkan “colleague” adalah orang yang menuntut kata penghubung untuk orang."
+        }
+      }
+    },
+    "CM-004": {
+      "objective": "Memilih “fewer” untuk kata benda jamak terhitung dan menyisakan “less” untuk kata benda tak terhitung",
+      "misconception": "Siswa memakai “less” untuk semua perbandingan jumlah tanpa melihat apakah kata bendanya terhitung",
+      "reasoning": "kelompokkan kata bendanya terhitung atau tak terhitung → pilih bentuk perbandingan jumlah yang cocok",
+      "rule": "Fewer dipakai untuk kata benda jamak terhitung; less dipakai untuk kata benda tak terhitung, dan pemakaian baku tetap menjaga pembedaan ini walaupun “less” makin sering terdengar dalam percakapan santai.",
+      "whyCorrect": "“Fewer” adalah bentuk perbandingan jumlah yang tepat untuk kata benda jamak terhitung seperti “eggs”.",
+      "whyOthersFail": "“Less”, “little”, dan “much less” semuanya bentuk untuk kata benda tak terhitung, sehingga tidak cocok dengan kata benda terhitung “eggs”.",
+      "howToAvoid": "Tanyakan: bisakah bendanya dihitung satu per satu, satu telur lalu dua telur? Kalau ya, pakai “fewer”.",
+      "memoryCue": "Telur bisa dihitung, jadi “fewer”, bukan “less”.",
+      "distractors": {
+        "less": {
+          "misconception": "bentuk perbandingan untuk benda tak terhitung dipakai pada kata benda jamak terhitung",
+          "whyFails": "“Eggs” adalah kata benda jamak terhitung, sedangkan pemakaian baku menyisakan “less” untuk benda tak terhitung seperti less sugar atau less time."
+        },
+        "little": {
+          "misconception": "kata jumlah dasar untuk benda tak terhitung dipakai menggantikan bentuk perbandingannya",
+          "whyFails": "“Little” sama sekali bukan bentuk perbandingan di sini; yang dibutuhkan “fewer” untuk kata benda terhitung."
+        },
+        "much less": {
+          "misconception": "bentuk untuk benda tak terhitung dikuatkan, bukan diganti ke bentuk untuk benda terhitung",
+          "whyFails": "Menambahkan “much” tidak menyelesaikan salah pasang keterhitungannya — “eggs” tetap menuntut “fewer”, bukan bentuk apa pun dari “less”."
+        }
+      }
+    },
+    "QN-004": {
+      "objective": "Mengenali dan menghindari penanda negatif ganda yang tidak baku, dengan memakai satu penanda negatif bersama kata ganti tak tentu",
+      "misconception": "Siswa menggabungkan kata kerja bernegatif dengan kata ganti bernegatif seperti “didn’t ... nothing”, sehingga muncul penanda negatif ganda yang tidak baku",
+      "reasoning": "kenali bahwa kata kerjanya sudah bernegatif → pilih kata ganti tak tentu yang tidak bernegatif",
+      "rule": "Bahasa Inggris baku hanya memakai satu penanda negatif dalam satu anak kalimat: kata kerja bernegatif dipasangkan dengan kata berawalan any seperti anything, anyone, dan anywhere, bukan dengan kata berawalan no.",
+      "whyCorrect": "“Anything” adalah kata ganti tak tentu tanpa penanda negatif, dan itulah yang cocok dipasangkan dengan kata kerja yang sudah dinegatifkan lewat “didn’t”.",
+      "whyOthersFail": "“Nothing” dan “no thing” sama-sama mengulang penanda negatif yang sudah ada di “didn’t”, sedangkan “something” keliru menyiratkan hasil yang positif.",
+      "howToAvoid": "Kalau kata kerjanya sudah bernegatif, ubah kata berawalan no menjadi padanannya yang berawalan any.",
+      "memoryCue": "Satu penanda negatif per anak kalimat: “didn’t ... anything”, tidak pernah “didn’t ... nothing”.",
+      "distractors": {
+        "nothing": {
+          "misconception": "kata kerja bernegatif digabung dengan kata ganti bernegatif sehingga muncul negatif ganda yang tidak baku",
+          "whyFails": "Bahasa Inggris baku menegatifkan satu anak kalimat hanya sekali; “didn’t find nothing” menggandakan penanda negatifnya."
+        },
+        "something": {
+          "misconception": "kata ganti positif dipakai padahal konteksnya negatif",
+          "whyFails": "“Something” menyiratkan ada benda tertentu yang ditemukan, dan itu bertentangan dengan “didn’t find”."
+        },
+        "no thing": {
+          "misconception": "kata ganti negatif yang seharusnya satu kata dipenggal menjadi dua",
+          "whyFails": "“Nothing” adalah satu kata yang berfungsi sebagai kata ganti negatif; memenggalnya menjadi “no thing” tidak baku dan tetap menciptakan negatif ganda bersama “didn’t”."
+        }
+      }
+    },
+    "QN-005": {
+      "objective": "Memilih susunan persetujuan singkat yang tepat untuk menyetujui pernyataan yang negatif",
+      "misconception": "Siswa memakai pola persetujuan positif “So do I” untuk menyetujui pernyataan negatif, padahal yang dibutuhkan pola negatifnya",
+      "reasoning": "kenali kutub pernyataan yang disetujui → pilih susunan persetujuan yang cocok, so atau neither",
+      "rule": "So + kata bantu + subjek menyetujui pernyataan positif; Neither atau Nor + kata bantu + subjek menyetujui pernyataan negatif.",
+      "whyCorrect": "“Neither do I” adalah susunan yang tepat untuk menyetujui pernyataan negatif, sejalan dengan “don’t enjoy” yang diucapkan A.",
+      "whyOthersFail": "“So do” dan “So does” adalah bentuk persetujuan positif yang tidak cocok untuk pernyataan negatif, sedangkan “either” tidak dipakai pada pola terbalik yang dimajukan seperti ini.",
+      "howToAvoid": "Periksa kutub kata kerja penutur pertama: pernyataan negatif berpasangan dengan Neither atau Nor, pernyataan positif dengan So.",
+      "memoryCue": "Negatif bertemu persetujuan negatif: “don’t” berjumpa “Neither do”.",
+      "distractors": {
+        "So do": {
+          "misconception": "susunan persetujuan positif dipakai untuk menyetujui pernyataan negatif",
+          "whyFails": "“So do I” dipakai untuk menyetujui pernyataan positif, sedangkan pernyataan A bernada negatif lewat “don’t enjoy”, sehingga butuh bentuk persetujuan negatif."
+        },
+        "So does": {
+          "misconception": "kutub susunannya salah sekaligus bentuk kata bantunya tidak cocok dengan subjeknya",
+          "whyFails": "Selain salah kutub untuk pernyataan negatif, “does” juga tidak sesuai dengan subjek “I”."
+        },
+        "Either do": {
+          "misconception": "“either” yang dipakai di akhir anak kalimat tertukar dengan susunan “neither” yang dimajukan",
+          "whyFails": "“Either” dipakai pada pola seperti “I don’t either”, bukan pada susunan terbalik yang dimajukan dan menuntut “neither” di awal."
+        }
+      }
+    },
+    "EC-004": {
+      "objective": "Mengenali dan membetulkan dua kalimat utuh yang disambung hanya dengan koma, dengan menambahkan kata sambung setara",
+      "misconception": "Siswa mengira koma saja sudah cukup untuk menyambung dua kalimat yang sama-sama utuh",
+      "reasoning": "kenali dua kalimat utuh yang hanya disambung koma → pilih perbaikan dengan kata sambung atau tanda baca yang tepat",
+      "rule": "Dua kalimat utuh tidak boleh disambung hanya dengan koma; tambahkan kata sambung setara setelah komanya, pakai titik koma, atau pisahkan menjadi dua kalimat.",
+      "whyCorrect": "Menambahkan kata sambung setara “so” setelah koma menyambungkan kedua kalimat utuh itu dengan benar sekaligus menyatakan hubungan sebab akibatnya.",
+      "whyOthersFail": "Membuang komanya justru membuat kalimatnya berlarian, dan menambah koma di tempat lain tidak menyentuh persoalan utamanya, yaitu dua kalimat penuh yang disambung tanpa penghubung.",
+      "howToAvoid": "Periksa kedua sisi komanya: kalau masing-masing sisi bisa berdiri sendiri sebagai kalimat utuh, penyambungnya harus lebih dari sekadar koma.",
+      "memoryCue": "Koma saja tidak bisa menyambung dua kalimat utuh — tambahkan so, and, atau but, atau pakai titik koma.",
+      "distractors": {
+        "The rain didn't stop, so we decide to cancel the picnic.": {
+          "misconception": "tense menjadi tidak selaras setelah kejadian yang sudah lampau",
+          "whyFails": "“Decide” berbentuk present, padahal kalimatnya menceritakan keputusan lampau yang sudah selesai, sehingga yang dibutuhkan “decided”."
+        },
+        "The rain didn't stop therefore, we decided to cancel the picnic.": {
+          "misconception": "“therefore” ditaruh di antara dua kalimat utuh dengan cara yang keliru",
+          "whyFails": "“Therefore” tidak bisa disisipkan di posisi ini kalau penyambung kedua kalimat utuhnya hanya sebuah koma."
+        },
+        "The rain didn't stop, we therefore decided to cancel the picnic.": {
+          "misconception": "sambungan komanya dibiarkan dan hanya ditambahi kata keterangan",
+          "whyFails": "“Therefore” tidak memperbaiki sambungan komanya; kedua kalimat utuh itu tetap hanya disambung oleh sebuah koma."
+        }
+      }
+    },
+    "EC-005": {
+      "objective": "Membedakan “affect” sebagai kata kerja yang berarti memengaruhi dari “effect” sebagai kata benda yang berarti akibat",
+      "misconception": "Siswa menganggap “affect” dan “effect” sekadar dua ejaan untuk kata yang sama, bukan dua jenis kata yang berbeda",
+      "reasoning": "kenali peran tata bahasa yang dibutuhkan, kata kerja atau kata benda → pilih kata yang cocok dengan peran itu",
+      "rule": "Affect adalah kata kerja yang berarti memengaruhi; effect adalah kata benda yang berarti akibat. Setelah modal seperti “will”, yang dibutuhkan kata kerja bentuk dasar.",
+      "whyCorrect": "“Affect” adalah kata kerja yang berarti memengaruhi, dan itulah yang dibutuhkan setelah modal “will” di kalimat ini.",
+      "whyOthersFail": "Menambahkan akhiran -s merusak pola modal + kata kerja dasar, menyisipkan “be” tidak mengubah kata benda menjadi kata kerja, dan “affection” adalah kata benda yang tidak berhubungan.",
+      "howToAvoid": "Tanyakan: posisi ini butuh kata kerja atau kata benda? Posisi setelah “will” adalah posisi kata kerja, jadi “affect”.",
+      "memoryCue": "Tindakan memakai affect sebagai kata kerja; akibat memakai effect sebagai kata benda.",
+      "distractors": {
+        "The new policy will affects thousands of employees across the company.": {
+          "misconception": "katanya sudah benar diganti “affect” tetapi ditambahi akhiran -s yang tidak perlu setelah modal",
+          "whyFails": "Setelah modal “will”, kata kerja tetap berbentuk dasar; “affects” keliru menambahkan akhiran orang ketiga tunggal."
+        },
+        "The new policy will be effect thousands of employees across the company.": {
+          "misconception": "kata benda “effect” dipertahankan dan disisipi “be” seolah itu menyelesaikan salah jenis katanya",
+          "whyFails": "Menyisipkan “be” tidak mengubah kata benda “effect” menjadi kata kerja di posisi ini; kalimatnya tetap membutuhkan kata kerja “affect”."
+        },
+        "The new policy will affection thousands of employees across the company.": {
+          "misconception": "kata benda lain yang hanya mirip bunyinya dipakai menggantikan kata kerja yang dibutuhkan",
+          "whyFails": "“Affection” berarti rasa sayang dan berjenis kata benda, bukan kata kerja yang berarti memengaruhi, jadi tidak cocok baik dari sisi susunan maupun maknanya."
+        }
+      }
+    },
+    "TA-010": {
+      "objective": "Memakai present simple, bukan present continuous atau going to, untuk kejadian yang sudah dipatok jadwal resmi, berbeda dari rencana pribadi",
+      "misconception": "Siswa langsung memakai going to atau present continuous untuk semua kejadian masa depan, tanpa melihat bahwa jadwal tetap memakai present simple",
+      "reasoning": "kenali jadwal yang dipatok pihak luar, bukan keputusan pribadi → pilih present simple untuk masa depan yang terjadwal",
+      "rule": "Present simple menggambarkan kejadian masa depan yang sudah dipatok oleh jadwal, acara, atau kalender, terlepas dari niat pribadi siapa pun.",
+      "whyCorrect": "Present simple dipakai untuk jadwal tetap, dan itu cocok dengan keterangan “according to the timetable”.",
+      "whyOthersFail": "Present continuous cocok untuk janji pribadi, going to cocok untuk niat atau ramalan, sedangkan future perfect menggambarkan sesuatu yang sudah selesai sebelum titik waktu berikutnya, bukan kejadiannya sendiri.",
+      "howToAvoid": "Tanyakan: kejadian ini dipatok oleh jadwal resmi, atau rencana pribadi seseorang?",
+      "memoryCue": "Jadwal berbicara dengan present simple: “the train leaves at 6:45”.",
+      "distractors": {
+        "is leaving": {
+          "misconception": "present continuous yang lekat dengan janji pribadi dipakai untuk jadwal resmi dari pihak luar",
+          "whyFails": "Present continuous lazimnya menyatakan janji yang dibuat seseorang, bukan jadwal tetap yang dipatok pihak luar."
+        },
+        "is going to leave": {
+          "misconception": "going to yang menyatakan niat atau ramalan dipakai untuk jadwal resmi",
+          "whyFails": "“Going to” menyatakan rencana atau ramalan berdasarkan tanda-tanda sekarang, bukan fakta terjadwal yang berdiri lepas dari niat siapa pun."
+        },
+        "will have left": {
+          "misconception": "future perfect dipakai padahal bentuk itu menyatakan selesai sebelum satu titik acuan, bukan keberangkatan terjadwalnya",
+          "whyFails": "Future perfect akan menyatakan keretanya sudah berangkat sebelum satu waktu tertentu, bukan menyebut jam keberangkatannya."
+        }
+      }
+    },
+    "b4_001": {
+      "objective": "Siswa memilih future perfect continuous untuk menyatakan lamanya waktu yang terkumpul sampai satu titik acuan di masa depan",
+      "misconception": "Siswa langsung memakai future continuous atau future perfect simple padahal yang diminta adalah lamanya waktu sampai satu titik",
+      "reasoning": "temukan patokan waktunya di masa depan, lalu periksa apakah kalimatnya menanyakan lamanya atau tuntasnya",
+      "rule": "Pakai will have been + kata kerja -ing ketika lamanya waktu dihitung sampai satu titik tertentu di masa depan.",
+      "whyCorrect": "Future perfect continuous berbentuk will have been + kata kerja -ing menonjolkan lamanya satu kegiatan yang terus berjalan sampai satu titik tertentu di masa depan.",
+      "whyOthersFail": "Future continuous menandai satu saat yang sedang berjalan, sedangkan future perfect simple menandai tuntasnya, bukan lamanya yang terus berjalan.",
+      "howToAvoid": "Tanyakan: apakah kalimatnya menghitung “berapa lama” sampai satu titik di masa depan? Kalau ya, pakai future perfect continuous.",
+      "memoryCue": "Lamanya waktu ditambah batas di masa depan berarti will have been + kata kerja -ing.",
+      "distractors": {
+        "will be working": {
+          "misconception": "future continuous yang menandai satu saat berjalan tertukar dengan future perfect continuous yang menghitung lamanya",
+          "whyFails": "Bentuk ini menggambarkan tindakan yang sedang berjalan pada satu saat, bukan lamanya waktu yang terkumpul sampai ia pensiun."
+        },
+        "will have worked": {
+          "misconception": "future perfect simple yang menekankan tuntasnya tertukar dengan future perfect continuous yang menekankan lamanya",
+          "whyFails": "Bentuk ini menonjolkan bahwa pekerjaannya tuntas, bukan lamanya, padahal keterangan “over two decades” justru meminta lamanya."
+        },
+        "will work": {
+          "misconception": "kalimatnya dianggap ramalan masa depan biasa, dan patokan “by the time” diabaikan",
+          "whyFails": "Bentuk masa depan sederhana sama sekali tidak menghubungkan lamanya tindakan itu dengan titik acuan di masa depan."
+        }
+      }
+    },
+    "b4_002": {
+      "objective": "Siswa membedakan past perfect sebagai kilas balik sebelum alur utama dari past simple sebagai rangkaian kejadian di alur utama",
+      "misconception": "Siswa memakai past simple untuk semua kejadian lampau di dalam cerita, sehingga bedanya kilas balik dan urutan maju hilang",
+      "reasoning": "tentukan kejadian mana yang lebih dulu terhadap alur utama cerita, lalu tandai dengan past perfect",
+      "rule": "Pakai past perfect untuk kejadian yang lebih dulu di antara dua kejadian lampau ketika urutannya perlu ditegaskan.",
+      "whyCorrect": "Past perfect menandai keberangkatan keretanya sudah selesai sebelum si penutur tiba, yaitu kejadian yang lebih dulu di antara keduanya.",
+      "whyOthersFail": "Past simple meratakan garis waktunya, past continuous menyiratkan tindakan yang belum tuntas, dan present perfect merusak bingkai lampau kalimatnya.",
+      "howToAvoid": "Gambarkan garis waktunya: kejadian lampau mana pun yang lebih dulu, itulah yang memakai past perfect.",
+      "memoryCue": "Kejadian lampau yang lebih dulu memakai had + past participle.",
+      "distractors": {
+        "left": {
+          "misconception": "kedua kejadian diperlakukan setara sebagai rangkaian past simple",
+          "whyFails": "Bentuk ini gagal menandai keberangkatan keretanya terjadi sebelum kedatangannya, sehingga kilas baliknya menyatu ke alur utama."
+        },
+        "was leaving": {
+          "misconception": "past continuous yang menandai tindakan berjalan tertukar dengan kejadian yang sudah tuntas lebih dulu",
+          "whyFails": "Bentuk ini berarti keretanya sedang dalam proses berangkat pada saat itu, dan itu bertentangan dengan “had to wait”."
+        },
+        "has left": {
+          "misconception": "present perfect dipakai sehingga tense berorientasi masa kini masuk ke dalam cerita lampau",
+          "whyFails": "Present perfect tidak bisa digabung dengan kerangka waktu lampau seperti “when I arrived”."
+        }
+      }
+    },
+    "b4_003": {
+      "objective": "Siswa mengenali bahwa kata kerja keadaan seperti belong, believe, dan own lazimnya menolak bentuk berkelanjutan walaupun konteksnya sekarang",
+      "misconception": "Siswa menerapkan aturan “sekarang berarti continuous” secara mekanis ke semua kata kerja, termasuk kata kerja keadaan",
+      "reasoning": "kelompokkan kata kerjanya sebagai kata kerja keadaan atau kata kerja tindakan sebelum memilih bentuk sederhana atau berkelanjutan",
+      "rule": "Kata kerja keadaan seperti belong, own, believe, know, dan prefer lazimnya tidak dipakai dalam bentuk berkelanjutan.",
+      "whyCorrect": "“Belong” menggambarkan keadaan kepemilikan yang menetap, jadi yang dibutuhkan present simple, tidak peduli konteksnya menunjuk saat ini.",
+      "whyOthersFail": "Bentuk berkelanjutan cocok untuk tindakan yang sedang berproses, sedangkan “belong” tidak punya proses seperti itu dan juga tidak dipakai dalam bentuk pasif.",
+      "howToAvoid": "Sebelum menambahkan -ing, periksa apakah kata kerjanya menggambarkan keadaan seperti perasaan, kepemilikan, atau pendapat, bukan tindakan.",
+      "memoryCue": "Keadaan tidak berproses — belong, own, dan believe tidak memakai -ing.",
+      "distractors": {
+        "is belonging": {
+          "misconception": "waktu sekarang dianggap selalu menuntut present continuous",
+          "whyFails": "“Belong” adalah kata kerja keadaan yang menyatakan hubungan menetap, bukan tindakan yang sedang berproses, jadi tidak bisa berbentuk berkelanjutan."
+        },
+        "belonged": {
+          "misconception": "berpindah ke bentuk lampau padahal konteksnya berlaku sekarang",
+          "whyFails": "Rumah itu masih milik mereka sampai sekarang, jadi bentuk lampau bertentangan dengan keadaan yang masih berlangsung."
+        },
+        "is being belonged": {
+          "misconception": "susunan pasif berkelanjutan dipaksakan pada kata kerja keadaan yang tidak berobjek",
+          "whyFails": "“Belong” sama sekali tidak dipakai dalam bentuk pasif, dan kata kerja keadaan juga menolak bentuk berkelanjutan."
+        }
+      }
+    },
+    "b4_004": {
+      "objective": "Siswa memakai could have + past participle untuk menyatakan peluang lampau yang tidak jadi diambil, berbeda dari bentuk yang menyatakan kewajiban",
+      "misconception": "Siswa mempertukarkan “could have” yang menyebut peluang terlewat dengan “should have” yang menegur, atau dengan “was able to” yang menyatakan kemampuan",
+      "reasoning": "tentukan apakah kalimatnya menyebut pilihan yang tersedia tetapi tidak diambil, bukan nasihat atau kemampuan yang terlaksana",
+      "rule": "Could have + past participle berarti kemungkinan di masa lalu yang tidak jadi terjadi.",
+      "whyCorrect": "“Could have taken” menyatakan pekerjaan itu benar-benar tersedia sebagai pilihan di masa lalu, tetapi tidak diambil.",
+      "whyOthersFail": "Should have menyiratkan teguran, were able to menyiratkan tindakannya terlaksana, dan can berbentuk present.",
+      "howToAvoid": "Tanyakan: kalimatnya sekadar menyebut pilihan yang tidak diambil, atau menilai keputusannya? Kalau sekadar menyebut, pakai could have.",
+      "memoryCue": "Could have berarti pintunya terbuka, tetapi tidak ada yang melewatinya.",
+      "distractors": {
+        "should have taken": {
+          "misconception": "peluang yang terlewat tertukar dengan nasihat atau teguran setelah kejadian",
+          "whyFails": "Kalimatnya tidak menegur pilihannya, hanya menyatakan peluangnya ada dan ditolak, dan itu tugas “could have”, bukan “should have”."
+        },
+        "were able to take": {
+          "misconception": "menyatakan kemungkinan lampau tertukar dengan melaporkan kemampuan yang benar-benar terlaksana",
+          "whyFails": "“Were able to” menyiratkan tindakannya benar-benar dilakukan, dan itu bertentangan dengan “you turned it down”."
+        },
+        "can take": {
+          "misconception": "modal bentuk present dipakai untuk keadaan lampau yang hanya dibayangkan",
+          "whyFails": "Seluruh kejadiannya sudah lampau karena tawaran dan penolakannya sudah terjadi, sehingga modal bentuk present tidak selaras waktunya."
+        }
+      }
+    },
+    "b4_005": {
+      "objective": "Siswa memilih “may” di atas “can” pada konteks pemberian izin yang resmi",
+      "misconception": "Siswa menganggap “can” dan “may” bisa saling menggantikan sepenuhnya tanpa melihat ragam bahasanya",
+      "reasoning": "kenali tingkat keresmian yang ditandai konteksnya, misalnya pengumuman resmi → pilih modal izin yang sepadan",
+      "rule": "Pakai “may” untuk izin dalam ragam resmi; “can” lazim untuk izin dalam percakapan santai.",
+      "whyCorrect": "“May” adalah modal yang lazim untuk memberi izin dalam ragam resmi atau tulisan resmi.",
+      "whyOthersFail": "“Can” terlalu santai untuk ragam ini, sedangkan “could” dan “might” menggeser maknanya menjadi kemungkinan, bukan izin.",
+      "howToAvoid": "Periksa ragam bahasanya: izin resmi dan tertulis lebih memilih “may” daripada “can”.",
+      "memoryCue": "Pengumuman resmi memakai modal resmi: “may”.",
+      "distractors": {
+        "can": {
+          "misconception": "“can” dikira sama diterimanya di dalam pengumuman izin yang resmi",
+          "whyFails": "Walaupun sah dalam percakapan, “can” terdengar terlalu santai untuk pengumuman resmi; “may” adalah pilihan resmi yang lazim."
+        },
+        "could": {
+          "misconception": "bentuk lampau atau bentuk ragu dari “can” dipakai untuk aturan yang berlaku sekarang",
+          "whyFails": "“Could” melunak menjadi pengandaian atau makna lampau, dan itu tidak cocok untuk aturan yang sedang berlaku."
+        },
+        "might": {
+          "misconception": "izin resmi tertukar dengan kemungkinan yang lemah",
+          "whyFails": "“Might” menyatakan ketidakpastian tentang kemungkinan, bukan pemberian izin resmi."
+        }
+      }
+    },
+    "b4_006": {
+      "objective": "Siswa mengenali susunan pengandaian formal Were + subjek + bentuk to sebagai padanan “If I were to”",
+      "misconception": "Siswa menyisipkan “if” ke dalam anak kalimat yang sudah dibalik, atau salah menyusun urutan pembalikannya",
+      "reasoning": "kenali pola pengandaian terbalik → lengkapi tanpa “if” yang mubazir",
+      "rule": "Second conditional yang formal bisa dibalik menjadi Were + subjek + bentuk to, menggantikan “if”.",
+      "whyCorrect": "“Were I to resign” adalah bentuk formal terbalik dari “If I were to resign”, dengan “were” dimajukan ke depan.",
+      "whyOthersFail": "Mengembalikan “if”, menghilangkan pembalikannya, atau memakai “was” sama-sama merusak pola pengandaian terbalik yang sudah baku.",
+      "howToAvoid": "Perlakukan pembalikan sebagai pengganti utuh dari “if” — jangan pernah memakai keduanya sekaligus.",
+      "memoryCue": "Were I to ... adalah bentuk formal terbalik dari “If I were to ...”.",
+      "distractors": {
+        "If were I to": {
+          "misconception": "“if” ditambahkan pada susunan yang sudah menandai pengandaian lewat pembalikan",
+          "whyFails": "Pengandaian terbalik menggantikan “if” dengan pembalikan subjek dan kata kerja; memakai keduanya sekaligus mubazir dan tidak sah."
+        },
+        "I were to": {
+          "misconception": "pembalikannya dihilangkan sehingga tersisa penggalan tanpa “if”",
+          "whyFails": "Tanpa “if” maupun pembalikan dengan kata kerja di depan, anak kalimatnya sama sekali tidak ditandai sebagai pengandaian."
+        },
+        "Was I to": {
+          "misconception": "“was” dipakai menggantikan “were” yang diwajibkan pada pembalikan pengandaian formal",
+          "whyFails": "Second conditional terbalik yang formal menuntut “were”, bukan “was”, apa pun subjeknya."
+        }
+      }
+    },
+    "b4_007": {
+      "objective": "Memakai present simple, bukan “will”, di dalam anak kalimat waktu yang dibuka when, as soon as, before, atau after",
+      "misconception": "Siswa menaruh “will” di kedua anak kalimat karena kedua kejadiannya sama-sama di masa depan",
+      "reasoning": "temukan kata penghubung waktunya → biarkan anak kalimat itu berbentuk present simple → taruh penanda masa depannya di induk kalimat",
+      "rule": "Di anak kalimat waktu bersama when, as soon as, before, after, until, atau once, pakai present simple di anak kalimat itu dan penanda masa depan di induk kalimatnya.",
+      "whyCorrect": "“Arrives” berbentuk present simple, dan itulah bentuk yang diwajibkan setelah “as soon as” walaupun kedatangannya di masa depan.",
+      "whyOthersFail": "“Will arrive” menggandakan penanda masa depan di anak kalimat, sedangkan “arrived” dan “would arrive” memasukkan garis waktu yang tidak ada di kalimat ini.",
+      "howToAvoid": "Lingkari dulu kata penghubung waktunya. Kalau kata itu membuka anak kalimat waktu, biarkan anak kalimat itu berbentuk present simple.",
+      "memoryCue": "Makna masa depan setelah “as soon as” tetap memakai present simple: as soon as it arrives.",
+      "distractors": {
+        "will arrive": {
+          "misconception": "penanda masa depan digandakan di dalam anak kalimat waktu",
+          "whyFails": "Setelah “as soon as”, Bahasa Inggris lazimnya memakai present simple untuk makna masa depan; “will” adalah milik induk kalimat."
+        },
+        "arrived": {
+          "misconception": "anak kalimat waktunya digeser menjadi kejadian lampau yang sudah selesai",
+          "whyFails": "Menelepon dan kedatangannya sama-sama masih di masa depan, jadi past simple tidak cocok dengan garis waktunya."
+        },
+        "would arrive": {
+          "misconception": "rangkaian masa depan yang nyata diperlakukan sebagai pengandaian atau masa depan dari sudut masa lalu",
+          "whyFails": "Tidak ada bagian konteksnya yang menciptakan syarat tidak nyata atau bingkai pelaporan lampau yang menuntut “would”."
+        }
+      }
+    },
+    "b4_008": {
+      "objective": "Siswa membedakan pola menyuruh have something done dari kalimat pasif biasa",
+      "misconception": "Siswa memakai pasif biasa padahal kalimatnya menuntut pola menyuruh untuk menunjukkan subjeknya yang mengatur pekerjaan itu",
+      "reasoning": "periksa apakah subjeknya sendiri yang mengatur jasa untuk dikerjakan atas namanya, karena itu menuntut pola menyuruh",
+      "rule": "Pola menyuruh: subjek + have atau get + objek + past participle, berarti mengatur agar sebuah jasa dikerjakan.",
+      "whyCorrect": "“Had our roof repaired” memakai pola menyuruh berupa have + objek + past participle, yang menunjukkan kami mengatur orang lain untuk memperbaikinya.",
+      "whyOthersFail": "Pilihan lainnya bukan bentuk menyuruh yang sah, atau bertabrakan dengan kerangka waktu lampau dan kesesuaian subjeknya.",
+      "howToAvoid": "Kalau subjeknya tidak mengerjakan sendiri melainkan mengaturnya, pakai have atau get + objek + past participle.",
+      "memoryCue": "Have + bendanya + bentuk done berarti ada orang lain yang dibayar atau diminta mengerjakannya.",
+      "distractors": {
+        "were": {
+          "misconception": "kalimatnya diperlakukan sebagai pasif biasa, bukan pola menyuruh",
+          "whyFails": "“Were roof repaired” bukan susunan pasif yang sah; pola menyuruh menuntut “had” + objek + past participle untuk menunjukkan subjeknya yang mengatur."
+        },
+        "have been": {
+          "misconception": "kata bantu pasif present perfect masuk ke kalimat menyuruh yang berkerangka lampau",
+          "whyFails": "“Have been” tidak cocok dengan penanda waktu lampau “last week” dan juga bukan pola kata bantu untuk menyuruh."
+        },
+        "was": {
+          "misconception": "mencoba pasif past simple tetapi salah kesesuaian subjek sekaligus salah susunan",
+          "whyFails": "“We was” salah kesesuaian subjeknya, dan pasif biasa tetap tidak menangkap makna mengatur orang lain."
+        }
+      }
+    },
+    "b4_009": {
+      "objective": "Siswa menyusun pasif pelaporan tanpa pelaku “It is believed that ...” dan membedakannya dari pasif berorang “He is believed to ...”",
+      "misconception": "Siswa mencampur kedua pola pasif pelaporan itu sehingga muncul susunan campuran yang tidak sah",
+      "reasoning": "tentukan apakah subjek kalimatnya “it” yang tanpa pelaku atau orang yang dibicarakan, lalu terapkan susunan yang cocok",
+      "rule": "Pasif pelaporan berorang: Subjek + is atau are + believed, thought, atau said + bentuk to, bukan “that”.",
+      "whyCorrect": "“The suspect is believed to have left ...” adalah pola pasif berorang: orangnya, lalu is believed, lalu bentuk to.",
+      "whyOthersFail": "Menyisipkan “that”, menambahkan “it” kedua sebagai subjek, atau menghilangkan kata bantunya sama-sama merusak pola pasif berorang yang sudah baku.",
+      "howToAvoid": "Kalau orangnya sudah menjadi subjek, lanjutkan dengan “to + kata kerja”, jangan pernah dengan “that” atau “it” kedua.",
+      "memoryCue": "Orangnya + is believed + to, bukan “that”.",
+      "distractors": {
+        "is believed that": {
+          "misconception": "pola pasif berorang dicampur dengan pola anak kalimat “that” yang tanpa pelaku",
+          "whyFails": "Begitu orangnya menjadi subjek lewat “The suspect is believed ...”, susunannya harus dilanjutkan dengan bentuk to, bukan dengan “that”."
+        },
+        "it is believed to": {
+          "misconception": "“it” tanpa pelaku ditambahkan padahal kalimatnya sudah punya subjek berorang",
+          "whyFails": "“It” akan menggandakan peran subjek yang sudah diisi “the suspect”, sehingga satu anak kalimat punya dua subjek."
+        },
+        "believed to": {
+          "misconception": "kata bantu pasif “is” dihilangkan sama sekali",
+          "whyFails": "Tanpa “is”, tidak ada kata kerja bertense yang menopang susunan pasifnya, sehingga kalimatnya menjadi tidak utuh."
+        }
+      }
+    },
+    "b4_010": {
+      "objective": "Siswa memundurkan modal “can” menjadi “could” dengan benar saat melaporkan ucapan di dalam bingkai pelaporan lampau",
+      "misconception": "Siswa membiarkan “can” apa adanya di kalimat pelaporan, tanpa memperhatikan kata kerja pelapornya yang berbentuk lampau",
+      "reasoning": "kenali tense kata kerja pelapornya yang lampau lalu terapkan pemunduran modal can menjadi could",
+      "rule": "Di dalam kalimat pelaporan setelah kata kerja pelapor berbentuk lampau, can berubah menjadi could.",
+      "whyCorrect": "“Could” adalah bentuk mundur yang tepat dari “can” ketika kata kerja pelapornya berbentuk lampau.",
+      "whyOthersFail": "Membiarkan “can” berarti mengabaikan aturan pemunduran, sedangkan “cans” dan “will can” sama sekali bukan bentuk modal yang sah.",
+      "howToAvoid": "Periksa dulu tense kata kerja pelapornya, baru terapkan tabel pemunduran modalnya.",
+      "memoryCue": "Ada “said”, maka can menjadi could, tidak pernah “cans” atau dua modal berjajar.",
+      "distractors": {
+        "can": {
+          "misconception": "modal dikira tidak perlu ikut mundur di kalimat pelaporan",
+          "whyFails": "Dengan kata kerja pelapor berbentuk lampau seperti “said”, “can” lazimnya mundur menjadi “could” dalam kalimat pelaporan baku."
+        },
+        "cans": {
+          "misconception": "modal diperlakukan seperti kata kerja biasa yang menerima akhiran -s untuk orang ketiga",
+          "whyFails": "Kata modal tidak pernah menerima akhiran -s; bentuk seperti ini tidak ada dalam Bahasa Inggris."
+        },
+        "will can": {
+          "misconception": "dua modal ditumpuk berjajar",
+          "whyFails": "Bahasa Inggris tidak membolehkan dua kata modal berurutan, sehingga “will” dan “can” tidak bisa digabung seperti ini."
+        }
+      }
     }
   }
 }
