@@ -99,7 +99,7 @@
       "level": "A1",
       "mode": "guided_response",
       "instruction": "Jawab dalam bahasa Inggris: perkenalkan nama dan kegiatan sekolahmu secara singkat.",
-      "sampleAnswer": "My name is Jahran. I am a high school student.",
+      "sampleAnswer": "My name is {name}. I am a high school student.",
       "requiredKeywords": [
         "name",
         "student"
