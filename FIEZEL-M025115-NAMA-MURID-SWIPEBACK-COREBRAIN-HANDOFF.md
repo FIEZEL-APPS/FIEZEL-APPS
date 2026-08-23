@@ -240,3 +240,44 @@ kode `brain_optimal_challenge` / `brain_trend_plateau` / `brain_memory_at_risk`.
 - Seluruh gate `quality.yml` hijau, termasuk `library-integrity-test.js` yang datang
   bersama `main`. Penanda rilis dinaikkan bersama ke `m025-115` (`main` sudah memakai
   `m025-114` untuk PR #165).
+
+---
+
+## Status rilis — DRAFT, menunggu OWNER
+
+PR #166 sengaja **draft**. Dua job merah di CI, dan keduanya perlu dicatat di sini supaya
+tidak dibaca ulang sebagai kegagalan rilis ini.
+
+### `A12 Evidence Gatekeeper` — kontrol yang bekerja sebagaimana mestinya
+
+A12 memblokir PR yang menyentuh jalur suara/Classroom bila ia BUKAN draft dan tidak membawa
+`<!-- FIEZEL_PHYSICAL_ACCEPTANCE: ACCEPTED -->` atau `WAIVED_BY_OWNER`. Rilis ini menyentuh
+`features/tutor-classroom/**` dan `features/neural-voice/fiezel-diag-panel.js`, jadi ia
+memang termasuk.
+
+Penandanya **tidak** ditambahkan, dan itu keputusan yang disengaja: penanda itu adalah
+pernyataan OWNER bahwa rilis sudah dicoba di perangkat sungguhan. Menuliskannya dari sisi
+yang mengerjakan patch berarti membatalkan justru kontrol yang A12 jaga — gerbang yang bisa
+dibuka sendiri oleh yang lewat bukan gerbang. Jalan yang sah sudah disediakan gate itu
+sendiri: PR draft menghasilkan `HOLD_DRAFT` (peringatan, bukan galat).
+
+**Yang dibutuhkan dari OWNER:** coba rilis ini di perangkat — terutama empat skenario
+swipe-back di bagian 1, langkah nama di perkenalan, dan suara Classroom — lalu tandai
+penerimaannya. Sesudah itu PR bisa keluar dari draft.
+
+### `audiobook-safari` — sudah rusak sebelum rilis ini
+
+Gagal dalam 7 detik pada `cd vendor/supertonic-3: No such file or directory`. Direktori itu
+**dihapus dari repo di m025-100** (`8a69bd0`, "mesin lokal dihapus") dan tidak ada di `main`
+maupun di cabang ini. Rilis ini tidak menyentuh `vendor/` sama sekali.
+
+Buktinya bukan dugaan: **PR #165 juga merah pada job yang sama** dan tetap di-merge. Gate itu
+berjalan pada setiap PR yang menyentuh `features/library/**` atau `features/neural-voice/**`,
+jadi ia sudah rusak untuk seluruh PR semacam itu sejak m025-100.
+
+**Usulan, dikerjakan terpisah** supaya perbaikan CI tidak tercampur ke rilis produk:
+`.github/workflows/m02547-neural-library-safari.yml` dan `m02526-product-neural-safari.yml`
+dihapus atau dinonaktifkan. Keduanya menguji mesin suara lokal yang memang sengaja dibuang di
+m025-100; gate yang menguji sesuatu yang tidak lagi dikirim tidak menjaga apa pun, dan merah
+permanennya justru melatih orang mengabaikan CI - persis kebiasaan yang membuat kerusakan
+Perpustakaan di bagian 0 lolos selama beberapa commit.
