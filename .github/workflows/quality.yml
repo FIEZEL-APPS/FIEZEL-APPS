@@ -79,6 +79,7 @@ jobs:
           node pwa-startup-white-screen-recovery-test.js
           node http-smoke-test.js
           node speaking-listening-test.js
+          node check-listening-similarity.js
           node search-feedback-test.js
           node diag-panel-test.js
           node diag-search-test.js
