@@ -1,7 +1,7 @@
 {
  "schemaVersion": 1,
  "note": "Diagnosis Indonesia untuk tiap nama miskonsepsi di grammar-templates.json. Kunci = nama miskonsepsi apa adanya dari bank soal (bahasa Inggris, tidak pernah ditampilkan ke murid). Nilai = klausa Indonesia berhuruf kecil di awal, dirangkai sebagai `\"pilihan\" <klausa>` di panel jawaban dan sebagai `Ini yang bikin pilihan tadi gagal - <klausa>` oleh tutor.",
- "count": 386,
+ "count": 416,
  "diagnoses": {
   "adds a dummy cleft subject and creates two competing subjects": "menambahkan 'it' padahal klausa what- sudah menjadi subjeknya, jadi kalimat itu punya dua subjek yang saling berebut.",
   "adds emphatic do but does not invert it with the subject": "sudah memakai auxiliary penegas, tetapi lupa memindahkannya ke depan subjek, jadi inversinya belum terjadi.",
@@ -388,6 +388,36 @@
   "using present continuous, associated with personal arrangements, for a fixed external timetable": "memakai bentuk untuk janji pribadi, padahal ini jadwal tetap yang ditentukan pihak lain.",
   "using present-tense future modal inside a past narrative frame": "memakai modal masa depan berpijak sekarang, padahal seluruh kalimat berlatar lampau.",
   "using simple past for a state that must be shown as prior to another past moment": "memakai bentuk lampau biasa, sehingga tidak terlihat bahwa itu terjadi lebih dulu dan menyebabkan keadaan sesudahnya.",
-  "wrongly applies future perfect, implying the dinner is finished by 8pm": "menandainya sudah selesai pada jam itu, padahal kalimat menyatakan justru sedang berlangsung saat itu."
- }
+  "wrongly applies future perfect, implying the dinner is finished by 8pm": "menandainya sudah selesai pada jam itu, padahal kalimat menyatakan justru sedang berlangsung saat itu.",
+  "consonant-letter shortcut": "memilih artikel berdasarkan huruf konsonan, bukan bunyi awal kata yang sebenarnya terdengar.",
+  "specific-article overuse": "memakai penentu khusus untuk benda yang belum jelas atau belum pernah disebut sebelumnya.",
+  "plural-or-uncountable quantifier": "menyamakan benda jamak dengan benda yang tidak dapat dihitung, sehingga jumlah penentunya keliru.",
+  "plural-form transfer": "memindahkan akhiran jamak ke kata yang bentuk jamaknya tidak mengikuti pola biasa.",
+  "be-verb substitution": "mengganti kata kerja utama dengan bentuk penghubung, padahal kalimat membutuhkan tindakan.",
+  "double-auxiliary construction": "menumpuk dua kata bantu dalam satu posisi, padahal cukup satu penanda waktu atau pertanyaan.",
+  "missing-past-marking": "menghilangkan tanda lampau meskipun keterangan waktunya menunjukkan kejadian yang sudah selesai.",
+  "third-person-present form": "lupa menyesuaikan bentuk kata kerja untuk subjek orang ketiga tunggal pada waktu kini.",
+  "progressive-form substitution": "memakai bentuk sedang berlangsung ketika konteks hanya menyatakan kebiasaan atau fakta.",
+  "singular-past transfer": "membawa bentuk tunggal ke subjek jamak pada cerita lampau, sehingga kesesuaian jumlahnya rusak.",
+  "present-tense substitution": "mengganti latar lampau dengan bentuk kini walaupun kejadian sudah dikunci oleh waktu sebelumnya.",
+  "bare-infinitive substitution": "memakai bentuk dasar setelah penanda yang menuntut bentuk lampau atau bentuk sedang berlangsung.",
+  "simple-s-overgeneralization": "menambahkan akhiran s pada semua subjek, termasuk subjek yang tidak memerlukannya.",
+  "add-es-without-spelling-change": "menambahkan es tanpa mengikuti perubahan ejaan yang diperlukan oleh akhir kata kerja.",
+  "singular-retention": "mempertahankan bentuk tunggal setelah penentu atau angka yang jelas meminta bentuk jamak.",
+  "container-reading": "memilih kata depan seolah-olah lokasi berada di dalam wadah, padahal maksudnya titik atau permukaan.",
+  "point-location-overuse": "memakai kata depan titik untuk tempat yang sebenarnya menunjukkan ruang atau area.",
+  "movement-preposition-substitution": "memilih kata depan gerak yang tidak menunjukkan jalur perpindahan dalam kalimat.",
+  "bare-verb-without-auxiliary": "menaruh kata kerja utama langsung dalam pertanyaan atau sangkalan tanpa kata bantu yang diperlukan.",
+  "present-simple-habit": "membaca kejadian yang sedang berlangsung sebagai kebiasaan rutin, bukan tindakan yang terlihat sekarang.",
+  "missing-be-auxiliary": "menghilangkan kata bantu penghubung yang dibutuhkan sebelum pelaku atau keterangan dalam pola ini.",
+  "thing-question substitution": "memakai kata tanya benda untuk menanyakan orang, sehingga sasaran pertanyaannya berubah.",
+  "time-question substitution": "memakai kata tanya waktu padahal kalimat sedang mencari alasan atau penyebab.",
+  "reason-question substitution": "memakai kata tanya alasan ketika informasi yang diminta sebenarnya adalah waktu.",
+  "positive-quantifier-in-negative": "memakai penentu positif dalam kalimat sangkalan, padahal maknanya membutuhkan jumlah yang terbatas.",
+  "singular-article-with-uncountable": "memasang artikel tunggal pada kata benda yang tidak dapat dihitung sebagai satu unit.",
+  "countable-quantity-substitution": "memilih penentu jumlah untuk benda yang dapat dihitung ketika kata bendanya bersifat massa.",
+  "subject-pronoun-before-noun": "memakai kata ganti pelaku sebelum kata benda, padahal posisi itu membutuhkan penentu kepemilikan.",
+  "stand-alone-possessive-before-noun": "memakai bentuk kepemilikan mandiri tepat sebelum kata benda yang masih harus diterangkan.",
+  "object-pronoun-substitution": "memakai kata ganti penerima setelah subjek, padahal posisi itu membutuhkan bentuk pelaku."
+}
 }

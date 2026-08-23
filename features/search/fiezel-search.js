@@ -170,10 +170,12 @@
    * @param {string} query
    * @returns {{query:string, tags:string[], results:Array, empty:boolean}}
    */
-  function search(index, query) {
+  function search(index, query, activeLevel) {
     var q = String(query == null ? '' : query).trim();
     var tags = conceptTags(q);
+    var level = String(activeLevel || '').trim().toUpperCase();
     var list = Array.isArray(index) ? index : [];
+    if (/^(?:A1|A2|B1|B2|C1|C2)$/.test(level)) list = list.filter(function (entry) { return !entry.level || entry.level === level; });
 
     var scored = [];
     for (var i = 0; i < list.length; i++) {
@@ -223,6 +225,7 @@
       push(out, {
         id: String(n.id || n.subskill || ''),
         view: 'grammar',
+        level: String(n.level || n.cefr || ''),
         title: String(n.subskill || n.family || '').replace(/[_-]+/g, ' '),
         label: [n.family, n.subskill].filter(Boolean).join(' '),
         text: [n.stem, n.pedagogicalObjective, n.explanation].filter(Boolean).join(' ')
@@ -234,6 +237,7 @@
       push(out, {
         id: String(n.id || n.word),
         view: 'vocab',
+        level: String(n.level || n.cefr || ''),
         title: String(n.word),
         label: String(n.partOfSpeech || ''),
         text: [n.meaning, n.example].filter(Boolean).join(' ')
@@ -245,6 +249,7 @@
       push(out, {
         id: String(n.id || n.passageId || ''),
         view: 'reading',
+        level: String(n.level || n.cefr || ''),
         title: String(n.title || n.passageId || ''),
         label: String(n.topic || n.cefr || ''),
         text: String(n.text || n.passage || '')
@@ -262,6 +267,7 @@
         push(out, {
           id: 'topic:' + label,
           view: 'grammar',
+          level: String(e.level || ''),
           title: label.replace(/[_-]+/g, ' '),
           label: label,
           text: ''
