@@ -25,13 +25,17 @@ assert(/FIEZEL_AI_TIMEOUT_MS=30000/.test(app)&&/currentAIRequest\(id,epoch\)/.te
 assert(/q\.explain\?\.avoid/.test(app)&&/q\.explain\?\.memory/.test(app)&&/distractor-breakdown/.test(app),'natural feedback dropped explanation fields');
 assert(/\.ai-btn/.test(css)&&/@keyframes aiBounce/.test(css),'AI visual states missing');
 assert(/adaptiveReady/.test(app),'adaptive readiness state missing');
-assert(/nextReview&&x\.nextReview<=Date\.now\(\)&&x\.mastery<80/.test(app),'review due must exclude mastered cards');
-assert(/function markMastered/.test(app)&&/b\.nextReview=0/.test(app),'mastered cards do not clear review schedule');
+assert(/nextReview&&x\.nextReview<=Date\.now\(\)/.test(app),'review due must be driven by the next review timestamp');
+assert(/function markMastered/.test(app)&&/b\.nextReview=Date\.now\(\)\+Math\.max\(30,b\.stability\)/.test(app),'mastered cards keep a maintenance review schedule');
+assert(/baseLapseBurden/.test(app)&&/lastSchedule=\{at:attemptAt/.test(app),'mastery scheduling keeps one attempt snapshot for confidence recalibration');
 assert(/function bindSwipe/.test(app)&&/touchstart/.test(app)&&/touchend/.test(app),'swipe controller missing');
 assert(/flash-inner/.test(app)&&/rotateY/.test(css),'3D flip implementation missing');
 assert(!/id="previous"/.test(app)&&!/id="next"/.test(app.split('function flashcards')[1]?.split('function reviewVocab')[0]||''),'flashcards still expose previous/next buttons');
 assert(/function getDiagnosticProfile/.test(app)&&/weakTargets/.test(app),'adaptive diagnostic profile missing');
 assert(/function setConfidence/.test(app)&&/confidenceHistory/.test(app),'confidence calibration missing');
+assert(/ACCOUNT_STATE_PREFIX/.test(app)&&/activateAccountStateFromPuter/.test(app)&&/LEGACY_STATE_OWNER_KEY/.test(app)&&/localStorage\.removeItem\(LEGACY_STATE_KEY\)/.test(app),'per-account state isolation and one-time legacy migration missing');
+assert(/timeZone:studyTimeZone\(\)/.test(app)&&/function validTimeZone/.test(app),'learner timezone is not propagated to remote activity');
+assert(/sessionAttempts:coreBrainSessionAttempts\(\)/.test(app)&&/state\.activeSession\?\.startedAt/.test(app),'session fatigue must use the active session, not global history');
 // m025-46: the brief is pinned by what renders it, not by a shouting copy string.
 // The all-caps kicker was removed as a design decision; the ring, the target and the
 // function are the feature. This is a stricter marker than the label it replaces.
@@ -54,7 +58,7 @@ assert(R.length===300,'reading bank unexpectedly reduced');
 for(const r of R)for(const q of r.qs||[]){assert(Array.isArray(q[1])&&q[1].length>=2,'reading question has too few options');const opts=q[1].map(x=>String(x).trim().toLowerCase());assert(new Set(opts).size===opts.length,`duplicate reading options in ${r.id}`);assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<q[1].length,`invalid reading answer in ${r.id}`)}
 
 const elements={};
-function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,classList:{add(){},remove(){},toggle(){}},addEventListener(){},focus(){}};}
+function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelector(){return null},focus(){}};}
 const document={baseURI:'http://localhost/',getElementById:element,querySelector(){return null},querySelectorAll(){return []},createElement(){return {className:'',textContent:'',disabled:false,onclick:null,classList:{add(){},remove(){},toggle(){}},append(){},addEventListener(){}}}};
 const store={};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
@@ -87,7 +91,22 @@ setTimeout(async()=>{
   st.vocab[v.id].nextReview=Date.now()-1000;
   assert(Object.values(st.vocab).filter(x=>x.nextReview<=Date.now()&&x.mastery<80).length===1,'due review setup failed');
   ctx.markMastered('vocab',v.id);
-  assert(st.vocab[v.id].mastery===100&&st.vocab[v.id].nextReview===0,'mastering a card must remove it from Review Due');
+  assert(st.vocab[v.id].mastery===100&&st.vocab[v.id].nextReview>Date.now()&&st.vocab[v.id].stability>=30,'mastering a card must schedule maintenance review');
+  st.vocab[v.id].nextReview=Date.now()-1;
+  assert(ctx.__fiezelDueReviews()>=1,'mastered cards should re-enter Review Due when maintenance is due');
+  st.vocab[v.id].nextReview=Date.now()+30*86400000;
+
+  // Keyakinan adalah sinyal kalibrasi, bukan jawaban kedua. Mengulang jawaban yang sama
+  // dengan nilai keyakinan boleh mengubah intervalnya, tetapi tidak boleh menambah lapse
+  // kedua atau menggeser titik waktu jawabannya.
+  const attemptAt=Date.now()-5000;
+  st.vocab[v.id]={correct:1,total:1,streak:1,mastery:20,nextReview:0,stability:2,lapses:0,lapseBurden:0,lastSeen:attemptAt,lastWrong:0};
+  st.history.push({id:'regression-confidence',type:'vocab',skill:'vocabulary_meaning',target:v.id,reviewBucket:'vocab',reviewKey:v.id,ok:false,ms:6000,confidence:null,at:attemptAt});
+  ctx.updateMastery('vocab',v.id,false,6000,null,attemptAt);
+  const afterAnswer=st.vocab[v.id];
+  assert(afterAnswer.lapses===1&&afterAnswer.lastSchedule?.at===attemptAt,'a failed attempt must schedule exactly one lapse');
+  ctx.setConfidence(1);
+  assert(st.vocab[v.id].lapses===1&&st.vocab[v.id].lastSchedule?.at===attemptAt,'confidence must not double-count the lapse');
 
   // Before diagnosis: no adaptive questions.
   st.adaptiveReady=false; assert(ctx.buildAdaptivePool(12).length===0,'adaptive questions appeared before diagnosis');

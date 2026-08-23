@@ -229,6 +229,7 @@
   function record(state, attempt) {
     var s = state;
     var a = attempt || {};
+    var scored = a.scored !== false;
     var timing = classifyTiming(a.ms, s.baselineMs || median(s.responseTimes));
     var d = diagnose({
       correct: a.correct, chosenOption: a.chosenOption, optionMisconceptions: a.optionMisconceptions,
@@ -237,15 +238,20 @@
     d.timing = timing;
     var concept = str(a.concept || a.skill);
 
-    s.answered++;
-    if (num(a.ms) > 0) s.responseTimes.push(num(a.ms));
+    // Retry adalah bukti bahwa bantuan tutor bekerja atau belum bekerja, tetapi bukan
+    // jawaban ujian kedua. Karena itu retry memperbarui ingatan konsep tanpa menaikkan
+    // denominator akurasi dan tanpa menggeser baseline waktu jawab sesi.
+    if (scored) s.answered++;
+    if (scored && num(a.ms) > 0) s.responseTimes.push(num(a.ms));
     if (!s.baselineMs) s.baselineMs = median(s.responseTimes);
     s.attemptsOnConcept[concept] = (s.attemptsOnConcept[concept] || 0) + 1;
     s.lastConcept = concept;
 
     if (d.correct) {
-      s.correct++;
-      s.streak++;
+      if (scored) {
+        s.correct++;
+        s.streak++;
+      }
       s.missStreak = 0;
       s.lastWinAt = num(a.now, s.lastWinAt);
       // Terobosan: miskonsepsi yang tadi bikin gagal PADA KONSEP INI, sekarang dilewati.
@@ -260,7 +266,7 @@
       // lagi, itu kesalahan pertama yang baru, bukan lanjutan dari episode yang sudah selesai.
       s.missesOnConcept[concept] = 0;
     } else {
-      s.streak = 0;
+      if (scored) s.streak = 0;
       s.missStreak++;
       s.misconceptions[d.misconception] = (s.misconceptions[d.misconception] || 0) + 1;
       s.misconceptionConcept[d.misconception] = concept;
@@ -271,7 +277,8 @@
     // Kegagalan SEBELUM yang ini - itulah yang menentukan seberapa tinggi bantuannya.
     d.priorMisses = d.correct ? 0 : Math.max(0, s.missesOnConcept[concept] - 1);
     d.concept = concept;
-    s.log.push({ concept: concept, correct: d.correct, timing: timing, misconception: d.misconception });
+    d.scored = scored;
+    s.log.push({ concept: concept, correct: d.correct, timing: timing, misconception: d.misconception, scored: scored });
     if (s.log.length > 60) s.log.shift();
     return d;
   }
@@ -413,7 +420,7 @@
     var s = state || {};
     var ctx = context || {};
     var predict = typeof ctx.predict === 'function' ? ctx.predict : null;
-    var target = clamp(ctx.targetSuccess, 0.4, 0.95) || 0.8;
+    var target = clamp(ctx.targetSuccess == null ? 0.8 : ctx.targetSuccess, 0.4, 0.95);
     var wanted = str(ctx.forceConcept);
     var avoid = str(ctx.avoidConcept);
 

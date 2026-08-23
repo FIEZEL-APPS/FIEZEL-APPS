@@ -10,7 +10,7 @@ function check(name,ok,details){report.checks.push({name,status:ok?'PASS':'FAIL'
 check('Meaningful streak model',app.includes('MEANINGFUL_ATTEMPTS=5')&&app.includes('recomputeMeaningfulDays'),'Streak requires 5 attempts/day and is recomputed from history.');
 check('Diagnostic evidence gate',app.includes('hs.length>=24&&skills.size>=3&&types.size>=2')&&!app.includes('state.totalAnswered>=150'),'Adaptive gate is evidence-based rather than hard-coded to 150.');
 check('Forgetting-aware review',app.includes('forgettingProbability')&&app.includes('stability')&&app.includes('lapses'),'Scheduler tracks stability, forgetting probability and lapses.');
-check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value)'),'Confidence changes future scheduling after calibration input.');
+check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value'),'Confidence changes future scheduling after calibration input.');
 check('Weakness timeline is time-series',app.includes('skillTimeline')&&app.includes('byDay[d]'),'Timeline groups evidence by date and skill.');
 check('Error pattern detector',app.includes('errorPatterns')&&app.includes('selectedAnswer'),'Detector records and analyzes repeated distractor choices.');
 check('Confusion network is history-backed',app.includes('confusionPairs')&&app.includes('confusion-network'),'Confusion pairs are ranked from observed wrong answers and vocabulary relations.');
