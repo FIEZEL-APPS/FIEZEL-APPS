@@ -1,7 +1,7 @@
 /**
  * FIEZEL — onboarding enam langkah (Step 1-6). Step 0 (splash) hidup terpisah di
  * `fiezel-splash.js`. Step 2-6 mengikuti Step 1-5 pada
- * `FIEZEL_Complete_Design_Specification.pdf` bagian 3; Step 1 adalah tambahan m025-116.
+ * `FIEZEL_Complete_Design_Specification.pdf` bagian 3; Step 1 adalah tambahan m025-117.
  *
  * m025-78: dibangun ulang dari nol mengikuti spesifikasi lengkap, menggantikan versi m025-77
  * yang mengikuti sheet PDF berbeda (IELTS/TOEFL, tes panjang sebagai satu-satunya jalan).
@@ -29,7 +29,7 @@
  *    sudah dipegang sejak m025-77. Pertanyaan spesifikasi "Kapan kamu ingin belajar?"
  *    dijawab jujur: dengan cara ALRS sebenarnya bekerja.
  *
- * m025-116 OWNER: "saat masuk tanya dulu nama mereka di onboarding (WAJIB)". Step 1 sekarang
+ * m025-117 OWNER: "saat masuk tanya dulu nama mereka di onboarding (WAJIB)". Step 1 sekarang
  * menanyakan nama murid, dan nama itulah satu-satunya sumber sapaan di seluruh aplikasi -
  * tidak ada lagi nama yang dipaku di kode sebagai nilai bawaan. Langkah ini adalah SATU-
  * SATUNYA langkah yang tidak punya "Lewati", dan penyimpangan dari batas nomor 1 di bawah
@@ -47,7 +47,7 @@
  * Tiga batas yang dijaga, sama seperti splash dan dengan alasan yang sama:
  *
  * 1. TIDAK PERNAH MENGURUNG. Tombol "Lewati" di kanan atas ada di setiap langkah kecuali
- *    Step 1 (lihat catatan m025-116 di atas) dan mengakhiri seluruh perkenalan (bukan hanya
+ *    Step 1 (lihat catatan m025-117 di atas) dan mengakhiri seluruh perkenalan (bukan hanya
  *    satu langkah) - gerbang notifikasi ada di bawah lapisan ini dan notifikasi wajib di
  *    produk ini. Langkah dengan aksi berat (pilih tujuan, tes penempatan) JUGA mendapat
  *    "Lewati langkah ini" supaya menunda satu langkah tidak memaksa mengakhiri semuanya.
@@ -75,7 +75,7 @@
   // "sudah di ujung" pada tombol lewati-langkah tidak bisa menyimpang satu sama lain -
   // ketidaksamaan itulah yang membuat tombol di langkah terakhir mati diam-diam.
   var LAST_STEP = 6;
-  // Step 1 (m025-116): nama murid. Langkah wajib, dan satu-satunya langkah tanpa "Lewati".
+  // Step 1 (m025-117): nama murid. Langkah wajib, dan satu-satunya langkah tanpa "Lewati".
   var NAME_STEP = 1;
   // Langkah tes penempatan. Tombol utamanya BUKAN "Lanjut" melainkan "Mulai tes penempatan",
   // jadi nomornya harus punya nama - angka lepas di dalam bind() adalah persis yang patah
@@ -156,7 +156,7 @@
   }
 
   /**
-   * m025-116: murid yang menyelesaikan perkenalan SEBELUM rilis ini tidak pernah ditanya
+   * m025-117: murid yang menyelesaikan perkenalan SEBELUM rilis ini tidak pernah ditanya
    * namanya. Mereka tidak boleh dipaksa mengulang seluruh perkenalan hanya untuk satu
    * pertanyaan - dan juga tidak boleh dibiarkan disapa dengan nama orang lain. Jawabannya
    * ada di show(env,{nameOnly:true}): satu langkah saja, lalu selesai.
@@ -232,7 +232,7 @@
   }
 
   // ---------------------------------------------------------------------------------------
-  // Step 1 (m025-116): nama murid. WAJIB.
+  // Step 1 (m025-117): nama murid. WAJIB.
   //
   // Satu pertanyaan, satu kolom, satu tombol. Tidak ada "Lewati" di sini - lihat catatan di
   // kepala berkas. Tombol Lanjut dinonaktifkan sampai ada nama yang benar-benar bisa dipakai
@@ -533,7 +533,7 @@
           if (step >= LAST_STEP) { finish('skip'); return; }
           goStep(step + 1);
         });
-        // m025-116: pada langkah nama tombol ini LAHIR nonaktif lalu menyala saat murid
+        // m025-117: pada langkah nama tombol ini LAHIR nonaktif lalu menyala saat murid
         // mengetik. Memasang listener hanya ketika ia sudah aktif berarti tombol yang
         // menyala kemudian tidak pernah punya listener - tombol hidup yang tidak melakukan
         // apa-apa. Listener selalu dipasang; advance() sendiri yang menolak nama kosong,
