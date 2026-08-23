@@ -9,7 +9,14 @@ const failures=[];
 const check=(ok,message)=>{if(!ok)failures.push(message)};
 
 check((html.match(/class="nav(?: active)?"/g)||[]).length===5,'Bottom navigation must contain exactly five primary destinations.');
-check((html.match(/data-lucide=/g)||[]).length>=9,'Core chrome must use the local icon system.');
+// m025-115: kroma inti pindah ke set ikon duotone milik FIEZEL sendiri
+// (features/ui/fiezel-icons.js), sesuai brief redesign OWNER bagian 4. Yang dijaga
+// pemeriksaan ini tidak berubah - ikon harus datang dari berkas LOKAL, bukan dari CDN -
+// jadi kedua sistem lokal dihitung bersama. Tab bar wajib memakai set sendiri, karena
+// di situlah "template vs eksklusif" paling terasa.
+check(((html.match(/data-lucide=/g)||[]).length+(html.match(/data-fz-icon=/g)||[]).length)>=9,'Core chrome must use the local icon system.');
+check((html.match(/data-fz-icon=/g)||[]).length>=5,'Bottom navigation must use the FIEZEL duotone icon set.');
+check(/features\/ui\/fiezel-icons\.js/.test(html)&&/data-fz-icon/.test(fs.readFileSync(path.join(root,'features','ui','fiezel-icons.js'),'utf8')),'FIEZEL icon runtime must ship and hydrate its own markers.');
 check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
 check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
 check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');

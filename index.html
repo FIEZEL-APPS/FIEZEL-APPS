@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#8C2233">
+  <meta name="theme-color" content="#FFF9F0">
   <meta name="description" content="FIEZEL adalah aplikasi belajar bahasa Inggris adaptif untuk vocabulary, grammar, reading, speaking, listening, dan tes diagnostik CEFR.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -190,14 +190,14 @@ html.fz-booting body{overflow:hidden}
        untuk pengukuran yang mendasarinya. Dekoratif murni, karena itu aria-hidden. -->
   <div class="nav-scrim" aria-hidden="true"></div>
   <nav class="bottomnav" aria-label="Navigasi utama">
-    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i data-lucide="house"></i><span>Home</span></button>
-    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i data-lucide="book-a"></i><span>Vocab</span></button>
-    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i data-lucide="braces"></i><span>Grammar</span></button>
-    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i data-lucide="book-open-text"></i><span>Reading</span></button>
+    <button type="button" class="nav active" data-view="home" onclick="go('home')" aria-label="Beranda"><i class="fz-i" data-fz-icon="home" aria-hidden="true"></i><span>Home</span></button>
+    <button type="button" class="nav" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i><span>Vocab</span></button>
+    <button type="button" class="nav" data-view="grammar" onclick="go('grammar')" aria-label="Grammar"><i class="fz-i" data-fz-icon="grammar" aria-hidden="true"></i><span>Grammar</span></button>
+    <button type="button" class="nav" data-view="reading" onclick="go('reading')" aria-label="Reading"><i class="fz-i" data-fz-icon="reading" aria-hidden="true"></i><span>Reading</span></button>
     <!-- Audit UX Bagian 4: ikon lama (grafik batang) membaca sebagai "statistik", bukan
          "jalur belajar". Ikon route adalah jalur berkelok dengan simpul - persis makna
          yang harus dibawa tab ini, sejajar dengan Path/Jalur Belajar di Duolingo. -->
-    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i data-lucide="route"></i><span>Peta</span></button>
+    <button type="button" class="nav" data-view="progress" onclick="go('progress')" aria-label="Peta belajar"><i class="fz-i" data-fz-icon="map" aria-hidden="true"></i><span>Peta</span></button>
   </nav>
 
   <!-- OWNER: "Terlalu banyak script terpisah (30+ file JS) dimuat sinkron di <head>/<body>
@@ -239,6 +239,11 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/neural-voice/fiezel-diag-panel.js"></script>
   <script defer src="./features/ui/fiezel-zoom-lock.js"></script>
   <script defer src="./features/ui/fiezel-back-nav.js"></script>
+  <!-- m025-115: set ikon duotone FIEZEL dan pembimbing mengambang. Keduanya dideklarasikan
+       SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
+       syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
+  <script defer src="./features/ui/fiezel-icons.js"></script>
+  <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
