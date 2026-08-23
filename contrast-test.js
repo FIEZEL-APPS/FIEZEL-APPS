@@ -30,8 +30,10 @@
  * bentuk persis dari akar A, dan tanpa gerbang itu bug yang sama bisa masuk lagi lewat
  * satu baris CSS baru tanpa satu pun tes memerah.
  *
- * Lingkup: keempat kombinasi tema x fase kini diuji - terang/siang, gelap/siang,
- * gelap/malam, dan (sejak m025-113) terang/malam.
+ * Lingkup: sejak m025-134 mode gelap dihapus dari produk, jadi yang diuji adalah kedua
+ * fase tema terang - terang/siang dan (sejak m025-113) terang/malam. Riwayat di atas
+ * sengaja dipertahankan: ia menjelaskan mengapa permukaan dan tinta harus selalu diambil
+ * dari keluarga token yang sama, dan aturan itu tetap berlaku tanpa tema kedua.
  *
  * m025-113: kombinasi terang + malam dulu sengaja dikecualikan dengan alasan
  * "memperbaikinya berarti mengubah tampilan mode terang". Harganya ditagih OWNER pada
@@ -150,18 +152,10 @@ function themeVars(theme, scene) {
     () => collectVars('style', eq(':root')),
     () => collectVars('tutor', eq('html.fiezel-ui-v6'))
   ];
-  if (theme === 'dark') {
-    chain.push(() => collectVars('style', eq(':root[data-theme="dark"]')));
-    chain.push(() => collectVars('tutor', eq(':root[data-theme="dark"].fiezel-ui-v6')));
-  }
   if (scene === 'night') {
     chain.push(() => collectVars('style', eq('.scene-night')));
   } else {
     chain.push(() => collectVars('style', eq('.scene-day,.scene-dawn')));
-    if (theme === 'dark') {
-      chain.push(() => collectVars('style', (sel, media) =>
-        !media && sel.startsWith(':root[data-theme="dark"] body.scene-day')));
-    }
   }
   const bag = {};
   for (const step of chain) Object.assign(bag, step());
@@ -272,13 +266,6 @@ function skyOpacity(theme, scene) {
   for (const r of RULES.tutor) {
     if (norm(r.selector) === 'html.fiezel-ui-v6 .global-sky' && !r.media) {
       for (const d of r.decls) if (d.prop === 'opacity') value = Number(d.value);
-    }
-  }
-  if (theme === 'dark') {
-    for (const r of RULES.style) {
-      if (norm(r.selector) === ':root[data-theme="dark"] .global-sky' && !r.media) {
-        for (const d of r.decls) if (d.prop === 'opacity') value = Number(d.value);
-      }
     }
   }
   // m025-113: tema TERANG pada fase senja/malam. Sebelum rilis ini kombinasi itu tidak
@@ -399,14 +386,11 @@ const PAIRS = [
 
 const SCENARIOS = [
   { theme: 'light', scene: 'day' },
-  { theme: 'dark', scene: 'day' },
-  { theme: 'dark', scene: 'night' },
-  // m025-113: terang + malam TIDAK lagi dikecualikan. Di sanalah OWNER menemukan Home
+  // m025-113: terang + malam TIDAK dikecualikan. Di sanalah OWNER menemukan Home
   // "berantakan dari atas sampai bawah": kartu modul memakai latar terang milik lapisan
-  // v6 sementara tintanya --glass-text yang menjadi TERANG pada .scene-night - 1,05:1,
-  // judulnya benar-benar tidak terbaca. Alasan pengecualian dulu adalah "memperbaikinya
-  // berarti mengubah mode terang"; itu memang yang dilakukan m025-113, dengan sengaja:
-  // permukaan dan tinta sekarang selalu diambil dari keluarga yang sama.
+  // v6 sementara tintanya --glass-text yang menjadi TERANG pada .scene-night - 1,05:1.
+  // m025-134: tema gelap dihapus, jadi kedua skenario gelap ikut hilang - bukan karena
+  // longgar, melainkan karena tampilannya memang tidak ada lagi.
   { theme: 'light', scene: 'night' }
 ];
 
@@ -430,7 +414,7 @@ function measure(pair, theme, scene) {
 }
 
 for (const sc of SCENARIOS) {
-  const label = sc.theme === 'dark' ? 'gelap' : 'terang';
+  const label = 'terang';
   const phase = sc.scene === 'night' ? 'malam' : 'siang';
   for (const pair of PAIRS) {
     const need = pair.large ? 3 : 4.5;
@@ -454,42 +438,6 @@ test('akar A — button tidak lagi memaku latarnya ke putih', () => {
   assert.ok(rule, 'aturan button dengan background tidak ditemukan');
   const bg = rule.decls.filter(d => d.prop === 'background').pop().value;
   assert.ok(/var\(--/.test(bg), 'button{background:' + bg + '} - latar tombol harus dari token tema');
-});
-
-test('akar B — --ui-* punya kembaran gelap untuk kedua selektor tema', () => {
-  const attr = collectVars('tutor', eq(':root[data-theme="dark"].fiezel-ui-v6'));
-  const query = collectVars('tutor', (sel, media) =>
-    /prefers-color-scheme:\s*dark/.test(media) && sel === ':root:not([data-theme="light"]).fiezel-ui-v6');
-  assert.ok(Object.keys(attr).length >= 10, 'blok :root[data-theme="dark"].fiezel-ui-v6 kosong');
-  assert.deepStrictEqual(attr, query, 'blok gelap atribut dan media query harus identik, kalau tidak salah satunya diam-diam basi');
-  const light = collectVars('tutor', eq('html.fiezel-ui-v6'));
-  for (const key of Object.keys(light)) {
-    if (key === '--ui-radius') continue;
-    assert.ok(key in attr, key + ' tidak punya nilai gelap - permukaan itu akan tetap terang di mode gelap');
-  }
-});
-
-test('akar B — latar halaman --ui-bg gelap di mode gelap', () => {
-  const dark = parseColor(resolveValue('var(--ui-bg)', themeVars('dark', 'day')));
-  const light = parseColor(resolveValue('var(--ui-bg)', themeVars('light', 'day')));
-  assert.ok(luminance(dark) < 0.05, '--ui-bg gelap = ' + hex(dark) + ', masih terang');
-  assert.ok(luminance(light) > 0.7, '--ui-bg terang berubah menjadi ' + hex(light) + ' - mode terang tidak boleh bergeser');
-});
-
-test('akar C — .scene-day/.scene-dawn sadar tema, 12 token kaca berhenti jadi kode mati', () => {
-  const dayLight = themeVars('light', 'day');
-  const dayDark = themeVars('dark', 'day');
-  const scened = ['--glass-thin', '--glass-regular', '--glass-thick', '--glass-edge',
-    '--glass-text', '--glass-muted', '--glass-line', '--ambient-text', '--ambient-muted',
-    '--chrome-bg', '--launcher-start', '--launcher-end'];
-  for (const key of scened) {
-    assert.notStrictEqual(dayDark[key], dayLight[key],
-      key + ' sama di kedua tema saat scene-day - blok .scene-* pada <body> masih membayangi palet gelap');
-  }
-  const glass = parseColor(resolveValue('var(--glass-thick)', dayDark));
-  assert.ok(luminance(glass) < 0.05, 'kaca mode gelap saat siang = ' + hex(glass) + ', masih material terang');
-  const ink = parseColor(resolveValue('var(--glass-text)', dayDark));
-  assert.ok(luminance(ink) > 0.7, 'tinta kaca mode gelap = ' + hex(ink) + ', masih tinta terang');
 });
 
 // m025-115 MENGGANTI kontrak lama di sini, dan penggantiannya disengaja.
@@ -523,7 +471,7 @@ test('m025-115 — material malam sama persis dengan material siang, per tema', 
   const MATERIAL = ['--glass-thin', '--glass-regular', '--glass-thick', '--glass-solid',
     '--glass-edge', '--glass-text', '--glass-muted', '--glass-line', '--ambient-text',
     '--ambient-muted', '--chrome-bg'];
-  for (const theme of ['light', 'dark']) {
+  for (const theme of ['light']) {
     const day = themeVars(theme, 'day');
     const night = themeVars(theme, 'night');
     for (const key of MATERIAL) {
@@ -533,43 +481,14 @@ test('m025-115 — material malam sama persis dengan material siang, per tema', 
   }
 });
 
-test('m025-115 — tema terang tetap terang sepanjang hari, tema gelap tetap gelap', () => {
+test('m025-115 — tema terang tetap terang sepanjang hari', () => {
   for (const scene of ['day', 'night']) {
     const light = themeVars('light', scene);
-    const dark = themeVars('dark', scene);
     const lightGlass = parseColor(resolveValue('var(--glass-thick)', light));
     const lightInk = parseColor(resolveValue('var(--glass-text)', light));
     assert.ok(luminance(lightGlass) > 0.7, 'terang/' + scene + ': kaca ' + hex(lightGlass) + ' tidak terang');
     assert.ok(luminance(lightInk) < 0.1, 'terang/' + scene + ': tinta ' + hex(lightInk) + ' tidak gelap');
-    const darkGlass = parseColor(resolveValue('var(--glass-thick)', dark));
-    const darkInk = parseColor(resolveValue('var(--glass-text)', dark));
-    assert.ok(luminance(darkGlass) < 0.06, 'gelap/' + scene + ': kaca ' + hex(darkGlass) + ' tidak gelap');
-    assert.ok(luminance(darkInk) > 0.7, 'gelap/' + scene + ': tinta ' + hex(darkInk) + ' tidak terang');
   }
-});
-
-test('langit tidak boleh membanjiri halaman gelap', () => {
-  // app.js menulis --sky-* dari jam saja; satu-satunya rem yang tersedia di CSS adalah
-  // opasitas lapisannya. Tanpa rem itu, siang hari di mode gelap latar naik ke ~#9d8f92.
-  const light = skyOpacity('light');
-  const dark = skyOpacity('dark');
-  assert.ok(typeof light === 'number' && light > 0, 'opasitas .global-sky mode terang tidak terbaca');
-  assert.ok(typeof dark === 'number', 'mode gelap tidak menurunkan opasitas .global-sky');
-  assert.ok(dark <= 0.3, 'opasitas langit mode gelap ' + dark + ' terlalu tinggi');
-  const base = pageBase('dark', 'day');
-  assert.ok(luminance(base) < 0.06, 'latar halaman gelap saat siang = ' + hex(base));
-});
-
-test('kedua blok gelap style.css identik, tidak ada drift', () => {
-  const attr = collectVars('style', eq(':root[data-theme="dark"]'));
-  const query = collectVars('style', (sel, media) =>
-    /prefers-color-scheme:\s*dark/.test(media) && sel === ':root:not([data-theme="light"])');
-  assert.deepStrictEqual(attr, query, 'palet gelap atribut dan media query berbeda');
-  const dayAttr = collectVars('style', (sel, media) =>
-    !media && sel.startsWith(':root[data-theme="dark"] body.scene-day'));
-  const dayQuery = collectVars('style', (sel, media) =>
-    /prefers-color-scheme:\s*dark/.test(media) && sel.startsWith(':root:not([data-theme="light"]) body.scene-day'));
-  assert.deepStrictEqual(dayAttr, dayQuery, 'penimpaan scene-day gelap berbeda antara atribut dan media query');
 });
 
 test('token permukaan terang persis seperti literal yang digantikannya', () => {
@@ -671,16 +590,6 @@ test('INVARIAN — tidak ada tinta gelap yang dipaku di atas permukaan bertema',
   assert.deepStrictEqual(bad, [],
     'tinta gelap dipaku di atas permukaan bertema - hilang begitu permukaannya menggelap:\n    ' +
     bad.join('\n    '));
-});
-
-test('INVARIAN — setiap token permukaan baru punya pasangan gelap', () => {
-  const light = themeVars('light', 'day');
-  const dark = themeVars('dark', 'day');
-  const surfaces = Object.keys(light).filter(k => /^--(surface|ink)-/.test(k) || k === '--surface-rgb');
-  assert.ok(surfaces.length >= 10, 'token permukaan tidak ditemukan');
-  for (const key of surfaces) {
-    assert.notStrictEqual(dark[key], light[key], key + ' tidak punya nilai gelap');
-  }
 });
 
 process.on('exit', () => {
