@@ -2717,3 +2717,18 @@ html.fiezel-ui-v6 .launcher-shell{
 .card.lesson-locked .lesson-card-foot button[disabled]{cursor:not-allowed;opacity:.65}
 .lesson-lock-note{display:flex;gap:7px;align-items:flex-start;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:var(--muted,#746958)}
 .lesson-lock-note i{flex:none;width:14px;height:14px;margin-top:2px}
+/* m025-138: kontrak ujian dan rubrik Writing. Batas kata sengaja dibuat menonjol -
+   di IELTS, tulisan di bawah batas kena penalti sebelum isinya sempat dinilai. */
+.writing-exam{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7);font-size:.8rem}
+.writing-exam b{color:var(--accent,#c2402c)}
+.writing-exam span{font-weight:650}
+.writing-exam small{color:var(--muted,#746958);line-height:1.4}
+.writing-focus{margin:6px 0 0;font-size:.78rem;color:var(--muted,#746958)}
+.writing-rubric ul,.writing-checklist{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.writing-rubric li{display:grid;gap:2px;font-size:.8rem}
+.writing-rubric li span{color:var(--muted,#746958)}
+.writing-checklist li{display:grid;gap:2px;padding:9px 11px;border-radius:12px;border-left:3px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.79rem}
+.writing-checklist li span{color:var(--muted,#746958);line-height:1.45}
+.writing-check.is-ok{border-left-color:#3f8f5f}
+.writing-check.is-perhatikan{border-left-color:var(--accent,#c2402c)}
+.writing-check.is-ai{border-left-color:#7a6cc4}
