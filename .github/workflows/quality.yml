@@ -68,6 +68,7 @@ jobs:
           node level-grammar-contract-test.js
           node grammar-unlock-test.js
           node writing-rubric-test.js
+          node reading-exam-test.js
           node notification-reminder-test.js
           node remote-push-test.js
           node core-brain-test.js

@@ -2732,3 +2732,10 @@ html.fiezel-ui-v6 .launcher-shell{
 .writing-check.is-ok{border-left-color:#3f8f5f}
 .writing-check.is-perhatikan{border-left-color:var(--accent,#c2402c)}
 .writing-check.is-ai{border-left-color:#7a6cc4}
+/* m025-139: jalur Reading berformat ujian. Kontraknya (panjang, jumlah soal, waktu)
+   ditaruh di muka karena itulah yang membedakannya dari bacaan latihan biasa. */
+.reading-exam{display:grid;gap:11px;margin:0 0 16px}
+.reading-exam-set{display:grid;gap:4px;padding:12px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7)}
+.reading-exam-set span{font-size:.75rem;font-weight:650;color:var(--accent,#c2402c)}
+.reading-exam-set small{font-size:.74rem;line-height:1.45;color:var(--muted,#746958)}
+.reading-exam-set button{justify-self:start;margin-top:5px}

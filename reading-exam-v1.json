@@ -1,0 +1,458 @@
+{
+  "schema": "fiezel-reading-exam-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL. Set ini latihan berformat ujian; tingkat kesulitannya disusun mendekati ujian aslinya, bukan disalin darinya.",
+  "examFormats": {
+    "ielts_academic_reading": {
+      "label": "IELTS Academic Reading",
+      "passageWords": [
+        700,
+        1000
+      ],
+      "questionsPerPassage": 13,
+      "minutesPerPassage": 20,
+      "questionTypes": [
+        "true_false_not_given",
+        "matching_information",
+        "multiple_choice"
+      ],
+      "note": "Di ujian aslinya ada 3 bacaan dalam 60 menit. True/False/Not Given adalah tipe yang paling sering salah dijawab: Not Given berarti teksnya DIAM, bukan bahwa pernyataannya terasa meragukan."
+    },
+    "toefl_reading": {
+      "label": "TOEFL iBT Reading",
+      "passageWords": [
+        650,
+        750
+      ],
+      "questionsPerPassage": 10,
+      "minutesPerPassage": 18,
+      "questionTypes": [
+        "factual",
+        "negative_factual",
+        "vocabulary",
+        "inference",
+        "sentence_simplification",
+        "rhetorical_purpose",
+        "insert_text"
+      ],
+      "note": "Di ujian aslinya ada 2 bacaan dalam 35 menit. Soal EXCEPT dan insert-text menghukum pembaca yang tergesa."
+    }
+  },
+  "passages": [
+    {
+      "id": "rx-tram",
+      "exam": "ielts_academic_reading",
+      "level": "B2",
+      "title": "The Return of the Urban Tram",
+      "topic": "transport history and policy",
+      "text": "Between 1900 and 1930, the electric tram was the ordinary way to cross a European or North American city. Rails ran down the middle of the main streets, cars arrived every few minutes, and fares were low enough that clerks and factory workers used them daily. Within four decades most of those systems had been torn up. The story of why they vanished, and why many cities are now laying rails again, says a great deal about how transport decisions are actually made.\n\nThe usual explanation is that the private car simply won. Cars were faster door to door, they carried families and shopping, and as incomes rose after 1945 more households could afford one. There is obvious truth in this. But the timing does not fit neatly. In several cities the tram network was closed years before car ownership became widespread, and the decision was taken by municipal committees rather than by passengers drifting away. Ridership on some closed lines was still rising when the closure was announced.\n\nA second factor was the condition of the infrastructure itself. Tram track is expensive to maintain. Rails set into a road surface wear at a different rate from the asphalt around them, and by the late 1930s much of the network laid before the First World War was reaching the end of its life. Wartime shortages postponed the reckoning; when it arrived, councils faced a large bill for renewal at exactly the moment when buses were being marketed as a flexible, cheap alternative that required no track at all. A bus route could be moved with a signpost. To a committee looking at a deficit, that argument was difficult to refuse.\n\nWhat the committees did not price was the cost of the switch to everyone else. Buses shared road space with the growing volume of cars, so they were subject to the same congestion. As journeys became slower and less predictable, passengers who had a choice moved to their own vehicles, which added to the congestion that had slowed the buses in the first place. Several transport historians describe this as a ratchet: each turn made the next turn easier, and none of them was easy to reverse.\n\nThe return of the tram, from the 1980s onward, was not driven by nostalgia. It began in cities that had run out of road. Once a corridor is full, adding a lane usually fills again within a few years, a pattern documented often enough to have its own name, induced demand. A tram lane carries far more people per metre of street width than a general traffic lane, and it does so predictably, because it is separated from the cars. Predictability turns out to matter more to passengers than raw speed: a service that is reliably slow is easier to plan around than one that is sometimes fast.\n\nModern systems also learned from the old ones. Where the pre-war tram stopped every two hundred metres, the modern equivalent often stops every five hundred, which raises average speed considerably at a modest cost in walking distance. Low floors, level boarding and off-vehicle ticketing cut the time spent standing still at each stop, which on a busy line can account for a third of the journey. None of these are dramatic innovations. Together they change the economics.\n\nThe rebuilding is not universally successful. A tram line is a fixed asset in a way a bus route is not, and if it is built along the wrong corridor the mistake is permanent and visible. Construction disrupts the businesses along the route for a year or more, and some never recover. Costs frequently exceed the original estimate, sometimes substantially, and the schemes that overrun are the ones that get written about. Cities that have done it well tend to share an unglamorous characteristic: they decided the route on the basis of where people already travelled, rather than where planners hoped development would follow.\n\nThat last point is the connection between the two eras. The systems torn up in the 1950s were dismantled by people who believed they were reading the future correctly, and who were working with the costs that appeared on their own balance sheet. The costs that did not appear there arrived anyway, and were paid by somebody else, over a longer period. Whether the current generation of schemes is making a symmetrical error is not something that can be settled now.",
+      "questions": [
+        {
+          "id": "rx-tram-1",
+          "type": "true_false_not_given",
+          "stem": "Tram fares in the early twentieth century were affordable for ordinary workers.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "fares were low enough that clerks and factory workers used them daily",
+            "why": "Teks menyebut tarifnya cukup murah sehingga pegawai dan buruh pabrik memakainya setiap hari - itu persis pernyataannya.",
+            "whyOthersFail": "False butuh teks yang membantah; Not Given butuh teks yang diam soal tarif. Keduanya tidak berlaku di sini."
+          }
+        },
+        {
+          "id": "rx-tram-2",
+          "type": "true_false_not_given",
+          "stem": "Every tram system that closed was losing passengers at the time the decision was taken.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Ridership on some closed lines was still rising when the closure was announced",
+            "why": "Teks menyatakan sebagian jalur yang ditutup justru penumpangnya masih NAIK. Itu membantah kata 'every', jadi False.",
+            "whyOthersFail": "True bertentangan dengan kalimat itu. Not Given salah karena teksnya justru bicara langsung soal ini - kesalahan paling umum di TFNG adalah memilih Not Given padahal jawabannya ada."
+          }
+        },
+        {
+          "id": "rx-tram-3",
+          "type": "true_false_not_given",
+          "stem": "Bus manufacturers lobbied municipal committees directly.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "buses were being marketed as a flexible, cheap alternative that required no track at all",
+            "why": "Teks menyebut bus DIPASARKAN sebagai alternatif, tetapi tidak pernah menyebut produsen melobi komite. Tidak ada informasinya, jadi Not Given.",
+            "whyOthersFail": "True menambahkan yang tidak tertulis; False butuh bantahan yang juga tidak ada. 'Dipasarkan' bukan sama dengan 'melobi komite'."
+          }
+        },
+        {
+          "id": "rx-tram-4",
+          "type": "true_false_not_given",
+          "stem": "Adding a traffic lane to a congested corridor tends to bring only temporary relief.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "adding a lane usually fills again within a few years, a pattern documented often enough to have its own name, induced demand",
+            "why": "Lajur baru terisi lagi dalam beberapa tahun - itu definisi kelegaan yang sementara.",
+            "whyOthersFail": "False butuh teks yang menyatakan kelegaannya bertahan. Not Given salah karena polanya bahkan diberi nama di teks."
+          }
+        },
+        {
+          "id": "rx-tram-5",
+          "type": "true_false_not_given",
+          "stem": "Modern tram systems place their stops closer together than pre-war systems did.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Where the pre-war tram stopped every two hundred metres, the modern equivalent often stops every five hundred",
+            "why": "Justru sebaliknya: sebelum perang tiap 200 meter, sekarang sering tiap 500 meter. Pernyataan ini dibalik, jadi False.",
+            "whyOthersFail": "True membalik angkanya. Not Given salah karena kedua angkanya disebut eksplisit."
+          }
+        },
+        {
+          "id": "rx-tram-6",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang memuat perbandingan berapa banyak ruang jalan yang dibutuhkan moda yang berbeda?",
+          "options": [
+            "Paragraf 3",
+            "Paragraf 4",
+            "Paragraf 5",
+            "Paragraf 7"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "A tram lane carries far more people per metre of street width than a general traffic lane",
+            "why": "Hanya paragraf 5 yang membandingkan daya angkut per meter lebar jalan.",
+            "whyOthersFail": "Paragraf 3 soal biaya perawatan rel, paragraf 4 soal lingkaran kemacetan, paragraf 7 soal proyek yang gagal."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-tram-7",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa biaya perawatan jatuh tempo pada saat tertentu?",
+          "options": [
+            "Paragraf 2",
+            "Paragraf 3",
+            "Paragraf 6",
+            "Paragraf 8"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Wartime shortages postponed the reckoning; when it arrived, councils faced a large bill for renewal",
+            "why": "Paragraf 3 menerangkan rel tua mendekati akhir usia dan kelangkaan masa perang menunda tagihannya.",
+            "whyOthersFail": "Paragraf 2 soal mobil pribadi, paragraf 6 soal perbaikan teknis, paragraf 8 soal penilaian penutup."
+          },
+          "paragraph": 3
+        },
+        {
+          "id": "rx-tram-8",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menggambarkan lingkaran yang menguatkan dirinya sendiri?",
+          "options": [
+            "Paragraf 1",
+            "Paragraf 4",
+            "Paragraf 6",
+            "Paragraf 7"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Several transport historians describe this as a ratchet: each turn made the next turn easier",
+            "why": "Paragraf 4 menjelaskan bus melambat karena macet, penumpang pindah ke mobil, dan macetnya bertambah - lingkaran yang memperkuat diri.",
+            "whyOthersFail": "Paragraf 1 latar sejarah, paragraf 6 perbaikan teknis sistem modern, paragraf 7 risiko proyek."
+          },
+          "paragraph": 4
+        },
+        {
+          "id": "rx-tram-9",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang mengakui sebagian proyek modern berjalan buruk?",
+          "options": [
+            "Paragraf 5",
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 8"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "Costs frequently exceed the original estimate, sometimes substantially",
+            "why": "Paragraf 7 menyebut gangguan pada usaha di sepanjang rute dan biaya yang membengkak.",
+            "whyOthersFail": "Paragraf 5 dan 6 justru menjelaskan kelebihan sistem modern; paragraf 8 membandingkan dua era."
+          },
+          "paragraph": 7
+        },
+        {
+          "id": "rx-tram-10",
+          "type": "multiple_choice",
+          "stem": "Mengapa penulis menyatakan bahwa waktunya 'does not fit neatly'?",
+          "options": [
+            "Karena sebagian jaringan ditutup sebelum kepemilikan mobil meluas",
+            "Karena mobil ternyata lebih lambat daripada trem",
+            "Karena penumpang trem tidak pernah berkurang di kota mana pun",
+            "Karena catatan tarif dari masa itu tidak lengkap"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "In several cities the tram network was closed years before car ownership became widespread",
+            "why": "Kalau mobil yang mengalahkan trem, penutupannya mestinya terjadi SETELAH mobil meluas - dan di beberapa kota urutannya terbalik.",
+            "whyOthersFail": "Teks justru menyebut mobil lebih cepat dari pintu ke pintu; 'tidak pernah berkurang di kota mana pun' terlalu luas dan tidak didukung; kelengkapan catatan tarif tidak dibahas."
+          }
+        },
+        {
+          "id": "rx-tram-11",
+          "type": "multiple_choice",
+          "stem": "Menurut penulis, apa yang gagal diperhitungkan komite kota?",
+          "options": [
+            "Biaya yang ditanggung pihak lain di luar neraca mereka sendiri",
+            "Harga bahan bakar bus dalam jangka panjang",
+            "Jumlah penduduk kota yang akan menyusut",
+            "Kesulitan memindahkan rute bus"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "What the committees did not price was the cost of the switch to everyone else",
+            "why": "Komite menghitung yang muncul di neracanya sendiri; biaya kemacetan yang ditanggung orang lain tidak masuk hitungan.",
+            "whyOthersFail": "Harga bahan bakar dan penyusutan penduduk tidak disebut. Kemudahan memindahkan rute bus justru dipakai sebagai ALASAN memilih bus, bukan yang terlewat."
+          }
+        },
+        {
+          "id": "rx-tram-12",
+          "type": "multiple_choice",
+          "stem": "Menurut bacaan, apa yang lebih dihargai penumpang dibanding kecepatan mentah?",
+          "options": [
+            "Keterduga-an jadwal",
+            "Tarif yang paling murah",
+            "Tempat duduk yang nyaman",
+            "Jumlah halte yang banyak"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Predictability turns out to matter more to passengers than raw speed",
+            "why": "Teks menyatakannya langsung: layanan yang lambat tetapi bisa diandalkan lebih mudah direncanakan daripada yang kadang cepat.",
+            "whyOthersFail": "Tarif, kenyamanan tempat duduk, dan jumlah halte tidak dibandingkan dengan kecepatan di bagian itu - halte justru DIKURANGI di sistem modern."
+          }
+        },
+        {
+          "id": "rx-tram-13",
+          "type": "multiple_choice",
+          "stem": "Ciri apa yang dimiliki bersama oleh kota yang berhasil membangun kembali tremnya?",
+          "options": [
+            "Rutenya ditentukan dari pola perjalanan yang sudah ada",
+            "Mereka membangun jalur terpanjang yang mampu dibiayai",
+            "Mereka memakai kembali rel dari sebelum perang",
+            "Mereka melarang mobil pribadi di pusat kota"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "they decided the route on the basis of where people already travelled, rather than where planners hoped development would follow",
+            "why": "Cirinya justru tidak megah: rute mengikuti ke mana orang memang sudah bepergian, bukan ke mana pembangunan diharapkan menyusul.",
+            "whyOthersFail": "Panjang jalur, rel lama, dan larangan mobil tidak disebut sebagai ciri keberhasilan."
+          }
+        }
+      ],
+      "wordCount": 736,
+      "paragraphs": 8
+    },
+    {
+      "id": "rx-rings",
+      "exam": "toefl_reading",
+      "level": "C1",
+      "title": "Reading the Rings of Trees",
+      "topic": "dendrochronology",
+      "text": "In temperate climates a tree adds one layer of wood each year, and the layers are visible in cross-section as rings. Wide rings correspond to favourable growing seasons and narrow rings to poor ones. Because every tree in a region experiences the same weather, trees of the same species growing near one another produce the same pattern of wide and narrow rings. That shared pattern is what makes the rings useful as a record. A single tree tells you about one organism; a pattern repeated across many trees tells you about a climate.\n\nThe technique that exploits this is called crossdating. An investigator measures the ring widths of a living tree whose outer ring corresponds to a known year, then looks for the same sequence of wide and narrow rings in a beam taken from an older structure. Where the sequences overlap, the beam can be dated exactly. The overlapping beam then extends the reference sequence further back, and the process repeats. Chronologies assembled in this way now reach back more than eight thousand years in some regions, and each year in them is a calendar year rather than an estimate.\n\nThe precision is the point. Radiocarbon dating, the other main technique available to archaeologists, returns a range rather than a date, and the width of that range is rarely less than several decades. For many questions a range is sufficient. For others it is not. If the question is whether a particular roof beam was cut before or after a documented siege, a range that spans the siege answers nothing. Tree rings, where the wood survives, can settle it.\n\nThe method has strict limits, and they are worth stating plainly. It requires a species that produces one clear ring per year, which excludes most tropical trees, where growth is not interrupted by a cold season. It requires enough rings in the sample to produce a distinctive pattern; a beam with thirty rings may match the reference sequence in several places by chance. It requires that the outermost ring be present, or the date obtained is the date of some year before felling rather than the felling itself, and carpenters routinely trimmed away the outer wood. A date reported without this qualification can be wrong by decades in a direction that is not random: always too early.\n\nBeyond dating, the rings carry environmental information. A ring formed during a drought is narrow, and a sequence of narrow rings across many trees over a wide area indicates a regional drought rather than a local misfortune. Reconstructions built this way have identified severe multi-year droughts in the American Southwest that coincide with the abandonment of settlements, and comparable episodes elsewhere. The correspondence is suggestive, and it has often been reported as though it settled the matter. It does not. A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it, and the archaeological record in several of these cases shows movement beginning before the drought did.\n\nRings also record events other than weather. A frost severe enough to damage growing cells leaves a distinctive damaged layer, and such frost rings appear in the same year across widely separated regions after some large volcanic eruptions, which inject material into the upper atmosphere and cool the surface. Because the ring gives an exact year, these layers have been used to date eruptions whose historical records are vague or contradictory. Scars from fire are preserved in the same way, and a fire history assembled from scarred trees can show how frequently a particular forest burned before modern suppression policies began.\n\nNone of this makes the rings a transparent window. Interpretation involves judgement about which trees to sample, how to combine sequences that disagree, and how to separate the effects of climate from the effects of a tree's own ageing, since rings tend to narrow as a trunk widens regardless of conditions. Different laboratories processing the same raw measurements have produced reconstructions that differ in their details. What the rings offer is not certainty but an unusually well-anchored starting point: a set of dates that are exact, from which the arguments can proceed.",
+      "questions": [
+        {
+          "id": "rx-rings-1",
+          "type": "factual",
+          "stem": "According to paragraph 1, what makes tree rings useful as a record?",
+          "options": [
+            "Rings appear in every species of tree",
+            "Nearby trees of the same species share the same ring pattern",
+            "Each ring can be measured to the nearest millimetre",
+            "Rings grow wider as a tree ages"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "trees of the same species growing near one another produce the same pattern of wide and narrow rings",
+            "why": "Pola yang SAMA di banyak pohon itulah yang mengubah cincin dari catatan satu pohon menjadi catatan iklim.",
+            "whyOthersFail": "Teks justru menyebut sebagian besar pohon tropis tidak membentuk satu cincin per tahun; ketelitian pengukuran dan pelebaran seiring usia bukan alasan yang diberikan di paragraf 1."
+          }
+        },
+        {
+          "id": "rx-rings-2",
+          "type": "factual",
+          "stem": "According to paragraph 2, how is a reference sequence extended further back in time?",
+          "options": [
+            "By counting rings on the oldest living tree available",
+            "By overlapping an older beam with a sequence that is already dated",
+            "By comparing rings with radiocarbon results",
+            "By sampling trees from several different regions"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "The overlapping beam then extends the reference sequence further back, and the process repeats",
+            "why": "Crossdating menyambung: balok yang lebih tua ditumpangkan pada urutan yang sudah bertanggal, lalu jadi dasar sambungan berikutnya.",
+            "whyOthersFail": "Pohon hidup hanya titik AWAL, bukan cara memperpanjang. Radiokarbon dibahas sebagai pembanding, bukan bagian metodenya."
+          }
+        },
+        {
+          "id": "rx-rings-3",
+          "type": "negative_factual",
+          "stem": "All of the following are stated as limits of the method EXCEPT:",
+          "options": [
+            "Most tropical trees do not produce one clear ring per year",
+            "A short sequence may match the reference in several places by chance",
+            "The outermost ring is often missing from worked timber",
+            "Ring widths cannot be measured accurately in very old wood"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "It requires a species that produces one clear ring per year... a beam with thirty rings may match the reference sequence in several places by chance... It requires that the outermost ring be present",
+            "why": "Tiga batasan pertama disebut eksplisit di paragraf 4. Kesulitan MENGUKUR pada kayu sangat tua tidak pernah disebut.",
+            "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti begitu menemukan satu pilihan yang benar - di sini yang dicari justru yang TIDAK ada."
+          }
+        },
+        {
+          "id": "rx-rings-4",
+          "type": "vocabulary",
+          "stem": "The word \"settle\" in paragraph 3 is closest in meaning to",
+          "options": [
+            "resolve",
+            "postpone",
+            "calculate",
+            "question"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Tree rings, where the wood survives, can settle it",
+            "why": "Konteksnya pertanyaan yang tidak terjawab oleh rentang radiokarbon; cincin pohon bisa MENYELESAIKANNYA.",
+            "whyOthersFail": "'Postpone' dan 'question' berlawanan arah dengan konteksnya; 'calculate' menyempitkan maknanya jadi sekadar berhitung."
+          }
+        },
+        {
+          "id": "rx-rings-5",
+          "type": "inference",
+          "stem": "It can be inferred from paragraph 4 that a felling date reported without noting a missing outer ring will most likely be",
+          "options": [
+            "too early",
+            "too late",
+            "accurate within one year",
+            "impossible to compare with other dates"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "the date obtained is the date of some year before felling rather than the felling itself... always too early",
+            "why": "Kalau cincin terluar sudah diserut tukang kayu, tanggal yang didapat adalah tahun SEBELUM penebangan - jadi selalu terlalu awal.",
+            "whyOthersFail": "'Too late' membalik arahnya; teks justru menekankan galatnya TIDAK acak, sehingga 'akurat' dan 'tidak bisa dibandingkan' keduanya meleset."
+          }
+        },
+        {
+          "id": "rx-rings-6",
+          "type": "sentence_simplification",
+          "stem": "Which sentence best expresses the essential information in: \"A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it\"?",
+          "options": [
+            "Timing alone does not prove that the drought caused the departure",
+            "Droughts and abandonments were never connected in any way",
+            "People always left their settlements before a drought started",
+            "Abandonments can only be explained by studying rainfall"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "it does not establish that people left because of it",
+            "why": "Bersamaan waktu membuktikan kebersamaan, bukan sebab-akibat. Itu inti kalimatnya.",
+            "whyOthersFail": "Pilihan lain melampaui teks: penulis tidak menyatakan keduanya tidak berhubungan, tidak mengatakan orang SELALU pergi lebih dulu, dan tidak menjadikan curah hujan satu-satunya penjelasan."
+          }
+        },
+        {
+          "id": "rx-rings-7",
+          "type": "rhetorical_purpose",
+          "stem": "Why does the author mention frost rings after volcanic eruptions?",
+          "options": [
+            "To give an example of information in the rings that is not about weather patterns alone",
+            "To argue that volcanic dating is more reliable than crossdating",
+            "To explain why tropical trees lack clear rings",
+            "To show that historical records of eruptions are usually accurate"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Rings also record events other than weather",
+            "why": "Paragraf itu dibuka dengan pernyataan bahwa cincin merekam peristiwa selain cuaca; frost ring adalah contohnya.",
+            "whyOthersFail": "Teks justru menyebut catatan sejarah letusan sering kabur atau bertentangan, dan tidak membandingkan keandalan kedua metode."
+          }
+        },
+        {
+          "id": "rx-rings-8",
+          "type": "factual",
+          "stem": "According to paragraph 7, why do rings tend to narrow as a trunk widens?",
+          "options": [
+            "Because the same amount of wood is spread over a longer circumference",
+            "Because older trees receive less rainfall",
+            "Because laboratories measure old rings differently",
+            "Because fire scars interrupt the growth layers"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "rings tend to narrow as a trunk widens regardless of conditions",
+            "why": "Teks menyatakan penyempitan itu terjadi TERLEPAS dari kondisi - efek geometri batang yang melebar, bukan efek iklim.",
+            "whyOthersFail": "Curah hujan, perbedaan laboratorium, dan bekas kebakaran memang disebut di tempat lain, tetapi bukan sebagai sebab penyempitan ini."
+          }
+        },
+        {
+          "id": "rx-rings-9",
+          "type": "insert_text",
+          "stem": "Where would this sentence best fit in paragraph 3?  \"For many questions a range is sufficient.\"  (A) Radiocarbon dating returns a range rather than a date. (B) The width of that range is rarely less than several decades. (C) For others it is not. (D) If the question is whether a beam was cut before or after a siege, a range answers nothing.",
+          "options": [
+            "Position A",
+            "Position B",
+            "Position C",
+            "Position D"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "For many questions a range is sufficient. For others it is not.",
+            "why": "Kalimat itu memasang pasangan 'For many... / For others...'. Ia harus berdiri tepat SEBELUM 'For others it is not', yaitu posisi C.",
+            "whyOthersFail": "Di A dan B kalimatnya memotong penjelasan tentang apa itu rentang; di D pasangannya sudah lewat dan 'For others' jadi menggantung."
+          }
+        },
+        {
+          "id": "rx-rings-10",
+          "type": "inference",
+          "stem": "What does the final paragraph suggest about reconstructions from different laboratories?",
+          "options": [
+            "Judgement in processing can lead to differing results from the same measurements",
+            "Only one laboratory's method is considered valid",
+            "Raw measurements are usually wrong",
+            "Disagreement means the dates themselves are unreliable"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Different laboratories processing the same raw measurements have produced reconstructions that differ in their details",
+            "why": "Yang berbeda adalah hasil OLAHANNYA, karena ada pertimbangan di dalamnya - bukan pengukurannya, dan bukan tanggalnya.",
+            "whyOthersFail": "Justru sebaliknya di pilihan terakhir: penulis menutup dengan menyebut tanggalnya tepat dan itulah pijakan argumennya."
+          }
+        }
+      ],
+      "wordCount": 702,
+      "paragraphs": 7
+    }
+  ]
+}
