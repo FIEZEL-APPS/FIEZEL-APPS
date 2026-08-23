@@ -1,53 +1,26 @@
-/* FIEZEL Dark Mode + A/B Testing + UI Utilities */
+/* FIEZEL UI: A/B Testing + Skeleton/Empty-state utilities (tema tunggal: terang) */
 
 class FiezelUIManager {
   constructor() {
+    /* Kunci lama dari era mode gelap; dipertahankan hanya untuk dibersihkan di initTheme. */
     this.STORAGE_KEY_THEME = 'fiezel_theme_preference';
     this.STORAGE_KEY_VARIANT = 'fiezel_ab_variant';
     this.init();
   }
 
-  /* ===== DARK MODE ===== */
-  /* m025-120: dasar cream adalah keputusan produk, bukan preferensi perangkat.
-     Sebelumnya baris ini memakai `stored || getSystemPreference()`, sehingga ponsel yang
-     disetel gelap memaksa aplikasi gelap pada kunjungan pertama - padahal OWNER meminta
-     dasar cream. Preferensi sistem kini hanya menjadi info, bukan penentu; yang menentukan
-     hanyalah pilihan yang pernah disimpan murid sendiri. */
-  initDarkMode() {
-    const stored = localStorage.getItem(this.STORAGE_KEY_THEME);
-    this.applyTheme(stored === 'dark' ? 'dark' : 'light');
-  }
-
-  getSystemPreference() {
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
-  }
-
-  applyTheme(theme) {
-    if (theme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      localStorage.setItem(this.STORAGE_KEY_THEME, 'dark');
-    } else {
-      /* m025-120 BUG: dulu baris ini menghapus atributnya. Aturan gelap di style.css
-         berbunyi `@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) }`,
-         jadi TIDAK ADA atribut tetap cocok dengan aturan gelap - memilih terang di ponsel
-         bermode gelap tidak mengubah apa pun. Terang harus dinyatakan, bukan dibiarkan. */
-      document.documentElement.setAttribute('data-theme', 'light');
-      localStorage.setItem(this.STORAGE_KEY_THEME, 'light');
-    }
-  }
-
-  toggleDarkMode() {
-    const current = document.documentElement.getAttribute('data-theme') || 'light';
-    const next = current === 'dark' ? 'light' : 'dark';
-    this.applyTheme(next);
-    return next;
+  /* ===== TEMA ===== */
+  /* m025-134: mode gelap dihapus atas permintaan OWNER. Dasar cream adalah keputusan
+     produk dan kini satu-satunya tampilan: tidak ada sakelar, tidak ada preferensi
+     tersimpan, dan preferensi sistem tidak lagi punya suara. Atribut data-theme="light"
+     tetap DINYATAKAN (bukan dihapus) supaya stylesheet atau ekstensi pihak ketiga yang
+     masih mengenal konvensi itu membaca terang secara eksplisit. */
+  initTheme() {
+    document.documentElement.setAttribute('data-theme', 'light');
+    try { localStorage.removeItem(this.STORAGE_KEY_THEME); } catch (e) {}
   }
 
   getCurrentTheme() {
-    return document.documentElement.getAttribute('data-theme') || 'light';
+    return 'light';
   }
 
   /* ===== A/B TESTING ===== */
@@ -147,23 +120,15 @@ class FiezelUIManager {
 
   /* ===== INITIALIZATION ===== */
   init() {
-    this.initDarkMode();
+    this.initTheme();
     this.initABTest();
-    this.setupThemeToggleListener();
     this.logInitialization();
   }
 
-  /* m025-120: perubahan mode sistem tidak lagi menimpa tema aplikasi. Penjaga lama hanya
-     menyala bila belum ada preferensi tersimpan, padahal applyTheme selalu menulis satu
-     pada init - jadi yang tersisa hanyalah risiko dasar cream berbalik gelap di belakang
-     murid. Metodenya dipertahankan sebagai titik pasang bila kelak ada tombol "ikuti
-     sistem" yang eksplisit. */
-  setupThemeToggleListener() {}
 
   logInitialization() {
-    const theme = this.getCurrentTheme();
     const variant = this.getABVariant();
-    console.log(`[FIEZEL UI] Theme: ${theme}, AB Variant: ${variant}`);
+    console.log(`[FIEZEL UI] AB Variant: ${variant}`);
   }
 }
 

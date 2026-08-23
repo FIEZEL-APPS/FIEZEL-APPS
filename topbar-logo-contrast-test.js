@@ -111,10 +111,6 @@ function allLightBlocks() {
 }
 
 const LIGHT = allLightBlocks();
-const DARKS = [
-  blockFrom(/@media \(prefers-color-scheme:dark\)/),
-  blockFrom(/:root\[data-theme="dark"\]\{/)
-];
 
 test('wordmark topbar tidak lagi memakai hex mati', () => {
   // Inilah akar masalahnya: warna yang tidak ikut sistem tidak ikut pindah ketika
@@ -126,28 +122,25 @@ test('wordmark topbar tidak lagi memakai hex mati', () => {
   }
 });
 
-test('setiap warna wordmark punya nilai di tema terang DAN gelap', () => {
+test('setiap warna wordmark punya nilai di tema terang', () => {
+  // m025-134: mode gelap dihapus, jadi yang dijaga tinggal satu - tokennya benar-benar
+  // ADA. Token yang tidak punya nilai sama sekali adalah bug m025-119 dalam bentuk lain:
+  // logo diam-diam kehilangan warnanya tanpa satu pun galat.
   const names = topbarStops().map((v) => (/var\(\s*(--[a-z0-9-]+)/.exec(v) || [])[1]).filter(Boolean);
   if (!names.length) throw new Error('tidak ada token warna di wordmark topbar');
-  const missing = [];
-  for (const n of names) {
-    const key = n.slice(2);
-    if (!tokenIn(LIGHT, key)) missing.push(n + ' @terang');
-    if (!DARKS.some((b) => tokenIn(b, key))) missing.push(n + ' @gelap');
-  }
+  const missing = names.filter((n) => !tokenIn(LIGHT, n.slice(2)));
   if (missing.length) {
-    throw new Error('token tanpa nilai: ' + missing.join(', ')
-      + ' — logo yang tidak punya pasangan gelap adalah bug m025-119 dalam bentuk lain');
+    throw new Error('token tanpa nilai: ' + missing.join(', '));
   }
 });
 
-test('logo terbaca di atas topbar, di kedua tema', () => {
+test('logo terbaca di atas topbar', () => {
   // Brief B: "perlakukan logo seperti elemen teks penting ... setara ambang keterbacaan
   // teks UI pada umumnya, bukan sekadar masih kelihatan kalau diperhatikan".
   const MIN = 4.5;
   const names = topbarStops().map((v) => (/var\(\s*(--[a-z0-9-]+)/.exec(v) || [])[1]).filter(Boolean);
   const weak = [];
-  for (const [label, blocks, fallback] of [['terang', [LIGHT], '#FFF8ED'], ['gelap', DARKS, '#221A11']]) {
+  for (const [label, blocks, fallback] of [['terang', [LIGHT], '#FFF8ED']]) {
     const merged = blocks.join('\n');
     const bg = chromeOver(label === 'terang' ? LIGHT : merged + LIGHT, fallback);
     for (const n of names) {

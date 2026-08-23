@@ -47,10 +47,30 @@ check(/\.launcher-shell\{grid-template-columns:1fr/.test(css),'Launcher does not
 // Yang dijaga sekarang bukan JUMLAH kolomnya melainkan sifat yang sebenarnya dimaksud: grid
 // tetap menyesuaikan diri di ponsel, dan tidak boleh kembali menjadi satu kolom yang membuat
 // Home terbaca sebagai daftar panjang.
-// Ada tiga blok @media(max-width:640px) di berkas ini, jadi mengambil yang pertama saja
+// Ada beberapa blok @media(max-width:640px) di berkas ini, jadi mengambil yang pertama saja
 // akan memeriksa blok yang salah. Yang dicari adalah blok mana pun di antaranya yang mengatur
 // grid modul.
-const mobileBlocks=css.split('@media(max-width:640px){').slice(1).map(part=>part.split('@media')[0]);
+//
+// m025-134: batas tiap blok dihitung dengan menghitung kurung, bukan dengan memotong di
+// '@media' berikutnya. Cara lama membuat panjang satu blok bergantung pada ada-tidaknya
+// media query LAIN sesudahnya - menghapus blok mode gelap saja sudah cukup membuat blok
+// ponsel menelan aturan milik breakpoint tetangga dan memerahkan pemeriksaan ini tanpa
+// satu pun aturan ponsel berubah.
+function mediaBlocks(source,opener){
+  const out=[];
+  let at=source.indexOf(opener);
+  while(at>=0){
+    let depth=1,i=at+opener.length;
+    for(;i<source.length&&depth>0;i++){
+      if(source[i]==='{')depth++;
+      else if(source[i]==='}')depth--;
+    }
+    out.push(source.slice(at+opener.length,i-1));
+    at=source.indexOf(opener,i);
+  }
+  return out;
+}
+const mobileBlocks=mediaBlocks(css,'@media(max-width:640px){');
 const launcherBlock=mobileBlocks.find(b=>b.includes('.learning-launcher{'))||'';
 check(/\.learning-launcher\{grid-template-columns:1fr 1fr/.test(launcherBlock),
   'Learning launcher must stay a two-column grid on phones - one column made Home 4.7 screens tall.');
