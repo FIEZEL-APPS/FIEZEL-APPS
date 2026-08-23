@@ -1,5 +1,5 @@
 /**
- * FIEZEL gate — onboarding enam langkah (Step 1 = nama murid, m025-114; Step 2-6 mengikuti
+ * FIEZEL gate — onboarding enam langkah (Step 1 = nama murid, m025-115; Step 2-6 mengikuti
  * FIEZEL_Complete_Design_Specification.pdf bagian 3).
  *
  * Lapisan yang menutupi seluruh layar adalah tempat paling mudah untuk mengurung pengguna,
@@ -42,7 +42,7 @@ function el(tag) {
     value: '',
     focus() { node.focused = true; },
     removeAttribute(k) { delete node.attrs[k]; },
-    // m025-114: kolom nama membuat gate ini harus melihat <input>, bukan hanya <button>.
+    // m025-115: kolom nama membuat gate ini harus melihat <input>, bukan hanya <button>.
     // Tanpa itu langkah wajib pertama tidak bisa diuji sama sekali - dan langkah yang tidak
     // bisa diuji adalah langkah yang paling gampang berubah jadi jalan buntu.
     _html: null, _found: null,
@@ -207,7 +207,7 @@ test('melewati (global) di langkah mana pun langsung menutup dan tidak kembali m
   const run = onboarding.show(env, { now: NOW });
   assert.strictEqual(run.shown, true);
   assert.strictEqual(env._body.children.length, 1);
-  // Step 1 (nama) sengaja TIDAK punya "Lewati" - m025-114. Jalan keluarnya adalah menjawab.
+  // Step 1 (nama) sengaja TIDAK punya "Lewati" - m025-115. Jalan keluarnya adalah menjawab.
   advanceTo(run, 2);
   run.element.querySelector('[data-ob-skip]').listeners.click[0]();
   assert.strictEqual(onboarding.completed(env), true, 'melewati harus dicatat selesai');
@@ -490,7 +490,7 @@ test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', (
     'aset maskot tidak boleh dirujuk lagi dari stylesheet');
 });
 
-// ---- m025-114: nama murid (Step 1, WAJIB) --------------------------------------------
+// ---- m025-115: nama murid (Step 1, WAJIB) --------------------------------------------
 //
 // OWNER: "sekarang Jahran adalah single user, ubah agar appsnya menyesuaikan dengan nama
 // user, misalnya saat masuk tanya dulu nama mereka di onboarding (WAJIB)".

@@ -29,7 +29,7 @@
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,Number(n)||0));
   const esc=s=>String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
   /**
-   * m025-114: bank latihan menyimpan token {name}, bukan nama sungguhan - contoh jawaban
+   * m025-115: bank latihan menyimpan token {name}, bukan nama sungguhan - contoh jawaban
    * "My name is {name}" harus berbunyi nama MURID INI, bukan nama orang lain yang kebetulan
    * ada di kode saat bank ini ditulis. Nama dibaca dari aplikasi lewat pengait opsional,
    * jadi sidecar ini tetap bisa dimuat dan diuji tanpa aplikasi. Tanpa nama, tokennya

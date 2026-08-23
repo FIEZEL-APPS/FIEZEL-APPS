@@ -3,7 +3,7 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-const SW_REV='m025-114-nama-murid-swipeback-corebrain-20260822-1';
+const SW_REV='m025-115-nama-murid-swipeback-corebrain-20260823-1';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -110,7 +110,7 @@ self.addEventListener('periodicsync',e=>{if(e.tag==='fiezel-update-check')e.wait
 self.addEventListener('notificationclick',e=>{e.notification.close();const url=e.notification.data?.url||'./';e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if(typeof client.navigate==='function'&&url&&url!=='./'){return client.navigate(url).then(c=>(c&&c.focus?c.focus():client.focus())).catch(()=>client.focus())}if('focus'in client)return client.focus()}return clients.openWindow?clients.openWindow(url):undefined}))});
 
 self.addEventListener('push',event=>{
-  // m025-114: service worker tidak punya akses ke state murid, jadi teks cadangan di sini
+  // m025-115: service worker tidak punya akses ke state murid, jadi teks cadangan di sini
   // TIDAK boleh menyebut nama siapa pun. Sapaan bernama datang dari payload push yang
   // memang membawanya; cadangan ini hanya berlaku saat payload-nya kosong atau rusak.
   let payload={title:'FIEZEL · Reminder belajar',body:'Waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};

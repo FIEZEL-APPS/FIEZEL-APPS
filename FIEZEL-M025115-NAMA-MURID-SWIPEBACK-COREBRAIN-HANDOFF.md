@@ -1,4 +1,4 @@
-# m025-114 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
+# m025-115 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
 
 OWNER (tiga permintaan dalam satu pesan):
 
@@ -16,21 +16,26 @@ sesungguhnya, yang ternyata tidak ada di modul riwayat sama sekali.
 
 ---
 
-## 0. Temuan tak terduga: Perpustakaan mati total
+## 0. Perpustakaan mati total — ditemukan di sini, sudah diperbaiki di main
 
-Saat menjalankan reproduksi pertama, layar Perpustakaan berbunyi:
+Saat menjalankan reproduksi pertama untuk (2), layar Perpustakaan berbunyi:
 
 > Perpustakaan belum bisa dimuat. Expected ',' or ']' after array element…
 
-`features/library/library-books-v1.json` **tidak bisa di-parse** sejak commit `34021f5`
-("Update library-books-v1.json", 5.801 baris ditambahkan). Satu koma hilang di sambungan
-antara buku `the_little_prince` dan `charlottes_web_guide` (baris 6823). Seluruh fitur
-Perpustakaan — 9 buku, audiobook, subtitle — mati sejak commit itu.
+`features/library/library-books-v1.json` tidak bisa di-parse, jadi seluruh fitur
+Perpustakaan — 9 buku, audiobook, subtitle — mati. Cabang ini memperbaikinya dengan
+menambahkan satu koma yang hilang di sambungan antara `the_little_prince` dan
+`charlottes_web_guide`.
 
-**Perbaikan:** satu karakter. Sesudahnya JSON valid, 9 buku, id unik, dan pembaca terbuka
-normal (diverifikasi di peramban).
+**Sementara itu, PR #165 (m025-114) memperbaiki berkas yang sama lebih dulu dan sudah
+masuk ke `main`**, dengan memulihkan versi sehat terakhir (`9dc132c`) alih-alih menambal
+komanya, plus `library-integrity-test.js` sebagai gate baru. Saat `main` digabungkan ke
+cabang ini, kedua hasilnya ternyata **identik byte-per-byte** (9 buku, 1.703 kalimat),
+jadi tidak ada isi yang hilang dari sisi mana pun dan tidak ada konflik pada berkas itu.
 
----
+Yang tetap berharga dari #165 bukan perbaikannya melainkan gate-nya: sebelum itu tidak
+satu pun dari 64 tes membuka berkas data yang benar-benar dikirim ke perangkat. Gate itu
+ikut berjalan di cabang ini.
 
 ## 1. Swipe back — diagnosis
 
@@ -232,4 +237,6 @@ kode `brain_optimal_challenge` / `brain_trend_plateau` / `brain_memory_at_risk`.
 - **Diperluas:** `back-nav-test.js` (+11) mengunci keenam akar masalah; `onboarding-test.js`
   (+8) mengunci langkah nama, termasuk bahwa ia wajib **dan** tidak mengurung. Fake DOM-nya
   kini melihat `<input>`, bukan hanya `<button>`.
-- Seluruh gate `quality.yml` hijau. Penanda rilis dinaikkan bersama ke `m025-114`.
+- Seluruh gate `quality.yml` hijau, termasuk `library-integrity-test.js` yang datang
+  bersama `main`. Penanda rilis dinaikkan bersama ke `m025-115` (`main` sudah memakai
+  `m025-114` untuk PR #165).
