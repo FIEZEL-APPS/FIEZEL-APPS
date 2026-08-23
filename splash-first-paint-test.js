@@ -189,7 +189,9 @@ test('markup statis identik dengan FiezelSplash.markup(), bukan salinan yang bis
 });
 
 test('latar boot gelap, jadi frame sebelum CSS pun bukan putih', () => {
-  assert.ok(/<html lang="id" class="fz-booting">/.test(html), 'dokumen harus menandai dirinya sedang boot');
+  // m025-134: <html> kini juga membawa data-theme="light", jadi yang diperiksa adalah
+  // kelasnya - bukan seluruh tag persis - supaya atribut lain boleh menumpang di sana.
+  assert.ok(/<html lang="id"[^>]*class="fz-booting"/.test(html), 'dokumen harus menandai dirinya sedang boot');
   const critical = /<style id="fiezelBootCritical">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(critical, 'CSS kritis splash harus disisipkan di <head>');
   assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#0B0709\}/.test(critical[1]),
