@@ -199,7 +199,7 @@
       // popstate ini adalah gema dari history.go() yang kita panggil sendiri di dismiss():
       // layarnya sudah ditutup, jadi tidak ada yang tersisa untuk dikerjakan.
       if (consumeSkip(at)) return { action: 'skipped', depth: stack.length };
-      // Gerbang wajib diperiksa SEBELUM tumpukan kosong. m025-116: urutan lama memeriksa
+      // Gerbang wajib diperiksa SEBELUM tumpukan kosong. m025-117: urutan lama memeriksa
       // tumpukan lebih dulu, jadi gerbang yang menyala di layar pertama - kunci target
       // harian, gerbang akun, undangan notifikasi - bisa ditembus oleh satu tekanan kembali
       // hanya karena belum ada navigasi apa pun yang terekam. Entrinya didorong ulang supaya
@@ -240,7 +240,7 @@
         return { action: 'chained', depth: stack.length };
       }
       chained = 0;
-      // m025-116: jalan buntu yang sesungguhnya - tumpukan HABIS, tidak ada lapisan yang
+      // m025-117: jalan buntu yang sesungguhnya - tumpukan HABIS, tidak ada lapisan yang
       // tertutup, dan view-nya sudah benar. Sampai rilis ini baris di bawah berbunyi
       // `return {action:'noop'}` begitu saja: satu tekanan kembali yang menghabiskan entri
       // riwayat dan TIDAK mengubah apa pun di layar. Dari sisi murid itu tidak terbaca
@@ -420,7 +420,7 @@
   /**
    * Apakah platform ini benar-benar TIDAK punya gestur kembali sendiri.
    *
-   * m025-116. Alasan gestur tepi ini ada hanya berlaku untuk satu platform: di iOS mode
+   * m025-117. Alasan gestur tepi ini ada hanya berlaku untuk satu platform: di iOS mode
    * standalone, gestur swipe-back adalah milik chrome Safari, dan di PWA terpasang chrome
    * itu tidak ada. Android terpasang BUKAN kasus yang sama - gestur kembali sistemnya tetap
    * berjalan di dalam PWA dan sudah memanggil history.back() sendiri. Memasang gestur kedua
