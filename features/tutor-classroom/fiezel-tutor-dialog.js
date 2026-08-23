@@ -61,11 +61,27 @@
     return 'open';
   }
 
+  /**
+   * m025-117: nama murid sekarang menjadi salah satu token seperti {topic} dan {formula}.
+   * Sampai rilis ini naskah sapaan menuliskan satu nama sungguhan apa adanya, sehingga
+   * setiap murid lain disapa dengan nama orang lain. Nilainya dibaca dari aplikasi bila
+   * ada; kalau tidak, token {name} menghilang dan kalimatnya tetap utuh - fill() memang
+   * membuang token kosong beserta spasi berlebihnya.
+   */
+  function learnerName(env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : null);
+    try {
+      var state = target && typeof target.__getFiezelState === 'function' ? target.__getFiezelState() : null;
+      return String((state && state.userName) || '').trim();
+    } catch (_) { return ''; }
+  }
+
   function lessonContext(lesson, beat) {
     var l = lesson || {};
     var board = l.board || {};
     var examples = Array.isArray(board.examples) ? board.examples : [];
     return {
+      name: learnerName(),
       topic: String(l.topic || 'materi ini'),
       level: String(l.level || ''),
       formula: String(board.formula || ''),
@@ -163,7 +179,7 @@
         en: '{formula}' }
     ],
     greeting: [
-      { id: 'Halo Jahran. Aku siap. Mau aku jelaskan bagian mana dari {topic}?', en: 'Hello! Ready when you are.' },
+      { id: 'Halo {name}. Aku siap. Mau aku jelaskan bagian mana dari {topic}?', en: 'Hello! Ready when you are.' },
       { id: 'Hai. Kita sedang di {topic}. Tanyakan apa saja, aku jawab.', en: 'Hi! We are on {topic}.' },
       { id: 'Halo. Kalau ada yang mengganjal di {topic}, sekarang waktunya bertanya.', en: 'Hello! Ask me anything about {topic}.' }
     ],
@@ -251,7 +267,8 @@
   function aiPrompt(text, context) {
     var ctx = lessonContext(context && context.lesson, context && context.beat);
     return [
-      'Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia milik Jahran.',
+      ctx.name ? ('Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia milik ' + ctx.name + '.')
+        : 'Kamu adalah FIEZEL, asisten belajar berbahasa Indonesia.',
       'Jawab pertanyaan APA PUN yang ditanyakan, termasuk yang tidak berhubungan dengan pelajaran bahasa Inggris.',
       'Jangan menolak pertanyaan hanya karena berada di luar materi, dan jangan mengalihkan balik ke materi kecuali memang diminta.',
       'Gaya bicara hangat dan wajar seperti orang yang sedang menjelaskan langsung, bukan daftar aturan.',

@@ -443,6 +443,141 @@ test('gerbang wajib disebut namanya pada pemasangan', () => {
   assert.ok(/knownView:v=>VALID_VIEWS\.has\(v\)/.test(app), 'tujuan kembali diverifikasi ke daftar view sah');
 });
 
+// ---- m025-117: penyebab "stuck screen" yang dilaporkan OWNER ---------------------------
+//
+// OWNER: "swipe back masih cacat sistem, meski di perbaiki, misalnya sudah masuk kedalam
+// folder, dan ingin kembali, ketika swipe back malah stuck screen".
+//
+// Diagnosisnya dijalankan di peramban sungguhan, dan penyebab utamanya BUKAN di modul ini:
+// features/daily-target/fiezel-daily-target.js membungkus window.go dengan
+// `function (view) { ... return baseGo(view) }`. go() punya dua parameter - go(view, opts) -
+// dan `opts.viaHistory === true` adalah SATU-SATUNYA hal yang menahan go() supaya tidak
+// mendorong entri riwayat baru. Pembungkus yang menjatuhkan argumen kedua membuat setiap
+// perpindahan MUNDUR mendorong entri MAJU, jadi riwayat berubah menjadi dua entri yang
+// saling menunjuk dan murid berpindah-pindah di antara dua layar yang sama selamanya.
+// Itulah "stuck screen"-nya. Gate ini menahan ketiga bagiannya.
+
+const dailyTarget = fs.readFileSync('./features/daily-target/fiezel-daily-target.js', 'utf8');
+
+test('pembungkus go() meneruskan SELURUH argumen, bukan hanya nama view', () => {
+  assert.ok(/return baseGo\.apply\(this, arguments\);/.test(dailyTarget),
+    'menjatuhkan opts.viaHistory membuat jalur kembali mendorong entri maju: gelung back->push->back');
+  assert.ok(!/return baseGo\(view\);/.test(dailyTarget));
+});
+
+test('hanya ADA SATU pemilik riwayat: kunci target harian tidak mendorong entrinya sendiri', () => {
+  // Entri asing menggeser kesejajaran antara tumpukan modul ini dan riwayat sungguhan, dan
+  // sejak itu satu tekanan kembali bisa memakan entri yang tidak diketahui siapa pun.
+  assert.ok(!/function guardHistory/.test(dailyTarget));
+  // Kode, bukan komentar: catatan m025-117 di berkas itu memang MENYEBUT entri lama supaya
+  // alasannya bisa dibaca, jadi yang diperiksa adalah pemakaian History API-nya.
+  const dailyCode = dailyTarget.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.ok(!/pushState|popstate|history\.go|history\.back/.test(dailyCode),
+    'kunci harian tidak boleh punya entri riwayatnya sendiri - itu pemilik riwayat kedua');
+  assert.ok(/daily-locked/.test(dailyTarget), 'ia cukup mengumumkan dirinya lewat kelas di <body>');
+  assert.ok(/daily-locked/.test(app), 'dan app.js yang menyerahkannya ke hook locked milik modul ini');
+});
+
+test('gerbang wajib menahan tekanan kembali bahkan saat belum ada navigasi apa pun', () => {
+  // Urutan lama memeriksa tumpukan kosong LEBIH DULU, jadi gerbang yang menyala di layar
+  // pertama bisa ditembus satu tekanan kembali - dan tekanan itu keluar dari aplikasi.
+  const a = makeApp({ locked: true });
+  const result = a.ctrl.handlePop();
+  assert.strictEqual(result.action, 'blocked');
+  assert.strictEqual(a.pushes, 1, 'entrinya harus didorong ulang, bukan dibiarkan lepas');
+  assert.deepStrictEqual(a.applied, []);
+});
+
+test('tekanan kembali tidak pernah berakhir tanpa perubahan apa pun di layar', () => {
+  // Lapisan yang ditutup lewat jalan lain meninggalkan satu entri mati di DASAR tumpukan.
+  // Sampai m025-117 hasilnya 'noop': entri riwayat habis, layar diam. Dari sisi murid itu
+  // tidak terbaca sebagai "tidak ada tujuan" melainkan sebagai aplikasi yang macet.
+  const a = makeApp();
+  a.view = 'library';
+  a.ctrl.pushLayer({ id: 'modal', close: () => false });
+  const result = a.ctrl.handlePop();
+  assert.strictEqual(result.action, 'fallback');
+  assert.deepStrictEqual(a.applied, ['home'], 'jalan buntu terakhir adalah beranda, bukan diam');
+  assert.strictEqual(a.ctrl.depth(), 0);
+});
+
+test('di beranda dengan tumpukan habis, diam memang jawaban yang benar', () => {
+  const a = makeApp();
+  a.ctrl.pushLayer({ id: 'modal', close: () => false });
+  const result = a.ctrl.handlePop();
+  assert.strictEqual(result.action, 'noop');
+  assert.deepStrictEqual(a.applied, [], 'melompat ke beranda dari beranda bukan perubahan, hanya kedipan');
+});
+
+test('gestur tepi hanya dipasang di platform yang memang tidak punya gestur kembali sendiri', () => {
+  // iOS terpasang tidak punya - gestur swipe-back di sana milik chrome Safari, dan di PWA
+  // chrome itu tidak ada. Android terpasang SUDAH punya, dan gestur sistemnya sudah
+  // memanggil history.back(); memasang gestur kedua berarti satu tarikan jari = dua langkah.
+  assert.strictEqual(backNav.needsEdgeSwipe({ navigator: { standalone: true } }), true);
+  assert.strictEqual(backNav.needsEdgeSwipe({
+    matchMedia: q => ({ matches: q.indexOf('standalone') !== -1 }),
+    navigator: { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/126' }
+  }), false, 'Android terpasang sudah punya gestur kembali sistem');
+  assert.strictEqual(backNav.needsEdgeSwipe({ matchMedia: () => ({ matches: false }) }), false);
+  assert.ok(/needsEdgeSwipe\(target\)/.test(moduleCode), 'pemasangan harus memakai pagar itu, bukan standalone() saja');
+});
+
+test('satu tarikan jari memicu paling banyak satu langkah mundur', () => {
+  const listeners = {};
+  const doc = {
+    addEventListener(type, fn) { (listeners[type] = listeners[type] || []).push(fn); },
+    emit(type, event) { (listeners[type] || []).forEach(fn => fn(event)); }
+  };
+  let hits = 0;
+  backNav.installEdgeSwipe({ document: doc }, () => { hits++; });
+  for (let i = 0; i < 3; i++) {
+    doc.emit('touchstart', { touches: [{ clientX: 6, clientY: 300 }], target: plainNode });
+    doc.emit('touchmove', { touches: [{ clientX: 300, clientY: 304 }], target: plainNode });
+    doc.emit('touchend', { changedTouches: [{ clientX: 300, clientY: 304 }], target: plainNode });
+  }
+  assert.strictEqual(hits, 1, 'gestur yang terbaca dua kali tidak boleh melompati dua layar sekaligus');
+});
+
+// ---- m025-117: "folder" di dalam satu view --------------------------------------------
+//
+// Kategori Classroom, rak buku, kartu flashcard, lesson Grammar, dan layar kuis semuanya
+// digambar DI DALAM satu view. Tanpa pendaftaran ini tekanan kembali dari dalam sebuah
+// folder mengambil entri VIEW-nya dan melempar murid keluar dari seluruh bagian.
+
+test('sub-layar mendaftar sebagai lapisan, memakai mekanisme yang sama dengan modal', () => {
+  assert.ok(/function enterStage\(kind,spec\)/.test(app));
+  assert.ok(/self\.FiezelBackNav\?\.pushLayer\?\.\(\{id:entry\.id,close:\(\)=>closeStage\(entry\)\}\)/.test(app),
+    'stage tidak boleh punya riwayatnya sendiri - itu pemilik riwayat kedua lagi');
+  for (const kind of ['vocab-flashcards', 'vocab-review', 'grammar-lesson', 'quiz', 'classroom-topic', 'classroom-lesson']) {
+    assert.ok(app.includes("enterStage('" + kind + "'"), 'sub-layar belum terdaftar: ' + kind);
+  }
+});
+
+test('stage menyimpan cara menggambar DIRINYA, bukan cara kembali ke induk', () => {
+  // Model "cara kembali ke induk" memaksa setiap pemanggil tahu induknya, dan kuis - yang
+  // bisa dimulai dari hub mana pun - tidak bisa tahu. Menutup satu stage cukup menggambar
+  // apa pun yang KINI di puncak.
+  assert.ok(/function drawTopScreen\(\)/.test(app));
+  assert.ok(/runStageLeave\(stageStack\.splice\(i\)\.reverse\(\)\);\n  drawTopScreen\(\);/.test(app));
+});
+
+test('perpindahan view membuang pembukuan stage, tanpa memutar riwayat mundur', () => {
+  // history.go() bersifat asinkron; menjalankannya tepat sebelum pushState entri view baru
+  // adalah cara tercepat membuat riwayat dan tumpukan kembali tidak sejajar.
+  assert.ok(/uiSfx\('nav'\);dropStages\(\);if\(opts\?\.viaHistory!==true\)pushBackNavView\(v\)/.test(app));
+  assert.ok(/function dropStages\(\)\{if\(!stageStack\.length\)return false;runStageLeave/.test(app));
+  assert.ok(!/function dropStages\(\)[^}]*dismiss/.test(app), 'dropStages tidak boleh menyentuh riwayat');
+});
+
+test('Classroom tutor ikut mendaftarkan foldernya, lewat pengait opsional', () => {
+  const tutor = fs.readFileSync('./features/tutor-classroom/fiezel-tutor-v3.js', 'utf8');
+  assert.ok(/root\.FiezelStage && root\.FiezelStage\.enter\(kind, restore\)/.test(tutor),
+    'pengait opsional supaya berkas tutor tetap bisa dimuat dan diuji sendirian');
+  assert.ok(/pushStage\('tutor-topic'/.test(tutor));
+  assert.ok(/pushStage\('tutor-lesson'/.test(tutor));
+  assert.ok(/popAllStages\(\)/.test(tutor), 'kembali ke akar Classroom harus membuang seluruh stage di dalamnya');
+});
+
 test('modul bisa dipakai di Node maupun di halaman', () => {
   assert.strictEqual(backNav.schema, 'fiezel-back-nav-v1');
   assert.strictEqual(typeof backNav.install, 'function');
