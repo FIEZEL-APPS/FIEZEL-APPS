@@ -2684,3 +2684,30 @@ html.fiezel-ui-v6 .launcher-shell{
 @media (prefers-reduced-motion:reduce){
   .fzw-spark{display:none}
 }
+
+/* Global learner-level contract */
+.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:14px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer;box-shadow:none}
+.active-level-control{flex:0 0 auto;flex-direction:column;align-items:flex-start;padding:10px 13px;min-width:118px;text-align:left}
+.active-level-control span,.active-level-control small{font-size:.66rem;color:var(--muted,#746958);line-height:1.1}
+.active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#c2402c)}
+.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);box-shadow:0 4px 14px rgba(67,43,25,.08);transform:translateY(-1px)}
+.home-level-context{padding:4px 9px;font-size:.68rem;font-weight:750;white-space:nowrap}
+.level-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}
+.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:16px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer}
+.level-picker-card strong{font-size:1.15rem;color:var(--accent,#c2402c)}
+.level-picker-card span{font-size:.72rem;line-height:1.35;color:var(--muted,#746958)}
+.level-picker-card.is-active{border-color:var(--accent,#c2402c);background:color-mix(in srgb,var(--accent,#c2402c) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#c2402c) 16%,transparent)}
+.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:15px;background:var(--panel-soft,#f8f1e7);color:var(--ink,#2b2118);font-size:.83rem}
+.level-source-note{display:block;margin-top:10px}
+.level-source-note b{color:var(--accent,#c2402c)}
+.level-scope-note span,.grammar-level-note span,.grammar-level-note small{color:var(--muted,#746958)}
+.grammar-level-note{display:grid;gap:4px}
+.grammar-level-note b{color:var(--accent,#c2402c)}
+.skill-level-note{margin-top:10px;font-size:.82rem;color:var(--muted,#746958)}
+.skill-level-note b{color:var(--accent,#c2402c)}
+@media(max-width:620px){
+  .section-head{align-items:flex-start;flex-direction:column}
+  .section-head .active-level-control{align-self:stretch;flex-direction:row;align-items:center;justify-content:space-between}
+  .level-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-level-context{font-size:.62rem}
+}

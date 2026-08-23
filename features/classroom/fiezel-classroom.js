@@ -16,11 +16,47 @@
   'use strict';
 
   var PHASES = ['category', 'topic', 'teach', 'quiz', 'summary'];
+  var LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  var DEFAULT_ACTIVE_LEVEL = 'A1';
 
-  function createSession(pack) {
+  function normalizeLevel(value) {
+    var level = String(value == null ? '' : value).trim().toUpperCase();
+    return LEVELS.indexOf(level) > -1 ? level : null;
+  }
+
+  function hasOwn(value, key) {
+    return Object.prototype.hasOwnProperty.call(value || {}, key);
+  }
+
+  /*
+   * The host owns the learner's level. Classroom accepts the same contract as
+   * the Skills Lab: activeLevel for a current value, initialLevel as an alias
+   * for first mount, and getActiveLevel for a host value that can change later.
+   * A caller that provides no contract keeps the original all-lessons behavior.
+   */
+  function createLevelContract(options) {
+    var source = options || {};
+    var getter = typeof source.getActiveLevel === 'function' ? source.getActiveLevel : null;
+    var explicit = hasOwn(source, 'activeLevel') || hasOwn(source, 'initialLevel') || !!getter;
+    var candidate;
+    try {
+      candidate = getter ? getter() : (source.activeLevel != null ? source.activeLevel : source.initialLevel);
+    } catch (_) {
+      candidate = null;
+    }
+    return {
+      external: explicit,
+      getter: getter,
+      level: explicit ? (normalizeLevel(candidate) || DEFAULT_ACTIVE_LEVEL) : null
+    };
+  }
+
+  function createSession(pack, options) {
     if (!pack || pack.schema !== 'fiezel-classroom-lessons-v1') {
       throw new Error('classroom_pack_invalid');
     }
+    var levelContract = createLevelContract(options);
+    var activeLevel = levelContract.level;
     var state = {
       phase: 'category',
       categoryId: null,
@@ -36,25 +72,60 @@
       finished: false
     };
 
-    function categories() { return pack.categories.slice(); }
+    function resetState() {
+      state.phase = 'category'; state.categoryId = null; state.lessonId = null;
+      state.segmentIndex = 0; state.questionIndex = 0; state.attempts = 0;
+      state.correct = 0; state.wrong = 0; state.remediating = false; state.finished = false;
+    }
+
+    function syncActiveLevel() {
+      if (!levelContract.getter) return activeLevel;
+      var candidate;
+      try { candidate = levelContract.getter(); } catch (_) { candidate = null; }
+      var next = normalizeLevel(candidate);
+      if (next && next !== activeLevel) {
+        activeLevel = next;
+        resetState();
+      }
+      return activeLevel;
+    }
+
+    function isAllowedLesson(lesson) {
+      var current = syncActiveLevel();
+      return !current || normalizeLevel(lesson && lesson.level) === current;
+    }
+
+    function visibleLessons() {
+      return pack.lessons.filter(isAllowedLesson);
+    }
+
+    function categories() {
+      var lessons = visibleLessons();
+      return pack.categories.filter(function (category) {
+        return lessons.some(function (lesson) { return lesson.category === category.id; });
+      });
+    }
     function lessonsIn(categoryId) {
-      return pack.lessons.filter(function (l) { return l.category === categoryId; });
+      return visibleLessons().filter(function (l) { return l.category === categoryId; });
     }
     function lesson() {
+      syncActiveLevel();
       if (!state.lessonId) return null;
-      return pack.lessons.filter(function (l) { return l.id === state.lessonId; })[0] || null;
+      return visibleLessons().filter(function (l) { return l.id === state.lessonId; })[0] || null;
     }
 
     function chooseCategory(id) {
-      if (!pack.categories.some(function (c) { return c.id === id; })) throw new Error('unknown_category');
+      if (!categories().some(function (c) { return c.id === id; })) throw new Error('unknown_category');
       state.categoryId = id;
       state.phase = 'topic';
       return snapshot();
     }
 
     function chooseLesson(id) {
+      syncActiveLevel();
       var found = pack.lessons.filter(function (l) { return l.id === id; })[0];
       if (!found) throw new Error('unknown_lesson');
+      if (!isAllowedLesson(found)) throw new Error('lesson_not_in_active_level');
       // Selecting a lesson from another category is legitimate deep-linking; keep the
       // category in sync rather than rejecting it.
       state.lessonId = id;
@@ -131,6 +202,7 @@
     }
 
     function snapshot() {
+      syncActiveLevel();
       var l = lesson();
       return {
         phase: state.phase,
@@ -138,6 +210,9 @@
         lessonId: state.lessonId,
         topic: l ? l.topic : null,
         level: l ? l.level : null,
+        activeLevel: activeLevel,
+        levelLocked: !!levelContract.external,
+        availableLessonCount: visibleLessons().length,
         board: l ? l.board : null,
         segmentIndex: state.segmentIndex,
         segmentCount: l ? l.segments.length : 0,
@@ -153,14 +228,26 @@
     }
 
     function reset() {
-      state.phase = 'category'; state.categoryId = null; state.lessonId = null;
-      state.segmentIndex = 0; state.questionIndex = 0; state.attempts = 0;
-      state.correct = 0; state.wrong = 0; state.remediating = false; state.finished = false;
+      resetState();
+      return snapshot();
+    }
+
+    function setActiveLevel(level) {
+      var next = normalizeLevel(level);
+      if (!next) throw new Error('invalid_level');
+      activeLevel = next;
+      levelContract.external = true;
+      levelContract.level = next;
+      levelContract.getter = null;
+      resetState();
       return snapshot();
     }
 
     return {
       phases: PHASES.slice(),
+      levels: LEVELS.slice(),
+      activeLevel: function () { return syncActiveLevel(); },
+      setActiveLevel: setActiveLevel,
       categories: categories,
       lessonsIn: lessonsIn,
       lesson: lesson,
@@ -175,5 +262,5 @@
     };
   }
 
-  return Object.freeze({ createSession: createSession, PHASES: PHASES.slice() });
+  return Object.freeze({ createSession: createSession, PHASES: PHASES.slice(), LEVELS: LEVELS.slice(), normalizeLevel: normalizeLevel });
 }));

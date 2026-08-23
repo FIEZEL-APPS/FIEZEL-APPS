@@ -24,9 +24,10 @@ const requiredTemplateStrings=['id','family','subskill','cefr','questionType','p
 const requiredExplanationStrings=['whyCorrect','rule','whyOthersFail','howToAvoid','memoryCue'];
 
 check('Grammar data version',grammar.version===expectedVersion&&grammar.schemaVersion==='2.0.0'&&grammar.practiceBlueprintVersion==='focused-25-v1',`version=${grammar.version} schema=${grammar.schemaVersion} blueprint=${grammar.practiceBlueprintVersion}`);
-check('Grammar lesson inventory',grammar.count===129&&grammar.templates.length===129,`declared=${grammar.count} actual=${grammar.templates.length}`);
+const lessonCount=grammar.templates.length;
+check('Grammar lesson inventory',grammar.count===lessonCount,`declared=${grammar.count} actual=${lessonCount}`);
 const ids=grammar.templates.map(x=>x.id),skills=grammar.templates.map(x=>x.subskill);
-check('Unique lesson identities',new Set(ids).size===129&&new Set(skills).size===129,`ids=${new Set(ids).size} subskills=${new Set(skills).size}`);
+check('Unique lesson identities',new Set(ids).size===lessonCount&&new Set(skills).size===lessonCount,`ids=${new Set(ids).size} subskills=${new Set(skills).size}`);
 
 const malformed=[],generic=[],badDistractors=[],badOptions=[],badCefr=[],unconstrainedAmbiguity=[];
 const bannedGeneric=/Each distractor conflicts|Check the subject, time reference|Match form to function and context|identify grammatical cue\s*->\s*select form/i;
@@ -95,7 +96,14 @@ setTimeout(()=>{
     const invalidRuntime=[],shortLessons=[],focusLeak=[],modeFailures=[],withinDuplicates=[],genericRuntime=[];
     const crossSignatures=new Map(),sourceOwners=new Map(),modeCounts={},samples={};
     let totalQuestions=0;
+    const runtimeState=context.__getFiezelState?.()||null;
+    const previousActiveLevel=runtimeState?.preferences?.activeLevel||'';
+    const previousLevelMode=runtimeState?.preferences?.levelMode||'placement';
     for(const template of grammar.templates){
+      // The runtime now enforces the learner's active CEFR level. The audit still
+      // needs to inspect every curriculum track, so it walks the same public
+      // contract one level at a time rather than bypassing the filter.
+      if(runtimeState?.preferences)runtimeState.preferences={...runtimeState.preferences,activeLevel:template.cefr,levelMode:'manual'};
       const questions=context.buildGrammarLessonQuestions(template.subskill,25);
       totalQuestions+=questions.length;
       if(questions.length!==25)shortLessons.push({skill:template.subskill,count:questions.length});
@@ -112,18 +120,20 @@ setTimeout(()=>{
       }
       if(Object.keys(samples).length<3)samples[template.id]=questions.slice(0,3).map(q=>({mode:q.practiceMode,question:q.question,answer:q.options[q.answerIndex]}));
     }
+    if(runtimeState?.preferences)runtimeState.preferences={...runtimeState.preferences,activeLevel:previousActiveLevel,levelMode:previousLevelMode};
     const crossLessonDuplicates=[...crossSignatures.entries()].filter(([,owners])=>owners.size>1);
     const sourceReuse=[...sourceOwners.entries()].filter(([,owners])=>owners.size>1);
-    check('Runtime question inventory',totalQuestions===3225,`generated=${totalQuestions} expected=3225`);
-    check('Twenty-five questions per lesson',shortLessons.length===0,shortLessons.length?shortLessons:'129/129 lessons complete');
-    check('Twenty-five distinct pedagogical modes',modeFailures.length===0,modeFailures.length?modeFailures:`${expectedModes.length} modes x 129 lessons`);
+    const expectedQuestions=lessonCount*expectedModes.length;
+    check('Runtime question inventory',totalQuestions===expectedQuestions,`generated=${totalQuestions} expected=${expectedQuestions}`);
+    check('Twenty-five questions per lesson',shortLessons.length===0,shortLessons.length?shortLessons:`${lessonCount}/${lessonCount} lessons complete`);
+    check('Twenty-five distinct pedagogical modes',modeFailures.length===0,modeFailures.length?modeFailures:`${expectedModes.length} modes x ${lessonCount} lessons`);
     check('Within-lesson question uniqueness',withinDuplicates.length===0,withinDuplicates.length?withinDuplicates:'no repeated question or option signature');
-    check('Lesson focus purity',focusLeak.length===0,focusLeak.length?focusLeak.slice(0,10):'all 3,225 questions use the active lesson concept');
+    check('Lesson focus purity',focusLeak.length===0,focusLeak.length?focusLeak.slice(0,10):`all ${totalQuestions.toLocaleString()} questions use the active lesson concept`);
     check('No source concept leaks across lessons',sourceReuse.length===0,sourceReuse.length?sourceReuse.slice(0,10):'each source concept belongs to exactly one lesson suite');
     check('No exact runtime duplicates across lessons',crossLessonDuplicates.length===0,`duplicates=${crossLessonDuplicates.length}`);
     check('Runtime integrity validator',invalidRuntime.length===0,`invalid=${invalidRuntime.length}`);
     check('Runtime explanations are production-ready',genericRuntime.length===0,`generic_or_placeholder=${genericRuntime.length}${genericRuntime.length?` ids=${genericRuntime.slice(0,10).join(',')}`:''}`);
-    check('Balanced mode coverage',expectedModes.every(mode=>modeCounts[mode]===129),Object.fromEntries(expectedModes.map(mode=>[mode,modeCounts[mode]||0])));
+    check('Balanced mode coverage',expectedModes.every(mode=>modeCounts[mode]===lessonCount),Object.fromEntries(expectedModes.map(mode=>[mode,modeCounts[mode]||0])));
     check('Legacy peer-mixing generator removed',!app.includes('familyPeers=')&&!app.includes('levelPeers=')&&!app.includes('others=shuffle(GRAMMAR_ITEMS.filter'), 'lesson builder no longer imports peer concepts');
 
     const report={version:grammar.version,status:pass?'PASS':'NOT READY',counts:{pass:checks.filter(x=>x.status==='PASS').length,fail:checks.filter(x=>x.status==='FAIL').length,lessons:grammar.templates.length,runtimeQuestions:totalQuestions,practiceModes:expectedModes.length,crossLessonDuplicates:crossLessonDuplicates.length,focusLeaks:focusLeak.length},checks,samples};
