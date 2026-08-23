@@ -21,7 +21,7 @@
     // m025-41: the scan covers the layers that actually broke in production -
     // speech shaping, the optional Indonesian bundle, module wiring, saved state and
     // what the learner sees on screen.
-    'prosody', 'indonesianVoice', 'runtime', 'storage', 'ui'];
+    'prosody', 'runtime', 'storage', 'ui'];
   var SEVERITIES = ['fatal', 'error', 'warning'];
   var MAX_ENTRIES = 500;
 

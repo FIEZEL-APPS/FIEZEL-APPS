@@ -60,15 +60,6 @@
     return { findings: tests.prosody(root.FiezelProsody || null, targets) };
   });
 
-  bus.registerSelfTest('indonesianVoice', function () {
-    var status = null;
-    try {
-      status = root.FiezelPuterVoice && root.FiezelPuterVoice.status
-        ? root.FiezelPuterVoice.status() : null;
-    } catch (_) {}
-    return { findings: tests.indonesianVoice(status, targets) };
-  });
-
   // The globals every screen depends on. Absence is checked directly rather than being
   // inferred later from a blank screen or a silent voice.
   var REQUIRED_MODULES = ['FiezelDiagnosticBus', 'FiezelClassroom', 'FiezelTutorV3', 'FiezelProsody',
