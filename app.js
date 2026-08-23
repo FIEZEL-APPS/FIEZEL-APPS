@@ -401,18 +401,69 @@ function record(q,ok,ms,selectedIndex){
   if(!ok)state.wrongAnswers.push({question:q.question,selectedAnswer:selected,correct:q.options?.[q.answerIndex],skill:q.skill,target:q.target||q.id,type:q.type,errorTag:h.errorTag,at:now});
   if(state.wrongAnswers.length>300)state.wrongAnswers.shift();if(q.canary&&CONTENT_CANARY&&q.canary.canaryId===state.contentCanaryMeta?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordEvidence(state.contentCanaryMeta,q.canary.canaryId,{type:'outcome',phase:q.canary.phase||'canary',correct:!!ok,at:new Date(now).toISOString()});save();queueRemoteActivitySync()
 }
-function setConfidence(value){const h=state.history[state.history.length-1];if(!h||h.confidence!=null)return;h.confidence=value;state.confidenceHistory.push({confidence:value,ok:h.ok,at:h.at,skill:h.skill,type:h.type,errorTag:h.errorTag});if(state.confidenceHistory.length>500)state.confidenceHistory.shift();const bucket=h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'reading';if(h.target&&state[bucket]?.[h.target]){const b=state[bucket][h.target];scheduleNext(b,h.ok,h.ms,value);state[bucket][h.target]=b}save();dismissConfidenceBox();showToast('Oke, kecatat')}
-/**
- * m025-132: menutup lembar keyakinan setelah dijawab.
- *
- * Wajib ada begitu lembarnya mengambang. Selama ia menempel di dasar panel, ia hanya ikut
- * tergulir; sekarang ia menutupi bagian bawah layar - termasuk tombol soal berikutnya.
- * Lembar mengambang yang tidak pernah pergi berubah dari pertolongan menjadi penghalang.
- */
-function dismissConfidenceBox(){
-  const box=$('confidenceBox');if(!box)return;
-  box.classList.add('is-done');
-  setTimeout(()=>{try{box.remove()}catch(_){}} ,260)
+function setConfidence(value){const h=state.history[state.history.length-1];if(!h||h.confidence!=null)return;h.confidence=value;state.confidenceHistory.push({confidence:value,ok:h.ok,at:h.at,skill:h.skill,type:h.type,errorTag:h.errorTag});if(state.confidenceHistory.length>500)state.confidenceHistory.shift();const bucket=h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'reading';if(h.target&&state[bucket]?.[h.target]){const b=state[bucket][h.target];scheduleNext(b,h.ok,h.ms,value);state[bucket][h.target]=b}save();confidencePopAnswered(value)}
+/* ==========================================================================
+   m025-133 popup keyakinan
+   ==========================================================================
+   OWNER: "mendingan muncul pop up aja di layar dan langsung diikuti tombol next di pop up
+   itu juga, setelah user menjawab 3 pilihan itu langsung muncul tombol next."
+
+   Dua percobaan sebelumnya gagal karena alasan yang sama: kotak ini selalu ditaruh di
+   TEMPAT, sementara masalahnya soal WAKTU. Di dasar panel ia harus dicari dengan
+   menggulir; mengambang di dasar layar ia menutupi tombol Lanjut. Sebagai popup ia tidak
+   perlu dicari dan tidak menghalangi apa pun, karena ia SENDIRI yang membawa jalan
+   keluarnya.
+
+   Tombol Lanjut sengaja belum ada sampai pilihannya diambil - itu permintaan OWNER, dan
+   ia benar secara data: kalibrasi keyakinan dibaca scheduleNext() untuk memutuskan kapan
+   materi ini muncul lagi, jadi pertanyaan yang dilewati membuat penjadwalannya menebak.
+
+   TETAPI popup ini bukan kurungan, dan itu batas yang dipegang seluruh aplikasi sejak
+   m025-126: "layar yang menahan alur tanpa jalan keluar adalah kurungan, bukan
+   pelajaran". Karena itu ada "Baca penjelasan dulu" yang menutup popup tanpa memaksa
+   memilih - penjelasan jawabannya memang ada di halaman di baliknya, dan tombol Lanjut di
+   kepala layar tetap hidup. Yang ditahan hanya jalan PINTASNYA, bukan satu-satunya jalan.
+   -------------------------------------------------------------------------- */
+function closeConfidencePop(){
+  const pop=$('confidencePop');if(!pop)return;
+  pop.classList.add('is-out');
+  setTimeout(()=>{try{pop.remove()}catch(_){}},220)
+}
+function openConfidencePop(ok){
+  closeConfidencePop();
+  const pop=document.createElement('div');
+  pop.id='confidencePop';pop.className='confidence-pop';
+  pop.setAttribute('role','dialog');pop.setAttribute('aria-modal','true');
+  pop.setAttribute('aria-label','Tadi seberapa yakin');
+  pop.innerHTML=`<div class="confidence-card">
+    <div class="confidence-verdict ${ok?'is-ok':'is-no'}"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, nggak apa-apa.'}</b></div>
+    <div id="confidenceAsk">
+      <p class="confidence-q">Tadi seberapa yakin?</p>
+      <div class="confidence-scale">
+        <button type="button" onclick="setConfidence(1)"><span>1</span>Masih ragu</button>
+        <button type="button" onclick="setConfidence(2)"><span>2</span>Lumayan yakin</button>
+        <button type="button" onclick="setConfidence(3)"><span>3</span>Yakin sekali</button>
+      </div>
+      <button type="button" class="confidence-skip" onclick="closeConfidencePop()">Baca penjelasan dulu</button>
+    </div>
+  </div>`;
+  document.body.appendChild(pop);
+  enhanceUI();
+}
+/** Pilihan diambil: skalanya diganti tombol Lanjut, di popup yang sama. */
+function confidencePopAnswered(value){
+  const ask=$('confidenceAsk');if(!ask)return;
+  const label=value===1?'Masih ragu':value===2?'Lumayan yakin':'Yakin sekali';
+  ask.innerHTML=`<p class="confidence-saved"><i data-lucide="check"></i> ${esc(label)} — kecatat</p>
+    <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">Lanjut <i data-lucide="arrow-right"></i></button>`;
+  enhanceUI();
+  setTimeout(()=>{$('confidencePop')?.querySelector('.confidence-go')?.focus()},60)
+}
+/** Satu-satunya jalan maju dari popup: menekan tombol Lanjut yang sudah ada di layar
+ *  kuis, supaya tidak ada dua jalur berbeda yang bisa menyimpang. */
+function confidencePopNext(){
+  closeConfidencePop();
+  $('quizNext')?.click()
 }
 function dueItems(){return Object.entries({...state.vocab,...state.grammar,...state.reading}).filter(([,x])=>x?.nextReview&&x.nextReview<=Date.now()&&x.mastery<MASTERY_THRESHOLD)}
 function forgettingProbability(b){if(!b?.total||b.mastery>=MASTERY_THRESHOLD)return 0;const stability=Math.max(.25,b.stability||1);const ageDays=Math.max(0,(Date.now()-(b.lastSeen||Date.now()))/86400000);return Math.min(.99,1-Math.exp(-ageDays/stability))}
@@ -2752,7 +2803,7 @@ function quizLoop(cfg){
   */
  const teach=info=>{
   setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked}</span><em>/ ${planned}</em></div><span class="quiz-teach-flag">Jeda mengajar</span></div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>AJAR ULANG</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${esc(info.rule)}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">Oke, aku siap coba lagi <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
-  $('quizExit').onclick=()=>{audio.stop();go('home')};
+  $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
   $('teachNext').onclick=()=>{pendingCard=null;draw()};
   enhanceUI();
  };
@@ -2766,7 +2817,7 @@ function quizLoop(cfg){
   answer.locked=false;answer.retryOf='';answer.scaffold='';
   const opts=q.options||[];
   setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`)} </section>`);
-  $('quizExit').onclick=()=>{audio.stop();go('home')};
+  $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   // Soal listening: naskahnya tidak pernah dirender sebagai teks - kalau dirender, soalnya
   // berubah menjadi soal membaca, dan tes ini justru dibuat tanpa reading. Pilihan dikunci
@@ -2782,7 +2833,7 @@ function quizLoop(cfg){
     finally{listen.disabled=false;enhanceUI()}
    };
   }
-  $('quizNext').onclick=()=>{if(answer.locked){answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
+  $('quizNext').onclick=()=>{if(answer.locked){closeConfidencePop();answer.locked=false;audio.stop();asked++;lastConcept=quizConcept(q);start=Date.now();draw()}};
  };
 
  /**
@@ -2812,10 +2863,11 @@ function quizLoop(cfg){
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move);
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');
-  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, tidak apa-apa.'}</b></div><p>Jawabanmu <strong>${esc(q.options[j])}</strong>. Jawaban yang paling tepat adalah <strong>${esc(q.options[q.answerIndex])}</strong>.</p><p><strong>Intinya:</strong> ${esc(q.explain?.why||'Jawaban perlu cocok dengan konteks soal.')} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="muted">${esc(q.explain?.distractor||'Pilihan lain belum didukung oleh konteks atau aturan yang relevan.')} ${esc(q.explain?.avoid||'Periksa petunjuk utama sebelum memilih.')}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}<p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||'Cari petunjuk utama dan hubungkan dengan pola yang sedang dipelajari.')}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> Jelaskan dengan cara yang lebih sederhana</button><div class="confidence-box" id="confidenceBox" role="group" aria-label="Tadi seberapa yakin"><b>Tadi seberapa yakin?</b><div class="actions"><button type="button" onclick="setConfidence(1)"><span>1</span>Masih ragu</button><button type="button" onclick="setConfidence(2)"><span>2</span>Lumayan yakin</button><button type="button" onclick="setConfidence(3)"><span>3</span>Yakin sekali</button></div></div>`;
+  f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, tidak apa-apa.'}</b></div><p>Jawabanmu <strong>${esc(q.options[j])}</strong>. Jawaban yang paling tepat adalah <strong>${esc(q.options[q.answerIndex])}</strong>.</p><p><strong>Intinya:</strong> ${esc(q.explain?.why||'Jawaban perlu cocok dengan konteks soal.')} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="muted">${esc(q.explain?.distractor||'Pilihan lain belum didukung oleh konteks atau aturan yang relevan.')} ${esc(q.explain?.avoid||'Periksa petunjuk utama sebelum memilih.')}</p>${q.explain?.distractors?`<div class="distractor-breakdown">${q.explain.distractors.map(x=>`<p><b>${esc(x.option)}:</b> ${esc(x.reason)}</p>`).join('')}</div>`:''}<p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||'Cari petunjuk utama dan hubungkan dengan pola yang sedang dipelajari.')}</span></p><button class="ai-btn" id="aiExplainBtn"><i data-lucide="sparkles"></i> Jelaskan dengan cara yang lebih sederhana</button>`;
   speak(turn);
   answer.locked=true;
-  $('quizNext').disabled=false;$('quizNext').focus();
+  $('quizNext').disabled=false;
+  openConfidencePop(ok);
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
   // m025-126: `breathe` berhenti menjadi kalimat dan menjadi PILIHAN.
   //
