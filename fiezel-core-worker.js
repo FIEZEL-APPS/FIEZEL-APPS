@@ -62,7 +62,7 @@ const EMBEDDED_PROMPT_LIBRARY={schema:'fiezel-prompt-library-v1',version:'5.19.0
 }};
 const EVOLUTION_DOMAINS=Object.freeze(['grammar','vocabulary','reading']);
 const EVOLUTION_MAX_SLOTS=12,EVOLUTION_MAX_PROMPT_LEN=8000;
-// m025-114: nama murid tidak lagi dipaku di sini. Core Brain melayani satu akun Puter,
+// m025-115: nama murid tidak lagi dipaku di sini. Core Brain melayani satu akun Puter,
 // tetapi akun itu bisa milik siapa saja - nama yang dipaku berarti setiap murid lain
 // disapa dengan nama orang lain. Namanya kini datang bersama snapshot aktivitas dari
 // klien (activity.learnerName) dan disimpan per-akun, seperti bukti belajar lainnya.
@@ -151,7 +151,7 @@ function boundedActivity(raw={}){
 }
 function boundedPolicyOutcome(raw={}){const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number(v)||0)),statuses=new Set(['positive','mixed','negative','insufficient']),recs=new Set(['keep_or_progress','adjust','reduce_load','collect_more_evidence']);if(raw?.schema!==POLICY_OUTCOME_SCHEMA||!statuses.has(String(raw.status))||!recs.has(String(raw.recommendation)))return null;return{schema:POLICY_OUTCOME_SCHEMA,outcomeId:String(raw.outcomeId||'').slice(0,160),sessionId:String(raw.sessionId||'').slice(0,120),policyId:String(raw.policyId||'').slice(0,120),evaluatedAt:String(raw.evaluatedAt||'').slice(0,40),policyMode:String(raw.policyMode||'').slice(0,30),targetSkill:String(raw.targetSkill||'').slice(0,80),primaryDomain:normalizePolicyDomain(raw.primaryDomain),completed:!!raw.completed,abandoned:!!raw.abandoned,planned:clamp(raw.planned,0,100),answered:clamp(raw.answered,0,100),completionRate:clamp(raw.completionRate,0,100),accuracy:raw.accuracy==null?null:clamp(raw.accuracy,0,100),targetAttempts:clamp(raw.targetAttempts,0,100),targetAccuracy:raw.targetAccuracy==null?null:clamp(raw.targetAccuracy,0,100),targetAdherence:clamp(raw.targetAdherence,0,100),medianResponseMs:raw.medianResponseMs==null?null:clamp(raw.medianResponseMs,0,300000),confidenceGap:raw.confidenceGap==null?null:clamp(raw.confidenceGap,0,100),masteryBefore:raw.masteryBefore==null?null:clamp(raw.masteryBefore,0,100),masteryAfter:raw.masteryAfter==null?null:clamp(raw.masteryAfter,0,100),masteryDelta:raw.masteryDelta==null?null:Math.max(-100,Math.min(100,Number(raw.masteryDelta)||0)),baselineTargetAccuracy:raw.baselineTargetAccuracy==null?null:clamp(raw.baselineTargetAccuracy,0,100),accuracyDelta:raw.accuracyDelta==null?null:Math.max(-100,Math.min(100,Number(raw.accuracyDelta)||0)),score:clamp(raw.score,0,100),status:String(raw.status),recommendation:String(raw.recommendation),privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}}}
 function boundedOutcomeList(raw){return(Array.isArray(raw)?raw:[]).map(boundedPolicyOutcome).filter(Boolean).slice(-10)}
-/* ---- m025-114 Core Brain v2 (cermin sisi server) --------------------------------------
+/* ---- m025-115 Core Brain v2 (cermin sisi server) --------------------------------------
  *
  * Penalaran v2 berjalan DI PERANGKAT MURID (features/brain/fiezel-core-brain.js), karena
  * di sanalah datanya: riwayat jawaban lengkap, waktu jawab tiap soal, dan jadwal ulang per
