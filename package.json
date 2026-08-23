@@ -8,6 +8,7 @@
   "scripts": {
     "test:grammar-curriculum": "node grammar-curriculum-test.js",
     "test:grammar-unlock": "node grammar-unlock-test.js",
+    "test:writing-rubric": "node writing-rubric-test.js",
     "audit:grammar": "node grammar-quality-audit.js",
     "test:level-contract": "node level-grammar-contract-test.js",
     "push:dispatch": "node push-dispatcher.mjs",
