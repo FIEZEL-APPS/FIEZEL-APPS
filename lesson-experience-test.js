@@ -20,12 +20,16 @@ const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'
 
 setTimeout(()=>{try{
   const skills=grammar.templates.map(x=>x.subskill);
-  assert(new Set(skills).size===129,'grammar skill fixture changed unexpectedly');
+  assert(new Set(skills).size===139,'grammar skill fixture changed unexpectedly');
+  const runtimeState=context.__getFiezelState();
+  const previousActiveLevel=runtimeState.preferences.activeLevel||'';
+  const previousLevelMode=runtimeState.preferences.levelMode||'placement';
   const expectedModes=['apply_form','complete_sentence','justify_correct','recognize_rule','recognize_objective','sequence_reasoning','identify_misconception','recall_memory_cue','choose_avoidance','diagnose_distractor_1','diagnose_distractor_2','diagnose_distractor_3','label_misconception_1','label_misconception_2','label_misconception_3','repair_distractor_1','repair_distractor_2','repair_distractor_3','contrast_distractor_1','contrast_distractor_2','contrast_distractor_3','classify_family','locate_decision_cue','teach_back','mastery_check'];
   const globalSignatures=new Map(),sourceOwners=new Map();
   let generated=0;
   for(const template of grammar.templates){
     const skill=template.subskill;
+    runtimeState.preferences={...runtimeState.preferences,activeLevel:template.cefr,levelMode:'manual'};
     const questions=context.buildGrammarLessonQuestions(skill,25);
     assert(questions.length===25,`${skill} generated ${questions.length}/25 questions`);
     assert(new Set(questions.map(signature)).size===25,`${skill} contains duplicate runtime questions`);
@@ -42,6 +46,7 @@ setTimeout(()=>{try{
     assert(!/Correct:|This form matches|does not satisfy|Evidence from the passage|Reading focus:/i.test(explanation),`${skill} still exposes raw English explanation text`);
     generated+=questions.length;
   }
+  runtimeState.preferences={...runtimeState.preferences,activeLevel:previousActiveLevel,levelMode:previousLevelMode};
 
   const at=(hour,minute=0)=>context.getCelestialState(new Date(2026,7,12,hour,minute,0));
   const sunrise=at(6),noon=at(12),sunset=at(17,59),moonrise=at(18),midnight=at(0);

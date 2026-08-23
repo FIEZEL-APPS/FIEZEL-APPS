@@ -138,4 +138,48 @@ test('sanitizer mempertahankan replay dan tetap membatasinya',()=>{
 
 test('pemanggil meneruskan jumlah replay yang benar-benar terjadi',()=>assert.ok(runtimeText.includes('this.store.record(this.domain,item,result,ms,this.replays)')));
 
+// Global level contract: the host-selected level must be authoritative for both
+// domains, while legacy callers without a contract retain the old picker behavior.
+test('level contract normalizes safely and accepts initialLevel alias',()=>{
+  const {createLevelContract}=runtime.__test;
+  assert.deepStrictEqual(createLevelContract({activeLevel:'b1'}),{external:true,getter:null,level:'B1'});
+  assert.deepStrictEqual(createLevelContract({initialLevel:'A2'}),{external:true,getter:null,level:'A2'});
+  assert.equal(createLevelContract({activeLevel:'not-a-level'}).level,'A1');
+  assert.equal(createLevelContract({}).external,false);
+});
+
+test('host-selected level isolates speaking and listening sessions',()=>{
+  const Controller=runtime.__test.Controller;
+  const controller=new Controller({activeLevel:'B1'});
+  controller.repo.speaking=[{id:'s-b1',level:'B1'},{id:'s-a1',level:'A1'}];
+  controller.repo.listening=[{id:'l-b1',level:'B1'},{id:'l-c2',level:'C2'}];
+  controller.open('speaking','C2');
+  assert.equal(controller.getActiveLevel(),'B1');
+  assert.deepStrictEqual(controller.items.map(item=>item.id),['s-b1']);
+  controller.open('listening','A1');
+  assert.deepStrictEqual(controller.items.map(item=>item.id),['l-b1']);
+  controller.setActiveLevel('C2',{render:false});
+  controller.open('listening','A1');
+  assert.equal(controller.items[0].id,'l-c2');
+});
+
+test('dynamic host level change clears a stale Skills Lab session',()=>{
+  let selected='A1';
+  const controller=new runtime.__test.Controller({getActiveLevel:()=>selected});
+  controller.repo.speaking=[{id:'s-a1',level:'A1'},{id:'s-b1',level:'B1'}];
+  controller.open('speaking');
+  assert.equal(controller.current().id,'s-a1');
+  selected='B1';
+  assert.equal(controller.getActiveLevel(),'B1');
+  assert.equal(controller.current(),null);
+  controller.open('speaking');
+  assert.equal(controller.current().id,'s-b1');
+});
+
+test('external level contract bypasses the sidecar level picker',()=>{
+  const source=runtimeText;
+  assert.ok(/this\.levelContract\.external\?this\.open\(b\.getAttribute\('data-open'\)\):this\.renderLevelPicker/.test(source));
+  assert.ok(/if\(this\.levelContract\.external\)\{return this\.open\(domain\)\}/.test(source));
+});
+
 console.log(`FIEZEL Speaking + Listening: PASS ${pass}/0`);

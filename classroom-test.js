@@ -5,6 +5,7 @@ const assert = require('assert');
 const fs = require('fs');
 
 const Tutor = require('./features/tutor-classroom/fiezel-tutor-v3.js');
+const Classroom = require('./features/classroom/fiezel-classroom.js');
 const pack = require('./features/classroom/classroom-lessons-v1.json');
 const app = fs.readFileSync('app.js', 'utf8');
 const index = fs.readFileSync('index.html', 'utf8');
@@ -177,5 +178,50 @@ test('PWA release identity is coherent and caches correction layer', () => {
   assert.ok(sw.includes('./features/neural-voice/fiezel-voice-say.js'),
     'pintu bicara bersama harus ikut tersimpan di shell');
   assert.ok(sw.includes('./features/tutor-classroom/tutor-v3.css'));
+});
+
+test('Classroom filters every category and lesson by the host active level', () => {
+  const a1 = Classroom.createSession(pack, { activeLevel: 'a1' });
+  assert.strictEqual(a1.snapshot().activeLevel, 'A1');
+  assert.strictEqual(a1.snapshot().levelLocked, true);
+  assert.ok(a1.categories().length > 0);
+  assert.ok(a1.categories().every(category => a1.lessonsIn(category.id).every(lesson => lesson.level === 'A1')));
+  const b1 = pack.lessons.find(lesson => lesson.level === 'B1');
+  assert.ok(b1, 'fixture must contain a B1 lesson');
+  assert.throws(() => a1.chooseLesson(b1.id), /lesson_not_in_active_level/);
+});
+
+test('Classroom level switching resets stale lesson state and keeps one global level', () => {
+  const first = pack.lessons.find(lesson => lesson.level === 'A1');
+  const second = pack.lessons.find(lesson => lesson.level === 'B1');
+  const session = Classroom.createSession(pack, { initialLevel: 'A1' });
+  session.chooseCategory(first.category);
+  session.chooseLesson(first.id);
+  assert.strictEqual(session.snapshot().phase, 'teach');
+  session.setActiveLevel('B1');
+  const after = session.snapshot();
+  assert.strictEqual(after.phase, 'category');
+  assert.strictEqual(after.activeLevel, 'B1');
+  assert.strictEqual(after.lessonId, null);
+  assert.ok(session.lessonsIn(second.category).every(lesson => lesson.level === 'B1'));
+  assert.throws(() => session.chooseLesson(first.id), /lesson_not_in_active_level/);
+});
+
+test('Classroom follows a dynamic host level callback without a second picker', () => {
+  let selected = 'A1';
+  const session = Classroom.createSession(pack, { getActiveLevel: () => selected });
+  assert.strictEqual(session.activeLevel(), 'A1');
+  selected = 'B1';
+  assert.strictEqual(session.activeLevel(), 'B1');
+  assert.strictEqual(session.snapshot().phase, 'category');
+  assert.strictEqual(session.snapshot().availableLessonCount, pack.lessons.filter(lesson => lesson.level === 'B1').length);
+  assert.strictEqual(session.snapshot().levelLocked, true);
+});
+
+test('Classroom legacy callers remain unrestricted when no level contract is supplied', () => {
+  const session = Classroom.createSession(pack);
+  assert.strictEqual(session.snapshot().activeLevel, null);
+  assert.strictEqual(session.snapshot().levelLocked, false);
+  assert.strictEqual(session.snapshot().availableLessonCount, pack.lessons.length);
 });
 console.log(`FIEZEL Classroom Indonesian tutor: PASS ${pass}/${pass}`);
