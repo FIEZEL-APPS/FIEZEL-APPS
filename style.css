@@ -2594,3 +2594,125 @@ html.fiezel-ui-v6 .nav.active::after{
   .hero-stat{padding:7px 11px}
   .hero-stat b{font-size:.94rem}
 }
+
+/* ==========================================================================
+   Home berhenti terbaca sebagai artikel (m025-131)
+   ==========================================================================
+   OWNER, sambil menunjukkan layarnya: "masih terlihat seperti bacaan article."
+
+   m025-130 sudah mengganti sapaan serif miring dengan kepingan angka, dan itu benar tapi
+   TIDAK CUKUP - karena tepat di bawahnya masih berdiri elemen yang jauh lebih besar:
+   judul Instrument Serif dua baris setinggi ~2,5rem, lalu paragraf pengantar di bawahnya,
+   lalu kartu Coach berisi paragraf lagi. Kepingan angka kalah telak melawan tiga blok itu.
+
+   Tiga hal yang membuat sebuah layar terbaca sebagai ARTIKEL, dan ketiganya ada di sini:
+     - huruf SERIF berukuran display sebagai elemen terbesar di layar;
+     - PARAGRAF mengalir - kalimat yang dibaca berurutan, bukan dipindai;
+     - tidak ada BATAS antar-blok, sehingga semuanya terbaca sebagai satu kolom bacaan.
+
+   Ketiganya dibalik:
+     - judul serif jadi satu baris sans pendek; yang terbesar di layar kini TOMBOL;
+     - paragraf pengantar dan paragraf Coach dihapus, bukan diperpendek. Panel Coach
+       tinggal satu kalimat, persis yang OWNER tulis di papan edit;
+     - strip Coach jadi kartu tersendiri dengan tepi dan bayangan padat, jadi mata
+       membacanya sebagai TOMBOL BESAR, bukan sebagai alinea berikutnya.
+   -------------------------------------------------------------------------- */
+
+/* Sapaan tinggal satu baris. Sans, bukan serif; ukuran teks, bukan ukuran judul. */
+.hero-line{
+  font-family:var(--fz-body);font-size:1rem;line-height:1.5;font-weight:650;
+  letter-spacing:-.01em;color:var(--ink);margin:2px 0 16px;max-width:38ch;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+}
+.hero-line span{font-weight:800}
+
+/* Strip Coach: satu kalimat, satu tombol besar, satu tautan kecil. */
+.coach-strip{
+  display:grid;grid-template-columns:auto 1fr;gap:12px 13px;align-items:center;
+  padding:15px;border-radius:22px;
+  background:rgba(var(--surface-pure-rgb),.94);
+  border:1.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);
+}
+.coach-strip-face{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--yellow);border:2px solid var(--ink);
+  display:grid;place-items:center;--fz-i-line:var(--ink);
+}
+.coach-strip-face svg{width:24px;height:24px}
+.coach-strip-say{min-width:0}
+.coach-strip-say small{
+  display:block;font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;
+  font-weight:800;color:var(--muted);margin-bottom:2px;
+}
+.coach-strip-say b{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+  font-size:1.02rem;line-height:1.35;font-weight:750;letter-spacing:-.015em;color:var(--ink);
+}
+/* Tombolnya melintasi dua kolom: di layar ponsel inilah elemen terbesar di Home, dan
+   memang harus begitu - yang paling besar di layar seharusnya yang paling ingin ditekan. */
+.coach-strip-go{grid-column:1/-1;width:100%;min-height:52px;font-size:1rem;font-weight:800}
+.coach-strip-more{
+  grid-column:1/-1;justify-self:center;
+  background:none;border:0;box-shadow:none;padding:2px 6px;min-height:0;
+  color:var(--accent);font-size:.78rem;font-weight:700;
+}
+.coach-strip-more:hover{background:none;box-shadow:none;transform:none}
+.coach-strip-more svg{width:14px;height:14px}
+
+/* Panel peluncur berhenti jadi dua kolom yang tinggi; ia kini setumpuk blok pendek. */
+html.fiezel-ui-v6 .launcher-shell{
+  grid-template-columns:1fr;grid-template-rows:auto;min-height:0;gap:16px;
+  padding:clamp(16px,4vw,22px);
+}
+@media (min-width:900px){
+  html.fiezel-ui-v6 .launcher-shell{grid-template-columns:minmax(0,1fr) minmax(280px,.7fr);align-items:center}
+  .coach-strip-go{grid-column:1/-1}
+}
+
+/* ==========================================================================
+   Logo topbar lahir seperti PAW (m025-131)
+   ==========================================================================
+   OWNER: "untuk logo fiezel di topbar buatkan animasi persis seperti animasi PAW."
+
+   Persis, dan itu bukan sekadar meniru tampilannya: enam belas partikel di sini juga
+   sudah berdiri di simpul HURUFNYA - ujung batang F, siku E, dua ujung Z, dua balok
+   aksen - dan yang dianimasikan tetap perjalanan MENJAUH lalu KEMBALI. Alasannya sama
+   seperti di PAW: partikel yang lahir acak lalu dituntun ke posisinya akan meleset dan
+   terbaca sebagai kotoran, bukan sebagai huruf yang terbentuk.
+
+   Satu perbedaan yang disengaja: durasinya 1 detik, bukan 0,92 detik. Wordmark jauh
+   lebih lebar daripada marka PAW, jadi partikelnya menempuh jarak lebih jauh; memakai
+   durasi yang sama akan membuatnya terlihat terburu-buru justru pada elemen yang paling
+   ingin terlihat tenang.
+
+   Jalannya SEKALI saja saat aplikasi dibuka - keputusan OWNER di papan edit: "Sekali saja
+   waktu aplikasi pertama dibuka. Tidak diulang tiap pindah menu - biar tetap terasa
+   spesial, bukan jadi kedipan."
+   -------------------------------------------------------------------------- */
+
+.fzw-spark{
+  fill:var(--wordmark-ink-hi);
+  transform-box:fill-box;transform-origin:50% 50%;
+  opacity:0;
+}
+.fzw-mark{transform-box:view-box;transform-origin:500px 130px}
+
+@media (prefers-reduced-motion:no-preference){
+  .is-mark-born .fzw-spark{animation:fzwSpark 1s cubic-bezier(.22,.68,.28,1) var(--sd,0s) 1 both}
+  @keyframes fzwSpark{
+    0%{transform:translate(0,0) scale(.15);opacity:0}
+    12%{opacity:1}
+    30%{transform:translate(var(--sx,0px),var(--sy,-40px)) scale(1);opacity:1}
+    76%{transform:translate(0,0) scale(.9);opacity:1}
+    100%{transform:translate(0,0) scale(.25);opacity:0}
+  }
+  .is-mark-born .fzw-mark{animation:fzwForm 1s cubic-bezier(.3,1.06,.5,1) 1 both}
+  @keyframes fzwForm{
+    0%,54%{transform:scale(.72);opacity:0}
+    74%{transform:scale(1.04);opacity:1}
+    100%{transform:scale(1);opacity:1}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .fzw-spark{display:none}
+}
