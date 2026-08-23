@@ -34,7 +34,12 @@
   var IV_BYTES = 12;
   // Batas yang sama dipakai saat menggabungkan, supaya berkas dari perangkat lain tidak bisa
   // membuat state tumbuh tanpa batas.
-  var LIMITS = { history: 500, wrongAnswers: 200, confidenceHistory: 500, sessionHistory: 100, learningDays: 400 };
+  var LIMITS = { history: 500, wrongAnswers: 200, confidenceHistory: 500, sessionHistory: 100, learningDays: 400, policyHistory: 30, policyOutcomes: 60 };
+  // m025-141 (B-07): HANYA tiga preferensi ini yang ikut berpindah perangkat. Ketiganya
+  // menjawab "murid ini sedang belajar di level apa" - kehilangan itu saat restore berarti
+  // murid kembali ke hasil placement atau ke bawaan, dan pilihannya sendiri terhapus diam-diam.
+  // Sisanya (haptics, suara, endpoint laporan, zona waktu) milik perangkat dan tetap tinggal.
+  var LEARNING_PREFERENCES = ['activeLevel', 'levelMode', 'selfAssessedLevel'];
   var ITEM_BUCKETS = ['vocab', 'grammar', 'reading'];
 
   function subtle() {
@@ -64,6 +69,25 @@
     return Array.isArray(value) ? value.slice(-limit) : [];
   }
 
+  function plainObject(value) { return value && typeof value === 'object' && !Array.isArray(value) ? value : null; }
+  function pickLearningPreferences(value) {
+    var src = plainObject(value) || {}, out = {};
+    for (var i = 0; i < LEARNING_PREFERENCES.length; i++) {
+      var key = LEARNING_PREFERENCES[i];
+      if (typeof src[key] === 'string' && src[key]) out[key] = src[key];
+    }
+    return out;
+  }
+  function boundedPolicyMeta(value) {
+    var src = plainObject(value); if (!src) return null;
+    return { lastPolicy: src.lastPolicy || null, lastSource: String(src.lastSource || ''), lastAt: Number(src.lastAt) || 0,
+      history: boundedArray(src.history, LIMITS.policyHistory) };
+  }
+  function boundedOutcomeMeta(value) {
+    var src = plainObject(value); if (!src) return null;
+    // Antrean kiriman TIDAK ikut: ia milik perangkat asal dan akan dikirim ulang dari sana.
+    return { last: src.last || null, history: boundedArray(src.history, LIMITS.policyOutcomes), queue: [] };
+  }
   function boundedBucket(value) {
     if (!value || typeof value !== 'object') return {};
     var out = {};
@@ -99,9 +123,17 @@
       confidenceHistory: boundedArray(state.confidenceHistory, LIMITS.confidenceHistory),
       sessionHistory: boundedArray(state.sessionHistory, LIMITS.sessionHistory),
       learningDays: boundedArray(state.learningDays, LIMITS.learningDays),
-      // Sengaja TIDAK menyertakan: view, activeSession, reportMeta, reminderMeta. Semua itu
-      // keadaan perangkat; membawanya ke perangkat lain hanya memindahkan kebingungan.
-      transferred: { deviceState: false, credentials: false }
+      // m025-141: preferensi BELAJAR dan buku besar adaptif ikut. Tanpa keduanya, restore
+      // memulihkan jawaban murid tetapi membuang alasan di baliknya: level yang ia pilih,
+      // kebijakan yang pernah dijalankan, dan hasil yang sudah dinilai.
+      preferences: pickLearningPreferences(state.preferences),
+      adaptivePolicyMeta: boundedPolicyMeta(state.adaptivePolicyMeta),
+      policyOutcomeMeta: boundedOutcomeMeta(state.policyOutcomeMeta),
+      contentCanaryMeta: plainObject(state.contentCanaryMeta),
+      // Sengaja TIDAK menyertakan: view, activeSession, reportMeta, reminderMeta, dan seluruh
+      // preferensi perangkat. Semua itu keadaan perangkat; membawanya ke perangkat lain hanya
+      // memindahkan kebingungan - dan reportMeta membawa endpoint milik pemiliknya.
+      transferred: { deviceState: false, credentials: false, learningPreferences: true, adaptiveLedger: true }
     };
     for (var i = 0; i < ITEM_BUCKETS.length; i++) payload[ITEM_BUCKETS[i]] = boundedBucket(state[ITEM_BUCKETS[i]]);
     payload.totals = recomputeTotals(payload.history);
@@ -240,6 +272,58 @@
    * maju, dan total dihitung ulang dari hasil gabungan. Menjalankannya dua kali dengan
    * masukan yang sama menghasilkan keadaan yang sama.
    */
+  function mergeWrongAnswers(localRows, backupRows) {
+    var seen = {}, out = [];
+    var sources = [Array.isArray(backupRows) ? backupRows : [], Array.isArray(localRows) ? localRows : []];
+    for (var s = 0; s < sources.length; s++) {
+      for (var i = 0; i < sources[s].length; i++) {
+        var row = sources[s][i];
+        if (!row || typeof row !== 'object') continue;
+        var id = String(row.at || '') + '|' + String(row.question || '') + '|' + String(row.target || '');
+        if (seen[id]) continue;
+        seen[id] = true; out.push(row);
+      }
+    }
+    return out.sort(function (a, b) { return (Number(a.at) || 0) - (Number(b.at) || 0); });
+  }
+  function mergeLearningPreferences(localPrefs, backupPrefs) {
+    var local = plainObject(localPrefs) || {}, incoming = pickLearningPreferences(backupPrefs), out = {};
+    for (var key in local) if (Object.prototype.hasOwnProperty.call(local, key)) out[key] = local[key];
+    for (var i = 0; i < LEARNING_PREFERENCES.length; i++) {
+      var name = LEARNING_PREFERENCES[i];
+      if (!out[name] && incoming[name]) out[name] = incoming[name];
+    }
+    return out;
+  }
+  function mergeRowsByKey(a, b, limit, keyOf) {
+    var seen = {}, out = [];
+    var rows = (Array.isArray(a) ? a : []).concat(Array.isArray(b) ? b : []);
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (!row || typeof row !== 'object') continue;
+      var id = keyOf(row, i);
+      if (seen[id]) continue;
+      seen[id] = true; out.push(row);
+    }
+    return boundedArray(out.sort(function (x, y) { return (Number(x.at || Date.parse(x.at || '')) || 0) - (Number(y.at || Date.parse(y.at || '')) || 0); }), limit);
+  }
+  function mergePolicyMeta(localMeta, backupMeta) {
+    var local = plainObject(localMeta), backup = plainObject(backupMeta);
+    if (!local && !backup) return null;
+    var base = local || backup;
+    return { lastPolicy: base.lastPolicy || null, lastSource: String(base.lastSource || ''), lastAt: Number(base.lastAt) || 0,
+      history: mergeRowsByKey(local && local.history, backup && backup.history, LIMITS.policyHistory,
+        function (row, i) { return String(row.policyId || '') + '|' + String(row.at || i); }) };
+  }
+  function mergeOutcomeMeta(localMeta, backupMeta) {
+    var local = plainObject(localMeta), backup = plainObject(backupMeta);
+    if (!local && !backup) return null;
+    var base = local || backup;
+    // Antrean tetap milik perangkat ini; yang digabung hanya riwayat hasil yang sudah dinilai.
+    return { last: base.last || null, queue: Array.isArray(local && local.queue) ? local.queue : [],
+      history: mergeRowsByKey(local && local.history, backup && backup.history, LIMITS.policyOutcomes,
+        function (row, i) { return String(row.outcomeId || row.sessionId || '') + '|' + String(row.at || i); }) };
+  }
   function mergeProgress(localState, backupPayload) {
     var local = localState || {};
     var backup = backupPayload || {};
@@ -261,7 +345,9 @@
 
     var merged = {
       history: history,
-      wrongAnswers: boundedArray(local.wrongAnswers, LIMITS.wrongAnswers),
+      // m025-141: sebelumnya HANYA wrongAnswers lokal yang dipakai, jadi daftar salah dari
+      // perangkat lama hilang tanpa jejak saat restore - padahal itu bahan utama review.
+      wrongAnswers: boundedArray(mergeWrongAnswers(local.wrongAnswers, backup.wrongAnswers), LIMITS.wrongAnswers),
       confidenceHistory: boundedArray((Array.isArray(local.confidenceHistory) ? local.confidenceHistory : [])
         .concat(Array.isArray(backup.confidenceHistory) ? backup.confidenceHistory : []), LIMITS.confidenceHistory),
       sessionHistory: boundedArray((Array.isArray(local.sessionHistory) ? local.sessionHistory : [])
@@ -272,8 +358,18 @@
       adaptiveReady: !!local.adaptiveReady || !!backup.adaptiveReady,
       // Streak diambil yang lebih besar, tidak dijumlahkan: dua perangkat pada hari yang sama
       // bukan dua hari belajar.
-      streak: Math.max(Number(local.streak) || 0, Number(backup.streak) || 0)
+      streak: Math.max(Number(local.streak) || 0, Number(backup.streak) || 0),
+      // Preferensi perangkat TETAP milik perangkat ini. Yang menyatu hanya tiga field belajar,
+      // dan pilihan yang sudah dibuat di perangkat ini menang - restore tidak boleh diam-diam
+      // memindahkan murid ke level lain saat ia sedang belajar.
+      preferences: mergeLearningPreferences(local.preferences, backup.preferences),
+      adaptivePolicyMeta: mergePolicyMeta(local.adaptivePolicyMeta, backup.adaptivePolicyMeta),
+      policyOutcomeMeta: mergeOutcomeMeta(local.policyOutcomeMeta, backup.policyOutcomeMeta),
+      contentCanaryMeta: plainObject(local.contentCanaryMeta) || plainObject(backup.contentCanaryMeta) || null
     };
+    if (!merged.contentCanaryMeta) delete merged.contentCanaryMeta;
+    if (!merged.adaptivePolicyMeta) delete merged.adaptivePolicyMeta;
+    if (!merged.policyOutcomeMeta) delete merged.policyOutcomeMeta;
 
     var days = {};
     var dayRows = (Array.isArray(local.learningDays) ? local.learningDays : []).concat(Array.isArray(backup.learningDays) ? backup.learningDays : []);
