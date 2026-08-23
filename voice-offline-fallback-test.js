@@ -138,6 +138,32 @@ test('mesin cadangan bukan kokoro, dan alasannya tertulis', () => {
   }
 });
 
+test('kemajuan unduhan bisa diperiksa, dan dihitung dari isi cache', () => {
+  // OWNER bertanya "sudah berapa persen". Jawaban yang dihitung dari penghitung di
+  // localStorage akan terus bertambah walaupun cache-nya sudah dibersihkan browser -
+  // laporan yang meyakinkan tentang sesuatu yang tidak ada. Persentasenya harus dibaca
+  // dari cache yang sebenarnya.
+  if (!/async function progress\(\)/.test(AUTOLOAD)) throw new Error('tidak ada cara membaca kemajuan');
+  if (!AUTOLOAD.includes('caches.open')) throw new Error('kemajuan tidak dibaca dari cache');
+  const fn = /async function progress\(\)\{?[\s\S]*?\n  \}/.exec(AUTOLOAD);
+  if (fn && /readState\(\)\.bytesDone/.test(fn[0])) {
+    throw new Error('kemajuan dihitung dari penghitung localStorage, bukan dari isi cache');
+  }
+  if (!/chunkSize\(item, i\)/.test(AUTOLOAD)) {
+    throw new Error('potongan terakhir dihitung sebagai potongan penuh; persentasenya akan lebih besar dari yang benar');
+  }
+});
+
+test('kemajuan muncul di Diagnostics, bukan di layar murid', () => {
+  const diag = read('features/neural-voice/fiezel-diag-panel.js');
+  if (!diag.includes('offlineVoiceBackup')) throw new Error('kemajuan tidak dilaporkan di panel diagnostik');
+  if (!diag.includes('addOfflineVoiceBackup(dump)')) throw new Error('laporannya tidak pernah dipanggil saat panel disegarkan');
+  // Pagar yang sama seperti sebelumnya, dari sisi lain: menambah cara MEMERIKSA tidak
+  // boleh berubah menjadi cara MEMBERITAHU.
+  const live = APP.split('\n').filter((l) => !/^\s*(\/\/|\*|\/\*)/.test(l)).join('\n');
+  if (/OfflineAutoload[\s\S]{0,80}showToast/.test(live)) throw new Error('kemajuan unduhan bocor ke toast di layar murid');
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL suara cadangan + akun: FAIL (' + failures.length + ')');
