@@ -219,6 +219,66 @@ test('bidang pastel lembut terbaca oleh teks tema, di kedua tema', () => {
   if (weak.length) throw new Error('teks tema tidak terbaca di atasnya: ' + weak.join('; '));
 });
 
+/**
+ * Palet resmi dari FIEZEL_Instruksi_Redesign_UIUX.pdf bagian 3, dipaku apa adanya.
+ *
+ * KENAPA INI DIPAKU. Kelima warna ini pernah melenceng SEMUANYA sekaligus: dasar, tinta,
+ * aksen utama, aksen kedua, dan gold. Yang terjadi bukan satu kekeliruan, melainkan
+ * instruksi susulan OWNER ("semua warnanya harus pastel") diterapkan ke AKSEN, padahal
+ * brief sendiri sudah menjawabnya: kuning dipakai sebagai aksen DI ATAS dasar cream,
+ * bukan pengganti seluruh background. Rasa pastelnya datang dari dominasi cream, bukan
+ * dari memudarkan aksennya - dan memudarkan aksen justru membunuh "ceria" yang diminta.
+ *
+ * Kelimanya juga lolos kontras terhadap tinta brief sendiri, jadi tidak pernah ada
+ * alasan teknis untuk mengubahnya.
+ */
+const BRIEF_PALETTE = {
+  '--cream': '#FFF8ED',   // dasar utama
+  '--ink': '#2B2118',     // teks utama dan outline
+  '--yellow': '#FFD23F',  // aksen utama: CTA, progress, ikon aktif
+  '--coral': '#EE5D4A',   // aksen kedua: notifikasi, badge, streak
+  '--gold': '#C9A24B'     // detail premium, dipakai hemat
+};
+
+/** Palet lama yang pernah menggantikannya. Tidak boleh muncul lagi di mana pun. */
+const SUPERSEDED = ['#FFF9F0', '#33281C', '#FFE07E', '#F5A091', '#D9BC7E'];
+
+test('palet mengikuti brief OWNER, kelima warnanya persis', () => {
+  const wrong = [];
+  for (const [token, want] of Object.entries(BRIEF_PALETTE)) {
+    const got = (LIGHT[token] || '').trim().toUpperCase();
+    if (got !== want) wrong.push(token + ' = ' + (got || 'hilang') + ', brief minta ' + want);
+  }
+  if (wrong.length) throw new Error('menyimpang dari brief bagian 3:\n    ' + wrong.join('\n    '));
+});
+
+test('palet lama tidak tertinggal di berkas mana pun', () => {
+  const scan = ['style.css', 'features/tutor-classroom/tutor-v3.css', 'app.js', 'index.html', 'manifest.json'];
+  const found = [];
+  for (const file of scan) {
+    let text;
+    try { text = fs.readFileSync(path.join(__dirname, file), 'utf8'); } catch { continue; }
+    for (const hex of SUPERSEDED) {
+      // Komentar boleh menyebut warna lama untuk menjelaskan sejarahnya; yang dilarang
+      // adalah nilainya masih dipakai.
+      const lines = text.split('\n').filter((l) => l.toUpperCase().includes(hex) && !/^\s*(\/\*|\*|\/\/)/.test(l));
+      if (lines.length) found.push(file + ' masih memakai ' + hex + ' (' + lines.length + ' baris)');
+    }
+  }
+  if (found.length) throw new Error('palet yang sudah diganti masih hidup:\n    ' + found.join('\n    '));
+});
+
+test('tinta brief terbaca di atas setiap warna brief', () => {
+  const ink = BRIEF_PALETTE['--ink'];
+  const weak = [];
+  for (const [token, hex] of Object.entries(BRIEF_PALETTE)) {
+    if (token === '--ink') continue;
+    const r = ratio(ink, hex);
+    if (r < 4.5) weak.push(token + ' ' + hex + ' = ' + r.toFixed(2) + ':1');
+  }
+  if (weak.length) throw new Error('di bawah 4,5:1 terhadap tinta brief: ' + weak.join('; '));
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL gerbang bidang pastel: FAIL (' + failures.length + ')');

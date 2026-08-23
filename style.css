@@ -12,61 +12,61 @@
      coklat lembut jadi tinta dan garis - inilah yang menahan pastel supaya tidak jatuh
      jadi kartun; emas pastel HANYA untuk detail tipis, tidak pernah untuk teks.
 
-     Pastel adalah warna BIDANG, bukan warna teks: #FFE07E di atas cream 1,2:1 dan
-     #F5A091 2,2:1. Karena itu tiap keluarga punya satu turunan pekat yang khusus untuk
+     Aksen adalah warna BIDANG, bukan warna teks: #FFD23F di atas cream 1,4:1 dan
+     #EE5D4A 3,2:1. Karena itu tiap keluarga punya satu turunan pekat yang khusus untuk
      tinta (--accent 6,5:1) dan satu turunan gelap untuk bayangan tombol. Tidak ada satu
      pun teks yang memakai warna pastelnya langsung di atas cream. */
-  --cream:#FFF9F0;
-  --cream-deep:#FFF3E2;
-  --ink:#33281C;
-  --yellow:#FFE07E;
-  --yellow-deep:#EFC75C;
-  --yellow-soft:#FFF6DC;
-  --coral:#F5A091;
-  --coral-deep:#E07C68;
-  --coral-soft:#FDECE7;
+  --cream:#FFF8ED;
+  --cream-deep:#FFF0DC;
+  --ink:#2B2118;
+  --yellow:#FFD23F;
+  --yellow-deep:#E0B22A;
+  --yellow-soft:#FFF1C9;
+  --coral:#EE5D4A;
+  --coral-deep:#C9432F;
+  --coral-soft:#FDE3DE;
   --mint:#A8DCC4;
   --mint-soft:#E9F7F0;
   --teal-pastel:#9FD5CE;
   --lilac:#C9BCE4;
   --lilac-soft:#F1EDF9;
-  --gold:#D9BC7E;
+  --gold:#C9A24B;
   --sky-top:#FFE9B8;
-  --sky-bottom:#FFF9F0;
+  --sky-bottom:#FFF8ED;
   --scene-light:rgba(255,224,126,.42);
   --orbit-x:50%;
   --orbit-y:10%;
-  --ambient-text:#33281C;
+  --ambient-text:#2B2118;
   --ambient-muted:#6F5F48;
   --chrome-bg:rgba(255,249,240,.82);
   --launcher-start:#FFF1D2;
-  --launcher-end:#FFE07E;
-  --bg:#FFF9F0;
+  --launcher-end:#FFD23F;
+  --bg:#FFF8ED;
   --panel:#FFFFFF;
-  --panel-soft:#FFF3E2;
+  --panel-soft:#FFF0DC;
   --line:#F2E6D3;
   --line-soft:#F8F0E4;
-  --text:#33281C;
+  --text:#2B2118;
   --muted:#6F5F48;
   --muted-soft:#8B7A60;
-  --accent:#B8452F;
-  --accent-strong:#9C3826;
-  --accent-soft:#FDECE7;
+  --accent:#C2402C;
+  --accent-strong:#A33422;
+  --accent-soft:#FDE3DE;
   /* m025-113: aksen yang duduk di atas material kaca. Sejak m025-115 material tidak lagi
      dibalik oleh fase langit, jadi token ini cukup mengikuti tema - tetapi ia tetap ada
      supaya satu tempat saja yang memutuskan warna aksen di atas permukaan. */
   --accent-on-glass:var(--accent-strong);
-  --black:#33281C;
+  --black:#2B2118;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#C9503A;
-  --red-soft:#FDECE7;
+  --red-soft:#FDE3DE;
   --radius-lg:26px;
   --radius-md:18px;
   --radius-sm:13px;
-  --shadow-sm:0 2px 10px rgba(51,40,28,.06);
-  --shadow-md:0 10px 30px rgba(51,40,28,.09);
-  --shadow-lg:0 24px 60px rgba(51,40,28,.15);
+  --shadow-sm:0 2px 10px rgba(43,33,24,.06);
+  --shadow-md:0 10px 30px rgba(43,33,24,.09);
+  --shadow-lg:0 24px 60px rgba(43,33,24,.15);
   --ease:cubic-bezier(.22,.8,.28,1);
   --ease-spring:cubic-bezier(.34,1.4,.4,1);
   --dur-s:.18s;
@@ -120,9 +120,9 @@ body{
 .global-celestial svg{position:relative;width:100%;height:100%;stroke-width:1.45}.global-celestial.sun{color:#fff0b3;filter:drop-shadow(0 0 14px rgba(255,222,145,.78))}.global-celestial.moon{color:#edf2ff;filter:drop-shadow(0 0 15px rgba(202,218,255,.72))}
 /* Glass has to invert with the sky, or a white pane at midnight is a lamp in the face.
    Each phase carries its own material weights; every surface below reads them. */
-.scene-day,.scene-dawn{--sky-top:#FFE9B8;--sky-bottom:#FFF9F0;--scene-light:rgba(255,224,126,.42)}
+.scene-day,.scene-dawn{--sky-top:#FFE9B8;--sky-bottom:#FFF8ED;--scene-light:rgba(255,224,126,.42)}
 .scene-dusk{--sky-top:#FFD3B4;--sky-bottom:#FFF6EA;--scene-light:rgba(245,160,145,.30)}
-.scene-night{--sky-top:#EFE0C4;--sky-bottom:#FFF9F0;--scene-light:rgba(217,188,126,.26)}
+.scene-night{--sky-top:#EFE0C4;--sky-bottom:#FFF8ED;--scene-light:rgba(217,188,126,.26)}
 /* m025-115: penimpaan "kembalikan material gelap untuk fase terang" milik m025-85
    dihapus bersama sebab keberadaannya. Fase langit tidak lagi memasang satu pun token
    material, jadi tidak ada lagi yang perlu dikembalikan. */
@@ -286,7 +286,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   position:fixed;left:50%;top:clamp(92px,18vh,170px);z-index:130;pointer-events:none;
   width:min(330px,calc(100% - 32px));display:grid;justify-items:center;gap:5px;padding:20px 24px;
   border:1px solid rgba(var(--surface-pure-rgb),.7);border-radius:22px;background:rgba(var(--surface-pure-rgb),.96);
-  box-shadow:0 26px 70px rgba(51,40,28,.24);opacity:0;transform:translate(-50%,-18px) scale(.84);
+  box-shadow:0 26px 70px rgba(43,33,24,.24);opacity:0;transform:translate(-50%,-18px) scale(.84);
   transition:opacity .25s var(--ease),transform .38s var(--ease-spring);backdrop-filter:blur(16px)
 }
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
@@ -301,7 +301,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   padding:7px;background:rgba(var(--surface-pure-rgb),.86);
   border:1px solid rgba(239,231,232,.9);border-radius:22px;
   display:grid;grid-template-columns:repeat(5,1fr);gap:4px;z-index:40;
-  box-shadow:0 16px 40px rgba(51,40,28,.10);
+  box-shadow:0 16px 40px rgba(43,33,24,.10);
 }
 .nav{
   border:0;background:transparent;padding:9px 4px;font-size:.65rem;font-weight:600;color:var(--muted-soft);
@@ -356,11 +356,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-listen-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;min-height:44px;
   border:0;border-radius:16px;background:var(--coral,var(--panel));color:var(--ink,var(--text));
   font-weight:700;letter-spacing:-.01em;cursor:pointer;
-  box-shadow:0 4px 0 var(--coral-deep,var(--line)),0 10px 22px rgba(51,40,28,.13);
+  box-shadow:0 4px 0 var(--coral-deep,var(--line)),0 10px 22px rgba(43,33,24,.13);
   transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease)}
 .quiz-listen-btn:hover:not(:disabled){background:#F7B0A3}
 .quiz-listen-btn:active:not(:disabled){
-  transform:translateY(3px);box-shadow:0 1px 0 var(--coral-deep,var(--line)),0 4px 10px rgba(51,40,28,.12)}
+  transform:translateY(3px);box-shadow:0 1px 0 var(--coral-deep,var(--line)),0 4px 10px rgba(43,33,24,.12)}
 .quiz-listen-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .quiz-listen-btn:disabled{opacity:.65;cursor:progress;transform:translateY(3px);
   box-shadow:0 1px 0 var(--coral-deep,var(--line))}
@@ -525,28 +525,28 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    justru karena ia yang menang - kalau hanya blok paling atas yang diganti, aplikasi
    tetap berjalan dengan netral marun lama sementara tokennya sudah pastel. */
 :root{
-  --bg:#FFF9F0;
+  --bg:#FFF8ED;
   --panel:#FFFFFF;
-  --panel-soft:#FFF3E2;
+  --panel-soft:#FFF0DC;
   --line:#F2E6D3;
   --line-soft:#F8F0E4;
-  --text:#33281C;
+  --text:#2B2118;
   --muted:#6F5F48;
   --muted-soft:#8B7A60;
-  --accent:#B8452F;
-  --accent-strong:#9C3826;
-  --accent-soft:#FDECE7;
-  --black:#33281C;
-  --gold:#D9BC7E;
+  --accent:#C2402C;
+  --accent-strong:#A33422;
+  --accent-soft:#FDE3DE;
+  --black:#2B2118;
+  --gold:#C9A24B;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#C9503A;
-  --red-soft:#FDECE7;
+  --red-soft:#FDE3DE;
   --radius-lg:22px;
   --radius-md:16px;
   --radius-sm:12px;
-  --shadow-sm:0 8px 24px rgba(51,40,28,.05);
-  --shadow-md:0 20px 50px rgba(51,40,28,.09);
+  --shadow-sm:0 8px 24px rgba(43,33,24,.05);
+  --shadow-md:0 20px 50px rgba(43,33,24,.09);
   --shadow-lg:0 34px 90px rgba(28,10,16,.22);
   /* m025-85 kontras: sebelum ini puluhan permukaan memaku warnanya sendiri (#fff,
      rgba(255,254,250,.9), #f6f4ed, ...) sementara TEKS di atasnya memakai var(--text).
@@ -573,7 +573,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --ink-danger:#A63A24;
   /* --glass-text/-muted/-line hanya hidup di blok .scene-* sebelum ini, jadi setiap
      layar yang lupa memasang kelas scene kehilangan warna tintanya. Diberi nilai bawaan. */
-  --glass-text:#33281C;
+  --glass-text:#2B2118;
   --glass-muted:#6F5F48;
   --glass-line:rgba(27,20,24,.08);
   /* Audit UX Bagian 5 + Roadmap #4: satu font display untuk judul, satu font teks untuk
@@ -605,14 +605,14 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
        persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
        dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
        berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
-    --cream:#241C13;--cream-deep:#2C2218;
-    --yellow-soft:#3B2F17;--coral-soft:#3C2620;--mint-soft:#1C302A;--lilac-soft:#292145;
+    --cream:#221A11;--cream-deep:#2A2016;
+    --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
     --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
-    --accent:#F5A091;--accent-strong:#F8BCB0;--accent-soft:#3B271F;
-    --black:#33281C;--gold:#E6CE9C;
+    --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
+    --black:#2B2118;--gold:#DCBA72;
     --green:#8FD8BC;--green-soft:#1B322A;--red:#F3A292;--red-soft:#3B241D;
     --glass-thin:rgba(49,38,26,.60);--glass-regular:rgba(49,38,26,.72);--glass-thick:rgba(39,29,20,.84);--glass-solid:rgba(39,29,20,.98);
     --glass-edge:rgba(255,246,230,.16);--glass-text:#FFF6E6;--glass-muted:#DCCBAE;--glass-line:rgba(255,246,230,.14);
@@ -629,14 +629,14 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
        persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
        dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
        berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
-    --cream:#241C13;--cream-deep:#2C2218;
-    --yellow-soft:#3B2F17;--coral-soft:#3C2620;--mint-soft:#1C302A;--lilac-soft:#292145;
+    --cream:#221A11;--cream-deep:#2A2016;
+    --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
     --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
     --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
     --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
     --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
-    --accent:#F5A091;--accent-strong:#F8BCB0;--accent-soft:#3B271F;
-    --black:#33281C;--gold:#E6CE9C;
+    --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
+    --black:#2B2118;--gold:#DCBA72;
     --green:#8FD8BC;--green-soft:#1B322A;--red:#F3A292;--red-soft:#3B241D;
     --glass-thin:rgba(49,38,26,.60);--glass-regular:rgba(49,38,26,.72);--glass-thick:rgba(39,29,20,.84);--glass-solid:rgba(39,29,20,.98);
     --glass-edge:rgba(255,246,230,.16);--glass-text:#FFF6E6;--glass-muted:#DCCBAE;--glass-line:rgba(255,246,230,.14);
@@ -731,8 +731,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .launcher-copy h1 span{color:#e8a3ad}
 .launcher-lead{font-size:1rem;line-height:1.7;color:#cdbcc1;max-width:680px;margin:22px 0 0}.learner-stage{display:flex;align-items:center;gap:8px;margin:13px 0 0;color:#c0aeb3;font-size:.72rem}.learner-stage svg{width:16px;height:16px;color:#d8b36b}
 .launcher-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.launcher-actions .luxe{background:#f7f6f1;color:#33281C;border-color:#f7f6f1}
-.launcher-actions .luxe:hover{background:#fff;color:#33281C;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+.launcher-actions .luxe{background:#f7f6f1;color:#2B2118;border-color:#f7f6f1}
+.launcher-actions .luxe:hover{background:#fff;color:#2B2118;box-shadow:0 14px 34px rgba(0,0,0,.22)}
 .ghost-dark{background:transparent;color:#faf5f6;border-color:rgba(255,255,255,.2)}
 .ghost-dark:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.34)}
 .launcher-trust{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;color:#9fa3b6;font-size:.72rem}
@@ -861,7 +861,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 }
 
 /* m025-30 neural voice rate control */
-.neural-voice-choice input[type="range"]{width:100%;accent-color:var(--accent,#B8452F);height:28px}
+.neural-voice-choice input[type="range"]{width:100%;accent-color:var(--accent,#C2402C);height:28px}
 .neural-voice-choice input[type="range"]:disabled{opacity:.5}
 
 /* m025-32 Indonesian optional voice block */
@@ -871,15 +871,15 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 /* m025-33 FIEZEL Classroom */
 .classroom-page{display:grid;gap:14px}
 .classroom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#33281C);min-height:88px}
+.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#2B2118);min-height:88px}
 .classroom-cat small{color:var(--muted,#6F5F48)}
-.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#33281C);border:1px solid var(--line,#F2E6D3)}
+.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3)}
 .classroom-board h2{margin:.2rem 0 .5rem}
 .classroom-formula{font:600 1.05rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0)}
 .classroom-board ul{margin:.6rem 0 0;padding-left:1.1rem;line-height:1.6}
-.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#33281C);border:1px solid var(--line,#F2E6D3)}
+.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3)}
 .classroom-en{font-weight:650;line-height:1.5;margin:.3rem 0}
-.classroom-id{color:var(--accent,#B8452F);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
+.classroom-id{color:var(--accent,#C2402C);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
 .classroom-options{display:grid;gap:9px}
 .classroom-option{text-align:left;padding:14px;border-radius:14px;min-height:48px}
 .classroom-option.is-correct{border-color:var(--green,#1f9d6f);background:var(--green-soft,#e7f8f1)}
@@ -891,27 +891,27 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.95),rgba(45,37,86,.95));backdrop-filter:blur(10px)}
 body.voice-bundle-locked{overflow:hidden}
 body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
-.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#33281C);border:1px solid var(--line,#F2E6D3);box-shadow:0 24px 60px rgba(7,13,29,.28)}
-.voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#B8452F)}
+.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3);box-shadow:0 24px 60px rgba(7,13,29,.28)}
+.voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .voice-bundle-panel h2{margin:0}
 .voice-bundle-panel p{margin:0;color:var(--muted,#6F5F48);line-height:1.55}
 .voice-bundle-track{height:8px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--accent,#B8452F);transition:width .3s ease}
+.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--accent,#C2402C);transition:width .3s ease}
 .voice-bundle-progress{font-size:.92rem}
 .voice-bundle-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
 .voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:14px}
-.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#33281C);border:1px solid var(--line,#F2E6D3);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
+.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
 @media (prefers-reduced-motion:reduce){.voice-bundle-track span{transition:none}}
 
 /* m025-42 mandatory daily target lock */
 .daily-lock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,rgba(7,13,29,.94),rgba(45,37,86,.94));backdrop-filter:blur(10px)}
-.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#33281C);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
-.daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#B8452F)}
+.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#2B2118);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
+.daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .daily-lock-panel h2{margin:0}
 .daily-lock-panel p{margin:0;color:var(--muted,#6F5F48);line-height:1.55}
 .daily-lock-track{height:10px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--accent,#B8452F);transition:width .35s ease}
-.daily-lock-count{font-weight:700;color:var(--text,#33281C)}
+.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--accent,#C2402C);transition:width .35s ease}
+.daily-lock-count{font-weight:700;color:var(--text,#2B2118)}
 .daily-lock-panel .wide{width:100%;min-height:52px;border-radius:16px}
 .daily-lock-note{font-size:.86rem}
 /* While the lock is armed every escape route inside the app is inert, including the
@@ -923,7 +923,7 @@ body.daily-locked{overflow:hidden}
 /* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
 .library-page{display:grid;gap:14px}
 .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
-.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#33281C);border-left:4px solid var(--book-accent,#B8452F)}
+.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#2B2118);border-left:4px solid var(--book-accent,#C2402C)}
 .library-cover{font-size:2rem;line-height:1}
 .library-meta{display:grid;gap:3px}
 .library-meta b{font-size:1.02rem}
@@ -931,41 +931,41 @@ body.daily-locked{overflow:hidden}
 .library-meta em{color:var(--muted,#6F5F48);font-style:normal;line-height:1.45}
 .library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6F5F48);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
 .library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.library-progress span{display:block;height:100%;background:var(--book-accent,#B8452F)}
+.library-progress span{display:block;height:100%;background:var(--book-accent,#C2402C)}
 .library-reader{padding-bottom:190px}
 .library-reader-head{display:flex;gap:12px;align-items:flex-start}
 .library-back{min-height:44px;padding:0 14px;border-radius:12px}
 .library-note{margin:0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6F5F48);font-size:.88rem;line-height:1.5}
 .library-text{display:grid;gap:2px}
 .library-chapter{margin:16px 0 6px;font-size:1.05rem}
-.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#33281C);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
-.library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#B8452F)}
+.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#2B2118);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
+.library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#C2402C)}
 /* m025-45: the translation floats in the middle of the screen. The book stays visible
    behind it and a tap outside dismisses it - a reader, not a modal. */
 .library-translation-layer{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:20px;background:rgba(7,13,29,.28);backdrop-filter:blur(2px)}
 .library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:22px;background:var(--panel,#fff);border:1px solid var(--line,#F2E6D3);box-shadow:0 26px 60px rgba(7,13,29,.32)}
-.library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#B8452F)}
+.library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-translation-en{margin:0;font-weight:650;line-height:1.5}
-.library-translation-id{margin:0;color:var(--accent,#B8452F);font-weight:600;line-height:1.5}
+.library-translation-id{margin:0;color:var(--accent,#C2402C);font-weight:600;line-height:1.5}
 .library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
 .library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#F2E6D3)}
 .library-progress-line{height:5px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.library-progress-line span{display:block;height:100%;background:var(--accent,#B8452F);transition:width .25s ease}
+.library-progress-line span{display:block;height:100%;background:var(--accent,#C2402C);transition:width .25s ease}
 .library-status{margin:0;font-size:.84rem;color:var(--muted,#6F5F48)}
 .library-controls{display:flex;gap:8px;align-items:center}
 .library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
 .library-controls .primary{flex:1}
 .library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
-.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#33281C)}
-.library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#B8452F)}
+.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#2B2118)}
+.library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-ask-panel h2{margin:0}
 .library-ask-quote{margin:0;padding:9px 11px;border-radius:12px;background:var(--panel-soft,#f6eef0);line-height:1.5}
 .library-ask-panel textarea{width:100%;padding:11px;border-radius:13px;border:1px solid var(--line,#F2E6D3);font:inherit;resize:vertical}
 .library-ask-actions{display:flex;gap:8px;justify-content:flex-end}
 .library-ask-actions button{min-height:46px;padding:0 16px;border-radius:13px}
-.library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#B8452F);font-weight:600}
+.library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#C2402C);font-weight:600}
 .library-ask-answer:empty{display:none}
 @media (max-width:620px){.library-sentence{font-size:1.02rem}}
 @media (prefers-reduced-motion:reduce){.library-progress-line span{transition:none}}
@@ -982,7 +982,7 @@ body.daily-locked{overflow:hidden}
   background:var(--glass-thick);
   border:.5px solid var(--glass-edge);
   color:var(--glass-text);
-  box-shadow:0 1px 1px rgba(51,40,28,.03),0 8px 24px rgba(51,40,28,.07);
+  box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.07);
 }
 .card{border-radius:22px;padding:18px}
 .card p.muted,.launch-card small,.coach-preview p{color:var(--glass-muted)}
@@ -1037,7 +1037,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   box-shadow:0 0 0 9999px rgba(10,5,8,.78),0 0 0 2px rgba(255,255,255,.55) inset;
   transition:top .26s var(--ease,ease),left .26s var(--ease,ease),width .26s var(--ease,ease),height .26s var(--ease,ease)}
 .fz-tour-card{position:fixed;left:16px;right:16px;padding:20px 20px 16px;border-radius:22px;
-  background:var(--glass-solid,#fff);color:var(--text,#33281C);box-shadow:0 24px 70px rgba(0,0,0,.34);
+  background:var(--glass-solid,#fff);color:var(--text,#2B2118);box-shadow:0 24px 70px rgba(0,0,0,.34);
   animation:fz-tour-in .28s cubic-bezier(.22,.8,.28,1) both}
 .fz-tour-card.is-top{top:max(22px,env(safe-area-inset-top))}
 .fz-tour-card.is-bottom{bottom:calc(104px + env(safe-area-inset-bottom))}
@@ -1046,10 +1046,10 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fz-tour-card p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted,#6F5F48)}
 .fz-tour-dots{display:flex;gap:6px}
 .fz-tour-dot{width:6px;height:6px;border-radius:50%;background:var(--line,#e9dfe1)}
-.fz-tour-dot.is-active{background:var(--accent,#B8452F);width:18px;border-radius:3px}
+.fz-tour-dot.is-active{background:var(--accent,#C2402C);width:18px;border-radius:3px}
 .fz-tour-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
 .fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6F5F48);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
-.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:14px;background:var(--accent,#B8452F);color:#fff;font:inherit;font-size:.86rem;font-weight:750;cursor:pointer}
+.fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:14px;background:var(--accent,#C2402C);color:#fff;font:inherit;font-size:.86rem;font-weight:750;cursor:pointer}
 /* Kurangi-gerak: sorotannya tetap ada, hanya perpindahannya yang tidak dianimasikan. */
 .fz-tour-still .fz-tour-hole{transition:none}
 .fz-tour-still .fz-tour-card{animation:none}
@@ -1076,7 +1076,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .bottomnav{
   background:var(--glass-solid);
   border:.5px solid var(--glass-edge);border-radius:30px;padding:6px;
-  box-shadow:0 1px 1px rgba(51,40,28,.05),0 14px 34px rgba(51,40,28,.14);
+  box-shadow:0 1px 1px rgba(43,33,24,.05),0 14px 34px rgba(43,33,24,.14);
 }
 /* Peredup di dasar layar. pointer-events:none supaya ia tidak pernah menelan sentuhan, dan
    ia duduk DI BAWAH pill (z-index 39 lawan 40) supaya tab tetap tajam di atasnya. */
@@ -1094,7 +1094,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   background:var(--glass-thick);
   -webkit-backdrop-filter:var(--glass-blur-heavy);backdrop-filter:var(--glass-blur-heavy);
   border:.5px solid var(--glass-edge);border-radius:34px;color:var(--glass-text);
-  box-shadow:0 1px 2px rgba(51,40,28,.06),0 -8px 60px rgba(51,40,28,.18);
+  box-shadow:0 1px 2px rgba(43,33,24,.06),0 -8px 60px rgba(43,33,24,.18);
 }
 
 /* The sky is a clock, not wallpaper: it stays, but it stops competing with the text. */
@@ -1159,7 +1159,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
    FIEZEL brand: Percik + splash + onboarding
    Sumber warna dan tipografi: FIEZEL_Complete_Design_Specification.pdf, bagian 2 dan 15.
    Token di bawah SENGAJA dinamai --fz-* dan dilingkupi ke elemen `.fiezel-*` saja - ini
-   BUKAN skema warna aplikasi (yang tetap --accent:#B8452F dkk di :root atas). Menyamakan
+   BUKAN skema warna aplikasi (yang tetap --accent:#C2402C dkk di :root atas). Menyamakan
    keduanya berarti mengecat ulang puluhan layar lain yang tidak diminta pada redesign ini;
    splash dan onboarding adalah lapisan tersendiri sehingga aman dilingkupi sendiri.
    ======================================================================================== */
@@ -1876,7 +1876,7 @@ button:active {
    Selektor sengaja diturunkan lewat .home-overview supaya deklarasi latar milik
    .mission-panel dan .home-stats sendiri tetap utuh - contrast-test membaca deklarasi itu
    sebagai sumber kebenaran untuk mengukur pasangan tinta/latarnya. */
-.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(51,40,28,.03),0 8px 24px rgba(51,40,28,.06)}
+.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.06)}
 .home-overview .mission-panel,.home-overview .home-stats{border:0;border-radius:0;background:transparent;box-shadow:none}
 .home-overview .mission-panel{border-bottom:1px solid var(--glass-line)}
 .mission-panel h3{font-family:var(--fz-body);font-size:.95rem;font-weight:650;letter-spacing:-.01em}
@@ -1889,7 +1889,7 @@ button:active {
 
 /* 4. Perjalanan belajar: dua panel menjadi satu bidang dengan satu garis pemisah, dan
    blok rencana berhenti menjadi kotak-kotak kecil di dalam kotak. */
-.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(51,40,28,.03),0 8px 24px rgba(51,40,28,.06)}
+.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.06)}
 .journey-panel .journey-mission,.journey-panel .journey-today{border:0;border-radius:0;background:transparent;box-shadow:none}
 .journey-panel .journey-mission{border-bottom:1px solid var(--glass-line)}
 .journey-mission small,.journey-today small{font-size:.6rem;letter-spacing:.16em}
@@ -1984,16 +1984,16 @@ button:active {
 button.primary,.primary.wide,.primary.luxe,html.fiezel-ui-v6 body .primary{
   background:var(--yellow);color:var(--ink);border:0;border-radius:18px;
   font-weight:700;letter-spacing:-.01em;
-  box-shadow:0 4px 0 var(--yellow-deep),0 10px 22px rgba(51,40,28,.13);
+  box-shadow:0 4px 0 var(--yellow-deep),0 10px 22px rgba(43,33,24,.13);
   transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease);
 }
 button.primary:hover,.primary.luxe:hover,html.fiezel-ui-v6 body .primary:hover{background:#FFE896;color:var(--ink)}
 button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:active{
-  transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep),0 4px 10px rgba(51,40,28,.12)}
+  transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep),0 4px 10px rgba(43,33,24,.12)}
 /* Aksi kedua: bidang koral pastel, bukan garis tipis yang nyaris tak terlihat. */
-.primary.is-coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep),0 10px 22px rgba(51,40,28,.13)}
+.primary.is-coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep),0 10px 22px rgba(43,33,24,.13)}
 .primary.is-coral:hover{background:#F7B0A3}
-.primary.is-coral:active{box-shadow:0 1px 0 var(--coral-deep),0 4px 10px rgba(51,40,28,.12)}
+.primary.is-coral:active{box-shadow:0 1px 0 var(--coral-deep),0 4px 10px rgba(43,33,24,.12)}
 
 /* Tombol biasa ikut punya tebal, hanya lebih tenang. */
 html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card){
@@ -2013,7 +2013,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   background:linear-gradient(155deg,var(--launcher-start) 0%,var(--launcher-end) 118%);
   color:var(--ink);
   border:1px solid rgba(217,188,126,.45);
-  box-shadow:0 18px 44px rgba(51,40,28,.14);
+  box-shadow:0 18px 44px rgba(43,33,24,.14);
 }
 /* Matahari sudut: satu lingkaran krem, bukan kabut emas yang tidak terbaca. */
 .launcher-shell::after{
@@ -2024,17 +2024,17 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .launcher-copy h1.login-message{color:var(--ink)}
 .launcher-copy h1.login-message span{color:var(--ink);opacity:.55}
 .launcher-lead{color:var(--ink);opacity:.78}
-.celestial-status{border:1px solid rgba(51,40,28,.14);background:rgba(255,255,255,.55);color:var(--ink)}
+.celestial-status{border:1px solid rgba(43,33,24,.14);background:rgba(255,255,255,.55);color:var(--ink)}
 .celestial-status span{color:var(--ink);opacity:.7}
 .live-signal{background:var(--green);box-shadow:0 0 0 5px rgba(46,139,105,.16)}
 
 /* Kartu Coach di dalam hero tetap tanpa bingkai, hanya garis rambut - hanya
    warnanya yang ikut berbalik. */
-.coach-preview{border-top:1px solid rgba(51,40,28,.14)}
+.coach-preview{border-top:1px solid rgba(43,33,24,.14)}
 .coach-icon{background:rgba(255,255,255,.7);color:var(--accent-strong);border:1px solid rgba(217,188,126,.6)}
 .coach-head small{color:var(--ink);opacity:.6}
 .coach-head b{color:var(--ink)}
-.coach-level{border-bottom:1px solid rgba(51,40,28,.12)}
+.coach-level{border-bottom:1px solid rgba(43,33,24,.12)}
 .coach-level span{color:var(--ink);opacity:.6}
 .coach-level strong{color:var(--ink)}
 .coach-preview h2{color:var(--ink)}
@@ -2056,7 +2056,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 /* --------------------------------------------------------------------------
    4. Tab bar. Tab aktif jadi kapsul kuning pastel, bukan hanya teks berwarna.
    -------------------------------------------------------------------------- */
-.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(51,40,28,.16)}
+.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(43,33,24,.16)}
 .nav{color:var(--muted);font-weight:600}
 .nav .fz-i{--fz-i-fill:var(--surface-mute);--fz-i-line:var(--muted)}
 .nav.active{color:var(--ink);background:var(--yellow-soft);font-weight:750}
@@ -2072,10 +2072,10 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:relative;display:grid;gap:10px;padding:16px;text-align:left;align-content:start;
   min-height:132px;border-radius:22px;border:1.5px solid var(--skill-line,var(--surface-edge));
   background:var(--skill-bg,var(--panel-soft));color:var(--ink);
-  box-shadow:0 4px 0 var(--skill-line,var(--surface-edge)),0 12px 26px rgba(51,40,28,.10);
+  box-shadow:0 4px 0 var(--skill-line,var(--surface-edge)),0 12px 26px rgba(43,33,24,.10);
   transition:transform .14s var(--ease),box-shadow .14s var(--ease);
 }
-.skill-card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--skill-line,var(--surface-edge)),0 6px 14px rgba(51,40,28,.10)}
+.skill-card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--skill-line,var(--surface-edge)),0 6px 14px rgba(43,33,24,.10)}
 .skill-card .fz-i{--fz-i-fill:var(--skill-ink,var(--yellow));--fz-i-line:var(--ink)}
 .skill-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .skill-card b{font-size:1rem;font-weight:700;letter-spacing:-.01em}
@@ -2084,12 +2084,12 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 /* Cincin progres: satu conic-gradient, tanpa satu pun elemen tambahan. */
 .skill-ring{
   width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
-  background:conic-gradient(var(--skill-ink,var(--yellow)) var(--ring,0%),rgba(51,40,28,.10) 0);
+  background:conic-gradient(var(--skill-ink,var(--yellow)) var(--ring,0%),rgba(43,33,24,.10) 0);
 }
 .skill-ring::before{content:"";grid-area:1/1;width:28px;height:28px;border-radius:50%;background:var(--skill-bg,var(--panel-soft))}
 .skill-ring b{grid-area:1/1;z-index:1;font-size:.62rem;font-weight:750;color:var(--ink)}
-.skill-listening{--skill-bg:#FFF6DC;--skill-line:#F3E0AE;--skill-ink:#FFE07E}
-.skill-speaking{--skill-bg:#FDECE7;--skill-line:#F6D3C9;--skill-ink:#F5A091}
+.skill-listening{--skill-bg:#FFF1C9;--skill-line:#F3E0AE;--skill-ink:#FFD23F}
+.skill-speaking{--skill-bg:#FDE3DE;--skill-line:#F6D3C9;--skill-ink:#EE5D4A}
 .skill-reading{--skill-bg:#E9F7F0;--skill-line:#CDE9DD;--skill-ink:#A8DCC4}
 .skill-writing{--skill-bg:#F1EDF9;--skill-line:#DCD3EE;--skill-ink:#C9BCE4}
 
@@ -2101,7 +2101,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .grammar-launch .launch-icon{background:var(--coral-soft)}
 .reading-launch .launch-icon{background:var(--mint-soft)}
 .skills-launch .launch-icon{background:var(--lilac-soft)}
-.launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(51,40,28,.08)}
+.launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(43,33,24,.08)}
 .launch-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
 
 /* --------------------------------------------------------------------------
@@ -2113,11 +2113,11 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:fixed;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));z-index:41;
   width:58px;height:58px;padding:0;border-radius:50%;border:2px solid var(--ink);
   background:var(--yellow);color:var(--ink);cursor:pointer;
-  box-shadow:0 4px 0 var(--yellow-deep),0 14px 30px rgba(51,40,28,.24);
+  box-shadow:0 4px 0 var(--yellow-deep),0 14px 30px rgba(43,33,24,.24);
   display:grid;place-items:center;
   transition:transform .16s var(--ease-spring),box-shadow .16s var(--ease);
 }
-.fz-coach-bubble:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 var(--yellow-deep),0 6px 16px rgba(51,40,28,.2)}
+.fz-coach-bubble:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 var(--yellow-deep),0 6px 16px rgba(43,33,24,.2)}
 .fz-coach-bubble .fz-coach-face{width:30px;height:30px}
 .fz-coach-bubble .fz-coach-pulse{
   position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--yellow);
@@ -2135,21 +2135,21 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:fixed;right:84px;bottom:calc(116px + env(safe-area-inset-bottom));z-index:41;
   max-width:min(230px,62vw);padding:10px 13px;border-radius:16px 16px 4px 16px;
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
-  font-size:.78rem;line-height:1.45;box-shadow:0 10px 26px rgba(51,40,28,.16);
+  font-size:.78rem;line-height:1.45;box-shadow:0 10px 26px rgba(43,33,24,.16);
   animation:fzCoachPeek .34s var(--ease-spring) both}
 @keyframes fzCoachPeek{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 .fz-coach-peek[hidden]{display:none}
 
 .fz-coach-sheet{
   position:fixed;inset:0;z-index:2147481500;display:flex;align-items:flex-end;justify-content:center;
-  padding:12px;background:rgba(51,40,28,.34);animation:fzCoachFade .2s var(--ease) both}
+  padding:12px;background:rgba(43,33,24,.34);animation:fzCoachFade .2s var(--ease) both}
 .fz-coach-sheet[hidden]{display:none}
 @keyframes fzCoachFade{from{opacity:0}to{opacity:1}}
 .fz-coach-panel{
   width:min(560px,100%);max-height:min(78vh,640px);display:flex;flex-direction:column;
   padding:16px 16px calc(14px + env(safe-area-inset-bottom));border-radius:26px;
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
-  box-shadow:0 -6px 60px rgba(51,40,28,.24);animation:fzCoachRise .28s var(--ease-spring) both}
+  box-shadow:0 -6px 60px rgba(43,33,24,.24);animation:fzCoachRise .28s var(--ease-spring) both}
 @keyframes fzCoachRise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .fz-coach-head{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .fz-coach-head b{font-size:.95rem}
