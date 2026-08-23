@@ -298,6 +298,36 @@ test('Home berhenti memakai huruf display dan paragraf', () => {
   if (!/coach-strip-go/.test(app)) throw new Error('tombol besar di strip Coach tidak ada');
 });
 
+test('kelahiran logo menunggu splash pergi, bukan menunggu jam', () => {
+  // BUG m025-131, dan bentuknya patut diingat: animasinya berjalan sempurna tetapi
+  // dipicu 60 ms setelah DOM siap, sementara splash boot menutupi layar 3.400 ms.
+  // Tidak ada yang gagal - yang salah cuma waktunya, dan waktu tidak terlihat oleh tes
+  // statis mana pun. Yang bisa dijaga: pemicunya tidak boleh kembali jadi jam pendek.
+  const boot = read('features/ui/fiezel-boot-tail.js');
+  if (!/fz-booting/.test(boot) || !/fiezelBootSplash/.test(boot)) {
+    throw new Error('kelahiran logo tidak menunggu splash; ia akan terjadi di balik tirai lagi');
+  }
+  if (!/MutationObserver/.test(boot)) throw new Error('tidak ada yang mengamati kepergian splash');
+  // Tenggat wajib ada: kalau splash memang tidak pernah muncul, tidak ada mutasi yang datang.
+  if (!/birth\(\);\s*\}, \d{4}\)/.test(boot)) {
+    throw new Error('tidak ada tenggat; pada boot tanpa splash kelahirannya tidak akan pernah jalan');
+  }
+});
+
+test('lembar keyakinan mengambang, dan pergi setelah dijawab', () => {
+  // OWNER: "buatkan mengambang, tanpa perlu user scroll sampai paling bawah."
+  if (!/\.confidence-box\{[^}]*position:fixed/.test(CSS)) {
+    throw new Error('kotak keyakinan masih ikut tergulir di dasar panel');
+  }
+  const app = read('app.js');
+  if (!/dismissConfidenceBox\(\)/.test(app)) {
+    throw new Error('lembar mengambang tidak pernah pergi; ia akan menutupi tombol soal berikutnya');
+  }
+  if (!/setConfidence\(value\)\{[\s\S]{0,900}?dismissConfidenceBox\(\)/.test(app)) {
+    throw new Error('penutupan tidak dipanggil dari setConfidence');
+  }
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL maskot PAW: FAIL (' + failures.length + ')');
