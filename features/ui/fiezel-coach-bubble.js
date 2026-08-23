@@ -59,6 +59,31 @@
    * Sapaan lokal. Satu kalimat, gaya bahasa FIEZEL dipertahankan apa adanya
    * (brief bagian 2: "Tone of voice TIDAK berubah").
    * ------------------------------------------------------------------ */
+  /**
+   * m025-128 - peta halaman ke KARAKTER GERAK PAW.
+   *
+   * Empat belas halaman tidak berarti empat belas animasi. Yang dipetakan di sini adalah
+   * PEKERJAAN halaman itu, dan beberapa halaman memang pekerjaannya sama: membaca cerita
+   * di Library dan mengikuti materi di Classroom keduanya "mengikuti satu baris", jadi
+   * keduanya memakai gerak yang sama. Memaksakan gerak berbeda untuk pekerjaan yang sama
+   * akan membuat sistemnya terasa acak, bukan kaya.
+   *
+   * Yang TIDAK ada di peta ini jatuh ke 'home' - itu default yang benar untuk halaman
+   * yang belum punya pendapat sendiri, dan lebih baik daripada maskot yang diam total
+   * karena namanya belum terdaftar.
+   */
+  var PAGE_SCENES = {
+    home: 'home', ask: 'home', search: 'home',
+    vocab: 'vocab',
+    grammar: 'grammar',
+    reading: 'reading', library: 'reading', classroom: 'reading',
+    listening: 'listening',
+    speaking: 'speaking',
+    writing: 'writing',
+    progress: 'progress',
+    test: 'test', skills: 'test'
+  };
+
   var PAGE_LINES = {
     home: ['Mau mulai dari mana hari ini?', 'Gue udah siapin rencana hari ini, tinggal jalan.'],
     vocab: ['Kata baru itu kayak koin — dikumpulin dikit-dikit.', 'Review dulu yang hampir lupa, baru tambah baru.'],
@@ -114,7 +139,29 @@
     bubble.className = 'fz-coach-bubble';
     bubble.setAttribute('aria-label', 'Buka pembimbing FIEZEL');
     bubble.innerHTML = '<span class="fz-coach-pulse" aria-hidden="true"></span>' +
-      '<span class="fz-i fz-coach-face" aria-hidden="true">' + icon('coach') + '</span>';
+      '<span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span>';
+
+    bubble.setAttribute('data-fz-scene', 'home');
+
+    /**
+     * Mengganti karakter gerak PAW.
+     *
+     * Kelasnya dilepas dan dipasang ulang lewat reflow paksa (offsetWidth) karena tanpa
+     * itu browser menganggap animasi masuknya "sudah berjalan" dan tidak memulainya lagi
+     * ketika murid berpindah dua kali ke halaman yang sama karakternya. Gerak masuk yang
+     * kadang muncul kadang tidak lebih buruk daripada tidak ada sama sekali.
+     */
+    var shiftTimer = null;
+    function setScene(view) {
+      var scene = PAGE_SCENES[view] || 'home';
+      if (bubble.getAttribute('data-fz-scene') === scene) return;
+      bubble.setAttribute('data-fz-scene', scene);
+      bubble.classList.remove('is-paw-shift');
+      void bubble.offsetWidth;
+      bubble.classList.add('is-paw-shift');
+      if (shiftTimer) clearTimeout(shiftTimer);
+      shiftTimer = setTimeout(function () { bubble.classList.remove('is-paw-shift'); }, 660);
+    }
 
     var peek = doc.createElement('div');
     peek.className = 'fz-coach-peek';
@@ -127,7 +174,7 @@
     sheet.innerHTML =
       '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="Pembimbing FIEZEL">' +
         '<div class="fz-coach-head">' +
-          '<span class="fz-coach-avatar"><span class="fz-i fz-coach-face" aria-hidden="true">' + icon('coach') + '</span></span>' +
+          '<span class="fz-coach-avatar"><span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span></span>' +
           '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>' +
           '<button type="button" class="fz-coach-close" aria-label="Tutup">✕</button>' +
         '</div>' +
@@ -254,13 +301,16 @@
         var previousView = context.view;
         context = Object.assign({}, context, next || {});
         if (context.view && context.view !== previousView) {
+          setScene(context.view);
           chips();
           if (!sheet.hidden) return;
           showPeek(localGreeting(context));
         }
       },
       say: function (text) { showPeek(text); },
-      context: function () { return Object.assign({}, context); }
+      context: function () { return Object.assign({}, context); },
+      /** Karakter gerak yang sedang dipakai. Dipakai gerbang dan Diagnostics. */
+      scene: function () { return bubble.getAttribute('data-fz-scene') || 'home'; }
     };
 
     global.__fiezelCoachBubble = api;

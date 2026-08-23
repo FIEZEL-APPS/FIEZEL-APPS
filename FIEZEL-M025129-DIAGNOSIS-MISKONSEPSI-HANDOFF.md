@@ -1,4 +1,4 @@
-# m025-128 — Diagnosis miskonsepsi berbahasa Indonesia
+# m025-129 — Diagnosis miskonsepsi berbahasa Indonesia
 
 OWNER bertanya apa kelebihan FIEZEL sekarang, lalu: "berarti kalau PR #171 sudah di merge
 FIEZEL udah bisa pintar mengajar?" Jawaban jujurnya diukur, bukan dikira-kira — dan
@@ -130,11 +130,11 @@ tentang grammar, bukan grammar-nya sendiri. Itu langkah berikutnya, bukan bagian
 
 ## 6. Verifikasi
 
-Seluruh **73 perintah** di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
+Seluruh **74 perintah** di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
 pemeriksaan sintaks seluruh berkas. Gelung tutor diverifikasi di Chromium (emulasi Pixel 5):
 tutor kini menyebut sebab spesifik, seluruhnya Indonesia, tanpa `pageerror`.
 
-Penanda rilis `FIEZEL_PAGE_BUILD` / `DIAG_BUILD` / `SW_REV` ketiganya **m025-128**.
+Penanda rilis `FIEZEL_PAGE_BUILD` / `DIAG_BUILD` / `SW_REV` ketiganya **m025-129**.
 
 Seluruh 18 check di CI hijau, termasuk `audiobook-safari`.
 
@@ -163,7 +163,15 @@ Pelajarannya untuk handoff berikutnya: pengukuran satu titik waktu adalah bukti 
 waktu itu, bukan tentang seluruh sejarah repo. Kalimat "di setiap commit" menuntut pemeriksaan
 lintas commit — dan saya tidak melakukannya sebelum menuliskannya.
 
-Cabang ini dibuat dari m025-126; sementara berjalan, main maju ke m025-127 (#179 kontras logo
-topbar). main sudah disatukan — satu-satunya konflik adalah `SW_REV`, diselesaikan ke
-**m025-128** karena m025-127 sudah dipakai main. Precache berkas diagnosis dan pendaftaran
-gate di `quality.yml` diperiksa masih utuh setelah penyatuan.
+Cabang ini dibuat dari m025-126; sementara berjalan main maju dua kali — ke m025-127 (#179
+kontras logo topbar), lalu ke m025-128 (#181 maskot PAW). Keduanya sudah disatukan, dan
+penanda rilis diselesaikan ke **m025-129**.
+
+Penyatuan kedua membawa konflik yang patut dicatat: **daftar `ASSETS` di `sw.js`**. main
+menambahkan `./assets/brand/fiezel-paw.svg`, cabang ini menambahkan
+`./grammar-misconception-id.json` — keduanya di baris yang sama, jadi git menandainya konflik.
+Memilih salah satu sisi akan **diam-diam membuang precache milik sisi lain**, dan akibatnya
+baru terasa saat offline: entah maskotnya hilang, entah diagnosis spesifiknya hilang. Kedua
+penambahan digabung; daftarnya kini 94 aset, dan keduanya diperiksa ada.
+
+Juga diperiksa masih utuh setelah penyatuan: pendaftaran gate di `quality.yml`.
