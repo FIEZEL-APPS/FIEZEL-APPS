@@ -768,7 +768,9 @@ function sanitizeAdaptivePolicy(raw,fallback){if(!raw||raw.schema!==ADAPTIVE_POL
 async function resolveAdaptivePolicy(now=Date.now()){const fallback={...buildAdaptivePolicy(now),source:CORE_WORKER_URL?'local-policy-mirror-fallback':'local-policy-mirror'};if(!CORE_WORKER_URL)return fallback;try{const response=await coreWorkerExec('/api/policy/next',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(adaptivePolicyRequestPayload(now))});if(!response.ok)throw new Error(`policy_${response.status}`);const data=await response.json();if(String(data.protocol||'')!==CORE_PROTOCOL_VERSION)throw new Error('policy_protocol_mismatch');return applyCoreBrain(sanitizeAdaptivePolicy({...data.policy,source:'core-worker'},fallback),now)}catch{return fallback}}
 function recordAdaptivePolicy(policy){if(!policy)return;const summary={at:Date.now(),policyId:String(policy.policyId||''),mode:String(policy.mode||''),targetSkill:String(policy.targetSkill||''),primaryDomain:String(policy.primaryDomain||''),sessionSize:Number(policy.sessionSize||0),source:String(policy.source||'')};state.adaptivePolicyMeta={lastPolicy:summary,lastSource:summary.source,lastAt:summary.at,history:[...(state.adaptivePolicyMeta?.history||[]),summary].slice(-30)};save()}
 function localCoachSignal(){const p=buildAdaptivePolicy();if(p.mode==='diagnostic')return{title:p.title,text:p.summary,action:p.cta,ready:false};const focus=p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain);return{title:p.title,text:`${p.summary} Fokus: ${focus}. ${p.sessionSize} soal, sekitar ${p.estimatedMinutes} menit.`,action:p.cta,ready:true,policy:p}}
-function greetingForNow(){const h=new Date().getHours();return h<11?'Pagi, bro. Otak masih fresh 👀':h<15?'Siang, bro. Gas dikit.':h<18?'Sore, bro. Jangan kabur dulu 😭':'Malam, bro. Satu sesi terakhir?'}
+// m025-129: greetingForNow() dihapus bersama baris sapaan serif miring yang menjadi
+// satu-satunya pemakainya. Sapaan kontekstual tetap ada - ia hidup di gelembung PAW,
+// tempat yang memang bertugas menyapa.
 function todayLabel(){try{return new Intl.DateTimeFormat('id-ID',{weekday:'long',day:'numeric',month:'long'}).format(new Date())}catch{return dayKey(Date.now())}}
 function reportStatusLabel(){if(!state.preferences?.reportConsent)return'Laporan privat';if(!state.preferences?.reportEndpoint)return'Creator Hub belum tersambung';if(state.reportMeta?.lastStatus==='sent')return`Terkirim ${state.reportMeta.lastSentAt?new Date(state.reportMeta.lastSentAt).toLocaleDateString('id-ID'):''}`.trim();if(state.reportMeta?.lastStatus==='queued')return'Antrean pengiriman aktif';if(state.reportMeta?.lastStatus==='error')return'Menunggu koneksi';return'Siap mengirim otomatis'}
 function buildAdaptivePool(count,policy=buildAdaptivePolicy()){
@@ -1477,7 +1479,7 @@ function coachAskPrompt(question,ctx){
 Gaya: santai, gaul, akrab seperti kakak yang nemenin belajar. Boleh emoji seperlunya.
 ATURAN KETAT: jawab maksimal 60 kata, maksimal 3 kalimat, tanpa daftar bernomor, tanpa judul. Ini percakapan, bukan laporan.
 Kalau relevan, akhiri dengan satu ajakan kecil yang bisa dikerjakan sekarang.
-Konteks murid: level ${c.level||'A1'}, runtun ${c.streak||0} hari, ${c.dueReviews||0} materi menunggu review, sedang membuka halaman "${c.view||'home'}", fokus minggu ini ${c.focusLabel||'belum ditentukan'}.
+Konteks murid: ${LEARNER_STAGE.gradeLabel} semester ${LEARNER_STAGE.semester}, level ${c.level||'A1'}, runtun ${c.streak||0} hari, ${c.dueReviews||0} materi menunggu review, sedang membuka halaman "${c.view||'home'}", fokus minggu ini ${c.focusLabel||'belum ditentukan'}.
 Pertanyaan murid: "${String(question||'').slice(0,600)}"`;
 }
 function syncCoachBubble(){
@@ -1671,14 +1673,43 @@ function skillHubMarkup(){
   return `<div class="home-section-head"><div><h2>Empat skill inti tes</h2></div><span class="journey-week">Listening · Speaking · Reading · Writing</span></div>
 <div class="skill-hub">${cards}</div>`;
 }
+/**
+ * m025-129 pita statistik Home.
+ *
+ * OWNER: "tampilan sekarang kebanyakan teks editorial serif panjang, mirip artikel
+ * medium ... ini kurang gamified" - untuk murid kelas 1 SMA.
+ *
+ * Ia benar, dan yang paling menyuarakan "artikel" bukan panjang teksnya, melainkan satu
+ * baris tepat di puncak layar pertama: sapaan beraksara SERIF MIRING. Tidak ada satu pun
+ * aplikasi belajar yang membuka layarnya begitu; yang membukanya begitu adalah esai.
+ *
+ * Baris itu diganti empat kepingan angka. Bukan hiasan - keempatnya angka yang memang
+ * BERUBAH karena murid belajar, dan itulah syarat sesuatu terasa gamified: yang
+ * ditampilkan harus bisa naik. Level naik, runtun bisa hilang, cincin harian terisi,
+ * antrean review menyusut. Menempelkan lencana pada angka yang tidak pernah bergerak
+ * hanya menghasilkan hiasan yang lebih ramai.
+ *
+ * Runtun nol tidak diberi keping sama sekali: keping "0 hari" mengajarkan murid bahwa
+ * layar ini tempat kegagalan diumumkan.
+ */
+function homeStatStripMarkup(level,streak,attempts,review){
+  const done=Math.min(Number(attempts)||0,MEANINGFUL_ATTEMPTS);
+  const pct=Math.round(done/MEANINGFUL_ATTEMPTS*100);
+  const chips=[
+    `<span class="hero-stat is-level"><b>${esc(level)}</b><small>Level</small></span>`,
+    Number(streak)>0?`<span class="hero-stat is-streak"><b><i data-lucide="flame"></i>${Number(streak)}</b><small>Runtun</small></span>`:'',
+    `<span class="hero-stat is-daily"><b><span class="hero-ring" style="--v:${pct}"></span>${done}/${MEANINGFUL_ATTEMPTS}</b><small>Hari ini</small></span>`,
+    Number(review)>0?`<span class="hero-stat is-review"><b>${Number(review)}</b><small>Review</small></span>`:''
+  ].filter(Boolean).join('');
+  return `<div class="hero-stats">${chips}</div>`
+}
 function home(){const snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=state.placementDone?snapshot.estimatedLevel:'A1',mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),coachText=state.coachCache?.text||signal.text,primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
     <div class="launcher-meta"><span class="live-signal"></span><span>FIEZEL PERSONAL · ${esc(todayLabel())}</span>${celestialStatusMarkup()}</div>
-    <p class="launcher-greeting">${esc(greetingForNow())}</p>
+    ${homeStatStripMarkup(level,state.streak,state.daily?.attempts,review)}
     <h1 class="login-message"><span>${esc(learnerName())},</span><br>${esc(homeHeadline(loginMessage.headline))}</h1>
     <p class="launcher-lead">${esc(personalize(loginMessage.lead))}</p>
-    <p class="learner-stage"><i data-lucide="graduation-cap"></i> ${esc(LEARNER_STAGE.gradeLabel)} · Semester ${LEARNER_STAGE.semester} · Tahun Ajaran ${esc(LEARNER_STAGE.schoolYear)}</p>
     <!-- m025-113 (brief redesign 4): tombol kedua di sini dulu berbunyi "Analisis skill
          dengan AI" dan memanggil askCoachAI() - fungsi yang SAMA PERSIS dengan tautan
          "Buka analisis personal" yang berdiri sekitar 300px di bawahnya, di dalam blok
