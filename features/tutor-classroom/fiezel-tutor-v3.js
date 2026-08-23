@@ -25,7 +25,7 @@
     catch (_) { return fallback; }
   }
   /**
-   * m025-114: nama murid dibaca dari state aplikasi, bukan dipaku di naskah. Kosong berarti
+   * m025-115: nama murid dibaca dari state aplikasi, bukan dipaku di naskah. Kosong berarti
    * naskahnya berjalan tanpa vokatif - kalimatnya tetap utuh, hanya tidak menyapa nama.
    */
   function learnerName(root) {
@@ -502,7 +502,7 @@
       if (pack) return pack;
       var response = await root.fetch('./features/classroom/classroom-lessons-v1.json', { credentials: 'same-origin' });
       if (!response || !response.ok) throw new Error('tutor_pack_unavailable');
-      // m025-114: bank materi menyimpan token {name}, bukan nama sungguhan. Diganti sekali
+      // m025-115: bank materi menyimpan token {name}, bukan nama sungguhan. Diganti sekali
       // di sini karena paketnya di-cache - satu penelusuran, dan tidak ada titik render
       // yang bisa lupa memanggilnya.
       pack = personalizePack(await response.json());
@@ -780,7 +780,7 @@
     }
 
     /**
-     * m025-114 (OWNER: masuk ke dalam folder lalu swipe back "malah stuck screen").
+     * m025-115 (OWNER: masuk ke dalam folder lalu swipe back "malah stuck screen").
      *
      * Classroom adalah folder berlapis - subject, lalu topik, lalu pelajaran - dan
      * ketiganya digambar di dalam SATU view app.js. Tanpa pendaftaran ini, tekanan kembali

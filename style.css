@@ -1222,7 +1222,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   font-size:.84rem;width:auto}
 .fiezel-btn[disabled]{opacity:.4;pointer-events:none}
 
-/* m025-114 Step 1: kolom nama murid. Tinggi sentuh 48px (di atas ambang 44px yang dijaga
+/* m025-115 Step 1: kolom nama murid. Tinggi sentuh 48px (di atas ambang 44px yang dijaga
    gate a11y), font 16px supaya iOS TIDAK memperbesar halaman saat kolom mendapat fokus -
    zoom itu menggeser seluruh lapisan perkenalan dan terbaca sebagai layar yang melompat. */
 .fiezel-field{display:flex;flex-direction:column;align-items:flex-start;gap:6px;

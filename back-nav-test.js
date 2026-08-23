@@ -443,7 +443,7 @@ test('gerbang wajib disebut namanya pada pemasangan', () => {
   assert.ok(/knownView:v=>VALID_VIEWS\.has\(v\)/.test(app), 'tujuan kembali diverifikasi ke daftar view sah');
 });
 
-// ---- m025-114: penyebab "stuck screen" yang dilaporkan OWNER ---------------------------
+// ---- m025-115: penyebab "stuck screen" yang dilaporkan OWNER ---------------------------
 //
 // OWNER: "swipe back masih cacat sistem, meski di perbaiki, misalnya sudah masuk kedalam
 // folder, dan ingin kembali, ketika swipe back malah stuck screen".
@@ -469,7 +469,7 @@ test('hanya ADA SATU pemilik riwayat: kunci target harian tidak mendorong entrin
   // Entri asing menggeser kesejajaran antara tumpukan modul ini dan riwayat sungguhan, dan
   // sejak itu satu tekanan kembali bisa memakan entri yang tidak diketahui siapa pun.
   assert.ok(!/function guardHistory/.test(dailyTarget));
-  // Kode, bukan komentar: catatan m025-114 di berkas itu memang MENYEBUT entri lama supaya
+  // Kode, bukan komentar: catatan m025-115 di berkas itu memang MENYEBUT entri lama supaya
   // alasannya bisa dibaca, jadi yang diperiksa adalah pemakaian History API-nya.
   const dailyCode = dailyTarget.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   assert.ok(!/pushState|popstate|history\.go|history\.back/.test(dailyCode),
@@ -490,7 +490,7 @@ test('gerbang wajib menahan tekanan kembali bahkan saat belum ada navigasi apa p
 
 test('tekanan kembali tidak pernah berakhir tanpa perubahan apa pun di layar', () => {
   // Lapisan yang ditutup lewat jalan lain meninggalkan satu entri mati di DASAR tumpukan.
-  // Sampai m025-114 hasilnya 'noop': entri riwayat habis, layar diam. Dari sisi murid itu
+  // Sampai m025-115 hasilnya 'noop': entri riwayat habis, layar diam. Dari sisi murid itu
   // tidak terbaca sebagai "tidak ada tujuan" melainkan sebagai aplikasi yang macet.
   const a = makeApp();
   a.view = 'library';
@@ -538,7 +538,7 @@ test('satu tarikan jari memicu paling banyak satu langkah mundur', () => {
   assert.strictEqual(hits, 1, 'gestur yang terbaca dua kali tidak boleh melompati dua layar sekaligus');
 });
 
-// ---- m025-114: "folder" di dalam satu view --------------------------------------------
+// ---- m025-115: "folder" di dalam satu view --------------------------------------------
 //
 // Kategori Classroom, rak buku, kartu flashcard, lesson Grammar, dan layar kuis semuanya
 // digambar DI DALAM satu view. Tanpa pendaftaran ini tekanan kembali dari dalam sebuah

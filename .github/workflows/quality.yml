@@ -74,6 +74,7 @@ jobs:
           node skills-evidence-test.js
           node skills-dashboard-test.js
           node academic-readiness-test.js
+          node library-integrity-test.js
           node pwa-cache-test.js
           node pwa-release-coherence-test.js
           node pwa-startup-white-screen-recovery-test.js
