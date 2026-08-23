@@ -264,7 +264,7 @@ test('login Puter yang menggantung tidak boleh mengurung: ada tenggat', () => {
   assert.ok(/const PUTER_SIGNIN_TIMEOUT_MS=\d+;/.test(app),
     "keadaan 'pending' mematikan tombolnya, jadi janji yang tidak pernah selesai berarti gerbang tanpa jalan keluar");
   assert.ok(/Promise\.race\(\[[\s\S]{0,200}puter\.auth\.signIn\(\)/.test(app));
-  assert.ok(/catch\(error\)\{if\(puterSignedIn\(\)\)\{completeAuthGate\(\)/.test(app),
+  assert.ok(/catch\(error\)\{if\(puterSignedIn\(\)\)\{(?:await\s+)?completeAuthGate\(\)/.test(app),
     'tenggat harus ditangkap seperti kegagalan lain supaya tombolnya hidup kembali');
 });
 

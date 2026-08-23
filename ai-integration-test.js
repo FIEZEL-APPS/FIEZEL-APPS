@@ -13,14 +13,15 @@ setTimeout(async()=>{try{
   assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js script order is invalid');
   assert(html.indexOf('./core-config.js')>0&&html.indexOf('./core-config.js')<html.indexOf('./app.js'),'Core config script order is invalid');
   assert(css.includes('.ai-btn')&&css.includes('@keyframes aiBounce'),'AI styles are missing');
-  let prompt='';context.puter={workers:{exec:async(url,opts)=>{const body=JSON.parse(opts.body||'{}');prompt=body.prompt||'';return response(String(url).includes('/api/coach/context')?'Coach aman.':'Jawaban AI aman.')}}};
+  let prompt='',requestPayload=null,coachPayload=null;context.puter={workers:{exec:async(url,opts)=>{const body=JSON.parse(opts.body||'{}');prompt=body.prompt||'';requestPayload=body;if(String(url).includes('/api/coach/context'))coachPayload=body;return response(String(url).includes('/api/coach/context')?'Coach aman.':'Jawaban AI aman.')}}};
   assert(await context.askFiezelAI('uji')==='Jawaban AI aman.','Core worker response is not supported');
-  assert(prompt==='uji','AI prompt was not sent to Core Brain');
+  assert(prompt==='uji'&&requestPayload?.task==='question'&&requestPayload?.profile?.goalProfile==='general'&&requestPayload?.profile?.timeZone,'AI prompt/profile contract was not sent to Core Brain');
   context.openAILoading=()=>0; context.renderCoachResult=text=>{elements.coachCapture={text}}; await context.askCoachAI(); assert(elements.coachCapture?.text==='Coach aman.','Context-Aware AI Coach did not use dedicated Core endpoint');
+  assert(coachPayload?.profile?.goalProfile==='general'&&coachPayload?.profile?.timeZone,'Context Coach profile contract missing');
   assert(!app.includes('puter.ai.chat('),'client still contains a direct Puter AI bypass');
   assert(app.includes("CORE_AI_GATEWAY!=='core-only'"),'core-only AI policy gate missing');
   context.renderAIResult('<img src=x>','<script>alert(1)</script>\nAman');
-  assert(!elements.modalPanel.innerHTML.includes('<script>')&&elements.modalPanel.innerHTML.includes('&lt;script&gt;'),'AI result can inject HTML');
+  assert(!elements.modalPanel.innerHTML.includes('<script>')&&elements.modalPanel.innerHTML.includes('&lt;script&gt;')&&/diproses oleh Core AI/.test(elements.modalPanel.innerHTML),'AI result can inject HTML or omits privacy disclosure');
   // m025-93 (brief redesign Bab 2, bug kritis #1): teks model datang dalam Markdown dan dulu
   // dicetak apa adanya - murid membaca "**tebal**" sebagai tanda baca. Yang dijaga di sini
   // bukan hanya bahwa penandanya diterjemahkan, melainkan URUTANNYA: esc() dulu, baru penanda
