@@ -374,7 +374,10 @@ const PAIRS = [
   { name: '.journey-block span', text: 'var(--glass-muted)', bg: [ref('style', '.journey-today')] },
   { name: '.lesson-example p', text: 'var(--muted)', bg: [ref('style', '.lesson-example')] },
   { name: '.diag-grid>div', text: 'var(--text)', bg: [ref('style', '.diag-grid>div')] },
-  { name: '.confidence-box', text: 'var(--text)', bg: [ref('style', '.confidence-box')] },
+  // m025-133: .confidence-box tidak ada lagi - pertanyaan keyakinan jadi popup, dan
+  // kartunya yang menampung teks. Permukaannya tetap wajib diperiksa; hanya namanya yang
+  // berubah, bukan kewajibannya.
+  { name: '.confidence-card', text: 'var(--text)', bg: [ref('style', '.confidence-card')] },
   { name: '.library span', text: 'var(--ink-soft)', bg: [ref('style', '.library span')] },
   { name: '.error', text: 'var(--ink-danger)', bg: [ref('style', '.error')] },
   { name: '.modal-panel', text: 'var(--glass-text)', bg: [MODAL] },

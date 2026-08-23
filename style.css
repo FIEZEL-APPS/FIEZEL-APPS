@@ -493,56 +493,74 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .passage p{white-space:pre-wrap}
 .flash-back .muted{margin-top:12px}
 /* ==========================================================================
-   Lembar keyakinan mengambang (m025-132)
+   Popup keyakinan (m025-133)
    ==========================================================================
-   OWNER: "saat di panel tadi seberapa yakin? ... buatkan mengambang, tanpa perlu user
-   scroll sampai paling bawah."
+   Percobaan ketiga, dan dua yang gagal sebelumnya layak dicatat karena keduanya salah
+   dengan cara yang sama: kotak ini selalu dipindah TEMPATNYA, sementara masalahnya soal
+   WAKTU. Di dasar panel umpan balik ia harus dicari dengan menggulir. Mengambang di dasar
+   layar ia justru menutupi tombol Lanjut.
 
-   Ia benar, dan letaknya yang lama membuat pertanyaan ini hampir tidak pernah terjawab:
-   kotaknya menempel di DASAR panel umpan balik, di bawah penjelasan jawaban dan tombol
-   "jelaskan lebih sederhana". Di layar ponsel itu berarti murid harus menggulir untuk
-   menemukan pertanyaan yang justru harus dijawab SELAGI perasaannya masih hangat.
+   Sebagai popup ia tidak perlu dicari dan tidak menghalangi apa pun - karena ia SENDIRI
+   yang membawa tombol Lanjutnya, persis yang diminta OWNER.
 
-   Dan datanya bukan hiasan: kalibrasi keyakinan dipakai penjadwal ulang (scheduleNext)
-   untuk memutuskan kapan materi ini muncul lagi. Pertanyaan yang tidak terjawab bukan
-   sekadar kolom kosong - ia membuat penjadwalannya menebak.
+   Ukurannya sengaja kecil dan duduk agak ke bawah: penjelasan jawaban ada di halaman di
+   baliknya, dan latar gelapnya dibuat tipis supaya halaman itu tetap terlihat. Popup yang
+   menutup pelajarannya sendiri akan menukar satu masalah dengan masalah lain.
    -------------------------------------------------------------------------- */
-.confidence-box{
-  position:fixed;left:50%;transform:translateX(-50%);
-  bottom:calc(16px + env(safe-area-inset-bottom));
-  z-index:42;width:min(520px,calc(100% - 24px));
-  padding:13px 14px;border-radius:20px;
-  border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.97);
-  box-shadow:0 3px 0 var(--ink),0 18px 40px rgba(43,33,24,.22);
-  backdrop-filter:blur(10px);
+.confidence-pop{
+  position:fixed;inset:0;z-index:2147481400;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:14px 14px calc(20px + env(safe-area-inset-bottom));
+  background:rgba(43,33,24,.28);
 }
-.confidence-box>b{display:block;font-size:.86rem;font-weight:750;margin-bottom:9px}
-.confidence-box .actions{margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.confidence-box .actions button{
-  flex-direction:column;gap:2px;min-height:56px;padding:8px 4px;
-  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;
-  border-radius:14px;
+.confidence-card{
+  width:min(420px,100%);
+  padding:16px;border-radius:24px;
+  border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.98);
+  box-shadow:0 3px 0 var(--ink),0 22px 50px rgba(43,33,24,.3);
 }
-.confidence-box .actions button span{
-  font-size:1.05rem;font-weight:850;font-variant-numeric:tabular-nums;line-height:1;
+.confidence-verdict{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
+.confidence-verdict svg{width:20px;height:20px;flex:none}
+.confidence-verdict.is-ok{color:var(--green,#2E8B69)}
+.confidence-verdict.is-no{color:var(--accent-strong)}
+.confidence-q{margin:0 0 9px;font-size:.88rem;font-weight:700;color:var(--text)}
+
+.confidence-scale{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.confidence-scale button{
+  flex-direction:column;gap:2px;min-height:62px;padding:9px 4px;
+  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;border-radius:15px;
 }
-/* Tiga tingkat, tiga warna - supaya pilihannya terbaca sebagai skala, bukan tiga tombol
-   yang kebetulan bersebelahan. */
-.confidence-box .actions button:nth-child(1){background:var(--coral-soft)}
-.confidence-box .actions button:nth-child(2){background:var(--yellow-soft)}
-.confidence-box .actions button:nth-child(3){background:var(--yellow);color:var(--ink)}
+.confidence-scale button span{font-size:1.15rem;font-weight:850;line-height:1;font-variant-numeric:tabular-nums}
+/* Tiga tingkat, tiga warna - supaya terbaca sebagai SKALA, bukan tiga tombol yang
+   kebetulan bersebelahan. */
+.confidence-scale button:nth-child(1){background:var(--coral-soft)}
+.confidence-scale button:nth-child(2){background:var(--yellow-soft)}
 /* Tinta tombol ketiga dipasang EKSPLISIT. --yellow beku di kedua tema, sementara tinta
-   yang diwarisi ikut berbalik jadi krem di mode gelap - krem di atas kuning, dan itu bug
-   m025-113 dalam bentuk paling kecil. Dua tombol lain aman karena bidang lembutnya memang
-   punya pasangan gelap. */
+   yang diwarisi ikut berbalik jadi krem di mode gelap - krem di atas kuning. */
+.confidence-scale button:nth-child(3){background:var(--yellow);color:var(--ink)}
+
+.confidence-skip{
+  display:block;width:100%;margin-top:10px;min-height:0;padding:6px;
+  background:none;border:0;box-shadow:none;
+  color:var(--muted);font-size:.78rem;font-weight:650;text-decoration:underline;
+}
+.confidence-skip:hover{background:none;box-shadow:none;transform:none;color:var(--text)}
+
+.confidence-saved{
+  display:flex;align-items:center;gap:6px;margin:0 0 12px;
+  font-size:.86rem;font-weight:700;color:var(--green,#2E8B69);
+}
+.confidence-saved svg{width:16px;height:16px}
+.confidence-go{width:100%;min-height:54px;font-size:1rem;font-weight:800}
 
 @media (prefers-reduced-motion:no-preference){
-  .confidence-box{animation:fzConfIn .3s cubic-bezier(.3,1.1,.5,1) both}
-  @keyframes fzConfIn{from{opacity:0;transform:translate(-50%,16px)}to{opacity:1;transform:translate(-50%,0)}}
-  .confidence-box.is-done{animation:fzConfOut .26s var(--ease) both}
-  @keyframes fzConfOut{from{opacity:1;transform:translate(-50%,0)}to{opacity:0;transform:translate(-50%,12px)}}
+  .confidence-pop{animation:fzPopFade .2s var(--ease) both}
+  .confidence-card{animation:fzPopRise .32s cubic-bezier(.3,1.12,.5,1) both}
+  @keyframes fzPopFade{from{opacity:0}to{opacity:1}}
+  @keyframes fzPopRise{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+  .confidence-pop.is-out{animation:fzPopFade .2s var(--ease) reverse both}
 }
-.confidence-box.is-done{opacity:0;pointer-events:none}
+.confidence-pop.is-out{opacity:0;pointer-events:none}
 .creator-credit{display:flex;align-items:center;gap:9px;margin-top:10px;color:var(--muted);font-size:.82rem}
 .instagram-mark{width:22px;height:22px;border:2px solid var(--black);border-radius:7px;display:inline-grid;place-items:center;font-size:16px;line-height:1}
 .grid>div>h3{margin:4px 2px 12px;font-size:1rem}
