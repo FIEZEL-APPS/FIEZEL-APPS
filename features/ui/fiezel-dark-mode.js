@@ -8,10 +8,14 @@ class FiezelUIManager {
   }
 
   /* ===== DARK MODE ===== */
+  /* m025-120: dasar cream adalah keputusan produk, bukan preferensi perangkat.
+     Sebelumnya baris ini memakai `stored || getSystemPreference()`, sehingga ponsel yang
+     disetel gelap memaksa aplikasi gelap pada kunjungan pertama - padahal OWNER meminta
+     dasar cream. Preferensi sistem kini hanya menjadi info, bukan penentu; yang menentukan
+     hanyalah pilihan yang pernah disimpan murid sendiri. */
   initDarkMode() {
     const stored = localStorage.getItem(this.STORAGE_KEY_THEME);
-    const theme = stored || this.getSystemPreference();
-    this.applyTheme(theme);
+    this.applyTheme(stored === 'dark' ? 'dark' : 'light');
   }
 
   getSystemPreference() {
@@ -26,7 +30,11 @@ class FiezelUIManager {
       document.documentElement.setAttribute('data-theme', 'dark');
       localStorage.setItem(this.STORAGE_KEY_THEME, 'dark');
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      /* m025-120 BUG: dulu baris ini menghapus atributnya. Aturan gelap di style.css
+         berbunyi `@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) }`,
+         jadi TIDAK ADA atribut tetap cocok dengan aturan gelap - memilih terang di ponsel
+         bermode gelap tidak mengubah apa pun. Terang harus dinyatakan, bukan dibiarkan. */
+      document.documentElement.setAttribute('data-theme', 'light');
       localStorage.setItem(this.STORAGE_KEY_THEME, 'light');
     }
   }
@@ -145,16 +153,12 @@ class FiezelUIManager {
     this.logInitialization();
   }
 
-  setupThemeToggleListener() {
-    if (window.matchMedia) {
-      const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      darkModeQuery.addEventListener('change', (e) => {
-        if (!localStorage.getItem(this.STORAGE_KEY_THEME)) {
-          this.applyTheme(e.matches ? 'dark' : 'light');
-        }
-      });
-    }
-  }
+  /* m025-120: perubahan mode sistem tidak lagi menimpa tema aplikasi. Penjaga lama hanya
+     menyala bila belum ada preferensi tersimpan, padahal applyTheme selalu menulis satu
+     pada init - jadi yang tersisa hanyalah risiko dasar cream berbalik gelap di belakang
+     murid. Metodenya dipertahankan sebagai titik pasang bila kelak ada tombol "ikuti
+     sistem" yang eksplisit. */
+  setupThemeToggleListener() {}
 
   logInitialization() {
     const theme = this.getCurrentTheme();
