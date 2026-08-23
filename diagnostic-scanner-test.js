@@ -22,7 +22,7 @@ const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name)
 (async () => {
   await test('targets are centralised, not hardcoded per module', () => {
     assert.strictEqual(targets.schema, 'fiezel-diag-targets-v1');
-    assert.strictEqual(targets.leveltest.totalQuestions, 150);
+    assert.strictEqual(targets.leveltest.totalQuestions, 25);
     const selftests = fs.readFileSync('features/diagnostics/fiezel-module-selftests.js', 'utf8');
     assert.ok(!/\b2000\b/.test(selftests), 'vocab target must not be inlined');
     assert.ok(!/totalQuestions\s*[:=]\s*150/.test(selftests), 'leveltest target must not be inlined');

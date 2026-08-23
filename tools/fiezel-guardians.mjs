@@ -14,8 +14,15 @@ const error = (m) => state.errors.push(m);
 const warn = (m) => state.warnings.push(m);
 const note = (m) => state.notes.push(m);
 
+// maxBuffer bawaan spawnSync adalah 1 MB. Diff yang lebih besar dari itu membuat anak
+// prosesnya dibunuh, status menjadi null, dan gerbang melaporkannya sebagai "git diff
+// failed" - yaitu KEGAGALAN ALAT yang terbaca seperti temuan keamanan. Satu perubahan
+// konten besar (bank soal, dataset) cukup untuk memblokir A9 dan A10 selamanya tanpa ada
+// yang salah di perubahannya. 64 MB memberi ruang untuk diff sebesar apa pun yang wajar.
+const SH_MAX_BUFFER = 64 * 1024 * 1024;
+
 function sh(command, commandArgs = [], opts = {}) {
-  const r = spawnSync(command, commandArgs, { encoding: 'utf8', ...opts });
+  const r = spawnSync(command, commandArgs, { encoding: 'utf8', maxBuffer: SH_MAX_BUFFER, ...opts });
   if (opts.allowFailure) return r;
   if (r.status !== 0) {
     throw new Error(`${command} ${commandArgs.join(' ')} failed (${r.status}): ${r.stderr || r.stdout}`);
