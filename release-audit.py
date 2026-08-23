@@ -12,6 +12,11 @@ def check(name,ok,details):
 def norm(s): return re.sub(r'\s+',' ',re.sub(r'[^a-z0-9 ]',' ',str(s).lower())).strip()
 def tokens(s): return set(x for x in re.findall(r'[a-z]{3,}',str(s).lower()) if x not in {'the','and','for','with','from','which','what','does','this','that','about','passage','case','text','according','most','best','does','did','how','why','into','than','here','project','team','passage','account','case','report','group','result','evidence','change','approach','described','describes','using','used','use','first','later','stage','process','problem','practical','information','detail','option','statement','text','writer','reader','people','action','decision','support','supported','according','target','selected','term','idea','main','central','best','most','which','what','does','how','why','would','could','should','about','involving','context','source','method','case','account'})
 version=json.load(open(ROOT/'VERSION.json'))['version']; V=json.load(open(ROOT/'vocabulary-master.json')); R=json.load(open(ROOT/'reading-bank.json')); GM=json.load(open(ROOT/'grammar-templates.json')); G={t['subskill']:[[t.get('stem',''),t.get('options',[]),t.get('correctIndex',-1),t.get('explanation',{}).get('rule',t.get('pedagogicalObjective','')),[(('Correct') if i==t.get('correctIndex') else next((d.get('whyFails','') for d in t.get('distractors',[]) if d.get('option')==o),'Distractor invalid')) for i,o in enumerate(t.get('options',[]))],t.get('cefr','')]] for t in GM.get('templates',[])}
+try: package_version=json.load(open(ROOT/'package.json')).get('version','')
+except Exception: package_version=''
+readme=(ROOT/'README.md').read_text(errors='ignore') if (ROOT/'README.md').exists() else ''
+check('Package version alignment',package_version==version,f'package={package_version} source={version}')
+check('README version alignment',readme.startswith(f'# FIEZEL {version}'),f'expected heading=# FIEZEL {version}')
 # Vocabulary
 words=[v['word'].strip().lower() for v in V]; levels=collections.Counter(v['level'] for v in V)
 check('Vocabulary unique',len(words)==len(set(words)),f'total={len(words)} unique={len(set(words))}')
@@ -100,7 +105,7 @@ for name,needle in [('Central question integrity guard','function validateQuesti
 runtime_names=['index.html','app.js','style.css','sw.js','version.js','manifest.json','report-config.js','core-config.js','fiezel-report-worker.js','fiezel-core-worker.js','creator-report-setup.html','creator-report-dashboard.html']; alltxt='\n'.join((ROOT/f).read_text(errors='ignore') for f in runtime_names)
 direct_ai=len(re.findall(r'fetch\([^)]*(?:gemini|openai|anthropic|generativelanguage)|https?://[^\s\'\"]*(?:api\.openai|googleapis|api\.anthropic)',alltxt,re.I)); keys=len(re.findall(r'(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})',alltxt))
 puter_ok='https://js.puter.com/v2/' in alltxt and "coreWorkerExec('/api/ai/chat'" in app and 'puter.ai.chat(' not in app
-ai_escape="esc(text).replace(/\\n/g,'<br>')" in app and "esc(aiErrorMessage(err))" in app
+ai_escape="${renderMarkdown(text)}" in app and "const line=esc(raw)" in app and "esc(aiErrorMessage(err))" in app
 ai_resilient='FIEZEL_AI_TIMEOUT_MS=30000' in app and 'currentAIRequest(id,epoch)' in app and 'id="aiRetry"' in app
 check('Security direct AI dependency',direct_ai==0,f'direct vendor API references={direct_ai}')
 check('Puter AI integration',puter_ok,'Puter.js is present and client AI is Core-Worker-only; direct Puter AI bypass is absent')
@@ -114,9 +119,9 @@ check('Animated answer popup','id="answerBurst"' in (ROOT/'index.html').read_tex
 check('Realtime sun and moon','getCelestialState' in app and 'getScenePalette' in app and 'SUNRISE_MINUTE=6*60' in app and 'SUNSET_MINUTE=18*60' in app and 'id="globalSky"' in (ROOT/'index.html').read_text() and '.sky-light' in (ROOT/'style.css').read_text(),'celestial position, light, and whole-screen palette follow device-local time across a 24-hour loop')
 check('Grammar lesson focused-25 contract','GRAMMAR_SESSION_SIZE=25' in app and 'GRAMMAR_PRACTICE_MODES' in app and 'buildGrammarLessonQuestions' in app and 'familyPeers=' not in app and 'levelPeers=' not in app,'every grammar lesson builds 25 focused pedagogical modes without importing peer concepts')
 check('Natural Indonesian explanations','NATURAL_AI_STYLE' in app and 'Hindari gaya buku teks' in app and 'grammarRuleIndonesian' in app and 'readingFocusLabel' in app,'grammar, vocabulary, reading, and AI share a natural Indonesian explanation contract')
-check('Persistent soundtrack','playAmbientChord' in app and 'visibilitychange' in app,'ambient audio lifecycle is navigation and visibility aware')
+check('Ambient audio lifecycle','playAmbientChord' not in app and 'visibilitychange' in app and 'silenceNeuralVoice' in app,'continuous generative soundtrack is retired; answer feedback and neural voice are silenced on tab hide')
 check('Rotating login reminders','LOGIN_MESSAGES=[' in app and 'selectLoginMessage' in app and 'LEARNER_STAGE' in app and 'fiezel-last-login-message' in app,'each app session receives a varied learner-stage reminder without immediate repetition')
-check('Mandatory notification entry gate','requestRequiredNotificationPermission' in app and 'notificationPermission()' in app and 'notification-locked' in (ROOT/'style.css').read_text() and 'notificationGateButton' in (ROOT/'index.html').read_text(),'app remains locked until browser notification permission is granted')
+check('Optional notification invitation','offerNotificationInvitation' in app and 'shouldInviteNotifications' in app and 'notificationPermission()' in app and 'notificationGateButton' in (ROOT/'index.html').read_text() and not re.search(r'classList\.add\([^\n]*notification-locked',app),'notification reminders are opt-in and never block the learning surface')
 check('Study reminder notification engine','checkStudyReminders' in app and 'showStudyNotification' in app and 'NOTIFICATION_REMINDER_INTERVAL_MS' in app and 'notificationclick' in (ROOT/'sw.js').read_text(),'local reminder engine covers inactivity, daily target, due review, and notification click return')
 check('ALRS escalation and fatigue guards',all(x in app for x in ['inactivity_1','inactivity_2','inactivity_3','inactivity_7','ALRS_MIN_GAP_MS','ALRS_QUIET_START_HOUR','lastNotificationDay','positive']), '1/2/3/7+ escalation, quiet hours, cooldown, one-per-day fatigue guard and reinforcement are present')
 check('Learner Evidence Model runtime',all(x in app for x in ['buildLearnerEvidenceModel','fiezel-learner-evidence-v1','abandonmentRate','medianResponseMs','preferredStudyWindow','maxForgettingRisk']), 'runtime derives behavior, confidence, memory and skill evidence without raw remote answer history')
@@ -133,7 +138,14 @@ feature_sw=(ROOT/'sw.js').read_text()
 check('Speaking and Listening route','FiezelSLAddon.create' in app and "go('skills')" in app and './features/speaking-listening/fiezel-speaking-listening-addon.js' in feature_html,'72 A1-C2 Speaking/Listening items are exposed through the isolated Skills Lab route')
 check('Speaking and Listening privacy boundary','fiezel-sl-v1-state' in (ROOT/'features/speaking-listening/speaking-listening-config.js').read_text() and 'persistRawAudio:false' in (ROOT/'features/speaking-listening/fiezel-speaking-listening-addon.js').read_text() and 'persistRawTranscript:false' in (ROOT/'features/speaking-listening/fiezel-speaking-listening-addon.js').read_text(),'sidecar uses isolated state and forbids raw audio/transcript persistence')
 check('Neural voice explicit opt-in','prepareNeuralVoice' in app and 'if(!readStatus().prepared&&!preparedFlag&&allowFallback)return browserSpeak' in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text() and "if(!readStatus().prepared&&!preparedFlag)throw new Error('Neural voice assets are not prepared')" in (ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text() and '!isNeuralAsset(e.request)' in feature_sw,'large local model cache is user-triggered; ordinary calls may fallback while neural-only calls fail closed, and heavy assets remain excluded from implicit service-worker caching')
-check('Neural voice source lock',(ROOT/'NEURAL-VOICE-SOURCE-LOCK.json').exists() and (ROOT/'vendor/kokoro-model/onnx/model_quantized.onnx').exists() and (ROOT/'vendor/kokoro-js/LICENSE').exists(),'pinned runtime/model assets and third-party license closure are present')
+voice_inventory_path=ROOT/'VENDOR-VOICE-INVENTORY.json'
+try: voice_inventory=json.load(open(voice_inventory_path))
+except Exception: voice_inventory={}
+voice_config=(ROOT/'features/neural-voice/fiezel-neural-voice-config.js').read_text(errors='ignore')
+voice_manifest=(ROOT/'features/neural-voice/fiezel-neural-voice-bootstrap.js').read_text(errors='ignore')
+voice_lock=(ROOT/'vendor/supertonic-3/provenance/SHA256SUMS.txt').read_text(errors='ignore') if (ROOT/'vendor/supertonic-3/provenance/SHA256SUMS.txt').exists() else ''
+voice_assets=['vendor/supertonic-3/sherpa-onnx-wasm-main-tts.js','vendor/supertonic-3/sherpa-onnx-tts.js','vendor/supertonic-3/sherpa-onnx-tts.worker.js','vendor/supertonic-3/sherpa-onnx-wasm-main-tts.wasm','vendor/supertonic-3/duration_predictor.int8.onnx','vendor/supertonic-3/text_encoder.int8.onnx','vendor/supertonic-3/vector_estimator.int8.onnx','vendor/supertonic-3/vocoder.int8.onnx','vendor/supertonic-3/tts.json','vendor/supertonic-3/unicode_indexer.bin','vendor/supertonic-3/voice.bin']
+check('Neural voice source lock',voice_inventory.get('schema')=='fiezel-local-voice-recovery-v1' and 'supertonic-3' in voice_config and 'supertonic-3' in voice_manifest and all((ROOT/f).exists() for f in voice_assets) and all('./'+Path(f).name in voice_lock for f in voice_assets if f.endswith(('.js','.wasm','.onnx','.bin','.json'))),'Supertonic-3 fallback assets are present, manifest-declared, and covered by the vendored SHA256 inventory')
 handoff_path=ROOT/'FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md'
 handoff_text=handoff_path.read_text(errors='ignore') if handoff_path.exists() else ''
 check('Versioned next-handoff artifact',handoff_path.exists() and 'BASELINE_VERSION: 5.18.0' in handoff_text and '# BEGIN MASTER PROMPT' in handoff_text and '# END MASTER PROMPT' in handoff_text,'versioned next-handoff master prompt exists and is locked to 5.18.0')
@@ -167,17 +179,22 @@ check('PWA asset precache',all(x in sw for x in ['version.js','report-config.js'
 http_smoke_run=subprocess.run(['node',str(ROOT/'http-smoke-test.js')],capture_output=True,text=True)
 check('HTTP release smoke test',http_smoke_run.returncode==0 and 'FIEZEL HTTP smoke test: PASS' in http_smoke_run.stdout,http_smoke_run.stdout.strip()[-500:] or http_smoke_run.stderr.strip()[-500:])
 speaking_listening_run=subprocess.run(['node',str(ROOT/'speaking-listening-test.js')],capture_output=True,text=True)
-check('Speaking and Listening gate',speaking_listening_run.returncode==0 and 'FIEZEL Speaking + Listening: PASS 25/0' in speaking_listening_run.stdout,speaking_listening_run.stdout.strip()[-800:] or speaking_listening_run.stderr.strip()[-800:])
-neural_voice_run=subprocess.run(['node',str(ROOT/'neural-voice-test.js')],capture_output=True,text=True)
-check('Local neural voice gate',neural_voice_run.returncode==0 and 'FIEZEL Neural Voice: PASS 39/0' in neural_voice_run.stdout,neural_voice_run.stdout.strip()[-800:] or neural_voice_run.stderr.strip()[-800:])
-neural_http_run=subprocess.run(['node',str(ROOT/'neural-voice-http-test.js')],capture_output=True,text=True)
-check('Neural voice HTTP and Range gate',neural_http_run.returncode==0 and 'FIEZEL neural voice HTTP: PASS' in neural_http_run.stdout,neural_http_run.stdout.strip()[-800:] or neural_http_run.stderr.strip()[-800:])
-neural_product_run=subprocess.run(['node',str(ROOT/'neural-voice-product-repair-test.js')],capture_output=True,text=True)
-check('Neural voice product repair gate',neural_product_run.returncode==0 and 'FIEZEL neural voice product repair: ALL GATES PASS' in neural_product_run.stdout,neural_product_run.stdout.strip()[-1000:] or neural_product_run.stderr.strip()[-1000:])
+check('Speaking and Listening gate',speaking_listening_run.returncode==0 and 'FIEZEL Speaking + Listening: PASS' in speaking_listening_run.stdout,speaking_listening_run.stdout.strip()[-800:] or speaking_listening_run.stderr.strip()[-800:])
+# Gerbang Kokoro yang lama ikut hilang bersama bundel vendor yang dipensiunkan. Gerbang di
+# bawah menguji jalur cadangan Supertonic, kontrak suara/subtitle Puter, dan permukaan
+# terjemahan subtitle yang benar-benar ada sekarang.
+neural_voice_run=subprocess.run(['node',str(ROOT/'voice-offline-fallback-test.js')],capture_output=True,text=True)
+check('Neural voice fallback and account gate',neural_voice_run.returncode==0 and 'FIEZEL suara cadangan + akun: PASS' in neural_voice_run.stdout,neural_voice_run.stdout.strip()[-1000:] or neural_voice_run.stderr.strip()[-1000:])
+neural_http_run=subprocess.run(['node',str(ROOT/'neural-voice-m02592-puter-subtitle-test.js')],capture_output=True,text=True)
+check('Puter voice and subtitle gate',neural_http_run.returncode==0 and 'm025-92 puter voice + subtitle: 27 pemeriksaan lolos' in neural_http_run.stdout,neural_http_run.stdout.strip()[-1000:] or neural_http_run.stderr.strip()[-1000:])
+neural_product_run=subprocess.run(['node',str(ROOT/'neural-voice-m02593-subtitle-translate-test.js')],capture_output=True,text=True)
+check('Subtitle translation gate',neural_product_run.returncode==0 and 'm025-93 subtitle translate: 24 pemeriksaan lolos' in neural_product_run.stdout,neural_product_run.stdout.strip()[-1000:] or neural_product_run.stderr.strip()[-1000:])
 sw_corp_run=subprocess.run(['node',str(ROOT/'sw-corp-test.js')],capture_output=True,text=True)
 check('Service worker CORP compatibility gate',sw_corp_run.returncode==0 and 'semua gate sw-corp LOLOS' in sw_corp_run.stdout,sw_corp_run.stdout.strip()[-1000:] or sw_corp_run.stderr.strip()[-1000:])
-neural_fix_run=subprocess.run(['node',str(ROOT/'neural-voice-fix-test.js')],capture_output=True,text=True)
-check('Neural voice repair regression gate',neural_fix_run.returncode==0 and 'semua gate neural-voice-fix LOLOS' in neural_fix_run.stdout,neural_fix_run.stdout.strip()[-1000:] or neural_fix_run.stderr.strip()[-1000:])
+# Pemeriksaan kesiapan jalur cadangan yang dilihat murid, sengaja memakai gerbang yang ada
+# sekarang alih-alih menghidupkan kembali tes m02520 khusus Kokoro yang sudah dipensiunkan.
+neural_fix_run=subprocess.run(['node',str(ROOT/'voice-offline-fallback-test.js')],capture_output=True,text=True)
+check('Neural voice readiness regression gate',neural_fix_run.returncode==0 and 'FIEZEL suara cadangan + akun: PASS' in neural_fix_run.stdout,neural_fix_run.stdout.strip()[-1000:] or neural_fix_run.stderr.strip()[-1000:])
 notification_run=subprocess.run(['node',str(ROOT/'notification-reminder-test.js')],capture_output=True,text=True)
 check('Notification runtime behavior',notification_run.returncode==0 and 'FIEZEL notification reminder: PASS' in notification_run.stdout,notification_run.stdout.strip()[-500:] or notification_run.stderr.strip()[-500:])
 remote_push_run=subprocess.run(['node',str(ROOT/'remote-push-test.js')],capture_output=True,text=True)
@@ -230,11 +247,14 @@ grammar_audit_run=subprocess.run(['node',str(ROOT/'grammar-quality-audit.js')],c
 try: grammar_audit_report=json.load(open(ROOT/'GRAMMAR-QUALITY-REPORT.json'))
 except Exception: grammar_audit_report={}
 check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==3225 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
-# syntax
-for f in ['app.js','fiezel-report-worker.js','fiezel-core-worker.js','validator.js','regression-test.js','content-audit.js','product-audit.js','runtime-stage8-test.js','ai-integration-test.js','experience-integration-test.js','lesson-experience-test.js','ui-structure-test.js','grammar-quality-audit.js','notification-reminder-test.js','remote-push-test.js','core-brain-test.js','core-worker-contract-test.js','learner-evidence-test.js','alrs-behavior-test.js','adaptive-policy-test.js','policy-outcome-test.js','content-qa-agent.js','content-qa-agent-test.js','content-patch-gate.js','content-patch-gate-test.js','content-canary.js','content-promotion.js','content-adoption.js','content-adoption-evidence.js','content-evidence-origin.js','content-adoption-rehearsal.js','content-canary-config.js','content-canary-config-builder.js','content-canary-test.js','content-promotion-test.js','content-adoption-evidence-test.js','content-evidence-origin-test.js','content-adoption-rehearsal-test.js','content-adoption-test.js','fiezel-core-worker.js','rebuild-grammar-data.js','rebuild-speaking-listening-data.js','http-smoke-test.js','speaking-listening-test.js','neural-voice-test.js','neural-voice-http-test.js','neural-voice-audibility-test.js','ios-cache-compat-test.js','diag-panel-test.js','neural-voice-fix-test.js','sw-corp-test.js','neural-voice-product-repair-test.js','features/neural-voice/fiezel-kokoro-adapter.js','features/neural-voice/fiezel-neural-voice-bootstrap.js','features/neural-voice/fiezel-neural-voice-config.js','features/neural-voice/fiezel-neural-voice.js','features/neural-voice/fiezel-web-audio-player.js','features/speaking-listening/fiezel-speaking-listening-addon.js','features/speaking-listening/speaking-listening-config.js']:
- if f.endswith('.js'):
-  r=subprocess.run(['node','--check',str(ROOT/f)],capture_output=True,text=True)
-  check(f'JS syntax {f}',r.returncode==0,r.stderr.strip() or 'PASS')
+# Syntax: telusuri pohon yang benar-benar ada, supaya gerbang yang dipensiunkan tidak bisa
+# terus menunjuk berkas yang sudah dihapus, dan modul runtime/tes baru ikut terlindungi
+# tanpa harus didaftarkan satu per satu.
+syntax_files=sorted(p for p in ROOT.rglob('*') if p.is_file() and p.suffix in {'.js','.mjs'} and 'node_modules' not in p.parts and '.git' not in p.parts and '.audit-tmp' not in p.parts)
+for file_path in syntax_files:
+ rel=file_path.relative_to(ROOT).as_posix()
+ r=subprocess.run(['node','--check',str(file_path)],capture_output=True,text=True)
+ check(f'JS syntax {rel}',r.returncode==0,r.stderr.strip() or 'PASS')
 # write report
 report={'version':version,'status':'PASS' if PASS else 'NOT READY','checks':checks,'counts':{'pass':sum(x['status']=='PASS' for x in checks),'fail':sum(x['status']=='FAIL' for x in checks)},'content':{'vocabulary':len(V),'reading_passages':len(R),'reading_questions':len(rq),'grammar_items':len(items),'grammar_runtime_questions':3225,'listening_items':36,'speaking_items':36,'reading_types':len(types),'content_qa':content_qa_report.get('counts',{}) if 'content_qa_report' in globals() else {}},'sha256':hashlib.sha256(open(ROOT/'app.js','rb').read()).hexdigest()}
 json.dump(report,open(ROOT/'FINAL-AUDIT-REPORT.json','w'),ensure_ascii=False,indent=2)

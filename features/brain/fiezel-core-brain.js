@@ -131,8 +131,9 @@
       var recency = Math.pow(0.5, ageDays / ABILITY_HALF_LIFE_DAYS);
       var expected = successProbability(ability, difficulty);
       var actual = row.ok ? 1 : 0;
-      // K mengecil dengan akar jumlah bukti: cepat di awal, tenang setelahnya.
-      var k = 0.62 / Math.sqrt(1 + seen);
+      // K mengecil menurut BUKTI EFEKTIF. Baris lama yang bobot waktunya hampir nol tidak
+      // boleh membekukan kemampuan hari ini hanya karena jumlah baris historisnya besar.
+      var k = 0.62 / Math.sqrt(1 + weighted);
       ability += k * recency * (actual - expected);
       ability = clamp(ability, 0.4, 6.6);
       seen++;
@@ -247,7 +248,7 @@
   function halfLife(item) {
     var it = item || {};
     var reps = clamp(it.successes, 0, 40);
-    var lapses = clamp(it.lapses, 0, 40);
+    var lapses = clamp(it.lapseBurden == null ? it.lapses : it.lapseBurden, 0, 40);
     var difficulty = clamp(it.difficulty == null ? 3 : it.difficulty, 1, 6);
     var growth = Math.pow(1.9, reps);
     var lapsePenalty = Math.pow(0.55, lapses);
@@ -652,12 +653,13 @@
     });
     var reviews = reviewPriority(data.memory || [], { now: now, targetRetention: data.targetRetention });
     var atRisk = reviews.filter(function (row) { return row.retrievability <= 0.85 && row.retrievability >= 0.35; });
+    var relearn = reviews.filter(function (row) { return row.retrievability < 0.35; });
     var plan = planSession({
       ability: ability,
       momentum: momentum(attempts),
       fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
       dueReviews: reviews.length,
-      atRiskReviews: atRisk.length,
+      atRiskReviews: atRisk.length + relearn.length,
       abandonmentRate: data.abandonmentRate,
       targetSuccess: data.targetSuccess
     });
@@ -669,7 +671,7 @@
       momentum: momentum(attempts),
       fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
       challenge: challengeWindow(ability.ability, { targetSuccess: data.targetSuccess }),
-      memory: { total: reviews.length, atRisk: atRisk.length, top: reviews.slice(0, 8) },
+      memory: { total: reviews.length, atRisk: atRisk.length, relearn: relearn.length, top: reviews.slice(0, 8) },
       chronotype: studyWindows(attempts, { hourOf: data.hourOf }),
       rootCause: data.weakTarget ? rootCause(data.weakTarget, data.skillEvidence) : null,
       plan: plan

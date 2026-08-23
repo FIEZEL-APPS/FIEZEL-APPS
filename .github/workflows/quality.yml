@@ -71,6 +71,12 @@ jobs:
           node tutor-brain-v3-test.js
           node misconception-diagnosis-test.js
           node tutor-reteach-card-test.js
+          node fiezel-autonomy-config-test.js
+          node fiezel-prompt-library-test.js
+          node fiezel-meta-learning-test.js
+          node fiezel-evolution-ledger-test.js
+          node fiezel-self-refine-test.js
+          node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js

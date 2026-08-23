@@ -26,6 +26,8 @@
         if(!p||!p.template||typeof p.template!=='string'){errors.push(`${domain}/${id} missing template`);continue}
         if(p.template.length>MAX_PROMPT_LEN)errors.push(`${domain}/${id} template too long`);
         if(SECRET.test(p.template))errors.push(`${domain}/${id} secret pattern`);
+        if(typeof p.constraints!=='string'||!p.constraints.trim())errors.push(`${domain}/${id} missing constraints`);
+        else if(p.constraints.length>1200||SECRET.test(p.constraints))errors.push(`${domain}/${id} constraints invalid`);
         const slots=slotNames(p.template);
         if(slots.length>MAX_SLOTS)errors.push(`${domain}/${id} too many slots`);
         for(const s of slots)seen[`${domain}/${id}/${s}`]=1;
@@ -37,7 +39,7 @@
     const v=validateLibrary(lib);
     if(!v.ok)return{ok:false,reason:'invalid_library',prompt:null};
     if(!DOMAINS.has(domain)||!lib.prompts[domain]||!lib.prompts[domain][templateId])return{ok:false,reason:'template_not_found',prompt:null};
-    const tpl=lib.prompts[domain][templateId].template;
+    const entry=lib.prompts[domain][templateId],tpl=entry.template;
     const slots=slotNames(tpl);
     const varsObj=vars&&typeof vars==='object'&&!Array.isArray(vars)?vars:{};
     const missing=slots.filter(s=>!(s in varsObj));
@@ -49,6 +51,7 @@
       if(SECRET.test(val))return{ok:false,reason:`secret_in_slot_${s}`,prompt:null};
       out=out.replace(new RegExp(`\\{\\{${s}\\}\\}`,'g'),val);
     }
+    out+=`\n\nKendala wajib yang harus dipatuhi: ${bound(entry.constraints,1200)}`;
     if(out.length>MAX_PROMPT_LEN)return{ok:false,reason:'prompt_too_long',prompt:null};
     return{ok:true,prompt:out};
   }
