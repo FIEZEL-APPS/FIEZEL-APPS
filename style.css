@@ -2428,3 +2428,169 @@ eteach) dan tawaran berhenti (reathe).
 @media (prefers-reduced-motion:reduce){
   .fz-paw,.fz-paw-bar{animation:none !important}
 }
+
+/* ==========================================================================
+   PAW — kelahiran: partikel meledak, lalu MEMBENTUK marka (m025-129)
+   ==========================================================================
+   OWNER: "untuk pawnya harusnya ada animasi jangan motion aja, seperti effect particle
+   burst, kemudian dari partikel itu terbentuk pawnya baru di lanjutkan oleh motion."
+
+   URUTANNYA, dan kenapa dibagi begini:
+     0,00-0,26s  dua belas partikel melesat KELUAR dari titiknya sendiri
+     0,26-0,74s  partikel kembali dan mengunci di tempat asalnya
+     0,52-0,86s  marka muncul dari balik partikel, sedikit membesar lalu mengendap
+     0,74-0,92s  partikel padam
+     0,92s ->    gerak per halaman mengambil alih, tanpa jeda
+
+   KUNCINYA ADA DI ARAH ANIMASI, dan ini bagian yang gampang dibuat salah. Partikel di
+   sini TIDAK lahir acak lalu mencari tempatnya - cx/cy tiap partikel sudah berdiri
+   tepat di simpul bentuk PAW (ujung tiap balok, enam titik keliling bantalan), dan yang
+   dianimasikan adalah perjalanan MENJAUH lalu KEMBALI ke nol. Arah sebaliknya - dua
+   belas titik acak yang harus dituntun ke posisi akhirnya - akan meleset satu-dua piksel
+   pada tiap partikel dan hasilnya terbaca sebagai kotoran, bukan pembentukan.
+
+   Tumpang tindih 0,52-0,74s juga disengaja: marka mulai muncul SEBELUM partikelnya padam,
+   jadi mata membaca "partikel menjadi marka", bukan "partikel hilang, lalu marka datang".
+   Dua kejadian yang tidak bertumpuk terbaca sebagai dua kejadian.
+   -------------------------------------------------------------------------- */
+
+.fz-paw-spark{
+  fill:var(--fz-i-line,var(--ink));
+  transform-box:fill-box;transform-origin:50% 50%;
+  opacity:0;
+}
+.fz-paw-sparks{pointer-events:none}
+
+@media (prefers-reduced-motion:no-preference){
+  .is-paw-born .fz-paw-spark{
+    animation:fzPawSpark .92s cubic-bezier(.22,.68,.28,1) var(--sd,0s) 1 both;
+  }
+  @keyframes fzPawSpark{
+    0%   {transform:translate(0,0) scale(.2);opacity:0}
+    12%  {opacity:1}
+    28%  {transform:translate(var(--sx,0px),var(--sy,-6px)) scale(1);opacity:1}
+    74%  {transform:translate(0,0) scale(.85);opacity:1}
+    100% {transform:translate(0,0) scale(.3);opacity:0}
+  }
+
+  /* Marka menyusul, dan gerak per halaman ditahan sampai ia selesai mengendap -
+     kalau tidak, napas 5,2 detik akan bertabrakan dengan transform kelahirannya. */
+  .is-paw-born .fz-paw{
+    animation:fzPawForm .92s cubic-bezier(.3,1.08,.5,1) 1 both;
+  }
+  .is-paw-born .fz-paw-bar{animation:none}
+  @keyframes fzPawForm{
+    0%,52%{transform:scale(.62);opacity:0}
+    72%   {transform:scale(1.07);opacity:1}
+    100%  {transform:scale(1);opacity:1}
+  }
+}
+
+/* Tanpa gerak: tidak ada kelahiran sama sekali, marka langsung utuh dan partikelnya
+   tidak pernah terlihat. Bukan versi yang lebih cepat - versi yang memang diam. */
+@media (prefers-reduced-motion:reduce){
+  .fz-paw-spark{display:none}
+}
+
+/* ==========================================================================
+   Tab bar — berat, bukan garis tipis (m025-129)
+   ==========================================================================
+   OWNER: "icon taskbarnya terlalu jadul kurang modern dan eye catching."
+
+   Ikonnya sendiri sudah digambar ulang di fiezel-icons.js - bidang jadi bentuk utamanya,
+   garis tinggal menegaskan tepi. Yang tersisa di sini adalah wadahnya, dan wadahnya punya
+   masalah yang sama: tab aktif hanya berubah warna latar. Perubahan warna adalah sinyal
+   TERLEMAH yang dimiliki antarmuka - ia tidak punya berat, tidak punya gerak, dan pada
+   layar terang nyaris tidak terbaca sama sekali.
+
+   Tab aktif kini mendapat tiga hal sekaligus: ia NAIK, ia punya bayangan padat 2 px
+   seperti tombol chunky di seluruh aplikasi, dan ikonnya MEMANTUL sekali saat dipilih.
+   Ketiganya bahasa yang sudah dipakai FIEZEL - tidak ada kosakata visual baru yang
+   diperkenalkan hanya untuk tab bar.
+   -------------------------------------------------------------------------- */
+
+.nav .fz-i{width:26px;height:26px}
+.nav .fz-i .fz-line{stroke-width:2}
+
+html.fiezel-ui-v6 .nav{
+  gap:5px;border-radius:17px;
+  transition:transform .18s var(--ease-spring),background .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease);
+}
+html.fiezel-ui-v6 .nav.active{
+  transform:translateY(-3px);
+  box-shadow:0 2px 0 var(--yellow-deep);
+}
+/* Titik di bawah label. Penanda kedua yang tidak bergantung pada warna sama sekali -
+   satu-satunya bagian dari state aktif yang tetap terbaca oleh mata yang sulit
+   membedakan kuning pastel dari cream. */
+html.fiezel-ui-v6 .nav.active::after{
+  content:"";width:5px;height:5px;border-radius:50%;background:var(--ink);
+  margin-top:-1px;
+}
+
+@media (prefers-reduced-motion:no-preference){
+  html.fiezel-ui-v6 .nav.active .fz-i{animation:fzNavPop .42s cubic-bezier(.3,1.32,.5,1) 1}
+  @keyframes fzNavPop{
+    0%{transform:scale(.84) translateY(2px)}
+    58%{transform:scale(1.12) translateY(-1px)}
+    100%{transform:scale(1) translateY(0)}
+  }
+}
+
+/* ==========================================================================
+   Home — kepingan angka menggantikan sapaan serif (m025-129)
+   ==========================================================================
+   Pita ini menempati baris yang dulu diisi sapaan serif miring. Empat kepingan, dan
+   keempatnya angka yang BISA NAIK - itu syaratnya, bukan lencana yang menempel pada
+   angka mati.
+
+   Runtun mendapat koral karena ia satu-satunya yang bisa HILANG; cincin harian memakai
+   conic-gradient sehingga kemajuannya terbaca sebagai bentuk, bukan sebagai persen yang
+   harus dibaca. Sisanya tetap cream supaya keramaiannya tidak pindah tempat saja.
+   -------------------------------------------------------------------------- */
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 14px}
+.hero-stat{
+  display:flex;flex-direction:column;gap:1px;
+  padding:8px 13px;border-radius:15px;
+  background:rgba(var(--surface-pure-rgb),.96);border:1.5px solid var(--ink);
+  box-shadow:0 2px 0 var(--ink);
+  color:var(--ink);
+}
+.hero-stat b{
+  display:flex;align-items:center;gap:5px;
+  font-size:1.02rem;font-weight:800;line-height:1.15;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.hero-stat small{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;font-weight:750;color:var(--muted)}
+.hero-stat svg{width:15px;height:15px}
+.hero-stat.is-streak{background:var(--coral-soft)}
+.hero-stat.is-streak svg{color:var(--coral-deep)}
+.hero-stat.is-level{background:var(--yellow)}
+
+/* Cincin harian. Sudut conic dihitung dari --v (0-100), jadi satu variabel saja yang
+   berpindah dari data ke bentuk - tidak ada perhitungan derajat yang tersebar di JS. */
+.hero-ring{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  background:conic-gradient(var(--ink) calc(var(--v,0) * 1%),rgba(43,33,24,.16) 0);
+  -webkit-mask:radial-gradient(circle,transparent 46%,#000 47%);
+  mask:radial-gradient(circle,transparent 46%,#000 47%);
+}
+
+/* Paragraf yang tersisa dijaga tetap PENDEK, bukan dihapus. Isinya masih berguna; yang
+   tidak berguna adalah membiarkannya tumbuh jadi dinding. Batas baris memotong pada
+   ukuran layar mana pun, termasuk yang belum ada saat ini ditulis. */
+.launcher-lead{
+  margin-top:14px;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  line-clamp:2;overflow:hidden;
+}
+.coach-body{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+  line-clamp:4;overflow:hidden;
+}
+
+@media (max-width:620px){
+  .hero-stats{gap:7px;margin:20px 0 12px}
+  .hero-stat{padding:7px 11px}
+  .hero-stat b{font-size:.94rem}
+}

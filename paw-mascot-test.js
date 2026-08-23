@@ -31,6 +31,21 @@ const BUBBLE = read('features/ui/fiezel-coach-bubble.js');
 const CSS = read('style.css');
 const ASSET = read('assets/brand/fiezel-paw.svg');
 
+/**
+ * Potongan definisi ikon paw saja.
+ *
+ * Dulu batas akhirnya adalah teks komentar tab bar. Itu rapuh, dan terbukti: begitu
+ * komentarnya ditulis ulang, indexOf mengembalikan -1, potongannya membentang ke seluruh
+ * berkas, dan tesnya melaporkan dua belas balok pada ikon yang punya empat. Batasnya kini
+ * definisi ikon BERIKUTNYA, apa pun namanya.
+ */
+function pawBlock() {
+  const start = ICONS.indexOf('paw:');
+  const rest = ICONS.slice(start + 4);
+  const next = /\n    [a-z][A-Za-z]*:\s/.exec(rest);
+  return ICONS.slice(start, next ? start + 4 + next.index : ICONS.length);
+}
+
 let pass = 0;
 const failures = [];
 function test(name, fn) {
@@ -47,7 +62,7 @@ function shapeOf(source) {
 
 test('PAW ada, dan bentuknya arah 02 — empat balok, satu bantalan', () => {
   if (!/paw:\s*'/.test(ICONS)) throw new Error('ikon paw tidak ada di fiezel-icons.js');
-  const shape = shapeOf(ICONS.slice(ICONS.indexOf("paw:"), ICONS.indexOf("/* Tab bar */")));
+  const shape = shapeOf(pawBlock());
   if (shape.bars.length !== 4) throw new Error('balok berjumlah ' + shape.bars.length + ', arah 02 punya empat');
   if (!shape.pad) throw new Error('bantalan tidak ditemukan');
   // Tinggi keempat balok harus BERBEDA - itu yang membedakannya dari empat jari bulat
@@ -61,7 +76,7 @@ test('PAW ada, dan bentuknya arah 02 — empat balok, satu bantalan', () => {
 
 test('hanya ada SATU sumber bentuk PAW, dan keduanya identik', () => {
   // Brief A.6: aset tunggal, dipakai identik di seluruh halaman.
-  const inline = shapeOf(ICONS.slice(ICONS.indexOf("paw:"), ICONS.indexOf("/* Tab bar */")));
+  const inline = shapeOf(pawBlock());
   const asset = shapeOf(ASSET);
   if (asset.bars.length !== 4) throw new Error('assets/brand/fiezel-paw.svg bukan bentuk arah 02');
   for (let i = 0; i < 4; i++) {
@@ -121,18 +136,24 @@ test('geraknya terkendali: amplitudo kecil, durasi panjang', () => {
   // bahwa tidak ada yang menaikkannya diam-diam supaya "lebih kelihatan".
   const paw = CSS.slice(CSS.indexOf('PAW — gerak per halaman'));
   const loud = [];
-  for (const m of paw.matchAll(/@keyframes\s+fzPaw\w+\{([^@]*?)\}\s*\n/g)) {
-    for (const s of m[1].matchAll(/scale[XY]?\(([\d.]+)\)/g)) {
+  // Kelahiran sekali-jalan sengaja DIKECUALIKAN. Ia memang harus melompat dari nol -
+  // yang dijaga aturan ini adalah gerak yang berulang selamanya di depan mata murid,
+  // dan menyamakan keduanya akan memaksa ledakannya jadi tidak terlihat.
+  const LOOPLESS = /^(fzPawSpark|fzPawForm|fzPawSettle)$/;
+  for (const m of paw.matchAll(/@keyframes\s+(fzPaw\w+)\{([^@]*?)\}\s*\n/g)) {
+    if (LOOPLESS.test(m[1])) continue;
+    for (const s of m[2].matchAll(/scale[XY]?\(([\d.]+)\)/g)) {
       if (Math.abs(Number(s[1]) - 1) > 0.25) loud.push('scale ' + s[1]);
     }
-    for (const t of m[1].matchAll(/translateY\((-?[\d.]+)px\)/g)) {
+    for (const t of m[2].matchAll(/translateY\((-?[\d.]+)px\)/g)) {
       if (Math.abs(Number(t[1])) > 1.6) loud.push('translateY ' + t[1] + 'px');
     }
   }
   if (loud.length) throw new Error('amplitudo terlalu besar: ' + loud.join(', '));
 
-  const fast = [...paw.matchAll(/animation:\s*fzPaw\w+\s+([\d.]+)s/g)]
-    .map((m) => Number(m[1])).filter((d) => d < 2.5 && d > 0.9);
+  const fast = [...paw.matchAll(/animation:\s*(fzPaw\w+)\s+([\d.]+)s/g)]
+    .filter((m) => !LOOPLESS.test(m[1]))
+    .map((m) => Number(m[2])).filter((d) => d < 2.5 && d > 0.9);
   if (fast.length) throw new Error('durasi terlalu pendek: ' + fast.join('s, ') + 's — gerak cepat menarik perhatian ke dirinya sendiri');
 });
 
@@ -159,11 +180,77 @@ test('tiap balok berputar dari alasnya sendiri', () => {
 });
 
 test('warna PAW tidak dipaku di dalam ikon', () => {
-  const block = ICONS.slice(ICONS.indexOf("paw:"), ICONS.indexOf("/* Tab bar */"));
+  const block = pawBlock();
   if (/#[0-9a-f]{3,6}/i.test(block)) throw new Error('ada warna mati di dalam ikon paw; mode gelap tidak akan mengikutinya');
   if (!/\.fz-paw-bar,\.fz-i \.fz-paw-pad\{fill:var\(--fz-i-line/.test(CSS)) {
     throw new Error('PAW tidak mengambil warna dari --fz-i-line');
   }
+});
+
+test('PAW lahir dari partikel, dan partikelnya berkumpul — bukan berhamburan', () => {
+  // OWNER: "seperti effect particle burst, kemudian dari partikel itu terbentuk pawnya
+  // baru di lanjutkan oleh motion."
+  const sparks = (ICONS.match(/class="fz-paw-spark"/g) || []).length;
+  if (sparks < 8) throw new Error('hanya ' + sparks + ' partikel; ledakan butuh cukup pecahan untuk terbaca');
+
+  // Yang paling gampang salah: menganimasikan partikel dari posisi acak MENUJU bentuk.
+  // Arah itu meleset satu-dua piksel pada tiap partikel dan terbaca sebagai kotoran.
+  // Di sini partikelnya sudah berdiri di simpul bentuknya, dan yang dianimasikan adalah
+  // perjalanan menjauh lalu KEMBALI ke nol - karena itu bingkai terakhirnya translate(0,0).
+  const frames = /@keyframes fzPawSpark\{([\s\S]*?)\n  \}/.exec(CSS);
+  if (!frames) throw new Error('keyframes ledakan tidak ditemukan');
+  if (!/74%\s*\{transform:translate\(0,0\)/.test(frames[1])) {
+    throw new Error('partikel tidak kembali ke titik bentuknya; ia berhamburan, bukan membentuk');
+  }
+  if (!/28%\s*\{transform:translate\(var\(--sx[^)]*\),var\(--sy[^)]*\)\)/.test(frames[1])) {
+    throw new Error('tidak ada fase melesat keluar; tanpa itu tidak ada ledakan');
+  }
+});
+
+test('marka muncul SEBELUM partikelnya padam', () => {
+  // Dua kejadian yang tidak bertumpuk terbaca sebagai dua kejadian: "partikel hilang,
+  // lalu marka datang". Yang diminta OWNER adalah partikel yang MENJADI marka.
+  const form = /@keyframes fzPawForm\{([\s\S]*?)\n  \}/.exec(CSS);
+  if (!form) throw new Error('keyframes pembentukan marka tidak ditemukan');
+  const start = /(\d+)%\{transform:scale\(\.62\)/.exec(form[1]);
+  if (!start) throw new Error('titik mulai marka tidak terbaca');
+  if (Number(start[1]) >= 74) {
+    throw new Error('marka baru mulai pada ' + start[1] + '%, sementara partikel sudah mengunci pada 74% — keduanya tidak bertumpuk');
+  }
+});
+
+test('kelahiran hanya saat marka benar-benar baru terlihat', () => {
+  // Meledakkan ulang tiap pindah menu mengubah kelahiran jadi tik yang berisik - persis
+  // kebalikan dari "eksklusif" yang diminta sebelumnya.
+  const setScene = /function setScene\(view\) \{[\s\S]*?\n    \}/.exec(BUBBLE);
+  if (!setScene) throw new Error('setScene tidak ditemukan');
+  if (/born\(/.test(setScene[0])) {
+    throw new Error('kelahiran dipicu saat pindah halaman; di sana yang benar adalah gerak masuk yang pendek');
+  }
+  if (!/born\(bubble\)/.test(BUBBLE)) throw new Error('kelahiran tidak pernah dijalankan saat gelembung dipasang');
+});
+
+test('ikon tab bar berbobot, bukan garis tipis', () => {
+  // OWNER: "icon taskbarnya terlalu jadul kurang modern dan eye catching."
+  const tab = ICONS.slice(ICONS.indexOf('/* Tab bar.'), ICONS.indexOf('/* Streak'));
+  for (const name of ['home', 'vocab', 'grammar', 'reading', 'map']) {
+    const glyph = new RegExp(name + ":\\s*'([\\s\\S]*?)',\\n").exec(tab);
+    if (!glyph) throw new Error('ikon ' + name + ' hilang dari tab bar');
+    if (!/class="fz-fill"/.test(glyph[1])) {
+      throw new Error('ikon ' + name + ' tanpa bidang; garis tipis saja adalah bahasa yang dikeluhkan OWNER');
+    }
+  }
+  if (!/\.nav \.fz-i \.fz-line\{stroke-width:2\}/.test(CSS)) {
+    throw new Error('garis ikon tab bar masih setipis 1,7');
+  }
+});
+
+test('tab aktif tidak hanya berubah warna', () => {
+  // Perubahan warna adalah sinyal terlemah yang dimiliki antarmuka: tidak punya berat,
+  // tidak punya gerak, dan pada layar terang nyaris tidak terbaca.
+  if (!/\.nav\.active\{[^}]*transform:translateY\(-3px\)/.test(CSS)) throw new Error('tab aktif tidak naik');
+  if (!/\.nav\.active::after\{/.test(CSS)) throw new Error('tidak ada penanda yang bekerja tanpa warna');
+  if (!/fzNavPop/.test(CSS)) throw new Error('tab aktif tidak memantul saat dipilih');
 });
 
 console.log('');

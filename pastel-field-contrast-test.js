@@ -118,7 +118,11 @@ const FROZEN_BY_DESIGN = {
  * alasannya supaya bisa ditinjau, bukan disembunyikan.
  */
 const NO_TEXT_INSIDE = {
-  '.fz-coach-avatar': 'lingkaran wajah pembimbing; isinya SVG, tidak pernah teks'
+  '.fz-coach-avatar': 'lingkaran wajah pembimbing; isinya SVG, tidak pernah teks',
+  // m025-129: dua penanda seukuran garis. Keduanya digambar lewat background karena itu
+  // cara termurah menggambar lingkaran, bukan karena keduanya permukaan.
+  'html.fiezel-ui-v6 .nav.active::after': 'titik 5x5 px; pseudo-element dengan content kosong, mustahil menampung teks',
+  '.hero-ring': 'cincin kemajuan 15x15 px yang dilubangi mask; isinya tidak pernah teks'
 };
 
 /** Aturan yang mewarisi tinta beku dari aturan dasarnya. */
@@ -129,7 +133,12 @@ const INHERITS_FROZEN_INK = {
   // m025-120: hover CTA menggelapkan bidangnya saja; tintanya tetap --ink dari aturan
   // dasar .primary / .auth-primary, yang beku di kedua tema (7,93:1).
   '.primary:hover': 'mewarisi color:var(--ink) dari .primary',
-  '.auth-gate .auth-primary:hover': 'mewarisi color:var(--ink) dari .auth-gate .auth-primary'
+  '.auth-gate .auth-primary:hover': 'mewarisi color:var(--ink) dari .auth-gate .auth-primary',
+  // m025-129: keping level memakai bidang kuning beku, tetapi tintanya datang dari
+  // .hero-stat yang memasang color:var(--ink) eksplisit - token yang juga beku. Jadi
+  // bidang dan tinta mengambil keputusan gelap-terang dari sumber yang SAMA, dan itulah
+  // syarat yang dijaga berkas ini.
+  '.hero-stat.is-level': 'mewarisi color:var(--ink) dari .hero-stat'
 };
 
 test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya', () => {
@@ -318,6 +327,22 @@ test('dasar cream tidak tergantung mode perangkat', () => {
   }
 });
 
+/**
+ * Coklat yang boleh jadi latar, beserta alasannya.
+ *
+ * Aturannya berbunyi "tinta dan garis, tidak pernah bidang", dan yang dilarang memang
+ * BIDANG - permukaan lebar yang membuat layar terasa gelap. Marka setinggi lima piksel
+ * bukan bidang; ia garis yang kebetulan digambar lewat background. Regex tidak bisa
+ * membedakan keduanya, jadi bedanya ditulis di sini supaya bisa ditinjau, bukan
+ * disembunyikan dengan melonggarkan aturannya.
+ *
+ * Ukuran adalah syaratnya: apa pun yang masuk daftar ini harus tetap seukuran garis.
+ */
+const BROWN_MARK_OK = {
+  'html.fiezel-ui-v6 .nav.active::after': 'titik penanda 5x5 px di bawah label tab aktif; penanda yang bekerja tanpa warna',
+  '.hero-ring': 'cincin kemajuan 15x15 px, dilubangi mask jadi tinggal cincin tipis; tidak menampung teks'
+};
+
 test('coklat hanya jadi tinta dan garis, tidak pernah jadi bidang', () => {
   // Coklat sebagai LATAR tombol besar adalah cara coklat mendominasi layar. Brief memberi
   // coklat peran tinta dan outline; bidangnya milik kuning dan koral.
@@ -326,9 +351,18 @@ test('coklat hanya jadi tinta dan garis, tidak pernah jadi bidang', () => {
   for (const file of ['style.css', 'features/tutor-classroom/tutor-v3.css']) {
     let text;
     try { text = fs.readFileSync(path.join(__dirname, file), 'utf8'); } catch { continue; }
-    text.split('\n').forEach((line, i) => {
+    const lines = text.split('\n');
+    lines.forEach((line, i) => {
       if (/^\s*(\/\*|\*)/.test(line)) return;
-      if (BROWN_FIELD.test(line)) offenders.push(file + ':' + (i + 1) + ' ' + line.trim().slice(0, 90));
+      if (!BROWN_FIELD.test(line)) return;
+      // Selector aturan ini: baris pembuka terdekat di atasnya yang berakhir '{'.
+      let selector = '';
+      for (let j = i; j >= 0 && j > i - 6; j--) {
+        const m = /^([^{}]+)\{/.exec(lines[j].trim());
+        if (m) { selector = m[1].trim(); break; }
+      }
+      if (BROWN_MARK_OK[selector]) return;
+      offenders.push(file + ':' + (i + 1) + ' ' + line.trim().slice(0, 90));
     });
   }
   if (offenders.length) {

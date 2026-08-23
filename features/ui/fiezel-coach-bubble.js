@@ -151,6 +151,26 @@
      * ketika murid berpindah dua kali ke halaman yang sama karakternya. Gerak masuk yang
      * kadang muncul kadang tidak lebih buruk daripada tidak ada sama sekali.
      */
+    /**
+     * m025-129 kelahiran PAW. Dijalankan saat marka BENAR-BENAR baru terlihat: sekali
+     * saat gelembungnya dipasang, dan sekali tiap kali panel dibuka (wajah di kepala
+     * panel itu marka kedua, dan ia memang baru muncul saat itu).
+     *
+     * TIDAK dijalankan saat pindah halaman. Di sana yang benar adalah gerak masuk
+     * sekali-jalan yang jauh lebih pendek - marka-nya tidak ke mana-mana, hanya ganti
+     * karakter. Meledakkan ulang tiap pindah menu akan mengubah kelahiran menjadi tik
+     * yang berisik, dan itu persis kebalikan dari "eksklusif".
+     */
+    var bornTimer = null;
+    function born(host) {
+      if (!host) return;
+      host.classList.remove('is-paw-born');
+      void host.offsetWidth;
+      host.classList.add('is-paw-born');
+      if (bornTimer) clearTimeout(bornTimer);
+      bornTimer = setTimeout(function () { host.classList.remove('is-paw-born'); }, 960);
+    }
+
     var shiftTimer = null;
     function setScene(view) {
       var scene = PAGE_SCENES[view] || 'home';
@@ -189,6 +209,11 @@
     doc.body.appendChild(peek);
     doc.body.appendChild(bubble);
     doc.body.appendChild(sheet);
+
+    // Kelahiran pertama. Ditunda satu putaran supaya ia berjalan setelah gelembungnya
+    // benar-benar tergambar - animasi yang dimulai pada elemen yang belum di-layout akan
+    // melompati bingkai pertamanya, dan yang paling sering hilang justru ledakannya.
+    setTimeout(function () { born(bubble); }, 40);
 
     var logHost = sheet.querySelector('.fz-coach-log');
     var chipHost = sheet.querySelector('.fz-coach-chips');
@@ -239,6 +264,8 @@
       peek.hidden = true;
       sheet.hidden = false;
       doc.body.classList.add('fz-coach-open');
+      // Wajah di kepala panel adalah marka KEDUA, dan ia memang baru muncul detik ini.
+      born(sheet.querySelector('.fz-coach-avatar'));
       if (!log.length) push('coach', localGreeting(context));
       chips();
       setTimeout(function () { input.focus(); }, 60);
