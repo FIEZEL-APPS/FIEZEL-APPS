@@ -287,13 +287,14 @@ Penandanya **tidak** ditambahkan, dan itu keputusan yang disengaja: penanda itu 
 pernyataan OWNER bahwa rilis sudah dicoba di perangkat sungguhan. Menuliskannya dari sisi
 yang mengerjakan patch berarti membatalkan justru kontrol yang A12 jaga — gerbang yang bisa
 dibuka sendiri oleh yang lewat bukan gerbang. Jalan yang sah sudah disediakan gate itu
-sendiri: PR draft menghasilkan `HOLD_DRAFT` (peringatan, bukan galat).
+sendiri: PR draft menghasilkan `HOLD_DRAFT` (peringatan, bukan galat), dan dengan status itu
+**A12 hijau** — bersama `quality`, `A6`, `A7`, `A9`–`A14`, dan `MASTER-only authority`.
 
 **Yang dibutuhkan dari OWNER:** coba rilis ini di perangkat — terutama empat skenario
 swipe-back di bagian 1, langkah nama di perkenalan, dan suara Classroom — lalu tandai
 penerimaannya. Sesudah itu PR bisa keluar dari draft.
 
-### `audiobook-safari` — sudah rusak sebelum rilis ini
+### `audiobook-safari` — satu-satunya yang merah, dan sudah rusak sebelum rilis ini
 
 Gagal dalam 7 detik pada `cd vendor/supertonic-3: No such file or directory`. Direktori itu
 **dihapus dari repo di m025-100** (`8a69bd0`, "mesin lokal dihapus") dan tidak ada di `main`
