@@ -1,6 +1,6 @@
-# FIEZEL — redesign pastel: ceria, eksklusif, minimalis, mahal (handoff m025-115)
+# FIEZEL — redesign pastel: ceria, eksklusif, minimalis, mahal (handoff m025-116)
 
-Rilis: `m025-115`
+Rilis: `m025-116` (semula ditulis m025-115; lihat bagian 9)
 Sumber: `FIEZEL_Instruksi_Redesign_UIUX.pdf` (brief OWNER v1) + instruksi susulan di sesi
 yang sama: *"AKU LUPA BILANG SEMUA WARNANYA HARUS PASTEL, SEPERTI KUNING PASTEL, CREAM
 PASTEL, DLL"*.
@@ -123,3 +123,45 @@ memakai koral. Confetti kecil sekali jalan saat sesi selesai, tunduk pada kurang
 - Verifikasi rilis ini dilakukan di server lokal 375x812 secara terukur (rasio kontras
   dihitung langsung dari DOM, kedua tema). Panel Browser sedang tidak tampil di sesi ini,
   jadi tangkapan layar tidak bisa diambil — pemeriksaan mata di perangkat OWNER menyusul.
+
+---
+
+## 9. Serah terima: bentrokan nomor rilis, dan penyatuannya
+
+Sesi yang menulis bagian 1-8 dihentikan OWNER sebelum rilis ini di-merge. Saat diambil
+alih, ditemukan **dua rilis berbeda sama-sama mengklaim `m025-115`**:
+
+| | isi | keadaan |
+|---|---|---|
+| `main` | tes penempatan 25 soal + bank listening 240 skenario | sudah di-merge (`4b4c84b`) |
+| branch ini | redesign pastel | belum di-merge, bercabang dari `c1a8955` (m025-114) |
+
+Ritual di `CLAUDE.md` menuntut `m025-N` naik tepat +1, jadi redesign pastel dinaikkan ke
+**m025-116** pada ketiga penanda (`FIEZEL_PAGE_BUILD`, `DIAG_BUILD`, `SW_REV`).
+
+**Yang perlu diketahui siapa pun yang membaca ini nanti:** `install-health-test.js` dan
+`pwa-release-coherence-test.js` **tetap lulus walau nomornya bentrok**. Keduanya hanya
+memeriksa ketiga penanda itu SALING COCOK, bukan bahwa angkanya belum pernah dipakai. Dua
+rilis dengan angka sama bisa lolos CI tanpa ada yang berteriak, sementara pengguna yang
+sudah menerima shell m025-115 pertama bisa tidak menerima yang kedua karena nama cache-nya
+berbeda tetapi angkanya sama. Gerbang untuk itu belum ada.
+
+Penyatuan dengan `main` hanya berkonflik di satu tempat, baris `SW_REV`. `app.js` dan
+`style.css` menyatu otomatis, dan diperiksa bahwa tes 25 soal, tombol Dengarkan, serta
+bank 1407 soal semuanya selamat.
+
+Satu penyesuaian dibuat saat penyatuan: tombol **Dengarkan** pada soal listening di tes
+penempatan ditulis dengan gaya pill rata milik desain lama. Ia dipindahkan ke bahasa
+chunky rilis ini - bidang koral pastel, tinta coklat, bayangan pekat 4px yang memendek
+saat ditekan. Koral dipilih, bukan kuning, supaya tombol itu tidak bersaing dengan aksi
+utama layar; koral memang peran aksi kedua di palet ini. Kontras tintanya 7,06:1, dan
+seperti tombol utama pastel ia tidak dibalik di mode gelap.
+
+## 10. Yang masih menunggu OWNER
+
+Pemeriksaan mata di perangkat sungguhan (bagian 8 menyebutnya, dan masih berlaku), plus:
+
+1. Warna pastelnya di layar HP, siang dan malam, tema terang dan gelap.
+2. Tombol **Dengarkan** di soal listening tes penempatan - bunyinya, dan pilihan yang
+   terbuka setelahnya.
+3. Gelembung pembimbing di beberapa halaman berbeda.
