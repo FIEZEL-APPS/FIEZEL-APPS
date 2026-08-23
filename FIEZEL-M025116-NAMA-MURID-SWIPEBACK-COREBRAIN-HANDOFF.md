@@ -1,4 +1,4 @@
-# m025-115 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
+# m025-116 — Nama murid, swipe-back yang benar-benar berfungsi, dan Core Brain v2
 
 OWNER (tiga permintaan dalam satu pesan):
 
@@ -238,8 +238,36 @@ kode `brain_optimal_challenge` / `brain_trend_plateau` / `brain_memory_at_risk`.
   (+8) mengunci langkah nama, termasuk bahwa ia wajib **dan** tidak mengurung. Fake DOM-nya
   kini melihat `<input>`, bukan hanya `<button>`.
 - Seluruh gate `quality.yml` hijau, termasuk `library-integrity-test.js` yang datang
-  bersama `main`. Penanda rilis dinaikkan bersama ke `m025-115` (`main` sudah memakai
+  bersama `main`. Penanda rilis dinaikkan bersama ke `m025-116` (`main` sudah memakai
   `m025-114` untuk PR #165).
+
+---
+
+## Catatan penggabungan: `main` bergerak dua kali selama rilis ini
+
+`main` menyerap dua PR lain saat cabang ini berjalan, dan keduanya mengklaim penanda
+milestone berurutan — #165 mengambil `m025-114`, lalu #163 mengambil `m025-115`. Rilis ini
+karena itu bergeser dua kali dan berakhir di **`m025-116`**; ketiga penandanya tetap
+dinaikkan bersama, sesuai ritual.
+
+Penggabungan kedua (#163: tes penempatan 25 soal + bank listening) berkonflik di tiga
+tempat, dan cara penyelesaiannya perlu dicatat karena satu di antaranya tidak sepele:
+
+- **`sw.js`** — hanya `SW_REV`.
+- **`fiezel-onboarding.js`** — hanya baris komentar: `main` mengubah "150 soal" menjadi
+  "25 soal", cabang ini mengubah "Step 3" menjadi "Step 4" (pergeseran karena langkah nama).
+  Keduanya benar, jadi keduanya dipakai.
+- **`app.js`, `quizLoop()`** — konflik sungguhan. Fungsi itu satu baris panjang, dan kedua
+  sisi mengubahnya: `main` menambahkan dukungan soal listening (opsi terkunci sampai audio
+  benar-benar berbunyi) dan melonggarkan validasi penempatan dari 150 ke jumlah apa pun;
+  cabang ini menambahkan pendaftaran stage. **Sisi `main` diambil utuh**, lalu dua delta
+  cabang ini dipasang ulang di atasnya — pendaftaran stage, dan tombol "Keluar" yang tidak
+  lagi menutup sesinya sendiri karena `leave()` milik stage yang memegangnya.
+
+Diverifikasi di peramban sesudah penggabungan: tes penempatan 25 soal milik `main` berjalan,
+stage-nya terdaftar, dan tekanan kembali dari dalam kuis keluar dengan `activeSession`
+benar-benar tertutup — bukti bahwa pemilik tunggal itu bekerja lewat jalur riwayat, bukan
+hanya lewat tombol.
 
 ---
 
