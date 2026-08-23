@@ -122,7 +122,10 @@ const NO_TEXT_INSIDE = {
   // m025-129: dua penanda seukuran garis. Keduanya digambar lewat background karena itu
   // cara termurah menggambar lingkaran, bukan karena keduanya permukaan.
   'html.fiezel-ui-v6 .nav.active::after': 'titik 5x5 px; pseudo-element dengan content kosong, mustahil menampung teks',
-  '.hero-ring': 'cincin kemajuan 15x15 px yang dilubangi mask; isinya tidak pernah teks'
+  '.hero-ring': 'cincin kemajuan 15x15 px yang dilubangi mask; isinya tidak pernah teks',
+  // m025-131: wajah PAW di strip Coach. Sama persis dengan .fz-coach-avatar di atas -
+  // lingkaran kuning berisi SVG, tidak pernah teks.
+  '.coach-strip-face': 'lingkaran wajah PAW di strip Coach; isinya SVG, tidak pernah teks'
 };
 
 /** Aturan yang mewarisi tinta beku dari aturan dasarnya. */

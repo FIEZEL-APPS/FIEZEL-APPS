@@ -54,3 +54,29 @@
     }, 100);
   };
 }());
+
+/**
+ * m025-131 kelahiran wordmark topbar.
+ *
+ * Dijalankan SEKALI per pemuatan aplikasi - keputusan OWNER, dan alasannya sama dengan
+ * PAW: yang diulang tiap pindah menu berhenti terasa spesial dan mulai terasa seperti
+ * kedipan. Kelasnya juga dilepas setelah selesai, supaya rilis berikutnya tidak mewarisi
+ * animasi yang menggantung.
+ *
+ * Ditunda sampai bingkai berikutnya karena animasi yang dimulai pada elemen yang belum
+ * di-layout akan melompati bingkai pertamanya - dan yang paling sering hilang justru
+ * ledakannya.
+ */
+(function () {
+  'use strict';
+  var doc = typeof document !== 'undefined' ? document : null;
+  if (!doc) return;
+  function birth() {
+    var mark = doc.getElementById('fzTopMark');
+    if (!mark) return;
+    mark.classList.add('is-mark-born');
+    setTimeout(function () { mark.classList.remove('is-mark-born'); }, 1100);
+  }
+  if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', function () { setTimeout(birth, 60); }, { once: true });
+  else setTimeout(birth, 60);
+}());

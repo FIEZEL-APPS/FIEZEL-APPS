@@ -18,7 +18,11 @@ check(((html.match(/data-lucide=/g)||[]).length+(html.match(/data-fz-icon=/g)||[
 check((html.match(/data-fz-icon=/g)||[]).length>=5,'Bottom navigation must use the FIEZEL duotone icon set.');
 check(/features\/ui\/fiezel-icons\.js/.test(html)&&/data-fz-icon/.test(fs.readFileSync(path.join(root,'features','ui','fiezel-icons.js'),'utf8')),'FIEZEL icon runtime must ship and hydrate its own markers.');
 check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
-check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
+// m025-131: coach-preview berganti nama jadi coach-strip. Kartu Coach yang lama berisi
+// judul serif dan paragraf - persis yang OWNER sebut "masih terlihat seperti bacaan
+// article" - dan diganti satu kalimat plus satu tombol. Yang dijaga pemeriksaan ini tetap
+// sama: Home punya peluncur, punya blok Coach, dan punya penanda peluncurnya.
+check(/launcher-shell/.test(app)&&/coach-strip/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
 check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');
 // Runtime fitur tetap DIDEKLARASIKAN sebelum app.js, dan itu masih penting: urutan tulis
 // di dokumen adalah urutan eksekusi baik untuk skrip ber-defer maupun untuk grup malas

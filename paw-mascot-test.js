@@ -253,6 +253,51 @@ test('tab aktif tidak hanya berubah warna', () => {
   if (!/fzNavPop/.test(CSS)) throw new Error('tab aktif tidak memantul saat dipilih');
 });
 
+test('logo topbar lahir dengan cara yang sama persis dengan PAW', () => {
+  // OWNER: "untuk logo fiezel di topbar buatkan animasi persis seperti animasi PAW."
+  const HTML = read('index.html');
+  const mark = /id="fzTopMark"[\s\S]*?<\/svg>/.exec(HTML);
+  if (!mark) throw new Error('wordmark topbar tidak punya penanda; kelahirannya tidak bisa dipicu');
+  const sparks = (mark[0].match(/class="fzw-spark"/g) || []).length;
+  if (sparks < 12) throw new Error('hanya ' + sparks + ' partikel di wordmark');
+  // Aturan yang sama seperti PAW, dan alasannya sama: partikel yang lahir acak lalu
+  // dituntun ke posisinya akan meleset dan terbaca sebagai kotoran.
+  const frames = /@keyframes fzwSpark\{([\s\S]*?)\n  \}/.exec(CSS);
+  if (!frames) throw new Error('keyframes ledakan wordmark tidak ditemukan');
+  if (!/76%\{transform:translate\(0,0\)/.test(frames[1])) {
+    throw new Error('partikel wordmark tidak kembali ke titik hurufnya');
+  }
+  const form = /@keyframes fzwForm\{([\s\S]*?)\n  \}/.exec(CSS);
+  if (!form) throw new Error('keyframes pembentukan wordmark tidak ditemukan');
+  const start = /(\d+)%\{transform:scale\(\.72\)/.exec(form[1]);
+  if (!start || Number(start[1]) >= 76) {
+    throw new Error('wordmark baru muncul setelah partikelnya mengunci; keduanya tidak bertumpuk');
+  }
+});
+
+test('kelahiran logo jalan sekali per pemuatan, bukan tiap pindah menu', () => {
+  // Keputusan OWNER di papan edit: "Sekali saja waktu aplikasi pertama dibuka."
+  const boot = read('features/ui/fiezel-boot-tail.js');
+  if (!/classList\.add\('is-mark-born'\)/.test(boot)) throw new Error('tidak ada yang memicu kelahiran wordmark');
+  if (!/classList\.remove\('is-mark-born'\)/.test(boot)) {
+    throw new Error('kelasnya tidak pernah dilepas; animasi menggantung ke rilis berikutnya');
+  }
+  const app = read('app.js');
+  if (/is-mark-born/.test(app)) {
+    throw new Error('app.js ikut memicu kelahiran wordmark; itu jalur pindah halaman');
+  }
+});
+
+test('Home berhenti memakai huruf display dan paragraf', () => {
+  // OWNER, sambil menunjukkan layarnya: "masih terlihat seperti bacaan article."
+  const app = read('app.js');
+  if (/class="login-message"/.test(app)) throw new Error('judul display serif masih dirender di Home');
+  if (/class="launcher-lead"/.test(app)) throw new Error('paragraf pengantar masih dirender di Home');
+  if (/class="coach-body"/.test(app)) throw new Error('paragraf Coach masih dirender; panelnya harus satu kalimat');
+  if (!/class="hero-line"/.test(app)) throw new Error('sapaan satu baris tidak ada');
+  if (!/coach-strip-go/.test(app)) throw new Error('tombol besar di strip Coach tidak ada');
+});
+
 console.log('');
 if (failures.length) {
   console.log('FIEZEL maskot PAW: FAIL (' + failures.length + ')');
