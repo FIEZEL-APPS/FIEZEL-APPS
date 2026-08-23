@@ -202,8 +202,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 
 .actions,.toolbar,.three{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.primary{background:var(--black);color:#fff;border-color:var(--black)}
-.primary:hover{background:#000;box-shadow:0 10px 26px rgba(27,20,24,.22)}
+.primary{background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep)}
+.primary:hover{background:var(--yellow-deep);box-shadow:0 10px 26px rgba(201,162,75,.28)}
 .danger{color:var(--red);border-color:#f3c3cf}
 .primary.danger{background:var(--red);color:#fff;border-color:var(--red)}
 
@@ -276,7 +276,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* ---------- toast ---------- */
 .toast{
   position:fixed;left:50%;bottom:96px;transform:translate(-50%,16px) scale(.96);opacity:0;pointer-events:none;
-  background:var(--black);color:#fff;padding:13px 20px;border-radius:999px;font-weight:700;font-size:.86rem;
+  background:var(--coral);color:var(--ink);padding:13px 20px;border-radius:999px;font-weight:700;font-size:.86rem;
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);
   z-index:80;box-shadow:0 18px 40px rgba(0,0,0,.22);max-width:88%;text-align:center
 }
@@ -343,7 +343,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-progress{text-align:center;font-weight:800}
 .quiz-progress span{font-size:1.1rem}
 .quiz-progress em{font-style:normal;color:var(--muted-soft)}
-.quiz-next{justify-self:end;background:var(--black);color:#fff;border-color:var(--black);min-width:92px}
+.quiz-next{justify-self:end;background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep);min-width:92px}
 .quiz-next:disabled{background:var(--surface-mute);color:var(--muted-soft);border-color:var(--line)}
 
 /* m025-114: soal listening di tes penempatan. Tombolnya harus terbaca sebagai satu-satunya
@@ -437,11 +437,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   display:flex;align-items:center;justify-content:center;gap:9px;
   width:100%;min-height:52px;padding:0 20px;
   border:0;border-radius:999px;
-  background:var(--black);color:#fff;
+  background:var(--yellow);color:var(--ink);
   font-family:var(--fz-body);font-size:.96rem;font-weight:650;letter-spacing:-.01em;
   box-shadow:0 10px 26px rgba(184,69,47,.24);
 }
-.auth-gate .auth-primary:hover{background:var(--accent-strong);border-color:transparent;box-shadow:0 14px 32px rgba(184,69,47,.3)}
+.auth-gate .auth-primary:hover{background:var(--yellow-deep);border-color:transparent;box-shadow:0 14px 32px rgba(201,162,75,.32)}
 .auth-gate .auth-primary svg{width:19px;height:19px}
 .auth-gate .auth-primary[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 .auth-gate .auth-help{margin:18px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55}
@@ -645,11 +645,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
     --surface-edge:#48381F;--surface-edge-strong:#57452C;--surface-mute:#33281B;--ink-soft:#EADCC2;--ink-danger:#F8B8A6;
     --shadow-sm:0 8px 24px rgba(0,0,0,.38);--shadow-md:0 20px 50px rgba(0,0,0,.48);--shadow-lg:0 34px 90px rgba(0,0,0,.62);
 }
-/* --black memikul dua peran di berkas ini: permukaan tombol utama (teksnya dipaku #fff)
-   dan warna teks pada beberapa label. Di mode gelap satu nilai tidak bisa melayani
-   keduanya - marun 8C2233 memberi kontras 7,3:1 untuk teks putih di atas tombol, tetapi
-   terlalu gelap sebagai teks di atas panel gelap. Dua pemakaian teks itu dialihkan ke
-   aksen terang di sini, bukan dengan mengorbankan tombolnya. */
+/* m025-120: --black tidak lagi memikul dua peran. Dulu ia sekaligus permukaan tombol
+   utama DAN warna teks beberapa label, dan itulah yang membuat coklat mendominasi
+   layar: setiap tombol besar adalah satu bidang coklat. Bidangnya kini pindah ke aksen
+   kuning brief (tinta --ink, 10,9:1), dan --black tersisa hanya sebagai TINTA dan GARIS -
+   persis peran yang brief berikan untuk coklat. Tiga pemakaian teks yang tersisa tetap
+   perlu dialihkan ke aksen terang di mode gelap, karena coklat pekat tidak terbaca di
+   atas panel gelap. */
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]) .nav.active{color:var(--accent-strong)}
   :root:not([data-theme="light"]) .welcome-mark,
@@ -709,8 +711,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .section-kicker{display:block;font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:850;margin-bottom:6px}
 .section-head{padding:10px 0 4px;margin-bottom:18px}.section-head h1{font-size:clamp(1.75rem,4vw,2.4rem)}
 .card{background:rgba(var(--surface-rgb),.93);box-shadow:var(--shadow-sm)}
-.primary{background:var(--black);border-color:var(--black)}
-.primary:hover{background:#2a1a20;border-color:#2a1a20}
+.primary{background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep)}
+.primary:hover{background:var(--yellow-deep);border-color:var(--yellow-deep)}
 
 /* Premium Home Launcher */
 .home-page{display:grid;gap:26px}
