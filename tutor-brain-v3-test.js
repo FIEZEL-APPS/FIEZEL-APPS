@@ -88,6 +88,20 @@ test('baseline memakai median, jadi satu jeda panjang tidak menggeser seluruh se
   assert.strictEqual(T.median([]), 0, 'tanpa data tidak boleh mengarang baseline');
 });
 
+test('retry bantuan tidak dihitung sebagai jawaban ujian atau baseline waktu baru', () => {
+  const s = session();
+  answer(s);
+  const answered = s.answered;
+  const correct = s.correct;
+  const timings = s.responseTimes.length;
+  const retry = answer(s, { correct: true, chosenOption: 'is preparing', ms: 1000, scored: false });
+  assert.strictEqual(retry.scored, false);
+  assert.strictEqual(retry.breakthrough, true, 'retry benar tetap harus menyelesaikan miskonsepsi');
+  assert.strictEqual(s.answered, answered, 'retry menggelembungkan denominator akurasi');
+  assert.strictEqual(s.correct, correct, 'retry menggelembungkan jumlah benar');
+  assert.strictEqual(s.responseTimes.length, timings, 'retry menggeser baseline waktu');
+});
+
 // ---------------------------------------------------------------------------------------
 // C. TANGGA SCAFFOLDING — bantuan paling sedikit dulu
 // ---------------------------------------------------------------------------------------
@@ -246,6 +260,12 @@ test('konsep yang sudah sering keluar turun peringkat, jadi sesi tidak terjebak 
   s.attemptsOnConcept = { present_simple_vs_continuous: 5 };
   const picked = T.selectNext(POOL, s, {});
   assert.notStrictEqual(picked.id, 'a');
+});
+
+test('target keberhasilan bawaan tetap delapan puluh persen', () => {
+  const s = session();
+  const predict = item => item.id === 'a' ? 0.6 : item.id === 'b' ? 0.8 : 0.95;
+  assert.strictEqual(T.selectNext(POOL, s, { predict }).id, 'b');
 });
 
 test('kolam kosong mengembalikan null, tidak mengarang soal', () => {

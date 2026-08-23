@@ -21,8 +21,8 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
 
   let modelSeen='';
   const user={puter:{auth:{getUser:async()=>({uuid:'jahran-uuid',username:'Jahran'})},ai:{chat:async(msgs,opt)=>{modelSeen=opt.model;return{message:{content:'aman'}}}}}};
-  const ai=await routes.POST.get('/api/ai/chat')({request:req({prompt:'jelaskan present perfect',model:'untrusted-model'}),user});
-  assert(ai.text==='aman'&&modelSeen==='gpt-5.4-nano'&&ai.model==='gpt-5.4-nano'&&ai.protocol==='1.7','server-side AI model ownership failed');
+  const ai=await routes.POST.get('/api/ai/chat')({request:req({task:'quiz_explanation',profile:{goalProfile:'scholarship',estimatedLevel:'B1',timeZone:'America/New_York'},prompt:'jelaskan present perfect',model:'untrusted-model'}),user});
+  assert(ai.text==='aman'&&ai.schema==='fiezel-ai-response-v1'&&ai.task==='quiz_explanation'&&modelSeen==='gpt-5.4-nano'&&ai.model==='gpt-5.4-nano'&&ai.protocol==='1.7','server-side AI model ownership/schema failed');
   const coach=await routes.POST.get('/api/coach/context')({request:req({snapshot:{adaptiveReady:true,totalAttempts:80,estimatedLevel:'B1',domains:{grammar:{attempts:30,accuracy:45}}},evidence:{behavior:{consistency14d:60},memory:{},skills:{weakest:[{skill:'present_perfect',type:'grammar',attempts:10,accuracy:40,errorRate:60,recurringErrors:3}]}},outcomes:[]}),user});
   assert(coach.text==='aman'&&coach.protocol==='1.7'&&coach.via==='fiezel-core-worker-context-coach','context-aware coach endpoint failed');
   let ownerPromptSeen='';
@@ -128,11 +128,17 @@ const req=(body={},headers={})=>({json:async()=>body,headers:{get:k=>headers[k.t
   assert(saved.activity.evidence.privacy.rawAnswersIncluded===false&&saved.activity.evidence.privacy.rawHistoryIncluded===false&&!JSON.stringify(saved.activity.evidence).includes('SHOULD_NOT_SURVIVE'),'raw/private learner evidence leaked to backend');
 
 
-  const rawOutcome={schema:'fiezel-policy-outcome-v1',outcomeId:'out-1',policyId:'p-1',evaluatedAt:new Date().toISOString(),policyMode:'repair',targetSkill:'present_perfect',primaryDomain:'grammar',completed:true,abandoned:false,planned:6,answered:6,completionRate:100,accuracy:40,targetAttempts:6,targetAccuracy:40,targetAdherence:100,score:35,status:'negative',recommendation:'reduce_load',privacy:{rawAnswersIncluded:true},selectedAnswer:'SHOULD_NOT_SURVIVE'};
+  const rawOutcome={schema:'fiezel-policy-outcome-v1',outcomeId:'out-1',sessionId:'session-1',policyId:'p-1',evaluatedAt:new Date().toISOString(),policyMode:'repair',targetSkill:'present_perfect',primaryDomain:'grammar',completed:true,abandoned:false,planned:6,answered:6,completionRate:100,accuracy:40,targetAttempts:6,targetAccuracy:40,targetAdherence:100,score:35,status:'negative',recommendation:'reduce_load',privacy:{rawAnswersIncluded:true},selectedAnswer:'SHOULD_NOT_SURVIVE'};
   const outcomeStored=await routes.POST.get('/api/policy/outcome')({request:req({outcome:rawOutcome}),user});
   assert(outcomeStored.stored===true&&outcomeStored.protocol==='1.7'&&outcomeStored.outcomeSchema==='fiezel-policy-outcome-v1','policy outcome store failed');
   const storedOutcome=store.get('fiezel_push_v1_outcomes_jahran-uuid');
   assert(storedOutcome.history.length===1&&!JSON.stringify(storedOutcome).includes('SHOULD_NOT_SURVIVE')&&storedOutcome.history[0].privacy.rawAnswersIncluded===false,'policy outcome privacy/bounding failed');
+  // Kiriman ulang untuk SESI yang sama: tidak menggandakan, dan tidak menimpa penilaian
+  // yang sudah tercatat - tulisan pertama yang menang.
+  const duplicateOutcome={...rawOutcome,outcomeId:'out-2',score:30};
+  const duplicateStored=await routes.POST.get('/api/policy/outcome')({request:req({outcome:duplicateOutcome}),user});
+  const afterDuplicate=store.get('fiezel_push_v1_outcomes_jahran-uuid');
+  assert(duplicateStored.idempotent===true&&duplicateStored.duplicate===true&&afterDuplicate.history.length===1&&afterDuplicate.history[0].score===35,'policy outcome session idempotency failed');
 
   const policyRes=await routes.POST.get('/api/policy/next')({request:req({snapshot:{adaptiveReady:true,totalAttempts:80,estimatedLevel:'B1',dueReviews:4,domains:{grammar:{attempts:30,accuracy:45,recentAccuracy:40},vocabulary:{attempts:20,accuracy:75},reading:{attempts:20,accuracy:70}}},evidence:{behavior:{consistency14d:50,abandonmentRate:10,medianResponseMs:6000},confidence:{evidence:20,gap:10},memory:{dueReviews:4,maxForgettingRisk:82,highRiskCount:3},skills:{measured:5,recurringErrorSkills:1,weakest:[{skill:'present_perfect',type:'grammar',attempts:10,accuracy:40,errorRate:60,recurringErrors:3}]}}}),user});
   assert(policyRes.protocol==='1.7'&&policyRes.policy?.schema==='fiezel-adaptive-policy-v1'&&policyRes.policy.mode==='review'&&policyRes.policy.primaryDomain==='grammar'&&policyRes.policy.targetSkill==='present_perfect'&&policyRes.policy.rationaleCodes.includes('recent_policy_outcome_negative'),'adaptive policy endpoint failed');
