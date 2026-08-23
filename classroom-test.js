@@ -105,10 +105,16 @@ test('Classroom speaks authored Indonesian tutor line through neural-only bundle
 // ---- m025-41 OWNER corrections ---------------------------------------------------
 
 test('opening Classroom lands on the subjects, not on a download interstitial', () => {
-  const grid = tutorSource.indexOf('tutor-subject-grid');
-  const bundle = tutorSource.indexOf('bundleCard()', tutorSource.indexOf('function renderCategory'));
-  assert.ok(grid > -1 && bundle > -1, 'both the grid and the bundle card must exist');
-  assert.ok(grid < bundle, 'the subject grid must be rendered before the optional bundle card');
+  // m025-41 menuntut kartu unduhan tidak boleh mendahului daftar subjek. m025-124 memenuhi
+  // tuntutan yang sama dengan cara yang lebih kuat: kartunya dihapus seluruhnya, karena
+  // paket yang ia tawarkan sudah tidak ada dan penyiapannya tidak pernah benar-benar
+  // berjalan. Yang dijaga sekarang adalah ketiadaannya - kalau ia kembali, ia kembali
+  // sebagai tawaran palsu lagi.
+  assert.ok(tutorSource.indexOf('tutor-subject-grid') > -1, 'the subject grid must exist');
+  assert.ok(!/data-tutor-bundle/.test(tutorSource),
+    'kartu "Siapkan paket Indonesia" tidak boleh hidup lagi: paketnya tidak ada dan tombolnya tidak menyiapkan apa pun');
+  assert.ok(!/indonesianVoicePrepared/.test(tutorSource),
+    'status paket Indonesia tidak pernah diisi siapa pun sejak m025-100');
   assert.strictEqual(Tutor.createSession(pack).snapshot().phase, 'category',
     'a fresh session opens on the subject list');
 });
