@@ -2217,3 +2217,29 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
   border-radius:999px;background:var(--coral-soft);border:1.5px solid var(--coral);
   font-size:1rem;line-height:1.2}
 .home-stats .streak-badge .fz-i{width:17px;height:17px;--fz-i-fill:var(--coral);--fz-i-line:var(--ink)}
+
+/* m025-118 giliran bicara tutor.
+   Sengaja BUKAN memakai gaya .feedback: keduanya berbeda peran dan tidak boleh terlihat
+   sama. Kotak feedback membuka jawaban; giliran tutor justru sering menahannya, dan murid
+   harus bisa membedakan "ini petunjuk, soalnya masih terbuka" dari "ini jawabannya". */
+.tutor-turn{margin-top:14px;padding:14px 16px;border-radius:16px;
+  background:var(--surface-tint);border:1px solid var(--line);
+  border-left:3px solid var(--accent)}
+.tutor-turn.hidden{display:none}
+.tutor-turn-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;
+  font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tutor-turn-face{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:var(--accent-on-glass)}
+.tutor-turn-face svg{width:14px;height:14px}
+.tutor-turn-say{margin:0;font-size:.94rem;line-height:1.6;color:var(--ink)}
+.tutor-turn-ask{margin:8px 0 0;font-size:.94rem;line-height:1.6;font-weight:650;
+  color:var(--accent-strong)}
+.tutor-turn-actions{margin-top:12px}
+/* Tinggi sentuh 44px, sama dengan seluruh kontrol lain - tombol ini justru ditekan oleh
+   murid yang sedang bingung, jadi ia tidak boleh jadi target yang sulit dikenai. */
+.tutor-stuck{min-height:44px;padding:10px 16px;border-radius:12px;font-size:.86rem;
+  background:transparent;border:1px solid var(--line);color:var(--muted)}
+.tutor-stuck:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tutor-report{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;
+  font-size:.9rem;line-height:1.55;color:var(--ink)}
+.tutor-report svg{width:16px;height:16px;flex:0 0 auto}

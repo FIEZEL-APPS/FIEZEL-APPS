@@ -248,6 +248,10 @@ html.fz-booting body{overflow:hidden}
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
        kebijakan lama sebelum lapisan penalarannya tiba. Berkasnya ~14 KB, murni fungsi. -->
   <script defer src="./features/brain/fiezel-core-brain.js"></script>
+  <!-- m025-118 Tutor Brain v3. Dimuat bersama Core Brain dan tidak malas: ia bekerja pada
+       jawaban PERTAMA murid, jadi menunggunya tiba berarti soal pertama setiap sesi
+       berjalan tanpa tutor. Berkasnya ~11 KB, murni fungsi, tanpa jaringan. -->
+  <script defer src="./features/brain/fiezel-tutor-brain.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
