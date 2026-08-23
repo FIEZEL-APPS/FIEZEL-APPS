@@ -2243,3 +2243,22 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
 .tutor-report{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;
   font-size:.9rem;line-height:1.55;color:var(--ink)}
 .tutor-report svg{width:16px;height:16px;flex:0 0 auto}
+
+/* m025-125 - kartu konsep (tindakan eteach) dan tawaran berhenti (reathe).
+   Bidangnya memakai --surface-tint (punya pasangan gelap) dengan tinta yang diwarisi,
+   sama seperti .tutor-turn - jadi gerbang bidang pastel m025-117 tetap terpenuhi dan
+   kartunya ikut berbalik dengan benar di mode gelap. */
+.tutor-card{display:grid;gap:12px}
+.tutor-card-head{display:flex;align-items:center;gap:10px}
+.tutor-card-head small{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tutor-card-head b{font-size:1.05rem;letter-spacing:-.01em}
+.tutor-card-why{margin:0;padding:10px 12px;border-radius:12px;font-size:.86rem;line-height:1.55;
+  background:var(--surface-tint);border-left:3px solid var(--accent)}
+.tutor-card-rule{margin:0;font-size:.98rem;line-height:1.6;font-weight:650}
+.tutor-card-cue{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:.88rem;line-height:1.55;color:var(--muted)}
+.tutor-card-cue svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
+.quiz-teach-flag{font-size:.66rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+/* Dua jalan keluar berdampingan, dan yang "berhenti" justru jadi tombol utamanya:
+   pada titik ini FIEZEL memang sedang menyarankan berhenti, bukan sekadar mengizinkan. */
+.tutor-breathe{display:flex;flex-wrap:wrap;gap:8px}
+.tutor-breathe .primary{min-height:44px;padding:10px 18px;font-size:.88rem}

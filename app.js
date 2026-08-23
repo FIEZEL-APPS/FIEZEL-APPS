@@ -666,6 +666,34 @@ function tutorCompose(q,pickedIndex,ok,scaffold,move){
     })
   }catch{return null}
 }
+/**
+ * m025-125 — bahan KARTU KONSEP untuk tindakan `reteach`.
+ *
+ * decideMove sudah memutuskan `reteach` sejak m025-118, tetapi yang terlihat murid hanya
+ * satu kalimat tutor lalu soal berikutnya. Padahal arti `reteach` justru "berhenti
+ * menguji, mulai mengajar" - dan mengajar butuh ruangnya sendiri, bukan satu baris di
+ * bawah soal yang baru saja gagal.
+ *
+ * Kartu ini disusun dari soal yang BARU SAJA keliru (bukan soal berikutnya): aturannya,
+ * pegangan ingatannya, dan sebab pilihan tadi gagal. Semuanya lewat tutorIndonesian(),
+ * karena bank soal menyimpan penjelasannya dalam bahasa Inggris dan tutor tidak pernah
+ * boleh mengutip itu mentah-mentah (regresi 1 di m025-118).
+ *
+ * Mengembalikan null kalau tidak ada bahan yang layak diajarkan. Kartu kosong lebih buruk
+ * daripada tidak ada kartu: ia menghentikan sesi tanpa memberi apa pun sebagai gantinya.
+ */
+function tutorConceptCard(q,pickedIndex){
+  const rule=tutorIndonesian(q?.explain?.rule);
+  const cue=tutorIndonesian(q?.explain?.memory);
+  const why=tutorWhyFails(q,String(q?.options?.[pickedIndex]??''));
+  if(!rule&&!cue)return null;
+  return{
+    concept:friendlySkillName(q?.lessonSkill||q?.skill||q?.type),
+    rule,cue,why,
+    example:String(q?.question||''),
+    answer:String(q?.options?.[q?.answerIndex]??'')
+  }
+}
 /** Satu anak tangga bantuan lebih tinggi, dipakai saat murid bilang belum paham. */
 function tutorEscalate(current){
   if(!tutorAvailable())return 'tell';
@@ -2610,9 +2638,27 @@ function quizLoop(cfg){
  const remaining=questions.slice();
  const tutor=tutorSession();
  let asked=0,score=0,start=Date.now(),q=null,forceConcept='',lastConcept='';
+ // m025-125: dua keputusan tutor yang sampai rilis ini hanya terdengar sebagai kalimat.
+ // `pendingCard` menahan satu layar mengajar sebelum soal berikutnya; `breatheOffered`
+ // menjaga tawaran berhenti hanya muncul SEKALI - tawaran yang diulang berhenti terbaca
+ // sebagai perhatian dan mulai terbaca sebagai gangguan.
+ let pendingCard=null,breatheOffered=false;
+
+ /**
+  * Layar mengajar untuk tindakan `reteach`. Ia menggantikan soal berikutnya, bukan
+  * menumpanginya: murid yang baru saja mengulang miskonsepsi yang sama tidak butuh soal
+  * lagi, ia butuh satu hal dijelaskan sekali dengan tenang.
+  */
+ const teach=info=>{
+  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked}</span><em>/ ${planned}</em></div><span class="quiz-teach-flag">Jeda mengajar</span></div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>AJAR ULANG</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${esc(info.rule)}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">Oke, aku siap coba lagi <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
+  $('quizExit').onclick=()=>{audio.stop();go('home')};
+  $('teachNext').onclick=()=>{pendingCard=null;draw()};
+  enhanceUI();
+ };
 
  const draw=()=>{
   if(asked>=planned||!remaining.length){finishQuiz(cfg,score,asked||planned,tutorSummary(tutor));return}
+  if(pendingCard){const c=pendingCard;teach(c);return}
   q=tutorPick(remaining,tutor,{forceConcept,avoidConcept:lastConcept,cfg})||remaining[0];
   const at=remaining.indexOf(q);if(at>=0)remaining.splice(at,1);
   forceConcept='';
@@ -2670,6 +2716,29 @@ function quizLoop(cfg){
   answer.locked=true;
   $('quizNext').disabled=false;$('quizNext').focus();
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
+  // m025-125: `breathe` berhenti menjadi kalimat dan menjadi PILIHAN.
+  //
+  // decideMove menaruh lelah di urutan paling atas justru karena latihan di atas kelelahan
+  // tidak menempel - tetapi sampai rilis ini satu-satunya yang terjadi adalah tutor berkata
+  // "kita berhenti dulu" lalu menyodorkan soal berikutnya. Sekarang murid benar-benar bisa
+  // berhenti, dan berhenti di sini TIDAK menghanguskan apa pun: skor sesi dihitung dari
+  // soal yang sudah dijawab, dan seluruh evidence-nya sudah tercatat per jawaban.
+  //
+  // Ditawarkan SEKALI per sesi. Tawaran berhenti yang diulang tiap soal berubah menjadi
+  // desakan, dan murid yang memilih lanjut sudah menjawab pertanyaan itu.
+  if(answer.breathe&&!breatheOffered){
+   breatheOffered=true;answer.breathe=false;
+   const host=$('tutorTurn');
+   if(host){
+    host.classList.remove('hidden');
+    const box=document.createElement('div');
+    box.className='tutor-turn-actions tutor-breathe';
+    box.innerHTML=`<button id="breatheStop" class="primary">Sudahi sesi ini</button><button id="breatheGo" class="tutor-stuck">Lanjut, aku masih kuat</button>`;
+    host.appendChild(box);
+    $('breatheStop').onclick=()=>{audio.stop();finishQuiz(cfg,score,asked+1,tutorSummary(tutor))};
+    $('breatheGo').onclick=()=>{box.remove()};
+   }
+  }
   enhanceUI();
  };
 
@@ -2692,7 +2761,11 @@ function quizLoop(cfg){
    else if(q.type==='reading')updateMastery('reading',q.target||cfg.context?.id||q.id,ok,h.ms,h.confidence);
    const decision=tutorObserve(tutor,q,j,ok,ms,{remaining:remaining.length});
    answer.move=decision.move;answer.scaffold=decision.scaffold;
-   if(decision.move==='reteach')forceConcept=quizConcept(q);
+   // m025-125: `reteach` sekarang benar-benar mengajar. Kartunya disusun dari soal yang
+   // BARU SAJA keliru dan ditahan sampai murid menekan Lanjut, jadi urutannya menjadi
+   // "buka jawaban ini -> ajarkan konsepnya -> soal berikutnya dengan konsep yang sama",
+   // bukan langsung melempar soal serupa kepada orang yang keyakinannya belum tersentuh.
+   if(decision.move==='reteach'){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }
 
