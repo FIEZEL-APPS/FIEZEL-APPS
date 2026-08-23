@@ -1,4 +1,4 @@
-# m025-118 — Tutor Brain v3: dari perencana sesi menjadi guru yang menjawab
+# m025-120 — Tutor Brain v3: dari perencana sesi menjadi guru yang menjawab
 
 OWNER:
 
@@ -202,13 +202,19 @@ keputusannya, pada kasus yang tidak bisa diperdebatkan guru mana pun:
 
 ## 5. Penanda rilis
 
-`FIEZEL_PAGE_BUILD`, `DIAG_BUILD`, `SW_REV` — ketiganya `m025-118`, dijaga
+`FIEZEL_PAGE_BUILD`, `DIAG_BUILD`, `SW_REV` — ketiganya `m025-120`, dijaga
 `install-health-test.js` dan `pwa-release-coherence-test.js`.
 
 ## 6. Verifikasi
 
-Seluruh 68 perintah di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
+Seluruh 69 perintah di `.github/workflows/quality.yml` dijalankan lokal — hijau, termasuk
 pemeriksaan sintaks seluruh berkas dan gate baru.
+
+Cabang ini dibuat dari m025-117; sementara berjalan, main maju ke m025-119 (kontras bidang
+pastel #169, palet brief OWNER #170). main disatukan ke sini — satu-satunya konflik adalah
+ketiga penanda rilis, yang diselesaikan ke **m025-120**. Gate pastel baru dari main
+(`pastel-field-contrast-test.js`) hijau atas gaya `.tutor-turn`, dan gelung tutor
+diverifikasi ulang di Chromium setelah penyatuan: hasilnya sama persis, tanpa `pageerror`.
 
 ## 7. Yang sengaja belum dikerjakan
 
