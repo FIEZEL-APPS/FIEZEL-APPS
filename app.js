@@ -362,7 +362,7 @@ function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.op
 
 const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
 let stateReady=false;
-let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='',state=loadState(),V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null);
+let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='',state=loadState(),V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null),WRITING_BANK=null;
 stateReady=true;
 function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
 function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
@@ -974,7 +974,7 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  if(policy?.mode==='balance'&&limit>=6)for(const d of ['vocabulary','grammar','reading'])if(!result.some(q=>normalizePolicyDomain(q.type)===d))take(x=>x.domain===d,1);
  take(()=>true,limit-result.length);return result.slice(0,limit)
 }
-async function load(){const root=document.baseURI;const get=async f=>{const r=await fetch(new URL(f,root));if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async f=>{try{return await get(f)}catch{return{schema:'fiezel-grammar-curriculum-v1',lessons:[]}}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json'),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=Object.create(null);for(const row of (Array.isArray(GRAMMAR_CURRICULUM?.lessons)?GRAMMAR_CURRICULUM.lessons:Array.isArray(GRAMMAR_CURRICULUM)?GRAMMAR_CURRICULUM:[])){const key=String(row.lessonId||row.skill||row.subskill||row.id||'').trim();if(key)GRAMMAR_CURRICULUM_INDEX[key]=row}if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
+async function load(){const root=document.baseURI;const get=async f=>{const r=await fetch(new URL(f,root));if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=Object.create(null);for(const row of (Array.isArray(GRAMMAR_CURRICULUM?.lessons)?GRAMMAR_CURRICULUM.lessons:Array.isArray(GRAMMAR_CURRICULUM)?GRAMMAR_CURRICULUM:[])){const key=String(row.lessonId||row.skill||row.subskill||row.id||'').trim();if(key)GRAMMAR_CURRICULUM_INDEX[key]=row}if(CONTENT_CANARY){const canonical={version:APP_VERSION,vocabulary:V,reading:R,grammar:grammarMaster},now=Date.now();contentPromotionRuntime=CONTENT_PROMOTION?CONTENT_PROMOTION.evaluate(CONTENT_CANARY_CONFIG,state.contentCanaryMeta,now):contentPromotionRuntime;if(CONTENT_CANARY_CONFIG?.enabled&&CONTENT_CANARY_CONFIG?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordPromotionDecision(state.contentCanaryMeta,CONTENT_CANARY_CONFIG.canaryId,contentPromotionRuntime,new Date(now).toISOString());contentCanaryRuntime=await CONTENT_CANARY.prepare(canonical,CONTENT_CANARY_CONFIG,learnerName(),state.contentCanaryMeta,now,contentPromotionRuntime);state.contentCanaryMeta=contentCanaryRuntime.evidence||state.contentCanaryMeta;V=contentCanaryRuntime.dataset.vocabulary;R=contentCanaryRuntime.dataset.reading;grammarMaster=contentCanaryRuntime.dataset.grammar;save()}G=grammarMaster;
   // Normalize the structured grammar master source into the runtime's canonical skill buckets.
   // The JSON master is authoritative; no legacy G[skill] file is used.
   if(Array.isArray(G?.templates)){
@@ -2521,10 +2521,18 @@ const WRITING_PROMPTS=[
   {id:'w-c2-1',level:'C2',target:180,en:'Evaluate whether artificial intelligence will improve or weaken independent learning in the long term.',id_hint:'Evaluasi apakah kecerdasan buatan akan memperkuat atau melemahkan belajar mandiri dalam jangka panjang.'}
 ];
 function writingLevel(){return getActiveLevel()}
+// m025-138: bank soal writing kini berkas data (writing-prompts-v1.json). WRITING_PROMPTS tetap
+// ada sebagai jaring pengaman: kalau berkasnya gagal dimuat, murid tetap punya topik - bukan
+// halaman kosong. Yang hilang saat fallback hanya metadata ujiannya, bukan latihannya.
+function writingPromptPool(level=writingLevel()){const bank=Array.isArray(WRITING_BANK?.prompts)&&WRITING_BANK.prompts.length?WRITING_BANK.prompts:WRITING_PROMPTS;return bank.filter(x=>x?.level===level)}
+function writingRubricCriteria(){return Array.isArray(WRITING_BANK?.rubric?.criteria)?WRITING_BANK.rubric.criteria:[]}
+function writingExamTask(prompt){const key=String(prompt?.examTask||'');const meta=key?WRITING_BANK?.examTasks?.[key]:null;return meta?{id:key,...meta}:null}
+// Batas kata yang MENGIKAT diambil dari kontrak ujiannya kalau ada. Di IELTS, tulisan di bawah
+// batas kena penalti - jadi menampilkan target yang lebih rendah daripada ujian aslinya akan
+// menyesatkan justru pada hal yang paling mudah dihindari murid.
+function writingTargetWords(prompt){const exam=writingExamTask(prompt);return Math.max(Number(prompt?.target)||0,Number(exam?.minWords)||0)||Number(prompt?.target)||40}
 function writingPromptFor(index){
-  const level=writingLevel();
-  const pool=WRITING_PROMPTS.filter(p=>p.level===level);
-  const list=pool;
+  const list=writingPromptPool();
   if(!list.length)return null;
   const i=Math.abs(Number.isFinite(index)?index:writingState().entries.length)%list.length;
   return list[i];
@@ -2542,22 +2550,26 @@ function saveWritingEntry(prompt,words){
 function writingSaveDraft(text){state.writing={...(state.writing||{}),draft:String(text||'').slice(0,4000)};save()}
 function writing(){
   const prompt=writingPromptFor(state.writing?.promptIndex),draft=String(state.writing?.draft||''),done=writingThisWeek();
+  const exam=prompt?writingExamTask(prompt):null,target=prompt?writingTargetWords(prompt):0,criteria=writingRubricCriteria();
   if(!prompt){setApp(`<section class="fade writing-page"><div class="section-head"><div><h1>Writing</h1><p>Belum ada topik writing untuk level ${esc(getActiveLevel())}.</p></div>${levelControlMarkup()}</div></section>`);return}
   setApp(`<section class="fade writing-page">
 <div class="skill-page-hero skill-writing"><span class="skill-badge">SKILL INTI TES · ${esc(getActiveLevel())}</span><h1>Writing</h1><p>Tulis dulu apa adanya. Rapihnya urusan nanti - yang penting jadi.</p><button type="button" class="active-level-control" onclick="openLevelPanel()"><span>Level belajar</span><strong>${esc(getActiveLevel())}</strong><small>Ganti</small></button></div>
 <div class="card writing-prompt">
   <span class="skill-badge">TOPIK ${esc(prompt.level)} · ${done}/${WRITING_WEEKLY_TARGET} minggu ini</span>
+  ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>Minimal ${exam.minWords} kata · ${exam.minutes} menit</span><small>${esc(exam.note)}</small></p>`:''}
   <b>${esc(prompt.en)}</b>
   <p class="muted">${esc(prompt.id_hint)}</p>
+  ${prompt.focus?`<p class="writing-focus">Yang dilatih: ${esc(prompt.focus)}</p>`:''}
   <textarea id="writingBox" placeholder="Start writing here…" aria-label="Kotak menulis">${esc(draft)}</textarea>
-  <div class="writing-meta"><span id="writingCount">0 kata</span><span>Target sekitar ${prompt.target} kata</span></div>
+  <div class="writing-meta"><span id="writingCount">0 kata</span><span>${exam?`Minimal ${target} kata`:`Target sekitar ${target} kata`}</span></div>
   <button class="primary wide" id="writingAsk"><i data-lucide="sparkles"></i> Minta masukan FIEZEL</button>
   <button id="writingSwap">Ganti topik</button>
 </div>
 <div id="writingFeedback" class="writing-feedback"></div>
+${criteria.length?`<div class="card writing-rubric"><b>Yang dinilai</b><p class="muted">Lima kriteria, masing-masing 0-4. Empat yang pertama mengikuti keluarga kriteria IELTS Writing.</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div>`:''}
 </section>`);
   const box=$('writingBox'),counter=$('writingCount');
-  const sync=()=>{const n=countWords(box.value);counter.textContent=`${n} kata`;counter.classList.toggle('is-hit',n>=prompt.target)};
+  const sync=()=>{const n=countWords(box.value);counter.textContent=`${n} kata`;counter.classList.toggle('is-hit',n>=target)};
   box.addEventListener('input',sync);
   box.addEventListener('blur',()=>writingSaveDraft(box.value));
   sync();
@@ -2571,14 +2583,24 @@ async function requestWritingFeedback(prompt){
   if(words<15){showToast('Tulis minimal 15 kata dulu, biar ada yang bisa dibaca FIEZEL.');return}
   writingSaveDraft(text);
   host.innerHTML=`<div class="card"><b>FIEZEL lagi baca tulisanmu…</b><p class="muted">Sebentar ya.</p></div>`;
-  const ai=`Kamu pembimbing menulis Bahasa Inggris untuk murid SMA Indonesia level ${prompt.level}. Bahasa jawaban: Indonesia santai, boleh emoji seperlunya, maksimal 120 kata.
+  const exam=writingExamTask(prompt),criteria=writingRubricCriteria();
+  const rubricBrief=criteria.map(c=>`- ${c.label} (${c.labelEn}): ${c.asks}`).join('\n');
+  const scaleBrief=criteria.length?`Skala 0-4 untuk SETIAP kriteria. Acuan singkat 4: ${criteria[0].levels[4]}`:'Skala 0-4 untuk setiap kriteria.';
+  const ai=`Kamu penilai menulis Bahasa Inggris untuk murid Indonesia level ${prompt.level}. Bahasa jawaban: Indonesia santai tapi jelas, maksimal 220 kata.
+${exam?`Tugas ini berbentuk ${exam.label}. Batas kata ${exam.minWords}, waktu ${exam.minutes} menit. ${exam.note}`:'Tugas ini latihan fondasi, belum berbentuk soal ujian.'}
 Topik: "${prompt.en}"
 Tulisan murid:
 """${text.slice(0,1800)}"""
-Jawab dengan tepat tiga bagian bernomor:
-1. Satu hal yang SUDAH bagus (spesifik, sebut kalimatnya).
-2. SATU perbaikan paling penting saja - jelaskan kenapa, jangan daftar semua kesalahan.
-3. Satu kalimat murid yang kamu tulis ulang versi benarnya (tulis "sebelum" dan "sesudah").`;
+
+Nilai dengan rubrik ini:
+${rubricBrief}
+${scaleBrief}
+
+Jawab dengan format ini, tanpa tambahan lain:
+1. Skor per kriteria, satu baris per kriteria: "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya".
+2. "Satu langkah berikutnya:" - SATU perbaikan paling berdampak saja, jelaskan kenapa itu yang dipilih.
+3. "Sebelum / sesudah:" - kutip satu kalimat murid, lalu tulis ulang versi yang lebih baik.
+Aturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan murid siap atau belum siap ujian. Skor rubrik ini alat latihan, bukan prediksi nilai ujian.`;
   try{
     // m025-115: dibatasi waktu DENGAN SENGAJA. Jalur AI lewat Puter tidak selalu menolak
     // ketika tidak tersambung - ia bisa menggantung tanpa batas, dan yang dilihat murid
@@ -2605,22 +2627,59 @@ ${writingLocalReview(prompt,text)}`;
 // panjang, jumlah kalimat, kalimat yang kepanjangan, dan kata yang diulang-ulang. Itu
 // sudah cukup untuk memberi murid satu langkah berikutnya, dan tidak pernah berbohong
 // tentang dari mana penilaiannya datang.
+// m025-138: sinyal BENTUK yang bisa dihitung jujur tanpa jaringan, dipetakan ke kriteria
+// rubrik. Fungsi ini murni supaya bisa diuji, dan ia sengaja TIDAK mengeluarkan skor 0-4:
+// panjang tulisan dan jumlah paragraf tidak pernah cukup untuk menilai ketepatan bahasa.
+// Yang dilakukannya hanya memisahkan "ini sudah bisa dicek sendiri" dari "ini perlu dibaca AI",
+// supaya murid tidak menyangka checklist ini adalah penilaian.
+function writingFormSignals(prompt,text){
+  const clean=String(text||'').replace(/\r/g,'').trim();
+  const words=countWords(clean),target=writingTargetWords(prompt),exam=writingExamTask(prompt);
+  const paragraphs=clean.split(/\n\s*\n/).map(x=>x.trim()).filter(Boolean);
+  const sentences=clean.split(/[.!?]+/).map(x=>x.trim()).filter(Boolean);
+  const lengths=sentences.map(countWords);
+  const longest=lengths.length?Math.max(...lengths):0;
+  const lower=clean.toLowerCase().replace(/[^a-z\s']/g,' ').split(/\s+/).filter(Boolean);
+  const content=lower.filter(w=>w.length>3);
+  const counts={};content.forEach(w=>{counts[w]=(counts[w]||0)+1});
+  const repeated=Object.entries(counts).filter(([,n])=>n>=4).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([word,n])=>({word,n}));
+  const variety=content.length?new Set(content).size/content.length:0;
+  const linkers=(clean.toLowerCase().match(/\b(however|therefore|although|whereas|moreover|in addition|for example|for instance|on the other hand|as a result|nevertheless|furthermore)\b/g)||[]).length;
+  const complex=(clean.toLowerCase().match(/\b(because|although|while|which|whose|whereas|unless|despite|since|if)\b/g)||[]).length;
+  return{
+    words,target,shortfall:Math.max(0,target-words),
+    minWords:Number(exam?.minWords)||0,belowExamMinimum:!!exam?.minWords&&words<Number(exam.minWords),
+    paragraphs:paragraphs.length,sentences:sentences.length,longestSentence:longest,
+    repeated,varietyRatio:Math.round(variety*100)/100,linkers,complexClauses:complex
+  }
+}
+// Peta sinyal -> kriteria. Statusnya hanya tiga: 'ok' (bentuknya sudah memenuhi), 'perhatikan'
+// (bentuknya kurang dan itu terukur), dan 'ai' (jujur: tidak bisa dinilai tanpa membaca).
+function writingFormChecklist(prompt,text){
+  const s=writingFormSignals(prompt,text),exam=writingExamTask(prompt);
+  const rows=[];
+  const push=(criterion,status,note)=>rows.push({criterion,status,note});
+  push('task_response',s.belowExamMinimum?'perhatikan':s.shortfall?'perhatikan':'ok',
+    s.belowExamMinimum?`${s.words} kata, di bawah batas ${exam.label} (${s.minWords}). Di ujian aslinya ini kena penalti sebelum isinya dinilai.`
+      :s.shortfall?`${s.words} kata, masih ${s.shortfall} kata di bawah target ${s.target}.`
+      :`${s.words} kata, target ${s.target} terpenuhi.`);
+  push('coherence_cohesion',s.paragraphs>=3?'ok':'perhatikan',
+    s.paragraphs>=3?`${s.paragraphs} paragraf - strukturnya sudah terbaca.`
+      :`Baru ${s.paragraphs} paragraf. Esai ujian biasanya butuh pembuka, isi yang terbagi, dan penutup.`);
+  push('lexical_resource',s.repeated.length?'perhatikan':'ok',
+    s.repeated.length?`Kata yang diulang: ${s.repeated.map(x=>`${x.word} (${x.n}x)`).join(', ')}.`
+      :`Tidak ada kata isi yang menumpuk berlebihan.`);
+  push('grammatical_range_accuracy','ai',
+    `Terhitung ${s.complexClauses} penanda klausa kompleks dan kalimat terpanjang ${s.longestSentence} kata. Ketepatannya hanya bisa dinilai dengan membaca - itu bagian AI.`);
+  push('register_mechanics','ai',
+    `Nada dan ejaan tidak bisa dihitung dari bentuk. Minta masukan AI untuk bagian ini.`);
+  return rows
+}
 function writingLocalReview(prompt,text){
-  const clean=String(text||'').replace(/\s+/g,' ').trim();
-  const words=countWords(clean);
-  const sentences=clean.split(/[.!?]+/).map(s=>s.trim()).filter(Boolean);
-  const longest=sentences.reduce((a,b)=>countWords(b)>countWords(a)?b:a,'');
-  const counts={};
-  clean.toLowerCase().replace(/[^a-z\s']/g,' ').split(/\s+/).filter(w=>w.length>3).forEach(w=>{counts[w]=(counts[w]||0)+1});
-  const repeated=Object.entries(counts).filter(([,n])=>n>=4).sort((a,b)=>b[1]-a[1]).slice(0,3);
-  const notes=[];
-  notes.push(`<li>${words} kata dalam ${sentences.length} kalimat${prompt?.target?` · target sekitar ${prompt.target} kata`:''}.</li>`);
-  if(words<(prompt?.target||40))notes.push('<li>Masih di bawah target. Tambah satu-dua kalimat detail: kapan, di mana, sama siapa.</li>');
-  if(countWords(longest)>=25)notes.push(`<li>Kalimat terpanjangmu ${countWords(longest)} kata - biasanya lebih enak dibaca kalau dipecah dua: "${esc(longest.slice(0,90))}${longest.length>90?'…':''}"</li>`);
-  if(repeated.length)notes.push(`<li>Kata yang diulang cukup sering: ${repeated.map(([w,n])=>`<b>${esc(w)}</b> (${n}x)`).join(', ')}. Coba ganti sebagian dengan kata lain.</li>`);
-  if(sentences.length<3)notes.push('<li>Baru sedikit kalimat. Tiga kalimat ke atas bikin tulisanmu punya awal, isi, dan penutup.</li>');
-  notes.push(`<li>Tersimpan sebagai latihan minggu ini (${writingThisWeek()}/${WRITING_WEEKLY_TARGET}).</li>`);
-  return `<div class="card"><b>Cek cepat FIEZEL (offline)</b><p class="muted">Ini hitungan bentuk tulisan, bukan penilaian bahasa - itu bagian AI, dan bisa dicoba lagi nanti.</p><ul class="muted">${notes.join('')}</ul></div>`;
+  const criteria=writingRubricCriteria(),rows=writingFormChecklist(prompt,text);
+  const labelFor=id=>criteria.find(x=>x.id===id)?.label||id;
+  const items=rows.map(row=>`<li class="writing-check is-${row.status}"><b>${esc(labelFor(row.criterion))}</b><span>${esc(row.note)}</span></li>`).join('');
+  return `<div class="card"><b>Cek bentuk FIEZEL (offline)</b><p class="muted">Ini pemeriksaan BENTUK terhadap kriteria rubrik, bukan penilaian bahasa dan bukan skor. Dua kriteria terakhir memang tidak bisa dihitung tanpa membaca - itu bagian AI.</p><ul class="writing-checklist">${items}</ul><p class="muted">Tersimpan sebagai latihan minggu ini (${writingThisWeek()}/${WRITING_WEEKLY_TARGET}).</p></div>`;
 }
 // m025-115: perayaan kecil saat sesuatu SELESAI - brief bagian 5. Sekali, ringan, lalu
 // hilang sendiri; dan tidak pernah berjalan kalau perangkat minta kurangi-gerak.
