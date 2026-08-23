@@ -762,7 +762,7 @@ function setAuthGateState(status,detail){
   refreshIcons()
 }
 function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
-function completeAuthGate(){document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast('Akun FIEZEL tersambung.')}
+function completeAuthGate(){document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast('Akun FIEZEL tersambung.');armOfflineVoiceAutoload()}
 let authRetryBound=false;
 function presentPuterAuthGateIfNeeded(){
   if(!puterAuthAvailable()||puterSignedIn())return false;
@@ -970,6 +970,7 @@ if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
 // kemampuan undangan itu untuk menahan apa pun. Kalau tidak ada undangan yang layak
 // tampil, gerbang akun langsung dipasang seperti biasa.
 if(!offerNotificationInvitation('after_onboarding'))armPuterAuthGate();
+armOfflineVoiceAutoload();
 // Creator Report menunggu SDK-nya, bukan menyerah. Antrean laporan dulu pasti terkirim
 // 1,2 detik setelah boot karena js.puter.com selalu sudah selesai dieksekusi sebelum
 // app.js sempat berjalan; dengan SDK yang async itu tidak lagi benar. Sekali SDK-nya
@@ -988,6 +989,26 @@ return true
 function armPuterAuthGate(){
   if(puterAuthAvailable())return presentPuterAuthGateIfNeeded();
   try{self.FiezelPuterReady?.ready?.().then(sdk=>{if(sdk)presentPuterAuthGateIfNeeded()})}catch{}
+  return false
+}
+/**
+ * m025-121: menyalakan unduhan suara cadangan begitu murid terlihat sudah login.
+ *
+ * Tidak ada apa pun yang muncul di layar - itu memang permintaannya. Dua hal yang
+ * membuatnya tidak boleh dipanggil sembarangan dari tempat lain:
+ *
+ *   - Modulnya MALAS. Memanggilnya sebelum grup 'voice' selesai berarti diam total, dan
+ *     diamnya tidak terlihat oleh siapa pun. Karena itu ia menunggu lewat
+ *     ensureVoiceRuntime(), bukan menebak.
+ *   - Ia menyalakan jam hanya SEKALI; panggilan berikutnya melanjutkan, bukan mengulang.
+ *     Jadi memanggilnya di setiap boot justru yang diinginkan: sesi berikutnya meneruskan
+ *     dari potongan terakhir.
+ */
+function armOfflineVoiceAutoload(){
+  if(!puterSignedIn())return false;
+  const go=()=>{try{return self.FiezelVoiceOfflineAutoload?.noteSignedIn?.()===true}catch{return false}};
+  if(go())return true;
+  ensureVoiceRuntime().then(go).catch(()=>{});
   return false
 }
 // Menampilkan undangan notifikasi. Mengembalikan true HANYA kalau panelnya benar-benar
@@ -1861,9 +1882,78 @@ function neuralRateLabel(v){return v<0.9?`${v.toFixed(2)}x · lebih pelan`:v>1.1
 // Unduhan lokal DIPERTAHANKAN sebagai tambahan opsional, bukan syarat: mesin server
 // butuh jaringan, dan seorang murid yang sering belajar tanpa sinyal masih berhak
 // memilih membawa modelnya sendiri.
-function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const size=Math.round(Number(status.totalBytes||0)/1000000)||119;const label=online.ready?'Suara siap, tanpa unduhan':'Menyiapkan suara…';return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">Setiap kalimat Inggris dibacakan dan diberi subtitle Indonesia di bawahnya. Tidak ada yang perlu diunduh.</p>${online.error?`<p class="muted">Status: ${esc(online.error)}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>Kecepatan bicara</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label><p class="muted">Opsional: simpan model suara di perangkat (~${size} MB) supaya tetap bersuara saat tidak ada sinyal.</p></div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> Tes suara</button><button id="prepareNeuralVoice" type="button" ${runtime?'':'disabled'}><i data-lucide="download"></i> ${status.ready?'Suara offline tersimpan':'Simpan untuk offline'}</button></div></article>`}
-function updateNeuralVoiceProgress(progress){const text=$('neuralVoiceProgress');if(!text)return;const done=Math.round(Number(progress?.completedBytes||0)/1000000),total=Math.round(Number(progress?.totalBytes||0)/1000000);text.textContent=progress?.phase==='downloading'?`Mengunduh aset ${progress.completed||0}/${progress.assetCount||0} · ${done}/${total} MB${progress.current?' · '+progress.current:''}`:'Menyiapkan mesin suara lokal…'}
-async function prepareNeuralVoice(){const button=$('prepareNeuralVoice'),runtime=self.FiezelVoiceRuntime;if(!button||!runtime)return;button.disabled=true;button.innerHTML='Menyiapkan…';const hint=$('neuralVoiceProgress');if(hint)hint.textContent='Mengunduh aset suara… (satu kali saja, sekitar 119 MB). Jangan tutup halaman ini.';try{await runtime.prepare({onProgress:updateNeuralVoiceProgress});const text=$('neuralVoiceProgress');if(text)text.textContent='Suara neural lokal siap dan aset sudah diverifikasi.';button.innerHTML='<i data-lucide="badge-check"></i> Suara siap';const testButton=$('testNeuralVoice');if(testButton)testButton.disabled=false;const st=runtime.status();/*[DEAD-CODE-20260814] Branch storage==='memory' tidak pernah aktif: fiezel-neural-voice-bootstrap.js hanya menulis storage==='cache' (baris 58 & 207; readStatus juga hanya menerima 'cache'), dan ios-cache-fix.js status() mewarisi runtime.status() tanpa nilai 'memory'. Branch ini sengaja DIBIARKAN (tidak dihapus) sebagai fallback safety jika runtime pihak ketiga/versi lama mengembalikan storage==='memory' (mis. mode memori tanpa CacheStorage). Jangan dihapus tanpa persetujuan owner. M-017/T-019 2026-08-14.*/if(st.storage==='memory'){if(text)text.textContent+=' Penyimpanan browser terbatas - mode memori aktif, aset diunduh ulang tiap sesi. Pasang FIEZEL ke Layar Utama agar tersimpan permanen.';showToast('Suara neural siap (mode memori). Pasang ke Layar Utama agar permanen.')}else showToast('Suara neural lokal siap.');haptic('success')}catch(error){const text=$('neuralVoiceProgress'),detail=runtime.status().error||String(error?.message||error);if(text)text.textContent=`Persiapan gagal: ${detail}. Browser TTS tetap digunakan.`;button.disabled=false;button.innerHTML='<i data-lucide="download"></i> Coba lagi';showToast(`Model neural belum siap (${detail}). Browser TTS tetap digunakan.`)}enhanceUI()}
+/* ==========================================================================
+   m025-121 kartu Akun Puter di Pengaturan
+   ==========================================================================
+   Sebelum ini akun Puter adalah jalan satu arah: gerbang login muncul sekali di boot,
+   dan sesudahnya tidak ada satu pun layar yang menyebut akun mana yang sedang dipakai,
+   apalagi cara keluar darinya. Satu perangkat yang dipakai bergantian - murid lalu
+   pengajar, atau dua murid - berarti progres, streak, dan tutor AI milik akun yang
+   pertama kali login, tanpa jalan keluar selain menghapus data situs.
+
+   "Ganti akun" sengaja BUKAN sekadar signIn(). Puter menyimpan sesi sebelumnya, jadi
+   signIn() di atas sesi yang masih hidup akan kembali ke akun yang sama tanpa pernah
+   menanyakan apa pun - persis kegagalan diam-diam yang membuat tombol seperti ini
+   terasa rusak. Keluar dulu, baru masuk. */
+let puterAccountCache=null;
+function puterAccountLabel(){
+  const user=puterAccountCache;
+  if(!user)return puterSignedIn()?'Akun tersambung':'Belum tersambung';
+  return String(user.username||user.email||'Akun tersambung');
+}
+async function refreshPuterAccountCard(){
+  const el=$('accountName');if(!el)return;
+  try{
+    const sdk=await awaitPuter(4000);
+    puterAccountCache=await sdk?.auth?.getUser?.()||null;
+  }catch{puterAccountCache=null}
+  const target=$('accountName');if(target)target.textContent=puterAccountLabel();
+}
+/** Keluar dari akun. Statusnya dibiarkan dibaca ulang oleh boot berikutnya - gerbang
+ *  login yang sudah ada adalah tempat yang benar untuk memutuskan apa selanjutnya, dan
+ *  menyalinnya ke sini berarti dua tempat yang bisa menyimpang. */
+async function signOutPuterAccount(){
+  const sdk=await awaitPuter(6000);
+  if(!sdk?.auth?.signOut)throw new Error('Layanan akun Puter belum bisa dihubungi.');
+  await sdk.auth.signOut();
+  puterAccountCache=null;
+}
+async function runPuterSignOut(){
+  const button=$('accountSignOut');if(button)button.disabled=true;
+  try{await signOutPuterAccount();showToast('Keluar dari akun. FIEZEL dimuat ulang.');setTimeout(()=>location.reload(),700)}
+  catch(error){showToast(aiErrorMessage(error));if(button)button.disabled=false}
+}
+async function runPuterSwitchAccount(){
+  const button=$('accountSwitch');if(button)button.disabled=true;
+  try{
+    await signOutPuterAccount();
+    const sdk=await awaitPuter(6000);
+    if(!sdk?.auth?.signIn)throw new Error('Layanan akun Puter belum bisa dihubungi.');
+    await sdk.auth.signIn();
+    showToast('Akun diganti. FIEZEL dimuat ulang.');
+    setTimeout(()=>location.reload(),700);
+  }catch(error){
+    // Login yang dibatalkan meninggalkan perangkat dalam keadaan SUDAH keluar, dan
+    // membiarkannya di halaman yang sama akan menampilkan aplikasi milik akun yang tidak
+    // lagi login. Memuat ulang mengembalikannya ke gerbang login yang benar.
+    showToast(aiErrorMessage(error));
+    setTimeout(()=>location.reload(),1200);
+  }
+}
+function accountSettingsMarkup(){
+  const connected=puterSignedIn();
+  return `<div class="card account-card"><h3>Akun Puter</h3><p class="muted">Progres belajar, streak, dan tutor AI tersimpan di akun ini.</p><div class="setting-row"><span class="setting-icon"><i data-lucide="user-round"></i></span><span><b id="accountName">${esc(puterAccountLabel())}</b><small>${connected?'Tersambung di perangkat ini':'Belum ada akun tersambung'}</small></span></div><div class="actions"><button type="button" id="accountSwitch"><i data-lucide="users-round"></i> Ganti akun</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="log-out"></i> Keluar</button></div><p class="muted">Ganti akun akan keluar dulu, lalu membuka login Puter - tanpa itu Puter langsung memakai sesi lama dan akunnya tidak pernah benar-benar berganti.</p></div>`
+}
+function bindAccountSettingControls(){
+  $('accountSwitch')?.addEventListener('click',runPuterSwitchAccount);
+  $('accountSignOut')?.addEventListener('click',runPuterSignOut);
+  refreshPuterAccountCard();
+}
+function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const offline=self.FiezelVoiceOfflineAutoload?.status?.()||{done:false,armed:false};const label=online.ready?'Suara siap, tanpa unduhan':'Menyiapkan suara…';
+  // m025-121: kartu ini TIDAK menjual unduhan apa pun, dan itu keputusan yang sama dengan
+  // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
+  // sini hanyalah kenyataan sesudahnya, satu baris, tanpa tombol dan tanpa angka megabita.
+  const backupLine=offline.done?'Cadangan suara sudah tersimpan di perangkat ini. Kalau suatu saat jatah suara online habis, pelajaran tetap bersuara.':'';return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">Setiap kalimat Inggris dibacakan dan diberi subtitle Indonesia di bawahnya. Tidak ada yang perlu diunduh.</p>${online.error?`<p class="muted">Status: ${esc(online.error)}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>Kecepatan bicara</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> Tes suara</button></div></article>`}
 // m025-96: menguji mesin yang benar-benar dipakai murid. Menguji mesin lokal di sini
 // akan melaporkan 'suara siap' padahal jalur yang dipakai pelajaran adalah yang lain.
 async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?'Tes selesai. Subtitle Indonesia muncul di bawah saat pelajaran berjalan.':'Suara tidak berbunyi. Periksa koneksi lalu coba lagi.';showToast(ok?'Suara terdengar.':'Suara belum berbunyi.')}catch(error){if(hint)hint.textContent=`Tes suara gagal: ${String(error?.message||error)}.`;showToast('Tes suara gagal. Buka Diagnostics untuk detail.')}finally{button.disabled=false;enhanceUI()}}
@@ -2512,7 +2602,7 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><label class="endpoint-label">Nama panggilan<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="Nama kamu" autocomplete="given-name"></label><div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="compass"></i></span><span><b>Ulangi kenalan cepat</b><small>Tur singkat yang nunjukin tombol mana buat apa</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="activity"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, ${esc(learnerName())}, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Masukan untuk pengembang</h3><p class="muted">Materi yang belum ada atau apa pun yang mengganggu. Terkirim tanpa data belajarmu.</p><button id="openFeedback"><i data-lucide="message-square-plus"></i> Kirim masukan</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><label class="endpoint-label">Nama panggilan<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="Nama kamu" autocomplete="given-name"></label><div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="compass"></i></span><span><b>Ulangi kenalan cepat</b><small>Tur singkat yang nunjukin tombol mana buat apa</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="activity"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, ${esc(learnerName())}, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div>${accountSettingsMarkup()}<div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Masukan untuk pengembang</h3><p class="muted">Materi yang belum ada atau apa pun yang mengganggu. Terkirim tanpa data belajarmu.</p><button id="openFeedback"><i data-lucide="message-square-plus"></i> Kirim masukan</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
@@ -2543,7 +2633,11 @@ async function toggleStudyReminders(input){
   if(input)input.checked=true;
   return true
 }
-function bindVoiceSettingControls(){$('prepareNeuralVoice')?.addEventListener('click',prepareNeuralVoice);$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value))}
+// m025-121: tombol "Simpan untuk offline" beserta prepareNeuralVoice() dan
+// updateNeuralVoiceProgress() dihapus, bukan disembunyikan. Cadangan perangkat kini
+// menyiapkan dirinya sendiri di latar; sebuah tombol yang menawarkan pekerjaan yang
+// sudah berjalan sendiri hanya akan membuat murid mengira ada yang harus ia lakukan.
+function bindVoiceSettingControls(){$('testNeuralVoice')?.addEventListener('click',testNeuralVoice);$('neuralRateInput')?.addEventListener('input',event=>setNeuralRatePreference(event.currentTarget.value))}
 function saveSettings(){const endpoint=$('reportEndpoint').value.trim(),consent=$('reportConsent').checked;if(endpoint&&!validReportEndpoint(endpoint)){showToast('Gunakan URL HTTPS dengan domain .puter.work');answerFeedbackSignal(false);return}
   // m025-117: nama boleh diganti kapan saja, tetapi tidak boleh DIHAPUS dari sini - kolom
   // yang dikosongkan lalu disimpan akan mengembalikan aplikasi ke keadaan tanpa nama yang

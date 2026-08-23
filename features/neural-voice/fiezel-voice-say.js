@@ -37,6 +37,29 @@
   function engine() { return root.FiezelPuterVoice || null; }
   function translator() { return root.FiezelSubtitleTranslate || null; }
 
+  /**
+   * m025-121 mesin cadangan di perangkat.
+   *
+   * Ia hanya ada di jalur GAGAL, dan itu keseluruhan rancangannya. Jatah Puter habis
+   * terlihat dari sini persis seperti kegagalan render lain: speak() menolak. Tidak ada
+   * pemeriksaan sisa jatah, tidak ada penghitung, tidak ada tebakan tentang kata apa yang
+   * dipakai Puter dalam pesan galatnya - semua itu akan menjadi tebakan yang diam-diam
+   * salah pada hari Puter mengubah naskahnya.
+   *
+   * Yang dijaga ketat justru satu hal lain: cadangan ini TIDAK PERNAH menyalakan mesin
+   * yang asetnya belum lengkap. status().ready sudah menjawab itu, dan tanpa pemeriksaan
+   * itu satu kalimat yang gagal akan memicu inisialisasi 152 MB di tengah pelajaran.
+   */
+  function localEngine() {
+    var rt = root.FiezelVoiceRuntime;
+    if (!rt || typeof rt.speak !== 'function' || typeof rt.status !== 'function') return null;
+    try {
+      var st = rt.status();
+      if (!st || !(st.prepared || st.ready)) return null;
+    } catch (_) { return null; }
+    return rt;
+  }
+
   function subtitles() {
     if (band) return band;
     var mod = root.FiezelSubtitle;
@@ -102,9 +125,22 @@
     }).then(function (done) {
       if (band_) band_.end();
       return done !== false;
-    }).catch(function () {
-      if (band_) band_.end();
-      return false;
+    }).catch(function (error) {
+      // Puter gagal. Sebelum menyerah, mesin perangkat dicoba - inilah satu-satunya saat
+      // ia terdengar. Kalau ia juga tidak ada atau ikut gagal, hasilnya sama seperti
+      // sebelum m025-121: false, dan pemanggil menampilkan subtitle tanpa suara.
+      var local = localEngine();
+      if (!local) { if (band_) band_.end(); return false; }
+      return local.speak(english, {
+        speed: opts.speed,
+        voice: opts.voice
+      }).then(function (done) {
+        if (band_) band_.end();
+        return done !== false;
+      }).catch(function () {
+        if (band_) band_.end();
+        return false;
+      });
     });
   }
 
@@ -129,6 +165,7 @@
     return Object.freeze({
       schema: SCHEMA,
       voiceReady: !!(voice && voice.status && voice.status().ready),
+      localFallbackReady: !!localEngine(),
       subtitleReady: !!subtitles(),
       translatorReady: !!translator()
     });
