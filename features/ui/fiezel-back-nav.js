@@ -74,6 +74,9 @@
   // berantai, tetapi harus ada batasnya supaya satu tekanan kembali tidak pernah bisa
   // menguras seluruh riwayat.
   var MAX_CHAIN = 3;
+  // Jeda antar-pemicu gestur tepi. Lebih pendek dari ini dan satu tarikan jari yang terbaca
+  // dua kali akan memundurkan dua layar sekaligus.
+  var GESTURE_COOLDOWN_MS = 450;
 
   function str(value) { return value == null ? '' : String(value); }
 
@@ -196,15 +199,18 @@
       // popstate ini adalah gema dari history.go() yang kita panggil sendiri di dismiss():
       // layarnya sudah ditutup, jadi tidak ada yang tersisa untuk dikerjakan.
       if (consumeSkip(at)) return { action: 'skipped', depth: stack.length };
-      // Tumpukan kosong berarti murid memang sedang meninggalkan aplikasi. Menahan mereka
-      // di sini akan mengurung mereka di dalam PWA tanpa jalan keluar.
-      if (!stack.length) return { action: 'exit', depth: 0 };
+      // Gerbang wajib diperiksa SEBELUM tumpukan kosong. m025-117: urutan lama memeriksa
+      // tumpukan lebih dulu, jadi gerbang yang menyala di layar pertama - kunci target
+      // harian, gerbang akun, undangan notifikasi - bisa ditembus oleh satu tekanan kembali
+      // hanya karena belum ada navigasi apa pun yang terekam. Entrinya didorong ulang supaya
+      // kedalaman riwayat tetap sama dan tekanan berikutnya tetap tertahan di sini.
       if (locked()) {
-        // Gerbang notifikasi / akun Puter sedang menutupi layar. Entrinya didorong ulang
-        // supaya kedalaman riwayat tetap sama dan tekanan berikutnya tetap tertahan di sini.
         pushHistory();
         return { action: 'blocked', depth: stack.length };
       }
+      // Tumpukan kosong berarti murid memang sedang meninggalkan aplikasi. Menahan mereka
+      // di sini akan mengurung mereka di dalam PWA tanpa jalan keluar.
+      if (!stack.length) return { action: 'exit', depth: 0 };
 
       var entry = stack.pop();
       var view = currentView();
@@ -234,6 +240,22 @@
         return { action: 'chained', depth: stack.length };
       }
       chained = 0;
+      // m025-117: jalan buntu yang sesungguhnya - tumpukan HABIS, tidak ada lapisan yang
+      // tertutup, dan view-nya sudah benar. Sampai rilis ini baris di bawah berbunyi
+      // `return {action:'noop'}` begitu saja: satu tekanan kembali yang menghabiskan entri
+      // riwayat dan TIDAK mengubah apa pun di layar. Dari sisi murid itu tidak terbaca
+      // sebagai "tidak ada tujuan" melainkan sebagai aplikasi yang macet - gesturnya jelas
+      // jalan, layarnya diam. Contoh nyatanya: modal yang ditutup lewat jalan lain
+      // meninggalkan satu entri mati di dasar tumpukan.
+      //
+      // Batas chained di atas TIDAK ikut jatuh ke sini, dan itu disengaja: di sana masih ada
+      // entri tersisa dan `chained` sudah dinolkan, jadi tekanan berikutnya melanjutkan
+      // penelusuran - murid tetap maju, hanya lebih pelan. Melompat ke beranda di situ
+      // berarti membuang layar yang masih bisa dicapai satu per satu.
+      if (!stack.length) {
+        var home = str(h.homeView) || 'home';
+        if (view !== home && applyView(home)) return { action: 'fallback', view: home, depth: 0 };
+      }
       return { action: 'noop', depth: stack.length };
     }
 
@@ -395,6 +417,27 @@
     } catch (_) { return false; }
   }
 
+  /**
+   * Apakah platform ini benar-benar TIDAK punya gestur kembali sendiri.
+   *
+   * m025-117. Alasan gestur tepi ini ada hanya berlaku untuk satu platform: di iOS mode
+   * standalone, gestur swipe-back adalah milik chrome Safari, dan di PWA terpasang chrome
+   * itu tidak ada. Android terpasang BUKAN kasus yang sama - gestur kembali sistemnya tetap
+   * berjalan di dalam PWA dan sudah memanggil history.back() sendiri. Memasang gestur kedua
+   * di atasnya berarti satu tarikan jari bisa menghasilkan DUA langkah mundur: murid yang
+   * ingin keluar dari satu folder terlempar dua layar sekaligus, atau langsung keluar dari
+   * aplikasi. Karena itu pemasangannya sekarang dipagari ke platform yang memang
+   * membutuhkannya, bukan ke "terpasang" secara umum.
+   */
+  function needsEdgeSwipe(env) {
+    if (!standalone(env)) return false;
+    try { if (env && env.navigator && env.navigator.standalone === true) return true; } catch (_) {}
+    var ua = '';
+    try { ua = str(env && env.navigator && env.navigator.userAgent); } catch (_) {}
+    if (/Android/i.test(ua)) return false;
+    return true;
+  }
+
   function pointFrom(event) {
     if (!event) return null;
     var touches = event.touches;
@@ -420,7 +463,15 @@
     var gesture = createEdgeSwipe({ env: target, edgePx: options && options.edgePx });
     var usePointer = typeof target.PointerEvent === 'function';
 
+    // Satu tarikan jari = paling banyak satu langkah mundur. Tanpa jeda ini, gestur yang
+    // terbaca dua kali (touchmove beruntun, atau gestur sistem yang ikut lewat) akan
+    // menghasilkan dua history.back() dan melompati satu layar penuh.
+    var lastFiredAt = -Infinity;
     function fire() {
+      var at = 0;
+      try { at = Date.now(); } catch (_) { at = 0; }
+      if (at - lastFiredAt < GESTURE_COOLDOWN_MS) return;
+      lastFiredAt = at;
       try { if (typeof onBack === 'function') onBack(); } catch (_) {}
     }
     function begin(event) {
@@ -475,7 +526,7 @@
     if (typeof target.addEventListener === 'function') {
       target.addEventListener('popstate', function () { controller.handlePop(); });
     }
-    if (config.edgeSwipe === true || (config.edgeSwipe !== false && standalone(target))) {
+    if (config.edgeSwipe === true || (config.edgeSwipe !== false && needsEdgeSwipe(target))) {
       installEdgeSwipe(target, function () { controller.back(); }, config);
     }
     return controller;
@@ -496,10 +547,12 @@
     VERTICAL_SLOP_PX: VERTICAL_SLOP_PX,
     SKIP_WINDOW_MS: SKIP_WINDOW_MS,
     MAX_CHAIN: MAX_CHAIN,
+    GESTURE_COOLDOWN_MS: GESTURE_COOLDOWN_MS,
     createStack: createStack,
     createEdgeSwipe: createEdgeSwipe,
     scrollsHorizontally: scrollsHorizontally,
     standalone: standalone,
+    needsEdgeSwipe: needsEdgeSwipe,
     installEdgeSwipe: installEdgeSwipe,
     install: install,
     controller: function () { return controller; },
