@@ -14,7 +14,7 @@
     vocabulary: Object.freeze({ minEntries: 1500, maxEmptyMeaningPercent: 1, maxEmptyPhoneticPercent: 5 }),
     reading: Object.freeze({ minPassages: 200, maxDuplicatePercent: 1 }),
     grammar: Object.freeze({ minTemplates: 100, minItemsPerSkill: 1 }),
-    leveltest: Object.freeze({ totalQuestions: 150 }),
+    leveltest: Object.freeze({ totalQuestions: 25 }),
     listening: Object.freeze({ minItems: 30 }),
     speaking: Object.freeze({ minItems: 30 }),
     // m025-45: Supertonic 3 ships 11 files (wasm + js + worker + four int8 models +

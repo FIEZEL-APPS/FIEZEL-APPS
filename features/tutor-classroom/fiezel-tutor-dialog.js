@@ -62,7 +62,7 @@
   }
 
   /**
-   * m025-115: nama murid sekarang menjadi salah satu token seperti {topic} dan {formula}.
+   * m025-116: nama murid sekarang menjadi salah satu token seperti {topic} dan {formula}.
    * Sampai rilis ini naskah sapaan menuliskan satu nama sungguhan apa adanya, sehingga
    * setiap murid lain disapa dengan nama orang lain. Nilainya dibaca dari aplikasi bila
    * ada; kalau tidak, token {name} menghilang dan kalimatnya tetap utuh - fill() memang

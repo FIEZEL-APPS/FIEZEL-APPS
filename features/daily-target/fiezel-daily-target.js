@@ -186,7 +186,7 @@
     /**
      * Leaving the practice screen re-raises the sheet immediately.
      *
-     * m025-115 (OWNER: "swipe back masih cacat sistem ... malah stuck screen"). Pembungkus
+     * m025-116 (OWNER: "swipe back masih cacat sistem ... malah stuck screen"). Pembungkus
      * ini adalah penyebabnya, dan bentuk bugnya persis bug yang paling dijaga oleh
      * features/ui/fiezel-back-nav.js: gelung back -> push -> back.
      *
@@ -225,7 +225,7 @@
     }
 
     /**
-     * m025-115: kunci ini TIDAK LAGI memegang riwayat sendiri.
+     * m025-116: kunci ini TIDAK LAGI memegang riwayat sendiri.
      *
      * Versi lama mendorong entri `{fiezelDailyLock:true}` miliknya sendiri saat start() dan
      * mendorong satu lagi pada setiap popstate. Niatnya benar (tekanan kembali tidak boleh
