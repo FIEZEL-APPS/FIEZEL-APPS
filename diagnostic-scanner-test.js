@@ -77,7 +77,6 @@ const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name)
     assert.strictEqual(tests.runtime(null)[0].code, 'RUNTIME_UNAVAILABLE');
     assert.strictEqual(tests.storage(null, targets)[0].code, 'STORAGE_UNAVAILABLE');
     assert.strictEqual(tests.ui(null, targets)[0].code, 'UI_UNAVAILABLE');
-    assert.strictEqual(tests.indonesianVoice(null, targets)[0].code, 'ID_VOICE_MODULE_MISSING');
     assert.strictEqual(tests.bank(null, 1, 'X')[0].code, 'X_UNAVAILABLE');
   });
 
@@ -174,21 +173,25 @@ const test = async (name, fn) => { await fn(); pass++; console.log('PASS', name)
     assert.deepStrictEqual(tests.ui({ mounted: true, empty: false, destinations: 5, lastRenderMs: 40 }, targets), [], 'a healthy screen is silent');
   });
 
-  await test('the optional Indonesian bundle degrades to a warning, drift does not', () => {
-    const notDownloaded = tests.indonesianVoice({ prepared: false, assetCount: 5 }, targets);
-    assert.strictEqual(notDownloaded[0].severity, 'warning', 'an optional bundle is never a failure');
-    const drifted = tests.indonesianVoice({ prepared: true, ready: true, assetCount: 4 }, targets).map(x => x.code);
-    assert.ok(drifted.includes('ID_VOICE_ASSET_COUNT'), 'asset drift is an error');
-    const failing = tests.indonesianVoice({ prepared: true, ready: false, assetCount: 5, error: 'boom' }, targets).map(x => x.code);
-    assert.ok(failing.includes('ID_VOICE_NOT_READY') && failing.includes('ID_VOICE_ERROR'));
+  await test('pemeriksaan paket Indonesia tidak dihidupkan kembali', () => {
+    // m025-124. Pemeriksaan ini mencari paket 94 MB yang dihapus dari produk di m025-95,
+    // lalu diarahkan ke FiezelPuterVoice yang tidak punya field prepared maupun assetCount -
+    // sehingga ia SELALU melapor "belum diunduh" dan menyalakan lencana merah permanen di
+    // panel. Alarm yang tidak pernah bisa dimatikan mengajari orang mengabaikan lencana,
+    // dan alarm yang SUNGGUHAN ikut terabaikan bersamanya.
+    assert.strictEqual(typeof tests.indonesianVoice, 'undefined',
+      'pemeriksaan indonesianVoice kembali; ia hanya bisa melapor gagal selamanya');
+    assert.ok(!bus.MODULES.includes('indonesianVoice'), 'modulnya tidak boleh terdaftar lagi');
+    assert.ok(!register.includes("registerSelfTest('indonesianVoice'"), 'pendaftarannya tidak boleh kembali');
+    assert.strictEqual(targets.indonesianVoice, undefined, 'targetnya ikut hilang, bukan ditinggal yatim');
   });
 
   await test('every scanned module is a known module id, so nothing is silently folded into core', () => {
-    for (const id of ['prosody', 'indonesianVoice', 'runtime', 'storage', 'ui', 'classroom']) {
+    for (const id of ['prosody', 'runtime', 'storage', 'ui', 'classroom']) {
       assert.ok(bus.MODULES.includes(id), `${id} must be a registered module id`);
       assert.strictEqual(bus.reportError(id, 'error', 'X', 'm').module, id, `${id} must not fall back to core`);
     }
-    for (const id of ['prosody', 'indonesianVoice', 'runtime', 'storage', 'ui']) {
+    for (const id of ['prosody', 'runtime', 'storage', 'ui']) {
       assert.ok(register.includes("registerSelfTest('" + id + "'"), `${id} must be registered for the scan`);
     }
   });
