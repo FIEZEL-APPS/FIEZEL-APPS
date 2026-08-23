@@ -69,20 +69,7 @@ function lightTokens() {
   return out;
 }
 
-/** Token tema gelap: media query preferensi sistem DAN atribut data-theme manual. */
-function darkTokens() {
-  const blocks = [];
-  LINES.forEach((line, i) => {
-    if (/prefers-color-scheme:\s*dark/.test(line) || /:root\[data-theme="dark"\]\s*{/.test(line)) {
-      blocks.push(blockAt(i + 1));
-    }
-  });
-  return declarations(blocks.join('\n'));
-}
-
 const LIGHT = lightTokens();
-const DARK = darkTokens();
-const isColor = (v) => /#[0-9a-f]{3,8}\b|rgba?\(/i.test(String(v || ''));
 
 function luminance(hex) {
   let h = hex.replace('#', '');
@@ -96,54 +83,6 @@ function ratio(a, b) {
   return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
 }
 
-/**
- * Bidang yang boleh beku, beserta alasannya. Setiap entri di sini adalah keputusan
- * desain yang sadar, bukan kelalaian - dan harus tetap begitu.
- */
-const FROZEN_BY_DESIGN = {
-  '--yellow': 'bidang CTA chunky; selalu berpasangan dengan --ink coklat di kedua tema',
-  '--yellow-deep': 'bayangan tombol dan bidang hover CTA; tintanya diwarisi --ink, 7,93:1',
-  '--coral': 'bidang aksi kedua; selalu berpasangan dengan --ink coklat di kedua tema',
-  '--coral-deep': 'hanya bayangan tombol, tidak pernah menampung teks',
-  '--mint': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
-  '--lilac': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
-  '--teal-pastel': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
-  '--ink': 'tinta coklat yang memang harus tetap coklat di atas bidang pastel',
-  '--accent-on-glass': 'alias, bukan warna tersendiri'
-};
-
-/**
- * Aturan yang bidangnya beku TETAPI tidak menampung teks sama sekali. Statis tidak bisa
- * membedakan bidang berteks dari bidang berisi SVG, jadi pengecualiannya ditulis dengan
- * alasannya supaya bisa ditinjau, bukan disembunyikan.
- */
-const NO_TEXT_INSIDE = {
-  '.fz-coach-avatar': 'lingkaran wajah pembimbing; isinya SVG, tidak pernah teks',
-  // m025-129: dua penanda seukuran garis. Keduanya digambar lewat background karena itu
-  // cara termurah menggambar lingkaran, bukan karena keduanya permukaan.
-  'html.fiezel-ui-v6 .nav.active::after': 'titik 5x5 px; pseudo-element dengan content kosong, mustahil menampung teks',
-  '.hero-ring': 'cincin kemajuan 15x15 px yang dilubangi mask; isinya tidak pernah teks',
-  // m025-131: wajah PAW di strip Coach. Sama persis dengan .fz-coach-avatar di atas -
-  // lingkaran kuning berisi SVG, tidak pernah teks.
-  '.coach-strip-face': 'lingkaran wajah PAW di strip Coach; isinya SVG, tidak pernah teks'
-};
-
-/** Aturan yang mewarisi tinta beku dari aturan dasarnya. */
-const INHERITS_FROZEN_INK = {
-  '.primary.is-coral': 'mewarisi color:var(--ink) dari button.primary',
-  '.primary.is-coral:hover': 'mewarisi color:var(--ink) dari button.primary',
-  '.primary.is-coral:active': 'mewarisi color:var(--ink) dari button.primary',
-  // m025-120: hover CTA menggelapkan bidangnya saja; tintanya tetap --ink dari aturan
-  // dasar .primary / .auth-primary, yang beku di kedua tema (7,93:1).
-  '.primary:hover': 'mewarisi color:var(--ink) dari .primary',
-  '.auth-gate .auth-primary:hover': 'mewarisi color:var(--ink) dari .auth-gate .auth-primary',
-  // m025-129: keping level memakai bidang kuning beku, tetapi tintanya datang dari
-  // .hero-stat yang memasang color:var(--ink) eksplisit - token yang juga beku. Jadi
-  // bidang dan tinta mengambil keputusan gelap-terang dari sumber yang SAMA, dan itulah
-  // syarat yang dijaga berkas ini.
-  '.hero-stat.is-level': 'mewarisi color:var(--ink) dari .hero-stat'
-};
-
 test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya', () => {
   // Ini bukan gaya - inilah yang membuat bug palet terus lolos. Blok kedua menang, tetapi
   // seluruh palet pastel justru hanya hidup di blok pertama. Siapa pun yang mengubah palet
@@ -152,57 +91,6 @@ test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya',
   if (roots < 2) throw new Error('struktur berubah: hanya ' + roots + ' blok :root ditemukan');
   if (!LIGHT['--yellow'] || !LIGHT['--panel']) {
     throw new Error('penggabungan blok :root gagal; token dari salah satu blok hilang');
-  }
-});
-
-test('setiap bidang pastel lembut punya pasangan gelap', () => {
-  const soft = ['--cream', '--cream-deep', '--yellow-soft', '--coral-soft', '--mint-soft', '--lilac-soft'];
-  const missing = soft.filter((k) => LIGHT[k] && !DARK[k]);
-  if (missing.length) {
-    throw new Error('beku di mode gelap: ' + missing.join(', ')
-      + ' — bidangnya tetap terang sementara tintanya berbalik, dan itu bug m025-113 lagi');
-  }
-});
-
-test('token warna beku hanya yang memang disengaja', () => {
-  const frozen = Object.keys(LIGHT).filter((k) => isColor(LIGHT[k]) && !DARK[k]);
-  const unexpected = frozen.filter((k) => !FROZEN_BY_DESIGN[k]);
-  if (unexpected.length) {
-    throw new Error('token warna tanpa pasangan gelap dan tanpa alasan tertulis: '
-      + unexpected.join(', ') + ' — beri pasangan gelap, atau daftarkan alasannya di FROZEN_BY_DESIGN');
-  }
-});
-
-test('bidang beku tidak pernah dipasangkan tinta yang berbalik', () => {
-  const frozenColorTokens = Object.keys(LIGHT).filter((k) => isColor(LIGHT[k]) && !DARK[k]);
-  const flippingInk = Object.keys(DARK);
-  const offenders = [];
-
-  for (const chunk of CSS.split('}')) {
-    const parts = chunk.split('{');
-    if (parts.length < 2) continue;
-    if (/prefers-color-scheme|data-theme="dark"/.test(chunk)) continue;
-
-    const selector = (parts[0].split('\n').filter((x) => x.trim()).pop() || '').trim();
-    const body = parts[1];
-    const bg = /(?:^|[;\s])background(?:-color)?\s*:\s*([^;]+)/.exec(body);
-    if (!bg) continue;
-    const bgToken = (bg[1].match(/--[a-z0-9-]+/) || [])[0];
-    if (!bgToken || !frozenColorTokens.includes(bgToken)) continue;
-
-    if (NO_TEXT_INSIDE[selector] || INHERITS_FROZEN_INK[selector]) continue;
-
-    const fg = /(?:^|[;\s])color\s*:\s*([^;]+)/.exec(body);
-    if (!fg) { offenders.push(selector + ' (bg ' + bgToken + ', tinta diwarisi)'); continue; }
-    const fgToken = (fg[1].match(/--[a-z0-9-]+/) || [])[0];
-    if (fgToken && flippingInk.includes(fgToken)) {
-      offenders.push(selector + ' (bg ' + bgToken + ' beku, tinta ' + fgToken + ' berbalik)');
-    }
-  }
-
-  if (offenders.length) {
-    throw new Error(offenders.length + ' permukaan terang-di-atas-terang di mode gelap:\n    '
-      + offenders.join('\n    '));
   }
 });
 
@@ -220,11 +108,11 @@ test('tinta coklat tetap terbaca di atas setiap bidang pastel pekat', () => {
   if (weak.length) throw new Error('tinta di bawah 4,5:1: ' + weak.join('; '));
 });
 
-test('bidang pastel lembut terbaca oleh teks tema, di kedua tema', () => {
+test('bidang pastel lembut terbaca oleh teks tema', () => {
   const soft = ['--cream', '--cream-deep', '--yellow-soft', '--coral-soft', '--mint-soft', '--lilac-soft'];
   const weak = [];
   for (const key of soft) {
-    for (const [theme, tokens] of [['terang', LIGHT], ['gelap', { ...LIGHT, ...DARK }]]) {
+    for (const [theme, tokens] of [['terang', LIGHT]]) {
       const field = (tokens[key] || '').match(/#[0-9a-f]{3,8}/i);
       const text = (tokens['--text'] || '').match(/#[0-9a-f]{3,8}/i);
       if (!field || !text) continue;
@@ -305,28 +193,34 @@ test('tinta brief terbaca di atas setiap warna brief', () => {
  * Keduanya punya satu penyebab yang bisa dijaga secara statis, jadi dijaga di sini.
  */
 
-const THEME_JS = fs.readFileSync(path.join(__dirname, 'features/ui/fiezel-dark-mode.js'), 'utf8');
+const THEME_JS = fs.readFileSync(path.join(__dirname, 'features/ui/fiezel-ui-manager.js'), 'utf8');
 
-test('memilih tema terang benar-benar menyatakan terang', () => {
-  // Aturan gelapnya `:root:not([data-theme="light"])`. Menghapus atributnya karena itu
-  // TIDAK keluar dari mode gelap - ia hanya berhenti melawannya.
-  if (/removeAttribute\(\s*['"]data-theme['"]\s*\)/.test(THEME_JS)) {
-    throw new Error('applyTheme masih menghapus data-theme; di ponsel bermode gelap, '
-      + 'memilih terang tidak mengubah apa pun karena :not([data-theme="light"]) tetap cocok');
-  }
+test('tema terang dinyatakan, bukan sekadar dibiarkan', () => {
+  // OWNER m025-134: "hapus mode gelap". Yang dijaga di sini: terang tetap DINYATAKAN
+  // sebagai atribut, bukan dibiarkan kosong - konvensi data-theme masih dibaca stylesheet
+  // atau ekstensi lain, dan atribut yang absen berarti "terserah perangkat".
   if (!/setAttribute\(\s*['"]data-theme['"]\s*,\s*['"]light['"]\s*\)/.test(THEME_JS)) {
     throw new Error('tidak ada yang memasang data-theme="light" secara eksplisit');
   }
+  if (/removeAttribute\(\s*['"]data-theme['"]\s*\)/.test(THEME_JS)) {
+    throw new Error('data-theme masih dihapus; terang harus dinyatakan');
+  }
 });
 
-test('dasar cream tidak tergantung mode perangkat', () => {
-  // OWNER: "INTINYA AKU TETAP MAU DASAR CREAM". Preferensi sistem boleh dibaca, tetapi
-  // tidak boleh menjadi tema awal.
-  const init = /initDarkMode\(\)\s*{[\s\S]*?\n  }/.exec(THEME_JS);
-  if (!init) throw new Error('initDarkMode tidak ditemukan');
-  if (/getSystemPreference\(\)/.test(init[0])) {
-    throw new Error('initDarkMode masih jatuh ke preferensi perangkat; ponsel bermode gelap '
-      + 'akan memaksa aplikasi gelap pada kunjungan pertama, padahal dasarnya harus cream');
+test('tidak ada sisa mode gelap di kode maupun palet', () => {
+  // Mode gelap dihapus seluruhnya: tidak ada sakelar, tidak ada pasangan token gelap,
+  // dan preferensi sistem tidak lagi punya suara atas tampilan aplikasi.
+  if (/toggleDarkMode|getSystemPreference|prefers-color-scheme/.test(THEME_JS)) {
+    throw new Error('pengelola UI masih memegang jalur mode gelap');
+  }
+  const leftovers = [];
+  for (const file of ['style.css', 'features/tutor-classroom/tutor-v3.css', 'features/ui/fiezel-boot-tail.js']) {
+    let text;
+    try { text = fs.readFileSync(path.join(__dirname, file), 'utf8'); } catch { continue; }
+    if (/prefers-color-scheme|data-theme="dark"|settingDarkMode/.test(text)) leftovers.push(file);
+  }
+  if (leftovers.length) {
+    throw new Error('sisa mode gelap masih ada di: ' + leftovers.join(', '));
   }
 });
 
