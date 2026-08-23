@@ -1,0 +1,93 @@
+{
+  "status": "PASS",
+  "threshold": 60,
+  "counts": {
+    "pass": 16,
+    "fail": 0,
+    "lessons": 139,
+    "gatedLessons": 16,
+    "openEntryPoints": 123
+  },
+  "checks": [
+    {
+      "name": "Unlock threshold is an explicit named constant",
+      "status": "PASS",
+      "details": "GRAMMAR_UNLOCK_MASTERY=60"
+    },
+    {
+      "name": "Unlock threshold is distinct from the mastered bar",
+      "status": "PASS",
+      "details": "melanjutkan jalur dan \"sudah dikuasai\" adalah dua ambang yang berbeda"
+    },
+    {
+      "name": "Unlock contract exposes a pure lessonUnlockState()",
+      "status": "PASS",
+      "details": "all three helpers found"
+    },
+    {
+      "name": "Every level keeps at least one open entry point",
+      "status": "PASS",
+      "details": "lessons without prerequisites=123"
+    },
+    {
+      "name": "A foundation lesson is never locked on an empty profile",
+      "status": "PASS",
+      "details": "murid baru harus selalu punya pintu masuk"
+    },
+    {
+      "name": "A lesson with unmet prerequisites is locked",
+      "status": "PASS",
+      "details": "gated lessons=16"
+    },
+    {
+      "name": "Locking names every prerequisite that is still missing",
+      "status": "PASS",
+      "details": "murid harus tahu APA yang menahannya, bukan hanya bahwa ia tertahan"
+    },
+    {
+      "name": "Mastery one point below the threshold still locks",
+      "status": "PASS",
+      "details": "be_subject_agreement at mastery 59"
+    },
+    {
+      "name": "Mastery at the threshold unlocks",
+      "status": "PASS",
+      "details": "be_subject_agreement at mastery 60"
+    },
+    {
+      "name": "Walking the curriculum in order never hits a locked lesson",
+      "status": "PASS",
+      "details": "139 lessons reachable in sequence order"
+    },
+    {
+      "name": "openGrammarLesson() refuses a locked lesson",
+      "status": "PASS",
+      "details": "entry point consults lessonUnlockState() itself"
+    },
+    {
+      "name": "renderGrammarLesson() refuses a locked lesson",
+      "status": "PASS",
+      "details": "entry point consults lessonUnlockState() itself"
+    },
+    {
+      "name": "practiceSkill() refuses a locked lesson",
+      "status": "PASS",
+      "details": "entry point consults lessonUnlockState() itself"
+    },
+    {
+      "name": "The content builder stays free of learner progress",
+      "status": "PASS",
+      "details": "inventaris soal harus bisa diaudit tanpa profil murid; penguncian ada di practiceSkill()"
+    },
+    {
+      "name": "Grammar Hub disables the button instead of only labelling it",
+      "status": "PASS",
+      "details": "kartu terkunci tidak boleh membawa onclick yang aktif"
+    },
+    {
+      "name": "Grammar Hub still shows what is waiting ahead",
+      "status": "PASS",
+      "details": "lesson terkunci tetap terlihat supaya jalurnya bisa dibaca murid"
+    }
+  ]
+}
