@@ -2711,3 +2711,9 @@ html.fiezel-ui-v6 .launcher-shell{
   .level-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .home-level-context{font-size:.62rem}
 }
+/* m025-137: lesson yang prasyaratnya belum tuntas. Kartunya sengaja tetap terbaca -
+   murid perlu melihat apa yang menunggunya di depan, bukan menemukan daftar yang kosong. */
+.card.lesson-locked{opacity:.72}
+.card.lesson-locked .lesson-card-foot button[disabled]{cursor:not-allowed;opacity:.65}
+.lesson-lock-note{display:flex;gap:7px;align-items:flex-start;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:var(--muted,#746958)}
+.lesson-lock-note i{flex:none;width:14px;height:14px;margin-top:2px}
