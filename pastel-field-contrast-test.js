@@ -1,0 +1,227 @@
+#!/usr/bin/env node
+/**
+ * m025-117 gerbang bidang pastel.
+ *
+ * KENAPA BERKAS INI ADA. Ini keluhan kontras KETIGA berturut-turut dari OWNER:
+ * m025-85, m025-113, lalu m025-116. Ketiganya bentuknya identik, dan itulah yang membuat
+ * berkas ini perlu ada - bukan warnanya yang salah, melainkan satu pola yang terus lolos:
+ *
+ *   Sebuah bidang memakai token yang TIDAK punya pasangan gelap, sehingga ia tetap
+ *   terang di mode gelap. Tinta di atasnya diwarisi dari halaman, dan tinta ITU punya
+ *   pasangan gelap, sehingga ia berbalik menjadi terang juga.
+ *
+ *   Hasilnya terang di atas terang. Di m025-116 ada lima permukaan seperti itu, dan yang
+ *   terparah 1,01:1 - benar-benar tidak terlihat.
+ *
+ * contrast-test.js yang sudah ada memeriksa PASANGAN WARNA yang sudah diketahui. Ia tidak
+ * bisa menangkap pola ini karena masalahnya bukan pada satu pasangan, melainkan pada
+ * bidang dan tinta yang mengambil keputusan gelap-terang dari sumber yang BERBEDA.
+ *
+ * ATURAN YANG DIJAGA:
+ *   Bila sebuah aturan memasang background dari token yang tidak punya pasangan gelap,
+ *   maka tinta di atasnya juga harus tidak berbalik - dipasang eksplisit ke token beku
+ *   (--ink), ke literal, atau diwarisi dari aturan dasar yang melakukannya.
+ *
+ * Bidang pastel PEKAT (--yellow, --coral) memang sengaja beku: ia selalu berpasangan
+ * dengan --ink coklat di kedua tema, persis seperti tombol chunky. Yang tidak boleh beku
+ * adalah bidang LEMBUT yang menampung teks biasa.
+ */
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const CSS = fs.readFileSync(path.join(__dirname, 'style.css'), 'utf8');
+const LINES = CSS.split('\n');
+
+let pass = 0;
+const failures = [];
+function test(name, fn) {
+  try { fn(); pass++; console.log('ok - ' + name); }
+  catch (e) { failures.push(name + ': ' + e.message); console.log('FAIL - ' + name + ': ' + e.message); }
+}
+
+/** Mengambil satu blok CSS utuh mulai dari baris tertentu (1-indexed). */
+function blockAt(start) {
+  let depth = 0, out = [];
+  for (let i = start - 1; i < LINES.length; i++) {
+    depth += (LINES[i].match(/{/g) || []).length;
+    depth -= (LINES[i].match(/}/g) || []).length;
+    out.push(LINES[i]);
+    if (depth <= 0 && out.length > 1) break;
+  }
+  return out.join('\n');
+}
+
+function declarations(text) {
+  const out = {}, re = /(--[a-z0-9-]+)\s*:\s*([^;]+);/gi;
+  let m;
+  while ((m = re.exec(text))) out[m[1]] = m[2].trim();
+  return out;
+}
+
+/** Token tema terang: gabungan SEMUA blok :root, karena style.css punya lebih dari satu. */
+function lightTokens() {
+  let out = {};
+  LINES.forEach((line, i) => {
+    if (/^:root\s*{/.test(line)) out = { ...out, ...declarations(blockAt(i + 1)) };
+  });
+  return out;
+}
+
+/** Token tema gelap: media query preferensi sistem DAN atribut data-theme manual. */
+function darkTokens() {
+  const blocks = [];
+  LINES.forEach((line, i) => {
+    if (/prefers-color-scheme:\s*dark/.test(line) || /:root\[data-theme="dark"\]\s*{/.test(line)) {
+      blocks.push(blockAt(i + 1));
+    }
+  });
+  return declarations(blocks.join('\n'));
+}
+
+const LIGHT = lightTokens();
+const DARK = darkTokens();
+const isColor = (v) => /#[0-9a-f]{3,8}\b|rgba?\(/i.test(String(v || ''));
+
+function luminance(hex) {
+  let h = hex.replace('#', '');
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  const c = [0, 2, 4].map((i) => parseInt(h.substr(i, 2), 16) / 255)
+    .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+function ratio(a, b) {
+  const x = luminance(a), y = luminance(b);
+  return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+
+/**
+ * Bidang yang boleh beku, beserta alasannya. Setiap entri di sini adalah keputusan
+ * desain yang sadar, bukan kelalaian - dan harus tetap begitu.
+ */
+const FROZEN_BY_DESIGN = {
+  '--yellow': 'bidang CTA chunky; selalu berpasangan dengan --ink coklat di kedua tema',
+  '--yellow-deep': 'hanya bayangan tombol, tidak pernah menampung teks',
+  '--coral': 'bidang aksi kedua; selalu berpasangan dengan --ink coklat di kedua tema',
+  '--coral-deep': 'hanya bayangan tombol, tidak pernah menampung teks',
+  '--mint': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
+  '--lilac': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
+  '--teal-pastel': 'pembeda skill, dipakai sebagai isian ikon bukan bidang teks',
+  '--ink': 'tinta coklat yang memang harus tetap coklat di atas bidang pastel',
+  '--accent-on-glass': 'alias, bukan warna tersendiri'
+};
+
+/**
+ * Aturan yang bidangnya beku TETAPI tidak menampung teks sama sekali. Statis tidak bisa
+ * membedakan bidang berteks dari bidang berisi SVG, jadi pengecualiannya ditulis dengan
+ * alasannya supaya bisa ditinjau, bukan disembunyikan.
+ */
+const NO_TEXT_INSIDE = {
+  '.fz-coach-avatar': 'lingkaran wajah pembimbing; isinya SVG, tidak pernah teks'
+};
+
+/** Aturan yang mewarisi tinta beku dari aturan dasarnya. */
+const INHERITS_FROZEN_INK = {
+  '.primary.is-coral': 'mewarisi color:var(--ink) dari button.primary',
+  '.primary.is-coral:hover': 'mewarisi color:var(--ink) dari button.primary',
+  '.primary.is-coral:active': 'mewarisi color:var(--ink) dari button.primary'
+};
+
+test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya', () => {
+  // Ini bukan gaya - inilah yang membuat bug palet terus lolos. Blok kedua menang, tetapi
+  // seluruh palet pastel justru hanya hidup di blok pertama. Siapa pun yang mengubah palet
+  // harus menyentuh keduanya, dan tes ini harus membaca keduanya.
+  const roots = LINES.filter((l) => /^:root\s*{/.test(l)).length;
+  if (roots < 2) throw new Error('struktur berubah: hanya ' + roots + ' blok :root ditemukan');
+  if (!LIGHT['--yellow'] || !LIGHT['--panel']) {
+    throw new Error('penggabungan blok :root gagal; token dari salah satu blok hilang');
+  }
+});
+
+test('setiap bidang pastel lembut punya pasangan gelap', () => {
+  const soft = ['--cream', '--cream-deep', '--yellow-soft', '--coral-soft', '--mint-soft', '--lilac-soft'];
+  const missing = soft.filter((k) => LIGHT[k] && !DARK[k]);
+  if (missing.length) {
+    throw new Error('beku di mode gelap: ' + missing.join(', ')
+      + ' — bidangnya tetap terang sementara tintanya berbalik, dan itu bug m025-113 lagi');
+  }
+});
+
+test('token warna beku hanya yang memang disengaja', () => {
+  const frozen = Object.keys(LIGHT).filter((k) => isColor(LIGHT[k]) && !DARK[k]);
+  const unexpected = frozen.filter((k) => !FROZEN_BY_DESIGN[k]);
+  if (unexpected.length) {
+    throw new Error('token warna tanpa pasangan gelap dan tanpa alasan tertulis: '
+      + unexpected.join(', ') + ' — beri pasangan gelap, atau daftarkan alasannya di FROZEN_BY_DESIGN');
+  }
+});
+
+test('bidang beku tidak pernah dipasangkan tinta yang berbalik', () => {
+  const frozenColorTokens = Object.keys(LIGHT).filter((k) => isColor(LIGHT[k]) && !DARK[k]);
+  const flippingInk = Object.keys(DARK);
+  const offenders = [];
+
+  for (const chunk of CSS.split('}')) {
+    const parts = chunk.split('{');
+    if (parts.length < 2) continue;
+    if (/prefers-color-scheme|data-theme="dark"/.test(chunk)) continue;
+
+    const selector = (parts[0].split('\n').filter((x) => x.trim()).pop() || '').trim();
+    const body = parts[1];
+    const bg = /(?:^|[;\s])background(?:-color)?\s*:\s*([^;]+)/.exec(body);
+    if (!bg) continue;
+    const bgToken = (bg[1].match(/--[a-z0-9-]+/) || [])[0];
+    if (!bgToken || !frozenColorTokens.includes(bgToken)) continue;
+
+    if (NO_TEXT_INSIDE[selector] || INHERITS_FROZEN_INK[selector]) continue;
+
+    const fg = /(?:^|[;\s])color\s*:\s*([^;]+)/.exec(body);
+    if (!fg) { offenders.push(selector + ' (bg ' + bgToken + ', tinta diwarisi)'); continue; }
+    const fgToken = (fg[1].match(/--[a-z0-9-]+/) || [])[0];
+    if (fgToken && flippingInk.includes(fgToken)) {
+      offenders.push(selector + ' (bg ' + bgToken + ' beku, tinta ' + fgToken + ' berbalik)');
+    }
+  }
+
+  if (offenders.length) {
+    throw new Error(offenders.length + ' permukaan terang-di-atas-terang di mode gelap:\n    '
+      + offenders.join('\n    '));
+  }
+});
+
+test('tinta coklat tetap terbaca di atas setiap bidang pastel pekat', () => {
+  const ink = (LIGHT['--ink'] || '').match(/#[0-9a-f]{3,8}/i);
+  if (!ink) throw new Error('--ink tidak ditemukan');
+  const fields = ['--yellow', '--coral', '--mint', '--lilac', '--teal-pastel'];
+  const weak = [];
+  for (const f of fields) {
+    const hex = (LIGHT[f] || '').match(/#[0-9a-f]{3,8}/i);
+    if (!hex) continue;
+    const r = ratio(ink[0], hex[0]);
+    if (r < 4.5) weak.push(f + ' ' + hex[0] + ' = ' + r.toFixed(2) + ':1');
+  }
+  if (weak.length) throw new Error('tinta di bawah 4,5:1: ' + weak.join('; '));
+});
+
+test('bidang pastel lembut terbaca oleh teks tema, di kedua tema', () => {
+  const soft = ['--cream', '--cream-deep', '--yellow-soft', '--coral-soft', '--mint-soft', '--lilac-soft'];
+  const weak = [];
+  for (const key of soft) {
+    for (const [theme, tokens] of [['terang', LIGHT], ['gelap', { ...LIGHT, ...DARK }]]) {
+      const field = (tokens[key] || '').match(/#[0-9a-f]{3,8}/i);
+      const text = (tokens['--text'] || '').match(/#[0-9a-f]{3,8}/i);
+      if (!field || !text) continue;
+      const r = ratio(field[0], text[0]);
+      if (r < 4.5) weak.push(key + ' @' + theme + ' = ' + r.toFixed(2) + ':1');
+    }
+  }
+  if (weak.length) throw new Error('teks tema tidak terbaca di atasnya: ' + weak.join('; '));
+});
+
+console.log('');
+if (failures.length) {
+  console.log('FIEZEL gerbang bidang pastel: FAIL (' + failures.length + ')');
+  process.exit(1);
+}
+console.log('FIEZEL gerbang bidang pastel: PASS ' + pass + '/0');
