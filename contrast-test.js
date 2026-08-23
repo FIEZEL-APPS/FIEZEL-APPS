@@ -262,7 +262,10 @@ const hex = c => '#' + [c.r, c.g, c.b]
 // sini adalah kasus TERBURUK yang bisa ditulis app.js (putih penuh saat siang) pada
 // opasitas lapisan yang memang tertulis di CSS. Dua tint radial pada body sengaja
 // diabaikan: keduanya <= 18% dan tidak bisa membalik satu pun pasangan di bawah.
-const SKY = { day: '#ffffff', night: '#0d0710' };
+// m025-115: SCENE_STOPS di app.js kini seluruhnya pastel - langit tidak pernah lagi
+// menjadi bidang gelap yang menutup halaman. Kasus terburuk untuk tinta gelap sekarang
+// adalah rona malam terpekatnya (#EFE0C4), bukan #0d0710 yang sudah tidak ada di mana pun.
+const SKY = { day: '#ffffff', night: '#EFE0C4' };
 
 function skyOpacity(theme, scene) {
   let value = null;
@@ -486,13 +489,59 @@ test('akar C — .scene-day/.scene-dawn sadar tema, 12 token kaca berhenti jadi 
   assert.ok(luminance(ink) > 0.7, 'tinta kaca mode gelap = ' + hex(ink) + ', masih tinta terang');
 });
 
-test('akar C — .scene-dusk/.scene-night tetap material gelap di kedua tema', () => {
+// m025-115 MENGGANTI kontrak lama di sini, dan penggantiannya disengaja.
+//
+// Sampai m025-114 aturannya berbunyi ".scene-dusk/.scene-night tetap material gelap di
+// KEDUA tema": jam 17.00 membalik seluruh permukaan aplikasi menjadi gelap, bahkan untuk
+// murid yang memilih tema terang. Itulah sumber dua bug kontras berturut-turut (m025-85
+// dan m025-113): satu permukaan punya dua sumber kebenaran - tema DAN jam - dan setiap
+// aturan baru harus menebak yang mana yang menang.
+//
+// Brief redesign OWNER menutup perdebatannya dari sisi produk: "Ceria adalah default,
+// bukan aksen. Kalau ragu antara membuat sesuatu lebih hangat/cerah atau lebih
+// gelap/netral, pilih yang lebih hangat/cerah." Membalik seluruh aplikasi menjadi gelap
+// tiap malam adalah kebalikan persis dari itu.
+//
+// Aturan barunya, dan inilah yang dijaga di bawah: FASE LANGIT TIDAK BOLEH MENYENTUH
+// SATU PUN TOKEN MATERIAL. Ia hanya mewarnai langit. Tema yang menentukan material.
+test('m025-115 — fase langit hanya mewarnai langit, tidak pernah material', () => {
+  const SKY_ONLY = new Set(['--sky-top', '--sky-bottom', '--scene-light', '--orbit-x', '--orbit-y']);
+  for (const sel of ['.scene-day,.scene-dawn', '.scene-dusk', '.scene-night']) {
+    const vars = collectVars('style', eq(sel));
+    const declared = Object.keys(vars);
+    assert.ok(declared.length, sel + ' tidak mendeklarasikan apa pun');
+    const bocor = declared.filter(k => !SKY_ONLY.has(k));
+    assert.deepStrictEqual(bocor, [],
+      sel + ' memasang token material: ' + bocor.join(', ') + ' - fase langit tidak boleh menentukan permukaan');
+  }
+});
+
+test('m025-115 — material malam sama persis dengan material siang, per tema', () => {
+  const MATERIAL = ['--glass-thin', '--glass-regular', '--glass-thick', '--glass-solid',
+    '--glass-edge', '--glass-text', '--glass-muted', '--glass-line', '--ambient-text',
+    '--ambient-muted', '--chrome-bg'];
   for (const theme of ['light', 'dark']) {
-    const vars = themeVars(theme, 'night');
-    const glass = parseColor(resolveValue('var(--glass-thick)', vars));
-    const ink = parseColor(resolveValue('var(--glass-text)', vars));
-    assert.ok(luminance(glass) < 0.08, theme + '/malam: kaca ' + hex(glass) + ' tidak gelap');
-    assert.ok(luminance(ink) > 0.7, theme + '/malam: tinta ' + hex(ink) + ' tidak terang');
+    const day = themeVars(theme, 'day');
+    const night = themeVars(theme, 'night');
+    for (const key of MATERIAL) {
+      assert.strictEqual(night[key], day[key],
+        theme + ': ' + key + ' berubah saat malam (' + day[key] + ' -> ' + night[key] + ')');
+    }
+  }
+});
+
+test('m025-115 — tema terang tetap terang sepanjang hari, tema gelap tetap gelap', () => {
+  for (const scene of ['day', 'night']) {
+    const light = themeVars('light', scene);
+    const dark = themeVars('dark', scene);
+    const lightGlass = parseColor(resolveValue('var(--glass-thick)', light));
+    const lightInk = parseColor(resolveValue('var(--glass-text)', light));
+    assert.ok(luminance(lightGlass) > 0.7, 'terang/' + scene + ': kaca ' + hex(lightGlass) + ' tidak terang');
+    assert.ok(luminance(lightInk) < 0.1, 'terang/' + scene + ': tinta ' + hex(lightInk) + ' tidak gelap');
+    const darkGlass = parseColor(resolveValue('var(--glass-thick)', dark));
+    const darkInk = parseColor(resolveValue('var(--glass-text)', dark));
+    assert.ok(luminance(darkGlass) < 0.06, 'gelap/' + scene + ': kaca ' + hex(darkGlass) + ' tidak gelap');
+    assert.ok(luminance(darkInk) > 0.7, 'gelap/' + scene + ': tinta ' + hex(darkInk) + ' tidak terang');
   }
 });
 
@@ -521,22 +570,27 @@ test('kedua blok gelap style.css identik, tidak ada drift', () => {
 });
 
 test('token permukaan terang persis seperti literal yang digantikannya', () => {
-  // Kontrak m025-85: mode terang TIDAK BOLEH bergeser. Nilai di sebelah kanan adalah
-  // literal yang dulu dipaku di setiap aturan; kalau ada yang menggesernya, tes ini merah.
+  // Kontrak m025-85 mengunci token ini pada literal terang LAMA supaya tidak ada
+  // perbaikan kontras yang diam-diam menggeser tampilan mode terang.
+  //
+  // m025-115 menggeser semuanya DENGAN SENGAJA: brief redesign OWNER meminta dasar cream
+  // menggantikan seluruh dasar maroon, dan seluruh paletnya pastel. Kuncinya tidak
+  // dibuang - ia dipindahkan ke nilai baru, jadi pergeseran berikutnya tetap harus
+  // disengaja dan tetap akan memerahkan tes ini.
   const vars = themeVars('light', 'day');
   const expect = {
-    '--surface-rgb': '255,254,250',
+    '--surface-rgb': '255,253,248',
     '--surface-pure-rgb': '255,255,255',
-    '--bg-rgb': '250,247,246',
+    '--bg-rgb': '255,249,240',
     '--surface-solid': '#ffffff',
-    '--surface-tint': '#fdfafa',
-    '--surface-warm': '#f6f4ed',
-    '--surface-cool': '#f9fbfd',
-    '--surface-edge': '#f3dfe3',
-    '--surface-edge-strong': '#e7cdd2',
-    '--surface-mute': '#e4eaf2',
-    '--ink-soft': '#4a343a',
-    '--ink-danger': '#a13454'
+    '--surface-tint': '#fffbf4',
+    '--surface-warm': '#fdf4e6',
+    '--surface-cool': '#f7f7f1',
+    '--surface-edge': '#f2e2cb',
+    '--surface-edge-strong': '#e8d3b2',
+    '--surface-mute': '#f0e8dc',
+    '--ink-soft': '#4E4130',
+    '--ink-danger': '#A63A24'
   };
   for (const [key, want] of Object.entries(expect)) {
     assert.strictEqual(vars[key], want, key + ' bergeser dari nilai terang aslinya');
