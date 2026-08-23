@@ -72,6 +72,7 @@ jobs:
           node level-evidence-test.js
           node neural-cache-isolation-test.js
           node prerequisite-graph-test.js
+          node e2e-level-grammar-test.js
           node notification-reminder-test.js
           node remote-push-test.js
           node core-brain-test.js
