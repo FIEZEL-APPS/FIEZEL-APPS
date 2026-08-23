@@ -136,6 +136,33 @@ tutor kini menyebut sebab spesifik, seluruhnya Indonesia, tanpa `pageerror`.
 
 Penanda rilis `FIEZEL_PAGE_BUILD` / `DIAG_BUILD` / `SW_REV` ketiganya **m025-128**.
 
+Seluruh 18 check di CI hijau, termasuk `audiobook-safari`.
+
+## 7. Koreksi atas diagnosis di m025-120 (#171)
+
+Handoff m025-120 menyatakan `audiobook-safari` "merah secara struktural" karena
+`vendor/supertonic-3/` tidak dilacak git "di setiap commit di repo ini", dan memperkirakan
+"setiap rilis di masa depan akan memerahkan gate ini". **Generalisasinya salah.**
+
+Pengukurannya benar untuk saat itu — pada `f2cb6be` (m025-119, basis cabang itu) direktorinya
+memang belum ada. Yang keliru adalah menyimpulkan keadaan itu berlaku selamanya. Direktori
+itu masuk lewat **#173 (m025-121)**:
+
+```
+$ git log --oneline --diff-filter=A -1 -- vendor/supertonic-3/sherpa-onnx-wasm-main-tts.wasm
+a327872 m025-121: kartu akun Puter, dan suara cadangan yang menyiapkan dirinya sendiri (#173)
+
+$ git ls-tree -r --name-only origin/main | grep -c '^vendor/'
+14
+```
+
+Celahnya sementara, bukan struktural, dan sudah tertutup sendiri oleh jalan yang waktu itu
+saya sebut sebagai opsi 1. Tidak ada keputusan governance yang perlu diambil soal ini.
+
+Pelajarannya untuk handoff berikutnya: pengukuran satu titik waktu adalah bukti tentang titik
+waktu itu, bukan tentang seluruh sejarah repo. Kalimat "di setiap commit" menuntut pemeriksaan
+lintas commit — dan saya tidak melakukannya sebelum menuliskannya.
+
 Cabang ini dibuat dari m025-126; sementara berjalan, main maju ke m025-127 (#179 kontras logo
 topbar). main sudah disatukan — satu-satunya konflik adalah `SW_REV`, diselesaikan ke
 **m025-128** karena m025-127 sudah dipakai main. Precache berkas diagnosis dan pendaftaran
