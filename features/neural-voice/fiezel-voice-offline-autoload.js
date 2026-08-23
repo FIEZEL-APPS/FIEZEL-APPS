@@ -276,6 +276,58 @@
     });
   }
 
+  /** Ukuran potongan ke-index milik satu aset. Potongan terakhir hampir selalu lebih
+   *  pendek, dan menghitungnya sebagai potongan penuh akan melaporkan persentase yang
+   *  lebih besar daripada yang benar-benar tersimpan. */
+  function chunkSize(item, index) {
+    var start = index * CHUNK_BYTES;
+    return Math.max(0, Math.min(item.bytes, start + CHUNK_BYTES) - start);
+  }
+
+  /**
+   * Kemajuan sesungguhnya, dihitung dari ISI CACHE - bukan dari penghitung di localStorage.
+   *
+   * Ini bukan kerumitan yang tidak perlu. bytesDone di state hanya bertambah dan tidak
+   * pernah tahu apa-apa tentang cache yang dibersihkan browser, aset yang sudah ada dari
+   * tombol lama, atau perakitan yang gagal. Angka yang bertambah terus sementara cache
+   * kosong adalah persis jenis laporan yang membuat orang percaya sesuatu sudah selesai
+   * padahal belum - dan yang ditanyakan OWNER di sini justru "sudah berapa persen".
+   */
+  async function progress() {
+    var rt = runtime();
+    var total = rt ? Number(rt.totalBytes || 0) : 0;
+    var out = { schema: SCHEMA, percent: 0, doneBytes: 0, totalBytes: total, assetsDone: 0, assetCount: 0, state: 'belum mulai' };
+    var state = readState();
+    if (!rt || typeof rt.assets !== 'function') { out.state = 'mesin suara belum dimuat'; return Object.freeze(out); }
+    var items = rt.assets();
+    out.assetCount = items.length;
+    if (!root.caches) { out.state = 'perangkat ini tidak punya Cache Storage'; return Object.freeze(out); }
+
+    var cache;
+    try { cache = await root.caches.open(rt.cacheName); }
+    catch (_) { out.state = 'cache tidak bisa dibuka'; return Object.freeze(out); }
+
+    var done = 0, whole = 0;
+    for (var a = 0; a < items.length; a++) {
+      var item = items[a];
+      var url = rt.assetUrl(item.path);
+      if (await cache.match(url)) { done += item.bytes; whole++; continue; }
+      var parts = chunkCount(item.bytes);
+      for (var i = 0; i < parts; i++) {
+        if (await cache.match(partUrl(url, i))) done += chunkSize(item, i);
+      }
+    }
+    out.doneBytes = done;
+    out.assetsDone = whole;
+    out.percent = total > 0 ? Math.round((done / total) * 1000) / 10 : 0;
+    out.state = state.done ? 'selesai'
+      : running ? 'sedang mengunduh'
+      : blockedReason() ? ('ditahan: ' + blockedReason())
+      : state.signedInAt ? 'menunggu giliran'
+      : 'belum mulai (belum ada login terdeteksi)';
+    return Object.freeze(out);
+  }
+
   function stop() { stopped = true; return true; }
   function resume() { stopped = false; schedule(); return true; }
 
@@ -289,6 +341,7 @@
     CHUNK_BYTES: CHUNK_BYTES,
     noteSignedIn: noteSignedIn,
     status: status,
+    progress: progress,
     stop: stop,
     resume: resume,
     pump: pump

@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-122';
+  var DIAG_BUILD = 'm025-123';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -183,6 +183,39 @@
         ? root.FiezelVoiceRuntime.diagnostics() : '(FiezelVoiceRuntime tidak ada)';
     });
   }
+  /**
+   * m025-123: kemajuan unduhan suara cadangan, ditaruh PALING ATAS di dump.
+   *
+   * Unduhan itu sengaja tidak terlihat murid - itu permintaan OWNER. Tetapi "tidak
+   * terlihat murid" tidak boleh berarti "tidak bisa diperiksa siapa pun": OWNER menanyakan
+   * sudah berapa persen, dan tanpa ini satu-satunya jawaban adalah membaca entri
+   * diagnostik satu per satu dan menghitungnya sendiri. Panel ini memang tempatnya -
+   * tersembunyi di balik gestur lima ketuk, jadi murid tidak akan pernah tidak sengaja
+   * menemukannya.
+   */
+  function addOfflineVoiceBackup(dump) {
+    var mod = root.FiezelVoiceOfflineAutoload;
+    if (!mod || typeof mod.progress !== 'function') {
+      dump.offlineVoiceBackup = '(pengunduh suara cadangan belum dimuat)';
+      return Promise.resolve(dump);
+    }
+    return mod.progress().then(function (p) {
+      var mb = function (bytes) { return Math.round(Number(bytes || 0) / 1000000) + ' MB'; };
+      dump.offlineVoiceBackup = {
+        ringkasan: p.percent + '% (' + mb(p.doneBytes) + ' dari ' + mb(p.totalBytes) + ')',
+        persen: p.percent,
+        keadaan: p.state,
+        berkasSelesai: p.assetsDone + ' dari ' + p.assetCount,
+        bitaTerunduh: p.doneBytes,
+        bitaTotal: p.totalBytes
+      };
+      return dump;
+    }).catch(function (error) {
+      dump.offlineVoiceBackup = 'Gagal membaca kemajuan: ' + String((error && error.message) || error);
+      return dump;
+    });
+  }
+
   function serialize(value) {
     try { return JSON.stringify(value, null, 2); }
     catch (error) { return 'Gagal membentuk JSON: ' + String(error && error.message || error); }
@@ -589,7 +622,7 @@
       dump = collectSync();
       addRuntimeDiagnostics(dump);
       setText();
-      Promise.all([addStorageEstimate(dump), addCacheInventory(dump), runUniversalScan()]).then(function(){
+      Promise.all([addOfflineVoiceBackup(dump), addStorageEstimate(dump), addCacheInventory(dump), runUniversalScan()]).then(function(){
         setText();
       });
     }
