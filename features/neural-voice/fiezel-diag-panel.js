@@ -15,7 +15,7 @@
   // DIAG_BUILD adalah penanda deploy manual yang sekarang dijaga A7. Untuk setiap
   // product deploy, angka m025-N wajib naik tepat +1 dan SW_REV wajib membawa build
   // yang sama. Ini membedakan build baru aktif vs shell lama dari service worker.
-  var DIAG_BUILD = 'm025-125';
+  var DIAG_BUILD = 'm025-126';
 
   var KEY = 'fiezel-neural-voice-diagnostics-v1';
   var Z = 2147483000;
@@ -184,7 +184,7 @@
     });
   }
   /**
-   * m025-124: kemajuan unduhan suara cadangan, ditaruh PALING ATAS di dump.
+   * m025-125: kemajuan unduhan suara cadangan, ditaruh PALING ATAS di dump.
    *
    * Unduhan itu sengaja tidak terlihat murid - itu permintaan OWNER. Tetapi "tidak
    * terlihat murid" tidak boleh berarti "tidak bisa diperiksa siapa pun": OWNER menanyakan
