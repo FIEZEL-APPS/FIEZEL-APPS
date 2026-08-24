@@ -64,6 +64,8 @@ jobs:
           node ui-structure-test.js
           node back-nav-test.js
           node grammar-quality-audit.js
+          node content-integrity-audit.js
+          node content-integrity-gate-test.js
           node grammar-curriculum-test.js
           node level-grammar-contract-test.js
           node grammar-unlock-test.js

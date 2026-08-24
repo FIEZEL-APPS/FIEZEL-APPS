@@ -144,8 +144,15 @@ test('app.js mencoba nama miskonsepsi LEBIH DULU sebelum mencocokkan pola teks I
 test('nama miskonsepsi benar-benar diteruskan dari soal, bukan sekadar diterima parameternya', () => {
   assert.ok(/grammarOptionReason\(x\.x,false,x\.reason,misMap\[x\.x\]\)/.test(app),
     'makeGrammarQuestion tidak meneruskan peta miskonsepsi');
-  assert.ok(/grammarOptionReason\(target\.option,false,target\.reason,target\.detail\?\.misconception\)/.test(app),
+  // m025-149: detail.misconception sekarang membawa LABEL Indonesia, karena label itulah yang
+  // ditampilkan sebagai pilihan di mode label_misconception. Kunci pencarian diagnosis tetap
+  // nama Inggris-nya dan pindah ke detail.misconceptionKey, sebab GRAMMAR_MISCONCEPTION_ID
+  // memang berkunci nama Inggris. Yang dijaga gate ini adalah namanya benar-benar DITERUSKAN
+  // dari soal - bukan properti mana yang kebetulan menampungnya.
+  assert.ok(/grammarOptionReason\(target\.option,false,target\.reason,target\.detail\?\.misconceptionKey\)/.test(app),
     'varian metakognitif tidak meneruskan nama miskonsepsi');
+  assert.ok(/misconceptionKey:String\(x\.misconception\|\|''\)/.test(app),
+    'hidrasi tidak menyimpan nama miskonsepsi Inggris sebagai kunci diagnosis');
 });
 
 test('pilihan yang tampil sebagai kalimat utuh tetap ketemu diagnosisnya', () => {

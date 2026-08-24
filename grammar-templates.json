@@ -1880,7 +1880,7 @@
           "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type",
           "whyFails": "'Little' pairs with uncountable nouns (little water), not countable plural nouns like 'chairs', which need 'few'.",
           "whyFailsId": "“Little” berpasangan dengan benda tak terhitung seperti little water, bukan dengan kata jamak terhitung seperti “chairs” yang menuntut “few”.",
-          "misconceptionId": "kata jumlah untuk benda tak terhitung dipakai pada kata benda jamak terhitung"
+          "misconceptionId": "kata jumlah untuk benda tak terhitung dipakai pada benda jamak terhitung, sekaligus salah memilih jenis kelangkaannya"
         },
         {
           "option": "much of",
@@ -4756,7 +4756,7 @@
         "whyCorrectId": "“Pleased with” lazim dipakai untuk menyebut orang, penampilan, atau hasil tertentu yang sedang dinilai secara positif.",
         "whyOthersFailId": "Pilihan lainnya menyatakan keadaan yang lebih luas, ikut senang atas nama orang lain, atau pasangan kata yang tidak baku.",
         "howToAvoidId": "Kenali apa yang menyusul: hal tertentu yang dinilai memakai with, keadaan memakai about, dan orang yang diikutsenangi memakai for.",
-        "memoryCueId": "Pleased with the result; pleased about the news; pleased for you."
+        "memoryCueId": "Pleased memakai with untuk hasil, about untuk kabar, dan for untuk orang lain."
       },
       "pedagogicalObjectiveId": "Siswa memilih kata depan yang tepat setelah kata sifat perasaan, sesuai apakah penyebabnya berupa orang atau hal tertentu, atau berupa keadaan",
       "misconceptionTargetedId": "Siswa memakai satu kata depan bawaan, biasanya “about”, setelah semua kata sifat perasaan tanpa melihat apa yang menyusul",
@@ -7247,17 +7247,23 @@
         {
           "option": "a",
           "misconception": "consonant-letter shortcut",
-          "whyFails": "'Engineer' begins with a vowel sound, so 'a' is not the correct indefinite article."
+          "whyFails": "'Engineer' begins with a vowel sound, so 'a' is not the correct indefinite article.",
+          "misconceptionId": "jalan pintas lewat huruf, bukan bunyi",
+          "whyFailsId": "“Engineer” diawali bunyi vokal, jadi “a” bukan article yang tepat di sini."
         },
         {
           "option": "the",
           "misconception": "specific-article overuse",
-          "whyFails": "Nothing says the listener already knows which engineer; this is a first, non-specific mention."
+          "whyFails": "Nothing says the listener already knows which engineer; this is a first, non-specific mention.",
+          "misconceptionId": "article penunjuk dipakai terlalu cepat",
+          "whyFailsId": "Tidak ada tanda bahwa pendengar sudah tahu engineer yang mana; ini penyebutan pertama yang masih umum."
         },
         {
           "option": "some",
           "misconception": "plural-or-uncountable quantifier",
-          "whyFails": "'Engineer' is a singular countable noun, so 'some' cannot introduce it here."
+          "whyFails": "'Engineer' is a singular countable noun, so 'some' cannot introduce it here.",
+          "misconceptionId": "penentu jumlah untuk benda jamak atau tak terhitung",
+          "whyFailsId": "“Engineer” adalah kata benda tunggal yang bisa dihitung, jadi “some” tidak bisa memperkenalkannya di sini."
         }
       ],
       "explanation": {
@@ -7265,8 +7271,16 @@
         "rule": "Use a before a consonant sound, an before a vowel sound, and the when the noun is specific or already known.",
         "whyOthersFail": "'A' does not match the initial vowel sound; 'the' adds an unsupported specific reference; 'some' does not introduce one singular countable noun.",
         "howToAvoid": "Say the first sound aloud, then ask whether you mean one of many or a particular known item.",
-        "memoryCue": "Listen to the sound: an engineer."
-      }
+        "memoryCue": "Listen to the sound: an engineer.",
+        "ruleId": "Pakai a sebelum bunyi konsonan, an sebelum bunyi vokal, dan the ketika bendanya sudah jelas atau sudah dikenal pendengar.",
+        "whyCorrectId": "Kata “engineer” diawali bunyi vokal, jadi article yang cocok adalah “an”.",
+        "whyOthersFailId": "“A” tidak cocok dengan bunyi vokal di awal, “the” menambahkan kesan benda yang sudah dikenal padahal belum, dan “some” tidak dipakai untuk satu benda tunggal yang bisa dihitung.",
+        "howToAvoidId": "Ucapkan dulu bunyi awal kata bendanya, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah dikenal?",
+        "memoryCueId": "Dengarkan bunyinya, bukan hurufnya: an engineer."
+      },
+      "pedagogicalObjectiveId": "Memilih a, an, atau the berdasarkan bunyi awal kata benda dan apakah pendengar sudah tahu benda yang dimaksud",
+      "misconceptionTargetedId": "Siswa memilih an hanya dari huruf yang tertulis, atau memakai the padahal bendanya baru disebut pertama kali",
+      "reasoningOperationId": "dengar bunyi awal kata bendanya → periksa sudah dikenal atau belum → pilih article-nya"
     },
     {
       "id": "A1-009",
@@ -7289,17 +7303,23 @@
         {
           "option": "have",
           "misconception": "plural-form transfer",
-          "whyFails": "A singular third-person subject such as 'she' takes 'has got', not 'have got'."
+          "whyFails": "A singular third-person subject such as 'she' takes 'has got', not 'have got'.",
+          "misconceptionId": "bentuk jamak dipakai untuk subjek tunggal",
+          "whyFailsId": "Subjek orang ketiga tunggal seperti “she” memakai “has got”, bukan “have got”."
         },
         {
           "option": "is",
           "misconception": "be-verb substitution",
-          "whyFails": "'Is got' is not the possession structure tested here; the correct form is 'has got'."
+          "whyFails": "'Is got' is not the possession structure tested here; the correct form is 'has got'.",
+          "misconceptionId": "kata kerja be dipakai menggantikan have",
+          "whyFailsId": "“Is got” bukan pola kepemilikan; bentuk yang benar adalah “has got”."
         },
         {
           "option": "does",
           "misconception": "double-auxiliary construction",
-          "whyFails": "'Does got' is not grammatical; 'have got' forms its own possession pattern."
+          "whyFails": "'Does got' is not grammatical; 'have got' forms its own possession pattern.",
+          "misconceptionId": "dua kata bantu dipakai sekaligus",
+          "whyFailsId": "“Does got” tidak gramatikal; “have got” sudah membentuk pola kepemilikannya sendiri."
         }
       ],
       "explanation": {
@@ -7307,8 +7327,16 @@
         "rule": "Use have got with I, you, we, and they; use has got with he, she, and it.",
         "whyOthersFail": "'Have' does not agree with 'she'; 'is' and 'does' do not form the have-got possession structure.",
         "howToAvoid": "Choose have or has from the subject first, then keep got after it.",
-        "memoryCue": "He, she, it has got; I, you, we, they have got."
-      }
+        "memoryCue": "He, she, it has got; I, you, we, they have got.",
+        "ruleId": "Pakai have got untuk I, you, we, dan they; pakai has got untuk he, she, dan it.",
+        "whyCorrectId": "“She” adalah orang ketiga tunggal, jadi bentuknya “has got”.",
+        "whyOthersFailId": "“Have” tidak selaras dengan “she”, sedangkan “is” dan “does” tidak membentuk pola kepemilikan have got.",
+        "howToAvoidId": "Tentukan dulu have atau has dari subjeknya, baru letakkan got sesudahnya.",
+        "memoryCueId": "Pakai has got untuk he, she, dan it; pakai have got untuk I, you, we, dan they."
+      },
+      "pedagogicalObjectiveId": "Memakai have got atau has got sesuai subjek, dan menyusun kalimat kepemilikan sederhana",
+      "misconceptionTargetedId": "Siswa memakai have untuk subjek orang ketiga tunggal, atau menggabungkan do dengan have got",
+      "reasoningOperationId": "lihat jumlah subjeknya → pilih have atau has → pertahankan got sesudahnya"
     },
     {
       "id": "A1-010",
@@ -7331,17 +7359,23 @@
         {
           "option": "play",
           "misconception": "missing-past-marking",
-          "whyFails": "'Yesterday' places the action in the past, so the regular verb needs its past form 'played'."
+          "whyFails": "'Yesterday' places the action in the past, so the regular verb needs its past form 'played'.",
+          "misconceptionId": "tanda waktu lampau tidak dipasang",
+          "whyFailsId": "“Yesterday” menempatkan kejadian di masa lampau, jadi kata kerjanya perlu bentuk “played”."
         },
         {
           "option": "plays",
           "misconception": "third-person-present form",
-          "whyFails": "'Plays' is present simple for he, she, or it; 'they' and 'yesterday' require past simple."
+          "whyFails": "'Plays' is present simple for he, she, or it; 'they' and 'yesterday' require past simple.",
+          "misconceptionId": "bentuk present orang ketiga tunggal",
+          "whyFailsId": "“Plays” dipakai untuk he, she, atau it di waktu sekarang; “they” dengan “yesterday” meminta past simple."
         },
         {
           "option": "playing",
           "misconception": "progressive-form substitution",
-          "whyFails": "'Playing' needs an auxiliary such as 'were' and does not by itself mark a completed past event."
+          "whyFails": "'Playing' needs an auxiliary such as 'were' and does not by itself mark a completed past event.",
+          "misconceptionId": "bentuk -ing dipakai tanpa kata bantu",
+          "whyFailsId": "“Playing” memerlukan kata bantu seperti “were”, dan sendirian ia tidak menandai kejadian lampau yang selesai."
         }
       ],
       "explanation": {
@@ -7349,8 +7383,16 @@
         "rule": "Regular past simple usually adds -ed; after did or did not, the main verb returns to its base form.",
         "whyOthersFail": "'Play' omits the past marker; 'plays' is present third person; 'playing' is a participle without an auxiliary.",
         "howToAvoid": "Find the time word first. If did already appears, use the base form after did.",
-        "memoryCue": "Yesterday: play becomes played; did + play, never did + played."
-      }
+        "memoryCue": "Yesterday: play becomes played; did + play, never did + played.",
+        "ruleId": "Past simple beraturan umumnya menambah -ed; setelah did atau did not, kata kerja utama kembali ke bentuk dasar.",
+        "whyCorrectId": "“Yesterday” menandai waktu lampau yang sudah selesai, jadi bentuknya “played”.",
+        "whyOthersFailId": "“Play” belum menandai waktu lampau, “plays” adalah present untuk orang ketiga tunggal, dan “playing” butuh kata bantu.",
+        "howToAvoidId": "Cari kata penanda waktunya dulu. Kalau did sudah muncul, pakai bentuk dasar sesudahnya.",
+        "memoryCueId": "Yesterday: play jadi played; did + play, bukan did + played."
+      },
+      "pedagogicalObjectiveId": "Membentuk dan memakai past simple kata kerja beraturan dalam kalimat positif dan negatif",
+      "misconceptionTargetedId": "Siswa menambahkan -ed setelah did, atau salah mengeja kata kerja berakhiran konsonan + y",
+      "reasoningOperationId": "temukan penanda waktu lampau → periksa apakah did sudah membawa tanda tense → pilih bentuk dasar atau -ed"
     },
     {
       "id": "A1-011",
@@ -7373,17 +7415,23 @@
         {
           "option": "was",
           "misconception": "singular-past transfer",
-          "whyFails": "'They' is plural, so the past form must be 'were', not 'was'."
+          "whyFails": "'They' is plural, so the past form must be 'were', not 'was'.",
+          "misconceptionId": "bentuk lampau tunggal dipakai untuk subjek jamak",
+          "whyFailsId": "“They” berbentuk jamak, jadi bentuk lampaunya “were”, bukan “was”."
         },
         {
           "option": "are",
           "misconception": "present-tense substitution",
-          "whyFails": "'Yesterday' requires a past form, while 'are' is present tense."
+          "whyFails": "'Yesterday' requires a past form, while 'are' is present tense.",
+          "misconceptionId": "bentuk sekarang dipakai untuk waktu lampau",
+          "whyFailsId": "“Yesterday” meminta bentuk lampau, sedangkan “are” adalah bentuk sekarang."
         },
         {
           "option": "be",
           "misconception": "bare-infinitive substitution",
-          "whyFails": "The finite past verb cannot be the bare form 'be'; choose 'were' for 'they'."
+          "whyFails": "The finite past verb cannot be the bare form 'be'; choose 'were' for 'they'.",
+          "misconceptionId": "bentuk dasar dipakai sebagai kata kerja utama",
+          "whyFailsId": "Kata kerja lampau di sini tidak boleh berbentuk dasar “be”; untuk “they” pilih “were”."
         }
       ],
       "explanation": {
@@ -7391,8 +7439,16 @@
         "rule": "Use was with I, he, she, and it; use were with you, we, and they.",
         "whyOthersFail": "'Was' is singular, 'are' is present, and bare 'be' is not a finite past form.",
         "howToAvoid": "Say the subject-and-be pair aloud: I was, she was, you were, they were.",
-        "memoryCue": "They were yesterday; she was yesterday."
-      }
+        "memoryCue": "They were yesterday; she was yesterday.",
+        "ruleId": "Pakai was untuk I, he, she, dan it; pakai were untuk you, we, dan they.",
+        "whyCorrectId": "Subjek jamak “they” memakai “were” dalam bentuk lampau.",
+        "whyOthersFailId": "“Was” untuk subjek tunggal, “are” bentuk sekarang, dan “be” sendirian bukan bentuk lampau yang lengkap.",
+        "howToAvoidId": "Ucapkan pasangan subjek dan be-nya: I was, she was, you were, they were.",
+        "memoryCueId": "Untuk subjek they pakai were; untuk subjek she pakai was."
+      },
+      "pedagogicalObjectiveId": "Memasangkan was atau were dengan subjeknya dalam kalimat be bentuk lampau",
+      "misconceptionTargetedId": "Siswa memakai was untuk subjek jamak, atau menambahkan did sebelum was dan were dalam pertanyaan",
+      "reasoningOperationId": "lihat jumlah subjeknya → pasangkan dengan was atau were → dalam pertanyaan, letakkan be sebelum subjek"
     },
     {
       "id": "A1-012",
@@ -7415,17 +7471,23 @@
         {
           "option": "citys",
           "misconception": "simple-s-overgeneralization",
-          "whyFails": "A consonant plus y changes y to i before -es: 'city' becomes 'cities'."
+          "whyFails": "A consonant plus y changes y to i before -es: 'city' becomes 'cities'.",
+          "misconceptionId": "aturan tambah -s dipukul rata",
+          "whyFailsId": "Konsonan + y mengubah y menjadi i sebelum -es: “city” menjadi “cities”."
         },
         {
           "option": "cityes",
           "misconception": "add-es-without-spelling-change",
-          "whyFails": "The spelling must change from consonant + y to -ies, not 'cityes'."
+          "whyFails": "The spelling must change from consonant + y to -ies, not 'cityes'.",
+          "misconceptionId": "menambah -es tanpa mengubah ejaan",
+          "whyFailsId": "Ejaannya harus berubah dari konsonan + y menjadi -ies, bukan “cityes”."
         },
         {
           "option": "city",
           "misconception": "singular-retention",
-          "whyFails": "The question asks for more than one city, so the singular form is incomplete."
+          "whyFails": "The question asks for more than one city, so the singular form is incomplete.",
+          "misconceptionId": "bentuk tunggal dipertahankan",
+          "whyFailsId": "Pertanyaannya meminta lebih dari satu kota, jadi bentuk tunggal belum menjawab."
         }
       ],
       "explanation": {
@@ -7433,8 +7495,16 @@
         "rule": "Many nouns take -s; nouns ending in s, x, ch, or sh often take -es; consonant + y changes to -ies.",
         "whyOthersFail": "'Citys' and 'cityes' do not follow the consonant-plus-y spelling rule, while 'city' remains singular.",
         "howToAvoid": "Look at the final letters before adding a plural ending, then check common irregular nouns separately.",
-        "memoryCue": "Consonant + y: change y to i, then add es."
-      }
+        "memoryCue": "Consonant + y: change y to i, then add es.",
+        "ruleId": "Banyak kata benda menambah -s; yang berakhiran s, x, ch, atau sh sering menambah -es; konsonan + y berubah menjadi -ies.",
+        "whyCorrectId": "Karena “city” berakhiran konsonan + y, bentuk jamaknya “cities”.",
+        "whyOthersFailId": "“Citys” dan “cityes” tidak mengikuti aturan konsonan + y, sedangkan “city” masih berbentuk tunggal.",
+        "howToAvoidId": "Lihat huruf-huruf terakhirnya sebelum menambahkan akhiran jamak, lalu hafalkan kata tak beraturan secara terpisah.",
+        "memoryCueId": "Konsonan + y: ubah y jadi i, baru tambahkan es."
+      },
+      "pedagogicalObjectiveId": "Membentuk kata benda jamak yang umum dengan -s, -es, -ies, dan perubahan tak beraturan",
+      "misconceptionTargetedId": "Siswa memakai satu aturan ejaan jamak untuk semua kata benda",
+      "reasoningOperationId": "periksa huruf akhir katanya → terapkan pola jamak yang cocok → cek bentuk tak beraturan"
     },
     {
       "id": "A1-013",
@@ -7457,17 +7527,23 @@
         {
           "option": "in",
           "misconception": "container-reading",
-          "whyFails": "The book rests on the table's surface; it is not inside the table."
+          "whyFails": "The book rests on the table's surface; it is not inside the table.",
+          "misconceptionId": "dibaca sebagai ruang tertutup",
+          "whyFailsId": "Bukunya berada di atas permukaan meja, bukan di dalam mejanya."
         },
         {
           "option": "at",
           "misconception": "point-location-overuse",
-          "whyFails": "'At' marks a general point or meeting place, not the surface relationship shown here."
+          "whyFails": "'At' marks a general point or meeting place, not the surface relationship shown here.",
+          "misconceptionId": "penanda titik tempat dipakai terlalu luas",
+          "whyFailsId": "“At” menandai titik atau tempat pertemuan secara umum, bukan hubungan permukaan seperti di kalimat ini."
         },
         {
           "option": "to",
           "misconception": "movement-preposition-substitution",
-          "whyFails": "'To' expresses movement toward a destination, but the sentence describes a stationary location."
+          "whyFails": "'To' expresses movement toward a destination, but the sentence describes a stationary location.",
+          "misconceptionId": "preposisi perpindahan dipakai untuk posisi diam",
+          "whyFailsId": "“To” menyatakan gerak menuju suatu tujuan, padahal kalimat ini menggambarkan posisi yang diam."
         }
       ],
       "explanation": {
@@ -7475,8 +7551,16 @@
         "rule": "Use in for an enclosed space, on for a surface, and at for a specific point or place.",
         "whyOthersFail": "'In' changes the relation to inside; 'at' is a point marker; 'to' signals movement rather than location.",
         "howToAvoid": "Ask one question: is the object inside, touching a surface, or located at a point?",
-        "memoryCue": "In a bag, on a table, at a bus stop."
-      }
+        "memoryCue": "In a bag, on a table, at a bus stop.",
+        "ruleId": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk satu titik atau tempat tertentu.",
+        "whyCorrectId": "Pakai “on” ketika benda berada di atas permukaan seperti meja.",
+        "whyOthersFailId": "“In” mengubah maknanya jadi di dalam, “at” menandai titik tempat, dan “to” menyatakan perpindahan, bukan posisi.",
+        "howToAvoidId": "Ajukan satu pertanyaan: bendanya di dalam, menempel di permukaan, atau berada di satu titik?",
+        "memoryCueId": "In a bag, on a table, at a bus stop."
+      },
+      "pedagogicalObjectiveId": "Memilih in, on, atau at untuk ruang tertutup, permukaan, atau titik tempat tertentu",
+      "misconceptionTargetedId": "Siswa memilih preposisi dari kata bendanya, bukan dari hubungan ruang yang dimaksud",
+      "reasoningOperationId": "tentukan letaknya: di dalam, di atas permukaan, atau di satu titik → pilih preposisi tempatnya"
     },
     {
       "id": "A1-014",
@@ -7499,17 +7583,23 @@
         {
           "option": "cook",
           "misconception": "bare-verb-without-auxiliary",
-          "whyFails": "Present continuous needs a form of 'be' before the -ing verb; 'cook' alone is incomplete."
+          "whyFails": "Present continuous needs a form of 'be' before the -ing verb; 'cook' alone is incomplete.",
+          "misconceptionId": "kata kerja dasar dipakai tanpa kata bantu",
+          "whyFailsId": "Present continuous butuh bentuk “be” sebelum kata kerja -ing; “cook” sendirian belum lengkap."
         },
         {
           "option": "cooks",
           "misconception": "present-simple-habit",
-          "whyFails": "'Cooks' describes a routine, while 'now' signals an action in progress."
+          "whyFails": "'Cooks' describes a routine, while 'now' signals an action in progress.",
+          "misconceptionId": "bentuk present simple untuk kebiasaan",
+          "whyFailsId": "“Cooks” menggambarkan rutinitas, sedangkan “now” menandai tindakan yang sedang berlangsung."
         },
         {
           "option": "cooking",
           "misconception": "missing-be-auxiliary",
-          "whyFails": "The -ing form must be paired with 'is' for the subject 'she'."
+          "whyFails": "The -ing form must be paired with 'is' for the subject 'she'.",
+          "misconceptionId": "kata bantu be tidak dipasang",
+          "whyFailsId": "Bentuk -ing harus dipasangkan dengan “is” untuk subjek “she”."
         }
       ],
       "explanation": {
@@ -7517,8 +7607,16 @@
         "rule": "Present continuous = am/is/are + verb-ing for an action happening around the time of speaking.",
         "whyOthersFail": "'Cook' and 'cooking' omit the required auxiliary; 'cooks' is present simple for a habit.",
         "howToAvoid": "Check both pieces: the correct be form for the subject and the -ing form of the main verb.",
-        "memoryCue": "Now = be + -ing: she is cooking."
-      }
+        "memoryCue": "Now = be + -ing: she is cooking.",
+        "ruleId": "Present continuous = am/is/are + kata kerja -ing, dipakai untuk tindakan yang sedang berlangsung saat kalimat diucapkan.",
+        "whyCorrectId": "“Now” menandakan tindakan yang sedang berlangsung, jadi bentuknya “is cooking”.",
+        "whyOthersFailId": "“Cook” dan “cooking” kehilangan kata bantunya, sedangkan “cooks” menggambarkan kebiasaan.",
+        "howToAvoidId": "Periksa dua bagian sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing kata kerja utamanya.",
+        "memoryCueId": "Ada “now”, berarti be + -ing: she is cooking."
+      },
+      "pedagogicalObjectiveId": "Menyusun present continuous dengan bentuk be yang tepat ditambah kata kerja berakhiran -ing",
+      "misconceptionTargetedId": "Siswa menghilangkan be, menghilangkan -ing, atau memakai present simple untuk kejadian yang sedang berlangsung",
+      "reasoningOperationId": "temukan penanda “sekarang” → pilih bentuk be sesuai subjek → tambahkan kata kerja -ing"
     },
     {
       "id": "A1-015",
@@ -7541,17 +7639,23 @@
         {
           "option": "What",
           "misconception": "thing-question substitution",
-          "whyFails": "'What' asks about a thing or activity, not the place where someone lives."
+          "whyFails": "'What' asks about a thing or activity, not the place where someone lives.",
+          "misconceptionId": "kata tanya benda dipakai untuk tempat",
+          "whyFailsId": "“What” menanyakan benda atau kegiatan, bukan tempat seseorang tinggal."
         },
         {
           "option": "When",
           "misconception": "time-question substitution",
-          "whyFails": "'When' asks about time, while this question asks for a location."
+          "whyFails": "'When' asks about time, while this question asks for a location.",
+          "misconceptionId": "kata tanya waktu dipakai untuk tempat",
+          "whyFailsId": "“When” menanyakan waktu, sedangkan pertanyaan ini meminta lokasi."
         },
         {
           "option": "Why",
           "misconception": "reason-question substitution",
-          "whyFails": "'Why' asks for a reason, but the blank needs a place question word."
+          "whyFails": "'Why' asks for a reason, but the blank needs a place question word.",
+          "misconceptionId": "kata tanya alasan dipakai untuk tempat",
+          "whyFailsId": "“Why” menanyakan alasan, padahal bagian yang kosong butuh kata tanya tempat."
         }
       ],
       "explanation": {
@@ -7559,8 +7663,16 @@
         "rule": "Who asks about people, what about things, where about places, when about time, and why about reasons.",
         "whyOthersFail": "The other words request a thing, time, or reason rather than a place.",
         "howToAvoid": "Decide what information the answer should contain before choosing the question word.",
-        "memoryCue": "Where = place; when = time; who = person."
-      }
+        "memoryCue": "Where = place; when = time; who = person.",
+        "ruleId": "Who menanyakan orang, what menanyakan benda, where menanyakan tempat, when menanyakan waktu, dan why menanyakan alasan.",
+        "whyCorrectId": "“Where” menanyakan tempat, jadi ia melengkapi “Where do you live?”.",
+        "whyOthersFailId": "Kata tanya lainnya meminta benda, waktu, atau alasan, bukan tempat.",
+        "howToAvoidId": "Tentukan dulu informasi apa yang seharusnya ada di jawaban, baru pilih kata tanyanya.",
+        "memoryCueId": "Where = tempat; when = waktu; who = orang."
+      },
+      "pedagogicalObjectiveId": "Memasangkan kata tanya yang umum dengan informasi yang diminta: orang, tempat, waktu, alasan, atau benda",
+      "misconceptionTargetedId": "Siswa memilih kata tanya dari posisinya di kalimat, bukan dari informasi yang dibutuhkan",
+      "reasoningOperationId": "tentukan jenis informasi yang diminta → pilih kata tanya yang cocok"
     },
     {
       "id": "A1-016",
@@ -7583,17 +7695,23 @@
         {
           "option": "some",
           "misconception": "positive-quantifier-in-negative",
-          "whyFails": "Basic negative statements normally use 'any' rather than 'some'."
+          "whyFails": "Basic negative statements normally use 'any' rather than 'some'.",
+          "misconceptionId": "penentu jumlah kalimat positif dipakai di kalimat negatif",
+          "whyFailsId": "Kalimat negatif dasar biasanya memakai “any”, bukan “some”."
         },
         {
           "option": "a",
           "misconception": "singular-article-with-uncountable",
-          "whyFails": "'Money' is uncountable here, so it does not take the singular article 'a'."
+          "whyFails": "'Money' is uncountable here, so it does not take the singular article 'a'.",
+          "misconceptionId": "article tunggal dipakai untuk benda tak terhitung",
+          "whyFailsId": "“Money” di sini tak terhitung, jadi ia tidak memakai article tunggal “a”."
         },
         {
           "option": "many",
           "misconception": "countable-quantity-substitution",
-          "whyFails": "'Many' modifies plural countable nouns, while 'money' is uncountable."
+          "whyFails": "'Many' modifies plural countable nouns, while 'money' is uncountable.",
+          "misconceptionId": "penentu jumlah benda terhitung dipakai untuk benda tak terhitung",
+          "whyFailsId": "“Many” menerangkan kata benda jamak yang terhitung, sedangkan “money” tak terhitung."
         }
       ],
       "explanation": {
@@ -7601,8 +7719,16 @@
         "rule": "Use some mainly in positive statements and any in negatives or questions; use many with plural countable nouns and much with uncountable nouns.",
         "whyOthersFail": "'Some' is not the expected basic negative quantifier; 'a' and 'many' do not match uncountable 'money'.",
         "howToAvoid": "Check polarity first, then decide whether the noun can be counted one by one.",
-        "memoryCue": "Negative + uncountable: I do not have any money."
-      }
+        "memoryCue": "Negative + uncountable: I do not have any money.",
+        "ruleId": "Pakai some terutama di kalimat positif dan any di kalimat negatif atau tanya; pakai many untuk benda jamak terhitung dan much untuk benda tak terhitung.",
+        "whyCorrectId": "Kalimat negatif umumnya memakai “any” dengan kata benda tak terhitung seperti “money”.",
+        "whyOthersFailId": "“Some” bukan penentu jumlah yang biasa dipakai di kalimat negatif dasar, sedangkan “a” dan “many” tidak cocok dengan “money” yang tak terhitung.",
+        "howToAvoidId": "Periksa dulu kalimatnya positif atau negatif, baru tentukan apakah bendanya bisa dihitung satu per satu.",
+        "memoryCueId": "Negatif + benda tak terhitung: I do not have any money."
+      },
+      "pedagogicalObjectiveId": "Memakai some dan any dengan kata benda terhitung dan tak terhitung dalam kalimat positif, tanya, dan negatif",
+      "misconceptionTargetedId": "Siswa memakai some di kalimat negatif, atau menambahkan akhiran jamak pada kata benda tak terhitung",
+      "reasoningOperationId": "periksa kalimatnya positif atau negatif dan bendanya terhitung atau tidak → pilih penentu jumlah dan bentuk bendanya"
     },
     {
       "id": "A1-017",
@@ -7625,17 +7751,23 @@
         {
           "option": "She",
           "misconception": "subject-pronoun-before-noun",
-          "whyFails": "'She' is a subject pronoun; before the noun 'name', the possessive adjective 'her' is required."
+          "whyFails": "'She' is a subject pronoun; before the noun 'name', the possessive adjective 'her' is required.",
+          "misconceptionId": "subject pronoun diletakkan sebelum kata benda",
+          "whyFailsId": "“She” adalah subject pronoun; sebelum kata benda “name” yang dibutuhkan adalah possessive adjective “her”."
         },
         {
           "option": "Hers",
           "misconception": "stand-alone-possessive-before-noun",
-          "whyFails": "'Hers' stands alone and cannot directly modify the following noun 'name'."
+          "whyFails": "'Hers' stands alone and cannot directly modify the following noun 'name'.",
+          "misconceptionId": "possessive yang berdiri sendiri diletakkan sebelum kata benda",
+          "whyFailsId": "“Hers” berdiri sendiri dan tidak bisa langsung menerangkan kata benda “name” sesudahnya."
         },
         {
           "option": "Me",
           "misconception": "object-pronoun-substitution",
-          "whyFails": "'Me' is an object pronoun and cannot show possession before 'name'."
+          "whyFails": "'Me' is an object pronoun and cannot show possession before 'name'.",
+          "misconceptionId": "object pronoun dipakai untuk menyatakan kepemilikan",
+          "whyFailsId": "“Me” adalah object pronoun dan tidak bisa menyatakan kepemilikan sebelum “name”."
         }
       ],
       "explanation": {
@@ -7643,14 +7775,22 @@
         "rule": "Use subject pronouns as subjects, object pronouns after verbs or prepositions, possessive adjectives before nouns, and possessive pronouns alone.",
         "whyOthersFail": "'She' is a subject, 'hers' is a stand-alone possessive, and 'me' is an object form.",
         "howToAvoid": "Look at the word after the blank. If a noun follows, choose a possessive adjective such as my, his, her, or their.",
-        "memoryCue": "Her name, but the name is hers."
-      }
+        "memoryCue": "Her name, but the name is hers.",
+        "ruleId": "Subject pronoun jadi subjek, object pronoun sesudah kata kerja atau preposisi, possessive adjective sebelum kata benda, dan possessive pronoun berdiri sendiri.",
+        "whyCorrectId": "“Her” adalah possessive adjective yang berdiri sebelum kata benda “name”.",
+        "whyOthersFailId": "“She” adalah subjek, “hers” berdiri sendiri, dan “me” adalah bentuk objek.",
+        "howToAvoidId": "Lihat kata sesudah bagian yang kosong. Kalau ada kata benda, pilih possessive adjective seperti my, his, her, atau their.",
+        "memoryCueId": "Her name, tetapi the name is hers."
+      },
+      "pedagogicalObjectiveId": "Membedakan subject pronoun, object pronoun, possessive adjective, dan possessive pronoun dalam kalimat dasar",
+      "misconceptionTargetedId": "Siswa memakai me sebagai subjek, atau tertukar antara my dan mine sebelum dan sesudah kata benda",
+      "reasoningOperationId": "tentukan perannya di kalimat dan apakah ada kata benda sesudahnya → pilih bentuk pronoun yang cocok"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 129,
+    "translated": 139,
     "total": 139,
     "updatedAt": "2026-08-24"
   }
