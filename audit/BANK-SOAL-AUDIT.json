@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-08-24T05:33:04.602Z",
+  "generatedAt": "2026-08-24T06:04:29.432Z",
   "totals": {
     "vocab": 1765,
-    "grammar": 129,
+    "grammar": 139,
     "reading": 300,
     "readingQuestions": 1500,
     "listening": 1407,
     "speaking": 36
   },
-  "findingCount": 2470,
+  "findingCount": 2620,
   "summary": [
     {
       "kind": "listening/pilihan-berbahasa-inggris",
@@ -29,10 +29,34 @@
       "sebab": "mode detail: pertanyaan pemahaman harus Bahasa Indonesia"
     },
     {
+      "kind": "grammar/penjelasan-belum-diterjemahkan",
+      "count": 80,
+      "contoh": "Use a before a consonant sound, an before a vowel sound, and the when the noun is specific or already known.",
+      "sebab": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan"
+    },
+    {
       "kind": "vocab/contoh-tidak-memuat-kata",
       "count": 58,
       "contoh": "break :: He accidentally broke the glass.",
       "sebab": "kalimat contoh tidak memuat kata target, jadi tidak bisa dipakai menjelaskan jenis kata"
+    },
+    {
+      "kind": "grammar/alasan-distraktor-belum-diterjemahkan",
+      "count": 30,
+      "contoh": "'Engineer' begins with a vowel sound, so 'a' is not the correct indefinite article.",
+      "sebab": "alasan untuk pilihan \"a\" belum punya versi Bahasa Indonesia"
+    },
+    {
+      "kind": "grammar/label-miskonsepsi-belum-diterjemahkan",
+      "count": 30,
+      "contoh": "consonant-letter shortcut",
+      "sebab": "label miskonsepsi untuk \"a\" belum punya versi Bahasa Indonesia"
+    },
+    {
+      "kind": "grammar/judul-lesson-berbahasa-inggris",
+      "count": 10,
+      "contoh": "articles_a_an_the",
+      "sebab": "nama subskill dipakai langsung sebagai judul lesson di layar siswa"
     },
     {
       "kind": "vocab/pos-tak-berlabel-indonesia",
@@ -461,6 +485,1056 @@
       "kind": "contoh-tidak-memuat-kata",
       "detail": "kalimat contoh tidak memuat kata target, jadi tidak bisa dipakai menjelaskan jenis kata",
       "sample": "disqualify :: The runner was disqualified for a false start."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use a before a consonant sound, an before a vowel sound, and the when the noun is specific or already known."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'An' comes before the vowel sound in 'engineer'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'A' does not match the initial vowel sound; 'the' adds an unsupported specific reference; 'some' does not introduce one singular countable noun."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Say the first sound aloud, then ask whether you mean one of many or a particular known item."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Listen to the sound: an engineer."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Choose a, an, or the from the first sound and whether the listener already knows the noun."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner chooses an from spelling alone or uses the for a first, non-specific mention."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "identify the noun sound and reference status -> select the article"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"a\" belum punya versi Bahasa Indonesia",
+      "sample": "'Engineer' begins with a vowel sound, so 'a' is not the correct indefinite article."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"a\" belum punya versi Bahasa Indonesia",
+      "sample": "consonant-letter shortcut"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"the\" belum punya versi Bahasa Indonesia",
+      "sample": "Nothing says the listener already knows which engineer; this is a first, non-specific mention."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"the\" belum punya versi Bahasa Indonesia",
+      "sample": "specific-article overuse"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"some\" belum punya versi Bahasa Indonesia",
+      "sample": "'Engineer' is a singular countable noun, so 'some' cannot introduce it here."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"some\" belum punya versi Bahasa Indonesia",
+      "sample": "plural-or-uncountable quantifier"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-008",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "articles_a_an_the"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use have got with I, you, we, and they; use has got with he, she, and it."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'She' is singular third person, so the phrase is 'has got'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Have' does not agree with 'she'; 'is' and 'does' do not form the have-got possession structure."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Choose have or has from the subject first, then keep got after it."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "He, she, it has got; I, you, we, they have got."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use have got or has got with the correct subject and form a basic possession question."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner uses have with a singular third-person subject or combines do with have got."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "match subject number to have or has -> keep got after the auxiliary"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"have\" belum punya versi Bahasa Indonesia",
+      "sample": "A singular third-person subject such as 'she' takes 'has got', not 'have got'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"have\" belum punya versi Bahasa Indonesia",
+      "sample": "plural-form transfer"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"is\" belum punya versi Bahasa Indonesia",
+      "sample": "'Is got' is not the possession structure tested here; the correct form is 'has got'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"is\" belum punya versi Bahasa Indonesia",
+      "sample": "be-verb substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"does\" belum punya versi Bahasa Indonesia",
+      "sample": "'Does got' is not grammatical; 'have got' forms its own possession pattern."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"does\" belum punya versi Bahasa Indonesia",
+      "sample": "double-auxiliary construction"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-009",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "have_got_has_got"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Regular past simple usually adds -ed; after did or did not, the main verb returns to its base form."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Yesterday' is a finished past-time marker, so the regular verb is 'played'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Play' omits the past marker; 'plays' is present third person; 'playing' is a participle without an auxiliary."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Find the time word first. If did already appears, use the base form after did."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Yesterday: play becomes played; did + play, never did + played."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Form and use the past simple of regular verbs in affirmative and negative sentences."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner adds -ed after did or changes a consonant-plus-y verb to the wrong spelling."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "locate the past marker -> decide whether did already carries tense -> choose the base or -ed form"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"play\" belum punya versi Bahasa Indonesia",
+      "sample": "'Yesterday' places the action in the past, so the regular verb needs its past form 'played'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"play\" belum punya versi Bahasa Indonesia",
+      "sample": "missing-past-marking"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"plays\" belum punya versi Bahasa Indonesia",
+      "sample": "'Plays' is present simple for he, she, or it; 'they' and 'yesterday' require past simple."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"plays\" belum punya versi Bahasa Indonesia",
+      "sample": "third-person-present form"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"playing\" belum punya versi Bahasa Indonesia",
+      "sample": "'Playing' needs an auxiliary such as 'were' and does not by itself mark a completed past event."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"playing\" belum punya versi Bahasa Indonesia",
+      "sample": "progressive-form substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-010",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "past_simple_regular_forms"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use was with I, he, she, and it; use were with you, we, and they."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "The plural subject 'they' takes 'were' in the past."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Was' is singular, 'are' is present, and bare 'be' is not a finite past form."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Say the subject-and-be pair aloud: I was, she was, you were, they were."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "They were yesterday; she was yesterday."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Match was or were to the subject in a basic past-tense be sentence."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner uses was with a plural subject or adds did before was or were in a question."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "identify subject number -> match it to was or were -> place be before the subject in a question"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"was\" belum punya versi Bahasa Indonesia",
+      "sample": "'They' is plural, so the past form must be 'were', not 'was'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"was\" belum punya versi Bahasa Indonesia",
+      "sample": "singular-past transfer"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"are\" belum punya versi Bahasa Indonesia",
+      "sample": "'Yesterday' requires a past form, while 'are' is present tense."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"are\" belum punya versi Bahasa Indonesia",
+      "sample": "present-tense substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"be\" belum punya versi Bahasa Indonesia",
+      "sample": "The finite past verb cannot be the bare form 'be'; choose 'were' for 'they'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"be\" belum punya versi Bahasa Indonesia",
+      "sample": "bare-infinitive substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-011",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "past_be_was_were"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Many nouns take -s; nouns ending in s, x, ch, or sh often take -es; consonant + y changes to -ies."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Because 'city' ends in a consonant plus y, its plural is 'cities'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Citys' and 'cityes' do not follow the consonant-plus-y spelling rule, while 'city' remains singular."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Look at the final letters before adding a plural ending, then check common irregular nouns separately."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Consonant + y: change y to i, then add es."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Form common plural nouns with -s, -es, -ies, and irregular changes."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner applies one plural spelling rule to every noun."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "inspect the word ending -> apply the matching plural pattern -> check irregular forms"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"citys\" belum punya versi Bahasa Indonesia",
+      "sample": "A consonant plus y changes y to i before -es: 'city' becomes 'cities'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"citys\" belum punya versi Bahasa Indonesia",
+      "sample": "simple-s-overgeneralization"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"cityes\" belum punya versi Bahasa Indonesia",
+      "sample": "The spelling must change from consonant + y to -ies, not 'cityes'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"cityes\" belum punya versi Bahasa Indonesia",
+      "sample": "add-es-without-spelling-change"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"city\" belum punya versi Bahasa Indonesia",
+      "sample": "The question asks for more than one city, so the singular form is incomplete."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"city\" belum punya versi Bahasa Indonesia",
+      "sample": "singular-retention"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-012",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "plural_nouns_basic"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use in for an enclosed space, on for a surface, and at for a specific point or place."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use 'on' when an object rests on a surface such as a table."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'In' changes the relation to inside; 'at' is a point marker; 'to' signals movement rather than location."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Ask one question: is the object inside, touching a surface, or located at a point?"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "In a bag, on a table, at a bus stop."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Choose in, on, or at for a container, surface, or specific place point."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner chooses a preposition from the object word without identifying the spatial relationship."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "classify the location as inside, on a surface, or at a point -> select the place preposition"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"in\" belum punya versi Bahasa Indonesia",
+      "sample": "The book rests on the table's surface; it is not inside the table."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"in\" belum punya versi Bahasa Indonesia",
+      "sample": "container-reading"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"at\" belum punya versi Bahasa Indonesia",
+      "sample": "'At' marks a general point or meeting place, not the surface relationship shown here."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"at\" belum punya versi Bahasa Indonesia",
+      "sample": "point-location-overuse"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"to\" belum punya versi Bahasa Indonesia",
+      "sample": "'To' expresses movement toward a destination, but the sentence describes a stationary location."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"to\" belum punya versi Bahasa Indonesia",
+      "sample": "movement-preposition-substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-013",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "place_prepositions_basic"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Present continuous = am/is/are + verb-ing for an action happening around the time of speaking."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Now' signals an action in progress, so use 'is cooking'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Cook' and 'cooking' omit the required auxiliary; 'cooks' is present simple for a habit."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Check both pieces: the correct be form for the subject and the -ing form of the main verb."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Now = be + -ing: she is cooking."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Build present continuous with the correct form of be plus a verb ending in -ing."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner drops be, drops -ing, or uses present simple for an action happening now."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "detect the now-time cue -> choose the subject form of be -> add verb-ing"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"cook\" belum punya versi Bahasa Indonesia",
+      "sample": "Present continuous needs a form of 'be' before the -ing verb; 'cook' alone is incomplete."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"cook\" belum punya versi Bahasa Indonesia",
+      "sample": "bare-verb-without-auxiliary"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"cooks\" belum punya versi Bahasa Indonesia",
+      "sample": "'Cooks' describes a routine, while 'now' signals an action in progress."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"cooks\" belum punya versi Bahasa Indonesia",
+      "sample": "present-simple-habit"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"cooking\" belum punya versi Bahasa Indonesia",
+      "sample": "The -ing form must be paired with 'is' for the subject 'she'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"cooking\" belum punya versi Bahasa Indonesia",
+      "sample": "missing-be-auxiliary"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-014",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "present_continuous_basics"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Who asks about people, what about things, where about places, when about time, and why about reasons."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Where' asks for a place, so it completes 'Where do you live?'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "The other words request a thing, time, or reason rather than a place."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Decide what information the answer should contain before choosing the question word."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Where = place; when = time; who = person."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Match common question words with the information requested: person, place, time, reason, or thing."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner chooses a question word from sentence position rather than the information needed."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "identify the information type requested -> select the matching question word"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"What\" belum punya versi Bahasa Indonesia",
+      "sample": "'What' asks about a thing or activity, not the place where someone lives."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"What\" belum punya versi Bahasa Indonesia",
+      "sample": "thing-question substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"When\" belum punya versi Bahasa Indonesia",
+      "sample": "'When' asks about time, while this question asks for a location."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"When\" belum punya versi Bahasa Indonesia",
+      "sample": "time-question substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"Why\" belum punya versi Bahasa Indonesia",
+      "sample": "'Why' asks for a reason, but the blank needs a place question word."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"Why\" belum punya versi Bahasa Indonesia",
+      "sample": "reason-question substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-015",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "question_words_basic"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use some mainly in positive statements and any in negatives or questions; use many with plural countable nouns and much with uncountable nouns."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Negative sentences commonly use 'any' with an uncountable noun such as 'money'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Some' is not the expected basic negative quantifier; 'a' and 'many' do not match uncountable 'money'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Check polarity first, then decide whether the noun can be counted one by one."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Negative + uncountable: I do not have any money."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use some and any with basic countable and uncountable nouns in statements, questions, and negatives."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner uses some in a negative sentence or adds a plural ending to an uncountable noun."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "identify polarity and noun countability -> choose the quantifier and noun form"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"some\" belum punya versi Bahasa Indonesia",
+      "sample": "Basic negative statements normally use 'any' rather than 'some'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"some\" belum punya versi Bahasa Indonesia",
+      "sample": "positive-quantifier-in-negative"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"a\" belum punya versi Bahasa Indonesia",
+      "sample": "'Money' is uncountable here, so it does not take the singular article 'a'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"a\" belum punya versi Bahasa Indonesia",
+      "sample": "singular-article-with-uncountable"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"many\" belum punya versi Bahasa Indonesia",
+      "sample": "'Many' modifies plural countable nouns, while 'money' is uncountable."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"many\" belum punya versi Bahasa Indonesia",
+      "sample": "countable-quantity-substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-016",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "some_any_countable_uncountable"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"rule\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Use subject pronouns as subjects, object pronouns after verbs or prepositions, possessive adjectives before nouns, and possessive pronouns alone."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyCorrect\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'Her' is a possessive adjective that comes before the noun 'name'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"whyOthersFail\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "'She' is a subject, 'hers' is a stand-alone possessive, and 'me' is an object form."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"howToAvoid\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Look at the word after the blank. If a noun follows, choose a possessive adjective such as my, his, her, or their."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"memoryCue\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Her name, but the name is hers."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"objective\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Distinguish subject pronouns, object pronouns, possessive adjectives, and possessive pronouns in basic sentences."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"misconception\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "Learner uses me as a subject or confuses my with mine before or after a noun."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "penjelasan-belum-diterjemahkan",
+      "detail": "field \"reasoning\" belum punya versi Bahasa Indonesia dan akan tampil dalam Bahasa Inggris sebagai pilihan/penjelasan",
+      "sample": "identify the grammatical role and whether a noun follows -> select the matching pronoun form"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"She\" belum punya versi Bahasa Indonesia",
+      "sample": "'She' is a subject pronoun; before the noun 'name', the possessive adjective 'her' is required."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"She\" belum punya versi Bahasa Indonesia",
+      "sample": "subject-pronoun-before-noun"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"Hers\" belum punya versi Bahasa Indonesia",
+      "sample": "'Hers' stands alone and cannot directly modify the following noun 'name'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"Hers\" belum punya versi Bahasa Indonesia",
+      "sample": "stand-alone-possessive-before-noun"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "alasan-distraktor-belum-diterjemahkan",
+      "detail": "alasan untuk pilihan \"Me\" belum punya versi Bahasa Indonesia",
+      "sample": "'Me' is an object pronoun and cannot show possession before 'name'."
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "label-miskonsepsi-belum-diterjemahkan",
+      "detail": "label miskonsepsi untuk \"Me\" belum punya versi Bahasa Indonesia",
+      "sample": "object-pronoun-substitution"
+    },
+    {
+      "bank": "grammar",
+      "id": "A1-017",
+      "kind": "judul-lesson-berbahasa-inggris",
+      "detail": "nama subskill dipakai langsung sebagai judul lesson di layar siswa",
+      "sample": "subject_object_pronouns_and_possessives"
     },
     {
       "bank": "reading",
