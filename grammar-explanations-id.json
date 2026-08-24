@@ -3097,6 +3097,106 @@
           "whyFails": "“Has appeal” tidak membentuk anak kalimat yang diwajibkan."
         }
       }
+    },
+    "A1-008": {
+      "objective": "Memilih a, an, atau the berdasarkan bunyi awal kata dan apakah bendanya sudah tertentu",
+      "misconception": "Siswa memilih an dari HURUF vokal, padahal yang menentukan adalah BUNYI awalnya",
+      "reasoning": "dengarkan bunyi awal lalu tentukan tertentu atau belum",
+      "rule": "Pakai a sebelum bunyi konsonan, an sebelum bunyi vokal, dan the ketika bendanya sudah tertentu atau sudah diketahui bersama.",
+      "whyCorrect": "“An” dipakai karena “engineer” diawali bunyi vokal.",
+      "whyOthersFail": "“A” tidak cocok dengan bunyi vokal di awal; “the” menambahkan kesan tertentu yang tidak didukung kalimatnya; “some” tidak dipakai untuk memperkenalkan satu benda tunggal yang bisa dihitung.",
+      "howToAvoid": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?",
+      "memoryCue": "Dengarkan bunyinya: an engineer."
+    },
+    "A1-009": {
+      "objective": "Memasangkan have got dan has got dengan subjeknya untuk menyatakan kepemilikan",
+      "misconception": "Siswa memakai satu bentuk untuk semua subjek, atau menukar have dan has dengan is dan does",
+      "reasoning": "tentukan subjeknya lalu pilih have atau has",
+      "rule": "Pakai have got untuk I, you, we, dan they; pakai has got untuk he, she, dan it.",
+      "whyCorrect": "“She” adalah orang ketiga tunggal, jadi bentuknya “has got”.",
+      "whyOthersFail": "“Have” tidak sesuai dengan “she”; “is” dan “does” tidak membentuk struktur kepemilikan have-got.",
+      "howToAvoid": "Tentukan have atau has dari subjeknya lebih dulu, baru letakkan got sesudahnya.",
+      "memoryCue": "He, she, it has got; I, you, we, they have got."
+    },
+    "A1-010": {
+      "objective": "Membentuk past simple beraturan, dan mengembalikan kata kerja ke bentuk dasar sesudah did",
+      "misconception": "Siswa menambahkan penanda lampau dua kali: sudah memakai did, kata kerjanya masih diberi -ed juga",
+      "reasoning": "temukan penanda waktu lampau lalu periksa ada did atau tidak",
+      "rule": "Past simple beraturan umumnya menambah -ed; sesudah did atau did not, kata kerja utamanya kembali ke bentuk dasar.",
+      "whyCorrect": "“Yesterday” menandai waktu lampau yang sudah selesai, jadi bentuk beraturannya “played”.",
+      "whyOthersFail": "“Play” tidak memuat penanda lampau; “plays” adalah bentuk present orang ketiga; “playing” adalah bentuk -ing yang tidak bisa berdiri tanpa kata bantu.",
+      "howToAvoid": "Cari kata penunjuk waktunya lebih dulu. Kalau did sudah muncul, pakai bentuk dasar sesudahnya.",
+      "memoryCue": "Yesterday: play jadi played; did + play, bukan did + played."
+    },
+    "A1-011": {
+      "objective": "Memilih was atau were sesuai subjek pada kalimat lampau",
+      "misconception": "Siswa memakai was untuk semua subjek, atau tertukar dengan bentuk present are",
+      "reasoning": "lihat subjeknya tunggal atau jamak lalu pilih was atau were",
+      "rule": "Pakai was untuk I, he, she, dan it; pakai were untuk you, we, dan they.",
+      "whyCorrect": "Subjek jamak “they” berpasangan dengan “were” pada kalimat lampau.",
+      "whyOthersFail": "“Was” untuk subjek tunggal, “are” adalah bentuk present, dan “be” polos bukan bentuk lampau yang bisa berdiri sendiri.",
+      "howToAvoid": "Ucapkan pasangan subjek dan be dengan suara: I was, she was, you were, they were.",
+      "memoryCue": "They were kemarin; she was kemarin."
+    },
+    "A1-012": {
+      "objective": "Membentuk kata benda jamak, termasuk perubahan ejaan konsonan tambah y",
+      "misconception": "Siswa menambahkan -s ke semua kata tanpa melihat huruf akhirnya",
+      "reasoning": "periksa huruf akhir lalu pilih pola jamaknya",
+      "rule": "Banyak kata benda menambah -s; kata yang berakhiran s, x, ch, atau sh biasanya menambah -es; konsonan tambah y berubah menjadi -ies.",
+      "whyCorrect": "Karena “city” berakhiran konsonan lalu y, bentuk jamaknya “cities”.",
+      "whyOthersFail": "“Citys” dan “cityes” tidak mengikuti aturan ejaan konsonan tambah y, sedangkan “city” masih bentuk tunggal.",
+      "howToAvoid": "Lihat huruf-huruf terakhirnya sebelum menambahkan akhiran jamak, lalu hafalkan kata tak beraturan secara terpisah.",
+      "memoryCue": "Konsonan tambah y: ganti y jadi i, lalu tambah es."
+    },
+    "A1-013": {
+      "objective": "Memilih in, on, atau at untuk menyatakan letak",
+      "misconception": "Siswa menerjemahkan langsung dari kata “di” dalam Bahasa Indonesia, yang satu kata untuk ketiganya",
+      "reasoning": "bayangkan posisinya lalu pilih preposisinya",
+      "rule": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk titik atau tempat tertentu.",
+      "whyCorrect": "Pakai “on” ketika benda berada di atas permukaan seperti meja.",
+      "whyOthersFail": "“In” mengubah maknanya menjadi di dalam; “at” menandai titik; “to” menyatakan perpindahan, bukan letak.",
+      "howToAvoid": "Ajukan satu pertanyaan: bendanya di dalam, menempel di permukaan, atau berada di satu titik?",
+      "memoryCue": "In a bag, on a table, at a bus stop."
+    },
+    "A1-014": {
+      "objective": "Membentuk present continuous secara utuh: be yang sesuai subjek ditambah kata kerja -ing",
+      "misconception": "Siswa menulis kata kerja -ing tanpa am, is, atau are, karena Bahasa Indonesia tidak memerlukan kata bantu itu",
+      "reasoning": "temukan penanda sedang berlangsung lalu pasang dua bagiannya",
+      "rule": "Present continuous dibentuk dengan am, is, atau are ditambah kata kerja -ing, untuk tindakan yang sedang berlangsung di sekitar waktu bicara.",
+      "whyCorrect": "“Now” menandakan tindakan yang sedang berlangsung, jadi bentuknya “is cooking”.",
+      "whyOthersFail": "“Cook” dan “cooking” kehilangan kata bantu yang wajib ada; “cooks” adalah present simple untuk kebiasaan.",
+      "howToAvoid": "Periksa dua bagiannya sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing pada kata kerja utamanya.",
+      "memoryCue": "Now berarti be tambah -ing: she is cooking."
+    },
+    "A1-015": {
+      "objective": "Memilih kata tanya sesuai jenis informasi yang ingin didapat",
+      "misconception": "Siswa memilih kata tanya dari kebiasaan, bukan dari isi jawaban yang diharapkan",
+      "reasoning": "bayangkan jawabannya lalu pilih kata tanyanya",
+      "rule": "Who menanyakan orang, what menanyakan benda, where menanyakan tempat, when menanyakan waktu, dan why menanyakan alasan.",
+      "whyCorrect": "“Where” menanyakan tempat, jadi cocok melengkapi “Where do you live?”.",
+      "whyOthersFail": "Kata tanya lainnya meminta benda, waktu, atau alasan, bukan tempat.",
+      "howToAvoid": "Tentukan dulu informasi apa yang harus ada di jawabannya, baru pilih kata tanyanya.",
+      "memoryCue": "Where berarti tempat; when berarti waktu; who berarti orang."
+    },
+    "A1-016": {
+      "objective": "Memilih some, any, many, atau much sesuai bentuk kalimat dan jenis kata bendanya",
+      "misconception": "Siswa memakai some di kalimat negatif, dan many untuk kata benda yang tidak bisa dihitung",
+      "reasoning": "periksa positif atau negatif lalu periksa bisa dihitung atau tidak",
+      "rule": "Pakai some terutama di kalimat positif dan any di kalimat negatif atau pertanyaan; pakai many untuk kata benda jamak yang bisa dihitung dan much untuk yang tidak bisa dihitung.",
+      "whyCorrect": "Kalimat negatif lazim memakai “any” dengan kata benda tak terhitung seperti “money”.",
+      "whyOthersFail": "“Some” bukan pilihan dasar untuk kalimat negatif; “a” dan “many” tidak cocok dengan “money” yang tak terhitung.",
+      "howToAvoid": "Periksa dulu kalimatnya positif atau negatif, baru tentukan apakah kata bendanya bisa dihitung satu per satu.",
+      "memoryCue": "Negatif dan tak terhitung: I do not have any money."
+    },
+    "A1-017": {
+      "objective": "Membedakan kata ganti subjek, kata ganti objek, kata sifat kepemilikan, dan kata ganti kepemilikan",
+      "misconception": "Siswa tertukar antara her, hers, dan she, karena Bahasa Indonesia memakai satu kata “dia” untuk semuanya",
+      "reasoning": "lihat kata sesudah rumpang lalu tentukan bentuk kata gantinya",
+      "rule": "Kata ganti subjek dipakai sebagai subjek, kata ganti objek dipakai setelah kata kerja atau kata depan, kata sifat kepemilikan berdiri sebelum kata benda, dan kata ganti kepemilikan berdiri sendiri.",
+      "whyCorrect": "“Her” adalah kata sifat kepemilikan yang berdiri sebelum kata benda “name”.",
+      "whyOthersFail": "“She” adalah bentuk subjek, “hers” berdiri sendiri tanpa kata benda, dan “me” adalah bentuk objek.",
+      "howToAvoid": "Lihat kata sesudah rumpangnya. Kalau yang menyusul kata benda, pilih kata sifat kepemilikan seperti my, his, her, atau their.",
+      "memoryCue": "Her name, tetapi the name is hers."
     }
   }
 }
