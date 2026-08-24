@@ -1880,7 +1880,7 @@
           "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type",
           "whyFails": "'Little' pairs with uncountable nouns (little water), not countable plural nouns like 'chairs', which need 'few'.",
           "whyFailsId": "“Little” berpasangan dengan benda tak terhitung seperti little water, bukan dengan kata jamak terhitung seperti “chairs” yang menuntut “few”.",
-          "misconceptionId": "kata jumlah untuk benda tak terhitung dipakai pada kata benda jamak terhitung"
+          "misconceptionId": "kata jumlah untuk benda tak terhitung dipakai pada benda jamak terhitung, sekaligus salah memilih jenis kelangkaannya"
         },
         {
           "option": "much of",
@@ -4756,7 +4756,7 @@
         "whyCorrectId": "“Pleased with” lazim dipakai untuk menyebut orang, penampilan, atau hasil tertentu yang sedang dinilai secara positif.",
         "whyOthersFailId": "Pilihan lainnya menyatakan keadaan yang lebih luas, ikut senang atas nama orang lain, atau pasangan kata yang tidak baku.",
         "howToAvoidId": "Kenali apa yang menyusul: hal tertentu yang dinilai memakai with, keadaan memakai about, dan orang yang diikutsenangi memakai for.",
-        "memoryCueId": "Pleased with the result; pleased about the news; pleased for you."
+        "memoryCueId": "Pleased memakai with untuk hasil, about untuk kabar, dan for untuk orang lain."
       },
       "pedagogicalObjectiveId": "Siswa memilih kata depan yang tepat setelah kata sifat perasaan, sesuai apakah penyebabnya berupa orang atau hal tertentu, atau berupa keadaan",
       "misconceptionTargetedId": "Siswa memakai satu kata depan bawaan, biasanya “about”, setelah semua kata sifat perasaan tanpa melihat apa yang menyusul",
@@ -7332,7 +7332,7 @@
         "whyCorrectId": "“She” adalah orang ketiga tunggal, jadi bentuknya “has got”.",
         "whyOthersFailId": "“Have” tidak sesuai dengan “she”; “is” dan “does” tidak membentuk struktur kepemilikan have-got.",
         "howToAvoidId": "Tentukan have atau has dari subjeknya lebih dulu, baru letakkan got sesudahnya.",
-        "memoryCueId": "He, she, it has got; I, you, we, they have got."
+        "memoryCueId": "Pakai has got untuk he, she, dan it; pakai have got untuk I, you, we, dan they."
       },
       "pedagogicalObjectiveId": "Memasangkan have got dan has got dengan subjeknya untuk menyatakan kepemilikan",
       "misconceptionTargetedId": "Siswa memakai satu bentuk untuk semua subjek, atau menukar have dan has dengan is dan does",
@@ -7444,7 +7444,7 @@
         "whyCorrectId": "Subjek jamak “they” berpasangan dengan “were” pada kalimat lampau.",
         "whyOthersFailId": "“Was” untuk subjek tunggal, “are” adalah bentuk present, dan “be” polos bukan bentuk lampau yang bisa berdiri sendiri.",
         "howToAvoidId": "Ucapkan pasangan subjek dan be dengan suara: I was, she was, you were, they were.",
-        "memoryCueId": "They were kemarin; she was kemarin."
+        "memoryCueId": "Untuk subjek they pakai were; untuk subjek she pakai was."
       },
       "pedagogicalObjectiveId": "Memilih was atau were sesuai subjek pada kalimat lampau",
       "misconceptionTargetedId": "Siswa memakai was untuk semua subjek, atau tertukar dengan bentuk present are",

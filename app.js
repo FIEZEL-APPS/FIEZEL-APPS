@@ -443,8 +443,8 @@ function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detai
  * ------------------------------------------------------------------------- */
 const CONTENT_GATE_INTERNAL=[
   [/\bCorrect:\s/,'awalan penulis soal "Correct:"'],
-  [/This form matches the grammar and context/i,'teks cadangan hidrasi'],
-  [/does not satisfy the grammar rule tested here/i,'teks cadangan hidrasi'],
+  [/This form matches the grammar and/i,'teks cadangan hidrasi'],
+  [/does not satisfy the grammar rule/i,'teks cadangan hidrasi'],
   [/Evidence from the passage|Reading focus:/i,'perancah reading berbahasa Inggris'],
   [/\bwhyFails\b|\bwhyCorrect\b|\bmisconceptionTargeted\b|\bpedagogicalObjective\b|\breasoningOperation\b|\bpatternId\b|\bcorrectIndex\b/,'kunci skema mentah'],
   [/\[object Object\]/,'objek ikut ter-stringify'],
@@ -505,7 +505,7 @@ function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.op
 // murid mengulang kalimat campur aduk itu sebagai bahan belajar. Yang dibuang HANYA entri
 // yang membawa tanda kerusakannya; riwayat dan mastery tidak disentuh karena keduanya
 // hitungan, dan menghapusnya berarti menghapus bukti belajar yang sah.
-const CORRUPTED_REVIEW_SIGNATURE=/respons berbasis bukti|biografi pribadi of |\bCorrect:\s|This form matches the grammar and context|does not satisfy the grammar rule tested here|\bundefined\b|\[object Object\]/;
+const CORRUPTED_REVIEW_SIGNATURE=/respons berbasis bukti|biografi pribadi of |\bCorrect:\s|This form matches the grammar and|does not satisfy the grammar rule|\bundefined\b|\[object Object\]/;
 function pruneCorruptedReviewEntries(entries){
   if(!Array.isArray(entries))return[];
   return entries.filter(entry=>{
