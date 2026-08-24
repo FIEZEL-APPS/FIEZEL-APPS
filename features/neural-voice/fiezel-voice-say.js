@@ -34,6 +34,20 @@
   var SCHEMA = 'fiezel-voice-say-v1';
   var band = null;
 
+  /**
+   * m025-150 aset ElevenLabs mendahului mesin apa pun.
+   *
+   * Mandat V2 pasal 1: memutar audio normalnya berarti mengambil berkas yang sudah disetujui,
+   * dan produksi suara baru adalah kekecualian yang terjadi di luar aplikasi. Karena itu
+   * resolver ditanya lebih dulu, selalu. Mesin runtime di bawahnya baru terpakai untuk kalimat
+   * yang memang belum punya aset - dan tak satu pun dari mesin itu memanggil ElevenLabs,
+   * sehingga urutan ini tidak bisa membocorkan kredit betapapun seringnya tombol ditekan.
+   */
+  function assets() {
+    var mod = root.FiezelAudioResolver;
+    return mod && typeof mod.resolve === 'function' ? mod : null;
+  }
+
   function engine() { return root.FiezelPuterVoice || null; }
   function translator() { return root.FiezelSubtitleTranslate || null; }
 
@@ -109,9 +123,6 @@
 
     if (!english) return Promise.resolve(false);
 
-    var voice = engine();
-    if (!voice || typeof voice.speak !== 'function') return Promise.resolve(false);
-
     var band_ = subtitles();
 
     // Subtitle diminta lebih dulu tetapi tidak ditunggu; lihat catatan kepala berkas.
@@ -119,6 +130,43 @@
     // students tidak bisa baca jawaban sambil mendengar.
     if (!opts.suppressSubtitles) {
       prepareSubtitle(english, indonesian);
+    }
+
+    var store = assets();
+    if (!store) return speakWithEngine(english, opts, band_);
+
+    return store.resolve({
+      text: english,
+      locale: opts.locale || 'en-US',
+      contentType: opts.contentType || 'sentence'
+    }).then(function (found) {
+      if (!found || found.state !== 'READY') return speakWithEngine(english, opts, band_);
+      return store.playUrl(found.url, {
+        speed: opts.speed,
+        onProgress: function (currentTime, duration) {
+          if (band_) band_.update(currentTime, duration);
+        }
+      }).then(function (played) {
+        // Berkas ada di manifest tetapi gagal diputar - jaringan putus, atau autoplay
+        // ditolak. Mesin runtime masih boleh mencoba: yang dijaga mandat adalah kredit,
+        // dan mesin itu tidak memakainya.
+        if (played) { if (band_) band_.end(); return true; }
+        return speakWithEngine(english, opts, band_);
+      });
+    }).catch(function () {
+      return speakWithEngine(english, opts, band_);
+    });
+  }
+
+  /**
+   * Jalur mesin runtime, persis seperti sebelum m025-150. Ia kini hanya terpakai untuk
+   * kalimat yang belum punya aset ElevenLabs.
+   */
+  function speakWithEngine(english, opts, band_) {
+    var voice = engine();
+    if (!voice || typeof voice.speak !== 'function') {
+      if (band_) { try { band_.end(); } catch (_) {} }
+      return Promise.resolve(false);
     }
 
     return voice.speak(english, {
@@ -151,14 +199,26 @@
 
   /** Menyiapkan kalimat berikutnya lebih awal. Diam bila mesin tidak mendukungnya. */
   function prefetch(input, options) {
-    var voice = engine();
-    if (!voice || typeof voice.prefetch !== 'function') return Promise.resolve(false);
     var english = text(typeof input === 'string' ? input : (input && input.en));
     if (!english) return Promise.resolve(false);
-    return voice.prefetch(english, options || {});
+    var opts = options || {};
+
+    var store = assets();
+    var ahead = store
+      ? store.prefetch({ text: english, locale: opts.locale || 'en-US', contentType: opts.contentType || 'sentence' })
+      : Promise.resolve(false);
+
+    return ahead.then(function (cached) {
+      if (cached) return true;
+      var voice = engine();
+      if (!voice || typeof voice.prefetch !== 'function') return false;
+      return voice.prefetch(english, opts);
+    }).catch(function () { return false; });
   }
 
   function stop() {
+    var store = assets();
+    if (store && typeof store.stop === 'function') { try { store.stop(); } catch (_) {} }
     var voice = engine();
     if (voice && typeof voice.stop === 'function') { try { voice.stop(); } catch (_) {} }
     if (band) { try { band.end(); } catch (_) {} }
@@ -167,8 +227,11 @@
 
   function status() {
     var voice = engine();
+    var store = assets();
     return Object.freeze({
       schema: SCHEMA,
+      assetsReady: !!(store && store.status && store.status().manifest && store.status().manifest.loaded),
+      assetCount: store && store.status && store.status().manifest ? store.status().manifest.assetCount : 0,
       voiceReady: !!(voice && voice.status && voice.status().ready),
       localFallbackReady: !!localEngine(),
       subtitleReady: !!subtitles(),
