@@ -16,7 +16,23 @@ self.FIEZEL_REQUIRE_NOTIFICATIONS=false;
 // m025-61: penanda build halaman, dipakai health check untuk membandingkan versi yang
 // benar-benar dimuat dengan shell yang dipegang service worker. Nilainya dijaga gate agar
 // selalu sama dengan DIAG_BUILD; kalau keduanya berbeda, install-health-test gagal.
-self.FIEZEL_PAGE_BUILD='m025-149';
+self.FIEZEL_PAGE_BUILD='m025-150';
+// m025-150 profil suara ElevenLabs untuk sisi klien.
+//
+// Isinya sengaja hanya penanda, BUKAN rahasia apa pun: kunci API ElevenLabs hidup di
+// GitHub Actions secret dan tidak pernah menyentuh berkas yang disajikan ke browser
+// (mandat V2 pasal 6). Yang ada di sini hanya cukup untuk menghitung audioKey.
+//
+// voiceId dibiarkan kosong sampai owner memilih suaranya. Selama kosong, resolver menjawab
+// setiap permintaan dengan ABSENT dan FIEZEL berbunyi persis seperti sebelum rilis ini -
+// keadaan aman yang disengaja, bukan konfigurasi yang lupa diisi. Setelah batch pertama
+// berjalan, manifest membawa profil yang sebenarnya dan nilai di sini tinggal jadi cadangan
+// selama manifest belum termuat.
+self.FIEZEL_AUDIO_CONFIG=Object.freeze({
+  voiceId:'',
+  modelId:'eleven_multilingual_v2',
+  settings:Object.freeze({stability:0.5,similarityBoost:0.75,speed:1})
+});
 self.FIEZEL_CORE_CONFIG=Object.freeze({
   workerUrl:'https://fiezel-core.puter.work',
   protocolVersion:'1.7',
