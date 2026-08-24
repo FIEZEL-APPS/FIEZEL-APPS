@@ -2,11 +2,11 @@
   "status": "PASS",
   "version": "1.0.0",
   "counts": {
-    "pass": 24,
+    "pass": 28,
     "fail": 0,
-    "examPassages": 2,
-    "examQuestions": 23,
-    "questionTypes": 10
+    "examPassages": 5,
+    "examQuestions": 60,
+    "questionTypes": 11
   },
   "legacyCalibration": {
     "rows": [
@@ -58,7 +58,7 @@
     {
       "name": "Exam reading schema",
       "status": "PASS",
-      "details": "schema=fiezel-reading-exam-v1 passages=2"
+      "details": "schema=fiezel-reading-exam-v1 passages=5"
     },
     {
       "name": "No-prediction statement is present",
@@ -69,6 +69,9 @@
       "name": "Both exams are represented",
       "status": "PASS",
       "details": [
+        "ielts_academic_reading",
+        "toefl_reading",
+        "ielts_academic_reading",
         "ielts_academic_reading",
         "toefl_reading"
       ]
@@ -86,7 +89,10 @@
       "status": "PASS",
       "details": [
         "rx-tram=736 (700-1000)",
-        "rx-rings=702 (650-750)"
+        "rx-rings=702 (650-750)",
+        "rx-fall=735 (700-1000)",
+        "rx-poverty=752 (700-1000)",
+        "rx-lakes=700 (650-750)"
       ]
     },
     {
@@ -94,7 +100,10 @@
       "status": "PASS",
       "details": [
         "rx-tram:736/736",
-        "rx-rings:702/702"
+        "rx-rings:702/702",
+        "rx-fall:735/735",
+        "rx-poverty:752/752",
+        "rx-lakes:700/700"
       ]
     },
     {
@@ -102,15 +111,29 @@
       "status": "PASS",
       "details": [
         "rx-tram=8",
-        "rx-rings=7"
+        "rx-rings=7",
+        "rx-fall=9",
+        "rx-poverty=10",
+        "rx-lakes=10"
       ]
     },
     {
-      "name": "Question count matches the format contract",
+      "name": "Question count per passage sits inside the format range",
       "status": "PASS",
       "details": [
         "rx-tram=13",
-        "rx-rings=10"
+        "rx-rings=10",
+        "rx-fall=13",
+        "rx-poverty=14",
+        "rx-lakes=10"
+      ]
+    },
+    {
+      "name": "Each exam has exactly one full session available",
+      "status": "PASS",
+      "details": [
+        "ielts_academic_reading: 3/3 bacaan, 40/40 soal",
+        "toefl_reading: 2/2 bacaan, 20/20 soal"
       ]
     },
     {
@@ -118,13 +141,16 @@
       "status": "PASS",
       "details": [
         "rx-tram=B2",
-        "rx-rings=C1"
+        "rx-rings=C1",
+        "rx-fall=B2",
+        "rx-poverty=C1",
+        "rx-lakes=B2"
       ]
     },
     {
       "name": "Unique question identities",
       "status": "PASS",
-      "details": "23 questions"
+      "details": "60 questions"
     },
     {
       "name": "Every answer index is inside its option list",
@@ -149,7 +175,8 @@
         "inference",
         "sentence_simplification",
         "rhetorical_purpose",
-        "insert_text"
+        "insert_text",
+        "yes_no_not_given"
       ]
     },
     {
@@ -165,7 +192,7 @@
     {
       "name": "TFNG questions keep the canonical option order",
       "status": "PASS",
-      "details": "5 TFNG questions"
+      "details": "12 TFNG questions"
     },
     {
       "name": "TFNG answers use all three verdicts",
@@ -175,8 +202,35 @@
         "False",
         "Not Given",
         "True",
-        "False"
+        "False",
+        "True",
+        "False",
+        "Not Given",
+        "False",
+        "True",
+        "True",
+        "True"
       ]
+    },
+    {
+      "name": "YNNG questions keep the canonical option order",
+      "status": "PASS",
+      "details": "4 soal YNNG"
+    },
+    {
+      "name": "YNNG answers use all three verdicts",
+      "status": "PASS",
+      "details": [
+        "No",
+        "Yes",
+        "No",
+        "Not Given"
+      ]
+    },
+    {
+      "name": "The IELTS format lists both TFNG and YNNG, and explains the difference",
+      "status": "PASS",
+      "details": "dua tipe yang mirip bentuknya tetapi berbeda yang diujinya harus dibedakan di kontraknya"
     },
     {
       "name": "Matching-information keys point at the paragraph that holds the evidence",
@@ -194,6 +248,15 @@
           "inference",
           "sentence_simplification",
           "rhetorical_purpose",
+          "insert_text"
+        ],
+        [
+          "factual",
+          "negative_factual",
+          "vocabulary",
+          "sentence_simplification",
+          "rhetorical_purpose",
+          "inference",
           "insert_text"
         ]
       ]
