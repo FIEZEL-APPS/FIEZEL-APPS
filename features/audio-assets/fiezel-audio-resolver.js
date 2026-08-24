@@ -38,33 +38,60 @@
   function keys() { return root.FiezelAudioKey || null; }
   function manifest() { return root.FiezelAudioManifest || null; }
 
-  function voiceProfile() {
+  /**
+   * m025-153 setiap suara yang pernah dipakai, bukan hanya yang sekarang.
+   *
+   * Jatah ElevenLabs habis tiap bulan dan token penggantinya datang dari akun baru dengan
+   * voice ID baru. Kalau hanya profil terkini yang dipakai menghitung kunci, seluruh aset
+   * bulan-bulan sebelumnya berhenti ditemukan pada hari token berganti - masih tersimpan di
+   * R2, sudah dibayar, tetapi tidak pernah dicari lagi.
+   *
+   * Urutannya menentukan: profil terkini didahulukan, sehingga konten yang baru diproduksi
+   * terdengar konsisten, dan suara lama hanya melayani teks yang memang hanya dimilikinya.
+   */
+  function voiceProfiles() {
     var m = manifest();
-    var fromManifest = m && m.status ? m.status().voiceProfile : null;
-    if (fromManifest && fromManifest.voiceId && fromManifest.modelId) return fromManifest;
+    var fromManifest = m && m.status ? m.status().voiceProfiles : null;
+    if (fromManifest && fromManifest.length) return fromManifest;
     var cfg = root.FIEZEL_AUDIO_CONFIG;
     if (cfg && cfg.voiceId && cfg.modelId) {
-      return { voiceId: cfg.voiceId, modelId: cfg.modelId, settings: cfg.settings || {} };
+      return [{ voiceId: cfg.voiceId, modelId: cfg.modelId, settings: cfg.settings || {} }];
     }
-    return null;
+    return [];
   }
 
-  function identify(request) {
+  /** Profil terkini; dipakai laporan status dan pemanggil yang hanya butuh satu. */
+  function voiceProfile() {
+    var list = voiceProfiles();
+    return list.length ? list[0] : null;
+  }
+
+  function identifyAll(request) {
     var k = keys();
-    if (!k) return null;
-    var profile = voiceProfile();
-    if (!profile) return null;
+    if (!k) return [];
+    var list = voiceProfiles();
+    if (!list.length) return [];
     var req = typeof request === 'string' ? { text: request } : (request || {});
-    try {
-      return k.build({
-        text: req.text,
-        locale: req.locale || 'en-US',
-        contentType: req.contentType || 'sentence',
-        voiceId: profile.voiceId,
-        modelId: profile.modelId,
-        settings: profile.settings
-      });
-    } catch (_) { return null; }
+    var out = [];
+    for (var i = 0; i < list.length; i++) {
+      try {
+        out.push(k.build({
+          text: req.text,
+          locale: req.locale || 'en-US',
+          contentType: req.contentType || 'sentence',
+          voiceId: list[i].voiceId,
+          modelId: list[i].modelId,
+          settings: list[i].settings
+        }));
+      } catch (_) { /* profil tak lengkap dilewati, bukan menggagalkan sisanya */ }
+    }
+    return out;
+  }
+
+  /** Identitas menurut profil terkini. Dipertahankan untuk pemanggil lama. */
+  function identify(request) {
+    var all = identifyAll(request);
+    return all.length ? all[0] : null;
   }
 
   function resolve(request) {
@@ -76,18 +103,28 @@
     }
 
     return m.load().then(function () {
-      var identity = identify(request);
-      if (!identity) {
+      var candidates = identifyAll(request);
+      if (!candidates.length) {
         metrics.misses++;
         return Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'no_voice_profile' });
       }
-      var entry = m.lookup(identity.audioKey);
-      if (!entry) {
-        metrics.misses++;
-        return Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'not_generated', audioKey: identity.audioKey, identity: identity });
+      for (var i = 0; i < candidates.length; i++) {
+        var entry = m.lookup(candidates[i].audioKey);
+        if (entry) {
+          metrics.cacheHits++;
+          return Object.freeze({
+            schema: SCHEMA, state: STATE.READY, audioKey: candidates[i].audioKey,
+            url: entry.url, entry: entry, identity: candidates[i]
+          });
+        }
       }
-      metrics.cacheHits++;
-      return Object.freeze({ schema: SCHEMA, state: STATE.READY, audioKey: identity.audioKey, url: entry.url, entry: entry, identity: identity });
+      metrics.misses++;
+      // Kunci yang dilaporkan adalah milik profil terkini - itulah yang akan diproduksi
+      // kalau seseorang menjalankan batch, bukan salah satu suara lama.
+      return Object.freeze({
+        schema: SCHEMA, state: STATE.ABSENT, reason: 'not_generated',
+        audioKey: candidates[0].audioKey, identity: candidates[0]
+      });
     }).catch(function (error) {
       metrics.manifestErrors++;
       return Object.freeze({ schema: SCHEMA, state: STATE.FAILED, retryable: true, reason: String(error && error.message ? error.message : error) });
@@ -250,6 +287,7 @@
       schema: SCHEMA,
       manifest: m && m.status ? m.status() : null,
       voiceProfile: voiceProfile(),
+      voiceProfiles: voiceProfiles(),
       metrics: Object.freeze(Object.assign({}, metrics)),
       playing: !!current,
       persistentCache: Object.freeze({ name: CACHE_NAME, supported: cacheSupported() })
@@ -267,6 +305,8 @@
     SCHEMA: SCHEMA,
     STATE: STATE,
     identify: identify,
+    identifyAll: identifyAll,
+    voiceProfiles: voiceProfiles,
     resolve: resolve,
     play: play,
     playUrl: playUrl,
