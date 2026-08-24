@@ -319,6 +319,33 @@ function manifestWith(text, extra = {}) {
       'gate hanya-baca dijalankan tiap deploy');
   }
 
+  // 15. Keadaan produksi yang sebenarnya: FIEZEL_AUDIO_CONFIG.voiceId KOSONG, dan profil
+  //     suara hanya ada di dalam manifest.
+  //
+  //     Ini yang lolos dari 14 bagian di atas dan baru terlihat di aplikasi sungguhan.
+  //     Semua skenario sebelumnya menyuplai config berisi voiceId, sehingga urutan
+  //     "muat manifest dulu, baru hitung identitas" tidak pernah teruji - padahal
+  //     terbaliknya membuat resolver menyerah sebelum manifest sempat dibuka, lalu
+  //     menjawab ABSENT selamanya untuk aset yang sudah dibayar.
+  {
+    const { doc, identity } = manifestWith('Good afternoon.');
+    const user = makeUser(doc, { config: null });
+    const found = await user.resolver.resolve('Good afternoon.');
+    check('Profil suara dari manifest cukup, tanpa config di halaman',
+      found.state === 'READY' && found.audioKey === identity.audioKey,
+      `${found.state} ${found.reason || ''}`);
+
+    // Dan kalau memang tidak ada profil di mana pun, jawabannya harus tetap tenang -
+    // ABSENT dengan sebab yang jujur, bukan galat yang menghentikan pemanggil.
+    const blank = manifestWith('Nowhere line');
+    delete blank.doc.voiceProfile;
+    const blankUser = makeUser(blank.doc, { config: null });
+    const blankFound = await blankUser.resolver.resolve('Nowhere line');
+    check('Tanpa profil di mana pun, jawabannya ABSENT yang jujur',
+      blankFound.state === 'ABSENT' && blankFound.reason === 'no_voice_profile',
+      `${blankFound.state} ${blankFound.reason || ''}`);
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     counts: { pass: checks.filter(i => i.status === 'PASS').length, fail: checks.filter(i => i.status === 'FAIL').length },

@@ -91,17 +91,26 @@
    */
   function resolve(request) {
     metrics.lookups++;
-    var identity = identify(request);
-    if (!identity) {
-      metrics.misses++;
-      return Promise.resolve(Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'no_voice_profile' }));
-    }
     var m = manifest();
     if (!m) {
       metrics.misses++;
-      return Promise.resolve(Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'manifest_module_missing', audioKey: identity.audioKey }));
+      return Promise.resolve(Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'manifest_module_missing' }));
     }
+
+    // MANIFEST DIMUAT LEBIH DULU, baru identitas dihitung. Urutan ini bukan selera.
+    //
+    // Profil suara yang benar hidup DI DALAM manifest, sementara FIEZEL_AUDIO_CONFIG.voiceId
+    // sengaja dibiarkan kosong sampai batch pertama berjalan. Menghitung identitas lebih dulu
+    // berarti menanyakan profil kepada sumber yang belum dibuka: jawabannya null, resolve()
+    // menyerah dengan 'no_voice_profile', dan karena ia menyerah, manifest tidak pernah
+    // dimuat - buntu yang tidak bisa pulih sendiri. Semua aset yang sudah dibayar terbaca
+    // ABSENT selamanya, tanpa satu pun galat yang terlihat.
     return m.load().then(function () {
+      var identity = identify(request);
+      if (!identity) {
+        metrics.misses++;
+        return Object.freeze({ schema: SCHEMA, state: STATE.ABSENT, reason: 'no_voice_profile' });
+      }
       var entry = m.lookup(identity.audioKey);
       if (!entry) {
         metrics.misses++;
@@ -112,7 +121,7 @@
     }).catch(function (error) {
       metrics.manifestErrors++;
       return Object.freeze({
-        schema: SCHEMA, state: STATE.FAILED, retryable: true, audioKey: identity.audioKey,
+        schema: SCHEMA, state: STATE.FAILED, retryable: true,
         reason: String(error && error.message ? error.message : error)
       });
     });
