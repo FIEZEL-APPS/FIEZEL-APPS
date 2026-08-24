@@ -333,9 +333,32 @@ function grammarMisconceptionReason(misconception){
 function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return`“${option}” tepat karena bentuk dan maknanya sama-sama cocok dengan kalimat.`;const named=grammarMisconceptionReason(misconception);if(named)return`“${option}” ${named}`;const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return`“${option}” tidak cocok karena kalimat sudah menunjuk waktu lampau yang jelas dan selesai.`;if(/habit|routine|general truth/.test(raw))return`“${option}” akan memberi kesan kebiasaan atau fakta umum, padahal konteks kalimat meminta makna lain.`;if(/permission/.test(raw))return`“${option}” menyatakan izin, sedangkan maksud kalimat bukan memberi izin.`;if(/obligation|requirement|rule/.test(raw))return`“${option}” belum menyampaikan tingkat kewajiban yang diminta kalimat.`;if(/prohibition/.test(raw))return`“${option}” berarti larangan, bukan kesimpulan atau kemungkinan.`;if(/singular|plural|agreement/.test(raw))return`“${option}” belum cocok dengan jumlah subjek, jadi subject dan verb tidak selaras.`;if(/superlative/.test(raw))return`“${option}” memakai bentuk superlative, padahal cakupan perbandingannya tidak meminta bentuk itu.`;if(/comparative/.test(raw))return`“${option}” belum memakai bentuk perbandingan yang sesuai dengan jumlah hal yang dibandingkan.`;if(/word order|order/.test(raw))return`“${option}” menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.`;if(/infinitive/.test(raw))return`“${option}” memakai bentuk infinitive yang tidak cocok dengan kata kerja atau maksud kalimat.`;if(/gerund/.test(raw))return`“${option}” memakai bentuk -ing dengan makna yang berbeda dari konteks kalimat.`;if(/passive|agent/.test(raw))return`“${option}” belum membentuk kalimat pasif yang tepat atau menambahkan pelaku yang tidak diperlukan.`;if(/article|identif/.test(raw))return`“${option}” tidak cocok dengan apakah benda itu masih umum atau sudah jelas bagi pembaca.`;if(/auxiliary/.test(raw))return`“${option}” memakai auxiliary yang tidak sama dengan tense atau struktur kalimat utama.`;return`“${option}” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat.`}
 function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
 function stableGrammarHash(value){let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
-function grammarAlternativeMeta(item,field,count=3){const own=grammarMeta(item),pool=GRAMMAR_ITEMS.filter(x=>x.item!==item).map(x=>grammarMeta(x.item)?.[field]).filter(Boolean);const start=pool.length?stableGrammarHash(`${own.id}:${field}`)%pool.length:0,out=[];for(let i=0;i<pool.length&&out.length<count;i++){const value=String(pool[(start+i)%pool.length]||'').trim();if(value&&norm(value)!==norm(own[field])&&!out.some(x=>norm(x)===norm(value)))out.push(value)}const fallback=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];for(const value of fallback)if(out.length<count&&!out.some(x=>norm(x)===norm(value)))out.push(value);return out.slice(0,count)}
+// m025-149: pengecoh untuk mode "aturan/tujuan/penalaran mana yang cocok" diambil dari
+// lesson lain - itu memang cara membuat pilihan ganda. Yang salah sebelumnya adalah
+// JANGKAUANNYA: kolamnya seluruh 139 template lintas keluarga dan lintas level, sehingga
+// lesson A2 tentang tense mendapat pengecoh aturan linking device C1. Murid tidak perlu
+// tahu aturannya untuk menjawab - cukup pilih satu-satunya pilihan yang menyebut tense.
+// Sekarang kolamnya menyempit dulu ke keluarga yang sama, lalu ke level yang sama, baru
+// melebar. Urutannya tetap deterministik lewat stableGrammarHash.
+function grammarAlternativeMeta(item,field,count=3){const own=grammarMeta(item),ownLevel=String(item?.[5]||'');
+  const peers=GRAMMAR_ITEMS.filter(x=>x.item!==item);
+  // Tingkatannya dihabiskan BERURUTAN: keluarga yang sama dulu sampai kuotanya penuh, baru
+  // level yang sama, baru sisanya. Mengumpulkan ketiganya ke satu kolam lalu mengambil dari
+  // titik acak akan mengembalikan perilaku lama - kolamnya memang tersusun, tetapi titik
+  // mulainya melompat ke mana saja di dalamnya.
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  const out=[];
+  for(const tier of tiers){
+    if(out.length>=count)break;
+    const pool=[],poolSeen=new Set();
+    for(const x of tier){const value=grammarMeta(x.item)?.[field];const key=norm(value);if(value&&key&&!poolSeen.has(key)){poolSeen.add(key);pool.push(value)}}
+    if(!pool.length)continue;
+    const start=stableGrammarHash(`${own.id}:${field}`)%pool.length;
+    for(let i=0;i<pool.length&&out.length<count;i++){const value=String(pool[(start+i)%pool.length]||'').trim();if(value&&norm(value)!==norm(own[field])&&!out.some(x=>norm(x)===norm(value)))out.push(value)}
+  }
+  const fallback=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];for(const value of fallback)if(out.length<count&&!out.some(x=>norm(x)===norm(value)))out.push(value);return out.slice(0,count)}
 function completeGrammarStem(stem,option){return /_{3,}/.test(stem)?stem.replace(/_{3,}/,option):option}
-function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correct=meta.options[meta.correctIndex],reasons=Array.isArray(item?.[4])?item[4]:meta.options.map(()=>''),wrong=meta.options.map((option,index)=>({option,index,reason:reasons[index]||'',detail:(item?.[12]?.distractors||[]).find(x=>String(x.option)===String(option))||{}})).filter(x=>x.index!==meta.correctIndex),mode=GRAMMAR_PRACTICE_MODES[variant]||GRAMMAR_PRACTICE_MODES[0],title=friendlySkillName(skill),base=`${meta.stem}`;
+function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correct=meta.options[meta.correctIndex],reasons=Array.isArray(item?.[4])?item[4]:meta.options.map(()=>''),wrong=meta.options.map((option,index)=>({option,index,reason:reasons[index]||'',detail:(Array.isArray(item?.[17])?item[17]:[]).find(x=>String(x.option)===String(option))||{}})).filter(x=>x.index!==meta.correctIndex),mode=GRAMMAR_PRACTICE_MODES[variant]||GRAMMAR_PRACTICE_MODES[0],title=friendlySkillName(skill),base=`${meta.stem}`;
   const direct=(question,options,answerIndex,correctWhy,optionReasons=[])=>({mode,question,options,answerIndex,correctWhy,optionReasons});
   const metaChoice=(question,field,correctWhy)=>direct(question,[meta[field],...grammarAlternativeMeta(item,field,3)],0,correctWhy);
   if(variant===0)return direct(base,meta.options,meta.correctIndex,`“${correct}” menerapkan pola ${title.toLowerCase()} secara tepat.`,reasons);
@@ -346,20 +369,119 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   if(variant===5)return metaChoice(`Urutan penalaran mana yang paling aman sebelum memilih jawaban?\n${base}`,'reasoning','Urutan ini membawa siswa dari petunjuk konteks menuju bentuk grammar yang tepat.');
   if(variant===6)return metaChoice(`Kesalahan berpikir apa yang memang dirancang untuk dicegah oleh lesson ${title}?`,'misconception','Inilah miskonsepsi inti yang menjadi sasaran lesson, bukan sekadar salah eja.');
   if(variant===7)return metaChoice(`Pengingat singkat mana yang paling relevan untuk contoh ini?\n${base}`,'memory','Pengingat ini langsung menautkan petunjuk soal dengan pola yang benar.');
-  if(variant===8)return metaChoice(`Strategi mana yang paling membantu agar kesalahan yang sama tidak terulang?`,'avoid','Strategi ini memeriksa makna dan bentuk pada titik yang paling sering menyesatkan.');
-  if(variant>=9&&variant<=11){const target=wrong[variant-9];return direct(`Seorang siswa memilih “${target.option}”. Alasan mana yang paling tepat menjelaskan mengapa pilihan itu gagal?\n${base}`,[target.reason,meta.whyCorrect,...wrong.filter(x=>x!==target).map(x=>x.reason)],0,grammarOptionReason(target.option,false,target.reason,target.detail?.misconception));}
+  // m025-149: satu-satunya mode yang teks soalnya TIDAK menyebut lesson mana pun. Selama
+  // pengecohnya diambil dari seluruh bank, dua lesson hampir tidak mungkin menghasilkan
+  // empat pilihan yang sama; setelah kolamnya dipersempit ke satu keluarga, itu jadi mungkin
+  // dan dua lesson conditionals benar-benar menghasilkan soal yang identik. Menyebut nama
+  // lesson-nya memulihkan identitas soal sekaligus memberi tahu murid strategi lesson mana
+  // yang sedang ditanyakan.
+  if(variant===8)return metaChoice(`Strategi mana yang paling membantu agar kesalahan pada lesson ${title} tidak terulang?`,'avoid','Strategi ini memeriksa makna dan bentuk pada titik yang paling sering menyesatkan.');
+  if(variant>=9&&variant<=11){const target=wrong[variant-9];return direct(`Seorang siswa memilih “${target.option}”. Alasan mana yang paling tepat menjelaskan mengapa pilihan itu gagal?\n${base}`,[target.reason,meta.whyCorrect,...wrong.filter(x=>x!==target).map(x=>x.reason)],0,grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey));}
   if(variant>=12&&variant<=14){const target=wrong[variant-12],labels=wrong.filter(x=>x!==target).map(x=>String(x.detail.misconception||x.reason));return direct(`Label miskonsepsi mana yang paling tepat untuk pilihan “${target.option}”?\n${base}`,[String(target.detail.misconception||target.reason),'jawaban benar tanpa miskonsepsi',...labels],0,`Label tersebut menjelaskan pola kesalahan di balik pilihan “${target.option}”.`);}
   if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(`Jawaban “${target.option}” belum tepat. Pilih perbaikan yang mempertahankan maksud kalimat berikut:\n${base}`,meta.options,meta.correctIndex,`Perbaikannya adalah “${correct}”; bentuk itu cocok dengan konteks semula.`,reasons);}
-  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconception);return direct(`Perbandingan mana yang akurat antara “${correct}” dan “${target.option}”?\n${base}`,[`“${correct}” tepat; ${failure}`,`“${target.option}” tepat, sedangkan “${correct}” mengubah maksud kalimat.`,`Keduanya selalu dapat saling menggantikan tanpa perubahan makna.`,`Keduanya salah karena lesson ini tidak menguji pilihan tersebut.`],0,`Perbandingan pertama menjaga jawaban benar sekaligus mendiagnosis kesalahan spesifik pada “${target.option}”.`);}
+  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang akurat antara “${correct}” dan “${target.option}”?\n${base}`,[`“${correct}” tepat; ${failure}`,`“${target.option}” tepat, sedangkan “${correct}” mengubah maksud kalimat.`,`Keduanya selalu dapat saling menggantikan tanpa perubahan makna.`,`Keduanya salah karena lesson ini tidak menguji pilihan tersebut.`],0,`Perbandingan pertama menjaga jawaban benar sekaligus mendiagnosis kesalahan spesifik pada “${target.option}”.`);}
   if(variant===21){const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[grammarFamilyLabel(item),labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]],0,`Fokus ${title.toLowerCase()} berada dalam keluarga ${grammarFamilyLabel(item)}.`);}
   if(variant===22)return metaChoice(`Petunjuk keputusan mana yang perlu ditemukan terlebih dahulu pada contoh ini?\n${base}`,'reasoning','Petunjuk ini menentukan hubungan antara konteks, fungsi, dan bentuk jawaban.');
   if(variant===23){const correctSummary=`${meta.objective} ${meta.rule}`.trim(),alternatives=grammarAlternativeMeta(item,'objective',3).map((x,i)=>`${x} ${grammarAlternativeMeta(item,'rule',3)[i]}`.trim());return direct(`Ringkasan ajar mana yang paling tepat untuk menjelaskan lesson ${title} kepada siswa lain?`,[correctSummary,...alternatives],0,'Ringkasan tersebut menyatukan tujuan lesson dan aturan yang benar.');}
   const correctPlan=`${meta.avoid} ${meta.memory}`.trim(),avoid=grammarAlternativeMeta(item,'avoid',3),memory=grammarAlternativeMeta(item,'memory',3);return direct(`Rencana cek mandiri mana yang paling tepat sebelum menuntaskan lesson ${title}?`,[correctPlan,...avoid.map((x,i)=>`${x} ${memory[i]}`.trim())],0,'Rencana ini menggabungkan pencegahan kesalahan dan pengingat yang khusus untuk lesson aktif.');
 }
-function indonesianPartOfSpeech(value){return({noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru'}[String(value||'').toLowerCase()]||String(value||'jenis kata'))}
+// m025-149: label yang tidak dikenal dikembalikan APA ADANYA, jadi entri seperti "anti"
+// yang berlabel prefix menampilkan kata Inggris "prefix" kepada murid - dan di soal jenis
+// kata, ia jadi satu-satunya pilihan berbahasa Inggris di antara empat. Datanya benar;
+// yang kurang adalah labelnya.
+function indonesianPartOfSpeech(value){return({noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan kata',suffix:'akhiran kata',phrase:'frasa',modal:'kata bantu modal',auxiliary:'kata bantu',article:'kata sandang',numeral:'kata bilangan',number:'kata bilangan',ordinal:'kata bilangan tingkat',exclamation:'kata seru'}[String(value||'').toLowerCase()]||String(value||'jenis kata'))}
 function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'informasi yang benar-benar disebutkan',why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
-function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};return{ok:true}}
+/* ---------------------------------------------------------------------------
+ * m025-149: GERBANG INTEGRITAS KONTEN TERPUSAT.
+ *
+ * Insiden m025-149 tidak lolos karena datanya tidak divalidasi - ia lolos karena yang
+ * divalidasi adalah BENTUKNYA, bukan HUBUNGANNYA. Sebuah soal bisa punya stem, empat
+ * pilihan unik, indeks jawaban yang sah, dan penjelasan lengkap, lalu tetap rusak total
+ * karena pilihannya berasal dari catatan internal penulis soal, atau karena kunci dan
+ * pengecohnya berbeda bahasa sehingga murid bisa benar tanpa membaca.
+ *
+ * Jadi gerbang ini memeriksa yang tidak bisa dilihat dari bentuk:
+ *   kebocoran teks internal, belahan bahasa antar-pilihan, sisipan kata Indonesia di
+ *   dalam kalimat Inggris, penjelasan yang menunjuk pilihan yang tidak ada di layar,
+ *   dan bukti reading yang tidak ada di bacaannya.
+ *
+ * Titik pasangnya sengaja validateQuestion(): setiap pembangun soal - lesson grammar,
+ * placement, adaptif, reading ujian - sudah menyaring lewat fungsi itu dan mengambil
+ * kandidat berikutnya bila satu ditolak. Menolak di sini berarti penggantinya deterministik
+ * dan tervalidasi ulang, tanpa satu pun jalur render baru yang perlu ditambahkan.
+ * ------------------------------------------------------------------------- */
+const CONTENT_GATE_INTERNAL=[
+  [/\bCorrect:\s/,'awalan penulis soal "Correct:"'],
+  [/This form matches the grammar and context/i,'teks cadangan hidrasi'],
+  [/does not satisfy the grammar rule tested here/i,'teks cadangan hidrasi'],
+  [/Evidence from the passage|Reading focus:/i,'perancah reading berbahasa Inggris'],
+  [/\bwhyFails\b|\bwhyCorrect\b|\bmisconceptionTargeted\b|\bpedagogicalObjective\b|\breasoningOperation\b|\bpatternId\b|\bcorrectIndex\b/,'kunci skema mentah'],
+  [/\[object Object\]/,'objek ikut ter-stringify'],
+  [/\bundefined\b|\bNaN\b/,'nilai runtime bocor'],
+];
+const CONTENT_GATE_ID=/\b(yang|tidak|karena|dengan|untuk|adalah|pada|dari|itu|ini|bukan|akan|sudah|dapat|harus|kalimat|bentuk|kata|jawaban|pilihan|makna|waktu|subjek|agar|saat|lalu|hanya|juga|atau|dalam|oleh|apa|bisa|belum|masih|setiap|semua|tanpa|antara|sebagai|supaya|maksud|aturan|petunjuk|konteks|siswa|soal|benda|kerja|sifat|jumlah|tempat|orang|jadi|tetapi|sedangkan|padahal|ketika|sehingga|boleh|perlu|memang|kalau|jika|dipakai|memakai|menjadi|menandai|menunjuk|menyatakan|menerangkan|membentuk|berarti|berbeda|berlangsung|terhitung|terjadi|keadaan|kejadian|kebiasaan|penanda|salah|benar|tepat|cocok|periksa|lihat|cari|pilih|ubah|tambahkan|hafalkan|jamak|tunggal|lampau|sekarang|pengandaian|kepemilikan|penekanan|perbandingan|keterangan|penghubung|pertanyaan|langsung|pasif|aktif)\b/gi;
+const CONTENT_GATE_EN=/\b(the|of|and|that|this|with|for|because|when|which|not|learner|treats|implies|requires|signals|completed|ongoing|rather|than|from|about|there|their|before|after|while|since|between|without|into|over|under|through|during|against|among|already|still|also|only|just|even|both|either|neither|however|therefore|although|though|whether|unless|whereas|its|his|her|they|them|our|your|my|me|him|us|she|he|it|we|you|i)\b/gi;
+// Istilah tata bahasa Inggris NETRAL: penjelasan Indonesia yang benar memang mengutipnya.
+const CONTENT_GATE_META=/\b(present|past|future|perfect|continuous|progressive|simple|tense|aspect|gerund|infinitive|participle|passive|active|modal|auxiliary|article|determiner|quantifier|preposition|conjunction|pronoun|possessive|subject|object|verb|noun|adjective|adverb|clause|phrase|singular|plural|countable|uncountable|comparative|superlative|inversion|relative|reported|conditional|am|is|are|was|were|be|been|being|have|has|had|do|does|did|will|would|can|could|shall|should|may|might|must|used|to|got|ing|ed|es|s|a|an|some|any|much|many|little|few|who|what|where|why|how|whom|whose)\b/gi;
+// Kata isi Indonesia; dipakai HANYA untuk menangkap sisipan terjemahan di dalam kalimat
+// Inggris yang kerangkanya masih utuh ("with her sekolah class").
+const CONTENT_GATE_SPLICE=/\b(sekolah|rumah|payung|toko|pintu|gerbang|dapur|meja|permainan|menunggu|hujan|dimainkan|nasi|makanan|pelajaran|respons|berbasis|bukti|biografi|pribadi|perjalanan|iklan|produk|bacaan|konkret|guru|murid|teman|kelas|kegiatan|kehidupan|keluarga)\b/i;
+const gateSet=re=>new Set(re.source.replace(/\\b|[()]/g,'').split('|'));
+const CONTENT_GATE_ID_SET=gateSet(CONTENT_GATE_ID),CONTENT_GATE_EN_SET=gateSet(CONTENT_GATE_EN),CONTENT_GATE_META_SET=gateSet(CONTENT_GATE_META);
+/** Bahasa KERANGKA sebuah teks; kutipan diabaikan karena itu contoh, bukan kerangkanya. */
+function contentLanguageFrame(text){
+  const framed=String(text??'').replace(/[“"'‘][^”"'’]*[”"'’]/g,' ');
+  let id=0,en=0;
+  for(const w of norm(framed).split(' ')){if(!w||CONTENT_GATE_META_SET.has(w))continue;if(CONTENT_GATE_ID_SET.has(w))id++;else if(CONTENT_GATE_EN_SET.has(w))en++}
+  return id>=1?'id':(en>=2?'en':'neutral');
+}
+const contentGateLedger=[];
+function recordGateRejection(q,reason){
+  // Ditolak berarti murid tidak pernah melihatnya - tetapi diam-diam menolak juga cara
+  // kerusakan bertahan tanpa terlihat. Alasannya disimpan supaya panel diagnostik bisa
+  // menunjukkan APA yang ditolak, bukan sekadar bahwa jumlah soalnya kurang.
+  contentGateLedger.push({at:Date.now(),id:String(q?.id||''),type:String(q?.type||''),skill:String(q?.skill||''),reason});
+  if(contentGateLedger.length>200)contentGateLedger.splice(0,contentGateLedger.length-200);
+  return{ok:false,reason};
+}
+function contentIntegrityGate(q){
+  const options=q.options.map(x=>String(x??''));
+  // 1. Kebocoran data internal pada permukaan yang dilihat murid.
+  for(const surface of [q.question,...options])for(const [re,why] of CONTENT_GATE_INTERNAL)if(re.test(surface))return recordGateRejection(q,`kebocoran internal: ${why}`);
+  // 2. Belahan bahasa: sebagian pilihan berbahasa Inggris, sebagian Indonesia. Kalau begitu
+  //    bahasanya sendiri yang menunjuk jawaban, dan soal itu tidak menguji apa pun.
+  const prose=options.filter(x=>norm(x).split(' ').filter(Boolean).length>=6).map(x=>({x,frame:contentLanguageFrame(x)}));
+  const en=prose.filter(x=>x.frame==='en'),id=prose.filter(x=>x.frame==='id');
+  if(en.length&&id.length&&prose.length>=3)return recordGateRejection(q,`belahan bahasa ${en.length} Inggris / ${id.length} Indonesia`);
+  // 3. Sisipan terjemahan di dalam kalimat Inggris.
+  for(const x of prose)if(x.frame==='en'&&CONTENT_GATE_SPLICE.test(x.x))return recordGateRejection(q,'sisipan kata Indonesia di kalimat Inggris');
+  // 4. Penjelasan per pilihan harus menunjuk pilihan yang benar-benar ada di layar.
+  if(Array.isArray(q.explain?.distractors))for(const d of q.explain.distractors)if(!options.some(o=>norm(o)===norm(d?.option)))return recordGateRejection(q,'penjelasan menunjuk pilihan yang tidak ada');
+  // 5. Bukti reading harus benar-benar ada di bacaannya.
+  if(q.type==='reading'&&q.explain?.evidence&&q.passage?.text){
+    const evidence=String(q.explain.evidence).trim();
+    if(evidence&&!String(q.passage.text).includes(evidence.slice(0,40)))return recordGateRejection(q,'bukti tidak ada di bacaan');
+  }
+  // 6. Identitas konsep: soal lesson tidak boleh membawa konsep lesson lain.
+  if(q.type==='grammar'&&q.lessonSkill&&q.skill&&q.lessonSkill!==q.skill)return recordGateRejection(q,'identitas lesson tidak cocok');
+  return{ok:true};
+}
+function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};return contentIntegrityGate(q)}
 
+// m025-149: entri review yang DIREKAM saat konten rusak masih menyimpan teksnya apa adanya.
+// Soalnya sendiri selalu dibangun ulang dari bank - tidak ada jalur yang memutar ulang teks
+// tersimpan sebagai soal baru - tetapi layar "salah sebelumnya" tetap menampilkannya, jadi
+// murid mengulang kalimat campur aduk itu sebagai bahan belajar. Yang dibuang HANYA entri
+// yang membawa tanda kerusakannya; riwayat dan mastery tidak disentuh karena keduanya
+// hitungan, dan menghapusnya berarti menghapus bukti belajar yang sah.
+const CORRUPTED_REVIEW_SIGNATURE=/respons berbasis bukti|biografi pribadi of |\bCorrect:\s|This form matches the grammar and context|does not satisfy the grammar rule tested here|\bundefined\b|\[object Object\]/;
+function pruneCorruptedReviewEntries(entries){
+  if(!Array.isArray(entries))return[];
+  return entries.filter(entry=>{
+    if(!entry||typeof entry!=='object')return false;
+    return !CORRUPTED_REVIEW_SIGNATURE.test(`${entry.question||''} ${entry.correct||''} ${entry.selectedAnswer||''}`);
+  });
+}
 const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
 let stateReady=false;
 // m025-140: bank konten dideklarasikan SEBELUM loadState(). sanitizeState() sekarang menghitung
@@ -403,7 +525,7 @@ function sessionLevel(session){const explicit=String(session?.level||'');return 
 function historyMatchesActive(h,level=getActiveLevel()){const explicit=String(h?.level||'');if(LEVELS.includes(explicit))return explicit===level;const inferred=contentLevelFor(h?.type,h?.target||h?.reviewKey||h?.skill||'');return !inferred||inferred===level}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:Array.isArray(raw?.wrongAnswers)?raw.wrongAnswers:[],confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null};
   if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
   next.version=APP_VERSION;
@@ -1005,17 +1127,37 @@ async function load(){const root=document.baseURI;const get=async f=>{const r=aw
       const skill=String(t.subskill||t.family||'general').trim(),curriculum=GRAMMAR_CURRICULUM_INDEX[String(t.id||skill)]||GRAMMAR_CURRICULUM_INDEX[skill]||{};
       const opts=Array.isArray(t.options)?t.options:[];
       const idx=Number.isInteger(t.correctIndex)?t.correctIndex:-1;
+      // m025-149: alasan per pilihan ini BUKAN teks internal - ia dipakai langsung sebagai
+      // pilihan jawaban di mode justify_correct dan diagnose_distractor. Selama ini yang
+      // diambil adalah whyFails/whyCorrect versi Inggris beserta awalan "Correct: ", jadi
+      // murid Indonesia melihat catatan penulis soal berbahasa Inggris sebagai jawaban -
+      // dan di mode diagnose, catatan itulah KUNCINYA. Terjemahan Indonesianya sudah ada
+      // di bank sejak lama dan tidak pernah dibaca. Versi Inggris hanya jadi cadangan.
       const reasons=opts.map((o,i)=>{
-        if(i===idx)return `Correct: ${String(t.explanation?.whyCorrect||'This form matches the grammar and context.')}`;
+        if(i===idx)return String(t.explanation?.whyCorrectId||t.explanation?.whyCorrect||'Bentuk ini cocok dengan aturan dan konteks kalimatnya.');
         const d=(t.distractors||[]).find(x=>String(x.option)===String(o));
-        return d?.whyFails||`“${o}” does not satisfy the grammar rule tested here.`;
+        return String(d?.whyFailsId||d?.whyFails||`“${o}” belum memenuhi aturan grammar yang diuji di sini.`);
       });
       const item=[t.stem||'',opts,idx,t.explanation?.rule||t.pedagogicalObjective||skill,reasons,curriculum.level||t.cefr||'',t.family||'core_grammar',t.explanation?.whyCorrect||'',t.id||'',t.pedagogicalObjective||'',t.misconceptionTargeted||'',t.reasoningOperation||'',t.explanation||{},t.questionType||'multiple_choice',t.__fiezelCanary||null,
         // m025-118: peta {teks pilihan -> nama miskonsepsi}. Bank soal SUDAH membawanya sejak
         // lama dan selama ini dibuang di sini - hanya whyFails yang lolos. Namanya yang
         // dipakai Tutor Brain untuk mengenali pola keliru yang SAMA di soal yang berbeda;
         // tanpa itu, "sudah dua kali salah karena keyakinan yang sama" mustahil dilihat.
-        Object.fromEntries((t.distractors||[]).filter(x=>x&&x.option).map(x=>[String(x.option),String(x.misconception||'')]))];
+        Object.fromEntries((t.distractors||[]).filter(x=>x&&x.option).map(x=>[String(x.option),String(x.misconception||'')])),
+        // m025-149 [16]: metadata ajar versi Indonesia. grammarMeta() SUDAH membaca slot ini
+        // sejak lama - objectiveId, misconceptionId, reasoningId - tetapi hidrasi tidak pernah
+        // mengisinya, jadi pembacaan itu selalu undefined dan jatuh ke item[9]/[10]/[11] yang
+        // berbahasa Inggris. Enam mode latihan (recognize_objective, identify_misconception,
+        // sequence_reasoning, locate_decision_cue, teach_back, mastery_check) menyajikan slot
+        // ini sebagai PILIHAN JAWABAN, jadi slot kosong itu berarti murid memilih di antara
+        // catatan penulis soal berbahasa Inggris.
+        {objectiveId:String(t.pedagogicalObjectiveId||''),misconceptionId:String(t.misconceptionTargetedId||''),reasoningId:String(t.reasoningOperationId||'')},
+        // m025-149 [17]: rincian distraktor beserta versi Indonesianya. grammarExercise()
+        // mencarinya di item[12].distractors - kunci yang TIDAK PERNAH ADA di satu pun dari
+        // 139 template, karena distractors adalah saudara explanation, bukan anaknya. Akibatnya
+        // pencarian itu selalu mengembalikan {} dan mode label_misconception menanyakan "label
+        // miskonsepsi mana yang tepat" dengan empat kalimat penuh bahasa Inggris sebagai pilihan.
+        (t.distractors||[]).filter(x=>x&&x.option).map(x=>({option:String(x.option),whyFails:String(x.whyFailsId||x.whyFails||''),misconception:String(x.misconceptionId||x.misconception||''),misconceptionKey:String(x.misconception||'')}))];
       (buckets[skill]??=[]).push(item);
       GRAMMAR_ITEMS.push({skill,item,family:item[6],level:item[5],sequence:Number(curriculum.sequence)||Number.MAX_SAFE_INTEGER,unit:String(curriculum.unit||''),title:String(curriculum.title||''),prerequisites:Array.isArray(curriculum.prerequisites)?curriculum.prerequisites.slice():[]});
     }
@@ -2847,13 +2989,25 @@ function uniqueReadingOptions(r,q,answer){
   return clean.slice(0,4)
 }
 function makeReadingQuestion(r,q,i){
-  const meta=q[3]&&typeof q[3]==='object'?q[3]:{};const original=q[0],answerText=meta.answer||q[1]?.[q[2]];const type=meta.type||readingSkill(original);
+  // m025-149: identitas jawaban dipegang oleh INDEKS, bukan oleh meta.answer. Bank soal
+  // menyimpan keduanya, dan ketika terjemahan merusak salah satunya keduanya berselisih -
+  // 170 soal begitu. Urutan lama mendahulukan meta.answer, tidak menemukan padanannya di
+  // daftar pilihan, lalu "memperbaiki" keadaan dengan MENIMPA pilihan pertama hasil acak.
+  // Artinya satu pengecoh sungguhan lenyap, dan pengecoh yang lenyap berbeda tiap kali soal
+  // dibuka. meta.answer sekarang hanya cadangan kalau indeksnya sendiri tidak sehat.
+  const meta=q[3]&&typeof q[3]==='object'?q[3]:{};const original=q[0];
+  const indexedAnswer=Array.isArray(q[1])&&Number.isInteger(q[2])?q[1][q[2]]:undefined;
+  const answerText=indexedAnswer!==undefined&&indexedAnswer!==null&&String(indexedAnswer).trim()?indexedAnswer:meta.answer;
+  const type=meta.type||readingSkill(original);
   const stems={main_idea:['Gagasan utama mana yang paling mewakili isi bacaan?','Sebenarnya, bacaan ini paling banyak membahas apa?'],detail:['Detail mana yang benar-benar didukung oleh bacaan?','Pernyataan mana yang disebutkan dengan jelas di dalam teks?'],inference:['Kesimpulan apa yang paling masuk akal dari petunjuk di bacaan?','Kesimpulan mana yang mengikuti bukti di dalam teks?'],vocabulary:['Arti kata atau frasa tersebut yang paling pas dalam konteks ini apa?','Makna mana yang cocok dengan pemakaian ungkapan itu?'],vocabulary_context:['Apa arti ungkapan tersebut di dalam bacaan ini?','Bagaimana istilah itu dipakai dalam konteks bacaan?'],purpose:['Apa tujuan utama penulis membuat bacaan ini?','Mengapa teks ini kemungkinan besar ditulis?'],sequence:['Peristiwa atau langkah mana yang terjadi lebih dulu?','Bagaimana urutan kejadian di dalam bacaan?'],cause_effect:['Apa yang menyebabkan perubahan tersebut?','Akibat apa yang muncul dari kondisi yang dijelaskan?'],comparison:['Perbandingan apa yang dibuat di dalam bacaan?','Perbedaan mana yang benar-benar didukung oleh teks?'],evidence:['Detail mana yang menjadi bukti paling kuat untuk kesimpulan itu?','Bukti apa di dalam bacaan yang mendukung penafsiran tersebut?'],tone:['Sikap apa yang terasa dari cara penulis menyampaikan gagasan?','Nada mana yang paling cocok dengan bacaan ini?'],paraphrase:['Pilihan mana yang menyampaikan ulang gagasan utama tanpa mengubah maknanya?','Kalimat mana yang punya makna sama dengan pernyataan penting itu?'],conclusion:['Kesimpulan mana yang paling kuat didukung oleh bacaan?','Kesimpulan apa yang paling aman diambil dari bukti yang tersedia?'],reference:['Kata rujukan itu mengarah ke apa?','Gagasan sebelumnya mana yang dirujuk oleh kata tersebut?'],true_false_not_stated:['Pernyataan mana yang benar menurut bacaan?','Klaim mana yang didukung teks, bukan hanya dugaan?'],why:['Mengapa tokoh di dalam bacaan mengambil pilihan itu?','Alasan apa yang diberikan untuk keputusan tersebut?'],how:['Bagaimana prosesnya berubah setelah bukti dikumpulkan?','Cara apa yang digunakan oleh kelompok tersebut?'],likely:['Apa yang paling mungkin terjadi jika kondisinya terus berlanjut?','Hasil berikutnya mana yang paling masuk akal?'],relationship:['Bagaimana hubungan antara dua gagasan atau tahap tersebut?','Hubungan apa antara peristiwa-peristiwa yang dijelaskan?'],detail2:['Detail pendukung mana yang menguatkan gagasan utama?','Fakta tambahan mana yang relevan dengan argumen bacaan?'],location:['Di mana kegiatan tersebut berlangsung?'],time:['Kapan peristiwa yang dimaksud terjadi?'],people:['Siapa yang terlibat langsung dalam peristiwa itu?'],quantity:['Berapa jumlah yang disebutkan di dalam bacaan?'],process:['Proses apa yang dijelaskan di dalam bacaan?'],action:['Tindakan apa yang disebutkan dengan jelas?'],record:['Informasi apa yang dicatat?']};
   const stem=pick(stems[type])||stems.detail[0];
   const opts=uniqueReadingOptions(r,q,q[2]);
   const shuffled=shuffle(opts.map(x=>({x,ok:norm(x)===norm(answerText)})));
   let answerIndex=shuffled.findIndex(x=>x.ok);
-  if(answerIndex<0&&answerText){shuffled[0]={x:answerText,ok:true};answerIndex=0}
+  // Kalau kuncinya tetap tidak ditemukan, soal ini memang rusak. Biarkan answerIndex -1
+  // supaya gerbang integritas menolaknya; menimpa satu pilihan hanya menyembunyikan
+  // kerusakan itu dan menukarnya dengan kerusakan lain yang lebih sulit dilihat.
+  if(answerIndex<0&&answerText&&!shuffled.some(x=>norm(x.x)===norm(answerText)))answerIndex=-1;
   const evidence=meta.evidence||String(r.text||'').split(/(?<=[.!?])\s+/).find(s=>answerText&&s.toLowerCase().includes(String(answerText).toLowerCase().slice(0,12)))||String(r.text||'').split(/(?<=[.!?])\s+/)[0];
   const title=r.title||'bacaan ini';
   const contextualStem=`Berdasarkan “${title}”, ${stem.charAt(0).toLowerCase()+stem.slice(1)}`;
@@ -2949,6 +3103,11 @@ function makeListeningQuestion(item){
   return{
     id:`listening-${item.id}-${Date.now()}-${Math.random()}`,
     type:'listening',
+    // m025-149: difficulty DITURUNKAN dari item.level, tetapi level-nya sendiri tidak pernah
+    // ikut terbawa. Enam soal listening di tes penempatan karena itu masuk tanpa band CEFR,
+    // dan setiap pembacaan hasil per level kehilangan keenamnya - termasuk laporan diagnostik
+    // yang menjelaskan kepada murid dari band mana kesimpulannya diambil.
+    level:LEVELS.includes(item.level)?item.level:'',
     skill:`listening_${item.mode}`,
     target:item.id,
     difficulty:LEVELS.indexOf(item.level)+1,
