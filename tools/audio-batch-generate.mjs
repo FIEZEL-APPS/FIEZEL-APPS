@@ -292,7 +292,21 @@ async function verifyVoice(voiceId, apiKey) {
       : `Panjangnya ${voiceId.length} karakter, sedangkan voice ID ElevenLabs selalu 20 - kemungkinan tersalin tidak utuh.`;
     return `Voice ID "${voiceId}" tidak ditemukan di akun ini. ${hint}`;
   }
-  if (!response.ok) return `ElevenLabs menjawab HTTP ${response.status} saat memeriksa suara.`;
+  // Status lain apa pun turun jadi catatan, bukan penghalang.
+  //
+  // Pemeriksaan ini penasihat, bukan penentu. Yang benar-benar menentukan adalah panggilan
+  // sintesis itu sendiri: kalau suaranya salah, ia berhenti fatal pada aset pertama dan
+  // tidak ada kredit yang terpakai. Membiarkan endpoint daftar suara memblokir produksi
+  // berarti satu jawaban aneh dari ElevenLabs - 400 untuk kunci bertipe terbatas, misalnya -
+  // menghentikan pekerjaan yang sebenarnya bisa berjalan sepenuhnya.
+  //
+  // Yang tetap fatal hanyalah dua jawaban yang tidak ambigu: kunci ditolak, dan suara yang
+  // dipastikan tidak ada.
+  if (!response.ok) {
+    let other = '';
+    try { other = (await response.text()).slice(0, 200).replace(/\s+/g, ' '); } catch (_) {}
+    return { skipped: `Keberadaan suara tidak bisa diperiksa (HTTP ${response.status}${other ? ': ' + other : ''}). Produksi tetap jalan; kesalahan suara akan berhenti fatal pada aset pertama tanpa memakai kredit.` };
+  }
   try {
     const doc = await response.json();
     if (doc?.name) console.log(`suara         : ${doc.name} (${voiceId})`);
