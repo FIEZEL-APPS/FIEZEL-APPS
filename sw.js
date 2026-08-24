@@ -76,6 +76,14 @@ self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);
   if(requestUrl.pathname.toLowerCase().endsWith('/version.json')){e.respondWith(fetch(e.request).then(r=>r&&r.ok?r:caches.match(e.request,{cacheName:SHELL_CACHE})).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE})));return}
+  // m025-150 indeks audio TIDAK boleh cache-first.
+  //
+  // Batch aset mendarat di antara rilis, sedangkan SHELL_CACHE hanya berganti saat SW_REV
+  // naik. Kalau manifest ikut aturan shell, setiap perangkat yang sudah terpasang akan terus
+  // membaca indeks lama - dan setiap kalimat yang baru dibayar ke ElevenLabs terbaca ABSENT
+  // sampai ada rilis yang sama sekali tidak berhubungan. Jaringan didahulukan, salinan shell
+  // tetap jadi jaring pengaman luring. Polanya sama persis dengan version.json di atas.
+  if(requestUrl.pathname.toLowerCase().endsWith('/audio/manifest.json')){e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));return r}return caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||r)}).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE})));return}
   if(requestUrl.origin!==self.location.origin){
     // Third-party SDK/API traffic is deliberately left to the browser. The
     // document uses COEP: credentialless, so no-cors resources such as Puter.js
