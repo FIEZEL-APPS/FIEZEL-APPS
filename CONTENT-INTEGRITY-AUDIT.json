@@ -15,7 +15,7 @@
     "writing.recordsInspected": 36,
     "classroom.recordsInspected": 38,
     "library.recordsInspected": 9,
-    "grammar.questionsInspected": 3460,
+    "grammar.questionsInspected": 3475,
     "reading.questionsInspected": 1500,
     "vocabulary.shippedRecords": 1765,
     "vocabulary.questionsInspected": 7060,
@@ -24,54 +24,78 @@
     "placement.cefrDistribution": "{\"A1\":6,\"A2\":5,\"B1\":4,\"B2\":4,\"C1\":3,\"C2\":3}"
   },
   "bySeverity": {
-    "CRITICAL": 14,
-    "MAJOR": 120
+    "CRITICAL": 8,
+    "MAJOR": 126
   },
   "byCode": {
-    "grammar/DUPLICATE_MISCONCEPTION_LABEL": 1,
-    "grammar/LESSON_UNDERFILLED": 13,
-    "grammar/CROSS_FAMILY_FALLBACK": 120
+    "grammar/OPTION_PROVENANCE_LOST": 4,
+    "grammar/EXPLANATION_WRONG_KIND": 4,
+    "grammar/CROSS_FAMILY_FALLBACK": 126
   },
   "findings": [
     {
       "severity": "CRITICAL",
       "module": "grammar",
-      "code": "DUPLICATE_MISCONCEPTION_LABEL",
-      "id": "AR-003",
-      "detail": "two distractors share one misconceptionId, so the misconception-labelling modes have two identical options",
-      "evidence": "kata jumlah untuk benda tak terhitung dipakai pada kata benda jamak terhitung | kata jumlah untuk benda tak terhitung dipakai pada kata benda jamak terhitung | menambah of tanpa kata penentu di belakangnya sekaligus tetap salah memakai much"
+      "code": "OPTION_PROVENANCE_LOST",
+      "id": "TA-006",
+      "detail": "an option borrowed from TA-004 carries no provenance, so a wrong pick cannot be traced to the lesson actually confused",
+      "evidence": "bentuk dasar present dipakai di dalam cerita lampau"
     },
     {
       "severity": "CRITICAL",
       "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "AR-003",
-      "detail": "lesson \"much_many_little_few_countability\" produced 22/25 valid questions",
-      "evidence": ""
+      "code": "EXPLANATION_WRONG_KIND",
+      "id": "TA-006",
+      "detail": "a borrowed rule statement is diagnosed as if it were a wrong verb form",
+      "evidence": "“bentuk dasar present dipakai di dalam cerita lampau” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat."
     },
     {
       "severity": "CRITICAL",
       "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "PR-002",
-      "detail": "lesson \"place_prepositions_at_in_on\" produced 24/25 valid questions",
-      "evidence": ""
+      "code": "OPTION_PROVENANCE_LOST",
+      "id": "TA-006",
+      "detail": "an option borrowed from TA-004 carries no provenance, so a wrong pick cannot be traced to the lesson actually confused",
+      "evidence": "bentuk dasar present dipakai di dalam cerita lampau"
     },
     {
       "severity": "CRITICAL",
       "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "PR-005",
-      "detail": "lesson \"movement_prepositions_through_across_along_over\" produced 24/25 valid questions",
-      "evidence": ""
+      "code": "EXPLANATION_WRONG_KIND",
+      "id": "TA-006",
+      "detail": "a borrowed rule statement is diagnosed as if it were a wrong verb form",
+      "evidence": "“bentuk dasar present dipakai di dalam cerita lampau” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat."
     },
     {
       "severity": "CRITICAL",
       "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "b4_015",
-      "detail": "lesson \"preposition_after_adjective_of_emotion_pleased_with_vs_about\" produced 24/25 valid questions",
-      "evidence": ""
+      "code": "OPTION_PROVENANCE_LOST",
+      "id": "CO-003",
+      "detail": "an option borrowed from CO-002 carries no provenance, so a wrong pick cannot be traced to the lesson actually confused",
+      "evidence": "“would” dipakai di kedua anak kalimat"
+    },
+    {
+      "severity": "CRITICAL",
+      "module": "grammar",
+      "code": "EXPLANATION_WRONG_KIND",
+      "id": "CO-003",
+      "detail": "a borrowed rule statement is diagnosed as if it were a wrong verb form",
+      "evidence": "““would” dipakai di kedua anak kalimat” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat."
+    },
+    {
+      "severity": "CRITICAL",
+      "module": "grammar",
+      "code": "OPTION_PROVENANCE_LOST",
+      "id": "CO-003",
+      "detail": "an option borrowed from CO-002 carries no provenance, so a wrong pick cannot be traced to the lesson actually confused",
+      "evidence": "“would” dipakai di kedua anak kalimat"
+    },
+    {
+      "severity": "CRITICAL",
+      "module": "grammar",
+      "code": "EXPLANATION_WRONG_KIND",
+      "id": "CO-003",
+      "detail": "a borrowed rule statement is diagnosed as if it were a wrong verb form",
+      "evidence": "““would” dipakai di kedua anak kalimat” belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat."
     },
     {
       "severity": "MAJOR",
@@ -128,22 +152,6 @@
       "id": "b4_024",
       "detail": "lesson \"cleft_sentences_it_was_x_that_emphasis\" (emphasis_inversion/C1) offers an answer option authored for CO-007 (conditionals/C1)",
       "evidence": "temukan syarat tidak nyata yang tersirat di balik “otherwise” → pilih bentuk kata kerja yang sejalan dengan syarat itu"
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "b5_013",
-      "detail": "lesson \"preposition_of_means_by_vs_with_vs_on\" produced 24/25 valid questions",
-      "evidence": ""
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "b5_014",
-      "detail": "lesson \"dependent_preposition_after_noun_reason_for_solution_to\" produced 24/25 valid questions",
-      "evidence": ""
     },
     {
       "severity": "MAJOR",
@@ -258,46 +266,6 @@
       "evidence": "kenali anak kalimat what di awal sebagai satu kesatuan subjek → pilih kesesuaian bentuk tunggal → taruh bagian yang ditonjolkan setelah be"
     },
     {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-003",
-      "detail": "lesson \"present_simple_basics\" produced 24/25 valid questions",
-      "evidence": ""
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-004",
-      "detail": "lesson \"be_subject_agreement\" produced 24/25 valid questions",
-      "evidence": ""
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-007",
-      "detail": "lesson \"can_ability\" produced 24/25 valid questions",
-      "evidence": ""
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" produced 24/25 valid questions",
-      "evidence": ""
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk titik atau tempat tertentu."
-    },
-    {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
@@ -318,16 +286,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
-      "evidence": "Memasangkan kata penunjuk dengan jumlah bendanya dan dengan jaraknya, dekat atau jauh"
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk titik atau tempat tertentu."
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for PR-001 (prepositions/A1)",
-      "evidence": "Memilih kata depan waktu sesuai tingkat kerinciannya: bulan atau tahun, hari, atau jam"
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
+      "evidence": "Memasangkan kata penunjuk dengan jumlah bendanya dan dengan jaraknya, dekat atau jauh"
     },
     {
       "severity": "MAJOR",
@@ -343,79 +311,7 @@
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-009",
       "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for PR-001 (prepositions/A1)",
-      "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
-      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-017 (pronouns_determiners/A1)",
-      "evidence": "lihat kata sesudah rumpang lalu tentukan bentuk kata gantinya"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-003 (core_grammar/A1)",
-      "evidence": "bentuk dasar dipakai berlebihan; tertukar dengan bentuk berkelanjutan; tertukar dengan bentuk lampau"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-004 (core_grammar/A1)",
-      "evidence": "bentuk be untuk orang pertama; bentuk be untuk tunggal; bentuk dasar"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
-      "evidence": "kesesuaian bentuk tunggal; bentuk dasar; bentuk lampau"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-010 (tense_aspect/A1)",
-      "evidence": "Cari kata penunjuk waktunya lebih dulu. Kalau did sudah muncul, pakai bentuk dasar sesudahnya."
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
-      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
-      "evidence": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-009",
-      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
-      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
+      "evidence": "Memilih kata depan waktu sesuai tingkat kerinciannya: bulan atau tahun, hari, atau jam"
     },
     {
       "severity": "MAJOR",
@@ -434,12 +330,116 @@
       "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
     },
     {
-      "severity": "CRITICAL",
+      "severity": "MAJOR",
       "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-011",
-      "detail": "lesson \"past_be_was_were\" produced 24/25 valid questions",
-      "evidence": ""
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
+      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-003 (core_grammar/A1)",
+      "evidence": "bentuk dasar dipakai berlebihan; tertukar dengan bentuk berkelanjutan; tertukar dengan bentuk lampau"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
+      "evidence": "kesesuaian bentuk tunggal; bentuk dasar; bentuk lampau"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-004 (core_grammar/A1)",
+      "evidence": "bentuk be untuk orang pertama; bentuk be untuk tunggal; bentuk dasar"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
+      "evidence": "Dengarkan bunyinya: an engineer."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "Can + kata kerja dasar: can swim, can drive."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-010 (tense_aspect/A1)",
+      "evidence": "Yesterday: play jadi played; did + play, bukan did + played."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-010 (tense_aspect/A1)",
+      "evidence": "Cari kata penunjuk waktunya lebih dulu. Kalau did sudah muncul, pakai bentuk dasar sesudahnya."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
+      "evidence": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for PR-001 (prepositions/A1)",
+      "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for A1-017 (pronouns_determiners/A1)",
+      "evidence": "lihat kata sesudah rumpang lalu tentukan bentuk kata gantinya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-009",
+      "detail": "lesson \"have_got_has_got\" (possession/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
+      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-012",
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
+      "evidence": "Kata penunjuk memadukan jumlah dan jarak: this untuk tunggal dekat, that untuk tunggal jauh, these untuk jamak dekat, dan those untuk jamak jauh."
     },
     {
       "severity": "MAJOR",
@@ -462,14 +462,6 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
-      "evidence": "Kata penunjuk memadukan jumlah dan jarak: this untuk tunggal dekat, that untuk tunggal jauh, these untuk jamak dekat, dan those untuk jamak jauh."
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-012",
       "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
       "evidence": "Membentuk present continuous secara utuh: be yang sesuai subjek ditambah kata kerja -ing"
     },
@@ -478,16 +470,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-016 (quantifiers/A1)",
-      "evidence": "Memilih some, any, many, atau much sesuai bentuk kalimat dan jenis kata bendanya"
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-015 (question_formation/A1)",
+      "evidence": "Memilih kata tanya sesuai jenis informasi yang ingin didapat"
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-015 (question_formation/A1)",
-      "evidence": "Memilih kata tanya sesuai jenis informasi yang ingin didapat"
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-016 (quantifiers/A1)",
+      "evidence": "Memilih some, any, many, atau much sesuai bentuk kalimat dan jenis kata bendanya"
     },
     {
       "severity": "MAJOR",
@@ -518,6 +510,14 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for PR-001 (prepositions/A1)",
+      "evidence": "Siswa memilih “at” untuk semua keterangan waktu tanpa melihat tingkat kerinciannya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-012",
       "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-017 (pronouns_determiners/A1)",
       "evidence": "Siswa tertukar antara her, hers, dan she, karena Bahasa Indonesia memakai satu kata “dia” untuk semuanya"
     },
@@ -534,8 +534,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for PR-001 (prepositions/A1)",
-      "evidence": "Siswa memilih “at” untuk semua keterangan waktu tanpa melihat tingkat kerinciannya"
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-004 (core_grammar/A1)",
+      "evidence": "They selalu berpasangan dengan are dalam bentuk present."
     },
     {
       "severity": "MAJOR",
@@ -559,7 +559,7 @@
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
       "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-004 (core_grammar/A1)",
-      "evidence": "They selalu berpasangan dengan are dalam bentuk present."
+      "evidence": "Ucapkan pasangannya dengan lantang sebelum melengkapi kalimatnya: I am, he, she, it is, you, we, they are."
     },
     {
       "severity": "MAJOR",
@@ -574,14 +574,6 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-004 (core_grammar/A1)",
-      "evidence": "Ucapkan pasangannya dengan lantang sebelum melengkapi kalimatnya: I am, he, she, it is, you, we, they are."
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-012",
       "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
       "evidence": "Jangan menyesuaikan kata kerjanya dengan “there”. Lihat kata benda pertama setelah kata kerjanya, lalu tentukan tunggal atau jamak."
     },
@@ -590,8 +582,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
-      "evidence": "temukan penanda sedang berlangsung lalu pasang dua bagiannya"
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-015 (question_formation/A1)",
+      "evidence": "bayangkan jawabannya lalu pilih kata tanyanya"
     },
     {
       "severity": "MAJOR",
@@ -606,16 +598,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-012",
-      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-015 (question_formation/A1)",
-      "evidence": "bayangkan jawabannya lalu pilih kata tanyanya"
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-013",
-      "detail": "lesson \"place_prepositions_basic\" produced 24/25 valid questions",
-      "evidence": ""
+      "detail": "lesson \"plural_nouns_basic\" (nouns/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
+      "evidence": "temukan penanda sedang berlangsung lalu pasang dua bagiannya"
     },
     {
       "severity": "MAJOR",
@@ -646,14 +630,6 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-006 (core_grammar/A1)",
-      "evidence": "Kata “her” menerangkan kata benda “brother” untuk menunjukkan kepemilikan"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-015",
       "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
       "evidence": "Kata “can” menyatakan kemampuan yang berlaku sekarang"
     },
@@ -670,8 +646,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-012 (nouns/A1)",
-      "evidence": "periksa huruf akhir lalu pilih pola jamaknya"
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-006 (core_grammar/A1)",
+      "evidence": "Kata “her” menerangkan kata benda “brother” untuk menunjukkan kepemilikan"
     },
     {
       "severity": "MAJOR",
@@ -686,16 +662,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "bayangkan posisinya lalu pilih preposisinya"
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-012 (nouns/A1)",
+      "evidence": "periksa huruf akhir lalu pilih pola jamaknya"
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-017 (pronouns_determiners/A1)",
-      "evidence": "Siswa tertukar antara her, hers, dan she, karena Bahasa Indonesia memakai satu kata “dia” untuk semuanya"
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "bayangkan posisinya lalu pilih preposisinya"
     },
     {
       "severity": "MAJOR",
@@ -718,8 +694,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
-      "evidence": "Now berarti be tambah -ing: she is cooking."
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-017 (pronouns_determiners/A1)",
+      "evidence": "Siswa tertukar antara her, hers, dan she, karena Bahasa Indonesia memakai satu kata “dia” untuk semuanya"
     },
     {
       "severity": "MAJOR",
@@ -742,16 +718,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "Ajukan satu pertanyaan: bendanya di dalam, menempel di permukaan, atau berada di satu titik?"
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
+      "evidence": "Now berarti be tambah -ing: she is cooking."
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
-      "evidence": "Periksa dua bagiannya sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing pada kata kerja utamanya."
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "Ajukan satu pertanyaan: bendanya di dalam, menempel di permukaan, atau berada di satu titik?"
     },
     {
       "severity": "MAJOR",
@@ -766,8 +742,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "bayangkan posisinya lalu pilih preposisinya"
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-014 (tense_aspect/A1)",
+      "evidence": "Periksa dua bagiannya sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing pada kata kerja utamanya."
     },
     {
       "severity": "MAJOR",
@@ -782,24 +758,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-015",
-      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-012 (nouns/A1)",
-      "evidence": "periksa huruf akhir lalu pilih pola jamaknya"
-    },
-    {
-      "severity": "CRITICAL",
-      "module": "grammar",
-      "code": "LESSON_UNDERFILLED",
-      "id": "A1-016",
-      "detail": "lesson \"some_any_countable_uncountable\" produced 24/25 valid questions",
-      "evidence": ""
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "bayangkan posisinya lalu pilih preposisinya"
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-016",
-      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk titik atau tempat tertentu."
+      "id": "A1-015",
+      "detail": "lesson \"question_words_basic\" (question_formation/A1) offers an answer option authored for A1-012 (nouns/A1)",
+      "evidence": "periksa huruf akhir lalu pilih pola jamaknya"
     },
     {
       "severity": "MAJOR",
@@ -808,6 +776,14 @@
       "id": "A1-016",
       "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-012 (nouns/A1)",
       "evidence": "Banyak kata benda menambah -s; kata yang berakhiran s, x, ch, atau sh biasanya menambah -es; konsonan tambah y berubah menjadi -ies."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-016",
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "Pakai in untuk ruang tertutup, on untuk permukaan, dan at untuk titik atau tempat tertentu."
     },
     {
       "severity": "MAJOR",
@@ -854,6 +830,14 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-016",
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
+      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-016",
       "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for PR-001 (prepositions/A1)",
       "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
     },
@@ -862,8 +846,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-016",
-      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for AR-005 (articles_determiners/A1)",
-      "evidence": "kenali jumlah kata bendanya dan petunjuk jaraknya → pilih kata penunjuk yang cocok untuk keduanya"
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
+      "evidence": "kesesuaian bentuk tunggal; bentuk dasar; bentuk lampau"
     },
     {
       "severity": "MAJOR",
@@ -886,8 +870,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-016",
-      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
-      "evidence": "kesesuaian bentuk tunggal; bentuk dasar; bentuk lampau"
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
+      "evidence": "Dengarkan bunyinya: an engineer."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-016",
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-009 (possession/A1)",
+      "evidence": "Pakai has got untuk he, she, dan it; pakai have got untuk I, you, we, dan they."
     },
     {
       "severity": "MAJOR",
@@ -895,7 +887,7 @@
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-016",
       "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
-      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
+      "evidence": "Can + kata kerja dasar: can swim, can drive."
     },
     {
       "severity": "MAJOR",
@@ -910,8 +902,24 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-016",
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-016",
       "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
       "evidence": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-016",
+      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for PR-001 (prepositions/A1)",
+      "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
     },
     {
       "severity": "MAJOR",
@@ -933,17 +941,9 @@
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-016",
-      "detail": "lesson \"some_any_countable_uncountable\" (quantifiers/A1) offers an answer option authored for PR-001 (prepositions/A1)",
-      "evidence": "kelompokkan tingkat kerincian keterangan waktunya → pilih kata depannya"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
-      "evidence": "Modal can + kata kerja dasar menyatakan kemampuan."
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-009 (possession/A1)",
+      "evidence": "Pakai have got untuk I, you, we, dan they; pakai has got untuk he, she, dan it."
     },
     {
       "severity": "MAJOR",
@@ -958,8 +958,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-009 (possession/A1)",
-      "evidence": "Pakai have got untuk I, you, we, dan they; pakai has got untuk he, she, dan it."
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "Modal can + kata kerja dasar menyatakan kemampuan."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-017",
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "Memilih in, on, atau at untuk menyatakan letak"
     },
     {
       "severity": "MAJOR",
@@ -982,16 +990,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "Memilih in, on, atau at untuk menyatakan letak"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
-      "evidence": "lewati kata “there” dan lihat frasa benda yang menyusul → kenali “two books” sebagai jamak → pilih are"
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "kenali maknanya sebagai kemampuan masa kini → pilih modal can → biarkan kata kerja swim di belakangnya tetap berbentuk dasar"
     },
     {
       "severity": "MAJOR",
@@ -1006,16 +1006,8 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
-      "evidence": "kenali maknanya sebagai kemampuan masa kini → pilih modal can → biarkan kata kerja swim di belakangnya tetap berbentuk dasar"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-016 (quantifiers/A1)",
-      "evidence": "Siswa memakai some di kalimat negatif, dan many untuk kata benda yang tidak bisa dihitung"
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-005 (core_grammar/A1)",
+      "evidence": "lewati kata “there” dan lihat frasa benda yang menyusul → kenali “two books” sebagai jamak → pilih are"
     },
     {
       "severity": "MAJOR",
@@ -1030,24 +1022,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-016 (quantifiers/A1)",
+      "evidence": "Siswa memakai some di kalimat negatif, dan many untuk kata benda yang tidak bisa dihitung"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-017",
       "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-015 (question_formation/A1)",
       "evidence": "Siswa memilih kata tanya dari kebiasaan, bukan dari isi jawaban yang diharapkan"
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-013 (prepositions/A1)",
-      "evidence": "In a bag, on a table, at a bus stop."
-    },
-    {
-      "severity": "MAJOR",
-      "module": "grammar",
-      "code": "CROSS_FAMILY_FALLBACK",
-      "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-012 (nouns/A1)",
-      "evidence": "Konsonan tambah y: ganti y jadi i, lalu tambah es."
     },
     {
       "severity": "MAJOR",
@@ -1062,8 +1046,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
-      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-012 (nouns/A1)",
+      "evidence": "Konsonan tambah y: ganti y jadi i, lalu tambah es."
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-017",
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-013 (prepositions/A1)",
+      "evidence": "In a bag, on a table, at a bus stop."
     },
     {
       "severity": "MAJOR",
@@ -1078,16 +1070,16 @@
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
-      "evidence": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?"
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
+      "evidence": "Kalau kalimatnya berarti “mampu melakukan”, pakai can lalu langsung kata kerja bentuk dasarnya, tanpa “to” dan tanpa akhiran -s."
     },
     {
       "severity": "MAJOR",
       "module": "grammar",
       "code": "CROSS_FAMILY_FALLBACK",
       "id": "A1-017",
-      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-006 (core_grammar/A1)",
-      "evidence": "kenali Anna sebagai pemiliknya → perhatikan bahwa “brother” berdiri tepat setelah bagian kosongnya → pilih kata kepemilikan her"
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-008 (articles_determiners/A1)",
+      "evidence": "Ucapkan bunyi awal katanya dengan suara, lalu tanyakan: ini salah satu dari banyak, atau benda tertentu yang sudah diketahui?"
     },
     {
       "severity": "MAJOR",
@@ -1104,6 +1096,14 @@
       "id": "A1-017",
       "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-007 (core_grammar/A1)",
       "evidence": "kenali maknanya sebagai kemampuan masa kini → pilih modal can → biarkan kata kerja swim di belakangnya tetap berbentuk dasar"
+    },
+    {
+      "severity": "MAJOR",
+      "module": "grammar",
+      "code": "CROSS_FAMILY_FALLBACK",
+      "id": "A1-017",
+      "detail": "lesson \"subject_object_pronouns_and_possessives\" (pronouns_determiners/A1) offers an answer option authored for A1-006 (core_grammar/A1)",
+      "evidence": "kenali Anna sebagai pemiliknya → perhatikan bahwa “brother” berdiri tepat setelah bagian kosongnya → pilih kata kepemilikan her"
     }
   ],
   "truncated": 0
