@@ -32,3 +32,4 @@ fiezel-autonomy-config.json
 
 # Preview-server config lokal per sesi (port bisa beda-beda antar sesi/agent).
 .claude/launch.json
+.reading-new/
