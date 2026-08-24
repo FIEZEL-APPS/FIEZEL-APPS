@@ -1,0 +1,41 @@
+# m025-150 pagar pengaman, BUKAN konfigurasi deploy.
+#
+# Berkas ini hanya berlaku kalau ada sesuatu di Cloudflare yang memperlakukan AKAR REPO
+# sebagai direktori aset statis - dan itu memang pernah terjadi: sebuah build Workers
+# Builds yang terhubung ke Git mencoba mengunggah seluruh repositori, lalu berhenti pada
+# vendor/supertonic-3/text_encoder.int8.onnx (34,7 MB, di atas batas 25 MiB per berkas).
+#
+# PERBAIKAN YANG SEBENARNYA ADA DI DASHBOARD, bukan di sini. Worker audio FIEZEL tidak
+# punya aset statis sama sekali; konfigurasinya di workers/wrangler.toml dan tidak memuat
+# satu pun field `assets`. Build yang berjalan dari akar repo tidak akan menemukan
+# konfigurasi itu, jadi meskipun berkas ini membuat unggahannya lolos, yang ter-deploy
+# tetap Worker yang salah. Root directory build harus diarahkan ke `workers/`, atau
+# integrasi Git-nya dilepas sama sekali karena .github/workflows/audio-deploy-worker.yml
+# sudah melakukan deploy dengan benar.
+#
+# Yang disaring di bawah bukan "berkas besar" melainkan segala sesuatu yang memang bukan
+# aset produksi. Aplikasi FIEZEL sendiri disajikan GitHub Pages, bukan Cloudflare.
+
+# Model neural dan runtime WASM - 151,5 MB, disajikan dari GitHub Pages, tak pernah dari sini.
+vendor/
+
+# Dependensi dan artefak kerja.
+node_modules/
+.git/
+.github/
+.claude/
+audit/
+analysis/
+visual-checks/
+.audit-tmp/
+
+# Tes, perkakas, dan dokumen. Tak satu pun perlu disajikan ke murid.
+*-test.js
+*-audit.js
+tools/
+docs/
+*.md
+*.py
+
+# Sumber Worker itu sendiri: ia kode, bukan aset yang boleh diunduh publik.
+workers/
