@@ -394,6 +394,27 @@ async function main() {
     process.exit(2);
   }
 
+  /**
+   * Semua profil yang pernah dipakai, profil sekarang di urutan pertama.
+   *
+   * Pergantian token ElevenLabs adalah kejadian RUTIN di sini: jatah habis tiap bulan dan
+   * penggantinya datang dari akun baru dengan voice ID baru. Katalog karena itu memang
+   * berisi beberapa suara sekaligus, dan itu disengaja - bukan keadaan darurat yang harus
+   * dirapikan. Daftar ini dipakai untuk dua hal: menentukan teks mana yang sudah bersuara
+   * (di suara mana pun), dan menuliskannya kembali ke manifest supaya klien bisa memutar
+   * semuanya.
+   */
+  const current = { voiceId, modelId, settings };
+  const profiles = [current];
+  const seenProfiles = new Set([`${voiceId}|${modelId}`]);
+  for (const raw of [manifest.voiceProfile, ...(manifest.voiceProfiles || [])]) {
+    if (!raw?.voiceId) continue;
+    const tag = `${raw.voiceId}|${raw.modelId || ''}`;
+    if (seenProfiles.has(tag)) continue;
+    seenProfiles.add(tag);
+    profiles.push({ voiceId: raw.voiceId, modelId: raw.modelId || modelId, settings: raw.settings || settings });
+  }
+
   const budgetChars = args.budgetChars || manifest.budget?.maxCharactersPerRun || 50000;
   const budgetAssets = args.budgetAssets || manifest.budget?.maxAssetsPerRun || 500;
 
@@ -410,11 +431,24 @@ async function main() {
     } catch (_) {
       continue;
     }
-    // Syaratnya sama persis dengan yang dipakai klien: ready DAN punya url. Entri ready
-    // tanpa url tidak akan pernah bisa diputar, dan kalau ia dilewati di sini ia juga tidak
-    // akan pernah diperbaiki - aset yang hilang selamanya tanpa satu pun galat.
-    const known = manifest.assets[identity.audioKey];
-    if (known?.status === 'ready' && known.url) { alreadyReady++; continue; }
+    // Sudah siap kalau teks ini punya aset di SUARA MANA PUN, bukan hanya suara sekarang.
+    //
+    // Klien memutar aset lama dengan suara lama, jadi memproduksinya kembali dengan suara
+    // baru hanya membeli hal yang sudah dimiliki. Setiap pergantian token akan membakar
+    // ulang seluruh katalog kalau pemeriksaan ini terikat pada satu profil saja.
+    //
+    // Syarat lainnya sama persis dengan klien: ready DAN punya url. Entri ready tanpa url
+    // tidak akan pernah bisa diputar, dan kalau dilewati di sini ia juga tidak akan pernah
+    // diperbaiki - aset yang hilang selamanya tanpa satu pun galat.
+    let voiced = false;
+    for (const profile of profiles) {
+      let key;
+      try { key = AudioKey.build({ ...item, voiceId: profile.voiceId, modelId: profile.modelId, settings: profile.settings }).audioKey; }
+      catch (_) { continue; }
+      const known = manifest.assets[key];
+      if (known?.status === 'ready' && known.url) { voiced = true; break; }
+    }
+    if (voiced) { alreadyReady++; continue; }
     if (planned.has(identity.audioKey)) { duplicates++; continue; }
     planned.set(identity.audioKey, { identity, sourceRef: item.sourceRef || '' });
   }
@@ -464,16 +498,19 @@ async function main() {
     const recorded = manifest.voiceProfile?.voiceId || '';
     console.log(`\nvoice sekarang : ${voiceId}`);
     console.log(`voice manifest : ${recorded || '(manifest belum punya profil)'}`);
+    console.log(`suara terdaftar: ${profiles.map((p) => p.voiceId).join(', ')}`);
     if (!recorded) {
-      console.log('BARU. Manifest belum punya profil suara, jadi belum ada aset yang bisa jadi yatim.');
+      console.log('BARU. Manifest belum punya profil suara.');
       return true;
     }
     if (recorded === voiceId) {
-      console.log('COCOK. Aset yang sudah ada tetap terpakai; produksi akan melanjutkan, bukan mengulang.');
+      console.log('LANJUT. Suara tidak berganti.');
       return true;
     }
-    console.log('BERBEDA. Setiap audioKey ikut berubah, jadi --apply akan memproduksi ULANG seluruh katalog dan menelantarkan aset lama.');
-    return false;
+    // Bukan lagi peringatan bahaya. Suara lama tetap tercatat di voiceProfiles dan tetap
+    // diputar klien; yang berganti hanya suara untuk konten yang belum pernah bersuara.
+    console.log('SUARA BARU. Suara lama tetap terdaftar dan tetap bisa diputar; suara ini hanya dipakai untuk konten yang belum bersuara.');
+    return true;
   }
 
   if (args.verifyOnly) {
@@ -526,19 +563,16 @@ async function main() {
     process.exit(2);
   }
 
-  // Suara yang bergeser DIAM-DIAM adalah kegagalan paling mahal di berkas ini: setiap
-  // audioKey ikut berubah, seluruh katalog diproduksi ulang dengan jatah baru, dan aset
-  // lama tetap di R2 tanpa ada yang bisa menjangkaunya. Produksi berhenti di sini kecuali
-  // seseorang menyatakan pergantian itu memang disengaja.
-  if (!compareVoiceWithManifest() && !args.allowVoiceChange) {
-    console.error('\nProduksi dibatalkan. Kembalikan ELEVENLABS_VOICE_ID ke nilai di manifest, atau jalankan dengan --allow-voice-change bila pergantian suara memang dikehendaki.');
-    process.exit(3);
-  }
+  compareVoiceWithManifest();
 
   let generated = 0;
   let failed = 0;
   let recovered = 0;
-  manifest.voiceProfile = { voiceId, modelId, settings };
+
+  // Profil sekarang jadi yang utama, seluruh riwayat ikut tertulis. Klien membaca daftar ini
+  // dan mencoba setiap suara, jadi aset dari token bulan-bulan sebelumnya tetap terputar.
+  manifest.voiceProfile = current;
+  manifest.voiceProfiles = profiles;
 
   for (const job of affordable) {
     const { identity, sourceRef } = job;
