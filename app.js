@@ -2916,7 +2916,7 @@ function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level
 // Puter butuh jaringan, dan tanpa cadangan ini sebuah bacaan yang dibuka saat sinyal
 // hilang akan diam sepenuhnya. Suara bawaan perangkat memang kalah jauh, tetapi diam
 // total lebih buruk daripada suara seadanya.
-function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceSay||browserSupported,stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceSay?.say)return self.FiezelVoiceSay.say(text,{speed:options.speed??selectedNeuralRate()});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
+function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceSay||browserSupported,stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceSay?.say)return self.FiezelVoiceSay.say(text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
 function bindSwipe(el,onLeft,onRight){let sx=0,sy=0;el.addEventListener('touchstart',e=>{const t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});el.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){haptic('navigate');if(dx<0)onLeft();else onRight()}},{passive:true})}
 function flashcards(level){
   const active=getActiveLevel();
@@ -2932,7 +2932,7 @@ function flashcards(level){
     $('backVocab').onclick=()=>{audio.stop();exitStage()};
     const flip=()=>{flipped=!flipped;$('flashcard').classList.toggle('flipped',flipped);haptic('tap')};
     $('flashcard').onclick=flip;$('flashcard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
-    $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word)};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example)};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
+    $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word,{contentType:'word'})};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence'})};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast('Progres tersimpan')};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast('Ditandai dikuasai');i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
@@ -3299,7 +3299,7 @@ function quizLoop(cfg){
    document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
    listen.onclick=async()=>{
     listen.disabled=true;note.textContent='Memutar…';
-    try{await audio.play(q.script);note.textContent='Putar ulang bila perlu.';unlock()}
+    try{await audio.play(q.script,{contentType:'listening'});note.textContent='Putar ulang bila perlu.';unlock()}
     catch(error){note.textContent=`Suara tidak berbunyi (${String(error?.message||error)}). Pilihan tetap dibuka.`;unlock()}
     finally{listen.disabled=false;enhanceUI()}
    };
