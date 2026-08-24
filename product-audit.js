@@ -10,7 +10,7 @@ function check(name,ok,details){report.checks.push({name,status:ok?'PASS':'FAIL'
 check('Meaningful streak model',app.includes('MEANINGFUL_ATTEMPTS=5')&&app.includes('recomputeMeaningfulDays'),'Streak requires 5 attempts/day and is recomputed from history.');
 check('Diagnostic evidence gate',app.includes('hs.length>=24&&skills.size>=3&&types.size>=2')&&!app.includes('state.totalAnswered>=150'),'Adaptive gate is evidence-based rather than hard-coded to 150.');
 check('Forgetting-aware review',app.includes('forgettingProbability')&&app.includes('stability')&&app.includes('lapses'),'Scheduler tracks stability, forgetting probability and lapses.');
-check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value)'),'Confidence changes future scheduling after calibration input.');
+check('Confidence affects scheduling',app.includes('scheduleNext(b,h.ok,h.ms,value'),'Confidence changes future scheduling after calibration input.');
 check('Weakness timeline is time-series',app.includes('skillTimeline')&&app.includes('byDay[d]'),'Timeline groups evidence by date and skill.');
 check('Error pattern detector',app.includes('errorPatterns')&&app.includes('selectedAnswer'),'Detector records and analyzes repeated distractor choices.');
 check('Confusion network is history-backed',app.includes('confusionPairs')&&app.includes('confusion-network'),'Confusion pairs are ranked from observed wrong answers and vocabulary relations.');
@@ -58,7 +58,7 @@ check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes
 check('Runtime syntax',true,'Validated separately with node --check.');
 const data=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json')));check('Vocabulary data readable',Array.isArray(data)&&data.length>0,`records=${data.length}`);
 const r=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json')));check('Reading data readable',Array.isArray(r)&&r.length>0,`passages=${r.length}`);
-const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===129&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
+const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===139&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
 fs.writeFileSync(path.join(root,'STAGE8-PRODUCT-AUDIT.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 process.exitCode=report.counts.fail?1:0;

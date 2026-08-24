@@ -6,7 +6,7 @@ const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 const V=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json'),'utf8'));
 const grammarRuntime=gm=>{const out={};for(const t of (gm.templates||[])){const opts=t.options||[];const reasons=opts.map((o,i)=>i===t.correctIndex?'Correct':((t.distractors||[]).find(d=>d.option===o)?.whyFails||'Distractor invalid'));(out[t.subskill]??=[]).push([t.stem,opts,t.correctIndex,t.explanation?.rule||t.pedagogicalObjective,reasons,t.cefr]);}return out};
-const GM=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));const G=grammarRuntime(GM);const R=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json'),'utf8'));
+const CURRICULUM=JSON.parse(fs.readFileSync(path.join(root,'grammar-curriculum-v1.json'),'utf8'));const GM=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));const G=grammarRuntime(GM);const R=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json'),'utf8'));
 const assert=(ok,msg)=>{if(!ok)throw new Error(msg)};
 
 assert(/const APP_VERSION=self\.FIEZEL_VERSION/.test(app)&&fs.readFileSync(path.join(root,'version.js'),'utf8').includes(`'${VERSION}'`),'runtime version matches VERSION.json');
@@ -25,13 +25,17 @@ assert(/FIEZEL_AI_TIMEOUT_MS=30000/.test(app)&&/currentAIRequest\(id,epoch\)/.te
 assert(/q\.explain\?\.avoid/.test(app)&&/q\.explain\?\.memory/.test(app)&&/distractor-breakdown/.test(app),'natural feedback dropped explanation fields');
 assert(/\.ai-btn/.test(css)&&/@keyframes aiBounce/.test(css),'AI visual states missing');
 assert(/adaptiveReady/.test(app),'adaptive readiness state missing');
-assert(/nextReview&&x\.nextReview<=Date\.now\(\)&&x\.mastery<80/.test(app),'review due must exclude mastered cards');
-assert(/function markMastered/.test(app)&&/b\.nextReview=0/.test(app),'mastered cards do not clear review schedule');
+assert(/nextReview&&x\.nextReview<=Date\.now\(\)/.test(app),'review due must be driven by the next review timestamp');
+assert(/function markMastered/.test(app)&&/b\.nextReview=Date\.now\(\)\+Math\.max\(30,b\.stability\)/.test(app),'mastered cards keep a maintenance review schedule');
+assert(/baseLapseBurden/.test(app)&&/lastSchedule=\{at:attemptAt/.test(app),'mastery scheduling keeps one attempt snapshot for confidence recalibration');
 assert(/function bindSwipe/.test(app)&&/touchstart/.test(app)&&/touchend/.test(app),'swipe controller missing');
 assert(/flash-inner/.test(app)&&/rotateY/.test(css),'3D flip implementation missing');
 assert(!/id="previous"/.test(app)&&!/id="next"/.test(app.split('function flashcards')[1]?.split('function reviewVocab')[0]||''),'flashcards still expose previous/next buttons');
 assert(/function getDiagnosticProfile/.test(app)&&/weakTargets/.test(app),'adaptive diagnostic profile missing');
 assert(/function setConfidence/.test(app)&&/confidenceHistory/.test(app),'confidence calibration missing');
+assert(/ACCOUNT_STATE_PREFIX/.test(app)&&/activateAccountStateFromPuter/.test(app)&&/LEGACY_STATE_OWNER_KEY/.test(app)&&/localStorage\.removeItem\(LEGACY_STATE_KEY\)/.test(app),'per-account state isolation and one-time legacy migration missing');
+assert(/timeZone:studyTimeZone\(\)/.test(app)&&/function validTimeZone/.test(app),'learner timezone is not propagated to remote activity');
+assert(/sessionAttempts:coreBrainSessionAttempts\(\)/.test(app)&&/state\.activeSession\?\.startedAt/.test(app),'session fatigue must use the active session, not global history');
 // m025-46: the brief is pinned by what renders it, not by a shouting copy string.
 // The all-caps kicker was removed as a design decision; the ring, the target and the
 // function are the feature. This is a stricter marker than the label it replaces.
@@ -44,17 +48,17 @@ assert(/getCelestialState/.test(app)&&/playFeedbackSound/.test(app)&&/showAnswer
 assert(/if\(!state\.adaptiveReady\)return \[\]/.test(app),'adaptive pool must be locked before diagnosis');
 assert(/passage:\{id:r\.id/.test(app),'reading questions do not carry their passage');
 assert(/q\.passage\?card\(.*TEKS BACAAN/s.test(app),'quiz renderer does not show passage with reading question');
-assert(/state\.adaptiveReady=diagnosticEvidenceReady\(state\)/.test(app),'adaptive readiness must be evidence-based');
+assert(/const readiness=diagnosticReadinessMap\(state\)/.test(app)&&/state\.adaptiveReady=!!readiness\[getActiveLevel\(state\)\]/.test(app),'adaptive readiness must be evidence-based, per active level');
 assert(/window\.__getFiezelState/.test(app),'test state hook missing');
 assert(V.length===1765,'active vocabulary master count changed unexpectedly');
 assert(V.filter(v=>v.status==='complete').length===1765,'active vocabulary contains incomplete records');
 assert(V.some(v=>v.level==='C2'&&v.status==='complete'),'C2 vocabulary is missing');
-assert(Object.keys(G).length===129,'grammar skills changed unexpectedly');
+assert(Object.keys(G).length===139,'grammar skills changed unexpectedly');
 assert(R.length===300,'reading bank unexpectedly reduced');
 for(const r of R)for(const q of r.qs||[]){assert(Array.isArray(q[1])&&q[1].length>=2,'reading question has too few options');const opts=q[1].map(x=>String(x).trim().toLowerCase());assert(new Set(opts).size===opts.length,`duplicate reading options in ${r.id}`);assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<q[1].length,`invalid reading answer in ${r.id}`)}
 
 const elements={};
-function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,classList:{add(){},remove(){},toggle(){}},addEventListener(){},focus(){}};}
+function element(id){return elements[id] ||= {id,innerHTML:'',textContent:'',onclick:null,disabled:false,classList:{add(){},remove(){},toggle(){}},addEventListener(){},querySelector(){return null},focus(){}};}
 const document={baseURI:'http://localhost/',getElementById:element,querySelector(){return null},querySelectorAll(){return []},createElement(){return {className:'',textContent:'',disabled:false,onclick:null,classList:{add(){},remove(){},toggle(){}},append(){},addEventListener(){}}}};
 const store={};
 const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]};const Notification=function(title,options){this.title=title;this.options=options;this.close=()=>{};};Notification.permission='granted';Notification.requestPermission=async()=>Notification.permission;
@@ -87,13 +91,36 @@ setTimeout(async()=>{
   st.vocab[v.id].nextReview=Date.now()-1000;
   assert(Object.values(st.vocab).filter(x=>x.nextReview<=Date.now()&&x.mastery<80).length===1,'due review setup failed');
   ctx.markMastered('vocab',v.id);
-  assert(st.vocab[v.id].mastery===100&&st.vocab[v.id].nextReview===0,'mastering a card must remove it from Review Due');
+  assert(st.vocab[v.id].mastery===100&&st.vocab[v.id].nextReview>Date.now()&&st.vocab[v.id].stability>=30,'mastering a card must schedule maintenance review');
+  st.vocab[v.id].nextReview=Date.now()-1;
+  assert(ctx.__fiezelDueReviews()>=1,'mastered cards should re-enter Review Due when maintenance is due');
+  st.vocab[v.id].nextReview=Date.now()+30*86400000;
+
+  // Keyakinan adalah sinyal kalibrasi, bukan jawaban kedua. Mengulang jawaban yang sama
+  // dengan nilai keyakinan boleh mengubah intervalnya, tetapi tidak boleh menambah lapse
+  // kedua atau menggeser titik waktu jawabannya.
+  const attemptAt=Date.now()-5000;
+  st.vocab[v.id]={correct:1,total:1,streak:1,mastery:20,nextReview:0,stability:2,lapses:0,lapseBurden:0,lastSeen:attemptAt,lastWrong:0};
+  st.history.push({id:'regression-confidence',type:'vocab',skill:'vocabulary_meaning',target:v.id,reviewBucket:'vocab',reviewKey:v.id,ok:false,ms:6000,confidence:null,at:attemptAt});
+  ctx.updateMastery('vocab',v.id,false,6000,null,attemptAt);
+  const afterAnswer=st.vocab[v.id];
+  assert(afterAnswer.lapses===1&&afterAnswer.lastSchedule?.at===attemptAt,'a failed attempt must schedule exactly one lapse');
+  ctx.setConfidence(1);
+  assert(st.vocab[v.id].lapses===1&&st.vocab[v.id].lastSchedule?.at===attemptAt,'confidence must not double-count the lapse');
 
   // Before diagnosis: no adaptive questions.
   st.adaptiveReady=false; assert(ctx.buildAdaptivePool(12).length===0,'adaptive questions appeared before diagnosis');
   // Simulate a diagnosis/profile with weaknesses across vocabulary, grammar and reading.
   const vv=V.find(x=>x.level==='A1'&&x.status==='complete')||v;
-  const skills=Object.keys(G).slice(0,3); const rrs=R.slice(0,3); const skill=skills[0]; const rr=rrs[0];
+  // m025-140: bukti harus datang dari level yang SEDANG aktif (A1 di sini). Sebelum B-01
+  // ditutup, fixture ini lolos memakai grammar dan reading level apa pun - dan itulah persis
+  // celahnya: 24 jawaban B1 membuka latihan adaptif untuk murid yang memilih A1.
+  // Catatan: binding `let` di dalam vm TIDAK muncul sebagai properti context, jadi daftar
+  // level harus dibaca dari berkas kurikulum, bukan dari ctx.GRAMMAR_ITEMS (yang selalu kosong
+  // dilihat dari luar dan diam-diam menjatuhkan fixture ke skill level lain).
+  const a1Skills=CURRICULUM.lessons.filter(l=>l.level==='A1').map(l=>l.lessonId).filter(x=>G[x]);
+  assert(a1Skills.length>=3,'fixture needs at least three A1 grammar lessons');
+  const skills=a1Skills.slice(0,3); const rrs=R.filter(x=>x.level==='A1').slice(0,3); const skill=skills[0]; const rr=rrs[0];
   st.vocab[vv.id]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};
   for(const sk of skills)st.grammar[sk]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};
   for(const r of rrs)st.reading[r.id]={correct:1,total:4,streak:0,mastery:25,nextReview:Date.now()+1000};

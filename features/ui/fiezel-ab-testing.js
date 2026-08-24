@@ -11,7 +11,6 @@ class FiezelABAnalytics {
       viewTransitions: 0,
       skeletonShown: 0,
       emptyStateShown: 0,
-      darkModeToggle: 0,
       interactionTime: {},
       screenTimes: {}
     };
@@ -51,14 +50,6 @@ class FiezelABAnalytics {
     });
   }
 
-  /* Track dark mode usage */
-  trackDarkModeToggle(toTheme) {
-    this.metrics.darkModeToggle++;
-    this.logEvent('dark_mode_toggled', {
-      to_theme: toTheme,
-      variant: this.variant
-    });
-  }
 
   /* Track screen time */
   trackScreenTime(screenName, durationMs) {
@@ -168,7 +159,6 @@ class FiezelABAnalytics {
       viewTransitions: this.metrics.viewTransitions,
       skeletonShown: this.metrics.skeletonShown,
       emptyStateShown: this.metrics.emptyStateShown,
-      darkModeToggle: this.metrics.darkModeToggle,
       screenTimes: this.metrics.screenTimes,
       interactionCounts: this.metrics.interactionTime
     };

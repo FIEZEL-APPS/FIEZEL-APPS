@@ -1,0 +1,1485 @@
+{
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "title": "FIEZEL Grammar Curriculum",
+  "description": "Ordered grammar pathway with CEFR isolation and explicit prerequisites.",
+  "source": "grammar-templates.json plus classroom-lessons-v1.json A1 foundation imports",
+  "levels": [
+    "A1",
+    "A2",
+    "B1",
+    "B2",
+    "C1",
+    "C2"
+  ],
+  "lessonCount": 139,
+  "levelCounts": {
+    "A1": 17,
+    "A2": 17,
+    "B1": 47,
+    "B2": 32,
+    "C1": 19,
+    "C2": 7
+  },
+  "classroomA1SourceLessons": [
+    "grammar_a1_articles",
+    "grammar_a1_can",
+    "grammar_a1_have_got",
+    "grammar_a1_past_simple",
+    "grammar_a1_past_be",
+    "grammar_a1_plurals",
+    "grammar_a1_prepositions_place",
+    "grammar_a1_prepositions_time",
+    "grammar_a1_present_continuous",
+    "grammar_a1_present_simple",
+    "grammar_a1_pronouns",
+    "grammar_a1_question_words",
+    "grammar_a1_some_any",
+    "grammar_a1_there_is",
+    "grammar_a1_to_be"
+  ],
+  "classroomA1Coverage": {
+    "grammar_a1_articles": "articles_a_an_the",
+    "grammar_a1_can": "can_ability",
+    "grammar_a1_have_got": "have_got_has_got",
+    "grammar_a1_past_simple": "past_simple_regular_forms",
+    "grammar_a1_past_be": "past_be_was_were",
+    "grammar_a1_plurals": "plural_nouns_basic",
+    "grammar_a1_prepositions_place": "place_prepositions_basic",
+    "grammar_a1_prepositions_time": "time_prepositions_in_on_at",
+    "grammar_a1_present_continuous": "present_continuous_basics",
+    "grammar_a1_present_simple": "present_simple_basics",
+    "grammar_a1_pronouns": "subject_object_pronouns_and_possessives",
+    "grammar_a1_question_words": "question_words_basic",
+    "grammar_a1_some_any": "some_any_countable_uncountable",
+    "grammar_a1_there_is": "there_is_are",
+    "grammar_a1_to_be": "be_subject_agreement"
+  },
+  "lessons": [
+    {
+      "lessonId": "subject_object_pronouns_and_possessives",
+      "level": "A1",
+      "sequence": 1,
+      "unit": "A1.1",
+      "title": "Subject, object, and possessive pronouns",
+      "prerequisites": [],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-017",
+      "templateId": "A1-017"
+    },
+    {
+      "lessonId": "be_subject_agreement",
+      "level": "A1",
+      "sequence": 2,
+      "unit": "A1.1",
+      "title": "Verb to be: subject agreement",
+      "prerequisites": [
+        "subject_object_pronouns_and_possessives"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-004"
+    },
+    {
+      "lessonId": "articles_a_an_the",
+      "level": "A1",
+      "sequence": 3,
+      "unit": "A1.1",
+      "title": "Articles: a, an, and the",
+      "prerequisites": [
+        "be_subject_agreement"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-008",
+      "templateId": "A1-008"
+    },
+    {
+      "lessonId": "plural_nouns_basic",
+      "level": "A1",
+      "sequence": 4,
+      "unit": "A1.1",
+      "title": "Plural nouns",
+      "prerequisites": [
+        "articles_a_an_the"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-012",
+      "templateId": "A1-012"
+    },
+    {
+      "lessonId": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sequence": 5,
+      "unit": "A1.1",
+      "title": "Demonstratives: this, that, these, those",
+      "prerequisites": [
+        "plural_nouns_basic"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "AR-005"
+    },
+    {
+      "lessonId": "possessive_adjectives",
+      "level": "A1",
+      "sequence": 6,
+      "unit": "A1.1",
+      "title": "Possessive adjectives",
+      "prerequisites": [
+        "subject_object_pronouns_and_possessives"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-006"
+    },
+    {
+      "lessonId": "have_got_has_got",
+      "level": "A1",
+      "sequence": 7,
+      "unit": "A1.1",
+      "title": "Have got and has got",
+      "prerequisites": [
+        "be_subject_agreement",
+        "possessive_adjectives"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-009",
+      "templateId": "A1-009"
+    },
+    {
+      "lessonId": "there_is_are",
+      "level": "A1",
+      "sequence": 8,
+      "unit": "A1.1",
+      "title": "There is and there are",
+      "prerequisites": [
+        "be_subject_agreement",
+        "plural_nouns_basic"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-005"
+    },
+    {
+      "lessonId": "place_prepositions_basic",
+      "level": "A1",
+      "sequence": 9,
+      "unit": "A1.2",
+      "title": "Prepositions of place",
+      "prerequisites": [
+        "there_is_are"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-013",
+      "templateId": "A1-013"
+    },
+    {
+      "lessonId": "present_simple_basics",
+      "level": "A1",
+      "sequence": 10,
+      "unit": "A1.2",
+      "title": "Present simple basics",
+      "prerequisites": [
+        "be_subject_agreement"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-003"
+    },
+    {
+      "lessonId": "question_words_basic",
+      "level": "A1",
+      "sequence": 11,
+      "unit": "A1.2",
+      "title": "Basic question words",
+      "prerequisites": [
+        "present_simple_basics"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-015",
+      "templateId": "A1-015"
+    },
+    {
+      "lessonId": "can_ability",
+      "level": "A1",
+      "sequence": 12,
+      "unit": "A1.2",
+      "title": "Can for ability",
+      "prerequisites": [
+        "be_subject_agreement"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-007"
+    },
+    {
+      "lessonId": "present_continuous_basics",
+      "level": "A1",
+      "sequence": 13,
+      "unit": "A1.2",
+      "title": "Present continuous basics",
+      "prerequisites": [
+        "be_subject_agreement",
+        "present_simple_basics"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-014",
+      "templateId": "A1-014"
+    },
+    {
+      "lessonId": "past_be_was_were",
+      "level": "A1",
+      "sequence": 14,
+      "unit": "A1.2",
+      "title": "Past form of be: was and were",
+      "prerequisites": [
+        "be_subject_agreement"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-011",
+      "templateId": "A1-011"
+    },
+    {
+      "lessonId": "past_simple_regular_forms",
+      "level": "A1",
+      "sequence": 15,
+      "unit": "A1.2",
+      "title": "Past simple regular verbs",
+      "prerequisites": [
+        "present_simple_basics"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-010",
+      "templateId": "A1-010"
+    },
+    {
+      "lessonId": "some_any_countable_uncountable",
+      "level": "A1",
+      "sequence": 16,
+      "unit": "A1.2",
+      "title": "Some, any, and countability",
+      "prerequisites": [
+        "plural_nouns_basic"
+      ],
+      "source": "features/classroom/classroom-lessons-v1.json#A1-016",
+      "templateId": "A1-016"
+    },
+    {
+      "lessonId": "time_prepositions_in_on_at",
+      "level": "A1",
+      "sequence": 17,
+      "unit": "A1.3",
+      "title": "Prepositions of time",
+      "prerequisites": [
+        "place_prepositions_basic"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "PR-001"
+    },
+    {
+      "lessonId": "present_simple_vs_continuous",
+      "level": "A2",
+      "sequence": 18,
+      "unit": "A2.1",
+      "title": "present simple vs continuous",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-001"
+    },
+    {
+      "lessonId": "obligation_vs_permission",
+      "level": "A2",
+      "sequence": 19,
+      "unit": "A2.1",
+      "title": "obligation vs permission",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-001"
+    },
+    {
+      "lessonId": "zero_vs_first_conditional",
+      "level": "A2",
+      "sequence": 20,
+      "unit": "A2.1",
+      "title": "zero vs first conditional",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-001"
+    },
+    {
+      "lessonId": "first_vs_subsequent_mention",
+      "level": "A2",
+      "sequence": 21,
+      "unit": "A2.1",
+      "title": "first vs subsequent mention",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "AR-001"
+    },
+    {
+      "lessonId": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sequence": 22,
+      "unit": "A2.1",
+      "title": "comparative vs superlative scope",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CM-001"
+    },
+    {
+      "lessonId": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sequence": 23,
+      "unit": "A2.1",
+      "title": "past continuous vs past simple interrupted action",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-004"
+    },
+    {
+      "lessonId": "much_many_little_few_countability",
+      "level": "A2",
+      "sequence": 24,
+      "unit": "A2.1",
+      "title": "much many little few countability",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "AR-003"
+    },
+    {
+      "lessonId": "place_prepositions_at_in_on",
+      "level": "A2",
+      "sequence": 25,
+      "unit": "A2.1",
+      "title": "place prepositions at in on",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PR-002"
+    },
+    {
+      "lessonId": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sequence": 26,
+      "unit": "A2.2",
+      "title": "as as equality vs comparative",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CM-002"
+    },
+    {
+      "lessonId": "article_omission_with_uncountable",
+      "level": "A2",
+      "sequence": 27,
+      "unit": "A2.2",
+      "title": "article omission with uncountable",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "EC-003"
+    },
+    {
+      "lessonId": "definite_article_with_unique_referents_and_superlatives",
+      "level": "A2",
+      "sequence": 28,
+      "unit": "A2.2",
+      "title": "definite article with unique referents and superlatives",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "AR-004"
+    },
+    {
+      "lessonId": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sequence": 29,
+      "unit": "A2.2",
+      "title": "movement prepositions through across along over",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PR-005"
+    },
+    {
+      "lessonId": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sequence": 30,
+      "unit": "A2.2",
+      "title": "double negative avoidance single negation rule",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "QN-004"
+    },
+    {
+      "lessonId": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sequence": 31,
+      "unit": "A2.2",
+      "title": "state verbs resist continuous form",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_003"
+    },
+    {
+      "lessonId": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sequence": 32,
+      "unit": "A2.2",
+      "title": "preposition of time duration for vs since vs during",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_014"
+    },
+    {
+      "lessonId": "reported_speech_pronoun_and_possessive_shift",
+      "level": "A2",
+      "sequence": 33,
+      "unit": "A2.2",
+      "title": "reported speech pronoun and possessive shift",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_009"
+    },
+    {
+      "lessonId": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sequence": 34,
+      "unit": "A2.3",
+      "title": "subject vs object questions word order",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_019"
+    },
+    {
+      "lessonId": "past_simple_vs_present_perfect",
+      "level": "B1",
+      "sequence": 35,
+      "unit": "B1.1",
+      "title": "past simple vs present perfect",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-002"
+    },
+    {
+      "lessonId": "future_forms_plan_vs_prediction",
+      "level": "B1",
+      "sequence": 36,
+      "unit": "B1.1",
+      "title": "future forms plan vs prediction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-003"
+    },
+    {
+      "lessonId": "deduction_present",
+      "level": "B1",
+      "sequence": 37,
+      "unit": "B1.1",
+      "title": "deduction present",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-002"
+    },
+    {
+      "lessonId": "second_conditional_unreal_present",
+      "level": "B1",
+      "sequence": 38,
+      "unit": "B1.1",
+      "title": "second conditional unreal present",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-002"
+    },
+    {
+      "lessonId": "agent_omission_when_irrelevant",
+      "level": "B1",
+      "sequence": 39,
+      "unit": "B1.1",
+      "title": "agent omission when irrelevant",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-001"
+    },
+    {
+      "lessonId": "backshift_statement",
+      "level": "B1",
+      "sequence": 40,
+      "unit": "B1.1",
+      "title": "backshift statement",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-001"
+    },
+    {
+      "lessonId": "question_tag_polarity",
+      "level": "B1",
+      "sequence": 41,
+      "unit": "B1.1",
+      "title": "question tag polarity",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "QN-001"
+    },
+    {
+      "lessonId": "subject_verb_agreement_with_intervening_phrase",
+      "level": "B1",
+      "sequence": 42,
+      "unit": "B1.1",
+      "title": "subject verb agreement with intervening phrase",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "EC-001"
+    },
+    {
+      "lessonId": "past_perfect_sequencing_two_past_events",
+      "level": "B1",
+      "sequence": 43,
+      "unit": "B1.2",
+      "title": "past perfect sequencing two past events",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-006"
+    },
+    {
+      "lessonId": "ability_past_could_vs_was_able_to",
+      "level": "B1",
+      "sequence": 44,
+      "unit": "B1.2",
+      "title": "ability past could vs was able to",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-003"
+    },
+    {
+      "lessonId": "necessity_absence_neednt_vs_mustnt",
+      "level": "B1",
+      "sequence": 45,
+      "unit": "B1.2",
+      "title": "necessity absence neednt vs mustnt",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-005"
+    },
+    {
+      "lessonId": "unless_vs_if_not",
+      "level": "B1",
+      "sequence": 46,
+      "unit": "B1.2",
+      "title": "unless vs if not",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-005"
+    },
+    {
+      "lessonId": "reported_questions_word_order",
+      "level": "B1",
+      "sequence": 47,
+      "unit": "B1.2",
+      "title": "reported questions word order",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-002"
+    },
+    {
+      "lessonId": "reported_commands_infinitive",
+      "level": "B1",
+      "sequence": 48,
+      "unit": "B1.2",
+      "title": "reported commands infinitive",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-003"
+    },
+    {
+      "lessonId": "zero_article_generic_plural_vs_the_specific",
+      "level": "B1",
+      "sequence": 49,
+      "unit": "B1.2",
+      "title": "zero article generic plural vs the specific",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "AR-002"
+    },
+    {
+      "lessonId": "dependent_prepositions_after_adjectives",
+      "level": "B1",
+      "sequence": 50,
+      "unit": "B1.2",
+      "title": "dependent prepositions after adjectives",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PR-003"
+    },
+    {
+      "lessonId": "gerund_after_preposition_vs_infinitive_of_purpose",
+      "level": "B1",
+      "sequence": 51,
+      "unit": "B1.3",
+      "title": "gerund after preposition vs infinitive of purpose",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "GI-003"
+    },
+    {
+      "lessonId": "negative_questions_expecting_agreement",
+      "level": "B1",
+      "sequence": 52,
+      "unit": "B1.3",
+      "title": "negative questions expecting agreement",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "QN-002"
+    },
+    {
+      "lessonId": "indirect_questions_embedded_word_order",
+      "level": "B1",
+      "sequence": 53,
+      "unit": "B1.3",
+      "title": "indirect questions embedded word order",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "QN-003"
+    },
+    {
+      "lessonId": "word_order_adverb_placement",
+      "level": "B1",
+      "sequence": 54,
+      "unit": "B1.3",
+      "title": "word order adverb placement",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "EC-002"
+    },
+    {
+      "lessonId": "advice_should_vs_ought_to_vs_had_better",
+      "level": "B1",
+      "sequence": 55,
+      "unit": "B1.3",
+      "title": "advice should vs ought to vs had better",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-006"
+    },
+    {
+      "lessonId": "speculation_scale_may_might_could_vs_will",
+      "level": "B1",
+      "sequence": 56,
+      "unit": "B1.3",
+      "title": "speculation scale may might could vs will",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-007"
+    },
+    {
+      "lessonId": "time_and_place_reference_shift",
+      "level": "B1",
+      "sequence": 57,
+      "unit": "B1.3",
+      "title": "time and place reference shift",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-005"
+    },
+    {
+      "lessonId": "phrasal_verb_particle_changes_meaning",
+      "level": "B1",
+      "sequence": 58,
+      "unit": "B1.3",
+      "title": "phrasal verb particle changes meaning",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PR-004"
+    },
+    {
+      "lessonId": "infinitive_after_too_enough_adjective",
+      "level": "B1",
+      "sequence": 59,
+      "unit": "B1.4",
+      "title": "infinitive after too enough adjective",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "GI-005"
+    },
+    {
+      "lessonId": "less_vs_fewer_countability_agreement",
+      "level": "B1",
+      "sequence": 60,
+      "unit": "B1.4",
+      "title": "less vs fewer countability agreement",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CM-004"
+    },
+    {
+      "lessonId": "agreement_structures_so_do_i_neither_do_i",
+      "level": "B1",
+      "sequence": 61,
+      "unit": "B1.4",
+      "title": "agreement structures so do i neither do i",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "QN-005"
+    },
+    {
+      "lessonId": "comma_splice_run_on_correction",
+      "level": "B1",
+      "sequence": 62,
+      "unit": "B1.4",
+      "title": "comma splice run on correction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "EC-004"
+    },
+    {
+      "lessonId": "confusing_word_pair_affect_vs_effect",
+      "level": "B1",
+      "sequence": 63,
+      "unit": "B1.4",
+      "title": "confusing word pair affect vs effect",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "EC-005"
+    },
+    {
+      "lessonId": "present_simple_for_fixed_schedules_not_personal_plans",
+      "level": "B1",
+      "sequence": 64,
+      "unit": "B1.4",
+      "title": "present simple for fixed schedules not personal plans",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-010"
+    },
+    {
+      "lessonId": "possibility_vs_permission_can_vs_may_formal_register",
+      "level": "B1",
+      "sequence": 65,
+      "unit": "B1.4",
+      "title": "possibility vs permission can vs may formal register",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_005"
+    },
+    {
+      "lessonId": "future_time_clauses_present_after_when_as_soon_as",
+      "level": "B1",
+      "sequence": 66,
+      "unit": "B1.4",
+      "title": "future time clauses present after when as soon as",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_007"
+    },
+    {
+      "lessonId": "reported_speech_modal_shift_can_to_could",
+      "level": "B1",
+      "sequence": 67,
+      "unit": "B1.5",
+      "title": "reported speech modal shift can to could",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_010"
+    },
+    {
+      "lessonId": "reported_yes_no_questions_if_whether",
+      "level": "B1",
+      "sequence": 68,
+      "unit": "B1.5",
+      "title": "reported yes no questions if whether",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_011"
+    },
+    {
+      "lessonId": "article_with_institutions_school_prison_hospital",
+      "level": "B1",
+      "sequence": 69,
+      "unit": "B1.5",
+      "title": "article with institutions school prison hospital",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_012"
+    },
+    {
+      "lessonId": "possessive_determiner_vs_double_genitive_of_mine",
+      "level": "B1",
+      "sequence": 70,
+      "unit": "B1.5",
+      "title": "possessive determiner vs double genitive of mine",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_013"
+    },
+    {
+      "lessonId": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
+      "level": "B1",
+      "sequence": 71,
+      "unit": "B1.5",
+      "title": "preposition after adjective of emotion pleased with vs about",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_015"
+    },
+    {
+      "lessonId": "bare_infinitive_after_modal_and_causative_make_let",
+      "level": "B1",
+      "sequence": 72,
+      "unit": "B1.5",
+      "title": "bare infinitive after modal and causative make let",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_017"
+    },
+    {
+      "lessonId": "relative_clause_omitting_object_pronoun",
+      "level": "B1",
+      "sequence": 73,
+      "unit": "B1.5",
+      "title": "relative clause omitting object pronoun",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_018"
+    },
+    {
+      "lessonId": "comparative_intensifiers_much_far_a_lot_before_comparative",
+      "level": "B1",
+      "sequence": 74,
+      "unit": "B1.5",
+      "title": "comparative intensifiers much far a lot before comparative",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_019"
+    },
+    {
+      "lessonId": "echo_questions_for_clarification",
+      "level": "B1",
+      "sequence": 75,
+      "unit": "B1.6",
+      "title": "echo questions for clarification",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_020"
+    },
+    {
+      "lessonId": "past_habitual_used_to_vs_would_vs_past_simple",
+      "level": "B1",
+      "sequence": 76,
+      "unit": "B1.6",
+      "title": "past habitual used to vs would vs past simple",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_001"
+    },
+    {
+      "lessonId": "present_perfect_for_unfinished_time_period_this_week",
+      "level": "B1",
+      "sequence": 77,
+      "unit": "B1.6",
+      "title": "present perfect for unfinished time period this week",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_002"
+    },
+    {
+      "lessonId": "ability_nonfinite_forms_be_able_to",
+      "level": "B1",
+      "sequence": 78,
+      "unit": "B1.6",
+      "title": "ability nonfinite forms be able to",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_004"
+    },
+    {
+      "lessonId": "quantifier_of_before_object_pronoun",
+      "level": "B1",
+      "sequence": 79,
+      "unit": "B1.6",
+      "title": "quantifier of before object pronoun",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_012"
+    },
+    {
+      "lessonId": "preposition_of_means_by_vs_with_vs_on",
+      "level": "B1",
+      "sequence": 80,
+      "unit": "B1.6",
+      "title": "preposition of means by vs with vs on",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_013"
+    },
+    {
+      "lessonId": "purpose_connectors_so_that_in_order_to_distinction",
+      "level": "B1",
+      "sequence": 81,
+      "unit": "B1.6",
+      "title": "purpose connectors so that in order to distinction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_021"
+    },
+    {
+      "lessonId": "verb_pattern_meaning_change_stop",
+      "level": "B2",
+      "sequence": 82,
+      "unit": "B2.1",
+      "title": "verb pattern meaning change stop",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "GI-001"
+    },
+    {
+      "lessonId": "defining_vs_nondefining",
+      "level": "B2",
+      "sequence": 83,
+      "unit": "B2.1",
+      "title": "defining vs nondefining",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RC-001"
+    },
+    {
+      "lessonId": "present_perfect_continuous_vs_present_perfect_simple",
+      "level": "B2",
+      "sequence": 84,
+      "unit": "B2.1",
+      "title": "present perfect continuous vs present perfect simple",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-005"
+    },
+    {
+      "lessonId": "future_continuous_vs_future_perfect",
+      "level": "B2",
+      "sequence": 85,
+      "unit": "B2.1",
+      "title": "future continuous vs future perfect",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-007"
+    },
+    {
+      "lessonId": "deduction_past_must_have_vs_cant_have",
+      "level": "B2",
+      "sequence": 86,
+      "unit": "B2.1",
+      "title": "deduction past must have vs cant have",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-004"
+    },
+    {
+      "lessonId": "third_conditional_unreal_past",
+      "level": "B2",
+      "sequence": 87,
+      "unit": "B2.1",
+      "title": "third conditional unreal past",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-003"
+    },
+    {
+      "lessonId": "passive_with_modal_verbs",
+      "level": "B2",
+      "sequence": 88,
+      "unit": "B2.1",
+      "title": "passive with modal verbs",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-002"
+    },
+    {
+      "lessonId": "get_passive_informal_vs_be_passive",
+      "level": "B2",
+      "sequence": 89,
+      "unit": "B2.1",
+      "title": "get passive informal vs be passive",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-003"
+    },
+    {
+      "lessonId": "causative_have_get_something_done",
+      "level": "B2",
+      "sequence": 90,
+      "unit": "B2.2",
+      "title": "causative have get something done",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-004"
+    },
+    {
+      "lessonId": "reporting_verb_choice_suggest_vs_tell",
+      "level": "B2",
+      "sequence": 91,
+      "unit": "B2.2",
+      "title": "reporting verb choice suggest vs tell",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-004"
+    },
+    {
+      "lessonId": "verb_pattern_remember_forget_meaning_change",
+      "level": "B2",
+      "sequence": 92,
+      "unit": "B2.2",
+      "title": "verb pattern remember forget meaning change",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "GI-002"
+    },
+    {
+      "lessonId": "relative_pronoun_whose_possession",
+      "level": "B2",
+      "sequence": 93,
+      "unit": "B2.2",
+      "title": "relative pronoun whose possession",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RC-003"
+    },
+    {
+      "lessonId": "double_comparative_progressive_change",
+      "level": "B2",
+      "sequence": 94,
+      "unit": "B2.2",
+      "title": "double comparative progressive change",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CM-003"
+    },
+    {
+      "lessonId": "future_in_the_past_would_vs_was_going_to",
+      "level": "B2",
+      "sequence": 95,
+      "unit": "B2.2",
+      "title": "future in the past would vs was going to",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-008"
+    },
+    {
+      "lessonId": "past_regret_should_have_vs_shouldnt_have",
+      "level": "B2",
+      "sequence": 96,
+      "unit": "B2.2",
+      "title": "past regret should have vs shouldnt have",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "MO-008"
+    },
+    {
+      "lessonId": "impersonal_reporting_it_is_said_that",
+      "level": "B2",
+      "sequence": 97,
+      "unit": "B2.2",
+      "title": "impersonal reporting it is said that",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-005"
+    },
+    {
+      "lessonId": "passive_infinitive_after_modal_expectation",
+      "level": "B2",
+      "sequence": 98,
+      "unit": "B2.3",
+      "title": "passive infinitive after modal expectation",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "PA-006"
+    },
+    {
+      "lessonId": "verb_pattern_try_meaning_change",
+      "level": "B2",
+      "sequence": 99,
+      "unit": "B2.3",
+      "title": "verb pattern try meaning change",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "GI-004"
+    },
+    {
+      "lessonId": "narrative_past_perfect_flashback_vs_past_simple_sequence",
+      "level": "B2",
+      "sequence": 100,
+      "unit": "B2.3",
+      "title": "narrative past perfect flashback vs past simple sequence",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_002"
+    },
+    {
+      "lessonId": "modal_perfect_could_have_missed_opportunity",
+      "level": "B2",
+      "sequence": 101,
+      "unit": "B2.3",
+      "title": "modal perfect could have missed opportunity",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_004"
+    },
+    {
+      "lessonId": "passive_causative_vs_passive_simple_confusion",
+      "level": "B2",
+      "sequence": 102,
+      "unit": "B2.3",
+      "title": "passive causative vs passive simple confusion",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_008"
+    },
+    {
+      "lessonId": "gerund_as_subject_vs_infinitive_as_subject_formality",
+      "level": "B2",
+      "sequence": 103,
+      "unit": "B2.3",
+      "title": "gerund as subject vs infinitive as subject formality",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_016"
+    },
+    {
+      "lessonId": "contrast_connectors_although_despite_however_distinction",
+      "level": "B2",
+      "sequence": 104,
+      "unit": "B2.3",
+      "title": "contrast connectors although despite however distinction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_022"
+    },
+    {
+      "lessonId": "result_connectors_so_such_that_therefore_distinction",
+      "level": "B2",
+      "sequence": 105,
+      "unit": "B2.3",
+      "title": "result connectors so such that therefore distinction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_023"
+    },
+    {
+      "lessonId": "modal_of_criticism_should_have_vs_could_have_contrast",
+      "level": "B2",
+      "sequence": 106,
+      "unit": "B2.4",
+      "title": "modal of criticism should have vs could have contrast",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_003"
+    },
+    {
+      "lessonId": "conditional_with_unless_provided_that_as_long_as_distinction",
+      "level": "B2",
+      "sequence": 107,
+      "unit": "B2.4",
+      "title": "conditional with unless provided that as long as distinction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_006"
+    },
+    {
+      "lessonId": "passive_with_two_objects_verb_give_send_choice_of_subject",
+      "level": "B2",
+      "sequence": 108,
+      "unit": "B2.4",
+      "title": "passive with two objects verb give send choice of subject",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_007"
+    },
+    {
+      "lessonId": "reporting_verb_pattern_deny_admit_apologize_for",
+      "level": "B2",
+      "sequence": 109,
+      "unit": "B2.4",
+      "title": "reporting verb pattern deny admit apologize for",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_010"
+    },
+    {
+      "lessonId": "zero_article_with_proper_nouns_exceptions_the_netherlands",
+      "level": "B2",
+      "sequence": 110,
+      "unit": "B2.4",
+      "title": "zero article with proper nouns exceptions the netherlands",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_011"
+    },
+    {
+      "lessonId": "dependent_preposition_after_noun_reason_for_solution_to",
+      "level": "B2",
+      "sequence": 111,
+      "unit": "B2.4",
+      "title": "dependent preposition after noun reason for solution to",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_014"
+    },
+    {
+      "lessonId": "superlative_with_ever_present_perfect_combination",
+      "level": "B2",
+      "sequence": 112,
+      "unit": "B2.4",
+      "title": "superlative with ever present perfect combination",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_018"
+    },
+    {
+      "lessonId": "parallel_structure_error_correction",
+      "level": "B2",
+      "sequence": 113,
+      "unit": "B2.4",
+      "title": "parallel structure error correction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_020"
+    },
+    {
+      "lessonId": "mixed_conditional_past_cause_present_result",
+      "level": "C1",
+      "sequence": 114,
+      "unit": "C1.1",
+      "title": "mixed conditional past cause present result",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-004"
+    },
+    {
+      "lessonId": "reduced_relative_clauses_participle",
+      "level": "C1",
+      "sequence": 115,
+      "unit": "C1.1",
+      "title": "reduced relative clauses participle",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RC-002"
+    },
+    {
+      "lessonId": "past_perfect_continuous_background_cause",
+      "level": "C1",
+      "sequence": 116,
+      "unit": "C1.1",
+      "title": "past perfect continuous background cause",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "TA-009"
+    },
+    {
+      "lessonId": "formal_inversion_had_i_known",
+      "level": "C1",
+      "sequence": 117,
+      "unit": "C1.1",
+      "title": "formal inversion had i known",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-006"
+    },
+    {
+      "lessonId": "implied_conditional_otherwise",
+      "level": "C1",
+      "sequence": 118,
+      "unit": "C1.1",
+      "title": "implied conditional otherwise",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "CO-007"
+    },
+    {
+      "lessonId": "reporting_first_conditional_sentences",
+      "level": "C1",
+      "sequence": 119,
+      "unit": "C1.1",
+      "title": "reporting first conditional sentences",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RS-006"
+    },
+    {
+      "lessonId": "preposition_placement_formal_vs_informal_relative_clause",
+      "level": "C1",
+      "sequence": 120,
+      "unit": "C1.1",
+      "title": "preposition placement formal vs informal relative clause",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "RC-004"
+    },
+    {
+      "lessonId": "future_perfect_continuous_duration_before_deadline",
+      "level": "C1",
+      "sequence": 121,
+      "unit": "C1.1",
+      "title": "future perfect continuous duration before deadline",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_001"
+    },
+    {
+      "lessonId": "conditional_inversion_were_i_to",
+      "level": "C1",
+      "sequence": 122,
+      "unit": "C1.2",
+      "title": "conditional inversion were i to",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_006"
+    },
+    {
+      "lessonId": "impersonal_passive_reporting_believed_thought",
+      "level": "C1",
+      "sequence": 123,
+      "unit": "C1.2",
+      "title": "impersonal passive reporting believed thought",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_009"
+    },
+    {
+      "lessonId": "dangling_modifier_correction",
+      "level": "C1",
+      "sequence": 124,
+      "unit": "C1.2",
+      "title": "dangling modifier correction",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_021"
+    },
+    {
+      "lessonId": "cleft_sentences_it_was_x_that_emphasis",
+      "level": "C1",
+      "sequence": 125,
+      "unit": "C1.2",
+      "title": "cleft sentences it was x that emphasis",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b4_024"
+    },
+    {
+      "lessonId": "mixed_conditional_present_cause_past_result",
+      "level": "C1",
+      "sequence": 126,
+      "unit": "C1.2",
+      "title": "mixed conditional present cause past result",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_005"
+    },
+    {
+      "lessonId": "passive_gerund_vs_passive_infinitive_after_verb",
+      "level": "C1",
+      "sequence": 127,
+      "unit": "C1.2",
+      "title": "passive gerund vs passive infinitive after verb",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_008"
+    },
+    {
+      "lessonId": "verb_pattern_regret_mean_go_on_meaning_change",
+      "level": "C1",
+      "sequence": 128,
+      "unit": "C1.2",
+      "title": "verb pattern regret mean go on meaning change",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_015"
+    },
+    {
+      "lessonId": "perfect_gerund_vs_simple_gerund_time_reference",
+      "level": "C1",
+      "sequence": 129,
+      "unit": "C1.2",
+      "title": "perfect gerund vs simple gerund time reference",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_016"
+    },
+    {
+      "lessonId": "relative_clause_with_quantifier_some_of_which_many_of_whom",
+      "level": "C1",
+      "sequence": 130,
+      "unit": "C1.3",
+      "title": "relative clause with quantifier some of which many of whom",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_017"
+    },
+    {
+      "lessonId": "addition_connectors_furthermore_in_addition_moreover_register",
+      "level": "C1",
+      "sequence": 131,
+      "unit": "C1.3",
+      "title": "addition connectors furthermore in addition moreover register",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_022"
+    },
+    {
+      "lessonId": "negative_adverbial_inversion_never_rarely_not_only",
+      "level": "C1",
+      "sequence": 132,
+      "unit": "C1.3",
+      "title": "negative adverbial inversion never rarely not only",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_023"
+    },
+    {
+      "lessonId": "fronting_for_emphasis_such_was_the_impact",
+      "level": "C2",
+      "sequence": 133,
+      "unit": "C2.1",
+      "title": "fronting for emphasis such was the impact",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_024"
+    },
+    {
+      "lessonId": "mixed_conditional_past_cause_future_result",
+      "level": "C2",
+      "sequence": 134,
+      "unit": "C2.1",
+      "title": "mixed conditional past cause future result",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-002"
+    },
+    {
+      "lessonId": "modal_deduction_past_progressive",
+      "level": "C2",
+      "sequence": 135,
+      "unit": "C2.1",
+      "title": "modal deduction past progressive",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-003"
+    },
+    {
+      "lessonId": "inversion_after_only_restrictive_phrase",
+      "level": "C2",
+      "sequence": 136,
+      "unit": "C2.1",
+      "title": "inversion after only restrictive phrase",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-004"
+    },
+    {
+      "lessonId": "pseudo_cleft_what_clause_emphasis",
+      "level": "C2",
+      "sequence": 137,
+      "unit": "C2.1",
+      "title": "pseudo cleft what clause emphasis",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-005"
+    },
+    {
+      "lessonId": "participle_clause",
+      "level": "C2",
+      "sequence": 138,
+      "unit": "C2.1",
+      "title": "participle clause",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-006"
+    },
+    {
+      "lessonId": "concession_linking",
+      "level": "C2",
+      "sequence": 139,
+      "unit": "C2.1",
+      "title": "concession linking",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "C2-007"
+    }
+  ]
+}

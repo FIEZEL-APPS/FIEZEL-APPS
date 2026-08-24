@@ -1,0 +1,146 @@
+// m025-138 — gate untuk B-10: bank prompt Writing dan rubrik analitik.
+//
+// Dua hal yang dijaga gate ini, dan keduanya pernah gagal di produk ini sebelumnya:
+// 1. Cakupan. B2, C1, dan C2 pernah punya SATU prompt masing-masing - tidak mungkin
+//    berlatih ujian dengan satu soal.
+// 2. Kejujuran. Cek offline tidak boleh berpura-pura mengeluarkan skor, dan tidak boleh
+//    ada janji band IELTS atau skor TOEFL di mana pun jalur Writing.
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
+
+const root = __dirname;
+const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const bank = JSON.parse(fs.readFileSync(path.join(root, 'writing-prompts-v1.json'), 'utf8'));
+
+const checks = [];
+let failed = false;
+const check = (name, ok, details) => {
+  checks.push({ name, status: ok ? 'PASS' : 'FAIL', details });
+  if (!ok) failed = true;
+};
+function sourceBlock(name, source = app) {
+  const start = source.search(new RegExp(`(?:function|async function)\\s+${name}\\s*\\(`));
+  if (start < 0) return '';
+  const next = source.slice(start + 10).search(/\n(?:async\s+)?function\s+[A-Za-z_$][\w$]*\s*\(/);
+  return source.slice(start, next < 0 ? source.length : start + 10 + next);
+}
+
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
+// --- 1. bank dan skema ------------------------------------------------------------------
+check('Writing bank schema', bank.schema === 'fiezel-writing-prompts-v1' && bank.schemaVersion === '1.0.0' && Array.isArray(bank.prompts), `schema=${bank.schema}`);
+check('Declared prompt count matches the bank', bank.promptCount === bank.prompts.length, `declared=${bank.promptCount} actual=${bank.prompts.length}`);
+check('Unique prompt identities', new Set(bank.prompts.map(p => p.id)).size === bank.prompts.length, `ids=${new Set(bank.prompts.map(p => p.id)).size}`);
+
+const perLevel = Object.fromEntries(LEVELS.map(level => [level, bank.prompts.filter(p => p.level === level)]));
+check('At least six prompts per level', LEVELS.every(level => perLevel[level].length >= 6), Object.fromEntries(LEVELS.map(l => [l, perLevel[l].length])));
+check('Only known CEFR levels', bank.prompts.every(p => LEVELS.includes(p.level)), 'setiap prompt harus terikat satu level');
+check('Every prompt carries both languages and a focus', bank.prompts.every(p => p.en && p.id_hint && p.focus), 'en, id_hint, dan focus wajib ada');
+check(
+  'Genre diversity within every level',
+  LEVELS.every(level => new Set(perLevel[level].map(p => p.genre)).size >= 3),
+  Object.fromEntries(LEVELS.map(l => [l, new Set(perLevel[l].map(p => p.genre)).size]))
+);
+
+// --- 2. bentuk ujian --------------------------------------------------------------------
+const examIds = Object.keys(bank.examTasks || {});
+check('Exam task contracts are complete', examIds.length > 0 && examIds.every(id => {
+  const task = bank.examTasks[id];
+  return task.label && Number(task.minWords) > 0 && Number(task.minutes) > 0 && task.note;
+}), examIds);
+check('Every examTask reference resolves', bank.prompts.every(p => !p.examTask || examIds.includes(p.examTask)), 'tidak boleh ada prompt menunjuk kontrak ujian yang tidak ada');
+check(
+  'Exam-shaped practice exists from B1 upward',
+  ['B1', 'B2', 'C1', 'C2'].every(level => perLevel[level].some(p => p.examTask)),
+  Object.fromEntries(['B1', 'B2', 'C1', 'C2'].map(l => [l, perLevel[l].filter(p => p.examTask).length]))
+);
+check(
+  'Both IELTS and TOEFL shapes are covered',
+  bank.prompts.some(p => String(p.examTask || '').startsWith('ielts')) && bank.prompts.some(p => String(p.examTask || '').startsWith('toefl')),
+  [...new Set(bank.prompts.map(p => p.examTask).filter(Boolean))]
+);
+check(
+  'Adapted exam formats say so',
+  bank.prompts.filter(p => String(p.examTask || '').includes('adapted')).every(p => p.sourceNote) &&
+    examIds.filter(id => id.includes('adapted')).every(id => /adaptasi|ADAPTASI/.test(bank.examTasks[id].note)),
+  'format yang tidak bisa direplikasi penuh harus mengaku sebagai adaptasi'
+);
+check(
+  'Prompt targets never undercut the exam minimum',
+  bank.prompts.every(p => !p.examTask || Number(p.target) >= Number(bank.examTasks[p.examTask].minWords)),
+  'target di bawah batas ujian akan melatih murid menulis terlalu pendek'
+);
+
+// --- 3. rubrik --------------------------------------------------------------------------
+const criteria = bank.rubric?.criteria || [];
+check('Rubric has five analytic criteria', criteria.length === 5, criteria.map(c => c.id));
+check('Rubric covers the IELTS criterion families', ['task_response', 'coherence_cohesion', 'lexical_resource', 'grammatical_range_accuracy'].every(id => criteria.some(c => c.id === id)), criteria.map(c => c.id));
+check('Every criterion is a full 0-4 band set', criteria.every(c => Array.isArray(c.levels) && c.levels.length === 5 && c.levels.every(x => typeof x === 'string' && x.length > 20)), 'tiap kriteria butuh deskriptor 0,1,2,3,4');
+check('Every criterion states what it asks', criteria.every(c => c.label && c.labelEn && c.asks), 'label, labelEn, dan asks wajib ada');
+check('Rubric scale is declared', bank.rubric?.scale?.min === 0 && bank.rubric?.scale?.max === 4, JSON.stringify(bank.rubric?.scale));
+
+// --- 4. kejujuran -----------------------------------------------------------------------
+check('Bank carries an explicit no-prediction statement', /tidak memprediksi skor/i.test(String(bank.honesty || '')), bank.honesty || 'missing');
+const feedbackBlock = sourceBlock('requestWritingFeedback');
+check('AI prompt forbids band and score claims', /jangan menyebut band IELTS atau skor TOEFL/i.test(feedbackBlock), 'AI tidak boleh mengarang band');
+check('AI prompt asks for the same rubric the learner sees', /writingRubricCriteria\s*\(/.test(feedbackBlock) && /0-4/.test(feedbackBlock), 'rubrik murid dan rubrik AI harus satu sumber');
+const reviewBlock = sourceBlock('writingLocalReview');
+check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlock) && /bukan penilaian bahasa dan bukan skor/i.test(reviewBlock), 'cek offline hanya boleh mengaku memeriksa bentuk');
+
+// --- 5. fixture: jalankan penilai bentuk yang asli ---------------------------------------
+const blocks = ['countWords', 'writingExamTask', 'writingTargetWords', 'writingFormSignals', 'writingFormChecklist'].map(name => sourceBlock(name));
+check('Form checker is exposed as pure functions', blocks.every(Boolean), blocks.map((b, i) => (b ? '' : ['countWords', 'writingExamTask', 'writingTargetWords', 'writingFormSignals', 'writingFormChecklist'][i])).filter(Boolean).join(', ') || 'all found');
+
+function runChecklist(prompt, text) {
+  const sandbox = { WRITING_BANK: bank };
+  vm.createContext(sandbox);
+  vm.runInContext(blocks.join('\n'), sandbox, { timeout: 2000 });
+  sandbox.__prompt = prompt;
+  sandbox.__text = text;
+  return vm.runInContext('writingFormChecklist(__prompt, __text)', sandbox, { timeout: 2000 });
+}
+
+const task2 = bank.prompts.find(p => p.examTask === 'ielts_task2');
+const shortEssay = runChecklist(task2, 'I agree with this statement because studying is important. It helps students.');
+const taskRow = shortEssay.find(row => row.criterion === 'task_response');
+check(
+  'A 249-word shortfall is reported against the exam minimum, not a soft target',
+  taskRow.status === 'perhatikan' && /di bawah batas/.test(taskRow.note) && taskRow.note.includes(String(bank.examTasks.ielts_task2.minWords)),
+  taskRow.note
+);
+const longEnough = Array.from({ length: 260 }, (_, i) => `word${i % 40}`).join(' ');
+const longRow = runChecklist(task2, `${longEnough}.`).find(row => row.criterion === 'task_response');
+check('Meeting the exam minimum clears the task-response form check', longRow.status === 'ok', longRow.note);
+const paragraphRow = runChecklist(task2, 'One.\n\nTwo.\n\nThree.').find(row => row.criterion === 'coherence_cohesion');
+check('Three paragraphs clear the structure form check', paragraphRow.status === 'ok', paragraphRow.note);
+const repeatRow = runChecklist(task2, `${'students '.repeat(6)}learn every day in class.`).find(row => row.criterion === 'lexical_resource');
+check('Heavy repetition is surfaced', repeatRow.status === 'perhatikan' && /students/.test(repeatRow.note), repeatRow.note);
+const honestRows = runChecklist(task2, longEnough).filter(row => row.status === 'ai');
+check(
+  'Criteria that cannot be measured offline admit it',
+  honestRows.length === 2 && honestRows.every(row => /AI|membaca/i.test(row.note)),
+  honestRows.map(row => row.criterion)
+);
+check(
+  'Every checklist row maps to a real rubric criterion',
+  runChecklist(task2, longEnough).every(row => criteria.some(c => c.id === row.criterion)),
+  'checklist tidak boleh menyebut kriteria yang tidak ada di rubrik'
+);
+
+const report = {
+  status: failed ? 'NOT READY' : 'PASS',
+  bank: bank.version,
+  counts: {
+    pass: checks.filter(item => item.status === 'PASS').length,
+    fail: checks.filter(item => item.status === 'FAIL').length,
+    prompts: bank.prompts.length,
+    perLevel: Object.fromEntries(LEVELS.map(l => [l, perLevel[l].length])),
+    examShaped: bank.prompts.filter(p => p.examTask).length,
+    criteria: criteria.length
+  },
+  checks
+};
+fs.writeFileSync(path.join(root, 'WRITING-RUBRIC-REPORT.json'), `${JSON.stringify(report, null, 2)}\n`);
+console.log(JSON.stringify(report, null, 2));
+if (failed) process.exitCode = 1;

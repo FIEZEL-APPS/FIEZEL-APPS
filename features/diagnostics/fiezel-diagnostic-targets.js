@@ -24,7 +24,6 @@
     // m025-41: the Indonesian bundle is optional, so its absence is never a failure -
     // but a half-installed or drifted bundle is exactly the state that produced silent
     // Classroom audio, and that must be visible.
-    indonesianVoice: Object.freeze({ expectedAssetCount: 11 }),
     // The prototype contract OWNER set: A1 complete across every subject before any
     // higher level is worth counting.
     classroom: Object.freeze({

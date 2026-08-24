@@ -217,7 +217,12 @@ test('lama tidak belajar juga memicu recovery', () => {
 
 test('penjelasan dibangun dari rationale code, bukan teks bebas', () => {
   assert.strictEqual(journey.explainSelection(plan), plan.rationale.explanation);
-  assert.ok(/jatuh tempo review/.test(mission.rationale.explanation));
+  // m025-131: teksnya jadi "ada materi yang harus diulang" - OWNER meminta istilah orang
+  // dalam seperti "jatuh tempo review" hilang dari seluruh aplikasi. Yang dijaga
+  // pemeriksaan ini tidak berubah: penjelasannya harus datang dari rationale code
+  // due_reviews, bukan dari teks bebas.
+  assert.ok(mission.rationale.codes.includes('due_reviews'));
+  assert.ok(/harus diulang/.test(mission.rationale.explanation));
   // Kode yang tidak dikenal diabaikan, tidak dicetak mentah ke layar pengguna.
   const asing = journey.buildTodayPlan({ mission, evidence, policy: { ...policy, rationaleCodes: ['kode_ngawur'] }, now: NOW });
   assert.ok(!/kode_ngawur/.test(asing.rationale.explanation));

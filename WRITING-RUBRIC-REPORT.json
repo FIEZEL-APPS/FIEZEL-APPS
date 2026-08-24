@@ -1,0 +1,212 @@
+{
+  "status": "PASS",
+  "bank": "1.0.0",
+  "counts": {
+    "pass": 29,
+    "fail": 0,
+    "prompts": 36,
+    "perLevel": {
+      "A1": 6,
+      "A2": 6,
+      "B1": 6,
+      "B2": 6,
+      "C1": 6,
+      "C2": 6
+    },
+    "examShaped": 23,
+    "criteria": 5
+  },
+  "checks": [
+    {
+      "name": "Writing bank schema",
+      "status": "PASS",
+      "details": "schema=fiezel-writing-prompts-v1"
+    },
+    {
+      "name": "Declared prompt count matches the bank",
+      "status": "PASS",
+      "details": "declared=36 actual=36"
+    },
+    {
+      "name": "Unique prompt identities",
+      "status": "PASS",
+      "details": "ids=36"
+    },
+    {
+      "name": "At least six prompts per level",
+      "status": "PASS",
+      "details": {
+        "A1": 6,
+        "A2": 6,
+        "B1": 6,
+        "B2": 6,
+        "C1": 6,
+        "C2": 6
+      }
+    },
+    {
+      "name": "Only known CEFR levels",
+      "status": "PASS",
+      "details": "setiap prompt harus terikat satu level"
+    },
+    {
+      "name": "Every prompt carries both languages and a focus",
+      "status": "PASS",
+      "details": "en, id_hint, dan focus wajib ada"
+    },
+    {
+      "name": "Genre diversity within every level",
+      "status": "PASS",
+      "details": {
+        "A1": 4,
+        "A2": 4,
+        "B1": 4,
+        "B2": 5,
+        "C1": 5,
+        "C2": 5
+      }
+    },
+    {
+      "name": "Exam task contracts are complete",
+      "status": "PASS",
+      "details": [
+        "ielts_task2",
+        "ielts_task1_letter",
+        "ielts_task1_report",
+        "toefl_discussion",
+        "toefl_integrated_adapted"
+      ]
+    },
+    {
+      "name": "Every examTask reference resolves",
+      "status": "PASS",
+      "details": "tidak boleh ada prompt menunjuk kontrak ujian yang tidak ada"
+    },
+    {
+      "name": "Exam-shaped practice exists from B1 upward",
+      "status": "PASS",
+      "details": {
+        "B1": 5,
+        "B2": 6,
+        "C1": 6,
+        "C2": 6
+      }
+    },
+    {
+      "name": "Both IELTS and TOEFL shapes are covered",
+      "status": "PASS",
+      "details": [
+        "ielts_task2",
+        "ielts_task1_letter",
+        "toefl_discussion",
+        "ielts_task1_report",
+        "toefl_integrated_adapted"
+      ]
+    },
+    {
+      "name": "Adapted exam formats say so",
+      "status": "PASS",
+      "details": "format yang tidak bisa direplikasi penuh harus mengaku sebagai adaptasi"
+    },
+    {
+      "name": "Prompt targets never undercut the exam minimum",
+      "status": "PASS",
+      "details": "target di bawah batas ujian akan melatih murid menulis terlalu pendek"
+    },
+    {
+      "name": "Rubric has five analytic criteria",
+      "status": "PASS",
+      "details": [
+        "task_response",
+        "coherence_cohesion",
+        "lexical_resource",
+        "grammatical_range_accuracy",
+        "register_mechanics"
+      ]
+    },
+    {
+      "name": "Rubric covers the IELTS criterion families",
+      "status": "PASS",
+      "details": [
+        "task_response",
+        "coherence_cohesion",
+        "lexical_resource",
+        "grammatical_range_accuracy",
+        "register_mechanics"
+      ]
+    },
+    {
+      "name": "Every criterion is a full 0-4 band set",
+      "status": "PASS",
+      "details": "tiap kriteria butuh deskriptor 0,1,2,3,4"
+    },
+    {
+      "name": "Every criterion states what it asks",
+      "status": "PASS",
+      "details": "label, labelEn, dan asks wajib ada"
+    },
+    {
+      "name": "Rubric scale is declared",
+      "status": "PASS",
+      "details": "{\"min\":0,\"max\":4}"
+    },
+    {
+      "name": "Bank carries an explicit no-prediction statement",
+      "status": "PASS",
+      "details": "FIEZEL tidak memprediksi skor IELTS atau TOEFL. Rubrik ini alat latihan dan umpan balik; band resmi hanya keluar dari ujian resmi."
+    },
+    {
+      "name": "AI prompt forbids band and score claims",
+      "status": "PASS",
+      "details": "AI tidak boleh mengarang band"
+    },
+    {
+      "name": "AI prompt asks for the same rubric the learner sees",
+      "status": "PASS",
+      "details": "rubrik murid dan rubrik AI harus satu sumber"
+    },
+    {
+      "name": "Offline review does not invent a score",
+      "status": "PASS",
+      "details": "cek offline hanya boleh mengaku memeriksa bentuk"
+    },
+    {
+      "name": "Form checker is exposed as pure functions",
+      "status": "PASS",
+      "details": "all found"
+    },
+    {
+      "name": "A 249-word shortfall is reported against the exam minimum, not a soft target",
+      "status": "PASS",
+      "details": "12 kata, di bawah batas IELTS Writing Task 2 (250). Di ujian aslinya ini kena penalti sebelum isinya dinilai."
+    },
+    {
+      "name": "Meeting the exam minimum clears the task-response form check",
+      "status": "PASS",
+      "details": "260 kata, target 250 terpenuhi."
+    },
+    {
+      "name": "Three paragraphs clear the structure form check",
+      "status": "PASS",
+      "details": "3 paragraf - strukturnya sudah terbaca."
+    },
+    {
+      "name": "Heavy repetition is surfaced",
+      "status": "PASS",
+      "details": "Kata yang diulang: students (6x)."
+    },
+    {
+      "name": "Criteria that cannot be measured offline admit it",
+      "status": "PASS",
+      "details": [
+        "grammatical_range_accuracy",
+        "register_mechanics"
+      ]
+    },
+    {
+      "name": "Every checklist row maps to a real rubric criterion",
+      "status": "PASS",
+      "details": "checklist tidak boleh menyebut kriteria yang tidak ada di rubrik"
+    }
+  ]
+}
