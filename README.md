@@ -1,6 +1,6 @@
-# FIEZEL 5.18.0
+# FIEZEL 5.19.0
 
-FIEZEL adalah Personal English OS untuk Jahran. Build 5.18.0 mengintegrasikan **Speaking + Listening Skills Lab** dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
+FIEZEL adalah Personal English OS. Build 5.19.0 mengintegrasikan **Speaking + Listening Skills Lab**, **Core Brain adaptif**, dan jalur **local neural voice** yang tetap menjaga privasi, biaya runtime nol, serta kompatibilitas state lama.
 
 Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti. Baca `FIEZEL-5.18.0-NEXT-HANDOFF-MASTER-PROMPT.md` bersama `FIEZEL-PRODUCT-ROADMAP-2026-2027.md`. GitHub dan archive wajib direkonsiliasi sebelum promosi bila version surfaces berbeda.
 

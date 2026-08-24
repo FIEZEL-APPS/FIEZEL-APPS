@@ -61,7 +61,10 @@ setTimeout(() => {
 
   test('Home merender panel perjalanan belajar', () => {
     assert.ok(markup.length > 0, 'markup tidak boleh kosong saat modul tersedia');
-    assert.ok(/Perjalanan belajar minggu ini/.test(markup));
+    // m025-131: judulnya "Rencana kamu", bukan "Perjalanan belajar minggu ini". OWNER
+    // meminta bahasa yang lebih pendek dan langsung untuk murid kelas 1 SMA; yang dijaga
+    // pemeriksaan ini tetap sama - panelnya benar-benar dirender.
+    assert.ok(/Rencana kamu/.test(markup));
     assert.ok(/journey-panel/.test(markup) && /journey-today/.test(markup));
     assert.ok(/2026-08-17/.test(markup) && /2026-08-23/.test(markup), 'rentang minggu WIB tampil');
   });
@@ -98,12 +101,18 @@ setTimeout(() => {
     // Catatan non-prediksi milik goal yang sedang aktif harus benar-benar tampil di layar,
     // bukan hanya ada di dalam objek.
     assert.ok(markup.indexOf(built.mission.goalProfile.note) !== -1, 'catatan non-prediksi harus terlihat');
-    assert.ok(/bukan prediksi/i.test(markup));
+    // m025-131: kalimatnya ditulis ulang jadi "bukan tebakan nilai ujian". Yang dijaga
+    // bukan kata "prediksi", melainkan bahwa penyangkalannya BENAR-BENAR tampil - jadi
+    // pemeriksaannya menyebut keduanya.
+    assert.ok(/bukan (prediksi|tebakan)/i.test(markup));
     assert.ok(!/band\s*\d|skor\s*[0-9]|score\s*[0-9]|\b[5-9]\.[05]\b/i.test(markup), 'tidak boleh ada angka berbentuk skor ujian');
     // Goal fondasi ujian adalah tempat klaim skor paling mungkin menyelinap masuk.
     context.__fiezelAudit.setGoalProfile('exam_foundation');
     const examMarkup = context.__fiezelAudit.journeyMarkup(now);
-    assert.ok(/tidak memprediksi skor/i.test(examMarkup), 'goal fondasi ujian wajib menyatakan tidak ada prediksi skor');
+    // m025-131: kalimatnya kini "FIEZEL nggak menebak skor IELTS/TOEFL kamu". Yang dijaga
+    // tetap sama dan tetap keras: goal ini WAJIB menyatakan tidak ada tebakan skor, karena
+    // di sinilah klaim skor paling mungkin menyelinap masuk.
+    assert.ok(/(tidak memprediksi|nggak menebak) skor/i.test(examMarkup), 'goal fondasi ujian wajib menyatakan tidak ada tebakan skor');
     assert.ok(!/band\s*\d|skor\s*[0-9]|score\s*[0-9]|\b[5-9]\.[05]\b/i.test(examMarkup));
     context.__fiezelAudit.setGoalProfile('school');
   });

@@ -24,22 +24,83 @@
   'use strict';
 
   var ICONS = {
-    /* Tab bar */
-    home: '<path class="fz-fill" d="M5 11.2 12 5.4l7 5.8V19a1.2 1.2 0 0 1-1.2 1.2H6.2A1.2 1.2 0 0 1 5 19z"/>' +
-      '<path class="fz-line" d="M4 11.6 12 5l8 6.6"/><path class="fz-line" d="M6.2 11.4V19c0 .55.45 1 1 1h9.6c.55 0 1-.45 1-1v-7.6"/>' +
-      '<path class="fz-line" d="M10.2 20v-4.3c0-.55.45-1 1-1h1.6c.55 0 1 .45 1 1V20"/>',
-    vocab: '<path class="fz-fill" d="M6.4 4.6h9.4c1 0 1.8.8 1.8 1.8v11.4c0 1-.8 1.8-1.8 1.8H6.4z"/>' +
-      '<path class="fz-line" d="M6.4 4.6h9.9c1 0 1.7.8 1.7 1.8v11.2c0 1-.7 1.8-1.7 1.8H6.4a1.6 1.6 0 0 1-1.6-1.6V6.2c0-.9.7-1.6 1.6-1.6z"/>' +
-      '<path class="fz-line" d="M9 15.2 11.6 8.6l2.6 6.6M9.9 13.2h3.4"/>',
-    grammar: '<rect class="fz-fill" x="4.6" y="6" width="14.8" height="10.4" rx="3.2"/>' +
-      '<path class="fz-line" d="M4.8 9.2c0-1.8 1.4-3.2 3.2-3.2h8c1.8 0 3.2 1.4 3.2 3.2v4c0 1.8-1.4 3.2-3.2 3.2h-4.4L8 19.4v-3h-.2c-1.8 0-3.2-1.4-3.2-3.2z"/>' +
-      '<path class="fz-line" d="M8.6 11.2h2.6M13.2 11.2h2.2"/>',
-    reading: '<path class="fz-fill" d="M12 7.4C10.4 6.1 8.6 5.6 5.4 5.6v11.2c3.2 0 5 .5 6.6 1.8z"/>' +
-      '<path class="fz-line" d="M12 7.4C10.4 6.1 8.6 5.6 5.4 5.6a.9.9 0 0 0-.9.9v9.6c0 .5.4.9.9.9 3.1 0 4.9.5 6.6 1.6"/>' +
-      '<path class="fz-line" d="M12 7.4c1.6-1.3 3.4-1.8 6.6-1.8.5 0 .9.4.9.9v9.6c0 .5-.4.9-.9.9-3.1 0-4.9.5-6.6 1.6V7.4z"/>',
-    map: '<path class="fz-fill" d="M8.6 4.8 15 7.4l4.4-2v11.8l-4.4 2L8.6 16.6l-4 1.8V6.6z"/>' +
-      '<path class="fz-line" d="m9 4.8 6 2.6 4.2-1.9c.4-.2.8.1.8.5v10.7c0 .2-.1.4-.3.5L15 19.2l-6-2.6-4.2 1.9a.5.5 0 0 1-.8-.5V7.3c0-.2.1-.4.3-.5z"/>' +
-      '<path class="fz-line" d="M9 4.8v11.8M15 7.4v11.8"/>',
+    /**
+     * m025-128 PAW - maskot pembimbing FIEZEL. Arah 02, dipilih OWNER dari lima arah.
+     *
+     * KENAPA BENTUKNYA BEGINI. Keempat jarinya bukan bulatan melainkan balok bersudut
+     * bulat dengan tinggi berbeda - bentuk yang sudah ada di logotype FIEZEL sendiri (dua
+     * balok emas di antara hurufnya, yang juga jadi ikon "Tanya FIEZEL" di topbar). Itulah
+     * klaim otentisitas yang diminta brief A.3: bentuknya tidak dipinjam dari icon library
+     * mana pun, ia diambil dari wordmark FIEZEL. Sebagai bonus ia terbaca sebagai gelombang
+     * suara naik - Listening dan Speaking - tanpa satu elemen tambahan.
+     *
+     * KENAPA PEKAT, BUKAN DUOTONE seperti ikon lain di berkas ini. PAW bukan ikon UI, ia
+     * MARKA - sekelas wordmark, bukan sekelas tombol. Lagi pula bidangnya duduk di atas
+     * lingkaran --yellow, dan .fz-fill default-nya juga --yellow: duotone di sini berarti
+     * bantalannya hilang. Warnanya tetap tidak dipaku; ia mengikuti --fz-i-line.
+     *
+     * Tiap balok punya kelasnya sendiri karena sistem gerak per-halaman (style.css,
+     * "PAW - gerak per halaman") menggerakkannya satu per satu.
+     */
+    paw: '<g class="fz-paw-sparks" aria-hidden="true">' +
+      /* m025-129: dua belas partikel. Titik cx/cy tiap partikel BUKAN acak - ia simpul
+         bentuk PAW itu sendiri (ujung tiap balok, dan enam titik keliling bantalan).
+         Itulah kenapa mereka bisa "membentuk" marka: mereka memang sudah berdiri di
+         tempat marka akan muncul, dan yang dianimasikan justru perjalanan MENJAUH lalu
+         KEMBALI. Menganimasikan arah sebaliknya - lahir acak lalu dicari tempatnya -
+         akan meleset satu-dua piksel pada tiap partikel dan terlihat seperti kotoran.
+         --sx/--sy arah lontarnya, --sd giliran berangkatnya. */
+      '<circle class="fz-paw-spark" cx="6.15" cy="9.8" r="1.05" style="--sx:-5.29px;--sy:-3.61px;--sd:0s"/>' +
+      '<circle class="fz-paw-spark" cx="10.45" cy="8.6" r="1.05" style="--sx:-2.94px;--sy:-7.66px;--sd:.028s"/>' +
+      '<circle class="fz-paw-spark" cx="14.75" cy="7.75" r="1.05" style="--sx:3.16px;--sy:-9.49px;--sd:.056s"/>' +
+      '<circle class="fz-paw-spark" cx="19.05" cy="9.15" r="1.05" style="--sx:5.75px;--sy:-4.5px;--sd:.084s"/>' +
+      '<circle class="fz-paw-spark" cx="8.4" cy="17.2" r="1.05" style="--sx:-7.4px;--sy:5.29px;--sd:.112s"/>' +
+      '<circle class="fz-paw-spark" cx="12.6" cy="14.9" r="1.05" style="--sx:0px;--sy:6.4px;--sd:.14s"/>' +
+      '<circle class="fz-paw-spark" cx="16.8" cy="17.2" r="1.05" style="--sx:6.67px;--sy:4.77px;--sd:.168s"/>' +
+      '<circle class="fz-paw-spark" cx="12.6" cy="20.6" r="1.05" style="--sx:0px;--sy:10px;--sd:.196s"/>' +
+      '<circle class="fz-paw-spark" cx="9.9" cy="19.9" r="1.05" style="--sx:-3.13px;--sy:6.6px;--sd:.224s"/>' +
+      '<circle class="fz-paw-spark" cx="15.3" cy="19.9" r="1.05" style="--sx:3.9px;--sy:8.22px;--sd:.252s"/>' +
+      '<circle class="fz-paw-spark" cx="7.3" cy="15.6" r="1.05" style="--sx:-6.19px;--sy:1.63px;--sd:.28s"/>' +
+      '<circle class="fz-paw-spark" cx="17.9" cy="15.6" r="1.05" style="--sx:7.93px;--sy:2.09px;--sd:.308s"/>' +
+      '</g>' +
+      '<g class="fz-paw">' +
+      '<rect class="fz-paw-bar" x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>' +
+      '<rect class="fz-paw-bar" x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>' +
+      '<path class="fz-paw-pad" d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>' +
+      '</g>',
+    /* Tab bar.
+       m025-129: kelima ikon ini digambar ULANG. OWNER: "icon taskbarnya terlalu jadul
+       kurang modern dan eye catching."
+
+       Ia benar, dan sebabnya bisa disebut: versi sebelumnya garis tipis 1,7 dengan satu
+       bidang pastel kecil di belakangnya. Bahasa itu - outline tipis, bidang malu-malu -
+       memang bahasa ikon 2020, dan pada 24 px di atas kapsul kuning ia nyaris tidak
+       punya berat sama sekali.
+
+       Yang berubah: BIDANG jadi bentuk utamanya, garis tinggal menegaskan tepi. Siluetnya
+       dibuat lebih gemuk dan lubangnya lebih besar supaya tetap terbaca saat mengecil.
+       Ini bahasa ikon yang dipakai aplikasi belajar yang jadi acuan brief (Duolingo), dan
+       ia jauh lebih tahan di ukuran kecil daripada garis tipis.
+
+       Aturan keluarga tetap: kanvas 24x24, isi di dalam kotak 3..21, satu bidang per
+       ikon, sudut membulat, tidak ada warna yang dipaku. */
+    home: '<path class="fz-fill" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>' +
+      '<path class="fz-line" d="M12 3.6 21 11v7.6a2.4 2.4 0 0 1-2.4 2.4H5.4A2.4 2.4 0 0 1 3 18.6V11z"/>' +
+      '<path class="fz-line" d="M9.5 21v-4.6a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V21"/>',
+    vocab: '<rect class="fz-fill" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
+      '<rect class="fz-line" x="3.6" y="3.6" width="16.8" height="16.8" rx="4.4"/>' +
+      '<path class="fz-line" d="M8.4 16.2 12 7.4l3.6 8.8M9.7 13.6h4.6"/>',
+    grammar: '<path class="fz-fill" d="M6 3.9h12a3.3 3.3 0 0 1 3.3 3.3v6.2a3.3 3.3 0 0 1-3.3 3.3h-4.6L8.5 20.4v-3.7H6a3.3 3.3 0 0 1-3.3-3.3V7.2A3.3 3.3 0 0 1 6 3.9Z"/>' +
+      '<path class="fz-line" d="M6 3.9h12a3.3 3.3 0 0 1 3.3 3.3v6.2a3.3 3.3 0 0 1-3.3 3.3h-4.6L8.5 20.4v-3.7H6a3.3 3.3 0 0 1-3.3-3.3V7.2A3.3 3.3 0 0 1 6 3.9Z"/>' +
+      '<path class="fz-line" d="M7.6 8.9h8.8M7.6 12.3h5.4"/>',
+    reading: '<path class="fz-fill" d="M12 6.6C10 4.9 7.6 4.2 3.6 4.2v13.2c4 0 6.4.7 8.4 2.4 2-1.7 4.4-2.4 8.4-2.4V4.2c-4 0-6.4.7-8.4 2.4Z"/>' +
+      '<path class="fz-line" d="M12 6.6C10 4.9 7.6 4.2 3.6 4.2v13.2c4 0 6.4.7 8.4 2.4 2-1.7 4.4-2.4 8.4-2.4V4.2c-4 0-6.4.7-8.4 2.4Z"/>' +
+      '<path class="fz-line" d="M12 6.6v13.2"/>',
+    map: '<path class="fz-fill" d="M8.9 3.9 15.1 6.4l5.3-2.2v12.6l-5.3 2.2-6.2-2.5-5.3 2.2V6.1z"/>' +
+      '<path class="fz-line" d="M8.9 3.9 15.1 6.4l5.3-2.2v12.6l-5.3 2.2-6.2-2.5-5.3 2.2V6.1z"/>' +
+      '<path class="fz-line" d="M8.9 3.9v14.6M15.1 6.4V21"/>',
     /* Empat skill inti tes */
     listening: '<path class="fz-fill" d="M7.6 10.6a4.4 4.4 0 1 1 8.8 0c0 2-1 2.7-1.8 3.6-.7.8-1 1.5-1 2.6a2.2 2.2 0 0 1-4.4 0z"/>' +
       '<path class="fz-line" d="M7.6 10.4a4.4 4.4 0 0 1 8.8.2c0 2-1 2.7-1.8 3.6-.7.8-1 1.5-1 2.6a2.2 2.2 0 0 1-4.3.5"/>' +

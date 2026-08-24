@@ -44,33 +44,45 @@
     },
     it: {
       id: 'it', label: 'IT dan teknologi',
-      prerequisites: ['Kosakata teknis dasar', 'Reading dokumentasi', 'Grammar instruksi dan prosedur']
+      prerequisites: ['Kosakata teknis dasar', 'Baca panduan teknis', 'Grammar buat langkah-langkah']
     },
     scholarship: {
       id: 'scholarship', label: 'Beasiswa',
-      prerequisites: ['Menulis email formal', 'Perkenalan diri', 'Reading pengumuman resmi']
+      prerequisites: ['Nulis email resmi', 'Perkenalan diri', 'Baca pengumuman resmi']
     },
     exam_foundation: {
-      id: 'exam_foundation', label: 'Fondasi IELTS/TOEFL',
+      id: 'exam_foundation', label: 'Persiapan IELTS/TOEFL',
       // Roadmap melarang prediksi skor. Yang boleh disebut hanya prasyarat.
-      prerequisites: ['Reading akademik dasar', 'Listening note-taking', 'Grammar akurasi tinggi'],
-      note: 'FIEZEL tidak memprediksi skor IELTS/TOEFL. Yang ditampilkan hanya prasyarat kemampuan.'
+      prerequisites: ['Baca teks sekolah', 'Nyatet sambil dengerin', 'Grammar yang rapi'],
+      note: 'FIEZEL nggak menebak skor IELTS/TOEFL kamu. Yang ditampilkan cuma apa yang harus bisa dulu.'
     }
   };
   var DEFAULT_GOAL = 'school';
 
+  /**
+   * m025-131: alasan rencana, ditulis ulang dengan bahasa murid.
+   *
+   * KENAPA DIUBAH DI SINI, bukan diterjemahkan di lapisan tampilan. Percobaan pertama
+   * memang begitu - app.js menyusun kalimatnya sendiri dari mode dan backlog - dan
+   * personal-journey-ui-test menolaknya dengan benar: ia menuntut alasan YANG TAMPIL sama
+   * persis dengan alasan yang dihitung mesin. Tuntutan itu bukan formalitas. Kalimat yang
+   * cantik tetapi bukan alasan sesungguhnya adalah layar yang berbohong kepada murid, dan
+   * ia akan menyimpang diam-diam pada hari mesinnya berubah.
+   *
+   * Jadi yang diperbaiki penulisnya, bukan penerjemahnya.
+   */
   var RATIONALE_TEXT = {
-    due_reviews: 'ada materi yang sudah jatuh tempo review',
-    forgetting_risk: 'ada materi yang mulai rawan lupa',
-    weak_skill: 'ada skill dengan tingkat salah yang tinggi',
-    recurring_error: 'pola salah yang sama berulang',
-    abandonment_risk: 'sesi sering tidak selesai',
-    consistency_risk: 'ritme belajar dua minggu terakhir masih jarang',
-    confidence_gap: 'rasa yakin dan hasil nyata masih berjauhan',
-    calm_pacing: 'waktu jawab rata-rata masih lambat',
-    session_interrupted: 'ada sesi yang terputus dan belum diselesaikan',
-    balanced_progression: 'bukti belajar cukup stabil untuk lanjut dengan ritme aman',
-    evidence_thin: 'bukti belajar belum cukup untuk mengunci prioritas'
+    due_reviews: 'ada materi yang harus diulang',
+    forgetting_risk: 'ada materi yang mulai kamu lupa',
+    weak_skill: 'ada bagian yang masih sering salah',
+    recurring_error: 'kesalahan yang sama muncul terus',
+    abandonment_risk: 'latihan sering nggak kamu selesaikan',
+    consistency_risk: 'dua minggu ini kamu jarang latihan',
+    confidence_gap: 'kamu ngerasa bisa, tapi hasilnya belum',
+    calm_pacing: 'kamu masih lama mikirnya',
+    session_interrupted: 'ada latihan yang belum kamu selesaikan',
+    balanced_progression: 'semuanya lagi aman',
+    evidence_thin: 'catatan latihanmu belum cukup'
   };
 
   function clamp(value, min, max) {
@@ -106,7 +118,7 @@
       id: row.id,
       label: row.label,
       prerequisites: row.prerequisites.slice(),
-      note: row.note || 'Profil ini menjelaskan prasyarat kemampuan, bukan prediksi hasil ujian.',
+      note: row.note || 'Ini daftar yang harus kamu bisa dulu, bukan tebakan nilai ujian.',
       scorePrediction: false
     };
   }
@@ -151,7 +163,7 @@
         return {
           skill: skill, label: SKILL_LABELS[skill], status: 'pending_r3',
           attempts: null, accuracy: null, mastery: null, riskCount: 0,
-          basis: 'Latihan Speaking/Listening tercatat terpisah dan belum masuk peta ini.'
+          basis: 'Latihan Speaking dan Listening dicatat terpisah, belum masuk peta ini.'
         };
       }
       // Snapshot memakai nama `vocabulary`, riwayat jawaban memakai type `vocab`.
@@ -176,7 +188,7 @@
         weakSkillCount: weakHere,
         basis: attempts > 0
           ? attempts + ' jawaban tercatat pada skill ini.'
-          : 'Belum ada jawaban tercatat pada skill ini.'
+          : 'Belum ada jawaban di bagian ini.'
       };
     });
   }
@@ -198,9 +210,9 @@
 
   function rationaleText(codes) {
     var known = codes.filter(function (c) { return RATIONALE_TEXT[c]; });
-    if (!known.length) return 'Rencana ini memakai ritme aman karena tidak ada sinyal risiko yang menonjol.';
+    if (!known.length) return 'Semuanya aman, jadi minggu ini santai dulu.';
     var reasons = known.slice(0, 3).map(function (c) { return RATIONALE_TEXT[c]; });
-    return 'Rencana ini dipilih karena ' + reasons.join(', ') + '.';
+    return 'Soalnya ' + reasons.join(', ') + '.';
   }
 
   /**
@@ -341,14 +353,14 @@
     if (!recovery.needed && !policy.avoidNewContent && focus > 4) { transfer = 1; focus -= 1; }
 
     var blocks = [];
-    if (review > 0) blocks.push({ kind: 'review', questions: review, mandatory: true, why: 'Materi jatuh tempo didahulukan supaya tidak hilang.' });
+    if (review > 0) blocks.push({ kind: 'review', questions: review, mandatory: true, why: 'Yang hampir kamu lupa didulukan.' });
     blocks.push({
       kind: 'focus', questions: focus, mandatory: true,
       why: mission.focusSkill
         ? 'Fokus minggu ini: ' + String(mission.focusSkill).replace(/_/g, ' ') + '.'
         : 'Fokus pada domain ' + String(mission.focusDomain || policy.primaryDomain || 'grammar') + '.'
     });
-    if (transfer > 0) blocks.push({ kind: 'transfer', questions: transfer, mandatory: false, why: 'Satu soal lintas skill untuk menjaga transfer.' });
+    if (transfer > 0) blocks.push({ kind: 'transfer', questions: transfer, mandatory: false, why: 'Soal campur biar nggak kaku.' });
 
     var codes = recovery.needed
       ? recovery.rationale.codes

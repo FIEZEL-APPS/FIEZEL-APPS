@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 129,
+  "count": 139,
   "templates": [
     {
       "id": "TA-001",
@@ -7225,13 +7225,433 @@
       "pedagogicalObjectiveId": "Susunan much as + anak kalimat menyatakan pertentangan dan menuntut kata kerja bertense",
       "misconceptionTargetedId": "bentuk present yang tidak cocok; penggalan participle; frasa benda",
       "reasoningOperationId": "kenali “much as” sebagai penghubung pertentangan → tuntut anak kalimat bertense sesudahnya → selaraskan kata kerjanya dengan keputusan dewan yang sudah selesai"
+    },
+    {
+      "id": "A1-008",
+      "family": "articles_determiners",
+      "subskill": "articles_a_an_the",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Choose a, an, or the from the first sound and whether the listener already knows the noun.",
+      "misconceptionTargeted": "Learner chooses an from spelling alone or uses the for a first, non-specific mention.",
+      "reasoningOperation": "identify the noun sound and reference status -> select the article",
+      "stem": "She is ___ engineer.",
+      "options": [
+        "a",
+        "an",
+        "the",
+        "some"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "a",
+          "misconception": "consonant-letter shortcut",
+          "whyFails": "'Engineer' begins with a vowel sound, so 'a' is not the correct indefinite article."
+        },
+        {
+          "option": "the",
+          "misconception": "specific-article overuse",
+          "whyFails": "Nothing says the listener already knows which engineer; this is a first, non-specific mention."
+        },
+        {
+          "option": "some",
+          "misconception": "plural-or-uncountable quantifier",
+          "whyFails": "'Engineer' is a singular countable noun, so 'some' cannot introduce it here."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'An' comes before the vowel sound in 'engineer'.",
+        "rule": "Use a before a consonant sound, an before a vowel sound, and the when the noun is specific or already known.",
+        "whyOthersFail": "'A' does not match the initial vowel sound; 'the' adds an unsupported specific reference; 'some' does not introduce one singular countable noun.",
+        "howToAvoid": "Say the first sound aloud, then ask whether you mean one of many or a particular known item.",
+        "memoryCue": "Listen to the sound: an engineer."
+      }
+    },
+    {
+      "id": "A1-009",
+      "family": "possession",
+      "subskill": "have_got_has_got",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use have got or has got with the correct subject and form a basic possession question.",
+      "misconceptionTargeted": "Learner uses have with a singular third-person subject or combines do with have got.",
+      "reasoningOperation": "match subject number to have or has -> keep got after the auxiliary",
+      "stem": "She ___ got a new phone.",
+      "options": [
+        "have",
+        "has",
+        "is",
+        "does"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "have",
+          "misconception": "plural-form transfer",
+          "whyFails": "A singular third-person subject such as 'she' takes 'has got', not 'have got'."
+        },
+        {
+          "option": "is",
+          "misconception": "be-verb substitution",
+          "whyFails": "'Is got' is not the possession structure tested here; the correct form is 'has got'."
+        },
+        {
+          "option": "does",
+          "misconception": "double-auxiliary construction",
+          "whyFails": "'Does got' is not grammatical; 'have got' forms its own possession pattern."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'She' is singular third person, so the phrase is 'has got'.",
+        "rule": "Use have got with I, you, we, and they; use has got with he, she, and it.",
+        "whyOthersFail": "'Have' does not agree with 'she'; 'is' and 'does' do not form the have-got possession structure.",
+        "howToAvoid": "Choose have or has from the subject first, then keep got after it.",
+        "memoryCue": "He, she, it has got; I, you, we, they have got."
+      }
+    },
+    {
+      "id": "A1-010",
+      "family": "tense_aspect",
+      "subskill": "past_simple_regular_forms",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Form and use the past simple of regular verbs in affirmative and negative sentences.",
+      "misconceptionTargeted": "Learner adds -ed after did or changes a consonant-plus-y verb to the wrong spelling.",
+      "reasoningOperation": "locate the past marker -> decide whether did already carries tense -> choose the base or -ed form",
+      "stem": "They ___ football yesterday.",
+      "options": [
+        "play",
+        "played",
+        "plays",
+        "playing"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "play",
+          "misconception": "missing-past-marking",
+          "whyFails": "'Yesterday' places the action in the past, so the regular verb needs its past form 'played'."
+        },
+        {
+          "option": "plays",
+          "misconception": "third-person-present form",
+          "whyFails": "'Plays' is present simple for he, she, or it; 'they' and 'yesterday' require past simple."
+        },
+        {
+          "option": "playing",
+          "misconception": "progressive-form substitution",
+          "whyFails": "'Playing' needs an auxiliary such as 'were' and does not by itself mark a completed past event."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Yesterday' is a finished past-time marker, so the regular verb is 'played'.",
+        "rule": "Regular past simple usually adds -ed; after did or did not, the main verb returns to its base form.",
+        "whyOthersFail": "'Play' omits the past marker; 'plays' is present third person; 'playing' is a participle without an auxiliary.",
+        "howToAvoid": "Find the time word first. If did already appears, use the base form after did.",
+        "memoryCue": "Yesterday: play becomes played; did + play, never did + played."
+      }
+    },
+    {
+      "id": "A1-011",
+      "family": "core_grammar",
+      "subskill": "past_be_was_were",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Match was or were to the subject in a basic past-tense be sentence.",
+      "misconceptionTargeted": "Learner uses was with a plural subject or adds did before was or were in a question.",
+      "reasoningOperation": "identify subject number -> match it to was or were -> place be before the subject in a question",
+      "stem": "They ___ at school yesterday.",
+      "options": [
+        "was",
+        "were",
+        "are",
+        "be"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "was",
+          "misconception": "singular-past transfer",
+          "whyFails": "'They' is plural, so the past form must be 'were', not 'was'."
+        },
+        {
+          "option": "are",
+          "misconception": "present-tense substitution",
+          "whyFails": "'Yesterday' requires a past form, while 'are' is present tense."
+        },
+        {
+          "option": "be",
+          "misconception": "bare-infinitive substitution",
+          "whyFails": "The finite past verb cannot be the bare form 'be'; choose 'were' for 'they'."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The plural subject 'they' takes 'were' in the past.",
+        "rule": "Use was with I, he, she, and it; use were with you, we, and they.",
+        "whyOthersFail": "'Was' is singular, 'are' is present, and bare 'be' is not a finite past form.",
+        "howToAvoid": "Say the subject-and-be pair aloud: I was, she was, you were, they were.",
+        "memoryCue": "They were yesterday; she was yesterday."
+      }
+    },
+    {
+      "id": "A1-012",
+      "family": "nouns",
+      "subskill": "plural_nouns_basic",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Form common plural nouns with -s, -es, -ies, and irregular changes.",
+      "misconceptionTargeted": "Learner applies one plural spelling rule to every noun.",
+      "reasoningOperation": "inspect the word ending -> apply the matching plural pattern -> check irregular forms",
+      "stem": "What is the plural of city?",
+      "options": [
+        "citys",
+        "cities",
+        "cityes",
+        "city"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "citys",
+          "misconception": "simple-s-overgeneralization",
+          "whyFails": "A consonant plus y changes y to i before -es: 'city' becomes 'cities'."
+        },
+        {
+          "option": "cityes",
+          "misconception": "add-es-without-spelling-change",
+          "whyFails": "The spelling must change from consonant + y to -ies, not 'cityes'."
+        },
+        {
+          "option": "city",
+          "misconception": "singular-retention",
+          "whyFails": "The question asks for more than one city, so the singular form is incomplete."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Because 'city' ends in a consonant plus y, its plural is 'cities'.",
+        "rule": "Many nouns take -s; nouns ending in s, x, ch, or sh often take -es; consonant + y changes to -ies.",
+        "whyOthersFail": "'Citys' and 'cityes' do not follow the consonant-plus-y spelling rule, while 'city' remains singular.",
+        "howToAvoid": "Look at the final letters before adding a plural ending, then check common irregular nouns separately.",
+        "memoryCue": "Consonant + y: change y to i, then add es."
+      }
+    },
+    {
+      "id": "A1-013",
+      "family": "prepositions",
+      "subskill": "place_prepositions_basic",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Choose in, on, or at for a container, surface, or specific place point.",
+      "misconceptionTargeted": "Learner chooses a preposition from the object word without identifying the spatial relationship.",
+      "reasoningOperation": "classify the location as inside, on a surface, or at a point -> select the place preposition",
+      "stem": "The book is ___ the table.",
+      "options": [
+        "in",
+        "on",
+        "at",
+        "to"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "in",
+          "misconception": "container-reading",
+          "whyFails": "The book rests on the table's surface; it is not inside the table."
+        },
+        {
+          "option": "at",
+          "misconception": "point-location-overuse",
+          "whyFails": "'At' marks a general point or meeting place, not the surface relationship shown here."
+        },
+        {
+          "option": "to",
+          "misconception": "movement-preposition-substitution",
+          "whyFails": "'To' expresses movement toward a destination, but the sentence describes a stationary location."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Use 'on' when an object rests on a surface such as a table.",
+        "rule": "Use in for an enclosed space, on for a surface, and at for a specific point or place.",
+        "whyOthersFail": "'In' changes the relation to inside; 'at' is a point marker; 'to' signals movement rather than location.",
+        "howToAvoid": "Ask one question: is the object inside, touching a surface, or located at a point?",
+        "memoryCue": "In a bag, on a table, at a bus stop."
+      }
+    },
+    {
+      "id": "A1-014",
+      "family": "tense_aspect",
+      "subskill": "present_continuous_basics",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Build present continuous with the correct form of be plus a verb ending in -ing.",
+      "misconceptionTargeted": "Learner drops be, drops -ing, or uses present simple for an action happening now.",
+      "reasoningOperation": "detect the now-time cue -> choose the subject form of be -> add verb-ing",
+      "stem": "She ___ dinner now.",
+      "options": [
+        "cook",
+        "is cooking",
+        "cooks",
+        "cooking"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "cook",
+          "misconception": "bare-verb-without-auxiliary",
+          "whyFails": "Present continuous needs a form of 'be' before the -ing verb; 'cook' alone is incomplete."
+        },
+        {
+          "option": "cooks",
+          "misconception": "present-simple-habit",
+          "whyFails": "'Cooks' describes a routine, while 'now' signals an action in progress."
+        },
+        {
+          "option": "cooking",
+          "misconception": "missing-be-auxiliary",
+          "whyFails": "The -ing form must be paired with 'is' for the subject 'she'."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Now' signals an action in progress, so use 'is cooking'.",
+        "rule": "Present continuous = am/is/are + verb-ing for an action happening around the time of speaking.",
+        "whyOthersFail": "'Cook' and 'cooking' omit the required auxiliary; 'cooks' is present simple for a habit.",
+        "howToAvoid": "Check both pieces: the correct be form for the subject and the -ing form of the main verb.",
+        "memoryCue": "Now = be + -ing: she is cooking."
+      }
+    },
+    {
+      "id": "A1-015",
+      "family": "question_formation",
+      "subskill": "question_words_basic",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Match common question words with the information requested: person, place, time, reason, or thing.",
+      "misconceptionTargeted": "Learner chooses a question word from sentence position rather than the information needed.",
+      "reasoningOperation": "identify the information type requested -> select the matching question word",
+      "stem": "___ do you live?",
+      "options": [
+        "What",
+        "Where",
+        "When",
+        "Why"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "What",
+          "misconception": "thing-question substitution",
+          "whyFails": "'What' asks about a thing or activity, not the place where someone lives."
+        },
+        {
+          "option": "When",
+          "misconception": "time-question substitution",
+          "whyFails": "'When' asks about time, while this question asks for a location."
+        },
+        {
+          "option": "Why",
+          "misconception": "reason-question substitution",
+          "whyFails": "'Why' asks for a reason, but the blank needs a place question word."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Where' asks for a place, so it completes 'Where do you live?'.",
+        "rule": "Who asks about people, what about things, where about places, when about time, and why about reasons.",
+        "whyOthersFail": "The other words request a thing, time, or reason rather than a place.",
+        "howToAvoid": "Decide what information the answer should contain before choosing the question word.",
+        "memoryCue": "Where = place; when = time; who = person."
+      }
+    },
+    {
+      "id": "A1-016",
+      "family": "quantifiers",
+      "subskill": "some_any_countable_uncountable",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use some and any with basic countable and uncountable nouns in statements, questions, and negatives.",
+      "misconceptionTargeted": "Learner uses some in a negative sentence or adds a plural ending to an uncountable noun.",
+      "reasoningOperation": "identify polarity and noun countability -> choose the quantifier and noun form",
+      "stem": "I don't have ___ money.",
+      "options": [
+        "some",
+        "any",
+        "a",
+        "many"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "some",
+          "misconception": "positive-quantifier-in-negative",
+          "whyFails": "Basic negative statements normally use 'any' rather than 'some'."
+        },
+        {
+          "option": "a",
+          "misconception": "singular-article-with-uncountable",
+          "whyFails": "'Money' is uncountable here, so it does not take the singular article 'a'."
+        },
+        {
+          "option": "many",
+          "misconception": "countable-quantity-substitution",
+          "whyFails": "'Many' modifies plural countable nouns, while 'money' is uncountable."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Negative sentences commonly use 'any' with an uncountable noun such as 'money'.",
+        "rule": "Use some mainly in positive statements and any in negatives or questions; use many with plural countable nouns and much with uncountable nouns.",
+        "whyOthersFail": "'Some' is not the expected basic negative quantifier; 'a' and 'many' do not match uncountable 'money'.",
+        "howToAvoid": "Check polarity first, then decide whether the noun can be counted one by one.",
+        "memoryCue": "Negative + uncountable: I do not have any money."
+      }
+    },
+    {
+      "id": "A1-017",
+      "family": "pronouns_determiners",
+      "subskill": "subject_object_pronouns_and_possessives",
+      "cefr": "A1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Distinguish subject pronouns, object pronouns, possessive adjectives, and possessive pronouns in basic sentences.",
+      "misconceptionTargeted": "Learner uses me as a subject or confuses my with mine before or after a noun.",
+      "reasoningOperation": "identify the grammatical role and whether a noun follows -> select the matching pronoun form",
+      "stem": "___ name is Sari.",
+      "options": [
+        "She",
+        "Her",
+        "Hers",
+        "Me"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "She",
+          "misconception": "subject-pronoun-before-noun",
+          "whyFails": "'She' is a subject pronoun; before the noun 'name', the possessive adjective 'her' is required."
+        },
+        {
+          "option": "Hers",
+          "misconception": "stand-alone-possessive-before-noun",
+          "whyFails": "'Hers' stands alone and cannot directly modify the following noun 'name'."
+        },
+        {
+          "option": "Me",
+          "misconception": "object-pronoun-substitution",
+          "whyFails": "'Me' is an object pronoun and cannot show possession before 'name'."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Her' is a possessive adjective that comes before the noun 'name'.",
+        "rule": "Use subject pronouns as subjects, object pronouns after verbs or prepositions, possessive adjectives before nouns, and possessive pronouns alone.",
+        "whyOthersFail": "'She' is a subject, 'hers' is a stand-alone possessive, and 'me' is an object form.",
+        "howToAvoid": "Look at the word after the blank. If a noun follows, choose a possessive adjective such as my, his, her, or their.",
+        "memoryCue": "Her name, but the name is hers."
+      }
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
     "translated": 129,
-    "total": 129,
-    "updatedAt": "2026-08-23"
+    "total": 139,
+    "updatedAt": "2026-08-24"
   }
 }

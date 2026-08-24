@@ -101,8 +101,10 @@ test('dua blok inline lama sekarang jadi berkas ber-defer SESUDAH app.js', () =>
     assert.ok(fs.existsSync(file.replace('./', '')), file + ' harus benar-benar ada');
   }
   const tail = fs.readFileSync('./features/ui/fiezel-boot-tail.js', 'utf8');
-  assert.ok(/serviceWorker/.test(tail) && /settingDarkMode/.test(tail),
-    'ekor boot harus tetap memegang pendaftaran service worker dan baris Mode gelap');
+  assert.ok(/serviceWorker/.test(tail),
+    'ekor boot harus tetap memegang pendaftaran service worker');
+  assert.ok(!/settingDarkMode/.test(tail),
+    'm025-134: baris Mode gelap dihapus, ekor boot tidak boleh menyuntikkannya lagi');
   assert.ok(/\(function \(\)/.test(tail),
     'isinya harus dibungkus IIFE: `const` global yang sama dua kali adalah SyntaxError yang mematikan boot');
 });

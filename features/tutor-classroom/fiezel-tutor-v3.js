@@ -582,14 +582,13 @@
       prepare: prepareLearningBundle
     });
 
-    function bundleCard() {
-      var st = bundleStatus();
-      return '<section class="tutor-bundle">' +
-        '<div><span class="tutor-kicker">ONE LEARNING BUNDLE</span><h3>Classroom + Bahasa Indonesia</h3>' +
-        '<p>Classroom mengajar dengan English neural voice dan subtitle Indonesia. Paket Bahasa Indonesia yang sama tetap tersedia untuk capability Speaking/Listening dan latihan bahasa lokal.</p></div>' +
-        '<button type="button" data-tutor-bundle class="' + (st.indonesianVoicePrepared ? 'bundle-ready' : '') + '">' +
-        (st.indonesianVoicePrepared ? 'Paket Indonesia siap' : 'Siapkan paket Indonesia') + '</button></section>';
-    }
+    // m025-124: kartu "Siapkan paket Indonesia" DIHAPUS.
+    //
+    // Ia menawarkan paket yang sudah tidak ada sejak m025-95, dan yang lebih buruk: sejak
+    // m025-100 prepareLearningBundle() hanya mengembalikan status tanpa menyiapkan apa pun.
+    // Jadi menekannya menampilkan "Menyiapkan paket…" lalu "Paket Indonesia siap" untuk
+    // sesuatu yang tidak pernah terjadi. Layar yang berbohong kepada murid lebih buruk
+    // daripada layar yang tidak menawarkan apa-apa.
 
     function boardMarkup(board) {
       board = board || {};
@@ -629,7 +628,7 @@
         '<div class="tutor-hub"><section><span class="tutor-kicker">CHOOSE A SUBJECT</span><h2>What do you want to learn' + (learnerName(root) ? ', ' + esc(learnerName(root)) : '') + '?</h2>' +
         '<p>Kurikulum A1 lengkap dulu, lalu naik ke jalur TOEFL / IELTS. Fiezel mengingat checkpoint, bukan audio mentah.</p></section>' +
         '<div class="tutor-subject-grid">' + cards + '</div></div>' +
-        bundleCard(), session.snapshot());
+        session.snapshot());
       wire();
     }
 
@@ -888,20 +887,6 @@
         b.addEventListener('click', function () {
           session.resetEvidence(); save();
           try { root.showToast && root.showToast('Tutor evidence direset.'); } catch (_) {}
-        });
-      });
-      root.document.querySelectorAll('[data-tutor-bundle]').forEach(function (b) {
-        b.addEventListener('click', async function () {
-          if (bundleStatus().indonesianVoicePrepared) return;
-          b.disabled = true; b.textContent = 'Menyiapkan paket…';
-          try {
-            await prepareLearningBundle(function (p) {
-              b.textContent = 'Paket ' + Number(p.completed || 0) + '/' + Number(p.total || 0);
-            });
-            b.textContent = 'Paket Indonesia siap'; b.classList.add('bundle-ready');
-          } catch (_) {
-            b.disabled = false; b.textContent = 'Coba siapkan lagi';
-          }
         });
       });
     }

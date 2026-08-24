@@ -16,6 +16,7 @@ function check(name,ok,details){if(ok){pass++}else{fail++;console.error(`FAIL ${
   const r=renderPrompt(LIB,'vocabulary','expand_context',{word:'develop',cefr:'B1',example:'The app helps you develop new skills.'});
   check('render ok',r.ok&&typeof r.prompt==='string',JSON.stringify(r));
   check('render injects vars',r.ok&&r.prompt.includes('develop')&&r.prompt.includes('B1'),r.prompt?.slice(0,120));
+  check('render binds constraints',r.ok&&/Kendala wajib yang harus dipatuhi:/.test(r.prompt),r.prompt?.slice(-180));
   check('rendered prompt has no leftover slots',r.ok&&!/\{\{/.test(r.prompt),r.prompt);
 }
 {
@@ -43,14 +44,14 @@ function check(name,ok,details){if(ok){pass++}else{fail++;console.error(`FAIL ${
 {
   const bad={schema:'fiezel-prompt-library-v1',prompts:{grammar:{a:{template:'no constraints listed'}}}};
   const v=validateLibrary(bad);
-  check('minimal library valid',v.ok,JSON.stringify(v.errors));
+  check('missing constraints rejected',!v.ok&&v.errors.some(x=>/missing constraints/.test(x)),JSON.stringify(v.errors));
   const v2=validateLibrary({schema:'wrong',prompts:{}});
   check('wrong schema rejected',!v2.ok,JSON.stringify(v2.errors));
-  const v3=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{grammar:{a:{template:'x {{a}} y {{a}}'}}}});
+  const v3=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{grammar:{a:{template:'x {{a}} y {{a}}',constraints:'keep the rule focused'}}}});
   check('duplicate slot deduped',v3.ok&&v3.slotCount===1,JSON.stringify(v3));
-  const v4=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{grammar:{a:{template:'Bearer ABCDEFGHIJKLMNOPQRSTUVWXYZ012345'}}}});
+  const v4=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{grammar:{a:{template:'Bearer ABCDEFGHIJKLMNOPQRSTUVWXYZ012345',constraints:'keep secrets out'}}}});
   check('secret pattern rejected',!v4.ok,JSON.stringify(v4.errors));
-  const v5=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{newdomain:{a:{template:'x'}}}});
+  const v5=validateLibrary({schema:'fiezel-prompt-library-v1',prompts:{newdomain:{a:{template:'x',constraints:'keep the response bounded'}}}});
   check('unknown domain rejected',!v5.ok,JSON.stringify(v5.errors));
 }
 {

@@ -18,7 +18,11 @@ check(((html.match(/data-lucide=/g)||[]).length+(html.match(/data-fz-icon=/g)||[
 check((html.match(/data-fz-icon=/g)||[]).length>=5,'Bottom navigation must use the FIEZEL duotone icon set.');
 check(/features\/ui\/fiezel-icons\.js/.test(html)&&/data-fz-icon/.test(fs.readFileSync(path.join(root,'features','ui','fiezel-icons.js'),'utf8')),'FIEZEL icon runtime must ship and hydrate its own markers.');
 check(/aria-label="Buka pengaturan"/.test(html),'Icon-only topbar controls need accessible names.');
-check(/launcher-shell/.test(app)&&/coach-preview/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
+// m025-131: coach-preview berganti nama jadi coach-strip. Kartu Coach yang lama berisi
+// judul serif dan paragraf - persis yang OWNER sebut "masih terlihat seperti bacaan
+// article" - dan diganti satu kalimat plus satu tombol. Yang dijaga pemeriksaan ini tetap
+// sama: Home punya peluncur, punya blok Coach, dan punya penanda peluncurnya.
+check(/launcher-shell/.test(app)&&/coach-strip/.test(app)&&/learning-launcher/.test(app),'Home launcher hierarchy is incomplete.');
 check(/go\('skills'\)/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/prepareNeuralVoice/.test(app),'Speaking, Listening, and explicit neural voice preparation are not integrated.');
 // Runtime fitur tetap DIDEKLARASIKAN sebelum app.js, dan itu masih penting: urutan tulis
 // di dokumen adalah urutan eksekusi baik untuk skrip ber-defer maupun untuk grup malas
@@ -43,10 +47,30 @@ check(/\.launcher-shell\{grid-template-columns:1fr/.test(css),'Launcher does not
 // Yang dijaga sekarang bukan JUMLAH kolomnya melainkan sifat yang sebenarnya dimaksud: grid
 // tetap menyesuaikan diri di ponsel, dan tidak boleh kembali menjadi satu kolom yang membuat
 // Home terbaca sebagai daftar panjang.
-// Ada tiga blok @media(max-width:640px) di berkas ini, jadi mengambil yang pertama saja
+// Ada beberapa blok @media(max-width:640px) di berkas ini, jadi mengambil yang pertama saja
 // akan memeriksa blok yang salah. Yang dicari adalah blok mana pun di antaranya yang mengatur
 // grid modul.
-const mobileBlocks=css.split('@media(max-width:640px){').slice(1).map(part=>part.split('@media')[0]);
+//
+// m025-134: batas tiap blok dihitung dengan menghitung kurung, bukan dengan memotong di
+// '@media' berikutnya. Cara lama membuat panjang satu blok bergantung pada ada-tidaknya
+// media query LAIN sesudahnya - menghapus blok mode gelap saja sudah cukup membuat blok
+// ponsel menelan aturan milik breakpoint tetangga dan memerahkan pemeriksaan ini tanpa
+// satu pun aturan ponsel berubah.
+function mediaBlocks(source,opener){
+  const out=[];
+  let at=source.indexOf(opener);
+  while(at>=0){
+    let depth=1,i=at+opener.length;
+    for(;i<source.length&&depth>0;i++){
+      if(source[i]==='{')depth++;
+      else if(source[i]==='}')depth--;
+    }
+    out.push(source.slice(at+opener.length,i-1));
+    at=source.indexOf(opener,i);
+  }
+  return out;
+}
+const mobileBlocks=mediaBlocks(css,'@media(max-width:640px){');
 const launcherBlock=mobileBlocks.find(b=>b.includes('.learning-launcher{'))||'';
 check(/\.learning-launcher\{grid-template-columns:1fr 1fr/.test(launcherBlock),
   'Learning launcher must stay a two-column grid on phones - one column made Home 4.7 screens tall.');

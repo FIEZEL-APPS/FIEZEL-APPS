@@ -45,5 +45,19 @@ const insights=m.ok?m.insights:[];
   check('bounded to 8 insights',r.ok&&r.insightCount===8,JSON.stringify(r.insightCount));
   check('chain verifies after many appends',r.chainIntegrity,JSON.stringify(r.chainIntegrity));
 }
+{
+  // m025-135: jalur meta -> loop. Insight `weak_skill` menyebut SUBSKILL, bukan item, dan
+  // dulu jalur ini membuangnya diam-diam - insightCount menyusut tanpa satu pun galat.
+  // Yang dijaga: insight itu tetap terhitung, dan alasannya tertulis.
+  const meta=require('./fiezel-meta-learning.js');
+  const outcomes={schema:meta.INPUT_SCHEMA,privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false},
+    bySubskill:[{subskill:'present_perfect',domain:'grammar',cefr:'B1',attempts:20,correct:8,trendDelta:-8,daysSinceLast:2}]};
+  const bare=loop.discoverInsights([],{leaderboard:outcomes});
+  check('weak_skill insight tidak hilang tanpa peta item',bare.length===1&&bare[0].incomplete==='missing_item_target',JSON.stringify(bare));
+  const mapped=loop.discoverInsights([],{leaderboard:outcomes,skillTargets:{present_perfect:{itemId:V0.id,domain:'vocabulary',templateId:'expand_context'}}});
+  check('peta subskill->item melengkapi insight',mapped.length===1&&mapped[0].itemId===V0.id&&!mapped[0].incomplete,JSON.stringify(mapped).slice(0,140));
+  const r=loop.runLoop({config:{autonomyLevel:'advisory'},insights:bare,library:LIB,patchGate,promotion});
+  check('insight tanpa sasaran dilaporkan sebagai hold beralasan',r.ok&&r.insightCount===1&&r.results[0].decision==='hold'&&r.results[0].errors[0]==='missing_item_target',JSON.stringify(r.results));
+}
 console.log(`FIEZEL Evolution Loop: ${pass} PASS / ${fail} FAIL`);
 process.exitCode=fail?1:0;

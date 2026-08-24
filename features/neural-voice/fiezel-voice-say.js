@@ -98,7 +98,8 @@
   /**
    * @param {string|object} input teks Inggris, atau {en, id} bila terjemahannya
    *        sudah tersedia seperti pada dialog tutor
-   * @param {object} [options] diteruskan ke mesin suara (speed, voice)
+   * @param {object} [options] diteruskan ke mesin suara (speed, voice). Options khusus:
+   *        - suppressSubtitles: true untuk listening exam (skrip tidak boleh terlihat)
    * @returns {Promise<boolean>} true bila kalimatnya selesai diucapkan
    */
   function say(input, options) {
@@ -114,7 +115,11 @@
     var band_ = subtitles();
 
     // Subtitle diminta lebih dulu tetapi tidak ditunggu; lihat catatan kepala berkas.
-    prepareSubtitle(english, indonesian);
+    // m025-147: suppressSubtitles menonaktifkan subtitle untuk listening exam, supaya
+    // students tidak bisa baca jawaban sambil mendengar.
+    if (!opts.suppressSubtitles) {
+      prepareSubtitle(english, indonesian);
+    }
 
     return voice.speak(english, {
       speed: opts.speed,

@@ -196,7 +196,13 @@ const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
 // Sebagian token sah diset dari JS atau HTML saat berjalan - --book-accent dipasang per
 // buku, --fz-b* per tema - jadi "harus ada di style.css" adalah aturan yang salah dan
 // akan gagal pada kode yang benar. Yang benar: token harus terdefinisi DI MANA PUN.
-const sources = ['style.css', 'app.js', 'index.html', 'features/library/fiezel-library-ui.js']
+// m025-129: fiezel-icons.js ikut dibaca. Partikel kelahiran PAW memasang --sx/--sy/--sd
+// inline di dalam markup SVG-nya, dan itu SAH menurut aturan yang ditulis di atas -
+// "terdefinisi di mana pun". Tanpa berkas ini di daftar, gerbangnya melaporkan tiga token
+// hilang yang sebenarnya ada; alarm palsu di gerbang yang benar sama merusaknya dengan
+// gerbang yang buta.
+const sources = ['style.css', 'app.js', 'index.html', 'features/library/fiezel-library-ui.js',
+  'features/ui/fiezel-icons.js']
   .map((p) => fs.readFileSync(path.join(__dirname, p), 'utf8')).join('\n');
 const defined = new Set([...sources.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
 const referenced = [...withoutComments.matchAll(/var\((--[a-z0-9-]+)/g)].map((m) => m[1]);
