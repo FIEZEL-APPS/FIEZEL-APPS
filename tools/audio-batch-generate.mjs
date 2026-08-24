@@ -395,7 +395,7 @@ async function main() {
 
     manifest.assets[identity.audioKey] = manifestEntry(identity, objectKey, result.bytes, sourceRef);
     generated++;
-    if (generated % 25 === 0) console.log(`  ${generated}/${affordable.length}â€¦`);
+    if (generated % 25 === 0) console.log(`  ${generated}/${affordable.length}…`);
   }
 
   saveManifest(manifest);

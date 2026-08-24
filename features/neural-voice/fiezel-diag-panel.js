@@ -248,7 +248,7 @@
       // tampilan. Sekarang disembunyikan visual (bukan display:none, supaya .click() lewat
       // gesture rahasia tetap bekerja di semua browser) dan dibuka lewat tap 5x di brand-button
       // pada topbar (lihat armSecretDiagnosticsGesture). Tetap mengambang di luar app.js supaya
-      // jalur ini masih hidup kalau app.js crash â€” hanya cara memicunya yang berubah.
+      // jalur ini masih hidup kalau app.js crash — hanya cara memicunya yang berubah.
       '#fiezelDiagOpen{position:fixed;width:1px;height:1px;padding:0;margin:-1px;',
       'overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}',
       // m025-124 OWNER: "PANELNYA PENUH, DAN GA BISA DI GERAKIN ATAU DI SCROLL SAMA SEKALI".
@@ -294,7 +294,7 @@
     sheet.id = 'fiezelDiagSheet';
 
     var heading = root.document.createElement('h2');
-    heading.textContent = 'Diagnostics Â· ' + DIAG_BUILD;
+    heading.textContent = 'Diagnostics · ' + DIAG_BUILD;
 
     var note = root.document.createElement('p');
     note.textContent = 'Cari event penting langsung di bawah. Kirim isi kotak ini ke coordinator bila perlu.';
@@ -353,7 +353,7 @@
     // The diagnostics harness renders this panel against a minimal DOM stub, so style
     // may be absent. Presentation is optional; the badges themselves are not.
     if (badges.style) badges.style.cssText = 'margin:2px 0;line-height:1.9;';
-    badges.textContent = 'Menjalankan scan modulâ€¦';
+    badges.textContent = 'Menjalankan scan modul…';
 
     var copySummary = root.document.createElement('button');
     copySummary.type = 'button';
@@ -430,7 +430,7 @@
   }
 
   // m025-82 OWNER: satu-satunya cara membuka Diagnostics sekarang. Menyasar .brand-button
-  // di topbar karena itu markup statis di index.html â€” sudah ada di DOM sebelum script ini
+  // di topbar karena itu markup statis di index.html — sudah ada di DOM sebelum script ini
   // jalan dan tidak bergantung pada app.js berhasil render, jadi jalur diagnostik tetap
   // hidup walau app.js crash. Tap-count direset kalau jeda antar-tap melebihi WINDOW_MS.
   function armSecretDiagnosticsGesture(openButton) {
