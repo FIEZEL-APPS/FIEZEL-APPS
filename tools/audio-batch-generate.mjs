@@ -226,6 +226,42 @@ function validateMp3(bytes) {
   return '';
 }
 
+/**
+ * Memastikan suaranya benar-benar ada SEBELUM satu karakter pun dikirim.
+ *
+ * Tanpa ini, voice ID yang salah muncul sebagai `BERHENTI: http_404` - benar, tetapi tidak
+ * memberi tahu apa pun tentang apa yang harus diperbaiki. Kesalahan yang sudah terjadi
+ * sekali di sini adalah ID yang tersalin kurang satu karakter, dan bentuk kegagalannya
+ * identik dengan kunci API yang salah, model yang salah, atau jaringan yang putus.
+ *
+ * Pemeriksaan ini gratis: endpoint daftar suara tidak memakai kredit.
+ */
+async function verifyVoice(voiceId, apiKey) {
+  let response;
+  try {
+    response = await fetch(`https://api.elevenlabs.io/v1/voices/${encodeURIComponent(voiceId)}`, {
+      headers: { 'xi-api-key': apiKey, accept: 'application/json' }
+    });
+  } catch (error) {
+    return `jaringan ke ElevenLabs gagal: ${error?.message || 'error'}`;
+  }
+  if (response.status === 401 || response.status === 403) {
+    return 'ELEVENLABS_API_KEY ditolak. Periksa kuncinya di secret repositori.';
+  }
+  if (response.status === 404) {
+    const hint = voiceId.length === 20
+      ? 'Panjangnya benar, jadi kemungkinan suara itu belum ditambahkan ke My Voices di akunmu.'
+      : `Panjangnya ${voiceId.length} karakter, sedangkan voice ID ElevenLabs selalu 20 - kemungkinan tersalin tidak utuh.`;
+    return `Voice ID "${voiceId}" tidak ditemukan di akun ini. ${hint}`;
+  }
+  if (!response.ok) return `ElevenLabs menjawab HTTP ${response.status} saat memeriksa suara.`;
+  try {
+    const doc = await response.json();
+    if (doc?.name) console.log(`suara         : ${doc.name} (${voiceId})`);
+  } catch (_) { /* nama hanya untuk kenyamanan; ketiadaannya bukan kegagalan */ }
+  return '';
+}
+
 async function synthesize(identity, apiKey) {
   const url = `${API_URL}/${encodeURIComponent(identity.voiceId)}?output_format=mp3_44100_128`;
   const body = {
@@ -262,7 +298,11 @@ async function synthesize(identity, apiKey) {
     if (response.status === 401 || response.status === 403) return { fatal: 'auth_rejected' };
     if (response.status === 429) return { fatal: 'quota_or_rate_limited' };
     if (!response.ok) {
-      lastError = `http_${response.status}`;
+      // Badan responsnya ikut dibaca. "http_422" sendirian tidak memberi tahu apa pun;
+      // ElevenLabs biasanya menjelaskan persis field mana yang ditolaknya.
+      let detail = '';
+      try { detail = (await response.text()).slice(0, 300).replace(/\s+/g, ' '); } catch (_) {}
+      lastError = detail ? `http_${response.status}: ${detail}` : `http_${response.status}`;
       if (response.status < 500) return { fatal: lastError };
       await new Promise((r) => setTimeout(r, attempt * 1000));
       continue;
@@ -361,6 +401,12 @@ async function main() {
   // dan kreditnya sudah terlanjur terpakai. Diperiksa di sini, bukan setelah batch selesai.
   if (!manifest.assetBaseUrl) {
     console.error('assetBaseUrl belum ada di manifest. Jalankan workflow deploy Worker lebih dulu.');
+    process.exit(2);
+  }
+
+  const voiceProblem = await verifyVoice(voiceId, apiKey);
+  if (voiceProblem) {
+    console.error(voiceProblem);
     process.exit(2);
   }
 
