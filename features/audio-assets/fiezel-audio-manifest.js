@@ -28,6 +28,7 @@
   var state = {
     url: DEFAULT_URL,
     index: null,
+    assetBaseUrl: '',
     version: 0,
     voiceProfile: null,
     pending: null,
@@ -37,6 +38,20 @@
 
   function isReadyEntry(entry) {
     return !!(entry && entry.status === 'ready' && entry.url);
+  }
+
+  /**
+   * m025-150 alamat biner tidak dipaku di dalam entri.
+   *
+   * Manifest menyimpan url relatif; asalnya datang dari assetBaseUrl yang ditulis pipeline
+   * saat deploy. Ini yang menjaga pasal 3 tetap benar - "aplikasi tidak boleh terikat erat
+   * pada satu penyedia penyimpanan". Pindah dari R2 ke CDN lain, atau kembali ke berkas
+   * statis di repo, hanya mengubah satu baris di manifest, bukan setiap entri di dalamnya.
+   */
+  function absolute(base, url) {
+    if (/^https?:\/\//i.test(url)) return url;
+    if (!base) return url;
+    return String(base).replace(/\/+$/, '') + '/' + String(url).replace(/^\.?\//, '');
   }
 
   /**
@@ -50,6 +65,7 @@
       throw new Error('audio_manifest_schema_mismatch');
     }
     var assets = source.assets && typeof source.assets === 'object' ? source.assets : {};
+    var base = String(source.assetBaseUrl || '');
     var index = {};
     var keys = Object.keys(assets);
     for (var i = 0; i < keys.length; i++) {
@@ -57,7 +73,7 @@
       if (!isReadyEntry(entry)) continue;
       index[keys[i]] = Object.freeze({
         audioKey: keys[i],
-        url: String(entry.url),
+        url: absolute(base, String(entry.url)),
         contentType: String(entry.contentType || 'sentence'),
         locale: String(entry.locale || 'en-US'),
         voiceId: String(entry.voiceId || ''),
@@ -71,6 +87,7 @@
       });
     }
     state.index = index;
+    state.assetBaseUrl = base;
     state.version = Number(source.version || 0);
     state.voiceProfile = source.voiceProfile && typeof source.voiceProfile === 'object'
       ? Object.freeze({
@@ -135,6 +152,7 @@
       loaded: !!state.index,
       version: state.version,
       assetCount: state.index ? Object.keys(state.index).length : 0,
+      assetBaseUrl: state.assetBaseUrl || '',
       voiceProfile: state.voiceProfile,
       error: state.error,
       attempts: state.attempts,
@@ -145,7 +163,7 @@
   function reset() {
     state.index = null; state.pending = null; state.error = '';
     state.version = 0; state.voiceProfile = null; state.attempts = 0;
-    state.url = DEFAULT_URL;
+    state.assetBaseUrl = ''; state.url = DEFAULT_URL;
   }
 
   return Object.freeze({

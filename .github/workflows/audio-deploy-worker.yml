@@ -1,0 +1,97 @@
+# m025-150 deploy Worker pengantar aset audio + bucket R2-nya.
+#
+# Dijalankan manual dan idempoten: bucket dibuat kalau belum ada, Worker selalu di-deploy
+# ulang dari sumber di repo. Aman diulang.
+#
+# Langkah terakhir menulis alamat Worker ke audio/manifest.json. Tanpa itu, aplikasi tahu
+# nama objek tetapi tidak tahu asalnya - dan generator memang menolak berjalan sebelum
+# alamat itu ada, supaya tidak ada kredit terpakai untuk aset yang tak bisa ditemukan.
+name: FIEZEL Audio Worker Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fiezel-audio-worker-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Siapkan bucket R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Bucket yang sudah ada membuat perintah ini gagal, dan itu bukan kegagalan.
+          npx --yes wrangler@3 r2 bucket create fiezel-audio || \
+            echo 'Bucket sudah ada; lanjut.'
+
+      - name: Deploy Worker
+        id: deploy
+        working-directory: workers
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Tanpa pipefail, status pipa ini adalah status tee - yang selalu sukses. Deploy
+          # yang gagal akan lolos, dan kalau keluaran galatnya kebetulan memuat satu alamat
+          # workers.dev, manifest akan mencatat alamat Worker yang tidak pernah ada. Kredit
+          # lalu terpakai untuk aset yang tak bisa disajikan siapa pun.
+          set -o pipefail
+          npx --yes wrangler@3 deploy 2>&1 | tee deploy.log
+          url="$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' deploy.log | head -1)"
+          if [ -z "$url" ]; then
+            echo 'Alamat Worker tidak terbaca dari keluaran wrangler.' >&2
+            exit 1
+          fi
+          echo "worker_url=$url" >> "$GITHUB_OUTPUT"
+          echo "Worker: $url"
+
+      - name: Uji Worker hidup dan hanya-baca
+        run: |
+          url='${{ steps.deploy.outputs.worker_url }}'
+          curl -fsS "$url/health"
+          echo
+          # Menulis harus ditolak. Kalau suatu hari langkah ini lulus dengan 200, artinya
+          # jalur tulis terbuka ke publik dan rilis harus berhenti di sini.
+          code="$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$url/a/x.mp3")"
+          if [ "$code" != '405' ]; then
+            echo "Worker menerima PUT (HTTP $code). Deploy dihentikan." >&2
+            exit 1
+          fi
+          echo 'PUT ditolak 405 seperti seharusnya.'
+
+      - name: Catat alamat aset di manifest
+        run: |
+          url='${{ steps.deploy.outputs.worker_url }}'
+          node -e "
+            const fs = require('fs');
+            const p = 'audio/manifest.json';
+            const doc = JSON.parse(fs.readFileSync(p, 'utf8'));
+            doc.assetBaseUrl = process.argv[1];
+            fs.writeFileSync(p, JSON.stringify(doc, null, 2) + '\n');
+          " "$url"
+          if [ -z "$(git status --porcelain audio/manifest.json)" ]; then
+            echo 'Alamat tidak berubah.'
+            exit 0
+          fi
+          git config user.name 'fiezel-audio-bot'
+          git config user.email 'noreply@github.com'
+          git add audio/manifest.json
+          git commit -m "Audio: catat alamat Worker R2 di manifest"
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push gagal (percobaan $attempt); menarik perubahan lalu mencoba lagi."
+            git pull --rebase --autostash || true
+          done
+          exit 1
