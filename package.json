@@ -12,6 +12,7 @@
     "test:reading-exam": "node reading-exam-test.js",
     "test:level-evidence": "node level-evidence-test.js",
     "test:neural-cache": "node neural-cache-isolation-test.js",
+    "test:prerequisite-graph": "node prerequisite-graph-test.js",
     "audit:grammar": "node grammar-quality-audit.js",
     "test:level-contract": "node level-grammar-contract-test.js",
     "push:dispatch": "node push-dispatcher.mjs",
