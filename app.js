@@ -356,7 +356,42 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   if(variant===23){const correctSummary=`${meta.objective} ${meta.rule}`.trim(),alternatives=grammarAlternativeMeta(item,'objective',3).map((x,i)=>`${x} ${grammarAlternativeMeta(item,'rule',3)[i]}`.trim());return direct(`Ringkasan ajar mana yang paling tepat untuk menjelaskan lesson ${title} kepada siswa lain?`,[correctSummary,...alternatives],0,'Ringkasan tersebut menyatukan tujuan lesson dan aturan yang benar.');}
   const correctPlan=`${meta.avoid} ${meta.memory}`.trim(),avoid=grammarAlternativeMeta(item,'avoid',3),memory=grammarAlternativeMeta(item,'memory',3);return direct(`Rencana cek mandiri mana yang paling tepat sebelum menuntaskan lesson ${title}?`,[correctPlan,...avoid.map((x,i)=>`${x} ${memory[i]}`.trim())],0,'Rencana ini menggabungkan pencegahan kesalahan dan pengingat yang khusus untuk lesson aktif.');
 }
-function indonesianPartOfSpeech(value){return({noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru'}[String(value||'').toLowerCase()]||String(value||'jenis kata'))}
+const PART_OF_SPEECH_ID={noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan',number:'kata bilangan',article:'kata sandang'};
+function indonesianPartOfSpeech(value){return PART_OF_SPEECH_ID[String(value||'').toLowerCase()]||'jenis kata'}
+// m025-149: dipulihkan setelah hilang saat penyelesaian konflik merge m025-148.
+// Soal jenis kata hanya jujur kalau siswa bisa melihat kata itu bekerja di dalam satu
+// kalimat. "dance" sendirian bisa kata benda atau kata kerja, jadi tanpa kalimat contoh
+// yang memuat kata targetnya soal ini mustahil dijawab dan wajib ditolak sejak pembuatan.
+const rxEsc=s=>String(s).replace(/[^A-Za-z0-9_ ]/g,c=>String.fromCharCode(92)+c);
+function vocabWordForms(word){
+  const out=new Set();
+  for(const raw of String(word||'').split('/')){
+    const b=raw.trim().toLowerCase();if(!b)continue;
+    out.add(b);
+    if(/s/.test(b))continue; // frasa dipakai apa adanya, tanpa tebakan infleksi
+    out.add(b+'s');out.add(b+'es');out.add(b+'ed');out.add(b+'ing');out.add(b+'d');
+    if(b.endsWith('y')){const t=b.slice(0,-1);out.add(t+'ies');out.add(t+'ied');out.add(t+'ier');out.add(t+'iest')}
+    if(b.endsWith('e')){const t=b.slice(0,-1);out.add(t+'ing');out.add(t+'ed');out.add(t+'er');out.add(t+'est')}
+    if(/[^aeiou][aeiou][bdgklmnprt]$/.test(b)){const c=b+b.slice(-1);out.add(c+'ing');out.add(c+'ed');out.add(c+'er');out.add(c+'est')}
+    out.add(b+'er');out.add(b+'est');out.add(b+'ly');out.add(b+'ally');
+  }
+  // bentuk terpanjang lebih dulu supaya "studies" menang atas "studie"
+  return [...out].sort((a,b)=>b.length-a.length);
+}
+// Bentuk kata sebagaimana benar-benar tertulis di kalimat contoh, atau null kalau kata
+// targetnya tidak muncul sama sekali di sana.
+function vocabSurfaceForm(v){
+  const example=String(v?.example||'');if(!example)return null;
+  for(const form of vocabWordForms(v?.word)){
+    const m=example.match(new RegExp(`(^|[^A-Za-z])(${rxEsc(form)})([^A-Za-z]|$)`,'i'));
+    if(m)return m[2];
+  }
+  return null;
+}
+function partOfSpeechAskable(v){
+  if(!v||!PART_OF_SPEECH_ID[String(v.partOfSpeech||'').toLowerCase()])return false;
+  return !!vocabSurfaceForm(v);
+}
 function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'informasi yang benar-benar disebutkan',why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
 function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};return{ok:true}}
 
@@ -1006,9 +1041,9 @@ async function load(){const root=document.baseURI;const get=async f=>{const r=aw
       const opts=Array.isArray(t.options)?t.options:[];
       const idx=Number.isInteger(t.correctIndex)?t.correctIndex:-1;
       const reasons=opts.map((o,i)=>{
-        if(i===idx)return `Correct: ${String(t.explanation?.whyCorrect||'This form matches the grammar and context.')}`;
+        if(i===idx)return String(t.explanation?.whyCorrectId||t.explanation?.whyCorrect||'Bentuk ini cocok dengan aturan grammar sekaligus dengan konteks kalimatnya.');
         const d=(t.distractors||[]).find(x=>String(x.option)===String(o));
-        return d?.whyFails||`“${o}” does not satisfy the grammar rule tested here.`;
+        return String(d?.whyFailsId||d?.whyFails||`“${o}” belum memenuhi aturan grammar yang sedang diuji pada kalimat ini.`);
       });
       const item=[t.stem||'',opts,idx,t.explanation?.rule||t.pedagogicalObjective||skill,reasons,curriculum.level||t.cefr||'',t.family||'core_grammar',t.explanation?.whyCorrect||'',t.id||'',t.pedagogicalObjective||'',t.misconceptionTargeted||'',t.reasoningOperation||'',t.explanation||{},t.questionType||'multiple_choice',t.__fiezelCanary||null,
         // m025-118: peta {teks pilihan -> nama miskonsepsi}. Bank soal SUDAH membawanya sejak
@@ -2793,10 +2828,10 @@ function makeVocabQuestion(v,preferType){
   const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:pick(types);
   if(type==='synonym'&&(!v.synonyms?.length||synonymSources.length<3))type='meaning';
   if(type==='context'&&!v.example)type='meaning';
-  if(type==='partOfSpeech'&&!v.partOfSpeech)type='meaning';
+  if(type==='partOfSpeech'&&!partOfSpeechAskable(v))type='meaning';
   let q,options,answer;
   if(type==='context'){options=shuffle([v.meaning,...distractMeaning]);q=`Dalam kalimat “${v.example}”, arti “${v.word}” yang paling pas apa?`;answer=v.meaning}
-  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=['noun','verb','adjective','adverb','preposition','conjunction'].filter(x=>x!==v.partOfSpeech).map(indonesianPartOfSpeech);options=shuffle([correctPos,...pos.slice(0,3)]);q=`Di lesson ini, “${v.word}” termasuk jenis kata apa?`;answer=correctPos}
+  else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=shuffle(Object.values(PART_OF_SPEECH_ID).filter(x=>x!==correctPos)),surface=vocabSurfaceForm(v)||v.word,asal=norm(surface)===norm(v.word)?'':` (bentuk dari “${v.word}”)`;options=shuffle([correctPos,...pos.slice(0,3)]);q=`Dalam kalimat “${v.example}”, kata “${surface}”${asal} berperan sebagai jenis kata apa?`;answer=correctPos}
   else if(type==='synonym'){options=shuffle([v.synonyms[0],...synonymSources.slice(0,3)]);q=`Kata mana yang maknanya paling dekat dengan “${v.word}”?`;answer=v.synonyms[0]}
   else{options=shuffle([v.meaning,...distractMeaning]);q=`Arti Bahasa Indonesia yang paling dekat dengan “${v.word}” apa?`;answer=v.meaning}
   const posLabel=indonesianPartOfSpeech(v.partOfSpeech);const why=type==='context'?`Di kalimat itu, “${v.word}” paling pas dimaknai “${v.meaning}”. Coba lihat tindakan atau situasi di sekeliling katanya.`:type==='partOfSpeech'?`“${v.word}” berfungsi sebagai ${posLabel}. Jenis kata dilihat dari tugasnya di dalam kalimat, bukan hanya dari bentuk katanya.`:type==='synonym'?`“${v.synonyms[0]}” paling dekat maknanya dengan “${v.word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.`:`Intinya, “${v.word}” berarti “${v.meaning}”${v.partOfSpeech?` dan biasanya dipakai sebagai ${posLabel}`:''}.`;
