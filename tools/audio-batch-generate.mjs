@@ -314,6 +314,63 @@ async function verifyVoice(voiceId, apiKey) {
   return '';
 }
 
+/**
+ * Membaca sisa jatah karakter pada kunci yang sedang dipakai.
+ *
+ * Kunci ini hanya hidup di secret GitHub Actions, jadi tidak ada seorang pun yang bisa
+ * membuka dasbor ElevenLabs dan melihat berapa yang tersisa sebelum menekan --apply. Tanpa
+ * angka itu, satu-satunya cara mengetahui jatah habis adalah dengan menabraknya di tengah
+ * batch - setelah sebagian aset terlanjur gagal.
+ *
+ * Endpoint langganan tidak memakai kredit, jadi memanggilnya tidak pernah merugikan.
+ */
+async function fetchQuota(apiKey) {
+  let response;
+  try {
+    response = await fetch('https://api.elevenlabs.io/v1/user/subscription', {
+      headers: { 'xi-api-key': apiKey, accept: 'application/json' }
+    });
+  } catch (error) {
+    return `jaringan ke ElevenLabs gagal: ${error?.message || 'error'}`;
+  }
+  if (response.status === 401 || response.status === 403) {
+    // Kunci bertipe terbatas boleh saja tidak punya izin user_read sementara izin membuat
+    // audio tetap ada. Kuota hanya informasi; ketiadaannya tidak boleh menghentikan apa pun.
+    let detail = '';
+    try { detail = (await response.text()).slice(0, 200).replace(/\s+/g, ' '); } catch (_) {}
+    return { skipped: `Kunci ini tidak punya izin user_read, jadi sisa kuota tidak bisa dibaca. Produksi tetap jalan; tambahkan izin itu di ElevenLabs kalau ingin angkanya muncul di log.${detail ? ' (' + detail + ')' : ''}` };
+  }
+  if (!response.ok) {
+    return `sisa kuota tidak bisa dibaca (HTTP ${response.status})`;
+  }
+  let doc;
+  try {
+    doc = await response.json();
+  } catch (_) {
+    return 'jawaban kuota tidak berbentuk JSON';
+  }
+  const used = Number(doc?.character_count);
+  const limit = Number(doc?.character_limit);
+  if (!Number.isFinite(used) || !Number.isFinite(limit)) {
+    return 'jawaban kuota tidak memuat character_count/character_limit';
+  }
+  return { used, limit, remaining: limit - used, tier: String(doc?.tier || 'tidak diketahui') };
+}
+
+/** Kuota tidak pernah menghalangi; setiap bentuk kegagalan turun jadi satu baris catatan. */
+async function reportQuota(apiKey, label) {
+  const quota = await fetchQuota(apiKey);
+  if (typeof quota === 'string') {
+    console.log(`kuota ${label}: ${quota}`);
+    return;
+  }
+  if (quota.skipped) {
+    console.log(`kuota ${label}: ${quota.skipped}`);
+    return;
+  }
+  console.log(`kuota ${label}: ${quota.remaining} tersisa dari ${quota.limit} (terpakai ${quota.used}, paket ${quota.tier})`);
+}
+
 async function synthesize(identity, apiKey) {
   const url = `${API_URL}/${encodeURIComponent(identity.voiceId)}?output_format=mp3_44100_128`;
   const body = {
@@ -488,6 +545,7 @@ async function main() {
       console.error(problem);
       process.exit(2);
     }
+    await reportQuota(apiKey, 'sekarang');
     process.exitCode = compareVoiceWithManifest() ? 0 : 3;
     return;
   }
@@ -525,6 +583,8 @@ async function main() {
     console.error(voiceProblem);
     process.exit(2);
   }
+
+  await reportQuota(apiKey, 'sebelum');
 
   // Suara yang bergeser DIAM-DIAM adalah kegagalan paling mahal di berkas ini: setiap
   // audioKey ikut berubah, seluruh katalog diproduksi ulang dengan jatah baru, dan aset
@@ -600,6 +660,10 @@ async function main() {
     storage, 'manifest.json', fs.readFileSync(MANIFEST_PATH), 'application/json'
   );
   if (mirrorError) console.error(`cermin manifest di R2 gagal (${mirrorError}); manifest di Git tetap sah.`);
+
+  // Dibaca ulang setelah batch selesai: selisih dua angka ini adalah satu-satunya catatan
+  // berapa kredit yang benar-benar terpakai untuk jalan ini.
+  await reportQuota(apiKey, 'sesudah');
 
   console.log(`\nselesai: ${generated} aset baru, ${recovered} dipulihkan dari R2 tanpa biaya, ${failed} gagal, manifest v${manifest.version}`);
   if (failed > 0) process.exitCode = 1;
