@@ -180,13 +180,20 @@
   }
 
   /**
-   * Jalur berkas statis untuk satu kunci. Dua tingkat awalan hex menjaga satu direktori tidak
-   * pernah berisi ribuan berkas - yang membuat klien Git dan penjelajah berkas melambat.
+   * Nama objek untuk satu kunci, datar: <audioKey>.mp3.
+   *
+   * Sebelumnya fungsi ini menyusun jalur bertingkat menurut tipe, locale, dan suara. Itu
+   * masuk akal untuk direktori di dalam repositori, tetapi salah untuk object storage - dan
+   * lebih buruk lagi, ia tidak lagi cocok dengan apa yang benar-benar disimpan pipeline.
+   * Worker hanya menerima nama 64-heksa telanjang, jadi setiap pemanggil fungsi versi lama
+   * akan dijawab 400 tanpa petunjuk apa pun tentang sebabnya.
+   *
+   * Semua pembeda itu toh sudah masuk ke dalam hash-nya. Menuliskannya lagi di jalur berkas
+   * hanya membuat dua sumber kebenaran yang bisa berselisih.
    */
   function assetPath(identity) {
     var built = identity && identity.audioKey ? identity : build(identity);
-    return 'audio/' + built.contentType + '/' + built.locale + '/' + built.voiceId + '/' +
-      built.audioKey.slice(0, 2) + '/' + built.audioKey + '.mp3';
+    return built.audioKey + '.mp3';
   }
 
   return Object.freeze({

@@ -2,10 +2,12 @@
   "schema": "fiezel-audio-manifest-v1",
   "version": 0,
   "generatedAt": "",
+  "assetBaseUrl": "",
   "voiceProfile": null,
   "budget": {
-    "maxCharactersPerRun": 50000,
-    "maxAssetsPerRun": 500
+    "note": "Jatah owner 2026-08: 9.650 karakter tersisa (paket gratis ElevenLabs). Batas 2.000 per run dipilih supaya satu perintah yang salah tidak bisa menghabiskan lebih dari seperlima sisa jatah, dan supaya bank kosakata terbangun bertahap lewat beberapa run yang masing-masing bisa diperiksa. Naikkan angka ini kalau paket berbayar aktif.",
+    "maxCharactersPerRun": 2000,
+    "maxAssetsPerRun": 400
   },
   "assets": {}
 }

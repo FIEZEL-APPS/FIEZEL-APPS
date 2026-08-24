@@ -260,6 +260,65 @@ function manifestWith(text, extra = {}) {
       /speakWithEngine\(english, opts, band_\)/.test(saySrc), 'jalur cadangan tetap ada');
   }
 
+  // 14. Cloudflare R2 (mandat V2 pasal 3 Tier A): biner tinggal di object storage, dan
+  //     jalannya ke sana hanya satu arah - baca.
+  {
+    const { doc, identity } = manifestWith('Where is the library?');
+    doc.assetBaseUrl = 'https://fiezel-audio.example.workers.dev';
+    doc.assets[identity.audioKey].url = `a/${identity.audioKey}.mp3`;
+    const user = makeUser(doc);
+    const found = await user.resolver.resolve('Where is the library?');
+    check('URL relatif digabung dengan assetBaseUrl menjadi alamat R2',
+      found.state === 'READY' && found.url === `https://fiezel-audio.example.workers.dev/a/${identity.audioKey}.mp3`,
+      String(found.url));
+
+    // Manifest yang belum punya alamat tidak boleh melahirkan URL setengah jadi yang
+    // dijawab 404 oleh GitHub Pages - itu akan terdengar sebagai "aset rusak", padahal
+    // yang terjadi adalah deploy Worker belum pernah dijalankan.
+    const orphan = manifestWith('Orphan line');
+    orphan.doc.assets[orphan.identity.audioKey].url = `a/${orphan.identity.audioKey}.mp3`;
+    const orphanUser = makeUser(orphan.doc);
+    const orphanFound = await orphanUser.resolver.resolve('Orphan line');
+    check('Tanpa assetBaseUrl, url tetap relatif apa adanya',
+      orphanFound.state === 'READY' && orphanFound.url === `a/${orphan.identity.audioKey}.mp3`,
+      String(orphanFound.url));
+
+    const workerSrc = fs.readFileSync(path.join(root, 'workers/fiezel-audio-worker.js'), 'utf8');
+    check('Worker menolak setiap metode tulis',
+      /!== 'GET' && request\.method !== 'HEAD'/.test(workerSrc) && /405/.test(workerSrc),
+      'PUT/POST/DELETE dijawab 405');
+    // Komentar dibuang lebih dulu. Catatan kepala Worker memang menyebut ElevenLabs dan
+    // endpoint /generate - justru untuk menjelaskan mengapa keduanya tidak ada di sana.
+    // Memindai teksnya mentah-mentah akan menghukum penjelasan itu, bukan kodenya.
+    const workerCode = workerSrc.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    check('Worker tidak punya endpoint produksi',
+      !/elevenlabs/i.test(workerCode) && !/generate/i.test(workerCode),
+      'tidak ada jalur ke ElevenLabs di kode');
+    check('Worker hanya melayani nama objek berbentuk audioKey',
+      /\[0-9a-f\]\{64\}/.test(workerSrc), 'pola kunci dijaga');
+
+    const wranglerSrc = fs.readFileSync(path.join(root, 'workers/wrangler.toml'), 'utf8');
+    check('Binding R2 dipakai, bukan access key S3',
+      /r2_buckets/.test(wranglerSrc) && !/access_key|secret_access_key/i.test(wranglerSrc),
+      'tidak ada kredensial bucket di repo');
+
+    const toolSrc = fs.readFileSync(path.join(root, 'tools/audio-batch-generate.mjs'), 'utf8');
+    check('Objek diambil ulang dari R2 sebelum ditandai ready',
+      toolSrc.indexOf('r2Verify(') < toolSrc.indexOf('manifest.assets[identity.audioKey] ='),
+      'verifikasi mendahului pencatatan');
+    check('Produksi berhenti bila alamat aset belum ada',
+      /assetBaseUrl[\s\S]{0,200}process\.exit\(2\)/.test(toolSrc),
+      'tidak ada kredit terpakai untuk aset tak teralamat');
+    check('Kredensial Cloudflare dibaca dari environment, bukan berkas repo',
+      /process\.env\.CLOUDFLARE_API_TOKEN/.test(toolSrc) && !/CLOUDFLARE_API_TOKEN\s*=\s*['"][^'"]+['"]/.test(toolSrc),
+      'token hanya dari secret');
+
+    const deploySrc = fs.readFileSync(path.join(root, '.github/workflows/audio-deploy-worker.yml'), 'utf8');
+    check('Deploy memverifikasi Worker menolak tulis sebelum dianggap selesai',
+      /PUT/.test(deploySrc) && /405/.test(deploySrc),
+      'gate hanya-baca dijalankan tiap deploy');
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     counts: { pass: checks.filter(i => i.status === 'PASS').length, fail: checks.filter(i => i.status === 'FAIL').length },

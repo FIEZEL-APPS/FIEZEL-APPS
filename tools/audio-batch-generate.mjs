@@ -14,7 +14,7 @@
  * anggaran karakter atau jumlah aset terlampaui.
  *
  * ASET TIDAK PERNAH DITANDAI SIAP SEBELUM BERKASNYA TERBUKTI ADA. Urutannya - hasilkan,
- * validasi, tulis biner, verifikasi ulang dari disk, baru catat di manifest - adalah pasal 7
+ * validasi, unggah ke R2, ambil ulang dari R2, baru catat di manifest - adalah pasal 7
  * apa adanya. Balasan 200 dari ElevenLabs saja bukan bukti apa pun: respons kosong, potongan
  * HTML halaman galat, dan body terpotong semuanya datang sebagai 200 di suatu hari.
  *
@@ -28,6 +28,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
@@ -39,6 +40,91 @@ const AudioKey = require(path.join(ROOT, 'features/audio-assets/fiezel-audio-key
 const MANIFEST_PATH = path.join(ROOT, 'audio/manifest.json');
 const API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 const MAX_RETRIES = 3;
+
+/**
+ * m025-150 biner disimpan di Cloudflare R2, manifest tetap di Git.
+ *
+ * Pembagian ini yang diminta pasal 3: Git memegang sumber kebenaran yang bisa ditinjau
+ * manusia - indeks, profil suara, anggaran - sementara ribuan MP3 tinggal di object storage
+ * tempat mereka memang seharusnya berada. Repositori tidak menggemuk, dan riwayat commit
+ * tetap bisa dibaca.
+ *
+ * Unggahan lewat REST API Cloudflare, bukan subproses wrangler per berkas. Satu batch bisa
+ * berisi ratusan aset; memanggil wrangler ratusan kali menambah menit demi menit ke runner
+ * tanpa memberi jaminan tambahan apa pun.
+ */
+const R2_API = 'https://api.cloudflare.com/client/v4/accounts';
+
+function r2Url(env, key) {
+  return `${R2_API}/${env.accountId}/r2/buckets/${env.bucket}/objects/${encodeURIComponent(key)}`;
+}
+
+async function r2Put(env, key, body, contentType) {
+  const response = await fetch(r2Url(env, key), {
+    method: 'PUT',
+    headers: { authorization: `Bearer ${env.token}`, 'content-type': contentType },
+    body
+  });
+  if (!response.ok) return `r2_put_${response.status}`;
+  return '';
+}
+
+/** Mengambil objek dari R2. Objek yang tidak ada bukan galat - ia jawaban yang sah. */
+async function r2Fetch(env, key) {
+  let response;
+  try {
+    response = await fetch(r2Url(env, key), { headers: { authorization: `Bearer ${env.token}` } });
+  } catch (error) {
+    return { error: `r2_network_${error?.message || 'error'}` };
+  }
+  if (response.status === 404) return { absent: true };
+  if (!response.ok) return { error: `r2_get_${response.status}` };
+  return { bytes: Buffer.from(await response.arrayBuffer()) };
+}
+
+/**
+ * Membaca ulang objek dari R2 setelah menulisnya. Pasal 7: balasan sukses dari API bukan
+ * bukti bahwa berkasnya benar-benar bisa diambil kembali, dan aset tidak boleh masuk
+ * manifest sebelum hal itu terbukti.
+ *
+ * Dicoba dua kali. Pembacaan pertama kadang mendahului objeknya sendiri, dan menganggap itu
+ * sebagai kegagalan berarti membuang aset yang sebenarnya baik-baik saja - beserta kredit
+ * yang sudah terpakai untuk membuatnya.
+ */
+async function r2Verify(env, key, expectedBytes) {
+  let last = 'unknown';
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const result = await r2Fetch(env, key);
+    if (result.bytes) {
+      if (result.bytes.length !== expectedBytes) { last = 'r2_size_mismatch'; }
+      else if (validateMp3(result.bytes)) { last = 'r2_corrupt'; }
+      else return '';
+    } else {
+      last = result.error || 'r2_absent';
+    }
+    if (attempt === 1) await new Promise((r) => setTimeout(r, 1500));
+  }
+  return last;
+}
+
+/** Bentuk satu entri manifest. Dipakai jalur produksi dan jalur pemulihan. */
+function manifestEntry(identity, objectKey, bytes, sourceRef) {
+  return {
+    url: `a/${objectKey}`,
+    contentType: identity.contentType,
+    locale: identity.locale,
+    voiceId: identity.voiceId,
+    modelId: identity.modelId,
+    bytes: bytes.length,
+    // crypto, bukan AudioKey.sha256. Yang terakhir itu menerima string dan mengkodekannya
+    // sebagai UTF-8, jadi setiap byte di atas 0x7f akan berlipat menjadi dua sebelum
+    // dihitung - digest-nya tidak akan cocok dengan berkasnya sendiri maupun sha256sum.
+    checksum: crypto.createHash('sha256').update(bytes).digest('hex'),
+    sourceRef,
+    createdAt: new Date().toISOString(),
+    status: 'ready'
+  };
+}
 
 function parseArgs(argv) {
   const out = { content: 'vocabulary', limit: 0, apply: false, budgetChars: 0, budgetAssets: 0 };
@@ -201,7 +287,11 @@ async function main() {
     } catch (_) {
       continue;
     }
-    if (manifest.assets[identity.audioKey]?.status === 'ready') { alreadyReady++; continue; }
+    // Syaratnya sama persis dengan yang dipakai klien: ready DAN punya url. Entri ready
+    // tanpa url tidak akan pernah bisa diputar, dan kalau ia dilewati di sini ia juga tidak
+    // akan pernah diperbaiki - aset yang hilang selamanya tanpa satu pun galat.
+    const known = manifest.assets[identity.audioKey];
+    if (known?.status === 'ready' && known.url) { alreadyReady++; continue; }
     if (planned.has(identity.audioKey)) { duplicates++; continue; }
     planned.set(identity.audioKey, { identity, sourceRef: item.sourceRef || '' });
   }
@@ -236,12 +326,44 @@ async function main() {
     process.exit(2);
   }
 
+  const storage = {
+    token: String(process.env.CLOUDFLARE_API_TOKEN || '').trim(),
+    accountId: String(process.env.CLOUDFLARE_ACCOUNT_ID || '').trim(),
+    bucket: String(process.env.R2_BUCKET || 'fiezel-audio').trim()
+  };
+  if (!storage.token || !storage.accountId) {
+    console.error('Kredensial Cloudflare tidak ada. Produksi dibatalkan sebelum satu kredit pun terpakai.');
+    process.exit(2);
+  }
+  // Tanpa alamat publik, aset yang berhasil diunggah tidak akan bisa ditemukan aplikasi -
+  // dan kreditnya sudah terlanjur terpakai. Diperiksa di sini, bukan setelah batch selesai.
+  if (!manifest.assetBaseUrl) {
+    console.error('assetBaseUrl belum ada di manifest. Jalankan workflow deploy Worker lebih dulu.');
+    process.exit(2);
+  }
+
   let generated = 0;
   let failed = 0;
+  let recovered = 0;
   manifest.voiceProfile = { voiceId, modelId, settings };
 
   for (const job of affordable) {
     const { identity, sourceRef } = job;
+    const objectKeyEarly = `${identity.audioKey}.mp3`;
+
+    // R2 diperiksa SEBELUM ElevenLabs dipanggil, bukan hanya manifest.
+    //
+    // Keduanya bisa berbeda, dan justru pada jalan yang gagal: unggahan yang berhasil tetapi
+    // verifikasinya meleset - 5xx sesaat, atau pembacaan yang datang terlalu cepat - membuat
+    // aset tidak tercatat padahal objeknya sudah ada di sana. Tanpa pemeriksaan ini, jalan
+    // berikutnya akan membayar ulang untuk berkas yang sudah dimiliki.
+    const existing = await r2Fetch(storage, objectKeyEarly);
+    if (existing.bytes && !validateMp3(existing.bytes)) {
+      manifest.assets[identity.audioKey] = manifestEntry(identity, objectKeyEarly, existing.bytes, sourceRef);
+      recovered++;
+      continue;
+    }
+
     const result = await synthesize(identity, apiKey);
 
     if (result.fatal) {
@@ -256,39 +378,37 @@ async function main() {
       continue;
     }
 
-    const relative = AudioKey.assetPath(identity);
-    const absolute = path.join(ROOT, relative);
-    fs.mkdirSync(path.dirname(absolute), { recursive: true });
-    fs.writeFileSync(absolute, result.bytes);
-
-    // Dibaca ulang dari disk. Penulisan yang gagal separuh - disk penuh di runner adalah
-    // contoh nyatanya - tidak terlihat dari writeFileSync yang tidak melempar.
-    const persisted = fs.readFileSync(absolute);
-    if (persisted.length !== result.bytes.length || validateMp3(persisted)) {
+    const objectKey = `${identity.audioKey}.mp3`;
+    const putError = await r2Put(storage, objectKey, result.bytes, 'audio/mpeg');
+    if (putError) {
       failed++;
-      try { fs.unlinkSync(absolute); } catch (_) {}
-      console.error(`gagal simpan ${identity.audioKey.slice(0, 8)}`);
+      console.error(`gagal unggah ${identity.audioKey.slice(0, 8)} (${putError})`);
       continue;
     }
 
-    manifest.assets[identity.audioKey] = {
-      url: './' + relative,
-      contentType: identity.contentType,
-      locale: identity.locale,
-      voiceId: identity.voiceId,
-      modelId: identity.modelId,
-      bytes: persisted.length,
-      checksum: AudioKey.sha256(persisted.toString('latin1')),
-      sourceRef,
-      createdAt: new Date().toISOString(),
-      status: 'ready'
-    };
+    const verifyError = await r2Verify(storage, objectKey, result.bytes.length);
+    if (verifyError) {
+      failed++;
+      console.error(`gagal verifikasi ${identity.audioKey.slice(0, 8)} (${verifyError})`);
+      continue;
+    }
+
+    manifest.assets[identity.audioKey] = manifestEntry(identity, objectKey, result.bytes, sourceRef);
     generated++;
-    if (generated % 25 === 0) console.log(`  ${generated}/${affordable.length}…`);
+    if (generated % 25 === 0) console.log(`  ${generated}/${affordable.length}â€¦`);
   }
 
   saveManifest(manifest);
-  console.log(`\nselesai: ${generated} aset baru, ${failed} gagal, manifest v${manifest.version}`);
+
+  // Salinan manifest di R2 melayani /manifest.json pada Worker. Sumber kebenarannya tetap
+  // yang di Git - yang ini hanya cermin, dan ditulis setelah versinya naik supaya tidak
+  // pernah lebih baru daripada yang sudah ditinjau.
+  const mirrorError = await r2Put(
+    storage, 'manifest.json', fs.readFileSync(MANIFEST_PATH), 'application/json'
+  );
+  if (mirrorError) console.error(`cermin manifest di R2 gagal (${mirrorError}); manifest di Git tetap sah.`);
+
+  console.log(`\nselesai: ${generated} aset baru, ${recovered} dipulihkan dari R2 tanpa biaya, ${failed} gagal, manifest v${manifest.version}`);
   if (failed > 0) process.exitCode = 1;
 }
 
