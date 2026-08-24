@@ -31,6 +31,7 @@
     assetBaseUrl: '',
     version: 0,
     voiceProfile: null,
+    voiceProfiles: [],
     pending: null,
     error: '',
     attempts: 0
@@ -48,6 +49,15 @@
    * pada satu penyedia penyimpanan". Pindah dari R2 ke CDN lain, atau kembali ke berkas
    * statis di repo, hanya mengubah satu baris di manifest, bukan setiap entri di dalamnya.
    */
+  function normalizeProfile(raw) {
+    if (!raw || typeof raw !== 'object' || !raw.voiceId) return null;
+    return Object.freeze({
+      voiceId: String(raw.voiceId),
+      modelId: String(raw.modelId || ''),
+      settings: Object.freeze(Object.assign({}, raw.settings || {}))
+    });
+  }
+
   function absolute(base, url) {
     if (/^https?:\/\//i.test(url)) return url;
     if (!base) return url;
@@ -89,13 +99,32 @@
     state.index = index;
     state.assetBaseUrl = base;
     state.version = Number(source.version || 0);
-    state.voiceProfile = source.voiceProfile && typeof source.voiceProfile === 'object'
-      ? Object.freeze({
-          voiceId: String(source.voiceProfile.voiceId || ''),
-          modelId: String(source.voiceProfile.modelId || ''),
-          settings: Object.freeze(Object.assign({}, source.voiceProfile.settings || {}))
-        })
-      : null;
+    state.voiceProfile = normalizeProfile(source.voiceProfile);
+
+    /**
+     * m025-153 katalog boleh memuat lebih dari satu suara.
+     *
+     * Jatah ElevenLabs habis tiap bulan dan token penggantinya datang dari akun baru, yang
+     * berarti voice ID baru. Kalau manifest hanya sanggup memegang satu profil, setiap
+     * pergantian membuat seluruh aset lama tak terjangkau - masih ada di R2, tetapi tidak
+     * pernah dicari lagi karena kuncinya dihitung dari profil yang sekarang. Sebulan penuh
+     * kredit hilang setiap kali token berganti.
+     *
+     * Daftar ini menyimpan setiap profil yang pernah dipakai. Profil yang sekarang selalu
+     * didahulukan supaya konten baru terdengar konsisten; sisanya jadi jaring pengaman bagi
+     * aset yang dibayar di bulan-bulan sebelumnya.
+     */
+    var history = Array.isArray(source.voiceProfiles) ? source.voiceProfiles : [];
+    var profiles = [];
+    var seen = {};
+    function push(profile) {
+      if (!profile || !profile.voiceId || seen[profile.voiceId + '|' + profile.modelId]) return;
+      seen[profile.voiceId + '|' + profile.modelId] = true;
+      profiles.push(profile);
+    }
+    push(state.voiceProfile);
+    for (var h = 0; h < history.length; h++) push(normalizeProfile(history[h]));
+    state.voiceProfiles = Object.freeze(profiles);
     state.error = '';
     return index;
   }
@@ -154,6 +183,7 @@
       assetCount: state.index ? Object.keys(state.index).length : 0,
       assetBaseUrl: state.assetBaseUrl || '',
       voiceProfile: state.voiceProfile,
+      voiceProfiles: state.voiceProfiles || [],
       error: state.error,
       attempts: state.attempts,
       url: state.url
@@ -162,7 +192,7 @@
 
   function reset() {
     state.index = null; state.pending = null; state.error = '';
-    state.version = 0; state.voiceProfile = null; state.attempts = 0;
+    state.version = 0; state.voiceProfile = null; state.voiceProfiles = []; state.attempts = 0;
     state.assetBaseUrl = ''; state.url = DEFAULT_URL;
   }
 
