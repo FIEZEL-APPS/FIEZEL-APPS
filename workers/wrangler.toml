@@ -5,7 +5,12 @@
 # kredensial bucket yang perlu disimpan, dibagikan, atau suatu hari bocor.
 name = "fiezel-audio"
 main = "fiezel-audio-worker.js"
-compatibility_date = "2026-08-24"
+# Tanggal yang sudah lewat dan mapan, bukan tanggal hari ini. API deploy menolak
+# compatibility date yang mendahului tanggal produksi terbaru yang didukungnya, jadi
+# memakai "hari ini" berarti deploy yang lulus atau gagal tergantung jam runner - tanpa
+# satu pun manfaat sebagai gantinya. Worker ini hanya memakai URL, Response, Headers,
+# dan binding R2; tak satu pun butuh perilaku baru.
+compatibility_date = "2025-06-01"
 
 # Worker ini sengaja tidak diberi secret apa pun. Tidak ada kunci ElevenLabs di sini karena
 # ia memang tidak pernah memproduksi audio - lihat catatan kepala fiezel-audio-worker.js.

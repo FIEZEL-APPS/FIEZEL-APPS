@@ -60,11 +60,20 @@ jobs:
       - name: Uji Worker hidup dan hanya-baca
         run: |
           url='${{ steps.deploy.outputs.worker_url }}'
-          curl -fsS "$url/health"
+          # Nama host workers.dev yang baru bisa butuh puluhan detik untuk bisa
+          # diselesaikan. Tanpa percobaan ulang, langkah ini gagal justru saat Worker-nya
+          # SUDAH hidup - dan alamatnya tidak jadi tercatat di manifest.
+          curl --retry 12 --retry-all-errors --retry-delay 5 -fsS "$url/health"
           echo
           # Menulis harus ditolak. Kalau suatu hari langkah ini lulus dengan 200, artinya
           # jalur tulis terbuka ke publik dan rilis harus berhenti di sini.
-          code="$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$url/a/x.mp3")"
+          code=''
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            code="$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$url/a/x.mp3")"
+            # 000 berarti belum tersambung sama sekali, bukan jawaban dari Worker.
+            [ "$code" != '000' ] && break
+            sleep 5
+          done
           if [ "$code" != '405' ]; then
             echo "Worker menerima PUT (HTTP $code). Deploy dihentikan." >&2
             exit 1

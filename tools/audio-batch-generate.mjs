@@ -59,14 +59,31 @@ function r2Url(env, key) {
   return `${R2_API}/${env.accountId}/r2/buckets/${env.bucket}/objects/${encodeURIComponent(key)}`;
 }
 
+/**
+ * REST API R2 dibatasi 1.200 permintaan per 5 menit untuk seluruh akun, dan satu aset
+ * memakan tiga panggilan. Batas itu akan tersentuh begitu anggaran dinaikkan - dan
+ * menyerah pada 429 berarti membuang aset yang kreditnya sudah terbayar.
+ */
 async function r2Put(env, key, body, contentType) {
-  const response = await fetch(r2Url(env, key), {
-    method: 'PUT',
-    headers: { authorization: `Bearer ${env.token}`, 'content-type': contentType },
-    body
-  });
-  if (!response.ok) return `r2_put_${response.status}`;
-  return '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    let response;
+    try {
+      response = await fetch(r2Url(env, key), {
+        method: 'PUT',
+        headers: { authorization: `Bearer ${env.token}`, 'content-type': contentType },
+        body
+      });
+    } catch (error) {
+      if (attempt === 3) return `r2_network_${error?.message || 'error'}`;
+      await new Promise((r) => setTimeout(r, attempt * 3000));
+      continue;
+    }
+    if (response.ok) return '';
+    if (response.status !== 429 && response.status < 500) return `r2_put_${response.status}`;
+    if (attempt === 3) return `r2_put_${response.status}`;
+    await new Promise((r) => setTimeout(r, attempt * 5000));
+  }
+  return 'r2_put_exhausted';
 }
 
 /** Mengambil objek dari R2. Objek yang tidak ada bukan galat - ia jawaban yang sah. */
@@ -214,9 +231,14 @@ async function synthesize(identity, apiKey) {
   const body = {
     text: identity.canonicalText,
     model_id: identity.modelId,
+    // speed ikut dikirim, dan itu wajib: audioKey menghitung SETIAP setelan suara,
+    // termasuk speed. Kalau ia dihitung tetapi tidak dikirim, mengubahnya melahirkan
+    // kunci baru untuk permintaan yang byte-nya identik - membayar ulang produksi audio
+    // yang persis sama dengan yang sudah dimiliki.
     voice_settings: {
       stability: Number(identity.settings.stability ?? 0.5),
-      similarity_boost: Number(identity.settings.similarityBoost ?? 0.75)
+      similarity_boost: Number(identity.settings.similarityBoost ?? 0.75),
+      speed: Number(identity.settings.speed ?? 1)
     }
   };
 
