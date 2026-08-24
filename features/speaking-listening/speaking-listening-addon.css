@@ -23,3 +23,18 @@
 .fsl-cue{margin:10px 0;padding-left:20px;display:grid;gap:5px;font-size:.85rem}
 .fsl-source{margin:10px 0;padding:12px 13px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.82rem;line-height:1.55;white-space:pre-wrap;max-height:320px;overflow:auto}
 .fsl-adapted{margin:6px 0 0;font-size:.75rem;opacity:.75}
+/* m025-146: sesi Listening berformat ujian. Satu audio, banyak soal, sekali putar. */
+.fsl-exam-list{display:grid;gap:16px;margin:12px 0 0;padding-left:20px}
+.fsl-exam-q p{margin:0 0 7px;line-height:1.5}
+.fsl-exam-q .fsl-input{width:100%}
+.fsl-q-feedback{display:none}
+.fsl-q-feedback.is-ok,.fsl-q-feedback.is-wrong{display:grid;gap:3px;margin-top:7px;padding:8px 10px;border-radius:10px;font-size:.79rem}
+.fsl-q-feedback.is-ok{background:rgba(63,143,95,.12)}
+.fsl-q-feedback.is-wrong{background:rgba(194,64,44,.12)}
+.fsl-q-feedback small{opacity:.85;line-height:1.45}
+.fsl-option.is-picked{outline:2px solid var(--accent,#c2402c);outline-offset:1px}
+.fsl-notes-label{display:grid;gap:5px;margin:12px 0 0;font-size:.79rem;font-weight:650}
+.fsl-notes{width:100%;font:inherit;font-weight:400;padding:9px 11px;border-radius:12px;border:1px solid var(--line,#eadfce);resize:vertical}
+.fsl-exam-result{margin:10px 0 0}
+.fsl-script{margin:10px 0 0;font-size:.8rem}
+.fsl-script pre{white-space:pre-wrap;line-height:1.55;padding:11px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.8rem;max-height:340px;overflow:auto}
