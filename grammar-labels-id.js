@@ -169,7 +169,18 @@
     inversion_after_only_restrictive_phrase: 'Pembalikan setelah ungkapan pembatas only',
     pseudo_cleft_what_clause_emphasis: 'Penekanan dengan anak kalimat what',
     participle_clause: 'Anak kalimat ringkas berbentuk participle',
-    concession_linking: 'Menghubungkan gagasan yang saling mengalah'
+    concession_linking: 'Menghubungkan gagasan yang saling mengalah',
+    // m025-149: sepuluh lesson A1 yang masuk lewat kurikulum grammar terbaru
+    articles_a_an_the: 'Artikel a, an, dan the: memilih dari bunyi awal',
+    have_got_has_got: 'Menyatakan kepemilikan dengan have got dan has got',
+    past_simple_regular_forms: 'Kata kerja lampau beraturan dan bentuk dasar sesudah did',
+    past_be_was_were: 'Was dan were: bentuk lampau kata kerja be',
+    plural_nouns_basic: 'Kata benda jamak dan perubahan ejaannya',
+    place_prepositions_basic: 'Preposisi tempat: in, on, dan at',
+    present_continuous_basics: 'Present continuous: sedang berlangsung sekarang',
+    question_words_basic: 'Kata tanya dasar: who, what, where, when, why',
+    some_any_countable_uncountable: 'Some, any, many, dan much sesuai jenis kata benda',
+    subject_object_pronouns_and_possessives: 'Kata ganti subjek, objek, dan bentuk kepemilikan'
   };
 
   root.GRAMMAR_SKILL_TITLES_ID = GRAMMAR_SKILL_TITLES_ID;
