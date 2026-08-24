@@ -144,11 +144,12 @@ function manifestEntry(identity, objectKey, bytes, sourceRef) {
 }
 
 function parseArgs(argv) {
-  const out = { content: 'vocabulary', limit: 0, apply: false, verifyOnly: false, budgetChars: 0, budgetAssets: 0 };
+  const out = { content: 'vocabulary', limit: 0, apply: false, verifyOnly: false, allowVoiceChange: false, budgetChars: 0, budgetAssets: 0 };
   for (const arg of argv.slice(2)) {
     const [rawKey, rawValue] = arg.startsWith('--') ? arg.slice(2).split('=') : [arg, ''];
     if (rawKey === 'apply') out.apply = true;
     else if (rawKey === 'verify-only') out.verifyOnly = true;
+    else if (rawKey === 'allow-voice-change') out.allowVoiceChange = true;
     else if (rawKey === 'content') out.content = String(rawValue || '').trim();
     else if (rawKey === 'limit') out.limit = Number(rawValue) || 0;
     else if (rawKey === 'budget-chars') out.budgetChars = Number(rawValue) || 0;
@@ -273,6 +274,13 @@ async function verifyVoice(voiceId, apiKey) {
     try { detail = (await response.text()).slice(0, 300).replace(/\s+/g, ' '); } catch (_) {}
     if (/quota|credit|limit|exceeded/i.test(detail)) {
       return `Kuota ElevenLabs pada kunci ini sudah habis (HTTP ${response.status}: ${detail})`;
+    }
+    // Kunci bertipe terbatas boleh saja tidak punya izin membaca daftar suara sementara
+    // izin membuat audio tetap ada. Itu BUKAN alasan untuk menolak produksi: pemeriksaan
+    // yang benar-benar mahal kalau terlewat - voice ID yang bergeser - dijawab lokal oleh
+    // compareVoiceWithManifest(), tanpa menyentuh API sama sekali.
+    if (/voices_read|missing_permissions/i.test(detail)) {
+      return { skipped: `Kunci ini tidak punya izin voices_read, jadi keberadaan suara tidak bisa diperiksa lewat API. Produksi tetap boleh jalan; tambahkan izin itu di ElevenLabs kalau ingin pemeriksaan penuh.` };
     }
     return detail
       ? `ELEVENLABS_API_KEY ditolak (HTTP ${response.status}: ${detail})`
@@ -430,24 +438,43 @@ async function main() {
    */
   const apiKey = String(process.env.ELEVENLABS_API_KEY || '').trim();
 
+  /**
+   * Perbandingan lokal, dan ini yang sebenarnya penting.
+   *
+   * Ia tidak menyentuh API, tidak butuh izin apa pun, dan tidak memakai kredit - tetapi
+   * justru ia yang menjawab pertanyaan paling mahal: apakah kunci audio yang akan dihitung
+   * masih sama dengan kunci aset yang sudah tersimpan. Selama dua nilai ini cocok, produksi
+   * pasti melanjutkan alih-alih mengulang, apa pun yang terjadi pada izin token.
+   */
+  function compareVoiceWithManifest() {
+    const recorded = manifest.voiceProfile?.voiceId || '';
+    console.log(`\nvoice sekarang : ${voiceId}`);
+    console.log(`voice manifest : ${recorded || '(manifest belum punya profil)'}`);
+    if (!recorded) {
+      console.log('BARU. Manifest belum punya profil suara, jadi belum ada aset yang bisa jadi yatim.');
+      return true;
+    }
+    if (recorded === voiceId) {
+      console.log('COCOK. Aset yang sudah ada tetap terpakai; produksi akan melanjutkan, bukan mengulang.');
+      return true;
+    }
+    console.log('BERBEDA. Setiap audioKey ikut berubah, jadi --apply akan memproduksi ULANG seluruh katalog dan menelantarkan aset lama.');
+    return false;
+  }
+
   if (args.verifyOnly) {
     if (!apiKey) {
       console.error('ELEVENLABS_API_KEY tidak ada.');
       process.exit(2);
     }
     const problem = await verifyVoice(voiceId, apiKey);
-    if (problem) {
+    if (problem && problem.skipped) {
+      console.log(`catatan       : ${problem.skipped}`);
+    } else if (problem) {
       console.error(problem);
       process.exit(2);
     }
-    const recorded = manifest.voiceProfile?.voiceId || '(manifest belum punya profil)';
-    const sama = recorded === voiceId;
-    console.log(`\nvoice sekarang : ${voiceId}`);
-    console.log(`voice manifest : ${recorded}`);
-    console.log(sama
-      ? 'COCOK. Aset yang sudah ada tetap terpakai; produksi akan melanjutkan, bukan mengulang.'
-      : 'BERBEDA. Setiap audioKey ikut berubah, jadi --apply akan memproduksi ULANG seluruh katalog dan menelantarkan aset lama.');
-    process.exitCode = sama ? 0 : 3;
+    process.exitCode = compareVoiceWithManifest() ? 0 : 3;
     return;
   }
 
@@ -478,9 +505,20 @@ async function main() {
   }
 
   const voiceProblem = await verifyVoice(voiceId, apiKey);
-  if (voiceProblem) {
+  if (voiceProblem && voiceProblem.skipped) {
+    console.log(`catatan       : ${voiceProblem.skipped}`);
+  } else if (voiceProblem) {
     console.error(voiceProblem);
     process.exit(2);
+  }
+
+  // Suara yang bergeser DIAM-DIAM adalah kegagalan paling mahal di berkas ini: setiap
+  // audioKey ikut berubah, seluruh katalog diproduksi ulang dengan jatah baru, dan aset
+  // lama tetap di R2 tanpa ada yang bisa menjangkaunya. Produksi berhenti di sini kecuali
+  // seseorang menyatakan pergantian itu memang disengaja.
+  if (!compareVoiceWithManifest() && !args.allowVoiceChange) {
+    console.error('\nProduksi dibatalkan. Kembalikan ELEVENLABS_VOICE_ID ke nilai di manifest, atau jalankan dengan --allow-voice-change bila pergantian suara memang dikehendaki.');
+    process.exit(3);
   }
 
   let generated = 0;
