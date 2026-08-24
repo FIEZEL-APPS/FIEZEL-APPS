@@ -109,7 +109,15 @@ export default {
     // 206 tanpa Content-Range melanggar protokol, dan elemen <audio> menolaknya. Safari
     // meminta Range untuk setiap pemutaran, bukan hanya saat melompat, jadi tanpa ini
     // seluruh audio FIEZEL diam di iOS.
-    if (object.range && typeof object.range.offset === 'number') {
+    // 206 HANYA kalau klien memang meminta Range.
+    //
+    // R2 mengisi object.range bahkan untuk pengambilan penuh, jadi memeriksa object.range
+    // saja membuat setiap permintaan biasa dijawab 206. Itu bukan sekadar tidak rapi: Cache
+    // API MENOLAK menyimpan respons 206, sehingga lapisan cache persisten di klien gagal
+    // menyimpan apa pun - diam-diam, tanpa galat, dan setiap pemutaran mengunduh ulang dari
+    // R2. Terukur di produksi: stores 0, entri cache 0, meski pemutarannya sendiri berhasil.
+    const rangeRequested = request.headers.get('range');
+    if (rangeRequested && object.range && typeof object.range.offset === 'number') {
       const start = object.range.offset;
       const length = typeof object.range.length === 'number' ? object.range.length : object.size - start;
       const end = start + length - 1;
