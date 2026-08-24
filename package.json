@@ -14,6 +14,7 @@
     "test:neural-cache": "node neural-cache-isolation-test.js",
     "test:prerequisite-graph": "node prerequisite-graph-test.js",
     "test:speaking-exam": "node speaking-exam-test.js",
+    "test:listening-exam": "node listening-exam-test.js",
     "test:e2e": "node e2e-level-grammar-test.js",
     "audit:grammar": "node grammar-quality-audit.js",
     "test:level-contract": "node level-grammar-contract-test.js",
