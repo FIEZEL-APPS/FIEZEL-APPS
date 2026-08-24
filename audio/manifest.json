@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 6,
-  "generatedAt": "2026-08-24T20:29:31.935Z",
+  "version": 7,
+  "generatedAt": "2026-08-24T20:31:06.917Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "KuNebS8MGzRaopODTydg",
@@ -1444,6 +1444,102 @@
       "checksum": "24efb5c6dc9368010f0d25ec8b16fba1fb6d126bec97950dfbc5c177509b1928",
       "sourceRef": "listen_sc_a1_dictation_034",
       "createdAt": "2026-08-24T20:29:31.935Z",
+      "status": "ready"
+    },
+    "bd39aa09525c00f746f7ebe8c5617ce00d67df0bd49254dfcbd6a215cab4b960": {
+      "url": "a/bd39aa09525c00f746f7ebe8c5617ce00d67df0bd49254dfcbd6a215cab4b960.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 163884,
+      "checksum": "7b51ccda8c2ba4af67081bb57595ff848978099c517e578884ab7da526ebcb20",
+      "sourceRef": "listen_sc_a1_gist_036",
+      "createdAt": "2026-08-24T20:30:43.814Z",
+      "status": "ready"
+    },
+    "fa25649cde7406e968fe3f17d31abd58ac645e2dae9df801c6b48b82962b984e": {
+      "url": "a/fa25649cde7406e968fe3f17d31abd58ac645e2dae9df801c6b48b82962b984e.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 35152,
+      "checksum": "2aac42b3e98ffd1de2a966fde368b2db1fdab9cfb2e035be11f48b897fcf7db2",
+      "sourceRef": "listen_sc_a1_dictation_035",
+      "createdAt": "2026-08-24T20:30:46.484Z",
+      "status": "ready"
+    },
+    "b1054799764acd3130474710f0697240ff14711352c115cc16b7992c022f9d5f": {
+      "url": "a/b1054799764acd3130474710f0697240ff14711352c115cc16b7992c022f9d5f.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 188125,
+      "checksum": "7ed3ae52eff0914962323f341df4621fb5292bfed557414279b51c9d569ecc23",
+      "sourceRef": "listen_sc_a1_gist_037",
+      "createdAt": "2026-08-24T20:30:50.241Z",
+      "status": "ready"
+    },
+    "5f0cc4515f2cfde43b4da98ccc53e6a84406e22fbf6f22909de0f9dfe104855f": {
+      "url": "a/5f0cc4515f2cfde43b4da98ccc53e6a84406e22fbf6f22909de0f9dfe104855f.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 24703,
+      "checksum": "52c77542c0dceac4a2b0e54cb96b2678a39d36d137fc2bb3280f26a255d258ba",
+      "sourceRef": "listen_sc_a1_dictation_036",
+      "createdAt": "2026-08-24T20:30:52.868Z",
+      "status": "ready"
+    },
+    "f07ddcadeed85b27e03589f5bcb72cc2576db4bbe601aa6ab03978668fd7aab7": {
+      "url": "a/f07ddcadeed85b27e03589f5bcb72cc2576db4bbe601aa6ab03978668fd7aab7.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 157196,
+      "checksum": "25a306cf7d485464ff3297466805f41a08b958de573f34d9de8c3bf4354966fe",
+      "sourceRef": "listen_sc_a1_gist_038",
+      "createdAt": "2026-08-24T20:30:56.106Z",
+      "status": "ready"
+    },
+    "52cb069137ac4c86d880ee1fc352debc12c37f47347af396b3d6ea97dc740f82": {
+      "url": "a/52cb069137ac4c86d880ee1fc352debc12c37f47347af396b3d6ea97dc740f82.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 38914,
+      "checksum": "786c08d675681a86beb268fa2cbedd8663b1fd6c7daecfc5ffab453a090b5c12",
+      "sourceRef": "listen_sc_a1_dictation_037",
+      "createdAt": "2026-08-24T20:30:58.917Z",
+      "status": "ready"
+    },
+    "2a7f904dda8e54b491c451523eb5eeacb9a0515c9c34f3efaa4ede2486cbb11f": {
+      "url": "a/2a7f904dda8e54b491c451523eb5eeacb9a0515c9c34f3efaa4ede2486cbb11f.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 153435,
+      "checksum": "dd9e0f148586a522a3dc547724455e98e159e34d79b3f7a4303159c3b23a7a0a",
+      "sourceRef": "listen_sc_a1_gist_039",
+      "createdAt": "2026-08-24T20:31:02.631Z",
+      "status": "ready"
+    },
+    "2ca0c42459b152b6e1e0a88c3c51091163b4d18b7c10aa99878989594289804a": {
+      "url": "a/2ca0c42459b152b6e1e0a88c3c51091163b4d18b7c10aa99878989594289804a.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "KuNebS8MGzRaopODTydg",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 40586,
+      "checksum": "7cbdb6148368badffefedb6716b96d3f3498978120feac5a2803c6890cfeeada",
+      "sourceRef": "listen_sc_a1_dictation_038",
+      "createdAt": "2026-08-24T20:31:05.331Z",
       "status": "ready"
     }
   }
