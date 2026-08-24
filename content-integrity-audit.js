@@ -584,7 +584,8 @@ function auditGrammarRuntime(ctx, templates) {
         if (ownText.has(norm(d.option))) continue;
         const borrowed = owner.get(norm(d.option));
         if (borrowed && borrowed.id !== q.sourceId) {
-          if (!q.optionSources || !q.optionSources[d.option]) {
+          const prov = Array.isArray(q.optionSources) ? q.optionSources.find(x => x && x.option === d.option) : null;
+          if (!prov || prov.own || !prov.sourceId) {
             critical('grammar', 'OPTION_PROVENANCE_LOST', q.sourceId || t.id,
               `an option borrowed from ${borrowed.id} carries no provenance, so a wrong pick cannot be traced to the lesson actually confused`, d.option);
           }

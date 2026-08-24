@@ -65,18 +65,33 @@ setTimeout(() => {
       if (q.practiceMode!=='recall_memory_cue' && q.mode!=='recall_memory_cue') continue;
       checked++;
       const expected=String(q.lessonSkill||q.skill||lesson.subskill).trim();
-      const sources=[];
-      if (Array.isArray(q.optionSources)) sources.push(...q.optionSources);
-      if (Array.isArray(q.options)) {
-        for (const o of q.options) if (o && typeof o==='object') sources.push(o);
-      }
-      if (!sources.length) {
-        failures.push(`${lesson.id}/${lesson.subskill}: recall_memory_cue exposes no option provenance`);
+      const sources=Array.isArray(q.optionSources)?q.optionSources:[];
+      if (sources.length!==q.options.length) {
+        failures.push(`${lesson.id}/${lesson.subskill}: ${sources.length} provenance entries for ${q.options.length} options`);
         continue;
       }
+      // Invarian yang BISA dipenuhi tanpa mengarang data.
+      //
+      // Versi pertama gate ini menuntut KEEMPAT pilihan milik lesson yang sedang dibuka.
+      // Bank soal tidak bisa memenuhinya: tiap template hanya punya SATU memoryCue, jadi
+      // empat pilihan sekaligus berarti mengarang tiga pengingat palsu per lesson - 417
+      // string baru, dan itu keputusan konten, bukan perbaikan kode.
+      //
+      // Yang benar-benar rusak sebelumnya bukan keberadaan pengecoh pinjaman, melainkan
+      // pinjaman yang TIDAK MENINGGALKAN JEJAK: peta miskonsepsi kartu tidak pernah cocok,
+      // dan salah-pilih tercatat sekadar "salah di lesson ini" tanpa petunjuk lesson mana
+      // yang sebenarnya tertukar. Jadi yang dijaga: setiap pilihan menyatakan asalnya,
+      // kuncinya milik lesson ini, dan tiap pengecoh menyebut lesson lain yang nyata.
+      const keys=sources.filter(x=>x&&x.own);
+      if (keys.length!==1) failures.push(`${lesson.id}/${lesson.subskill}: ${keys.length} pilihan mengaku milik lesson ini, seharusnya tepat 1`);
+      const key=sources[q.answerIndex];
+      if (!key||!key.own) failures.push(`${lesson.id}/${lesson.subskill}: kunci jawaban tidak ditandai milik lesson ini`);
+      else if (identity(key)&&String(key.lessonSkill||'').trim()!==expected) failures.push(`${lesson.id}/${lesson.subskill}: kunci mengaku ${key.lessonSkill}, seharusnya ${expected}`);
       for (const source of sources) {
-        const actual=identity(source);
-        if (!actual || actual!==expected) failures.push(`${lesson.id}/${lesson.subskill}: expected ${expected}, got ${actual||'(missing)'} in ${JSON.stringify(source).slice(0,180)}`);
+        if (!source||typeof source!=='object') { failures.push(`${lesson.id}/${lesson.subskill}: ada pilihan tanpa provenance`); continue; }
+        if (!identity(source)) failures.push(`${lesson.id}/${lesson.subskill}: provenance kosong di ${JSON.stringify(source).slice(0,120)}`);
+        if (!source.own && !String(source.sourceSkill||'').trim()) failures.push(`${lesson.id}/${lesson.subskill}: pengecoh pinjaman tidak menyebut lesson asalnya`);
+        if (!source.own && String(source.sourceSkill||'').trim()===expected) failures.push(`${lesson.id}/${lesson.subskill}: pengecoh mengaku pinjaman tetapi menunjuk lesson ini sendiri`);
       }
     }
   }
