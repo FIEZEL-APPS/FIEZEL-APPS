@@ -1,10 +1,10 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 15,
-  "generatedAt": "2026-08-24T23:10:51.886Z",
+  "version": 16,
+  "generatedAt": "2026-08-24T23:17:18.354Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
-    "voiceId": "hZClfFgpVdl548zhrwyC",
+    "voiceId": "si0svtk05vPEuvwAW93c",
     "modelId": "eleven_multilingual_v2",
     "settings": {
       "stability": 0.5,
@@ -2300,6 +2300,15 @@
     }
   },
   "voiceProfiles": [
+    {
+      "voiceId": "si0svtk05vPEuvwAW93c",
+      "modelId": "eleven_multilingual_v2",
+      "settings": {
+        "stability": 0.5,
+        "similarityBoost": 0.75,
+        "speed": 1
+      }
+    },
     {
       "voiceId": "hZClfFgpVdl548zhrwyC",
       "modelId": "eleven_multilingual_v2",
