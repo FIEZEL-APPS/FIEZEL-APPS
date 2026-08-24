@@ -24,6 +24,10 @@ on:
         description: 'Ketik APPLY untuk benar-benar memproduksi. Selain itu tetap dry-run.'
         required: false
         default: ''
+      verify_only:
+        description: 'Ketik VERIFY untuk hanya memeriksa kunci dan suara (nol kredit), tanpa memproduksi apa pun.'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -63,8 +67,21 @@ jobs:
             --content="$CONTENT" \
             --limit="$LIMIT"
 
+      # Nol kredit: hanya bertanya apakah kunci sah dan suaranya sama dengan yang tercatat
+      # di manifest. Wajib dijalankan setelah mengganti token, sebelum --apply - lihat
+      # catatan --verify-only di tools/audio-batch-generate.mjs.
+      - name: Periksa kunci dan suara
+        if: ${{ inputs.verify_only == 'VERIFY' }}
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_MODEL_ID: ${{ secrets.ELEVENLABS_MODEL_ID }}
+          CONTENT: ${{ inputs.content }}
+        run: |
+          node tools/audio-batch-generate.mjs --content="$CONTENT" --verify-only
+
       - name: Produksi
-        if: ${{ inputs.apply == 'APPLY' }}
+        if: ${{ inputs.apply == 'APPLY' && inputs.verify_only != 'VERIFY' }}
         env:
           ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
           ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}

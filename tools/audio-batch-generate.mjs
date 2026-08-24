@@ -144,10 +144,11 @@ function manifestEntry(identity, objectKey, bytes, sourceRef) {
 }
 
 function parseArgs(argv) {
-  const out = { content: 'vocabulary', limit: 0, apply: false, budgetChars: 0, budgetAssets: 0 };
+  const out = { content: 'vocabulary', limit: 0, apply: false, verifyOnly: false, budgetChars: 0, budgetAssets: 0 };
   for (const arg of argv.slice(2)) {
     const [rawKey, rawValue] = arg.startsWith('--') ? arg.slice(2).split('=') : [arg, ''];
     if (rawKey === 'apply') out.apply = true;
+    else if (rawKey === 'verify-only') out.verifyOnly = true;
     else if (rawKey === 'content') out.content = String(rawValue || '').trim();
     else if (rawKey === 'limit') out.limit = Number(rawValue) || 0;
     else if (rawKey === 'budget-chars') out.budgetChars = Number(rawValue) || 0;
@@ -405,12 +406,46 @@ async function main() {
   console.log(`dalam anggaran: ${affordable.length} aset / ${chars} karakter`);
   console.log(`anggaran      : ${budgetAssets} aset / ${budgetChars} karakter`);
 
+  /**
+   * --verify-only menjawab satu pertanyaan yang mahal kalau ditebak: apakah kunci dan suara
+   * yang sekarang benar-benar cocok dengan aset yang SUDAH ada.
+   *
+   * Mengganti token biasanya berarti mengganti akun, dan akun baru berarti voice ID baru -
+   * padahal voice ID ikut dihitung ke dalam audioKey. Kalau ia bergeser, seluruh katalog
+   * terbaca "belum pernah dibuat" dan satu jalan --apply akan memproduksi ulang semuanya:
+   * jatah baru habis hanya untuk kembali ke tempat yang sama, dan aset lama jadi yatim.
+   *
+   * Mode ini memanggil endpoint daftar suara - yang tidak memakai kredit - lalu melaporkan
+   * apakah profil sekarang sama dengan yang tercatat di manifest. Nol kredit, jawaban pasti.
+   */
+  const apiKey = String(process.env.ELEVENLABS_API_KEY || '').trim();
+
+  if (args.verifyOnly) {
+    if (!apiKey) {
+      console.error('ELEVENLABS_API_KEY tidak ada.');
+      process.exit(2);
+    }
+    const problem = await verifyVoice(voiceId, apiKey);
+    if (problem) {
+      console.error(problem);
+      process.exit(2);
+    }
+    const recorded = manifest.voiceProfile?.voiceId || '(manifest belum punya profil)';
+    const sama = recorded === voiceId;
+    console.log(`\nvoice sekarang : ${voiceId}`);
+    console.log(`voice manifest : ${recorded}`);
+    console.log(sama
+      ? 'COCOK. Aset yang sudah ada tetap terpakai; produksi akan melanjutkan, bukan mengulang.'
+      : 'BERBEDA. Setiap audioKey ikut berubah, jadi --apply akan memproduksi ULANG seluruh katalog dan menelantarkan aset lama.');
+    process.exitCode = sama ? 0 : 3;
+    return;
+  }
+
   if (!args.apply) {
     console.log('\nDRY-RUN. Tidak ada yang dikirim ke ElevenLabs. Tambahkan --apply untuk memproduksi.');
     return;
   }
 
-  const apiKey = String(process.env.ELEVENLABS_API_KEY || '').trim();
   if (!apiKey) {
     console.error('ELEVENLABS_API_KEY tidak ada. Produksi dibatalkan.');
     process.exit(2);
