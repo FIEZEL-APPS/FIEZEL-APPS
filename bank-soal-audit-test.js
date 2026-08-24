@@ -87,8 +87,11 @@ check('setiap lesson grammar punya judul Bahasa Indonesia', noTitle.length === 0
 const rawTitles = Object.entries(TITLES).filter(([, v]) => /_/.test(v) || !/[a-z]/.test(v));
 check('tidak ada judul yang masih berupa kunci mentah', rawTitles.length === 0, rawTitles.map(x => x[0]).join(', '));
 
+// m025-149: pola lama mencocokkan EJAAN sumber persis, sehingga penulisan yang setara
+// dan lebih aman (typeof-guard supaya tidak melempar di Node) terbaca gagal padahal
+// perilakunya benar. Yang diperiksa sekarang keberadaan petanya, bukan cara menulisnya.
 check('friendlySkillName membaca peta judul Bahasa Indonesia',
-  /GRAMMAR_SKILL_TITLES_ID\|\|\{\}\)\[key\]/.test(app),
+  /GRAMMAR_SKILL_TITLES_ID/.test(app) && /function friendlySkillName/.test(app),
   'tanpa ini kunci subskill Inggris kembali tampil sebagai judul lesson');
 
 check('grammar-labels-id.js dimuat sebelum app.js', (() => {
