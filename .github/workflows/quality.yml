@@ -73,6 +73,7 @@ jobs:
           node neural-cache-isolation-test.js
           node prerequisite-graph-test.js
           node speaking-exam-test.js
+          node listening-exam-test.js
           node e2e-level-grammar-test.js
           node notification-reminder-test.js
           node remote-push-test.js
