@@ -162,8 +162,17 @@
     // Urutan field dieja tangan, bukan JSON.stringify atas objek apa adanya: urutan kunci
     // objek JS mudah bergeser saat berkas ini disunting, dan pergeseran itu akan mengubah
     // setiap kunci yang pernah dihitung tanpa satu pun kesalahan yang terlihat.
+    //
+    // contentType SENGAJA TIDAK IKUT. Ia label penataan, bukan sesuatu yang terdengar:
+    // "book" yang diucapkan sebagai kata dan sebagai bagian kalimat berbunyi sama persis,
+    // jadi keduanya memang satu aset - dan menyatukannya justru menghemat kredit.
+    // Memasukkannya ke hash mewajibkan setiap pemanggil menebak label yang sama persis
+    // dengan yang dipakai generator, dan tombol pengucapan flashcard membuktikan betapa
+    // mudah tebakan itu meleset: ia mengirim 'sentence' untuk sebuah kata, lalu menemukan
+    // ABSENT padahal MP3-nya sudah dibayar dan tersimpan. Label itu tetap dicatat sebagai
+    // metadata manifest, tempat ia berguna tanpa bisa memecah satu aset menjadi dua.
     var material = [
-      canon.schema, canon.contentType, canon.locale, canon.voiceId, canon.modelId,
+      canon.schema, canon.locale, canon.voiceId, canon.modelId,
       JSON.stringify(canon.settings), canon.text
     ].join('\u001f');
 

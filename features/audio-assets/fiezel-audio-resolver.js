@@ -120,9 +120,15 @@
 
   function stop() {
     if (!current) return false;
-    try { current.pause(); } catch (_) {}
-    try { current.src = ''; } catch (_) {}
+    var el = current;
     current = null;
+    try { el.pause(); } catch (_) {}
+    try { el.src = ''; } catch (_) {}
+    // Janji pemutaran diselesaikan di sini, bukan diserahkan ke peristiwa error.
+    // Menyetel src='' tidak dijamin memicu error di setiap browser, dan janji yang tidak
+    // pernah selesai akan menahan pemanggil yang menunggunya - satu stop() lalu berhenti
+    // selamanya, tepat di tengah pelajaran.
+    if (typeof el.__fiezelSettle === 'function') { try { el.__fiezelSettle(false); } catch (_) {} }
     return true;
   }
 
@@ -145,10 +151,26 @@
       function finish(ok) {
         if (settled) return;
         settled = true;
+        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
         if (current === el) current = null;
         if (ok) metrics.plays++; else metrics.playFailures++;
         done(ok);
       }
+      el.__fiezelSettle = finish;
+
+      // BATAS WAKTU, dan ini yang paling penting di fungsi ini.
+      //
+      // Pemuatan media lintas-origin bisa menggantung tanpa pernah memicu error - jaringan
+      // setengah hidup, portal kampus, sinyal yang datang-pergi. Tanpa batas ini janjinya
+      // tidak pernah selesai, say() tidak pernah kembali, dan mesin cadangan tidak pernah
+      // sempat dicoba: FIEZEL diam total, tanpa satu pun pesan galat. Lebih baik menyerah
+      // dalam sepuluh detik dan membiarkan mesin lain bicara.
+      el.__fiezelGuard = root.setTimeout(function () { finish(false); }, 10000);
+      el.addEventListener('playing', function () {
+        // Sudah benar-benar berbunyi. Sejak titik ini durasinya yang menentukan, bukan jam.
+        try { root.clearTimeout(el.__fiezelGuard); } catch (_) {}
+      });
+
       el.preload = 'auto';
       if (typeof opts.speed === 'number' && opts.speed > 0) el.playbackRate = opts.speed;
       if (typeof opts.onProgress === 'function') {
@@ -178,14 +200,25 @@
     });
   }
 
-  /** Meminta browser mengunduh aset lebih awal. Tidak pernah memicu produksi apa pun. */
+  /**
+   * Meminta browser mengunduh aset lebih awal. Tidak pernah memicu produksi apa pun.
+   *
+   * mode 'no-cors' dipilih dengan sengaja, dan bukan karena CORS-nya bermasalah. Elemen
+   * <audio> memuat berkasnya sebagai permintaan no-cors; permintaan CORS ke URL yang sama
+   * masuk ke kunci cache yang BERBEDA. Prefetch bermode cors karena itu akan berhasil,
+   * melaporkan sukses, dan tidak mengisi entri yang beberapa detik kemudian dicari pemutar.
+   */
   function prefetch(request) {
     return resolve(request).then(function (result) {
       if (result.state !== STATE.READY) return false;
       var f = root.fetch;
       if (typeof f !== 'function') return false;
-      return f(result.url, { cache: 'force-cache' }).then(function () { return true; })
-        .catch(function () { return false; });
+      return f(result.url, { mode: 'no-cors', cache: 'force-cache' }).then(function (res) {
+        // Respons opaque tidak punya status yang bisa dibaca, jadi 'opaque' dihitung
+        // berhasil. Yang tidak boleh terjadi adalah 404 bermode cors dilaporkan sukses -
+        // pemanggil akan melewati prefetch mesin runtime untuk kalimat yang tak punya aset.
+        return !!res && (res.type === 'opaque' || res.ok);
+      }).catch(function () { return false; });
     });
   }
 
