@@ -530,6 +530,15 @@ function auditGrammarRuntime(ctx, templates) {
   for (const t of templates) {
     if (n >= SAMPLE) break;
     state.preferences = { ...state.preferences, activeLevel: t.cefr, levelMode: 'manual' };
+    // Semua teks metadata milik template ini sendiri, untuk memisahkan "kebetulan sama"
+    // dari "benar-benar dipinjam".
+    const ownText = new Set();
+    {
+      const e = t.explanation || {};
+      for (const v of [t.pedagogicalObjective, t.misconceptionTargeted, t.reasoningOperation, t.pedagogicalObjectiveId, t.misconceptionTargetedId, t.reasoningOperationId,
+        e.whyCorrect, e.rule, e.whyOthersFail, e.howToAvoid, e.memoryCue, e.whyCorrectId, e.ruleId, e.whyOthersFailId, e.howToAvoidId, e.memoryCueId]) if (v) ownText.add(norm(v));
+      for (const d of t.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
+    }
     let questions = [];
     try { questions = ctx.buildGrammarLessonQuestions(t.subskill, 25) || []; }
     catch (e) { critical('grammar', 'GENERATOR_THREW', t.id, `buildGrammarLessonQuestions crashed for "${t.subskill}"`, e.message); continue; }
@@ -559,6 +568,31 @@ function auditGrammarRuntime(ctx, templates) {
         const report = sameBand ? major : critical;
         report('grammar', sameBand ? 'CROSS_FAMILY_FALLBACK' : 'CROSS_TOPIC_CONTAMINATION', q.sourceId || t.id,
           `lesson "${t.subskill}" (${t.family}/${t.cefr}) offers an answer option authored for ${src.id} (${src.family}/${src.cefr})`, o);
+      }
+      // Provenance pilihan: mode "pilih pernyataan yang tepat" meminjam pengecohnya dari
+      // template lain. Pinjaman itu harus meninggalkan jejak, DAN harus dijelaskan sebagai
+      // pinjaman. Tanpa jejaknya, peta miskonsepsi kartu tidak pernah cocok dan diagnosis
+      // Tutor Brain buta; tanpa penjelasan yang benar, sebuah kalimat aturan didiagnosis
+      // seolah-olah bentuk kata kerja yang keliru.
+      const answerText = q.options?.[q.answerIndex];
+      for (const d of q.explain?.distractors || []) {
+        if (d.option === answerText) continue;
+        // "Teksnya juga dimiliki template lain" BUKAN bukti pinjaman: dua lesson boleh
+        // menargetkan miskonsepsi yang sama, dan label Indonesianya memang sama. Yang
+        // menentukan hanyalah apakah kartu itu sendiri menandainya sebagai pinjaman, atau
+        // teksnya sama sekali tidak ada di metadata template ini.
+        if (ownText.has(norm(d.option))) continue;
+        const borrowed = owner.get(norm(d.option));
+        if (borrowed && borrowed.id !== q.sourceId) {
+          if (!q.optionSources || !q.optionSources[d.option]) {
+            critical('grammar', 'OPTION_PROVENANCE_LOST', q.sourceId || t.id,
+              `an option borrowed from ${borrowed.id} carries no provenance, so a wrong pick cannot be traced to the lesson actually confused`, d.option);
+          }
+          if (/belum cocok dengan waktu, fungsi, atau susunan/.test(String(d.reason))) {
+            critical('grammar', 'EXPLANATION_WRONG_KIND', q.sourceId || t.id,
+              'a borrowed rule statement is diagnosed as if it were a wrong verb form', d.reason);
+          }
+        }
       }
       if (q.sourceId && q.sourceId !== t.id) {
         critical('grammar', 'CONCEPT_IDENTITY_LOST', t.id, `question claims sourceId=${q.sourceId} inside lesson ${t.subskill}`);
