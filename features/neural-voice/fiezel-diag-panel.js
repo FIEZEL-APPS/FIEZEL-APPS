@@ -314,11 +314,11 @@
 
     var previous = root.document.createElement('button');
     previous.type = 'button';
-    previous.textContent = 'â†‘ Sebelumnya';
+    previous.textContent = '↑ Sebelumnya';
 
     var next = root.document.createElement('button');
     next.type = 'button';
-    next.textContent = 'â†“ Berikutnya';
+    next.textContent = '↓ Berikutnya';
 
     searchBar.appendChild(search);
     searchBar.appendChild(searchCount);
