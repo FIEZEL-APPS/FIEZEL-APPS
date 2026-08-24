@@ -375,6 +375,62 @@ function manifestWith(text, extra = {}) {
       'header Range diperiksa sebelum menjawab parsial');
   }
 
+  // 17. Rotasi suara. Jatah ElevenLabs habis tiap bulan dan token penggantinya datang dari
+  //     akun baru dengan voice ID baru - jadi katalog memang berisi beberapa suara sekaligus.
+  //     Aset yang dibayar bulan lalu HARUS tetap terputar bersama yang baru.
+  {
+    const AK = require(path.join(root, 'features/audio-assets/fiezel-audio-key.js'));
+    const LAMA = { voiceId: 'voice-lama', modelId: 'eleven_multilingual_v2', settings: { stability: 0.5 } };
+    const BARU = { voiceId: 'voice-baru', modelId: 'eleven_multilingual_v2', settings: { stability: 0.5 } };
+    const teksLama = 'Produced last month.';
+    const teksBaru = 'Produced this month.';
+    const kunciLama = AK.build({ text: teksLama, locale: 'en-US', contentType: 'sentence', ...LAMA });
+    const kunciBaru = AK.build({ text: teksBaru, locale: 'en-US', contentType: 'sentence', ...BARU });
+
+    const doc = {
+      schema: 'fiezel-audio-manifest-v1',
+      version: 9,
+      voiceProfile: BARU,
+      voiceProfiles: [BARU, LAMA],
+      assets: {
+        [kunciLama.audioKey]: { url: 'a/lama.mp3', contentType: 'sentence', locale: 'en-US', voiceId: LAMA.voiceId, modelId: LAMA.modelId, bytes: 100, status: 'ready' },
+        [kunciBaru.audioKey]: { url: 'a/baru.mp3', contentType: 'sentence', locale: 'en-US', voiceId: BARU.voiceId, modelId: BARU.modelId, bytes: 100, status: 'ready' }
+      }
+    };
+    const user = makeUser(doc, { config: null });
+
+    const lama = await user.resolver.resolve(teksLama);
+    check('Aset dari suara lama tetap bisa diputar setelah suara berganti',
+      lama.state === 'READY' && lama.url.endsWith('a/lama.mp3'),
+      `${lama.state} ${lama.url || lama.reason}`);
+
+    const baru = await user.resolver.resolve(teksBaru);
+    check('Aset dari suara baru juga ditemukan',
+      baru.state === 'READY' && baru.url.endsWith('a/baru.mp3'),
+      `${baru.state} ${baru.url || baru.reason}`);
+
+    // Teks yang dimiliki KEDUA suara harus jatuh ke yang terkini, supaya konten baru
+    // terdengar konsisten alih-alih berganti-ganti suara tanpa pola.
+    const teksDua = 'Owned by both voices.';
+    const duaLama = AK.build({ text: teksDua, locale: 'en-US', contentType: 'sentence', ...LAMA });
+    const duaBaru = AK.build({ text: teksDua, locale: 'en-US', contentType: 'sentence', ...BARU });
+    doc.assets[duaLama.audioKey] = { url: 'a/dua-lama.mp3', contentType: 'sentence', locale: 'en-US', voiceId: LAMA.voiceId, modelId: LAMA.modelId, bytes: 100, status: 'ready' };
+    doc.assets[duaBaru.audioKey] = { url: 'a/dua-baru.mp3', contentType: 'sentence', locale: 'en-US', voiceId: BARU.voiceId, modelId: BARU.modelId, bytes: 100, status: 'ready' };
+    const keduanya = await makeUser(doc, { config: null }).resolver.resolve(teksDua);
+    check('Teks yang dimiliki dua suara memakai suara terkini',
+      keduanya.state === 'READY' && keduanya.url.endsWith('a/dua-baru.mp3'),
+      String(keduanya.url));
+
+    // Generator tidak boleh membeli ulang teks yang sudah bersuara di profil mana pun.
+    const toolSrc2 = fs.readFileSync(path.join(root, 'tools/audio-batch-generate.mjs'), 'utf8');
+    check('Generator melewati teks yang sudah bersuara di suara mana pun',
+      /for \(const profile of profiles\)/.test(toolSrc2) && /voiced = true/.test(toolSrc2),
+      'pemeriksaan sudah-siap menelusuri seluruh profil');
+    check('Riwayat suara ikut ditulis ke manifest',
+      /manifest\.voiceProfiles = profiles/.test(toolSrc2),
+      'voiceProfiles tersimpan');
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     counts: { pass: checks.filter(i => i.status === 'PASS').length, fail: checks.filter(i => i.status === 'FAIL').length },

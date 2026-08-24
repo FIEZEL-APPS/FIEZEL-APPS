@@ -44,6 +44,38 @@ yang benar-benar disajikan, lalu membaca metriknya.
 
 ---
 
+## Rotasi token: alur tetap, bukan kejadian luar biasa
+
+Jatah ElevenLabs habis tiap bulan dan OWNER membuat akun baru — token baru, **voice ID baru**.
+Sejak m025-153 ini tidak lagi merusak apa pun.
+
+**Yang perlu dilakukan saat OWNER bilang "sudah create token dan voice ID baru":**
+
+1. OWNER sendiri memperbarui secret `ELEVENLABS_API_KEY` (kunci API tidak pernah lewat chat).
+2. Pasang voice ID-nya:
+   `gh secret set ELEVENLABS_VOICE_ID --body '<id>'`
+   Gunakan `--body`, **jangan pipe** — pipe PowerShell menambahkan baris baru di ujung, dan
+   itu pernah merusak `CLOUDFLARE_ACCOUNT_ID` selama satu jam penuh.
+3. Jalankan produksi. Tidak ada langkah lain, tidak ada flag khusus.
+
+**Kenapa tidak ada yang perlu diutak-atik:** `audio/manifest.json` menyimpan `voiceProfiles` —
+setiap suara yang pernah dipakai, yang terkini di urutan pertama. Resolver mencoba semuanya,
+jadi aset yang dibayar bulan-bulan lalu tetap terputar berdampingan dengan yang baru.
+Generator melewati teks yang sudah bersuara di profil **mana pun**, jadi pergantian token
+tidak pernah membeli ulang yang sudah dimiliki.
+
+OWNER memang menghendaki variasi suara antar-angkatan konten; itu keputusan produk, bukan
+efek samping yang perlu dirapikan.
+
+**Suara yang sudah dipakai:**
+
+| Voice ID | Catatan |
+|---|---|
+| `KuNebS8MGzRaopODTydg` | akun 1, 127 aset — 77 listening A1 + 50 kosakata |
+| `hZClfFgpVdl548zhrwyC` | akun 2, mulai dipakai m025-153 |
+
+---
+
 ## Apa yang berubah
 
 Memutar audio kini normalnya berarti mengambil berkas yang sudah disetujui. Produksi suara
