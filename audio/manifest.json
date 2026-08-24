@@ -13,7 +13,7 @@
     }
   },
   "budget": {
-    "note": "Jatah owner 2026-08: 9.650 karakter tersisa (paket gratis ElevenLabs). Batas 2.000 per run dipilih supaya satu perintah yang salah tidak bisa menghabiskan lebih dari seperlima sisa jatah, dan supaya bank kosakata terbangun bertahap lewat beberapa run yang masing-masing bisa diperiksa. Naikkan angka ini kalau paket berbayar aktif.",
+    "note": "Jatah 2026-08 SUDAH HABIS: 9.650 karakter terpakai seluruhnya - 895 untuk 50 aset kosakata, 8.587 untuk 77 aset listening A1. Produksi berikutnya baru mungkin setelah jatah bulanan ElevenLabs disetel ulang, atau paket berbayar aktif. Sisa di A1 tinggal listen_sc_a1_gist_040 (189 karakter); A2 butuh 11.530 karakter, seluruh sisa bank 88.588. Batas 2.000 per run dipertahankan supaya satu perintah yang salah tidak bisa menghabiskan lebih dari seperlima jatah baru.",
     "maxCharactersPerRun": 2000,
     "maxAssetsPerRun": 400
   },
