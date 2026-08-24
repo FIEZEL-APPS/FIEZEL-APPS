@@ -1,0 +1,83 @@
+# m025-150 produksi aset audio ElevenLabs.
+#
+# Hanya workflow_dispatch. TIDAK ADA pemicu push, schedule, atau pull_request, dan itu
+# disengaja: satu-satunya cara kredit terpakai adalah seseorang membukanya dan menekan
+# tombol. Mandat V2 pasal 11 meminta batch besar melewati persetujuan manusia, dan
+# ketiadaan pemicu otomatis adalah bentuk paling sederhana dari persetujuan itu.
+#
+# apply bawaannya kosong. Menjalankan workflow ini tanpa mengubah apa pun akan melaporkan
+# rencananya dan berhenti - tidak satu karakter pun dikirim.
+name: FIEZEL Audio Assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      content:
+        description: 'Kumpulan konten: vocabulary | listening | reading'
+        required: true
+        default: 'vocabulary'
+      limit:
+        description: 'Jumlah aset maksimum untuk sekali jalan (0 = ikut anggaran manifest)'
+        required: false
+        default: '50'
+      apply:
+        description: 'Ketik APPLY untuk benar-benar memproduksi. Selain itu tetap dry-run.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  # Dua jalan bersamaan akan memproduksi kunci yang sama dua kali dan bertabrakan saat
+  # menulis manifest. Pasal 5 - satu pekerjaan saja per kunci - dijaga di sini pada
+  # tingkat yang paling kasar sekaligus paling sulit dilanggar.
+  group: fiezel-audio-generate
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Rencana (dry-run)
+        env:
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_MODEL_ID: ${{ secrets.ELEVENLABS_MODEL_ID }}
+        run: |
+          node tools/audio-batch-generate.mjs \
+            --content='${{ inputs.content }}' \
+            --limit='${{ inputs.limit }}'
+
+      - name: Produksi
+        if: ${{ inputs.apply == 'APPLY' }}
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ELEVENLABS_VOICE_ID: ${{ secrets.ELEVENLABS_VOICE_ID }}
+          ELEVENLABS_MODEL_ID: ${{ secrets.ELEVENLABS_MODEL_ID }}
+        run: |
+          node tools/audio-batch-generate.mjs \
+            --content='${{ inputs.content }}' \
+            --limit='${{ inputs.limit }}' \
+            --apply
+
+      - name: Pemeriksaan rahasia sebelum commit
+        if: ${{ inputs.apply == 'APPLY' }}
+        run: node audio-asset-pipeline-test.js
+
+      - name: Simpan aset
+        if: ${{ inputs.apply == 'APPLY' }}
+        run: |
+          if [ -z "$(git status --porcelain audio)" ]; then
+            echo 'Tidak ada aset baru.'
+            exit 0
+          fi
+          git config user.name 'fiezel-audio-bot'
+          git config user.email 'noreply@github.com'
+          git add audio
+          git commit -m "Audio: aset ${{ inputs.content }} hasil produksi terkendali"
+          git push
