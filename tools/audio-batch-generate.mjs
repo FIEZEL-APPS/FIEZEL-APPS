@@ -266,7 +266,17 @@ async function verifyVoice(voiceId, apiKey) {
     return `jaringan ke ElevenLabs gagal: ${error?.message || 'error'}`;
   }
   if (response.status === 401 || response.status === 403) {
-    return 'ELEVENLABS_API_KEY ditolak. Periksa kuncinya di secret repositori.';
+    // Badan responsnya dibaca, sama seperti di jalur sintesis. Tanpa ini, kunci yang salah
+    // dan jatah yang habis terlihat identik - dan keduanya butuh tindakan yang berbeda:
+    // yang satu ganti kunci, yang satu tunggu jatah. Menebaknya memakan waktu berjam-jam.
+    let detail = '';
+    try { detail = (await response.text()).slice(0, 300).replace(/\s+/g, ' '); } catch (_) {}
+    if (/quota|credit|limit|exceeded/i.test(detail)) {
+      return `Kuota ElevenLabs pada kunci ini sudah habis (HTTP ${response.status}: ${detail})`;
+    }
+    return detail
+      ? `ELEVENLABS_API_KEY ditolak (HTTP ${response.status}: ${detail})`
+      : `ELEVENLABS_API_KEY ditolak (HTTP ${response.status}, tanpa keterangan).`;
   }
   if (response.status === 404) {
     const hint = voiceId.length === 20
