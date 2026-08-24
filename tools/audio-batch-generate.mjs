@@ -314,8 +314,17 @@ async function synthesize(identity, apiKey) {
 
     // Kuota habis dan kunci ditolak TIDAK diulang. Mengulangnya tidak pernah berhasil, dan
     // setiap percobaan tambahan hanya memperpanjang jalannya runner sebelum gagal juga.
-    if (response.status === 401 || response.status === 403) return { fatal: 'auth_rejected' };
-    if (response.status === 429) return { fatal: 'quota_or_rate_limited' };
+    // Kuota habis TIDAK selalu datang sebagai 429. Pada paket gratis ElevenLabs ia datang
+    // sebagai 401 dengan sebab di badan respons, jadi status saja akan melaporkannya sebagai
+    // "kunci ditolak" - dan bulan depan seseorang akan membuang waktu mengganti kunci yang
+    // sebenarnya baik-baik saja. Badan responsnya dibaca supaya keduanya bisa dibedakan.
+    if (response.status === 401 || response.status === 403 || response.status === 429) {
+      let detail = '';
+      try { detail = (await response.text()).slice(0, 300).replace(/\s+/g, ' '); } catch (_) {}
+      const quotaish = /quota|credit|limit|exceeded/i.test(detail) || response.status === 429;
+      const label = quotaish ? 'kuota ElevenLabs habis' : 'ELEVENLABS_API_KEY ditolak';
+      return { fatal: detail ? `${label} (HTTP ${response.status}: ${detail})` : `${label} (HTTP ${response.status})` };
+    }
     if (!response.ok) {
       // Badan responsnya ikut dibaca. "http_422" sendirian tidak memberi tahu apa pun;
       // ElevenLabs biasanya menjelaskan persis field mana yang ditolaknya.
