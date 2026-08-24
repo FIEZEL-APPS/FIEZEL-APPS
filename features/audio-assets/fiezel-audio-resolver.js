@@ -142,15 +142,26 @@
     }).catch(function () { return false; });
   }
 
+  /**
+   * Mode CORS, BUKAN no-cors, dan perbedaannya menentukan hidup-matinya pemutaran.
+   *
+   * no-cors menghasilkan respons opaque: statusnya 0 dan badannya tidak bisa dibaca, jadi
+   * .blob() mengembalikan blob berukuran 0 byte. Lapisan cache ini membangun object URL dari
+   * blob itu, sehingga setiap aset gagal diputar tanpa satu pun galat - resolve() menjawab
+   * READY, play() menjawab false, dan seluruh katalog berbayar diam-diam jatuh kembali ke
+   * mesin lama. Diukur di produksi: no-cors memberi 0 byte, cors memberi 10.075 byte untuk
+   * berkas yang sama.
+   *
+   * CORS aman di sini karena Worker R2 memang menyajikan 'access-control-allow-origin: *'
+   * beserta 'vary: origin'. Aset ini publik dan tidak membawa kredensial.
+   */
   function loadForPlayback(url) {
     return cachedResponse(url).then(function (cached) {
       if (cached) return cached;
       var f = root.fetch;
       if (typeof f !== 'function') return null;
-      return f(url, { mode: 'no-cors', cache: 'force-cache' }).then(function (response) {
-        if (!response) return null;
-        // Opaque responses are valid for audio playback but cannot be inspected.
-        // Keep a copy in Cache API and return the original response for playback.
+      return f(url, { cache: 'force-cache' }).then(function (response) {
+        if (!response || !response.ok) return null;
         storeResponse(url, response);
         return response;
       }).catch(function () { return null; });
@@ -222,10 +233,13 @@
       if (result.state !== STATE.READY) return false;
       var f = root.fetch;
       if (typeof f !== 'function') return false;
-      return f(result.url, { mode: 'no-cors', cache: 'force-cache' }).then(function (res) {
-        if (!res) return false;
+      // Mode yang sama dengan loadForPlayback. Kalau keduanya berbeda, prefetch mengisi
+      // entri cache yang tidak akan pernah dicari pemutar - sukses semu yang membuat
+      // pemanggil melewati prefetch mesin runtime untuk kalimat yang tetap belum siap.
+      return f(result.url, { cache: 'force-cache' }).then(function (res) {
+        if (!res || !res.ok) return false;
         storeResponse(result.url, res);
-        return !!res && (res.type === 'opaque' || res.ok);
+        return true;
       }).catch(function () { return false; });
     });
   }

@@ -1,10 +1,46 @@
 # FIEZEL m025-150 — Audio ElevenLabs cache-first di atas Cloudflare R2
 
-**Status:** implementasi selesai, bukti fisik BELUM ada. PR #204 sengaja ditahan sebagai
-draft sampai OWNER benar-benar mendengar audionya di perangkat.
+**Status:** pipeline hidup, 127 aset terproduksi, jatah 2026-08 habis. Bukti fisik oleh OWNER
+masih terutang; syaratnya dilepas sebagai WAIVER, bukan bukti.
 
 **Otoritas:** OWNER memutuskan arsitekturnya (mandat V2, penyimpanan Tier A di R2, bukan
 Puter). MASTER/OWNER yang memegang wewenang rilis; berkas ini tidak memberi wewenang apa pun.
+
+---
+
+## Keadaan per m025-152
+
+| | |
+|---|---|
+| Worker | `https://fiezel-audio.fitrajft.workers.dev`, hanya-baca, `writable: false` |
+| Bucket R2 | `fiezel-audio` |
+| Manifest | v7, **127 aset**, 8,54 MB |
+| Listening A1 | 77 dari 78 skrip unik |
+| Kosakata | 25 kata + 25 kalimat |
+| Jatah 2026-08 | **habis** — 9.482 dari 9.650 karakter |
+| Suara | `KuNebS8MGzRaopODTydg` ("Fizell") |
+
+### Tiga jebakan yang sudah ditemukan dan ditutup
+
+Ketiganya sama bentuknya: **aplikasi tampak sehat, aset tampak siap, dan tidak ada satu pun
+galat** — tetapi tidak ada suara yang keluar. Ketiganya hanya ketahuan dengan menjalankan
+FIEZEL yang sungguhan, bukan dari tes.
+
+1. **Urutan resolver.** `resolve()` menghitung identitas sebelum memuat manifest, padahal
+   profil suara ada di dalam manifest. Ia menyerah dengan `no_voice_profile`, dan karena
+   menyerah, manifest tidak pernah dimuat — buntu permanen.
+2. **Mode pengambilan.** Lapisan cache persisten memakai `no-cors`; respons opaque memberi
+   blob 0 byte, jadi object URL selalu kosong. `resolve()` tetap `READY`, `play()` menjawab
+   `false`, seluruh katalog jatuh diam-diam ke mesin lama. Diukur: `no-cors` 0 byte, `cors`
+   10.075 byte untuk berkas yang sama.
+3. **Voice ID yang bergeser.** Mengganti token ElevenLabs ikut mengganti voice ID, dan voice
+   ID masuk ke `audioKey`. Dry-run melaporkan `sudah siap: 0` padahal 127 aset ada di R2.
+   Satu jalan `--apply` akan memproduksi ulang semuanya dan menelantarkan yang lama.
+   Dijaga sekarang oleh `compareVoiceWithManifest()`, yang berjalan lokal tanpa API.
+
+**Pelajaran untuk siapa pun yang melanjutkan:** gate yang membaca kode tidak menangkap satu
+pun dari ketiganya. Yang menangkap adalah menjalankan `resolve()` dan `play()` di aplikasi
+yang benar-benar disajikan, lalu membaca metriknya.
 
 ---
 
