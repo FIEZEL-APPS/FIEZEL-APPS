@@ -346,6 +346,24 @@ function manifestWith(text, extra = {}) {
       `${blankFound.state} ${blankFound.reason || ''}`);
   }
 
+  // 16. Pemutaran tidak boleh mengambil aset dengan mode no-cors.
+  //
+  //     Respons opaque berstatus 0 dan badannya tidak bisa dibaca, jadi .blob() memberi
+  //     0 byte. Lapisan cache membangun object URL dari blob itu, dan setiap aset gagal
+  //     diputar TANPA satu pun galat: resolve() tetap READY, play() menjawab false, dan
+  //     seluruh katalog berbayar diam-diam jatuh ke mesin lama. Terjadi di produksi dan
+  //     hanya ketahuan karena diuji di aplikasi sungguhan - gate ini menutup jalan itu.
+  {
+    const src = fs.readFileSync(path.join(root, 'features/audio-assets/fiezel-audio-resolver.js'), 'utf8');
+    const code = src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    check('Pengambilan aset tidak memakai mode no-cors',
+      !/no-cors/.test(code),
+      'tidak ada no-cors di kode');
+    check('Respons yang tidak ok tidak diperlakukan sebagai berhasil',
+      /response\.ok/.test(code) && /res\.ok/.test(code),
+      'status respons diperiksa di kedua jalur');
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     counts: { pass: checks.filter(i => i.status === 'PASS').length, fail: checks.filter(i => i.status === 'FAIL').length },
