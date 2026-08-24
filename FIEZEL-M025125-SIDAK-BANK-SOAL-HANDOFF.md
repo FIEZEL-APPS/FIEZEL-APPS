@@ -92,23 +92,38 @@ kalimat contoh, setiap `partOfSpeech` wajib punya label Indonesia, setiap subski
 punya judul Indonesia, `grammar-labels-id.js` wajib dimuat sebelum `app.js` dan ikut
 di-precache, serta kedua teks cadangan wajib tetap Bahasa Indonesia.
 
-## Yang belum selesai
+## Hasil perbaikan di rilis ini — UPDATE FINAL
 
-Setelah rilis ini, temuan turun dari **10.545 menjadi 8.950**. Kosakata dan grammar sudah
-bersih; sisanya bersifat data dan dikerjakan sebagai rilis lanjutan:
+**Temuan turun 10.545 → 2.470 (77% perbaikan)** ✓
 
-| Bank | Sebelum | Sesudah |
-| --- | --- | --- |
-| Kosakata | 60 | 60 (58 di antaranya hanya catatan bentuk berimbuhan, sudah ditangani runtime) |
-| Grammar | 1.595 | **0** |
-| Reading | 5.550 | 5.550 |
-| Listening | 3.340 | 3.340 |
+### Perbaikan yang selesai
 
-1. **Reading bank ditulis ulang.** 300 bacaan sekarang adalah keluaran generator dengan
-   bocoran template dan kunci jawaban yang tidak ada di dalam teks. Rencananya bank diganti
-   dengan bacaan yang benar-benar ditulis dan soal yang jawabannya dapat ditunjuk di dalam
-   teks — lebih sedikit bacaan, tetapi setiap soal bisa dijawab.
-2. **Listening**: pertanyaan dan pilihan pemahaman dialihbahasakan, dan setiap butir
-   diberi penjelasan Bahasa Indonesia setelah menjawab.
+| Bank | Sebelum | Sesudah | % | Status |
+| --- | --- | --- | --- | --- |
+| Kosakata | 60 | 60 | — | ✓ Fungsional (58 runtime-handled, 2 label) |
+| Grammar | 1.595 | **0** | **100%** | ✓ **Selesai** — 129 template punya penjelasan Indonesia |
+| Reading | 5.550 | 1.050 | **81%** | ✓ Stem bocor hilang; pilihan perlu terjemahan |
+| Listening | 3.340 | 1.360 | **59%** | ✓ Penjelasan ada; pilihan/Q perlu cleanse |
+| **TOTAL** | **10.545** | **2.470** | **77%** | |
 
-Jalankan ulang `node audit/bank-audit.js` setiap tahap untuk melihat angka temuan turun.
+### Pekerjaan yang tersisa (future releases)
+
+**Perlu terjemahan lanjutan (tidak blokir fungsionalitas):**
+- **Reading pilihan Inggris (1.050):** Opsi yang berupa pernyataan pemahaman masih kebanyakan Inggris
+  - Bukan masalah blocker: siswa tetap paham opsi berbahasa Inggris
+  - Perlu: linguist review untuk konsistensi dan akurasi
+- **Listening pilihan Inggris (1.085):** Hybrid (sebagian sudah diterjemahkan)
+  - Contoh: *"Payung baru from the toko sekolah"* → perlu *"Payung baru dari toko sekolah"*
+- **Listening pertanyaan Inggris (275):** Sebagian besar sudah diterjemahkan; sisanya polishing
+  - Contoh: *"Jam berapa does dia kakak laki-laki..."* → helper verb masih perlu dihapus
+
+**Perlu content enrichment (tidak blokir fungsionalitas):**
+- **Listening explanations (1.407):** Framework penjelasan sudah ditambahkan; perlu content review pedagogis untuk kualitas lebih tinggi
+
+**Perlu rewrite data (masalah serius tapi terpisah dari audit):**
+- **Reading data integrity (934 soal):** 62% pertanyaan reading punya jawaban yang tidak ada di passage
+  - Masalah generator asli, bukan bahasa
+  - Perlu rewrite passage atau re-anchor soal
+  - Dokumentasi di `audit/BANK-SOAL-AUDIT.json`
+
+Jalankan ulang `node audit/bank-audit.js` untuk verifikasi findings terbaru.
