@@ -2,6 +2,8 @@ const fs=require('fs'),path=require('path'),crypto=require('crypto');
 const ROOT=__dirname;
 const CONTENT_QA_SCHEMA='fiezel-content-qa-v1';
 const REVIEW_QUEUE_LIMIT=200;
+// Ambang yang sama dipakai untuk stem grammar dan bacaan, supaya "mirip" punya satu definisi.
+const NEAR_DUPLICATE_PASSAGE_SIMILARITY=0.86;
 const LEVELS=['A1','A2','B1','B2','C1','C2'];
 const text=v=>String(v??'').trim();
 const norm=v=>text(v).toLowerCase().normalize('NFKC').replace(/[“”‘’]/g,"'").replace(/[^a-z0-9']+/g,' ').replace(/\s+/g,' ').trim();
@@ -58,6 +60,25 @@ function auditContent(input){
     });
   }
   for(const [shape,ids] of shapeGroups)if(ids.length>=12)add('reading',ids[0],'repetition','review','Reading question wording template is reused heavily; review for mechanical practice.',{count:ids.length,samples:ids.slice(0,5),shape:shape.slice(0,180)});
+  // m025-149: bacaan yang SAMA PERSIS sudah tertangkap di atas, tetapi bank ini dibangun dari
+  // template. Puluhan bacaan memakai kerangka kalimat yang identik dan hanya menukar topik dan
+  // nama tokohnya, sehingga pemeriksaan exact-match tidak melihat satu pun - padahal justru
+  // bentuk pengulangan inilah yang paling merugikan: murid belajar mengenali polanya, bukan
+  // membaca teksnya. Dilaporkan per KELOMPOK, bukan per pasangan, supaya satu template yang
+  // dipakai 24 kali muncul sebagai satu temuan dan bukan 276.
+  const nearDuplicateSeen=new Set();
+  for(let i=0;i<reading.length;i++){
+    const a=reading[i],aid=text(a.id);if(nearDuplicateSeen.has(aid))continue;
+    const cluster=[];
+    for(let j=i+1;j<reading.length;j++){
+      const b=reading[j],bid=text(b.id);if(nearDuplicateSeen.has(bid))continue;
+      if(jaccard(a.text,b.text)>=NEAR_DUPLICATE_PASSAGE_SIMILARITY){cluster.push(bid);nearDuplicateSeen.add(bid)}
+    }
+    if(!cluster.length)continue;
+    nearDuplicateSeen.add(aid);
+    add('reading',aid,'repetition','review','Reading passages are near-duplicates: the same sentence frame with a swapped topic, which trains pattern recognition rather than reading.',{count:cluster.length+1,samples:[aid,...cluster].slice(0,5),similarity:NEAR_DUPLICATE_PASSAGE_SIMILARITY});
+  }
+
   for(const [option,rec] of wrongOptionFreq)if(rec.count>=20)add('reading',rec.samples[0]||'', 'weak_distractor','review','The same reading distractor is reused frequently and may become guessable by pattern.',{count:rec.count,samples:rec.samples,option:option.slice(0,180)});
   const med=a=>{const x=[...a].sort((m,n)=>m-n);return x.length?x[Math.floor(x.length/2)]:0};
   const difficulty={};for(const level of LEVELS){const rows=levelMetrics[level],mw=med(rows.map(x=>x.words)),ms=med(rows.map(x=>x.sentenceAvg));difficulty[level]={passages:rows.length,medianWords:mw,medianSentenceWords:Number(ms.toFixed(1))}}
