@@ -492,8 +492,75 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .passage h3{margin:5px 0 8px;font-size:1.02rem}
 .passage p{white-space:pre-wrap}
 .flash-back .muted{margin-top:12px}
-.confidence-box{margin-top:16px;padding:14px;border:1px solid var(--line);border-radius:16px;background:var(--surface-solid)}
-.confidence-box .actions{margin-top:10px}
+/* ==========================================================================
+   Popup keyakinan (m025-133)
+   ==========================================================================
+   Percobaan ketiga, dan dua yang gagal sebelumnya layak dicatat karena keduanya salah
+   dengan cara yang sama: kotak ini selalu dipindah TEMPATNYA, sementara masalahnya soal
+   WAKTU. Di dasar panel umpan balik ia harus dicari dengan menggulir. Mengambang di dasar
+   layar ia justru menutupi tombol Lanjut.
+
+   Sebagai popup ia tidak perlu dicari dan tidak menghalangi apa pun - karena ia SENDIRI
+   yang membawa tombol Lanjutnya, persis yang diminta OWNER.
+
+   Ukurannya sengaja kecil dan duduk agak ke bawah: penjelasan jawaban ada di halaman di
+   baliknya, dan latar gelapnya dibuat tipis supaya halaman itu tetap terlihat. Popup yang
+   menutup pelajarannya sendiri akan menukar satu masalah dengan masalah lain.
+   -------------------------------------------------------------------------- */
+.confidence-pop{
+  position:fixed;inset:0;z-index:2147481400;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:14px 14px calc(20px + env(safe-area-inset-bottom));
+  background:rgba(43,33,24,.28);
+}
+.confidence-card{
+  width:min(420px,100%);
+  padding:16px;border-radius:24px;
+  border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.98);
+  box-shadow:0 3px 0 var(--ink),0 22px 50px rgba(43,33,24,.3);
+}
+.confidence-verdict{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
+.confidence-verdict svg{width:20px;height:20px;flex:none}
+.confidence-verdict.is-ok{color:var(--green,#2E8B69)}
+.confidence-verdict.is-no{color:var(--accent-strong)}
+.confidence-q{margin:0 0 9px;font-size:.88rem;font-weight:700;color:var(--text)}
+
+.confidence-scale{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.confidence-scale button{
+  flex-direction:column;gap:2px;min-height:62px;padding:9px 4px;
+  font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;border-radius:15px;
+}
+.confidence-scale button span{font-size:1.15rem;font-weight:850;line-height:1;font-variant-numeric:tabular-nums}
+/* Tiga tingkat, tiga warna - supaya terbaca sebagai SKALA, bukan tiga tombol yang
+   kebetulan bersebelahan. */
+.confidence-scale button:nth-child(1){background:var(--coral-soft)}
+.confidence-scale button:nth-child(2){background:var(--yellow-soft)}
+/* Tinta tombol ketiga dipasang EKSPLISIT. --yellow beku di kedua tema, sementara tinta
+   yang diwarisi ikut berbalik jadi krem di mode gelap - krem di atas kuning. */
+.confidence-scale button:nth-child(3){background:var(--yellow);color:var(--ink)}
+
+.confidence-skip{
+  display:block;width:100%;margin-top:10px;min-height:0;padding:6px;
+  background:none;border:0;box-shadow:none;
+  color:var(--muted);font-size:.78rem;font-weight:650;text-decoration:underline;
+}
+.confidence-skip:hover{background:none;box-shadow:none;transform:none;color:var(--text)}
+
+.confidence-saved{
+  display:flex;align-items:center;gap:6px;margin:0 0 12px;
+  font-size:.86rem;font-weight:700;color:var(--green,#2E8B69);
+}
+.confidence-saved svg{width:16px;height:16px}
+.confidence-go{width:100%;min-height:54px;font-size:1rem;font-weight:800}
+
+@media (prefers-reduced-motion:no-preference){
+  .confidence-pop{animation:fzPopFade .2s var(--ease) both}
+  .confidence-card{animation:fzPopRise .32s cubic-bezier(.3,1.12,.5,1) both}
+  @keyframes fzPopFade{from{opacity:0}to{opacity:1}}
+  @keyframes fzPopRise{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+  .confidence-pop.is-out{animation:fzPopFade .2s var(--ease) reverse both}
+}
+.confidence-pop.is-out{opacity:0;pointer-events:none}
 .creator-credit{display:flex;align-items:center;gap:9px;margin-top:10px;color:var(--muted);font-size:.82rem}
 .instagram-mark{width:22px;height:22px;border:2px solid var(--black);border-radius:7px;display:inline-grid;place-items:center;font-size:16px;line-height:1}
 .grid>div>h3{margin:4px 2px 12px;font-size:1rem}
@@ -538,6 +605,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --accent-soft:#FDE3DE;
   --black:#2B2118;
   --gold:#C9A24B;
+  /* m025-127 wordmark topbar. Empat token ini ada karena logonya BUKAN teks: ia SVG dengan
+     gradien di dalamnya, jadi ia tidak ikut --ambient-text dan tidak ikut berbalik di mode
+     gelap. Sampai m025-118 itu benar - topbarnya maroon gelap dan gading di atasnya terbaca.
+     Sejak dasar berubah jadi cream (m025-119/120), gading #FFFBF3 duduk di atas cream
+     #FFF9EE: 1,02:1. Bukan "kurang kontras" - benar-benar tidak terlihat.
+
+     Perannya persis peran yang brief palet berikan: coklat sebagai TINTA untuk hurufnya,
+     terracotta sebagai AKSEN untuk dua balok. Tidak ada warna baru yang ditambahkan. */
+  --wordmark-ink-hi:#2B2118;
+  --wordmark-ink-lo:#4A382A;
+  --wordmark-accent-hi:#C9432F;
+  --wordmark-accent-lo:#A33422;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
   --red:#C9503A;
@@ -588,95 +667,6 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --fz-heading:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 }
-
-/* ==========================================================================
-   Mode gelap (Audit UX Bagian 5)
-   Diletakkan TEPAT setelah palet v6 supaya cascade-nya terbaca lurus: palet terang
-   dulu, lalu penimpaan gelap. Nilainya diturunkan dari v6, bukan dari blok v5 di
-   kepala berkas. Dua selektor dipakai karena keduanya menangani kasus berbeda:
-   media query melayani preferensi sistem, atribut data-theme melayani sakelar manual
-   di Pengaturan - dan atribut harus tetap menang di kedua arah.
-   ========================================================================== */
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --sky-top:#3E3020;--sky-bottom:#1C160E;--scene-light:rgba(255,224,126,.14);
-    /* m025-117: bidang pastel LEMBUT wajib punya pasangan gelap.
-       Tanpa ini bidangnya beku terang sementara tintanya berbalik jadi terang juga -
-       persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
-       dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
-       berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
-    --cream:#221A11;--cream-deep:#2A2016;
-    --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
-    --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
-    --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
-    --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
-    --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
-    --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
-    --black:#2B2118;--gold:#DCBA72;
-    --green:#8FD8BC;--green-soft:#1B322A;--red:#F3A292;--red-soft:#3B241D;
-    --glass-thin:rgba(49,38,26,.60);--glass-regular:rgba(49,38,26,.72);--glass-thick:rgba(39,29,20,.84);--glass-solid:rgba(39,29,20,.98);
-    --glass-edge:rgba(255,246,230,.16);--glass-text:#FFF6E6;--glass-muted:#DCCBAE;--glass-line:rgba(255,246,230,.14);
-    --surface-rgb:39,29,20;--surface-pure-rgb:47,36,25;--bg-rgb:28,22,14;
-    --surface-solid:#271D14;--surface-tint:#2F2418;--surface-warm:#31261A;--surface-cool:#25231C;
-    --surface-edge:#48381F;--surface-edge-strong:#57452C;--surface-mute:#33281B;--ink-soft:#EADCC2;--ink-danger:#F8B8A6;
-    --shadow-sm:0 8px 24px rgba(0,0,0,.38);--shadow-md:0 20px 50px rgba(0,0,0,.48);--shadow-lg:0 34px 90px rgba(0,0,0,.62);
-  }
-}
-:root[data-theme="dark"]{
-    --sky-top:#3E3020;--sky-bottom:#1C160E;--scene-light:rgba(255,224,126,.14);
-    /* m025-117: bidang pastel LEMBUT wajib punya pasangan gelap.
-       Tanpa ini bidangnya beku terang sementara tintanya berbalik jadi terang juga -
-       persis bug m025-113, dan itu terjadi lagi di lima permukaan. Yang TIDAK ikut
-       dibalik hanyalah bidang pastel PEKAT (--yellow, --coral) yang memang selalu
-       berpasangan dengan --ink coklat di tombol chunky, di kedua tema. */
-    --cream:#221A11;--cream-deep:#2A2016;
-    --yellow-soft:#3A2E12;--coral-soft:#3B231D;--mint-soft:#1C302A;--lilac-soft:#292145;
-    --ambient-text:#FFF6E6;--ambient-muted:#CDBB9C;
-    --chrome-bg:rgba(32,24,16,.80);--launcher-start:#3E2F16;--launcher-end:#6B5322;
-    --bg:#1C160E;--panel:#271D14;--panel-soft:#31261A;--line:#3F3122;--line-soft:#34281C;
-    --text:#FFF6E6;--muted:#CDBB9C;--muted-soft:#AB997C;
-    --accent:#F08A78;--accent-strong:#F5A996;--accent-soft:#3B231D;
-    --black:#2B2118;--gold:#DCBA72;
-    --green:#8FD8BC;--green-soft:#1B322A;--red:#F3A292;--red-soft:#3B241D;
-    --glass-thin:rgba(49,38,26,.60);--glass-regular:rgba(49,38,26,.72);--glass-thick:rgba(39,29,20,.84);--glass-solid:rgba(39,29,20,.98);
-    --glass-edge:rgba(255,246,230,.16);--glass-text:#FFF6E6;--glass-muted:#DCCBAE;--glass-line:rgba(255,246,230,.14);
-    --surface-rgb:39,29,20;--surface-pure-rgb:47,36,25;--bg-rgb:28,22,14;
-    --surface-solid:#271D14;--surface-tint:#2F2418;--surface-warm:#31261A;--surface-cool:#25231C;
-    --surface-edge:#48381F;--surface-edge-strong:#57452C;--surface-mute:#33281B;--ink-soft:#EADCC2;--ink-danger:#F8B8A6;
-    --shadow-sm:0 8px 24px rgba(0,0,0,.38);--shadow-md:0 20px 50px rgba(0,0,0,.48);--shadow-lg:0 34px 90px rgba(0,0,0,.62);
-}
-/* m025-120: --black tidak lagi memikul dua peran. Dulu ia sekaligus permukaan tombol
-   utama DAN warna teks beberapa label, dan itulah yang membuat coklat mendominasi
-   layar: setiap tombol besar adalah satu bidang coklat. Bidangnya kini pindah ke aksen
-   kuning brief (tinta --ink, 10,9:1), dan --black tersisa hanya sebagai TINTA dan GARIS -
-   persis peran yang brief berikan untuk coklat. Tiga pemakaian teks yang tersisa tetap
-   perlu dialihkan ke aksen terang di mode gelap, karena coklat pekat tidak terbaca di
-   atas panel gelap. */
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .nav.active{color:var(--accent-strong)}
-  :root:not([data-theme="light"]) .welcome-mark,
-  :root:not([data-theme="light"]) .modal-mark{color:var(--ambient-text)}
-  :root:not([data-theme="light"]) .instagram-mark{border-color:var(--accent-strong)}
-}
-:root[data-theme="dark"] .nav.active{color:var(--accent-strong)}
-:root[data-theme="dark"] .welcome-mark,
-:root[data-theme="dark"] .modal-mark{color:var(--ambient-text)}
-:root[data-theme="dark"] .instagram-mark{border-color:var(--accent-strong)}
-
-/* m025-85 kontras: app.js menulis --sky-top/--sky-bottom sebagai INLINE STYLE di <html>,
-   dihitung dari jam perangkat saja dan tidak pernah melihat tema. Di mode gelap pukul 12
-   siang .global-sky karena itu tetap gradien merah muda terang yang menutup seluruh
-   viewport; pada opasitas .58 (dipasang tutor-v3.css) latar halaman naik ke sekitar
-   #9d8f92 dan teks --ambient-text #fdf4f6 di atasnya tinggal ~2,5:1. Inline style tidak
-   bisa dilawan dari stylesheet, tetapi opasitas lapisannya bisa - langit tetap ada sebagai
-   jam, hanya berhenti menjadi latar teks. Spesifisitas (0,3,0) sengaja dipilih supaya
-   menang atas html.fiezel-ui-v6 .global-sky (0,2,1) yang dimuat belakangan. */
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]) .global-sky{opacity:.16}
-  :root:not([data-theme="light"]) .sky-light{opacity:.24}
-}
-:root[data-theme="dark"] .global-sky{opacity:.16}
-:root[data-theme="dark"] .sky-light{opacity:.24}
 
 /* Font merek berlaku di SELURUH aplikasi, termasuk gerbang izin, gerbang akun, modal,
    dan toast - bukan hanya di splash/onboarding seperti sebelumnya (Audit Roadmap #4). */
@@ -2243,3 +2233,509 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
 .tutor-report{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;
   font-size:.9rem;line-height:1.55;color:var(--ink)}
 .tutor-report svg{width:16px;height:16px;flex:0 0 auto}
+
+/* m025-126 - kartu konsep (tindakan 
+eteach) dan tawaran berhenti (reathe).
+   Bidangnya memakai --surface-tint (punya pasangan gelap) dengan tinta yang diwarisi,
+   sama seperti .tutor-turn - jadi gerbang bidang pastel m025-117 tetap terpenuhi dan
+   kartunya ikut berbalik dengan benar di mode gelap. */
+.tutor-card{display:grid;gap:12px}
+.tutor-card-head{display:flex;align-items:center;gap:10px}
+.tutor-card-head small{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tutor-card-head b{font-size:1.05rem;letter-spacing:-.01em}
+.tutor-card-why{margin:0;padding:10px 12px;border-radius:12px;font-size:.86rem;line-height:1.55;
+  background:var(--surface-tint);border-left:3px solid var(--accent)}
+.tutor-card-rule{margin:0;font-size:.98rem;line-height:1.6;font-weight:650}
+.tutor-card-cue{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:.88rem;line-height:1.55;color:var(--muted)}
+.tutor-card-cue svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
+.quiz-teach-flag{font-size:.66rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+/* Dua jalan keluar berdampingan, dan yang "berhenti" justru jadi tombol utamanya:
+   pada titik ini FIEZEL memang sedang menyarankan berhenti, bukan sekadar mengizinkan. */
+.tutor-breathe{display:flex;flex-wrap:wrap;gap:8px}
+.tutor-breathe .primary{min-height:44px;padding:10px 18px;font-size:.88rem}
+/* ==========================================================================
+   PAW — gerak per halaman (m025-128)
+   ==========================================================================
+   OWNER memilih arah 02, lalu meminta dua hal: "animasinya buatkan lebih eksklusif lagi,
+   dan authentic" dan "animasinya berubah tergantung user masuk ke menu bagian apa".
+
+   APA YANG MEMBUAT GERAK TERASA MURAH, dan karena itu dihindari di seluruh blok ini:
+   amplitudo besar, durasi pendek, easing bawaan, dan gerak yang mengulang persis sejak
+   milidetik pertama. Semua itu menarik perhatian ke DIRINYA. Yang dipakai di sini
+   kebalikannya - amplitudo di bawah 1,6 px, durasi 2,6-5,2 detik, easing yang ditulis
+   sendiri, dan satu gerak masuk sekali-jalan tiap kali halaman berganti supaya loop-nya
+   tidak pernah tertangkap sebagai loop.
+
+   APA YANG MEMBUATNYA OTENTIK, bukan sekadar berbeda-beda. Tiap halaman mendapat gerak
+   yang menggambarkan PEKERJAAN di halaman itu, bukan gerak acak yang kebetulan tidak sama:
+   kosakata mengumpulkan, grammar menelusuri satu pola, membaca mengikuti satu baris,
+   listening berjalan sebagai gelombang, speaking mendorong keluar dari tengah. Tes justru
+   nyaris diam - saat murid sedang diukur, maskot yang bergerak adalah gangguan.
+
+   SATU LAPIS YANG SELALU HIDUP: napas 5,2 detik pada seluruh marka. Gerak per halaman
+   ditumpuk DI ATASNYA lewat elemen yang berbeda (balok, bukan grup), jadi keduanya tidak
+   pernah saling menimpa transform.
+   -------------------------------------------------------------------------- */
+
+.fz-i .fz-paw-bar,.fz-i .fz-paw-pad{fill:var(--fz-i-line,var(--ink));stroke:none}
+
+/* Tiap balok berputar/bergeser dari ALASNYA sendiri, bukan dari pusat kanvas. Tanpa
+   fill-box, transform-origin dihitung terhadap viewBox dan keempat balok bergerak seperti
+   satu papan - persis yang membuat animasi SVG terlihat kaku. */
+.fz-paw-bar{transform-box:fill-box;transform-origin:50% 100%}
+.fz-paw{transform-box:view-box;transform-origin:12px 13px}
+
+@media (prefers-reduced-motion:no-preference){
+
+  /* Lapis dasar: napas. Selalu hidup, di semua halaman, pada GRUP-nya. */
+  .fz-coach-bubble .fz-paw,.fz-coach-avatar .fz-paw{
+    animation:fzPawBreath 5.2s cubic-bezier(.37,0,.24,1) infinite;
+  }
+  @keyframes fzPawBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+
+  /* Gerak masuk sekali-jalan saat halaman berganti. Inilah yang membuat perpindahan
+     terasa disusun, bukan ditukar: marka mengendap sekali sebelum karakter barunya
+     mengambil alih. */
+  .fz-coach-bubble.is-paw-shift .fz-paw{
+    animation:fzPawSettle .62s cubic-bezier(.34,1.12,.52,1) 1;
+  }
+  @keyframes fzPawSettle{
+    0%{transform:scale(.9) rotate(-5deg)}
+    55%{transform:scale(1.05) rotate(1.5deg)}
+    100%{transform:scale(1) rotate(0)}
+  }
+  .fz-coach-bubble.is-paw-shift .fz-paw-bar{animation:none}
+
+  /* ---- home / ask / search: mengendap bergiliran, tidak menuntut apa pun ---- */
+  [data-fz-scene="home"] .fz-paw-bar{animation:fzPawIdle 4.6s cubic-bezier(.37,0,.24,1) infinite}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(2){animation-delay:.22s}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(3){animation-delay:.44s}
+  [data-fz-scene="home"] .fz-paw-bar:nth-child(4){animation-delay:.66s}
+  @keyframes fzPawIdle{0%,72%,100%{transform:scaleY(1)}36%{transform:scaleY(1.07)}}
+
+  /* ---- vocab: mengumpulkan. Balok naik satu per satu lalu DITAHAN sebentar,
+          seperti koin yang dikumpulkan - bukan bolak-balik. ---- */
+  [data-fz-scene="vocab"] .fz-paw-bar{animation:fzPawCollect 4.2s cubic-bezier(.32,1.06,.6,1) infinite}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(2){animation-delay:.3s}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(3){animation-delay:.6s}
+  [data-fz-scene="vocab"] .fz-paw-bar:nth-child(4){animation-delay:.9s}
+  @keyframes fzPawCollect{
+    0%{transform:translateY(1.4px) scaleY(.9)}
+    18%,74%{transform:translateY(0) scaleY(1)}
+    100%{transform:translateY(1.4px) scaleY(.9)}
+  }
+
+  /* ---- grammar: satu pola dulu. Tepat SATU balok meninggi pada satu waktu, berjalan
+          dari kiri ke kanan - kalimat yang diucapkan halaman ini sendiri. ---- */
+  [data-fz-scene="grammar"] .fz-paw-bar{animation:fzPawPattern 4.8s cubic-bezier(.4,0,.2,1) infinite}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(2){animation-delay:1.2s}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(3){animation-delay:2.4s}
+  [data-fz-scene="grammar"] .fz-paw-bar:nth-child(4){animation-delay:3.6s}
+  @keyframes fzPawPattern{
+    0%,50%,100%{transform:scaleY(1);opacity:.72}
+    22%{transform:scaleY(1.16);opacity:1}
+  }
+
+  /* ---- reading / library / classroom: mengikuti satu baris. Sapuan pekat berjalan
+          kiri ke kanan, seperti jari yang menuntun bacaan. ---- */
+  [data-fz-scene="reading"] .fz-paw-bar{animation:fzPawLine 3.8s cubic-bezier(.45,0,.25,1) infinite}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(2){animation-delay:.26s}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(3){animation-delay:.52s}
+  [data-fz-scene="reading"] .fz-paw-bar:nth-child(4){animation-delay:.78s}
+  @keyframes fzPawLine{0%,58%,100%{opacity:.55}22%{opacity:1}}
+
+  /* ---- listening: gelombang berjalan. Di sinilah bacaan "equalizer" yang tadinya
+          risiko justru menjadi keuntungan - halaman ini memang tentang bunyi. ---- */
+  [data-fz-scene="listening"] .fz-paw-bar{animation:fzPawWave 2.6s cubic-bezier(.37,0,.24,1) infinite}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(2){animation-delay:.17s}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(3){animation-delay:.34s}
+  [data-fz-scene="listening"] .fz-paw-bar:nth-child(4){animation-delay:.51s}
+  @keyframes fzPawWave{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.22)}}
+
+  /* ---- speaking: mendorong keluar dari tengah. Dua balok tengah lebih dulu, lalu
+          dua balok tepi menyusul - suara yang keluar, bukan yang masuk. ---- */
+  [data-fz-scene="speaking"] .fz-paw-bar{animation:fzPawProject 3.1s cubic-bezier(.3,1.1,.6,1) infinite;animation-delay:.28s}
+  [data-fz-scene="speaking"] .fz-paw-bar:nth-child(2),
+  [data-fz-scene="speaking"] .fz-paw-bar:nth-child(3){animation-delay:0s}
+  @keyframes fzPawProject{
+    0%,64%,100%{transform:scaleY(1) translateY(0)}
+    30%{transform:scaleY(1.14) translateY(-.9px)}
+  }
+
+  /* ---- writing: satu goresan. Marka miring sedikit dan balok tertinggi turun -
+          gerak tangan yang menekan pena, bukan denyut. ---- */
+  [data-fz-scene="writing"] .fz-paw-bar:nth-child(3){animation:fzPawStroke 4.4s cubic-bezier(.4,0,.2,1) infinite}
+  @keyframes fzPawStroke{
+    0%,70%,100%{transform:scaleY(1) rotate(0)}
+    26%{transform:scaleY(.82) rotate(-4deg)}
+    44%{transform:scaleY(1.04) rotate(2deg)}
+  }
+
+  /* ---- progress: naik jadi tangga, lalu ditahan lama. Halaman ini tentang hasil yang
+          menumpuk, jadi geraknya berakhir di posisi tinggi - bukan kembali ke nol. ---- */
+  [data-fz-scene="progress"] .fz-paw-bar{animation:fzPawClimb 5s cubic-bezier(.32,1.06,.6,1) infinite}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(2){animation-delay:.24s}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(3){animation-delay:.48s}
+  [data-fz-scene="progress"] .fz-paw-bar:nth-child(4){animation-delay:.72s}
+  @keyframes fzPawClimb{
+    0%{transform:scaleY(.86)}
+    16%,82%{transform:scaleY(1.1)}
+    100%{transform:scaleY(.86)}
+  }
+
+  /* ---- test / skills: nyaris diam.
+          Ini keputusan, bukan kelalaian. Saat murid sedang diukur, maskot yang bergerak
+          adalah gangguan - jadi yang tersisa hanya napas pada grupnya, dan baloknya
+          benar-benar diam. Halaman inilah yang membuktikan sistem geraknya punya
+          pendapat, bukan sekadar punya variasi. ---- */
+  [data-fz-scene="test"] .fz-paw-bar{animation:none}
+}
+
+/* Gerak mati sepenuhnya bila murid memintanya. Marka tetap utuh dan terbaca; tidak ada
+   satu pun state yang HANYA bisa dibedakan lewat gerak - lihat titik notifikasi. */
+@media (prefers-reduced-motion:reduce){
+  .fz-paw,.fz-paw-bar{animation:none !important}
+}
+
+/* ==========================================================================
+   PAW — kelahiran: partikel meledak, lalu MEMBENTUK marka (m025-129)
+   ==========================================================================
+   OWNER: "untuk pawnya harusnya ada animasi jangan motion aja, seperti effect particle
+   burst, kemudian dari partikel itu terbentuk pawnya baru di lanjutkan oleh motion."
+
+   URUTANNYA, dan kenapa dibagi begini:
+     0,00-0,26s  dua belas partikel melesat KELUAR dari titiknya sendiri
+     0,26-0,74s  partikel kembali dan mengunci di tempat asalnya
+     0,52-0,86s  marka muncul dari balik partikel, sedikit membesar lalu mengendap
+     0,74-0,92s  partikel padam
+     0,92s ->    gerak per halaman mengambil alih, tanpa jeda
+
+   KUNCINYA ADA DI ARAH ANIMASI, dan ini bagian yang gampang dibuat salah. Partikel di
+   sini TIDAK lahir acak lalu mencari tempatnya - cx/cy tiap partikel sudah berdiri
+   tepat di simpul bentuk PAW (ujung tiap balok, enam titik keliling bantalan), dan yang
+   dianimasikan adalah perjalanan MENJAUH lalu KEMBALI ke nol. Arah sebaliknya - dua
+   belas titik acak yang harus dituntun ke posisi akhirnya - akan meleset satu-dua piksel
+   pada tiap partikel dan hasilnya terbaca sebagai kotoran, bukan pembentukan.
+
+   Tumpang tindih 0,52-0,74s juga disengaja: marka mulai muncul SEBELUM partikelnya padam,
+   jadi mata membaca "partikel menjadi marka", bukan "partikel hilang, lalu marka datang".
+   Dua kejadian yang tidak bertumpuk terbaca sebagai dua kejadian.
+   -------------------------------------------------------------------------- */
+
+.fz-paw-spark{
+  fill:var(--fz-i-line,var(--ink));
+  transform-box:fill-box;transform-origin:50% 50%;
+  opacity:0;
+}
+.fz-paw-sparks{pointer-events:none}
+
+@media (prefers-reduced-motion:no-preference){
+  .is-paw-born .fz-paw-spark{
+    animation:fzPawSpark .92s cubic-bezier(.22,.68,.28,1) var(--sd,0s) 1 both;
+  }
+  @keyframes fzPawSpark{
+    0%   {transform:translate(0,0) scale(.2);opacity:0}
+    12%  {opacity:1}
+    28%  {transform:translate(var(--sx,0px),var(--sy,-6px)) scale(1);opacity:1}
+    74%  {transform:translate(0,0) scale(.85);opacity:1}
+    100% {transform:translate(0,0) scale(.3);opacity:0}
+  }
+
+  /* Marka menyusul, dan gerak per halaman ditahan sampai ia selesai mengendap -
+     kalau tidak, napas 5,2 detik akan bertabrakan dengan transform kelahirannya. */
+  .is-paw-born .fz-paw{
+    animation:fzPawForm .92s cubic-bezier(.3,1.08,.5,1) 1 both;
+  }
+  .is-paw-born .fz-paw-bar{animation:none}
+  @keyframes fzPawForm{
+    0%,52%{transform:scale(.62);opacity:0}
+    72%   {transform:scale(1.07);opacity:1}
+    100%  {transform:scale(1);opacity:1}
+  }
+}
+
+/* Tanpa gerak: tidak ada kelahiran sama sekali, marka langsung utuh dan partikelnya
+   tidak pernah terlihat. Bukan versi yang lebih cepat - versi yang memang diam. */
+@media (prefers-reduced-motion:reduce){
+  .fz-paw-spark{display:none}
+}
+
+/* ==========================================================================
+   Tab bar — berat, bukan garis tipis (m025-129)
+   ==========================================================================
+   OWNER: "icon taskbarnya terlalu jadul kurang modern dan eye catching."
+
+   Ikonnya sendiri sudah digambar ulang di fiezel-icons.js - bidang jadi bentuk utamanya,
+   garis tinggal menegaskan tepi. Yang tersisa di sini adalah wadahnya, dan wadahnya punya
+   masalah yang sama: tab aktif hanya berubah warna latar. Perubahan warna adalah sinyal
+   TERLEMAH yang dimiliki antarmuka - ia tidak punya berat, tidak punya gerak, dan pada
+   layar terang nyaris tidak terbaca sama sekali.
+
+   Tab aktif kini mendapat tiga hal sekaligus: ia NAIK, ia punya bayangan padat 2 px
+   seperti tombol chunky di seluruh aplikasi, dan ikonnya MEMANTUL sekali saat dipilih.
+   Ketiganya bahasa yang sudah dipakai FIEZEL - tidak ada kosakata visual baru yang
+   diperkenalkan hanya untuk tab bar.
+   -------------------------------------------------------------------------- */
+
+.nav .fz-i{width:26px;height:26px}
+.nav .fz-i .fz-line{stroke-width:2}
+
+html.fiezel-ui-v6 .nav{
+  gap:5px;border-radius:17px;
+  transition:transform .18s var(--ease-spring),background .16s var(--ease),color .16s var(--ease),box-shadow .16s var(--ease);
+}
+html.fiezel-ui-v6 .nav.active{
+  transform:translateY(-3px);
+  box-shadow:0 2px 0 var(--yellow-deep);
+}
+/* Titik di bawah label. Penanda kedua yang tidak bergantung pada warna sama sekali -
+   satu-satunya bagian dari state aktif yang tetap terbaca oleh mata yang sulit
+   membedakan kuning pastel dari cream. */
+html.fiezel-ui-v6 .nav.active::after{
+  content:"";width:5px;height:5px;border-radius:50%;background:var(--ink);
+  margin-top:-1px;
+}
+
+@media (prefers-reduced-motion:no-preference){
+  html.fiezel-ui-v6 .nav.active .fz-i{animation:fzNavPop .42s cubic-bezier(.3,1.32,.5,1) 1}
+  @keyframes fzNavPop{
+    0%{transform:scale(.84) translateY(2px)}
+    58%{transform:scale(1.12) translateY(-1px)}
+    100%{transform:scale(1) translateY(0)}
+  }
+}
+
+/* ==========================================================================
+   Home — kepingan angka menggantikan sapaan serif (m025-129)
+   ==========================================================================
+   Pita ini menempati baris yang dulu diisi sapaan serif miring. Empat kepingan, dan
+   keempatnya angka yang BISA NAIK - itu syaratnya, bukan lencana yang menempel pada
+   angka mati.
+
+   Runtun mendapat koral karena ia satu-satunya yang bisa HILANG; cincin harian memakai
+   conic-gradient sehingga kemajuannya terbaca sebagai bentuk, bukan sebagai persen yang
+   harus dibaca. Sisanya tetap cream supaya keramaiannya tidak pindah tempat saja.
+   -------------------------------------------------------------------------- */
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 14px}
+.hero-stat{
+  display:flex;flex-direction:column;gap:1px;
+  padding:8px 13px;border-radius:15px;
+  background:rgba(var(--surface-pure-rgb),.96);border:1.5px solid var(--ink);
+  box-shadow:0 2px 0 var(--ink);
+  color:var(--ink);
+}
+.hero-stat b{
+  display:flex;align-items:center;gap:5px;
+  font-size:1.02rem;font-weight:800;line-height:1.15;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;
+}
+.hero-stat small{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;font-weight:750;color:var(--muted)}
+.hero-stat svg{width:15px;height:15px}
+.hero-stat.is-streak{background:var(--coral-soft)}
+.hero-stat.is-streak svg{color:var(--coral-deep)}
+.hero-stat.is-level{background:var(--yellow)}
+
+/* Cincin harian. Sudut conic dihitung dari --v (0-100), jadi satu variabel saja yang
+   berpindah dari data ke bentuk - tidak ada perhitungan derajat yang tersebar di JS. */
+.hero-ring{
+  width:15px;height:15px;border-radius:50%;flex:none;
+  background:conic-gradient(var(--ink) calc(var(--v,0) * 1%),rgba(43,33,24,.16) 0);
+  -webkit-mask:radial-gradient(circle,transparent 46%,#000 47%);
+  mask:radial-gradient(circle,transparent 46%,#000 47%);
+}
+
+/* Paragraf yang tersisa dijaga tetap PENDEK, bukan dihapus. Isinya masih berguna; yang
+   tidak berguna adalah membiarkannya tumbuh jadi dinding. Batas baris memotong pada
+   ukuran layar mana pun, termasuk yang belum ada saat ini ditulis. */
+.launcher-lead{
+  margin-top:14px;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  line-clamp:2;overflow:hidden;
+}
+.coach-body{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+  line-clamp:4;overflow:hidden;
+}
+
+@media (max-width:620px){
+  .hero-stats{gap:7px;margin:20px 0 12px}
+  .hero-stat{padding:7px 11px}
+  .hero-stat b{font-size:.94rem}
+}
+
+/* ==========================================================================
+   Home berhenti terbaca sebagai artikel (m025-131)
+   ==========================================================================
+   OWNER, sambil menunjukkan layarnya: "masih terlihat seperti bacaan article."
+
+   m025-130 sudah mengganti sapaan serif miring dengan kepingan angka, dan itu benar tapi
+   TIDAK CUKUP - karena tepat di bawahnya masih berdiri elemen yang jauh lebih besar:
+   judul Instrument Serif dua baris setinggi ~2,5rem, lalu paragraf pengantar di bawahnya,
+   lalu kartu Coach berisi paragraf lagi. Kepingan angka kalah telak melawan tiga blok itu.
+
+   Tiga hal yang membuat sebuah layar terbaca sebagai ARTIKEL, dan ketiganya ada di sini:
+     - huruf SERIF berukuran display sebagai elemen terbesar di layar;
+     - PARAGRAF mengalir - kalimat yang dibaca berurutan, bukan dipindai;
+     - tidak ada BATAS antar-blok, sehingga semuanya terbaca sebagai satu kolom bacaan.
+
+   Ketiganya dibalik:
+     - judul serif jadi satu baris sans pendek; yang terbesar di layar kini TOMBOL;
+     - paragraf pengantar dan paragraf Coach dihapus, bukan diperpendek. Panel Coach
+       tinggal satu kalimat, persis yang OWNER tulis di papan edit;
+     - strip Coach jadi kartu tersendiri dengan tepi dan bayangan padat, jadi mata
+       membacanya sebagai TOMBOL BESAR, bukan sebagai alinea berikutnya.
+   -------------------------------------------------------------------------- */
+
+/* Sapaan tinggal satu baris. Sans, bukan serif; ukuran teks, bukan ukuran judul. */
+.hero-line{
+  font-family:var(--fz-body);font-size:1rem;line-height:1.5;font-weight:650;
+  letter-spacing:-.01em;color:var(--ink);margin:2px 0 16px;max-width:38ch;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+}
+.hero-line span{font-weight:800}
+
+/* Strip Coach: satu kalimat, satu tombol besar, satu tautan kecil. */
+.coach-strip{
+  display:grid;grid-template-columns:auto 1fr;gap:12px 13px;align-items:center;
+  padding:15px;border-radius:22px;
+  background:rgba(var(--surface-pure-rgb),.94);
+  border:1.5px solid var(--ink);box-shadow:0 3px 0 var(--ink);
+}
+.coach-strip-face{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--yellow);border:2px solid var(--ink);
+  display:grid;place-items:center;--fz-i-line:var(--ink);
+}
+.coach-strip-face svg{width:24px;height:24px}
+.coach-strip-say{min-width:0}
+.coach-strip-say small{
+  display:block;font-size:.6rem;letter-spacing:.13em;text-transform:uppercase;
+  font-weight:800;color:var(--muted);margin-bottom:2px;
+}
+.coach-strip-say b{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;
+  font-size:1.02rem;line-height:1.35;font-weight:750;letter-spacing:-.015em;color:var(--ink);
+}
+/* Tombolnya melintasi dua kolom: di layar ponsel inilah elemen terbesar di Home, dan
+   memang harus begitu - yang paling besar di layar seharusnya yang paling ingin ditekan. */
+.coach-strip-go{grid-column:1/-1;width:100%;min-height:52px;font-size:1rem;font-weight:800}
+.coach-strip-more{
+  grid-column:1/-1;justify-self:center;
+  background:none;border:0;box-shadow:none;padding:2px 6px;min-height:0;
+  color:var(--accent);font-size:.78rem;font-weight:700;
+}
+.coach-strip-more:hover{background:none;box-shadow:none;transform:none}
+.coach-strip-more svg{width:14px;height:14px}
+
+/* Panel peluncur berhenti jadi dua kolom yang tinggi; ia kini setumpuk blok pendek. */
+html.fiezel-ui-v6 .launcher-shell{
+  grid-template-columns:1fr;grid-template-rows:auto;min-height:0;gap:16px;
+  padding:clamp(16px,4vw,22px);
+}
+@media (min-width:900px){
+  html.fiezel-ui-v6 .launcher-shell{grid-template-columns:minmax(0,1fr) minmax(280px,.7fr);align-items:center}
+  .coach-strip-go{grid-column:1/-1}
+}
+
+/* ==========================================================================
+   Logo topbar lahir seperti PAW (m025-131)
+   ==========================================================================
+   OWNER: "untuk logo fiezel di topbar buatkan animasi persis seperti animasi PAW."
+
+   Persis, dan itu bukan sekadar meniru tampilannya: enam belas partikel di sini juga
+   sudah berdiri di simpul HURUFNYA - ujung batang F, siku E, dua ujung Z, dua balok
+   aksen - dan yang dianimasikan tetap perjalanan MENJAUH lalu KEMBALI. Alasannya sama
+   seperti di PAW: partikel yang lahir acak lalu dituntun ke posisinya akan meleset dan
+   terbaca sebagai kotoran, bukan sebagai huruf yang terbentuk.
+
+   Satu perbedaan yang disengaja: durasinya 1 detik, bukan 0,92 detik. Wordmark jauh
+   lebih lebar daripada marka PAW, jadi partikelnya menempuh jarak lebih jauh; memakai
+   durasi yang sama akan membuatnya terlihat terburu-buru justru pada elemen yang paling
+   ingin terlihat tenang.
+
+   Jalannya SEKALI saja saat aplikasi dibuka - keputusan OWNER di papan edit: "Sekali saja
+   waktu aplikasi pertama dibuka. Tidak diulang tiap pindah menu - biar tetap terasa
+   spesial, bukan jadi kedipan."
+   -------------------------------------------------------------------------- */
+
+.fzw-spark{
+  fill:var(--wordmark-ink-hi);
+  transform-box:fill-box;transform-origin:50% 50%;
+  opacity:0;
+}
+.fzw-mark{transform-box:view-box;transform-origin:500px 130px}
+
+@media (prefers-reduced-motion:no-preference){
+  .is-mark-born .fzw-spark{animation:fzwSpark 1s cubic-bezier(.22,.68,.28,1) var(--sd,0s) 1 both}
+  @keyframes fzwSpark{
+    0%{transform:translate(0,0) scale(.15);opacity:0}
+    12%{opacity:1}
+    30%{transform:translate(var(--sx,0px),var(--sy,-40px)) scale(1);opacity:1}
+    76%{transform:translate(0,0) scale(.9);opacity:1}
+    100%{transform:translate(0,0) scale(.25);opacity:0}
+  }
+  .is-mark-born .fzw-mark{animation:fzwForm 1s cubic-bezier(.3,1.06,.5,1) 1 both}
+  @keyframes fzwForm{
+    0%,54%{transform:scale(.72);opacity:0}
+    74%{transform:scale(1.04);opacity:1}
+    100%{transform:scale(1);opacity:1}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .fzw-spark{display:none}
+}
+
+/* Global learner-level contract */
+.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:14px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer;box-shadow:none}
+.active-level-control{flex:0 0 auto;flex-direction:column;align-items:flex-start;padding:10px 13px;min-width:118px;text-align:left}
+.active-level-control span,.active-level-control small{font-size:.66rem;color:var(--muted,#746958);line-height:1.1}
+.active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#c2402c)}
+.active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);box-shadow:0 4px 14px rgba(67,43,25,.08);transform:translateY(-1px)}
+.home-level-context{padding:4px 9px;font-size:.68rem;font-weight:750;white-space:nowrap}
+.level-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}
+.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:16px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer}
+.level-picker-card strong{font-size:1.15rem;color:var(--accent,#c2402c)}
+.level-picker-card span{font-size:.72rem;line-height:1.35;color:var(--muted,#746958)}
+.level-picker-card.is-active{border-color:var(--accent,#c2402c);background:color-mix(in srgb,var(--accent,#c2402c) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#c2402c) 16%,transparent)}
+.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:15px;background:var(--panel-soft,#f8f1e7);color:var(--ink,#2b2118);font-size:.83rem}
+.level-source-note{display:block;margin-top:10px}
+.level-source-note b{color:var(--accent,#c2402c)}
+.level-scope-note span,.grammar-level-note span,.grammar-level-note small{color:var(--muted,#746958)}
+.grammar-level-note{display:grid;gap:4px}
+.grammar-level-note b{color:var(--accent,#c2402c)}
+.skill-level-note{margin-top:10px;font-size:.82rem;color:var(--muted,#746958)}
+.skill-level-note b{color:var(--accent,#c2402c)}
+@media(max-width:620px){
+  .section-head{align-items:flex-start;flex-direction:column}
+  .section-head .active-level-control{align-self:stretch;flex-direction:row;align-items:center;justify-content:space-between}
+  .level-picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-level-context{font-size:.62rem}
+}
+/* m025-137: lesson yang prasyaratnya belum tuntas. Kartunya sengaja tetap terbaca -
+   murid perlu melihat apa yang menunggunya di depan, bukan menemukan daftar yang kosong. */
+.card.lesson-locked{opacity:.72}
+.card.lesson-locked .lesson-card-foot button[disabled]{cursor:not-allowed;opacity:.65}
+.lesson-lock-note{display:flex;gap:7px;align-items:flex-start;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:var(--muted,#746958)}
+.lesson-lock-note i{flex:none;width:14px;height:14px;margin-top:2px}
+/* m025-138: kontrak ujian dan rubrik Writing. Batas kata sengaja dibuat menonjol -
+   di IELTS, tulisan di bawah batas kena penalti sebelum isinya sempat dinilai. */
+.writing-exam{display:grid;gap:3px;margin:0 0 10px;padding:11px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7);font-size:.8rem}
+.writing-exam b{color:var(--accent,#c2402c)}
+.writing-exam span{font-weight:650}
+.writing-exam small{color:var(--muted,#746958);line-height:1.4}
+.writing-focus{margin:6px 0 0;font-size:.78rem;color:var(--muted,#746958)}
+.writing-rubric ul,.writing-checklist{display:grid;gap:8px;margin:10px 0 0;padding:0;list-style:none}
+.writing-rubric li{display:grid;gap:2px;font-size:.8rem}
+.writing-rubric li span{color:var(--muted,#746958)}
+.writing-checklist li{display:grid;gap:2px;padding:9px 11px;border-radius:12px;border-left:3px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.79rem}
+.writing-checklist li span{color:var(--muted,#746958);line-height:1.45}
+.writing-check.is-ok{border-left-color:#3f8f5f}
+.writing-check.is-perhatikan{border-left-color:var(--accent,#c2402c)}
+.writing-check.is-ai{border-left-color:#7a6cc4}
+/* m025-139: jalur Reading berformat ujian. Kontraknya (panjang, jumlah soal, waktu)
+   ditaruh di muka karena itulah yang membedakannya dari bacaan latihan biasa. */
+.reading-exam{display:grid;gap:11px;margin:0 0 16px}
+.reading-exam-set{display:grid;gap:4px;padding:12px 13px;border-radius:14px;background:var(--panel-soft,#f8f1e7)}
+.reading-exam-set span{font-size:.75rem;font-weight:650;color:var(--accent,#c2402c)}
+.reading-exam-set small{font-size:.74rem;line-height:1.45;color:var(--muted,#746958)}
+.reading-exam-set button{justify-self:start;margin-top:5px}

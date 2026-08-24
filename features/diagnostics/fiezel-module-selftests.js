@@ -222,28 +222,13 @@
     return out;
   }
 
-  /**
-   * The Indonesian bundle is an optional 94MB download, so "not downloaded" is a normal
-   * state and never a failure. A bundle that is half-installed, drifted in asset count,
-   * or reporting an error is a different matter: that is the state that produced a mute
-   * Classroom, and it is reported.
-   */
-  function indonesianVoice(status, targets) {
-    var out = [];
-    if (!status) return [f('ID_VOICE_MODULE_MISSING', 'warning', 'Modul suara Indonesia tidak dimuat.')];
-    if (!status.prepared) {
-      out.push(f('ID_VOICE_NOT_DOWNLOADED', 'warning', 'Paket suara Indonesia belum diunduh (opsional).'));
-    }
-    if (status.prepared && !status.ready) {
-      out.push(f('ID_VOICE_NOT_READY', 'warning', 'Paket terunduh tetapi runtime belum siap.'));
-    }
-    var expected = (targets && targets.indonesianVoice && targets.indonesianVoice.expectedAssetCount) || null;
-    if (expected && Number(status.assetCount) !== expected) {
-      out.push(f('ID_VOICE_ASSET_COUNT', 'error', 'Jumlah aset ' + status.assetCount + ', target ' + expected + '.', Number(status.assetCount)));
-    }
-    if (status.error) out.push(f('ID_VOICE_ERROR', 'error', 'Kesalahan terakhir: ' + String(status.error)));
-    return out;
-  }
+  // m025-124: pemeriksaan indonesianVoice DIHAPUS. Suara Indonesia dihapus dari produk di
+  // m025-95, dan m025-100 menghapus mesin lokal yang menyediakannya. Yang tersisa hanyalah
+  // pemeriksaan yang mencari paket 94 MB yang tidak akan pernah ada lagi - diarahkan ke
+  // FiezelPuterVoice yang tidak punya field prepared maupun assetCount, sehingga ia SELALU
+  // melapor "belum diunduh" dan menyalakan lencana merah di panel. Alarm yang tidak pernah
+  // bisa dimatikan mengajari orang mengabaikan lencana, dan itu membuat alarm yang SUNGGUHAN
+  // ikut terabaikan.
 
   /**
    * Module wiring. Two of the three fatal outages this app has shipped were a global that
@@ -337,7 +322,7 @@
   return Object.freeze({
     vocabulary: vocabulary, reading: reading, grammar: grammar, leveltest: leveltest,
     bank: bank, neuralVoice: neuralVoice, classroom: classroom, chat: chat, adaptive: adaptive,
-    prosody: prosody, indonesianVoice: indonesianVoice, runtime: runtime,
+    prosody: prosody, runtime: runtime,
     storage: storage, ui: ui
   });
 }));

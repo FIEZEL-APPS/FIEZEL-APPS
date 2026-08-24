@@ -44,21 +44,23 @@
       const gap=100-accuracy;
       if(accuracy<=WEAK_ACCURACY&&o.attempts>=MIN_ATTEMPTS&&o.trendDelta<=MIN_TREND_DELTA){
         const priority=gap+Math.max(0,-o.trendDelta)*2+Math.min(o.attempts,50)/5+(CEFR_BONUS[o.cefr]??0);
-        insights.push({insightId:`weak-${o.domain}-${o.subskill}`,type:'weak_skill',domain:o.domain,subskill:o.subskill,cefr:o.cefr,evidence:{accuracy,attempts:o.attempts,trendDelta:o.trendDelta,daysSinceLast:o.daysSinceLast},priority:Math.round(priority*10)/10,recommendation:'candidate_request'});
+        const insightId=`weak-${o.domain}-${o.subskill}`;
+        insights.push({id:insightId,insightId,type:'weak_skill',domain:o.domain,subskill:o.subskill,cefr:o.cefr,evidence:{accuracy,attempts:o.attempts,trendDelta:o.trendDelta,daysSinceLast:o.daysSinceLast},priority:Math.round(priority*10)/10,recommendation:'candidate_request'});
       }
     }
     for(const r of reviewQueue){
       if(r.severity!=='review'||!['context_thin','repetition','weak_distractor','difficulty_mismatch'].includes(r.category))continue;
-      insights.push({insightId:`review-${r.domain}-${r.itemId}`,type:'stale_review_item',domain:r.domain,itemId:r.itemId,cefr:'',evidence:{category:r.category},priority:5,recommendation:'candidate_request'});
+      const insightId=`review-${r.domain}-${r.itemId}`;
+      insights.push({id:insightId,insightId,type:'stale_review_item',domain:r.domain,itemId:r.itemId,category:r.category,finding:`QA review: ${r.category}`,templateId:r.category==='repetition'?'rewrite_repetition':'fix_weak_skill',cefr:'',evidence:{category:r.category},priority:5,recommendation:'candidate_request'});
     }
     insights.sort((a,b)=>b.priority-a.priority);
     return insights.slice(0,MAX_INSIGHTS);
   }
   function analyze(rawOutcomes,rawReviewQueue){
-    if(!rawOutcomes||rawOutcomes.schema!==INPUT_SCHEMA)return{schema:INSIGHT_SCHEMA,status:'FAIL',reason:'invalid_outcome_schema',insights:[]};
-    if(rawOutcomes?.privacy?.rawAnswersIncluded===true||rawOutcomes?.privacy?.rawHistoryIncluded===true)return{schema:INSIGHT_SCHEMA,status:'FAIL',reason:'privacy_violation',insights:[]};
+    if(!rawOutcomes||rawOutcomes.schema!==INPUT_SCHEMA)return{ok:false,schema:INSIGHT_SCHEMA,status:'FAIL',reason:'invalid_outcome_schema',insights:[]};
+    if(rawOutcomes?.privacy?.rawAnswersIncluded===true||rawOutcomes?.privacy?.rawHistoryIncluded===true)return{ok:false,schema:INSIGHT_SCHEMA,status:'FAIL',reason:'privacy_violation',insights:[]};
     const insights=deriveInsights(rawOutcomes,rawReviewQueue);
-    return{schema:INSIGHT_SCHEMA,status:'PASS',count:insights.length,insights};
+    return{ok:true,schema:INSIGHT_SCHEMA,status:'PASS',count:insights.length,insights};
   }
-  return{INSIGHT_SCHEMA,INPUT_SCHEMA,MAX_INSIGHTS,WEAK_ACCURACY,MIN_ATTEMPTS,MIN_TREND_DELTA,sanitizeOutcomes,sanitizeReviewQueue,deriveInsights,analyze,stable};
+  return{INSIGHT_SCHEMA,INPUT_SCHEMA,MAX_INSIGHTS,WEAK_ACCURACY,MIN_ATTEMPTS,MIN_TREND_DELTA,sanitizeOutcomes,sanitizeReviewQueue,deriveInsights,analyze,run:analyze,stable};
 });

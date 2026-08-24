@@ -1,11 +1,23 @@
 {
   "name": "fiezel-push-ops",
   "private": true,
-  "version": "5.18.0",
+  "version": "5.19.0",
   "dependencies": {
     "web-push": "3.6.7"
   },
   "scripts": {
+    "test:grammar-curriculum": "node grammar-curriculum-test.js",
+    "test:grammar-unlock": "node grammar-unlock-test.js",
+    "test:writing-rubric": "node writing-rubric-test.js",
+    "test:reading-exam": "node reading-exam-test.js",
+    "test:level-evidence": "node level-evidence-test.js",
+    "test:neural-cache": "node neural-cache-isolation-test.js",
+    "test:prerequisite-graph": "node prerequisite-graph-test.js",
+    "test:speaking-exam": "node speaking-exam-test.js",
+    "test:listening-exam": "node listening-exam-test.js",
+    "test:e2e": "node e2e-level-grammar-test.js",
+    "audit:grammar": "node grammar-quality-audit.js",
+    "test:level-contract": "node level-grammar-contract-test.js",
     "push:dispatch": "node push-dispatcher.mjs",
     "push:secrets": "node generate-push-secrets.mjs",
     "core:preflight": "node core-deploy-preflight.mjs",

@@ -131,8 +131,9 @@
       var recency = Math.pow(0.5, ageDays / ABILITY_HALF_LIFE_DAYS);
       var expected = successProbability(ability, difficulty);
       var actual = row.ok ? 1 : 0;
-      // K mengecil dengan akar jumlah bukti: cepat di awal, tenang setelahnya.
-      var k = 0.62 / Math.sqrt(1 + seen);
+      // K mengecil menurut BUKTI EFEKTIF. Baris lama yang bobot waktunya hampir nol tidak
+      // boleh membekukan kemampuan hari ini hanya karena jumlah baris historisnya besar.
+      var k = 0.62 / Math.sqrt(1 + weighted);
       ability += k * recency * (actual - expected);
       ability = clamp(ability, 0.4, 6.6);
       seen++;
@@ -247,7 +248,7 @@
   function halfLife(item) {
     var it = item || {};
     var reps = clamp(it.successes, 0, 40);
-    var lapses = clamp(it.lapses, 0, 40);
+    var lapses = clamp(it.lapseBurden == null ? it.lapses : it.lapseBurden, 0, 40);
     var difficulty = clamp(it.difficulty == null ? 3 : it.difficulty, 1, 6);
     var growth = Math.pow(1.9, reps);
     var lapsePenalty = Math.pow(0.55, lapses);
@@ -394,18 +395,96 @@
     emphasis_inversion: Object.freeze(['relative_clauses', 'question_negation']),
     error_correction: Object.freeze(['tense_aspect', 'articles_determiners']),
     core_grammar: Object.freeze([]),
-    advanced_grammar: Object.freeze(['conditionals', 'passive', 'relative_clauses'])
+    advanced_grammar: Object.freeze(['conditionals', 'passive', 'relative_clauses']),
+    // m025-143 (B-06): lima keluarga ini ADA di bank soal tetapi hilang dari graph, jadi
+    // setiap lesson di bawahnya tidak punya rantai prasyarat sama sekali - rootCause()
+    // selalu menyimpulkan "gejala ini akarnya sendiri" untuk mereka, tanpa pernah salah
+    // secara terlihat. Empat di antaranya adalah materi paling awal A1.
+    nouns: Object.freeze([]),
+    pronouns_determiners: Object.freeze([]),
+    possession: Object.freeze(['nouns', 'pronouns_determiners']),
+    quantifiers: Object.freeze(['nouns']),
+    question_formation: Object.freeze(['tense_aspect'])
   });
 
-  /** Semua prasyarat sebuah keluarga, terdalam dulu. Siklus dipagari oleh daftar `seen`. */
-  function prerequisiteChain(family) {
+  // =====================================================================================
+  // Graph kurikulum tingkat LESSON.
+  //
+  // Graph keluarga di atas terlalu kasar untuk membimbing: ia tahu "conditionals butuh
+  // modals", tetapi tidak tahu lesson mana di dalamnya yang harus lebih dulu. Graph lesson
+  // disuntikkan dari grammar-curriculum-v1.json saat aplikasi memuatnya, sehingga Core Brain
+  // tidak perlu ikut membaca berkas dan tetap bisa diuji sendirian.
+  //
+  // Keluarga TETAP dipertahankan sebagai cadangan: materi legacy dan bukti lama menyebut
+  // family tanpa lessonId, dan menghapus jalur itu berarti mereka kehilangan diagnosis.
+  // =====================================================================================
+  var lessonGraph = Object.create(null);
+  var lessonGraphSize = 0;
+  function setCurriculumGraph(rows) {
+    lessonGraph = Object.create(null);
+    lessonGraphSize = 0;
+    var list = Array.isArray(rows) ? rows : (rows && Array.isArray(rows.lessons) ? rows.lessons : []);
+    for (var i = 0; i < list.length; i++) {
+      var row = list[i] || {};
+      var id = str(row.lessonId || row.skill || row.subskill || row.id);
+      if (!id) continue;
+      var parents = [];
+      var declared = Array.isArray(row.prerequisites) ? row.prerequisites : [];
+      for (var p = 0; p < declared.length; p++) {
+        var parent = str(declared[p]);
+        if (parent && parent !== id) parents.push(parent);
+      }
+      lessonGraph[id] = {
+        prerequisites: parents,
+        family: str(row.family),
+        level: str(row.level),
+        sequence: Number(row.sequence) || 0
+      };
+      lessonGraphSize++;
+    }
+    return lessonGraphSize;
+  }
+  function curriculumGraphSize() { return lessonGraphSize; }
+  function lessonNode(id) { return lessonGraph[str(id)] || null; }
+
+  /**
+   * Semua prasyarat sebuah simpul, terdalam dulu. Siklus dipagari oleh daftar `seen`.
+   *
+   * Simpulnya boleh lessonId maupun family. Kalau graph kurikulum mengenal lessonId-nya,
+   * rantainya dibangun di tingkat lesson; kalau tidak, ia jatuh ke graph keluarga. Satu
+   * fungsi untuk keduanya, supaya pemanggil tidak perlu tahu bukti mana yang sudah dilabeli
+   * lesson dan mana yang masih legacy.
+   */
+  function prerequisiteChain(node) {
+    var start = str(node);
+    if (lessonGraph[start]) return lessonPrerequisiteChain(start);
     var out = [];
     var seen = {};
-    var queue = [str(family)];
+    var queue = [start];
     var guard = 0;
     while (queue.length && guard++ < 32) {
       var current = queue.shift();
       var parents = PREREQUISITES[current] || [];
+      for (var i = 0; i < parents.length; i++) {
+        if (seen[parents[i]]) continue;
+        seen[parents[i]] = true;
+        out.push(parents[i]);
+        queue.push(parents[i]);
+      }
+    }
+    return out;
+  }
+  function lessonPrerequisiteChain(lessonId) {
+    var out = [];
+    var seen = {};
+    var queue = [str(lessonId)];
+    var guard = 0;
+    // Batas penjaga dinaikkan: rantai lesson bisa jauh lebih panjang daripada rantai keluarga,
+    // dan pemotongan diam-diam akan menyembunyikan prasyarat terdalam - persis yang dicari.
+    while (queue.length && guard++ < 512) {
+      var current = queue.shift();
+      var node = lessonGraph[current];
+      var parents = node ? node.prerequisites : [];
       for (var i = 0; i < parents.length; i++) {
         if (seen[parents[i]]) continue;
         seen[parents[i]] = true;
@@ -447,22 +526,72 @@
       if (Object.prototype.hasOwnProperty.call(byFamily, key)) byFamily[key].mastery = byFamily[key].mastery / (byFamily[key].weight || 1);
     }
     var symptomMastery = byFamily[symptomFamily] ? byFamily[symptomFamily].mastery : clamp(target && target.mastery, 0, 100);
-    var chain = prerequisiteChain(symptomFamily);
-    var best = null;
-    for (var c = 0; c < chain.length; c++) {
-      var candidate = byFamily[chain[c]];
-      if (!candidate || candidate.attempts < ROOT_CAUSE_MIN_ATTEMPTS) continue;
-      if (candidate.mastery > symptomMastery - ROOT_CAUSE_MASTERY_GAP) continue;
-      if (!best || candidate.mastery < best.mastery) best = { family: chain[c], mastery: candidate.mastery, skill: candidate.skill, attempts: candidate.attempts };
+
+    // m025-143: bukti per LESSON dikumpulkan berdampingan dengan bukti per keluarga. Keduanya
+    // dari baris yang sama; yang berbeda hanya seberapa halus pertanyaannya bisa dijawab.
+    var bySkill = {};
+    for (var r = 0; r < rows.length; r++) {
+      var srow = rows[r] || {};
+      var skillKey = str(srow.skill);
+      if (!skillKey) continue;
+      var sb = bySkill[skillKey] || (bySkill[skillKey] = { attempts: 0, mastery: 0, weight: 0 });
+      var sAttempts = clamp(srow.attempts, 0, 1e6);
+      sb.attempts += sAttempts;
+      sb.mastery += clamp(srow.mastery, 0, 100) * Math.max(1, sAttempts);
+      sb.weight += Math.max(1, sAttempts);
     }
+    for (var sk in bySkill) {
+      if (Object.prototype.hasOwnProperty.call(bySkill, sk)) bySkill[sk].mastery = bySkill[sk].mastery / (bySkill[sk].weight || 1);
+    }
+
+    function weakestIn(chainList, table, baseline) {
+      var found = null;
+      for (var c = 0; c < chainList.length; c++) {
+        var candidate = table[chainList[c]];
+        if (!candidate || candidate.attempts < ROOT_CAUSE_MIN_ATTEMPTS) continue;
+        if (candidate.mastery > baseline - ROOT_CAUSE_MASTERY_GAP) continue;
+        if (!found || candidate.mastery < found.mastery) {
+          found = { key: chainList[c], mastery: candidate.mastery, skill: candidate.skill || '', attempts: candidate.attempts };
+        }
+      }
+      return found;
+    }
+
+    // Lesson dulu kalau kurikulumnya mengenal skill ini: "kamu belum kuat di articles" jauh
+    // lebih bisa ditindaklanjuti daripada "kamu belum kuat di articles_determiners".
+    var lessonChain = lessonGraph[symptomSkill] ? lessonPrerequisiteChain(symptomSkill) : [];
+    if (lessonChain.length) {
+      var lessonBaseline = bySkill[symptomSkill] ? bySkill[symptomSkill].mastery : symptomMastery;
+      var lessonBest = weakestIn(lessonChain, bySkill, lessonBaseline);
+      if (lessonBest) {
+        var parentNode = lessonGraph[lessonBest.key] || {};
+        return {
+          family: parentNode.family || symptomFamily,
+          skill: lessonBest.key,
+          isRoot: false,
+          via: 'prerequisite',
+          scope: 'lesson',
+          symptomFamily: symptomFamily,
+          symptomSkill: symptomSkill,
+          gap: round(lessonBaseline - lessonBest.mastery, 2),
+          chain: lessonChain,
+          rationale: 'weaker_prerequisite'
+        };
+      }
+    }
+
+    var chain = prerequisiteChain(symptomFamily);
+    var best = weakestIn(chain, byFamily, symptomMastery);
     if (!best) {
-      return { family: symptomFamily, skill: symptomSkill, isRoot: true, via: 'symptom', chain: chain, rationale: chain.length ? 'prerequisites_healthy' : 'no_prerequisites' };
+      var mergedChain = lessonChain.length ? lessonChain.concat(chain) : chain;
+      return { family: symptomFamily, skill: symptomSkill, isRoot: true, via: 'symptom', scope: lessonChain.length ? 'lesson' : 'family', chain: mergedChain, rationale: mergedChain.length ? 'prerequisites_healthy' : 'no_prerequisites' };
     }
     return {
-      family: best.family,
-      skill: best.skill || best.family,
+      family: best.key,
+      skill: best.skill || best.key,
       isRoot: false,
       via: 'prerequisite',
+      scope: 'family',
       symptomFamily: symptomFamily,
       symptomSkill: symptomSkill,
       gap: round(symptomMastery - best.mastery, 2),
@@ -652,12 +781,13 @@
     });
     var reviews = reviewPriority(data.memory || [], { now: now, targetRetention: data.targetRetention });
     var atRisk = reviews.filter(function (row) { return row.retrievability <= 0.85 && row.retrievability >= 0.35; });
+    var relearn = reviews.filter(function (row) { return row.retrievability < 0.35; });
     var plan = planSession({
       ability: ability,
       momentum: momentum(attempts),
       fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
       dueReviews: reviews.length,
-      atRiskReviews: atRisk.length,
+      atRiskReviews: atRisk.length + relearn.length,
       abandonmentRate: data.abandonmentRate,
       targetSuccess: data.targetSuccess
     });
@@ -669,7 +799,7 @@
       momentum: momentum(attempts),
       fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
       challenge: challengeWindow(ability.ability, { targetSuccess: data.targetSuccess }),
-      memory: { total: reviews.length, atRisk: atRisk.length, top: reviews.slice(0, 8) },
+      memory: { total: reviews.length, atRisk: atRisk.length, relearn: relearn.length, top: reviews.slice(0, 8) },
       chronotype: studyWindows(attempts, { hourOf: data.hourOf }),
       rootCause: data.weakTarget ? rootCause(data.weakTarget, data.skillEvidence) : null,
       plan: plan
@@ -782,6 +912,9 @@
     trend: trend,
     momentum: momentum,
     prerequisiteChain: prerequisiteChain,
+    setCurriculumGraph: setCurriculumGraph,
+    curriculumGraphSize: curriculumGraphSize,
+    lessonNode: lessonNode,
     rootCause: rootCause,
     studyWindows: studyWindows,
     fatigue: fatigue,

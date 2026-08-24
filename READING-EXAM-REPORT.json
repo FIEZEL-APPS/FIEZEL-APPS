@@ -1,0 +1,335 @@
+{
+  "status": "PASS",
+  "version": "1.0.0",
+  "counts": {
+    "pass": 28,
+    "fail": 0,
+    "examPassages": 5,
+    "examQuestions": 60,
+    "questionTypes": 11
+  },
+  "legacyCalibration": {
+    "rows": [
+      {
+        "level": "A1",
+        "passages": 50,
+        "meanWords": 58.1,
+        "meanFlesch": 38
+      },
+      {
+        "level": "A2",
+        "passages": 50,
+        "meanWords": 58,
+        "meanFlesch": 32.5
+      },
+      {
+        "level": "B1",
+        "passages": 50,
+        "meanWords": 58.1,
+        "meanFlesch": 29
+      },
+      {
+        "level": "B2",
+        "passages": 50,
+        "meanWords": 58.1,
+        "meanFlesch": 32.4
+      },
+      {
+        "level": "C1",
+        "passages": 50,
+        "meanWords": 58.2,
+        "meanFlesch": 35.1
+      },
+      {
+        "level": "C2",
+        "passages": 50,
+        "meanWords": 60.9,
+        "meanFlesch": 43.3
+      }
+    ],
+    "inversions": [
+      "B1->B2",
+      "B2->C1",
+      "C1->C2"
+    ],
+    "ceiling": 3
+  },
+  "checks": [
+    {
+      "name": "Exam reading schema",
+      "status": "PASS",
+      "details": "schema=fiezel-reading-exam-v1 passages=5"
+    },
+    {
+      "name": "No-prediction statement is present",
+      "status": "PASS",
+      "details": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL. Set ini latihan berformat ujian; tingkat kesulitannya disusun mendekati ujian aslinya, bukan disalin darinya."
+    },
+    {
+      "name": "Both exams are represented",
+      "status": "PASS",
+      "details": [
+        "ielts_academic_reading",
+        "toefl_reading",
+        "ielts_academic_reading",
+        "ielts_academic_reading",
+        "toefl_reading"
+      ]
+    },
+    {
+      "name": "Format contracts are complete",
+      "status": "PASS",
+      "details": [
+        "ielts_academic_reading",
+        "toefl_reading"
+      ]
+    },
+    {
+      "name": "Every passage sits inside its exam word range",
+      "status": "PASS",
+      "details": [
+        "rx-tram=736 (700-1000)",
+        "rx-rings=702 (650-750)",
+        "rx-fall=735 (700-1000)",
+        "rx-poverty=752 (700-1000)",
+        "rx-lakes=700 (650-750)"
+      ]
+    },
+    {
+      "name": "Declared word counts match the text",
+      "status": "PASS",
+      "details": [
+        "rx-tram:736/736",
+        "rx-rings:702/702",
+        "rx-fall:735/735",
+        "rx-poverty:752/752",
+        "rx-lakes:700/700"
+      ]
+    },
+    {
+      "name": "Every passage has enough paragraphs to be navigable",
+      "status": "PASS",
+      "details": [
+        "rx-tram=8",
+        "rx-rings=7",
+        "rx-fall=9",
+        "rx-poverty=10",
+        "rx-lakes=10"
+      ]
+    },
+    {
+      "name": "Question count per passage sits inside the format range",
+      "status": "PASS",
+      "details": [
+        "rx-tram=13",
+        "rx-rings=10",
+        "rx-fall=13",
+        "rx-poverty=14",
+        "rx-lakes=10"
+      ]
+    },
+    {
+      "name": "Each exam has exactly one full session available",
+      "status": "PASS",
+      "details": [
+        "ielts_academic_reading: 3/3 bacaan, 40/40 soal",
+        "toefl_reading: 2/2 bacaan, 20/20 soal"
+      ]
+    },
+    {
+      "name": "Every passage is bound to a known CEFR level",
+      "status": "PASS",
+      "details": [
+        "rx-tram=B2",
+        "rx-rings=C1",
+        "rx-fall=B2",
+        "rx-poverty=C1",
+        "rx-lakes=B2"
+      ]
+    },
+    {
+      "name": "Unique question identities",
+      "status": "PASS",
+      "details": "60 questions"
+    },
+    {
+      "name": "Every answer index is inside its option list",
+      "status": "PASS",
+      "details": "kunci di luar daftar pilihan akan menilai jawaban benar sebagai salah"
+    },
+    {
+      "name": "Options are non-empty and distinct",
+      "status": "PASS",
+      "details": "pilihan kembar membuat dua jawaban benar"
+    },
+    {
+      "name": "Every question declares a type its format allows",
+      "status": "PASS",
+      "details": [
+        "true_false_not_given",
+        "matching_information",
+        "multiple_choice",
+        "factual",
+        "negative_factual",
+        "vocabulary",
+        "inference",
+        "sentence_simplification",
+        "rhetorical_purpose",
+        "insert_text",
+        "yes_no_not_given"
+      ]
+    },
+    {
+      "name": "Every question explains itself three ways",
+      "status": "PASS",
+      "details": "evidence, why, dan whyOthersFail wajib ada"
+    },
+    {
+      "name": "Every cited evidence string appears verbatim in its passage",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "TFNG questions keep the canonical option order",
+      "status": "PASS",
+      "details": "12 TFNG questions"
+    },
+    {
+      "name": "TFNG answers use all three verdicts",
+      "status": "PASS",
+      "details": [
+        "True",
+        "False",
+        "Not Given",
+        "True",
+        "False",
+        "True",
+        "False",
+        "Not Given",
+        "False",
+        "True",
+        "True",
+        "True"
+      ]
+    },
+    {
+      "name": "YNNG questions keep the canonical option order",
+      "status": "PASS",
+      "details": "4 soal YNNG"
+    },
+    {
+      "name": "YNNG answers use all three verdicts",
+      "status": "PASS",
+      "details": [
+        "No",
+        "Yes",
+        "No",
+        "Not Given"
+      ]
+    },
+    {
+      "name": "The IELTS format lists both TFNG and YNNG, and explains the difference",
+      "status": "PASS",
+      "details": "dua tipe yang mirip bentuknya tetapi berbeda yang diujinya harus dibedakan di kontraknya"
+    },
+    {
+      "name": "Matching-information keys point at the paragraph that holds the evidence",
+      "status": "PASS",
+      "details": []
+    },
+    {
+      "name": "TOEFL sets cover the types that punish skimming",
+      "status": "PASS",
+      "details": [
+        [
+          "factual",
+          "negative_factual",
+          "vocabulary",
+          "inference",
+          "sentence_simplification",
+          "rhetorical_purpose",
+          "insert_text"
+        ],
+        [
+          "factual",
+          "negative_factual",
+          "vocabulary",
+          "sentence_simplification",
+          "rhetorical_purpose",
+          "inference",
+          "insert_text"
+        ]
+      ]
+    },
+    {
+      "name": "Exam options are never shuffled",
+      "status": "PASS",
+      "details": "mengacak \"Position A-D\" atau True/False/Not Given menghancurkan artinya"
+    },
+    {
+      "name": "Exam sets honour the active level contract",
+      "status": "PASS",
+      "details": "set di luar level aktif harus ditolak, dan soal cacat tidak boleh masuk sesi"
+    },
+    {
+      "name": "Exam sets stay out of the random and adaptive pools",
+      "status": "PASS",
+      "details": "jalur ujian terpisah dari bank lama supaya kontrak level tidak bocor"
+    },
+    {
+      "name": "Legacy reading calibration does not get worse",
+      "status": "PASS",
+      "details": {
+        "inversions": [
+          "B1->B2",
+          "B2->C1",
+          "C1->C2"
+        ],
+        "ceiling": 3,
+        "note": "bank lama BELUM terkalibrasi; angka ini plafon regresi, bukan tanda sehat"
+      }
+    },
+    {
+      "name": "Legacy calibration debt stays visible in the report",
+      "status": "PASS",
+      "details": [
+        {
+          "level": "A1",
+          "passages": 50,
+          "meanWords": 58.1,
+          "meanFlesch": 38
+        },
+        {
+          "level": "A2",
+          "passages": 50,
+          "meanWords": 58,
+          "meanFlesch": 32.5
+        },
+        {
+          "level": "B1",
+          "passages": 50,
+          "meanWords": 58.1,
+          "meanFlesch": 29
+        },
+        {
+          "level": "B2",
+          "passages": 50,
+          "meanWords": 58.1,
+          "meanFlesch": 32.4
+        },
+        {
+          "level": "C1",
+          "passages": 50,
+          "meanWords": 58.2,
+          "meanFlesch": 35.1
+        },
+        {
+          "level": "C2",
+          "passages": 50,
+          "meanWords": 60.9,
+          "meanFlesch": 43.3
+        }
+      ]
+    }
+  ]
+}

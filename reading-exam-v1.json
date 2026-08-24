@@ -1,0 +1,1128 @@
+{
+  "schema": "fiezel-reading-exam-v1",
+  "schemaVersion": "1.0.0",
+  "version": "1.0.0",
+  "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL. Set ini latihan berformat ujian; tingkat kesulitannya disusun mendekati ujian aslinya, bukan disalin darinya.",
+  "examFormats": {
+    "ielts_academic_reading": {
+      "label": "IELTS Academic Reading",
+      "passageWords": [
+        700,
+        1000
+      ],
+      "minutesPerPassage": 20,
+      "questionTypes": [
+        "true_false_not_given",
+        "yes_no_not_given",
+        "matching_information",
+        "multiple_choice"
+      ],
+      "note": "Di ujian aslinya ada 3 bacaan dalam 60 menit. True/False/Not Given menguji FAKTA di teks; Yes/No/Not Given menguji PANDANGAN penulis - dan tertukarnya keduanya adalah salah satu sebab kehilangan nilai yang paling sering. Not Given berarti teksnya DIAM, bukan bahwa pernyataannya terasa meragukan.",
+      "questionsPerPassage": [
+        13,
+        14
+      ],
+      "passagesPerSession": 3,
+      "questionsPerSession": 40
+    },
+    "toefl_reading": {
+      "label": "TOEFL iBT Reading",
+      "passageWords": [
+        650,
+        750
+      ],
+      "minutesPerPassage": 18,
+      "questionTypes": [
+        "factual",
+        "negative_factual",
+        "vocabulary",
+        "inference",
+        "sentence_simplification",
+        "rhetorical_purpose",
+        "insert_text"
+      ],
+      "note": "Di ujian aslinya ada 2 bacaan dalam 35 menit. Soal EXCEPT dan insert-text menghukum pembaca yang tergesa.",
+      "questionsPerPassage": [
+        10,
+        10
+      ],
+      "passagesPerSession": 2,
+      "questionsPerSession": 20
+    }
+  },
+  "passages": [
+    {
+      "id": "rx-tram",
+      "exam": "ielts_academic_reading",
+      "level": "B2",
+      "title": "The Return of the Urban Tram",
+      "topic": "transport history and policy",
+      "text": "Between 1900 and 1930, the electric tram was the ordinary way to cross a European or North American city. Rails ran down the middle of the main streets, cars arrived every few minutes, and fares were low enough that clerks and factory workers used them daily. Within four decades most of those systems had been torn up. The story of why they vanished, and why many cities are now laying rails again, says a great deal about how transport decisions are actually made.\n\nThe usual explanation is that the private car simply won. Cars were faster door to door, they carried families and shopping, and as incomes rose after 1945 more households could afford one. There is obvious truth in this. But the timing does not fit neatly. In several cities the tram network was closed years before car ownership became widespread, and the decision was taken by municipal committees rather than by passengers drifting away. Ridership on some closed lines was still rising when the closure was announced.\n\nA second factor was the condition of the infrastructure itself. Tram track is expensive to maintain. Rails set into a road surface wear at a different rate from the asphalt around them, and by the late 1930s much of the network laid before the First World War was reaching the end of its life. Wartime shortages postponed the reckoning; when it arrived, councils faced a large bill for renewal at exactly the moment when buses were being marketed as a flexible, cheap alternative that required no track at all. A bus route could be moved with a signpost. To a committee looking at a deficit, that argument was difficult to refuse.\n\nWhat the committees did not price was the cost of the switch to everyone else. Buses shared road space with the growing volume of cars, so they were subject to the same congestion. As journeys became slower and less predictable, passengers who had a choice moved to their own vehicles, which added to the congestion that had slowed the buses in the first place. Several transport historians describe this as a ratchet: each turn made the next turn easier, and none of them was easy to reverse.\n\nThe return of the tram, from the 1980s onward, was not driven by nostalgia. It began in cities that had run out of road. Once a corridor is full, adding a lane usually fills again within a few years, a pattern documented often enough to have its own name, induced demand. A tram lane carries far more people per metre of street width than a general traffic lane, and it does so predictably, because it is separated from the cars. Predictability turns out to matter more to passengers than raw speed: a service that is reliably slow is easier to plan around than one that is sometimes fast.\n\nModern systems also learned from the old ones. Where the pre-war tram stopped every two hundred metres, the modern equivalent often stops every five hundred, which raises average speed considerably at a modest cost in walking distance. Low floors, level boarding and off-vehicle ticketing cut the time spent standing still at each stop, which on a busy line can account for a third of the journey. None of these are dramatic innovations. Together they change the economics.\n\nThe rebuilding is not universally successful. A tram line is a fixed asset in a way a bus route is not, and if it is built along the wrong corridor the mistake is permanent and visible. Construction disrupts the businesses along the route for a year or more, and some never recover. Costs frequently exceed the original estimate, sometimes substantially, and the schemes that overrun are the ones that get written about. Cities that have done it well tend to share an unglamorous characteristic: they decided the route on the basis of where people already travelled, rather than where planners hoped development would follow.\n\nThat last point is the connection between the two eras. The systems torn up in the 1950s were dismantled by people who believed they were reading the future correctly, and who were working with the costs that appeared on their own balance sheet. The costs that did not appear there arrived anyway, and were paid by somebody else, over a longer period. Whether the current generation of schemes is making a symmetrical error is not something that can be settled now.",
+      "questions": [
+        {
+          "id": "rx-tram-1",
+          "type": "true_false_not_given",
+          "stem": "Tram fares in the early twentieth century were affordable for ordinary workers.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "fares were low enough that clerks and factory workers used them daily",
+            "why": "Teks menyebut tarifnya cukup murah sehingga pegawai dan buruh pabrik memakainya setiap hari - itu persis pernyataannya.",
+            "whyOthersFail": "False butuh teks yang membantah; Not Given butuh teks yang diam soal tarif. Keduanya tidak berlaku di sini."
+          }
+        },
+        {
+          "id": "rx-tram-2",
+          "type": "true_false_not_given",
+          "stem": "Every tram system that closed was losing passengers at the time the decision was taken.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Ridership on some closed lines was still rising when the closure was announced",
+            "why": "Teks menyatakan sebagian jalur yang ditutup justru penumpangnya masih NAIK. Itu membantah kata 'every', jadi False.",
+            "whyOthersFail": "True bertentangan dengan kalimat itu. Not Given salah karena teksnya justru bicara langsung soal ini - kesalahan paling umum di TFNG adalah memilih Not Given padahal jawabannya ada."
+          }
+        },
+        {
+          "id": "rx-tram-3",
+          "type": "true_false_not_given",
+          "stem": "Bus manufacturers lobbied municipal committees directly.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "buses were being marketed as a flexible, cheap alternative that required no track at all",
+            "why": "Teks menyebut bus DIPASARKAN sebagai alternatif, tetapi tidak pernah menyebut produsen melobi komite. Tidak ada informasinya, jadi Not Given.",
+            "whyOthersFail": "True menambahkan yang tidak tertulis; False butuh bantahan yang juga tidak ada. 'Dipasarkan' bukan sama dengan 'melobi komite'."
+          }
+        },
+        {
+          "id": "rx-tram-4",
+          "type": "true_false_not_given",
+          "stem": "Adding a traffic lane to a congested corridor tends to bring only temporary relief.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "adding a lane usually fills again within a few years, a pattern documented often enough to have its own name, induced demand",
+            "why": "Lajur baru terisi lagi dalam beberapa tahun - itu definisi kelegaan yang sementara.",
+            "whyOthersFail": "False butuh teks yang menyatakan kelegaannya bertahan. Not Given salah karena polanya bahkan diberi nama di teks."
+          }
+        },
+        {
+          "id": "rx-tram-5",
+          "type": "true_false_not_given",
+          "stem": "Modern tram systems place their stops closer together than pre-war systems did.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Where the pre-war tram stopped every two hundred metres, the modern equivalent often stops every five hundred",
+            "why": "Justru sebaliknya: sebelum perang tiap 200 meter, sekarang sering tiap 500 meter. Pernyataan ini dibalik, jadi False.",
+            "whyOthersFail": "True membalik angkanya. Not Given salah karena kedua angkanya disebut eksplisit."
+          }
+        },
+        {
+          "id": "rx-tram-6",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang memuat perbandingan berapa banyak ruang jalan yang dibutuhkan moda yang berbeda?",
+          "options": [
+            "Paragraf 3",
+            "Paragraf 4",
+            "Paragraf 5",
+            "Paragraf 7"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "A tram lane carries far more people per metre of street width than a general traffic lane",
+            "why": "Hanya paragraf 5 yang membandingkan daya angkut per meter lebar jalan.",
+            "whyOthersFail": "Paragraf 3 soal biaya perawatan rel, paragraf 4 soal lingkaran kemacetan, paragraf 7 soal proyek yang gagal."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-tram-7",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa biaya perawatan jatuh tempo pada saat tertentu?",
+          "options": [
+            "Paragraf 2",
+            "Paragraf 3",
+            "Paragraf 6",
+            "Paragraf 8"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Wartime shortages postponed the reckoning; when it arrived, councils faced a large bill for renewal",
+            "why": "Paragraf 3 menerangkan rel tua mendekati akhir usia dan kelangkaan masa perang menunda tagihannya.",
+            "whyOthersFail": "Paragraf 2 soal mobil pribadi, paragraf 6 soal perbaikan teknis, paragraf 8 soal penilaian penutup."
+          },
+          "paragraph": 3
+        },
+        {
+          "id": "rx-tram-8",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menggambarkan lingkaran yang menguatkan dirinya sendiri?",
+          "options": [
+            "Paragraf 1",
+            "Paragraf 4",
+            "Paragraf 6",
+            "Paragraf 7"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "Several transport historians describe this as a ratchet: each turn made the next turn easier",
+            "why": "Paragraf 4 menjelaskan bus melambat karena macet, penumpang pindah ke mobil, dan macetnya bertambah - lingkaran yang memperkuat diri.",
+            "whyOthersFail": "Paragraf 1 latar sejarah, paragraf 6 perbaikan teknis sistem modern, paragraf 7 risiko proyek."
+          },
+          "paragraph": 4
+        },
+        {
+          "id": "rx-tram-9",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang mengakui sebagian proyek modern berjalan buruk?",
+          "options": [
+            "Paragraf 5",
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 8"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "Costs frequently exceed the original estimate, sometimes substantially",
+            "why": "Paragraf 7 menyebut gangguan pada usaha di sepanjang rute dan biaya yang membengkak.",
+            "whyOthersFail": "Paragraf 5 dan 6 justru menjelaskan kelebihan sistem modern; paragraf 8 membandingkan dua era."
+          },
+          "paragraph": 7
+        },
+        {
+          "id": "rx-tram-10",
+          "type": "multiple_choice",
+          "stem": "Mengapa penulis menyatakan bahwa waktunya 'does not fit neatly'?",
+          "options": [
+            "Karena sebagian jaringan ditutup sebelum kepemilikan mobil meluas",
+            "Karena mobil ternyata lebih lambat daripada trem",
+            "Karena penumpang trem tidak pernah berkurang di kota mana pun",
+            "Karena catatan tarif dari masa itu tidak lengkap"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "In several cities the tram network was closed years before car ownership became widespread",
+            "why": "Kalau mobil yang mengalahkan trem, penutupannya mestinya terjadi SETELAH mobil meluas - dan di beberapa kota urutannya terbalik.",
+            "whyOthersFail": "Teks justru menyebut mobil lebih cepat dari pintu ke pintu; 'tidak pernah berkurang di kota mana pun' terlalu luas dan tidak didukung; kelengkapan catatan tarif tidak dibahas."
+          }
+        },
+        {
+          "id": "rx-tram-11",
+          "type": "multiple_choice",
+          "stem": "Menurut penulis, apa yang gagal diperhitungkan komite kota?",
+          "options": [
+            "Biaya yang ditanggung pihak lain di luar neraca mereka sendiri",
+            "Harga bahan bakar bus dalam jangka panjang",
+            "Jumlah penduduk kota yang akan menyusut",
+            "Kesulitan memindahkan rute bus"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "What the committees did not price was the cost of the switch to everyone else",
+            "why": "Komite menghitung yang muncul di neracanya sendiri; biaya kemacetan yang ditanggung orang lain tidak masuk hitungan.",
+            "whyOthersFail": "Harga bahan bakar dan penyusutan penduduk tidak disebut. Kemudahan memindahkan rute bus justru dipakai sebagai ALASAN memilih bus, bukan yang terlewat."
+          }
+        },
+        {
+          "id": "rx-tram-12",
+          "type": "multiple_choice",
+          "stem": "Menurut bacaan, apa yang lebih dihargai penumpang dibanding kecepatan mentah?",
+          "options": [
+            "Keterduga-an jadwal",
+            "Tarif yang paling murah",
+            "Tempat duduk yang nyaman",
+            "Jumlah halte yang banyak"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Predictability turns out to matter more to passengers than raw speed",
+            "why": "Teks menyatakannya langsung: layanan yang lambat tetapi bisa diandalkan lebih mudah direncanakan daripada yang kadang cepat.",
+            "whyOthersFail": "Tarif, kenyamanan tempat duduk, dan jumlah halte tidak dibandingkan dengan kecepatan di bagian itu - halte justru DIKURANGI di sistem modern."
+          }
+        },
+        {
+          "id": "rx-tram-13",
+          "type": "multiple_choice",
+          "stem": "Ciri apa yang dimiliki bersama oleh kota yang berhasil membangun kembali tremnya?",
+          "options": [
+            "Rutenya ditentukan dari pola perjalanan yang sudah ada",
+            "Mereka membangun jalur terpanjang yang mampu dibiayai",
+            "Mereka memakai kembali rel dari sebelum perang",
+            "Mereka melarang mobil pribadi di pusat kota"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "they decided the route on the basis of where people already travelled, rather than where planners hoped development would follow",
+            "why": "Cirinya justru tidak megah: rute mengikuti ke mana orang memang sudah bepergian, bukan ke mana pembangunan diharapkan menyusul.",
+            "whyOthersFail": "Panjang jalur, rel lama, dan larangan mobil tidak disebut sebagai ciri keberhasilan."
+          }
+        }
+      ],
+      "wordCount": 736,
+      "paragraphs": 8
+    },
+    {
+      "id": "rx-rings",
+      "exam": "toefl_reading",
+      "level": "C1",
+      "title": "Reading the Rings of Trees",
+      "topic": "dendrochronology",
+      "text": "In temperate climates a tree adds one layer of wood each year, and the layers are visible in cross-section as rings. Wide rings correspond to favourable growing seasons and narrow rings to poor ones. Because every tree in a region experiences the same weather, trees of the same species growing near one another produce the same pattern of wide and narrow rings. That shared pattern is what makes the rings useful as a record. A single tree tells you about one organism; a pattern repeated across many trees tells you about a climate.\n\nThe technique that exploits this is called crossdating. An investigator measures the ring widths of a living tree whose outer ring corresponds to a known year, then looks for the same sequence of wide and narrow rings in a beam taken from an older structure. Where the sequences overlap, the beam can be dated exactly. The overlapping beam then extends the reference sequence further back, and the process repeats. Chronologies assembled in this way now reach back more than eight thousand years in some regions, and each year in them is a calendar year rather than an estimate.\n\nThe precision is the point. Radiocarbon dating, the other main technique available to archaeologists, returns a range rather than a date, and the width of that range is rarely less than several decades. For many questions a range is sufficient. For others it is not. If the question is whether a particular roof beam was cut before or after a documented siege, a range that spans the siege answers nothing. Tree rings, where the wood survives, can settle it.\n\nThe method has strict limits, and they are worth stating plainly. It requires a species that produces one clear ring per year, which excludes most tropical trees, where growth is not interrupted by a cold season. It requires enough rings in the sample to produce a distinctive pattern; a beam with thirty rings may match the reference sequence in several places by chance. It requires that the outermost ring be present, or the date obtained is the date of some year before felling rather than the felling itself, and carpenters routinely trimmed away the outer wood. A date reported without this qualification can be wrong by decades in a direction that is not random: always too early.\n\nBeyond dating, the rings carry environmental information. A ring formed during a drought is narrow, and a sequence of narrow rings across many trees over a wide area indicates a regional drought rather than a local misfortune. Reconstructions built this way have identified severe multi-year droughts in the American Southwest that coincide with the abandonment of settlements, and comparable episodes elsewhere. The correspondence is suggestive, and it has often been reported as though it settled the matter. It does not. A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it, and the archaeological record in several of these cases shows movement beginning before the drought did.\n\nRings also record events other than weather. A frost severe enough to damage growing cells leaves a distinctive damaged layer, and such frost rings appear in the same year across widely separated regions after some large volcanic eruptions, which inject material into the upper atmosphere and cool the surface. Because the ring gives an exact year, these layers have been used to date eruptions whose historical records are vague or contradictory. Scars from fire are preserved in the same way, and a fire history assembled from scarred trees can show how frequently a particular forest burned before modern suppression policies began.\n\nNone of this makes the rings a transparent window. Interpretation involves judgement about which trees to sample, how to combine sequences that disagree, and how to separate the effects of climate from the effects of a tree's own ageing, since rings tend to narrow as a trunk widens regardless of conditions. Different laboratories processing the same raw measurements have produced reconstructions that differ in their details. What the rings offer is not certainty but an unusually well-anchored starting point: a set of dates that are exact, from which the arguments can proceed.",
+      "questions": [
+        {
+          "id": "rx-rings-1",
+          "type": "factual",
+          "stem": "According to paragraph 1, what makes tree rings useful as a record?",
+          "options": [
+            "Rings appear in every species of tree",
+            "Nearby trees of the same species share the same ring pattern",
+            "Each ring can be measured to the nearest millimetre",
+            "Rings grow wider as a tree ages"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "trees of the same species growing near one another produce the same pattern of wide and narrow rings",
+            "why": "Pola yang SAMA di banyak pohon itulah yang mengubah cincin dari catatan satu pohon menjadi catatan iklim.",
+            "whyOthersFail": "Teks justru menyebut sebagian besar pohon tropis tidak membentuk satu cincin per tahun; ketelitian pengukuran dan pelebaran seiring usia bukan alasan yang diberikan di paragraf 1."
+          }
+        },
+        {
+          "id": "rx-rings-2",
+          "type": "factual",
+          "stem": "According to paragraph 2, how is a reference sequence extended further back in time?",
+          "options": [
+            "By counting rings on the oldest living tree available",
+            "By overlapping an older beam with a sequence that is already dated",
+            "By comparing rings with radiocarbon results",
+            "By sampling trees from several different regions"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "The overlapping beam then extends the reference sequence further back, and the process repeats",
+            "why": "Crossdating menyambung: balok yang lebih tua ditumpangkan pada urutan yang sudah bertanggal, lalu jadi dasar sambungan berikutnya.",
+            "whyOthersFail": "Pohon hidup hanya titik AWAL, bukan cara memperpanjang. Radiokarbon dibahas sebagai pembanding, bukan bagian metodenya."
+          }
+        },
+        {
+          "id": "rx-rings-3",
+          "type": "negative_factual",
+          "stem": "All of the following are stated as limits of the method EXCEPT:",
+          "options": [
+            "Most tropical trees do not produce one clear ring per year",
+            "A short sequence may match the reference in several places by chance",
+            "The outermost ring is often missing from worked timber",
+            "Ring widths cannot be measured accurately in very old wood"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "It requires a species that produces one clear ring per year... a beam with thirty rings may match the reference sequence in several places by chance... It requires that the outermost ring be present",
+            "why": "Tiga batasan pertama disebut eksplisit di paragraf 4. Kesulitan MENGUKUR pada kayu sangat tua tidak pernah disebut.",
+            "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti begitu menemukan satu pilihan yang benar - di sini yang dicari justru yang TIDAK ada."
+          }
+        },
+        {
+          "id": "rx-rings-4",
+          "type": "vocabulary",
+          "stem": "The word \"settle\" in paragraph 3 is closest in meaning to",
+          "options": [
+            "resolve",
+            "postpone",
+            "calculate",
+            "question"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Tree rings, where the wood survives, can settle it",
+            "why": "Konteksnya pertanyaan yang tidak terjawab oleh rentang radiokarbon; cincin pohon bisa MENYELESAIKANNYA.",
+            "whyOthersFail": "'Postpone' dan 'question' berlawanan arah dengan konteksnya; 'calculate' menyempitkan maknanya jadi sekadar berhitung."
+          }
+        },
+        {
+          "id": "rx-rings-5",
+          "type": "inference",
+          "stem": "It can be inferred from paragraph 4 that a felling date reported without noting a missing outer ring will most likely be",
+          "options": [
+            "too early",
+            "too late",
+            "accurate within one year",
+            "impossible to compare with other dates"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "the date obtained is the date of some year before felling rather than the felling itself... always too early",
+            "why": "Kalau cincin terluar sudah diserut tukang kayu, tanggal yang didapat adalah tahun SEBELUM penebangan - jadi selalu terlalu awal.",
+            "whyOthersFail": "'Too late' membalik arahnya; teks justru menekankan galatnya TIDAK acak, sehingga 'akurat' dan 'tidak bisa dibandingkan' keduanya meleset."
+          }
+        },
+        {
+          "id": "rx-rings-6",
+          "type": "sentence_simplification",
+          "stem": "Which sentence best expresses the essential information in: \"A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it\"?",
+          "options": [
+            "Timing alone does not prove that the drought caused the departure",
+            "Droughts and abandonments were never connected in any way",
+            "People always left their settlements before a drought started",
+            "Abandonments can only be explained by studying rainfall"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "it does not establish that people left because of it",
+            "why": "Bersamaan waktu membuktikan kebersamaan, bukan sebab-akibat. Itu inti kalimatnya.",
+            "whyOthersFail": "Pilihan lain melampaui teks: penulis tidak menyatakan keduanya tidak berhubungan, tidak mengatakan orang SELALU pergi lebih dulu, dan tidak menjadikan curah hujan satu-satunya penjelasan."
+          }
+        },
+        {
+          "id": "rx-rings-7",
+          "type": "rhetorical_purpose",
+          "stem": "Why does the author mention frost rings after volcanic eruptions?",
+          "options": [
+            "To give an example of information in the rings that is not about weather patterns alone",
+            "To argue that volcanic dating is more reliable than crossdating",
+            "To explain why tropical trees lack clear rings",
+            "To show that historical records of eruptions are usually accurate"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Rings also record events other than weather",
+            "why": "Paragraf itu dibuka dengan pernyataan bahwa cincin merekam peristiwa selain cuaca; frost ring adalah contohnya.",
+            "whyOthersFail": "Teks justru menyebut catatan sejarah letusan sering kabur atau bertentangan, dan tidak membandingkan keandalan kedua metode."
+          }
+        },
+        {
+          "id": "rx-rings-8",
+          "type": "factual",
+          "stem": "According to paragraph 7, why do rings tend to narrow as a trunk widens?",
+          "options": [
+            "Because the same amount of wood is spread over a longer circumference",
+            "Because older trees receive less rainfall",
+            "Because laboratories measure old rings differently",
+            "Because fire scars interrupt the growth layers"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "rings tend to narrow as a trunk widens regardless of conditions",
+            "why": "Teks menyatakan penyempitan itu terjadi TERLEPAS dari kondisi - efek geometri batang yang melebar, bukan efek iklim.",
+            "whyOthersFail": "Curah hujan, perbedaan laboratorium, dan bekas kebakaran memang disebut di tempat lain, tetapi bukan sebagai sebab penyempitan ini."
+          }
+        },
+        {
+          "id": "rx-rings-9",
+          "type": "insert_text",
+          "stem": "Where would this sentence best fit in paragraph 3?  \"For many questions a range is sufficient.\"  (A) Radiocarbon dating returns a range rather than a date. (B) The width of that range is rarely less than several decades. (C) For others it is not. (D) If the question is whether a beam was cut before or after a siege, a range answers nothing.",
+          "options": [
+            "Position A",
+            "Position B",
+            "Position C",
+            "Position D"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "For many questions a range is sufficient. For others it is not.",
+            "why": "Kalimat itu memasang pasangan 'For many... / For others...'. Ia harus berdiri tepat SEBELUM 'For others it is not', yaitu posisi C.",
+            "whyOthersFail": "Di A dan B kalimatnya memotong penjelasan tentang apa itu rentang; di D pasangannya sudah lewat dan 'For others' jadi menggantung."
+          }
+        },
+        {
+          "id": "rx-rings-10",
+          "type": "inference",
+          "stem": "What does the final paragraph suggest about reconstructions from different laboratories?",
+          "options": [
+            "Judgement in processing can lead to differing results from the same measurements",
+            "Only one laboratory's method is considered valid",
+            "Raw measurements are usually wrong",
+            "Disagreement means the dates themselves are unreliable"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Different laboratories processing the same raw measurements have produced reconstructions that differ in their details",
+            "why": "Yang berbeda adalah hasil OLAHANNYA, karena ada pertimbangan di dalamnya - bukan pengukurannya, dan bukan tanggalnya.",
+            "whyOthersFail": "Justru sebaliknya di pilihan terakhir: penulis menutup dengan menyebut tanggalnya tepat dan itulah pijakan argumennya."
+          }
+        }
+      ],
+      "wordCount": 702,
+      "paragraphs": 7
+    },
+    {
+      "id": "rx-fall",
+      "exam": "ielts_academic_reading",
+      "level": "B2",
+      "title": "Why Buildings Fall Down Less Often",
+      "topic": "structural engineering and the sharing of failure",
+      "text": "Large buildings collapse far less often than they did a century ago, and the reason is not that engineers have become cleverer. It is that the profession developed a systematic habit of studying its own failures, and of treating each one as information that belonged to everybody rather than as an embarrassment belonging to one firm.\n\nThe habit was not adopted willingly. Through most of the nineteenth century, a structural failure was handled as a private matter between the builder, the client and, if anyone had died, the courts. Detailed findings rarely circulated. An engineer in Glasgow might repeat, in 1880, an error that had already killed people in Manchester in 1868, simply because nobody had told him about it.\n\nWhat changed the pattern was a series of disasters too public to be handled quietly. The collapse of the Tay Bridge in 1879, which took a train and its passengers into the river below, produced an inquiry whose findings were printed and argued over across Europe. The inquiry concluded that the bridge had been designed without adequate allowance for wind pressure — a factor its designer had considered, but had estimated at roughly a fifth of what later measurement suggested. The importance of the case was less the specific error than the precedent: the reasoning behind a failure had been laid out in public for other engineers to read.\n\nFrom that beginning, a body of shared knowledge accumulated, and much of it took a form that is easy to overlook. Building codes are often described as bureaucratic obstacles, and in their day-to-day operation they can certainly feel that way. But a code is, in substance, a record of past failures written in the form of instructions. A clause specifying a minimum thickness, or a maximum span, or a required margin above the calculated load, is usually there because at some point a structure built to a lesser standard came down.\n\nThis gives codes a characteristic that is genuinely awkward. They are conservative by design, and they accumulate rather than simplify. Each generation adds its lessons, and few clauses are ever removed, because removing one requires proving a negative — that the failure it prevents can no longer occur. The result is a document that grows steadily more cautious and more complex, and that occasionally forbids things which modern materials would handle perfectly well.\n\nThere is a second and less comfortable pattern. Failures cluster around novelty. Structures built in a familiar way, using familiar materials, at familiar scales, almost never fail; the accumulated caution covers them. Failures happen at the edges — when a span is longer than any previously attempted, when a material is used in a role it has not filled before, or when a form is copied from one climate into another. In each case the code has nothing to say, because nothing has yet gone wrong in that particular way.\n\nEngineers are aware of this, and the standard response is to add margin where the calculations are least certain. But margin is expensive, and the pressure to reduce it is constant and comes from people who are not being unreasonable. A client who is told that a design carries a safety factor of three will quite naturally ask what would be lost by using two and a half. The honest answer is often that nobody knows precisely — which is an uncomfortable thing to say and a difficult thing to charge for.\n\nThe most instructive modern cases are therefore not the collapses but the near-misses: structures where an error was found before it caused harm. The best known is a New York tower whose engineer, prompted by a student's question, rechecked his own calculations and discovered that the building as built was vulnerable to winds striking it at the corners rather than the faces. The repairs were carried out quietly, at night, over several months. The case is now taught widely, though it should be noted that it became public only years afterwards, and that the incentives at the time pointed strongly towards silence.\n\nThat last point is where the story remains unfinished. The discipline's improvement rests on failures being examined and shared, and the pressures against sharing — legal, commercial, reputational — have not weakened. What has changed is that most engineers now regard concealment as professionally disgraceful rather than merely risky. Whether that norm holds when it is expensive to honour is tested somewhere every year.",
+      "questions": [
+        {
+          "id": "rx-fall-1",
+          "type": "true_false_not_given",
+          "stem": "Detailed findings from nineteenth-century structural failures were rarely shared between engineers.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Detailed findings rarely circulated",
+            "why": "Teks menyatakannya langsung, lalu memberi contoh: insinyur di Glasgow bisa mengulang kesalahan yang sudah menewaskan orang di Manchester.",
+            "whyOthersFail": "False butuh bantahan; Not Given salah karena teksnya justru membahas hal ini secara eksplisit."
+          }
+        },
+        {
+          "id": "rx-fall-2",
+          "type": "true_false_not_given",
+          "stem": "The Tay Bridge designer had ignored wind pressure completely.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "a factor its designer had considered, but had estimated at roughly a fifth of what later measurement suggested",
+            "why": "Ia MEMPERHITUNGKANNYA, hanya terlalu kecil. \"Ignored completely\" membalik faktanya.",
+            "whyOthersFail": "True menerima kata 'completely' yang tidak didukung; Not Given salah karena angkanya disebut."
+          }
+        },
+        {
+          "id": "rx-fall-3",
+          "type": "true_false_not_given",
+          "stem": "The Tay Bridge inquiry led directly to the first national building code.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "produced an inquiry whose findings were printed and argued over across Europe",
+            "why": "Teks menyebut penyelidikannya jadi preseden berbagi pengetahuan, tetapi tidak pernah menyatakan ia melahirkan kode bangunan nasional pertama.",
+            "whyOthersFail": "True menambahkan yang tidak tertulis. Ini jebakan TFNG yang paling khas: kesimpulan yang terasa wajar tetapi tidak pernah dikatakan."
+          }
+        },
+        {
+          "id": "rx-fall-4",
+          "type": "true_false_not_given",
+          "stem": "Clauses are frequently removed from building codes as materials improve.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "few clauses are ever removed, because removing one requires proving a negative",
+            "why": "Justru sebaliknya: klausul hampir tidak pernah dicabut, karena mencabutnya menuntut pembuktian negatif.",
+            "whyOthersFail": "True membalik pernyataannya; Not Given salah karena alasannya dijelaskan panjang."
+          }
+        },
+        {
+          "id": "rx-fall-5",
+          "type": "true_false_not_given",
+          "stem": "Structures built using familiar materials at familiar scales almost never fail.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Structures built in a familiar way, using familiar materials, at familiar scales, almost never fail",
+            "why": "Kalimatnya hampir identik - dan itulah sebabnya kegagalan justru berkumpul di tepi kebaruan.",
+            "whyOthersFail": "False butuh bantahan; Not Given salah karena pernyataannya ada hampir kata per kata."
+          }
+        },
+        {
+          "id": "rx-fall-6",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa kode bangunan makin rumit seiring waktu?",
+          "options": [
+            "Paragraf 3",
+            "Paragraf 4",
+            "Paragraf 5",
+            "Paragraf 7"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "They are conservative by design, and they accumulate rather than simplify",
+            "why": "Paragraf 5 menerangkan kode menumpuk dan hampir tidak pernah dikurangi.",
+            "whyOthersFail": "Paragraf 4 mendefinisikan apa itu kode; paragraf 3 soal Tay Bridge; paragraf 7 soal margin dan biaya."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-fall-7",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang memuat contoh kesalahan yang ditemukan sebelum menimbulkan korban?",
+          "options": [
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 8",
+            "Paragraf 9"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "rechecked his own calculations and discovered that the building as built was vulnerable to winds striking it at the corners",
+            "why": "Paragraf 8 menceritakan menara New York yang diperbaiki diam-diam pada malam hari.",
+            "whyOthersFail": "Paragraf 6 soal kebaruan, paragraf 7 soal margin, paragraf 9 penilaian penutup."
+          },
+          "paragraph": 8
+        },
+        {
+          "id": "rx-fall-8",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa margin keamanan sulit dipertahankan?",
+          "options": [
+            "Paragraf 5",
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 8"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "margin is expensive, and the pressure to reduce it is constant and comes from people who are not being unreasonable",
+            "why": "Paragraf 7: klien yang meminta faktor keamanan diturunkan tidak sedang bersikap tidak masuk akal, dan jawabannya sering 'tidak ada yang tahu persis'.",
+            "whyOthersFail": "Paragraf 5 soal kerumitan kode; paragraf 6 soal kebaruan; paragraf 8 soal near-miss."
+          },
+          "paragraph": 7
+        },
+        {
+          "id": "rx-fall-9",
+          "type": "multiple_choice",
+          "stem": "Menurut bacaan, apa sebenarnya isi sebuah kode bangunan?",
+          "options": [
+            "Catatan kegagalan masa lalu yang ditulis sebagai instruksi",
+            "Daftar bahan yang disetujui pemerintah",
+            "Perhitungan yang harus diulang setiap proyek",
+            "Kesepakatan harga antara insinyur dan klien"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "a code is, in substance, a record of past failures written in the form of instructions",
+            "why": "Tiap klausul biasanya ada karena suatu ketika bangunan yang dibangun di bawah standar itu runtuh.",
+            "whyOthersFail": "Pilihan lain tidak disebut sama sekali; kode justru digambarkan terasa birokratis, bukan soal harga atau bahan."
+          }
+        },
+        {
+          "id": "rx-fall-10",
+          "type": "multiple_choice",
+          "stem": "Mengapa penulis menyebut kegagalan berkumpul di sekitar kebaruan?",
+          "options": [
+            "Karena kode belum punya apa pun untuk dikatakan tentang hal yang belum pernah gagal",
+            "Karena bahan baru selalu lebih lemah",
+            "Karena insinyur muda mengerjakan proyek baru",
+            "Karena proyek baru selalu terburu-buru"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "the code has nothing to say, because nothing has yet gone wrong in that particular way",
+            "why": "Kehati-hatian yang menumpuk melindungi yang sudah dikenal; di tepi kebaruan perlindungan itu belum terbentuk.",
+            "whyOthersFail": "Kelemahan bahan, usia insinyur, dan ketergesaan tidak pernah disebut sebagai sebabnya."
+          }
+        },
+        {
+          "id": "rx-fall-11",
+          "type": "multiple_choice",
+          "stem": "Apa yang membuat kasus menara New York itu instruktif menurut penulis?",
+          "options": [
+            "Kesalahan ditemukan sebelum mencelakai siapa pun",
+            "Menaranya akhirnya dirobohkan",
+            "Insinyurnya kehilangan lisensinya",
+            "Perbaikannya dibiayai pemerintah"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "The most instructive modern cases are therefore not the collapses but the near-misses",
+            "why": "Yang paling mengajarkan justru yang nyaris - bukan yang runtuh.",
+            "whyOthersFail": "Tidak ada penyebutan pembongkaran, lisensi, maupun pembiayaan pemerintah."
+          }
+        },
+        {
+          "id": "rx-fall-12",
+          "type": "multiple_choice",
+          "stem": "Apa yang penulis catat tentang kasus itu, yang sering dilupakan?",
+          "options": [
+            "Kasusnya baru terbuka bertahun-tahun kemudian, dan insentif saat itu mendorong ke arah diam",
+            "Perbaikannya gagal dan harus diulang",
+            "Mahasiswa yang bertanya itu tidak pernah diakui",
+            "Angin sudut ternyata tidak berbahaya"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "it became public only years afterwards, and that the incentives at the time pointed strongly towards silence",
+            "why": "Penulis memuji hasilnya tetapi menolak merapikan ceritanya - itu yang membuat paragraf terakhir tetap terbuka.",
+            "whyOthersFail": "Kegagalan perbaikan, pengakuan mahasiswa, dan keamanan angin sudut tidak disebut."
+          }
+        },
+        {
+          "id": "rx-fall-13",
+          "type": "multiple_choice",
+          "stem": "Apa yang menurut penulis BELUM selesai?",
+          "options": [
+            "Tekanan hukum dan komersial yang melawan keterbukaan belum melemah",
+            "Kode bangunan belum ada di sebagian negara",
+            "Perhitungan angin masih belum bisa dilakukan",
+            "Insinyur belum sepakat soal faktor keamanan"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "the pressures against sharing — legal, commercial, reputational — have not weakened",
+            "why": "Yang berubah hanya normanya: menyembunyikan kini dianggap memalukan. Apakah norma itu bertahan saat mahal, diuji tiap tahun.",
+            "whyOthersFail": "Ketiadaan kode, ketidakmampuan menghitung angin, dan ketidaksepakatan faktor keamanan tidak dinyatakan."
+          }
+        }
+      ],
+      "wordCount": 735,
+      "paragraphs": 9
+    },
+    {
+      "id": "rx-poverty",
+      "exam": "ielts_academic_reading",
+      "level": "C1",
+      "title": "The Problem of Measuring Poverty",
+      "topic": "social measurement and definition",
+      "text": "Few statistics are quoted as confidently as the number of people living in poverty, and few rest on foundations as contested. The difficulty is not that the data are poor, though in many countries they are. It is that the question being answered changes depending on how poverty is defined, and there is no definition that is simply correct.\n\nThe oldest approach is absolute. It sets a threshold based on what a person needs to survive — typically a basket of food sufficient for a given calorie intake, plus an allowance for shelter and other necessities — and counts everyone below it. Its appeal is obvious: it produces a line that can be compared across countries and across decades, and it makes claims about progress possible. Most headline figures showing large falls in global poverty since 1990 rest on a threshold of this kind.\n\nThe objections to it are equally clear. A basket of goods adequate in one place may be useless in another; a calorie requirement says nothing about whether a person can travel to work, or heat a home in a cold climate. And because the threshold must be converted between currencies, the resulting figure is sensitive to the exchange rates used. Revisions to those conversion factors have, on more than one occasion, moved the estimated number of people in poverty by tens of millions without anyone's circumstances having changed at all.\n\nThe alternative is relative. Here poverty is defined by distance from the middle of one's own society — commonly, a household income below some fraction of the national median. This captures something the absolute approach misses: that being poor is partly about exclusion from the ordinary life of the place where one lives, and that a person who cannot afford what everyone around them takes for granted is meaningfully deprived, whatever their calorie intake.\n\nBut the relative measure has a property that troubles many people when they first encounter it. Because it moves with the median, it can register changes that feel wrong. If a recession reduces middle incomes while the poorest are protected by transfers, measured relative poverty falls — not because anybody has become better off, but because the line itself has dropped. Conversely, a period of broad prosperity can raise measured poverty even as the poorest gain in real terms.\n\nA third approach abandons income altogether. Multidimensional measures count deprivations directly: whether a household has clean water, whether its children attend school, whether anyone in it is malnourished, whether the dwelling has a floor. A household is counted as poor if it is deprived on enough dimensions at once. This has the advantage of describing conditions rather than proxies, and it can identify households that an income measure would miss — those with some cash income but no access to services.\n\nIts weakness is that the choice of dimensions, and of how to weight them against each other, is unavoidably a judgement. Deciding that a lack of electricity counts for as much as a child out of school is not a finding; it is a decision, and reasonable people make it differently. The measure's designers are generally candid about this, but the candour rarely survives the journey into a newspaper headline.\n\nNone of the three is a fraud, and none is complete. What matters practically is that they are not interchangeable, and that they can move in opposite directions over the same period in the same country. Absolute poverty can fall while relative poverty rises; multidimensional poverty can improve while both income measures worsen, if services expand during a downturn.\n\nThere is also a practical asymmetry between the three that is rarely mentioned. Absolute and relative measures can be produced from household income surveys that many countries already run, at modest additional cost. Multidimensional measures require asking about a dozen separate conditions, household by household, which is slower and considerably more expensive. Where budgets are tight, the measure chosen is therefore sometimes the one that is affordable rather than the one that is most informative — and that constraint bears hardest on exactly the countries where the question matters most.\n\nThis has a consequence for anyone reading such figures. The useful question is not \"how many people are poor\", which cannot be answered without a prior choice, but \"which measure is being used, and what does it treat as important\". A claim that poverty has fallen is, on its own, close to uninformative. It becomes informative only when the definition is stated — and the definition is precisely the part that headlines omit.",
+      "questions": [
+        {
+          "id": "rx-pov-1",
+          "type": "yes_no_not_given",
+          "stem": "The writer believes there is one correct definition of poverty.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "there is no definition that is simply correct",
+            "why": "Penulis menyatakan sebaliknya secara langsung. Yes/No/Not Given menguji PANDANGAN penulis, bukan fakta dunia.",
+            "whyOthersFail": "Yes membalik pandangannya; Not Given salah karena kalimatnya ada di paragraf pembuka."
+          }
+        },
+        {
+          "id": "rx-pov-2",
+          "type": "yes_no_not_given",
+          "stem": "The writer believes that a claim that poverty has fallen means little on its own.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "A claim that poverty has fallen is, on its own, close to uninformative.",
+            "why": "Penulis menyatakannya persis begitu, dan menambahkan bahwa klaim itu baru berinformasi setelah definisinya disebutkan.",
+            "whyOthersFail": "No membalik pandangan penulis; Not Given salah karena kalimat itu justru penutup argumennya. Ingat: YNNG menanyakan apa yang PENULIS pikirkan, bukan apakah pernyataannya benar di dunia nyata."
+          }
+        },
+        {
+          "id": "rx-pov-3",
+          "type": "yes_no_not_given",
+          "stem": "The writer thinks newspapers usually explain which measure they are using.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 1,
+          "explain": {
+            "evidence": "the definition is precisely the part that headlines omit",
+            "why": "Justru itu yang dihilangkan berita - dan tanpa itu klaim penurunan kemiskinan nyaris tidak berinformasi.",
+            "whyOthersFail": "Yes membalik; Not Given salah karena penulis menutup tulisannya dengan poin ini."
+          }
+        },
+        {
+          "id": "rx-pov-4",
+          "type": "yes_no_not_given",
+          "stem": "The writer considers multidimensional measures to be the most accurate of the three.",
+          "options": [
+            "Yes",
+            "No",
+            "Not Given"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "None of the three is a fraud, and none is complete",
+            "why": "Penulis menjelaskan kekuatan DAN kelemahannya, tetapi tidak pernah menobatkannya sebagai yang paling akurat.",
+            "whyOthersFail": "Yes dan No sama-sama menambahkan peringkat yang tidak pernah diberikan penulis."
+          }
+        },
+        {
+          "id": "rx-pov-5",
+          "type": "true_false_not_given",
+          "stem": "Changes to currency conversion factors have altered global poverty estimates by tens of millions of people.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "moved the estimated number of people in poverty by tens of millions without anyone's circumstances having changed at all",
+            "why": "Dan bagian terpentingnya: tanpa keadaan seorang pun benar-benar berubah.",
+            "whyOthersFail": "False butuh bantahan; Not Given salah karena angkanya disebut."
+          }
+        },
+        {
+          "id": "rx-pov-6",
+          "type": "true_false_not_given",
+          "stem": "A recession can cause measured relative poverty to fall.",
+          "options": [
+            "True",
+            "False",
+            "Not Given"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "If a recession reduces middle incomes while the poorest are protected by transfers, measured relative poverty falls",
+            "why": "Karena garisnya sendiri yang turun - bukan karena ada yang membaik.",
+            "whyOthersFail": "False membalik; Not Given salah karena ini justru contoh utama paragraf itu."
+          }
+        },
+        {
+          "id": "rx-pov-7",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menjelaskan mengapa ukuran relatif bisa bergerak dengan cara yang terasa keliru?",
+          "options": [
+            "Paragraf 3",
+            "Paragraf 4",
+            "Paragraf 5",
+            "Paragraf 6"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "Because it moves with the median, it can register changes that feel wrong",
+            "why": "Paragraf 5 memberi dua contoh berlawanan arah: resesi dan kemakmuran.",
+            "whyOthersFail": "Paragraf 4 memperkenalkan ukuran relatif; paragraf 3 keberatan atas ukuran absolut; paragraf 6 ukuran multidimensi."
+          },
+          "paragraph": 5
+        },
+        {
+          "id": "rx-pov-8",
+          "type": "matching_information",
+          "stem": "Paragraf mana yang menyebut biaya pengumpulan datanya?",
+          "options": [
+            "Paragraf 6",
+            "Paragraf 7",
+            "Paragraf 9",
+            "Paragraf 10"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "Multidimensional measures require asking about a dozen separate conditions, household by household, which is slower and considerably more expensive",
+            "why": "Paragraf 9 menambahkan asimetri praktis: ukuran yang dipilih kadang yang terjangkau, bukan yang paling informatif.",
+            "whyOthersFail": "Paragraf 6 dan 7 membahas isi dan kelemahan ukuran multidimensi; paragraf 10 kesimpulan pembacaan."
+          },
+          "paragraph": 9
+        },
+        {
+          "id": "rx-pov-9",
+          "type": "multiple_choice",
+          "stem": "Apa keunggulan utama ukuran absolut menurut bacaan?",
+          "options": [
+            "Ia menghasilkan garis yang bisa dibandingkan antarnegara dan antardekade",
+            "Ia tidak memerlukan data rumah tangga",
+            "Ia memasukkan akses layanan",
+            "Ia bergerak mengikuti pendapatan menengah"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "it produces a line that can be compared across countries and across decades",
+            "why": "Karena itulah angka utama penurunan kemiskinan global sejak 1990 memakai ambang jenis ini.",
+            "whyOthersFail": "Bergerak mengikuti median adalah ciri ukuran RELATIF; akses layanan ciri ukuran multidimensi."
+          }
+        },
+        {
+          "id": "rx-pov-10",
+          "type": "multiple_choice",
+          "stem": "Apa kelemahan ukuran multidimensi yang ditekankan penulis?",
+          "options": [
+            "Pemilihan dimensi dan bobotnya adalah keputusan, bukan temuan",
+            "Ia tidak bisa dihitung untuk negara miskin",
+            "Ia mengabaikan pendidikan anak",
+            "Ia selalu menghasilkan angka lebih rendah"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Deciding that a lack of electricity counts for as much as a child out of school is not a finding; it is a decision",
+            "why": "Perancangnya umumnya berterus terang soal ini - keterusterangan itulah yang hilang saat masuk judul berita.",
+            "whyOthersFail": "Justru sekolah anak dipakai sebagai contoh dimensinya; tidak ada klaim soal angka selalu lebih rendah."
+          }
+        },
+        {
+          "id": "rx-pov-11",
+          "type": "multiple_choice",
+          "stem": "Menurut penulis, pertanyaan apa yang berguna saat membaca angka kemiskinan?",
+          "options": [
+            "Ukuran mana yang dipakai, dan apa yang dianggapnya penting",
+            "Berapa banyak orang yang miskin",
+            "Siapa yang membiayai surveinya",
+            "Kapan data terakhir dikumpulkan"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "The useful question is not \"how many people are poor\", which cannot be answered without a prior choice",
+            "why": "Pertanyaan jumlah tidak bisa dijawab tanpa pilihan definisi lebih dulu.",
+            "whyOthersFail": "Pembiayaan survei dan waktu pengumpulan tidak pernah diajukan penulis sebagai pertanyaan kuncinya."
+          }
+        },
+        {
+          "id": "rx-pov-12",
+          "type": "multiple_choice",
+          "stem": "Apa yang penulis katakan bisa terjadi pada ketiga ukuran dalam periode yang sama?",
+          "options": [
+            "Ketiganya bisa bergerak ke arah berlawanan di negara yang sama",
+            "Ketiganya selalu bergerak bersamaan",
+            "Dua di antaranya selalu identik",
+            "Hanya satu yang bisa dihitung tiap tahun"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "they can move in opposite directions over the same period in the same country",
+            "why": "Contohnya diberikan: kemiskinan absolut turun sementara relatif naik, atau multidimensi membaik saat keduanya memburuk.",
+            "whyOthersFail": "Justru ketidaksalingtukaran itulah poinnya - jadi 'selalu bersamaan' dan 'selalu identik' membantah teks."
+          }
+        },
+        {
+          "id": "rx-pov-13",
+          "type": "multiple_choice",
+          "stem": "Beban asimetri biaya itu paling berat menimpa siapa?",
+          "options": [
+            "Negara yang justru paling membutuhkan jawabannya",
+            "Kota besar di negara kaya",
+            "Lembaga statistik internasional",
+            "Rumah tangga yang disurvei"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "that constraint bears hardest on exactly the countries where the question matters most",
+            "why": "Di mana anggaran ketat, ukuran yang dipilih kadang yang terjangkau - bukan yang paling informatif.",
+            "whyOthersFail": "Kota kaya, lembaga internasional, dan rumah tangga tidak disebut sebagai pihak yang paling terbebani."
+          }
+        },
+        {
+          "id": "rx-pov-14",
+          "type": "multiple_choice",
+          "stem": "Apa yang ditangkap ukuran relatif dan dilewatkan ukuran absolut?",
+          "options": [
+            "Keterasingan dari kehidupan biasa di tempat seseorang tinggal",
+            "Jumlah kalori yang dikonsumsi",
+            "Nilai tukar mata uang",
+            "Jumlah anak dalam rumah tangga"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "being poor is partly about exclusion from the ordinary life of the place where one lives",
+            "why": "Orang yang tak mampu membeli apa yang dianggap biasa oleh sekelilingnya tetap terampas, berapa pun kalorinya.",
+            "whyOthersFail": "Kalori dan nilai tukar justru bagian dari ukuran absolut; jumlah anak tidak dibahas."
+          }
+        }
+      ],
+      "wordCount": 752,
+      "paragraphs": 10
+    },
+    {
+      "id": "rx-lakes",
+      "exam": "toefl_reading",
+      "level": "B2",
+      "title": "Why Some Lakes Turn Over",
+      "topic": "limnology",
+      "text": "A deep lake in a temperate climate is not a single body of water. For much of the year it is layered, and the layers barely mix. Understanding why they form, and what happens when they break down, explains a great deal about where fish can live and why some lakes suffocate in summer.\n\nThe layering is a consequence of an unusual property of water: its density does not increase steadily as it cools. Water is densest at about four degrees Celsius, and becomes less dense both above and below that temperature. This is why ice floats, and it is also why a lake in midsummer is arranged the way it is.\n\nBy July, the sun has warmed the upper metres considerably. That warm water is less dense than the cold water below it, so it sits on top and stays there. Between the warm surface layer and the cold deep water lies a narrow zone in which temperature drops sharply — sometimes ten degrees within a metre or two. This zone acts as a barrier. Wind can stir the surface layer thoroughly, but it rarely has the energy to push warm water down through the barrier or draw cold water up.\n\nThe consequences for the deep water are considerable. Cut off from the surface, it receives no new oxygen from the atmosphere. Meanwhile, organic material — dead algae, mostly — sinks continuously from above and decomposes, and decomposition consumes oxygen. In a lake with abundant nutrients, and therefore abundant algae, the deep water can be stripped of oxygen entirely by late summer. Fish that require cold water are then caught in an unpleasant squeeze: the surface is too warm for them and the depths have no oxygen. In some lakes the habitable band narrows to a few metres.\n\nThen, in autumn, the arrangement collapses. As air temperatures fall, the surface layer cools. Once it reaches the temperature of the water below, the density difference vanishes, the barrier disappears, and a moderate wind is sufficient to mix the entire lake from top to bottom. This event is called turnover, and it happens over a matter of days.\n\nTurnover recharges the deep water with oxygen, which is essential to the lake's recovery. But it also lifts nutrients that had accumulated at the bottom back into the sunlit upper layers, and that can trigger a burst of algal growth in autumn. In lakes that receive heavy fertiliser runoff, turnover can produce an algal bloom that is visible from shore within a week.\n\nMost temperate lakes turn over twice a year: once in autumn as described, and once in spring, when ice melts and the surface warms towards four degrees before summer layering re-establishes itself. Lakes that mix twice annually are called dimictic, and the pattern is common enough that it was long treated as the standard case in textbooks.\n\nIt is not, however, universal, and the exceptions are informative. Very deep tropical lakes may not mix at all: without a cold season the surface never cools enough to erase the density difference, and their depths can remain oxygen-free and undisturbed for centuries. Shallow lakes, at the other extreme, may mix continuously all summer, because wind reaches the bottom and no stable layering can establish itself.\n\nThe distinction matters for anyone managing a lake. A reservoir that supplies drinking water is usually drawn from the depths, and water taken from an oxygen-free layer carries dissolved iron and manganese that must be removed before use. Managers of such reservoirs sometimes install aerators to break the layering artificially, at considerable running cost, precisely to avoid treating water that the lake's own physics has degraded.\n\nThere is a further point that has become important recently. Because the whole mechanism depends on the surface cooling to meet the deep water, warmer winters lengthen the period of layering. Several long-monitored lakes now stratify earlier in spring and turn over later in autumn than they did fifty years ago, which extends the season during which their depths are without oxygen. The lakes have not become warmer in any simple sense — the deep water is often unchanged. What has changed is the length of time it spends sealed off.",
+      "questions": [
+        {
+          "id": "rx-lake-1",
+          "type": "factual",
+          "stem": "According to paragraph 2, why does ice float?",
+          "options": [
+            "Water is densest at about four degrees Celsius",
+            "Ice contains trapped air",
+            "Cold water sinks continuously",
+            "Wind pushes ice to the surface"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Water is densest at about four degrees Celsius, and becomes less dense both above and below that temperature",
+            "why": "Sifat itulah yang menjelaskan es mengapung DAN susunan danau di pertengahan musim panas.",
+            "whyOthersFail": "Udara terperangkap, tenggelamnya air dingin, dan angin tidak disebut sebagai sebabnya."
+          }
+        },
+        {
+          "id": "rx-lake-2",
+          "type": "factual",
+          "stem": "According to paragraph 3, what prevents wind from mixing the whole lake in midsummer?",
+          "options": [
+            "A narrow zone in which temperature drops sharply",
+            "The depth of the lake alone",
+            "Ice remaining at the bottom",
+            "The absence of wind in summer"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Between the warm surface layer and the cold deep water lies a narrow zone in which temperature drops sharply",
+            "why": "Zona itu bertindak sebagai penghalang: angin bisa mengaduk lapisan atas, tetapi jarang cukup kuat menembusnya.",
+            "whyOthersFail": "Teks justru menyebut angin sedang saja cukup mengaduk seluruh danau begitu penghalangnya hilang."
+          }
+        },
+        {
+          "id": "rx-lake-3",
+          "type": "negative_factual",
+          "stem": "All of the following are stated about deep water in late summer EXCEPT:",
+          "options": [
+            "It receives no new oxygen from the atmosphere",
+            "Decomposing organic material consumes its oxygen",
+            "It can be stripped of oxygen entirely in nutrient-rich lakes",
+            "Its temperature rises steadily through the summer"
+          ],
+          "answerIndex": 3,
+          "explain": {
+            "evidence": "Cut off from the surface, it receives no new oxygen from the atmosphere... decomposition consumes oxygen... the deep water can be stripped of oxygen entirely by late summer",
+            "why": "Tiga yang pertama disebut eksplisit. Kenaikan suhu air dalam sepanjang musim panas tidak pernah dinyatakan - teks justru menyebut air dalam sering tidak berubah.",
+            "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti setelah menemukan satu pilihan yang benar."
+          }
+        },
+        {
+          "id": "rx-lake-4",
+          "type": "vocabulary",
+          "stem": "The word \"squeeze\" in paragraph 4 is closest in meaning to",
+          "options": [
+            "a trap with no good option on either side",
+            "a sudden pressure change",
+            "a narrow passage between rocks",
+            "a shortage of food"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Fish that require cold water are then caught in an unpleasant squeeze: the surface is too warm for them and the depths have no oxygen",
+            "why": "Kedua arah sama-sama tidak bisa dihuni - itulah jepitannya.",
+            "whyOthersFail": "Tekanan, celah batu, dan kelangkaan makanan tidak sesuai dengan penjelasan yang mengikuti titik dua."
+          }
+        },
+        {
+          "id": "rx-lake-5",
+          "type": "factual",
+          "stem": "According to paragraph 5, what causes turnover?",
+          "options": [
+            "The surface cools until the density difference vanishes",
+            "Heavy autumn rainfall",
+            "Fish moving to deeper water",
+            "Ice forming on the surface"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Once it reaches the temperature of the water below, the density difference vanishes, the barrier disappears",
+            "why": "Setelah itu angin sedang saja cukup mengaduk danau dari atas ke bawah, dalam hitungan hari.",
+            "whyOthersFail": "Hujan, ikan, dan pembentukan es tidak disebut sebagai pemicunya."
+          }
+        },
+        {
+          "id": "rx-lake-6",
+          "type": "sentence_simplification",
+          "stem": "Which sentence best expresses the essential information in: \"Turnover recharges the deep water with oxygen, which is essential to the lake's recovery. But it also lifts nutrients that had accumulated at the bottom back into the sunlit upper layers\"?",
+          "options": [
+            "Turnover restores oxygen below but also carries nutrients upward",
+            "Turnover removes nutrients from the lake entirely",
+            "Turnover harms the lake more than it helps",
+            "Turnover only occurs in lakes with heavy runoff"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Turnover recharges the deep water with oxygen... But it also lifts nutrients",
+            "why": "Dua akibat sekaligus, satu memulihkan dan satu memicu - itu inti kalimatnya.",
+            "whyOthersFail": "Pilihan lain melampaui teks: nutriennya tidak dibuang, penulis tidak menimbang untung-rugi, dan turnover tidak terbatas pada danau berlimpasan pupuk."
+          }
+        },
+        {
+          "id": "rx-lake-7",
+          "type": "rhetorical_purpose",
+          "stem": "Why does the author mention tropical and shallow lakes?",
+          "options": [
+            "To show that the twice-yearly pattern is not universal",
+            "To argue that tropical lakes are healthier",
+            "To explain why textbooks are unreliable",
+            "To introduce a new method of measuring oxygen"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "It is not, however, universal, and the exceptions are informative",
+            "why": "Keduanya disajikan sebagai dua ujung pengecualian: yang tak pernah mengaduk dan yang mengaduk terus-menerus.",
+            "whyOthersFail": "Teks tidak menilai kesehatan danau tropis maupun keandalan buku teks secara umum."
+          }
+        },
+        {
+          "id": "rx-lake-8",
+          "type": "factual",
+          "stem": "According to paragraph 9, why do reservoir managers sometimes install aerators?",
+          "options": [
+            "To avoid treating water degraded by the lake's own layering",
+            "To raise the temperature of the deep water",
+            "To increase algal growth",
+            "To speed up autumn turnover for fish"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "Managers of such reservoirs sometimes install aerators to break the layering artificially, at considerable running cost",
+            "why": "Air dari lapisan tanpa oksigen membawa besi dan mangan terlarut yang harus dibuang sebelum dipakai.",
+            "whyOthersFail": "Menaikkan suhu, menambah alga, dan mempercepat turnover demi ikan tidak disebut sebagai alasannya."
+          }
+        },
+        {
+          "id": "rx-lake-9",
+          "type": "inference",
+          "stem": "What can be inferred about the long-monitored lakes mentioned in the final paragraph?",
+          "options": [
+            "Their deep water spends more of the year sealed off than it used to",
+            "Their deep water has warmed considerably",
+            "They have stopped turning over altogether",
+            "They now mix three times a year"
+          ],
+          "answerIndex": 0,
+          "explain": {
+            "evidence": "What has changed is the length of time it spends sealed off",
+            "why": "Danau-danau itu berlapis lebih awal dan mengaduk lebih lambat - yang memanjang adalah durasinya, bukan suhunya.",
+            "whyOthersFail": "Penulis justru menegaskan air dalamnya sering TIDAK berubah, dan tidak menyebut penghentian turnover."
+          }
+        },
+        {
+          "id": "rx-lake-10",
+          "type": "insert_text",
+          "stem": "Where would this sentence best fit in paragraph 4?  \"Meanwhile, organic material - dead algae, mostly - sinks continuously from above and decomposes, and decomposition consumes oxygen.\"  (A) The consequences for the deep water are considerable. (B) Cut off from the surface, it receives no new oxygen from the atmosphere. (C) In a lake with abundant nutrients, the deep water can be stripped of oxygen entirely by late summer. (D) Fish that require cold water are then caught in an unpleasant squeeze.",
+          "options": [
+            "Position A",
+            "Position B",
+            "Position C",
+            "Position D"
+          ],
+          "answerIndex": 2,
+          "explain": {
+            "evidence": "Cut off from the surface, it receives no new oxygen from the atmosphere. Meanwhile, organic material",
+            "why": "Kalimatnya melengkapi pasangan sebab: pasokan berhenti (B), sekaligus konsumsi berjalan - baru setelah itu kesimpulan 'habis sama sekali' (C) masuk akal.",
+            "whyOthersFail": "Di A ia mendahului pernyataan pembuka; di D pembahasan sudah pindah ke ikan dan 'meanwhile' kehilangan rujukannya."
+          }
+        }
+      ],
+      "wordCount": 700,
+      "paragraphs": 10
+    }
+  ]
+}
