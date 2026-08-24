@@ -279,7 +279,7 @@ const GRAMMAR_PRACTICE_MODES=[
   'contrast_distractor_1','contrast_distractor_2','contrast_distractor_3',
   'classify_family','locate_decision_cue','teach_back','mastery_check'
 ];
-function friendlySkillName(skill){const key=String(skill||'grammar');return(GRAMMAR_SKILL_TITLES_ID||{})[key]||key.replace(/_/g,' ').replace(/\bvs\b/gi,'dan').replace(/\bwith\b/gi,'dengan').replace(/\bwithout\b/gi,'tanpa').replace(/^\w/,m=>m.toUpperCase())}
+function friendlySkillName(skill){const key=String(skill||'grammar');const titles=typeof GRAMMAR_SKILL_TITLES_ID==='object'?GRAMMAR_SKILL_TITLES_ID:{};return titles[key]||key.replace(/_/g,' ').replace(/\bvs\b/gi,'dan').replace(/\bwith\b/gi,'dengan').replace(/\bwithout\b/gi,'tanpa').replace(/^\w/,m=>m.toUpperCase())}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||'pola grammar'}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?`Petunjuk pentingnya adalah “${hit}”.`:'Petunjuknya ada pada hubungan makna, subjek, dan bentuk kata kerja dalam satu kalimat penuh.'}
