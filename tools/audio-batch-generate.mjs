@@ -179,11 +179,30 @@ const REGISTRY = {
     }
     return items;
   },
+  /**
+   * Listening diurutkan menurut level CEFR, bukan menurut urutan berkas.
+   *
+   * Anggaran selalu terpotong di tengah daftar, jadi yang menentukan bukan "berapa yang
+   * diproduksi" melainkan "yang mana". Bank ini menyimpan 1407 item yang berselang-seling
+   * antar level; tanpa pengurutan, satu jalan dengan anggaran kecil menghasilkan segenggam
+   * A1, segenggam C2, dan tidak ada satu level pun yang utuh - murid A1 tetap bertemu
+   * potongan yang diam. Dengan urutan ini, kredit habis dari bawah ke atas dan setiap level
+   * selesai sebelum level berikutnya dimulai.
+   */
   listening() {
     const bank = readJson('features/speaking-listening/listening-bank-v1.json');
+    const order = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
     return (bank?.items || [])
       .filter((item) => item?.script)
-      .map((item) => ({
+      .map((item, index) => ({ item, index }))
+      // Urutan asli dipakai sebagai pemecah seri supaya dua jalan dengan bank yang sama
+      // selalu memilih aset yang sama - sort JS tidak dijamin stabil di setiap mesin.
+      .sort((a, b) => {
+        const la = order[a.item.level] ?? 99;
+        const lb = order[b.item.level] ?? 99;
+        return la === lb ? a.index - b.index : la - lb;
+      })
+      .map(({ item }) => ({
         text: item.script,
         contentType: 'listening',
         locale: item.voiceLang || 'en-US',
