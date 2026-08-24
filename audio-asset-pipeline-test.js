@@ -362,6 +362,17 @@ function manifestWith(text, extra = {}) {
     check('Respons yang tidak ok tidak diperlakukan sebagai berhasil',
       /response\.ok/.test(code) && /res\.ok/.test(code),
       'status respons diperiksa di kedua jalur');
+
+    // Worker: 206 hanya boleh keluar untuk permintaan yang memang membawa Range. R2 mengisi
+    // object.range bahkan pada pengambilan penuh, dan Cache API MENOLAK menyimpan 206 - jadi
+    // memeriksa object.range saja mematikan seluruh cache klien tanpa satu pun galat.
+    // Terukur di produksi sebelum diperbaiki: stores 0, entri cache 0, meski pemutarannya
+    // sendiri berhasil dan tak ada yang tampak salah.
+    const workerCode = fs.readFileSync(path.join(root, 'workers/fiezel-audio-worker.js'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    check('206 hanya untuk permintaan yang membawa header Range',
+      /rangeRequested\s*&&\s*object\.range/.test(workerCode),
+      'header Range diperiksa sebelum menjawab parsial');
   }
 
   const report = {
