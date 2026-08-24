@@ -1,0 +1,11 @@
+{
+  "schema": "fiezel-audio-manifest-v1",
+  "version": 0,
+  "generatedAt": "",
+  "voiceProfile": null,
+  "budget": {
+    "maxCharactersPerRun": 50000,
+    "maxAssetsPerRun": 500
+  },
+  "assets": {}
+}
