@@ -133,7 +133,7 @@ self.addEventListener('push',event=>{
   // m025-117: service worker tidak punya akses ke state murid, jadi teks cadangan di sini
   // TIDAK boleh menyebut nama siapa pun. Sapaan bernama datang dari payload push yang
   // memang membawanya; cadangan ini hanya berlaku saat payload-nya kosong atau rusak.
-  let payload={title:'FIEZEL Â· Reminder belajar',body:'Waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};
+  let payload={title:'FIEZEL · Reminder belajar',body:'Waktunya kembali ke sesi belajar.',url:'./',tag:'fiezel-remote'};
   try{
     if(event.data){
       const parsed=event.data.json();
