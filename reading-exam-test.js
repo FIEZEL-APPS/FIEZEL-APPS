@@ -31,7 +31,10 @@ check('Both exams are represented', ['ielts_academic_reading', 'toefl_reading'].
 const formatIds = Object.keys(exam.examFormats || {});
 check('Format contracts are complete', formatIds.length > 0 && formatIds.every(id => {
   const f = exam.examFormats[id];
-  return f.label && Array.isArray(f.passageWords) && f.passageWords.length === 2 && Number(f.questionsPerPassage) > 0 && Number(f.minutesPerPassage) > 0 && Array.isArray(f.questionTypes) && f.note;
+  return f.label && Array.isArray(f.passageWords) && f.passageWords.length === 2 &&
+    Array.isArray(f.questionsPerPassage) && f.questionsPerPassage.length === 2 &&
+    Number(f.passagesPerSession) > 0 && Number(f.questionsPerSession) > 0 &&
+    Number(f.minutesPerPassage) > 0 && Array.isArray(f.questionTypes) && f.note;
 }), formatIds);
 
 const badLength = exam.passages.filter(p => {
@@ -43,7 +46,23 @@ check('Every passage sits inside its exam word range', badLength.length === 0,
   exam.passages.map(p => `${p.id}=${words(p.text)} (${exam.examFormats[p.exam]?.passageWords.join('-')})`));
 check('Declared word counts match the text', exam.passages.every(p => p.wordCount === words(p.text)), exam.passages.map(p => `${p.id}:${p.wordCount}/${words(p.text)}`));
 check('Every passage has enough paragraphs to be navigable', exam.passages.every(p => p.text.split(/\n\s*\n/).filter(Boolean).length >= 5), exam.passages.map(p => `${p.id}=${p.text.split(/\n\s*\n/).filter(Boolean).length}`));
-check('Question count matches the format contract', exam.passages.every(p => p.questions.length === exam.examFormats[p.exam].questionsPerPassage), exam.passages.map(p => `${p.id}=${p.questions.length}`));
+// IELTS memberi 40 soal untuk TIGA bacaan (13/13/14), bukan 13 rata - jadi yang dijaga
+// rentang per bacaan DAN total per sesi. Total itulah yang menentukan apakah satu sesi penuh
+// benar-benar tersedia; rentang saja bisa lolos dengan jumlah bacaan yang salah.
+check('Question count per passage sits inside the format range',
+  exam.passages.every(p => {
+    const [lo, hi] = exam.examFormats[p.exam].questionsPerPassage;
+    return p.questions.length >= lo && p.questions.length <= hi;
+  }), exam.passages.map(p => `${p.id}=${p.questions.length}`));
+const sessionRows = formatIds.map(id => {
+  const f = exam.examFormats[id];
+  const owned = exam.passages.filter(p => p.exam === id);
+  return { id, passages: owned.length, questions: owned.reduce((n, p) => n + p.questions.length, 0),
+    wantPassages: Number(f.passagesPerSession), wantQuestions: Number(f.questionsPerSession) };
+});
+check('Each exam has exactly one full session available',
+  sessionRows.every(r => r.passages === r.wantPassages && r.questions === r.wantQuestions),
+  sessionRows.map(r => `${r.id}: ${r.passages}/${r.wantPassages} bacaan, ${r.questions}/${r.wantQuestions} soal`));
 check('Every passage is bound to a known CEFR level', exam.passages.every(p => LEVELS.includes(p.level)), exam.passages.map(p => `${p.id}=${p.level}`));
 
 const allQuestions = exam.passages.flatMap(p => p.questions.map(q => ({ passage: p, q })));
@@ -55,7 +74,7 @@ check('Every question explains itself three ways', allQuestions.every(({ q }) =>
 
 // Bukti harus benar-benar ada di bacaannya. Ini yang membedakan kunci jawaban yang bisa
 // dipertanggungjawabkan dari kunci yang terdengar meyakinkan.
-const normalise = t => String(t || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/\s+/g, ' ').trim();
+const normalise = t => String(t || '').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[\u2010-\u2015]/g, '-').replace(/\s+/g, ' ').trim();
 const missingEvidence = allQuestions.filter(({ passage, q }) => {
   const haystack = normalise(passage.text).toLowerCase();
   return String(q.explain.evidence).split('...').map(x => normalise(x).toLowerCase()).filter(Boolean)
@@ -68,6 +87,21 @@ check('Every cited evidence string appears verbatim in its passage', missingEvid
 const tfng = allQuestions.filter(({ q }) => q.type === 'true_false_not_given');
 check('TFNG questions keep the canonical option order', tfng.length > 0 && tfng.every(({ q }) => JSON.stringify(q.options) === JSON.stringify(['True', 'False', 'Not Given'])), `${tfng.length} TFNG questions`);
 check('TFNG answers use all three verdicts', new Set(tfng.map(({ q }) => q.options[q.answerIndex])).size === 3, tfng.map(({ q }) => q.options[q.answerIndex]));
+
+// m025-147: Yes/No/Not Given menguji PANDANGAN penulis, bukan fakta di teks, dan tertukarnya
+// dengan TFNG adalah salah satu sebab kehilangan nilai yang paling sering di IELTS. Karena itu
+// ia dijaga dengan syarat yang sama ketatnya: urutan pilihan baku, dan ketiga vonis terpakai.
+const ynng = allQuestions.filter(({ q }) => q.type === 'yes_no_not_given');
+check('YNNG questions keep the canonical option order',
+  ynng.length > 0 && ynng.every(({ q }) => JSON.stringify(q.options) === JSON.stringify(['Yes', 'No', 'Not Given'])),
+  `${ynng.length} soal YNNG`);
+check('YNNG answers use all three verdicts',
+  new Set(ynng.map(({ q }) => q.options[q.answerIndex])).size === 3,
+  ynng.map(({ q }) => q.options[q.answerIndex]));
+check('The IELTS format lists both TFNG and YNNG, and explains the difference',
+  ['true_false_not_given', 'yes_no_not_given'].every(t => exam.examFormats.ielts_academic_reading.questionTypes.includes(t)) &&
+    /pandangan penulis/i.test(exam.examFormats.ielts_academic_reading.note),
+  'dua tipe yang mirip bentuknya tetapi berbeda yang diujinya harus dibedakan di kontraknya');
 
 // Mencocokkan informasi: nomor paragraf yang dipilih harus benar-benar memuat buktinya.
 const matching = allQuestions.filter(({ q }) => q.type === 'matching_information');
