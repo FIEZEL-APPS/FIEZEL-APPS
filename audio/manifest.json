@@ -1,9 +1,17 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 0,
-  "generatedAt": "",
+  "version": 1,
+  "generatedAt": "2026-08-24T19:13:48.721Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
-  "voiceProfile": null,
+  "voiceProfile": {
+    "voiceId": "KuNebS8MGzRaopODTyd",
+    "modelId": "eleven_multilingual_v2",
+    "settings": {
+      "stability": 0.5,
+      "similarityBoost": 0.75,
+      "speed": 1
+    }
+  },
   "budget": {
     "note": "Jatah owner 2026-08: 9.650 karakter tersisa (paket gratis ElevenLabs). Batas 2.000 per run dipilih supaya satu perintah yang salah tidak bisa menghabiskan lebih dari seperlima sisa jatah, dan supaya bank kosakata terbangun bertahap lewat beberapa run yang masing-masing bisa diperiksa. Naikkan angka ini kalau paket berbayar aktif.",
     "maxCharactersPerRun": 2000,
