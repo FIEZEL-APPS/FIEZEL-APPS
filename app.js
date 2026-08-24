@@ -2110,8 +2110,10 @@ function applyRestore(payload){
   if(!payload||payload.schema!==c.BACKUP_SCHEMA)return{ok:false,reason:'invalid_payload'};
   const before={answered:state.totalAnswered||0,history:(state.history||[]).length};
   const merged=c.mergeProgress(state,payload);
-  // View, sesi aktif, preferensi, dan endpoint laporan sengaja tidak ikut: itu milik perangkat
-  // ini, bukan milik berkas backup.
+  // m025-141: yang berpindah adalah PROGRES plus tiga preferensi belajar (activeLevel,
+  // levelMode, selfAssessedLevel) dan buku besar adaptif. View, sesi aktif, endpoint laporan,
+  // dan seluruh setting perangkat tetap tinggal - mergeProgress mengembalikan preferences yang
+  // sudah digabung, jadi menyebar hasilnya ke state tidak menghapus setting perangkat ini.
   state={...state,...merged};
   save();
   return{ok:true,before,after:{answered:state.totalAnswered,history:(state.history||[]).length}};

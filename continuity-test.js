@@ -63,8 +63,69 @@ test('backup membawa progres, bukan keadaan perangkat', () => {
   assert.strictEqual(payload.view, undefined);
   assert.strictEqual(payload.activeSession, undefined);
   assert.strictEqual(payload.reportMeta, undefined);
-  assert.strictEqual(payload.preferences, undefined);
   assert.strictEqual(payload.transferred.deviceState, false);
+  // m025-141 (B-07): preferensi BELAJAR ikut, preferensi PERANGKAT tidak. Dulu seluruh
+  // preferences dibuang, sehingga restore mengembalikan jawaban murid tetapi membuang level
+  // yang ia pilih - murid jatuh kembali ke hasil placement di perangkat barunya.
+  assert.ok(payload.preferences && typeof payload.preferences === 'object', 'preferensi belajar harus ikut');
+  const allowed = ['activeLevel', 'levelMode', 'selfAssessedLevel'];
+  assert.deepStrictEqual(Object.keys(payload.preferences).filter(k => !allowed.includes(k)), [],
+    'hanya tiga preferensi belajar yang boleh ikut');
+});
+
+test('pilihan level manual ikut berpindah perangkat', () => {
+  const dengan = continuity.buildBackupPayload({
+    state: { ...stateLokal, preferences: { activeLevel: 'B1', levelMode: 'manual', selfAssessedLevel: 'A2', haptics: false, reportEndpoint: 'https://contoh.puter.work', timeZone: 'Asia/Jakarta' } },
+    now: NOW
+  });
+  assert.strictEqual(dengan.preferences.activeLevel, 'B1');
+  assert.strictEqual(dengan.preferences.levelMode, 'manual');
+  assert.strictEqual(dengan.preferences.selfAssessedLevel, 'A2');
+  assert.strictEqual(dengan.preferences.haptics, undefined, 'setting perangkat tidak boleh ikut');
+  assert.strictEqual(dengan.preferences.reportEndpoint, undefined, 'endpoint tidak boleh ikut');
+  assert.strictEqual(dengan.preferences.timeZone, undefined, 'zona waktu perangkat tidak boleh ikut');
+});
+
+test('restore tidak menimpa level yang sedang dipakai di perangkat ini', () => {
+  const backup = continuity.buildBackupPayload({ state: { ...stateLokal, preferences: { activeLevel: 'C1', levelMode: 'manual' } }, now: NOW });
+  const sudahPilih = continuity.mergeProgress({ ...stateLokal, preferences: { activeLevel: 'A2', levelMode: 'manual', haptics: false } }, backup);
+  assert.strictEqual(sudahPilih.preferences.activeLevel, 'A2', 'pilihan di perangkat ini menang');
+  assert.strictEqual(sudahPilih.preferences.haptics, false, 'setting perangkat tetap utuh');
+  const belumPilih = continuity.mergeProgress({ ...stateLokal, preferences: { haptics: true } }, backup);
+  assert.strictEqual(belumPilih.preferences.activeLevel, 'C1', 'kalau perangkat ini belum memilih, pilihan dari backup dipakai');
+  assert.strictEqual(belumPilih.preferences.haptics, true, 'setting perangkat tidak ikut tergantikan');
+});
+
+test('daftar jawaban salah dari perangkat lama ikut pulih', () => {
+  const backup = continuity.buildBackupPayload({
+    state: { ...stateLokal, wrongAnswers: [{ at: NOW - 9 * DAY, question: 'lama', target: 'kata_x' }] },
+    now: NOW
+  });
+  const merged = continuity.mergeProgress({ ...stateLokal, wrongAnswers: [{ at: NOW - DAY, question: 'baru', target: 'kata_y' }] }, backup);
+  const targets = merged.wrongAnswers.map(x => x.target);
+  assert.ok(targets.includes('kata_x'), 'jawaban salah dari backup hilang - itu bahan utama review');
+  assert.ok(targets.includes('kata_y'), 'jawaban salah lokal harus tetap ada');
+  const lagi = continuity.mergeProgress({ ...stateLokal, wrongAnswers: merged.wrongAnswers }, backup);
+  assert.strictEqual(lagi.wrongAnswers.length, merged.wrongAnswers.length, 'menggabungkan dua kali tidak boleh menggandakan');
+});
+
+test('buku besar adaptif ikut pulih tanpa membawa antrean perangkat lain', () => {
+  const backup = continuity.buildBackupPayload({
+    state: {
+      ...stateLokal,
+      adaptivePolicyMeta: { lastPolicy: { policyId: 'p-lama' }, lastSource: 'core', lastAt: NOW - DAY, history: [{ policyId: 'p-lama', at: NOW - DAY }] },
+      policyOutcomeMeta: { last: { outcomeId: 'o-lama' }, history: [{ outcomeId: 'o-lama', at: NOW - DAY }], queue: [{ outcomeId: 'belum-terkirim' }] },
+      contentCanaryMeta: { schema: 'fiezel-content-canary-evidence-v1', canaryId: 'c1' }
+    },
+    now: NOW
+  });
+  assert.deepStrictEqual(backup.policyOutcomeMeta.queue, [], 'antrean kiriman milik perangkat asal, tidak boleh ikut');
+  assert.strictEqual(backup.adaptivePolicyMeta.history.length, 1);
+  const merged = continuity.mergeProgress({ ...stateLokal, policyOutcomeMeta: { last: null, history: [], queue: [{ outcomeId: 'lokal' }] } }, backup);
+  assert.strictEqual(merged.policyOutcomeMeta.history.length, 1, 'hasil kebijakan dari backup harus pulih');
+  assert.strictEqual(merged.policyOutcomeMeta.queue[0].outcomeId, 'lokal', 'antrean perangkat ini tidak boleh tergantikan');
+  assert.strictEqual(merged.adaptivePolicyMeta.history.length, 1);
+  assert.strictEqual(merged.contentCanaryMeta.canaryId, 'c1');
 });
 
 test('endpoint dan kredensial tidak pernah ikut ke berkas backup', () => {
