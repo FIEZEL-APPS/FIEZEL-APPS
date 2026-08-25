@@ -167,19 +167,39 @@ function readJson(relative) {
  * menjawab "berkas ini milik pelajaran mana" tanpa menebak dari teksnya.
  */
 const REGISTRY = {
+  /**
+   * Kosakata diurutkan level dulu, lalu KATA sebelum kalimat contoh di dalam level itu.
+   *
+   * Dua tingkat pengurutan, dua alasan berbeda. Level dulu karena level yang setengah
+   * bersuara lebih buruk daripada level yang belum disentuh - murid A1 bertemu tombol yang
+   * diam di tengah latihan. Kata sebelum kalimat karena selisih harganya besar: satu kata
+   * rata-rata 5,5 karakter, satu kalimat contoh 42. Seluruh 217 kata A1 berharga 1.204
+   * karakter; kalimat contohnya sendiri 7.647. Dengan jatah yang selalu lebih kecil dari
+   * kebutuhan, mendahulukan kata berarti setiap entri A1 punya pengucapan sebelum satu pun
+   * kalimat contoh dibeli.
+   */
   vocabulary() {
+    const rank = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
+    const records = readJson('vocabulary-master.json');
     const items = [];
-    for (const record of readJson('vocabulary-master.json')) {
+
+    records.forEach((record, index) => {
+      const level = rank[record?.level] ?? 99;
       if (record?.word) {
-        items.push({ text: record.word, contentType: 'word', locale: 'en-US', sourceRef: record.id });
+        items.push({ text: record.word, contentType: 'word', locale: 'en-US', sourceRef: record.id, level, kind: 0, index });
       }
       for (const example of record?.examples || []) {
         if (example?.en) {
-          items.push({ text: example.en, contentType: 'sentence', locale: 'en-US', sourceRef: record.id });
+          items.push({ text: example.en, contentType: 'sentence', locale: 'en-US', sourceRef: record.id, level, kind: 1, index });
         }
       }
-    }
-    return items;
+    });
+
+    // Urutan asli sebagai pemecah seri terakhir: sort JS tidak dijamin stabil, dan dua jalan
+    // atas bank yang sama harus memilih aset yang sama.
+    return items
+      .sort((a, b) => (a.level - b.level) || (a.kind - b.kind) || (a.index - b.index))
+      .map(({ text, contentType, locale, sourceRef }) => ({ text, contentType, locale, sourceRef }));
   },
   /**
    * Listening diurutkan menurut level CEFR, bukan menurut urutan berkas.
