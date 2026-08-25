@@ -99,6 +99,15 @@ setTimeout(()=>{
     // dipertahankan, tetapi jaminan kualitas sesungguhnya kini pindah ke KONTRAK provenance
     // per entry optionSources: {sourceId, sourceLevel, origin:'own'|'peer'|'taxonomy'|'fallback'}.
     const provenanceViolations=[],sequenceCueCollisions=[],classifyFamilyIssues=[];
+    // m025-160: gerbang bahasa A1-A2 (issue #222 tahap 2). Istilah internal/metabahasa produk
+    // dilarang tampil di teks yang dilihat siswa pemula; "Siswa" sebagai sebutan pembaca
+    // dilarang di field *Id template A1-A2. Kutipan “...” dibuang dulu supaya teks opsi
+    // pinjaman lintas level tidak jadi positif palsu.
+    const jargonViolations=[];
+    // 'backshift' TIDAK dilarang: itu istilah Inggris T1 yang disahkan council (nama lesson
+    // B1 boleh dirujuk kartu A2 lewat atribusi pinjaman); calque privat 'pemunduran' tetap haram.
+    const bannedJargonA=/(miskonsepsi|distraktor|polaritas|takrif|kuantifier|pemunduran)/i;
+    const stripQuoted=s=>String(s||'').replace(/“[^”]*”/g,'').replace(/'[^']*'/g,'');
     const templateById=new Map(grammar.templates.map(t=>[t.id,t]));
     const validOrigins=new Set(['own','peer','taxonomy','fallback']);
     // m025-155: kalimat fallback heuristik bentuk kata kerja - tidak boleh muncul sebagai
@@ -117,6 +126,14 @@ setTimeout(()=>{
       const questions=context.buildGrammarLessonQuestions(template.subskill,25);
       totalQuestions+=questions.length;
       if(questions.length!==25)shortLessons.push({skill:template.subskill,count:questions.length});
+      if(template.cefr==='A1'||template.cefr==='A2'){
+        const idFields=[template.pedagogicalObjectiveId,template.misconceptionTargetedId,template.reasoningOperationId,template.explanation?.whyCorrectId,template.explanation?.ruleId,template.explanation?.whyOthersFailId,template.explanation?.howToAvoidId,template.explanation?.memoryCueId,...(template.distractors||[]).flatMap(d=>[d.whyFailsId,d.misconceptionId])];
+        for(const f of idFields){if(f&&/\bSiswa\b/.test(f))jargonViolations.push({lesson:template.subskill,issue:'sebutan_Siswa_di_field_A1A2',detail:String(f).slice(0,80)});if(f&&bannedJargonA.test(stripQuoted(f)))jargonViolations.push({lesson:template.subskill,issue:'istilah_internal_di_field_A1A2',detail:String(f).slice(0,80)})}
+        for(const q of questions){
+          const visible=[q.question,q.explain?.why,q.explain?.rule,q.explain?.avoid,q.explain?.memory,q.explain?.distractor,...(q.explain?.distractors||[]).map(d=>d?.reason)];
+          for(const v of visible)if(v&&bannedJargonA.test(stripQuoted(v)))jargonViolations.push({lesson:template.subskill,mode:q.practiceMode,issue:'istilah_internal_di_kartu_A1A2',detail:String(v).slice(0,80)});
+        }
+      }
       const sigs=questions.map(signature),questionTexts=questions.map(q=>norm(q.question)),modes=questions.map(q=>q.practiceMode);
       if(new Set(sigs).size!==questions.length||new Set(questionTexts).size!==questions.length)withinDuplicates.push(template.subskill);
       if(new Set(modes).size!==expectedModes.length||expectedModes.some(mode=>!modes.includes(mode)))modeFailures.push(template.subskill);
@@ -183,6 +200,7 @@ setTimeout(()=>{
     check('Option provenance contract (m025-155)',provenanceViolations.length===0,provenanceViolations.length?{violations:provenanceViolations.length,samples:provenanceViolations.slice(0,10)}:'semua entry optionSources memenuhi kontrak own/peer/taxonomy/fallback');
     check('Sequence vs decision-cue option sets differ (m025-155)',sequenceCueCollisions.length===0,sequenceCueCollisions.length?sequenceCueCollisions.slice(0,10):'set opsi v5 dan v22 berbeda di setiap lesson');
     check('Classify-family distractors are honest taxonomy (m025-155)',classifyFamilyIssues.length===0,classifyFamilyIssues.length?classifyFamilyIssues.slice(0,10):'semua label keluarga salah berlabel taxonomy dengan alasan yang jujur');
+    check('A1-A2 learner text free of internal jargon (m025-160)',jargonViolations.length===0,jargonViolations.length?{violations:jargonViolations.length,samples:jargonViolations.slice(0,10)}:'nol istilah internal & nol sebutan "Siswa" di teks A1-A2');
     check('No source concept leaks across lessons',sourceReuse.length===0,sourceReuse.length?sourceReuse.slice(0,10):'each source concept belongs to exactly one lesson suite');
     check('No exact runtime duplicates across lessons',crossLessonDuplicates.length===0,`duplicates=${crossLessonDuplicates.length}`);
     check('Runtime integrity validator',invalidRuntime.length===0,`invalid=${invalidRuntime.length}`);
