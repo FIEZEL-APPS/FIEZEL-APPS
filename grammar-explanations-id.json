@@ -7,18 +7,18 @@
       "misconception": "Siswa mengira setiap kalimat bermakna “sekarang” harus memakai bentuk -ing, tanpa memeriksa apakah kalimatnya bicara soal kebiasaan",
       "reasoning": "temukan penanda waktu → tentukan bentuk aspeknya",
       "rule": "Present continuous dibentuk dengan am/is/are + kata kerja -ing, dipakai untuk tindakan yang sedang terjadi pada saat kalimat itu diucapkan.",
-      "whyCorrect": "Kata “Look!” menunjuk pada kegiatan yang sedang terlihat berlangsung, dan itulah tugas present continuous.",
+      "whyCorrect": "“Look!” ditambah “right now — you can smell it” menunjuk kegiatan yang terlihat sedang berlangsung saat ini juga, jadi present continuous “is preparing” yang dibutuhkan.",
       "whyOthersFail": "Present simple akan menggambarkan kebiasaan, present perfect menggambarkan tindakan yang sudah selesai, sedangkan bentuk dasar tanpa perubahan tidak bisa berdiri di posisi ini.",
       "howToAvoid": "Tanyakan pada diri sendiri: ini kebiasaan yang berulang, atau sesuatu yang sedang terjadi di depan mata?",
       "memoryCue": "Ada “Look!”, berarti lihat bentuk -ing-nya.",
       "distractors": {
         "prepares": {
           "misconception": "kebiasaan dipakai untuk kejadian yang sedang berlangsung",
-          "whyFails": "Kata “Look!” di kalimat itu menandakan tindakan yang sedang terlihat berlangsung, bukan rutinitas yang berulang."
+          "whyFails": "“Prepares” menyatakan rutinitas atau kebiasaan umum, dan itu bertabrakan dengan hidangan yang sedang dibuat saat ini juga."
         },
         "has prepared": {
           "misconception": "yang sedang berlangsung tertukar dengan yang sudah selesai",
-          "whyFails": "Present perfect berarti pekerjaannya sudah rampung, padahal masakan itu masih dalam proses dibuat."
+          "whyFails": "“Has prepared” mengumumkan hidangan yang sudah jadi, padahal “right now — you can smell it” menunjukkan masakannya masih berlangsung."
         },
         "prepare": {
           "misconception": "bentuk dasar tanpa penyesuaian dengan subjek",
@@ -101,7 +101,7 @@
     "MO-002": {
       "objective": "Memakai “must” untuk kesimpulan yang diyakini kuat dan “might” atau “could” untuk dugaan yang masih ragu",
       "misconception": "Siswa memakai “must” untuk sembarang tebakan, padahal kata itu disediakan untuk kesimpulan yang bukti pendukungnya kuat",
-      "reasoning": "timbang seberapa kuat buktinya → pilih kata modal sesuai tingkat keyakinan",
+      "reasoning": "kenali simpulan waktu kini → timbang kekuatan bukti yang terlihat → pilih must untuk keyakinan hampir pasti atau can't untuk kemustahilan",
       "rule": "Untuk kesimpulan negatif yang diyakini kuat, pakai “can’t”, bukan “mustn’t” yang berarti larangan.",
       "whyCorrect": "“Can’t” menyatakan kesimpulan negatif yang diyakini kuat berdasarkan bukti yang ada.",
       "whyOthersFail": "“Mustn’t” berarti dilarang, “might not” hanya kemungkinan lemah, dan “shouldn’t” berupa saran atau harapan — tidak ada yang cocok dengan kesimpulan yang diyakini.",
@@ -230,7 +230,7 @@
       "distractors": {
         "A": {
           "misconception": "kata sandang penyebutan pertama diulang untuk benda yang sudah dikenali",
-          "whyFails": "Anjing itu sudah diperkenalkan di kalimat pertama, jadi sekarang sudah bisa dikenali dan menuntut “the”."
+          "whyFails": "“A” memperkenalkan anjing itu seolah-olah informasi yang benar-benar baru, padahal kalimat pertama sudah membuatnya bisa dikenali."
         },
         "An": {
           "misconception": "bentuk kata sandang salah karena aturan bunyi vokal diterapkan keliru",
@@ -330,7 +330,7 @@
         },
         "scenic": {
           "misconception": "kata sifat dasar dipakai tanpa penanda perbandingan",
-          "whyFails": "Kalimatnya membandingkan dua jalur dengan kata “than”, dan itu menuntut bentuk comparative."
+          "whyFails": "“Scenic” membiarkan kata sifatnya polos tanpa penanda, sehingga perbandingan dengan “than” tidak punya pijakan."
         },
         "most scenic": {
           "misconception": "bentuk superlative tanpa “the”, dan cakupannya tetap keliru",
@@ -426,7 +426,7 @@
         },
         "was writing": {
           "misconception": "berpindah ke tense cerita lampau yang waktunya sudah dipatok",
-          "whyFails": "Tidak ada patokan waktu lampau yang sudah tutup di sini; tahunnya masih berjalan, jadi yang dibutuhkan present perfect."
+          "whyFails": "“Was writing” membingkai kegiatan menulisnya di dalam momen lampau yang sudah tutup, padahal “this year” masih terbuka dan tidak ada patokan waktu selesai di kalimatnya."
         },
         "writes": {
           "misconception": "kalimatnya dibaca sebagai kebiasaan sehari-hari",
@@ -833,8 +833,8 @@
           "whyFails": "“In the second traffic light” membaca lampu itu sebagai ruang tertutup dan “at Baker Street” menciutkan satu jalan utuh menjadi satu titik; kedua celah salah membaca jenis lokasinya."
         },
         "on / in": {
-          "misconception": "“on” dipakai untuk lokasi titik dan “in” untuk nama jalan",
-          "whyFails": "“On the second traffic light” memperlakukan titik pada rute sebagai permukaan, jadi celah pertama sudah gagal bahkan sebelum frasa nama jalannya ditimbang."
+          "misconception": "titik pada rute diperlakukan sebagai permukaan pada celah pertama",
+          "whyFails": null
         },
         "at / in": {
           "misconception": "bagian titiknya sudah tepat, tetapi nama jalannya keliru memakai “in”",
@@ -1447,22 +1447,22 @@
       "misconception": "Siswa menganggap through, across, dan along sama-sama berarti “ke arah”, tanpa memperhatikan bentuk ruang yang dilalui",
       "reasoning": "kenali bentuk ruang yang tersirat dari kata bendanya → pilih kata depan gerak yang cocok",
       "rule": "Through berarti menembus ruang tertutup; across berarti menyeberangi permukaan datar terbuka; along berarti menyusuri panjangnya sesuatu; over berarti melintas di atasnya.",
-      "whyCorrect": "“Through” menggambarkan gerak masuk lalu keluar di sisi lain sebuah ruang tiga dimensi yang tertutup, dan itu cocok dengan terowongan.",
+      "whyCorrect": "“Through” menandai gerakan masuk dari satu sisi celah sempit yang tertutup dan keluar di sisi lainnya, persis seperti menyelinap lewat celah pagar.",
       "whyOthersFail": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan terowongan yang tertutup.",
       "howToAvoid": "Bayangkan bentuk ruangnya: tertutup dan tiga dimensi menandakan “through”.",
       "memoryCue": "Terowongan punya bagian dalam, jadi dilewati “through”.",
       "distractors": {
         "across": {
           "misconception": "kata depan untuk permukaan datar terbuka dipakai untuk ruang tertutup tiga dimensi",
-          "whyFails": "“Across” menggambarkan gerak di atas permukaan datar seperti jalan atau lapangan, bukan gerak di dalam ruang tertutup seperti terowongan."
+          "whyFails": "“Across” bergerak melintasi bentangan datar terbuka seperti jalan atau ladang; celah sempit tidak punya permukaan untuk dilintasi."
         },
         "along": {
           "misconception": "kata depan untuk menyusuri garis memanjang dipakai untuk gerak di dalam ruang tertutup",
-          "whyFails": "“Along” menggambarkan gerak menyusuri panjangnya sesuatu seperti jalan setapak atau sungai, bukan menembus bagian dalam ruang tertutup."
+          "whyFails": "“Along” mengikuti panjang sesuatu seperti jalan setapak atau sungai; “along a gap” berarti bergerak memanjang di dalam celahnya, bukan menembus ke sisi lain."
         },
         "over": {
           "misconception": "kata depan untuk melintas di atas dipakai untuk gerak di dalam ruangnya",
-          "whyFails": "“Over” menyiratkan gerak melewati bagian atas sesuatu, padahal terowongan itu dimasuki dan ditembus, bukan dilewati dari atas."
+          "whyFails": "“Over” berarti memanjat melewati bagian atas pagar, sedangkan kalimatnya memakai celah yang ada di pagar itu."
         }
       }
     },
@@ -2285,8 +2285,8 @@
     "b5_002": {
       "objective": "Siswa memakai present perfect bersama rentang waktu yang belum berakhir seperti “this week”, untuk menghubungkan tindakan lampau dengan kerangka waktu yang masih berjalan",
       "misconception": "Siswa langsung memakai past simple setiap kali ada kejadian tertentu yang disebut, tanpa melihat bahwa rentang waktunya sendiri masih berjalan",
-      "reasoning": "periksa apakah rentang waktu yang disebut seperti this week, this month, atau this year sudah berakhir atau masih berjalan, lalu pilih present perfect untuk yang belum berakhir",
-      "rule": "Pakai present perfect bersama rentang waktu yang belum berakhir seperti today, this week, dan this year ketika melaporkan tindakan di dalam rentang itu.",
+      "reasoning": "pastikan kontras yang diuji adalah present perfect lawan past simple → periksa rentang yang disebut seperti this week masih berjalan → tolak bentuk lampau yang akan menutupnya",
+      "rule": "Pilih present perfect alih-alih past simple saat melaporkan tindakan di dalam rentang yang belum berakhir, seperti “I have sent three reports this week”; bentuk lampau justru menutup rentang yang masih berjalan.",
       "whyCorrect": "Present perfect menghubungkan surel yang sudah terkirim dengan kerangka waktu “this week” yang belum berakhir.",
       "whyOthersFail": "Past simple menuntut kerangka waktu yang sudah tutup, past continuous keliru menampilkan tindakan tuntas sebagai sesuatu yang sedang berjalan, dan present simple bukan untuk tindakan lampau tertentu.",
       "howToAvoid": "Periksa apakah rentang waktu yang disebut sudah berakhir; kalau belum, biasanya yang dibutuhkan present perfect.",
@@ -2294,7 +2294,7 @@
       "distractors": {
         "sent": {
           "misconception": "past simple dipakai karena jumlah surelnya disebut dengan pasti",
-          "whyFails": "Past simple menuntut kerangka waktu yang sudah tutup, padahal “this week” masih berjalan karena baru hari Selasa, jadi yang dibutuhkan present perfect."
+          "whyFails": "“Sent” menutup kerangka waktunya seolah sudah selesai, padahal “this week” masih berjalan karena baru hari Selasa, jadi kerangka yang dibutuhkannya tidak ada di kalimat ini."
         },
         "was sending": {
           "misconception": "past continuous dipakai untuk menggambarkan serangkaian tindakan yang sudah tuntas",
@@ -3163,7 +3163,7 @@
       "misconception": "Siswa menulis kata kerja -ing tanpa am, is, atau are, karena Bahasa Indonesia tidak memerlukan kata bantu itu",
       "reasoning": "temukan penanda sedang berlangsung lalu pasang dua bagiannya",
       "rule": "Present continuous dibentuk dengan am, is, atau are ditambah kata kerja -ing, untuk tindakan yang sedang berlangsung di sekitar waktu bicara.",
-      "whyCorrect": "“Now” menandakan tindakan yang sedang berlangsung, jadi bentuknya “is cooking”.",
+      "whyCorrect": "“Right now” menunjuk saat ini juga, jadi tindakan yang sedang berlangsung membutuhkan “is cooking”.",
       "whyOthersFail": "“Cook” dan “cooking” kehilangan kata bantu yang wajib ada; “cooks” adalah present simple untuk kebiasaan.",
       "howToAvoid": "Periksa dua bagiannya sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing pada kata kerja utamanya.",
       "memoryCue": "Now berarti be tambah -ing: she is cooking."
