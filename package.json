@@ -8,6 +8,7 @@
   "scripts": {
     "test:grammar-curriculum": "node grammar-curriculum-test.js",
     "test:grammar-unlock": "node grammar-unlock-test.js",
+    "test:grammar-memory-scope": "node grammar-memory-scope-test.js",
     "test:writing-rubric": "node writing-rubric-test.js",
     "test:reading-exam": "node reading-exam-test.js",
     "test:level-evidence": "node level-evidence-test.js",
