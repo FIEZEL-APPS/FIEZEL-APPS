@@ -1611,13 +1611,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "The speaker arranges for someone else to do the repair, which is exactly the causative meaning of 'have something done'.",
+        "whyCorrect": "Filling both gaps as 'have / repaired' matches the arranged service in 'I always ___ it ___ by a professional' — have + object + past participle.",
         "rule": "Causative: have/get + object + past participle — used when someone else performs an action for the subject.",
         "whyOthersFail": "The base form and -ing form both break the required past-participle pattern; 'make' fits a different structure (make someone do something) with a different meaning.",
         "howToAvoid": "Ask: did the subject perform the action, or arrange for someone else to do it? The second case needs the causative pattern.",
         "memoryCue": "Have/get + thing + done (not do/doing).",
         "ruleId": "Pola menyuruh: have atau get + objek + past participle — dipakai ketika orang lain yang mengerjakan sesuatu untuk subjeknya.",
-        "whyCorrectId": "Pembicara mengatur agar orang lain yang memperbaiki, dan itulah makna pola “have something done”.",
+        "whyCorrectId": "Pengisian kedua celah dengan “have / repaired” cocok dengan layanan yang diatur pada “I always ___ it ___ by a professional” — pola have + objek + past participle.",
         "whyOthersFailId": "Bentuk dasar dan bentuk -ing sama-sama melanggar pola past participle yang diwajibkan, sedangkan “make” masuk ke susunan lain dengan makna yang berbeda.",
         "howToAvoidId": "Tanyakan: subjeknya mengerjakan sendiri, atau mengatur orang lain mengerjakannya? Kalau yang kedua, pakai pola menyuruh.",
         "memoryCueId": "Have atau get + bendanya + bentuk done, bukan do atau doing."
@@ -3047,8 +3047,8 @@
         {
           "option": "to announce",
           "misconception": "using active infinitive when the subject (the policy) cannot perform the announcing itself",
-          "whyFails": "The policy doesn't announce itself; it is the thing being announced, so the infinitive must be passive.",
-          "whyFailsId": "Kebijakan itu tidak mengumumkan dirinya sendiri; ia justru yang diumumkan, jadi bentuk to-nya harus pasif.",
+          "whyFails": "'To announce' makes the policy the announcer, even though the policy is the thing receiving the announcement.",
+          "whyFailsId": "“To announce” menjadikan kebijakan itu pihak yang mengumumkan, padahal kebijakan itulah yang menerima pengumumannya.",
           "misconceptionId": "bentuk to aktif dipakai padahal subjeknya tidak mungkin melakukan pengumumannya sendiri"
         },
         {
@@ -3061,8 +3061,8 @@
         {
           "option": "to be announcing",
           "misconception": "adding continuous aspect to the passive infinitive unnecessarily",
-          "whyFails": "This wrongly implies an ongoing process of being announced; a single future announcement needs the simple passive infinitive.",
-          "whyFailsId": "Bentuk ini keliru menyiratkan proses pengumuman yang berlangsung; satu pengumuman di masa depan cukup dengan bentuk to pasif sederhana.",
+          "whyFails": "'To be announcing' stretches a one-off announcement into an ongoing process that the sentence never describes.",
+          "whyFailsId": "“To be announcing” merentangkan pengumuman sekali jadi menjadi proses berkepanjangan yang tidak pernah digambarkan kalimatnya.",
           "misconceptionId": "aspek berkelanjutan ditambahkan pada bentuk to pasif tanpa perlu"
         }
       ],
@@ -3159,8 +3159,8 @@
         {
           "option": "rains / will cancel",
           "misconception": "leaving the first conditional entirely unbackshifted in reported speech",
-          "whyFails": "Reported speech generally requires backshifting both the if-clause and result-clause verbs from present/will to past/would.",
-          "whyFailsId": "Kalimat pelaporan umumnya menuntut pemunduran pada anak kalimat syarat dan anak kalimat hasilnya, dari present dan will menjadi past dan would.",
+          "whyFails": "'Rains / will cancel' repeats the direct quote unchanged, ignoring that the reporting frame has moved the moment of speaking into the past.",
+          "whyFailsId": "“Rains / will cancel” mengulang kutipan langsungnya tanpa perubahan, mengabaikan bahwa bingkai pelaporannya sudah memindahkan momen bicara ke masa lampau.",
           "misconceptionId": "first conditional dibiarkan tanpa pemunduran sama sekali di kalimat pelaporan"
         },
         {
@@ -3368,9 +3368,9 @@
       "subskill": "movement_prepositions_through_across_along_over",
       "cefr": "A2",
       "questionType": "multiple_choice",
-      "pedagogicalObjective": "Match a movement preposition to the shape of the path described (a tunnel-like space vs. an open flat surface vs. a linear route)",
+      "pedagogicalObjective": "Match a movement preposition to the shape of the path described (a tight enclosed opening vs. an open flat surface vs. a linear route)",
       "misconceptionTargeted": "Learner treats all movement prepositions (through/across/along) as generally meaning 'in the direction of' without attending to the shape of the space being moved through",
-      "reasoningOperation": "identify the spatial shape implied by the noun (tunnel/enclosed space) -> select the movement preposition matching that shape",
+      "reasoningOperation": "identify the spatial shape implied by the noun (narrow gap/enclosed opening) -> select the movement preposition matching that shape",
       "stem": "We squeezed ___ the narrow gap in the fence.",
       "options": [
         "across",
@@ -3405,14 +3405,14 @@
       "explanation": {
         "whyCorrect": "'Through' marks movement into one side of a tight enclosed opening and out the other, which is exactly what squeezing past a gap in a fence involves.",
         "rule": "Through = inside an enclosed space; across = a flat open surface; along = following the length of something; over = above and across.",
-        "whyOthersFail": "Each alternative fits a different path shape (flat surface, linear edge, or overhead arc), not an enclosed tunnel.",
+        "whyOthersFail": "Each alternative fits a different path shape (flat surface, linear edge, or overhead arc), not a tight enclosed opening like a gap in a fence.",
         "howToAvoid": "Picture the shape of the space: enclosed and three-dimensional signals 'through'.",
-        "memoryCue": "A tunnel has an inside — you go 'through' it.",
+        "memoryCue": "A gap or opening has an inside — you squeeze 'through' it.",
         "ruleId": "Through berarti menembus ruang tertutup; across berarti menyeberangi permukaan datar terbuka; along berarti menyusuri panjangnya sesuatu; over berarti melintas di atasnya.",
         "whyCorrectId": "“Through” menandai gerakan masuk dari satu sisi celah sempit yang tertutup dan keluar di sisi lainnya, persis seperti menyelinap lewat celah pagar.",
-        "whyOthersFailId": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan terowongan yang tertutup.",
+        "whyOthersFailId": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan celah sempit tertutup seperti celah pagar.",
         "howToAvoidId": "Bayangkan bentuk ruangnya: tertutup dan tiga dimensi menandakan “through”.",
-        "memoryCueId": "Terowongan punya bagian dalam, jadi dilewati “through”."
+        "memoryCueId": "Celah punya bagian dalam — ditembus dengan “through”."
       },
       "pedagogicalObjectiveId": "Memasangkan kata depan gerak dengan bentuk lintasannya: ruang tertutup, permukaan datar terbuka, atau jalur memanjang",
       "misconceptionTargetedId": "Siswa menganggap through, across, dan along sama-sama berarti “ke arah”, tanpa memperhatikan bentuk ruang yang dilalui",
@@ -4355,13 +4355,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "'Had our roof repaired' uses the causative structure: have + object + past participle, showing we arranged for someone else to do the repair.",
+        "whyCorrect": "'Had' fits the past marker 'last week' and completes the causative frame around 'our roof repaired' in its past form.",
         "rule": "Causative: subject + have/get + object + past participle = arrange for a service to be done.",
         "whyOthersFail": "The other options either aren't grammatical causative forms or clash with the past time frame and subject agreement.",
         "howToAvoid": "If the subject didn't do the action themselves but arranged it, use have/get + object + past participle.",
         "memoryCue": "Have + thing + done = you paid/arranged someone else to do it.",
         "ruleId": "Pola menyuruh: subjek + have atau get + objek + past participle, berarti mengatur agar sebuah jasa dikerjakan.",
-        "whyCorrectId": "“Had our roof repaired” memakai pola menyuruh berupa have + objek + past participle, yang menunjukkan kami mengatur orang lain untuk memperbaikinya.",
+        "whyCorrectId": "“Had” cocok dengan penanda lampau “last week” dan melengkapi kerangka menyuruh di sekitar “our roof repaired” dalam bentuk lampaunya.",
         "whyOthersFailId": "Pilihan lainnya bukan bentuk menyuruh yang sah, atau bertabrakan dengan kerangka waktu lampau dan kesesuaian subjeknya.",
         "howToAvoidId": "Kalau subjeknya tidak mengerjakan sendiri melainkan mengaturnya, pakai have atau get + objek + past participle.",
         "memoryCueId": "Have + bendanya + bentuk done berarti ada orang lain yang dibayar atau diminta mengerjakannya."
@@ -6239,8 +6239,8 @@
         {
           "option": "had; had",
           "misconception": "Uses past simple twice instead of the fixed present perfect + ever pattern.",
-          "whyFails": "Superlative + ever claims typically require present perfect ('have had') to cover the speaker's whole life experience up to now, not a specific past-tense claim.",
-          "whyFailsId": "Pernyataan superlative + ever lazimnya menuntut present perfect seperti “have had” untuk mencakup pengalaman sepanjang hidup sampai sekarang, bukan satu waktu lampau tertentu.",
+          "whyFails": "'Had; had' seals the experience inside a finished past, cutting the 'ever' life-claim off from the present moment.",
+          "whyFailsId": "“Had; had” mengunci pengalamannya di masa lampau yang sudah selesai, sehingga klaim seumur hidup “ever”-nya terputus dari saat ini.",
           "misconceptionId": "past simple dipakai dua kali menggantikan pola tetap present perfect + ever"
         },
         {
