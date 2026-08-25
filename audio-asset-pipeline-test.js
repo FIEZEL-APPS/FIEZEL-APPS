@@ -431,6 +431,63 @@ function manifestWith(text, extra = {}) {
       'voiceProfiles tersimpan');
   }
 
+  // 18. Audiobook: teks berhak cipta tidak boleh ikut diproduksi.
+  //
+  //     Delapan entri perpustakaan adalah retelling FIEZEL. Entri the_little_prince MENGAKU
+  //     hal yang sama di field source-nya, tetapi isinya terjemahan Katherine Woods 1943
+  //     kata per kata - 93.018 karakter, enam puluh kali lipat entri lain, lengkap dengan
+  //     halaman judul penerjemahnya. Gate ini mengunci pengecualian itu supaya ia tidak
+  //     hilang tanpa sengaja saat registry disunting lagi.
+  {
+    const books = require(path.join(root, 'features/library/library-books-v1.json'));
+    const list = Array.isArray(books) ? books : (books.items || books.books || []);
+    const tlp = list.find((b) => b.id === 'the_little_prince');
+
+    const toolSrc3 = fs.readFileSync(path.join(root, 'tools/audio-batch-generate.mjs'), 'utf8');
+    check('Registry audiobook mengecualikan the_little_prince',
+      /DIKECUALIKAN[\s\S]{0,120}the_little_prince/.test(toolSrc3),
+      'pengecualian ada di registry');
+
+    // Kalau suatu hari teksnya benar-benar diganti retelling, entri ini akan menyusut ke
+    // ukuran sekitar entri lain - dan gate ini yang memberi tahu bahwa pengecualiannya
+    // sudah boleh dicabut, alih-alih membiarkannya terkunci selamanya tanpa alasan.
+    let tlpChars = 0;
+    for (const c of tlp?.chapters || []) for (const s of c.sentences || []) if (s?.en) tlpChars += s.en.length;
+    const lain = list.filter((b) => b.id !== 'the_little_prince').map((b) => {
+      let n = 0;
+      for (const c of b.chapters || []) for (const s of c.sentences || []) if (s?.en) n += s.en.length;
+      return n;
+    });
+    const terbesarLain = Math.max(...lain);
+    check('the_little_prince masih memuat teks penuh, bukan retelling',
+      tlpChars > terbesarLain * 5,
+      `${tlpChars} karakter vs ${terbesarLain} terbesar di antara retelling - selama ini benar, pengecualian tetap perlu`);
+
+    // Pemeriksaan perilaku, bukan pemindaian teks: registry-nya benar-benar dijalankan.
+    // Memindai sumber apa adanya akan menghukum komentar yang justru menjelaskan
+    // pengecualian ini - kesalahan yang sudah pernah terjadi pada gate Worker.
+    let lainnya = 0;
+    for (const b of list) {
+      if (b.id === 'the_little_prince') continue;
+      for (const c of b.chapters || []) for (const s of c.sentences || []) if (s?.en?.trim()) lainnya++;
+    }
+    let terpancar = -1;
+    try {
+      const keluaran = require('child_process').execFileSync(
+        process.execPath,
+        ['tools/audio-batch-generate.mjs', '--content=audiobook', '--limit=1'],
+        { cwd: root, env: { ...process.env, ELEVENLABS_VOICE_ID: 'gate-voice' }, encoding: 'utf8' }
+      );
+      const m = keluaran.match(/belum ada\s*:\s*(\d+)/);
+      const d = keluaran.match(/duplikat\s*:\s*(\d+)/);
+      if (m && d) terpancar = Number(m[1]) + Number(d[1]);
+    } catch (_) { /* terpancar tetap -1 dan gate gagal, sebagaimana mestinya */ }
+
+    check('Registry hanya memancarkan kalimat dari buku yang boleh diproduksi',
+      terpancar === lainnya,
+      `registry ${terpancar} kalimat, delapan buku lain ${lainnya} - the_little_prince (${tlp?.chapters?.length || 0} bab) tidak ikut`);
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     counts: { pass: checks.filter(i => i.status === 'PASS').length, fail: checks.filter(i => i.status === 'FAIL').length },
