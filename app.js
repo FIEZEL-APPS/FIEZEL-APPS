@@ -279,7 +279,31 @@ const GRAMMAR_PRACTICE_MODES=[
   'contrast_distractor_1','contrast_distractor_2','contrast_distractor_3',
   'classify_family','locate_decision_cue','teach_back','mastery_check'
 ];
-function friendlySkillName(skill){const key=String(skill||'grammar');const titles=typeof GRAMMAR_SKILL_TITLES_ID==='object'?GRAMMAR_SKILL_TITLES_ID:{};return titles[key]||key.replace(/_/g,' ').replace(/\bvs\b/gi,'dan').replace(/\bwith\b/gi,'dengan').replace(/\bwithout\b/gi,'tanpa').replace(/^\w/,m=>m.toUpperCase())}
+// m025-161 (F1-1): JUDUL LESSON KORUP. Judul dipakai di stem, why, dan ekor alasan; sebelum
+// ini fallback-nya mengganti kata Inggris DI DALAM slug Inggris (vs→dan, with→dengan) dan
+// melahirkan metabahasa yang bukan bahasa apa pun: "Preposition of means by dan dengan dan on",
+// "for dan since dan during", "pola comparative dan superlative scope" (82+78 kemunculan).
+// Urutan resolusi sekarang: (1) judul Indonesia grammar-labels-id.js, (2) judul kurikulum
+// grammar-curriculum-v1.json (indeksnya dibangun ulang sendiri kalau load belum mengisinya),
+// (3) baru slug - dan slug itu TIDAK lagi menukar kata di tengah frasa Inggris, jadi paling
+// buruk yang tampil adalah judul Inggris utuh, bukan campuran rusak.
+function grammarSkillTitleMap(){
+  if(typeof GRAMMAR_SKILL_TITLES_ID==='object'&&GRAMMAR_SKILL_TITLES_ID)return GRAMMAR_SKILL_TITLES_ID;
+  const scope=typeof globalThis!=='undefined'?globalThis:null;
+  if(scope&&typeof scope.GRAMMAR_SKILL_TITLES_ID==='object'&&scope.GRAMMAR_SKILL_TITLES_ID)return scope.GRAMMAR_SKILL_TITLES_ID;
+  // konteks CommonJS (harness audit/dump di node): judulnya tetap satu sumber, bukan salinan.
+  if(typeof require==='function'){try{const mod=require('./grammar-labels-id.js');if(mod&&mod.GRAMMAR_SKILL_TITLES_ID)return mod.GRAMMAR_SKILL_TITLES_ID}catch(error){/* berkas judul opsional */}}
+  return{};
+}
+function friendlySkillName(skill){
+  const key=String(skill||'grammar');
+  const titles=grammarSkillTitleMap();
+  if(titles[key])return String(titles[key]);
+  let curriculumTitle='';
+  try{curriculumTitle=String(grammarCurriculumEntry(key)?.title||'').trim()}catch(error){curriculumTitle=''}
+  if(curriculumTitle)return curriculumTitle;
+  return key.replace(/_/g,' ').replace(/^\w/,m=>m.toUpperCase());
+}
 function grammarFamilyLabel(item){return GRAMMAR_FAMILY_LABELS[item?.[6]]||'pola grammar'}
 function grammarRuleIndonesian(item){return GRAMMAR_FAMILY_RULES[item?.[6]]||GRAMMAR_FAMILY_RULES.core_grammar}
 function grammarClue(base){const text=String(base||'');const hit=text.match(/\b(look|now|right now|every day|usually|always|yesterday|last [a-z]+|in \d{4}|since|for \d+|tomorrow|next [a-z]+|already|yet|if|unless|than|said|told|must|should|might|because|although)\b/i)?.[0];return hit?`Petunjuk pentingnya adalah “${hit}”.`:'Petunjuknya ada pada hubungan makna, subjek, dan bentuk kata kerja dalam satu kalimat penuh.'}
@@ -337,8 +361,39 @@ function stripQuotes(s){const t=String(s??'').trim();for(const[open,close]of[['�
 // Pembungkus embed “...”: bila teksnya (setelah stripQuotes) masih diawali ATAU diakhiri
 // kutip - misal '“Otherwise” bisa menyimpan...' atau '...setelah “going to”' - pembungkusan
 // dilewati agar tidak menghasilkan ““/”” bertumpuk.
-const quoteEmbed=s=>{const t=stripQuotes(s);return/^[“"]|[”"]$/.test(t)?t:`“${t}”`};
-function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return`${quoteEmbed(option)} tepat karena bentuk dan maknanya sama-sama cocok dengan kalimat.`;const named=grammarMisconceptionReason(misconception);if(named)return`${quoteEmbed(option)} ${named}`;const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return`${quoteEmbed(option)} tidak cocok karena kalimat sudah menunjuk waktu lampau yang jelas dan selesai.`;if(/habit|routine|general truth/.test(raw))return`${quoteEmbed(option)} akan memberi kesan kebiasaan atau fakta umum, padahal konteks kalimat meminta makna lain.`;if(/permission/.test(raw))return`${quoteEmbed(option)} menyatakan izin, sedangkan maksud kalimat bukan memberi izin.`;if(/obligation|requirement|rule/.test(raw))return`${quoteEmbed(option)} belum menyampaikan tingkat kewajiban yang diminta kalimat.`;if(/prohibition/.test(raw))return`${quoteEmbed(option)} berarti larangan, bukan kesimpulan atau kemungkinan.`;if(/singular|plural|agreement/.test(raw))return`${quoteEmbed(option)} belum cocok dengan jumlah subjek, jadi subject dan verb tidak selaras.`;if(/superlative/.test(raw))return`${quoteEmbed(option)} memakai bentuk superlative, padahal cakupan perbandingannya tidak meminta bentuk itu.`;if(/comparative/.test(raw))return`${quoteEmbed(option)} belum memakai bentuk perbandingan yang sesuai dengan jumlah hal yang dibandingkan.`;if(/word order|order/.test(raw))return`${quoteEmbed(option)} menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.`;if(/infinitive/.test(raw))return`${quoteEmbed(option)} memakai bentuk infinitive yang tidak cocok dengan kata kerja atau maksud kalimat.`;if(/gerund/.test(raw))return`${quoteEmbed(option)} memakai bentuk -ing dengan makna yang berbeda dari konteks kalimat.`;if(/passive|agent/.test(raw))return`${quoteEmbed(option)} belum membentuk kalimat pasif yang tepat atau menambahkan pelaku yang tidak diperlukan.`;if(/article|identif/.test(raw))return`${quoteEmbed(option)} tidak cocok dengan apakah benda itu masih umum atau sudah jelas bagi pembaca.`;if(/auxiliary/.test(raw))return`${quoteEmbed(option)} memakai auxiliary yang tidak sama dengan tense atau struktur kalimat utama.`;return`${quoteEmbed(option)} belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat.`}
+// m025-161 (F1-5a): kutipan BERSARANG (159 kartu A1). Pemeriksaan lama cuma melihat ujung
+// teks, jadi opsi yang memuat “...” DI DALAMNYA ("Banyak: “there are”. Satu: “there is”.")
+// tetap dibungkus lagi dan menghasilkan kutipan bertingkat. Sekarang: teks yang sudah
+// mengandung kutip lengkung mana pun dipakai apa adanya.
+const quoteEmbed=s=>{const t=stripQuotes(s);return/[“”]/.test(t)||/^"|"$/.test(t)?t:`“${t}”`};
+// m025-161 (F1-5c): PEMBUKA KUTIPAN VERBATIM (139 kartu A2). Di dalam alasan, kutipan opsi
+// dipotong ke ±8 kata pertama plus "…" supaya alasan tidak dibuka satu paragraf verbatim.
+// Teks opsi ASLI (q.options) tidak pernah dipotong - pemotongan hanya untuk rujukan di reason.
+const QUOTE_EMBED_MAX_WORDS=8;
+function quoteEmbedShort(s,maxWords=QUOTE_EMBED_MAX_WORDS){
+  const t=stripQuotes(s),words=t.split(/\s+/).filter(Boolean);
+  let short=t;
+  if(words.length>maxWords){
+    // jangan berhenti di kata sambung menggantung ("“Look!” dan…") - potongannya jadi bunyi rusak
+    let head=words.slice(0,maxWords).join(' ').replace(/[.,;:!?]+$/,'');
+    head=head.replace(/\s+(dan|atau|tapi|yang|di|ke|dari|buat|sama|dengan|jadi|terus|untuk|pada|kalau)$/i,'');
+    short=`${head}…`;
+    // jangan tinggalkan kutip pembuka yang tidak pernah ditutup akibat pemotongan
+    if((short.match(/“/g)||[]).length>(short.match(/”/g)||[]).length)short=short.replace(/\s*“[^”]*…$/,'…');
+    // rapikan sekali lagi: pemotongan kutip menggantung bisa menyisakan kata sambung di ujung
+    short=short.replace(/\s+(dan|atau|tapi|yang|di|ke|dari|buat|sama|dengan|jadi|terus|untuk|pada|kalau)…$/i,'…');
+  }
+  return/[“”]/.test(short)||/^"|"$/.test(short)?short:`“${short}”`;
+}
+// m025-161 (F1-5b): PEREKATAN (77 kartu A1 + 86 kartu A2). Kalau kutipan opsi berakhir tanda
+// kalimat, diagnosis huruf kecil di belakangnya tidak boleh ditempel dengan spasi biasa
+// ("…they are at home.” sebenarnya bener") - sambungannya pakai em dash.
+function joinQuoteReason(quoted,tail){
+  const q=String(quoted||'').trim(),t=String(tail||'').trim();
+  if(!q)return t;if(!t)return q;
+  return/[.!?](?:[”"'’»])?$/.test(q)?`${q} — ${t}`:`${q} ${t}`;
+}
+function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),'pas di sini: bentuk sama maknanya cocok sama kalimatnya.');const named=grammarMisconceptionReason(misconception);if(named)return joinQuoteReason(quoteEmbedShort(option),named);const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'tidak cocok karena kalimat sudah menunjuk waktu lampau yang jelas dan selesai.');if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'akan memberi kesan kebiasaan atau fakta umum, padahal konteks kalimat meminta makna lain.');if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'menyatakan izin, sedangkan maksud kalimat bukan memberi izin.');if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum menyampaikan tingkat kewajiban yang diminta kalimat.');if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'berarti larangan, bukan kesimpulan atau kemungkinan.');if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum cocok dengan jumlah subjek, jadi subject dan verb tidak selaras.');if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk superlative, padahal cakupan perbandingannya tidak meminta bentuk itu.');if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum memakai bentuk perbandingan yang sesuai dengan jumlah hal yang dibandingkan.');if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.');if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk infinitive yang tidak cocok dengan kata kerja atau maksud kalimat.');if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk -ing dengan makna yang berbeda dari konteks kalimat.');if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum membentuk kalimat pasif yang tepat atau menambahkan pelaku yang tidak diperlukan.');if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'tidak cocok dengan apakah benda itu masih umum atau sudah jelas bagi pembaca.');if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai auxiliary yang tidak sama dengan tense atau struktur kalimat utama.');return joinQuoteReason(quoteEmbedShort(option),'belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat.')}
 function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
 function stableGrammarHash(value){let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 // m025-149: pengecoh untuk mode "aturan/tujuan/penalaran mana yang cocok" diambil dari
@@ -435,8 +490,11 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // untuk bentuk kata kerja, lalu menjelaskan sebuah KALIMAT ATURAN sebagai "belum cocok
   // dengan waktu, fungsi, atau susunan kalimat". Asalnya sekarang ikut dibawa.
   const metaChoice=(question,field,correctWhy,metaOpts)=>{const alts=grammarAlternativeMeta(item,field,3,metaOpts);return direct(question,[meta[field],...alts.map(a=>a.value)],0,correctWhy,[],[ownSrc(),...alts.map(a=>({origin:a.origin,sourceId:a.sourceId,sourceLevel:a.sourceLevel}))])}; // m025-155: provenance objek penuh, bukan string id
-  if(variant===0)return direct(base,meta.options,meta.correctIndex,`${quoteEmbed(correct)} menerapkan pola ${title.toLowerCase()} secara tepat.`,reasons);
-  if(variant===1)return direct(`Pilih versi lengkap yang benar menurut pola ${title.toLowerCase()}:\n${base}`,meta.options.map(option=>completeGrammarStem(base,option)),meta.correctIndex,`Versi dengan ${quoteEmbed(correct)} mempertahankan bentuk dan makna yang diminta.`,reasons);
+  // m025-161 (F1-2): bingkai mode dibawa ke register council (sehari-hari mapan, sudut pandang
+  // "kamu", satu gagasan per kalimat). "menerapkan ... secara tepat", "mempertahankan",
+  // "merupakan", "menegaskan/mendiagnosis", dan "tersebut" dibuang dari teks tampil-siswa.
+  if(variant===0)return direct(base,meta.options,meta.correctIndex,joinQuoteReason(quoteEmbedShort(correct),`pas banget sama pola ${title.toLowerCase()}.`),reasons);
+  if(variant===1)return direct(`Pilih versi lengkap yang pas sama pola ${title.toLowerCase()}:\n${base}`,meta.options.map(option=>completeGrammarStem(base,option)),meta.correctIndex,joinQuoteReason(`Versi pakai ${quoteEmbedShort(correct)}`,'yang bentuk sama maknanya pas.'),reasons);
   // m025-155: mode beropsi KALIMAT (justify/diagnose/label/contrast) tidak boleh jatuh ke
   // heuristik bentuk kata kerja di grammarOptionReason(); tiap opsi salah diberi penjelasan
   // verbatim yang menyebut peran sebenarnya dari kalimat itu.
@@ -454,7 +512,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
     const keyNorm=norm(meta.whyCorrect);
     const echoesKey=t=>{const k=norm(t);return !k||k===keyNorm||keyNorm.includes(k)};
     const kept=[],droppedCount={n:0};
-    for(const x of wrong){const text=String(x.reason||x.detail.whyFails||'');if(text&&!mentionsKey(text)&&!echoesKey(text))kept.push({value:text,src:ownSrc(),expl:`Ini nunjukin kenapa pilihan ${quoteEmbed(x.option)} gagal, bukan kenapa ${quoteEmbed(correct)} bener.`/* m025-160: santai, tetap tidak membocorkan kunci */});else droppedCount.n++}
+    for(const x of wrong){const text=String(x.reason||x.detail.whyFails||'');if(text&&!mentionsKey(text)&&!echoesKey(text))kept.push({value:text,src:ownSrc(),expl:`Ini nunjukin kenapa pilihan ${quoteEmbedShort(x.option)} meleset, bukan kenapa ${quoteEmbedShort(correct)} bener.`/* m025-160: santai, tetap tidak membocorkan kunci */});else droppedCount.n++}
     let borrowed=[];
     if(droppedCount.n){
       const pool=grammarAlternativeMeta(item,'whyCorrect',droppedCount.n+5,{salt:'justify',exclude:[meta.whyCorrect,...kept.map(k=>k.value)]});
@@ -467,7 +525,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
       borrowed=borrowed.slice(0,droppedCount.n);
     }
     const picks=[...kept,...borrowed];
-    return direct(`Mengapa ${quoteEmbed(correct)} merupakan jawaban yang paling tepat untuk contoh ini?\n${base}`,[meta.whyCorrect,...picks.map(p=>p.value)],0,'Alasan tersebut menghubungkan jawaban dengan konteks dan aturan yang benar.',[],[ownSrc(),...picks.map(p=>p.src)],['',...picks.map(p=>p.expl)]);
+    return direct(`Kenapa ${quoteEmbed(correct)} jadi jawaban paling pas di contoh ini?\n${base}`/* m025-161 (F1-2) */,[meta.whyCorrect,...picks.map(p=>p.value)],0,'Alasan ini nyambungin jawabannya sama konteks kalimat dan aturannya.',[],[ownSrc(),...picks.map(p=>p.src)],['',...picks.map(p=>p.expl)]);
   }
   // m025-160: wording final council - stem dan correctWhy mode meta dibawa ke register
   // sehari-hari (CJI mapan: pas/nyambung/bener/nggak), sudut pandang "kamu", satu gagasan
@@ -486,22 +544,24 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // lesson-nya memulihkan identitas soal sekaligus memberi tahu murid strategi lesson mana
   // yang sedang ditanyakan.
   if(variant===8)return metaChoice(`Strategi mana yang paling bantu biar kesalahan di lesson ${title} nggak keulang?`,'avoid','Strategi ini ngecek makna dan bentuk di titik yang paling sering nyesatin.');
-  if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(`Seorang siswa memilih ${quoteEmbed(target.option)}. Alasan mana yang paling tepat menjelaskan mengapa pilihan itu gagal?\n${base}`,[target.reason,meta.whyCorrect,...others.map(x=>x.reason)],0,grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey),[],[],['',`Ini alasan kenapa ${quoteEmbed(correct)} bener; padahal soal nanya kenapa ${quoteEmbed(target.option)} gagal.`,...others.map(x=>`Ini penjelasan buat pilihan ${quoteEmbed(x.option)}, bukan buat ${quoteEmbed(target.option)}.`)]);}
-  if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(`Label kesalahan mana yang paling pas buat pilihan ${quoteEmbed(target.option)}?\n${base}`,[String(target.detail.misconception||target.reason),'jawaban benar, nggak ada kesalahan mikir',...labels],0,`Label itu pas dengan pola salah di balik pilihan ${quoteEmbed(target.option)}.`,[],[],['',`${quoteEmbed(target.option)} memang keliru, jadi label “jawaban benar, nggak ada kesalahan mikir” jelas nggak berlaku buatnya.`,...others.map(x=>`Label ini nunjukin kesalahan mikir di balik pilihan ${quoteEmbed(x.option)}, bukan ${quoteEmbed(target.option)}.`)]);}
-  if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(`Jawaban ${quoteEmbed(target.option)} belum tepat. Pilih perbaikan yang mempertahankan maksud kalimat berikut:\n${base}`,meta.options,meta.correctIndex,`Perbaikannya adalah ${quoteEmbed(correct)}; bentuk itu cocok dengan konteks semula.`,reasons);}
-  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang akurat antara ${quoteEmbed(correct)} dan ${quoteEmbed(target.option)}?\n${base}`,[`${quoteEmbed(correct)} tepat; ${failure}`,`${quoteEmbed(target.option)} tepat, sedangkan ${quoteEmbed(correct)} mengubah maksud kalimat.`,`Keduanya selalu dapat saling menggantikan tanpa perubahan makna.`,`Keduanya salah karena lesson ini tidak menguji pilihan tersebut.`],0,`Perbandingan yang akurat menegaskan ${quoteEmbed(correct)} sebagai jawaban yang benar sekaligus mendiagnosis kesalahan spesifik pada ${quoteEmbed(target.option)}.`/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun */,[],[],['',`Kebalik: justru ${quoteEmbed(correct)} yang jaga maksud kalimatnya, ${quoteEmbed(target.option)} yang gagal.`,`Dua-duanya nggak sepadan; cuma ${quoteEmbed(correct)} yang cocok sama kalimat ini.`,`Keliru: lesson ini memang nguji perbandingan itu, dan ${quoteEmbed(correct)} jawaban yang bener.`]);}
+  // m025-161 (F1-3): narasi orang ketiga "Seorang siswa" (236× di 78 kartu) diganti skenario
+  // teman — pembacanya tetap "kamu", dan yang milih di dalam soal bukan lagi "siswa".
+  if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(`Temanmu milih ${quoteEmbed(target.option)}. Alasan mana yang paling pas jelasin kenapa pilihan itu meleset?\n${base}`,[target.reason,meta.whyCorrect,...others.map(x=>x.reason)],0,grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey),[],[],['',`Ini alasan kenapa ${quoteEmbedShort(correct)} bener; padahal soal nanya kenapa ${quoteEmbedShort(target.option)} meleset.`,...others.map(x=>`Ini penjelasan buat pilihan ${quoteEmbedShort(x.option)}, bukan buat ${quoteEmbedShort(target.option)}.`)]);}
+  if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(`Label kesalahan mana yang paling pas buat pilihan ${quoteEmbed(target.option)}?\n${base}`,[String(target.detail.misconception||target.reason),'jawaban benar, nggak ada kesalahan mikir',...labels],0,`Label itu pas sama pola salah di balik pilihan ${quoteEmbedShort(target.option)}.`,[],[],['',`${quoteEmbed(target.option)} memang keliru, jadi label “jawaban benar, nggak ada kesalahan mikir” jelas nggak berlaku buatnya.`,...others.map(x=>`Label ini nunjukin kesalahan mikir di balik pilihan ${quoteEmbedShort(x.option)}, bukan ${quoteEmbedShort(target.option)}.`)]);}
+  if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(`Jawaban ${quoteEmbed(target.option)} belum pas. Pilih perbaikan yang tetap jaga maksud kalimatnya:\n${base}`,meta.options,meta.correctIndex,joinQuoteReason(`Perbaikannya ${quoteEmbedShort(correct)};`,'bentuk itu yang cocok sama kalimat aslinya.'),reasons);}
+  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang pas antara ${quoteEmbed(correct)} dan ${quoteEmbed(target.option)}?\n${base}`,[joinQuoteReason(`${quoteEmbed(correct)} pas di sini;`,failure),`${quoteEmbed(target.option)} pas, dan ${quoteEmbed(correct)} malah ngubah maksud kalimatnya.`,`Dua-duanya bisa dipakai bolak-balik tanpa ngubah makna.`,`Dua-duanya salah karena lesson ini nggak nguji pilihan itu.`],0,`Perbandingan yang bener nunjukin ${quoteEmbed(correct)} jawabannya, terus nunjuk di mana ${quoteEmbed(target.option)} melesetnya.`/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',`Kebalik: justru ${quoteEmbed(correct)} yang jaga maksud kalimatnya, ${quoteEmbed(target.option)} yang meleset.`,`Dua-duanya nggak sepadan; cuma ${quoteEmbed(correct)} yang cocok sama kalimat ini.`,`Keliru: lesson ini memang nguji perbandingan itu, dan ${quoteEmbed(correct)} jawaban yang bener.`]);}
   // m025-155: label keluarga pengecoh adalah taksonomi global, bukan konten lesson mana pun -
   // stempel origin 'taxonomy' plus penjelasan verbatim yang jujur, supaya murid tidak lagi
   // membaca heuristik bentuk kata kerja untuk sebuah label keluarga.
-  if(variant===21){const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;const familyLabel=grammarFamilyLabel(item),wrongLabels=[labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]];return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[familyLabel,...wrongLabels],0,`Fokus ${title.toLowerCase()} berada dalam keluarga ${familyLabel}.`,[],[ownSrc(),...wrongLabels.map(()=>({origin:'taxonomy',sourceId:'taxonomy:family',sourceLevel:''}))],['',...wrongLabels.map(label=>`Label ${quoteEmbed(label)} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga ${quoteEmbed(familyLabel)}.`)]);}
+  if(variant===21){const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;const familyLabel=grammarFamilyLabel(item),wrongLabels=[labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]];return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[familyLabel,...wrongLabels],0,`Fokus ${title.toLowerCase()} masuk keluarga ${familyLabel}.`,[],[ownSrc(),...wrongLabels.map(()=>({origin:'taxonomy',sourceId:'taxonomy:family',sourceLevel:''}))],['',...wrongLabels.map(label=>`Label ${quoteEmbed(label)} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga ${quoteEmbed(familyLabel)}.`)]);}
   // m025-155: v22 dulu kembar dengan v5 - field 'reasoning' dan seed `${own.id}:reasoning`
   // yang sama menghasilkan set opsi identik, hanya stem yang beda. Sekarang seed diberi salt
   // 'cue', distraktor v5 (dihitung dengan seed lama) dilarang terpilih ulang, dan stem
   // menegaskan fokus "petunjuk keputusan pertama".
   // m025-160: stem tetap menegaskan fokus "petunjuk keputusan pertama", hanya bahasanya santai.
-  if(variant===22){const priorAlts=grammarAlternativeMeta(item,'reasoning',3);return metaChoice(`Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n${base}`,'reasoning','Petunjuk ini yang nentuin hubungan antara konteks, fungsi, dan bentuk jawaban.',{salt:'cue',exclude:priorAlts.map(a=>a.value)});}
+  if(variant===22){const priorAlts=grammarAlternativeMeta(item,'reasoning',3);return metaChoice(`Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n${base}`,'reasoning','Petunjuk ini yang nentuin bentuk jawabannya pas atau nggak.'/* m025-161 (F1-2) */,{salt:'cue',exclude:priorAlts.map(a=>a.value)});}
   // m025-155: v23/v24 memakai entry pairs baru - sourceLevel dan origin ikut dibawa.
-  if(variant===23){const correctSummary=joinSentences(meta.objective,meta.rule),alts=grammarAlternativePairs(item,'objective','rule',3);/* m025-156 (D1) */return direct(`Ringkasan ajar mana yang paling pas buat jelasin lesson ${title} ke siswa lain?`/* m025-160: "siswa lain" itu orang ketiga di dalam soal, bukan sapaan ke pembaca */,[correctSummary,...alts.map(x=>x.value)],0,'Ringkasan itu nyatuin tujuan lesson sama aturan yang bener.',[],[ownSrc(),...alts.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);}
+  if(variant===23){const correctSummary=joinSentences(meta.objective,meta.rule),alts=grammarAlternativePairs(item,'objective','rule',3);/* m025-156 (D1) */return direct(`Ringkasan ajar mana yang paling pas buat jelasin lesson ${title} ke temanmu?`/* m025-161 (F1-3): "siswa lain" diganti "temanmu" - nol sebutan siswa di stem */,[correctSummary,...alts.map(x=>x.value)],0,'Ringkasan itu nyatuin tujuan lesson sama aturan yang bener.',[],[ownSrc(),...alts.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);}
   const correctPlan=joinSentences(meta.avoid,meta.memory),plans=grammarAlternativePairs(item,'avoid','memory',3);/* m025-156 (D1) */return direct(`Rencana cek mandiri mana yang paling pas sebelum kamu nuntasin lesson ${title}?`,[correctPlan,...plans.map(x=>x.value)],0,'Rencana ini gabungin cara nyegah salah sama pengingat khusus lesson ini.',[],[ownSrc(),...plans.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);
 }
 const PART_OF_SPEECH_ID={noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan',number:'kata bilangan',article:'kata sandang'};
@@ -647,7 +707,22 @@ function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences|
 function activeLevelIsManual(sourceState=state){return LEVELS.includes(String(sourceState?.preferences?.activeLevel||''))}
 function activeLevelLabel(sourceState=state){return `${getActiveLevel(sourceState)}${activeLevelIsManual(sourceState)?' · pilihanmu':''}`}
 function levelDescriptor(level){return({A1:'Pemula · fondasi kalimat sederhana',A2:'Dasar · percakapan sehari-hari',B1:'Menengah · komunikasi mandiri',B2:'Menengah atas · ide yang lebih kompleks',C1:'Mahir · akademik dan profesional',C2:'Penguasaan · nuansa dan struktur lanjut'}[level]||'Level belajar aktif')}
-function grammarCurriculumEntry(skill){return GRAMMAR_CURRICULUM_INDEX[String(skill||'')]||null}
+// m025-161 (F1-1): indeks kurikulum dibangun oleh satu fungsi yang dipakai load() MAUPUN
+// pembaca pertama. Sebelumnya indeksnya hanya diisi di dalam load(), jadi setiap pemakai yang
+// jalan sebelum load selesai (mis. friendlySkillName di harness render) melihat indeks kosong
+// dan judul lesson jatuh ke slug.
+function buildGrammarCurriculumIndex(source){
+  const index=Object.create(null);
+  const rows=Array.isArray(source?.lessons)?source.lessons:Array.isArray(source)?source:[];
+  for(const row of rows){const key=String(row?.lessonId||row?.skill||row?.subskill||row?.id||'').trim();if(key)index[key]=row}
+  return index;
+}
+function grammarCurriculumEntry(skill){
+  const key=String(skill||'');
+  if(!key)return null;
+  if(!GRAMMAR_CURRICULUM_INDEX||!Object.keys(GRAMMAR_CURRICULUM_INDEX).length)GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);
+  return GRAMMAR_CURRICULUM_INDEX[key]||null;
+}
 function grammarSequenceFor(skill){const meta=grammarCurriculumEntry(skill);return Number.isFinite(Number(meta?.sequence))?Number(meta.sequence):Number.MAX_SAFE_INTEGER}
 function sortedGrammarSkillsForLevel(level=getActiveLevel()){const seen=new Set();return grammarItemsForLevel(level).sort((a,b)=>grammarSequenceFor(a.skill)-grammarSequenceFor(b.skill)||a.skill.localeCompare(b.skill)).map(x=>x.skill).filter(skill=>{if(seen.has(skill))return false;seen.add(skill);return true})}
 function filterClassroomPack(pack,level=getActiveLevel()){if(!pack||!Array.isArray(pack.lessons))return pack;return {...pack,lessons:pack.lessons.filter(x=>x?.level===level)}}
@@ -1264,7 +1339,7 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  if(policy?.mode==='balance'&&limit>=6)for(const d of ['vocabulary','grammar','reading'])if(!result.some(q=>normalizePolicyDomain(q.type)===d))take(x=>x.domain===d,1);
  take(()=>true,limit-result.length);return result.slice(0,limit)
 }
-async function load(){const root=document.baseURI;const get=async f=>{const r=await fetch(new URL(f,root));if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=Object.create(null);for(const row of (Array.isArray(GRAMMAR_CURRICULUM?.lessons)?GRAMMAR_CURRICULUM.lessons:Array.isArray(GRAMMAR_CURRICULUM)?GRAMMAR_CURRICULUM:[])){const key=String(row.lessonId||row.skill||row.subskill||row.id||'').trim();if(key)GRAMMAR_CURRICULUM_INDEX[key]=row}// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
+async function load(){const root=document.baseURI;const get=async f=>{const r=await fetch(new URL(f,root));if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
   // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
   // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
@@ -3131,17 +3206,53 @@ function grammarBorrowedOptionReason(option,sourceId){
   // m025-155: sentinel bukan pinjaman lesson - jangan pernah mengklaim "pernyataan yang
   // benar untuk lesson X" untuk label taksonomi, filler generik, atau sourceId kosong.
   const key=String(sourceId||'');
-  if(key==='taxonomy:family')return `Label ${quoteEmbed(option)} itu keluarga grammar lain, bukan keluarga pola yang lagi diuji lesson ini.`;
-  if(key==='fallback:generic'||!key)return `${quoteEmbed(option)} cuma pernyataan umum yang nggak menjelasin pola lesson ini.`;
+  // m025-161 (F1-5b/5c): rujukan opsi dipendekkan (±8 kata) dan disambung " — " kalau
+  // kutipannya berakhir tanda kalimat - alasan pinjaman inilah pembuka verbatim di 139 kartu A2.
+  if(key==='taxonomy:family')return joinQuoteReason(`Label ${quoteEmbedShort(option)}`,'itu keluarga grammar lain, bukan keluarga pola yang lagi diuji lesson ini.');
+  if(key==='fallback:generic'||!key)return joinQuoteReason(quoteEmbedShort(option),'cuma pernyataan umum yang nggak menjelasin pola lesson ini.');
   const skill=grammarSkillForTemplate(key);
   return skill
-    ? `${quoteEmbed(option)} sebenarnya bener, tapi itu punyanya lesson ${friendlySkillName(skill)} — bukan pola yang lagi diuji di sini.`/* m025-160 */
-    : `${quoteEmbed(option)} kedengeran masuk akal, tapi nggak menjelasin pola yang lagi diuji di lesson ini.`;
+    ? joinQuoteReason(quoteEmbedShort(option),`sebenarnya bener, tapi itu punyanya lesson ${friendlySkillName(skill)}, bukan pola yang lagi diuji di sini.`)/* m025-160, dipendekkan m025-161 */
+    : joinQuoteReason(quoteEmbedShort(option),'kedengeran masuk akal, tapi nggak menjelasin pola yang lagi diuji di lesson ini.');
 }
 // m025-155: normalisasi entry provenance dari grammarExercise ke kontrak
 // {sourceId,sourceLevel,origin}. String legacy '' berarti milik lesson; string non-kosong
 // berarti pinjaman (level asalnya dicari di GRAMMAR_ITEMS); objek dipakai apa adanya.
 // Sentinel 'taxonomy:family'/'fallback:generic' dikenali dari sourceId-nya.
+// m025-161 (F1-4): REASON KUNCI SALAH KATEGORI (bug semantik council #3, sisa m025-160).
+// Ekor endorse `bener — ini yang diminta pola {focus} di kalimat ini.` hanya benar untuk mode
+// yang opsinya BENTUK KATA (v0, v1, v15-17). Di mode meta, opsinya kalimat aturan/tujuan/urutan
+// mikir/pengingat/strategi/label/keluarga, jadi kalimat lama salah kategori dan berbunyi
+// nonsens ("«pola grammar dasar» bener — ini yang diminta pola present simple basics di
+// kalimat ini"). Tiap mode meta sekarang punya endorse-nya sendiri, dengan kata yang cocok.
+const GRAMMAR_META_KEY_ENDORSE={
+  justify_correct:'bener — ini emang alasan yang dipakai lesson ini.',
+  recognize_rule:'bener — ini emang aturan yang dipakai lesson ini.',
+  recognize_objective:'bener — ini emang tujuan yang dibidik lesson ini.',
+  sequence_reasoning:'bener — ini emang urutan mikir yang dipakai lesson ini.',
+  identify_misconception:'bener — ini emang kesalahan mikir yang dibidik lesson ini.',
+  recall_memory_cue:'bener — ini emang pengingat yang dipakai lesson ini.',
+  choose_avoidance:'bener — ini emang strategi yang dipakai lesson ini.',
+  locate_decision_cue:'bener — ini emang petunjuk pertama yang dipakai lesson ini.',
+  teach_back:'bener — ini emang ringkasan ajar yang dipakai lesson ini.',
+  mastery_check:'bener — ini emang rencana cek yang dipakai lesson ini.',
+  // mode beropsi kalimat/label lain - kategorinya juga bukan "pola di kalimat ini"
+  diagnose_distractor_1:'bener — ini emang alasan gagal yang dibidik lesson ini.',
+  diagnose_distractor_2:'bener — ini emang alasan gagal yang dibidik lesson ini.',
+  diagnose_distractor_3:'bener — ini emang alasan gagal yang dibidik lesson ini.',
+  label_misconception_1:'bener — ini emang label kesalahan yang dipakai lesson ini.',
+  label_misconception_2:'bener — ini emang label kesalahan yang dipakai lesson ini.',
+  label_misconception_3:'bener — ini emang label kesalahan yang dipakai lesson ini.',
+  contrast_distractor_1:'bener — ini emang perbandingan yang dipakai lesson ini.',
+  contrast_distractor_2:'bener — ini emang perbandingan yang dipakai lesson ini.',
+  contrast_distractor_3:'bener — ini emang perbandingan yang dipakai lesson ini.',
+  classify_family:'bener — ini emang keluarga pola yang dipakai lesson ini.'
+};
+function grammarCorrectOptionReason(optionText,mode,focus){
+  const endorse=GRAMMAR_META_KEY_ENDORSE[String(mode||'')]||`bener — ini yang diminta pola ${focus} di kalimat ini.`;
+  // dua em dash beruntun ("…itu.” — bener — ini emang…") membaca kaku; dash kedua jadi koma.
+  return joinQuoteReason(quoteEmbedShort(optionText),endorse).replace(' — bener — ',' — bener, ');
+}
 function grammarNormalizeOptionSource(raw){
   let sourceId,sourceLevel,origin;
   if(raw&&typeof raw==='object'){sourceId=String(raw.sourceId||'');sourceLevel=String(raw.sourceLevel||'');origin=['own','peer','taxonomy','fallback'].includes(raw.origin)?raw.origin:(sourceId?'peer':'own')}
@@ -3160,7 +3271,8 @@ function makeGrammarQuestion(skill,item,variant=0,lessonSkill=skill){const exerc
   // m025-160: bug semantik pada reason KUNCI - klaim kausal "bener KARENA pas dengan fokus"
   // salah alamat: yang membuat pilihan ini benar adalah pola yang diminta kalimatnya, bukan
   // kecocokannya dengan judul fokus lesson. Rumusan baru menyebut fokus sebagai pola diminta.
-  distractors=marked.map(x=>({option:x.x,reason:x.ok?`${quoteEmbed(x.x)} bener — ini yang diminta pola ${focus} di kalimat ini.`:(x.expl||(x.src.origin!=='own'?grammarBorrowedOptionReason(x.x,x.src.sourceId):grammarOptionReason(x.x,false,x.reason,misMap[x.x]))),sourceId:x.src.origin==='own'?lessonId:x.src.sourceId,own:x.src.origin==='own'}));return{id:`grammar-${item?.[8]||skill}-${exercise.mode}-${Date.now()}-${Math.random()}`,type:'grammar',level,skill,lessonSkill,sourceId:item?.[8]||'',conceptId:item?.[8]||'',practiceMode:exercise.mode,canary:item?.[14]||null,question:exercise.question,options:marked.map(x=>x.x),answerIndex:marked.findIndex(x=>x.ok),difficulty:LEVELS.indexOf(level)+1,explain:{why:exercise.correctWhy,rule:`${rule} Fokus khusus: ${focus}.`,avoid:'Pahami dulu maksud kalimatnya. Baru cek petunjuk dari lesson, terus pilih bentuknya.',memory:`Inget fokus ${focus}, ya. Cek kenapa tiap jebakan beda dari jawaban benar.`,distractors,distractor:'Tiap pilihan salah bawa jebakan mikirnya sendiri. Cek alasannya satu-satu, jangan asal pilih yang keliatan akrab.'},
+  // m025-161 (F1-4): endorse kunci dibedakan per mode lewat grammarCorrectOptionReason().
+  distractors=marked.map(x=>({option:x.x,reason:x.ok?grammarCorrectOptionReason(x.x,exercise.mode,focus):(x.expl||(x.src.origin!=='own'?grammarBorrowedOptionReason(x.x,x.src.sourceId):grammarOptionReason(x.x,false,x.reason,misMap[x.x]))),sourceId:x.src.origin==='own'?lessonId:x.src.sourceId,own:x.src.origin==='own'}));return{id:`grammar-${item?.[8]||skill}-${exercise.mode}-${Date.now()}-${Math.random()}`,type:'grammar',level,skill,lessonSkill,sourceId:item?.[8]||'',conceptId:item?.[8]||'',practiceMode:exercise.mode,canary:item?.[14]||null,question:exercise.question,options:marked.map(x=>x.x),answerIndex:marked.findIndex(x=>x.ok),difficulty:LEVELS.indexOf(level)+1,explain:{why:exercise.correctWhy,rule:`${rule} Fokus khusus: ${focus}.`,avoid:'Pahami dulu maksud kalimatnya. Baru cek petunjuk dari lesson, terus pilih bentuknya.',memory:`Inget fokus ${focus}, ya. Cek kenapa tiap jebakan beda dari jawaban benar.`,distractors,distractor:'Tiap pilihan salah bawa jebakan mikirnya sendiri. Cek alasannya satu-satu, jangan asal pilih yang keliatan akrab.'},
   // m025-118: bahan mentah Tutor Brain. optionMisconceptions memakai teks pilihan sebagai
   // kunci - bukan indeks - karena pilihan diacak setiap kali soal dibuat, dan indeks yang
   // bergeser akan mendiagnosis miskonsepsi yang salah dengan sangat meyakinkan.
