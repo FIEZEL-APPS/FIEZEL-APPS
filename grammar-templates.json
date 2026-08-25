@@ -111,7 +111,7 @@
         "memoryCueId": "Ada tanggal pasti, berarti past simple."
       },
       "pedagogicalObjectiveId": "Memilih past simple untuk kejadian selesai yang waktunya disebut jelas, dan present perfect untuk kejadian lampau tanpa waktu pasti yang masih terasa akibatnya sekarang",
-      "misconceptionTargetedId": "Siswa mengira present perfect selalu berarti “masih berlangsung”, padahal maknanya adalah lampau tanpa waktu pasti yang masih berkaitan dengan sekarang",
+      "misconceptionTargetedId": "Kamu mengira present perfect selalu berarti “masih berlangsung”, padahal maknanya adalah lampau tanpa waktu pasti yang masih berkaitan dengan sekarang",
       "reasoningOperationId": "cari penanda waktu yang pasti → tentukan tense-nya"
     },
     {
@@ -167,7 +167,7 @@
         "memoryCueId": "Keputusan seketika, pakai “will” seketika."
       },
       "pedagogicalObjectiveId": "Membedakan rencana yang sudah diatur sebelumnya (present continuous atau going to) dari keputusan mendadak (will)",
-      "misconceptionTargetedId": "Siswa memakai “will” untuk semua hal yang belum terjadi, tanpa memisahkan rencana lama dari keputusan mendadak",
+      "misconceptionTargetedId": "Kamu memakai “will” untuk semua hal yang belum terjadi, tanpa memisahkan rencana lama dari keputusan mendadak",
       "reasoningOperationId": "periksa apakah sudah direncanakan sebelumnya atau baru diputuskan → pilih bentuk masa depannya"
     },
     {
@@ -279,7 +279,7 @@
         "memoryCueId": "Yakin tidak mungkin, pakai “can’t”, bukan “mustn’t”."
       },
       "pedagogicalObjectiveId": "Memakai “must” untuk kesimpulan yang diyakini kuat dan “might” atau “could” untuk dugaan yang masih ragu",
-      "misconceptionTargetedId": "Siswa memakai “must” untuk sembarang tebakan, padahal kata itu disediakan untuk kesimpulan yang bukti pendukungnya kuat",
+      "misconceptionTargetedId": "Kamu memakai “must” untuk sembarang tebakan, padahal kata itu disediakan untuk kesimpulan yang bukti pendukungnya kuat",
       "reasoningOperationId": "kenali simpulan waktu kini → timbang kekuatan bukti yang terlihat → pilih must untuk keyakinan hampir pasti atau can't untuk kemustahilan"
     },
     {
@@ -391,7 +391,7 @@
         "memoryCueId": "Tidak nyata sekarang: bentuknya lampau, maknanya bukan lampau."
       },
       "pedagogicalObjectiveId": "Memakai second conditional untuk keadaan sekarang yang tidak nyata atau kecil kemungkinannya, bukan untuk masa depan yang wajar terjadi",
-      "misconceptionTargetedId": "Siswa memilih first conditional untuk semua kalimat if, tanpa memperhatikan bahwa kalimatnya justru menegaskan hal itu tidak akan terjadi",
+      "misconceptionTargetedId": "Kamu memilih first conditional untuk semua kalimat if, tanpa memperhatikan bahwa kalimatnya justru menegaskan hal itu tidak akan terjadi",
       "reasoningOperationId": "kenali tanda bahwa keadaannya tidak nyata → pilih second conditional"
     },
     {
@@ -447,7 +447,7 @@
         "memoryCueId": "Tidak tahu siapa pelakunya, buang “by”-nya."
       },
       "pedagogicalObjectiveId": "Mengenali kapan kalimat pasif lebih tepat karena pelakunya tidak diketahui atau tidak penting",
-      "misconceptionTargetedId": "Siswa tetap menambahkan “by + pelaku” walaupun pelakunya tidak penting, sehingga kalimatnya terasa janggal",
+      "misconceptionTargetedId": "Kamu tetap menambahkan “by + pelaku” walaupun pelakunya tidak penting, sehingga kalimatnya terasa janggal",
       "reasoningOperationId": "nilai apakah pelaku penting bagi pesan kalimat → pilih pasif dengan atau tanpa “by”"
     },
     {
@@ -503,7 +503,7 @@
         "memoryCueId": "Sudah diucapkan, mundurkan satu langkah."
       },
       "pedagogicalObjectiveId": "Menerapkan pergeseran tense saat melaporkan ucapan yang disampaikan di masa lalu",
-      "misconceptionTargetedId": "Siswa menyalin tense aslinya apa adanya ke dalam kalimat pelaporan",
+      "misconceptionTargetedId": "Kamu menyalin tense aslinya apa adanya ke dalam kalimat pelaporan",
       "reasoningOperationId": "lihat tense kata kerja pelapornya → mundurkan tense kata kerja utama kalimat beritanya satu langkah, misalnya present simple “am” menjadi past simple “was”"
     },
     {
@@ -671,7 +671,7 @@
         "memoryCueId": "Stop TO DO berarti berhenti demi satu tujuan."
       },
       "pedagogicalObjectiveId": "Mengenali bahwa stop + bentuk -ing berarti menghentikan kegiatan, sedangkan stop + to berarti berhenti sejenak untuk melakukan hal lain",
-      "misconceptionTargetedId": "Siswa menganggap bentuk -ing dan bentuk to setelah “stop” bisa dipakai bergantian, padahal maknanya berbeda",
+      "misconceptionTargetedId": "Kamu menganggap bentuk -ing dan bentuk to setelah “stop” bisa dipakai bergantian, padahal maknanya berbeda",
       "reasoningOperationId": "tentukan makna yang dimaksud → pilih pola yang membawa makna itu"
     },
     {
@@ -727,7 +727,7 @@
         "memoryCueId": "Tanpa keterangan itu tidak bisa dikenali? Berarti tanpa koma."
       },
       "pedagogicalObjectiveId": "Membedakan anak kalimat penjelas yang wajib (tanpa koma) dari yang hanya tambahan keterangan (dengan koma)",
-      "misconceptionTargetedId": "Siswa membubuhkan koma di sekitar keterangan yang justru dipakai untuk mengenali bendanya, sehingga tidak jelas benda mana yang dimaksud",
+      "misconceptionTargetedId": "Kamu membubuhkan koma di sekitar keterangan yang justru dipakai untuk mengenali bendanya, sehingga tidak jelas benda mana yang dimaksud",
       "reasoningOperationId": "nilai apakah anak kalimatnya wajib untuk mengenali bendanya → tentukan pemakaian komanya"
     },
     {
@@ -776,8 +776,8 @@
         "whyOthersFail": "Superlative forms misrepresent a two-item comparison as a group comparison; the base adjective lacks any comparison marker.",
         "howToAvoid": "Count what's being compared: exactly two = comparative; a group = superlative.",
         "memoryCue": "Two = -ER/more. Group = -EST/most.",
-        "ruleId": "Bentuk comparative jalan bareng “than” buat mbandingin dua hal. Bentuk superlative pakai the plus -est atau most buat nunjuk juara satu kelompok.",
-        "whyCorrectId": "Susunan “more scenic ... than” mbandingin tepat dua jalur. Itu memang tugas bentuk comparative.",
+        "ruleId": "Bentuk “lebih” (comparative) jalan bareng “than” buat mbandingin dua hal. Bentuk “paling” (superlative) pakai the plus -est atau most buat nunjuk juara satu kelompok.",
+        "whyCorrectId": "Susunan “more scenic ... than” mbandingin tepat dua jalur. Itu memang tugas bentuk “lebih” (comparative).",
         "whyOthersFailId": "Bentuk “paling” bikin dua jalur ini kayak satu kelompok besar. Kata sifat polos malah nggak bawa arti mbandingin.",
         "howToAvoidId": "Hitung dulu, ya: tepat dua hal, atau satu kelompok yang dicari juaranya?",
         "memoryCueId": "Dua hal pakai -er atau more. Satu kelompok pakai -est atau most."
@@ -839,7 +839,7 @@
         "memoryCueId": "Pernyataan negatif, tag positif — selalu dibalik."
       },
       "pedagogicalObjectiveId": "Menyusun question tag dengan kutub yang dibalik dan kata bantu yang sama dengan induk kalimatnya",
-      "misconceptionTargetedId": "Siswa menyamakan kutub tag dengan induk kalimatnya, padahal seharusnya dibalik",
+      "misconceptionTargetedId": "Kamu menyamakan kutub tag dengan induk kalimatnya, padahal seharusnya dibalik",
       "reasoningOperationId": "kenali kutub dan kata bantu induk kalimatnya → susun tag dengan kutub terbalik"
     },
     {
@@ -895,7 +895,7 @@
         "memoryCueId": "Coret bagian “of ___” untuk menemukan subjek yang sebenarnya."
       },
       "pedagogicalObjectiveId": "Mengenali bahwa kata kerja harus sesuai dengan subjek yang sebenarnya, bukan dengan kata benda terdekat di dalam sisipan",
-      "misconceptionTargetedId": "Siswa menyesuaikan kata kerja dengan kata benda yang paling dekat, bukan dengan subjek kalimatnya",
+      "misconceptionTargetedId": "Kamu menyesuaikan kata kerja dengan kata benda yang paling dekat, bukan dengan subjek kalimatnya",
       "reasoningOperationId": "temukan subjek sebenarnya di balik frasa sisipan → periksa kesesuaiannya"
     },
     {
@@ -1007,7 +1007,7 @@
         "memoryCueId": "Hasil terhitung pakai simple, proses berjalan pakai continuous."
       },
       "pedagogicalObjectiveId": "Memilih present perfect continuous untuk menekankan lamanya kegiatan, dan present perfect simple untuk hasil yang sudah bisa dihitung",
-      "misconceptionTargetedId": "Siswa mengira setiap keterangan rentang waktu otomatis menuntut bentuk continuous, padahal kalimatnya justru menghitung hasil",
+      "misconceptionTargetedId": "Kamu mengira setiap keterangan rentang waktu otomatis menuntut bentuk continuous, padahal kalimatnya justru menghitung hasil",
       "reasoningOperationId": "periksa apakah kalimatnya menekankan lamanya kegiatan atau hasil yang terhitung → pilih bentuknya"
     },
     {
@@ -1063,7 +1063,7 @@
         "memoryCueId": "Ada “by the time X happened”, tindakan satunya butuh “had” lebih dulu."
       },
       "pedagogicalObjectiveId": "Memakai past perfect untuk menandai kejadian yang lebih dulu di antara dua kejadian lampau ketika urutannya harus jelas",
-      "misconceptionTargetedId": "Siswa memakai past simple untuk kedua kejadian dan hanya bersandar pada kata before atau after, padahal urutannya perlu ditegaskan",
+      "misconceptionTargetedId": "Kamu memakai past simple untuk kedua kejadian dan hanya bersandar pada kata before atau after, padahal urutannya perlu ditegaskan",
       "reasoningOperationId": "temukan penanda “by the time” yang menetapkan titik acuan lampaunya → tandai kejadian yang sudah selesai sebelum titik itu dengan had + past participle"
     },
     {
@@ -1119,7 +1119,7 @@
         "memoryCueId": "Masih berlangsung nanti pakai will be + -ing; sudah selesai sebelum itu pakai will have + past participle."
       },
       "pedagogicalObjectiveId": "Membedakan future continuous untuk tindakan yang sedang berlangsung di satu titik nanti dari future perfect untuk tindakan yang sudah selesai sebelum titik itu",
-      "misconceptionTargetedId": "Siswa mengira setiap keterangan waktu masa depan menuntut “will + kata kerja dasar”, dan belum bisa memisahkan “sedang berlangsung saat itu” dari “sudah selesai sebelum itu”",
+      "misconceptionTargetedId": "Kamu mengira setiap keterangan waktu masa depan menuntut “will + kata kerja dasar”, dan belum bisa memisahkan “sedang berlangsung saat itu” dari “sudah selesai sebelum itu”",
       "reasoningOperationId": "temukan titik acuan waktunya di masa depan → tentukan tindakannya masih berjalan atau sudah selesai di titik itu"
     },
     {
@@ -1175,7 +1175,7 @@
         "memoryCueId": "Berhasil sekali dalam keadaan mendesak: pakai “was able to”, bukan “could”."
       },
       "pedagogicalObjectiveId": "Membedakan kemampuan umum di masa lalu (could) dari satu keberhasilan tertentu di situasi tertentu (was able to atau managed to)",
-      "misconceptionTargetedId": "Siswa memakai “could” untuk keberhasilan sekali kejadian, padahal pemakaian baku menuntut “was/were able to” atau “managed to”",
+      "misconceptionTargetedId": "Kamu memakai “could” untuk keberhasilan sekali kejadian, padahal pemakaian baku menuntut “was/were able to” atau “managed to”",
       "reasoningOperationId": "periksa apakah kemampuannya umum dan berulang atau satu keberhasilan tertentu → pilih bentuk modalnya"
     },
     {
@@ -1231,7 +1231,7 @@
         "memoryCueId": "Bukti kuat mendukung: must have. Bukti kuat menyangkal: can’t have."
       },
       "pedagogicalObjectiveId": "Memilih modal kesimpulan untuk kejadian lampau sesuai apakah buktinya mendukung kesimpulan positif atau negatif yang sama-sama diyakini",
-      "misconceptionTargetedId": "Siswa memakai “must have” untuk kesimpulan positif maupun negatif, tanpa menyadari bahwa pasangan negatifnya adalah “can’t have”",
+      "misconceptionTargetedId": "Kamu memakai “must have” untuk kesimpulan positif maupun negatif, tanpa menyadari bahwa pasangan negatifnya adalah “can’t have”",
       "reasoningOperationId": "nilai arah buktinya → pasangkan dengan must have untuk yakin ya, atau can’t have untuk yakin tidak"
     },
     {
@@ -1287,7 +1287,7 @@
         "memoryCueId": "Mustn’t berarti jangan dilakukan. Needn’t berarti boleh dilewati."
       },
       "pedagogicalObjectiveId": "Membedakan tidak adanya keharusan (needn’t atau don’t have to) dari larangan (mustn’t)",
-      "misconceptionTargetedId": "Siswa menganggap “mustn’t” sekadar bentuk negatif dari “must”, sehingga dikira berarti tidak perlu, padahal artinya dilarang",
+      "misconceptionTargetedId": "Kamu menganggap “mustn’t” sekadar bentuk negatif dari “must”, sehingga dikira berarti tidak perlu, padahal artinya dilarang",
       "reasoningOperationId": "kenali apakah kalimatnya berarti tidak diwajibkan atau dilarang → pilih modal negatifnya"
     },
     {
@@ -1343,7 +1343,7 @@
         "memoryCueId": "Dua-duanya menoleh ke belakang: had ... would have ..."
       },
       "pedagogicalObjectiveId": "Menyusun third conditional untuk membayangkan keadaan lampau yang sebenarnya tidak terjadi",
-      "misconceptionTargetedId": "Siswa mencampur anak kalimat if berbentuk past simple dengan “would have”, padahal anak kalimat if-nya menuntut past perfect",
+      "misconceptionTargetedId": "Kamu mencampur anak kalimat if berbentuk past simple dengan “would have”, padahal anak kalimat if-nya menuntut past perfect",
       "reasoningOperationId": "kenali bahwa kedua anak kalimatnya membicarakan masa lalu yang tidak nyata → terapkan if + past perfect dan would have + past participle"
     },
     {
@@ -1399,7 +1399,7 @@
         "memoryCueId": "Sebab lampau, akibat sekarang: had done → would be."
       },
       "pedagogicalObjectiveId": "Menyusun mixed conditional yang menghubungkan sebab lampau yang tidak nyata dengan akibat yang dibayangkan sekarang",
-      "misconceptionTargetedId": "Siswa memaksakan third conditional utuh dengan “would have”, padahal anak kalimat akibatnya jelas berbicara tentang keadaan sekarang",
+      "misconceptionTargetedId": "Kamu memaksakan third conditional utuh dengan “would have”, padahal anak kalimat akibatnya jelas berbicara tentang keadaan sekarang",
       "reasoningOperationId": "pisahkan waktu sebab dan waktu akibatnya → pakai past perfect di anak kalimat if dan would + kata kerja dasar di induk kalimat"
     },
     {
@@ -1455,7 +1455,7 @@
         "memoryCueId": "“Unless” sudah berarti “if not” — jangan pernah menulis “unless not”."
       },
       "pedagogicalObjectiveId": "Memakai “unless” dengan benar sebagai “if ... not”, tanpa menambahkan penanda negatif kedua",
-      "misconceptionTargetedId": "Siswa menambahkan penanda negatif lagi setelah “unless”, seolah kata itu masih perlu “not” sendiri",
+      "misconceptionTargetedId": "Kamu menambahkan penanda negatif lagi setelah “unless”, seolah kata itu masih perlu “not” sendiri",
       "reasoningOperationId": "sadari bahwa “unless” sudah membawa makna negatif → jangan menumpuk penanda negatif kedua"
     },
     {
@@ -1511,7 +1511,7 @@
         "memoryCueId": "Pasif bermodal selalu butuh “be” menempel sebelum past participle."
       },
       "pedagogicalObjectiveId": "Menyusun kalimat pasif dengan benar ketika ada kata modal, yaitu modal + be + past participle",
-      "misconceptionTargetedId": "Siswa salah membentuk “be” atau malah menghilangkannya setelah modal ketika menyusun kalimat pasif",
+      "misconceptionTargetedId": "Kamu salah membentuk “be” atau malah menghilangkannya setelah modal ketika menyusun kalimat pasif",
       "reasoningOperationId": "biarkan modalnya tetap → sisipkan be + past participle untuk membentuk pasifnya"
     },
     {
@@ -1567,7 +1567,7 @@
         "memoryCueId": "Santai, mendadak, dan tidak menyenangkan: pakai pasif “get”."
       },
       "pedagogicalObjectiveId": "Mengenali bahwa pasif dengan “get” lazim dalam percakapan santai, terutama untuk kejadian tak terduga, lalu memilih bentuk yang cocok dengan rasa bahasanya",
-      "misconceptionTargetedId": "Siswa mengira pasif dengan “get” dan dengan “be” selalu bisa saling menggantikan, tanpa memperhatikan rasa bahasa dan nuansa kejadian tak sengaja",
+      "misconceptionTargetedId": "Kamu mengira pasif dengan “get” dan dengan “be” selalu bisa saling menggantikan, tanpa memperhatikan rasa bahasa dan nuansa kejadian tak sengaja",
       "reasoningOperationId": "nilai rasa bahasa dan jenis kejadiannya → pilih bentuk pasif yang terdengar wajar"
     },
     {
@@ -1623,7 +1623,7 @@
         "memoryCueId": "Have atau get + bendanya + bentuk done, bukan do atau doing."
       },
       "pedagogicalObjectiveId": "Memakai pola have atau get + benda + past participle untuk menyatakan bahwa orang lain yang dimintai mengerjakan sesuatu",
-      "misconceptionTargetedId": "Siswa memakai kalimat aktif padahal maksudnya orang lain yang mengerjakan pekerjaan itu",
+      "misconceptionTargetedId": "Kamu memakai kalimat aktif padahal maksudnya orang lain yang mengerjakan pekerjaan itu",
       "reasoningOperationId": "kenali kebiasaan masa kini di mana subjeknya selalu membayar orang lain, bukan mengerjakan sendiri → isi kedua celahnya sekaligus: have atau get bentuk present di celah pertama dan past participle di celah kedua"
     },
     {
@@ -1679,7 +1679,7 @@
         "memoryCueId": "Pertanyaan yang dilaporkan berbunyi seperti pernyataan."
       },
       "pedagogicalObjectiveId": "Mengubah pertanyaan langsung menjadi kalimat pelaporan dengan urutan kata pernyataan, tanpa pembalikan dan tanpa tanda tanya",
-      "misconceptionTargetedId": "Siswa mempertahankan pembalikan kata bantu dan subjek dari pertanyaan aslinya di dalam anak kalimat pelaporan",
+      "misconceptionTargetedId": "Kamu mempertahankan pembalikan kata bantu dan subjek dari pertanyaan aslinya di dalam anak kalimat pelaporan",
       "reasoningOperationId": "kenali anak kalimat pertanyaan yang disisipkan → kembalikan ke urutan subjek lalu kata kerja"
     },
     {
@@ -1735,7 +1735,7 @@
         "memoryCueId": "Perintah menjadi “told someone TO do it”, bukan “told that they did it”."
       },
       "pedagogicalObjectiveId": "Melaporkan perintah dengan pola kata kerja pelapor + orangnya + bentuk to",
-      "misconceptionTargetedId": "Siswa melaporkan perintah seolah itu pernyataan, memakai anak kalimat “that” dengan tense yang mundur, bukan pola bentuk to",
+      "misconceptionTargetedId": "Kamu melaporkan perintah seolah itu pernyataan, memakai anak kalimat “that” dengan tense yang mundur, bukan pola bentuk to",
       "reasoningOperationId": "kenali bahwa ucapan aslinya berupa perintah → pakai kata kerja pelapor + objek + bentuk to"
     },
     {
@@ -1791,7 +1791,7 @@
         "memoryCueId": "Suggest diikuti bentuk -ing, tidak pernah “suggested me/us to ...”."
       },
       "pedagogicalObjectiveId": "Memilih kata kerja pelapor yang pola susunannya dan maknanya sama-sama cocok dengan maksud ucapan aslinya, usulan atau perintah",
-      "misconceptionTargetedId": "Siswa memakai “suggested” dengan pola objek + bentuk to, meniru pola yang memang berlaku untuk “told” dan “asked”",
+      "misconceptionTargetedId": "Kamu memakai “suggested” dengan pola objek + bentuk to, meniru pola yang memang berlaku untuk “told” dan “asked”",
       "reasoningOperationId": "cocokkan makna kata kerja pelapor dengan maksud ucapannya → terapkan pola susunan khusus milik kata kerja itu"
     },
     {
@@ -1847,7 +1847,7 @@
         "memoryCueId": "Kebenaran umum tentang satu kategori: tanpa kata sandang di depan kata jamaknya."
       },
       "pedagogicalObjectiveId": "Membedakan tanpa kata sandang untuk pernyataan umum berbentuk jamak dari “the” untuk kelompok tertentu yang sudah dikenali",
-      "misconceptionTargetedId": "Siswa menambahkan “the” pada kata benda jamak yang bermakna umum, mengira kata jamak selalu butuh kata sandang",
+      "misconceptionTargetedId": "Kamu menambahkan “the” pada kata benda jamak yang bermakna umum, mengira kata jamak selalu butuh kata sandang",
       "reasoningOperationId": "tentukan apakah kata bendanya menunjuk kategori umum atau kelompok tertentu → pilih tanpa kata sandang atau “the”"
     },
     {
@@ -1887,7 +1887,7 @@
           "misconception": "adds an unnecessary partitive 'of' without a following determiner, and still misapplies 'much' to a countable noun",
           "whyFails": "'Much of' requires a specific defined noun phrase (much of the furniture) and still wouldn't fix the countable/uncountable mismatch.",
           "whyFailsId": "“much of” minta frasa benda yang udah tertentu.",
-          "misconceptionId": "“of” ditambah tanpa kata penentu, salah pasangnya juga tetap"
+          "misconceptionId": "“of” ditambah tanpa kata kayak “the”, salah pasangnya juga tetap"
         }
       ],
       "explanation": {
@@ -2015,7 +2015,7 @@
         "memoryCueId": "Proud OF, bukan proud about, for, atau with."
       },
       "pedagogicalObjectiveId": "Mengenali bahwa sebagian kata sifat menuntut kata depan tertentu yang harus dihafal, bukan diturunkan dari aturan umum",
-      "misconceptionTargetedId": "Siswa memakai “about” sebagai kata depan serba guna setelah kata sifat perasaan, tanpa melihat pasangan tetap kata sifat itu",
+      "misconceptionTargetedId": "Kamu memakai “about” sebagai kata depan serba guna setelah kata sifat perasaan, tanpa melihat pasangan tetap kata sifat itu",
       "reasoningOperationId": "ingat kembali kata depan tetap yang berpasangan dengan kata sifat ini → pilih itu, bukan kata depan yang umum dipakai"
     },
     {
@@ -2071,7 +2071,7 @@
         "memoryCueId": "Remember doing berarti ingatan lampau; remember to do berarti tugas yang akan datang."
       },
       "pedagogicalObjectiveId": "Membedakan makna remember + bentuk -ing yang mengingat kejadian lampau dari remember + bentuk to yang berarti jangan lupa melakukan sesuatu nanti",
-      "misconceptionTargetedId": "Siswa mengira “remember” selalu diikuti pola yang sama, sehingga tidak melihat bahwa -ing dan to justru mengubah maknanya",
+      "misconceptionTargetedId": "Kamu mengira “remember” selalu diikuti pola yang sama, sehingga tidak melihat bahwa -ing dan to justru mengubah maknanya",
       "reasoningOperationId": "tentukan apakah kalimatnya tentang ingatan masa lalu atau kewajiban nanti → pilih bentuk -ing atau bentuk to"
     },
     {
@@ -2127,7 +2127,7 @@
         "memoryCueId": "Tujuan cukup “to” + kata kerja, tanpa kata depan apa pun."
       },
       "pedagogicalObjectiveId": "Memakai bentuk -ing setelah kata depan dan bentuk to untuk menyatakan tujuan, tanpa mencampur keduanya",
-      "misconceptionTargetedId": "Siswa menyisipkan “to” tepat setelah kata depan, padahal setelah kata depan harus berganti ke bentuk -ing",
+      "misconceptionTargetedId": "Kamu menyisipkan “to” tepat setelah kata depan, padahal setelah kata depan harus berganti ke bentuk -ing",
       "reasoningOperationId": "lihat kata tepat sebelum bagian kosongnya, apakah kata depan → kalau ya, pakai bentuk -ing"
     },
     {
@@ -2183,7 +2183,7 @@
         "memoryCueId": "Pelaku dengan kata kerja aktif: buang “who” dan kata bantunya, lalu tambahkan -ing."
       },
       "pedagogicalObjectiveId": "Memendekkan anak kalimat penjelas menjadi frasa participle ketika kata penghubungnya berkedudukan sebagai subjek",
-      "misconceptionTargetedId": "Siswa mempertahankan kata penghubung dan kata bantunya, padahal bentuk ringkas berupa participle terdengar lebih wajar",
+      "misconceptionTargetedId": "Kamu mempertahankan kata penghubung dan kata bantunya, padahal bentuk ringkas berupa participle terdengar lebih wajar",
       "reasoningOperationId": "pastikan kata penghubungnya berkedudukan subjek pada anak kalimat aktif atau pasif → pendekkan menjadi participle bentuk -ing atau bentuk ketiga"
     },
     {
@@ -2239,7 +2239,7 @@
         "memoryCueId": "Whose berarti milik; who’s berarti who is atau who has."
       },
       "pedagogicalObjectiveId": "Memakai “whose” untuk menyatakan kepemilikan di dalam anak kalimat penjelas",
-      "misconceptionTargetedId": "Siswa memakai “who’s”, yang sebenarnya singkatan dari who is atau who has, padahal yang diminta bentuk kepemilikan “whose”",
+      "misconceptionTargetedId": "Kamu memakai “who’s”, yang sebenarnya singkatan dari who is atau who has, padahal yang diminta bentuk kepemilikan “whose”",
       "reasoningOperationId": "kenali adanya hubungan kepemilikan antara kata benda dan kata benda berikutnya → pilih “whose”"
     },
     {
@@ -2288,7 +2288,7 @@
         "whyOthersFail": "'Faster than' wrongly implies a difference; 'the fastest' misapplies the superlative to a two-item comparison; 'more fast than' misforms the comparative of a short adjective.",
         "howToAvoid": "Check the surrounding context for clues about whether the two things are being shown as equal or different.",
         "memoryCue": "No upgrade needed = no real difference = as...as.",
-        "ruleId": "Pola as + kata sifat + as bilang dua hal setara. Bentuk comparative bareng “than” bilang ada selisih.",
+        "ruleId": "Pola as + kata sifat + as bilang dua hal setara. Bentuk “lebih” (comparative) bareng “than” bilang ada selisih.",
         "whyCorrectId": "Dua laptop butuh waktu yang sama persis, sepuluh detik. Jadi cuma bentuk setara “as fast as” yang cocok.",
         "whyOthersFailId": "“Faster than” bilang ada selisih, padahal waktunya sama. “The fastest” pakai bentuk “paling” (superlative) buat dua hal. “More fast” salah bentuk kata sifat pendek.",
         "howToAvoidId": "Baca konteks sekitarnya: dua hal ini ditampilin setara atau beda?",
@@ -2351,7 +2351,7 @@
         "memoryCueId": "Perubahan yang terus berjalan menggandakan bentuk perbandingannya."
       },
       "pedagogicalObjectiveId": "Memakai pola perbandingan ganda untuk menyatakan perubahan yang terus berlanjut",
-      "misconceptionTargetedId": "Siswa memakai satu bentuk perbandingan dengan “than”, padahal kalimatnya menuntut pola perbandingan yang diulang untuk perubahan berkelanjutan",
+      "misconceptionTargetedId": "Kamu memakai satu bentuk perbandingan dengan “than”, padahal kalimatnya menuntut pola perbandingan yang diulang untuk perubahan berkelanjutan",
       "reasoningOperationId": "kenali bahwa kalimatnya menggambarkan kecenderungan yang berjalan terus, bukan satu perbandingan → pakai bentuk perbandingan + and + bentuk perbandingan"
     },
     {
@@ -2407,7 +2407,7 @@
         "memoryCueId": "Wajah kelelahan ditambah “last night”: pakai pertanyaan didn’t, bukan do."
       },
       "pedagogicalObjectiveId": "Menyusun pertanyaan negatif yang menyatakan keheranan atau mengharapkan pendengar menyetujui dugaan pembicara",
-      "misconceptionTargetedId": "Siswa menganggap pertanyaan negatif hanya soal penanda negatif, tanpa melihat fungsinya untuk menyatakan keheranan atau mencari pembenaran",
+      "misconceptionTargetedId": "Kamu menganggap pertanyaan negatif hanya soal penanda negatif, tanpa melihat fungsinya untuk menyatakan keheranan atau mencari pembenaran",
       "reasoningOperationId": "kenali dugaan dan sikap pembicaranya → susun pertanyaan negatif yang cocok"
     },
     {
@@ -2463,7 +2463,7 @@
         "memoryCueId": "Pertanyaan yang disisipkan dengan sopan berbunyi seperti pernyataan: subjek dulu, kata kerja menyusul."
       },
       "pedagogicalObjectiveId": "Menyusun pertanyaan tidak langsung yang sopan dengan urutan kata pernyataan di dalam kalimat tanya yang lebih panjang",
-      "misconceptionTargetedId": "Siswa mempertahankan pembalikan kata bantu dan subjek di dalam anak kalimat pertanyaan sopan, seolah itu masih pertanyaan langsung",
+      "misconceptionTargetedId": "Kamu mempertahankan pembalikan kata bantu dan subjek di dalam anak kalimat pertanyaan sopan, seolah itu masih pertanyaan langsung",
       "reasoningOperationId": "kenali anak kalimat yang disisipkan di dalam bingkai sopan → pakai urutan kata pernyataan tanpa pembalikan"
     },
     {
@@ -2519,7 +2519,7 @@
         "memoryCueId": "Keterangan frekuensi melompat SESUDAH be, tetapi SEBELUM kata kerja utama lainnya."
       },
       "pedagogicalObjectiveId": "Mengenali dan membetulkan letak kata keterangan frekuensi yang seharusnya berdiri sebelum kata kerja utama, atau sesudah be",
-      "misconceptionTargetedId": "Siswa menaruh kata keterangan frekuensi di awal atau akhir kalimat mengikuti kebiasaan bahasa ibunya, bukan di posisi tengah seperti lazimnya Bahasa Inggris",
+      "misconceptionTargetedId": "Kamu menaruh kata keterangan frekuensi di awal atau akhir kalimat mengikuti kebiasaan bahasa ibunya, bukan di posisi tengah seperti lazimnya Bahasa Inggris",
       "reasoningOperationId": "temukan kata keterangan frekuensinya → pindahkan tepat sebelum kata kerja utama, atau sesudah be"
     },
     {
@@ -2631,7 +2631,7 @@
         "memoryCueId": "Titik lampau ditambah “would” berarti masa depan yang kini sudah terjadi."
       },
       "pedagogicalObjectiveId": "Membedakan “would” untuk masa depan yang dilihat dari masa lalu dari “was going to” yang menyatakan niat yang sudah diucapkan sebelumnya",
-      "misconceptionTargetedId": "Siswa mengira “would” untuk masa depan dari sudut masa lalu selalu bermakna kebiasaan berulang, bukan satu kejadian yang kemudian terjadi",
+      "misconceptionTargetedId": "Kamu mengira “would” untuk masa depan dari sudut masa lalu selalu bermakna kebiasaan berulang, bukan satu kejadian yang kemudian terjadi",
       "reasoningOperationId": "kenali bingkai cerita lampaunya → pilih bentuk masa depan dari masa lalu yang cocok untuk satu kejadian yang kemudian terjadi"
     },
     {
@@ -2687,7 +2687,7 @@
         "memoryCueId": "Mata memerah butuh sebab yang berdurasi: “had been -ing”."
       },
       "pedagogicalObjectiveId": "Memakai past perfect continuous untuk menunjukkan sebab berdurasi di balik satu keadaan lampau, berbeda dari past perfect simple yang menekankan tuntasnya",
-      "misconceptionTargetedId": "Siswa menganggap past perfect simple dan past perfect continuous bisa saling menggantikan setiap kali ada dua kejadian lampau yang berurutan",
+      "misconceptionTargetedId": "Kamu menganggap past perfect simple dan past perfect continuous bisa saling menggantikan setiap kali ada dua kejadian lampau yang berurutan",
       "reasoningOperationId": "kenali makna durasi sebagai sebabnya → pilih past perfect continuous, bukan past perfect simple"
     },
     {
@@ -2743,7 +2743,7 @@
         "memoryCueId": "Kereta terakhir sampai besok berarti “had better” hari ini."
       },
       "pedagogicalObjectiveId": "Memilih “had better” di atas “should” ketika konteksnya menyiratkan akibat buruk yang mendesak bila nasihatnya diabaikan",
-      "misconceptionTargetedId": "Siswa memakai “should” untuk semua nasihat tanpa melihat tingkat mendesaknya, sehingga tidak menangkap bahwa “had better” menandai akibat buruk yang sudah di depan mata",
+      "misconceptionTargetedId": "Kamu memakai “should” untuk semua nasihat tanpa melihat tingkat mendesaknya, sehingga tidak menangkap bahwa “had better” menandai akibat buruk yang sudah di depan mata",
       "reasoningOperationId": "temukan penanda mendesak atau akibatnya → pilih modal nasihat yang mendesak"
     },
     {
@@ -2799,7 +2799,7 @@
         "memoryCueId": "“Not sure” berpasangan dengan “might”, bukan dengan “will”."
       },
       "pedagogicalObjectiveId": "Memilih modal yang menyatakan dugaan tidak pasti tentang keadaan sekarang, bukan ramalan yang diyakini",
-      "misconceptionTargetedId": "Siswa memakai “will” untuk semua tebakan tentang keadaan sekarang, tanpa memisahkan pernyataan yang yakin dari dugaan yang masih ragu",
+      "misconceptionTargetedId": "Kamu memakai “will” untuk semua tebakan tentang keadaan sekarang, tanpa memisahkan pernyataan yang yakin dari dugaan yang masih ragu",
       "reasoningOperationId": "temukan penanda ketidakpastiannya → pilih modal dugaan, bukan modal masa depan yang yakin"
     },
     {
@@ -2855,7 +2855,7 @@
         "memoryCueId": "Kelelahan hari ini berarti tadi malam memang begadang, jadi “shouldn’t have”."
       },
       "pedagogicalObjectiveId": "Menegatifkan modal penyesalan dengan benar untuk menegur tindakan yang MEMANG dilakukan padahal seharusnya tidak",
-      "misconceptionTargetedId": "Siswa mempertukarkan “shouldn’t have” yang menegur sesuatu yang terjadi dengan “should have” yang menyesali sesuatu yang tidak dilakukan",
+      "misconceptionTargetedId": "Kamu mempertukarkan “shouldn’t have” yang menegur sesuatu yang terjadi dengan “should have” yang menyesali sesuatu yang tidak dilakukan",
       "reasoningOperationId": "tentukan apakah tindakan yang ditegur itu terjadi atau tidak → pilih modal lampau dengan kutub yang tepat"
     },
     {
@@ -2911,7 +2911,7 @@
         "memoryCueId": "Buang “if”, balik urutannya: “Had I known” sama dengan “If I had known”."
       },
       "pedagogicalObjectiveId": "Mengenali susunan pengandaian formal berbentuk Had + subjek + past participle sebagai padanan dari “If I had known”",
-      "misconceptionTargetedId": "Siswa belum mengenali pembalikan kata bantu dan subjek sebagai bentuk formal yang sah, dan mengira “if” harus selalu ada",
+      "misconceptionTargetedId": "Kamu belum mengenali pembalikan kata bantu dan subjek sebagai bentuk formal yang sah, dan mengira “if” harus selalu ada",
       "reasoningOperationId": "kenali urutan kata bantu mendahului subjek tanpa “if” → baca sebagai padanan third conditional yang formal"
     },
     {
@@ -2967,7 +2967,7 @@
         "memoryCueId": "“Otherwise” adalah “if not” yang tersembunyi, jadi sering menuntut “would have + past participle”."
       },
       "pedagogicalObjectiveId": "Membaca “otherwise” sebagai penghubung yang menyimpan syarat tersirat, yaitu “kalau hal itu tidak terjadi”",
-      "misconceptionTargetedId": "Siswa menganggap “otherwise” sekadar kata pertentangan seperti “but”, sehingga logika pengandaian yang tersembunyi di dalamnya terlewat",
+      "misconceptionTargetedId": "Kamu menganggap “otherwise” sekadar kata pertentangan seperti “but”, sehingga logika pengandaian yang tersembunyi di dalamnya terlewat",
       "reasoningOperationId": "temukan syarat tidak nyata yang tersirat di balik “otherwise” → pilih bentuk kata kerja yang sejalan dengan syarat itu"
     },
     {
@@ -3023,7 +3023,7 @@
         "memoryCueId": "Tanpa sumber yang disebut dan bernada resmi: “It is believed that ...”."
       },
       "pedagogicalObjectiveId": "Menyusun kalimat pasif pelaporan tanpa pelaku, untuk menyampaikan anggapan tanpa menyebut sumbernya",
-      "misconceptionTargetedId": "Siswa berusaha mempertahankan susunan aktif seperti “they say that”, padahal konteksnya menuntut pola pasif pelaporan tanpa pelaku",
+      "misconceptionTargetedId": "Kamu berusaha mempertahankan susunan aktif seperti “they say that”, padahal konteksnya menuntut pola pasif pelaporan tanpa pelaku",
       "reasoningOperationId": "kenali bahwa sumber anggapannya umum atau tidak diketahui → pilih bentuk pasif pelaporan tanpa pelaku"
     },
     {
@@ -3079,7 +3079,7 @@
         "memoryCueId": "Kebijakan itu diumumkan, bukan mengumumkan: “to be announced”."
       },
       "pedagogicalObjectiveId": "Memakai bentuk to pasif, yaitu to be + past participle, setelah kata kerja harapan ketika subjeknya yang dikenai tindakan",
-      "misconceptionTargetedId": "Siswa mempertahankan bentuk to aktif setelah “expected to” walaupun subjeknya penerima tindakan, bukan pelakunya",
+      "misconceptionTargetedId": "Kamu mempertahankan bentuk to aktif setelah “expected to” walaupun subjeknya penerima tindakan, bukan pelakunya",
       "reasoningOperationId": "kenali subjeknya sebagai penerima tindakan → pilih bentuk to pasif"
     },
     {
@@ -3135,7 +3135,7 @@
         "memoryCueId": "Kata kerjanya mundur, “today” pun ikut menjadi “that day”."
       },
       "pedagogicalObjectiveId": "Menggeser keterangan waktu dan tempat dengan benar saat ucapan langsung dilaporkan di waktu atau tempat yang berbeda",
-      "misconceptionTargetedId": "Siswa sudah benar memundurkan tense-nya tetapi lupa bahwa kata seperti today dan here juga harus ikut bergeser mengikuti konteks pelaporan yang baru",
+      "misconceptionTargetedId": "Kamu sudah benar memundurkan tense-nya tetapi lupa bahwa kata seperti today dan here juga harus ikut bergeser mengikuti konteks pelaporan yang baru",
       "reasoningOperationId": "temukan kata waktu atau tempat di dalam ucapan yang dikutip → ubah menjadi padanan yang cocok dengan konteks pelaporannya"
     },
     {
@@ -3191,7 +3191,7 @@
         "memoryCueId": "First conditional yang dilaporkan: kedua anak kalimatnya mundur bersama-sama."
       },
       "pedagogicalObjectiveId": "Melaporkan kalimat first conditional dengan memundurkan tense pada kedua anak kalimatnya secara serempak",
-      "misconceptionTargetedId": "Siswa tidak memundurkan apa pun pada pengandaian yang dilaporkan, atau justru memundurkan kedua anak kalimatnya sampai menjadi third conditional",
+      "misconceptionTargetedId": "Kamu tidak memundurkan apa pun pada pengandaian yang dilaporkan, atau justru memundurkan kedua anak kalimatnya sampai menjadi third conditional",
       "reasoningOperationId": "kenali jenis pengandaian aslinya → terapkan pola pemunduran yang tepat untuk pengandaian yang dilaporkan"
     },
     {
@@ -3240,8 +3240,8 @@
         "whyOthersFail": "'A/an' introduce one of several possible items, which contradicts the 'only one exists' meaning of a superlative; omitting the article isn't standard for superlative noun phrases.",
         "howToAvoid": "Whenever you see -est or 'most', expect 'the' right before it.",
         "memoryCue": "Superlative = there's only one, so it gets 'the'.",
-        "ruleId": "Pakai “the” di depan bentuk superlative kayak the tallest atau the best. Benda yang cuma satu-satunya juga pakai “the”.",
-        "whyCorrectId": "Bentuk superlative nunjuk satu hal yang unik di kelompoknya. Bahasa Inggris nandain keunikan itu pakai “the”.",
+        "ruleId": "Pakai “the” di depan bentuk “paling” (superlative) kayak the tallest atau the best. Benda yang cuma satu-satunya juga pakai “the”.",
+        "whyCorrectId": "Bentuk “paling” (superlative) nunjuk satu hal yang unik di kelompoknya. Bahasa Inggris nandain keunikan itu pakai “the”.",
         "whyOthersFailId": "“A” dan “an” nyodorin satu dari banyak kemungkinan. Ngosongin tempat itu juga bukan bentuk baku.",
         "howToAvoidId": "Tiap lihat akhiran -est atau kata “most”, siapin “the” di depannya.",
         "memoryCueId": "Bentuk “paling” berarti cuma ada satu, jadi pakai “the”."
@@ -3359,7 +3359,7 @@
         "memoryCueId": "“Put off” sebuah rapat berarti mendorongnya lebih jauh ke depan."
       },
       "pedagogicalObjectiveId": "Memilih partikel yang tepat untuk phrasal verb yang maknanya berubah total bila partikelnya diganti",
-      "misconceptionTargetedId": "Siswa mengira partikel setelah kata kerja dasar bisa saling menggantikan, tanpa menyadari bahwa pilihan partikel mengubah maknanya sepenuhnya",
+      "misconceptionTargetedId": "Kamu mengira partikel setelah kata kerja dasar bisa saling menggantikan, tanpa menyadari bahwa pilihan partikel mengubah maknanya sepenuhnya",
       "reasoningOperationId": "cocokkan makna yang dimaksud, yaitu menunda → pilih partikel yang menghasilkan makna itu bersama kata kerja ini"
     },
     {
@@ -3471,7 +3471,7 @@
         "memoryCueId": "Saran mengatasi masalah memakai “try -ing”."
       },
       "pedagogicalObjectiveId": "Membedakan try + bentuk -ing yang berarti mencoba satu cara dari try + bentuk to yang berarti berusaha melakukan sesuatu yang sulit",
-      "misconceptionTargetedId": "Siswa mengira “try” selalu diikuti pola yang sama, tanpa melihat apakah maksudnya berusaha keras atau mencoba satu cara",
+      "misconceptionTargetedId": "Kamu mengira “try” selalu diikuti pola yang sama, tanpa melihat apakah maksudnya berusaha keras atau mencoba satu cara",
       "reasoningOperationId": "tentukan apakah konteksnya menyiratkan kesulitan atau percobaan satu cara → pilih pola kata kerjanya"
     },
     {
@@ -3527,7 +3527,7 @@
         "memoryCueId": "Too hot to drink — setelah “too + kata sifat” selalu menyusul “to”."
       },
       "pedagogicalObjectiveId": "Melengkapi susunan too atau enough + kata sifat dengan bentuk to yang tepat beserta urutan katanya",
-      "misconceptionTargetedId": "Siswa memakai bentuk -ing setelah too atau enough + kata sifat, atau menaruh “enough” di posisi yang keliru terhadap kata sifatnya",
+      "misconceptionTargetedId": "Kamu memakai bentuk -ing setelah too atau enough + kata sifat, atau menaruh “enough” di posisi yang keliru terhadap kata sifatnya",
       "reasoningOperationId": "kenali susunan too atau enough + kata sifat → lengkapi dengan bentuk to pada urutan yang benar"
     },
     {
@@ -3583,7 +3583,7 @@
         "memoryCueId": "Kata depan di depan menuntut “whom”, bukan “who”."
       },
       "pedagogicalObjectiveId": "Mengenali pola formal yang memajukan kata depan di depan whom atau which, berbeda dari pola santai yang meninggalkannya di akhir anak kalimat",
-      "misconceptionTargetedId": "Siswa mengira “who” bisa menyusul kata depan yang dimajukan sama seperti “whom”, tanpa memisahkan bentuk subjek dan bentuk objek dalam ragam formal",
+      "misconceptionTargetedId": "Kamu mengira “who” bisa menyusul kata depan yang dimajukan sama seperti “whom”, tanpa memisahkan bentuk subjek dan bentuk objek dalam ragam formal",
       "reasoningOperationId": "kenali penanda ragam formalnya → pilih kata penghubung bentuk objek yang cocok dengan kata depan yang dimajukan"
     },
     {
@@ -3639,7 +3639,7 @@
         "memoryCueId": "Telur bisa dihitung, jadi “fewer”, bukan “less”."
       },
       "pedagogicalObjectiveId": "Memilih “fewer” untuk kata benda jamak terhitung dan menyisakan “less” untuk kata benda tak terhitung",
-      "misconceptionTargetedId": "Siswa memakai “less” untuk semua perbandingan jumlah tanpa melihat apakah kata bendanya terhitung",
+      "misconceptionTargetedId": "Kamu memakai “less” untuk semua perbandingan jumlah tanpa melihat apakah kata bendanya terhitung",
       "reasoningOperationId": "kelompokkan kata bendanya terhitung atau tak terhitung → pilih bentuk perbandingan jumlah yang cocok"
     },
     {
@@ -3751,7 +3751,7 @@
         "memoryCueId": "Negatif bertemu persetujuan negatif: “don’t” berjumpa “Neither do”."
       },
       "pedagogicalObjectiveId": "Memilih susunan persetujuan singkat yang tepat untuk menyetujui pernyataan yang negatif",
-      "misconceptionTargetedId": "Siswa memakai pola persetujuan positif “So do I” untuk menyetujui pernyataan negatif, padahal yang dibutuhkan pola negatifnya",
+      "misconceptionTargetedId": "Kamu memakai pola persetujuan positif “So do I” untuk menyetujui pernyataan negatif, padahal yang dibutuhkan pola negatifnya",
       "reasoningOperationId": "kenali kutub pernyataan yang disetujui → pilih susunan persetujuan yang cocok, so atau neither"
     },
     {
@@ -3807,7 +3807,7 @@
         "memoryCueId": "Koma saja tidak bisa menyambung dua kalimat utuh — tambahkan so, and, atau but, atau pakai titik koma."
       },
       "pedagogicalObjectiveId": "Mengenali dan membetulkan dua kalimat utuh yang disambung hanya dengan koma, dengan menambahkan kata sambung setara",
-      "misconceptionTargetedId": "Siswa mengira koma saja sudah cukup untuk menyambung dua kalimat yang sama-sama utuh",
+      "misconceptionTargetedId": "Kamu mengira koma saja sudah cukup untuk menyambung dua kalimat yang sama-sama utuh",
       "reasoningOperationId": "kenali dua kalimat utuh yang hanya disambung koma → pilih perbaikan dengan kata sambung atau tanda baca yang tepat"
     },
     {
@@ -3863,7 +3863,7 @@
         "memoryCueId": "Tindakan memakai affect sebagai kata kerja; akibat memakai effect sebagai kata benda."
       },
       "pedagogicalObjectiveId": "Membedakan “affect” sebagai kata kerja yang berarti memengaruhi dari “effect” sebagai kata benda yang berarti akibat",
-      "misconceptionTargetedId": "Siswa menganggap “affect” dan “effect” sekadar dua ejaan untuk kata yang sama, bukan dua jenis kata yang berbeda",
+      "misconceptionTargetedId": "Kamu menganggap “affect” dan “effect” sekadar dua ejaan untuk kata yang sama, bukan dua jenis kata yang berbeda",
       "reasoningOperationId": "kenali peran tata bahasa yang dibutuhkan, kata kerja atau kata benda → pilih kata yang cocok dengan peran itu"
     },
     {
@@ -3919,7 +3919,7 @@
         "memoryCueId": "Jadwal berbicara dengan present simple: “the train leaves at 6:45”."
       },
       "pedagogicalObjectiveId": "Memakai present simple, bukan present continuous atau going to, untuk kejadian yang sudah dipatok jadwal resmi, berbeda dari rencana pribadi",
-      "misconceptionTargetedId": "Siswa langsung memakai going to atau present continuous untuk semua kejadian masa depan, tanpa melihat bahwa jadwal tetap memakai present simple",
+      "misconceptionTargetedId": "Kamu langsung memakai going to atau present continuous untuk semua kejadian masa depan, tanpa melihat bahwa jadwal tetap memakai present simple",
       "reasoningOperationId": "kenali jadwal yang dipatok pihak luar, bukan keputusan pribadi → pilih present simple untuk masa depan yang terjadwal"
     },
     {
@@ -3974,8 +3974,8 @@
         "howToAvoidId": "Tanyakan: apakah kalimatnya menghitung “berapa lama” sampai satu titik di masa depan? Kalau ya, pakai future perfect continuous.",
         "memoryCueId": "Lamanya waktu ditambah batas di masa depan berarti will have been + kata kerja -ing."
       },
-      "pedagogicalObjectiveId": "Siswa memilih future perfect continuous untuk menyatakan lamanya waktu yang terkumpul sampai satu titik acuan di masa depan",
-      "misconceptionTargetedId": "Siswa langsung memakai future continuous atau future perfect simple padahal yang diminta adalah lamanya waktu sampai satu titik",
+      "pedagogicalObjectiveId": "Kamu memilih future perfect continuous untuk menyatakan lamanya waktu yang terkumpul sampai satu titik acuan di masa depan",
+      "misconceptionTargetedId": "Kamu langsung memakai future continuous atau future perfect simple padahal yang diminta adalah lamanya waktu sampai satu titik",
       "reasoningOperationId": "temukan patokan waktunya di masa depan, lalu periksa apakah kalimatnya menanyakan lamanya atau tuntasnya"
     },
     {
@@ -4030,8 +4030,8 @@
         "howToAvoidId": "Gambarkan garis waktunya: kejadian lampau mana pun yang lebih dulu, itulah yang memakai past perfect.",
         "memoryCueId": "Kejadian lampau yang lebih dulu memakai had + past participle."
       },
-      "pedagogicalObjectiveId": "Siswa membedakan past perfect sebagai kilas balik sebelum alur utama dari past simple sebagai rangkaian kejadian di alur utama",
-      "misconceptionTargetedId": "Siswa memakai past simple untuk semua kejadian lampau di dalam cerita, sehingga bedanya kilas balik dan urutan maju hilang",
+      "pedagogicalObjectiveId": "Kamu membedakan past perfect sebagai kilas balik sebelum alur utama dari past simple sebagai rangkaian kejadian di alur utama",
+      "misconceptionTargetedId": "Kamu memakai past simple untuk semua kejadian lampau di dalam cerita, sehingga bedanya kilas balik dan urutan maju hilang",
       "reasoningOperationId": "tentukan kejadian mana yang lebih dulu terhadap alur utama cerita, lalu tandai dengan past perfect"
     },
     {
@@ -4142,8 +4142,8 @@
         "howToAvoidId": "Tanyakan: kalimatnya sekadar menyebut pilihan yang tidak diambil, atau menilai keputusannya? Kalau sekadar menyebut, pakai could have.",
         "memoryCueId": "Could have berarti pintunya terbuka, tetapi tidak ada yang melewatinya."
       },
-      "pedagogicalObjectiveId": "Siswa memakai could have + past participle untuk menyatakan peluang lampau yang tidak jadi diambil, berbeda dari bentuk yang menyatakan kewajiban",
-      "misconceptionTargetedId": "Siswa mempertukarkan “could have” yang menyebut peluang terlewat dengan “should have” yang menegur, atau dengan “was able to” yang menyatakan kemampuan",
+      "pedagogicalObjectiveId": "Kamu memakai could have + past participle untuk menyatakan peluang lampau yang tidak jadi diambil, berbeda dari bentuk yang menyatakan kewajiban",
+      "misconceptionTargetedId": "Kamu mempertukarkan “could have” yang menyebut peluang terlewat dengan “should have” yang menegur, atau dengan “was able to” yang menyatakan kemampuan",
       "reasoningOperationId": "pastikan kalimatnya sekadar menyebut peluang lampau yang terbuka tetapi tidak diambil, tanpa menilai keputusannya → pakai could have + past participle untuk kemungkinan netral itu"
     },
     {
@@ -4198,8 +4198,8 @@
         "howToAvoidId": "Periksa ragam bahasanya: izin resmi dan tertulis lebih memilih “may” daripada “can”.",
         "memoryCueId": "Pengumuman resmi memakai modal resmi: “may”."
       },
-      "pedagogicalObjectiveId": "Siswa memilih “may” di atas “can” pada konteks pemberian izin yang resmi",
-      "misconceptionTargetedId": "Siswa menganggap “can” dan “may” bisa saling menggantikan sepenuhnya tanpa melihat ragam bahasanya",
+      "pedagogicalObjectiveId": "Kamu memilih “may” di atas “can” pada konteks pemberian izin yang resmi",
+      "misconceptionTargetedId": "Kamu menganggap “can” dan “may” bisa saling menggantikan sepenuhnya tanpa melihat ragam bahasanya",
       "reasoningOperationId": "kenali tingkat keresmian yang ditandai konteksnya, misalnya pengumuman resmi → pilih modal izin yang sepadan"
     },
     {
@@ -4254,8 +4254,8 @@
         "howToAvoidId": "Perlakukan pembalikan sebagai pengganti utuh dari “if” — jangan pernah memakai keduanya sekaligus.",
         "memoryCueId": "Were I to ... adalah bentuk formal terbalik dari “If I were to ...”."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali susunan pengandaian formal Were + subjek + bentuk to sebagai padanan “If I were to”",
-      "misconceptionTargetedId": "Siswa menyisipkan “if” ke dalam anak kalimat yang sudah dibalik, atau salah menyusun urutan pembalikannya",
+      "pedagogicalObjectiveId": "Kamu mengenali susunan pengandaian formal Were + subjek + bentuk to sebagai padanan “If I were to”",
+      "misconceptionTargetedId": "Kamu menyisipkan “if” ke dalam anak kalimat yang sudah dibalik, atau salah menyusun urutan pembalikannya",
       "reasoningOperationId": "kenali pembalikan “Were + subjek + bentuk to” yang menggantikan “if” pada pengandaian → lengkapi dengan bentuk to tanpa “if” yang mubazir"
     },
     {
@@ -4311,7 +4311,7 @@
         "memoryCueId": "Makna masa depan setelah “as soon as” tetap memakai present simple: as soon as it arrives."
       },
       "pedagogicalObjectiveId": "Memakai present simple, bukan “will”, di dalam anak kalimat waktu yang dibuka when, as soon as, before, atau after",
-      "misconceptionTargetedId": "Siswa menaruh “will” di kedua anak kalimat karena kedua kejadiannya sama-sama di masa depan",
+      "misconceptionTargetedId": "Kamu menaruh “will” di kedua anak kalimat karena kedua kejadiannya sama-sama di masa depan",
       "reasoningOperationId": "temukan kata penghubung waktunya → biarkan anak kalimat itu berbentuk present simple → taruh penanda masa depannya di induk kalimat"
     },
     {
@@ -4366,8 +4366,8 @@
         "howToAvoidId": "Kalau subjeknya tidak mengerjakan sendiri melainkan mengaturnya, pakai have atau get + objek + past participle.",
         "memoryCueId": "Have + bendanya + bentuk done berarti ada orang lain yang dibayar atau diminta mengerjakannya."
       },
-      "pedagogicalObjectiveId": "Siswa membedakan pola menyuruh have something done dari kalimat pasif biasa",
-      "misconceptionTargetedId": "Siswa memakai pasif biasa padahal kalimatnya menuntut pola menyuruh untuk menunjukkan subjeknya yang mengatur pekerjaan itu",
+      "pedagogicalObjectiveId": "Kamu membedakan pola menyuruh have something done dari kalimat pasif biasa",
+      "misconceptionTargetedId": "Kamu memakai pasif biasa padahal kalimatnya menuntut pola menyuruh untuk menunjukkan subjeknya yang mengatur pekerjaan itu",
       "reasoningOperationId": "uji dulu apakah kalimatnya pasif biasa dengan was/were + past participle; kalau subjeknya sendiri yang mengatur jasanya, ganti kata bantunya menjadi “had” dalam kerangka menyuruh had + benda + past participle"
     },
     {
@@ -4422,8 +4422,8 @@
         "howToAvoidId": "Kalau orangnya sudah menjadi subjek, lanjutkan dengan “to + kata kerja”, jangan pernah dengan “that” atau “it” kedua.",
         "memoryCueId": "Orangnya + is believed + to, bukan “that”."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun pasif pelaporan berorang — subjek + is believed + bentuk to seperti “He is believed to have left” — tanpa tergelincir ke pola ber-“that” tanpa pelaku",
-      "misconceptionTargetedId": "Siswa mencampur kedua pola pasif pelaporan itu sehingga muncul susunan campuran yang tidak sah",
+      "pedagogicalObjectiveId": "Kamu menyusun pasif pelaporan berorang — subjek + is believed + bentuk to seperti “He is believed to have left” — tanpa tergelincir ke pola ber-“that” tanpa pelaku",
+      "misconceptionTargetedId": "Kamu mencampur kedua pola pasif pelaporan itu sehingga muncul susunan campuran yang tidak sah",
       "reasoningOperationId": "tentukan apakah subjek kalimatnya “it” yang tanpa pelaku atau orang yang dibicarakan, lalu terapkan susunan yang cocok"
     },
     {
@@ -4478,8 +4478,8 @@
         "howToAvoidId": "Periksa dulu tense kata kerja pelapornya, baru terapkan tabel pemunduran modalnya.",
         "memoryCueId": "Ada “said”, maka can menjadi could, tidak pernah “cans” atau dua modal berjajar."
       },
-      "pedagogicalObjectiveId": "Siswa memundurkan modal “can” menjadi “could” dengan benar saat melaporkan ucapan di dalam bingkai pelaporan lampau",
-      "misconceptionTargetedId": "Siswa membiarkan “can” apa adanya di kalimat pelaporan, tanpa memperhatikan kata kerja pelapornya yang berbentuk lampau",
+      "pedagogicalObjectiveId": "Kamu memundurkan modal “can” menjadi “could” dengan benar saat melaporkan ucapan di dalam bingkai pelaporan lampau",
+      "misconceptionTargetedId": "Kamu membiarkan “can” apa adanya di kalimat pelaporan, tanpa memperhatikan kata kerja pelapornya yang berbentuk lampau",
       "reasoningOperationId": "kenali tense kata kerja pelapornya yang lampau lalu terapkan pemunduran modal can menjadi could"
     },
     {
@@ -4535,7 +4535,7 @@
         "memoryCueId": "Pelaporan ya atau tidak memakai whether + subjek + kata kerja, tidak pernah whether + kata bantu + subjek."
       },
       "pedagogicalObjectiveId": "Melaporkan pertanyaan ya atau tidak dengan if atau whether, urutan kata pernyataan, dan pemunduran tense yang sesuai",
-      "misconceptionTargetedId": "Siswa mempertahankan pembalikan khas pertanyaan langsung, atau membuka pertanyaan ya dan tidak yang dilaporkan dengan “that”",
+      "misconceptionTargetedId": "Kamu mempertahankan pembalikan khas pertanyaan langsung, atau membuka pertanyaan ya dan tidak yang dilaporkan dengan “that”",
       "reasoningOperationId": "kenali pertanyaan ya atau tidak → sisipkan if atau whether → kembalikan urutan subjek sebelum kata kerja → mundurkan tense bila konteks pelaporannya lampau"
     },
     {
@@ -4590,8 +4590,8 @@
         "howToAvoidId": "Tanyakan apakah orangnya mengikuti fungsi lazim lembaga itu, atau sekadar mendatangi gedungnya.",
         "memoryCueId": "Belajar di sana sebagai murid, pakai “go to school”. Kalau cuma mendatangi gedungnya, pakai “go to the school”."
       },
-      "pedagogicalObjectiveId": "Siswa membedakan tanpa kata sandang untuk fungsi utama sebuah lembaga dari “the” yang menunjuk gedungnya",
-      "misconceptionTargetedId": "Siswa langsung menambahkan “the” pada nama lembaga walaupun yang dimaksud fungsinya, bukan gedungnya",
+      "pedagogicalObjectiveId": "Kamu membedakan tanpa kata sandang untuk fungsi utama sebuah lembaga dari “the” yang menunjuk gedungnya",
+      "misconceptionTargetedId": "Kamu langsung menambahkan “the” pada nama lembaga walaupun yang dimaksud fungsinya, bukan gedungnya",
       "reasoningOperationId": "tentukan apakah kalimatnya menunjuk fungsi lembaganya, yang tanpa kata sandang, atau gedungnya, yang memakai the"
     },
     {
@@ -4646,8 +4646,8 @@
         "howToAvoidId": "Pakai a atau an, bukan “my” atau “the”, di depan kata bendanya, dan selalu bentuk kata ganti kepemilikan setelah “of”.",
         "memoryCueId": "A friend of mine berarti salah satu temanku, bukan satu-satunya temanku."
       },
-      "pedagogicalObjectiveId": "Siswa memakai bentuk kepemilikan ganda “a friend of mine”, bukan menumpuk kata kepemilikan dengan of + kata ganti kepemilikan",
-      "misconceptionTargetedId": "Siswa menggabungkan “my” dan “of mine” secara mubazir, atau memakai “of me” alih-alih bentuk kata ganti kepemilikan",
+      "pedagogicalObjectiveId": "Kamu memakai bentuk kepemilikan ganda “a friend of mine”, bukan menumpuk kata kepemilikan dengan of + kata ganti kepemilikan",
+      "misconceptionTargetedId": "Kamu menggabungkan “my” dan “of mine” secara mubazir, atau memakai “of me” alih-alih bentuk kata ganti kepemilikan",
       "reasoningOperationId": "kenali pola kepemilikan ganda yang sudah baku: kata sandang tak tentu + kata benda + of + kata ganti kepemilikan"
     },
     {
@@ -4758,8 +4758,8 @@
         "howToAvoidId": "Kenali apa yang menyusul: hal tertentu yang dinilai memakai with, keadaan memakai about, dan orang yang diikutsenangi memakai for.",
         "memoryCueId": "Pleased memakai with untuk hasil, about untuk kabar, dan for untuk orang lain."
       },
-      "pedagogicalObjectiveId": "Siswa memilih kata depan yang tepat setelah kata sifat perasaan, sesuai apakah penyebabnya berupa orang atau hal tertentu, atau berupa keadaan",
-      "misconceptionTargetedId": "Siswa memakai satu kata depan bawaan, biasanya “about”, setelah semua kata sifat perasaan tanpa melihat apa yang menyusul",
+      "pedagogicalObjectiveId": "Kamu memilih kata depan yang tepat setelah kata sifat perasaan, sesuai apakah penyebabnya berupa orang atau hal tertentu, atau berupa keadaan",
+      "misconceptionTargetedId": "Kamu memakai satu kata depan bawaan, biasanya “about”, setelah semua kata sifat perasaan tanpa melihat apa yang menyusul",
       "reasoningOperationId": "periksa apakah kata benda setelahnya menunjuk orang atau hasil tertentu, yang berpasangan dengan with, atau keadaan, yang berpasangan dengan about"
     },
     {
@@ -4814,8 +4814,8 @@
         "howToAvoidId": "Untuk pernyataan umum tentang sebuah kegiatan sebagai subjek, pilih saja bentuk -ing.",
         "memoryCueId": "Kegiatan sebagai subjek memakai bentuk -ing: Exercising, Reading, Smoking, lalu kata kerjanya."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali bahwa subjek berbentuk -ing terdengar wajar untuk pernyataan umum, sedangkan subjek berbentuk to terdengar lebih formal dan abstrak",
-      "misconceptionTargetedId": "Siswa mengira hanya satu bentuk, biasanya bentuk to, yang bisa membuka kalimat sebagai subjek, sehingga melewatkan bentuk -ing yang justru lebih wajar untuk pernyataan umum",
+      "pedagogicalObjectiveId": "Kamu mengenali bahwa subjek berbentuk -ing terdengar wajar untuk pernyataan umum, sedangkan subjek berbentuk to terdengar lebih formal dan abstrak",
+      "misconceptionTargetedId": "Kamu mengira hanya satu bentuk, biasanya bentuk to, yang bisa membuka kalimat sebagai subjek, sehingga melewatkan bentuk -ing yang justru lebih wajar untuk pernyataan umum",
       "reasoningOperationId": "nilai apakah kalimatnya berupa pernyataan umum, yang condong ke subjek bentuk -ing, atau pernyataan formal tentang satu hal yang dibayangkan, yang condong ke subjek bentuk to bersama “It is ...”"
     },
     {
@@ -4870,8 +4870,8 @@
         "howToAvoidId": "Hafalkan make dan let sebagai kata kerja berbentuk dasar, berlawanan dengan allow, force, dan permit yang menuntut “to”.",
         "memoryCueId": "Make dan let tanpa “to” — let her go, make him laugh."
       },
-      "pedagogicalObjectiveId": "Siswa memakai bentuk dasar tanpa “to” setelah kata kerja menyuruh make dan let dalam kalimat aktif",
-      "misconceptionTargetedId": "Siswa menambahkan “to” setelah make dan let dengan meniru kata kerja lain seperti allow atau force",
+      "pedagogicalObjectiveId": "Kamu memakai bentuk dasar tanpa “to” setelah kata kerja menyuruh make dan let dalam kalimat aktif",
+      "misconceptionTargetedId": "Kamu menambahkan “to” setelah make dan let dengan meniru kata kerja lain seperti allow atau force",
       "reasoningOperationId": "kenali make dan let sebagai kata kerja yang menuntut pelengkap bentuk dasar dalam kalimat aktif, berbeda dari allow atau force"
     },
     {
@@ -4926,8 +4926,8 @@
         "howToAvoidId": "Uji apakah kata penghubungnya berkedudukan objek dari kata kerja anak kalimat; kalau ya, menghilangkannya justru benar dan lazim.",
         "memoryCueId": "Kalau bisa diucapkan “I borrowed it”, kata penghubungnya boleh menghilang."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali kapan kata penghubung boleh dihilangkan karena kedudukannya sebagai objek di anak kalimatnya",
-      "misconceptionTargetedId": "Siswa bersikeras kata penghubung selalu harus ditulis, walaupun secara tata bahasa boleh dihilangkan ketika kedudukannya objek",
+      "pedagogicalObjectiveId": "Kamu mengenali kapan kata penghubung boleh dihilangkan karena kedudukannya sebagai objek di anak kalimatnya",
+      "misconceptionTargetedId": "Kamu bersikeras kata penghubung selalu harus ditulis, walaupun secara tata bahasa boleh dihilangkan ketika kedudukannya objek",
       "reasoningOperationId": "tentukan apakah kata penghubungnya berkedudukan subjek, yang wajib ditulis, atau objek, yang boleh dihilangkan"
     },
     {
@@ -4982,8 +4982,8 @@
         "howToAvoidId": "Di depan bentuk perbandingan berakhiran -er atau berawalan more, pakai hanya much, far, a lot, a bit, atau rather sebagai penguat.",
         "memoryCueId": "Much faster, far better, a lot cheaper — tidak pernah “very faster”."
       },
-      "pedagogicalObjectiveId": "Siswa memilih penguat yang sah di depan bentuk perbandingan, seperti much, far, atau a lot, dan menghindari penguat yang hanya untuk kata sifat biasa",
-      "misconceptionTargetedId": "Siswa memakai “very” untuk menguatkan bentuk perbandingan, membawa kebiasaan penguat kata sifat biasa ke tempat yang keliru",
+      "pedagogicalObjectiveId": "Kamu memilih penguat yang sah di depan bentuk perbandingan, seperti much, far, atau a lot, dan menghindari penguat yang hanya untuk kata sifat biasa",
+      "misconceptionTargetedId": "Kamu memakai “very” untuk menguatkan bentuk perbandingan, membawa kebiasaan penguat kata sifat biasa ke tempat yang keliru",
       "reasoningOperationId": "kenali bahwa “very” menerangkan kata sifat biasa, sedangkan bentuk perbandingan menuntut penguat seperti much, far, atau a lot"
     },
     {
@@ -5038,8 +5038,8 @@
         "howToAvoidId": "Untuk mengulang, biarkan urutan subjek dan kata kerja pernyataannya utuh, lalu ganti saja bagiannya dengan kata tanya.",
         "memoryCueId": "Pertanyaan ulang mengulang, bukan membalik: “You saw WHAT?”"
       },
-      "pedagogicalObjectiveId": "Siswa menyusun pertanyaan ulang yang mengulang bagian penting dari pernyataan dengan nada naik untuk meminta penegasan",
-      "misconceptionTargetedId": "Siswa menyusun pertanyaan terbalik yang utuh padahal konteksnya meminta pengulangan penuh keheranan untuk memastikan",
+      "pedagogicalObjectiveId": "Kamu menyusun pertanyaan ulang yang mengulang bagian penting dari pernyataan dengan nada naik untuk meminta penegasan",
+      "misconceptionTargetedId": "Kamu menyusun pertanyaan terbalik yang utuh padahal konteksnya meminta pengulangan penuh keheranan untuk memastikan",
       "reasoningOperationId": "kenali fungsi percakapannya, yaitu memastikan dengan heran apa yang baru saja diucapkan, dan itu menuntut bentuk pengulangan, bukan pembalikan biasa"
     },
     {
@@ -5094,8 +5094,8 @@
         "howToAvoidId": "Setelah menulis frasa pembuka berbentuk -ing, pastikan kata benda tepat sesudahnya memang bisa melakukan tindakan itu.",
         "memoryCueId": "Siapa pun yang sedang “walking” harus disebut tepat sesudah komanya."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali dan membetulkan keterangan yang menggantung dengan memastikan frasa pembukanya benar-benar menerangkan subjek kalimatnya",
-      "misconceptionTargetedId": "Siswa menganggap kalimat yang terdengar lancar sudah benar, tanpa memeriksa apakah pelaku yang tersirat di frasa pembukanya sama dengan subjek induk kalimatnya",
+      "pedagogicalObjectiveId": "Kamu mengenali dan membetulkan keterangan yang menggantung dengan memastikan frasa pembukanya benar-benar menerangkan subjek kalimatnya",
+      "misconceptionTargetedId": "Kamu menganggap kalimat yang terdengar lancar sudah benar, tanpa memeriksa apakah pelaku yang tersirat di frasa pembukanya sama dengan subjek induk kalimatnya",
       "reasoningOperationId": "tentukan siapa atau apa yang secara masuk akal melakukan tindakan di frasa pembukanya, lalu periksa apakah subjek induk kalimatnya memang itu"
     },
     {
@@ -5150,8 +5150,8 @@
         "howToAvoidId": "Periksa yang menyusul: kata benda saja menuntut despite atau in spite of; anak kalimat utuh menuntut although atau even though.",
         "memoryCueId": "Despite + kata benda; although + anak kalimat."
       },
-      "pedagogicalObjectiveId": "Siswa memilih “despite” yang diikuti kata benda, bukan “although” yang diikuti anak kalimat, ketika yang menyusul berupa frasa benda",
-      "misconceptionTargetedId": "Siswa memakai “although” di depan frasa benda, tanpa melihat bahwa “although” menuntut anak kalimat berisi subjek dan kata kerja sedangkan “despite” menerima kata benda",
+      "pedagogicalObjectiveId": "Kamu memilih “despite” yang diikuti kata benda, bukan “although” yang diikuti anak kalimat, ketika yang menyusul berupa frasa benda",
+      "misconceptionTargetedId": "Kamu memakai “although” di depan frasa benda, tanpa melihat bahwa “although” menuntut anak kalimat berisi subjek dan kata kerja sedangkan “despite” menerima kata benda",
       "reasoningOperationId": "periksa bentuk yang menyusul kata penghubungnya, anak kalimat atau frasa benda, lalu pasangkan dengan penghubung yang menerimanya"
     },
     {
@@ -5206,8 +5206,8 @@
         "howToAvoidId": "Periksa apakah ada kata benda setelah kata sifatnya: kalau tidak ada, pakai “so”; kalau ada, pakai “such” dengan a atau an.",
         "memoryCueId": "So + kata sifat seperti so boring; such + a + kata sifat + kata benda seperti such a boring lecture."
       },
-      "pedagogicalObjectiveId": "Siswa memilih pola so + kata sifat + that, bukan “such”, ketika yang diterangkan langsung sebuah kata sifat, bukan kata benda",
-      "misconceptionTargetedId": "Siswa memakai “such” di depan kata sifat telanjang, lupa bahwa “such” menuntut kata benda sedangkan “so” langsung menerangkan kata sifat atau kata keterangan",
+      "pedagogicalObjectiveId": "Kamu memilih pola so + kata sifat + that, bukan “such”, ketika yang diterangkan langsung sebuah kata sifat, bukan kata benda",
+      "misconceptionTargetedId": "Kamu memakai “such” di depan kata sifat telanjang, lupa bahwa “such” menuntut kata benda sedangkan “so” langsung menerangkan kata sifat atau kata keterangan",
       "reasoningOperationId": "tentukan apakah yang dikuatkan sebuah kata sifat sendirian, yang memakai so, atau frasa benda, yang memakai such a atau such an + kata sifat + kata benda"
     },
     {
@@ -5262,8 +5262,8 @@
         "howToAvoidId": "Biarkan “It was” tetap di awal, sisipkan kata benda yang ditonjolkan tepat sesudahnya, lalu “that” sebelum sisa anak kalimatnya.",
         "memoryCueId": "It was [yang ditonjolkan] that [sisanya] — jangan pernah memisahkan “It was”."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun kalimat penekanan berbentuk it-cleft untuk menonjolkan satu bagian tertentu dari kalimat aslinya",
-      "misconceptionTargetedId": "Siswa salah menempatkan bagian yang ditonjolkan, atau memakai who dan which secara tidak konsisten alih-alih pola baku dengan “that”",
+      "pedagogicalObjectiveId": "Kamu menyusun kalimat penekanan berbentuk it-cleft untuk menonjolkan satu bagian tertentu dari kalimat aslinya",
+      "misconceptionTargetedId": "Kamu salah menempatkan bagian yang ditonjolkan, atau memakai who dan which secara tidak konsisten alih-alih pola baku dengan “that”",
       "reasoningOperationId": "tentukan bagian yang perlu ditonjolkan, lalu majukan dengan benar ke dalam kerangka “It was/is ... that ...”"
     },
     {
@@ -5318,8 +5318,8 @@
         "howToAvoidId": "Untuk kata kerja keadaan seperti live, have, know, dan believe di masa lalu, pakai “used to” atau past simple biasa, jangan pernah “would”.",
         "memoryCueId": "Keadaan hanya used to. Tindakan boleh used to atau would."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali bahwa “would” tidak bisa menyatakan keadaan lampau yang berulang, hanya tindakan berulang, berbeda dari “used to”",
-      "misconceptionTargetedId": "Siswa menganggap “used to” dan “would” bisa saling menggantikan untuk semua kebiasaan lampau, termasuk untuk keadaan",
+      "pedagogicalObjectiveId": "Kamu mengenali bahwa “would” tidak bisa menyatakan keadaan lampau yang berulang, hanya tindakan berulang, berbeda dari “used to”",
+      "misconceptionTargetedId": "Kamu menganggap “used to” dan “would” bisa saling menggantikan untuk semua kebiasaan lampau, termasuk untuk keadaan",
       "reasoningOperationId": "kelompokkan apakah kalimatnya menggambarkan keadaan lampau, yang hanya boleh used to atau past simple, atau tindakan berulang, yang boleh used to atau would"
     },
     {
@@ -5374,8 +5374,8 @@
         "howToAvoidId": "Periksa apakah rentang waktu yang disebut sudah berakhir; kalau belum, biasanya yang dibutuhkan present perfect.",
         "memoryCueId": "Rentang waktunya belum tutup, berarti present perfect, bukan past simple."
       },
-      "pedagogicalObjectiveId": "Siswa memakai present perfect bersama rentang waktu yang belum berakhir seperti “this week”, untuk menghubungkan tindakan lampau dengan kerangka waktu yang masih berjalan",
-      "misconceptionTargetedId": "Siswa langsung memakai past simple setiap kali ada kejadian tertentu yang disebut, tanpa melihat bahwa rentang waktunya sendiri masih berjalan",
+      "pedagogicalObjectiveId": "Kamu memakai present perfect bersama rentang waktu yang belum berakhir seperti “this week”, untuk menghubungkan tindakan lampau dengan kerangka waktu yang masih berjalan",
+      "misconceptionTargetedId": "Kamu langsung memakai past simple setiap kali ada kejadian tertentu yang disebut, tanpa melihat bahwa rentang waktunya sendiri masih berjalan",
       "reasoningOperationId": "pastikan kontras yang diuji adalah present perfect lawan past simple → periksa rentang yang disebut seperti this week masih berjalan → tolak bentuk lampau yang akan menutupnya"
     },
     {
@@ -5430,8 +5430,8 @@
         "howToAvoidId": "Kalau kalimatnya menyalahkan seseorang atas kelalaian di masa lalu, pakai should have, bukan could have.",
         "memoryCueId": "Should have berarti “kamu keliru karena tidak melakukannya”; could have berarti “itu mungkin saja, tanpa menilai”."
       },
-      "pedagogicalObjectiveId": "Siswa membedakan “should have” yang menegur keputusan keliru dari “could have” yang sekadar menyebut peluang yang tidak diambil, pada konteks yang menuntut teguran",
-      "misconceptionTargetedId": "Siswa memilih “could have” padahal konteks kalimatnya jelas menyiratkan penyesalan dan teguran, bukan pilihan yang netral",
+      "pedagogicalObjectiveId": "Kamu membedakan “should have” yang menegur keputusan keliru dari “could have” yang sekadar menyebut peluang yang tidak diambil, pada konteks yang menuntut teguran",
+      "misconceptionTargetedId": "Kamu memilih “could have” padahal konteks kalimatnya jelas menyiratkan penyesalan dan teguran, bukan pilihan yang netral",
       "reasoningOperationId": "temukan nada menyalahkan di kalimatnya — akibat buruk yang kini disesali — lalu tandai teguran atas pilihan lampau itu dengan should have + past participle"
     },
     {
@@ -5487,7 +5487,7 @@
         "memoryCueId": "Tidak ada “to can”; ucapkan “to be able to”."
       },
       "pedagogicalObjectiveId": "Memakai “be able to” di posisi yang secara tata bahasa menuntut bentuk kemampuan tanpa tense, misalnya setelah bentuk to yang lain",
-      "misconceptionTargetedId": "Siswa memperlakukan “can” seperti kata kerja biasa dan menulis gabungan yang tidak mungkin seperti “to can”",
+      "misconceptionTargetedId": "Kamu memperlakukan “can” seperti kata kerja biasa dan menulis gabungan yang tidak mungkin seperti “to can”",
       "reasoningOperationId": "temukan penanda bentuk to yang mendahuluinya → sadari bahwa can tidak punya bentuk to → ganti dengan be able to"
     },
     {
@@ -5542,8 +5542,8 @@
         "howToAvoidId": "Pisahkan kedua anak kalimatnya: sebabnya sifat menetap di masa kini, atau kejadian lampau tertentu? Tentukan tense masing-masing secara terpisah.",
         "memoryCueId": "Sebab masa kini dan hasil masa lalu: If + were ..., would have + past participle."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun mixed conditional dengan keadaan sekarang yang tidak nyata sebagai sebab dari hasil lampau yang tidak terjadi",
-      "misconceptionTargetedId": "Siswa memaksakan kedua anak kalimat mixed conditional memakai tense yang sama, tanpa melihat bahwa sebab masa kini dan hasil masa lalu menuntut bentuk berbeda",
+      "pedagogicalObjectiveId": "Kamu menyusun mixed conditional dengan keadaan sekarang yang tidak nyata sebagai sebab dari hasil lampau yang tidak terjadi",
+      "misconceptionTargetedId": "Kamu memaksakan kedua anak kalimat mixed conditional memakai tense yang sama, tanpa melihat bahwa sebab masa kini dan hasil masa lalu menuntut bentuk berbeda",
       "reasoningOperationId": "kenali bahwa syaratnya menggambarkan sifat menetap di masa kini sedangkan hasilnya menggambarkan kejadian lampau tertentu, sehingga tense-nya harus berbeda"
     },
     {
@@ -5598,8 +5598,8 @@
         "howToAvoidId": "Periksa alurnya: ini syarat yang wajib dipenuhi dengan provided that, atau kekecualian yang membatalkan hasilnya dengan unless?",
         "memoryCueId": "Provided that berarti hanya jika; unless berarti kecuali jika."
       },
-      "pedagogicalObjectiveId": "Siswa memilih “provided that” sebagai syarat positif yang harus dipenuhi, bukan “unless” yang berupa kekecualian negatif, berdasarkan alur makna kalimatnya",
-      "misconceptionTargetedId": "Siswa menganggap semua penghubung syarat seperti unless, provided that, dan as long as bisa saling menggantikan tanpa melihat kutub positif atau negatifnya",
+      "pedagogicalObjectiveId": "Kamu memilih “provided that” sebagai syarat positif yang harus dipenuhi, bukan “unless” yang berupa kekecualian negatif, berdasarkan alur makna kalimatnya",
+      "misconceptionTargetedId": "Kamu menganggap semua penghubung syarat seperti unless, provided that, dan as long as bisa saling menggantikan tanpa melihat kutub positif atau negatifnya",
       "reasoningOperationId": "tentukan apakah kalimatnya menyebut syarat positif yang wajib dipenuhi, yang memakai provided that atau as long as, atau kekecualian negatif, yang memakai unless"
     },
     {
@@ -5654,8 +5654,8 @@
         "howToAvoidId": "Jadikan penerimanya subjek, lalu taruh benda yang diberikan langsung setelah kata kerjanya tanpa kata depan tambahan.",
         "memoryCueId": "Penerimanya menjadi subjek: “Employees were sent a bonus”, tanpa “to”."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun kalimat pasif dari kata kerja berobjek dua dengan memilih objek mana yang menjadi subjek pasifnya, dan yang lazim adalah penerimanya",
-      "misconceptionTargetedId": "Siswa mempertahankan kedua objeknya di kalimat pasif, atau langsung memakai pola yang menjadikan objek langsung sebagai subjek walaupun terdengar kurang wajar",
+      "pedagogicalObjectiveId": "Kamu menyusun kalimat pasif dari kata kerja berobjek dua dengan memilih objek mana yang menjadi subjek pasifnya, dan yang lazim adalah penerimanya",
+      "misconceptionTargetedId": "Kamu mempertahankan kedua objeknya di kalimat pasif, atau langsung memakai pola yang menjadikan objek langsung sebagai subjek walaupun terdengar kurang wajar",
       "reasoningOperationId": "kenali objek penerimanya sebagai pilihan subjek pasif yang lebih wajar untuk kata kerja seperti give, send, dan offer"
     },
     {
@@ -5710,8 +5710,8 @@
         "howToAvoidId": "Periksa dulu apakah kata kerjanya menuntut pelengkap berbentuk -ing; kalau ya, bentuk pasifnya wajib being + past participle.",
         "memoryCueId": "Resent, avoid, dan admit diikuti being + past participle, tidak pernah “to be”."
       },
-      "pedagogicalObjectiveId": "Siswa memilih bentuk -ing pasif berupa being + past participle setelah kata kerja atau kata depan yang menuntut pelengkap berbentuk -ing",
-      "misconceptionTargetedId": "Siswa memakai bentuk to pasif setelah kata kerja yang justru menuntut pelengkap berbentuk -ing",
+      "pedagogicalObjectiveId": "Kamu memilih bentuk -ing pasif berupa being + past participle setelah kata kerja atau kata depan yang menuntut pelengkap berbentuk -ing",
+      "misconceptionTargetedId": "Kamu memakai bentuk to pasif setelah kata kerja yang justru menuntut pelengkap berbentuk -ing",
       "reasoningOperationId": "kenali dulu jenis pelengkap yang dituntut kata kerjanya, bentuk -ing atau bentuk to, baru terapkan bentuk pasif yang cocok"
     },
     {
@@ -5822,8 +5822,8 @@
         "howToAvoidId": "Hafalkan pola pelengkap tiap kata kerja pelapor, jangan menganggap semuanya bisa diikuti “that”.",
         "memoryCueId": "Apologize FOR + bentuk -ing untuk alasannya; deny + bentuk -ing tanpa kata depan."
       },
-      "pedagogicalObjectiveId": "Siswa memilih pola pelengkap yang tepat untuk kata kerja pelapor yang menuntut bentuk -ing atau kata depan diikuti bentuk -ing",
-      "misconceptionTargetedId": "Siswa memakai pola umum kata kerja pelapor + anak kalimat “that” pada kata kerja yang sebenarnya menuntut pelengkap berbentuk -ing",
+      "pedagogicalObjectiveId": "Kamu memilih pola pelengkap yang tepat untuk kata kerja pelapor yang menuntut bentuk -ing atau kata depan diikuti bentuk -ing",
+      "misconceptionTargetedId": "Kamu memakai pola umum kata kerja pelapor + anak kalimat “that” pada kata kerja yang sebenarnya menuntut pelengkap berbentuk -ing",
       "reasoningOperationId": "kenali pola pelengkap yang melekat pada tiap kata kerja pelapor, seperti deny + bentuk -ing dan apologize for + bentuk -ing, jangan langsung memakai “that”"
     },
     {
@@ -5878,8 +5878,8 @@
         "howToAvoidId": "Hafalkan daftar kekecualiannya: nama negara berbentuk jamak dan nama resmi ber-United atau ber-Republic selalu memakai “the”.",
         "memoryCueId": "Nama negara yang terdengar jamak memakai “the”: the Netherlands, the Philippines, the United States."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali bahwa sebagian nama negara berbentuk jamak atau bernama gugusan lazimnya memakai “the”, berbeda dari kebanyakan nama negara yang tunggal",
-      "misconceptionTargetedId": "Siswa menerapkan aturan umum “nama negara tanpa kata sandang” untuk semua kasus, sehingga melewatkan kekecualian seperti nama negara berbentuk jamak",
+      "pedagogicalObjectiveId": "Kamu mengenali bahwa sebagian nama negara berbentuk jamak atau bernama gugusan lazimnya memakai “the”, berbeda dari kebanyakan nama negara yang tunggal",
+      "misconceptionTargetedId": "Kamu menerapkan aturan umum “nama negara tanpa kata sandang” untuk semua kasus, sehingga melewatkan kekecualian seperti nama negara berbentuk jamak",
       "reasoningOperationId": "kenali bahwa nama negara ini termasuk kelompok kekecualian berbentuk jamak yang menuntut “the”, bukan aturan umum tanpa kata sandang"
     },
     {
@@ -5935,7 +5935,7 @@
         "memoryCueId": "Ada kata ganti objek di depan? Pakai of: both of them."
       },
       "pedagogicalObjectiveId": "Memakai “of” di antara kata jumlah dan kata ganti objek, sehingga menjadi “both of them”, bukan “both them” yang tidak sah",
-      "misconceptionTargetedId": "Siswa menghilangkan “of” di depan kata ganti objek karena “both” memang bisa berdiri langsung di depan sebagian frasa benda",
+      "misconceptionTargetedId": "Kamu menghilangkan “of” di depan kata ganti objek karena “both” memang bisa berdiri langsung di depan sebagian frasa benda",
       "reasoningOperationId": "perhatikan kata ganti objek “them” → sisipkan of setelah kata jumlahnya → pilih both of"
     },
     {
@@ -5990,8 +5990,8 @@
         "howToAvoidId": "Untuk cara bepergian secara umum, bukan posisi fisik, selalu pakai by + kata benda telanjang.",
         "memoryCueId": "By bus, by car, by plane untuk caranya tanpa kata sandang; on the bus dan in the car untuk posisi fisiknya."
       },
-      "pedagogicalObjectiveId": "Siswa memilih “by” untuk cara atau sarana bepergian dan berkomunikasi, berbeda dari “with” untuk alat dan “on” untuk permukaan atau perangkat",
-      "misconceptionTargetedId": "Siswa memakai “with” untuk cara bepergian atau berkomunikasi, membawa kata depan untuk alat ke konteks cara melakukan sesuatu",
+      "pedagogicalObjectiveId": "Kamu memilih “by” untuk cara atau sarana bepergian dan berkomunikasi, berbeda dari “with” untuk alat dan “on” untuk permukaan atau perangkat",
+      "misconceptionTargetedId": "Kamu memakai “with” untuk cara bepergian atau berkomunikasi, membawa kata depan untuk alat ke konteks cara melakukan sesuatu",
       "reasoningOperationId": "tentukan apakah kalimatnya menyebut cara atau sarana, yang memakai by, atau alat yang dipegang, yang memakai with"
     },
     {
@@ -6046,8 +6046,8 @@
         "howToAvoidId": "Hafalkan pasangan kata benda dan kata depannya sebagai satu kesatuan, bukan menurunkannya dari kata kerja atau kata sifat yang berkaitan.",
         "memoryCueId": "Solution TO a problem; reason FOR a decision; answer TO a question."
       },
-      "pedagogicalObjectiveId": "Siswa memilih kata depan tetap yang benar setelah kata benda abstrak, yaitu solution to, bukan solution for atau solution of",
-      "misconceptionTargetedId": "Siswa mengira kata depan tetap milik sebuah kata benda mengikuti kata depan kata kerja atau kata sifat yang berkaitan",
+      "pedagogicalObjectiveId": "Kamu memilih kata depan tetap yang benar setelah kata benda abstrak, yaitu solution to, bukan solution for atau solution of",
+      "misconceptionTargetedId": "Kamu mengira kata depan tetap milik sebuah kata benda mengikuti kata depan kata kerja atau kata sifat yang berkaitan",
       "reasoningOperationId": "ingat kembali kata depan tetap milik kata bendanya sendiri, lepas dari bentuk kata lain yang berkaitan"
     },
     {
@@ -6102,8 +6102,8 @@
         "howToAvoidId": "Periksa apakah “regret” membuka kabar yang sedang disampaikan sekarang, yang memakai bentuk to, atau penyesalan atas masa lalu, yang memakai bentuk -ing.",
         "memoryCueId": "Regret TO INFORM you sekarang; regret DOING sesuatu di masa lalu."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali bahwa regret + bentuk to yang menyampaikan kabar buruk secara resmi berbeda maknanya dari regret + bentuk -ing yang menyesali tindakan lampau",
-      "misconceptionTargetedId": "Siswa mengira “regret” selalu diikuti pelengkap yang sama, tanpa melihat maksudnya menyampaikan kabar atau menyesali",
+      "pedagogicalObjectiveId": "Kamu mengenali bahwa regret + bentuk to yang menyampaikan kabar buruk secara resmi berbeda maknanya dari regret + bentuk -ing yang menyesali tindakan lampau",
+      "misconceptionTargetedId": "Kamu mengira “regret” selalu diikuti pelengkap yang sama, tanpa melihat maksudnya menyampaikan kabar atau menyesali",
       "reasoningOperationId": "tentukan apakah kalimatnya menyampaikan kabar buruk secara resmi, yang memakai bentuk to, atau menyesali tindakan lampau, yang memakai bentuk -ing"
     },
     {
@@ -6158,8 +6158,8 @@
         "howToAvoidId": "Baca syarat soalnya dengan teliti: kalau diminta menegaskan mana yang lebih dulu, pilih having + past participle, jangan bersandar pada konteks saja.",
         "memoryCueId": "Having + past participle berarti tegas lebih dulu."
       },
-      "pedagogicalObjectiveId": "Siswa memakai bentuk -ing perfect berupa having + past participle untuk menegaskan bahwa tindakan itu terjadi lebih dulu daripada kata kerja utamanya",
-      "misconceptionTargetedId": "Siswa memakai bentuk -ing sederhana walaupun kalimatnya perlu menegaskan bahwa satu tindakan mendahului tindakan lainnya",
+      "pedagogicalObjectiveId": "Kamu memakai bentuk -ing perfect berupa having + past participle untuk menegaskan bahwa tindakan itu terjadi lebih dulu daripada kata kerja utamanya",
+      "misconceptionTargetedId": "Kamu memakai bentuk -ing sederhana walaupun kalimatnya perlu menegaskan bahwa satu tindakan mendahului tindakan lainnya",
       "reasoningOperationId": "tentukan apakah hubungan waktu antara tindakan berbentuk -ing dan kata kerja utamanya perlu ditegaskan sebagai lebih dulu, karena itu menuntut bentuk -ing perfect"
     },
     {
@@ -6214,8 +6214,8 @@
         "howToAvoidId": "Jaga urutannya tetap: kata jumlah, lalu of, lalu whom untuk orang atau which untuk benda.",
         "memoryCueId": "Many of whom dan some of which — kata jumlah dulu, lalu “of”, lalu kata penghubungnya."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun anak kalimat penjelas tambahan dengan pola kata jumlah + of + kata penghubung, seperti many of whom, untuk merujuk kembali ke satu kelompok",
-      "misconceptionTargetedId": "Siswa memakai kata penghubung biasa lalu menambahkan kalimat berisi kata jumlah secara terpisah, bukan pola gabungan kata jumlah + of + whom atau which",
+      "pedagogicalObjectiveId": "Kamu menyusun anak kalimat penjelas tambahan dengan pola kata jumlah + of + kata penghubung, seperti many of whom, untuk merujuk kembali ke satu kelompok",
+      "misconceptionTargetedId": "Kamu memakai kata penghubung biasa lalu menambahkan kalimat berisi kata jumlah secara terpisah, bukan pola gabungan kata jumlah + of + whom atau which",
       "reasoningOperationId": "kenali bahwa merujuk sebagian dari kelompok jamak yang sudah disebut menuntut pola tetap kata jumlah + of + kata penghubung"
     },
     {
@@ -6270,8 +6270,8 @@
         "howToAvoidId": "Setiap kali “ever” menyusul pernyataan superlative tentang pengalaman, pakai present perfect di seluruh susunannya.",
         "memoryCueId": "Best atau worst ... I have ever + past participle, bukan “did ever”."
       },
-      "pedagogicalObjectiveId": "Siswa memadukan bentuk superlative dengan present perfect dan “ever” untuk menyatakan pengalaman sepanjang hidup",
-      "misconceptionTargetedId": "Siswa memakai past simple setelah susunan superlative + ever, tanpa melihat bahwa pola tetap ini menuntut present perfect",
+      "pedagogicalObjectiveId": "Kamu memadukan bentuk superlative dengan present perfect dan “ever” untuk menyatakan pengalaman sepanjang hidup",
+      "misconceptionTargetedId": "Kamu memakai past simple setelah susunan superlative + ever, tanpa melihat bahwa pola tetap ini menuntut present perfect",
       "reasoningOperationId": "kenali bahwa pola tetap superlative + ever menuntut present perfect untuk menyatakan “sepanjang hidup sampai sekarang”"
     },
     {
@@ -6382,8 +6382,8 @@
         "howToAvoidId": "Setelah menulis satu rangkaian, periksa apakah setiap bagiannya berbentuk persis sama dengan bagian yang pertama.",
         "memoryCueId": "Satu rangkaian, satu bentuk: semuanya -ing, atau semuanya to + kata kerja, jangan dicampur."
       },
-      "pedagogicalObjectiveId": "Siswa mengenali dan membetulkan kesalahan kesejajaran bentuk pada rangkaian yang disambung “and”, agar semua bagiannya berbentuk sama",
-      "misconceptionTargetedId": "Siswa melewatkan ketidaksamaan bentuk di dalam satu rangkaian selama tiap bagiannya terdengar wajar bila berdiri sendiri",
+      "pedagogicalObjectiveId": "Kamu mengenali dan membetulkan kesalahan kesejajaran bentuk pada rangkaian yang disambung “and”, agar semua bagiannya berbentuk sama",
+      "misconceptionTargetedId": "Kamu melewatkan ketidaksamaan bentuk di dalam satu rangkaian selama tiap bagiannya terdengar wajar bila berdiri sendiri",
       "reasoningOperationId": "periksa apakah setiap bagian di dalam rangkaian itu berbentuk sama, semuanya -ing atau semuanya bentuk to"
     },
     {
@@ -6438,8 +6438,8 @@
         "howToAvoidId": "Periksa apakah anak kalimat tujuannya bersubjek berbeda dari induk kalimatnya; kalau ya, pakai “so that”, bukan “in order to”.",
         "memoryCueId": "Subjek berbeda di anak kalimat tujuan memakai so that; subjek sama memakai in order to + kata kerja dasar."
       },
-      "pedagogicalObjectiveId": "Siswa memilih “so that” yang diikuti anak kalimat bermodal, bukan “in order to” yang diikuti kata kerja dasar, ketika yang menyusul berupa anak kalimat dengan subjek berbeda",
-      "misconceptionTargetedId": "Siswa memakai “in order to” di depan anak kalimat utuh yang punya subjek dan modal sendiri, padahal pola itu milik “so that”",
+      "pedagogicalObjectiveId": "Kamu memilih “so that” yang diikuti anak kalimat bermodal, bukan “in order to” yang diikuti kata kerja dasar, ketika yang menyusul berupa anak kalimat dengan subjek berbeda",
+      "misconceptionTargetedId": "Kamu memakai “in order to” di depan anak kalimat utuh yang punya subjek dan modal sendiri, padahal pola itu milik “so that”",
       "reasoningOperationId": "periksa apakah anak kalimat tujuannya punya subjek sendiri, yang menuntut so that, atau berbagi subjek dengan induk kalimatnya, yang membolehkan in order to + kata kerja dasar"
     },
     {
@@ -6494,8 +6494,8 @@
         "howToAvoidId": "Periksa dua hal yang disebut soalnya: jenis katanya dan ragam bahasanya. Sebuah penghubung bisa saja bermakna penambahan tetapi tetap gagal pada salah satu syarat itu.",
         "memoryCueId": "Kata keterangan penambahan untuk ragam akademik: furthermore atau moreover."
       },
-      "pedagogicalObjectiveId": "Siswa memilih penghubung penambahan yang resmi, yaitu furthermore, sesuai ragam bahasa tulisan akademik, berbeda dari padanannya yang santai",
-      "misconceptionTargetedId": "Siswa memakai penghubung penambahan yang santai seperti also atau plus di dalam konteks akademik yang jelas resmi",
+      "pedagogicalObjectiveId": "Kamu memilih penghubung penambahan yang resmi, yaitu furthermore, sesuai ragam bahasa tulisan akademik, berbeda dari padanannya yang santai",
+      "misconceptionTargetedId": "Kamu memakai penghubung penambahan yang santai seperti also atau plus di dalam konteks akademik yang jelas resmi",
       "reasoningOperationId": "sesuaikan tingkat keresmian penghubungnya dengan ragam bahasa yang ditandai konteks akademiknya"
     },
     {
@@ -6550,8 +6550,8 @@
         "howToAvoidId": "Setiap kali keterangan negatif dimajukan demi penekanan, langsung balikkan dengan kata bantu mendahului subjeknya.",
         "memoryCueId": "Never + kata bantu + subjek: “Never have I ...”, “Rarely does she ...”."
       },
-      "pedagogicalObjectiveId": "Siswa menerapkan pembalikan subjek dan kata bantu setelah keterangan negatif dimajukan, seperti Never, Rarely, dan Not only, untuk gaya resmi yang menekankan",
-      "misconceptionTargetedId": "Siswa memajukan keterangan negatifnya demi penekanan tetapi mempertahankan urutan kata pernyataan biasa, tanpa membalik subjek dan kata bantunya",
+      "pedagogicalObjectiveId": "Kamu menerapkan pembalikan subjek dan kata bantu setelah keterangan negatif dimajukan, seperti Never, Rarely, dan Not only, untuk gaya resmi yang menekankan",
+      "misconceptionTargetedId": "Kamu memajukan keterangan negatifnya demi penekanan tetapi mempertahankan urutan kata pernyataan biasa, tanpa membalik subjek dan kata bantunya",
       "reasoningOperationId": "kenali bahwa memajukan keterangan negatif atau pembatas demi penekanan mewajibkan pembalikan subjek dan kata bantu"
     },
     {
@@ -6606,8 +6606,8 @@
         "howToAvoidId": "Perlakukan “Such was” atau “Such were” + subjek sebagai satu bukaan tetap yang dihafal, bukan susunan yang dirakit kata per kata.",
         "memoryCueId": "Such was the impact that ... — “such” memimpin, kata kerjanya langsung menyusul."
       },
-      "pedagogicalObjectiveId": "Siswa menyusun pola penekanan Such + be + subjek + that untuk kesan dramatis dalam ragam sastra atau resmi",
-      "misconceptionTargetedId": "Siswa mempertahankan “such” di posisi biasanya sebelum kata benda, bukan memajukan seluruh bagian predikatnya untuk pembalikan yang menekankan",
+      "pedagogicalObjectiveId": "Kamu menyusun pola penekanan Such + be + subjek + that untuk kesan dramatis dalam ragam sastra atau resmi",
+      "misconceptionTargetedId": "Kamu mempertahankan “such” di posisi biasanya sebelum kata benda, bukan memajukan seluruh bagian predikatnya untuk pembalikan yang menekankan",
       "reasoningOperationId": "kenali pola tetap Such + was atau were + subjek + that + anak kalimat akibat sebagai bentuk lain dari “The impact was such that ...”"
     },
     {
@@ -6943,7 +6943,7 @@
         "memoryCueId": "Sebab lampau dan akibat masa depan: if had done, would be doing."
       },
       "pedagogicalObjectiveId": "Menyusun mixed conditional yang keputusan lampaunya tidak nyata dan mengendalikan kejadian masa depan yang dibayangkan",
-      "misconceptionTargetedId": "Siswa memaksa kedua anak kalimatnya berada di kerangka waktu yang sama, sehingga hubungan lampau ke masa depannya hilang",
+      "misconceptionTargetedId": "Kamu memaksa kedua anak kalimatnya berada di kerangka waktu yang sama, sehingga hubungan lampau ke masa depannya hilang",
       "reasoningOperationId": "tandai syarat tidak nyatanya di masa lalu → tandai akibatnya di masa depan → gabungkan past perfect dengan would be + bentuk -ing"
     },
     {
@@ -6999,7 +6999,7 @@
         "memoryCueId": "Bukti kuat ditambah kegiatan lampau yang sedang berlangsung berarti must have been working."
       },
       "pedagogicalObjectiveId": "Memakai modal perfect berbentuk berkelanjutan untuk menyimpulkan bahwa satu kegiatan sedang berlangsung pada satu saat tertentu di masa lalu",
-      "misconceptionTargetedId": "Siswa melihat buktinya di masa lalu tetapi mengabaikan makna “sedang berlangsung saat itu”, lalu memilih bentuk yang menandai tindakan tuntas",
+      "misconceptionTargetedId": "Kamu melihat buktinya di masa lalu tetapi mengabaikan makna “sedang berlangsung saat itu”, lalu memilih bentuk yang menandai tindakan tuntas",
       "reasoningOperationId": "nilai kekuatan buktinya → temukan titik acuan lampaunya → tandai kegiatan yang disimpulkan itu sebagai sedang berlangsung dengan must have been + bentuk -ing"
     },
     {
@@ -7055,7 +7055,7 @@
         "memoryCueId": "Only after ... did + subjek + kata kerja dasar."
       },
       "pedagogicalObjectiveId": "Menerapkan pembalikan subjek dan kata bantu ketika frasa pembatas berawalan “only” dimajukan demi penekanan yang resmi",
-      "misconceptionTargetedId": "Siswa memajukan “only after”, “only by”, atau “only when” tetapi mempertahankan urutan subjek dan kata kerja biasa",
+      "misconceptionTargetedId": "Kamu memajukan “only after”, “only by”, atau “only when” tetapi mempertahankan urutan subjek dan kata kerja biasa",
       "reasoningOperationId": "kenali frasa pembatas berawalan “only” yang dimajukan → tentukan tense-nya → hadirkan kata bantu sebelum subjeknya"
     },
     {
@@ -7111,7 +7111,7 @@
         "memoryCueId": "What we needed was X — satu anak kalimat what, satu gagasan tunggal."
       },
       "pedagogicalObjectiveId": "Menyusun kalimat penekanan dengan anak kalimat what sebagai subjek dan bagian yang ditonjolkan setelah bentuk be",
-      "misconceptionTargetedId": "Siswa mencampur pola it-cleft dengan pola anak kalimat what, atau menyesuaikan kata kerjanya dengan kata benda jamak terdekat, bukan dengan seluruh anak kalimat what-nya",
+      "misconceptionTargetedId": "Kamu mencampur pola it-cleft dengan pola anak kalimat what, atau menyesuaikan kata kerjanya dengan kata benda jamak terdekat, bukan dengan seluruh anak kalimat what-nya",
       "reasoningOperationId": "kenali anak kalimat what di awal sebagai satu kesatuan subjek → pilih kesesuaian bentuk tunggal → taruh bagian yang ditonjolkan setelah be"
     },
     {
@@ -7167,7 +7167,7 @@
         "memoryCueId": "Tindakan aktif yang lebih dulu: having reviewed; tindakan pasif yang lebih dulu: having been reviewed."
       },
       "pedagogicalObjectiveId": "Bentuk having reviewed menunjukkan peninjauannya terjadi sebelum penyelidikan dibuka kembali",
-      "misconceptionTargetedId": "Siswa menandai tindakan yang selesai lebih dulu dengan bentuk yang patah — past participle sendirian, kata kerja dasar setelah “having”, atau campuran to + bentuk -ing — alih-alih merangkai pola “having + past participle” secara utuh",
+      "misconceptionTargetedId": "Kamu menandai tindakan yang selesai lebih dulu dengan bentuk yang patah — past participle sendirian, kata kerja dasar setelah “having”, atau campuran to + bentuk -ing — alih-alih merangkai pola “having + past participle” secara utuh",
       "reasoningOperationId": "pastikan komitenya melakukan kedua tindakan itu → tempatkan peninjauannya sebelum pembukaan kembali → tandai tindakan aktif yang lebih dulu dengan having + past participle"
     },
     {
@@ -7223,7 +7223,7 @@
         "memoryCueId": "Much as + subjek + kata kerja bertense berarti walaupun."
       },
       "pedagogicalObjectiveId": "Susunan much as + anak kalimat menyatakan pertentangan dan menuntut kata kerja bertense",
-      "misconceptionTargetedId": "Siswa melengkapi anak kalimat pertentangan setelah “Much as” dengan bentuk yang merusaknya — kata kerja present yang bentrok dengan bingkai lampau, participle menggantung tanpa kata kerja bertense, atau “has appeal” yang bentrok tense sekaligus kolokasinya — alih-alih kata kerja lampau bertense yang dibutuhkan anak kalimat itu",
+      "misconceptionTargetedId": "Kamu melengkapi anak kalimat pertentangan setelah “Much as” dengan bentuk yang merusaknya — kata kerja present yang bentrok dengan bingkai lampau, participle menggantung tanpa kata kerja bertense, atau “has appeal” yang bentrok tense sekaligus kolokasinya — alih-alih kata kerja lampau bertense yang dibutuhkan anak kalimat itu",
       "reasoningOperationId": "kenali “much as” sebagai penghubung pertentangan → tuntut anak kalimat bertense sesudahnya → selaraskan kata kerjanya dengan keputusan dewan yang sudah selesai"
     },
     {
