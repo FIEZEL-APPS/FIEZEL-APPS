@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 29,
-  "generatedAt": "2026-08-25T00:18:33.275Z",
+  "version": 30,
+  "generatedAt": "2026-08-25T00:21:59.182Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "0s3XXk3iKXAW2UBC8qMF",
@@ -3424,6 +3424,18 @@
       "checksum": "cd9c8af4f9606b2225d9da75a8e468f5d0673a9f60fbbde7283f6abadceff09d",
       "sourceRef": "listen_sc_b2_dictation_004",
       "createdAt": "2026-08-25T00:18:33.275Z",
+      "status": "ready"
+    },
+    "9fb6ff51abd98e3c63dd535f8978e203aaf4d0e8de24884eb2c2848ba617be11": {
+      "url": "a/9fb6ff51abd98e3c63dd535f8978e203aaf4d0e8de24884eb2c2848ba617be11.mp3",
+      "contentType": "listening",
+      "locale": "en-US",
+      "voiceId": "0s3XXk3iKXAW2UBC8qMF",
+      "modelId": "eleven_multilingual_v2",
+      "bytes": 323544,
+      "checksum": "f21f0e48cf74a4d860c6b2420763aa124f1e21f16eec9fc525c018c04e2edc81",
+      "sourceRef": "listen_sc_b2_gist_005",
+      "createdAt": "2026-08-25T00:21:58.667Z",
       "status": "ready"
     }
   },
