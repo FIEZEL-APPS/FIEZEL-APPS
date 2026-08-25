@@ -54,6 +54,7 @@ for (const r of bank) {
   const qs = Array.isArray(r.qs) ? r.qs : [];
   if (qs.length !== 5) E(id, `harus 5 soal, ada ${qs.length}`);
 
+  const keysInPassage = new Set();
   const seenType = new Set();
   qs.forEach((q, i) => {
     const qid = `${id}#${i}`;
@@ -73,6 +74,32 @@ for (const r of bank) {
     if (!meta.evidence) E(qid, 'meta.evidence kosong');
     else if (!String(r.text).includes(String(meta.evidence))) E(qid, 'meta.evidence tidak ada PERSIS di dalam teks bacaan');
     if (!meta.patternId) E(qid, 'meta.patternId kosong');
+    // Dua soal berkunci sama dalam satu bacaan berarti murid menghafal satu kalimat,
+    // bukan membaca. Di bank lama ini terjadi di 225 dari 300 bacaan.
+    const keyNorm = norm(opts[ci]);
+    if (keyNorm) { if (keysInPassage.has(keyNorm)) E(qid, 'kuncinya sama persis dengan soal lain di bacaan yang sama'); keysInPassage.add(keyNorm); }
+    // --- KEBENARAN, bukan sekadar bentuk -------------------------------------
+    //
+    // Gerbang lama hanya memastikan meta.evidence ADA di dalam teks. Bank lama lolos
+    // 1.500/1.500 di situ dan tetap rusak: 225 soal punya lebih dari satu opsi yang
+    // sama-sama kalimat verbatim teks (dua-duanya bisa dibela), 75 kunci `reference`
+    // isinya gumpalan kata kunci yang tidak ada di teks sama sekali, dan 225 dari 300
+    // bacaan punya dua soal berkunci identik. Ketiganya diperiksa di sini.
+    const bodyNorm = norm(r.text);
+    const verbatim = opts.filter(o => words(o).length >= 6 && bodyNorm.includes(norm(o)));
+    if (verbatim.length > 1) E(qid, `${verbatim.length} pilihan sama-sama kalimat verbatim dari bacaan — lebih dari satu jawaban bisa dibela`);
+    if (['reference', 'detail'].includes(meta.type) && !bodyNorm.includes(norm(opts[ci]))) {
+      E(qid, `tipe "${meta.type}" tetapi kuncinya tidak ada di dalam teks bacaan`);
+    }
+    // Entitas yang disebut stem harus benar-benar ada di bacaan. Bank lama menyebut
+    // lokasi yang tidak pernah muncul di teks ("In the case at a local food cooperative"
+    // pada bacaan tentang coastal ecology), melatih murid menerima premis palsu.
+    for (const m of String(stem).matchAll(/[“"]([^”"]{4,60})[”"]/g)) {
+      const quoted = norm(m[1]);
+      if (quoted && quoted !== norm(r.title) && !bodyNorm.includes(quoted)) {
+        E(qid, `stem mengutip “${m[1]}” yang tidak ada di bacaan maupun judulnya`);
+      }
+    }
     // Bahasa: stem dan pilihan harus konsisten, tidak boleh separuh Inggris separuh Indonesia.
     const idw = /\b(yang|tidak|karena|dengan|untuk|adalah|pada|dari|itu|ini|bukan|akan|apa|mana|siapa|kapan|mengapa|bagaimana|dalam|oleh)\b/i;
     const enw = /\b(the|of|and|that|this|with|for|because|which|from|their|about)\b/i;
