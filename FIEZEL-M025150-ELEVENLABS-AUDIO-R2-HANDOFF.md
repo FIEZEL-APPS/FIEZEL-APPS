@@ -1,146 +1,197 @@
-# FIEZEL m025-150 — Audio ElevenLabs cache-first di atas Cloudflare R2
+# FIEZEL — Audio ElevenLabs di atas Cloudflare R2
 
-**Status:** pipeline hidup, 127 aset terproduksi, jatah 2026-08 habis. Bukti fisik oleh OWNER
-masih terutang; syaratnya dilepas sebagai WAIVER, bukan bukti.
+**Untuk agen berikutnya.** Berkas ini ditulis supaya kamu tidak perlu menemukan ulang apa pun
+di bawah ini. Baca bagian *Jebakan* sebelum menyentuh kode — empat kegagalan terparah di jalur
+ini semuanya **tidak menampakkan galat apa pun**, dan tidak satu pun tertangkap oleh tes yang
+membaca kode.
 
-**Otoritas:** OWNER memutuskan arsitekturnya (mandat V2, penyimpanan Tier A di R2, bukan
-Puter). MASTER/OWNER yang memegang wewenang rilis; berkas ini tidak memberi wewenang apa pun.
+**Status:** hidup dan berproduksi. 541 aset, 51,4 MB di R2.
+**Otoritas:** OWNER memutuskan arsitektur dan konten. Berkas ini tidak memberi wewenang rilis.
 
 ---
 
-## Keadaan per m025-152
+## 1. Apa yang dibangun
 
-| | |
+Mandat OWNER (`FIEZEL_ElevenLabs_Audio_Architecture_Mandate_V2.pdf`): memutar audio harus
+normalnya berarti mengambil berkas yang sudah disetujui. **Produksi suara baru adalah
+kekecualian yang terjadi di luar aplikasi.** Menekan tombol putar tidak pernah menghabiskan
+kredit — bukan karena disiplin, melainkan karena kode sisi klien memang tidak punya cara
+melakukannya.
+
+```
+Aplikasi → resolver → audioKey → manifest → URL R2 → putar
+                                     ↓ tidak ada
+                                  ABSENT (mesin lama bicara)
+
+Produksi: GitHub Actions → ElevenLabs → validasi → R2 → manifest → commit
+```
+
+## 2. Berkas dan perannya
+
+| Berkas | Peran |
 |---|---|
-| Worker | `https://fiezel-audio.fitrajft.workers.dev`, hanya-baca, `writable: false` |
-| Bucket R2 | `fiezel-audio` |
-| Manifest | v7, **127 aset**, 8,54 MB |
-| Listening A1 | 77 dari 78 skrip unik |
-| Kosakata | 25 kata + 25 kalimat |
-| Jatah 2026-08 | **habis** — 9.482 dari 9.650 karakter |
-| Suara | `KuNebS8MGzRaopODTydg` ("Fizell") |
+| `features/audio-assets/fiezel-audio-key.js` | `audioKey` deterministik. SHA-256 ditulis sendiri, sinkron, identik di browser dan runner. |
+| `features/audio-assets/fiezel-audio-manifest.js` | Indeks resmi. Satu-satunya sumber jawaban "boleh diputar". |
+| `features/audio-assets/fiezel-audio-resolver.js` | Pintu tunggal + pemutar + cache persisten. |
+| `features/neural-voice/fiezel-voice-say.js` | Seam yang dipakai seluruh aplikasi. Aset didahulukan, mesin lama menyusul. |
+| `workers/fiezel-audio-worker.js` | Cloudflare Worker hanya-baca di atas binding R2. |
+| `tools/audio-batch-generate.mjs` | **Satu-satunya tempat kredit bisa terpakai.** |
+| `audio/manifest.json` | Indeks + profil suara + anggaran. Biner TIDAK di sini. |
+| `audio-asset-pipeline-test.js` | 52 gate. Menjalankan modul asli, bukan mencocokkan teks. |
 
-### Tiga jebakan yang sudah ditemukan dan ditutup
+Workflow: `audio-deploy-worker.yml` (deploy Worker + bucket) dan `audio-generate.yml`
+(produksi). Keduanya `workflow_dispatch` saja — ketiadaan pemicu otomatis **adalah** bentuk
+persetujuan manusia yang diminta mandat.
 
-Ketiganya sama bentuknya: **aplikasi tampak sehat, aset tampak siap, dan tidak ada satu pun
-galat** — tetapi tidak ada suara yang keluar. Ketiganya hanya ketahuan dengan menjalankan
-FIEZEL yang sungguhan, bukan dari tes.
+## 3. Keadaan sekarang
+
+Manifest **v42**, `assetBaseUrl` `https://fiezel-audio.fitrajft.workers.dev`.
+
+| Jenis | Siap | Sisa |
+|---|---|---|
+| audiobook (`book`) | **219** | 0 — tuntas |
+| listening | 857 butir / 273 aset | 174 skrip (B1 ke atas) |
+| kosakata (`word` + `sentence`) | 50 | 3.480 |
+| reading (`passage`) | 0 | 300 |
+
+Tujuh profil suara terdaftar; enam punya aset. Katalog memang bersuara macam-macam — OWNER
+menghendakinya.
+
+## 4. Prosedur: OWNER bilang "sudah create token dan voice ID baru"
+
+Ini **rutin**, terjadi tiap bulan saat jatah gratis habis. Langsung kerjakan, tanpa bertanya.
+
+1. OWNER memperbarui `ELEVENLABS_API_KEY` sendiri. **Jangan pernah menerima kunci API lewat
+   chat.** Kunci yang sah diawali `sk_`; ID kunci bukan kunci (pernah tertukar, satu ronde
+   terbuang).
+2. Voice ID bukan rahasia — minta lewat chat, lalu:
+   `gh secret set ELEVENLABS_VOICE_ID --body '<id>'`
+   **Pakai `--body`, jangan pipe.** Pipe PowerShell menambahkan baris baru; itu merusak
+   `CLOUDFLARE_ACCOUNT_ID` dan menghabiskan satu jam untuk didiagnosis.
+3. Suara harus **premade**, bukan dari Voice Library. Akun gratis ditolak `402
+   paid_plan_required` untuk suara library.
+4. Jalankan produksi. Tidak ada flag khusus, tidak ada yang perlu diutak-atik.
+
+```
+gh workflow run audio-generate.yml --ref main -f content=listening -f limit=400 -f apply=APPLY
+```
+
+Ulangi sampai berhenti dengan pesan kuota. Skrip pembantu ada di scratchpad sesi, tetapi
+perintah di atas sudah cukup.
+
+**Kenapa aman:** manifest menyimpan `voiceProfiles` — setiap suara yang pernah dipakai,
+terkini di urutan pertama. Resolver mencoba semuanya, jadi aset bulan-bulan lalu tetap
+terputar. Generator melewati teks yang sudah bersuara di profil **mana pun**, jadi pergantian
+token tidak pernah membeli ulang yang sudah dimiliki.
+
+## 5. Jebakan — baca ini
+
+Empat kegagalan, semuanya berbentuk sama: **aplikasi tampak sehat, aset tampak siap, tidak ada
+galat, dan tidak ada suara.** Semua lolos dari 39 gate yang ada saat itu.
 
 1. **Urutan resolver.** `resolve()` menghitung identitas sebelum memuat manifest, padahal
-   profil suara ada di dalam manifest. Ia menyerah dengan `no_voice_profile`, dan karena
-   menyerah, manifest tidak pernah dimuat — buntu permanen.
-2. **Mode pengambilan.** Lapisan cache persisten memakai `no-cors`; respons opaque memberi
-   blob 0 byte, jadi object URL selalu kosong. `resolve()` tetap `READY`, `play()` menjawab
-   `false`, seluruh katalog jatuh diam-diam ke mesin lama. Diukur: `no-cors` 0 byte, `cors`
-   10.075 byte untuk berkas yang sama.
-3. **Voice ID yang bergeser.** Mengganti token ElevenLabs ikut mengganti voice ID, dan voice
-   ID masuk ke `audioKey`. Dry-run melaporkan `sudah siap: 0` padahal 127 aset ada di R2.
-   Satu jalan `--apply` akan memproduksi ulang semuanya dan menelantarkan yang lama.
-   Dijaga sekarang oleh `compareVoiceWithManifest()`, yang berjalan lokal tanpa API.
+   profil suara ada *di dalam* manifest. Ia menyerah dengan `no_voice_profile`, dan karena
+   menyerah, manifest tidak pernah dimuat. Buntu permanen.
+2. **`mode: 'no-cors'`.** Respons opaque → `.blob()` memberi **0 byte** → object URL null →
+   `play()` false. Terukur: no-cors 0 byte, cors 10.075 byte untuk berkas yang sama. Worker
+   menyajikan `access-control-allow-origin: *`, jadi CORS memang jalur yang benar.
+3. **206 untuk semua permintaan.** R2 mengisi `object.range` bahkan pada pengambilan penuh.
+   Cache API **menolak menyimpan 206**, jadi seluruh cache klien mati diam-diam.
+4. **Voice ID yang bergeser.** Ikut dihitung ke `audioKey`; ganti token, seluruh katalog
+   berhenti ditemukan. Dijawab `voiceProfiles` (bagian 4).
 
-**Pelajaran untuk siapa pun yang melanjutkan:** gate yang membaca kode tidak menangkap satu
-pun dari ketiganya. Yang menangkap adalah menjalankan `resolve()` dan `play()` di aplikasi
-yang benar-benar disajikan, lalu membaca metriknya.
+**Cara memeriksa yang benar-benar bekerja:** buka aplikasi yang sudah ter-deploy, jalankan
+`resolve()` lalu `play()` dari modul asli, dan baca `status().metrics`. Yang menjawab jujur:
+`plays`, `playFailures`, `persistentCacheStores`, `clientGenerations`.
 
----
+Hati-hati saat menguji berturut-turut: `stop()` menyelesaikan elemen sebelumnya sebagai
+kegagalan, sehingga terlihat seperti bug "putaran pertama gagal" yang sebenarnya tidak ada.
+Muat ulang halaman di antara pengukuran.
 
-## Rotasi token: alur tetap, bukan kejadian luar biasa
+## 6. Keputusan rancangan, beserta alasannya
 
-Jatah ElevenLabs habis tiap bulan dan OWNER membuat akun baru — token baru, **voice ID baru**.
-Sejak m025-153 ini tidak lagi merusak apa pun.
-
-**Yang perlu dilakukan saat OWNER bilang "sudah create token dan voice ID baru":**
-
-1. OWNER sendiri memperbarui secret `ELEVENLABS_API_KEY` (kunci API tidak pernah lewat chat).
-2. Pasang voice ID-nya:
-   `gh secret set ELEVENLABS_VOICE_ID --body '<id>'`
-   Gunakan `--body`, **jangan pipe** — pipe PowerShell menambahkan baris baru di ujung, dan
-   itu pernah merusak `CLOUDFLARE_ACCOUNT_ID` selama satu jam penuh.
-3. Jalankan produksi. Tidak ada langkah lain, tidak ada flag khusus.
-
-**Kenapa tidak ada yang perlu diutak-atik:** `audio/manifest.json` menyimpan `voiceProfiles` —
-setiap suara yang pernah dipakai, yang terkini di urutan pertama. Resolver mencoba semuanya,
-jadi aset yang dibayar bulan-bulan lalu tetap terputar berdampingan dengan yang baru.
-Generator melewati teks yang sudah bersuara di profil **mana pun**, jadi pergantian token
-tidak pernah membeli ulang yang sudah dimiliki.
-
-OWNER memang menghendaki variasi suara antar-angkatan konten; itu keputusan produk, bukan
-efek samping yang perlu dirapikan.
-
-**Suara yang sudah dipakai:**
-
-| Voice ID | Catatan |
-|---|---|
-| `KuNebS8MGzRaopODTydg` | akun 1, 127 aset — 77 listening A1 + 50 kosakata |
-| `hZClfFgpVdl548zhrwyC` | akun 2, mulai dipakai m025-153 |
-
----
-
-## Apa yang berubah
-
-Memutar audio kini normalnya berarti mengambil berkas yang sudah disetujui. Produksi suara
-baru adalah kekecualian yang terjadi **di luar aplikasi**, di GitHub Actions, di belakang
-persetujuan manusia.
-
-| Lapisan | Berkas | Peran |
-|---|---|---|
-| Identitas | `features/audio-assets/fiezel-audio-key.js` | `audioKey` deterministik, SHA-256 sinkron yang identik di browser dan runner |
-| Indeks | `features/audio-assets/fiezel-audio-manifest.js` | Satu-satunya sumber jawaban "aset ini boleh diputar" |
-| Resolver | `features/audio-assets/fiezel-audio-resolver.js` | Pintu tunggal; tidak punya jalur apa pun menuju ElevenLabs |
-| Seam | `features/neural-voice/fiezel-voice-say.js` | Menanyakan aset lebih dulu, mesin runtime hanya untuk yang belum ada |
-| Pengantar | `workers/fiezel-audio-worker.js` | Cloudflare Worker hanya-baca di atas binding R2 |
-| Produksi | `tools/audio-batch-generate.mjs` | Satu-satunya tempat kredit bisa terpakai |
-
-## Keputusan yang perlu diingat
-
-**`FIEZEL_AUDIO_CONFIG.voiceId` sengaja kosong.** Selama kosong, resolver menjawab setiap
-permintaan dengan `ABSENT` dan FIEZEL berbunyi persis seperti sebelum rilis ini. Itu yang
-membuat perubahan ini nol-regresi sampai batch pertama berjalan — bukan konfigurasi yang
-lupa diisi. Setelah batch pertama, manifest membawa profil suara yang sebenarnya.
-
-**`contentType` tidak ikut dihitung ke `audioKey`.** Ia label penataan, bukan sesuatu yang
+**`contentType` TIDAK ikut dihitung ke `audioKey`.** Ia label penataan, bukan sesuatu yang
 terdengar. Memasukkannya mewajibkan setiap pemanggil menebak label yang sama persis dengan
 generator — dan tombol pengucapan flashcard sudah membuktikan betapa mudah tebakan itu
-meleset.
+meleset: ia mengirim `sentence` untuk sebuah kata, lalu tidak menemukan MP3 yang sudah dibayar.
 
-**Manifest audio tidak boleh cache-first di service worker.** Batch aset mendarat di antara
-rilis, sedangkan `SHELL_CACHE` hanya berganti saat `SW_REV` naik. Kalau manifest ikut aturan
-shell, setiap kalimat yang baru dibayar terbaca `ABSENT` sampai ada rilis yang tak
-berhubungan. Lihat cabang network-first di `sw.js`.
+**Yang ikut dihitung:** teks kanonik, locale, voiceId, modelId, dan setelan suara. Normalisasi
+membuang spasi ganda, zero-width, nbsp, dan menyeragamkan NFC — tetapi **mempertahankan huruf
+besar dan tanda baca**, karena ketiganya mengubah intonasi.
 
-**Phase E belum dikerjakan.** Tumpukan neural lama (`kokoro`/`sherpa`/VITS) masih utuh.
-Membuangnya sebelum ada satu pun MP3 berarti aplikasi diam total, dan aturan OWNER melarang
-jatuh ke browser TTS.
+**Dry-run adalah bawaan.** Produksi butuh `--apply`, dan workflow butuh input `apply=APPLY`.
 
-## Anggaran
+**Anggaran 2.000 karakter per run** (`audio/manifest.json`). Bukan angka keramat: ia membatasi
+kerusakan satu perintah yang salah pada jatah gratis 10.000.
 
-Sisa kredit OWNER per 2026-08-24: **9.650 karakter** (paket gratis). `audio/manifest.json`
-membatasi **2.000 karakter per run**, jadi satu perintah yang salah tidak bisa menghabiskan
-lebih dari seperlima sisa jatah. Naikkan angka itu hanya kalau paket berbayar aktif.
+**Konten diurutkan menurut level CEFR.** Anggaran selalu terpotong di tengah daftar, jadi yang
+menentukan bukan berapa banyak melainkan **yang mana**. Level yang setengah bersuara lebih
+buruk daripada level yang belum disentuh — murid bertemu butir yang diam di tengah latihan.
 
-## Bukti mesin
+**Aset tidak pernah ditandai siap sebelum terbukti ada:** hasilkan → validasi MP3 → unggah ke
+R2 → **ambil ulang dari R2** → baru catat di manifest. Balasan 200 dari ElevenLabs bukan bukti;
+halaman galat HTML datang sebagai 200 juga.
 
-`audio-asset-pipeline-test.js` — 39/39 PASS. Ia menjalankan resolver yang asli di atas
-manifest dan fetch tiruan, bukan mencocokkan teks: pertanyaan "berapa kali ElevenLabs
-terpanggil kalau seratus orang menekan putar" terletak pada urutan janji yang saling
-menunggu, dan itu hanya terlihat saat dijalankan.
+**R2 diperiksa sebelum memanggil ElevenLabs.** Batch yang terputus setelah unggah berhasil
+tetapi sebelum manifest tersimpan akan dipulihkan gratis — sudah terjadi sekali, 56 aset
+kembali tanpa biaya.
 
-Termasuk gate untuk: 100 pemutaran = 1 aset; 100 cache-miss serentak = 0 produksi; pengguna
-baru tanpa cache memakai ulang berkas yang sama; produksi sukses tetapi penyimpanan gagal
-tidak pernah disajikan; luring tidak pernah mengaku memproduksi; dan tidak ada kunci
-ElevenLabs maupun token GitHub di berkas mana pun yang disajikan ke browser.
+## 7. Aturan konten: hak cipta
 
-## Langkah berikutnya
+Perpustakaan (`features/library/library-books-v1.json`) berisi sembilan buku. Delapan adalah
+retelling FIEZEL dan sudah diproduksi. **`the_little_prince` dikecualikan dari registry.**
 
-1. **OWNER**: token Cloudflare butuh scope `Workers Scripts:Edit` + `Workers R2
-   Storage:Edit` + `Account Settings:Read`. Token R2 ber-scope "Object Read & Write" akan
-   ditolak 403 oleh endpoint REST yang dipakai generator.
-2. **OWNER**: daftarkan subdomain `workers.dev` sekali di dashboard, kalau belum ada.
-3. Jalankan workflow **FIEZEL Audio Worker Deploy** — membuat bucket, deploy Worker, menulis
-   `assetBaseUrl` ke manifest. Nol kredit.
-4. Jalankan **FIEZEL Audio Assets** dengan `apply` kosong (dry-run), baca rencananya, baru
-   ulangi dengan `apply=APPLY`.
-5. **Bukti fisik**: OWNER membuka FIEZEL di perangkat, menekan tombol pengucapan sebuah kata
-   yang ada di batch, dan mendengar suara ElevenLabs. Setelah itu PR boleh keluar dari draft
-   dengan penanda `FIEZEL_PHYSICAL_ACCEPTANCE`.
-6. **Setelah aset terkumpul**: Phase E — cabut jalur neural lama, di PR terpisah.
+Field `source`-nya mengaku retelling FIEZEL, tetapi isinya terjemahan Katherine Woods 1943
+kata per kata — 1.484 kalimat, 93.018 karakter, enam puluh kali lipat entri lain, lengkap
+dengan halaman judul penerjemahnya. Terjemahan itu masih berhak cipta.
+
+Tiga entri lain (Charlotte's Web, The Giving Tree, Matilda) menunjukkan pola yang benar: label
+tegas bahwa teks asli tidak direproduksi, lalu retelling pendek.
+
+Gate `audio-asset-pipeline-test.js` **menjalankan registry** dan membandingkan jumlah kalimat
+yang dipancarkan (219) dengan jumlah kalimat delapan buku. Gate lain membandingkan ukuran entri
+itu dengan retelling terbesar — jadi **begitu teksnya benar-benar diganti retelling, gate itu
+sendiri yang menyala** dan memberi tahu bahwa pengecualiannya boleh dicabut. OWNER memutuskan
+belum menulis retelling-nya (2026-08-24).
+
+## 8. Lingkungan: hal yang akan menggigit
+
+**Jangan menyunting berkas repo lewat `Get-Content -Raw` + `Set-Content`.** PowerShell
+mendekode sebagai CP1252 dan merusak seluruh teks Indonesia beserta `— · … ↑`. Pakai Edit/Write,
+atau `[Text.Encoding]::UTF8.GetString([IO.File]::ReadAllBytes($p))` +
+`[IO.File]::WriteAllBytes($p, [Text.UTF8Encoding]::new($false).GetBytes($s))`.
+Setelah menyunting, pindai dengan `Â|â€|â†|Ã[-¿]`.
+
+Pernah terjadi: dua panah di `fiezel-diag-panel.js` rusak, `diag-search-test.js` mencari tombol
+lewat kecocokan teks persis, gagal — dan karena langkah CI berjalan dengan `bash -e`, satu
+kegagalan itu membuat **tiga gate berbeda** merah dari sebab yang tak terlihat.
+
+**`gh`:** kosongkan `GH_TOKEN` lebih dulu (`if (Test-Path Env:GH_TOKEN) { Remove-Item
+Env:GH_TOKEN }`). Token ambient adalah PAT tanpa izin; auth keyring yang berfungsi.
+
+**Gate A12** menolak setiap PR yang menyentuh berkas audio/voice kecuali badan PR memuat baris
+`<!-- FIEZEL_PHYSICAL_ACCEPTANCE: WAIVED_BY_OWNER -->` atau PR berstatus draft. **Gate A13**
+menuntut berkas `*HANDOFF.md` ikut berubah untuk setiap perubahan di `features/neural-voice/`.
+
+**Penanda build** (`core-config.js`, `fiezel-diag-panel.js`, `sw.js`) wajib naik tepat +1
+bersama-sama untuk setiap perubahan pada berkas yang ikut di-precache shell — termasuk
+`fiezel-audio-*.js`. Tanpa itu perangkat yang sudah terpasang terus memakai salinan lama.
+
+**Gate yang memindai teks sumber akan menghukum komentar yang menjelaskan hal yang dilarang.**
+Sudah terjadi dua kali. Buang komentar sebelum memindai, atau lebih baik: periksa perilaku,
+bukan teks.
+
+## 9. Berikutnya
+
+Urutan yang disarankan, termurah dan paling terpakai lebih dulu:
+
+1. **Kosakata — kata saja** (1.740 item, ~13.500 karakter). ~7,7 karakter per item, unit
+   pedagogis termurah di repo; murid menekan tombol pengucapan flashcard terus-menerus.
+2. **Listening B1 ke atas** (174 skrip). A1 dan A2 sudah tuntas.
+3. **Kalimat contoh kosakata** (~74.000 karakter).
+4. **Reading** (300 bacaan, ~117.000 karakter) — paling mahal, paling tidak bergantung audio.
+
+Yang belum ada dan mungkin berguna: pembacaan sisa kuota di awal/akhir tiap batch
+([PR #215](https://github.com/fitrajft-ux/FIEZEL-APPS/pull/215), belum ditinjau), dan
+pembuangan tumpukan neural lama (Phase E mandat) — yang terakhir hanya masuk akal setelah
+cakupan audio jauh lebih luas, karena aturan OWNER melarang jatuh ke browser TTS.
