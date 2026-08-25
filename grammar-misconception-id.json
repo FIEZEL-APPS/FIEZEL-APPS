@@ -91,7 +91,7 @@
     "Uses 'in case' (precaution for a possible future event) instead of a condition of permission.": "memakai penghubung untuk berjaga-jaga, padahal yang dimaksud syarat yang harus dipenuhi.",
     "Uses 'was' instead of the subjunctive 'were' required in formal hypothetical inversion.": "memakai 'was', padahal andai-andai bentuk formal memakai 'were' untuk semua subjek.",
     "Uses a concessive connector implying the condition doesn't matter to the outcome.": "memakai penghubung yang justru menyatakan syaratnya tidak berpengaruh, padahal di sini syaratnya wajib.",
-    "uses a past form without the modal required in the result clause": "memakai past simple polos “weren’t”, padahal klausa akibat mixed conditional ini butuh modal “would” untuk menandai andai-andainya.",
+    "uses a past form without the modal required in the result clause": "memakai past simple polos 'weren’t', padahal klausa akibat mixed conditional ini butuh modal 'would' untuk menandai andai-andainya.",
     "uses a zero/first-conditional present form for a past unreal situation": "memakai bentuk untuk syarat nyata, padahal yang dibahas andai-andai tentang masa lampau.",
     "Uses ordinary past simple negative instead of the subjunctive 'weren't' required in hypothetical conditionals.": "memakai bentuk lampau biasa, padahal klausa andai-andai formal memakai 'were' untuk semua subjek.",
     "Uses present tense, missing that the condition is hypothetical/unreal, not a real current fact.": "memakai bentuk kini, sehingga terbaca sebagai fakta nyata, bukan syarat andai-andai.",
@@ -115,7 +115,7 @@
     "subject pronoun": "memakai kata ganti subjek, padahal posisi ini butuh bentuk kepemilikan untuk menerangkan kata benda sesudahnya.",
     "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'.": "menaruh kata negatif di depan tanpa auxiliary sama sekali, jadi inversinya hilang dan bentuk pengalamannya juga belum tepat.",
     "Fronts 'such' but fails to invert the verb 'was' before the subject.": "sudah menaruh penegas di depan, tetapi lupa membalik kata kerja dan subjeknya.",
-    "Fronts the emphasized noun before the cleft frame entirely.": "menaruh kata benda yang ditonjolkan bahkan sebelum kata “it”, sehingga kalimatnya tidak lagi dibuka kerangka wajib “It was”.",
+    "Fronts the emphasized noun before the cleft frame entirely.": "menaruh kata benda yang ditonjolkan bahkan sebelum kata 'it', sehingga kalimatnya tidak lagi dibuka kerangka wajib 'It was'.",
     "Fronts the negative adverbial without applying the required subject-auxiliary inversion.": "memajukan keterangan negatifnya, tetapi kata bantu “have” yang sudah ada dibiarkan tak berpindah di belakang subjek.",
     "Keeps normal subject-first order and misplaces 'such' mid-sentence.": "mempertahankan urutan biasa dan menaruh penegasnya di tengah, padahal pola ini menuntutnya di awal kalimat.",
     "Misorders the fixed cleft frame, inserting the emphasized element before 'was'.": "memecah kerangka cleft yang seharusnya utuh, dengan menyisipkan bagian yang ditegaskan di tengahnya.",
@@ -268,7 +268,6 @@
     "time preposition confused with deadline preposition": "memakai preposisi tenggat 'paling lambat', sehingga maknanya berubah, bukan sekadar menunjuk harinya.",
     "Transfers the preposition pattern from a related phrase like 'search for' onto 'solution'.": "memindahkan preposisi dari ungkapan yang mirip, padahal kata benda ini punya pasangan tetap sendiri.",
     "Treats modes of transport as tools/instruments requiring 'with'.": "memperlakukan kendaraan seperti alat yang dipegang, padahal cara berpergian memakai preposisi yang lain.",
-    "uses 'on' for a point location and 'in' for a street name": "memakai preposisi permukaan untuk sebuah titik, dan preposisi ruang untuk nama jalan; keduanya tertukar.",
     "uses the broader situation-focused pattern instead of directly evaluating the result": "memakai pola yang menyorot keadaan secara umum, padahal soal meminta bentuk yang langsung menilai hasilnya.",
     "Uses the conjunction 'while' where a preposition is grammatically required before a noun phrase.": "memakai kata sambung yang menuntut klausa, padahal sesudahnya hanya frasa benda.",
     "using the above-and-across preposition for movement inside a space, not above it": "memakai preposisi 'melewati bagian atas', padahal terowongan dilalui dari dalamnya.",
@@ -303,7 +302,7 @@
     "keeps the unreduced full relative clause when a reduced participle phrase is the target structure being tested": "mempertahankan klausa lengkapnya; sah secara tata bahasa, tetapi soal ini menguji bentuk ringkasnya.",
     "reverses the preposition-pronoun order, putting 'with' directly after 'who' mid-clause": "membalik urutannya sehingga kata depannya jatuh tepat setelah “who” di tengah kalimat — susunan yang tidak sah di ragam mana pun.",
     "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things.": "menawarkan dua kata ganti sekaligus, padahal di posisi ini kata gantinya justru boleh dihilangkan.",
-    "Reverses the order of quantifier and relative pronoun.": "menaruh kata penghubung sebelum kata jumlah seperti pada “which many”, padahal pola tetapnya menempatkan kata jumlah lebih dulu — dan “which” pun tidak bisa menunjuk orang.",
+    "Reverses the order of quantifier and relative pronoun.": "menaruh kata penghubung sebelum kata jumlah seperti pada 'which many', padahal pola tetapnya menempatkan kata jumlah lebih dulu — dan 'which' pun tidak bisa menunjuk orang.",
     "Scrambles the word order of the fixed quantifier + of + whom structure.": "mengacak urutan pola yang sebenarnya sudah baku.",
     "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error.": "memakai kata tanya sebagai penghubung, padahal setelah kata benda yang diterangkan bentuknya berbeda.",
     "Uses a personal pronoun 'them' instead of a relative pronoun, which cannot join two clauses.": "memakai kata ganti orang biasa, padahal yang menyambung dua klausa harus kata ganti penghubung.",
@@ -406,7 +405,7 @@
     "container-reading": "memilih kata depan seolah-olah lokasi berada di dalam wadah, padahal maksudnya titik atau permukaan.",
     "point-location-overuse": "memakai kata depan untuk titik lokasi, padahal hubungan buku dengan mejanya adalah benda di atas sebuah permukaan.",
     "movement-preposition-substitution": "memilih kata depan gerak yang tidak menunjukkan jalur perpindahan dalam kalimat.",
-    "bare-verb-without-auxiliary": "memakai kata kerja bentuk dasar tanpa kata bantu “is” yang wajib hadir pada pola present continuous.",
+    "bare-verb-without-auxiliary": "memakai kata kerja bentuk dasar tanpa kata bantu 'is' yang wajib hadir pada pola present continuous.",
     "present-simple-habit": "membaca kejadian yang sedang berlangsung sebagai kebiasaan rutin, bukan tindakan yang terlihat sekarang.",
     "missing-be-auxiliary": "menghilangkan kata bantu penghubung yang dibutuhkan sebelum pelaku atau keterangan dalam pola ini.",
     "thing-question substitution": "memakai kata tanya benda, padahal informasi yang diminta kalimat ini adalah tempat.",
@@ -418,6 +417,7 @@
     "subject-pronoun-before-noun": "memakai kata ganti pelaku sebelum kata benda, padahal posisi itu membutuhkan penentu kepemilikan.",
     "stand-alone-possessive-before-noun": "memakai bentuk kepemilikan mandiri tepat sebelum kata benda yang masih harus diterangkan.",
     "object-pronoun-substitution": "memakai kata ganti objek di depan kata benda, padahal posisi sebelum kata benda seperti “name” membutuhkan kata sifat kepemilikan.",
-    "movement preposition used for a static location": "memakai preposisi perpindahan untuk menyatakan posisi yang diam."
+    "movement preposition used for a static location": "memakai preposisi perpindahan untuk menyatakan posisi yang diam.",
+    "treats a route point as a surface in the first slot": "memperlakukan titik pada rute sebagai permukaan, sehingga celah pertamanya sudah keliru sebelum nama jalannya sempat dinilai."
   }
 }
