@@ -1,0 +1,1842 @@
+[
+  {
+    "id": "r0151",
+    "level": "B2",
+    "title": "The Return of the Night Train",
+    "text": "Across Europe, sleeper trains that were written off as relics two decades ago are being rebuilt, and the arguments used to bury them are now being used to revive them. Operators once claimed that no traveller would trade a ninety-minute flight for eleven hours in a bunk. What they underestimated was how much of a short-haul journey is spent not flying: the airport transfer, the queue, the wait. If those hours were counted honestly, the night train would already have looked competitive. Critics respond, fairly, that sleeper carriages are expensive to run, since a bed sells once while an aircraft seat may sell four times a day. Subsidy, then, is unavoidable, and the honest question is not whether the state should pay but what it is paying for. A government that taxes aviation fuel while starving the railway is not neutral; it has simply chosen a slower kind of subsidy. Night trains may never carry the majority of travellers. They tend, however, to change what the majority considers normal, and that shift is worth buying.",
+    "qs": [
+      [
+        "Gagasan utama editorial ini adalah...",
+        [
+          "Sleeper trains are returning, and the arguments once used against them now support them",
+          "Air travel has become slower than rail on every European route",
+          "Governments should withdraw support from all forms of transport",
+          "Sleeper carriages are cheaper to operate than aircraft"
+        ],
+        0,
+        {
+          "type": "main_idea",
+          "evidence": "are being rebuilt, and the arguments used to bury them are now being used to revive them",
+          "answer": "Sleeper trains are returning, and the arguments once used against them now support them",
+          "patternId": "b2-151-main-idea"
+        }
+      ],
+      [
+        "Menurut editorial, mengapa penerbangan jarak pendek kurang cepat daripada yang terlihat?",
+        [
+          "Because sleeper carriages have suddenly become far cheaper to operate",
+          "Because European airports have raised their landing fees",
+          "Because much of the journey is spent on transfers, queues and waiting rather than in the air",
+          "Because most travellers now say they prefer sleeping in bunks"
+        ],
+        2,
+        {
+          "type": "cause_effect",
+          "evidence": "how much of a short-haul journey is spent not flying",
+          "answer": "Because much of the journey is spent on transfers, queues and waiting rather than in the air",
+          "patternId": "b2-151-cause-effect"
+        }
+      ],
+      [
+        "Bukti mana yang dipakai penulis untuk menunjukkan bahwa kereta malam mahal dijalankan?",
+        [
+          "Night trains may never carry the majority of travellers",
+          "A government that taxes aviation fuel is not neutral",
+          "The airport transfer, the queue and the wait consume hours",
+          "A bed sells once while an aircraft seat may sell four times a day"
+        ],
+        3,
+        {
+          "type": "evidence",
+          "evidence": "a bed sells once while an aircraft seat may sell four times a day",
+          "answer": "A bed sells once while an aircraft seat may sell four times a day",
+          "patternId": "b2-151-evidence"
+        }
+      ],
+      [
+        "Ungkapan a slower kind of subsidy dalam teks paling dekat maknanya dengan...",
+        [
+          "a payment that arrives after a long delay",
+          "an indirect form of support created by leaving one sector starved",
+          "a tax charged on aviation fuel",
+          "a discount offered to regular rail passengers"
+        ],
+        1,
+        {
+          "type": "vocabulary_context",
+          "evidence": "it has simply chosen a slower kind of subsidy",
+          "answer": "an indirect form of support created by leaving one sector starved",
+          "patternId": "b2-151-vocabulary-context"
+        }
+      ],
+      [
+        "Tujuan penulis pada paragraf penutup adalah...",
+        [
+          "to prove that night trains will soon replace aircraft entirely",
+          "to list the technical faults of modern sleeper carriages",
+          "to argue that the value of night trains lies in shifting expectations rather than in market share",
+          "to describe the timetables of several European operators"
+        ],
+        2,
+        {
+          "type": "author_purpose",
+          "evidence": "to change what the majority considers normal",
+          "answer": "to argue that the value of night trains lies in shifting expectations rather than in market share",
+          "patternId": "b2-151-author-purpose"
+        }
+      ]
+    ],
+    "topic": "transport-policy",
+    "author": "Elena Marchetti",
+    "setting": "European rail editorial desk",
+    "focus": "argument-and-concession"
+  },
+  {
+    "id": "r0152",
+    "level": "B2",
+    "title": "Forty Dutch Words",
+    "text": "A study carried out at a university in Freiburg tested a claim that language teachers have repeated for years: that new vocabulary is consolidated during sleep. Sixty adult learners were taught forty Dutch words in the evening. Half were allowed to sleep for eight hours; the others stayed awake and were tested at the same clock time the following morning, so that fatigue was distributed evenly across both groups. The sleepers recalled roughly twenty per cent more items. What the researchers regard as the more interesting result, however, concerns which words survived. Items that had been linked to an existing German cognate were retained almost equally by both groups, while isolated, unfamiliar forms benefited most from sleep. This suggests that sleep may not strengthen memory in general so much as rescue material that has nothing else to hold on to. The authors are cautious. A single laboratory night with young, motivated volunteers tells us little about a teenager revising for an examination after four nights of five hours.",
+    "qs": [
+      [
+        "Bagaimana peneliti mencegah kelelahan mengacaukan hasil?",
+        [
+          "By teaching both groups their word list in the morning instead",
+          "By testing both groups at the same clock time the following morning",
+          "By selecting only participants who normally sleep badly",
+          "By removing every word that resembled a German cognate"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "were tested at the same clock time the following morning",
+          "answer": "By testing both groups at the same clock time the following morning",
+          "patternId": "b2-152-detail"
+        }
+      ],
+      [
+        "Apa perbedaan hasil antara kata bercognate dan kata yang terasing?",
+        [
+          "Cognates were forgotten far faster than isolated forms in both groups",
+          "Isolated forms were retained equally well with or without sleep",
+          "Cognates survived almost equally in both groups, while isolated forms gained most from sleep",
+          "Sleep made no measurable difference to either category of word"
+        ],
+        2,
+        {
+          "type": "comparison",
+          "evidence": "while isolated, unfamiliar forms benefited most from sleep",
+          "answer": "Cognates survived almost equally in both groups, while isolated forms gained most from sleep",
+          "patternId": "b2-152-comparison"
+        }
+      ],
+      [
+        "Dari hasil itu, apa yang mungkin disimpulkan tentang cara kerja tidur?",
+        [
+          "Sleep may act less as a general strengthener than as a rescue for unsupported material",
+          "Sleep improves every kind of memory by exactly the same proportion",
+          "Sleep helps only those learners who already speak German",
+          "Sleep removes the need for any repetition of new words"
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "rescue material that has nothing else to hold on to",
+          "answer": "Sleep may act less as a general strengthener than as a rescue for unsupported material",
+          "patternId": "b2-152-inference"
+        }
+      ],
+      [
+        "Nada penulis pada bagian penutup paling tepat digambarkan sebagai...",
+        [
+          "triumphant about a settled finding",
+          "dismissive of all sleep research",
+          "guarded about how far the result can travel",
+          "openly hostile towards the research team"
+        ],
+        2,
+        {
+          "type": "tone",
+          "evidence": "The authors are cautious.",
+          "answer": "guarded about how far the result can travel",
+          "patternId": "b2-152-tone"
+        }
+      ],
+      [
+        "Mengapa penulis menyebut remaja yang belajar setelah empat malam tidur lima jam?",
+        [
+          "To recommend five hours of sleep before an examination",
+          "To show how far the laboratory condition sits from real revision",
+          "To prove that teenagers learn Dutch faster than adults do",
+          "To criticise the university that ran the experiment"
+        ],
+        1,
+        {
+          "type": "purpose",
+          "evidence": "tells us little about a teenager revising for an examination",
+          "answer": "To show how far the laboratory condition sits from real revision",
+          "patternId": "b2-152-purpose"
+        }
+      ]
+    ],
+    "topic": "memory-research",
+    "author": "Ingrid Halvorsen",
+    "setting": "sleep laboratory, Freiburg",
+    "focus": "reading-a-study-summary"
+  },
+  {
+    "id": "r0153",
+    "level": "B2",
+    "title": "Week Three on the Mudflat",
+    "text": "Notes from the eastern edge of the delta, week three. The plantation we were shown last year has thinned badly. Of the seedlings pushed into the mud in 2019, perhaps one in five is still standing, and the survivors are clustered where a creek keeps the sediment soft. Villagers had warned the contractors about the site. Mangroves are not a single crop; each species tolerates a narrow band of salt and tide, and the fast-growing variety chosen for the photographs was planted well above the line where it can breathe. Had the planners walked the mudflat at low tide with the fishers, the failure would have been obvious before a single seedling was ordered. What is striking is that the restoration is still recorded as complete. Hectares planted, not hectares surviving, is the figure the funding cycle rewards. Two kilometres north, where no money was spent and grazing was simply banned, the forest has closed over on its own. That contrast is uncomfortable, and it is the one the final report will probably omit.",
+    "qs": [
+      [
+        "Mengapa sebagian besar bibit di lokasi tanam itu mati?",
+        [
+          "Because villagers pulled the young trees out of the mud",
+          "Because the species chosen was planted above the tidal line it can tolerate",
+          "Because the creek washed all of the sediment away",
+          "Because grazing animals were banned far too late"
+        ],
+        1,
+        {
+          "type": "why",
+          "evidence": "was planted well above the line where it can breathe",
+          "answer": "Because the species chosen was planted above the tidal line it can tolerate",
+          "patternId": "b2-153-why"
+        }
+      ],
+      [
+        "Apa akibat dari cara pendanaan proyek ini diukur?",
+        [
+          "A failed planting is still recorded as complete, because area planted is what earns reward",
+          "Contractors are paid only after five years of monitoring",
+          "Local fishers are hired to plant every seedling themselves",
+          "Funders now prefer natural regeneration in every delta"
+        ],
+        0,
+        {
+          "type": "cause_effect",
+          "evidence": "Hectares planted, not hectares surviving, is the figure the funding cycle rewards.",
+          "answer": "A failed planting is still recorded as complete, because area planted is what earns reward",
+          "patternId": "b2-153-cause-effect"
+        }
+      ],
+      [
+        "Perbandingan lokasi tanam dengan lokasi dua kilometer di utara menunjukkan bahwa...",
+        [
+          "spending money on planting guarantees a denser forest",
+          "the unfunded site recovered while the planted site thinned",
+          "both sites failed for exactly the same reason",
+          "grazing animals improved seedling survival"
+        ],
+        1,
+        {
+          "type": "comparison",
+          "evidence": "the forest has closed over on its own",
+          "answer": "the unfunded site recovered while the planted site thinned",
+          "patternId": "b2-153-comparison"
+        }
+      ],
+      [
+        "Kesimpulan yang paling didukung catatan lapangan ini adalah...",
+        [
+          "Mangrove restoration should never receive public money",
+          "Photographs are the most reliable record of restoration work",
+          "Measuring the wrong quantity can make a failed project look successful",
+          "The delta is unsuitable for any species of mangrove"
+        ],
+        2,
+        {
+          "type": "conclusion",
+          "evidence": "the restoration is still recorded as complete",
+          "answer": "Measuring the wrong quantity can make a failed project look successful",
+          "patternId": "b2-153-conclusion"
+        }
+      ],
+      [
+        "Apa yang kemungkinan besar dilakukan laporan akhir proyek?",
+        [
+          "It will leave the uncomfortable comparison out",
+          "It will recommend banning grazing across the whole delta",
+          "It will name the villagers who warned the contractors",
+          "It will return the unspent funding to the donor"
+        ],
+        0,
+        {
+          "type": "likely",
+          "evidence": "it is the one the final report will probably omit",
+          "answer": "It will leave the uncomfortable comparison out",
+          "patternId": "b2-153-likely"
+        }
+      ]
+    ],
+    "topic": "restoration-ecology",
+    "author": "Prosenjit Barua",
+    "setting": "delta fieldwork notebook",
+    "focus": "field-report-inference"
+  },
+  {
+    "id": "r0154",
+    "level": "B2",
+    "title": "A Wage Floor, Discussed",
+    "text": "Q: For decades the textbooks said that a higher minimum wage destroys jobs. Has that changed?\nA: The textbook prediction assumed an employer who can hire as many workers as she likes at the going rate. In many towns there are only two or three large employers, and they set the rate rather than accept it. Under those conditions a modest rise can increase employment, because more people are willing to take the job at all.\nQ: The word modest is doing a great deal of work in that sentence.\nA: It is, deliberately. Nobody serious claims the effect holds at any level. If the floor were raised to twice the median wage tomorrow, I would expect closures, and anyone who told you otherwise would be selling something.\nQ: Then why is the debate still so bitter?\nA: Partly because both sides quote studies from different labour markets as though they described the same country. And partly because the losses, when they come, fall on people who never appear in the average. A restaurant that never opens employs nobody, and nobody counts it.",
+    "qs": [
+      [
+        "Hubungan antara jumlah pemberi kerja besar di sebuah kota dan efek upah minimum adalah...",
+        [
+          "Where only a few employers dominate, a moderate rise can raise employment",
+          "Where only a few employers dominate, any rise destroys jobs at once",
+          "The number of employers has no bearing on wages at all",
+          "More employers in a town always means lower wages for workers"
+        ],
+        0,
+        {
+          "type": "relationship",
+          "evidence": "a modest rise can increase employment",
+          "answer": "Where only a few employers dominate, a moderate rise can raise employment",
+          "patternId": "b2-154-relationship"
+        }
+      ],
+      [
+        "Ungkapan would be selling something dalam wawancara ini berarti...",
+        [
+          "would be offering customers a discount",
+          "would be advertising a commercial product",
+          "would have some motive other than accuracy",
+          "would be quoting directly from a textbook"
+        ],
+        2,
+        {
+          "type": "vocabulary_context",
+          "evidence": "anyone who told you otherwise would be selling something",
+          "answer": "would have some motive other than accuracy",
+          "patternId": "b2-154-vocabulary-context"
+        }
+      ],
+      [
+        "Apa yang menurut narasumber akan terjadi jika upah minimum dinaikkan menjadi dua kali upah median?",
+        [
+          "Employment would rise sharply within a year",
+          "He would expect businesses to close",
+          "Nothing measurable would change in the labour market",
+          "Only the largest firms in each town would benefit"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "I would expect closures",
+          "answer": "He would expect businesses to close",
+          "patternId": "b2-154-detail"
+        }
+      ],
+      [
+        "Detail mana yang menjelaskan mengapa kerugian sering tidak terlihat dalam statistik?",
+        [
+          "Both sides quote studies from different labour markets",
+          "Textbooks assume an employer who can hire freely",
+          "More people become willing to take the job at all",
+          "A restaurant that never opens employs nobody, and nobody counts it"
+        ],
+        3,
+        {
+          "type": "supporting_detail",
+          "evidence": "A restaurant that never opens employs nobody, and nobody counts it.",
+          "answer": "A restaurant that never opens employs nobody, and nobody counts it",
+          "patternId": "b2-154-supporting-detail"
+        }
+      ],
+      [
+        "Sikap narasumber terhadap kedua kubu perdebatan adalah...",
+        [
+          "wholly supportive of those who want higher wages",
+          "critical of the carelessness he sees on both sides",
+          "indifferent to whatever the evidence shows",
+          "convinced that the question cannot be studied at all"
+        ],
+        1,
+        {
+          "type": "tone",
+          "evidence": "both sides quote studies from different labour markets as though they described the same country",
+          "answer": "critical of the carelessness he sees on both sides",
+          "patternId": "b2-154-tone"
+        }
+      ]
+    ],
+    "topic": "labour-economics",
+    "author": "Tomas Ruiz",
+    "setting": "magazine interview transcript",
+    "focus": "following-a-dialogue"
+  },
+  {
+    "id": "r0155",
+    "level": "B2",
+    "title": "Nostalgia as an Instrument",
+    "text": "Every studio executive now knows that the safest film to finance is one the audience has already seen. Remakes and sequels reduce the terrifying question of whether anyone wants this to the manageable question of whether anyone remembers it. The result is not, as the angrier critics insist, a collapse in imagination. Craft is often superb; the money is on the screen. What has narrowed is the range of things a mainstream film is permitted to be about. A story that arrives with no prior audience must earn attention from nothing, and attention has become the scarcest input in the industry. If risk were spread across a whole slate, as it once was, a studio could absorb four failures for one surprise. Streaming has made that arithmetic harder to defend to shareholders who can watch cancellation figures by the hour. Nostalgia, then, is less a taste than a financing instrument. Audiences are blamed for wanting the familiar, yet they are rarely offered a comparable budget attached to anything else, and preference measured under those conditions tells us very little.",
+    "qs": [
+      [
+        "Gagasan utama tulisan ini adalah...",
+        [
+          "Modern films are made with far less skill than older ones",
+          "Nostalgia in cinema is driven mainly by financing logic rather than by public taste",
+          "Audiences have genuinely lost interest in original stories",
+          "Streaming companies make better remakes than the old studios did"
+        ],
+        1,
+        {
+          "type": "main_idea",
+          "evidence": "Nostalgia, then, is less a taste than a financing instrument.",
+          "answer": "Nostalgia in cinema is driven mainly by financing logic rather than by public taste",
+          "patternId": "b2-155-main-idea"
+        }
+      ],
+      [
+        "Kalimat the money is on the screen paling tepat diparafrasekan sebagai...",
+        [
+          "the budget is visibly reflected in the production quality",
+          "cinema tickets have become far more expensive",
+          "profits are announced publicly before release",
+          "actors are paid before filming begins"
+        ],
+        0,
+        {
+          "type": "paraphrase",
+          "evidence": "Craft is often superb; the money is on the screen.",
+          "answer": "the budget is visibly reflected in the production quality",
+          "patternId": "b2-155-paraphrase"
+        }
+      ],
+      [
+        "Bagaimana penulis menjelaskan berkurangnya keberanian studio?",
+        [
+          "By claiming that directors have lost their technical skills",
+          "By showing that audiences vote against every new story",
+          "By arguing that risk can no longer be spread across a slate of films",
+          "By comparing cinema with television drama of the same period"
+        ],
+        2,
+        {
+          "type": "how",
+          "evidence": "a studio could absorb four failures for one surprise",
+          "answer": "By arguing that risk can no longer be spread across a slate of films",
+          "patternId": "b2-155-how"
+        }
+      ],
+      [
+        "Pernyataan: Penulis menganggap film remake dibuat dengan keterampilan rendah. Pernyataan ini...",
+        [
+          "is true and stated directly in the text",
+          "is false, since the writer says the craft is often superb",
+          "is true, but only where sequels are concerned",
+          "is never mentioned anywhere in the passage"
+        ],
+        1,
+        {
+          "type": "true_false_not_stated",
+          "evidence": "Craft is often superb",
+          "answer": "is false, since the writer says the craft is often superb",
+          "patternId": "b2-155-true-false-not-stated"
+        }
+      ],
+      [
+        "Kesimpulan penulis tentang selera penonton adalah...",
+        [
+          "Audience preference is meaningless in every possible context",
+          "Audiences deserve most of the blame for repetitive films",
+          "Preference measured when only familiar titles get large budgets proves little",
+          "Audiences would certainly reject an original film with a large budget"
+        ],
+        2,
+        {
+          "type": "conclusion",
+          "evidence": "preference measured under those conditions tells us very little",
+          "answer": "Preference measured when only familiar titles get large budgets proves little",
+          "patternId": "b2-155-conclusion"
+        }
+      ]
+    ],
+    "topic": "film-industry",
+    "author": "Dalia Ferreira",
+    "setting": "culture column",
+    "focus": "critical-reading"
+  },
+  {
+    "id": "r0156",
+    "level": "B2",
+    "title": "Inside the Sandstone Mountain",
+    "text": "Cut into a sandstone mountain on a Norwegian island, the Svalbard Global Seed Vault is often described as a doomsday store, a phrase its staff quietly dislike. The vault holds duplicates. Each box remains the property of the gene bank that deposited it, and only that depositor may withdraw it, which makes the building less an ark than a safety deposit facility for agriculture. Its first withdrawal, in 2015, followed not a meteor or a plague but a civil war that cut researchers off from their collection in Aleppo. Those seeds were multiplied in Lebanon and Morocco and then redeposited, which is exactly how the system is meant to work. Permafrost was expected to keep the chambers cold without power. Warming has already forced the installation of mechanical cooling and a waterproofed entrance tunnel, an irony noted by every journalist who visits. The vault protects against a narrow set of risks. Whether crop diversity survives depends far more on the underfunded national gene banks whose losses it can only mirror, never prevent.",
+    "qs": [
+      [
+        "Apa fungsi utama brankas benih ini menurut teks?",
+        [
+          "To store duplicate collections that only the depositor may withdraw",
+          "To gather every seed variety on earth for open public use",
+          "To breed new crop varieties suited to the Norwegian climate",
+          "To replace national gene banks that are running out of money"
+        ],
+        0,
+        {
+          "type": "purpose",
+          "evidence": "only that depositor may withdraw it",
+          "answer": "To store duplicate collections that only the depositor may withdraw",
+          "patternId": "b2-156-purpose"
+        }
+      ],
+      [
+        "Urutan peristiwa penarikan pertama yang benar adalah...",
+        [
+          "seeds redeposited, then war, then a withdrawal request",
+          "war cut off the Aleppo collection, seeds were withdrawn, multiplied abroad, then redeposited",
+          "a meteor warning, then withdrawal, then replanting in Aleppo",
+          "withdrawal, then war, then the failure of the permafrost"
+        ],
+        1,
+        {
+          "type": "sequence",
+          "evidence": "Those seeds were multiplied in Lebanon and Morocco and then redeposited",
+          "answer": "war cut off the Aleppo collection, seeds were withdrawn, multiplied abroad, then redeposited",
+          "patternId": "b2-156-sequence"
+        }
+      ],
+      [
+        "Apa yang terpaksa dipasang akibat pemanasan?",
+        [
+          "A second and larger sandstone chamber",
+          "A duplicate vault built in Lebanon",
+          "Mechanical cooling and a waterproofed entrance tunnel",
+          "A public exhibition centre for visiting journalists"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "forced the installation of mechanical cooling and a waterproofed entrance tunnel",
+          "answer": "Mechanical cooling and a waterproofed entrance tunnel",
+          "patternId": "b2-156-detail"
+        }
+      ],
+      [
+        "Kata it dalam frasa losses it can only mirror merujuk pada...",
+        [
+          "the Syrian collection held in Aleppo",
+          "the permafrost surrounding the chambers",
+          "the national gene banks mentioned earlier",
+          "the vault itself"
+        ],
+        3,
+        {
+          "type": "reference",
+          "evidence": "whose losses it can only mirror, never prevent",
+          "answer": "the vault itself",
+          "patternId": "b2-156-reference"
+        }
+      ],
+      [
+        "Mengapa penulis menyebut bahwa staf tidak menyukai istilah doomsday store?",
+        [
+          "To show that the real function of the vault is narrower than its popular image",
+          "To argue that the vault ought to be closed to visitors",
+          "To criticise the officials who approved the building",
+          "To explain how the entrance tunnel was constructed"
+        ],
+        0,
+        {
+          "type": "author_purpose",
+          "evidence": "a phrase its staff quietly dislike",
+          "answer": "To show that the real function of the vault is narrower than its popular image",
+          "patternId": "b2-156-author-purpose"
+        }
+      ]
+    ],
+    "topic": "seed-conservation",
+    "author": "Karin Lund",
+    "setting": "Svalbard, Norway",
+    "focus": "institution-profile"
+  },
+  {
+    "id": "r0157",
+    "level": "B2",
+    "title": "Two Ways to Open a Book",
+    "text": "Two philosophies have fought over the teaching of reading for half a century. The first treats decoding as the core task: children are taught the relationship between letters and sounds systematically, in a fixed order, before meaning is emphasised. The second treats reading as the pursuit of meaning, with children guessing unfamiliar words from pictures and context, on the assumption that decoding will follow naturally, as speech does. Large reviews now favour the first approach for beginners, particularly for children who arrive at school with small vocabularies and nobody at home to read with them. That finding is often reported as a total victory, which it is not. Systematic phonics reliably gets children off the page and into words; it does not by itself produce readers who understand what they have decoded. Comprehension depends on background knowledge that no phonics programme supplies. The strongest classrooms borrow from both traditions, and the fiercest advocates on either side tend to be arguing about a stage of learning rather than about reading as a whole.",
+    "qs": [
+      [
+        "Perbedaan pokok antara dua pendekatan itu adalah...",
+        [
+          "one teaches letter and sound relations systematically, the other treats guessing meaning as primary",
+          "one is used in primary schools while the other belongs to universities",
+          "one uses printed books while the other uses pictures alone",
+          "one is fifty years old while the other appeared very recently"
+        ],
+        0,
+        {
+          "type": "comparison",
+          "evidence": "children are taught the relationship between letters and sounds systematically",
+          "answer": "one teaches letter and sound relations systematically, the other treats guessing meaning as primary",
+          "patternId": "b2-157-comparison"
+        }
+      ],
+      [
+        "Kelompok anak mana yang paling diuntungkan oleh pendekatan pertama?",
+        [
+          "Children who already read fluently before starting school",
+          "Children with small vocabularies and nobody at home to read with them",
+          "Children who are learning a second language only",
+          "Children in their final year of secondary school"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "children who arrive at school with small vocabularies",
+          "answer": "Children with small vocabularies and nobody at home to read with them",
+          "patternId": "b2-157-detail"
+        }
+      ],
+      [
+        "Apa yang tersirat dari kalimat bahwa temuan itu sering dilaporkan sebagai kemenangan total?",
+        [
+          "The reviews themselves were fabricated by their authors",
+          "Phonics teaching has been banned in most schools",
+          "The reporting claims more than the evidence actually settles",
+          "Comprehension is unimportant in the early years"
+        ],
+        2,
+        {
+          "type": "inference",
+          "evidence": "which it is not",
+          "answer": "The reporting claims more than the evidence actually settles",
+          "patternId": "b2-157-inference"
+        }
+      ],
+      [
+        "Mengapa fonik saja tidak cukup untuk menghasilkan pembaca yang paham?",
+        [
+          "Because comprehension rests on background knowledge that phonics does not supply",
+          "Because systematic teaching slows reading speed permanently",
+          "Because children dislike any instruction given in a fixed order",
+          "Because pictures are always more memorable than letters"
+        ],
+        0,
+        {
+          "type": "cause_effect",
+          "evidence": "Comprehension depends on background knowledge that no phonics programme supplies.",
+          "answer": "Because comprehension rests on background knowledge that phonics does not supply",
+          "patternId": "b2-157-cause-effect"
+        }
+      ],
+      [
+        "Menurut penulis, ruang kelas yang paling kuat kemungkinan besar akan...",
+        [
+          "abandon phonics after the first term of school",
+          "use a single method exclusively for the sake of consistency",
+          "combine elements drawn from both traditions",
+          "delay all reading instruction until the age of nine"
+        ],
+        2,
+        {
+          "type": "likely",
+          "evidence": "The strongest classrooms borrow from both traditions",
+          "answer": "combine elements drawn from both traditions",
+          "patternId": "b2-157-likely"
+        }
+      ]
+    ],
+    "topic": "literacy-teaching",
+    "author": "Grace Achebe",
+    "setting": "education review",
+    "focus": "weighing-two-approaches"
+  },
+  {
+    "id": "r0158",
+    "level": "B2",
+    "title": "Pricing the Road in Stockholm",
+    "text": "Policy note: pricing the road. When Stockholm introduced a charge for driving into the city centre in 2006, it did so as a trial, with a referendum promised at the end. Support before the trial stood at around a third of residents. Seven months later, after traffic had fallen by roughly a fifth and journey times had become predictable, a narrow majority voted to keep it. The sequence matters more than the numbers. Had the referendum been held first, the scheme would almost certainly have been rejected, and it is difficult to imagine the trial being authorised afterwards. Opponents had argued that shops in the centre would empty; retail turnover did not fall. They had also argued that the charge was regressive, and here the objection carries more force, since a flat fee weighs more heavily on a low income. The city answered by spending the revenue on public transport, which is a compensation rather than a correction. Cities copying the design should note that what made it survivable was not the economics but the order in which citizens were asked.",
+    "qs": [
+      [
+        "Urutan langkah yang membuat kebijakan ini bertahan adalah...",
+        [
+          "a referendum first, then a trial, then permanent charging",
+          "a trial first, then a referendum seven months later",
+          "investment in public transport first, then the charge",
+          "a permanent charge introduced with no vote at all"
+        ],
+        1,
+        {
+          "type": "sequence",
+          "evidence": "it did so as a trial, with a referendum promised at the end",
+          "answer": "a trial first, then a referendum seven months later",
+          "patternId": "b2-158-sequence"
+        }
+      ],
+      [
+        "Apa yang mengubah pendapat warga selama masa uji coba?",
+        [
+          "Retail turnover in the centre rose sharply",
+          "The size of the charge was cut by half",
+          "Traffic fell and journey times became predictable",
+          "A completely new metro line was opened"
+        ],
+        2,
+        {
+          "type": "cause_effect",
+          "evidence": "traffic had fallen by roughly a fifth and journey times had become predictable",
+          "answer": "Traffic fell and journey times became predictable",
+          "patternId": "b2-158-cause-effect"
+        }
+      ],
+      [
+        "Bukti mana yang dipakai untuk menolak keberatan bahwa toko-toko akan sepi?",
+        [
+          "Support before the trial stood at around a third of residents",
+          "Retail turnover did not fall",
+          "A narrow majority voted to keep the charge",
+          "The revenue was spent on public transport"
+        ],
+        1,
+        {
+          "type": "evidence",
+          "evidence": "retail turnover did not fall",
+          "answer": "Retail turnover did not fall",
+          "patternId": "b2-158-evidence"
+        }
+      ],
+      [
+        "Mengapa penulis menyebut penggunaan pendapatan itu sebagai kompensasi, bukan koreksi?",
+        [
+          "Because the spending offsets the burden without removing the unfairness of a flat fee",
+          "Because the money collected was in fact never spent",
+          "Because public transport in the city is already free",
+          "Because the charge was quietly abolished a year later"
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "which is a compensation rather than a correction",
+          "answer": "Because the spending offsets the burden without removing the unfairness of a flat fee",
+          "patternId": "b2-158-inference"
+        }
+      ],
+      [
+        "Pesan utama catatan kebijakan ini bagi kota lain adalah...",
+        [
+          "Congestion charges always cut traffic by about a fifth",
+          "Referendums should be avoided in transport policy",
+          "Revenue from drivers should be spent on roads instead",
+          "The political sequence matters as much as the economic design"
+        ],
+        3,
+        {
+          "type": "main_idea",
+          "evidence": "not the economics but the order in which citizens were asked",
+          "answer": "The political sequence matters as much as the economic design",
+          "patternId": "b2-158-main-idea"
+        }
+      ]
+    ],
+    "topic": "urban-policy",
+    "author": "Anders Sjoberg",
+    "setting": "city policy briefing",
+    "focus": "policy-sequence"
+  },
+  {
+    "id": "r0159",
+    "level": "B2",
+    "title": "Thinking With Eight Arms",
+    "text": "An octopus has about five hundred million neurons, comparable to a dog, but two thirds of them sit in its arms rather than its brain. Each arm can taste what it touches and can solve a small problem, such as working a limb into a crevice, while the animal attends to something else entirely. Researchers who describe this as distributed intelligence are careful to add that we do not know what, if anything, it is like to be such a creature. Experiments have shown that octopuses recognise individual keepers, learn to open jars, and, in captivity, appear to grow bored. A famous account of one animal squirting water at a light bulb it disliked circulates so widely that its evidential status is rarely questioned. This is the difficulty. The behaviour is genuinely strange, so anecdote and data are easily confused, and a field that depends on charming stories risks losing the scepticism that would make its claims stick. If octopus cognition were less appealing, it might be studied more rigorously.",
+    "qs": [
+      [
+        "Di mana sebagian besar neuron gurita berada?",
+        [
+          "In the central brain and nowhere else",
+          "Split evenly between the brain and the skin",
+          "Mostly in the digestive system",
+          "Mostly in its arms rather than its brain"
+        ],
+        3,
+        {
+          "type": "detail",
+          "evidence": "two thirds of them sit in its arms rather than its brain",
+          "answer": "Mostly in its arms rather than its brain",
+          "patternId": "b2-159-detail"
+        }
+      ],
+      [
+        "Frasa distributed intelligence dalam teks mengacu pada...",
+        [
+          "intelligence shared between several octopuses at once",
+          "thinking spread across the body instead of being centralised",
+          "knowledge passed from a keeper to the animal",
+          "memory that fades between one task and the next"
+        ],
+        1,
+        {
+          "type": "vocabulary_context",
+          "evidence": "Researchers who describe this as distributed intelligence",
+          "answer": "thinking spread across the body instead of being centralised",
+          "patternId": "b2-159-vocabulary-context"
+        }
+      ],
+      [
+        "Mengapa penulis menyebut kisah gurita yang menyemprot bola lampu?",
+        [
+          "To prove that octopuses genuinely dislike bright light",
+          "To show how an anecdote can pass as evidence through repetition",
+          "To explain the method by which jars are opened",
+          "To argue that keeping octopuses in captivity should be banned"
+        ],
+        1,
+        {
+          "type": "why",
+          "evidence": "its evidential status is rarely questioned",
+          "answer": "To show how an anecdote can pass as evidence through repetition",
+          "patternId": "b2-159-why"
+        }
+      ],
+      [
+        "Nada penulis terhadap bidang penelitian ini adalah...",
+        [
+          "admiring, but uneasy about its rigour",
+          "entirely dismissive of the whole subject",
+          "neutral and purely descriptive throughout",
+          "mocking towards the researchers as individuals"
+        ],
+        0,
+        {
+          "type": "tone",
+          "evidence": "risks losing the scepticism that would make its claims stick",
+          "answer": "admiring, but uneasy about its rigour",
+          "patternId": "b2-159-tone"
+        }
+      ],
+      [
+        "Kalimat terakhir menyiratkan bahwa...",
+        [
+          "octopuses are in fact less intelligent than dogs",
+          "the charm of a subject can weaken the standards applied to it",
+          "the field ought to be closed down altogether",
+          "appealing subjects never attract any research funding"
+        ],
+        1,
+        {
+          "type": "conclusion",
+          "evidence": "If octopus cognition were less appealing, it might be studied more rigorously.",
+          "answer": "the charm of a subject can weaken the standards applied to it",
+          "patternId": "b2-159-conclusion"
+        }
+      ]
+    ],
+    "topic": "animal-cognition",
+    "author": "Miriam Kessler",
+    "setting": "popular science feature",
+    "focus": "evidence-versus-anecdote"
+  },
+  {
+    "id": "r0160",
+    "level": "B2",
+    "title": "The Wrong Argument for Coding",
+    "text": "The proposal to make programming compulsory for every secondary pupil is usually defended on economic grounds: the jobs are there, and the country needs them filled. That argument is weaker than it looks. Labour forecasts have a poor record, and a curriculum designed around the shortages of one decade may equip a generation for a market that has moved on by the time they graduate. A better defence exists, and supporters rarely make it. Writing a program forces a pupil to state a procedure so precisely that a machine can follow it, and to accept that a failure belongs to the instructions rather than to the listener. Very little else in school teaches that discipline so unforgivingly. If coding were taught as a way of thinking rather than as vocational training, the shallow criticism that not everyone will become a developer would lose its force, since not everyone who studies geometry becomes a surveyor. The risk is that ministers, who must justify budgets within a single term, will keep choosing the argument that sounds urgent over the one that lasts.",
+    "qs": [
+      [
+        "Tujuan penulis menulis esai ini adalah...",
+        [
+          "to reject compulsory programming lessons altogether",
+          "to replace the economic case for coding with a stronger educational one",
+          "to compare several programming languages used in schools",
+          "to praise the accuracy of government labour forecasts"
+        ],
+        1,
+        {
+          "type": "author_purpose",
+          "evidence": "A better defence exists, and supporters rarely make it.",
+          "answer": "to replace the economic case for coding with a stronger educational one",
+          "patternId": "b2-160-author-purpose"
+        }
+      ],
+      [
+        "Detail mana yang mendukung klaim bahwa argumen ekonomi itu lemah?",
+        [
+          "Labour forecasts have a poor record",
+          "Writing a program forces a pupil to state a procedure precisely",
+          "Not everyone who studies geometry becomes a surveyor",
+          "Ministers must justify their budgets within a single term"
+        ],
+        0,
+        {
+          "type": "supporting_detail",
+          "evidence": "Labour forecasts have a poor record",
+          "answer": "Labour forecasts have a poor record",
+          "patternId": "b2-160-supporting-detail"
+        }
+      ],
+      [
+        "Kalimat a failure belongs to the instructions rather than to the listener berarti...",
+        [
+          "machines are usually at fault when a program stops working",
+          "teachers should never blame pupils for making errors",
+          "when the program fails, the fault lies in what was written, not in a reader who fills gaps",
+          "listeners tend to misunderstand highly technical language"
+        ],
+        2,
+        {
+          "type": "paraphrase",
+          "evidence": "a failure belongs to the instructions rather than to the listener",
+          "answer": "when the program fails, the fault lies in what was written, not in a reader who fills gaps",
+          "patternId": "b2-160-paraphrase"
+        }
+      ],
+      [
+        "Perbandingan dengan geometri dipakai untuk menunjukkan bahwa...",
+        [
+          "geometry is a more useful subject than programming",
+          "a subject need not lead to a matching job in order to be worth teaching",
+          "trained surveyors are currently in short supply",
+          "mathematics ought to be made compulsory as well"
+        ],
+        1,
+        {
+          "type": "relationship",
+          "evidence": "not everyone who studies geometry becomes a surveyor",
+          "answer": "a subject need not lead to a matching job in order to be worth teaching",
+          "patternId": "b2-160-relationship"
+        }
+      ],
+      [
+        "Menurut penulis, apa yang kemungkinan akan dilakukan para menteri?",
+        [
+          "They will remove programming from the curriculum entirely",
+          "They will fund long-term research into thinking skills",
+          "They will consult classroom teachers before deciding",
+          "They will keep preferring the argument that sounds urgent"
+        ],
+        3,
+        {
+          "type": "likely",
+          "evidence": "will keep choosing the argument that sounds urgent over the one that lasts",
+          "answer": "They will keep preferring the argument that sounds urgent",
+          "patternId": "b2-160-likely"
+        }
+      ]
+    ],
+    "topic": "curriculum-debate",
+    "author": "Owen Trask",
+    "setting": "education essay",
+    "focus": "evaluating-an-argument"
+  },
+  {
+    "id": "r0161",
+    "level": "B2",
+    "title": "The Price of a Light Metal",
+    "text": "Between 2021 and 2023 the price of lithium carbonate rose roughly sixfold and then gave most of it back. Commentators reached for the language of scarcity, yet lithium is not rare, and known reserves would cover projected demand for decades. What is scarce is processing capacity and the permission to build it. A new mine takes between seven and fifteen years to move from discovery to first shipment, most of that time spent waiting for permits, while a battery factory can be finished in two. When demand accelerates, the two clocks fall out of step, and the price does the adjusting. Producers respond by opening capacity, which arrives late and all at once, and the crash that follows discourages the next round of investment. If the cycle is understood as a mismatch of lead times rather than a shortage of rock, the policy conclusion changes: subsidising extraction may do less than shortening the approval process. Neither option is politically comfortable, which is one reason the cycle tends to repeat itself.",
+    "qs": [
+      [
+        "Bagaimana penulis menjelaskan lonjakan harga litium?",
+        [
+          "By pointing to a genuine global shortage of the metal in the earth",
+          "By blaming speculation in commodity markets and nothing else",
+          "By contrasting the time needed to open a mine with the time needed to build a factory",
+          "By comparing lithium prices with the price of copper"
+        ],
+        2,
+        {
+          "type": "how",
+          "evidence": "A new mine takes between seven and fifteen years",
+          "answer": "By contrasting the time needed to open a mine with the time needed to build a factory",
+          "patternId": "b2-161-how"
+        }
+      ],
+      [
+        "Pernyataan: Cadangan litium yang diketahui tidak cukup untuk permintaan puluhan tahun ke depan. Pernyataan ini...",
+        [
+          "is true; the text says reserves are nearly exhausted",
+          "is false; the text says known reserves would cover projected demand for decades",
+          "is never addressed in the passage",
+          "is true, but only for battery-grade material"
+        ],
+        1,
+        {
+          "type": "true_false_not_stated",
+          "evidence": "known reserves would cover projected demand for decades",
+          "answer": "is false; the text says known reserves would cover projected demand for decades",
+          "patternId": "b2-161-true-false-not-stated"
+        }
+      ],
+      [
+        "Apa akibat dari kapasitas baru yang datang terlambat dan sekaligus?",
+        [
+          "Prices settle permanently at a high level",
+          "Permitting is completed far more quickly afterwards",
+          "Battery factories stop being built anywhere",
+          "A crash follows, which discourages the next round of investment"
+        ],
+        3,
+        {
+          "type": "cause_effect",
+          "evidence": "the crash that follows discourages the next round of investment",
+          "answer": "A crash follows, which discourages the next round of investment",
+          "patternId": "b2-161-cause-effect"
+        }
+      ],
+      [
+        "Berapa lama tambang baru biasanya perlu sejak penemuan hingga pengiriman pertama?",
+        [
+          "Between two and three years",
+          "Between seven and fifteen years",
+          "About six months in most countries",
+          "More than thirty years on average"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "seven and fifteen years to move from discovery to first shipment",
+          "answer": "Between seven and fifteen years",
+          "patternId": "b2-161-detail"
+        }
+      ],
+      [
+        "Kesimpulan kebijakan yang ditarik penulis adalah...",
+        [
+          "Governments should build national stockpiles of the metal",
+          "Subsidising extraction is clearly the most effective response",
+          "Battery factories ought to be built much more slowly",
+          "Shortening approvals may achieve more than subsidising extraction"
+        ],
+        3,
+        {
+          "type": "conclusion",
+          "evidence": "subsidising extraction may do less than shortening the approval process",
+          "answer": "Shortening approvals may achieve more than subsidising extraction",
+          "patternId": "b2-161-conclusion"
+        }
+      ]
+    ],
+    "topic": "commodity-markets",
+    "author": "Priya Nandakumar",
+    "setting": "market analysis desk",
+    "focus": "reading-an-analysis"
+  },
+  {
+    "id": "r0162",
+    "level": "B2",
+    "title": "When the Clocks Agreed",
+    "text": "Before the railways, every town kept its own noon, set by the sun overhead, and nobody found this inconvenient. A traveller who arrived in a city half an hour behind his own watch simply adjusted it. What made local time intolerable was the timetable. Trains running on lines that crossed a dozen local noons produced collisions and missed connections, and the companies, not governments, imposed the first uniform standard, printing their own time on station clocks and daring the towns to disagree. Some resisted for years, and a few clock faces in England carried two minute hands. The lesson usually drawn is that technology forced a rational reform on a superstitious public. That reading flatters us. Local time had been perfectly rational for the purposes it served, and the new standard was not more accurate, only more shared. What the railways changed was not the sun but the cost of disagreement. Similar arguments now surround file formats, plugs and measurement systems, where the winning standard is seldom the best one, merely the one that arrived when coordination had become expensive enough to buy.",
+    "qs": [
+      [
+        "Siapa yang pertama kali memaksakan standar waktu seragam?",
+        [
+          "National governments, through legislation",
+          "Astronomers working at royal observatories",
+          "The railway companies themselves",
+          "Town councils across England"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "the companies, not governments, imposed the first uniform standard",
+          "answer": "The railway companies themselves",
+          "patternId": "b2-162-detail"
+        }
+      ],
+      [
+        "Mengapa waktu lokal akhirnya menjadi tidak tertahankan?",
+        [
+          "Because sundials had become unreliable instruments",
+          "Because towns wished to appear modern to visitors",
+          "Because pocket watches were expensive to adjust",
+          "Because timetables crossing many local noons produced collisions and missed connections"
+        ],
+        3,
+        {
+          "type": "why",
+          "evidence": "produced collisions and missed connections",
+          "answer": "Because timetables crossing many local noons produced collisions and missed connections",
+          "patternId": "b2-162-why"
+        }
+      ],
+      [
+        "Frasa That reading dalam kalimat That reading flatters us merujuk pada...",
+        [
+          "the interpretation that technology forced reform on a superstitious public",
+          "the practice of setting town clocks by the sun",
+          "the timetable printed by the railway companies",
+          "the presence of two minute hands on some clock faces"
+        ],
+        0,
+        {
+          "type": "reference",
+          "evidence": "technology forced a rational reform on a superstitious public",
+          "answer": "the interpretation that technology forced reform on a superstitious public",
+          "patternId": "b2-162-reference"
+        }
+      ],
+      [
+        "Apa yang tersirat dari pernyataan bahwa standar baru bukan lebih akurat, hanya lebih dibagi bersama?",
+        [
+          "Sun time had been measured incorrectly for centuries",
+          "The value of a standard lies in agreement rather than in truth",
+          "Railway clocks always ran faster than town clocks",
+          "Accuracy never mattered to nineteenth-century travellers"
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "not more accurate, only more shared",
+          "answer": "The value of a standard lies in agreement rather than in truth",
+          "patternId": "b2-162-inference"
+        }
+      ],
+      [
+        "Hubungan yang ditarik penulis antara waktu kereta dan standar modern seperti colokan listrik adalah...",
+        [
+          "both were designed by committees of scientists",
+          "both prove that older systems were irrational",
+          "in both cases the winning standard is the one that arrives when coordination has become costly",
+          "both were finally adopted through public referendums"
+        ],
+        2,
+        {
+          "type": "relationship",
+          "evidence": "merely the one that arrived when coordination had become expensive enough to buy",
+          "answer": "in both cases the winning standard is the one that arrives when coordination has become costly",
+          "patternId": "b2-162-relationship"
+        }
+      ]
+    ],
+    "topic": "history-of-standards",
+    "author": "Hugh Cormack",
+    "setting": "historical essay",
+    "focus": "historical-argument"
+  },
+  {
+    "id": "r0163",
+    "level": "B2",
+    "title": "Where the Shade Went",
+    "text": "A survey of one southwestern American city found that the difference in summer afternoon temperature between its wealthiest and poorest districts reached almost seven degrees. The cause is not mysterious. Tree canopy covers roughly a quarter of the ground in the older, richer neighbourhoods and less than five per cent in the districts built after 1960, where wide roads and parking lots absorb sunlight all day and release it after dark. Planting programmes have been announced repeatedly. Their weakness is that a tree is not a light bulb: it must be watered for years before it shades anything, and the households expected to water it are frequently tenants who may not be living there when the shade arrives. Where the city has paid a small monthly sum to residents who agree to maintain a street tree, survival rates after three years have roughly doubled. That is a modest, unglamorous intervention, and it is far cheaper than the cooling centres opened each July. Whether it can be scaled before the next decade of heat is a separate question, and nobody in the department sounds confident.",
+    "qs": [
+      [
+        "Mengapa distrik yang lebih miskin jauh lebih panas?",
+        [
+          "Because they contain more parks than the wealthier districts do",
+          "Because far less canopy covers them, while roads and parking lots store heat all day",
+          "Because the cooling centres have all been built elsewhere",
+          "Because tenants water street trees more often than owners do"
+        ],
+        1,
+        {
+          "type": "cause_effect",
+          "evidence": "wide roads and parking lots absorb sunlight all day and release it after dark",
+          "answer": "Because far less canopy covers them, while roads and parking lots store heat all day",
+          "patternId": "b2-163-cause-effect"
+        }
+      ],
+      [
+        "Berapa tutupan pohon di dua jenis lingkungan itu?",
+        [
+          "About a quarter in the older richer areas and under five per cent in the newer districts",
+          "Under five per cent everywhere in the city",
+          "About half of the ground in the newest districts",
+          "Roughly equal in both kinds of district"
+        ],
+        0,
+        {
+          "type": "detail",
+          "evidence": "less than five per cent in the districts built after 1960",
+          "answer": "About a quarter in the older richer areas and under five per cent in the newer districts",
+          "patternId": "b2-163-detail"
+        }
+      ],
+      [
+        "Mengapa program penanaman pohon sering gagal?",
+        [
+          "Because the climate is too dry for any species to survive",
+          "Because residents object to losing space for parking",
+          "Because trees need years of watering and those asked to water them often move away",
+          "Because the city government refuses to buy seedlings"
+        ],
+        2,
+        {
+          "type": "why",
+          "evidence": "it must be watered for years before it shades anything",
+          "answer": "Because trees need years of watering and those asked to water them often move away",
+          "patternId": "b2-163-why"
+        }
+      ],
+      [
+        "Bukti mana yang menunjukkan bahwa pembayaran kecil kepada warga berhasil?",
+        [
+          "Cooling centres are opened in the city every July",
+          "The temperature gap reaches almost seven degrees",
+          "Wide roads release stored heat after dark",
+          "Survival rates after three years have roughly doubled"
+        ],
+        3,
+        {
+          "type": "evidence",
+          "evidence": "survival rates after three years have roughly doubled",
+          "answer": "Survival rates after three years have roughly doubled",
+          "patternId": "b2-163-evidence"
+        }
+      ],
+      [
+        "Nada kalimat penutup laporan ini adalah...",
+        [
+          "confident that the programme will soon be expanded",
+          "sober and doubtful about the pace of change",
+          "angry at the residents of the poorer districts",
+          "entirely indifferent to the outcome"
+        ],
+        1,
+        {
+          "type": "tone",
+          "evidence": "nobody in the department sounds confident",
+          "answer": "sober and doubtful about the pace of change",
+          "patternId": "b2-163-tone"
+        }
+      ]
+    ],
+    "topic": "urban-heat",
+    "author": "Rosa Delgado",
+    "setting": "city environment report",
+    "focus": "report-detail"
+  },
+  {
+    "id": "r0164",
+    "level": "B2",
+    "title": "Money With No Conditions",
+    "text": "Two experiments are usually cited in arguments about unconditional cash. In a two-year Finnish trial, unemployed people who received a monthly payment with no obligations were slightly more likely to be in work at the end than the control group, though the difference was small; what changed clearly was reported stress and trust in institutions. In a long-running Kenyan programme, villages received transfers large enough to matter, and researchers recorded new businesses, more schooling and no measurable rise in spending on alcohol, a fear that had dominated the debate beforehand. Reading the two together is tempting and slightly dishonest. The Finnish payment replaced an existing benefit within a wealthy welfare state; the Kenyan transfer arrived where almost nothing else did. A policy that mainly buys dignity in Helsinki may buy capital in a village, and evidence for one claim is routinely presented as evidence for the other. Supporters would strengthen their case by saying which of the two effects they are promising, since a scheme sold as a growth policy will be judged, eventually, by growth.",
+    "qs": [
+      [
+        "Perbedaan paling penting antara dua percobaan itu adalah...",
+        [
+          "one paid only men while the other paid only women",
+          "one replaced an existing benefit in a rich welfare state, the other arrived where little else existed",
+          "one lasted two years while the other lasted two months",
+          "one was run by a government and the other by a university"
+        ],
+        1,
+        {
+          "type": "comparison",
+          "evidence": "The Finnish payment replaced an existing benefit within a wealthy welfare state",
+          "answer": "one replaced an existing benefit in a rich welfare state, the other arrived where little else existed",
+          "patternId": "b2-164-comparison"
+        }
+      ],
+      [
+        "Apa yang jelas berubah dalam percobaan di Finlandia?",
+        [
+          "Employment rose dramatically among participants",
+          "Spending on alcohol fell very sharply",
+          "Reported stress and trust in institutions",
+          "The number of newly registered businesses"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "what changed clearly was reported stress and trust in institutions",
+          "answer": "Reported stress and trust in institutions",
+          "patternId": "b2-164-detail"
+        }
+      ],
+      [
+        "Pernyataan: Program di Kenya menunjukkan kenaikan belanja alkohol. Pernyataan ini...",
+        [
+          "is true, and the text supplies the figures",
+          "is a subject the passage never mentions",
+          "is true, but only during the first year",
+          "is false; the text reports no measurable rise"
+        ],
+        3,
+        {
+          "type": "true_false_not_stated",
+          "evidence": "no measurable rise in spending on alcohol",
+          "answer": "is false; the text reports no measurable rise",
+          "patternId": "b2-164-true-false-not-stated"
+        }
+      ],
+      [
+        "Mengapa penulis menyebut pembacaan gabungan kedua studi itu sedikit tidak jujur?",
+        [
+          "Because evidence for one kind of effect is presented as evidence for a different one",
+          "Because both studies were paid for by the same donor",
+          "Because neither study was ever properly published",
+          "Because the Kenyan villages were selected unfairly"
+        ],
+        0,
+        {
+          "type": "author_purpose",
+          "evidence": "evidence for one claim is routinely presented as evidence for the other",
+          "answer": "Because evidence for one kind of effect is presented as evidence for a different one",
+          "patternId": "b2-164-author-purpose"
+        }
+      ],
+      [
+        "Saran penulis kepada para pendukung kebijakan ini menyiratkan bahwa...",
+        [
+          "unconditional cash should be abandoned as an idea",
+          "a scheme should be defended by the effect it actually promises",
+          "growth is the only outcome ever worth measuring",
+          "welfare states make controlled trials impossible"
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "a scheme sold as a growth policy will be judged, eventually, by growth",
+          "answer": "a scheme should be defended by the effect it actually promises",
+          "patternId": "b2-164-inference"
+        }
+      ]
+    ],
+    "topic": "social-policy",
+    "author": "Lars Ekstrom",
+    "setting": "policy comparison",
+    "focus": "comparing-evidence"
+  },
+  {
+    "id": "r0165",
+    "level": "B2",
+    "title": "The Station Above the Bakery",
+    "text": "The transmitter sits in a room above a bakery, and the aerial is guyed to a water tank. Radio Ayni broadcasts for nine hours a day in Aymara and Spanish, and its most popular programme is not the news but a slot in which listeners telephone messages to relatives who have no telephone. Somebody in the valley will hear it and walk the message up the hill. Founded by a miners union in the 1970s, the station survived two periods in which it was closed and its equipment removed. Younger volunteers now argue that its future lies online, and they are half right: the archive of recordings has found an audience among migrants in Buenos Aires. Yet the households the station was built for often have electricity for only part of the day, and a battery radio asks nothing of them. If the schedule were moved to a platform requiring data, the audience that gives the station its purpose would be the first to disappear. The volunteers know this. They are arguing, really, about who the station is for.",
+    "qs": [
+      [
+        "Apa fungsi acara paling populer di stasiun ini?",
+        [
+          "It broadcasts national news in two languages every evening",
+          "It carries spoken messages to relatives who have no telephone",
+          "It teaches the Aymara language to migrants abroad",
+          "It sells advertising space for the bakery downstairs"
+        ],
+        1,
+        {
+          "type": "purpose",
+          "evidence": "listeners telephone messages to relatives who have no telephone",
+          "answer": "It carries spoken messages to relatives who have no telephone",
+          "patternId": "b2-165-purpose"
+        }
+      ],
+      [
+        "Siapa yang mendirikan stasiun radio ini?",
+        [
+          "A group of migrants living in Buenos Aires",
+          "The municipal government of the valley",
+          "A university department of broadcasting",
+          "A miners union in the 1970s"
+        ],
+        3,
+        {
+          "type": "detail",
+          "evidence": "Founded by a miners union in the 1970s",
+          "answer": "A miners union in the 1970s",
+          "patternId": "b2-165-detail"
+        }
+      ],
+      [
+        "Detail mana yang mendukung keberatan terhadap pindah sepenuhnya ke daring?",
+        [
+          "The archive has found listeners among migrants abroad",
+          "The aerial is guyed to a nearby water tank",
+          "Many households have electricity for only part of the day",
+          "The station broadcasts for nine hours every day"
+        ],
+        2,
+        {
+          "type": "supporting_detail",
+          "evidence": "electricity for only part of the day",
+          "answer": "Many households have electricity for only part of the day",
+          "patternId": "b2-165-supporting-detail"
+        }
+      ],
+      [
+        "Jika jadwal siaran dipindahkan ke platform yang menuntut data, apa yang kemungkinan terjadi?",
+        [
+          "The original rural audience would be lost first",
+          "The station would double its listeners in the valley",
+          "The bakery below would be forced to close",
+          "The union would take ownership of the archive"
+        ],
+        0,
+        {
+          "type": "likely",
+          "evidence": "the audience that gives the station its purpose would be the first to disappear",
+          "answer": "The original rural audience would be lost first",
+          "patternId": "b2-165-likely"
+        }
+      ],
+      [
+        "Inti perdebatan di antara para relawan sebenarnya adalah...",
+        [
+          "which of the two languages should be used on air",
+          "how the ageing transmitter should be repaired",
+          "whether the union should still own the building",
+          "who the station exists to serve"
+        ],
+        3,
+        {
+          "type": "main_idea",
+          "evidence": "They are arguing, really, about who the station is for.",
+          "answer": "who the station exists to serve",
+          "patternId": "b2-165-main-idea"
+        }
+      ]
+    ],
+    "topic": "community-media",
+    "author": "Claudia Mamani",
+    "setting": "Andean valley, Bolivia",
+    "focus": "profile-reading"
+  },
+  {
+    "id": "r0166",
+    "level": "B2",
+    "title": "Pills That Announce Themselves",
+    "text": "For a century the placebo effect was assumed to require deception. A trial at a Boston hospital tested whether it does. Patients with long-standing digestive pain were given a bottle labelled, in plain language, as containing inert pills, and were told directly that the tablets contained no active medicine. They were also told, truthfully, that placebos have produced measurable improvement in many studies and that the body can respond to a treatment ritual. Reported symptoms fell more in this group than in a group offered no treatment at all. The result has since been repeated for back pain and for fatigue, though the effect sizes are modest and the outcomes are all self-reported, which matters, because pain is precisely the sort of thing that improves when a patient believes somebody is paying attention. What the study appears to challenge is not the existence of the placebo effect but the story told about it. If honesty does not destroy the response, then belief in a specific chemical may matter less than the shape of the encounter itself.",
+    "qs": [
+      [
+        "Bagaimana peneliti menguji apakah efek plasebo memerlukan penipuan?",
+        [
+          "By hiding the tablets inside ordinary food",
+          "By telling patients openly that the tablets contained no active medicine",
+          "By comparing two different painkilling drugs",
+          "By interviewing doctors about what they believed"
+        ],
+        1,
+        {
+          "type": "how",
+          "evidence": "were told directly that the tablets contained no active medicine",
+          "answer": "By telling patients openly that the tablets contained no active medicine",
+          "patternId": "b2-166-how"
+        }
+      ],
+      [
+        "Apa lagi yang disampaikan kepada pasien selain isi botolnya?",
+        [
+          "That placebos have produced measurable improvement in many studies",
+          "That the pills would certainly cure them completely",
+          "That the trial had been running for a century",
+          "That other patients had refused to take part"
+        ],
+        0,
+        {
+          "type": "detail",
+          "evidence": "placebos have produced measurable improvement in many studies",
+          "answer": "That placebos have produced measurable improvement in many studies",
+          "patternId": "b2-166-detail"
+        }
+      ],
+      [
+        "Mengapa penulis menekankan bahwa hasilnya dilaporkan sendiri oleh pasien?",
+        [
+          "To show that the study was deliberately fraudulent",
+          "To suggest the measurement is sensitive to the attention patients receive",
+          "To prove that digestive pain is entirely imaginary",
+          "To explain why the trial was stopped early"
+        ],
+        1,
+        {
+          "type": "inference",
+          "evidence": "improves when a patient believes somebody is paying attention",
+          "answer": "To suggest the measurement is sensitive to the attention patients receive",
+          "patternId": "b2-166-inference"
+        }
+      ],
+      [
+        "Apa yang menurut penulis sebenarnya ditantang oleh studi ini?",
+        [
+          "The existence of the placebo effect itself",
+          "The safety of giving patients inert tablets",
+          "The story usually told about why placebos work",
+          "The value of treating back pain at all"
+        ],
+        2,
+        {
+          "type": "conclusion",
+          "evidence": "not the existence of the placebo effect but the story told about it",
+          "answer": "The story usually told about why placebos work",
+          "patternId": "b2-166-conclusion"
+        }
+      ],
+      [
+        "Frasa the shape of the encounter itself paling tepat diartikan sebagai...",
+        [
+          "the chemical structure of the tablet given",
+          "the length of the patient stay in hospital",
+          "the total cost of the treatment course",
+          "the ritual and manner of the consultation"
+        ],
+        3,
+        {
+          "type": "paraphrase",
+          "evidence": "the shape of the encounter itself",
+          "answer": "the ritual and manner of the consultation",
+          "patternId": "b2-166-paraphrase"
+        }
+      ]
+    ],
+    "topic": "medical-research",
+    "author": "Nadia Farouk",
+    "setting": "clinical trial summary",
+    "focus": "interpreting-results"
+  },
+  {
+    "id": "r0167",
+    "level": "B2",
+    "title": "Fractions of a Cent",
+    "text": "A song streamed a million times may earn its writer less than a single well-attended concert. This is usually blamed on the platforms, and their share is indeed large, but the arithmetic that hurts most working musicians happens earlier. Revenue is pooled: every subscription in a country is added together, and the pot is divided according to each track's share of total plays. A listener who plays one obscure album on repeat all month therefore funds the artists at the top of the chart, not the album he actually listened to. Under a user-centric model, his subscription would follow his own listening instead. Trials suggest such a change would move only a few per cent of the money, which sounds trivial until one notices where those percentages land: on artists with small, devoted audiences, precisely the group least able to absorb a bad year. Labels resist the change, partly because the accounting is harder and partly because they benefit from the present distribution. The argument is often framed as technical. It is a question about who counts as a listener.",
+    "qs": [
+      [
+        "Gagasan utama analisis ini adalah...",
+        [
+          "Streaming platforms ought to be taken into public ownership",
+          "Concerts earn more than recordings for every kind of artist",
+          "The way revenue is pooled, not only the platform share, damages smaller artists",
+          "Listeners should stop paying for streaming subscriptions"
+        ],
+        2,
+        {
+          "type": "main_idea",
+          "evidence": "the arithmetic that hurts most working musicians happens earlier",
+          "answer": "The way revenue is pooled, not only the platform share, damages smaller artists",
+          "patternId": "b2-167-main-idea"
+        }
+      ],
+      [
+        "Bagaimana uang langganan dibagikan dalam sistem yang berlaku sekarang?",
+        [
+          "Each subscription is paid to the artists that subscriber played",
+          "All subscriptions in a country are pooled and split by each track share of total plays",
+          "The money is divided equally among every registered artist",
+          "Platforms keep the whole of the subscription fee"
+        ],
+        1,
+        {
+          "type": "how",
+          "evidence": "the pot is divided according to each track's share of total plays",
+          "answer": "All subscriptions in a country are pooled and split by each track share of total plays",
+          "patternId": "b2-167-how"
+        }
+      ],
+      [
+        "Apa akibat sistem itu bagi pendengar yang memutar satu album tak dikenal sepanjang bulan?",
+        [
+          "His money largely funds the artists at the top of the chart",
+          "His money goes entirely to the album he played",
+          "His subscription price rises the following month",
+          "The album is quietly removed from the service"
+        ],
+        0,
+        {
+          "type": "cause_effect",
+          "evidence": "funds the artists at the top of the chart, not the album he actually listened to",
+          "answer": "His money largely funds the artists at the top of the chart",
+          "patternId": "b2-167-cause-effect"
+        }
+      ],
+      [
+        "Apa yang diperkirakan uji coba tentang model user-centric?",
+        [
+          "It would double the income of most recording artists",
+          "It would bankrupt the largest record labels",
+          "It would move only a few per cent of the money",
+          "It would be impossible to calculate accurately"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "would move only a few per cent of the money",
+          "answer": "It would move only a few per cent of the money",
+          "patternId": "b2-167-detail"
+        }
+      ],
+      [
+        "Kalimat terakhir dipakai penulis untuk...",
+        [
+          "explain the accounting software used inside labels",
+          "suggest that a supposedly technical dispute is really about principle",
+          "praise labels for protecting small artists",
+          "argue that listeners themselves should be paid"
+        ],
+        1,
+        {
+          "type": "author_purpose",
+          "evidence": "It is a question about who counts as a listener.",
+          "answer": "suggest that a supposedly technical dispute is really about principle",
+          "patternId": "b2-167-author-purpose"
+        }
+      ]
+    ],
+    "topic": "music-economics",
+    "author": "Bea Okonjo",
+    "setting": "industry analysis",
+    "focus": "following-a-mechanism"
+  },
+  {
+    "id": "r0168",
+    "level": "B2",
+    "title": "Amphorae at Thirty Metres",
+    "text": "The wreck lies at thirty metres, shallow enough for divers and deep enough that trawlers have left it largely intact. We recorded the site over eleven days before lifting anything. The cargo is mixed: amphorae from at least three production centres, a crate of unfinished bronze fittings, and a small quantity of raw glass, still in the lumps in which it was traded. Mixed cargoes complicate the tidy picture of ancient trade running between fixed pairs of ports. A ship carrying goods from three regions was probably calling at several harbours, buying and selling as prices allowed, which is closer to peddling than to shipping. Dating rests on the amphorae, since the glass could have travelled for decades before being loaded. One team member argued for lifting the bronze immediately; the conservation laboratory was full, and an object raised without a place to go often deteriorates faster than one left in the sediment. It stayed down. Publication will take four years, which visitors find astonishing and archaeologists consider brisk.",
+    "qs": [
+      [
+        "Apa isi muatan kapal karam itu?",
+        [
+          "Only amphorae from a single production centre",
+          "Amphorae from several centres, unfinished bronze fittings and raw glass",
+          "Coins, weapons and personal jewellery",
+          "Marble blocks and cut timber for building"
+        ],
+        1,
+        {
+          "type": "detail",
+          "evidence": "amphorae from at least three production centres",
+          "answer": "Amphorae from several centres, unfinished bronze fittings and raw glass",
+          "patternId": "b2-168-detail"
+        }
+      ],
+      [
+        "Muatan campuran itu menunjukkan bahwa kapal tersebut kemungkinan...",
+        [
+          "sank very close to its home port",
+          "belonged to a state naval fleet",
+          "called at several harbours, trading as prices allowed",
+          "carried goods ordered by one wealthy buyer"
+        ],
+        2,
+        {
+          "type": "inference",
+          "evidence": "buying and selling as prices allowed",
+          "answer": "called at several harbours, trading as prices allowed",
+          "patternId": "b2-168-inference"
+        }
+      ],
+      [
+        "Mengapa penanggalan situs bersandar pada amphorae dan bukan pada kaca?",
+        [
+          "Because glass cannot be dated by any known method",
+          "Because the glass found was too damaged to examine",
+          "Because amphorae are worth more to collectors",
+          "Because the glass may have circulated for decades before being loaded"
+        ],
+        3,
+        {
+          "type": "why",
+          "evidence": "the glass could have travelled for decades before being loaded",
+          "answer": "Because the glass may have circulated for decades before being loaded",
+          "patternId": "b2-168-why"
+        }
+      ],
+      [
+        "Mengapa perunggu itu akhirnya dibiarkan di dasar laut?",
+        [
+          "Because no laboratory space was free, and an object raised without one can decay faster",
+          "Because the divers were unable to reach that part of the wreck",
+          "Because the crate was judged to have no archaeological value",
+          "Because local law forbids lifting any metal from wrecks"
+        ],
+        0,
+        {
+          "type": "cause_effect",
+          "evidence": "the conservation laboratory was full",
+          "answer": "Because no laboratory space was free, and an object raised without one can decay faster",
+          "patternId": "b2-168-cause-effect"
+        }
+      ],
+      [
+        "Bagaimana pengunjung dan arkeolog menilai waktu empat tahun untuk publikasi?",
+        [
+          "Both groups regard it as unacceptably slow",
+          "Both groups regard it as remarkably fast",
+          "Visitors find it astonishing while archaeologists consider it quick",
+          "Neither group expresses any opinion about it"
+        ],
+        2,
+        {
+          "type": "comparison",
+          "evidence": "which visitors find astonishing and archaeologists consider brisk",
+          "answer": "Visitors find it astonishing while archaeologists consider it quick",
+          "patternId": "b2-168-comparison"
+        }
+      ]
+    ],
+    "topic": "maritime-archaeology",
+    "author": "Selin Aydin",
+    "setting": "excavation diary, Aegean coast",
+    "focus": "field-notes-reasoning"
+  },
+  {
+    "id": "r0169",
+    "level": "B2",
+    "title": "The Glue in the Case",
+    "text": "A washing machine that fails after seven years is not a scandal in itself. What deserves scrutiny is why the failure is so often terminal. Control boards are paired to serial numbers, fasteners are replaced by adhesive, and diagnostic codes are withheld from anyone outside an authorised network, so a repair that would take an hour becomes a purchase instead. Manufacturers defend these choices on grounds of safety and reliability, and the defence is not empty: a sealed unit really can be more waterproof. It is also, conveniently, more profitable. Recent legislation in several countries now requires spare parts to be available for a decade and manuals to be published, which is progress, though a right to buy a part is worth little if the part costs two thirds of a new machine. The deeper problem is that repair competes with a business model rather than with a technical limit. Until the price of a spare board is regulated, or the cost of replacement is charged to whoever designs the glue, the law will keep addressing the symptom.",
+    "qs": [
+      [
+        "Pendirian pokok editorial ini tentang perbaikan barang adalah...",
+        [
+          "Household appliances should be built to last for thirty years",
+          "Repair is blocked less by technical limits than by a profitable business model",
+          "Recent legislation has already solved the repair problem",
+          "Manufacturers are right that sealed units are always safer"
+        ],
+        1,
+        {
+          "type": "main_idea",
+          "evidence": "repair competes with a business model rather than with a technical limit",
+          "answer": "Repair is blocked less by technical limits than by a profitable business model",
+          "patternId": "b2-169-main-idea"
+        }
+      ],
+      [
+        "Praktik mana yang disebut mengubah perbaikan menjadi pembelian?",
+        [
+          "Publishing diagnostic manuals openly to the public",
+          "Selling machines with a ten-year written warranty",
+          "Pairing control boards to serial numbers and replacing fasteners with adhesive",
+          "Training independent technicians in every region"
+        ],
+        2,
+        {
+          "type": "detail",
+          "evidence": "Control boards are paired to serial numbers, fasteners are replaced by adhesive",
+          "answer": "Pairing control boards to serial numbers and replacing fasteners with adhesive",
+          "patternId": "b2-169-detail"
+        }
+      ],
+      [
+        "Bagaimana penulis memperlakukan pembelaan dari pihak produsen?",
+        [
+          "It is rejected as completely false",
+          "It is ignored and never mentioned",
+          "It is accepted without any reservation at all",
+          "It is partly granted and then qualified"
+        ],
+        3,
+        {
+          "type": "tone",
+          "evidence": "the defence is not empty",
+          "answer": "It is partly granted and then qualified",
+          "patternId": "b2-169-tone"
+        }
+      ],
+      [
+        "Mengapa hak untuk membeli suku cadang disebut bernilai kecil?",
+        [
+          "Because a part may cost almost as much as a new machine",
+          "Because the manuals are written in difficult technical language",
+          "Because the law applies only to washing machines",
+          "Because most owners cannot use a screwdriver safely"
+        ],
+        0,
+        {
+          "type": "inference",
+          "evidence": "the part costs two thirds of a new machine",
+          "answer": "Because a part may cost almost as much as a new machine",
+          "patternId": "b2-169-inference"
+        }
+      ],
+      [
+        "Tujuan kalimat penutup editorial ini adalah...",
+        [
+          "to praise the recent legislation as entirely sufficient",
+          "to explain how industrial adhesives are manufactured",
+          "to argue that the law treats only the symptom unless prices or costs are addressed",
+          "to advise readers to buy the cheapest machines available"
+        ],
+        2,
+        {
+          "type": "purpose",
+          "evidence": "the law will keep addressing the symptom",
+          "answer": "to argue that the law treats only the symptom unless prices or costs are addressed",
+          "patternId": "b2-169-purpose"
+        }
+      ]
+    ],
+    "topic": "right-to-repair",
+    "author": "Martin Kelleher",
+    "setting": "consumer affairs editorial",
+    "focus": "editorial-stance"
+  },
+  {
+    "id": "r0170",
+    "level": "B2",
+    "title": "Rails or Rubber",
+    "text": "Cities choosing between bus rapid transit and light rail are usually presented with a cost comparison, and on that measure the bus wins comfortably: a dedicated busway can be built for a fraction of the price per kilometre and opened years earlier. The comparison is fair as far as it goes. What it omits is that the two systems make different promises to a landowner. Rails are difficult to remove, so a developer who builds beside a tram line is buying a commitment; a bus lane can be repainted as a general traffic lane by a future council in a weekend. This is why light rail is more often followed by dense construction along its corridor, an effect that is sometimes reported as though the vehicles themselves attracted investment. In cities where the busway has been given legal protection and its stations built in concrete, buses have produced similar development. The choice, then, is less about rubber and steel than about how credibly a city can bind its own hands.",
+    "qs": [
+      [
+        "Dalam perbandingan biaya, apa keunggulan busway?",
+        [
+          "It attracts far more development than any rail line",
+          "It costs a fraction per kilometre and can open years earlier",
+          "It carries more passengers per hour than light rail",
+          "It needs no dedicated lane of its own"
+        ],
+        1,
+        {
+          "type": "comparison",
+          "evidence": "built for a fraction of the price per kilometre and opened years earlier",
+          "answer": "It costs a fraction per kilometre and can open years earlier",
+          "patternId": "b2-170-comparison"
+        }
+      ],
+      [
+        "Mengapa pengembang properti lebih percaya pada jalur trem?",
+        [
+          "Because trams are quieter than buses at night",
+          "Because tram tickets are cheaper for commuters",
+          "Because rails are hard to remove, so the line represents a commitment",
+          "Because trams run more frequently outside peak hours"
+        ],
+        2,
+        {
+          "type": "why",
+          "evidence": "a developer who builds beside a tram line is buying a commitment",
+          "answer": "Because rails are hard to remove, so the line represents a commitment",
+          "patternId": "b2-170-why"
+        }
+      ],
+      [
+        "Klaim bahwa kendaraan rel itu sendiri menarik investasi dianggap penulis sebagai...",
+        [
+          "the central finding of the whole passage",
+          "a proven law of urban economics",
+          "a misreading of what actually causes the development",
+          "a strong argument in favour of buses"
+        ],
+        2,
+        {
+          "type": "inference",
+          "evidence": "an effect that is sometimes reported as though the vehicles themselves attracted investment",
+          "answer": "a misreading of what actually causes the development",
+          "patternId": "b2-170-inference"
+        }
+      ],
+      [
+        "Bukti mana yang dipakai untuk menunjukkan bahwa bus dapat menghasilkan efek serupa?",
+        [
+          "A bus lane can be repainted in a single weekend",
+          "The cost comparison is fair as far as it goes",
+          "Rails are difficult and expensive to remove",
+          "Where busways were legally protected and stations built in concrete, similar development followed"
+        ],
+        3,
+        {
+          "type": "evidence",
+          "evidence": "buses have produced similar development",
+          "answer": "Where busways were legally protected and stations built in concrete, similar development followed",
+          "patternId": "b2-170-evidence"
+        }
+      ],
+      [
+        "Kesimpulan penulis tentang pilihan antara kedua sistem adalah...",
+        [
+          "Steel is always superior to rubber in urban transport",
+          "The real issue is how credibly a city can commit itself",
+          "Cost per kilometre should be the only criterion used",
+          "Developers should be excluded from transport planning"
+        ],
+        1,
+        {
+          "type": "conclusion",
+          "evidence": "how credibly a city can bind its own hands",
+          "answer": "The real issue is how credibly a city can commit itself",
+          "patternId": "b2-170-conclusion"
+        }
+      ]
+    ],
+    "topic": "transit-planning",
+    "author": "Felipe Andrade",
+    "setting": "transport comparison paper",
+    "focus": "weighing-a-trade-off"
+  }
+]
