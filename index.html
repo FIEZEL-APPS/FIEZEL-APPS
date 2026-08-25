@@ -77,6 +77,12 @@ html.fz-booting body{overflow:hidden}
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./features/speaking-listening/speaking-listening-addon.css">
   <link rel="stylesheet" href="./features/tutor-classroom/tutor-v3.css">
+  <!-- m026-01: motion system maskot PAW. Sengaja PALING AKHIR di antara stylesheet:
+       berkasnya memakai nama token yang bertabrakan dengan style.css (--fz-gold,
+       --fz-ink, --fz-line), jadi di sana token dipasang pada kelas .fz-mascot/.fz-motion
+       dan bukan :root. Urutan terakhir memastikan aturan penempatan maskotnya menang
+       atas ukuran wajah pembimbing lama tanpa perlu !important. -->
+  <link rel="stylesheet" href="./features/mascot/fiezel-motion.css">
 </head>
 <body class="scene-day">
   <!-- Splash frame-pertama. Isinya WAJIB sama persis dengan FiezelSplash.markup(); modul
@@ -249,6 +255,12 @@ html.fz-booting body{overflow:hidden}
        SEBELUM app.js karena app.js memanggil keduanya pada cat pertama (refreshIcons dan
        syncCoachBubble). Keduanya ringan dan tidak menyentuh jaringan sama sekali. -->
   <script defer src="./features/ui/fiezel-icons.js"></script>
+  <!-- m026-01: <fiezel-mascot> WAJIB terdaftar sebelum dua berkas di bawahnya.
+       fiezel-coach-bubble.js memutuskan bentuk wajah gelembung saat install(), dan
+       app.js memutuskan wajah panel "Kata FIEZEL" saat cat pertama; keduanya membaca
+       customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
+       tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
+  <script defer src="./features/mascot/fiezel-mascot.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan

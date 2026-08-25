@@ -55,6 +55,46 @@
     return lib && lib.markup ? lib.markup(name) : '';
   }
 
+  /**
+   * Wajah PAW. Mengembalikan <fiezel-mascot> kalau motion system-nya benar-benar
+   * terdaftar, kalau tidak jatuh ke ikon paw yang sama seperti sebelum m026-01.
+   *
+   * Cadangannya bukan hiasan: fiezel-mascot.js bisa gagal (cache lama, berkas
+   * belum sampai, browser tanpa custom element). Kalau itu terjadi, gelembung
+   * harus tetap punya wajah paw - bukan lingkaran kosong. Bentuk paw-nya tetap
+   * satu sumber, yaitu icon('paw') dari features/ui/fiezel-icons.js; berkas ini
+   * tidak pernah menggambar path paw sendiri.
+   */
+  function pawReady() {
+    try { var api = global.FiezelPaw; return !!(api && api.ready && api.ready()); }
+    catch (_) { return false; }
+  }
+
+  /** Wajah PAW. Maskot memakai kelasnya SENDIRI (fz-coach-mascot), bukan
+   *  fz-coach-face - style.css memaku fz-coach-face ke 30px/22px untuk ikon
+   *  paw, dan ukuran itu salah untuk maskot yang perlu dipotong ke kepalanya. */
+  function pawFace(fallbackClass) {
+    if (pawReady()) return '<fiezel-mascot class="fz-coach-mascot" aria-hidden="true"></fiezel-mascot>';
+    return '<span class="fz-i ' + String(fallbackClass || '') + '" aria-hidden="true">' + icon('paw') + '</span>';
+  }
+
+  /** Wadah bulat aplikasi berlatar KUNING, dan badan maskot juga kuning. Kelas
+   *  has-mascot yang mengubah latarnya jadi krem + memotong bidangnya ke kepala.
+   *  Dipasang dari JS, bukan lewat :has() di CSS, supaya peranti lama yang tidak
+   *  mengenal :has() tidak kebagian kuning-di-atas-kuning. */
+  function pawHost(baseClass) {
+    return baseClass + (pawReady() ? ' has-mascot' : '');
+  }
+
+  /** Memanggil corong maskot tanpa pernah melempar. Reaksi gerak tidak boleh
+   *  menjatuhkan percakapan pembimbing. */
+  function paw(method, a, b) {
+    try {
+      var api = global.FiezelPaw;
+      if (api && typeof api[method] === 'function') api[method](a, b);
+    } catch (_) {}
+  }
+
   /* ------------------------------------------------------------------ *
    * Sapaan lokal. Satu kalimat, gaya bahasa FIEZEL dipertahankan apa adanya
    * (brief bagian 2: "Tone of voice TIDAK berubah").
@@ -136,10 +176,10 @@
 
     var bubble = doc.createElement('button');
     bubble.type = 'button';
-    bubble.className = 'fz-coach-bubble';
+    bubble.className = pawHost('fz-coach-bubble');
     bubble.setAttribute('aria-label', 'Buka pembimbing FIEZEL');
     bubble.innerHTML = '<span class="fz-coach-pulse" aria-hidden="true"></span>' +
-      '<span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span>';
+      pawFace('fz-coach-face');
 
     bubble.setAttribute('data-fz-scene', 'home');
 
@@ -194,7 +234,7 @@
     sheet.innerHTML =
       '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="Pembimbing FIEZEL">' +
         '<div class="fz-coach-head">' +
-          '<span class="fz-coach-avatar"><span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span></span>' +
+          '<span class="' + pawHost('fz-coach-avatar') + '">' + pawFace('fz-coach-face') + '</span>' +
           '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>' +
           '<button type="button" class="fz-coach-close" aria-label="Tutup">✕</button>' +
         '</div>' +
@@ -266,6 +306,10 @@
       doc.body.classList.add('fz-coach-open');
       // Wajah di kepala panel adalah marka KEDUA, dan ia memang baru muncul detik ini.
       born(sheet.querySelector('.fz-coach-avatar'));
+      // Panel baru dibuka: maskot menyapa sekali. 'onboard' dipilih, bukan setState
+      // langsung, supaya komponen yang memutuskan levelnya - sapaan kedua dan
+      // seterusnya lebih tenang daripada yang pertama.
+      paw('react', 'onboard');
       if (!log.length) push('coach', localGreeting(context));
       chips();
       setTimeout(function () { input.focus(); }, 60);
@@ -283,6 +327,10 @@
       push('user', text);
       input.value = '';
       statusEl.textContent = 'lagi mikir…';
+      // Status teks dan wajah maskot harus sepakat: kalau tulisannya "lagi mikir",
+      // maskotnya jangan diam. hold:0 = tahan sampai diganti, karena lama menunggu
+      // jawaban AI tidak bisa ditebak.
+      paw('setState', 'thinking', { hold: 0 });
       try {
         // Pembimbing tidak boleh membuat murid menunggu lama. Jalur AI aplikasi punya
         // batas waktunya sendiri yang panjang (wajar untuk penjelasan panjang di modal);
@@ -300,6 +348,9 @@
       } finally {
         statusEl.textContent = 'pembimbing kamu';
         busy = false;
+        // Baik jawabannya dari AI atau dari jalur lokal, murid tetap dapat jawaban.
+        // Sengaja transient supaya maskot kembali idle sendiri.
+        paw('setState', 'encouraging', { hold: 1600 });
       }
     }
 
