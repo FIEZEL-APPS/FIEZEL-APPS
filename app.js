@@ -2964,11 +2964,25 @@ function makeVocabQuestion(v,preferType){
   const same=V.filter(x=>x.id!==v.id&&x.meaning&&x.level===v.level);
   const allMeaning=V.filter(x=>x.id!==v.id&&x.meaning&&x.level===v.level);
   const uniqueByNorm=arr=>{const seen=new Set();return arr.filter(x=>{const k=norm(x);if(!k||seen.has(k))return false;seen.add(k);return true})};
-  const distractMeaning=uniqueByNorm(shuffle(same.map(x=>x.meaning).filter(x=>norm(x)!==norm(v.meaning)))).slice(0,3);
+  // Arti di bank ini kerap berisi beberapa padanan yang dipisah titik koma ("pasti; jelas").
+  // Pengecoh yang berbagi salah satu padanan itu sama-sama bisa dibela oleh murid, jadi ia
+  // disingkirkan - bukan hanya yang sama persis seluruh teksnya.
+  const glossesOf=m=>String(m||'').split(/[;,]/).map(norm).filter(Boolean);
+  const ownGlosses=new Set(glossesOf(v.meaning));
+  const sharesGloss=m=>glossesOf(m).some(g=>ownGlosses.has(g));
+  const distractMeaning=uniqueByNorm(shuffle(same.map(x=>x.meaning).filter(x=>norm(x)!==norm(v.meaning)&&!sharesGloss(x)))).slice(0,3);
   if(distractMeaning.length<3){
     distractMeaning.push(...uniqueByNorm(shuffle(allMeaning.map(x=>x.meaning).filter(x=>norm(x)!==norm(v.meaning)&&!distractMeaning.some(d=>norm(d)===norm(x))))).slice(0,3-distractMeaning.length));
   }
-  const synonymSources=uniqueByNorm(shuffle(V.filter(x=>x.id!==v.id&&x.level===v.level&&x.synonyms?.length).flatMap(x=>x.synonyms)).filter(x=>norm(x)!==norm(v.synonyms?.[0]||'')));
+  // m025-154: pengecoh sinonim dulu hanya menyingkirkan KUNCI-nya saja, sehingga sinonim
+  // lain milik kata yang sama tetap bisa terpilih jadi pengecoh. "decline" berkunci "refuse"
+  // bisa menyodorkan "reject" sebagai pengecoh - padahal keduanya sinonim sah "decline".
+  // Murid yang menjawab dengan Bahasa Inggris yang BENAR ditandai salah, dan itulah bentuk
+  // kerusakan yang menurunkan nilai di sekolah. Yang disingkirkan sekarang: seluruh sinonim
+  // kata target, kata targetnya sendiri, dan kata mana pun yang artinya sama persis.
+  const ownSynonyms=new Set([...(v.synonyms||[]).map(norm),norm(v.word)]);
+  const sameMeaningWords=new Set(V.filter(x=>x.id!==v.id&&v.meaning&&norm(x.meaning)===norm(v.meaning)).map(x=>norm(x.word)));
+  const synonymSources=uniqueByNorm(shuffle(V.filter(x=>x.id!==v.id&&x.level===v.level&&x.synonyms?.length).flatMap(x=>x.synonyms)).filter(x=>!ownSynonyms.has(norm(x))&&!sameMeaningWords.has(norm(x))));
   // m025-114: placement dasar memaksa bentuk termudah ("meaning"). Tanpa ini, satu tes
   // 25 soal bisa kebetulan berisi empat soal part-of-speech dan salah membaca level.
   const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:pick(types);
