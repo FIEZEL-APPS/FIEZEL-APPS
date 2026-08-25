@@ -516,13 +516,25 @@ function auditGrammarRuntime(ctx, templates) {
   // borrowed from a different lesson is provable rather than a hunch.
   const owner = new Map();
   const claim = (text, t) => { const k = norm(text); if (k && k.length > 12 && !owner.has(k)) owner.set(k, { id: t.id, family: t.family, cefr: t.cefr, subskill: t.subskill }); };
+  // m025-155: mode teach_back dan mastery_check merangkai DUA field jadi satu opsi
+  // (objective+rule, howToAvoid+memoryCue). Peta pemilik dulu hanya mengklaim field
+  // satuan, sehingga opsi rangkaian tidak pernah bisa dilacak ke template pemiliknya.
+  // Sekarang teks GABUNGANNYA (plus varian *Id) ikut diklaim.
+  const claimPair = (a, b, t) => { if (a && b) claim(`${a} ${b}`, t); };
   for (const t of templates) {
     for (const f of ['pedagogicalObjective', 'misconceptionTargeted', 'reasoningOperation', 'pedagogicalObjectiveId', 'misconceptionTargetedId', 'reasoningOperationId']) claim(t[f], t);
     const e = t.explanation || {};
     for (const f of ['whyCorrect', 'rule', 'whyOthersFail', 'howToAvoid', 'memoryCue', 'whyCorrectId', 'ruleId', 'whyOthersFailId', 'howToAvoidId', 'memoryCueId']) claim(e[f], t);
+    claimPair(t.pedagogicalObjective, e.rule, t); claimPair(t.pedagogicalObjectiveId, e.ruleId, t);
+    claimPair(e.howToAvoid, e.memoryCue, t); claimPair(e.howToAvoidId, e.memoryCueId, t);
     for (const d of t.distractors || []) { claim(d.whyFails, t); claim(d.whyFailsId, t); claim(d.misconception, t); claim(d.misconceptionId, t); }
   }
   const byId = new Map(templates.map(t => [t.id, t]));
+  // m025-155: nilai GRAMMAR_FAMILY_LABELS adalah taksonomi global, bukan konten milik satu
+  // lesson dan bukan pinjaman antar lesson. Label ini tidak boleh dituduh "pinjaman tak
+  // berjejak" -- yang salah justru kalau kartu menstempelnya origin 'own'.
+  let taxonomyLabels = new Set();
+  try { taxonomyLabels = new Set(Object.values(vm.runInContext('GRAMMAR_FAMILY_LABELS', ctx) || {}).map(norm).filter(Boolean)); } catch (e) { /* runtime lama tanpa label global -- check taksonomi otomatis kosong */ }
 
   const state = ctx.__getFiezelState();
   const prevLevel = state.preferences.activeLevel || '', prevMode = state.preferences.levelMode || 'placement';
@@ -538,6 +550,8 @@ function auditGrammarRuntime(ctx, templates) {
       for (const v of [t.pedagogicalObjective, t.misconceptionTargeted, t.reasoningOperation, t.pedagogicalObjectiveId, t.misconceptionTargetedId, t.reasoningOperationId,
         e.whyCorrect, e.rule, e.whyOthersFail, e.howToAvoid, e.memoryCue, e.whyCorrectId, e.ruleId, e.whyOthersFailId, e.howToAvoidId, e.memoryCueId]) if (v) ownText.add(norm(v));
       for (const d of t.distractors || []) for (const v of [d.whyFails, d.whyFailsId, d.misconception, d.misconceptionId]) if (v) ownText.add(norm(v));
+      // m025-155: teks gabungan milik lesson sendiri (teach_back/mastery_check) juga sah.
+      for (const [a, b] of [[t.pedagogicalObjective, e.rule], [t.pedagogicalObjectiveId, e.ruleId], [e.howToAvoid, e.memoryCue], [e.howToAvoidId, e.memoryCueId]]) if (a && b) ownText.add(norm(`${a} ${b}`));
     }
     let questions = [];
     try { questions = ctx.buildGrammarLessonQuestions(t.subskill, 25) || []; }
@@ -598,6 +612,22 @@ function auditGrammarRuntime(ctx, templates) {
       const answerText = q.options?.[q.answerIndex];
       for (const d of q.explain?.distractors || []) {
         if (d.option === answerText) continue;
+        // m025-155: label keluarga grammar (GRAMMAR_FAMILY_LABELS) diperlakukan sebagai
+        // taksonomi. Ia bukan pinjaman tak berjejak; pelanggarannya justru kalau kartu
+        // menstempelnya milik lesson (origin 'own' / own:true), atau mendiagnosisnya
+        // seolah-olah bentuk kata kerja yang keliru.
+        if (taxonomyLabels.has(norm(d.option))) {
+          const prov = Array.isArray(q.optionSources) ? q.optionSources.find(x => x && x.option === d.option) : null;
+          if (!prov || prov.own === true || prov.origin === 'own' || (prov.origin !== undefined && prov.origin !== 'taxonomy')) {
+            critical('grammar', 'TAXONOMY_STAMPED_AS_OWN', q.sourceId || t.id,
+              "a global grammar-family label is stamped as the lesson's own content instead of origin 'taxonomy'", d.option);
+          }
+          if (/belum cocok dengan waktu, fungsi, atau susunan/.test(String(d.reason))) {
+            critical('grammar', 'EXPLANATION_WRONG_KIND', q.sourceId || t.id,
+              'a taxonomy family label is diagnosed as if it were a wrong verb form', d.reason);
+          }
+          continue;
+        }
         // "Teksnya juga dimiliki template lain" BUKAN bukti pinjaman: dua lesson boleh
         // menargetkan miskonsepsi yang sama, dan label Indonesianya memang sama. Yang
         // menentukan hanyalah apakah kartu itu sendiri menandainya sebagai pinjaman, atau
@@ -606,9 +636,17 @@ function auditGrammarRuntime(ctx, templates) {
         const borrowed = owner.get(norm(d.option));
         if (borrowed && borrowed.id !== q.sourceId) {
           const prov = Array.isArray(q.optionSources) ? q.optionSources.find(x => x && x.option === d.option) : null;
-          if (!prov || prov.own || !prov.sourceId) {
+          // m025-155: entry optionSources kini objek kontrak {sourceId, sourceLevel, origin}.
+          // Pinjaman sah = origin 'peer' dengan sourceId non-kosong milik template lain;
+          // sourceLevel wajib menyalin cefr template asal supaya pinjaman lintas level
+          // dalam keluarga tidak lagi tanpa label.
+          const isPeer = prov && prov.origin === 'peer' && prov.sourceId && prov.sourceId !== q.sourceId;
+          if (!isPeer || prov.own === true) {
             critical('grammar', 'OPTION_PROVENANCE_LOST', q.sourceId || t.id,
-              `an option borrowed from ${borrowed.id} carries no provenance, so a wrong pick cannot be traced to the lesson actually confused`, d.option);
+              `an option borrowed from ${borrowed.id} carries no peer provenance {sourceId, sourceLevel, origin:'peer'}, so a wrong pick cannot be traced to the lesson actually confused`, d.option);
+          } else if (String(prov.sourceLevel || '') !== String((byId.get(prov.sourceId) || {}).cefr || '')) {
+            critical('grammar', 'PEER_LEVEL_UNLABELLED', q.sourceId || t.id,
+              `peer option from ${prov.sourceId} carries sourceLevel="${prov.sourceLevel || ''}" but the source template is ${(byId.get(prov.sourceId) || {}).cefr || '?'}`, d.option);
           }
           if (/belum cocok dengan waktu, fungsi, atau susunan/.test(String(d.reason))) {
             critical('grammar', 'EXPLANATION_WRONG_KIND', q.sourceId || t.id,
