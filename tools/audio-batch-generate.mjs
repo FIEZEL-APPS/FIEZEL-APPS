@@ -215,6 +215,52 @@ const REGISTRY = {
     return readJson('reading-bank.json')
       .filter((item) => item?.text)
       .map((item) => ({ text: item.text, contentType: 'passage', locale: 'en-US', sourceRef: item.id }));
+  },
+
+  /**
+   * Audiobook perpustakaan: satu aset per kalimat.
+   *
+   * Per kalimat, bukan per bab, karena pembaca FIEZEL menyorot kalimat yang sedang dibaca
+   * dan boleh mengulang satu kalimat saja. Satu berkas per bab akan memaksa mengunduh
+   * seluruh bab untuk mengulang satu baris, dan menutup kemungkinan penyorotan itu.
+   *
+   * THE LITTLE PRINCE SENGAJA DIKECUALIKAN. Delapan entri lain di bank ini adalah retelling
+   * FIEZEL - tiga di antaranya bahkan diberi label tegas bahwa teks aslinya masih berhak
+   * cipta dan TIDAK direproduksi. Entri the_little_prince mengaku hal yang sama di field
+   * source-nya, tetapi isinya terjemahan Katherine Woods 1943 kata per kata, lengkap dengan
+   * halaman judulnya - 93.018 karakter, enam puluh kali lipat entri lain. Terjemahan itu
+   * masih berhak cipta, jadi ia tidak diproduksi sampai teksnya benar-benar diganti retelling
+   * seperti yang dijanjikan metadatanya.
+   */
+  audiobook() {
+    const DIKECUALIKAN = new Set(['the_little_prince']);
+    const rank = { A1: 0, A2: 1, B1: 2, B2: 3, C1: 4, C2: 5 };
+    const books = readJson('features/library/library-books-v1.json');
+    const list = Array.isArray(books) ? books : (books?.items || books?.books || []);
+
+    return list
+      .filter((book) => book?.id && !DIKECUALIKAN.has(book.id))
+      .map((book, index) => ({ book, index }))
+      // Level dulu, lalu urutan asli sebagai pemecah seri - alasannya sama dengan listening:
+      // anggaran selalu terpotong di tengah, jadi yang menentukan adalah yang mana.
+      .sort((a, b) => {
+        const la = rank[a.book.level] ?? 99;
+        const lb = rank[b.book.level] ?? 99;
+        return la === lb ? a.index - b.index : la - lb;
+      })
+      .flatMap(({ book }) =>
+        (book.chapters || []).flatMap((chapter, ci) =>
+          (chapter.sentences || [])
+            .map((sentence, si) => ({ sentence, si }))
+            .filter(({ sentence }) => typeof sentence?.en === 'string' && sentence.en.trim())
+            .map(({ sentence, si }) => ({
+              text: sentence.en,
+              contentType: 'book',
+              locale: 'en-US',
+              sourceRef: `${book.id}#${ci}.${si}`
+            }))
+        )
+      );
   }
 };
 
