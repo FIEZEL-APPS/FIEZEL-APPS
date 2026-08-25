@@ -463,10 +463,29 @@ function manifestWith(text, extra = {}) {
       tlpChars > terbesarLain * 5,
       `${tlpChars} karakter vs ${terbesarLain} terbesar di antara retelling - selama ini benar, pengecualian tetap perlu`);
 
-    const AK2 = require(path.join(root, 'features/audio-assets/fiezel-audio-key.js'));
-    check('Judul-halaman penerjemah tidak pernah masuk daftar produksi',
-      !/Katherine Woods/i.test(toolSrc3) && AK2.canonicalText('  x  ') === 'x',
-      'teks penerjemah tidak dirujuk registry');
+    // Pemeriksaan perilaku, bukan pemindaian teks: registry-nya benar-benar dijalankan.
+    // Memindai sumber apa adanya akan menghukum komentar yang justru menjelaskan
+    // pengecualian ini - kesalahan yang sudah pernah terjadi pada gate Worker.
+    let lainnya = 0;
+    for (const b of list) {
+      if (b.id === 'the_little_prince') continue;
+      for (const c of b.chapters || []) for (const s of c.sentences || []) if (s?.en?.trim()) lainnya++;
+    }
+    let terpancar = -1;
+    try {
+      const keluaran = require('child_process').execFileSync(
+        process.execPath,
+        ['tools/audio-batch-generate.mjs', '--content=audiobook', '--limit=1'],
+        { cwd: root, env: { ...process.env, ELEVENLABS_VOICE_ID: 'gate-voice' }, encoding: 'utf8' }
+      );
+      const m = keluaran.match(/belum ada\s*:\s*(\d+)/);
+      const d = keluaran.match(/duplikat\s*:\s*(\d+)/);
+      if (m && d) terpancar = Number(m[1]) + Number(d[1]);
+    } catch (_) { /* terpancar tetap -1 dan gate gagal, sebagaimana mestinya */ }
+
+    check('Registry hanya memancarkan kalimat dari buku yang boleh diproduksi',
+      terpancar === lainnya,
+      `registry ${terpancar} kalimat, delapan buku lain ${lainnya} - the_little_prince (${tlp?.chapters?.length || 0} bab) tidak ikut`);
   }
 
   const report = {
