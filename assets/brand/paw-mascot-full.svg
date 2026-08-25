@@ -1,0 +1,162 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="PAW — maskot FIEZEL">
+    <ellipse class="fz-shadow" cx="160" cy="284" rx="86" ry="10" fill="#000" opacity=".08"/>
+    <g class="fz-all">
+      <!-- ekor: melengkung dari belakang kanan, ring + ujung marun -->
+      <g class="fz-tail">
+        <defs>
+          <mask id="fzTailMaskStatic" maskUnits="userSpaceOnUse" x="180" y="120" width="160" height="170">
+            <path d="M212 244 C 266 258 298 238 296 200 C 295 180 284 164 268 158"
+                  stroke="#fff" stroke-width="25" fill="none" stroke-linecap="round"/>
+          </mask>
+        </defs>
+        <path d="M212 244 C 266 258 298 238 296 200 C 295 180 284 164 268 158"
+              stroke="#EDB93A" stroke-width="25" fill="none" stroke-linecap="round"/>
+        <g mask="url(#fzTailMaskStatic)">
+          <circle class="fz-ring" cx="268" cy="158" r="15" fill="#8C2233"/>
+        </g>
+      </g>
+
+      <g class="fz-body">
+        <!-- badan duduk -->
+        <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+        <ellipse cx="132" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+        <ellipse cx="188" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+        <!-- dada + emblem paw -->
+        <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+        <g transform="translate(160,224)" fill="#8C2233">
+          <ellipse cx="0" cy="5" rx="10" ry="8"/>
+          <circle cx="-10" cy="-7" r="4"/><circle cx="0" cy="-10" r="4"/><circle cx="10" cy="-7" r="4"/>
+        </g>
+        <!-- telinga segitiga geometris -->
+        <g class="fz-ear fz-ear-l">
+          <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+          <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        </g>
+        <g class="fz-ear fz-ear-r">
+          <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+          <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        </g>
+        <!-- kepala bulat besar -->
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+        <!-- wajah -->
+        <g class="fz-face">
+          <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+          <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+          <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+          <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+          <g class="fz-eyes">
+            <g class="fz-eye-open">
+              <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/>
+                 <circle cx="130" cy="93" r="5" fill="#fff"/>
+                 <circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+              <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/>
+                 <circle cx="198" cy="93" r="5" fill="#fff"/>
+                 <circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+            </g>
+            <g class="fz-eye-happy" opacity="0">
+              <path d="M112 101 C 119 90 133 90 140 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+              <path d="M180 101 C 187 90 201 90 208 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+            </g>
+            <g class="fz-eye-love" opacity="0" fill="#D9536A">
+              <g transform="translate(126,98)"><g class="fz-heart-eye">
+                <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+                <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+              </g></g>
+              <g transform="translate(194,98)"><g class="fz-heart-eye">
+                <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+                <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+              </g></g>
+            </g>
+            </g>
+          </g>
+          <g class="fz-brows" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" opacity="0">
+            <path class="fz-brow-l" d="M112 74 L 138 70"/>
+            <path class="fz-brow-r" d="M182 70 L 208 74"/>
+          </g>
+          <g class="fz-mouth">
+            <path class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-open" style="display:none"
+                  d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+            <circle class="fz-m fz-m-o" style="display:none" cx="160" cy="151" r="6.5" fill="#33201F"/>
+            <path class="fz-m fz-m-wave" style="display:none" d="M147 150 Q 153 145 160 150 Q 167 155 173 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-flat" style="display:none" d="M150 150 L 170 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path class="fz-m fz-m-sad" style="display:none"
+                  d="M148 154 C 154 147 166 147 172 154"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+          </g>
+          <g class="fz-acc fz-sweat" opacity="0">
+            <path d="M80 72 C 88 84 90 92 90 98 A 10 10 0 1 1 70 98 C 70 92 72 84 80 72 Z"
+                  fill="#9CC7E8"/>
+          </g>
+        </g>
+
+        <!-- lengan depan (setelah kepala agar tampak saat diangkat) -->
+        <g class="fz-arm fz-arm-l"><ellipse cx="122" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+          <ellipse cx="122" cy="206" rx="14" ry="30" fill="#000" opacity=".04"/></g>
+        <g class="fz-arm fz-arm-r"><ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+          <g class="fz-pads" opacity="0" transform="translate(198,228) scale(.85)">
+            <ellipse cx="0" cy="6" rx="9" ry="7" fill="#8C2233"/>
+            <circle cx="-9" cy="-5" r="3.6" fill="#8C2233"/>
+            <circle cx="0" cy="-8" r="3.6" fill="#8C2233"/>
+            <circle cx="9" cy="-5" r="3.6" fill="#8C2233"/>
+          </g></g>
+
+        <!-- headphone di dalam badan agar ikut goyangan groove -->
+        <g class="fz-acc fz-headphones" opacity="0">
+          <path d="M76 70 C 92 10 228 10 244 70" stroke="#D8B36B" stroke-width="14" fill="none"
+                stroke-linecap="round"/>
+          <rect x="52" y="66" width="38" height="54" rx="18" fill="#8C2233"/>
+          <rect x="230" y="66" width="38" height="54" rx="18" fill="#8C2233"/>
+        </g>
+      </g>
+
+      <!-- aksesori kontekstual -->
+      <g class="fz-acc fz-notes" fill="#D8B36B" opacity="0">
+        <g class="fz-note n1">
+          <circle cx="0" cy="10" r="7"/><rect x="5" y="-18" width="4.5" height="28" rx="2"/>
+          <rect x="5" y="-18" width="16" height="5" rx="2.5"/></g>
+        <g class="fz-note n2">
+          <circle cx="0" cy="8" r="6"/><rect x="4" y="-14" width="4" height="22" rx="2"/></g>
+      </g>
+      <g class="fz-acc fz-dots" fill="#8C2233" opacity="0">
+        <circle class="d1" cx="252" cy="54" r="7"/>
+        <circle class="d2" cx="262" cy="32" r="8.5"/>
+        <circle class="d3" cx="286" cy="18" r="10"/>
+      </g>
+      <g class="fz-acc fz-bulb" opacity="0">
+        <circle cx="262" cy="34" r="20" fill="#D8B36B"/>
+        <circle cx="262" cy="34" r="20" fill="#fff" opacity=".25"/>
+        <rect x="254" y="50" width="16" height="10" rx="4" fill="#8C2233"/>
+        <g stroke="#D8B36B" stroke-width="5" stroke-linecap="round">
+          <path d="M232 16 L 224 10"/><path d="M292 16 L 300 10"/><path d="M262 6 L 262 -4"/>
+        </g>
+      </g>
+      <g class="fz-acc fz-stars" fill="#D8B36B" opacity="0">
+        <path class="s1" d="M42 46 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+        <path class="s2" d="M282 78 l3.5 9 9 3.5 -9 3.5 -3.5 9 -3.5 -9 -9 -3.5 9 -3.5 Z"/>
+        <path class="s3" d="M258 6 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#D9536A"/>
+      </g>
+      <g class="fz-acc fz-zzz" opacity="0" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path class="fz-z z1" d="M246 40 L 268 40 L 246 62 L 268 62" stroke="#8C2233" stroke-width="6"/>
+        <path class="fz-z z2" d="M274 18 L 290 18 L 274 34 L 290 34" stroke="#D8B36B" stroke-width="5"/>
+      </g>
+      <g class="fz-acc fz-tear" opacity="0">
+        <path d="M120 114 C 126 123 127 128 127 132.5 A 7 7 0 1 1 113 132.5 C 113 128 114 123 120 114 Z"
+              fill="#9CC7E8"/>
+      </g>
+      <g class="fz-acc fz-hearts" opacity="0" fill="#D9536A">
+        <g transform="translate(58,78)">
+          <path class="fz-heart hh1" d="M0 6.5 C -4.2 2.7 -7.5 .5 -7.5 -2.8 C -7.5 -5.8 -5.3 -7.5 -3.4 -7.5 C -1.7 -7.5 -.5 -6.4 0 -5.1 C .5 -6.4 1.7 -7.5 3.4 -7.5 C 5.3 -7.5 7.5 -5.8 7.5 -2.8 C 7.5 .5 4.2 2.7 0 6.5 Z"/>
+        </g>
+        <g transform="translate(266,64)">
+          <path class="fz-heart hh2" fill="#F0A0AC" d="M0 6.5 C -4.2 2.7 -7.5 .5 -7.5 -2.8 C -7.5 -5.8 -5.3 -7.5 -3.4 -7.5 C -1.7 -7.5 -.5 -6.4 0 -5.1 C .5 -6.4 1.7 -7.5 3.4 -7.5 C 5.3 -7.5 7.5 -5.8 7.5 -2.8 C 7.5 .5 4.2 2.7 0 6.5 Z"/>
+        </g>
+      </g>
+    </g>
+  </svg>

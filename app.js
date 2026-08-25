@@ -1446,7 +1446,10 @@ function bindAudioUnlockGestures(){if(bindAudioUnlockGestures.bound)return;bindA
 function feedbackTone(freq,at,duration=.24,type='sine'){if(!fxCtx||!fxGain)return;const oscillator=fxCtx.createOscillator(),gain=fxCtx.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(freq,at);gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.6,at+.012);gain.gain.exponentialRampToValueAtTime(.0001,at+duration);oscillator.connect(gain);gain.connect(fxGain);oscillator.start(at);oscillator.stop(at+duration+.02)}
 function playFeedbackSound(kind){if(!feedbackSoundsOn()||!unlockFeedbackAudio())return false;try{const now=fxCtx.currentTime+.01;if(kind==='success')[[523.25,0],[659.25,.085],[783.99,.17],[1046.5,.26]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.3,i>1?'triangle':'sine'));else if(kind==='error')[[220,0],[164.81,.14],[110,.28]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.34,i===2?'sawtooth':'triangle'));else feedbackTone(392,now,.12,'sine');return true}catch{return false}}
 function showAnswerBurst(ok){const burst=$('answerBurst');if(!burst)return;clearTimeout(showAnswerBurst.timer);burst.className=`answer-burst ${ok?'success':'error'}`;burst.innerHTML=`<span class="answer-burst-icon"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i></span><strong>${ok?'Benar!':'Belum tepat'}</strong><small>${ok?'Mantap, polanya sudah terbaca.':'Tenang, kita bedah jawabannya.'}</small>`;burst.classList?.remove?.('hidden');refreshIcons();const show=()=>burst.classList?.add?.('show');if(window.requestAnimationFrame)window.requestAnimationFrame(show);else setTimeout(show,16);showAnswerBurst.timer=setTimeout(()=>{burst.classList?.remove?.('show');setTimeout(()=>burst.classList?.add?.('hidden'),320)},1500)}
-function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok)}
+// m026-01: reaksi maskot dititipkan DI SINI, bukan di answer() atau record(). Fungsi ini
+// sudah menjadi corong tunggal untuk getar + suara + kilas jawaban, jadi setiap tempat
+// yang menilai jawaban otomatis ikut - tanpa menambah pemanggilan di tiap penilai.
+function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok);pawReact(ok?'correct':'wrong')}
 let appOpened=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
 function notificationPermission(){return typeof Notification==='undefined'?'unsupported':Notification.permission}
 function notificationsSupported(){return typeof Notification!=='undefined'&&typeof Notification.requestPermission==='function'}
@@ -2035,7 +2038,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
@@ -2071,6 +2074,39 @@ function syncCoachBubble(){
 // batasan pertama: "Nol fitur dihapus."
 const VALID_VIEWS=new Set(['home','vocab','grammar','reading','skills','listening','speaking','writing','test','progress','classroom','library','ask','search']);
 function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(_){return false}}
+// m026-01 - maskot PAW. Tiga pembungkus di bawah ini adalah SATU-SATUNYA cara app.js
+// berbicara dengan <fiezel-mascot>. Alasannya:
+//
+// 1. Titik pasangnya ada di jalur panas: answerFeedbackSignal (tiap jawaban),
+//    finishQuiz (tiap sesi tuntas), callback perkenalan. Reaksi gerak adalah lapisan
+//    paling boleh gagal di aplikasi ini, jadi ia tidak pernah boleh melempar ke atas.
+// 2. Hormat pada pengaturan gerak. Murid yang mematikan animasi, atau sistem yang
+//    minta prefers-reduced-motion, tidak mendapat reaksi maskot sama sekali - bukan
+//    versi lebih pelan. Ini pemeriksaan yang sama yang dipakai celebrate().
+// 3. Kalau motion system-nya tidak ada (cache lama, berkas gagal dimuat), semuanya
+//    diam tanpa suara. Tidak ada cabang darurat, tidak ada log yang menakuti murid.
+function pawMotionAllowed(){if(prefersReducedMotion())return false;return state.preferences?.motion!==false}
+function pawReact(evt,detail){if(!pawMotionAllowed())return false;try{return !!self.FiezelPaw?.react?.(evt,detail)}catch(_){return false}}
+function pawSetState(name,opts){if(!pawMotionAllowed())return false;try{return !!self.FiezelPaw?.setState?.(name,opts)}catch(_){return false}}
+// Wajah panel "Kata FIEZEL". Cadangannya ikon paw yang sama seperti sebelum m026-01:
+// bentuk paw tetap satu sumber di features/ui/fiezel-icons.js lewat atribut data-fz-icon,
+// berkas ini tidak menggambar path apa pun.
+// Wajah panel "Kata FIEZEL". Mengembalikan SATU span coach-strip-face utuh, karena
+// dua cabangnya butuh kelas wadah yang berbeda: maskot perlu has-mascot (latar krem +
+// potong ke kepala, lihat fiezel-motion.css), ikon paw perlu fz-i seperti sebelumnya.
+// Bentuk paw tetap satu sumber lewat data-fz-icon -> features/ui/fiezel-icons.js.
+function pawFaceMarkup(){try{if(self.FiezelPaw?.ready?.())
+  return '<span class="coach-strip-face has-mascot" aria-hidden="true"><fiezel-mascot class="coach-strip-mascot"></fiezel-mascot></span>'}catch(_){}
+  return '<span class="coach-strip-face fz-i" data-fz-icon="paw" aria-hidden="true"></span>'}
+// Streak yang putus hanya bisa dikenali dengan membandingkan dua kali cat Home;
+// recomputeMeaningfulDays() sengaja TIDAK disentuh - ia lapisan data yang juga
+// berjalan saat tidak ada layar yang tampil, dan reaksi gerak dari sana akan
+// menyala di waktu yang salah. Ambangnya <=1 supaya hanya kejatuhan sungguhan
+// (rantai hilang) yang memicunya, bukan koreksi angka biasa.
+let pawLastSeenStreak=null;
+function pawStreakWatch(){const now=Number(state.streak)||0;
+  if(pawLastSeenStreak!==null&&now<pawLastSeenStreak&&now<=1)pawReact('streak-lost');
+  pawLastSeenStreak=now}
 // m025-84: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
 // seluruh aplikasi hidup di SATU entri riwayat - gestur swipe-back tidak punya tujuan dan
 // tombol kembali sistem justru menutup PWA. Sekarang setiap navigasi maju mendorong satu
@@ -2279,7 +2315,7 @@ function homeStatStripMarkup(level,streak,attempts,review){
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
-function home(){const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
+function home(){pawStreakWatch();const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
   <div class="launcher-meta"><span class="live-signal"></span><span>FIEZEL PERSONAL · ${esc(todayLabel())}</span><button type="button" class="home-level-context" onclick="openLevelPanel()">${esc(activeLevel)} · semua materi · ganti</button>${celestialStatusMarkup()}</div>
@@ -2293,7 +2329,7 @@ function home(){const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level==
          tautan Coach tetap ada dan tetap satu ketukan. -->
   </div>
   <aside class="coach-strip">
-    <span class="coach-strip-face fz-i" data-fz-icon="paw" aria-hidden="true"></span>
+    ${pawFaceMarkup()}
     <div class="coach-strip-say">
       <small>Kata FIEZEL</small>
       <b>${esc(state.adaptiveReady?signal.title:'Aku belum kenal kamu. Coba tes singkat dulu, ya.')}</b>
@@ -2641,7 +2677,9 @@ function showOnboarding(now=Date.now()){
       // m025-117: langkah pertama perkenalan. Namanya masuk ke state SEKETIKA, bukan di
       // ujung alur - murid yang menutup aplikasi di tengah perkenalan tetap punya namanya
       // saat kembali, dan Home tidak pernah tercat dengan sapaan netral setelah dijawab.
-      onName:({name})=>{if(setLearnerName(name)){try{render()}catch{}}},
+      // m026-01: sapaan maskot dipicu saat namanya masuk, bukan saat perkenalan dibuka -
+      // di titik ini murid sudah menjawab sesuatu, jadi sapaannya terasa balasan.
+      onName:({name})=>{if(setLearnerName(name)){try{render()}catch{}}pawReact('onboard')},
       onGoal:({goal,level})=>{
         const journey=self.FiezelPersonalJourney;
         const id=journey?journey.buildGoalProfile(goal).id:goal;
@@ -2891,7 +2929,7 @@ const SKILL_PAGE_COPY={
   listening:{title:'Listening',lead:'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.'},
   speaking:{title:'Speaking',lead:'Ngomong aja dulu. Rekamannya tidak pernah dikirim ke mana pun, cuma dinilai di perangkatmu.'}
 };
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
 // m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
@@ -3714,6 +3752,9 @@ function finishQuiz(cfg,score,total,tutorReport){
   // sesinya selesai. completeActiveSession() bukan tempatnya - ia fungsi data yang juga
   // berjalan pada penutupan yang tidak pernah tampil di layar.
   uiSfx('celebrate');
+  // m026-01: menempel pada uiSfx('celebrate') dengan sengaja - keduanya perayaan yang
+  // sama, dan keduanya hanya berjalan pada penutupan sesi yang MEMANG tampil di layar.
+  pawReact('lesson-complete');
   setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="score">${accuracy}%</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${outcomeLine}<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
