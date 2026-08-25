@@ -94,6 +94,16 @@ vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(()=>{
   try{
     const invalidRuntime=[],shortLessons=[],focusLeak=[],modeFailures=[],withinDuplicates=[],genericRuntime=[];
+    // m025-155: check focus-leak lama tautologis - q.sourceId/conceptId/lessonSkill distempel
+    // dari template yang sama sehingga tidak pernah bisa gagal. Check identitas murah tetap
+    // dipertahankan, tetapi jaminan kualitas sesungguhnya kini pindah ke KONTRAK provenance
+    // per entry optionSources: {sourceId, sourceLevel, origin:'own'|'peer'|'taxonomy'|'fallback'}.
+    const provenanceViolations=[],sequenceCueCollisions=[],classifyFamilyIssues=[];
+    const templateById=new Map(grammar.templates.map(t=>[t.id,t]));
+    const validOrigins=new Set(['own','peer','taxonomy','fallback']);
+    // m025-155: kalimat fallback heuristik bentuk kata kerja - tidak boleh muncul sebagai
+    // alasan untuk label keluarga grammar (v21).
+    const verbFormFallbackReason=/belum cocok dengan waktu, fungsi, atau susunan/i;
     const crossSignatures=new Map(),sourceOwners=new Map(),modeCounts={},samples={};
     let totalQuestions=0;
     const runtimeState=context.__getFiezelState?.()||null;
@@ -114,10 +124,51 @@ setTimeout(()=>{
         modeCounts[q.practiceMode]=(modeCounts[q.practiceMode]||0)+1;
         if(!context.__fiezelAudit.validateQuestion(q).ok)invalidRuntime.push(q.id);
         if(q.skill!==template.subskill||q.lessonSkill!==template.subskill||q.sourceId!==template.id||q.conceptId!==template.id)focusLeak.push({lesson:template.subskill,question:q.id,source:q.sourceId});
+        // m025-155: validasi kontrak provenance tiap entry optionSources (sejajar indeks opsi).
+        // own -> sourceId===id template lesson; peer -> sourceId non-kosong milik template lain
+        // yang benar-benar ada dan sourceLevel===cefr template asal; taxonomy/fallback ->
+        // sentinel 'taxonomy:family'/'fallback:generic' dan tidak boleh diaku own.
+        const entries=Array.isArray(q.optionSources)?q.optionSources:[];
+        if(entries.length!==q.options.length)provenanceViolations.push({lesson:template.subskill,question:q.id,mode:q.practiceMode,issue:'jumlah_entry_tidak_sama_dengan_jumlah_opsi',detail:`entries=${entries.length} options=${q.options.length}`});
+        entries.forEach((entry,index)=>{
+          const flag=issue=>provenanceViolations.push({lesson:template.subskill,question:q.id,mode:q.practiceMode,option:q.options[index],origin:entry&&entry.origin,sourceId:entry&&entry.sourceId,issue});
+          if(!entry||typeof entry!=='object')return flag('entry_bukan_objek_kontrak');
+          if(!validOrigins.has(entry.origin))return flag('origin_tidak_valid');
+          if(entry.own===true&&entry.origin!=='own')flag('own_true_hanya_boleh_untuk_origin_own');
+          if(entry.origin==='own'){
+            if(entry.sourceId!==template.id)flag('own_sourceId_bukan_id_template_lesson');
+          }else if(entry.origin==='peer'){
+            const peer=templateById.get(String(entry.sourceId||''));
+            if(!entry.sourceId||entry.sourceId===template.id)flag('peer_sourceId_kosong_atau_menunjuk_lesson_sendiri');
+            else if(!peer)flag('peer_sourceId_tidak_resolve_ke_template_nyata');
+            else if(String(entry.sourceLevel||'')!==String(peer.cefr||''))flag(`peer_sourceLevel_mismatch(${entry.sourceLevel||''}!=${peer.cefr||''})`);
+          }else if(entry.origin==='taxonomy'){
+            if(entry.sourceId!=='taxonomy:family'||entry.own===true)flag('taxonomy_sentinel_atau_own_salah');
+          }else if(entry.origin==='fallback'){
+            if(entry.sourceId!=='fallback:generic'||entry.own===true)flag('fallback_sentinel_atau_own_salah');
+          }
+        });
+        // m025-155: v21 classify_family - setiap opsi salah wajib origin 'taxonomy' dan
+        // alasannya bukan kalimat fallback bentuk kata kerja (murid membaca label keluarga,
+        // bukan bentuk kata kerja yang keliru).
+        if(q.practiceMode==='classify_family'){
+          q.options.forEach((option,index)=>{
+            if(index===q.answerIndex)return;
+            const entry=entries[index];
+            if(!entry||entry.origin!=='taxonomy')classifyFamilyIssues.push({lesson:template.subskill,question:q.id,option,issue:'opsi_salah_bukan_origin_taxonomy'});
+            const diagnosed=(q.explain?.distractors||[]).find(x=>norm(x.option)===norm(option));
+            if(diagnosed&&verbFormFallbackReason.test(String(diagnosed.reason||'')))classifyFamilyIssues.push({lesson:template.subskill,question:q.id,option,issue:'reason_memakai_fallback_bentuk_kata_kerja'});
+          });
+        }
         const sig=signature(q);if(!crossSignatures.has(sig))crossSignatures.set(sig,new Set());crossSignatures.get(sig).add(template.subskill);
         if(!sourceOwners.has(q.sourceId))sourceOwners.set(q.sourceId,new Set());sourceOwners.get(q.sourceId).add(template.subskill);
         if(/Correct:|This form matches|does not satisfy|placeholder|lorem ipsum/i.test(JSON.stringify(q.explain)))genericRuntime.push(q.id);
       }
+      // m025-155: v5 (sequence_reasoning) dan v22 (locate_decision_cue) dulu berbagi seed
+      // hash sehingga set opsinya identik. Kontrak baru mewajibkan keduanya berbeda per lesson.
+      const optionSetOf=mode=>{const found=questions.find(x=>x.practiceMode===mode);return found?found.options.map(norm).sort().join('|'):null};
+      const sequenceSet=optionSetOf('sequence_reasoning'),cueSet=optionSetOf('locate_decision_cue');
+      if(sequenceSet&&cueSet&&sequenceSet===cueSet)sequenceCueCollisions.push(template.subskill);
       if(Object.keys(samples).length<3)samples[template.id]=questions.slice(0,3).map(q=>({mode:q.practiceMode,question:q.question,answer:q.options[q.answerIndex]}));
     }
     if(runtimeState?.preferences)runtimeState.preferences={...runtimeState.preferences,activeLevel:previousActiveLevel,levelMode:previousLevelMode};
@@ -129,6 +180,9 @@ setTimeout(()=>{
     check('Twenty-five distinct pedagogical modes',modeFailures.length===0,modeFailures.length?modeFailures:`${expectedModes.length} modes x ${lessonCount} lessons`);
     check('Within-lesson question uniqueness',withinDuplicates.length===0,withinDuplicates.length?withinDuplicates:'no repeated question or option signature');
     check('Lesson focus purity',focusLeak.length===0,focusLeak.length?focusLeak.slice(0,10):`all ${totalQuestions.toLocaleString()} questions use the active lesson concept`);
+    check('Option provenance contract (m025-155)',provenanceViolations.length===0,provenanceViolations.length?{violations:provenanceViolations.length,samples:provenanceViolations.slice(0,10)}:'semua entry optionSources memenuhi kontrak own/peer/taxonomy/fallback');
+    check('Sequence vs decision-cue option sets differ (m025-155)',sequenceCueCollisions.length===0,sequenceCueCollisions.length?sequenceCueCollisions.slice(0,10):'set opsi v5 dan v22 berbeda di setiap lesson');
+    check('Classify-family distractors are honest taxonomy (m025-155)',classifyFamilyIssues.length===0,classifyFamilyIssues.length?classifyFamilyIssues.slice(0,10):'semua label keluarga salah berlabel taxonomy dengan alasan yang jujur');
     check('No source concept leaks across lessons',sourceReuse.length===0,sourceReuse.length?sourceReuse.slice(0,10):'each source concept belongs to exactly one lesson suite');
     check('No exact runtime duplicates across lessons',crossLessonDuplicates.length===0,`duplicates=${crossLessonDuplicates.length}`);
     check('Runtime integrity validator',invalidRuntime.length===0,`invalid=${invalidRuntime.length}`);
@@ -136,7 +190,7 @@ setTimeout(()=>{
     check('Balanced mode coverage',expectedModes.every(mode=>modeCounts[mode]===lessonCount),Object.fromEntries(expectedModes.map(mode=>[mode,modeCounts[mode]||0])));
     check('Legacy peer-mixing generator removed',!app.includes('familyPeers=')&&!app.includes('levelPeers=')&&!app.includes('others=shuffle(GRAMMAR_ITEMS.filter'), 'lesson builder no longer imports peer concepts');
 
-    const report={version:grammar.version,status:pass?'PASS':'NOT READY',counts:{pass:checks.filter(x=>x.status==='PASS').length,fail:checks.filter(x=>x.status==='FAIL').length,lessons:grammar.templates.length,runtimeQuestions:totalQuestions,practiceModes:expectedModes.length,crossLessonDuplicates:crossLessonDuplicates.length,focusLeaks:focusLeak.length},checks,samples};
+    const report={version:grammar.version,status:pass?'PASS':'NOT READY',counts:{pass:checks.filter(x=>x.status==='PASS').length,fail:checks.filter(x=>x.status==='FAIL').length,lessons:grammar.templates.length,runtimeQuestions:totalQuestions,practiceModes:expectedModes.length,crossLessonDuplicates:crossLessonDuplicates.length,focusLeaks:focusLeak.length,provenanceViolations:provenanceViolations.length,sequenceCueCollisions:sequenceCueCollisions.length,classifyFamilyIssues:classifyFamilyIssues.length},checks,samples};
     fs.writeFileSync(path.join(root,'GRAMMAR-QUALITY-REPORT.json'),`${JSON.stringify(report,null,2)}\n`);
     console.log(JSON.stringify(report,null,2));
     if(!pass)process.exitCode=1;
