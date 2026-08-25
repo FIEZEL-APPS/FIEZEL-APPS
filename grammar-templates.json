@@ -291,7 +291,7 @@
       "pedagogicalObjective": "Distinguish general/scientific truth (zero conditional) from a specific likely future result (first conditional)",
       "misconceptionTargeted": "Learner uses 'will' in the if-clause for general truths",
       "reasoningOperation": "identify generality vs specific-future prediction -> select conditional type",
-      "stem": "If you heat ice, it ___.",
+      "stem": "Which completion states this as a general fact that is always true, not a prediction about one occasion? If you heat ice, it ___.",
       "options": [
         "will melt",
         "melts",
@@ -303,8 +303,8 @@
         {
           "option": "will melt",
           "misconception": "general truth treated as a one-time prediction",
-          "whyFails": "This is a universal scientific fact, not a single predicted future event, so 'will' is not needed.",
-          "whyFailsId": "Ini fakta ilmiah yang selalu berlaku, bukan satu kejadian masa depan yang diramalkan, jadi “will” tidak diperlukan.",
+          "whyFails": "This is correct English, but 'will' frames it as a prediction about a particular occasion; the question asks for the always-true general fact.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar, tetapi “will” menjadikannya ramalan untuk satu kejadian tertentu; yang ditanyakan adalah fakta umum yang selalu berlaku.",
           "misconceptionId": "kebenaran umum diperlakukan sebagai ramalan sekali kejadian"
         },
         {
@@ -403,7 +403,7 @@
       "pedagogicalObjective": "Recognize when passive voice is preferred because the agent is unknown or unimportant",
       "misconceptionTargeted": "Learner keeps 'by + agent' even when the actor is irrelevant, producing an unnatural sentence",
       "reasoningOperation": "assess relevance of the agent to the message -> choose passive with or without 'by'",
-      "stem": "The bridge ___ in 1932; nobody today remembers who built it.",
+      "stem": "Which completion most explicitly leaves the unknown builder out of the sentence? The bridge ___ in 1932; nobody today remembers who built it.",
       "options": [
         "was constructed",
         "constructed",
@@ -429,8 +429,8 @@
         {
           "option": "was constructed by workers",
           "misconception": "adds a vague, uninformative agent instead of omitting it",
-          "whyFails": "Naming a generic, uninformative agent ('workers') is unnecessary and stylistically weak when the point is that the agent is unknown.",
-          "whyFailsId": "Menyebut pelaku yang tidak memberi keterangan apa pun terasa mubazir, apalagi ketika inti kalimatnya justru pelakunya tidak diketahui.",
+          "whyFails": "This is grammatically correct, but naming a generic agent ('workers') adds nothing; the question asks for the version that leaves the unknown builder out.",
+          "whyFailsId": "Ini benar secara tata bahasa, tetapi menyebut pelaku yang umum (“workers”) tidak menambah keterangan apa pun; yang ditanyakan adalah versi yang justru tidak menyebut pembangunnya.",
           "misconceptionId": "menambahkan pelaku samar padahal seharusnya dihilangkan"
         }
       ],
@@ -1075,7 +1075,7 @@
       "pedagogicalObjective": "Distinguish future continuous (action in progress at a future point) from future perfect (action completed before a future point)",
       "misconceptionTargeted": "Learner treats any future time expression as requiring 'will + base verb' and cannot separate 'in progress then' from 'finished by then'",
       "reasoningOperation": "locate the future reference point -> decide if the action is ongoing or already finished at that point",
-      "stem": "Don't call at 8pm — I ___ dinner with my in-laws then.",
+      "stem": "Which completion shows the action already in progress at that exact moment? Don't call at 8pm — I ___ dinner with my in-laws then.",
       "options": [
         "will have",
         "will be having",
@@ -1087,8 +1087,8 @@
         {
           "option": "will have",
           "misconception": "uses a bare future form without marking the ongoing nature of the action",
-          "whyFails": "'Then' points to a moment the action is happening, not a possession or completed state.",
-          "whyFailsId": "Kata “then” menunjuk saat tindakannya sedang berjalan, bukan menyatakan kepemilikan atau keadaan yang sudah tuntas.",
+          "whyFails": "This is correct English ('have dinner' = eat), but it only announces the plan; it does not present the meal as already under way at 8pm.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar (“have dinner” berarti makan malam), tetapi ia hanya menyatakan rencananya; ia tidak menggambarkan makan malamnya sudah sedang berlangsung pada pukul 8.",
           "misconceptionId": "bentuk masa depan sederhana dipakai tanpa menandai bahwa tindakannya sedang berlangsung"
         },
         {
@@ -1920,7 +1920,7 @@
         "at / on",
         "in / at",
         "on / in",
-        "at / in"
+        "at / to"
       ],
       "correctIndex": 0,
       "distractors": [
@@ -1939,20 +1939,20 @@
           "misconceptionId": "“on” dipakai untuk lokasi titik dan “in” untuk nama jalan"
         },
         {
-          "option": "at / in",
-          "misconception": "correctly starts with 'at' for the point but wrongly uses 'in' for the street",
-          "whyFails": "Street names in English typically pair with 'on' (on Baker Street), not 'in'.",
-          "whyFailsId": "Nama jalan dalam Bahasa Inggris lazimnya berpasangan dengan “on” seperti on Baker Street, bukan dengan “in”.",
-          "misconceptionId": "bagian titiknya sudah tepat, tetapi nama jalannya keliru memakai “in”"
+          "option": "at / to",
+          "misconception": "movement preposition used for a static location",
+          "whyFails": "'To' marks movement towards a destination, but the sentence states where the hotel is located.",
+          "whyFailsId": "“To” menandai perpindahan menuju suatu tujuan, sedangkan kalimatnya menyatakan di mana hotel itu berada.",
+          "misconceptionId": "preposisi perpindahan dipakai untuk posisi yang diam"
         }
       ],
       "explanation": {
         "whyCorrect": "A traffic light is treated as a specific point ('at the second traffic light'), and a named street is treated as a line/surface ('on Baker Street').",
-        "rule": "'At' = specific point; 'in' = enclosed space/area; 'on' = surface or line, including street names.",
+        "rule": "'At' = specific point; 'on' = surface or line, including street names in American English ('on Baker Street'); British English also says 'in Baker Street'. Both are standard.",
         "whyOthersFail": "The other combinations mix up which preposition matches point vs. line/surface locations.",
         "howToAvoid": "Picture the location: is it a dot on a map (at), a container/area (in), or a line/surface (on)?",
         "memoryCue": "Traffic light = a dot -> at. Street name = a line -> on.",
-        "ruleId": "“At” untuk titik tertentu, “in” untuk ruang atau wilayah tertutup, dan “on” untuk permukaan atau garis, termasuk nama jalan.",
+        "ruleId": "“At” untuk titik tertentu; “on” untuk permukaan atau garis, termasuk nama jalan dalam Inggris Amerika (“on Baker Street”); Inggris Britania juga memakai “in Baker Street”. Keduanya baku.",
         "whyCorrectId": "Lampu lalu lintas diperlakukan sebagai titik tertentu lewat “at the second traffic light”, dan nama jalan diperlakukan sebagai garis lewat “on Baker Street”.",
         "whyOthersFailId": "Gabungan lainnya tertukar dalam menentukan mana kata depan untuk titik dan mana untuk garis atau permukaan.",
         "howToAvoidId": "Bayangkan lokasinya: sebuah titik di peta pakai at, sebuah wadah atau wilayah pakai in, sebuah garis atau permukaan pakai on.",
@@ -2139,7 +2139,7 @@
       "pedagogicalObjective": "Reduce a relative clause to a participle phrase when the relative pronoun is the subject of the clause",
       "misconceptionTargeted": "Learner keeps the relative pronoun and full auxiliary when a reduced participle clause would be more natural and idiomatic",
       "reasoningOperation": "confirm the relative pronoun is the subject of an active/passive clause -> reduce to present or past participle",
-      "stem": "Choose the reduced relative-clause form: The scientists ___ the vaccine were awarded a major prize.",
+      "stem": "Choose the reduced relative-clause form: \"The scientists who were developing the vaccine at that time were awarded a major prize.\" → The scientists ___ the vaccine at that time were awarded a major prize.",
       "options": [
         "who developed",
         "developing",
@@ -2151,8 +2151,8 @@
         {
           "option": "who developed",
           "misconception": "keeps the unreduced full relative clause when a reduced participle phrase is the target structure being tested",
-          "whyFails": "This is grammatically valid but not the reduced form; the target answer tests reduction to 'developing' since the scientists actively did the developing.",
-          "whyFailsId": "Bentuk ini memang sah secara tata bahasa tetapi belum dipendekkan; yang diuji adalah pemendekan menjadi “developing”.",
+          "whyFails": "This is correct English, but it is the full clause and it also changes the meaning to a finished action; the question asks for the reduced form of the ongoing clause given.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar, tetapi bentuknya masih utuh dan maknanya berubah menjadi tindakan yang sudah selesai; yang diminta adalah bentuk reduksi dari klausa berlangsung yang diberikan.",
           "misconceptionId": "anak kalimat penuh dipertahankan padahal yang diuji adalah bentuk ringkasnya"
         },
         {
@@ -2171,13 +2171,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "Since the scientists actively did the developing, the active relative clause 'who developed' reduces to the present participle 'developing'.",
-        "rule": "An active relative clause with the relative pronoun as subject (who/which + active verb) reduces to a present participle; a passive one (who/which + be + past participle) reduces to a past participle.",
+        "whyCorrect": "The original clause is 'who were developing' — an ongoing past action — and that is exactly the case where the clause reduces to the participle 'developing'.",
+        "rule": "A relative clause reduces to a present participle only when it expresses an ongoing or simultaneous action (who was/were V-ing) or a general state (who lives, who works). A finished past-simple clause such as 'who broke the window' does NOT reduce to '-ing'.",
         "whyOthersFail": "'Who developed' is correct but unreduced; 'which they developed' shifts the modified noun; 'developed by' wrongly applies passive reduction to an active agent.",
         "howToAvoid": "Check whether the noun being modified performed the action (present participle) or received it (past participle), then drop the relative pronoun and auxiliary.",
         "memoryCue": "Doer + active verb -> drop 'who' + auxiliary, add -ing.",
-        "ruleId": "Anak kalimat aktif yang kata penghubungnya berkedudukan subjek dipendekkan menjadi participle bentuk -ing; anak kalimat pasif dipendekkan menjadi past participle.",
-        "whyCorrectId": "Karena para ilmuwan itulah yang aktif mengembangkan, anak kalimat aktif “who developed” dipendekkan menjadi bentuk -ing “developing”.",
+        "ruleId": "Klausa relatif hanya boleh direduksi menjadi bentuk -ing kalau maknanya sedang berlangsung atau bersamaan (who was/were + -ing) atau menyatakan keadaan umum (who lives, who works). Klausa past simple yang sudah selesai seperti “who broke the window” TIDAK bisa direduksi menjadi -ing.",
+        "whyCorrectId": "Klausa aslinya “who were developing”, yaitu tindakan lampau yang sedang berlangsung, dan justru itulah satu-satunya keadaan yang boleh direduksi menjadi bentuk “developing”.",
         "whyOthersFailId": "“Who developed” memang benar tetapi belum dipendekkan, “which they developed” memindahkan kata benda yang diterangkan, dan “developed by” keliru memakai bentuk pasif untuk pelaku yang justru aktif.",
         "howToAvoidId": "Periksa dulu apakah kata benda yang diterangkan melakukan tindakannya atau menerimanya, baru buang kata penghubung dan kata bantunya.",
         "memoryCueId": "Pelaku dengan kata kerja aktif: buang “who” dan kata bantunya, lalu tambahkan -ing."
@@ -2251,7 +2251,7 @@
       "pedagogicalObjective": "Use 'as...as' to express equality between two things instead of a comparative form, which would express inequality",
       "misconceptionTargeted": "Learner defaults to a comparative + 'than' structure even when the sentence intends to express that two things are equal, not different",
       "reasoningOperation": "detect whether the sentence expresses equality or difference -> select as...as or comparative + than",
-      "stem": "This laptop is ___ the one I had before, so I don't need an upgrade.",
+      "stem": "This laptop is ___ the one I had before — both take exactly ten seconds to start up.",
       "options": [
         "faster than",
         "as fast as",
@@ -2263,8 +2263,8 @@
         {
           "option": "faster than",
           "misconception": "defaults to the comparative form even though the context implies equality, not difference",
-          "whyFails": "The reason given ('so I don't need an upgrade') implies the laptops perform similarly, not that the new one is faster.",
-          "whyFailsId": "Alasan “so I don’t need an upgrade” menyiratkan kedua laptop itu setara, bukan yang baru lebih cepat.",
+          "whyFails": "The sentence states both laptops take exactly the same time, so a comparative claiming one is faster contradicts the given fact.",
+          "whyFailsId": "Kalimatnya menyatakan kedua laptop butuh waktu yang sama persis, jadi bentuk perbandingan yang mengaku salah satunya lebih cepat bertentangan dengan fakta itu.",
           "misconceptionId": "bentuk perbandingan dipakai walaupun konteksnya menyiratkan kesetaraan"
         },
         {
@@ -2283,13 +2283,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "The context ('so I don't need an upgrade') signals that performance is equal, which 'as fast as' correctly expresses.",
+        "whyCorrect": "Both laptops take exactly the same time, so the equality form 'as fast as' is the only one that matches the stated fact.",
         "rule": "'As + adjective + as' expresses equality between two things; comparative + 'than' expresses a difference between them.",
         "whyOthersFail": "'Faster than' wrongly implies a difference; 'the fastest' misapplies the superlative to a two-item comparison; 'more fast than' misforms the comparative of a short adjective.",
         "howToAvoid": "Check the surrounding context for clues about whether the two things are being shown as equal or different.",
         "memoryCue": "No upgrade needed = no real difference = as...as.",
         "ruleId": "Pola as + kata sifat + as menyatakan dua hal yang setara; bentuk perbandingan bersama “than” menyatakan selisih di antara keduanya.",
-        "whyCorrectId": "Alasan “so I don’t need an upgrade” menandakan kecepatannya setara, dan itulah yang dinyatakan “as fast as”.",
+        "whyCorrectId": "Kedua laptop butuh waktu yang sama persis, jadi hanya bentuk kesetaraan “as fast as” yang cocok dengan fakta yang disebutkan.",
         "whyOthersFailId": "“Faster than” keliru menyiratkan ada selisih, “the fastest” memakai superlative untuk perbandingan dua hal, dan “more fast than” salah membentuk perbandingan kata sifat pendek.",
         "howToAvoidId": "Baca konteks di sekelilingnya untuk melihat apakah kedua hal itu ditampilkan setara atau berbeda.",
         "memoryCueId": "Tidak perlu ganti berarti tidak ada selisih, jadi pakai as ... as."
@@ -2307,7 +2307,7 @@
       "pedagogicalObjective": "Use the double comparative structure (comparative + and + comparative) to express a progressive/continuing change",
       "misconceptionTargeted": "Learner uses a single comparative with 'than' where the sentence actually requires the repeated-comparative pattern for ongoing change",
       "reasoningOperation": "identify that the sentence describes a trend continuing over time, not a single comparison -> apply comparative + and + comparative",
-      "stem": "As the deadline approached, the team's schedule became ___.",
+      "stem": "Which completion best expresses a gradual increase that keeps continuing? As the deadline approached, the team's schedule became ___.",
       "options": [
         "busier than before",
         "busier and busier",
@@ -2319,8 +2319,8 @@
         {
           "option": "busier than before",
           "misconception": "treats a continuous, ongoing change as a single fixed-point comparison",
-          "whyFails": "'As the deadline approached' signals a gradual, ongoing increase over time, which needs the doubled comparative, not a one-time comparison.",
-          "whyFailsId": "“As the deadline approached” menandakan peningkatan bertahap yang berjalan terus, dan itu menuntut perbandingan ganda, bukan perbandingan sekali jalan.",
+          "whyFails": "This is correct English, but it compares against one earlier point; the question asks for the form that shows the increase continuing step by step.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar, tetapi ia membandingkan dengan satu titik waktu sebelumnya; yang ditanyakan adalah bentuk yang menunjukkan kenaikannya terus berlanjut sedikit demi sedikit.",
           "misconceptionId": "perubahan yang berjalan terus diperlakukan sebagai perbandingan pada satu titik saja"
         },
         {
@@ -2643,7 +2643,7 @@
       "pedagogicalObjective": "Use past perfect continuous to show a duration-based cause behind a past state/result, distinct from past perfect simple's completed-fact focus",
       "misconceptionTargeted": "Learner treats past perfect simple and past perfect continuous as interchangeable whenever two past events are sequenced",
       "reasoningOperation": "detect duration-as-cause meaning -> select past perfect continuous over past perfect simple",
-      "stem": "His eyes were red because he ___ all night for the exam.",
+      "stem": "Which completion foregrounds the accumulated duration of the studying as the cause of his red eyes? His eyes were red because he ___ all night for the exam.",
       "options": [
         "had studied",
         "had been studying",
@@ -2655,15 +2655,15 @@
         {
           "option": "had studied",
           "misconception": "treating past perfect simple as sufficient for any earlier past event",
-          "whyFails": "Past perfect simple emphasizes completion, not the ongoing duration that explains the red eyes as a result.",
-          "whyFailsId": "Past perfect simple menekankan bahwa kegiatannya tuntas, bukan durasi berjalan yang menjelaskan mata memerahnya.",
+          "whyFails": "This is correct English and does mark the earlier time, but it stresses that the studying was finished rather than how long it accumulated.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar dan memang menandai waktu yang lebih awal, tetapi ia menekankan bahwa belajarnya sudah tuntas, bukan berapa lama waktu yang terkumpul.",
           "misconceptionId": "past perfect simple dianggap cukup untuk semua kejadian lampau yang lebih awal"
         },
         {
           "option": "studied",
           "misconception": "using simple past for a state that must be shown as prior to another past moment",
-          "whyFails": "Simple past doesn't establish that the studying happened before and caused the later observed state.",
-          "whyFailsId": "Past simple tidak menegaskan bahwa belajarnya terjadi lebih dulu dan menjadi sebab keadaan yang terlihat kemudian.",
+          "whyFails": "This is correct English — 'because' already marks the cause — but it reports the fact plainly instead of foregrounding how long the studying went on.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar — kata “because” sendiri sudah menyatakan sebabnya — tetapi ia melaporkan faktanya saja, bukan menonjolkan berapa lama belajarnya berlangsung.",
           "misconceptionId": "past simple dipakai untuk keadaan yang harus ditunjukkan lebih dulu dari titik lampau lainnya"
         },
         {
@@ -3012,11 +3012,11 @@
       ],
       "explanation": {
         "whyCorrect": "'It is believed that...' is the standard impersonal passive used to report a widely-held but unattributed belief.",
-        "rule": "Impersonal passive reporting: It + is/are + past participle + that-clause, used when the source of a claim is general or unknown.",
+        "rule": "Impersonal passive reporting: It + is/was + past participle + that-clause (It is said/believed/thought/reported that…). The dummy subject \"it\" is always singular.",
         "whyOthersFail": "Active 'they are believing' misuses tense and an unspecified subject; 'it believes' misassigns agency to a dummy subject; omitting 'it' leaves the sentence without a subject.",
         "howToAvoid": "When a claim has no clear speaker and needs to sound objective, reach for 'It is said/believed/thought/reported that...'.",
         "memoryCue": "No named source + formal claim = 'It is believed that...'.",
-        "ruleId": "Pasif pelaporan tanpa pelaku: It + is atau are + past participle + anak kalimat that, dipakai ketika sumber anggapannya umum atau tidak diketahui.",
+        "ruleId": "Pelaporan pasif impersonal: It + is/was + past participle + klausa that (It is said/believed/thought/reported that…). Subjek semu “it” selalu tunggal.",
         "whyCorrectId": "“It is believed that ...” adalah bentuk baku pasif pelaporan tanpa pelaku untuk menyampaikan anggapan yang luas dianut tetapi tidak bersumber jelas.",
         "whyOthersFailId": "Bentuk aktif “they are believing” salah tense sekaligus memakai subjek yang tidak pernah disebut, “it believes” memberi peran pelaku pada subjek boneka, dan menghilangkan “it” membuat kalimatnya tanpa subjek.",
         "howToAvoidId": "Kalau sebuah anggapan tidak punya penutur yang jelas dan perlu terdengar objektif, pakai “It is said/believed/thought/reported that ...”.",
@@ -3931,7 +3931,7 @@
       "pedagogicalObjective": "Learner selects future perfect continuous to express duration accumulating up to a stated future reference point.",
       "misconceptionTargeted": "Learners default to future continuous or future perfect simple when duration-up-to-a-point is required.",
       "reasoningOperation": "Identify the future time anchor, then check whether the sentence asks about ongoing duration vs completion/progress.",
-      "stem": "By the time she retires next year, Maria ____ at this company for over two decades.",
+      "stem": "Which completion emphasizes the duration accumulating up to the deadline rather than merely the fact of completion? By the time she retires next year, Maria ____ at this company for over two decades.",
       "options": [
         "will have been working",
         "will be working",
@@ -3950,8 +3950,8 @@
         {
           "option": "will have worked",
           "misconception": "Confuses future perfect simple (completion/result) with future perfect continuous (ongoing duration emphasis).",
-          "whyFails": "It stresses the fact of completion rather than the duration itself, which the 'over two decades' phrase calls for.",
-          "whyFailsId": "Bentuk ini menonjolkan bahwa pekerjaannya tuntas, bukan lamanya, padahal keterangan “over two decades” justru meminta lamanya.",
+          "whyFails": "This is correct English, but it reports the completed fact; the question asks for the form that foregrounds the accumulating duration.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar, tetapi ia melaporkan fakta yang sudah tuntas; yang ditanyakan adalah bentuk yang menonjolkan lamanya waktu yang terkumpul.",
           "misconceptionId": "future perfect simple yang menekankan tuntasnya tertukar dengan future perfect continuous yang menekankan lamanya"
         },
         {
@@ -4678,8 +4678,8 @@
         {
           "option": "since",
           "misconception": "Confuses 'during' (within a period) with 'since' (marking a starting point).",
-          "whyFails": "'Since' requires a starting point in time (like 'since Monday'), not a bounded event like 'the meeting'.",
-          "whyFailsId": "“Since” menuntut titik mulai seperti since Monday, bukan satu acara berbatas seperti “the meeting”.",
+          "whyFails": "'Since' can take an event noun, but it marks the start of a period running up to now and needs a perfect form ('has been ringing since the meeting'); it cannot sit with the one-off past event 'went off'.",
+          "whyFailsId": "“Since” memang boleh diikuti nomina peristiwa, tetapi ia menandai awal suatu periode yang berjalan sampai sekarang dan menuntut bentuk perfect (“has been ringing since the meeting”); ia tidak cocok dengan kejadian sesaat “went off”.",
           "misconceptionId": "“during” yang menandai rentang tertukar dengan “since” yang menandai titik mulai"
         },
         {
@@ -5499,7 +5499,7 @@
       "pedagogicalObjective": "Learner constructs a mixed conditional where a present unreal state explains a past unreal result.",
       "misconceptionTargeted": "Learners force both clauses of a mixed conditional into the same tense, missing that present cause and past result require different forms.",
       "reasoningOperation": "Identify that the condition describes a permanent present trait while the result describes a specific past event, requiring mixed tenses.",
-      "stem": "If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
+      "stem": "In formal written English, which completion presents his fear as an ongoing trait he still has, rather than only a past state? If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
       "options": [
         "weren't",
         "hadn't been",
@@ -5511,8 +5511,8 @@
         {
           "option": "hadn't been",
           "misconception": "Forces the third conditional past perfect form into the condition clause, matching the past result tense.",
-          "whyFails": "This mixed conditional's if-clause describes a permanent present character trait (his ongoing fear), which needs second-conditional 'weren't', not past perfect.",
-          "whyFailsId": "Anak kalimat if pada mixed conditional ini menggambarkan sifat masa kini yang menetap, yaitu rasa takutnya yang masih ada, dan itu menuntut “weren’t”, bukan past perfect.",
+          "whyFails": "This is correct English, but it frames the fear as a past state only; the question asks for the form that keeps the fear ongoing today.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar, tetapi ia menempatkan rasa takut itu sebagai keadaan lampau saja; yang ditanyakan adalah bentuk yang membuat rasa takutnya masih berlaku sampai sekarang.",
           "misconceptionId": "bentuk past perfect milik third conditional dipaksakan ke anak kalimat syarat agar sama dengan tense hasilnya"
         },
         {
@@ -5891,7 +5891,7 @@
       "pedagogicalObjective": "Use 'of' between a quantifier and an object pronoun, producing 'both of them' rather than the ungrammatical 'both them'.",
       "misconceptionTargeted": "Learner drops 'of' before an object pronoun because 'both' can appear directly before some noun phrases.",
       "reasoningOperation": "notice the object pronoun 'them' -> insert of after the quantifier -> select both of",
-      "stem": "I have exactly two closest friends. ____ them live in different countries now, so we rarely meet in person.",
+      "stem": "I have exactly two close friends. ____ them live in different countries now, so we rarely meet in person.",
       "options": [
         "Both of",
         "Both",
@@ -6619,7 +6619,7 @@
       "pedagogicalObjective": "A habitual action with a third-person singular subject uses present simple -s.",
       "misconceptionTargeted": "base-form overuse; progressive confusion; past-tense confusion",
       "reasoningOperation": "find the routine marker 'every morning' -> identify the third-person singular subject -> add -s to the present-simple verb",
-      "stem": "My brother ___ coffee every morning.",
+      "stem": "These days my brother ___ coffee every morning.",
       "options": [
         "drink",
         "drinks",
@@ -6645,8 +6645,8 @@
         {
           "option": "drank",
           "misconception": "past-tense confusion",
-          "whyFails": "The sentence describes a current routine.",
-          "whyFailsId": "Kalimat ini menggambarkan kebiasaan yang berlaku sekarang.",
+          "whyFails": "'These days' fixes the sentence in the present, so the past form does not fit here.",
+          "whyFailsId": "“These days” menempatkan kalimat ini di masa sekarang, jadi bentuk lampau tidak cocok di sini.",
           "misconceptionId": "tertukar dengan bentuk lampau"
         }
       ],
@@ -6899,7 +6899,7 @@
       "pedagogicalObjective": "Construct a mixed conditional in which an unreal past decision controls a hypothetical future event.",
       "misconceptionTargeted": "Learner forces both clauses into the same time frame and loses the past-to-future relationship.",
       "reasoningOperation": "date the unreal condition in the past -> date the consequence in the future -> combine past perfect with would be + -ing",
-      "stem": "If the board had approved the budget last month, construction ___ next Monday.",
+      "stem": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
       "options": [
         "would be starting",
         "would have started",
@@ -6911,8 +6911,8 @@
         {
           "option": "would have started",
           "misconception": "moves the result into the unreal past",
-          "whyFails": "'Would have started' describes a past result, but 'next Monday' places the result in the future.",
-          "whyFailsId": "“Would have started” menggambarkan akibat di masa lalu, padahal “next Monday” menaruh akibatnya di masa depan.",
+          "whyFails": "This is correct English — 'would have' can point to a future date that is now impossible — but it presents the start as a single completed event rather than something under way on that day.",
+          "whyFailsId": "Ini Bahasa Inggris yang benar — “would have” bisa menunjuk tanggal di masa depan yang kini mustahil — tetapi ia menggambarkan dimulainya sebagai satu kejadian tuntas, bukan sesuatu yang sedang berjalan pada hari itu.",
           "misconceptionId": "akibatnya dipindahkan ke masa lalu yang tidak nyata"
         },
         {
