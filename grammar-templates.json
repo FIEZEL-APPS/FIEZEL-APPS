@@ -11,7 +11,7 @@
       "pedagogicalObjective": "Distinguish habitual routine (present simple) from action-in-progress-now (present continuous)",
       "misconceptionTargeted": "Learner treats 'right now' as always requiring -ing regardless of habituality markers",
       "reasoningOperation": "identify time-frame marker -> select aspect",
-      "stem": "Look! The chef ___ a new dish for tonight's menu.",
+      "stem": "Look! The chef ___ a new dish right now — you can smell it.",
       "options": [
         "prepares",
         "is preparing",
@@ -23,15 +23,15 @@
         {
           "option": "prepares",
           "misconception": "habitual-aspect overgeneralization",
-          "whyFails": "The stem's 'Look!' signals an action visibly unfolding now, not a routine.",
-          "whyFailsId": "Kata “Look!” di kalimat itu menandakan tindakan yang sedang terlihat berlangsung, bukan rutinitas yang berulang.",
+          "whyFails": "'Prepares' states a routine or general habit, which clashes with a dish being made at this very moment.",
+          "whyFailsId": "“Prepares” menyatakan rutinitas atau kebiasaan umum, dan itu bertabrakan dengan hidangan yang sedang dibuat saat ini juga.",
           "misconceptionId": "kebiasaan dipakai untuk kejadian yang sedang berlangsung"
         },
         {
           "option": "has prepared",
           "misconception": "confusing in-progress with completed result",
-          "whyFails": "Present perfect implies completion; the dish is still being made.",
-          "whyFailsId": "Present perfect berarti pekerjaannya sudah rampung, padahal masakan itu masih dalam proses dibuat.",
+          "whyFails": "'Has prepared' announces a finished dish, but 'right now — you can smell it' shows the cooking is still in progress.",
+          "whyFailsId": "“Has prepared” mengumumkan hidangan yang sudah jadi, padahal “right now — you can smell it” menunjukkan masakannya masih berlangsung.",
           "misconceptionId": "yang sedang berlangsung tertukar dengan yang sudah selesai"
         },
         {
@@ -43,13 +43,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "'Look!' plus a visible ongoing activity requires present continuous.",
+        "whyCorrect": "'Look!' plus 'right now — you can smell it' points at an activity visibly unfolding this moment, so present continuous 'is preparing' is required.",
         "rule": "Present continuous = am/is/are + verb-ing, used for actions happening at the moment of speaking.",
         "whyOthersFail": "Present simple would describe a routine; present perfect would describe a finished action; the bare form is ungrammatical here.",
         "howToAvoid": "Ask: is this a repeated habit, or something happening right in front of me?",
         "memoryCue": "'Look!' = look at the -ing.",
         "ruleId": "Present continuous dibentuk dengan am/is/are + kata kerja -ing, dipakai untuk tindakan yang sedang terjadi pada saat kalimat itu diucapkan.",
-        "whyCorrectId": "Kata “Look!” menunjuk pada kegiatan yang sedang terlihat berlangsung, dan itulah tugas present continuous.",
+        "whyCorrectId": "“Look!” ditambah “right now — you can smell it” menunjuk kegiatan yang terlihat sedang berlangsung saat ini juga, jadi present continuous “is preparing” yang dibutuhkan.",
         "whyOthersFailId": "Present simple akan menggambarkan kebiasaan, present perfect menggambarkan tindakan yang sudah selesai, sedangkan bentuk dasar tanpa perubahan tidak bisa berdiri di posisi ini.",
         "howToAvoidId": "Tanyakan pada diri sendiri: ini kebiasaan yang berulang, atau sesuatu yang sedang terjadi di depan mata?",
         "memoryCueId": "Ada “Look!”, berarti lihat bentuk -ing-nya."
@@ -234,7 +234,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use 'must' for confident logical deduction vs 'might/could' for uncertain speculation",
       "misconceptionTargeted": "Learner uses 'must' for any guess, not reserving it for strong evidence-based conclusions",
-      "reasoningOperation": "weigh strength of evidence -> select degree of certainty modal",
+      "reasoningOperation": "spot a present-time deduction -> weigh how strong the visible evidence is -> pick must for near-certainty or can't for impossibility",
       "stem": "Which option expresses the strongest negative deduction supported by the evidence? The lights are off and the car isn't in the driveway, so they ___ be home.",
       "options": [
         "mustn't",
@@ -280,7 +280,7 @@
       },
       "pedagogicalObjectiveId": "Memakai “must” untuk kesimpulan yang diyakini kuat dan “might” atau “could” untuk dugaan yang masih ragu",
       "misconceptionTargetedId": "Siswa memakai “must” untuk sembarang tebakan, padahal kata itu disediakan untuk kesimpulan yang bukti pendukungnya kuat",
-      "reasoningOperationId": "timbang seberapa kuat buktinya → pilih kata modal sesuai tingkat keyakinan"
+      "reasoningOperationId": "kenali simpulan waktu kini → timbang kekuatan bukti yang terlihat → pilih must untuk keyakinan hampir pasti atau can't untuk kemustahilan"
     },
     {
       "id": "CO-001",
@@ -527,8 +527,8 @@
         {
           "option": "A",
           "misconception": "indefinite article reused for an already-identified noun",
-          "whyFails": "The dog was already introduced in the first sentence, so it is now identifiable and requires 'the'.",
-          "whyFailsId": "Anjing itu sudah diperkenalkan di kalimat pertama, jadi sekarang sudah bisa dikenali dan menuntut “the”.",
+          "whyFails": "'A' introduces the dog as if it were brand-new information, even though the first sentence already made it identifiable.",
+          "whyFailsId": "“A” memperkenalkan anjing itu seolah-olah informasi yang benar-benar baru, padahal kalimat pertama sudah membuatnya bisa dikenali.",
           "misconceptionId": "kata sandang penyebutan pertama diulang untuk benda yang sudah dikenali"
         },
         {
@@ -758,8 +758,8 @@
         {
           "option": "scenic",
           "misconception": "base adjective used without comparative marking",
-          "whyFails": "The sentence explicitly compares two routes using 'than', which requires the comparative form.",
-          "whyFailsId": "Kalimatnya membandingkan dua jalur dengan kata “than”, dan itu menuntut bentuk comparative.",
+          "whyFails": "'Scenic' leaves the adjective unmarked, so the 'than' comparison has nothing to hang on.",
+          "whyFailsId": "“Scenic” membiarkan kata sifatnya polos tanpa penanda, sehingga perbandingan dengan “than” tidak punya pijakan.",
           "misconceptionId": "kata sifat dasar dipakai tanpa penanda perbandingan"
         },
         {
@@ -982,8 +982,8 @@
         {
           "option": "was writing",
           "misconception": "shifts to a fixed past narrative tense",
-          "whyFails": "There is no specific finished past time reference; the year is still ongoing, so present perfect is needed.",
-          "whyFailsId": "Tidak ada patokan waktu lampau yang sudah tutup di sini; tahunnya masih berjalan, jadi yang dibutuhkan present perfect.",
+          "whyFails": "'Was writing' frames the writing inside a closed past moment, but 'this year' is still open and no finished reference point appears in the sentence.",
+          "whyFailsId": "“Was writing” membingkai kegiatan menulisnya di dalam momen lampau yang sudah tutup, padahal “this year” masih terbuka dan tidak ada patokan waktu selesai di kalimatnya.",
           "misconceptionId": "berpindah ke tense cerita lampau yang waktunya sudah dipatok"
         },
         {
@@ -1933,10 +1933,10 @@
         },
         {
           "option": "on / in",
-          "misconception": "uses 'on' for a point location and 'in' for a street name",
+          "misconception": "treats a route point as a surface in the first slot",
           "whyFails": "'On the second traffic light' treats a point on the route as a surface, so the first gap already fails before the street phrase is even weighed.",
           "whyFailsId": "“On the second traffic light” memperlakukan titik pada rute sebagai permukaan, jadi celah pertama sudah gagal bahkan sebelum frasa nama jalannya ditimbang.",
-          "misconceptionId": "“on” dipakai untuk lokasi titik dan “in” untuk nama jalan"
+          "misconceptionId": "titik pada rute diperlakukan sebagai permukaan pada celah pertama"
         },
         {
           "option": "at / to",
@@ -3371,7 +3371,7 @@
       "pedagogicalObjective": "Match a movement preposition to the shape of the path described (a tunnel-like space vs. an open flat surface vs. a linear route)",
       "misconceptionTargeted": "Learner treats all movement prepositions (through/across/along) as generally meaning 'in the direction of' without attending to the shape of the space being moved through",
       "reasoningOperation": "identify the spatial shape implied by the noun (tunnel/enclosed space) -> select the movement preposition matching that shape",
-      "stem": "We walked ___ the dark tunnel, unable to see more than a few steps ahead.",
+      "stem": "We squeezed ___ the narrow gap in the fence.",
       "options": [
         "across",
         "along",
@@ -3383,33 +3383,33 @@
         {
           "option": "across",
           "misconception": "using the flat-open-surface preposition for an enclosed three-dimensional space",
-          "whyFails": "'Across' describes movement over a flat surface (a road, a field), not movement inside an enclosed space like a tunnel.",
-          "whyFailsId": "“Across” menggambarkan gerak di atas permukaan datar seperti jalan atau lapangan, bukan gerak di dalam ruang tertutup seperti terowongan.",
+          "whyFails": "'Across' moves over an open flat expanse such as a road or a field; a narrow gap has no surface to cross.",
+          "whyFailsId": "“Across” bergerak melintasi bentangan datar terbuka seperti jalan atau ladang; celah sempit tidak punya permukaan untuk dilintasi.",
           "misconceptionId": "kata depan untuk permukaan datar terbuka dipakai untuk ruang tertutup tiga dimensi"
         },
         {
           "option": "along",
           "misconception": "using the linear-edge preposition (following a line such as a river or street) for movement inside an enclosed space",
-          "whyFails": "'Along' describes following the length of something like a path or river, not passing through an enclosed interior.",
-          "whyFailsId": "“Along” menggambarkan gerak menyusuri panjangnya sesuatu seperti jalan setapak atau sungai, bukan menembus bagian dalam ruang tertutup.",
+          "whyFails": "'Along' follows the length of something like a path or a river; squeezing 'along a gap' would mean travelling lengthwise inside it, not passing to the other side.",
+          "whyFailsId": "“Along” mengikuti panjang sesuatu seperti jalan setapak atau sungai; “along a gap” berarti bergerak memanjang di dalam celahnya, bukan menembus ke sisi lain.",
           "misconceptionId": "kata depan untuk menyusuri garis memanjang dipakai untuk gerak di dalam ruang tertutup"
         },
         {
           "option": "over",
           "misconception": "using the above-and-across preposition for movement inside a space, not above it",
-          "whyFails": "'Over' implies passing above something; a tunnel is entered and passed through, not passed above.",
-          "whyFailsId": "“Over” menyiratkan gerak melewati bagian atas sesuatu, padahal terowongan itu dimasuki dan ditembus, bukan dilewati dari atas.",
+          "whyFails": "'Over' would mean climbing above the fence, but the sentence describes using the gap in it.",
+          "whyFailsId": "“Over” berarti memanjat melewati bagian atas pagar, sedangkan kalimatnya memakai celah yang ada di pagar itu.",
           "misconceptionId": "kata depan untuk melintas di atas dipakai untuk gerak di dalam ruangnya"
         }
       ],
       "explanation": {
-        "whyCorrect": "'Through' describes movement inside and out the other side of an enclosed three-dimensional space, matching a tunnel.",
+        "whyCorrect": "'Through' marks movement into one side of a tight enclosed opening and out the other, which is exactly what squeezing past a gap in a fence involves.",
         "rule": "Through = inside an enclosed space; across = a flat open surface; along = following the length of something; over = above and across.",
         "whyOthersFail": "Each alternative fits a different path shape (flat surface, linear edge, or overhead arc), not an enclosed tunnel.",
         "howToAvoid": "Picture the shape of the space: enclosed and three-dimensional signals 'through'.",
         "memoryCue": "A tunnel has an inside — you go 'through' it.",
         "ruleId": "Through berarti menembus ruang tertutup; across berarti menyeberangi permukaan datar terbuka; along berarti menyusuri panjangnya sesuatu; over berarti melintas di atasnya.",
-        "whyCorrectId": "“Through” menggambarkan gerak masuk lalu keluar di sisi lain sebuah ruang tiga dimensi yang tertutup, dan itu cocok dengan terowongan.",
+        "whyCorrectId": "“Through” menandai gerakan masuk dari satu sisi celah sempit yang tertutup dan keluar di sisi lainnya, persis seperti menyelinap lewat celah pagar.",
         "whyOthersFailId": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan terowongan yang tertutup.",
         "howToAvoidId": "Bayangkan bentuk ruangnya: tertutup dan tiga dimensi menandakan “through”.",
         "memoryCueId": "Terowongan punya bagian dalam, jadi dilewati “through”."
@@ -5330,7 +5330,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner uses present perfect with an unfinished time period ('this week') to connect a past action to the still-ongoing present frame.",
       "misconceptionTargeted": "Learners default to past simple whenever a specific event is named, ignoring that the time period itself is still in progress.",
-      "reasoningOperation": "Check whether the named time period (this week/month/year) has finished or is still ongoing, then select present perfect for unfinished periods.",
+      "reasoningOperation": "confirm the tested contrast is present perfect versus past simple -> check the named period (this week) is still running -> reject the past form that would close it",
       "stem": "I ____ three important emails this week, and it's only Tuesday.",
       "options": [
         "have sent",
@@ -5343,8 +5343,8 @@
         {
           "option": "sent",
           "misconception": "Uses past simple because a specific number of emails is mentioned.",
-          "whyFails": "Past simple would require a finished time frame, but 'this week' is still in progress (it's only Tuesday), so present perfect is needed.",
-          "whyFailsId": "Past simple menuntut kerangka waktu yang sudah tutup, padahal “this week” masih berjalan karena baru hari Selasa, jadi yang dibutuhkan present perfect.",
+          "whyFails": "'Sent' closes the time frame as finished, but 'this week' is still in progress (it's only Tuesday), so the frame it needs does not exist here.",
+          "whyFailsId": "“Sent” menutup kerangka waktunya seolah sudah selesai, padahal “this week” masih berjalan karena baru hari Selasa, jadi kerangka yang dibutuhkannya tidak ada di kalimat ini.",
           "misconceptionId": "past simple dipakai karena jumlah surelnya disebut dengan pasti"
         },
         {
@@ -5364,11 +5364,11 @@
       ],
       "explanation": {
         "whyCorrect": "Present perfect links the completed emails to the still-unfinished time frame 'this week'.",
-        "rule": "Use present perfect with unfinished time periods (today, this week, this year) when actions within that period are being reported.",
+        "rule": "Choose present perfect over past simple when reporting actions inside a period that has not ended yet, as in 'I have sent three reports this week'; the past form would close a period that is still running.",
         "whyOthersFail": "Past simple needs a finished time frame; past continuous misrepresents completed actions as in-progress; present simple isn't for specific past actions.",
         "howToAvoid": "Check if the named time period has ended yet — if not, present perfect is usually required.",
         "memoryCue": "Time period not over yet = present perfect, not past simple.",
-        "ruleId": "Pakai present perfect bersama rentang waktu yang belum berakhir seperti today, this week, dan this year ketika melaporkan tindakan di dalam rentang itu.",
+        "ruleId": "Pilih present perfect alih-alih past simple saat melaporkan tindakan di dalam rentang yang belum berakhir, seperti “I have sent three reports this week”; bentuk lampau justru menutup rentang yang masih berjalan.",
         "whyCorrectId": "Present perfect menghubungkan surel yang sudah terkirim dengan kerangka waktu “this week” yang belum berakhir.",
         "whyOthersFailId": "Past simple menuntut kerangka waktu yang sudah tutup, past continuous keliru menampilkan tindakan tuntas sebagai sesuatu yang sedang berjalan, dan present simple bukan untuk tindakan lampau tertentu.",
         "howToAvoidId": "Periksa apakah rentang waktu yang disebut sudah berakhir; kalau belum, biasanya yang dibutuhkan present perfect.",
@@ -5376,7 +5376,7 @@
       },
       "pedagogicalObjectiveId": "Siswa memakai present perfect bersama rentang waktu yang belum berakhir seperti “this week”, untuk menghubungkan tindakan lampau dengan kerangka waktu yang masih berjalan",
       "misconceptionTargetedId": "Siswa langsung memakai past simple setiap kali ada kejadian tertentu yang disebut, tanpa melihat bahwa rentang waktunya sendiri masih berjalan",
-      "reasoningOperationId": "periksa apakah rentang waktu yang disebut seperti this week, this month, atau this year sudah berakhir atau masih berjalan, lalu pilih present perfect untuk yang belum berakhir"
+      "reasoningOperationId": "pastikan kontras yang diuji adalah present perfect lawan past simple → periksa rentang yang disebut seperti this week masih berjalan → tolak bentuk lampau yang akan menutupnya"
     },
     {
       "id": "b5_003",
@@ -7571,7 +7571,7 @@
       "pedagogicalObjective": "Build present continuous with the correct form of be plus a verb ending in -ing.",
       "misconceptionTargeted": "Learner drops be, drops -ing, or uses present simple for an action happening now.",
       "reasoningOperation": "detect the now-time cue -> choose the subject form of be -> add verb-ing",
-      "stem": "She ___ dinner now.",
+      "stem": "She ___ dinner right now.",
       "options": [
         "cook",
         "is cooking",
@@ -7590,8 +7590,8 @@
         {
           "option": "cooks",
           "misconception": "present-simple-habit",
-          "whyFails": "'Cooks' describes a routine, while 'now' signals an action in progress.",
-          "whyFailsId": "“Cooks” menggambarkan kebiasaan, sedangkan “now” menandakan tindakan yang sedang berlangsung.",
+          "whyFails": "'Cooks' states a routine, but 'right now' points at this very moment, not a habit.",
+          "whyFailsId": "“Cooks” menyatakan rutinitas, padahal “right now” menunjuk saat ini juga, bukan kebiasaan.",
           "misconceptionId": "present simple untuk kebiasaan"
         },
         {
@@ -7603,13 +7603,13 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "'Now' signals an action in progress, so use 'is cooking'.",
+        "whyCorrect": "'Right now' points at this very moment, so the action in progress needs 'is cooking'.",
         "rule": "Present continuous = am/is/are + verb-ing for an action happening around the time of speaking.",
         "whyOthersFail": "'Cook' and 'cooking' omit the required auxiliary; 'cooks' is present simple for a habit.",
         "howToAvoid": "Check both pieces: the correct be form for the subject and the -ing form of the main verb.",
         "memoryCue": "Now = be + -ing: she is cooking.",
         "ruleId": "Present continuous dibentuk dengan am, is, atau are ditambah kata kerja -ing, untuk tindakan yang sedang berlangsung di sekitar waktu bicara.",
-        "whyCorrectId": "“Now” menandakan tindakan yang sedang berlangsung, jadi bentuknya “is cooking”.",
+        "whyCorrectId": "“Right now” menunjuk saat ini juga, jadi tindakan yang sedang berlangsung membutuhkan “is cooking”.",
         "whyOthersFailId": "“Cook” dan “cooking” kehilangan kata bantu yang wajib ada; “cooks” adalah present simple untuk kebiasaan.",
         "howToAvoidId": "Periksa dua bagiannya sekaligus: bentuk be yang cocok dengan subjek, dan bentuk -ing pada kata kerja utamanya.",
         "memoryCueId": "Now berarti be tambah -ing: she is cooking."
