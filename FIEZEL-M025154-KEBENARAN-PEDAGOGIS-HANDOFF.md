@@ -1,6 +1,7 @@
 # m025-154 — Kebenaran pedagogis: soal yang MENGAJARKAN hal salah
 
 **Status: SEDANG BERJALAN. Dokumen ini supaya agent berikutnya tidak mulai dari nol.**
+**Terakhir disinkronkan: m025-154, sesudah telaah kebenaran reading selesai.**
 
 OWNER melaporkan hal yang mengubah prioritas seluruh pekerjaan ini:
 
@@ -121,18 +122,72 @@ Yang paling berbahaya dari temuan mereka:
 - **`A1-003`** satu-satunya soal A1 yang kuncinya tidak tunggal ("drank" juga benar untuk
   kebiasaan lampau). A1 dipakai pemula, jadi paling merusak. Stem diberi jangkar "These days".
 
-### 3c. Reading — BELUM ditelaah untuk kebenaran pedagogis sama sekali
+### 3c. Reading — SUDAH ditelaah. 300 soal benar-benar merugikan murid.
 
-1.500 soal reading belum pernah diperiksa dengan pertanyaan "apakah buktinya
-benar-benar mendukung kuncinya?". Gerbang yang ada hanya memastikan `meta.evidence`
-ADA di dalam teks — bukan bahwa ia **membuktikan** jawabannya. Ini celah besar
-yang masih terbuka.
+Tiga peninjau ahli memeriksa seluruh 1.500 soal (A1-A2, B1-B2, C1-C2). Seluruh angka
+di bawah **kuverifikasi ulang sendiri lewat runtime**, bukan dari laporan mereka.
+
+**PERINGATAN PALING PENTING UNTUK AGENT BERIKUTNYA — jangan ulangi kesalahan ini.**
+
+Ketiga peninjau memeriksa **DATA** di `reading-bank.json`, bukan soal yang **BENAR-BENAR
+DILIHAT MURID**. Runtime mengubah keduanya secara besar-besaran:
+
+- `makeReadingQuestion()` **MEMBUANG stem dari bank sepenuhnya** dan menyusun stem-nya
+  sendiri dari daftar tetap berbahasa Indonesia, diawali judul bacaan yang sebenarnya.
+- Runtime **mengacak posisi jawaban** sebelum ditampilkan.
+
+Akibatnya tiga temuan yang dilaporkan sebagai "paling merusak" ternyata **tidak pernah
+sampai ke murid sama sekali**:
+
+| Temuan di data | Jumlah | Sampai ke murid? |
+|---|---:|---|
+| Kunci selalu di indeks tetap per tipe | 1.500 | **TIDAK** — runtime mengacak |
+| Stem menyebut lokasi yang tak ada di teks | 1.200 | **TIDAK** — stem dibuang runtime |
+| Stem mengutip gumpalan kata kunci | 1.500 | **TIDAK** — stem dibuang runtime |
+
+Cara memverifikasi klaim reading: SELALU lewat
+`ctx.__fiezelAudit.makeReadingQuestion(r, q, i)`, jangan membaca `q[0]` mentah.
+
+**Yang BENAR-BENAR merugikan murid — 300 dari 1.500 soal (20%), terverifikasi runtime:**
+
+1. **225 soal punya lebih dari satu pilihan berupa kalimat verbatim dari bacaan.**
+   Dua-duanya bisa dibela dengan bukti dari teks. Murid yang membaca teliti memilih
+   yang sama sahihnya lalu **ditandai salah**. Ini mekanisme paling langsung yang
+   menurunkan nilai. Terparah di tipe `detail`, `evidence`, `supporting_detail` —
+   di situ 3 dari 4 pilihan adalah kalimat verbatim.
+
+2. **75 soal `reference` tidak bisa dijawab.** Kuncinya gumpalan kata kunci sintetis
+   yang tidak pernah muncul sebagai frasa di teks. Contoh nyata yang dilihat murid:
+
+   ```
+   Q: Berdasarkan "Coastal Ecology — Case 003", kata rujukan itu mengarah ke apa?
+      [ ] the calendar date
+      [*] coastal ecology access timing reliability     <- bukan frasa di teks
+      [ ] Mira
+      [ ] an unrelated location
+   ```
+
+Cacat lain yang nyata tetapi lebih ringan: 225 dari 300 bacaan punya dua soal berkunci
+identik, dan tipe `purpose`/`author_purpose` memakai set pilihan yang sama persis dengan
+`main_idea` di bacaan yang sama.
+
+**Perbaikannya adalah penulisan ulang (3d), bukan tambal.** Kedua cacat itu lahir dari
+generator template yang sama; menambal 300 soal di bank lama tidak menghapus sebabnya.
+`tools/reading-bank-validate.mjs` sudah diperkuat untuk memblokir keduanya di konten baru:
+lebih dari satu opsi verbatim, kunci `reference`/`detail` yang tak ada di teks, dua soal
+berkunci sama dalam satu bacaan, dan kutipan stem yang tak ada di bacaan.
 
 ### 3d. Penulisan ulang bacaan reading (terpisah, sudah jalan sebagian)
 
 276 dari 300 bacaan adalah kembaran template. Penulisan ulang sedang berjalan:
 
-- **A2 dan B1 SELESAI** 50/50, lolos validator, sudah di-commit
+- **A2 dan B1 ditulis ulang 50/50** dan lolos validator versi LAMA — tetapi validator
+  yang diperkuat di m025-154 menangkap cacat yang SAMA di dalamnya (opsi verbatim ganda,
+  kunci `reference`/`detail` yang tak ada di teks). **Penulis ulang mengulangi pola bank
+  lama.** Keduanya HARUS divalidasi ulang dan diperbaiki sebelum dipakai.
+  Pelajarannya untuk agent berikutnya: beri penulis konten aturan "jangan ambil pengecoh
+  verbatim dari bacaan" dan "kunci reference harus kata/frasa nyata di teks" SEJAK AWAL
+  di prompt-nya, jangan hanya mengandalkan validator di akhir.
 - **A1** tinggal batch terakhir (r0041-r0050); batch 1-4 ada di `.reading-new/parts/`
 - **B2** 20/50 (r0151-r0170) — perlu 30 lagi, dan ada satu stem kembar r0169#0 vs r0151#0
 - **C1, C2** belum mulai
