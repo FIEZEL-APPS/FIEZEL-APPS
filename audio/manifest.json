@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-audio-manifest-v1",
-  "version": 41,
-  "generatedAt": "2026-08-25T12:20:27.790Z",
+  "version": 42,
+  "generatedAt": "2026-08-25T12:21:12.230Z",
   "assetBaseUrl": "https://fiezel-audio.fitrajft.workers.dev",
   "voiceProfile": {
     "voiceId": "YzlPYWCaY6Y0Ult2o51B",
