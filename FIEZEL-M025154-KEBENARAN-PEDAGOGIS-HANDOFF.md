@@ -122,6 +122,34 @@ Yang paling berbahaya dari temuan mereka:
 - **`A1-003`** satu-satunya soal A1 yang kuncinya tidak tunggal ("drank" juga benar untuk
   kebiasaan lampau). A1 dipakai pemula, jadi paling merusak. Stem diberi jangkar "These days".
 
+### 3f. Grammar mode turunan — BELUM ditelaah ahli, tanpa bukti cacat
+
+Ini celah yang tersisa di grammar dan perlu dinyatakan jujur.
+
+Tiga peninjau ahli memeriksa **139 template** — dan itu setara **1 dari 25 mode latihan**
+(`apply_form`). Dua puluh empat mode turunan (`justify_correct`, `recognize_rule`,
+`label_misconception`, `diagnose_distractor`, `contrast_distractor`, `teach_back`, dst.)
+**belum pernah ditelaah ahli**. Yang dilihat murid ada 3.475 kartu, bukan 139.
+
+Aku mencoba menutup celah itu secara otomatis dan **gagal menemukan cacat** — semua
+kandidat ternyata salah tangkap metrik. Dicatat supaya tidak diulang:
+
+| Metrik yang dicoba | Hasil | Kenapa keliru |
+|---|---:|---|
+| Tumpang tindih kata kunci vs pengecoh ≥70% | 57 kandidat | Label berkerangka paralel ("...diperlakukan sebagai **jam**" vs "**rentang waktu luas**") justru desain bagus — bagian yang beda yang bermakna |
+| Jaccard ≥85% | 4 kandidat | Keempatnya **pasangan cermin** ("subjeknya digeser tetapi kepemilikannya terlupa" vs kebalikannya). Maknanya berlawanan; metrik kata buta terhadap urutan |
+| Pengecoh identik dengan kunci | 0 | — |
+
+**Kesimpulan jujur: tidak ada bukti cacat di mode turunan, tetapi juga tidak ada bukti
+ketiadaannya.** Cacat "pengecoh juga benar" butuh penilaian bahasa, bukan pencocokan
+pola — sama seperti kesimpulan di 3a. Yang benar-benar menutup celah ini hanya telaah
+ahli atas kartu HASIL RENDER (lewat `buildGrammarLessonQuestions`), bukan atas template.
+
+Prioritaskan mode yang pengecohnya dipinjam dari lesson lain — `recognize_rule`,
+`recognize_objective`, `sequence_reasoning`, `identify_misconception`, `recall_memory_cue`,
+`choose_avoidance`, `locate_decision_cue`, `teach_back`, `mastery_check` — karena di situ
+peluang "pengecoh yang ternyata juga benar untuk lesson ini" paling besar.
+
 ### 3c. Reading — SUDAH ditelaah. 300 soal benar-benar merugikan murid.
 
 Tiga peninjau ahli memeriksa seluruh 1.500 soal (A1-A2, B1-B2, C1-C2). Seluruh angka
