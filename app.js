@@ -623,7 +623,7 @@ function partOfSpeechAskable(v){
   if(!v||!PART_OF_SPEECH_ID[String(v.partOfSpeech||'').toLowerCase()])return false;
   return !!vocabSurfaceForm(v);
 }
-function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'informasi yang benar-benar disebutkan',why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
+function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'benar / salah / tidak disebutkan'/* m025-163: label lama sengaja kabur utk menutupi ketiadaan NS */,why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
 /* ---------------------------------------------------------------------------
  * m025-149: GERBANG INTEGRITAS KONTEN TERPUSAT.
  *
@@ -699,7 +699,7 @@ function contentIntegrityGate(q){
   if(q.type==='grammar'&&q.lessonSkill&&q.skill&&q.lessonSkill!==q.skill)return recordGateRejection(q,'identitas lesson tidak cocok');
   return{ok:true};
 }
-function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};return contentIntegrityGate(q)}
+function validateQuestion(q){if(!q||!q.question||!Array.isArray(q.options)||q.options.length<2)return{ok:false,reason:'missing question/options'};if(!Number.isInteger(q.answerIndex)||q.answerIndex<0||q.answerIndex>=q.options.length)return{ok:false,reason:'invalid answer index'};const opts=q.options.map(norm);if(opts.some(x=>!x)||new Set(opts).size!==opts.length)return{ok:false,reason:'duplicate/empty options'};if(q.type==='reading'){if(!q.passage?.id||!q.passage?.title||!q.passage?.text)return{ok:false,reason:'reading passage missing'};if(!q.explain?.evidence)return{ok:false,reason:'reading evidence missing'}}if(!q.explain?.why||!q.explain?.rule||!q.explain?.distractor||!q.explain?.memory)return{ok:false,reason:'explanation incomplete'};if(q.type==='grammar'&&(!Array.isArray(q.explain.distractors)||q.explain.distractors.length!==q.options.length))return{ok:false,reason:'per-distractor explanation missing'};if(/\b(random|placeholder|lorem ipsum)\b/i.test(q.question))return{ok:false,reason:'placeholder question'};if(q.skill==='reading_true_false_not_stated'){if(q.options.length!==3)return{ok:false,reason:'TFNS wajib 3 pilihan skala'};if(!/[“”]/.test(q.question))return{ok:false,reason:'TFNS tanpa klaim di stem'}}/* m025-163: gerbang TFNS jujur */return contentIntegrityGate(q)}
 
 // m025-149: entri review yang DIREKAM saat konten rusak masih menyimpan teksnya apa adanya.
 // Soalnya sendiri selalu dibangun ulang dari bank - tidak ada jalur yang memutar ulang teks
@@ -1354,7 +1354,7 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  const add=(q,baseScore,meta={})=>{if(!q||!q.options||q.answerIndex<0||seen.has(sigQ(q)))return;seen.add(sigQ(q));const domain=normalizePolicyDomain(q.type),skill=String(q.lessonSkill||q.skill||''),difficulty=Number(q.difficulty||LEVELS.indexOf(level)+1),measured=!!meta.measured,due=!!meta.due,risk=Number(meta.risk||0);let score=Number(baseScore||0);if(domain===primary)score+=8;if(domain===secondary)score+=3;if(targetSkill&&(skill===targetSkill||skill.includes(targetSkill)||targetSkill.includes(skill)))score+=14;if(due)score+=8+Number(policy?.reviewShare||0)*8;score+=risk*7;if(policy?.avoidNewContent&&!measured)score-=10;score-=Math.abs(difficulty-Number(policy?.targetDifficulty||difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};
  for(const v of V){if(v.level!==level)continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;add(q,score,{measured:true,due,risk})}
  for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?Math.min(8,GRAMMAR_PRACTICE_MODES.length):1;for(let variant=0;variant<variants;variant++)add(makeGrammarQuestion(skill,item,variant,skill),score-variant*.05,{measured:true,due,risk})}}
- for(const r of R){if(r.level!==level)continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){const skill=q0.skill||q0.type||'reading_detail',risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2);add(makeReadingQuestion(r,q0,i),score,{measured:!!b,due,risk})}}
+ for(const r of R){if(r.level!==level)continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){const skill=`reading_${(q0?.[3]&&typeof q0[3]==='object'&&q0[3].type)||'detail'}`/* m025-163: q0 itu TUPLE - q0.skill/q0.type selalu undefined, semua soal reading diskor sebagai reading_detail (temuan Fable) */,risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2);add(makeReadingQuestion(r,q0,i),score,{measured:!!b,due,risk})}}
  const requested=Math.max(1,Math.round(Number(count)||1)),limit=Math.max(requested,Math.min(candidates.length,requested*Math.max(1,Math.min(5,Math.round(Number(reservoirMultiplier)||1))))),ranked=candidates.sort((a,b)=>b.score-a.score),result=[],picked=new Set(),take=(fn,n)=>{for(const x of ranked){if(result.length>=limit||n<=0)break;if(picked.has(x)||!fn(x))continue;picked.add(x);result.push(x.q);n--}};
  if(targetSkill)take(x=>x.skill===targetSkill||x.skill.includes(targetSkill)||targetSkill.includes(x.skill),Math.ceil(limit*.4));
  if(primary)take(x=>x.domain===primary,Math.ceil(limit*.55)-result.filter(q=>normalizePolicyDomain(q.type)===primary).length);
@@ -3372,6 +3372,11 @@ function readingSkill(original){
   return 'detail';
 }
 function uniqueReadingOptions(r,q,answer){
+  // m025-163 (council-2): item berskala tetap (TFNS) TIDAK boleh ditambal opsi dari passage
+  // lain - skala tiga nilainya rusak dan korupsinya senyap (probe Opus: validateQuestion
+  // tetap ok:true). fixedOptions mematikan penambalan per item.
+  const meta0=q[3]&&typeof q[3]==='object'?q[3]:{};
+  if(meta0.fixedOptions===true)return(q[1]||[]).map(x=>String(x));
   const clean=[];const seen=new Set();
   for(const x of q[1]||[]){const n=norm(x);if(n&&!seen.has(n)){seen.add(n);clean.push(x)}}
   const ans=q[1]?.[answer];
@@ -3401,8 +3406,12 @@ function makeReadingQuestion(r,q,i){
     const m=String(original||'').match(/["“']([^"”']{1,40})["”']/);
     if(m&&m[1])stem=type==='reference'?`Kata “${m[1]}” di bacaan mengarah ke apa?`:`Apa arti “${m[1]}” di dalam bacaan ini?`;
   }
+  // m025-163: TFNS jujur - klaim Inggris (objek yang diuji) tampil verbatim di stem;
+  // tanpa klaim, soal TFNS cuma pilihan ganda tanpa soal.
+  if(type==='true_false_not_stated'&&meta.claim)stem=`pernyataan ini benar, salah, atau tidak disebutkan? “${String(meta.claim).trim()}”`;
   const opts=uniqueReadingOptions(r,q,q[2]);
-  const shuffled=shuffle(opts.map(x=>({x,ok:norm(x)===norm(answerText)})));
+  // m025-163: skala tetap tidak diacak (True/False/Not stated kehilangan makna urutannya).
+  const shuffled=meta.fixedOptions===true?opts.map(x=>({x,ok:norm(x)===norm(answerText)})):shuffle(opts.map(x=>({x,ok:norm(x)===norm(answerText)})));
   let answerIndex=shuffled.findIndex(x=>x.ok);
   // Kalau kuncinya tetap tidak ditemukan, soal ini memang rusak. Biarkan answerIndex -1
   // supaya gerbang integritas menolaknya; menimpa satu pilihan hanya menyembunyikan
@@ -3412,7 +3421,13 @@ function makeReadingQuestion(r,q,i){
   const title=r.title||'bacaan ini';
   const contextualStem=`Berdasarkan “${title}”, ${stem.charAt(0).toLowerCase()+stem.slice(1)}`;
   const focus=readingFocusLabel(type);
-  return{id:`reading-${r.id}-${i}-${Date.now()}-${Math.random()}`,type:'reading',level:r.level,skill:`reading_${type}`,target:r.id,difficulty:LEVELS.indexOf(r.level)+1,canary:meta.__fiezelCanary||null,passage:{id:r.id,title:r.title||'Bacaan',text:r.text||''},question:contextualStem,options:shuffled.map(x=>x.x),answerIndex,explain:{evidence,why:evidence?`Bagian yang paling mendukung jawaban ini adalah: “${evidence}”`:`Jawaban yang aman harus punya bukti yang benar-benar ada di bacaan.`,rule:`Fokus soal ini adalah ${focus}. Cari bagian teks yang langsung menjawab fokus tersebut.`,avoid:'Baca pertanyaannya dulu, cari bagian teks yang relevan, lalu cocokkan setiap pilihan dengan bukti. Jangan memilih hanya karena katanya terlihat sama.',memory:`Cara cepat: cari bukti dulu, baru pilih jawaban.`,distractor:'Pilihan lain tidak punya dukungan yang cukup, terlalu luas, atau hanya mengulang kata dari pertanyaan tanpa benar-benar menjawabnya.'}}
+  return{id:`reading-${r.id}-${i}-${Date.now()}-${Math.random()}`,type:'reading',level:r.level,skill:`reading_${type}`,target:r.id,difficulty:LEVELS.indexOf(r.level)+1,canary:meta.__fiezelCanary||null,passage:{id:r.id,title:r.title||'Bacaan',text:r.text||''},question:contextualStem,options:shuffled.map(x=>x.x),answerIndex,explain:{evidence,
+  // m025-163: (1) meta.why dari bank menang (kanal verbatim penulis); (2) kunci "Not stated"
+  // tidak boleh diberi template "bagian yang mendukung" - itu bohong secara logika, karena
+  // justifikasinya adalah KETIADAAN. Evidence NS = kalimat nyaris-cocok (jebakan pencocok kata).
+  why:String(meta.why||'').trim()||(type==='true_false_not_stated'&&norm(answerText)===norm('Not stated')?`Teks tidak menyebut hal ini. Kalimat terdekat cuma membahas: “${evidence}” — itu bukan bukti untuk klaim tadi.`:(evidence?`Bagian yang paling mendukung jawaban ini adalah: “${evidence}”`:`Jawaban yang aman harus punya bukti yang benar-benar ada di bacaan.`)),
+  rule:`Fokus soal ini adalah ${focus}. Cari bagian teks yang langsung menjawab fokus tersebut.`,avoid:'Baca pertanyaannya dulu, cari bagian teks yang relevan, lalu cocokkan setiap pilihan dengan bukti. Jangan memilih hanya karena katanya terlihat sama.',memory:`Cara cepat: cari bukti dulu, baru pilih jawaban.`,
+  distractor:String(meta.whyOthersFail||'').trim()||'Pilihan lain tidak punya dukungan yang cukup, terlalu luas, atau hanya mengulang kata dari pertanyaan tanpa benar-benar menjawabnya.'}}
 }
 // m025-139: jalur Reading berformat ujian. Bank reading lama berisi 300 bacaan ~58 kata -
 // berguna untuk kosakata dalam konteks, tetapi tidak melatih membaca ujian sama sekali:
