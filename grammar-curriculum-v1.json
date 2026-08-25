@@ -61,1425 +61,1564 @@
       "level": "A1",
       "sequence": 1,
       "unit": "A1.1",
-      "title": "Subject, object, and possessive pronouns",
+      "title": "I, me, my: tiga wujud kata ganti",
       "prerequisites": [],
       "source": "features/classroom/classroom-lessons-v1.json#A1-017",
-      "templateId": "A1-017"
+      "templateId": "A1-017",
+      "titleEn": "Subject, object, and possessive pronouns"
     },
     {
       "lessonId": "be_subject_agreement",
       "level": "A1",
       "sequence": 2,
       "unit": "A1.1",
-      "title": "Verb to be: subject agreement",
+      "title": "Am, is, are: pasangan tiap subjek",
       "prerequisites": [
         "subject_object_pronouns_and_possessives"
       ],
       "source": "grammar-templates.json",
-      "templateId": "A1-004"
+      "templateId": "A1-004",
+      "titleEn": "Verb to be: subject agreement"
     },
     {
       "lessonId": "articles_a_an_the",
       "level": "A1",
       "sequence": 3,
       "unit": "A1.1",
-      "title": "Articles: a, an, and the",
+      "title": "Kata sandang \u201ca\u201d, \u201can\u201d, \u201cthe\u201d: memilih yang pas",
       "prerequisites": [
         "be_subject_agreement"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-008",
-      "templateId": "A1-008"
+      "templateId": "A1-008",
+      "titleEn": "Articles: a, an, and the"
     },
     {
       "lessonId": "plural_nouns_basic",
       "level": "A1",
       "sequence": 4,
       "unit": "A1.1",
-      "title": "Plural nouns",
+      "title": "Bentuk jamak: dari book jadi books",
       "prerequisites": [
         "articles_a_an_the"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-012",
-      "templateId": "A1-012"
+      "templateId": "A1-012",
+      "titleEn": "Plural nouns"
     },
     {
       "lessonId": "demonstrative_reference_distance_this_these_that_those",
       "level": "A1",
       "sequence": 5,
       "unit": "A1.1",
-      "title": "Demonstratives: this, that, these, those",
+      "title": "This, that, these, those: dekat atau jauh",
       "prerequisites": [
         "plural_nouns_basic"
       ],
       "source": "grammar-templates.json",
-      "templateId": "AR-005"
+      "templateId": "AR-005",
+      "titleEn": "Demonstratives: this, that, these, those"
     },
     {
       "lessonId": "possessive_adjectives",
       "level": "A1",
       "sequence": 6,
       "unit": "A1.1",
-      "title": "Possessive adjectives",
+      "title": "My, your, his, her: menyebut pemiliknya",
       "prerequisites": [
         "subject_object_pronouns_and_possessives"
       ],
       "source": "grammar-templates.json",
-      "templateId": "A1-006"
+      "templateId": "A1-006",
+      "titleEn": "Possessive adjectives"
     },
     {
       "lessonId": "have_got_has_got",
       "level": "A1",
       "sequence": 7,
       "unit": "A1.1",
-      "title": "Have got and has got",
+      "title": "Have got dan has got: menyatakan kepemilikan",
       "prerequisites": [
         "be_subject_agreement",
         "possessive_adjectives"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-009",
-      "templateId": "A1-009"
+      "templateId": "A1-009",
+      "titleEn": "Have got and has got"
     },
     {
       "lessonId": "there_is_are",
       "level": "A1",
       "sequence": 8,
       "unit": "A1.1",
-      "title": "There is and there are",
+      "title": "There is dan there are: satu atau banyak",
       "prerequisites": [
         "be_subject_agreement",
         "plural_nouns_basic"
       ],
       "source": "grammar-templates.json",
-      "templateId": "A1-005"
+      "templateId": "A1-005",
+      "titleEn": "There is and there are"
     },
     {
       "lessonId": "place_prepositions_basic",
       "level": "A1",
       "sequence": 9,
       "unit": "A1.2",
-      "title": "Prepositions of place",
+      "title": "In, on, under: kata depan tempat",
       "prerequisites": [
         "there_is_are"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-013",
-      "templateId": "A1-013"
+      "templateId": "A1-013",
+      "titleEn": "Prepositions of place"
     },
     {
       "lessonId": "present_simple_basics",
       "level": "A1",
       "sequence": 10,
       "unit": "A1.2",
-      "title": "Present simple basics",
+      "title": "Present simple: cerita kebiasaan tiap hari",
       "prerequisites": [
         "be_subject_agreement"
       ],
       "source": "grammar-templates.json",
-      "templateId": "A1-003"
+      "templateId": "A1-003",
+      "titleEn": "Present simple basics"
     },
     {
       "lessonId": "question_words_basic",
       "level": "A1",
       "sequence": 11,
       "unit": "A1.2",
-      "title": "Basic question words",
+      "title": "What, where, when, who: kata tanya dasar",
       "prerequisites": [
         "present_simple_basics"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-015",
-      "templateId": "A1-015"
+      "templateId": "A1-015",
+      "titleEn": "Basic question words"
     },
     {
       "lessonId": "can_ability",
       "level": "A1",
       "sequence": 12,
       "unit": "A1.2",
-      "title": "Can for ability",
+      "title": "Can: cara bilang \u201caku bisa\u201d",
       "prerequisites": [
         "be_subject_agreement"
       ],
       "source": "grammar-templates.json",
-      "templateId": "A1-007"
+      "templateId": "A1-007",
+      "titleEn": "Can for ability"
     },
     {
       "lessonId": "present_continuous_basics",
       "level": "A1",
       "sequence": 13,
       "unit": "A1.2",
-      "title": "Present continuous basics",
+      "title": "Present continuous: yang sedang terjadi sekarang",
       "prerequisites": [
         "be_subject_agreement",
         "present_simple_basics"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-014",
-      "templateId": "A1-014"
+      "templateId": "A1-014",
+      "titleEn": "Present continuous basics"
     },
     {
       "lessonId": "past_be_was_were",
       "level": "A1",
       "sequence": 14,
       "unit": "A1.2",
-      "title": "Past form of be: was and were",
+      "title": "Was dan were: be di masa lampau",
       "prerequisites": [
         "be_subject_agreement"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-011",
-      "templateId": "A1-011"
+      "templateId": "A1-011",
+      "titleEn": "Past form of be: was and were"
     },
     {
       "lessonId": "past_simple_regular_forms",
       "level": "A1",
       "sequence": 15,
       "unit": "A1.2",
-      "title": "Past simple regular verbs",
+      "title": "Past simple beraturan: tinggal tambah -ed",
       "prerequisites": [
         "present_simple_basics"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-010",
-      "templateId": "A1-010"
+      "templateId": "A1-010",
+      "titleEn": "Past simple regular verbs"
     },
     {
       "lessonId": "some_any_countable_uncountable",
       "level": "A1",
       "sequence": 16,
       "unit": "A1.2",
-      "title": "Some, any, and countability",
+      "title": "Some dan any: bisa dihitung atau nggak",
       "prerequisites": [
         "plural_nouns_basic"
       ],
       "source": "features/classroom/classroom-lessons-v1.json#A1-016",
-      "templateId": "A1-016"
+      "templateId": "A1-016",
+      "titleEn": "Some, any, and countability"
     },
     {
       "lessonId": "time_prepositions_in_on_at",
       "level": "A1",
       "sequence": 17,
       "unit": "A1.3",
-      "title": "Prepositions of time",
+      "title": "In, on, at: kata depan waktu",
       "prerequisites": [
         "place_prepositions_basic"
       ],
       "source": "grammar-templates.json",
-      "templateId": "PR-001"
+      "templateId": "PR-001",
+      "titleEn": "Prepositions of time"
     },
     {
       "lessonId": "present_simple_vs_continuous",
       "level": "A2",
       "sequence": 18,
       "unit": "A2.1",
-      "title": "present simple vs continuous",
+      "title": "Present simple vs present continuous: kebiasaan atau sekarang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-001"
+      "templateId": "TA-001",
+      "titleEn": "present simple vs continuous"
     },
     {
       "lessonId": "obligation_vs_permission",
       "level": "A2",
       "sequence": 19,
       "unit": "A2.1",
-      "title": "obligation vs permission",
+      "title": "Must dan can: wajib atau boleh",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-001"
+      "templateId": "MO-001",
+      "titleEn": "obligation vs permission"
     },
     {
       "lessonId": "zero_vs_first_conditional",
       "level": "A2",
       "sequence": 20,
       "unit": "A2.1",
-      "title": "zero vs first conditional",
+      "title": "Zero vs first conditional: fakta atau kemungkinan nyata",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-001"
+      "templateId": "CO-001",
+      "titleEn": "zero vs first conditional"
     },
     {
       "lessonId": "first_vs_subsequent_mention",
       "level": "A2",
       "sequence": 21,
       "unit": "A2.1",
-      "title": "first vs subsequent mention",
+      "title": "\u201cA\u201d untuk baru, \u201cthe\u201d untuk yang sudah disebut",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "AR-001"
+      "templateId": "AR-001",
+      "titleEn": "first vs subsequent mention"
     },
     {
       "lessonId": "comparative_vs_superlative_scope",
       "level": "A2",
       "sequence": 22,
       "unit": "A2.1",
-      "title": "comparative vs superlative scope",
+      "title": "Comparative vs superlative: dua hal atau satu kelompok",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CM-001"
+      "templateId": "CM-001",
+      "titleEn": "comparative vs superlative scope"
     },
     {
       "lessonId": "past_continuous_vs_past_simple_interrupted_action",
       "level": "A2",
       "sequence": 23,
       "unit": "A2.1",
-      "title": "past continuous vs past simple interrupted action",
+      "title": "Past continuous vs past simple: kejadian yang terpotong",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-004"
+      "templateId": "TA-004",
+      "titleEn": "past continuous vs past simple interrupted action"
     },
     {
       "lessonId": "much_many_little_few_countability",
       "level": "A2",
       "sequence": 24,
       "unit": "A2.1",
-      "title": "much many little few countability",
+      "title": "Much, many, little, few: pilih sesuai bendanya",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "AR-003"
+      "templateId": "AR-003",
+      "titleEn": "much many little few countability"
     },
     {
       "lessonId": "place_prepositions_at_in_on",
       "level": "A2",
       "sequence": 25,
       "unit": "A2.1",
-      "title": "place prepositions at in on",
+      "title": "At, in, on untuk tempat: titik, ruang, permukaan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PR-002"
+      "templateId": "PR-002",
+      "titleEn": "place prepositions at in on"
     },
     {
       "lessonId": "as_as_equality_vs_comparative",
       "level": "A2",
       "sequence": 26,
       "unit": "A2.2",
-      "title": "as as equality vs comparative",
+      "title": "As ... as: sama rata, bukan lebih",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CM-002"
+      "templateId": "CM-002",
+      "titleEn": "as as equality vs comparative"
     },
     {
       "lessonId": "article_omission_with_uncountable",
       "level": "A2",
       "sequence": 27,
       "unit": "A2.2",
-      "title": "article omission with uncountable",
+      "title": "Benda tak terhitung: tanpa \u201ca\u201d dan \u201can\u201d",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "EC-003"
+      "templateId": "EC-003",
+      "titleEn": "article omission with uncountable"
     },
     {
       "lessonId": "definite_article_with_unique_referents_and_superlatives",
       "level": "A2",
       "sequence": 28,
       "unit": "A2.2",
-      "title": "definite article with unique referents and superlatives",
+      "title": "\u201cThe\u201d buat benda satu-satunya dan bentuk superlative",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "AR-004"
+      "templateId": "AR-004",
+      "titleEn": "definite article with unique referents and superlatives"
     },
     {
       "lessonId": "movement_prepositions_through_across_along_over",
       "level": "A2",
       "sequence": 29,
       "unit": "A2.2",
-      "title": "movement prepositions through across along over",
+      "title": "Through, across, along, over: arah gerakan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PR-005"
+      "templateId": "PR-005",
+      "titleEn": "movement prepositions through across along over"
     },
     {
       "lessonId": "double_negative_avoidance_single_negation_rule",
       "level": "A2",
       "sequence": 30,
       "unit": "A2.2",
-      "title": "double negative avoidance single negation rule",
+      "title": "Satu kalimat cukup satu kata negatif",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "QN-004"
+      "templateId": "QN-004",
+      "titleEn": "double negative avoidance single negation rule"
     },
     {
       "lessonId": "state_verbs_resist_continuous_form",
       "level": "A2",
       "sequence": 31,
       "unit": "A2.2",
-      "title": "state verbs resist continuous form",
+      "title": "Kata kerja keadaan: nggak dipakai bentuk -ing",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_003"
+      "templateId": "b4_003",
+      "titleEn": "state verbs resist continuous form"
     },
     {
       "lessonId": "preposition_of_time_duration_for_vs_since_vs_during",
       "level": "A2",
       "sequence": 32,
       "unit": "A2.2",
-      "title": "preposition of time duration for vs since vs during",
+      "title": "For, since, during: cara menyebut lamanya",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_014"
+      "templateId": "b4_014",
+      "titleEn": "preposition of time duration for vs since vs during"
     },
     {
       "lessonId": "reported_speech_pronoun_and_possessive_shift",
       "level": "A2",
       "sequence": 33,
       "unit": "A2.2",
-      "title": "reported speech pronoun and possessive shift",
+      "title": "Reported speech: kata ganti ikut pindah",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_009"
+      "templateId": "b5_009",
+      "titleEn": "reported speech pronoun and possessive shift"
     },
     {
       "lessonId": "subject_vs_object_questions_word_order",
       "level": "A2",
       "sequence": 34,
       "unit": "A2.3",
-      "title": "subject vs object questions word order",
+      "title": "Pertanyaan subjek vs objek: perlu \u201cdo\u201d atau nggak",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_019"
+      "templateId": "b5_019",
+      "titleEn": "subject vs object questions word order"
     },
     {
       "lessonId": "past_simple_vs_present_perfect",
       "level": "B1",
       "sequence": 35,
       "unit": "B1.1",
-      "title": "past simple vs present perfect",
+      "title": "Present perfect vs past simple: rentang yang belum tutup",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-002"
+      "templateId": "TA-002",
+      "titleEn": "past simple vs present perfect"
     },
     {
       "lessonId": "future_forms_plan_vs_prediction",
       "level": "B1",
       "sequence": 36,
       "unit": "B1.1",
-      "title": "future forms plan vs prediction",
+      "title": "Bentuk masa depan: rencana atau perkiraan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-003"
+      "templateId": "TA-003",
+      "titleEn": "future forms plan vs prediction"
     },
     {
       "lessonId": "deduction_present",
       "level": "B1",
       "sequence": 37,
       "unit": "B1.1",
-      "title": "deduction present",
+      "title": "Must, might, can\u2019t: menyimpulkan keadaan sekarang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-002"
+      "templateId": "MO-002",
+      "titleEn": "deduction present"
     },
     {
       "lessonId": "second_conditional_unreal_present",
       "level": "B1",
       "sequence": 38,
       "unit": "B1.1",
-      "title": "second conditional unreal present",
+      "title": "Second conditional: pengandaian yang nggak nyata",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-002"
+      "templateId": "CO-002",
+      "titleEn": "second conditional unreal present"
     },
     {
       "lessonId": "agent_omission_when_irrelevant",
       "level": "B1",
       "sequence": 39,
       "unit": "B1.1",
-      "title": "agent omission when irrelevant",
+      "title": "Kalimat pasif: kapan pelaku boleh hilang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-001"
+      "templateId": "PA-001",
+      "titleEn": "agent omission when irrelevant"
     },
     {
       "lessonId": "backshift_statement",
       "level": "B1",
       "sequence": 40,
       "unit": "B1.1",
-      "title": "backshift statement",
+      "title": "Reported speech: tense mundur satu langkah",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-001"
+      "templateId": "RS-001",
+      "titleEn": "backshift statement"
     },
     {
       "lessonId": "question_tag_polarity",
       "level": "B1",
       "sequence": 41,
       "unit": "B1.1",
-      "title": "question tag polarity",
+      "title": "Question tag: negatif ketemu positif",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "QN-001"
+      "templateId": "QN-001",
+      "titleEn": "question tag polarity"
     },
     {
       "lessonId": "subject_verb_agreement_with_intervening_phrase",
       "level": "B1",
       "sequence": 42,
       "unit": "B1.1",
-      "title": "subject verb agreement with intervening phrase",
+      "title": "Subjek dan kata kerja: jangan terkecoh sisipan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "EC-001"
+      "templateId": "EC-001",
+      "titleEn": "subject verb agreement with intervening phrase"
     },
     {
       "lessonId": "past_perfect_sequencing_two_past_events",
       "level": "B1",
       "sequence": 43,
       "unit": "B1.2",
-      "title": "past perfect sequencing two past events",
+      "title": "Past perfect: mengurutkan dua kejadian lampau",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-006"
+      "templateId": "TA-006",
+      "titleEn": "past perfect sequencing two past events"
     },
     {
       "lessonId": "ability_past_could_vs_was_able_to",
       "level": "B1",
       "sequence": 44,
       "unit": "B1.2",
-      "title": "ability past could vs was able to",
+      "title": "Could vs was able to: kemampuan masa lalu",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-003"
+      "templateId": "MO-003",
+      "titleEn": "ability past could vs was able to"
     },
     {
       "lessonId": "necessity_absence_neednt_vs_mustnt",
       "level": "B1",
       "sequence": 45,
       "unit": "B1.2",
-      "title": "necessity absence neednt vs mustnt",
+      "title": "Needn\u2019t vs mustn\u2019t: nggak perlu atau nggak boleh",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-005"
+      "templateId": "MO-005",
+      "titleEn": "necessity absence neednt vs mustnt"
     },
     {
       "lessonId": "unless_vs_if_not",
       "level": "B1",
       "sequence": 46,
       "unit": "B1.2",
-      "title": "unless vs if not",
+      "title": "Unless vs if not: negatifnya sudah di dalam",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-005"
+      "templateId": "CO-005",
+      "titleEn": "unless vs if not"
     },
     {
       "lessonId": "reported_questions_word_order",
       "level": "B1",
       "sequence": 47,
       "unit": "B1.2",
-      "title": "reported questions word order",
+      "title": "Melaporkan pertanyaan: susunan kata jadi kalimat berita",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-002"
+      "templateId": "RS-002",
+      "titleEn": "reported questions word order"
     },
     {
       "lessonId": "reported_commands_infinitive",
       "level": "B1",
       "sequence": 48,
       "unit": "B1.2",
-      "title": "reported commands infinitive",
+      "title": "Melaporkan perintah: pakai to sebelum kata kerja",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-003"
+      "templateId": "RS-003",
+      "titleEn": "reported commands infinitive"
     },
     {
       "lessonId": "zero_article_generic_plural_vs_the_specific",
       "level": "B1",
       "sequence": 49,
       "unit": "B1.2",
-      "title": "zero article generic plural vs the specific",
+      "title": "Jamak umum tanpa \u201cthe\u201d, spesifik pakai \u201cthe\u201d",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "AR-002"
+      "templateId": "AR-002",
+      "titleEn": "zero article generic plural vs the specific"
     },
     {
       "lessonId": "dependent_prepositions_after_adjectives",
       "level": "B1",
       "sequence": 50,
       "unit": "B1.2",
-      "title": "dependent prepositions after adjectives",
+      "title": "Pasangan tetap kata sifat: interested in, good at",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PR-003"
+      "templateId": "PR-003",
+      "titleEn": "dependent prepositions after adjectives"
     },
     {
       "lessonId": "gerund_after_preposition_vs_infinitive_of_purpose",
       "level": "B1",
       "sequence": 51,
       "unit": "B1.3",
-      "title": "gerund after preposition vs infinitive of purpose",
+      "title": "Gerund setelah kata depan, infinitive untuk tujuan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "GI-003"
+      "templateId": "GI-003",
+      "titleEn": "gerund after preposition vs infinitive of purpose"
     },
     {
       "lessonId": "negative_questions_expecting_agreement",
       "level": "B1",
       "sequence": 52,
       "unit": "B1.3",
-      "title": "negative questions expecting agreement",
+      "title": "Pertanyaan negatif yang mengharap persetujuan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "QN-002"
+      "templateId": "QN-002",
+      "titleEn": "negative questions expecting agreement"
     },
     {
       "lessonId": "indirect_questions_embedded_word_order",
       "level": "B1",
       "sequence": 53,
       "unit": "B1.3",
-      "title": "indirect questions embedded word order",
+      "title": "Indirect questions: bertanya sopan tanpa membalik urutan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "QN-003"
+      "templateId": "QN-003",
+      "titleEn": "indirect questions embedded word order"
     },
     {
       "lessonId": "word_order_adverb_placement",
       "level": "B1",
       "sequence": 54,
       "unit": "B1.3",
-      "title": "word order adverb placement",
+      "title": "Posisi kata keterangan dalam kalimat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "EC-002"
+      "templateId": "EC-002",
+      "titleEn": "word order adverb placement"
     },
     {
       "lessonId": "advice_should_vs_ought_to_vs_had_better",
       "level": "B1",
       "sequence": 55,
       "unit": "B1.3",
-      "title": "advice should vs ought to vs had better",
+      "title": "Should, ought to, had better: memberi saran",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-006"
+      "templateId": "MO-006",
+      "titleEn": "advice should vs ought to vs had better"
     },
     {
       "lessonId": "speculation_scale_may_might_could_vs_will",
       "level": "B1",
       "sequence": 56,
       "unit": "B1.3",
-      "title": "speculation scale may might could vs will",
+      "title": "May, might, could vs will: tingkat keyakinan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-007"
+      "templateId": "MO-007",
+      "titleEn": "speculation scale may might could vs will"
     },
     {
       "lessonId": "time_and_place_reference_shift",
       "level": "B1",
       "sequence": 57,
       "unit": "B1.3",
-      "title": "time and place reference shift",
+      "title": "Reported speech: here jadi there, now jadi then",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-005"
+      "templateId": "RS-005",
+      "titleEn": "time and place reference shift"
     },
     {
       "lessonId": "phrasal_verb_particle_changes_meaning",
       "level": "B1",
       "sequence": 58,
       "unit": "B1.3",
-      "title": "phrasal verb particle changes meaning",
+      "title": "Phrasal verb: kata kecilnya mengubah makna",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PR-004"
+      "templateId": "PR-004",
+      "titleEn": "phrasal verb particle changes meaning"
     },
     {
       "lessonId": "infinitive_after_too_enough_adjective",
       "level": "B1",
       "sequence": 59,
       "unit": "B1.4",
-      "title": "infinitive after too enough adjective",
+      "title": "Infinitive setelah too dan enough",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "GI-005"
+      "templateId": "GI-005",
+      "titleEn": "infinitive after too enough adjective"
     },
     {
       "lessonId": "less_vs_fewer_countability_agreement",
       "level": "B1",
       "sequence": 60,
       "unit": "B1.4",
-      "title": "less vs fewer countability agreement",
+      "title": "Less vs fewer: sesuai bisa dihitung atau nggak",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CM-004"
+      "templateId": "CM-004",
+      "titleEn": "less vs fewer countability agreement"
     },
     {
       "lessonId": "agreement_structures_so_do_i_neither_do_i",
       "level": "B1",
       "sequence": 61,
       "unit": "B1.4",
-      "title": "agreement structures so do i neither do i",
+      "title": "So do I dan neither do I: ikut setuju",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "QN-005"
+      "templateId": "QN-005",
+      "titleEn": "agreement structures so do i neither do i"
     },
     {
       "lessonId": "comma_splice_run_on_correction",
       "level": "B1",
       "sequence": 62,
       "unit": "B1.4",
-      "title": "comma splice run on correction",
+      "title": "Comma splice: koma saja nggak cukup",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "EC-004"
+      "templateId": "EC-004",
+      "titleEn": "comma splice run on correction"
     },
     {
       "lessonId": "confusing_word_pair_affect_vs_effect",
       "level": "B1",
       "sequence": 63,
       "unit": "B1.4",
-      "title": "confusing word pair affect vs effect",
+      "title": "Affect vs effect: kata kerja atau kata benda",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "EC-005"
+      "templateId": "EC-005",
+      "titleEn": "confusing word pair affect vs effect"
     },
     {
       "lessonId": "present_simple_for_fixed_schedules_not_personal_plans",
       "level": "B1",
       "sequence": 64,
       "unit": "B1.4",
-      "title": "present simple for fixed schedules not personal plans",
+      "title": "Present simple untuk jadwal tetap, bukan rencana pribadi",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-010"
+      "templateId": "TA-010",
+      "titleEn": "present simple for fixed schedules not personal plans"
     },
     {
       "lessonId": "possibility_vs_permission_can_vs_may_formal_register",
       "level": "B1",
       "sequence": 65,
       "unit": "B1.4",
-      "title": "possibility vs permission can vs may formal register",
+      "title": "Can vs may: izin di situasi formal",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_005"
+      "templateId": "b4_005",
+      "titleEn": "possibility vs permission can vs may formal register"
     },
     {
       "lessonId": "future_time_clauses_present_after_when_as_soon_as",
       "level": "B1",
       "sequence": 66,
       "unit": "B1.4",
-      "title": "future time clauses present after when as soon as",
+      "title": "Setelah when dan as soon as: pakai present",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_007"
+      "templateId": "b4_007",
+      "titleEn": "future time clauses present after when as soon as"
     },
     {
       "lessonId": "reported_speech_modal_shift_can_to_could",
       "level": "B1",
       "sequence": 67,
       "unit": "B1.5",
-      "title": "reported speech modal shift can to could",
+      "title": "Reported speech: can berubah jadi could",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_010"
+      "templateId": "b4_010",
+      "titleEn": "reported speech modal shift can to could"
     },
     {
       "lessonId": "reported_yes_no_questions_if_whether",
       "level": "B1",
       "sequence": 68,
       "unit": "B1.5",
-      "title": "reported yes no questions if whether",
+      "title": "Melaporkan pertanyaan yes-no: pakai if atau whether",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_011"
+      "templateId": "b4_011",
+      "titleEn": "reported yes no questions if whether"
     },
     {
       "lessonId": "article_with_institutions_school_prison_hospital",
       "level": "B1",
       "sequence": 69,
       "unit": "B1.5",
-      "title": "article with institutions school prison hospital",
+      "title": "School, prison, hospital: kapan tanpa \u201cthe\u201d",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_012"
+      "templateId": "b4_012",
+      "titleEn": "article with institutions school prison hospital"
     },
     {
       "lessonId": "possessive_determiner_vs_double_genitive_of_mine",
       "level": "B1",
       "sequence": 70,
       "unit": "B1.5",
-      "title": "possessive determiner vs double genitive of mine",
+      "title": "Kata milik ganda: a friend of mine",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_013"
+      "templateId": "b4_013",
+      "titleEn": "possessive determiner vs double genitive of mine"
     },
     {
       "lessonId": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
       "level": "B1",
       "sequence": 71,
       "unit": "B1.5",
-      "title": "preposition after adjective of emotion pleased with vs about",
+      "title": "Pleased with vs about: kata depan setelah emosi",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_015"
+      "templateId": "b4_015",
+      "titleEn": "preposition after adjective of emotion pleased with vs about"
     },
     {
       "lessonId": "bare_infinitive_after_modal_and_causative_make_let",
       "level": "B1",
       "sequence": 72,
       "unit": "B1.5",
-      "title": "bare infinitive after modal and causative make let",
+      "title": "Bare infinitive setelah modal, make, dan let",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_017"
+      "templateId": "b4_017",
+      "titleEn": "bare infinitive after modal and causative make let"
     },
     {
       "lessonId": "relative_clause_omitting_object_pronoun",
       "level": "B1",
       "sequence": 73,
       "unit": "B1.5",
-      "title": "relative clause omitting object pronoun",
+      "title": "Relative clause: kata ganti objek boleh hilang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_018"
+      "templateId": "b4_018",
+      "titleEn": "relative clause omitting object pronoun"
     },
     {
       "lessonId": "comparative_intensifiers_much_far_a_lot_before_comparative",
       "level": "B1",
       "sequence": 74,
       "unit": "B1.5",
-      "title": "comparative intensifiers much far a lot before comparative",
+      "title": "Much, far, a lot: menguatkan comparative",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_019"
+      "templateId": "b4_019",
+      "titleEn": "comparative intensifiers much far a lot before comparative"
     },
     {
       "lessonId": "echo_questions_for_clarification",
       "level": "B1",
       "sequence": 75,
       "unit": "B1.6",
-      "title": "echo questions for clarification",
+      "title": "Echo question: mengulang untuk memastikan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_020"
+      "templateId": "b4_020",
+      "titleEn": "echo questions for clarification"
     },
     {
       "lessonId": "past_habitual_used_to_vs_would_vs_past_simple",
       "level": "B1",
       "sequence": 76,
       "unit": "B1.6",
-      "title": "past habitual used to vs would vs past simple",
+      "title": "Used to, would, past simple: kebiasaan lama",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_001"
+      "templateId": "b5_001",
+      "titleEn": "past habitual used to vs would vs past simple"
     },
     {
       "lessonId": "present_perfect_for_unfinished_time_period_this_week",
       "level": "B1",
       "sequence": 77,
       "unit": "B1.6",
-      "title": "present perfect for unfinished time period this week",
+      "title": "Present perfect dengan \u201cthis week\u201d: periodenya masih jalan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_002"
+      "templateId": "b5_002",
+      "titleEn": "present perfect for unfinished time period this week"
     },
     {
       "lessonId": "ability_nonfinite_forms_be_able_to",
       "level": "B1",
       "sequence": 78,
       "unit": "B1.6",
-      "title": "ability nonfinite forms be able to",
+      "title": "Be able to: saat can nggak bisa dipakai",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_004"
+      "templateId": "b5_004",
+      "titleEn": "ability nonfinite forms be able to"
     },
     {
       "lessonId": "quantifier_of_before_object_pronoun",
       "level": "B1",
       "sequence": 79,
       "unit": "B1.6",
-      "title": "quantifier of before object pronoun",
+      "title": "Some of them: \u201cof\u201d sebelum kata ganti",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_012"
+      "templateId": "b5_012",
+      "titleEn": "quantifier of before object pronoun"
     },
     {
       "lessonId": "preposition_of_means_by_vs_with_vs_on",
       "level": "B1",
       "sequence": 80,
       "unit": "B1.6",
-      "title": "preposition of means by vs with vs on",
+      "title": "By, with, on: menyebut alat dan cara",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_013"
+      "templateId": "b5_013",
+      "titleEn": "preposition of means by vs with vs on"
     },
     {
       "lessonId": "purpose_connectors_so_that_in_order_to_distinction",
       "level": "B1",
       "sequence": 81,
       "unit": "B1.6",
-      "title": "purpose connectors so that in order to distinction",
+      "title": "So that vs in order to: menyatakan tujuan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_021"
+      "templateId": "b5_021",
+      "titleEn": "purpose connectors so that in order to distinction"
     },
     {
       "lessonId": "verb_pattern_meaning_change_stop",
       "level": "B2",
       "sequence": 82,
       "unit": "B2.1",
-      "title": "verb pattern meaning change stop",
+      "title": "Stop doing vs stop to do: makna berubah",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "GI-001"
+      "templateId": "GI-001",
+      "titleEn": "verb pattern meaning change stop"
     },
     {
       "lessonId": "defining_vs_nondefining",
       "level": "B2",
       "sequence": 83,
       "unit": "B2.1",
-      "title": "defining vs nondefining",
+      "title": "Defining vs non-defining relative clause: peran koma",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RC-001"
+      "templateId": "RC-001",
+      "titleEn": "defining vs nondefining"
     },
     {
       "lessonId": "present_perfect_continuous_vs_present_perfect_simple",
       "level": "B2",
       "sequence": 84,
       "unit": "B2.1",
-      "title": "present perfect continuous vs present perfect simple",
+      "title": "Present perfect continuous vs simple: proses atau hasil",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-005"
+      "templateId": "TA-005",
+      "titleEn": "present perfect continuous vs present perfect simple"
     },
     {
       "lessonId": "future_continuous_vs_future_perfect",
       "level": "B2",
       "sequence": 85,
       "unit": "B2.1",
-      "title": "future continuous vs future perfect",
+      "title": "Future continuous vs future perfect: sedang atau tuntas",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-007"
+      "templateId": "TA-007",
+      "titleEn": "future continuous vs future perfect"
     },
     {
       "lessonId": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
       "sequence": 86,
       "unit": "B2.1",
-      "title": "deduction past must have vs cant have",
+      "title": "Must have vs can\u2019t have: menyimpulkan masa lalu",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-004"
+      "templateId": "MO-004",
+      "titleEn": "deduction past must have vs cant have"
     },
     {
       "lessonId": "third_conditional_unreal_past",
       "level": "B2",
       "sequence": 87,
       "unit": "B2.1",
-      "title": "third conditional unreal past",
+      "title": "Third conditional: andai masa lalu berbeda",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-003"
+      "templateId": "CO-003",
+      "titleEn": "third conditional unreal past"
     },
     {
       "lessonId": "passive_with_modal_verbs",
       "level": "B2",
       "sequence": 88,
       "unit": "B2.1",
-      "title": "passive with modal verbs",
+      "title": "Kalimat pasif dengan modal: must be done",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-002"
+      "templateId": "PA-002",
+      "titleEn": "passive with modal verbs"
     },
     {
       "lessonId": "get_passive_informal_vs_be_passive",
       "level": "B2",
       "sequence": 89,
       "unit": "B2.1",
-      "title": "get passive informal vs be passive",
+      "title": "Get passive vs be passive: santai atau baku",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-003"
+      "templateId": "PA-003",
+      "titleEn": "get passive informal vs be passive"
     },
     {
       "lessonId": "causative_have_get_something_done",
       "level": "B2",
       "sequence": 90,
       "unit": "B2.2",
-      "title": "causative have get something done",
+      "title": "Have/get something done: menyuruh orang lain mengerjakan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-004"
+      "templateId": "PA-004",
+      "titleEn": "causative have get something done"
     },
     {
       "lessonId": "reporting_verb_choice_suggest_vs_tell",
       "level": "B2",
       "sequence": 91,
       "unit": "B2.2",
-      "title": "reporting verb choice suggest vs tell",
+      "title": "Memilih kata pelapor: suggest vs tell",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-004"
+      "templateId": "RS-004",
+      "titleEn": "reporting verb choice suggest vs tell"
     },
     {
       "lessonId": "verb_pattern_remember_forget_meaning_change",
       "level": "B2",
       "sequence": 92,
       "unit": "B2.2",
-      "title": "verb pattern remember forget meaning change",
+      "title": "Remember dan forget: -ing atau to beda makna",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "GI-002"
+      "templateId": "GI-002",
+      "titleEn": "verb pattern remember forget meaning change"
     },
     {
       "lessonId": "relative_pronoun_whose_possession",
       "level": "B2",
       "sequence": 93,
       "unit": "B2.2",
-      "title": "relative pronoun whose possession",
+      "title": "Whose: kepemilikan dalam relative clause",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RC-003"
+      "templateId": "RC-003",
+      "titleEn": "relative pronoun whose possession"
     },
     {
       "lessonId": "double_comparative_progressive_change",
       "level": "B2",
       "sequence": 94,
       "unit": "B2.2",
-      "title": "double comparative progressive change",
+      "title": "More and more: perubahan yang terus bertambah",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CM-003"
+      "templateId": "CM-003",
+      "titleEn": "double comparative progressive change"
     },
     {
       "lessonId": "future_in_the_past_would_vs_was_going_to",
       "level": "B2",
       "sequence": 95,
       "unit": "B2.2",
-      "title": "future in the past would vs was going to",
+      "title": "Would vs was going to: rencana dari lampau",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-008"
+      "templateId": "TA-008",
+      "titleEn": "future in the past would vs was going to"
     },
     {
       "lessonId": "past_regret_should_have_vs_shouldnt_have",
       "level": "B2",
       "sequence": 96,
       "unit": "B2.2",
-      "title": "past regret should have vs shouldnt have",
+      "title": "Should have vs shouldn\u2019t have: menyesali masa lalu",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "MO-008"
+      "templateId": "MO-008",
+      "titleEn": "past regret should have vs shouldnt have"
     },
     {
       "lessonId": "impersonal_reporting_it_is_said_that",
       "level": "B2",
       "sequence": 97,
       "unit": "B2.2",
-      "title": "impersonal reporting it is said that",
+      "title": "It is said that: melaporkan tanpa menyebut sumber",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-005"
+      "templateId": "PA-005",
+      "titleEn": "impersonal reporting it is said that"
     },
     {
       "lessonId": "passive_infinitive_after_modal_expectation",
       "level": "B2",
       "sequence": 98,
       "unit": "B2.3",
-      "title": "passive infinitive after modal expectation",
+      "title": "Passive infinitive: expected to be done",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "PA-006"
+      "templateId": "PA-006",
+      "titleEn": "passive infinitive after modal expectation"
     },
     {
       "lessonId": "verb_pattern_try_meaning_change",
       "level": "B2",
       "sequence": 99,
       "unit": "B2.3",
-      "title": "verb pattern try meaning change",
+      "title": "Try doing vs try to do: beda maksud",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "GI-004"
+      "templateId": "GI-004",
+      "titleEn": "verb pattern try meaning change"
     },
     {
       "lessonId": "narrative_past_perfect_flashback_vs_past_simple_sequence",
       "level": "B2",
       "sequence": 100,
       "unit": "B2.3",
-      "title": "narrative past perfect flashback vs past simple sequence",
+      "title": "Past perfect vs past simple: kilas balik cerita",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_002"
+      "templateId": "b4_002",
+      "titleEn": "narrative past perfect flashback vs past simple sequence"
     },
     {
       "lessonId": "modal_perfect_could_have_missed_opportunity",
       "level": "B2",
       "sequence": 101,
       "unit": "B2.3",
-      "title": "modal perfect could have missed opportunity",
+      "title": "Could have: peluang yang terlewat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_004"
+      "templateId": "b4_004",
+      "titleEn": "modal perfect could have missed opportunity"
     },
     {
       "lessonId": "passive_causative_vs_passive_simple_confusion",
       "level": "B2",
       "sequence": 102,
       "unit": "B2.3",
-      "title": "passive causative vs passive simple confusion",
+      "title": "Pasif causative vs pasif biasa: siapa yang mengerjakan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_008"
+      "templateId": "b4_008",
+      "titleEn": "passive causative vs passive simple confusion"
     },
     {
       "lessonId": "gerund_as_subject_vs_infinitive_as_subject_formality",
       "level": "B2",
       "sequence": 103,
       "unit": "B2.3",
-      "title": "gerund as subject vs infinitive as subject formality",
+      "title": "Subjek kalimat: gerund santai, infinitive formal",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_016"
+      "templateId": "b4_016",
+      "titleEn": "gerund as subject vs infinitive as subject formality"
     },
     {
       "lessonId": "contrast_connectors_although_despite_however_distinction",
       "level": "B2",
       "sequence": 104,
       "unit": "B2.3",
-      "title": "contrast connectors although despite however distinction",
+      "title": "Although, despite, however: memilih penanda kontras",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_022"
+      "templateId": "b4_022",
+      "titleEn": "contrast connectors although despite however distinction"
     },
     {
       "lessonId": "result_connectors_so_such_that_therefore_distinction",
       "level": "B2",
       "sequence": 105,
       "unit": "B2.3",
-      "title": "result connectors so such that therefore distinction",
+      "title": "So, such, therefore: merangkai sebab jadi akibat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_023"
+      "templateId": "b4_023",
+      "titleEn": "result connectors so such that therefore distinction"
     },
     {
       "lessonId": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
       "sequence": 106,
       "unit": "B2.4",
-      "title": "modal of criticism should have vs could have contrast",
+      "title": "Should have vs could have: teguran atau peluang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_003"
+      "templateId": "b5_003",
+      "titleEn": "modal of criticism should have vs could have contrast"
     },
     {
       "lessonId": "conditional_with_unless_provided_that_as_long_as_distinction",
       "level": "B2",
       "sequence": 107,
       "unit": "B2.4",
-      "title": "conditional with unless provided that as long as distinction",
+      "title": "Unless, provided that, as long as: memasang syarat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_006"
+      "templateId": "b5_006",
+      "titleEn": "conditional with unless provided that as long as distinction"
     },
     {
       "lessonId": "passive_with_two_objects_verb_give_send_choice_of_subject",
       "level": "B2",
       "sequence": 108,
       "unit": "B2.4",
-      "title": "passive with two objects verb give send choice of subject",
+      "title": "Pasif give dan send: memilih subjeknya",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_007"
+      "templateId": "b5_007",
+      "titleEn": "passive with two objects verb give send choice of subject"
     },
     {
       "lessonId": "reporting_verb_pattern_deny_admit_apologize_for",
       "level": "B2",
       "sequence": 109,
       "unit": "B2.4",
-      "title": "reporting verb pattern deny admit apologize for",
+      "title": "Deny, admit, apologize for: pola kata pelapor",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_010"
+      "templateId": "b5_010",
+      "titleEn": "reporting verb pattern deny admit apologize for"
     },
     {
       "lessonId": "zero_article_with_proper_nouns_exceptions_the_netherlands",
       "level": "B2",
       "sequence": 110,
       "unit": "B2.4",
-      "title": "zero article with proper nouns exceptions the netherlands",
+      "title": "Nama tempat dengan \u201cthe\u201d: the Netherlands dan kawannya",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_011"
+      "templateId": "b5_011",
+      "titleEn": "zero article with proper nouns exceptions the netherlands"
     },
     {
       "lessonId": "dependent_preposition_after_noun_reason_for_solution_to",
       "level": "B2",
       "sequence": 111,
       "unit": "B2.4",
-      "title": "dependent preposition after noun reason for solution to",
+      "title": "Reason for, solution to: pasangan kata benda",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_014"
+      "templateId": "b5_014",
+      "titleEn": "dependent preposition after noun reason for solution to"
     },
     {
       "lessonId": "superlative_with_ever_present_perfect_combination",
       "level": "B2",
       "sequence": 112,
       "unit": "B2.4",
-      "title": "superlative with ever present perfect combination",
+      "title": "Superlative dengan ever dan present perfect",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_018"
+      "templateId": "b5_018",
+      "titleEn": "superlative with ever present perfect combination"
     },
     {
       "lessonId": "parallel_structure_error_correction",
       "level": "B2",
       "sequence": 113,
       "unit": "B2.4",
-      "title": "parallel structure error correction",
+      "title": "Struktur paralel: menyamakan bentuk dalam daftar",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_020"
+      "templateId": "b5_020",
+      "titleEn": "parallel structure error correction"
     },
     {
       "lessonId": "mixed_conditional_past_cause_present_result",
       "level": "C1",
       "sequence": 114,
       "unit": "C1.1",
-      "title": "mixed conditional past cause present result",
+      "title": "Mixed conditional: sebab lampau, akibat sekarang",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-004"
+      "templateId": "CO-004",
+      "titleEn": "mixed conditional past cause present result"
     },
     {
       "lessonId": "reduced_relative_clauses_participle",
       "level": "C1",
       "sequence": 115,
       "unit": "C1.1",
-      "title": "reduced relative clauses participle",
+      "title": "Relative clause diringkas jadi participle",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RC-002"
+      "templateId": "RC-002",
+      "titleEn": "reduced relative clauses participle"
     },
     {
       "lessonId": "past_perfect_continuous_background_cause",
       "level": "C1",
       "sequence": 116,
       "unit": "C1.1",
-      "title": "past perfect continuous background cause",
+      "title": "Past perfect continuous: sebab lama di belakang cerita",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "TA-009"
+      "templateId": "TA-009",
+      "titleEn": "past perfect continuous background cause"
     },
     {
       "lessonId": "formal_inversion_had_i_known",
       "level": "C1",
       "sequence": 117,
       "unit": "C1.1",
-      "title": "formal inversion had i known",
+      "title": "Had I known: pengandaian lampau tanpa if",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-006"
+      "templateId": "CO-006",
+      "titleEn": "formal inversion had i known"
     },
     {
       "lessonId": "implied_conditional_otherwise",
       "level": "C1",
       "sequence": 118,
       "unit": "C1.1",
-      "title": "implied conditional otherwise",
+      "title": "Otherwise: syarat yang tersirat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "CO-007"
+      "templateId": "CO-007",
+      "titleEn": "implied conditional otherwise"
     },
     {
       "lessonId": "reporting_first_conditional_sentences",
       "level": "C1",
       "sequence": 119,
       "unit": "C1.1",
-      "title": "reporting first conditional sentences",
+      "title": "Melaporkan kalimat first conditional",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RS-006"
+      "templateId": "RS-006",
+      "titleEn": "reporting first conditional sentences"
     },
     {
       "lessonId": "preposition_placement_formal_vs_informal_relative_clause",
       "level": "C1",
       "sequence": 120,
       "unit": "C1.1",
-      "title": "preposition placement formal vs informal relative clause",
+      "title": "Kata depan di relative clause: formal atau santai",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "RC-004"
+      "templateId": "RC-004",
+      "titleEn": "preposition placement formal vs informal relative clause"
     },
     {
       "lessonId": "future_perfect_continuous_duration_before_deadline",
       "level": "C1",
       "sequence": 121,
       "unit": "C1.1",
-      "title": "future perfect continuous duration before deadline",
+      "title": "Future perfect continuous: durasi sampai batas waktu",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_001"
+      "templateId": "b4_001",
+      "titleEn": "future perfect continuous duration before deadline"
     },
     {
       "lessonId": "conditional_inversion_were_i_to",
       "level": "C1",
       "sequence": 122,
       "unit": "C1.2",
-      "title": "conditional inversion were i to",
+      "title": "Were I to: pengandaian formal tanpa if",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_006"
+      "templateId": "b4_006",
+      "titleEn": "conditional inversion were i to"
     },
     {
       "lessonId": "impersonal_passive_reporting_believed_thought",
       "level": "C1",
       "sequence": 123,
       "unit": "C1.2",
-      "title": "impersonal passive reporting believed thought",
+      "title": "Is believed to, is thought to: pelaporan pasif",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_009"
+      "templateId": "b4_009",
+      "titleEn": "impersonal passive reporting believed thought"
     },
     {
       "lessonId": "dangling_modifier_correction",
       "level": "C1",
       "sequence": 124,
       "unit": "C1.2",
-      "title": "dangling modifier correction",
+      "title": "Dangling modifier: keterangan yang kehilangan pemilik",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_021"
+      "templateId": "b4_021",
+      "titleEn": "dangling modifier correction"
     },
     {
       "lessonId": "cleft_sentences_it_was_x_that_emphasis",
       "level": "C1",
       "sequence": 125,
       "unit": "C1.2",
-      "title": "cleft sentences it was x that emphasis",
+      "title": "Cleft sentence: it was X that untuk penekanan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b4_024"
+      "templateId": "b4_024",
+      "titleEn": "cleft sentences it was x that emphasis"
     },
     {
       "lessonId": "mixed_conditional_present_cause_past_result",
       "level": "C1",
       "sequence": 126,
       "unit": "C1.2",
-      "title": "mixed conditional present cause past result",
+      "title": "Mixed conditional: sebab sekarang, akibat lampau",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_005"
+      "templateId": "b5_005",
+      "titleEn": "mixed conditional present cause past result"
     },
     {
       "lessonId": "passive_gerund_vs_passive_infinitive_after_verb",
       "level": "C1",
       "sequence": 127,
       "unit": "C1.2",
-      "title": "passive gerund vs passive infinitive after verb",
+      "title": "Passive gerund vs passive infinitive setelah kata kerja",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_008"
+      "templateId": "b5_008",
+      "titleEn": "passive gerund vs passive infinitive after verb"
     },
     {
       "lessonId": "verb_pattern_regret_mean_go_on_meaning_change",
       "level": "C1",
       "sequence": 128,
       "unit": "C1.2",
-      "title": "verb pattern regret mean go on meaning change",
+      "title": "Regret, mean, go on: -ing atau to",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_015"
+      "templateId": "b5_015",
+      "titleEn": "verb pattern regret mean go on meaning change"
     },
     {
       "lessonId": "perfect_gerund_vs_simple_gerund_time_reference",
       "level": "C1",
       "sequence": 129,
       "unit": "C1.2",
-      "title": "perfect gerund vs simple gerund time reference",
+      "title": "Having done vs doing: urutan waktunya beda",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_016"
+      "templateId": "b5_016",
+      "titleEn": "perfect gerund vs simple gerund time reference"
     },
     {
       "lessonId": "relative_clause_with_quantifier_some_of_which_many_of_whom",
       "level": "C1",
       "sequence": 130,
       "unit": "C1.3",
-      "title": "relative clause with quantifier some of which many of whom",
+      "title": "Relative clause dengan jumlah: some of which",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_017"
+      "templateId": "b5_017",
+      "titleEn": "relative clause with quantifier some of which many of whom"
     },
     {
       "lessonId": "addition_connectors_furthermore_in_addition_moreover_register",
       "level": "C1",
       "sequence": 131,
       "unit": "C1.3",
-      "title": "addition connectors furthermore in addition moreover register",
+      "title": "Furthermore, in addition, moreover: penambah bernada formal",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_022"
+      "templateId": "b5_022",
+      "titleEn": "addition connectors furthermore in addition moreover register"
     },
     {
       "lessonId": "negative_adverbial_inversion_never_rarely_not_only",
       "level": "C1",
       "sequence": 132,
       "unit": "C1.3",
-      "title": "negative adverbial inversion never rarely not only",
+      "title": "Never, rarely, not only di depan: susunan dibalik",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_023"
+      "templateId": "b5_023",
+      "titleEn": "negative adverbial inversion never rarely not only"
     },
     {
       "lessonId": "fronting_for_emphasis_such_was_the_impact",
       "level": "C2",
       "sequence": 133,
       "unit": "C2.1",
-      "title": "fronting for emphasis such was the impact",
+      "title": "Fronting: membawa such was the impact ke depan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "b5_024"
+      "templateId": "b5_024",
+      "titleEn": "fronting for emphasis such was the impact"
     },
     {
       "lessonId": "mixed_conditional_past_cause_future_result",
       "level": "C2",
       "sequence": 134,
       "unit": "C2.1",
-      "title": "mixed conditional past cause future result",
+      "title": "Mixed conditional: sebab lampau, akibat masa depan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-002"
+      "templateId": "C2-002",
+      "titleEn": "mixed conditional past cause future result"
     },
     {
       "lessonId": "modal_deduction_past_progressive",
       "level": "C2",
       "sequence": 135,
       "unit": "C2.1",
-      "title": "modal deduction past progressive",
+      "title": "Must have been doing: menyimpulkan proses lampau",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-003"
+      "templateId": "C2-003",
+      "titleEn": "modal deduction past progressive"
     },
     {
       "lessonId": "inversion_after_only_restrictive_phrase",
       "level": "C2",
       "sequence": 136,
       "unit": "C2.1",
-      "title": "inversion after only restrictive phrase",
+      "title": "Only after, only when: susunan kalimat dibalik",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-004"
+      "templateId": "C2-004",
+      "titleEn": "inversion after only restrictive phrase"
     },
     {
       "lessonId": "pseudo_cleft_what_clause_emphasis",
       "level": "C2",
       "sequence": 137,
       "unit": "C2.1",
-      "title": "pseudo cleft what clause emphasis",
+      "title": "Pseudo-cleft: what clause untuk penekanan",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-005"
+      "templateId": "C2-005",
+      "titleEn": "pseudo cleft what clause emphasis"
     },
     {
       "lessonId": "participle_clause",
       "level": "C2",
       "sequence": 138,
       "unit": "C2.1",
-      "title": "participle clause",
+      "title": "Participle clause: meringkas kalimat dengan -ing dan -ed",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-006"
+      "templateId": "C2-006",
+      "titleEn": "participle clause"
     },
     {
       "lessonId": "concession_linking",
       "level": "C2",
       "sequence": 139,
       "unit": "C2.1",
-      "title": "concession linking",
+      "title": "Penghubung konsesi: mengakui lawan, menegaskan pendapat",
       "prerequisites": [],
       "source": "grammar-templates.json",
-      "templateId": "C2-007"
+      "templateId": "C2-007",
+      "titleEn": "concession linking"
     }
   ]
 }
