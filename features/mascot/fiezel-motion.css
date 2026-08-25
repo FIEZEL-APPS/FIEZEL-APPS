@@ -1,0 +1,375 @@
+/* ============================================================
+   FIEZEL Motion System — token gerak + animasi maskot + micro-interaction
+   Bahasa gerak: pegas kecil, overshoot halus, cepat (90–450 ms UI).
+
+   Sumber: /fiezel-motion/fiezel-motion.css (paket motion system <fiezel-mascot>).
+   Berkas ini dimuat SETELAH style.css, jadi empat penyesuaian wajib dilakukan
+   supaya paket ini tidak mengubah tampilan aplikasi di luar maskot. Semuanya
+   ditandai [ADAPTASI] dan tidak menyentuh satu pun aturan gerak maskot:
+
+   [ADAPTASI 1] Token TIDAK lagi dipasang di :root. Paket asli memakai nama
+     --fz-gold / --fz-ink / --fz-line yang SUDAH dipakai style.css dengan nilai
+     berbeda (#d9a441, #2c1b1c, #ecdec0). Memasangnya di :root akan mengganti
+     palet seluruh aplikasi, bukan cuma maskot. Token kini hidup di dua kelas
+     pembawa: .fz-mascot (dipakai komponen) dan .fz-motion (wadah opt-in untuk
+     kelas micro-interaction di bawah).
+   [ADAPTASI 2] Blok prefers-reduced-motion dibatasi ke subtree maskot. Aplikasi
+     sudah punya jalur reduced-motion sendiri (style.css + .reduce-motion, dan
+     prefersReducedMotion() di app.js); menimpanya dengan selektor * akan
+     mematikan koreografi splash/nav yang sudah diatur di tempat lain.
+   [ADAPTASI 3] Aturan :focus-visible global dihapus. Cincin fokus aplikasi
+     sudah ditetapkan style.css dan dijaga a11y-test.js.
+   [ADAPTASI 4] fzPop → fzMascotPop dan .fz-pop → .fz-motion-pop. style.css
+     sudah punya @keyframes fzPop dengan isi berbeda; nama yang sama membuat
+     definisi terakhir menang secara global.
+   ============================================================ */
+.fz-mascot, .fz-motion {
+  /* motion tokens */
+  --fz-spring: cubic-bezier(.34, 1.56, .64, 1);   /* overshoot lembut */
+  --fz-out:    cubic-bezier(.22, 1, .36, 1);       /* ease-out expo-ish */
+  --fz-fast: 120ms; --fz-base: 240ms; --fz-slow: 420ms;
+  /* palet */
+  --fz-yel:#FFD94F; --fz-yel-d:#EDB93A; --fz-cream:#FDFAF3; --fz-cream2:#FFF4DA;
+  --fz-maroon:#8C2233; --fz-maroon-d:#6D1926; --fz-red:#D9536A; --fz-gold:#D8B36B;
+  --fz-cocoa:#33201F; --fz-ink:#1d1114; --fz-muted:#6b5a60; --fz-panel:#fffdfc;
+  --fz-line:#e9dfe1; --fz-green:#278268; --fz-green-soft:#e8f4ef; --fz-red-soft:#faecef;
+}
+/* [ADAPTASI 2] hanya subtree maskot; jalur reduced-motion aplikasi tidak disentuh. */
+@media (prefers-reduced-motion: reduce) {
+  .fz-mascot, .fz-mascot *, .fz-mascot *::before, .fz-mascot *::after {
+    animation-duration:.01ms !important; animation-delay:0ms !important;
+    animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+}
+/* Murid yang mematikan gerak dari Pengaturan aplikasi (state.preferences.motion=false)
+   membuat enhanceUI() memasang .reduce-motion di <body> (app.js). Aturan style.css
+   sudah menjinakkan seluruh keturunannya; baris ini hanya menegaskannya untuk maskot. */
+body.reduce-motion .fz-mascot, body.reduce-motion .fz-mascot * {
+  animation-duration:.01ms !important; animation-delay:0ms !important;
+  animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+
+/* ================= MASKOT ================= */
+.fz-mascot { position:relative; display:inline-block; width:200px; aspect-ratio:320/300; }
+.fz-mascot .fz-svg { width:100%; height:100%; display:block; overflow:visible; }
+.fz-mascot * { transform-box: fill-box; }
+.fz-all, .fz-body, .fz-face, .fz-arm, .fz-ear, .fz-eyes, .fz-acc { transform-origin:center; }
+
+/* --- idle: bernafas + kuping bergerak sesekali --- */
+.fz-all { animation: fzBreathe 2.6s ease-in-out infinite; transform-origin:50% 88%; }
+@keyframes fzBreathe { 0%,100%{transform:scale(1,1)} 50%{transform:scale(1.015,.985)} }
+.fz-ear-l { animation: fzEarTwitch 7.4s ease-in-out infinite; transform-origin:60% 90%; }
+.fz-ear-r { animation: fzEarTwitch 9.1s ease-in-out infinite 3s; transform-origin:40% 90%; }
+@keyframes fzEarTwitch { 0%,92%,100%{transform:rotate(0)} 94%{transform:rotate(-7deg)} 97%{transform:rotate(4deg)} }
+
+/* --- mata: kedip + arah pandang (--lx/--ly di-set JS) --- */
+.fz-eyes { transform: translate(var(--lx,0), var(--ly,0)); transition: transform .3s var(--fz-out); }
+.fz-face { transform: translate(calc(var(--lx,0)*.4), calc(var(--ly,0)*.4)); transition: transform .35s var(--fz-out); }
+.fz-lid { transform: scale(1,0); transform-origin:50% 0%; transition: transform 70ms ease-in; }
+.blink .fz-lid { transform: scale(1,1); }
+
+/* ====== STATE ====== */
+/* greeting: lambaian + badan miring */
+.st-greeting .fz-body { animation: fzTilt 1.5s var(--fz-spring); }
+@keyframes fzTilt { 0%{transform:rotate(0)} 25%{transform:rotate(-5deg)} 70%{transform:rotate(-4deg)} 100%{transform:rotate(0)} }
+.st-greeting .fz-arm-r { animation: fzWave 1.5s var(--fz-spring) 1; transform-origin:50% 8%; }
+.st-greeting .fz-pads { animation: fzPadsShow 1.5s ease-out; }
+@keyframes fzPadsShow { 0%{opacity:0} 12%{opacity:1} 86%{opacity:1} 100%{opacity:0} }
+@keyframes fzWave { 0%{transform:rotate(0)} 20%{transform:rotate(-128deg)}
+  36%{transform:rotate(-104deg)} 52%{transform:rotate(-130deg)} 68%{transform:rotate(-104deg)}
+  82%{transform:rotate(-126deg)} 100%{transform:rotate(0)} }
+
+/* curious: condong + satu alis */
+.st-curious .fz-body { animation: fzLean .5s var(--fz-spring) forwards; }
+@keyframes fzLean { to { transform: rotate(4deg) translateY(2px); } }
+.st-curious .fz-brows { opacity:1; }
+.st-curious .fz-brow-l { transform: translateY(-4px) rotate(-8deg); }
+
+/* thinking: mata ke atas + titik-titik muncul bergiliran */
+.st-thinking .fz-eyes { transform: translate(6px,-6px); }
+.st-thinking .fz-brows { opacity:1; }
+.st-thinking .fz-dots { opacity:1; }
+.st-thinking .fz-dots circle { animation: fzDot 1.1s ease-in-out infinite; }
+.st-thinking .fz-dots .d2 { animation-delay:.18s } .st-thinking .fz-dots .d3 { animation-delay:.36s }
+@keyframes fzDot { 0%,100%{opacity:.25; transform:translateY(0)} 40%{opacity:1; transform:translateY(-5px)} }
+
+/* listening: headphone + goyang berirama + not balok */
+.st-listening .fz-headphones { opacity:1; animation: fzMascotPop .4s var(--fz-spring); }
+.st-listening .fz-body { animation: fzGroove .62s ease-in-out infinite alternate; transform-origin:50% 92%; }
+@keyframes fzGroove { from{transform:rotate(-4.5deg)} to{transform:rotate(4.5deg)} }
+.st-listening .fz-eye-open { opacity:0 } .st-listening .fz-eye-happy { opacity:1 }
+.st-listening .fz-notes { opacity:1 }
+.st-listening .fz-note { animation: fzFloat 1.4s ease-in-out infinite; }
+.st-listening .fz-note.n2 { animation-delay:.5s }
+@keyframes fzFloat { 0%{transform:translate(var(--tx,0),8px); opacity:0} 25%{opacity:1}
+  100%{transform:translate(var(--tx,0),-26px); opacity:0} }
+.fz-note.n1{ --tx:264px } .fz-note.n2{ --tx:44px }
+.st-listening .fz-note.n1{ transform-box:view-box }
+
+/* encouraging: menunjuk + angguk */
+.st-encouraging .fz-arm-r { animation: fzPoint 1.4s var(--fz-spring); transform-origin:50% 8%; }
+@keyframes fzPoint { 0%{transform:rotate(0)} 25%{transform:rotate(-94deg)}
+  72%{transform:rotate(-88deg)} 100%{transform:rotate(0)} }
+.st-encouraging .fz-pads { animation: fzPadsShow 1.4s ease-out; }
+.st-encouraging .fz-face { animation: fzNod .5s ease-in-out 2; }
+@keyframes fzNod { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
+
+/* celebrating: lompat squash-stretch, intensitas lv-1..3 */
+.st-celebrating .fz-all { animation: fzJump .85s var(--fz-spring) 1; transform-origin:50% 95%; }
+.st-celebrating.lv-2 .fz-all { animation: fzJump .8s var(--fz-spring) 2; }
+.st-celebrating.lv-3 .fz-all { animation: fzJumpBig .9s var(--fz-spring) 2; }
+@keyframes fzJump {
+  0%{transform:scale(1,1) translateY(0)} 18%{transform:scale(1.1,.82) translateY(4px)}
+  45%{transform:scale(.94,1.08) translateY(-40px)} 70%{transform:scale(1.05,.92) translateY(0)}
+  100%{transform:scale(1,1) translateY(0)} }
+@keyframes fzJumpBig {
+  0%{transform:scale(1,1) translateY(0)} 16%{transform:scale(1.14,.78) translateY(6px)}
+  45%{transform:scale(.92,1.1) translateY(-58px) rotate(-4deg)}
+  70%{transform:scale(1.06,.9) translateY(0)} 100%{transform:scale(1,1)} }
+.st-celebrating .fz-arm-l { animation: fzArmsUpL .85s var(--fz-spring); transform-origin:50% 8%; }
+.st-celebrating .fz-arm-r { animation: fzArmsUpR .85s var(--fz-spring); transform-origin:50% 8%; }
+@keyframes fzArmsUpL { 30%,70%{transform:rotate(96deg)} }
+@keyframes fzArmsUpR { 30%,70%{transform:rotate(-96deg)} }
+.st-celebrating.lv-2 .fz-arm-l, .st-celebrating.lv-3 .fz-arm-l,
+.st-celebrating.lv-2 .fz-arm-r, .st-celebrating.lv-3 .fz-arm-r {
+  animation-duration:.8s; animation-iteration-count:2; }
+.st-celebrating .fz-eye-open { opacity:0 } .st-celebrating .fz-eye-happy { opacity:1 }
+
+/* confused: miring + alis turun + keringat + geleng */
+.st-confused .fz-body { animation: fzConf .5s var(--fz-spring) forwards; }
+@keyframes fzConf { to{ transform: rotate(-6deg); } }
+.st-confused .fz-face { animation: fzShakeX .55s ease-in-out .25s 1; }
+@keyframes fzShakeX { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.st-confused .fz-brows { opacity:1 }
+.st-confused .fz-brow-l { transform: rotate(14deg) translateY(2px); }
+.st-confused .fz-brow-r { transform: rotate(-14deg) translateY(2px); }
+.st-confused .fz-sweat { opacity:1; animation: fzSweat 1.6s ease-in forwards; }
+@keyframes fzSweat { 0%{transform:translate(0,0) scale(.4); opacity:0}
+  25%{opacity:1} 100%{transform:translate(0,26px) scale(1); opacity:0} }
+.st-confused .fz-blush { opacity:.5 }
+
+/* hinting: bohlam + kedip sebelah + condong */
+.st-hinting .fz-bulb { opacity:1; animation: fzMascotPop .45s var(--fz-spring); }
+.st-hinting .fz-lid:not(.fz-lid-r) { transform:scale(1,1); }
+.st-hinting .fz-body { animation: fzLean .5s var(--fz-spring) forwards; }
+@keyframes fzMascotPop { 0%{transform:scale(0)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+
+/* completion: lompat besar + bintang + cincin ekor berkilau */
+.st-completion .fz-all { animation: fzJumpBig .95s var(--fz-spring) 2; transform-origin:50% 95%; }
+.st-completion .fz-arm-l { animation: fzArmsUpL 1s var(--fz-spring) 2; transform-origin:50% 8%; }
+.st-completion .fz-arm-r { animation: fzArmsUpR 1s var(--fz-spring) 2; transform-origin:50% 8%; }
+.st-completion .fz-eye-open { opacity:0 } .st-completion .fz-eye-happy { opacity:1 }
+.st-completion .fz-stars { opacity:1 }
+.st-completion .fz-stars path { animation: fzStar 1.2s var(--fz-spring) infinite; }
+.st-completion .fz-stars .s2 { animation-delay:.2s } .st-completion .fz-stars .s3 { animation-delay:.4s }
+@keyframes fzStar { 0%{transform:scale(0) rotate(0)} 50%{transform:scale(1.2) rotate(18deg)} 100%{transform:scale(0) rotate(36deg)} }
+.st-completion .fz-ring { animation: fzRingGlow 1s ease-in-out infinite alternate;
+  transform-box:fill-box; transform-origin:50% 50%; }
+@keyframes fzRingGlow { from{transform:scale(1); opacity:1} to{transform:scale(1.3); opacity:.72} }
+
+/* confetti dari JS */
+.fz-confetti-layer { position:absolute; inset:0; pointer-events:none; overflow:visible; }
+.fz-confetti-layer i { position:absolute; border-radius:2px; opacity:0;
+  animation: fzConfetti 1.25s var(--fz-out) forwards; }
+@keyframes fzConfetti {
+  0%{opacity:1; transform:translate(0,0) rotate(0)}
+  55%{opacity:1; transform:translate(calc(var(--cx) * .75), var(--cy)) rotate(calc(var(--cr) * .6))}
+  100%{opacity:0; transform:translate(var(--cx), calc(var(--cy) + 130px)) rotate(var(--cr))} }
+
+/* ================= MICRO-INTERACTIONS UI ================= */
+.fz-btn { font:inherit; font-weight:700; border:none; cursor:pointer; border-radius:999px;
+  padding:14px 28px; background:var(--fz-maroon); color:#fff;
+  transition: transform var(--fz-fast) var(--fz-spring), box-shadow var(--fz-fast) ease,
+              background var(--fz-fast) ease;
+  box-shadow: 0 3px 0 var(--fz-maroon-d); }
+.fz-btn:hover { transform: translateY(-2px); }
+.fz-btn:active { transform: translateY(1px) scale(.97); box-shadow: 0 1px 0 var(--fz-maroon-d); }
+.fz-btn.gold { background:var(--fz-gold); color:var(--fz-ink); box-shadow:0 3px 0 #b8935a; }
+.fz-btn.ghost { background:var(--fz-panel); color:var(--fz-ink); box-shadow:0 0 0 2px var(--fz-line) inset; }
+
+.fz-card { background:var(--fz-panel); border:2px solid var(--fz-line); border-radius:20px;
+  padding:18px 20px; transition: transform var(--fz-base) var(--fz-spring),
+  border-color var(--fz-fast) ease, box-shadow var(--fz-base) ease; }
+.fz-card.clickable { cursor:pointer; }
+.fz-card.clickable:hover { transform: translateY(-3px) scale(1.015); border-color:var(--fz-gold);
+  box-shadow: 0 10px 24px rgba(140,34,51,.10); }
+.fz-card.clickable:active { transform: scale(.98); }
+
+/* pop-in berjenjang */
+.fz-motion-pop { opacity:0; animation: fzPopIn .45s var(--fz-spring) forwards; }
+@keyframes fzPopIn { from{opacity:0; transform:translateY(16px) scale(.94)}
+  to{opacity:1; transform:translateY(0) scale(1)} }
+.fz-stagger > * { opacity:0; animation: fzPopIn .45s var(--fz-spring) forwards; }
+.fz-stagger > *:nth-child(1){animation-delay:.03s} .fz-stagger > *:nth-child(2){animation-delay:.09s}
+.fz-stagger > *:nth-child(3){animation-delay:.15s} .fz-stagger > *:nth-child(4){animation-delay:.21s}
+.fz-stagger > *:nth-child(5){animation-delay:.27s} .fz-stagger > *:nth-child(6){animation-delay:.33s}
+
+/* jawaban benar / salah */
+.fz-answer { position:relative; }
+.fz-answer.correct, .fz-answer.wrong { opacity:1 !important; }
+.fz-answer.correct { border-color:var(--fz-green); background:var(--fz-green-soft);
+  animation: fzCorrect .5s var(--fz-spring); }
+@keyframes fzCorrect { 30%{transform:scale(1.04)} }
+.fz-answer.wrong { border-color:var(--fz-red); background:var(--fz-red-soft);
+  animation: fzShake .45s ease-in-out; }
+@keyframes fzShake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+
+/* XP bar */
+.fz-xp { height:16px; background:#e6d5d9; border:1px solid #c9b3b8; border-radius:999px; overflow:hidden; }
+.fz-xp > b { display:block; height:100%; width:0; border-radius:999px;
+  background: linear-gradient(90deg, var(--fz-gold), var(--fz-yel));
+  transition: width .8s var(--fz-spring); }
+.fz-xp.pulse > b { animation: fzXp .6s var(--fz-spring); }
+@keyframes fzXp { 50%{transform:scaleY(1.3)} }
+
+/* toast / badge */
+.fz-badge-pop { animation: fzMascotPop .5s var(--fz-spring); }
+.fz-float-xp { position:absolute; font-weight:800; color:var(--fz-green);
+  animation: fzFloatXp 1s var(--fz-out) forwards; pointer-events:none; }
+@keyframes fzFloatXp { from{opacity:1; transform:translateY(0)} to{opacity:0; transform:translateY(-34px)} }
+
+/* equalizer kecil utk listening */
+.fz-eq { display:flex; gap:4px; align-items:flex-end; height:28px; }
+.fz-eq i { width:6px; border-radius:3px; background:var(--fz-maroon); height:100%;
+  transform:scaleY(.22); transform-origin:50% 100%;
+  animation: fzEq .5s ease-in-out infinite alternate; }
+.fz-eq i:nth-child(2){animation-delay:.1s; background:var(--fz-gold)}
+.fz-eq i:nth-child(3){animation-delay:.2s} .fz-eq i:nth-child(4){animation-delay:.3s; background:var(--fz-gold)}
+.fz-eq i:nth-child(5){animation-delay:.15s}
+@keyframes fzEq { from{transform:scaleY(.22)} to{transform:scaleY(1)} }
+.fz-eq.paused i { animation:none; transform:scaleY(.22); }
+/* ===== 4 STATE TAMBAHAN: proud | sleepy | sad | love ===== */
+
+/* proud: dada membusung + dagu naik + mata tertutup senang
+   + tangan kiri menepuk dada. Transient (2200ms). */
+.st-proud .fz-body { animation: fzPuff .6s var(--fz-spring) forwards; transform-origin:50% 92%; }
+@keyframes fzPuff { 0%{transform:scale(1,1) translateY(0)}
+  55%{transform:scale(1.09,1.04) translateY(-6px)}
+  100%{transform:scale(1.06,1.02) translateY(-4px)} }
+.st-proud .fz-eye-open { opacity:0 } .st-proud .fz-eye-happy { opacity:1 }
+.st-proud .fz-arm-l { animation: fzChest .65s var(--fz-spring) forwards; transform-origin:50% 8%; }
+/* -40deg = telapak kiri (ujung bawah lengan, ~122,236) mendarat tepat
+   di tengah dada krem (~160,226); overshoot -46deg dulu ala pegas */
+@keyframes fzChest { 0%{transform:rotate(0)} 60%{transform:rotate(-46deg)} 100%{transform:rotate(-40deg)} }
+.st-proud .fz-face { animation: fzChinUp .6s var(--fz-out) forwards; }
+@keyframes fzChinUp { to{ transform: translateY(-3px); } }
+.st-proud .fz-tail { animation: fzTailProud 1s var(--fz-spring); transform-origin:20% 95%; }
+@keyframes fzTailProud { 0%,100%{transform:rotate(0)} 40%{transform:rotate(-8deg)} }
+
+/* sleepy: badan oleng pelan (nafas + ngedrop sesekali) + kelopak
+   setengah turun + telinga lemas + Zz mengambang. Persisten
+   (seperti listening) — diakhiri event 'wake' / setState lain. */
+.st-sleepy .fz-all { animation: fzDrowse 3.4s ease-in-out infinite; transform-origin:50% 88%; }
+@keyframes fzDrowse {
+  0%,100%{transform:rotate(0) scale(1,1) translateY(0)}
+  30%{transform:rotate(-3deg) scale(1.012,.988) translateY(1px)}
+  48%{transform:rotate(-3.6deg) scale(1,1) translateY(3px)}  /* kepala ngedrop */
+  62%{transform:rotate(-1deg) scale(1,1) translateY(0)}
+  80%{transform:rotate(1.6deg) scale(1.012,.988) translateY(1px)} }
+/* kelopak (lid) kuning turun 62% dari atas = mata setengah tertutup */
+.st-sleepy .fz-lid { transform: scale(1,.62); transition: transform .45s var(--fz-out); }
+.st-sleepy.blink .fz-lid { transform: scale(1,1); }  /* kedip penuh tetap jalan */
+.st-sleepy .fz-eyes { transform: translate(0,2px); } /* pandangan turun */
+.st-sleepy .fz-ear-l, .st-sleepy .fz-ear-r { animation:none; transition: transform .45s var(--fz-out); }
+.st-sleepy .fz-ear-l { transform: rotate(-7deg); }
+.st-sleepy .fz-ear-r { transform: rotate(7deg); }
+.st-sleepy .fz-zzz { opacity:1 }
+.st-sleepy .fz-z { animation: fzZzz 2.6s ease-in-out infinite; }
+.st-sleepy .fz-z.z2 { animation-delay:1.3s }
+@keyframes fzZzz { 0%{opacity:0; transform:translate(0,8px) scale(.55)}
+  30%{opacity:1} 70%{opacity:.9}
+  100%{opacity:0; transform:translate(10px,-24px) scale(1.08)} }
+.st-sleepy .fz-tail { animation: fzTailSway 3.4s ease-in-out infinite; transform-origin:20% 95%; }
+@keyframes fzTailSway { 0%,100%{transform:rotate(0)} 50%{transform:rotate(4deg) translateY(2px)} }
+
+/* sad: telinga terkulai (rotasi keluar-bawah) + alis sedih (ujung
+   dalam naik — kebalikan confused) + mulut turun (.fz-m-sad via JS)
+   + badan merosot + air mata. Untuk streak putus. Transient (2400ms). */
+.st-sad .fz-ear-l { animation: fzEarSadL .55s var(--fz-out) forwards; }
+.st-sad .fz-ear-r { animation: fzEarSadR .55s var(--fz-out) forwards; }
+@keyframes fzEarSadL { to{ transform: rotate(-17deg) translateY(3px); } }
+@keyframes fzEarSadR { to{ transform: rotate(17deg) translateY(3px); } }
+.st-sad .fz-brows { opacity:1 }
+.st-sad .fz-brow-l { transform: rotate(-12deg) translateY(3px); }
+.st-sad .fz-brow-r { transform: rotate(12deg) translateY(3px); }
+.st-sad .fz-body { animation: fzSlump .55s var(--fz-out) forwards; transform-origin:50% 92%; }
+@keyframes fzSlump { to{ transform: translateY(6px) scale(1.02,.96); } }
+.st-sad .fz-eyes { transform: translate(0,4px); }   /* menatap ke bawah */
+.st-sad .fz-face { transform: translateY(3px); }
+.st-sad .fz-blush { opacity:.4 }
+.st-sad .fz-tear { opacity:1; animation: fzTearDrop 1.9s ease-in infinite; }
+@keyframes fzTearDrop { 0%{transform:translate(0,0) scale(.45); opacity:0}
+  22%{opacity:1} 100%{transform:translate(0,24px) scale(1); opacity:0} }
+.st-sad .fz-tail { animation: fzTailDroop .6s var(--fz-out) forwards; transform-origin:20% 95%; }
+@keyframes fzTailDroop { to{ transform: rotate(11deg) translateY(3px); } }
+
+/* love: mata jadi hati (.fz-eye-love, pop lalu berdegup) + goyang
+   gemas + kedua tangan merapat + blush menguat + hati mengambang.
+   Untuk apresiasi/favorit. Transient (2000ms). */
+.st-love .fz-eye-open { opacity:0 }
+.st-love .fz-eye-love { opacity:1; animation: fzMascotPop .4s var(--fz-spring); } /* fzMascotPop sudah ada di core */
+.st-love .fz-heart-eye { animation: fzHeartBeat .9s var(--fz-spring) infinite .35s; }
+@keyframes fzHeartBeat { 0%,100%{transform:scale(1)} 28%{transform:scale(1.18)}
+  44%{transform:scale(.94)} 60%{transform:scale(1.1)} }
+.st-love .fz-body { animation: fzLoveWiggle .85s ease-in-out 2; transform-origin:50% 92%; }
+@keyframes fzLoveWiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(3.5deg)} 75%{transform:rotate(-3.5deg)} }
+.st-love .fz-arm-l { animation: fzHugL .6s var(--fz-spring) forwards; transform-origin:50% 8%; }
+.st-love .fz-arm-r { animation: fzHugR .6s var(--fz-spring) forwards; transform-origin:50% 8%; }
+@keyframes fzHugL { to{ transform: rotate(-20deg); } }
+@keyframes fzHugR { to{ transform: rotate(20deg); } }
+.st-love .fz-blush { animation: fzBlushPulse .8s ease-in-out infinite alternate; }
+@keyframes fzBlushPulse { from{opacity:.75; transform:scale(1)} to{opacity:1; transform:scale(1.15)} }
+.st-love .fz-hearts { opacity:1 }
+.st-love .fz-heart { animation: fzHeartFloat 1.5s ease-in-out infinite; }
+.st-love .fz-heart.hh2 { animation-delay:.55s }
+@keyframes fzHeartFloat { 0%{transform:translateY(8px) scale(.5); opacity:0}
+  25%{opacity:1} 100%{transform:translateY(-26px) scale(1); opacity:0} }
+
+/* ============================================================
+   PENEMPATAN DI FIEZEL-APPS
+   Tiga wadah bulat aplikasi berbagi masalah yang sama: latarnya var(--yellow)
+   dan diameternya 38-58px. Maskot badan-penuh di dalam lingkaran sekecil itu
+   jadi dua hal buruk sekaligus - kuning di atas kuning, dan detail yang mustahil
+   dibaca. Solusinya satu pola, dipakai bertiga:
+
+     1. wadah dapat kelas has-mascot dari JS -> latarnya jadi krem, jadi badan
+        kuning maskot punya bidang untuk berdiri;
+     2. wadah memotong (overflow:hidden) dan maskot dibuat lebih besar dari
+        wadahnya, ditarik ke atas, sehingga yang terlihat KEPALANYA saja.
+        Kepala = mata, kumis, pipi. Itu yang terbaca di 38px, bukan badan.
+
+   Angka 178% dan -8% bukan tebakan: kepala + telinga menempati y 14..194 dari
+   viewBox 320x300, yaitu 0,5625 dari lebar. Supaya kepala mengisi wadah penuh,
+   maskot harus 1/0,5625 = 178% lebar wadah, dan pusat kepala (y 104) digeser
+   agar duduk di tengah wadah.
+   ============================================================ */
+
+.fz-coach-bubble.has-mascot,
+.fz-coach-avatar.has-mascot,
+.coach-strip-face.has-mascot {
+  overflow:hidden;
+  background:var(--cream, #FDFAF3);
+}
+/* position:relative HANYA untuk dua wadah yang aslinya statis. Gelembung
+   pembimbing sudah position:fixed (style.css) dan itu yang menempelkannya di
+   pojok kanan bawah - menimpanya dengan relative membuatnya jatuh mengikuti
+   aliran dokumen, jauh di bawah lipatan. Sudah pernah terjadi sekali di sini. */
+.fz-coach-avatar.has-mascot,
+.coach-strip-face.has-mascot { position:relative; }
+.fz-coach-bubble.has-mascot fiezel-mascot,
+.fz-coach-avatar.has-mascot fiezel-mascot,
+.coach-strip-face.has-mascot fiezel-mascot {
+  position:absolute; left:50%; top:-8%; width:178%; height:auto;
+  transform:translateX(-50%);
+  /* WAJIB: tanpa ini klik jatuh ke maskot dan tidak pernah sampai ke <button>
+     induk yang membuka panel pembimbing. */
+  pointer-events:none;
+}
+/* style.css memaku .coach-strip-face svg ke 24px untuk ikon paw. Maskot butuh
+   svg yang mengisi elemennya sendiri. */
+.coach-strip-face.has-mascot fiezel-mascot .fz-svg { width:100%; height:100%; }
+
+/* Bayangan lantai dan confetti tidak berarti di dalam lingkaran terpotong:
+   yang pertama tidak terlihat, yang kedua hanya menabrak tepi potongan.
+   Selebrasinya tetap terbaca dari gerak kepala dan matanya. */
+.has-mascot fiezel-mascot .fz-shadow,
+.has-mascot fiezel-mascot .fz-confetti-layer { display:none; }
