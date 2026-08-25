@@ -3,13 +3,10 @@ importScripts('./version.js');
 // mutable application-shell generations to it: prepared neural assets must survive
 // a shell release without being rewritten underneath a live document.
 const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
-// m026-01: awalan 'm025-158-' DIPERTAHANKAN dengan sengaja. install-health-test.js
-// mewajibkan SW_REV dimulai dengan DIAG_BUILD halaman (m025-158), karena health check
-// membandingkan build halaman dengan shell yang dipegang worker. Menaikkan awalannya
-// berarti menaikkan DIAG_BUILD + FIEZEL_PAGE_BUILD juga - itu keputusan rilis, bukan
-// bagian dari integrasi maskot. Yang penting sudah terjadi: nilainya berubah, jadi
-// SHELL_CACHE baru dan dua berkas maskot ikut terpasang di pemuatan berikutnya.
-const SW_REV='m025-158-maskot-paw-motion-20260826-1';
+// m025-162: rebase di atas m026-01 (maskot PAW). DIAG_BUILD + FIEZEL_PAGE_BUILD naik ke
+// m025-159 di commit ini, jadi awalan SW_REV ikut naik; deskriptor menggabungkan kedua
+// gelombang (reading-register + maskot) supaya jejak rilisnya jujur.
+const SW_REV='m025-159-reading-register-maskot-20260826-1';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
