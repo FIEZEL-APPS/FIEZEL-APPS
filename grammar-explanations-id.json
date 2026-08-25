@@ -679,7 +679,7 @@
       "misconception": "Siswa memakai kalimat aktif padahal maksudnya orang lain yang mengerjakan pekerjaan itu",
       "reasoning": "kenali kebiasaan masa kini di mana subjeknya selalu membayar orang lain, bukan mengerjakan sendiri → isi kedua celahnya sekaligus: have atau get bentuk present di celah pertama dan past participle di celah kedua",
       "rule": "Pola menyuruh: have atau get + objek + past participle — dipakai ketika orang lain yang mengerjakan sesuatu untuk subjeknya.",
-      "whyCorrect": "Pembicara mengatur agar orang lain yang memperbaiki, dan itulah makna pola “have something done”.",
+      "whyCorrect": "Pengisian kedua celah dengan “have / repaired” cocok dengan layanan yang diatur pada “I always ___ it ___ by a professional” — pola have + objek + past participle.",
       "whyOthersFail": "Bentuk dasar dan bentuk -ing sama-sama melanggar pola past participle yang diwajibkan, sedangkan “make” masuk ke susunan lain dengan makna yang berbeda.",
       "howToAvoid": "Tanyakan: subjeknya mengerjakan sendiri, atau mengatur orang lain mengerjakannya? Kalau yang kedua, pakai pola menyuruh.",
       "memoryCue": "Have atau get + bendanya + bentuk done, bukan do atau doing.",
@@ -1310,7 +1310,7 @@
       "distractors": {
         "to announce": {
           "misconception": "bentuk to aktif dipakai padahal subjeknya tidak mungkin melakukan pengumumannya sendiri",
-          "whyFails": "Kebijakan itu tidak mengumumkan dirinya sendiri; ia justru yang diumumkan, jadi bentuk to-nya harus pasif."
+          "whyFails": "“To announce” menjadikan kebijakan itu pihak yang mengumumkan, padahal kebijakan itulah yang menerima pengumumannya."
         },
         "announcing": {
           "misconception": "bentuk -ing dipakai padahal setelah “expected” yang diminta pola bentuk to",
@@ -1318,7 +1318,7 @@
         },
         "to be announcing": {
           "misconception": "aspek berkelanjutan ditambahkan pada bentuk to pasif tanpa perlu",
-          "whyFails": "Bentuk ini keliru menyiratkan proses pengumuman yang berlangsung; satu pengumuman di masa depan cukup dengan bentuk to pasif sederhana."
+          "whyFails": "“To be announcing” merentangkan pengumuman sekali jadi menjadi proses berkepanjangan yang tidak pernah digambarkan kalimatnya."
         }
       }
     },
@@ -1358,7 +1358,7 @@
       "distractors": {
         "rains / will cancel": {
           "misconception": "first conditional dibiarkan tanpa pemunduran sama sekali di kalimat pelaporan",
-          "whyFails": "Kalimat pelaporan umumnya menuntut pemunduran pada anak kalimat syarat dan anak kalimat hasilnya, dari present dan will menjadi past dan would."
+          "whyFails": "“Rains / will cancel” mengulang kutipan langsungnya tanpa perubahan, mengabaikan bahwa bingkai pelaporannya sudah memindahkan momen bicara ke masa lampau."
         },
         "had rained / would have cancelled": {
           "misconception": "first conditional dimundurkan berlebihan sampai menjadi bentuk third conditional",
@@ -1448,9 +1448,9 @@
       "reasoning": "kenali bentuk ruang yang tersirat dari kata bendanya → pilih kata depan gerak yang cocok",
       "rule": "Through berarti menembus ruang tertutup; across berarti menyeberangi permukaan datar terbuka; along berarti menyusuri panjangnya sesuatu; over berarti melintas di atasnya.",
       "whyCorrect": "“Through” menandai gerakan masuk dari satu sisi celah sempit yang tertutup dan keluar di sisi lainnya, persis seperti menyelinap lewat celah pagar.",
-      "whyOthersFail": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan terowongan yang tertutup.",
+      "whyOthersFail": "Setiap pilihan lain cocok untuk bentuk lintasan yang berbeda — permukaan datar, tepi memanjang, atau lengkungan di atas — bukan celah sempit tertutup seperti celah pagar.",
       "howToAvoid": "Bayangkan bentuk ruangnya: tertutup dan tiga dimensi menandakan “through”.",
-      "memoryCue": "Terowongan punya bagian dalam, jadi dilewati “through”.",
+      "memoryCue": "Celah punya bagian dalam — ditembus dengan “through”.",
       "distractors": {
         "across": {
           "misconception": "kata depan untuk permukaan datar terbuka dipakai untuk ruang tertutup tiga dimensi",
@@ -1855,7 +1855,7 @@
       "misconception": "Siswa memakai pasif biasa padahal kalimatnya menuntut pola menyuruh untuk menunjukkan subjeknya yang mengatur pekerjaan itu",
       "reasoning": "uji dulu apakah kalimatnya pasif biasa dengan was/were + past participle; kalau subjeknya sendiri yang mengatur jasanya, ganti kata bantunya menjadi “had” dalam kerangka menyuruh had + benda + past participle",
       "rule": "Pola menyuruh: subjek + have atau get + objek + past participle, berarti mengatur agar sebuah jasa dikerjakan.",
-      "whyCorrect": "“Had our roof repaired” memakai pola menyuruh berupa have + objek + past participle, yang menunjukkan kami mengatur orang lain untuk memperbaikinya.",
+      "whyCorrect": "“Had” cocok dengan penanda lampau “last week” dan melengkapi kerangka menyuruh di sekitar “our roof repaired” dalam bentuk lampaunya.",
       "whyOthersFail": "Pilihan lainnya bukan bentuk menyuruh yang sah, atau bertabrakan dengan kerangka waktu lampau dan kesesuaian subjeknya.",
       "howToAvoid": "Kalau subjeknya tidak mengerjakan sendiri melainkan mengaturnya, pakai have atau get + objek + past participle.",
       "memoryCue": "Have + bendanya + bentuk done berarti ada orang lain yang dibayar atau diminta mengerjakannya.",
@@ -2678,7 +2678,7 @@
       "distractors": {
         "had; had": {
           "misconception": "past simple dipakai dua kali menggantikan pola tetap present perfect + ever",
-          "whyFails": "Pernyataan superlative + ever lazimnya menuntut present perfect seperti “have had” untuk mencakup pengalaman sepanjang hidup sampai sekarang, bukan satu waktu lampau tertentu."
+          "whyFails": "“Had; had” mengunci pengalamannya di masa lampau yang sudah selesai, sehingga klaim seumur hidup “ever”-nya terputus dari saat ini."
         },
         "have; have": {
           "misconception": "kata bantu “have” diulang tanpa past participle yang dibutuhkan kata kerja utamanya",
