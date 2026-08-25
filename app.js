@@ -357,6 +357,32 @@ function grammarAlternativeMeta(item,field,count=3){const own=grammarMeta(item),
     for(let i=0;i<pool.length&&out.length<count;i++){const entry=pool[(start+i)%pool.length];const value=String(entry.value||'').trim();if(value&&norm(value)!==norm(own[field])&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:entry.sourceId})}
   }
   const fallback=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];for(const value of fallback)if(out.length<count&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:''});return out.slice(0,count)}
+// m025-154: mode teach_back dan mastery_check merangkai DUA field jadi satu pilihan.
+// Sebelumnya keduanya diambil lewat dua panggilan grammarAlternativeMeta() yang terpisah,
+// dan masing-masing punya urutan serta titik mulainya sendiri - jadi objective[i] dan
+// rule[i] berasal dari TEMPLATE YANG BERBEDA. Yang dibaca murid berbunyi seperti
+// "Memilih in, on, atau at untuk menyatakan letak. Pakai a sebelum bunyi konsonan..." -
+// dua lesson yang tidak berhubungan dilem jadi satu kalimat. Fungsi ini memilih
+// template tetangganya SEKALI, lalu kedua field dibaca dari template yang sama itu.
+function grammarAlternativePairs(item,fieldA,fieldB,count=3){
+  const own=grammarMeta(item),ownLevel=String(item?.[5]||'');
+  const peers=GRAMMAR_ITEMS.filter(x=>x.item!==item);
+  const tiers=[peers.filter(x=>x.family===own.family),peers.filter(x=>x.family!==own.family&&String(x.level||'')===ownLevel),peers];
+  const out=[],seen=new Set();
+  for(const tier of tiers){
+    if(out.length>=count)break;
+    const pool=tier.filter(x=>{const m=grammarMeta(x.item);return m?.[fieldA]&&m?.[fieldB]});
+    if(!pool.length)continue;
+    const start=stableGrammarHash(`${own.id}:${fieldA}:${fieldB}`)%pool.length;
+    for(let i=0;i<pool.length&&out.length<count;i++){
+      const peer=pool[(start+i)%pool.length],m=grammarMeta(peer.item);
+      const text=`${m[fieldA]} ${m[fieldB]}`.trim(),key=norm(text);
+      if(!key||seen.has(key)||key===norm(`${own[fieldA]} ${own[fieldB]}`.trim()))continue;
+      seen.add(key);out.push({value:text,sourceId:String(peer.item?.[8]||'')});
+    }
+  }
+  return out.slice(0,count);
+}
 function completeGrammarStem(stem,option){return /_{3,}/.test(stem)?stem.replace(/_{3,}/,option):option}
 function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correct=meta.options[meta.correctIndex],reasons=Array.isArray(item?.[4])?item[4]:meta.options.map(()=>''),wrong=meta.options.map((option,index)=>({option,index,reason:reasons[index]||'',detail:(Array.isArray(item?.[17])?item[17]:[]).find(x=>String(x.option)===String(option))||{}})).filter(x=>x.index!==meta.correctIndex),mode=GRAMMAR_PRACTICE_MODES[variant]||GRAMMAR_PRACTICE_MODES[0],title=friendlySkillName(skill),base=`${meta.stem}`;
   const direct=(question,options,answerIndex,correctWhy,optionReasons=[],optionSources=[])=>({mode,question,options,answerIndex,correctWhy,optionReasons,optionSources});
@@ -390,8 +416,8 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang akurat antara “${correct}” dan “${target.option}”?\n${base}`,[`“${correct}” tepat; ${failure}`,`“${target.option}” tepat, sedangkan “${correct}” mengubah maksud kalimat.`,`Keduanya selalu dapat saling menggantikan tanpa perubahan makna.`,`Keduanya salah karena lesson ini tidak menguji pilihan tersebut.`],0,`Perbandingan pertama menjaga jawaban benar sekaligus mendiagnosis kesalahan spesifik pada “${target.option}”.`);}
   if(variant===21){const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[grammarFamilyLabel(item),labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]],0,`Fokus ${title.toLowerCase()} berada dalam keluarga ${grammarFamilyLabel(item)}.`);}
   if(variant===22)return metaChoice(`Petunjuk keputusan mana yang perlu ditemukan terlebih dahulu pada contoh ini?\n${base}`,'reasoning','Petunjuk ini menentukan hubungan antara konteks, fungsi, dan bentuk jawaban.');
-  if(variant===23){const correctSummary=`${meta.objective} ${meta.rule}`.trim(),objectives=grammarAlternativeMeta(item,'objective',3),rules=grammarAlternativeMeta(item,'rule',3),alternatives=objectives.map((x,i)=>`${x.value} ${rules[i]?.value||''}`.trim());return direct(`Ringkasan ajar mana yang paling tepat untuk menjelaskan lesson ${title} kepada siswa lain?`,[correctSummary,...alternatives],0,'Ringkasan tersebut menyatukan tujuan lesson dan aturan yang benar.',[],['',...objectives.map(x=>x.sourceId)]);}
-  const correctPlan=`${meta.avoid} ${meta.memory}`.trim(),avoid=grammarAlternativeMeta(item,'avoid',3),memory=grammarAlternativeMeta(item,'memory',3);return direct(`Rencana cek mandiri mana yang paling tepat sebelum menuntaskan lesson ${title}?`,[correctPlan,...avoid.map((x,i)=>`${x.value} ${memory[i]?.value||''}`.trim())],0,'Rencana ini menggabungkan pencegahan kesalahan dan pengingat yang khusus untuk lesson aktif.',[],['',...avoid.map(x=>x.sourceId)]);
+  if(variant===23){const correctSummary=`${meta.objective} ${meta.rule}`.trim(),alts=grammarAlternativePairs(item,'objective','rule',3);return direct(`Ringkasan ajar mana yang paling tepat untuk menjelaskan lesson ${title} kepada siswa lain?`,[correctSummary,...alts.map(x=>x.value)],0,'Ringkasan tersebut menyatukan tujuan lesson dan aturan yang benar.',[],['',...alts.map(x=>x.sourceId)]);}
+  const correctPlan=`${meta.avoid} ${meta.memory}`.trim(),plans=grammarAlternativePairs(item,'avoid','memory',3);return direct(`Rencana cek mandiri mana yang paling tepat sebelum menuntaskan lesson ${title}?`,[correctPlan,...plans.map(x=>x.value)],0,'Rencana ini menggabungkan pencegahan kesalahan dan pengingat yang khusus untuk lesson aktif.',[],['',...plans.map(x=>x.sourceId)]);
 }
 const PART_OF_SPEECH_ID={noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan',number:'kata bilangan',article:'kata sandang'};
 function indonesianPartOfSpeech(value){return PART_OF_SPEECH_ID[String(value||'').toLowerCase()]||'jenis kata'}

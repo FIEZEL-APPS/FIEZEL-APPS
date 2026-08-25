@@ -569,6 +569,27 @@ function auditGrammarRuntime(ctx, templates) {
         report('grammar', sameBand ? 'CROSS_FAMILY_FALLBACK' : 'CROSS_TOPIC_CONTAMINATION', q.sourceId || t.id,
           `lesson "${t.subskill}" (${t.family}/${t.cefr}) offers an answer option authored for ${src.id} (${src.family}/${src.cefr})`, o);
       }
+      // Mode teach_back dan mastery_check merangkai DUA field jadi satu pilihan. Kedua
+      // bagian itu harus datang dari template YANG SAMA. Ketika diambil lewat dua undian
+      // terpisah, murid membaca dua lesson yang tidak berhubungan dilem jadi satu kalimat:
+      // "Memilih in, on, atau at untuk menyatakan letak. Pakai a sebelum bunyi konsonan..."
+      if (q.practiceMode === 'teach_back' || q.practiceMode === 'mastery_check') {
+        const pair = q.practiceMode === 'teach_back' ? ['pedagogicalObjectiveId', 'ruleId'] : ['howToAvoidId', 'memoryCueId'];
+        const coherent = new Set();
+        for (const peer of templates) {
+          const e = peer.explanation || {};
+          const a = pair[0] === 'pedagogicalObjectiveId' ? peer.pedagogicalObjectiveId : e[pair[0]];
+          const b = e[pair[1]];
+          if (a && b) coherent.add(norm(`${a} ${b}`));
+        }
+        for (const o of q.options || []) {
+          if (words(o).length < 8) continue;
+          if (!coherent.has(norm(o))) {
+            critical('grammar', 'COMPOSED_OPTION_INCOHERENT', q.sourceId || t.id,
+              `${q.practiceMode} option is not one lesson's own pair — two unrelated lessons glued into one sentence`, o);
+          }
+        }
+      }
       // Provenance pilihan: mode "pilih pernyataan yang tepat" meminjam pengecohnya dari
       // template lain. Pinjaman itu harus meninggalkan jejak, DAN harus dijelaskan sebagai
       // pinjaman. Tanpa jejaknya, peta miskonsepsi kartu tidak pernah cocok dan diagnosis

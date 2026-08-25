@@ -122,6 +122,32 @@ Yang paling berbahaya dari temuan mereka:
 - **`A1-003`** satu-satunya soal A1 yang kuncinya tidak tunggal ("drank" juga benar untuk
   kebiasaan lampau). A1 dipakai pemula, jadi paling merusak. Stem diberi jangkar "These days".
 
+### 3g. teach_back & mastery_check — DIPERBAIKI, ditemukan dari screenshot OWNER
+
+OWNER mengirim screenshot aplikasi nyata dan menemukan apa yang seluruh audit otomatis
+lewatkan. Ini pengingat penting: **telaah data dan gerbang otomatis tidak menggantikan
+melihat layar sungguhan.**
+
+Mode `teach_back` dan `mastery_check` merangkai DUA field jadi satu pilihan. Keduanya
+diambil lewat dua panggilan `grammarAlternativeMeta()` yang TERPISAH, masing-masing dengan
+urutan dan titik mulainya sendiri — jadi `objective[i]` dan `rule[i]` berasal dari
+**template yang berbeda**. Yang dibaca murid:
+
+> "Memilih **in, on, atau at** untuk menyatakan letak. Pakai **a sebelum bunyi konsonan**,
+> an sebelum bunyi vokal..."
+
+Dua lesson yang tidak berhubungan dilem jadi satu kalimat. Empat pilihan seperti itu dalam
+satu soal. Wajar kalau murid bingung.
+
+Diperbaiki dengan `grammarAlternativePairs()`: template tetangganya dipilih SEKALI, lalu
+kedua field dibaca dari template yang sama itu. Dikunci gerbang baru
+`COMPOSED_OPTION_INCOHERENT` di `content-integrity-audit.js`.
+
+Dua keluhan lain di screenshot yang sama (`label_misconception` menampilkan kalimat
+penjelasan alih-alih label, dan `recognize_rule` menyodorkan aturan lesson lain yang jauh)
+**sudah teratasi** oleh perbaikan m025-149/m025-154 sebelumnya — screenshot itu dari build
+lama. Diverifikasi ulang lewat runtime sebelum dinyatakan beres.
+
 ### 3f. Grammar mode turunan — BELUM ditelaah ahli, tanpa bukti cacat
 
 Ini celah yang tersisa di grammar dan perlu dinyatakan jujur.
