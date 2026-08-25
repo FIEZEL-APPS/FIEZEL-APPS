@@ -478,9 +478,13 @@ function manifestWith(text, extra = {}) {
         ['tools/audio-batch-generate.mjs', '--content=audiobook', '--limit=1'],
         { cwd: root, env: { ...process.env, ELEVENLABS_VOICE_ID: 'gate-voice' }, encoding: 'utf8' }
       );
+      // Ketiganya, bukan dua. Aset yang sudah diproduksi pindah dari "belum ada" ke
+      // "sudah siap", jadi menjumlahkan dua saja membuat gate ini gagal begitu batch
+      // pertama selesai - persis yang terjadi dan memblokir produksi berikutnya.
       const m = keluaran.match(/belum ada\s*:\s*(\d+)/);
       const d = keluaran.match(/duplikat\s*:\s*(\d+)/);
-      if (m && d) terpancar = Number(m[1]) + Number(d[1]);
+      const r = keluaran.match(/sudah siap\s*:\s*(\d+)/);
+      if (m && d && r) terpancar = Number(m[1]) + Number(d[1]) + Number(r[1]);
     } catch (_) { /* terpancar tetap -1 dan gate gagal, sebagaimana mestinya */ }
 
     check('Registry hanya memancarkan kalimat dari buku yang boleh diproduksi',
