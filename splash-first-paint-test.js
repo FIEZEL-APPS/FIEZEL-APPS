@@ -194,7 +194,7 @@ test('latar boot gelap, jadi frame sebelum CSS pun bukan putih', () => {
   assert.ok(/<html lang="id"[^>]*class="fz-booting"/.test(html), 'dokumen harus menandai dirinya sedang boot');
   const critical = /<style id="fiezelBootCritical">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(critical, 'CSS kritis splash harus disisipkan di <head>');
-  assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#0B0709\}/.test(critical[1]),
+  assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#1B1418\}/.test(critical[1]),
     'html dan body harus gelap selama boot; tanpa ini #fdf6f5 tetap menyembul di frame pertama');
   assert.ok(html.indexOf('<style id="fiezelBootCritical">') < html.indexOf('href="./style.css"'),
     'CSS kritis harus mendahului style.css supaya style.css tetap yang berwenang atas desainnya');
