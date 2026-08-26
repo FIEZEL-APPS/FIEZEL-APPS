@@ -33,6 +33,7 @@ body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--font);f
 .credit-strip{background:var(--ink);color:var(--cream)}
 .credit-in{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;font-size:.78rem;letter-spacing:.02em}
 .credit-in strong{font-weight:700;color:var(--yellow)}
-.credit-ig{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;color:var(--cream);transition:transform var(--fz-fast) var(--fz-spring),opacity var(--fz-fast)}
-.credit-ig svg{width:16px;height:16px}
+.credit-in{flex-wrap:nowrap;white-space:nowrap}
+.credit-ig{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;color:var(--cream);transition:transform var(--fz-fast) var(--fz-spring),opacity var(--fz-fast)}
+.credit-ig svg{width:15px;height:15px}
 .credit-ig:hover{transform:scale(1.15);color:var(--yellow)}
