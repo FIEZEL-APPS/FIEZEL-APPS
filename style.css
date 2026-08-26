@@ -1055,6 +1055,16 @@ body.daily-locked{overflow:hidden}
 .library-controls{display:flex;gap:8px;align-items:center}
 .library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
 .library-controls .primary{flex:1}
+/* m028 fase4: tombol kecepatan duduk di baris status di KIRI, bukan di .library-controls.
+   Terukur di 390x844: baris kontrol sudah penuh (mundur + Audiobook + maju + Tanya Fiezel
+   selebar 281px) sehingga tombol kelima melipat; dan seluruh sudut kanan-bawah dok berada di
+   lajur gelembung pembimbing (x316-374, y682-740) yang menelan pointer - Playwright menolak
+   mengetuk tombol di sana. Pojok kiri baris status adalah satu-satunya tempat di dok yang
+   bebas dari gelembung sekaligus tetap terlihat sambil menyimak.
+   Lebarnya dipaku supaya siklus 0.75x -> 1x -> 1.25x tidak menggeser teks statusnya. */
+.library-dock-line{display:flex;align-items:center;gap:8px}
+.library-dock-line .library-status{flex:1;min-width:0}
+.library-speed{flex:0 0 auto;min-width:62px;padding:0 12px;border-radius:12px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
 .library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
 .library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#241A11)}
 .library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
@@ -3280,6 +3290,37 @@ body.fz-stage-map .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
 /* Ruang bawah supaya kartu terakhir Peta Belajar bisa lewat di atas pita dok. */
 body.fz-stage-map .app{padding-bottom:104px}
 body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
+
+/* ---------- m028 fase4: gelembung pindah ke kanan-ATAS di panggung ber-panel-bawah ----------
+   AKAR: mengecilkan gelembung tidak memindahkannya keluar dari lajur kanan-bawah, dan lajur
+   itu sudah dipakai bar aksi yang dipaku ke dasar layar - .fsl-actions (z55, bottom 76) di
+   Skills Lab dan panel NEXT SESSION di Peta. Terukur di 390x844: gelembung 46x46 menimpa
+   ujung kanan tombol "Lanjut" 46x37 px, dan begitu subtitle (z70) atau voice-pill (z60)
+   muncul giliran gelembungnya yang tertutup.
+   OBAT: saat panggung ber-panel-bawah aktif, gelembung berpindah ke kanan-atas, di bawah
+   topbar (sticky, tinggi 62px + offset 6px; 88px membebaskannya baik saat diam maupun saat
+   menempel). Memakai bendera body-class yang SUDAH di-toggle renderInner() - nol perubahan JS,
+   kontrak m025-115 (gelembung anak <body>) tidak tersentuh.
+   fz-stage-quiz TIDAK ikut: tombol "Lanjut" kuis justru ada di kanan-ATAS (#quizNext di
+   .quiz-topbar sticky), jadi memindahkannya ke atas di kuis hanya menukar satu tabrakan
+   dengan tabrakan baru. Yang dianimasikan hanya transform+opacity - top/bottom tidak pernah
+   ikut, supaya perpindahannya tidak memaksa layout ulang tiap frame. */
+body.fz-stage-sl .fz-coach-bubble,
+body.fz-stage-map .fz-coach-bubble{
+  bottom:auto;
+  top:calc(88px + env(safe-area-inset-top,0px));
+  animation:fzCoachRelocate .28s var(--ease-spring) both;
+}
+@keyframes fzCoachRelocate{
+  from{opacity:0;transform:translateY(-10px) scale(.9)}
+  to{opacity:1;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+  body.fz-stage-sl .fz-coach-bubble,
+  body.fz-stage-map .fz-coach-bubble{animation:none}
+}
+body.reduce-motion.fz-stage-sl .fz-coach-bubble,
+body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 
 /* ---------- §2 kuis: benar / salah / pijakan ----------
    Banner benar-salah, kartu sebab, dan tip ingatan SUDAH ada 1:1 di reveal(); yang
