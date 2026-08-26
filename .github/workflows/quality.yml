@@ -129,3 +129,4 @@ jobs:
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
           node puter-popup-once-test.js
+          node owner-dashboard-test.js
