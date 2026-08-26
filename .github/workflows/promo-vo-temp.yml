@@ -29,17 +29,10 @@ jobs:
               -o "vo_out/${name}.mp3"
             echo "ok ${name} $(stat -c%s vo_out/${name}.mp3) bytes"
           }
-          gen s00 "Aplikasi belajar kamu cuma bisa bilang salah? Terus? Ya udah, gitu doang?"
-          gen s01 "Nah — gimana kalau ada yang beneran merhatiin cara kamu mikir?"
-          gen s02 "Kenalin — Fizel! Bareng maskotnya, PAW!"
-          gen s03 "Buat Fizel, salah itu bukan aib. Itu data — biar dia makin ngerti kamu!"
-          gen s04 "Fizel nggak cuma bilang bener apa salah — dia jelasin kenapa!"
-          gen s05 "Pas kamu stuck? Nggak langsung dikasih jawaban. Kamu dipancing mikir dulu, baru dibantu pelan-pelan."
-          gen s06_listening_en "Hello! I am Anna, from London!"
-          gen s06 "Tiap sesi, dia makin ngerti kamu!"
-          gen s07 "Fizel nyari pola lemah kamu — biar sesi berikutnya emang yang kamu butuhin!"
-          gen s08 "Ratusan pelajaran, ribuan kosakata, dari A satu sampe C dua — dan semuanya gratis!"
-          gen s09 "Fizel! Ngerti kamu, bukan cuma ngajar kamu. Gas, mulai belajar!"
+          gen s00 "Aplikasi kamu cuma bilang salah? Ya udah, gitu doang?"
+          gen s01 "Gimana kalau ada yang beneran merhatiin cara kamu mikir?"
+          gen s03 "Buat Fizel, salah itu data — biar dia makin ngerti kamu!"
+          gen s08 "Ratusan pelajaran, dari A satu sampe C dua — dan semuanya gratis!"
       - uses: actions/upload-artifact@v4
         with:
           name: promo-vo
