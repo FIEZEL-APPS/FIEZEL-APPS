@@ -64,6 +64,7 @@ jobs:
           node lesson-experience-test.js
           node ui-structure-test.js
           node settings-cache-test.js
+          node gems-test.js
           node back-nav-test.js
           node grammar-quality-audit.js
           node content-integrity-audit.js
