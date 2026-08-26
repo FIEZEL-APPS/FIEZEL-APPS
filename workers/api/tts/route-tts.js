@@ -1,0 +1,453 @@
+/**
+ * E5 — POST /api/tts/render + GET /api/tts/manifest (cf-b4 §2.2-2.4).
+ * Ekspor `registerTtsRoutes(router)`; pemasangan sama seperti route-ai.js (lihat notes).
+ *
+ * URUTAN YANG MENJADI SELURUH ISI BERKAS INI — dan urutannya adalah kontrol biaya, bukan gaya:
+ *
+ *   1. hitung ULANG audioKey di server            (kunci dari klien tidak dipercaya)
+ *   2. HEAD R2                → ADA  ⇒ balas URL  (NOL kuota, NOL neuron, NOL tulis)
+ *   3. breaker                → OPEN ⇒ mode hemat (tanpa menyentuh provider)
+ *   4. kuota                  → habis ⇒ 429       (SATU-SATUNYA titik kuota diperiksa)
+ *   5. single-flight per kunci → dua permintaan serentak = satu produksi
+ *   6. provider TTS → PUT idempoten ke R2 → catat event server-side
+ *
+ * Kenapa langkah 1 tidak boleh dihapus walau klien sudah mengirim kunci: kunci yang dipercaya
+ * adalah kunci yang bisa dikarang. Satu klien nakal bisa mengirim kunci acak untuk teks yang
+ * sudah ada di R2 dan memaksa produksi ulang berbayar berkali-kali, atau sebaliknya menuliskan
+ * teks lain ke atas nama kunci milik kalimat sah. Kunci yang dihitung server dari input mustahil
+ * dipakai untuk keduanya.
+ *
+ * Kenapa langkah 2 mendahului langkah 4 (`cf-b4 §2.4`, dinaikkan menjadi invarian sistem):
+ * replay item listening adalah pedagogi (maxReplays 2), bukan biaya. Aset yang sudah dibayar
+ * sekali tidak boleh memakan jatah harian murid setiap kali diputar.
+ */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.FiezelRouteTts = factory();
+}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+
+  var TtsKey = (function () {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('./tts-key.js');
+    return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelTtsKey;
+  }());
+
+  var Breaker = (function () {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('../breaker/breaker.js');
+    return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelBreaker;
+  }());
+
+  /** Sama alasannya dengan route-ai.js: E5 dan paket kuota harus bisa di-merge dalam urutan apa pun. */
+  function resolveEnforceQuota(deps) {
+    var d = deps || {};
+    if (typeof d.enforceQuota === 'function') return d.enforceQuota;
+    var g = typeof globalThis !== 'undefined' ? globalThis : {};
+    if (typeof g.FIEZEL_ENFORCE_QUOTA === 'function') return g.FIEZEL_ENFORCE_QUOTA;
+    if (typeof require === 'function') {
+      try {
+        var spec = '../quota/route-' + 'quota.js';
+        var mod = require(spec);
+        if (mod && typeof mod.enforceQuota === 'function') return mod.enforceQuota;
+      } catch (_) { /* belum ada di branch ini */ }
+    }
+    return null;
+  }
+
+  var ENGINES = Object.freeze({
+    '@cf/deepgram/aura-1': Object.freeze({
+      id: '@cf/deepgram/aura-1',
+      engineVersion: 'cf-aura-1@v1',
+      usdPer1kChars: 0.015,
+      // Jatah gratis 10.000 neuron/hari ≈ 7.333 karakter/hari untuk SELURUH akun. Angka itu yang
+      // membuat pra-render (tools/prerender-tts.mjs) wajib, bukan opsional.
+      freeCharsPerDay: 7333,
+      maxChars: 3000
+    }),
+    '@cf/myshell-ai/melotts': Object.freeze({
+      id: '@cf/myshell-ai/melotts',
+      engineVersion: 'cf-melotts@v1',
+      usdPer1kChars: 0.0002,
+      freeCharsPerDay: 500000,
+      maxChars: 3000
+    })
+  });
+
+  var DEFAULT_ENGINE = '@cf/deepgram/aura-1';
+  var CHEAP_ENGINE = '@cf/myshell-ai/melotts';
+  var TTS_TIMEOUT_MS = 25000; // selaras CALL_TIMEOUT_MS; 35 s dinilai terlalu longgar (cf-a10 §6)
+  var MAX_BODY_BYTES = 12000;
+
+  var POLITE = Object.freeze({
+    bad_json: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
+    invalid_input: 'Teks yang akan dibacakan belum lengkap.',
+    key_mismatch: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
+    too_long: 'Teksnya terlalu panjang untuk sekali dibacakan.',
+    quota_exceeded: 'Jatah suara hari ini sudah habis. Suara perangkat tetap bisa dipakai.',
+    breaker_open: 'Suara dari perangkat — layanan suara sedang istirahat sebentar.',
+    unavailable: 'Suara dari perangkat — audio belum tersedia untuk kalimat ini.',
+    body_too_big: 'Permintaan terlalu besar.'
+  });
+
+  /** Single-flight per kunci, per isolate. */
+  var inFlight = new Map();
+
+  function json(payload, status, headers) {
+    var h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' };
+    if (headers) Object.keys(headers).forEach(function (k) { h[k] = headers[k]; });
+    return new Response(JSON.stringify(payload), { status: status || 200, headers: h });
+  }
+
+  function assetUrl(env, objectName) {
+    var base = String((env && env.AUDIO_PUBLIC_BASE) || '').replace(/\/+$/, '');
+    return base ? base + '/a/' + objectName : 'a/' + objectName;
+  }
+
+  function baseResponse(extra) {
+    var out = {
+      schema: 'fiezel-tts-response-v2',
+      keySchema: TtsKey.SCHEMA,
+      audioKey: '',
+      objectName: '',
+      url: '',
+      source: 'unavailable',
+      degraded: true,
+      breaker: 'CLOSED',
+      bytes: 0,
+      chars: 0,
+      protocol: '2.0'
+    };
+    if (extra) Object.keys(extra).forEach(function (k) { out[k] = extra[k]; });
+    return out;
+  }
+
+  function pickEngine(body, deps) {
+    var requested = String((body && body.engineId) || '') || DEFAULT_ENGINE;
+    if (!ENGINES[requested]) requested = DEFAULT_ENGINE;
+    var used = Number((deps && deps.charsUsedToday) || 0);
+    // Begitu jatah gratis harian mesin utama terlampaui, tier murah mengambil alih SEBELUM murid
+    // kehilangan suara. Turun mutu itu pilihan yang lebih baik daripada senyap.
+    if (used >= ENGINES[requested].freeCharsPerDay && ENGINES[CHEAP_ENGINE]) return ENGINES[CHEAP_ENGINE];
+    return ENGINES[requested];
+  }
+
+  async function headObject(env, objectName) {
+    if (!env || !env.AUDIO) return null;
+    try {
+      if (typeof env.AUDIO.head === 'function') return await env.AUDIO.head(objectName);
+      if (typeof env.AUDIO.get === 'function') {
+        var obj = await env.AUDIO.get(objectName);
+        return obj ? { size: obj.size || 0, etag: obj.etag || '' } : null;
+      }
+    } catch (_) { /* R2 yang mati diperlakukan sebagai "belum ada" */ }
+    return null;
+  }
+
+  function toBytes(result) {
+    if (!result) return null;
+    if (result instanceof ArrayBuffer) return new Uint8Array(result);
+    if (result && result.audio instanceof ArrayBuffer) return new Uint8Array(result.audio);
+    if (result && typeof result.audio === 'string') return result.audio; // base64 dari sebagian model
+    if (result && result.byteLength !== undefined) return result;
+    return null;
+  }
+
+  function byteSize(payload) {
+    if (!payload) return 0;
+    if (typeof payload === 'string') return Math.floor(payload.length * 0.75); // perkiraan base64
+    return payload.byteLength || payload.length || 0;
+  }
+
+  async function callEngine(env, engineId, text, timeoutMs) {
+    var options = {};
+    if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+      options.signal = AbortSignal.timeout(timeoutMs);
+    }
+    var run = env.AI.run(engineId, { text: text }, options);
+    var timer;
+    var guard = new Promise(function (_, reject) {
+      timer = setTimeout(function () {
+        var err = new Error('provider_timeout');
+        err.fiezelTimeout = true;
+        reject(err);
+      }, timeoutMs + 250);
+    });
+    try { return await Promise.race([run, guard]); } finally { clearTimeout(timer); }
+  }
+
+  function signalFromError(error) {
+    var e = error || {};
+    if (e.fiezelTimeout === true || e.name === 'TimeoutError' || e.name === 'AbortError') return { timeout: true };
+    var status = Number(e.status || (e.response && e.response.status) || 0);
+    if (status) return { status: status };
+    return { networkError: true };
+  }
+
+  async function handleRender(args) {
+    var a = args || {};
+    var env = a.env || {};
+    var deps = a.deps || {};
+    var now = typeof deps.now === 'function' ? deps.now : function () { return Date.now(); };
+    var started = now();
+
+    var raw;
+    try { raw = await a.request.text(); } catch (_) {
+      return json(baseResponse({ error: 'bad_json', message: POLITE.bad_json }), 400);
+    }
+    if ((raw || '').length > MAX_BODY_BYTES) {
+      return json(baseResponse({ error: 'body_too_big', message: POLITE.body_too_big }), 413);
+    }
+    var body;
+    try { body = JSON.parse(raw || '{}'); } catch (_) {
+      return json(baseResponse({ error: 'bad_json', message: POLITE.bad_json }), 400);
+    }
+
+    var engine = pickEngine(body, deps);
+
+    // LANGKAH 1 — kunci dihitung ULANG dari input. `speed` yang dikirim klien tidak pernah masuk
+    // hitungan (tts-key.js): ia diterapkan di playbackRate pemutar.
+    var identity;
+    try {
+      identity = TtsKey.build({
+        text: body.text,
+        locale: body.locale,
+        voiceId: body.voiceId,
+        engineId: engine.id,
+        engineVersion: body.engineVersion || engine.engineVersion,
+        contentType: body.contentType,
+        settings: body.settings
+      });
+    } catch (error) {
+      return json(baseResponse({ error: 'invalid_input', message: POLITE.invalid_input }), 400);
+    }
+    if (identity.canonicalText.length > engine.maxChars) {
+      // Skrip panjang dipecah menjadi parts[] oleh pipeline pra-render, bukan dipaksakan di sini.
+      return json(baseResponse({
+        audioKey: identity.audioKey, error: 'too_long', message: POLITE.too_long
+      }), 400);
+    }
+    if (body.audioKey && String(body.audioKey) !== identity.audioKey) {
+      return json(baseResponse({
+        audioKey: identity.audioKey, error: 'key_mismatch', message: POLITE.key_mismatch
+      }), 400);
+    }
+
+    var objectName = TtsKey.objectName(identity);
+    var chars = identity.canonicalText.length;
+
+    // LANGKAH 2 — HEAD R2. Hit di sini TIDAK menyentuh kuota, dan itu yang membuat replay gratis.
+    var existing = await headObject(env, objectName);
+    if (existing) {
+      if (typeof deps.recordUsage === 'function' && a.ctx && typeof a.ctx.waitUntil === 'function') {
+        a.ctx.waitUntil(Promise.resolve(deps.recordUsage({
+          kind: 'tts', event: 'cache_hit', audioKey: identity.audioKey, chars: chars, costUsd: 0
+        })).catch(function () {}));
+      }
+      return json(baseResponse({
+        audioKey: identity.audioKey, objectName: objectName, url: assetUrl(env, objectName),
+        source: 'cache', degraded: false, bytes: Number(existing.size || 0), chars: chars,
+        quotaCharged: false
+      }), 200);
+    }
+
+    // LANGKAH 3 — breaker
+    var target = 'tts:' + engine.id;
+    var store = deps.breakerStore || null;
+    var prev = store ? await store.load(target, started) : Breaker.initialState(started);
+    var gate = Breaker.beforeRequest(prev, started);
+    if (store) await store.save(target, gate.state, started, { changed: gate.changed });
+    if (!gate.allow) {
+      return json(baseResponse({
+        audioKey: identity.audioKey, objectName: objectName,
+        source: 'unavailable', degraded: true, breaker: gate.phase, chars: chars,
+        message: POLITE.breaker_open, retryAfter: Math.max(1, Math.ceil(gate.retryAfterMs / 1000)),
+        quotaCharged: false
+      }), 200);
+    }
+
+    // LANGKAH 4 — kuota, satu-satunya titik pemeriksaan
+    var enforceQuota = resolveEnforceQuota(deps);
+    var quotaChecked = false;
+    if (enforceQuota) {
+      var quota;
+      try {
+        quota = await enforceQuota({
+          env: env, ctx: a.ctx, request: a.request,
+          kind: 'tts', chars: chars, engineId: engine.id, audioKey: identity.audioKey
+        });
+        quotaChecked = true;
+      } catch (_) {
+        quota = { allowed: false, reason: 'quota_unavailable', retryAfter: 60 };
+        quotaChecked = true;
+      }
+      if (quota && quota.allowed === false) {
+        return json(baseResponse({
+          audioKey: identity.audioKey, objectName: objectName, chars: chars,
+          source: 'unavailable', degraded: true, breaker: gate.phase,
+          error: 'quota_exceeded', message: POLITE.quota_exceeded,
+          retryAfter: Number(quota.retryAfter) || 3600, quotaCharged: false
+        }), 429, { 'retry-after': String(Number(quota.retryAfter) || 3600) });
+      }
+    }
+
+    // LANGKAH 5 — single-flight. Prefetch N+1 Library dan Cache API klien sering datang bersamaan;
+    // tanpa ini keduanya membayar untuk objek yang sama.
+    if (inFlight.has(identity.audioKey)) {
+      var shared = await inFlight.get(identity.audioKey);
+      return json(baseResponse(Object.assign({}, shared, { source: 'cache', coalesced: true })), 200);
+    }
+
+    var work = (async function () {
+      var bytes = null;
+      var failureKind = '';
+      try {
+        var result = await callEngine(env, engine.id, identity.canonicalText, TTS_TIMEOUT_MS);
+        bytes = toBytes(result);
+        if (!bytes || byteSize(bytes) < 512) failureKind = 'empty_body';
+      } catch (error) {
+        failureKind = Breaker.classify(signalFromError(error)) || 'unavailable';
+      }
+
+      if (failureKind) {
+        var failed = Breaker.onFailure(gate.state, failureKind, now(), 0);
+        if (store) await store.save(target, failed, now(), { changed: true, transition: true });
+        return {
+          audioKey: identity.audioKey, objectName: objectName, chars: chars,
+          source: 'unavailable', degraded: true,
+          breaker: Breaker.snapshot(failed, now()).breaker,
+          message: POLITE.unavailable, quotaCharged: quotaChecked, failed: true
+        };
+      }
+
+      // LANGKAH 6 — PUT IDEMPOTEN. HEAD diulang tepat sebelum menulis: kalau pra-render atau
+      // permintaan lain sudah menaruh objeknya, tulisan ini dilewati. Nama objek = hash seluruh
+      // input, jadi dua tulisan yang lolos pun menulis byte ke nama yang sama (R2 strong
+      // consistency per object) — duplikat mustahil secara struktural, bukan secara disiplin.
+      var again = await headObject(env, objectName);
+      if (!again && env.AUDIO && typeof env.AUDIO.put === 'function') {
+        try {
+          await env.AUDIO.put(objectName, bytes, {
+            httpMetadata: { contentType: 'audio/mpeg', cacheControl: 'public, max-age=31536000, immutable' },
+            customMetadata: {
+              keySchema: TtsKey.SCHEMA, engineId: engine.id,
+              engineVersion: identity.engineVersion, voiceId: identity.voiceId,
+              locale: identity.locale, chars: String(chars)
+            }
+          });
+        } catch (_) {
+          // Objek gagal ditulis: audionya tetap dikirim ke klien untuk sesi ini, tapi TIDAK
+          // dicatat sebagai ready. Mencatatnya akan membuat manifest berjanji sesuatu yang 404.
+          return {
+            audioKey: identity.audioKey, objectName: objectName, chars: chars,
+            source: 'provider', degraded: true, breaker: 'CLOSED',
+            bytes: byteSize(bytes), stored: false, quotaCharged: quotaChecked
+          };
+        }
+      }
+
+      var healthy = Breaker.onSuccess(gate.state, now());
+      if (store) await store.save(target, healthy, now(), { changed: gate.phase !== 'CLOSED' });
+
+      if (typeof deps.recordUsage === 'function' && a.ctx && typeof a.ctx.waitUntil === 'function') {
+        a.ctx.waitUntil(Promise.resolve(deps.recordUsage({
+          kind: 'tts', event: 'render', audioKey: identity.audioKey, engineId: engine.id,
+          chars: chars, bytes: byteSize(bytes),
+          costUsd: (chars / 1000) * engine.usdPer1kChars, ms: now() - started
+        })).catch(function () {}));
+      }
+
+      return {
+        audioKey: identity.audioKey, objectName: objectName, url: assetUrl(env, objectName),
+        source: 'provider', degraded: false, breaker: 'CLOSED',
+        bytes: byteSize(bytes), chars: chars, stored: true, quotaCharged: quotaChecked
+      };
+    }());
+
+    inFlight.set(identity.audioKey, work);
+    var out;
+    try { out = await work; } finally { inFlight.delete(identity.audioKey); }
+    return json(baseResponse(out), 200);
+  }
+
+  /**
+   * GET /api/tts/manifest — daftar kunci yang tersedia, ber-ETag.
+   *
+   * ETag dihitung dari isi daftar, bukan dari waktu: manifest yang tidak berubah harus dijawab
+   * 304 supaya klien yang membukanya tiap perpindahan halaman tidak membangkitkan biaya Class B
+   * (cf-a10 mencatat manifest `max-age=60` sebagai komponen R2 Class B pertama yang membengkak).
+   */
+  async function handleManifest(args) {
+    var a = args || {};
+    var env = a.env || {};
+    var deps = a.deps || {};
+    var url;
+    try { url = new URL(a.request.url); } catch (_) { url = { searchParams: { get: function () { return null; } } }; }
+    var domain = (url.searchParams && url.searchParams.get('domain')) || '';
+
+    var keys = [];
+    if (typeof deps.listKeys === 'function') {
+      keys = (await deps.listKeys(domain)) || [];
+    } else if (env.AUDIO && typeof env.AUDIO.list === 'function') {
+      try {
+        var listed = await env.AUDIO.list({ limit: 1000 });
+        keys = ((listed && listed.objects) || []).map(function (o) {
+          return { audioKey: String(o.key || '').replace(/\.mp3$/, ''), bytes: Number(o.size || 0) };
+        }).filter(function (e) { return /^[0-9a-f]{64}$/.test(e.audioKey); });
+      } catch (_) { keys = []; }
+    }
+
+    keys.sort(function (x, y) { return x.audioKey < y.audioKey ? -1 : x.audioKey > y.audioKey ? 1 : 0; });
+    var payload = {
+      schema: 'fiezel-tts-manifest-v2',
+      keySchema: TtsKey.SCHEMA,
+      domain: domain || 'all',
+      count: keys.length,
+      engineVersions: Object.keys(ENGINES).map(function (k) { return ENGINES[k].engineVersion; }),
+      keys: keys
+    };
+    var etag = '"' + TtsKey.sha256(TtsKey.SCHEMA + '|' + payload.domain + '|' + keys.map(function (k) { return k.audioKey; }).join(',')) + '"';
+    var inm = a.request.headers && typeof a.request.headers.get === 'function' ? a.request.headers.get('if-none-match') : null;
+    var headers = {
+      etag: etag,
+      'cache-control': 'public, max-age=300, stale-while-revalidate=86400',
+      'content-type': 'application/json; charset=utf-8'
+    };
+    if (inm && inm === etag) return new Response(null, { status: 304, headers: headers });
+    return new Response(JSON.stringify(payload), { status: 200, headers: headers });
+  }
+
+  function adapt(handler, deps) {
+    return function (first, second, third) {
+      if (first && first.req && first.env !== undefined) {
+        return handler({
+          request: first.req.raw || first.req,
+          env: first.env,
+          ctx: first.executionCtx || first.ctx || null,
+          deps: deps
+        });
+      }
+      return handler({ request: first, env: second || {}, ctx: third || null, deps: deps });
+    };
+  }
+
+  function registerTtsRoutes(router, deps) {
+    if (!router || typeof router.post !== 'function' || typeof router.get !== 'function') {
+      throw new Error('router_required');
+    }
+    router.post('/api/tts/render', adapt(handleRender, deps || {}));
+    router.get('/api/tts/manifest', adapt(handleManifest, deps || {}));
+    return router;
+  }
+
+  return Object.freeze({
+    ROUTES: Object.freeze({ render: '/api/tts/render', manifest: '/api/tts/manifest' }),
+    ENGINES: ENGINES,
+    DEFAULT_ENGINE: DEFAULT_ENGINE,
+    CHEAP_ENGINE: CHEAP_ENGINE,
+    TTS_TIMEOUT_MS: TTS_TIMEOUT_MS,
+    POLITE: POLITE,
+    registerTtsRoutes: registerTtsRoutes,
+    handleRender: handleRender,
+    handleManifest: handleManifest,
+    resolveEnforceQuota: resolveEnforceQuota
+  });
+}));

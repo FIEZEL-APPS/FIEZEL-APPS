@@ -137,3 +137,7 @@ jobs:
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
+          node tts-key-test.js
+          node ai-task-contract-test.js
+          node breaker-test.js
+          node prerender-dryrun-test.js
