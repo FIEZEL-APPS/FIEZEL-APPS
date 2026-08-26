@@ -13,45 +13,41 @@
       {
         "level": "A1",
         "passages": 50,
-        "meanWords": 58.1,
-        "meanFlesch": 38
+        "meanWords": 43.3,
+        "meanFlesch": 91.2
       },
       {
         "level": "A2",
         "passages": 50,
-        "meanWords": 58,
-        "meanFlesch": 32.5
+        "meanWords": 66.3,
+        "meanFlesch": 88.6
       },
       {
         "level": "B1",
         "passages": 50,
-        "meanWords": 58.1,
-        "meanFlesch": 29
+        "meanWords": 157.2,
+        "meanFlesch": 71.3
       },
       {
         "level": "B2",
         "passages": 50,
-        "meanWords": 58.1,
-        "meanFlesch": 32.4
+        "meanWords": 228.4,
+        "meanFlesch": 59
       },
       {
         "level": "C1",
         "passages": 50,
-        "meanWords": 58.2,
-        "meanFlesch": 35.1
+        "meanWords": 336.1,
+        "meanFlesch": 46.4
       },
       {
         "level": "C2",
         "passages": 50,
-        "meanWords": 60.9,
-        "meanFlesch": 43.3
+        "meanWords": 432.5,
+        "meanFlesch": 31.7
       }
     ],
-    "inversions": [
-      "B1->B2",
-      "B2->C1",
-      "C1->C2"
-    ],
+    "inversions": [],
     "ceiling": 3
   },
   "checks": [
@@ -280,11 +276,7 @@
       "name": "Legacy reading calibration does not get worse",
       "status": "PASS",
       "details": {
-        "inversions": [
-          "B1->B2",
-          "B2->C1",
-          "C1->C2"
-        ],
+        "inversions": [],
         "ceiling": 3,
         "note": "bank lama BELUM terkalibrasi; angka ini plafon regresi, bukan tanda sehat"
       }
@@ -296,38 +288,38 @@
         {
           "level": "A1",
           "passages": 50,
-          "meanWords": 58.1,
-          "meanFlesch": 38
+          "meanWords": 43.3,
+          "meanFlesch": 91.2
         },
         {
           "level": "A2",
           "passages": 50,
-          "meanWords": 58,
-          "meanFlesch": 32.5
+          "meanWords": 66.3,
+          "meanFlesch": 88.6
         },
         {
           "level": "B1",
           "passages": 50,
-          "meanWords": 58.1,
-          "meanFlesch": 29
+          "meanWords": 157.2,
+          "meanFlesch": 71.3
         },
         {
           "level": "B2",
           "passages": 50,
-          "meanWords": 58.1,
-          "meanFlesch": 32.4
+          "meanWords": 228.4,
+          "meanFlesch": 59
         },
         {
           "level": "C1",
           "passages": 50,
-          "meanWords": 58.2,
-          "meanFlesch": 35.1
+          "meanWords": 336.1,
+          "meanFlesch": 46.4
         },
         {
           "level": "C2",
           "passages": 50,
-          "meanWords": 60.9,
-          "meanFlesch": 43.3
+          "meanWords": 432.5,
+          "meanFlesch": 31.7
         }
       ]
     }
