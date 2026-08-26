@@ -145,7 +145,9 @@ button{
 }
 button:hover{transform:translateY(-1px);border-color:var(--surface-edge-strong);box-shadow:var(--shadow-sm)}
 button:active{transform:translateY(0) scale(.97);transition-duration:.08s}
-button:disabled{opacity:.42;cursor:not-allowed;transform:none;box-shadow:none}
+/* Disabled bukan lagi "teks yang sama, tapi pudar" (opacity .42 = 2,0:1, gagal AA).
+   Yang mati adalah PERMUKAANNYA: panel-soft + tinta --text-disabled 4,6:1. */
+button:disabled{background:var(--panel-soft);color:var(--text-disabled);border-color:var(--line);opacity:1;cursor:not-allowed;transform:none;box-shadow:none}
 /* m028: satu cincin fokus untuk seluruh aplikasi. Cincin lama rgba(184,69,47,.32)
    menghasilkan 1,4:1 terhadap cream - terlihat kalau dicari, tidak terlihat kalau dipakai.
    --focus-ring #A67A00 = 3,4:1 terhadap cream, di atas ambang 3:1 untuk komponen non-teks. */
@@ -200,16 +202,16 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 .status-pill{
   display:inline-flex;align-items:center;gap:6px;margin-top:14px;
-  font-size:.72rem;font-weight:700;color:var(--accent-strong);
+  font-size:12px;font-weight:700;color:var(--accent-strong);
   background:rgba(var(--surface-pure-rgb),.7);border:1px solid var(--surface-edge);
   padding:6px 12px;border-radius:999px;
 }
 
 .actions,.toolbar,.three{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.primary{background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep)}
-.primary:hover{background:var(--yellow-deep);box-shadow:0 10px 26px rgba(201,162,75,.28)}
-.danger{color:var(--red);border-color:#f3c3cf}
-.primary.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.primary{background:var(--sun);color:var(--text);border-color:var(--sun-deep)}
+.primary:hover{background:var(--sun-deep);box-shadow:var(--shadow-md)}
+.danger{color:var(--bad);border-color:var(--bad-soft)}
+.primary.danger{background:var(--bad);color:var(--on-core);border-color:var(--bad)}
 
 /* ---------- stats ---------- */
 .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
@@ -233,7 +235,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .library{display:flex;flex-wrap:wrap;gap:9px;color:var(--ink-soft);font-size:.78rem;margin-top:12px}
 .library span{background:var(--panel-soft);padding:6px 11px;border-radius:999px}
 
-.pill,.notice{display:inline-block;border:1px solid var(--surface-edge);border-radius:999px;padding:5px 11px;color:var(--accent-strong);background:var(--accent-soft);font-size:.7rem;font-weight:600}
+.pill,.notice{display:inline-block;border:1px solid var(--surface-edge);border-radius:999px;padding:5px 11px;color:var(--accent-strong);background:var(--accent-soft);font-size:12px;min-height:24px;font-weight:600}
 
 /* m025-85: Peta Belajar tab switcher - keeps the 17 sections that used to be one
    long scroll grouped and reachable without turning this into a separate route. */
@@ -250,14 +252,21 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .question{font-size:1.35rem;line-height:1.34;margin:8px 0 18px;font-weight:700;letter-spacing:-.01em}
 .options{display:grid;gap:9px}
 .option{
-  text-align:left;background:var(--surface-tint);padding:15px 16px;border-radius:15px;
+  text-align:left;background:var(--panel);border:1.5px solid var(--line);
+  min-height:52px;padding:15px 16px;border-radius:var(--radius-md);
   position:relative;transition:transform var(--dur-s) var(--ease-spring),
   background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease),
   box-shadow var(--dur-s) var(--ease);
 }
-.option:not(:disabled):hover{background:var(--surface-solid);border-color:var(--surface-edge-strong)}
-.option.correct{border-color:var(--green);background:var(--green-soft);animation:pop .32s var(--ease-spring)}
-.option.wrong{border-color:var(--red);background:var(--red-soft);animation:shake .32s var(--ease)}
+.option:not(:disabled):hover{background:var(--panel-soft);border-color:var(--sun-deep)}
+.option.correct{border-color:var(--good-bright);background:var(--good-soft);animation:pop .32s var(--ease-spring)}
+.option.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .32s var(--ease)}
+/* Mode review mematikan tombol pilihan. Resep disabled global mengubah permukaan +
+   tinta - untuk pilihan jawaban itu SALAH: jawabannya masih harus dibaca. Di sini
+   disabled hanya melepas interaksi, warna state benar/salah tetap. */
+.option:disabled{background:var(--panel);color:var(--text);border-color:var(--line);opacity:1;cursor:default}
+.option.correct:disabled{border-color:var(--good-bright);background:var(--good-soft)}
+.option.wrong:disabled{border-color:var(--bad);background:var(--bad-soft)}
 .feedback{
   margin-top:14px;padding:18px;border:1px solid var(--line);border-radius:18px;
   background:var(--surface-cool);line-height:1.6;font-size:.87rem;
@@ -299,8 +308,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .answer-burst-icon{width:54px;height:54px;display:grid;place-items:center;border-radius:17px;margin-bottom:3px}.answer-burst-icon svg{width:30px;height:30px}
 .answer-burst strong{font-size:1.24rem;letter-spacing:-.02em}.answer-burst small{color:var(--muted);font-size:.76rem;text-align:center}
-.answer-burst.success .answer-burst-icon{color:var(--green);background:var(--green-soft)}
-.answer-burst.error .answer-burst-icon{color:var(--red);background:var(--red-soft)}
+.answer-burst.success .answer-burst-icon{color:var(--good);background:var(--good-soft)}
+.answer-burst.error .answer-burst-icon{color:var(--bad);background:var(--bad-soft)}
 
 /* ---------- bottom nav ---------- */
 .bottomnav{
@@ -339,7 +348,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .flash-face hr{width:100%;border:0;border-top:1px solid var(--line);margin:16px 0}
 .flash-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
 .swipe-hint{text-align:center;color:var(--muted-soft);font-size:.74rem;margin:10px 0 2px}
-.flashcard:focus-visible{box-shadow:0 0 0 3px rgba(184,69,47,.25)}
+.flashcard:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;box-shadow:none}
 
 .three{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
 
@@ -352,7 +361,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-progress{text-align:center;font-weight:800}
 .quiz-progress span{font-size:1.1rem}
 .quiz-progress em{font-style:normal;color:var(--muted-soft)}
-.quiz-next{justify-self:end;background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep);min-width:92px}
+.quiz-next{justify-self:end;background:var(--sun);color:var(--text);border-color:var(--sun-deep);min-width:92px}
 /* m028: keadaan nonaktif dulu memakai opacity global .42 di atas permukaan redup - hasilnya
    teks 2,4:1, tidak terbaca. Sekarang keadaan nonaktif punya warnanya sendiri (4,8:1):
    tetap jelas terbaca sebagai TIDAK BISA DIKLIK, tanpa menghilang. */
@@ -453,13 +462,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   display:flex;align-items:center;justify-content:center;gap:9px;
   width:100%;min-height:52px;padding:0 20px;
   border:0;border-radius:999px;
-  background:var(--yellow);color:var(--ink);
-  font-family:var(--fz-body);font-size:.96rem;font-weight:650;letter-spacing:-.01em;
-  box-shadow:0 10px 26px rgba(184,69,47,.24);
+  background:var(--sun);color:var(--text);
+  font-family:var(--fz-body);font-size:.96rem;font-weight:600;letter-spacing:-.01em;
+  box-shadow:0 10px 26px rgba(36,26,17,.14);
 }
-.auth-gate .auth-primary:hover{background:var(--yellow-deep);border-color:transparent;box-shadow:0 14px 32px rgba(201,162,75,.32)}
+.auth-gate .auth-primary:hover{background:var(--sun-deep);border-color:transparent;box-shadow:var(--shadow-md)}
 .auth-gate .auth-primary svg{width:19px;height:19px}
-.auth-gate .auth-primary[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+.auth-gate .auth-primary[disabled]{background:var(--panel-soft);color:var(--text-disabled);opacity:1;cursor:not-allowed;transform:none;box-shadow:none}
 .auth-gate .auth-help{margin:18px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55}
 .auth-gate .auth-legal{margin:14px 0 0;color:var(--muted-soft);font-size:.68rem;line-height:1.5}
 @media (max-width:420px){.auth-gate .auth-panel{padding:36px 24px 30px;border-radius:22px}.auth-gate .auth-mark{width:60px;height:60px;margin-bottom:20px}}
@@ -537,8 +546,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 }
 .confidence-verdict{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
 .confidence-verdict svg{width:20px;height:20px;flex:none}
-.confidence-verdict.is-ok{color:var(--green,#2E8B69)}
-.confidence-verdict.is-no{color:var(--accent-strong)}
+.confidence-verdict.is-ok{color:var(--good)}
+.confidence-verdict.is-no{color:var(--bad)}
 .confidence-q{margin:0 0 9px;font-size:.88rem;font-weight:700;color:var(--text)}
 
 .confidence-scale{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
@@ -546,14 +555,14 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   flex-direction:column;gap:2px;min-height:62px;padding:9px 4px;
   font-size:.7rem;font-weight:700;line-height:1.25;text-align:center;border-radius:15px;
 }
-.confidence-scale button span{font-size:1.15rem;font-weight:850;line-height:1;font-variant-numeric:tabular-nums}
+.confidence-scale button span{font-size:1.15rem;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
 /* Tiga tingkat, tiga warna - supaya terbaca sebagai SKALA, bukan tiga tombol yang
    kebetulan bersebelahan. */
-.confidence-scale button:nth-child(1){background:var(--coral-soft)}
-.confidence-scale button:nth-child(2){background:var(--yellow-soft)}
+.confidence-scale button:nth-child(1){background:var(--bad-soft)}
+.confidence-scale button:nth-child(2){background:var(--sun-soft)}
 /* Tinta tombol ketiga dipasang EKSPLISIT. --yellow beku di kedua tema, sementara tinta
    yang diwarisi ikut berbalik jadi krem di mode gelap - krem di atas kuning. */
-.confidence-scale button:nth-child(3){background:var(--yellow);color:var(--ink)}
+.confidence-scale button:nth-child(3){background:var(--sun);color:var(--text)}
 
 .confidence-skip{
   display:block;width:100%;margin-top:10px;min-height:0;padding:6px;
@@ -564,7 +573,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 .confidence-saved{
   display:flex;align-items:center;gap:6px;margin:0 0 12px;
-  font-size:.86rem;font-weight:700;color:var(--green,#2E8B69);
+  font-size:.86rem;font-weight:700;color:var(--good);
 }
 .confidence-saved svg{width:16px;height:16px}
 .confidence-go{width:100%;min-height:54px;font-size:1rem;font-weight:800}
@@ -679,6 +688,14 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --text-disabled:#75654C;
   --ink-hover:#3A2B1C;
   --ink-press:#120C07;
+  /* Fase 2: tiga token yang dipakai komponen fase ini tetapi belum ada di Fase 1.
+     --bad-bright = kembaran terang --bad (nilainya sama dengan --red sekarang) untuk
+     GARIS/bidang, bukan teks kecil. --scrim* = backdrop modal turunan --text; sebelum
+     ini backdrop dialog memakai rgba(var(--bg-rgb),.82) alias kabut TERANG di atas
+     layar terang - panelnya tidak pernah benar-benar terangkat dari latarnya. */
+  --bad-bright:#B8432D;
+  --scrim:rgba(36,26,17,.45);
+  --scrim-soft:rgba(36,26,17,.28);
   /* m025-85 kontras: sebelum ini puluhan permukaan memaku warnanya sendiri (#fff,
      rgba(255,254,250,.9), #f6f4ed, ...) sementara TEKS di atasnya memakai var(--text).
      Di mode gelap teksnya jadi #fdf4f6 di atas putih - 1,08:1, tidak terbaca sama sekali,
@@ -753,8 +770,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .section-kicker{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:850;margin-bottom:6px}
 .section-head{padding:10px 0 4px;margin-bottom:18px}.section-head h1{font-size:clamp(1.75rem,4vw,2.4rem)}
 .card{background:rgba(var(--surface-rgb),.93);box-shadow:var(--shadow-sm)}
-.primary{background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep)}
-.primary:hover{background:var(--yellow-deep);border-color:var(--yellow-deep)}
+.primary{background:var(--sun);color:var(--text);border-color:var(--sun-deep)}
+.primary:hover{background:var(--sun-deep);border-color:var(--sun-deep)}
 
 /* Premium Home Launcher */
 .home-page{display:grid;gap:26px}
@@ -829,7 +846,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .endpoint-label{display:grid;gap:7px;margin:16px 0 12px;font-size:.72rem;font-weight:750;color:var(--muted)}
 .setup-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:var(--accent-strong);font-size:.74rem;font-weight:750;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
 .endpoint-label input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font:inherit;color:var(--text)}
-.endpoint-label input:focus{outline:3px solid rgba(184,69,47,.18);border-color:var(--accent)}
+.endpoint-label input:focus{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
 .report-state{font-size:.7rem!important;margin:13px 0 0!important;padding-top:11px;border-top:1px solid var(--line)}
 .report-preview{text-align:left;display:grid;gap:0;margin:18px 0;padding:15px 18px;background:var(--surface-warm);border:1px solid var(--line);border-radius:16px}.report-preview p{margin:5px 0;font-size:.8rem}
@@ -847,10 +864,12 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .bottomnav{width:min(620px,calc(100% - 24px));padding:7px;border-color:rgba(223,221,214,.82);background:rgba(var(--surface-rgb),.88);box-shadow:0 20px 50px rgba(17,23,42,.13);color:var(--text)}
 .nav{display:flex;flex-direction:column;gap:3px;min-height:54px}.nav svg{width:18px;height:18px}.nav.active{color:var(--accent-strong);background:var(--accent-soft)}
 .topline button,.toolbar button,.flash-actions button,.quiz-topbar button{display:inline-flex;align-items:center;gap:7px}
-.feedback{background:rgba(var(--surface-rgb),.96);color:var(--text)}
-.feedback.feedback-success{border-color:rgba(39,130,104,.38);box-shadow:inset 4px 0 0 var(--green)}
-.feedback.feedback-error{border-color:rgba(189,79,99,.38);box-shadow:inset 4px 0 0 var(--red)}
-.feedback-title{display:flex;align-items:center;gap:9px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--green)}.feedback-error .feedback-title{color:var(--red)}
+.feedback{background:var(--panel);color:var(--text)}
+/* Aksen kiri 4px dipasang lewat box-shadow inset, BUKAN border-left: border akan
+   menggeser padding dan membuat teks banner melompat saat state berubah. */
+.feedback.feedback-success{border-color:var(--line);box-shadow:inset 4px 0 0 var(--good)}
+.feedback.feedback-error{border-color:var(--line);box-shadow:inset 4px 0 0 var(--bad)}
+.feedback-title{display:flex;align-items:center;gap:9px}.feedback-title svg{width:21px;height:21px}.feedback-success .feedback-title{color:var(--good)}.feedback-error .feedback-title{color:var(--bad)}
 .grammar-grid .card{display:grid;gap:10px}.lesson-card-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}.lesson-card-foot>span{font-size:.72rem;color:var(--muted)}
 .lesson-title{font-size:1.55rem;margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
 .lesson-example{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:17px;background:var(--surface-warm)}.lesson-example>span{font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);font-weight:800}.lesson-example h3{margin:7px 0 8px;font-size:1rem;line-height:1.5}.lesson-example p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
@@ -925,8 +944,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .classroom-id{color:var(--accent,#C2402C);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
 .classroom-options{display:grid;gap:9px}
 .classroom-option{text-align:left;padding:14px;border-radius:14px;min-height:48px}
-.classroom-option.is-correct{border-color:var(--green,#1f9d6f);background:var(--green-soft,#e7f8f1)}
-.classroom-option.is-wrong{border-color:var(--red,#e0526f);background:var(--red-soft,#fdeef1)}
+.classroom-option.is-correct{border-color:var(--good-bright);background:var(--good-soft)}
+.classroom-option.is-wrong{border-color:var(--bad);background:var(--bad-soft)}
 .classroom-actions{display:flex;flex-wrap:wrap;gap:9px}
 .classroom-actions button{min-height:46px;padding:0 16px;border-radius:14px}
 
@@ -1041,7 +1060,7 @@ button.primary,.primary.wide,.primary.luxe{
   font-size:17px;font-weight:620;letter-spacing:-.2px;
   box-shadow:0 8px 22px rgba(184,69,47,.30);
 }
-button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
+button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--text)}
 
 .launcher-shell{border-radius:26px}
 .coach-preview{border-radius:22px}
@@ -1186,8 +1205,10 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .journey-skill b{font-size:.78rem}.journey-skill span{color:var(--muted);font-size:.72rem}
 .journey-skill.is-unmeasured span{font-style:italic}
 .journey-goal-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:.74rem}
-.journey-goal-chip.is-active{border-color:var(--accent);color:var(--accent)}
+.journey-goal-chip{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--text);font-size:12px;min-height:36px}
+/* Chip terpilih = BIDANG kuning + tinta gelap, bukan garis+teks aksen: satu-satunya
+   penanda "terpilih" sebelum ini adalah warna garis 1px - hampir tak terlihat. */
+.journey-goal-chip.is-active{background:var(--sun);border-color:var(--sun-deep);color:var(--text);font-weight:600}
 @media(max-width:760px){.journey-panel{grid-template-columns:1fr}.journey-skills{grid-template-columns:repeat(2,1fr)}.journey-skill{border-bottom:1px solid var(--line)}}
 .journey-skill small{color:var(--muted);font-size:.66rem;letter-spacing:.01em}
 .readiness-block{margin-bottom:14px}
@@ -1424,7 +1445,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   font-size:14px;font-weight:600;width:100%}
 /* Nonaktif punya warnanya sendiri, bukan opacity .4 yang menyeret teks ke 2,3:1. Tombol
    yang belum bisa ditekan tetap harus BISA DIBACA - itu yang menjelaskan apa syaratnya. */
-.fiezel-btn[disabled]{background:var(--fz-soft);color:#75654C;box-shadow:none;
+.fiezel-btn[disabled]{background:var(--fz-soft);color:var(--text-disabled);box-shadow:none;
   transform:none;pointer-events:none}
 
 /* m025-117 Step 1: kolom nama murid. Tinggi sentuh 48px (di atas ambang 44px yang dijaga
@@ -2160,18 +2181,21 @@ button:active {
    3px dan bayangannya ikut memendek, persis seperti benda yang ditekan.
    -------------------------------------------------------------------------- */
 button.primary,.primary.wide,.primary.luxe,html.fiezel-ui-v6 body .primary{
-  background:var(--yellow);color:var(--ink);border:0;border-radius:18px;
+  background:var(--sun);color:var(--text);border:0;border-radius:18px;
   font-weight:700;letter-spacing:-.01em;
-  box-shadow:0 4px 0 var(--yellow-deep),0 10px 22px rgba(36,26,17,.13);
+  box-shadow:0 4px 0 var(--sun-deep),0 10px 22px rgba(36,26,17,.13);
   transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease);
 }
-button.primary:hover,.primary.luxe:hover,html.fiezel-ui-v6 body .primary:hover{background:#FFE896;color:var(--ink)}
+/* Hover MENGGELAP, bukan menerang: #FFE896 lebih terang dari --sun sehingga tombol
+   terasa "menghilang" saat disentuh. Resep components.css §1: sun -> sun-deep. */
+button.primary:hover,.primary.luxe:hover,html.fiezel-ui-v6 body .primary:hover{background:var(--sun-deep);color:var(--text)}
 button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:active{
-  transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep),0 4px 10px rgba(36,26,17,.12)}
-/* Aksi kedua: bidang koral pastel, bukan garis tipis yang nyaris tak terlihat. */
-.primary.is-coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep),0 10px 22px rgba(36,26,17,.13)}
-.primary.is-coral:hover{background:#F7B0A3}
-.primary.is-coral:active{box-shadow:0 1px 0 var(--coral-deep),0 4px 10px rgba(36,26,17,.12)}
+  transform:translateY(3px);box-shadow:0 1px 0 var(--sun-deep),0 4px 10px rgba(36,26,17,.12)}
+/* Aksi kedua. Koral dipensiunkan sebagai permukaan tombol (kontras tinta gagal);
+   varian ini dipetakan ke keluarga TINTA - bidang --text, teks krem, >=10:1. */
+.primary.is-coral{background:var(--text);color:var(--on-core);border-color:var(--text);box-shadow:0 4px 0 var(--ink-press),0 10px 22px rgba(36,26,17,.13)}
+.primary.is-coral:hover{background:var(--ink-hover);color:var(--on-core)}
+.primary.is-coral:active{box-shadow:0 1px 0 var(--ink-press),0 4px 10px rgba(36,26,17,.12)}
 
 /* Tombol biasa ikut punya tebal, hanya lebih tenang. */
 html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card){
@@ -2302,9 +2326,9 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   opacity:0;animation:fzCoachBreath 3.4s var(--ease) infinite}
 @keyframes fzCoachBreath{0%{transform:scale(.94);opacity:.55}70%{transform:scale(1.16);opacity:0}100%{opacity:0}}
 .fz-coach-dot{
-  position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;
-  background:var(--coral);border:2px solid var(--cream);
-  display:grid;place-items:center;font-size:.55rem;font-weight:800;color:var(--ink)}
+  position:absolute;top:-3px;right:-3px;width:20px;height:20px;border-radius:50%;
+  background:var(--bad);border:2px solid var(--bg);
+  display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--on-core)}
 .fz-coach-bubble[hidden]{display:none}
 
 /* Sapaan singkat yang muncul sendiri di samping gelembung. Ia menghilang sendiri;
@@ -2338,11 +2362,11 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .fz-coach-log{flex:1;overflow-y:auto;display:grid;gap:10px;padding:14px 2px;align-content:start}
 .fz-coach-msg{max-width:88%;padding:10px 13px;font-size:.84rem;line-height:1.55;border-radius:16px}
 .fz-coach-msg.is-coach{justify-self:start;border-radius:16px 16px 16px 4px;background:var(--yellow-soft);border:1px solid var(--surface-edge)}
-.fz-coach-msg.is-user{justify-self:end;border-radius:16px 16px 4px 16px;background:var(--coral-soft);border:1px solid var(--surface-edge)}
+.fz-coach-msg.is-user{justify-self:end;border-radius:16px 16px 4px 16px;background:var(--panel-soft);border:1px solid var(--surface-edge)}
 .fz-coach-msg p{margin:0 0 6px}.fz-coach-msg p:last-child{margin:0}
 .fz-coach-chips{display:flex;flex-wrap:wrap;gap:7px;padding:2px 0 10px}
 .fz-coach-chip{
-  min-height:36px;padding:7px 12px;border-radius:999px;font-size:.76rem;font-weight:650;cursor:pointer;
+  min-height:36px;padding:7px 12px;border-radius:999px;font-size:.76rem;font-weight:600;cursor:pointer;
   border:1.5px solid var(--surface-edge);background:var(--panel-soft);color:var(--text)}
 .fz-coach-chip:active{transform:translateY(1px)}
 .fz-coach-form{display:flex;gap:8px;align-items:flex-end}
@@ -2390,9 +2414,9 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    "badge streak yang terasa didapat"). Ikon api ikut ukuran teksnya, bukan sebaliknya. */
 .home-stats .streak-badge{
   display:inline-flex;align-items:center;gap:6px;margin-top:4px;padding:4px 10px 4px 7px;
-  border-radius:999px;background:var(--coral-soft);border:1.5px solid var(--coral);
+  border-radius:999px;background:var(--sun-soft);border:1.5px solid var(--sun-deep);
   font-size:1rem;line-height:1.2}
-.home-stats .streak-badge .fz-i{width:17px;height:17px;--fz-i-fill:var(--coral);--fz-i-line:var(--ink)}
+.home-stats .streak-badge .fz-i{width:17px;height:17px;--fz-i-fill:var(--sun);--fz-i-line:var(--ink)}
 
 /* m025-118 giliran bicara tutor.
    Sengaja BUKAN memakai gaya .feedback: keduanya berbeda peran dan tidak boleh terlihat
@@ -2415,7 +2439,7 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    murid yang sedang bingung, jadi ia tidak boleh jadi target yang sulit dikenai. */
 .tutor-stuck{min-height:44px;padding:10px 16px;border-radius:12px;font-size:.86rem;
   background:transparent;border:1px solid var(--line);color:var(--muted)}
-.tutor-stuck:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tutor-stuck:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 .tutor-report{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 0 0;
   font-size:.9rem;line-height:1.55;color:var(--ink)}
 .tutor-report svg{width:16px;height:16px;flex:0 0 auto}
@@ -2717,9 +2741,10 @@ html.fiezel-ui-v6 .nav.active::after{
 }
 .hero-stat small{font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;font-weight:750;color:var(--muted)}
 .hero-stat svg{width:15px;height:15px}
-.hero-stat.is-streak{background:var(--coral-soft)}
-.hero-stat.is-streak svg{color:var(--coral-deep)}
-.hero-stat.is-level{background:var(--yellow)}
+.hero-stat.is-streak{background:var(--sun-soft)}
+/* Ikon kecil butuh >=3:1. --sun-deep hanya 1,9:1 di atas sun-soft, jadi tintanya --info. */
+.hero-stat.is-streak svg{color:var(--info)}
+.hero-stat.is-level{background:var(--sun)}
 
 /* Cincin harian. Sudut conic dihitung dari --v (0-100), jadi satu variabel saja yang
    berpindah dari data ke bentuk - tidak ada perhitungan derajat yang tersebar di JS. */
@@ -2900,7 +2925,8 @@ html.fiezel-ui-v6 .launcher-shell{
 /* m025-137: lesson yang prasyaratnya belum tuntas. Kartunya sengaja tetap terbaca -
    murid perlu melihat apa yang menunggunya di depan, bukan menemukan daftar yang kosong. */
 .card.lesson-locked{opacity:.72}
-.card.lesson-locked .lesson-card-foot button[disabled]{cursor:not-allowed;opacity:.65}
+/* warna sudah datang dari resep button:disabled; opacity dilepas supaya tidak dobel-pudar */
+.card.lesson-locked .lesson-card-foot button[disabled]{cursor:not-allowed;opacity:1}
 .lesson-lock-note{display:flex;gap:7px;align-items:flex-start;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:var(--muted,#746958)}
 .lesson-lock-note i{flex:none;width:14px;height:14px;margin-top:2px}
 /* m025-138: kontrak ujian dan rubrik Writing. Batas kata sengaja dibuat menonjol -
