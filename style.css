@@ -2140,6 +2140,9 @@ button:active {
 .journey-skills{margin:0}
 .home-fold{margin:0}
 .home-fold>summary{font-weight:600}
+/* Footer aksi Pengaturan ikut material kaca yang sama dengan panelnya. */
+.modal-actions.settings-actions{border-top-color:var(--glass-line)}
+.settings-fold{background:var(--glass-thick);color:var(--glass-text)}
 
 /* 5. Kepala bagian: satu bentuk untuk semuanya - judul serif, tautan tenang di kanan. */
 .home-section-head{margin:18px 0 0;align-items:baseline}
@@ -3127,6 +3130,38 @@ html.fiezel-ui-v6 .launcher-shell{
    Di dua ukuran itu kebulatan Fredoka terbaca sebagai kehangatan; di ukuran UI
    ia hanya jadi kabur.
    ========================================================================== */
+/* m028-06 (R4 Pengaturan) — kelompok setting yang bisa dilipat + footer aksi sticky.
+   Panel Pengaturan dulu 3.362 px dalam jendela 743 px: ±4,5 layar untuk sampai ke tombol
+   Simpan. Pembungkusnya numpang .home-fold (satu bahasa visual dengan Home) dan hanya
+   menambahkan padding isi; tinggi awal keadaan tertutup turun ke bawah 900 px. */
+.settings-fold{margin:8px 0 0;text-align:left}
+.settings-fold>summary{font-size:.9rem}
+.settings-fold-body{padding:12px 14px 14px}
+.settings-fold-body>.settings-list{margin-top:0}
+.settings-fold-body>.card:first-child,.settings-fold-body>.report-settings:first-child{margin-top:0}
+/* Kepala panel dibuat sekecil mungkin: judul modal utilitas tidak perlu setinggi judul
+   halaman konten, dan setiap piksel di sini adalah piksel yang tidak dipakai setting. */
+.settings-head{margin-bottom:2px}
+.settings-head h2{font-size:1.35rem;margin:6px 0 4px}
+.settings-head p{font-size:.82rem;line-height:1.45}
+/* Isi kelompok dirapatkan - microcopy panjang (§3 reports/ui-baseline.md) yang paling
+   banyak memakan tinggi, bukan kontrolnya. Ukuran sentuh 44px tidak ikut dikecilkan. */
+.settings-fold-body .card,.settings-fold-body .report-settings{padding:14px}
+.settings-fold-body p.muted{font-size:.78rem;line-height:1.45;margin:4px 0}
+.settings-fold-body .account-card .actions{display:flex;gap:8px}
+.settings-fold-body .account-card .actions button{flex:1;min-width:0}
+.settings-fold-body>.settings-list{gap:0}
+.settings-subfold{margin:10px 0 0;background:var(--panel-soft)}
+.settings-subfold>summary{font-size:.84rem}
+.settings-subfold .card{border:0;padding:0;background:transparent}
+/* Aksi utama tidak boleh ikut tergulung: ia menempel di dasar panel yang bisa di-scroll.
+   Latar dan garisnya diambil dari token tema yang sama dengan panelnya, bukan literal
+   terang - kalau dipaku, teks tombol ikut hilang persis seperti akar bug m025-85. */
+.modal-actions.settings-actions{position:sticky;bottom:0;z-index:3;margin:18px -26px -32px;padding:14px 26px calc(14px + env(safe-area-inset-bottom,0px));background:var(--glass-solid,var(--panel));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+@media(max-width:520px){
+  .modal-actions.settings-actions{bottom:0;margin:16px -20px -26px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px))}
+}
+
 .word,
 .lesson-title{
   font-family:var(--fz-display-round);
