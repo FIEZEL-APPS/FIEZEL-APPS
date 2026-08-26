@@ -32,6 +32,32 @@
       +'<span class="fsl-replays" data-replays>Belum diputar</span></div>';
   }
 
+  /* ---- Gem Terjemahan (reports/recon-listening-gems.md Bagian B) ---------------------
+   *
+   * Aturan ekonominya TIDAK ditulis di sini. Ia hidup di features/speaking-listening/gems-core.js
+   * sebagai fungsi murni supaya gems-test.js bisa mengujinya tanpa DOM, dan supaya app.js
+   * (pemegang state kanonik) memakai aturan yang sama persis. Addon hanya menyumbang dua hal
+   * yang memang miliknya: penghitung runtun PER SESI dan tempat baris terjemahan dirender.
+   *
+   * Ketiadaan modul bukan galat: kalau FiezelGems belum termuat, hadiah tidak diberikan dan
+   * toggle tidak pernah aktif. Sesi latihan tetap jalan penuh - fitur uang tidak boleh bisa
+   * mematikan fitur belajar.
+   */
+  // `global` di pembungkus UMD ini adalah `self` di peramban, tetapi di Node ia jatuh ke
+  // `this` alias module.exports - bukan lingkup global. Tanpa penyelesai ini, gerbang
+  // gems-test.js akan lolos secara palsu: gemsApi() selalu null, jadi tidak ada satu pun
+  // aturan ekonomi yang benar-benar dijalankan. Lingkup nyata dicari eksplisit.
+  function hostScope(){
+    if(global&&(global.FiezelGems||global.FiezelSubtitleTranslate))return global;
+    if(typeof globalThis!=='undefined')return globalThis;
+    if(typeof self!=='undefined')return self;
+    return global||{};
+  }
+  function gemsApi(){try{return hostScope().FiezelGems||null}catch(_){return null}}
+  function gemsRules(){const g=gemsApi();return g?g.GEMS_RULES:{streakTarget:5,perAward:2,maxAwardsPerSession:2,translationCost:1}}
+  function gemsCopy(){const g=gemsApi();return g?g.GEMS_COPY:null}
+  function gemsAwardFor(streak,awards){const g=gemsApi();try{return g&&typeof g.gemsAward==='function'?g.gemsAward(streak,awards):0}catch(_){return 0}}
+
   const ADDON_SCHEMA='fiezel-speaking-listening-addon-v1';
   const STATE_SCHEMA='fiezel-speaking-listening-state-v1';
   const EVIDENCE_SCHEMA='fiezel-speaking-listening-evidence-v1';
@@ -328,13 +354,17 @@
   function mergeConfig(input){const cfg={...DEFAULT_CONFIG,...(global.FIEZEL_SPEAKING_LISTENING_CONFIG||{}),...(input||{})};cfg.persistRawAudio=false;cfg.persistRawTranscript=false;cfg.aggregateEventLimit=Math.max(20,Math.min(300,Number(cfg.aggregateEventLimit)||120));return cfg}
 
   class Controller{
-    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}
+    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';this.resetGemSession()}
+    /* Runtun sesi & status toggle adalah milik SESI, bukan milik penyimpanan. Sengaja tidak
+       ikut StateStore: runtun yang selamat dari reload adalah celah farming (rekon §A.3). */
+    resetGemSession(){this.sessionStreak=0;this.sessionAwards=0;this.translationOn=false;this.translationCharged=false;this.answeredItemId='';return this}
+    gemsBalance(){try{const n=Number(this.options.gems?.balance?.());return Number.isFinite(n)&&n>0?Math.floor(n):0}catch(_){return 0}}
     async init(){await this.repo.load();return this}
     mount(root){this.root=root||this.root;if(!this.root)throw new Error('mount_root_required');this.renderHub();return this}
     readActiveLevel(){let candidate;try{candidate=this.levelContract.getter?this.levelContract.getter():null}catch{}const next=normalizeLevel(candidate);if(next&&next!==this.activeLevel){this.activeLevel=next;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}this.level=this.activeLevel;return this.activeLevel}
     setActiveLevel(level,options={}){const next=normalizeLevel(level);if(!next)throw new Error('invalid_level');this.activeLevel=next;this.level=next;this.levelContract.level=next;this.levelContract.external=true;this.levelContract.getter=null;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';if(options.render!==false&&this.root)this.renderHub();return this.activeLevel}
     getActiveLevel(){return this.readActiveLevel()}
-    open(domain,level){if(!['listening','speaking','speaking_exam','listening_exam'].includes(domain))throw new Error('invalid_domain');this.domain=domain;const active=this.readActiveLevel();const requested=this.levelContract.external?active:(normalizeLevel(level)||active);this.activeLevel=requested;this.level=requested;this.items=domain==='speaking_exam'?this.repo.examFor(requested):domain==='listening_exam'?this.repo.listeningExamFor(requested):this.repo.for(domain,requested);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.renderSession();return this}
+    open(domain,level){if(!['listening','speaking','speaking_exam','listening_exam'].includes(domain))throw new Error('invalid_domain');this.domain=domain;const active=this.readActiveLevel();const requested=this.levelContract.external?active:(normalizeLevel(level)||active);this.activeLevel=requested;this.level=requested;this.items=domain==='speaking_exam'?this.repo.examFor(requested):domain==='listening_exam'?this.repo.listeningExamFor(requested):this.repo.for(domain,requested);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.resetGemSession();this.renderSession();return this}
     /* m026-02: satu kait "sesi dengar sudah selesai" untuk app.js. Ia dipanggil di DUA
        tempat saja - exit() dan renderComplete() - karena hanya itu dua cara sebuah sesi
        berakhir. Pemberitahuan apa pun yang menunggu (mis. kredit Puter habis) ditampilkan
@@ -349,9 +379,100 @@
     renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
     current(){return this.items[this.index]||null}
     renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
-    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p>${slPlayerMarkup()}<div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
+    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span>${this.gemBarMarkup()}<h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p>${slPlayerMarkup()}<div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
       this.root.querySelector('[data-play]').addEventListener('click',async event=>{if(this.replays>=Number(item.maxReplays||this.config.maxListeningReplays)){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}const button=event.currentTarget;button.disabled=true;this.replays++;try{const result=await Promise.race([this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),35000))]);this.root.querySelector('[data-work]').disabled=false;this.store.noteCapability('tts',String(result?.provider||'ok'));/* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;this.setFeedback(`Audio siap · replay ${this.replays}/${Number(item.maxReplays||this.config.maxListeningReplays)}.`)}catch{this.store.noteCapability('tts','unavailable');this.setFeedback('Audio tidak tersedia. Item listening ini tetap terkunci dan tidak dinilai.')}finally{button.disabled=false}});this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
-      if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))))
+      if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))));
+      this.bindGemBar(item);
+    }
+
+    /* ---- Gem Terjemahan: chip saldo + toggle -----------------------------------------
+     *
+     * Chip dan toggle duduk di HEADER kartu sesi, bukan di pojok layar: murid harus melihat
+     * harga di tempat yang sama dengan barangnya. Chip tetap tampil saat saldo 0 - kemajuan
+     * menuju hadiah ("Runtun 3/5") justru paling berguna ketika belum punya gem.
+     *
+     * #fslTranslateToggle adalah id KONTRAK BERSAMA (dipakai tur fitur & tes browser).
+     * Jangan diganti tanpa memperbarui gems-test.js dan tur.
+     */
+    gemBarMarkup(){
+      const g=gemsApi();if(!g)return '';
+      const balance=this.gemsBalance(),rules=gemsRules(),copy=g.GEMS_COPY;
+      const on=!!this.translationOn;
+      return `<div class="fsl-gem-bar">`
+        +`<span class="fsl-gem-chip" id="fslGemChip" data-gem-chip role="status" aria-label="${esc(g.chipAria(balance))}"><svg class="fsl-gem-mark" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10l4 6-9 10L3 10z"/><path d="M3 10h18"/><path d="M12 4 8 10l4 10 4-10z"/></svg><b data-gem-count>${esc(g.chipLabel(balance))}</b><small data-gem-streak>${esc(g.streakLabel(this.sessionStreak,this.sessionAwards,rules))}</small></span>`
+        +`<button type="button" class="fsl-gem-toggle" id="fslTranslateToggle" data-translate-toggle aria-pressed="${String(on)}"><span class="fsl-gem-toggle-label">${esc(copy.toggleLabel)}</span><small data-gem-price>${esc(g.priceHint(balance))}</small></button>`
+        +`<div class="fsl-gem-empty" data-gem-empty hidden><b>${esc(copy.emptyTitle)}</b><p>${esc(copy.emptyBody)}</p></div>`
+        +`</div>`;
+    }
+    bindGemBar(item){
+      const toggle=this.root?.querySelector?.('[data-translate-toggle]');
+      if(!toggle)return;
+      toggle.addEventListener('click',()=>{
+        if(this.translationOn){
+          // Mematikan tidak mengembalikan gem yang SUDAH terpakai, dan tidak menagih lagi
+          // kalau dinyalakan ulang di sesi yang sama. Satu sesi = maksimal satu tagihan.
+          this.translationOn=false;this.hideTranslationLine();this.syncGemBar();return;
+        }
+        const cost=Math.max(1,Number(gemsRules().translationCost)||1);
+        if(!this.translationCharged&&this.gemsBalance()<cost){this.showGemEmpty(true);this.syncGemBar();return}
+        this.translationOn=true;this.showGemEmpty(false);this.syncGemBar();
+        if(this.answeredItemId&&this.answeredItemId===String(item.id||''))this.renderTranslationLine(item);
+      });
+    }
+    showGemEmpty(show){const box=this.root?.querySelector?.('[data-gem-empty]');if(box)box.hidden=!show}
+    syncGemBar(){
+      const g=gemsApi();if(!g||!this.root)return;
+      const balance=this.gemsBalance(),rules=gemsRules();
+      const count=this.root.querySelector?.('[data-gem-count]');if(count)count.textContent=g.chipLabel(balance);
+      const price=this.root.querySelector?.('[data-gem-price]');if(price)price.textContent=g.priceHint(balance);
+      const streak=this.root.querySelector?.('[data-gem-streak]');if(streak)streak.textContent=g.streakLabel(this.sessionStreak,this.sessionAwards,rules);
+      const chip=this.root.querySelector?.('[data-gem-chip]');if(chip&&chip.setAttribute)chip.setAttribute('aria-label',g.chipAria(balance));
+      const toggle=this.root.querySelector?.('[data-translate-toggle]');if(toggle&&toggle.setAttribute)toggle.setAttribute('aria-pressed',String(!!this.translationOn));
+    }
+    hideTranslationLine(){const host=this.root?.querySelector?.('[data-translation]');if(host){host.hidden=true;host.innerHTML=''}}
+    /**
+     * TAGIHAN JUJUR: gem baru dipotong saat terjemahan BENAR-BENAR tampil.
+     *
+     * FiezelSubtitleTranslate berjalan lewat Worker AI online dengan jatah 40 permintaan/jam
+     * dan gagal secara senyap dengan string kosong (recon-audiobook.md §b). Menagih saat
+     * toggle ditekan berarti menjual barang yang kadang tidak dikirim. Karena itu urutannya:
+     * ambil dulu, baru bayar - dan kalau kosong, katakan apa adanya bahwa gem tidak terpakai.
+     *
+     * Satu permintaan menanggung skrip DAN pilihan jawaban sekaligus (dipisah baris baru),
+     * karena jatah AI dihitung per permintaan, bukan per kalimat.
+     */
+    async renderTranslationLine(item){
+      const host=this.root?.querySelector?.('[data-translation]');if(!host)return false;
+      const g=gemsApi();if(!g)return false;
+      const copy=g.GEMS_COPY;
+      const options=Array.isArray(item.options)?item.options.map(o=>String(o||'')):[];
+      const payload=[String(item.script||''),...options].filter(Boolean).join('\n');
+      let raw='';
+      try{const T=hostScope().FiezelSubtitleTranslate;raw=T&&typeof T.translate==='function'?String(await T.translate(payload)||''):''}catch(_){raw=''}
+      if(!this.translationOn){this.hideTranslationLine();return false}
+      if(!raw.trim()){
+        host.hidden=false;host.innerHTML=`<p class="fsl-translation-miss">${esc(copy.unavailable)}</p>`;
+        return false;
+      }
+      if(!this.translationCharged){
+        const cost=Math.max(1,Number(gemsRules().translationCost)||1);
+        let ok=false;try{ok=this.options.gems?.spend?.(cost,'translation_session')===true}catch(_){ok=false}
+        if(!ok){
+          this.translationOn=false;this.showGemEmpty(true);this.syncGemBar();
+          host.hidden=false;host.innerHTML=`<p class="fsl-translation-miss">${esc(copy.emptyTitle)}. ${esc(copy.emptyBody)}</p>`;
+          return false;
+        }
+        this.translationCharged=true;
+      }
+      const lines=raw.split('\n').map(s=>s.trim()).filter(Boolean);
+      const scriptLine=lines[0]||raw.trim();
+      const optionLines=options.length&&lines.length===options.length+1?lines.slice(1):[];
+      host.hidden=false;
+      host.innerHTML=`<div class="fsl-translation" data-translation-body><p><b>Terjemahan:</b> ${esc(scriptLine)}</p>`
+        +(optionLines.length?`<ul class="fsl-translation-options">${optionLines.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'')
+        +`<small class="fsl-privacy">${esc(copy.autoNote)} · butuh jaringan, hasilnya belum dikurasi</small></div>`;
+      this.syncGemBar();
+      return true;
     }
     // m025-145: latihan berformat ujian. Yang membedakannya dari latihan harian bukan isinya
     // melainkan KONTRAKNYA - waktu menyiapkan, waktu bicara, dan butir yang wajib disentuh.
@@ -462,8 +583,22 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
     setFeedback(text){const el=this.root?.querySelector?.('[data-feedback]');if(el)el.innerHTML=`<div class="fsl-feedback">${esc(text)}</div>`}
     finishItem(item,result,prefix=''){
       const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?'Lolos target item':'Belum mencapai target item';const note=this.domain==='speaking'?`Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation.`:`Skor ${result.score}%.`;
-      const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>Script:</b> ${esc(item.script)}</p>`:`<p><b>Contoh respons:</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>Lanjut</button></div></div>`;
-      this.root.querySelectorAll('button').forEach(b=>{if(!b.hasAttribute('data-next')&&!b.hasAttribute('data-exit'))b.disabled=true});this.root.querySelector('[data-next]')?.addEventListener('click',()=>{this.ephemeralTranscript='';this.index++;this.renderSession()})
+      const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>Script:</b> ${esc(item.script)}</p><div data-translation hidden></div>`:`<p><b>Contoh respons:</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>Lanjut</button></div></div>`;
+      /* Toggle terjemahan DIKECUALIKAN dari pemadaman tombol: blok feedback adalah satu-satunya
+         fase di mana terjemahan boleh tampil, jadi mematikannya di sana harus tetap mungkin. */
+      this.root.querySelectorAll('button').forEach(b=>{if(!b.hasAttribute('data-next')&&!b.hasAttribute('data-exit')&&!b.hasAttribute('data-translate-toggle'))b.disabled=true});this.root.querySelector('[data-next]')?.addEventListener('click',()=>{this.ephemeralTranscript='';this.index++;this.renderSession()});
+      /* ---- Gem Terjemahan: runtun sesi & hadiah ----------------------------------------
+         Dijaga this.domain==='listening' supaya kontrak owner ("runtun dalam sesi listening")
+         tidak diam-diam melebar ke speaking dan latihan ujian. Kait host gagal-diam: dompet
+         yang bermasalah tidak boleh merusak sesi latihan. */
+      if(this.domain==='listening'){
+        this.sessionStreak=result.passed?this.sessionStreak+1:0;
+        this.answeredItemId=String(item.id||'');
+        const won=gemsAwardFor(this.sessionStreak,this.sessionAwards);
+        if(won>0){this.sessionAwards++;try{this.options.gems?.award?.(won,'listening_streak_5',{level:this.activeLevel,streak:this.sessionStreak})}catch(_){}}
+        this.syncGemBar();
+        if(this.translationOn)this.renderTranslationLine(item);
+      }
     }
     renderComplete(){const ev=this.store.evidence(),d=ev.domains[this.domain];this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">Session complete</span><h2>${this.domain==='listening'?'Listening':'Speaking'} selesai</h2><p>Evidence sidecar saat ini: ${d.attempts} attempt · average ${d.averageScore??'-'}% · pass rate ${d.passRate??'-'}%.</p><p class="fsl-privacy">Tidak ada raw audio, transcript, atau jawaban dictation yang disimpan di state.</p><div class="fsl-actions"><button class="fsl-primary" data-home>Kembali ke lab</button></div></article></section>`;this.root.querySelector('[data-home]').addEventListener('click',()=>this.renderHub());this.notifySessionEnd('complete')}
     destroy(){this.tts.stop();this.recognition.stop();this.recorder.destroy();this.ephemeralTranscript='';if(this.root)this.root.innerHTML=''}
