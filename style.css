@@ -3414,14 +3414,14 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .ring-row .coach-strip-face{flex:0 0 auto;width:52px;height:52px}
 .result-actions{display:grid;gap:9px;margin-top:4px}
 /* F1 placement: layar hasil tes penempatan menyebut levelnya secara eksplisit. */
-.result-level{display:grid;gap:2px;justify-items:center;margin:10px 0 4px;padding:12px 14px;border-radius:16px;background:var(--surface-2,rgba(255,255,255,.06));border:1px solid var(--border,rgba(255,255,255,.12))}
+.result-level{display:grid;gap:2px;justify-items:center;margin:10px 0 4px;padding:12px 14px;border-radius:16px;background:var(--panel-soft,rgba(255,255,255,.06));border:1px solid var(--line,rgba(255,255,255,.12))}
 .result-level-mark{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;opacity:.7}
 .result-level-name{font-size:1.9rem;line-height:1.1;font-weight:800}
 .result-level-desc{font-size:.8rem;opacity:.78;text-align:center}
 .result-bands{display:grid;gap:6px;justify-items:center;margin-bottom:6px}
 .result-bands small{opacity:.7;font-size:.7rem;text-align:center}
 .result-band-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.result-band{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--border,rgba(255,255,255,.14));opacity:.72}
+.result-band{font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px solid var(--line,rgba(255,255,255,.14));opacity:.72}
 .result-band-pass{opacity:1;font-weight:700;border-color:var(--accent,#5eead4);color:var(--accent,#5eead4)}
 .result-actions .ghost{min-height:44px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}
 
@@ -3463,19 +3463,19 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
  * menunjukkan pintu mana yang sedang kebuka. Semua warna memakai variabel tema yang sudah
  * ada supaya mode gelap dan kontras tinggi ikut benar tanpa aturan tambahan. */
 .level-trust-badge{display:inline-block;justify-self:start;padding:3px 8px;border-radius:999px;font-size:.64rem;font-style:normal;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.level-trust-badge.is-verified{background:color-mix(in srgb,var(--ok,#3f7d4e) 16%,transparent);color:var(--ok,#3f7d4e)}
-.level-trust-badge.is-probation{background:color-mix(in srgb,var(--warn,#b8862b) 18%,transparent);color:var(--warn,#b8862b)}
+.level-trust-badge.is-verified{background:color-mix(in srgb,var(--good,#3f7d4e) 16%,transparent);color:var(--good,#3f7d4e)}
+.level-trust-badge.is-probation{background:color-mix(in srgb,var(--yellow-deep,#b8862b) 18%,transparent);color:var(--yellow-deep,#b8862b)}
 .level-trust-badge.is-locked{background:color-mix(in srgb,var(--muted,#746958) 16%,transparent);color:var(--muted,#746958)}
 .level-picker-card.is-locked{opacity:.62;cursor:not-allowed;border-style:dashed}
 .level-lock-note{display:grid;gap:5px;padding:12px 14px;margin-top:12px;border-radius:15px;border:1px solid color-mix(in srgb,var(--muted,#746958) 32%,transparent);background:var(--panel-soft,#f8f1e7);font-size:.8rem;line-height:1.45}
-.level-lock-note.is-probation{border-color:color-mix(in srgb,var(--warn,#b8862b) 42%,transparent)}
+.level-lock-note.is-probation{border-color:color-mix(in srgb,var(--yellow-deep,#b8862b) 42%,transparent)}
 .level-exam-cta{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:13px 14px;margin-top:12px;border-radius:16px;border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
 .level-exam-cta div{display:grid;gap:3px}
 .level-exam-cta span{font-size:.74rem;color:var(--muted,#746958)}
 .level-exam-facts{display:grid;gap:6px;margin:12px 0;padding-left:18px;font-size:.8rem;line-height:1.45}
 .level-trust-banner{display:grid;gap:10px;padding:15px 16px;margin:0 0 16px;border-radius:18px;border:1px solid var(--line,#eadfce);background:var(--panel,#fff)}
 .level-trust-banner.is-locked{border-color:color-mix(in srgb,var(--accent,#c2402c) 40%,transparent);background:color-mix(in srgb,var(--accent,#c2402c) 6%,var(--panel,#fff))}
-.level-trust-banner.is-probation{border-color:color-mix(in srgb,var(--warn,#b8862b) 42%,transparent);background:color-mix(in srgb,var(--warn,#b8862b) 7%,var(--panel,#fff))}
+.level-trust-banner.is-probation{border-color:color-mix(in srgb,var(--yellow-deep,#b8862b) 42%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 7%,var(--panel,#fff))}
 .level-trust-head{display:grid;gap:4px}
 .level-trust-head b{font-size:.98rem}
 .level-trust-head span,.level-trust-count{font-size:.79rem;line-height:1.5;color:var(--muted,#746958)}
@@ -3483,8 +3483,8 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-trust-ladder{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
 .level-trust-ladder li{display:grid;gap:2px;min-width:82px;padding:8px 10px;border-radius:13px;border:1px solid var(--line,#eadfce);background:var(--panel-soft,#f8f1e7);font-size:.68rem;color:var(--muted,#746958)}
 .level-trust-ladder li b{font-size:.88rem;color:var(--ink,#241a11)}
-.level-trust-ladder li.is-done{border-color:color-mix(in srgb,var(--ok,#3f7d4e) 45%,transparent)}
-.level-trust-ladder li.is-done b{color:var(--ok,#3f7d4e)}
+.level-trust-ladder li.is-done{border-color:color-mix(in srgb,var(--good,#3f7d4e) 45%,transparent)}
+.level-trust-ladder li.is-done b{color:var(--good,#3f7d4e)}
 .level-trust-ladder li.is-open{border-color:color-mix(in srgb,var(--accent,#c2402c) 48%,transparent)}
 .level-trust-ladder li.is-open b{color:var(--accent,#c2402c)}
 .level-trust-actions{display:flex;flex-wrap:wrap;gap:8px}
@@ -3502,7 +3502,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-entry-pop .level-entry-line{margin:0;text-align:left;animation-delay:.2s;font-size:.86rem;line-height:1.5;color:var(--muted,#746958)}
 .level-entry-pop .modal-actions{width:100%;animation-delay:.24s}
 .level-entry-face{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--panel-soft,#f8f1e7);border:1px solid var(--line,#eadfce)}
-.level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--warn,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--warn,#b8862b) 14%,transparent);color:var(--warn,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--yellow-deep,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--yellow-deep,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
 .level-trust-chip{justify-self:start}
 .level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
 @keyframes fzLevelEntryPop{from{opacity:0;transform:scale(.9) translate3d(0,10px,0)}60%{opacity:1;transform:scale(1.01) translate3d(0,0,0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
@@ -3512,6 +3512,6 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 }
 .level-entry-pop.is-static,.level-entry-pop.is-static>*{animation:none;opacity:1;transform:none}
 .level-exam-verdict{padding:12px 14px;margin:10px 0;border-radius:15px;font-size:.85rem;line-height:1.5}
-.level-exam-verdict.is-pass{background:color-mix(in srgb,var(--ok,#3f7d4e) 12%,transparent);color:var(--ok,#3f7d4e)}
-.level-exam-verdict.is-fail{background:color-mix(in srgb,var(--warn,#b8862b) 14%,transparent);color:var(--ink,#241a11)}
+.level-exam-verdict.is-pass{background:color-mix(in srgb,var(--good,#3f7d4e) 12%,transparent);color:var(--good,#3f7d4e)}
+.level-exam-verdict.is-fail{background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--ink,#241a11)}
 @media (max-width:520px){.level-exam-cta{flex-direction:column;align-items:stretch}.level-exam-cta button{width:100%}}
