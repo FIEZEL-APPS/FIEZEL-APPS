@@ -432,7 +432,7 @@
       + '<p class="fiezel-greet-bubble">Sudah beres semua. Ini rangkumannya.</p>'
       + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="6">'
-      + '<h2 class="fiezel-title">' + (name ? escapeHtml(name) + ', siap belajar bersama Percik!' : 'Siap belajar bersama Percik!') + '</h2>'
+      + '<h2 class="fiezel-title">' + (name ? escapeHtml(name) + ', siap belajar bersama FIEZEL!' : 'Siap belajar bersama FIEZEL!') + '</h2>'
       + '<div class="fiezel-summary-card">'
       + (name ? '<div class="fiezel-summary-row"><b>Nama</b><span>' + escapeHtml(name) + '</span></div>' : '')
       + '<div class="fiezel-summary-row"><b>Tujuan</b><span>' + escapeHtml(goalLabel) + '</span></div>'
