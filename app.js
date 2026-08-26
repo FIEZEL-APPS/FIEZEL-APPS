@@ -3521,7 +3521,11 @@ function setNeuralVoicePreference(value){const next=String(value||'auto');state.
 // this slider can never request an unintelligible delivery.
 const NEURAL_RATE_MIN=0.75,NEURAL_RATE_MAX=1.25,NEURAL_RATE_STEP=0.05;
 function selectedNeuralRate(){const v=Number(state.preferences?.neuralRate);return Number.isFinite(v)?Math.min(NEURAL_RATE_MAX,Math.max(NEURAL_RATE_MIN,v)):1}
-function setNeuralRatePreference(value){const v=Math.min(NEURAL_RATE_MAX,Math.max(NEURAL_RATE_MIN,Number(value)||1));state.preferences={...state.preferences,neuralRate:v};save();const el=$('neuralRateValue');if(el)el.textContent=neuralRateLabel(v)}
+// m028 fase4: satu preferensi, dua pintu masuk (slider Settings dan tombol siklus di dok
+// pembaca Library). Supaya keduanya tidak pernah menampilkan angka berbeda, penulis mana pun
+// wajib lewat sini: slider disamakan nilainya, lalu satu peristiwa disiarkan agar pemakai
+// lain (dok Library) memperbarui labelnya tanpa perlu tahu siapa yang mengubah.
+function setNeuralRatePreference(value){const v=Math.min(NEURAL_RATE_MAX,Math.max(NEURAL_RATE_MIN,Number(value)||1));state.preferences={...state.preferences,neuralRate:v};save();const el=$('neuralRateValue');if(el)el.textContent=neuralRateLabel(v);const slider=$('neuralRateInput');if(slider&&Number(slider.value)!==v)slider.value=String(v);try{document.dispatchEvent(new CustomEvent('fiezel-neural-rate',{detail:{rate:v}}))}catch(_){}}
 function neuralRateLabel(v){return v<0.9?`${v.toFixed(2)}x · lebih pelan`:v>1.1?`${v.toFixed(2)}x · lebih cepat`:`${v.toFixed(2)}x · natural`}
 // m025-42: Indonesian is NO LONGER a separate bundle. One Supertonic model speaks both
 // languages, so preparing the voice prepares both at once; this helper now reports the
@@ -3978,7 +3982,12 @@ function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level
 // Puter butuh jaringan, dan tanpa cadangan ini sebuah bacaan yang dibuka saat sinyal
 // hilang akan diam sepenuhnya. Suara bawaan perangkat memang kalah jauh, tetapi diam
 // total lebih buruk daripada suara seadanya.
-function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceSay||browserSupported,stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceSay?.say)return self.FiezelVoiceSay.say(text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=.88;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
+function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceSay||browserSupported,stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceSay?.say)return self.FiezelVoiceSay.say(text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';
+// m028 fase4 AKAR: cadangan ini memakai .88 tetap, jadi murid yang menggeser "Kecepatan
+// bicara" ke 1.25x tetap mendengar suara pelan begitu jalur neural gagal - satu preferensi
+// dengan dua kecepatan berbeda tergantung mesin mana yang menyahut. OBAT: baca preferensi
+// yang sama seperti jalur neural di atas. Clamp 0.75-1.25 sudah dijamin selectedNeuralRate().
+u.rate=Number(options.speed??selectedNeuralRate())||1;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
 function bindSwipe(el,onLeft,onRight){let sx=0,sy=0;el.addEventListener('touchstart',e=>{const t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});el.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){haptic('navigate');if(dx<0)onLeft();else onRight()}},{passive:true})}
 function flashcards(level){
   const active=getActiveLevel();
