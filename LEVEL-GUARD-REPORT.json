@@ -1,0 +1,208 @@
+{
+  "schema": "fiezel-level-guard-report-v1",
+  "generatedAt": "2026-08-26T14:29:42.066Z",
+  "status": "PASS",
+  "contract": {
+    "wrongLimit": 10,
+    "examPass": 80,
+    "examSize": 25,
+    "cooldownMs": 86400000,
+    "blueprint": {
+      "grammar": 10,
+      "vocab": 8,
+      "reading": 7
+    }
+  },
+  "counts": {
+    "pass": 37,
+    "fail": 0,
+    "saves": 0
+  },
+  "checks": [
+    {
+      "name": "LEVEL_GUARD_WRONG_LIMIT terdefinisi sebagai 10",
+      "status": "PASS",
+      "details": "nilai terbaca: 10 — angka ini yang muncul di teks UI, jadi test membacanya dari kode, bukan menghardcode ulang"
+    },
+    {
+      "name": "Ambang lulus ujian terdefinisi dan >= 80%",
+      "status": "PASS",
+      "details": "LEVEL_EXAM_PASS=80"
+    },
+    {
+      "name": "Ukuran ujian 25 soal",
+      "status": "PASS",
+      "details": "LEVEL_EXAM_SIZE=25"
+    },
+    {
+      "name": "Cooldown gagal ujian tepat 24 jam",
+      "status": "PASS",
+      "details": "LEVEL_EXAM_COOLDOWN_MS=86400000 (anti-eksploitasi, rekomendasi 8 reports/riset-duolingo.md)"
+    },
+    {
+      "name": "Blueprint ujian 10 grammar + 8 vocab + 7 reading = 25",
+      "status": "PASS",
+      "details": "grammar 10, vocab 8, reading 7"
+    },
+    {
+      "name": "Semua fungsi keputusan level trust bisa diekstrak per nama",
+      "status": "PASS",
+      "details": "defaultLevelTrust, sanitizeLevelTrust, levelTrustState, verifiedLevel, levelTrustGap, nextVerifiableLevel, probationMistakes, probationActive, isLevelLocked, levelGuardEvaluate, applyLevelDemotion, levelExamUnlockable, levelExamCooldownRemaining, levelExamAvailability, recordSkipExamPass, recordSkipExamFail, levelTrustAdoptPlacement, getActiveLevel, placementLevel"
+    },
+    {
+      "name": "Fungsi level trust bisa dievaluasi di vm",
+      "status": "PASS",
+      "details": "blok fungsi dieksekusi tanpa DOM"
+    },
+    {
+      "name": "L1 · 10 salah di level percobaan mendemosi ke level terverifikasi dan mengunci di atasnya",
+      "status": "PASS",
+      "details": "verdict={\"action\":\"demote\",\"from\":\"B1\",\"to\":\"A2\",\"mistakes\":10,\"limit\":10,\"reason\":\"probation_limit_reached\"} aktif=A2 B1Terkunci=true C1Terkunci=true"
+    },
+    {
+      "name": "L1b · level terverifikasi tidak ikut terkunci saat demosi",
+      "status": "PASS",
+      "details": "murid harus punya minimal satu pintu yang boleh dibuka, kalau tidak ia terjebak"
+    },
+    {
+      "name": "L2 · 9 salah (satu di bawah limit) belum mendemosi siapa pun",
+      "status": "PASS",
+      "details": "batasnya harus persis LEVEL_GUARD_WRONG_LIMIT (10); verdict={\"action\":\"none\",\"from\":\"B1\",\"to\":\"A2\",\"mistakes\":9,\"limit\":10,\"reason\":\"probation_within_limit\"}"
+    },
+    {
+      "name": "L3 · lulus Ujian Skip Level menaikkan verified, membuka kunci, dan menaikkan level aktif",
+      "status": "PASS",
+      "details": "verified=B1 aktif=B1 terkunci=false ujian={\"attempts\":1,\"passed\":true,\"lastAt\":1787754582059,\"lastScore\":21,\"lastTotal\":25,\"lastAccuracy\":84,\"cooldownUntil\":0,\"weakSkill\":\"\"}"
+    },
+    {
+      "name": "L3b · setelah lulus B1, level di atas verified tetap belum otomatis terbuka sebagai terverifikasi",
+      "status": "PASS",
+      "details": "ujian berantai: satu ujian, satu anak tangga (kontrak owner butir 3)"
+    },
+    {
+      "name": "L3c · ujian level jauh di atas verified ditolak (berantai, bukan lompat bebas)",
+      "status": "PASS",
+      "details": "verified tetap A2; hanya B1 yang boleh diuji"
+    },
+    {
+      "name": "L4 · salah sebanyak apa pun di level terverifikasi sendiri tidak pernah mendemosi",
+      "status": "PASS",
+      "details": "level terverifikasi adalah pelabuhan aman — di sana murid sedang belajar, bukan sedang mengklaim"
+    },
+    {
+      "name": "L5 · A1 tidak pernah didemosi dan tidak pernah terkunci",
+      "status": "PASS",
+      "details": "tidak ada level di bawah A1; mengunci A1 berarti mengunci murid keluar dari aplikasinya sendiri"
+    },
+    {
+      "name": "L5b · saat terkunci, level verified tetap bisa dipakai",
+      "status": "PASS",
+      "details": "kunci hanya berlaku di atas verified"
+    },
+    {
+      "name": "L6 · guard dan ujian tidak menghapus satu pun bukti belajar",
+      "status": "PASS",
+      "details": "snapshot vocab/grammar/reading/history/totalAnswered identik sebelum dan sesudah demosi + lulus ujian"
+    },
+    {
+      "name": "L7 · gagal ujian memberi jeda 24 jam untuk level itu, bukan hukuman progres",
+      "status": "PASS",
+      "details": "sisa cooldown 24 jam; verified tetap A2"
+    },
+    {
+      "name": "L7b · setelah 24 jam lewat, ujian bisa diulang",
+      "status": "PASS",
+      "details": "{\"ok\":true,\"reason\":\"ready\",\"waitMs\":0}"
+    },
+    {
+      "name": "L8 · hasil placement langsung menjadi level terverifikasi",
+      "status": "PASS",
+      "details": "placement 25 soal tanpa petunjuk adalah bukti — kontrak owner butir 3"
+    },
+    {
+      "name": "L9 · state lama tanpa levelTrust bersifat DEFAULT-ALLOW",
+      "status": "PASS",
+      "details": "guard menghitung, bukan memblokir pindah level; hanya level TERKUNCI akibat demosi yang ditolak (kontrak owner butir 4)"
+    },
+    {
+      "name": "L10 · sanitizeLevelTrust menolak nilai sampah tanpa melempar",
+      "status": "PASS",
+      "details": "{\"B2\":6}"
+    },
+    {
+      "name": "S1 · record() memanggil hook guard untuk setiap jawaban salah",
+      "status": "PASS",
+      "details": "record() adalah satu-satunya titik yang dilewati semua jawaban pertama; hook di sini berarti tidak ada jalur latihan yang bisa lupa melapor"
+    },
+    {
+      "name": "S2 · hook kesalahan berkonsultasi ke levelGuardEvaluate(",
+      "status": "PASS",
+      "details": "vonis dihitung di satu tempat, dan peringatan PAW memakai daftar langkah yang sama"
+    },
+    {
+      "name": "S3 · kesalahan di dalam ujian/placement tidak dihitung sebagai pelanggaran guard",
+      "status": "PASS",
+      "details": "ujian menilai, bukan menghukum"
+    },
+    {
+      "name": "S4 · setActiveLevel() menolak level yang terkunci",
+      "status": "PASS",
+      "details": "penolakan ada di pintunya, bukan hanya di tampilan panel"
+    },
+    {
+      "name": "S5 · penolakan setActiveLevel bersifat default-allow",
+      "status": "PASS",
+      "details": "state lama dan fixture kontrak yang tidak menyuplai helper tetap boleh berpindah level"
+    },
+    {
+      "name": "S6 · openLevelPanel merender status terkunci dan jalan keluarnya",
+      "status": "PASS",
+      "details": "pesan §3d muncul di panel level, bukan hanya di toast"
+    },
+    {
+      "name": "S7 · defaultState memuat levelTrust tersanitasi",
+      "status": "PASS",
+      "details": "flag baru punya bentuk default; sanitizeState memanggil sanitizeLevelTrust"
+    },
+    {
+      "name": "S8 · sanitizeState menjalankan sanitizeLevelTrust",
+      "status": "PASS",
+      "details": "state lama dari localStorage naik bentuk tanpa memicu error"
+    },
+    {
+      "name": "S9 · soal ujian diacak dari bank level itu setiap percobaan",
+      "status": "PASS",
+      "details": "anti-eksploitasi: kolam besar + acak, dan tiap soal tetap lewat validateQuestion"
+    },
+    {
+      "name": "S10 · ujian berjalan tanpa petunjuk dan tanpa percobaan kedua",
+      "status": "PASS",
+      "details": "\"terverifikasi\" tidak boleh berarti dituntun sampai benar"
+    },
+    {
+      "name": "S11 · penilaian ujian memakai LEVEL_EXAM_PASS dan bercabang lulus/gagal",
+      "status": "PASS",
+      "details": "ambang tidak dihardcode di dua tempat"
+    },
+    {
+      "name": "S12 · finishQuiz menyambungkan ujian dan placement ke level trust",
+      "status": "PASS",
+      "details": "hasil ujian dan hasil placement sama-sama tersimpan sebagai bukti"
+    },
+    {
+      "name": "S13 · Home menampilkan banner mode percobaan / terkunci",
+      "status": "PASS",
+      "details": "murid harus tahu statusnya tanpa harus membuka panel level"
+    },
+    {
+      "name": "S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian",
+      "status": "PASS",
+      "details": "teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar"
+    },
+    {
+      "name": "S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS",
+      "status": "PASS",
+      "details": "teks harus menulis 80% supaya tidak menjanjikan ambang yang berbeda dari kode"
+    }
+  ]
+}

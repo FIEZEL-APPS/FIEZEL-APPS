@@ -73,6 +73,7 @@ jobs:
           node level-grammar-contract-test.js
           node grammar-unlock-test.js
           node placement-accuracy-test.js
+          node level-guard-test.js
           node writing-rubric-test.js
           node reading-exam-test.js
           node level-evidence-test.js
