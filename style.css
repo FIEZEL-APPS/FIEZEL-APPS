@@ -3270,3 +3270,34 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .ring-row .coach-strip-face{flex:0 0 auto;width:52px;height:52px}
 .result-actions{display:grid;gap:9px;margin-top:4px}
 .result-actions .ghost{min-height:44px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}
+
+/* ---------- §7 pengaturan: sakelar + ikon ----------
+   CSS-ONLY, nol JS. Sakelarnya digambar DI ATAS checkbox natif, jadi seluruh id
+   (#settingReminders, #settingHaptics, #settingFeedbackSounds, #settingMotion),
+   handler #settingsSave, label, dan role bawaan tetap utuh - pembaca layar tetap
+   mendapat checkbox sungguhan, bukan div ber-aria. */
+.setting-row{min-height:44px}
+.setting-row input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;position:relative;
+  width:50px;height:30px;flex:0 0 auto;border-radius:99px;
+  background:var(--line);border:1.5px solid var(--line);cursor:pointer;
+  transition:background var(--dur-s) var(--ease),border-color var(--dur-s) var(--ease)
+}
+.setting-row input[type=checkbox]::after{
+  content:"";position:absolute;top:2px;left:2px;width:23px;height:23px;border-radius:50%;
+  background:var(--panel);box-shadow:0 1px 4px rgba(36,26,17,.25);
+  transition:transform var(--dur-s) var(--ease-spring)
+}
+.setting-row input[type=checkbox]:checked{background:var(--text);border-color:var(--text)}
+.setting-row input[type=checkbox]:checked::after{transform:translateX(20px);background:var(--sun)}
+.setting-row input[type=checkbox]:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.setting-row input[type=checkbox]:disabled{background:var(--panel-soft);border-color:var(--line);cursor:not-allowed}
+.setting-row input[type=checkbox]:disabled::after{background:var(--line-soft);box-shadow:none}
+/* Audit #4 lagi: baris yang tidak bisa diubah tetap TERBACA, tinta yang berubah -
+   bukan opacity. Tanpa dukungan :has() teks tetap warna normal, jadi kegagalan
+   fitur ini bukan regresi keterbacaan. */
+.setting-row:has(input:disabled) b,
+.setting-row:has(input:disabled) small{color:var(--muted)}
+/* Ikon baris pindah ke keluarga sun: marun --accent-strong di dalam kotak kecil
+   membuat setiap baris pengaturan terbaca seperti peringatan. */
+.setting-icon{background:var(--sun-soft);color:var(--text);border-radius:10px}
