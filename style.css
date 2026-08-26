@@ -3162,3 +3162,18 @@ html.fiezel-ui-v6 .launcher-shell{
 /* Sapuan pemindai adalah satu-satunya gerak di panel ini, jadi ia yang dimatikan -
    panelnya sendiri tetap tampil supaya sebab-akibatnya tidak hilang. */
 @media (prefers-reduced-motion:reduce){.core-bar::after{animation:none;display:none}}
+
+/* ---------- §8/§9.3 aturan dock maskot ----------
+   Gelembung pembimbing tetap tinggal di <body> dan tetap bisa diketuk di mana pun
+   (kontrak m025-115). Yang berubah hanya di dua panggung latihan: sapaan otomatis
+   dibungkam supaya tidak ada balon yang menutup soal, gelembungnya mengecil dan
+   turun keluar dari kolom konten, dan elemen interaktif terakhir diberi ruang
+   napas supaya selalu bisa digulir lepas dari bayangan gelembung.
+   Z-index tidak diubah: .fz-coach-sheet dan #confidencePop tetap menang. */
+body.fz-stage-quiz .fz-coach-peek,
+body.fz-stage-sl .fz-coach-peek{display:none}
+body.fz-stage-quiz .fz-coach-bubble,
+body.fz-stage-sl .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(safe-area-inset-bottom))}
+body.fz-stage-quiz .fz-coach-bubble .fz-coach-face,
+body.fz-stage-sl .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
+body.fz-stage-quiz .quiz-shell{padding-bottom:96px}

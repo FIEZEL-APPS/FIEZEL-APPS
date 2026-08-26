@@ -1450,7 +1450,21 @@ function updateCelestialClock(input=new Date()){
 let celestialTimer=null;
 function startCelestialClock(){updateCelestialClock();if(typeof setInterval!=='function')return;if(celestialTimer&&typeof clearInterval==='function')clearInterval(celestialTimer);celestialTimer=setInterval(updateCelestialClock,30000);celestialTimer.unref?.()}
 function enhanceUI(){document.body?.classList?.toggle('reduce-motion',state.preferences?.motion===false);updateCelestialClock();(window.requestAnimationFrame||setTimeout)(refreshIcons)}
-function setApp(html){$('app').innerHTML=html;enhanceUI()}
+// m028 fase3 (PATCH-PLAN §8/§9.3): setApp adalah corong tunggal SEMUA layar, jadi
+// di sinilah panggung dicatat. Layar kuis digambar langsung dari quizLoop tanpa
+// melewati router, jadi renderInner/syncCoachBubble tidak pernah tahu sedang ada
+// kuis - dan gelembung pembimbing 58px di kanan-bawah menutupi ujung pilihan
+// jawaban terakhir pada layar sempit. Bendera panggung memberi CSS satu tempat
+// untuk mengecilkan dan menaikkan gelembung, tanpa memindahkan gelembungnya keluar
+// dari <body> (itu kontrak arsitektur m025-115 di fiezel-coach-bubble.js).
+function setApp(html){
+  $('app').innerHTML=html;
+  // Opsional-berantai dengan sengaja: harness tes menjalankan app.js di atas DOM
+  // tiruan yang tidak punya <body>, dan penandaan panggung tidak boleh pernah menjadi
+  // alasan sebuah layar gagal digambar.
+  document.body?.classList?.toggle?.('fz-stage-quiz',String(html).includes('quiz-shell'));
+  enhanceUI();
+}
 // m025-43 OWNER: "tidak bergetar". Two real causes, both handled here.
 // 1. The patterns were far too short to feel through a case - a wrong answer buzzed
 //    for 28ms. They are now long enough to register as a deliberate signal.
@@ -1967,7 +1981,7 @@ function dismissWelcome(){return declineStudyNotifications()}
 // ditulis sekali sebagai markup statis, isi pesannya tidak pernah ikut jalur innerHTML,
 // jadi tidak ada pintu injeksi yang dibuka oleh perubahan ini. Atribut role="status" +
 // aria-live="polite" tinggal di index.html dan tidak disentuh (a11y-test.js:68-69).
-function showToast(text){const t=$('toast');t.innerHTML='<svg class="toast-mark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span></span>';t.querySelector('span').textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
+function showToast(text){const t=$('toast');t.innerHTML='<svg class="toast-mark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span></span>';const slot=t.querySelector?.('span');if(slot)slot.textContent=text;else t.textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 let speakingListeningController=null,speakingListeningMountToken=0;
 
 /* ---- m025-102 pencarian materi + feedback ---------------------------------------
@@ -2096,7 +2110,7 @@ function openFeedback(prefill){
 function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
-function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
+function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
 // m025-115 - pembimbing yang ikut ke mana pun murid pergi (brief bagian 7).
 //
 // Gelembungnya dipasang SEKALI ke <body> dan tidak pernah ikut dicat ulang; yang dikirim
