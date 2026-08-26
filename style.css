@@ -3142,3 +3142,23 @@ html.fiezel-ui-v6 .launcher-shell{
    satu baris, dan teks panjang membungkus rata kiri alih-alih rata tengah. */
 .toast{display:flex;align-items:center;gap:8px;text-align:left}
 .toast .toast-mark{flex:0 0 auto;color:var(--sun)}
+
+/* ---------- §1/§9.1 panel ANALYZING ----------
+   Permukaan gelap yang sengaja: ia satu-satunya bidang di layar kuis yang bukan
+   kertas, jadi murid tahu yang sedang bicara adalah mesinnya. Tinta --on-core di
+   atas --core = 14,7:1; ukuran terkecil .core-eyebrow 12px (.75rem). */
+.core-panel{position:relative;overflow:hidden;background:var(--core);border-radius:var(--radius-lg);padding:18px;color:var(--on-core)}
+.core-panel .neural{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none;color:var(--sun)}
+.core-panel>div{position:relative}
+.core-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.18em;color:var(--sun)}
+.core-title{margin-top:6px;font-size:1rem;font-weight:700;color:var(--on-core)}
+.core-sub{margin-top:5px;font-size:.82rem;line-height:1.5;color:var(--on-core-muted)}
+.core-bar{position:relative;margin-top:14px;height:5px;border-radius:99px;background:rgba(253,250,243,.22);overflow:hidden}
+.core-bar i{position:absolute;inset:0 auto 0 0;width:46%;border-radius:99px;background:linear-gradient(90deg,var(--sun),var(--sun-deep))}
+.core-bar::after{content:"";position:absolute;inset:0 auto 0 0;width:18%;border-radius:99px;background:rgba(253,250,243,.35);animation:coreScan 1.6s var(--ease) infinite}
+@keyframes coreScan{from{left:-18%}to{left:100%}}
+.core-panel :focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
+.core-analyzing{margin:12px 0}
+/* Sapuan pemindai adalah satu-satunya gerak di panel ini, jadi ia yang dimatikan -
+   panelnya sendiri tetap tampil supaya sebab-akibatnya tidak hilang. */
+@media (prefers-reduced-motion:reduce){.core-bar::after{animation:none;display:none}}
