@@ -51,6 +51,9 @@ jobs:
           node splash-first-paint-test.js
           node splash-choreography-test.js
           node observability-privacy-test.js
+          node analytics-privacy-test.js
+          node analytics-aggregate-test.js
+          node analytics-server-only-test.js
           node a11y-test.js
           node contrast-test.js
           node pastel-field-contrast-test.js
