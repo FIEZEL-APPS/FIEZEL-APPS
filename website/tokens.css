@@ -1,0 +1,30 @@
+/* FIEZEL website — token desain bersama (SATU sumber, dipakai landing + install).
+   Diturunkan dari palet aplikasi (style.css m025-115) dan BRAND-GUIDE.
+   Aturan keras: teks tidak pernah memakai warna pastel langsung di atas cream;
+   animasi hanya transform+opacity; hormati prefers-reduced-motion. */
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-700.woff2') format('woff2');font-weight:700 800;font-display:swap}
+:root{
+  --cream:#FFF8ED; --cream-deep:#FFF0DC; --panel:#FFFFFF;
+  --ink:#2B2118; --muted:#6F5F48;
+  --yellow:#FFD23F; --yellow-deep:#E0B22A; --yellow-soft:#FFF1C9;
+  --coral:#EE5D4A; --coral-deep:#C9432F; --coral-soft:#FDE3DE;
+  --mint:#A8DCC4; --mint-soft:#E9F7F0; --teal-pastel:#9FD5CE; --lilac:#C9BCE4;
+  --line:#F2E6D3; --line-soft:#F8F0E4;
+  --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --fz-spring:cubic-bezier(.34,1.56,.64,1); --fz-out:cubic-bezier(.22,1,.36,1);
+  --fz-fast:120ms; --fz-base:240ms; --fz-slow:420ms;
+  --radius:20px; --radius-sm:12px;
+  --shadow-card:0 2px 0 var(--line),0 12px 32px rgba(43,33,24,.07);
+  --shadow-btn:0 3px 0 var(--yellow-deep);
+  --maxw:1080px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--font);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+:focus-visible{outline:3px solid var(--coral);outline-offset:3px;border-radius:6px}

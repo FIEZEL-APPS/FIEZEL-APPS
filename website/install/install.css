@@ -1,0 +1,147 @@
+/* FIEZEL — halaman /install/. Semua token berasal dari ../tokens.css (jangan definisikan palet baru di sini). */
+
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+
+.skip{position:absolute;left:-9999px;top:0}
+.skip:focus{left:12px;top:12px;z-index:20;background:var(--panel);color:var(--ink);padding:10px 14px;border-radius:var(--radius-sm);box-shadow:var(--shadow-card);font-weight:700}
+
+/* ---------- header ---------- */
+.top{border-bottom:1px solid var(--line);background:var(--cream)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
+.brand{display:inline-flex;align-items:center;color:var(--ink);text-decoration:none}
+.wordmark{width:104px;height:auto;display:block}
+.back{color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:700;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);white-space:nowrap}
+.back:hover{color:var(--ink);transform:translateY(-1px)}
+.back{transition:transform var(--fz-fast) var(--fz-out),color var(--fz-fast) var(--fz-out)}
+
+/* ---------- intro ---------- */
+.intro{padding:32px 20px 8px}
+.intro>*{max-width:720px}
+.mascot{display:block;width:72px;height:auto;margin:0 0 12px}
+h1{font-size:clamp(1.6rem,6vw,2.35rem);line-height:1.18;font-weight:800;letter-spacing:-.02em;margin:0 0 14px}
+.lead{color:var(--muted);font-size:1.03rem;margin:0 0 22px}
+
+.note{background:var(--yellow-soft);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px}
+.note-h{margin:0 0 6px;font-size:.78rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--ink)}
+.note p{margin:0;color:var(--ink);font-size:.95rem}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:13px 24px;border-radius:999px;font-weight:700;font-size:1rem;text-decoration:none;border:2px solid var(--ink);transition:transform var(--fz-fast) var(--fz-spring)}
+.btn-primary{background:var(--yellow);color:var(--ink);box-shadow:var(--shadow-btn)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-primary:active{transform:translateY(1px)}
+.btn-ghost{background:var(--panel);color:var(--ink);box-shadow:0 3px 0 var(--line)}
+.btn-ghost:hover{transform:translateY(-2px)}
+
+/* ---------- section heading ---------- */
+.sec-h{font-size:1.25rem;font-weight:800;letter-spacing:-.01em;margin:0 0 14px}
+
+/* ---------- tabs ---------- */
+.platforms{padding:34px 20px 8px}
+.tabs{display:flex;gap:8px;background:var(--cream-deep);border:1px solid var(--line);border-radius:999px;padding:6px;margin:0 0 18px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs[hidden]{display:none}
+.tab{flex:1 1 auto;min-height:44px;white-space:nowrap;border:0;background:transparent;color:var(--muted);font-family:var(--font);font-size:.95rem;font-weight:700;border-radius:999px;padding:8px 14px;cursor:pointer;transition:transform var(--fz-fast) var(--fz-out),background-color var(--fz-fast) var(--fz-out),color var(--fz-fast) var(--fz-out)}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--yellow);color:var(--ink);box-shadow:0 2px 0 var(--yellow-deep)}
+
+/* progressive enhancement:
+   tanpa JS -> semua panel tampil berurutan; dengan JS -> hanya panel terpilih */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:20px 18px;margin:0 0 18px}
+html.js .panel{display:none}
+html.js .panel.is-open{display:block;animation:fzIn var(--fz-base) var(--fz-out) both}
+@keyframes fzIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel[hidden]{display:none}
+
+.panel-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.panel-head h3{margin:0;font-size:1.1rem;font-weight:800;letter-spacing:-.01em}
+.chip{display:inline-block;background:var(--yellow-soft);border:1px solid var(--line);color:var(--ink);font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.chip-coral{background:var(--coral-soft)}
+
+/* ---------- langkah bernomor ---------- */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px}
+.steps li{display:flex;gap:14px;align-items:flex-start}
+.num{flex:0 0 auto;width:38px;height:38px;border-radius:50%;background:var(--cream-deep);border:1px solid var(--line);color:var(--ink);font-weight:800;font-size:1.1rem;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.step-body{min-width:0}
+.step-body p{margin:0;font-size:1rem;overflow-wrap:break-word}
+.step-body .hint{margin:8px 0 0;color:var(--muted);font-size:.87rem;display:flex;align-items:center;gap:8px}
+
+.ico{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:0 0 auto;border-radius:9px;background:var(--cream-deep);border:1px solid var(--line);color:var(--ink);vertical-align:-9px}
+.ico svg{width:19px;height:19px;fill:currentColor}
+.ico-sm{width:24px;height:24px;vertical-align:-7px}
+.ico-sm svg{width:15px;height:15px}
+
+.callout{margin:18px 0 0;padding:14px 16px;background:var(--yellow-soft);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:.92rem;color:var(--ink)}
+.callout-coral{background:var(--coral-soft)}
+.callout strong{font-weight:800}
+
+/* ---------- setelah terpasang ---------- */
+.after{padding:26px 20px}
+.after-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-card);padding:22px 18px;display:flex;flex-direction:column;gap:20px}
+.after-text p{margin:0 0 10px;color:var(--muted);font-size:.98rem}
+.after-text p:last-child{margin-bottom:0}
+.must{font-weight:700;color:var(--ink)!important;font-size:1.02rem!important;border-left:4px solid var(--yellow);padding-left:12px}
+.shot{margin:0;text-align:center}
+.shot img{width:100%;max-width:210px;height:auto;border-radius:16px;border:1px solid var(--line);box-shadow:var(--shadow-card)}
+.shot figcaption{margin-top:10px;font-size:.82rem;color:var(--muted)}
+
+/* ---------- troubleshooting ---------- */
+.trouble{padding:8px 20px 26px}
+.acc{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);margin:0 0 10px;overflow:hidden}
+.acc summary{cursor:pointer;list-style:none;padding:15px 46px 15px 16px;font-weight:700;position:relative;font-size:.98rem}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"";position:absolute;right:16px;top:50%;width:10px;height:10px;margin-top:-6px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);transition:transform var(--fz-fast) var(--fz-out)}
+.acc[open] summary::after{transform:rotate(225deg);margin-top:-2px}
+.acc p{margin:0;padding:0 16px 16px;color:var(--muted);font-size:.94rem}
+
+/* ---------- CTA akhir ---------- */
+.end{padding:6px 20px 34px}
+.end-card{background:var(--cream-deep);border:1px solid var(--line);border-radius:var(--radius);padding:26px 20px;text-align:center}
+.end-card h2{margin:0 0 8px;font-size:clamp(1.2rem,4.6vw,1.6rem);font-weight:800;letter-spacing:-.01em}
+.end-card p{margin:0;color:var(--muted)}
+.end .cta-row{justify-content:center;margin-top:20px}
+
+/* ---------- footer ---------- */
+.foot{border-top:1px solid var(--line);background:var(--panel);padding:28px 0 34px}
+.foot-in{text-align:center}
+.wordmark-foot{width:96px;margin:0 auto 10px;color:var(--ink)}
+.foot-tag{margin:0 0 14px;color:var(--muted);font-size:.92rem}
+.foot-nav{display:flex;gap:10px;justify-content:center;align-items:center;color:var(--muted);font-size:.92rem;margin-bottom:14px}
+.foot-nav a{color:var(--ink);font-weight:700;text-decoration:none;border-bottom:2px solid var(--yellow);padding-bottom:1px}
+.foot-nav a:hover{border-color:var(--yellow-deep)}
+.foot-note{margin:0 auto 6px;max-width:52ch;color:var(--muted);font-size:.84rem}
+.foot-copy{margin:14px 0 0;color:var(--muted);font-size:.82rem}
+
+/* ---------- <= 359px (ponsel sangat kecil): jaga tiga tab tetap satu baris ---------- */
+@media (max-width:359px){
+  .tabs{gap:4px}
+  .tab{padding:8px 8px;font-size:.88rem}
+}
+
+/* ---------- >= 720px ---------- */
+@media (min-width:720px){
+  .intro{padding:52px 20px 8px}
+  .lead{font-size:1.1rem}
+  .platforms{padding:44px 20px 8px}
+  .tabs{display:inline-flex;gap:6px}
+  .tab{flex:0 0 auto;padding:8px 20px}
+  .panel{padding:28px 30px}
+  .num{width:44px;height:44px;font-size:1.25rem}
+  .steps{gap:20px}
+  .after-card{flex-direction:row;align-items:center;gap:34px;padding:30px}
+  .after-text{flex:1 1 auto}
+  .shot{flex:0 0 200px}
+  .end-card{padding:36px}
+  .acc summary{font-size:1rem}
+}
+
+/* ---------- >= 1024px ---------- */
+@media (min-width:1024px){
+  .wordmark{width:118px}
+  h1{font-size:2.6rem}
+  .sec-h{font-size:1.4rem}
+  .panel-head h3{font-size:1.25rem}
+  .step-body p{font-size:1.03rem}
+  .shot{flex:0 0 220px}
+  .shot img{max-width:220px}
+}
