@@ -97,7 +97,10 @@ test('style.css punya lebih dari satu blok :root, dan tes ini membaca semuanya',
 test('tinta coklat tetap terbaca di atas setiap bidang pastel pekat', () => {
   const ink = (LIGHT['--ink'] || '').match(/#[0-9a-f]{3,8}/i);
   if (!ink) throw new Error('--ink tidak ditemukan');
-  const fields = ['--yellow', '--coral', '--mint', '--lilac', '--teal-pastel'];
+  // m028 fase2 F2-16: --coral/--mint/--lilac/--teal-pastel DIHAPUS dari :root.
+  // Daftar ini memang toleran terhadap token yang hilang (continue), tapi menyimpan
+  // namanya berarti pembaca berikutnya mengira ia masih ada.
+  const fields = ['--yellow'];
   const weak = [];
   for (const f of fields) {
     const hex = (LIGHT[f] || '').match(/#[0-9a-f]{3,8}/i);
@@ -109,7 +112,7 @@ test('tinta coklat tetap terbaca di atas setiap bidang pastel pekat', () => {
 });
 
 test('bidang pastel lembut terbaca oleh teks tema', () => {
-  const soft = ['--cream', '--cream-deep', '--yellow-soft', '--coral-soft', '--mint-soft', '--lilac-soft'];
+  const soft = ['--cream', '--cream-deep', '--yellow-soft', '--good-soft', '--bad-soft', '--info-soft'];
   const weak = [];
   for (const key of soft) {
     for (const [theme, tokens] of [['terang', LIGHT]]) {
@@ -141,11 +144,21 @@ test('bidang pastel lembut terbaca oleh teks tema', () => {
    digeser supaya lolos WCAG AA: cream sedikit lebih hangat (#FFF9EE), tinta lebih pekat
    (#241A11, 15,4:1 terhadap cream, dulu 12,9:1), dan kuningnya kuning penuh (#FFC700)
    supaya batas bidangnya terbaca tanpa garis bantu. Koral dan emas tidak bergeser. */
+/* m028 fase2 F2-16: '--coral' DIKELUARKAN dari kunci brief, dan ini keputusan yang
+   perlu dibaca utuh sebelum dibalik. Brief bagian 3 menyebut koral sebagai "aksen
+   kedua: notifikasi, badge, streak" - dan justru di ketiga peran itu koral gagal:
+   tinta gelap di atas #EE5D4A hanya 3,4:1, sedangkan teks putih 3,6:1, jadi tidak
+   ada tinta yang lolos AA di atasnya. Selama tiga gelombang, setiap pemakaian koral
+   berakhir dipetakan ke keluarga lain supaya lolos kontras, sampai tidak ada satu
+   pun bidang koral yang benar-benar tersisa. Yang dipensiunkan bukan warnanya,
+   melainkan kepura-puraan bahwa ia masih dipakai.
+   Perannya diambil --bad/--bad-soft (galat + notifikasi) yang punya turunan pekat.
+   Kalau OWNER mau koral kembali, ia harus kembali sebagai HIASAN tanpa teks di
+   atasnya, dan test ini harus dituliskan ulang dengan syarat itu. */
 const BRIEF_PALETTE = {
   '--cream': '#FFF9EE',   // dasar utama
   '--ink': '#241A11',     // teks utama dan outline
   '--yellow': '#FFC700',  // aksen utama: CTA, progress, ikon aktif
-  '--coral': '#EE5D4A',   // aksen kedua: notifikasi, badge, streak
   '--gold': '#C9A24B'     // detail premium, dipakai hemat
 };
 
