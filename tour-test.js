@@ -68,7 +68,11 @@ function el(tag) {
 function fakeEnv(targets) {
   const body = el('body');
   const store = {};
-  const found = targets || { '.launcher-actions .primary': el('button'), '.learning-launcher': el('div'), '.bottomnav': el('nav'), '.coach-preview': el('aside') };
+  // m026-03: target bawaan mengikuti registri tur menu (FiezelTour.TOURS.menu) - dan itu
+  // memang maksudnya. Peta palsu yang dikunci ke selector lama adalah cara gate ini tetap
+  // hijau sementara turnya sendiri kehilangan separuh langkahnya di layar sungguhan (baseline
+  // 27 Agustus 2026: 4 langkah didefinisikan, 2 tampil).
+  const found = targets || tour.TOURS.menu.steps.reduce((map, step) => { map[step.target] = el('div'); return map; }, {});
   const env = {
     innerHeight: 800,
     scrollY: 0,
@@ -134,7 +138,7 @@ test('bisa diputar ulang setelah direset - perkenalan m025-88 tidak bisa, dan it
 /* ---------------- target: tidak pernah menunjuk yang tidak ada ---------------- */
 
 test('target yang tidak ada dibuang sebelum tur dimulai', () => {
-  const env = fakeEnv({ '.bottomnav': el('nav') });
+  const env = fakeEnv({ '.learning-launcher': el('div') });
   const run = tour.show(env, {});
   assert.strictEqual(run.shown, true);
   assert.strictEqual(run.steps, 1, 'hanya langkah yang targetnya benar-benar ada yang tersisa');
@@ -143,7 +147,7 @@ test('target yang tidak ada dibuang sebelum tur dimulai', () => {
 test('target berukuran nol tidak bisa disorot, jadi ikut dibuang', () => {
   const nol = el('div');
   nol._box = { top: 0, left: 0, width: 0, height: 0 };
-  const env = fakeEnv({ '.learning-launcher': nol, '.bottomnav': el('nav') });
+  const env = fakeEnv({ '.learning-launcher': nol, '.topbar .ask-button': el('button') });
   assert.strictEqual(tour.show(env, {}).steps, 1);
 });
 
@@ -196,7 +200,10 @@ test('setiap langkah menunjuk selector nyata dan punya penjelasan', () => {
     assert.ok(!ids.has(s.id), 'id langkah ganda: ' + s.id);
     ids.add(s.id);
   }
-  assert.ok(tour.STEPS.length >= 3 && tour.STEPS.length <= 6,
+  // m026-03: batas atas naik dari 6 ke 7 karena tur menu sekarang menjelaskan SEMUA menunya
+  // (copy §1) dan berhenti di sana - langkah ketujuh adalah kartu penutup, bukan langkah
+  // kedelapan yang membuka fitur. Tur fitur punya daftarnya sendiri di TOURS.
+  assert.ok(tour.STEPS.length >= 3 && tour.STEPS.length <= 7,
     'tur yang terlalu panjang berhenti dibaca; terlalu pendek tidak mengajari apa pun');
 });
 
@@ -204,16 +211,21 @@ test('selector setiap langkah benar-benar ada di aplikasi', () => {
   const css = fs.readFileSync('./style.css', 'utf8');
   const html = fs.readFileSync('./index.html', 'utf8');
   const app = fs.readFileSync('./app.js', 'utf8');
+  const haystack = css + html + app;
   for (const s of tour.STEPS) {
-    const cls = s.target.split(' ').pop().replace('.', '');
-    assert.ok(css.includes('.' + cls) || html.includes(cls) || app.includes(cls),
-      'selector tur menunjuk kelas yang tidak ada di mana pun: ' + s.target);
+    // Selector bisa berupa kelas ('.bottomnav') maupun atribut ('[data-view="vocab"]'), jadi
+    // yang dicari adalah setiap potongannya - bukan hanya potongan terakhirnya.
+    for (const part of s.target.split(/\s+/)) {
+      const token = part.replace(/^[.#]/, '').replace(/^\[|\]$/g, '');
+      assert.ok(haystack.includes(token),
+        'selector tur menunjuk sesuatu yang tidak ada di mana pun: ' + s.target);
+    }
   }
 });
 
 test('teks tur tidak bisa menyuntik markup', () => {
   const env = fakeEnv();
-  const run = tour.show(env, { steps: [{ id: 'x', target: '.bottomnav', title: '<img src=x>', body: '<script>alert(1)</script>' }] });
+  const run = tour.show(env, { steps: [{ id: 'x', target: '.learning-launcher', title: '<img src=x>', body: '<script>alert(1)</script>' }] });
   assert.ok(!/<img|<script>/.test(run.element.innerHTML));
   assert.ok(/&lt;img|&lt;script&gt;/.test(run.element.innerHTML));
 });
