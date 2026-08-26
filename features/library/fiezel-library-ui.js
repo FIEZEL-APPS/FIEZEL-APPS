@@ -310,6 +310,11 @@
     }
     var progress = session.progressFor(bookId);
     if (progress.percent) setStatus('Lanjut dari kalimat ' + (session.snapshot().sentenceIndex + 1) + '.');
+    // m026-03: tur kontekstual pembaca, sekali saja per murid. Modul ini tidak tahu apa pun
+    // tentang bendera tur, state, atau save() - ia hanya memberi tahu host bahwa pembaca baru
+    // tergambar, dan host yang memutuskan. Gagalnya diam: tur adalah lapisan paling boleh
+    // gagal di aplikasi ini, dan buku harus tetap terbuka kalau ia tidak ada.
+    try { if (typeof root.notifyFeatureTour === 'function') root.notifyFeatureTour('library'); } catch (_) {}
   }
 
   /** Tap a sentence: translate instantly, and make it the narration position too. */

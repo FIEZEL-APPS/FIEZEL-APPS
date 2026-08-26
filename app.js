@@ -776,7 +776,12 @@ function pruneCorruptedReviewEntries(entries){
     return !CORRUPTED_REVIEW_SIGNATURE.test(`${entry.question||''} ${entry.correct||''} ${entry.selectedAnswer||''}`);
   });
 }
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,
+// m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
+// localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
+// tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
+// tur punya benderanya sendiri di dalam state per-akun.
+toursSeen:{menu:false,library:false,listening:false}};
 let stateReady=false;
 // m025-140: bank konten dideklarasikan SEBELUM loadState(). sanitizeState() sekarang menghitung
 // readiness per level, dan jalur itu memanggil contentLevelFor() yang membaca V/R/GRAMMAR_ITEMS.
@@ -988,9 +993,23 @@ function levelExamCooldownLabel(ms){const hours=Math.ceil(Math.max(0,Number(ms)|
 // sebagai A1 - kalau tidak, satu kali ganti level menulis ulang arti bukti yang sudah ada.
 function sessionLevel(session){const explicit=String(session?.level||'');return LEVELS.includes(explicit)?explicit:getActiveLevel()}
 function historyMatchesActive(h,level=getActiveLevel()){const explicit=String(h?.level||'');if(LEVELS.includes(explicit))return explicit===level;const inferred=contentLevelFor(h?.type,h?.target||h?.reviewKey||h?.skill||'');return !inferred||inferred===level}
+// m026-03: bendera tur disanitasi ke tiga kunci yang dikenal saja, dan HANYA nilai true yang
+// dianggap "sudah lihat" - state lama dari peramban lain tidak boleh menyelundupkan kunci baru.
+//
+// MIGRASI: pemasangan yang sudah pernah menyelesaikan (atau melewati) tur lama menyimpan
+// localStorage['fiezel-tour-v1']. Murid itu sudah pernah dituntun; menampilkan tur menu lagi
+// setelah pembaruan ini akan terasa seperti aplikasi lupa. Karena itu kunci lama dibaca SEKALI
+// sebagai menu:true, dan hanya ketika state belum punya pendapat sendiri soal menu.
+function legacyTourSeen(){try{return localStorage.getItem(self.FiezelTour?.STORAGE_KEY||'fiezel-tour-v1')!=null}catch{return false}}
+function sanitizeToursSeen(raw){
+  const src=raw&&typeof raw==='object'?raw:{};
+  const next={menu:src.menu===true,library:src.library===true,listening:src.listening===true};
+  if(src.menu===undefined&&legacyTourSeen())next.menu=true;
+  return next;
+}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust)};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust),toursSeen:sanitizeToursSeen(raw?.toursSeen)};
   if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
   next.version=APP_VERSION;
@@ -2123,20 +2142,118 @@ function homeScreenIsClear(){
     return !!document.querySelector('.learning-launcher,.launcher-actions .primary');
   }catch{return false}
 }
+// m026-03: TUR BERSESI. Daftar langkahnya hidup di features/onboarding/fiezel-tour.js
+// (FiezelTour.TOURS); yang tinggal di sini hanya PEMICU dan BENDERA-nya, karena hanya app.js
+// yang tahu view mana yang sedang tergambar dan hanya app.js yang boleh save() state.
+//
+// Tiga tur, tiga bendera terpisah (state.toursSeen), tiga pemicu berbeda:
+//   menu       boot/pasca-perkenalan, layar Home bersih   -> maybeStartTour() di bawah
+//   library    buku pertama dibuka (hook openBook)        -> notifyFeatureTour('library')
+//   listening  sesi listening pertama tergambar           -> notifyFeatureTour('listening')
+const TOUR_FLAG_NAMES=['menu','library','listening'];
+function tourDef(name){try{return self.FiezelTour?.TOURS?.[name]||null}catch{return null}}
+function tourSeen(name){return state.toursSeen?.[name]===true}
+// Bendera dicatat untuk SEMUA hasil kecuali "belum sempat tampil karena layarnya kotor" -
+// termasuk 'skip' dan 'no_target'. Tur yang mencoba lagi setiap render adalah gangguan, dan
+// tur yang menunggu elemen yang tidak akan pernah datang adalah pewaktu abadi.
+function markTourSeen(name){
+  if(!TOUR_FLAG_NAMES.includes(name))return false;
+  state.toursSeen={menu:false,library:false,listening:false,...(state.toursSeen||{}),[name]:true};
+  save();return true;
+}
+// Satu lapisan saja. Splash, perkenalan, tur lain, dan modal semuanya bisa berada di atas
+// layar fitur; menyorot tombol di baliknya menunjuk benda yang tidak terlihat.
+function tourLayerIsClear(){
+  try{
+    if(document.body?.classList?.contains?.('auth-locked'))return false;
+    if(document.querySelector('.fiezel-splash,.fiezel-ob,.fz-tour'))return false;
+    const gate=$('welcome'),auth=$('authGate'),modal=$('modal');
+    if(gate&&!gate.classList.contains('hidden'))return false;
+    if(auth&&!auth.classList.contains('hidden'))return false;
+    if(modal&&!modal.classList.contains('hidden'))return false;
+    return true;
+  }catch{return false}
+}
+function tourViewMatches(name){
+  if(name==='library')return state.view==='library';
+  if(name==='listening')return SKILLS_LAB_VIEWS.has(state.view);
+  return state.view==='home';
+}
+// Layar fitur datang belakangan: library mem-fetch JSON bukunya, addon Skills Lab menunggu
+// runtime suara. Karena resolveSteps MEMBUANG target yang belum tercat, tur yang dimulai
+// terlalu cepat akan tersegel permanen sebagai 'no_target'. Karena itu pola retry yang sama
+// dengan tur menu dipakai di sini juga, hanya lebih pendek.
+const tourFeatureAttempts={library:0,listening:0};
+function maybeStartFeatureTour(name){
+  try{
+    const tour=self.FiezelTour,def=tourDef(name);
+    if(!tour||typeof tour.show!=='function'||!def)return false;
+    if(!TOUR_FLAG_NAMES.includes(name)||name==='menu')return false;
+    if(tourSeen(name))return false;
+    if(!tourViewMatches(name)||!tourLayerIsClear()){
+      if(tourFeatureAttempts[name]++>=6)return false;
+      const retry=setTimeout(()=>maybeStartFeatureTour(name),800);retry?.unref?.();
+      return false;
+    }
+    if(!tour.resolveSteps(self,def.steps).length){
+      if(tourFeatureAttempts[name]++>=6){markTourSeen(name);return false}
+      const retry=setTimeout(()=>maybeStartFeatureTour(name),800);retry?.unref?.();
+      return false;
+    }
+    // force:true karena keputusan "sudah lihat" sekarang milik state.toursSeen, bukan kunci
+    // localStorage lama yang dipakai completed().
+    const res=tour.show(self,{force:true,steps:def.steps});
+    if(res?.shown||res?.reason==='no_target')markTourSeen(name);
+    return res?.shown===true;
+  }catch{return false}
+}
+// Satu-satunya pintu yang dipanggil modul fitur (library UI, addon Skills Lab). Modul fitur
+// tidak boleh tahu apa pun tentang bendera, state, atau save() - ia hanya memberi tahu bahwa
+// layarnya baru tergambar.
+function notifyFeatureTour(name){
+  try{
+    if(!TOUR_FLAG_NAMES.includes(name)||name==='menu')return false;
+    if(tourSeen(name))return false;
+    const t=setTimeout(()=>maybeStartFeatureTour(name),450);t?.unref?.();
+    return true;
+  }catch{return false}
+}
+window.notifyFeatureTour=notifyFeatureTour;
+// Tur MENU. Namanya tidak diubah supaya jadwal boot (setTimeout ... ,900) dan gate yang
+// memeriksanya tetap menunjuk fungsi yang sama. Yang berubah: langkahnya diambil dari
+// registry (7 langkah navigasi, berhenti di kartu penutup - tidak menyeret ke fitur) dan
+// bendera "sudah lihat"-nya state.toursSeen.menu, bukan kunci localStorage lepas.
 function maybeStartTour(){
   try{
-    const tour=self.FiezelTour;
-    if(!tour||typeof tour.show!=='function')return false;
-    if(tour.completed(self))return false;
+    const tour=self.FiezelTour,def=tourDef('menu');
+    if(!tour||typeof tour.show!=='function'||!def)return false;
+    if(tourSeen('menu'))return false;
     if(!homeScreenIsClear()){
       if(tourAttempts++>=12)return false;
       const retry=setTimeout(maybeStartTour,1200);retry?.unref?.();
       return false;
     }
-    return tour.show(self,{})?.shown===true;
+    const res=tour.show(self,{force:true,steps:def.steps});
+    if(res?.shown||res?.reason==='no_target')markTourSeen('menu');
+    return res?.shown===true;
   }catch{return false}
 }
-function replayTour(){try{self.FiezelTour?.reset?.(self);tourAttempts=0;closeModal();setTimeout(maybeStartTour,360);return true}catch{return false}}
+const maybeStartMenuTour=maybeStartTour;
+// Ulangi kenalan cepat (Pengaturan -> Belajar). Dua hal yang diperbaiki di sini, keduanya
+// kelemahan yang ditemukan rekon:
+//
+//   1. SEMUA bendera tur direset, bukan hanya menu. Copy tombolnya menjanjikan tur fitur
+//      muncul lagi "pas kamu masuk fiturnya" - janji itu harus benar.
+//   2. PAKSA go('home') DULU. Sebelumnya replay dari view lain hanya menjadwalkan retry
+//      12x1200 ms yang habis tanpa tur, karena homeScreenIsClear() menuntut view 'home'.
+function replayTour(){try{
+  state.toursSeen={menu:false,library:false,listening:false};save();
+  self.FiezelTour?.reset?.(self);
+  tourAttempts=0;tourFeatureAttempts.library=0;tourFeatureAttempts.listening=0;
+  closeModal();
+  if(state.view!=='home')go('home');
+  const start=setTimeout(maybeStartTour,360);start?.unref?.();
+  return true}catch{return false}}
 window.replayTour=replayTour;
 function openApp(){
   if(appOpened)return true;appOpened=true;
@@ -3617,7 +3734,7 @@ const SKILL_PAGE_COPY={
   listening:{title:'Listening',lead:'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.'},
   speaking:{title:'Speaking',lead:'Ngomong aja dulu. Rekamannya tidak pernah dikirim ke mana pun, cuma dinilai di perangkatmu.'}
 };
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}}});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}}});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host (getActiveLevel, tts, onSessionEnd). Tur baru diberi tahu setelah kartu soalnya benar-benar tercat, bukan saat mount. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
 // m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
@@ -4854,7 +4971,7 @@ function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p
   // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
   // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
   const grupProfil=`<label class="endpoint-label">Nama panggilan<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="Nama kamu" autocomplete="given-name"></label>`+settingsFold('Akun Puter',accountSettingsMarkup(),false,'settings-subfold');
-  const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>Ulangi kenalan cepat</b><small>Tur singkat yang nunjukin tombol mana buat apa</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label></div>`;
+  const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>Ulangi kenalan cepat</b><small>Menjalankan ulang tur menu dari awal. Tur fitur (Audiobook, Listening, dan lainnya) juga bakal muncul lagi pas kamu masuk fiturnya.</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label></div>`;
   const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
   // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
   // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
