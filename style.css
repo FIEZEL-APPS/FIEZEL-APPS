@@ -3135,3 +3135,10 @@ html.fiezel-ui-v6 .launcher-shell{
      panel gelap butuh kuningnya sendiri (#FFC700 = 11,4:1 di atas --core). */
   --focus-ring-on-core:#FFC700;
 }
+
+/* ---------- §9.2 toast: ikon + sejajar ----------
+   Warna toast (permukaan --core, tinta --on-core) sudah dipasang Fase 2 di blok
+   atas; yang ditambahkan di sini hanya tata letaknya supaya ikon dan teks duduk
+   satu baris, dan teks panjang membungkus rata kiri alih-alih rata tengah. */
+.toast{display:flex;align-items:center;gap:8px;text-align:left}
+.toast .toast-mark{flex:0 0 auto;color:var(--sun)}
