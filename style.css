@@ -3156,10 +3156,49 @@ html.fiezel-ui-v6 .launcher-shell{
 .settings-subfold .card{border:0;padding:0;background:transparent}
 /* Aksi utama tidak boleh ikut tergulung: ia menempel di dasar panel yang bisa di-scroll.
    Latar dan garisnya diambil dari token tema yang sama dengan panelnya, bukan literal
-   terang - kalau dipaku, teks tombol ikut hilang persis seperti akar bug m025-85. */
-.modal-actions.settings-actions{position:sticky;bottom:0;z-index:3;margin:18px -26px -32px;padding:14px 26px calc(14px + env(safe-area-inset-bottom,0px));background:var(--glass-solid,var(--panel));-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+   terang - kalau dipaku, teks tombol ikut hilang persis seperti akar bug m025-85.
+
+   m025-165 AKAR BUG FOOTER MENIMPA "Lanjutan":
+   1. margin-bottom NEGATIF (-32px / -26px). #modalPanel adalah scroller-nya sendiri, dan
+      elemen sticky DIJEPIT di dalam content box induknya - bukan di padding box. Margin
+      negatif itu memendekkan scrollHeight sebesar padding bawah panel, sehingga posisi
+      alir footer jatuh 26px DI BAWAH batas jepitan sticky. Hasilnya bar tidak pernah bisa
+      turun ke dasar: ia tertahan melayang di atas elemen terakhir dan menutupi ekor fold
+      "Lanjutan" walau sudah digulir habis (terukur 10px iris di 390x844).
+   2. Ukurannya. Footer memakai .modal-actions button{flex:1;min-width:120px} + padding
+      tombol global 13px 18px, jadi "Simpan pengaturan" membungkus dua baris: tombol 70px,
+      bar 95px. Itu blok, bukan taskbar.
+
+   OBAT: margin bawah dinolkan (footer kembali jadi elemen alir terakhir -> jepitan sticky
+   dan posisi alir berhimpit, iris 0 selamanya), tinggi dipatok setara pita .bottomnav
+   (min-height 58px, padding 7px seperti padding pill nav), dan tombolnya diperlakukan
+   seperti .nav: satu baris, 44px sasaran sentuh, tanpa membungkus. */
+.modal-actions.settings-actions{
+  position:sticky;bottom:0;z-index:6;
+  display:flex;align-items:center;gap:8px;
+  margin:14px -26px 0;
+  padding:7px 26px calc(7px + env(safe-area-inset-bottom,0px));
+  min-height:58px;box-sizing:border-box;
+  background:var(--glass-solid,var(--panel));
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  box-shadow:0 -6px 16px rgba(36,26,17,.07)
+}
+/* Tombol footer mengikuti ukuran tombol navigasi, bukan tombol aksi halaman: 44px sasaran
+   sentuh tetap dihormati (kontrak a11y), tetapi paddingnya tidak lagi menumpuk di atasnya
+   dan labelnya dipaksa satu baris supaya tinggi bar tidak pernah dua kali lipat. */
+.modal-actions.settings-actions button{
+  flex:1 1 0;min-width:0;min-height:44px;height:44px;
+  padding:0 12px;font-size:.86rem;line-height:1.2;white-space:nowrap;
+  border-radius:14px
+}
+/* Panel diberi dasar rata supaya bar benar-benar duduk di dasar modal, dan scroll-padding
+   sebesar bar supaya elemen yang di-fokus/di-scroll-into-view tidak berhenti di baliknya. */
+.modal-panel:has(.modal-actions.settings-actions){padding-bottom:0;scroll-padding-bottom:58px}
+.settings-fold:last-of-type{margin-bottom:0}
 @media(max-width:520px){
-  .modal-actions.settings-actions{bottom:0;margin:16px -20px -26px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px))}
+  .modal-actions.settings-actions{bottom:0;margin:12px -20px 0;padding:7px 20px calc(7px + env(safe-area-inset-bottom,0px));min-height:56px}
+  .modal-panel:has(.modal-actions.settings-actions){scroll-padding-bottom:56px}
 }
 
 .word,
@@ -3167,6 +3206,14 @@ html.fiezel-ui-v6 .launcher-shell{
   font-family:var(--fz-display-round);
   font-weight:600;
   letter-spacing:-.01em;
+}
+/* m025-165 AKAR BUG IKON PETA: kurung tutup di atas ini HILANG saat merge Fase 2/Fase 3.
+   Akibatnya seluruh blok FASE3 di bawah (±200 baris) ikut tertelan sebagai deklarasi
+   tidak sah di dalam .word/.lesson-title dan dibuang parser - termasuk
+   `.map-row .mi svg{width:14px;height:14px}`, satu-satunya aturan yang membatasi ikon
+   lucide di Peta. Tanpa aturan itu svg lucide memakai ukuran intrinsik kontainer dan
+   jadi 300x300 px. Obatnya bukan menambah aturan ikon baru, tetapi menutup kurung ini
+   supaya seluruh ekor berkas hidup lagi. */
 /* ==========================================================================
    ===== FASE3 =====
    Blok terpisah di akhir berkas, dengan sengaja. Fase 2 sedang mengedit blok
