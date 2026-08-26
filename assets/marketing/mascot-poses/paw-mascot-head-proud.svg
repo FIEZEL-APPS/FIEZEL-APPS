@@ -1,0 +1,22 @@
+<!--
+  PAW pose statis: PROUD (mata happy tertutup + senyum + bintang)
+  Sumber geometri : design/redesign-v1/screens/c/listening-feedback.html (mascot-dock inline SVG)
+  Padanan dinamis : promo-v7/shared/mascot/fiezel-mascot.js (grup .fz-eye-happy + .fz-stars, state proud/celebrating)
+  Belum ada di    : fiezel-apps/assets/brand/
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 -18 248 232" role="img" aria-label="PAW bangga">
+  <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+  <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+  <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+  <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+  <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+  <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+  <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+  <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+  <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  <path d="M114 96 C 120 88 132 88 138 96" stroke="#33201F" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M182 96 C 188 88 200 88 206 96" stroke="#33201F" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M146 146 C 154 156 166 156 174 146" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M60 34 l4 -10 4 10 10 4 -10 4 -4 10 -4 -10 -10 -4z" fill="#FFC700" stroke="#E6A800" stroke-width="1.5"/>
+  <path d="M252 20 l3 -8 3 8 8 3 -8 3 -3 8 -3 -8 -8 -3z" fill="#FFC700" stroke="#E6A800" stroke-width="1.5"/>
+  </svg>

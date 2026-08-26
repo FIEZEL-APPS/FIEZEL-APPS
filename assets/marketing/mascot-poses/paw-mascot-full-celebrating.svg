@@ -1,0 +1,39 @@
+<!--
+  PAW pose statis: FULL-BODY CELEBRATING (mata happy + mulut terbuka + lengan kiri diangkat + bintang + ekor)
+  Sumber geometri : design/redesign-v1/screens/d/completion.html (svg.mascot-cel)
+  Padanan dinamis : promo-v7/shared/mascot/fiezel-mascot.js (state st-celebrating: fz-eye-happy, fz-m-open,
+                    fz-arm-l raised, fz-stars; koordinat bintang & lengan sama persis dgn komponen)
+  Belum ada di    : fiezel-apps/assets/brand/ (paw-mascot-full.svg yang ada = pose netral idle)
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="PAW merayakan">
+  <ellipse cx="160" cy="284" rx="86" ry="10" fill="#000" opacity=".08"/>
+  <path d="M212 244 C 266 258 298 238 296 200 C 295 180 284 164 268 158" stroke="#EDB93A" stroke-width="25" fill="none" stroke-linecap="round"/>
+  <rect x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+  <ellipse cx="132" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+  <ellipse cx="188" cy="257" rx="24" ry="11" fill="#EDB93A"/>
+  <ellipse cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+  <g transform="translate(160,224)" fill="#8C2233">
+  <ellipse cx="0" cy="5" rx="10" ry="8"/>
+  <circle cx="-10" cy="-7" r="4"/><circle cx="0" cy="-10" r="4"/><circle cx="10" cy="-7" r="4"/>
+  </g>
+  <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+  <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+  <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+  <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+  <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+  <circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  <!-- mata happy (celebrating) -->
+  <path d="M112 101 C 119 90 133 90 140 101" stroke="#33201F" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <path d="M180 101 C 187 90 201 90 208 101" stroke="#33201F" stroke-width="7" stroke-linecap="round" fill="none"/>
+  <!-- mulut terbuka senang -->
+  <path d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+  <!-- lengan kiri diangkat -->
+  <g transform="rotate(-38 122 236)"><ellipse cx="122" cy="206" rx="14" ry="30" fill="#FFD94F"/></g>
+  <ellipse cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+  <!-- bintang perayaan -->
+  <g fill="#D8B36B">
+  <path d="M42 46 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+  <path d="M282 78 l3.5 9 9 3.5 -9 3.5 -3.5 9 -3.5 -9 -9 -3.5 9 -3.5 Z"/>
+  <path d="M258 6 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#D9536A"/>
+  </g>
+  </svg>
