@@ -1,0 +1,318 @@
+SNAP m01_splash_boot
+SNAP m02_onboarding_1_name
+SNAP m02b_onboarding_1_name_filled
+SNAP m03_onboarding_2_carousel
+SNAP m03b_onboarding_2_carousel_slide2
+SNAP m04_onboarding_3_goal
+SNAP m04b_onboarding_3_goal_selected
+SNAP m05_onboarding_4_placement_offer
+SNAP m06_onboarding_5
+--- DUMP onboarding step5 ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "home-level-context", "txt": "A2 · semua materi · ganti", "oc": "openLevelPanel()", "w": 139, "h": 44}
+  {"cls": "primary luxe coach-strip-go", "txt": "Cari tahu level kamu", "oc": "go('test')", "w": 298, "h": 52}
+  {"cls": "coach-strip-more", "txt": "Lihat detail", "oc": "askCoachAI()", "w": 101, "h": 22}
+  {"cls": "skill-card skill-listening", "txt": "— ListeningBelum diukur · mulai di sini", "oc": "go('listening')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-speaking", "txt": "— SpeakingBelum diukur · mulai di sini", "oc": "go('speaking')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-reading", "txt": "— ReadingBelum diukur · mulai di sini", "oc": "go('reading')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-writing", "txt": "— WritingBelum diukur · mulai di sini", "oc": "go('writing')", "w": 176, "h": 136}
+  {"cls": "primary luxe", "txt": "Mulai hari ini", "oc": "go('test')", "w": 330, "h": 52}
+  {"cls": "journey-goal-chip is-active", "txt": "Sekolah", "oc": "setGoalProfile('school')", "w": 73, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "IT dan teknologi", "oc": "setGoalProfile('it')", "w": 117, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "Beasiswa", "oc": "setGoalProfile('scholarship')", "w": 80, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "Persiapan IELTS/TOEFL", "oc": "setGoalProfile('exam_foundation')", "w": 156, "h": 44}
+  {"cls": "text-button", "txt": "Lihat peta belajar", "oc": "go('progress')", "w": 125, "h": 44}
+  {"cls": "launch-card vocab-launch", "txt": "310 kata · A2Vocabulary", "oc": "go('vocab')", "w": 177, "h": 112}
+  {"cls": "launch-card grammar-launch", "txt": "17 lesson · A2Grammar", "oc": "go('grammar')", "w": 177, "h": 112}
+  {"cls": "launch-card reading-launch", "txt": "50 bacaan · A2Reading", "oc": "go('reading')", "w": 177, "h": 112}
+  {"cls": "launch-card library-launch", "txt": "9 buku · audiobookPerpustakaan", "oc": "go('library')", "w": 177, "h": 112}
+  {"cls": "launch-card classroom-launch", "txt": "Materi · subtitleClassroom", "oc": "go('classroom')", "w": 177, "h": 132}
+  {"cls": "launch-card skills-launch", "txt": "72 latihan · A1–C2Speaking + Listening", "oc": "go('skills')", "w": 177, "h": 132}
+  {"cls": "nav active", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fiezel-back", "txt": "Kembali", "oc": "", "w": 86, "h": 44}
+  {"cls": "fiezel-skip", "txt": "Lewati", "oc": "", "w": 55, "h": 44}
+  {"cls": "fiezel-btn fiezel-btn-primary", "txt": "Lanjut", "oc": "", "w": 336, "h": 46}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+SNAP m06b_onboarding_step
+SNAP m07_onboarding_summary
+SNAP m09_home_top
+SNAP m09b_home_full
+--- DUMP home ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "home-level-context", "txt": "A2 · semua materi · ganti", "oc": "openLevelPanel()", "w": 139, "h": 44}
+  {"cls": "primary luxe coach-strip-go", "txt": "Cari tahu level kamu", "oc": "go('test')", "w": 298, "h": 52}
+  {"cls": "coach-strip-more", "txt": "Lihat detail", "oc": "askCoachAI()", "w": 101, "h": 22}
+  {"cls": "skill-card skill-listening", "txt": "— ListeningBelum diukur · mulai di sini", "oc": "go('listening')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-speaking", "txt": "— SpeakingBelum diukur · mulai di sini", "oc": "go('speaking')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-reading", "txt": "— ReadingBelum diukur · mulai di sini", "oc": "go('reading')", "w": 176, "h": 136}
+  {"cls": "skill-card skill-writing", "txt": "— WritingBelum diukur · mulai di sini", "oc": "go('writing')", "w": 176, "h": 136}
+  {"cls": "primary luxe", "txt": "Mulai hari ini", "oc": "go('test')", "w": 330, "h": 52}
+  {"cls": "journey-goal-chip is-active", "txt": "Sekolah", "oc": "setGoalProfile('school')", "w": 73, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "IT dan teknologi", "oc": "setGoalProfile('it')", "w": 117, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "Beasiswa", "oc": "setGoalProfile('scholarship')", "w": 80, "h": 44}
+  {"cls": "journey-goal-chip", "txt": "Persiapan IELTS/TOEFL", "oc": "setGoalProfile('exam_foundation')", "w": 156, "h": 44}
+  {"cls": "text-button", "txt": "Lihat peta belajar", "oc": "go('progress')", "w": 125, "h": 44}
+  {"cls": "launch-card vocab-launch", "txt": "310 kata · A2Vocabulary", "oc": "go('vocab')", "w": 177, "h": 112}
+  {"cls": "launch-card grammar-launch", "txt": "17 lesson · A2Grammar", "oc": "go('grammar')", "w": 177, "h": 112}
+  {"cls": "launch-card reading-launch", "txt": "50 bacaan · A2Reading", "oc": "go('reading')", "w": 177, "h": 112}
+  {"cls": "launch-card library-launch", "txt": "9 buku · audiobookPerpustakaan", "oc": "go('library')", "w": 177, "h": 112}
+  {"cls": "launch-card classroom-launch", "txt": "Materi · subtitleClassroom", "oc": "go('classroom')", "w": 177, "h": 132}
+  {"cls": "launch-card skills-launch", "txt": "72 latihan · A1–C2Speaking + Listening", "oc": "go('skills')", "w": 177, "h": 132}
+  {"cls": "nav active", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+  {"cls": "fz-tour-skip", "txt": "Lewati", "oc": "", "w": 73, "h": 44}
+  {"cls": "fz-tour-next", "txt": "Lanjut", "oc": "", "w": 86, "h": 44}
+settings fail Page.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("[onclick^='openSettings']")
+    - locator resolved to <button type="button" class="icon-button" onclick="openSettings()" aria-label="Buka pengaturan">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div data-tour-card="" class="fz-tour-card is-top">…</div> from <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> subtree intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div data-tour-card="" class="fz-tour-card is-top">…</div> from <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> subtree intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div data-tour-card="" class="fz-tour-card is-top">…</div> from <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> subtree intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+nav fail vocab view Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Vocab')").first
+    - locator resolved to <button class="nav" type="button" data-view="vocab" onclick="go('vocab')" aria-label="Vocabulary">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+SNAP m11b_vocab_full
+nav fail reading view Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Reading')").first
+    - locator resolved to <button class="nav" type="button" data-view="reading" aria-label="Reading" onclick="go('reading')">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+nav fail progress view Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Peta')").first
+    - locator resolved to <button class="nav" type="button" data-view="progress" onclick="go('progress')" aria-label="Peta belajar">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+SNAP m13b_progress_full
+nav fail home again Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Home')").first
+    - locator resolved to <button type="button" data-view="home" class="nav active" onclick="go('home')" aria-label="Beranda">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+nav fail library view Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.launch-card.library-launch").first
+    - locator resolved to <button onclick="go('library')" class="launch-card library-launch">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not stable
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+SNAP m15b_library_full
+nav fail home Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Home')").first
+    - locator resolved to <button type="button" data-view="home" class="nav active" onclick="go('home')" aria-label="Beranda">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+nav fail classroom view Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.launch-card.classroom-launch").first
+    - locator resolved to <button onclick="go('classroom')" class="launch-card classroom-launch">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not stable
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+
+nav fail home Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for locator("button.nav:has-text('Home')").first
+    - locator resolved to <button type="button" data-view="home" class="nav active" onclick="go('home')" aria-label="Beranda">…</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is visible, enabled and stable
+      - scrolling into view if needed
+      - done scrolling
+      - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+    - retrying click action
+      - waiting 100ms
+    56 × waiting for element to be visible, enabled and stable
+       - element is visible, enabled and stable
+       - scrolling into view if needed
+       - done scrolling
+       - <div role="dialog" class="fz-tour" aria-label="Kenalan cepat dengan FIEZEL">…</div> intercepts pointer events
+     - retrying click action
+       - waiting 500ms
+

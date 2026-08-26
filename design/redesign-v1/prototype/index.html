@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL — Prototype Flow (Warm Paper, Bright Mind)</title>
+<style>
+/* ================= Fonts (offline, companion files) ================= */
+@font-face{font-family:'FZ Jakarta';src:url('fonts/PlusJakartaSans-400.woff2') format('woff2');font-weight:400;font-display:swap;}
+@font-face{font-family:'FZ Jakarta';src:url('fonts/PlusJakartaSans-500.woff2') format('woff2');font-weight:500;font-display:swap;}
+@font-face{font-family:'FZ Jakarta';src:url('fonts/PlusJakartaSans-600.woff2') format('woff2');font-weight:600;font-display:swap;}
+@font-face{font-family:'FZ Jakarta';src:url('fonts/PlusJakartaSans-700.woff2') format('woff2');font-weight:700;font-display:swap;}
+
+/* ================= DIRECTION tokens ================= */
+:root{
+  --bg:#FFF9EE; --panel:#FFFFFF; --panel-soft:#FFF3DC; --line:#F0E4CF; --line-soft:#F7EFDF;
+  --text:#241A11; --muted:#6E5E47; --muted-soft:#857350;
+  --sun:#FFC700; --sun-deep:#E6A800; --sun-press:#CC9600; --sun-soft:#FFF3C4;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  --core:#1B1418; --core-soft:#2A2126; --core-line:#3A3038; --on-core:#FDFAF3; --on-core-muted:rgba(253,250,243,.68);
+  --good:#2E8B69; --good-soft:#E9F7F0; --bad:#B8432D; --bad-soft:#FDE3DE;
+  --info:#8C6D1F; --info-soft:#FFF3C4;
+  --radius-lg:24px; --radius-md:16px; --radius-sm:12px;
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06); --shadow-md:0 10px 30px rgba(36,26,17,.09); --shadow-lg:0 24px 60px rgba(36,26,17,.15);
+  --ease:cubic-bezier(.22,.8,.28,1); --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --dur:240ms; --dur-fast:160ms;
+  /* display: FZ Fredoka tidak tersedia offline → fallback Jakarta 700 (dicatat di LAPORAN) */
+  --font-display:'FZ Fredoka','FZ Jakarta',system-ui,sans-serif;
+  --font-ui:'FZ Jakarta',system-ui,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+
+/* ================= Stage (latar netral) ================= */
+body{
+  font-family:var(--font-ui); color:var(--text);
+  background:#EDE8DF;
+  background-image:radial-gradient(1200px 700px at 50% -10%, #F6F2EA 0%, #EDE8DF 55%, #E4DED2 100%);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:18px; min-height:100vh; padding:28px 16px;
+}
+.stage-label{font-size:13px;font-weight:600;color:#6E6250;letter-spacing:.14em;text-transform:uppercase}
+.stage-sub{font-size:12px;color:#8A7E68;margin-top:-12px}
+
+/* ================= Device frame 390×844 ================= */
+.device{
+  width:414px; height:868px; flex:none;
+  background:#171013; border-radius:56px; padding:12px;
+  box-shadow:var(--shadow-lg), 0 2px 0 rgba(255,255,255,.35) inset;
+  position:relative;
+}
+.device::after{ /* speaker notch pill */
+  content:""; position:absolute; top:26px; left:50%; transform:translateX(-50%);
+  width:118px; height:26px; border-radius:14px; background:#171013; z-index:60; pointer-events:none;
+}
+.viewport{
+  width:390px; height:844px; border-radius:44px; overflow:hidden; position:relative;
+  background:var(--bg);
+}
+
+/* status bar */
+.statusbar{
+  position:absolute; top:0; left:0; right:0; height:52px; z-index:50;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  padding:0 30px 6px; pointer-events:none;
+  font-size:13px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums;
+}
+.statusbar svg{display:block}
+
+/* ================= Screens & transitions (fade/slide 240ms) ================= */
+.screen{
+  position:absolute; inset:0; padding:60px 0 0; display:none; flex-direction:column;
+  background:var(--bg); overflow:hidden;
+}
+.screen.active{display:flex}
+.screen-scroll{flex:1; overflow-y:auto; overflow-x:hidden; padding:6px 20px 118px; scrollbar-width:none}
+.screen-scroll::-webkit-scrollbar{display:none}
+
+@keyframes screenIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes screenInBack{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes screenOut{from{opacity:1}to{opacity:0}}
+.screen.entering{animation:screenIn var(--dur) var(--ease) both;z-index:2}
+.screen.leaving{display:flex;animation:screenOut var(--dur) var(--ease) both;z-index:1;pointer-events:none}
+.screen.entering.back{animation:screenInBack var(--dur) var(--ease) both}
+@keyframes riseIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.rise{animation:riseIn 320ms var(--ease) both}
+
+/* ================= Type scale ================= */
+.display{font-family:var(--font-display);font-size:28px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+h1.h1,.h1{font-family:var(--font-display);font-size:22px;line-height:1.2;font-weight:700}
+.h2{font-size:18px;font-weight:700}
+.body{font-size:15px;line-height:1.5}
+.label{font-size:13px;font-weight:600}
+.micro{font-size:12px} /* LANTAI 12px */
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.num{font-weight:700;font-variant-numeric:tabular-nums}
+:is(h1,h2,h3)[tabindex="-1"]{outline:none}
+
+/* ================= Buttons (spring press) ================= */
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.btn{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  min-height:52px; padding:0 20px; width:100%;
+  border-radius:var(--radius-md); font-size:15px; font-weight:700;
+  transition:transform var(--dur) var(--ease-spring), box-shadow var(--dur) var(--ease),
+             background-color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+}
+.btn:active{transform:scale(.96)}
+.btn-ink{background:var(--text); color:#FFF6E4; box-shadow:var(--shadow-md)}
+.btn-ink:hover{background:#3A2C1D}
+.btn-sun{background:var(--sun); color:var(--text); box-shadow:var(--shadow-sm)}
+.btn-sun:hover{background:#FFD230}
+.btn-sun:active{background:var(--sun-press)}
+.btn-ghost{background:transparent; color:var(--muted); border:1.5px solid var(--line); min-height:48px}
+.btn-ghost:hover{background:var(--panel-soft); color:var(--text)}
+.btn[disabled]{ /* audit fix #4: teks kontras + ikon gembok, bukan opacity rendah */
+  background:var(--panel-soft); color:var(--muted); box-shadow:none; cursor:not-allowed;
+}
+.btn[disabled]:active{transform:none}
+.btn-icon{
+  width:44px; min-width:44px; height:44px; border-radius:14px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--panel); border:1.5px solid var(--line); color:var(--text);
+  transition:transform var(--dur) var(--ease-spring), background-color var(--dur-fast) var(--ease);
+}
+.btn-icon:hover{background:var(--panel-soft)}
+.btn-icon:active{transform:scale(.92)}
+
+/* audit fix #7: focus ring konsisten */
+:focus-visible{outline:2px solid var(--sun-deep); outline-offset:2px; border-radius:6px}
+.btn:focus-visible,.btn-icon:focus-visible,.opt:focus-visible,.lesson-card:focus-visible{border-radius:var(--radius-md)}
+
+/* ================= Cards ================= */
+.card{background:var(--panel); border:1px solid var(--line); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); padding:18px}
+.card-soft{background:var(--panel-soft); border:1px solid var(--line)}
+
+/* Bright Mind (panel AI) */
+.core-card{
+  background:var(--core); color:var(--on-core); border-radius:var(--radius-lg);
+  padding:18px; position:relative; overflow:hidden; box-shadow:var(--shadow-md);
+}
+.core-card .eyebrow{color:#FFC700}
+.core-card .muted{color:var(--on-core-muted)}
+.core-neural{position:absolute; inset:0; pointer-events:none; opacity:.5}
+
+/* ================= Header row ================= */
+.apph{display:flex;align-items:center;gap:12px;padding:8px 20px 10px}
+.apph .grow{flex:1;min-width:0}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;
+      background:var(--sun-soft);color:var(--info);font-size:12px;font-weight:700}
+.chip-line{background:var(--panel);border:1.5px solid var(--line);color:var(--muted)}
+
+/* progress bar (quiz) */
+.pbar{flex:1;height:8px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+.pbar > i{display:block;height:100%;border-radius:99px;background:var(--sun-grad);
+          transition:width 420ms var(--ease); width:0}
+
+/* ================= Home ================= */
+.stat-row{display:flex;gap:10px}
+.stat{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-md);
+      padding:12px 10px;text-align:center}
+.stat .num{font-size:18px}
+.stat .micro{color:var(--muted)}
+
+.continue-card{display:flex;flex-direction:column;gap:12px}
+.lesson-meta{display:flex;gap:8px;flex-wrap:wrap}
+
+/* bottom nav */
+.tabbar{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:40;
+  background:rgba(255,255,255,.92); backdrop-filter:blur(8px);
+  border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow-md);
+  display:flex; padding:6px;
+}
+.tab{flex:1;min-height:52px;border-radius:16px;display:flex;flex-direction:column;align-items:center;
+     justify-content:center;gap:3px;font-size:12px;font-weight:600;color:var(--muted);
+     transition:transform var(--dur) var(--ease-spring), background-color var(--dur-fast) var(--ease)}
+.tab:active{transform:scale(.94)}
+.tab[aria-current="page"]{background:var(--sun-soft);color:var(--text)}
+
+/* mascot dock (aturan maskot: dock kanan-bawah 88px, tak menutupi konten) */
+.paw-dock{position:absolute;right:14px;bottom:96px;width:88px;height:88px;z-index:30;pointer-events:none}
+.paw-dock svg{width:100%;height:100%;filter:drop-shadow(0 6px 14px rgba(36,26,17,.18))}
+.paw-inline{width:96px;height:90px;flex:none}
+.paw-inline svg,.paw-big svg{width:100%;height:100%}
+@keyframes pawFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.paw-dock .paw-anim{animation:pawFloat 3.2s ease-in-out infinite}
+
+/* coach bubble: maks 2 baris, auto-dismiss */
+.coach{
+  position:absolute;right:108px;bottom:118px;z-index:30;max-width:220px;
+  background:var(--core);color:var(--on-core);font-size:13px;font-weight:600;line-height:1.35;
+  padding:10px 14px;border-radius:16px 16px 4px 16px;box-shadow:var(--shadow-md);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  transition:opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.coach.hide{opacity:0;transform:translateY(6px);pointer-events:none}
+
+/* ================= Lesson select ================= */
+.lesson-card{
+  width:100%;text-align:left;display:flex;align-items:center;gap:14px;
+  background:var(--panel);border:1.5px solid var(--line);border-radius:var(--radius-lg);
+  padding:16px;box-shadow:var(--shadow-sm);
+  transition:transform var(--dur) var(--ease-spring), border-color var(--dur-fast) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.lesson-card:hover{border-color:var(--sun-deep);box-shadow:var(--shadow-md)}
+.lesson-card:active{transform:scale(.97)}
+.lesson-card.locked{background:var(--panel-soft);box-shadow:none;cursor:not-allowed}
+.lesson-card.locked:hover{border-color:var(--line)}
+.lesson-card.locked:active{transform:none}
+.lesson-ico{width:48px;height:48px;border-radius:16px;flex:none;display:flex;align-items:center;justify-content:center}
+.lesson-ico.sun{background:var(--sun-soft);color:var(--info)}
+.lesson-ico.lock{background:#F1E8D4;color:var(--muted)}
+.badge-paw{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--info);
+           background:var(--sun-soft);border-radius:999px;padding:3px 9px}
+
+/* ================= Quiz ================= */
+.qcard{display:flex;flex-direction:column;gap:6px}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.opt{
+  width:100%;min-height:52px;text-align:left;display:flex;align-items:center;gap:12px;
+  background:var(--panel);border:1.5px solid var(--line);border-radius:var(--radius-md);
+  padding:12px 16px;font-size:15px;font-weight:600;box-shadow:var(--shadow-sm);
+  transition:transform var(--dur) var(--ease-spring), border-color var(--dur-fast) var(--ease),
+             background-color var(--dur-fast) var(--ease);
+}
+.opt:hover{border-color:var(--sun-deep)}
+.opt:active{transform:scale(.97)}
+.opt .key{width:28px;height:28px;border-radius:9px;background:var(--line-soft);color:var(--muted);
+          display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.opt.correct{border-color:var(--good);background:var(--good-soft)}
+.opt.correct .key{background:var(--good);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .key{background:var(--bad);color:#fff}
+.opt[disabled]{cursor:default}
+.opt[disabled]:not(.correct):not(.wrong){color:var(--muted);background:var(--panel-soft);box-shadow:none}
+.opt[disabled]:active{transform:none}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.opt.shake{animation:shake 320ms var(--ease)}
+
+.feedback{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.verdict{display:flex;align-items:center;gap:12px;border-radius:var(--radius-md);padding:12px 14px;font-weight:700}
+.verdict.good{background:var(--good-soft);color:var(--good);border:1px solid #CFEDDD}
+.verdict.bad{background:var(--bad-soft);color:var(--bad);border:1px solid #F6CFC5}
+.verdict .paw-slot{width:52px;height:50px;flex:none;margin-left:auto}
+.verdict .paw-slot svg{width:100%;height:100%}
+.why-card{border-left:4px solid var(--sun);background:var(--panel);border-radius:var(--radius-md);
+          border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+          padding:14px 16px;box-shadow:var(--shadow-sm)}
+.hint-card{background:var(--info-soft);border:1px solid #F2E3AE;border-radius:var(--radius-md);padding:12px 14px;
+           display:flex;gap:10px;align-items:flex-start}
+.hint-card svg{flex:none;margin-top:1px;color:var(--info)}
+
+/* ================= Listening player (baru) ================= */
+.player{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);
+        box-shadow:var(--shadow-md);padding:20px;display:flex;flex-direction:column;gap:16px}
+.play-row{display:flex;align-items:center;gap:16px}
+.play-btn{
+  width:64px;height:64px;border-radius:50%;flex:none;
+  background:var(--text);color:#FFF6E4;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow-md);
+  transition:transform var(--dur) var(--ease-spring), background-color var(--dur-fast) var(--ease);
+}
+.play-btn:hover{background:#3A2C1D}
+.play-btn:active{transform:scale(.92)}
+.wave{display:flex;align-items:center;gap:3px;height:40px;flex:1}
+.wave i{flex:1;border-radius:99px;background:var(--line);transition:background-color 200ms var(--ease)}
+.wave i.on{background:var(--sun-deep)}
+@keyframes waveDance{0%,100%{transform:scaleY(.55)}50%{transform:scaleY(1)}}
+.player.playing .wave i.on{animation:waveDance .9s ease-in-out infinite}
+.player.playing .wave i.on:nth-child(2n){animation-delay:.15s}
+.player.playing .wave i.on:nth-child(3n){animation-delay:.3s}
+.ptime{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ptrack{height:8px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+.ptrack > i{display:block;height:100%;width:0;border-radius:99px;background:var(--sun-grad)}
+.transcript{border-top:1px dashed var(--line);padding-top:14px;display:none}
+.transcript.show{display:block;animation:riseIn 320ms var(--ease) both}
+
+/* ================= Completion ================= */
+.done-hero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding-top:6px}
+.ring{position:relative;width:150px;height:150px;margin:8px 0 4px}
+.ring svg{transform:rotate(-90deg)}
+.ring .ring-fg{stroke:url(#sunGrad);stroke-linecap:round;transition:stroke-dashoffset 900ms var(--ease)}
+.ring .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.confetti i{position:absolute;border-radius:3px;opacity:0}
+@keyframes confettiFall{0%{transform:translateY(-30px) rotate(0);opacity:0}12%{opacity:1}100%{transform:translateY(560px) rotate(320deg);opacity:0}}
+.celebrate .confetti i{animation:confettiFall 2.6s var(--ease) both}
+.paw-big{width:150px;height:142px;margin:2px auto 0}
+
+/* ================= Reduced motion ================= */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms !important; animation-delay:0ms !important;
+    animation-iteration-count:1 !important; transition-duration:.01ms !important;
+  }
+  .paw-dock .paw-anim{animation:none}
+}
+
+/* stage responsiveness (frame tetap 390×844; hanya di-scale visual bila layar pendek) */
+@media (max-height:960px){ .device{transform:scale(.92); transform-origin:top center} }
+</style>
+</head>
+<body>
+  <div class="stage-label">Fiezel · Prototype Flow</div>
+  <p class="stage-sub">Warm Paper, Bright Mind — 6 langkah klik-able · 390×844</p>
+
+  <div class="device" role="region" aria-label="Prototype Fiezel dalam bingkai perangkat">
+    <div class="viewport" id="viewport">
+      <div class="statusbar" aria-hidden="true">
+        <span>16:25</span>
+        <span style="display:flex;gap:6px;align-items:center">
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="4.5" width="3" height="7.5" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+          <svg width="24" height="12" viewBox="0 0 24 12" fill="none"><rect x="1" y="1" width="19" height="10" rx="3" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="3" width="12" height="6" rx="1.6" fill="currentColor"/><rect x="21.5" y="4" width="2" height="4" rx="1" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <!-- screens diinjeksikan oleh app.js -->
+    </div>
+  </div>
+
+  <button class="btn btn-ghost" id="globalReset" style="width:auto;padding:0 26px" type="button">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+    Reset flow
+  </button>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL — Component Library (Warm Paper, Bright Mind)</title>
+<link rel="stylesheet" href="components.css">
+</head>
+<body>
+
+<!-- ================= LUCIDE-STYLE ICON SPRITE (stroke 1.75, offline) ================= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H3v-7a9 9 0 0 1 18 0v7h-3a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2z"/><path d="M9 3v16M15 5v16"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4.5 20 12 6 19.5z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+</svg>
+
+<!-- ================= HEADER ================= -->
+<header class="lib-header">
+  <p class="eyebrow">FIEZEL REBRAND · KOMPONEN · DRAF TOKEN DIRECTION.MD</p>
+  <h1 class="display">Warm Paper, Bright Mind — Component Library</h1>
+  <p>Satu halaman offline berisi semua komponen sistem baru dengan semua state relevan.
+     Warm Paper = permukaan belajar krem <code>--bg #FFF9EE</code>; Bright Mind = panel AI gelap <code>--core #1B1418</code> dipakai hemat.
+     Setiap komponen diberi label nama + anotasi token. Lantai font 12px, focus ring 2px <code>--sun-deep</code> offset 2px, target sentuh ≥44px.</p>
+  <nav class="lib-toc">
+    <a href="#tokens">Token</a><a href="#buttons">Tombol</a><a href="#cards">Kartu</a><a href="#chips">Chip/Badge</a>
+    <a href="#progress">Progress</a><a href="#tabs">Tabs</a><a href="#nav">Bottom nav</a><a href="#answers">Answer choice</a>
+    <a href="#feedback">Feedback</a><a href="#hint">Hint panel</a><a href="#audio">Audio player</a><a href="#mascot">Maskot</a>
+    <a href="#empty">Empty/Skeleton</a><a href="#toast">Toast</a><a href="#modal">Modal</a><a href="#form">Form/Toggle</a>
+  </nav>
+</header>
+
+<main class="lib-main">
+
+<!-- ================= 0. TOKEN ================= -->
+<h2 class="lib-section-title" id="tokens">0 · Token draf (dari DIRECTION.md)</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Palet inti</div>
+    <p class="spec-tokens">Draf persis DIRECTION — agen token memfinalkan + matriks WCAG. Coral/mint/lilac didemosi dari permukaan tombol/aksi.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="swatchrow">
+      <div class="swatch"><i style="background:var(--bg)"></i><span><b>--bg</b>#FFF9EE</span></div>
+      <div class="swatch"><i style="background:var(--panel);border-bottom:1px solid var(--line)"></i><span><b>--panel</b>#FFFFFF</span></div>
+      <div class="swatch"><i style="background:var(--panel-soft)"></i><span><b>--panel-soft</b>#FFF3DC</span></div>
+      <div class="swatch"><i style="background:var(--text)"></i><span><b>--text</b>#241A11</span></div>
+      <div class="swatch"><i style="background:var(--muted)"></i><span><b>--muted</b>#6E5E47</span></div>
+      <div class="swatch"><i style="background:var(--sun)"></i><span><b>--sun</b>#FFC700</span></div>
+      <div class="swatch"><i style="background:var(--sun-deep)"></i><span><b>--sun-deep</b>#E6A800</span></div>
+      <div class="swatch"><i style="background:var(--sun-grad)"></i><span><b>--sun-grad</b>#FFDE59→#FFA500</span></div>
+      <div class="swatch"><i style="background:var(--core)"></i><span><b>--core</b>#1B1418</span></div>
+      <div class="swatch"><i style="background:var(--good)"></i><span><b>--good</b>#2E8B69</span></div>
+      <div class="swatch"><i style="background:var(--bad)"></i><span><b>--bad</b>#B8432D</span></div>
+      <div class="swatch"><i style="background:var(--info-soft)"></i><span><b>--info-soft</b>#FFF3C4</span></div>
+    </div>
+    <p class="lib-note">Tipe: display 28 (FZ Fredoka — file font belum ada di repo aset, fallback Jakarta 700 sementara), h1 22 / h2 18 / body 15 / label 13 / micro 12 Jakarta. Radius 24/16/12. Shadow sm/md/lg. Ease + ease-spring.</p>
+  </div>
+</figure>
+
+<!-- ================= 1. TOMBOL ================= -->
+<h2 class="lib-section-title" id="buttons">1 · Tombol</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Button / Primer Ink</div>
+    <p class="spec-tokens">Token: <code>--text</code> permukaan · <code>--on-core</code> teks (≈15:1) · <code>--radius-md</code> · <code>--shadow-sm/md</code> · <code>--ease-spring</code> · focus <code>--sun-deep</code>. Disabled: <code>--panel-soft</code> + <code>--muted</code> ≥4.5:1 + gembok (audit fix #4).</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span><button class="btn btn-ink" data-cc="btn-ink">Mulai belajar</button></div>
+    <div class="state"><span>Hover</span><button class="btn btn-ink is-hover">Mulai belajar</button></div>
+    <div class="state"><span>Press</span><button class="btn btn-ink is-press">Mulai belajar</button></div>
+    <div class="state"><span>Focus-visible</span><button class="btn btn-ink is-focus">Mulai belajar</button></div>
+    <div class="state"><span>Loading</span><button class="btn btn-ink is-loading" aria-busy="true"><span class="spinner" aria-hidden="true"></span>Menyimpan…</button></div>
+    <div class="state"><span>Disabled</span><button class="btn is-disabled" disabled data-cc="btn-disabled"><svg class="icon"><use href="#i-lock"/></svg>Mulai belajar</button></div>
+  </div>
+</figure>
+
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Button / Primer Sun (+ varian gradasi CTA)</div>
+    <p class="spec-tokens">Token: <code>--sun</code> → hover <code>--sun-deep</code> → press <code>--sun-press</code> · teks <code>--text</code> (≥10:1) · gradasi <code>--sun-grad</code> utk CTA energi.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span><button class="btn btn-sun" data-cc="btn-sun">Lanjut</button></div>
+    <div class="state"><span>Hover</span><button class="btn btn-sun is-hover" data-cc="btn-sun-hover">Lanjut</button></div>
+    <div class="state"><span>Press</span><button class="btn btn-sun is-press" data-cc="btn-sun-press">Lanjut</button></div>
+    <div class="state"><span>Focus-visible</span><button class="btn btn-sun is-focus">Lanjut</button></div>
+    <div class="state"><span>Loading</span><button class="btn btn-sun is-loading" aria-busy="true"><span class="spinner" aria-hidden="true"></span>Menilai…</button></div>
+    <div class="state"><span>Success</span><button class="btn is-success"><svg class="icon"><use href="#i-check"/></svg>Tersimpan</button></div>
+    <div class="state"><span>Error</span><button class="btn is-error"><svg class="icon"><use href="#i-x"/></svg>Gagal, coba lagi</button></div>
+    <div class="state"><span>Gradasi (CTA)</span><button class="btn btn-sun-grad" data-cc="btn-grad">Mulai hari ini</button></div>
+  </div>
+</figure>
+
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Button / Sekunder Outline · Ghost · Ikon 44px</div>
+    <p class="spec-tokens">Token: <code>--panel</code> + border <code>--line</code>→hover <code>--text</code> · ghost hover <code>--panel-soft</code> · ikon 44×44 <code>--radius-sm</code> Lucide 20/1.75 (audit fix #6: target ≥44px).</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Outline default</span><button class="btn btn-outline" data-cc="btn-outline">Keluar</button></div>
+    <div class="state"><span>Outline hover</span><button class="btn btn-outline is-hover">Keluar</button></div>
+    <div class="state"><span>Outline press</span><button class="btn btn-outline is-press">Keluar</button></div>
+    <div class="state"><span>Outline focus</span><button class="btn btn-outline is-focus">Keluar</button></div>
+    <div class="state"><span>Ghost default</span><button class="btn btn-ghost">Lewati dulu</button></div>
+    <div class="state"><span>Ghost hover</span><button class="btn btn-ghost is-hover">Lewati dulu</button></div>
+    <div class="state"><span>Ikon default</span><button class="btn btn-outline btn-icon" aria-label="Cari"><svg class="icon"><use href="#i-search"/></svg></button></div>
+    <div class="state"><span>Ikon hover</span><button class="btn btn-outline btn-icon is-hover" aria-label="Cari"><svg class="icon"><use href="#i-search"/></svg></button></div>
+    <div class="state"><span>Ikon focus</span><button class="btn btn-sun btn-icon is-focus" aria-label="Tanya FIEZEL"><svg class="icon"><use href="#i-sparkles"/></svg></button></div>
+    <div class="state"><span>Ikon disabled</span><button class="btn btn-icon is-disabled" disabled aria-label="Mic terkunci"><svg class="icon"><use href="#i-lock"/></svg></button></div>
+  </div>
+</figure>
+
+<!-- ================= 2. KARTU ================= -->
+<h2 class="lib-section-title" id="cards">2 · Kartu</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Card / Lesson</div>
+    <p class="spec-tokens">Token: <code>--panel</code> · <code>--line</code> · <code>--radius-lg</code> · <code>--shadow-sm→md</code> · eyebrow 12 <code>--muted</code> · judul Jakarta 700 18 · progress <code>--sun-grad</code>. Seluruh kartu klik-able.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span>
+      <a class="card-lesson" href="#0">
+        <div class="row"><span class="eyebrow">Grammar · Jalur A2</span><span class="badge-level">A2</span></div>
+        <h3>Present Continuous untuk rencana</h3>
+        <p class="meta">12 soal · ±8 menit · terakhir 3 hari lalu</p>
+        <div class="progress"><div class="track"><div class="fill" style="width:45%"></div></div>
+          <div class="caption"><span>Progres</span><b>45%</b></div></div>
+        <div class="row"><span class="meta">Lanjutkan dari soal 6</span><svg class="icon go"><use href="#i-chevron"/></svg></div>
+      </a>
+    </div>
+    <div class="state"><span>Hover</span>
+      <a class="card-lesson is-hover" href="#0">
+        <div class="row"><span class="eyebrow">Grammar · Jalur A2</span><span class="badge-level">A2</span></div>
+        <h3>Simple Past: kata kerja tak beraturan</h3>
+        <p class="meta">25 soal · ±15 menit</p>
+        <div class="progress"><div class="track"><div class="fill" style="width:0%"></div></div>
+          <div class="caption"><span>Belum dimulai</span><b>0%</b></div></div>
+      </a>
+    </div>
+    <div class="state"><span>Focus-visible</span>
+      <a class="card-lesson is-focus" href="#0">
+        <div class="row"><span class="eyebrow">Listening · Jalur A2</span><span class="badge-level">A2</span></div>
+        <h3>Dictation: percakapan kafe</h3>
+        <p class="meta">8 klip · ±10 menit</p>
+      </a>
+    </div>
+    <div class="state"><span>Disabled (terkunci)</span>
+      <div class="card-lesson is-disabled" aria-disabled="true">
+        <div class="row"><span class="eyebrow" style="color:var(--muted)">Grammar · Jalur B1</span><svg class="icon" style="color:var(--muted)"><use href="#i-lock"/></svg></div>
+        <h3>Conditional tipe 2</h3>
+        <p class="meta">Selesaikan jalur A2 dulu untuk membuka</p>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Card / Modul (grid 2 kolom)</div>
+    <p class="spec-tokens">Token: tile ikon <code>--sun-soft</code>/<code>--good-soft</code> · <code>--radius-lg</code> · meta 12 <code>--muted</code> · ikon Lucide 24.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span>
+      <div class="card-module"><div class="tile"><svg class="icon icon-24"><use href="#i-book"/></svg></div><h3>Vocabulary</h3><p class="meta">320 kata · 12 due hari ini</p></div>
+    </div>
+    <div class="state"><span>Hover</span>
+      <div class="card-module is-hover"><div class="tile good"><svg class="icon icon-24"><use href="#i-headphones"/></svg></div><h3>Listening</h3><p class="meta">Dictation · level A2</p></div>
+    </div>
+    <div class="state"><span>Loading (skeleton)</span>
+      <div class="card-module"><div class="skel skel-tile"></div><div class="skel skel-line w80"></div><div class="skel skel-line w60"></div></div>
+    </div>
+  </div>
+</figure>
+
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Card / Panel AI Core (Bright Mind) — garis neural</div>
+    <p class="spec-tokens">Token: <code>--core</code> · <code>--core-line</code> · <code>--on-core</code>/<code>--on-core-muted</code> · aksen <code>--sun</code> · <code>--shadow-lg</code>. Dipakai HEMAT: hanya momen AI (BrainCore, analyzing, adaptive path).</p>
+  </figcaption>
+  <div class="spec-body on-core-bg">
+    <div class="state"><span>Default (diagnosis)</span>
+      <div class="card-core">
+        <svg class="neural" viewBox="0 0 364 220" preserveAspectRatio="none" aria-hidden="true">
+          <g stroke="#FFC700" stroke-width="1" fill="none" opacity=".35">
+            <path d="M-10 40 C60 20 120 90 190 62 S 320 30 380 58"/>
+            <path d="M-10 120 C80 96 150 160 230 128 S 330 100 380 132"/>
+            <path d="M40 -10 C58 60 30 130 70 230"/>
+            <path d="M300 -10 C280 70 320 140 290 230"/>
+          </g>
+          <g fill="#FFC700" opacity=".7">
+            <circle cx="60" cy="31" r="2.5"/><circle cx="190" cy="62" r="3"/><circle cx="300" cy="42" r="2"/>
+            <circle cx="90" cy="104" r="2"/><circle cx="230" cy="128" r="3"/><circle cx="52" cy="88" r="2"/><circle cx="296" cy="176" r="2.5"/>
+          </g>
+        </svg>
+        <p class="eyebrow" style="color:var(--sun)">BrainCore · Diagnosis</p>
+        <h3>Pola kesalahanmu: to be di kalimat tanya</h3>
+        <p>PAW mendeteksi 4 dari 5 salah terakhir memakai pola yang sama. Jalur belajar disesuaikan.</p>
+        <div class="row" style="display:flex;align-items:center;justify-content:space-between">
+          <span class="stat">82%</span>
+          <button class="btn btn-sun" style="min-height:44px" data-cc="btn-core-cta">Latih pola ini</button>
+        </div>
+      </div>
+    </div>
+    <div class="state"><span>Loading (analyzing)</span>
+      <div class="card-core">
+        <svg class="neural" viewBox="0 0 364 160" preserveAspectRatio="none" aria-hidden="true">
+          <g stroke="#FFC700" stroke-width="1" fill="none" opacity=".3">
+            <path d="M-10 40 C60 20 120 90 190 62 S 320 30 380 58"/>
+            <path d="M-10 110 C80 86 150 150 230 118 S 330 90 380 122"/>
+          </g>
+        </svg>
+        <p class="eyebrow" style="color:var(--sun)">BrainCore · Analyzing</p>
+        <h3 style="display:flex;gap:10px;align-items:center">Membaca jawabanmu <span class="pulse-dots"><i></i><i></i><i></i></span></h3>
+        <p>OBSERVE → ANALYZE → ADAPT. Sebentar ya…</p>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 3. CHIP / BADGE ================= -->
+<h2 class="lib-section-title" id="chips">3 · Chip &amp; Badge</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Chip level CEFR · Chip streak · Badge NEEDS ATTENTION</div>
+    <p class="spec-tokens">Token: aktif <code>--sun</code>+<code>--text</code> · idle <code>--panel</code>/<code>--line</code> · streak <code>--sun-soft</code>+ikon <code>--sun-deep</code> · attention <code>--bad-soft</code>+<code>--bad</code> 12/700 caps. Hit-area chip diperluas ke ≥44px.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>CEFR default + aktif</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="chip">A1</button><button class="chip is-active" data-cc="chip-active">A2</button><button class="chip">B1</button>
+        <button class="chip">B2</button><button class="chip">C1</button><button class="chip">C2</button>
+      </div>
+    </div>
+    <div class="state"><span>Hover</span><button class="chip is-hover">B1</button></div>
+    <div class="state"><span>Focus-visible</span><button class="chip is-focus">B2</button></div>
+    <div class="state"><span>Disabled</span><button class="chip is-disabled" disabled><svg class="icon" style="width:14px;height:14px"><use href="#i-lock"/></svg>C2</button></div>
+    <div class="state"><span>Streak</span><span class="chip chip-streak"><svg class="icon"><use href="#i-flame"/></svg><b class="num">12</b>&nbsp;hari</span></div>
+    <div class="state"><span>Needs attention</span><span class="badge-attn" data-cc="badge-attn"><svg class="icon" style="width:14px;height:14px"><use href="#i-info"/></svg>Needs attention</span></div>
+    <div class="state"><span>Badge level (ink)</span><span class="badge-level">A2</span></div>
+  </div>
+</figure>
+
+<!-- ================= 4. PROGRESS ================= -->
+<h2 class="lib-section-title" id="progress">4 · Progress bar &amp; ring</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Progress bar · Progress ring</div>
+    <p class="spec-tokens">Token: track <code>--line-soft</code>+border <code>--line</code> · fill <code>--sun-grad</code> (selesai: <code>--good</code>) · angka Jakarta 700 tabular-nums · ring stroke <code>--sun</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default 45%</span>
+      <div class="progress"><div class="track"><div class="fill" style="width:45%"></div></div>
+        <div class="caption"><span>Soal 11 dari 25</span><b>45%</b></div></div>
+    </div>
+    <div class="state"><span>Empty 0%</span>
+      <div class="progress"><div class="track"><div class="fill" style="width:0%"></div></div>
+        <div class="caption"><span>Belum dimulai</span><b>0%</b></div></div>
+    </div>
+    <div class="state"><span>Success 100%</span>
+      <div class="progress"><div class="track"><div class="fill good" style="width:100%"></div></div>
+        <div class="caption"><span>Sesi selesai</span><b style="color:var(--good)">100%</b></div></div>
+    </div>
+    <div class="state"><span>Ring 3/5 hari</span>
+      <div class="ring">
+        <svg viewBox="0 0 76 76" aria-hidden="true">
+          <circle cx="38" cy="38" r="32" fill="none" stroke="var(--line-soft)" stroke-width="8"/>
+          <circle cx="38" cy="38" r="32" fill="none" stroke="var(--sun)" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="80"/>
+        </svg>
+        <span class="val num">3/5</span>
+      </div>
+    </div>
+    <div class="state"><span>Ring loading</span>
+      <div class="ring">
+        <svg viewBox="0 0 76 76" aria-hidden="true" style="animation:spin 1.1s linear infinite">
+          <circle cx="38" cy="38" r="32" fill="none" stroke="var(--line-soft)" stroke-width="8"/>
+          <circle cx="38" cy="38" r="32" fill="none" stroke="var(--sun-deep)" stroke-width="8" stroke-linecap="round" stroke-dasharray="50 151"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 5. TABS ================= -->
+<h2 class="lib-section-title" id="tabs">5 · Tabs</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Tabs (segmented)</div>
+    <p class="spec-tokens">Token: wadah <code>--panel-soft</code>/<code>--line</code> pill · aktif <code>--text</code>+<code>--on-core</code> · label 13/600 · tinggi 44px.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default + aktif + hover</span>
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" role="tab" aria-selected="true" data-cc="tab-active">Ringkasan</button>
+        <button class="tab is-hover" role="tab">Analisis</button>
+        <button class="tab" role="tab" data-cc="tab-idle">Adaptive Engine</button>
+      </div>
+    </div>
+    <div class="state"><span>Focus-visible</span>
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" role="tab" aria-selected="true">Ringkasan</button>
+        <button class="tab is-focus" role="tab">Analisis</button>
+      </div>
+    </div>
+    <div class="state"><span>Disabled</span>
+      <div class="tabs" role="tablist">
+        <button class="tab is-active" role="tab" aria-selected="true">Ringkasan</button>
+        <button class="tab is-disabled" role="tab" disabled><svg class="icon" style="width:14px;height:14px"><use href="#i-lock"/></svg>Lab</button>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 6. BOTTOM NAV ================= -->
+<h2 class="lib-section-title" id="nav">6 · Bottom nav</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Bottom nav 5 item — label 12px (audit fix #3: dari 9,4px)</div>
+    <p class="spec-tokens">Token: glass krem + blur · <code>--line</code> · aktif tile <code>--sun</code> + dot <code>--sun-deep</code> · label 12/600 <code>--muted</code>→aktif <code>--text</code> · item ≥56px.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state" style="width:100%"><span>Default (Home aktif)</span>
+      <nav class="bottomnav" aria-label="Navigasi utama">
+        <a href="#0" class="is-active" aria-current="page"><span class="navtile"><svg class="icon icon-24"><use href="#i-home"/></svg></span>Home</a>
+        <a href="#0" data-cc="nav-label"><span class="navtile"><svg class="icon icon-24"><use href="#i-book"/></svg></span>Vocab</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-sparkles"/></svg></span>Grammar</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-headphones"/></svg></span>Reading</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-map"/></svg></span>Peta</a>
+      </nav>
+    </div>
+    <div class="state" style="width:100%"><span>Focus-visible (item ke-3)</span>
+      <nav class="bottomnav" aria-label="Contoh fokus">
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-home"/></svg></span>Home</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-book"/></svg></span>Vocab</a>
+        <a href="#0" class="is-focus"><span class="navtile"><svg class="icon icon-24"><use href="#i-sparkles"/></svg></span>Grammar</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-headphones"/></svg></span>Reading</a>
+        <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-map"/></svg></span>Peta</a>
+      </nav>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 7. ANSWER CHOICE ================= -->
+<h2 class="lib-section-title" id="answers">7 · Answer choice</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Answer choice (quiz)</div>
+    <p class="spec-tokens">Token: <code>--panel</code>/<code>--line</code> 16/600 · selected <code>--sun-soft</code>+<code>--sun-deep</code> · correct <code>--good-soft</code>+<code>--good</code> · wrong <code>--bad-soft</code>+<code>--bad</code> · disabled <code>--panel-soft</code>+<code>--muted</code> ≥4.5:1 + gembok (audit fix #4 — bukan pudar 2,3:1). Teks state tetap ink.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="stack">
+      <div class="state" style="width:100%"><span>Default</span><button class="answer" data-cc="answer-default"><span>She <b>is going</b> to the market.</span></button></div>
+      <div class="state" style="width:100%"><span>Hover</span><button class="answer is-hover"><span>She <b>goes</b> to the market.</span></button></div>
+      <div class="state" style="width:100%"><span>Focus-visible</span><button class="answer is-focus"><span>She <b>go</b> to the market.</span></button></div>
+    </div>
+    <div class="stack">
+      <div class="state" style="width:100%"><span>Selected (belum dinilai)</span><button class="answer is-selected" aria-pressed="true"><span>She <b>is going</b> to the market.</span><svg class="icon mark" style="color:var(--sun-deep)"><use href="#i-chevron"/></svg></button></div>
+      <div class="state" style="width:100%"><span>Correct</span><button class="answer is-correct" data-cc="answer-correct"><span>She <b>is going</b> to the market.</span><svg class="icon mark"><use href="#i-check"/></svg></button></div>
+      <div class="state" style="width:100%"><span>Wrong</span><button class="answer is-wrong"><span>She <b>goes</b> to the market.</span><svg class="icon mark"><use href="#i-x"/></svg></button></div>
+      <div class="state" style="width:100%"><span>Disabled + gembok (review)</span><button class="answer is-disabled" disabled data-cc="answer-disabled"><span>She <b>go</b> to the market.</span><svg class="icon mark"><use href="#i-lock"/></svg></button></div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 8. FEEDBACK BANNER ================= -->
+<h2 class="lib-section-title" id="feedback">8 · Feedback banner</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Feedback benar / salah / info</div>
+    <p class="spec-tokens">Token: <code>--good-soft</code>·<code>--bad-soft</code>·<code>--info-soft</code> + border semantik · judul ink 15/700 · body 14 <code>--muted</code> (teks kecil tidak memakai hijau/merah mentah — audit 3a). Copy konsisten: “Belum tepat, tidak apa-apa.”</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="stack">
+      <div class="state" style="width:100%"><span>Benar</span>
+        <div class="feedback feedback-good" role="status">
+          <span class="ficon"><svg class="icon"><use href="#i-check"/></svg></span>
+          <div><b>Benar, mantap!</b><p>“Is going” dipakai karena rencananya sudah pasti. Ingat pola be + V-ing.</p></div>
+        </div>
+      </div>
+      <div class="state" style="width:100%"><span>Salah</span>
+        <div class="feedback feedback-bad" role="alert">
+          <span class="ficon"><svg class="icon"><use href="#i-x"/></svg></span>
+          <div><b>Belum tepat, tidak apa-apa.</b><p>Subjek “she” butuh “goes”, bukan “go”. Coba ingat aturan -s orang ketiga.</p></div>
+        </div>
+      </div>
+      <div class="state" style="width:100%"><span>Info</span>
+        <div class="feedback feedback-info" role="status">
+          <span class="ficon"><svg class="icon"><use href="#i-info"/></svg></span>
+          <div><b>Tips jeda</b><p>Kamu sudah 20 menit fokus. Istirahat 2 menit membantu daya ingat.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 9. HINT PANEL ================= -->
+<h2 class="lib-section-title" id="hint">9 · Hint panel bertahap</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Hint panel PROBE → HINT → EXAMPLE → EXPLAIN</div>
+    <p class="spec-tokens">Token: stepper done <code>--sun-soft</code>/<code>--sun</code> · current <code>--text</code>+<code>--on-core</code> · locked <code>--panel-soft</code>+<code>--muted</code>+gembok · isi <code>--panel-soft</code> · ikon bulb <code>--sun-deep</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Tahap 2 aktif (HINT)</span>
+      <div class="hintpanel">
+        <p class="eyebrow">Bantuan bertahap</p>
+        <div class="hint-steps">
+          <span class="hint-step is-done"><svg class="icon"><use href="#i-check"/></svg>PROBE</span>
+          <span class="hint-step is-current">HINT</span>
+          <span class="hint-step is-locked"><svg class="icon"><use href="#i-lock"/></svg>EXAMPLE</span>
+          <span class="hint-step is-locked"><svg class="icon"><use href="#i-lock"/></svg>EXPLAIN</span>
+        </div>
+        <div class="hint-body"><p class="hq"><svg class="icon"><use href="#i-bulb"/></svg>Perhatikan subjeknya: “she” itu orang ketiga tunggal. Apa akibatnya untuk kata kerja?</p></div>
+        <button class="btn btn-outline" style="min-height:44px">Buka contoh (EXAMPLE)</button>
+      </div>
+    </div>
+    <div class="state"><span>Tahap 4 (EXPLAIN, semua terbuka)</span>
+      <div class="hintpanel">
+        <p class="eyebrow">Bantuan bertahap</p>
+        <div class="hint-steps">
+          <span class="hint-step is-done"><svg class="icon"><use href="#i-check"/></svg>PROBE</span>
+          <span class="hint-step is-done"><svg class="icon"><use href="#i-check"/></svg>HINT</span>
+          <span class="hint-step is-done"><svg class="icon"><use href="#i-check"/></svg>EXAMPLE</span>
+          <span class="hint-step is-current">EXPLAIN</span>
+        </div>
+        <div class="hint-body">
+          <p class="hq"><svg class="icon"><use href="#i-sparkles"/></svg>Aturan: orang ketiga tunggal (he/she/it) + simple present → kata kerja diberi -s/-es. “She goes”, bukan “she go”.</p>
+        </div>
+        <button class="btn btn-sun" style="min-height:44px">Oke, aku siap coba lagi</button>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 10. AUDIO PLAYER ================= -->
+<h2 class="lib-section-title" id="audio">10 · Audio player (listening)</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Audio player + tombol Dengarkan (REPLACE coral pastel 1,92:1 → ink ≥4.5:1, audit fix #1)</div>
+    <p class="spec-tokens">Token: Dengarkan = <code>--text</code>+<code>--on-core</code> (≈15:1) · Nilai jawaban = <code>--sun</code>+<code>--text</code> (≥10:1) · equalizer <code>--sun</code> · waktu 13 tabular · replay ikon 44px.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span>
+      <div class="audioplayer">
+        <p class="eyebrow">Listening · Klip 2/8</p>
+        <div class="row">
+          <button class="btn btn-ink" style="flex:1" data-cc="btn-dengarkan"><svg class="icon"><use href="#i-vol"/></svg>Dengarkan</button>
+          <button class="btn btn-outline btn-icon" aria-label="Putar ulang"><svg class="icon"><use href="#i-replay"/></svg></button>
+          <button class="chip">0.75×</button>
+        </div>
+        <div class="progress" style="max-width:none"><div class="track"><div class="fill" style="width:0%"></div></div>
+          <div class="caption"><span class="time">0:00</span><span class="time">0:12</span></div></div>
+        <div class="dictation">
+          <div class="field" style="max-width:none"><label for="dict1">Tulis yang kamu dengar</label><input id="dict1" placeholder="Ketik di sini…"></div>
+          <button class="btn btn-sun" data-cc="btn-nilai">Nilai jawaban</button>
+        </div>
+      </div>
+    </div>
+    <div class="state"><span>Playing + Nilai disabled</span>
+      <div class="audioplayer">
+        <p class="eyebrow">Listening · Klip 2/8</p>
+        <div class="row">
+          <button class="btn btn-ink" style="flex:1"><svg class="icon"><use href="#i-pause"/></svg>Jeda<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>
+          <button class="btn btn-outline btn-icon" aria-label="Putar ulang"><svg class="icon"><use href="#i-replay"/></svg></button>
+          <button class="chip is-active">1×</button>
+        </div>
+        <div class="progress" style="max-width:none"><div class="track"><div class="fill" style="width:38%"></div></div>
+          <div class="caption"><span class="time">0:05</span><span class="time">0:12</span></div></div>
+        <div class="dictation">
+          <div class="field" style="max-width:none"><label for="dict2">Tulis yang kamu dengar</label><input id="dict2" value="I would like a"></div>
+          <button class="btn is-disabled" disabled data-cc="btn-nilai-disabled"><svg class="icon"><use href="#i-lock"/></svg>Nilai jawaban — dengarkan dulu sampai selesai</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 11. MASKOT ================= -->
+<h2 class="lib-section-title" id="mascot">11 · Maskot dock + coach bubble</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Mascot dock 88px + coach bubble (aturan DIRECTION)</div>
+    <p class="spec-tokens">Aturan: (1) TIDAK PERNAH menutupi konten interaktif — slot khusus kanan-bawah 88px di atas bottom nav; (2) mood badge kontekstual (correct/encouraging/hinting/listening/celebrating/thinking) di <code>--sun</code>; (3) bubble maks 2 baris (line-clamp), auto-dismiss + tombol tutup hit-area 44px. Token: <code>--panel</code>·<code>--line</code>·<code>--shadow-md</code>·<code>--radius-md</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Dock + bubble (mood: hinting)</span>
+      <div class="phone-frame">
+        <div style="padding:16px;display:grid;gap:10px">
+          <div class="skel skel-line w40" style="animation:none"></div>
+          <div class="skel skel-line w80" style="animation:none"></div>
+          <div class="skel skel-line w60" style="animation:none"></div>
+        </div>
+        <div class="coach-bubble" role="status">
+          <p>Coba lihat subjek kalimatnya dulu — itu kuncinya!</p>
+          <button class="coach-dismiss" aria-label="Tutup pesan PAW"><svg class="icon"><use href="#i-x"/></svg></button>
+        </div>
+        <div class="mascot-dock" aria-label="PAW sedang memberi petunjuk">
+          <img src="assets/mascot/paw-mascot-head.svg" alt="Maskot PAW">
+          <span class="mood"><svg class="icon"><use href="#i-bulb"/></svg></span>
+        </div>
+        <nav class="bottomnav" style="position:absolute;left:8px;right:8px;bottom:8px;max-width:none" aria-label="Nav demo">
+          <a href="#0" class="is-active"><span class="navtile"><svg class="icon icon-24"><use href="#i-home"/></svg></span>Home</a>
+          <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-book"/></svg></span>Vocab</a>
+          <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-sparkles"/></svg></span>Grammar</a>
+          <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-headphones"/></svg></span>Reading</a>
+          <a href="#0"><span class="navtile"><svg class="icon icon-24"><use href="#i-map"/></svg></span>Peta</a>
+        </nav>
+      </div>
+    </div>
+    <div class="state"><span>Dock saja (mood: celebrating) — bubble sudah auto-dismiss</span>
+      <div class="phone-frame" style="height:220px">
+        <div class="mascot-dock" style="bottom:16px" aria-label="PAW merayakan jawaban benar">
+          <img src="assets/mascot/paw-mascot-head.svg" alt="Maskot PAW">
+          <span class="mood" style="background:var(--good);color:#fff"><svg class="icon"><use href="#i-check"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 12–13. EMPTY + SKELETON ================= -->
+<h2 class="lib-section-title" id="empty">12–13 · Empty state &amp; Skeleton</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Empty state</div>
+    <p class="spec-tokens">Token: <code>--panel</code> border putus <code>--line</code> · art <code>--sun-soft</code>+<code>--sun-deep</code> · body 14 <code>--muted</code> · CTA <code>--sun</code>. Ganti “0% / belum diukur” polos.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span>
+      <div class="empty">
+        <span class="art"><svg class="icon icon-24" style="width:36px;height:36px"><use href="#i-mic"/></svg></span>
+        <h2>Belum ada latihan speaking</h2>
+        <p>PAW belum bisa mengukur pelafalanmu. Mulai satu sesi pendek dulu, 3 menit cukup.</p>
+        <button class="btn btn-sun">Mulai sesi pertama</button>
+      </div>
+    </div>
+    <div class="state"><span>Skeleton loading</span>
+      <div class="skeleton-card" aria-busy="true" aria-label="Memuat lesson">
+        <div style="display:flex;gap:12px;align-items:center"><div class="skel skel-tile"></div><div style="flex:1;display:grid;gap:8px"><div class="skel skel-line w60"></div><div class="skel skel-line w40"></div></div></div>
+        <div class="skel skel-line w80"></div>
+        <div class="skel skel-line" style="width:100%"></div>
+        <div class="skel" style="height:44px;border-radius:12px"></div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 14. TOAST ================= -->
+<h2 class="lib-section-title" id="toast">14 · Toast (baru: ink + krem)</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Toast — REPLACE navy+teks gelap (audit fix #2, “bug kontras paling parah”)</div>
+    <p class="spec-tokens">Token: panel <code>--text</code> · teks <code>--on-core</code> 14/500 (≈15:1) · ikon <code>--sun</code> · aksi teks <code>--sun</code> ≥8:1 · <code>--radius-md</code>+<code>--shadow-lg</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Info</span>
+      <div class="toast" role="status" data-cc="toast"><svg class="icon"><use href="#i-sparkles"/></svg>Core Brain aktif — jalur belajarmu diperbarui.</div>
+    </div>
+    <div class="state"><span>Success</span>
+      <div class="toast is-good" role="status"><svg class="icon"><use href="#i-check"/></svg>Progres tersimpan di perangkat.</div>
+    </div>
+    <div class="state"><span>Error + aksi</span>
+      <div class="toast is-bad" role="alert"><svg class="icon"><use href="#i-x"/></svg>Gagal sinkron. Coba lagi nanti.<button class="toast-action" data-cc="toast-action">Ulangi</button></div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 15. MODAL ================= -->
+<h2 class="lib-section-title" id="modal">15 · Modal</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Modal / bottom-sheet</div>
+    <p class="spec-tokens">Token: backdrop rgba(ink,.45) · sheet <code>--panel</code> <code>--radius-lg</code> <code>--shadow-lg</code> · judul h2 18 · tutup = ikon 44px · footer tombol ink/outline. role="dialog" + aria-label.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default (konfirmasi keluar sesi)</span>
+      <div class="modal-demo">
+        <div style="padding:16px;display:grid;gap:10px">
+          <div class="skel skel-line w60" style="animation:none"></div>
+          <div class="skel skel-line w80" style="animation:none"></div>
+        </div>
+        <div class="modal-backdrop">
+          <div class="modal" role="dialog" aria-modal="true" aria-label="Keluar dari sesi?">
+            <header>
+              <h2>Keluar dari sesi?</h2>
+              <button class="btn btn-ghost btn-icon" aria-label="Tutup"><svg class="icon"><use href="#i-x"/></svg></button>
+            </header>
+            <p>Progres 11/25 soal tersimpan otomatis. Kamu bisa lanjut kapan saja dari kartu lesson.</p>
+            <footer>
+              <button class="btn btn-outline">Keluar</button>
+              <button class="btn btn-ink">Lanjut belajar</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<!-- ================= 16–17. FORM + TOGGLE ================= -->
+<h2 class="lib-section-title" id="form">16–17 · Form field &amp; Toggle</h2>
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Form field (text input)</div>
+    <p class="spec-tokens">Token: input 48px <code>--panel</code>/<code>--line</code> <code>--radius-sm</code> · label 13/600 · placeholder <code>--muted-soft</code> (15px, ≥14px OK) · error <code>--bad</code> (≥4.5:1 di bg) · success ikon <code>--good</code>+teks ink · focus ring <code>--sun-deep</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Default</span>
+      <div class="field"><label for="f1">Nama panggilan</label><input id="f1" placeholder="mis. Rara"><span class="msg">Dipakai PAW untuk menyapamu.</span></div>
+    </div>
+    <div class="state"><span>Focus</span>
+      <div class="field is-focus"><label for="f2">Nama panggilan</label><input id="f2" value="Rara"></div>
+    </div>
+    <div class="state"><span>Error</span>
+      <div class="field is-error"><label for="f3">Nama panggilan</label><input id="f3" value="">
+        <span class="msg" data-cc="field-error"><svg class="icon"><use href="#i-info"/></svg>Nama tidak boleh kosong.</span></div>
+    </div>
+    <div class="state"><span>Success</span>
+      <div class="field is-success"><label for="f4">Nama panggilan</label><input id="f4" value="Rara">
+        <span class="msg"><svg class="icon"><use href="#i-check"/></svg>Siap! PAW akan memanggilmu Rara.</span></div>
+    </div>
+    <div class="state"><span>Disabled</span>
+      <div class="field is-disabled"><label for="f5" style="color:var(--muted)">Level (diisi otomatis)</label><input id="f5" value="A2 — dari placement test" disabled>
+        <span class="msg"><svg class="icon"><use href="#i-lock"/></svg>Terkunci sampai placement ulang.</span></div>
+    </div>
+  </div>
+</figure>
+
+<figure class="spec">
+  <figcaption>
+    <div class="spec-name">Toggle</div>
+    <p class="spec-tokens">Token: track off <code>--line</code> → on <code>--text</code> + knob <code>--sun</code> · label 14/600 · tinggi sentuh 44px · <code>--ease-spring</code>.</p>
+  </figcaption>
+  <div class="spec-body">
+    <div class="state"><span>Off</span>
+      <button class="toggle" role="switch" aria-checked="false" style="background:none;border:none"><span class="track"><span class="knob"></span></span><span class="tlabel">Pengingat harian</span></button>
+    </div>
+    <div class="state"><span>On</span>
+      <button class="toggle is-on" role="switch" aria-checked="true" style="background:none;border:none"><span class="track"><span class="knob"></span></span><span class="tlabel">Efek suara</span></button>
+    </div>
+    <div class="state"><span>Focus-visible (on)</span>
+      <button class="toggle is-on" role="switch" aria-checked="true" style="background:none;border:none"><span class="track is-focus" style="border-radius:999px"><span class="knob"></span></span><span class="tlabel">Motion penuh</span></button>
+    </div>
+    <div class="state"><span>Disabled</span>
+      <button class="toggle is-disabled" role="switch" aria-checked="false" disabled style="background:none;border:none"><span class="track"><span class="knob"></span></span><span class="tlabel">Push jarak jauh (belum tersambung)</span></button>
+    </div>
+  </div>
+</figure>
+
+<p class="lib-note" style="margin-top:8px">QA terprogram: elemen ber-atribut <code>data-cc</code> diukur kontrasnya oleh skrip Playwright (hasil di redesign/components/contrast-report.json). Lantai font 12px juga discan otomatis.</p>
+
+</main>
+</body>
+</html>

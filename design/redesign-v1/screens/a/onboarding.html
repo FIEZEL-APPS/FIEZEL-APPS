@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FIEZEL — Onboarding (Langkah 1 dari 6)</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  body{display:flex;flex-direction:column;min-height:844px}
+
+  /* ===== Logo reveal statis (jembatan splash gelap -> app krem) ===== */
+  .reveal{
+    position:relative;overflow:hidden;flex:0 0 auto;
+    background:radial-gradient(120% 130% at 50% 0%,#2A2126 0%,var(--core) 62%);
+    border-radius:0 0 var(--radius-lg) var(--radius-lg);
+    padding:34px 20px 24px;text-align:center;color:var(--on-core);
+  }
+  .reveal .glow{
+    position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);
+    width:300px;height:180px;border-radius:50%;
+    background:radial-gradient(closest-side,rgba(255,199,0,.28),rgba(255,199,0,0));
+    pointer-events:none;
+  }
+  .reveal .wordmark{position:relative;height:34px;width:auto;display:inline-block}
+  .reveal .tag{
+    position:relative;margin-top:10px;
+    font:700 12px/1 var(--font-ui);letter-spacing:.32em;text-indent:.32em;color:var(--sun);
+  }
+
+  /* ===== Stepper 6 langkah ===== */
+  .stepper{padding:18px 16px 6px}
+  .stepper-head{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+  .stepper-head .eyebrow{color:var(--info)}
+  .stepper-head .step-name{font:600 13px/1.4 var(--font-ui);color:var(--muted)}
+  .stepper-head .step-name b{color:var(--text);font-weight:700}
+  .segments{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+  .segments i{height:6px;border-radius:999px;background:var(--line)}
+  .segments i.done{background:var(--sun-grad)}
+
+  /* ===== Maskot greeting ===== */
+  .greet{display:flex;align-items:flex-end;gap:10px;padding:14px 16px 4px}
+  .greet .avatar{
+    flex:0 0 auto;width:64px;height:64px;border-radius:20px;
+    background:var(--sun-soft);border:2px solid var(--text);
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);
+  }
+  .greet .avatar svg{width:46px;height:46px}
+  .greet .bubble{
+    position:relative;background:var(--panel);border:1.5px solid var(--line);
+    border-radius:var(--radius-md);border-bottom-left-radius:4px;
+    padding:10px 14px;box-shadow:var(--shadow-sm);
+    font:500 14px/1.45 var(--font-ui);color:var(--text);max-width:270px;
+  }
+
+  /* ===== Sheet langkah 1 ===== */
+  .sheet{flex:1;padding:16px 16px 24px}
+  .sheet-card{padding:22px 20px 20px}
+  .sheet-card .t-h1{margin:2px 0 8px}
+  .sheet-card .lead{color:var(--muted);font-size:15px;margin-bottom:18px}
+  .field-label{display:block;margin-bottom:8px}
+  .input{
+    width:100%;min-height:52px;padding:0 16px;
+    background:var(--bg);border:1.5px solid var(--line);border-radius:var(--radius-md);
+    font:600 16px/1 var(--font-ui);color:var(--text);
+  }
+  .input::placeholder{color:var(--muted);font-weight:500}
+  .privacy{display:flex;gap:8px;align-items:flex-start;margin:12px 0 18px;color:var(--muted);font-size:13px;line-height:1.5}
+  .privacy svg{flex:0 0 auto;width:16px;height:16px;margin-top:2px;stroke:var(--info);fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+</style>
+</head>
+<body>
+
+  <!-- Logo reveal statis: momen Bright Mind, menjembatani splash gelap ke app krem -->
+  <header class="reveal">
+    <span class="glow"></span>
+    <svg class="neural" viewBox="0 0 390 150" aria-hidden="true">
+      <g stroke="#FFC700" stroke-width="1" fill="none" opacity=".26">
+        <path d="M-10 118 C 60 96, 96 128, 150 108 S 260 70, 330 92 S 380 110, 400 100"/>
+        <path d="M-10 36 C 50 52, 120 20, 178 40 S 300 66, 400 30"/>
+      </g>
+      <g fill="#FFC700" opacity=".5">
+        <circle cx="66" cy="103" r="2"/><circle cx="178" cy="40" r="2"/>
+        <circle cx="306" cy="84" r="2"/><circle cx="120" cy="27" r="1.5"/>
+      </g>
+    </svg>
+    <!-- Wordmark FIEZEL (ivory + gold, identitas splash dipertahankan) -->
+    <svg class="wordmark" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL">
+      <defs>
+        <linearGradient id="wmIvory" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFFBF3"/><stop offset="100%" stop-color="#EBDBC0"/></linearGradient>
+        <linearGradient id="wmGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="100%" stop-color="#FFA500"/></linearGradient>
+      </defs>
+      <g fill="url(#wmIvory)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g>
+      <g fill="url(#wmGold)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g>
+    </svg>
+    <div class="tag">Adaptive English</div>
+  </header>
+
+  <!-- Stepper: struktur 6 langkah asli dipertahankan -->
+  <nav class="stepper" aria-label="Progres onboarding">
+    <div class="stepper-head">
+      <span class="eyebrow">Langkah 1 dari 6</span>
+      <span class="step-name"><b>Nama</b> · Intro · Tujuan · Level · Pengingat · Ringkasan</span>
+    </div>
+    <div class="segments" role="progressbar" aria-valuenow="1" aria-valuemin="1" aria-valuemax="6">
+      <i class="done"></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </nav>
+
+  <!-- Maskot greeting: slot inline, mengisi lingkaran kosong pada desain lama -->
+  <section class="greet" aria-label="Sapaan maskot">
+    <span class="avatar" aria-hidden="true">
+      <svg viewBox="56 -10 208 216"><g>
+        <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/><path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/><path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        <circle cx="160" cy="106" r="88" fill="#FFD94F"/><ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+        <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+        <circle cx="102" cy="126" r="11" fill="#F0A0AC"/><circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+        <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+        <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+        <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      </g></svg>
+    </span>
+    <p class="bubble">Halo! Aku PAW, teman belajarmu. Kita mulai dari kenalan dulu, ya.</p>
+  </section>
+
+  <!-- Langkah 1: nama (arsitektur informasi asli) -->
+  <main class="sheet">
+    <div class="card sheet-card">
+      <h1 class="t-h1">Halo! Aku FIEZEL.<br>Nama kamu siapa?</h1>
+      <p class="lead">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>
+
+      <label class="eyebrow field-label" for="nickname">Nama panggilan</label>
+      <input class="input" id="nickname" type="text" value="Rara" placeholder="Tulis nama kamu">
+
+      <p class="privacy">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-3.6 8-9V5l-8-3-8 3v8c0 5.4 8 9 8 9z"/></svg>
+        Nama ini disimpan di HP kamu dan cuma ikut ke akun FIEZEL kamu sendiri. Nggak dibagi ke siapa pun.
+      </p>
+
+      <button class="btn btn-sun" type="button">
+        Lanjut
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </main>
+
+</body>
+</html>
