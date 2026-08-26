@@ -376,15 +376,77 @@ test('confetti ringkas dan tunduk pada kurangi-gerak', () => {
   assert.ok(!/fiezel-confetti/.test(reduced), 'kurangi-gerak harus mematikan confetti, bukan hanya memperlambatnya');
 });
 
-// m025-80 OWNER: "maskot hilangkan saja". Perkenalan menggambar lambangnya sendiri dari
-// ikon Lucide, jadi tidak ada lagi modul gambar yang bisa membatalkan tampilnya.
-test('perkenalan tampil tanpa bergantung pada modul gambar apa pun', () => {
-  const env = fakeEnv({ FiezelMascot: undefined });
+// m028-maskot: maskot kembali, TAPI kegagalannya harus tetap jinak. Tanpa komponen maskot
+// perkenalan wajib tetap tampil dan tetap punya wajah (ikon paw cadangan) - bukan lubang
+// kosong seperti <i data-lucide> yang menunggu pustaka.
+test('perkenalan tampil walau komponen maskot tidak ada', () => {
+  const env = fakeEnv({ FiezelPaw: undefined, customElements: undefined });
   const run = onboarding.show(env, { now: NOW });
   assert.strictEqual(run.shown, true);
   assert.strictEqual(env._body.children.length, 1);
-  assert.ok(/fiezel-step-art/.test(env._body.children[0].innerHTML),
-    'setiap langkah harus punya lambang penggantinya');
+  const html = env._body.children[0].innerHTML;
+  assert.ok(/data-ob-mascot/.test(html), 'setiap langkah harus punya maskot');
+  assert.ok(/fiezel-ob-paw-fallback/.test(html),
+    'tanpa komponen, yang tampil harus ikon paw cadangan - bukan wadah kosong');
+});
+
+// Inti spesifikasi m028-maskot: pose maskot MENJELASKAN langkahnya. Kalau peta ini bergeser
+// jadi acak atau seragam, maskotnya kembali jadi hiasan dan tes ini yang jatuh lebih dulu.
+test('setiap langkah membawa pose maskot yang kontekstual, bukan acak', () => {
+  const env = fakeEnv();
+  const intent = (html) => (String(html).match(/data-ob-mascot-intent="([a-z]+)"/) || [])[1];
+  assert.strictEqual(intent(onboarding.nameMarkup(env, '')), 'greeting', 'langkah nama harus menyapa');
+  assert.strictEqual(intent(onboarding.carouselMarkup(env, 0)), 'curious');
+  assert.strictEqual(intent(onboarding.carouselMarkup(env, 1)), 'listening',
+    'slide suara neural harus memakai pose mendengarkan');
+  assert.strictEqual(intent(onboarding.goalMarkup(env, '', '')), 'curious');
+  assert.strictEqual(intent(onboarding.goalMarkup(env, 'school', '')), 'observing',
+    'setelah tujuan dipilih, maskot mengamati pilihan level');
+  assert.strictEqual(intent(onboarding.placementMarkup(env)), 'encouraging');
+  assert.strictEqual(intent(onboarding.scheduleMarkup(env)), 'sleepy');
+  assert.strictEqual(intent(onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', false)), 'celebrating');
+  // Kurangi-gerak: pose yang tenang dipakai SEJAK cat pertama, bukan lompatan yang lalu
+  // dibekukan setengah jalan oleh CSS.
+  assert.strictEqual(intent(onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', true)), 'proud');
+  // Panjang peta slide harus mengikuti jumlah slide yang benar-benar ada.
+  assert.strictEqual(onboarding.MASCOT_SLIDES.length, onboarding.CAROUSEL_SLIDES.length,
+    'setiap slide carousel harus punya pose, tidak ada yang jatuh ke pose bawaan diam-diam');
+});
+
+// 'observing' tidak ada di komponen maskot. Yang dijaga: perkenalan MEMINTA pose itu apa
+// adanya, lalu memilih pengganti dari state yang komponen benar-benar punya - tidak pernah
+// mengirim nama asing ke setState() (yang akan ditolak dan meninggalkan maskot di idle).
+test('pose yang tidak dimiliki komponen jatuh ke pose nyata, bukan ke nama asing', () => {
+  const known = ['idle', 'greeting', 'curious', 'listening', 'thinking', 'encouraging', 'sleepy', 'celebrating', 'proud'];
+  const env = fakeEnv({
+    customElements: { get: (n) => (n === 'fiezel-mascot' ? { states: known } : null), define() {} }
+  });
+  assert.strictEqual(onboarding.resolveMascotState(env, 'observing'), 'thinking');
+  assert.strictEqual(onboarding.resolveMascotState(env, 'greeting'), 'greeting');
+  assert.strictEqual(onboarding.resolveMascotState(env, 'entah-apa'), 'idle');
+  Object.keys(onboarding.MASCOT_CHAIN).forEach((wanted) => {
+    assert.ok(known.indexOf(onboarding.resolveMascotState(env, wanted)) >= 0,
+      'pose terpilih untuk ' + wanted + ' harus ada di komponen');
+  });
+});
+
+// Lambang kecil di perkenalan tidak boleh kembali bergantung pada lucide.min.js yang dimuat
+// `defer`: itu persis perlombaan yang membuat ikon lahir kosong.
+test('tidak ada satu pun ikon perkenalan yang menunggu pustaka luar', () => {
+  const env = fakeEnv();
+  const screens = [
+    onboarding.nameMarkup(env, ''), onboarding.carouselMarkup(env, 0), onboarding.carouselMarkup(env, 1),
+    onboarding.goalMarkup(env, 'school', 'A2'), onboarding.placementMarkup(env),
+    onboarding.scheduleMarkup(env), onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', false)
+  ];
+  screens.forEach((html, i) => {
+    assert.ok(!/data-lucide/.test(html), 'layar ' + i + ' masih memakai <i data-lucide>');
+  });
+  // Kode, bukan komentar: alasan penghapusannya memang ditulis di komentar berkas itu.
+  const src = fs.readFileSync('./features/onboarding/fiezel-onboarding.js', 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.ok(!/createIcons|\.lucide/.test(src),
+    'percobaan-ulang createIcons() harus hilang bersama ikon yang dulu membutuhkannya');
 });
 
 test('tanpa modul perjalanan belajar, kartu tujuan kosong tapi tidak melempar', () => {
@@ -485,13 +547,20 @@ test('gaya onboarding memenuhi ukuran sentuh dan tidak mewarnai ulang maskot', (
   const flat = css.replace(/\s*\n\s*/g, '');
   assert.ok(/\.fiezel-btn\{[^}]*min-height:44px/.test(flat), 'tombol dasar harus 44px');
   const brand = css.slice(css.indexOf('FIEZEL brand: Percik'));
-  // m025-80: aturan lama "maskot tidak boleh diwarnai ulang atau direntangkan" sudah tidak
-  // punya sasaran - maskotnya dihapus. Yang dijaga sekarang: lambang langkah tetap ikon
-  // vektor dari set yang sama, dan tidak ada aset raster maskot yang diam-diam kembali.
-  assert.ok(/\.fiezel-step-art\{/.test(brand.replace(/\s+/g, '')),
-    'lambang langkah harus punya gayanya sendiri');
-  assert.ok(!/fiezel-mascot|fiezel-hero\.png|fiezel-belajar\.png|fiezel-mengintip\.png/.test(css),
-    'aset maskot tidak boleh dirujuk lagi dari stylesheet');
+  // m028-maskot: maskot kembali sebagai KOMPONEN, jadi aturannya kembali juga - ukurannya
+  // boleh diatur, warnanya tidak. Aset raster maskot tetap dilarang: satu sumber bentuk.
+  const flatBrand = brand.replace(/\s+/g, '');
+  assert.ok(/\.fiezel-ob-mascot\{/.test(flatBrand), 'maskot perkenalan harus punya gayanya sendiri');
+  assert.ok(!/fiezel-hero\.png|fiezel-belajar\.png|fiezel-mengintip\.png/.test(css),
+    'aset raster maskot tidak boleh dirujuk dari stylesheet');
+  assert.ok(!/\.fiezel-ob-mascot[^{]*\{[^}]*(fill:|background-image:)/.test(flatBrand),
+    'maskot tidak boleh diwarnai ulang dari stylesheet perkenalan');
+  assert.ok(/\.fiezel-ob-mascot\{[^}]*aspect-ratio:320\/300/.test(flatBrand),
+    'maskot harus menjaga rasio aslinya, bukan direntangkan');
+  // Kurangi-gerak: pose tetap tampil, geraknya berhenti.
+  assert.ok(/prefers-reduced-motion:reduce\)\{\.fiezel-ob-mascot/.test(flatBrand)
+    || /\.fiezel-ob-still\.fiezel-ob-mascot/.test(flatBrand),
+    'harus ada aturan yang mematikan gerak maskot di bawah kurangi-gerak');
 });
 
 // ---- m025-117: nama murid (Step 1, WAJIB) --------------------------------------------
