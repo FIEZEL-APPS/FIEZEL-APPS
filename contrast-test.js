@@ -503,7 +503,8 @@ test('token permukaan terang persis seperti literal yang digantikannya', () => {
   const expect = {
     '--surface-rgb': '255,253,248',
     '--surface-pure-rgb': '255,255,255',
-    '--bg-rgb': '255,249,240',
+    // m028: --bg-rgb ikut cream baru #FFF9EE (design/redesign-v1/tokens/tokens.css).
+    '--bg-rgb': '255,249,238',
     '--surface-solid': '#ffffff',
     '--surface-tint': '#fffbf4',
     '--surface-warm': '#fdf4e6',

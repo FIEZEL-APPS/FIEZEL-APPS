@@ -12,16 +12,16 @@
      coklat lembut jadi tinta dan garis - inilah yang menahan pastel supaya tidak jatuh
      jadi kartun; emas pastel HANYA untuk detail tipis, tidak pernah untuk teks.
 
-     Aksen adalah warna BIDANG, bukan warna teks: #FFD23F di atas cream 1,4:1 dan
+     Aksen adalah warna BIDANG, bukan warna teks: #FFC700 di atas cream 1,4:1 dan
      #EE5D4A 3,2:1. Karena itu tiap keluarga punya satu turunan pekat yang khusus untuk
      tinta (--accent 6,5:1) dan satu turunan gelap untuk bayangan tombol. Tidak ada satu
      pun teks yang memakai warna pastelnya langsung di atas cream. */
-  --cream:#FFF8ED;
-  --cream-deep:#FFF0DC;
-  --ink:#2B2118;
-  --yellow:#FFD23F;
-  --yellow-deep:#E0B22A;
-  --yellow-soft:#FFF1C9;
+  --cream:#FFF9EE;
+  --cream-deep:#FFF3DC;
+  --ink:#241A11;
+  --yellow:#FFC700;
+  --yellow-deep:#E6A800;
+  --yellow-soft:#FFF3C4;
   --coral:#EE5D4A;
   --coral-deep:#C9432F;
   --coral-soft:#FDE3DE;
@@ -32,23 +32,23 @@
   --lilac-soft:#F1EDF9;
   --gold:#C9A24B;
   --sky-top:#FFE9B8;
-  --sky-bottom:#FFF8ED;
+  --sky-bottom:#FFF9EE;
   --scene-light:rgba(255,224,126,.42);
   --orbit-x:50%;
   --orbit-y:10%;
-  --ambient-text:#2B2118;
-  --ambient-muted:#6F5F48;
-  --chrome-bg:rgba(255,249,240,.82);
-  --launcher-start:#FFF1D2;
-  --launcher-end:#FFD23F;
-  --bg:#FFF8ED;
+  --ambient-text:#241A11;
+  --ambient-muted:#6E5E47;
+  --chrome-bg:rgba(255,249,238,.82);
+  --launcher-start:#FFF3C4;
+  --launcher-end:#FFC700;
+  --bg:#FFF9EE;
   --panel:#FFFFFF;
-  --panel-soft:#FFF0DC;
-  --line:#F2E6D3;
-  --line-soft:#F8F0E4;
-  --text:#2B2118;
-  --muted:#6F5F48;
-  --muted-soft:#8B7A60;
+  --panel-soft:#FFF3DC;
+  --line:#F0E4CF;
+  --line-soft:#F7EFDF;
+  --text:#241A11;
+  --muted:#6E5E47;
+  --muted-soft:#7E6C4B;
   --accent:#C2402C;
   --accent-strong:#A33422;
   --accent-soft:#FDE3DE;
@@ -56,17 +56,18 @@
      dibalik oleh fase langit, jadi token ini cukup mengikuti tema - tetapi ia tetap ada
      supaya satu tempat saja yang memutuskan warna aksen di atas permukaan. */
   --accent-on-glass:var(--accent-strong);
-  --black:#2B2118;
+  --black:#241A11;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
-  --red:#C9503A;
+  --red:#B8432D;
   --red-soft:#FDE3DE;
-  --radius-lg:26px;
-  --radius-md:18px;
-  --radius-sm:13px;
-  --shadow-sm:0 2px 10px rgba(43,33,24,.06);
-  --shadow-md:0 10px 30px rgba(43,33,24,.09);
-  --shadow-lg:0 24px 60px rgba(43,33,24,.15);
+  --radius-lg:24px;
+  --radius-md:16px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06);
+  --shadow-md:0 10px 30px rgba(36,26,17,.09);
+  --shadow-lg:0 24px 60px rgba(36,26,17,.15);
   --ease:cubic-bezier(.22,.8,.28,1);
   --ease-spring:cubic-bezier(.34,1.4,.4,1);
   --dur-s:.18s;
@@ -120,9 +121,9 @@ body{
 .global-celestial svg{position:relative;width:100%;height:100%;stroke-width:1.45}.global-celestial.sun{color:#fff0b3;filter:drop-shadow(0 0 14px rgba(255,222,145,.78))}.global-celestial.moon{color:#edf2ff;filter:drop-shadow(0 0 15px rgba(202,218,255,.72))}
 /* Glass has to invert with the sky, or a white pane at midnight is a lamp in the face.
    Each phase carries its own material weights; every surface below reads them. */
-.scene-day,.scene-dawn{--sky-top:#FFE9B8;--sky-bottom:#FFF8ED;--scene-light:rgba(255,224,126,.42)}
+.scene-day,.scene-dawn{--sky-top:#FFE9B8;--sky-bottom:#FFF9EE;--scene-light:rgba(255,224,126,.42)}
 .scene-dusk{--sky-top:#FFD3B4;--sky-bottom:#FFF6EA;--scene-light:rgba(245,160,145,.30)}
-.scene-night{--sky-top:#EFE0C4;--sky-bottom:#FFF8ED;--scene-light:rgba(217,188,126,.26)}
+.scene-night{--sky-top:#EFE0C4;--sky-bottom:#FFF9EE;--scene-light:rgba(217,188,126,.26)}
 /* m025-115: penimpaan "kembalikan material gelap untuk fase terang" milik m025-85
    dihapus bersama sebab keberadaannya. Fase langit tidak lagi memasang satu pun token
    material, jadi tidak ada lagi yang perlu dikembalikan. */
@@ -145,10 +146,13 @@ button{
 button:hover{transform:translateY(-1px);border-color:var(--surface-edge-strong);box-shadow:var(--shadow-sm)}
 button:active{transform:translateY(0) scale(.97);transition-duration:.08s}
 button:disabled{opacity:.42;cursor:not-allowed;transform:none;box-shadow:none}
-button:focus-visible{outline:3px solid rgba(184,69,47,.32);outline-offset:2px}
+/* m028: satu cincin fokus untuk seluruh aplikasi. Cincin lama rgba(184,69,47,.32)
+   menghasilkan 1,4:1 terhadap cream - terlihat kalau dicari, tidak terlihat kalau dipakai.
+   --focus-ring #A67A00 = 3,4:1 terhadap cream, di atas ambang 3:1 untuk komponen non-teks. */
+button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 /* m025-63 accessibility pass. Sebelumnya hanya tombol yang punya cincin fokus, sehingga
    pengguna keyboard kehilangan jejak begitu berpindah ke tautan atau kolom isian. */
-a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:3px solid rgba(184,69,47,.32);outline-offset:2px}
+a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible,summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
 /* Ukuran sentuh minimum ditegaskan, bukan hanya kebetulan hasil padding: satu perubahan
    ukuran huruf tidak boleh diam-diam menyusutkan sasaran sentuh di bawah 44px. */
 button,.nav,input[type="url"],input[type="text"],input[type="password"],input[type="email"],input[type="number"],select{min-height:44px}
@@ -192,7 +196,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .hero{padding:26px;background:linear-gradient(150deg,var(--surface-solid) 0%,var(--accent-soft) 130%);border-color:#f0dfe3}
 .hero h2{font-size:1.85rem;line-height:1.12;letter-spacing:-.035em;margin:8px 0 8px;font-weight:800}
 .hero p{color:var(--muted);line-height:1.6;font-size:.92rem;margin:0 0 16px}
-.eyebrow{font-size:.66rem;letter-spacing:.14em;color:var(--accent-strong);font-weight:800;text-transform:uppercase}
+.eyebrow{font-size:12px;letter-spacing:.1em;color:var(--info);font-weight:700;text-transform:uppercase}
 
 .status-pill{
   display:inline-flex;align-items:center;gap:6px;margin-top:14px;
@@ -276,7 +280,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 /* ---------- toast ---------- */
 .toast{
   position:fixed;left:50%;bottom:96px;transform:translate(-50%,16px) scale(.96);opacity:0;pointer-events:none;
-  background:var(--coral);color:var(--ink);padding:13px 20px;border-radius:999px;font-weight:700;font-size:.86rem;
+  /* m028: toast dulu koral dengan tinta coklat di atasnya - 3,1:1, di bawah ambang teks,
+     dan itu satu-satunya cara aplikasi mengabarkan kesalahan. Sekarang permukaan core
+     dengan krem di atasnya: 14,7:1, dan sekeluarga dengan panggung splash. */
+  background:var(--core);color:var(--on-core);padding:13px 20px;border-radius:var(--radius-pill);font-weight:700;font-size:.86rem;
   transition:opacity var(--dur-m) var(--ease),transform var(--dur-m) var(--ease-spring);
   z-index:80;box-shadow:0 18px 40px rgba(0,0,0,.22);max-width:88%;text-align:center
 }
@@ -286,7 +293,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   position:fixed;left:50%;top:clamp(92px,18vh,170px);z-index:130;pointer-events:none;
   width:min(330px,calc(100% - 32px));display:grid;justify-items:center;gap:5px;padding:20px 24px;
   border:1px solid rgba(var(--surface-pure-rgb),.7);border-radius:22px;background:rgba(var(--surface-pure-rgb),.96);
-  box-shadow:0 26px 70px rgba(43,33,24,.24);opacity:0;transform:translate(-50%,-18px) scale(.84);
+  box-shadow:0 26px 70px rgba(36,26,17,.24);opacity:0;transform:translate(-50%,-18px) scale(.84);
   transition:opacity .25s var(--ease),transform .38s var(--ease-spring);backdrop-filter:blur(16px)
 }
 .answer-burst.hidden{display:none}.answer-burst.show{opacity:1;transform:translate(-50%,0) scale(1)}
@@ -301,10 +308,12 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   padding:7px;background:rgba(var(--surface-pure-rgb),.86);
   border:1px solid rgba(239,231,232,.9);border-radius:22px;
   display:grid;grid-template-columns:repeat(5,1fr);gap:4px;z-index:40;
-  box-shadow:0 16px 40px rgba(43,33,24,.10);
+  box-shadow:0 16px 40px rgba(36,26,17,.10);
 }
 .nav{
-  border:0;background:transparent;padding:9px 4px;font-size:.65rem;font-weight:600;color:var(--muted-soft);
+  /* m028: lantai 12px. Label navigasi 10,4px adalah teks yang harus dibaca setiap hari;
+     di bawah 12px ia berhenti terbaca sebagai kata dan hanya jadi bentuk. */
+  border:0;background:transparent;padding:9px 4px;font-size:12px;font-weight:600;color:var(--muted);
   border-radius:15px;line-height:1.5;transition:color var(--dur-s) var(--ease),background var(--dur-m) var(--ease),transform var(--dur-s) var(--ease-spring)
 }
 .nav:hover{transform:none;box-shadow:none;border-color:transparent}
@@ -344,7 +353,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .quiz-progress span{font-size:1.1rem}
 .quiz-progress em{font-style:normal;color:var(--muted-soft)}
 .quiz-next{justify-self:end;background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep);min-width:92px}
-.quiz-next:disabled{background:var(--surface-mute);color:var(--muted-soft);border-color:var(--line)}
+/* m028: keadaan nonaktif dulu memakai opacity global .42 di atas permukaan redup - hasilnya
+   teks 2,4:1, tidak terbaca. Sekarang keadaan nonaktif punya warnanya sendiri (4,8:1):
+   tetap jelas terbaca sebagai TIDAK BISA DIKLIK, tanpa menghilang. */
+.quiz-next:disabled{background:var(--panel-soft);color:var(--text-disabled);border-color:var(--line);opacity:1}
 
 /* m025-114: soal listening di tes penempatan. Tombolnya harus terbaca sebagai satu-satunya
    jalan ke soal - naskahnya sengaja tidak pernah dirender, jadi tanpa tombol ini murid
@@ -354,16 +366,20 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    coklat, bayangan pekat 4px yang memendek saat ditekan. Ia memakai koral, bukan kuning,
    supaya tidak bersaing dengan aksi utama layar; dan koral memang peran aksi kedua. */
 .quiz-listen-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;min-height:44px;
-  border:0;border-radius:16px;background:var(--coral,var(--panel));color:var(--ink,var(--text));
+  /* m028: koral dengan tinta coklat = 3,1:1. Tombol ini memutar audio soal - satu-satunya
+     jalan menjawab soal listening - jadi ia dipindah ke permukaan tinta: krem di atas
+     coklat 13,9:1, dan ia tetap TIDAK kuning sehingga tidak bersaing dengan aksi utama. */
+  border:0;border-radius:var(--radius-md);background:var(--text);color:var(--on-core);
   font-weight:700;letter-spacing:-.01em;cursor:pointer;
-  box-shadow:0 4px 0 var(--coral-deep,var(--line)),0 10px 22px rgba(43,33,24,.13);
+  box-shadow:0 4px 0 var(--ink-press),0 10px 22px rgba(36,26,17,.13);
   transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease)}
-.quiz-listen-btn:hover:not(:disabled){background:#F7B0A3}
+.quiz-listen-btn:hover:not(:disabled){background:var(--ink-hover)}
 .quiz-listen-btn:active:not(:disabled){
-  transform:translateY(3px);box-shadow:0 1px 0 var(--coral-deep,var(--line)),0 4px 10px rgba(43,33,24,.12)}
-.quiz-listen-btn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-.quiz-listen-btn:disabled{opacity:.65;cursor:progress;transform:translateY(3px);
-  box-shadow:0 1px 0 var(--coral-deep,var(--line))}
+  transform:translateY(3px);box-shadow:0 1px 0 var(--ink-press),0 4px 10px rgba(36,26,17,.12)}
+.quiz-listen-btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.quiz-listen-btn:disabled{background:var(--panel-soft);color:var(--text-disabled);opacity:1;
+  cursor:progress;transform:translateY(3px);
+  box-shadow:0 1px 0 var(--line)}
 .quiz-listen .muted{font-size:13px}
 
 /* ---------- level grid ---------- */
@@ -511,13 +527,13 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   position:fixed;inset:0;z-index:2147481400;
   display:flex;align-items:flex-end;justify-content:center;
   padding:14px 14px calc(20px + env(safe-area-inset-bottom));
-  background:rgba(43,33,24,.28);
+  background:rgba(36,26,17,.28);
 }
 .confidence-card{
   width:min(420px,100%);
   padding:16px;border-radius:24px;
   border:1.5px solid var(--ink);background:rgba(var(--surface-pure-rgb),.98);
-  box-shadow:0 3px 0 var(--ink),0 22px 50px rgba(43,33,24,.3);
+  box-shadow:0 3px 0 var(--ink),0 22px 50px rgba(36,26,17,.3);
 }
 .confidence-verdict{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.98rem;font-weight:800;letter-spacing:-.01em}
 .confidence-verdict svg{width:20px;height:20px;flex:none}
@@ -592,18 +608,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    justru karena ia yang menang - kalau hanya blok paling atas yang diganti, aplikasi
    tetap berjalan dengan netral marun lama sementara tokennya sudah pastel. */
 :root{
-  --bg:#FFF8ED;
+  --bg:#FFF9EE;
   --panel:#FFFFFF;
-  --panel-soft:#FFF0DC;
-  --line:#F2E6D3;
-  --line-soft:#F8F0E4;
-  --text:#2B2118;
-  --muted:#6F5F48;
-  --muted-soft:#8B7A60;
+  --panel-soft:#FFF3DC;
+  --line:#F0E4CF;
+  --line-soft:#F7EFDF;
+  --text:#241A11;
+  --muted:#6E5E47;
+  --muted-soft:#7E6C4B;
   --accent:#C2402C;
   --accent-strong:#A33422;
   --accent-soft:#FDE3DE;
-  --black:#2B2118;
+  --black:#241A11;
   --gold:#C9A24B;
   /* m025-127 wordmark topbar. Empat token ini ada karena logonya BUKAN teks: ia SVG dengan
      gradien di dalamnya, jadi ia tidak ikut --ambient-text dan tidak ikut berbalik di mode
@@ -613,20 +629,56 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
      Perannya persis peran yang brief palet berikan: coklat sebagai TINTA untuk hurufnya,
      terracotta sebagai AKSEN untuk dua balok. Tidak ada warna baru yang ditambahkan. */
-  --wordmark-ink-hi:#2B2118;
+  --wordmark-ink-hi:#241A11;
   --wordmark-ink-lo:#4A382A;
   --wordmark-accent-hi:#C9432F;
   --wordmark-accent-lo:#A33422;
   --green:#2E8B69;
   --green-soft:#E9F7F0;
-  --red:#C9503A;
+  --red:#B8432D;
   --red-soft:#FDE3DE;
-  --radius-lg:22px;
+  --radius-lg:24px;
   --radius-md:16px;
   --radius-sm:12px;
-  --shadow-sm:0 8px 24px rgba(43,33,24,.05);
-  --shadow-md:0 20px 50px rgba(43,33,24,.09);
-  --shadow-lg:0 34px 90px rgba(28,10,16,.22);
+  --radius-pill:999px;
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06);
+  --shadow-md:0 10px 30px rgba(36,26,17,.09);
+  --shadow-lg:0 24px 60px rgba(36,26,17,.15);
+  /* ---- m028 "Warm Paper, Bright Mind" (design/redesign-v1/tokens/tokens.css) ----
+     Keluarga token BARU. Yang lama TIDAK dihapus di fase ini: nilainya sudah ditukar
+     di tempat, jadi seluruh layar ikut pindah tanpa satu selektor pun berubah. Keluarga
+     di bawah adalah yang dipakai lapisan baru (splash, onboarding, komponen hi-fi) dan
+     yang akan menggantikan alias lama di Fase 2.
+
+     Kuning adalah warna BIDANG, bukan warna teks: --sun di atas --bg 1,5:1. Setiap
+     keluarga karena itu punya turunan pekat khusus tinta (--sun-deep untuk garis,
+     --info untuk teks kecil) - tidak ada teks yang memakai --sun langsung. */
+  --sun:#FFC700;
+  --sun-deep:#E6A800;
+  --sun-press:#CC9600;
+  --sun-soft:#FFF3C4;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  /* Permukaan gelap "core": panggung splash, kartu highlight, toast. Satu keluarga saja,
+     supaya ikon aplikasi, splash, dan toast terbaca sebagai satu benda. */
+  --core:#1B1418;
+  --core-soft:#2A2126;
+  --core-line:#3A3038;
+  --on-core:#FDFAF3;
+  --on-core-muted:rgba(253,250,243,.68);
+  --good:#1F6B4E;
+  --good-bright:#2E8B69;
+  --good-soft:#E9F7F0;
+  --bad:#AC3E2A;
+  --bad-soft:#FDE3DE;
+  /* --info adalah SATU-SATUNYA kuning yang boleh jadi teks: #7A5F1B di atas cream 5,9:1. */
+  --info:#7A5F1B;
+  --info-soft:#FFF3C4;
+  /* Cincin fokus tunggal untuk seluruh aplikasi. --gold (#C9A24B) yang dipakai sebelumnya
+     hanya 1,9:1 terhadap cream - cincin yang tidak terlihat sama dengan tidak ada cincin. */
+  --focus-ring:#A67A00;
+  --text-disabled:#75654C;
+  --ink-hover:#3A2B1C;
+  --ink-press:#120C07;
   /* m025-85 kontras: sebelum ini puluhan permukaan memaku warnanya sendiri (#fff,
      rgba(255,254,250,.9), #f6f4ed, ...) sementara TEKS di atasnya memakai var(--text).
      Di mode gelap teksnya jadi #fdf4f6 di atas putih - 1,08:1, tidak terbaca sama sekali,
@@ -640,7 +692,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
      kuncinya dipindahkan ke nilai baru di contrast-test, bukan dibuang. */
   --surface-rgb:255,253,248;
   --surface-pure-rgb:255,255,255;
-  --bg-rgb:255,249,240;
+  --bg-rgb:255,249,238;
   --surface-solid:#ffffff;
   --surface-tint:#fffbf4;
   --surface-warm:#fdf4e6;
@@ -652,8 +704,8 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   --ink-danger:#A63A24;
   /* --glass-text/-muted/-line hanya hidup di blok .scene-* sebelum ini, jadi setiap
      layar yang lupa memasang kelas scene kehilangan warna tintanya. Diberi nilai bawaan. */
-  --glass-text:#2B2118;
-  --glass-muted:#6F5F48;
+  --glass-text:#241A11;
+  --glass-muted:#6E5E47;
   --glass-line:rgba(27,20,24,.08);
   /* Audit UX Bagian 5 + Roadmap #4: satu font display untuk judul, satu font teks untuk
      tubuh, dan keduanya dinaikkan ke lingkup global. Sebelum ini kedua token hanya hidup
@@ -688,7 +740,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 }
 .brand-button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px 2px;box-shadow:none;color:var(--ambient-text)}
 .brand-button:hover{transform:none;border-color:transparent;box-shadow:none}
-.brand{width:112px}.brand-edition{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:750;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
+.brand{width:112px}.brand-edition{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:750;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
 .topbar-actions{display:flex;align-items:center;gap:8px}
 /* m025-113: tombol ikon duduk DI DALAM topbar, dan topbar kini memakai --chrome-bg yang
    ikut fase langit. Permukaan bertema di dalam kroma sadar-fase itulah cara lama bug
@@ -698,7 +750,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .icon-button.active{color:var(--accent-strong);border-color:#cfc8f6;background:var(--accent-soft)}
 .version{min-width:40px;text-align:right}
 
-.section-kicker{display:block;font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:850;margin-bottom:6px}
+.section-kicker{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-on-glass);font-weight:850;margin-bottom:6px}
 .section-head{padding:10px 0 4px;margin-bottom:18px}.section-head h1{font-size:clamp(1.75rem,4vw,2.4rem)}
 .card{background:rgba(var(--surface-rgb),.93);box-shadow:var(--shadow-sm)}
 .primary{background:var(--yellow);color:var(--ink);border-color:var(--yellow-deep)}
@@ -723,15 +775,15 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .launcher-copy h1 span{color:#e8a3ad}
 .launcher-lead{font-size:1rem;line-height:1.7;color:#cdbcc1;max-width:680px;margin:22px 0 0}.learner-stage{display:flex;align-items:center;gap:8px;margin:13px 0 0;color:#c0aeb3;font-size:.72rem}.learner-stage svg{width:16px;height:16px;color:#d8b36b}
 .launcher-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
-.launcher-actions .luxe{background:#f7f6f1;color:#2B2118;border-color:#f7f6f1}
-.launcher-actions .luxe:hover{background:#fff;color:#2B2118;box-shadow:0 14px 34px rgba(0,0,0,.22)}
+.launcher-actions .luxe{background:#f7f6f1;color:#241A11;border-color:#f7f6f1}
+.launcher-actions .luxe:hover{background:#fff;color:#241A11;box-shadow:0 14px 34px rgba(0,0,0,.22)}
 .ghost-dark{background:transparent;color:#faf5f6;border-color:rgba(255,255,255,.2)}
 .ghost-dark:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.34)}
 .launcher-trust{display:flex;flex-wrap:wrap;gap:18px;margin-top:26px;color:#9fa3b6;font-size:.72rem}
 .launcher-trust span{display:flex;align-items:center;gap:7px}.launcher-trust svg{width:15px}
 
 .coach-preview{position:relative;z-index:1;align-self:stretch;display:flex;flex-direction:column;padding:25px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.075);border-radius:22px}
-.coach-head{display:flex;align-items:center;gap:11px}.coach-head>div{display:grid;gap:3px}.coach-head small{color:#c0aeb3;font-size:.6rem;letter-spacing:.14em}.coach-head b{font-size:.86rem}
+.coach-head{display:flex;align-items:center;gap:11px}.coach-head>div{display:grid;gap:3px}.coach-head small{color:#c0aeb3;font-size:12px;letter-spacing:.14em}.coach-head b{font-size:.86rem}
 .coach-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;color:#171d31;background:#d8b36b}.coach-icon svg{width:21px;height:21px}
 .coach-level{display:flex;justify-content:space-between;align-items:end;margin:34px 0 22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.12)}
 .coach-level span{color:#afb2c4;font-size:.72rem}.coach-level strong{font:600 2.4rem Georgia,"Times New Roman",serif;color:#d9d3ff}
@@ -753,7 +805,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .mission-ring::before{content:"";grid-area:1/1;width:60px;height:60px;border-radius:50%;background:var(--panel)}
 .mission-ring div{grid-area:1/1;z-index:1;display:flex;align-items:baseline}.mission-ring strong{font-size:1.2rem}.mission-ring span{font-size:.65rem;color:var(--muted)}
 .home-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);overflow:hidden;color:var(--glass-text)}
-.home-stats>div{padding:22px 16px;border-right:1px solid var(--glass-line)}.home-stats>div:last-child{border:0}.home-stats small{display:block;color:var(--glass-muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.1em}.home-stats strong{display:block;font-size:1.15rem;margin-top:8px}
+.home-stats>div{padding:22px 16px;border-right:1px solid var(--glass-line)}.home-stats>div:last-child{border:0}.home-stats small{display:block;color:var(--glass-muted);font-size:12px;text-transform:uppercase;letter-spacing:.1em}.home-stats strong{display:block;font-size:1.15rem;margin-top:8px}
 
 .home-section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-top:14px}.home-section-head h2{font-size:1.65rem;margin:0;letter-spacing:-.035em}.text-button{border:0;background:transparent;padding:6px;color:var(--accent-strong);box-shadow:none}.text-button:hover{box-shadow:none;border-color:transparent;transform:translateX(2px)}
 .learning-launcher{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -803,7 +855,6 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .lesson-title{font-size:1.55rem;margin:8px 0 10px}.grammar-lesson-card>p{line-height:1.7}
 .lesson-example{margin:20px 0;padding:18px;border:1px solid var(--line);border-radius:17px;background:var(--surface-warm)}.lesson-example>span{font-size:.63rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent-strong);font-weight:800}.lesson-example h3{margin:7px 0 8px;font-size:1rem;line-height:1.5}.lesson-example p{margin:0;color:var(--muted);font-size:.82rem;line-height:1.55}
 .practice-contract{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:14px 0;padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.9);color:var(--text)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.8rem;line-height:1.55}.practice-contract button{flex:0 0 auto}
-.toast{background:#101628}
 
 @keyframes signalPulse{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
 .reduce-motion *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
@@ -857,19 +908,19 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .neural-voice-choice input[type="range"]:disabled{opacity:.5}
 
 /* m025-32 Indonesian optional voice block */
-.indonesian-voice-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#F2E6D3)}
-.indonesian-voice-block p{margin:.35rem 0 0;color:var(--muted,#6F5F48);line-height:1.5}
+.indonesian-voice-block{margin-top:14px;padding-top:14px;border-top:1px solid var(--line,#F0E4CF)}
+.indonesian-voice-block p{margin:.35rem 0 0;color:var(--muted,#6E5E47);line-height:1.5}
 
 /* m025-33 FIEZEL Classroom */
 .classroom-page{display:grid;gap:14px}
 .classroom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#2B2118);min-height:88px}
-.classroom-cat small{color:var(--muted,#6F5F48)}
-.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3)}
+.classroom-cat{display:grid;gap:4px;justify-items:start;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);min-height:88px}
+.classroom-cat small{color:var(--muted,#6E5E47)}
+.classroom-board{padding:18px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
 .classroom-board h2{margin:.2rem 0 .5rem}
 .classroom-formula{font:600 1.05rem/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0)}
 .classroom-board ul{margin:.6rem 0 0;padding-left:1.1rem;line-height:1.6}
-.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3)}
+.classroom-subtitle-card{padding:16px;border-radius:20px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF)}
 .classroom-en{font-weight:650;line-height:1.5;margin:.3rem 0}
 .classroom-id{color:var(--accent,#C2402C);font-weight:600;line-height:1.5;margin:.2rem 0;min-height:1.4em}
 .classroom-options{display:grid;gap:9px}
@@ -883,27 +934,27 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .voice-bundle-sheet{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:linear-gradient(160deg,rgba(7,13,29,.95),rgba(45,37,86,.95));backdrop-filter:blur(10px)}
 body.voice-bundle-locked{overflow:hidden}
 body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer-events:none;opacity:.3}
-.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3);box-shadow:0 24px 60px rgba(7,13,29,.28)}
+.voice-bundle-panel{width:min(520px,100%);display:grid;gap:10px;padding:20px;border-radius:24px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 24px 60px rgba(7,13,29,.28)}
 .voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .voice-bundle-panel h2{margin:0}
-.voice-bundle-panel p{margin:0;color:var(--muted,#6F5F48);line-height:1.55}
+.voice-bundle-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
 .voice-bundle-track{height:8px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
 .voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--accent,#C2402C);transition:width .3s ease}
 .voice-bundle-progress{font-size:.92rem}
 .voice-bundle-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
 .voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:14px}
-.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#2B2118);border:1px solid var(--line,#F2E6D3);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
+.voice-bundle-pill{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0));z-index:60;padding:9px 16px;border-radius:999px;background:var(--panel,#fff);color:var(--text,#241A11);border:1px solid var(--line,#F0E4CF);box-shadow:0 10px 30px rgba(7,13,29,.18);font:600 .86rem/1.3 -apple-system,system-ui,sans-serif}
 @media (prefers-reduced-motion:reduce){.voice-bundle-track span{transition:none}}
 
 /* m025-42 mandatory daily target lock */
 .daily-lock{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:18px;background:linear-gradient(160deg,rgba(7,13,29,.94),rgba(45,37,86,.94));backdrop-filter:blur(10px)}
-.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#2B2118);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
+.daily-lock-panel{width:min(460px,100%);display:grid;gap:12px;padding:24px;border-radius:26px;background:var(--panel,#fff);color:var(--text,#241A11);text-align:center;box-shadow:0 30px 70px rgba(7,13,29,.4)}
 .daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .daily-lock-panel h2{margin:0}
-.daily-lock-panel p{margin:0;color:var(--muted,#6F5F48);line-height:1.55}
+.daily-lock-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
 .daily-lock-track{height:10px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
 .daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--accent,#C2402C);transition:width .35s ease}
-.daily-lock-count{font-weight:700;color:var(--text,#2B2118)}
+.daily-lock-count{font-weight:700;color:var(--text,#241A11)}
 .daily-lock-panel .wide{width:100%;min-height:52px;border-radius:16px}
 .daily-lock-note{font-size:.86rem}
 /* While the lock is armed every escape route inside the app is inert, including the
@@ -915,46 +966,46 @@ body.daily-locked{overflow:hidden}
 /* m025-44 FIEZEL Library: shelf, reader, audiobook, tap-to-translate */
 .library-page{display:grid;gap:14px}
 .library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:11px}
-.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#F2E6D3);background:var(--panel,#fff);color:var(--text,#2B2118);border-left:4px solid var(--book-accent,#C2402C)}
+.library-card{display:grid;grid-template-columns:56px 1fr;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:20px;border:1px solid var(--line,#F0E4CF);background:var(--panel,#fff);color:var(--text,#241A11);border-left:4px solid var(--book-accent,#C2402C)}
 .library-cover{font-size:2rem;line-height:1}
 .library-meta{display:grid;gap:3px}
 .library-meta b{font-size:1.02rem}
-.library-meta small{color:var(--muted,#6F5F48)}
-.library-meta em{color:var(--muted,#6F5F48);font-style:normal;line-height:1.45}
-.library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6F5F48);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
+.library-meta small{color:var(--muted,#6E5E47)}
+.library-meta em{color:var(--muted,#6E5E47);font-style:normal;line-height:1.45}
+.library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
 .library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
 .library-progress span{display:block;height:100%;background:var(--book-accent,#C2402C)}
 .library-reader{padding-bottom:190px}
 .library-reader-head{display:flex;gap:12px;align-items:flex-start}
 .library-back{min-height:44px;padding:0 14px;border-radius:12px}
-.library-note{margin:0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6F5F48);font-size:.88rem;line-height:1.5}
+.library-note{margin:0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font-size:.88rem;line-height:1.5}
 .library-text{display:grid;gap:2px}
 .library-chapter{margin:16px 0 6px;font-size:1.05rem}
-.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#2B2118);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
+.library-sentence{display:block;width:100%;text-align:left;padding:7px 10px;border:none;border-radius:10px;background:transparent;color:var(--text,#241A11);font:500 1.06rem/1.72 -apple-system,system-ui,sans-serif}
 .library-sentence[data-active]{background:var(--panel-soft,#f6eef0);box-shadow:inset 3px 0 0 var(--accent,#C2402C)}
 /* m025-45: the translation floats in the middle of the screen. The book stays visible
    behind it and a tap outside dismisses it - a reader, not a modal. */
 .library-translation-layer{position:fixed;inset:0;z-index:78;display:grid;place-items:center;padding:20px;background:rgba(7,13,29,.28);backdrop-filter:blur(2px)}
-.library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:22px;background:var(--panel,#fff);border:1px solid var(--line,#F2E6D3);box-shadow:0 26px 60px rgba(7,13,29,.32)}
+.library-translation-card{width:min(460px,100%);display:grid;gap:7px;padding:18px 18px 14px;border-radius:22px;background:var(--panel,#fff);border:1px solid var(--line,#F0E4CF);box-shadow:0 26px 60px rgba(7,13,29,.32)}
 .library-translation-mark{font:700 10px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-translation-en{margin:0;font-weight:650;line-height:1.5}
 .library-translation-id{margin:0;color:var(--accent,#C2402C);font-weight:600;line-height:1.5}
 .library-translation-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
-.library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#F2E6D3)}
+.library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#F0E4CF)}
 .library-progress-line{height:5px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
 .library-progress-line span{display:block;height:100%;background:var(--accent,#C2402C);transition:width .25s ease}
-.library-status{margin:0;font-size:.84rem;color:var(--muted,#6F5F48)}
+.library-status{margin:0;font-size:.84rem;color:var(--muted,#6E5E47)}
 .library-controls{display:flex;gap:8px;align-items:center}
 .library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
 .library-controls .primary{flex:1}
 .library-ask-sheet{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:rgba(7,13,29,.5)}
-.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#2B2118)}
+.library-ask-panel{width:min(480px,100%);display:grid;gap:9px;padding:20px;border-radius:22px;background:var(--panel,#fff);color:var(--text,#241A11)}
 .library-ask-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .library-ask-panel h2{margin:0}
 .library-ask-quote{margin:0;padding:9px 11px;border-radius:12px;background:var(--panel-soft,#f6eef0);line-height:1.5}
-.library-ask-panel textarea{width:100%;padding:11px;border-radius:13px;border:1px solid var(--line,#F2E6D3);font:inherit;resize:vertical}
+.library-ask-panel textarea{width:100%;padding:11px;border-radius:13px;border:1px solid var(--line,#F0E4CF);font:inherit;resize:vertical}
 .library-ask-actions{display:flex;gap:8px;justify-content:flex-end}
 .library-ask-actions button{min-height:46px;padding:0 16px;border-radius:13px}
 .library-ask-answer{margin:0;line-height:1.55;color:var(--accent,#C2402C);font-weight:600}
@@ -974,7 +1025,7 @@ body.daily-locked{overflow:hidden}
   background:var(--glass-thick);
   border:.5px solid var(--glass-edge);
   color:var(--glass-text);
-  box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.07);
+  box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.07);
 }
 .card{border-radius:22px;padding:18px}
 .card p.muted,.launch-card small,.coach-preview p{color:var(--glass-muted)}
@@ -1029,18 +1080,18 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   box-shadow:0 0 0 9999px rgba(10,5,8,.78),0 0 0 2px rgba(255,255,255,.55) inset;
   transition:top .26s var(--ease,ease),left .26s var(--ease,ease),width .26s var(--ease,ease),height .26s var(--ease,ease)}
 .fz-tour-card{position:fixed;left:16px;right:16px;padding:20px 20px 16px;border-radius:22px;
-  background:var(--glass-solid,#fff);color:var(--text,#2B2118);box-shadow:0 24px 70px rgba(0,0,0,.34);
+  background:var(--glass-solid,#fff);color:var(--text,#241A11);box-shadow:0 24px 70px rgba(0,0,0,.34);
   animation:fz-tour-in .28s cubic-bezier(.22,.8,.28,1) both}
 .fz-tour-card.is-top{top:max(22px,env(safe-area-inset-top))}
 .fz-tour-card.is-bottom{bottom:calc(104px + env(safe-area-inset-bottom))}
 @keyframes fz-tour-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .fz-tour-card h2{margin:8px 0 6px;font-size:1.12rem;line-height:1.25;letter-spacing:-.02em}
-.fz-tour-card p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted,#6F5F48)}
+.fz-tour-card p{margin:0;font-size:.86rem;line-height:1.6;color:var(--muted,#6E5E47)}
 .fz-tour-dots{display:flex;gap:6px}
 .fz-tour-dot{width:6px;height:6px;border-radius:50%;background:var(--line,#e9dfe1)}
 .fz-tour-dot.is-active{background:var(--accent,#C2402C);width:18px;border-radius:3px}
 .fz-tour-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
-.fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6F5F48);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
+.fz-tour-skip{min-height:44px;padding:10px 14px;border:0;background:transparent;color:var(--muted,#6E5E47);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer}
 .fz-tour-next{min-height:44px;padding:11px 22px;border:0;border-radius:14px;background:var(--accent,#C2402C);color:#fff;font:inherit;font-size:.86rem;font-weight:750;cursor:pointer}
 /* Kurangi-gerak: sorotannya tetap ada, hanya perpindahannya yang tidak dianimasikan. */
 .fz-tour-still .fz-tour-hole{transition:none}
@@ -1068,7 +1119,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .bottomnav{
   background:var(--glass-solid);
   border:.5px solid var(--glass-edge);border-radius:30px;padding:6px;
-  box-shadow:0 1px 1px rgba(43,33,24,.05),0 14px 34px rgba(43,33,24,.14);
+  box-shadow:0 1px 1px rgba(36,26,17,.05),0 14px 34px rgba(36,26,17,.14);
 }
 /* Peredup di dasar layar. pointer-events:none supaya ia tidak pernah menelan sentuhan, dan
    ia duduk DI BAWAH pill (z-index 39 lawan 40) supaya tab tetap tajam di atasnya. */
@@ -1086,7 +1137,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   background:var(--glass-thick);
   -webkit-backdrop-filter:var(--glass-blur-heavy);backdrop-filter:var(--glass-blur-heavy);
   border:.5px solid var(--glass-edge);border-radius:34px;color:var(--glass-text);
-  box-shadow:0 1px 2px rgba(43,33,24,.06),0 -8px 60px rgba(43,33,24,.18);
+  box-shadow:0 1px 2px rgba(36,26,17,.06),0 -8px 60px rgba(36,26,17,.18);
 }
 
 /* The sky is a clock, not wallpaper: it stays, but it stops competing with the text. */
@@ -1769,7 +1820,7 @@ button:active {
    Yang diambil karena itu maksudnya: label yang mengecil sampai batas masih terbaca, dan
    tidak lagi bersaing dengan baloknya. Kapital, tebal, dan jarak huruf dicabut; ketiganya
    itulah yang menyumbang lebar, bukan tinggi hurufnya. */
-.ask-button .ask-label{font-size:7px;font-weight:500;letter-spacing:0;
+.ask-button .ask-label{font-size:12px;font-weight:500;letter-spacing:0;
   color:var(--muted);white-space:nowrap;opacity:.75}
 
 .ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
@@ -1778,7 +1829,7 @@ button:active {
 .ask-box input::placeholder{color:var(--muted)}
 /* outline dimatikan di atas demi sudut membulat, jadi penanda fokusnya WAJIB ada di
    sini: tanpa ini pengguna keyboard kehilangan jejak posisinya sama sekali. */
-.ask-box input:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-color:var(--gold)}
+.ask-box input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .ask-box button{flex-shrink:0;padding:12px 16px;border-radius:14px}
 .ask-answer{padding:16px;margin-bottom:16px}
 /* Jawaban model datang sebagai satu blok teks; tanpa ini baris barunya hilang dan
@@ -1868,7 +1919,7 @@ button:active {
    Selektor sengaja diturunkan lewat .home-overview supaya deklarasi latar milik
    .mission-panel dan .home-stats sendiri tetap utuh - contrast-test membaca deklarasi itu
    sebagai sumber kebenaran untuk mengukur pasangan tinta/latarnya. */
-.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.06)}
+.home-overview{gap:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.06)}
 .home-overview .mission-panel,.home-overview .home-stats{border:0;border-radius:0;background:transparent;box-shadow:none}
 .home-overview .mission-panel{border-bottom:1px solid var(--glass-line)}
 .mission-panel h3{font-family:var(--fz-body);font-size:.95rem;font-weight:650;letter-spacing:-.01em}
@@ -1881,7 +1932,7 @@ button:active {
 
 /* 4. Perjalanan belajar: dua panel menjadi satu bidang dengan satu garis pemisah, dan
    blok rencana berhenti menjadi kotak-kotak kecil di dalam kotak. */
-.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(43,33,24,.03),0 8px 24px rgba(43,33,24,.06)}
+.journey-panel{grid-template-columns:1fr;gap:0;margin:0;border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);color:var(--glass-text);overflow:hidden;box-shadow:0 1px 1px rgba(36,26,17,.03),0 8px 24px rgba(36,26,17,.06)}
 .journey-panel .journey-mission,.journey-panel .journey-today{border:0;border-radius:0;background:transparent;box-shadow:none}
 .journey-panel .journey-mission{border-bottom:1px solid var(--glass-line)}
 .journey-mission small,.journey-today small{font-size:.6rem;letter-spacing:.16em}
@@ -1976,16 +2027,16 @@ button:active {
 button.primary,.primary.wide,.primary.luxe,html.fiezel-ui-v6 body .primary{
   background:var(--yellow);color:var(--ink);border:0;border-radius:18px;
   font-weight:700;letter-spacing:-.01em;
-  box-shadow:0 4px 0 var(--yellow-deep),0 10px 22px rgba(43,33,24,.13);
+  box-shadow:0 4px 0 var(--yellow-deep),0 10px 22px rgba(36,26,17,.13);
   transition:transform .12s var(--ease),box-shadow .12s var(--ease),background .2s var(--ease);
 }
 button.primary:hover,.primary.luxe:hover,html.fiezel-ui-v6 body .primary:hover{background:#FFE896;color:var(--ink)}
 button.primary:active,.primary.luxe:active,html.fiezel-ui-v6 body .primary:active{
-  transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep),0 4px 10px rgba(43,33,24,.12)}
+  transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep),0 4px 10px rgba(36,26,17,.12)}
 /* Aksi kedua: bidang koral pastel, bukan garis tipis yang nyaris tak terlihat. */
-.primary.is-coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep),0 10px 22px rgba(43,33,24,.13)}
+.primary.is-coral{background:var(--coral);box-shadow:0 4px 0 var(--coral-deep),0 10px 22px rgba(36,26,17,.13)}
 .primary.is-coral:hover{background:#F7B0A3}
-.primary.is-coral:active{box-shadow:0 1px 0 var(--coral-deep),0 4px 10px rgba(43,33,24,.12)}
+.primary.is-coral:active{box-shadow:0 1px 0 var(--coral-deep),0 4px 10px rgba(36,26,17,.12)}
 
 /* Tombol biasa ikut punya tebal, hanya lebih tenang. */
 html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.text-button):not(.coach-link):not(.fz-coach-bubble):not(.launch-card):not(.skill-card){
@@ -2005,7 +2056,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   background:linear-gradient(155deg,var(--launcher-start) 0%,var(--launcher-end) 118%);
   color:var(--ink);
   border:1px solid rgba(217,188,126,.45);
-  box-shadow:0 18px 44px rgba(43,33,24,.14);
+  box-shadow:0 18px 44px rgba(36,26,17,.14);
 }
 /* Matahari sudut: satu lingkaran krem, bukan kabut emas yang tidak terbaca. */
 .launcher-shell::after{
@@ -2016,17 +2067,17 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .launcher-copy h1.login-message{color:var(--ink)}
 .launcher-copy h1.login-message span{color:var(--ink);opacity:.55}
 .launcher-lead{color:var(--ink);opacity:.78}
-.celestial-status{border:1px solid rgba(43,33,24,.14);background:rgba(255,255,255,.55);color:var(--ink)}
+.celestial-status{border:1px solid rgba(36,26,17,.14);background:rgba(255,255,255,.55);color:var(--ink)}
 .celestial-status span{color:var(--ink);opacity:.7}
 .live-signal{background:var(--green);box-shadow:0 0 0 5px rgba(46,139,105,.16)}
 
 /* Kartu Coach di dalam hero tetap tanpa bingkai, hanya garis rambut - hanya
    warnanya yang ikut berbalik. */
-.coach-preview{border-top:1px solid rgba(43,33,24,.14)}
+.coach-preview{border-top:1px solid rgba(36,26,17,.14)}
 .coach-icon{background:rgba(255,255,255,.7);color:var(--accent-strong);border:1px solid rgba(217,188,126,.6)}
 .coach-head small{color:var(--ink);opacity:.6}
 .coach-head b{color:var(--ink)}
-.coach-level{border-bottom:1px solid rgba(43,33,24,.12)}
+.coach-level{border-bottom:1px solid rgba(36,26,17,.12)}
 .coach-level span{color:var(--ink);opacity:.6}
 .coach-level strong{color:var(--ink)}
 .coach-preview h2{color:var(--ink)}
@@ -2048,7 +2099,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 /* --------------------------------------------------------------------------
    4. Tab bar. Tab aktif jadi kapsul kuning pastel, bukan hanya teks berwarna.
    -------------------------------------------------------------------------- */
-.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(43,33,24,.16)}
+.bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(36,26,17,.16)}
 .nav{color:var(--muted);font-weight:600}
 .nav .fz-i{--fz-i-fill:var(--surface-mute);--fz-i-line:var(--muted)}
 .nav.active{color:var(--ink);background:var(--yellow-soft);font-weight:750}
@@ -2064,10 +2115,10 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:relative;display:grid;gap:10px;padding:16px;text-align:left;align-content:start;
   min-height:132px;border-radius:22px;border:1.5px solid var(--skill-line,var(--surface-edge));
   background:var(--skill-bg,var(--panel-soft));color:var(--ink);
-  box-shadow:0 4px 0 var(--skill-line,var(--surface-edge)),0 12px 26px rgba(43,33,24,.10);
+  box-shadow:0 4px 0 var(--skill-line,var(--surface-edge)),0 12px 26px rgba(36,26,17,.10);
   transition:transform .14s var(--ease),box-shadow .14s var(--ease);
 }
-.skill-card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--skill-line,var(--surface-edge)),0 6px 14px rgba(43,33,24,.10)}
+.skill-card:active{transform:translateY(3px);box-shadow:0 1px 0 var(--skill-line,var(--surface-edge)),0 6px 14px rgba(36,26,17,.10)}
 .skill-card .fz-i{--fz-i-fill:var(--skill-ink,var(--yellow));--fz-i-line:var(--ink)}
 .skill-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .skill-card b{font-size:1rem;font-weight:700;letter-spacing:-.01em}
@@ -2076,11 +2127,11 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 /* Cincin progres: satu conic-gradient, tanpa satu pun elemen tambahan. */
 .skill-ring{
   width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
-  background:conic-gradient(var(--skill-ink,var(--yellow)) var(--ring,0%),rgba(43,33,24,.10) 0);
+  background:conic-gradient(var(--skill-ink,var(--yellow)) var(--ring,0%),rgba(36,26,17,.10) 0);
 }
 .skill-ring::before{content:"";grid-area:1/1;width:28px;height:28px;border-radius:50%;background:var(--skill-bg,var(--panel-soft))}
 .skill-ring b{grid-area:1/1;z-index:1;font-size:.62rem;font-weight:750;color:var(--ink)}
-.skill-listening{--skill-bg:#FFF1C9;--skill-line:#F3E0AE;--skill-ink:#FFD23F}
+.skill-listening{--skill-bg:#FFF3C4;--skill-line:#F3E0AE;--skill-ink:#FFC700}
 .skill-speaking{--skill-bg:#FDE3DE;--skill-line:#F6D3C9;--skill-ink:#EE5D4A}
 .skill-reading{--skill-bg:#E9F7F0;--skill-line:#CDE9DD;--skill-ink:#A8DCC4}
 .skill-writing{--skill-bg:#F1EDF9;--skill-line:#DCD3EE;--skill-ink:#C9BCE4}
@@ -2093,7 +2144,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .grammar-launch .launch-icon{background:var(--coral-soft)}
 .reading-launch .launch-icon{background:var(--mint-soft)}
 .skills-launch .launch-icon{background:var(--lilac-soft)}
-.launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(43,33,24,.08)}
+.launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(36,26,17,.08)}
 .launch-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
 
 /* --------------------------------------------------------------------------
@@ -2105,11 +2156,11 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:fixed;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));z-index:41;
   width:58px;height:58px;padding:0;border-radius:50%;border:2px solid var(--ink);
   background:var(--yellow);color:var(--ink);cursor:pointer;
-  box-shadow:0 4px 0 var(--yellow-deep),0 14px 30px rgba(43,33,24,.24);
+  box-shadow:0 4px 0 var(--yellow-deep),0 14px 30px rgba(36,26,17,.24);
   display:grid;place-items:center;
   transition:transform .16s var(--ease-spring),box-shadow .16s var(--ease);
 }
-.fz-coach-bubble:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 var(--yellow-deep),0 6px 16px rgba(43,33,24,.2)}
+.fz-coach-bubble:active{transform:translateY(3px) scale(.97);box-shadow:0 1px 0 var(--yellow-deep),0 6px 16px rgba(36,26,17,.2)}
 .fz-coach-bubble .fz-coach-face{width:30px;height:30px}
 .fz-coach-bubble .fz-coach-pulse{
   position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--yellow);
@@ -2127,21 +2178,21 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
   position:fixed;right:84px;bottom:calc(116px + env(safe-area-inset-bottom));z-index:41;
   max-width:min(230px,62vw);padding:10px 13px;border-radius:16px 16px 4px 16px;
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
-  font-size:.78rem;line-height:1.45;box-shadow:0 10px 26px rgba(43,33,24,.16);
+  font-size:.78rem;line-height:1.45;box-shadow:0 10px 26px rgba(36,26,17,.16);
   animation:fzCoachPeek .34s var(--ease-spring) both}
 @keyframes fzCoachPeek{from{opacity:0;transform:translateY(6px) scale(.96)}to{opacity:1;transform:none}}
 .fz-coach-peek[hidden]{display:none}
 
 .fz-coach-sheet{
   position:fixed;inset:0;z-index:2147481500;display:flex;align-items:flex-end;justify-content:center;
-  padding:12px;background:rgba(43,33,24,.34);animation:fzCoachFade .2s var(--ease) both}
+  padding:12px;background:rgba(36,26,17,.34);animation:fzCoachFade .2s var(--ease) both}
 .fz-coach-sheet[hidden]{display:none}
 @keyframes fzCoachFade{from{opacity:0}to{opacity:1}}
 .fz-coach-panel{
   width:min(560px,100%);max-height:min(78vh,640px);display:flex;flex-direction:column;
   padding:16px 16px calc(14px + env(safe-area-inset-bottom));border-radius:26px;
   border:1.5px solid var(--surface-edge);background:var(--glass-solid);color:var(--text);
-  box-shadow:0 -6px 60px rgba(43,33,24,.24);animation:fzCoachRise .28s var(--ease-spring) both}
+  box-shadow:0 -6px 60px rgba(36,26,17,.24);animation:fzCoachRise .28s var(--ease-spring) both}
 @keyframes fzCoachRise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
 .fz-coach-head{display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .fz-coach-head b{font-size:.95rem}
@@ -2539,7 +2590,7 @@ html.fiezel-ui-v6 .nav.active::after{
    berpindah dari data ke bentuk - tidak ada perhitungan derajat yang tersebar di JS. */
 .hero-ring{
   width:15px;height:15px;border-radius:50%;flex:none;
-  background:conic-gradient(var(--ink) calc(var(--v,0) * 1%),rgba(43,33,24,.16) 0);
+  background:conic-gradient(var(--ink) calc(var(--v,0) * 1%),rgba(36,26,17,.16) 0);
   -webkit-mask:radial-gradient(circle,transparent 46%,#000 47%);
   mask:radial-gradient(circle,transparent 46%,#000 47%);
 }
@@ -2686,18 +2737,18 @@ html.fiezel-ui-v6 .launcher-shell{
 }
 
 /* Global learner-level contract */
-.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:14px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer;box-shadow:none}
+.active-level-control,.home-level-context{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line,#eadfce);border-radius:14px;background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer;box-shadow:none}
 .active-level-control{flex:0 0 auto;flex-direction:column;align-items:flex-start;padding:10px 13px;min-width:118px;text-align:left}
 .active-level-control span,.active-level-control small{font-size:.66rem;color:var(--muted,#746958);line-height:1.1}
 .active-level-control strong{font-size:1rem;line-height:1.1;color:var(--accent,#c2402c)}
 .active-level-control:hover,.home-level-context:hover{border-color:var(--accent,#c2402c);box-shadow:0 4px 14px rgba(67,43,25,.08);transform:translateY(-1px)}
 .home-level-context{padding:4px 9px;font-size:.68rem;font-weight:750;white-space:nowrap}
 .level-picker-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:18px 0}
-.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:16px;background:var(--panel,#fff);color:var(--ink,#2b2118);cursor:pointer}
+.level-picker-card{display:grid;gap:5px;min-height:88px;padding:13px;text-align:left;border:1px solid var(--line,#eadfce);border-radius:16px;background:var(--panel,#fff);color:var(--ink,#241a11);cursor:pointer}
 .level-picker-card strong{font-size:1.15rem;color:var(--accent,#c2402c)}
 .level-picker-card span{font-size:.72rem;line-height:1.35;color:var(--muted,#746958)}
 .level-picker-card.is-active{border-color:var(--accent,#c2402c);background:color-mix(in srgb,var(--accent,#c2402c) 8%,var(--panel,#fff));box-shadow:0 0 0 2px color-mix(in srgb,var(--accent,#c2402c) 16%,transparent)}
-.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:15px;background:var(--panel-soft,#f8f1e7);color:var(--ink,#2b2118);font-size:.83rem}
+.level-source-note,.level-scope-note,.grammar-level-note{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:baseline;padding:12px 14px;margin:0 0 16px;border-radius:15px;background:var(--panel-soft,#f8f1e7);color:var(--ink,#241a11);font-size:.83rem}
 .level-source-note{display:block;margin-top:10px}
 .level-source-note b{color:var(--accent,#c2402c)}
 .level-scope-note span,.grammar-level-note span,.grammar-level-note small{color:var(--muted,#746958)}
