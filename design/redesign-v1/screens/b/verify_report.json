@@ -1,0 +1,32 @@
+{
+  "quiz": {
+    "font_violations": [],
+    "target_violations": [],
+    "contrast_fail": [],
+    "contrast_checked": 25
+  },
+  "quiz-analyzing": {
+    "font_violations": [],
+    "target_violations": [],
+    "contrast_fail": [],
+    "contrast_checked": 25
+  },
+  "quiz-correct": {
+    "font_violations": [],
+    "target_violations": [],
+    "contrast_fail": [],
+    "contrast_checked": 36
+  },
+  "quiz-wrong": {
+    "font_violations": [],
+    "target_violations": [],
+    "contrast_fail": [],
+    "contrast_checked": 32
+  },
+  "quiz-hint": {
+    "font_violations": [],
+    "target_violations": [],
+    "contrast_fail": [],
+    "contrast_checked": 34
+  }
+}
