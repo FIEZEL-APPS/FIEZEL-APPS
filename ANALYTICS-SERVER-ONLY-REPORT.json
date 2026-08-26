@@ -1,0 +1,308 @@
+{
+  "status": "PASS",
+  "gate": "analytics-server-only",
+  "serverOnlyEvents": [
+    "user_created",
+    "ai_request",
+    "ai_success",
+    "ai_failure",
+    "tts_request",
+    "tts_success",
+    "tts_failure",
+    "quota_exhausted",
+    "circuit_opened",
+    "circuit_recovered"
+  ],
+  "clientEvents": [
+    "app_open",
+    "day_active",
+    "session_started",
+    "session_ended",
+    "lesson_started",
+    "lesson_completed",
+    "question_answered",
+    "retention_ping"
+  ],
+  "counts": {
+    "pass": 69,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "SERVER_ONLY_EVENTS mencakup semua jalur AI/TTS/kuota/breaker + user_created",
+      "status": "PASS"
+    },
+    {
+      "name": "Penandaan origin di EVENT_SPEC konsisten dengan SERVER_ONLY_EVENTS",
+      "status": "PASS"
+    },
+    {
+      "name": "Semua 18 event terdaftar (15 nama bab 19 + app_open + day_active + retention_ping)",
+      "status": "PASS"
+    },
+    {
+      "name": "Lima belas event bab 19 semuanya ada",
+      "status": "PASS"
+    },
+    {
+      "name": "Gerbang ini menguji setiap event yang terdaftar (tak ada yang terlewat)",
+      "status": "PASS"
+    },
+    {
+      "name": "Kode menandai blok server-only secara eksplisit untuk pembaca berikutnya",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim user_created",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim ai_request",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim ai_success",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim ai_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim tts_request",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim tts_success",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim tts_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim quota_exhausted",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim circuit_opened",
+      "status": "PASS"
+    },
+    {
+      "name": "Klien DITOLAK saat mengirim circuit_recovered",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan user_created",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan ai_request",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan ai_success",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan ai_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan tts_request",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan tts_success",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan tts_failure",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan quota_exhausted",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan circuit_opened",
+      "status": "PASS"
+    },
+    {
+      "name": "Worker BOLEH menerbitkan circuit_recovered",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak user_created dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak ai_request dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak ai_success dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak ai_failure dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak tts_request dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak tts_success dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak tts_failure dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak quota_exhausted dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak circuit_opened dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "normalizeEvent menolak circuit_recovered dari klien di lapisan inti",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien app_open diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien day_active diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien session_started diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien session_ended diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien lesson_started diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien lesson_completed diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien question_answered diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Event klien retention_ping diterima",
+      "status": "PASS"
+    },
+    {
+      "name": "Satu event server-only menolak seluruh batch (tidak ada yang lolos sebagian)",
+      "status": "PASS"
+    },
+    {
+      "name": "POST /api/usage/events menolak user_created dari klien dengan 400 server_only",
+      "status": "PASS"
+    },
+    {
+      "name": "POST /api/usage/events menerima event klien dengan 202",
+      "status": "PASS"
+    },
+    {
+      "name": "Field asing membuat batch ditolak 400 foreign_field",
+      "status": "PASS"
+    },
+    {
+      "name": "Event tak dikenal ditolak 400 unknown_event",
+      "status": "PASS"
+    },
+    {
+      "name": "Batch > 20 event ditolak 413",
+      "status": "PASS"
+    },
+    {
+      "name": "Body > 8 KB ditolak 413 tanpa di-parse",
+      "status": "PASS"
+    },
+    {
+      "name": "Body besar tanpa content-length tetap ditolak 413",
+      "status": "PASS"
+    },
+    {
+      "name": "Body bukan JSON ditolak 400 bad_json",
+      "status": "PASS"
+    },
+    {
+      "name": "Skema salah ditolak 400 bad_schema",
+      "status": "PASS"
+    },
+    {
+      "name": "Hari di luar toleransi ±2 hari ditolak 400 day_out_of_range",
+      "status": "PASS"
+    },
+    {
+      "name": "Flag OFF: endpoint diam (202, tidak menulis apa pun)",
+      "status": "PASS"
+    },
+    {
+      "name": "Rate limit menahan setelah 60 batch/jam per klien",
+      "status": "PASS"
+    },
+    {
+      "name": "Jendela rate limit terbuka lagi setelah satu jam",
+      "status": "PASS"
+    },
+    {
+      "name": "POST /api/usage/retention menerima cohort_day + day_index",
+      "status": "PASS"
+    },
+    {
+      "name": "Retention menolak field tambahan apa pun (termasuk token)",
+      "status": "PASS"
+    },
+    {
+      "name": "Retention menolak cohort_day di masa depan",
+      "status": "PASS"
+    },
+    {
+      "name": "Retention menolak day_index di luar 0..400",
+      "status": "PASS"
+    },
+    {
+      "name": "Agregat retensi tidak memuat token maupun identitas apa pun",
+      "status": "PASS"
+    },
+    {
+      "name": "registerAnalyticsRoutes mendaftarkan POST /api/usage/events",
+      "status": "PASS"
+    },
+    {
+      "name": "registerAnalyticsRoutes mendaftarkan POST /api/usage/retention",
+      "status": "PASS"
+    },
+    {
+      "name": "registerAnalyticsRoutes mendaftarkan GET /api/usage/pepper",
+      "status": "PASS"
+    },
+    {
+      "name": "registerAnalyticsRoutes juga mendukung router bergaya on(method, path)",
+      "status": "PASS"
+    },
+    {
+      "name": "registerAnalyticsRoutes gagal jelas bila bentuk router tidak dikenali",
+      "status": "PASS"
+    },
+    {
+      "name": "workers/api/index.js TIDAK diedit oleh paket kerja ini",
+      "status": "PASS"
+    }
+  ]
+}
