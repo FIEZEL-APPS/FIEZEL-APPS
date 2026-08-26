@@ -405,14 +405,17 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 /* ---------- welcome / modal overlays ---------- */
 .welcome,.modal{
-  position:fixed;inset:0;background:rgba(var(--bg-rgb),.82);backdrop-filter:blur(18px);
+  /* Backdrop dulu kabut TERANG di atas layar terang (rgba(bg,.82)) - panel dialog
+     tidak pernah benar-benar terangkat dari latarnya. Scrim gelap turunan --text
+     memisahkan keduanya tanpa menambah satu elemen pun. */
+  position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(18px);
   display:grid;place-items:center;z-index:100;opacity:0;pointer-events:none;transition:opacity var(--dur-l) var(--ease);
   padding:20px;
 }
 .welcome.show,.modal.show{opacity:1;pointer-events:auto}
 .welcome.hidden,.modal.hidden{display:none}
 .welcome-panel,.modal-panel{
-  width:min(460px,100%);padding:32px 26px;border:1px solid var(--line);border-radius:28px;
+  width:min(460px,100%);padding:32px 26px;border:1px solid var(--line);border-radius:var(--radius-lg);
   background:rgba(var(--surface-pure-rgb),.98);box-shadow:var(--shadow-lg);text-align:center;
   transform:translateY(16px) scale(.96);transition:transform .45s var(--ease-spring);
 }
@@ -542,7 +545,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   position:fixed;inset:0;z-index:2147481400;
   display:flex;align-items:flex-end;justify-content:center;
   padding:14px 14px calc(20px + env(safe-area-inset-bottom));
-  background:rgba(36,26,17,.28);
+  background:var(--scrim-soft);
 }
 .confidence-card{
   width:min(420px,100%);
@@ -851,7 +854,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .report-settings{margin:4px 0 18px;padding:18px;text-align:left;background:var(--surface-warm);border:1px solid var(--line);border-radius:18px}.report-settings .row{align-items:start}.report-settings .row p{margin:3px 0 0}
 .endpoint-label{display:grid;gap:7px;margin:16px 0 12px;font-size:.72rem;font-weight:750;color:var(--muted)}
 .setup-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:var(--accent-strong);font-size:.74rem;font-weight:750;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
-.endpoint-label input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);font:inherit;color:var(--text)}
+.endpoint-label input{width:100%;min-height:48px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);font:inherit;color:var(--text)}
 .endpoint-label input:focus{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
 .report-state{font-size:.7rem!important;margin:13px 0 0!important;padding-top:11px;border-top:1px solid var(--line)}
@@ -925,7 +928,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   .voice-setup-card{align-items:stretch;flex-direction:column}.voice-setup-actions{width:100%;display:grid;grid-template-columns:1fr}.voice-setup-card button{width:100%}
   .home-section-head{align-items:flex-start;flex-direction:column}.privacy-strip{align-items:flex-start;flex-direction:column}.privacy-strip>button{width:100%}
   .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:12px;padding:8px 2px}
-  .welcome-panel,.modal-panel{padding:26px 20px;border-radius:22px}.modal{padding:12px}.setting-row{grid-template-columns:auto 1fr auto}.practice-contract{align-items:stretch;flex-direction:column}.practice-contract button{width:100%}.lesson-card-foot{align-items:flex-start;flex-direction:column}.lesson-card-foot button{width:100%}
+  .welcome-panel,.modal-panel{padding:26px 20px;border-radius:var(--radius-lg)}.modal{padding:12px}.setting-row{grid-template-columns:auto 1fr auto}.practice-contract{align-items:stretch;flex-direction:column}.practice-contract button{width:100%}.lesson-card-foot{align-items:flex-start;flex-direction:column}.lesson-card-foot button{width:100%}
 }
 
 /* m025-30 neural voice rate control */
@@ -1987,8 +1990,8 @@ button:active {
   color:var(--muted);white-space:nowrap;opacity:.75}
 
 .ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
-.ask-box input{flex:1;min-width:0;padding:12px 14px;border:1px solid var(--line);
-  border-radius:14px;background:var(--panel);color:var(--text);font:inherit;outline:none}
+.ask-box input{flex:1;min-width:0;min-height:48px;padding:12px 14px;border:1px solid var(--line);
+  border-radius:var(--radius-sm);background:var(--panel);color:var(--text);font:inherit;outline:none}
 .ask-box input::placeholder{color:var(--muted)}
 /* outline dimatikan di atas demi sudut membulat, jadi penanda fokusnya WAJIB ada di
    sini: tanpa ini pengguna keyboard kehilangan jejak posisinya sama sekali. */
@@ -2357,7 +2360,7 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 
 .fz-coach-sheet{
   position:fixed;inset:0;z-index:2147481500;display:flex;align-items:flex-end;justify-content:center;
-  padding:12px;background:rgba(36,26,17,.34);animation:fzCoachFade .2s var(--ease) both}
+  padding:12px;background:var(--scrim-soft);animation:fzCoachFade .2s var(--ease) both}
 .fz-coach-sheet[hidden]{display:none}
 @keyframes fzCoachFade{from{opacity:0}to{opacity:1}}
 .fz-coach-panel{
@@ -2435,18 +2438,20 @@ body.reduce-motion .fz-coach-bubble .fz-coach-pulse,body.reduce-motion .fz-confe
    Sengaja BUKAN memakai gaya .feedback: keduanya berbeda peran dan tidak boleh terlihat
    sama. Kotak feedback membuka jawaban; giliran tutor justru sering menahannya, dan murid
    harus bisa membedakan "ini petunjuk, soalnya masih terbuka" dari "ini jawabannya". */
+/* Petunjuk BUKAN kesalahan. Aksen marun membuat setiap giliran tutor terbaca sebagai
+   peringatan; keluarga info (kuning tua) menandainya sebagai bantuan. */
 .tutor-turn{margin-top:14px;padding:14px 16px;border-radius:16px;
-  background:var(--surface-tint);border:1px solid var(--line);
-  border-left:3px solid var(--accent)}
+  background:var(--panel-soft);border:1px solid var(--line);
+  border-left:3px solid var(--info)}
 .tutor-turn.hidden{display:none}
 .tutor-turn-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;
   font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .tutor-turn-face{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
-  background:var(--accent);color:var(--accent-on-glass)}
+  background:var(--sun);color:var(--text)}
 .tutor-turn-face svg{width:14px;height:14px}
 .tutor-turn-say{margin:0;font-size:.94rem;line-height:1.6;color:var(--ink)}
-.tutor-turn-ask{margin:8px 0 0;font-size:.94rem;line-height:1.6;font-weight:650;
-  color:var(--accent-strong)}
+.tutor-turn-ask{margin:8px 0 0;font-size:.94rem;line-height:1.6;font-weight:600;
+  color:var(--info)}
 .tutor-turn-actions{margin-top:12px}
 /* Tinggi sentuh 44px, sama dengan seluruh kontrol lain - tombol ini justru ditekan oleh
    murid yang sedang bingung, jadi ia tidak boleh jadi target yang sulit dikenai. */
@@ -2467,11 +2472,11 @@ eteach) dan tawaran berhenti (reathe).
 .tutor-card-head small{display:block;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .tutor-card-head b{font-size:1.05rem;letter-spacing:-.01em}
 .tutor-card-why{margin:0;padding:10px 12px;border-radius:12px;font-size:.86rem;line-height:1.55;
-  background:var(--surface-tint);border-left:3px solid var(--accent)}
+  background:var(--panel-soft);border-left:3px solid var(--info)}
 .tutor-card-rule{margin:0;font-size:.98rem;line-height:1.6;font-weight:650}
 .tutor-card-cue{display:flex;align-items:flex-start;gap:8px;margin:0;font-size:.88rem;line-height:1.55;color:var(--muted)}
 .tutor-card-cue svg{width:16px;height:16px;flex:0 0 auto;margin-top:2px}
-.quiz-teach-flag{font-size:.66rem;font-weight:750;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.quiz-teach-flag{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 /* Dua jalan keluar berdampingan, dan yang "berhenti" justru jadi tombol utamanya:
    pada titik ini FIEZEL memang sedang menyarankan berhenti, bukan sekadar mengizinkan. */
 .tutor-breathe{display:flex;flex-wrap:wrap;gap:8px}
@@ -2966,3 +2971,47 @@ html.fiezel-ui-v6 .launcher-shell{
 .reading-exam-set span{font-size:.75rem;font-weight:650;color:var(--accent,#c2402c)}
 .reading-exam-set small{font-size:.74rem;line-height:1.45;color:var(--muted,#746958)}
 .reading-exam-set button{justify-self:start;margin-top:5px}
+
+
+/* ==========================================================================
+   FASE 2 — komponen BARU dari design/redesign-v1/components (§9 hint, §10 audio,
+   §13 field). Belum ada markup yang memanggilnya; resepnya ditulis di sini supaya
+   layar Fase 3 tidak menulis ulang tiga kali dengan tiga nilai berbeda.
+   ========================================================================== */
+/* §9 panel petunjuk bertahap — nomor langkah, bukan paragraf jawaban */
+.hintpanel{background:var(--panel);border:1.5px solid var(--line);border-radius:var(--radius-md);
+  padding:14px 16px;display:grid;gap:10px}
+.hint-step{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text)}
+.hint-step .hint-num{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font-size:12px;font-weight:700;background:var(--panel-soft);color:var(--muted);
+  border:1.5px solid var(--line)}
+.hint-step.is-done .hint-num{background:var(--sun-soft);border-color:var(--sun);color:var(--text)}
+.hint-step.is-current .hint-num{background:var(--text);border-color:var(--text);color:var(--on-core)}
+.hint-step.is-locked{color:var(--muted)}
+.hint-step.is-locked .hint-num{background:var(--panel-soft);color:var(--muted)}
+
+/* §10 pemutar audio + equalizer */
+.audioplayer{display:flex;align-items:center;gap:12px;background:var(--panel);
+  border:1.5px solid var(--line);border-radius:var(--radius-lg);padding:12px 16px}
+.eq{display:flex;align-items:flex-end;gap:3px;height:22px}
+.eq i{width:4px;border-radius:2px;background:var(--sun);height:100%;
+  animation:eq .9s var(--ease) infinite alternate}
+.eq i:nth-child(2){animation-delay:.15s}
+.eq i:nth-child(3){animation-delay:.3s}
+.eq i:nth-child(4){animation-delay:.45s}
+@keyframes eq{from{transform:scaleY(.55)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.eq i{animation:none;transform:scaleY(.8)}}
+
+/* §13 field — tinggi 48px, cincin fokus satu resep, state error/success by teks+warna */
+.field{display:grid;gap:6px}
+.field label{font-size:12px;font-weight:600;color:var(--muted)}
+.field input,.field textarea,.field select{min-height:48px;padding:12px 14px;
+  border:1.5px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);
+  color:var(--text);font:inherit}
+.field input:focus-visible,.field textarea:focus-visible,.field select:focus-visible{
+  outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
+.field.is-error input{border-color:var(--bad)}
+.field.is-error .field-msg{color:var(--bad);font-size:12px}
+.field.is-success input{border-color:var(--good)}
+.field.is-success .field-msg{color:var(--good);font-size:12px}
+.field input:disabled{background:var(--panel-soft);color:var(--text-disabled)}
