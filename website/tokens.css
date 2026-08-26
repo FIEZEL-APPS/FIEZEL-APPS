@@ -146,28 +146,22 @@ body{margin:0;background:var(--bg);color:var(--body);font-family:var(--font);fon
 .credit-strip{background:var(--cream-deep);color:var(--maroon-mid);border-bottom:1px solid var(--gold-line-soft)}
 .credit-in{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;font-size:var(--fs-micro);
   letter-spacing:.12em;text-transform:uppercase;flex-wrap:nowrap;white-space:nowrap}
-.credit-in strong{font-weight:700;color:var(--maroon-deep)}
-.credit-ig{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;
-  color:var(--maroon);transition:transform var(--fz-fast) var(--fz-spring),color var(--fz-fast)}
-.credit-ig svg{width:15px;height:15px}
-.credit-ig:hover{transform:scale(1.15);color:var(--maroon-deep)}
+/* satu anchor membungkus ikon Instagram DAN teks @fitrarustqi (arahan owner m028-06) */
+.credit-ig{display:inline-flex;align-items:center;gap:7px;padding:2px 8px;border-radius:var(--radius-pill);
+  color:var(--maroon);text-decoration:none;
+  transition:transform var(--fz-fast) var(--fz-spring),color var(--fz-fast),background-color var(--fz-fast)}
+.credit-ig svg{width:15px;height:15px;flex:0 0 auto}
+.credit-ig strong{font-weight:700;color:var(--maroon-deep);letter-spacing:.12em}
+.credit-ig:hover,.credit-ig:focus-visible{text-decoration:none;transform:scale(1.05);
+  color:var(--maroon-deep);background:var(--blush)}
+.credit-ig:hover strong,.credit-ig:focus-visible strong{color:var(--maroon-deep);text-decoration:underline;
+  text-decoration-color:var(--maroon-line-strong);text-underline-offset:3px}
 
 /* ---------- ornamen garis: hairline emas/maroon ---------- */
 .rule{height:1px;border:0;margin:0;background:linear-gradient(90deg,var(--maroon-line-strong),var(--gold-line) 42%,transparent)}
 .rule-center{background:linear-gradient(90deg,transparent,var(--gold-line) 30%,var(--maroon-line-strong) 50%,var(--gold-line) 70%,transparent)}
 
-/* ---------- pemutar musik latar (tidak autoplay) ---------- */
-.music-btn{position:fixed;top:10px;right:12px;z-index:60;width:44px;height:44px;display:inline-flex;
-  align-items:center;justify-content:center;border-radius:var(--radius-pill);cursor:pointer;
-  background:var(--cream-warm);border:1px solid var(--maroon-line-strong);color:var(--maroon-deep);
-  box-shadow:var(--shadow-sm);padding:0;
-  transition:transform var(--fz-fast) var(--fz-spring),box-shadow var(--fz-fast) var(--fz-out),background-color var(--fz-fast)}
-.music-btn svg{width:20px;height:20px}
-.music-btn:hover{transform:translateY(-2px) scale(1.04);box-shadow:var(--shadow-md)}
-.music-btn:active{transform:translateY(1px) scale(.97)}
-.music-btn[aria-pressed="true"]{background:var(--sun);border-color:var(--maroon)}
-.music-btn .m-bar{transform-origin:center bottom}
-.music-btn[aria-pressed="true"] .m-wave{animation:mWave 1.6s var(--fz-out) infinite}
-.music-btn[aria-pressed="true"] .m-wave-2{animation-delay:.25s}
-@keyframes mWave{0%,100%{transform:scaleY(.55);opacity:.75}50%{transform:scaleY(1);opacity:1}}
-@media (min-width:900px){.music-btn{top:14px;right:20px;width:46px;height:46px}}
+/* ---------- musik latar: TANPA elemen UI sama sekali (arahan owner m028-06) ----------
+   Landing memutar assets/music/ambient.mp3 otomatis lewat site.js: percobaan play() saat
+   load, lalu fallback ke gestur pertama (pointerdown/keydown/touchstart/scroll). Tidak ada
+   tombol, banner, atau indikator apa pun — jadi tidak ada gaya yang perlu didefinisikan. */
