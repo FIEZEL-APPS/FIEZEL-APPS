@@ -242,11 +242,13 @@ content_adoption_test_run=subprocess.run(['node',str(ROOT/'content-adoption-test
 try: content_adoption_proof=json.load(open(ROOT/'CONTENT-ADOPTION-PROOF.json'))
 except Exception: content_adoption_proof={}
 check('Canonical Adoption gate v1',content_adoption_test_run.returncode==0 and 'FIEZEL canonical adoption gate: PASS' in content_adoption_test_run.stdout and content_adoption_proof.get('status')=='PASS' and content_adoption_proof.get('canonicalAdoptionPerformed') is False and content_adoption_proof.get('proofFixtureRejected') is True and content_adoption_proof.get('canaryGateDigestLocked') is True and content_adoption_proof.get('evidenceAttestationRequired') is True and content_adoption_proof.get('evidenceAttestationDigestLocked') is True and content_adoption_proof.get('evidenceOriginRequired') is True and content_adoption_proof.get('evidenceOriginSignatureVerified') is True and content_adoption_proof.get('originTrustPolicySeparate') is True and content_adoption_proof.get('originTrustPolicyDigestLocked') is True and content_adoption_proof.get('ownerApprovalStillSeparate') is True and content_adoption_proof.get('deterministicRebuild') is True and content_adoption_proof.get('rollbackArtifact') is True and content_adoption_proof.get('sourceRootWriteRejected') is True and content_adoption_proof.get('canonicalImmutable') is True,content_adoption_proof or content_adoption_test_run.stderr[-800:])
-# Dedicated grammar audit executes the full 3,225-question runtime matrix and writes a machine-readable report.
+# Dedicated grammar audit executes the full runtime matrix (139 lesson x 25 = 3.475 saat ini;
+# diturunkan dari len(items)*25 supaya bank yang bertambah tidak lagi memerahkan audit karena
+# angka mati yang basi - temuan cf-c1 K13) and writes a machine-readable report.
 grammar_audit_run=subprocess.run(['node',str(ROOT/'grammar-quality-audit.js')],capture_output=True,text=True)
 try: grammar_audit_report=json.load(open(ROOT/'GRAMMAR-QUALITY-REPORT.json'))
 except Exception: grammar_audit_report={}
-check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==3225 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
+check('Dedicated grammar quality audit',grammar_audit_run.returncode==0 and grammar_audit_report.get('status')=='PASS' and grammar_audit_report.get('counts',{}).get('runtimeQuestions')==len(items)*25 and grammar_audit_report.get('counts',{}).get('crossLessonDuplicates')==0 and grammar_audit_report.get('counts',{}).get('focusLeaks')==0,grammar_audit_report.get('counts') or grammar_audit_run.stderr[-500:])
 # Syntax: telusuri pohon yang benar-benar ada, supaya gerbang yang dipensiunkan tidak bisa
 # terus menunjuk berkas yang sudah dihapus, dan modul runtime/tes baru ikut terlindungi
 # tanpa harus didaftarkan satu per satu.
@@ -256,6 +258,6 @@ for file_path in syntax_files:
  r=subprocess.run(['node','--check',str(file_path)],capture_output=True,text=True)
  check(f'JS syntax {rel}',r.returncode==0,r.stderr.strip() or 'PASS')
 # write report
-report={'version':version,'status':'PASS' if PASS else 'NOT READY','checks':checks,'counts':{'pass':sum(x['status']=='PASS' for x in checks),'fail':sum(x['status']=='FAIL' for x in checks)},'content':{'vocabulary':len(V),'reading_passages':len(R),'reading_questions':len(rq),'grammar_items':len(items),'grammar_runtime_questions':3225,'listening_items':36,'speaking_items':36,'reading_types':len(types),'content_qa':content_qa_report.get('counts',{}) if 'content_qa_report' in globals() else {}},'sha256':hashlib.sha256(open(ROOT/'app.js','rb').read()).hexdigest()}
+report={'version':version,'status':'PASS' if PASS else 'NOT READY','checks':checks,'counts':{'pass':sum(x['status']=='PASS' for x in checks),'fail':sum(x['status']=='FAIL' for x in checks)},'content':{'vocabulary':len(V),'reading_passages':len(R),'reading_questions':len(rq),'grammar_items':len(items),'grammar_runtime_questions':len(items)*25,'listening_items':36,'speaking_items':36,'reading_types':len(types),'content_qa':content_qa_report.get('counts',{}) if 'content_qa_report' in globals() else {}},'sha256':hashlib.sha256(open(ROOT/'app.js','rb').read()).hexdigest()}
 json.dump(report,open(ROOT/'FINAL-AUDIT-REPORT.json','w'),ensure_ascii=False,indent=2)
 print(json.dumps(report,ensure_ascii=False,indent=2));raise SystemExit(0 if PASS else 1)
