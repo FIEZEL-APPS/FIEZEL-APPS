@@ -67,10 +67,71 @@
   // ---- narration ----------------------------------------------------------------
 
   function narrationOptions() {
-    var speed = 1;
-    try { speed = typeof root.selectedNeuralRate === 'function' ? Number(root.selectedNeuralRate()) || 1 : 1; } catch (_) {}
-    return { speed: speed };
+    return { speed: currentRate() };
   }
+
+  // ---- kecepatan narasi ----------------------------------------------------------
+  //
+  // m028 fase4: kecepatan bicara sudah punya satu sumber kebenaran di app.js
+  // (state.preferences.neuralRate, dibaca selectedNeuralRate, ditulis
+  // setNeuralRatePreference). Yang belum ada adalah pintunya DI SINI - murid yang sedang
+  // mendengarkan buku harus keluar ke Pengaturan hanya untuk memperlambat satu kalimat,
+  // dan pada saat ia kembali narasinya sudah lewat.
+  //
+  // Tombol ini TIDAK menyimpan angkanya sendiri. Ia membaca dan menulis preferensi yang
+  // sama seperti slider Settings, jadi keduanya tidak bisa berselisih; peristiwa
+  // 'fiezel-neural-rate' yang disiarkan setNeuralRatePreference membuat labelnya ikut
+  // berubah walau yang digeser adalah slider di Settings.
+  //
+  // narrationOptions() dibaca ulang tiap kalimat, jadi perubahan terasa di kalimat
+  // berikutnya tanpa memutus narasi yang sedang berjalan.
+  var SPEED_STEPS = [0.75, 1, 1.25];
+
+  function currentRate() {
+    try {
+      if (typeof root.selectedNeuralRate === 'function') return Number(root.selectedNeuralRate()) || 1;
+    } catch (_) {}
+    return 1;
+  }
+
+  function speedLabel(rate) {
+    var text = Number(rate) === 1 ? '1x' : String(Number(rate)) + 'x';
+    return text;
+  }
+
+  function nextSpeed(rate) {
+    var current = Number(rate) || 1;
+    // Preset terdekat dulu, supaya nilai dari slider (misal 1.05) tetap masuk siklus
+    // di tempat yang masuk akal, bukan melompat ke awal.
+    var nearest = 0;
+    for (var i = 1; i < SPEED_STEPS.length; i++) {
+      if (Math.abs(SPEED_STEPS[i] - current) < Math.abs(SPEED_STEPS[nearest] - current)) nearest = i;
+    }
+    if (Math.abs(SPEED_STEPS[nearest] - current) > 0.001) return SPEED_STEPS[nearest];
+    return SPEED_STEPS[(nearest + 1) % SPEED_STEPS.length];
+  }
+
+  function renderSpeedButton() {
+    var button = doc.getElementById('librarySpeed');
+    if (!button) return;
+    var rate = currentRate();
+    button.textContent = speedLabel(rate);
+    button.setAttribute('aria-label', 'Kecepatan suara ' + speedLabel(rate) + ', ketuk untuk mengganti');
+    button.dataset.rate = String(rate);
+  }
+
+  function cycleSpeed() {
+    var wanted = nextSpeed(currentRate());
+    if (typeof root.setNeuralRatePreference === 'function') {
+      try { root.setNeuralRatePreference(wanted); } catch (_) {}
+    }
+    renderSpeedButton();
+    setStatus('Kecepatan suara ' + speedLabel(currentRate()) + '. Berlaku dari kalimat berikutnya.');
+  }
+
+  // Slider Settings memakai fungsi tulis yang sama, jadi satu pendengar cukup untuk
+  // menjaga label dok tetap sejajar tanpa polling.
+  try { doc.addEventListener('fiezel-neural-rate', renderSpeedButton); } catch (_) {}
 
   /**
    * m025-100: narasi buku ikut pintu bicara bersama.
@@ -197,9 +258,12 @@
       '<div class="library-text" id="libraryText">' + body + '</div>' +
       '<div class="library-dock">' +
       '<div class="library-progress-line"><span id="libraryBar" style="width:' + snap.percent + '%"></span></div>' +
+      '<div class="library-dock-line">' +
+      '<button type="button" class="library-speed" id="librarySpeed" aria-label="Kecepatan suara ' + esc(speedLabel(currentRate())) + ', ketuk untuk mengganti" data-rate="' + esc(currentRate()) + '">' + esc(speedLabel(currentRate())) + '</button>' +
       '<p class="library-status" id="libraryStatus">Ketuk kalimat untuk arti, atau putar audiobook.</p>' +
+      '</div>' +
       '<div class="library-controls">' +
-      '<button type="button" id="librayPrev" data-step="-1" aria-label="Kalimat sebelumnya"><i data-lucide="chevron-left"></i></button>' +
+      '<button type="button" id="libraryPrev" data-step="-1" aria-label="Kalimat sebelumnya"><i data-lucide="chevron-left"></i></button>' +
       '<button type="button" class="primary" id="libraryPlay"><i data-lucide="play"></i> Audiobook</button>' +
       '<button type="button" id="libraryNext" data-step="1" aria-label="Kalimat berikutnya"><i data-lucide="chevron-right"></i></button>' +
       '<button type="button" id="libraryAsk"><i data-lucide="message-circle-question"></i> Tanya Fiezel</button>' +
@@ -236,6 +300,9 @@
     if (play) play.addEventListener('click', togglePlay);
     var ask = doc.getElementById('libraryAsk');
     if (ask) ask.addEventListener('click', openAsk);
+    var speed = doc.getElementById('librarySpeed');
+    if (speed) speed.addEventListener('click', cycleSpeed);
+    renderSpeedButton();
     icons();
   }
 
