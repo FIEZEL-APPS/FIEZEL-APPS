@@ -191,6 +191,13 @@ html.fz-booting body{overflow:hidden}
       <p id="authGateBody">Akunmu menyimpan progres belajar, streak, dan AI tutor supaya tetap sama di setiap perangkat.</p>
       <p id="authGateStatus" class="auth-status" role="status">Memeriksa status akun…</p>
       <button id="authGateButton" type="button" class="auth-primary" onclick="attemptPuterSignIn()"><i data-lucide="user-round"></i><span>Lanjutkan dengan Puter</span></button>
+      <!-- m026-02: jalan keluar yang selalu ada, meniru notificationGateSkip "Nanti saja"
+           persis satu-banding-satu. Tanpa tombol ini, murid yang tidak mau (atau tidak
+           bisa) login terkurung di balik .auth-locked - dark-pattern yang sama yang sudah
+           dibongkar OWNER di gerbang notifikasi. Pengaturan > Akun Puter adalah jalan
+           masuknya kembali. -->
+      <button id="authGateSkip" type="button" class="text-button wide" onclick="skipPuterSignIn()">Lanjut tanpa akun</button>
+      <p id="authGateSkipHelp" class="auth-help">Semua materi dan latihan tetap jalan tanpa akun — tutor AI dan suara neural baru bisa dipakai kalau kamu masuk akun Puter dan ada jaringan.</p>
       <p id="authGateHelp" class="auth-help">Jendela login Puter terbuka sebentar di atas FIEZEL, lalu tertutup sendiri begitu selesai - kamu tidak akan dipindahkan ke browser lain.</p>
       <p class="auth-legal">Dengan melanjutkan, kamu menyetujui progres belajarmu disimpan di akun Puter milikmu sendiri.</p>
     </div>
