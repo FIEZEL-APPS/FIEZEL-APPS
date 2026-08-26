@@ -41,3 +41,7 @@
 .fsl-exam-result{margin:10px 0 0}
 .fsl-script{margin:10px 0 0;font-size:.8rem}
 .fsl-script pre{white-space:pre-wrap;line-height:1.55;padding:11px;border-radius:12px;background:rgba(0,0,0,.05);font:inherit;font-size:.8rem;max-height:340px;overflow:auto}
+/* m028 fase3 (§9.3): blok umpan balik listening dipaku ke dasar layar oleh aturan
+   di atas, jadi di panggung Skills Lab ia butuh ruang tambahan agar tombol "Nilai
+   jawaban" tidak pernah berbagi tempat dengan gelembung pembimbing. */
+body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
