@@ -25,7 +25,7 @@
       {
         "level": "B1",
         "passages": 50,
-        "meanWords": 157.3,
+        "meanWords": 157.2,
         "meanFlesch": 71.3
       },
       {
@@ -37,8 +37,8 @@
       {
         "level": "C1",
         "passages": 50,
-        "meanWords": 336.7,
-        "meanFlesch": 46.6
+        "meanWords": 336.1,
+        "meanFlesch": 46.4
       },
       {
         "level": "C2",
@@ -300,7 +300,7 @@
         {
           "level": "B1",
           "passages": 50,
-          "meanWords": 157.3,
+          "meanWords": 157.2,
           "meanFlesch": 71.3
         },
         {
@@ -312,8 +312,8 @@
         {
           "level": "C1",
           "passages": 50,
-          "meanWords": 336.7,
-          "meanFlesch": 46.6
+          "meanWords": 336.1,
+          "meanFlesch": 46.4
         },
         {
           "level": "C2",
