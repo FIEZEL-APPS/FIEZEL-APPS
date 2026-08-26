@@ -1932,7 +1932,11 @@ function dismissWelcome(){return declineStudyNotifications()}
 // plus convolution reverb and feedback delay) rescheduled every 250ms for as long as the
 // app was open, on by default - real, sustained CPU/battery cost that showed up as device
 // heat on every login. See OWNER report: phone gets hot while FIEZEL is open, every time.
-function showToast(text){const t=$('toast');t.textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
+// m028 fase3: toast dapat ikon centang. Teksnya TETAP lewat textContent - ikonnya
+// ditulis sekali sebagai markup statis, isi pesannya tidak pernah ikut jalur innerHTML,
+// jadi tidak ada pintu injeksi yang dibuka oleh perubahan ini. Atribut role="status" +
+// aria-live="polite" tinggal di index.html dan tidak disentuh (a11y-test.js:68-69).
+function showToast(text){const t=$('toast');t.innerHTML='<svg class="toast-mark" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span></span>';t.querySelector('span').textContent=text;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2600)}
 let speakingListeningController=null,speakingListeningMountToken=0;
 
 /* ---- m025-102 pencarian materi + feedback ---------------------------------------
