@@ -1,0 +1,64 @@
+{
+  "schema": "fiezel-cf-transport-v1",
+  "pass": true,
+  "skipped": true,
+  "cfFlagsInstalled": false,
+  "requireCfFlags": false,
+  "counts": {
+    "pass": 7,
+    "fail": 0,
+    "skip": 3
+  },
+  "checks": [
+    {
+      "name": "Gerbang ini terdaftar di quality.yml",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "Regex kunci `*.puter.work` bisa diekstrak dari remote-push-test.js (bukan disalin)",
+      "status": "PASS",
+      "details": "/^https:\\/\\/[a-z0-9-]+\\.puter\\.work$/i"
+    },
+    {
+      "name": "core-config.js masih punya field workerUrl dan deploymentState",
+      "status": "PASS",
+      "details": "workerUrl=https://fiezel-core.puter.work deploymentState=validated"
+    },
+    {
+      "name": "workerUrl lama tetap lolos kunci remote-push-test.js:6 (tidak dialihkan ke Cloudflare)",
+      "status": "PASS",
+      "details": "workerUrl=https://fiezel-core.puter.work deploymentState=validated"
+    },
+    {
+      "name": "workerUrl tidak menunjuk domain Cloudflare",
+      "status": "PASS",
+      "details": "https://fiezel-core.puter.work"
+    },
+    {
+      "name": "Tidak ada URL Cloudflare hardcode di app.js (alamat hanya boleh dari FIEZEL_CF_CONFIG.baseUrl)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "Tidak ada URL Cloudflare hardcode di sw.js",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "Struktur FIEZEL_CF_CONFIG",
+      "status": "SKIP",
+      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+    },
+    {
+      "name": "Semua nilai flag CF default OFF",
+      "status": "SKIP",
+      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+    },
+    {
+      "name": "Jalur rollback CF ada dan hidup",
+      "status": "SKIP",
+      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+    }
+  ]
+}
