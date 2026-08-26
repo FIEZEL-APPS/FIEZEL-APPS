@@ -3177,3 +3177,52 @@ body.fz-stage-sl .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(
 body.fz-stage-quiz .fz-coach-bubble .fz-coach-face,
 body.fz-stage-sl .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
 body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
+
+/* ---------- §2 kuis: benar / salah / pijakan ----------
+   Banner benar-salah, kartu sebab, dan tip ingatan SUDAH ada 1:1 di reveal(); yang
+   kurang cuma dua hal yang bisa dibaca dalam sekejap: mana jawaban yang benar, dan
+   mana yang tadi dipilih. Keduanya dipasang sebagai pseudo-element - nol perubahan
+   pada answer()/reveal(), jadi tidak ada kontrak markup yang bergeser. */
+.option.correct::after,
+.option.wrong::after{
+  display:block;width:fit-content;margin-top:9px;padding:3px 9px;border-radius:999px;
+  font-size:.75rem;font-weight:700;letter-spacing:.08em
+}
+/* Tag ditaruh DI BAWAH teks pilihan, bukan mengambang di sudut: pilihan jawaban bisa
+   dua baris pada layar sempit, dan tag mengambang akan menabraknya. */
+.option.correct::after{content:"BENAR";background:var(--good);color:var(--on-core)}
+.option.wrong::after{content:"PILIHANMU";background:var(--bad);color:var(--on-core)}
+
+/* Rincian pengecoh dulu selalu terbentang. Pada soal empat pilihan itu empat paragraf
+   tambahan tepat di bawah kesimpulan yang justru paling penting dibaca; sekarang ia
+   terlipat dan dibuka kalau memang mau dibandingkan. */
+.acc{margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.acc>summary{cursor:pointer;font-size:.8rem;font-weight:700;color:var(--muted);list-style:none}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary::after{content:"\2304";margin-left:6px;font-weight:700}
+.acc[open]>summary::after{content:"\2303"}
+.acc>summary:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:6px}
+.acc .distractor-breakdown{margin-top:2px;border-top:0;padding-top:0}
+
+/* Tombol Lanjut yang terkunci: Fase 2 sudah membuat tintanya terbaca (4,8:1). Yang
+   ditambahkan di sini adalah SEBABNYA - gembok, supaya "belum bisa" tidak perlu
+   ditebak dari warna. Digambar lewat CSS mask agar markup draw() tetap utuh. */
+.quiz-next:disabled::before{
+  content:"";width:13px;height:13px;flex:0 0 auto;background:currentColor;
+  -webkit-mask:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='11' width='18' height='11' rx='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E") center/contain no-repeat
+}
+
+/* Kartu ajar-ulang dan pijakan: aksennya lepas dari marun kontrol dan pindah ke
+   keluarga sun, sekeluarga dengan panel FIEZEL. Nama kelas tidak ada yang berubah -
+   tutor-reteach-card-test.js dan tutor-classroom-regression-test.js memeriksa
+   strukturnya, dan struktur itu memang tidak boleh bergeser. */
+.tutor-turn,.tutor-card-why{border-left-color:var(--sun-deep)}
+.tutor-card-why{background:var(--sun-soft)}
+/* Wajah tutor dulu bidang --accent dengan tinta --accent-on-glass di atasnya: dua
+   turunan marun yang sama, 1,3:1 - ikon topi wisudanya praktis tidak ada. Sekarang
+   bidang sun dengan tinta ink, 11,4:1. */
+.tutor-turn-face{background:var(--sun);color:var(--text)}
+/* Penanda "Jeda mengajar" jadi bidang, bukan teks abu di antara teks abu lain: ia
+   satu-satunya keterangan bahwa layar ini BUKAN soal. --info di atas --sun-soft 5,9:1. */
+.quiz-teach-flag{padding:4px 10px;border-radius:999px;font-size:.7rem;background:var(--sun-soft);color:var(--info)}
