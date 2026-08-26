@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>FIEZEL — Halaman tidak ditemukan</title>
+<script>
+/* GitHub Pages project site ini hidup di /FIEZEL-APPS/ dan path-nya case-sensitive.
+   Pengguna yang mengetik fitrajft-ux.github.io/fiezel-apps (huruf kecil) mendarat di 404 ini.
+   Bila segmen repo pada path cocok dengan "fiezel-apps" tanpa memedulikan besar-kecil huruf
+   tetapi penulisannya belum persis "FIEZEL-APPS", perbaiki case segmen itu dan alihkan
+   otomatis — query string dan hash dipertahankan apa adanya. Redirect dijalankan sebelum
+   render supaya pengguna nyaris tidak melihat halaman ini. */
+(function () {
+  var CANON = 'FIEZEL-APPS';
+  try {
+    var segs = window.location.pathname.split('/');
+    if (segs.length > 1 && segs[1] !== CANON && segs[1].toLowerCase() === CANON.toLowerCase()) {
+      segs[1] = CANON;
+      window.location.replace(segs.join('/') + window.location.search + window.location.hash);
+    }
+  } catch (_) { /* biarkan fallback manual di bawah yang bekerja */ }
+})();
+</script>
+<style>
+  :root { --maroon: #8C2233; --cream: #FDFAF3; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--cream);
+    color: var(--maroon);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  main { max-width: 420px; }
+  .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 72px; height: 72px; border-radius: 22px;
+    background: var(--maroon); color: var(--cream);
+    font-size: 30px; font-weight: 800; letter-spacing: .5px;
+    margin-bottom: 20px;
+  }
+  h1 { font-size: 24px; line-height: 1.25; margin-bottom: 10px; }
+  p { font-size: 15px; line-height: 1.6; color: rgba(140, 34, 51, .78); margin-bottom: 24px; }
+  a.cta {
+    display: inline-block;
+    background: var(--maroon); color: var(--cream);
+    text-decoration: none; font-weight: 700; font-size: 16px;
+    padding: 14px 28px; border-radius: 999px;
+  }
+  a.cta:active { opacity: .85; }
+  .hint { margin-top: 18px; font-size: 12.5px; color: rgba(140, 34, 51, .55); }
+</style>
+</head>
+<body>
+<main>
+  <div class="badge" aria-hidden="true">F</div>
+  <h1>Halaman tidak ditemukan</h1>
+  <p>Alamat yang kamu buka tidak ada di sini. Bila kamu mengetik alamat dengan huruf kecil,
+     kami akan mengalihkanmu otomatis — atau lanjut lewat tombol di bawah.</p>
+  <a class="cta" href="/FIEZEL-APPS/">Buka FIEZEL</a>
+  <p class="hint">FIEZEL Personal English OS · fitrajft-ux.github.io/FIEZEL-APPS</p>
+</main>
+</body>
+</html>
