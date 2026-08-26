@@ -72,6 +72,15 @@
     persistRawTranscript:false,
     aggregateEventLimit:120
   });
+  /* m026-BUG1: ambang tunggu audio latihan dengar.
+   *
+   * Dulu 35.000 ms ditulis langsung di dalam pendengar tombol. Dua hal salah dengan itu:
+   * murid menatap tombol mati lebih dari setengah menit sebelum tahu suaranya gagal, dan
+   * angkanya tidak bisa dibaca dari mana pun kecuali dari dalam handler. cf-b4 §5.2 dan
+   * cf-a10 §6 menyebut 35 s sebagai penahan slot kuota yang kelewat longgar; ia kini
+   * sejajar dengan CALL_TIMEOUT_MS jalur suara (fiezel-puter-voice.js).
+   */
+  const TTS_TIMEOUT_MS=25000;
   const LEVELS=Object.freeze(['A1','A2','B1','B2','C1','C2']);
   const DEFAULT_ACTIVE_LEVEL='A1';
   const hasOwn=(value,key)=>Object.prototype.hasOwnProperty.call(value||{},key);
@@ -354,7 +363,7 @@
   function mergeConfig(input){const cfg={...DEFAULT_CONFIG,...(global.FIEZEL_SPEAKING_LISTENING_CONFIG||{}),...(input||{})};cfg.persistRawAudio=false;cfg.persistRawTranscript=false;cfg.aggregateEventLimit=Math.max(20,Math.min(300,Number(cfg.aggregateEventLimit)||120));return cfg}
 
   class Controller{
-    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';this.resetGemSession()}
+    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';this.noAudio=false;this.noAudioItems=[];this.resetGemSession()}
     /* Runtun sesi & status toggle adalah milik SESI, bukan milik penyimpanan. Sengaja tidak
        ikut StateStore: runtun yang selamat dari reload adalah celah farming (rekon §A.3). */
     resetGemSession(){this.sessionStreak=0;this.sessionAwards=0;this.translationOn=false;this.translationCharged=false;this.answeredItemId='';return this}
@@ -364,7 +373,7 @@
     readActiveLevel(){let candidate;try{candidate=this.levelContract.getter?this.levelContract.getter():null}catch{}const next=normalizeLevel(candidate);if(next&&next!==this.activeLevel){this.activeLevel=next;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript=''}this.level=this.activeLevel;return this.activeLevel}
     setActiveLevel(level,options={}){const next=normalizeLevel(level);if(!next)throw new Error('invalid_level');this.activeLevel=next;this.level=next;this.levelContract.level=next;this.levelContract.external=true;this.levelContract.getter=null;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';if(options.render!==false&&this.root)this.renderHub();return this.activeLevel}
     getActiveLevel(){return this.readActiveLevel()}
-    open(domain,level){if(!['listening','speaking','speaking_exam','listening_exam'].includes(domain))throw new Error('invalid_domain');this.domain=domain;const active=this.readActiveLevel();const requested=this.levelContract.external?active:(normalizeLevel(level)||active);this.activeLevel=requested;this.level=requested;this.items=domain==='speaking_exam'?this.repo.examFor(requested):domain==='listening_exam'?this.repo.listeningExamFor(requested):this.repo.for(domain,requested);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.resetGemSession();this.renderSession();return this}
+    open(domain,level){if(!['listening','speaking','speaking_exam','listening_exam'].includes(domain))throw new Error('invalid_domain');this.domain=domain;const active=this.readActiveLevel();const requested=this.levelContract.external?active:(normalizeLevel(level)||active);this.activeLevel=requested;this.level=requested;this.items=domain==='speaking_exam'?this.repo.examFor(requested):domain==='listening_exam'?this.repo.listeningExamFor(requested):this.repo.for(domain,requested);this.index=0;this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.noAudio=false;this.noAudioItems=[];this.resetGemSession();this.renderSession();return this}
     /* m026-02: satu kait "sesi dengar sudah selesai" untuk app.js. Ia dipanggil di DUA
        tempat saja - exit() dan renderComplete() - karena hanya itu dua cara sebuah sesi
        berakhir. Pemberitahuan apa pun yang menunggu (mis. kredit Puter habis) ditampilkan
@@ -378,9 +387,45 @@
     }
     renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
     current(){return this.items[this.index]||null}
-    renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
+    renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.noAudio=false;const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
     renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span>${this.gemBarMarkup()}<h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p>${slPlayerMarkup()}<div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
-      this.root.querySelector('[data-play]').addEventListener('click',async event=>{if(this.replays>=Number(item.maxReplays||this.config.maxListeningReplays)){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}const button=event.currentTarget;button.disabled=true;this.replays++;try{const result=await Promise.race([this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),35000))]);this.root.querySelector('[data-work]').disabled=false;this.store.noteCapability('tts',String(result?.provider||'ok'));/* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;this.setFeedback(`Audio siap · replay ${this.replays}/${Number(item.maxReplays||this.config.maxListeningReplays)}.`)}catch{this.store.noteCapability('tts','unavailable');this.setFeedback('Audio tidak tersedia. Item listening ini tetap terkunci dan tidak dinilai.')}finally{button.disabled=false}});this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
+      this.root.querySelector('[data-play]').addEventListener('click',async event=>{
+        const limit=Number(item.maxReplays||this.config.maxListeningReplays);
+        if(this.replays>=limit){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}
+        const button=event.currentTarget;
+        button.disabled=true;this.replays++;
+        try{
+          const result=await Promise.race([this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),TTS_TIMEOUT_MS))]);
+          /* m026-BUG1b. Kegagalan suara tidak selalu datang sebagai throw: FiezelVoiceSay
+             MENJAWAB false ketika seluruh tangganya habis (aset R2 -> Puter -> neural lokal
+             -> speechSynthesis), dan host membungkusnya sebagai promise yang RESOLVE. Tanpa
+             baris ini, false terhitung sukses: jawaban dibuka, kapabilitas dicatat 'ok', dan
+             murid diminta menjawab soal dengar yang tidak pernah berbunyi. */
+          if(result===false||result==null)throw new Error('tts_silent');
+          this.noAudio=false;
+          this.root.querySelector('[data-work]').disabled=false;
+          this.store.noteCapability('tts',String(result?.provider||'ok'));
+          /* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */
+          const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;
+          this.setFeedback(`Audio siap \u00b7 replay ${this.replays}/${limit}.`);
+        }catch(_){
+          /* m026-BUG1 (cf-b4 §5.2, CF-MIGRATION §Ringkasan). Kegagalan pemutaran BUKAN
+             pemakaian replay. Sebelum baris ini, this.replays++ dijalankan di luar try dan
+             tidak pernah dikembalikan: DUA kegagalan TTS berturut-turut membuat
+             this.replays mencapai batas, tombol Dengarkan menolak selamanya, dan
+             [data-work] tetap disabled - item listening itu MATI di layar, permanen, tanpa
+             jalan keluar selain keluar dari sesi. Jalur ujian di renderListeningExam()
+             sudah melakukan hal yang benar sejak awal (this.replays-- di catch); ini
+             menirunya persis. */
+          this.replays--;
+          this.store.noteCapability('tts','unavailable');
+          this.noteNoAudio(item);
+        /* Penutup handler ditulis rapat (`}finally{...}});`) karena gems-test.js:420
+           mengambil seluruh penangan tombol Dengarkan dengan pola itu untuk membuktikan ia
+           tidak menyentuh terjemahan. Merapikannya menjadi baris terpisah membuat gerbang
+           itu kehilangan handler-nya dan gagal tanpa sebab yang terlihat. */
+        }finally{button.disabled=false}});
+      this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
       if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))));
       this.bindGemBar(item);
     }
@@ -530,7 +575,10 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
         button.disabled=true;this.replays++;
         status.textContent='Memutar…';
         try{
-          await this.tts.play(set.script,{voice:set.voice,lang:set.voiceLang||'en-US',suppressSubtitles:true});
+          /* Sama seperti jalur harian: false berarti tidak ada suara, dan di ujian itu lebih
+             berbahaya lagi - soal terbuka tanpa pernah berbunyi dan nilainya dianggap sah. */
+          const played=await this.tts.play(set.script,{voice:set.voice,lang:set.voiceLang||'en-US',suppressSubtitles:true});
+          if(played===false||played==null)throw new Error('tts_silent');
           status.textContent=this.replays>=allowedReplays?'Audio selesai. Tidak ada pengulangan - persis seperti ujiannya.':'Audio selesai.';
           this.store.noteCapability('tts','ok');
         }catch(error){
@@ -580,6 +628,37 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
       this.root.querySelector('[data-recognize]')?.addEventListener('click',async e=>{e.currentTarget.disabled=true;this.root.querySelector('[data-rec-status]').textContent='Mendengarkan…';try{const r=await this.recognition.listen();this.ephemeralTranscript=r.transcript;const result=scoreSpeaking(item,r.transcript);this.store.noteCapability('speechRecognition','ok');this.root.querySelector('[data-rec-status]').textContent='Respons diterima. Transcript hanya dipakai sementara untuk penilaian.';this.finishItem(item,result,`<div class="fsl-transcript">${esc(r.transcript)}</div>`)}catch(err){this.store.noteCapability('speechRecognition','unavailable');this.root.querySelector('[data-rec-status]').textContent=`Tidak dapat menilai otomatis: ${esc(err.message)}.`;e.currentTarget.disabled=false}});
       this.root.querySelector('[data-record]')?.addEventListener('click',async e=>{const btn=e.currentTarget;if(btn.dataset.active==='1'){btn.disabled=true;try{const clip=await this.recorder.stop();btn.dataset.active='0';btn.textContent='Rekam untuk dengar ulang';btn.disabled=false;if(clip?.url)this.root.querySelector('[data-playback]').innerHTML=`<audio class="fsl-audio" controls src="${esc(clip.url)}"></audio><p class="fsl-privacy">Audio hanya berada di memory browser dan URL blob sementara; tidak disimpan ke state.</p>`}catch{btn.disabled=false}}else{try{await this.recorder.start();btn.dataset.active='1';btn.textContent='Stop rekaman';this.store.noteCapability('mediaRecorder','ok')}catch{this.store.noteCapability('mediaRecorder','unavailable');this.setFeedback('Microphone recording tidak tersedia atau izin ditolak.')}}})
     }
+    /**
+     * m026-BUG1: keadaan "tidak ada suara" adalah keadaan SAH, bukan kunci.
+     *
+     * Empat janji sekaligus, dan tiga di antaranya justru soal apa yang TIDAK terjadi:
+     *   - item tidak dinilai: store.record() tidak dipanggil, jadi tidak ada skor 0 karangan
+     *     untuk soal yang tidak pernah didengar murid, dan tidak ada baris evidence;
+     *   - item tidak dikunci: replay sudah dikembalikan di catch, tombol Dengarkan hidup lagi;
+     *   - skrip tetap tertutup: memperbaiki bug suara dengan membocorkan naskah akan
+     *     mengubah latihan dengar menjadi latihan baca (cf-b4 §5.2 butir 3);
+     *   - murid diberi tahu apa adanya, dan diberi satu tombol untuk terus berjalan.
+     */
+    noteNoAudio(item){
+      this.noAudio=true;
+      const id=String(item?.id||'');
+      if(!Array.isArray(this.noAudioItems))this.noAudioItems=[];
+      if(id&&!this.noAudioItems.includes(id))this.noAudioItems.push(id);
+      const host=this.root?.querySelector?.('[data-feedback]');
+      if(host)host.innerHTML=`<div class="fsl-feedback" data-no-audio role="status"><strong>Suaranya sedang bermasalah, bukan kamu.</strong><span>Aku belum berhasil memutar audio untuk item ini. Item ini tidak dinilai dan tidak dikunci — kamu boleh menekan Dengarkan lagi sekarang, atau lanjut ke item lain dan kembali nanti.</span><span class="fsl-privacy">Skripnya tetap aku tutup: membacanya akan mengubah latihan dengar menjadi latihan baca.</span><div class="fsl-actions"><button class="fsl-primary" data-skip-no-audio>Lanjut ke item lain</button></div></div>`;
+      this.root?.querySelector?.('[data-skip-no-audio]')?.addEventListener('click',()=>this.skipNoAudio());
+      /* Di 390 px, blok ini lahir DI BAWAH lipatan: yang terlihat hanya tombol hitamnya di
+         dekat dok, dan murid diminta memutuskan sesuatu tanpa membaca alasannya. Pesan jujur
+         yang tidak terbaca sama saja dengan tidak ada. Gagalnya diam - lingkungan tanpa
+         layout (gerbang node) tidak punya scrollIntoView dan itu bukan kesalahan. */
+      try{host?.querySelector?.('[data-no-audio]')?.scrollIntoView?.({block:'center',behavior:'smooth'})}catch(_){}
+      return {state:'no_audio',itemId:id,scored:false,locked:false};
+    }
+    /* Jalan keluar untuk keadaan no_audio: maju satu item TANPA menilai dan TANPA menulis
+       evidence. Sengaja bukan finishItem(), karena finishItem() selalu memanggil
+       store.record() - memakainya di sini akan menyimpan skor untuk soal yang audionya
+       tidak pernah berbunyi. */
+    skipNoAudio(){this.tts.stop();this.noAudio=false;this.ephemeralTranscript='';this.index++;this.renderSession();return true}
     setFeedback(text){const el=this.root?.querySelector?.('[data-feedback]');if(el)el.innerHTML=`<div class="fsl-feedback">${esc(text)}</div>`}
     finishItem(item,result,prefix=''){
       const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?'Lolos target item':'Belum mencapai target item';const note=this.domain==='speaking'?`Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation.`:`Skor ${result.score}%.`;
