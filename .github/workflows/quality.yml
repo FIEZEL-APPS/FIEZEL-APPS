@@ -26,7 +26,24 @@ jobs:
             -not -path './node_modules/*' \
             -not -path './vendor/*' \
             -print0)
+      # Bab 32 mewajibkan audit rilis lulus sebelum rilis, tetapi sampai commit ini tidak ada
+      # satu pun workflow yang menjalankannya (temuan K13, reports/cf-c1-konsistensi.md) — satu
+      # setup-python terpasang di atas tanpa ada yang memakai Python. Step ini dibuat berdiri
+      # sendiri, bukan disisipkan ke blok `Core validation`, karena tiga alasan: ia bukan node
+      # dan butuh toolchain berbeda, ia berjalan menit (bukan detik) sehingga durasinya perlu
+      # terlihat sendiri di UI Actions, dan kegagalannya harus punya lampu merah sendiri alih-alih
+      # tenggelam di antara ~100 baris `node ...`. Ia sengaja diletakkan SEBELUM Core validation
+      # agar gagal cepat, dan agar `release-audit-gate-test.js` di bawah bisa memakai ulang
+      # FINAL-AUDIT-REPORT.json yang baru saja ditulisnya.
+      - name: Release audit (Python)
+        run: python3 release-audit.py
       - name: Core validation
+        env:
+          # Memberi izin kepada release-audit-gate-test.js untuk memakai ulang laporan dari step
+          # di atas alih-alih menjalankan audit menit-menitan dua kali. Gerbang itu TIDAK percaya
+          # pada flag ini sendirian: ia memverifikasi sha256 app.js + version di dalam laporan
+          # cocok dengan berkas kerja saat ini, dan menjalankan auditnya sendiri kalau tidak.
+          FIEZEL_RELEASE_AUDIT_REPORT_FRESH: '1'
         run: |
           node validator.js
           node regression-test.js
@@ -129,3 +146,7 @@ jobs:
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
           node puter-popup-once-test.js
+          node tools/cf-test-harness.js
+          node no-network-test.js
+          node release-audit-gate-test.js
+          node cf-transport-test.js
