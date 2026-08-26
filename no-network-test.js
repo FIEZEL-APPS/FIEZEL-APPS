@@ -42,6 +42,17 @@ const root = __dirname;
 // jumlahnya ikut di-assert.
 const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js']);
 
+// Kelas kedua yang berbeda secara MAKNA, bukan sekadar pengecualian kedua:
+//   prerender-dryrun-test.js - :33-38 require('https')/require('http') SEMATA-MATA untuk
+//                              menimpa `request`/`get` dengan jerat yang MELEMPAR. Berkas
+//                              ini tidak membuka socket; ia menutup socket. Menghukumnya
+//                              berarti menghukum pertahanan yang sepihak dengan gerbang ini.
+// Syaratnya diperiksa, bukan dipercaya: berkas harus benar-benar MENUGASKAN jerat ke
+// `request`/`get`, dan larangan MEMANGGIL socket tetap berlaku penuh (penugasan
+// `https.request = trap(...)` bukan panggilan, jadi detektor panggilan tidak dilonggarkan).
+const TRAP_ONLY_ALLOWLIST = new Set(['prerender-dryrun-test.js']);
+const RE_TRAP_INSTALL = /\b(?:https?|net|tls)\s*\.\s*(?:request|get|connect)\s*=/;
+
 const checks = [];
 const notes = [];
 let failed = false;
@@ -85,12 +96,14 @@ function matchesWithIndex(code, regex) {
 }
 const lineOf = (code, index) => code.slice(0, index).split('\n').length;
 
-function analyzeSource(file, rawCode, { allowSocket = false } = {}) {
+function analyzeSource(file, rawCode, { allowSocket = false, trapOnly = false } = {}) {
   const code = stripComments(rawCode);
   const findings = [];
   const add = (kind, index, detail) => findings.push({ kind, file, line: lineOf(code, index), detail });
 
-  for (const hit of matchesWithIndex(code, RE.socketRequire)) if (!allowSocket) add('socketRequire', hit.index, hit.text);
+  const trapInstalled = RE_TRAP_INSTALL.test(code);
+  const requireAllowed = allowSocket || (trapOnly && trapInstalled);
+  for (const hit of matchesWithIndex(code, RE.socketRequire)) if (!requireAllowed) add('socketRequire', hit.index, hit.text);
   for (const hit of matchesWithIndex(code, RE.socketCall)) if (!allowSocket) add('socketCall', hit.index, hit.text);
   for (const hit of matchesWithIndex(code, RE.webSocket)) if (!allowSocket) add('webSocket', hit.index, hit.text);
   for (const hit of matchesWithIndex(code, RE.literalRemoteFetch)) if (!allowSocket) add('literalRemoteFetch', hit.index, hit.text);
@@ -149,7 +162,8 @@ function analyzeSource(file, rawCode, { allowSocket = false } = {}) {
     hasLocalFetchMock: definitions.length > 0,
     injects: injections.length > 0,
     usesVm,
-    loopbackProven: /127\.0\.0\.1|localhost|::1/.test(code)
+    loopbackProven: /127\.0\.0\.1|localhost|::1/.test(code),
+    trapInstalled
   };
 }
 
@@ -177,6 +191,8 @@ const FIXTURES = {
     const ctx={console,fetch:fetchMock};vm.createContext(ctx);`,
   bocorPengenalTakDikenal: `const vm=require('vm');const ctx={console,fetch:fetchDariMana};vm.createContext(ctx);`,
   bocorEksplisitGlobal: `const vm=require('vm');const ctx={console,fetch:globalThis.fetch};vm.createContext(ctx);`,
+  amanJeratSaja: `const https=require('https');https.request = trap('x'); https.get = trap('y');`,
+  bocorJeratTapiMemanggil: `const https=require('https');https.request = trap('x'); https.request({hostname:'example.com'});`,
   amanKomentarSaja: `// dulu kami memakai fetch('https://example.com/x') lalu menghapusnya
     /* net.connect(80,'example.com') hanya dikutip di komentar */
     const kosong=1;`
@@ -195,6 +211,11 @@ check('Detektor menangkap pengenal yang tidak didefinisikan lokal', kinds(FIXTUR
 // Nama assert ini sengaja TIDAK menuliskan pola `fetch<titik dua>globalThis.fetch` apa
 // adanya: berkas ini memindai dirinya sendiri, jadi label yang memuat polanya akan
 // menghukum dirinya sendiri. Fixture-nya yang memuat pola itu, bukan labelnya.
+const trapKinds = (source) => analyzeSource('fixture', source, { trapOnly: true }).findings.map(f => f.kind).sort().join(',');
+check('Detektor MEMBEBASKAN require socket yang hanya memasang jerat', trapKinds(FIXTURES.amanJeratSaja) === '', trapKinds(FIXTURES.amanJeratSaja) || '(kosong)');
+check('Detektor tetap menangkap PANGGILAN socket walau jerat dipasang', trapKinds(FIXTURES.bocorJeratTapiMemanggil).includes('socketCall'), trapKinds(FIXTURES.bocorJeratTapiMemanggil) || '(kosong)');
+check('Kelonggaran jerat TIDAK berlaku tanpa penugasan jerat', kinds(FIXTURES.bocorHttpRequest).includes('socketRequire'), kinds(FIXTURES.bocorHttpRequest) || '(kosong)');
+
 check('Detektor menangkap penyuntikan eksplisit dari globalThis', kinds(FIXTURES.bocorEksplisitGlobal).includes('vmFetchLeak'), kinds(FIXTURES.bocorEksplisitGlobal) || '(kosong)');
 
 /* =======================================================================================
@@ -225,8 +246,10 @@ const allowlistProblems = [];
 for (const file of files) {
   if (file === SELF) continue; // sudah diperiksa di atas, dengan fixture dipotong
   const allowSocket = SOCKET_ALLOWLIST.has(file);
+  const trapOnly = TRAP_ONLY_ALLOWLIST.has(file);
   const raw = fs.readFileSync(path.join(root, file), 'utf8');
-  const result = analyzeSource(file, raw, { allowSocket });
+  const result = analyzeSource(file, raw, { allowSocket, trapOnly });
+  if (trapOnly && !result.trapInstalled) allowlistProblems.push(file + ' ada di daftar jerat tetapi tidak memasang jerat request/get');
   offenders.push(...result.findings);
   if (result.injects && result.hasLocalFetchMock && result.findings.length === 0) shadowSafe.push(file);
   if (allowSocket && !result.loopbackProven) allowlistProblems.push(file + ' tidak membuktikan loopback');
@@ -255,6 +278,11 @@ check('Setiap berkas allowlist benar-benar loopback dan masih benar-benar butuh 
 check('Allowlist tetap dua nama dan keduanya ada di repo',
   SOCKET_ALLOWLIST.size === 2 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
   [...SOCKET_ALLOWLIST].join(', '));
+check('Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket',
+  TRAP_ONLY_ALLOWLIST.size === 1
+  && [...TRAP_ONLY_ALLOWLIST].every(f => fs.existsSync(path.join(root, f)))
+  && [...TRAP_ONLY_ALLOWLIST].every(f => !SOCKET_ALLOWLIST.has(f)),
+  [...TRAP_ONLY_ALLOWLIST].join(', '));
 
 /* =======================================================================================
  * 3. Gerbang ini terdaftar di CI

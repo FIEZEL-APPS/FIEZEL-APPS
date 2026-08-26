@@ -41,7 +41,18 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/tts/resolve': 4096,
   '/api/tts/render': 4096,
   '/api/quota/preflight': 512,
-  '/api/usage/event': 16384
+  '/api/usage/event': 16384,
+  // --- path NYATA yang didaftarkan paket kerja E3/E4/E5 ----------------------
+  // Angka di sini, bukan di handler: cap harus melekat pada kontrak, dan
+  // `mw-guard` menegakkannya SEBELUM routing (path tak terdaftar jatuh ke
+  // DEFAULT_BYTE_LIMIT 4096 — terlalu kecil untuk /api/ai/task, yang prompt
+  // ternormalisasinya saja boleh 4.000 char).
+  '/api/ai/task': 20000,        // = cap /api/ai/chat Worker Puter; FREE_MAX_PROMPT_CHARS 4.000 + amplop task
+  '/api/tts/manifest': 512,     // GET, tanpa body
+  '/api/quota': 512,            // GET, tanpa body
+  '/api/usage/events': 16384,   // batch event klien; sama dengan /api/usage/event (tunggal) yang digantikannya
+  '/api/usage/retention': 2048, // {cohort_day, day_index} + amplop
+  '/api/usage/pepper': 512      // GET, tanpa body
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

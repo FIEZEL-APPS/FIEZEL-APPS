@@ -273,9 +273,17 @@ const ENV_ON = { ANALYTICS_ENABLED: 'on', RATE_SALT: 'salt-uji' };
   try { route.registerAnalyticsRoutes({}); } catch { tolakRouterAneh = true; }
   check('registerAnalyticsRoutes gagal jelas bila bentuk router tidak dikenali', tolakRouterAneh);
 
+  // Sebelum merge, assert ini berbunyi "index.js TIDAK diedit oleh paket kerja ini".
+  // Sesudah delapan paket di-merge, pemasangan MEMANG sudah terjadi, jadi yang
+  // dijaga sekarang adalah bentuk pemasangannya: SATU titik (`route-wiring.js`),
+  // dan `index.js` tetap tidak tahu-menahu soal modul analytics.
   const indexPath = path.join(root, 'workers', 'api', 'index.js');
-  check('workers/api/index.js TIDAK diedit oleh paket kerja ini', !fs.existsSync(indexPath) || !/registerAnalyticsRoutes/.test(fs.readFileSync(indexPath, 'utf8')),
-    'index.js sudah memanggil registerAnalyticsRoutes — pemasangan adalah tugas MASTER');
+  const wiringPath = path.join(root, 'workers', 'api', 'route-wiring.js');
+  const indexSrc = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, 'utf8') : '';
+  const wiringSrc = fs.existsSync(wiringPath) ? fs.readFileSync(wiringPath, 'utf8') : '';
+  check('Rute analytics dipasang tepat di satu titik (route-wiring.js), bukan di index.js',
+    /registerAnalyticsRoutes/.test(wiringSrc) && !/registerAnalyticsRoutes/.test(indexSrc),
+    'pemasangan terpusat di route-wiring.js');
 
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
