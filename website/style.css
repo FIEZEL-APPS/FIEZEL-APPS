@@ -60,27 +60,24 @@ ul,ol{margin:0;padding:0;list-style:none}
 .brand-icon{width:30px;height:30px;color:var(--maroon)}
 .brand-word{width:112px;height:auto;color:var(--maroon-deep)}
 .brand-word rect{fill:currentColor}
-.topnav{display:flex;align-items:center;gap:16px;padding-right:52px}
+.topnav{display:flex;align-items:center;gap:16px}
 .topnav>a:first-child{display:none;font-weight:700;color:var(--maroon-deep);font-size:.92rem;
   letter-spacing:.02em;border-bottom:1px solid transparent}
 .topnav>a:first-child:hover{text-decoration:none;border-color:var(--maroon-line-strong)}
 
-/* ---------- masthead: wordmark FIEZEL besar paling atas ---------- */
-.masthead{padding:34px 0 8px;text-align:center}
-.mast-lock{display:inline-flex;align-items:center;justify-content:center;gap:16px}
-.mast-icon{width:44px;height:44px;color:var(--maroon);flex:0 0 auto}
-.mast-word{width:min(70vw,320px);height:auto;color:var(--maroon-deep)}
-.mast-word rect{fill:currentColor}
-.mast-sub{margin-top:14px;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
-  text-transform:uppercase;color:var(--maroon-soft)}
+/* ---------- masthead: WORDMARK RESMI (assets/brand/fiezel-wordmark.svg) ---------- */
+.masthead{padding:20px 0 4px;text-align:center}
+.mast-lock{display:block}
+.mast-word{width:min(74vw,296px);height:auto;margin:0 auto}
+/* tagline SATU baris di semua lebar: huruf besar+tracking hanya saat ruangnya cukup */
+.mast-sub{margin-top:12px;font-size:var(--fs-micro);font-weight:700;letter-spacing:.02em;
+  color:var(--maroon-soft);white-space:nowrap}
 .mast-rule{margin:22px auto 0;max-width:280px}
+.mast-cta{margin-top:18px}
 
-/* ---------- hero ---------- */
-.hero{position:relative;overflow:hidden;padding:8px 0 16px;
-  background:linear-gradient(180deg,var(--sun-soft) 0%,var(--cream-deep) 30%,var(--cream) 74%)}
-.hero-grid{display:grid;gap:34px;padding-top:26px}
-.hero h1{font-size:clamp(2.15rem,9vw,2.9rem);letter-spacing:-.035em;margin-bottom:18px;text-wrap:balance}
-.hero .lede{font-size:1.04rem;color:var(--body);max-width:54ch}
+/* ---------- hero: PANGGUNG VISUAL, bukan artikel ---------- */
+.hero{position:relative;overflow:hidden;padding:4px 0 24px;
+  background:linear-gradient(180deg,var(--sun-soft) 0%,var(--cream-deep) 38%,var(--cream) 84%)}
 .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:26px}
 .cta-center{justify-content:center}
 
@@ -92,14 +89,108 @@ ul,ol{margin:0;padding:0;list-style:none}
   border:1px solid var(--maroon-line);box-shadow:inset 0 0 0 14px rgba(255,199,0,.10)}
 .hero>.wrap{position:relative;z-index:1}
 
-/* panggung terang: maskot + layar app duduk bersama tagline kampanye */
-.hero-visual{position:relative}
-.hero-stage{padding:24px 22px 22px}
-.hero-stage .tagline{font-size:clamp(1rem,4.2vw,1.24rem);margin-bottom:20px}
-.stage-figures{position:relative;display:flex;align-items:flex-end;justify-content:center;gap:12px;min-height:130px}
-.mascot{width:100px;height:auto;flex:0 0 auto}
-.stage-note{margin-top:18px;font-size:var(--fs-label);color:var(--muted);max-width:42ch;
-  border-left:1px solid var(--maroon-line-strong);padding-left:12px}
+/* ============ PANGGUNG MOTION GRAPHIC (above-the-fold) ============
+   Semua gerak hanya transform + opacity, kecuali dua stroke-dashoffset (garis path
+   yang menggambar diri + ring progress) yang memang diminta owner. Tanpa library,
+   tanpa canvas. prefers-reduced-motion => pose statis rapi di blok paling bawah. */
+.showcase{position:relative;display:grid;place-items:center;margin-top:16px;
+  min-height:clamp(340px,50vh,470px);isolation:isolate}
+.showcase-fx{position:absolute;inset:0;pointer-events:none;z-index:0}
+
+/* cincin + garis path yang menggambar diri */
+.fx-lines{position:absolute;left:50%;top:50%;width:min(112%,552px);aspect-ratio:1;
+  transform:translate(-50%,-50%);overflow:visible}
+.fx-ring{fill:none;stroke:var(--maroon-line);stroke-width:1.1;transform-origin:320px 320px}
+.fx-ring-2{stroke:var(--gold-line);stroke-dasharray:4 10}
+.anim .fx-ring-1{animation:fxSpin 52s linear infinite}
+.anim .fx-ring-2{animation:fxSpin 38s linear infinite reverse}
+@keyframes fxSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.fx-draw{fill:none;stroke:var(--maroon-line-strong);stroke-width:1.4;stroke-linecap:round;
+  stroke-dasharray:1200;stroke-dashoffset:1200}
+.anim .fx-draw{animation:fxDraw 5.4s var(--fz-out) .35s forwards}
+.fx-draw-2{stroke:var(--gold-line)}
+.anim .fx-draw-2{animation-duration:6.2s;animation-delay:1s}
+@keyframes fxDraw{to{stroke-dashoffset:0}}
+
+/* partikel solar halus */
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;opacity:0;
+  background:radial-gradient(circle,#FFDE59 0%,rgba(255,199,0,.55) 45%,rgba(255,199,0,0) 100%)}
+.anim .spark{animation:sparkRise 9.5s ease-in-out infinite}
+@keyframes sparkRise{0%{opacity:0;transform:translate3d(0,14px,0) scale(.55)}
+  16%{opacity:.95}56%{opacity:.45}100%{opacity:0;transform:translate3d(0,-52px,0) scale(1.15)}}
+.sp1{left:9%;top:64%}
+.sp2{left:20%;top:30%;animation-delay:1.1s}
+.sp3{left:33%;top:78%;animation-delay:2.4s}
+.sp4{left:48%;top:16%;animation-delay:3.5s}
+.sp5{left:63%;top:70%;animation-delay:.6s}
+.sp6{left:76%;top:34%;animation-delay:4.4s}
+.sp7{left:88%;top:58%;animation-delay:2s}
+.sp8{left:57%;top:44%;animation-delay:5.6s}
+
+/* orbit chip skill: dua cincin berlawanan arah, label tetap tegak (counter-rotate) */
+/* diameter orbit selalu lebih kecil dari panggung supaya chip tidak pernah menabrak
+   CTA di atasnya atau terpotong tepi layar */
+.orbit{position:absolute;left:50%;top:50%;width:min(94%,318px);aspect-ratio:1;transform:translate(-50%,-50%)}
+.anim .orbit-a{animation:fxOrbit 40s linear infinite}
+.anim .orbit-b{animation:fxOrbit 32s linear infinite reverse}
+@keyframes fxOrbit{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.orb{position:absolute;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;
+  border-radius:var(--radius-pill);background:var(--cream-warm);border:1px solid var(--maroon-line);
+  color:var(--maroon-deep);box-shadow:var(--shadow-sm);font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transform:translate(-50%,-50%)}
+.orb svg{width:14px;height:14px;color:var(--maroon)}
+.anim .orbit-a .orb{animation:fxUpright 40s linear infinite reverse}
+.anim .orbit-b .orb{animation:fxUpright 32s linear infinite}
+@keyframes fxUpright{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.orb-1{left:50%;top:1%}
+.orb-2{left:93%;top:70%}
+.orb-3{left:7%;top:70%}
+.orb-4{left:50%;top:99%}
+.orb-5{left:95%;top:26%}
+.orb-6{left:5%;top:26%}
+
+/* mockup app di frame device: float lembut (parallax dipasang di .device oleh site.js) */
+.device{position:relative;z-index:2}
+/* spesifisitas .showcase dipakai supaya lebar frame hero tidak ditimpa .phone/.phone-sm */
+.showcase .phone-hero{width:clamp(150px,40vw,192px)}
+.anim .phone-hero{animation:deviceFloat 7.4s ease-in-out infinite}
+@keyframes deviceFloat{0%,100%{transform:translate3d(0,0,0) rotate(-.5deg)}
+  50%{transform:translate3d(0,-13px,0) rotate(.6deg)}}
+
+/* ring progress animasi */
+.fx-progress{position:absolute;top:-30px;right:-48px;width:84px;height:84px;overflow:visible;z-index:3}
+.pg-track{fill:none;stroke:var(--gold-line-soft);stroke-width:7}
+.pg-bar{fill:none;stroke:var(--maroon);stroke-width:7;stroke-linecap:round;
+  stroke-dasharray:327;stroke-dashoffset:327;transform:rotate(-90deg);transform-origin:60px 60px}
+.anim .pg-bar{animation:pgFill 7.2s var(--fz-out) infinite}
+@keyframes pgFill{0%{stroke-dashoffset:327}42%,74%{stroke-dashoffset:78}100%{stroke-dashoffset:327}}
+
+/* maskot PAW resmi (custom element) — besar, dekat panggung */
+.showcase .hero-paw{position:absolute;z-index:3;left:-3%;bottom:0;
+  width:clamp(138px,37vw,236px);height:auto}
+
+/* chip level CEFR muncul bergantian */
+.cefr-cycle{position:absolute;z-index:3;right:0;top:50%;transform:translateY(-50%);display:grid;gap:7px;justify-items:end}
+.cefr-cycle li{padding:4px 11px;border-radius:var(--radius-pill);background:var(--sun-soft);
+  border:1px solid var(--gold-line);color:var(--maroon-deep);font-size:var(--fs-micro);font-weight:700;
+  letter-spacing:.1em;opacity:.22;font-variant-numeric:tabular-nums}
+.anim .cefr-cycle li{animation:cefrPop 7.2s ease-in-out infinite}
+.anim .cefr-cycle li:nth-child(2){animation-delay:1.2s}
+.anim .cefr-cycle li:nth-child(3){animation-delay:2.4s}
+.anim .cefr-cycle li:nth-child(4){animation-delay:3.6s}
+.anim .cefr-cycle li:nth-child(5){animation-delay:4.8s}
+.anim .cefr-cycle li:nth-child(6){animation-delay:6s}
+@keyframes cefrPop{0%{opacity:.22;transform:translateY(4px) scale(.94)}
+  7%,20%{opacity:1;transform:none}34%,100%{opacity:.22;transform:translateY(0) scale(.97)}}
+
+/* ---------- ringkasan teks (turun setelah panggung) ---------- */
+.sec-intro{padding-top:46px}
+.intro-grid{display:grid;gap:28px}
+.intro-copy h1{font-size:clamp(1.95rem,8vw,2.7rem);letter-spacing:-.035em;margin-bottom:16px;text-wrap:balance}
+.intro-copy .lede{font-size:1.04rem;color:var(--body);max-width:56ch}
+.intro-note{padding:24px 22px}
+.intro-note .tagline{font-size:clamp(1rem,4.2vw,1.2rem);margin:14px 0 14px}
+.intro-note-body{font-size:var(--fs-label);color:var(--muted);border-left:1px solid var(--maroon-line-strong);padding-left:12px}
 
 /* bingkai ponsel — krem, hairline maroon (dulu bezel gelap) */
 .phone{position:relative;width:196px;max-width:60vw;padding:9px;background:var(--cream-warm);
@@ -219,7 +310,6 @@ ul,ol{margin:0;padding:0;list-style:none}
 .foot{background:var(--cream-deep);color:var(--body);padding:48px 0 0;border-top:1px solid var(--gold-line)}
 .foot-in{display:grid;gap:28px;padding-bottom:28px}
 .foot-word{width:148px;height:auto;color:var(--maroon-deep)}
-.foot-word rect{fill:currentColor}
 .foot-tag{margin-top:14px;color:var(--muted);font-size:.95rem}
 .foot-links{display:flex;align-items:center;gap:12px;margin-top:16px;font-weight:700;flex-wrap:wrap}
 .foot-links a,.foot-links a:visited{color:var(--maroon-deep);border-bottom:1px solid var(--maroon-line-strong);padding-bottom:1px}
@@ -246,16 +336,30 @@ ul,ol{margin:0;padding:0;list-style:none}
 .anim .seq-6{animation-delay:.88s}
 @keyframes seqIn{from{opacity:0;transform:translate3d(0,16px,0)}to{opacity:1;transform:none}}
 
+/* ---------- reduced motion: pose statis rapi (panggung tetap terbaca) ---------- */
 @media (prefers-reduced-motion:reduce){
   .reveal,.seq{opacity:1!important;transform:none!important}
   .ticker-track{transform:none!important}
+  .spark{opacity:.5!important}
+  .fx-draw{stroke-dashoffset:0!important}
+  .pg-bar{stroke-dashoffset:78!important}
+  .cefr-cycle li{opacity:1!important;transform:none!important}
+  .phone-hero{transform:none!important}
 }
 
 /* ---------- <= 359px ---------- */
 @media (max-width:359px){
-  .mascot{width:76px}
   .hero .phone{max-width:52vw}
-  .mast-icon{width:34px;height:34px}
+  .showcase{min-height:322px}
+  .showcase .hero-paw{width:112px}
+}
+
+/* ---------- < 560px: chip orbit hanya ikon supaya panggung tidak padat ---------- */
+@media (max-width:559px){
+  .orb{padding:7px;gap:0}
+  .orb b{display:none}
+  .orbit{width:min(96%,306px)}
+  .fx-progress{width:70px;height:70px;top:-22px;right:-36px}
 }
 
 /* ---------- >= 560px ---------- */
@@ -272,26 +376,24 @@ ul,ol{margin:0;padding:0;list-style:none}
   .feat-grid>.feat:last-child .ico{grid-row:1 / span 2}
   .feat-grid>.feat:last-child h3{margin-top:0}
   .topnav>a:first-child{display:inline}
-  .hero-stage{padding:28px 26px 26px}
-  .stage-figures{gap:20px}
-  .mascot{width:120px}
 }
 
 /* ---------- >= 900px ---------- */
 @media (min-width:900px){
   .sec{padding:104px 0}
-  .masthead{padding:52px 0 10px}
-  .mast-word{width:400px}
-  .mast-icon{width:56px;height:56px}
+  .masthead{padding:28px 0 6px}
+  .mast-word{width:344px}
   .mast-rule{max-width:420px;margin-top:28px}
-  .hero{padding:10px 0 24px}
-  .hero-grid{grid-template-columns:1.04fr .96fr;align-items:center;gap:52px;padding-top:36px}
-  .hero h1{font-size:3.35rem}
-  .hero .lede{font-size:1.09rem}
-  .hero-stage{padding:34px 34px 32px}
-  .hero-stage .tagline{font-size:1.3rem}
+  .hero{padding:8px 0 30px}
+  .showcase{min-height:min(58vh,472px);margin-top:8px}
+  .mast-sub{letter-spacing:var(--track-wide);text-transform:uppercase}
+  .orbit{width:424px}
+  .fx-progress{width:92px;height:92px;top:-34px;right:-56px}
+  .intro-grid{grid-template-columns:1.16fr .84fr;align-items:center;gap:52px}
+  .intro-copy h1{font-size:2.9rem}
+  .intro-copy .lede{font-size:1.09rem}
+  .intro-note{padding:32px 30px}
   .phone{width:228px}
-  .mascot{width:140px}
   .stats{gap:18px;margin-top:52px}
   .stats li{padding:24px 22px}
   .about-grid{grid-template-columns:1.05fr .95fr;align-items:center;gap:56px}
