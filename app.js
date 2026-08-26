@@ -1473,6 +1473,37 @@ function showAnswerBurst(ok){const burst=$('answerBurst');if(!burst)return;clear
 // sudah menjadi corong tunggal untuk getar + suara + kilas jawaban, jadi setiap tempat
 // yang menilai jawaban otomatis ikut - tanpa menambah pemanggilan di tiap penilai.
 function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok);pawReact(ok?'correct':'wrong')}
+// m028 fase3 (PATCH-PLAN §1/§9.1): jeda "FIEZEL membaca jawabanmu".
+//
+// Sampai rilis ini penilaian jatuh SEKETIKA: satu ketukan, dan seluruh pembahasan
+// sudah terpampang. Yang hilang di sana bukan animasi melainkan sebab-akibat -
+// murid tidak pernah melihat bahwa ada sesuatu yang membaca jawabannya, jadi
+// pembahasan yang muncul terbaca sebagai halaman berikutnya, bukan sebagai
+// tanggapan atas apa yang baru saja ia pilih.
+//
+// Tiga hal dijaga di sini, dan ketiganya alasan keselamatan bukan alasan rasa:
+//   1. Panelnya dilewati TOTAL saat perangkat minta kurangi-gerak atau preferensi
+//      animasi dimatikan - ambangnya sama dengan pawMotionAllowed(), bukan ambang
+//      kedua yang bisa menyimpang darinya.
+//   2. Pilihan dimatikan selama panel hidup. answer.locked baru menjadi true di
+//      dalam reveal(), jadi tanpa ini ada jendela 700ms tempat ketukan kedua bisa
+//      menilai soal yang sama dua kali.
+//   3. Panelnya menghapus dirinya sendiri sebelum then() dijalankan, jadi reveal()
+//      tetap menggambar ke #feedback yang bersih - tidak ada state yang ditinggal.
+function showCoreAnalyzing(then){
+  const f=$('feedback');
+  if(!f||prefersReducedMotion()||state.preferences?.motion===false){then();return}
+  const opts=[...document.querySelectorAll('.option')].filter(b=>!b.disabled);
+  opts.forEach(b=>{b.disabled=true});
+  const panel=document.createElement('section');
+  panel.className='core-panel core-analyzing';
+  panel.setAttribute('role','status');
+  panel.setAttribute('aria-live','polite');
+  panel.innerHTML='<svg class="neural" viewBox="0 0 358 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g stroke="currentColor" stroke-width="1" fill="none" opacity=".65"><path d="M-10 96 C 60 70, 110 108, 178 84 S 300 40, 372 66"/><path d="M-10 40 C 70 66, 140 22, 210 44 S 320 88, 372 30"/></g></svg><div><div class="core-eyebrow">ANALYZING</div><div class="core-title">FIEZEL membaca jawabanmu\u2026</div><div class="core-bar"><i></i></div></div>';
+  f.before(panel);
+  pawSetState('thinking',{hold:900});
+  setTimeout(()=>{panel.remove();then()},700);
+}
 let appOpened=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
 function notificationPermission(){return typeof Notification==='undefined'?'unsupported':Notification.permission}
 function notificationsSupported(){return typeof Notification!=='undefined'&&typeof Notification.requestPermission==='function'}
@@ -3776,7 +3807,9 @@ function quizLoop(cfg){
    enhanceUI();
    return;
   }
-  reveal(q,j,ok);
+  // m028 fase3: penilaian final lewat jeda analyzing dulu. Cabang retry di atas
+  // sengaja TIDAK melewatinya - ia bukan penilaian, ia pijakan.
+  showCoreAnalyzing(()=>reveal(q,j,ok));
  }
 
  // m025-117: layar kuis adalah sub-layar juga. Tekanan kembali dari dalam kuis harus naik
