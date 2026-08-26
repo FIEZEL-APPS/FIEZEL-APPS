@@ -82,15 +82,15 @@ const GRAMMAR_SESSION_SIZE=25;
 const SUNRISE_MINUTE=6*60;
 const SUNSET_MINUTE=18*60;
 const SCENE_STOPS=[
-  {minute:0,top:'#EFE0C4',bottom:'#FFF8ED'},
-  {minute:285,top:'#F3DCC2',bottom:'#FFF8ED'},
+  {minute:0,top:'#EFE0C4',bottom:'#FFF9EE'},
+  {minute:285,top:'#F3DCC2',bottom:'#FFF9EE'},
   {minute:360,top:'#FFD9B8',bottom:'#FFFAF2'},
-  {minute:480,top:'#FFE5A8',bottom:'#FFF8ED'},
-  {minute:720,top:'#FFD23F',bottom:'#FFFBF4'},
-  {minute:960,top:'#FFDCA0',bottom:'#FFF8ED'},
+  {minute:480,top:'#FFE5A8',bottom:'#FFF9EE'},
+  {minute:720,top:'#FFC700',bottom:'#FFFBF4'},
+  {minute:960,top:'#FFDCA0',bottom:'#FFF9EE'},
   {minute:1080,top:'#FFC9A6',bottom:'#FFF6EA'},
   {minute:1140,top:'#F6D2B4',bottom:'#FFF7EC'},
-  {minute:1440,top:'#EFE0C4',bottom:'#FFF8ED'}
+  {minute:1440,top:'#EFE0C4',bottom:'#FFF9EE'}
 ];
 const DEFAULT_REPORT_ENDPOINT=String(self.FIEZEL_REPORT_ENDPOINT||'').trim();
 /* m025-135: satu perangkat, banyak murid. Sebelum ini seluruh kemajuan hidup di SATU kunci
@@ -3138,7 +3138,7 @@ function writingLocalReview(prompt,text){
 function celebrate(){
   if(prefersReducedMotion()||state.preferences?.motion===false)return false;
   const host=document.createElement('div');host.className='fz-confetti';
-  const colors=['#FFD23F','#EE5D4A','#A8DCC4','#C9BCE4','#C9A24B'];
+  const colors=['#FFC700','#EE5D4A','#A8DCC4','#C9BCE4','#C9A24B'];
   for(let i=0;i<18;i++){
     const bit=document.createElement('i');
     bit.style.left=Math.random()*100+'%';

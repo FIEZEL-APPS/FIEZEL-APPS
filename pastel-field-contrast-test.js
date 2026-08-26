@@ -136,10 +136,15 @@ test('bidang pastel lembut terbaca oleh teks tema', () => {
  * Kelimanya juga lolos kontras terhadap tinta brief sendiri, jadi tidak pernah ada
  * alasan teknis untuk mengubahnya.
  */
+/* m028 "Warm Paper, Bright Mind": kunci tiga warna di bawah DIPERBARUI mengikuti
+   design/redesign-v1/tokens/tokens.css + WCAG.md. Bukan palet baru - keluarga yang sama,
+   digeser supaya lolos WCAG AA: cream sedikit lebih hangat (#FFF9EE), tinta lebih pekat
+   (#241A11, 15,4:1 terhadap cream, dulu 12,9:1), dan kuningnya kuning penuh (#FFC700)
+   supaya batas bidangnya terbaca tanpa garis bantu. Koral dan emas tidak bergeser. */
 const BRIEF_PALETTE = {
-  '--cream': '#FFF8ED',   // dasar utama
-  '--ink': '#2B2118',     // teks utama dan outline
-  '--yellow': '#FFD23F',  // aksen utama: CTA, progress, ikon aktif
+  '--cream': '#FFF9EE',   // dasar utama
+  '--ink': '#241A11',     // teks utama dan outline
+  '--yellow': '#FFC700',  // aksen utama: CTA, progress, ikon aktif
   '--coral': '#EE5D4A',   // aksen kedua: notifikasi, badge, streak
   '--gold': '#C9A24B'     // detail premium, dipakai hemat
 };

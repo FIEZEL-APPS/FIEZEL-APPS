@@ -4,8 +4,8 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#FFF8ED",
-  "theme_color": "#FFD23F",
+  "background_color": "#FFF9EE",
+  "theme_color": "#FFC700",
   "description": "Ruang belajar bahasa Inggris personal dengan Vocabulary, Grammar, Reading, Speaking, Listening, neural voice lokal opsional, FIEZEL Core Brain, dan release gates yang terverifikasi.",
   "version": "5.19.0",
   "icons": [
