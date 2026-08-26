@@ -140,7 +140,7 @@ test('logo terbaca di atas topbar', () => {
   const MIN = 4.5;
   const names = topbarStops().map((v) => (/var\(\s*(--[a-z0-9-]+)/.exec(v) || [])[1]).filter(Boolean);
   const weak = [];
-  for (const [label, blocks, fallback] of [['terang', [LIGHT], '#FFF8ED']]) {
+  for (const [label, blocks, fallback] of [['terang', [LIGHT], '#FFF9EE']]) {
     const merged = blocks.join('\n');
     const bg = chromeOver(label === 'terang' ? LIGHT : merged + LIGHT, fallback);
     for (const n of names) {
