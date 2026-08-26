@@ -1,0 +1,162 @@
+# ============================================================================
+# FIEZEL API gateway (`fiezel-api`) — konfigurasi PLAN GRATIS-SAFE.
+#
+# BERKAS INI TERPISAH TOTAL dari `workers/wrangler.toml` (Worker audio).
+# `workers/wrangler.toml` dan `workers/fiezel-audio-worker.js` TIDAK BOLEH
+# disentuh: gerbang `audio-asset-pipeline-test.js` melarang string tertentu di
+# sana dan memverifikasi Worker audio tetap hanya-baca. Satu berkas wrangler =
+# satu Worker; menambahkan blok kedua ke berkas itu adalah kesalahan.
+#
+# TIDAK ADA SATU PUN NILAI RAHASIA DI BERKAS INI. Semua rahasia lewat
+# `wrangler secret put` (daftar nama di bagian paling bawah).
+# ============================================================================
+name = "fiezel-api"
+main = "index.js"
+compatibility_date = "2026-06-01"
+workers_dev = false
+
+# `nodejs_compat` SENGAJA TIDAK DIPASANG: seluruh Worker ini hanya memakai API
+# web standar (WebCrypto, Request/Response, btoa/atob). Flag kompatibilitas yang
+# tidak dipakai memperbesar permukaan perubahan perilaku runtime tanpa manfaat.
+
+# --- ROUTE ------------------------------------------------------------------
+# Custom domain sejak hari pertama. Alasannya bukan estetika: CORS untuk API
+# berkredensial tidak boleh "*" (Worker audio memakai "*" dan itu BENAR untuk
+# aset publik, SALAH untuk API), dan `api.fiezel.my.id` satu registrable domain
+# dengan `fiezel.my.id` sehingga cookie `SameSite=Lax` ikut terkirim.
+#
+# PRASYARAT OWNER (P0, blocking): zona `fiezel.my.id` harus sudah ada di
+# Cloudflare. Tanpa itu, deploy dengan blok ini akan GAGAL — dan itu lebih baik
+# daripada diam-diam jatuh ke `workers.dev` yang tidak bisa dikunci CORS.
+routes = [
+  { pattern = "api.fiezel.my.id", custom_domain = true }
+]
+
+# --- VARS (BUKAN rahasia; boleh terlihat di dashboard dan di repo) -----------
+[vars]
+PROTOCOL_VERSION  = "1.7"          # dibaca /health; frontend MENOLAK selain ini
+SERVICE_NAME      = "fiezel-api"
+API_VERSION       = "cf-api-1"
+AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
+# Allowlist CORS eksplisit. BUKAN pantulan Origin, BUKAN "*".
+# Catatan jujur: `fiezel-apps.github.io` ada di public suffix list => cross-site,
+# jadi cookie identitas TIDAK akan terkirim dari sana. Cermin GitHub Pages tetap
+# bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
+ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
+COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
+# Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
+# jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).
+FEATURE_AI        = "off"
+FEATURE_TTS       = "off"
+FEATURE_COACH     = "off"
+# Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
+# Sumber angka: cf-b3 §3 / cf-c1 K26.
+AI_LIMIT_PER_DAY  = "20"
+AI_LIMIT_PER_HOUR = "40"           # sama dengan AI_RATE_LIMIT_PER_HOUR lama
+TTS_CHARS_PER_DAY = "6000"
+GLOBAL_NEURON_CAP = "8000"         # < 10.000/hari alokasi gratis akun
+MAX_USERS         = "250"          # cermin fiezel-core-worker.js:5
+AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
+# CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
+# Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
+# meng-assert ketiadaannya di berkas ini.
+
+# --- D1: identitas, sesi, entitlement ---------------------------------------
+# Kenapa D1 dan bukan KV: KV eventually consistent ("may take up to 60 seconds
+# or more") dan hanya 1 tulis/detik/kunci. D1 single-threaded per database
+# sehingga `UPDATE ... WHERE ... RETURNING` bersyarat bersifat atomik — dan itu
+# pengganti Durable Object yang bisa dipakai di PLAN GRATIS.
+[[d1_databases]]
+binding        = "CORE_DB"
+database_name  = "fiezel-core"
+database_id    = "<isi setelah: wrangler d1 create fiezel-core>"
+migrations_dir = "migrations"
+
+# D1 kedua untuk statistik/agregat. Dipisah supaya analytics tidak
+# menyerialisasi jalur panas identitas (D1 single-threaded per database).
+# Tabelnya HANYA agregat — kontrak analytics privasi-maksimal melarang baris
+# per-orang untuk analytics, dan melarang join ke tabel kuota.
+[[d1_databases]]
+binding       = "STATS_DB"
+database_name = "fiezel-stats"
+database_id   = "<isi setelah: wrangler d1 create fiezel-stats>"
+
+# --- KV: HANYA config/flag/state breaker + penanda anti-replay ber-TTL -------
+# PLAN GRATIS: 1.000 TULIS/HARI. Karena itu jalur panas DILARANG menulis ke KV.
+# Yang boleh menulis: `PUT /api/owner/flags` (jarang) dan penanda anti-replay
+# tiket klaim (`claim:jti:*`, TTL 300 s, hanya saat murid login Puter).
+# Baca memakai `cacheTtl` 60 s supaya baca berulang tidak jadi operasi baru.
+[[kv_namespaces]]
+binding = "CFG"
+id      = "<isi setelah: wrangler kv namespace create CFG>"
+
+# --- R2: BACA aset audio yang SUDAH ADA -------------------------------------
+# Bucket yang sama dengan Worker audio. Worker ini hanya perlu `head`/`get` untuk
+# memeriksa apakah aset TTS/pelajaran sudah ada (cache-hit dijawab dengan URL
+# publik `audio.fiezel.my.id`, BUKAN dengan mem-proxy byte: nol CPU, nol
+# subrequest, egress gratis).
+# 1.170 objek `a/<sha256>.mp3` milik pipeline ElevenLabs TIDAK PERNAH ditulis
+# dari Worker ini; prefiks tulis (kalau nanti ada) dipisah di `tts/v1/**`.
+[[r2_buckets]]
+binding     = "AUDIO"
+bucket_name = "fiezel-audio"
+
+# --- Workers AI: binding, bukan REST ----------------------------------------
+# Binding berarti TIDAK ADA token API di dalam Worker => nol permukaan kebocoran
+# kunci (repo ini pernah punya insiden secret). Penggunaan AI di fase ini NOL;
+# binding sudah disiapkan supaya paket kerja AI/TTS tidak perlu mengubah berkas
+# konfigurasi ini lagi.
+[ai]
+binding = "AI"
+
+# --- Analytics Engine -------------------------------------------------------
+# Event OPERASIONAL saja (ai_call, tts_call, cache_hit/miss, quota_denied,
+# circuit_open). Bukan sumber kebenaran DAU/MAU. Kontrak privasi: tidak ada
+# `index1 = user_id`; pengenal harian ber-pepper saja, dan pepper dirotasi 24 jam.
+[[analytics_engine_datasets]]
+binding = "AE"
+dataset = "fiezel_events"
+
+# ============================================================================
+# YANG SENGAJA TIDAK ADA DI SINI, DAN ALASANNYA
+# ============================================================================
+# 1. DURABLE OBJECTS — TIDAK DIPASANG.
+#    Durable Objects membutuhkan Workers PAID. Keputusan owner 27 Agu 2026:
+#    PLAN GRATIS dulu. Konsekuensi teknis yang harus dilaporkan apa adanya:
+#    kuota memakai D1 `UPDATE ... WHERE used < limit RETURNING` (atomik per
+#    pernyataan, TANPA lease), jadi dua request yang datang persis bersamaan
+#    tetap terhitung benar, TETAPI tidak ada penguncian lintas-pernyataan
+#    (mis. "cadangkan lalu refund" tidak bisa dibungkus satu transaksi lintas
+#    request). KALAU pemantauan menunjukkan kuota terlampaui atau butuh
+#    atomisitas lebih ketat: Durable Object adalah UPGRADE BERBAYAR, dan itu
+#    WAJIB DILAPORKAN KE OWNER dengan angka (berapa kali terlampaui, berapa
+#    biaya kelebihannya) — bukan dinyalakan diam-diam di berkas ini.
+# 2. `[[unsafe.bindings]]` rate limiting — ditunda ke paket kerja kuota, supaya
+#    dua paket kerja tidak menulis blok yang sama.
+# 3. `[triggers] crons` — ditunda ke paket kerja analytics/rollup. Cron di PLAN
+#    GRATIS terbatas dan setiap eksekusi memakai jatah request; satu cron harian
+#    sudah cukup, jadi yang memasangnya harus satu paket kerja saja.
+# 4. Bucket R2 kedua (`USERDATA`, backup progres murid) — TIDAK DIPASANG.
+#    Backup progres ke server default MATI (bab 1 melarang server jadi sumber
+#    kebenaran progres). Binding yang tidak ada = fitur yang secara struktural
+#    tidak bisa bocor.
+# 5. `[observability] enabled = true` — TIDAK DIPASANG di plan gratis: retensi
+#    log dan biayanya berbeda antar plan. Pakai `wrangler tail` saat perlu.
+
+# ============================================================================
+# SECRET YANG HARUS DIPASANG OWNER (NAMA SAJA — jangan pernah menulis nilainya)
+#
+#   wrangler secret put SESSION_HMAC_KEY_CURRENT     # penanda cookie fz_id (kid=2)
+#   wrangler secret put SESSION_HMAC_KEY_PREVIOUS    # kid=1; rotasi tanpa logout massal
+#   wrangler secret put PUTER_CLAIM_SECRET_CURRENT   # verifikasi tiket klaim dari Worker Puter
+#   wrangler secret put PUTER_CLAIM_SECRET_PREVIOUS  # rotasi tiket klaim
+#   wrangler secret put IDENTITY_PEPPER              # HMAC pengenal turunan (ip_hmac, ref)
+#   wrangler secret put OWNER_SUBJECT                # identitas owner untuk Worker owner
+#   wrangler secret put CRON_TOKEN                   # pengganti FIEZEL_REMINDER_CRON_TOKEN
+#
+# Tanpa `SESSION_HMAC_KEY_CURRENT`, `/api/auth/anon` akan 500 (tidak bisa
+# menandatangani cookie) — itu kegagalan yang benar: lebih baik gagal jelas
+# daripada menerbitkan identitas yang tidak bisa diverifikasi.
+# Tanpa `PUTER_CLAIM_SECRET_CURRENT`, `/api/auth/claim` selalu 401 — juga benar:
+# fitur tanpa penerbit tiket tidak boleh mengikat identitas.
+# ============================================================================
