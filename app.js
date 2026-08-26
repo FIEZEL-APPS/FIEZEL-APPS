@@ -101,10 +101,17 @@ const LEVEL_EXAM_COOLDOWN_MS=86400000;
    ambang lulus ditulis 80% (bukan 90%) karena kontrak owner mengikat LEVEL_EXAM_PASS=80,
    dan catatan implementasi §Catatan menyuruh teks menyesuaikan angka kode. */
 const LEVEL_GUARD_COPY={
-  probationTitle:'Level ini belum terverifikasi buat kamu',
-  probationBody:'Kamu bebas menjajalnya \u2014 PAW ikut menemani, kok. Kalau nanti terasa berat, itu bukan kegagalan; artinya cuma ada fondasi yang perlu dikuatin dulu. Atau, kalau kamu yakin udah siap, buktikan lewat Ujian Skip Level dan level ini langsung terverifikasi.',
-  probationTry:'Coba dulu',
-  probationExam:'Ikut Ujian Skip Level',
+  /* m025-166 (redesign alur owner): mode percobaan TIDAK lagi bisa dimasuki dari UI, jadi
+     teks panjang "kamu bebas menjajalnya" ikut pensiun. Yang tersisa adalah microcopy
+     aplikasi: satu chip + satu kalimat + satu CTA. Dua tombol lama (menjajal level dan
+     label panjang ujian skip) dihapus dari alur pemilihan level; penggantinya dua tombol
+     popup gerbang di bawah (entryExam/entryLater). Fungsi probation/demosi tetap ada
+     sebagai backstop state lama - hanya pintu masuknya yang ditutup. */
+  probationTitle:'Level ini belum terverifikasi',
+  probationBody:'Lulusin Ujian Skip Level dulu, PAW temenin dari A1.',
+  entryChip:'Belum terverifikasi',
+  entryExam:'Ikuti ujian',
+  entryLater:'Nanti aja',
   warn5:'Udah 5 yang meleset, dan itu nggak apa-apa \u2014 salah itu bagian dari belajar. Coba pelan-pelan: baca soalnya dua kali, atau pakai petunjuk kalau butuh. PAW nungguin, nggak ke mana-mana.',
   warn8:'Level ini kayaknya masih lumayan berat buat sekarang, dan itu wajar banget. Saran PAW: mampir sebentar ke materi dasarnya, biar pas balik ke sini rasanya lebih enteng. Kalau meleset 2 kali lagi, kita turun bareng dulu buat nguatin fondasi, ya.',
   demotionTitle:'Kita mundur selangkah dulu, ya',
@@ -855,6 +862,39 @@ function levelTrustState(s=state){return sanitizeLevelTrust(s?.levelTrust)}
 function verifiedLevel(s=state){const value=String(levelTrustState(s).verified||'A1');return LEVELS.includes(value)?value:'A1'}
 function levelTrustGap(level,s=state){const i=LEVELS.indexOf(String(level||''));return i<0?0:i-LEVELS.indexOf(verifiedLevel(s))}
 function nextVerifiableLevel(s=state){const i=LEVELS.indexOf(verifiedLevel(s));return LEVELS[i+1]||''}
+/* ---- m025-166: gerbang masuk level (alur baru owner) ---------------------------------
+ *
+ * Owner mendesain ulang alurnya: memilih level yang belum terverifikasi TIDAK lagi membuka
+ * mode percobaan, tetapi membuka satu popup keputusan - "ikuti ujian" atau "nanti aja"
+ * (dialihkan ke A1). Keputusannya sendiri harus MURNI: tanpa state, tanpa DOM, tanpa jam,
+ * supaya gerbang test bisa menanyainya langsung dan supaya lapisan UI tidak pernah
+ * menghitung rantai ujian dua kali dengan cara berbeda.
+ *
+ * Rantainya sama dengan levelTrust: verified mulai A1 dan naik SATU tangga per ujian lulus,
+ * jadi ujian yang wajib diambil selalu level tepat di atas verified - pilih B1 saat verified
+ * A1 berarti ujian A2 dulu, pilih C1 saat verified B1 berarti ujian B2.
+ *
+ * PENTING: penegakannya ada di lapisan UI/handler ini, BUKAN di setActiveLevel(). Fungsi inti
+ * itu tetap default-allow supaya fixture level-grammar-contract-test (pindah A1->B1 tanpa
+ * levelTrust) tetap hijau. */
+function levelEntryDecision(chosen,verified){
+  const target=String(chosen||'').toUpperCase();
+  const base=LEVELS.includes(String(verified||'').toUpperCase())?String(verified).toUpperCase():LEVELS[0];
+  if(!LEVELS.includes(target))return{chosen:'',verified:base,allowed:true,requiredExam:''};
+  if(LEVELS.indexOf(target)<=LEVELS.indexOf(base))return{chosen:target,verified:base,allowed:true,requiredExam:''};
+  return{chosen:target,verified:base,allowed:false,requiredExam:LEVELS[LEVELS.indexOf(base)+1]||''};
+}
+/* "Nanti aja" selalu mengembalikan murid ke pelabuhan paling aman - A1 - bukan ke level
+   terverifikasinya, karena alur ini dipakai murid BARU yang belum punya bukti apa pun. */
+function levelEntryDeferLevel(){return LEVELS[0]||'A1'}
+function levelEntryChoiceCopy(chosen,requiredExam){
+  const target=String(chosen||'').toUpperCase(),exam=String(requiredExam||'').toUpperCase();
+  return{
+    title:`Mau belajar di ${target}? Sedikit lagi.`,
+    line:`Buat buka ${target}, lulusin dulu ${LEVEL_GUARD_COPY.examTitle} ${exam} \u2014 satu ujian, satu anak tangga.`,
+    deferToast:`Oke, kita mulai dari ${levelEntryDeferLevel()} dulu. ${target} nungguin kamu abis lulus ujian ${exam}.`
+  };
+}
 function probationMistakes(level,s=state){return Math.max(0,Number(levelTrustState(s).probation.mistakesByLevel?.[String(level||'')])||0)}
 function probationActive(s=state){return levelTrustGap(getActiveLevel(s),s)>0}
 /* Kunci hanya berlaku untuk level DI ATAS level terverifikasi, dan hanya setelah demosi.
@@ -2601,16 +2641,88 @@ function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('le
 function openLevelPanel(){const current=getActiveLevel(),estimated=placementLevel(),manual=activeLevelIsManual(),verified=verifiedLevel(state),trust=levelTrustState(state),examLevel=nextVerifiableLevel(state),examWait=examLevel?levelExamCooldownRemaining(examLevel,state):0;
  const cards=LEVELS.map(level=>{
   const locked=isLevelLocked(state,level),position=LEVELS.indexOf(level)-LEVELS.indexOf(verified);
-  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">Terkunci · lewat ujian</em>':`<em class="level-trust-badge is-probation">Mode percobaan · salah ${probationMistakes(level)}/${LEVEL_GUARD_WRONG_LIMIT}</em>`;
+  /* m025-166: kartu level yang belum terbukti dulu berlabel "Mode percobaan" - label itu
+     sekarang bohong, karena mode percobaan tidak bisa lagi dimasuki dari UI. Labelnya jadi
+     "Belum terverifikasi"; hitungan salah hanya muncul kalau state lama memang menyimpannya,
+     supaya murid yang masih menyandang percobaan warisan tetap melihat sisa jatahnya. */
+  const mistakes=probationMistakes(level);
+  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">Terkunci · lewat ujian</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?` · salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT}`:''}</em>`;
   return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
  }).join('');
- const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(LEVEL_GUARD_COPY.probationBody)}</span></div>`:'';
+ /* m025-166: penjelasan "belum terverifikasi" dulu satu paragraf panjang bergaya artikel.
+    Sekarang microcopy aplikasi: chip status + satu kalimat + satu CTA, seirama dengan
+    modal-mark/eyebrow kartu lain. */
+ const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(current)}</em><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span><button type="button" class="level-trust-chip-cta" id="levelNoteExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button></div>`:'';
  const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(examLevel)}</b><span>${LEVEL_EXAM_SIZE} soal · grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading} · lulus ${LEVEL_EXAM_PASS}%</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?`Bisa diulang ${esc(levelExamCooldownLabel(examWait))}`:esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examBadge)} sampai C2</b><span>Semua level sudah kamu buktikan.</span></div></div>`;
  openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>Pilih level belajar</h2><p>Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level aktif pilihanmu: <b>${esc(current)}</b>. Hasil placement tersimpan sebagai ${esc(estimated)}. Level terverifikasi: <b>${esc(verified)}</b>.`:`Saat ini mengikuti hasil placement: <b>${esc(estimated)}</b>. Level terverifikasi: <b>${esc(verified)}</b>.`}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">Gunakan hasil tes (${esc(estimated)})</button>`:''}<button type="button" class="primary" id="levelPanelClose">Selesai</button></div>`);
- document.querySelectorAll('[data-active-level]').forEach(button=>button.addEventListener('click',()=>setActiveLevel(button.getAttribute('data-active-level'))));
+ /* m025-166: pintu pemilihan level sekarang lewat gerbang keputusan. Level yang belum
+    terverifikasi TIDAK langsung aktif - popup gerbang yang memutuskan (ikuti ujian, atau
+    nanti aja dan dialihkan ke A1). setActiveLevel() sendiri tidak diubah: ia tetap
+    default-allow supaya kontrak level/grammar tetap hijau. */
+ document.querySelectorAll('[data-active-level]').forEach(button=>button.addEventListener('click',()=>{
+  const target=String(button.getAttribute('data-active-level')||'').toUpperCase();
+  if(levelEntryDecision(target,verifiedLevel(state)).allowed)return setActiveLevel(target);
+  return openLevelEntryGate(target);
+ }));
  $('usePlacementLevel')?.addEventListener('click',usePlacementLevel);
  $('openLevelExam')?.addEventListener('click',()=>openActiveLevelExamPanel(examLevel));
+ $('levelNoteExam')?.addEventListener('click',()=>openActiveLevelExamPanel(examLevel||verified));
  $('levelPanelClose').onclick=closeModal;enhanceUI()}
+/* ---- m025-166 gerbang popup masuk level ------------------------------------------------
+ *
+ * Satu popup untuk DUA jalan masuk: level yang dipilih di perkenalan (dibuka begitu murid
+ * benar-benar masuk aplikasi, lewat armLevelEntryGate + maybeShowLevelEntryGate) dan level
+ * belum-terverifikasi yang dipilih dari panel level di dalam aplikasi. Gerakannya hanya
+ * transform+opacity (lihat .level-entry-pop di style.css) dan mati total saat murid meminta
+ * gerak minimal - popup ini muncul di detik pertama pemakaian, jadi ia tidak boleh jadi
+ * animasi yang membuat orang pusing. */
+let levelEntryGatePending='';
+function armLevelEntryGate(level){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return false;
+  if(levelEntryDecision(target,verifiedLevel(state)).allowed)return false;
+  levelEntryGatePending=target;return true;
+}
+function maybeShowLevelEntryGate(attempt=0){
+  if(!levelEntryGatePending)return false;
+  /* Tidak pernah menumpuk di atas lapisan lain (undangan notifikasi, gerbang akun, modal
+     apa pun yang sedang terbuka). Ia menunggu layarnya bersih - maksimal ~9 detik, lalu
+     menyerah dengan tenang supaya tidak ada popup yang muncul di waktu yang salah. */
+  let busy=false;
+  try{busy=(typeof modalOpen!=='undefined'&&modalOpen)||!!document.querySelector('#welcome.show')||!!document.querySelector('.fiezel-ob')}catch(_){}
+  if(busy){if(attempt<15)setTimeout(()=>{try{maybeShowLevelEntryGate(attempt+1)}catch(_){}},600);else levelEntryGatePending='';return false}
+  const target=levelEntryGatePending;levelEntryGatePending='';
+  return openLevelEntryGate(target);
+}
+/* "Nanti aja": murid dialihkan ke A1 dan diberi kabar hangat bahwa level pilihannya masih
+   menunggu di ujung ujian. Menulis preferensi langsung (bukan lewat setActiveLevel) supaya
+   tidak ada toast "Level belajar aktif: A1" yang menimpa pesan hangat itu. */
+function levelEntryDefer(chosen,requiredExam,s=state){
+  const fallback=levelEntryDeferLevel(),copy=levelEntryChoiceCopy(chosen,requiredExam);
+  try{if(s?.activeSession)abandonActiveSession('level_entry_defer')}catch(_){}
+  try{leaveAllStages()}catch(_){}
+  if(s&&s.preferences)s.preferences={...s.preferences,activeLevel:fallback,levelMode:'manual'};
+  try{if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(fallback)}catch(_){}
+  try{coreBrainCache=null}catch(_){}
+  try{save()}catch(_){}
+  try{closeModal()}catch(_){}
+  try{render()}catch(_){}
+  try{showToast(copy.deferToast)}catch(_){}
+  return fallback;
+}
+function openLevelEntryGate(chosen){
+  const decision=levelEntryDecision(chosen,verifiedLevel(state));
+  if(decision.allowed)return false;
+  const copy=levelEntryChoiceCopy(decision.chosen,decision.requiredExam);
+  const motion=(typeof pawMotionAllowed==='function'&&pawMotionAllowed())?'':' is-static';
+  openModal(`<div class="level-entry-pop${motion}" data-level-entry="${esc(decision.chosen)}"><div class="level-entry-face">${pawFaceMarkup()}</div><div class="modal-mark">FIEZEL LEVEL</div><em class="level-entry-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(decision.chosen)}</em><h2>${esc(copy.title)}</h2><p class="level-entry-line">${esc(copy.line)}</p><div class="modal-actions"><button type="button" id="levelEntryLater">${esc(LEVEL_GUARD_COPY.entryLater)}</button><button type="button" class="primary" id="levelEntryExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(decision.requiredExam)}</button></div></div>`);
+  $('levelEntryLater')?.addEventListener('click',()=>levelEntryDefer(decision.chosen,decision.requiredExam));
+  $('levelEntryExam')?.addEventListener('click',()=>{closeModal();startLevelExam(decision.requiredExam)});
+  try{pawReact('onboard')}catch(_){}
+  enhanceUI();
+  return true;
+}
+window.openLevelEntryGate=openLevelEntryGate;
 /* ---- m028-06 runtime guard: menghitung, memperingatkan, lalu menurunkan --------------- */
 function levelTrustNoteMistake(q){
   const sessionType=String(state.activeSession?.type||'');
@@ -2634,7 +2746,7 @@ function levelGuardWarn(level,count){
   const message=count>=8?LEVEL_GUARD_COPY.warn8:LEVEL_GUARD_COPY.warn5;
   try{pawReact(count>=8?'wrong':'question-shown')}catch(_){}
   try{showToast(`Salah ${count} dari ${LEVEL_GUARD_WRONG_LIMIT} di ${level}. PAW menemani.`)}catch(_){}
-  try{openModal(`<div class="modal-mark">PAW MENEMANI</div><h2>Level ${esc(level)} · salah ${count}/${LEVEL_GUARD_WRONG_LIMIT}</h2><p>${esc(message)}</p><div class="modal-actions"><button type="button" id="levelWarnExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button><button type="button" class="primary" id="levelWarnGo">Lanjut latihan</button></div>`);
+  try{openModal(`<div class="modal-mark">PAW MENEMANI</div><h2>Level ${esc(level)} · salah ${count}/${LEVEL_GUARD_WRONG_LIMIT}</h2><p>${esc(message)}</p><div class="modal-actions"><button type="button" id="levelWarnExam">${esc(LEVEL_GUARD_COPY.entryExam)}</button><button type="button" class="primary" id="levelWarnGo">Lanjut latihan</button></div>`);
     $('levelWarnGo').onclick=closeModal;
     $('levelWarnExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
     enhanceUI()}catch(_){}
@@ -2661,7 +2773,7 @@ function flushLevelGuardNotice(){
 function openDemotionModal(fromLevel,toLevel){
   const verified=LEVELS.includes(String(toLevel||''))?String(toLevel):verifiedLevel(state);
   try{pawReact('wrong')}catch(_){}
-  openModal(`<div class="modal-mark">FIEZEL LEVEL GUARD</div><h2>${esc(LEVEL_GUARD_COPY.demotionTitle)}</h2><p>${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionBody,verified))}</p><p class="muted">Level ${esc(String(fromLevel||''))} dan semua level di atas ${esc(verified)} terkunci sampai kamu lulus ${esc(LEVEL_GUARD_COPY.examTitle)}.</p><div class="modal-actions"><button type="button" class="primary" id="demotionStart">${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionStart,verified))}</button><button type="button" id="demotionExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button></div>`);
+  openModal(`<div class="modal-mark">FIEZEL LEVEL GUARD</div><h2>${esc(LEVEL_GUARD_COPY.demotionTitle)}</h2><p>${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionBody,verified))}</p><p class="muted">Level ${esc(String(fromLevel||''))} dan semua level di atas ${esc(verified)} terkunci sampai kamu lulus ${esc(LEVEL_GUARD_COPY.examTitle)}.</p><div class="modal-actions"><button type="button" class="primary" id="demotionStart">${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionStart,verified))}</button><button type="button" id="demotionExam">${esc(LEVEL_GUARD_COPY.entryExam)}</button></div>`);
   $('demotionStart').onclick=()=>{closeModal();go('home')};
   $('demotionExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
   enhanceUI();
@@ -2758,10 +2870,10 @@ function activeLevelTrustMarkup(){
       const step=LEVELS[i],done=i<=LEVELS.indexOf(verified),open=step===examLevel;
       ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(step)}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?'Ujian kebuka':'Menunggu'}</span></li>`;
     }
-    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.probationExam)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
+    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
   }
   const mistakes=probationMistakes(active);
-  return `<div class="level-trust-banner is-probation"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(LEVEL_GUARD_COPY.probationBody)}</span></div><p class="level-trust-count">Level ${esc(active)} · salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT} · terverifikasi sampai ${esc(verified)}</p><div class="level-trust-actions"><button type="button" onclick="closeModal()">${esc(LEVEL_GUARD_COPY.probationTry)}</button><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.probationExam)}</button></div></div>`;
+  return `<div class="level-trust-banner is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(active)}</em><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span></div><p class="level-trust-count">Level ${esc(active)} \u00b7 salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT} \u00b7 terverifikasi sampai ${esc(verified)}</p><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
 }
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>${levelControlMarkup()}</div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
@@ -2862,7 +2974,8 @@ function homeStatStripMarkup(level,streak,attempts,review){
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
-function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
+function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
+   benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
   <div class="launcher-meta"><span class="live-signal"></span><span>FIEZEL PERSONAL · ${esc(todayLabel())}</span><button type="button" class="home-level-context" onclick="openLevelPanel()">${esc(activeLevel)} · semua materi · ganti</button>${celestialStatusMarkup()}</div>
@@ -3236,6 +3349,10 @@ function showOnboarding(now=Date.now()){
         // itu tidak pernah menyentuh state.level, yang hanya diisi tes penempatan asli.
         const selectedLevel=LEVELS.includes(String(level||''))?String(level):'';
         state.preferences={...state.preferences,goalProfile:id,selfAssessedLevel:selectedLevel,activeLevel:selectedLevel||state.preferences.activeLevel||'',levelMode:selectedLevel?'manual':state.preferences.levelMode||'placement'};
+        // m025-166: level yang dipilih di sini belum terbukti. Gerbangnya TIDAK dibuka di atas
+        // perkenalan (lapisan bertumpuk adalah jebakan) - ia hanya dipasang, lalu muncul
+        // sendiri begitu murid benar-benar mendarat di Home; lihat maybeShowLevelEntryGate().
+        try{armLevelEntryGate(selectedLevel)}catch(_){}
         save();render();showToast(`Tujuan belajar: ${label}`)
       },
       onPlacement:()=>afterOnboardingExit('placement'),
