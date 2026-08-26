@@ -301,7 +301,7 @@
       "status": "PASS"
     },
     {
-      "name": "workers/api/index.js TIDAK diedit oleh paket kerja ini",
+      "name": "Rute analytics dipasang tepat di satu titik (route-wiring.js), bukan di index.js",
       "status": "PASS"
     }
   ]

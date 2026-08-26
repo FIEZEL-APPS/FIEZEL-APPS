@@ -26,25 +26,39 @@
  *     bukan di dalam handler, supaya tidak ada rute yang lupa memeriksanya.
  */
 
-/* --- SLOT 1: AI (route-ai.js) — /api/ai/chat, /api/ai/translate, /api/coach/context */
-// import { ROUTES as AI_ROUTES } from './route-ai.js';
+/*
+ * ==========================================================================
+ * STATUS PEMASANGAN (diisi paket kerja "integrasi rute", 27 Agu 2026)
+ * ==========================================================================
+ * SLOT 1 (AI), SLOT 2 (TTS), SLOT 3 (KUOTA), dan SLOT 4 (ANALYTICS) sudah
+ * TERPASANG, tetapi bukan sebagai empat baris `...X_ROUTES` seperti rancangan
+ * awal. Alasannya konkret: keempat paket kerja itu tidak mengekspor array
+ * `ROUTES` — mereka mengekspor fungsi pendaftar (`registerAiRoutes`,
+ * `registerTtsRoutes`, `registerQuotaRoutes`, `registerAnalyticsRoutes`) dengan
+ * TIGA konvensi argumen handler yang berbeda, dan dua di antaranya butuh
+ * `deps.enforceQuota`. Menyalin adaptasi itu ke berkas slot akan menaruh logika
+ * kuota di tempat yang tidak ada gerbangnya.
+ *
+ * Karena itu seluruh adaptasi tinggal di `route-wiring.js` (satu berkas, satu
+ * gerbang: `cf-wiring-test.js`) dan berkas ini tetap menjadi apa yang
+ * dijanjikannya: satu titik yang menentukan rute tambahan mana yang hidup.
+ *
+ * SLOT 5 (warisan Puter) BELUM ada dan itu bukan kelalaian: `/api/policy/*`,
+ * `/api/activity`, `/api/feedback`, `/api/push/*` masih dilayani Worker Puter.
+ * Memindahkannya adalah paket kerja tersendiri.
+ */
+import { buildExtraRoutes } from './route-wiring.js';
 
-/* --- SLOT 2: TTS (route-tts.js) — /api/tts/resolve, /api/tts/render */
-// import { ROUTES as TTS_ROUTES } from './route-tts.js';
-
-/* --- SLOT 3: KUOTA (route-quota.js) — /api/quota, /api/quota/preflight */
-// import { ROUTES as QUOTA_ROUTES } from './route-quota.js';
-
-/* --- SLOT 4: ANALYTICS (route-usage.js) — /api/usage/event, /api/usage/summary */
-// import { ROUTES as USAGE_ROUTES } from './route-usage.js';
-
-/* --- SLOT 5: WARISAN PUTER (route-legacy.js) — /api/policy/*, /api/activity, /api/feedback, /api/push/* */
+/* --- SLOT 1: AI (ai/route-ai.js) — /api/ai/task                     [TERPASANG] */
+/* --- SLOT 2: TTS (tts/route-tts.js) — /api/tts/render, /api/tts/manifest [TERPASANG] */
+/* --- SLOT 3: KUOTA (quota/route-quota.js) — /api/quota              [TERPASANG] */
+/* --- SLOT 4: ANALYTICS (analytics/route-events.js) — /api/usage/events,
+ *             /api/usage/retention, /api/usage/pepper                [TERPASANG] */
+/* --- SLOT 5: WARISAN PUTER (route-legacy.js) — /api/policy/*, /api/activity,
+ *             /api/feedback, /api/push/*                             [BELUM] */
 // import { ROUTES as LEGACY_ROUTES } from './route-legacy.js';
 
 export const EXTRA_ROUTES = [
-  // ...AI_ROUTES,      /* SLOT 1 */
-  // ...TTS_ROUTES,     /* SLOT 2 */
-  // ...QUOTA_ROUTES,   /* SLOT 3 */
-  // ...USAGE_ROUTES,   /* SLOT 4 */
-  // ...LEGACY_ROUTES,  /* SLOT 5 */
+  ...buildExtraRoutes(),  /* SLOT 1-4 */
+  // ...LEGACY_ROUTES,    /* SLOT 5 */
 ];

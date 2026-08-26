@@ -57,18 +57,33 @@ function mustRead(relative) {
 
 const MODULE_CACHE = new Map();
 
-function inlineModule(name, stack) {
+const REL_SPEC = '(\\.\\.?\\/[A-Za-z0-9_.\\/-]+\\.js)';
+
+function inlineModule(rawName, stack) {
+  // Path bersarang diselesaikan RELATIF terhadap modul pengimpor. Sebelum
+  // penggabungan delapan paket kerja, seluruh graf ada di satu direktori dan
+  // `./x.js` cukup; sekarang `index.js` -> `route-slots.js` -> `route-wiring.js`
+  // -> `./quota/route-quota.js` -> `./quota-core.js`, dan tanpa penyelesaian
+  // relatif yang benar berkas terakhir itu dicari di `workers/api/quota-core.js`.
+  const name = String(rawName).replace(/\\/g, '/');
   if (MODULE_CACHE.has(name)) return MODULE_CACHE.get(name);
   if (stack.includes(name)) throw new Error('impor sirkular: ' + stack.concat(name).join(' -> '));
   const source = mustRead(name);
+  const dir = path.posix.dirname(name);
+  const resolveDep = (dep) => inlineModule(path.posix.normalize(path.posix.join(dir, dep)), stack.concat(name));
   // Baris berkomentar DILEWATI: `route-slots.js` sengaja menyimpan contoh impor
   // untuk paket kerja lain (`// import ... from './route-ai.js'`) dan itu bukan
   // dependency nyata. Menganggapnya nyata akan membuat gerbang menuntut berkas
   // yang memang belum ada.
   const transformed = source.split('\n').map((line) => {
     if (/^\s*(\/\/|\*|\/\*)/.test(line)) return line;
-    return line.replace(/(from\s+')\.\/([A-Za-z0-9_.-]+\.js)(')/g, (all, pre, dep, post) =>
-      pre + inlineModule(dep, stack.concat(name)) + post);
+    return line
+      // `from './x.js'`
+      .replace(new RegExp("(from\\s+')" + REL_SPEC + "(')", 'g'), (a, p, dep, s) => p + resolveDep(dep) + s)
+      // `await import('./x.js')` — dipakai `handlePepper` di analytics.
+      .replace(new RegExp("(import\\s*\\(\\s*')" + REL_SPEC + "('\\s*\\))", 'g'), (a, p, dep, s) => p + resolveDep(dep) + s)
+      // `import './x.js';` — impor efek-samping modul UMD (ai-tasks, breaker, tts-key).
+      .replace(new RegExp("(^\\s*import\\s+')" + REL_SPEC + "(')", 'g'), (a, p, dep, s) => p + resolveDep(dep) + s);
   }).join('\n');
   const url = 'data:text/javascript;base64,' + Buffer.from(transformed, 'utf8').toString('base64');
   MODULE_CACHE.set(name, url);

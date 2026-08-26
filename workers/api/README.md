@@ -65,9 +65,20 @@ wrangler d1 create fiezel-stats
 # 2. Tempelkan `database_id` hasil perintah di atas ke workers/api/wrangler.toml
 #    (placeholder GANTI_DENGAN_ID_D1_... harus habis; deploy akan gagal kalau tidak)
 
-# 3. Terapkan migrasi — lokal dulu, lalu remote
-wrangler d1 migrations apply fiezel-core --local
-wrangler d1 migrations apply fiezel-core --remote
+# 3. Terapkan migrasi — lokal dulu, lalu remote.
+#    PERHATIAN: `wrangler d1 migrations apply` TIDAK dipakai lagi dan
+#    `migrations_dir` sudah dihapus dari wrangler.toml. Alasannya: satu
+#    direktori migrasi hanya bisa menunjuk SATU database, sedangkan
+#    migrations/ memuat migrasi untuk DUA database, dan menjalankan
+#    0002_analytics.sql di fiezel-core akan menaruh tabel analytics satu
+#    database dengan tabel kuota — JOIN yang dilarang kontrak privasi.
+#    Perintah resmi (dan alasan lengkapnya) ada di migrations/MIGRATIONS.md:
+wrangler d1 execute fiezel-core  --local  --file=migrations/0001_identity.sql
+wrangler d1 execute fiezel-core  --local  --file=migrations/0001_quota.sql
+wrangler d1 execute fiezel-stats --local  --file=migrations/0002_analytics.sql
+wrangler d1 execute fiezel-core  --remote --file=migrations/0001_identity.sql
+wrangler d1 execute fiezel-core  --remote --file=migrations/0001_quota.sql
+wrangler d1 execute fiezel-stats --remote --file=migrations/0002_analytics.sql
 
 # 4. Periksa
 wrangler d1 execute fiezel-core --remote --command "SELECT name FROM sqlite_master WHERE type='table'"

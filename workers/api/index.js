@@ -33,12 +33,35 @@
  *        Semua lapisan sesudahnya butuh subjek, dan subjek TIDAK PERNAH datang
  *        dari body.
  *   [M2] handler rute
- *   [M3..M6] SLOT: plan/entitlement -> kuota -> rate limit -> breaker.
- *        BELUM ADA di fase ini; dikerjakan paket kerja lain. Urutannya sudah
- *        ditetapkan cf-b1 §4 dan tidak boleh ditukar: kuota (akuntansi akurat)
- *        SEBELUM rate limit (perlindungan permisif), validasi skema SESUDAH
- *        otorisasi karena `JSON.parse` adalah CPU dan CPU adalah anggaran
- *        paling langka di PLAN GRATIS.
+ *   [M3..M6] kuota -> rate limit -> breaker.
+ *        TERPASANG, tetapi SENGAJA BUKAN sebagai middleware global. Alasannya
+ *        bisa diperiksa: kuota hanya boleh ditagih untuk permintaan yang benar-
+ *        benar akan memanggil provider, dan yang tahu hal itu cuma handler-nya
+ *        (`route-tts.js` menjawab dari cache R2 pada LANGKAH 2, sebelum kuota;
+ *        `route-ai.js` menjawab dari breaker OPEN tanpa kuota). Middleware
+ *        global akan menagih keduanya — murid dihukum untuk replay audio yang
+ *        gratis dan untuk provider yang mati.
+ *        Yang dijaga tetap terjaga: penegakannya TIDAK ada di dalam handler,
+ *        melainkan di `route-wiring.js` yang menyuntikkan `enforceQuota` asli
+ *        dari `quota/route-quota.js` ke setiap rute berbiaya. Rute berbiaya yang
+ *        lupa memanggilnya akan merah di `cf-wiring-test.js` butir (b)/(c),
+ *        bukan lolos diam-diam.
+ *        Urutan di dalam satu permintaan tetap seperti cf-b1 §4 dan tidak boleh
+ *        ditukar: identitas -> gerbang payload -> breaker -> kuota -> provider.
+ *        Validasi skema SESUDAH otorisasi karena `JSON.parse` adalah CPU dan CPU
+ *        adalah anggaran paling langka di PLAN GRATIS.
+ *
+ * ==========================================================================
+ * CRON (`scheduled`)
+ * ==========================================================================
+ * Dua job, keduanya idempoten, keduanya WAJIB ada supaya dua kontrak tidak
+ * bohong:
+ *   (a) sweep reservasi kuota kedaluwarsa — tanpa ini slot yang ditahan
+ *       permintaan yang mati menghilang dari jatah murid sampai tengah malam;
+ *   (b) rollup analytics harian + rotasi pepper — tanpa rotasi + purge token
+ *       harian, klaim "server tidak bisa menghubungkan hari-1 ke hari-2" palsu.
+ * Ekspresi cron ada di `wrangler.toml` `[triggers]`, pemetaannya di
+ * `route-wiring.js` (`CRON_QUOTA_SWEEP`, `CRON_ANALYTICS_ROLLUP`).
  *
  * ==========================================================================
  * PLAN GRATIS (keputusan owner 27 Agu 2026)
@@ -58,6 +81,7 @@ import { routeAuthAnon, routeAuthClaim } from './route-auth.js';
 import { routeUserMe } from './route-user.js';
 import { routeConfig } from './route-config.js';
 import { EXTRA_ROUTES } from './route-slots.js';
+import { runScheduled } from './route-wiring.js';
 import { notFound, methodNotAllowed, jsonError, ERR } from './errors.js';
 
 /** Rute fase ini. Bentuk: [metode, path literal, handler]. */
@@ -72,12 +96,13 @@ export const ROUTES = [
 
 /** Rantai middleware. Mengembalikan Response = short-circuit. */
 const MIDDLEWARE = [
-  guardMiddleware,     // [M0]
-  identityMiddleware   // [M1]
-  // [M3] planMiddleware,        <- SLOT paket kerja kuota
-  // [M4] quotaMiddleware,       <- SLOT paket kerja kuota
-  // [M5] rateLimitMiddleware,   <- SLOT paket kerja kuota
-  // [M6] breakerMiddleware      <- SLOT paket kerja AI/TTS
+  guardMiddleware,     // [M0] cors + origin + cap byte
+  identityMiddleware   // [M1] cookie fz_id ber-HMAC -> ctx.identity.sub
+  // [M3] plan/entitlement: TIDAK ADA. Hanya ada satu plan (free) dan batasnya
+  //      hidup di quota/quota-config.js; lapisan kosong hanya menipu pembaca.
+  // [M4] kuota      -> route-wiring.js (per-rute, lihat catatan urutan di atas)
+  // [M5] rate limit -> quota/route-quota.js lewat jalur yang sama
+  // [M6] breaker    -> di dalam handler AI/TTS, SEBELUM kuota (E5 LANGKAH 3)
 ];
 
 function matchRoute(method, pathname) {
@@ -127,7 +152,11 @@ async function handle(request, env, executionCtx) {
     // Diisi `guardMiddleware` HANYA kalau `Content-Length` tidak ada; handler
     // wajib membacanya lewat `readJsonFromCtx`, bukan dari `request` langsung.
     bodyText: undefined,
-    identity: { sub: null, kid: null, issued: false, verified: false }
+    identity: { sub: null, kid: null, issued: false, verified: false },
+    // Reservasi kuota yang dibuka permintaan ini. Diselesaikan (commit/rollback)
+    // oleh `route-wiring.js` sesudah handler selesai; array-nya di ctx supaya
+    // tidak ada state kuota per-permintaan yang hidup di variabel modul.
+    quotaTickets: []
   };
 
   for (const mw of MIDDLEWARE) {
@@ -162,6 +191,17 @@ function withCookies(response, ctx) {
 }
 
 export default {
+  /**
+   * Cron. Galat SATU job tidak boleh membatalkan job lain (`runScheduled`
+   * sudah menangkapnya per job), dan hasilnya di-log supaya owner bisa melihat
+   * bahwa sweep/rollup benar-benar jalan — bukan mengira jalan.
+   */
+  async scheduled(event, env, executionCtx) {
+    const summary = await runScheduled(event, env, executionCtx, nowFrom(env));
+    console.log('fiezel-api scheduled', JSON.stringify(summary));
+    return summary;
+  },
+
   async fetch(request, env, executionCtx) {
     try {
       return await handle(request, env, executionCtx);

@@ -405,7 +405,9 @@ function fakeD1(handlersOrOptions) {
 
     let m;
     /* CREATE TABLE */
-    if ((m = sql.match(/^CREATE TABLE (?:IF NOT EXISTS )?([A-Za-z_][\w]*)\s*\((.*)\)$/i))) {
+    // `WITHOUT ROWID` / `STRICT` diterima dan diabaikan: keduanya soal tata letak
+    // penyimpanan SQLite, bukan semantik baris — migrasi analytics memakainya.
+    if ((m = sql.match(/^CREATE TABLE (?:IF NOT EXISTS )?([A-Za-z_][\w]*)\s*\((.*)\)(?:\s+(?:WITHOUT ROWID|STRICT)\s*,?\s*)*$/i))) {
       const [, name, body] = m;
       const key = name.toLowerCase();
       if (tables.has(key)) return { rows: [], meta: { changes: 0, last_row_id: 0 } };
@@ -469,7 +471,7 @@ function fakeD1(handlersOrOptions) {
     }
 
     /* SELECT */
-    if ((m = sql.match(/^SELECT (.+?) FROM ([A-Za-z_][\w]*)(?:\s+WHERE\s+(.+?))?(?:\s+GROUP BY\s+(.+?))?(?:\s+ORDER BY\s+(.+?))?(?:\s+LIMIT\s+(\d+))?$/i))) {
+    if ((m = sql.match(/^SELECT (.+?) FROM ([A-Za-z_][\w]*)(?:\s+WHERE\s+(.+?))?(?:\s+GROUP BY\s+(.+?))?(?:\s+ORDER BY\s+(.+?))?(?:\s+LIMIT\s+(\d+|\?\d*))?$/i))) {
       const [, columns, name, whereText, groupBy, orderBy, limit] = m;
       if (groupBy) throw new Error('D1_UNSUPPORTED_SQL: GROUP BY belum didukung harness');
       const t = table(name);
@@ -481,7 +483,10 @@ function fakeD1(handlersOrOptions) {
         if (direction && direction.toUpperCase() === 'DESC') rows.reverse();
       }
       const projected = projection(t, columns, rows, binds);
-      return { rows: limit ? projected.slice(0, Number(limit)) : projected, meta: { changes: 0, last_row_id: 0, rows_read: rows.length } };
+      // `LIMIT ?2` sama sahnya dengan `LIMIT 500` di D1 — sweep reservasi kuota
+      // (quota-store-d1.js sweepExpiredReservations) memakai bentuk terikat.
+      const cap = limit === undefined ? null : (/^\?/.test(limit) ? compileExpr(limit)(null, binds) : Number(limit));
+      return { rows: cap == null ? projected : projected.slice(0, Number(cap)), meta: { changes: 0, last_row_id: 0, rows_read: rows.length } };
     }
 
     /* UPDATE … [RETURNING] — jalur atomik kuota cf-b3:224-240 */

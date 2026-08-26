@@ -211,8 +211,27 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
     'import opsional dengan try');
   check('Timeout provider ditegakkan di server',
     /AbortSignal\.timeout/.test(srcRoute) && /Promise\.race/.test(srcRoute), 'AbortSignal + race');
-  check('index.js tidak disunting oleh paket kerja ini',
-    !fs.existsSync(path.join(root, 'workers/api/index.js')), 'hanya instruksi pemasangan di notes');
+  // Assert ini DULU berbunyi "index.js tidak disunting oleh paket kerja ini" dan
+  // dibuktikan dengan `!fs.existsSync('workers/api/index.js')`. Itu benar hanya
+  // selama paket kerja E5 hidup di cabangnya sendiri. Sesudah delapan paket
+  // di-merge, `index.js` ADA dan memang harus ada; mempertahankan bentuk lama
+  // berarti gerbang ini menuntut rute AI tetap tidak terpasang. Yang diuji
+  // sekarang adalah invarian pasca-merge yang sebenarnya penting: rute AI
+  // dipasang lewat satu titik (`route-wiring.js`) dan `index.js` tetap tidak
+  // mengetahui apa pun tentang isi modul AI.
+  const indexPath = path.join(root, 'workers/api/index.js');
+  const wiringPath = path.join(root, 'workers/api/route-wiring.js');
+  // Komentar dibuang: `index.js` menjelaskan alasan urutan middleware dan
+  // menyebut `route-ai.js` di prosa. Menyebut nama modul dalam penjelasan bukan
+  // ketergantungan kode.
+  const stripKomentar = (s) => s.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:\\])\/\/[^\n]*/g, '$1 ');
+  const indexSrc = fs.existsSync(indexPath) ? stripKomentar(fs.readFileSync(indexPath, 'utf8')) : '';
+  const wiringSrc = fs.existsSync(wiringPath) ? fs.readFileSync(wiringPath, 'utf8') : '';
+  check('Rute AI dipasang lewat route-wiring.js, dan index.js tidak menyentuh modul AI',
+    indexSrc.length > 0
+    && /registerAiRoutes/.test(wiringSrc)
+    && !/registerAiRoutes|route-ai\.js|ai-tasks\.js/.test(indexSrc),
+    'pemasangan terpusat di route-wiring.js');
 
   // Galat provider TIDAK diteruskan: setiap kalimat yang dikirim ke klien berasal dari peta POLITE.
   const polite = Object.values(RouteAi.POLITE);
