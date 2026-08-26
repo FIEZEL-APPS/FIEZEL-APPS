@@ -50,8 +50,17 @@ function auditContent(input){
     const qs=Array.isArray(r.qs)?r.qs:[];if(qs.length!==5)add('reading',id,'inventory','blocker','Reading passage must contain exactly five questions.',{questions:qs.length});
     qs.forEach((q,qi)=>{
       const qid=`${id}#${qi+1}`,stem=text(q?.[0]),opts=Array.isArray(q?.[1])?q[1]:[],answer=Number(q?.[2]),meta=q?.[3]||{},qn=norm(stem);
-      if(questionNorm.has(qn))add('reading',qid,'repetition','blocker','Exact normalized reading question duplicate.',{other:questionNorm.get(qn)}); else questionNorm.set(qn,qid);
-      if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(answer)||answer<0||answer>=4)add('reading',qid,'ambiguity','blocker','Reading question must have four unique options and one valid answer index.',{options:opts.length,answer:q?.[2]});
+      // m025-163: stem kembar LINTAS passage bukan cacat tampil-siswa (jalur bank membuang
+      // q[0] dan merender stem generik per meta.type) - turunkan jadi review; kembar di DALAM
+      // satu passage tetap blocker karena dua kartu identik benar-benar tampil.
+      if(questionNorm.has(qn)){const other=questionNorm.get(qn);const samePassage=String(other).split('#')[0]===id;add('reading',qid,'repetition',samePassage?'blocker':'review','Exact normalized reading question duplicate.',{other})} else questionNorm.set(qn,qid);
+      // m025-163: TFNS jujur memakai skala tetap 3 opsi (True/False/Not stated) dengan
+      // meta.claim + meta.fixedOptions - kontrak baru yang sah, bukan ambiguitas.
+      const isTFNS=text(meta.type)==='true_false_not_stated'&&meta.fixedOptions===true;
+      if(isTFNS){
+        const want=['true','false','not stated'];
+        if(opts.length!==3||!opts.every((o,oi)=>norm(o)===want[oi])||!Number.isInteger(answer)||answer<0||answer>=3||!text(meta.claim))add('reading',qid,'ambiguity','blocker','TFNS question must have the fixed True/False/Not stated scale, a valid answer index, and a claim.',{options:opts.length,answer:q?.[2],claim:!!text(meta.claim)});
+      } else if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(answer)||answer<0||answer>=4)add('reading',qid,'ambiguity','blocker','Reading question must have four unique options and one valid answer index.',{options:opts.length,answer:q?.[2]});
       if(text(meta.answer)&&norm(meta.answer)!==norm(opts[answer]))add('reading',qid,'evidence_mismatch','blocker','Reading metadata answer does not match the indexed answer option.',{metadata:text(meta.answer),indexed:text(opts[answer])});
       if(text(meta.evidence)&&!pNorm.includes(norm(meta.evidence)))add('reading',qid,'evidence_mismatch','blocker','Reading evidence is not grounded verbatim in the passage.',{evidence:text(meta.evidence).slice(0,180)});
       if(!text(meta.type)||!text(meta.evidence))add('reading',qid,'evidence_mismatch','blocker','Reading question requires a type and specific passage evidence.');
