@@ -121,7 +121,7 @@ test('reteach menyiapkan kartu dari soal yang gagal, bukan dari soal berikutnya'
 });
 
 test('kartu menahan alur SEBELUM soal berikutnya digambar', () => {
-  const draw = APP.match(/const draw=\(\)=>\{[\s\S]*?\n {2}q=tutorPick/);
+  const draw = APP.match(/const draw=\(\)=>\{[\s\S]*?\n {2}q=\(cfg\.placement\|\|cfg\.preserveOrder\)\?remaining\[0\]:\(tutorPick/);
   assert.ok(draw, 'awal draw() tidak terbaca');
   assert.ok(/if\(pendingCard\)\{const c=pendingCard;teach\(c\);return\}/.test(draw[0]),
     'draw() tidak menyerahkan giliran ke kartu sebelum memilih soal');
@@ -144,7 +144,7 @@ test('tawaran berhenti benar-benar menutup sesi dan menghitung soal yang barusan
 });
 
 test('tawaran berhenti hanya sekali per sesi', () => {
-  assert.ok(/if\(answer\.breathe&&!breatheOffered\)\{\s*breatheOffered=true;answer\.breathe=false;/.test(APP),
+  assert.ok(/if\(answer\.breathe&&!breatheOffered&&!cfg\.placement\)\{\s*breatheOffered=true;answer\.breathe=false;/.test(APP),
     'penjaga sekali-tawar tidak dipasang sebelum tawaran digambar');
   assert.ok(/let pendingCard=null,breatheOffered=false;/.test(APP),
     'breatheOffered tidak direset per sesi kuis');
