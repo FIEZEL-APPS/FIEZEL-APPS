@@ -1,0 +1,143 @@
+{
+  "schema": "fiezel-quota-reset-v1",
+  "pass": true,
+  "counts": {
+    "pass": 26,
+    "fail": 0
+  },
+  "resetTimezone": "Asia/Jakarta",
+  "accountBudgetTimezone": "UTC",
+  "wibOffsetMinutes": 420,
+  "checks": [
+    {
+      "name": "R1 23:59:59 WIB = 2026-08-27",
+      "status": "PASS",
+      "details": "2026-08-27"
+    },
+    {
+      "name": "R1 00:00:01 WIB = 2026-08-28 (hari BERGANTI)",
+      "status": "PASS",
+      "details": "2026-08-28"
+    },
+    {
+      "name": "R1 pergantian tepat pada 17:00:00 UTC (= 00:00 WIB), bukan sedetik sebelumnya",
+      "status": "PASS",
+      "details": "2026-08-28"
+    },
+    {
+      "name": "R1 kuota habis pada 23:59:59 WIB memang ditolak",
+      "status": "PASS",
+      "details": "ai_daily"
+    },
+    {
+      "name": "R1 pada 00:00:01 WIB semua bucket kembali nol dan permintaan lolos (reset LAZY)",
+      "status": "PASS",
+      "details": "{\"ai\":0,\"aiTranslate\":0,\"ttsCalls\":0,\"ttsChars\":0}"
+    },
+    {
+      "name": "R2 00:00 UTC (=07:00 WIB) TIDAK mengganti hari kuota murid",
+      "status": "PASS",
+      "details": "2026-08-28→2026-08-28"
+    },
+    {
+      "name": "R2 kuota murid TIDAK pulih saat 00:00 UTC (jam belajar pagi tidak diganggu reset)",
+      "status": "PASS",
+      "details": "25"
+    },
+    {
+      "name": "R3 hari ANGGARAN AKUN memang berganti di 00:00 UTC (dipaksa Cloudflare, cf-a10 §2)",
+      "status": "PASS",
+      "details": "2026-08-27→2026-08-28"
+    },
+    {
+      "name": "R3 dua jam berbeda pada waktu yang sama (bukti keduanya tidak tertukar)",
+      "status": "PASS",
+      "details": "Asia/Jakarta vs UTC"
+    },
+    {
+      "name": "R4 zona apa pun yang datang dari klien menghasilkan hari WIB yang sama",
+      "status": "PASS",
+      "details": "zones=10"
+    },
+    {
+      "name": "R4 dayKeyForQuota() tidak MENERIMA parameter zona (tidak ada tombol untuk digeser)",
+      "status": "PASS",
+      "details": "arity=1"
+    },
+    {
+      "name": "R4 hanya UTC dan Asia/Jakarta yang dikenal; sisanya jatuh ke RESET_TZ",
+      "status": "PASS",
+      "details": "2026-08-28"
+    },
+    {
+      "name": "R4 menyuntik tz ke dalam state pun tidak menambah satu pun reset",
+      "status": "PASS",
+      "details": "ai_daily"
+    },
+    {
+      "name": "R5 resetAt pada 23:59:59 WIB = 00:00:00 WIB berikutnya",
+      "status": "PASS",
+      "details": "1787850000000"
+    },
+    {
+      "name": "R5 untuk 1.440 titik waktu dalam sehari: now < resetAt ≤ now+24 jam, dan tepat di batas hari",
+      "status": "PASS",
+      "details": "1440 titik"
+    },
+    {
+      "name": "R5 snapshot mengirim resetAt + resetTimezone eksplisit (klien tidak menebak)",
+      "status": "PASS",
+      "details": "Asia/Jakarta"
+    },
+    {
+      "name": "R6 dua permintaan di hari WIB yang sama TIDAK mereset dua kali (counter bertahan)",
+      "status": "PASS",
+      "details": "1"
+    },
+    {
+      "name": "R6 rolloverIfNeeded mengembalikan state YANG SAMA bila hari belum berganti (nol tulis)",
+      "status": "PASS",
+      "details": "identity"
+    },
+    {
+      "name": "R6 rolloverIfNeeded baru membuat hari baru saat memang berganti",
+      "status": "PASS",
+      "details": "2026-08-28"
+    },
+    {
+      "name": "R6 tidak ada penjadwal/alarm di jalur reset (lazy by day-string, hemat 1 tulis/pengguna/hari)",
+      "status": "PASS",
+      "details": "no scheduler"
+    },
+    {
+      "name": "R7 400 hari berurutan: jarak antar reset TEPAT 86.400.000 ms (Indonesia tanpa DST)",
+      "status": "PASS",
+      "details": "400 hari"
+    },
+    {
+      "name": "R7 aritmetika hari sipil benar tanpa objek Date (termasuk kabisat & lintas tahun)",
+      "status": "PASS",
+      "details": "2026-01-01,2026-01-01,2025-12-31,2028-02-29,2027-01-01"
+    },
+    {
+      "name": "R8 quota-core.js tidak memanggil Date.now()/new Date sama sekali",
+      "status": "PASS",
+      "details": "no hidden clock"
+    },
+    {
+      "name": "R8 modul termuat di sandbox yang bahkan TIDAK punya Date",
+      "status": "PASS",
+      "details": "undefined"
+    },
+    {
+      "name": "R8 quota-store-d1.js juga menerima `now` sebagai parameter, bukan membaca jam",
+      "status": "PASS",
+      "details": "store pure clock"
+    },
+    {
+      "name": "quality.yml memanggil node quota-reset-test.js",
+      "status": "PASS",
+      "details": "quality.yml"
+    }
+  ]
+}
