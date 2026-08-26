@@ -3171,11 +3171,16 @@ html.fiezel-ui-v6 .launcher-shell{
    napas supaya selalu bisa digulir lepas dari bayangan gelembung.
    Z-index tidak diubah: .fz-coach-sheet dan #confidencePop tetap menang. */
 body.fz-stage-quiz .fz-coach-peek,
-body.fz-stage-sl .fz-coach-peek{display:none}
+body.fz-stage-sl .fz-coach-peek,
+body.fz-stage-map .fz-coach-peek{display:none}
 body.fz-stage-quiz .fz-coach-bubble,
-body.fz-stage-sl .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(safe-area-inset-bottom))}
+body.fz-stage-sl .fz-coach-bubble,
+body.fz-stage-map .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(safe-area-inset-bottom))}
 body.fz-stage-quiz .fz-coach-bubble .fz-coach-face,
-body.fz-stage-sl .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
+body.fz-stage-sl .fz-coach-bubble .fz-coach-face,
+body.fz-stage-map .fz-coach-bubble .fz-coach-face{width:24px;height:24px}
+/* Ruang bawah supaya kartu terakhir Peta Belajar bisa lewat di atas pita dok. */
+body.fz-stage-map .app{padding-bottom:104px}
 body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 
 /* ---------- §2 kuis: benar / salah / pijakan ----------
