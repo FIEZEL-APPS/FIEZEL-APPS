@@ -1,0 +1,294 @@
+// no-network-test.js — gerbang mutu tidak boleh bergantung pada jaringan sungguhan.
+//
+// Ia memindai SELURUH berkas `*-test.js` / `*-audit.js` di akar repo dan mencari pola
+// jaringan nyata (`fetch(`, `http.request`, `net.connect`, `tls.connect`, `new WebSocket`,
+// spawn `curl`/`wget`) DI LUAR allowlist.
+//
+// SADAR-SHADOW, DAN ITU BUKAN HIASAN. Sepuluh gerbang existing menyuntikkan `fetch` ke
+// dalam konteks `vm` — tetapi `fetch` di sana adalah MOCK LOKAL yang membaca berkas repo,
+// bukan `fetch` global Node:
+//
+//   regression-test.js:70   const fetch=async url=>{ … fs.existsSync(file) … }   ← definisi mock
+//   regression-test.js:77   const ctx={…,fetch,…}                                ← memakai mock itu
+//
+// Klaim cf-a9 (temuan #5 / R3) bahwa `regression-test.js:77` membocorkan `fetch` asli
+// **SALAH**, dan sudah dikoreksi oleh reports/cf-b7-testing-strategy.md §5.0 lalu
+// dikuatkan reports/cf-c1-konsistensi.md. Karena itu baris 77 TIDAK boleh "diperbaiki":
+// gerbang ini yang harus cukup pintar untuk mengenalinya aman. Pemindai naif yang
+// menghukum 10 berkas itu akan merah pada hari pertama, lalu dimatikan orang — dan gerbang
+// yang dimatikan tidak melindungi apa pun.
+//
+// Sepuluh berkas dengan pola mock-lokal yang sah (semua terverifikasi oleh gerbang ini
+// sendiri, bukan didaftar putih): regression-test.js, ai-integration-test.js,
+// lesson-experience-test.js, notification-reminder-test.js, grammar-quality-audit.js,
+// adaptive-policy-test.js, content-audit.js, learner-evidence-test.js,
+// alrs-behavior-test.js, policy-outcome-test.js.
+//
+// Nol dependency, nol jaringan, nol berkas temporer.
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const root = __dirname;
+
+// ---------------------------------------------------------------------------------------
+// Allowlist berkomentar. DUA berkas, bukan satu (koreksi cf-b7 §5.0 atas cf-a9):
+//   http-smoke-test.js        - menyalakan server loopback untuk memeriksa aset HTTP nyata
+//   e2e-level-grammar-test.js - :12 require('http'), :37 server.listen(0,'127.0.0.1'),
+//                               :82 WebSocket ke CDP Chromium lokal
+// Keduanya loopback tanpa DNS eksternal, dan gerbang ini MEMBUKTIKAN sifat loopback itu
+// (bukan mempercayainya). Menambah nama ke daftar ini adalah keputusan arsitektur, jadi
+// jumlahnya ikut di-assert.
+const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js']);
+
+const checks = [];
+const notes = [];
+let failed = false;
+const check = (name, ok, details) => {
+  checks.push({ name, status: ok ? 'PASS' : 'FAIL', details: String(details) });
+  if (!ok) failed = true;
+};
+
+// Buang komentar SEBELUM memindai — pola yang sudah dipakai audio-asset-pipeline-test.js:290-292
+// — supaya penjelasan panjang seperti header berkas ini tidak ikut dihukum.
+const stripComments = src => src
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')
+  .replace(/(^|[^:\\])\/\/[^\n]*/g, '$1 ');
+
+/* =======================================================================================
+ * Detektor sadar-shadow (satu fungsi, dipakai untuk repo NYATA dan untuk fixture sintetis)
+ * ===================================================================================== */
+const RE = {
+  socketRequire: /require\(\s*['"](?:node:)?(https?|net|tls|dgram|dns)['"]\s*\)/g,
+  socketCall: /\b(?:https?|net|tls|dns)\s*\.\s*(?:request|get|connect|createConnection|lookup|resolve\w*)\s*\(/g,
+  webSocket: /\bnew\s+WebSocket\s*\(/g,
+  // fetch( ke URL literal non-loopback = panggilan jaringan nyata, apa pun shadow-nya.
+  literalRemoteFetch: /\bfetch\(\s*['"`]https?:\/\/(?!127\.0\.0\.1|localhost|\[?::1\]?|0\.0\.0\.0)/g,
+  netTool: /['"](?:\/usr\/bin\/)?(?:curl|wget|nc|ncat|ssh|scp|telnet)['"]/g,
+  // Definisi mock lokal: `const fetch=…`, `function fetch(…)`, atau properti `fetch(url){…}`
+  fetchDefinition: /(?:const|let|var)\s+fetch\s*=|(?:async\s+)?function\s+fetch\s*\(|globalThis\.fetch\s*=/g,
+  // Penyuntikan ke konteks vm dalam bentuk shorthand `{…, fetch, …}` atau `fetch: X`
+  vmInjectionShorthand: /[{,]\s*fetch\s*(?=[,}])/g,
+  vmInjectionExplicit: /\bfetch\s*:\s*/g,
+  vmUsage: /\bvm\s*\.\s*(?:createContext|runInContext|runInNewContext|runInThisContext|Script)\b/,
+  // Mock yang MENERUSKAN ke fetch asli bukan mock — itu kebocoran berkedok.
+  delegatesToReal: /(?:globalThis|global)\s*\.\s*fetch\s*(?:\.\s*(?:call|apply|bind)\s*)?\(/
+};
+
+function matchesWithIndex(code, regex) {
+  const out = [];
+  const re = new RegExp(regex.source, regex.flags.includes('g') ? regex.flags : regex.flags + 'g');
+  let m;
+  while ((m = re.exec(code)) !== null) { out.push({ text: m[0], index: m.index, groups: m.slice(1) }); if (m.index === re.lastIndex) re.lastIndex += 1; }
+  return out;
+}
+const lineOf = (code, index) => code.slice(0, index).split('\n').length;
+
+function analyzeSource(file, rawCode, { allowSocket = false } = {}) {
+  const code = stripComments(rawCode);
+  const findings = [];
+  const add = (kind, index, detail) => findings.push({ kind, file, line: lineOf(code, index), detail });
+
+  for (const hit of matchesWithIndex(code, RE.socketRequire)) if (!allowSocket) add('socketRequire', hit.index, hit.text);
+  for (const hit of matchesWithIndex(code, RE.socketCall)) if (!allowSocket) add('socketCall', hit.index, hit.text);
+  for (const hit of matchesWithIndex(code, RE.webSocket)) if (!allowSocket) add('webSocket', hit.index, hit.text);
+  for (const hit of matchesWithIndex(code, RE.literalRemoteFetch)) if (!allowSocket) add('literalRemoteFetch', hit.index, hit.text);
+  for (const hit of matchesWithIndex(code, RE.netTool)) if (!allowSocket) add('netTool', hit.index, hit.text);
+
+  // ---- inti sadar-shadow -------------------------------------------------------------
+  // Sebuah penyuntikan `fetch` ke konteks vm hanya kebocoran kalau TIDAK ada definisi mock
+  // lokal yang mendahuluinya secara posisi. Urutan itu penting: definisi SESUDAH pemakaian
+  // (mis. `var fetch` yang di-hoist tapi baru diisi belakangan) tidak boleh dianggap aman
+  // secara membabi buta, jadi yang dibandingkan adalah indeks karakternya.
+  const definitions = matchesWithIndex(code, RE.fetchDefinition);
+  const usesVm = RE.vmUsage.test(code);
+  const injections = [
+    ...matchesWithIndex(code, RE.vmInjectionShorthand).map(h => ({ index: h.index, form: 'shorthand', rhs: 'fetch' })),
+    ...matchesWithIndex(code, RE.vmInjectionExplicit).map(h => ({
+      index: h.index,
+      form: 'explicit',
+      rhs: code.slice(h.index + h.text.length, h.index + h.text.length + 60).trim()
+    }))
+  ].sort((a, b) => a.index - b.index);
+
+  for (const injection of injections) {
+    const rhs = injection.rhs;
+    // (a) Nilai INLINE (`fetch: async url => …`, `fetch: function(){…}`, `fetch: () => …`)
+    //     mustahil menjadi fetch global: ia fungsi baru yang ditulis di tempat.
+    //     Sebelas gerbang existing memakai bentuk ini (runtime-stage8-test.js:7,
+    //     puter-auth-coop-test.js:24, backup-ui-test.js:37 lewat pengenal, dst).
+    if (injection.form === 'explicit' && /^(?:async\s*)?(?:function\b|\(|[A-Za-z_$][\w$]*\s*=>)/.test(rhs)) continue;
+    // (b) `fetch: globalThis.fetch` = kebocoran tanpa perlu diskusi.
+    if (/^(?:globalThis|global)\s*\.\s*fetch\b/.test(rhs)) { add('vmFetchLeak', injection.index, 'menyuntik ' + rhs.slice(0, 24)); continue; }
+    // (c) `fetch: namaLain` aman kalau `namaLain` didefinisikan lokal SEBELUM titik ini
+    //     (pola `fetchMock` di observability-privacy-test.js:67-69).
+    if (injection.form === 'explicit') {
+      const identifier = (rhs.match(/^([A-Za-z_$][\w$]*)/) || [])[1];
+      if (identifier && identifier !== 'fetch') {
+        const declaration = new RegExp(`(?:const|let|var)\\s+${identifier}\\s*=|function\\s+${identifier}\\s*\\(`);
+        const found = code.search(declaration);
+        if (found >= 0 && found < injection.index) continue;
+        add('vmFetchLeak', injection.index, 'menyuntik `' + identifier + '` yang tidak didefinisikan lokal lebih dulu');
+        continue;
+      }
+    }
+    // (d) `{…, fetch, …}` atau `fetch: fetch` — butuh mock lokal bernama `fetch` yang
+    //     mendahului secara POSISI (pola regression-test.js:70 → :77).
+    const shadowedBefore = definitions.some(d => d.index < injection.index);
+    if (!shadowedBefore && usesVm) add('vmFetchLeak', injection.index, 'menyuntik `fetch` tanpa mock lokal yang mendahului');
+    if (!shadowedBefore && !usesVm) add('bareFetchAlias', injection.index, 'meneruskan `fetch` global sebagai nilai');
+  }
+  // Mock yang meneruskan ke fetch asli = kebocoran berkedok mock.
+  if (definitions.length && RE.delegatesToReal.test(code)) {
+    add('mockDelegatesToReal', code.search(RE.delegatesToReal), 'mock fetch meneruskan panggilan ke fetch global');
+  }
+
+  return {
+    findings,
+    hasLocalFetchMock: definitions.length > 0,
+    injects: injections.length > 0,
+    usesVm,
+    loopbackProven: /127\.0\.0\.1|localhost|::1/.test(code)
+  };
+}
+
+/* =======================================================================================
+ * 1. Anti-vakum: buktikan detektornya hidup SEBELUM dipercaya atas repo
+ * ===================================================================================== */
+// Gerbang yang hijau karena pemindainya mati adalah kebohongan yang paling mahal. Empat
+// fixture sintetis di bawah menguji kedua arah sekaligus: yang aman harus lolos, yang
+// bocor harus tertangkap.
+const FIXTURES = {
+  bocorTanpaMock: `const vm=require('vm');const ctx={console,fetch};vm.createContext(ctx);`,
+  amanDenganMockLokal: `const vm=require('vm');
+    const fetch=async url=>{const f=path.join(root,String(url));return fs.existsSync(f)?{ok:true,status:200}:{ok:false,status:404};};
+    const ctx={console,fetch};vm.createContext(ctx);`,
+  bocorMockMeneruskan: `const realFetch=globalThis.fetch;
+    const fetch=async url=>globalThis.fetch(url);
+    const vm=require('vm');const ctx={fetch};vm.createContext(ctx);`,
+  bocorUrlLiteral: `(async()=>{const r=await fetch('https://fiezel.my.id/manifest.json');})();`,
+  amanUrlLoopback: `(async()=>{const r=await fetch('http://127.0.0.1:8080/manifest.json');})();`,
+  bocorHttpRequest: `const h=require('https');h.request({hostname:'example.com'});`,
+  amanMockInline: `const vm=require('vm');
+    const ctx={console,fetch:async url=>({ok:true,json:async()=>({})})};vm.createContext(ctx);`,
+  amanMockBernamaLain: `const vm=require('vm');
+    const fetchMock = async u => ({ ok: true, json: async () => ({}) });
+    const ctx={console,fetch:fetchMock};vm.createContext(ctx);`,
+  bocorPengenalTakDikenal: `const vm=require('vm');const ctx={console,fetch:fetchDariMana};vm.createContext(ctx);`,
+  bocorEksplisitGlobal: `const vm=require('vm');const ctx={console,fetch:globalThis.fetch};vm.createContext(ctx);`,
+  amanKomentarSaja: `// dulu kami memakai fetch('https://example.com/x') lalu menghapusnya
+    /* net.connect(80,'example.com') hanya dikutip di komentar */
+    const kosong=1;`
+};
+const kinds = source => analyzeSource('fixture', source).findings.map(f => f.kind).sort().join(',');
+check('Detektor menangkap penyuntikan `fetch` tanpa mock lokal', kinds(FIXTURES.bocorTanpaMock).includes('vmFetchLeak'), kinds(FIXTURES.bocorTanpaMock) || '(kosong)');
+check('Detektor MEMBEBASKAN mock lokal yang mendahului (pola regression-test.js:70-77)', kinds(FIXTURES.amanDenganMockLokal) === '', kinds(FIXTURES.amanDenganMockLokal) || '(kosong)');
+check('Detektor menangkap mock yang meneruskan ke fetch global (kebocoran berkedok)', kinds(FIXTURES.bocorMockMeneruskan).includes('mockDelegatesToReal'), kinds(FIXTURES.bocorMockMeneruskan) || '(kosong)');
+check('Detektor menangkap fetch( ke URL literal non-loopback', kinds(FIXTURES.bocorUrlLiteral) === 'literalRemoteFetch', kinds(FIXTURES.bocorUrlLiteral) || '(kosong)');
+check('Detektor MEMBEBASKAN fetch( ke loopback', kinds(FIXTURES.amanUrlLoopback) === '', kinds(FIXTURES.amanUrlLoopback) || '(kosong)');
+check('Detektor menangkap require(https)+request', kinds(FIXTURES.bocorHttpRequest).split(',').includes('socketRequire'), kinds(FIXTURES.bocorHttpRequest) || '(kosong)');
+check('Detektor tidak menghukum komentar', kinds(FIXTURES.amanKomentarSaja) === '', kinds(FIXTURES.amanKomentarSaja) || '(kosong)');
+check('Detektor MEMBEBASKAN mock inline `fetch: async url => …` (pola runtime-stage8-test.js:7)', kinds(FIXTURES.amanMockInline) === '', kinds(FIXTURES.amanMockInline) || '(kosong)');
+check('Detektor MEMBEBASKAN mock bernama lain yang didefinisikan lebih dulu (pola observability-privacy-test.js:67)', kinds(FIXTURES.amanMockBernamaLain) === '', kinds(FIXTURES.amanMockBernamaLain) || '(kosong)');
+check('Detektor menangkap pengenal yang tidak didefinisikan lokal', kinds(FIXTURES.bocorPengenalTakDikenal).includes('vmFetchLeak'), kinds(FIXTURES.bocorPengenalTakDikenal) || '(kosong)');
+// Nama assert ini sengaja TIDAK menuliskan pola `fetch<titik dua>globalThis.fetch` apa
+// adanya: berkas ini memindai dirinya sendiri, jadi label yang memuat polanya akan
+// menghukum dirinya sendiri. Fixture-nya yang memuat pola itu, bukan labelnya.
+check('Detektor menangkap penyuntikan eksplisit dari globalThis', kinds(FIXTURES.bocorEksplisitGlobal).includes('vmFetchLeak'), kinds(FIXTURES.bocorEksplisitGlobal) || '(kosong)');
+
+/* =======================================================================================
+ * 2. Pemindaian repo yang sesungguhnya
+ * ===================================================================================== */
+const SELF = path.basename(__filename);
+const files = fs.readdirSync(root).filter(f => /-(test|audit)\.js$/.test(f)).sort();
+check('Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)', files.length >= 100, `files=${files.length}`);
+
+// Berkas ini SENDIRI memuat contoh pelanggaran di dalam FIXTURES — itu memang tugasnya.
+// Alih-alih memberi dirinya pengecualian buta, ia memindai dirinya sendiri dengan blok
+// FIXTURES dipotong lebih dulu: kalau suatu hari ada `fetch(` nyata di luar fixture,
+// gerbang ini menghukum dirinya sendiri.
+const selfSource = fs.readFileSync(__filename, 'utf8');
+const fixturesStart = selfSource.indexOf('const FIXTURES = {');
+const fixturesEnd = selfSource.indexOf('\n};', fixturesStart);
+check('Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri', fixturesStart > 0 && fixturesEnd > fixturesStart, `start=${fixturesStart} end=${fixturesEnd}`);
+const selfWithoutFixtures = fixturesStart > 0 && fixturesEnd > fixturesStart
+  ? selfSource.slice(0, fixturesStart) + selfSource.slice(fixturesEnd)
+  : selfSource;
+const selfFindings = analyzeSource(SELF, selfWithoutFixtures).findings;
+check('Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya', selfFindings.length === 0,
+  selfFindings.map(f => `${f.kind}@${f.line}`).join(', ') || '0');
+
+const offenders = [];
+const shadowSafe = [];
+const allowlistProblems = [];
+for (const file of files) {
+  if (file === SELF) continue; // sudah diperiksa di atas, dengan fixture dipotong
+  const allowSocket = SOCKET_ALLOWLIST.has(file);
+  const raw = fs.readFileSync(path.join(root, file), 'utf8');
+  const result = analyzeSource(file, raw, { allowSocket });
+  offenders.push(...result.findings);
+  if (result.injects && result.hasLocalFetchMock && result.findings.length === 0) shadowSafe.push(file);
+  if (allowSocket && !result.loopbackProven) allowlistProblems.push(file + ' tidak membuktikan loopback');
+  if (allowSocket && !/require\(\s*['"](?:node:)?(?:https?|net|tls)['"]\s*\)/.test(stripComments(raw))) {
+    allowlistProblems.push(file + ' ada di allowlist tetapi tidak lagi butuh socket — keluarkan dari daftar');
+  }
+}
+const byKind = kind => offenders.filter(o => o.kind === kind).map(o => `${o.file}:${o.line} ${o.detail}`);
+
+check('Tak ada gerbang non-allowlist yang me-require socket', byKind('socketRequire').length === 0, byKind('socketRequire').join(' | ') || '0');
+check('Tak ada gerbang non-allowlist yang memanggil http.request/net.connect/tls.connect', byKind('socketCall').length === 0, byKind('socketCall').join(' | ') || '0');
+check('Tak ada gerbang non-allowlist yang membuka WebSocket', byKind('webSocket').length === 0, byKind('webSocket').join(' | ') || '0');
+check('Tak ada fetch( ke URL literal non-loopback', byKind('literalRemoteFetch').length === 0, byKind('literalRemoteFetch').join(' | ') || '0');
+check('Tak ada gerbang yang men-spawn alat jaringan (curl/wget/nc/ssh)', byKind('netTool').length === 0, byKind('netTool').join(' | ') || '0');
+check('Tak ada `fetch` global asli yang disuntikkan ke konteks vm', byKind('vmFetchLeak').length === 0, byKind('vmFetchLeak').join(' | ') || '0');
+check('Tak ada mock `fetch` yang meneruskan ke fetch global', byKind('mockDelegatesToReal').length === 0, byKind('mockDelegatesToReal').join(' | ') || '0');
+check('Tak ada gerbang yang meneruskan `fetch` global sebagai nilai di luar vm', byKind('bareFetchAlias').length === 0, byKind('bareFetchAlias').join(' | ') || '0');
+
+// Pola mock-lokal harus tetap TERPAKAI, bukan hanya diizinkan. Kalau angka ini jatuh ke 0,
+// artinya seseorang mengganti mock repo-file dengan sesuatu yang lain dan gerbang ini
+// kehilangan alasan hidupnya — jadi ia harus bicara, bukan diam.
+check('Pola mock-lokal masih dipakai gerbang existing (≥8 berkas, koreksi cf-b7 §5.0)',
+  shadowSafe.length >= 8, `${shadowSafe.length} berkas: ${shadowSafe.join(', ')}`);
+check('Setiap berkas allowlist benar-benar loopback dan masih benar-benar butuh socket',
+  allowlistProblems.length === 0, allowlistProblems.join(' | ') || '0');
+check('Allowlist tetap dua nama dan keduanya ada di repo',
+  SOCKET_ALLOWLIST.size === 2 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
+  [...SOCKET_ALLOWLIST].join(', '));
+
+/* =======================================================================================
+ * 3. Gerbang ini terdaftar di CI
+ * ===================================================================================== */
+const workflow = fs.readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8');
+check('Gerbang ini terdaftar di quality.yml', workflow.includes('node no-network-test.js'), 'quality.yml');
+
+// CATATAN JUJUR, bukan assert: lapis 1 (berkas ini) hanya membaca TEKS. Panggilan jaringan
+// yang dibangun secara dinamis lolos darinya. Penahan sesungguhnya adalah lapis 3 —
+// `tools/no-net-preload.js` dipasang lewat `NODE_OPTIONS: --require` pada step Core
+// validation (cf-b7 §5.3). Berkas preload itu BELUM dibuat pada paket kerja ini dan
+// memasangnya mengubah perilaku 101 gerbang sekaligus, jadi ia tidak boleh diselundupkan
+// ke sini. Statusnya dilaporkan apa adanya supaya tidak ada yang menyangka lapis 3 aktif.
+const layer3Installed = fs.existsSync(path.join(root, 'tools/no-net-preload.js'))
+  && /NODE_OPTIONS:\s*--require\s+\.\/tools\/no-net-preload\.js/.test(workflow);
+notes.push(layer3Installed
+  ? 'Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) AKTIF.'
+  : 'Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3.');
+
+/* ===================================================================================== */
+const report = {
+  schema: 'fiezel-no-network-v1',
+  pass: !failed,
+  scanned: files.length,
+  allowlist: [...SOCKET_ALLOWLIST],
+  shadowSafeGates: shadowSafe,
+  layer3Installed,
+  notes,
+  counts: { pass: checks.filter(c => c.status === 'PASS').length, fail: checks.filter(c => c.status === 'FAIL').length },
+  checks
+};
+fs.writeFileSync(path.join(root, 'NO-NETWORK-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+console.log(JSON.stringify(report, null, 2));
+console.log(failed
+  ? `FIEZEL no-network gate: FAIL (${report.counts.fail} dari ${report.counts.pass + report.counts.fail})`
+  : `FIEZEL no-network gate: PASS (${report.counts.pass} assert, ${files.length} gerbang dipindai)`);
+if (failed) process.exitCode = 1;
