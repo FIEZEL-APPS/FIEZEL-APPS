@@ -79,6 +79,45 @@ const MASTERY_THRESHOLD=80;
 // dikerjakan, bukan sekadar dibuka.
 const GRAMMAR_UNLOCK_MASTERY=60;
 const GRAMMAR_SESSION_SIZE=25;
+/* ---- m028-06 LEVEL GUARD & UJIAN SKIP LEVEL (kontrak owner F4) ------------------------
+ *
+ * OWNER: level yang belum dibuktikan boleh dijajal, tetapi tidak boleh dibiarkan diam-diam.
+ * Sepuluh kesalahan di level yang lebih tinggi dari level TERVERIFIKASI menurunkan murid ke
+ * level terverifikasinya dan mengunci semua level di atasnya sampai ia lulus Ujian Skip
+ * Level. Angka-angka di bawah ini adalah satu-satunya sumber angka yang muncul di teks UI -
+ * copy-fitur-baru.md menyesuaikan diri ke sini, bukan sebaliknya (§6 klaim jujur).
+ *
+ * Riset (reports/riset-duolingo.md): TIDAK berhenti di kegagalan pertama seperti Duolingo -
+ * pakai desain owner (guard 10 salah + demosi), tetapi dengan framing pembimbing, soal acak
+ * dari bank besar tiap percobaan, dan cooldown 1 hari setelah gagal supaya tidak bisa
+ * di-brute-force. */
+const LEVEL_GUARD_WRONG_LIMIT=10;
+const LEVEL_GUARD_WARN_STEPS=[5,8];
+const LEVEL_EXAM_PASS=80;
+const LEVEL_EXAM_SIZE=25;
+const LEVEL_EXAM_BLUEPRINT={grammar:10,vocab:8,reading:7};
+const LEVEL_EXAM_COOLDOWN_MS=86400000;
+/* Teks verbatim dari reports/copy-fitur-baru.md §3 dan §4. Satu-satunya penyesuaian:
+   ambang lulus ditulis 80% (bukan 90%) karena kontrak owner mengikat LEVEL_EXAM_PASS=80,
+   dan catatan implementasi §Catatan menyuruh teks menyesuaikan angka kode. */
+const LEVEL_GUARD_COPY={
+  probationTitle:'Level ini belum terverifikasi buat kamu',
+  probationBody:'Kamu bebas menjajalnya \u2014 PAW ikut menemani, kok. Kalau nanti terasa berat, itu bukan kegagalan; artinya cuma ada fondasi yang perlu dikuatin dulu. Atau, kalau kamu yakin udah siap, buktikan lewat Ujian Skip Level dan level ini langsung terverifikasi.',
+  probationTry:'Coba dulu',
+  probationExam:'Ikut Ujian Skip Level',
+  warn5:'Udah 5 yang meleset, dan itu nggak apa-apa \u2014 salah itu bagian dari belajar. Coba pelan-pelan: baca soalnya dua kali, atau pakai petunjuk kalau butuh. PAW nungguin, nggak ke mana-mana.',
+  warn8:'Level ini kayaknya masih lumayan berat buat sekarang, dan itu wajar banget. Saran PAW: mampir sebentar ke materi dasarnya, biar pas balik ke sini rasanya lebih enteng. Kalau meleset 2 kali lagi, kita turun bareng dulu buat nguatin fondasi, ya.',
+  demotionTitle:'Kita mundur selangkah dulu, ya',
+  demotionBody:'Sepuluh jawaban meleset di level ini \u2014 bukan karena kamu nggak mampu, tapi karena fondasinya belum kebentuk penuh, dan maksa lanjut cuma bikin capek. Makanya PAW ajak kamu balik ke A1 dulu, nguatin dasarnya bareng-bareng; fitur level atas dikunci sementara biar fokusmu nggak pecah. Kalau kamu merasa udah siap lebih cepat, jalannya ada: lulus Ujian Skip Level, dan pintunya kebuka lagi.',
+  demotionStart:'Mulai dari A1',
+  lockedFeature:'Fitur ini dikunci sementara kamu nguatin fondasi di A1. Selesaikan materinya pelan-pelan, atau buka lebih cepat lewat Ujian Skip Level.',
+  examTitle:'Ujian Skip Level',
+  examDesc:'Ujian singkat berisi soal campuran \u2014 grammar, kosakata, dan bacaan \u2014 dari level yang mau kamu lompati. Jawab benar minimal 80% tanpa petunjuk, dan level itu langsung terverifikasi buat kamu.',
+  examStart:'Mulai ujian',
+  examPass:'Lulus! Level ini sekarang terverifikasi buat kamu \u2014 PAW sampai lompat-lompat. Fondasimu terbukti kuat; semua fitur di level ini kebuka, lanjut!',
+  examFail:'Belum lulus kali ini, dan itu nggak apa-apa \u2014 ujiannya memang dibikin jujur, bukan dibikin gampang. Istirahat dulu, kuatin bagian yang tadi terasa berat, dan kamu boleh coba lagi besok.',
+  examBadge:'Terverifikasi'
+};
 const SUNRISE_MINUTE=6*60;
 const SUNSET_MINUTE=18*60;
 const SCENE_STOPS=[
@@ -715,7 +754,7 @@ function pruneCorruptedReviewEntries(entries){
     return !CORRUPTED_REVIEW_SIGNATURE.test(`${entry.question||''} ${entry.correct||''} ${entry.selectedAnswer||''}`);
   });
 }
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
 let stateReady=false;
 // m025-140: bank konten dideklarasikan SEBELUM loadState(). sanitizeState() sekarang menghitung
 // readiness per level, dan jalur itu memanggil contentLevelFor() yang membaca V/R/GRAMMAR_ITEMS.
@@ -766,6 +805,129 @@ function lessonUnlockState(skill,sourceState=state){
   return{skill:key,locked:missing.length>0,threshold,missing,reason:missing.length?'prerequisite_not_mastered':'prerequisite_mastered'}
 }
 function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unlock.missing.map(x=>friendlySkillName(x.skill)).join(', ');return `Selesaikan dulu ${names} sampai mastery ${unlock.threshold}%.`}
+/* ---- m028-06 LEVEL TRUST: bukti per level, bukan klaim ---------------------------------
+ *
+ * Semua fungsi di blok ini MURNI terhadap state yang dikirimkan (pola lessonUnlockState dan
+ * diagnosticEvidenceReady): tidak menyentuh DOM, tidak menyimpan, tidak memanggil render.
+ * Itu yang membuat panel level, record(), finishQuiz(), dan gerbang test memakai jawaban
+ * yang SAMA - dan yang membuat gerbang level-guard-test.js bisa menjalankannya di vm.
+ *
+ * KOMPATIBILITAS (kontrak owner 4): state lama tanpa `levelTrust` harus DEFAULT-ALLOW.
+ * levelTrustState() selalu memulangkan bentuk lengkap, verified='A1', locked=false - jadi
+ * fixture kontrak A1->B1 (level-grammar-contract-test.js) tetap lulus: guard menghitung,
+ * bukan memblokir pindah level. Yang diblokir hanya level yang TERKUNCI akibat demosi. */
+function defaultLevelTrust(){return{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null}}
+function sanitizeLevelTrust(raw){
+  const base=defaultLevelTrust(),src=raw&&typeof raw==='object'?raw:{};
+  const verified=LEVELS.includes(String(src.verified||''))?String(src.verified):'A1';
+  const clamp=(value,cap=Number.MAX_SAFE_INTEGER)=>Math.max(0,Math.min(cap,Math.floor(Number(value)||0)));
+  const probation=src.probation&&typeof src.probation==='object'?src.probation:{};
+  const rawMistakes=probation.mistakesByLevel&&typeof probation.mistakesByLevel==='object'?probation.mistakesByLevel:{};
+  const mistakesByLevel={};
+  for(const key of Object.keys(rawMistakes)){if(!LEVELS.includes(String(key)))continue;const n=clamp(rawMistakes[key],9999);if(n)mistakesByLevel[String(key)]=n}
+  const rawExams=src.exams&&typeof src.exams==='object'&&!Array.isArray(src.exams)?src.exams:{};
+  const exams={};
+  for(const key of Object.keys(rawExams)){
+    if(!LEVELS.includes(String(key)))continue;
+    const e=rawExams[key]&&typeof rawExams[key]==='object'?rawExams[key]:{};
+    exams[String(key)]={attempts:clamp(e.attempts,999),passed:!!e.passed,lastAt:clamp(e.lastAt),lastScore:clamp(e.lastScore,999),lastTotal:clamp(e.lastTotal,999),lastAccuracy:clamp(e.lastAccuracy,100),cooldownUntil:clamp(e.cooldownUntil),weakSkill:String(e.weakSkill||'').slice(0,80)};
+  }
+  const demotions=(Array.isArray(src.demotions)?src.demotions:[]).filter(x=>x&&typeof x==='object').map(x=>({from:LEVELS.includes(String(x.from||''))?String(x.from):'',to:LEVELS.includes(String(x.to||''))?String(x.to):'',at:clamp(x.at),mistakes:clamp(x.mistakes,9999)})).filter(x=>x.from).slice(-10);
+  const notice=src.pendingNotice&&typeof src.pendingNotice==='object'&&LEVELS.includes(String(src.pendingNotice.from||''))?{from:String(src.pendingNotice.from),to:LEVELS.includes(String(src.pendingNotice.to||''))?String(src.pendingNotice.to):'A1',at:clamp(src.pendingNotice.at)}:null;
+  return{...base,verified,locked:!!src.locked,probation:{level:LEVELS.includes(String(probation.level||''))?String(probation.level):'',mistakesByLevel,startedAt:clamp(probation.startedAt),lastMistakeAt:clamp(probation.lastMistakeAt)},exams,demotions,pendingNotice:notice};
+}
+function levelTrustState(s=state){return sanitizeLevelTrust(s?.levelTrust)}
+function verifiedLevel(s=state){const value=String(levelTrustState(s).verified||'A1');return LEVELS.includes(value)?value:'A1'}
+function levelTrustGap(level,s=state){const i=LEVELS.indexOf(String(level||''));return i<0?0:i-LEVELS.indexOf(verifiedLevel(s))}
+function nextVerifiableLevel(s=state){const i=LEVELS.indexOf(verifiedLevel(s));return LEVELS[i+1]||''}
+function probationMistakes(level,s=state){return Math.max(0,Number(levelTrustState(s).probation.mistakesByLevel?.[String(level||'')])||0)}
+function probationActive(s=state){return levelTrustGap(getActiveLevel(s),s)>0}
+/* Kunci hanya berlaku untuk level DI ATAS level terverifikasi, dan hanya setelah demosi.
+   A1 dan level yang sudah terbukti tidak pernah bisa terkunci - kalau tidak, murid bisa
+   terjebak tanpa satu pun pintu yang boleh dibuka. */
+function isLevelLocked(s=state,level=''){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return false;
+  const trust=levelTrustState(s);
+  if(!trust.locked)return false;
+  if(target===trust.verified)return false;
+  return LEVELS.indexOf(target)>LEVELS.indexOf(verifiedLevel(s));
+}
+/* Vonis guard dihitung di SATU tempat: kesalahan kumulatif di level percobaan versus
+   LEVEL_GUARD_WRONG_LIMIT. Level terverifikasi (dan A1) adalah pelabuhan aman - salah
+   sebanyak apa pun di sana tidak pernah menurunkan siapa pun. */
+function levelGuardEvaluate(s=state){
+  const active=getActiveLevel(s),verified=verifiedLevel(s),mistakes=probationMistakes(active,s);
+  if(levelTrustGap(active,s)<=0)return{action:'none',from:active,to:active,mistakes,limit:LEVEL_GUARD_WRONG_LIMIT,reason:'verified_or_below'};
+  if(mistakes<LEVEL_GUARD_WRONG_LIMIT)return{action:'none',from:active,to:verified,mistakes,limit:LEVEL_GUARD_WRONG_LIMIT,reason:'probation_within_limit'};
+  return{action:'demote',from:active,to:verified,mistakes,limit:LEVEL_GUARD_WRONG_LIMIT,reason:'probation_limit_reached'};
+}
+/* Demosi TIDAK menghapus satu pun bukti belajar (vocab/grammar/reading/history/total*).
+   Hitungan salah per level pun dibiarkan sebagai jejak; ia hanya dinolkan ketika level itu
+   benar-benar dibuktikan lewat ujian. */
+function applyLevelDemotion(s=state){
+  const verdict=levelGuardEvaluate(s);
+  if(verdict.action!=='demote')return null;
+  const trust=levelTrustState(s),now=Date.now();
+  trust.locked=true;
+  trust.probation.level=verdict.from;
+  trust.demotions=[...trust.demotions,{from:verdict.from,to:verdict.to,at:now,mistakes:verdict.mistakes}].slice(-10);
+  trust.pendingNotice={from:verdict.from,to:verdict.to,at:now};
+  s.levelTrust=trust;
+  s.consecutiveWrong=0;
+  s.preferences={...(s.preferences||{}),activeLevel:verdict.to,levelMode:'manual'};
+  return verdict;
+}
+/* Ujian berantai: hanya level tepat SATU tangga di atas verified yang boleh diuji. */
+function levelExamUnlockable(level,s=state){const target=String(level||'').toUpperCase();return LEVELS.includes(target)&&target===nextVerifiableLevel(s)}
+function levelExamCooldownRemaining(level,s=state,now=Date.now()){const entry=levelTrustState(s).exams[String(level||'').toUpperCase()]||{};return Math.max(0,Math.floor(Number(entry.cooldownUntil||0))-now)}
+function levelExamAvailability(level,s=state,now=Date.now()){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return{ok:false,reason:'unknown_level',waitMs:0};
+  if(!levelExamUnlockable(target,s))return{ok:false,reason:'not_next',waitMs:0,next:nextVerifiableLevel(s)};
+  const waitMs=levelExamCooldownRemaining(target,s,now);
+  return waitMs>0?{ok:false,reason:'cooldown',waitMs}:{ok:true,reason:'ready',waitMs:0};
+}
+/* Lulus ujian = satu tangga naik, kunci dibuka, hitungan salah level itu dinolkan. */
+function recordSkipExamPass(s=state,level='',detail={}){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return false;
+  const trust=levelTrustState(s),now=Date.now();
+  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)+1)return false;
+  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified))trust.verified=target;
+  const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
+  trust.probation.mistakesByLevel=mistakes;
+  const previous=trust.exams[target]||{attempts:0};
+  trust.exams[target]={...previous,attempts:Math.max(1,Math.floor(Number(previous.attempts||0))+(detail.countAttempt===false?0:1)),passed:true,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:0,weakSkill:''};
+  trust.locked=false;
+  trust.pendingNotice=null;
+  s.levelTrust=trust;
+  s.preferences={...(s.preferences||{}),activeLevel:trust.verified,levelMode:'manual'};
+  return true;
+}
+/* Gagal ujian tidak menghukum progres: hanya jeda 24 jam untuk level itu (anti brute-force,
+   rekomendasi 8 riset Duolingo) plus catatan bagian yang menjatuhkan. */
+function recordSkipExamFail(s=state,level='',detail={}){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return false;
+  const trust=levelTrustState(s),now=Date.now(),previous=trust.exams[target]||{attempts:0};
+  trust.exams[target]={...previous,attempts:Math.floor(Number(previous.attempts||0))+1,passed:false,lastAt:now,lastScore:Math.max(0,Math.floor(Number(detail.score||0))),lastTotal:Math.max(0,Math.floor(Number(detail.total||0))),lastAccuracy:Math.max(0,Math.min(100,Math.floor(Number(detail.accuracy||0)))),cooldownUntil:now+LEVEL_EXAM_COOLDOWN_MS,weakSkill:String(detail.weakSkill||'').slice(0,80)};
+  s.levelTrust=trust;
+  return true;
+}
+/* Placement 25 soal adalah BUKTI (kontrak owner 3): level hasil tes langsung terverifikasi. */
+function levelTrustAdoptPlacement(level,s=state){
+  const target=String(level||'').toUpperCase();
+  if(!LEVELS.includes(target))return false;
+  const trust=levelTrustState(s);
+  if(LEVELS.indexOf(target)>LEVELS.indexOf(trust.verified)){trust.verified=target;trust.locked=false;trust.pendingNotice=null}
+  const mistakes={...trust.probation.mistakesByLevel};delete mistakes[target];
+  trust.probation.mistakesByLevel=mistakes;
+  s.levelTrust=trust;
+  return true;
+}
+function levelTrustCopy(text,level){const target=String(level||'A1');return target==='A1'?String(text||''):String(text||'').split('A1').join(target)}
+function levelExamCooldownLabel(ms){const hours=Math.ceil(Math.max(0,Number(ms)||0)/3600000);return hours>1?`${hours} jam lagi`:'kurang dari sejam lagi'}
 // m025-140 (B-04): level SESI, bukan level yang kebetulan aktif saat outcome dihitung.
 // Sesi yang dimulai di A1 lalu murid pindah ke B1 sebelum menutupnya harus tetap dinilai
 // sebagai A1 - kalau tidak, satu kali ganti level menulis ulang arti bukti yang sudah ada.
@@ -773,7 +935,7 @@ function sessionLevel(session){const explicit=String(session?.level||'');return 
 function historyMatchesActive(h,level=getActiveLevel()){const explicit=String(h?.level||'');if(LEVELS.includes(explicit))return explicit===level;const inferred=contentLevelFor(h?.type,h?.target||h?.reviewKey||h?.skill||'');return !inferred||inferred===level}
 function sanitizeState(raw){
   const rawPreferences=raw?.preferences||{},activeLevel=LEVELS.includes(String(rawPreferences.activeLevel||''))?String(rawPreferences.activeLevel):'';
-  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null};
+  const next={...defaultState,...raw,view:'home',ownerUuid:String(raw?.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128),vocab:raw?.vocab||{},grammar:raw?.grammar||{},reading:raw?.reading||{},history:Array.isArray(raw?.history)?raw.history:[],wrongAnswers:pruneCorruptedReviewEntries(raw?.wrongAnswers),confidenceHistory:Array.isArray(raw?.confidenceHistory)?raw.confidenceHistory:[],sessionHistory:Array.isArray(raw?.sessionHistory)?raw.sessionHistory:[],learningDays:Array.isArray(raw?.learningDays)?raw.learningDays:[],daily:raw?.daily&&typeof raw.daily==='object'?raw.daily:{date:'',count:0,attempts:0,meaningful:false},preferences:{...defaultPreferences,...rawPreferences,activeLevel,levelMode:activeLevel?'manual':'placement',selfAssessedLevel:LEVELS.includes(String(rawPreferences.selfAssessedLevel||''))?String(rawPreferences.selfAssessedLevel):'',timeZone:validTimeZone(rawPreferences.timeZone||defaultPreferences.timeZone),goalProfile:String(rawPreferences.goalProfile||defaultPreferences.goalProfile).slice(0,30),reportEndpoint:String(rawPreferences.reportEndpoint||DEFAULT_REPORT_ENDPOINT).trim()},reportMeta:{...defaultReportMeta,...(raw?.reportMeta||{}),queue:Array.isArray(raw?.reportMeta?.queue)?raw.reportMeta.queue.slice(-8):[]},reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[],...(raw?.reminderMeta||{}),evidenceLog:Array.isArray(raw?.reminderMeta?.evidenceLog)?raw.reminderMeta.evidenceLog.slice(-ALRS_EVIDENCE_LOG_LIMIT):[]},activeSession:raw?.activeSession&&typeof raw.activeSession==='object'?raw.activeSession:null,adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[],...(raw?.adaptivePolicyMeta||{}),history:Array.isArray(raw?.adaptivePolicyMeta?.history)?raw.adaptivePolicyMeta.history.slice(-30):[]},policyOutcomeMeta:{last:null,history:[],queue:[],...(raw?.policyOutcomeMeta||{}),history:Array.isArray(raw?.policyOutcomeMeta?.history)?raw.policyOutcomeMeta.history.slice(-POLICY_OUTCOME_LOG_LIMIT):[],queue:Array.isArray(raw?.policyOutcomeMeta?.queue)?raw.policyOutcomeMeta.queue.slice(-10):[]},contentCanaryMeta:CONTENT_CANARY?CONTENT_CANARY.sanitizeEvidence(raw?.contentCanaryMeta,CONTENT_CANARY_CONFIG?.canaryId||raw?.contentCanaryMeta?.canaryId||''):{...defaultState.contentCanaryMeta},coachCache:raw?.coachCache&&typeof raw.coachCache==='object'?raw.coachCache:null,levelTrust:sanitizeLevelTrust(raw?.levelTrust)};
   if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
   next.version=APP_VERSION;
@@ -881,7 +1043,13 @@ function record(q,ok,ms,selectedIndex){
   const h={id:q.id||sigQ(q),type:q.type||'unknown',level:q.level||getActiveLevel(),skill:q.skill||'general',target:q.target||q.lessonSkill||q.skill||q.id||'',reviewBucket,reviewKey,difficulty:q.difficulty||null,ok,ms:Math.max(0,ms||0),confidence:null,selectedIndex,selectedAnswer:selected||null,correctAnswer:q.options?.[q.answerIndex]||null,errorTag:q.errorTag||q.skill||q.type||'general',at:now};
   state.history.push(h);if(state.history.length>1000)state.history.shift();
   if(!ok)state.wrongAnswers.push({question:q.question,selectedAnswer:selected,correct:q.options?.[q.answerIndex],skill:q.skill,target:q.target||q.id,type:q.type,errorTag:h.errorTag,at:now});
-  if(state.wrongAnswers.length>300)state.wrongAnswers.shift();if(q.canary&&CONTENT_CANARY&&q.canary.canaryId===state.contentCanaryMeta?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordEvidence(state.contentCanaryMeta,q.canary.canaryId,{type:'outcome',phase:q.canary.phase||'canary',correct:!!ok,at:new Date(now).toISOString()});save();queueRemoteActivitySync()
+  if(state.wrongAnswers.length>300)state.wrongAnswers.shift();
+  /* m028-06: SATU titik sambung guard level. Semua jawaban pertama di aplikasi ini lewat
+     record(), jadi tidak ada jalur latihan (vocab, grammar, reading, adaptif, level practice)
+     yang bisa lupa melaporkan kesalahannya. Percobaan kedua tidak lewat sini - jadi pijakan
+     tidak pernah ikut dihitung sebagai kesalahan baru. */
+  if(!ok)try{levelTrustNoteMistake(q)}catch(_){}
+  if(q.canary&&CONTENT_CANARY&&q.canary.canaryId===state.contentCanaryMeta?.canaryId)state.contentCanaryMeta=CONTENT_CANARY.recordEvidence(state.contentCanaryMeta,q.canary.canaryId,{type:'outcome',phase:q.canary.phase||'canary',correct:!!ok,at:new Date(now).toISOString()});save();queueRemoteActivitySync()
 }
 /* m025-135: keyakinan MENGULANG penjadwalan jawaban yang sama dari titik awal yang sama -
    bukan menjadwalkan ulang di atas hasilnya. Tanpa itu satu jawaban salah dihitung dua kali:
@@ -2298,9 +2466,181 @@ function stageDepth(){return stageStack.length}
 self.FiezelStage={enter:enterStage,leave:leaveStage,leaveAll:leaveAllStages,depth:stageDepth};
 window.exitStage=exitStage;
 function levelControlMarkup(){const level=getActiveLevel();return `<button type="button" class="active-level-control" onclick="openLevelPanel()" aria-label="Ganti level belajar"><span>Level belajar</span><strong>${esc(level)}</strong><small>Ganti</small></button>`}
-function setActiveLevel(level){const next=String(level||'').toUpperCase();if(!LEVELS.includes(next))return false;if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(`Level belajar aktif: ${next}`);return true}
+function setActiveLevel(level){const next=String(level||'').toUpperCase();if(!LEVELS.includes(next))return false;/* m028-06: DEFAULT-ALLOW. Guard hanya menolak level yang benar-benar TERKUNCI akibat
+     demosi; state lama tanpa levelTrust, atau murid yang belum pernah didemosi, tetap bebas
+     pindah ke atas (mode percobaan). Dibungkus typeof+try supaya fixture kontrak level yang
+     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(`Level ${next} kebuka lewat Ujian Skip Level ${nextVerifiableLevel(state)}.`);openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(`Level belajar aktif: ${next}`);return true}
 function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(`Mengikuti level hasil tes: ${getActiveLevel()}`);return true}
-function openLevelPanel(){const current=getActiveLevel(),estimated=placementLevel(),manual=activeLevelIsManual();openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>Pilih level belajar</h2><p>Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.</p><div class="level-picker-grid">${LEVELS.map(level=>`<button type="button" class="level-picker-card${level===current?' is-active':''}" data-active-level="${level}" aria-pressed="${level===current}"><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span></button>`).join('')}</div><div class="level-source-note">${manual?`Level aktif pilihanmu: <b>${esc(current)}</b>. Hasil placement tersimpan sebagai ${esc(estimated)}.`:`Saat ini mengikuti hasil placement: <b>${esc(estimated)}</b>.`}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">Gunakan hasil tes (${esc(estimated)})</button>`:''}<button type="button" class="primary" id="levelPanelClose">Selesai</button></div>`);document.querySelectorAll('[data-active-level]').forEach(button=>button.addEventListener('click',()=>setActiveLevel(button.getAttribute('data-active-level'))));$('usePlacementLevel')?.addEventListener('click',usePlacementLevel);$('levelPanelClose').onclick=closeModal;enhanceUI()}
+/* m028-06: panel level sekarang JUJUR - tiap kartu membawa statusnya (terverifikasi, mode
+   percobaan dengan hitungan salah, atau terkunci setelah demosi) dan level terkunci benar-
+   benar disabled. Penolakannya tetap ada di setActiveLevel(), jadi menyembunyikan tombol
+   bukan satu-satunya pertahanan. Nama fungsi ini sengaja tetap openLevelPanel: kontrak
+   level-grammar-contract-test.js hanya mengizinkan iterasi LEVELS di pemilih level. */
+function openLevelPanel(){const current=getActiveLevel(),estimated=placementLevel(),manual=activeLevelIsManual(),verified=verifiedLevel(state),trust=levelTrustState(state),examLevel=nextVerifiableLevel(state),examWait=examLevel?levelExamCooldownRemaining(examLevel,state):0;
+ const cards=LEVELS.map(level=>{
+  const locked=isLevelLocked(state,level),position=LEVELS.indexOf(level)-LEVELS.indexOf(verified);
+  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">Terkunci · lewat ujian</em>':`<em class="level-trust-badge is-probation">Mode percobaan · salah ${probationMistakes(level)}/${LEVEL_GUARD_WRONG_LIMIT}</em>`;
+  return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
+ }).join('');
+ const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(LEVEL_GUARD_COPY.probationBody)}</span></div>`:'';
+ const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(examLevel)}</b><span>${LEVEL_EXAM_SIZE} soal · grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading} · lulus ${LEVEL_EXAM_PASS}%</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?`Bisa diulang ${esc(levelExamCooldownLabel(examWait))}`:esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examBadge)} sampai C2</b><span>Semua level sudah kamu buktikan.</span></div></div>`;
+ openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>Pilih level belajar</h2><p>Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level aktif pilihanmu: <b>${esc(current)}</b>. Hasil placement tersimpan sebagai ${esc(estimated)}. Level terverifikasi: <b>${esc(verified)}</b>.`:`Saat ini mengikuti hasil placement: <b>${esc(estimated)}</b>. Level terverifikasi: <b>${esc(verified)}</b>.`}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">Gunakan hasil tes (${esc(estimated)})</button>`:''}<button type="button" class="primary" id="levelPanelClose">Selesai</button></div>`);
+ document.querySelectorAll('[data-active-level]').forEach(button=>button.addEventListener('click',()=>setActiveLevel(button.getAttribute('data-active-level'))));
+ $('usePlacementLevel')?.addEventListener('click',usePlacementLevel);
+ $('openLevelExam')?.addEventListener('click',()=>openActiveLevelExamPanel(examLevel));
+ $('levelPanelClose').onclick=closeModal;enhanceUI()}
+/* ---- m028-06 runtime guard: menghitung, memperingatkan, lalu menurunkan --------------- */
+function levelTrustNoteMistake(q){
+  const sessionType=String(state.activeSession?.type||'');
+  /* Kesalahan di dalam ujian tidak menular ke guard (rekomendasi 7 riset): ujian menilai,
+     bukan menghukum. Placement pun tidak - ia justru sumber bukti. */
+  if(sessionType==='placement'||sessionType==='level-exam')return false;
+  const level=String(q?.level||getActiveLevel());
+  if(!LEVELS.includes(level)||levelTrustGap(level)<=0)return false;
+  const trust=levelTrustState(state),now=Date.now();
+  trust.probation.level=level;
+  trust.probation.mistakesByLevel={...trust.probation.mistakesByLevel,[level]:probationMistakes(level)+1};
+  trust.probation.lastMistakeAt=now;
+  if(!trust.probation.startedAt)trust.probation.startedAt=now;
+  state.levelTrust=trust;
+  const total=probationMistakes(level),verdict=levelGuardEvaluate(state);
+  if(verdict.action==='demote'){levelGuardDemote();return true}
+  if(LEVEL_GUARD_WARN_STEPS.includes(total))levelGuardWarn(level,total);
+  return true;
+}
+function levelGuardWarn(level,count){
+  const message=count>=8?LEVEL_GUARD_COPY.warn8:LEVEL_GUARD_COPY.warn5;
+  try{pawReact(count>=8?'answer-wrong':'question-shown')}catch(_){}
+  try{showToast(`Salah ${count} dari ${LEVEL_GUARD_WRONG_LIMIT} di ${level}. PAW menemani.`)}catch(_){}
+  try{openModal(`<div class="modal-mark">PAW MENEMANI</div><h2>Level ${esc(level)} · salah ${count}/${LEVEL_GUARD_WRONG_LIMIT}</h2><p>${esc(message)}</p><div class="modal-actions"><button type="button" id="levelWarnExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button><button type="button" class="primary" id="levelWarnGo">Lanjut latihan</button></div>`);
+    $('levelWarnGo').onclick=closeModal;
+    $('levelWarnExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
+    enhanceUI()}catch(_){}
+  return true;
+}
+function levelGuardDemote(){
+  const verdict=applyLevelDemotion(state);
+  if(!verdict)return false;
+  try{coreBrainCache=null}catch(_){}
+  try{if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(verdict.to)}catch(_){}
+  save();
+  /* Kalau murid sedang di dalam kuis, kabar turun level DITAHAN sampai layar hasil. */
+  if(state.activeSession){try{showToast(`Kita mundur ke ${verdict.to} dulu — semua progresmu tetap tersimpan.`)}catch(_){}}
+  else{try{flushLevelGuardNotice()}catch(_){}}
+  return true;
+}
+function flushLevelGuardNotice(){
+  const trust=levelTrustState(state),notice=trust.pendingNotice;
+  if(!notice||!notice.from)return false;
+  trust.pendingNotice=null;state.levelTrust=trust;save();
+  openDemotionModal(notice.from,notice.to);
+  return true;
+}
+function openDemotionModal(fromLevel,toLevel){
+  const verified=LEVELS.includes(String(toLevel||''))?String(toLevel):verifiedLevel(state);
+  try{pawReact('answer-wrong')}catch(_){}
+  openModal(`<div class="modal-mark">FIEZEL LEVEL GUARD</div><h2>${esc(LEVEL_GUARD_COPY.demotionTitle)}</h2><p>${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionBody,verified))}</p><p class="muted">Level ${esc(String(fromLevel||''))} dan semua level di atas ${esc(verified)} terkunci sampai kamu lulus ${esc(LEVEL_GUARD_COPY.examTitle)}.</p><div class="modal-actions"><button type="button" class="primary" id="demotionStart">${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionStart,verified))}</button><button type="button" id="demotionExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button></div>`);
+  $('demotionStart').onclick=()=>{closeModal();go('home')};
+  $('demotionExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
+  enhanceUI();
+  return true;
+}
+/* ---- m028-06 Ujian Skip Level: satu level, 25 soal, acak tiap percobaan --------------- */
+function buildLevelExamQuestions(examLevel){
+  const target=String(examLevel||'').toUpperCase();
+  if(!LEVELS.includes(target))throw new Error('Level ujian tidak dikenal.');
+  /* Bank besar + acak tiap percobaan (rekomendasi 8 riset): grammar memakai seluruh mode
+     latihan dari tiap template level itu, jadi kolamnya jauh lebih besar dari 25. */
+  const grammarEntries=shuffle(grammarItemsForLevel(target)),grammarPool=[];
+  for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length;variant++)for(const entry of grammarEntries)grammarPool.push(makeGrammarQuestion(entry.skill,entry.item,variant,entry.skill));
+  const pools={
+    grammar:grammarPool,
+    vocab:shuffle(V.filter(v=>v.level===target&&v.meaning)).map(v=>makeVocabQuestion(v)),
+    reading:shuffle(R.filter(r=>r.level===target)).flatMap(r=>(r.qs||[]).slice(0,2).map((q,i)=>makeReadingQuestion(r,q,i)))
+  };
+  const out=[],seen=new Set();
+  for(const type of Object.keys(LEVEL_EXAM_BLUEPRINT)){
+    const need=LEVEL_EXAM_BLUEPRINT[type];let added=0;
+    for(const q of pools[type]||[]){
+      if(!q||!validateQuestion(q).ok)continue;
+      const signature=sigQ(q);
+      if(seen.has(signature))continue;
+      seen.add(signature);
+      q.difficulty=LEVELS.indexOf(target)+1;
+      q.level=target;
+      out.push(q);
+      if(++added>=need)break;
+    }
+    if(added<need)throw new Error(`Bank ujian ${target}/${type} baru punya ${added} dari ${need} soal.`);
+  }
+  return shuffle(out);
+}
+function startLevelExam(level){
+  const target=String(level||nextVerifiableLevel(state)||'').toUpperCase();
+  const availability=levelExamAvailability(target,state);
+  if(!availability.ok){
+    if(availability.reason==='cooldown')return showToast(`${LEVEL_GUARD_COPY.examTitle} ${target} bisa diulang ${levelExamCooldownLabel(availability.waitMs)}.`);
+    if(availability.reason==='not_next')return showToast(`Ujiannya berantai: yang kebuka sekarang ${availability.next||verifiedLevel(state)}.`);
+    return showToast('Level ujian belum bisa dibuka.');
+  }
+  let questions=[];
+  try{questions=buildLevelExamQuestions(target)}catch(error){return showToast(String(error?.message||error))}
+  closeModal();
+  showToast(`${LEVEL_GUARD_COPY.examTitle} ${target} · ${LEVEL_EXAM_SIZE} soal tanpa petunjuk`);
+  quizLoop({type:'level-exam',count:LEVEL_EXAM_SIZE,pool:questions,factory:x=>x,levelScope:target,noHints:true,preserveOrder:false});
+}
+function levelExamWeakSkill(){
+  const rows=(state.wrongAnswers||[]).slice(-LEVEL_EXAM_SIZE),tally={};
+  for(const row of rows){const key=String(row?.skill||row?.errorTag||'');if(!key)continue;tally[key]=(tally[key]||0)+1}
+  const best=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
+  return best?friendlySkillName(best[0]):'';
+}
+function levelExamSettle(examLevel,score,total,accuracy){
+  const target=String(examLevel||'').toUpperCase();
+  if(!LEVELS.includes(target))return null;
+  const passed=Number(accuracy||0)>=LEVEL_EXAM_PASS;
+  if(passed){
+    recordSkipExamPass(state,target,{score,total,accuracy});
+    try{coreBrainCache=null}catch(_){}
+    try{if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(target)}catch(_){}
+    const next=nextVerifiableLevel(state);
+    return{passed:true,level:target,message:`${LEVEL_GUARD_COPY.examPass}${next?` Ujian ${next} sudah kebuka kalau mau lanjut.`:''}`};
+  }
+  const weak=levelExamWeakSkill();
+  recordSkipExamFail(state,target,{score,total,accuracy,weakSkill:weak});
+  return{passed:false,level:target,message:`${LEVEL_GUARD_COPY.examFail} Skor kamu ${score}/${total} (${accuracy}%), lulusnya mulai ${LEVEL_EXAM_PASS}%.${weak?` Yang paling sering meleset tadi: ${weak}.`:''}`};
+}
+function openActiveLevelExamPanel(level){
+  const target=String(level||nextVerifiableLevel(state)||'').toUpperCase(),verified=verifiedLevel(state);
+  if(!LEVELS.includes(target))return showToast(`${LEVEL_GUARD_COPY.examBadge} sampai C2 — tidak ada level yang perlu diuji lagi.`);
+  const availability=levelExamAvailability(target,state),entry=levelTrustState(state).exams[target]||{};
+  const history=entry.lastAt?`<p class="muted">Percobaan terakhir: ${entry.lastScore||0}/${entry.lastTotal||LEVEL_EXAM_SIZE} (${entry.lastAccuracy||0}%)${entry.weakSkill?` · yang menjatuhkan: ${esc(entry.weakSkill)}`:''}.</p>`:'';
+  const chain=`<p class="muted">Ujiannya berantai: level terverifikasimu sekarang <b>${esc(verified)}</b>, jadi yang boleh diuji adalah <b>${esc(nextVerifiableLevel(state)||verified)}</b>. Satu ujian, satu anak tangga.</p>`;
+  const action=availability.ok?`<button type="button" class="primary" id="levelExamStart">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(target)}</button>`:availability.reason==='cooldown'?`<button type="button" class="primary" disabled aria-disabled="true">Bisa diulang ${esc(levelExamCooldownLabel(availability.waitMs))}</button>`:`<button type="button" class="primary" disabled aria-disabled="true">Buka ujian ${esc(availability.next||verified)} dulu</button>`;
+  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${LEVEL_EXAM_SIZE} soal: grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading}</li><li>Soal diacak dari bank level ${esc(target)} setiap percobaan</li><li>Lulus mulai ${LEVEL_EXAM_PASS}% · tanpa petunjuk, tanpa percobaan kedua</li><li>Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">Nanti dulu</button>${action}</div>`);
+  $('levelExamCancel').onclick=closeModal;
+  $('levelExamStart')?.addEventListener('click',()=>startLevelExam(target));
+  enhanceUI();
+  return true;
+}
+/* Banner Home. Nama fungsi memuat "activeLevel" dengan sengaja: kontrak level/grammar hanya
+   mengizinkan pembacaan lintas level di pemilih level, dan tangga verifikasi di bawah ini
+   dibangun dengan LEVELS.indexOf + indeks manual, bukan LEVELS.map. */
+function activeLevelTrustMarkup(){
+  const trust=levelTrustState(state),verified=verifiedLevel(state),active=getActiveLevel(),examLevel=nextVerifiableLevel(state);
+  if(!trust.locked&&!probationActive(state))return '';
+  if(trust.locked){
+    const goalIndex=Math.max(LEVELS.indexOf(active),LEVELS.indexOf(trust.probation.level||active));
+    let ladder='';
+    for(let i=0;i<=goalIndex&&i<LEVELS.length;i++){
+      const step=LEVELS[i],done=i<=LEVELS.indexOf(verified),open=step===examLevel;
+      ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(step)}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?'Ujian kebuka':'Menunggu'}</span></li>`;
+    }
+    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.probationExam)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
+  }
+  const mistakes=probationMistakes(active);
+  return `<div class="level-trust-banner is-probation"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(LEVEL_GUARD_COPY.probationBody)}</span></div><p class="level-trust-count">Level ${esc(active)} · salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT} · terverifikasi sampai ${esc(verified)}</p><div class="level-trust-actions"><button type="button" onclick="closeModal()">${esc(LEVEL_GUARD_COPY.probationTry)}</button><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.probationExam)}</button></div></div>`;
+}
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>${levelControlMarkup()}</div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
 function stat(a,b){return `<small>${a}</small><strong>${b}</strong>`}
@@ -2400,10 +2740,11 @@ function homeStatStripMarkup(level,streak,attempts,review){
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
-function home(){pawStreakWatch();const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
+function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
   <div class="launcher-meta"><span class="live-signal"></span><span>FIEZEL PERSONAL · ${esc(todayLabel())}</span><button type="button" class="home-level-context" onclick="openLevelPanel()">${esc(activeLevel)} · semua materi · ganti</button>${celestialStatusMarkup()}</div>
+    ${activeLevelTrustMarkup()}
     ${homeStatStripMarkup(level,state.streak,state.daily?.attempts,review)}
     <p class="hero-line"><span>${esc(learnerName())},</span> ${esc(homeHeadline(loginMessage.headline))}</p>
     <!-- m025-113 (brief redesign 4): tombol kedua di sini dulu berbunyi "Analisis skill
@@ -3668,7 +4009,7 @@ function startLevelPractice(level){
  *    daripada yang sebenarnya, dan seluruh model kemampuan di atasnya ikut keliru.
  */
 function quizLoop(cfg){
- let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||!q?.level||q.level===getActiveLevel());
+ let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
  const unique=[],seen=new Set();
  for(const q of questions){if(!validateQuestion(q).ok)continue;const s=sigQ(q);if(!seen.has(s)){seen.add(s);unique.push(q)}}
  questions=cfg.preserveOrder?unique:shuffle(unique);
@@ -3812,7 +4153,7 @@ function quizLoop(cfg){
    // BARU SAJA keliru dan ditahan sampai murid menekan Lanjut, jadi urutannya menjadi
    // "buka jawaban ini -> ajarkan konsepnya -> soal berikutnya dengan konsep yang sama",
    // bukan langsung melempar soal serupa kepada orang yang keyakinannya belum tersentuh.
-   if(decision.move==='reteach'){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
+   if(decision.move==='reteach'&&!cfg.noHints){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }else{
    // Percobaan kedua tidak menaikkan skor atau penguasaan, tetapi tetap menutup episode
@@ -3827,7 +4168,9 @@ function quizLoop(cfg){
   // Kesalahan PERTAMA tidak dibuka jawabannya: satu pijakan, lalu coba lagi. Pilihan yang
   // barusan dipilih dimatikan supaya percobaan kedua benar-benar pilihan baru, bukan klik
   // ulang yang sama.
-  if(!ok&&firstTry&&answer.scaffold!=='tell'){
+  /* m028-06: Ujian Skip Level berjalan TANPA petunjuk dan tanpa percobaan kedua
+     (cfg.noHints) - kalau tidak, "terverifikasi" hanya berarti dituntun sampai benar. */
+  if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints){
    answer.retryOf=q.id;
    button.disabled=true;
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
@@ -3855,7 +4198,12 @@ function finishQuiz(cfg,score,total,tutorReport){
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
-  if(cfg.placement){state.level=accuracy<35?1:accuracy<50?2:accuracy<65?3:accuracy<78?4:accuracy<90?5:6;state.placementDone=true}
+  if(cfg.placement){state.level=accuracy<35?1:accuracy<50?2:accuracy<65?3:accuracy<78?4:accuracy<90?5:6;state.placementDone=true;/* m028-06 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
+  /* m028-06: penilaian Ujian Skip Level. Satu level per ujian (bukan placement lintas
+     level), lulus >=LEVEL_EXAM_PASS% menaikkan verified SATU tangga dan membuka kunci;
+     gagal hanya memberi jeda 24 jam untuk level itu. */
+  let examVerdict=null;
+  if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy)}catch(_){examVerdict=null}}
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
@@ -3877,7 +4225,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // adalah levelnya, dan langkah setelahnya bukan "satu sesi lagi".
   let nextDomain='';
   if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=p?.primaryDomain==='vocab'?'vocab':p?.primaryDomain==='reading'?'reading':'grammar'}catch(_){nextDomain='grammar'}}
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${outcomeLine}${nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':cfg.type==='level-exam'?`${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai`:'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${examVerdict?`<p class="level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}">${esc(examVerdict.message)}</p>`:''}${outcomeLine}${nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
   // Momen wajar untuk menawarkan pengingat sekali lagi kepada murid yang tadi memilih
@@ -3885,6 +4233,9 @@ function finishQuiz(cfg,score,total,tutorReport){
   // diulang" sekarang punya arti yang nyata baginya. Jatah tawaran dijaga di dalam
   // maybeReOfferNotifications - ini tidak akan pernah menjadi tawaran di setiap sesi.
   const reoffer=setTimeout(maybeReOfferNotifications,1400);reoffer?.unref?.();
+  /* Modal demosi ditahan selama kuis berjalan dan dibuka di sini - memotong murid di
+     tengah soal dengan kabar turun level adalah cara tercepat membuat dia berhenti. */
+  try{flushLevelGuardNotice()}catch(_){}
 }
 function skillTimeline(){
  const byDay={};for(const h of (state.history||[]).filter(h=>historyMatchesActive(h))){const d=dayKey(h.at);const k=h.skill||h.type||'general';byDay[d]??={};byDay[d][k]??={total:0,correct:0};byDay[d][k].total++;if(h.ok)byDay[d][k].correct++}
