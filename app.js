@@ -2632,7 +2632,7 @@ function levelTrustNoteMistake(q){
 }
 function levelGuardWarn(level,count){
   const message=count>=8?LEVEL_GUARD_COPY.warn8:LEVEL_GUARD_COPY.warn5;
-  try{pawReact(count>=8?'answer-wrong':'question-shown')}catch(_){}
+  try{pawReact(count>=8?'wrong':'question-shown')}catch(_){}
   try{showToast(`Salah ${count} dari ${LEVEL_GUARD_WRONG_LIMIT} di ${level}. PAW menemani.`)}catch(_){}
   try{openModal(`<div class="modal-mark">PAW MENEMANI</div><h2>Level ${esc(level)} · salah ${count}/${LEVEL_GUARD_WRONG_LIMIT}</h2><p>${esc(message)}</p><div class="modal-actions"><button type="button" id="levelWarnExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button><button type="button" class="primary" id="levelWarnGo">Lanjut latihan</button></div>`);
     $('levelWarnGo').onclick=closeModal;
@@ -2660,7 +2660,7 @@ function flushLevelGuardNotice(){
 }
 function openDemotionModal(fromLevel,toLevel){
   const verified=LEVELS.includes(String(toLevel||''))?String(toLevel):verifiedLevel(state);
-  try{pawReact('answer-wrong')}catch(_){}
+  try{pawReact('wrong')}catch(_){}
   openModal(`<div class="modal-mark">FIEZEL LEVEL GUARD</div><h2>${esc(LEVEL_GUARD_COPY.demotionTitle)}</h2><p>${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionBody,verified))}</p><p class="muted">Level ${esc(String(fromLevel||''))} dan semua level di atas ${esc(verified)} terkunci sampai kamu lulus ${esc(LEVEL_GUARD_COPY.examTitle)}.</p><div class="modal-actions"><button type="button" class="primary" id="demotionStart">${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionStart,verified))}</button><button type="button" id="demotionExam">${esc(LEVEL_GUARD_COPY.probationExam)}</button></div>`);
   $('demotionStart').onclick=()=>{closeModal();go('home')};
   $('demotionExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
