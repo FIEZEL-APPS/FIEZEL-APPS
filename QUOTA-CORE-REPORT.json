@@ -1,0 +1,343 @@
+{
+  "schema": "fiezel-quota-core-v1",
+  "pass": true,
+  "counts": {
+    "pass": 65,
+    "fail": 0
+  },
+  "limits": {
+    "ai": 25,
+    "aiTranslate": 15,
+    "ttsCalls": 120,
+    "ttsChars": 12000
+  },
+  "reservationTtlMs": 30000,
+  "resetTimezone": "Asia/Jakarta",
+  "checks": [
+    {
+      "name": "quota-config.js: QUOTA_CONFIG beku",
+      "status": "PASS",
+      "details": "true"
+    },
+    {
+      "name": "quota-config.js: plans.free beku",
+      "status": "PASS",
+      "details": "freeze"
+    },
+    {
+      "name": "quota-config.js: ASSIGNABLE_PLANS beku dan hanya free",
+      "status": "PASS",
+      "details": "[\"free\"]"
+    },
+    {
+      "name": "quota-config.js: PAYMENT_ENABLED ADA dan false (bukan undefined)",
+      "status": "PASS",
+      "details": "false"
+    },
+    {
+      "name": "quota-config.js: FREE_AI_DAILY_LIMIT = 25",
+      "status": "PASS",
+      "details": "25"
+    },
+    {
+      "name": "quota-config.js: FREE_AI_TRANSLATE_DAILY = 15",
+      "status": "PASS",
+      "details": "15"
+    },
+    {
+      "name": "quota-config.js: FREE_TTS_DAILY_LIMIT = 120",
+      "status": "PASS",
+      "details": "120"
+    },
+    {
+      "name": "quota-config.js: FREE_TTS_DAILY_CHARS = 12000",
+      "status": "PASS",
+      "details": "12000"
+    },
+    {
+      "name": "quota-config.js: FREE_MAX_OUTPUT_TOKENS = 400",
+      "status": "PASS",
+      "details": "400"
+    },
+    {
+      "name": "quota-config.js: FREE_MAX_PROMPT_CHARS = 4000",
+      "status": "PASS",
+      "details": "4000"
+    },
+    {
+      "name": "quota-config.js: FREE_MAX_INPUT_TOKENS = 1200",
+      "status": "PASS",
+      "details": "1200"
+    },
+    {
+      "name": "quota-config.js: FREE_AI_RATE_PER_MINUTE = 8",
+      "status": "PASS",
+      "details": "8"
+    },
+    {
+      "name": "quota-config.js: FREE_TTS_RATE_PER_MINUTE = 20",
+      "status": "PASS",
+      "details": "20"
+    },
+    {
+      "name": "quota-config.js: FREE_ANY_RATE_PER_MINUTE = 60",
+      "status": "PASS",
+      "details": "60"
+    },
+    {
+      "name": "quota-config.js: FREE_AI_CONCURRENCY = 1",
+      "status": "PASS",
+      "details": "1"
+    },
+    {
+      "name": "quota-config.js: FREE_TTS_CONCURRENCY = 2",
+      "status": "PASS",
+      "details": "2"
+    },
+    {
+      "name": "quota-config.js: AI_TIMEOUT_MS=20000 & TTS_TIMEOUT_MS=25000 (cf-a10 §6)",
+      "status": "PASS",
+      "details": "20000/25000"
+    },
+    {
+      "name": "quota-config.js: RESERVATION_TTL_MS = TTS_TIMEOUT_MS + 5000",
+      "status": "PASS",
+      "details": "30000"
+    },
+    {
+      "name": "quota-config.js: RESET_TZ Asia/Jakarta, ACCOUNT_BUDGET_TZ UTC (dua jam, dua tujuan)",
+      "status": "PASS",
+      "details": "Asia/Jakarta/UTC"
+    },
+    {
+      "name": "quota-config.js: TANPA import/require (satu sumber, tanpa state luar)",
+      "status": "PASS",
+      "details": "importless"
+    },
+    {
+      "name": "quota-config.js: TANPA Date/Date.now/env/globalThis",
+      "status": "PASS",
+      "details": "no time, no env"
+    },
+    {
+      "name": "quota-config.js: setiap konstanta punya komentar ALASAN (≥14 rujukan cf-a10/cf-b3)",
+      "status": "PASS",
+      "details": "ALASAN×24"
+    },
+    {
+      "name": "quota-config.js: tidak ada jalur pembayaran (bab 34)",
+      "status": "PASS",
+      "details": "no payment surface"
+    },
+    {
+      "name": "quota-core.js: TANPA Date.now()/new Date (waktu selalu parameter)",
+      "status": "PASS",
+      "details": "pure clock"
+    },
+    {
+      "name": "quota-core.js: TANPA fetch/DOM/penyimpanan/crypto",
+      "status": "PASS",
+      "details": "no side doors"
+    },
+    {
+      "name": "quota-core.js: modul termuat di sandbox TANPA Date (bukti kemurnian)",
+      "status": "PASS",
+      "details": "undefined"
+    },
+    {
+      "name": "quota-core.js: tidak menyalin angka kuota (limit datang dari state/config)",
+      "status": "PASS",
+      "details": "no literal quota numbers"
+    },
+    {
+      "name": "state awal: hari WIB benar dan semua counter nol",
+      "status": "PASS",
+      "details": "2026-08-27"
+    },
+    {
+      "name": "Q3 reserve TIDAK menaikkan counter (kuota dipotong saat commit, bukan saat minta)",
+      "status": "PASS",
+      "details": "{\"ai\":0,\"aiTranslate\":0,\"ttsCalls\":0,\"ttsChars\":0}"
+    },
+    {
+      "name": "Q3 reserve mengembalikan quotaCharged:false",
+      "status": "PASS",
+      "details": "false"
+    },
+    {
+      "name": "Q4 invarian used_effective = counter + Σ held setelah reserve",
+      "status": "PASS",
+      "details": "1"
+    },
+    {
+      "name": "Q5 commit menaikkan counter tepat sekali dan melepas reservasi",
+      "status": "PASS",
+      "details": "{\"ai\":1,\"aiTranslate\":0,\"ttsCalls\":0,\"ttsChars\":0}"
+    },
+    {
+      "name": "Q5 commit kedua dengan token sama → reservation_expired, counter TIDAK naik dua kali",
+      "status": "PASS",
+      "details": "reservation_expired"
+    },
+    {
+      "name": "Q6 rollback: counter tidak naik sama sekali dan sisa kembali ke nilai sebelum reserve",
+      "status": "PASS",
+      "details": "24→24"
+    },
+    {
+      "name": "Q6 rollback menaikkan penghitung audit rolled_back",
+      "status": "PASS",
+      "details": "1"
+    },
+    {
+      "name": "Q6 rollback token yang sudah dipanen → already_reaped, tanpa efek samping",
+      "status": "PASS",
+      "details": "already_reaped"
+    },
+    {
+      "name": "Q7 ai: limit-1 lolos, limit DITOLAK dengan scope ai_daily",
+      "status": "PASS",
+      "details": "allow/ai_daily"
+    },
+    {
+      "name": "Q7 ai: penolakan membawa resetAt + quotaCharged:false + denied++",
+      "status": "PASS",
+      "details": "1787850000000/1"
+    },
+    {
+      "name": "Q7 aiTranslate: limit-1 lolos, limit DITOLAK dengan scope ai_translate_daily",
+      "status": "PASS",
+      "details": "allow/ai_translate_daily"
+    },
+    {
+      "name": "Q7 aiTranslate: penolakan membawa resetAt + quotaCharged:false + denied++",
+      "status": "PASS",
+      "details": "1787850000000/1"
+    },
+    {
+      "name": "Q7 ttsCalls: limit-1 lolos, limit DITOLAK dengan scope tts_daily_calls",
+      "status": "PASS",
+      "details": "allow/tts_daily_calls"
+    },
+    {
+      "name": "Q7 ttsCalls: penolakan membawa resetAt + quotaCharged:false + denied++",
+      "status": "PASS",
+      "details": "1787850000000/1"
+    },
+    {
+      "name": "Q7 ttsChars: limit-1 lolos, limit DITOLAK dengan scope tts_daily_chars",
+      "status": "PASS",
+      "details": "allow/tts_daily_chars"
+    },
+    {
+      "name": "Q7 ttsChars: penolakan membawa resetAt + quotaCharged:false + denied++",
+      "status": "PASS",
+      "details": "1787850000000/1"
+    },
+    {
+      "name": "Q8 satu terjemahan menaikkan ai DAN aiTranslate (sub-kuota di dalam, bukan tambahan)",
+      "status": "PASS",
+      "details": "15/15"
+    },
+    {
+      "name": "Q8 terjemahan ke-16 ditolak scope ai_translate_daily",
+      "status": "PASS",
+      "details": "ai_translate_daily"
+    },
+    {
+      "name": "Q8 penjelasan tutor TIDAK diblokir oleh habisnya sub-kuota terjemahan (sisa 10)",
+      "status": "PASS",
+      "details": "10"
+    },
+    {
+      "name": "Q9 reserve tts komposit menahan 1 panggilan + 438 char",
+      "status": "PASS",
+      "details": "438"
+    },
+    {
+      "name": "Q9 reservasi kedaluwarsa DIPANEN (lease habis = rollback otomatis, bukan hangus)",
+      "status": "PASS",
+      "details": "[\"rsv-2026-08-27-1\"]"
+    },
+    {
+      "name": "Q9 commit setelah dipanen TIDAK menagih (kalau harus salah, salah ke arah murid)",
+      "status": "PASS",
+      "details": "reservation_expired"
+    },
+    {
+      "name": "Q9 reserve berikutnya ikut memanen lease mati sebelum menilai gerbang",
+      "status": "PASS",
+      "details": "10"
+    },
+    {
+      "name": "Q10 pada 23:59:59 WIB kuota memang habis",
+      "status": "PASS",
+      "details": "ai_daily"
+    },
+    {
+      "name": "Q10 pada 00:00:01 WIB hari berganti, counter nol, permintaan lolos TANPA reset eksplisit",
+      "status": "PASS",
+      "details": "2026-08-28"
+    },
+    {
+      "name": "Q10 dua permintaan di hari yang sama TIDAK mereset dua kali",
+      "status": "PASS",
+      "details": "2"
+    },
+    {
+      "name": "Q10 snapshot 23:59:59 WIB: resetAt tepat 00:00 WIB berikutnya dan ≤ 24 jam",
+      "status": "PASS",
+      "details": "1000"
+    },
+    {
+      "name": "Q10 snapshot menandai exhausted saat bucket penuh dan mengirim copyKey lewat rute",
+      "status": "PASS",
+      "details": "exhausted"
+    },
+    {
+      "name": "Q11 cache hit (ditentukan SERVER) tidak menagih apa pun",
+      "status": "PASS",
+      "details": "cache_hit"
+    },
+    {
+      "name": "Q11 klaim cacheHit dari klien TIDAK berarti: cache-miss tetap ditagih",
+      "status": "PASS",
+      "details": "{\"charge\":true,\"reason\":\"cache_miss\",\"bucket\":\"tts\",\"amount\":438}"
+    },
+    {
+      "name": "Q11 500 replay aset yang sudah ada = nol konsumsi kuota (replay gratis, tak terbatas)",
+      "status": "PASS",
+      "details": "{\"ai\":0,\"aiTranslate\":0,\"ttsCalls\":0,\"ttsChars\":0}"
+    },
+    {
+      "name": "Q12 commit tidak bisa menagih lebih dari yang direservasi (di-clamp)",
+      "status": "PASS",
+      "details": "100/1"
+    },
+    {
+      "name": "Q12 pemakaian nyata lebih kecil ditagih apa adanya (bukan angka pesimistis)",
+      "status": "PASS",
+      "details": "40"
+    },
+    {
+      "name": "Q13 30 reserve pada limit 25 → TEPAT 25 lolos, tidak pernah over-grant",
+      "status": "PASS",
+      "details": "allowed=25"
+    },
+    {
+      "name": "Q13 invarian tetap utuh setelah 30 percobaan",
+      "status": "PASS",
+      "details": "invariant"
+    },
+    {
+      "name": "Q13 semua reservasi terbuka bisa di-rollback dan kuota kembali nol terpakai",
+      "status": "PASS",
+      "details": "full rollback"
+    },
+    {
+      "name": "quality.yml memanggil node quota-core-test.js",
+      "status": "PASS",
+      "details": "quality.yml"
+    }
+  ]
+}

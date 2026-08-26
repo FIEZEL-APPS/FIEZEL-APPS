@@ -131,3 +131,6 @@ jobs:
           node puter-auth-diagnostics-test.js
           node puter-popup-once-test.js
           node cf-api-contract-test.js
+          node quota-core-test.js
+          node quota-manipulation-test.js
+          node quota-reset-test.js
