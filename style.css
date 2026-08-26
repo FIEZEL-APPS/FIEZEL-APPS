@@ -478,6 +478,18 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .auth-gate .auth-primary:hover{background:var(--sun-deep);border-color:transparent;box-shadow:var(--shadow-md)}
 .auth-gate .auth-primary svg{width:19px;height:19px}
 .auth-gate .auth-primary[disabled]{background:var(--panel-soft);color:var(--text-disabled);opacity:1;cursor:not-allowed;transform:none;box-shadow:none}
+/* m026-02 tombol sekunder "Lanjut tanpa akun". Bentuknya sengaja SEKUNDER - tanpa
+   latar, tanpa bayangan - supaya hierarki Apple di atas tetap utuh: yang utama tetap
+   satu. Tetap penuh lebar dan tetap 44px supaya bisa ditekan dengan ibu jari. */
+.auth-gate .text-button{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:44px;margin:12px 0 0;padding:0 16px;
+  border:0;background:transparent;box-shadow:none;
+  color:var(--accent-strong);font-family:var(--fz-body);font-size:.86rem;font-weight:600;
+}
+.auth-gate .text-button:hover{background:var(--panel-soft);box-shadow:none;transform:none}
+.auth-gate .text-button[disabled]{color:var(--text-disabled);cursor:not-allowed;transform:none}
+.auth-gate #authGateSkipHelp{margin:10px 0 0}
 .auth-gate .auth-help{margin:18px 0 0;color:var(--muted);font-size:.76rem;line-height:1.55}
 .auth-gate .auth-legal{margin:14px 0 0;color:var(--muted-soft);font-size:.68rem;line-height:1.5}
 @media (max-width:420px){.auth-gate .auth-panel{padding:36px 24px 30px;border-radius:22px}.auth-gate .auth-mark{width:60px;height:60px;margin-bottom:20px}}

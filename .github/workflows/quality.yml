@@ -124,3 +124,4 @@ jobs:
           node neural-voice-m02593-subtitle-translate-test.js
           node puter-auth-coop-test.js
           node puter-auth-diagnostics-test.js
+          node puter-popup-once-test.js
