@@ -3237,3 +3237,26 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .chip-level{background:var(--sun-soft);color:var(--text);border:1px solid var(--sun-deep)}
 .chip-cat{background:var(--panel-soft);border:1px solid var(--line);color:var(--muted)}
 .chip-cat b{color:var(--text);font-weight:700}
+
+/* ---------- §5 peta belajar satu kartu + panel NEXT SESSION ---------- */
+.map-rows{display:grid;gap:13px}
+.map-row{display:grid;grid-template-columns:22px 84px 1fr 40px;align-items:center;gap:10px}
+.map-row .mi{width:22px;height:22px;display:grid;place-items:center;border-radius:7px;background:var(--sun-soft);color:var(--text)}
+.map-row .mi svg{width:14px;height:14px}
+.map-row .mn{font-weight:700;font-size:.86rem}
+.map-row .bar{margin-top:0}
+.map-row .mp{text-align:right;font-weight:800;font-size:.84rem;font-variant-numeric:tabular-nums}
+/* Keterangan bukti pindah ke baris kedua di kolom batang: pada layar sempit ia tidak
+   pernah ikut menyempitkan batangnya sendiri. */
+.map-row .me{grid-column:3/5;font-size:.72rem;color:var(--muted);line-height:1.4}
+.map-note{display:flex;align-items:center;gap:9px;margin:14px 0 0;font-size:.79rem;line-height:1.5;color:var(--muted)}
+.map-note .coach-strip-face{flex:0 0 auto;width:28px;height:28px}
+
+.next-session{margin-bottom:2px}
+.core-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.core-cta,.core-ghost{min-height:44px;padding:10px 18px;border-radius:var(--radius-md);font-weight:700;font-size:.86rem;cursor:pointer}
+/* Bidang kuning dengan tinta ink di atasnya (11,4:1). Kuning tidak pernah jadi warna
+   TEKS di sistem ini; di sini ia bidang, dan itu memang perannya. */
+.core-cta{background:linear-gradient(135deg,var(--sun),var(--sun-deep));color:var(--text);border:1.5px solid var(--sun-deep)}
+.core-ghost{background:var(--core-soft);border:1.5px solid var(--core-line);color:var(--on-core)}
+.core-cta:focus-visible,.core-ghost:focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
