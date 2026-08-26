@@ -39,5 +39,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "./assets/brand/screenshot-home.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Layar Home FIEZEL dengan target harian dan empat skill inti"
+    },
+    {
+      "src": "./assets/brand/screenshot-grammar.png",
+      "sizes": "780x1688",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Grammar Hub dengan 17 lesson terurut untuk level A1"
+    }
   ]
 }
