@@ -1,0 +1,181 @@
+SNAP f01_grammar_lesson_intro
+SNAP f01b_grammar_lesson_intro_full
+--- DUMP grammar lesson intro ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "active-level-control", "txt": "Level belajarA1Ganti", "oc": "openLevelPanel()", "w": 364, "h": 44}
+  {"cls": "primary", "txt": "Mulai 25 soal", "oc": "practiceSkill('subject_object_pronouns_and_possessives'", "w": 318, "h": 52}
+  {"cls": "", "txt": "Kembali ke Grammar Hub", "oc": "exitStage()", "w": 259, "h": 49}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+quiz started: True
+SNAP f02_grammar_quiz_question
+--- DUMP grammar quiz question ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "", "txt": "Keluar", "oc": "", "w": 153, "h": 49}
+  {"cls": "quiz-next", "txt": "Lanjut", "oc": "", "w": 109, "h": 49}
+  {"cls": "option", "txt": "She", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Her", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Me", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Hers", "oc": "", "w": 326, "h": 53}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+SNAP f06b_tutor_turn_hint
+--- DUMP tutor turn ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "", "txt": "Keluar", "oc": "", "w": 153, "h": 49}
+  {"cls": "quiz-next", "txt": "Lanjut", "oc": "", "w": 109, "h": 49}
+  {"cls": "option wrong", "txt": "She", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Her", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Me", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "Hers", "oc": "", "w": 326, "h": 53}
+  {"cls": "tutor-stuck", "txt": "Aku masih belum paham", "oc": "", "w": 192, "h": 44}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+SNAP f03_confidence_pop
+SNAP f06_grammar_teach_pause
+SNAP f07_grammar_completion
+SNAP f07b_grammar_completion_full
+--- DUMP grammar completion ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "primary", "txt": "Kembali ke Home", "oc": "go('home')", "w": 200, "h": 52}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+got: {'err': False, 'ok': False, 'conf': True, 'teach': True, 'tutor': True}
+--- DUMP vocab view ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "active-level-control", "txt": "Level belajarA1Ganti", "oc": "openLevelPanel()", "w": 364, "h": 44}
+  {"cls": "primary", "txt": "Uji Vocabulary A1", "oc": "startVocabQuiz()", "w": 195, "h": 52}
+  {"cls": "", "txt": "Review Due (0)", "oc": "reviewVocab()", "w": 179, "h": 50}
+  {"cls": "", "txt": "Buka flashcards", "oc": "flashcards('A1')", "w": 185, "h": 49}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+vocab start via Belajar
+SNAP f08_vocab_quiz_question
+--- DUMP vocab quiz ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "active-level-control", "txt": "Level belajarA1Ganti", "oc": "openLevelPanel()", "w": 364, "h": 44}
+  {"cls": "primary", "txt": "Uji Vocabulary A1", "oc": "startVocabQuiz()", "w": 195, "h": 52}
+  {"cls": "", "txt": "Review Due (0)", "oc": "reviewVocab()", "w": 179, "h": 50}
+  {"cls": "", "txt": "Buka flashcards", "oc": "flashcards('A1')", "w": 185, "h": 49}
+  {"cls": "level-picker-card is-active", "txt": "A1Pemula · fondasi kalimat sederhana", "oc": "", "w": 158, "h": 88}
+  {"cls": "level-picker-card", "txt": "A2Dasar · percakapan sehari-hari", "oc": "", "w": 158, "h": 88}
+  {"cls": "level-picker-card", "txt": "B1Menengah · komunikasi mandiri", "oc": "", "w": 158, "h": 88}
+  {"cls": "level-picker-card", "txt": "B2Menengah atas · ide yang lebih kompleks", "oc": "", "w": 158, "h": 88}
+  {"cls": "level-picker-card", "txt": "C1Mahir · akademik dan profesional", "oc": "", "w": 158, "h": 88}
+  {"cls": "level-picker-card", "txt": "C2Penguasaan · nuansa dan struktur lanjut", "oc": "", "w": 158, "h": 88}
+  {"cls": "primary", "txt": "Selesai", "oc": "", "w": 324, "h": 52}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 70}
+  {"cls": "nav active", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 70}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 70}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+--- DUMP listening view ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "fsl-primary", "txt": "Dengarkan", "oc": "", "w": 176, "h": 49}
+  {"cls": "", "txt": "Keluar", "oc": "", "w": 142, "h": 49}
+  {"cls": "fsl-input", "txt": "Ketik yang kamu dengar…", "oc": "", "w": 326, "h": 47}
+  {"cls": "fsl-primary", "txt": "Nilai jawaban", "oc": "", "w": 326, "h": 49}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 61}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+listening start via Dengarkan
+SNAP f10_listening_exercise
+SNAP f10b_listening_exercise_full
+--- DUMP listening exercise ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "fsl-primary", "txt": "Dengarkan", "oc": "", "w": 176, "h": 49}
+  {"cls": "", "txt": "Keluar", "oc": "", "w": 142, "h": 49}
+  {"cls": "fsl-input", "txt": "Ketik yang kamu dengar…", "oc": "", "w": 326, "h": 47}
+  {"cls": "fsl-primary", "txt": "Nilai jawaban", "oc": "", "w": 326, "h": 49}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 61}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+SNAP f12_test_start
+--- DUMP test view ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "active-level-control", "txt": "Level belajarA1Ganti", "oc": "openLevelPanel()", "w": 364, "h": 44}
+  {"cls": "primary", "txt": "Mulai 25 soal", "oc": "startPlacement()", "w": 162, "h": 52}
+  {"cls": "level-card", "txt": "1A1Masuk ke latihan level A1", "oc": "startLevelPractice('A1')", "w": 326, "h": 72}
+  {"cls": "level-card", "txt": "2A2Masuk ke latihan level A2", "oc": "startLevelPractice('A2')", "w": 326, "h": 72}
+  {"cls": "level-card", "txt": "3B1Masuk ke latihan level B1", "oc": "startLevelPractice('B1')", "w": 326, "h": 72}
+  {"cls": "level-card", "txt": "4B2Masuk ke latihan level B2", "oc": "startLevelPractice('B2')", "w": 326, "h": 72}
+  {"cls": "level-card", "txt": "5C1Masuk ke latihan level C1", "oc": "startLevelPractice('C1')", "w": 326, "h": 72}
+  {"cls": "level-card", "txt": "6C2Masuk ke latihan level C2", "oc": "startLevelPractice('C2')", "w": 326, "h": 72}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 61}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
+SNAP f13_test_question
+--- DUMP test question ---
+  {"cls": "brand-button", "txt": "", "oc": "go('home')", "w": 118, "h": 44}
+  {"cls": "icon-button ask-button", "txt": "Tanya FIEZEL?", "oc": "go('ask')", "w": 61, "h": 44}
+  {"cls": "icon-button", "txt": "", "oc": "openSettings()", "w": 39, "h": 44}
+  {"cls": "", "txt": "Keluar", "oc": "", "w": 153, "h": 49}
+  {"cls": "quiz-next", "txt": "Lanjut", "oc": "", "w": 109, "h": 49}
+  {"cls": "option", "txt": "roti", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "bisa; dapat (bentuk lampau/kesopanan dari 'can')", "oc": "", "w": 326, "h": 76}
+  {"cls": "option", "txt": "di bawah", "oc": "", "w": 326, "h": 53}
+  {"cls": "option", "txt": "toko buku (American)", "oc": "", "w": 326, "h": 54}
+  {"cls": "nav", "txt": "Home", "oc": "go('home')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Vocab", "oc": "go('vocab')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Grammar", "oc": "go('grammar')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Reading", "oc": "go('reading')", "w": 69, "h": 61}
+  {"cls": "nav", "txt": "Peta", "oc": "go('progress')", "w": 69, "h": 61}
+  {"cls": "", "txt": "Diagnostics", "oc": "", "w": 1, "h": 44}
+  {"cls": "fz-coach-bubble has-mascot", "txt": "", "oc": "", "w": 58, "h": 58}
