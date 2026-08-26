@@ -1,39 +1,137 @@
 /* FIEZEL website — token desain bersama (SATU sumber, dipakai landing + install).
-   Diturunkan dari palet aplikasi (style.css m025-115) dan BRAND-GUIDE.
-   Aturan keras: teks tidak pernah memakai warna pastel langsung di atas cream;
-   animasi hanya transform+opacity; hormati prefers-reduced-motion. */
+   m028-04 REBRAND: token disamakan dengan sistem aplikasi (style.css :root utama, blok
+   m025-115 + fase 2 --sun/--core) dan design/redesign-v1/DIRECTION.md
+   "WARM PAPER, BRIGHT MIND".
+
+   Dua dunia, satu sistem:
+   1. WARM PAPER — dasar krem #FFF9EE, tinta #241A11. Semua bacaan dan navigasi.
+   2. BRIGHT MIND — permukaan gelap hangat --core #1B1418 + energi kuning Solar #FFC700
+      untuk momen "kecerdasan" (hero, panel maskot, CTA akhir). Dipakai HEMAT.
+
+   Aturan keras yang diwarisi dari app:
+   - Kuning/pastel adalah warna BIDANG, bukan warna teks. #FFC700 di atas krem hanya 1,4:1,
+     jadi tinta selalu --text / --accent, dan kuning hanya jadi latar dengan tinta ink.
+   - LANTAI FONT 12px (.75rem). Tidak ada teks di bawah itu.
+   - Focus ring: 2px --focus-ring (#A67A00, 3,4:1 di atas krem) offset 2px; di dalam panel
+     --core dipakai --focus-ring-on-core (#FFC700, 11,4:1 di atas #1B1418).
+   - Animasi hanya transform+opacity; hormati prefers-reduced-motion.
+   - Keluarga coral/mint/lilac DIPENSIUNKAN sebagai permukaan kontrol (tinta di atasnya
+     gagal kontras). Perannya diambil keluarga semantik yang punya turunan pekat. */
 @font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-400.woff2') format('woff2');font-weight:400;font-display:swap}
 @font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-600.woff2') format('woff2');font-weight:600;font-display:swap}
 @font-face{font-family:'Plus Jakarta Sans';src:url('assets/fonts/PlusJakartaSans-700.woff2') format('woff2');font-weight:700 800;font-display:swap}
 :root{
-  --cream:#FFF8ED; --cream-deep:#FFF0DC; --panel:#FFFFFF;
-  --ink:#2B2118; --muted:#6F5F48;
-  --yellow:#FFD23F; --yellow-deep:#E0B22A; --yellow-soft:#FFF1C9;
-  --coral:#EE5D4A; --coral-deep:#C9432F; --coral-soft:#FDE3DE;
-  --mint:#A8DCC4; --mint-soft:#E9F7F0; --teal-pastel:#9FD5CE; --lilac:#C9BCE4;
-  --line:#F2E6D3; --line-soft:#F8F0E4;
+  /* --- surface (Warm Paper) --- */
+  --bg:#FFF9EE;
+  --cream:#FFF9EE;
+  --cream-deep:#FFF3DC;
+  --panel:#FFFFFF;
+  --panel-soft:#FFF3DC;
+  --line:#F0E4CF;
+  --line-soft:#F7EFDF;
+
+  /* --- ink --- */
+  --text:#241A11;
+  --ink:#241A11;
+  --muted:#6E5E47;
+  --muted-soft:#7E6C4B;   /* hanya untuk teks >=14px */
+
+  /* --- brand energy (Solar) --- */
+  --sun:#FFC700;
+  --sun-deep:#E6A800;
+  --sun-press:#CC9600;
+  --sun-soft:#FFF3C4;
+  --sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  --yellow:#FFC700;
+  --yellow-deep:#E6A800;
+  --yellow-soft:#FFF3C4;
+
+  /* --- intelligence (Bright Mind / panel AI) --- */
+  --core:#1B1418;
+  --core-soft:#2A2126;
+  --core-line:#3A3038;
+  --on-core:#FDFAF3;
+  --on-core-muted:rgba(253,250,243,.72);
+
+  /* --- semantik + tinta aksen --- */
+  --accent:#C2402C;        /* 6,5:1 di atas krem - dipakai untuk tautan & ikon, bukan bidang */
+  --accent-strong:#A33422;
+  --accent-soft:#FDE3DE;
+  --good:#1F6B4E; --good-soft:#E9F7F0;
+  --bad:#AC3E2A;  --bad-soft:#FDE3DE;
+  --info:#7A5F1B; --info-soft:#FFF3C4;
+  --focus-ring:#A67A00;
+  --focus-ring-on-core:#FFC700;
+
+  /* --- tipografi --- */
   --font:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
-  --fz-spring:cubic-bezier(.34,1.56,.64,1); --fz-out:cubic-bezier(.22,1,.36,1);
-  --fz-fast:120ms; --fz-base:240ms; --fz-slow:420ms;
-  --radius:20px; --radius-sm:12px;
-  --shadow-card:0 2px 0 var(--line),0 12px 32px rgba(43,33,24,.07);
-  --shadow-btn:0 3px 0 var(--yellow-deep);
+  --fs-micro:.75rem;   /* 12px - LANTAI */
+  --fs-label:.8125rem; /* 13px */
+  --fs-body:1rem;
+
+  /* --- bentuk --- */
+  --radius-lg:24px;
+  --radius-md:16px;
+  --radius-sm:12px;
+  --radius-pill:999px;
+  --radius:24px;        /* alias lama */
+
+  /* --- bayangan --- */
+  --shadow-sm:0 2px 10px rgba(36,26,17,.06);
+  --shadow-md:0 10px 30px rgba(36,26,17,.09);
+  --shadow-lg:0 24px 60px rgba(36,26,17,.15);
+  --shadow-card:var(--shadow-md);
+  --shadow-btn:0 3px 0 var(--sun-deep);
+
+  /* --- gerak --- */
+  --ease:cubic-bezier(.22,.8,.28,1);
+  --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  --dur-s:.18s; --dur-m:.32s; --dur-l:.5s;
+  --fz-out:cubic-bezier(.22,.8,.28,1);
+  --fz-spring:cubic-bezier(.34,1.4,.4,1);
+  --fz-fast:180ms; --fz-base:320ms; --fz-slow:500ms;
+
   --maxw:1080px;
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--font);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-weight:400;line-height:1.6;-webkit-font-smoothing:antialiased}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{animation:none!important;transition:none!important}
 }
-:focus-visible{outline:3px solid var(--coral);outline-offset:3px;border-radius:6px}
+:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-radius:6px}
+
+/* ---------- BRIGHT MIND: panel core (dipakai landing + install) ----------
+   Permukaan gelap hangat + energi kuning. Tinta --on-core di atas --core = 14,7:1. */
+.core-panel{position:relative;overflow:hidden;background:var(--core);color:var(--on-core);border-radius:var(--radius-lg)}
+.core-panel::before{
+  content:"";position:absolute;inset:-30% -20% auto -20%;height:120%;
+  background:radial-gradient(58% 52% at 78% 8%,rgba(255,199,0,.30) 0%,rgba(255,199,0,.10) 42%,transparent 72%);
+  pointer-events:none;
+}
+.core-panel::after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(90deg,rgba(255,199,0,.10) 1px,transparent 1px),linear-gradient(180deg,rgba(255,199,0,.07) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(70% 60% at 70% 10%,#000 0%,transparent 78%);
+  -webkit-mask-image:radial-gradient(70% 60% at 70% 10%,#000 0%,transparent 78%);
+}
+.core-panel>*{position:relative;z-index:1}
+.core-panel :focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
+.core-eyebrow{font-size:var(--fs-micro);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sun)}
+
+/* tagline kampanye V3 - "NOT JUST LEARNING WITH YOU. LEARNING ABOUT YOU." */
+.tagline{margin:0;font-weight:800;letter-spacing:-.01em;line-height:1.28;text-transform:uppercase}
+.tagline .t-1{color:var(--on-core-muted)}
+.tagline .t-2{color:var(--sun)}
 
 /* credit strip - baris kredit paling atas topbar (m028-03) */
-.credit-strip{background:var(--ink);color:var(--cream)}
-.credit-in{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;font-size:.78rem;letter-spacing:.02em}
-.credit-in strong{font-weight:700;color:var(--yellow)}
+.credit-strip{background:var(--core);color:var(--on-core)}
+.credit-in{display:flex;align-items:center;justify-content:center;gap:8px;min-height:32px;font-size:var(--fs-micro);letter-spacing:.02em}
+.credit-in strong{font-weight:700;color:var(--sun)}
 .credit-in{flex-wrap:nowrap;white-space:nowrap}
-.credit-ig{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;color:var(--cream);transition:transform var(--fz-fast) var(--fz-spring),opacity var(--fz-fast)}
+.credit-ig{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;color:var(--on-core);transition:transform var(--fz-fast) var(--fz-spring),opacity var(--fz-fast)}
 .credit-ig svg{width:15px;height:15px}
-.credit-ig:hover{transform:scale(1.15);color:var(--yellow)}
+.credit-ig:hover{transform:scale(1.15);color:var(--sun)}
+.credit-strip :focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}

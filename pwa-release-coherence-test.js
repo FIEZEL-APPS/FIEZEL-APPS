@@ -23,7 +23,7 @@ class ResponseMock{
 }
 
 function load(){
-  const origin='https://fitrajft-ux.github.io';
+  const origin='https://fiezel-apps.github.io';
   const scope=origin+'/FIEZEL-APPS/';
   const listeners={};
   const stores=new Map();

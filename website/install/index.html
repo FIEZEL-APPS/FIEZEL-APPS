@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cara Install FIEZEL di Android, iPhone, dan Desktop</title>
 <meta name="description" content="Panduan pasang FIEZEL ke layar utama lewat Chrome, Safari, atau desktop. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.">
-<meta name="theme-color" content="#FFF8ED">
+<meta name="theme-color" content="#FFF9EE">
 <link rel="icon" href="../assets/brand/fiezel-icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="../assets/brand/fiezel-icon-192.png">
 <meta property="og:type" content="website">
@@ -13,7 +13,7 @@
 <meta property="og:description" content="Panduan pasang FIEZEL ke layar utama lewat Chrome, Safari, atau desktop. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.">
 <meta property="og:image" content="../assets/brand/fiezel-icon-512.png">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="../tokens.css?v=m02804">
+<link rel="stylesheet" href="../tokens.css?v=m02804rb">
 <link rel="stylesheet" href="install.css">
 <script>document.documentElement.className = 'js';</script>
 </head>
@@ -42,7 +42,13 @@
 <main id="utama">
 
   <section class="wrap intro">
-    <img class="mascot" src="../assets/brand/paw-mascot-head.svg" alt="PAW, maskot kucing FIEZEL" width="72" height="75">
+    <div class="core-panel intro-stage">
+      <img class="mascot" src="../assets/brand/paw-mascot-head.svg" alt="PAW, maskot kucing FIEZEL" width="72" height="75">
+      <div>
+        <p class="core-eyebrow">Aplikasi web (PWA)</p>
+        <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
+      </div>
+    </div>
     <h1>Cara pasang FIEZEL di perangkatmu</h1>
     <p class="lead">FIEZEL adalah aplikasi web, jadi kamu tidak perlu toko aplikasi dan tidak perlu mengunduh berkas apa pun. Kamu cukup menambahkannya ke layar utama lewat menu browser, dan setelahnya FIEZEL terbuka layar penuh seperti aplikasi biasa. Pilih panduan sesuai perangkatmu di bawah.</p>
 
@@ -51,7 +57,10 @@
       <p>Buka FIEZEL lewat alamat HTTPS di browser yang mendukung pemasangan aplikasi web — Chrome di Android dan desktop, Edge di desktop, atau Safari di iPhone dan iPad. Pemasangan tidak muncul pada koneksi tanpa HTTPS.</p>
     </div>
 
-    <p class="cta-row"><a class="btn btn-primary" href="../app/">Buka aplikasi dulu</a></p>
+    <p class="cta-row">
+      <a class="btn btn-primary" href="../app/">Buka aplikasi dulu</a>
+      <a class="btn btn-ghost" href="https://fiezel-apps.github.io/FIEZEL-APPS/" rel="noopener">Buka lewat cermin GitHub Pages</a>
+    </p>
   </section>
 
   <section class="wrap platforms" aria-labelledby="pilih-perangkat">
@@ -72,7 +81,7 @@
       <ol class="steps">
         <li>
           <span class="num" aria-hidden="true">1</span>
-          <div class="step-body"><p>Buka FIEZEL di Chrome lewat alamat resminya, lalu tunggu halaman selesai dimuat.</p></div>
+          <div class="step-body"><p>Buka FIEZEL di Chrome lewat alamat resminya — <b>fiezel.my.id/app/</b> (cermin: fiezel-apps.github.io/FIEZEL-APPS) — lalu tunggu halaman selesai dimuat.</p></div>
         </li>
         <li>
           <span class="num" aria-hidden="true">2</span>
@@ -102,7 +111,7 @@
     <!-- iOS -->
     <article class="panel" id="panel-ios" role="tabpanel" aria-labelledby="tab-ios" tabindex="0">
       <header class="panel-head">
-        <span class="chip chip-coral">iPhone / iPad</span>
+        <span class="chip chip-core">iPhone / iPad</span>
         <h3>iPhone dan iPad (Safari)</h3>
       </header>
       <ol class="steps">
@@ -133,7 +142,7 @@
           <div class="step-body"><p>Buka FIEZEL dari ikon barunya di Layar Utama.</p></div>
         </li>
       </ol>
-      <p class="callout callout-coral"><strong>Catatan:</strong> Di iOS hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama. Bila kamu membuka FIEZEL dari Chrome iOS, menu itu tidak akan ada.</p>
+      <p class="callout callout-core"><strong>Catatan:</strong> Di iOS hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama. Bila kamu membuka FIEZEL dari Chrome iOS, menu itu tidak akan ada.</p>
     </article>
 
     <!-- DESKTOP -->
@@ -198,7 +207,8 @@
   </section>
 
   <section class="wrap end" aria-labelledby="cta-akhir">
-    <div class="end-card">
+    <div class="core-panel end-card">
+      <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
       <h2 id="cta-akhir">Sudah terpasang? Mulai lesson pertamamu</h2>
       <p>Buka FIEZEL dari layar utama, pilih tingkat CEFR-mu, lalu kerjakan satu lesson hari ini.</p>
       <p class="cta-row">
@@ -218,6 +228,8 @@
       <a href="../">Halaman utama</a>
       <span aria-hidden="true">·</span>
       <a href="../app/">Buka Aplikasi</a>
+      <span aria-hidden="true">·</span>
+      <a href="https://fiezel-apps.github.io/FIEZEL-APPS/" rel="noopener">Cermin aplikasi</a>
     </nav>
     <p class="foot-note">Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
     <p class="foot-note">Materi dipetakan ke tingkat CEFR A1–C2. Bukan sertifikasi resmi. Gratis, tanpa langganan.</p>
