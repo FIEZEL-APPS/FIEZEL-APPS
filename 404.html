@@ -24,13 +24,14 @@
 })();
 </script>
 <style>
-  :root { --maroon: #8C2233; --cream: #FDFAF3; }
+  /* m028-04 rebrand: palet disamakan dengan sistem app "Warm Paper, Bright Mind". */
+  :root { --core: #1B1418; --on-core: #FDFAF3; --cream: #FFF9EE; --sun: #FFC700; --sun-deep: #E6A800; --text: #241A11; --muted: #6E5E47; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     background: var(--cream);
-    color: var(--maroon);
+    color: var(--text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -41,20 +42,23 @@
   .badge {
     display: inline-flex; align-items: center; justify-content: center;
     width: 72px; height: 72px; border-radius: 22px;
-    background: var(--maroon); color: var(--cream);
+    background: var(--core); color: var(--sun);
     font-size: 30px; font-weight: 800; letter-spacing: .5px;
     margin-bottom: 20px;
   }
   h1 { font-size: 24px; line-height: 1.25; margin-bottom: 10px; }
-  p { font-size: 15px; line-height: 1.6; color: rgba(140, 34, 51, .78); margin-bottom: 24px; }
+  p { font-size: 15px; line-height: 1.6; color: var(--muted); margin-bottom: 24px; }
   a.cta {
     display: inline-block;
-    background: var(--maroon); color: var(--cream);
+    background: var(--sun); color: var(--text);
     text-decoration: none; font-weight: 700; font-size: 16px;
-    padding: 14px 28px; border-radius: 999px;
+    border: 2px solid var(--text); box-shadow: 0 3px 0 var(--sun-deep);
+    padding: 12px 26px; border-radius: 999px;
   }
   a.cta:active { opacity: .85; }
-  .hint { margin-top: 18px; font-size: 12.5px; color: rgba(140, 34, 51, .55); }
+  .hint { margin-top: 18px; font-size: 12.5px; color: var(--muted); }
+  .hint a.site { color: var(--text); font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--sun); }
+  a:focus-visible, .cta:focus-visible { outline: 2px solid #A67A00; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -65,6 +69,7 @@
      kami akan mengalihkanmu otomatis — atau lanjut lewat tombol di bawah.</p>
   <a class="cta" href="/FIEZEL-APPS/">Buka FIEZEL</a>
   <p class="hint">FIEZEL Personal English OS · fiezel-apps.github.io/FIEZEL-APPS</p>
+  <p class="hint"><a class="site" href="https://fiezel.my.id/">Situs resmi: fiezel.my.id</a></p>
 </main>
 </body>
 </html>
