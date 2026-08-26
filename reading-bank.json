@@ -14667,10 +14667,10 @@
       [
         "What is the main idea of this review?",
         [
-          "the app keeps its screens simple but gives away some privacy",
+          "notes stay on the device but travel to one rented server abroad",
           "the app offers a plain feature list but unusual honesty",
-          "the app looks open but hides a thin privacy notice",
-          "the app wins on features but loses on its export choices"
+          "the developers publish a yearly report but limit export to two forms",
+          "the app wins on speed rather than on what it promises"
         ],
         1,
         {
@@ -14679,7 +14679,7 @@
           "answer": "the app offers a plain feature list but unusual honesty",
           "patternId": "b2a-r0154-1-main_idea",
           "why": "Resensinya nyimpulin \u201cWhere the app genuinely wins is in the small print\u201d sambil ngakui fiturnya \u201ccompetent rather than brilliant\u201d.",
-          "whyOthersFail": "Ketiganya penilaian yang masuk akal buat aplikasi gratis, tapi teks ngeblok: aplikasinya \u201crequests no contact list, no location, and no advertising identifier\u201d, jadi nggak ada privasi yang ditukar; notisnya justru dipuji karena \u201centirely free of the usual fog\u201d, bukan disembunyikan; dan kalah-menangnya kebalik \u2014 fiturnya biasa, ekspornya cuma satu dari beberapa kekurangan."
+          "whyOthersFail": "Ketiga pengecoh adalah klaim yang betul-betul ada di paragraf kedua ulasan ini, tetapi masing-masing keterangan sampingan, bukan penilaian pokoknya. Penyimpanan di perangkat dan satu server sewaan hanyalah rincian teknis di tengah daftar fitur. Laporan tahunan tentang permintaan pejabat serta ekspor yang terbatas pada dua bentuk adalah dua rincian yang benar tetapi bukan pertimbangan yang ditimbang ulasan ini. Kecepatan kotak pencarian termasuk dalam bagian yang dinilai \"competent rather than brilliant\". Penekanannya disebut sendiri oleh penulis: \"Where the app genuinely wins is in the small print\" berbanding \"the design feels plain beside its commercial rivals\". Opsi terakhir memang berbentuk rangkuman, tetapi salah arah: kecepatan justru dinilai \"competent rather than brilliant\", sedangkan janji kecillah yang dipuji."
         }
       ],
       [
@@ -14873,9 +14873,9 @@
       [
         "What is the writer arguing in this column?",
         [
-          "morning counts show that riders arrive before any lane is built",
-          "empty lanes show that every painted lane deserves its road space",
-          "empty lanes show that riders prefer quiet streets to main roads",
+          "the case for lanes rests on how many people they move",
+          "a lane ending at a roundabout is worse than having none at all",
+          "fear rather than comfort keeps the writer's neighbours in their cars",
           "empty lanes show only that the network is still unfinished"
         ],
         3,
@@ -14885,7 +14885,7 @@
           "answer": "empty lanes show only that the network is still unfinished",
           "patternId": "b2a-r0156-1-main_idea",
           "why": "Penulis nutup argumennya sama perumpamaan \u201ccomplaining about empty lanes resembles blaming an unfinished bridge for the river\u201d, jadi jalur yang kelihatan kosong cuma nandain jaringannya belum nyambung.",
-          "whyOthersFail": "Ketiganya bacaan yang wajar buat perdebatan jalur sepeda, tapi teks ngeblok: \u201cDemand does not appear before the lane; it appears afterwards\u201d ngebalik urutan di opsi hitungan pagi; \u201cNone of this makes every lane sensible\u201d nolak klaim setiap jalur berhak dapat ruang; dan yang dituntut penulis justru jaringan yang nyambungin \u201cschools, markets, and stations\u201d, bukan jalan-jalan sepi."
+          "whyOthersFail": "Ketiga pengecoh adalah klaim nyata dari paragraf lain kolom ini, tetapi tak satu pun menjadi hujah utamanya. Angka lima kali lipat adalah jawaban pihak pendukung yang dikutip penulis untuk menunjukkan kedua kubu punya angka. Lajur yang berhenti di bundaran muncul sebagai kelonggaran, \"None of this makes every lane sensible\". Rasa takut para tetangga adalah bukti pendukung dari pengalaman penulis. Penekanannya ada pada \"Until then, complaining about empty lanes resembles blaming an unfinished bridge for the river\". Opsi pertama juga berbentuk rangkuman, tetapi angka kapasitas itu dibawa penulis sebagai jawaban pihak pendukung, bukan sebagai tumpuan hujahnya sendiri."
         }
       ],
       [
@@ -14976,10 +14976,10 @@
       [
         "What is this report mainly about?",
         [
-          "how the length of practice affects a player's sleep",
-          "how coaches can improve sleep by dimming the lights",
+          "why heat and excitement keep players alert once they lie down",
+          "how much less the late squad slept on its training nights",
           "how the hour of practice shapes the following morning",
-          "how muscle pain after hard exercise delays a player's sleep"
+          "why one academy's figures should not be transferred elsewhere"
         ],
         2,
         {
@@ -14988,7 +14988,7 @@
           "answer": "how the hour of practice shapes the following morning",
           "patternId": "b2a-r0157-1-main_idea",
           "why": "Laporan nyebut rantainya lugas: \u201cfrom the timetable to the sleep, and from the sleep to the following day\u201d.",
-          "whyOthersFail": "Ketiganya kesimpulan yang wajar dari studi tidur atlet, tapi teks ngeblok: yang dibedakan antar kelompok cuma jam selesai latihan (\u201cEverything else in their weekly routine remained identical\u201d), bukan lamanya; lampu yang diredupkan cuma satu dari tiga saran di akhir, bukan pokok laporan; dan yang bikin pemain tetap terjaga disebut \u201cBody temperature and excitement\u201d, bukan nyeri otot."
+          "whyOthersFail": "Ketiga pengecoh benar-benar dinyatakan dalam laporan ini, tetapi masing-masing satu mata rantai atau satu catatan kehati-hatian, bukan pokoknya. Suhu tubuh dan kegembiraan adalah penjelasan mengapa tidurnya berkurang, bukan temuannya. Selisih 47 menit adalah satu ukuran di dalam rantai itu. Peringatan agar angkanya tidak dipindahkan ke tempat lain adalah pembatasan cakupan. Penekanannya dinyatakan sendiri: \"The chain therefore runs from the timetable to the sleep, and from the sleep to the following day\"."
         }
       ],
       [
@@ -15182,10 +15182,10 @@
       [
         "What is the main argument of this column?",
         [
-          "the cost of fast delivery falls mainly on the shops",
+          "a two-hour parcel shares its van with far fewer other items",
           "the cost of fast delivery is carried by other people",
-          "the cost of fast delivery falls on shoppers who order often",
-          "the cost of fast delivery shows up in the delivery fee"
+          "most buyers chose the slower box once retailers offered it",
+          "the choice of speed is made by the app rather than the buyer"
         ],
         1,
         {
@@ -15194,7 +15194,7 @@
           "answer": "the cost of fast delivery is carried by other people",
           "patternId": "b2a-r0159-1-main_idea",
           "why": "Kolomnya nyebut \u201cThe saving in time belongs to me alone\u201d sementara bahan bakar, kemacetan, dan tekanan ke kurir ditanggung seluruh distrik.",
-          "whyOthersFail": "Ketiganya cara masuk akal buat ngomongin biaya pengiriman cepat, tapi teks ngeblok: yang disebut nanggung adalah pengemudi dan orang sedistrik, bukan tokonya; penulis nyatain \u201cThe remedy is not to shame shoppers\u201d, jadi bebannya nggak ditaruh di pembeli yang sering pesan; dan \u201ccosts far more than the delivery fee suggests\u201d justru bilang biayanya nggak kelihatan di tarif kirim."
+          "whyOthersFail": "Ketiga pengecoh adalah klaim nyata dari paragraf lain kolom ini, tetapi masing-masing pendukung, bukan hujahnya. Perbandingan enam barang dengan dua ratus barang adalah bukti untuk klaim biaya. Pilihan pembeli pada kotak yang lebih lambat termasuk bagian obat, bukan tesis. Aplikasi yang memilih tanpa bertanya adalah anekdot pembuka. Penekanannya ada pada \"The bill is paid by other people\" dan \"The saving in time belongs to me alone\". Opsi terakhir berbentuk rangkuman pula, tetapi aplikasi yang memilih lebih dulu hanya anekdot pembuka; kolom ini menutup dengan siapa yang menanggung ongkosnya."
         }
       ],
       [
@@ -15388,10 +15388,10 @@
       [
         "What is the reviewer's overall verdict on the app?",
         [
-          "handy for daily riders, and fine for occasional ones too",
+          "the fare is charged at the cheaper weekly rate without asking",
           "handy for daily riders, risky for occasional ones",
-          "handy for daily riders, but weaker than paper overall",
-          "risky for daily riders, handy for occasional ones"
+          "the app refused to open underground, where there is no signal",
+          "the loss of paper tickets is the change that hurts most"
         ],
         1,
         {
@@ -15400,7 +15400,7 @@
           "answer": "handy for daily riders, risky for occasional ones",
           "patternId": "b2a-r0161-1-main_idea",
           "why": "Nilai \u201cthree marks out of five\u201d itu hasil penimbangan: berguna banget buat yang naik tiap hari dengan ponsel baru, rapuh buat penumpang sesekali dan ponsel tua.",
-          "whyOthersFail": "Ketiganya vonis yang wajar buat aplikasi tiket baru, tapi teks ngeblok: buat penumpang sesekali aplikasinya disebut \u201cremoves a functioning system and offers a fragile one\u201d, jadi bukan sama-sama pas; \u201cThe advantages are genuine\u201d plus nilai tiga dari lima nolak simpulan lebih lemah dari kertas secara keseluruhan; dan arah dua kelompoknya kebalikan dari opsi terakhir."
+          "whyOthersFail": "Ketiga pengecoh betul-betul tercatat dalam ulasan ini, tetapi masing-masing satu butir untung atau satu butir rugi, bukan putusan menyeluruhnya. Tarif mingguan otomatis adalah salah satu keunggulan. Kegagalan membuka di bawah tanah adalah satu contoh keandalan yang timpang. Penumpang tua yang kembali ke tiket kertas adalah akibat yang dicatat, lalu dipakai di kalimat penutup sebagai syarat nilai keempat. Putusannya sendiri berbunyi \"it is both better and worse than the system it removed\", dengan pemilahan harian berbanding sesekali. Opsi terakhir berbentuk putusan, tetapi hanya menimbang satu sisi; ulasan ini menyatakan \"it is both better and worse than the system it removed\"."
         }
       ],
       [
@@ -15594,10 +15594,10 @@
       [
         "What is the central finding of this study?",
         [
-          "the effect of a job depends on the pupil's subjects",
+          "pupils working eight hours or fewer were better organized",
           "the effect of a job depends on the hours worked",
-          "the effect of a job depends on the family's needs",
-          "the effect of a job depends on the employer's shifts"
+          "the heaviest workers gave up revision and rest before anything else",
+          "schools should ask about working hours early in the year"
         ],
         1,
         {
@@ -15606,7 +15606,7 @@
           "answer": "the effect of a job depends on the hours worked",
           "patternId": "b2a-r0163-1-main_idea",
           "why": "Studi tiga tahun atas 1.200 murid nyimpulin \u201cthe answer depends almost entirely on the number of hours\u201d.",
-          "whyOthersFail": "Ketiganya faktor yang masuk akal buat kerja sambil sekolah, tapi frasa \u201calmost entirely on the number of hours\u201d nutup semuanya: mata pelajaran nggak pernah jadi variabel; kebutuhan keluarga cuma disebut sebagai kasus yang bikin laporan menolak aturan kaku; dan shift malam cuma muncul di imbauan buat pemberi kerja, bukan sebagai penentu hasil."
+          "whyOthersFail": "Ketiga pengecoh adalah pernyataan nyata dari paragraf lain laporan ini, tetapi masing-masing satu sisi temuan atau satu anjuran, bukan temuan pusatnya. Kelompok delapan jam yang lebih tertata adalah separuh pola. Penyerahan waktu ulang kaji dan istirahat adalah mekanismenya, \"The cause was not the employment itself but what it replaced\". Anjuran agar sekolah bertanya lebih awal adalah rekomendasi. Temuan pusatnya berbunyi \"the answer depends almost entirely on the number of hours\"."
         }
       ],
       [
@@ -16110,9 +16110,9 @@
         "What is the main judgement of this review?",
         [
           "one week earns the fee and the rest does not",
-          "the whole course earns its fee at the lower price",
-          "the marketing describes the teaching fairly accurately",
-          "the certificate earns the fee for anyone seeking work"
+          "the interview week is two videos, a quiz and a free list",
+          "the promised mentor was a monthly call with ninety people",
+          "the certificate carries no recognized value with employers"
         ],
         0,
         {
@@ -16121,7 +16121,7 @@
           "answer": "one week earns the fee and the rest does not",
           "patternId": "b2a-r0168-1-main_idea",
           "why": "Nilai tiga dari lima disebut \u201cweighted almost entirely by one week\u201d, yaitu pekan lamaran yang dianggap benar-benar berguna.",
-          "whyOthersFail": "Ketiganya vonis yang wajar buat kursus daring, tapi teks ngeblok: rekomendasinya \u201cchiefly for the application week\u201d, jadi bukan seluruh kursus yang sepadan walau lagi murah; \u201cthe marketing is the worst feature of the product\u201d nolak klaim iklannya akurat; dan \u201cThe certificate at the end carries no recognized value with employers\u201d nutup opsi sertifikat."
+          "whyOthersFail": "Ketiga pengecoh benar-benar tercantum dalam ulasan ini, tetapi masing-masing satu keluhan terperinci, bukan putusan pokoknya. Isi pekan wawancara adalah contoh bagian yang tipis. Mentor yang ternyata panggilan bulanan adalah keluhan tambahan. Sertifikat tanpa nilai pengakuan adalah catatan penutup. Putusan pokoknya dinyatakan sebagai \"three marks out of five, weighted almost entirely by one week\" bersama \"chiefly for the application week\"."
         }
       ],
       [
@@ -16315,9 +16315,9 @@
       [
         "What is the writer arguing in this column?",
         [
-          "unpaid places select by ability, not by family money",
-          "unpaid places select on merit once employers see the work",
-          "unpaid places select the youngest applicants above all others",
+          "three months in a large city costs more than many families earn",
+          "a required wage widened the field and cut places only slightly",
+          "employers report quite honestly that their interns were excellent",
           "unpaid places select by family money, not by ability"
         ],
         3,
@@ -16327,7 +16327,7 @@
           "answer": "unpaid places select by family money, not by ability",
           "patternId": "b2a-r0170-1-main_idea",
           "why": "Teks nyebut \u201cAn unpaid position does not select the strongest candidate; it selects the candidate who can afford to be unpaid\u201d.",
-          "whyOthersFail": "Ketiganya bacaan yang masuk akal soal magang tanpa upah, tapi teks ngeblok: kalimat itu persis ngebalik opsi seleksi berdasar kecakapan; pemberi kerja disebut \u201cconvinced that they chose on merit\u201d justru sebagai kekeliruan mereka; dan umur pelamar nggak pernah dibahas, yang dibahas siapa yang mampu hidup tanpa upah."
+          "whyOthersFail": "Ketiga pengecoh adalah klaim nyata dari paragraf lain kolom ini, tetapi masing-masing langkah dalam rantai atau bagian obat, bukan hujahnya. Biaya tiga bulan di kota besar adalah mata rantai pertama. Pengalaman upah minimum adalah usul penyelesaian, bukan tesis. Laporan pemberi kerja tentang intern yang cemerlang adalah bagian dari sebab mereka salah menyimpulkan merit. Hujahnya ada pada \"An unpaid position does not select the strongest candidate; it selects the candidate who can afford to be unpaid\"."
         }
       ],
       [
@@ -16418,10 +16418,10 @@
       [
         "What is the main point of this report?",
         [
-          "the risk sits inside the bus, not around the journey",
-          "the risk sits with the drivers, not with the passengers",
+          "the walk home from the stop averages nine unlit minutes",
+          "reported offences along these routes have remained low",
           "the risk sits around the journey, not inside the bus",
-          "the risk sits in the crime figures, not in the timetable"
+          "women's late travel rose by a third on one altered line"
         ],
         2,
         {
@@ -16430,7 +16430,7 @@
           "answer": "the risk sits around the journey, not inside the bus",
           "patternId": "b2a-r0171-1-main_idea",
           "why": "Laporan nyimpulin \u201cThe problem therefore sat at the edges of the journey rather than inside the vehicle\u201d.",
-          "whyOthersFail": "Ketiganya kesimpulan yang masuk akal buat studi bus malam, tapi teks ngeblok: kalimat itu persis ngebalik opsi \u201cdi dalam kendaraan\u201d; pengemudi nggak pernah jadi bagian temuan; dan \u201cReported offences along the routes remained low\u201d nolak penempatan risiko di angka kejahatan."
+          "whyOthersFail": "Ketiga pengecoh betul-betul dilaporkan dalam kajian ini, tetapi masing-masing satu temuan bagian atau satu hasil percobaan, bukan pokoknya. Sembilan menit berjalan tanpa lampu hanya satu dari dua titik penolakan; yang kedua adalah menunggu di perhentian terpencil. Angka kejahatan yang tetap rendah adalah pembanding, bukan kesimpulan. Kenaikan sepertiga pada satu jalur adalah uji coba yang disebut \"encouraging rather than conclusive\". Pokoknya berbunyi \"The problem therefore sat at the edges of the journey rather than inside the vehicle\"."
         }
       ],
       [
@@ -16830,10 +16830,10 @@
       [
         "What is the writer arguing in this column?",
         [
-          "shoppers, not rules, should make mending cheaper again",
-          "recycling, not repair, should carry the lower tax rate",
+          "new appliances use less electricity and carry a guarantee",
+          "recycling arrives too late to repair that arithmetic",
           "rules, not shoppers, should make mending cheaper again",
-          "factories, not workshops, should be asked to mend goods"
+          "spare parts should be sold fairly for ten years"
         ],
         2,
         {
@@ -16842,7 +16842,7 @@
           "answer": "rules, not shoppers, should make mending cheaper again",
           "patternId": "b2a-r0175-1-main_idea",
           "why": "Teks nyebut \u201cNone of this difficulty is solved by lecturing individual shoppers about their choices\u201d, lalu ngusulin kewajiban suku cadang dan tarif pajak lebih rendah.",
-          "whyOthersFail": "Ketiganya arah kebijakan yang masuk akal, tapi teks ngeblok: kalimat soal menceramahi pembeli persis nolak opsi yang naruh bebannya di pembeli; \u201cRecycling arrives far too late in the process\u201d nutup opsi keringanan buat daur ulang; dan bengkel kecil digambarkan sebagai yang dibela, bukan digantikan pabrik."
+          "whyOthersFail": "Ketiga pengecoh adalah klaim nyata dari paragraf lain kolom ini, tetapi masing-masing hujah pihak lain, satu bantahan, atau satu usul, bukan tesisnya. Listrik yang lebih hemat dan garansi adalah \"arguments worth hearing\" dari pembela penggantian. Daur ulang yang datang terlambat adalah satu bantahan atas hitungan itu. Suku cadang sepuluh tahun adalah satu dari tiga usul aturan. Tesisnya ada pada \"None of this difficulty is solved by lecturing individual shoppers about their choices\" yang diikuti daftar kewajiban bagi pabrik."
         }
       ],
       [
@@ -17036,9 +17036,9 @@
       [
         "What is the main idea of this report?",
         [
-          "Sudden fame raises what a village earns beyond anyone's expectation.",
-          "Sudden fame spreads visitor money evenly once arrivals are counted.",
-          "Sudden fame pushes a village to cap bookings and protect owners.",
+          "Photographs online multiplied weekend arrivals in the nearest village.",
+          "Higher rents moved several food stalls behind the village car park.",
+          "A booking limit protects local owners at the cost of faster growth.",
           "Sudden fame changes who keeps the money a village earns."
         ],
         3,
@@ -17047,7 +17047,7 @@
           "evidence": "As a result, the money earned from visitors was shared far less evenly than the team had expected.",
           "answer": "Sudden fame changes who keeps the money a village earns.",
           "why": "Rantai sebab-akibat laporan berakhir di satu temuan: \u201cthe money earned from visitors was shared far less evenly than the team had expected.\u201d Yang berubah karena ketenaran adalah siapa yang memegang uangnya.",
-          "whyOthersFail": "Keempat opsi memakai kerangka \u201csudden fame\u201d yang sama, jadi bedanya harus diambil dari teks. Yang di luar dugaan tim bukan besarnya pendapatan melainkan pembagiannya \u2014 \u201cfar less evenly than the team had expected\u201d. Kata \u201cless evenly\u201d juga memblokir pembagian yang merata. Batas pemesanan bukan reaksi terhadap ketenaran: teks menyebut \u201cthe two villages that kept a daily booking limit\u201d sebagai desa yang sudah punya aturan itu.",
+          "whyOthersFail": "Ketiga pengecoh adalah temuan nyata dari paragraf kedua laporan ini, tetapi masing-masing satu mata rantai, bukan penekanannya. Kenaikan lima kali lipat adalah pemicu di awal rantai. Kepindahan warung ke belakang tempat parkir adalah akibat kenaikan sewa. Dua desa dengan batas pemesanan harian adalah pembanding. Penekanannya dinyatakan sendiri: \"the money earned from visitors was shared far less evenly than the team had expected\". Opsi ketiga juga berbentuk rangkuman, tetapi batas pemesanan hanyalah pembanding dua desa di dalam rantai itu, bukan temuan yang dibawa laporan ini.",
           "patternId": "main_idea-0177-0"
         }
       ],
@@ -17140,9 +17140,9 @@
         "What point does this article make about the two ways of watching?",
         [
           "Each habit meets a separate appetite, so neither should be dropped.",
-          "Each habit meets a separate appetite, so the hall must widen its range.",
-          "Each habit meets a separate appetite, so the cheaper one will last.",
-          "Each habit meets a separate appetite, so the district must pick one."
+          "A subscription costs less each month than two cinema tickets.",
+          "The cinema prints its programme a fortnight before showing it.",
+          "At home a film competes with messages, cooking and a doorbell."
         ],
         0,
         {
@@ -17150,7 +17150,7 @@
           "evidence": "My own view is that the two are not rivals but different goods, and the town needs both.",
           "answer": "Each habit meets a separate appetite, so neither should be dropped.",
           "why": "Penulis menyatakan pendiriannya lugas: keduanya bukan pesaing melainkan barang yang berbeda, dan kota membutuhkan dua-duanya. Kesimpulannya menahan dua-duanya, bukan memilih.",
-          "whyOthersFail": "Premis \u201cseparate appetite\u201d dipakai keempat opsi, jadi yang diuji adalah akibat mana yang ditulis teks. Menuntut bioskop melebarkan pilihan berarti mengukurnya dengan ukuran pesaingnya, dan teks menyebut itu \u201cthe mistake\u201d. Harga juga ditolak sebagai penentu: \u201cit will not be because it is cheaper.\u201d Dan \u201cthe town needs both\u201d menutup keharusan memilih satu.",
+          "whyOthersFail": "Ketiga pengecoh betul-betul dinyatakan di paragraf lain artikel ini, tetapi masing-masing satu butir perbandingan, bukan pokoknya. Harga langganan adalah keunggulan biaya. Program cetak dua pekan sebelumnya adalah keunggulan bioskop dalam perencanaan. Gangguan di rumah adalah bukti untuk hujah perhatian. Pokoknya berbunyi \"the two are not rivals but different goods, and the town needs both\".",
           "patternId": "main_idea-0178-0"
         }
       ],
@@ -17242,10 +17242,10 @@
       [
         "What is the reviewer's overall judgement of the exhibition?",
         [
-          "Worth an hour for its finished cloth, despite labels that omit makers.",
+          "The strongest room holds no finished cloth, only tools and a bench.",
           "Worth an hour for its live craft, despite labels that omit makers.",
-          "Worth an hour for its trade-route history, despite a noisy demonstration room.",
-          "Worth an hour for its live craft, despite guides who hurry visitors along."
+          "An indigo panel is dated closely, yet its maker is called a workshop.",
+          "Visitors should walk the galleries backwards, makers before treasures."
         ],
         1,
         {
@@ -17253,7 +17253,7 @@
           "evidence": "The travelling batik exhibition that opened last Friday is worth an hour of anyone's Saturday, though not for the reason the posters suggest.",
           "answer": "Worth an hour for its live craft, despite labels that omit makers.",
           "why": "Penulis memuji apa yang dikerjakan di depan pengunjung \u2014 \u201cwhat the show actually delivers is process\u201d \u2014 dan menyebut satu cacat: \u201cThe weakness is the labelling.\u201d",
-          "whyOthersFail": "Keempat opsi memuji-dengan-syarat dalam bentuk yang sama, jadi isinya yang diuji. Kain jadi bukan alasannya: ruang terkuat \u201cholds no finished cloth at all\u201d. Sejarah jalur dagang justru bagian yang ia keluhkan, dan keramaian ruang peraga disebut \u201ca good sign\u201d, bukan gangguan. Pemandu pun dipuji karena \u201canswer questions without hurrying\u201d.",
+          "whyOthersFail": "Ketiga pengecoh adalah pernyataan nyata dari paragraf lain ulasan ini, tetapi masing-masing satu bukti atau satu saran, bukan putusan menyeluruhnya. Ruang terkuat tanpa kain jadi adalah bukti bahwa yang disuguhkan proses. Panel indigo yang penciptanya disebut bengkel adalah contoh kelemahan pelabelan. Anjuran berjalan mundur adalah saran praktis di penutup. Putusannya berbunyi \"worth an hour of anyone's Saturday, though not for the reason the posters suggest\".",
           "patternId": "main_idea-0179-0"
         }
       ],
@@ -17448,10 +17448,10 @@
       [
         "What is the writer's central argument?",
         [
-          "Dance needs stricter selection, so the chosen twenty rehearse properly.",
-          "Dance needs fresh interest from pupils before any timetable change helps.",
+          "Thirty of thirty-four pupils enjoyed the movements they were shown.",
+          "Only six pupils had ever practised outside a rehearsal for guests.",
           "Dance needs an ordinary timetable slot, not only two annual shows.",
-          "Dance needs shielding from examinations, so guest shows remain its home."
+          "Forty minutes a fortnight with a local dancer would cost very little."
         ],
         2,
         {
@@ -17459,7 +17459,7 @@
           "evidence": "A tradition kept only for visitors is a tradition already halfway lost.",
           "answer": "Dance needs an ordinary timetable slot, not only two annual shows.",
           "why": "Tesisnya di kalimat pembuka dan penutup: menyimpan tari hanya untuk tamu adalah \u201ca tradition already halfway lost\u201d, dan obatnya \u201cone period a fortnight\u201d di jadwal.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cdance needs \u2026\u201d, jadi teks yang memilih isinya. Seleksi lebih ketat berlawanan dengan perintahnya: \u201cabandon the selection of twenty.\u201d Minat murid juga sudah ada \u2014 \u201cthirty of thirty-four said they enjoyed the movements\u201d \u2014 jadi bukan itu yang kurang. Ujian memang diakui memadatkan pekan, tapi itu konsesi, bukan kesimpulan: ia tetap menuntut satu jam pelajaran.",
+          "whyOthersFail": "Ketiga pengecoh adalah angka atau usul nyata dari paragraf lain kolom ini, tetapi masing-masing bahan pendukung, bukan hujah pusatnya. Tiga puluh dari tiga puluh empat murid yang menikmati gerakannya justru dipakai untuk menyingkirkan ketidakpedulian sebagai sebab. Enam murid yang pernah berlatih di luar gladi adalah ukuran masalahnya. Empat puluh menit setiap dua pekan adalah biaya obatnya. Hujahnya berbunyi \"A tradition kept only for visitors is a tradition already halfway lost\".",
           "patternId": "main_idea-0181-0"
         }
       ],
@@ -17552,9 +17552,9 @@
         "What does the study mainly show?",
         [
           "Explanation, not equipment, produced the fall in contaminated food waste.",
-          "Identical bins, not explanation, produced the fall in contaminated food waste.",
-          "Fortnightly weighing, not explanation, produced the fall in contaminated food waste.",
-          "Extra collection rounds, not explanation, produced the fall in contaminated waste."
+          "Contamination in the visited ward fell from 31 per cent to 9 per cent.",
+          "Cleaner food waste let the compost yard pay for two more rounds.",
+          "A scheme's visible half is the part a council chooses to buy."
         ],
         0,
         {
@@ -17562,7 +17562,7 @@
           "evidence": "Equipment by itself altered very little.",
           "answer": "Explanation, not equipment, produced the fall in contaminated food waste.",
           "why": "Dua kalimat pendek memutuskannya: \u201cEquipment by itself altered very little. Conversation altered a great deal.\u201d Kontaminasi turun di ward yang dikunjungi petugas penjelas.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cX, not Y, produced \u2026\u201d yang sama, jadi teks yang memilih X. Kedua ward menerima tong hijau yang sama pada Januari, dan di ward tanpa kunjungan kontaminasi \u201cremained near a third\u201d \u2014 tong saja tidak menurunkan apa pun. Penimbangan dua mingguan adalah cara mengukur, bukan perlakuan, dan dua ronde tambahan datang setelah kompos terjual, jadi ia akibat, bukan sebab.",
+          "whyOthersFail": "Ketiga pengecoh adalah angka nyata dari paragraf kedua kajian ini, tetapi masing-masing satu langkah dalam rantai sebab-akibat, bukan simpulannya. Penurunan 31 ke 9 persen adalah ukuran akibatnya. Kompos yang membiayai dua ronde tambahan adalah akibat lanjutan. Bahan yang dialihkan ke tempat pembuangan adalah keadaan bangsal pembanding. Simpulannya dinyatakan sendiri: \"Equipment by itself altered very little. Conversation altered a great deal\". Opsi terakhir berbentuk rangkuman, tetapi kalimat tentang bagian yang kelihatan adalah tafsir penulis di penutup, bukan yang diukur kajian ini.",
           "patternId": "main_idea-0182-0"
         }
       ],
@@ -17655,9 +17655,9 @@
         "What is the writer's main point about the two arrangements?",
         [
           "The right choice depends on the traveller, so both kinds should stay.",
-          "The right choice depends on the traveller, so licensing should set one standard.",
-          "The right choice depends on the price, so homestays suit nearly everyone.",
-          "The right choice depends on the brochures, which already set out the trade-off."
+          "Roughly four fifths of a homestay fee stays inside the town.",
+          "A hotel guest arriving at midnight is never an inconvenience.",
+          "Homestay standards vary sharply from one lane to the next."
         ],
         0,
         {
@@ -17665,7 +17665,7 @@
           "evidence": "In my judgement the sensible advice depends on the traveller rather than on the accommodation.",
           "answer": "The right choice depends on the traveller, so both kinds should stay.",
           "why": "Penulis menyebut dasarnya sendiri: \u201cthe sensible advice depends on the traveller rather than on the accommodation\u201d, lalu menyimpulkan dua pilihan tak sempurna melayani lebih banyak pengunjung daripada satu standar.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cthe right choice depends on \u2026\u201d, jadi teks yang memilih penutupnya. Satu standar lewat izin justru dilarang: \u201cWhat the town must not do is impose a single model on everyone through licensing rules.\u201d Harga bukan penentunya, sebab keluarga dengan penerbangan pagi disarankan memesan hotel. Dan brosur disebut \u201crarely mention the trade-off\u201d, jadi ia bukan panduan yang sudah jelas.",
+          "whyOthersFail": "Ketiga pengecoh betul-betul tercatat di paragraf kedua artikel ini, tetapi masing-masing satu keunggulan atau satu kelemahan, bukan pokoknya. Empat perlima ongkos yang tetap di kota adalah keunggulan homestay. Tamu tengah malam yang tak menyusahkan adalah keunggulan hotel. Mutu yang berbeda dari satu lorong ke lorong lain adalah kelemahan homestay. Pokoknya berbunyi \"the sensible advice depends on the traveller rather than on the accommodation\" dan \"Two imperfect options, honestly described, serve more visitors than one polished standard\".",
           "patternId": "main_idea-0183-0"
         }
       ],
@@ -17757,10 +17757,10 @@
       [
         "What is the reviewer's overall verdict on the documentary?",
         [
-          "Flawed in editing and music, and often too quiet to hold viewers.",
+          "Chalk marks on a boat persuade more than any commentary could.",
           "Flawed in editing and music, yet honest enough to recommend warmly.",
-          "Flawed in editing and music, so its chalk figures no longer persuade.",
-          "Flawed in editing and music, though its interviews rescue the argument."
+          "Two sequences of mending nets add texture, though not meaning.",
+          "A tighter edit could have removed about twelve minutes of film."
         ],
         1,
         {
@@ -17768,7 +17768,7 @@
           "evidence": "Even with those faults, this is the most honest local film I have seen this year, and I recommend it warmly.",
           "answer": "Flawed in editing and music, yet honest enough to recommend warmly.",
           "why": "Penilaian akhirnya jelas: \u201cEven with those faults, this is the most honest local film I have seen this year, and I recommend it warmly.\u201d",
-          "whyOthersFail": "Keempat opsi mengakui cacat yang sama, jadi bagian keduanya yang diuji. Keheningan film disebut sebagai kekuatan \u2014 \u201cThat deliberate restraint is the making of it\u201d \u2014 bukan sebab penonton lepas. Angka kapur pun tetap kuat: \u201cmore persuasive than any voice could be.\u201d Dan wawancara tidak menyelamatkan apa pun, sebab pembeli yang menentukan harga justru tidak ada dan ketiadaannya \u201cleaves a hole in the argument\u201d.",
+          "whyOthersFail": "Ketiga pengecoh adalah pengamatan nyata dari paragraf lain ulasan ini, tetapi masing-masing satu pujian atau satu keluhan terperinci, bukan putusan menyeluruhnya. Angka kapur di lambung perahu adalah contoh kekuatan filmnya. Dua rangkaian menjahit jaring adalah satu cacat susunan. Dua belas menit yang bisa dibuang adalah saran penyuntingan. Putusannya berbunyi \"Even with those faults, this is the most honest local film I have seen this year, and I recommend it warmly\".",
           "patternId": "main_idea-0184-0"
         }
       ],
@@ -17963,10 +17963,10 @@
       [
         "What does the survey mainly reveal about teenage listening?",
         [
-          "Listening has grown because pupils now own better headphones.",
-          "Listening has grown because programmes are shorter and louder.",
+          "Almost nobody in the diaries listened while sitting still.",
+          "Expensive headphones explained almost none of the difference.",
           "Listening has grown because sound fits itself around a moving day.",
-          "Listening has grown because pupils spend more of their evenings at home."
+          "Pupils chose forty-minute episodes to match a long journey."
         ],
         2,
         {
@@ -17974,7 +17974,7 @@
           "evidence": "Audio grew because it survives movement: it accompanies a bus ride, a kitchen shift or a walk to a tuition class.",
           "answer": "Listening has grown because sound fits itself around a moving day.",
           "why": "Laporan menyebut sebabnya, bukan angkanya: audio tumbuh karena ia bertahan saat orang bergerak \u2014 menemani perjalanan bus, giliran di dapur, jalan ke tempat bimbingan.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201clistening has grown because \u2026\u201d, jadi sebab mana yang tercatat itulah pembedanya. Alat mahal dibantah langsung: \u201cOwnership of expensive headphones explained almost none of the difference.\u201d Materi pendek dan riuh justru disebut salah baca pasar. Dan pertumbuhan tercepat ada pada murid dengan perjalanan terpanjang, bukan yang paling banyak di rumah.",
+          "whyOthersFail": "Ketiga pengecoh adalah temuan nyata dari catatan harian yang dilaporkan di sini, tetapi masing-masing bukti atau akibat, bukan penekanannya. Tak ada yang mendengarkan sambil duduk diam adalah bukti awal untuk sebabnya. Headphone mahal yang tak menjelaskan apa-apa adalah penyingkiran penjelasan saingan. Episode empat puluh menit adalah pelajaran bagi produser di paragraf penutup. Penekanannya dinyatakan sendiri: \"The interesting part is not the total but the reason\", lalu \"Audio grew because it survives movement\".",
           "patternId": "main_idea-0186-0"
         }
       ],
@@ -18169,10 +18169,10 @@
       [
         "What is the writer's main argument about the two options?",
         [
-          "Every family should be offered a digester, since its gas costs nothing.",
+          "A family with three cows can cook for nothing and gain fertilizer.",
           "Each family should be offered the system its own situation fits.",
-          "Every family should be offered a cylinder, since floods cut deliveries.",
-          "Every family should be offered cylinders at one fixed fair price."
+          "Cylinder prices rose twice and deliveries stop when the road floods.",
+          "A digester may produce less gas once a cold month arrives."
         ],
         1,
         {
@@ -18180,7 +18180,7 @@
           "evidence": "My conclusion is that the village should stop presenting these options as rivals for the same household.",
           "answer": "Each family should be offered the system its own situation fits.",
           "why": "Kesimpulan penulis menolak memperlakukan keduanya sebagai saingan untuk rumah tangga yang sama: keluarga berternak dengan orang di rumah diberi digester, keluarga tanpa keduanya diberi tabung.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cfamily should be offered \u2026\u201d, jadi cakupannya yang diuji. Memasak tanpa biaya hanya berlaku bagi keluarga dengan tiga ekor sapi, dan digester menghasilkan \u201cnothing at all if the animals are sold\u201d. Tabung juga bukan jawaban umum: pengirimannya berhenti tiap jalan sungai banjir. Harga wajar tabung memang diusulkan, tapi hanya bagi keluarga tanpa ternak.",
+          "whyOthersFail": "Ketiga pengecoh adalah keterangan nyata dari paragraf kedua kolom ini, tetapi masing-masing satu sisi perbandingan, bukan hujahnya. Keluarga bersapi tiga yang memasak tanpa biaya adalah keunggulan biogas. Kenaikan harga tabung dan banjir jalan sungai adalah kelemahan tabung. Gas yang menyusut di bulan dingin adalah kelemahan digester. Hujahnya berbunyi \"the village should stop presenting these options as rivals for the same household\".",
           "patternId": "main_idea-0188-0"
         }
       ],
@@ -18375,10 +18375,10 @@
       [
         "What is the main finding of the survey?",
         [
-          "The language is dying out, though slowly, one generation at a time.",
+          "Parents keep it for scolding but pray in the national language.",
           "The language is retreating from formal settings but alive in jokes.",
-          "The language is holding its ground while the young keep joking in it.",
-          "The language is confined to prayer, which keeps it formal."
+          "Campaigns aimed at children misread a problem that lies with adults.",
+          "Councils could hold one public meeting a month in the language."
         ],
         1,
         {
@@ -18386,7 +18386,7 @@
           "evidence": "The consequence is that the language is not so much dying as narrowing: it retains warmth and humour while losing formality.",
           "answer": "The language is retreating from formal settings but alive in jokes.",
           "why": "Akibat temuannya ditulis lugas: bahasa itu bukan mati melainkan menyempit \u2014 ia menyimpan kehangatan dan humor sambil kehilangan keresmian.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cthe language is \u2026\u201d dan semuanya nasib yang wajar bagi bahasa kecil, jadi teks yang memilih. Polanya dinyatakan mengikuti fungsi, bukan usia, sehingga bukan soal generasi demi generasi. Bertahan utuh dibantah oleh kata \u201cnarrowing\u201d dan oleh mundurnya bahasa itu di ranah prestise. Dan doa justru sudah beralih ke bahasa nasional pada tingkat orang tua.",
+          "whyOthersFail": "Ketiga pengecoh adalah pernyataan nyata dari paragraf lain laporan ini, tetapi masing-masing satu baris data atau satu anjuran, bukan temuan pokoknya. Kebiasaan orang tua adalah satu baris dalam pola fungsi. Kritik atas kampanye untuk anak-anak serta usul rapat bulanan berada di paragraf penutup sebagai obat. Temuan pokoknya berbunyi \"the language is not so much dying as narrowing: it retains warmth and humour while losing formality\".",
           "patternId": "main_idea-0190-0"
         }
       ],
@@ -18478,10 +18478,10 @@
       [
         "What is the reviewer's overall opinion of the new guide?",
         [
-          "Its maps repay the price, though a rival covers the quarter better.",
-          "Its errors are small, yet the thin history leaves the quarter unexplained.",
+          "Its history fills four pages, and the pavement takes the rest.",
+          "Its photographs print too dark and the index omits two mosques.",
           "Its practical strengths outweigh faults that are real and plain.",
-          "Its faults pass only because no better guide is on sale."
+          "It should be bought before arrival rather than at the station."
         ],
         2,
         {
@@ -18489,7 +18489,7 @@
           "evidence": "This one knows the difference, which is why its faults are forgivable.",
           "answer": "Its practical strengths outweigh faults that are real and plain.",
           "why": "Penilaian akhirnya ada di kalimat penutup: buku ini tahu bedanya panduan jalan dan kajian sejarah, \u201cwhich is why its faults are forgivable\u201d, setelah cacatnya disebut satu per satu.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cits \u2026\u201d dan semuanya putusan resensi yang wajar, jadi teks yang memilih. Panduan pesaing justru dinilai lebih buruk: mereka baru mencapai jalan pertama di halaman empat puluh dan tak menyebut jam gang pasar. Sejarah empat halaman dipuji, sebab satu paragraf soal gudang miring \u201crearranges the whole quarter\u201d. Dan alasan memaafkan cacatnya adalah buku ini tahu fungsinya, bukan ketiadaan saingan.",
+          "whyOthersFail": "Ketiga pengecoh betul-betul dinyatakan di bagian lain ulasan ini, tetapi masing-masing satu ciri, satu daftar cacat, atau satu saran beli, bukan penilaian menyeluruhnya. Empat halaman sejarah adalah keterangan susunan buku. Foto gelap dan indeks yang lupa dua masjid adalah rinciannya. Membeli sebelum tiba adalah saran praktis. Penilaiannya berbunyi \"This one knows the difference, which is why its faults are forgivable\".",
           "patternId": "main_idea-0191-0"
         }
       ],
@@ -18684,9 +18684,9 @@
       [
         "What does the experiment suggest about repeat donation?",
         [
-          "Donors come back when reminded that the district shortage continues.",
-          "Donors come back when contacted within nine days of donating.",
-          "Donors come back when any message follows their first donation.",
+          "The shortage reminder produced no measurable effect at all.",
+          "Duty is what brings a donor through the door the first time.",
+          "Poster money would be better spent on short messages.",
           "Donors come back when told their own unit finished a job."
         ],
         3,
@@ -18695,7 +18695,7 @@
           "evidence": "Duty may bring somebody in the first time; evidence of effect brings her back.",
           "answer": "Donors come back when told their own unit finished a job.",
           "why": "Penulis laporan merumuskannya sendiri: kewajiban bisa membawa orang datang pertama kali, tetapi \u201cevidence of effect brings her back\u201d \u2014 kelompok yang diberi tahu kantongnya terpakai kembali hampir dua kali lipat.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cdonors come back when \u2026\u201d dan semuanya sebab yang wajar, jadi angka percobaan yang memutus. Pengingat kelangkaan \u201cproduced no measurable effect at all\u201d. Sembilan hari adalah kecepatan kantong darah terpakai, bukan tenggat menghubungi donor. Dan bukan sembarang pesan yang bekerja: dua jenis pesan dikirim, hanya satu yang menaikkan kunjungan ulang.",
+          "whyOthersFail": "Ketiga pengecoh adalah pernyataan nyata dari laporan percobaan ini, tetapi masing-masing hasil sampingan, catatan metode, atau usul anggaran, bukan simpulannya. Pesan kekurangan tanpa efek adalah pembanding. Kesamaan usia dan pekerjaan adalah alasan hasilnya bukan kebetulan. Pengalihan dana poster ada di kalimat penutup. Simpulannya berbunyi \"Duty may bring somebody in the first time; evidence of effect brings her back\". Opsi kedua juga berbentuk rangkuman dan memang tertulis, tetapi ia menerangkan kunjungan pertama; percobaan ini menguji kunjungan kedua.",
           "patternId": "main_idea-0193-0"
         }
       ],
@@ -18788,9 +18788,9 @@
         "What is the writer's main point about the two festivals?",
         [
           "Each way of paying buys something the other village gives up.",
-          "Each way of paying works, provided the sums involved are published.",
-          "Each way of paying is flawed, so a joint festival would serve both.",
-          "Each way of paying buys control, which matters more than audience size."
+          "The sponsored village paid three troupes from the provincial capital.",
+          "The levy programme held six forms unperformed since 2016.",
+          "Audiences keep traditions alive as surely as committees do."
         ],
         0,
         {
@@ -18798,7 +18798,7 @@
           "evidence": "My own view is that the two villages are buying different things and should admit it.",
           "answer": "Each way of paying buys something the other village gives up.",
           "why": "Penulis menyebut pendiriannya: kedua desa \u201care buying different things and should admit it\u201d \u2014 sponsor membeli skala dengan harga penyuntingan, iuran membeli kendali dengan harga jangkauan.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201ceach way of paying \u2026\u201d, jadi penutupnya yang diuji. Penerbitan angka sponsor tidak pernah diusulkan; yang diusulkan adalah menjaga susunan acara di tangan warga. Festival gabungan tidak pernah dibahas. Dan kendali tidak dinyatakan lebih penting: \u201ccontrol is worth little if only three hundred people watch.\u201d",
+          "whyOthersFail": "Ketiga pengecoh adalah keterangan nyata dari paragraf kedua kolom ini, tetapi masing-masing satu butir perbandingan, bukan pokoknya. Tiga sanggar dari ibu kota provinsi adalah bukti kemewahan festival bersponsor. Enam bentuk yang tak dipentaskan sejak 2016 adalah keunggulan festival iuran. Kalimat tentang penonton yang menjaga tradisi adalah pengakuan sebelah untuk desa bersponsor. Pokoknya berbunyi \"the two villages are buying different things and should admit it\".",
           "patternId": "main_idea-0194-0"
         }
       ],
@@ -19097,9 +19097,9 @@
         "What does the study conclude about the scheme?",
         [
           "The scheme is useful, but not for the reason it was sold.",
-          "The scheme is useful, and it did move riders off their motorbikes.",
-          "The scheme is useful, though it should be closed while docks are moved.",
-          "The scheme is useful, but mostly to hill residents who own motorbikes."
+          "Nearly half of the journeys replaced a walk rather than a motorbike.",
+          "Where the docks stand, rather than the fare, decides who rides.",
+          "Moving six docks uphill could test the traffic claim honestly."
         ],
         0,
         {
@@ -19107,7 +19107,7 @@
           "evidence": "Their argument is that its stated purpose should be corrected or its map redrawn.",
           "answer": "The scheme is useful, but not for the reason it was sold.",
           "why": "Kesimpulannya dua sisi: skema itu tetap berguna, tapi janji resminya salah \u2014 maka tujuannya harus dikoreksi atau petanya digambar ulang.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cthe scheme is useful, \u2026\u201d, jadi bagian setelah koma yang diuji. Perpindahan dari motor tidak terjadi: hanya 14 persen perjalanan menggantikan motor. Penutupan ditolak eksplisit, \u201cthe authors do not recommend closing the scheme\u201d. Dan warga bukit justru yang paling sulit memakainya, sebab \u201cthe nearest dock was too far to be convenient\u201d.",
+          "whyOthersFail": "Ketiga pengecoh adalah temuan nyata dari kajian ini, tetapi masing-masing satu angka atau satu usul, bukan simpulannya. Setengah perjalanan yang menggantikan jalan kaki adalah bukti. Empat belas dari dua puluh titik parkir adalah penjelasan sebab pola itu. Pemindahan enam titik ke bukit adalah usul yang, kata penulis, hanya salah satu dari dua jalan sah. Simpulannya berbunyi \"its stated purpose should be corrected or its map redrawn\". Opsi ketiga berbentuk rangkuman pula, tetapi letak titik parkir adalah sebab pola penggantian, bukan putusan yang ditarik kajian ini tentang tujuan skema.",
           "patternId": "main_idea-0197-0"
         }
       ],
@@ -19200,9 +19200,9 @@
         "What is the reviewer's overall assessment of the production?",
         [
           "A production reaching past its means, yet with real achievement in it.",
-          "A production that was mostly careful, though let down by borrowed costumes.",
-          "A production brave enough to attempt, but not to be tried again.",
-          "A production of modest aims whose set deserved a stronger cast."
+          "The borrowed scaffolding set makes two rooms of a shallow stage.",
+          "The second act held ninety people still, though the first rushed.",
+          "It could try the play again with nine actors and twelve weeks."
         ],
         0,
         {
@@ -19210,7 +19210,7 @@
           "evidence": "So the honest verdict is mixed, and I offer it as encouragement rather than complaint.",
           "answer": "A production reaching past its means, yet with real achievement in it.",
           "why": "Penilaiannya disebut \u201cmixed\u201d dan dirinci: pilihan lakon lebih berani daripada bijak dengan tujuh pemain, namun babak kedua dan tata cahayanya capaian nyata.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201ca production \u2026\u201d dan semuanya putusan campuran yang masuk akal, jadi teks yang memblokir. Kostum memang satu-satunya unsur yang tampak darurat, tapi cacat besarnya babak pertama yang \u201crushed\u201d dan tabrakan pintu masuk. Pengulangan justru disarankan: \u201cit should attempt it again next autumn\u201d. Dan lakonnya disebut salah satu terberat, jadi bukan malam bertujuan sederhana.",
+          "whyOthersFail": "Ketiga pengecoh betul-betul tertulis di paragraf kedua dan ketiga ulasan ini, tetapi masing-masing satu pujian, satu perbandingan babak, atau satu saran, bukan penilaian menyeluruhnya. Panggung dari perancah adalah satu keberhasilan teknis. Babak kedua berbanding babak pertama adalah bukti kesenjangannya. Sembilan pemain dan dua belas pekan adalah anjuran untuk tahun depan. Penilaiannya berbunyi \"the honest verdict is mixed, and I offer it as encouragement rather than complaint\".",
           "patternId": "main_idea-0198-0"
         }
       ],
@@ -19302,10 +19302,10 @@
       [
         "What is the writer's central claim?",
         [
-          "The city should pause planting until felling rules exist on paper.",
+          "About a third of the last campaign's trees died within two summers.",
           "The city should guard the trees it has, not just announce new ones.",
-          "The city should stop planting saplings, since a third die early.",
-          "The city should promise a good deal more than fifty thousand saplings."
+          "Four market-road trees were cooling a bus stop and holding soil.",
+          "A written reason should be required before a large tree is removed."
         ],
         1,
         {
@@ -19313,7 +19313,7 @@
           "evidence": "Trading them for saplings is not a gain but a delay disguised as progress.",
           "answer": "The city should guard the trees it has, not just announce new ones.",
           "why": "Inti keberatannya aritmetika perbandingan: menukar pohon dewasa dengan bibit \u201cis not a gain but a delay disguised as progress\u201d, jadi melindungi yang sudah ada lebih penting daripada mengumumkan penanaman.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cthe city should \u2026\u201d, jadi tuntutan penutupnya yang memblokir. Penulis meminta \u201ctwo lines added to the campaign, not the campaign cancelled\u201d, jadi bukan penundaan atau penghentian. Angka sepertiga dipakai menakar nilai bibit dibanding pohon dewasa. Dan jumlah lima puluh ribu tidak pernah diminta ditambah.",
+          "whyOthersFail": "Ketiga pengecoh adalah pernyataan nyata dari kolom ini, tetapi masing-masing satu angka pendukung atau satu langkah teknis, bukan klaim pusatnya. Sepertiga pohon kampanye lalu yang mati adalah bahan hitungannya. Empat pohon di jalan pasar adalah contohnya. Kewajiban menulis alasan adalah baris kedua dari dua usul, bukan tesis yang menaunginya. Klaim pusatnya berbunyi \"Trading them for saplings is not a gain but a delay disguised as progress\".",
           "patternId": "main_idea-0199-0"
         }
       ],
@@ -19406,9 +19406,9 @@
         "What does the writer conclude about the two channels?",
         [
           "Both channels should stay, each steering its audience towards the rival.",
-          "Both channels have worked, so the podcast can now replace radio.",
-          "Both channels help, so whichever is weaker should now be quietly dropped.",
-          "Both channels compete, so support should follow the larger audience."
+          "A storyteller with seven minutes must cut, and the cutting helps.",
+          "A podcast episode may run forty minutes and keep a dialect version.",
+          "An archive matters less than the chance of meeting a strange tale."
         ],
         0,
         {
@@ -19416,7 +19416,7 @@
           "evidence": "In my view the region needs both formats, and it needs them to talk to each other.",
           "answer": "Both channels should stay, each steering its audience towards the rival.",
           "why": "Penutupnya dua bagian: kawasan itu butuh kedua format dan butuh keduanya bicara satu sama lain \u2014 radio menyebut episode lanjutan, podcast menyerahkan satu episode sebulan pada penyiar.",
-          "whyOthersFail": "Keempat opsi memakai rangka \u201cboth channels \u2026\u201d, jadi kelanjutannya yang diuji. Penggantian radio oleh podcast bertentangan dengan \u201cthe region needs both formats\u201d, begitu pula membuang yang lebih lemah. Dan pilihan berdasarkan besar pendengar ditolak logika penutupnya: pengawetan tanpa peredaran jadi lemari terkunci, peredaran tanpa pengawetan jadi kabar yang lenyap.",
+          "whyOthersFail": "Ketiga pengecoh adalah keterangan nyata dari paragraf kedua tulisan ini, tetapi masing-masing satu keunggulan atau satu kelemahan satu saluran, bukan simpulannya. Tujuh menit yang memaksa memangkas adalah keunggulan radio. Episode empat puluh menit dengan versi dialek adalah keunggulan siniar. Pendengar yang mencari yang sudah dikenal adalah kelemahan siniar. Simpulannya berbunyi \"the region needs both formats, and it needs them to talk to each other\". Opsi terakhir berbentuk simpulan, tetapi memihak satu saluran; tulisan ini menolak pemihakan itu dengan \"Preservation without circulation becomes a locked cupboard. Circulation without preservation becomes a rumour that fades\".",
           "patternId": "main_idea-0200-0"
         }
       ],
@@ -19545,9 +19545,9 @@
         "Which best describes the writer's attitude as the piece develops?",
         [
           "unpersuaded by the centres' case, yet not asking for the cameras to go",
-          "unpersuaded by the centres' case, and ready to see the cameras switched off",
-          "troubled by the private lists, though satisfied that redress exists elsewhere",
-          "troubled by the unequal errors, though easy about the measuring itself"
+          "unpersuaded by the same case, yet content to leave appeals to the firms",
+          "troubled by the uneven errors, yet not pressing for losses to be shown",
+          "troubled by the small notice, yet easy about the measuring itself"
         ],
         0,
         {
@@ -19556,7 +19556,7 @@
           "answer": "unpersuaded by the centres' case, yet not asking for the cameras to go",
           "patternId": "c1a-r0201-q3-tone",
           "why": "Penutupnya menolak menuntut pencabutan (\"None of this requires that the cameras be removed tomorrow\") sekaligus menyebut \"a promise that nobody has audited\": tidak yakin pada pembelaan pusat perbelanjaan, tapi tidak meminta kameranya dibongkar.",
-          "whyOthersFail": "Ketiga pengecoh memakai sikap yang sama-sama sejalan dengan tesis teks, tapi salah derajat atau salah sasaran. Kesiapan mematikan kamera salah DERAJAT: frasa pemblokirnya \"None of this requires that the cameras be removed tomorrow\". Kepuasan bahwa ganti rugi tersedia di tempat lain salah SASARAN: frasa pemblokirnya \"Nor is there any independent body to which a complaint might sensibly be addressed\". Ketenangan pada pengukuran itu sendiri salah NUANSA: frasa pemblokirnya \"the cost carried by the thousands of innocent faces measured every hour\"."
+          "whyOthersFail": "Keempat opsi memakai bentuk yang sama \u2014 tidak yakin atau terusik, lalu menahan diri \u2014 sehingga bentuk opsi tidak lagi menunjuk kunci; pemilihnya adalah sasaran penahanan itu. Menyerahkan jalur banding kepada firma salah SASARAN: frasa pemblokirnya \"provide an appeal\" dan \"Nor is there any independent body to which a complaint might sensibly be addressed\". Tidak menuntut angka kerugian salah SASARAN juga: frasa pemblokirnya \"demonstrate that losses genuinely decline\". Ketenangan pada pengukurannya sendiri salah NUANSA: frasa pemblokirnya \"the cost carried by the thousands of innocent faces measured every hour\"."
         }
       ],
       [
@@ -19647,9 +19647,9 @@
       [
         "What is the writer's attitude towards the reforms set out in the third paragraph?",
         [
-          "approving of the reforms, yet doubtful that journals will keep to them",
+          "approving of the reforms, yet unwilling to grant that the field caught itself out",
           "approving of the reforms, yet unwilling to describe the trouble as over",
-          "approving of the reforms, and content that the record is now dependable",
+          "approving of the reforms, yet unwilling to acquit the first researchers of fraud",
           "approving of the reforms, though only where they alter how work is published"
         ],
         1,
@@ -19659,7 +19659,7 @@
           "answer": "approving of the reforms, yet unwilling to describe the trouble as over",
           "patternId": "c1a-r0202-q3-tone",
           "why": "Kalimat penutup paragraf tiga memuji hasilnya lalu menahan diri: \"replication rates have improved, though nobody claims the problem is settled\". Jadi persetujuannya penuh, penutupan masalahnya ditolak.",
-          "whyOthersFail": "Keempat opsi menyetujui reformasi itu, jadi tesis teks tidak memilih salah satu; pemilihnya sinyal leksikal derajat dan sasaran. Keraguan pada keteguhan jurnal salah SASARAN: frasa pemblokirnya \"Editors at several journals now accept a paper on the strength of its design alone, before a single result is known\" \u2014 jurnalnya justru sudah bergerak, dan keberatan penulis tertuju pada keadaan masalahnya. Kepuasan bahwa rekaman kini andal salah DERAJAT: frasa pemblokirnya \"nobody claims the problem is settled\". Pembatasan pada perubahan cara menerbitkan salah CAKUPAN: frasa pemblokirnya \"Teams now register their predictions and their procedures before gathering data\" dan \"several laboratories often run the same procedure together\", yaitu perubahan metode, bukan penerbitan."
+          "whyOthersFail": "Keempat opsi menyetujui reformasi dan ketiganya sama-sama menolak sesuatu, jadi pola \"menahan diri\" tidak lagi menandai kunci; pemilihnya sasaran penolakan itu. Menolak mengakui bahwa disiplinnya menangkap dirinya sendiri salah SASARAN: frasa pemblokirnya \"the discipline had caught itself out without outside help\". Menolak membebaskan peneliti pertama dari tuduhan kecurangan salah SASARAN dan DERAJAT: frasa pemblokirnya \"The reasons proved less dramatic than fraud\" serta \"small choices made in good faith\". Pembatasan pada perubahan cara menerbitkan salah CAKUPAN: frasa pemblokirnya \"Sample sizes have grown, several laboratories often run the same procedure together\"."
         }
       ],
       [
@@ -19854,8 +19854,8 @@
         "How would you describe the writer's tone in the first paragraph?",
         [
           "drily sceptical of an answer that arrives a little too smoothly",
-          "mildly amused by an answer so smooth, without yet doubting it",
-          "openly indignant at employers who take a junior's labour unpaid",
+          "drily sceptical of students who take the placement and profit by it",
+          "drily doubtful that experience must be obtained somewhere at all",
           "briskly factual about how such placements come to carry credit"
         ],
         0,
@@ -19865,7 +19865,7 @@
           "answer": "drily sceptical of an answer that arrives a little too smoothly",
           "patternId": "c1a-r0204-q3-tone",
           "why": "Paragraf pertama menyebut jawaban resmi datang \"smoothly\" dan tampak \"like a gift\", lalu kalimat ketiga membalikkannya menjadi \"a charge quietly transferred\": kering, curiga, tanpa kemarahan terbuka.",
-          "whyOthersFail": "Keempat opsi cocok dengan penulis yang akhirnya menolak penempatan tanpa upah; yang memisahkan hanya derajat dan sasaran di paragraf pertama. Opsi terhibur tanpa curiga salah DERAJAT: frasa pemblokirnya \"Examined a little longer, it looks more like a charge quietly transferred\", yang sudah membalik penilaian di dalam paragraf itu. Opsi marah terbuka pada pemberi kerja salah DERAJAT dan SASARAN: paragraf pertama belum menyebut pemberi kerja sebagai pihak yang disalahkan, dan frasa pemblokirnya \"The remedy need not be dramatic\". Opsi laporan faktual salah NUANSA: frasa pemblokirnya \"The arrangement looks like a gift\", sebuah penilaian, bukan keterangan."
+          "whyOthersFail": "Tiga opsi memakai nada kering-skeptis yang sama seperti kunci, jadi register tidak lagi memisahkan; pemilihnya sasaran dan nuansanya. Skeptis pada mahasiswa yang mengambil penempatan salah SASARAN: frasa pemblokirnya \"the credit she forgoes is not optional\" dan \"an applicant filtered by household wealth\" \u2014 yang disoal penyaringnya, bukan yang lolos. Keraguan bahwa pengalaman harus diperoleh di suatu tempat salah NUANSA: frasa pemblokirnya \"That is true, and it is precisely the difficulty\". Opsi laporan faktual salah NUANSA juga: frasa pemblokirnya \"The arrangement looks like a gift\", sebuah penilaian, bukan keterangan."
         }
       ],
       [
@@ -20059,8 +20059,8 @@
       [
         "What attitude do the authors take towards the dimming of converted lamps?",
         [
-          "reassured, though only by the small number of roads complaining",
-          "wary, and pressing that the dimming be suspended at once",
+          "wary, yet not pressing for the first-year streets to be refitted",
+          "wary, and still unwilling to credit the revision with fewer complaints",
           "wary, and still unwilling to read quiet streets as agreement",
           "wary, though chiefly about the tariff on which the savings rest"
         ],
@@ -20071,7 +20071,7 @@
           "answer": "wary, and still unwilling to read quiet streets as agreement",
           "patternId": "c1a-r0206-q3-tone",
           "why": "Kalimat pengunci melarang persis satu langkah nalar: \"Officers should not assume public tolerance of dimming merely because complaints have been few\". Jadi sikapnya waspada, dan jalan yang sepi tidak dibaca sebagai persetujuan.",
-          "whyOthersFail": "Keempat opsi cocok dengan laporan yang memuji programnya sambil mencatat risiko; pemilihnya sinyal leksikal, bukan tesisnya. Rasa tenang karena keluhannya sedikit salah NUANSA dan justru sikap yang dilarang: frasa pemblokirnya \"should not assume public tolerance of dimming merely because complaints have been few\". Penangguhan peredupan seketika salah DERAJAT: frasa pemblokirnya rekomendasi \"commission an independent assessment of dimming before extending it to any further streets\" dan \"None of this asks the council to slow down\". Kewaspadaan yang terutama soal tarif salah SASARAN: tarif adalah risiko pertama yang terpisah, sedangkan soal peredupan frasa pemblokirnya \"the evidence connecting that measure to reported feelings of safety remains thin\"."
+          "whyOthersFail": "Keempat opsi waspada dan sama-sama menahan diri, jadi bentuknya tidak menunjuk kunci; pemilihnya objek penahanan itu. Tidak menuntut pemasangan ulang jalan tahun pertama salah SASARAN: frasa pemblokirnya rekomendasi \"Fit first-year streets with the revised specification within eighteen months\". Penolakan memberi kredit kepada revisi spesifikasi salah SASARAN juga: frasa pemblokirnya \"which suggests the revision worked rather than that residents grew accustomed to the change\". Kewaspadaan yang terutama soal tarif salah SASARAN: tarif adalah risiko pertama yang terpisah, sedangkan untuk peredupan frasa pemblokirnya \"the evidence connecting that measure to reported feelings of safety remains thin\"."
         }
       ],
       [
@@ -20162,8 +20162,8 @@
       [
         "What is the writer's attitude towards the way such decisions are presented?",
         [
-          "critical, though chiefly of models that count only drivers' saved time",
-          "critical, and arguing that such major road works should now stop",
+          "critical, though content to let vehicle counts stand as the measure",
+          "critical, yet unwilling to hold anybody answerable for the ranking",
           "critical, since the preference for drivers is defended too openly",
           "critical, since a political choice is offered as pure technique"
         ],
@@ -20174,7 +20174,7 @@
           "answer": "critical, since a political choice is offered as pure technique",
           "patternId": "c1a-r0207-q3-tone",
           "why": "Kalimat tentang kota yang mengubah aturannya adalah penguncinya: \"they simply stopped pretending the choice was technical rather than political\", diperkuat \"A preference dressed up as engineering necessity\". Yang dikecam adalah penyajian pilihan politis sebagai teknik murni.",
-          "whyOthersFail": "Keempat opsi kritis dan sejalan dengan tesis teks, jadi tebakan lintas-soal tidak cukup; yang memisahkan adalah sasaran dan derajatnya. Kritik yang terutama pada model hitungan salah SASARAN: frasa pemblokirnya \"The bias is partly a matter of measurement\" \u2014 hanya sebagian, sedangkan tuduhan intinya \"pretending\". Tuntutan menghentikan pekerjaan jalan besar salah DERAJAT: frasa pemblokirnya \"None of this argues against major road works, some of which are unavoidable\". Keberatan bahwa preferensi itu dibela terlalu terbuka salah NUANSA: frasa pemblokirnya \"Nobody defends that hierarchy openly, and the silence is part of how it survives\"."
+          "whyOthersFail": "Keempat opsi kritis dan dua di antaranya memakai penahanan diri yang sama seperti register kunci, jadi bentuknya tidak memisahkan; pemilihnya sasaran dan nuansanya. Kesediaan membiarkan hitungan kendaraan menjadi ukurannya salah SASARAN: frasa pemblokirnya \"Count pedestrians as carefully as vehicles\". Keengganan menuntut pertanggungjawaban salah DERAJAT: frasa pemblokirnya \"The hierarchy will survive until somebody writes it down and asks who consented to it\". Keberatan bahwa preferensi itu dibela terlalu terbuka salah NUANSA: frasa pemblokirnya \"Nobody defends that hierarchy openly, and the silence is part of how it survives\"."
         }
       ],
       [
@@ -20266,7 +20266,7 @@
         "How does the writer regard the operators' earlier denials of this pattern?",
         [
           "unimpressed, though allowing the mathematics was grasped only lately",
-          "unimpressed, since the old fortnight of hand counting was too brief",
+          "unimpressed, though chiefly with models that assumed inward travel",
           "unimpressed, since passengers had described the pattern for years",
           "unimpressed, yet leaving the disagreement for the operators to settle"
         ],
@@ -20277,7 +20277,7 @@
           "answer": "unimpressed, since passengers had described the pattern for years",
           "patternId": "c1a-r0208-q3-tone",
           "why": "Polanya disebut \"familiar to passengers and long denied by operators\", jadi penyangkalan itu tidak dihargai penulis: yang membatalkannya bukan kebaruan angka, melainkan kesaksian yang sudah lama ada.",
-          "whyOthersFail": "Keempat opsi memakai sikap yang sama-sama tidak terkesan pada operator, sehingga tesis teks tidak menunjuk satu pun; pemilihnya sinyal leksikal. Kelonggaran bahwa matematikanya baru dipahami salah NUANSA: frasa pemblokirnya \"The cause is well understood mathematically\". Keberatan pada dua pekan hitungan tangan salah SASARAN: hitungan lama disebut sebagai bahan mentah zaman itu, sedangkan frasa pemblokir untuk penyangkalannya adalah \"a pattern familiar to passengers and long denied by operators\". Penyerahan sengketa kepada operator salah DERAJAT: frasa pemblokirnya \"the argument about whether it existed simply ended\"."
+          "whyOthersFail": "Keempat opsi tidak terkesan dan dua di antaranya mengaku memberi kelonggaran, sehingga register kunci tidak menonjol; pemilihnya sinyal leksikal. Kelonggaran bahwa matematikanya baru dipahami salah NUANSA: frasa pemblokirnya \"The cause is well understood mathematically\". Keberatan yang terutama pada model perjalanan ke pusat salah SASARAN: itu temuan terpisah tentang arus antar-distrik, sedangkan frasa pemblokir untuk penyangkalannya adalah \"a pattern familiar to passengers and long denied by operators\". Penyerahan sengketa kepada operator salah DERAJAT: frasa pemblokirnya \"the argument about whether it existed simply ended\"."
         }
       ],
       [
@@ -20369,8 +20369,8 @@
         "What is the writer's attitude towards the council's consultation?",
         [
           "unimpressed, though chiefly with the way the dispute was reported",
-          "unimpressed, and asking that the whole scheme now be withdrawn",
-          "unimpressed, yet content that both sides were reached in good time",
+          "unimpressed, while granting the online form reached both sides fairly",
+          "unimpressed, yet content that the funded transition is already in hand",
           "unimpressed, and doubtful that the exercise was adequate"
         ],
         3,
@@ -20380,7 +20380,7 @@
           "answer": "unimpressed, and doubtful that the exercise was adequate",
           "patternId": "c1a-r0209-q3-tone",
           "why": "Kalimat penutup menyebut, \"on the evidence of its consultation\", tidak jelas apakah dewan menangkap perbedaan itu; jadi konsultasinya sendiri yang diragukan kecukupannya.",
-          "whyOthersFail": "Keempat opsi memakai sikap tidak terkesan yang sama, sehingga tesis lintas-soal tidak memilih; pemilihnya sasaran dan derajat. Keberatan yang terutama pada pemberitaan salah SASARAN: pemberitaan memang ditegur (\"which is not how either has been reported\"), tetapi frasa pemblokirnya \"on the evidence of its consultation\", yang menunjuk dewan. Tuntutan pembatalan skema salah DERAJAT: frasa pemblokirnya \"A scheme of this sort can still be defended\". Kepuasan bahwa kedua pihak terjangkau tepat waktu salah NUANSA: frasa pemblokirnya \"consultation took place through an online form during a fortnight in August\", yang dicatat sebagai keberatan wajar."
+          "whyOthersFail": "Keempat opsi tidak terkesan dan dua di antaranya memberi kelonggaran serupa kunci, jadi tesis lintas-soal tidak memilih; pemilihnya sasaran dan derajat. Keberatan yang terutama pada pemberitaan salah SASARAN: pemberitaan memang ditegur, tetapi frasa pemblokirnya \"on the evidence of its consultation\", yang menunjuk dewan. Kelonggaran bahwa formulir daring menjangkau kedua pihak salah NUANSA: frasa pemblokirnya \"consultation took place through an online form during a fortnight in August\", yang dicatat sebagai keberatan wajar. Kepuasan bahwa transisi berbiaya sudah tersedia salah DERAJAT: frasa pemblokirnya \"only where the transition is funded rather than merely announced\"."
         }
       ],
       [
@@ -20474,7 +20474,7 @@
           "sceptical, though allowing that compliance would cost such firms something",
           "sceptical, taking a loud objection largely as evidence in itself",
           "sceptical, since every term is kept out of the customer's sight",
-          "sceptical, though chiefly of households that fail to watch their charges"
+          "sceptical, though content to leave cancellation where it is now placed"
         ],
         1,
         {
@@ -20483,7 +20483,7 @@
           "answer": "sceptical, taking a loud objection largely as evidence in itself",
           "patternId": "c1a-r0210-q3-tone",
           "why": "Kalimat penutup paragraf empat menyediakan penguncinya: \"those relying on inattention will object loudly, and their objection is itself the evidence\". Keberatan yang lantang dibaca sebagai bukti, bukan sebagai keluhan yang perlu ditimbang.",
-          "whyOthersFail": "Keempat opsi skeptis dan sejalan dengan tesis teks, jadi menebak tesis tidak menolong; pemilihnya sasaran dan derajat. Kelonggaran pada biaya kepatuhan salah DERAJAT: frasa pemblokirnya \"Firms confident of their value have little to fear from such rules\" dan \"Regulation here need not be heavy\". Tuduhan menyembunyikan syarat salah DERAJAT juga: frasa pemblokirnya \"None of this is fraud; every term appears somewhere in the agreement\" \u2014 yang dipersoalkan penempatannya, bukan penyembunyiannya. Keberatan yang terutama pada rumah tangga salah SASARAN: frasa pemblokirnya \"The design simply relies on a well-documented feature of human attention\" dan \"Firms understand this arithmetic better than their customers do\"."
+          "whyOthersFail": "Keempat opsi skeptis dan dua di antaranya memakai kelonggaran terukur yang sama seperti kunci, jadi menebak tesis tidak menolong; pemilihnya sasaran dan derajat. Kelonggaran pada biaya kepatuhan salah DERAJAT: frasa pemblokirnya \"Firms confident of their value have little to fear from such rules\" dan \"Regulation here need not be heavy\". Tuduhan menyembunyikan syarat salah DERAJAT juga: frasa pemblokirnya \"every term appears somewhere in the agreement\" \u2014 yang dipersoalkan penempatannya. Kesediaan membiarkan letak pembatalan salah SASARAN: frasa pemblokirnya \"Require that cancellation be no harder than subscription\"."
         }
       ],
       [
@@ -20576,7 +20576,7 @@
         [
           "disapproving, and holding such employers answerable for the cost",
           "disapproving, yet accepting that a punishing rota is sometimes unavoidable",
-          "disapproving, though chiefly of the workers' own habits at night",
+          "disapproving, though unwilling to press for the rota to be redesigned",
           "disapproving, though hopeful the cheap adjustments are now widely made"
         ],
         0,
@@ -20586,7 +20586,7 @@
           "answer": "disapproving, and holding such employers answerable for the cost",
           "patternId": "c1a-r0211-q3-tone",
           "why": "Kalimat penutup memindahkan tanggungan: \"Where they have not, the cost is still paid, simply by somebody else\". Jadi pemberi kerja yang membiarkan rota tetap dianggap berutang atas biaya itu.",
-          "whyOthersFail": "Keempat opsi mencela pemberi kerja, sehingga tesis teks tidak memilih satu pun; pemilihnya sinyal leksikal. Penerimaan bahwa rota menyiksa itu tak terhindarkan salah DERAJAT: frasa pemblokirnya \"Not every rota is equally punishing\" dan \"These are cheap adjustments\". Celaan yang terutama pada kebiasaan pekerja salah SASARAN: frasa pemblokirnya \"Errors at that hour are not evidence of carelessness; they are a predictable output of the rota\". Harapan bahwa penyesuaian murah kini lazim salah NUANSA: frasa pemblokirnya \"they are frequently the last to be considered\"."
+          "whyOthersFail": "Keempat opsi mencela pemberi kerja dan tiga di antaranya menahan diri atau memberi kelonggaran, sehingga bentuk kunci tidak lagi khas; pemilihnya sinyal leksikal. Penerimaan bahwa rota menyiksa itu tak terhindarkan salah DERAJAT: frasa pemblokirnya \"Not every rota is equally punishing\" dan \"These are cheap adjustments\". Keengganan menuntut perancangan ulang rota salah SASARAN: frasa pemblokirnya \"the rota is a piece of safety equipment, and should be designed with the same seriousness as any other\". Harapan bahwa penyesuaian murah kini lazim salah NUANSA: frasa pemblokirnya \"they are frequently the last to be considered\"."
         }
       ],
       [
@@ -20678,9 +20678,9 @@
         "How does the paper treat the fear of a new league table?",
         [
           "an objection worth answering, though raised largely to shield institutions",
-          "a genuine risk that the minimum cohort rule already meets",
+          "a genuine risk that argues for withholding the contextual offer counts",
           "a genuine risk that argues for a better measure instead",
-          "a genuine risk that leaves each prospectus the safer place"
+          "a genuine risk that argues for leaving publication to each prospectus"
         ],
         2,
         {
@@ -20689,7 +20689,7 @@
           "answer": "a genuine risk that argues for a better measure instead",
           "patternId": "c1a-r0212-q3-tone",
           "why": "Kalimatnya mengakui lalu mengalihkan: \"That risk is real, though it argues for publishing alongside a measure of progress after entry, not for publishing nothing\", dan ditutup \"A bad table is a reason to build a better one\".",
-          "whyOthersFail": "Tiga dari empat opsi sama-sama menyebut risikonya sungguhan, jadi register kunci tidak menonjol; pemilihnya jalan keluar yang dipilih teks. Tuduhan motif melindungi institusi salah NUANSA: frasa pemblokirnya \"That risk is real\", sebuah pengakuan, bukan pembongkaran motif. Klaim bahwa aturan kohort minimum sudah menjawabnya salah SASARAN: aturan itu menjawab keberatan lain, \"Small courses cannot publish grade distributions without effectively identifying individuals\". Penyerahan angka kepada prospektus salah DERAJAT: frasa pemblokirnya \"Publication should be centralized in a single register rather than left to individual prospectuses\"."
+          "whyOthersFail": "Tiga opsi mengakui risikonya sungguhan dan menarik satu kesimpulan terukur, jadi register kunci tidak menonjol; pemilihnya jalan keluar yang dipilih teks. Tuduhan motif melindungi institusi salah NUANSA: frasa pemblokirnya \"That risk is real\", sebuah pengakuan, bukan pembongkaran motif. Penahanan angka tawaran kontekstual salah SASARAN: frasa pemblokirnya \"together with the number of offers made on contextual grounds\". Penyerahan penerbitan kepada prospektus salah DERAJAT: frasa pemblokirnya \"Publication should be centralized in a single register rather than left to individual prospectuses\"."
         }
       ],
       [
@@ -20780,9 +20780,9 @@
       [
         "What is the writer's attitude towards review by journals?",
         [
-          "unimpressed, though troubled chiefly that its reviewers go unpaid",
+          "unimpressed, though allowing that an early posting still needs translating",
           "unimpressed, yet grateful that it filters weak work before release",
-          "unimpressed, and holding that preprints should replace it outright",
+          "unimpressed, though content to let the seal stand as a signal for readers",
           "unimpressed, since readers hand it an authority it never earned"
         ],
         3,
@@ -20792,7 +20792,7 @@
           "answer": "unimpressed, since readers hand it an authority it never earned",
           "patternId": "c1a-r0213-q3-tone",
           "why": "Frasa penguncinya dua: telaah jurnal sebagai jaminan kebenaran disebut \"a comfortable fiction\", dan siapa pun yang pernah melihat makalah tertelaah ditarik tahu segelnya tak sebernilai dugaan pembaca.",
-          "whyOthersFail": "Keempat opsi sama-sama tidak terkesan pada telaah jurnal, sehingga tesis teks tidak menunjuk satu pun; pemilihnya sasaran dan derajat. Keprihatinan yang terutama pada penelaah tanpa upah salah SASARAN: keterangan \"slow, unpaid and unevenly performed\" dipakai untuk membantah jaminan kebenarannya, dan frasa pemblokirnya \"the seal was never worth what readers assumed\". Rasa syukur pada penyaringan salah NUANSA: frasa pemblokirnya \"treating it as a guarantee of truth was always a comfortable fiction\". Tuntutan agar praregistrasi publik menggantikannya salah DERAJAT: frasa pemblokirnya \"The difficulty lies not in posting but in translation\", dan remedi yang diusulkan menyentuh server, institusi, dan wartawan."
+          "whyOthersFail": "Keempat opsi tidak terkesan pada telaah jurnal dan dua di antaranya memberi kelonggaran atau menahan diri seperti kunci, jadi bentuknya tidak memisahkan; pemilihnya sasaran dan nuansa. Kelonggaran soal draf yang perlu diterjemahkan salah SASARAN: frasa pemblokirnya \"The difficulty lies not in posting but in translation\", yaitu kesulitan praterbitan, bukan sifat telaahnya. Rasa syukur pada penyaringan salah NUANSA: frasa pemblokirnya \"treating it as a guarantee of truth was always a comfortable fiction\". Kesediaan membiarkan segelnya berdiri sebagai isyarat salah DERAJAT: frasa pemblokirnya \"the seal was never worth what readers assumed\" dan usul \"servers could readily require a plain statement of what remains untested\"."
         }
       ],
       [
@@ -20988,7 +20988,7 @@
         [
           "even-handed, though persuaded the access case is finally the stronger",
           "even-handed, and content to leave both conclusions where they stand",
-          "even-handed, though impatient that neither has weighed the evidence",
+          "even-handed, yet unwilling to press either department to change its policy",
           "even-handed, yet critical of a department that drifts without saying so"
         ],
         3,
@@ -20998,7 +20998,7 @@
           "answer": "even-handed, yet critical of a department that drifts without saying so",
           "patternId": "c1a-r0215-q3-tone",
           "why": "Penulis menimbang kedua posisi (\"each is arguing from something real\") lalu tetap menghakimi: \"A department that records everything and changes nothing else has made a choice without admitting it\", begitu pula yang menolak merekam.",
-          "whyOthersFail": "Keempat opsi menerima bahwa kedua posisi masuk akal, jadi tesis lintas-soal tidak memilih; pemilihnya sinyal leksikal penutupnya. Keberpihakan pada kasus akses salah DERAJAT: frasa pemblokirnya \"Both accounts rest on evidence chosen to fit the expectation each observer brought to it\". Kepuasan membiarkan kedua simpulan berdiri salah NUANSA: frasa pemblokirnya \"The honest conclusion is that recordings redistribute something rather than simply adding it\", sebuah simpulan yang ditarik penulis sendiri. Ketidaksabaran bahwa keduanya mengabaikan bukti salah SASARAN: frasa pemblokirnya \"each is arguing from something real\"."
+          "whyOthersFail": "Keempat opsi menerima bahwa kedua posisi masuk akal dan dua di antaranya menahan diri seperti kunci, jadi tesis lintas-soal tidak memilih; pemilihnya sinyal leksikal penutupnya. Keberpihakan pada kasus akses salah DERAJAT: frasa pemblokirnya \"Both accounts rest on evidence chosen to fit the expectation each observer brought to it\". Kepuasan membiarkan kedua simpulan berdiri salah NUANSA: frasa pemblokirnya \"The honest conclusion is that recordings redistribute something rather than simply adding it\", sebuah simpulan yang ditarik penulis sendiri. Keengganan mendesak salah satu jurusan berubah salah DERAJAT: frasa pemblokirnya \"Institutional honesty, on this reading, demands an explicit justification rather than an inherited arrangement\"."
         }
       ],
       [
@@ -21090,7 +21090,7 @@
         "How does the writer regard the claim that such an objective cannot be specified?",
         [
           "dismissive, though granting that naming such an aim is genuinely hard",
-          "dismissive, and reading the claim as proof that these firms are wicked",
+          "dismissive, though allowing the age check answers part of the difficulty",
           "dismissive, reading the claim as a defence of revenue",
           "dismissive, though content to let each firm name its own aim"
         ],
@@ -21101,7 +21101,7 @@
           "answer": "dismissive, reading the claim as a defence of revenue",
           "patternId": "c1a-r0216-q3-tone",
           "why": "Kalimat penguncinya \"The impossibility is not technical; it is commercial, and it should be named as such\", didahului catatan bahwa firma merumuskan tujuan sebanding tiap kuartal. Jadi klaim itu dibaca sebagai pembelaan pendapatan.",
-          "whyOthersFail": "Keempat opsi menolak klaim firma, sehingga menebak tesis tidak menolong; pemilihnya sasaran dan derajat. Kelonggaran bahwa merumuskan tujuan itu memang sukar salah NUANSA: frasa pemblokirnya \"they specify comparable objectives every quarter, in language precise enough to pay bonuses on\". Tuduhan bahwa firma jahat salah DERAJAT: frasa pemblokirnya \"The point is not that these firms are wicked\". Kesediaan membiarkan tiap firma menamai tujuannya sendiri salah DERAJAT juga: frasa pemblokirnya \"Require that feeds for accounts registered to minors be optimized for something other than duration, and require the chosen objective to be published\"."
+          "whyOthersFail": "Keempat opsi menolak klaim firma dan ketiga pengecoh memberi kelonggaran atau menahan diri, sehingga register kunci tidak menonjol; pemilihnya sasaran dan derajat. Kelonggaran bahwa merumuskan tujuan itu sukar salah NUANSA: frasa pemblokirnya \"they specify comparable objectives every quarter, in language precise enough to pay bonuses on\". Kelonggaran bahwa verifikasi usia menjawab sebagian kesulitan salah SASARAN: frasa pemblokirnya \"A gate answers the wrong question, since the difficulty begins after entry\". Kesediaan membiarkan tiap firma menamai tujuannya sendiri salah DERAJAT: frasa pemblokirnya \"require the chosen objective to be published\"."
         }
       ],
       [
@@ -21192,7 +21192,7 @@
       [
         "What is the writer's attitude towards automatic enrolment as it is currently set?",
         [
-          "approving of the mechanism, and content with the rate now set",
+          "approving of the mechanism, though uneasy that it fades after the first year",
           "approving of the mechanism, yet uneasy about the rate it carries",
           "approving of the mechanism, though uneasy that a default overrides choice",
           "approving of the mechanism, though sure three per cent suits most workers"
@@ -21204,7 +21204,7 @@
           "answer": "approving of the mechanism, yet uneasy about the rate it carries",
           "patternId": "c1a-r0217-q3-tone",
           "why": "Teks menerima pendaftaran otomatis sebagai temuan yang bekerja, lalu menahan pujiannya: \"Workers enrolled at three per cent often remain at three per cent for a decade, treating the figure as advice rather than a floor\".",
-          "whyOthersFail": "Keempat opsi menyetujui mekanismenya, jadi kuncinya tidak menonjol dari register; pemilihnya derajat dan sasaran. Kepuasan pada tarif yang berlaku salah DERAJAT: frasa pemblokirnya satu dekade tanpa kenaikan itu dan \"the contribution rate accompanying automatic enrolment is frequently minimal\". Keberatan bahwa default menindas pilihan salah SASARAN: frasa pemblokirnya \"There is no arrangement without a default, because somebody must determine what happens when nothing is determined\". Keyakinan bahwa tiga persen cocok bagi kebanyakan pekerja salah NUANSA: frasa pemblokirnya \"frequently minimal\" pada tarif itu."
+          "whyOthersFail": "Keempat opsi menyetujui mekanismenya dan tiga di antaranya memakai keresahan terukur yang sama, jadi bentuk kunci tidak lagi khas; pemilihnya sasaran dan derajat. Keresahan bahwa efeknya memudar salah SASARAN dan bertentangan dengan teks: frasa pemblokirnya \"it does not fade after the first year\". Keberatan bahwa default menindas pilihan salah SASARAN: frasa pemblokirnya \"There is no arrangement without a default, because somebody must determine what happens when nothing is determined\". Keyakinan bahwa tiga persen cocok bagi kebanyakan pekerja salah NUANSA: frasa pemblokirnya \"the contribution rate accompanying automatic enrolment is frequently minimal\"."
         }
       ],
       [
@@ -21399,7 +21399,7 @@
         "How does the writer treat the argument that the work is training?",
         [
           "unconvinced, though chiefly because the multiplier is set too low",
-          "unconvinced, since no training of any kind is provided at all",
+          "unconvinced, yet not asking that preparation be counted at four hours",
           "unconvinced, since the support that training implies is largely absent",
           "unconvinced, yet treating the shortfall as a matter for budgets"
         ],
@@ -21410,7 +21410,7 @@
           "answer": "unconvinced, since the support that training implies is largely absent",
           "patternId": "c1a-r0219-q3-tone",
           "why": "Penguncinya daftar isi pelatihan: \"Training implies observation, feedback and a reduction in load while competence is built, and few of these appear on any timetable\". Jadi hujahnya ditolak karena isi yang dijanjikan sebagian besar tak ada.",
-          "whyOthersFail": "Keempat opsi menolak pembelaan itu, sehingga tesis lintas-soal tidak memilih; pemilihnya sasaran dan derajat. Keberatan yang terutama pada besaran pengali salah SASARAN: pengali dua-versus-empat adalah bantahan atas jam persiapan, dan frasa pemblokir untuk hujah pelatihan tetap \"few of these appear on any timetable\". Klaim bahwa pelatihan sama sekali tidak ada salah DERAJAT: frasa pemblokirnya \"few of these\" (bukan nol) dan \"there is something in the argument\". Penyerahan selisihnya kepada anggaran salah NUANSA: frasa pemblokirnya \"Budgets have permitted the present arrangement precisely because somebody else has been absorbing the difference\"."
+          "whyOthersFail": "Keempat opsi menolak pembelaan itu dan ketiga pengecoh memberi kelonggaran atau menahan diri seperti kunci, sehingga tesis lintas-soal tidak memilih; pemilihnya sasaran dan derajat. Keberatan yang terutama pada besaran pengali salah SASARAN: pengali dua-versus-empat adalah bantahan atas jam persiapan, dan frasa pemblokir untuk hujah pelatihan tetap \"few of these appear on any timetable\". Keengganan menuntut hitungan empat jam salah DERAJAT: frasa pemblokirnya \"count preparation honestly\" bersama \"the honest figure is nearer four\". Penyerahan selisihnya kepada anggaran salah NUANSA: frasa pemblokirnya \"Budgets have permitted the present arrangement precisely because somebody else has been absorbing the difference\"."
         }
       ],
       [
@@ -21707,10 +21707,10 @@
       [
         "What is the writer's attitude towards shops that stop accepting cash?",
         [
-          "critical, and certain that the exclusion is intended",
-          "critical, though chiefly of the fees the traders carry",
+          "critical, yet content to leave the terminal fees uncapped",
+          "critical, though chiefly of the settlement delay that traders carry",
           "critical, since the shops will not admit the choice",
-          "critical, though satisfied the change is announced"
+          "critical, though satisfied the change is usually announced"
         ],
         2,
         {
@@ -21719,7 +21719,7 @@
           "answer": "critical, since the shops will not admit the choice",
           "patternId": "c1a-r0222-q3-tone",
           "why": "Kalimat penguncinya \"it has quietly selected its customers\" disusul \"That decision is seldom announced in those terms\": pilihannya nyata tapi tak diakui sebagai pilihan.",
-          "whyOthersFail": "Keempat opsi kritis terhadap peralihan itu, jadi menebak tesis tidak menolong; pemilihnya sasaran dan derajat. Keyakinan bahwa eksklusinya disengaja salah DERAJAT: frasa pemblokirnya \"Exclusion of this kind is administrative rather than deliberate\". Keberatan yang terutama pada ongkos terminal salah SASARAN: ongkos itu beban pedagang, sedangkan pertanyaan ini soal toko yang berhenti menerima tunai. Kepuasan bahwa perubahannya diumumkan salah NUANSA: frasa pemblokirnya \"That decision is seldom announced in those terms\"."
+          "whyOthersFail": "Keempat opsi kritis terhadap peralihan itu dan ketiga pengecoh memberi kelonggaran atau menahan diri, jadi menebak tesis tidak menolong; pemilihnya sasaran dan derajat. Kesediaan membiarkan ongkos terminal tanpa batas salah DERAJAT: frasa pemblokirnya \"Terminal fees on small transactions could be capped\". Keberatan yang terutama pada tenggat penyelesaian salah SASARAN: itu beban pedagang, sedangkan soal ini tentang toko, dan frasa pemblokirnya \"A shop that stops accepting cash has not merely changed its systems; it has quietly selected its customers\". Kepuasan bahwa perubahannya diumumkan salah NUANSA: frasa pemblokirnya \"That decision is seldom announced in those terms\"."
         }
       ],
       [
@@ -22018,7 +22018,7 @@
         [
           "treats it as serious, though answered by the saving both accept",
           "treats it as serious, though only as a worry about accuracy",
-          "treats it as serious, and settled against adopting such systems",
+          "treats it as serious, yet content to leave the displacement undescribed",
           "treats it as serious and as a question still unsettled"
         ],
         3,
@@ -22028,7 +22028,7 @@
           "answer": "treats it as serious and as a question still unsettled",
           "patternId": "c1a-r0225-q3-tone",
           "why": "Penulis menyebut variabelnya \"cognitive rather than administrative\" dan menutup dengan \"Until that question is settled, a practice adopting such a system is running an experiment on its own judgement\": keberatannya berat dan belum terjawab.",
-          "whyOthersFail": "Keempat opsi memperlakukan keberatan itu sebagai serius, jadi kuncinya tidak menonjol dari register; pemilihnya derajat dan sasaran. Anggapan sudah terjawab oleh penghematan salah DERAJAT: frasa pemblokirnya \"The unresolved variable is cognitive rather than administrative\". Penyempitan menjadi kekhawatiran akurasi salah SASARAN: frasa pemblokirnya \"they are not disagreeing about accuracy\". Putusan menolak pemakaian sistemnya salah DERAJAT juga: frasa pemblokirnya \"A cautious practice would insist that the displacement be described in advance\", yaitu syarat, bukan penolakan."
+          "whyOthersFail": "Keempat opsi memperlakukan keberatan itu sebagai serius dan dua pengecoh memberi kelonggaran atau menahan diri seperti kunci, jadi register tidak memisahkan; pemilihnya derajat dan sasaran. Anggapan sudah terjawab oleh penghematan salah DERAJAT: frasa pemblokirnya \"The unresolved variable is cognitive rather than administrative\". Penyempitan menjadi kekhawatiran akurasi salah SASARAN: frasa pemblokirnya \"they are not disagreeing about accuracy\". Kesediaan membiarkan pergeseran itu tak diuraikan salah DERAJAT: frasa pemblokirnya \"A cautious practice would insist that the displacement be described in advance\"."
         }
       ],
       [
@@ -22120,7 +22120,7 @@
         "What attitude does the writer take towards the objection raised by critics?",
         [
           "Respectful of the objection, and ready to soften his central claim",
-          "Respectful of the objection, and doubtful of its motives",
+          "Respectful of the objection, and reluctant to blame institutions for it",
           "Respectful of the objection, and unpersuaded all the same",
           "Respectful of the objection, and content to leave it open"
         ],
@@ -22131,7 +22131,7 @@
           "answer": "Respectful of the objection, and unpersuaded all the same",
           "patternId": "c1b-0226-q3",
           "why": "Keempat opsi memberi keberatan itu penghormatan yang sama; teks memilih derajatnya: keberatan disebut layak didengar, menata ruang diakui sebagai keputusan, lalu penulis tetap menyimpulkan keberatan itu mengacaukan momen usaha dengan tempatnya.",
-          "whyOthersFail": "Ketiganya sejalan dengan tesis bahwa penataan ruang mengalahkan tekad, dan ketiganya sama-sama menghormati keberatan; yang salah cuma apa yang terjadi sesudah penghormatan itu. Melunakkan hujah diblokir \"Nevertheless, the objection confuses the moment of effort with its location\", sebab tak satu klaim pun ditarik. Meragukan motif diblokir \"The objection deserves a fair hearing\", sebab penulis menjawab isi keberatan dan tak pernah menyoal niat pengeritik. Membiarkannya terbuka diblokir oleh bantahan yang justru diberikan di kalimat berikutnya. | \"Respectful of the objection, and conceding th...\" is wrong: the claim is never scaled back: 'Effort invested once in a sensible arrangement continues to repay the investment for weeks' and 'The difference lies in the room rather than in the person'"
+          "whyOthersFail": "Ketiga pengecoh sejalan dengan tesis bahwa penataan ruang mengalahkan tekad, sama-sama menghormati keberatan, dan ketiganya juga menahan diri sesudah penghormatan itu \u2014 jadi bentuk kunci tidak lagi khas. Melunakkan hujah diblokir \"Nevertheless, the objection confuses the moment of effort with its location\", sebab tak satu klaim pun ditarik dan \"Effort invested once in a sensible arrangement continues to repay the investment for weeks\". Keengganan menyalahkan institusi salah SASARAN: keberatan itu datang dari pengeritik, sedangkan tentang institusi penulis justru tegas \u2014 \"Institutions distributing cheerful reminders about determination, while tolerating noisy classrooms and chaotic timetables, are examining patience rather than cultivating it\". Membiarkannya terbuka diblokir oleh bantahan yang justru diberikan di kalimat berikutnya."
         }
       ],
       [
@@ -22531,10 +22531,10 @@
       [
         "How does the writer present the disagreement between the two researchers?",
         [
-          "As a narrow difference over the aim rather than the remedy",
-          "As a narrow difference that a plainer slogan would dissolve",
+          "As a narrow difference that nonetheless divides them over the aim",
+          "As a narrow difference that a plainer slogan would nonetheless dissolve",
           "As a narrow difference that still changes what teachers do",
-          "As a narrow difference the mathematics trainer has settled"
+          "As a narrow difference that the mathematics trainer has already settled"
         ],
         2,
         {
@@ -22543,7 +22543,7 @@
           "answer": "As a narrow difference that still changes what teachers do",
           "patternId": "c1b-0230-q3",
           "why": "Keempat opsi menyebutnya perbedaan sempit; teks menentukan akibatnya: guru yang mengikuti psikolog lebih sering menghibur, guru yang mengikuti pelatih lebih sering mengajari dan mungkin lebih jarang menghibur.",
-          "whyOthersFail": "Ketiganya menerima tesis bahwa jaraknya sempit, dan salah pada satu unsur. Perbedaan pada tujuan diblokir \"the two positions share a target and separate over the remedy\", sebab yang berpisah justru obatnya. Soal pilihan kata diblokir \"Neither position is a mere slogan\". Sudah diputus oleh pelatih matematika diblokir \"both survive contact with a noisy Monday class\", sebab penulis tak memberi kemenangan kepada siapa pun."
+          "whyOthersFail": "Keempat opsi menerima bahwa jaraknya sempit dan ketiga pengecoh memakai bentuk \"sempit namun tetap\" yang sama seperti kunci, jadi bentuknya tidak memisahkan; yang salah adalah unsurnya. Perpisahan pada tujuan diblokir \"the two positions share a target and separate over the remedy\", sebab yang berpisah justru obatnya. Soal pilihan kata diblokir \"Neither position is a mere slogan\". Sudah diputus oleh pelatih matematika diblokir \"both survive contact with a noisy Monday class\", sebab penulis tak memberi kemenangan kepada siapa pun."
         }
       ],
       [
@@ -22739,7 +22739,7 @@
         [
           "Granting their civic value though slow to question the cost",
           "Granting their civic value while placing them second",
-          "Granting their civic value yet unwilling to fund them",
+          "Granting their civic value while treating neglect as a decision",
           "Granting their civic value while leaving the ranking to others"
         ],
         1,
@@ -22749,7 +22749,7 @@
           "answer": "Granting their civic value while placing them second",
           "patternId": "c1b-0232-q3",
           "why": "Keempat opsi mengakui nilai kewargaan monumen; teks menentukan derajatnya: monumen memang mengajarkan rasa kewargaan, dan penulis tetap menaruhnya di urutan kedua sesudah kertas yang lembap.",
-          "whyOthersFail": "Ketiganya koheren dengan tesis bahwa arsip lebih dulu, dan salah pada satu unsur. Lambat menyoal biaya diblokir kalimat biaya yang justru dihitung, \"listing and shelving an entire district collection costs less than one bronze figure\". Enggan membiayai menggeser derajatnya dari menunda ke menolak dan diblokir \"This is not a plea to demolish anything\" serta \"Bronze survives a decade of delay without harm\". Menyerahkan peringkat kepada orang lain diblokir \"the priority is not obvious, and it is not the statue\"."
+          "whyOthersFail": "Keempat opsi memberi pengakuan lalu menahan diri dengan cara yang sama, jadi register kunci tidak menonjol; yang salah adalah satu unsurnya. Lambat menyoal biaya diblokir kalimat biaya yang justru dihitung, \"listing and shelving an entire district collection costs less than one bronze figure\". Menganggap kelalaian sebagai keputusan diblokir \"Neglect is rarely a decision; it is what happens when nobody decides\". Menyerahkan peringkat kepada orang lain diblokir \"the priority is not obvious, and it is not the statue\"."
         }
       ],
       [
@@ -22944,9 +22944,9 @@
         "How does the writer treat the disagreement between the two architects?",
         [
           "As a small difference that nonetheless decides what is shown",
-          "As a small difference that careful measurement could close",
+          "As a small difference that nonetheless careful measurement could close",
           "As a small difference about ornament that both would refuse",
-          "As a small difference the shared budget has already settled"
+          "As a small difference that the shared budget has nonetheless settled"
         ],
         0,
         {
@@ -22955,7 +22955,7 @@
           "answer": "As a small difference that nonetheless decides what is shown",
           "patternId": "c1b-0234-q3",
           "why": "Keempat opsi menyebutnya perbedaan kecil; teks menentukan letaknya: jaraknya lebih sempit daripada tampaknya dan tetap nyata, sebab satu ingin pengunjung memahami bangunannya dan satu ingin pengunjung memahami sejarahnya.",
-          "whyOthersFail": "Ketiganya menerima tesis bahwa dua posisi itu berdekatan, dan salah pada satu unsur. Bisa ditutup pengukuran diblokir \"committees dislike such choices, because measurement cannot settle them\". Soal ornamen rekaan diblokir \"both refuse invented ornament\", jadi itu bukan sumbu perbedaannya. Sudah diputus anggaran diblokir \"They agree on the danger and on the budget\"."
+          "whyOthersFail": "Keempat opsi menerima tesis bahwa dua posisi itu berdekatan dan ketiga pengecoh memakai bentuk konsesif yang sama, jadi bentuknya tidak menunjuk kunci; yang salah adalah unsurnya. Bisa ditutup pengukuran diblokir \"committees dislike such choices, because measurement cannot settle them\". Soal ornamen rekaan diblokir \"both refuse invented ornament\", jadi itu bukan sumbu perbedaannya. Sudah diputus anggaran diblokir \"They agree on the danger and on the budget\"."
         }
       ],
       [
@@ -23150,9 +23150,9 @@
         "How would you describe the writer's stance towards audience data?",
         [
           "Ready to grant its use and to dispute what it counts",
-          "Ready to grant its use and to dispute the pace of the screen",
+          "Ready to grant its use and to dispute the dullness it punctures",
           "Ready to grant its use and to dispute what a reporter chooses",
-          "Ready to grant its use and to dispute its place on the wall"
+          "Ready to grant its use and to dispute the price it once set"
         ],
         0,
         {
@@ -23161,7 +23161,7 @@
           "answer": "Ready to grant its use and to dispute what it counts",
           "patternId": "c1b-0236-q3",
           "why": "Keempat opsi mengakui gunanya data pembaca lalu menyoal satu hal; teks menentukan hal itu: kesulitannya bukan pada pengukuran itu sendiri melainkan pada pilihan apa yang diukur.",
-          "whyOthersFail": "Ketiganya koheren dengan tesis bahwa satu angka telah dinaikkan menjadi ukuran nilai, dan masing-masing menyoal sasaran yang salah. Menyoal laju pembaruan di layar diblokir \"The difficulty lies not in measurement itself but in the selection of what gets measured\", sebab yang dipersoalkan pilihan ukurannya, bukan lajunya. Menyoal pilihan si reporter diblokir \"Nothing was censored and no instruction was issued\", sebab reporternya justru yang dirugikan. Menyoal keberadaan layar di dinding diblokir \"Nobody in the trade would argue for less information\" dan usul yang sebenarnya, \"Newsrooms can record outcomes alongside traffic\"."
+          "whyOthersFail": "Keempat opsi memberi pengakuan lebih dulu lalu menyoal satu hal, jadi bentuknya seragam; masing-masing pengecoh menyoal sasaran yang salah. Menyoal kebosanan yang ditembus data diblokir \"audience data punctures that comfort usefully\", yang justru diakui penulis. Menyoal pilihan si reporter diblokir \"Nothing was censored and no instruction was issued\", sebab reporternya yang dirugikan. Menyoal fungsi lamanya sebagai harga ruang iklan diblokir \"The difficulty lies not in measurement itself but in the selection of what gets measured\" \u2014 yang dipersoalkan perannya sekarang, bukan pemakaian aslinya."
         }
       ],
       [
@@ -23666,7 +23666,7 @@
         [
           "Conceding the costs and still disputing the comparison",
           "Conceding the costs and doubting the hauliers' good faith",
-          "Conceding the costs and asking the health service to pay",
+          "Conceding the costs and asking the transport authority to absorb them",
           "Conceding the costs and treating them as the decisive point"
         ],
         0,
@@ -23676,7 +23676,7 @@
           "answer": "Conceding the costs and still disputing the comparison",
           "patternId": "c1b-0241-q3",
           "why": "Keempat opsi mengakui biayanya nyata; teks menentukan langkah berikutnya: keberatan finansial layak dijawab, biaya pengalihan angkutan diakui, lalu perbandingan yang ditawarkan disebut hampir selalu salah.",
-          "whyOthersFail": "Ketiganya sejalan dengan tesis bahwa udara bersih lebih murah daripada perawatan, dan salah pada satu unsur. Meragukan niat pengusaha angkutan diblokir \"Objections are usually financial, and they deserve an answer\". Menyuruh layanan kesehatan membayar diblokir usul yang sebenarnya, yaitu menerbitkan satu angka di samping angka lain agar kedua kolom bisa dijumlahkan. Menjadikan biaya sebagai penentu diblokir \"the comparison offered is almost always the wrong one\"."
+          "whyOthersFail": "Keempat opsi mengakui biayanya lebih dulu, jadi bentuk mengaku-lalu-menahan itu tidak lagi menandai kunci; yang salah adalah unsurnya. Meragukan niat pengusaha angkutan diblokir \"Objections are usually financial, and they deserve an answer\". Menyuruh otoritas transportasi menanggungnya diblokir usul yang sebenarnya, \"no accountant is asked to add the two columns together\" dan \"publish one figure alongside the other\". Menjadikan biaya sebagai penentu diblokir \"the comparison offered is almost always the wrong one\"."
         }
       ],
       [
@@ -24181,7 +24181,7 @@
         [
           "Prepared to keep it for good news while pricing the rest",
           "Prepared to keep it for reactions while limiting its reach",
-          "Prepared to keep it for new teams while writing to old ones",
+          "Prepared to keep it for decisions while writing down the disputes",
           "Prepared to keep it for briefings while writing the rest down"
         ],
         1,
@@ -24191,7 +24191,7 @@
           "answer": "Prepared to keep it for reactions while limiting its reach",
           "patternId": "c1b-0246-q3",
           "why": "Keempat opsi mempertahankan ruangan untuk sebagian hal saja; teks menentukan pemilahnya: berkumpul bila hasilnya bergantung pada bagaimana orang bereaksi, dan menulis bila bergantung pada apa yang benar.",
-          "whyOthersFail": "Ketiganya menerima tesis bahwa rapat memakan jam yang tak tercatat, dan salah pada satu unsur pemilahnya. Kabar baik diblokir \"anything involving bad news belong in a room with faces in it\", jadi arahnya terbalik. Tim baru menggeser dasarnya menjadi lama-baru, padahal aturannya soal reaksi dan kebenaran. Rapat pemaparan diblokir \"they are broadcasts with an audience obliged to attend\", sebab justru itu yang harus dijadikan tulisan."
+          "whyOthersFail": "Keempat opsi mempertahankan rapat untuk sesuatu sambil membatasinya, jadi bentuknya seragam; yang salah adalah dasar pemilahnya. Kabar baik diblokir \"anything involving bad news belong in a room with faces in it\", jadi arahnya terbalik. Menuliskan perselisihan diblokir \"disputes between colleagues who mistrust one another\" yang justru harus berlangsung di ruangan. Rapat pemaparan diblokir \"they are broadcasts with an audience obliged to attend\", sebab justru itu yang harus dijadikan tulisan."
         }
       ],
       [
