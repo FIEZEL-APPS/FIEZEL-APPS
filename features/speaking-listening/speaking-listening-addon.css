@@ -45,3 +45,25 @@
    di atas, jadi di panggung Skills Lab ia butuh ruang tambahan agar tombol "Nilai
    jawaban" tidak pernah berbagi tempat dengan gelembung pembimbing. */
 body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
+
+/* ===== FASE3 ===== (blok terpisah di akhir berkas; Fase 2 memegang baris .fsl-primary di atas) */
+/* §3 pemutar latihan dengar: wajah PAW + gelombang statis + chip jumlah putar. */
+.fsl-player{display:flex;align-items:center;gap:11px;margin-top:14px;padding:11px 13px;border-radius:16px;background:var(--panel-soft,#FFF3DC);border:1px solid var(--line,#F0E4CF)}
+.fsl-mascot-slot{flex:0 0 auto;width:38px;height:38px;display:grid;place-items:center;border-radius:50%;background:var(--sun-soft,#FFF3C4);overflow:hidden}
+.fsl-mascot-slot .fsl-mascot{width:38px;height:38px}
+.fsl-mascot-slot .fz-i{width:20px;height:20px;color:var(--text,#241A11)}
+.fsl-wave{flex:1 1 auto;min-width:0;height:22px;color:var(--sun-deep,#E6A800)}
+.fsl-replays{flex:0 0 auto;font-size:.72rem;font-weight:650;color:var(--muted,#6E5E47)}
+
+/* §3 audit #4: keadaan terkunci harus TERBACA, bukan diredupkan.
+   opacity:.56 di atas kertas cream menjatuhkan tinta soal ke ~2,6:1 - dan yang diredupkan
+   itu justru isi latihannya. Redupnya dilepas; keadaan terkunci sekarang punya
+   permukaan dan tinta sendiri, plus satu baris alasan supaya tidak perlu ditebak. */
+.fsl-work:disabled{opacity:1}
+.fsl-work:disabled .fsl-input,.fsl-work:disabled .fsl-option{background:var(--panel-soft,#FFF3DC);color:var(--muted,#6E5E47);border-color:var(--line,#F0E4CF)}
+.fsl-work:disabled::before{content:"Terkunci — putar audio dulu";display:block;margin-bottom:9px;font-size:.75rem;font-weight:650;color:var(--muted,#6E5E47)}
+
+/* §3 kolom dikte: garis 1,5px dan cincin fokus yang benar-benar terlihat. */
+.fsl-input{padding:12px 13px;border-width:1.5px}
+.fsl-input:focus-visible{outline:2px solid var(--focus-ring,#A67A00);outline-offset:2px;border-color:var(--sun-deep,#E6A800)}
+.fsl-input::placeholder{color:var(--muted,#6E5E47);opacity:1}

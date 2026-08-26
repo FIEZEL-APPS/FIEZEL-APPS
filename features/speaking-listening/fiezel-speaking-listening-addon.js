@@ -10,6 +10,28 @@
 })(typeof self!=='undefined'?self:this,function(global){
   'use strict';
 
+  // m028 fase3 (PATCH-PLAN §3): pemutar latihan dengar.
+  //
+  // Sampai rilis ini "Dengarkan" hanyalah satu tombol di antara tombol lain, dan tidak ada
+  // apa pun di layar yang menandakan bahwa layar ini tentang SUARA. Baris pemutar memberi
+  // dua penanda: wajah PAW yang sedang mendengarkan, dan gelombang.
+  //
+  // Gelombangnya STATIS dan itu disengaja: addon TTS tidak mengekspos buffer audio, jadi
+  // visualisasi yang bergerak mengikuti suara akan menjadi kebohongan yang digambar. Ia
+  // dekorasi, karena itu aria-hidden dan tidak pernah membawa informasi.
+  //
+  // Wajah maskot memakai pola fallback yang sama dengan coach-bubble pawFace(): kalau
+  // custom element belum siap, ikon paw yang tampil - tidak pernah kotak kosong.
+  function slPawReady(){try{return !!global.FiezelPaw?.ready?.()}catch(_){return false}}
+  function slPlayerMarkup(){
+    const face=slPawReady()
+      ?'<fiezel-mascot class="fsl-mascot"></fiezel-mascot>'
+      :'<span class="fz-i" data-fz-icon="paw"></span>';
+    return '<div class="fsl-player" aria-hidden="true"><span class="fsl-mascot-slot">'+face+'</span>'
+      +'<svg class="fsl-wave" viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q 6 2 12 12 T 24 12 T 36 12 T 48 12 T 60 12 T 72 12 T 84 12 T 96 12 T 108 12 T 120 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+      +'<span class="fsl-replays" data-replays>Belum diputar</span></div>';
+  }
+
   const ADDON_SCHEMA='fiezel-speaking-listening-addon-v1';
   const STATE_SCHEMA='fiezel-speaking-listening-state-v1';
   const EVIDENCE_SCHEMA='fiezel-speaking-listening-evidence-v1';
@@ -321,8 +343,8 @@
     renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
     current(){return this.items[this.index]||null}
     renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
-    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p><div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
-      this.root.querySelector('[data-play]').addEventListener('click',async event=>{if(this.replays>=Number(item.maxReplays||this.config.maxListeningReplays)){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}const button=event.currentTarget;button.disabled=true;this.replays++;try{const result=await Promise.race([this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),35000))]);this.root.querySelector('[data-work]').disabled=false;this.store.noteCapability('tts',String(result?.provider||'ok'));this.setFeedback(`Audio siap · replay ${this.replays}/${Number(item.maxReplays||this.config.maxListeningReplays)}.`)}catch{this.store.noteCapability('tts','unavailable');this.setFeedback('Audio tidak tersedia. Item listening ini tetap terkunci dan tidak dinilai.')}finally{button.disabled=false}});this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
+    renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p>${slPlayerMarkup()}<div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
+      this.root.querySelector('[data-play]').addEventListener('click',async event=>{if(this.replays>=Number(item.maxReplays||this.config.maxListeningReplays)){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}const button=event.currentTarget;button.disabled=true;this.replays++;try{const result=await Promise.race([this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('tts_timeout')),35000))]);this.root.querySelector('[data-work]').disabled=false;this.store.noteCapability('tts',String(result?.provider||'ok'));/* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;this.setFeedback(`Audio siap · replay ${this.replays}/${Number(item.maxReplays||this.config.maxListeningReplays)}.`)}catch{this.store.noteCapability('tts','unavailable');this.setFeedback('Audio tidak tersedia. Item listening ini tetap terkunci dan tidak dinilai.')}finally{button.disabled=false}});this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
       if(isDict)this.root.querySelector('[data-submit]').addEventListener('click',()=>{const input=this.root.querySelector('[data-dictation]'),value=input.value;const result=scoreListening(item,value);input.value='';this.finishItem(item,result)});else this.root.querySelectorAll('[data-choice]').forEach(b=>b.addEventListener('click',()=>this.finishItem(item,scoreListening(item,Number(b.getAttribute('data-choice'))))))
     }
     // m025-145: latihan berformat ujian. Yang membedakannya dari latihan harian bukan isinya
