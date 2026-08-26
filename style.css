@@ -1219,9 +1219,17 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   src:url('./assets/fonts/PlusJakartaSans-700.woff2') format('woff2')}
 
 .fiezel-splash,.fiezel-ob{
-  --fz-bg:#efe3d3; --fz-paper:#fdf3e2; --fz-ink:#2c1b1c; --fz-ink-muted:#6e5a4f;
-  --fz-accent:#7a1e2e; --fz-accent-deep:#4a1119; --fz-gold:#d9a441; --fz-soft:#f3e0e0;
-  --fz-line:#ecdec0;
+  /* m028 "Warm Paper, Bright Mind". Peran token TIDAK berubah - hanya nilainya, plus
+     empat token baru untuk peran yang dulu dipaksa dipikul --fz-accent sendirian:
+     bidang aksi (--fz-sun-grad), bidang terpilih (--fz-sun-soft), tinta kecil di atas
+     krem (--fz-info), dan panggung gelap (--fz-core). Kuning adalah warna BIDANG:
+     #FFC700 di atas krem hanya 1,5:1, jadi tidak satu pun teks memakainya. */
+  --fz-bg:#FFF9EE; --fz-paper:#FFFFFF; --fz-ink:#241A11; --fz-ink-muted:#6E5E47;
+  --fz-accent:#241A11; --fz-accent-deep:#120C07; --fz-gold:#E6A800; --fz-soft:#FFF3C4;
+  --fz-line:#F0E4CF;
+  --fz-sun:#FFC700; --fz-sun-soft:#FFF3C4; --fz-sun-press:#CC9600;
+  --fz-sun-grad:linear-gradient(180deg,#FFDE59,#FFA500);
+  --fz-info:#7A5F1B; --fz-core:#1B1418; --fz-core-soft:#2A2126; --fz-on-core:#FDFAF3;
   --fz-display:'FZ Instrument Serif',Georgia,'Times New Roman',serif;
   --fz-heading:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
   --fz-body:'FZ Plus Jakarta Sans',-apple-system,'Segoe UI',sans-serif;
@@ -1359,9 +1367,9 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
    menyusul setelah keduanya berdiri. Semuanya selesai di ~1,3 detik, jauh sebelum splash
    menutup diri di 2,6 detik.
    ========================================================================== */
-.fiezel-splash-dark{background:#0B0709;padding-top:0}
+.fiezel-splash-dark{background:#1B1418;padding-top:0}
 .fiezel-splash-brand{
-  background:radial-gradient(circle at 30% 18%,#241A1D 0%,#140E10 55%,#070405 100%);
+  background:radial-gradient(circle at 30% 18%,#2A2126 0%,#1B1418 55%,#120C0F 100%);
   position:relative;overflow:hidden;
   /* m025-91 OWNER: "tulisan fiezel itu diletakkan di bawah lagi seperti duolingo".
      Baris pertama menyerap seluruh sisa tinggi, jadi tanda terpusat di area atas-tengah;
@@ -1378,7 +1386,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-brand::before{
   content:"";position:absolute;left:50%;top:38%;width:min(78vw,440px);aspect-ratio:1;
   border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle,rgba(221,181,95,.42) 0%,rgba(221,181,95,0) 68%);
+  background:radial-gradient(circle,rgba(255,199,0,.34) 0%,rgba(255,199,0,0) 68%);
   animation:fz-splash-halo 3.4s ease-in-out infinite;
 }
 .fiezel-splash-brand>*{position:relative;z-index:1}
@@ -1417,7 +1425,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-logo-stage{position:relative}
 .fiezel-logo-stage::after{
   content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(74deg,transparent 38%,rgba(255,247,225,.34) 50%,transparent 62%);
+  background:linear-gradient(74deg,transparent 38%,rgba(255,222,89,.30) 50%,transparent 62%);
   animation:fz-logo-sheen 1.2s cubic-bezier(.3,.7,.3,1) var(--fz-b6,820ms) both;
 }
 
@@ -1431,8 +1439,8 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both;
 }
 .fiezel-splash-brand .fiezel-splash-tag{
-  font-family:var(--fz-body);font-size:.62rem;letter-spacing:.30em;
-  text-transform:uppercase;color:rgba(221,181,95,.9);margin:14px 0 0;
+  font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;
+  text-transform:uppercase;color:#FFC700;margin:14px 0 0;
   animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both;
 }
 /* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
