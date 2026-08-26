@@ -238,11 +238,40 @@ test('keadaan bunyi bisa dibaca pemiliknya di perangkat, bukan hanya dari kode',
 
 /* ---------------- tipografi ---------------- */
 
-test('wajah bulat pensiun dari chrome aplikasi', () => {
-  assert.ok(!/Fredoka/.test(css), 'style.css masih merujuk Fredoka');
-  assert.ok(!/Fredoka/.test(html), 'index.html masih merujuk Fredoka');
-  assert.ok(!fs.existsSync(path.join(root, 'assets/fonts/Fredoka-700.woff2')),
-    'berkas Fredoka masih ada; ia akan ikut ter-precache tanpa dirujuk siapa pun');
+/* m028 fase2: LARANGAN TOTAL Fredoka dicabut, dan alasan pencabutannya penting.
+   Yang dijaga assertion lama BUKAN "Fredoka haram" - Fredoka dulu dilepas karena
+   berkasnya tergeletak di assets/fonts tanpa satu pun aturan CSS merujuknya, jadi
+   ia ikut ter-precache dan dibayar oleh setiap murid tanpa pernah tergambar. Itu
+   masalah aset yatim, bukan masalah wajah huruf.
+
+   DIRECTION redesign-v1 memanggilnya kembali sebagai wajah display bulat brand,
+   kali ini dirujuk dan diberi anggaran: satu berkas variable 29 KB (wght 300-700),
+   dirujuk oleh --fz-display-round, ter-precache, dan di-preload.
+
+   Kontraknya digeser dari "tidak boleh ada" menjadi tiga syarat yang sebenarnya
+   melindungi pembaca: (1) tidak yatim - kalau berkasnya ada, ia harus dirujuk;
+   (2) tidak menyentuh wordmark/judul dialog, karena koreografi pembukaan dipaku
+   pada Instrument Serif; (3) tidak dipakai di ukuran UI kecil, tempat kebulatannya
+   berubah jadi kabur - lantainya 1.4rem. */
+test('wajah bulat dirujuk, dibatasi ke display, dan menjauhi wordmark', () => {
+  const file = path.join(root, 'assets/fonts/Fredoka-var.woff2');
+  if (fs.existsSync(file)) {
+    assert.ok(/--fz-display-round:'FZ Fredoka'/.test(css),
+      'berkas Fredoka ada tapi tidak ada token yang merujuknya: aset yatim');
+    assert.ok(/@font-face\{font-family:'FZ Fredoka'/.test(css), 'Fredoka harus punya @font-face');
+    assert.ok(fs.statSync(file).size < 60 * 1024,
+      'Fredoka harus tetap ter-subset; di atas 60 KB berarti berkas penuh ikut masuk');
+  } else {
+    assert.ok(!/Fredoka/.test(css), 'style.css merujuk Fredoka tapi berkasnya tidak ada');
+  }
+  // Wordmark + judul dialog tetap serif. Aturan display yang dipaku di bawah
+  // tidak boleh berpindah keluarga.
+  const round = /\.word,[^{]*\{[^}]*var\(--fz-display-round\)[^}]*\}/.exec(css);
+  assert.ok(round, 'blok Fredoka tidak ditemukan');
+  for (const banned of ['.fiezel-title', '.welcome-panel h2', '.modal-panel h2', '.fiezel-splash']) {
+    assert.ok(!round[0].includes(banned),
+      banned + ' tidak boleh memakai wajah bulat: koreografi pembukaan dipaku ke serif');
+  }
 });
 
 test('serif display dipakai di ukuran besar saja, dengan berat yang benar-benar ada', () => {
@@ -258,7 +287,13 @@ test('serif display dipakai di ukuran besar saja, dengan berat yang benar-benar 
 test('font display ikut ter-precache dan di-preload, jadi wordmark tidak berkedip', () => {
   const sw = fs.readFileSync(path.join(root, 'sw.js'), 'utf8');
   assert.ok(sw.includes("'./assets/fonts/InstrumentSerif-400.woff2'"), 'font display harus masuk precache');
-  assert.ok(!sw.includes('Fredoka'), 'sw.js masih memprecache font yang sudah dilepas');
+  // m028 fase2: dulu "jangan precache font yatim". Sekarang Fredoka DIRUJUK, jadi
+  // syaratnya berbalik: kalau berkasnya ada, ia HARUS ter-precache, atau judul hero
+  // akan swap saat aplikasi dibuka offline.
+  if (fs.existsSync(path.join(root, 'assets/fonts/Fredoka-var.woff2'))) {
+    assert.ok(sw.includes("'./assets/fonts/Fredoka-var.woff2'"), 'Fredoka dirujuk tapi tidak ter-precache');
+    assert.ok(/rel="preload"[^>]*Fredoka-var\.woff2/.test(html), 'Fredoka harus di-preload');
+  }
   assert.ok(/rel="preload"[^>]*InstrumentSerif-400\.woff2/.test(html), 'font display harus di-preload');
 });
 
