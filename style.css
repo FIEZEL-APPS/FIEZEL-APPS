@@ -1252,7 +1252,13 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
   padding-top:max(18px,env(safe-area-inset-top));
   animation:fzm-page-in .4s cubic-bezier(.22,.61,.36,1) both;
 }
-.fiezel-ob{z-index:2147481900}
+/* m028: kepala onboarding kini bidang gelap yang menempel ke tepi atas, jadi padding
+   aman-area dipindah KE DALAM band itu - kalau tidak, ada garis krem tipis di atas bidang
+   gelap yang terbaca sebagai kesalahan render. Lapisannya juga boleh digulir: langkah
+   pemilihan tujuan lebih tinggi dari 844px begitu enam chip level muncul, dan sebelum ini
+   kelebihannya terpotong tanpa jalan keluar. */
+.fiezel-ob{z-index:2147481900;padding-top:0;overflow-y:auto;overscroll-behavior:contain}
+.fiezel-ob-reveal{padding-top:max(26px,calc(env(safe-area-inset-top) + 10px))}
 .fiezel-splash[hidden]{display:none}
 .fiezel-splash.is-leaving,.fiezel-ob.is-leaving{animation:fzm-page-out .3s ease-in both}
 /* Page In/Out (bagian 14): fade + slide, 400ms masuk / 300ms keluar. */
@@ -1260,88 +1266,155 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 @keyframes fzm-page-out{from{opacity:1;transform:none}to{opacity:0;transform:translateX(-16px)}}
 
 .fiezel-topbar{display:flex;align-items:center;justify-content:space-between;
-  padding:4px 18px;min-height:40px}
+  padding:4px 16px;min-height:40px}
+
+/* ---------- m028: reveal gelap di kepala onboarding ----------
+   Splash tutup di panggung gelap, lalu aplikasi terang. Sebelum ini peralihannya adalah
+   potongan keras: gelap penuh langsung jadi krem penuh. Band ini yang menjembatani -
+   bidang core yang sama dengan splash, mengecil jadi kepala layar, membawa wordmark yang
+   baru saja tersusun di splash. Ia dekorasi murni: tidak ada aksi di dalamnya. */
+.fiezel-ob-reveal{
+  position:relative;overflow:hidden;flex:0 0 auto;margin:-1px 0 0;
+  background:radial-gradient(120% 130% at 50% 0%,var(--fz-core-soft) 0%,var(--fz-core) 62%);
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  padding:26px 20px 20px;text-align:center;color:var(--fz-on-core);
+}
+.fiezel-ob-reveal::before{
+  content:"";position:absolute;left:50%;top:36%;width:min(70vw,300px);height:170px;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,199,0,.26),rgba(255,199,0,0));
+}
+.fiezel-ob-reveal .fiezel-wordmark{position:relative;width:min(46vw,178px);margin:0 auto;display:block}
+.fiezel-ob-word{position:relative;margin:0;font-family:var(--fz-heading);font-weight:700;
+  font-size:1.8rem;letter-spacing:.02em;color:var(--fz-on-core)}
+.fiezel-ob-tag{position:relative;margin:10px 0 0;font-size:12px;font-weight:700;
+  letter-spacing:.32em;text-indent:.32em;text-transform:uppercase;color:var(--fz-sun)}
+
+/* ---------- m028: stepper enam langkah ----------
+   Perkenalan lama hanya memberi tahu di mana murid berada lewat titik-titik kecil di dalam
+   carousel - dan hanya di satu langkah. Sekarang posisinya selalu terbaca: nomor langkah,
+   nama langkah, dan enam segmen. Jumlah langkah dan urutannya TIDAK berubah. */
+.fiezel-stepper{padding:16px 16px 4px;flex:0 0 auto}
+.fiezel-stepper-eyebrow{display:block;font-size:12px;font-weight:700;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--fz-info)}
+.fiezel-stepper-names{display:block;margin-top:3px;font-size:13px;font-weight:600;
+  line-height:1.4;color:var(--fz-ink-muted)}
+.fiezel-stepper-names b{color:var(--fz-ink);font-weight:700}
+.fiezel-segments{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:10px}
+.fiezel-segments i{height:6px;border-radius:var(--radius-pill);background:var(--fz-line)}
+.fiezel-segments i.is-done{background:var(--fz-sun-grad)}
 /* Back selalu ada dari langkah 1+, Skip selalu ada - keduanya ukuran sentuh penuh
    walau tampilannya ringan, karena ini SATU-SATUNYA jalan keluar dari lapisan penuh layar. */
 .fiezel-back,.fiezel-skip{min-height:44px;min-width:44px;display:inline-flex;align-items:center;
   gap:4px;background:none;border:0;color:var(--fz-ink-muted);font-family:var(--fz-body);
-  font-size:.8rem;font-weight:600;padding:0 6px}
+  font-size:13px;font-weight:600;padding:0 6px}
+.fiezel-topbar.is-bare{min-height:0;padding:0;height:6px}
 .fiezel-back[hidden],.fiezel-skip[hidden]{visibility:hidden}
 .fiezel-skip{text-decoration:underline;margin-left:auto}
 
-.fiezel-stage{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;
-  justify-content:flex-end;min-height:0;padding:6px 20px 0;text-align:center}
-.fiezel-stage-art{display:flex;align-items:flex-end;justify-content:center;flex:1 1 auto;
+.fiezel-stage{flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
+  min-height:0;padding:12px 16px 0;text-align:left}
+.fiezel-stage-art{display:flex;align-items:flex-end;justify-content:flex-start;gap:10px;
   min-height:64px;width:100%}
 .fiezel-stage-art img{max-height:38vh;width:auto}
 
 /* Lambang langkah perkenalan (m025-80 OWNER: maskot dihilangkan).
    Satu ikon besar di atas piringan lembut bercincin emas tipis - cukup untuk menahan
    komposisi yang dulu diisi maskot, tanpa menambah gaya gambar baru ke dalam produk. */
+/* m028: piringan raksasa (200px, radial emas di tengah layar kosong) diganti kartu wajah
+   64px yang duduk BERSAMA gelembung sapaan. Alasannya bukan selera: piringan itu memakan
+   sepertiga layar untuk menyampaikan nol informasi, dan tinggi yang direbutnya adalah
+   tinggi yang dibutuhkan kartu langkah supaya CTA-nya tidak perlu digulir. --fz-art
+   dibiarkan hidup sebagai penyetel ukuran (JS masih mengirimnya per langkah), tetapi
+   sekarang dijepit: sebesar apa pun angkanya, wajahnya tetap seukuran wajah. */
 .fiezel-step-art{
   --fz-art:200px;
-  width:var(--fz-art);height:var(--fz-art);
-  display:grid;place-items:center;align-self:center;
-  border-radius:50%;
-  background:radial-gradient(circle at 34% 28%,rgba(217,164,65,.20) 0%,rgba(122,30,46,.10) 62%,transparent 78%);
-  box-shadow:inset 0 0 0 1px rgba(217,164,65,.32);
+  width:64px;height:64px;flex:0 0 auto;
+  display:grid;place-items:center;align-self:flex-end;
+  border-radius:20px;
+  background:var(--fz-sun-soft);
+  border:2px solid var(--fz-ink);
+  box-shadow:var(--shadow-sm);
 }
 .fiezel-step-art svg{
-  width:46%;height:46%;
-  color:var(--fz-accent,#7a1e2e);
-  /* Goresan dipertebal dari 1,5: pada piringan sebesar ini goresan tipis terbaca kurus
-     dan generik, sementara lambang ini harus memikul ruang yang dulu diisi maskot. */
-  stroke-width:1.75;
+  width:34px;height:34px;
+  color:var(--fz-ink);
+  /* Goresan dipertebal dari 1,5: di dalam kartu sekecil ini goresan tipis terbaca kurus
+     dan generik, sementara lambang ini adalah wajah yang menyapa. */
+  stroke-width:1.9;
 }
-@media (max-height:700px){.fiezel-step-art{--fz-art:150px}}
+/* Gelembung sapaan. Kalimatnya berbeda tiap langkah, jadi murid tidak merasa sedang
+   diwawancarai formulir - ada yang menemani. */
+.fiezel-greet-bubble{
+  position:relative;margin:0;background:var(--fz-paper);border:1.5px solid var(--fz-line);
+  border-radius:var(--radius-md);border-bottom-left-radius:4px;
+  padding:10px 14px;box-shadow:var(--shadow-sm);
+  font-size:14px;font-weight:500;line-height:1.45;color:var(--fz-ink);max-width:270px;
+}
+@media (max-height:700px){.fiezel-stepper{padding-top:10px}.fiezel-ob-reveal{padding:18px 20px 14px}}
 
-.fiezel-sheet{position:relative;flex:0 0 auto;width:100%;background:var(--fz-paper);
-  border-top-left-radius:28px;border-top-right-radius:28px;
-  border:1px solid var(--fz-line);border-bottom:0;
-  box-shadow:0 -8px 24px rgba(74,17,25,.12);
-  padding:22px 22px max(22px,env(safe-area-inset-bottom));
-  display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+/* m028: lembar bawah selebar layar diganti kartu. Bottom sheet dipilih dulu supaya CTA
+   terjangkau ibu jari - itu masih benar, dan tetap dijaga: kartu ini yang terakhir dalam
+   kolom, jadi tombolnya tetap duduk di bawah. Yang hilang cuma dua sudut yang menempel ke
+   tepi layar, dan bersama itu kesan "dialog sistem" yang tidak pernah dimaksudkan. */
+.fiezel-sheet{position:relative;flex:0 0 auto;width:auto;background:var(--fz-paper);
+  border-radius:var(--radius-lg);
+  border:1px solid var(--fz-line);
+  box-shadow:var(--shadow-md);
+  margin:14px 16px max(16px,env(safe-area-inset-bottom));
+  padding:22px 20px 20px;
+  display:flex;flex-direction:column;align-items:stretch;gap:10px;text-align:left}
 
 .fiezel-badge{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
-  background:var(--fz-accent);color:#fff;font-family:var(--fz-heading);font-weight:600;font-size:.82rem}
-.fiezel-title{margin:0;font-family:var(--fz-heading);font-weight:600;font-size:1.32rem;
-  line-height:1.28;color:var(--fz-accent)}
-.fiezel-body{margin:0;font-size:.9rem;line-height:1.55;color:var(--fz-ink);max-width:24rem}
-.fiezel-note{margin:0;font-size:.74rem;line-height:1.5;color:var(--fz-ink-muted);max-width:24rem}
+  background:var(--fz-sun);color:var(--fz-ink);font-family:var(--fz-heading);font-weight:700;font-size:13px}
+.fiezel-title{margin:0 0 2px;font-family:var(--fz-heading);font-weight:600;font-size:1.38rem;
+  line-height:1.22;color:var(--fz-ink)}
+.fiezel-body{margin:0;font-size:15px;line-height:1.55;color:var(--fz-ink-muted);max-width:24rem}
+.fiezel-note{margin:0;font-size:13px;line-height:1.5;color:var(--fz-ink-muted);max-width:24rem}
 
 /* Component Styling Guidelines (bagian 2): Primary/Secondary/Ghost. */
-.fiezel-btn{min-height:44px;font-family:var(--fz-body);font-weight:650;font-size:.92rem;
-  border-radius:14px;padding:13px 20px;width:min(21rem,100%);
-  transition:transform .12s ease-out,box-shadow .12s ease-out,opacity .12s ease-out}
-.fiezel-btn-primary{background:var(--fz-accent);color:#fff;border:0;box-shadow:0 4px 0 var(--fz-accent-deep)}
-.fiezel-btn-primary:active{transform:translateY(3px);box-shadow:0 1px 0 var(--fz-accent-deep)}
-.fiezel-btn-secondary{background:var(--fz-soft);color:var(--fz-accent);border:1px solid var(--fz-gold)}
+.fiezel-btn{min-height:44px;font-family:var(--fz-body);font-weight:700;font-size:16px;
+  border-radius:var(--radius-md);padding:15px 20px;width:100%;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  transition:transform .12s ease-out,box-shadow .12s ease-out}
+/* Aksi utama memakai bidang sun, bukan tinta: satu-satunya kuning penuh di layar adalah
+   apa yang harus disentuh berikutnya. Tulisannya tinta di atas kuning (10,4:1) - bukan
+   putih di atas kuning, yang cuma 1,9:1 dan itulah kesalahan paling sering pada tombol
+   kuning di mana pun. */
+.fiezel-btn-primary{background:var(--fz-sun-grad);color:var(--fz-ink);border:0;
+  box-shadow:0 3px 0 var(--fz-sun-press),var(--shadow-sm)}
+.fiezel-btn-primary:active{transform:translateY(2px);box-shadow:0 1px 0 var(--fz-sun-press)}
+.fiezel-btn-secondary{background:var(--fz-ink);color:var(--fz-on-core);border:0;
+  box-shadow:var(--shadow-sm)}
 .fiezel-btn-secondary:active{transform:translateY(2px)}
 .fiezel-btn-ghost{background:transparent;color:var(--fz-ink-muted);border:0;box-shadow:none;
-  font-size:.84rem;width:auto}
-.fiezel-btn[disabled]{opacity:.4;pointer-events:none}
+  font-size:14px;font-weight:600;width:100%}
+/* Nonaktif punya warnanya sendiri, bukan opacity .4 yang menyeret teks ke 2,3:1. Tombol
+   yang belum bisa ditekan tetap harus BISA DIBACA - itu yang menjelaskan apa syaratnya. */
+.fiezel-btn[disabled]{background:var(--fz-soft);color:#75654C;box-shadow:none;
+  transform:none;pointer-events:none}
 
 /* m025-117 Step 1: kolom nama murid. Tinggi sentuh 48px (di atas ambang 44px yang dijaga
    gate a11y), font 16px supaya iOS TIDAK memperbesar halaman saat kolom mendapat fokus -
    zoom itu menggeser seluruh lapisan perkenalan dan terbaca sebagai layar yang melompat. */
-.fiezel-field{display:flex;flex-direction:column;align-items:flex-start;gap:6px;
-  width:min(21rem,100%);text-align:left}
-.fiezel-field>span{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
-  font-weight:650;color:var(--fz-ink-muted)}
-.fiezel-field input{width:100%;min-height:48px;font-size:16px;font-family:var(--fz-body);
-  color:var(--fz-ink);background:#fff;border:1.5px solid var(--fz-line);border-radius:14px;
-  padding:12px 14px;transition:border-color .14s ease-out,box-shadow .14s ease-out}
-.fiezel-field input::placeholder{color:var(--fz-ink-muted);opacity:.75}
-.fiezel-field input:focus-visible{outline:2px solid var(--fz-accent);outline-offset:2px}
-.fiezel-field input:focus{border-color:var(--fz-accent);
-  box-shadow:0 0 0 3px rgba(122,30,46,.16)}
+.fiezel-field{display:flex;flex-direction:column;align-items:flex-start;gap:8px;
+  width:100%;text-align:left}
+.fiezel-field>span{font-size:12px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;color:var(--fz-info)}
+.fiezel-field input{width:100%;min-height:52px;font-size:16px;font-weight:600;font-family:var(--fz-body);
+  color:var(--fz-ink);background:var(--fz-bg);border:1.5px solid var(--fz-line);border-radius:var(--radius-md);
+  padding:12px 16px;transition:border-color .14s ease-out,box-shadow .14s ease-out}
+.fiezel-field input::placeholder{color:var(--fz-ink-muted);font-weight:500;opacity:1}
+.fiezel-field input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.fiezel-field input:focus{border-color:var(--fz-gold);
+  box-shadow:0 0 0 3px rgba(230,168,0,.22)}
 /* Step 1 tidak punya tombol "Lewati" (langkah wajib). Penahan ini menjaga tombol "Kembali"
    tetap di kolom kiri, supaya kepala layarnya tidak bergeser antar-langkah. */
 .fiezel-skip-spacer{display:inline-block;min-width:44px;min-height:44px}
 
 .fiezel-dots{display:flex;gap:6px;margin-top:2px}
 .fiezel-dot{width:7px;height:7px;border-radius:50%;background:var(--fz-line)}
-.fiezel-dot.is-active{background:var(--fz-accent)}
+.fiezel-dot.is-active{background:var(--fz-sun-press)}
 
 /* ---------- Splash (Step 0) ---------- */
 .fiezel-splash-body{flex:1;display:flex;flex-direction:column;align-items:center;
@@ -1463,43 +1536,52 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
 
 /* ---------- Feature Carousel (Step 1) ---------- */
-.fiezel-carousel-track{display:flex;flex-direction:column;gap:10px;width:100%;text-align:left}
+.fiezel-carousel-track{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}
 .fiezel-carousel-item{display:flex;align-items:center;gap:10px;background:var(--fz-bg);
-  border:1px solid var(--fz-line);border-radius:12px;padding:10px 12px;font-size:.86rem}
-.fiezel-carousel-item i{flex:0 0 auto;color:var(--fz-accent)}
+  border:1px solid var(--fz-line);border-radius:var(--radius-sm);padding:11px 13px;font-size:14px;font-weight:600}
+.fiezel-carousel-item i{flex:0 0 auto;color:var(--fz-gold)}
 .fiezel-carousel-arrows{display:flex;align-items:center;gap:14px;justify-content:center}
-.fiezel-carousel-arrow{min-height:40px;min-width:40px;border-radius:50%;background:var(--fz-soft);
-  color:var(--fz-accent);border:0;display:grid;place-items:center}
-.fiezel-carousel-arrow[disabled]{opacity:.35}
+/* padding:0 + width tetap: tanpa itu padding 13px/18px dari aturan `button` dasar membuat
+   tombol "bulat" ini melebar jadi lonjong, dan border-radius:50% mengikuti bentuk kotaknya. */
+.fiezel-carousel-arrow{width:44px;height:44px;min-height:44px;min-width:44px;padding:0;
+  border-radius:50%;background:var(--fz-sun-soft);
+  color:var(--fz-ink);border:1.5px solid var(--fz-line);display:grid;place-items:center}
+.fiezel-carousel-arrow[disabled]{background:var(--fz-bg);color:#75654C;opacity:1}
 
 /* ---------- Goal Selection (Step 2) ---------- */
 .fiezel-goal-grid{display:flex;flex-direction:column;gap:8px;width:100%}
 /* Card Selection (bagian 14): border->gold, bg->soft, scale 1->1.035->1, 300-400ms. */
-.fiezel-goal-card{display:flex;flex-direction:column;gap:2px;text-align:left;width:100%;
-  border:1px solid var(--fz-line);border-radius:12px;padding:11px 14px;background:#fff;
+/* align-items dipaksa flex-start: aturan dasar `button{display:inline-flex;align-items:center}`
+   di kepala berkas ini menang atas text-align, jadi tanpa baris ini judul dan penjelasan
+   kartu tujuan tetap rata tengah walau kartunya jelas-jelas daftar pilihan. */
+.fiezel-goal-card{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  gap:3px;text-align:left;width:100%;
+  border:1.5px solid var(--fz-line);border-radius:var(--radius-sm);padding:12px 14px;background:var(--fz-paper);
   transition:transform .32s cubic-bezier(.34,1.56,.64,1),border-color .3s,background .3s}
-.fiezel-goal-card b{font-family:var(--fz-heading);font-weight:600;font-size:.88rem;color:var(--fz-ink)}
-.fiezel-goal-card span{font-size:.76rem;color:var(--fz-ink-muted)}
-.fiezel-goal-card.is-selected{border:2px solid var(--fz-gold);background:var(--fz-soft);
+.fiezel-goal-card b{font-family:var(--fz-heading);font-weight:700;font-size:14px;color:var(--fz-ink)}
+.fiezel-goal-card span{font-size:13px;color:var(--fz-ink-muted);line-height:1.45}
+/* Keadaan terpilih ditandai DUA hal - garis tinta dan bidang kuning lembut - supaya ia
+   tetap terbaca oleh mata yang tidak membedakan kuning dari krem. */
+.fiezel-goal-card.is-selected{border:2px solid var(--fz-ink);background:var(--fz-sun-soft);
   transform:scale(1.02)}
-.fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;width:100%}
-.fiezel-level-chip{min-height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--fz-line);
-  background:#fff;color:var(--fz-ink);font-family:var(--fz-body);font-weight:650;font-size:.82rem}
-.fiezel-level-chip.is-selected{border:2px solid var(--fz-gold);background:var(--fz-soft);color:var(--fz-accent)}
+.fiezel-level-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-start;width:100%}
+.fiezel-level-chip{min-height:44px;padding:0 16px;border-radius:var(--radius-pill);border:1.5px solid var(--fz-line);
+  background:var(--fz-paper);color:var(--fz-ink);font-family:var(--fz-body);font-weight:700;font-size:13px}
+.fiezel-level-chip.is-selected{border:1.5px solid var(--fz-ink);background:var(--fz-ink);color:var(--fz-on-core)}
 
 /* ---------- Summary (Step 5) ---------- */
 .fiezel-summary-card{width:100%;background:var(--fz-bg);border:1px solid var(--fz-line);
-  border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;text-align:left}
-.fiezel-summary-row{display:flex;justify-content:space-between;gap:10px;font-size:.82rem}
+  border-radius:var(--radius-sm);padding:14px;display:flex;flex-direction:column;gap:8px;text-align:left}
+.fiezel-summary-row{display:flex;justify-content:space-between;gap:10px;font-size:14px}
 .fiezel-summary-row b{color:var(--fz-ink)}
 .fiezel-summary-row span{color:var(--fz-ink-muted);text-align:right}
 
 /* Confetti kecil, CSS murni, berhenti di bawah kurangi-gerak lewat blok global di atas. */
 .fiezel-confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit}
 .fiezel-confetti i{position:absolute;top:-10px;width:6px;height:6px;border-radius:1px;
-  background:var(--fz-gold);animation:fzm-confetti 1.6s ease-in both}
-.fiezel-confetti i:nth-child(2n){background:var(--fz-accent)}
-.fiezel-confetti i:nth-child(3n){background:#fff;border:1px solid var(--fz-gold)}
+  background:var(--fz-sun);animation:fzm-confetti 1.6s ease-in both}
+.fiezel-confetti i:nth-child(2n){background:var(--fz-gold)}
+.fiezel-confetti i:nth-child(3n){background:var(--fz-paper);border:1px solid var(--fz-gold)}
 @keyframes fzm-confetti{to{transform:translateY(120px) rotate(220deg);opacity:0}}
 
 /* ---------- Kurangi-gerak: splash dan onboarding tunduk pada blok global juga,

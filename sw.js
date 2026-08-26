@@ -6,7 +6,12 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // m025-162: rebase di atas m026-01 (maskot PAW). DIAG_BUILD + FIEZEL_PAGE_BUILD naik ke
 // m025-159 di commit ini, jadi awalan SW_REV ikut naik; deskriptor menggabungkan kedua
 // gelombang (reading-register + maskot) supaya jejak rilisnya jujur.
-const SW_REV='m025-161-reading-bc-tfns-20260826-2';
+// m028: rebrand "Warm Paper, Bright Mind" fase 1 (token) + splash + onboarding. Yang
+// berubah adalah style.css, index.html (blok kritis), dan fiezel-onboarding.js - ketiganya
+// ada di shell, jadi revisi HARUS naik atau murid lama akan melihat cangkang berwarna lama
+// di atas kode baru. Naik SEKALI untuk seluruh gelombang ini: tiap kenaikan memaksa unduh
+// ulang cangkang, dan tiga kenaikan untuk satu rilis berarti tiga kali beban itu.
+const SW_REV='m025-163-warm-paper-20260826';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
