@@ -3982,12 +3982,65 @@ function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level
 // Puter butuh jaringan, dan tanpa cadangan ini sebuah bacaan yang dibuka saat sinyal
 // hilang akan diam sepenuhnya. Suara bawaan perangkat memang kalah jauh, tetapi diam
 // total lebih buruk daripada suara seadanya.
-function AudioService(){const browserSupported='speechSynthesis'in window;return{isSupported:()=>!!self.FiezelVoiceSay||browserSupported,stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},play(text,options={}){if(!text)return Promise.resolve(null);this.stop();if(self.FiezelVoiceSay?.say)return self.FiezelVoiceSay.say(text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale});if(!browserSupported)return Promise.reject(new Error('tts_unavailable'));const u=new SpeechSynthesisUtterance(text);u.lang='en-US';
-// m028 fase4 AKAR: cadangan ini memakai .88 tetap, jadi murid yang menggeser "Kecepatan
-// bicara" ke 1.25x tetap mendengar suara pelan begitu jalur neural gagal - satu preferensi
-// dengan dua kecepatan berbeda tergantung mesin mana yang menyahut. OBAT: baca preferensi
-// yang sama seperti jalur neural di atas. Clamp 0.75-1.25 sudah dijamin selectedNeuralRate().
-u.rate=Number(options.speed??selectedNeuralRate())||1;speechSynthesis.speak(u);return Promise.resolve({provider:'browser-speech-synthesis'})}}}const audio=AudioService();
+function AudioService(){
+ const browserSupported='speechSynthesis'in window&&typeof SpeechSynthesisUtterance==='function';
+ // m026-BUG3: pesan jujur DIUCAPKAN SEKALI per sesi. Reading, Vocabulary, dan Grammar
+ // memanggil audio.play() berkali-kali dalam satu layar; memberi tahu murid setiap kali
+ // akan mengubah satu kegagalan menjadi banjir toast di atas materinya.
+ let silenceNoticed=false;
+ const rateFor=options=>Number(options.speed??selectedNeuralRate())||1;
+ // Cadangan peramban, dipanggil sebagai FUNGSI - bukan sebagai cabang if yang hanya
+ // hidup ketika modulnya absen. Ia resolve false bila peramban tidak punya suara sama
+ // sekali, supaya pemanggil di bawah bisa membedakan "berbunyi" dari "tidak ada apa-apa".
+ const browserPlay=(text,options)=>{
+  if(!browserSupported)return Promise.resolve(false);
+  try{
+   const u=new SpeechSynthesisUtterance(text);u.lang=options.locale||'en-US';
+   // m028 fase4 AKAR: cadangan ini dulu memakai .88 tetap, jadi murid yang menggeser
+   // "Kecepatan bicara" ke 1.25x tetap mendengar suara pelan begitu jalur neural gagal -
+   // satu preferensi dengan dua kecepatan berbeda tergantung mesin mana yang menyahut.
+   // OBAT: baca preferensi yang sama seperti jalur neural. Clamp 0.75-1.25 dijamin
+   // selectedNeuralRate().
+   u.rate=rateFor(options);
+   speechSynthesis.speak(u);
+   return Promise.resolve({provider:'browser-speech-synthesis'});
+  }catch(_){return Promise.resolve(false)}
+ };
+ const noteSilence=()=>{
+  if(silenceNoticed)return false;
+  silenceNoticed=true;
+  showToast('Suara sedang bermasalah di perangkatmu. Teksnya tetap bisa kamu baca, dan kamu boleh mencoba lagi nanti.');
+  return true;
+ };
+ return{
+  isSupported:()=>!!self.FiezelVoiceSay||browserSupported,
+  stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},
+  /**
+   * m026-BUG3 (cf-c1 K11). Sebelum perbaikan ini cabang SpeechSynthesisUtterance hanya
+   * dipakai bila modul FiezelVoiceSay TIDAK ADA - dan sw.js mem-precache modul itu, jadi
+   * cabangnya mati secara struktural. Akibatnya say() yang mengembalikan false (atau
+   * menolak) berarti Reading/Vocabulary/Grammar BISU, tanpa cadangan dan tanpa pesan.
+   *
+   * Yang memicu cadangan sekarang adalah HASIL pemutaran, bukan ada-tidaknya modul.
+   */
+  play(text,options={}){
+   if(!text)return Promise.resolve(null);
+   this.stop();
+   const say=self.FiezelVoiceSay?.say;
+   const viaDoor=typeof say==='function'
+    ?Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false)
+    :Promise.resolve(false);
+   return viaDoor.then(result=>{
+    if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
+    return Promise.resolve(browserPlay(text,options)).then(fallback=>{
+     if(fallback)return fallback;
+     noteSilence();
+     return null;
+    });
+   });
+  }
+ }
+}const audio=AudioService();
 function bindSwipe(el,onLeft,onRight){let sx=0,sy=0;el.addEventListener('touchstart',e=>{const t=e.changedTouches[0];sx=t.clientX;sy=t.clientY},{passive:true});el.addEventListener('touchend',e=>{const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.25){haptic('navigate');if(dx<0)onLeft();else onRight()}},{passive:true})}
 function flashcards(level){
   const active=getActiveLevel();
@@ -4623,7 +4676,12 @@ function quizLoop(cfg){
    document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
    listen.onclick=async()=>{
     listen.disabled=true;note.textContent='Memutar…';
-    try{await audio.play(q.script,{contentType:'listening'});note.textContent='Putar ulang bila perlu.';unlock()}
+    // m026-BUG3: audio.play() kini menyelesaikan diri dengan null ketika SELURUH tangga
+    // suara gagal, bukan menolak. Tanpa memeriksa hasilnya, catatan di bawah tombol akan
+    // berbunyi "Putar ulang bila perlu" untuk rekaman yang tidak pernah berbunyi.
+    try{const played=await audio.play(q.script,{contentType:'listening'});
+     note.textContent=played?'Putar ulang bila perlu.':'Suaranya belum berbunyi di perangkat ini. Pilihan tetap aku buka supaya kamu tidak terjebak, dan kamu boleh menekan Dengarkan lagi.';
+     unlock()}
     catch(error){note.textContent=`Suara tidak berbunyi (${String(error?.message||error)}). Pilihan tetap dibuka.`;unlock()}
     finally{listen.disabled=false;enhanceUI()}
    };
