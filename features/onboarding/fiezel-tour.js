@@ -53,32 +53,168 @@
    * Nada bahasanya sengaja santai; brief redesign bagian 3.1 mempertahankan gaya itu sebagai
    * identitas suara FIEZEL, jadi tur tidak boleh terdengar seperti manual.
    */
-  var STEPS = Object.freeze([
+  /**
+   * REGISTRY TUR BERSESI (m026-03).
+   *
+   * Satu kunci "sudah pernah lihat" untuk seluruh aplikasi adalah sumber dua penyakit yang
+   * sudah terbukti di produk ini:
+   *
+   *   1. TUR MENU MENYERET MURID KE FITUR. Tur tunggal harus memilih antara menjelaskan menu
+   *      atau menjelaskan isi fitur; yang terjadi adalah keduanya setengah-setengah.
+   *   2. SELECTOR BASI TIDAK PERNAH TERLIHAT GAGAL. `resolveSteps` membuang langkah yang
+   *      targetnya tidak ada - diam-diam. Baseline 27 Agustus 2026 membuktikannya: dari empat
+   *      langkah bawaan, dua dibuang (`.launcher-actions .primary` dan `.coach-preview` sudah
+   *      tidak dirender Home sejak redesign), jadi tur yang tampil hanya 2 kartu dan murid
+   *      tidak pernah diberi tahu soal tombol coach maupun chip level.
+   *
+   * Karena itu tur dipecah PER SESI, masing-masing dengan daftar langkahnya sendiri:
+   *
+   *   menu       7 langkah, semuanya navigasi, dan BERHENTI di kartu penutup. Tidak satu pun
+   *              targetnya berada di dalam fitur - itu tugas tur kontekstual.
+   *   library    4 langkah di dalam pembaca buku, dipicu saat buku pertama dibuka.
+   *   listening  4 langkah di dalam sesi listening, dipicu saat sesi pertama tergambar.
+   *
+   * Bendera "sudah lihat" TIDAK lagi di localStorage lepas melainkan di `state.toursSeen`
+   * (app.js), supaya ikut backup/restore dan tidak bocor antar akun Puter.
+   *
+   * Semua teks di bawah ini VERBATIM dari reports/copy-tour-gems.md (§1 menu, §2 audiobook,
+   * §3 listening). Gate `tours-test.js` membandingkannya karakter demi karakter; kalau copy
+   * berubah, ubah laporan copy-nya dan gate-nya sekaligus, bukan diam-diam di sini.
+   *
+   * Semua selector di bawah ini DIVERIFIKASI hidup pada 390x844 lewat serve+Playwright
+   * (reports/fix-tour.md §selector), bukan dibaca dari CSS.
+   */
+  var MENU_STEPS = Object.freeze([
     Object.freeze({
-      id: 'mulai',
-      target: '.launcher-actions .primary',
-      title: 'Mulai dari tombol ini',
-      body: 'Bingung mau ngapain? Tekan ini aja. FIEZEL yang mikirin langkah berikutnya buat kamu.'
-    }),
-    Object.freeze({
-      id: 'materi',
+      id: 'home',
       target: '.learning-launcher',
-      title: 'Semua materi ada di sini',
-      body: 'Kosakata, grammar, bacaan, perpustakaan, sampai latihan ngomong. Ketuk yang kamu mau.'
+      title: 'Mulai dari Home',
+      body: 'Ini beranda kamu: progres harian, streak, dan saran latihan dari PAW. Semua perjalananmu berangkat dari sini.'
     }),
     Object.freeze({
-      id: 'navigasi',
-      target: '.bottomnav',
-      title: 'Pindah-pindah lewat sini',
-      body: 'Bar bawah ini nempel terus. Tab Peta buat lihat sejauh mana kamu udah jalan.'
+      id: 'vocab-grammar',
+      target: '.bottomnav [data-view="vocab"]',
+      title: 'Vocab dan Grammar',
+      body: 'Tab Vocab buat nambah kosakata, tab Grammar buat materi tata bahasa \u2014 dua fondasi yang saling nguatin.'
     }),
     Object.freeze({
-      id: 'coach',
-      target: '.coach-preview',
-      title: 'Ini pelatihmu',
-      body: 'Dia baca hasil latihanmu terus nyusun rencana. Makin sering latihan, makin pas sarannya.'
+      id: 'reading-peta',
+      target: '.bottomnav [data-view="reading"]',
+      title: 'Reading dan Peta',
+      body: 'Reading isinya bacaan berjenjang plus soalnya. Peta nunjukin jalur belajarmu dari A1 sampai C2 \u2014 biar arahmu jelas.'
+    }),
+    Object.freeze({
+      id: 'ask',
+      target: '.topbar .ask-button',
+      title: 'Tanya FIEZEL?',
+      body: 'Tombol di kanan ini pintu ke PAW, pembimbing kamu. Bingung apa pun, tanya di sini (butuh jaringan).'
+    }),
+    Object.freeze({
+      id: 'level',
+      target: '.home-level-context',
+      title: 'Chip level kamu',
+      body: 'Chip ini nunjukin level aktifmu. Ketuk buat pindah level \u2014 materi dan latihan langsung ngikutin pilihanmu.'
+    }),
+    Object.freeze({
+      id: 'settings',
+      target: '.topbar-actions [aria-label="Buka pengaturan"]',
+      title: 'Tombol Pengaturan',
+      body: 'Ini pintu ke FIEZEL Control Room: suara, gerak, tampilan, sampai data belajarmu \u2014 semuanya kamu yang pegang.'
+    }),
+    // PENUTUP. Targetnya wordmark FIEZEL - benda paling netral di layar, dan bukan pintu ke
+    // fitur apa pun. Di sinilah tur menu berhenti: tidak ada langkah kedelapan yang membuka
+    // Perpustakaan atau Listening, karena tur yang memindahkan layar sendiri berhenti menjadi
+    // penjelasan dan berubah menjadi remote control.
+    Object.freeze({
+      id: 'penutup',
+      target: '.topbar .brand-button',
+      title: 'Tur menu selesai!',
+      body: 'Kamu udah kenal semua menunya. Tur lanjutan bakal muncul otomatis tiap kamu masuk fitur baru \u2014 santai aja.'
     })
   ]);
+
+  // Pembaca buku. Langkah 2 TIDAK menunjuk pita subtitle `#fiezelSubtitle`: pita itu `hidden`
+  // sampai narasi benar-benar berbunyi, jadi kotaknya 0x0 dan resolveSteps membuangnya (diukur
+  // di probe: exists=false saat reader baru dibuka). Yang ditunjuk adalah kalimat pertama
+  // `.library-sentence` (364x72) - kontainer yang BENAR-BENAR terlihat dan memang yang nanti
+  // ikut disorot saat dibacakan.
+  var LIBRARY_STEPS = Object.freeze([
+    Object.freeze({
+      id: 'putar',
+      target: '#libraryPlay',
+      title: 'Ketuk buat mulai',
+      body: 'Tombol putar ini yang menghidupkan ceritanya. Ketuk sekali buat jalan, ketuk lagi buat jeda \u2014 kapan pun kamu mau.'
+    }),
+    Object.freeze({
+      id: 'subtitle',
+      target: '.library-sentence',
+      title: 'Subtitle ngikutin suara',
+      body: 'Teksnya jalan bareng audionya, kalimat demi kalimat. Sambil dengar sambil baca \u2014 telinga dan mata belajar bareng.'
+    }),
+    // Toggle Gem Terjemahan adalah ID KONTRAK BERSAMA dengan pekerjaan gems yang berjalan
+    // paralel (#fslTranslateToggle). Selama elemennya belum ada, resolveSteps melewatinya -
+    // itu memang perilaku yang diinginkan, bukan kegagalan: tur menunjukkan apa yang ada.
+    Object.freeze({
+      id: 'terjemahan',
+      target: '#fslTranslateToggle, #libraryTranslateToggle',
+      title: 'Terjemahan Otomatis',
+      body: 'Nyalakan toggle ini, dan tiap kalimat subtitle langsung diterjemahkan ke bahasa Indonesia. Harganya 1 Gem Terjemahan per sesi, dan butuh jaringan, ya.'
+    }),
+    Object.freeze({
+      id: 'kecepatan',
+      target: '.topbar-actions [aria-label="Buka pengaturan"]',
+      title: 'Mau lebih pelan?',
+      body: 'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.'
+    })
+  ]);
+
+  // Sesi listening. Langkah 2 menunjuk `.fsl-privacy` (baris kejujuran di atas blok feedback)
+  // dan bukan `[data-feedback]`: blok feedback ADA di DOM tetapi tingginya 0 px sampai jawaban
+  // dinilai (diukur di probe: 326x0), jadi menyorotnya berarti menyorot garis tak terlihat.
+  var LISTENING_STEPS = Object.freeze([
+    Object.freeze({
+      id: 'sekali-dengar',
+      target: '#speakingListeningRoot .fsl-card',
+      title: 'Dengar sekali, jawab',
+      body: 'Di sini audionya cuma diputar sekali \u2014 kayak percakapan sungguhan. Pasang telinga baik-baik, baru pilih jawabanmu.'
+    }),
+    Object.freeze({
+      id: 'meleset',
+      target: '#speakingListeningRoot .fsl-privacy',
+      title: 'Meleset? Nggak apa-apa',
+      body: 'Sekali-dengar memang menantang, dan salah itu bagian dari latihan. PAW nemenin kamu di tiap soalnya.'
+    }),
+    Object.freeze({
+      id: 'terjemahan',
+      target: '#fslTranslateToggle',
+      title: 'Terjemahan Indonesia',
+      body: 'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'
+    }),
+    Object.freeze({
+      id: 'kecepatan',
+      target: '.topbar-actions [aria-label="Buka pengaturan"]',
+      title: 'Atur kecepatan suara',
+      body: 'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.'
+    })
+  ]);
+
+  var TOURS = Object.freeze({
+    menu: Object.freeze({ id: 'menu', scope: 'home', steps: MENU_STEPS }),
+    library: Object.freeze({ id: 'library', scope: 'library', steps: LIBRARY_STEPS }),
+    listening: Object.freeze({ id: 'listening', scope: 'listening', steps: LISTENING_STEPS })
+  });
+
+  var TOUR_NAMES = Object.freeze(['menu', 'library', 'listening']);
+
+  /** Daftar langkah sebuah tur, atau daftar kosong untuk nama yang tidak dikenal. */
+  function stepsFor(name) {
+    var def = TOURS[String(name || '')];
+    return def ? def.steps : [];
+  }
+
+  // STEPS tetap ada sebagai nama lama, tetapi ia BUKAN salinan: ia menunjuk langkah menu yang
+  // sama. Duplikat daftar langkah adalah cara selector menjadi basi tanpa ada yang tahu.
+  var STEPS = MENU_STEPS;
 
   function prefersReducedMotion(env) {
     try {
@@ -316,6 +452,9 @@
   return {
     STORAGE_KEY: STORAGE_KEY,
     STEPS: STEPS,
+    TOURS: TOURS,
+    TOUR_NAMES: TOUR_NAMES,
+    stepsFor: stepsFor,
     completed: completed,
     reset: reset,
     resolveSteps: resolveSteps,
