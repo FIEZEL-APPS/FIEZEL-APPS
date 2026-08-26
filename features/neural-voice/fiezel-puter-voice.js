@@ -167,12 +167,86 @@
     return fetch(url).then(function (r) { return r.blob(); });
   }
 
+  /* ---- memo kredit habis ---------------------------------------------- */
+
+  /**
+   * m026-02 AKAR POPUP BERULANG. Dialog "upgrade" itu BUKAN milik FIEZEL: SDK
+   * js.puter.com memunculkannya sendiri untuk SETIAP panggilan yang kandas dengan
+   * 402 insufficient_funds (docs.puter.com/rate-limits-and-quotas). Karena tiap item
+   * listening adalah skrip unik, satu sesi 10 item = 10 panggilan kandas = 10 dialog.
+   *
+   * Satu-satunya cara andal mematikannya adalah TIDAK MEMANGGIL LAGI. Memo di bawah ini
+   * berumur satu sesi halaman: begitu satu kegagalan berkode kredit terlihat, panggilan
+   * berikutnya ditolak di sini - sebelum menyentuh SDK - sehingga pemanggil langsung
+   * jatuh ke suara cadangan perangkat tanpa dialog pihak ketiga muncul sekali pun.
+   *
+   * Yang TIDAK dilakukan: menebak dari naskah pesan galat. Keberatan di
+   * fiezel-voice-say.js:57-61 tetap dihormati - pemeriksaannya TERSTRUKTUR (status 402
+   * atau code insufficient_funds/insufficient_credit, keduanya terdokumentasi resmi),
+   * jadi ia tidak akan diam-diam salah pada hari Puter mengubah kalimatnya.
+   */
+  var creditExhausted = false;
+  var pendingCreditNotice = false;
+
+  function errorCodeOf(error) {
+    if (!error || typeof error !== 'object') return '';
+    var nested = error.error && typeof error.error === 'object' ? error.error : null;
+    return String(error.code || (nested && nested.code) || '').toLowerCase();
+  }
+
+  function errorStatusOf(error) {
+    if (!error || typeof error !== 'object') return 0;
+    var nested = error.error && typeof error.error === 'object' ? error.error : null;
+    var response = error.response && typeof error.response === 'object' ? error.response : null;
+    return Number(
+      error.status || error.statusCode ||
+      (nested && (nested.status || nested.statusCode)) ||
+      (response && response.status) || 0
+    ) || 0;
+  }
+
+  function isInsufficientCredit(error) {
+    if (errorStatusOf(error) === 402) return true;
+    var code = errorCodeOf(error);
+    return code === 'insufficient_funds' || code === 'insufficient_credit';
+  }
+
+  function outOfCreditError() {
+    var e = new Error('puter_out_of_credit');
+    e.code = 'insufficient_funds';
+    e.outOfCredit = true;
+    return e;
+  }
+
+  function noteCreditExhausted() {
+    creditExhausted = true;
+    // Benderanya hanya DINAIKKAN di sini; yang menampilkan pemberitahuan adalah app.js di
+    // ujung sesi (maybePresentPuterCreditNotice), bukan di tengah item.
+    pendingCreditNotice = true;
+    state.lastError = 'puter_out_of_credit';
+    return true;
+  }
+
+  /** Dikonsumsi app.js SEKALI di luar sesi; setelah diambil, benderanya turun. */
+  function consumeCreditNotice() {
+    var pending = pendingCreditNotice;
+    pendingCreditNotice = false;
+    return pending;
+  }
+
+  function creditStatus() {
+    return { outOfCredit: creditExhausted, noticePending: pendingCreditNotice };
+  }
+
   /* ---- render --------------------------------------------------------- */
 
   function render(text, settings) {
     var key = cacheKey(text, settings);
     return cachedBlob(key).then(function (hit) {
       if (hit) { state.cacheHits++; return hit; }
+      // Singgah simpan diperiksa LEBIH DULU: audio yang sudah ada tidak memakai kredit,
+      // jadi memo tidak boleh membisukan kalimat yang sebenarnya gratis.
+      if (creditExhausted) return Promise.reject(outOfCreditError());
       return waitForSdk().then(function (p) {
         state.calls++;
         // Teks dikirim apa adanya. Lihat catatan kepala berkas: membentuknya lebih
@@ -182,6 +256,9 @@
           CALL_TIMEOUT_MS,
           'txt2speech'
         );
+      }).catch(function (e) {
+        if (isInsufficientCredit(e)) { noteCreditExhausted(); throw outOfCreditError(); }
+        throw e;
       }).then(toBlob).then(function (blob) {
         return putBlob(key, blob).then(function () { return blob; });
       });
@@ -341,6 +418,9 @@
     CALL_TIMEOUT_MS: CALL_TIMEOUT_MS,
     MAX_CHARS: MAX_CHARS,
     status: status,
+    creditStatus: creditStatus,
+    consumeCreditNotice: consumeCreditNotice,
+    isInsufficientCreditError: isInsufficientCredit,
     prepare: prepare,
     ensureReady: ensureReady,
     speak: speak,
