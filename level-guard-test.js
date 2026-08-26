@@ -79,7 +79,8 @@ check('Blueprint ujian 10 grammar + 8 vocab + 7 reading = 25', blueprintSum === 
   blueprintMatch ? `grammar ${blueprintMatch[1]}, vocab ${blueprintMatch[2]}, reading ${blueprintMatch[3]}` : 'LEVEL_EXAM_BLUEPRINT tidak ditemukan');
 
 const NEEDED = ['defaultLevelTrust', 'sanitizeLevelTrust', 'levelTrustState', 'verifiedLevel', 'levelTrustGap',
-  'nextVerifiableLevel', 'probationMistakes', 'probationActive', 'isLevelLocked', 'levelGuardEvaluate',
+  'nextVerifiableLevel', 'levelEntryDecision', 'levelEntryDeferLevel', 'levelEntryChoiceCopy', 'levelEntryDefer',
+  'probationMistakes', 'probationActive', 'isLevelLocked', 'levelGuardEvaluate',
   'applyLevelDemotion', 'levelExamUnlockable', 'levelExamCooldownRemaining', 'levelExamAvailability',
   'recordSkipExamPass', 'recordSkipExamFail', 'levelTrustAdoptPlacement', 'getActiveLevel', 'placementLevel'];
 const blocks = {};
@@ -103,6 +104,13 @@ const sandbox = {
   LEVEL_EXAM_SIZE: EXAM_SIZE,
   LEVEL_EXAM_COOLDOWN_MS: COOLDOWN_MS,
   state: null,
+  // m025-166: teks gerbang masuk level dibangun dari copy yang sama seperti UI, jadi
+  // sandbox menyuplai bloknya apa adanya dari app.js - bukan salinan yang bisa menua.
+  LEVEL_GUARD_COPY: (() => {
+    const block = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
+    try { return block ? vm.runInNewContext(`${block[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '')}`) : {}; }
+    catch (_) { return {}; }
+  })(),
   save: () => { saves++; },
   showToast: () => {},
   coreBrainCache: null,
@@ -278,6 +286,56 @@ if (sandboxReady) {
 }
 
 // ---------------------------------------------------------------------------
+// 1b. m025-166 · gerbang masuk level: keputusan MURNI + "nanti aja" jatuh ke A1
+//
+// Alur baru owner: memilih level yang belum terverifikasi tidak lagi membuka mode percobaan,
+// tetapi satu popup keputusan. Keputusan itu harus bisa ditanyai tanpa DOM, tanpa state, dan
+// tanpa jam - kalau tidak, satu-satunya cara mengujinya adalah lewat browser, dan rantai
+// ujian yang salah akan lolos sampai ke tangan murid.
+// ---------------------------------------------------------------------------
+
+if (sandboxReady) {
+  const decide = (chosen, verified) => vm.runInContext(`levelEntryDecision(${JSON.stringify(chosen)},${JSON.stringify(verified)})`, sandbox, { timeout: 2000 });
+  const b1FromA1 = decide('B1', 'A1');
+  const c1FromB1 = decide('C1', 'B1');
+  const a1FromA1 = decide('A1', 'A1');
+  const b1FromB2 = decide('B1', 'B2');
+  check('E1 · levelEntryDecision(chosen, verified) memulangkan {requiredExam, allowed} murni',
+    b1FromA1.allowed === false && b1FromA1.requiredExam === 'A2' &&
+    c1FromB1.allowed === false && c1FromB1.requiredExam === 'B2',
+    `pilih B1 saat verified A1 -> ${JSON.stringify(b1FromA1)}; pilih C1 saat verified B1 -> ${JSON.stringify(c1FromB1)}`);
+  check('E1b · level yang sudah terbukti (atau di bawahnya) masuk tanpa gerbang',
+    a1FromA1.allowed === true && a1FromA1.requiredExam === '' && b1FromB2.allowed === true,
+    'gerbang hanya berlaku ke ATAS; kalau tidak, murid yang sudah lulus dihadang lagi di levelnya sendiri');
+  check('E1c · rantainya naik satu tangga per ujian, tidak pernah melompat ke level yang dipilih',
+    LEVELS.slice(0, LEVELS.length - 1).every((verified, i) => {
+      const target = LEVELS[LEVELS.length - 1];
+      return decide(target, verified).requiredExam === LEVELS[i + 1];
+    }) && decide('C2', 'C2').allowed === true,
+    'memilih C2 dari verified A1 tetap berarti ujian A2 dulu - konsisten dengan nextVerifiableLevel');
+  check('E1d · level sampah tidak pernah membuat gerbang menuntut ujian hantu',
+    decide('', 'A1').allowed === true && decide('Z9', 'A1').allowed === true && decide('B1', 'Z9').requiredExam === 'A2',
+    'verified tak dikenal jatuh ke A1, bukan ke undefined');
+
+  const deferLevel = vm.runInContext('levelEntryDeferLevel()', sandbox, { timeout: 2000 });
+  check('E2 · "Nanti aja" mengembalikan murid ke A1', deferLevel === 'A1',
+    `levelEntryDeferLevel()=${deferLevel} — pelabuhan paling aman untuk murid yang belum punya bukti apa pun`);
+
+  const deferState = { preferences: { activeLevel: 'B1', levelMode: 'manual' }, vocab: {}, grammar: {}, reading: {}, history: [], totalAnswered: 3 };
+  const returned = call("levelEntryDefer('B1','A2',state)", deferState);
+  check('E2b · levelEntryDefer memindahkan activeLevel ke A1 dan mengembalikan A1',
+    returned === 'A1' && deferState.preferences.activeLevel === 'A1' && deferState.preferences.levelMode === 'manual' &&
+    deferState.totalAnswered === 3,
+    `kembali=${returned} aktif=${deferState.preferences.activeLevel} — pengalihan tidak menyentuh bukti belajar`);
+
+  const copy = vm.runInContext("levelEntryChoiceCopy('B1','A2')", sandbox, { timeout: 2000 });
+  check('E3 · teks gerbang menyebut level pilihan DAN ujian berikutnya di rantai',
+    /B1/.test(copy.title) && /A2/.test(copy.line) && /B1/.test(copy.line) &&
+    /A1/.test(copy.deferToast) && /B1/.test(copy.deferToast) && copy.line.length <= 140,
+    `judul="${copy.title}" kalimat="${copy.line}" toast="${copy.deferToast}" — microcopy, bukan paragraf artikel`);
+}
+
+// ---------------------------------------------------------------------------
 // 2. Pemeriksaan statis: penolakan harus ada di PINTUNYA, bukan cuma tersedia
 // ---------------------------------------------------------------------------
 
@@ -300,6 +358,37 @@ check('S5 · penolakan setActiveLevel bersifat default-allow', /typeof\s+isLevel
 const panelBlock = sourceBlock('openLevelPanel');
 check('S6 · openLevelPanel merender status terkunci dan jalan keluarnya', /isLevelLocked\(/.test(panelBlock) && /disabled/.test(panelBlock) && /LEVEL_GUARD_COPY/.test(panelBlock),
   'pesan §3d muncul di panel level, bukan hanya di toast');
+
+// -------------------------------------------------- m025-166 kontrak UI alur baru
+check('S6b · panel level mengarahkan level belum-terverifikasi ke gerbang popup, bukan langsung aktif',
+  /levelEntryDecision\(/.test(panelBlock) && /openLevelEntryGate\(/.test(panelBlock),
+  'penegakan alur ada di lapisan handler; setActiveLevel() sendiri tetap default-allow');
+check('S6c · tombol "Coba dulu" dan "Ikut Ujian Skip Level" tidak ada lagi di UI',
+  !/probationTry/.test(app) && !/'Coba dulu'/.test(app) && !/"Coba dulu"/.test(app) && !/'Ikut Ujian Skip Level'/.test(app),
+  'mode percobaan tidak bisa lagi dimasuki dari UI (fungsinya tetap ada sebagai backstop state lama)');
+
+const gateBlock = sourceBlock('openLevelEntryGate');
+check('S6d · popup gerbang memakai keputusan murni, dua tombol, dan maskot PAW',
+  /levelEntryDecision\(/.test(gateBlock) && /entryExam/.test(gateBlock) && /entryLater/.test(gateBlock) &&
+  /pawFaceMarkup\(\)/.test(gateBlock) && /levelEntryDefer\(/.test(gateBlock) && /startLevelExam\(/.test(gateBlock),
+  '"Ikuti ujian" membuka ujian berikutnya di rantai; "Nanti aja" mengalihkan ke A1');
+check('S6e · gerakan popup hanya transform+opacity, memakai token easing, dan hormat pada gerak minimal',
+  /pawMotionAllowed\(/.test(gateBlock) && /is-static/.test(gateBlock),
+  'kelas is-static memadamkan animasi saat murid mematikan gerak; prefers-reduced-motion ditangani di style.css');
+
+const gateCss = fs.readFileSync(path.join(root, 'style.css'), 'utf8');
+const popCss = gateCss.match(/@keyframes\s+fzLevelEntryPop\{[^}]*\}[^@]*/);
+check('S6f · style popup memakai var(--fz-spring)/var(--fz-out) dan tidak menganimasikan properti layout',
+  /--fz-spring:/.test(gateCss) && /--fz-out:/.test(gateCss) &&
+  /\.level-entry-pop\{[^}]*var\(--fz-spring/.test(gateCss) && /\.level-entry-pop>\*\{[^}]*var\(--fz-out/.test(gateCss) &&
+  /prefers-reduced-motion:reduce\)\{\s*\.level-entry-pop/.test(gateCss) &&
+  !!popCss && /transform:/.test(popCss[0]) && !/(?:height|width|margin|padding|top|left):/.test(popCss[0].replace(/[^{]*\{/, '')),
+  'animasi yang menyentuh layout memaksa reflow tiap frame di ponsel murah');
+
+const onboardingHook = app.match(/onGoal:\(\{goal,level\}\)=>\{[\s\S]*?\},\n/);
+check('S6g · level pilihan di perkenalan memasang gerbang, dan Home yang membukanya',
+  !!onboardingHook && /armLevelEntryGate\(/.test(onboardingHook[0]) && /maybeShowLevelEntryGate\(/.test(sourceBlock('home')),
+  'popup tidak pernah muncul menumpuk di atas layar perkenalan');
 
 const defaultStateMatch = app.match(/const\s+defaultState=\{[\s\S]{0,2400}?\};/);
 check('S7 · defaultState memuat levelTrust tersanitasi', !!defaultStateMatch && /levelTrust:\{/.test(defaultStateMatch[0]),
@@ -331,6 +420,10 @@ const copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
 const copyText = copyBlock ? copyBlock[0] : '';
 check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5:/.test(copyText) && /warn8:/.test(copyText) && /demotionBody:/.test(copyText) && /lockedFeature:/.test(copyText) && /examDesc:/.test(copyText),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
+check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
+  /entryChip:/.test(copyText) && /entryExam:'Ikuti ujian'/.test(copyText) && /entryLater:'Nanti aja'/.test(copyText) &&
+  (copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length <= 90,
+  `panjang probationBody sekarang ${(copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
 check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(copyText),
   `teks harus menulis ${EXAM_PASS}% supaya tidak menjanjikan ambang yang berbeda dari kode`);
 
