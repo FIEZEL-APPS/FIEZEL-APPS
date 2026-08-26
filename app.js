@@ -239,7 +239,22 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 const shuffle=a=>{const x=[...a];for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}return x};
 const pick=a=>a?.length?a[Math.floor(Math.random()*a.length)]:null;
-const norm=s=>String(s??'').toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+// F1 placement: norm() adalah 61,7% self-time CPU pada freeze 4 detik sebelum soal pertama
+// (bukti: reports/empiris-placement.md, profil CDP). Fungsinya murni - masukan sama selalu
+// menghasilkan keluaran sama - jadi hasilnya boleh dihafal. Satu bank vocabulary hanya punya
+// ribuan string unik, sementara pembuatan pengecoh memanggilnya jutaan kali atas string yang
+// SAMA; memo Map mengubah biaya O(panggilan) menjadi O(string unik). Batas 60.000 entri
+// menjaga memori tetap terbatas pada perangkat kelas bawah: setelah penuh, norm tetap benar,
+// hanya berhenti menambah cache.
+const NORM_MEMO=new Map(),NORM_MEMO_LIMIT=60000;
+const norm=s=>{
+  const key=typeof s==='string'?s:String(s??'');
+  const hit=NORM_MEMO.get(key);
+  if(hit!==undefined)return hit;
+  const value=key.toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+  if(NORM_MEMO.size<NORM_MEMO_LIMIT)NORM_MEMO.set(key,value);
+  return value;
+};
 const sigQ=q=>norm(q.question)+'||'+(q.options||[]).map(norm).sort().join('|');
 const GRAMMAR_FAMILY_LABELS={tense_aspect:'waktu dan keadaan tindakan',modals:'kata kerja bantu',conditionals:'kalimat pengandaian',passive:'kalimat pasif',reported_speech:'kalimat tidak langsung',articles_determiners:'artikel dan penentu kata benda',prepositions:'kata depan',gerunds_infinitives:'gerund dan infinitive',question_negation:'pertanyaan dan bentuk negatif',error_correction:'mencari dan memperbaiki kesalahan',relative_clauses:'klausa relatif',comparison:'perbandingan',advanced_grammar:'pola grammar tingkat lanjut',core_grammar:'pola grammar dasar',linking_devices:'kata penghubung',emphasis_inversion:'penekanan dan inversi',nouns:'kata benda',possession:'kepemilikan',pronouns_determiners:'kata ganti dan penentu',quantifiers:'kata penunjuk jumlah',question_formation:'menyusun pertanyaan'};/* m025-162: 5 keluarga tanpa label jatuh ke 'pola grammar' generik di mode classify_family */
 const GRAMMAR_FAMILY_RULES={
@@ -715,7 +730,7 @@ function pruneCorruptedReviewEntries(entries){
     return !CORRUPTED_REVIEW_SIGNATURE.test(`${entry.question||''} ${entry.correct||''} ${entry.selectedAnswer||''}`);
   });
 }
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null};
 let stateReady=false;
 // m025-140: bank konten dideklarasikan SEBELUM loadState(). sanitizeState() sekarang menghitung
 // readiness per level, dan jalur itu memanggil contentLevelFor() yang membaca V/R/GRAMMAR_ITEMS.
@@ -3271,17 +3286,23 @@ function reviewVocab(){
 function startVocabQuiz(){const level=getActiveLevel(),pool=shuffle(V.filter(v=>v.level===level));if(!pool.length)return showToast(`Vocabulary ${level} belum tersedia.`);quizLoop({type:'vocab',count:12,pool,factory:makeVocabQuestion})}
 function makeVocabQuestion(v,preferType){
   const same=V.filter(x=>x.id!==v.id&&x.meaning&&x.level===v.level);
-  const allMeaning=V.filter(x=>x.id!==v.id&&x.meaning&&x.level===v.level);
+  // F1 placement: `allMeaning` dulu adalah filter KEDUA yang identik persis dengan `same`
+  // (predikat sama, kata per kata) - satu sapuan penuh bank 1.765 kata yang dibuang. Cadangan
+  // pengecoh sekarang membaca `same` yang sudah ada, jadi perilaku soal tidak berubah
+  // sedikit pun sementara satu sapuan hilang dari jalur terpanas.
+  const allMeaning=same;
   const uniqueByNorm=arr=>{const seen=new Set();return arr.filter(x=>{const k=norm(x);if(!k||seen.has(k))return false;seen.add(k);return true})};
+  // norm(v.meaning) dulu dihitung ulang DI DALAM setiap iterasi callback filter di bawah.
+  const ownMeaningKey=norm(v.meaning);
   // Arti di bank ini kerap berisi beberapa padanan yang dipisah titik koma ("pasti; jelas").
   // Pengecoh yang berbagi salah satu padanan itu sama-sama bisa dibela oleh murid, jadi ia
   // disingkirkan - bukan hanya yang sama persis seluruh teksnya.
   const glossesOf=m=>String(m||'').split(/[;,]/).map(norm).filter(Boolean);
   const ownGlosses=new Set(glossesOf(v.meaning));
   const sharesGloss=m=>glossesOf(m).some(g=>ownGlosses.has(g));
-  const distractMeaning=uniqueByNorm(shuffle(same.map(x=>x.meaning).filter(x=>norm(x)!==norm(v.meaning)&&!sharesGloss(x)))).slice(0,3);
+  const distractMeaning=uniqueByNorm(shuffle(same.map(x=>x.meaning).filter(x=>norm(x)!==ownMeaningKey&&!sharesGloss(x)))).slice(0,3);
   if(distractMeaning.length<3){
-    distractMeaning.push(...uniqueByNorm(shuffle(allMeaning.map(x=>x.meaning).filter(x=>norm(x)!==norm(v.meaning)&&!distractMeaning.some(d=>norm(d)===norm(x))))).slice(0,3-distractMeaning.length));
+    distractMeaning.push(...uniqueByNorm(shuffle(allMeaning.map(x=>x.meaning).filter(x=>norm(x)!==ownMeaningKey&&!distractMeaning.some(d=>norm(d)===norm(x))))).slice(0,3-distractMeaning.length));
   }
   // m025-154: pengecoh sinonim dulu hanya menyingkirkan KUNCI-nya saja, sehingga sinonim
   // lain milik kata yang sama tetap bisa terpilih jadi pengecoh. "decline" berkunci "refuse"
@@ -3289,19 +3310,32 @@ function makeVocabQuestion(v,preferType){
   // Murid yang menjawab dengan Bahasa Inggris yang BENAR ditandai salah, dan itulah bentuk
   // kerusakan yang menurunkan nilai di sekolah. Yang disingkirkan sekarang: seluruh sinonim
   // kata target, kata targetnya sendiri, dan kata mana pun yang artinya sama persis.
-  const ownSynonyms=new Set([...(v.synonyms||[]).map(norm),norm(v.word)]);
-  const sameMeaningWords=new Set(V.filter(x=>x.id!==v.id&&v.meaning&&norm(x.meaning)===norm(v.meaning)).map(x=>norm(x.word)));
-  const synonymSources=uniqueByNorm(shuffle(V.filter(x=>x.id!==v.id&&x.level===v.level&&x.synonyms?.length).flatMap(x=>x.synonyms)).filter(x=>!ownSynonyms.has(norm(x))&&!sameMeaningWords.has(norm(x))));
+  //
+  // F1 placement: ketiga himpunan itu masing-masing menyapu SELURUH bank (1.765 kata) dan
+  // dulu selalu dihitung, padahal hanya soal bertipe `synonym` yang memakainya - dan jalur
+  // tes penempatan mengunci preferType='meaning', jadi hasilnya 100% dibuang. Sekarang
+  // pekerjaannya ditunda ke belakang keputusan tipe soal lewat synonymPool(); hasilnya
+  // dihafal sekali per soal supaya pemakaian kedua tidak menyapu bank lagi.
+  let synonymSourcesMemo=null;
+  const synonymPool=()=>{
+    if(synonymSourcesMemo)return synonymSourcesMemo;
+    const ownSynonyms=new Set([...(v.synonyms||[]).map(norm),norm(v.word)]);
+    const sameMeaningWords=new Set(V.filter(x=>x.id!==v.id&&v.meaning&&norm(x.meaning)===ownMeaningKey).map(x=>norm(x.word)));
+    synonymSourcesMemo=uniqueByNorm(shuffle(V.filter(x=>x.id!==v.id&&x.level===v.level&&x.synonyms?.length).flatMap(x=>x.synonyms)).filter(x=>!ownSynonyms.has(norm(x))&&!sameMeaningWords.has(norm(x))));
+    return synonymSourcesMemo;
+  };
   // m025-114: placement dasar memaksa bentuk termudah ("meaning"). Tanpa ini, satu tes
   // 25 soal bisa kebetulan berisi empat soal part-of-speech dan salah membaca level.
   const types=['meaning','context','partOfSpeech','synonym']; let type=types.includes(preferType)?preferType:pick(types);
-  if(type==='synonym'&&(!v.synonyms?.length||synonymSources.length<3))type='meaning';
+  // Urutan syarat dijaga: kata tanpa sinonim gugur lebih dulu, jadi bank tidak disapu
+  // untuk soal yang memang tidak akan pernah berbentuk sinonim.
+  if(type==='synonym'&&(!v.synonyms?.length||synonymPool().length<3))type='meaning';
   if(type==='context'&&!v.example)type='meaning';
   if(type==='partOfSpeech'&&!partOfSpeechAskable(v))type='meaning';
   let q,options,answer;
   if(type==='context'){options=shuffle([v.meaning,...distractMeaning]);q=`Dalam kalimat “${v.example}”, arti “${v.word}” yang paling pas apa?`;answer=v.meaning}
   else if(type==='partOfSpeech'){const correctPos=indonesianPartOfSpeech(v.partOfSpeech),pos=shuffle(Object.values(PART_OF_SPEECH_ID).filter(x=>x!==correctPos)),surface=vocabSurfaceForm(v)||v.word,asal=norm(surface)===norm(v.word)?'':` (bentuk dari “${v.word}”)`;options=shuffle([correctPos,...pos.slice(0,3)]);q=`Dalam kalimat “${v.example}”, kata “${surface}”${asal} berperan sebagai jenis kata apa?`;answer=correctPos}
-  else if(type==='synonym'){options=shuffle([v.synonyms[0],...synonymSources.slice(0,3)]);q=`Kata mana yang maknanya paling dekat dengan “${v.word}”?`;answer=v.synonyms[0]}
+  else if(type==='synonym'){options=shuffle([v.synonyms[0],...synonymPool().slice(0,3)]);q=`Kata mana yang maknanya paling dekat dengan “${v.word}”?`;answer=v.synonyms[0]}
   else{options=shuffle([v.meaning,...distractMeaning]);q=`Arti Bahasa Indonesia yang paling dekat dengan “${v.word}” apa?`;answer=v.meaning}
   const posLabel=indonesianPartOfSpeech(v.partOfSpeech);const why=type==='context'?`Di kalimat itu, “${v.word}” paling pas dimaknai “${v.meaning}”. Coba lihat tindakan atau situasi di sekeliling katanya.`:type==='partOfSpeech'?`“${v.word}” berfungsi sebagai ${posLabel}. Jenis kata dilihat dari tugasnya di dalam kalimat, bukan hanya dari bentuk katanya.`:type==='synonym'?`“${v.synonyms[0]}” paling dekat maknanya dengan “${v.word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.`:`Intinya, “${v.word}” berarti “${v.meaning}”${v.partOfSpeech?` dan biasanya dipakai sebagai ${posLabel}`:''}.`;
   const rule=type==='partOfSpeech'?'Lihat fungsi kata di dalam kalimat: apakah ia menamai sesuatu, menyatakan tindakan, menerangkan, atau menghubungkan bagian kalimat.':type==='synonym'?'Kata yang bersinonim punya makna inti yang berdekatan, tetapi belum tentu bisa saling menggantikan di setiap kalimat.':'Jangan menebak dari satu kata saja. Baca konteks lengkap supaya arti yang dipilih tetap masuk akal.';
@@ -3561,16 +3595,110 @@ const PLACEMENT_BLUEPRINT={A1:{vocab:3,grammar:2,listening:1},A2:{vocab:2,gramma
 // Hanya dua mode listening yang dipakai. Sisanya menguji inferensi dan sikap pembicara,
 // yang bukan kemampuan dasar dan membuat murid A1 gagal karena alasan yang salah.
 const PLACEMENT_LISTENING_MODES=['gist','detail'];
-let placementListeningBank=null;
+/* ---- F1 placement: tangga bukti per band, menggantikan akurasi global -----------------
+ *
+ * AKAR MASALAHNYA. Pemetaan lama adalah satu garis lurus dari akurasi global ke level:
+ * <35% A1, <50% A2, <65% B1, <78% B2, <90% C1, sisanya C2. Dua hal membuatnya salah baca:
+ *
+ *   1. Blueprint tes berat di pangkal - 11 dari 25 soal ada di band A1-A2 - jadi murid yang
+ *      HANYA bisa dasar-dasar sudah mengumpulkan 44% sebelum menebak apa pun.
+ *   2. Semua soal berisi 4 opsi, jadi lantai tebakan adalah 25%, tetapi rumus lama tidak
+ *      mengurangkan kredit tebakan sama sekali.
+ *
+ * Akibatnya terukur (recon §c, simulasi binomial + Monte Carlo 100 ribu run): murid murni A2
+ * berekspektasi 11 + 14x0,25 = 14,5 dari 25 = 58% dan dipetakan ke B1 dengan peluang 89,9%;
+ * pemula Indonesia realistis mendarat di B1 60,8% dan B2 8,5% waktu, di A1 hanya 0,8%. Uji
+ * empiris juga menemukan satu dari dua run TEBAKAN ACAK diumumkan A2 (seed 1337, 36%).
+ *
+ * OBATNYA. Level tidak lagi dibaca dari satu angka global, melainkan dinaiki satu band pada
+ * satu waktu, mulai dari A1, dan hanya dengan bukti benar DI BAND ITU SENDIRI. Sekali satu
+ * band gagal, tangganya berhenti - band di atasnya tidak bisa "ditolong" oleh tebakan
+ * beruntung di tempat lain. Ini persis asumsi awal Duolingo ("tes dimulai dengan menganggap
+ * user pemula total", riset §1) ditambah aturan naik yang eksplisit (riset §8 rekomendasi 1)
+ * dan penempatan konservatif di batas bawah ala Busuu (riset §4, rekomendasi 3).
+ *
+ * AMBANGNYA. PLACEMENT_BAND_PASS = 0,625 bukan angka bulat yang dipilih karena enak dibaca:
+ * ia adalah lantai tebakan ditambah separuh jarak menuju sempurna, 0,25 + 0,75 x 0,5. Artinya
+ * skor terkoreksi-tebakan (p - 0,25) / 0,75 harus mencapai 0,5 - setengah dari band itu benar
+ * DI ATAS apa yang bisa didapat dengan mata tertutup. Konkretnya: 4 dari 6 soal A1, 4 dari 5
+ * A2, 3 dari 4 B1/B2, 2 dari 3 C1/C2.
+ *
+ * Peluang penebak acak (p=0,25) melewati satu band: A1 3,8%, A2 1,6%. Untuk berakhir di atas
+ * A2 ia harus melewati keduanya - sekitar 0,06%, dan setiap band berikutnya mengalikan lagi
+ * dengan angka sekecil itu. Murid murni A2 (benar semua A1-A2, menebak sisanya) melewati A1
+ * dan A2, lalu gugur di B1 karena butuh 3 dari 4 tebakan benar (5,1%): ia mendarat A2. Murid
+ * murni A1 mendarat A1. Yang selalu salah tetap A1 karena band pertama pun tidak lewat.
+ *
+ * PLACEMENT_BAND_MIN_EVIDENCE = 2 bukan 3 karena bank listening boleh gagal dimuat (guard
+ * `floor` di startPlacement); tanpa listening, band C1 dan C2 hanya berisi 2 soal, dan tangga
+ * yang menuntut 3 bukti akan menutup C1/C2 secara permanen untuk alasan jaringan, bukan
+ * alasan kemampuan.
+ */
+const PLACEMENT_BAND_PASS=0.625;
+const PLACEMENT_BAND_MIN_EVIDENCE=2;
+/** Mengelompokkan jawaban percobaan-pertama satu sesi placement per band CEFR. */
+function placementBandTally(answers){
+  const bands={};
+  for(const level of LEVELS)bands[level]={n:0,ok:0};
+  for(const a of (Array.isArray(answers)?answers:[])){
+    const band=bands[String(a?.level||'')];
+    if(!band)continue;
+    band.n++;
+    if(a?.ok)band.ok++;
+  }
+  return bands;
+}
+/** Chip bukti per band untuk layar hasil: menunjukkan DASAR dari level, bukan cuma levelnya. */
+function placementBandChips(bands){
+  if(!bands)return '';
+  return LEVELS.map(level=>{
+    const band=bands[level]||{n:0,ok:0};
+    const passed=band.n>=PLACEMENT_BAND_MIN_EVIDENCE&&(band.ok||0)/band.n>=PLACEMENT_BAND_PASS;
+    return `<span class="result-band ${passed?'result-band-pass':''}">${esc(level)} ${band.ok||0}/${band.n||0}</span>`;
+  }).join('');
+}
+/** Tangga bukti: mulai A1 (indeks level 1), naik satu band hanya bila band itu lulus. */
+function placementBandLevel(bands){
+  let level=1;
+  for(let i=0;i<LEVELS.length;i++){
+    const band=bands?.[LEVELS[i]];
+    if(!band||!(band.n>=PLACEMENT_BAND_MIN_EVIDENCE))break;
+    if(!((band.ok||0)/band.n>=PLACEMENT_BAND_PASS))break;
+    level=i+1;
+  }
+  return level;
+}
+let placementListeningBank=null,placementListeningInflight=null;
 async function loadPlacementListening(){
   if(placementListeningBank)return placementListeningBank;
+  // F1 placement: satu permintaan yang sama tidak boleh berjalan dua kali. Prefetch idle di
+  // bawah dan klik murid bisa tiba berbarengan; tanpa penampung ini, klik pertama menunggu
+  // unduhan 1,7 MB KEDUA meski yang pertama sedang jalan.
+  if(placementListeningInflight)return placementListeningInflight;
+  placementListeningInflight=(async()=>{
   try{
-    const response=await fetch('./features/speaking-listening/listening-bank-v1.json',{cache:'no-store'});
+    // `cache:'no-store'` dulu memaksa lewati HTTP cache untuk berkas 1,7 MB ini, jadi setiap
+    // kali tes dimulai tanpa service worker aktif biayanya adalah unduhan jaringan penuh -
+    // 2-10 detik di koneksi seluler. Bank ini berversi bersama shell (sw.js mem-precache-nya),
+    // jadi cache biasa sudah benar dan `no-store` hanya menghukum pengguna non-SW.
+    const response=await fetch('./features/speaking-listening/listening-bank-v1.json');
     if(!response.ok)throw new Error(`bank listening ${response.status}`);
     const bank=await response.json();
     placementListeningBank=Array.isArray(bank?.items)?bank.items.filter(x=>PLACEMENT_LISTENING_MODES.includes(x?.mode)&&Array.isArray(x?.options)):[];
   }catch{placementListeningBank=[]}
   return placementListeningBank;
+  })();
+  try{return await placementListeningInflight}finally{placementListeningInflight=null}
+}
+// F1 placement: bank listening diambil saat peluncur menganggur, bukan saat murid menekan
+// "Mulai 25 soal". Ongkosnya sama; yang berubah adalah siapa yang menunggunya. Kalau gagal,
+// loadPlacementListening() tetap mencoba lagi pada klik - prefetch ini spekulatif, bukan
+// prasyarat, dan tes tetap boleh jalan tanpa listening (lihat guard `floor` di startPlacement).
+function prefetchPlacementListening(){
+  if(placementListeningBank||placementListeningInflight)return;
+  const run=()=>{try{loadPlacementListening()?.catch?.(()=>{})}catch{}};
+  if(typeof window!=='undefined'&&typeof window.requestIdleCallback==='function')window.requestIdleCallback(run,{timeout:6000});
+  else setTimeout(run,1500);
 }
 function makeListeningQuestion(item){
   const options=Array.isArray(item.options)?item.options.slice():[];
@@ -3608,16 +3736,29 @@ async function buildPlacement(){
   const listeningItems=await loadPlacementListening();
   for(const level of LEVELS){
     const plan=PLACEMENT_BLUEPRINT[level];
-    const pools={
+    // F1 placement: di sini letak freeze 4 detik. `.map()` dulu EAGER - seluruh kata di level
+    // itu dijadikan objek soal lebih dulu (1.765 panggilan makeVocabQuestion lintas 6 level)
+    // padahal blueprint hanya memakai 11, dan loop di bawah sudah `break` setelah kuotanya
+    // penuh. Yang berubah hanya WAKTU pembuatannya: kandidat tetap sumber yang sama, tetap
+    // diacak dengan shuffle yang sama, tetap diperiksa validateQuestion dan sigQ dengan urutan
+    // yang sama - soalnya kini dibangun satu per satu saat benar-benar diminta, jadi kandidat
+    // yang tidak terpakai tidak pernah dibangun.
+    const candidates={
+      vocab:shuffle(V.filter(v=>v.level===level&&v.meaning)),
+      grammar:shuffle(grammarItemsForLevel(level)),
+      listening:shuffle(listeningItems.filter(x=>x.level===level))
+    };
+    const build={
       // preferType 'meaning' mengunci bentuk termudah; lihat catatan blueprint di atas.
-      vocab:shuffle(V.filter(v=>v.level===level&&v.meaning)).map(v=>makeVocabQuestion(v,'meaning')),
-      grammar:shuffle(grammarItemsForLevel(level)).map(({skill,item})=>makeGrammarQuestion(skill,item)),
-      listening:shuffle(listeningItems.filter(x=>x.level===level)).map(makeListeningQuestion).filter(Boolean)
+      vocab:v=>makeVocabQuestion(v,'meaning'),
+      grammar:({skill,item})=>makeGrammarQuestion(skill,item),
+      listening:makeListeningQuestion
     };
     for(const [type,n] of Object.entries(plan)){
       let added=0;
-      for(const q of pools[type]){
-        if(!validateQuestion(q).ok)continue;
+      for(const source of candidates[type]){
+        const q=build[type](source);
+        if(!q||!validateQuestion(q).ok)continue;
         const sig=sigQ(q);
         if(seen.has(sig))continue;
         seen.add(sig);
@@ -3672,6 +3813,17 @@ function quizLoop(cfg){
  const unique=[],seen=new Set();
  for(const q of questions){if(!validateQuestion(q).ok)continue;const s=sigQ(q);if(!seen.has(s)){seen.add(s);unique.push(q)}}
  questions=cfg.preserveOrder?unique:shuffle(unique);
+ // F1 placement: tes penempatan berjenjang A1 -> C2, deterministik-acak. Diacak DI DALAM band
+ // (Array.prototype.sort stabil di V8, jadi hasil shuffle di atas tetap terpakai sebagai urutan
+ // internal band) tetapi bandnya sendiri selalu naik. Dua alasan, keduanya dari recon §c:
+ //
+ //   1. Tangga bukti per band hanya bisa dibaca kalau setiap band benar-benar ditanyakan.
+ //   2. Urutan lama diserahkan ke tutorPick dengan targetSuccess 0,8 - untuk murid dengan
+ //      estimasi ability rendah, ia MENYODORKAN SOAL TERMUDAH LEBIH DULU (skor -(p-0,8)²,
+ //      "frustrasi lebih mahal daripada bosan"). Itu benar untuk sesi belajar dan salah untuk
+ //      pengukuran: sampel awal jadi didominasi A1/A2, dan bila tes berhenti di tengah, level
+ //      dihitung dari potongan tes yang paling mudah.
+ if(cfg.placement)questions=questions.sort((a,b)=>(Number(a.difficulty)||0)-(Number(b.difficulty)||0));
  if(!cfg.dynamicPool)questions=questions.slice(0,cfg.count);
  if(cfg.placement&&!questions.length){showToast('Belum ada soal tes yang valid.');return}
  if(!questions.length){showToast('Belum ada soal yang valid untuk latihan ini.');return}
@@ -3704,8 +3856,10 @@ function quizLoop(cfg){
  const draw=()=>{
   if(asked>=planned||!remaining.length){finishQuiz(cfg,score,asked||planned,tutorSummary(tutor));return}
   if(pendingCard){const c=pendingCard;teach(c);return}
-  q=tutorPick(remaining,tutor,{forceConcept,avoidConcept:lastConcept,cfg})||remaining[0];
-  if(cfg.preserveOrder)q=remaining[0];
+  // Placement mengambil soal berikutnya dari urutan berjenjang di atas, bukan dari tutorPick:
+  // pemilihan adaptif targetSuccess 0,8 adalah alat MENGAJAR, dan di dalam alat UKUR ia
+  // membengkokkan sampel ke arah band termudah (lihat catatan pengurutan di atas).
+  q=(cfg.placement||cfg.preserveOrder)?remaining[0]:(tutorPick(remaining,tutor,{forceConcept,avoidConcept:lastConcept,cfg})||remaining[0]);
   const at=remaining.indexOf(q);if(at>=0)remaining.splice(at,1);
   forceConcept='';
   answer.locked=false;answer.retryOf='';answer.scaffold='';answer.timing='';
@@ -3773,7 +3927,13 @@ function quizLoop(cfg){
   //
   // Ditawarkan SEKALI per sesi. Tawaran berhenti yang diulang tiap soal berubah menjadi
   // desakan, dan murid yang memilih lanjut sudah menjawab pertanyaan itu.
-  if(answer.breathe&&!breatheOffered){
+  // F1 placement: tawaran ini TIDAK ditampilkan di tes penempatan. Tombolnya memanggil
+  // finishQuiz(cfg,score,asked+1), dan di jalur placement itu berarti level murid ditulis dari
+  // sampel sekecil 7 soal - yang, karena urutan lama menyodorkan soal termudah lebih dulu,
+  // adalah potongan tes yang paling mudah. Simulasi recon §c: benar 4 dari 7 -> 57% -> B1;
+  // 5 dari 7 -> 71% -> B2; 4 dari 5 -> 80% -> C1. Sesi belajar boleh disudahi kapan saja;
+  // pengukuran tidak boleh, karena hasilnya menempel ke seluruh kurikulum murid sesudahnya.
+  if(answer.breathe&&!breatheOffered&&!cfg.placement){
    breatheOffered=true;answer.breathe=false;
    const host=$('tutorTurn');
    if(host){
@@ -3801,6 +3961,9 @@ function quizLoop(cfg){
   // dan model kemampuan yang berdiri di atasnya ikut keliru.
   if(firstTry){
    if(ok)score++;
+   // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
+   // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
+   if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
    record(q,ok,ms,j);
    const h=state.history[state.history.length-1];
    if(q.type==='vocab')updateMastery('vocab',q.target,ok,h.ms,h.confidence,h.at);
@@ -3855,7 +4018,47 @@ function finishQuiz(cfg,score,total,tutorReport){
   // "ditinggalkan" ketika murid menekan kembali dari layar hasil.
   if(cfg)cfg.__finished=true;
   const accuracy=Math.round(score/Math.max(1,total)*100),session=completeActiveSession(cfg,score,total);
-  if(cfg.placement){state.level=accuracy<35?1:accuracy<50?2:accuracy<65?3:accuracy<78?4:accuracy<90?5:6;state.placementDone=true}
+  // F1 placement: level dibaca dari DUA hal yang harus sepakat, dan yang lebih rendah menang.
+  //
+  //   1. `state.placementBandLevel` - tangga bukti per band (lihat placementBandLevel, jauh di
+  //      atas). Inilah penentu utamanya: mulai A1, naik hanya dengan bukti benar di band itu.
+  //   2. Plafon akurasi global di baris skoring di bawah - jaring kedua yang menjaga agar satu
+  //      band beruntung tidak bisa mengangkat murid yang, dilihat dari seluruh 25 soal, jelas
+  //      belum sampai. Ambangnya dinaikkan dari 35/50/65/78/90 menjadi 45/60/72/82/92 supaya
+  //      batas A1-A2 berdiri JAUH di atas garis tebakan acak (25% dengan simpangan ±8,7 pp);
+  //      ambang 35% yang lama berada di dalam satu simpangan baku dari menebak buta, dan uji
+  //      empiris memang menemukan satu run tebakan acak (seed 1337, 36%) diumumkan A2.
+  //
+  // Baris skoringnya sengaja hanya bergantung pada `accuracy` dan `state`, tanpa konstanta lain:
+  // itulah yang membuat placement-accuracy-test.js bisa mengeksekusinya hermetis di vm dan
+  // menguji PERILAKUnya (monotonik, selalu-salah -> A1, acak tidak boleh > A2) tanpa memaku
+  // angka ambangnya. `state.placementBandLevel` yang belum ada berarti "tidak ada plafon dari
+  // bukti band", jadi di dalam test yang berjalan tanpa sesi ia jatuh ke plafon akurasi murni.
+  if(cfg.placement)state.placementBandLevel=placementBandLevel(placementBandTally(cfg.__placementAnswers));
+  const placementBands=cfg.placement?placementBandTally(cfg.__placementAnswers):null;
+  // Bukti per band ikut disimpan supaya hasil tes bisa diaudit owner maupun murid, bukan hanya
+  // dipercaya. Satu angka level tanpa bandnya adalah kesimpulan tanpa dasar.
+  if(cfg.placement)state.placementBands=placementBands;
+  const placementWasDone=!!state.placementDone;
+  if(cfg.placement){state.level=accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true}
+  // Hasil tes vs level yang dipilih sendiri di onboarding. `getActiveLevel()` mendahulukan
+  // `preferences.activeLevel`, jadi tanpa penyelesaian di sini seluruh perbaikan skoring tidak
+  // akan pernah terlihat oleh murid yang keburu menebak levelnya sendiri di layar perkenalan.
+  //
+  // MURID BARU (belum pernah menyelesaikan tes) - hasil tes MENANG dan diadopsi otomatis:
+  // pilihan di onboarding adalah perkiraan, tes adalah pengukuran, dan murid itu belum punya
+  // progres apa pun yang bisa hilang. Perubahannya diumumkan di layar hasil, tidak diam-diam.
+  //
+  // MURID LAMA yang pernah memilih level sendiri - levelnya TIDAK diubah tanpa izin (ia bisa
+  // saja sengaja belajar di band lain); layar hasil menawarkan satu tombol adopsi eksplisit.
+  let placementLevelName='',placementAdopted=false,placementManualLevel='';
+  if(cfg.placement){
+    placementLevelName=placementLevel();
+    if(activeLevelIsManual()&&getActiveLevel()!==placementLevelName){
+      if(!placementWasDone){state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;placementAdopted=true}
+      else placementManualLevel=getActiveLevel();
+    }
+  }
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
@@ -3877,8 +4080,15 @@ function finishQuiz(cfg,score,total,tutorReport){
   // adalah levelnya, dan langkah setelahnya bukan "satu sesi lagi".
   let nextDomain='';
   if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=p?.primaryDomain==='vocab'?'vocab':p?.primaryDomain==='reading'?'reading':'grammar'}catch(_){nextDomain='grammar'}}
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${outcomeLine}${nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
-  showToast(accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
+  // F1 placement: layar hasil MENYEBUT levelnya. Sebelum perbaikan ini layar "Tes level selesai"
+  // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip
+  // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,
+  // beserta band mana yang menjadi dasarnya.
+  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">LEVEL KAMU</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span></div>${placementBands?`<div class="result-bands"><small>Bukti per band (benar / ditanyakan pada percobaan pertama):</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>Level naik satu band hanya kalau band itu lulus, mulai dari A1. Menebak tidak cukup.</small></div>`:''}${placementAdopted?`<p class="muted">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="muted">Level aktifmu sekarang <b>${esc(placementManualLevel)}</b> karena kamu memilihnya sendiri. Hasil tes ini menunjukkan <b>${esc(placementLevelName)}</b>.</p>`:''}`:'';
+  const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&amp;&amp;go('home')">Ikuti hasil tes (${esc(placementLevelName)}) <i data-lucide="arrow-right"></i></button>`:'';
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${placementLevelBlock}${tutorLine}${outcomeLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  // Satu pesan saja. Untuk tes penempatan yang penting adalah levelnya, bukan pujian sesi.
+  showToast(cfg.placement&&placementLevelName?`Hasil tes: level ${placementLevelName}.`:accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
   // Momen wajar untuk menawarkan pengingat sekali lagi kepada murid yang tadi memilih
   // "Nanti saja": sesi belajar baru saja selesai, jadi "target harian" dan "waktunya
@@ -4266,6 +4476,10 @@ function warmNeuralVoice(){
   else setTimeout(run,1200);
 }
 warmNeuralVoice();
+// F1 placement: bank listening tes penempatan dipanaskan di jendela idle yang sama. Enam dari
+// 25 soal berasal dari berkas 1,7 MB itu; kalau ia baru diambil pada klik "Mulai 25 soal",
+// murid yang menunggu adalah murid yang sudah siap mengerjakan tes.
+prefetchPlacementListening();
 // Pemanasan pertama di atas hampir pasti tidak menemukan apa pun: runtime suara sekarang
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
