@@ -171,8 +171,15 @@ test('gaya kartu memakai bidang yang punya pasangan gelap', () => {
   assert.ok(/\.tutor-card\{/.test(css), 'gaya .tutor-card tidak ada');
   const why = css.match(/\.tutor-card-why\{[^}]*\}/);
   assert.ok(why, 'gaya .tutor-card-why tidak ada');
-  assert.ok(/var\(--surface-tint\)/.test(why[0]),
+  // m028 fase2 F2-09: yang dijaga di sini adalah "bidangnya token bertema, bukan literal",
+  // bukan nama satu tokennya. Rebrand "Warm Paper" memindahkan bidang kartu penjelas dari
+  // --surface-tint ke --panel-soft (dan aksen kirinya dari --accent marun ke --info) karena
+  // petunjuk bukan kesalahan. Kuncinya digeser ke keluarga token baru, tidak dibuang -
+  // preseden yang sama dipakai contrast-test saat nilai token m025-115 bergeser.
+  assert.ok(/var\(--(?:panel-soft|surface-tint)\)/.test(why[0]),
     'bidang kartu tidak memakai token bertema - inilah pola yang memerahkan gerbang bidang pastel');
+  assert.ok(/border-left:3px solid var\(--info\)/.test(why[0]),
+    'aksen kiri kartu penjelas harus keluarga info (bantuan), bukan aksen merah (kesalahan)');
 });
 
 process.on('exit', () => {
