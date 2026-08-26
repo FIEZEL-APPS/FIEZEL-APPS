@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
-  "scanned": 104,
+  "scanned": 118,
   "allowlist": [
     "http-smoke-test.js",
     "e2e-level-grammar-test.js"
@@ -23,7 +23,7 @@
     "Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3."
   ],
   "counts": {
-    "pass": 26,
+    "pass": 30,
     "fail": 0
   },
   "checks": [
@@ -78,6 +78,21 @@
       "details": "vmFetchLeak"
     },
     {
+      "name": "Detektor MEMBEBASKAN require socket yang hanya memasang jerat",
+      "status": "PASS",
+      "details": "(kosong)"
+    },
+    {
+      "name": "Detektor tetap menangkap PANGGILAN socket walau jerat dipasang",
+      "status": "PASS",
+      "details": "socketCall"
+    },
+    {
+      "name": "Kelonggaran jerat TIDAK berlaku tanpa penugasan jerat",
+      "status": "PASS",
+      "details": "socketRequire"
+    },
+    {
       "name": "Detektor menangkap penyuntikan eksplisit dari globalThis",
       "status": "PASS",
       "details": "vmFetchLeak"
@@ -85,12 +100,12 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
-      "details": "files=104"
+      "details": "files=118"
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
       "status": "PASS",
-      "details": "start=9403 end=10945"
+      "details": "start=10416 end=12184"
     },
     {
       "name": "Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya",
@@ -151,6 +166,11 @@
       "name": "Allowlist tetap dua nama dan keduanya ada di repo",
       "status": "PASS",
       "details": "http-smoke-test.js, e2e-level-grammar-test.js"
+    },
+    {
+      "name": "Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket",
+      "status": "PASS",
+      "details": "prerender-dryrun-test.js"
     },
     {
       "name": "Gerbang ini terdaftar di quality.yml",

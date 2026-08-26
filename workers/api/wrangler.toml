@@ -57,6 +57,12 @@ TTS_CHARS_PER_DAY = "6000"
 GLOBAL_NEURON_CAP = "8000"         # < 10.000/hari alokasi gratis akun
 MAX_USERS         = "250"          # cermin fiezel-core-worker.js:5
 AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
+# Kill switch analytics. "off" = `/api/usage/*` tetap TERDAFTAR (menjawab 202
+# `{disabled:true}`, bukan 404 — klien lama yang melihat 404 akan mengulang
+# tanpa henti) tetapi tidak satu baris pun ditulis, dan cron rollup keluar
+# lewat `{skipped:'flag_off'}`. Owner menyalakannya dengan:
+#   wrangler deploy   (setelah mengubah nilai ini)  ATAU  var override di dashboard.
+ANALYTICS_ENABLED = "off"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
@@ -70,16 +76,28 @@ AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
 binding        = "CORE_DB"
 database_name  = "fiezel-core"
 database_id    = "<isi setelah: wrangler d1 create fiezel-core>"
-migrations_dir = "migrations"
 
 # D1 kedua untuk statistik/agregat. Dipisah supaya analytics tidak
 # menyerialisasi jalur panas identitas (D1 single-threaded per database).
 # Tabelnya HANYA agregat — kontrak analytics privasi-maksimal melarang baris
 # per-orang untuk analytics, dan melarang join ke tabel kuota.
+# CATATAN PENTING soal migrasi: `migrations_dir` di atas SENGAJA DIHAPUS setelah
+# migrasi analytics masuk ke `migrations/`. `wrangler d1 migrations apply` hanya
+# mengenal SATU database per direktori, sehingga membiarkannya berarti
+# `0002_analytics.sql` akan dijalankan di `fiezel-core` — tabel agregat analytics
+# berakhir satu database dengan `quota_daily`, dan JOIN yang dilarang kontrak
+# privasi mendadak menjadi mungkin. Cara menerapkan migrasi ada di
+# `migrations/MIGRATIONS.md` (per berkas, per database, eksplisit).
+
 [[d1_databases]]
 binding       = "STATS_DB"
 database_name = "fiezel-stats"
 database_id   = "<isi setelah: wrangler d1 create fiezel-stats>"
+# Modul analytics (`analytics/route-events.js`, `analytics/rollup.js`) membaca
+# `env.ANALYTICS_DB`. Aliasnya dibuat di kode (`route-wiring.js:analyticsEnv`),
+# BUKAN dengan binding kedua ke database yang sama: dua binding ke satu database
+# membuat pembaca berikutnya mengira ada dua database, dan itu justru kebalikan
+# dari yang mau dijamin (pemisahan fisik kuota vs analytics).
 
 # --- KV: HANYA config/flag/state breaker + penanda anti-replay ber-TTL -------
 # PLAN GRATIS: 1.000 TULIS/HARI. Karena itu jalur panas DILARANG menulis ke KV.
@@ -117,6 +135,29 @@ binding = "AI"
 binding = "AE"
 dataset = "fiezel_events"
 
+# --- CRON -------------------------------------------------------------------
+# DUA trigger, dan keduanya wajib. Handler-nya `scheduled()` di `index.js`,
+# pemetaan ekspresi -> job di `route-wiring.js` (CRON_QUOTA_SWEEP,
+# CRON_ANALYTICS_ROLLUP).
+#
+#   "*/5 * * * *"  (a) sweep reservasi kuota kedaluwarsa + rekonsiliasi `held`.
+#                      TTL reservasi 30 s (quota-config RESERVATION_TTL_MS), jadi
+#                      5 menit jauh lebih cepat dari yang dibutuhkan sementara
+#                      tetap murah: 288 eksekusi/hari dari 100.000 request/hari
+#                      plan gratis = 0,3%. Tanpa job ini, slot yang ditahan
+#                      permintaan yang mati hilang dari jatah murid sampai
+#                      tengah malam.
+#   "5 17 * * *"   (b) rollup analytics harian + rotasi pepper, 00:05 WIB
+#                      (UTC+7). Menit ke-5, bukan ke-0: memberi ruang bagi event
+#                      terakhir hari itu tiba. Tanpa job ini kontrak privasi
+#                      BOHONG — token harian tidak pernah dihapus dan pepper
+#                      tidak pernah dirotasi.
+#
+# Cron cadangan TIDAK dipasang: kalau satu eksekusi gagal, yang berikutnya
+# mengerjakan hal yang sama (kedua job idempoten).
+[triggers]
+crons = ["*/5 * * * *", "5 17 * * *"]
+
 # ============================================================================
 # YANG SENGAJA TIDAK ADA DI SINI, DAN ALASANNYA
 # ============================================================================
@@ -131,11 +172,18 @@ dataset = "fiezel_events"
 #    atomisitas lebih ketat: Durable Object adalah UPGRADE BERBAYAR, dan itu
 #    WAJIB DILAPORKAN KE OWNER dengan angka (berapa kali terlampaui, berapa
 #    biaya kelebihannya) — bukan dinyalakan diam-diam di berkas ini.
-# 2. `[[unsafe.bindings]]` rate limiting — ditunda ke paket kerja kuota, supaya
-#    dua paket kerja tidak menulis blok yang sama.
-# 3. `[triggers] crons` — ditunda ke paket kerja analytics/rollup. Cron di PLAN
-#    GRATIS terbatas dan setiap eksekusi memakai jatah request; satu cron harian
-#    sudah cukup, jadi yang memasangnya harus satu paket kerja saja.
+# 2. `migrations_dir` — lihat catatan di blok D1 di atas: dihapus karena satu
+#    direktori migrasi hanya bisa menunjuk satu database, dan repo ini punya dua.
+# 3. `[triggers] crons` — SUDAH TERPASANG (lihat blok CRON di atas) oleh paket
+#    kerja integrasi rute, karena dua paket kerja berbeda (kuota + analytics)
+#    masing-masing butuh satu trigger dan hanya boleh ada satu blok
+#    `[triggers]` per Worker.
+# 3b. `[[unsafe.bindings]]` rate limiting TETAP tidak dipasang: penegakan
+#    per-menit hari ini memakai tabel kuota D1 yang sama (satu sumber angka),
+#    dan binding rate-limit Cloudflare masih ditandai unsafe/beta. Menambahkannya
+#    berarti dua sumber kebenaran untuk satu batas.
+# 3c. Bucket R2 tulis untuk TTS (`tts/v1/**`) memakai binding `AUDIO` yang sudah
+#    ada; prefiksnya yang dipisah, bukan bucket-nya.
 # 4. Bucket R2 kedua (`USERDATA`, backup progres murid) — TIDAK DIPASANG.
 #    Backup progres ke server default MATI (bab 1 melarang server jadi sumber
 #    kebenaran progres). Binding yang tidak ada = fitur yang secara struktural
