@@ -29,6 +29,22 @@
  *    sudah dipegang sejak m025-77. Pertanyaan spesifikasi "Kapan kamu ingin belajar?"
  *    dijawab jujur: dengan cara ALRS sebenarnya bekerja.
  *
+ * m028-maskot OWNER: maskot PAW yang bergerak kembali ke perkenalan, ala Duolingo - satu
+ * wajah besar di kepala tiap panel dengan pose yang MENJELASKAN langkahnya (bukan pose acak),
+ * menggantikan lambang statis m025-80 yang terbukti bisa lahir kosong karena menunggu
+ * lucide.min.js. Peta posenya:
+ *
+ *   Langkah 1 nama        -> greeting   (melambai sekali, lalu tenang)
+ *   Langkah 2 slide 1     -> curious    (isi latihan: menengok ke pilihan)
+ *   Langkah 2 slide 2     -> listening  (suara neural: headphone + not + groove)
+ *   Langkah 3 tanpa tujuan-> curious ; setelah tujuan dipilih -> observing (jatuh ke thinking)
+ *   Langkah 4 tes         -> encouraging
+ *   Langkah 5 pengingat   -> sleepy     (pose paling tenang, bukan yang paling ramai)
+ *   Langkah 6 ringkasan   -> celebrating lalu MENETAP proud
+ *
+ * Maskotnya adalah komponen yang sudah ada (features/mascot, <fiezel-mascot>); berkas ini
+ * tidak menggambar maskot sendiri dan tidak menambah state baru ke sistem gerak.
+ *
  * m025-117 OWNER: "saat masuk tanya dulu nama mereka di onboarding (WAJIB)". Step 1 sekarang
  * menanyakan nama murid, dan nama itulah satu-satunya sumber sapaan di seluruh aplikasi -
  * tidak ada lagi nama yang dipaku di kode sebagai nilai bawaan. Langkah ini adalah SATU-
@@ -107,23 +123,25 @@
     return clean.replace(/\s+/g, ' ').trim().slice(0, NAME_MAX).trim();
   }
 
+  // Dua slide, dan JUMLAHNYA yang menentukan pose maskot per slide (lihat MASCOT_SLIDES).
+  // `paw` adalah state maskot yang dimaksudkan untuk slide itu - bukan nama ikon lagi.
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
-      art: 'book-a',
+      paw: 'curious',
       title: 'Apa aja yang bisa kamu latih?',
       body: 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
       items: Object.freeze([
-        { icon: 'book-a', label: 'Kosakata (Vocabulary)' },
-        { icon: 'spell-check-2', label: 'Grammar (Grammar Patterns)' }
+        { icon: 'vocab', label: 'Kosakata (Vocabulary)' },
+        { icon: 'grammar', label: 'Grammar (Grammar Patterns)' }
       ])
     }),
     Object.freeze({
-      art: 'audio-lines',
+      paw: 'listening',
       title: 'Apa aja yang bisa kamu latih?',
       body: 'Suara neural, bukan robot — kedengeran kayak orang beneran ngomong.',
       items: Object.freeze([
-        { icon: 'book-open', label: 'Reading (Reading Comprehension)' },
-        { icon: 'headphones', label: 'Listening (Listening with Neural Voice)' }
+        { icon: 'reading', label: 'Reading (Reading Comprehension)' },
+        { icon: 'listening', label: 'Listening (Listening with Neural Voice)' }
       ])
     })
   ]);
@@ -247,12 +265,12 @@
       + bars + '</div></div>';
   }
 
-  // Sapaan: kartu wajah + gelembung. Teksnya berbeda tiap langkah supaya perkenalan terasa
+  // Sapaan: maskot + gelembung. Teksnya berbeda tiap langkah supaya perkenalan terasa
   // ada yang menemani, bukan formulir enam halaman. Disembunyikan dari pembaca layar
-  // HANYA untuk wajahnya (di art()); kalimatnya tetap dibacakan karena ia informasi.
-  function greet(env, icon, text) {
+  // HANYA maskotnya (di mascot()); kalimatnya tetap dibacakan karena ia informasi.
+  function greet(env, pawState, text) {
     return '<div class="fiezel-stage"><div class="fiezel-stage-art">'
-      + art(env, icon, 64)
+      + mascot(env, pawState)
       + '<p class="fiezel-greet-bubble">' + escapeHtml(text) + '</p>'
       + '</div></div>';
   }
@@ -264,23 +282,157 @@
     var bare = !showBack && showSkip === false;
     return '<div class="fiezel-topbar' + (bare ? ' is-bare' : '') + '">'
       + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
-      + '<i data-lucide="chevron-left"></i>Kembali</button>'
+      + glyph('chevron-left') + 'Kembali</button>'
       + (showSkip === false ? '<span class="fiezel-skip-spacer" aria-hidden="true"></span>'
         : '<button type="button" class="fiezel-skip" data-ob-skip>Lewati</button>')
       + '</div>';
   }
 
-  // m025-80 OWNER: "maskot hilangkan saja". Setiap langkah dulu memakai satu pose maskot;
-  // sekarang memakai satu lambang ikonik di atas piringan lembut. Tiap langkah tetap punya
-  // gambar yang berbeda supaya perkenalan tidak terasa berulang, dan bentuknya sejalur
-  // dengan ikon Lucide yang sudah dipakai di seluruh aplikasi - satu gaya, bukan campuran.
-  function art(env, icon, width) {
-    var size = Number(width) || 200;
-    // Dekorasi murni: judul dan isi langkah sudah membawa maknanya, jadi lambang ini
-    // disembunyikan dari pembaca layar supaya tidak dibacakan dua kali.
-    return '<div class="fiezel-step-art" style="--fz-art:' + size + 'px" aria-hidden="true">'
-      + '<i data-lucide="' + escapeHtml(String(icon || 'sparkles')) + '"></i>'
-      + '</div>';
+  // ---------------------------------------------------------------------------------------
+  // m028-maskot: MASKOT BERGERAK di tiap langkah, menggantikan lambang statis.
+  //
+  // Lambang Lucide di dalam piringan (m025-80) dilepas dari perkenalan sepenuhnya, dan
+  // bersama itu percobaan-ulang createIcons() yang dulu dipasang khusus untuk layar ini:
+  // begitu tidak ada satu pun <i data-lucide> di dalam perkenalan, tidak ada lagi ikon yang
+  // bisa lahir kosong karena pustakanya belum sampai - jadi mekanisme penantinya menjadi
+  // mubazir, bukan sekadar tidak terpakai. Lucide TIDAK disentuh di layar lain: aplikasi
+  // masih memuatnya dan masih memakainya di luar berkas ini.
+  //
+  // Gantinya adalah <fiezel-mascot> dari features/mascot - komponen yang SUDAH ada, dengan
+  // API setState() dan state yang sudah dipakai gelembung pembimbing. Perkenalan tidak
+  // menggambar maskot sendiri dan tidak menambah state baru; ia hanya MEMILIH state yang
+  // cocok dengan pekerjaan tiap langkah.
+  // ---------------------------------------------------------------------------------------
+
+  // Ukuran bawaan (px). CSS yang menjepitnya (clamp) supaya 390px tetap rapi; angka ini
+  // hanya nilai awal --fz-ob-paw, bukan ukuran final.
+  var MASCOT_SIZE = 148;
+
+  /**
+   * Pose yang DIMAKSUDKAN per langkah, dan rantai penggantinya.
+   *
+   * Rantai ini ada karena satu alasan yang jujur: state yang diminta desain tidak selalu
+   * ada di komponen. 'observing' adalah contohnya - komponen punya 'thinking' (mata
+   * mengarah ke atas-samping, kening naik) yang membawa arti sama "sedang mengamati
+   * pilihanmu", dan menambah state baru ke sistem gerak adalah pekerjaan komponen, bukan
+   * pekerjaan perkenalan. Jadi yang diminta ditulis apa adanya, dan penggantinya dipilih
+   * dari daftar state yang komponen benar-benar punya - bukan dipaksa lalu gagal diam-diam
+   * (setState() menolak state tak dikenal dan maskot akan tertinggal di 'idle').
+   */
+  var MASCOT_CHAIN = Object.freeze({
+    idle: Object.freeze(['idle']),
+    greeting: Object.freeze(['greeting']),
+    curious: Object.freeze(['curious']),
+    listening: Object.freeze(['listening']),
+    thinking: Object.freeze(['thinking']),
+    observing: Object.freeze(['observing', 'thinking']),
+    encouraging: Object.freeze(['encouraging']),
+    sleepy: Object.freeze(['sleepy']),
+    celebrating: Object.freeze(['celebrating']),
+    proud: Object.freeze(['proud'])
+  });
+
+  // Pose per slide carousel. Panjangnya MENGIKUTI jumlah slide yang benar-benar ada (dua):
+  // slide isi latihan = curious, slide suara neural = listening. Slide "adaptif" yang
+  // disebut brief tidak ada di produk ini, jadi tidak ada pose yang dipaksa untuknya.
+  var MASCOT_SLIDES = Object.freeze(['curious', 'listening']);
+
+  /** State yang komponen maskot benar-benar punya, atau [] bila komponennya tidak ada. */
+  function mascotStates(env) {
+    try {
+      var reg = env && env.customElements;
+      var ctor = reg && typeof reg.get === 'function' ? reg.get('fiezel-mascot') : null;
+      var list = ctor && ctor.states;
+      return Array.isArray(list) ? list : [];
+    } catch (_) { return []; }
+  }
+
+  /**
+   * Pose yang dipakai untuk `wanted`. Tanpa komponen (mis. saat diuji di Node) yang
+   * dikembalikan adalah pose yang DIMAKSUDKAN - markupnya tetap jujur menyebut niatnya.
+   */
+  function resolveMascotState(env, wanted) {
+    var chain = MASCOT_CHAIN[wanted] || [wanted];
+    var known = mascotStates(env);
+    if (!known.length) return chain[0];
+    for (var i = 0; i < chain.length; i++) {
+      if (known.indexOf(chain[i]) >= 0) return chain[i];
+    }
+    return 'idle';
+  }
+
+  function mascotReady(env) {
+    try {
+      var api = env && env.FiezelPaw;
+      return !!(api && typeof api.ready === 'function' && api.ready());
+    } catch (_) { return false; }
+  }
+
+  /**
+   * Cadangan bila motion system-nya tidak terdaftar (cache lama, berkas belum sampai,
+   * peramban tanpa custom element): ikon paw dari SATU sumber bentuk yang sama
+   * (features/ui/fiezel-icons.js). Yang tidak boleh terjadi adalah kotak kosong - itu
+   * persis kegagalan yang sedang diperbaiki, hanya dengan penyebab lain.
+   */
+  function mascotFallback(env) {
+    var svg = '';
+    try {
+      var lib = env && env.FiezelIcons;
+      if (lib && typeof lib.markup === 'function') svg = String(lib.markup('paw') || '');
+    } catch (_) { svg = ''; }
+    return '<span class="fiezel-ob-paw-fallback fz-i" aria-hidden="true">' + svg + '</span>';
+  }
+
+  /**
+   * Maskot satu langkah. Wadahnya membawa niat DAN pose terpilih sebagai atribut data,
+   * jadi keduanya bisa diperiksa dari DOM (gate QA) tanpa membaca keadaan internal
+   * komponen. Kelas st-<pose> juga sudah dipasang di markup supaya pose benar sejak cat
+   * pertama - termasuk saat setState() tidak pernah jalan (kurangi-gerak, tanpa JS lanjutan).
+   *
+   * aria-hidden: judul dan gelembung sapaan sudah membawa seluruh maknanya. Maskot yang
+   * ikut dibacakan hanya menggandakan kalimat yang sama.
+   */
+  function mascot(env, wanted, size) {
+    var intent = String(wanted || 'idle');
+    var state = resolveMascotState(env, intent);
+    var px = Number(size) || MASCOT_SIZE;
+    var body = mascotReady(env)
+      ? '<fiezel-mascot class="fiezel-ob-paw st-' + state + '" data-ob-mascot-el aria-hidden="true"></fiezel-mascot>'
+      : mascotFallback(env);
+    return '<div class="fiezel-ob-mascot" data-ob-mascot'
+      + ' data-ob-mascot-intent="' + escapeHtml(intent) + '"'
+      + ' data-ob-mascot-state="' + escapeHtml(state) + '"'
+      + ' style="--fz-ob-paw:' + px + 'px" aria-hidden="true">' + body + '</div>';
+  }
+
+  /**
+   * Lambang kecil di dalam kartu perkenalan, digambar INLINE.
+   *
+   * Sebelumnya empat lambang ini adalah <i data-lucide> dan bergantung pada pustaka yang
+   * dimuat `defer`, sementara perkenalan dicat dari jalur boot yang lebih dulu jalan -
+   * itulah sebabnya mereka bisa lahir kosong. SVG inline tidak punya perlombaan itu sama
+   * sekali. Bentuknya tetap satu keluarga: kanvas 24x24, garis currentColor, ujung membulat.
+   */
+  var GLYPHS = Object.freeze({
+    'chevron-left': '<path d="M15 5 8 12l7 7"/>',
+    'chevron-right': '<path d="M9 5l7 7-7 7"/>',
+    vocab: '<path d="M5 5.6A2.6 2.6 0 0 1 7.6 3H19v18H7.6A2.6 2.6 0 0 1 5 18.4z"/>'
+      + '<path d="m9.2 14.6 2.8-6.4 2.8 6.4"/><path d="M10.2 12.6h3.6"/>',
+    grammar: '<path d="m6 15.4 3 3 6.6-9.4"/><path d="M14.6 18.4h4.6"/>'
+      + '<path d="M4.6 6.4h8"/>',
+    reading: '<path d="M12 7.4C10.4 5.9 8.2 5.3 5 5.5v12c3.2-.2 5.4.4 7 1.9 1.6-1.5 3.8-2.1 7-1.9v-12c-3.2-.2-5.4.4-7 1.9z"/>'
+      + '<path d="M12 7.4v12"/>',
+    listening: '<path d="M5 14.2v-1.4a7 7 0 0 1 14 0v1.4"/>'
+      + '<rect x="3.4" y="13.6" width="4.2" height="6.4" rx="2.1"/>'
+      + '<rect x="16.4" y="13.6" width="4.2" height="6.4" rx="2.1"/>'
+  });
+
+  function glyph(name, className) {
+    var body = GLYPHS[name];
+    if (!body) return '';
+    return '<svg class="fiezel-glyph' + (className ? ' ' + className : '') + '" viewBox="0 0 24 24"'
+      + ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"'
+      + ' stroke-linejoin="round" aria-hidden="true" focusable="false">' + body + '</svg>';
   }
 
   function btn(label, attr, variant) {
@@ -298,12 +450,11 @@
   function nameMarkup(env, typed) {
     var clean = normalizeName(typed);
     return reveal(env)
-      // Lambangnya harus ada di lucide.min.js yang benar-benar dikirim (57 ikon, bukan set
-      // penuh). Ikon yang tidak ada tidak melempar - ia hanya menggambar piringan kosong,
-      // dan itu terbaca sebagai gambar yang gagal dimuat.
       + topbar(false, false)
       + stepper(1)
-      + greet(env, 'user-round', 'Senang ketemu kamu! Kita mulai dari yang paling gampang.')
+      // Langkah nama = sapaan. Maskot melambaikan tangan sekali (greeting), lalu diam di
+      // pose itu - bukan melambai terus-terusan di atas kolom yang sedang diisi.
+      + greet(env, 'greeting', 'Senang ketemu kamu! Kita mulai dari yang paling gampang.')
       + '<div class="fiezel-sheet" data-ob-step="name">'
       + '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>'
       + '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>'
@@ -326,24 +477,27 @@
   function carouselMarkup(env, slideIndex) {
     var slide = CAROUSEL_SLIDES[slideIndex];
     var items = slide.items.map(function (it) {
-      return '<div class="fiezel-carousel-item"><i data-lucide="' + escapeHtml(it.icon) + '"></i>'
+      return '<div class="fiezel-carousel-item">' + glyph(it.icon)
         + '<span>' + escapeHtml(it.label) + '</span></div>';
     }).join('');
     var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
     return reveal(env)
       + topbar(false)
       + stepper(2)
-      + greet(env, slide.art, 'Ini isi aplikasinya. Sebentar saja, dua layar.')
+      // Pose mengikuti ISI slide: slide latihan = curious, slide suara neural = listening.
+      // Sumbernya slide itu sendiri, jadi tidak bisa menyimpang dari apa yang tertulis.
+      + greet(env, MASCOT_SLIDES[slideIndex] || slide.paw || 'curious',
+        'Ini isi aplikasinya. Sebentar saja, dua layar.')
       + '<div class="fiezel-sheet" data-ob-step="2">'
       + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
       + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
       + '<div class="fiezel-carousel-track">' + items + '</div>'
       + '<div class="fiezel-carousel-arrows">'
       + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-prev' + (slideIndex === 0 ? ' disabled' : '') + '>'
-      + '<i data-lucide="chevron-left"></i></button>'
+      + glyph('chevron-left') + '</button>'
       + dots(CAROUSEL_SLIDES.length, slideIndex)
       + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-next' + (isLast ? ' disabled' : '') + '>'
-      + '<i data-lucide="chevron-right"></i></button>'
+      + glyph('chevron-right') + '</button>'
       + '</div>'
       + btn('Lanjut', 'data-ob-advance')
       + '</div>';
@@ -366,7 +520,11 @@
     return reveal(env)
       + topbar(false)
       + stepper(3)
-      + greet(env, 'sparkles', 'Tujuanmu yang menentukan materi mana yang kamu dapat dulu.')
+      // Selama tujuan belum dipilih maskot MENGAMATI pilihan (curious). Begitu tujuan
+      // terpilih dan enam chip level muncul, pekerjaannya berubah: ia menimbang jawaban
+      // murid, bukan lagi menawarkan pilihan - karena itu posenya juga berubah.
+      + greet(env, selectedGoal ? 'observing' : 'curious',
+        'Tujuanmu yang menentukan materi mana yang kamu dapat dulu.')
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
@@ -384,7 +542,7 @@
     return reveal(env)
       + topbar(true)
       + stepper(4)
-      + greet(env, 'book-open-text', 'Santai, ini bukan ujian. Bisa kamu hentikan kapan saja.')
+      + greet(env, 'encouraging', 'Santai, ini bukan ujian. Bisa kamu hentikan kapan saja.')
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
       + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
@@ -401,7 +559,9 @@
     return reveal(env)
       + topbar(true)
       + stepper(5)
-      + greet(env, 'clock-3', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
+      // Langkah pengingat bicara soal waktu istirahat dan kembali lagi; posenya yang paling
+      // tenang di seluruh sistem (sleepy: napas lambat 3,4s), bukan yang paling ramai.
+      + greet(env, 'sleepy', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
@@ -428,7 +588,11 @@
     return reveal(env)
       + topbar(true)
       + stepper(6)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'trophy', 64)
+      // Ringkasan: satu lompatan celebrating, lalu maskot MENETAP di pose proud (dipindah
+      // oleh applyMascot() setelah lompatannya selesai). Dengan kurangi-gerak ia langsung
+      // duduk di proud - pose yang sama, tanpa lompatan dan tanpa confetti.
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti
+      + mascot(env, reduceMotion ? 'proud' : 'celebrating')
       + '<p class="fiezel-greet-bubble">Sudah beres semua. Ini rangkumannya.</p>'
       + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="6">'
@@ -480,32 +644,88 @@
     var selectedLevel = '';
     var closed = false;
 
-    /**
-     * m028: menggambar ikon Lucide - dan MENCOBA LAGI kalau pustakanya belum ada.
+    /* ---------------------------------------------------------------------------------
+     * MASKOT: satu wajah per langkah, state-nya ditentukan langkahnya sendiri.
      *
-     * lucide.min.js dimuat dengan `defer`, sedangkan perkenalan digambar dari jalur boot yang
-     * berjalan lebih dulu. Sebelum ini akibatnya tersembunyi: createIcons() dipanggil sekali,
-     * gagal diam-diam karena target.lucide masih undefined, dan setiap <i data-lucide> di
-     * perkenalan tinggal jadi elemen kosong. Dulu itu tidak terlihat karena lambangnya duduk
-     * di tengah piringan besar yang toh sudah berisi gradien; sejak lambang itu menjadi kartu
-     * wajah 64px dengan garis tinta, yang tampak adalah kotak kuning kosong.
+     * Percobaan-ulang createIcons() yang dulu ada di sini DIHAPUS bersama seluruh
+     * <i data-lucide> di perkenalan: tidak ada lagi lambang yang menunggu pustaka, jadi
+     * tidak ada lagi yang bisa lahir kosong. Lucide tetap dimuat aplikasi dan tetap
+     * dipakai layar lain - yang dilepas hanya ketergantungan berkas ini padanya.
      *
-     * Percobaan ulangnya dibatasi 12 kali x 120ms (~1,4 detik) dan berhenti begitu berhasil,
-     * jadi ia tidak bisa berubah menjadi loop yang menggantung kalau pustakanya memang tidak
-     * ikut terkirim - dalam keadaan itu perkenalan tetap jalan, hanya tanpa ikon.
-     */
-    var iconTries = 0;
-    function drawIcons() {
-      var ok = false;
+     * Yang dijaga di sini: (1) niat state tinggal di DOM sebagai atribut, jadi bisa
+     * diperiksa dari luar; (2) pergantian langkah = SATU morph state + satu entrance
+     * 240ms, bukan rentetan reaksi; (3) kurangi-gerak berarti pose yang sama tanpa gerak
+     * sama sekali - termasuk tanpa entrance dan tanpa lompatan celebrating.
+     * --------------------------------------------------------------------------------- */
+    var settleT = null;
+    var entranceT = null;
+
+    function clearMascotTimers() {
       try {
-        if (target.lucide && target.lucide.createIcons) {
-          target.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true' } });
-          ok = true;
+        if (typeof target.clearTimeout === 'function') {
+          if (settleT != null) target.clearTimeout(settleT);
+          if (entranceT != null) target.clearTimeout(entranceT);
         }
-      } catch (_) { ok = false; }
-      if (ok || closed || iconTries >= 12) return;
-      iconTries++;
-      try { target.setTimeout(drawIcons, 120); } catch (_) {}
+      } catch (_) {}
+      settleT = null; entranceT = null;
+    }
+
+    function mascotBox() {
+      try { return host.querySelector('[data-ob-mascot]'); } catch (_) { return null; }
+    }
+
+    /**
+     * Memasang satu pose. Elemen maskot dipanggil LANGSUNG (bukan lewat corong global
+     * FiezelPaw) dengan sengaja: corong itu mengenai SEMUA maskot yang hidup di halaman,
+     * termasuk wajah di gelembung pembimbing yang sedang berada di belakang lapisan ini.
+     * Pose langkah perkenalan tidak boleh menyeret wajah lain ikut berubah.
+     */
+    function pose(wanted) {
+      var box = mascotBox();
+      var resolved = resolveMascotState(target, wanted);
+      if (box) {
+        try {
+          box.setAttribute('data-ob-mascot-state', resolved);
+          var el = box.querySelector('[data-ob-mascot-el]');
+          // hold 0 = tahan sampai langkah berikutnya menggantinya. Tanpa itu state
+          // transien (greeting/encouraging/celebrating/proud) balik sendiri ke idle di
+          // tengah langkah, dan maskotnya berhenti menjelaskan langkah yang sedang dibuka.
+          if (el && typeof el.setState === 'function') el.setState(resolved, { hold: 0 });
+        } catch (_) {}
+      }
+      return resolved;
+    }
+
+    function applyMascot() {
+      clearMascotTimers();
+      var box = mascotBox();
+      if (!box) return;
+      var intent = box.getAttribute('data-ob-mascot-intent') || 'idle';
+      pose(intent);
+      if (reduceMotion) return;
+      // Micro-entrance: scale settle 240ms dengan --ease-spring (dipasang di style.css).
+      try {
+        box.classList.add('is-entering');
+        entranceT = target.setTimeout(function () {
+          entranceT = null;
+          try { box.classList.remove('is-entering'); } catch (_) {}
+        }, 260);
+      } catch (_) {}
+      // Ringkasan: lompat sekali, lalu MENETAP bangga. Dipindah di sini, bukan lewat
+      // opts.then komponen - `then` memakai hold bawaannya sendiri dan proud akan luruh
+      // ke idle 2,2 detik kemudian, jadi langkah terakhir berakhir dengan wajah kosong.
+      if (intent === 'celebrating') {
+        try {
+          settleT = target.setTimeout(function () {
+            settleT = null;
+            if (closed) return;
+            var live = mascotBox();
+            if (!live || live.getAttribute('data-ob-mascot-intent') !== 'celebrating') return;
+            live.setAttribute('data-ob-mascot-intent', 'proud');
+            pose('proud');
+          }, 1900);
+        } catch (_) {}
+      }
     }
 
     function paint() {
@@ -517,7 +737,7 @@
       else if (step === 5) html = scheduleMarkup(target);
       else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
       host.innerHTML = html;
-      drawIcons();
+      applyMascot();
       bind();
     }
 
@@ -537,6 +757,7 @@
     function finish(via) {
       if (closed) return;
       closed = true;
+      clearMascotTimers();
       markCompleted(target, { at: now, via: via, name: typedName, goal: selectedGoal, level: selectedLevel });
       try { host.classList.add('is-leaving'); } catch (_) {}
       if (typeof target.setTimeout === 'function') target.setTimeout(remove, 260);
@@ -675,6 +896,10 @@
 
     paint();
     try { doc.body.appendChild(host); } catch (_) { return { shown: false, reason: 'append_failed' }; }
+    // Cat pertama terjadi SEBELUM host masuk dokumen, jadi custom element-nya belum
+    // ter-upgrade dan setState() waktu itu masih ditolak (komponen menolak sebelum
+    // connect). Pose dipasang lagi di sini - sekali, bukan lewat penantian berulang.
+    applyMascot();
 
     return {
       shown: true,
@@ -689,6 +914,10 @@
     STORAGE_KEY: STORAGE_KEY,
     CEFR_LEVELS: CEFR_LEVELS,
     CAROUSEL_SLIDES: CAROUSEL_SLIDES,
+    MASCOT_SLIDES: MASCOT_SLIDES,
+    MASCOT_CHAIN: MASCOT_CHAIN,
+    MASCOT_SIZE: MASCOT_SIZE,
+    resolveMascotState: resolveMascotState,
     LAST_STEP: LAST_STEP,
     NAME_STEP: NAME_STEP,
     PLACEMENT_STEP: PLACEMENT_STEP,

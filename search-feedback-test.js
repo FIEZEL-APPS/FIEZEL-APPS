@@ -229,7 +229,14 @@ ok(/class="ask-label"/.test(indexSrc), 'label di bawah balok emas belum ada');
 // kembali tanpa sengaja saat seseorang merapikan gaya topbar.
 const labelRule = withoutComments.slice(withoutComments.indexOf('.ask-button .ask-label{'),
   withoutComments.indexOf('.ask-button .ask-label{') + 200);
-ok(/font-size:7px/.test(labelRule), 'ukuran label berubah dari yang OWNER setujui');
+// m028 fase1 (kontrak label 12px): angka yang dipaku di sini DIPERBARUI 7px -> 12px, dengan
+// pola yang sama dipakai c8d5d3d untuk kunci warna - nilai lama ditukar di tempat, alasannya
+// ditulis di berkas testnya. Yang dilindungi test ini sejak awal bukan angka 7 itu sendiri,
+// melainkan permintaan OWNER "labelnya jangan mendominasi baloknya", dan penyumbang lebarnya
+// adalah kapital + tebal + jarak huruf - ketiganya masih dijaga dua baris di bawah. 7px di
+// bawah lantai aksesibilitas 12px yang dipakai seluruh redesign; mempertahankannya berarti
+// test ini memaksa teks yang tidak terbaca, yaitu melindungi angka sambil melanggar maksudnya.
+ok(/font-size:12px/.test(labelRule), 'ukuran label turun di bawah lantai aksesibilitas 12px');
 ok(!/text-transform:uppercase/.test(labelRule), 'kapital kembali; labelnya akan melebar lagi');
 ok(!/font-weight:[67]00/.test(labelRule), 'huruf tebal kembali; labelnya akan mendominasi lagi');
 

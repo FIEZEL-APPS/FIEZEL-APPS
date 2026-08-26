@@ -11,7 +11,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // ada di shell, jadi revisi HARUS naik atau murid lama akan melihat cangkang berwarna lama
 // di atas kode baru. Naik SEKALI untuk seluruh gelombang ini: tiap kenaikan memaksa unduh
 // ulang cangkang, dan tiga kenaikan untuk satu rilis berarti tiga kali beban itu.
-const SW_REV='m025-163-warm-paper-20260826';
+const SW_REV='m025-163-onboarding-maskot-20260826';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
