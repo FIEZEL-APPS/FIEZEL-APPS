@@ -1,0 +1,140 @@
+{
+  "schema": "fiezel-puter-popup-once-v1",
+  "generatedAt": "2026-08-26T14:23:34.555Z",
+  "pass": true,
+  "periodMs": 86400000,
+  "storageKey": "fiezel-puter-popup-last",
+  "stateMachine": {
+    "Q1_first_eligible": true,
+    "Q2_within_period": false,
+    "Q3_next_period": true,
+    "Q4_listening_active": false,
+    "Q5_after_listening": true,
+    "Q6_signed_in": false,
+    "Q7_corrupt_last_shown": "treated as null",
+    "Q8_gate_consults_decision": true,
+    "Q9_key_is_not_progress": true
+  },
+  "checks": [
+    {
+      "name": "Periode popup adalah konstanta bernama yang berhingga dan positif",
+      "status": "PASS",
+      "details": "PUTER_POPUP_PERIOD_MS=86400000"
+    },
+    {
+      "name": "Kunci penyimpanan popup adalah konstanta bernama",
+      "status": "PASS",
+      "details": "PUTER_POPUP_LAST_KEY=fiezel-puter-popup-last"
+    },
+    {
+      "name": "shouldPresentPuterPopup() dan markPuterPopupShown() bisa di-extract dari app.js",
+      "status": "PASS",
+      "details": "keduanya ditemukan"
+    },
+    {
+      "name": "Keputusan tidak memanggil Date.now() sendiri - waktu datang dari parameter",
+      "status": "PASS",
+      "details": "jam yang bocor membuat \"sekali per periode\" tidak bisa diuji dan tidak bisa dipercaya"
+    },
+    {
+      "name": "Q1 panggilan eligible pertama menampilkan popup",
+      "status": "PASS",
+      "details": "lastShownAt null berarti belum pernah ditampilkan"
+    },
+    {
+      "name": "Q2 timestamp ditulis ke store yang di-inject, bukan ke localStorage nyata",
+      "status": "PASS",
+      "details": "store[fiezel-puter-popup-last]=1772000000000"
+    },
+    {
+      "name": "Q2 popup kedua di dalam periode yang sama ditolak",
+      "status": "PASS",
+      "details": "satu milidetik sebelum periode berakhir masih periode yang sama"
+    },
+    {
+      "name": "Q3 periode baru membuka popup lagi",
+      "status": "PASS",
+      "details": "batasnya inklusif: tepat satu periode sudah lewat"
+    },
+    {
+      "name": "Q4 sesi listening aktif menekan popup meski periode sudah lewat",
+      "status": "PASS",
+      "details": "popup tidak boleh memotong sesi dengar"
+    },
+    {
+      "name": "Q5 penekanan saat listening tidak mengonsumsi jatah periode",
+      "status": "PASS",
+      "details": "timestamp tetap 1772000000000 setelah jalur tolak"
+    },
+    {
+      "name": "Q6 akun yang sudah tersambung tidak pernah melihat popup",
+      "status": "PASS",
+      "details": "3 kombinasi diuji"
+    },
+    {
+      "name": "Q7 lastShownAt korup diperlakukan seperti null dan tidak melempar",
+      "status": "PASS",
+      "details": "hasil=[true,true,true] threw=false"
+    },
+    {
+      "name": "Q8 gerbang akun berkonsultasi ke shouldPresentPuterPopup( dan tahu sesi dengar",
+      "status": "PASS",
+      "details": "gerbang yang tidak berkonsultasi akan kembali muncul di setiap boot"
+    },
+    {
+      "name": "Q9 kunci popup bukan (dan tidak berprefix) kunci progres",
+      "status": "PASS",
+      "details": "PUTER_POPUP_LAST_KEY=fiezel-puter-popup-last vs fiezel-v4-state, fiezel-v5-state:, fiezel-v5-legacy-owner"
+    },
+    {
+      "name": "Panel gerbang punya tombol sekunder \"Lanjut tanpa akun\"",
+      "status": "PASS",
+      "details": "tanpa tombol ini, murid yang tidak mau login terkurung di balik .auth-locked"
+    },
+    {
+      "name": "skipPuterSignIn() melepas kunci body DAN menulis penanda persisten",
+      "status": "PASS",
+      "details": "melepas kunci tanpa penanda berarti gerbangnya balik lagi di boot berikutnya"
+    },
+    {
+      "name": "Gerbang menghormati penanda lewat",
+      "status": "PASS",
+      "details": "penanda yang tidak dibaca sama dengan tidak ada penanda"
+    },
+    {
+      "name": "Jalan masuk kembali ada di Pengaturan (Akun Puter)",
+      "status": "PASS",
+      "details": "jalan keluar tanpa jalan masuk kembali adalah jalan buntu yang lain"
+    },
+    {
+      "name": "Deteksi kredit habis TERSTRUKTUR (402 / code insufficient), bukan menebak naskah pesan",
+      "status": "PASS",
+      "details": "menebak dari naskah pesan akan diam-diam salah pada hari Puter mengubah kalimatnya"
+    },
+    {
+      "name": "Memo kredit menghentikan panggilan SDK berikutnya di dalam render()",
+      "status": "PASS",
+      "details": "dialog SDK lahir dari panggilan; satu-satunya cara memadamkannya adalah tidak memanggil lagi"
+    },
+    {
+      "name": "Singgah simpan tetap diperiksa lebih dulu, jadi audio gratis tidak ikut dibisukan",
+      "status": "PASS",
+      "details": "memo tidak boleh membisukan kalimat yang sudah ada di cache"
+    },
+    {
+      "name": "Pintu bicara melewati Puter saat memo menyala dan langsung ke suara perangkat",
+      "status": "PASS",
+      "details": "fallback harus terjadi TANPA memicu dialog SDK sekali pun"
+    },
+    {
+      "name": "Pemberitahuan FIEZEL diantrikan, lalu dikonsumsi HANYA di ujung sesi",
+      "status": "PASS",
+      "details": "renderComplete()/exit() adalah dua satu-satunya cara sesi berakhir"
+    },
+    {
+      "name": "Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK",
+      "status": "PASS",
+      "details": "FIEZEL tetap jalan penuh tanpa upgrade - naskahnya harus mengatakan itu"
+    }
+  ]
+}

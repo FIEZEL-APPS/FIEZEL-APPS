@@ -1625,7 +1625,7 @@ async function awaitPuter(timeoutMs){
   return typeof puter!=='undefined'&&puter?puter:null
 }
 function setAuthGateState(status,detail){
-  const gate=$('authGate'),button=$('authGateButton'),stateText=$('authGateStatus');if(!gate)return;
+  const gate=$('authGate'),button=$('authGateButton'),stateText=$('authGateStatus'),skip=$('authGateSkip');if(!gate)return;
   // Sama seperti gerbang notifikasi: akun yang sudah tersambung tidak boleh memunculkan
   // panel hanya untuk ditutup lagi sesaat kemudian (m025-80).
   const wasHidden=gate.classList.contains('hidden');
@@ -1637,17 +1637,124 @@ function setAuthGateState(status,detail){
   if(status==='signed_in'){stateText.textContent='Akun tersambung. Membuka FIEZEL…';stateText.className='auth-status success';button.disabled=true;button.innerHTML='<i data-lucide="circle-check-big"></i><span>Tersambung</span>'}
   else if(status==='pending'){stateText.textContent='Menghubungkan ke Puter…';stateText.className='auth-status';button.disabled=true;button.innerHTML='<i data-lucide="loader-circle"></i><span>Menghubungkan…</span>'}
   else if(status==='error'){stateText.textContent=aiErrorMessage(detail);stateText.className='auth-status error';button.disabled=false;button.innerHTML='<i data-lucide="refresh-cw"></i><span>Coba lagi</span>'}
-  else{stateText.textContent='Progres belajar, streak, dan AI tutor tersimpan di akunmu.';stateText.className='auth-status';button.disabled=false;button.innerHTML='<i data-lucide="user-round"></i><span>Lanjutkan dengan Puter</span>'}
+  // "Lanjut tanpa akun" ditekan: nadanya sama dengan 'declined' di gerbang notifikasi -
+  // tidak ada yang gagal, tidak ada yang tertahan.
+  else if(status==='skipped'){stateText.textContent='Oke, lanjut tanpa akun.';stateText.className='auth-status';button.disabled=true;if(skip)skip.disabled=true}
+  else{stateText.textContent='Progres belajar, streak, dan AI tutor tersimpan di akunmu.';stateText.className='auth-status';button.disabled=false;button.innerHTML='<i data-lucide="user-round"></i><span>Lanjutkan dengan Puter</span>';if(skip)skip.disabled=false}
   refreshIcons()
 }
 function hideAuthGate(){const gate=$('authGate');if(!gate)return;gate.classList.remove('show');setTimeout(()=>gate.classList.add('hidden'),300)}
 async function completeAuthGate(){await activateAccountStateFromPuter();document.body?.classList?.remove?.('auth-locked');setAuthGateState('signed_in');setTimeout(hideAuthGate,220);showToast('Akun FIEZEL tersambung.');armOfflineVoiceAutoload()}
+// m026-02 AKAR: gerbang akun dipasang di SETIAP boot tanpa memori apa pun, dan satu-satunya
+// tombolnya adalah "Lanjutkan dengan Puter" - jadi murid yang tidak mau (atau belum bisa)
+// login terkurung di balik .auth-locked (style.css:438). Dua obatnya di bawah ini:
+//
+//   1. PENANDA LEWAT. Murid yang memilih "Lanjut tanpa akun" tidak ditanya lagi di boot
+//      berikutnya. Penandanya di localStorage, BUKAN di state progres, karena ini bukan
+//      bukti belajar - pola yang sama dengan REMINDER_INVITE_KEY di atas.
+//   2. SATU KALI PER PERIODE, DI LUAR SESI. Keputusannya dipisah menjadi fungsi murni
+//      shouldPresentPuterPopup() supaya bisa diuji tanpa DOM, tanpa jam nyata, dan tanpa
+//      localStorage: seluruh masukannya parameter.
+const PUTER_POPUP_PERIOD_MS=86400000;
+const PUTER_POPUP_LAST_KEY='fiezel-puter-popup-last';
+const PUTER_AUTH_SKIP_KEY='fiezel-puter-auth-skipped';
+/**
+ * Satu-satunya tempat "boleh muncul atau tidak" diputuskan. Murni: tidak memanggil
+ * Date.now(), tidak menyentuh localStorage, tidak melihat DOM.
+ *
+ * @param {{now:number,lastShownAt:*,signedIn:boolean,listeningActive:boolean}} ctx
+ * @returns {boolean}
+ */
+function shouldPresentPuterPopup(ctx){
+  const c=ctx||{};
+  // Akun sudah tersambung: tidak ada yang perlu ditawarkan.
+  if(c.signedIn===true)return false;
+  // Sesi dengar sedang jalan. Jalur tolak ini TIDAK menulis timestamp apa pun, jadi
+  // penekanan di tengah sesi tidak memakan jatah periode - popupnya cuma menunggu.
+  if(c.listeningActive===true)return false;
+  const now=Number(c.now);
+  if(!Number.isFinite(now))return false;
+  const last=Number(c.lastShownAt);
+  // lastShownAt korup ('abc', -5, undefined) diperlakukan seperti "belum pernah" - lebih
+  // baik satu popup yang sah daripada melempar di tengah boot.
+  if(!Number.isFinite(last)||last<=0)return true;
+  return now-last>=PUTER_POPUP_PERIOD_MS;
+}
+/** Menulis waktu tampil lewat store yang di-inject (localStorage di runtime, Map palsu di test). */
+function markPuterPopupShown(now,store){
+  const target=store||(typeof localStorage!=='undefined'?localStorage:null);
+  const stamp=Number(now);
+  if(!target||typeof target.setItem!=='function')return false;
+  if(!Number.isFinite(stamp)||stamp<=0)return false;
+  try{target.setItem(PUTER_POPUP_LAST_KEY,String(Math.floor(stamp)))}catch{}
+  return true;
+}
+function readPuterPopupLastShown(store){
+  const target=store||(typeof localStorage!=='undefined'?localStorage:null);
+  if(!target||typeof target.getItem!=='function')return null;
+  try{return target.getItem(PUTER_POPUP_LAST_KEY)}catch{return null}
+}
+function puterAuthSkipped(){
+  try{if(localStorage.getItem(PUTER_AUTH_SKIP_KEY)==='1')return true}catch{}
+  return state?.preferences?.puterAuthSkipped===true;
+}
+// Sesi dengar aktif = ada controller Skills Lab hidup, atau layar yang sedang dibuka
+// memang salah satu panggung dengar/bicara (daftar view di renderInner()).
+function puterListeningActive(){
+  try{
+    if(typeof speakingListeningController!=='undefined'&&speakingListeningController)return true;
+    return ['skills','listening','speaking'].includes(String(state?.view||''));
+  }catch{return false}
+}
+/**
+ * "Lanjut tanpa akun". Cermin declineStudyNotifications(): jawaban yang sah, bukan
+ * kegagalan. Kuncinya dilepas, penandanya ditulis, dan Pengaturan -> Akun Puter tetap
+ * menjadi jalan masuknya kembali (lihat accountSettingsMarkup()).
+ */
+function skipPuterSignIn(){
+  try{localStorage.setItem(PUTER_AUTH_SKIP_KEY,'1')}catch{}
+  try{state.preferences={...state.preferences,puterAuthSkipped:true};save()}catch{}
+  haptic('tap');
+  document.body?.classList?.remove?.('auth-locked');
+  setAuthGateState('skipped');
+  setTimeout(hideAuthGate,220);
+  showToast('Lanjut tanpa akun. Masuk kapan saja lewat Pengaturan.');
+  return true
+}
 let authRetryBound=false;
 function presentPuterAuthGateIfNeeded(){
   if(!puterAuthAvailable())return false;
   if(puterSignedIn()){activateAccountStateFromPuter();return false}
+  // Murid sudah pernah memilih jalan tanpa akun. Menanyakannya lagi setiap boot adalah
+  // dark-pattern yang sama dengan gerbang notifikasi lama.
+  if(puterAuthSkipped())return false;
+  const listeningActive=puterListeningActive();
+  const at=Date.now();
+  if(!shouldPresentPuterPopup({now:at,lastShownAt:readPuterPopupLastShown(),signedIn:puterSignedIn(),listeningActive}))return false;
+  markPuterPopupShown(at);
   document.body?.classList?.add?.('auth-locked');setAuthGateState('idle');
   if(!authRetryBound){authRetryBound=true;document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='visible'&&document.body?.classList?.contains('auth-locked')&&puterSignedIn())completeAuthGate()})}
+  return true
+}
+/**
+ * m026-02 pemberitahuan kredit habis - MILIK FIEZEL, bukan dialog SDK.
+ *
+ * Dipanggil hanya di ujung sesi (onSessionEnd addon listening: renderComplete()/exit()),
+ * jadi ia tidak pernah memotong item yang sedang diputar. listeningActive:false ditulis
+ * eksplisit karena titik panggilnya ADALAH momen "sesi sudah selesai" - controllernya
+ * mungkin masih terpasang sedetik lagi. signedIn:false juga eksplisit: aturan "sudah
+ * login berarti diam" milik gerbang LOGIN, sedangkan pemberitahuan ini justru hanya lahir
+ * pada akun yang sudah login dan kreditnya habis.
+ */
+function maybePresentPuterCreditNotice(){
+  let pending=false;
+  try{pending=self.FiezelPuterVoice?.consumeCreditNotice?.()===true}catch{}
+  if(!pending)return false;
+  const at=Date.now();
+  if(!shouldPresentPuterPopup({now:at,lastShownAt:readPuterPopupLastShown(),signedIn:false,listeningActive:false}))return false;
+  markPuterPopupShown(at);
+  openModal(`<div class="modal-mark">FIEZEL</div><h2>Kredit AI Puter kamu habis</h2><p>Tenang &mdash; aplikasi tetap bisa kamu pakai penuh tanpa upgrade apa pun. Yang terdampak cuma tutor AI dan suara neural; materi, latihan, dan progresmu jalan seperti biasa. Kalau mau lanjut pakai fitur AI, opsi upgrade ada di akun Puter kamu.</p><div class="modal-actions"><a class="setup-link" id="puterCreditLearn" href="https://puter.com/settings/usage" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Pelajari opsi upgrade</a><button type="button" class="primary" id="puterCreditClose">Oke, lanjut belajar</button></div>`);
+  $('puterCreditClose')?.addEventListener('click',closeModal);
   return true
 }
 // Tenggat login. Keadaan 'pending' mematikan tombolnya, dan tidak ada apa pun yang
@@ -2907,12 +3014,35 @@ async function runPuterSwitchAccount(){
     setTimeout(()=>location.reload(),1200);
   }
 }
+/**
+ * m026-02: jalan masuk kembali setelah "Lanjut tanpa akun".
+ *
+ * Penanda lewat DIHAPUS di sini - kalau tidak, gerbangnya akan menolak tampil dan tombol
+ * ini menjadi tombol yang tidak melakukan apa-apa pada boot berikutnya.
+ */
+async function runPuterSignInFromSettings(){
+  const button=$('accountSignIn');if(button)button.disabled=true;
+  try{localStorage.removeItem(PUTER_AUTH_SKIP_KEY)}catch{}
+  try{state.preferences={...state.preferences,puterAuthSkipped:false};save()}catch{}
+  closeModal();
+  setAuthGateState('idle');
+  return attemptPuterSignIn();
+}
 function accountSettingsMarkup(){
   const connected=puterSignedIn();
-  return `<div class="card account-card"><h3>Akun Puter</h3><p class="muted">Progres belajar, streak, dan tutor AI tersimpan di akun ini.</p><div class="setting-row"><span class="setting-icon"><i data-lucide="user-round"></i></span><span><b id="accountName">${esc(puterAccountLabel())}</b><small>${connected?'Tersambung di perangkat ini':'Belum ada akun tersambung'}</small></span></div><div class="actions"><button type="button" id="accountSwitch"><i data-lucide="user-round"></i> Ganti akun</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="arrow-up-right"></i> Keluar</button></div><p class="muted">Ganti akun akan keluar dulu, lalu membuka login Puter - tanpa itu Puter langsung memakai sesi lama dan akunnya tidak pernah benar-benar berganti.</p></div>`
+  // Tanpa akun, tombol "Ganti akun"/"Keluar" tidak punya apa pun untuk digantikan; yang
+  // dibutuhkan murid yang tadi memilih "Lanjut tanpa akun" adalah satu pintu masuk.
+  const actions=connected
+    ?`<button type="button" id="accountSwitch"><i data-lucide="user-round"></i> Ganti akun</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="arrow-up-right"></i> Keluar</button>`
+    :`<button type="button" id="accountSignIn" class="primary"><i data-lucide="user-round"></i> Masuk ke akun Puter</button>`;
+  const note=connected
+    ?'Ganti akun akan keluar dulu, lalu membuka login Puter - tanpa itu Puter langsung memakai sesi lama dan akunnya tidak pernah benar-benar berganti.'
+    :'Belajar tetap jalan penuh tanpa akun. Masuk hanya menambahkan tutor AI, suara neural, dan sinkron progres antar perangkat.';
+  return `<div class="card account-card"><h3>Akun Puter</h3><p class="muted">Progres belajar, streak, dan tutor AI tersimpan di akun ini.</p><div class="setting-row"><span class="setting-icon"><i data-lucide="user-round"></i></span><span><b id="accountName">${esc(puterAccountLabel())}</b><small>${connected?'Tersambung di perangkat ini':'Belum ada akun tersambung'}</small></span></div><div class="actions">${actions}</div><p class="muted">${esc(note)}</p></div>`
 }
 function bindAccountSettingControls(){
   $('accountSwitch')?.addEventListener('click',runPuterSwitchAccount);
+  $('accountSignIn')?.addEventListener('click',runPuterSignInFromSettings);
   $('accountSignOut')?.addEventListener('click',runPuterSignOut);
   refreshPuterAccountCard();
 }
@@ -3029,7 +3159,7 @@ const SKILL_PAGE_COPY={
   listening:{title:'Listening',lead:'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.'},
   speaking:{title:'Speaking',lead:'Ngomong aja dulu. Rekamannya tidak pernah dikirim ke mana pun, cuma dinilai di perangkatmu.'}
 };
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}}});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}
 // m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
@@ -4485,7 +4615,7 @@ prefetchPlacementListening();
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
 document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
 window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
-window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
+window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
 function installBackNav(){
