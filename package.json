@@ -6,6 +6,7 @@
     "web-push": "3.6.7"
   },
   "scripts": {
+    "test:gems": "node gems-test.js",
     "test:grammar-curriculum": "node grammar-curriculum-test.js",
     "test:grammar-unlock": "node grammar-unlock-test.js",
     "test:grammar-memory-scope": "node grammar-memory-scope-test.js",
