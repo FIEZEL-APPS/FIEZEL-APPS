@@ -285,6 +285,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/library/fiezel-library.js"></script>
   <script defer src="./features/library/fiezel-library-ui.js"></script>
   <script defer src="./features/speaking-listening/speaking-listening-config.js"></script>
+  <!-- Gem Terjemahan. Dimuat SEBELUM addon dan app.js, dan tidak malas: defaultState app.js
+       memanggil freshGems() saat berkas itu dieksekusi, jadi modulnya harus sudah ada.
+       Isinya fungsi murni ~4 KB tanpa DOM dan tanpa jaringan. -->
+  <script defer src="./features/speaking-listening/gems-core.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 

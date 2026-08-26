@@ -67,3 +67,35 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 .fsl-input{padding:12px 13px;border-width:1.5px}
 .fsl-input:focus-visible{outline:2px solid var(--focus-ring,#A67A00);outline-offset:2px;border-color:var(--sun-deep,#E6A800)}
 .fsl-input::placeholder{color:var(--muted,#6E5E47);opacity:1}
+
+/* ===== GEM TERJEMAHAN ===== (reports/recon-listening-gems.md §B.6 butir 8)
+   Baris ini duduk di HEADER kartu sesi, tepat di bawah kicker: harga dan saldo terbaca di
+   tempat yang sama dengan barangnya. Dua target sentuh berdampingan pada 390 px, keduanya
+   ≥44 px tinggi. Chip TIDAK disembunyikan saat saldo 0 - progres "Runtun 3/5" justru paling
+   berguna ketika gem belum ada. */
+.fsl-gem-bar{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:10px 0 4px}
+.fsl-gem-chip{flex:0 1 auto;min-width:0;display:flex;align-items:center;gap:7px;min-height:44px;padding:8px 12px;border-radius:14px;background:var(--sun-soft,#FFF3C4);border:1px solid var(--line,#F0E4CF);color:var(--text,#241A11)}
+.fsl-gem-chip .fsl-gem-mark{flex:0 0 auto;color:var(--sun-deep,#E6A800)}
+.fsl-gem-chip b{font-size:.84rem;font-weight:700;line-height:1.1}
+.fsl-gem-chip small{font-size:.7rem;font-weight:650;color:var(--muted,#6E5E47);line-height:1.1}
+.fsl-gem-toggle{flex:1 1 140px;display:grid;gap:2px;justify-items:start;text-align:left;min-height:44px;padding:8px 13px;border-radius:14px;border:1.5px solid var(--line,#F0E4CF);background:var(--panel-soft,#FFF3DC);color:var(--text,#241A11);font:inherit;cursor:pointer}
+.fsl-gem-toggle .fsl-gem-toggle-label{font-size:.84rem;font-weight:700;line-height:1.2}
+.fsl-gem-toggle small{font-size:.7rem;font-weight:600;color:var(--muted,#6E5E47);line-height:1.25}
+.fsl-gem-toggle[aria-pressed="true"]{border-color:var(--sun-deep,#E6A800);background:var(--sun-soft,#FFF3C4);box-shadow:inset 0 0 0 1px var(--sun-deep,#E6A800)}
+.fsl-gem-toggle:focus-visible{outline:2px solid var(--focus-ring,#A67A00);outline-offset:2px}
+/* Keadaan gem habis: ajakan, bukan paywall. Tidak ada tombol beli di mana pun - sengaja
+   dibuat sebagai teks hangat sewarna panel, bukan peringatan merah. */
+.fsl-gem-empty{flex:1 1 100%;display:grid;gap:4px;padding:11px 13px;border-radius:14px;background:var(--panel-soft,#FFF3DC);border:1px dashed var(--line,#F0E4CF)}
+.fsl-gem-empty[hidden]{display:none}
+.fsl-gem-empty b{font-size:.82rem;font-weight:700}
+.fsl-gem-empty p{margin:0;font-size:.76rem;line-height:1.5;color:var(--muted,#6E5E47)}
+/* Baris terjemahan hidup HANYA di dalam blok feedback pasca-jawab (keputusan m025-148).
+   Labelnya menyebut "terjemahan otomatis" apa adanya: hasil AI on-the-fly, belum dikurasi. */
+.fsl-translation{display:grid;gap:6px;margin:8px 0 0;padding:11px 13px;border-radius:12px;background:rgba(63,143,95,.1)}
+.fsl-translation p{margin:0;font-size:.82rem;line-height:1.55}
+.fsl-translation-options{margin:0;padding-left:19px;display:grid;gap:3px;font-size:.79rem;line-height:1.5}
+.fsl-translation small{font-size:.7rem;color:var(--muted,#6E5E47)}
+.fsl-translation-miss{margin:8px 0 0;padding:10px 12px;border-radius:12px;background:var(--panel-soft,#FFF3DC);font-size:.78rem;line-height:1.5;color:var(--muted,#6E5E47)}
+/* Entri Pengaturan: baris statis (tanpa aksi), dua kalimat penjelasan. */
+.setting-row-static{cursor:default}
+.setting-row-static .setting-note{margin-top:3px;line-height:1.5;opacity:.9}
