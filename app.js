@@ -1495,6 +1495,13 @@ function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);p
 // pembahasan yang muncul terbaca sebagai halaman berikutnya, bukan sebagai
 // tanggapan atas apa yang baru saja ia pilih.
 //
+// KOREKSI DARI QA VISUAL: rencana menulis judul "FIEZEL membaca jawabanmu", dan itu
+// klaim yang salah. #answerBurst sudah menjatuhkan vonis "Benar!"/"Belum tepat" pada
+// milidetik ketukan - harus, karena getar dan bunyinya tidak boleh terlambat 700ms dari
+// jari. Jadi yang benar-benar ditunggu panel ini bukan penilaian melainkan PEMBAHASAN
+// yang ditulis reveal() sesudahnya, dan judulnya berbunyi begitu. Panel yang mengaku
+// sedang menilai padahal nilainya sudah tampil hanya teater.
+//
 // Tiga hal dijaga di sini, dan ketiganya alasan keselamatan bukan alasan rasa:
 //   1. Panelnya dilewati TOTAL saat perangkat minta kurangi-gerak atau preferensi
 //      animasi dimatikan - ambangnya sama dengan pawMotionAllowed(), bukan ambang
@@ -1513,10 +1520,16 @@ function showCoreAnalyzing(then){
   panel.className='core-panel core-analyzing';
   panel.setAttribute('role','status');
   panel.setAttribute('aria-live','polite');
-  panel.innerHTML='<svg class="neural" viewBox="0 0 358 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g stroke="currentColor" stroke-width="1" fill="none" opacity=".65"><path d="M-10 96 C 60 70, 110 108, 178 84 S 300 40, 372 66"/><path d="M-10 40 C 70 66, 140 22, 210 44 S 320 88, 372 30"/></g></svg><div><div class="core-eyebrow">ANALYZING</div><div class="core-title">FIEZEL membaca jawabanmu\u2026</div><div class="core-bar"><i></i></div></div>';
+  panel.innerHTML='<svg class="neural" viewBox="0 0 358 120" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g stroke="currentColor" stroke-width="1" fill="none" opacity=".65"><path d="M-10 96 C 60 70, 110 108, 178 84 S 300 40, 372 66"/><path d="M-10 40 C 70 66, 140 22, 210 44 S 320 88, 372 30"/></g></svg><div><div class="core-eyebrow">ANALYZING</div><div class="core-title">FIEZEL menyiapkan pembahasannya\u2026</div><div class="core-bar"><i></i></div></div>';
+  // QA fase3: pada percobaan KEDUA, banner "Belum tepat" dari percobaan pertama masih
+  // menempel di layar, jadi ANALYZING tampil di bawah vonis yang sudah dijatuhkan.
+  // Bannernya disembunyikan selama panel hidup; reveal() menulis ulang isinya 700ms
+  // kemudian dan melepas .hidden sendiri, jadi tidak ada keadaan yang bisa tertinggal.
+  const hadFeedback=!f.classList.contains('hidden');
+  if(hadFeedback)f.classList.add('hidden');
   f.before(panel);
   pawSetState('thinking',{hold:900});
-  setTimeout(()=>{panel.remove();then()},700);
+  setTimeout(()=>{panel.remove();if(hadFeedback)f.classList.remove('hidden');then()},700);
 }
 let appOpened=false,reminderTimer=null,loginMessageCache=null,notificationRetryBound=false;
 function notificationPermission(){return typeof Notification==='undefined'?'unsupported':Notification.permission}
