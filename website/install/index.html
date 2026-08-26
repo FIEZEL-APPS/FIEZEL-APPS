@@ -6,6 +6,7 @@
 <title>Cara Install FIEZEL di Android, iPhone, dan Desktop</title>
 <meta name="description" content="Panduan pasang FIEZEL ke layar utama lewat Chrome, Safari, atau desktop. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.">
 <meta name="theme-color" content="#FFF9EE">
+<link rel="icon" href="../assets/brand/fiezel-icon.svg" type="image/svg+xml">
 <link rel="icon" href="../assets/brand/fiezel-icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="../assets/brand/fiezel-icon-192.png">
 <meta property="og:type" content="website">
@@ -13,13 +14,24 @@
 <meta property="og:description" content="Panduan pasang FIEZEL ke layar utama lewat Chrome, Safari, atau desktop. Setelah terpasang, materi dan latihan bisa dibuka tanpa internet.">
 <meta property="og:image" content="../assets/brand/fiezel-icon-512.png">
 <meta name="twitter:card" content="summary">
-<link rel="stylesheet" href="../tokens.css?v=m02804rb">
-<link rel="stylesheet" href="install.css">
-<script>document.documentElement.className = 'js';</script>
+<link rel="stylesheet" href="../tokens.css?v=m02805cm">
+<link rel="stylesheet" href="install.css?v=m02805cm">
+<script>document.documentElement.className = 'js' + ((window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) ? '' : ' anim');</script>
 </head>
 <body>
 
 <a class="skip" href="#utama">Lompat ke panduan</a>
+
+<!-- musik latar: tidak pernah autoplay, mulai hanya saat tombol ini ditekan -->
+<button class="music-btn" id="music-toggle" type="button" aria-pressed="false" aria-label="Putar musik latar" title="Putar musik latar" data-src="../assets/music/ambient.mp3">
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path d="M10 16.4V6.1l8.4-1.9v10.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="7.6" cy="16.9" r="2.7" stroke="currentColor" stroke-width="1.8"/>
+    <circle cx="16" cy="14.6" r="2.7" stroke="currentColor" stroke-width="1.8"/>
+    <rect class="m-bar m-wave" x="2.4" y="9" width="1.7" height="7" rx=".85" fill="currentColor"/>
+    <rect class="m-bar m-wave m-wave-2" x="5.1" y="6.4" width="1.7" height="6" rx=".85" fill="currentColor"/>
+  </svg>
+</button>
 
 <header class="top">
   <div class="credit-strip">
@@ -33,19 +45,30 @@
   </div>
   <div class="wrap top-in">
     <a class="brand" href="../" aria-label="FIEZEL — halaman utama">
+      <!-- ikon logo resmi: geometri asli assets/brand/fiezel-paw.svg, diwarnai maroon -->
+      <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
       <svg class="wordmark" viewBox="0 0 968 260" role="img" aria-label="FIEZEL" focusable="false"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
     </a>
-    <a class="back" href="../"><span aria-hidden="true">←</span> Kembali ke halaman utama</a>
+    <a class="back" href="../" aria-label="Kembali ke halaman utama"><span aria-hidden="true">←</span> Kembali<span class="back-long"> ke halaman utama</span></a>
   </div>
 </header>
+
+<div class="masthead">
+  <div class="mast-lock seq seq-1">
+    <svg class="mast-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
+    <svg class="mast-word" viewBox="0 0 968 260" role="img" aria-label="FIEZEL" focusable="false"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
+  </div>
+  <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
+  <hr class="mast-rule seq seq-2" aria-hidden="true">
+</div>
 
 <main id="utama">
 
   <section class="wrap intro">
-    <div class="core-panel intro-stage">
-      <img class="mascot" src="../assets/brand/paw-mascot-head.svg" alt="PAW, maskot kucing FIEZEL" width="72" height="75">
+    <div class="stage intro-stage seq seq-3">
+      <img class="mascot paw-idle" src="../assets/brand/paw-mascot-head.svg" alt="PAW, maskot kucing FIEZEL" width="72" height="75">
       <div>
-        <p class="core-eyebrow">Aplikasi web (PWA)</p>
+        <p class="eyebrow-line">Aplikasi web (PWA)</p>
         <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
       </div>
     </div>
@@ -64,6 +87,7 @@
   </section>
 
   <section class="wrap platforms" aria-labelledby="pilih-perangkat">
+    <span class="sec-num" aria-hidden="true">01 — Perangkat</span>
     <h2 id="pilih-perangkat" class="sec-h">Pilih perangkatmu</h2>
 
     <div class="tabs" id="tabs" role="tablist" aria-label="Pilih platform" hidden>
@@ -111,7 +135,7 @@
     <!-- iOS -->
     <article class="panel" id="panel-ios" role="tabpanel" aria-labelledby="tab-ios" tabindex="0">
       <header class="panel-head">
-        <span class="chip chip-core">iPhone / iPad</span>
+        <span class="chip chip-maroon">iPhone / iPad</span>
         <h3>iPhone dan iPad (Safari)</h3>
       </header>
       <ol class="steps">
@@ -142,7 +166,7 @@
           <div class="step-body"><p>Buka FIEZEL dari ikon barunya di Layar Utama.</p></div>
         </li>
       </ol>
-      <p class="callout callout-core"><strong>Catatan:</strong> Di iOS hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama. Bila kamu membuka FIEZEL dari Chrome iOS, menu itu tidak akan ada.</p>
+      <p class="callout callout-blush"><strong>Catatan:</strong> Di iOS hanya Safari yang bisa menambahkan aplikasi web ke Layar Utama. Bila kamu membuka FIEZEL dari Chrome iOS, menu itu tidak akan ada.</p>
     </article>
 
     <!-- DESKTOP -->
@@ -177,8 +201,9 @@
   </section>
 
   <section class="wrap after" aria-labelledby="setelah">
-    <div class="after-card">
+    <div class="after-card reveal">
       <div class="after-text">
+        <span class="sec-num" aria-hidden="true">02 — Setelah terpasang</span>
         <h2 id="setelah" class="sec-h">Setelah terpasang</h2>
         <p class="must">Materi dan latihan bisa dibuka tanpa internet. Suara neural dan tutor AI butuh jaringan.</p>
         <p>Karena itu, kerjakan lesson grammar, kosakata, dan bacaan kapan saja — termasuk saat sinyal hilang. Sambungkan jaringan bila kamu ingin memakai suara neural atau tutor AI, dan sesekali agar pembaruan materi ikut masuk.</p>
@@ -191,23 +216,24 @@
   </section>
 
   <section class="wrap trouble" aria-labelledby="gagal">
+    <span class="sec-num" aria-hidden="true">03 — Pemecahan masalah</span>
     <h2 id="gagal" class="sec-h">Kalau tidak berhasil</h2>
-    <details class="acc">
+    <details class="acc reveal">
       <summary>Menu install tidak muncul.</summary>
       <p>Pastikan kamu memakai Safari di iPhone atau iPad, dan Chrome di Android. Browser lain sering tidak menyediakan opsi itu. Muat ulang halaman, tunggu sampai selesai, lalu buka menunya lagi.</p>
     </details>
-    <details class="acc">
+    <details class="acc reveal">
       <summary>Ikon sudah ada tapi halaman kosong atau gagal terbuka.</summary>
       <p>Sambungkan internet sekali lagi, buka FIEZEL dari ikonnya, dan biarkan halaman selesai memuat sampai tuntas. Setelah itu materi dan latihan bisa dibuka tanpa internet.</p>
     </details>
-    <details class="acc">
+    <details class="acc reveal">
       <summary>Progres belajar hilang.</summary>
       <p>Progres tersimpan lokal di perangkatmu, bukan di akun. Menghapus data browser, memakai mode private, atau berpindah perangkat berarti mulai dari awal. Pasang FIEZEL dan pakai satu perangkat yang sama untuk belajar rutin.</p>
     </details>
   </section>
 
   <section class="wrap end" aria-labelledby="cta-akhir">
-    <div class="core-panel end-card">
+    <div class="stage end-card reveal">
       <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
       <h2 id="cta-akhir">Sudah terpasang? Mulai lesson pertamamu</h2>
       <p>Buka FIEZEL dari layar utama, pilih tingkat CEFR-mu, lalu kerjakan satu lesson hari ini.</p>
@@ -215,6 +241,7 @@
         <a class="btn btn-primary" href="../app/">Mulai Belajar</a>
         <a class="btn btn-ghost" href="../">Kembali ke halaman utama</a>
       </p>
+      <hr class="end-rule" aria-hidden="true">
     </div>
   </section>
 
@@ -279,6 +306,8 @@
   select(start, false);
 })();
 </script>
+
+<script src="../site.js?v=m02805cm" defer></script>
 
 </body>
 </html>
