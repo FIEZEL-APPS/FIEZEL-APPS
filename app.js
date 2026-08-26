@@ -4028,12 +4028,92 @@ async function sendCreatorReport(reason='manual',force=false){if(!state.preferen
 async function flushReportQueue(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint)||!state.reportMeta?.queue?.length)return false;const pending=[...state.reportMeta.queue];for(const report of pending){try{await deliverCreatorReport(report);state.reportMeta.queue=state.reportMeta.queue.filter(x=>x.id!==report.id);save()}catch{state.reportMeta.lastStatus='error';save();return false}}return true}
 async function maybeSendAccessReport(){if(!state.preferences?.reportConsent||!validReportEndpoint(state.preferences?.reportEndpoint))return false;const today=dayKey(Date.now());if(state.reportMeta?.lastAccessReportDay===today)return false;state.reportMeta.lastAccessReportDay=today;save();return sendCreatorReport('daily_access',true)}
 function openReportPreview(){const report=buildCreatorReport('preview');openModal(`<div class="modal-mark">PRIVACY PREVIEW</div><h2>Data yang akan dikirim</h2><p>FIEZEL mengirim ringkasan kemampuan, bukan isi jawaban mentah, riwayat browser, password, atau API key.</p><div class="report-preview"><p><b>Level:</b> ${esc(report.summary.estimatedLevel)}</p><p><b>Total latihan:</b> ${esc(report.summary.totalAttempts)}</p><p><b>Akurasi:</b> ${report.summary.totalAccuracy==null?'Belum terukur':esc(report.summary.totalAccuracy)+'%'}</p><p><b>Area lemah:</b> ${esc(report.summary.weakSkills.map(x=>x.skill.replace(/_/g,' ')).join(', ')||'Belum terukur')}</p><p><b>Laporan terakhir:</b> ${esc(reportStatusLabel())}</p></div><div class="modal-actions"><button class="primary" id="previewClose"><i data-lucide="arrow-left"></i> Kembali ke pengaturan</button></div>`);$('previewClose').onclick=openSettings;enhanceUI()}
-function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';openModal(`<div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>Atur respons perangkat, suara, gerakan, dan laporan creator dari satu tempat.</p><label class="endpoint-label">Nama panggilan<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="Nama kamu" autocomplete="given-name"></label><div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>Ulangi kenalan cepat</b><small>Tur singkat yang nunjukin tombol mana buat apa</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label></div><div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, ${esc(learnerName())}, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div>${accountSettingsMarkup()}<div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>${continuitySettingsMarkup()}<div class="card"><h3>Masukan untuk pengembang</h3><p class="muted">Materi yang belum ada atau apa pun yang mengganggu. Terkirim tanpa data belajarmu.</p><button id="openFeedback"><i data-lucide="send"></i> Kirim masukan</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div><div class="modal-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);$('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
+// m028-06 (R4 Pengaturan): panel ini dulu SATU gulungan 3.362 px - ±4,5 layar ponsel untuk
+// sebuah modal utilitas, dengan tombol Simpan terkubur di dasarnya (reports/ui-baseline.md).
+// Sekarang isinya dikelompokkan ke lima <details class="settings-fold"> memakai pola
+// .home-fold yang sudah dipakai Home, dan aksi Batal/Simpan jadi footer sticky.
+//
+// Accordion dipilih SENGAJA, bukan tab ala panel Peta: saveSettings() membaca
+// $('reportEndpoint').value dan $('settingHaptics').checked TANPA optional chaining, jadi
+// semua input wajib tetap ada di DOM saat Simpan ditekan. <details> hanya menyembunyikan
+// secara visual - tidak satu elemen pun dilepas - sehingga saveSettings(),
+// refreshInstallHealth(), refreshAudioDiagnostics(), bindVoiceSettingControls(),
+// bindAccountSettingControls(), dan listener backup berjalan tanpa perubahan perilaku.
+// NOL setting dihapus di sini: semua markup lama dipindahkan utuh ke dalam kelompoknya.
+function settingsFold(title,body,open,extraClass){return `<details class="home-fold settings-fold${extraClass?' '+extraClass:''}"${open?' open':''}><summary><span>${title}</span><i data-lucide="chevron-down"></i></summary><div class="settings-fold-body">${body}</div></details>`}
+function openSettings(){const p=state.preferences||defaultPreferences,endpoint=p.reportEndpoint||'';
+  // Kartu Akun Puter dibungkus lipatan bersarang, BUKAN dipindah atau dihapus: elemennya
+  // tetap di DOM (bindAccountSettingControls dan refreshPuterAccountCard tetap menemukannya),
+  // tetapi 330 px penjelasan akun tidak lagi ikut terbuka saat panel baru dibuka.
+  const grupProfil=`<label class="endpoint-label">Nama panggilan<input id="settingLearnerName" type="text" value="${esc(state.userName||'')}" maxlength="24" placeholder="Nama kamu" autocomplete="given-name"></label>`+settingsFold('Akun Puter',accountSettingsMarkup(),false,'settings-subfold');
+  const grupBelajar=`<div class="settings-list"><button type="button" class="setting-row setting-row-action" onclick="replayTour()"><span class="setting-icon"><i data-lucide="rotate-ccw"></i></span><span><b>Ulangi kenalan cepat</b><small>Tur singkat yang nunjukin tombol mana buat apa</small></span><i data-lucide="chevron-right"></i></button><label class="setting-row"><span class="setting-icon"><i data-lucide="wand-sparkles"></i></span><span><b>Animasi antarmuka</b><small>Transisi halaman, kartu, popup, dan feedback jawaban</small></span><input id="settingMotion" type="checkbox" ${p.motion?'checked':''}></label><label class="setting-row"><span class="setting-icon"><i data-lucide="vibrate"></i></span><span><b>Getaran sentuh</b><small>${typeof navigator!=='undefined'&&typeof navigator.vibrate==='function'?'Perangkat ini mendukung getaran':'Akan aktif pada perangkat yang mendukung'}</small></span><input id="settingHaptics" type="checkbox" ${p.haptics?'checked':''}></label></div>`;
+  const grupSuara=`<div class="settings-list"><label class="setting-row"><span class="setting-icon"><i data-lucide="bell-check"></i></span><span><b>Pengingat belajar</b><small>${esc(reminderSettingHint())}</small></span><input id="settingReminders" type="checkbox" ${remindersActive()?'checked':''} ${notificationPermission()==='denied'||notificationPermission()==='unsupported'?'disabled':''} aria-label="Pengingat belajar"></label><label class="setting-row"><span class="setting-icon"><i data-lucide="badge-check"></i></span><span><b>Suara jawaban</b><small>Bunyi naik saat benar dan bunyi lembut saat perlu mencoba lagi</small></span><input id="settingFeedbackSounds" type="checkbox" ${p.feedbackSounds!==false?'checked':''}></label><div class="setting-row" id="audioDiagRow"><span class="setting-icon"><i data-lucide="smartphone"></i></span><span><b>Status bunyi di perangkat ini</b><small id="audioDiagText">Memeriksa…</small></span></div></div><div id="voiceSettingsCard">${neuralVoiceStatusMarkup()}</div>`;
+  // Tombol bersihkan-cache duduk di antara Backup dan Kesehatan Instalasi: kartu diagnosis
+  // itulah yang melaporkan shell usang, jadi tombol perbaikannya berdampingan dengannya.
+  const grupData=`${continuitySettingsMarkup()}<div class="card cache-card"><h3>Bersihkan cache</h3><p class="muted">Menghapus berkas aplikasi lama yang menumpuk lalu memuat ulang — progres belajarmu nggak ikut terhapus.</p><button id="settingClearCache" type="button"><i data-lucide="refresh-ccw"></i> Bersihkan cache &amp; muat ulang</button></div><div class="card"><h3>Kesehatan Instalasi</h3><div id="installHealth"><p class="muted">Memeriksa pemasangan…</p></div></div>`;
+  const grupLanjutan=`<div class="report-settings"><div class="row"><div><b>Creator Learning Report</b><p class="muted">Otomatis setelah sesi selesai. Hanya data agregat.</p></div><button id="reportPreview">Lihat data</button></div><a class="setup-link" href="./creator-report-setup.html" target="_blank" rel="noopener"><i data-lucide="cloud-cog"></i> Pasang Creator Hub satu klik</a><label class="endpoint-label">Endpoint Puter Worker<input id="reportEndpoint" type="url" value="${esc(endpoint)}" placeholder="https://nama-worker.puter.work" autocomplete="off"></label><label class="consent-row"><input id="reportConsent" type="checkbox" ${p.reportConsent?'checked':''}><span>Saya, ${esc(learnerName())}, menyetujui pengiriman ringkasan belajar agregat ke creator dan dapat menonaktifkannya kapan saja.</span></label><p class="report-state">Status: ${esc(reportStatusLabel())}</p></div><div class="card"><h3>Masukan untuk pengembang</h3><p class="muted">Materi yang belum ada atau apa pun yang mengganggu. Terkirim tanpa data belajarmu.</p><button id="openFeedback"><i data-lucide="send"></i> Kirim masukan</button></div>`;
+  openModal(`<div class="settings-head"><div class="modal-mark">FIEZEL CONTROL ROOM</div><h2>Pengalaman ${esc(learnerName())}</h2><p>Semua yang bisa diatur, dikelompokkan per topik. Ketuk kelompoknya untuk membuka.</p></div>`
+    +settingsFold('Profil &amp; Level',grupProfil,true)
+    +settingsFold('Belajar',grupBelajar,false)
+    +settingsFold('Suara &amp; Notifikasi',grupSuara,false)
+    +settingsFold('Data &amp; Penyimpanan',grupData,false)
+    +settingsFold('Lanjutan',grupLanjutan,false)
+    +`<div class="modal-actions settings-actions"><button id="settingsCancel">Batal</button><button class="primary" id="settingsSave">Simpan pengaturan</button></div>`);
+  $('settingsCancel').onclick=closeModal;setTimeout(refreshInstallHealth,0);setTimeout(refreshAudioDiagnostics,0);$('backupExport')?.addEventListener('click',runBackupExport);$('backupPick')?.addEventListener('click',()=>$('backupFile')?.click());$('backupFile')?.addEventListener('change',event=>runBackupImport(event.currentTarget.files?.[0]));$('openFeedback')?.addEventListener('click',()=>{closeModal();openFeedback('')});$('reportPreview').onclick=openReportPreview;$('settingsSave').onclick=saveSettings;$('settingClearCache')?.addEventListener('click',()=>{confirmClearAppCache()});bindVoiceSettingControls();bindAccountSettingControls();$('settingReminders')?.addEventListener('change',event=>toggleStudyReminders(event.currentTarget));
 // Runtime suara dimuat malas (lihat ./fiezel-lazy-loader.js). Kalau murid membuka
 // Pengaturan sebelum gelombang idle selesai, kartunya akan berbunyi "tidak tersedia"
 // padahal berkasnya sedang dalam perjalanan - jadi kartunya digambar ulang begitu tiba.
 if(!self.FiezelVoiceRuntime)ensureVoiceRuntime().then(()=>{const holder=$('voiceSettingsCard');if(!holder)return;holder.innerHTML=neuralVoiceStatusMarkup();bindVoiceSettingControls();enhanceUI()});
 enhanceUI()}
+// m028-06 (R4 Pengaturan): satu-satunya jalan murid membuang cache aplikasi.
+//
+// KONTRAK KERAS: fungsi ini TIDAK PERNAH menyentuh localStorage. Progres belajar hidup di
+// kunci 'fiezel-v4-state', 'fiezel-v5-state:<uuid akun>', dan 'fiezel-v5-legacy-owner';
+// satu-satunya yang boleh menghapusnya adalah resetProgress(). Yang dibuang di sini hanya
+// CacheStorage, dan CacheStorage secara API tidak bisa menyentuh localStorage.
+//
+// Cache `fiezel-v<versi>` DILINDUNGI: di situ tersimpan model suara vendor supertonic-3
+// (±152 MB) yang sw.js sengaja pertahankan lintas rilis ("must survive a shell release").
+// Sisanya (fiezel-shell-*, fiezel-r2-audio-v1, fiezel-puter-voice-v1) boleh dibuang karena
+// terisi ulang sendiri dari jaringan tanpa sintesis berbayar.
+function confirmClearAppCache(){
+  const offline=typeof navigator!=='undefined'&&navigator.onLine===false;
+  openModal(`<div class="modal-mark">FIEZEL</div><h2>Bersihkan cache?</h2><p>Aplikasi akan memuat ulang sebentar setelah cache dibersihkan. Progres belajar, level, dan pengaturanmu aman — nggak ada yang terhapus.</p>${offline?'<p class="muted">Kamu sedang offline sekarang. Tampilan baru bisa diunduh ulang setelah perangkat tersambung internet, jadi sebaiknya tunggu sampai online.</p>':''}<div class="modal-actions"><button id="cacheClearCancel" type="button">Batal</button><button class="primary" id="cacheClearOk" type="button"><i data-lucide="refresh-ccw"></i> Ya, bersihkan</button></div>`);
+  $('cacheClearCancel').onclick=openSettings;
+  $('cacheClearOk').onclick=clearAppCache;
+  enhanceUI()
+}
+// Ekspor ditulis di atas deklarasi (fungsi ter-hoist) supaya blok sumber clearAppCache
+// berakhir bersih - gerbang settings-cache-test menjalankan blok itu apa adanya di vm.
+window.confirmClearAppCache=confirmClearAppCache;window.clearAppCache=clearAppCache;
+async function clearAppCache(){
+  const button=$('cacheClearOk');
+  const dilindungi=`fiezel-v${self.FIEZEL_VERSION||'5.19.0'}`;
+  if(button){button.disabled=true;button.textContent='Membersihkan…'}
+  try{
+    if(typeof caches==='undefined'||!caches||!caches.keys)throw new Error('Browser ini tidak menyediakan penyimpanan cache');
+    const keys=await caches.keys();
+    const targets=keys.filter(name=>String(name).startsWith('fiezel-')&&name!==dilindungi);
+    for(const name of targets)await caches.delete(name);
+    // JANGAN unregister service worker: halaman berikutnya akan kehilangan controller dan
+    // kemampuan offline mati sampai registrasi ulang. update() cukup - ia memberi SW
+    // kesempatan menemukan rilis baru, lalu reload mengisi shell dari jaringan.
+    let catatan='';
+    try{
+      const reg=await (typeof navigator!=='undefined'?navigator.serviceWorker?.getRegistration?.():null);
+      if(reg&&reg.update)await reg.update();
+      else catatan=' Service worker belum terdaftar di perangkat ini, jadi hanya cache yang dibersihkan.';
+    }catch{catatan=' Pembaruan service worker belum bisa diperiksa sekarang.'}
+    if(typeof navigator!=='undefined'&&navigator.onLine===false)catatan+=' Kamu sedang offline: tampilan baru akan lengkap setelah tersambung internet.';
+    showToast(`${targets.length} cache dibersihkan. Progres belajarmu tetap aman.${catatan}`);
+    setTimeout(()=>{try{location.reload()}catch{}},700);
+    return targets
+  }catch(error){
+    showToast(`Gagal membersihkan cache: ${String(error?.message||error)}`);
+    if(button){button.disabled=false;button.innerHTML='<i data-lucide="refresh-ccw"></i> Ya, bersihkan';enhanceUI()}
+    return null
+  }
+}
 // Kalimat status baris pengingat. Ia harus jujur pada TIGA keadaan berbeda yang dulu
 // diringkas menjadi satu "wajib": belum diputuskan, dimatikan murid, dan ditolak browser.
 function reminderSettingHint(){
