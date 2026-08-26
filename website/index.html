@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-music="assets/music/ambient.mp3">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,32 +21,22 @@
 <meta name="twitter:image" content="assets/shots/home-desktop.png">
 <link rel="preload" href="assets/fonts/PlusJakartaSans-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/PlusJakartaSans-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="tokens.css?v=m02805cm">
-<link rel="stylesheet" href="style.css?v=m02805cm">
+<link rel="stylesheet" href="tokens.css?v=m02806">
+<link rel="stylesheet" href="style.css?v=m02806">
+<link rel="stylesheet" href="assets/mascot/fiezel-motion.css?v=m02806">
 <script>if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.className+=' anim';</script>
 </head>
 <body>
 <a class="skip" href="#main">Lewati ke konten utama</a>
 
-<!-- musik latar: tidak pernah autoplay, mulai hanya saat tombol ini ditekan -->
-<button class="music-btn" id="music-toggle" type="button" aria-pressed="false" aria-label="Putar musik latar" title="Putar musik latar" data-src="assets/music/ambient.mp3">
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M10 16.4V6.1l8.4-1.9v10.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="7.6" cy="16.9" r="2.7" stroke="currentColor" stroke-width="1.8"/>
-    <circle cx="16" cy="14.6" r="2.7" stroke="currentColor" stroke-width="1.8"/>
-    <rect class="m-bar m-wave" x="2.4" y="9" width="1.7" height="7" rx=".85" fill="currentColor"/>
-    <rect class="m-bar m-wave m-wave-2" x="5.1" y="6.4" width="1.7" height="6" rx=".85" fill="currentColor"/>
-  </svg>
-</button>
-
 <header class="topbar">
   <div class="credit-strip">
     <div class="wrap credit-in">
       <span>Create by</span>
-      <a class="credit-ig" href="https://www.instagram.com/fitrarustqi?igsi=Z3p0Mm02Njk0a3ln&amp;utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width:15px;height:15px"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <a class="credit-ig" href="https://instagram.com/fitrarustqi" target="_blank" rel="noopener" aria-label="Instagram @fitrarustqi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <strong>@fitrarustqi</strong>
       </a>
-      <strong>@fitrarustqi</strong>
     </div>
   </div>
   <div class="wrap topbar-in">
@@ -64,48 +54,91 @@
 
 <main id="main">
 
-  <!-- ============ HERO ============ -->
-  <section class="hero">
+  <!-- ============ HERO — PANGGUNG VISUAL (arahan owner #2) ============
+       Layar pertama = pertunjukan, bukan artikel: wordmark resmi + tagline 1 baris +
+       CTA, lalu panggung motion graphic (mockup app di frame device + orbit skill +
+       partikel solar + garis path menggambar diri + ring progress + chip CEFR).
+       SEMUA teks panjang pindah ke seksi di bawah panggung ini. -->
+  <section class="hero" id="hero">
     <span class="decor decor-glow" data-parallax="0.10" aria-hidden="true"></span>
     <span class="decor decor-arc" data-parallax="-0.05" aria-hidden="true"></span>
 
-    <!-- masthead: wordmark FIEZEL besar + ikon logo, paling atas halaman -->
     <div class="wrap masthead">
       <div class="mast-lock seq seq-1">
-        <svg class="mast-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><g fill="currentColor"><rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/><rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/><rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/><rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/><path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/></g></svg>
-        <svg class="mast-word" viewBox="0 0 968 260" role="img" aria-label="FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
+        <!-- wordmark RESMI repo: assets/brand/fiezel-wordmark.svg (inline, tint maroon) -->
+        <svg class="mast-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-mast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-mast)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-mast)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       </div>
       <p class="mast-sub seq seq-2">Not just learning with you. Learning about you.</p>
-      <hr class="rule rule-center mast-rule seq seq-2" aria-hidden="true">
+      <div class="cta-row cta-center mast-cta seq seq-3">
+        <a class="btn btn-primary" href="app/">Mulai Belajar</a>
+        <a class="btn btn-ghost" href="install/">Cara Install</a>
+      </div>
     </div>
 
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <p class="eyebrow seq seq-3">Gratis, tanpa langganan</p>
-        <h1 class="seq seq-4">Ruang belajar bahasa Inggris personal milikmu</h1>
-        <p class="lede seq seq-5">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
-        <div class="cta-row seq seq-6">
+    <div class="wrap">
+      <div class="showcase seq seq-4">
+        <div class="showcase-fx" aria-hidden="true">
+          <svg class="fx-lines" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <circle class="fx-ring fx-ring-1" cx="320" cy="320" r="252"/>
+            <circle class="fx-ring fx-ring-2" cx="320" cy="320" r="196"/>
+            <path class="fx-draw fx-draw-1" d="M28 470C142 470 172 302 320 302c148 0 178-158 292-158"/>
+            <path class="fx-draw fx-draw-2" d="M36 190C154 190 186 376 320 376s170 128 284 128"/>
+          </svg>
+          <span class="spark sp1"></span><span class="spark sp2"></span><span class="spark sp3"></span>
+          <span class="spark sp4"></span><span class="spark sp5"></span><span class="spark sp6"></span>
+          <span class="spark sp7"></span><span class="spark sp8"></span>
+          <div class="orbit orbit-a">
+            <span class="orb orb-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19V6a2 2 0 0 1 2-2h9l5 5v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><path d="M14 4v5h5"/><path d="M8 13h7M8 16.5h4"/></svg><b>Grammar</b></span>
+            <span class="orb orb-2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H11v18H5.5A2.5 2.5 0 0 1 3 18.5Z"/><path d="M21 5.5A2.5 2.5 0 0 0 18.5 3H13v18h5.5A2.5 2.5 0 0 0 21 18.5Z"/></svg><b>Reading</b></span>
+            <span class="orb orb-3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3Z"/><path d="M5 17h14"/><path d="M9 8h6M9 11.5h4"/></svg><b>Kosakata</b></span>
+          </div>
+          <div class="orbit orbit-b">
+            <span class="orb orb-4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/></svg><b>Speaking</b></span>
+            <span class="orb orb-5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13a8 8 0 0 1 16 0v5a2 2 0 0 1-2 2h-1.5v-6H20"/><path d="M4 14h3.5v6H6a2 2 0 0 1-2-2Z"/></svg><b>Listening</b></span>
+            <span class="orb orb-6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3.5 0 4.5-10 8-10s4.5 10 8 10"/><path d="M3 12.5h4M17 12.5h4"/></svg><b>Adaptif</b></span>
+          </div>
+        </div>
+
+        <div class="device" data-parallax="-0.035">
+          <div class="phone phone-hero">
+            <div class="phone-screen">
+              <img src="assets/shots/home-mobile.png" alt="Layar Home FIEZEL dengan target harian dan empat skill inti" width="780" height="1688" fetchpriority="high" decoding="async">
+            </div>
+          </div>
+          <svg class="fx-progress" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="pg-track" cx="60" cy="60" r="52"/>
+            <circle class="pg-bar" cx="60" cy="60" r="52"/>
+          </svg>
+        </div>
+
+        <!-- maskot resmi: custom element features/mascot/fiezel-mascot.js (arahan owner #3) -->
+        <fiezel-mascot class="hero-paw" role="img" aria-label="PAW, maskot FIEZEL, melambai menyambutmu"></fiezel-mascot>
+
+        <ul class="cefr-cycle" aria-hidden="true">
+          <li>A1</li><li>A2</li><li>B1</li><li>B2</li><li>C1</li><li>C2</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RINGKASAN (teks panjang: turun setelah panggung visual) ============ -->
+  <section class="sec sec-intro" id="ringkasan">
+    <div class="wrap intro-grid">
+      <div class="intro-copy reveal">
+        <p class="eyebrow">Gratis, tanpa langganan</p>
+        <h1>Ruang belajar bahasa Inggris personal milikmu</h1>
+        <p class="lede">FIEZEL menyatukan grammar, kosakata, reading, speaking, dan listening dalam satu aplikasi yang menyesuaikan soal dengan jawabanmu. Semuanya dipetakan ke tingkat CEFR A1–C2 dan bisa kamu pakai tanpa biaya.</p>
+        <div class="cta-row">
           <a class="btn btn-primary" href="app/">Mulai Belajar</a>
           <a class="btn btn-ghost" href="install/">Cara Install</a>
         </div>
-        <p class="fineprint seq seq-6">Tanpa akun. Progres belajarmu tersimpan di perangkatmu sendiri.</p>
+        <p class="fineprint">Tanpa akun. Progres belajarmu tersimpan di perangkatmu sendiri.</p>
       </div>
-
-      <div class="hero-visual reveal">
-        <div class="stage hero-stage">
-          <p class="eyebrow-line">Adaptive learning companion</p>
-          <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
-          <div class="stage-figures">
-            <img class="mascot paw-idle" src="assets/brand/paw-mascot-full.svg" alt="PAW, maskot kucing geometris FIEZEL" width="200" height="188" decoding="async">
-            <div class="phone">
-              <div class="phone-screen">
-                <img src="assets/shots/home-mobile.png" alt="Layar Home FIEZEL dengan target harian dan empat skill inti" width="780" height="1688" decoding="async">
-              </div>
-            </div>
-          </div>
-          <p class="stage-note">FIEZEL membaca pola jawabanmu, lalu menyesuaikan soal berikutnya — bukan cuma menandai benar atau salah.</p>
-        </div>
-      </div>
+      <aside class="card intro-note reveal">
+        <p class="eyebrow-line">Adaptive learning companion</p>
+        <p class="tagline"><span class="t-1">Not just learning with you.</span> <span class="t-2">Learning about you.</span></p>
+        <p class="intro-note-body">FIEZEL membaca pola jawabanmu, lalu menyesuaikan soal berikutnya — bukan cuma menandai benar atau salah.</p>
+      </aside>
     </div>
 
     <div class="wrap">
@@ -325,7 +358,7 @@
 <footer class="foot">
   <div class="wrap foot-in">
     <div class="foot-brand">
-      <svg class="foot-word" viewBox="0 0 968 260" role="img" aria-label="Wordmark FIEZEL"><g fill="currentColor"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="268" y="30" width="42" height="200" rx="21"/><rect x="268" y="30" width="144" height="42" rx="21"/><rect x="268" y="109" width="100" height="42" rx="21"/><rect x="268" y="188" width="130" height="42" rx="21"/><rect x="446" y="30" width="150" height="42" rx="21"/><rect x="446" y="188" width="150" height="42" rx="21"/><rect x="575" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 575 51)"/><rect x="630" y="30" width="42" height="200" rx="21"/><rect x="630" y="30" width="144" height="42" rx="21"/><rect x="630" y="109" width="100" height="42" rx="21"/><rect x="630" y="188" width="130" height="42" rx="21"/><rect x="808" y="30" width="42" height="200" rx="21"/><rect x="808" y="188" width="130" height="42" rx="21"/><rect x="192" y="30" width="42" height="200" rx="21"/></g></svg>
+      <svg class="foot-word" viewBox="0 0 1000 260" role="img" aria-label="FIEZEL"><defs><linearGradient id="fzwMaroon-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8C2233"/><stop offset="100%" stop-color="#6D1926"/></linearGradient><linearGradient id="fzwGold-foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FFDE59"/><stop offset="45%" stop-color="#FFC700"/><stop offset="100%" stop-color="#E6A800"/></linearGradient></defs><g fill="url(#fzwMaroon-foot)"><rect x="30" y="30" width="42" height="200" rx="21"/><rect x="30" y="30" width="144" height="42" rx="21"/><rect x="30" y="109" width="116" height="42" rx="21"/><rect x="300" y="30" width="42" height="200" rx="21"/><rect x="300" y="30" width="144" height="42" rx="21"/><rect x="300" y="109" width="100" height="42" rx="21"/><rect x="300" y="188" width="130" height="42" rx="21"/><rect x="478" y="30" width="150" height="42" rx="21"/><rect x="478" y="188" width="150" height="42" rx="21"/><rect x="607" y="30" width="191.38" height="42" rx="21" transform="rotate(124.354 607 51)"/><rect x="662" y="30" width="42" height="200" rx="21"/><rect x="662" y="30" width="144" height="42" rx="21"/><rect x="662" y="109" width="100" height="42" rx="21"/><rect x="662" y="188" width="130" height="42" rx="21"/><rect x="840" y="30" width="42" height="200" rx="21"/><rect x="840" y="188" width="130" height="42" rx="21"/></g><g fill="url(#fzwGold-foot)"><rect x="192" y="30" width="26" height="200" rx="13"/><rect x="240" y="106" width="26" height="124" rx="13"/></g></svg>
       <p class="foot-tag">Ruang belajar bahasa Inggris personal.</p>
       <nav class="foot-links" aria-label="Tautan footer">
         <a href="app/">Buka Aplikasi</a>
@@ -344,6 +377,7 @@
   <div class="wrap foot-copy"><p>© 2026 FIEZEL</p></div>
 </footer>
 
-<script src="site.js?v=m02805cm" defer></script>
+<script src="assets/mascot/fiezel-mascot.js?v=m02806" defer></script>
+<script src="site.js?v=m02806" defer></script>
 </body>
 </html>

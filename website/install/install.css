@@ -24,8 +24,9 @@
 .masthead{padding:30px 22px 4px;text-align:center}
 .mast-lock{display:inline-flex;align-items:center;justify-content:center;gap:15px}
 .mast-icon{width:40px;height:40px;color:var(--maroon);flex:0 0 auto}
-.mast-word{width:min(66vw,280px);height:auto;color:var(--maroon-deep)}
-.mast-word rect{fill:currentColor}
+/* wordmark RESMI (assets/brand/fiezel-wordmark.svg) — gradient internalnya dipakai apa
+   adanya, jadi TIDAK ada override fill di sini. */
+.mast-word{width:min(66vw,280px);height:auto}
 .mast-sub{margin:12px 0 0;font-size:var(--fs-micro);font-weight:700;letter-spacing:var(--track-wide);
   text-transform:uppercase;color:var(--maroon-soft)}
 .mast-rule{margin:20px auto 0;max-width:260px;height:1px;border:0;
