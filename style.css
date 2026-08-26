@@ -3260,3 +3260,13 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .core-cta{background:linear-gradient(135deg,var(--sun),var(--sun-deep));color:var(--text);border:1.5px solid var(--sun-deep)}
 .core-ghost{background:var(--core-soft);border:1.5px solid var(--core-line);color:var(--on-core)}
 .core-cta:focus-visible,.core-ghost:focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
+
+/* ---------- §6 layar selesai ----------
+   Skor berhenti berwarna hijau: hijau adalah warna BENAR di sistem ini (banner, opsi),
+   dan memakainya untuk skor 34% berarti mengucapkan "bagus" pada sesi yang justru perlu
+   diulang. Angkanya jadi tinta biasa; yang merayakan adalah piala, maskot, dan bunyinya. */
+.result-card .score{color:var(--text)}
+.ring-row{display:flex;align-items:center;justify-content:center;gap:14px}
+.ring-row .coach-strip-face{flex:0 0 auto;width:52px;height:52px}
+.result-actions{display:grid;gap:9px;margin-top:4px}
+.result-actions .ghost{min-height:44px;background:transparent;border:1.5px solid var(--line);color:var(--muted)}

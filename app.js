@@ -3856,7 +3856,15 @@ function finishQuiz(cfg,score,total,tutorReport){
   // m026-01: menempel pada uiSfx('celebrate') dengan sengaja - keduanya perayaan yang
   // sama, dan keduanya hanya berjalan pada penutupan sesi yang MEMANG tampil di layar.
   pawReact('lesson-complete');
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="score">${accuracy}%</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${outcomeLine}<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`,'hero result-card')}</section>`);
+  // m028 fase3 (PATCH-PLAN §6): layar selesai dulu satu jalan keluar - "Kembali ke Home".
+  // Murid yang baru saja menyelesaikan sesi dan masih mau lanjut harus kembali ke Home
+  // dulu lalu mencari pintunya sendiri. Tujuan lanjutan diambil dari policy adaptif yang
+  // sama dengan panel NEXT SESSION di Peta Belajar, jadi kedua layar tidak pernah
+  // menyarankan dua hal yang berbeda. Tes penempatan TIDAK diberi tombol lanjut: hasilnya
+  // adalah levelnya, dan langkah setelahnya bukan "satu sesi lagi".
+  let nextDomain='';
+  if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=p?.primaryDomain==='vocab'?'vocab':p?.primaryDomain==='reading'?'reading':'grammar'}catch(_){nextDomain='grammar'}}
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${tutorLine}${outcomeLine}${nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   showToast(accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
   // Momen wajar untuk menawarkan pengingat sekali lagi kepada murid yang tadi memilih
