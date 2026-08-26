@@ -141,3 +141,4 @@ jobs:
           node ai-task-contract-test.js
           node breaker-test.js
           node prerender-dryrun-test.js
+          node owner-dashboard-test.js
