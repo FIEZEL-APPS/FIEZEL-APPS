@@ -204,8 +204,65 @@
     return '<div class="fiezel-dots" aria-hidden="true">' + out + '</div>';
   }
 
+  // -------------------------------------------------------------------------------------
+  // m028 (rebrand "Warm Paper, Bright Mind"): tiga hiasan kepala yang BUKAN kontrol.
+  //
+  // Tidak ada langkah baru, tidak ada data baru, tidak ada cabang logika baru. Yang
+  // ditambahkan hanya jawaban atas tiga pertanyaan yang selalu ditanyakan murid di layar
+  // perkenalan mana pun: aplikasi apa ini, saya di langkah berapa dari berapa, dan siapa
+  // yang sedang bicara. Sebelum ini ketiganya tidak dijawab sama sekali.
+  // -------------------------------------------------------------------------------------
+
+  // Nama langkah untuk breadcrumb stepper. Urutannya WAJIB mengikuti step 1..LAST_STEP di
+  // render() - kalau suatu hari langkah ditambah, daftar ini yang pertama harus ikut.
+  var STEP_LABELS = ['Nama', 'Kenalan', 'Tujuan', 'Level', 'Pengingat', 'Selesai'];
+
+  // Band gelap pembawa merek. Warnanya sama dengan panggung splash yang baru saja tutup,
+  // jadi peralihan splash -> onboarding terbaca sebagai satu gerakan, bukan dua layar yang
+  // tidak saling kenal. Wordmark diambil dari sumber tunggalnya (FiezelSplash) dengan
+  // awalan id sendiri: id gradien bersifat global di dokumen, dan splash boleh masih ada di
+  // DOM saat onboarding menggambar.
+  function reveal(env) {
+    var brand = env && env.FiezelSplash && typeof env.FiezelSplash.wordmarkMarkup === 'function'
+      ? env.FiezelSplash.wordmarkMarkup('fzob')
+      : '<p class="fiezel-ob-word">FIEZEL</p>';
+    return '<div class="fiezel-ob-reveal">' + brand
+      + '<p class="fiezel-ob-tag">Adaptive English</p></div>';
+  }
+
+  // Stepper enam segmen. Murni turunan dari nomor langkah yang sudah ada - ia tidak
+  // menyimpan keadaan apa pun, jadi tidak bisa melenceng dari langkah yang sebenarnya.
+  function stepper(step) {
+    var current = Math.min(STEP_LABELS.length, Math.max(1, Number(step) || 1));
+    var bars = '';
+    for (var i = 1; i <= STEP_LABELS.length; i++) {
+      bars += '<i' + (i <= current ? ' class="is-done"' : '') + '></i>';
+    }
+    return '<div class="fiezel-stepper">'
+      + '<span class="fiezel-stepper-eyebrow">Langkah ' + current + ' dari ' + STEP_LABELS.length + '</span>'
+      + '<span class="fiezel-stepper-names"><b>' + escapeHtml(STEP_LABELS[current - 1]) + '</b>'
+      + (current < STEP_LABELS.length ? ' · berikutnya: ' + escapeHtml(STEP_LABELS[current]) : ' · terakhir') + '</span>'
+      + '<div class="fiezel-segments" role="progressbar" aria-valuemin="1" aria-valuemax="'
+      + STEP_LABELS.length + '" aria-valuenow="' + current + '" aria-label="Kemajuan perkenalan">'
+      + bars + '</div></div>';
+  }
+
+  // Sapaan: kartu wajah + gelembung. Teksnya berbeda tiap langkah supaya perkenalan terasa
+  // ada yang menemani, bukan formulir enam halaman. Disembunyikan dari pembaca layar
+  // HANYA untuk wajahnya (di art()); kalimatnya tetap dibacakan karena ia informasi.
+  function greet(env, icon, text) {
+    return '<div class="fiezel-stage"><div class="fiezel-stage-art">'
+      + art(env, icon, 64)
+      + '<p class="fiezel-greet-bubble">' + escapeHtml(text) + '</p>'
+      + '</div></div>';
+  }
+
   function topbar(showBack, showSkip) {
-    return '<div class="fiezel-topbar">'
+    // m028: kalau tidak ada satu pun kontrol yang tampak (langkah 1: tanpa Kembali, tanpa
+    // Lewati), baris ini menyusut. Sebelumnya ia tetap memakan 44px kosong tepat di bawah
+    // band merek, dan celah itu terbaca sebagai kesalahan tata letak, bukan sebagai ruang.
+    var bare = !showBack && showSkip === false;
+    return '<div class="fiezel-topbar' + (bare ? ' is-bare' : '') + '">'
       + '<button type="button" class="fiezel-back"' + (showBack ? '' : ' hidden') + ' data-ob-back>'
       + '<i data-lucide="chevron-left"></i>Kembali</button>'
       + (showSkip === false ? '<span class="fiezel-skip-spacer" aria-hidden="true"></span>'
@@ -240,11 +297,13 @@
   // ---------------------------------------------------------------------------------------
   function nameMarkup(env, typed) {
     var clean = normalizeName(typed);
-    return topbar(false, false)
+    return reveal(env)
       // Lambangnya harus ada di lucide.min.js yang benar-benar dikirim (57 ikon, bukan set
       // penuh). Ikon yang tidak ada tidak melempar - ia hanya menggambar piringan kosong,
       // dan itu terbaca sebagai gambar yang gagal dimuat.
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'user-round', 180) + '</div></div>'
+      + topbar(false, false)
+      + stepper(1)
+      + greet(env, 'user-round', 'Senang ketemu kamu! Kita mulai dari yang paling gampang.')
       + '<div class="fiezel-sheet" data-ob-step="name">'
       + '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>'
       + '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>'
@@ -271,8 +330,10 @@
         + '<span>' + escapeHtml(it.label) + '</span></div>';
     }).join('');
     var isLast = slideIndex === CAROUSEL_SLIDES.length - 1;
-    return topbar(false)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, slide.art, 200) + '</div></div>'
+    return reveal(env)
+      + topbar(false)
+      + stepper(2)
+      + greet(env, slide.art, 'Ini isi aplikasinya. Sebentar saja, dua layar.')
       + '<div class="fiezel-sheet" data-ob-step="2">'
       + '<h2 class="fiezel-title">' + escapeHtml(slide.title) + '</h2>'
       + '<p class="fiezel-body">' + escapeHtml(slide.body) + '</p>'
@@ -302,8 +363,10 @@
       var selected = lv === selectedLevel;
       return '<button type="button" class="fiezel-level-chip' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
     }).join('') + '</div>' : '';
-    return topbar(false)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'sparkles', 180) + '</div></div>'
+    return reveal(env)
+      + topbar(false)
+      + stepper(3)
+      + greet(env, 'sparkles', 'Tujuanmu yang menentukan materi mana yang kamu dapat dulu.')
       + '<div class="fiezel-sheet" data-ob-step="3">'
       + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
@@ -318,8 +381,10 @@
   // Step 4: Placement (mengarah ke tes 25 soal yang sungguhan, bukan versi 4-5 soal palsu)
   // ---------------------------------------------------------------------------------------
   function placementMarkup(env) {
-    return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'book-open-text', 200) + '</div></div>'
+    return reveal(env)
+      + topbar(true)
+      + stepper(4)
+      + greet(env, 'book-open-text', 'Santai, ini bukan ujian. Bisa kamu hentikan kapan saja.')
       + '<div class="fiezel-sheet" data-ob-step="4">'
       + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
       + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
@@ -333,8 +398,10 @@
   // Step 5: Schedule & Reminders (jujur soal cara ALRS bekerja, bukan pemilih jam palsu)
   // ---------------------------------------------------------------------------------------
   function scheduleMarkup(env) {
-    return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + art(env, 'clock-3', 200) + '</div></div>'
+    return reveal(env)
+      + topbar(true)
+      + stepper(5)
+      + greet(env, 'clock-3', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
@@ -358,8 +425,12 @@
       }
       confetti = '<div class="fiezel-confetti" aria-hidden="true">' + pieces + '</div>';
     }
-    return topbar(true)
-      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'trophy', 220) + '</div></div>'
+    return reveal(env)
+      + topbar(true)
+      + stepper(6)
+      + '<div class="fiezel-stage"><div class="fiezel-stage-art">' + confetti + art(env, 'trophy', 64)
+      + '<p class="fiezel-greet-bubble">Sudah beres semua. Ini rangkumannya.</p>'
+      + '</div></div>'
       + '<div class="fiezel-sheet" data-ob-step="6">'
       + '<h2 class="fiezel-title">' + (name ? escapeHtml(name) + ', siap belajar bersama Percik!' : 'Siap belajar bersama Percik!') + '</h2>'
       + '<div class="fiezel-summary-card">'
@@ -409,6 +480,34 @@
     var selectedLevel = '';
     var closed = false;
 
+    /**
+     * m028: menggambar ikon Lucide - dan MENCOBA LAGI kalau pustakanya belum ada.
+     *
+     * lucide.min.js dimuat dengan `defer`, sedangkan perkenalan digambar dari jalur boot yang
+     * berjalan lebih dulu. Sebelum ini akibatnya tersembunyi: createIcons() dipanggil sekali,
+     * gagal diam-diam karena target.lucide masih undefined, dan setiap <i data-lucide> di
+     * perkenalan tinggal jadi elemen kosong. Dulu itu tidak terlihat karena lambangnya duduk
+     * di tengah piringan besar yang toh sudah berisi gradien; sejak lambang itu menjadi kartu
+     * wajah 64px dengan garis tinta, yang tampak adalah kotak kuning kosong.
+     *
+     * Percobaan ulangnya dibatasi 12 kali x 120ms (~1,4 detik) dan berhenti begitu berhasil,
+     * jadi ia tidak bisa berubah menjadi loop yang menggantung kalau pustakanya memang tidak
+     * ikut terkirim - dalam keadaan itu perkenalan tetap jalan, hanya tanpa ikon.
+     */
+    var iconTries = 0;
+    function drawIcons() {
+      var ok = false;
+      try {
+        if (target.lucide && target.lucide.createIcons) {
+          target.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true' } });
+          ok = true;
+        }
+      } catch (_) { ok = false; }
+      if (ok || closed || iconTries >= 12) return;
+      iconTries++;
+      try { target.setTimeout(drawIcons, 120); } catch (_) {}
+    }
+
     function paint() {
       var html;
       if (step === 1) html = nameMarkup(target, typedName);
@@ -418,7 +517,7 @@
       else if (step === 5) html = scheduleMarkup(target);
       else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
       host.innerHTML = html;
-      try { target.lucide && target.lucide.createIcons && target.lucide.createIcons({ attrs: { 'stroke-width': 1.8, 'aria-hidden': 'true' } }); } catch (_) {}
+      drawIcons();
       bind();
     }
 
