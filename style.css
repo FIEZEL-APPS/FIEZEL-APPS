@@ -3230,7 +3230,7 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .tutor-turn-face{background:var(--sun);color:var(--text)}
 /* Penanda "Jeda mengajar" jadi bidang, bukan teks abu di antara teks abu lain: ia
    satu-satunya keterangan bahwa layar ini BUKAN soal. --info di atas --sun-soft 5,9:1. */
-.quiz-teach-flag{padding:4px 10px;border-radius:999px;font-size:.7rem;background:var(--sun-soft);color:var(--info)}
+.quiz-teach-flag{padding:4px 10px;border-radius:999px;font-size:.75rem;background:var(--sun-soft);color:var(--info)}
 
 /* ---------- §4 flashcard: chip level + "Kelas kata" ----------
    indonesianPartOfSpeech() sudah menerjemahkan kuncinya sejak lama, jadi ini bukan
@@ -3253,7 +3253,7 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .map-row .mp{text-align:right;font-weight:800;font-size:.84rem;font-variant-numeric:tabular-nums}
 /* Keterangan bukti pindah ke baris kedua di kolom batang: pada layar sempit ia tidak
    pernah ikut menyempitkan batangnya sendiri. */
-.map-row .me{grid-column:3/5;font-size:.72rem;color:var(--muted);line-height:1.4}
+.map-row .me{grid-column:3/5;font-size:.75rem;color:var(--muted);line-height:1.4}
 .map-note{display:flex;align-items:center;gap:9px;margin:14px 0 0;font-size:.79rem;line-height:1.5;color:var(--muted)}
 .map-note .coach-strip-face{flex:0 0 auto;width:28px;height:28px}
 
