@@ -84,7 +84,7 @@ const COPY = {
       'Terlalu cepat? Kecepatan suara bisa diatur di FIEZEL Control Room \u2014 buka lewat tombol Pengaturan kapan aja.']
   ]
 };
-const REPLAY_SUBTEXT = 'Menjalankan ulang tur menu dari awal. Tur fitur (Audiobook, Listening, dan lainnya) juga bakal muncul lagi pas kamu masuk fiturnya.';
+const REPLAY_SUBTEXT = 'Menjalankan ulang tur menu dari awal. Tur fitur (Audiobook dan Listening) juga bakal muncul lagi pas kamu masuk fiturnya.';
 
 /* ------------------------------------------------------------ T1: registri --- */
 
