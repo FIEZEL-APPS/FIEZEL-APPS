@@ -68,7 +68,10 @@ const PLACEMENT_SIZE = sizeMatch ? Number(sizeMatch[1]) : 0;
 check('PLACEMENT_SIZE is a sane question count', PLACEMENT_SIZE >= 12 && PLACEMENT_SIZE <= 60,
   `PLACEMENT_SIZE=${PLACEMENT_SIZE}; di bawah 12 soal tidak cukup bukti untuk enam band CEFR`);
 
-const scoringMatch = app.match(/if\(cfg\.placement\)\{(state\.level=accuracy[^;]+;)state\.placementDone=true\}/);
+// m025-165: baris skoring kini juga mengadopsi hasil placement ke levelTrust (kontrak owner:
+// placement adalah bukti), jadi setelah placementDone boleh ada pernyataan lanjutan di blok
+// yang sama. Yang diekstrak tetap HANYA pernyataan skoringnya sendiri.
+const scoringMatch = app.match(/if\(cfg\.placement\)\{(state\.level=accuracy[^;]+;)state\.placementDone=true[;}]/);
 check('Placement scoring statement is extractable', !!scoringMatch,
   scoringMatch ? scoringMatch[1] : 'pola inline di finish quizLoop() berubah — perbarui regex, jangan lemahkan');
 
