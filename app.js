@@ -3920,9 +3920,42 @@ function coreBrainPanelMarkup(){
 const PROGRESS_TABS=[['overview','Ringkasan'],['analysis','Analisis'],['adaptive','Adaptive Engine'],['readiness','Kesiapan & Skills']];
 let progressTab='overview';
 function switchProgressTab(tab){if(!PROGRESS_TABS.some(([id])=>id===tab)||progressTab===tab)return;progressTab=tab;progress()}
+/**
+ * m028 fase3 (PATCH-PLAN §5): panel "NEXT SESSION · dipilih PAW".
+ *
+ * buildAdaptivePolicy() sudah memilih mode, fokus, jumlah soal, dan perkiraan menit
+ * untuk sesi berikutnya - tetapi keputusan itu hanya terbaca kalau murid membuka tab
+ * Adaptive Engine dan mau membaca enam kotak diagnostik. Ringkasan yang sama dinaikkan
+ * ke Ringkasan sebagai satu ajakan: inilah yang akan dilatih, sekian soal, sekian menit.
+ *
+ * SETIAP angka di sini berasal dari policy yang benar-benar dipakai untuk memilih soal.
+ * Mockup desain memuat prediksi "+9% dalam seminggu"; angka itu TIDAK dibuat di sini -
+ * tidak ada model di aplikasi ini yang menghasilkannya, dan menggambarnya sama dengan
+ * menjanjikan hasil yang tidak pernah dihitung.
+ */
+function nextSessionPanelMarkup(){
+  let p=null;
+  try{p=buildAdaptivePolicy()}catch(_){return ''}
+  if(!p)return '';
+  const fokus=p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain);
+  const view=p.primaryDomain==='vocab'?'vocab':p.primaryDomain==='reading'?'reading':'grammar';
+  const ukuran=Number(p.sessionSize)||0,menit=Number(p.estimatedMinutes)||0;
+  const takaran=ukuran?`<b>${ukuran} soal${menit?` · \u00b1${menit} menit`:''}</b>`:'';
+  return `<section class="core-panel next-session">
+    <div><div class="core-eyebrow">NEXT SESSION \u00b7 DIPILIH PAW</div>
+    <div class="core-title">${esc(fokus)}</div>
+    <div class="core-sub">${esc(p.summary||'')} ${takaran}</div>
+    <div class="core-actions"><button type="button" class="core-cta" onclick="go('${view}')">Mulai sesi</button>
+    <button type="button" class="core-ghost" onclick="switchProgressTab('adaptive')">Lihat alasannya</button></div></div></section>`;
+}
 function progress(){
  const active=getActiveLevel(),snapshot=buildLearningSnapshot(),acc=snapshot.totalAccuracy??0;const profile=getDiagnosticProfile();const map=[['Kosakata','vocab',state.vocab],['Grammar','grammar',state.grammar],['Reading','reading',state.reading]];
- const mapCards=map.map(([name,type,bucket])=>{const items=Object.entries(bucket||{}).filter(([key,x])=>x?.total&&(contentLevelFor(type,key)||active)===active).map(([,x])=>x),m=items.length?Math.round(items.reduce((a,x)=>a+(x.mastery||0),0)/items.length):0;return card(`<div class="row"><b>${name}</b><strong>${m}%</strong></div><div class="bar"><i style="width:${m}%"></i></div><p class="muted">${items.length} materi ${active} sudah memiliki bukti belajar</p>`) }).join('');
+ // m028 fase3 (PATCH-PLAN §5): peta belajar dulu TIGA kartu terpisah untuk tiga angka.
+ // Tiga kartu berdampingan membuat perbandingan - satu-satunya alasan peta ini ada -
+ // harus dikerjakan dengan mata melompat antar kotak. Sekarang satu kartu, tiga baris,
+ // batangnya sejajar di kolom yang sama. Datanya persis sama: m% per domain.
+ const mapRows=map.map(([name,type,bucket])=>{const items=Object.entries(bucket||{}).filter(([key,x])=>x?.total&&(contentLevelFor(type,key)||active)===active).map(([,x])=>x),m=items.length?Math.round(items.reduce((a,x)=>a+(x.mastery||0),0)/items.length):0;return `<div class="map-row"><span class="mi fz-i" data-fz-icon="${type}" aria-hidden="true"></span><span class="mn">${name}</span><span class="bar"><i style="width:${m}%"></i></span><strong class="mp">${m}%</strong><small class="me">${items.length} materi ${active} sudah punya bukti belajar</small></div>`}).join('');
+ const mapCards=card(`<div class="map-rows">${mapRows}</div><p class="map-note">${pawFaceMarkup()}<span>Ini peta kemampuanmu, bukan rapor. Yang rendah cuma berarti belum banyak dilatih.</span></p>`);
  const tl=skillTimeline(),days=Object.keys(tl).sort().slice(-7);const timelineHtml=days.length?days.map(d=>{const x=tl[d];const vals=Object.entries(x).map(([k,v])=>`${esc(friendlySkillName(k))} ${Math.round(v.correct/v.total*100)}%`).join(' · ');return `<div class="timeline-row"><span>${d}</span><span>${vals}</span></div>`}).join(''):'<p class="muted">Bukti belajar belum cukup untuk membuat linimasa.</p>';
  const patterns=errorPatterns().slice(0,6);const conf=confidenceCalibration();const due=dueItems().sort((a,b)=>forgettingProbability(b[1])-forgettingProbability(a[1])).slice(0,8);const pairs=confusionPairs();const diag=diagnosticReport(),evidence=buildLearnerEvidenceModel();
  const readingSkills=['reading_inference','reading_detail','reading_vocabulary','reading_purpose','reading_comparison'];
@@ -3935,7 +3968,7 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid"><div><h3>Peta Belajar</h3>${mapCards}</div>
+  overview:`<div class="grid">${nextSessionPanelMarkup()}<div><h3>Peta Belajar</h3>${mapCards}</div>
    ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${x.mastery||0}% dikuasai · risiko lupa ${Math.round(forgettingProbability(x)*100)}%</span></div>`).join('<hr>'):'<p class="muted">Belum ada materi yang perlu diulang sekarang.</p>'}`)}
    ${card(`<h3>Laporan Diagnostik</h3>${diagHtml}`)}
    </div>`,
