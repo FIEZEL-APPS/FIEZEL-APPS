@@ -195,7 +195,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .fade .card:nth-of-type(5){animation-delay:.22s}
 .fade .card:nth-of-type(n+6){animation-delay:.26s}
 
-.hero{padding:26px;background:linear-gradient(150deg,var(--surface-solid) 0%,var(--accent-soft) 130%);border-color:#f0dfe3}
+.hero{padding:26px;background:linear-gradient(150deg,var(--surface-solid) 0%,var(--sun-soft) 130%);border-color:var(--line)}
 .hero h2{font-size:1.85rem;line-height:1.12;letter-spacing:-.035em;margin:8px 0 8px;font-weight:800}
 .hero p{color:var(--muted);line-height:1.6;font-size:.92rem;margin:0 0 16px}
 .eyebrow{font-size:12px;letter-spacing:.1em;color:var(--info);font-weight:700;text-transform:uppercase}
@@ -239,9 +239,12 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 
 /* m025-85: Peta Belajar tab switcher - keeps the 17 sections that used to be one
    long scroll grouped and reachable without turning this into a separate route. */
-.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding-bottom:2px;-webkit-overflow-scrolling:touch}
-.progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:.82rem;font-weight:650;white-space:nowrap}
-.progress-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+/* Segmented control, bukan deretan tombol lepas: kapsulnya SATU bidang --panel-soft
+   dan tab-nya kehilangan garisnya sendiri, jadi yang terbaca adalah satu kontrol
+   dengan satu bagian terpilih. Tab aktif = bidang tinta (resep components.css §6). */
+.progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch}
+.progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:36px;white-space:nowrap}
+.progress-tab.active{background:var(--text);border-color:var(--text);color:var(--on-core)}
 
 .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 .word{font-size:2.6rem;margin:6px 0;font-weight:800;letter-spacing:-.03em}
@@ -283,8 +286,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .emoji{font-size:2.6rem}
 .score{font-size:3.4rem;font-weight:900;color:var(--green);margin:10px 0;letter-spacing:-.03em;animation:pop .5s var(--ease-spring)}
 .meter{margin:13px 0}
-.bar{height:8px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:7px}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#d9909c,var(--accent));border-radius:999px;transition:width .6s var(--ease)}
+/* Track = --line-soft (garis, bukan bidang biru dingin #e9eef5 yang tidak ada di
+   palet sama sekali). Isi = keluarga sun, gelap ke arah kanan supaya arah majunya
+   terbaca tanpa membaca angkanya. */
+.bar{height:8px;background:var(--line-soft);border-radius:999px;overflow:hidden;margin-top:7px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun),var(--sun-deep));border-radius:999px;transition:width .6s var(--ease)}
 
 /* ---------- toast ---------- */
 .toast{
@@ -818,7 +824,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .home-overview{display:grid;grid-template-columns:minmax(320px,.92fr) minmax(0,1.08fr);gap:12px}
 .mission-panel{display:flex;align-items:center;gap:19px;padding:22px;border:1px solid var(--glass-line);background:var(--glass-thick);border-radius:20px;color:var(--glass-text)}
 .mission-panel h3{margin:2px 0 4px;font-size:1.05rem}.mission-panel p{margin:0;color:var(--glass-muted);font-size:.78rem;line-height:1.55}
-.mission-ring{--ring-size:76px;width:var(--ring-size);height:var(--ring-size);flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--mission),#e4e1eb 0)}
+.mission-ring{--ring-size:76px;width:var(--ring-size);height:var(--ring-size);flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--sun-deep) var(--mission),var(--line-soft) 0)}
 .mission-ring::before{content:"";grid-area:1/1;width:60px;height:60px;border-radius:50%;background:var(--panel)}
 .mission-ring div{grid-area:1/1;z-index:1;display:flex;align-items:baseline}.mission-ring strong{font-size:1.2rem}.mission-ring span{font-size:.65rem;color:var(--muted)}
 .home-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--glass-line);border-radius:20px;background:var(--glass-thick);overflow:hidden;color:var(--glass-text)}
@@ -831,7 +837,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .launch-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--accent-soft);color:var(--accent-strong)}.launch-icon svg{width:22px;height:22px}
 .launch-card small{color:var(--muted);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase}.launch-card b{font-size:1.3rem;letter-spacing:-.025em}.launch-card em{font-style:normal;font-weight:450;color:var(--muted);font-size:.78rem;line-height:1.5}
 .launch-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md)}
-.grammar-launch .launch-icon{background:#f4ead7;color:#8a6228}.reading-launch .launch-icon{background:#e1efeb;color:#287662}.skills-launch .launch-icon{background:#e8e5f8;color:#5f50b8}
+.grammar-launch .launch-icon{background:var(--sun-soft);color:var(--info)}.reading-launch .launch-icon{background:var(--good-soft);color:var(--good)}.skills-launch .launch-icon{background:var(--info-soft);color:var(--info)}
 .skills-page{display:grid;gap:18px}.voice-setup-card{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.93);color:var(--text)}.voice-setup-copy{min-width:0;flex:1}.voice-setup-card h2{margin:0 0 7px;font-size:1.15rem}.voice-setup-card p{max-width:720px;margin:0;color:var(--muted);font-size:.8rem;line-height:1.55}.voice-setup-actions{display:flex;gap:10px;align-items:center;flex:0 0 auto}.voice-setup-card button{flex:0 0 auto}.neural-voice-choice{display:grid;gap:5px;margin-top:14px;max-width:360px}.neural-voice-choice span{font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.neural-voice-choice select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-solid);color:var(--text);font:inherit}.neural-voice-choice small{color:var(--muted);font-size:.72rem;line-height:1.4}.skills-loading{padding:24px}
 .privacy-strip{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:20px 22px;border:1px solid var(--line);border-radius:20px;background:rgba(var(--surface-rgb),.9);color:var(--text)}
 .privacy-strip>div{display:flex;align-items:center;gap:13px}.privacy-strip b{font-size:.86rem}.privacy-strip p{margin:3px 0 0;color:var(--muted);font-size:.74rem}.privacy-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:13px;color:var(--accent-strong);background:var(--accent-soft)}
@@ -862,7 +868,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .modal-panel{max-height:min(760px,88vh);overflow:auto}
 
 .bottomnav{width:min(620px,calc(100% - 24px));padding:7px;border-color:rgba(223,221,214,.82);background:rgba(var(--surface-rgb),.88);box-shadow:0 20px 50px rgba(17,23,42,.13);color:var(--text)}
-.nav{display:flex;flex-direction:column;gap:3px;min-height:54px}.nav svg{width:18px;height:18px}.nav.active{color:var(--accent-strong);background:var(--accent-soft)}
+.nav{display:flex;flex-direction:column;gap:3px;min-height:54px}.nav svg{width:18px;height:18px}.nav.active{color:var(--text);background:var(--sun-soft)}
 .topline button,.toolbar button,.flash-actions button,.quiz-topbar button{display:inline-flex;align-items:center;gap:7px}
 .feedback{background:var(--panel);color:var(--text)}
 /* Aksen kiri 4px dipasang lewat box-shadow inset, BUKAN border-left: border akan
@@ -918,7 +924,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
   .learning-launcher{grid-template-columns:1fr 1fr;gap:10px}.launch-card{min-height:118px}
   .voice-setup-card{align-items:stretch;flex-direction:column}.voice-setup-actions{width:100%;display:grid;grid-template-columns:1fr}.voice-setup-card button{width:100%}
   .home-section-head{align-items:flex-start;flex-direction:column}.privacy-strip{align-items:flex-start;flex-direction:column}.privacy-strip>button{width:100%}
-  .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:.59rem;padding:8px 2px}
+  .bottomnav{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 16px)}.nav{font-size:12px;padding:8px 2px}
   .welcome-panel,.modal-panel{padding:26px 20px;border-radius:22px}.modal{padding:12px}.setting-row{grid-template-columns:auto 1fr auto}.practice-contract{align-items:stretch;flex-direction:column}.practice-contract button{width:100%}.lesson-card-foot{align-items:flex-start;flex-direction:column}.lesson-card-foot button{width:100%}
 }
 
@@ -957,8 +963,8 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .voice-bundle-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .voice-bundle-panel h2{margin:0}
 .voice-bundle-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
-.voice-bundle-track{height:8px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--accent,#C2402C);transition:width .3s ease}
+.voice-bundle-track{height:8px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.voice-bundle-track span{display:block;height:100%;width:0;border-radius:999px;background:var(--sun-deep);transition:width .3s ease}
 .voice-bundle-progress{font-size:.92rem}
 .voice-bundle-actions{display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
 .voice-bundle-actions button{min-height:48px;padding:0 18px;border-radius:14px}
@@ -971,8 +977,8 @@ body.voice-bundle-locked .bottomnav,body.voice-bundle-locked .app-header{pointer
 .daily-lock-mark{font:700 11px/1.4 -apple-system,system-ui,sans-serif;letter-spacing:.12em;color:var(--accent,#C2402C)}
 .daily-lock-panel h2{margin:0}
 .daily-lock-panel p{margin:0;color:var(--muted,#6E5E47);line-height:1.55}
-.daily-lock-track{height:10px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--accent,#C2402C);transition:width .35s ease}
+.daily-lock-track{height:10px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.daily-lock-track span{display:block;height:100%;border-radius:999px;background:var(--sun-deep);transition:width .35s ease}
 .daily-lock-count{font-weight:700;color:var(--text,#241A11)}
 .daily-lock-panel .wide{width:100%;min-height:52px;border-radius:16px}
 .daily-lock-note{font-size:.86rem}
@@ -992,8 +998,9 @@ body.daily-locked{overflow:hidden}
 .library-meta small{color:var(--muted,#6E5E47)}
 .library-meta em{color:var(--muted,#6E5E47);font-style:normal;line-height:1.45}
 .library-badge{justify-self:start;margin-top:3px;padding:2px 8px;border-radius:999px;background:var(--panel-soft,#f6eef0);color:var(--muted,#6E5E47);font:600 10px/1.6 -apple-system,system-ui,sans-serif;letter-spacing:.04em}
-.library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.library-progress span{display:block;height:100%;background:var(--book-accent,#C2402C)}
+/* --book-accent (aksen per buku dari JS) tetap dihormati; hanya fallback-nya pindah. */
+.library-progress{display:block;height:5px;margin-top:7px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.library-progress span{display:block;height:100%;background:var(--book-accent,var(--sun-deep))}
 .library-reader{padding-bottom:190px}
 .library-reader-head{display:flex;gap:12px;align-items:flex-start}
 .library-back{min-height:44px;padding:0 14px;border-radius:12px}
@@ -1013,8 +1020,8 @@ body.daily-locked{overflow:hidden}
 #libraryCloseOne{margin-left:auto;width:44px;padding:0}
 .library-translation-actions button{min-height:42px;padding:0 13px;border-radius:12px}
 .library-dock{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:40;display:grid;gap:7px;padding:11px 14px;background:var(--chrome-bg,rgba(250,247,247,.94));backdrop-filter:blur(12px);border-top:1px solid var(--line,#F0E4CF)}
-.library-progress-line{height:5px;border-radius:999px;background:var(--panel-soft,#f6eef0);overflow:hidden}
-.library-progress-line span{display:block;height:100%;background:var(--accent,#C2402C);transition:width .25s ease}
+.library-progress-line{height:5px;border-radius:999px;background:var(--line-soft,var(--panel-soft));overflow:hidden}
+.library-progress-line span{display:block;height:100%;background:var(--sun-deep);transition:width .25s ease}
 .library-status{margin:0;font-size:.84rem;color:var(--muted,#6E5E47)}
 .library-controls{display:flex;gap:8px;align-items:center}
 .library-controls button{min-height:48px;padding:0 14px;border-radius:14px}
@@ -1149,7 +1156,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
 }
 @media (prefers-reduced-transparency:reduce){.nav-scrim{background:var(--bg)}}
 .nav{min-height:44px;color:var(--glass-muted);border-radius:24px}
-.nav.active{color:var(--accent-on-glass);background:transparent;transform:none;font-weight:620}
+.nav.active{color:var(--accent-on-glass);background:transparent;transform:none;font-weight:600}
 
 /* Sheets sit on the heavier material, because they take the whole screen. */
 .modal-panel,.welcome-panel{
@@ -1797,7 +1804,7 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
 /* Progress indicator during load */
 .loading-progress {
   height: 2px;
-  background: var(--line);
+  background: var(--line-soft);
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 12px;
@@ -1808,7 +1815,7 @@ body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!
   display: block;
   height: 100%;
   width: 30%;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background: linear-gradient(90deg, transparent, var(--sun), transparent);
   animation: shimmer 1.5s infinite;
 }
 
@@ -2079,7 +2086,7 @@ button:active {
 .home-overview .mission-panel,.home-overview .home-stats{border:0;border-radius:0;background:transparent;box-shadow:none}
 .home-overview .mission-panel{border-bottom:1px solid var(--glass-line)}
 .mission-panel h3{font-family:var(--fz-body);font-size:.95rem;font-weight:650;letter-spacing:-.01em}
-.mission-ring{--ring-size:60px;background:conic-gradient(var(--accent-on-glass) var(--mission),var(--glass-line) 0)}
+.mission-ring{--ring-size:60px;background:conic-gradient(var(--sun-deep) var(--mission),var(--glass-line) 0)}
 .mission-ring::before{width:46px;height:46px;background:var(--glass-solid)}
 .mission-ring strong{font-size:1rem}
 .mission-ring span{font-size:.6rem;color:var(--glass-muted)}
@@ -2261,8 +2268,8 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .bottomnav{border:1px solid var(--surface-edge);box-shadow:0 2px 0 var(--surface-edge),0 16px 36px rgba(36,26,17,.16)}
 .nav{color:var(--muted);font-weight:600}
 .nav .fz-i{--fz-i-fill:var(--surface-mute);--fz-i-line:var(--muted)}
-.nav.active{color:var(--ink);background:var(--yellow-soft);font-weight:750}
-.nav.active .fz-i{--fz-i-fill:var(--yellow);--fz-i-line:var(--ink)}
+.nav.active{color:var(--text);background:var(--sun-soft);font-weight:700}
+.nav.active .fz-i{--fz-i-fill:var(--sun);--fz-i-line:var(--text)}
 
 /* --------------------------------------------------------------------------
    5. Home hub: empat skill inti tes sebagai pusat gravitasi baru.
@@ -2291,18 +2298,24 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
 .skill-ring::before{content:"";grid-area:1/1;width:28px;height:28px;border-radius:50%;background:var(--skill-bg,var(--panel-soft))}
 .skill-ring b{grid-area:1/1;z-index:1;font-size:.62rem;font-weight:750;color:var(--ink)}
 .skill-listening{--skill-bg:#FFF3C4;--skill-line:#F3E0AE;--skill-ink:#FFC700}
-.skill-speaking{--skill-bg:#FDE3DE;--skill-line:#F6D3C9;--skill-ink:#EE5D4A}
-.skill-reading{--skill-bg:#E9F7F0;--skill-line:#CDE9DD;--skill-ink:#A8DCC4}
-.skill-writing{--skill-bg:#F1EDF9;--skill-line:#DCD3EE;--skill-ink:#C9BCE4}
+/* --skill-ink adalah warna ANGKA di tengah cincin. Tiga dari empat nilai lamanya
+   pastel: #A8DCC4 mengukur 1,4:1 dan #C9BCE4 1,8:1 terhadap bidangnya - angkanya
+   memang tidak terbaca, bukan kurang terbaca. Sekarang tiap keterampilan memakai
+   turunan pekat keluarganya. Writing masuk keluarga INFO (kuning tua): lilac tidak
+   punya turunan pekat di sistem baru, dan --sun-deep 5,9:1 di atas info-soft.
+   --skill-line dibiarkan literal: ia garis lokal, bukan token brief. */
+.skill-speaking{--skill-bg:var(--bad-soft);--skill-line:#F6D3C9;--skill-ink:var(--bad-bright)}
+.skill-reading{--skill-bg:var(--good-soft);--skill-line:#CDE9DD;--skill-ink:var(--good-bright)}
+.skill-writing{--skill-bg:var(--info-soft);--skill-line:#F3E0AE;--skill-ink:var(--sun-deep)}
 
 /* --------------------------------------------------------------------------
    6. Kartu modul lama ikut keluarga yang sama, hanya lebih tenang: ia bukan lagi
    pusat perhatian, tetapi tetap satu ketukan.
    -------------------------------------------------------------------------- */
 .launch-icon{background:var(--yellow-soft);color:var(--accent-strong);border:1px solid var(--surface-edge)}
-.grammar-launch .launch-icon{background:var(--coral-soft)}
-.reading-launch .launch-icon{background:var(--mint-soft)}
-.skills-launch .launch-icon{background:var(--lilac-soft)}
+.grammar-launch .launch-icon{background:var(--sun-soft)}
+.reading-launch .launch-icon{background:var(--good-soft)}
+.skills-launch .launch-icon{background:var(--info-soft)}
 .launch-card{border:1.5px solid var(--surface-edge);box-shadow:0 3px 0 var(--surface-edge),0 10px 22px rgba(36,26,17,.08)}
 .launch-card:active{transform:translateY(2px);box-shadow:0 1px 0 var(--surface-edge)}
 
@@ -2696,7 +2709,7 @@ html.fiezel-ui-v6 .nav{
 }
 html.fiezel-ui-v6 .nav.active{
   transform:translateY(-3px);
-  box-shadow:0 2px 0 var(--yellow-deep);
+  box-shadow:0 2px 0 var(--sun-deep);
 }
 /* Titik di bawah label. Penanda kedua yang tidak bergantung pada warna sama sekali -
    satu-satunya bagian dari state aktif yang tetap terbaca oleh mata yang sulit
@@ -2832,7 +2845,9 @@ html.fiezel-ui-v6 .nav.active::after{
 .coach-strip-go{grid-column:1/-1;width:100%;min-height:52px;font-size:1rem;font-weight:800}
 .coach-strip-more{
   grid-column:1/-1;justify-self:center;
-  background:none;border:0;box-shadow:none;padding:2px 6px;min-height:0;
+  /* Hit area 101x22 sebelum ini - di bawah 44px minimum DIRECTION #6. Padding-nya
+     yang tumbuh, bukan tekstunya, jadi tata letak Home tidak bergeser. */
+  background:none;border:0;box-shadow:none;padding:10px 14px;min-height:44px;
   color:var(--accent);font-size:.78rem;font-weight:700;
 }
 .coach-strip-more:hover{background:none;box-shadow:none;transform:none}
