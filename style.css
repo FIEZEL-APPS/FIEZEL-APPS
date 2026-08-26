@@ -1314,42 +1314,75 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 
 .fiezel-stage{flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;
   min-height:0;padding:12px 16px 0;text-align:left}
-.fiezel-stage-art{display:flex;align-items:flex-end;justify-content:flex-start;gap:10px;
-  min-height:64px;width:100%}
+/* m028-maskot: wajah 64px di SAMPING gelembung diganti maskot besar DI ATAS gelembung.
+   Susunan kolom dipilih karena aritmetikanya: pada 390px lebar isi hanya 358px, dan
+   maskot 132px + gelembung 270px tidak muat berdampingan tanpa memaksa gelembungnya
+   menyusut jadi dua kata per baris. Menumpuknya juga yang menjaga aturan DIRECTION -
+   maskot tidak pernah berada di atas kolom nama atau tombol, ia berada DI ATASNYA dalam
+   aliran normal, tanpa position:absolute sama sekali. */
+.fiezel-stage-art{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  gap:8px;min-height:64px;width:100%}
 .fiezel-stage-art img{max-height:38vh;width:auto}
 
-/* Lambang langkah perkenalan (m025-80 OWNER: maskot dihilangkan).
-   Satu ikon besar di atas piringan lembut bercincin emas tipis - cukup untuk menahan
-   komposisi yang dulu diisi maskot, tanpa menambah gaya gambar baru ke dalam produk. */
-/* m028: piringan raksasa (200px, radial emas di tengah layar kosong) diganti kartu wajah
-   64px yang duduk BERSAMA gelembung sapaan. Alasannya bukan selera: piringan itu memakan
-   sepertiga layar untuk menyampaikan nol informasi, dan tinggi yang direbutnya adalah
-   tinggi yang dibutuhkan kartu langkah supaya CTA-nya tidak perlu digulir. --fz-art
-   dibiarkan hidup sebagai penyetel ukuran (JS masih mengirimnya per langkah), tetapi
-   sekarang dijepit: sebesar apa pun angkanya, wajahnya tetap seukuran wajah. */
-.fiezel-step-art{
-  --fz-art:200px;
-  width:64px;height:64px;flex:0 0 auto;
-  display:grid;place-items:center;align-self:flex-end;
-  border-radius:20px;
-  background:var(--fz-sun-soft);
-  border:2px solid var(--fz-ink);
-  box-shadow:var(--shadow-sm);
+/* ---------- m028-maskot: MASKOT PAW di kepala tiap panel perkenalan ----------
+   Lambang Lucide di dalam kartu 64px (m025-80) dilepas: ia menunggu pustaka yang dimuat
+   `defer` dan karena itu bisa lahir sebagai kotak kosong, dan sebuah lambang yang gagal
+   tampil lebih buruk daripada tidak ada lambang. Penggantinya bukan gambar baru melainkan
+   maskot yang SUDAH ada di produk (<fiezel-mascot>, features/mascot) - satu sumber bentuk,
+   satu sistem gerak, kini juga di layar pertama yang dilihat murid.
+
+   Ukurannya dijepit clamp: 132px pada 390px, 152px pada layar lebar. Keduanya di dalam
+   rentang yang diminta (120-160px), dan tidak satu pun bergantung pada tinggi viewport -
+   maskot yang tumbuh mengikuti vh adalah maskot yang menelan CTA di layar pendek. */
+.fiezel-ob-mascot{
+  /* Nilai bawaan bila JS tidak mengirimnya. Angka dari JS menjadi BATAS ATAS, bukan ukuran
+     mati: pada 390px yang menang tetap 34vw (=132px), jadi satu angka tidak bisa membuat
+     layar kecil kebanjiran maskot. */
+  --fz-ob-paw:148px;
+  width:clamp(120px,34vw,var(--fz-ob-paw));
+  aspect-ratio:320/300;
+  flex:0 0 auto;
+  display:grid;place-items:center;
+  /* Tidak ada bidang, tidak ada cincin, tidak ada bayangan: maskotnya sendiri sudah
+     membawa bayangan tanahnya di dalam SVG, dan piringan di belakangnya hanya membuat
+     badan kuning duduk di atas kuning. */
+  background:none;border:0;box-shadow:none;
+  pointer-events:none;
 }
-.fiezel-step-art svg{
-  width:34px;height:34px;
-  color:var(--fz-ink);
-  /* Goresan dipertebal dari 1,5: di dalam kartu sekecil ini goresan tipis terbaca kurus
-     dan generik, sementara lambang ini adalah wajah yang menyapa. */
-  stroke-width:1.9;
+/* Komponen memaku .fz-mascot ke 200px; di sini lebarnya milik wadah. Warna TIDAK
+   disentuh - tidak satu pun fill/stroke maskot ditimpa dari berkas ini. */
+.fiezel-ob-mascot .fiezel-ob-paw{width:100%;height:100%}
+/* Micro-entrance saat langkah berganti: satu scale settle 240ms dengan pegas yang sama
+   dipakai seluruh aplikasi. Sekali per langkah, bukan gerak yang berulang - maskot yang
+   melompat tiap kali layar dicat ulang terbaca hiperaktif, bukan hidup. */
+.fiezel-ob-mascot.is-entering{animation:fzm-ob-paw-in 240ms var(--ease-spring) both}
+@keyframes fzm-ob-paw-in{
+  from{transform:scale(.88) translateY(8px);opacity:.55}
+  to{transform:none;opacity:1}
 }
+/* Cadangan bila custom element tidak terdaftar: ikon paw, tetap satu bentuk yang sama. */
+.fiezel-ob-paw-fallback{display:grid;place-items:center;width:64%;height:64%;color:var(--fz-ink)}
+.fiezel-ob-paw-fallback svg{width:100%;height:100%}
+
+/* Lambang kecil di dalam kartu (SVG inline, tanpa pustaka - lihat GLYPHS di
+   features/onboarding/fiezel-onboarding.js). */
+.fiezel-glyph{width:20px;height:20px;flex:0 0 auto}
+.fiezel-back .fiezel-glyph{width:18px;height:18px}
+.fiezel-carousel-arrow .fiezel-glyph{width:22px;height:22px}
 /* Gelembung sapaan. Kalimatnya berbeda tiap langkah, jadi murid tidak merasa sedang
    diwawancarai formulir - ada yang menemani. */
 .fiezel-greet-bubble{
   position:relative;margin:0;background:var(--fz-paper);border:1.5px solid var(--fz-line);
-  border-radius:var(--radius-md);border-bottom-left-radius:4px;
+  border-radius:var(--radius-md);
+  /* Sudut yang "dipotong" pindah ke ATAS: gelembung sekarang duduk di bawah maskot, jadi
+     ekornya harus menunjuk ke atas - ke wajah yang sedang bicara. */
+  border-top-left-radius:4px;
   padding:10px 14px;box-shadow:var(--shadow-sm);
-  font-size:14px;font-weight:500;line-height:1.45;color:var(--fz-ink);max-width:270px;
+  font-size:14px;font-weight:500;line-height:1.45;color:var(--fz-ink);max-width:320px;
+  /* Gelembung ikut di tengah bersama maskot: pada layar lebar gelembung yang menempel ke
+     tepi kiri sementara maskotnya di tengah terbaca seperti dua elemen yang tidak saling
+     bicara. Teksnya tetap rata kiri karena ini kalimat, bukan judul. */
+  align-self:center;text-align:left;
 }
 @media (max-height:700px){.fiezel-stepper{padding-top:10px}.fiezel-ob-reveal{padding:18px 20px 14px}}
 
@@ -1539,7 +1572,7 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 .fiezel-carousel-track{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}
 .fiezel-carousel-item{display:flex;align-items:center;gap:10px;background:var(--fz-bg);
   border:1px solid var(--fz-line);border-radius:var(--radius-sm);padding:11px 13px;font-size:14px;font-weight:600}
-.fiezel-carousel-item i{flex:0 0 auto;color:var(--fz-gold)}
+.fiezel-carousel-item i,.fiezel-carousel-item .fiezel-glyph{flex:0 0 auto;color:var(--fz-gold)}
 .fiezel-carousel-arrows{display:flex;align-items:center;gap:14px;justify-content:center}
 /* padding:0 + width tetap: tanpa itu padding 13px/18px dari aturan `button` dasar membuat
    tombol "bulat" ini melebar jadi lonjong, dan border-radius:50% mengikuti bentuk kotaknya. */
@@ -1587,6 +1620,18 @@ button.primary:hover,.primary.luxe:hover{background:var(--accent-strong)}
 /* ---------- Kurangi-gerak: splash dan onboarding tunduk pada blok global juga,
    ditambah override lokal untuk memastikan lambaian/kedip-setara berhenti total. ---------- */
 .fiezel-splash-still .fiezel-star,.fiezel-ob-still .fiezel-star{animation:none}
+/* m028-maskot: kurangi-gerak berarti maskot tampil sebagai POSE STATIS dari state yang
+   SAMA - bukan maskot yang hilang, dan bukan maskot yang tetap bernapas. Kelas st-<state>
+   yang menentukan pose sudah dipasang di markup, jadi mematikan animasinya tidak mengubah
+   arti satu langkah pun. Dua jalan masuk dijaga sekaligus: preferensi sistem (lapisan
+   dapat .fiezel-ob-still dari JS) dan preferensi aplikasi (.reduce-motion di <body>). */
+.fiezel-ob-still .fiezel-ob-mascot,
+.fiezel-ob-still .fiezel-ob-mascot *,
+body.reduce-motion .fiezel-ob-mascot,
+body.reduce-motion .fiezel-ob-mascot *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){
+  .fiezel-ob-mascot,.fiezel-ob-mascot *{animation:none!important;transition:none!important}
+}
 
 /* ========== SKELETON LOADING STATES (Polished, Premium Feel) ========== */
 /* Shimmer animation: Creates the premium "loading" feel like Spotify/Duolingo */
