@@ -1,0 +1,190 @@
+{
+  "status": "PASS",
+  "gate": "analytics-aggregate",
+  "counts": {
+    "pass": 45,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "Satu perangkat dua kali sehari terhitung satu",
+      "status": "PASS"
+    },
+    {
+      "name": "Dua perangkat berbeda terhitung dua",
+      "status": "PASS"
+    },
+    {
+      "name": "Perangkat sama di hari berbeda terhitung sekali per hari",
+      "status": "PASS"
+    },
+    {
+      "name": "Laporan day_active tetap dihitung apa adanya (tidak sama dengan DAU)",
+      "status": "PASS"
+    },
+    {
+      "name": "Dimensi attempts_bucket masuk usage_daily",
+      "status": "PASS"
+    },
+    {
+      "name": "Kirim ulang batch tidak menggandakan token DAU",
+      "status": "PASS"
+    },
+    {
+      "name": "computeDauFromTokens men-dedup token duplikat",
+      "status": "PASS"
+    },
+    {
+      "name": "WAU batas bawah = DAU tertinggi dalam 7 hari",
+      "status": "PASS"
+    },
+    {
+      "name": "WAU batas atas = jumlah DAU 7 hari",
+      "status": "PASS"
+    },
+    {
+      "name": "WAU batas bawah <= batas atas",
+      "status": "PASS"
+    },
+    {
+      "name": "Jendela WAU tepat 7 hari dan cakupan penuh",
+      "status": "PASS"
+    },
+    {
+      "name": "MAU mengabaikan hari di luar jendela 30 hari",
+      "status": "PASS"
+    },
+    {
+      "name": "MAU melaporkan cakupan < 1 saat data belum penuh",
+      "status": "PASS"
+    },
+    {
+      "name": "Tanpa data, WAU = 0 (bukan NaN)",
+      "status": "PASS"
+    },
+    {
+      "name": "dayWindow menghasilkan 7 hari berurutan yang berakhir di hari itu",
+      "status": "PASS"
+    },
+    {
+      "name": "Retention dikelompokkan per (cohort_day, day_index)",
+      "status": "PASS"
+    },
+    {
+      "name": "Kohor berbeda tidak tercampur",
+      "status": "PASS"
+    },
+    {
+      "name": "retention_ping tidak menyumbang token DAU (tidak ada token di dalamnya)",
+      "status": "PASS"
+    },
+    {
+      "name": "Rate D1 = 45/100",
+      "status": "PASS"
+    },
+    {
+      "name": "Rate D7 = 20/100",
+      "status": "PASS"
+    },
+    {
+      "name": "Ukuran kohor (n=) selalu ikut dilaporkan",
+      "status": "PASS"
+    },
+    {
+      "name": "Kohor tanpa D0 melaporkan rate null, bukan persentase palsu",
+      "status": "PASS"
+    },
+    {
+      "name": "ai_tokens_out dijumlahkan, bukan dihitung",
+      "status": "PASS"
+    },
+    {
+      "name": "tts_chars_rendered hanya menjumlahkan cache-miss (dasar biaya)",
+      "status": "PASS"
+    },
+    {
+      "name": "cache hit dan miss dihitung terpisah",
+      "status": "PASS"
+    },
+    {
+      "name": "answers vs answers_ok terpisah",
+      "status": "PASS"
+    },
+    {
+      "name": "breaker_trips terhitung",
+      "status": "PASS"
+    },
+    {
+      "name": "quota_exhausted terhitung + dimensi kuota",
+      "status": "PASS"
+    },
+    {
+      "name": "mergeAggregate menjumlahkan metrik tanpa menggandakan token",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup menghitung DAU = jumlah token unik hari itu",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup menulis metrics_daily.dau",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup MENGHAPUS dau_dedup hari itu",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup menulis rentang WAU (lower & upper), bukan satu angka",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup menandai WAU/MAU sebagai estimasi",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup merotasi pepper saat jatuh tempo",
+      "status": "PASS"
+    },
+    {
+      "name": "Pepper lama pindah ke previous, bukan diarsipkan",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup melakukan purge usage_daily & retention_daily",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup kedua tidak mengubah state sama sekali (idempoten)",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup kedua tidak menggandakan DAU (tetap 3 di metrics_daily)",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup kedua melaporkan DAU 0 dari token (sudah dipurge) tanpa menimpa metrik jadi 0",
+      "status": "PASS"
+    },
+    {
+      "name": "Event terlambat menaikkan DAU (3 -> 4), tidak menurunkannya",
+      "status": "PASS"
+    },
+    {
+      "name": "Rollup kedua tidak merotasi pepper lagi di jam yang sama",
+      "status": "PASS"
+    },
+    {
+      "name": "Token hari-hari lama yang terlewat purge ikut tersapu",
+      "status": "PASS"
+    },
+    {
+      "name": "scheduledAnalytics diam saat flag mati",
+      "status": "PASS"
+    },
+    {
+      "name": "scheduledAnalytics diam saat binding D1 belum ada",
+      "status": "PASS"
+    }
+  ]
+}
