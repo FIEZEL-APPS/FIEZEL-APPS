@@ -169,6 +169,15 @@
       return Promise.resolve(false);
     }
 
+    // m026-02: memo kredit habis. Keberatan di kepala fungsi localEngine() tetap berlaku -
+    // yang dibaca di sini BUKAN naskah pesan galat, melainkan keputusan terstruktur yang
+    // sudah diambil mesin Puter sendiri (status 402 / code insufficient_funds). Selama memo
+    // itu menyala, mesin Puter TIDAK dipanggil lagi di sesi ini: itulah yang mencegah SDK
+    // memunculkan dialog upgrade-nya untuk kalimat kedua, ketiga, dan seterusnya.
+    var credit = null;
+    try { credit = typeof voice.creditStatus === 'function' ? voice.creditStatus() : null; } catch (_) { credit = null; }
+    if (credit && credit.outOfCredit) return speakWithLocal(english, opts, band_);
+
     return voice.speak(english, {
       speed: opts.speed,
       voice: opts.voice,
@@ -179,21 +188,30 @@
       if (band_) band_.end();
       return done !== false;
     }).catch(function (error) {
-      // Puter gagal. Sebelum menyerah, mesin perangkat dicoba - inilah satu-satunya saat
-      // ia terdengar. Kalau ia juga tidak ada atau ikut gagal, hasilnya sama seperti
-      // sebelum m025-121: false, dan pemanggil menampilkan subtitle tanpa suara.
-      var local = localEngine();
-      if (!local) { if (band_) band_.end(); return false; }
-      return local.speak(english, {
-        speed: opts.speed,
-        voice: opts.voice
-      }).then(function (done) {
-        if (band_) band_.end();
-        return done !== false;
-      }).catch(function () {
-        if (band_) band_.end();
-        return false;
-      });
+      // Puter gagal - termasuk 'puter_out_of_credit' pada kalimat PERTAMA yang kandas.
+      // Jalur turunnya sama seperti kegagalan render lain; yang membedakan hanya memo di
+      // mesin Puter, yang membuat kalimat berikutnya tidak lewat sini lagi.
+      return speakWithLocal(english, opts, band_);
+    });
+  }
+
+  /**
+   * Mesin perangkat - satu-satunya saat ia terdengar. Kalau ia juga tidak ada atau ikut
+   * gagal, hasilnya sama seperti sebelum m025-121: false, dan pemanggil menampilkan
+   * subtitle tanpa suara. Tidak ada modal, tidak ada dialog, tidak ada tuntutan upgrade.
+   */
+  function speakWithLocal(english, opts, band_) {
+    var local = localEngine();
+    if (!local) { if (band_) band_.end(); return Promise.resolve(false); }
+    return local.speak(english, {
+      speed: opts.speed,
+      voice: opts.voice
+    }).then(function (done) {
+      if (band_) band_.end();
+      return done !== false;
+    }).catch(function () {
+      if (band_) band_.end();
+      return false;
     });
   }
 
