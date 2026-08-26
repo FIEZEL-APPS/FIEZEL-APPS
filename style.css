@@ -3226,3 +3226,14 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 /* Penanda "Jeda mengajar" jadi bidang, bukan teks abu di antara teks abu lain: ia
    satu-satunya keterangan bahwa layar ini BUKAN soal. --info di atas --sun-soft 5,9:1. */
 .quiz-teach-flag{padding:4px 10px;border-radius:999px;font-size:.7rem;background:var(--sun-soft);color:var(--info)}
+
+/* ---------- §4 flashcard: chip level + "Kelas kata" ----------
+   indonesianPartOfSpeech() sudah menerjemahkan kuncinya sejak lama, jadi ini bukan
+   perbaikan kebocoran kunci mentah - ini soal keterbacaan. "A2 · Kata benda" sebagai
+   satu baris eyebrow abu tidak memberi tahu bahwa yang kedua adalah KELAS KATA;
+   dua chip dengan labelnya sendiri memberi tahu. */
+.chips-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.chip{display:inline-flex;align-items:center;min-height:24px;padding:3px 10px;border-radius:999px;font-size:.75rem;font-weight:600}
+.chip-level{background:var(--sun-soft);color:var(--text);border:1px solid var(--sun-deep)}
+.chip-cat{background:var(--panel-soft);border:1px solid var(--line);color:var(--muted)}
+.chip-cat b{color:var(--text);font-weight:700}
