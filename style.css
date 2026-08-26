@@ -70,6 +70,11 @@
   --shadow-lg:0 24px 60px rgba(36,26,17,.15);
   --ease:cubic-bezier(.22,.8,.28,1);
   --ease-spring:cubic-bezier(.34,1.4,.4,1);
+  /* m025-166: dua token gerak yang dipakai popup gerbang level. Namanya --fz-* karena
+     lapisan gerak FIEZEL (fiezel-motion.css) memakai awalan yang sama; nilainya sengaja
+     menunjuk ke dua easing yang sudah ada supaya tidak ada kurva ketiga yang lahir. */
+  --fz-spring:var(--ease-spring);
+  --fz-out:var(--ease);
   --dur-s:.18s;
   --dur-m:.32s;
   --dur-l:.5s;
@@ -3167,6 +3172,12 @@ html.fiezel-ui-v6 .launcher-shell{
   font-family:var(--fz-display-round);
   font-weight:600;
   letter-spacing:-.01em;
+}
+/* m025-166 (temuan sambil kerja): kurung tutup di atas HILANG. Akibatnya seluruh
+   sisa berkas ini - termasuk blok FASE3 dan semua gaya level guard m028-06 - terbaca
+   sebagai aturan BERSARANG di dalam ".word, .lesson-title", jadi hanya berlaku pada
+   turunan dua selektor itu. Itu sebabnya animasi popup gerbang tidak pernah jalan
+   walau CSS-nya benar. Kurungnya dipasang; jangan dihapus lagi. */
 /* ==========================================================================
    ===== FASE3 =====
    Blok terpisah di akhir berkas, dengan sengaja. Fase 2 sedang mengedit blok
@@ -3396,6 +3407,29 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
 .level-trust-ladder li.is-open{border-color:color-mix(in srgb,var(--accent,#c2402c) 48%,transparent)}
 .level-trust-ladder li.is-open b{color:var(--accent,#c2402c)}
 .level-trust-actions{display:flex;flex-wrap:wrap;gap:8px}
+/* m025-166 popup gerbang masuk level. Isinya HANYA transform+opacity - tidak ada properti
+   layout yang dianimasikan, jadi tidak ada reflow per frame di ponsel murah. Pop masuk
+   memakai var(--fz-spring) (pegas, terasa "menyapa"), isinya menyusul dengan var(--fz-out)
+   supaya teks tidak ikut memantul. Murid yang minta gerak minimal, atau yang mematikan
+   animasi di Pengaturan (kelas .is-static dari app.js), langsung mendapat bentuk akhirnya. */
+.level-entry-pop{display:grid;gap:9px;justify-items:start;text-align:left;transform-origin:50% 8%;animation:fzLevelEntryPop .42s var(--fz-spring,cubic-bezier(.34,1.4,.4,1)) both}
+.level-entry-pop>*{animation:fzLevelEntryRise .34s var(--fz-out,cubic-bezier(.22,.8,.28,1)) both}
+.level-entry-pop .level-entry-face{animation-delay:.04s}
+.level-entry-pop .modal-mark{animation-delay:.08s}
+.level-entry-pop .level-entry-chip{animation-delay:.12s}
+.level-entry-pop h2{margin:0;animation-delay:.16s;font-size:1.16rem;line-height:1.28}
+.level-entry-pop .level-entry-line{margin:0;text-align:left;animation-delay:.2s;font-size:.86rem;line-height:1.5;color:var(--muted,#746958)}
+.level-entry-pop .modal-actions{width:100%;animation-delay:.24s}
+.level-entry-face{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--panel-soft,#f8f1e7);border:1px solid var(--line,#eadfce)}
+.level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--warn,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--warn,#b8862b) 14%,transparent);color:var(--warn,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.level-trust-chip{justify-self:start}
+.level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
+@keyframes fzLevelEntryPop{from{opacity:0;transform:scale(.9) translate3d(0,10px,0)}60%{opacity:1;transform:scale(1.01) translate3d(0,0,0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
+@keyframes fzLevelEntryRise{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .level-entry-pop,.level-entry-pop>*{animation:none!important;opacity:1;transform:none}
+}
+.level-entry-pop.is-static,.level-entry-pop.is-static>*{animation:none;opacity:1;transform:none}
 .level-exam-verdict{padding:12px 14px;margin:10px 0;border-radius:15px;font-size:.85rem;line-height:1.5}
 .level-exam-verdict.is-pass{background:color-mix(in srgb,var(--ok,#3f7d4e) 12%,transparent);color:var(--ok,#3f7d4e)}
 .level-exam-verdict.is-fail{background:color-mix(in srgb,var(--warn,#b8862b) 14%,transparent);color:var(--ink,#241a11)}
