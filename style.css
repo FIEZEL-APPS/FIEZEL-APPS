@@ -3120,4 +3120,18 @@ html.fiezel-ui-v6 .launcher-shell{
   font-family:var(--fz-display-round);
   font-weight:600;
   letter-spacing:-.01em;
+/* ==========================================================================
+   ===== FASE3 =====
+   Blok terpisah di akhir berkas, dengan sengaja. Fase 2 sedang mengedit blok
+   atas (palet :root, tombol, .option, nav bawah, kartu). Seluruh tambahan
+   Fase 3 tinggal di bawah marker ini supaya dua rangkaian patch tidak pernah
+   bertengkar atas baris yang sama; urutan cascade juga menguntungkan kita —
+   restyle di sini menang tanpa perlu !important.
+   ========================================================================== */
+:root{
+  /* Fase 2 sudah memasang keluarga --sun/--core/--good/--bad/--focus-ring di
+     blok :root kedua. Yang belum ada hanya cincin fokus DI ATAS permukaan core:
+     --focus-ring #A67A00 cuma 1,9:1 di atas --core #1B1418, jadi fokus di dalam
+     panel gelap butuh kuningnya sendiri (#FFC700 = 11,4:1 di atas --core). */
+  --focus-ring-on-core:#FFC700;
 }
