@@ -1,0 +1,27 @@
+<!--
+  PAW pose statis: LISTENING (headphone)
+  Sumber geometri : design/redesign-v1/screens/c/listening.html (inline SVG, identik dgn listening-dictation.html)
+  Padanan dinamis : promo-v7/shared/mascot/fiezel-mascot.js (grup .fz-headphones, state st-listening;
+                    file identik md5 dgn features/mascot/fiezel-mascot.js di app)
+  Belum ada di    : fiezel-apps/assets/brand/
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="36 -18 248 232" role="img" aria-label="PAW sedang mendengarkan">
+  <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
+  <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+  <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
+  <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+  <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
+  <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+  <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+  <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
+  <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
+  <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+  <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
+  <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <!-- headphone -->
+  <path d="M78 104 C 78 26 242 26 242 104" stroke="#241A11" stroke-width="13" fill="none" stroke-linecap="round"/>
+  <rect x="62" y="86" width="30" height="48" rx="13" fill="#241A11"/>
+  <rect x="228" y="86" width="30" height="48" rx="13" fill="#241A11"/>
+  <circle cx="77" cy="110" r="6.5" fill="#FFC700"/>
+  <circle cx="243" cy="110" r="6.5" fill="#FFC700"/>
+  </svg>
