@@ -90,7 +90,13 @@ const ALL_ON = { health: 'on', config: 'on', auth: 'on', quota: 'on', ai: 'on', 
 
 // MOCK LOKAL, didefinisikan SEBELUM disuntikkan ke konteks vm. Ia tidak pernah meneruskan ke
 // fetch global: seluruh jawabannya dibuat di sini.
-function makeHarness(cfConfig) {
+// m031-killswitch: `cfEndpointMode` sekarang meminta izin lapis SERVER lewat
+// `self.FiezelCfKillSwitch.allows(key)` (blok CF-KILLSWITCH di app.js) dan gagal ke arah
+// MATI kalau jawabannya bukan `true`. Harness ini menyuntikkan stub yang mengizinkan semua,
+// supaya berkas ini tetap menguji apa yang memang tugasnya: perilaku tiga mode transport.
+// Perilaku kill switch itu sendiri diuji `cf-config-killswitch-test.js`, dan sifat
+// fail-closed-nya ikut di-assert di bawah dengan stub yang DIHILANGKAN.
+function makeHarness(cfConfig, killSwitch = { allows: () => true }) {
   const log = { cfCalls: [], puter: [], debug: [], storage: [], bodyReads: [] };
   const cfResponse = {
     ok: true, status: 200, __from: 'cloudflare',
@@ -129,6 +135,7 @@ function makeHarness(cfConfig) {
   sandbox.self = sandbox;
   sandbox.globalThis = sandbox;
   sandbox.puter = puter;
+  if (killSwitch) sandbox.FiezelCfKillSwitch = killSwitch;
   sandbox.FIEZEL_CF_CONFIG = cfConfig ? Object.freeze({ ...cfConfig, endpoints: Object.freeze({ ...cfConfig.endpoints }) }) : undefined;
   vm.createContext(sandbox);
   // `const` di puncak skrip tidak menempel ke global vm; deklarasi fungsi menempel. Ekspor
@@ -256,6 +263,24 @@ const results = {};
   check('(d) nilai mode yang tidak dikenali jatuh ke off, bukan ke on',
     ['/api/ai/chat', '/api/usage/event', '/api/tts/say'].every(p => weird.api.cfEndpointMode(p) === 'off'),
     ['/api/ai/chat', '/api/usage/event', '/api/tts/say'].map(p => `${p}=${weird.api.cfEndpointMode(p)}`).join(', '));
+
+  /* ===================================================================================
+   * (d-bis) kill switch server sebagai gerbang WAJIB, gagal ke arah mati
+   * ================================================================================= */
+  // Tanpa modul kill switch di bundel, jalur CF harus MATI walau semua flag statis 'on':
+  // sebuah jalur CF yang hidup tanpa pengawas server adalah persis keadaan yang paket kerja
+  // ini ada untuk menghapus.
+  const noGate = makeHarness({ enabled: true, base: CF_BASE_SYNTHETIC, endpoints: { ...ALL_ON } }, null);
+  await noGate.api.coreWorkerExec('/api/ai/chat', { method: 'POST', body: '{}' });
+  check('(d) tanpa FiezelCfKillSwitch di bundel, jalur CF MATI (gagal ke arah aman, bukan ke arah mahal)',
+    noGate.log.cfCalls.length === 0 && noGate.log.puter.length === 1 && noGate.api.cfEndpointMode('/api/ai/chat') === 'off',
+    `fetch=${noGate.log.cfCalls.length} puter=${noGate.log.puter.length} mode=${noGate.api.cfEndpointMode('/api/ai/chat')}`);
+  // Dan izin server yang ditolak juga mematikan, walau statisnya 'on'.
+  const denied = makeHarness({ enabled: true, base: CF_BASE_SYNTHETIC, endpoints: { ...ALL_ON } }, { allows: () => false });
+  await denied.api.coreWorkerExec('/api/tts/say', { method: 'POST' });
+  check('(d) izin server false ⇒ endpoint statis on tetap dilayani Puter',
+    denied.log.cfCalls.length === 0 && denied.log.puter.length === 1,
+    `fetch=${denied.log.cfCalls.length} puter=${denied.log.puter.length}`);
 
   /* ===================================================================================
    * (e) tidak ada URL Cloudflare hardcode di app.js

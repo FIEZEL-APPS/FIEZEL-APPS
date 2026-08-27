@@ -2028,6 +2028,206 @@ function selectLoginMessage(){
 }
 function pushSupported(){return typeof navigator!=='undefined'&&'serviceWorker'in navigator&&typeof PushManager!=='undefined'}
 function base64UrlBytes(value){const pad='='.repeat((4-value.length%4)%4),raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/')),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
+/* CF-KILLSWITCH-BEGIN — kill switch server (`GET /api/config`), lapis PERTAMA.
+ *
+ * KENAPA BLOK INI ADA. Sampai rilis ini, satu-satunya sakelar klien adalah `FIEZEL_CF_CONFIG`
+ * di core-config.js — dan berkas itu ikut precache service worker (`sw.js:35`, daftar ASSETS)
+ * dan dilayani cache-first. Artinya "matikan AI sekarang" butuh commit + bump invarian +
+ * deploy + pembaruan SW di setiap perangkat: terlalu lambat untuk sesuatu yang menagih
+ * dompet. Worker CF sudah menyediakan jawabannya dengan `Cache-Control: no-store`; yang belum
+ * ada adalah klien yang membacanya. Sekarang ada.
+ *
+ * ATURAN PENGGABUNGAN = AND, dan ketidaksimetrisannya disengaja:
+ *   statis 'off' + server on   -> off   (server TIDAK BISA menyalakan apa pun)
+ *   statis 'on'  + server off  -> off   (server BISA mematikan)
+ *   statis 'on'  + server on   -> on
+ * Satu server yang disusupi — atau satu nilai KV salah ketik oleh owner yang sedang panik —
+ * tidak boleh bisa menyalakan jalur AI/TTS/kuota di perangkat murid. Karena itu keputusan
+ * "hidup" selalu butuh DUA suara, sedangkan keputusan "mati" cukup satu.
+ *
+ * GAGAL KE ARAH AMAN, SELALU. Empat keadaan berbeda menghasilkan keputusan yang sama —
+ * seluruh jalur CF mati dan aplikasi berjalan lewat jalur Puter hari ini seperti biasa:
+ * server tak terjangkau, timeout, HTTP bukan 2xx, dan `protocol` bukan '1.7'. Tidak ada satu
+ * pun jalur di blok ini yang bisa membuat boot gagal: pengambilnya tidak pernah di-`await`
+ * di jalur boot, dan setiap kegagalan berhenti di dalam blok ini.
+ *
+ * BOOT TIDAK DIBLOKIR — dan ini diukur, bukan diasumsikan (lihat reports/roll-s1-config.md
+ * §4). Pengambil dijadwalkan di `requestIdleCallback` (fallback `setTimeout` 1500ms) SESUDAH
+ * layar pertama tercat, tidak pernah di-`await` oleh `load()`, dan selama jawabannya belum
+ * tiba `cfServerAllows()` menjawab `false` — jadi jendela ketidakpastian itu berjalan di
+ * jalur Puter, arah yang aman. Hari ini biayanya nol permintaan: selama tidak ada satu pun
+ * endpoint statis yang 'on'/'shadow', tidak ada apa pun yang bisa dimatikan, dan blok ini
+ * TIDAK menembak server sama sekali.
+ *
+ * CERMIN 5 MENIT, `sessionStorage`, BUKAN localStorage. Navigasi antar layar tidak menembak
+ * server berulang karena keadaan hidup di memori; cermin hanya menutup celah reload/relaunch
+ * PWA. Umurnya dibatasi keras di klien (`mirrorTtlMs` 5 menit) walau server mengaku
+ * `ttlSeconds` lebih panjang, dan tidak pernah ditulis ke localStorage: kill switch yang
+ * bertahan berhari-hari di perangkat adalah kill switch yang bisa diabaikan murid hanya
+ * dengan tidak menutup tabnya.
+ */
+const CF_REMOTE=self.FIEZEL_CF_REMOTE||{};
+const CF_REMOTE_PATH=String(CF_REMOTE.path||'/api/config');
+const CF_REMOTE_PROTOCOL=String(CF_REMOTE.protocol||'1.7');
+const CF_REMOTE_TIMEOUT_MS=Number(CF_REMOTE.timeoutMs)>0?Number(CF_REMOTE.timeoutMs):2500;
+// Batas atas keras: 5 menit. Nilai yang lebih besar di core-config.js pun dipangkas di sini,
+// karena angka inilah yang menentukan berapa lama sebuah kill switch bisa diabaikan.
+const CF_MIRROR_TTL_CAP_MS=300000;
+const CF_MIRROR_TTL_MS=Math.min(Number(CF_REMOTE.mirrorTtlMs)>0?Number(CF_REMOTE.mirrorTtlMs):CF_MIRROR_TTL_CAP_MS,CF_MIRROR_TTL_CAP_MS);
+const CF_MIRROR_MIN_TTL_MS=Number(CF_REMOTE.mirrorMinTtlMs)>0?Number(CF_REMOTE.mirrorMinTtlMs):30000;
+const CF_MIRROR_KEY=String(CF_REMOTE.mirrorKey||'fiezel-cf-flags-mirror-v1');
+const CF_ENDPOINT_KEYS=Object.freeze(['health','config','auth','quota','ai','tts','usage']);
+// Enam nama flag di jawaban Worker (workers/api/schema.js:108 CLIENT_FLAG_DEFAULTS). Daftar
+// ini tertutup: kunci asing di jawaban server diabaikan, bukan dipercaya.
+const CF_SERVER_FLAG_NAMES=Object.freeze(['cfApiEnabled','cfAiEnabled','cfTtsEnabled','cfQuotaEnabled','cfAnalyticsEnabled','cfIdentityEnabled']);
+// Peta kunci endpoint klien -> flag server yang WAJIB bernilai true agar endpoint itu boleh
+// hidup. `health` dan `config` tidak punya flag sendiri: keduanya diatur sakelar induk
+// `cfApiEnabled` saja.
+const CF_SERVER_FLAG_FOR=Object.freeze({auth:'cfIdentityEnabled',quota:'cfQuotaEnabled',ai:'cfAiEnabled',tts:'cfTtsEnabled',usage:'cfAnalyticsEnabled'});
+// Kill switch tingkat server (`enabled:{ai,tts,coach,analytics}`) ikut dihormati sebagai
+// lapis tambahan yang hanya bisa MEMATIKAN. Kunci yang tidak dikirim server = tidak
+// berpendapat (daftar `flags` di atas yang otoritatif), kunci bernilai false = mati.
+const CF_SERVER_KILL_FOR=Object.freeze({ai:Object.freeze(['ai','coach']),tts:Object.freeze(['tts']),usage:Object.freeze(['analytics'])});
+// status: 'idle' | 'ok' | 'protocol_mismatch' | 'unreachable' | 'no_base' | 'not_needed'
+// Apa pun selain 'ok' berarti SELURUH jalur CF mati.
+let cfRemoteState={status:'idle',protocol:'',flags:null,enabled:null,fetchedAt:0,source:'none',reason:''};
+let cfConfigInFlight=null;
+let cfConfigBootStarted=false;
+function cfStaticConfig(){return self.FIEZEL_CF_CONFIG||{}}
+// Mode statis (lapis KEDUA) apa adanya, dengan aturan yang sama seperti blok transport:
+// alamat kosong atau enabled!==true berarti mati, nilai asing jatuh ke 'off'.
+function cfStaticMode(key){
+  const cfg=cfStaticConfig();
+  if(cfg.enabled!==true)return 'off';
+  if(String(cfg.base||'').trim()==='')return 'off';
+  const mode=String(cfg.endpoints?.[key]||'off');
+  return mode==='on'||mode==='shadow'?mode:'off';
+}
+function cfHasLiveStatic(){return CF_ENDPOINT_KEYS.some(key=>cfStaticMode(key)!=='off')}
+/* Izin lapis SERVER untuk satu kunci endpoint. Inilah satu-satunya tempat yang boleh
+ * mengubah keputusan menjadi 'off' berdasarkan jawaban server — dan ia tidak punya cara
+ * mengubah apa pun menjadi 'on'. */
+function cfServerAllows(key){
+  const st=cfRemoteState;
+  if(st.status!=='ok')return false;                        // idle/unreachable/protokol beda = MATI
+  const flags=st.flags||{};
+  if(flags.cfApiEnabled!==true)return false;               // sakelar induk server
+  const named=CF_SERVER_FLAG_FOR[key];
+  if(named&&flags[named]!==true)return false;              // flag absen/false = MATI (fail-closed)
+  const kill=st.enabled;
+  if(kill&&typeof kill==='object')for(const feature of (CF_SERVER_KILL_FOR[key]||[]))if(kill[feature]===false)return false;
+  return true;
+}
+// Hasil GABUNGAN = AND dari statis dan server. Dipakai panel diagnostik; blok transport
+// memanggil `allows()` di atas supaya keputusan hanya ada di satu tempat.
+function cfMergedMode(key){const staticMode=cfStaticMode(key);return staticMode==='off'?'off':(cfServerAllows(key)?staticMode:'off')}
+function cfMirrorTtlFor(data){
+  const ttlSeconds=Number(data?.ttlSeconds);
+  if(!(ttlSeconds>0))return CF_MIRROR_TTL_MS;
+  return Math.min(Math.max(ttlSeconds*1000,CF_MIRROR_MIN_TTL_MS),CF_MIRROR_TTL_MS);
+}
+function cfMirrorRead(){
+  try{
+    const raw=self.sessionStorage?.getItem?.(CF_MIRROR_KEY);
+    if(!raw)return null;
+    const box=JSON.parse(raw);
+    if(!box||box.v!==1||!box.data)return null;
+    const age=Date.now()-Number(box.at||0);
+    const ttl=Math.min(Number(box.ttl)>0?Number(box.ttl):CF_MIRROR_TTL_MS,CF_MIRROR_TTL_MS);
+    if(!(age>=0&&age<ttl))return null;                     // kedaluwarsa (atau jam mundur) = buang
+    return box;
+  }catch{return null}
+}
+function cfMirrorWrite(data){
+  try{self.sessionStorage?.setItem?.(CF_MIRROR_KEY,JSON.stringify({v:1,at:Date.now(),ttl:cfMirrorTtlFor(data),data}))}catch{}
+}
+/* Salin jawaban server ke keadaan runtime. Hanya enam nama flag yang dikenal yang dibaca,
+ * dan hanya `=== true` yang berarti hidup: nilai 'true', 1, atau 'on' dari server ditolak,
+ * karena flag yang ambigu harus berarti mati. */
+function cfApplyServerConfig(data,source){
+  const protocol=String(data?.protocol||'');
+  const at=Date.now();
+  if(protocol!==CF_REMOTE_PROTOCOL){
+    // Protokol tidak cocok = SELURUH jalur CF mati, bukan diteruskan dengan bentuk yang
+    // belum tentu kita pahami.
+    cfRemoteState={status:'protocol_mismatch',protocol,flags:null,enabled:null,fetchedAt:at,source,reason:`expected ${CF_REMOTE_PROTOCOL}`};
+    return cfRemoteState;
+  }
+  const flags={};for(const name of CF_SERVER_FLAG_NAMES)flags[name]=data?.flags?.[name]===true;
+  const kill={};for(const feature of ['ai','tts','coach','analytics']){const value=data?.enabled?.[feature];kill[feature]=typeof value==='boolean'?value:null}
+  cfRemoteState={status:'ok',protocol,flags,enabled:kill,fetchedAt:at,source,reason:''};
+  return cfRemoteState;
+}
+function cfConfigFailed(reason){cfRemoteState={status:'unreachable',protocol:'',flags:null,enabled:null,fetchedAt:Date.now(),source:'error',reason:String(reason||'')};return cfRemoteState}
+/* Pengambil. Tidak pernah melempar, tidak pernah di-await di jalur boot, satu permintaan
+ * tanpa retry, dan dibatasi timeout supaya server yang menggantung tidak menahan apa pun.
+ * `credentials:'omit'`: jawaban ini flag publik, jadi ia tidak perlu — dan tidak boleh —
+ * membawa cookie sesi. */
+async function cfFetchServerConfig(){
+  const base=String(cfStaticConfig().base||'').trim().replace(/\/$/,'');
+  if(!base)return cfConfigFailed('no_base');
+  let controller=null,timer=null;
+  try{if(typeof AbortController==='function')controller=new AbortController()}catch{controller=null}
+  try{
+    if(controller)timer=setTimeout(()=>{try{controller.abort()}catch{}},CF_REMOTE_TIMEOUT_MS);
+    const response=await fetch(base+CF_REMOTE_PATH,{method:'GET',cache:'no-store',mode:'cors',credentials:'omit',signal:controller?controller.signal:undefined});
+    if(!response||!response.ok)return cfConfigFailed(`config_${response?response.status:'no_response'}`);
+    const data=await response.json();
+    const state=cfApplyServerConfig(data,'server');
+    // Cermin ditulis juga saat protokol tidak cocok: keputusan "mati" itu sah untuk
+    // di-cache sebentar, dan ia mencegah setiap reload menembak server yang sudah
+    // dipastikan tidak cocok.
+    cfMirrorWrite({protocol:data?.protocol,flags:data?.flags,enabled:data?.enabled,ttlSeconds:data?.ttlSeconds});
+    return state;
+  }catch(error){return cfConfigFailed(error?.name==='AbortError'?'timeout':(error?.message||error))}
+  finally{if(timer)clearTimeout(timer)}
+}
+function cfConfigRefresh(){
+  if(cfConfigInFlight)return cfConfigInFlight;
+  cfConfigInFlight=cfFetchServerConfig().catch(error=>cfConfigFailed(error?.message||error)).then(state=>{cfConfigInFlight=null;return state});
+  return cfConfigInFlight;
+}
+/* Sekali per boot, dan TIDAK di jalur kritis. Tiga jalan keluar tanpa permintaan sama
+ * sekali: cermin masih segar, atau tidak ada satu pun endpoint statis yang hidup (tidak ada
+ * yang bisa dimatikan — keadaan hari ini), atau `base` kosong. */
+function cfConfigBootOnce(){
+  if(cfConfigBootStarted)return 'already';
+  cfConfigBootStarted=true;
+  const mirror=cfMirrorRead();
+  if(mirror){cfApplyServerConfig(mirror.data,'mirror');return 'mirror'}
+  if(!cfHasLiveStatic()){cfRemoteState={status:'not_needed',protocol:'',flags:null,enabled:null,fetchedAt:0,source:'none',reason:'semua endpoint statis off'};return 'not_needed'}
+  const run=()=>{try{cfConfigRefresh()}catch{}};
+  if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:3000});
+  else setTimeout(run,1500);
+  return 'scheduled';
+}
+/* Jendela baca untuk panel diagnostik (features/neural-voice/fiezel-diag-panel.js): flag
+ * statis, flag server, hasil gabungan, dan kapan terakhir diambil — tanpa nilai rahasia
+ * apa pun, karena dump panel ditempel ke chat. */
+function cfKillSwitchSnapshot(){
+  const cfg=cfStaticConfig(),staticModes={},merged={};
+  for(const key of CF_ENDPOINT_KEYS){staticModes[key]=cfStaticMode(key);merged[key]=cfMergedMode(key)}
+  return {
+    aturan:'gabungan = AND(statis, server) — server hanya bisa mematikan',
+    statis:{enabled:cfg.enabled===true,baseTerpasang:String(cfg.base||'').trim()!=='',endpoints:staticModes},
+    server:{status:cfRemoteState.status,sumber:cfRemoteState.source,protokol:cfRemoteState.protocol||'',protokolDiharapkan:CF_REMOTE_PROTOCOL,flags:cfRemoteState.flags?{...cfRemoteState.flags}:null,enabled:cfRemoteState.enabled?{...cfRemoteState.enabled}:null,alasan:cfRemoteState.reason||''},
+    gabungan:merged,
+    cfHidup:CF_ENDPOINT_KEYS.some(key=>merged[key]!=='off'),
+    terakhirDiambil:cfRemoteState.fetchedAt?new Date(cfRemoteState.fetchedAt).toISOString():null,
+    umurMs:cfRemoteState.fetchedAt?Date.now()-cfRemoteState.fetchedAt:null,
+    cermin:{penyimpanan:'sessionStorage',kunci:CF_MIRROR_KEY,umurMaksMs:CF_MIRROR_TTL_MS,segar:Boolean(cfMirrorRead())}
+  };
+}
+self.FiezelCfKillSwitch=Object.freeze({
+  allows:cfServerAllows,
+  mode:cfMergedMode,
+  snapshot:cfKillSwitchSnapshot,
+  refresh:cfConfigRefresh,
+  boot:cfConfigBootOnce,
+  state:()=>({...cfRemoteState})
+});
+cfConfigBootOnce();
+/* CF-KILLSWITCH-END */
 /* CF-TRANSPORT-BEGIN — sakelar transport Cloudflare (core-config.js: FIEZEL_CF_CONFIG).
  * Blok ini adalah PRA-CABANG di depan jalur Puter, bukan penulisan ulang jalur itu:
  * `corePuterExec` di bawah memuat badan `coreWorkerExec` HARI INI apa adanya (termasuk
@@ -2061,7 +2261,16 @@ function cfEndpointMode(path){
   const mode=String(CF_CONFIG.endpoints?.[key]||'off');
   // Nilai asing (typo, nilai lama) jatuh ke 'off'. Flag yang tidak dikenali harus berarti
   // aman, bukan berarti hidup.
-  return mode==='on'||mode==='shadow'?mode:'off';
+  const staticMode=mode==='on'||mode==='shadow'?mode:'off';
+  if(staticMode==='off')return 'off';
+  // LAPIS PERTAMA: kill switch server (blok CF-KILLSWITCH di atas, `GET /api/config`).
+  // Penggabungannya AND: nilai statis di atas hanya batas ATAS, dan izin server dibutuhkan
+  // untuk melewatinya. `!==true` (bukan `===false`) disengaja — kalau modul kill switch
+  // hilang dari bundel, jawabannya `undefined` dan jalur CF MATI, bukan hidup tanpa
+  // pengawas. Server tidak punya cara menaikkan apa pun di sini: nilai kembalian `true`
+  // paling banter mempertahankan mode statis.
+  if(self.FiezelCfKillSwitch?.allows?.(key)!==true)return 'off';
+  return staticMode;
 }
 function cfWorkerFetch(path,options={}){return fetch(CF_BASE+String(path),{...options,credentials:'include',mode:'cors',cache:'no-store'})}
 // Catatan shadow, HANYA ke konsol diagnostik. Tidak pernah ke UI, tidak pernah ke state.
