@@ -380,6 +380,11 @@ jobs:
           # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
           # menjalankan blok kill switch DAN blok transport bersama-sama.
           node cf-config-killswitch-test.js
+          # Batas waktu klien di jalur CF (paket F6): setiap batas punya nilai eksplisit,
+          # nilainya >= p95 terukur + margin yang ditulis di komentar sumber, jalur config
+          # tidak pernah menahan render, dan kegagalan config jatuh ke semua-off. Berjalan
+          # sesudah gerbang kill switch karena ia memakai blok app.js yang sama.
+          node cf-client-timeout-test.js
           # Konsistensi konfigurasi lintas berkas: bentuk KV di runbook (§4.5-4.7) harus
           # benar-benar bisa dibaca route-config.js, dan angka batas di wrangler [vars]
           # (yang dikirim ke NASKAH murid) harus sama dengan angka yang DITEGAKKAN di
