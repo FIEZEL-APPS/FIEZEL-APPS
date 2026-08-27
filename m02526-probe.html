@@ -1,0 +1,51 @@
+<!doctype html><meta charset="utf-8"><title>m025-26 product neural proof</title>
+<script>window.FIEZEL_VERSION='5.19.0';</script>
+<script src="./features/neural-voice/fiezel-neural-voice-config.js"></script>
+<script src="./features/neural-voice/fiezel-kokoro-adapter.js"></script>
+<script src="./features/neural-voice/fiezel-voice-persona.js"></script>
+<script src="./features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+<script src="./features/neural-voice/fiezel-neural-voice.js"></script>
+<script src="./features/neural-voice/fiezel-web-audio-player.js"></script>
+<script src="./features/neural-voice/fiezel-neural-voice-bootstrap.js"></script>
+<script>
+(()=>{
+  const r={phase:'boot',engine:null,plays:[],errors:[],usedBrowserTts:false};
+  window.__probeStatus='boot';window.__probeResult=null;
+  try{const realSpeak=speechSynthesis.speak.bind(speechSynthesis);
+    speechSynthesis.speak=u=>{const t=String(u&&u.text||'');if(t.trim()){r.usedBrowserTts=true}return realSpeak(u)}}catch(_){}
+  let last=performance.now(),maxDrift=0,ticks=0;
+  const timer=setInterval(()=>{const n=performance.now();maxDrift=Math.max(maxDrift,n-last-100);last=n;ticks++},100);
+  const finish=(ok,e)=>{clearInterval(timer);r.success=ok;r.eventLoop={maxTickDriftMs:Math.round(Math.max(0,maxDrift)),tickCount:ticks};
+    if(e){r.errors.push(String(e&&e.message||e))}window.__probeStatus=ok?'done':'error';window.__probeResult=r};
+  const to=(p,ms,l)=>Promise.race([p,new Promise((_,rj)=>setTimeout(()=>rj(new Error(l+' timeout '+ms)),ms))]);
+  (async()=>{
+    const rt=window.FiezelVoiceRuntime;
+    if(!rt)throw new Error('FiezelVoiceRuntime missing');
+    const dlStart=performance.now();
+    await to(rt.prepare(),900000,'prepare');
+    r.prepareMs=Math.round(performance.now()-dlStart);
+    const st=rt.status();
+    r.engine=st.engine;r.engineModel=st.engineModel;r.totalBytes=st.totalBytes;r.assetCount=st.assetCount;
+    r.prepared=st.prepared;r.storage=st.storage;
+    const speak=async(label,text)=>{
+      const t0=performance.now();
+      const res=await to(rt.speak(text,{allowFallback:false}),300000,label);
+      const ms=performance.now()-t0;
+      r.plays.push({label,ms:Math.round(ms),provider:String(res&&res.provider||''),voice:String(res&&res.voice||'')});
+      return ms;
+    };
+    await speak('first','Neural voice readiness check for FIEZEL.');
+    await speak('warm-1','Neural voice readiness check for FIEZEL.');
+    await speak('warm-2','A second sentence to confirm stable warm latency.');
+    const after=rt.status();
+    r.circuitOpen=after.circuitOpen;r.lastFallbackReason=after.lastFallbackReason;r.readyAfter=after.ready;
+    try{
+      const eng=performance.getEntriesByType('resource').filter(e=>e.name.indexOf('/vendor/supertonic-3/')!==-1);
+      r.engineRequests=eng.length;
+      r.engineTransferBytes=eng.reduce((s,e)=>s+(Number(e.transferSize)||0),0);
+      r.engineDecodedBytes=eng.reduce((s,e)=>s+(Number(e.decodedBodySize)||0),0);
+    }catch(_){r.engineTransferBytes=null}
+    finish(true);
+  })().catch(e=>finish(false,e));
+})();
+</script>
