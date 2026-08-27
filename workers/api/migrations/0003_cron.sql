@@ -69,7 +69,39 @@ CREATE TABLE IF NOT EXISTS cron_run (
 -- Satu BARIS PER JALAN, bukan satu baris per hari: "berapa kali gagal hari ini"
 -- adalah pertanyaan yang harus bisa dijawab, dan PRIMARY KEY (job, day) akan
 -- menimpa kegagalan pertama dengan keberhasilan berikutnya — tepatnya bukti yang
--- paling ingin disembunyikan oleh bug yang sedang dicari.
-CREATE INDEX IF NOT EXISTS idx_cron_run_job_day ON cron_run(job, day);
--- Jalur panas ringkasan: WHERE day >= ? ORDER BY started_at
+-- paling ingin disembunyikan oleh bug yang sedang dicari. Karena itu tabel ini
+-- SENGAJA tanpa PRIMARY KEY.
+--
+-- ----------------------------------------------------------------------------
+-- INDEKS YANG SENGAJA TIDAK DIBUAT: idx_cron_run_job_day(job, day)
+-- ----------------------------------------------------------------------------
+-- Versi pertama berkas ini membuat `idx_cron_run_job_day ON cron_run(job, day)`.
+-- Indeks itu DIHAPUS sebelum 0003 pernah dijalankan di produksi, karena TIDAK
+-- ADA SATU PUN KUERI yang menyaring atau mengurutkan dengan `job`. Seluruh SQL
+-- terhadap tabel ini hidup di satu tempat, `CRON_SQL` di ../cron-status.js, dan
+-- isinya cuma tiga: satu INSERT, satu `DELETE ... WHERE day < ?1`, dan satu
+-- `SELECT ... WHERE day >= ?1 AND day <= ?2 ORDER BY started_at`. Pemisahan
+-- per-job dilakukan di JS oleh `summarizeCronRuns()` — disengaja, karena barisnya
+-- sedikit (2 job x <=289 jalan/hari x 60 hari) dan fungsi murni bisa diuji tanpa
+-- D1. Jadi `job` tidak pernah menjadi kolom penyaring, dan indeks berkepala `job`
+-- tidak pernah terpakai.
+-- Indeks tak terpakai bukan netral: setiap INSERT ke tabel ini akan menulis SATU
+-- BARIS TAMBAHAN untuk indeks itu ("Indexes add an additional written row when
+-- writes include the indexed column" —
+-- https://developers.cloudflare.com/d1/platform/pricing/), dan sweep kuota jalan
+-- tiap 5 menit = 288 INSERT/hari + 1 rollup, di atas plan gratis 100.000 baris
+-- tertulis/hari untuk SELURUH akun. Lebih penting daripada kuota: D1
+-- single-threaded per database ("processes queries one at a time" —
+-- https://developers.cloudflare.com/d1/platform/limits/), jadi tulis adalah
+-- sumber daya paling langka di `fiezel-core` — database yang sama yang memikul
+-- jalur panas kuota. Membayar tulis untuk indeks yang tidak dibaca siapa pun
+-- berarti memperlambat reserve/commit murid demi nol manfaat.
+-- KALAU nanti ada kueri nyata berkepala `job` (mis. `WHERE job = ?1 AND day >= ?2`),
+-- tambahkan indeksnya di migrasi BARU bersama kuerinya — jangan di sini.
+
+-- Jalur panas ringkasan owner + purge retensi, keduanya berkepala `day`.
+-- DIPAKAI OLEH: cron-status.js CRON_SQL.readRange (GET /api/owner/cron-status)
+--   'SELECT job, day, started_at, finished_at, ok, rows_affected, error_class FROM cron_run WHERE day >= ?1 AND day <= ?2 ORDER BY started_at'
+-- DIPAKAI OLEH: cron-status.js CRON_SQL.purgeOlderThan (retensi 60 hari)
+--   'DELETE FROM cron_run WHERE day < ?1'
 CREATE INDEX IF NOT EXISTS idx_cron_run_day ON cron_run(day);

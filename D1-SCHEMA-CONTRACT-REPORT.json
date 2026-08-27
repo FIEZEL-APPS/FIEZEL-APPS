@@ -1,18 +1,58 @@
 {
   "schema": "fiezel-d1-schema-contract-v1",
-  "generated_at": "2026-08-27T17:09:13.626Z",
-  "total": 27,
-  "lulus": 27,
+  "generated_at": "2026-08-27T18:08:12.108Z",
+  "total": 28,
+  "lulus": 28,
   "gagal": 0,
   "status": "PASS",
   "checks": [
     {
+      "name": "semua_berkas_migrasi_terbaca",
+      "ok": true,
+      "details": {
+        "berkas_sql_di_direktori": [
+          "0001_identity.sql",
+          "0001_quota.sql",
+          "0002_analytics.sql",
+          "0003_cron.sql",
+          "0004_indexes.sql"
+        ],
+        "jumlah_di_direktori": 5,
+        "berkas_terpetakan": [
+          "0001_identity.sql",
+          "0001_quota.sql",
+          "0002_analytics.sql",
+          "0003_cron.sql",
+          "0004_indexes.sql"
+        ],
+        "jumlah_terbaca": 5,
+        "peta_dari_MIGRATIONS_md": {
+          "core": [
+            "0001_identity.sql",
+            "0001_quota.sql",
+            "0003_cron.sql",
+            "0004_indexes.sql"
+          ],
+          "stats": [
+            "0002_analytics.sql"
+          ]
+        },
+        "tidak_terpetakan": [],
+        "dipetakan_tapi_tidak_ada": [],
+        "terpetakan_ganda": [],
+        "berkas_nol_pernyataan_dikenali": [],
+        "pernyataan_tak_dikenali": [],
+        "catatan": "Peta berkas->database diturunkan dari perintah `wrangler d1 execute` di workers/api/migrations/MIGRATIONS.md. Migrasi baru WAJIB muncul di sana, kalau tidak gerbang ini MERAH dan bukan diam-diam mengabaikan berkasnya."
+      }
+    },
+    {
       "name": "kode_punya_sql_yang_terbaca",
       "ok": true,
       "details": {
-        "literal_sql": 49,
+        "literal_sql": 48,
         "tabel_dirujuk": [
           "breaker_events",
+          "cron_run",
           "dau_dedup",
           "identity",
           "metrics_daily",
@@ -30,6 +70,7 @@
       "details": {
         "tabel_migrasi": [
           "anon_issue",
+          "cron_run",
           "dau_dedup",
           "identity",
           "metrics_daily",
@@ -76,6 +117,7 @@
       "details": {
         "core": [
           "anon_issue",
+          "cron_run",
           "identity",
           "quota_daily",
           "quota_reservation",
@@ -119,6 +161,7 @@
       "details": {
         "dipindai": [
           "anon_issue",
+          "cron_run",
           "identity",
           "quota_daily",
           "quota_reservation",
@@ -144,6 +187,7 @@
       "ok": true,
       "details": {
         "migrasi_baru": [
+          "0003_cron.sql",
           "0004_indexes.sql"
         ]
       }
@@ -154,6 +198,26 @@
       "details": {
         "tanpa_bukti": [],
         "bukti": [
+          {
+            "migrasi": "0003_cron.sql",
+            "indeks": "idx_cron_run_day",
+            "tabel": "cron_run",
+            "kolom": [
+              "day"
+            ],
+            "klaim": 2,
+            "bukti": [
+              {
+                "kueri": "select job, day, started_at, finished_at, ok, rows_affected, error_class from cron_run where day >= ?1 and day <= ?2 order by started_at",
+                "sumber": "kode"
+              },
+              {
+                "kueri": "delete from cron_run where day < ?1",
+                "sumber": "kode"
+              }
+            ],
+            "klaim_ditolak": []
+          },
           {
             "migrasi": "0004_indexes.sql",
             "indeks": "idx_quota_daily_day_user",
@@ -167,6 +231,15 @@
               {
                 "kueri": "select user_id from quota_daily where day = ?1",
                 "sumber": "kode"
+              }
+            ],
+            "klaim_ditolak": [
+              {
+                "kueri": "delete from quota_daily where rowid in (select rowid from quota_daily where day < ? limit 500)",
+                "ada_di_kode": false,
+                "ada_di_dokumen_retensi": false,
+                "menyentuh_tabel": true,
+                "memakai_kolom_pertama_sebagai_penyaring": true
               }
             ]
           },
@@ -188,7 +261,8 @@
                 "kueri": "select * from quota_reservation where user_id = ?1 and day = ?2",
                 "sumber": "kode"
               }
-            ]
+            ],
+            "klaim_ditolak": []
           }
         ]
       }
@@ -198,6 +272,7 @@
       "ok": true,
       "details": {
         "diperiksa": [
+          "0003_cron.sql",
           "0004_indexes.sql"
         ],
         "masalah": []
@@ -226,10 +301,10 @@
         "exit": 0,
         "beda": [],
         "ringkasan": {
-          "tabel_harapan": 5,
-          "tabel_nyata": 5,
-          "indeks_harapan": 8,
-          "indeks_nyata": 8,
+          "tabel_harapan": 6,
+          "tabel_nyata": 6,
+          "indeks_harapan": 9,
+          "indeks_nyata": 9,
           "objek_internal_diabaikan": 0,
           "beda": 0
         }

@@ -49,12 +49,60 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..');
 
-/** Berkas migrasi per database. Satu direktori melayani DUA database, jadi
- *  pemetaan ini WAJIB eksplisit — lihat `workers/api/migrations/MIGRATIONS.md`. */
-const FILES_BY_DB = {
-  core: ['0001_identity.sql', '0001_quota.sql', '0004_indexes.sql'],
-  stats: ['0002_analytics.sql']
-};
+/** Nama database yang dikenal skrip ini. */
+const DB_NAMES = ['core', 'stats'];
+const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats' };
+
+/**
+ * Berkas migrasi per database — DITURUNKAN, bukan ditulis tangan.
+ *
+ * Satu direktori melayani DUA database, jadi pemetaan berkas->database wajib
+ * eksplisit. Sebelumnya pemetaan itu berupa literal di berkas ini DAN literal
+ * kembar di `d1-schema-contract-test.js`. Ketika `0003_cron.sql` mendarat, kedua
+ * literal itu tidak diperbarui, jadi tabel `cron_run` lenyap dari "skema harapan"
+ * di kedua sisi sekaligus — persis kegagalan diam-diam yang paling berbahaya:
+ * gerbang tetap HIJAU untuk hal yang tidak pernah ia periksa.
+ *
+ * Sumber kebenarannya sekarang perintah penerapan resmi di
+ * `<dir>/MIGRATIONS.md`. Kalau ada berkas `.sql` di direktori yang tidak punya
+ * perintah `wrangler d1 execute <db> ... --file=migrations/<berkas>`, skrip ini
+ * KELUAR 2 (masukan tidak bisa dipercaya) alih-alih membandingkan skema separuh.
+ */
+export function filesByDbFromDoc(dir) {
+  const doc = path.join(dir, 'MIGRATIONS.md');
+  if (!fs.existsSync(doc)) {
+    throw new Error('katalog migrasi tidak ada: ' + doc + ' (dibutuhkan untuk memetakan berkas -> database)');
+  }
+  const text = fs.readFileSync(doc, 'utf8');
+  const byDb = {};
+  for (const db of DB_NAMES) byDb[db] = [];
+  const re = /d1\s+execute\s+([A-Za-z0-9_-]+)[^\n]*?--file=migrations\/([A-Za-z0-9_.-]+\.sql)/gi;
+  let m;
+  while ((m = re.exec(text))) {
+    const db = DB_ALIAS[m[1].toLowerCase()];
+    if (!db) continue;
+    if (!byDb[db].includes(m[2])) byDb[db].push(m[2]);
+  }
+  for (const db of DB_NAMES) byDb[db].sort();
+
+  // Setiap berkas .sql di direktori WAJIB terpetakan. Diam bukan jawaban.
+  const inDir = fs.readdirSync(dir).filter((f) => f.endsWith('.sql')).sort();
+  const mapped = DB_NAMES.flatMap((db) => byDb[db]).sort();
+  const unmapped = inDir.filter((f) => !mapped.includes(f));
+  const missing = mapped.filter((f) => !inDir.includes(f));
+  if (!inDir.length) throw new Error('tidak ada berkas .sql di ' + dir);
+  if (unmapped.length) {
+    throw new Error('berkas migrasi tanpa database tujuan di MIGRATIONS.md: ' + unmapped.join(', ') +
+      ' — tambahkan perintah `wrangler d1 execute <fiezel-core|fiezel-stats> --remote --file=migrations/<berkas>`');
+  }
+  if (missing.length) {
+    throw new Error('MIGRATIONS.md menyebut berkas yang tidak ada di ' + dir + ': ' + missing.join(', '));
+  }
+  if (mapped.length !== inDir.length) {
+    throw new Error('jumlah berkas terpetakan (' + mapped.length + ') != jumlah berkas .sql (' + inDir.length + ')');
+  }
+  return byDb;
+}
 
 /** Tabel yang HARAM ada di masing-masing database (kontrak privasi). */
 const FORBIDDEN_BY_DB = {
@@ -354,12 +402,23 @@ function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.error) { console.error(args.error + '\n' + USAGE); process.exit(2); }
   if (args.help) { console.log(USAGE); process.exit(0); }
-  if (!args.db || !FILES_BY_DB[args.db]) {
-    console.error('--db wajib dan harus salah satu: ' + Object.keys(FILES_BY_DB).join(', ') + '\n' + USAGE);
+  if (!args.db || !DB_NAMES.includes(args.db)) {
+    console.error('--db wajib dan harus salah satu: ' + DB_NAMES.join(', ') + '\n' + USAGE);
     process.exit(2);
   }
   const dir = args.migrations ? path.resolve(args.migrations) : path.join(REPO, 'workers', 'api', 'migrations');
-  const files = args.files && args.files.length ? args.files : FILES_BY_DB[args.db];
+  let files;
+  if (args.files && args.files.length) {
+    files = args.files;
+  } else {
+    try {
+      files = filesByDbFromDoc(dir)[args.db];
+    } catch (e) {
+      if (args.json) console.log(JSON.stringify({ schema: 'fiezel-d1-schema-check-v1', cocok: false, galat: e.message }, null, 2));
+      else console.error('GALAT: ' + e.message);
+      process.exit(2);
+    }
+  }
   let report;
   try {
     report = runCheck({ db: args.db, dir, files, stdinText: readStdin() });
@@ -395,4 +454,4 @@ function main() {
 const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
 if (invokedDirectly) main();
 
-export default { runCheck, expectedSchema, actualSchema, compare, rowsFromWranglerJson, parseStatement, splitStatements, FILES_BY_DB };
+export default { runCheck, expectedSchema, actualSchema, compare, rowsFromWranglerJson, parseStatement, splitStatements, filesByDbFromDoc, DB_NAMES };
