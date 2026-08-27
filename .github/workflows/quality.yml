@@ -144,6 +144,7 @@ jobs:
           node diagnostic-scanner-test.js
           node reminder-struggle-test.js
           node prosody-test.js
+          node voice-chunker-test.js
           node tutor-classroom-regression-test.js
           node m02542-experience-test.js
           node neural-voice-m02592-puter-subtitle-test.js
