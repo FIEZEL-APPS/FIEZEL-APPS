@@ -5726,7 +5726,6 @@ function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
 function closeModal(){try{self.FiezelBackNav?.dismiss?.('modal')}catch{}return closeModalNow()}
-<<<<<<< HEAD
 // Temuan cf-a12: fungsi ini dulu mengembalikan `err.message` APA ADANYA sebagai kalimat
 // terakhir, sehingga isi galat provider ("AI core merespons 429",
 // "puter_workers_unavailable", nama model, badan JSON provider) dicetak ke modal murid.
@@ -5740,14 +5739,25 @@ function closeModal(){try{self.FiezelBackNav?.dismiss?.('modal')}catch{}return c
 // kami sendiri - naskah statis hari ini bisa memuat placeholder besok.
 function aiErrorMessage(err){
   const code=String(err?.error||err?.code||'').toLowerCase();
-  if(code==='popup_blocked')return'Popup login Puter diblokir browser. Izinkan popup untuk situs ini, lalu coba lagi.';
-  if(code==='auth_window_closed')return'Login Puter dibatalkan. Coba lagi dan selesaikan proses login.';
-  if(err?.name==='TimeoutError'||code==='timeout')return`Permintaan AI melewati batas waktu ${FIEZEL_AI_TIMEOUT_MS/1000} detik. Periksa koneksi, lalu coba lagi.`;
+  // A8 butir (d): galat ASLI hanya untuk diagnostik owner - konsol, bukan DOM. Nilai
+  // kembalian fungsi ini selalu naskah kami sendiri, jadi tidak ada jalan bagi isi galat
+  // provider (nama model, angka status, badan JSON) untuk sampai ke mata murid.
+  try{if(err)console.debug('fiezel-ai-error',code||'unknown',err)}catch{}
+  if(code==='popup_blocked')return'Jendela masuk akun diblokir peramban. Izinkan jendela pop-up untuk situs ini, lalu coba lagi.';
+  if(code==='auth_window_closed')return'Masuk akunnya belum selesai. Coba lagi, ya — tinggal satu langkah.';
+  if(err?.name==='TimeoutError'||code==='timeout')return'Jawabannya nggak datang dalam waktu yang wajar. Periksa sambungan internetmu lalu coba lagi.';
+  // A8 temuan BOHONG: "penghitung jatahnya nggak bisa dibaca" BUKAN "jatahmu habis". Dua
+  // keadaan, dua kalimat - naskahnya diambil dari sumber terpusat AI_TASK_COPY, bukan
+  // disalin ke sini.
+  if(code==='quota_unavailable')return AI_TASK_COPY.quotaUnknown.body;
   if(code==='quota_exhausted'||code==='quota_exceeded')return AI_TASK_COPY.ai.body;
   if(code==='ai_offline')return AI_TASK_COPY.offline.body;
   if(code==='ai_protocol_mismatch')return AI_TASK_COPY.provider.body;
   if(code==='ai_unavailable'||code==='provider_down')return AI_TASK_COPY.provider.body;
-  return'Penjelasan AI belum bisa dimuat sekarang. Materi, latihan, dan progresmu tetap jalan seperti biasa.'
+  // Lepas internet diputuskan di klien lebih dulu supaya galat jaringan tidak pernah
+  // dibacakan sebagai "jatah habis" (A8, sama dengan aturan resolveKey di quota-copy.js).
+  if(typeof navigator!=='undefined'&&navigator?.onLine===false)return AI_TASK_COPY.offline.body;
+  return'Penjelasan AI-nya belum bisa dimuat sekarang. Ini bukan kesalahanmu — coba lagi sebentar lagi, ya.'
 }
 /* AI-TASK-TRANSPORT-BEGIN — lapisan tipis pemilih transport untuk permintaan AI.
  *
@@ -5833,6 +5843,16 @@ const AI_TASK_COPY=Object.freeze({
     title:'Kamu sedang nggak terhubung internet',
     body:'Kamu sedang nggak terhubung internet. Materi, latihan, dan progresmu tetap jalan penuh — itu memang dirancang begitu. Terjemahan dan suara neural nyala lagi begitu jaringannya kembali.',
     retry:false
+  }),
+  // A8: keadaan "sisa jatah nggak bisa dibaca" ditambahkan DI SUMBER TERPUSAT ini, bukan
+  // sebagai kalimat kedua di aiErrorMessage. Ia sengaja terpisah dari `ai` (jatah habis):
+  // murid yang penghitungnya rusak belum memakai apa pun, dan memberitahunya "jatahmu habis"
+  // adalah kebohongan yang paling mudah dibuat sistem ini (lihat quota-notice-a11y-test (f2)).
+  quotaUnknown:Object.freeze({
+    code:'QC-A1u',
+    title:'Sisa jatahmu belum bisa aku baca',
+    body:'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Coba lagi sebentar lagi, ya.',
+    retry:true
   }),
   degraded:Object.freeze({
     code:'QC-DEG',
@@ -5957,25 +5977,6 @@ function aiTaskFetch(body,signalOptions){
 // pra-syarat SDK Puter dan perakitan prompt di klien: keduanya benar untuk jalur ini dan
 // hanya untuk jalur ini.
 async function askPuterAI(prompt,task='question'){
-=======
-/* A8 · naskah kegagalan AI untuk MURID.
-
-   Versi sebelumnya meneruskan `err.message` provider apa adanya ke layar murid - dan kalau
-   itu kosong, JSON.stringify(err) mentah. Artinya murid bisa membaca kalimat Inggris berisi
-   nama mesin, kode angka, atau isi objek galat; naskah yang nggak pernah ditulis siapa pun
-   dan nggak bisa diperiksa gerbang mana pun. Sekarang setiap cabang mengembalikan kalimat
-   yang ditulis untuk murid, dan galat aslinya berhenti di console (untuk diagnostik), bukan
-   di layar. */
-function aiErrorMessage(err){const code=String(err?.error||err?.code||'').toLowerCase();try{if(err)console.debug('fiezel-ai-error',err)}catch{}
-  if(code==='popup_blocked')return'Jendela masuk akun diblokir peramban. Izinkan jendela pop-up untuk situs ini, lalu coba lagi.';
-  if(code==='auth_window_closed')return'Masuk akunnya belum selesai. Coba lagi, ya — tinggal satu langkah.';
-  if(err?.name==='TimeoutError'||code==='timeout')return'Jawabannya nggak datang dalam waktu yang wajar. Periksa sambungan internetmu lalu coba lagi.';
-  if(code==='quota_unavailable')return'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Coba lagi sebentar lagi, ya.';
-  if(code==='quota_exceeded')return'Jatah tanya-jawab hari ini sudah habis. Materi, latihan, dan progresmu tetap jalan seperti biasa.';
-  if(typeof navigator!=='undefined'&&navigator?.onLine===false)return'Perangkatmu sedang lepas dari internet. Latihan yang sudah tersimpan tetap bisa kamu kerjakan.';
-  return'Penjelasan AI-nya belum bisa dimuat sekarang. Ini bukan kesalahanmu — coba lagi sebentar lagi, ya.'}
-async function askFiezelAI(prompt,task='question'){
->>>>>>> add/a8a11y
   if(CORE_AI_GATEWAY!=='core-only')throw new Error('Konfigurasi AI FIEZEL tidak valid.');
   if(typeof puter==='undefined'||!puter?.workers?.exec)throw new Error('AI belum siap. Login Puter dan koneksi internet diperlukan.');
   if(!CORE_WORKER_URL)throw new Error('Core Brain FIEZEL belum diaktifkan pada deployment ini. Fitur belajar tetap bisa dipakai, tetapi AI menunggu Core Worker tersambung.');
@@ -6056,7 +6057,6 @@ function renderMarkdown(text){
   closeList();
   return out.join('')||'<p></p>'
 }
-<<<<<<< HEAD
 // `meta` opsional. Kalau Worker menjawab `degraded:true` (jawaban fallback deterministik,
 // bukan jawaban model), jawabannya TETAP ditampilkan sebagai jawaban - hanya ditandai. Ia
 // bukan galat: teksnya berguna, dirakit dari data murid, dan menjatuhkannya ke modal galat
@@ -6082,12 +6082,21 @@ function renderAIResult(title,text,meta){const degraded=meta?.degraded===true;$(
 // tetapi LUMPUH selama AI_RETRY_DELAY_MS. Dulu ia aktif seketika (temuan cf-a12), dan satu
 // modal galat yang bisa ditekan berulang kali adalah generator retry storm yang paling
 // mudah dibuat.
+//
+// A8 (resolusi S5×A8) menambahkan satu hal lagi: wilayah pesannya diberi `role="status"`
+// dengan `aria-live="polite"` dan `aria-atomic="true"` - BUKAN `role="alert"`. Penjelasan
+// yang gagal dimuat itu informasi, bukan keadaan darurat: `alert` akan memotong kalimat soal
+// yang sedang dibacakan pembaca layar, dan `aria-atomic` membuat judul+penjelasan dibacakan
+// sebagai satu kesatuan alih-alih sepotong-sepotong. Gerbangnya: quota-notice-a11y-test (d).
 function renderAIError(title,err,retry){
   const code=String(err?.error||err?.code||'').toLowerCase();
   const quota=code==='quota_exhausted'||code==='quota_exceeded';
+  // Penghitung jatah yang rusak BUKAN jatah habis: tombol coba-lagi tetap ditawarkan di
+  // sini, karena sebabnya memang bisa hilang dengan satu tekanan berikutnya.
+  const quotaUnknown=code==='quota_unavailable';
   const providerDown=code==='ai_unavailable'||code==='ai_protocol_mismatch'||code==='provider_down';
   const offline=code==='ai_offline'||(typeof navigator!=='undefined'&&navigator.onLine===false);
-  const copy=err?.copy||(quota?AI_TASK_COPY.ai:providerDown?AI_TASK_COPY.provider:offline?AI_TASK_COPY.offline:null);
+  const copy=err?.copy||(quotaUnknown?AI_TASK_COPY.quotaUnknown:quota?AI_TASK_COPY.ai:providerDown?AI_TASK_COPY.provider:offline?AI_TASK_COPY.offline:null);
   // Cabang yang sebabnya TIDAK hilang dengan satu tekanan tidak mendapat tombol.
   const retryAllowed=typeof retry==='function'&&!quota&&!providerDown&&!offline;
   // Diagnostik untuk owner tetap ada, hanya tidak lewat layar murid.
@@ -6095,7 +6104,7 @@ function renderAIError(title,err,retry){
   const heading=copy?.title?esc(copy.title):esc(title);
   const detail=quota&&copy?`<p class="muted">${esc(aiQuotaCopyText(copy,err?.retryAfter))}</p><p class="muted">${esc(copy.plusNote)}</p>`
     :providerDown&&copy?`<p class="muted">${esc(err?.breaker?copy.extra:copy.extraNoHalfOpen)}</p>`:'';
-  $('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${heading}</h2><p>${esc(aiErrorMessage(err))}</p>${detail}<div class="modal-actions">${retryAllowed?`<button id="aiRetry" disabled aria-disabled="true" data-retry-delay="${AI_RETRY_DELAY_MS}">Coba lagi</button>`:''}<button class="primary" id="aiClose">Tutup</button></div>`;
+  $('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${heading}</h2><div role="status" aria-live="polite" aria-atomic="true"><p>${esc(aiErrorMessage(err))}</p>${detail}</div><div class="modal-actions">${retryAllowed?`<button id="aiRetry" disabled aria-disabled="true" data-retry-delay="${AI_RETRY_DELAY_MS}">Coba lagi</button>`:''}<button class="primary" id="aiClose">Tutup</button></div>`;
   $('aiClose').onclick=closeModal;
   if(retryAllowed){
     const button=$('aiRetry');
@@ -6105,15 +6114,6 @@ function renderAIError(title,err,retry){
   }
   enhanceUI()
 }
-=======
-function renderAIResult(title,text){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${esc(title)}</h2><div class="ai-answer">${renderMarkdown(text)}</div><p class="ai-disclosure"><i data-lucide="shield-check"></i> Konteks soal atau materi yang kamu buka diproses oleh Core AI untuk membuat penjelasan. Jangan masukkan data pribadi.</p><div class="modal-actions"><button class="primary" id="aiClose">Tutup</button></div>`;$('aiClose').onclick=closeModal;enhanceUI()}
-/* A8: "Pastikan Anda sudah login ke Puter" diganti. Dua pelanggaran sekaligus - sudut
-   pandang "Anda" (kanon memakai "kamu") dan nama mesin yang murid nggak perlu tahu - lalu
-   ditambah satu lagi: paragraf keduanya mencetak galat mentah. Wilayahnya diberi
-   role="status": penjelasan yang gagal dimuat itu informasi, bukan keadaan mendesak, jadi ia
-   nggak boleh memotong kalimat yang sedang dibaca pembaca layar. */
-function renderAIError(title,err,retry){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${esc(title)}</h2><div role="status" aria-live="polite" aria-atomic="true"><p>Penjelasan AI-nya belum bisa dimuat. Pastikan kamu sudah masuk ke akunmu dan internetnya nyala.</p><p class="muted">${esc(aiErrorMessage(err))}</p></div><div class="modal-actions">${retry?'<button id="aiRetry">Coba lagi</button>':''}<button class="primary" id="aiClose">Tutup</button></div>`;$('aiClose').onclick=closeModal;if(retry)$('aiRetry').onclick=retry;enhanceUI()}
->>>>>>> add/a8a11y
 function currentAIRequest(id,epoch){return id===aiRequestSeq&&epoch===modalEpoch}
 function aiProfileContext(){const s=buildLearningSnapshot();return{activeLevel:s.activeLevel||getActiveLevel(),estimatedLevel:s.estimatedLevel,totalAttempts:s.totalAttempts,totalAccuracy:s.totalAccuracy,domainAccuracy:Object.fromEntries(Object.entries(s.domains).map(([k,v])=>[k,v.recentAccuracy??v.accuracy])),weakSkills:s.weakSkills.slice(0,3),dueReviews:s.dueReviews,streakDays:s.streakDays,goalProfile:String(state.preferences?.goalProfile||'general').slice(0,30),timeZone:studyTimeZone()}}
 function renderCoachResult(text,meta){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI COACH</div><h2>${esc(personalize("Rencana {name}"))}</h2>${meta?.degraded===true?`<p class="ai-degraded-note" data-ai-degraded="1"><i data-lucide="cloud-cog"></i> ${esc(meta?.note||AI_TASK_COPY.degraded.note)}</p>`:''}<div class="ai-answer coach-answer">${renderMarkdown(text)}</div><p class="ai-disclosure"><i data-lucide="shield-check"></i> Ini dibuat dari ringkasan latihanmu, bukan dari isi jawabanmu.</p><div class="modal-actions"><button id="coachMap">Peta belajar</button><button class="primary" id="coachStart">${state.adaptiveReady?'Mulai latihan':'Mulai tes awal'}</button></div>`;$('coachMap').onclick=()=>{closeModal();go('progress')};$('coachStart').onclick=()=>{closeModal();state.adaptiveReady?startAdaptive():go('test')};enhanceUI()}
