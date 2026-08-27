@@ -71,9 +71,26 @@
     }).join('&');
   }
 
+  // S2 — ringkasan telemetri bayangan Cloudflare (features/cf-shadow/fiezel-shadow-ledger.js).
+  //
+  // Panel ini hanya MEMBACA agregat yang sudah disaring modul itu: angka dan nama endpoint.
+  // Tidak ada prompt, jawaban AI, teks murid, nama, email, uuid, IP, atau cookie yang bisa
+  // sampai ke sini, karena tidak ada satu pun dari itu yang pernah masuk ke ledger (allowlist
+  // field di modul tersebut). Panel tidak pernah menulis ke ledger — kontrak read-only tetap.
+  function shadowLedgerModule() {
+    try { return root.FiezelShadowLedger || null; } catch (_) { return null; }
+  }
+
+  function collectShadowSummary() {
+    var ledger = shadowLedgerModule();
+    if (!ledger || typeof ledger.summary !== 'function') return '(modul cf-shadow belum dimuat)';
+    return safe(function () { return ledger.summary(); });
+  }
+
   function collectSync() {
     return {
       diagBuild: DIAG_BUILD,
+      cfShadow: collectShadowSummary(),
       appVersion: safe(function(){ return String(root.FIEZEL_VERSION || '(tidak ada)'); }),
       capturedAt: new Date().toISOString(),
       origin: safe(function(){ return location.origin; }),
@@ -380,6 +397,18 @@
     pcmState.id = 'fiezelDiagPcmState';
     if (pcmState.style) pcmState.style.cssText = 'font:600 12px/1.6 -apple-system,system-ui,sans-serif;';
 
+    // S2: tabel bayangan CF per endpoint. Ini yang dibaca OWNER untuk memutuskan endpoint mana
+    // dinyalakan lebih dulu, jadi ia di atas kotak JSON — bukan dikubur di dalamnya.
+    var shadow = root.document.createElement('div');
+    shadow.id = 'fiezelDiagShadow';
+    if (shadow.style) shadow.style.cssText = 'font:400 11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-x:auto;';
+    shadow.textContent = 'Bayangan CF: (memuat)';
+
+    var copyShadow = root.document.createElement('button');
+    copyShadow.type = 'button';
+    copyShadow.textContent = 'Copy bayangan CF';
+
+    bar.appendChild(copyShadow);
     bar.appendChild(copySummary);
     bar.appendChild(send);
     bar.appendChild(sendTarget);
@@ -387,6 +416,7 @@
     sheet.appendChild(heading);
     sheet.appendChild(note);
     sheet.appendChild(badges);
+    sheet.appendChild(shadow);
     sheet.appendChild(pcmState);
     sheet.appendChild(searchBar);
     sheet.appendChild(text);
@@ -400,8 +430,56 @@
       search: search, searchCount: searchCount, previous: previous, next: next,
       send: send, sendTarget: sendTarget, close: close,
       badges: badges, copySummary: copySummary,
-      pcmState: pcmState
+      pcmState: pcmState,
+      shadow: shadow, copyShadow: copyShadow
     };
+  }
+
+  function esc(value) {
+    return String(value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /**
+   * Tabel per endpoint: jumlah cocok / tidak cocok / gagal, dan latensi rata-rata Puter vs CF.
+   * Semua sel berasal dari agregat ledger (angka + nama endpoint dari daftar tetap), tetapi
+   * tetap di-escape: panel ini tidak boleh menjadi jalur injeksi walau isinya diyakini bersih.
+   */
+  function shadowTableMarkup(summary) {
+    if (typeof summary === 'string') return '<div>Bayangan CF: ' + esc(summary) + '</div>';
+    if (!summary || !summary.rows) return '<div>Bayangan CF: (ringkasan tidak terbaca)</div>';
+    var head = '<div><strong>Bayangan CF</strong> — ' + esc(summary.observed) + ' permintaan tercatat · '
+      + esc(summary.droppedFields) + ' field ditolak allowlist · pemangkasan ' + esc(summary.pruned)
+      + ' · ' + esc(summary.bytes) + '/' + esc(summary.maxBytes) + 'B</div>';
+    if (!summary.rows.length) return head + '<div>(belum ada permintaan bayangan — endpoint shadow belum menyala)</div>';
+    var rows = summary.rows.map(function (r) {
+      var keys = Object.keys(r.diffKeys || {}).sort();
+      return '<tr>'
+        + '<td>' + esc(r.endpoint) + '</td>'
+        + '<td align="right">' + esc(r.n) + '</td>'
+        + '<td align="right">' + esc(r.match) + '</td>'
+        + '<td align="right">' + esc(r.diff) + '</td>'
+        + '<td align="right">' + esc(r.unknown) + '</td>'
+        + '<td align="right">' + esc(r.puterFail) + '/' + esc(r.cfFail) + '</td>'
+        + '<td align="right">' + esc(r.puterAvgMs) + 'ms</td>'
+        + '<td align="right">' + esc(r.cfAvgMs) + 'ms</td>'
+        + '<td align="right">' + (r.deltaAvgMs > 0 ? '+' : '') + esc(r.deltaAvgMs) + 'ms</td>'
+        + '<td>' + (keys.length ? esc(keys.join(', ')) : '-') + '</td>'
+        + '</tr>';
+    }).join('');
+    return head
+      + '<table style="border-collapse:collapse;width:100%;font:inherit"><thead><tr>'
+      + '<th align="left">endpoint</th><th>n</th><th>cocok</th><th>beda</th><th>?</th>'
+      + '<th>gagal P/CF</th><th>puter</th><th>cf</th><th>selisih</th><th align="left">kunci beda</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  }
+
+  function shadowExportText(summary) {
+    var ledger = shadowLedgerModule();
+    if (ledger && typeof ledger.exportText === 'function') {
+      return safe(function () { return ledger.exportText(); });
+    }
+    return 'Bayangan CF: ' + (typeof summary === 'string' ? summary : 'modul cf-shadow belum dimuat');
   }
 
   function share(button, label, payload) {
@@ -501,6 +579,15 @@
       refreshSearch();
     }
 
+    function renderShadow() {
+      if (!ui.shadow) return;
+      var markup = shadowTableMarkup(dump && dump.cfShadow);
+      // Harness diagnostik me-render panel ini di atas DOM stub minimal; kalau innerHTML tidak
+      // ada, ringkasannya tetap harus terbaca, jadi ada jalur teks.
+      if ('innerHTML' in ui.shadow) ui.shadow.innerHTML = markup;
+      else ui.shadow.textContent = shadowExportText(dump && dump.cfShadow);
+    }
+
     // m025-34: the button now scans every module, not just Neural Voice. The scan is
     // additive -- the existing TTS payload is preserved so older evidence stays readable.
     function runUniversalScan() {
@@ -539,6 +626,7 @@
       dump = collectSync();
       addRuntimeDiagnostics(dump);
       setText();
+      renderShadow();
       Promise.all([addOfflineVoiceBackup(dump), addStorageEstimate(dump), addCacheInventory(dump), runUniversalScan()]).then(function(){
         setText();
       });
@@ -592,6 +680,15 @@
     ui.next.addEventListener('click', function(){ selectMatch(matchIndex + 1); });
     ui.send.addEventListener('click', function(){
       share(ui.send, 'Kirim', ui.text.value);
+    });
+    // S2 butir 6: ekspor teks yang bisa di-copy. Tanpa PII secara konstruksi — yang diekspor
+    // adalah agregat ledger, dan ledger tidak pernah menerima field di luar allowlist-nya.
+    ui.copyShadow.addEventListener('click', function(){
+      var payload = shadowExportText(dump && dump.cfShadow);
+      copy(ui.copyShadow, function(label){
+        ui.copyShadow.textContent = label;
+        setTimeout(function(){ ui.copyShadow.textContent = 'Copy bayangan CF'; }, 1800);
+      }, payload);
     });
     ui.copySummary.addEventListener('click', function(){
       // Human-readable digest, not JSON: this is the paste-into-chat path.
