@@ -16,7 +16,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // tipografi, cleanup token pastel) + berkas font baru Fredoka-var.woff2. style.css
 // dan assets/fonts ada di shell, jadi revisi HARUS naik. Naik SEKALI untuk seluruh
 // fase, bukan per kelompok: tiap kenaikan memaksa unduh ulang cangkang.
-const SW_REV='m025-171-prefetch-pemanggil-suara-20260827';
+const SW_REV='m025-172-jembatan-edge-api-20260827';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
