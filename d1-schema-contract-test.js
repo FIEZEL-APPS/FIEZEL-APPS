@@ -610,6 +610,17 @@ function renderRows(schema) {
 function wranglerEnvelope(rows) {
   return JSON.stringify([{ results: rows, success: true, meta: { duration: 1 } }]);
 }
+/** Ambil daftar `beda`/`kind` dari laporan pembanding TANPA meledak kalau
+ *  pembanding keluar 2 (masukan/berkas migrasi tidak bisa dipercaya, laporannya
+ *  memuat `galat` bukan `beda`). Gerbang yang MELEDAK tetap merah, tetapi merah
+ *  yang tidak bisa dibaca menyembunyikan sebab aslinya. */
+function bedaOf(r) {
+  return r && r.report && Array.isArray(r.report.beda) ? r.report.beda : [];
+}
+function kindsOf(r) {
+  return bedaOf(r).map((d) => d.kind);
+}
+
 function runChecker(db, stdinText) {
   try {
     const out = execFileSync(process.execPath, [CHECKER, '--db', db, '--json'], { input: stdinText, encoding: 'utf8' });
@@ -645,48 +656,48 @@ const statsRows = renderRows(statsSchema);
 { // TABEL HILANG
   const rows = coreRows.filter((r) => r.name !== 'quota_reservation');
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_tabel_hilang', r.code === 1 && kinds.includes('tabel_hilang'), { exit: r.code, kinds });
 }
 { // KOLOM HILANG
   const rows = coreRows.map((r) => (r.name === 'quota_daily'
     ? { ...r, sql: r.sql.replace(/ai_held TEXT, /, '') } : r));
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_kolom_hilang', r.code === 1 && kinds.includes('kolom_hilang'), {
-    exit: r.code, kinds, beda: r.report ? r.report.beda.filter((d) => d.kind === 'kolom_hilang') : null
+    exit: r.code, kinds, beda: bedaOf(r).filter((d) => d.kind === 'kolom_hilang')
   });
 }
 { // INDEKS HILANG
   const rows = coreRows.filter((r) => r.name !== 'idx_quota_reservation_expires');
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_indeks_hilang', r.code === 1 && kinds.includes('indeks_hilang'), { exit: r.code, kinds });
 }
 { // INDEKS SALAH KOLOM (mis. rollback diam-diam di produksi)
   const rows = coreRows.map((r) => (r.name === 'idx_quota_reservation_day_user'
     ? { ...r, sql: 'CREATE INDEX idx_quota_reservation_day_user ON quota_reservation(day)' } : r));
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_kolom_indeks_berbeda', r.code === 1 && kinds.includes('indeks_kolom_beda'), { exit: r.code, kinds });
 }
 { // INDEKS BERLEBIH (indeks lama yang seharusnya sudah di-DROP masih hidup)
   const rows = coreRows.concat([{ type: 'index', name: 'idx_quota_daily_day', tbl_name: 'quota_daily', sql: 'CREATE INDEX idx_quota_daily_day ON quota_daily(day)' }]);
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_indeks_berlebih', r.code === 1 && kinds.includes('indeks_berlebih'), { exit: r.code, kinds });
 }
 { // PELANGGARAN PRIVASI: tabel analytics muncul di database kuota
   const rows = coreRows.concat([{ type: 'table', name: 'dau_dedup', tbl_name: 'dau_dedup', sql: 'CREATE TABLE dau_dedup (day TEXT, token TEXT)' }]);
   const r = runChecker('core', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_tabel_analytics_di_database_kuota', r.code === 1 && kinds.includes('pelanggaran_privasi_tabel'), { exit: r.code, kinds });
 }
 { // PELANGGARAN PRIVASI: kolom penghubung muncul di database analytics
   const rows = statsRows.map((r) => (r.name === 'metrics_daily'
     ? { ...r, sql: r.sql.replace(/\)$/, ', user_id TEXT)') } : r));
   const r = runChecker('stats', wranglerEnvelope(rows));
-  const kinds = r.report ? r.report.beda.map((d) => d.kind) : [];
+  const kinds = kindsOf(r);
   check('pembanding_mendeteksi_kolom_penghubung_di_database_analytics', r.code === 1 && kinds.includes('pelanggaran_privasi_kolom'), { exit: r.code, kinds });
 }
 { // Masukan rusak harus keluar 2, bukan 0 (jangan pernah "hijau karena diam")
