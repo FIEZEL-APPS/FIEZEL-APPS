@@ -1,11 +1,7 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
-<<<<<<< HEAD
-  "scanned": 144,
-=======
-  "scanned": 128,
->>>>>>> add/a5e2e
+  "scanned": 146,
   "allowlist": [
     "http-smoke-test.js",
     "e2e-level-grammar-test.js",
@@ -30,11 +26,7 @@
     "Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3."
   ],
   "counts": {
-<<<<<<< HEAD
-    "pass": 36,
-=======
-    "pass": 37,
->>>>>>> add/a5e2e
+    "pass": 39,
     "fail": 0
   },
   "checks": [
@@ -111,20 +103,12 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
-<<<<<<< HEAD
-      "details": "files=144"
-=======
-      "details": "files=128"
->>>>>>> add/a5e2e
+      "details": "files=146"
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
       "status": "PASS",
-<<<<<<< HEAD
-      "details": "start=13423 end=15191"
-=======
-      "details": "start=13121 end=14889"
->>>>>>> add/a5e2e
+      "details": "start=14230 end=15998"
     },
     {
       "name": "Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya",
@@ -227,14 +211,19 @@
       "details": "quality.yml"
     },
     {
-      "name": "quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL",
+      "name": "Env gerbang live datang dari input workflow_dispatch, bukan URL yang dipaku (SKIP secara bawaan pada push/PR)",
       "status": "PASS",
-      "details": "komentar SKIP + FIEZEL_CF_LIVE_BASE"
+      "details": "FIEZEL_CF_LIVE_BASE <- github.event.inputs.cf_live_base"
     },
     {
-      "name": "Gerbang staging live terdaftar di quality.yml sebagai langkah yang SKIP secara bawaan",
+      "name": "Env gerbang staging datang dari input workflow_dispatch, bukan URL yang dipaku (SKIP secara bawaan pada push/PR)",
       "status": "PASS",
-      "details": "komentar SKIP STAGING + FIEZEL_STAGING_BASE"
+      "details": "FIEZEL_STAGING_BASE <- github.event.inputs.staging_base"
+    },
+    {
+      "name": "Gerbang staging live terdaftar di quality.yml",
+      "status": "PASS",
+      "details": "quality.yml"
     }
   ]
 }
