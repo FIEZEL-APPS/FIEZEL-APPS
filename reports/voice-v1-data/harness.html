@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>FIEZEL V1 voice pause audit harness</title>
+</head>
+<body>
+<h1>voice pause audit harness</h1>
+<pre id="log"></pre>
+<script src="/features/neural-voice/fiezel-prosody.js"></script>
+<script src="/features/neural-voice/fiezel-neural-voice-config.js"></script>
+<script src="/features/neural-voice/fiezel-voice-persona.js"></script>
+<script src="/features/neural-voice/fiezel-sherpa-vits-adapter.js"></script>
+<script src="/features/neural-voice/fiezel-web-audio-player.js"></script>
+<script src="/features/neural-voice/fiezel-neural-voice.js"></script>
+<script>
+(function () {
+  'use strict';
+  const A = { events: [], pcm: [], notes: [] };
+  window.__AUDIT = A;
+  const log = m => { document.getElementById('log').textContent += m + '\n'; };
+  const t0 = performance.now();
+  const push = e => { e.wall = +(performance.now() - t0).toFixed(2); A.events.push(e); };
+  A.push = push;
+
+  // ---- instrumentation: every AudioBufferSourceNode.start is one audible piece ----
+  const origStart = AudioBufferSourceNode.prototype.start;
+  AudioBufferSourceNode.prototype.start = function (when) {
+    const ctx = this.context;
+    const now = ctx.currentTime;
+    const at = (typeof when === 'number' && when > 0) ? when : now;
+    push({
+      type: 'source_start',
+      requestedWhen: (typeof when === 'number') ? +when.toFixed(6) : null,
+      startsAtCtx: +at.toFixed(6),
+      ctxNow: +now.toFixed(6),
+      durationS: this.buffer ? +this.buffer.duration.toFixed(6) : null,
+      ctxSampleRate: ctx.sampleRate
+    });
+    return origStart.apply(this, arguments);
+  };
+
+  // ---- build the engine EXACTLY as fiezel-neural-voice-bootstrap.js:269-313 does ----
+  let service = null, adapter = null, player = null, genLog = [];
+  async function boot() {
+    const speech = window.FiezelNeuralVoiceConfig.speech; // streamSentences true, 26, 0.4
+    adapter = window.FiezelSherpaVitsAdapter.createSherpaVitsAdapter({
+      env: window,
+      basePath: location.origin + '/vendor/supertonic-3/',
+      expectedSpeakers: 10,
+      modelId: 'supertonic-3-int8-2026-05-11',
+      voiceSids: window.FiezelVoicePersona ? window.FiezelVoicePersona.voiceSids() : undefined,
+      defaultVoice: 'id_natural',
+      kind: 'supertonic-3',
+      generationLang: 'en',
+      personas: window.FiezelVoicePersona || null,
+      usePersona: !!window.FiezelVoicePersona,
+      padBetweenPhrases: false,
+      naturalSpeed: 1,
+      generationSteps: 4,
+      usePitchContour: false,
+      useEmotion: true,
+      silenceScale: speech.silenceScale,
+      prosody: window.FiezelProsody || null,
+      onStage: e => { if (e && /generate/.test(String(e.phase))) push({ type: 'adapter_stage', phase: e.phase, elapsedMs: e.elapsedMs ?? null, samples: e.samples ?? null, sampleRate: e.sampleRate ?? null, phrases: e.phrases ?? null }); }
+    });
+    const initAt = performance.now();
+    await adapter.initialize();
+    push({ type: 'adapter_ready', elapsedMs: +(performance.now() - initAt).toFixed(1) });
+
+    // wrap generate so model time is measured directly, and PCM captured for ffmpeg
+    const rawGenerate = adapter.generate;
+    const wrapped = Object.assign({}, adapter, {
+      generate: function (text, options) {
+        const started = performance.now();
+        push({ type: 'generate_enter', chars: String(text || '').length, text: String(text || ''), position: options && options.position || null });
+        return rawGenerate(text, options).then(res => {
+          const ms = +(performance.now() - started).toFixed(1);
+          const samples = res && (res.audio || res.data);
+          const rate = res && (res.sampling_rate || res.sampleRate) || 0;
+          const idx = A.pcm.length;
+          A.pcm.push({ index: idx, text: String(text || ''), sampleRate: rate, samples: samples });
+          push({
+            type: 'generate_ready', pcmIndex: idx, elapsedMs: ms,
+            samples: samples ? samples.length : 0, sampleRate: rate,
+            audioSeconds: samples && rate ? +(samples.length / rate).toFixed(4) : null,
+            rtf: samples && rate ? +((ms / 1000) / (samples.length / rate)).toFixed(3) : null,
+            chars: String(text || '').length
+          });
+          return res;
+        }, err => { push({ type: 'generate_error', error: String(err && err.message || err) }); throw err; });
+      }
+    });
+    adapter = wrapped;
+    player = window.FiezelWebAudioPlayer.createPlayer(window);
+    player.warm();
+    service = window.FiezelNeuralVoice.createVoiceService({
+      config: window.FiezelNeuralVoiceConfig,
+      adapter: wrapped,
+      env: window,
+      playAudio: player.play,
+      generationTimeoutMs: 20000,
+      streamSentences: speech.streamSentences,
+      streamMaxWords: speech.streamMaxWords,
+      prosody: window.FiezelProsody || null
+    });
+    A.notes.push('engine booted with config speech=' + JSON.stringify(speech));
+    log('booted');
+    return true;
+  }
+  window.__boot = boot;
+
+  // Scenario A: exactly what features/library/fiezel-library-ui.js:148-215 does -
+  // one say() per sentence, awaited, with prefetch of the NEXT sentence deferred one task.
+  window.__runPerSentence = async function (sentences, usePrefetch) {
+    push({ type: 'scenario_start', scenario: usePrefetch ? 'per_sentence_with_prefetch' : 'per_sentence_no_prefetch', sentences: sentences.length });
+    for (let i = 0; i < sentences.length; i++) {
+      push({ type: 'say_call', index: i, text: sentences[i] });
+      const p = service.speak(sentences[i], { voice: 'default', speed: 1, lang: 'en-US', allowFallback: false });
+      if (usePrefetch && sentences[i + 1]) {
+        setTimeout(() => { try { service.prefetch(sentences[i + 1], { voice: 'default', speed: 1, lang: 'en-US' }); } catch (_) {} }, 0);
+      }
+      await p;
+      push({ type: 'say_resolved', index: i });
+    }
+    push({ type: 'scenario_end' });
+    return true;
+  };
+
+  // Scenario B: one speak() for the whole passage (the streaming plan inside
+  // fiezel-neural-voice.js:569-632 is the only path where continuous/trim/gapMs are used).
+  window.__runOneCall = async function (text) {
+    push({ type: 'scenario_start', scenario: 'single_speak_streaming', chars: text.length });
+    push({ type: 'say_call', index: 0, text: text });
+    await service.speak(text, { voice: 'default', speed: 1, lang: 'en-US', allowFallback: false });
+    push({ type: 'say_resolved', index: 0 });
+    push({ type: 'scenario_end' });
+    return true;
+  };
+
+  window.__plan = function (text) { return service.splitIntoChunks(text); };
+
+  window.__dump = function () {
+    return { events: A.events, notes: A.notes, pcmMeta: A.pcm.map(p => ({ index: p.index, text: p.text, sampleRate: p.sampleRate, length: p.samples ? p.samples.length : 0 })) };
+  };
+
+  // WAV of one captured render, base64, so ffmpeg can measure the silence that is
+  // genuinely inside the model output.
+  window.__wav = function (i) {
+    const rec = A.pcm[i];
+    if (!rec) return null;
+    const buf = window.FiezelWebAudioPlayer.encodeWav(rec.samples, rec.sampleRate);
+    const bytes = new Uint8Array(buf);
+    let s = '';
+    for (let k = 0; k < bytes.length; k += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(k, k + 0x8000));
+    return btoa(s);
+  };
+  window.__reset = function () { A.events.length = 0; A.pcm.length = 0; };
+})();
+</script>
+</body>
+</html>
