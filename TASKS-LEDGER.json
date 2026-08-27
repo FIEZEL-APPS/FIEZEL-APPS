@@ -321,6 +321,14 @@
       "status": "in_progress",
       "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
       "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
+    },
+    {
+      "id": "T-027",
+      "title": "Wave D: audit menyeluruh (10 auditor) + perbaikan temuan (10 fixer) + rilis m025-176",
+      "owner": "perplexity-computer (braincore session)",
+      "status": "in_progress",
+      "evidence": "Branch audit-wave-d dari main 2e31010 (m025-175). 10 auditor read-only lalu 10 fixer dengan kepemilikan file eksklusif. Semua gate lokal + CI harus hijau sebelum merge.",
+      "note": "SCOPE EXCLUSION: tidak menyentuh features/neural-voice/**, workflows audio*, NEURAL-VOICE-SOURCE-LOCK.json (T-026 in_progress oleh agent-5 sesi lain). Kepemilikan fixer: grammar-templates.json+misconception jsons; bank reading; bank listening/speaking data; app.js+index.html; features/brain/**; sw.js+style.css; workers/**; docs; .github/workflows/nightwatch.yml; tools/release-check.js."
     }
   ],
   "last_report": {
