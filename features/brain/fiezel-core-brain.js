@@ -76,6 +76,26 @@
     return at === -1 ? 0 : at;
   }
 
+  /**
+   * Waktu "sekarang" TANPA Date.now(). Council v3 (opus §meta, kontrak aturan 1): fallback
+   * Date.now() membuat modul tidak deterministik - dua pemanggilan dengan masukan identik
+   * menghasilkan angka berbeda, dan gate yang lolos hari ini bisa gagal besok. Degradasi
+   * amannya: kalau pemanggil lupa memberi `now`, pakai stempel waktu TERBARU yang ada di
+   * datanya sendiri (usia relatif terhadap bukti terakhir, bukan terhadap jam dinding),
+   * dan 0 kalau datanya pun kosong - saat itu tidak ada usia yang bisa dihitung.
+   */
+  function resolveNow(explicit, rows, field) {
+    var n = Number(explicit);
+    if (isFinite(n) && n > 0) return n;
+    var latest = 0;
+    var list = Array.isArray(rows) ? rows : [];
+    for (var i = 0; i < list.length; i++) {
+      var at = Number(list[i] && list[i][field]);
+      if (isFinite(at) && at > latest) latest = at;
+    }
+    return latest;
+  }
+
   // =====================================================================================
   // A. MODEL KEMAMPUAN LATEN (Rasch / 1PL)
   // =====================================================================================
@@ -119,8 +139,10 @@
   var ABILITY_HALF_LIFE_DAYS = 21;
   function estimateAbility(attempts, options) {
     var opts = options || {};
-    var now = num(opts.now, Date.now()) || Date.now();
     var rows = Array.isArray(attempts) ? attempts : [];
+    // Council v3: `now` wajib argumen (analyze() selalu meneruskannya). Tanpa argumen,
+    // usia dihitung relatif ke jawaban terbaru - deterministik, bukan jam dinding.
+    var now = resolveNow(opts.now, rows, 'at');
     var ability = num(opts.prior, 1.5);
     var seen = 0;
     var weighted = 0;
@@ -157,12 +179,24 @@
   /**
    * Kesulitan yang membuat peluang benar mendekati `targetSuccess`.
    *
-   * 0.80 bukan angka karangan, dan bukan pula 0.85 yang biasa dikutip. Aturan 85% berlaku
-   * untuk tugas TANPA tebakan; pada pilihan ganda empat opsi, 0.85 teramati hanya setara
-   * ~0.80 pengetahuan sesungguhnya - dan mengejar 0.85 teramati akan menggeser latihan ke
-   * soal yang terlalu mudah. Target di sini karena itu dinyatakan pada peluang TERAMATI dan
-   * disetel 0.80: cukup sering benar untuk tetap berjalan, cukup sering salah untuk ada yang
-   * dipelajari.
+   * 0.80 adalah PRIOR OPERASIONAL yang dipilih secara eksplisit sebagai desirable
+   * difficulty (Bjork & Bjork: kondisi yang sedikit menurunkan performa jangka pendek
+   * justru menaikkan retensi jangka panjang), BUKAN hasil koreksi tebakan.
+   *
+   * Koreksi council v3 (opus §2.2): alasan lama di sini menyebut 0.80 sebagai "0.85
+   * teramati setelah dikoreksi lantai tebakan", dan arah aritmetikanya terbalik. Hubungan
+   * yang benar adalah p_teramati = c + (1-c)·p_tahu, sehingga:
+   *
+   *   - teramati 0.85 → pengetahuan 0.80 (bukan sebaliknya);
+   *   - teramati 0.80 yang dipakai di sini → pengetahuan 0.733;
+   *   - kalau targetnya pengetahuan 0.85, teramatinya harus DINAIKKAN ke
+   *     0.25 + 0.75·0.85 = 0.8875, bukan diturunkan ke 0.80.
+   *
+   * Jadi posisinya sekarang dinyatakan apa adanya: target 0.80 pada peluang TERAMATI,
+   * dipertahankan karena pengetahuan-ekuivalen 0.733 adalah tingkat kesalahan yang cukup
+   * sering untuk selalu ada yang dipelajari, dan cukup jarang untuk tidak mematahkan
+   * semangat. Angka ini boleh dibantah dengan data kalibrasi - tetapi tidak boleh lagi
+   * dibela dengan aritmetika koreksi tebakan yang arahnya salah.
    *
    * Kebalikan dari successProbability, dengan lantai tebakan ikut dibuka:
    *
@@ -247,6 +281,12 @@
   var BASE_HALF_LIFE_DAYS = 1.6;
   function halfLife(item) {
     var it = item || {};
+    // Council v3 (fable P2): item yang sudah dimigrasikan ke memori FSRS-lite membawa
+    // `stability` (hari) yang diperbarui oleh updateMemory(). Kalau ada dan positif, IA-lah
+    // paruh-waktunya - formula streak di bawah hanya untuk item lama tanpa field baru
+    // (degradasi anggun, kompat mundur total: tanpa `stability`, hasilnya identik v2).
+    var stability = Number(it.stability);
+    if (isFinite(stability) && stability > 0) return round(clamp(stability, 0.2, 365), 3);
     var reps = clamp(it.successes, 0, 40);
     var lapses = clamp(it.lapseBurden == null ? it.lapses : it.lapseBurden, 0, 40);
     var difficulty = clamp(it.difficulty == null ? 3 : it.difficulty, 1, 6);
@@ -254,6 +294,56 @@
     var lapsePenalty = Math.pow(0.55, lapses);
     var difficultyPenalty = Math.pow(0.9, difficulty - 1);
     return round(clamp(BASE_HALF_LIFE_DAYS * growth * lapsePenalty * difficultyPenalty, 0.2, 365), 3);
+  }
+
+  /**
+   * Pembaruan stabilitas ingatan SETELAH satu review - FSRS-lite (council v3, fable P2 &
+   * opus §2.5). Dua cacat v2 yang diperbaiki di sini, keduanya terverifikasi probe:
+   *
+   *   1. PERTUMBUHAN v2 BUTA TERHADAP JARAK. Faktor 1.9^successes memberi hadiah yang sama
+   *      untuk review 10 menit setelah belajar dan review 20 hari kemudian - padahal seluruh
+   *      nilai spaced repetition ada pada premis bahwa review saat retrievability RENDAH
+   *      menguatkan lebih besar. Di sini gain memuat e^(1.8·(1-R)) - 1: mendekati nol saat
+   *      R→1 (review prematur nyaris sia-sia), membesar saat R rendah. Ditambah S^-0.15:
+   *      ingatan yang sudah stabil tumbuh lebih lambat (saturasi).
+   *   2. LAPSE v2 MENGHUKUM GANDA. successes=streak berarti satu kegagalan mereset eksponen
+   *      ke nol DAN mengalikan 0.55 - item 8 sukses jatuh >99%. Di sini lapse runtuh
+   *      SEBAGIAN: S' = min(S, 1.5·Dmap^-0.6·((S+1)^0.35 - 1)) dengan lantai >=10% S,
+   *      supaya satu hari buruk tidak menghapus berbulan-bulan penguatan.
+   *
+   * Tanda tangan FINAL kontrak: updateMemory({stability, retrievability, difficulty, ok})
+   * -> {stability, rationale}. `stability` dalam HARI; `difficulty` skala soal 1..6,
+   * dipetakan ke Dmap = clamp(difficulty·1.6, 1, 10) skala FSRS. Murni: tanpa waktu, tanpa
+   * state - pemanggil menghitung R sendiri (retrievability(halfLife(item), umur)).
+   */
+  var MEMORY_GAIN = 1.2;          // skala gain sukses
+  var MEMORY_SATURATION = 0.15;   // S^-b: ingatan stabil tumbuh lebih lambat
+  var MEMORY_SPACING = 1.8;       // e^(c·(1-R)): inti efek spacing
+  var LAPSE_SCALE = 1.5;          // skala stabilitas pasca-lapse
+  var LAPSE_DIFFICULTY = 0.6;     // materi sulit runtuh lebih dalam
+  var LAPSE_RETAIN = 0.35;        // (S+1)^f: sebagian riwayat penguatan dipertahankan
+  var LAPSE_FLOOR = 0.1;          // lantai anti-keruntuhan total: S' >= 10% S
+  function updateMemory(review) {
+    var rv = review || {};
+    var S = Number(rv.stability);
+    if (!isFinite(S) || S <= 0) S = BASE_HALF_LIFE_DAYS;
+    S = clamp(S, 0.05, 365);
+    var R = clamp(rv.retrievability, 0, 1);
+    var dmap = clamp(num(rv.difficulty, 3) * 1.6, 1, 10);
+    if (rv.ok) {
+      var gain = MEMORY_GAIN * (11 - dmap) * Math.pow(S, -MEMORY_SATURATION)
+        * (Math.exp(MEMORY_SPACING * (1 - R)) - 1);
+      // Sukses tidak pernah menurunkan stabilitas (gain >= 0 karena R <= 1), dan langit-langit
+      // 365 hari menjaga jadwal tetap di dalam rentang yang halfLife() janjikan.
+      return {
+        stability: round(clamp(S * (1 + gain), S, 365), 3),
+        rationale: 'brain3_memory_gain_spacing'
+      };
+    }
+    var collapsed = Math.min(S, LAPSE_SCALE * Math.pow(dmap, -LAPSE_DIFFICULTY)
+      * (Math.pow(S + 1, LAPSE_RETAIN) - 1));
+    collapsed = Math.max(collapsed, LAPSE_FLOOR * S, 0.05);
+    return { stability: round(collapsed, 3), rationale: 'brain3_memory_lapse_partial' };
   }
 
   /** Peluang materi masih bisa ditarik dari ingatan setelah `ageDays`. 2^(-t/h). */
@@ -278,20 +368,36 @@
    * Mengurutkan materi menurut MANFAAT mengulangnya sekarang, bukan menurut jatuh tempo.
    *
    * Manfaat tertinggi ada di materi yang berada di ambang lupa: retensi ~0.6-0.85. Materi
-   * yang retensinya masih 0.98 belum perlu disentuh, dan materi yang sudah 0.2 praktis harus
-   * dipelajari ulang - keduanya bukan "review" yang efisien. Puncak di 0.75 itulah yang
-   * dikejar skor di bawah.
+   * yang retensinya masih 0.98 belum perlu disentuh - itu bukan "review" yang efisien.
+   * Puncak di 0.75 itulah yang dikejar skor di bawah.
+   *
+   * Council v3 (opus §2.6, temuan T6): jendela Gauss murni menghukum ekor bawah sampai NOL.
+   * Item dengan retrievability 0.03 - materi yang paling butuh diselamatkan - berskor 0.000,
+   * di bawah item yang baru dilihat kemarin, dan makin lama ditinggalkan makin kecil
+   * skornya: jebakan absorbing state, materi yang hilang tidak pernah muncul lagi. Skor
+   * sekarang memisahkan dua pertanyaan: EFISIENSI penguatan (puncak Gauss di 0.75) dan
+   * NILAI PENYELAMATAN yang naik saat r turun:
+   *
+   *   score = gauss(r, 0.75, 0.22) · (1 + 1.5·(1-r)) · weight
+   *
+   * sehingga di ekor bawah skor tidak lagi mati ke nol dan item yang runtuh tetap punya
+   * urutan yang benar (r 0.03 > r 0.001, bukan seri di 0).
    */
   function reviewPriority(items, options) {
     var opts = options || {};
-    var now = num(opts.now, Date.now()) || Date.now();
-    return (Array.isArray(items) ? items : []).map(function (raw) {
+    var list = Array.isArray(items) ? items : [];
+    // Council v3: tanpa Date.now(). Kalau `now` absen, usia dihitung relatif ke review
+    // terakhir yang tercatat - analyze() sendiri selalu meneruskan `now` miliknya.
+    var now = resolveNow(opts.now, list, 'lastSeenAt');
+    return list.map(function (raw) {
       var item = raw || {};
       var h = item.halfLifeDays == null ? halfLife(item) : num(item.halfLifeDays, BASE_HALF_LIFE_DAYS);
       var ageDays = Math.max(0, (now - num(item.lastSeenAt, now)) / 86400000);
       var r = retrievability(h, ageDays);
-      // Puncak di 0.75, turun mulus ke kedua arah.
+      // Puncak di 0.75, turun mulus ke kedua arah...
       var urgency = Math.exp(-Math.pow((r - 0.75) / 0.22, 2));
+      // ...dikalikan faktor penyelamatan yang membesar saat r turun (T6).
+      var salvage = 1 + 1.5 * (1 - r);
       var weight = clamp(item.weight == null ? 1 : item.weight, 0.2, 3);
       return {
         id: str(item.id),
@@ -301,7 +407,7 @@
         ageDays: round(ageDays, 3),
         retrievability: r,
         dueInDays: round(nextReviewGapDays(h, opts.targetRetention) - ageDays, 3),
-        score: round(urgency * weight, 4)
+        score: round(urgency * salvage * weight, 4)
       };
     }).sort(function (a, b) { return b.score - a.score; });
   }
@@ -352,7 +458,10 @@
       for (var j = 0; j < chunk.length; j++) if (chunk[j] && chunk[j].ok) correct++;
       series.push(correct / chunk.length);
     }
-    if (series.length < 2) return { state: 'unknown', slope: 0, r2: 0, blocks: series.length, attempts: rows.length, confidence: 0 };
+    // Council v3 (opus §2.9): regresi pada DUA titik selalu r²=1 - garis melalui dua titik
+    // apa pun cocok sempurna, jadi confidence-nya (0.33) sepenuhnya palsu. Arah belajar baru
+    // boleh dinyatakan mulai TIGA blok; di bawah itu jawabannya 'unknown', bukan tebakan.
+    if (series.length < 3) return { state: 'unknown', slope: 0, r2: 0, blocks: series.length, attempts: rows.length, confidence: 0 };
     var fit = trend(series);
     // Ambang 0.04 per blok ≈ 4 poin akurasi per lima soal: cukup besar untuk bukan derau.
     var state = fit.slope >= 0.04 ? 'improving' : fit.slope <= -0.04 ? 'declining' : 'plateau';
@@ -768,8 +877,12 @@
    */
   function analyze(input) {
     var data = input || {};
-    var now = num(data.now, Date.now()) || Date.now();
     var attempts = Array.isArray(data.attempts) ? data.attempts : [];
+    // Council v3: `now` wajib diberikan pemanggil (app.js coreBrainSnapshot sudah begitu).
+    // Degradasi aman tanpa Date.now(): pakai stempel waktu terbaru dari bukti yang ada -
+    // seluruh model turunan (kemampuan, memori) menerima `now` YANG SAMA dari sini.
+    var now = resolveNow(data.now, attempts, 'at');
+    if (!now) now = resolveNow(null, data.memory, 'lastSeenAt');
     var ability = estimateAbility(attempts, { now: now, prior: data.priorAbility });
     var byDomain = {};
     ['vocab', 'grammar', 'reading'].forEach(function (domain) {
@@ -906,6 +1019,7 @@
     challengeWindow: challengeWindow,
     difficultyBand: difficultyBand,
     halfLife: halfLife,
+    updateMemory: updateMemory,
     retrievability: retrievability,
     nextReviewGapDays: nextReviewGapDays,
     reviewPriority: reviewPriority,
