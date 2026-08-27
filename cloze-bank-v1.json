@@ -1,0 +1,3068 @@
+{
+  "schema": "fiezel-cloze-bank-v1",
+  "generatedFrom": "grammar-templates.json",
+  "counts": {
+    "templates": 139,
+    "items": 112,
+    "rejected": 27,
+    "byLevel": {
+      "A2": 12,
+      "B1": 39,
+      "B2": 25,
+      "C1": 16,
+      "A1": 13,
+      "C2": 7
+    }
+  },
+  "rejected": [
+    {
+      "templateId": "AR-001",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"The\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "PR-001",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "RC-001",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "EC-001",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "PA-004",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have / repaired\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "PR-002",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"at / on\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "PR-003",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"of\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "RC-002",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"developing\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "EC-002",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "EC-003",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "RS-006",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"rained / would cancel\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "AR-004",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"the\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "GI-004",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"restarting\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "EC-004",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "EC-005",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "b4_010",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"could\" muncul 2x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "b4_017",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "b4_021",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "b4_023",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"so\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "b5_009",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"he; his\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "b5_013",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"by; by\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "b5_014",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"to\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "b5_018",
+      "reason": "multi_blank",
+      "detail": "stem memuat 2 blank dengan jawaban gabungan \"have; had\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "b5_020",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "A1-008",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"an\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "A1-012",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
+    },
+    {
+      "templateId": "A1-013",
+      "reason": "answer_too_short",
+      "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+    }
+  ],
+  "items": [
+    {
+      "id": "TA-001-cz0",
+      "templateId": "TA-001",
+      "skill": "present_simple_vs_continuous",
+      "level": "A2",
+      "sentence": "Look! The chef ___ a new dish right now — you can smell it.",
+      "blank": {
+        "answer": "is preparing",
+        "alternates": [],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "prepares",
+          "misconception": "habitual-aspect overgeneralization"
+        },
+        {
+          "text": "has prepared",
+          "misconception": "confusing in-progress with completed result"
+        },
+        {
+          "text": "prepare",
+          "misconception": "missing subject-verb agreement / bare form"
+        }
+      ]
+    },
+    {
+      "id": "TA-002-cz0",
+      "templateId": "TA-002",
+      "skill": "past_simple_vs_present_perfect",
+      "level": "B1",
+      "sentence": "She ___ to Lisbon exactly once, in 2019, before the pandemic changed everything.",
+      "blank": {
+        "answer": "traveled",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "has traveled",
+          "misconception": "present-perfect-for-any-past-event"
+        },
+        {
+          "text": "was traveling",
+          "misconception": "aspect confusion (progressive for a single completed trip)"
+        },
+        {
+          "text": "travels",
+          "misconception": "tense-timeline mismatch"
+        }
+      ]
+    },
+    {
+      "id": "TA-003-cz0",
+      "templateId": "TA-003",
+      "skill": "future_forms_plan_vs_prediction",
+      "level": "B1",
+      "sentence": "Which completion shows a decision made only at the moment of speaking? A: 'The phone's ringing.' B: 'Don't worry, I ___ it.'",
+      "blank": {
+        "answer": "will get",
+        "alternates": [],
+        "position": 116
+      },
+      "distractors": [
+        {
+          "text": "am getting",
+          "misconception": "treats spontaneous offers as pre-arranged plans"
+        },
+        {
+          "text": "get",
+          "misconception": "present simple used for a one-off future act"
+        },
+        {
+          "text": "am going to getting",
+          "misconception": "structural error: double -ing after 'going to'"
+        }
+      ]
+    },
+    {
+      "id": "MO-001-cz0",
+      "templateId": "MO-001",
+      "skill": "obligation_vs_permission",
+      "level": "A2",
+      "sentence": "Visitors ___ leave their bags at the front desk; it's a museum rule, not a choice.",
+      "blank": {
+        "answer": "must",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "can",
+          "misconception": "obligation read as ability/permission"
+        },
+        {
+          "text": "may",
+          "misconception": "obligation read as formal permission"
+        },
+        {
+          "text": "could",
+          "misconception": "obligation read as a polite hypothetical"
+        }
+      ]
+    },
+    {
+      "id": "MO-002-cz0",
+      "templateId": "MO-002",
+      "skill": "deduction_present",
+      "level": "B1",
+      "sentence": "Which option expresses the strongest negative deduction supported by the evidence? The lights are off and the car isn't in the driveway, so they ___ be home.",
+      "blank": {
+        "answer": "can't",
+        "alternates": [],
+        "position": 145
+      },
+      "distractors": [
+        {
+          "text": "mustn't",
+          "misconception": "negative obligation confused with negative deduction"
+        },
+        {
+          "text": "might not",
+          "misconception": "underestimates the strength of the evidence"
+        },
+        {
+          "text": "shouldn't",
+          "misconception": "deduction confused with expectation/advice"
+        }
+      ]
+    },
+    {
+      "id": "CO-001-cz0",
+      "templateId": "CO-001",
+      "skill": "zero_vs_first_conditional",
+      "level": "A2",
+      "sentence": "Which completion states this as a general fact that is always true, not a prediction about one occasion? If you heat ice, it ___.",
+      "blank": {
+        "answer": "melts",
+        "alternates": [],
+        "position": 125
+      },
+      "distractors": [
+        {
+          "text": "will melt",
+          "misconception": "general truth treated as a one-time prediction"
+        },
+        {
+          "text": "would melt",
+          "misconception": "real condition treated as hypothetical"
+        },
+        {
+          "text": "melted",
+          "misconception": "past tense used for a timeless fact"
+        }
+      ]
+    },
+    {
+      "id": "CO-002-cz0",
+      "templateId": "CO-002",
+      "skill": "second_conditional_unreal_present",
+      "level": "B1",
+      "sentence": "If I ___ the lottery, I would travel the world — but let's be honest, it's not going to happen.",
+      "blank": {
+        "answer": "won",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "win",
+          "misconception": "if-clause verb form mismatched with 'would' in the main clause"
+        },
+        {
+          "text": "would win",
+          "misconception": "duplicating 'would' in both clauses"
+        },
+        {
+          "text": "will win",
+          "misconception": "real/likely framing applied to an admittedly unlikely event"
+        }
+      ]
+    },
+    {
+      "id": "PA-001-cz0",
+      "templateId": "PA-001",
+      "skill": "agent_omission_when_irrelevant",
+      "level": "B1",
+      "sentence": "Which completion most explicitly leaves the unknown builder out of the sentence? The bridge ___ in 1932; nobody today remembers who built it.",
+      "blank": {
+        "answer": "was constructed",
+        "alternates": [],
+        "position": 92
+      },
+      "distractors": [
+        {
+          "text": "constructed",
+          "misconception": "active voice used despite an unknown/irrelevant agent"
+        },
+        {
+          "text": "has construct",
+          "misconception": "malformed passive/perfect blend"
+        },
+        {
+          "text": "was constructed by workers",
+          "misconception": "adds a vague, uninformative agent instead of omitting it"
+        }
+      ]
+    },
+    {
+      "id": "RS-001-cz0",
+      "templateId": "RS-001",
+      "skill": "backshift_statement",
+      "level": "B1",
+      "sentence": "Apply conventional backshift to report the earlier state: Yesterday she said, ‘I am tired.’ Today we report that she ___ tired.",
+      "blank": {
+        "answer": "was",
+        "alternates": [],
+        "position": 117
+      },
+      "distractors": [
+        {
+          "text": "is",
+          "misconception": "no backshift applied"
+        },
+        {
+          "text": "has been",
+          "misconception": "backshift target confused with present perfect"
+        },
+        {
+          "text": "will be",
+          "misconception": "tense category changed instead of shifted one step back"
+        }
+      ]
+    },
+    {
+      "id": "GI-001-cz0",
+      "templateId": "GI-001",
+      "skill": "verb_pattern_meaning_change_stop",
+      "level": "B2",
+      "sentence": "On the way home, she stopped ___ some bread because the bakery was still open.",
+      "blank": {
+        "answer": "to buy",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "buying",
+          "misconception": "gerund used where a purpose-infinitive is needed"
+        },
+        {
+          "text": "buy",
+          "misconception": "bare infinitive used instead of the required to-infinitive"
+        },
+        {
+          "text": "having bought",
+          "misconception": "perfect gerund used where a simple purpose clause is needed"
+        }
+      ]
+    },
+    {
+      "id": "CM-001-cz0",
+      "templateId": "CM-001",
+      "skill": "comparative_vs_superlative_scope",
+      "level": "A2",
+      "sentence": "Between these two routes, the coastal road is ___ than the mountain pass.",
+      "blank": {
+        "answer": "more scenic",
+        "alternates": [],
+        "position": 46
+      },
+      "distractors": [
+        {
+          "text": "the most scenic",
+          "misconception": "superlative used for a two-item comparison"
+        },
+        {
+          "text": "scenic",
+          "misconception": "base adjective used without comparative marking"
+        },
+        {
+          "text": "most scenic",
+          "misconception": "superlative used without 'the', still wrong scope"
+        }
+      ]
+    },
+    {
+      "id": "QN-001-cz0",
+      "templateId": "QN-001",
+      "skill": "question_tag_polarity",
+      "level": "B1",
+      "sentence": "You haven't finished the report yet, ___?",
+      "blank": {
+        "answer": "have you",
+        "alternates": [],
+        "position": 37
+      },
+      "distractors": [
+        {
+          "text": "haven't you",
+          "misconception": "tag polarity copied instead of reversed"
+        },
+        {
+          "text": "did you",
+          "misconception": "wrong auxiliary borrowed from a different tense"
+        },
+        {
+          "text": "don't you",
+          "misconception": "wrong auxiliary substituted (present simple instead of present perfect)"
+        }
+      ]
+    },
+    {
+      "id": "TA-004-cz0",
+      "templateId": "TA-004",
+      "skill": "past_continuous_vs_past_simple_interrupted_action",
+      "level": "A2",
+      "sentence": "I ___ dinner when the power suddenly went out.",
+      "blank": {
+        "answer": "was cooking",
+        "alternates": [],
+        "position": 2
+      },
+      "distractors": [
+        {
+          "text": "cooked",
+          "misconception": "treats both clauses as sequential completed events"
+        },
+        {
+          "text": "have cooked",
+          "misconception": "confuses interrupted past action with present perfect result"
+        },
+        {
+          "text": "cook",
+          "misconception": "bare present form used for a past narrative"
+        }
+      ]
+    },
+    {
+      "id": "TA-005-cz0",
+      "templateId": "TA-005",
+      "skill": "present_perfect_continuous_vs_present_perfect_simple",
+      "level": "B2",
+      "sentence": "She ___ three novels this year, and she's already working on a fourth.",
+      "blank": {
+        "answer": "has written",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "has been writing",
+          "misconception": "over-applies continuous aspect whenever a time span like 'this year' appears"
+        },
+        {
+          "text": "was writing",
+          "misconception": "shifts to a fixed past narrative tense"
+        },
+        {
+          "text": "writes",
+          "misconception": "treats the sentence as a habitual routine"
+        }
+      ]
+    },
+    {
+      "id": "TA-006-cz0",
+      "templateId": "TA-006",
+      "skill": "past_perfect_sequencing_two_past_events",
+      "level": "B1",
+      "sentence": "By the time the ambulance arrived, the neighbors ___ first aid.",
+      "blank": {
+        "answer": "had already given",
+        "alternates": [],
+        "position": 49
+      },
+      "distractors": [
+        {
+          "text": "already gave",
+          "misconception": "uses past simple for the earlier event, flattening the sequence"
+        },
+        {
+          "text": "were already giving",
+          "misconception": "confuses completed prior action with an action still in progress at the reference point"
+        },
+        {
+          "text": "already give",
+          "misconception": "bare present form in a past narrative"
+        }
+      ]
+    },
+    {
+      "id": "TA-007-cz0",
+      "templateId": "TA-007",
+      "skill": "future_continuous_vs_future_perfect",
+      "level": "B2",
+      "sentence": "Which completion shows the action already in progress at that exact moment? Don't call at 8pm — I ___ dinner with my in-laws then.",
+      "blank": {
+        "answer": "will be having",
+        "alternates": [],
+        "position": 98
+      },
+      "distractors": [
+        {
+          "text": "will have",
+          "misconception": "uses a bare future form without marking the ongoing nature of the action"
+        },
+        {
+          "text": "will have had",
+          "misconception": "wrongly applies future perfect, implying the dinner is finished by 8pm"
+        },
+        {
+          "text": "have",
+          "misconception": "drops the future marker entirely, defaulting to present simple"
+        }
+      ]
+    },
+    {
+      "id": "MO-003-cz0",
+      "templateId": "MO-003",
+      "skill": "ability_past_could_vs_was_able_to",
+      "level": "B1",
+      "sentence": "The fire was spreading fast, but the firefighters ___ everyone out of the building.",
+      "blank": {
+        "answer": "were able to get",
+        "alternates": [],
+        "position": 50
+      },
+      "distractors": [
+        {
+          "text": "could get",
+          "misconception": "extends general-ability 'could' to a single specific achievement"
+        },
+        {
+          "text": "can get",
+          "misconception": "uses present-tense modal for a clearly past narrative"
+        },
+        {
+          "text": "get",
+          "misconception": "drops the modal/auxiliary entirely"
+        }
+      ]
+    },
+    {
+      "id": "MO-004-cz0",
+      "templateId": "MO-004",
+      "skill": "deduction_past_must_have_vs_cant_have",
+      "level": "B2",
+      "sentence": "Which option expresses the strongest positive past deduction supported by the evidence? The lights are still off and his car isn't here — he ___ left for work already.",
+      "blank": {
+        "answer": "must have",
+        "alternates": [],
+        "position": 141
+      },
+      "distractors": [
+        {
+          "text": "can't have",
+          "misconception": "confuses the polarity of the deduction"
+        },
+        {
+          "text": "should have",
+          "misconception": "confuses deduction with obligation/expectation not met"
+        },
+        {
+          "text": "might have",
+          "misconception": "weakens certainty when the evidence actually supports a confident conclusion"
+        }
+      ]
+    },
+    {
+      "id": "MO-005-cz0",
+      "templateId": "MO-005",
+      "skill": "necessity_absence_neednt_vs_mustnt",
+      "level": "B1",
+      "sentence": "You ___ bring your passport to the local gym — a membership card is enough.",
+      "blank": {
+        "answer": "needn't",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "mustn't",
+          "misconception": "treats 'mustn't' as the negation of obligation rather than prohibition"
+        },
+        {
+          "text": "shouldn't",
+          "misconception": "confuses absence of necessity with negative advice"
+        },
+        {
+          "text": "can't",
+          "misconception": "confuses lack of requirement with lack of permission/ability"
+        }
+      ]
+    },
+    {
+      "id": "CO-003-cz0",
+      "templateId": "CO-003",
+      "skill": "third_conditional_unreal_past",
+      "level": "B2",
+      "sentence": "If she ___ earlier, she wouldn't have missed the flight.",
+      "blank": {
+        "answer": "had left",
+        "alternates": [],
+        "position": 7
+      },
+      "distractors": [
+        {
+          "text": "left",
+          "misconception": "uses second-conditional past simple in an if-clause that needs third-conditional past perfect"
+        },
+        {
+          "text": "would leave",
+          "misconception": "duplicates 'would' in both clauses"
+        },
+        {
+          "text": "leaves",
+          "misconception": "uses a zero/first-conditional present form for a past unreal situation"
+        }
+      ]
+    },
+    {
+      "id": "CO-004-cz0",
+      "templateId": "CO-004",
+      "skill": "mixed_conditional_past_cause_present_result",
+      "level": "C1",
+      "sentence": "If I hadn't taken that job in Berlin, I ___ fluent in German now.",
+      "blank": {
+        "answer": "wouldn't be",
+        "alternates": [],
+        "position": 40
+      },
+      "distractors": [
+        {
+          "text": "wouldn't have been",
+          "misconception": "places the result in the unreal past instead of the present"
+        },
+        {
+          "text": "weren't",
+          "misconception": "uses a past form without the modal required in the result clause"
+        },
+        {
+          "text": "hadn't been",
+          "misconception": "repeats past perfect in the main clause"
+        }
+      ]
+    },
+    {
+      "id": "CO-005-cz0",
+      "templateId": "CO-005",
+      "skill": "unless_vs_if_not",
+      "level": "B1",
+      "sentence": "You won't pass the exam ___ you study harder.",
+      "blank": {
+        "answer": "unless",
+        "alternates": [],
+        "position": 24
+      },
+      "distractors": [
+        {
+          "text": "unless not",
+          "misconception": "stacks a redundant negative onto 'unless', which is already negative in meaning"
+        },
+        {
+          "text": "if not",
+          "misconception": "confuses 'if not' with 'unless' as directly interchangeable in this exact slot"
+        },
+        {
+          "text": "if",
+          "misconception": "drops the negative condition entirely, reversing the sentence's logic"
+        }
+      ]
+    },
+    {
+      "id": "PA-002-cz0",
+      "templateId": "PA-002",
+      "skill": "passive_with_modal_verbs",
+      "level": "B2",
+      "sentence": "This form ___ by a licensed doctor before submission.",
+      "blank": {
+        "answer": "must be signed",
+        "alternates": [],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "must sign",
+          "misconception": "leaves the verb in active form after the modal"
+        },
+        {
+          "text": "must signed",
+          "misconception": "omits the auxiliary 'be' required to form the passive after a modal"
+        },
+        {
+          "text": "must be signing",
+          "misconception": "uses the -ing form instead of the past participle"
+        }
+      ]
+    },
+    {
+      "id": "PA-003-cz0",
+      "templateId": "PA-003",
+      "skill": "get_passive_informal_vs_be_passive",
+      "level": "B2",
+      "sentence": "To use the informal get-passive for an unexpected event: \"Ugh, my bike ___ stolen outside the station last night!\"",
+      "blank": {
+        "answer": "got",
+        "alternates": [],
+        "position": 71
+      },
+      "distractors": [
+        {
+          "text": "was",
+          "misconception": "not wrong grammatically, but ignores that the informal, exclamatory register strongly favors the 'get' passive here"
+        },
+        {
+          "text": "has",
+          "misconception": "misapplies present perfect auxiliary to a simple past passive event"
+        },
+        {
+          "text": "did",
+          "misconception": "uses an active-voice auxiliary in a passive construction"
+        }
+      ]
+    },
+    {
+      "id": "RS-002-cz0",
+      "templateId": "RS-002",
+      "skill": "reported_questions_word_order",
+      "level": "B1",
+      "sentence": "She asked me ___.",
+      "blank": {
+        "answer": "where I lived",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "where did I live",
+          "misconception": "keeps the question-form inversion (auxiliary before subject) inside the reported clause"
+        },
+        {
+          "text": "where I did live",
+          "misconception": "keeps 'did' as an unnecessary emphatic auxiliary instead of a simple backshifted past verb"
+        },
+        {
+          "text": "where lived I",
+          "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern"
+        }
+      ]
+    },
+    {
+      "id": "RS-003-cz0",
+      "templateId": "RS-003",
+      "skill": "reported_commands_infinitive",
+      "level": "B1",
+      "sentence": "The coach said, \"Stop talking and listen!\" -> The coach told the players ___.",
+      "blank": {
+        "answer": "to stop talking and listen",
+        "alternates": [],
+        "position": 73
+      },
+      "distractors": [
+        {
+          "text": "that they stop talking and listen",
+          "misconception": "applies the statement-reporting pattern ('that' clause) to an imperative"
+        },
+        {
+          "text": "they stopped talking and listened",
+          "misconception": "backshifts as if reporting a past statement rather than a command"
+        },
+        {
+          "text": "stop talking and listen",
+          "misconception": "leaves the original imperative form unchanged, without integrating it into reported speech"
+        }
+      ]
+    },
+    {
+      "id": "RS-004-cz0",
+      "templateId": "RS-004",
+      "skill": "reporting_verb_choice_suggest_vs_tell",
+      "level": "B2",
+      "sentence": "\"Why don't we take the train instead?\" she said. -> She ___ taking the train instead.",
+      "blank": {
+        "answer": "suggested",
+        "alternates": [],
+        "position": 56
+      },
+      "distractors": [
+        {
+          "text": "told us",
+          "misconception": "uses a direct-instruction verb for what was actually a suggestion"
+        },
+        {
+          "text": "ordered us",
+          "misconception": "escalates a mild suggestion into a forceful command"
+        },
+        {
+          "text": "suggested us",
+          "misconception": "copies the object pattern of 'tell/ask' (verb + object) onto 'suggest', which doesn't take a direct personal object this way"
+        }
+      ]
+    },
+    {
+      "id": "AR-002-cz0",
+      "templateId": "AR-002",
+      "skill": "zero_article_generic_plural_vs_the_specific",
+      "level": "B1",
+      "sentence": "___ Elephants are the largest land animals on Earth.",
+      "blank": {
+        "answer": "(no article)",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "The",
+          "misconception": "adds a definite article to a generic plural statement about the species as a whole"
+        },
+        {
+          "text": "A",
+          "misconception": "applies a singular indefinite article to a plural noun"
+        },
+        {
+          "text": "An",
+          "misconception": "applies a singular indefinite article to a plural noun and ignores the consonant sound"
+        }
+      ]
+    },
+    {
+      "id": "AR-003-cz0",
+      "templateId": "AR-003",
+      "skill": "much_many_little_few_countability",
+      "level": "A2",
+      "sentence": "We don't have ___ chairs for all the guests.",
+      "blank": {
+        "answer": "many",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "much",
+          "misconception": "applies the uncountable-noun quantifier to a countable plural noun"
+        },
+        {
+          "text": "little",
+          "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type"
+        },
+        {
+          "text": "much of",
+          "misconception": "adds an unnecessary partitive 'of' without a following determiner, and still misapplies 'much' to a countable noun"
+        }
+      ]
+    },
+    {
+      "id": "GI-002-cz0",
+      "templateId": "GI-002",
+      "skill": "verb_pattern_remember_forget_meaning_change",
+      "level": "B2",
+      "sentence": "I clearly remember ___ the front door before we left this morning.",
+      "blank": {
+        "answer": "locking",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "to lock",
+          "misconception": "applies the 'future duty' pattern ('remember to do') to a sentence that is actually recalling a completed past action"
+        },
+        {
+          "text": "lock",
+          "misconception": "uses the bare infinitive, which isn't a valid pattern after 'remember' in either meaning"
+        },
+        {
+          "text": "having to lock",
+          "misconception": "adds an unnecessary obligation phrase not supported by the sentence's meaning"
+        }
+      ]
+    },
+    {
+      "id": "GI-003-cz0",
+      "templateId": "GI-003",
+      "skill": "gerund_after_preposition_vs_infinitive_of_purpose",
+      "level": "B1",
+      "sentence": "She left work early ___ time to prepare for the interview.",
+      "blank": {
+        "answer": "to have",
+        "alternates": [],
+        "position": 20
+      },
+      "distractors": [
+        {
+          "text": "for having",
+          "misconception": "misreads the sentence as needing a preposition + gerund structure instead of an infinitive of purpose"
+        },
+        {
+          "text": "for to have",
+          "misconception": "mixes a preposition with a to-infinitive, a combination that isn't standard in English"
+        },
+        {
+          "text": "having",
+          "misconception": "drops the purpose marker entirely, leaving a bare gerund with no clear grammatical link to the main clause"
+        }
+      ]
+    },
+    {
+      "id": "RC-003-cz0",
+      "templateId": "RC-003",
+      "skill": "relative_pronoun_whose_possession",
+      "level": "B2",
+      "sentence": "That's the author ___ latest novel just won an international award.",
+      "blank": {
+        "answer": "whose",
+        "alternates": [],
+        "position": 18
+      },
+      "distractors": [
+        {
+          "text": "who's",
+          "misconception": "confuses the contraction 'who's' (who is / who has) with the possessive relative pronoun 'whose'"
+        },
+        {
+          "text": "who",
+          "misconception": "uses the subject relative pronoun without showing the required possessive relationship"
+        },
+        {
+          "text": "which",
+          "misconception": "uses the non-personal relative pronoun for a person (the author)"
+        }
+      ]
+    },
+    {
+      "id": "CM-002-cz0",
+      "templateId": "CM-002",
+      "skill": "as_as_equality_vs_comparative",
+      "level": "A2",
+      "sentence": "This laptop is ___ the one I had before — both take exactly ten seconds to start up.",
+      "blank": {
+        "answer": "as fast as",
+        "alternates": [],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "faster than",
+          "misconception": "defaults to the comparative form even though the context implies equality, not difference"
+        },
+        {
+          "text": "the fastest",
+          "misconception": "confuses a two-item comparison with a superlative among three or more items"
+        },
+        {
+          "text": "more fast than",
+          "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'"
+        }
+      ]
+    },
+    {
+      "id": "CM-003-cz0",
+      "templateId": "CM-003",
+      "skill": "double_comparative_progressive_change",
+      "level": "B2",
+      "sentence": "Which completion best expresses a gradual increase that keeps continuing? As the deadline approached, the team's schedule became ___.",
+      "blank": {
+        "answer": "busier and busier",
+        "alternates": [],
+        "position": 129
+      },
+      "distractors": [
+        {
+          "text": "busier than before",
+          "misconception": "treats a continuous, ongoing change as a single fixed-point comparison"
+        },
+        {
+          "text": "the busiest",
+          "misconception": "confuses a progressive change over time with a superlative ranking among multiple items"
+        },
+        {
+          "text": "more busy than usual",
+          "misconception": "uses a single comparative with 'more' for a short adjective, and frames it as a comparison to a norm rather than ongoing change"
+        }
+      ]
+    },
+    {
+      "id": "QN-002-cz0",
+      "templateId": "QN-002",
+      "skill": "negative_questions_expecting_agreement",
+      "level": "B1",
+      "sentence": "You look exhausted. ___ you sleep at all last night?",
+      "blank": {
+        "answer": "Didn't",
+        "alternates": [],
+        "position": 20
+      },
+      "distractors": [
+        {
+          "text": "Do",
+          "misconception": "uses a neutral positive question form, missing the speaker's implied surprise/assumption"
+        },
+        {
+          "text": "Don't",
+          "misconception": "uses present-tense negative auxiliary in a context that requires the past tense to match 'last night'"
+        },
+        {
+          "text": "Aren't",
+          "misconception": "uses the 'be' auxiliary instead of the 'do' auxiliary needed for the main verb 'sleep'"
+        }
+      ]
+    },
+    {
+      "id": "QN-003-cz0",
+      "templateId": "QN-003",
+      "skill": "indirect_questions_embedded_word_order",
+      "level": "B1",
+      "sentence": "Excuse me, could you tell me ___?",
+      "blank": {
+        "answer": "where the nearest pharmacy is",
+        "alternates": [],
+        "position": 29
+      },
+      "distractors": [
+        {
+          "text": "where is the nearest pharmacy",
+          "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause"
+        },
+        {
+          "text": "is where the nearest pharmacy",
+          "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order"
+        },
+        {
+          "text": "where the nearest pharmacy was",
+          "misconception": "unnecessarily backshifts to past tense when the pharmacy's existence is a current, general fact"
+        }
+      ]
+    },
+    {
+      "id": "TA-008-cz0",
+      "templateId": "TA-008",
+      "skill": "future_in_the_past_would_vs_was_going_to",
+      "level": "B2",
+      "sentence": "In 2010, nobody guessed that the small startup ___ the entire industry within a decade.",
+      "blank": {
+        "answer": "would transform",
+        "alternates": [],
+        "position": 47
+      },
+      "distractors": [
+        {
+          "text": "was transforming",
+          "misconception": "confusing future-in-the-past with past continuous background action"
+        },
+        {
+          "text": "will transform",
+          "misconception": "using present-tense future modal inside a past narrative frame"
+        },
+        {
+          "text": "transformed",
+          "misconception": "collapsing future-in-the-past into simple past"
+        }
+      ]
+    },
+    {
+      "id": "TA-009-cz0",
+      "templateId": "TA-009",
+      "skill": "past_perfect_continuous_background_cause",
+      "level": "C1",
+      "sentence": "Which completion foregrounds the accumulated duration of the studying as the cause of his red eyes? His eyes were red because he ___ all night for the exam.",
+      "blank": {
+        "answer": "had been studying",
+        "alternates": [],
+        "position": 129
+      },
+      "distractors": [
+        {
+          "text": "had studied",
+          "misconception": "treating past perfect simple as sufficient for any earlier past event"
+        },
+        {
+          "text": "studied",
+          "misconception": "using simple past for a state that must be shown as prior to another past moment"
+        },
+        {
+          "text": "was studying",
+          "misconception": "confusing past continuous with past perfect continuous"
+        }
+      ]
+    },
+    {
+      "id": "MO-006-cz0",
+      "templateId": "MO-006",
+      "skill": "advice_should_vs_ought_to_vs_had_better",
+      "level": "B1",
+      "sentence": "Which completion gives the strongest urgent warning tied to the stated consequence? You ___ leave now — if you miss this train, there isn't another one until tomorrow.",
+      "blank": {
+        "answer": "had better",
+        "alternates": [],
+        "position": 88
+      },
+      "distractors": [
+        {
+          "text": "should",
+          "misconception": "treating general advice modal as equally strong as urgent-consequence modal"
+        },
+        {
+          "text": "could",
+          "misconception": "using a possibility modal where obligation/urgency is meant"
+        },
+        {
+          "text": "might",
+          "misconception": "using a modal of weak possibility for a directive"
+        }
+      ]
+    },
+    {
+      "id": "MO-007-cz0",
+      "templateId": "MO-007",
+      "skill": "speculation_scale_may_might_could_vs_will",
+      "level": "B1",
+      "sentence": "I'm not sure where Sam is, and I have no idea what the roads are like — he ___ still be stuck in traffic.",
+      "blank": {
+        "answer": "might",
+        "alternates": [],
+        "position": 75
+      },
+      "distractors": [
+        {
+          "text": "will",
+          "misconception": "using the confident future/prediction modal for uncertain present speculation"
+        },
+        {
+          "text": "must",
+          "misconception": "using the strong-deduction modal where only weak possibility is intended"
+        },
+        {
+          "text": "can",
+          "misconception": "using 'can' for a specific present possibility about one situation"
+        }
+      ]
+    },
+    {
+      "id": "MO-008-cz0",
+      "templateId": "MO-008",
+      "skill": "past_regret_should_have_vs_shouldnt_have",
+      "level": "B2",
+      "sentence": "He's exhausted today — he ___ up so late watching movies last night.",
+      "blank": {
+        "answer": "shouldn't have stayed",
+        "alternates": [],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "should have stayed",
+          "misconception": "missing the negation needed for criticizing a completed unwise action"
+        },
+        {
+          "text": "should stay",
+          "misconception": "using present-form advice modal instead of past-regret structure"
+        },
+        {
+          "text": "wouldn't have stayed",
+          "misconception": "confusing third conditional result clause with a past-regret judgement"
+        }
+      ]
+    },
+    {
+      "id": "CO-006-cz0",
+      "templateId": "CO-006",
+      "skill": "formal_inversion_had_i_known",
+      "level": "C1",
+      "sentence": "___ known about the delay, I would have booked a later flight.",
+      "blank": {
+        "answer": "Had I",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "If had I",
+          "misconception": "mixing formal inversion with the conjunction 'if' at the same time"
+        },
+        {
+          "text": "I had",
+          "misconception": "using normal subject-verb order, missing the inversion signal"
+        },
+        {
+          "text": "Would I have",
+          "misconception": "using the result-clause auxiliary structure at the start of the if-clause"
+        }
+      ]
+    },
+    {
+      "id": "CO-007-cz0",
+      "templateId": "CO-007",
+      "skill": "implied_conditional_otherwise",
+      "level": "C1",
+      "sentence": "The bridge was closed for repairs; otherwise, the trip ___ much shorter.",
+      "blank": {
+        "answer": "would have been",
+        "alternates": [],
+        "position": 55
+      },
+      "distractors": [
+        {
+          "text": "will be",
+          "misconception": "reading 'otherwise' as a simple future contrast marker"
+        },
+        {
+          "text": "was",
+          "misconception": "treating the implied condition as a real past fact rather than a hypothetical one"
+        },
+        {
+          "text": "is",
+          "misconception": "ignoring the past time frame set by 'was closed'"
+        }
+      ]
+    },
+    {
+      "id": "PA-005-cz0",
+      "templateId": "PA-005",
+      "skill": "impersonal_reporting_it_is_said_that",
+      "level": "B2",
+      "sentence": "___ that the ancient city was destroyed by an earthquake, though no written records survive.",
+      "blank": {
+        "answer": "It is believed",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "They are believing",
+          "misconception": "using active voice with a vague 'they' plus an incorrect continuous form for a general belief"
+        },
+        {
+          "text": "It believes",
+          "misconception": "treating 'it' as an active subject capable of believing"
+        },
+        {
+          "text": "Is believed",
+          "misconception": "dropping the required dummy subject 'it' from the impersonal passive pattern"
+        }
+      ]
+    },
+    {
+      "id": "PA-006-cz0",
+      "templateId": "PA-006",
+      "skill": "passive_infinitive_after_modal_expectation",
+      "level": "B2",
+      "sentence": "The new policy is expected ___ next month, though the exact date hasn't been confirmed.",
+      "blank": {
+        "answer": "to be announced",
+        "alternates": [],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "to announce",
+          "misconception": "using active infinitive when the subject (the policy) cannot perform the announcing itself"
+        },
+        {
+          "text": "announcing",
+          "misconception": "using a gerund where an infinitive pattern after 'expected' is required"
+        },
+        {
+          "text": "to be announcing",
+          "misconception": "adding continuous aspect to the passive infinitive unnecessarily"
+        }
+      ]
+    },
+    {
+      "id": "RS-005-cz0",
+      "templateId": "RS-005",
+      "skill": "time_and_place_reference_shift",
+      "level": "B1",
+      "sentence": "On Monday, Maria said, 'I'll finish the report today.' A week later, reporting this, you'd say: Maria said she would finish the report ___.",
+      "blank": {
+        "answer": "that day",
+        "alternates": [],
+        "position": 135
+      },
+      "distractors": [
+        {
+          "text": "today",
+          "misconception": "leaving the original deictic time word unchanged despite the shift in reporting time"
+        },
+        {
+          "text": "tomorrow",
+          "misconception": "misreading the original 'today' as if it referred to the day after speaking"
+        },
+        {
+          "text": "the day",
+          "misconception": "producing an incomplete deictic shift missing the demonstrative"
+        }
+      ]
+    },
+    {
+      "id": "AR-005-cz0",
+      "templateId": "AR-005",
+      "skill": "demonstrative_reference_distance_this_these_that_those",
+      "level": "A1",
+      "sentence": "Can you pass me ___ books on the shelf over there?",
+      "blank": {
+        "answer": "those",
+        "alternates": [],
+        "position": 16
+      },
+      "distractors": [
+        {
+          "text": "this",
+          "misconception": "using a singular near demonstrative with a plural, distant noun"
+        },
+        {
+          "text": "that",
+          "misconception": "correctly matching distance but ignoring plural agreement"
+        },
+        {
+          "text": "these",
+          "misconception": "correctly matching plural but ignoring the distance cue"
+        }
+      ]
+    },
+    {
+      "id": "PR-004-cz0",
+      "templateId": "PR-004",
+      "skill": "phrasal_verb_particle_changes_meaning",
+      "level": "B1",
+      "sentence": "The meeting has been put ___ until next Thursday because two directors are traveling.",
+      "blank": {
+        "answer": "off",
+        "alternates": [],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "down",
+          "misconception": "confusing 'put down' (to set something down / write something / criticize) with 'put off' (postpone)"
+        },
+        {
+          "text": "up",
+          "misconception": "confusing 'put up' (to erect / accommodate / tolerate) with 'put off' (postpone)"
+        },
+        {
+          "text": "away",
+          "misconception": "confusing 'put away' (to store something) with 'put off' (postpone)"
+        }
+      ]
+    },
+    {
+      "id": "PR-005-cz0",
+      "templateId": "PR-005",
+      "skill": "movement_prepositions_through_across_along_over",
+      "level": "A2",
+      "sentence": "We squeezed ___ the narrow gap in the fence.",
+      "blank": {
+        "answer": "through",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "across",
+          "misconception": "using the flat-open-surface preposition for an enclosed three-dimensional space"
+        },
+        {
+          "text": "along",
+          "misconception": "using the linear-edge preposition (following a line such as a river or street) for movement inside an enclosed space"
+        },
+        {
+          "text": "over",
+          "misconception": "using the above-and-across preposition for movement inside a space, not above it"
+        }
+      ]
+    },
+    {
+      "id": "GI-005-cz0",
+      "templateId": "GI-005",
+      "skill": "infinitive_after_too_enough_adjective",
+      "level": "B1",
+      "sentence": "The coffee was too hot ___ right away, so she waited a few minutes.",
+      "blank": {
+        "answer": "to drink",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "drinking",
+          "misconception": "using a gerund where the too/enough + adjective structure requires a to-infinitive"
+        },
+        {
+          "text": "for drinking",
+          "misconception": "inserting an unnecessary preposition before the verb form"
+        },
+        {
+          "text": "drink",
+          "misconception": "using the bare infinitive instead of the required to-infinitive"
+        }
+      ]
+    },
+    {
+      "id": "RC-004-cz0",
+      "templateId": "RC-004",
+      "skill": "preposition_placement_formal_vs_informal_relative_clause",
+      "level": "C1",
+      "sentence": "This is the colleague ___ I was speaking earlier — a very formal way to phrase it.",
+      "blank": {
+        "answer": "with whom",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "with who",
+          "misconception": "using subject-form 'who' after a fronted preposition, which requires the object form"
+        },
+        {
+          "text": "who with",
+          "misconception": "reverses the preposition-pronoun order, putting 'with' directly after 'who' mid-clause"
+        },
+        {
+          "text": "which",
+          "misconception": "using the non-personal relative pronoun for a person"
+        }
+      ]
+    },
+    {
+      "id": "CM-004-cz0",
+      "templateId": "CM-004",
+      "skill": "less_vs_fewer_countability_agreement",
+      "level": "B1",
+      "sentence": "This recipe uses ___ eggs than the one my grandmother used to make.",
+      "blank": {
+        "answer": "fewer",
+        "alternates": [],
+        "position": 17
+      },
+      "distractors": [
+        {
+          "text": "less",
+          "misconception": "applying the uncountable-noun comparative to a countable plural noun"
+        },
+        {
+          "text": "little",
+          "misconception": "using the base uncountable quantifier instead of its comparative form"
+        },
+        {
+          "text": "much less",
+          "misconception": "intensifying the wrong (uncountable) comparative rather than switching to the countable form"
+        }
+      ]
+    },
+    {
+      "id": "QN-004-cz0",
+      "templateId": "QN-004",
+      "skill": "double_negative_avoidance_single_negation_rule",
+      "level": "A2",
+      "sentence": "I looked everywhere, but I didn't find ___ in the drawer.",
+      "blank": {
+        "answer": "anything",
+        "alternates": [],
+        "position": 39
+      },
+      "distractors": [
+        {
+          "text": "nothing",
+          "misconception": "combining a negated verb ('didn't') with a negative pronoun, creating a non-standard double negative"
+        },
+        {
+          "text": "something",
+          "misconception": "using a positive indefinite pronoun that contradicts the negative context"
+        },
+        {
+          "text": "no thing",
+          "misconception": "incorrectly splitting the compound negative pronoun into two words"
+        }
+      ]
+    },
+    {
+      "id": "QN-005-cz0",
+      "templateId": "QN-005",
+      "skill": "agreement_structures_so_do_i_neither_do_i",
+      "level": "B1",
+      "sentence": "A: 'I don't really enjoy horror movies.' B: '___ I. They give me nightmares.'",
+      "blank": {
+        "answer": "Neither do",
+        "alternates": [],
+        "position": 45
+      },
+      "distractors": [
+        {
+          "text": "So do",
+          "misconception": "using the positive agreement structure to agree with a negative statement"
+        },
+        {
+          "text": "So does",
+          "misconception": "combining the wrong polarity structure with the wrong subject-verb agreement form"
+        },
+        {
+          "text": "Either do",
+          "misconception": "confusing 'either' (used with 'not...either' at the end of a clause) with the fronted 'neither' agreement structure"
+        }
+      ]
+    },
+    {
+      "id": "TA-010-cz0",
+      "templateId": "TA-010",
+      "skill": "present_simple_for_fixed_schedules_not_personal_plans",
+      "level": "B1",
+      "sentence": "According to the timetable, the train ___ at 6:45, so we should leave home by 6:15.",
+      "blank": {
+        "answer": "leaves",
+        "alternates": [],
+        "position": 38
+      },
+      "distractors": [
+        {
+          "text": "is leaving",
+          "misconception": "using present continuous, associated with personal arrangements, for a fixed external timetable"
+        },
+        {
+          "text": "is going to leave",
+          "misconception": "using 'going to' for intention/prediction rather than an externally fixed schedule"
+        },
+        {
+          "text": "will have left",
+          "misconception": "using future perfect, which describes completion before a reference point, not the scheduled departure itself"
+        }
+      ]
+    },
+    {
+      "id": "b4_001-cz0",
+      "templateId": "b4_001",
+      "skill": "future_perfect_continuous_duration_before_deadline",
+      "level": "C1",
+      "sentence": "Which completion emphasizes the duration accumulating up to the deadline rather than merely the fact of completion? By the time she retires next year, Maria ____ at this company for over two decades.",
+      "blank": {
+        "answer": "will have been working",
+        "alternates": [],
+        "position": 157
+      },
+      "distractors": [
+        {
+          "text": "will be working",
+          "misconception": "Confuses future continuous (in-progress at a moment) with future perfect continuous (duration up to a point)."
+        },
+        {
+          "text": "will have worked",
+          "misconception": "Confuses future perfect simple (completion/result) with future perfect continuous (ongoing duration emphasis)."
+        },
+        {
+          "text": "will work",
+          "misconception": "Treats the sentence as a plain future prediction, ignoring the 'by the time' anchor."
+        }
+      ]
+    },
+    {
+      "id": "b4_002-cz0",
+      "templateId": "b4_002",
+      "skill": "narrative_past_perfect_flashback_vs_past_simple_sequence",
+      "level": "B2",
+      "sentence": "When I arrived at the station, the train ____ already, so I had to wait for the next one.",
+      "blank": {
+        "answer": "had left",
+        "alternates": [],
+        "position": 41
+      },
+      "distractors": [
+        {
+          "text": "left",
+          "misconception": "Treats both events as equally sequential in past simple."
+        },
+        {
+          "text": "was leaving",
+          "misconception": "Confuses past continuous (in-progress) with an already-completed prior event."
+        },
+        {
+          "text": "has left",
+          "misconception": "Uses present perfect, mixing a present-relevance tense into a past narrative."
+        }
+      ]
+    },
+    {
+      "id": "b4_003-cz0",
+      "templateId": "b4_003",
+      "skill": "state_verbs_resist_continuous_form",
+      "level": "A2",
+      "sentence": "This house ____ to my grandparents; it has been in the family for fifty years.",
+      "blank": {
+        "answer": "belongs",
+        "alternates": [],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "is belonging",
+          "misconception": "Assumes present time always requires present continuous."
+        },
+        {
+          "text": "belonged",
+          "misconception": "Shifts to past tense despite the present-relevance context."
+        },
+        {
+          "text": "is being belonged",
+          "misconception": "Forces a passive continuous structure onto an intransitive stative verb."
+        }
+      ]
+    },
+    {
+      "id": "b4_004-cz0",
+      "templateId": "b4_004",
+      "skill": "modal_perfect_could_have_missed_opportunity",
+      "level": "B2",
+      "sentence": "Which completion neutrally states an available past opportunity without criticizing the decision? You ____ the job — they offered it to you, but you turned it down.",
+      "blank": {
+        "answer": "could have taken",
+        "alternates": [],
+        "position": 102
+      },
+      "distractors": [
+        {
+          "text": "should have taken",
+          "misconception": "Confuses missed opportunity with retrospective advice/criticism."
+        },
+        {
+          "text": "were able to take",
+          "misconception": "Confuses expressing a past possibility with reporting a completed achieved ability."
+        },
+        {
+          "text": "can take",
+          "misconception": "Uses present modal for a past hypothetical situation."
+        }
+      ]
+    },
+    {
+      "id": "b4_005-cz0",
+      "templateId": "b4_005",
+      "skill": "possibility_vs_permission_can_vs_may_formal_register",
+      "level": "B1",
+      "sentence": "For the conventionally most formal wording in an official notice: Visitors ___ enter the laboratory only when accompanied by staff.",
+      "blank": {
+        "answer": "may",
+        "alternates": [],
+        "position": 75
+      },
+      "distractors": [
+        {
+          "text": "can",
+          "misconception": "Assumes 'can' is equally acceptable in formal written permission notices."
+        },
+        {
+          "text": "could",
+          "misconception": "Uses the past/tentative form of 'can' for a present-tense rule."
+        },
+        {
+          "text": "might",
+          "misconception": "Confuses formal permission with weak possibility."
+        }
+      ]
+    },
+    {
+      "id": "b4_006-cz0",
+      "templateId": "b4_006",
+      "skill": "conditional_inversion_were_i_to",
+      "level": "C1",
+      "sentence": "____ resign now, the whole project would collapse.",
+      "blank": {
+        "answer": "Were I to",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "If were I to",
+          "misconception": "Adds 'if' to a structure that already signals conditionality through inversion."
+        },
+        {
+          "text": "I were to",
+          "misconception": "Drops the inversion, leaving a non-inverted fragment without 'if'."
+        },
+        {
+          "text": "Was I to",
+          "misconception": "Uses 'was' instead of the subjunctive 'were' required in formal hypothetical inversion."
+        }
+      ]
+    },
+    {
+      "id": "b4_007-cz0",
+      "templateId": "b4_007",
+      "skill": "future_time_clauses_present_after_when_as_soon_as",
+      "level": "B1",
+      "sentence": "I'll call you as soon as the train ___.",
+      "blank": {
+        "answer": "arrives",
+        "alternates": [],
+        "position": 35
+      },
+      "distractors": [
+        {
+          "text": "will arrive",
+          "misconception": "duplicates future marking inside the time clause"
+        },
+        {
+          "text": "arrived",
+          "misconception": "shifts the time clause into a completed past event"
+        },
+        {
+          "text": "would arrive",
+          "misconception": "treats a real future sequence as hypothetical or future-in-the-past"
+        }
+      ]
+    },
+    {
+      "id": "b4_008-cz0",
+      "templateId": "b4_008",
+      "skill": "passive_causative_vs_passive_simple_confusion",
+      "level": "B2",
+      "sentence": "We ___ our roof repaired last week after the storm damaged it.",
+      "blank": {
+        "answer": "had",
+        "alternates": [],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "were",
+          "misconception": "Treats the sentence as simple passive ('the roof was repaired') rather than causative."
+        },
+        {
+          "text": "have been",
+          "misconception": "Mixes present perfect passive auxiliary into a past-time causative sentence."
+        },
+        {
+          "text": "was",
+          "misconception": "Attempts simple past passive but misapplies subject-verb agreement and structure."
+        }
+      ]
+    },
+    {
+      "id": "b4_009-cz0",
+      "templateId": "b4_009",
+      "skill": "impersonal_passive_reporting_believed_thought",
+      "level": "C1",
+      "sentence": "The suspect ____ have left the country before the investigation began.",
+      "blank": {
+        "answer": "is believed to",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "is believed that",
+          "misconception": "Blends the personal passive subject pattern with the impersonal 'that'-clause pattern."
+        },
+        {
+          "text": "it is believed to",
+          "misconception": "Adds a redundant impersonal 'it' when the sentence already has a personal subject."
+        },
+        {
+          "text": "believed to",
+          "misconception": "Omits the passive auxiliary 'is' entirely."
+        }
+      ]
+    },
+    {
+      "id": "b4_011-cz0",
+      "templateId": "b4_011",
+      "skill": "reported_yes_no_questions_if_whether",
+      "level": "B1",
+      "sentence": "He asked me, “Did you lock the door?” -> He asked me ___ the door.",
+      "blank": {
+        "answer": "whether I had locked",
+        "alternates": [],
+        "position": 53
+      },
+      "distractors": [
+        {
+          "text": "did I lock",
+          "misconception": "keeps direct-question inversion and omits if/whether"
+        },
+        {
+          "text": "that I had locked",
+          "misconception": "uses 'that' for a yes/no reported question"
+        },
+        {
+          "text": "whether had I locked",
+          "misconception": "adds whether but retains auxiliary-subject inversion"
+        }
+      ]
+    },
+    {
+      "id": "b4_012-cz0",
+      "templateId": "b4_012",
+      "skill": "article_with_institutions_school_prison_hospital",
+      "level": "B1",
+      "sentence": "To express attendance for the institution's normal purpose, not movement to a building: During term time, the children go to ____ every weekday to study.",
+      "blank": {
+        "answer": "school",
+        "alternates": [],
+        "position": 125
+      },
+      "distractors": [
+        {
+          "text": "the school",
+          "misconception": "focuses on a particular building instead of institutional attendance"
+        },
+        {
+          "text": "a school",
+          "misconception": "introduces one unspecified building rather than the attendance idiom"
+        },
+        {
+          "text": "schools",
+          "misconception": "turns one routine of attendance into a generic plural destination"
+        }
+      ]
+    },
+    {
+      "id": "b4_013-cz0",
+      "templateId": "b4_013",
+      "skill": "possessive_determiner_vs_double_genitive_of_mine",
+      "level": "B1",
+      "sentence": "I bumped into ____ at the airport yesterday.",
+      "blank": {
+        "answer": "a friend of mine",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "my friend of mine",
+          "misconception": "Duplicates possession by using both 'my' and 'of mine' together."
+        },
+        {
+          "text": "a friend of me",
+          "misconception": "Uses the object pronoun 'me' instead of the possessive pronoun 'mine' after 'of'."
+        },
+        {
+          "text": "the friend of mine",
+          "misconception": "Uses definite article 'the' where the indefinite 'a' is required for introducing one of several friends."
+        }
+      ]
+    },
+    {
+      "id": "b4_014-cz0",
+      "templateId": "b4_014",
+      "skill": "preposition_of_time_duration_for_vs_since_vs_during",
+      "level": "A2",
+      "sentence": "The fire alarm went off ____ the meeting, so everyone had to leave the building.",
+      "blank": {
+        "answer": "during",
+        "alternates": [],
+        "position": 24
+      },
+      "distractors": [
+        {
+          "text": "for",
+          "misconception": "Applies duration preposition 'for' to a point-in-time event rather than a length of time."
+        },
+        {
+          "text": "since",
+          "misconception": "Confuses 'during' (within a period) with 'since' (marking a starting point)."
+        },
+        {
+          "text": "while",
+          "misconception": "Uses the conjunction 'while' where a preposition is grammatically required before a noun phrase."
+        }
+      ]
+    },
+    {
+      "id": "b4_015-cz0",
+      "templateId": "b4_015",
+      "skill": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
+      "level": "B1",
+      "sentence": "To use the conventional collocation for directly evaluating a specific result: I'm really pleased ____ your exam results.",
+      "blank": {
+        "answer": "with",
+        "alternates": [],
+        "position": 98
+      },
+      "distractors": [
+        {
+          "text": "about",
+          "misconception": "uses the broader situation-focused pattern instead of directly evaluating the result"
+        },
+        {
+          "text": "for",
+          "misconception": "confuses pleased with pleased for someone"
+        },
+        {
+          "text": "on",
+          "misconception": "imports a preposition that does not collocate with pleased"
+        }
+      ]
+    },
+    {
+      "id": "b4_016-cz0",
+      "templateId": "b4_016",
+      "skill": "gerund_as_subject_vs_infinitive_as_subject_formality",
+      "level": "B2",
+      "sentence": "____ regularly is one of the best things you can do for your long-term health.",
+      "blank": {
+        "answer": "Exercising",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "To exercising",
+          "misconception": "Blends the infinitive marker 'to' with a gerund ending, producing an invalid hybrid."
+        },
+        {
+          "text": "Exercise to",
+          "misconception": "Places 'to' after the verb instead of before it, misreading the infinitive structure."
+        },
+        {
+          "text": "For exercise",
+          "misconception": "Uses 'for' as if introducing purpose rather than a subject."
+        }
+      ]
+    },
+    {
+      "id": "b4_018-cz0",
+      "templateId": "b4_018",
+      "skill": "relative_clause_omitting_object_pronoun",
+      "level": "B1",
+      "sentence": "The book ____ I borrowed from the library was due back yesterday.",
+      "blank": {
+        "answer": "[no word needed]",
+        "alternates": [],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "who",
+          "misconception": "Uses a personal relative pronoun for a non-human antecedent."
+        },
+        {
+          "text": "whom, which",
+          "misconception": "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things."
+        },
+        {
+          "text": "what",
+          "misconception": "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error."
+        }
+      ]
+    },
+    {
+      "id": "b4_019-cz0",
+      "templateId": "b4_019",
+      "skill": "comparative_intensifiers_much_far_a_lot_before_comparative",
+      "level": "B1",
+      "sentence": "This new laptop is ____ faster than my old one.",
+      "blank": {
+        "answer": "much",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "very",
+          "misconception": "Transfers the common absolute-adjective intensifier 'very' onto a comparative form."
+        },
+        {
+          "text": "so",
+          "misconception": "Uses 'so', which needs a following 'that'-clause or exclamatory context, as a plain intensifier before a comparative."
+        },
+        {
+          "text": "too",
+          "misconception": "Uses 'too' (meaning excessive) as if it were a neutral intensifier."
+        }
+      ]
+    },
+    {
+      "id": "b4_020-cz0",
+      "templateId": "b4_020",
+      "skill": "echo_questions_for_clarification",
+      "level": "B1",
+      "sentence": "A: \"I saw a UFO last night.\" B: \"You saw ____?\"",
+      "blank": {
+        "answer": "what",
+        "alternates": [],
+        "position": 41
+      },
+      "distractors": [
+        {
+          "text": "did you see",
+          "misconception": "Forms a standard inverted question instead of echoing the statement's structure."
+        },
+        {
+          "text": "what did you see",
+          "misconception": "Fully reformulates the question with standard word order rather than echoing."
+        },
+        {
+          "text": "seeing what",
+          "misconception": "Uses a gerund fragment instead of the statement's original verb form."
+        }
+      ]
+    },
+    {
+      "id": "b4_022-cz0",
+      "templateId": "b4_022",
+      "skill": "contrast_connectors_although_despite_however_distinction",
+      "level": "B2",
+      "sentence": "____ the heavy rain, the outdoor concert went ahead as planned.",
+      "blank": {
+        "answer": "Despite",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Although",
+          "misconception": "Assumes 'although' can be followed directly by a noun phrase like 'despite' can."
+        },
+        {
+          "text": "However",
+          "misconception": "Treats 'however' as a subordinating connector that can start a sentence and directly attach to a noun."
+        },
+        {
+          "text": "Even though",
+          "misconception": "Confuses 'even though' (also clause-requiring, like 'although') with prepositional 'despite'."
+        }
+      ]
+    },
+    {
+      "id": "b4_024-cz0",
+      "templateId": "b4_024",
+      "skill": "cleft_sentences_it_was_x_that_emphasis",
+      "level": "C1",
+      "sentence": "Original: Sarah broke the vase, not her brother. Cleft emphasis: ____ broke the vase, not her brother.",
+      "blank": {
+        "answer": "It was Sarah that",
+        "alternates": [],
+        "position": 65
+      },
+      "distractors": [
+        {
+          "text": "It Sarah was that",
+          "misconception": "Misorders the fixed cleft frame, inserting the emphasized element before 'was'."
+        },
+        {
+          "text": "Sarah it was that",
+          "misconception": "Fronts the emphasized noun before the cleft frame entirely."
+        },
+        {
+          "text": "It was that Sarah",
+          "misconception": "Places 'that' before the emphasized noun instead of after it."
+        }
+      ]
+    },
+    {
+      "id": "b5_001-cz0",
+      "templateId": "b5_001",
+      "skill": "past_habitual_used_to_vs_would_vs_past_simple",
+      "level": "B1",
+      "sentence": "When I was a child, I ____ a small village near the mountains.",
+      "blank": {
+        "answer": "used to live in",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "would live in",
+          "misconception": "Applies 'would' to a stative verb (live = residing state) as if it were a repeated dynamic action."
+        },
+        {
+          "text": "would lived in",
+          "misconception": "Adds a past-tense ending to the verb after the modal 'would'."
+        },
+        {
+          "text": "living in",
+          "misconception": "Uses a bare gerund with no finite verb to carry the sentence's tense."
+        }
+      ]
+    },
+    {
+      "id": "b5_002-cz0",
+      "templateId": "b5_002",
+      "skill": "present_perfect_for_unfinished_time_period_this_week",
+      "level": "B1",
+      "sentence": "So far this week I ___ three important emails, and there are two more to write before Friday.",
+      "blank": {
+        "answer": "have sent",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "sent",
+          "misconception": "Uses past simple because a specific number of emails is mentioned."
+        },
+        {
+          "text": "was sending",
+          "misconception": "Uses past continuous to describe a series of completed actions."
+        },
+        {
+          "text": "send",
+          "misconception": "Uses present simple, ignoring that the sentence reports completed past actions within the current period."
+        }
+      ]
+    },
+    {
+      "id": "b5_003-cz0",
+      "templateId": "b5_003",
+      "skill": "modal_of_criticism_should_have_vs_could_have_contrast",
+      "level": "B2",
+      "sentence": "Which completion explicitly criticizes the past decision rather than merely noting a possibility? You ____ more carefully before signing the contract — now we're stuck with these terms.",
+      "blank": {
+        "answer": "should have read",
+        "alternates": [],
+        "position": 102
+      },
+      "distractors": [
+        {
+          "text": "could have read",
+          "misconception": "Treats a clearly critical statement as a neutral, non-judgmental missed opportunity."
+        },
+        {
+          "text": "would have read",
+          "misconception": "Uses 'would have' as if this were a hypothetical conditional result rather than direct criticism."
+        },
+        {
+          "text": "must have read",
+          "misconception": "Confuses past deduction ('must have') with retrospective criticism."
+        }
+      ]
+    },
+    {
+      "id": "b5_004-cz0",
+      "templateId": "b5_004",
+      "skill": "ability_nonfinite_forms_be_able_to",
+      "level": "B1",
+      "sentence": "After months of treatment, she hopes to ___ walk without assistance again.",
+      "blank": {
+        "answer": "be able to",
+        "alternates": [],
+        "position": 40
+      },
+      "distractors": [
+        {
+          "text": "can",
+          "misconception": "places the finite modal 'can' after infinitive 'to'"
+        },
+        {
+          "text": "could",
+          "misconception": "uses a finite past/conditional modal in a non-finite slot"
+        },
+        {
+          "text": "being able to",
+          "misconception": "uses a gerund-participle where a bare infinitive is required"
+        }
+      ]
+    },
+    {
+      "id": "b5_005-cz0",
+      "templateId": "b5_005",
+      "skill": "mixed_conditional_present_cause_past_result",
+      "level": "C1",
+      "sentence": "In formal written English, which completion presents his fear as an ongoing trait he still has, rather than only a past state? If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
+      "blank": {
+        "answer": "weren't",
+        "alternates": [],
+        "position": 133
+      },
+      "distractors": [
+        {
+          "text": "hadn't been",
+          "misconception": "Forces the third conditional past perfect form into the condition clause, matching the past result tense."
+        },
+        {
+          "text": "wasn't",
+          "misconception": "Uses ordinary past simple negative instead of the subjunctive 'weren't' required in hypothetical conditionals."
+        },
+        {
+          "text": "isn't",
+          "misconception": "Uses present tense, missing that the condition is hypothetical/unreal, not a real current fact."
+        }
+      ]
+    },
+    {
+      "id": "b5_006-cz0",
+      "templateId": "b5_006",
+      "skill": "conditional_with_unless_provided_that_as_long_as_distinction",
+      "level": "B2",
+      "sentence": "You can borrow my car ____ you bring it back before six o'clock.",
+      "blank": {
+        "answer": "provided that",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "unless",
+          "misconception": "Uses the negative-exception connector where a positive required condition is meant."
+        },
+        {
+          "text": "even if",
+          "misconception": "Uses a concessive connector implying the condition doesn't matter to the outcome."
+        },
+        {
+          "text": "in case",
+          "misconception": "Uses 'in case' (precaution for a possible future event) instead of a condition of permission."
+        }
+      ]
+    },
+    {
+      "id": "b5_007-cz0",
+      "templateId": "b5_007",
+      "skill": "passive_with_two_objects_verb_give_send_choice_of_subject",
+      "level": "B2",
+      "sentence": "The company sent all employees a bonus. → All employees ____ a bonus.",
+      "blank": {
+        "answer": "were sent",
+        "alternates": [],
+        "position": 56
+      },
+      "distractors": [
+        {
+          "text": "were sent to",
+          "misconception": "Adds an unnecessary preposition after the passive verb when the recipient is already the subject."
+        },
+        {
+          "text": "sent were",
+          "misconception": "Reverses the auxiliary and main verb order."
+        },
+        {
+          "text": "was sent",
+          "misconception": "Fails subject-verb agreement, treating the plural subject 'all employees' as singular."
+        }
+      ]
+    },
+    {
+      "id": "b5_008-cz0",
+      "templateId": "b5_008",
+      "skill": "passive_gerund_vs_passive_infinitive_after_verb",
+      "level": "C1",
+      "sentence": "She resents ____ like a child in front of her colleagues.",
+      "blank": {
+        "answer": "being treated",
+        "alternates": [],
+        "position": 12
+      },
+      "distractors": [
+        {
+          "text": "to be treated",
+          "misconception": "Applies the passive infinitive pattern to a verb ('resent') that specifically requires a gerund complement."
+        },
+        {
+          "text": "be treated",
+          "misconception": "Uses the bare passive infinitive without 'to' or the required gerund '-ing' form."
+        },
+        {
+          "text": "treated",
+          "misconception": "Drops the auxiliary needed to mark the passive voice, leaving only the past participle."
+        }
+      ]
+    },
+    {
+      "id": "b5_010-cz0",
+      "templateId": "b5_010",
+      "skill": "reporting_verb_pattern_deny_admit_apologize_for",
+      "level": "B2",
+      "sentence": "He apologized ____ late to the meeting.",
+      "blank": {
+        "answer": "for being",
+        "alternates": [],
+        "position": 14
+      },
+      "distractors": [
+        {
+          "text": "that he was",
+          "misconception": "Applies the generic reporting pattern (verb + that-clause) to a verb requiring preposition + gerund."
+        },
+        {
+          "text": "to be",
+          "misconception": "Uses an infinitive complement instead of the required preposition + gerund pattern."
+        },
+        {
+          "text": "for be",
+          "misconception": "Uses the bare base form after the preposition 'for' instead of the required gerund."
+        }
+      ]
+    },
+    {
+      "id": "b5_011-cz0",
+      "templateId": "b5_011",
+      "skill": "zero_article_with_proper_nouns_exceptions_the_netherlands",
+      "level": "B2",
+      "sentence": "My cousin has lived in ____ Netherlands for almost ten years now.",
+      "blank": {
+        "answer": "the",
+        "alternates": [],
+        "position": 23
+      },
+      "distractors": [
+        {
+          "text": "a",
+          "misconception": "Treats the country name as an ordinary countable noun needing an indefinite article."
+        },
+        {
+          "text": "an",
+          "misconception": "Applies the indefinite article rule based on the following vowel sound, ignoring that country names don't take indefinite articles at all."
+        },
+        {
+          "text": "[no article]",
+          "misconception": "Overgeneralizes the common 'no article before country names' rule to every country name."
+        }
+      ]
+    },
+    {
+      "id": "b5_012-cz0",
+      "templateId": "b5_012",
+      "skill": "quantifier_of_before_object_pronoun",
+      "level": "B1",
+      "sentence": "I have exactly two close friends. ____ them live in different countries now, so we rarely meet in person.",
+      "blank": {
+        "answer": "Both of",
+        "alternates": [],
+        "position": 34
+      },
+      "distractors": [
+        {
+          "text": "Both",
+          "misconception": "drops 'of' before the object pronoun"
+        },
+        {
+          "text": "All",
+          "misconception": "drops 'of' and ignores the explicitly two-person set"
+        },
+        {
+          "text": "Neither",
+          "misconception": "drops 'of' and reverses the affirmative meaning"
+        }
+      ]
+    },
+    {
+      "id": "b5_015-cz0",
+      "templateId": "b5_015",
+      "skill": "verb_pattern_regret_mean_go_on_meaning_change",
+      "level": "C1",
+      "sentence": "We regret ___ you that your application has been unsuccessful.",
+      "blank": {
+        "answer": "to inform",
+        "alternates": [],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "informing",
+          "misconception": "Uses the gerund pattern (regretting a past action) where the formal-announcement meaning is intended."
+        },
+        {
+          "text": "having informed",
+          "misconception": "Uses a perfect gerund implying the informing already happened before the regret."
+        },
+        {
+          "text": "inform",
+          "misconception": "Drops the infinitive marker 'to' entirely."
+        }
+      ]
+    },
+    {
+      "id": "b5_016-cz0",
+      "templateId": "b5_016",
+      "skill": "perfect_gerund_vs_simple_gerund_time_reference",
+      "level": "C1",
+      "sentence": "Which completion most explicitly marks the breaking as earlier than the later admission? He admitted ____ the vase.",
+      "blank": {
+        "answer": "having broken",
+        "alternates": [],
+        "position": 101
+      },
+      "distractors": [
+        {
+          "text": "breaking",
+          "misconception": "Uses the simple gerund, which leaves the earlier timing to context instead of encoding it explicitly."
+        },
+        {
+          "text": "to break",
+          "misconception": "Uses an infinitive complement after 'admit', a verb that takes a gerund, not an infinitive."
+        },
+        {
+          "text": "break",
+          "misconception": "Uses the bare base form with no verb marking at all."
+        }
+      ]
+    },
+    {
+      "id": "b5_017-cz0",
+      "templateId": "b5_017",
+      "skill": "relative_clause_with_quantifier_some_of_which_many_of_whom",
+      "level": "C1",
+      "sentence": "The charity has over two hundred volunteers, ____ are retired teachers.",
+      "blank": {
+        "answer": "many of whom",
+        "alternates": [],
+        "position": 45
+      },
+      "distractors": [
+        {
+          "text": "which many",
+          "misconception": "Reverses the order of quantifier and relative pronoun."
+        },
+        {
+          "text": "whom many of",
+          "misconception": "Scrambles the word order of the fixed quantifier + of + whom structure."
+        },
+        {
+          "text": "many of them",
+          "misconception": "Uses a personal pronoun 'them' instead of a relative pronoun, which cannot join two clauses."
+        }
+      ]
+    },
+    {
+      "id": "b5_019-cz0",
+      "templateId": "b5_019",
+      "skill": "subject_vs_object_questions_word_order",
+      "level": "A2",
+      "sentence": "____ the window during the storm last night?",
+      "blank": {
+        "answer": "Who broke",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Who did break",
+          "misconception": "Adds the auxiliary 'did' as if this were an object question, following the standard question-formation rule mechanically."
+        },
+        {
+          "text": "Who did broke",
+          "misconception": "Adds 'did' and keeps the past-tense main verb form together."
+        },
+        {
+          "text": "Who does break",
+          "misconception": "Uses present-tense auxiliary 'does' for a clearly past-time event ('last night')."
+        }
+      ]
+    },
+    {
+      "id": "b5_021-cz0",
+      "templateId": "b5_021",
+      "skill": "purpose_connectors_so_that_in_order_to_distinction",
+      "level": "B1",
+      "sentence": "She whispered the instructions ____ the other students wouldn't hear.",
+      "blank": {
+        "answer": "so that",
+        "alternates": [],
+        "position": 31
+      },
+      "distractors": [
+        {
+          "text": "in order to",
+          "misconception": "Uses the infinitive-purpose connector before a full clause with a different subject."
+        },
+        {
+          "text": "so as to",
+          "misconception": "Uses another infinitive-purpose connector requiring the same subject, mismatching the different-subject clause."
+        },
+        {
+          "text": "for",
+          "misconception": "Uses a preposition that cannot introduce a full purpose clause."
+        }
+      ]
+    },
+    {
+      "id": "b5_022-cz0",
+      "templateId": "b5_022",
+      "skill": "addition_connectors_furthermore_in_addition_moreover_register",
+      "level": "C1",
+      "sentence": "Which formal conjunctive adverb best completes this academic passage? The study's sample size was too small to generalize the findings. ____, the participants were not randomly selected, further weakening the results.",
+      "blank": {
+        "answer": "Furthermore",
+        "alternates": [],
+        "position": 136
+      },
+      "distractors": [
+        {
+          "text": "What's more",
+          "misconception": "Selects a conversational addition phrase instead of a formal conjunctive adverb."
+        },
+        {
+          "text": "Plus",
+          "misconception": "Uses a casual spoken connector in a formal academic passage."
+        },
+        {
+          "text": "And",
+          "misconception": "Uses a coordinating conjunction instead of the requested conjunctive adverb."
+        }
+      ]
+    },
+    {
+      "id": "b5_023-cz0",
+      "templateId": "b5_023",
+      "skill": "negative_adverbial_inversion_never_rarely_not_only",
+      "level": "C1",
+      "sentence": "____ such a disorganized meeting before — nothing was decided at all.",
+      "blank": {
+        "answer": "Never have I attended",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Never I have attended",
+          "misconception": "Fronts the negative adverbial without applying the required subject-auxiliary inversion."
+        },
+        {
+          "text": "Never I attended",
+          "misconception": "Fronts 'Never' with no auxiliary at all, ignoring both the inversion rule and the need for 'have' with 'before'."
+        },
+        {
+          "text": "Have never I attended",
+          "misconception": "Places 'never' after the auxiliary instead of at the very front of the sentence."
+        }
+      ]
+    },
+    {
+      "id": "b5_024-cz0",
+      "templateId": "b5_024",
+      "skill": "fronting_for_emphasis_such_was_the_impact",
+      "level": "C2",
+      "sentence": "____ of the earthquake that entire buildings collapsed within seconds.",
+      "blank": {
+        "answer": "Such was the impact",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Such the impact was",
+          "misconception": "Fronts 'such' but fails to invert the verb 'was' before the subject."
+        },
+        {
+          "text": "The impact such was",
+          "misconception": "Keeps normal subject-first order and misplaces 'such' mid-sentence."
+        },
+        {
+          "text": "Was such the impact",
+          "misconception": "Treats the sentence as a yes/no question by fronting only the verb."
+        }
+      ]
+    },
+    {
+      "id": "A1-003-cz0",
+      "templateId": "A1-003",
+      "skill": "present_simple_basics",
+      "level": "A1",
+      "sentence": "These days my brother ___ coffee every morning.",
+      "blank": {
+        "answer": "drinks",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "drink",
+          "misconception": "base-form overuse"
+        },
+        {
+          "text": "drinking",
+          "misconception": "progressive confusion"
+        },
+        {
+          "text": "drank",
+          "misconception": "past-tense confusion"
+        }
+      ]
+    },
+    {
+      "id": "A1-004-cz0",
+      "templateId": "A1-004",
+      "skill": "be_subject_agreement",
+      "level": "A1",
+      "sentence": "They ___ at home today.",
+      "blank": {
+        "answer": "are",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "am",
+          "misconception": "first-person be"
+        },
+        {
+          "text": "is",
+          "misconception": "singular be"
+        },
+        {
+          "text": "be",
+          "misconception": "base form"
+        }
+      ]
+    },
+    {
+      "id": "A1-005-cz0",
+      "templateId": "A1-005",
+      "skill": "there_is_are",
+      "level": "A1",
+      "sentence": "There ___ two books on the table.",
+      "blank": {
+        "answer": "are",
+        "alternates": [],
+        "position": 6
+      },
+      "distractors": [
+        {
+          "text": "is",
+          "misconception": "singular agreement"
+        },
+        {
+          "text": "be",
+          "misconception": "base form"
+        },
+        {
+          "text": "was",
+          "misconception": "past tense"
+        }
+      ]
+    },
+    {
+      "id": "A1-006-cz0",
+      "templateId": "A1-006",
+      "skill": "possessive_adjectives",
+      "level": "A1",
+      "sentence": "Anna is my friend. ___ brother is a doctor.",
+      "blank": {
+        "answer": "Her",
+        "alternates": [],
+        "position": 19
+      },
+      "distractors": [
+        {
+          "text": "She",
+          "misconception": "subject pronoun"
+        },
+        {
+          "text": "Hers",
+          "misconception": "possessive pronoun"
+        },
+        {
+          "text": "Him",
+          "misconception": "object pronoun"
+        }
+      ]
+    },
+    {
+      "id": "A1-007-cz0",
+      "templateId": "A1-007",
+      "skill": "can_ability",
+      "level": "A1",
+      "sentence": "My sister ___ swim, but she cannot drive.",
+      "blank": {
+        "answer": "can",
+        "alternates": [],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "am",
+          "misconception": "be verb"
+        },
+        {
+          "text": "do",
+          "misconception": "do auxiliary"
+        },
+        {
+          "text": "have",
+          "misconception": "possession"
+        }
+      ]
+    },
+    {
+      "id": "C2-002-cz0",
+      "templateId": "C2-002",
+      "skill": "mixed_conditional_past_cause_future_result",
+      "level": "C2",
+      "sentence": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
+      "blank": {
+        "answer": "would be starting",
+        "alternates": [],
+        "position": 161
+      },
+      "distractors": [
+        {
+          "text": "would have started",
+          "misconception": "moves the result into the unreal past"
+        },
+        {
+          "text": "will start",
+          "misconception": "treats the future result as real despite the unreal past condition"
+        },
+        {
+          "text": "started",
+          "misconception": "uses simple past for an explicitly future consequence"
+        }
+      ]
+    },
+    {
+      "id": "C2-003-cz0",
+      "templateId": "C2-003",
+      "skill": "modal_deduction_past_progressive",
+      "level": "C2",
+      "sentence": "At 9 p.m. the office lights were on and keyboards could be heard, so the team ___ late at that moment.",
+      "blank": {
+        "answer": "must have been working",
+        "alternates": [],
+        "position": 78
+      },
+      "distractors": [
+        {
+          "text": "must have worked",
+          "misconception": "uses a completed-event deduction instead of an ongoing past activity"
+        },
+        {
+          "text": "should work",
+          "misconception": "changes evidence-based deduction into present advice or expectation"
+        },
+        {
+          "text": "cannot have been working",
+          "misconception": "reverses the polarity of the evidence"
+        }
+      ]
+    },
+    {
+      "id": "C2-004-cz0",
+      "templateId": "C2-004",
+      "skill": "inversion_after_only_restrictive_phrase",
+      "level": "C2",
+      "sentence": "Only after the second audit ___ the scale of the error.",
+      "blank": {
+        "answer": "did the board understand",
+        "alternates": [],
+        "position": 28
+      },
+      "distractors": [
+        {
+          "text": "the board understood",
+          "misconception": "keeps ordinary statement order after a fronted restrictive phrase"
+        },
+        {
+          "text": "understood the board",
+          "misconception": "inverts the lexical verb directly"
+        },
+        {
+          "text": "the board did understand",
+          "misconception": "adds emphatic do but does not invert it with the subject"
+        }
+      ]
+    },
+    {
+      "id": "C2-005-cz0",
+      "templateId": "C2-005",
+      "skill": "pseudo_cleft_what_clause_emphasis",
+      "level": "C2",
+      "sentence": "What the team needed most ___ a clear decision.",
+      "blank": {
+        "answer": "was",
+        "alternates": [],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "were",
+          "misconception": "makes the verb agree with the nearby plural noun team"
+        },
+        {
+          "text": "that was",
+          "misconception": "inserts an it-cleft linker into a pseudo-cleft"
+        },
+        {
+          "text": "it was",
+          "misconception": "adds a dummy cleft subject and creates two competing subjects"
+        }
+      ]
+    },
+    {
+      "id": "C2-006-cz0",
+      "templateId": "C2-006",
+      "skill": "participle_clause",
+      "level": "C2",
+      "sentence": "___ the evidence twice, the committee reopened the investigation.",
+      "blank": {
+        "answer": "Having reviewed",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Reviewed",
+          "misconception": "past participle alone"
+        },
+        {
+          "text": "Having review",
+          "misconception": "bare verb"
+        },
+        {
+          "text": "To reviewing",
+          "misconception": "gerund mismatch"
+        }
+      ]
+    },
+    {
+      "id": "C2-007-cz0",
+      "templateId": "C2-007",
+      "skill": "concession_linking",
+      "level": "C2",
+      "sentence": "Much as the proposal ___ to several members at last month's meeting, the board rejected it on practical grounds.",
+      "blank": {
+        "answer": "appealed",
+        "alternates": [],
+        "position": 21
+      },
+      "distractors": [
+        {
+          "text": "appeals",
+          "misconception": "present mismatch"
+        },
+        {
+          "text": "appealing",
+          "misconception": "participle fragment"
+        },
+        {
+          "text": "has appeal",
+          "misconception": "present-tense clash plus unnatural collocation"
+        }
+      ]
+    },
+    {
+      "id": "A1-009-cz0",
+      "templateId": "A1-009",
+      "skill": "have_got_has_got",
+      "level": "A1",
+      "sentence": "She ___ got a new phone.",
+      "blank": {
+        "answer": "has",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "have",
+          "misconception": "plural-form transfer"
+        },
+        {
+          "text": "is",
+          "misconception": "be-verb substitution"
+        },
+        {
+          "text": "does",
+          "misconception": "double-auxiliary construction"
+        }
+      ]
+    },
+    {
+      "id": "A1-010-cz0",
+      "templateId": "A1-010",
+      "skill": "past_simple_regular_forms",
+      "level": "A1",
+      "sentence": "They ___ football yesterday.",
+      "blank": {
+        "answer": "played",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "play",
+          "misconception": "missing-past-marking"
+        },
+        {
+          "text": "plays",
+          "misconception": "third-person-present form"
+        },
+        {
+          "text": "playing",
+          "misconception": "progressive-form substitution"
+        }
+      ]
+    },
+    {
+      "id": "A1-011-cz0",
+      "templateId": "A1-011",
+      "skill": "past_be_was_were",
+      "level": "A1",
+      "sentence": "They ___ at school yesterday.",
+      "blank": {
+        "answer": "were",
+        "alternates": [],
+        "position": 5
+      },
+      "distractors": [
+        {
+          "text": "was",
+          "misconception": "singular-past transfer"
+        },
+        {
+          "text": "are",
+          "misconception": "present-tense substitution"
+        },
+        {
+          "text": "be",
+          "misconception": "bare-infinitive substitution"
+        }
+      ]
+    },
+    {
+      "id": "A1-014-cz0",
+      "templateId": "A1-014",
+      "skill": "present_continuous_basics",
+      "level": "A1",
+      "sentence": "She ___ dinner right now.",
+      "blank": {
+        "answer": "is cooking",
+        "alternates": [],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "cook",
+          "misconception": "bare-verb-without-auxiliary"
+        },
+        {
+          "text": "cooks",
+          "misconception": "present-simple-habit"
+        },
+        {
+          "text": "cooking",
+          "misconception": "missing-be-auxiliary"
+        }
+      ]
+    },
+    {
+      "id": "A1-015-cz0",
+      "templateId": "A1-015",
+      "skill": "question_words_basic",
+      "level": "A1",
+      "sentence": "___ do you live?",
+      "blank": {
+        "answer": "Where",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "What",
+          "misconception": "thing-question substitution"
+        },
+        {
+          "text": "When",
+          "misconception": "time-question substitution"
+        },
+        {
+          "text": "Why",
+          "misconception": "reason-question substitution"
+        }
+      ]
+    },
+    {
+      "id": "A1-016-cz0",
+      "templateId": "A1-016",
+      "skill": "some_any_countable_uncountable",
+      "level": "A1",
+      "sentence": "I don't have ___ money.",
+      "blank": {
+        "answer": "any",
+        "alternates": [],
+        "position": 13
+      },
+      "distractors": [
+        {
+          "text": "some",
+          "misconception": "positive-quantifier-in-negative"
+        },
+        {
+          "text": "a",
+          "misconception": "singular-article-with-uncountable"
+        },
+        {
+          "text": "many",
+          "misconception": "countable-quantity-substitution"
+        }
+      ]
+    },
+    {
+      "id": "A1-017-cz0",
+      "templateId": "A1-017",
+      "skill": "subject_object_pronouns_and_possessives",
+      "level": "A1",
+      "sentence": "___ name is Sari.",
+      "blank": {
+        "answer": "Her",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "She",
+          "misconception": "subject-pronoun-before-noun"
+        },
+        {
+          "text": "Hers",
+          "misconception": "stand-alone-possessive-before-noun"
+        },
+        {
+          "text": "Me",
+          "misconception": "object-pronoun-substitution"
+        }
+      ]
+    }
+  ]
+}

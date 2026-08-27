@@ -3520,6 +3520,168 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-exam-verdict.is-fail{background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--ink,#241a11)}
 @media (max-width:520px){.level-exam-cta{flex-direction:column;align-items:stretch}.level-exam-cta button{width:100%}}
 
+/* ================================================================================
+   P1 GAME LAYER (audit §14) — Jalur Lesson Bersimpul, Prasasti, Ritual Pembuka.
+   Semua warna dari token merek Warm Paper yang sudah ada; semua gerak memakai
+   token --dur/--ease dan dimatikan total pada prefers-reduced-motion.
+   ================================================================================ */
+
+/* ---- P1-1 Jalur Lesson Bersimpul ---------------------------------------------- */
+.path-view-toggle{display:flex;justify-content:flex-end;margin:2px 0 10px}
+.path-view-toggle button{font-size:.82rem;padding:8px 14px}
+.lesson-path{list-style:none;margin:0;padding:4px 0 18px;position:relative}
+.path-step{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0 22px}
+/* Garis penghubung antar simpul: satu kolom di tengah cincin. Selesai = tinta hangat,
+   terkunci = putus-putus redup — jalur terbaca bahkan tanpa warna (aksesibilitas). */
+.path-step::after{content:'';position:absolute;left:31px;top:66px;bottom:-6px;width:3px;border-radius:2px;background:var(--gold);opacity:.55}
+.path-step.is-locked::after{background:none;border-left:3px dashed rgba(36,26,17,.18)}
+.path-step:last-child::after{display:none}
+.path-node{display:grid;place-items:center;width:64px;height:64px;padding:0;border:none;border-radius:50%;background:transparent;box-shadow:none}
+.path-node:disabled{opacity:1;cursor:not-allowed}
+.path-ring{display:grid;place-items:center;width:60px;height:60px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--pm,0)*1%),#EFE3CE 0);transition:background var(--dur-m) var(--ease)}
+.path-ring>b,.path-ring>i,.path-ring>svg{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--bg);color:var(--ink);font-size:1rem;box-shadow:inset 0 0 0 1px rgba(36,26,17,.08)}
+.path-ring i{padding:12px}
+.path-step.is-mastered .path-ring{background:var(--green)}
+.path-step.is-mastered .path-ring>b,.path-step.is-mastered .path-ring>i{background:var(--green-soft);color:var(--green)}
+.path-step.is-locked .path-ring{background:#EFE3CE}
+.path-step.is-locked .path-ring>i{color:rgba(36,26,17,.42);background:#FBF4E4}
+.path-step.is-locked .path-label b{color:rgba(36,26,17,.55)}
+.path-step.is-current .path-ring>b{background:var(--accent-soft);color:var(--accent-strong)}
+.path-label{min-width:0}
+.path-label b{display:block;font-size:.95rem}
+.path-label>span{display:block;font-size:.78rem;color:rgba(36,26,17,.62);margin-top:2px}
+.path-label .lesson-lock-note{margin:8px 0 0}
+.path-mascot{width:44px;justify-self:end;align-self:center}
+.path-mascot :is(svg,img,canvas){width:44px;height:44px}
+/* Node ujian emas di ujung jalur — tujuan jangka menengah selalu terlihat. */
+.path-node-exam .path-ring{background:linear-gradient(140deg,var(--gold),#E7C878)}
+.path-node-exam .path-ring>i{background:#FFF6DF;color:#8A6A24}
+.path-step-exam .path-label b{color:#8A6A24}
+/* Denyut halus node aktif: HANYA saat gerak diizinkan. */
+@media (prefers-reduced-motion:no-preference){
+  .path-step.is-current .path-node{animation:pathPulse 2.4s var(--ease) infinite}
+  @keyframes pathPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+}
+
+/* ---- P1 Prasasti: galeri + momen ---------------------------------------------- */
+.prasasti-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-top:10px}
+.prasasti-badge{display:grid;justify-items:center;gap:6px;text-align:center;padding:14px 10px;border-radius:16px;background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.08)}
+.prasasti-badge b{font-size:.82rem;line-height:1.25}
+.prasasti-badge .prasasti-hint{font-size:.7rem;color:rgba(36,26,17,.55)}
+.prasasti-icon{display:grid;place-items:center;width:52px;height:52px;border-radius:50%}
+.prasasti-icon svg{width:28px;height:28px}
+.prasasti-badge.is-earned .prasasti-icon{background:linear-gradient(140deg,#FFF2C9,#FCE3B0);color:#8A6A24;box-shadow:0 2px 8px rgba(201,162,75,.35)}
+.prasasti-badge.is-earned b{color:var(--ink)}
+/* Siluet: lencana yang belum terukir tetap terlihat bentuknya — tujuan, bukan rahasia. */
+.prasasti-badge.is-locked{opacity:.72}
+.prasasti-badge.is-locked .prasasti-icon{background:#F1EADB;color:rgba(36,26,17,.35)}
+.prasasti-badge.is-locked b{color:rgba(36,26,17,.5)}
+.fz-prasasti-moment{position:fixed;inset:0;z-index:96;display:grid;place-items:center;padding:22px;background:rgba(36,26,17,.34)}
+.fz-prasasti-card{width:min(340px,92vw);display:grid;justify-items:center;gap:10px;text-align:center;padding:26px 22px 20px;border-radius:22px;background:var(--bg);box-shadow:0 18px 44px rgba(36,26,17,.28)}
+.fz-prasasti-hero{display:grid;justify-items:center;gap:6px}
+.fz-prasasti-hero .prasasti-icon{width:72px;height:72px;background:linear-gradient(140deg,#FFF2C9,#FCE3B0);color:#8A6A24;box-shadow:0 3px 12px rgba(201,162,75,.4)}
+.fz-prasasti-hero .prasasti-icon svg{width:38px;height:38px}
+.fz-prasasti-hero b{font-size:1.1rem}
+.fz-prasasti-hero p{margin:0;font-size:.86rem;color:rgba(36,26,17,.68)}
+.fz-prasasti-note{margin:0;font-size:.74rem;color:rgba(36,26,17,.5)}
+.fz-prasasti-moment.is-leaving{opacity:0;transition:opacity var(--dur-m) var(--ease)}
+@media (prefers-reduced-motion:no-preference){
+  .fz-prasasti-card{animation:riseIn var(--dur-m) var(--ease-spring) both}
+}
+
+/* ---- P1-2 Ritual Pembuka Harian ------------------------------------------------ */
+.fz-ritual{position:fixed;inset:0;z-index:95;display:grid;place-items:end center;padding:0 16px 92px;background:rgba(36,26,17,.28)}
+.fz-ritual-card{width:min(380px,94vw);display:grid;gap:8px;padding:22px 20px 18px;border-radius:22px;background:var(--bg);box-shadow:0 16px 40px rgba(36,26,17,.26)}
+.fz-ritual-paw{width:48px;height:48px}
+.fz-ritual-paw :is(svg,img,canvas){width:48px;height:48px}
+.fz-ritual-hi{margin:0;font-size:1.16rem;font-weight:700}
+.fz-ritual-streak{margin:0;display:flex;align-items:center;gap:6px;font-size:.84rem;color:var(--accent-strong)}
+.fz-ritual-mark{letter-spacing:.14em;font-size:.66rem;color:rgba(36,26,17,.5);margin-top:4px}
+.fz-ritual-blocks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.fz-ritual-block{display:grid;gap:2px;padding:9px 12px;border-radius:12px;background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.07)}
+.fz-ritual-block b{font-size:.86rem}
+.fz-ritual-block span{font-size:.74rem;color:rgba(36,26,17,.6)}
+.fz-ritual-empty{margin:0;font-size:.84rem;color:rgba(36,26,17,.65)}
+.fz-ritual-actions{display:flex;gap:8px;margin-top:8px}
+.fz-ritual-actions .primary{flex:1}
+.fz-ritual.is-leaving{opacity:0;transition:opacity var(--dur-m) var(--ease)}
+@media (prefers-reduced-motion:no-preference){
+  .fz-ritual-card{animation:riseIn var(--dur-m) var(--ease-spring) both}
+  /* Reveal rencana ber-stagger 3×80ms sesuai spek P1-2. */
+  .fz-ritual-block{animation:riseIn var(--dur-m) var(--ease) both;animation-delay:calc(var(--ri,0)*80ms)}
+}
+
+/* ==========================================================================
+   R2 UX OVERHAUL RONDE 2 (permintaan owner, IMPLEMENTATION-R2-REPORT.md)
+   ========================================================================== */
+/* R2-1 chip Ujian Skip Level di puncak Grammar Hub. Lengket di bawah kepala layar supaya
+   pintu ujiannya terlihat TANPA menggulir ke ujung jalur; node emas di ujung tetap ada. */
+.grammar-hub-tools{
+  position:sticky;top:8px;z-index:6;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:0 0 12px;
+}
+/* Latar dan tinta SAMA-SAMA token bertema (aturan kontras m025-85: jangan memaku salah
+   satunya sebagai literal) — pasangan sun/text yang sudah diaudit di .primary. */
+.exam-entry-chip{
+  display:inline-flex;align-items:center;gap:10px;min-height:0;
+  padding:9px 14px;border-radius:16px;text-align:left;
+  background:var(--sun);
+  border:1.5px solid var(--sun-deep);box-shadow:0 2px 0 var(--sun-deep);
+  color:var(--text);
+}
+.exam-entry-chip>svg{width:18px;height:18px;flex:none}
+.exam-entry-chip span b{display:block;font-size:.82rem;font-weight:700;letter-spacing:-.01em}
+.exam-entry-chip span small{display:block;font-size:.66rem;font-weight:600;color:var(--text);opacity:.75}
+.exam-entry-chip.is-passed{background:var(--good-soft,#DFF3E4)}
+.grammar-hub-tools .path-view-toggle{margin:0}
+@media(max-width:560px){
+  .grammar-hub-tools{flex-wrap:wrap}
+  .exam-entry-chip{flex:1 1 100%;justify-content:flex-start}
+}
+
+/* R2-2 tautan "Lewati materi": gerbang bukti, bukan aksi utama - gaya tautan kecil supaya
+   jalur normal tetap terbaca sebagai jalan utama. */
+.lesson-skip-link{
+  display:inline-flex;align-items:center;gap:5px;min-height:0;width:max-content;
+  margin-top:5px;padding:4px 8px;border-radius:10px;
+  background:none;border:1px dashed rgba(36,26,17,.35);box-shadow:none;
+  color:var(--muted);font-size:.7rem;font-weight:700;
+}
+.lesson-skip-link svg{width:12px;height:12px}
+.lesson-skip-link:hover{background:var(--sun-soft);color:var(--text);transform:none;box-shadow:none}
+/* Node terkunci: tombol node-nya disabled, tetapi tautan lewati TIDAK ikut redup -
+   ia justru pintu yang sah dari keadaan terkunci. */
+.path-step.is-locked .lesson-skip-link{opacity:1}
+
+/* R2-3 kartu Classroom terkunci: tetap terlihat (fiturnya nyata dan sedang datang),
+   tidak bisa diketuk, dan membawa label SEGERA - bukan kartu mati tanpa penjelasan. */
+.launch-card.is-coming-soon{opacity:.62;cursor:not-allowed;box-shadow:none;transform:none}
+.launch-card.is-coming-soon:hover{transform:none;box-shadow:none}
+.coming-soon-tag{
+  flex:none;padding:3px 8px;border-radius:999px;
+  background:var(--sun-soft);border:1px solid rgba(36,26,17,.25);
+  font-size:.58rem;font-weight:700;letter-spacing:.1em;color:var(--text);
+}
+
+/* R2-4 maskot DI ATAS panel soal, di semua tipe sesi. Kompak (52px), dekorasi murni
+   (aria-hidden), dan tidak pernah menghalangi konten - reaksinya lewat pawReact yang
+   sudah bergerbang reduced-motion. */
+.quiz-mascot{display:flex;justify-content:center;margin:2px 0 10px}
+.quiz-mascot:empty{display:none}
+.quiz-mascot .coach-strip-face{width:52px;height:52px}
+.quiz-mascot .coach-strip-mascot{width:34px;height:34px}
+
+/* R2-6 keping gem di pita statistik hero. */
+.hero-stat.is-gems{background:var(--good-soft,#DFF3E4)}
+.hero-stat.is-gems svg{color:var(--good,#2E7D4F)}
+/* R2-6: baris cincin misi di panel HARI INI (Peta Belajar → Ringkasan). */
+.journey-ring-row{display:flex;align-items:center;gap:14px;margin:6px 0 10px}
+.journey-ring-row p{margin:0;font-size:.78rem;line-height:1.5;color:var(--glass-muted)}
+
+/* MERGE 28 Agu 2026: dua blok CSS independen bertemu di ujung berkas - lapisan game & UX
+   dari hulu, dan pemberitahuan jatah/suara A8 dari jalur rollout Cloudflare. Selektornya
+   tidak bersinggungan, jadi keduanya disimpan utuh; tidak ada yang dibuang. */
 /* ===================================================== A8 · pemberitahuan jatah/suara =====
    Naskahnya di features/quota/quota-copy.js; di sini hanya bentuknya. Empat angka di bawah
    dijaga quota-notice-a11y-test.js dan nggak boleh diturunkan tanpa mengubah gerbangnya:

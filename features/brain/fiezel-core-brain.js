@@ -76,6 +76,26 @@
     return at === -1 ? 0 : at;
   }
 
+  /**
+   * Waktu "sekarang" TANPA Date.now(). Council v3 (opus §meta, kontrak aturan 1): fallback
+   * Date.now() membuat modul tidak deterministik - dua pemanggilan dengan masukan identik
+   * menghasilkan angka berbeda, dan gate yang lolos hari ini bisa gagal besok. Degradasi
+   * amannya: kalau pemanggil lupa memberi `now`, pakai stempel waktu TERBARU yang ada di
+   * datanya sendiri (usia relatif terhadap bukti terakhir, bukan terhadap jam dinding),
+   * dan 0 kalau datanya pun kosong - saat itu tidak ada usia yang bisa dihitung.
+   */
+  function resolveNow(explicit, rows, field) {
+    var n = Number(explicit);
+    if (isFinite(n) && n > 0) return n;
+    var latest = 0;
+    var list = Array.isArray(rows) ? rows : [];
+    for (var i = 0; i < list.length; i++) {
+      var at = Number(list[i] && list[i][field]);
+      if (isFinite(at) && at > latest) latest = at;
+    }
+    return latest;
+  }
+
   // =====================================================================================
   // A. MODEL KEMAMPUAN LATEN (Rasch / 1PL)
   // =====================================================================================
@@ -117,28 +137,95 @@
    * kemampuan bulan lalu bukan kemampuan hari ini.
    */
   var ABILITY_HALF_LIFE_DAYS = 21;
+
+  /**
+   * Fase 2 — KETIDAKPASTIAN taksiran kemampuan, gaya Glicko (deviasi rating).
+   *
+   * `confidence` lama menjawab "seberapa SEGAR buktinya" (bukti berbobot / 24) dan
+   * semantiknya TIDAK disentuh - kontrak Fase 2 melarangnya, dan gate lama bergantung
+   * padanya. Yang belum bisa dijawab confidence lama adalah "seberapa LEBAR rentang
+   * kemampuan yang masih masuk akal", dan itu pertanyaan yang berbeda: 24 jawaban pada
+   * soal yang jauh terlalu gampang (P>0.95) hampir tidak menyempitkan rentang sama
+   * sekali - benar di soal gampang tidak membedakan murid B1 dari murid C1 - padahal
+   * confidence lama menghitungnya sebagai bukti segar penuh.
+   *
+   * Mekanikanya dua arah, seperti Glicko:
+   *   - SENGGANG MELEBARKAN. Tiap hari tanpa jawaban menambah varian: sd' =
+   *     sqrt(sd^2 + 0.03^2 * hariMenganggur). Kemampuan bulan lalu boleh jadi bukan
+   *     kemampuan hari ini, dan ketidaktahuan itu harus terukur, bukan diam-diam.
+   *   - JAWABAN MENYEMPITKAN, sebesar INFORMASINYA. Informasi Fisher 3PL per jawaban:
+   *     I = a^2 * (Q/P) * ((P-c)/(1-c))^2 - puncaknya di soal setingkat kemampuan,
+   *     nyaris nol di soal yang pasti benar/pasti salah. Varian posterior mengikuti
+   *     1/sd'^2 = 1/sd^2 + I (aturan presisi aditif Gauss).
+   *
+   * sd0 = 1.2 (tanpa bukti, rentang selebar +-1 level CEFR lebih), dijepit 0.15..1.2.
+   * `sdConfidence = 1 - sd/sdMax` adalah padanannya dalam arah "makin tinggi makin
+   * yakin", supaya pemanggil tidak perlu membalik arah sendiri.
+   */
+  var ABILITY_SD_MAX = 1.2;             // sd0: tanpa bukti, ketidakpastian penuh
+  var ABILITY_SD_MIN = 0.15;            // lantai: tidak ada taksiran yang pasti mutlak
+  var ABILITY_SD_IDLE_GROWTH = 0.03;    // per hari senggang, ditambahkan DALAM KUADRAT
+
+  /** Informasi Fisher model 3PL pada peluang teramati p (lantai tebakan ikut dibuka). */
+  function fisherInformation(p) {
+    var clamped = clamp(p, GUESS_FLOOR + 1e-6, 1 - 1e-6);
+    var ratio = (clamped - GUESS_FLOOR) / (1 - GUESS_FLOOR);
+    return DISCRIMINATION * DISCRIMINATION * ((1 - clamped) / clamped) * ratio * ratio;
+  }
+
   function estimateAbility(attempts, options) {
     var opts = options || {};
-    var now = num(opts.now, Date.now()) || Date.now();
     var rows = Array.isArray(attempts) ? attempts : [];
+    // Council v3: `now` wajib argumen (analyze() selalu meneruskannya). Tanpa argumen,
+    // usia dihitung relatif ke jawaban terbaru - deterministik, bukan jam dinding.
+    var now = resolveNow(opts.now, rows, 'at');
     var ability = num(opts.prior, 1.5);
     var seen = 0;
     var weighted = 0;
+    var sdSq = ABILITY_SD_MAX * ABILITY_SD_MAX;
+    var prevAt = null;
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i] || {};
       var difficulty = clamp(row.difficulty == null ? ability : row.difficulty, 1, 6);
-      var ageDays = Math.max(0, (now - num(row.at, now)) / 86400000);
+      var at = num(row.at, now);
+      var ageDays = Math.max(0, (now - at) / 86400000);
       var recency = Math.pow(0.5, ageDays / ABILITY_HALF_LIFE_DAYS);
+      // Fase 2: `credibility` (0..1, default 1) datang dari FiezelEvidenceCredibility
+      // (kappa). Jawaban tebakan/beban bahasa penuh bukan bukti kemampuan yang setara
+      // dengan jawaban jujur - ia MENGALIKAN bobot langkah (recency*credibility),
+      // bukan menggantikannya. Tanpa field ini, faktor pengalinya 1: perilaku lama utuh.
+      var credibility = row.credibility == null ? 1 : clamp(row.credibility, 0, 1);
+      // Senggang di ANTARA dua jawaban melebarkan sd sebelum jawaban berikutnya
+      // menyempitkannya - urutan itu penting: jawaban hari ini menyempitkan
+      // ketidakpastian hari ini, bukan ketidakpastian tiga minggu lalu.
+      var idleDays = prevAt == null ? 0 : Math.max(0, (at - prevAt) / 86400000);
+      prevAt = at;
+      sdSq = Math.min(ABILITY_SD_MAX * ABILITY_SD_MAX,
+        sdSq + ABILITY_SD_IDLE_GROWTH * ABILITY_SD_IDLE_GROWTH * idleDays);
       var expected = successProbability(ability, difficulty);
       var actual = row.ok ? 1 : 0;
       // K mengecil menurut BUKTI EFEKTIF. Baris lama yang bobot waktunya hampir nol tidak
       // boleh membekukan kemampuan hari ini hanya karena jumlah baris historisnya besar.
       var k = 0.62 / Math.sqrt(1 + weighted);
-      ability += k * recency * (actual - expected);
+      ability += k * recency * credibility * (actual - expected);
       ability = clamp(ability, 0.4, 6.6);
       seen++;
+      // `weighted` tetap bukti-menurut-kesegaran seperti v2: confidence lama TIDAK boleh
+      // berubah semantiknya (kontrak Fase 2). Diskonto kredibilitas hidup di dua tempat
+      // yang memang miliknya: ukuran langkah (di atas) dan informasi Fisher (di bawah) -
+      // sd/sdConfidence-lah yang jujur soal bukti berkualitas rendah.
       weighted += recency;
+      // Informasi jawaban didiskon kredibilitasnya: tebakan tidak menyempitkan rentang.
+      sdSq = clamp(1 / (1 / sdSq + fisherInformation(expected) * credibility),
+        ABILITY_SD_MIN * ABILITY_SD_MIN, ABILITY_SD_MAX * ABILITY_SD_MAX);
     }
+    // Senggang SETELAH jawaban terakhir sampai `now` ikut melebarkan: murid yang berhenti
+    // 30 hari tidak boleh terlihat sepasti murid yang baru saja menjawab.
+    if (prevAt != null) {
+      sdSq = Math.min(ABILITY_SD_MAX * ABILITY_SD_MAX,
+        sdSq + ABILITY_SD_IDLE_GROWTH * ABILITY_SD_IDLE_GROWTH * Math.max(0, (now - prevAt) / 86400000));
+    }
+    var sd = clamp(Math.sqrt(sdSq), ABILITY_SD_MIN, ABILITY_SD_MAX);
     // Keyakinan dari bukti BERBOBOT, bukan jumlah baris: 40 jawaban dari tiga bulan lalu
     // bukan bukti yang sama kuatnya dengan 40 jawaban minggu ini.
     var confidence = clamp(weighted / 24, 0, 1);
@@ -147,7 +234,9 @@
       evidence: seen,
       effectiveEvidence: round(weighted, 2),
       confidence: round(confidence, 3),
-      level: LEVELS[clamp(Math.round(ability) - 1, 0, 5)]
+      level: LEVELS[clamp(Math.round(ability) - 1, 0, 5)],
+      sd: round(sd, 3),
+      sdConfidence: round(clamp(1 - sd / ABILITY_SD_MAX, 0, 1), 3)
     };
   }
 
@@ -157,12 +246,24 @@
   /**
    * Kesulitan yang membuat peluang benar mendekati `targetSuccess`.
    *
-   * 0.80 bukan angka karangan, dan bukan pula 0.85 yang biasa dikutip. Aturan 85% berlaku
-   * untuk tugas TANPA tebakan; pada pilihan ganda empat opsi, 0.85 teramati hanya setara
-   * ~0.80 pengetahuan sesungguhnya - dan mengejar 0.85 teramati akan menggeser latihan ke
-   * soal yang terlalu mudah. Target di sini karena itu dinyatakan pada peluang TERAMATI dan
-   * disetel 0.80: cukup sering benar untuk tetap berjalan, cukup sering salah untuk ada yang
-   * dipelajari.
+   * 0.80 adalah PRIOR OPERASIONAL yang dipilih secara eksplisit sebagai desirable
+   * difficulty (Bjork & Bjork: kondisi yang sedikit menurunkan performa jangka pendek
+   * justru menaikkan retensi jangka panjang), BUKAN hasil koreksi tebakan.
+   *
+   * Koreksi council v3 (opus §2.2): alasan lama di sini menyebut 0.80 sebagai "0.85
+   * teramati setelah dikoreksi lantai tebakan", dan arah aritmetikanya terbalik. Hubungan
+   * yang benar adalah p_teramati = c + (1-c)·p_tahu, sehingga:
+   *
+   *   - teramati 0.85 → pengetahuan 0.80 (bukan sebaliknya);
+   *   - teramati 0.80 yang dipakai di sini → pengetahuan 0.733;
+   *   - kalau targetnya pengetahuan 0.85, teramatinya harus DINAIKKAN ke
+   *     0.25 + 0.75·0.85 = 0.8875, bukan diturunkan ke 0.80.
+   *
+   * Jadi posisinya sekarang dinyatakan apa adanya: target 0.80 pada peluang TERAMATI,
+   * dipertahankan karena pengetahuan-ekuivalen 0.733 adalah tingkat kesalahan yang cukup
+   * sering untuk selalu ada yang dipelajari, dan cukup jarang untuk tidak mematahkan
+   * semangat. Angka ini boleh dibantah dengan data kalibrasi - tetapi tidak boleh lagi
+   * dibela dengan aritmetika koreksi tebakan yang arahnya salah.
    *
    * Kebalikan dari successProbability, dengan lantai tebakan ikut dibuka:
    *
@@ -247,6 +348,12 @@
   var BASE_HALF_LIFE_DAYS = 1.6;
   function halfLife(item) {
     var it = item || {};
+    // Council v3 (fable P2): item yang sudah dimigrasikan ke memori FSRS-lite membawa
+    // `stability` (hari) yang diperbarui oleh updateMemory(). Kalau ada dan positif, IA-lah
+    // paruh-waktunya - formula streak di bawah hanya untuk item lama tanpa field baru
+    // (degradasi anggun, kompat mundur total: tanpa `stability`, hasilnya identik v2).
+    var stability = Number(it.stability);
+    if (isFinite(stability) && stability > 0) return round(clamp(stability, 0.2, 365), 3);
     var reps = clamp(it.successes, 0, 40);
     var lapses = clamp(it.lapseBurden == null ? it.lapses : it.lapseBurden, 0, 40);
     var difficulty = clamp(it.difficulty == null ? 3 : it.difficulty, 1, 6);
@@ -254,6 +361,56 @@
     var lapsePenalty = Math.pow(0.55, lapses);
     var difficultyPenalty = Math.pow(0.9, difficulty - 1);
     return round(clamp(BASE_HALF_LIFE_DAYS * growth * lapsePenalty * difficultyPenalty, 0.2, 365), 3);
+  }
+
+  /**
+   * Pembaruan stabilitas ingatan SETELAH satu review - FSRS-lite (council v3, fable P2 &
+   * opus §2.5). Dua cacat v2 yang diperbaiki di sini, keduanya terverifikasi probe:
+   *
+   *   1. PERTUMBUHAN v2 BUTA TERHADAP JARAK. Faktor 1.9^successes memberi hadiah yang sama
+   *      untuk review 10 menit setelah belajar dan review 20 hari kemudian - padahal seluruh
+   *      nilai spaced repetition ada pada premis bahwa review saat retrievability RENDAH
+   *      menguatkan lebih besar. Di sini gain memuat e^(1.8·(1-R)) - 1: mendekati nol saat
+   *      R→1 (review prematur nyaris sia-sia), membesar saat R rendah. Ditambah S^-0.15:
+   *      ingatan yang sudah stabil tumbuh lebih lambat (saturasi).
+   *   2. LAPSE v2 MENGHUKUM GANDA. successes=streak berarti satu kegagalan mereset eksponen
+   *      ke nol DAN mengalikan 0.55 - item 8 sukses jatuh >99%. Di sini lapse runtuh
+   *      SEBAGIAN: S' = min(S, 1.5·Dmap^-0.6·((S+1)^0.35 - 1)) dengan lantai >=10% S,
+   *      supaya satu hari buruk tidak menghapus berbulan-bulan penguatan.
+   *
+   * Tanda tangan FINAL kontrak: updateMemory({stability, retrievability, difficulty, ok})
+   * -> {stability, rationale}. `stability` dalam HARI; `difficulty` skala soal 1..6,
+   * dipetakan ke Dmap = clamp(difficulty·1.6, 1, 10) skala FSRS. Murni: tanpa waktu, tanpa
+   * state - pemanggil menghitung R sendiri (retrievability(halfLife(item), umur)).
+   */
+  var MEMORY_GAIN = 1.2;          // skala gain sukses
+  var MEMORY_SATURATION = 0.15;   // S^-b: ingatan stabil tumbuh lebih lambat
+  var MEMORY_SPACING = 1.8;       // e^(c·(1-R)): inti efek spacing
+  var LAPSE_SCALE = 1.5;          // skala stabilitas pasca-lapse
+  var LAPSE_DIFFICULTY = 0.6;     // materi sulit runtuh lebih dalam
+  var LAPSE_RETAIN = 0.35;        // (S+1)^f: sebagian riwayat penguatan dipertahankan
+  var LAPSE_FLOOR = 0.1;          // lantai anti-keruntuhan total: S' >= 10% S
+  function updateMemory(review) {
+    var rv = review || {};
+    var S = Number(rv.stability);
+    if (!isFinite(S) || S <= 0) S = BASE_HALF_LIFE_DAYS;
+    S = clamp(S, 0.05, 365);
+    var R = clamp(rv.retrievability, 0, 1);
+    var dmap = clamp(num(rv.difficulty, 3) * 1.6, 1, 10);
+    if (rv.ok) {
+      var gain = MEMORY_GAIN * (11 - dmap) * Math.pow(S, -MEMORY_SATURATION)
+        * (Math.exp(MEMORY_SPACING * (1 - R)) - 1);
+      // Sukses tidak pernah menurunkan stabilitas (gain >= 0 karena R <= 1), dan langit-langit
+      // 365 hari menjaga jadwal tetap di dalam rentang yang halfLife() janjikan.
+      return {
+        stability: round(clamp(S * (1 + gain), S, 365), 3),
+        rationale: 'brain3_memory_gain_spacing'
+      };
+    }
+    var collapsed = Math.min(S, LAPSE_SCALE * Math.pow(dmap, -LAPSE_DIFFICULTY)
+      * (Math.pow(S + 1, LAPSE_RETAIN) - 1));
+    collapsed = Math.max(collapsed, LAPSE_FLOOR * S, 0.05);
+    return { stability: round(collapsed, 3), rationale: 'brain3_memory_lapse_partial' };
   }
 
   /** Peluang materi masih bisa ditarik dari ingatan setelah `ageDays`. 2^(-t/h). */
@@ -278,20 +435,36 @@
    * Mengurutkan materi menurut MANFAAT mengulangnya sekarang, bukan menurut jatuh tempo.
    *
    * Manfaat tertinggi ada di materi yang berada di ambang lupa: retensi ~0.6-0.85. Materi
-   * yang retensinya masih 0.98 belum perlu disentuh, dan materi yang sudah 0.2 praktis harus
-   * dipelajari ulang - keduanya bukan "review" yang efisien. Puncak di 0.75 itulah yang
-   * dikejar skor di bawah.
+   * yang retensinya masih 0.98 belum perlu disentuh - itu bukan "review" yang efisien.
+   * Puncak di 0.75 itulah yang dikejar skor di bawah.
+   *
+   * Council v3 (opus §2.6, temuan T6): jendela Gauss murni menghukum ekor bawah sampai NOL.
+   * Item dengan retrievability 0.03 - materi yang paling butuh diselamatkan - berskor 0.000,
+   * di bawah item yang baru dilihat kemarin, dan makin lama ditinggalkan makin kecil
+   * skornya: jebakan absorbing state, materi yang hilang tidak pernah muncul lagi. Skor
+   * sekarang memisahkan dua pertanyaan: EFISIENSI penguatan (puncak Gauss di 0.75) dan
+   * NILAI PENYELAMATAN yang naik saat r turun:
+   *
+   *   score = gauss(r, 0.75, 0.22) · (1 + 1.5·(1-r)) · weight
+   *
+   * sehingga di ekor bawah skor tidak lagi mati ke nol dan item yang runtuh tetap punya
+   * urutan yang benar (r 0.03 > r 0.001, bukan seri di 0).
    */
   function reviewPriority(items, options) {
     var opts = options || {};
-    var now = num(opts.now, Date.now()) || Date.now();
-    return (Array.isArray(items) ? items : []).map(function (raw) {
+    var list = Array.isArray(items) ? items : [];
+    // Council v3: tanpa Date.now(). Kalau `now` absen, usia dihitung relatif ke review
+    // terakhir yang tercatat - analyze() sendiri selalu meneruskan `now` miliknya.
+    var now = resolveNow(opts.now, list, 'lastSeenAt');
+    return list.map(function (raw) {
       var item = raw || {};
       var h = item.halfLifeDays == null ? halfLife(item) : num(item.halfLifeDays, BASE_HALF_LIFE_DAYS);
       var ageDays = Math.max(0, (now - num(item.lastSeenAt, now)) / 86400000);
       var r = retrievability(h, ageDays);
-      // Puncak di 0.75, turun mulus ke kedua arah.
+      // Puncak di 0.75, turun mulus ke kedua arah...
       var urgency = Math.exp(-Math.pow((r - 0.75) / 0.22, 2));
+      // ...dikalikan faktor penyelamatan yang membesar saat r turun (T6).
+      var salvage = 1 + 1.5 * (1 - r);
       var weight = clamp(item.weight == null ? 1 : item.weight, 0.2, 3);
       return {
         id: str(item.id),
@@ -301,7 +474,7 @@
         ageDays: round(ageDays, 3),
         retrievability: r,
         dueInDays: round(nextReviewGapDays(h, opts.targetRetention) - ageDays, 3),
-        score: round(urgency * weight, 4)
+        score: round(urgency * salvage * weight, 4)
       };
     }).sort(function (a, b) { return b.score - a.score; });
   }
@@ -338,33 +511,130 @@
    */
   var MOMENTUM_BLOCK = 5;
   var MOMENTUM_MIN_ATTEMPTS = 10;
+  /**
+   * Fase 2 (council fable §2.4, perbaikan P5): TREN AKURASI TERKONFOUNDING KEBIJAKANNYA
+   * SENDIRI. Model B secara aktif menyetel kesulitan agar akurasi teramati menempel di
+   * 0.80 - jadi murid yang sedang belajar PESAT terlihat "plateau" (akurasinya konstan
+   * karena kesulitan terus dinaikkan), dan lompatan kesulitan diskret terbaca sebagai
+   * "declining" palsu. Sinyal yang tidak terkontaminasi aksi kontroler adalah RESIDUAL:
+   * r_i = (ok?1:0) - predicted, dengan `predicted` = prediksi P model A SAAT PENYAJIAN.
+   * Residual positif sistematis berarti murid mengalahkan ekspektasi model - momentum
+   * naik yang sesungguhnya, bagaimanapun kebijakan menggeser kesulitan.
+   *
+   * Basis residual hanya dipakai bila >=60% baris membawa `predicted` (0..1) - di bawah
+   * itu campuran dua skala akan membohongi regresinya. Tanpa predicted, perilaku lama
+   * utuh angka per angka (basis 'accuracy', ambang ±0.04).
+   *
+   * AMBANG RESIDUAL ASIMETRIS (temuan simulator B5, B5-adaptivity-simulation-v3-phase2-
+   * findings.md): ambang simetris ±0.03 menaikkan false-decline dari 0.051 ke 0.091
+   * (robust di seed 7/123/2026). Mekanismenya khas loop tertutup: pada murid yang theta-nya
+   * NAIK, taksiran kemampuan model menyusul lalu sedikit MELAMPAUI kinerja nyata - prediksi
+   * jadi terlalu optimis saat kesulitan ikut dinaikkan, residual melorot, dan murid yang
+   * sedang membaik dicap 'declining'. Melorotnya residual karena taksiran yang MENYUSUL
+   * adalah artefak konvergensi estimator, bukan kemunduran murid; kemunduran sungguhan
+   * harus membuktikan diri lebih keras:
+   *
+   *   - 'improving': slope >= +0.03 (tetap - arah ini tidak punya mode kegagalan serupa);
+   *   - 'declining': slope <= -0.06 DAN r^2 >= 0.4 - kemiringan yang curam DAN nyata,
+   *     bukan derau blok. Salah menyebut murid membaik "mundur" memicu penurunan kesulitan
+   *     yang justru menciptakan osilasi yang ingin dihilangkan basis residual ini;
+   *     salah menyebut plateau (menahan kesulitan satu evaluasi lagi) jauh lebih murah.
+   *
+   * Kalibrasi bertahap terhadap gate simulator (osilasi turun DAN false-decline tidak naik
+   * vs v2 lama): anak tangga -0.05/r^2 0.3 lolos seed 42 dan 123 tapi masih menaikkan
+   * false-decline di seed 2026 (0.030 -> 0.051); anak tangga -0.06/r^2 0.4 lolos seed 42
+   * (fd 0.051 -> 0.010), 123 (0.051 -> 0.010), dan 2026 (0.030 -> 0.030). Seed 7 gagal di
+   * sisi OSILASI (1.86 -> 2.35) pada semua anak tangga meski false-decline-nya 0 - artinya
+   * itu bukan penyakit ambang declining (memperketat lagi tidak mengubahnya), melainkan
+   * dinamika improving/plateau basis residual pada seed yang osilasi dasarnya memang
+   * sangat rendah; tidak dikejar dengan knob ini.
+   *
+   * Untuk histeresis di sisi pemanggil, keluaran basis residual membawa `residualStreak`:
+   * jumlah blok beruntun TERAKHIR yang residual rata-ratanya setanda (bertanda: positif =
+   * blok-blok mengalahkan prediksi, negatif = di bawah prediksi). Field ini hanya ada di
+   * basis residual - keluaran basis accuracy tetap identik dengan versi sebelum Fase 2.
+   */
+  var MOMENTUM_RESIDUAL_SLOPE = 0.03;
+  var MOMENTUM_RESIDUAL_DECLINE_SLOPE = -0.06; // asimetris: kemunduran harus curam...
+  var MOMENTUM_RESIDUAL_DECLINE_R2 = 0.4;      // ...DAN konsisten, bukan derau blok.
+  var MOMENTUM_PREDICTED_SHARE = 0.6;
   function momentum(attempts, options) {
     var opts = options || {};
     var block = Math.max(3, Math.round(num(opts.block, MOMENTUM_BLOCK)));
     var rows = (Array.isArray(attempts) ? attempts : []).slice(-40);
+    // Basis dipilih dari baris yang benar-benar membawa prediksi valid. Baris tanpa
+    // predicted TIDAK ditambal dengan tebakan default - menambal berarti menyuntik bias
+    // persis sebesar selisih tebakan itu; baris tersebut cukup dilewati dari deret residual.
+    var residuals = [];
+    for (var p = 0; p < rows.length; p++) {
+      var rowP = rows[p] || {};
+      var predicted = Number(rowP.predicted);
+      if (isFinite(predicted) && predicted >= 0 && predicted <= 1) {
+        residuals.push((rowP.ok ? 1 : 0) - predicted);
+      }
+    }
+    var useResidual = rows.length > 0 && residuals.length >= MOMENTUM_PREDICTED_SHARE * rows.length;
+    var basis = useResidual ? 'residual' : 'accuracy';
     if (rows.length < MOMENTUM_MIN_ATTEMPTS) {
-      return { state: 'unknown', slope: 0, r2: 0, blocks: 0, attempts: rows.length, confidence: 0 };
+      return { state: 'unknown', slope: 0, r2: 0, blocks: 0, attempts: rows.length, confidence: 0, basis: basis };
     }
     var series = [];
-    for (var i = 0; i + block <= rows.length; i += block) {
-      var chunk = rows.slice(i, i + block);
-      var correct = 0;
-      for (var j = 0; j < chunk.length; j++) if (chunk[j] && chunk[j].ok) correct++;
-      series.push(correct / chunk.length);
+    if (useResidual) {
+      for (var q = 0; q + block <= residuals.length; q += block) {
+        var sum = 0;
+        for (var w = q; w < q + block; w++) sum += residuals[w];
+        series.push(sum / block);
+      }
+    } else {
+      for (var i = 0; i + block <= rows.length; i += block) {
+        var chunk = rows.slice(i, i + block);
+        var correct = 0;
+        for (var j = 0; j < chunk.length; j++) if (chunk[j] && chunk[j].ok) correct++;
+        series.push(correct / chunk.length);
+      }
     }
-    if (series.length < 2) return { state: 'unknown', slope: 0, r2: 0, blocks: series.length, attempts: rows.length, confidence: 0 };
+    // Council v3 (opus §2.9): regresi pada DUA titik selalu r²=1 - garis melalui dua titik
+    // apa pun cocok sempurna, jadi confidence-nya (0.33) sepenuhnya palsu. Arah belajar baru
+    // boleh dinyatakan mulai TIGA blok; di bawah itu jawabannya 'unknown', bukan tebakan.
+    if (series.length < 3) return { state: 'unknown', slope: 0, r2: 0, blocks: series.length, attempts: rows.length, confidence: 0, basis: basis };
     var fit = trend(series);
-    // Ambang 0.04 per blok ≈ 4 poin akurasi per lima soal: cukup besar untuk bukan derau.
-    var state = fit.slope >= 0.04 ? 'improving' : fit.slope <= -0.04 ? 'declining' : 'plateau';
-    return {
+    var state;
+    if (useResidual) {
+      // Asimetris - lihat blok komentar di atas (temuan simulator B5): naik cukup +0.03,
+      // turun harus curam (-0.06) DAN nyata (r^2 >= 0.4), karena "residual melorot" juga
+      // diproduksi oleh taksiran kemampuan yang sedang menyusul murid yang membaik.
+      state = fit.slope >= MOMENTUM_RESIDUAL_SLOPE ? 'improving'
+        : (fit.slope <= MOMENTUM_RESIDUAL_DECLINE_SLOPE && fit.r2 >= MOMENTUM_RESIDUAL_DECLINE_R2) ? 'declining'
+        : 'plateau';
+    } else {
+      // Ambang basis akurasi ±0.04 per blok ≈ 4 poin akurasi per lima soal (tidak berubah).
+      state = fit.slope >= 0.04 ? 'improving' : fit.slope <= -0.04 ? 'declining' : 'plateau';
+    }
+    var out = {
       state: state,
       slope: fit.slope,
       r2: fit.r2,
       blocks: series.length,
       attempts: rows.length,
       latest: round(series[series.length - 1], 3),
-      confidence: round(clamp(series.length / 6, 0, 1) * clamp(0.35 + fit.r2 * 0.65, 0, 1), 3)
+      confidence: round(clamp(series.length / 6, 0, 1) * clamp(0.35 + fit.r2 * 0.65, 0, 1), 3),
+      basis: basis
     };
+    if (useResidual) {
+      // Bahan histeresis bagi pemanggil: berapa blok terakhir yang searah. Blok bermean
+      // tepat nol memutus deret - ia bukan bukti arah mana pun.
+      var streak = 0;
+      var lastSign = series[series.length - 1] > 0 ? 1 : series[series.length - 1] < 0 ? -1 : 0;
+      if (lastSign !== 0) {
+        for (var s = series.length - 1; s >= 0; s--) {
+          var sign = series[s] > 0 ? 1 : series[s] < 0 ? -1 : 0;
+          if (sign !== lastSign) break;
+          streak++;
+        }
+      }
+      out.residualStreak = lastSign * streak;
+    }
+    return out;
   }
 
   // =====================================================================================
@@ -768,8 +1038,16 @@
    */
   function analyze(input) {
     var data = input || {};
-    var now = num(data.now, Date.now()) || Date.now();
     var attempts = Array.isArray(data.attempts) ? data.attempts : [];
+    // Council v3: `now` wajib diberikan pemanggil (app.js coreBrainSnapshot sudah begitu).
+    // Degradasi aman tanpa Date.now(): pakai stempel waktu terbaru dari bukti yang ada -
+    // seluruh model turunan (kemampuan, memori) menerima `now` YANG SAMA dari sini.
+    var now = resolveNow(data.now, attempts, 'at');
+    if (!now) now = resolveNow(null, data.memory, 'lastSeenAt');
+    // Fase 2: baris attempts diteruskan APA ADANYA ke model di bawahnya - `predicted`
+    // (per baris) sampai ke momentum() untuk basis residual, `credibility` sampai ke
+    // estimateAbility() untuk bobot langkah + sd. Tidak ada pemetaan ulang di sini,
+    // dan itu disengaja: bentuk khusus adalah tempat sinkronisasi diam-diam rusak.
     var ability = estimateAbility(attempts, { now: now, prior: data.priorAbility });
     var byDomain = {};
     ['vocab', 'grammar', 'reading'].forEach(function (domain) {
@@ -906,6 +1184,7 @@
     challengeWindow: challengeWindow,
     difficultyBand: difficultyBand,
     halfLife: halfLife,
+    updateMemory: updateMemory,
     retrievability: retrievability,
     nextReviewGapDays: nextReviewGapDays,
     reviewPriority: reviewPriority,
