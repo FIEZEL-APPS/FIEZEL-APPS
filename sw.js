@@ -21,7 +21,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // pernah masuk precache pengguna lama.
 // m025-173: lapisan game & UX overhaul ikut fase ini - ASSETS bertambah (prasasti) dan
 // isi app.js/style.css/addon berubah, jadi revisi naik lagi di atas fase 2 braincore.
-const SW_REV='m025-172-braincore-v3-fase2-b3-game-ux-20260828';
+const SW_REV='m025-173-game-ux-overhaul-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
