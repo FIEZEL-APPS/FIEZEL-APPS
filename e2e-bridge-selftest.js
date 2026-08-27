@@ -167,13 +167,38 @@ function makeBridge(mut, tls) {
       return send(200, {
         schema: 'fiezel-config-v1',
         protocol: mut.protocol || PROTOCOL,
-        flags: mut.flagsEmpty ? {} : Object.assign({ cfApiEnabled: false, cfAiEnabled: false, cfQuotaEnabled: false }, mut.flagsOverride || {})
+        // Bawaan MENIRU keadaan KV produksi tahap R2-R3, dan itu bukan kebetulan: assert
+        // presedensi dua arah gerbang (`server-flag-wins-off` + `server-flag-wins-on`) hanya
+        // punya premis kalau flag server TIDAK seragam. Kalau bawaan di sini semuanya false
+        // (seperti versi pertama berkas ini), skenario BENAR pun akan berakhir INCONCLUSIVE
+        // dan matriks jadi bohong.
+        flags: mut.flagsEmpty ? {} : Object.assign({
+          cfApiEnabled: true,
+          cfIdentityEnabled: true,
+          cfQuotaEnabled: true,
+          cfAiEnabled: false,
+          cfTtsEnabled: false,
+          cfAnalyticsEnabled: false
+        }, mut.flagsAllTrue ? { cfAiEnabled: true, cfTtsEnabled: true, cfAnalyticsEnabled: true } : {},
+        mut.flagsAllFalse ? { cfApiEnabled: false, cfIdentityEnabled: false, cfQuotaEnabled: false } : {},
+        mut.flagsOverride || {}),
+        // Lapis `enabled` server: hanya bisa MEMATIKAN. Dibuat konsisten dengan flags supaya
+        // partisi yang dihitung gerbang tidak dibelokkan lapis ini.
+        enabled: mut.flagsAllTrue
+          ? { ai: true, tts: true, coach: true, analytics: true }
+          : { ai: false, tts: false, coach: false, analytics: false }
       });
     }
     if (url.pathname === '/api/auth/anon') {
       if (mut.anonBroken) return send(500, { error: 'internal' });
       const setCookie = buildSetCookie(mut);
       return send(200, { userId: 'tiruan-1', plan: 'free', class: 'visitor', issued: true }, setCookie ? { 'set-cookie': setCookie } : {});
+    }
+    // Endpoint yang HANYA disentuh ketika flag servernya true (atau ketika aplikasi tiruan
+    // sengaja tuli terhadap flag). Jawaban 200 kosong cukup: yang diukur gerbang di sini
+    // adalah ADA/TIDAK ADA permintaan, bukan isinya.
+    if (url.pathname === '/api/ai/task' || url.pathname === '/api/tts' || url.pathname === '/api/usage') {
+      return send(200, { ok: true, jalur: url.pathname });
     }
     if (url.pathname === '/api/quota') {
       const authed = mut.quotaLeak || /(^|;\s*)fz_id=/.test(cookie);
@@ -208,6 +233,7 @@ const LONG_TEXT = 'Halo, ini aplikasi tiruan untuk menguji gerbang E2E jembatan 
 function appHtml(mut) {
   const flags = {
     ignoresServerFlags: !!mut.ignoresServerFlags,
+    deafToServerTrue: !!mut.deafToServerTrue,
     noConfigCall: !!mut.noConfigCall,
     configTwice: !!mut.configTwice,
     blocksBoot: !!mut.blocksBoot,
@@ -234,21 +260,36 @@ function appHtml(mut) {
     ? { mode: 'cors', cache: 'no-store' }
     : { credentials: 'include', mode: 'cors', cache: 'no-store' };
 
+  // Peta flag server per endpoint: SALINAN CF_SERVER_FLAG_FOR di app.js. Aplikasi tiruan
+  // versi pertama memakai aturan "semua flag false = mati", dan aturan itu tidak bisa dipakai
+  // membuktikan presedensi DUA ARAH: ia tidak punya pendapat tentang endpoint per-endpoint.
+  var FLAG_FOR = { auth: 'cfIdentityEnabled', quota: 'cfQuotaEnabled', ai: 'cfAiEnabled', tts: 'cfTtsEnabled', usage: 'cfAnalyticsEnabled' };
+  function serverAllows(name) {
+    // Flag belum tiba = tiruan ini belum berpendapat (skenario C/C0/D memang tidak memanggil
+    // /api/config). Mutasi ignoresServerFlags = aplikasi yang tuli total pada lapis server.
+    if (!serverFlags || MUT.ignoresServerFlags) return true;
+    if (serverFlags.cfApiEnabled !== true) return false;
+    // Mutasi deafToServerTrue: server MEMBOLEHKAN, tetapi aplikasi tetap tidak memanggil.
+    // Inilah cacat yang hanya bisa ditangkap arah kedua (server-flag-wins-on) — versi lama
+    // assert itu buta terhadapnya, karena diam selalu dinilai lulus.
+    if (MUT.deafToServerTrue) return false;
+    var named = FLAG_FOR[name];
+    if (named && serverFlags[named] !== true) return false;
+    return true;
+  }
   function endpointMode(name) {
     if (cfg.enabled !== true || !cfg.base) return MUT.ignoresEnabledFalse ? String((cfg.endpoints || {})[name] || 'off') : 'off';
     var m = String((cfg.endpoints || {})[name] || 'off');
     if (m !== 'on') return 'off';
-    if (serverFlags && !MUT.ignoresServerFlags) {
-      var keys = Object.keys(serverFlags);
-      var semuaMati = keys.length > 0 && keys.every(function (k) { return serverFlags[k] === false; });
-      if (semuaMati) return 'off';
-    }
+    if (!serverAllows(name)) return 'off';
     return 'on';
   }
   function keyFor(p) {
     if (p.indexOf('/api/config') === 0) return 'config';
     if (p.indexOf('/api/auth') === 0) return 'auth';
     if (p.indexOf('/api/quota') === 0) return 'quota';
+    if (p.indexOf('/api/tts') === 0) return 'tts';
+    if (p.indexOf('/api/usage') === 0) return 'usage';
     if (p.indexOf('/health') === 0) return 'health';
     return 'ai';
   }
@@ -339,6 +380,12 @@ async function runGate(env) {
     stderr: String(result.stderr || ''),
     report,
     failedIds: report && Array.isArray(report.checks) ? report.checks.filter(c => c.status === 'FAIL').map(c => c.id) : [],
+    // INCONCLUSIVE dibaca terpisah, dan TIDAK dilebur ke failedIds: matriks di bawah menuntut
+    // status yang TEPAT, supaya "tidak bisa disimpulkan" tidak pernah tertukar dengan "merah"
+    // dan keduanya tidak pernah tertukar dengan "lulus".
+    inconclusiveIds: report && Array.isArray(report.checks) ? report.checks.filter(c => c.status === 'INCONCLUSIVE').map(c => c.id) : [],
+    status: report ? String(report.status || '') : '',
+    reportPass: report ? report.pass : undefined,
     passCount: report && report.counts ? report.counts.pass : 0
   };
 }
@@ -370,7 +417,12 @@ const SCENARIOS = [
   { name: 'aplikasi tidak pernah memanggil /api/config', mut: { noConfigCall: true }, only: 'B-', expect: 'config-called-once' },
   { name: 'aplikasi memanggil /api/config dua kali per boot', mut: { configTwice: true }, only: 'B-', expect: 'config-called-once' },
   { name: 'aplikasi MENAHAN boot sampai /api/config datang', mut: { blocksBoot: true }, only: 'B-', expect: 'config-non-blocking' },
-  { name: 'aplikasi mengabaikan flag server yang false', mut: { ignoresServerFlags: true }, only: 'B-', expect: 'server-flag-wins' },
+  // Presedensi flag server, DUA ARAH. Tiga kasus di bawah menutup ketiga cara assert ini bisa
+  // bohong: bocor ke arah mati, bisu ke arah hidup, dan premis yang tidak tersedia.
+  { name: 'aplikasi mengabaikan flag server yang false (bocor ke endpoint yang dimatikan server)', mut: { ignoresServerFlags: true }, only: 'B-', expect: 'server-flag-wins-off' },
+  { name: 'aplikasi bisu walau flag server true (endpoint yang DIIZINKAN server tidak pernah dipanggil)', mut: { deafToServerTrue: true }, only: 'B-', expect: 'server-flag-wins-on' },
+  { name: 'flag server SERAGAM true ⇒ gerbang harus INCONCLUSIVE, bukan lulus', mut: { flagsAllTrue: true }, only: 'B-', expect: 'server-flag-partition', expectStatus: 'INCONCLUSIVE' },
+  { name: 'flag server SERAGAM false ⇒ gerbang harus INCONCLUSIVE, bukan lulus', mut: { flagsAllFalse: true }, only: 'B-', expect: 'server-flag-partition', expectStatus: 'INCONCLUSIVE' },
   { name: 'aplikasi menembak *.workers.dev langsung', mut: { hitsWorkersDev: true }, only: 'A-', expect: 'no-workers-dev' },
   { name: 'aplikasi membuang credentials:include (cookie tidak dikirim ulang)', mut: { noCredentials: true }, only: 'C-,D-', expect: 'cookie-replayed' },
   { name: 'aplikasi tidak me-render apa pun', mut: { dead: true }, only: 'A-', expect: 'off-app-boots' },
@@ -446,20 +498,28 @@ const SCENARIOS = [
     await new Promise(resolve => bridge.close(resolve));
 
     const wantPass = scenario.expect === null;
+    const wantInconclusive = scenario.expectStatus === 'INCONCLUSIVE';
     const gotPass = run.code === 0;
-    const idHit = wantPass ? true : run.failedIds.includes(scenario.expect);
+    const idHit = wantPass
+      ? true
+      : (wantInconclusive
+        // INCONCLUSIVE harus terbaca sebagai INCONCLUSIVE di ketiga tempat: id assertnya,
+        // status laporan, dan `pass:false`. Kalau salah satunya bilang lulus, gerbangnya
+        // mengubah "tidak terbukti" menjadi "terbukti" — justru cacat yang dilarang.
+        ? (run.inconclusiveIds.includes(scenario.expect) && run.status === 'INCONCLUSIVE' && run.reportPass === false && !run.failedIds.length)
+        : run.failedIds.includes(scenario.expect));
     const ok = wantPass ? gotPass : (!gotPass && idHit);
     matrix.push({
       skenario: scenario.name,
-      diharapkan: wantPass ? 'LULUS' : 'GAGAL@' + scenario.expect,
-      hasil: gotPass ? 'LULUS' : 'GAGAL',
-      assertGagal: run.failedIds,
+      diharapkan: wantPass ? 'LULUS' : (wantInconclusive ? 'INCONCLUSIVE@' + scenario.expect : 'GAGAL@' + scenario.expect),
+      hasil: gotPass ? 'LULUS' : (run.status === 'INCONCLUSIVE' ? 'INCONCLUSIVE' : 'GAGAL'),
+      assertGagal: run.failedIds.concat(run.inconclusiveIds.map(id => id + '(INCONCLUSIVE)')),
       assertLulus: run.passCount,
       cocok: ok,
       // Rincian assert yang gagal ikut dibawa: kalau matriks tidak cocok, penyebabnya harus
       // bisa dibaca dari keluaran ini saja, tanpa harus menjalankan ulang gerbang manual.
       rincian: !ok && run.report && Array.isArray(run.report.checks)
-        ? run.report.checks.filter(c => c.status === 'FAIL').map(c => c.id + ' :: ' + String(c.details).slice(0, 200))
+        ? run.report.checks.filter(c => c.status !== 'PASS').map(c => c.status + ' ' + c.id + ' :: ' + String(c.details).slice(0, 200))
         : []
     });
 
@@ -467,10 +527,16 @@ const SCENARIOS = [
       check('Skenario BENAR: ' + scenario.name + ' → gerbang LULUS',
         ok, 'exit=' + run.code + ' assertGagal=' + (run.failedIds.join(',') || '0') + ' assertLulus=' + run.passCount
           + (run.failedIds.length ? '\n         stderr: ' + run.stderr.slice(0, 300) : ''));
-      // Hijau karena kosong juga hijau. Gerbang penuh punya 22 assert; 20 adalah ambang aman
-      // yang tetap menangkap jalan yang berhenti di tengah.
-      check('Skenario BENAR menjalankan ≥20 assert (bukan hijau karena tidak menguji apa-apa)',
-        run.passCount >= 20, 'assertLulus=' + run.passCount);
+      // Hijau karena kosong juga hijau. Gerbang penuh punya 24 assert (22 + dua arah
+      // presedensi flag server); 22 adalah ambang aman yang tetap menangkap jalan yang
+      // berhenti di tengah.
+      check('Skenario BENAR menjalankan ≥22 assert (bukan hijau karena tidak menguji apa-apa)',
+        run.passCount >= 22, 'assertLulus=' + run.passCount);
+    } else if (wantInconclusive) {
+      check('Skenario TAK TERSIMPULKAN: ' + scenario.name + ' → gerbang INCONCLUSIVE di `' + scenario.expect + '` dan exit ≠ 0',
+        ok, 'exit=' + run.code + ' status=' + run.status + ' pass=' + JSON.stringify(run.reportPass)
+          + ' inconclusive=' + (run.inconclusiveIds.join(',') || '(kosong)')
+          + ' assertGagal=' + (run.failedIds.join(',') || '(kosong)'));
     } else {
       check('Skenario SALAH: ' + scenario.name + ' → gerbang GAGAL di `' + scenario.expect + '`',
         ok, 'exit=' + run.code + ' assertGagal=' + (run.failedIds.join(',') || '(kosong)'));
@@ -485,6 +551,13 @@ const SCENARIOS = [
   check('Varian salah menutup id assert yang berbeda-beda (bukan satu assert yang sama berulang)',
     new Set(SCENARIOS.filter(s => s.expect).map(s => s.expect)).size >= 12,
     [...new Set(SCENARIOS.filter(s => s.expect).map(s => s.expect))].join(', '));
+  // Presedensi flag server WAJIB ditutup dari tiga sisi. Kalau salah satu hilang, assert itu
+  // kembali bisa hijau karena diam — persis cacat yang membuatnya harus dirancang ulang.
+  check('Presedensi flag server ditutup dua arah PLUS kasus tak tersimpulkan (off, on, INCONCLUSIVE)',
+    SCENARIOS.some(s => s.expect === 'server-flag-wins-off')
+    && SCENARIOS.some(s => s.expect === 'server-flag-wins-on')
+    && SCENARIOS.filter(s => s.expectStatus === 'INCONCLUSIVE' && s.expect === 'server-flag-partition').length >= 2,
+    'off/on/INCONCLUSIVE×' + SCENARIOS.filter(s => s.expectStatus === 'INCONCLUSIVE').length);
   check('Laporan gerbang tidak pernah ditulis ke akar repo (working tree bersih)',
     !fs.existsSync(path.join(__dirname, 'E2E-BRIDGE-REPORT.json')), 'E2E-BRIDGE-REPORT.json tidak ada di akar');
 
