@@ -1059,19 +1059,78 @@ curl -s -o /dev/null -w "%{http_code}\n" https://owner.fiezel.my.id/api/owner/su
 # Kalau 200 tanpa kredensial: HENTIKAN, hapus route, perbaiki dulu.
 ```
 
-### 4.5 Isi nilai flag awal di KV (semua `off`)
+### 4.5 Isi nilai flag awal di KV (semua mati)
+
+> **🔄 TEMUAN LAPANGAN 28 Agu 2026 — SELURUH BAGIAN 4.5 DITULIS ULANG. PERINTAH LAMA GAGAL
+> DENGAN TENANG.** Versi lama menyuruh menulis bentuk DATAR dengan nama karangan:
+> `{"transport":"off","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}`.
+> `wrangler` menerimanya (KV tidak punya skema), lalu `workers/api/route-config.js:53-54`
+> **MENGABAIKANNYA SEPENUHNYA**: ia hanya membaca `stored.flags` dan `stored.enabled`, dan
+> `mergeFlags` hanya memakai kunci yang sudah dikenal **bertipe boolean** — kunci `transport`
+> tidak ada di daftar mana pun, dan string `"off"` bukan boolean. Jadi perintah itu masuk KV
+> **tanpa satu pun galat** dan owner mengira sudah mematikan fitur padahal tidak ada satu bit
+> pun yang berubah. Ini kegagalan paling berbahaya di seluruh runbook: kill switch yang
+> menjawab "sukses" saat tidak melakukan apa-apa. Bentuk yang BENAR ada di bawah, dan gerbang
+> `config-consistency-test.js` sekarang menolak bentuk datar/string masuk ke dokumen ini lagi.
+
+**Bentuk KV yang sesungguhnya dibaca** (`workers/api/route-config.js:53-54`) — dua objek
+bersarang, nilainya **boolean** (`true`/`false`), bukan string:
+
+| Blok KV | Kunci yang sah | Sumber daftar | Arti |
+|---|---|---|---|
+| `flags` | `cfApiEnabled`, `cfAiEnabled`, `cfTtsEnabled`, `cfQuotaEnabled`, `cfAnalyticsEnabled`, `cfIdentityEnabled` | `workers/api/schema.js:108-115` (`CLIENT_FLAG_DEFAULTS`) | Izin per jalur klien. `cfApiEnabled` adalah **sakelar induk**: `false` = seluruh jalur CF mati |
+| `enabled` | `ai`, `tts`, `coach`, `analytics` | `workers/api/schema.js:118-123` (`KILL_SWITCH_DEFAULTS`) | Kill switch tingkat server per fitur mahal, lapis tambahan yang hanya bisa MEMATIKAN |
+
+Nama lama → nama yang benar (pakai tabel ini kalau kamu masih menyimpan perintah versi lama):
+`transport` → `flags.cfApiEnabled` · `tts` → `flags.cfTtsEnabled` (+ `enabled.tts`) ·
+`identity` → `flags.cfIdentityEnabled` · `quotaUi` → `flags.cfQuotaEnabled` ·
+`analytics` → `flags.cfAnalyticsEnabled` (+ `enabled.analytics`) ·
+AI → `flags.cfAiEnabled` (+ `enabled.ai`, `enabled.coach`).
+
+Satu status yang **tidak bisa** diwakili di KV: `shadow`. KV hanya mengenal boolean di sini;
+`shadow` adalah nilai **statis** di `core-config.js` (lihat 4.6). Menulis `"shadow"` ke KV
+diabaikan tanpa galat.
 
 ```bash
 cd FIEZEL-APPS/workers/api
 
-# Tulis konfigurasi awal — SEMUA off. Ini yang dibaca GET /api/config.
+# Tulis konfigurasi awal — SEMUA MATI. Ini bentuk yang benar-benar dibaca GET /api/config.
 npx wrangler@3 kv key put --binding=CFG "cfg:flags" \
-  '{"transport":"off","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}' \
+  '{"flags":{"cfApiEnabled":false,"cfAiEnabled":false,"cfTtsEnabled":false,"cfQuotaEnabled":false,"cfAnalyticsEnabled":false,"cfIdentityEnabled":false},"enabled":{"ai":false,"tts":false,"coach":false,"analytics":false}}' \
   --remote
 
+# Verifikasi 1: isi KV apa adanya (harus objek bersarang, bukan datar)
 npx wrangler@3 kv key get --binding=CFG "cfg:flags" --remote
+
+# Verifikasi 2 — YANG MENENTUKAN: apa yang benar-benar dilihat murid.
 curl -s https://api.fiezel.my.id/api/config
-# HARUS: semua nilai "off". Ini kondisi aman default.
+# HARUS: jawaban memuat DUA blok bersarang, setiap nilainya false (boolean, tanpa kutip):
+#   flags   -> cfApiEnabled, cfAiEnabled, cfTtsEnabled, cfQuotaEnabled,
+#              cfAnalyticsEnabled, cfIdentityEnabled
+#   enabled -> ai, tts, coach, analytics
+# Kalau kamu melihat nama datar versi lama (transport, quotaUi) atau nilai bertanda kutip
+# (string off/on) di jawaban, berarti kamu memakai perintah lama dan TIDAK ADA yang
+# berubah. Ulangi dengan bentuk di atas.
+```
+
+**Cara membuktikan nilainya benar-benar berubah (bukan sekadar "perintah sukses").** Ambil
+satu kunci sebelum dan sesudah, lalu bandingkan — kalau nilainya sama, tulisanmu diabaikan:
+
+```bash
+# Sebelum: catat satu kunci sebagai jangkar
+curl -s https://api.fiezel.my.id/api/config | tr ',' '\n' | grep cfTtsEnabled
+# contoh keluaran: "cfTtsEnabled":false
+
+# Ubah HANYA kunci itu (tulis ulang objek utuh — KV put MENGGANTI seluruh nilai)
+npx wrangler@3 kv key put --binding=CFG "cfg:flags" \
+  '{"flags":{"cfApiEnabled":true,"cfAiEnabled":false,"cfTtsEnabled":true,"cfQuotaEnabled":false,"cfAnalyticsEnabled":false,"cfIdentityEnabled":false},"enabled":{"ai":false,"tts":true,"coach":false,"analytics":false}}' \
+  --remote
+
+# Sesudah: tunggu <=60 detik (cacheTtl KV di route-config.js), lalu baca lagi
+sleep 65
+curl -s https://api.fiezel.my.id/api/config | tr ',' '\n' | grep cfTtsEnabled
+# HARUS: "cfTtsEnabled":true  → nilai BERUBAH, kill switch nyata hidup.
+# Kalau masih false setelah 60 detik: perintahmu tidak sampai (salah binding/akun/bentuk).
 ```
 
 ### 4.6 Memutar flag klien: `off` → `shadow` → `on`
@@ -1088,24 +1147,54 @@ Arti tiap status (`reports/cf-b6-migration-plan.md` P1):
 
 - **Statis** di `core-config.js` (`FIEZEL_CF_CONFIG`) — memilih jalur mana yang **ada**.
   Terkunci cache-first di service worker ⇒ **bukan** kill switch. Wajib `off` saat push.
-- **Dinamis** dari `GET /api/config` (KV `cfg:flags`) — **override** yang menang, dibaca sekali
-  per boot dengan timeout pendek dan default = nilai statis kalau gagal. **Ini kill switch-mu.**
+- **Dinamis** dari `GET /api/config` (KV `cfg:flags`, boolean di `flags`/`enabled`) — dibaca
+  sekali per boot dengan timeout pendek. Digabung **AND**: ia hanya bisa **mematikan**, dan
+  kegagalan memuatnya = seluruh jalur CF mati (arah aman). **Ini kill switch-mu.**
 
-Cara memutar (contoh: transport `off` → `shadow`):
+> **🔄 TEMUAN LAPANGAN 28 Agu 2026 — PEMBAGIAN TUGAS DUA LAPIS DIPERBAIKI DI SINI.** Versi lama
+> menyuruh menulis `{"transport":"shadow", ...}` ke KV. Itu **dua kesalahan sekaligus**: nama
+> kuncinya tidak ada di `CLIENT_FLAG_DEFAULTS`, **dan** `shadow` bukan sesuatu yang bisa
+> dikatakan lewat KV — lapis server hanya bisa menjawab boleh/tidak (boolean). Pilihan
+> `off`/`shadow`/`on` per endpoint hidup di `core-config.js` (`FIEZEL_CF_CONFIG.endpoints`) dan
+> berubah lewat **commit + rilis**, sedangkan KV hanya bisa **mencabut izin**. Penggabungannya
+> `AND` (`app.js`, blok `CF-KILLSWITCH`): statis `off` + server `true` tetap **off** — server
+> tidak bisa menyalakan apa pun. Jadi "memutar ke shadow" = rilis, "mematikan" = KV.
+
+Cara memutar, dua langkah yang **tidak bisa saling menggantikan**:
+
+**Langkah A — pilih statusnya (rilis).** Ubah `core-config.js` → `FIEZEL_CF_CONFIG` →
+`endpoints.<key>` menjadi `'shadow'` (atau `'on'`), set `enabled:true` + `base`, lalu push.
+Kunci endpoint yang sah: `health`, `config`, `auth`, `quota`, `ai`, `tts`, `usage`.
+
+**Langkah B — beri izin servernya (KV, `<=60` detik).** Tanpa langkah ini status apa pun di
+langkah A tetap mati, karena `cfApiEnabled` (sakelar induk) default `false`.
+
+Contoh nyata: **menyalakan SATU endpoint saja** — `/api/ai/translate` (jalur `ai`) hidup,
+semua jalur lain tetap mati:
 
 ```bash
 cd FIEZEL-APPS/workers/api
 
+# Sakelar induk ON + hanya cfAiEnabled ON. Sisanya tetap false secara eksplisit:
+# tulis objek UTUH setiap kali — `kv key put` MENGGANTI nilai, bukan menggabungkan.
 npx wrangler@3 kv key put --binding=CFG "cfg:flags" \
-  '{"transport":"shadow","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}' \
+  '{"flags":{"cfApiEnabled":true,"cfAiEnabled":true,"cfTtsEnabled":false,"cfQuotaEnabled":false,"cfAnalyticsEnabled":false,"cfIdentityEnabled":false},"enabled":{"ai":true,"tts":false,"coach":false,"analytics":false}}' \
   --remote
 
-# Verifikasi dari luar, seperti murid melihatnya
+# Verifikasi dari luar, seperti murid melihatnya — dan buktikan yang lain TETAP mati
 curl -s https://api.fiezel.my.id/api/config
+# HARUS: cfApiEnabled dan cfAiEnabled bernilai true, sedangkan cfTtsEnabled, cfQuotaEnabled,
+#        cfAnalyticsEnabled, cfIdentityEnabled tetap false. Kalau salah satu ikut true:
+#        kamu menulis objek yang salah, ulangi.
 # Efek terasa dalam <=60 detik (cacheTtl KV). Tidak butuh rilis, tidak butuh push.
 ```
 
-**Urutan menaikkan `transport` ke `on` — satu endpoint per rilis, paling toleran dulu**
+Catatan penting soal `enabled`: kunci `enabled.ai` bernilai `false` **mematikan** `ai` **dan**
+`coach` (peta `CF_SERVER_KILL_FOR` di `app.js`), jadi jangan memakainya sebagai sakelar halus
+— ia rem, bukan gas.
+
+**Urutan menaikkan jalur transport (`flags.cfApiEnabled` + statis `on`) — satu endpoint per
+rilis, paling toleran dulu**
 (`reports/cf-b6-migration-plan.md` PHASE H):
 
 `/api/feedback` → `/api/activity` → `/api/policy/*` → `/api/ai/translate` →
@@ -1117,23 +1206,48 @@ murid. `/api/ai/chat` terakhir karena itu yang paling kelihatan.
 Syarat naik dari `shadow` ke `on`: **`shadow` jalan ≥3 hari** dengan tingkat ketidaksesuaian yang
 **terukur** — bukan "kelihatannya oke".
 
-**Urutan aman untuk `identity` (paling berisiko dari semuanya):** aktifkan **paling akhir**,
-setelah `transport` dan `tts` stabil. Salah pemetaan identitas = **progres murid tampak hilang
+**Urutan aman untuk identitas (`flags.cfIdentityEnabled` — paling berisiko dari semuanya):**
+aktifkan **paling akhir**, setelah `flags.cfApiEnabled` dan `flags.cfTtsEnabled` stabil. Salah pemetaan identitas = **progres murid tampak hilang
 massal**, dan tidak bisa dipulihkan dari server karena progres memang tidak pernah ada di server
 (`reports/cf-b6-migration-plan.md` PHASE D, risiko #1).
 
 ### 4.7 KILL SWITCH — cara mematikan cepat
 
+> **🔄 TEMUAN LAPANGAN 28 Agu 2026 — PERINTAH KILL SWITCH NOMOR 1 DIGANTI.** Perintah versi lama
+> (`{"transport":"off", ...}`) **tidak mematikan apa pun**: kunci datar itu tidak dikenal
+> `route-config.js:53-54` dan string `"off"` bukan boolean, jadi `wrangler` menjawab sukses
+> sementara flag di server tetap seperti semula. Kalau kamu pernah menyalin perintah lama ke
+> catatan insidenmu, **hapus dan ganti dengan yang di bawah**, lalu uji sekarang — bukan saat
+> insiden. Bentuk di bawah dijaga gerbang `config-consistency-test.js`.
+
 **Urutan tercepat ke terlambat. Selalu mulai dari nomor 1.**
 
 ```bash
-# 1. MATIKAN SEMUA JALUR CF — efek <=60 detik, tanpa push, tanpa rilis
+# 1. MATIKAN SEMUA JALUR CF — efek <=60 detik, tanpa push, tanpa rilis.
+#    DARURAT: cukup flags.cfApiEnabled=false (sakelar induk) untuk mematikan semuanya,
+#    tapi tulis SELURUH objek dengan false eksplisit supaya tidak ada sisa nilai lama.
 cd FIEZEL-APPS/workers/api
 npx wrangler@3 kv key put --binding=CFG "cfg:flags" \
-  '{"transport":"off","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}' \
+  '{"flags":{"cfApiEnabled":false,"cfAiEnabled":false,"cfTtsEnabled":false,"cfQuotaEnabled":false,"cfAnalyticsEnabled":false,"cfIdentityEnabled":false},"enabled":{"ai":false,"tts":false,"coach":false,"analytics":false}}' \
   --remote
 
-curl -s https://api.fiezel.my.id/api/config     # konfirmasi semua "off"
+# KONFIRMASI — wajib, karena inilah cacat yang membuat kill switch dulu gagal diam-diam.
+curl -s https://api.fiezel.my.id/api/config
+# HARUS: setiap kunci di flags dan enabled bernilai false (boolean, tanpa tanda kutip).
+# Masih ada yang true setelah 60 detik? Berarti tulisanmu tidak masuk — lanjut ke nomor 2
+# SEKARANG, jangan mengulang perintah yang sama berharap hasil berbeda.
+```
+
+Mematikan **satu fitur mahal saja** (mis. hanya TTS yang membakar biaya, AI masih dibutuhkan):
+
+```bash
+cd FIEZEL-APPS/workers/api
+npx wrangler@3 kv key put --binding=CFG "cfg:flags" \
+  '{"flags":{"cfApiEnabled":true,"cfAiEnabled":true,"cfTtsEnabled":false,"cfQuotaEnabled":true,"cfAnalyticsEnabled":false,"cfIdentityEnabled":true},"enabled":{"ai":true,"tts":false,"coach":true,"analytics":false}}' \
+  --remote
+
+curl -s https://api.fiezel.my.id/api/config | tr ',' '\n' | grep -E 'cfTtsEnabled|tts'
+# HARUS: cfTtsEnabled false DAN tts false — TTS mati, jalur lain utuh.
 ```
 
 Setelah ini, klien kembali ke jalur Puter yang **masih hidup penuh** (Worker Puter belum dicabut —
@@ -1281,7 +1395,8 @@ Ingat: push = produksi dalam ≤5 menit. Tidak ada langkah "batalkan sebelum sam
 
 - [ ] Semua flag di `core-config.js` (`FIEZEL_CF_CONFIG`) bernilai **`'off'`**. Cek:
       `grep -n "FIEZEL_CF" core-config.js`
-- [ ] KV `cfg:flags` di produksi juga **semua `off`**:
+- [ ] KV `cfg:flags` di produksi juga **semua mati** — setiap kunci di `flags` dan `enabled`
+      bernilai `false` (boolean, bukan string `"off"`; lihat 4.5):
       `curl -s https://api.fiezel.my.id/api/config`
 - [ ] Field `workerUrl` di `core-config.js` **tidak diubah** — `remote-push-test.js:6` mengunci
       ke regex `*.puter.work`. Sakelar CF adalah **field baru**, bukan timpaan.
@@ -1306,7 +1421,9 @@ Ingat: push = produksi dalam ≤5 menit. Tidak ada langkah "batalkan sebelum sam
 - [ ] `npx wrangler@3 secret list` → semua nama secret Bagian 3 ada
 - [ ] Migrasi D1 sudah `--remote` dan tabel terverifikasi
 - [ ] Worker owner menolak non-owner (403/404, bukan 200)
-- [ ] Kamu tahu persis perintah kill switch-nya (4.7 nomor 1) dan sudah menyiapkannya di terminal
+- [ ] Kamu tahu persis perintah kill switch-nya (4.7 nomor 1), memakai bentuk **bersarang**
+      (`flags`/`enabled` dengan nilai boolean — **bukan** bentuk datar `transport: "off"` yang
+      gagal diam-diam), dan sudah menyiapkannya di terminal
 
 **🔄 D. Gerbang DNS/zona — ditambahkan 27 Agu 2026** (jalankan kalau rilis ini menyentuh zona,
 record, atau setelan SSL):
@@ -1378,8 +1495,8 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PUT https://fiezel-audio.fitrajft.wo
 |---|---|---|
 | Situs 5xx / loop redirect | SSL/TLS → **Full**; semua record HTTP → **abu-abu** | Rollback nameserver (Bagian 1g) |
 | Situs 200 tapi tampilan/versi campur | Purge Everything (kalau proxied); verifikasi `SW_REV` vs `FIEZEL_PAGE_BUILD` | Set record `@` ke abu-abu (DNS only) |
-| Progres murid tampak hilang | **Kill switch: `identity` → `off`** (4.7 nomor 1). Kunci progres lama tetap dibaca, jadi `off` memulihkan | `git revert` commit identitas + push |
-| AI/TTS gagal atau mahal | `transport`/`tts` → `off`. Klien kembali ke Puter yang masih hidup | Periksa neuron & CPU di dashboard (Bagian 5) |
+| Progres murid tampak hilang | **Kill switch: `flags.cfIdentityEnabled` → `false`** (4.7 nomor 1). Kunci progres lama tetap dibaca, jadi mematikannya memulihkan | `git revert` commit identitas + push |
+| AI/TTS gagal atau mahal | `flags.cfAiEnabled`/`flags.cfTtsEnabled` → `false` (atau `flags.cfApiEnabled` → `false` untuk semuanya). Klien kembali ke Puter yang masih hidup | Periksa neuron & CPU di dashboard (Bagian 5) |
 | Endpoint owner menjawab 200 tanpa kredensial | **Hapus route `owner.fiezel.my.id` sekarang** | `wrangler delete` Worker owner |
 | Worker error setelah deploy | `wrangler rollback` | Hapus route → flag `off` |
 | Email berhenti masuk | **Cek kolom proxy dulu** (`mail` + `@` harus abu-abu — penyebab #1 sejak 27 Agu 2026), lalu bandingkan `MX`/`TXT` dengan `~/fiezel-dns-sebelum.txt` | Rollback nameserver **lewat tiket** (1g — jam, bukan menit) |
