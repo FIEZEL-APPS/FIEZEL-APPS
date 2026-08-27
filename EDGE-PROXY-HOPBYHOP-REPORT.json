@@ -1,0 +1,553 @@
+{
+  "schema": "fiezel-edge-proxy-hopbyhop-report-v1",
+  "generatedAt": "2026-08-27T18:59:12.713Z",
+  "pass": true,
+  "defect": {
+    "id": "F4",
+    "measuredBy": "tools/fiezel-e2e-bridge.mjs (bridge-hop-stable)",
+    "measurement": "#1 200 1853ms | #2 200 943ms | #3 TIMEOUT 8002ms",
+    "invisibleTo": "curl (satu proses = satu koneksi baru; tidak menganyam permintaan pada satu koneksi keep-alive)"
+  },
+  "scope": "deploy/edge/api-index.php + deploy/edge/owner-index.php dipindai sebagai TEKS (nol PHP, nol jaringan)",
+  "honesty": "Gerbang ini mencegah kelas cacat KEMBALI. Ia TIDAK membuktikan cacat F4 tertutup; itu hanya terbukti sesudah gerbang E2E browser dijalankan ULANG terhadap jembatan yang sudah diunggah. Hipotesis batas proses PHP per pengguna cPanel (LSAPI_CHILDREN/entry process) tidak bisa dinilai dari teks sama sekali.",
+  "counts": {
+    "pass": 133,
+    "fail": 0,
+    "total": 133,
+    "poisonRows": 12
+  },
+  "checks": [
+    {
+      "ok": true,
+      "message": "penghapus komentar mempertahankan jumlah baris untuk deploy/edge/api-index.php"
+    },
+    {
+      "ok": true,
+      "message": "penghapus komentar mempertahankan jumlah baris untuk deploy/edge/owner-index.php"
+    },
+    {
+      "ok": true,
+      "message": "penghapus komentar TERBUKTI bekerja: nama header di prosa tidak terbaca sebagai header yang dikirim"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopListComplete ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: daftar HOP_BY_HOP memuat semua nama wajib (Connection, Keep-Alive, Proxy-*, Transfer-Encoding, TE, Trailer, Upgrade, Content-Length)"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopHelperSound ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: helper hopByHop() tidak peka huruf DAN memeriksa keluarga proxy-* sebagai awalan"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopFilteredUpstream ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: ARAH NAIK: header ke upstream disaring hopByHop() sebelum curl disentuh"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopFilteredDownstream ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: ARAH TURUN: hopByHop() diperiksa SEBELUM allowlist passThrough dan sebelum Set-Cookie"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopHeaderRemoved ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: sapuan terakhir header_remove() atas seluruh daftar, tanpa syarat"
+    },
+    {
+      "ok": true,
+      "message": "detektor passThroughClean ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: nol nama hop-by-hop yang diselipkan ke allowlist $passThrough"
+    },
+    {
+      "ok": true,
+      "message": "detektor noHopHeaderComposed ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/api-index.php: nol header hop-by-hop yang disusun tangan untuk dikirim ke upstream"
+    },
+    {
+      "ok": true,
+      "message": "detektor curlTimeoutsSet ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(b) deploy/edge/api-index.php: CURLOPT_TIMEOUT dan CURLOPT_CONNECTTIMEOUT diset eksplisit dan bukan 0 (tanpa batas)"
+    },
+    {
+      "ok": true,
+      "message": "detektor sessionSafe ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(c) deploy/edge/api-index.php: nol session_start() yang tidak ditutup; lock sesi dilepas sebelum kerja jaringan"
+    },
+    {
+      "ok": true,
+      "message": "detektor contentLengthDropped ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(d) deploy/edge/api-index.php: content-length ada di daftar wajib-buang (tidak diteruskan mentah dari hulu)"
+    },
+    {
+      "ok": true,
+      "message": "detektor noSelfContentLength ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(d) deploy/edge/api-index.php: proxy tidak pernah mengarang Content-Length hasil hitungan sendiri"
+    },
+    {
+      "ok": true,
+      "message": "detektor bodyWrittenOnceAndFlushed ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(f) deploy/edge/api-index.php: badan ditulis SEKALI lalu di-flush, buffer nyasar dibuang lebih dulu"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/api-index.php: EDGE_SECRET tetap placeholder __EDGE_SECRET__, tepat sekali, bukan nilai sungguhan"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/api-index.php: nol literal berentropi tinggi di seluruh berkas (termasuk komentar)"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopListComplete ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: daftar HOP_BY_HOP memuat semua nama wajib (Connection, Keep-Alive, Proxy-*, Transfer-Encoding, TE, Trailer, Upgrade, Content-Length)"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopHelperSound ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: helper hopByHop() tidak peka huruf DAN memeriksa keluarga proxy-* sebagai awalan"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopFilteredUpstream ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: ARAH NAIK: header ke upstream disaring hopByHop() sebelum curl disentuh"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopFilteredDownstream ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: ARAH TURUN: hopByHop() diperiksa SEBELUM allowlist passThrough dan sebelum Set-Cookie"
+    },
+    {
+      "ok": true,
+      "message": "detektor hopHeaderRemoved ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: sapuan terakhir header_remove() atas seluruh daftar, tanpa syarat"
+    },
+    {
+      "ok": true,
+      "message": "detektor passThroughClean ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: nol nama hop-by-hop yang diselipkan ke allowlist $passThrough"
+    },
+    {
+      "ok": true,
+      "message": "detektor noHopHeaderComposed ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(a) deploy/edge/owner-index.php: nol header hop-by-hop yang disusun tangan untuk dikirim ke upstream"
+    },
+    {
+      "ok": true,
+      "message": "detektor curlTimeoutsSet ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(b) deploy/edge/owner-index.php: CURLOPT_TIMEOUT dan CURLOPT_CONNECTTIMEOUT diset eksplisit dan bukan 0 (tanpa batas)"
+    },
+    {
+      "ok": true,
+      "message": "detektor sessionSafe ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(c) deploy/edge/owner-index.php: nol session_start() yang tidak ditutup; lock sesi dilepas sebelum kerja jaringan"
+    },
+    {
+      "ok": true,
+      "message": "detektor contentLengthDropped ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(d) deploy/edge/owner-index.php: content-length ada di daftar wajib-buang (tidak diteruskan mentah dari hulu)"
+    },
+    {
+      "ok": true,
+      "message": "detektor noSelfContentLength ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(d) deploy/edge/owner-index.php: proxy tidak pernah mengarang Content-Length hasil hitungan sendiri"
+    },
+    {
+      "ok": true,
+      "message": "detektor bodyWrittenOnceAndFlushed ada (nama tidak salah tulis)"
+    },
+    {
+      "ok": true,
+      "message": "(f) deploy/edge/owner-index.php: badan ditulis SEKALI lalu di-flush, buffer nyasar dibuang lebih dulu"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/owner-index.php: EDGE_SECRET tetap placeholder __EDGE_SECRET__, tepat sekali, bukan nilai sungguhan"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/owner-index.php: nol literal berentropi tinggi di seluruh berkas (termasuk komentar)"
+    },
+    {
+      "ok": true,
+      "message": "(b) batas kesabaran klien bisa dibaca dari tools/fiezel-e2e-bridge.mjs (HOP_TIMEOUT)"
+    },
+    {
+      "ok": true,
+      "message": "(b) batas itu masih 8.000 ms — angka yang membuat permintaan ke-3 dilaporkan TIMEOUT 8002ms, dapat 8000"
+    },
+    {
+      "ok": true,
+      "message": "(b) CLIENT_ABANDON_S di PHP mencerminkan HOP_TIMEOUT gerbang E2E (8 s vs 8 s)"
+    },
+    {
+      "ok": true,
+      "message": "(b) TIMEOUT_FAST_S (6 s) LEBIH PENDEK dari batas klien (8 s): proxy wajib kalah lebih dulu, supaya murid melihat 504, bukan gantungan"
+    },
+    {
+      "ok": true,
+      "message": "(b) sisa >= 2 s antara batas proxy dan batas klien (jatah perjalanan 504 ke browser), dapat 2 s"
+    },
+    {
+      "ok": true,
+      "message": "(b) TIMEOUT_FAST_S tetap >= 4 s: ekor terburuk terukur 2.214 ms, jadi jangan memotong permintaan yang sehat, dapat 6"
+    },
+    {
+      "ok": true,
+      "message": "(b) batas connect (4 s) lebih pendek dari batas total (6 s)"
+    },
+    {
+      "ok": true,
+      "message": "(b) jalur model tetap sabar (TIMEOUT_S >= 20 s) — batas pendek tidak boleh memotong jawaban AI, dapat 25"
+    },
+    {
+      "ok": true,
+      "message": "(b) FAST_TIMEOUT_PATHS bisa dibaca gerbang"
+    },
+    {
+      "ok": true,
+      "message": "(b) /api/config memakai batas pendek: ia jalur boot murid yang terbukti menggantung, dan 25 s > 8 s kesabaran browser"
+    },
+    {
+      "ok": true,
+      "message": "(b) /api/user/me memakai batas pendek: ia jalur boot murid yang terbukti menggantung, dan 25 s > 8 s kesabaran browser"
+    },
+    {
+      "ok": true,
+      "message": "(b) /api/quota memakai batas pendek: ia jalur boot murid yang terbukti menggantung, dan 25 s > 8 s kesabaran browser"
+    },
+    {
+      "ok": true,
+      "message": "(b) jalur model TIDAK ikut batas pendek"
+    },
+    {
+      "ok": true,
+      "message": "(b) ada klem yang MEMAKSA batas jalur cepat tinggal di bawah batas klien walau konstantanya dinaikkan"
+    },
+    {
+      "ok": true,
+      "message": "(b) owner-index.php: CONNECT_S 2..5 s (leg origin->Cloudflare), dapat 4"
+    },
+    {
+      "ok": true,
+      "message": "(b) owner-index.php: TIMEOUT_S terbatas dan masuk akal, dapat 25"
+    },
+    {
+      "ok": true,
+      "message": "(e) direktori deploy/edge bisa dibaca"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/README.md: nol nilai EDGE_SHARED_SECRET yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/README.md: nol nilai header X-Fiezel-Edge yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/api-index.php: nol nilai EDGE_SHARED_SECRET yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/api-index.php: nol nilai header X-Fiezel-Edge yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/owner-index.php: nol nilai EDGE_SHARED_SECRET yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "(e) deploy/edge/owner-index.php: nol nilai header X-Fiezel-Edge yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: satu nama dihapus dari daftar HOP_BY_HOP"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopListComplete HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopListComplete MERAH saat: satu nama dihapus dari daftar HOP_BY_HOP"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: helper berhenti memeriksa keluarga proxy-*"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopHelperSound HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopHelperSound MERAH saat: helper berhenti memeriksa keluarga proxy-*"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: saringan arah NAIK dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopFilteredUpstream HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopFilteredUpstream MERAH saat: saringan arah NAIK dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: saringan arah TURUN dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopFilteredDownstream HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopFilteredDownstream MERAH saat: saringan arah TURUN dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: sapuan header_remove() dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopHeaderRemoved HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor hopHeaderRemoved MERAH saat: sapuan header_remove() dihapus"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: transfer-encoding diselipkan ke allowlist passThrough"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor passThroughClean HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor passThroughClean MERAH saat: transfer-encoding diselipkan ke allowlist passThrough"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) racun benar-benar mengubah sumber: header `Connection: keep-alive` disusun tangan untuk upstream"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor noHopHeaderComposed HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (a) detektor noHopHeaderComposed MERAH saat: header `Connection: keep-alive` disusun tangan untuk upstream"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (b) racun benar-benar mengubah sumber: CURLOPT_TIMEOUT diset 0 (tanpa batas — permintaan boleh menggantung selamanya)"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (b) detektor curlTimeoutsSet HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (b) detektor curlTimeoutsSet MERAH saat: CURLOPT_TIMEOUT diset 0 (tanpa batas — permintaan boleh menggantung selamanya)"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (c) racun benar-benar mengubah sumber: session_start() disisipkan tanpa session_write_close()"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (c) detektor sessionSafe HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (c) detektor sessionSafe MERAH saat: session_start() disisipkan tanpa session_write_close()"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) racun benar-benar mengubah sumber: content-length dikeluarkan dari daftar wajib-buang"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) detektor contentLengthDropped HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) detektor contentLengthDropped MERAH saat: content-length dikeluarkan dari daftar wajib-buang"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) racun benar-benar mengubah sumber: Content-Length hasil hitungan sendiri dipasang ke klien"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) detektor noSelfContentLength HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (d) detektor noSelfContentLength MERAH saat: Content-Length hasil hitungan sendiri dipasang ke klien"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (f) racun benar-benar mengubah sumber: badan ditulis dua kali (dan tanpa flush di antaranya)"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (f) detektor bodyWrittenOnceAndFlushed HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (f) detektor bodyWrittenOnceAndFlushed MERAH saat: badan ditulis dua kali (dan tanpa flush di antaranya)"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (e) detektor placeholder HIJAU atas berkas asli"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (e) detektor placeholder MERAH saat nilai secret sungguhan menggantikan placeholder"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (e) detektor entropi HIJAU atas berkas asli (nol positif palsu di 500+ baris prosa)"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (e) detektor entropi MERAH atas nilai berentropi tinggi yang ter-commit"
+    },
+    {
+      "ok": true,
+      "message": "MATRIKS (e) detektor entropi MERAH walau nilai itu \"hanya\" ditinggalkan di komentar"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan angka cacat yang terukur (#3 TIMEOUT 8002ms)"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan diagnosis header hop-by-hop"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan diagnosis lock sesi PHP"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan diagnosis Content-Length yang tidak boleh diteruskan"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan hipotesis batas proses cPanel yang TIDAK bisa dinilai dari kode"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan perintah curl 5 permintaan berurutan pada satu koneksi"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan gerbang struktural baru"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan gerbang E2E browser yang harus dijalankan ulang"
+    },
+    {
+      "ok": true,
+      "message": "README deploy/edge menjelaskan pernyataan jujur bahwa analisis kode saja tidak menutup cacat ini"
+    },
+    {
+      "ok": true,
+      "message": "README memuat perintah curl dengan >=4 `--next` (5 permintaan pada SATU koneksi)"
+    },
+    {
+      "ok": true,
+      "message": "README menyebut alternatif -H 'Connection: keep-alive'"
+    },
+    {
+      "ok": true,
+      "message": "README menunjukkan cara MEMBACA hasilnya (kode status + waktu per permintaan)"
+    },
+    {
+      "ok": true,
+      "message": "quality.yml memanggil node edge-proxy-hopbyhop-test.js"
+    },
+    {
+      "ok": true,
+      "message": "quality.yml masih memanggil edge-proxy-contract-test.js (gerbang ini melengkapinya)"
+    }
+  ]
+}
