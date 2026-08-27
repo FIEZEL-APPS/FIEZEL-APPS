@@ -41,6 +41,24 @@ concurrency:
 
 jobs:
   generate:
+    # Gate aktor — pola yang sama dengan deploy-core-worker.yml:17, configure-core.yml:12,
+    # audio-prerender-cf.yml:55, dan audio-deploy-worker.yml.
+    #
+    # "apply bawaannya kosong" (lihat catatan kepala) melindungi dari kecelakaan, BUKAN dari
+    # niat: apply adalah masukan yang diisi si penekan tombol, jadi siapa pun yang bisa
+    # men-dispatch cukup mengetik APPLY untuk membelanjakan kredit ElevenLabs owner. Langkah
+    # Produksi di bawah memegang ELEVENLABS_API_KEY sekaligus CLOUDFLARE_API_TOKEN, dan
+    # workflow ini commit+push ke branch produksi.
+    #
+    # cf-a7 §2 mendaftar workflow ini sebagai salah satu dari lima pemegang secrets, dan
+    # cf-a2 §(d) menandainya "Tidak ada gate aktor". audio-prerender-cf.yml:6-11 sudah
+    # menuliskan aturannya lebih dulu: "Jangan mewarisi yang lebih lemah." Di sini yang lemah
+    # itu diperbaiki di sumbernya, bukan disalin lagi.
+    #
+    # Yang TIDAK diubah: ketiadaan pemicu otomatis (cf-a2 "Yang TIDAK boleh diubah") dan
+    # gerbang `apply == 'APPLY'` per langkah. Gate aktor adalah lapis tambahan, bukan
+    # pengganti persetujuan manusia.
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
