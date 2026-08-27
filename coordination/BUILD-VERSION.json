@@ -1,0 +1,7 @@
+{
+  "version": "m025-176",
+  "claimedBy": "sesi-computer-086e9698 (MASTER)",
+  "claimedAt": "2026-08-28T06:30:00+07:00",
+  "reason": "Dasar setelah merge rollout Cloudflare + braincore fase 3 + lapisan game/UX. Berkas ini adalah SATU-SATUNYA sumber kebenaran nomor build.",
+  "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
+}
