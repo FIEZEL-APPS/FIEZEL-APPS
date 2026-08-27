@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T15:16:00+07:00",
+  "updated": "2026-08-28T06:40:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -321,12 +321,47 @@
       "status": "in_progress",
       "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
       "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
+    },
+    {
+      "id": "T-028",
+      "title": "FIEZEL Nightwatch: authority guard dan PR stale pada produksi",
+      "owner": "nightwatch",
+      "status": "blocked",
+      "scope": {
+        "files_allowed": [
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js",
+          "app.js"
+        ],
+        "objective": "Catat blocker produksi tanpa menyentuh area T-026 atau Wave D T-027 yang sedang diklaim agent lain.",
+        "forbidden_actions": [
+          "Jangan bypass MASTER-only authority guard.",
+          "Jangan rebase/merge PR agent lain.",
+          "Jangan mengubah area neural voice, audio workflow, atau runtime app."
+        ],
+        "done_when": [
+          "Bukti Pages/live/local gates/CI/PR tercatat.",
+          "Owner dapat melihat opsi pemulihan yang konkret."
+        ],
+        "evidence_required": [
+          "status Pages build dan live marker",
+          "hasil empat gate lokal",
+          "hasil CI authority/quality",
+          "status PR terbuka"
+        ]
+      },
+      "evidence": "HEAD main eb5152df239219e496fc3b5231c96878e2d117a6; Pages latest built pada commit yang sama; live core-config.js menyajikan FIEZEL_PAGE_BUILD m025-176; regression-test.js, core-brain-v2-test.js, tutor-brain-v3-test.js, validator.js semuanya PASS. Quality Gate run 33126880941 masih in_progress; MASTER Authority Guard run 33126880951 gagal karena actor push FIEZEL-APPS bukan owner MASTER fitrajft-ux. PR #227 mergeable CONFLICTING meskipun quality check-nya SUCCESS; PR #226 MERGEABLE tetapi quality/authority checks gagal.",
+      "note": "BLOCKED oleh kebijakan otoritas repository dan antrean PR stale, bukan kegagalan gate kode lokal atau Pages. Opsi owner: lakukan push/merge ulang dengan identitas MASTER fitrajft-ux setelah PR yang stale direkonsiliasi; jangan bypass guard. T-026 neural voice dan T-027 Wave D tetap tidak disentuh."
     }
   ],
   "last_report": {
-    "by": "master (single-agent) — m025-46",
-    "time": "2026-08-19T10:15:00+07:00",
-    "summary": "Redesign masuk aplikasi. Dua pelajaran untuk dicatat. (1) Suite tidak melihat warna: tombol utama seluruh aplikasi masih biru setelah 66 test hijau, dan hanya ketahuan setelah halaman benar-benar dirender. (2) Ada overflow horizontal yang memotong panel di sisi kanan pada 393px MAUPUN 430px - dibuktikan ADA JUGA di build sebelum redesign, jadi bukan regresi, tapi nyata di produksi sekarang dan belum diperbaiki."
+    "by": "FIEZEL Nightwatch",
+    "time": "2026-08-28T06:40:00+07:00",
+    "summary": "Production health gates are locally green and Pages matches main, but CI is not fully green: MASTER Authority Guard rejects push actor FIEZEL-APPS versus required owner fitrajft-ux; stale open PR #227 is conflicting. No locked T-026/T-027 area was changed."
   },
   "missions": [
     {
