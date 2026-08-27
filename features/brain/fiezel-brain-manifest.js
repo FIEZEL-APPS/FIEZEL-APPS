@@ -101,6 +101,7 @@
     { file: 'fiezel-confusion-matrix.js', global: 'FiezelConfusionMatrix', schema: 'fiezel-confusion-matrix-v1', authorityKey: 'confusionMap' },
     { file: 'fiezel-core-brain.js', global: 'FiezelCoreBrain', schema: 'fiezel-core-brain-v2', authorityKey: 'memory' },
     { file: 'fiezel-evidence-credibility.js', global: 'FiezelEvidenceCredibility', schema: 'fiezel-evidence-credibility-v1', authorityKey: 'evidenceCredibility' },
+    { file: 'fiezel-item-calibration.js', global: 'FiezelItemCalibration', schema: 'fiezel-item-calibration-v1', authorityKey: 'itemCalibration' },
     { file: 'fiezel-item-prior.js', global: 'FiezelItemPrior', schema: null, authorityKey: 'itemDifficultyPrior' },
     { file: 'fiezel-learning-metrics.js', global: 'FiezelLearningMetrics', schema: 'fiezel-learning-metrics-v1', authorityKey: 'learningMetrics' },
     { file: 'fiezel-listening-adaptive.js', global: 'FiezelListeningAdaptive', schema: 'fiezel-listening-adaptive-v1', authorityKey: 'listeningPolicy' },
@@ -109,6 +110,8 @@
     { file: 'fiezel-misconception-ledger.js', global: 'FiezelMisconceptionLedger', schema: 'fiezel-misconception-ledger-v1', authorityKey: 'misconceptionPrior' },
     { file: 'fiezel-olm.js', global: 'FiezelOLM', schema: 'fiezel-olm-v1', authorityKey: 'olmInsight' },
     { file: 'fiezel-production-grader.js', global: 'FiezelProductionGrader', schema: 'fiezel-production-grader-v1', authorityKey: 'productionGrader' },
+    { file: 'fiezel-speaking-adaptive.js', global: 'FiezelSpeakingAdaptive', schema: 'fiezel-speaking-adaptive-v1', authorityKey: 'speakingPolicy' },
+    { file: 'fiezel-srl-coach.js', global: 'FiezelSrlCoach', schema: 'fiezel-srl-coach-v1', authorityKey: 'srlCoach' },
     { file: 'fiezel-stat-gate.js', global: 'FiezelStatGate', schema: null, authorityKey: 'statGate' },
     { file: 'fiezel-step-tutor.js', global: 'FiezelStepTutor', schema: null, authorityKey: 'stepTutor' },
     { file: 'fiezel-tutor-brain.js', global: 'FiezelTutorBrain', schema: 'fiezel-tutor-brain-v3', authorityKey: 'tutorSelection' }
@@ -130,6 +133,14 @@
     itemDifficultyPrior: 'active',
     evidenceCredibility: 'active',
     affectTargetSuccess: 'active',
+    // Fase 3 (sesi hulu): kalibrasi item Elo dipakai buildAdaptivePool via effective()
+    // (app.js:1802/1809) — mempengaruhi soal yang tampil: 'active'. SRL coach
+    // sessionPlan() dipakai perencanaan sesi (app.js:1984): 'active'. Speaking
+    // adaptive: evidence/policy dibaca hook Speaking Lab, addon yang memutuskan
+    // kapan memakainya (app.js:2045-2048) — jalur keputusan belum pasti: 'shadow'.
+    itemCalibration: 'active',
+    srlCoach: 'active',
+    speakingPolicy: 'shadow',
     bktUnlock: 'shadow',
     confusionMap: 'shadow',
     olmInsight: 'shadow',

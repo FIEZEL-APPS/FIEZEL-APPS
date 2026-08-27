@@ -41,4 +41,6 @@ CREATE TABLE IF NOT EXISTS batch_dedup (
 
 -- Indeks hanya untuk purge harian. Sengaja TIDAK ada indeks lain: satu-satunya
 -- pola baca yang boleh nyaman adalah "hapus yang kadaluarsa".
+-- DIPAKAI oleh purge harian rollup (analytics-store-d1.js purgeBatchDedupOlderThan):
+--   'DELETE FROM batch_dedup WHERE day < ?1'
 CREATE INDEX IF NOT EXISTS idx_batch_dedup_day ON batch_dedup(day);

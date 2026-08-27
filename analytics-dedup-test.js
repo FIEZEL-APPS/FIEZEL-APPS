@@ -77,6 +77,11 @@ function makeDb(SQL) {
         return { results: [], meta: { changes: 1 } };
       case SQL.countDauTokens:
         return { results: [{ n: [...t.dau].filter(k => k.startsWith(`${params[0]}|`)).length }], meta: { changes: 0 } };
+      // [REBASE-20260828] rollup fase-3 main menambah pagar kewarasan countUsageRows
+      // (bedakan "hari sepi" vs "pengumpulan token rusak"). Kunci usage di tiruan
+      // ini berbentuk `${day}|${bucket}` — hitung baris per hari, bukan orang.
+      case SQL.countUsageRows:
+        return { results: [{ n: [...t.usage.keys()].filter(k => k.startsWith(`${params[0]}|`)).length }], meta: { changes: 0 } };
       case SQL.purgeDauDay:
         for (const k of [...t.dau]) if (k.startsWith(`${params[0]}|`)) t.dau.delete(k);
         return { results: [], meta: { changes: 0 } };
