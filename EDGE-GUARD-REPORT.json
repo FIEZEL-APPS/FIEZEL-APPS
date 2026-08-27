@@ -1,10 +1,6 @@
 {
   "schema": "fiezel-edge-guard-report-v1",
-<<<<<<< HEAD
-  "generatedAt": "2026-08-27T16:28:45.935Z",
-=======
-  "generatedAt": "2026-08-27T16:58:32.408Z",
->>>>>>> add/a3cron
+  "generatedAt": "2026-08-27T17:03:03.170Z",
   "pass": true,
   "counts": {
     "pass": 119,
