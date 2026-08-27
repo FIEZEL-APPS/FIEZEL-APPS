@@ -35,6 +35,28 @@
  *   - keputusan gate membawa `rationale` berprefiks brain3_;
  *   - keluaran ringkasan JSON ke stdout (log proses ke stderr), exit non-zero
  *     bila v2 lebih buruk dari v1 pada mayoritas metrik ATAU determinisme gagal.
+ *
+ * FASE 2 (B5) — momentum residual:
+ *   Temuan A11: v2 menang kalibrasi/retensi tetapi OSILASI kesulitan lebih buruk
+ *   dari v1 (4.22 vs 2.84 per 10 sesi). Hipotesis B1: momentum berbasis AKURASI
+ *   mentah salah membaca murid yang sedang ditantang — akurasi turun karena soal
+ *   naik kelas, bukan karena murid mundur, lalu kebijakan memantul. Fase 2
+ *   menambah kontrak momentum: baris attempts boleh membawa `predicted` (prediksi
+ *   P saat penyajian); bila >=60% baris punya predicted, tren dihitung pada
+ *   RESIDUAL (ok?1:0)-predicted per blok (field `basis:'residual'`).
+ *   Simulator ini menguji TIGA varian pada murid laten identik (seed berpasangan):
+ *     v1          : kebijakan worker murni (baseline lama);
+ *     v2_lama     : v2 TANPA predicted di baris → momentum basis 'accuracy';
+ *     v2_residual : v2 DENGAN predicted per attempt (successProbability saat
+ *                   penyajian) → momentum residual aktif.
+ *   Metrik baru: falseDeclineRate — berapa proporsi evaluasi momentum yang
+ *   menyebut 'declining' padahal theta LATEN murid sedang NAIK (kunci jawaban
+ *   simulator dipakai HANYA untuk menilai momentum, tidak pernah dilihat
+ *   kebijakan). Gate baru: exit 1 bila v2_residual TIDAK menurunkan osilasi
+ *   dibanding v2_lama ATAU false-decline v2_residual > v2_lama. Bila modul core
+ *   brain belum punya dukungan residual (B1 belum selesai), varian residual
+ *   dilewati dan gate residual ditandai SKIPPED (bukan gagal) — feature-detect
+ *   runtime, bukan asumsi.
  */
 (function (root, factory) {
   var api = factory();
@@ -57,6 +79,23 @@
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
   function round(v, digits) { var f = Math.pow(10, digits); return Math.round(v * f) / f; }
+
+  /**
+   * Feature-detect dukungan momentum residual (kontrak Fase 2 milik B1):
+   * beri momentum baris sintetis yang SEMUANYA membawa `predicted`; implementasi
+   * yang sudah mendukung wajib menjawab `basis:'residual'`. Deteksi runtime pada
+   * PERILAKU, bukan pada nomor versi — kalau B1 belum selesai saat simulator
+   * jalan, varian residual dilewati dengan jujur alih-alih diam-diam mengukur
+   * perilaku lama dan mengklaimnya sebagai residual.
+   */
+  function dukungResidual() {
+    if (typeof brain.momentum !== 'function') return false;
+    var rows = [];
+    for (var i = 0; i < 30; i++) rows.push({ ok: i % 2 === 0, predicted: 0.5 });
+    var m;
+    try { m = brain.momentum(rows); } catch (e) { return false; }
+    return !!(m && m.basis === 'residual');
+  }
 
   // ===================================================================================
   // 1. PRNG BERSEED (mulberry32)
@@ -247,6 +286,19 @@
     var masteryDay = null;
     var itemCounter = {};
 
+    // FASE 2: varian menentukan APA yang dikirim di baris riwayat, bukan rumus
+    // kebijakannya — v2_lama dan v2_residual memakai analyze+refinePolicy yang
+    // sama persis; satu-satunya beda adalah field `predicted` pada baris attempts
+    // (persis wiring B3 butir 1: app menyimpan successProbability saat penyajian).
+    var pakaiV2 = policyName !== 'v1';
+    var kirimPredicted = policyName === 'v2_residual';
+
+    // Penilaian false-decline: kunci jawaban laten (theta rata-rata) dicatat per
+    // hari HANYA untuk menghakimi momentum — kebijakan tetap buta terhadapnya.
+    var thetaHistori = [];
+    var momentumEvals = 0, falseDecline = 0;
+    var basisCount = {};
+
     for (var day = 0; day < SIM_DAYS; day++) {
       var nowMs = NOW + day * DAY;
 
@@ -257,11 +309,32 @@
         }
       }
 
+      // --- penilaian momentum vs arah laten (metrik false-decline, Fase 2) ---
+      // Dievaluasi pada titik keputusan: momentum membaca riwayat teramati sampai
+      // kemarin; arah laten dibaca dari theta rata-rata ~3 hari terakhir (sepadan
+      // dengan jendela ~40 attempt yang dilihat momentum). 'False decline' =
+      // momentum bilang 'declining' padahal theta laten sedang NAIK — kesalahan
+      // yang persis ingin dihapus momentum residual: akurasi turun karena soal
+      // naik kelas, bukan karena muridnya mundur.
+      var thetaRata = 0;
+      for (var tf = 0; tf < FAMILIES.length; tf++) thetaRata += murid.theta[FAMILIES[tf]];
+      thetaRata /= FAMILIES.length;
+      thetaHistori.push(thetaRata);
+      var momHariIni = brain.momentum(observed);
+      if (momHariIni && momHariIni.state && momHariIni.state !== 'unknown') {
+        momentumEvals++;
+        var basisKey = momHariIni.basis || 'accuracy';
+        basisCount[basisKey] = (basisCount[basisKey] || 0) + 1;
+        var pembanding = thetaHistori[Math.max(0, thetaHistori.length - 4)];
+        var latenNaik = thetaRata > pembanding + 0.02;
+        if (momHariIni.state === 'declining' && latenNaik) falseDecline++;
+      }
+
       // --- keputusan kebijakan hari ini (hanya dari data teramati) ---
       var base = kebijakanV1(observed, stateV1);
       var policy = base;
       var abilityUntukPrediksi = brain.estimateAbility(observed, { now: nowMs, prior: 1.5 }).ability;
-      if (policyName === 'v2') {
+      if (pakaiV2) {
         var snapshot = brain.analyze({
           now: nowMs,
           attempts: observed,
@@ -303,6 +376,10 @@
           family: family,
           difficulty: d
         };
+        // FASE 2: hanya varian residual yang membawa prediksi saat penyajian di
+        // baris riwayat — nilainya SAMA dengan yang dipakai Brier (dicatat sebelum
+        // hasil diketahui), jadi tidak ada kebocoran masa depan.
+        if (kirimPredicted) row.predicted = prediksi;
         sesi.push(row);
         observed.push(row);
         stateV1.sejakUnlock++;
@@ -350,6 +427,14 @@
       difficultyOscillationPer10: round(osilasiPer10, 3),
       retentionDay90: retN ? round(retSum / retN, 4) : 0,
       brier: brierN ? round(brierSum / brierN, 4) : 1,
+      // FASE 2: false decline = momentum bilang 'declining' saat theta laten naik.
+      // Rate dinormalkan terhadap jumlah evaluasi momentum yang punya arah (bukan
+      // 'unknown'), supaya varian dengan hari 'unknown' lebih banyak tidak tampak
+      // palsu lebih baik hanya karena jarang bicara.
+      falseDeclineCount: falseDecline,
+      momentumEvals: momentumEvals,
+      falseDeclineRate: momentumEvals ? round(falseDecline / momentumEvals, 4) : 0,
+      momentumBasis: basisCount,
       finalTargetDifficulty: difficulties[difficulties.length - 1],
       itemsTracked: retN
     };
@@ -388,23 +473,88 @@
     return { rows: rows, v2KalahPada: kalah, totalMetrik: METRIK.length, v2KalahMayoritas: kalah > METRIK.length / 2 };
   }
 
-  /** Satu suite penuh (3 profil × 2 kebijakan) untuk satu seed — dipakai dua kali
-   *  oleh gate determinisme dan hasilnya harus identik string-demi-string. */
+  /**
+   * FASE 2 — perbandingan v2_lama vs v2_residual untuk gate residual:
+   * dua klaim yang harus dibuktikan momentum residual, dua-duanya diukur agregat
+   * antar profil (rata-rata):
+   *   1. osilasi kesulitan TURUN (alasan keberadaan fitur ini — temuan A11);
+   *   2. false-decline TIDAK NAIK (kalau naik, 'perbaikan' osilasi cuma karena
+   *      momentum jadi tuli, bukan jadi benar).
+   */
+  function bandingkanResidual(hasilLama, hasilResidual) {
+    var EPS = 1e-9;
+    function rata(rows, ambil) { var s = 0; for (var i = 0; i < rows.length; i++) s += ambil(rows[i]); return rows.length ? s / rows.length : 0; }
+    var oscLama = rata(hasilLama, function (r) { return r.difficultyOscillationPer10; });
+    var oscRes = rata(hasilResidual, function (r) { return r.difficultyOscillationPer10; });
+    var fdLama = rata(hasilLama, function (r) { return r.falseDeclineRate; });
+    var fdRes = rata(hasilResidual, function (r) { return r.falseDeclineRate; });
+    var osilasiTurun = oscRes < oscLama - EPS;
+    var falseDeclineNaik = fdRes > fdLama + EPS;
+    return {
+      oscillation: { v2Lama: round(oscLama, 4), v2Residual: round(oscRes, 4), turun: osilasiTurun },
+      falseDecline: { v2Lama: round(fdLama, 4), v2Residual: round(fdRes, 4), naik: falseDeclineNaik },
+      pass: osilasiTurun && !falseDeclineNaik
+    };
+  }
+
+  /** Satu suite penuh (3 profil × kebijakan) untuk satu seed — dipakai dua kali
+   *  oleh gate determinisme dan hasilnya harus identik string-demi-string.
+   *  FASE 2: varian v2_residual hanya dijalankan bila core brain terdeteksi
+   *  mendukung basis residual (kalau tidak, hasilnya identik v2_lama dan
+   *  membandingkannya berarti menguji nol — lebih jujur dilewati + SKIPPED). */
   function jalankanSuite(seed) {
-    var v1 = [], v2 = [];
+    var residualTersedia = dukungResidual();
+    var v1 = [], v2Lama = [], v2Residual = residualTersedia ? [] : null;
     for (var p = 0; p < PROFILES.length; p++) {
-      // Seed diturunkan per profil supaya tiap profil punya deret sendiri, dan v1/v2
-      // memakai deret yang SAMA → keacakan berpasangan (paired), perbandingan lebih adil.
+      // Seed diturunkan per profil supaya tiap profil punya deret sendiri, dan semua
+      // varian memakai deret yang SAMA → keacakan berpasangan (paired), perbandingan adil.
       var seedProfil = (seed * 1000003 + p * 7919) >>> 0;
       v1.push(jalankanRun(PROFILES[p], 'v1', seedProfil));
-      v2.push(jalankanRun(PROFILES[p], 'v2', seedProfil));
+      v2Lama.push(jalankanRun(PROFILES[p], 'v2_lama', seedProfil));
+      if (residualTersedia) v2Residual.push(jalankanRun(PROFILES[p], 'v2_residual', seedProfil));
     }
-    return { seed: seed, perProfil: { v1: v1, v2: v2 }, perbandingan: bandingkan(v1, v2) };
+    return {
+      seed: seed,
+      residualSupported: residualTersedia,
+      perProfil: { v1: v1, v2Lama: v2Lama, v2Residual: v2Residual },
+      perbandingan: bandingkan(v1, v2Lama),
+      perbandinganResidual: residualTersedia ? bandingkanResidual(v2Lama, v2Residual) : null
+    };
   }
 
   // ===================================================================================
   // 6. MAIN — gate CI
   // ===================================================================================
+  /**
+   * FASE 2 — tabel metrik agregat (rata-rata antar profil) untuk TIGA varian,
+   * supaya laporan CI langsung bisa dibaca manusia tanpa merakit ulang angka.
+   * timeToMasteryDays null → SIM_DAYS+1 (melewati horizon), konsisten dengan gate lama.
+   */
+  function tabelMetrik(perProfil) {
+    var METRIK = [
+      { nama: 'timeToMasteryDays', arah: 'turun', ambil: function (r) { return r.timeToMasteryDays == null ? SIM_DAYS + 1 : r.timeToMasteryDays; } },
+      { nama: 'observedAccuracy', arah: 'target 0.80', ambil: function (r) { return r.observedAccuracy; } },
+      { nama: 'accuracyGapVsTarget', arah: 'turun', ambil: function (r) { return r.accuracyGapVsTarget; } },
+      { nama: 'difficultyOscillationPer10', arah: 'turun', ambil: function (r) { return r.difficultyOscillationPer10; } },
+      { nama: 'retentionDay90', arah: 'naik', ambil: function (r) { return r.retentionDay90; } },
+      { nama: 'brier', arah: 'turun', ambil: function (r) { return r.brier; } },
+      { nama: 'falseDeclineRate', arah: 'turun', ambil: function (r) { return r.falseDeclineRate; } }
+    ];
+    function rata(rows, ambil) { var s = 0; for (var i = 0; i < rows.length; i++) s += ambil(rows[i]); return rows.length ? round(s / rows.length, 4) : null; }
+    var rows = [];
+    for (var i = 0; i < METRIK.length; i++) {
+      var m = METRIK[i];
+      rows.push({
+        metric: m.nama,
+        arahLebihBaik: m.arah,
+        v1: rata(perProfil.v1, m.ambil),
+        v2Lama: rata(perProfil.v2Lama, m.ambil),
+        v2Residual: perProfil.v2Residual ? rata(perProfil.v2Residual, m.ambil) : null
+      });
+    }
+    return rows;
+  }
+
   function main(argv) {
     var seed = parseInt(argv[2], 10);
     if (!Number.isFinite(seed)) seed = 42;
@@ -416,7 +566,27 @@
     var deterministik = JSON.stringify(runA) === JSON.stringify(runB);
 
     var cmp = runA.perbandingan;
-    var lulus = deterministik && !cmp.v2KalahMayoritas;
+    var resGate = runA.perbandinganResidual; // null bila dukungan residual belum ada
+
+    // FASE 2 — status gate residual, tiga kemungkinan yang sengaja dibedakan:
+    //   SKIPPED: B1 belum mendarat → varian residual tak bisa diuji; BUKAN kegagalan
+    //            (jangan menghukum modul yang belum ada), tapi WAJIB terlihat di laporan.
+    //   FAIL   : residual TIDAK menurunkan osilasi vs v2_lama, ATAU false-decline NAIK.
+    //   PASS   : dua-duanya terpenuhi.
+    var residualStatus = !runA.residualSupported ? 'SKIPPED' : (resGate.pass ? 'PASS' : 'FAIL');
+    var residualMessage;
+    if (residualStatus === 'SKIPPED') {
+      residualMessage = 'FiezelCoreBrain.momentum belum mendukung basis residual (B1 belum selesai saat simulasi dijalankan). Varian v2_residual DILEWATI dan gate residual TIDAK digagalkan — jalankan ulang setelah dukungan `predicted`/basis residual mendarat di features/brain/fiezel-core-brain.js.';
+    } else if (residualStatus === 'PASS') {
+      residualMessage = 'v2_residual menurunkan osilasi (' + resGate.oscillation.v2Lama + ' → ' + resGate.oscillation.v2Residual + ' per 10 sesi) tanpa menaikkan false-decline (' + resGate.falseDecline.v2Lama + ' → ' + resGate.falseDecline.v2Residual + ').';
+    } else {
+      var alasan = [];
+      if (!resGate.oscillation.turun) alasan.push('osilasi TIDAK turun (' + resGate.oscillation.v2Lama + ' → ' + resGate.oscillation.v2Residual + ')');
+      if (resGate.falseDecline.naik) alasan.push('false-decline NAIK (' + resGate.falseDecline.v2Lama + ' → ' + resGate.falseDecline.v2Residual + ')');
+      residualMessage = 'Momentum residual gagal membuktikan nilainya: ' + alasan.join('; ') + '.';
+    }
+
+    var lulus = deterministik && !cmp.v2KalahMayoritas && residualStatus !== 'FAIL';
 
     var ringkasan = {
       schema: SCHEMA,
@@ -425,16 +595,25 @@
       retentionEvaluatedAtDay: RETENTION_DAY,
       profiles: PROFILES.map(function (p) { return p.id; }),
       deterministic: deterministik,
+      residualSupported: runA.residualSupported,
       results: runA.perProfil,
+      metricsTable: tabelMetrik(runA.perProfil),
       comparison: cmp.rows,
       v2WorseOnMetrics: cmp.v2KalahPada,
       totalMetrics: cmp.totalMetrik,
+      residualGate: {
+        status: residualStatus,
+        detail: resGate,
+        message: residualMessage
+      },
       gate: {
         pass: lulus,
         rationale: !deterministik ? 'brain3_sim_nondeterministic'
           : cmp.v2KalahMayoritas ? 'brain3_sim_v2_regression'
-            : 'brain3_sim_v2_no_regression',
-        confidence: round(1 - cmp.v2KalahPada / cmp.totalMetrik, 3)
+            : residualStatus === 'FAIL' ? 'brain3_sim_residual_no_improvement'
+              : residualStatus === 'SKIPPED' ? 'brain3_sim_v2_no_regression_residual_skipped'
+                : 'brain3_sim_v2_no_regression_residual_ok',
+        confidence: round((1 - cmp.v2KalahPada / cmp.totalMetrik) * (residualStatus === 'SKIPPED' ? 0.6 : 1), 3)
       }
     };
 
@@ -448,7 +627,14 @@
       process.stderr.write('GAGAL: v2 lebih buruk dari v1 pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik.\n');
       return 1;
     }
-    process.stderr.write('AdaptivitySimulationV3: PASS (v2 kalah pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik)\n');
+    if (residualStatus === 'FAIL') {
+      process.stderr.write('GAGAL (gate residual): ' + residualMessage + '\n');
+      return 1;
+    }
+    if (residualStatus === 'SKIPPED') {
+      process.stderr.write('SKIPPED (gate residual): ' + residualMessage + '\n');
+    }
+    process.stderr.write('AdaptivitySimulationV3: PASS (v2 kalah pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik; gate residual ' + residualStatus + ')\n');
     return 0;
   }
 
@@ -462,6 +648,9 @@
     jalankanRun: jalankanRun,
     jalankanSuite: jalankanSuite,
     bandingkan: bandingkan,
+    bandingkanResidual: bandingkanResidual,
+    dukungResidual: dukungResidual,
+    tabelMetrik: tabelMetrik,
     main: main
   };
 
