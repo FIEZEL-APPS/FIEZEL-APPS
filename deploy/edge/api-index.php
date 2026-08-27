@@ -35,6 +35,9 @@ const CONNECT_S     = 8;
 // Endpoint yang boleh lewat. Default TOLAK: jalur baru harus didaftarkan sadar.
 const ALLOW = [
   '/health'            => ['GET'],
+  // `/healthz` ikut di-allowlist supaya monitor eksternal bisa memakai domain sendiri
+  // (api.fiezel.my.id) alih-alih alamat workers.dev yang akan ditolak penjaga edge.
+  '/healthz'           => ['GET'],
   '/api/config'        => ['GET'],
   '/api/auth/anon'     => ['POST'],
   '/api/auth/claim'    => ['POST'],
