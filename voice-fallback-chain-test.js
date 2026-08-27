@@ -377,11 +377,19 @@ check('app.js: cadangan TIDAK lagi bersyarat "modul FiezelVoiceSay absen"',
 
 function audioHarness(options) {
   const opts = options || {};
-  const calls = { say: 0, synth: 0, toast: [], utterances: [] };
+  const calls = { say: 0, synth: 0, toast: [], utterances: [], cancelPrefetch: 0, prefetch: 0 };
   const sandbox = {
     console,
     selectedNeuralRate: () => 1,
-    showToast: (message) => { calls.toast.push(String(message)); }
+    showToast: (message) => { calls.toast.push(String(message)); },
+    // V6: AudioService sekarang membatalkan/mengajukan prefetch lewat dua pintu di app.js
+    // (cancelVoicePrefetch/prefetchNextVoice). Keduanya di luar blok sumber yang dijalankan
+    // gerbang ini, jadi mereka distub di sini - sama seperti selectedNeuralRate dan
+    // showToast di atas. Yang diuji berkas ini tetap TANGGA CADANGAN, bukan prefetch;
+    // prefetch punya gerbangnya sendiri (voice-callsite-prefetch-test.js). Jumlah
+    // panggilannya dicatat supaya stub ini tidak bisa menyembunyikan pemanggilan liar.
+    cancelVoicePrefetch: () => { calls.cancelPrefetch++; },
+    prefetchNextVoice: () => { calls.prefetch++; }
   };
   sandbox.window = sandbox;
   sandbox.self = sandbox;
