@@ -199,4 +199,5 @@ jobs:
           node release-audit-gate-test.js
           node cf-transport-test.js
           node cf-shadow-mode-test.js
+          node cf-shadow-ledger-test.js
           node workflow-actor-gate-test.js
