@@ -17,6 +17,7 @@
  */
 
 import { PROTOCOL, CAPABILITIES } from './schema.js';
+import { edgeGuardStatus } from './mw-edge.js';
 import { jsonResponse } from './errors.js';
 
 export function routeHealth(ctx) {
@@ -29,6 +30,13 @@ export function routeHealth(ctx) {
       aiGateway: ctx.env.AI_GATEWAY_MODE || 'core-only',
       capabilities: CAPABILITIES.slice(),
       plan: 'free-tier',
+      // `on` = alamat `*.workers.dev` tertutup untuk pemanggil yang tidak lewat
+      // jembatan `api.fiezel.my.id`. `off` = secret `EDGE_SHARED_SECRET` belum
+      // dipasang dan alamat itu MASIH TERBUKA; itu keadaan transisi, bukan
+      // konfigurasi yang sah untuk dibiarkan. Lihat `mw-edge.js`.
+      // Aman diumumkan di sini justru karena `/health` sendiri ikut dilindungi
+      // gerbang: pembacanya sudah lewat jembatan.
+      edgeGuard: edgeGuardStatus(ctx.env),
       // Waktu SERVER. Klien tidak boleh menghitung reset kuota dari jamnya
       // sendiri (cf-b2 §5): itu yang membuat cooldown 24 jam hari ini bisa
       // dihapus hanya dengan membersihkan localStorage.
@@ -36,4 +44,31 @@ export function routeHealth(ctx) {
     },
     { headers: ctx.corsHeaders }
   );
+}
+
+/**
+ * `GET /healthz` — probe monitor eksternal, SATU-SATUNYA rute yang boleh diakses
+ * tanpa header jembatan `X-Fiezel-Edge` (`mw-edge.EDGE_FREE_PATHS`).
+ *
+ * KENAPA RUTE KEDUA, BUKAN MEMBEBASKAN `/health`:
+ * `/health` mengumumkan `capabilities`, `aiGateway`, `version`, `service`,
+ * `plan`, `edgeGuard`, dan waktu server. Untuk monitor, semua itu tidak
+ * berguna; untuk penyerang, `capabilities` adalah peta fitur mana yang hidup
+ * tanpa perlu menebak. Membebaskan `/health` = membocorkan peta itu ke publik
+ * selamanya, sedangkan yang dibutuhkan monitor hanya satu bit hidup/mati.
+ *
+ * Yang BOLEH ada di sini, dan tidak lebih:
+ *   - `ok` — satu bit yang dicari monitor.
+ *   - `protocol` — monitor yang berguna harus bisa melihat protokol yang salah,
+ *     dan '1.7' sudah publik di klien (app.js), jadi bukan kebocoran baru.
+ * Yang DILARANG ditambahkan ke sini, sekarang atau nanti: `capabilities`, nama
+ *   layanan, versi, mode gateway, status `edgeGuard`, waktu server, angka kuota,
+ *   atau apa pun yang berubah menurut konfigurasi. `edge-guard-test.js` butir (f)
+ *   memindai badan respons ini dan akan MERAH kalau ada yang menyelinap.
+ *
+ * Nol baca D1, nol baca KV, nol tulis — rute ini dipanggil monitor setiap menit,
+ * selamanya.
+ */
+export function routeHealthz(ctx) {
+  return jsonResponse({ ok: true, protocol: PROTOCOL }, { headers: ctx.corsHeaders });
 }

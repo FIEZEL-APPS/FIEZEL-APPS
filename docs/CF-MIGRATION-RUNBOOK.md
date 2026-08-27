@@ -659,6 +659,135 @@ di berkasnya sudah membuat `audio-asset-pipeline-test.js` merah
 
 ---
 
+## Bagian 2A — 🔄 JEMBATAN SEMENTARA `api.fiezel.my.id` LEWAT ORIGIN PHP
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — BAGIAN INI BARU.** Ia mencatat apa yang **sudah hidup hari
+> ini**, bukan rencana. Bagian 2 di atas (custom domain Worker) tetap **terblokir** sampai
+> nameserver pindah; bagian ini adalah jalan yang benar-benar dipakai murid selama blokade itu, dan
+> **PEMBONGKARANNYA sudah ditulis** supaya ia tidak menua menjadi arsitektur permanen.
+
+### Apa yang dipasang
+
+`https://api.fiezel.my.id` **bukan** custom domain Cloudflare. Ia **subdomain cPanel di server
+ArenHost yang sama dengan situs murid**, dan di dalamnya ada satu proxy PHP
+(`~/public_html/api/index.php`) yang meneruskan ke `https://fiezel-api.fitrajft.workers.dev`.
+
+Artefaknya ada di repo dan bisa diaudit: **`deploy/edge/api-index.php`** (nilai secret diganti
+placeholder `__EDGE_SECRET__`) + **`deploy/edge/README.md`** (cara pasang, allowlist, pembongkaran).
+
+### Kenapa begitu, bukan langsung ke `*.workers.dev`
+
+Satu hal yang tidak bisa dikompromikan: **cookie identitas `fz_id` harus pihak pertama di
+`fiezel.my.id`.** `workers.dev` ada di public suffix list, jadi memanggilnya langsung = lintas situs
+⇒ cookie `SameSite=Lax` **tidak terkirim** ⇒ seluruh model identitas + kuota runtuh menjadi token
+`localStorage` yang bisa direset murid dengan menghapus data aplikasi. Subdomain cPanel di origin
+yang sama menjaga cookie tetap pihak pertama **tanpa** menunggu zona DNS.
+
+**Terbukti jalan, bukan diasumsikan:** `/api/auth/anon` memasang cookie `fz_id`
+`Domain=fiezel.my.id`; `/api/user/me` dan `/api/quota` menjawab **200** dengan cookie itu; dan
+`cf-live-contract-test.js` lulus **33 assert** melawan `https://api.fiezel.my.id`.
+
+### Lubang keamanan yang jembatan ini BUKA, dan cara menutupnya
+
+Selama jembatan ada, Worker hidup di **dua** alamat, dan alamat asal
+`https://fiezel-api.fitrajft.workers.dev` **tidak bisa dimatikan** karena proxy PHP memanggilnya.
+Selama alamat itu terbuka tanpa syarat: siapa pun bisa `POST /api/auth/anon` langsung ke sana,
+**melewati jembatan**, menulis baris ke D1 (`identity`, `anon_issue`), dan menerbitkan identitas
+anonim tanpa batas — masing-masing membawa **jatah gratisnya sendiri**. Itu pintu untuk mengisi D1
+plan gratis sekaligus menguras kuota gratis akun.
+
+Gerbang origin Worker **tidak bisa** menutupnya: pemanggil langsung tidak mengirim `Origin` sama
+sekali, dan `originGate` sengaja meloloskan permintaan tanpa `Origin`.
+
+Penutupnya: proxy mengirim header rahasia **`X-Fiezel-Edge`** pada setiap permintaan, dan
+`workers/api/mw-edge.js` menolak **403** apa pun yang tidak membawanya — dibandingkan
+**waktu-konstan** (`ctEq()`, pola `workers/owner/index.js:65`), karena operator kesetaraan biasa
+membocorkan panjang prefiks yang cocok lewat waktu eksekusi dan header ini bisa dicoba tanpa batas.
+
+```bash
+# Pasang secret (nilainya HARUS sama dengan yang disuntik ke proxy di origin)
+cd FIEZEL-APPS/workers/api && npx wrangler@3 secret put EDGE_SHARED_SECRET
+
+curl -s https://api.fiezel.my.id/health | grep -o '"edgeGuard":"[a-z]*"'
+# HARUS: "edgeGuard":"on"    <-- "off" = secret belum aktif, lubang di atas MASIH TERBUKA
+
+curl -s -o /dev/null -w '%{http_code}\n' https://fiezel-api.fitrajft.workers.dev/health
+# HARUS: 403   (tanpa header)
+curl -s -o /dev/null -w '%{http_code}\n' -X POST https://fiezel-api.fitrajft.workers.dev/api/auth/anon
+# HARUS: 403   (dan D1 tidak bertambah baris)
+
+curl -s https://fiezel-api.fitrajft.workers.dev/healthz
+# HARUS PERSIS: {"ok":true,"protocol":"1.7"}   <-- tanpa daftar capabilities
+```
+
+**Urutan pemasangan tidak boleh dibalik:** suntik secret ke **proxy dulu**, `wrangler secret put`
+**belakangan**. Kalau Worker punya secret sebelum proxy mengirim header, jendela antara dua langkah
+itu = **403 untuk seluruh murid**. Aturan yang sama berlaku untuk rotasi.
+
+Selama secret belum dipasang, Worker **tetap jalan** (deploy tidak mati mendadak), mencatat
+peringatan ke log Worker, dan `/health` melaporkan `edgeGuard:"off"`. **`off` bukan mode produksi.**
+Kalau `/health` masih `off` seminggu setelah deploy, itu **temuan**, bukan konfigurasi.
+
+### `/health` dilindungi; `/healthz` untuk monitor
+
+Monitor eksternal (UptimeRobot dsb.) tidak bisa mengirim header rahasia, jadi harus ada satu jalur
+bebas-header. Kandidat alaminya `/health` — **ditolak**, karena `/health` mengumumkan
+`capabilities`, `aiGateway`, `version`, `service`, dan `plan`; itu peta permukaan serang yang
+memberi tahu penyerang fitur mana yang hidup tanpa ia perlu menebak. Monitor tidak butuh peta itu;
+ia butuh satu bit hidup/mati.
+
+Karena itu ada **`GET /healthz`**: hanya `{"ok":true,"protocol":"1.7"}` — nol kapabilitas, nol nama
+layanan, nol versi, nol waktu server, nol baca D1/KV. `protocol` tetap ada karena monitor yang
+berguna harus bisa melihat protokol yang salah, dan '1.7' sudah publik di klien. Arahkan monitor ke
+**`/healthz`**, jangan ke `/health`.
+
+### Harga yang dibayar — angka terukur, bukan perkiraan
+
+| Yang diukur | Angka |
+|---|---|
+| Hop PHP tambahan pada `/health`, permintaan **dingin** (proses PHP baru) | **2.214 ms** |
+| Hop PHP tambahan pada `/health`, permintaan **hangat** | **~1.051 – 1.163 ms** |
+
+Dua kejujuran yang menyertainya:
+
+1. **Hop ini menambah latensi.** Kecil untuk JSON, tetapi **nyata dan selalu ada** pada setiap
+   panggilan API murid. Custom domain Cloudflare tidak punya hop ini sama sekali.
+2. **Origin PHP sekarang menjadi titik gagal tunggal.** Kalau hosting bersama ArenHost mati atau
+   kena batas proses, **seluruh API mati walaupun Worker Cloudflare sehat**. Sebelum jembatan,
+   kegagalan origin tidak menyentuh API. Ini kemunduran ketersediaan yang diterima **sadar**, dengan
+   syarat ia sementara.
+
+**Konsekuensi langsung: aset audio TIDAK lewat jembatan.** Berkas audio ratusan kB sampai MB;
+melewatkannya lewat satu proses PHP di hosting bersama mengubah hop 1 ms menjadi leher botol yang
+mematikan pelajaran mendengarkan — memindahkan risiko dari JSON kecil ke jalur yang paling ditunggu
+murid. Audio tetap dilayani langsung dari R2 / Worker `fiezel-audio`, dan **jangan** ditambahkan ke
+`const ALLOW` proxy.
+
+### Allowlist endpoint (default TOLAK)
+
+Proxy hanya meneruskan path yang terdaftar di `const ALLOW` (`deploy/edge/api-index.php`); sisanya
+404 di origin tanpa menyentuh Worker, metode salah 405. Hari ini: `/health`, `/api/config`,
+`/api/auth/anon`, `/api/auth/claim`, `/api/user/me`, `/api/quota`, `/api/ai/task`, `/api/tts/render`,
+`/api/tts/manifest`, `/api/usage/events`, `/api/usage/retention`, `/api/usage/pepper`. Rute baru
+**harus** didaftarkan sadar — dan `/healthz` **tidak** perlu lewat proxy, karena tujuannya justru
+diakses langsung oleh monitor.
+
+### PEMBONGKARAN — ringkas; langkah lengkap di `deploy/edge/README.md` §6
+
+1. Tunggu zona `fiezel.my.id` **Active** (Bagian 1(c) selesai, curl 1(f) hijau).
+2. **Hapus subdomain cPanel `api.fiezel.my.id`** + `rm -rf ~/public_html/api` — record DNS-nya
+   bertabrakan dengan record proxied yang dibuat Wrangler, dan berkas itu memuat secret.
+3. Pasang **custom domain** Worker (Bagian 2), verifikasi `/health`, cookie `Domain=fiezel.my.id`,
+   dan `cf-live-contract-test.js` terhadap hostname baru.
+4. **Matikan `workers.dev`** (`workers_dev = false`, lalu deploy). Sesudah ini lubang di atas hilang
+   **secara struktural**, bukan karena header.
+5. `npx wrangler@3 secret delete EDGE_SHARED_SECRET`; lalu putuskan sadar soal `mw-edge.js` — mode
+   `off` sudah tidak punya masa transisi untuk dibenarkan, jadi hapus modulnya atau ubah `off`
+   menjadi penolakan tanpa syarat. Tandai `deploy/edge/` dan bagian ini **HISTORIS** dengan tanggal
+   pembongkaran, atau hapus keduanya.
+
+---
+
 ## Bagian 3 — DAFTAR SECRET YANG HARUS DIPASANG OWNER
 
 **Nilai tidak ada di dokumen ini dan tidak boleh pernah masuk ke repo mana pun.** Yang tercatat
@@ -676,6 +805,7 @@ di sana (`reports/cf-b1-arch-worker.md` §3).
 | `TURNSTILE_SECRET` | Verifikasi Turnstile untuk endpoint terbuka (`/api/feedback`) | `/api/feedback` memang terbuka tanpa login atas keputusan owner ⇒ wajib rate limit + Turnstile |
 | `CRON_TOKEN` | Pengganti `FIEZEL_REMINDER_CRON_TOKEN` untuk cron rollup/reminder | Bandingkan **constant-time** di Worker; implementasi Puter lama tidak constant-time |
 | `VAPID_PUBLIC_KEY` | Push notification (kunci **publik**, disimpan seragam saja) | **Private key JANGAN masuk Worker.** Hanya dispatcher yang memegangnya |
+| `EDGE_SHARED_SECRET` | Header `X-Fiezel-Edge` dari proxy jembatan origin (**Bagian 2A**) | Nilainya **harus identik** dengan yang disuntik ke `~/public_html/api/index.php`. Tanpa dia Worker tetap jalan tetapi `*.workers.dev` **terbuka** dan `/health` melaporkan `edgeGuard:"off"`. Pasang di **proxy dulu**, Worker belakangan — urutan terbalik = 403 untuk seluruh murid |
 
 ```bash
 cd FIEZEL-APPS/workers/api
@@ -688,6 +818,7 @@ npx wrangler@3 secret put OWNER_SUBJECT
 npx wrangler@3 secret put TURNSTILE_SECRET
 npx wrangler@3 secret put CRON_TOKEN
 npx wrangler@3 secret put VAPID_PUBLIC_KEY
+npx wrangler@3 secret put EDGE_SHARED_SECRET   # Bagian 2A — sesudah proxy origin sudah mengirim header
 
 # Verifikasi: hanya menampilkan NAMA, bukan nilai
 npx wrangler@3 secret list

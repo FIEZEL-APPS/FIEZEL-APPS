@@ -26,6 +26,14 @@
  * ==========================================================================
  * URUTAN MIDDLEWARE (mengikuti cf-b1 §4, dipangkas ke fase ini)
  * ==========================================================================
+ *   [M-1] gerbang jembatan edge: header `X-Fiezel-Edge`             (mw-edge)
+ *        PALING LUAR, bahkan sebelum CORS. Alasannya: penyerang yang memanggil
+ *        `https://fiezel-api.fitrajft.workers.dev` langsung TIDAK mengirim
+ *        `Origin`, dan `originGate` sengaja meloloskan permintaan tanpa Origin
+ *        (non-browser/same-origin). Jadi gerbang origin tidak pernah bisa
+ *        menutup jalur itu, dan penolakannya harus terjadi sebelum satu byte
+ *        D1/KV disentuh. Lihat `mw-edge.js` untuk seluruh alasan + kenapa
+ *        keadaan `off` hanya sah selama masa transisi.
  *   [M0] cors + gerbang origin + cap byte via Content-Length   (mw-guard)
  *        Paling luar: respons GALAT pun butuh header CORS, kalau tidak browser
  *        menampilkan "network error" alih-alih pesan FIEZEL.
@@ -75,8 +83,9 @@
  */
 
 import { guardMiddleware, corsHeaders, preflightResponse } from './mw-guard.js';
+import { edgeGuardMiddleware } from './mw-edge.js';
 import { identityMiddleware } from './mw-identity.js';
-import { routeHealth } from './route-health.js';
+import { routeHealth, routeHealthz } from './route-health.js';
 import { routeAuthAnon, routeAuthClaim } from './route-auth.js';
 import { routeUserMe } from './route-user.js';
 import { routeConfig } from './route-config.js';
@@ -87,6 +96,11 @@ import { notFound, methodNotAllowed, jsonError, ERR } from './errors.js';
 /** Rute fase ini. Bentuk: [metode, path literal, handler]. */
 export const ROUTES = [
   ['GET', '/health', routeHealth],
+  // `/healthz` = SATU-SATUNYA jalur yang boleh diakses tanpa header jembatan
+  // (`mw-edge.EDGE_FREE_PATHS`). Sengaja terpisah dari `/health` karena
+  // `/health` mengumumkan `capabilities` dan itu adalah peta permukaan serang
+  // yang tidak boleh publik. Alasan lengkapnya di `mw-edge.js`.
+  ['GET', '/healthz', routeHealthz],
   ['POST', '/api/auth/anon', routeAuthAnon],
   ['POST', '/api/auth/claim', routeAuthClaim],
   ['GET', '/api/user/me', routeUserMe],
@@ -96,6 +110,7 @@ export const ROUTES = [
 
 /** Rantai middleware. Mengembalikan Response = short-circuit. */
 const MIDDLEWARE = [
+  edgeGuardMiddleware, // [M-1] header jembatan `X-Fiezel-Edge` (nol I/O, nol await)
   guardMiddleware,     // [M0] cors + origin + cap byte
   identityMiddleware   // [M1] cookie fz_id ber-HMAC -> ctx.identity.sub
   // [M3] plan/entitlement: TIDAK ADA. Hanya ada satu plan (free) dan batasnya

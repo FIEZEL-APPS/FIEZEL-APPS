@@ -1,10 +1,11 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
-  "scanned": 118,
+  "scanned": 127,
   "allowlist": [
     "http-smoke-test.js",
-    "e2e-level-grammar-test.js"
+    "e2e-level-grammar-test.js",
+    "cf-live-selftest.js"
   ],
   "shadowSafeGates": [
     "adaptive-policy-test.js",
@@ -20,10 +21,11 @@
   ],
   "layer3Installed": false,
   "notes": [
+    "Kelas ENV_GATED_LIVE_ALLOWLIST ada karena pemindai teks tidak bisa melihat `fetch(<variabel>)`; anggotanya didaftarkan dan diprobe, bukan dideteksi.",
     "Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3."
   ],
   "counts": {
-    "pass": 30,
+    "pass": 35,
     "fail": 0
   },
   "checks": [
@@ -100,12 +102,12 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
-      "details": "files=118"
+      "details": "files=127"
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
       "status": "PASS",
-      "details": "start=10416 end=12184"
+      "details": "start=12314 end=14082"
     },
     {
       "name": "Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya",
@@ -163,9 +165,14 @@
       "details": "0"
     },
     {
-      "name": "Allowlist tetap dua nama dan keduanya ada di repo",
+      "name": "Allowlist tetap tiga nama dan semuanya ada di repo",
       "status": "PASS",
-      "details": "http-smoke-test.js, e2e-level-grammar-test.js"
+      "details": "http-smoke-test.js, e2e-level-grammar-test.js, cf-live-selftest.js"
+    },
+    {
+      "name": "Pemindaian mencakup berkas *-selftest.js (bukan hanya *-test.js/*-audit.js)",
+      "status": "PASS",
+      "details": "cf-live-selftest.js"
     },
     {
       "name": "Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket",
@@ -173,9 +180,29 @@
       "details": "prerender-dryrun-test.js"
     },
     {
+      "name": "Gerbang live ber-env memenuhi syaratnya (baca env, SKIP bersih, tanpa URL bawaan)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "Kelas live ber-env tetap satu nama dan terdaftar di quality.yml sebagai langkah SKIP",
+      "status": "PASS",
+      "details": "cf-live-contract-test.js"
+    },
+    {
       "name": "Gerbang ini terdaftar di quality.yml",
       "status": "PASS",
       "details": "quality.yml"
+    },
+    {
+      "name": "Gerbang live dan self-test-nya terdaftar di quality.yml",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL",
+      "status": "PASS",
+      "details": "komentar SKIP + FIEZEL_CF_LIVE_BASE"
     }
   ]
 }
