@@ -515,6 +515,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .ai-btn:hover{border-color:var(--accent);box-shadow:var(--shadow-md)}
 .ai-answer{margin-top:6px;line-height:1.7;font-size:.92rem;color:var(--text);text-align:left}
 .ai-answer p{margin:0 0 10px;color:var(--text)}
+/* Penanda jawaban mode hemat. Bukan galat, jadi tidak memakai warna galat - hanya nada
+   sekunder plus garis kiri supaya murid tahu jawaban ini datang dari FIEZEL, bukan AI. */
+.ai-degraded-note{margin:0 0 10px;padding:6px 10px;border-left:3px solid var(--line);
+  background:var(--panel-soft);color:var(--muted);font-size:.82rem;line-height:1.55;text-align:left}
 .ai-loading{display:flex;gap:7px;justify-content:center;margin:22px 0}
 .ai-loading span{width:9px;height:9px;border-radius:50%;background:var(--accent);animation:aiBounce calc(var(--dur-l) + var(--dur-l)) var(--ease) infinite}
 .ai-loading span:nth-child(2){animation-delay:var(--dur-s)}
