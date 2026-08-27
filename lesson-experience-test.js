@@ -60,10 +60,11 @@ setTimeout(()=>{try{
 
   assert(context.playFeedbackSound('success')===true,'correct-answer sound did not start');
   assert(context.playFeedbackSound('error')===true,'wrong-answer sound did not start');
-  // m025-43: OWNER could not hear the answer feedback. Both cues are now longer and
-  // fuller - a four-note rise for correct, a three-note fall for wrong - so the count
-  // moved from 5 to 7 deliberately.
-  assert(oscillatorStarts===7,`feedback sound produced ${oscillatorStarts}/7 expected tones`);
+  // m025-43 made the cues longer (4-note C-major rise + 3-note fall = 7 tones).
+  // P0-2 (FIEZEL-GAME-INTERACTION-AUDIT.md §13, SFX spec §1.2 R2) replaced that C-major
+  // vocabulary with the F add9 brand family: correct = F4→A4→C5 (3 tones), wrong =
+  // A4→F4 soft sine (2 tones, no sawtooth) - so the expected count moved from 7 to 5.
+  assert(oscillatorStarts===5,`feedback sound produced ${oscillatorStarts}/5 expected tones`);
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
