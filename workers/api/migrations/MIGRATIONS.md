@@ -13,6 +13,14 @@ sini yang menjadi urutan resmi.
 | `0001_quota.sql` | `fiezel-core` (binding `CORE_DB`) | `quota_daily`, `quota_reservation` |
 | `0002_analytics.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `metrics_daily`, `usage_daily`, `retention_daily`, `dau_dedup`, `pepper_state` |
 | `0003_cron.sql` | `fiezel-core` (binding `CORE_DB`) | `cron_run` |
+| `0004_indexes.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
+
+Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
+`tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
+dari perintah `wrangler d1 execute … --file=migrations/<berkas>` di dokumen ini,
+lalu MEMERAH kalau ada satu berkas `.sql` di direktori yang tidak punya perintah
+penerapan di sini. Jadi migrasi baru tanpa dokumentasi = gerbang merah, bukan
+migrasi yang tidak pernah diperiksa (lihat "Cacat yang pernah terjadi" di bawah).
 
 `0003_cron.sql` masuk `fiezel-core` dan bukan `fiezel-stats` karena dua alasan
 yang keduanya keras: (1) `analytics-privacy-test.js` menuntut database analytics
@@ -117,8 +125,40 @@ masing-masing, dan setiap indeks tambahan di sana hanya menambah baris tertulis
 (plan gratis = 100.000 baris tertulis/hari untuk seluruh akun,
 https://developers.cloudflare.com/d1/platform/pricing/).
 
-Tidak ada berkas `0003_*`. Nomor itu dilewati dengan sengaja supaya nomor migrasi
-A6/D1 sama dengan nomor paket kerjanya; jangan "mengisi" 0003 di kemudian hari.
+Nomor `0003` dipakai oleh `0003_cron.sql` (paket A3). Catatan lama di sini
+berbunyi "tidak ada berkas `0003_*`" — itu benar saat A6/D1 ditulis dan **sudah
+tidak benar** sejak A3 mendarat; keduanya lahir paralel. Nomor `0004` tetap milik
+A6/D1, dan tidak ada tabrakan: `0003` hanya membuat `cron_run`, `0004` hanya
+menyentuh indeks `quota_daily`/`quota_reservation`.
+
+## Cacat yang pernah terjadi: `cron_run` "hilang" dari skema harapan
+
+`0003_cron.sql` dan gerbang skema A6/D1 lahir di dua paket kerja paralel. Gerbang
+(`d1-schema-contract-test.js`) dan pembanding (`tools/d1-schema-check.mjs`)
+masing-masing memuat daftar berkas migrasi **yang ditulis tangan**, dan daftar itu
+tidak ikut berubah saat `0003_cron.sql` mendarat. Akibatnya "skema harapan"
+dibangun tanpa `cron_run`, lalu gerbang menuduh `cron-status.js` memakai tabel
+tanpa migrasi — padahal migrasinya ada di direktori yang sama. Sisi sebaliknya
+lebih berbahaya: berkas migrasi yang tidak terdaftar **tidak diperiksa sama
+sekali** dan gerbang tetap hijau.
+
+Sekarang kedua pihak menurunkan daftarnya dari dokumen ini dan **menghitung**
+berkas: `jumlah berkas terpetakan == jumlah berkas .sql di direktori`, kalau tidak
+sama → merah (gerbang) / keluar 2 (pembanding).
+
+## `0003_cron.sql` hanya punya SATU indeks
+
+Versi pertama `0003_cron.sql` membuat dua indeks: `idx_cron_run_day(day)` dan
+`idx_cron_run_job_day(job, day)`. Yang kedua **dihapus dari berkas sebelum 0003
+pernah dijalankan di database mana pun** (produksi baru menjalankan `0001*` dan
+`0002`), karena tidak ada satu pun kueri di `cron-status.js` yang menyaring atau
+mengurutkan dengan `job` — `CRON_SQL` cuma memuat satu `INSERT`, satu
+`DELETE … WHERE day < ?1`, dan satu `SELECT … WHERE day >= ?1 AND day <= ?2 ORDER BY
+started_at`; pemisahan per-job dilakukan di JS oleh `summarizeCronRuns()`. Indeks
+tanpa kueri hanya menambah satu baris tertulis per INSERT
+(https://developers.cloudflare.com/d1/platform/pricing/) di database yang
+single-threaded (https://developers.cloudflare.com/d1/platform/limits/) dan juga
+memikul jalur panas kuota. Alasan lengkap ada di kepala berkasnya.
 
 Berkas ini **tidak** punya salinan di `quota/migrations/`. Salinan hanya wajib
 untuk berkas yang dibaca gerbang paket kerja lain (lihat "Salinan, bukan
