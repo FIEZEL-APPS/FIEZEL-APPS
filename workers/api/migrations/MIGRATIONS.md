@@ -15,6 +15,7 @@ sini yang menjadi urutan resmi.
 | `0003_cron.sql` | `fiezel-core` (binding `CORE_DB`) | `cron_run` |
 | `0004_indexes.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
 | `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
+| `0006_analytics_batch_dedup.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `batch_dedup` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -72,6 +73,9 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0003_cron.sql
 
 # --- fiezel-core: pagar neuron tingkat AKUN (P3) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0005_ai_account_budget.sql
+
+# --- fiezel-stats: dedup idempoten batch telemetry (wave brain-learning-infra) ---
+wrangler d1 execute fiezel-stats --remote --file=migrations/0006_analytics_batch_dedup.sql
 ```
 
 `0005_ai_account_budget.sql` WAJIB diterapkan SEBELUM `cfAiEnabled` dinyalakan.
@@ -95,7 +99,7 @@ Ganti `--remote` dengan `--local` untuk `wrangler dev`. Semua berkas memakai
 ```bash
 # HARUS kosong: tidak boleh ada tabel analytics di database kuota
 wrangler d1 execute fiezel-core --remote \
-  --command "SELECT name FROM sqlite_master WHERE name IN ('metrics_daily','usage_daily','retention_daily','dau_dedup','pepper_state')"
+  --command "SELECT name FROM sqlite_master WHERE name IN ('metrics_daily','usage_daily','retention_daily','dau_dedup','pepper_state','batch_dedup')"
 
 # HARUS kosong: tidak boleh ada tabel kuota/identitas di database analytics
 wrangler d1 execute fiezel-stats --remote \
@@ -115,6 +119,12 @@ path itu (mis. `analytics-privacy-test.js` membaca
 **byte-identik** dengan aslinya, dan `cf-wiring-test.js` yang membuktikannya —
 jadi tidak ada kemungkinan dua versi skema yang berbeda hidup berdampingan tanpa
 ada yang tahu.
+
+`analytics/migrations/0006_analytics_batch_dedup.sql` mengikuti pola yang sama:
+aslinya hidup di `analytics/migrations/` (dibaca gerbang `analytics-dedup-test.js`),
+salinan di direktori ini wajib **byte-identik**. Catatan jujur: pasangan `0006`
+belum terdaftar di cek byte-identik `cf-wiring-test.js` — penambahan pasangan itu
+milik pemilik gerbang wiring.
 
 ## 0004_indexes.sql — hanya `fiezel-core` (A6/D1)
 

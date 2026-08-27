@@ -21,7 +21,7 @@
  */
 
 import { normalizeEvent, aggregate, isServerOnly, CLIENT_EVENTS } from './analytics-core.js';
-import { applyAggregate } from './analytics-store-d1.js';
+import { applyAggregate, markBatchSeen } from './analytics-store-d1.js';
 
 /* -------------------------------------------------------------------------- */
 /* Batas keras. Semua angka konservatif supaya aman di Workers Free.          */
@@ -32,8 +32,33 @@ export const LIMITS = Object.freeze({
   MAX_RETENTION_PINGS: 3,       // satu perangkat tidak butuh lebih
   RATE_PER_WINDOW: 60,          // batch per jendela
   RATE_WINDOW_MS: 60 * 60 * 1000,
-  DAY_SKEW_DAYS: 2              // toleransi zona waktu + backfill offline
+  DAY_SKEW_DAYS: 2,             // toleransi zona waktu + backfill offline
+  BATCH_ID_TTL_DAYS: 2          // umur kunci dedup batch = jendela retry klien (48 jam)
 });
+
+/**
+ * Bentuk `batchId` yang diterima: UUID (36 karakter, hex + tanda hubung).
+ * Klien membuatnya ACAK sekali per batch (crypto.randomUUID) — BUKAN turunan
+ * identitas dan BUKAN turunan waktu. Server tidak bisa membuktikan keacakan,
+ * tapi bentuknya dikunci ketat supaya tidak ada ruang menyelipkan ID stabil
+ * atau teks bebas ke kolom ini. (Temuan council: gpt_5_6_sol §4.3, opus §1.3.)
+ */
+export const BATCH_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/**
+ * normalizeBatchId(raw) -> { ok, value }
+ * `batchId` OPSIONAL: batch tanpa batchId tetap diterima (kompatibilitas mundur
+ * dengan klien lama), hanya saja tanpa jaminan idempotensi. Bila hadir tapi
+ * bentuknya salah, batch DITOLAK — klien harus tahu payload-nya salah, sama
+ * seperti kebijakan foreign_field.
+ */
+export function normalizeBatchId(raw) {
+  if (raw === undefined || raw === null) return { ok: true, value: null };
+  if (typeof raw !== 'string') return { ok: false };
+  const id = raw.toLowerCase();
+  if (!BATCH_ID_PATTERN.test(id)) return { ok: false };
+  return { ok: true, value: id };
+}
 
 export const SCHEMA_ID = 'fiezel-analytics-v1';
 
@@ -128,6 +153,10 @@ export function processClientBatch(body, now = Date.now()) {
   if (body.schema !== SCHEMA_ID) {
     return { status: 400, payload: { ok: false, error: 'bad_schema' } };
   }
+  const batch = normalizeBatchId(body.batchId);
+  if (!batch.ok) {
+    return { status: 400, payload: { ok: false, error: 'bad_batch_id' } };
+  }
   const events = Array.isArray(body.events) ? body.events : null;
   if (!events || events.length === 0) {
     return { status: 400, payload: { ok: false, error: 'no_events' } };
@@ -159,7 +188,7 @@ export function processClientBatch(body, now = Date.now()) {
     clean.push(res.event);
   }
 
-  return { status: 202, payload: { ok: true, accepted: clean.length }, agg: aggregate(clean) };
+  return { status: 202, payload: { ok: true, accepted: clean.length }, agg: aggregate(clean), batchId: batch.value };
 }
 
 /**
@@ -174,6 +203,10 @@ export function processRetentionPing(body, now = Date.now()) {
   if (body.schema !== SCHEMA_ID) {
     return { status: 400, payload: { ok: false, error: 'bad_schema' } };
   }
+  const batch = normalizeBatchId(body.batchId);
+  if (!batch.ok) {
+    return { status: 400, payload: { ok: false, error: 'bad_batch_id' } };
+  }
   const list = Array.isArray(body.pings) ? body.pings : [body];
   if (list.length > LIMITS.MAX_RETENTION_PINGS) {
     return { status: 413, payload: { ok: false, error: 'too_many_pings', max: LIMITS.MAX_RETENTION_PINGS } };
@@ -185,8 +218,8 @@ export function processRetentionPing(body, now = Date.now()) {
     // Selubung dibangun ulang dari nol: apa pun yang klien kirim di luar dua
     // field ini tidak punya jalan masuk sama sekali.
     const raw = { name: 'retention_ping', day: src.day || dayKey(now), cohort_day: src.cohort_day, day_index: src.day_index };
-    // `schema`/`pings` adalah kunci selubung; sisanya harus tepat dua field.
-    const extras = Object.keys(src).filter(k => !['day', 'cohort_day', 'day_index', 'schema', 'pings'].includes(k));
+    // `schema`/`pings`/`batchId` adalah kunci selubung; sisanya harus tepat dua field.
+    const extras = Object.keys(src).filter(k => !['day', 'cohort_day', 'day_index', 'schema', 'pings', 'batchId'].includes(k));
     if (extras.length > 0) {
       return { status: 400, payload: { ok: false, error: 'foreign_field', fields: extras, index: i } };
     }
@@ -201,7 +234,7 @@ export function processRetentionPing(body, now = Date.now()) {
     clean.push(res.event);
   }
 
-  return { status: 202, payload: { ok: true, accepted: clean.length }, agg: aggregate(clean) };
+  return { status: 202, payload: { ok: true, accepted: clean.length }, agg: aggregate(clean), batchId: batch.value };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -224,6 +257,27 @@ function enabled(env) {
   return String((env && env.ANALYTICS_ENABLED) || 'off') === 'on';
 }
 
+/**
+ * dedupBatch(db, batchId, now) -> true bila batch BARU, false bila duplikat.
+ *
+ * Dedup HARUS selesai SEBELUM applyAggregate dijadwalkan — kalau tidak, retry
+ * setelah timeout ambigu menaikkan semua penghitung dua kali (temuan council).
+ * Satu SELECT + satu INSERT kecil; latensinya jauh lebih murah daripada angka
+ * dashboard yang bohong.
+ *
+ * Bila tabel dedup belum ada (migrasi 0003 belum diterapkan), kegagalan
+ * ditelan dan batch diperlakukan BARU: perilaku persis seperti sebelum fitur
+ * ini ada. Fitur baru wajib aman saat prasyaratnya belum terpasang.
+ */
+async function dedupBatch(db, batchId, now) {
+  if (!db || !batchId) return true;
+  try {
+    return await markBatchSeen(db, batchId, dayKey(now));
+  } catch {
+    return true;
+  }
+}
+
 export async function handleEvents(request, env, ctx, now = Date.now()) {
   if (!enabled(env)) return json({ ok: true, accepted: 0, disabled: true }, 202);
   if (!(await checkRateLimit(request, env, now))) return json({ ok: false, error: 'rate_limited' }, 429);
@@ -235,6 +289,11 @@ export async function handleEvents(request, env, ctx, now = Date.now()) {
   if (result.status !== 202) return json(result.payload, result.status);
 
   const db = analyticsDb(env);
+  if (!(await dedupBatch(db, result.batchId, now))) {
+    // Batch ini sudah pernah diterima: balas sukses (klien boleh berhenti
+    // retry) TANPA agregasi ulang. 200, bukan 202: tidak ada yang diproses.
+    return json({ ok: true, accepted: result.payload.accepted, duplicate: true }, 200);
+  }
   if (db) waitUntil(ctx, applyAggregate(db, result.agg));
   return json(result.payload, 202);
 }
@@ -250,6 +309,11 @@ export async function handleRetention(request, env, ctx, now = Date.now()) {
   if (result.status !== 202) return json(result.payload, result.status);
 
   const db = analyticsDb(env);
+  if (!(await dedupBatch(db, result.batchId, now))) {
+    // retention_ping tanpa batchId dapat di-replay (temuan council §4.3);
+    // dengan batchId, replay berhenti di sini tanpa menyentuh penghitung kohor.
+    return json({ ok: true, accepted: result.payload.accepted, duplicate: true }, 200);
+  }
   if (db) waitUntil(ctx, applyAggregate(db, result.agg));
   return json(result.payload, 202);
 }
@@ -331,4 +395,4 @@ export function registerAnalyticsRoutes(router) {
 
 export { CLIENT_EVENTS };
 
-export default { registerAnalyticsRoutes, handleEvents, handleRetention, handlePepper, processClientBatch, processRetentionPing, LIMITS, SCHEMA_ID, ROUTES };
+export default { registerAnalyticsRoutes, handleEvents, handleRetention, handlePepper, processClientBatch, processRetentionPing, normalizeBatchId, BATCH_ID_PATTERN, LIMITS, SCHEMA_ID, ROUTES };
