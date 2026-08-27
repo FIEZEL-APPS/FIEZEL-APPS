@@ -8,19 +8,27 @@
 //   (2) `workerUrl` LAMA tidak diubah. `remote-push-test.js:6` mengunci field itu ke regex
 //       `^https://[a-z0-9-]+\.puter\.work$`; mengarahkannya ke domain Cloudflare akan
 //       membuat gerbang push merah dan memutus jalur pengingat yang sudah jalan. Sakelar CF
-//       WAJIB memakai field BARU (`baseUrl`), bukan menimpa yang lama.
+//       WAJIB memakai field BARU (`base`), bukan menimpa yang lama.
 //   (3) Tidak ada URL Cloudflare hardcode di `app.js`. Satu-satunya sumber alamat CF adalah
-//       `FIEZEL_CF_CONFIG.baseUrl` — kalau alamat tersebar di kode produk, mematikan CF
+//       `FIEZEL_CF_CONFIG.base` — kalau alamat tersebar di kode produk, mematikan CF
 //       tidak lagi bisa dilakukan dengan satu sakelar.
-//   (4) Ada jalur rollback yang bisa ditunjuk (`fallbackToPuter`), bukan sekadar niat.
+//   (4) Ada jalur rollback yang bisa ditunjuk (`enabled:false` mematikan SELURUH jalur CF),
+//       bukan sekadar niat.
 //
-// STATUS HARI INI DAN CARA MENGAKTIFKANNYA (untuk MASTER saat merge):
-// Sakelar `FIEZEL_CF_CONFIG` ditulis oleh paket kerja LAIN (cf-b1 §5.3, PHASE C). Selama ia
-// belum ada di `core-config.js`, blok (1) dan (4) berstatus **SKIP** dan gerbang ini
-// **exit 0** — dengan pesan "belum terpasang" yang eksplisit, bukan hijau yang menyesatkan.
-// Blok (2) dan (3) berjalan penuh HARI INI karena tidak bergantung pada flag baru.
-// >>> MASTER: setelah paket flag CF di-merge, ubah `REQUIRE_CF_FLAGS` di bawah menjadi
-// >>> `true`. Sejak saat itu ketiadaan flag = FAIL, dan gerbang ini menjadi pagar penuh.
+// STATUS: PAGAR PENUH (W1, paket flag CF sudah terpasang).
+// `REQUIRE_CF_FLAGS` sekarang `true`: ketiadaan `self.FIEZEL_CF_CONFIG` = FAIL, dan tiga
+// assert yang dulu berstatus SKIP (`Struktur FIEZEL_CF_CONFIG`, `Semua nilai flag CF default
+// OFF`, `Jalur rollback CF ada dan hidup`) BERJALAN SUNGGUHAN atas nilai hasil evaluasi vm.
+//
+// BENTUK FLAG YANG DIJAGA — dan mengapa berbeda dari draf cf-b1 §5.3: draf itu menulis
+// `{baseUrl, routes:{path:'puter'|'cf'|'cf-shadow'}, fallbackToPuter, shadowSampleRate}`.
+// Yang mengikat sekarang adalah kosakata `'off'|'shadow'|'on'` per ENDPOINT dari
+// `reports/cf-b6-migration-plan.md` (pola P1) + `docs/CF-MIGRATION-RUNBOOK.md` (Bagian 4.6,
+// tabel tiga status dan kill switch `GET /api/config`), yaitu:
+//   `{enabled:false, base:'', endpoints:{health,config,auth,quota,ai,tts,usage}}`.
+// Jaminan yang dijaga TIDAK dilonggarkan — hanya nama fieldnya yang mengikuti kosakata yang
+// dipakai runbook operasional, supaya orang yang memutar flag saat insiden membaca kata yang
+// sama di repo, di runbook, dan di `GET /api/config`.
 'use strict';
 
 const fs = require('fs');
@@ -28,8 +36,8 @@ const path = require('path');
 const vm = require('vm');
 
 const root = __dirname;
-// MASTER: jadikan `true` sesudah paket flag CF di-merge (lihat header).
-const REQUIRE_CF_FLAGS = false;
+// AKTIF sejak paket flag CF (W1) terpasang: ketiadaan flag = FAIL, bukan SKIP.
+const REQUIRE_CF_FLAGS = true;
 
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const checks = [];
@@ -95,7 +103,7 @@ for (const pattern of CF_HARDCODE) {
   const found = appCode.match(pattern);
   if (found) hardcoded.push(...found);
 }
-check('Tidak ada URL Cloudflare hardcode di app.js (alamat hanya boleh dari FIEZEL_CF_CONFIG.baseUrl)',
+check('Tidak ada URL Cloudflare hardcode di app.js (alamat hanya boleh dari FIEZEL_CF_CONFIG.base)',
   hardcoded.length === 0, hardcoded.join(', ') || '0');
 // Berkas produk lain di jalur transport ikut dijaga: sekali satu alamat lolos ke sw.js,
 // mematikan CF dari core-config.js tidak lagi cukup.
@@ -133,41 +141,75 @@ if (!hasCfFlags) {
   check('FIEZEL_CF_CONFIG bisa dibaca sebagai objek', cf !== null && typeof cf === 'object', typeof cf);
 
   if (cf && typeof cf === 'object') {
+    const MODES = new Set(['off', 'shadow', 'on']);
+    const REQUIRED_ENDPOINTS = ['health', 'config', 'auth', 'quota', 'ai', 'tts', 'usage'];
+    const endpoints = cf.endpoints && typeof cf.endpoints === 'object' ? cf.endpoints : {};
+    const endpointEntries = Object.entries(endpoints);
+    const missingEndpoints = REQUIRED_ENDPOINTS.filter(k => !(k in endpoints));
+    const badModes = endpointEntries.filter(([, mode]) => !MODES.has(String(mode)));
+    const liveEndpoints = endpointEntries.filter(([, mode]) => String(mode) !== 'off');
+    const booleansOn = Object.entries(cf).filter(([, value]) => value === true);
+
+    /* ---- (1a) STRUKTUR — assert yang dulu SKIP, kini berjalan atas NILAI -------------- */
+    const strukturDetail = `keys=${Object.keys(cf).join('|')} endpoints=${endpointEntries.map(([k, v]) => k + '=' + v).join(',')}`;
+    const strukturOk = ['enabled', 'base', 'endpoints'].every(k => k in cf)
+      && typeof cf.enabled === 'boolean'
+      && typeof cf.base === 'string'
+      && !('workerUrl' in cf)
+      && Object.isFrozen(cf)
+      && Object.isFrozen(endpoints)
+      && missingEndpoints.length === 0
+      && badModes.length === 0;
+    check('Struktur FIEZEL_CF_CONFIG', strukturOk, strukturDetail);
+    // Pecahan di bawah bukan pengulangan: kalau assert gabungan di atas merah, inilah yang
+    // memberi tahu bagian MANA yang salah tanpa harus membaca kode gerbang.
     check('FIEZEL_CF_CONFIG dibekukan (Object.freeze) seperti FIEZEL_CORE_CONFIG',
-      Object.isFrozen(cf), String(Object.isFrozen(cf)));
-    check('FIEZEL_CF_CONFIG punya field yang dijanjikan cf-b1 §5.3',
-      ['baseUrl', 'routes', 'fallbackToPuter'].every(k => k in cf), Object.keys(cf).join(', '));
+      Object.isFrozen(cf) && Object.isFrozen(endpoints),
+      `cf=${Object.isFrozen(cf)} endpoints=${Object.isFrozen(endpoints)}`);
     check('FIEZEL_CF_CONFIG memakai field BARU dan tidak menyentuh workerUrl',
       !('workerUrl' in cf), Object.keys(cf).join(', '));
+    check('endpoints memuat tujuh sakelar yang dijanjikan (health/config/auth/quota/ai/tts/usage)',
+      missingEndpoints.length === 0, missingEndpoints.join(', ') || 'lengkap');
+    check('setiap endpoint bernilai "off" | "shadow" | "on" (kosakata cf-b6 P1)',
+      badModes.length === 0, badModes.map(([k, v]) => `${k}=${v}`).join(', ') || '0');
 
-    const routes = cf.routes && typeof cf.routes === 'object' ? cf.routes : {};
-    const routeEntries = Object.entries(routes);
-    const enabledRoutes = routeEntries.filter(([, mode]) => String(mode) !== 'puter');
-    const sampleRate = Number(cf.shadowSampleRate || 0);
-    const booleansOn = Object.entries(cf).filter(([key, value]) =>
-      value === true && !/^fallback/i.test(key));
+    /* ---- (1b) DEFAULT OFF — assert yang dulu SKIP ------------------------------------- */
+    // main auto-deploy ke fiezel.my.id tiap ≤5 menit tanpa gerbang di antaranya (K12), jadi
+    // "default off" bukan gaya penulisan: ia yang membuat push ini aman untuk murid.
+    const defaultOff = cf.enabled === false
+      && String(cf.base || '') === ''
+      && liveEndpoints.length === 0
+      && booleansOn.length === 0;
+    check('Semua nilai flag CF default OFF', defaultOff,
+      `enabled=${cf.enabled} base="${cf.base}" hidup=${liveEndpoints.map(([k, v]) => k + '=' + v).join(',') || '0'}`);
+    check('enabled === false (sakelar induk mati)', cf.enabled === false, String(cf.enabled));
+    check('base kosong — alamat CF belum diaktifkan (api.fiezel.my.id menunggu nameserver)',
+      String(cf.base || '') === '', `base="${cf.base}"`);
+    check('NOL endpoint bernilai shadow/on', liveEndpoints.length === 0,
+      liveEndpoints.map(([k, v]) => `${k}=${v}`).join(', ') || '0');
+    check('Tidak ada bendera boolean yang default true', booleansOn.length === 0,
+      booleansOn.map(([k]) => k).join(', ') || '0');
+    check('base, kalau diisi, https dan di bawah fiezel.my.id (bukan workers.dev)',
+      String(cf.base || '') === '' || /^https:\/\/[a-z0-9-]+\.fiezel\.my\.id$/i.test(String(cf.base)), String(cf.base));
 
-    check('routes berisi peta endpoint (bukan kosong)', routeEntries.length > 0, `routes=${routeEntries.length}`);
-    check('SEMUA route default "puter" — nol endpoint dialihkan ke CF',
-      enabledRoutes.length === 0, enabledRoutes.map(([k, v]) => `${k}=${v}`).join(', ') || '0');
-    check('shadowSampleRate default 0 (mode bayangan pun mati)', sampleRate === 0, String(cf.shadowSampleRate));
-    check('Tidak ada bendera boolean lain yang default true selain jalur rollback',
-      booleansOn.length === 0, booleansOn.map(([k]) => k).join(', ') || '0');
-    check('baseUrl kosong ATAU seluruh route masih "puter" (CF tidak bisa hidup diam-diam)',
-      String(cf.baseUrl || '') === '' || enabledRoutes.length === 0, `baseUrl=${cf.baseUrl}`);
-    check('baseUrl, kalau diisi, https dan di bawah fiezel.my.id',
-      String(cf.baseUrl || '') === '' || /^https:\/\/[a-z0-9-]+\.fiezel\.my\.id$/i.test(String(cf.baseUrl)), String(cf.baseUrl));
-
-    /* ---- (4) rollback ---------------------------------------------------------------- */
-    // `fallbackToPuter:true` adalah jalur rollback per-request (cf-b1 §5.4): kegagalan CF
-    // jatuh kembali ke Puter tanpa deploy. Ia HARUS true, dan app.js harus benar-benar
-    // membacanya — flag rollback yang tidak dibaca siapa pun bukan rollback.
-    check('Jalur rollback: fallbackToPuter === true', cf.fallbackToPuter === true, String(cf.fallbackToPuter));
-    check('Jalur rollback dibaca app.js (bukan flag mati)',
-      /fallbackToPuter/.test(appCode), 'cari fallbackToPuter di app.js');
+    /* ---- (4) ROLLBACK — assert yang dulu SKIP ----------------------------------------- */
+    // Rollback klien = SATU nilai: `enabled:false` mematikan seluruh jalur CF walau setiap
+    // endpoint bernilai 'on'. Ia hanya nyata kalau app.js benar-benar membacanya sebagai
+    // syarat WAJIB, bukan sebagai catatan. Buktinya perilaku diuji cf-shadow-mode-test.js (d);
+    // di sini yang dijaga adalah keberadaan syarat itu di sumber produk.
+    const readsEnabled = /CF_CONFIG\.enabled\s*===\s*true/.test(appCode);
+    const gateBeforeMode = /CF_ENABLED[\s\S]{0,200}?return\s*'off'/.test(appCode);
+    check('Jalur rollback CF ada dan hidup', readsEnabled && gateBeforeMode,
+      `enabled dibaca app.js=${readsEnabled} gerbang mode=${gateBeforeMode}`);
+    check('Rollback satu nilai dibaca app.js (bukan flag mati)', readsEnabled,
+      'cari CF_CONFIG.enabled===true di app.js');
+    check('Mode endpoint dikunci di belakang sakelar induk (enabled:false ⇒ selalu off)',
+      gateBeforeMode, 'cari CF_ENABLED … return \'off\' di app.js');
+    check('Gerbang perilaku shadow/off terdaftar di quality.yml (bukan hanya pemeriksaan teks)',
+      workflow.includes('node cf-shadow-mode-test.js'), 'quality.yml');
     check('app.js membaca alamat CF hanya dari FIEZEL_CF_CONFIG',
-      !/FIEZEL_CF_CONFIG/.test(appCode) ? false : /FIEZEL_CF_CONFIG[\s\S]{0,200}?baseUrl/.test(appCode),
-      'cari FIEZEL_CF_CONFIG…baseUrl di app.js');
+      !/FIEZEL_CF_CONFIG/.test(appCode) ? false : /FIEZEL_CF_CONFIG[\s\S]{0,200}?\.base\b/.test(appCode),
+      'cari FIEZEL_CF_CONFIG…base di app.js');
     // Sakelar statis di core-config.js di-cache service worker (`sw.js`), jadi ia BUKAN kill
     // switch instan — putusan cf-b6:16-20. Assert ini menjaga agar kenyataan itu tercatat di
     // repo, bukan hanya di laporan yang tidak dibaca saat insiden.
