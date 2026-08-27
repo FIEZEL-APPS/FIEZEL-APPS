@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T15:16:00+07:00",
+  "updated": "2026-08-28T05:34:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -321,6 +321,41 @@
       "status": "in_progress",
       "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
       "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
+    },
+    {
+      "id": "T-027",
+      "title": "Nightwatch: perbaiki deteksi render-time integrity pada release audit",
+      "owner": "nightwatch",
+      "status": "in_progress",
+      "scope": {
+        "files_allowed": [
+          "release-audit.py",
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js"
+        ],
+        "objective": "Pulihkan deteksi gate render yang tetap valid setelah kode memakai guard tambahan sebelum validateQuestion.",
+        "forbidden_actions": [
+          "Jangan mengubah area neural voice yang dikunci T-026.",
+          "Jangan melonggarkan gate konten atau mengubah ambang kualitas.",
+          "Jangan mengubah workflow audio."
+        ],
+        "done_when": [
+          "Pemeriksaan regex mendeteksi guard validateQuestion(...).ok sebelum continue.",
+          "Semua gate lokal yang relevan hijau dan CI Quality Gate pada head main hijau.",
+          "Pages live menyajikan commit merge terbaru."
+        ],
+        "evidence_required": [
+          "hasil gate lokal nyata",
+          "hasil CI Quality Gate",
+          "Pages build dan live marker setelah merge"
+        ]
+      },
+      "evidence": "Root cause confirmed: release-audit.py mencari literal if(!validateQuestion(q).ok)continue, tetapi main memakai if(!q||!validateQuestion(q).ok)continue; guard runtime tetap ada.",
+      "note": "Perbaikan dibatasi ke release-audit.py; tidak menyentuh fitur neural voice, SW, atau workflow audio yang dikunci T-026."
     }
   ],
   "last_report": {

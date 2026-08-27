@@ -100,7 +100,13 @@ check('Placement blueprint defined',blueprint=={l:{'vocab':10,'grammar':7,'readi
 # Integrity guard / adaptive
 app=open(ROOT/'app.js',encoding='utf8').read()
 for name,needle in [('Central question integrity guard','function validateQuestion'),('Render-time integrity gate','if(!validateQuestion(q).ok)continue'),('Evidence adaptive gate','hs.length>=24&&skills.size>=3&&types.size>=2'),('No hardcoded adaptive 150 gate','state.totalAnswered>=150')]:
- check(name, (needle in app) if name!='No hardcoded adaptive 150 gate' else (needle not in app), needle)
+ if name=='Render-time integrity gate':
+  ok = re.search(r'if\([^;\n]*validateQuestion\(q\)\.ok\)\s*continue', app) is not None
+  details = 'render loop validates each question before continuing'
+ else:
+  ok = (needle in app) if name!='No hardcoded adaptive 150 gate' else (needle not in app)
+  details = needle
+ check(name, ok, details)
 # Security and optional AI integration
 runtime_names=['index.html','app.js','style.css','sw.js','version.js','manifest.json','report-config.js','core-config.js','fiezel-report-worker.js','fiezel-core-worker.js','creator-report-setup.html','creator-report-dashboard.html']; alltxt='\n'.join((ROOT/f).read_text(errors='ignore') for f in runtime_names)
 direct_ai=len(re.findall(r'fetch\([^)]*(?:gemini|openai|anthropic|generativelanguage)|https?://[^\s\'\"]*(?:api\.openai|googleapis|api\.anthropic)',alltxt,re.I)); keys=len(re.findall(r'(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})',alltxt))
