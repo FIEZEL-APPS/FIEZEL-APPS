@@ -27,6 +27,27 @@
  *   L4 speechSynthesis peramban .... speakWithBrowser()   <- lapisan terakhir yang bersuara
  *   L5 teks tanpa suara ............ resolve(false), pemanggil menampilkan teksnya
  *
+ * S6 — LAPISAN CLOUDFLARE, DUA SISIPAN DAN TIDAK LEBIH. Saat
+ * `FIEZEL_CF_CONFIG.endpoints.tts === 'on'` (dan `enabled:true` + `base` terisi), tangga di
+ * atas menjadi:
+ *
+ *   C0 cache Cache API klien ....... cfCachedFirst()      <- alamat R2 yang pernah berhasil
+ *   L1 aset R2/ElevenLabs .......... speakFromAssets()     (tidak diubah)
+ *   C1 POST /api/tts/render ........ speakWithCloudflare() <- sisipan kedua
+ *   L2 -> L3 -> L4 -> L5 ........... tidak diubah, satu baris pun
+ *
+ * SAAT FLAG BUKAN 'on', `cfEnabled()` menjawab false dan tangga ini SAMA PERSIS dengan hari
+ * ini: `afterAssets()` memanggil `speakWithEngine()` langsung, tidak ada satu pun permintaan
+ * jaringan tambahan, tidak ada Cache API yang dibuka. Itu properti yang dijaga gerbang
+ * `tts-transport-switch-test.js` butir (a), dan alasannya sederhana: tangga ini baru selesai
+ * diperbaiki dua kali (kebisuan murid baru m026-BUG2, prefetch neural v5) dan tidak boleh
+ * berubah perilaku demi jalur yang belum pernah hidup di perangkat murid.
+ *
+ * SELURUH pengetahuan tentang Cloudflare — alamat, badan permintaan, allowlist, cache klien,
+ * memo kuota, penolakan URL jembatan — tinggal di `fiezel-cf-tts-transport.js`. Berkas ini
+ * hanya tahu URUTAN. Itu sengaja: urutan tangga adalah satu-satunya hal yang pernah salah
+ * berulang kali di sini.
+ *
  * Sampai perbaikan ini L4 tidak pernah tercapai justru pada kasus yang paling penting:
  * murid BARU, yang aset neuralnya belum diunduh, mendapat senyap total karena L3
  * mengembalikan false alih-alih meneruskan ke bawah. Penjaga unduhan 152 MB di L3 tidak
@@ -73,6 +94,46 @@
 
   function engine() { return root.FiezelPuterVoice || null; }
   function translator() { return root.FiezelSubtitleTranslate || null; }
+
+  /**
+   * S6 — pintu Cloudflare. Dua pemeriksaan, dan keduanya wajib:
+   *
+   *   1. modulnya ADA (`fiezel-cf-tts-transport.js` sudah dimuat, bukan gagal 404);
+   *   2. flagnya 'on' (`isOn()`, yang juga menuntut `enabled:true` + `base` terisi).
+   *
+   * Kalau salah satu tidak terpenuhi, jawabannya null dan tangga berjalan seperti hari ini.
+   * Modul yang absen HARUS berarti aman, bukan berarti galat: berkas ini dimuat malas lewat
+   * `FiezelLazy`, dan satu berkas yang gagal diunduh di jaringan buruk tidak boleh
+   * mendiamkan murid yang jalur L1/L2/L4-nya sehat.
+   */
+  function cfTransport() {
+    var mod = root.FiezelCfTtsTransport;
+    if (!mod || typeof mod.render !== 'function' || typeof mod.isOn !== 'function') return null;
+    try { return mod.isOn() ? mod : null; } catch (_) { return null; }
+  }
+
+  function cfEnabled() { return !!cfTransport(); }
+
+  /** Permintaan render TANPA `speed`. Lihat catatan aturan 2 di fiezel-cf-tts-transport.js. */
+  function cfRequest(english, opts) {
+    return {
+      text: english,
+      locale: opts.locale || 'en-US',
+      contentType: opts.contentType || 'sentence'
+    };
+  }
+
+  /**
+   * Pemberitahuan kuota/degradasi. Ia hanya BERBICARA; ia tidak pernah mengunci item dan
+   * tidak pernah menyentuh hitungan replay (bug m025-170). Modul naskah absen berarti tidak
+   * ada pemberitahuan — bukan pengecualian yang menjatuhkan kalimat yang sedang berbunyi.
+   */
+  function notify(copyKey, detail) {
+    if (!copyKey) return null;
+    var mod = root.FiezelCfVoiceNotice;
+    if (!mod || typeof mod.emit !== 'function') return null;
+    try { return mod.emit(copyKey, detail || {}); } catch (_) { return null; }
+  }
 
   /**
    * m025-121 mesin cadangan di perangkat.
@@ -155,15 +216,74 @@
       prepareSubtitle(english, indonesian);
     }
 
+    // Saat flag 'off' baris ini adalah SATU-SATUNYA percabangan tambahan di seluruh jalur
+    // bicara, dan ia langsung masuk ke L1 seperti hari ini.
+    if (!cfEnabled()) return speakFromAssets(english, opts, band_);
+    return cfCachedFirst(english, opts, band_);
+  }
+
+  /**
+   * C0 — lapisan paling atas saat flag 'on'. Ia hanya membaca Cache API di perangkat: nol
+   * permintaan jaringan, nol kuota, nol byte lewat origin. Isinya bukan audio, melainkan
+   * ALAMAT R2 yang pernah berhasil diputar untuk kalimat ini; byte-nya sendiri sudah dipegang
+   * cache resolver, jadi memutarnya tetap lewat `playUrl()` yang sama dengan L1.
+   *
+   * Gagal di sini SELALU berarti "lanjut ke L1", bukan "diam": cache adalah percepatan, dan
+   * percepatan yang bisa mendiamkan murid bukan percepatan.
+   */
+  function cfCachedFirst(english, opts, band_) {
+    var cf = cfTransport();
     var store = assets();
-    if (!store) return speakWithEngine(english, opts, band_);
+    if (!cf || !store || typeof store.playUrl !== 'function' || typeof cf.cachedUrl !== 'function') {
+      return speakFromAssets(english, opts, band_);
+    }
+    var req = cfRequest(english, opts);
+    return Promise.resolve(cf.cachedUrl(req)).then(function (url) {
+      if (!url) return speakFromAssets(english, opts, band_);
+      return playFromUrl(store, url, opts, band_).then(function (played) {
+        if (played) return true;
+        return speakFromAssets(english, opts, band_);
+      });
+    }, function () {
+      return speakFromAssets(english, opts, band_);
+    });
+  }
+
+  /**
+   * Memutar URL objek R2 LANGSUNG dari `audio.fiezel.my.id`, bukan lewat jembatan PHP origin.
+   * `speed` diterapkan di sini sebagai `playbackRate` — itulah sebabnya ia tidak perlu, dan
+   * tidak boleh, menjadi bagian identitas suara di badan permintaan render.
+   */
+  function playFromUrl(store, url, opts, band_) {
+    try {
+      return Promise.resolve(store.playUrl(url, {
+        speed: opts.speed,
+        onProgress: function (currentTime, duration) {
+          if (band_) band_.update(currentTime, duration);
+        }
+      })).then(function (played) {
+        if (played) { if (band_) band_.end(); return true; }
+        return false;
+      }, function () { return false; });
+    } catch (_) {
+      return Promise.resolve(false);
+    }
+  }
+
+  /**
+   * L1 — badan say() sebelum S6, tanpa perubahan perilaku. Satu-satunya bedanya: sasaran
+   * jatuhnya kini `afterAssets()`, yang saat flag 'off' identik dengan `speakWithEngine()`.
+   */
+  function speakFromAssets(english, opts, band_) {
+    var store = assets();
+    if (!store) return afterAssets(english, opts, band_);
 
     return store.resolve({
       text: english,
       locale: opts.locale || 'en-US',
       contentType: opts.contentType || 'sentence'
     }).then(function (found) {
-      if (!found || found.state !== 'READY') return speakWithEngine(english, opts, band_);
+      if (!found || found.state !== 'READY') return afterAssets(english, opts, band_);
       return store.playUrl(found.url, {
         speed: opts.speed,
         onProgress: function (currentTime, duration) {
@@ -174,10 +294,82 @@
         // ditolak. Mesin runtime masih boleh mencoba: yang dijaga mandat adalah kredit,
         // dan mesin itu tidak memakainya.
         if (played) { if (band_) band_.end(); return true; }
-        return speakWithEngine(english, opts, band_);
+        return afterAssets(english, opts, band_);
       });
     }).catch(function () {
+      return afterAssets(english, opts, band_);
+    });
+  }
+
+  /**
+   * TITIK SISIP. Saat flag 'off' fungsi ini hanya meneruskan ke L2, jadi tangga hari ini utuh
+   * baris demi baris. Saat 'on' ia menyisipkan C1 di antara L1 dan L2 — posisi yang disengaja:
+   * sesudah aset yang sudah dibayar (gratis), sebelum Puter (kredit pihak ketiga).
+   */
+  function afterAssets(english, opts, band_) {
+    if (!cfEnabled()) return speakWithEngine(english, opts, band_);
+    return speakWithCloudflare(english, opts, band_);
+  }
+
+  /**
+   * C1 — `POST /api/tts/render`. Klien mengirim teks + parameter yang di-allowlist saja;
+   * kunci cache dihitung ULANG di server dan klien tidak pernah mengirimnya (badan permintaan
+   * dibangun di `fiezel-cf-tts-transport.js:renderBody`).
+   *
+   * TIGA HASIL, dan semuanya berujung pada murid mendengar sesuatu bila mungkin:
+   *   - ok + URL → diputar langsung dari R2, lalu alamatnya diingat untuk C0;
+   *   - 429 kuota habis → TURUN ke L2/L3/L4 dan naskah kuota ditampilkan, dengan varian jujur
+   *     bila ternyata tidak ada lapisan yang bersuara. Tidak mengunci, tidak menghitung replay;
+   *   - degradasi/galat/timeout → turun seperti kegagalan render lain.
+   */
+  function speakWithCloudflare(english, opts, band_) {
+    var cf = cfTransport();
+    var store = assets();
+    if (!cf) return speakWithEngine(english, opts, band_);
+    var req = cfRequest(english, opts);
+
+    return Promise.resolve(cf.render(req)).then(function (res) {
+      var out = res || {};
+      if (out.ok && out.url && store && typeof store.playUrl === 'function') {
+        return playFromUrl(store, out.url, opts, band_).then(function (played) {
+          if (played) {
+            // Diingat SESUDAH berhasil berbunyi. Mengingat URL yang belum pernah bisa diputar
+            // berarti menanam kegagalan yang sama di lapisan teratas untuk selamanya.
+            try { Promise.resolve(cf.remember(req, out.url)).catch(function () {}); } catch (_) {}
+            return true;
+          }
+          return descend(out, english, opts, band_);
+        });
+      }
+      return descend(out, english, opts, band_);
+    }, function () {
       return speakWithEngine(english, opts, band_);
+    });
+  }
+
+  /**
+   * Turun satu lapisan, lalu bicara jujur tentang apa yang terjadi.
+   *
+   * Naskahnya dipilih SESUDAH tahu hasilnya, bukan sebelum: hanya di titik ini kita tahu
+   * apakah murid akhirnya mendengar sesuatu (`spoken:true`, naskah "pakai suara perangkat
+   * dulu") atau tidak sama sekali (`spoken:false`, naskah jujur yang menyebut audionya tidak
+   * ada dan teksnya tetap bisa dibaca). Memutuskan naskah lebih awal adalah cara termudah
+   * menampilkan "pakai suara perangkat" pada murid yang sedang tidak mendengar apa pun.
+   */
+  function descend(res, english, opts, band_) {
+    var out = res || {};
+    var copyKey = out.status === 429 ? (out.copyKey || 'quota.tts.exhausted') : (out.copyKey || '');
+    return speakWithEngine(english, opts, band_).then(function (spoke) {
+      notify(copyKey, {
+        spoken: spoke === true,
+        resetAt: out.resetAt,
+        retryAfter: out.retryAfter,
+        layer: spoke === true ? 'fallback' : ''
+      });
+      return spoke;
+    }, function () {
+      notify(copyKey, { spoken: false, resetAt: out.resetAt, retryAfter: out.retryAfter });
+      return false;
     });
   }
 
@@ -393,6 +585,55 @@
     }
   }
 
+  /**
+   * S6 — C1 hangat. Prefetch memakai jalur CF yang SAMA dengan say(), sehingga kalimat
+   * berikutnya sudah ada di R2 (dan alamatnya sudah ada di C0) sebelum tombolnya ditekan.
+   *
+   * PAGAR 152 MB TETAP UTUH: tidak ada `prepare()`, `ensureReady()`, atau `prewarm()` di
+   * cabang ini, sama seperti `prefetchWithLocal()`. Jalur CF adalah panggilan HTTP, bukan
+   * inisialisasi mesin di perangkat, jadi ia tidak bisa memicu unduhan model.
+   *
+   * KEJUJURAN TENTANG BIAYA, dan ini batas nyata yang tidak ditutupi: `POST /api/tts/render`
+   * untuk kalimat yang BELUM ada di R2 memang bisa memakai kuota untuk kalimat yang mungkin
+   * tidak pernah didengar murid. Yang meredam bukan tebakan, melainkan tiga hal yang bisa
+   * diperiksa: (1) C0 dibaca lebih dulu, jadi kalimat yang sudah hangat tidak mengirim apa
+   * pun; (2) cache hit di server TIDAK menyentuh kuota sama sekali (route-tts.js langkah 2
+   * menjawab sebelum langkah 4), sehingga korpus yang sudah dipra-render gratis; (3) memo 429
+   * di transport mematikan seluruh jalur CF sesudah penolakan pertama, termasuk untuk prefetch.
+   * Kalau kelak biaya spekulatif ini terukur terlalu mahal, yang dimatikan adalah cabang INI —
+   * bukan `render()`, dan bukan tangga bicaranya.
+   */
+  function prefetchWithCloudflare(english, opts) {
+    var cf = cfTransport();
+    if (!cf) return prefetchWithEngine(english, opts);
+    var req = cfRequest(english, opts);
+    var cached = typeof cf.cachedUrl === 'function' ? Promise.resolve(cf.cachedUrl(req)) : Promise.resolve('');
+    return cached.then(function (url) {
+      // Sudah hangat: nol permintaan, nol kuota.
+      if (url) return true;
+      return Promise.resolve(cf.render(req)).then(function (res) {
+        var out = res || {};
+        if (out.ok && out.url) {
+          return Promise.resolve(cf.remember(req, out.url)).then(function () { return true; }, function () { return true; });
+        }
+        // 429/degradasi/galat: hangatkan lapisan di bawahnya, DIAM-DIAM. Prefetch tidak
+        // pernah memunculkan pemberitahuan — murid tidak menekan apa pun untuk memicunya,
+        // jadi ia juga tidak berhak mendapat toast karenanya.
+        return prefetchWithEngine(english, opts);
+      }, function () {
+        return prefetchWithEngine(english, opts);
+      });
+    }, function () {
+      return prefetchWithEngine(english, opts);
+    });
+  }
+
+  /** Titik sisip prefetch. Saat flag 'off' ia identik dengan prefetchWithEngine(). */
+  function prefetchAfterAssets(english, opts) {
+    if (!cfEnabled()) return prefetchWithEngine(english, opts);
+    return prefetchWithCloudflare(english, opts);
+  }
+
   /** L2 hangat, dengan memo kredit yang sama seperti speakWithEngine(). */
   function prefetchWithEngine(english, opts) {
     var voice = engine();
@@ -441,11 +682,11 @@
         : Promise.resolve(false);
       run = ahead.then(function (cached) {
         if (cached) return true;
-        return prefetchWithEngine(english, opts);
+        return prefetchAfterAssets(english, opts);
       }, function () {
         // Resolver gagal (manifest/jaringan) bukan alasan melewatkan lapisan di bawahnya:
         // justru kalimat inilah yang paling butuh mesin di perangkat.
-        return prefetchWithEngine(english, opts);
+        return prefetchAfterAssets(english, opts);
       });
     } catch (_) {
       run = Promise.resolve(false);
@@ -486,7 +727,14 @@
       browserBreakerOpen: browserBreakerIsOpen(),
       browserBreakerCooldownMs: BROWSER_COOLDOWN_MS,
       subtitleReady: !!subtitles(),
-      translatorReady: !!translator()
+      translatorReady: !!translator(),
+      // S6 — dilaporkan supaya panel Diagnostics bisa menjawab "jalur mana yang dipakai"
+      // tanpa menebak dari perilaku. false berarti tangga hari ini, apa adanya.
+      cfVoiceEnabled: cfEnabled(),
+      cfVoiceMode: (function () {
+        var mod = root.FiezelCfTtsTransport;
+        try { return mod && typeof mod.mode === 'function' ? mod.mode() : 'off'; } catch (_) { return 'off'; }
+      }())
     });
   }
 
