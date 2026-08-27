@@ -53,7 +53,6 @@ const cssNorm = s => squeeze(s).replace(/;\}/g, '}');
  * Perancah
  * ------------------------------------------------------------------ */
 
-const MOTIF_NOTES = 3;
 const NOW = Date.parse('2026-08-21T04:00:00Z');
 
 function el(tag) {
@@ -134,7 +133,9 @@ function fakeAudio(state) {
       start: t => scheduled.push({ kind: 'osc', at: t }),
       stop: () => {}
     }),
-    createBuffer: (_c, len) => ({ getChannelData: () => new Float32Array(len) })
+    createBuffer: (_c, len) => ({ getChannelData: () => new Float32Array(len) }),
+    // m029: sampel .ogg didekode, bukan disintesis - fake-nya cukup mengembalikan buffer kosong.
+    decodeAudioData: (raw, yes) => { const buf = { duration: 0.4 }; if (yes) yes(buf); return Promise.resolve(buf); }
   };
   function param() {
     return { value: 0, setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime() {} };
@@ -148,6 +149,8 @@ function audioEnv(state) {
   let ctx = null;
   const env = {
     AudioContext: function () { ctx = fakeAudio(state); return ctx; },
+    // m029: fasad mengunduh .ogg lewat fetch sebelum mendekodenya.
+    fetch: () => Promise.resolve({ ok: true, arrayBuffer: () => Promise.resolve(new ArrayBuffer(4)) }),
     navigator: { userActivation: { hasBeenActive: state === 'running' } },
     document: {
       addEventListener: (t, fn) => { (listeners[t] = listeners[t] || []).push(fn); },
@@ -213,8 +216,9 @@ test('CSS kritis adalah salinan APA ADANYA dari style.css, bukan desain kedua ya
   const drifted = rules.filter(rule => !compactCss.includes(cssNorm(rule)));
   assert.deepStrictEqual(drifted, [],
     'aturan berikut sudah berbeda dari style.css - salin ulang blok kritisnya:\n      ' + drifted.join('\n      '));
-  // ...dan sebaliknya: koreografi logo tidak boleh cuma sebagian.
-  ['fz-logo-stem', 'fz-logo-arm', 'fz-logo-bar', 'fz-logo-sheen', 'fz-splash-rise', 'fz-splash-halo']
+  // ...dan sebaliknya: keyframe yang dipakai splash v4 tidak boleh cuma sebagian.
+  // (v4/OA-6: gerak utama digambar JS; CSS hanya butuh transisi halaman + pudar kurangi-gerak.)
+  ['fzm-page-in', 'fzm-page-out', 'fz-fade-in']
     .forEach(name => assert.ok(compactCritical.includes('@keyframes' + name),
       '@keyframes ' + name + ' harus ikut disalin; tanpa itu splash frame-pertama diam lalu tersentak saat style.css tiba'));
 });
@@ -294,24 +298,39 @@ test('menutup splash mengembalikan latar aplikasi dan membatalkan motif yang mas
     'motif yang belum berbunyi harus dibatalkan bersama splash - inilah pagar terakhir sebelum ia bocor ke menu');
 });
 
-test('splash meneruskan umur tayangnya ke motif sebagai tenggat', () => {
+test('splash membunyikan splash_intro lewat fasad, dengan nama dari tabel koreografi', () => {
+  // v4: sapaan pembuka adalah sampel splash_intro.ogg yang diputar lewat FiezelUiSfx.play()
+  // - bukan lagi motif osilator. Fasadnya sendiri yang memegang izin, preferensi, dan jatah.
   const seen = [];
   const env = fakeEnv({
     bootSplash: true,
     bootElapsedMs: 0,
-    FiezelUiSfx: { playMotif: (_e, o) => { seen.push(o); return false; }, cancelPending: () => true }
+    FiezelUiSfx: { play: name => { seen.push(name); return true; }, cancelPending: () => true }
   });
   splash.show(env, { now: NOW, force: true });
-  assert.strictEqual(seen.length, 1);
-  assert.strictEqual(seen[0].windowMs, splash.VISIBLE_MS,
-    'windowMs harus sama dengan sisa waktu tayang splash; itulah yang mengikat motif ke layarnya sendiri');
+  assert.deepStrictEqual(seen, ['splash_intro'],
+    'splash harus meminta tepat satu bunyi pembuka, dan namanya splash_intro');
+});
+
+test('adopsi yang terlambat memilih SENYAP, bukan nada pembuka yang menyusul', () => {
+  // Pagar pengganti windowMs lama: nada pembuka hanya pantas di ketukan pertamanya.
+  // Splash yang diadopsi jauh setelah ketukan itu lewat tidak boleh membunyikannya telat.
+  const seen = [];
+  const env = fakeEnv({
+    bootSplash: true,
+    bootElapsedMs: 800,
+    FiezelUiSfx: { play: name => { seen.push(name); return true; }, cancelPending: () => true }
+  });
+  splash.show(env, { now: NOW, force: true });
+  assert.deepStrictEqual(seen, [],
+    'ketukan pertama sudah lewat ' + 800 + 'ms saat splash diadopsi - bunyinya harus dibuang, bukan diantre');
 });
 
 /* ------------------------------------------------------------------ *
  * 2. SFX yang muncul belakangan
  * ------------------------------------------------------------------ */
 
-test('AKAR BUG: motif splash TIDAK PERNAH dijadwalkan ke konteks yang masih terkunci', () => {
+test('AKAR BUG: sapaan splash TIDAK PERNAH dijadwalkan ke konteks yang masih terkunci', () => {
   sfx.__reset();
   const env = audioEnv('suspended');
   const played = sfx.playMotif(env, { windowMs: 2600 });
@@ -321,15 +340,16 @@ test('AKAR BUG: motif splash TIDAK PERNAH dijadwalkan ke konteks yang masih terk
   assert.ok(sfx.pendingMotif(), 'motif harus disiagakan, dengan tenggat');
 });
 
-test('motif yang disiagakan berbunyi pada sentuhan pertama SELAMA splash masih tampil', () => {
+test('sapaan yang disiagakan berbunyi pada sentuhan pertama SELAMA splash masih tampil', () => {
   sfx.__reset();
   const env = audioEnv('suspended');
   sfx.playMotif(env, { windowMs: 2600 });
   assert.ok(env._bound('pointerdown') > 0, 'pembuka audio harus terpasang di fase capture dokumen');
   env._fire('pointerdown');
-  return Promise.resolve().then(() => {
-    assert.strictEqual(sfx.pendingMotif(), null, 'motif harus dilepas dari siaga begitu berbunyi');
-    assert.ok(env._ctx && env._ctx._scheduled.length > 0, 'motif harus benar-benar dijadwalkan setelah audio terbuka');
+  // resume() lalu fetch+decode sampel - keduanya asinkron; beri waktu satu-dua tick.
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.strictEqual(sfx.pendingMotif(), null, 'sapaan harus dilepas dari siaga begitu berbunyi');
+    assert.ok(env._ctx && env._ctx._scheduled.length > 0, 'sapaan harus benar-benar dijadwalkan setelah audio terbuka');
   });
 });
 
@@ -371,20 +391,26 @@ test('SFX transisi juga tidak diantre ke konteks terkunci', () => {
     'menjadwalkan ke konteks suspended berarti menitipkan bunyi ke sentuhan berikutnya - persis pola bug ini');
 });
 
-test('audio yang sudah terbuka membunyikan motif SEKARANG, di layar splashnya sendiri', () => {
+test('audio yang sudah terbuka membunyikan sapaan SEKARANG, di layar splashnya sendiri', () => {
   sfx.__reset();
   const env = audioEnv('running');
   const played = sfx.playMotif(env, { windowMs: 2600 });
   assert.strictEqual(played, true);
   assert.strictEqual(sfx.pendingMotif(), null, 'tidak ada yang perlu disiagakan kalau bunyinya sudah keluar');
-  assert.ok(env._ctx._scheduled.length >= MOTIF_NOTES, 'seluruh nada motif harus dijadwalkan');
+  // Sampel diambil dan didekode secara asinkron sebelum sumbernya di-start.
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.ok(env._ctx._scheduled.length >= 1, 'sampel sapaan harus benar-benar dijadwalkan');
+  });
 });
 
 test('audio yang sudah terbuka membunyikan SFX transisi seketika', () => {
   sfx.__reset();
   const env = audioEnv('running');
   assert.strictEqual(sfx.play('nav', env), true);
-  assert.ok(env._ctx._scheduled.length > 0);
+  // Pemutaran pertama menunggu unduhan+dekode sampelnya (asinkron, dalam tenggat).
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.ok(env._ctx._scheduled.length > 0);
+  });
 });
 
 test('preferensi murid tetap berkuasa penuh di atas seluruh mekanisme siaga', () => {
