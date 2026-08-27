@@ -78,6 +78,7 @@ jobs:
           node paw-mascot-test.js
           node voice-offline-fallback-test.js
           node voice-fallback-chain-test.js
+          node voice-pipeline-gap-test.js
           node audio-asset-pipeline-test.js
           node product-audit.js
           node runtime-stage8-test.js
