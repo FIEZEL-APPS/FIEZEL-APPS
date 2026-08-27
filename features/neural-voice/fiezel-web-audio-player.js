@@ -57,6 +57,98 @@
   const SILENCE_FLOOR = 0.0025;
   const TRIM_KEEP_S = 0.012;
 
+  // =========================================================================================
+  // m025-73 PEMUTAR BERPIPA (pipelined player)
+  // =========================================================================================
+  //
+  // MASALAH YANG DIPERBAIKI. Sampai m025-72 sintesis dan pemutaran berjalan BERURUTAN pada
+  // batas kalimat: potongan N+1 baru masuk mesin setelah potongan N selesai berbunyi, jadi
+  // SELURUH waktu generate terdengar sebagai keheningan. Di perangkat OWNER satu potongan
+  // pendek memakan sekitar 0,6-1,5 detik pada 4 langkah denoising, dan itulah "delay di setiap
+  // titik" yang dilaporkan - bukan cacat model, bukan cacat prosodi.
+  //
+  // BENTUK PERBAIKANNYA ADA DI SINI, DI LAPISAN PEMUTAR, karena hanya pemutar yang memegang
+  // dua hal yang dibutuhkan sekaligus: garis waktu AudioContext (satu-satunya jam yang benar)
+  // dan buffer PCM yang sudah jadi. Dua aturannya:
+  //   1. generate N+1 dimulai SEGERA setelah N dijadwalkan, bukan setelah N selesai berbunyi;
+  //   2. penjadwalan memakai KURSOR garis waktu (`start(when)`), bukan event `ended`.
+  // Menunggu `ended` lalu memulai potongan berikutnya selalu menyisakan celah sebesar satu
+  // giliran event-loop + latensi keluaran perangkat, dan di iOS itu bisa puluhan milidetik
+  // bahkan ketika PCM-nya sudah siap sejak tadi.
+
+  // Berapa potongan yang boleh digenerasi di depan. 2 sudah cukup untuk menutup satu waktu
+  // generate penuh dengan satu potongan yang sedang berbunyi; lebih dalam dari itu hanya
+  // menumpuk PCM di RAM ponsel tanpa menutup celah tambahan.
+  const PIPELINE_LOOKAHEAD_CHUNKS = 2;
+  // Batas keras jumlah potongan yang tertahan (terjadwal + siap) sebelum pipa menahan diri.
+  // Satu potongan kalimat ~2 detik pada 44,1 kHz mono = ~350 KB Float32; 3 potongan ~1 MB,
+  // aman untuk ponsel kelas bawah.
+  const PIPELINE_MAX_QUEUED_CHUNKS = 3;
+  // Jarak aman minimal antara "sekarang" dan `start(when)` untuk potongan pertama. Menjadwalkan
+  // tepat di `currentTime` berarti bersaing dengan render quantum yang sedang berjalan dan
+  // menghasilkan potongan awal yang terpotong.
+  const SCHEDULE_LEAD_S = 0.03;
+  // Ambang menyambung ANTAR PANGGILAN `play()`. Audit V1 (reports/voice-v1-audit.md) menemukan
+  // pemanggil produksi mengirim SATU kalimat per panggilan, sehingga `chunks.length === 1` dan
+  // pemutar selalu menerima `continuous:false, trim:false`. Akibatnya seluruh mesin gapless
+  // yang sudah ada mati di produksi: jeda terdengar 4.422 ms per titik, 733 ms di antaranya
+  // keheningan PCM yang tidak pernah dipangkas. Karena itu kontinuitas TIDAK LAGI ditentukan
+  // oleh flag pemanggil, melainkan oleh kenyataan garis waktu: kalau kursor masih di depan
+  // `currentTime` lebih dari ambang ini, ada bunyi yang sedang berjalan dan potongan baru
+  // disambung ke ujungnya. Ambang kecil (10 ms) supaya sisa kursor yang praktis sudah habis
+  // tidak dianggap bisa disambung.
+  const CROSS_CALL_JOIN_MIN_LEAD_S = 0.01;
+
+  /**
+   * JEDA PROSODI YANG DISENGAJA. Tujuan pekerjaan ini BUKAN menghapus semua jeda - jeda adalah
+   * bagian dari bahasa, dan murid pemula justru butuh ruang bernapas untuk mencerna. Yang
+   * dihapus adalah jeda TIDAK SENGAJA (waktu generate + keheningan sisa di ujung PCM). Sesudah
+   * itu jeda dipasang kembali di sini, dengan nilai yang diketahui dan bisa disetel.
+   *
+   * Nilai awal (detik), dikalibrasi ke ritme bicara guru pada kecepatan 1,0:
+   *   clause     0,09  koma/titik dua - hanya penanda frasa, lebih panjang terdengar tersendat
+   *   sentence   0,22  titik/tanya/seru - batas gagasan; di bawah 0,15 dua kalimat menempel
+   *   paragraph  0,45  pindah paragraf - batas topik, tempat murid boleh mengejar makna
+   *   none       0     lanjutan di tengah kalimat: WAJIB nol, ini seam yang harus mulus
+   */
+  const PROSODY_GAP_DEFAULT_S = Object.freeze({ none: 0, clause: 0.09, sentence: 0.22, paragraph: 0.45 });
+  const PROSODY_BOUNDARIES = Object.freeze(['none', 'clause', 'sentence', 'paragraph']);
+  // Ambang untuk MENERJEMAHKAN petunjuk jeda dari lapisan atas (ms) menjadi KELAS batas.
+  // Ambang ini mengklasifikasikan petunjuk; panjang jedanya sendiri tetap datang dari
+  // PROSODY_GAP_DEFAULT_S di atas, supaya hanya ada SATU tempat untuk menyetel ritme.
+  const PROSODY_HINT_SENTENCE_MS = 220;
+  const PROSODY_HINT_PARAGRAPH_MS = 420;
+
+  /** Gabungan konstanta bawaan dengan override pemanggil; nilai non-angka diabaikan. */
+  function resolveProsodyGaps(overrides) {
+    const out = {};
+    PROSODY_BOUNDARIES.forEach((key) => {
+      const candidate = Number(overrides && overrides[key]);
+      out[key] = Number.isFinite(candidate) && candidate >= 0 ? candidate : PROSODY_GAP_DEFAULT_S[key];
+    });
+    return Object.freeze(out);
+  }
+
+  /** Kelas batas dari teks yang BARU SAJA diucapkan (potongan sebelumnya). */
+  function boundaryFromText(text) {
+    const value = String(text == null ? '' : text);
+    if (!value.trim()) return 'none';
+    if (/\n\s*\n\s*$/.test(value)) return 'paragraph';
+    const tail = value.replace(/[\s"'”’)\]]+$/, '');
+    if (/[.!?…]$/.test(tail)) return 'sentence';
+    if (/[,;:—-]$/.test(tail)) return 'clause';
+    return 'none';
+  }
+
+  /** Kelas batas dari petunjuk milidetik lapisan atas. Lihat catatan ambang di atas. */
+  function boundaryFromGapMs(gapMs) {
+    const value = Number(gapMs);
+    if (!Number.isFinite(value) || value <= 0) return 'none';
+    if (value >= PROSODY_HINT_PARAGRAPH_MS) return 'paragraph';
+    if (value >= PROSODY_HINT_SENTENCE_MS) return 'sentence';
+    return 'clause';
+  }
+
   function pickSamples(rawAudio) {
     if (!rawAudio) return null;
     if (rawAudio.audio instanceof Float32Array) return rawAudio.audio;
@@ -489,6 +581,25 @@
     let activePlaybackEpoch = 0;
     const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+    // --- keadaan pipa berkelanjutan -------------------------------------------------------
+    // Kursor garis waktu AudioContext (detik). Ini SATU-SATUNYA sumber "kapan potongan
+    // berikutnya mulai"; tidak ada satu pun jalur di bawah yang menunggu event `ended` untuk
+    // memulai potongan berikutnya.
+    let pipelineCursor = 0;
+    // Dinaikkan oleh stop()/cancel(). Pipa yang sedang berjalan membandingkan nilainya sebelum
+    // menjadwalkan potongan berikutnya, jadi potongan yang generate-nya selesai SESUDAH murid
+    // pindah layar tidak pernah sampai ke destination - itu sumber "suara hantu".
+    let pipelineGeneration = 0;
+    let pipelineScheduledCount = 0;
+    // Berapa kali PCM datang terlambat (kursor sudah lewat): satu-satunya celah yang tersisa
+    // secara sah, dan angka yang harus dipantau kalau mesin lebih lambat dari realtime.
+    let pipelineUnderruns = 0;
+    const prosodyGaps = resolveProsodyGaps(settings.prosodyGaps);
+    const pipelineLookahead = Math.max(1, Math.min(
+      PIPELINE_MAX_QUEUED_CHUNKS,
+      Math.floor(Number(settings.lookaheadChunks) > 0 ? Number(settings.lookaheadChunks) : PIPELINE_LOOKAHEAD_CHUNKS)
+    ));
+
     function playbackEpoch() {
       if (!appleStandalone) return 0;
       return Math.max(0, Math.floor(Number(env.__fiezelPcmPlaybackEpoch) || 0));
@@ -691,6 +802,18 @@
       });
       source = null;
       sourceGain = null;
+    }
+
+    /**
+     * Apakah masih ada bunyi terjadwal yang bisa disambung? Dipakai supaya antrean menyambung
+     * LINTAS PANGGILAN `play()`/`enqueue()`, bukan hanya di dalam satu panggilan. Konteks dibaca
+     * dari penyimpanan bersama (`env.__fiezelWebAudioContext`) supaya keputusan ini bisa diambil
+     * sebelum `resumeContext()` dan tanpa pernah membuat AudioContext baru.
+     */
+    function timelineJoinable() {
+      const ctx = env.__fiezelWebAudioContext;
+      if (!ctx || !pipelineCursor) return false;
+      return pipelineCursor > contextTime(ctx) + CROSS_CALL_JOIN_MIN_LEAD_S;
     }
 
     function scheduledUntil(ctx) {
@@ -906,17 +1029,278 @@
       };
     }
 
+    /**
+     * Kelas batas untuk satu panggilan enqueue.
+     *
+     * Urutan: `boundary` eksplisit -> teks potongan SEBELUMNYA -> petunjuk `gapMs` dari lapisan
+     * atas. `gapMs` TIDAK dipakai sebagai panjang jeda, hanya sebagai penanda kelas: kalau dua
+     * lapisan sama-sama menambahkan jeda, murid mendengar keduanya berturut-turut dan hasilnya
+     * justru lebih lambat dari sebelum diperbaiki.
+     */
+    function resolveBoundary(opts) {
+      const explicit = String(opts && opts.boundary || '').toLowerCase();
+      if (PROSODY_BOUNDARIES.includes(explicit)) return explicit;
+      if (opts && typeof opts.previousText === 'string' && opts.previousText) return boundaryFromText(opts.previousText);
+      if (opts && opts.gapMs != null) return boundaryFromGapMs(opts.gapMs);
+      return 'none';
+    }
+
+    /**
+     * Menjadwalkan satu potongan pada garis waktu yang berkelanjutan dan langsung kembali.
+     *
+     * Tiga hal yang membuatnya tidak berceleh:
+     *   - `start(startAt)` dengan startAt = kursor + jeda prosodi, bukan `start()` "sekarang";
+     *   - kursor maju sebesar durasi potongan, jadi potongan berikutnya sudah punya tempat
+     *     bahkan sebelum potongan ini terdengar;
+     *   - keheningan tak sengaja di kedua ujung PCM dipotong lebih dulu, sehingga satu-satunya
+     *     keheningan yang tersisa di sambungan adalah jeda prosodi yang kita pilih sendiri.
+     *
+     * Tidak ada `onended` di jalur ini. Penyelesaian dicatat oleh timer pada waktu akhir yang
+     * SUDAH diketahui saat penjadwalan; `ended` hanya dipakai kalau pemutaran perlu menunggu
+     * bunyi selesai untuk memulai yang berikutnya - dan justru itu yang dihapus.
+     */
+    async function enqueue(rawAudio, options) {
+      const opts = options || {};
+      if (!AudioContextCtor) throw new Error('Web Audio API unavailable');
+      let samples = pickSamples(rawAudio);
+      if (!samples || !samples.length) throw new Error('Unsupported Kokoro audio payload');
+      const sampleRate = pickSampleRate(rawAudio);
+      // Trim default AKTIF di pipa: keheningan kepala/ekor dari model adalah jeda tidak
+      // sengaja. Ambangnya SILENCE_FLOOR dengan TRIM_KEEP_S sampel yang tetap disisakan di
+      // kedua ujung, supaya awal kata dan ekor konsonan tidak ikut terpotong.
+      // Audit V1: pemanggil produksi mengirim SATU kalimat per panggilan dan menyertakan
+      // `trim:false`; itulah sebabnya 733 ms keheningan per batas tetap berbunyi. Karena itu
+      // `trim:false` tidak lagi mematikan pemangkasan - hanya `trim:'off'` yang eksplisit.
+      const trimRequested = opts.trim !== 'off' && diagnosticMode !== 'raw';
+      if (trimRequested) samples = trimSilence(samples, sampleRate);
+      if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
+      if (!samples.length) throw new Error('Unsupported Kokoro audio payload');
+
+      // Menyambung LINTAS PANGGILAN: potongan tunggal dari `speak()` berikutnya tetap masuk ke
+      // garis waktu yang sama selama masih ada bunyi terjadwal. `interrupt:true` memaksa putus.
+      const joined = opts.interrupt === true ? false : (opts.continuous === true || timelineJoinable());
+      const generationAtEntry = pipelineGeneration;
+      const epoch = reservePlaybackEpoch(joined);
+      // SATU AudioContext untuk seumur halaman. resumeContext() memakai instance bersama di
+      // env.__fiezelWebAudioContext dan hanya me-resume; tidak ada konstruksi per potongan,
+      // karena iOS membatasi jumlah AudioContext dan menolak yang dibuat di luar gesture.
+      const current = await resumeContext();
+      if (!current) throw new Error('Web Audio API unavailable');
+      if (pipelineGeneration !== generationAtEntry) throw new Error('TTS playback superseded');
+      if (typeof current.createBuffer !== 'function' || typeof current.createBufferSource !== 'function') {
+        throw new Error('Web Audio API unavailable');
+      }
+
+      // Ucapan baru menggantikan yang lama: bersihkan yang terjadwal lalu mulai kursor dari nol.
+      if (!joined) { stopAll(current, epoch); pipelineCursor = 0; }
+
+      const boundary = resolveBoundary(opts);
+      const gapSeconds = joined ? (prosodyGaps[boundary] || 0) : 0;
+      const now = contextTime(current);
+      const floorAt = now + SCHEDULE_LEAD_S;
+      let base = pipelineCursor;
+      let underrun = false;
+      if (!(base > floorAt)) {
+        if (joined && pipelineCursor > 0) { underrun = true; pipelineUnderruns += 1; }
+        base = floorAt;
+      }
+      const startAt = base + gapSeconds;
+      const durationSeconds = samples.length / sampleRate;
+      pipelineCursor = startAt + durationSeconds;
+
+      const buffer = current.createBuffer(1, samples.length, sampleRate);
+      if (typeof buffer.copyToChannel === 'function') buffer.copyToChannel(samples, 0);
+      else buffer.getChannelData(0).set(samples);
+      const localSource = current.createBufferSource();
+      const localGain = makeGain(current);
+      localSource.buffer = buffer;
+      if (localGain) {
+        localSource.connect(localGain);
+        localGain.connect(current.destination);
+        // Fade sangat pendek di kedua ujung potongan: menghilangkan klik sambungan tanpa
+        // menambah keheningan yang bisa terdengar sebagai jeda.
+        rampGain(localGain, current, 0, 1, FADE_IN_S, startAt);
+        scheduleNaturalEndFade(localGain, current, durationSeconds, startAt);
+      } else {
+        localSource.connect(current.destination);
+      }
+
+      let resolveDone;
+      const done = new Promise((resolve) => { resolveDone = resolve; });
+      const trace = sink();
+      let holding = false;
+      let timer = null;
+      const release = () => {
+        if (!holding) return;
+        holding = false;
+        try { if (trace) trace.end(env); } catch (_) {}
+      };
+      const entry = {
+        kind: 'pipeline',
+        epoch,
+        node: localSource,
+        gain: localGain,
+        boundary,
+        gapSeconds,
+        startsAt: startAt,
+        endsAt: pipelineCursor,
+        underrun,
+        settled: false,
+        release,
+        // Dipanggil oleh stopAll(): potongan sudah ditandai settled di sana, jadi jalur ini
+        // hanya perlu memastikan `done` TETAP selesai - kalau tidak, pemanggil yang menunggu
+        // potongan terakhir akan menggantung setelah murid menekan berhenti.
+        resolve: () => { if (timer) clearTimeout(timer); resolveDone({ cancelled: true }); }
+      };
+      const finish = (cancelled) => {
+        if (entry.settled) return;
+        entry.settled = true;
+        if (timer) clearTimeout(timer);
+        queued = queued.filter((item) => item !== entry);
+        release();
+        resolveDone({ cancelled: cancelled === true });
+      };
+      entry.finish = finish;
+      queued.push(entry);
+      pipelineScheduledCount += 1;
+      try { if (trace) { trace.begin(); holding = true; } } catch (_) {}
+
+      try {
+        localSource.start(startAt);
+      } catch (error) {
+        finish(true);
+        throw error;
+      }
+      timer = setTimeout(() => finish(false), Math.max(1, Math.round((entry.endsAt - now) * 1000)) + FADE_OUT_MS);
+      return {
+        done,
+        startsAt: startAt,
+        endsAt: entry.endsAt,
+        boundary,
+        gapSeconds,
+        underrun,
+        trimmed: trimRequested,
+        joined,
+        diagnosticMode,
+        stop() {
+          if (entry.settled) return;
+          advancePlaybackEpoch();
+          queued = queued.filter((item) => item !== entry);
+          fadeAndStop(localSource, localGain, current);
+          finish(true);
+        }
+      };
+    }
+
+    /**
+     * Pemutaran BERPIPA untuk satu ucapan berpotongan-potongan.
+     *
+     * `generate(text, index)` adalah adapter mesin suara (dipanggil, tidak disentuh isinya).
+     * Pipa memanggilnya untuk `pipelineLookahead` potongan di DEPAN potongan yang sedang
+     * berbunyi, jadi waktu generate potongan N+1 dibayar oleh waktu bunyi potongan N - itulah
+     * seluruh perbaikan yang diminta owner. Tidak ada `prepare()`, `ensureReady()`, atau apa pun
+     * yang berhubungan dengan unduhan model di jalur ini: pipa hanya berbunyi dengan mesin yang
+     * SUDAH siap.
+     */
+    async function playSequence(items, generate, options) {
+      const opts = options || {};
+      if (typeof generate !== 'function') throw new Error('playSequence requires a generate function');
+      const list = (Array.isArray(items) ? items : []).map((item) => (
+        item && typeof item === 'object' ? { text: String(item.text || ''), boundary: item.boundary } : { text: String(item || '') }
+      )).filter((item) => item.text.length > 0);
+      if (!list.length) return { chunks: 0, scheduled: [], cancelled: false };
+
+      const myGeneration = pipelineGeneration;
+      const cancelled = () => pipelineGeneration !== myGeneration;
+      const inflight = [];
+      let issued = 0;
+      // Mengisi pipa. Dipanggil SEBELUM menunggu apa pun, supaya generate potongan berikutnya
+      // sudah berjalan selagi potongan sekarang berbunyi.
+      const fill = () => {
+        while (inflight.length < pipelineLookahead && issued < list.length && !cancelled()) {
+          const index = issued;
+          issued += 1;
+          inflight.push({
+            index,
+            promise: Promise.resolve()
+              .then(() => generate(list[index].text, index))
+              .then((value) => ({ ok: true, value }), (error) => ({ ok: false, error }))
+          });
+        }
+      };
+      fill();
+
+      const scheduled = [];
+      let last = null;
+      while (inflight.length) {
+        const head = inflight.shift();
+        const outcome = await head.promise;
+        if (cancelled()) return { chunks: list.length, scheduled, cancelled: true };
+        if (!outcome.ok) throw outcome.error;
+        const previous = head.index > 0 ? list[head.index - 1] : null;
+        const playback = await enqueue(outcome.value, {
+          continuous: head.index > 0,
+          trim: opts.trim,
+          boundary: previous ? previous.boundary : undefined,
+          previousText: previous ? previous.text : '',
+          signalGeneration: opts.signalGeneration
+        });
+        if (cancelled()) { try { playback.stop(); } catch (_) {} return { chunks: list.length, scheduled, cancelled: true }; }
+        scheduled.push({ index: head.index, startsAt: playback.startsAt, endsAt: playback.endsAt, boundary: playback.boundary, gapSeconds: playback.gapSeconds, underrun: playback.underrun });
+        last = playback;
+        // Isi ulang pipa DI SINI - sebelum menunggu apa pun. Ini baris yang memindahkan waktu
+        // generate ke belakang bunyi.
+        fill();
+        // Tekanan-balik memori, bukan tekanan-balik waktu: menunggu potongan TERTUA selesai
+        // tidak pernah membuat celah, karena potongan yang sedang berbunyi dan yang berikutnya
+        // sudah terjadwal di garis waktu.
+        while (queued.filter((entry) => entry.kind === 'pipeline' && !entry.settled).length >= PIPELINE_MAX_QUEUED_CHUNKS) {
+          const oldest = queued.find((entry) => entry.kind === 'pipeline' && !entry.settled);
+          if (!oldest) break;
+          await new Promise((resolve) => {
+            const at = Math.max(1, Math.round((oldest.endsAt - contextTime(env.__fiezelWebAudioContext)) * 1000));
+            setTimeout(resolve, at);
+          });
+          if (cancelled()) return { chunks: list.length, scheduled, cancelled: true };
+        }
+      }
+      if (last && last.done && typeof last.done.then === 'function') await last.done;
+      return { chunks: list.length, scheduled, cancelled: cancelled() };
+    }
+
+    function pipelineStats() {
+      return Object.freeze({
+        cursor: pipelineCursor,
+        generation: pipelineGeneration,
+        scheduledCount: pipelineScheduledCount,
+        underruns: pipelineUnderruns,
+        lookahead: pipelineLookahead,
+        maxQueued: PIPELINE_MAX_QUEUED_CHUNKS,
+        gaps: prosodyGaps,
+        pending: queued.filter((entry) => entry.kind === 'pipeline' && !entry.settled).length
+      });
+    }
+
     async function play(rawAudio, options) {
       const opts = options || {};
       // Pembanding WAV memang harus bisa berjalan tanpa Web Audio sama sekali; kalau ia masih
       // menuntut AudioContext, ia bukan pembanding independen.
       if (!AudioContextCtor && diagnosticMode !== 'wavref') throw new Error('Web Audio API unavailable');
-      const continuous = opts.continuous === true;
-      const epoch = reservePlaybackEpoch(continuous);
+      // Kontinuitas dari KENYATAAN garis waktu, bukan dari flag pemanggil. Pemanggil hanya bisa
+      // memaksa PUTUS (`interrupt:true`), yaitu kalau ucapan baru memang harus menggantikan
+      // ucapan lama, bukan menyambungnya.
+      const joined = opts.interrupt === true ? false : (opts.continuous === true || timelineJoinable());
+      const epoch = reservePlaybackEpoch(joined);
       let samples = pickSamples(rawAudio);
       if (!samples || !samples.length) throw new Error('Unsupported Kokoro audio payload');
       const sampleRate = pickSampleRate(rawAudio);
-      if (opts.trim) samples = trimSilence(samples, sampleRate);
+      // Pangkas keheningan SELALU, termasuk untuk potongan tunggal. Audit V1 mengukur 331 ms
+      // keheningan kepala + 361 ms ekor pada setiap potongan tunggal yang lolos tanpa dipangkas:
+      // 733 ms, yaitu 16,6% dari jeda 4.422 ms yang dikeluhkan owner. `trim:false` dari pemanggil
+      // lama TIDAK lagi mematikan pemangkasan; hanya mode diagnostik `raw` (yang memang harus
+      // memutar PCM apa adanya) dan `trim:'off'` yang eksplisit.
+      const trimRequested = opts.trim !== 'off' && diagnosticMode !== 'raw';
+      if (trimRequested) samples = trimSilence(samples, sampleRate);
       const rawStats = diagnosticMode ? analyzeSamples(samples) : null;
       if (diagnosticMode !== 'raw') samples = conditionSamples(samples);
       const renderedStats = diagnosticMode ? analyzeSamples(samples) : null;
@@ -951,7 +1335,7 @@
           sourceSampleRate: sampleRate,
           contextSampleRate: contextRate,
           resamplingExpected: contextRate > 0 && contextRate !== sampleRate,
-          trimmed: opts.trim === true,
+          trimmed: trimRequested,
           raw: rawStats,
           rendered: renderedStats
         });
@@ -970,14 +1354,28 @@
       }
 
       const now = contextTime(current);
-      const gapSeconds = Math.max(0, Number(opts.gapMs) || 0) / 1000;
-      const startAt = continuous ? scheduledUntil(current) + gapSeconds : now;
-      if (!continuous) stopAll(current, epoch);
+      // Panjang jeda SELALU dari tabel konstanta prosodi; petunjuk `gapMs`/`boundary`/teks dari
+      // lapisan atas hanya menentukan KELASNYA. Kalau tidak, jeda pemanggil dan jeda pemutar
+      // tertumpuk dan satu batas kalimat jadi dua kali lebih panjang dari yang dikalibrasi.
+      const boundary = resolveBoundary(opts);
+      const gapSeconds = joined ? Math.max(0, Number(prosodyGaps[boundary]) || 0) : 0;
+      const durationSeconds = samples.length / sampleRate;
+      let startAt = now;
+      if (joined) {
+        const base = Math.max(pipelineCursor, scheduledUntil(current));
+        if (base <= now) { pipelineUnderruns += 1; startAt = now + SCHEDULE_LEAD_S + gapSeconds; }
+        else startAt = base + gapSeconds;
+      } else {
+        stopAll(current, epoch);
+        pipelineCursor = 0;
+      }
+      pipelineCursor = startAt + durationSeconds;
+      pipelineScheduledCount += 1;
 
       if (pcmWorklet) {
         if (epoch < playbackEpoch()) throw new Error('TTS playback superseded');
         if (diagnosticMode) recordDiagnostic({ playbackPath: 'audio-worklet', sourceSampleRate: sampleRate, contextSampleRate: contextRate });
-        return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, continuous ? gapSeconds : 0, epoch);
+        return playViaWorklet(current, pcmWorklet, samples, sampleRate, startAt, joined ? gapSeconds : 0, epoch);
       }
 
       if (epoch < playbackEpoch()) throw new Error('TTS playback superseded');
@@ -985,15 +1383,14 @@
       buffer.copyToChannel(samples, 0);
       const localSource = current.createBufferSource();
       const localGain = makeGain(current);
-      const durationSeconds = samples.length / sampleRate;
       source = localSource;
       sourceGain = localGain;
       localSource.buffer = buffer;
       if (localGain) {
         localSource.connect(localGain);
         localGain.connect(current.destination);
-        rampGain(localGain, current, 0, 1, FADE_IN_S, continuous ? startAt : undefined);
-        scheduleNaturalEndFade(localGain, current, durationSeconds, continuous ? startAt : undefined);
+        rampGain(localGain, current, 0, 1, FADE_IN_S, joined ? startAt : undefined);
+        scheduleNaturalEndFade(localGain, current, durationSeconds, joined ? startAt : undefined);
       } else {
         localSource.connect(current.destination);
       }
@@ -1022,7 +1419,9 @@
       queued.push(entry);
       try { if (trace) { trace.begin(); holding = true; } } catch (_) {}
       try {
-        if (continuous && startAt > now) localSource.start(startAt);
+        // Penjadwalan pada garis waktu, bukan menunggu potongan sebelumnya selesai. `onended` di
+        // jalur ini hanya membereskan node yang sudah habis; ia tidak memulai apa pun.
+        if (startAt > now) localSource.start(startAt);
         else localSource.start();
       } catch (error) {
         finish();
@@ -1034,6 +1433,10 @@
         done,
         startsAt: startAt,
         endsAt: entry.endsAt,
+        boundary,
+        gapSeconds,
+        trimmed: trimRequested,
+        joined,
         diagnosticMode,
         stop() {
           if (entry.settled) return;
@@ -1051,6 +1454,12 @@
     function stop() {
       const ctx = env.__fiezelWebAudioContext;
       const epoch = advancePlaybackEpoch();
+      // Membatalkan pipa: kursor dinolkan supaya penjadwalan berikutnya tidak menyambung ke
+      // garis waktu yang sudah mati, dan generasi dinaikkan supaya potongan yang generate-nya
+      // baru selesai SESUDAH ini tidak pernah dijadwalkan. Keduanya harus terjadi SEBELUM
+      // stopAll, karena stopAll bisa memicu penyelesaian yang membangunkan pemanggil.
+      pipelineCursor = 0;
+      pipelineGeneration += 1;
       if (queued.length) { stopAll(ctx, epoch); return; }
       if (source) {
         fadeAndStop(source, sourceGain, ctx);
@@ -1104,11 +1513,23 @@
       } catch (_) { return false; }
     }
 
-    return Object.freeze({ play, stop, warm, close });
+    // `cancel` adalah nama yang sama dengan yang dipakai lapisan UI ketika murid pindah layar;
+    // menyediakan keduanya menghindari satu pemanggil yang lupa memanggil stop().
+    return Object.freeze({ play, enqueue, playSequence, pipelineStats, stop, cancel: stop, warm, close });
   }
 
   return Object.freeze({
     createPlayer,
+    resolveProsodyGaps,
+    boundaryFromText,
+    boundaryFromGapMs,
+    PROSODY_GAP_DEFAULT_S,
+    PROSODY_BOUNDARIES,
+    PROSODY_HINT_SENTENCE_MS,
+    PROSODY_HINT_PARAGRAPH_MS,
+    PIPELINE_LOOKAHEAD_CHUNKS,
+    PIPELINE_MAX_QUEUED_CHUNKS,
+    SCHEDULE_LEAD_S,
     pickSamples,
     pickSampleRate,
     pcmDiagnosticMode,

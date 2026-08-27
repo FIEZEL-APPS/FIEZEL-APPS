@@ -310,7 +310,16 @@
         await adapter.initialize();
         const sherpaPlayer=root.FiezelWebAudioPlayer.createPlayer(root);
         const speech=speechSettings();
-        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.play,generationTimeoutMs:neuralGenerationTimeoutMs(),streamSentences:speech.streamSentences,streamMaxWords:speech.streamMaxWords,prosody:root.FiezelProsody||null});
+        // m025-73 TITIK ANTREAN. Pemutaran potongan lewat pipa berkelanjutan milik pemutar
+        // (`enqueue`) alih-alih `play` per potongan. Bedanya bukan kosmetik: `enqueue`
+        // menjadwalkan `start(when)` pada kursor garis waktu AudioContext yang sama untuk semua
+        // potongan, memotong keheningan tak sengaja di ujung PCM, lalu menyisipkan jeda prosodi
+        // dari konstanta yang bisa disetel. Karena penjadwalan tidak menunggu bunyi selesai,
+        // waktu generate potongan berikutnya dibayar oleh waktu bunyi potongan sekarang - itu
+        // yang menghapus "delay di setiap titik". `playSequence` ikut diberikan supaya lapisan
+        // yang memegang daftar potongan sendiri bisa memakai pipa yang sama.
+        // TIDAK ADA hubungannya dengan prepare()/ensureReady() atau penjaga unduhan 152 MB.
+        service=root.FiezelNeuralVoice.createVoiceService({config:root.FiezelNeuralVoiceConfig,adapter,env:root,playAudio:sherpaPlayer.enqueue,playSequence:sherpaPlayer.playSequence,generationTimeoutMs:neuralGenerationTimeoutMs(),streamSentences:speech.streamSentences,streamMaxWords:speech.streamMaxWords,prosody:root.FiezelProsody||null});
         playerRef=sherpaPlayer;
         wasmPolicy='supertonic-3-wasm-worker';
         phase='ready';lastError='';initFailedThisSession=false;initTimedOutThisSession=false;
@@ -497,7 +506,10 @@
       return false;
     }
   }
-  function stop(){try{service?.stop?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
+  // Berhenti harus mencapai TIGA lapisan: permintaan mesin yang sedang jalan, potongan yang
+  // SUDAH dijadwalkan di garis waktu Web Audio (murid tidak boleh mendengar sisa kalimat
+  // sesudah pindah layar), dan TTS peramban sebagai cadangan.
+  function stop(){try{service?.stop?.()}catch{}try{playerRef?.cancel?.()}catch{}try{root.speechSynthesis?.cancel?.()}catch{}}
   // T-023 lifecycle: bebaskan sesi neural + WebAudio saat tab tidak terlihat agar
   // tab tidak dipaksa mati oleh browser (WASM 92MB+21MB + AudioContext tetap hidup
   // saat hidden). ADDITIVE — kontrak publik tidak berubah; init ulang on-demand
