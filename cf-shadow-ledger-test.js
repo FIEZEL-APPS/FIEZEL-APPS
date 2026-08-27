@@ -39,6 +39,93 @@ const check = (name, ok, details) => {
   if (!ok) failed = true;
 };
 
+/* =======================================================================================
+ * Kegagalan harness harus BERBICARA, bukan meledak
+ * =====================================================================================
+ * Riwayat nyata (m032/F3): blok transport di app.js mulai meminta izin lapis kill switch,
+ * harness ini tidak menyediakannya, mode jatuh ke 'off', tidak ada satu pun baris ledger
+ * yang terbentuk — dan gerbang meledak sebagai
+ *   `TypeError: Cannot read properties of undefined (reading 'match')`
+ * di sebuah baris yang JAUH dari sebabnya. Assertnya sendiri sehat; yang rusak adalah
+ * harness yang tidak berhasil merakit konteks lalu diam saja. Karena itu setiap titik
+ * perakitan di bawah punya pesannya sendiri dan tetap menulis laporan.
+ */
+function tulisLaporan() {
+  const report = {
+    schema: 'fiezel-cf-shadow-ledger-v1',
+    pass: !failed,
+    counts: {
+      pass: checks.filter(c => c.status === 'PASS').length,
+      fail: checks.filter(c => c.status === 'FAIL').length
+    },
+    checks
+  };
+  fs.writeFileSync(path.join(root, 'CF-SHADOW-LEDGER-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
+  for (const c of checks) console.log(`${c.status === 'PASS' ? 'ok  ' : 'FAIL'} ${c.name}${c.status === 'PASS' ? '' : ' — ' + c.details}`);
+  console.log('');
+  return report;
+}
+
+// Kegagalan perakitan: dicatat sebagai assert merah, dilaporkan dengan kalimat yang
+// menyebut sebab DAN tempat memperbaikinya, lalu berhenti — bukan dibiarkan merambat
+// menjadi TypeError beberapa ratus baris kemudian.
+function gagalTotal(nama, pesan) {
+  check(nama, false, pesan);
+  const report = tulisLaporan();
+  console.error(`FIEZEL cf-shadow-ledger gate: FAIL (perakitan harness) — ${pesan}`);
+  console.error(`(${report.counts.fail} assert merah; ini kegagalan yang DIJELASKAN, bukan TypeError)`);
+  process.exit(1);
+}
+
+/* Ekstraksi blok app.js: SENTINEL EKSPLISIT, bukan nomor baris dan bukan regex atas bentuk
+ * kode di dalamnya. Bentuk isi blok boleh berubah sebebas apa pun (resolusi konflik,
+ * penulisan ulang `renderAIResult`, blok baru disisipkan di atasnya) tanpa membuat gerbang
+ * ini salah memotong; yang tidak boleh berubah hanyalah sepasang sentinelnya.
+ * Fungsi ini MURNI: ia mengembalikan pesan galat, tidak melempar dan tidak keluar, supaya
+ * pagarnya sendiri bisa diuji (lihat 'pagar ekstraksi' di bawah). */
+function sliceBlock(source, name) {
+  const begin = `/* ${name}-BEGIN`;
+  const end = `/* ${name}-END */`;
+  const src = String(source || '');
+  const beginAt = src.indexOf(begin);
+  const endAt = src.indexOf(end);
+  if (beginAt < 0) return { name, code: '', beginAt, endAt, error: `sentinel "${begin}" tidak ditemukan di app.js — blok ${name} hilang atau sentinelnya diubah` };
+  if (endAt < 0) return { name, code: '', beginAt, endAt, error: `sentinel "${end}" tidak ditemukan di app.js — blok ${name} tidak tertutup` };
+  if (endAt <= beginAt) return { name, code: '', beginAt, endAt, error: `sentinel "${end}" mendahului "${begin}" di app.js (urutan blok ${name} rusak)` };
+  const code = src.slice(beginAt, endAt);
+  // "Ada" tidak cukup: blok yang isinya hanya sentinel dan komentar akan dijalankan tanpa
+  // galat, memberi konteks HAMPA, dan membuat setiap assert perilaku di bawah lulus kosong
+  // atau meledak sebagai TypeError. Jadi yang dihitung adalah KODE sesudah komentar kepala.
+  const headerEnd = code.indexOf('*/');
+  const body = (headerEnd >= 0 ? code.slice(headerEnd + 2) : code.slice(begin.length))
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^\s*\/\/.*$/gm, '');
+  if (body.trim().length === 0) {
+    return { name, code: '', beginAt, endAt, error: `blok ${name} terpotong KOSONG di app.js: hanya sentinel/komentar, nol kode (begin=${beginAt} end=${endAt})` };
+  }
+  return { name, code, beginAt, endAt, error: '' };
+}
+
+// Pagar baris ledger. Juga MURNI: mengembalikan kalimat, bukan melempar.
+function pesanBarisKosong(summary, label) {
+  const rows = summary && Array.isArray(summary.rows) ? summary.rows : null;
+  if (!rows) return `ringkasan ledger di ${label} tidak punya array \`rows\` (bentuk modul ledger berubah?)`;
+  if (rows.length === 0) {
+    return `ledger bayangan KOSONG di ${label}: nol baris terbentuk (observed=${summary.observed}). `
+      + 'Rantai yang harus diperiksa, berurutan: (1) blok CF-TRANSPORT/CF-KILLSWITCH terpotong dari app.js, '
+      + "(2) cfEndpointMode() mengembalikan 'shadow' dan bukan 'off' (izin FiezelCfKillSwitch!), "
+      + '(3) fetch mock benar-benar terpanggil, (4) FiezelShadowLedger.observe() menulis. '
+      + 'JANGAN melemahkan assert untuk membuat ini hijau.';
+  }
+  return '';
+}
+
+function barisPertama(summary, label) {
+  const pesan = pesanBarisKosong(summary, label);
+  if (pesan) gagalTotal(`Ledger bayangan menghasilkan baris di ${label}`, pesan);
+  return summary.rows[0];
+}
+
 const LEDGER_FILE = 'features/cf-shadow/fiezel-shadow-ledger.js';
 const ledgerSource = read(LEDGER_FILE);
 const app = read('app.js');
@@ -306,13 +393,52 @@ check('(c) yang dibuang lebih dulu adalah nama kunci, bukan hitungan permintaan'
 /* =======================================================================================
  * Harness transport: blok CF-TRANSPORT app.js + ledger di dalam satu konteks
  * ===================================================================================== */
-const BEGIN = '/* CF-TRANSPORT-BEGIN';
-const END = '/* CF-TRANSPORT-END */';
-const beginAt = app.indexOf(BEGIN);
-const endAt = app.indexOf(END);
-check('Blok transport bisa dipotong lewat sentinel CF-TRANSPORT-BEGIN/END', beginAt >= 0 && endAt > beginAt,
-  `begin=${beginAt} end=${endAt}`);
-const block = beginAt >= 0 && endAt > beginAt ? app.slice(beginAt, endAt) : '';
+// Dua blok, bukan satu: sejak m031 `cfEndpointMode()` di blok transport meminta izin lapis
+// SERVER lewat `self.FiezelCfKillSwitch.allows(key)` dan gagal ke arah MATI kalau jawabannya
+// bukan `true`. Harness ini karena itu menjalankan blok kill switch YANG ASLI dari app.js
+// juga — bukan stub — supaya "bayangan mencatat" dibuktikan lewat rantai izin yang sama
+// dengan produksi. Perilaku kill switch itu sendiri diuji cf-config-killswitch-test.js.
+const killSlice = sliceBlock(app, 'CF-KILLSWITCH');
+const transportSlice = sliceBlock(app, 'CF-TRANSPORT');
+if (killSlice.error) gagalTotal('Blok kill switch bisa dipotong lewat sentinel CF-KILLSWITCH-BEGIN/END', killSlice.error);
+if (transportSlice.error) gagalTotal('Blok transport bisa dipotong lewat sentinel CF-TRANSPORT-BEGIN/END', transportSlice.error);
+check('Blok transport bisa dipotong lewat sentinel CF-TRANSPORT-BEGIN/END', true,
+  `begin=${transportSlice.beginAt} end=${transportSlice.endAt} panjang=${transportSlice.code.length}`);
+check('Blok kill switch bisa dipotong lewat sentinel CF-KILLSWITCH-BEGIN/END', true,
+  `begin=${killSlice.beginAt} end=${killSlice.endAt} panjang=${killSlice.code.length}`);
+check('Blok kill switch berada SEBELUM blok transport (izin harus ada saat transport dipakai)',
+  killSlice.endAt < transportSlice.beginAt, `kill=${killSlice.beginAt}..${killSlice.endAt} transport=${transportSlice.beginAt}`);
+const killBlock = killSlice.code;
+const block = transportSlice.code;
+
+// PAGAR EKSTRAKSI, diuji dan bukan diasumsikan: kalau app.js suatu hari kehilangan sentinel
+// (blok dipindah, dihapus, atau namanya diubah saat resolusi konflik), gerbang ini harus
+// berhenti dengan KALIMAT yang menyebut sentinelnya — bukan lolos dengan blok kosong dan
+// bukan meledak sebagai TypeError di assert (e).
+const appTanpaSentinel = app.split('/* CF-TRANSPORT-BEGIN').join('/* BLOK-DIPINDAH');
+const gagalBegin = sliceBlock(appTanpaSentinel, 'CF-TRANSPORT');
+const gagalKosong = sliceBlock('/* CF-TRANSPORT-BEGIN\n/* CF-TRANSPORT-END */', 'CF-TRANSPORT');
+const gagalKomentar = sliceBlock('/* CF-TRANSPORT-BEGIN kepala */\n// hanya komentar\n/* CF-TRANSPORT-END */', 'CF-TRANSPORT');
+const gagalUrutan = sliceBlock('/* CF-TRANSPORT-END */\nkode\n/* CF-TRANSPORT-BEGIN x', 'CF-TRANSPORT');
+check('pagar ekstraksi: sentinel BEGIN hilang -> pesan jelas yang menyebut sentinelnya (bukan blok kosong yang lolos)',
+  gagalBegin.code === '' && /CF-TRANSPORT-BEGIN/.test(gagalBegin.error) && !/undefined|Cannot read/.test(gagalBegin.error),
+  gagalBegin.error);
+check('pagar ekstraksi: blok yang terpotong KOSONG ditolak, tidak dijalankan sebagai konteks hampa',
+  gagalKosong.code === '' && /KOSONG/.test(gagalKosong.error), gagalKosong.error);
+check('pagar ekstraksi: blok yang hanya berisi komentar juga dihitung KOSONG (nol kode = nol bukti)',
+  gagalKomentar.code === '' && /nol kode/.test(gagalKomentar.error), gagalKomentar.error);
+check('pagar ekstraksi: sentinel END yang mendahului BEGIN dikenali sebagai urutan rusak',
+  gagalUrutan.code === '' && /mendahului/.test(gagalUrutan.error), gagalUrutan.error);
+check('pagar ekstraksi: app.js hari ini LOLOS pagar yang sama (pagarnya bukan hiasan)',
+  transportSlice.error === '' && killSlice.error === '' && /async function coreWorkerExec\(/.test(block),
+  `transport=${block.length}B kill=${killBlock.length}B`);
+// Dan pagar baris ledger: ledger kosong harus berbunyi sebagai kalimat, bukan `rows[0]`
+// yang undefined lalu TypeError. Diuji lewat fungsi murninya supaya gerbang tidak perlu mati.
+const pesanKosong = pesanBarisKosong({ observed: 0, rows: [] }, '(uji-pagar)');
+check('pagar ledger: nol baris menghasilkan pesan yang menyebut rantai yang harus diperiksa',
+  /KOSONG/.test(pesanKosong) && /cfEndpointMode/.test(pesanKosong) && /fetch mock/.test(pesanKosong)
+  && pesanBarisKosong({ observed: 1, rows: [{ endpoint: 'ai' }] }, '(uji-pagar)') === '',
+  pesanKosong.slice(0, 80));
 
 const CF_BASE_SYNTHETIC = 'https://api.fiezel.my.id';
 const ALL_SHADOW = { health: 'shadow', config: 'shadow', auth: 'shadow', quota: 'shadow', ai: 'shadow', tts: 'shadow', usage: 'shadow' };
@@ -321,7 +447,7 @@ const ALL_SHADOW = { health: 'shadow', config: 'shadow', auth: 'shadow', quota: 
 function makeTransport(options) {
   const opts = options || {};
   const store = {};
-  const log = { cf: [], puter: [], debug: [], puterBodyReads: 0, cfBodyReads: 0, cloneReads: 0 };
+  const log = { cf: [], puter: [], debug: [], puterBodyReads: 0, cfBodyReads: 0, cloneReads: 0, idle: 0 };
   const bodyPuter = { ok: true, protocol: '1.7', text: PII.jawabanAi, prompt: PII.prompt, user: PII.nama };
   const bodyCf = Object.assign({}, opts.cfBody || { ok: true, protocol: '1.7', text: 'JAWABAN-CF', prompt: 'PROMPT-CF', user: 'USER-CF' });
   function makeResponse(kind, body) {
@@ -357,6 +483,33 @@ function makeTransport(options) {
     CORE_WORKER_URL: 'https://fiezel-core.puter.work',
     awaitPuter: async () => puter
   };
+  // Izin lapis SERVER, tanpa satu pun permintaan jaringan: cermin `sessionStorage` yang masih
+  // segar dibaca blok kill switch saat blok itu dijalankan (`cfConfigBootOnce` -> mirror),
+  // jadi statusnya langsung 'ok' dan `GET /api/config` tidak pernah ditembak. Isinya adalah
+  // bentuk jawaban Worker apa adanya: protokol 1.7 + enam flag yang dikenal.
+  const mirror = {
+    v: 1, at: Date.now(), ttl: 60000,
+    data: {
+      protocol: '1.7',
+      flags: {
+        cfApiEnabled: true, cfAiEnabled: true, cfTtsEnabled: true,
+        cfQuotaEnabled: true, cfAnalyticsEnabled: true, cfIdentityEnabled: true
+      },
+      enabled: { ai: true, tts: true, coach: true, analytics: true },
+      ttlSeconds: 60
+    }
+  };
+  const sessionData = {};
+  if (opts.serverAllows !== false) sessionData['fiezel-cf-flags-mirror-v1'] = JSON.stringify(mirror);
+  sandbox.sessionStorage = {
+    getItem: k => (Object.prototype.hasOwnProperty.call(sessionData, k) ? sessionData[k] : null),
+    setItem: (k, v) => { sessionData[k] = String(v); },
+    removeItem: k => { delete sessionData[k]; }
+  };
+  // DIREKAM, tidak dijalankan: kalau cermin di atas suatu hari ditolak, kill switch akan
+  // menjadwalkan pengambil di sini. Angkanya di-assert = 0 di bawah, supaya "harness diam-diam
+  // berjalan tanpa izin server" mustahil lolos.
+  sandbox.requestIdleCallback = () => { log.idle++; return log.idle; };
   if (opts.navigator !== undefined) sandbox.navigator = opts.navigator;
   sandbox.self = sandbox;
   sandbox.globalThis = sandbox;
@@ -365,9 +518,12 @@ function makeTransport(options) {
   sandbox.FIEZEL_CF_CONFIG = cfg;
   vm.createContext(sandbox);
   if (opts.withLedger !== false) vm.runInContext(ledgerSource, sandbox, { filename: LEDGER_FILE });
-  vm.runInContext(block + '\n;globalThis.__cf={coreWorkerExec,cfEndpointMode,cfShadowPolicy};',
-    sandbox, { filename: 'app.js#cf-transport' });
-  return { api: sandbox.__cf, log, store, puterResponse, cfResponse, ledger: sandbox.FiezelShadowLedger, sandbox };
+  // Kedua blok dijalankan sebagai SATU skrip, urutan app.js: kill switch dulu (ia yang
+  // memasang `self.FiezelCfKillSwitch`), transport sesudahnya.
+  vm.runInContext(killBlock + '\n' + block
+    + '\n;globalThis.__cf={coreWorkerExec,cfEndpointMode,cfShadowPolicy,cfMergedMode,cfServerAllows};',
+    sandbox, { filename: 'app.js#cf-killswitch+cf-transport' });
+  return { api: sandbox.__cf, log, store, puterResponse, cfResponse, ledger: sandbox.FiezelShadowLedger, sandbox, sessionData };
 }
 
 (async () => {
@@ -375,6 +531,22 @@ function makeTransport(options) {
    * (d) PEMBATAS LAJU — pada beban, bukan pada catatan
    * ================================================================================= */
   const T = makeTransport({ config: { shadow: { minGapMs: 120, maxPerSession: 3 } } });
+  // Perakitan dulu, perilaku kemudian. Kalau mode ternyata 'off', seluruh (d) dan (e) akan
+  // "lulus kosong" atau meledak jauh di bawah — persis kegagalan senyap yang F3 perbaiki.
+  check('mode bayangan BENAR-BENAR aktif di harness (izin statis DAN izin kill switch server lolos)',
+    T.api.cfEndpointMode('/api/ai/chat') === 'shadow' && T.api.cfServerAllows('ai') === true,
+    `mode=${T.api.cfEndpointMode('/api/ai/chat')} serverAllows=${T.api.cfServerAllows('ai')}`);
+  check('izin server datang dari cermin sessionStorage, bukan dari permintaan jaringan',
+    T.log.idle === 0 && T.log.cf.length === 0, `idle=${T.log.idle} fetch=${T.log.cf.length}`);
+  // Dan pagar arah lain: tanpa izin server, bayangan MATI — gerbang ini tidak boleh hijau
+  // karena harness memaksa jalur CF hidup tanpa pengawas.
+  const tanpaIzin = makeTransport({ serverAllows: false });
+  await tanpaIzin.api.coreWorkerExec('/api/ai/chat', { method: 'POST', body: '{}' });
+  await tick(20);
+  check('tanpa izin lapis server, bayangan mati total dan murid tetap dilayani Puter',
+    tanpaIzin.api.cfEndpointMode('/api/ai/chat') === 'off' && tanpaIzin.log.cf.length === 0
+    && tanpaIzin.log.puter.length === 1 && tanpaIzin.ledger.summary().rows.length === 0,
+    `mode=${tanpaIzin.api.cfEndpointMode('/api/ai/chat')} fetch=${tanpaIzin.log.cf.length} baris=${tanpaIzin.ledger.summary().rows.length}`);
   check('(d) batas dibaca dari FIEZEL_CF_CONFIG.shadow dan bukan angka mati',
     T.api.cfShadowPolicy().minGapMs === 120 && T.api.cfShadowPolicy().maxPerSession === 3,
     JSON.stringify(T.api.cfShadowPolicy()));
@@ -466,21 +638,22 @@ function makeTransport(options) {
   check('(e) perbandingan bentuk memang berjalan, dan HANYA lewat clone()',
     E.log.cloneReads === 2, `clone=${E.log.cloneReads}`);
   const eLedger = E.ledger.summary();
+  const eRow = barisPertama(eLedger, '(e) bayangan nyata lewat blok transport app.js');
   check('(e) bukti bayangan benar-benar terkumpul (bukan gerbang yang lulus kosong)',
-    eLedger.observed === 1 && eLedger.rows.length === 1 && eLedger.rows[0].endpoint === 'ai',
+    eLedger.observed === 1 && eLedger.rows.length === 1 && eRow.endpoint === 'ai',
     JSON.stringify(eLedger.rows));
   check('(e) bentuk jawaban Puter vs CF dinilai COCOK padahal isinya beda jauh',
-    eLedger.rows[0].match === 1 && eLedger.rows[0].diff === 0, JSON.stringify(eLedger.rows[0]));
+    eRow.match === 1 && eRow.diff === 0, JSON.stringify(eRow));
   bersih('(e) isi penyimpanan sesudah bayangan nyata tidak memuat isi jawaban', E.store[E.ledger.STORAGE_KEY]);
   check('(e) latensi kedua sisi tercatat sebagai angka',
-    Number.isFinite(eLedger.rows[0].puterAvgMs) && eLedger.rows[0].cfAvgMs >= 100,
-    `puter=${eLedger.rows[0].puterAvgMs}ms cf=${eLedger.rows[0].cfAvgMs}ms`);
+    Number.isFinite(eRow.puterAvgMs) && eRow.cfAvgMs >= 100,
+    `puter=${eRow.puterAvgMs}ms cf=${eRow.cfAvgMs}ms`);
 
   // Bentuk yang BERBEDA harus terdeteksi lewat jalur nyata, bukan hanya lewat unit compareShapes.
   const F = makeTransport({ cfBody: { ok: true, protocol: 1.7, text: 'JAWABAN-CF' } });
   await F.api.coreWorkerExec('/api/ai/chat', { method: 'POST', body: '{}' });
   await tick(40);
-  const fRow = F.ledger.summary().rows[0];
+  const fRow = barisPertama(F.ledger.summary(), '(e) bentuk CF yang berbeda');
   check('(e) bentuk berbeda pada jalur nyata terdeteksi, dan kunci yang beda dinamai',
     fRow.diff === 1 && Object.keys(fRow.diffKeys).sort().join(',') === 'prompt,protocol,user',
     JSON.stringify(fRow.diffKeys));
@@ -555,18 +728,7 @@ function makeTransport(options) {
     (() => { const bad = {}; bad[A.STORAGE_KEY] = '{bukan json'; return makeLedger(bad).read().observed === 0; })(), 'JSON rusak');
 
   /* ================================================================================= */
-  const report = {
-    schema: 'fiezel-cf-shadow-ledger-v1',
-    pass: !failed,
-    counts: {
-      pass: checks.filter(c => c.status === 'PASS').length,
-      fail: checks.filter(c => c.status === 'FAIL').length
-    },
-    checks
-  };
-  fs.writeFileSync(path.join(root, 'CF-SHADOW-LEDGER-REPORT.json'), JSON.stringify(report, null, 2) + '\n');
-  for (const c of checks) console.log(`${c.status === 'PASS' ? 'ok  ' : 'FAIL'} ${c.name}${c.status === 'PASS' ? '' : ' — ' + c.details}`);
-  console.log('');
+  const report = tulisLaporan();
   if (failed) {
     console.log(`FIEZEL cf-shadow-ledger gate: FAIL (${report.counts.fail} assert merah)`);
     process.exitCode = 1;
@@ -574,7 +736,12 @@ function makeTransport(options) {
     console.log(`FIEZEL cf-shadow-ledger gate: PASS (${report.counts.pass} assert)`);
   }
 })().catch(error => {
-  console.error('FIEZEL cf-shadow-ledger gate: FAIL (harness melempar)');
-  console.error(error);
+  // Jaring terakhir. Yang bisa diramalkan sudah dijelaskan oleh `gagalTotal`; sisanya tetap
+  // dilaporkan sebagai assert merah supaya laporan JSON tidak pernah kosong saat merah.
+  check('Harness berjalan sampai akhir tanpa melempar', false,
+    `${error && error.name}: ${error && error.message}`);
+  tulisLaporan();
+  console.error(`FIEZEL cf-shadow-ledger gate: FAIL (harness melempar) — ${error && error.message}`);
+  console.error(error && error.stack ? error.stack : error);
   process.exitCode = 1;
 });
