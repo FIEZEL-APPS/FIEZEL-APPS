@@ -176,8 +176,10 @@ Monitor eksternal (UptimeRobot dsb.) **wajib** diarahkan ke `/healthz`, bukan
 ## 5. Harga yang dibayar — dicatat jujur, bukan disembunyikan
 
 - **Latensi.** Hop PHP tambahan terukur pada `/health`: **2.214 ms** saat dingin,
-  lalu **~1.051–1.163 ms** saat hangat. Kecil untuk JSON, tetapi ia **nyata dan
-  selalu ada**.
+  lalu **~1.051–1.163 ms** saat hangat; pengukuran berikutnya melihat lantai yang
+  lebih rendah, **847 ms**, jadi rentang hangat yang jujur adalah **847–1.163 ms**.
+  `/healthz` dingin sempat **2.071 ms**. Kecil untuk JSON, tetapi ia **nyata dan
+  selalu ada**. Uraian biaya dan apa yang sudah ditekan ada di §5b.
 - **Titik gagal tunggal.** Origin PHP ArenHost sekarang berada di jalur setiap
   panggilan API. Kalau hosting bersama itu mati atau kena batas proses, seluruh API
   mati **walaupun Worker Cloudflare sehat**. Sebelum jembatan, kegagalan origin
@@ -187,6 +189,171 @@ Monitor eksternal (UptimeRobot dsb.) **wajib** diarahkan ke `/healthz`, bukan
   hop 1 ms menjadi leher botol yang mematikan pelajaran mendengarkan, dan itu
   memindahkan risiko dari JSON kecil ke jalur yang paling ditunggu murid. Audio
   tetap dari R2 / Worker audio langsung.
+
+## 5b. A7 — dari mana latensi itu datang, dan apa yang sudah ditekan
+
+Bagian ini adalah **telaah lebih dulu, ukur belakangan**. Angka yang ada baru angka
+**SEBELUM**; lihat §5d untuk pengakuan jujur soal itu.
+
+### 5b.1 Uraian biaya per permintaan (urut dari yang terbesar)
+
+| # | Sumber biaya | Bisa ditekan dari PHP? | Status sesudah A7 |
+|---|---|---|---|
+| 1 | **Handshake TLS baru ke upstream, setiap permintaan** | sebagian | TFO + h2 (lihat 5b.2) |
+| 2 | Resolusi DNS berulang | sebagian | IPv4-only; DNS cache curl **tidak menolong** |
+| 3 | Dekompresi lalu kompresi ulang badan | ya | **dihapus** |
+| 4 | HTTP/1.1 ke upstream (tanpa HPACK, badan `chunked`) | ya | dipaksa `2TLS` |
+| 5 | Startup PHP | tidak dari dalam berkas | urusan konfigurasi origin |
+
+**(1) Tidak ada reuse koneksi antar proses — dan ini biaya terbesar.** Satu permintaan
+HTTP ke `api.fiezel.my.id` = satu proses/worker PHP = satu handle curl baru = TCP +
+TLS penuh ke `*.workers.dev`. Cache sesi TLS curl hidup **di dalam handle**
+(`CURLOPT_SSL_SESSIONID_CACHE`), dan handle itu mati bersama proses. Jadi 1×RTT TCP +
+1–2×RTT TLS terbayar **ulang, selalu**. Tidak ada `Connection: keep-alive` yang bisa
+menolong, karena tidak ada proses yang hidup cukup lama untuk memegang koneksinya.
+Ini **batas struktural jembatan**, bukan sesuatu yang kurang dioptimasi.
+
+**(2) DNS.** Nasibnya sama: cache DNS curl juga hidup di handle/share handle, jadi ia
+mati bersama proses. Karena itu **`CURLOPT_DNS_CACHE_TIMEOUT` SENGAJA TIDAK
+DIPASANG** — nilai berapa pun tidak akan pernah kena hit di model
+satu-permintaan-satu-proses, dan opsi yang menghemat 0 ms tetapi terlihat seperti
+optimasi adalah komentar yang berbohong kepada pembaca berikutnya. Yang benar-benar
+meredam biaya DNS adalah resolver OS origin (nscd/systemd-resolved) — di luar kendali
+PHP — dan `CURLOPT_IPRESOLVE` di 5b.2.
+
+**(3) `CURLOPT_ENCODING => ''` adalah kerja ganda tanpa manfaat.** Ia membuat curl
+meminta gzip lalu **mendekompresi** badan di origin, padahal badan itu hanya
+diteruskan apa adanya ke murid — dan lapisan web origin lalu berpeluang meng-gzip
+**ULANG**. Dua kali kerja CPU untuk byte yang sama, di hosting bersama yang CPU-nya
+adalah sumber daya paling langka. **Dihapus.**
+
+**(4) HTTP/1.1 vs HTTP/2.** Tanpa dipaksa, curl bisa memakai 1.1 ke Cloudflare.
+Setiap permintaan di sini membawa `Cookie` + `User-Agent`, dan pada 1.1 header itu
+dikirim sebagai teks penuh (tanpa HPACK); responsnya datang ber-`chunked` dengan
+overhead framing per potong. Bukan ratusan ms — puluhan-an ms, dan itu ditulis apa
+adanya supaya tidak ada yang mengharapkan keajaiban.
+
+**(5) Startup PHP.** Menyalakan interpreter + parse berkas proxy ada harganya
+(puluhan ms bila **opcache** mati). Yang bisa dilakukan dari dalam repo sudah
+dilakukan: berkas itu **nol dependency, nol autoloader, nol include**. Sisanya milik
+konfigurasi origin: `opcache.enable=1`, `opcache.validate_timestamps` boleh tetap
+hidup (satu berkas, jarang berubah), dan PHP-FPM lebih baik daripada CGI karena
+CGI menyalakan interpreter dari nol pada setiap permintaan. Itu **saran untuk
+master**, bukan klaim bahwa sudah beres.
+
+### 5b.2 Sakelar yang dipasang — apa yang dihemat, apa risikonya
+
+Setiap baris di bawah punya komentar padanannya di `api-index.php` (gerbang
+`edge-proxy-contract-test.js` butir (g) menuntutnya, jadi ia tidak bisa hilang):
+
+| Sakelar | Hemat | Risiko |
+|---|---|---|
+| `CURL_HTTP_VERSION_2TLS` | header ter-HPACK, respons tanpa framing `chunked` | ~nol; `2TLS` **jatuh otomatis** ke 1.1 |
+| `CURLOPT_TCP_FASTOPEN` | sampai **satu RTT** pada pembuatan koneksi; cookie TFO ada di **kernel** sehingga bertahan antar proses | **nyata**: sebagian middlebox membuang SYN berisi data ⇒ pemulihan lewat retransmit bisa **menambah** ratusan ms. Karena itu ia punya sakelar sendiri `ENABLE_TCP_FASTOPEN` |
+| `CURLOPT_TCP_KEEPALIVE` (+`KEEPIDLE`/`KEEPINTVL` 15 s) | 0 ms pada GET kecil — bukan itu gunanya. Ia untuk `/api/ai/task`: koneksi menganggur belasan detik, NAT/firewall membuang pemetaan **senyap**, dan hasilnya timeout 25 s dengan kuota sudah terbakar | beberapa paket kecil per permintaan panjang |
+| `CURLOPT_IPRESOLVE = V4` | satu query DNS (AAAA) hilang, dan yang lebih mahal: tidak ada "happy eyeballs" mencoba IPv6 yang tidak benar-benar berfungsi di hosting bersama | kalau origin suatu hari IPv6-only, ini pemutus total — tetapi gejalanya 502 seragam, bukan halus |
+| Pass-through gzip (tanpa `CURLOPT_ENCODING`) | nol dekompresi + nol kompresi ulang di origin | badan gzip diteruskan, jadi **hanya** bila klien mengiklankan gzip **dan** `zlib.output_compression` origin mati (kalau tidak, gzip ganda = sampah) |
+| `CURLPROTO_HTTPS`, `SSL_VERIFYPEER/HOST` eksplisit | 0 ms | 0; ia ikat pinggang kedua supaya optimasi berikutnya tidak menggerus TLS |
+| `CURLOPT_DNS_CACHE_TIMEOUT` | **tidak dipasang** — 0 ms (lihat 5b.1 poin 2) | — |
+
+### 5b.3 Cache — kesimpulannya: **TIDAK ADA yang boleh di-cache**
+
+Kandidat satu-satunya adalah `GET /healthz` dan `GET /api/config`; semua jalur lain
+menyentuh identitas/kuota atau membawa `Set-Cookie`, jadi haram di-cache tanpa
+diskusi. Setelah diperiksa ke sumbernya, **keduanya juga tidak boleh**:
+
+- **`/api/config` mengirim `Cache-Control: no-store` eksplisit**
+  (`workers/api/route-config.js`). Endpoint itu **adalah kill switch runtime**:
+  men-cache-nya berarti "matikan AI sekarang" tertunda selama TTL cache — persis
+  kelas kegagalan yang endpoint itu diciptakan untuk mencegah.
+- **`/healthz` juga `no-store`**: `jsonResponse` (`workers/api/errors.js`) memasang
+  `cache-control: no-store` bila rute tidak memasang sendiri. Dan men-cache probe
+  kesehatan berarti monitor melaporkan "hidup" dari berkas cache saat Worker sudah
+  mati. **Cache pada probe = monitor yang berbohong.**
+
+Karena `Cache-Control` upstream dihormati **mutlak**, dan kedua kandidat berkata
+`no-store`, hasil akhirnya **nol jalur yang boleh di-cache**. Jadi tidak ada mesin
+cache yang dipasang: ia hanya akan menambah permukaan gagal (berkas cache di hosting
+bersama, risiko keracunan, risiko ikut menyimpan `Set-Cookie`) demi 0 ms. Kalau suatu
+hari Worker mengirim `Cache-Control: public, max-age=N` pada satu jalur bebas
+identitas, keputusan ini boleh ditinjau ulang — dan gerbang butir (c) sudah menunggu
+untuk menuntut penjaganya (denylist identitas/kuota + bypass `Set-Cookie` + hormati
+`no-store`).
+
+### 5b.4 Jalur gagal: `CURLOPT_CONNECTTIMEOUT` 8 s → 4 s
+
+`CONNECT_S` **hanya** mengatur leg **origin (ArenHost) → tepi Cloudflare**, BUKAN leg
+**murid → origin**. Ini yang paling sering dicampur: jaringan murid Indonesia yang
+lambat (3G di kabupaten, paket data tersendat) memengaruhi leg pertama, dan leg itu
+diatur timeout server web/browser — bukan konstanta ini. Leg yang diatur di sini
+adalah datacenter → tepi Cloudflare terdekat (CGK/SIN), RTT puluhan ms, dan total
+permintaan terburuk yang pernah terukur pun hanya 2.214 ms.
+
+- **Angka: 4 s.** Masih memberi ruang untuk satu retry DNS (biasanya ~1 s + ~1 s)
+  plus satu handshake.
+- **Trade-off jujur:** bila resolver origin sedang sangat sakit (>4 s), permintaan
+  yang dulu akhirnya berhasil pada detik ke-6 sekarang gagal 502. Itu pertukaran yang
+  disengaja: **gagal cepat dan jujur** (murid melihat pesan jaringan dan bisa mencoba
+  lagi) lebih baik daripada 8 detik layar menunggu yang berakhir sama gagalnya.
+- **Jangan turunkan ke bawah ~3 s tanpa angka baru:** di bawah itu satu retry DNS
+  saja sudah tidak kebagian waktu.
+
+Selain itu batas **total** dipecah menjadi dua, karena dua kelas permintaan tidak
+boleh berbagi kesabaran: `TIMEOUT_FAST_S = 8` untuk GET JSON kecil (`/health`,
+`/healthz`, `/api/config`, `/api/tts/manifest`) dan `TIMEOUT_S = 25` untuk jalur model
+(`/api/ai/task`, `/api/tts/render`) yang memang boleh berpikir lama. Default-nya
+**sabar**: jalur yang tidak terdaftar di `FAST_TIMEOUT_PATHS` otomatis dapat 25 s,
+jadi menambah rute baru tidak bisa diam-diam memotong jawaban model. Kegagalan pun
+dibedakan: **504 `upstream_timeout`** (mencoba lagi masuk akal) vs **502
+`upstream_unreachable`** (jalurnya rusak) — keduanya pesan generik, nol byte dari
+`curl_error()`.
+
+## 5c. Cara mengukur (`tools/edge-latency-probe.mjs`)
+
+Node murni, nol dependency, **nol rahasia** (tidak membaca env secret, tidak mengirim
+cookie, tidak mengirim `X-Fiezel-Edge`), target **dari argumen** supaya ia tidak bisa
+tersangkut di CI dan menembak produksi pada setiap push. Ia melaporkan **p50/p95** atas
+N permintaan untuk `/healthz`, `/health`, `/api/config`; permintaan pertama tiap jalur
+dilaporkan tersendiri sebagai `cold` dan **tidak** masuk hitungan p50/p95 — mencampurnya
+akan membuat p95 palsu yang sebenarnya hanya biaya penyalaan proses PHP pertama.
+
+Kalau proxy versi baru sudah terpasang, ia juga merangkum header `Server-Timing` yang
+dikirim jembatan (`edge_dns`, `edge_tcp`, `edge_tls`, `upstream_ttfb`, `edge_total`) —
+di situlah pertanyaan "handshake TLS atau Worker yang mahal?" dijawab dengan angka.
+
+```bash
+# (1) SEBELUM — jalankan ini SEBELUM mengunggah versi baru proxy.
+node tools/edge-latency-probe.mjs https://api.fiezel.my.id --n=30 --json=A7-SEBELUM.json
+
+# (2) Pasang versi baru (langkah §4 tetap berlaku; secret disuntik ke salinan /tmp).
+#     Simpan salinan lama lebih dulu supaya bisa dibalikkan tanpa mengarang ulang:
+#     ssh <USER>@<HOST> 'cp ~/public_html/api/index.php ~/api-index.php.a7-sebelum'
+
+# (3) SESUDAH — bandingkan langsung terhadap baseline.
+node tools/edge-latency-probe.mjs https://api.fiezel.my.id --n=30 \
+  --baseline=A7-SEBELUM.json --json=A7-SESUDAH.json
+```
+
+Cara membaca hasilnya, supaya tidak salah menyimpulkan:
+
+- **Bandingkan p50 dan p95, bukan `cold`.** `cold` tunggal berisik; ia dilaporkan
+  hanya supaya biaya proses pertama tidak hilang dari catatan.
+- **Kalau p95 justru MEMBURUK**, tersangka pertamanya TCP Fast Open (middlebox
+  membuang SYN berisi data). Matikan dengan mengubah **satu** konstanta
+  `ENABLE_TCP_FASTOPEN = false` di proxy, unggah ulang, ukur lagi. Jangan menebak di
+  blok curl.
+- **Kalau `edge_tls` p50 mendominasi `edge_total`**, itu konfirmasi biaya nomor 1:
+  tidak ada perbaikan PHP yang akan menghapusnya. Yang menghapusnya adalah §6.
+
+## 5d. Angka SESUDAH: **belum ada** — dan itu bukan kelalaian
+
+**Angka sesudah belum ada.** Pemasangan versi baru proxy membutuhkan SSH/cPanel ke
+origin ArenHost, dan **hanya master yang memegangnya** (`MASTER-ONLY-GOVERNANCE.md`).
+Agen ini tidak memasang apa pun ke server, jadi tidak ada satu pun pengukuran
+"sesudah" yang boleh diklaim. Yang tersedia: analisis di §5b, kode yang sudah
+diterapkan, gerbang CI yang menjaganya, dan **perintah siap-jalan** di §5c untuk
+master. Sampai master menjalankan (1) dan (3), status yang benar adalah
+**"diperkirakan membaik, belum terbukti"** — bukan "lebih cepat".
 
 ## 6. PEMBONGKARAN — begitu nameserver pindah ke Cloudflare
 
