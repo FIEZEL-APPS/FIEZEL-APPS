@@ -12,6 +12,26 @@ registrar, dan terminal. Ditulis supaya bisa diikuti tanpa bertanya ke siapa pun
 
 ---
 
+## 🔄 REVISI 27 AGUSTUS 2026 — APA YANG BERUBAH KARENA TEMUAN LAPANGAN
+
+Runbook ini semula ditulis dari rencana. Hari ini (**27 Agu 2026**) sebagian asumsinya diuji di
+lapangan dan **gugur**. Setiap tempat yang berubah ditandai blok
+**`🔄 TEMUAN LAPANGAN 27 Agu 2026`** — kalau kamu pernah membaca versi lama, cukup cari penanda itu.
+
+| # | Asumsi lama | Kenyataan hari ini | Bagian yang direvisi |
+|---|---|---|---|
+| 1 | Nameserver bisa diganti sendiri di panel ArenHost | **Registrar bukan ArenHost.** Registrar sebenarnya **PT Digital Registra Indonesia**; ArenHost hanya reseller. Panel klien menolak dengan galat `website doesn't exist for fiezel.my.id`. Perubahan NS **harus lewat tiket** | Bagian 1 fakta origin, Bagian 1(c) |
+| 2 | Kalau tidak mau pindah zona penuh, `api.fiezel.my.id` bisa didaftarkan sebagai zona sendiri | **TIDAK BISA di plan Free.** Dashboard menolak: "Please ensure you are providing the root domain and not any subdomains". Subdomain-zone = Enterprise, partial/CNAME = Business ke atas | Bagian 1(a) + peringatan baru 1(a1) |
+| 3 | Zona belum dibuat; impor record belum diverifikasi | **Zona sudah dibuat (status `pending`)**, 27 record terimpor dan **sudah diverifikasi identik** dengan DNS lama. **12 record yang tadinya ber-proxy sudah dimatikan proxy-nya.** SSL = Full; `always_use_https` + `automatic_https_rewrites` = **off** | Bagian 1(b), 1(d), 1(e) |
+| 4 | D1/KV/Worker masih harus dibuat dari nol | **Sudah hidup di akun** (tanpa nameserver ⇒ belum menyentuh murid): D1 `fiezel-core` + `fiezel-stats`, KV `fiezel-CFG`, Worker `fiezel-api` + `fiezel-owner`. **Analytics Engine BELUM aktif** (error API `10089`), binding AE sengaja dilewati | Bagian 4.0 (baru), 4.1, 4.2, 4.3, 4.4 |
+| 5 | Model TTS masih generik ("aura-1") | Daftar model **nyata di akun ini** sudah diuji, termasuk latensi & ukuran byte, dan unggah ke R2 `fiezel-audio` prefiks `tts/v1/` terbukti byte-identik | Bagian 5 baris #3 + Lampiran pra-render |
+| 6 | Token API owner bisa membuat zona | **Tidak bisa** — token tidak punya `com.cloudflare.api.account.zone.create`. Pembuatan zona **harus lewat dashboard** | Bagian 3.4 (baru) |
+
+**Yang TIDAK berubah:** urutan aman (infrastruktur → Worker → secret → curl → flag), semua flag
+default `off`, kill switch dari KV, dan larangan menyentuh Worker `fiezel-audio`.
+
+---
+
 ## ⚠️ PERINGATAN PALING PENTING — BACA SEBELUM APA PUN
 
 **Branch `main` otomatis jadi produksi publik dalam ≤5 menit.** Di server ArenHost ada cron yang
@@ -69,8 +89,16 @@ dan email bisa mati berjam-jam.
 |---|---|
 | Hosting sekarang | ArenHost / LiteSpeed, cPanel di `195.88.211.212:2083` |
 | IP origin (record `A` untuk `@` dan `www`) | **`195.88.211.212`** |
-| Nameserver sekarang | **`srv1.arenhost.com`**, **`srv2.arenhost.com`** |
+| Nameserver sekarang | **`SRV1.ARENHOST.COM`**, **`SRV2.ARENHOST.COM`** |
 | Sertifikat origin | Let's Encrypt sudah aktif di hosting (`https://fiezel.my.id` sudah HTTPS) |
+| **Registrar sebenarnya** | **PT Digital Registra Indonesia** (`digitalregistra.co.id`), Registrar IANA ID **1** — hasil WHOIS `whois.id` 27 Agu 2026 |
+| **Peran ArenHost** | **Reseller**, bukan registrar. ArenHost adalah hosting + operator nameserver, bukan pemegang catatan domain |
+| **Status domain (EPP)** | `addPeriod`, `clientTransferProhibited`, `serverTransferProhibited` |
+| **Nameserver Cloudflare yang sudah ditugaskan** | **`sydney.ns.cloudflare.com`** + **`syeef.ns.cloudflare.com`** (dari zona yang sudah dibuat, status `pending`) |
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — registrar.** Dua baris registrar/reseller di atas adalah
+> **koreksi**. Versi lama runbook ini mengira ArenHost adalah registrar dan nameserver bisa diganti
+> sendiri lewat panel. Itu **salah** — lihat Bagian 1(c) yang sudah ditulis ulang.
 
 ### (a) Add Site di dashboard Cloudflare — plan Free
 
@@ -83,6 +111,40 @@ dan email bisa mati berjam-jam.
 4. Pilih plan: **Free**. Jangan tergoda tombol Pro; keputusan owner adalah gratis dulu.
 5. **JANGAN klik "Continue to activation" / jangan ganti nameserver sekarang.** Berhenti di sini
    dan lanjut ke (b).
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — langkah (a) SUDAH SELESAI.**
+> Zona `fiezel.my.id` **sudah dibuat** di akun yang benar, plan **Free**, status **`pending`**
+> (menunggu nameserver). **Zone ID ada di dashboard** (Overview → API section) — tidak dicatat di
+> dokumen ini secara sengaja, ambil dari dashboard saat butuh.
+> Nameserver yang ditugaskan untuk zona ini: **`sydney.ns.cloudflare.com`** dan
+> **`syeef.ns.cloudflare.com`**. **Pakai dua ini, bukan contoh `bella`/`rick` mana pun.**
+> Catatan penting: **zona dibuat lewat dashboard, bukan API** — token API owner tidak punya izin
+> `com.cloudflare.api.account.zone.create` (Bagian 3.4). Jadi kalau kamu perlu membuat/menghapus
+> zona lagi, itu pekerjaan dashboard.
+
+### (a1) ⛔ JANGAN COBA JALUR "ZONA SUBDOMAIN" — SUDAH DIUJI, TIDAK ADA
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — bagian ini BARU.** Ditulis supaya tidak ada orang (termasuk
+> kamu, tiga bulan dari sekarang) menghabiskan satu hari mencoba jalan yang tertutup.
+
+Ide yang terdengar cerdas: "kenapa tidak tambahkan saja `api.fiezel.my.id` sebagai zona sendiri di
+Cloudflare, biar zona `fiezel.my.id` tetap di ArenHost dan **tidak ada risiko ke situs/email**?"
+
+**Sudah dicoba hari ini. Tidak bisa. Dua pintu, dua-duanya terkunci di plan Free:**
+
+| Jalur | Hasil nyata | Syarat plan |
+|---|---|---|
+| **Add Site `api.fiezel.my.id`** (subdomain sebagai zona sendiri) | Dashboard **menolak**: “Please ensure you are providing the root domain and not any subdomains” | **Enterprise saja** — availability Free/Pro/Business semuanya **No** ([Cloudflare: subdomain setup](https://developers.cloudflare.com/dns/zone-setups/subdomain-setup/)) |
+| **Partial / CNAME setup** (pertahankan DNS lama, proxy sebagian hostname) | Tidak tersedia di akun ini | **Business atau Enterprise** — Free/Pro **No** ([Cloudflare: CNAME/partial setup](https://developers.cloudflare.com/dns/zone-setups/partial-setup/)) |
+
+**Konsekuensi yang harus diterima, bukan ditawar:** di plan Free, **satu-satunya** jalan mendapatkan
+`api.fiezel.my.id` sebagai custom domain Worker adalah **memindahkan zona penuh `fiezel.my.id`** ke
+Cloudflare (full setup, ganti nameserver). Itu sebabnya Bagian 1 tidak punya alternatif "aman" yang
+lebih kecil — alternatif itu memang tidak ada.
+
+Kalau kamu menemukan tutorial yang bilang bisa: tutorial itu (a) memakai akun partner Cloudflare,
+(b) memakai Business/Enterprise, atau (c) sebenarnya membicarakan **record** CNAME biasa di dalam
+zona penuh — hal yang berbeda. **Jangan buang waktu lagi di sini.**
 
 ### (b) VERIFIKASI HASIL IMPOR RECORD — LANGKAH PALING KRITIS
 
@@ -124,22 +186,139 @@ Sekarang bandingkan dengan tabel DNS di dashboard Cloudflare. **Checklist wajib 
 Kalau ada yang kurang: tambahkan manual di tabel DNS Cloudflare **sebelum** langkah (c). Sepuluh
 menit di sini menghemat berjam-jam pemulihan.
 
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — langkah (b) SUDAH DIKERJAKAN DAN HIJAU.**
+>
+> **27 record terimpor** ke zona `fiezel.my.id` dan sudah **dibandingkan satu per satu** dengan DNS
+> lama di `SRV1/SRV2.ARENHOST.COM`. Hasil: **identik**. Yang secara eksplisit diverifikasi:
+>
+> - `A` untuk `@` dan `www` → **`195.88.211.212`** ✔
+> - **`MX` prioritas `0`** → sesuai DNS lama ✔ (prioritas paling mudah rusak saat impor — ini dicek)
+> - **SPF** (`v=spf1 …`) ✔, **DMARC** (`_dmarc`) ✔
+> - **DKIM — 409 karakter**, tersalin **utuh** ✔. Ini butir yang paling rawan: record TXT panjang
+>   sering terpotong atau terpecah salah saat impor, dan gejalanya bukan "email mati" melainkan
+>   **email masuk spam beberapa hari kemudian**. Kalau kamu pernah menyentuh ulang record DKIM,
+>   **hitung ulang panjangnya** dan pastikan tetap 409 karakter.
+> - Subdomain cPanel (`mail`, `webmail`, `cpanel`, `whm`, `ftp`, `webdisk`, `autodiscover`,
+>   `autoconfig`, `cpcalendars`, `cpcontacts`) → ada ✔
+>
+> **Yang masih HARUS kamu lakukan sendiri sebelum (c):** ambil ulang snapshot
+> `~/fiezel-dns-sebelum.txt` (perintah di atas) kalau kamu belum punya salinannya di komputermu.
+> Verifikasi orang lain **bukan** jaring pengamanmu; berkas snapshot itu jaring pengamanmu.
+
 **Turunkan TTL sebelum pindah.** Set TTL record penting jadi **2 menit (Auto juga boleh untuk
-record proxied)**. Ini yang membuat rollback di (g) berukuran menit, bukan jam.
+record proxied)**. Ini yang membuat **perbaikan record** di (g) berukuran menit.
 
-### (c) Ganti nameserver di registrar / panel ArenHost
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — koreksi harapan.** TTL rendah mempercepat perbaikan
+> **record**, **bukan** rollback nameserver. Karena nameserver harus diubah pihak lain lewat tiket
+> (1c), rollback penuh tetap **jam sampai hari**. Jadi TTL 2 menit itu berguna — tapi jangan
+> memperlakukannya sebagai jaring pengaman untuk keputusan besar.
 
-1. Di dashboard Cloudflare, catat dua nameserver yang diberikan untuk zona ini — bentuknya
-   `<nama>.ns.cloudflare.com` (mis. `bella.ns.cloudflare.com` + `rick.ns.cloudflare.com`).
-   **Pakai yang tertulis di akunmu**, jangan menyalin dari tutorial mana pun.
-2. Masuk ke tempat domain `fiezel.my.id` didaftarkan (Domain Manager: `srb4280.srs-x.com/user`,
-   atau panel ArenHost tempat domain dikelola).
-3. Ubah nameserver **dari** `srv1.arenhost.com` + `srv2.arenhost.com` **menjadi** dua nameserver
-   Cloudflare. **Hapus** yang lama — jangan tinggalkan campuran ArenHost + Cloudflare; nameserver
-   campur = jawaban DNS acak antara dua sumber, dan gejalanya terlihat seperti hantu.
-4. Simpan. Balik ke Cloudflare → **Check nameservers now**.
-   Aktivasi biasanya beberapa menit, bisa sampai 24 jam untuk resolver yang keras kepala
+### (c) Ganti nameserver — LEWAT TIKET, BUKAN LEWAT PANEL SENDIRI
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SELURUH LANGKAH (c) DITULIS ULANG.** Versi lama menyuruh
+> kamu mengubah nameserver sendiri di panel ArenHost / Domain Manager. **Itu tidak bekerja.** Ini
+> satu-satunya langkah di runbook ini yang **tidak bisa kamu selesaikan sendiri** — dan itu berarti
+> waktu tunggu pihak lain harus masuk ke rencanamu.
+
+**Apa yang sebenarnya terjadi hari ini:**
+
+1. Panel klien ArenHost **menolak** perubahan nameserver untuk `fiezel.my.id` dengan galat:
+   `website doesn't exist for fiezel.my.id`. Galat ini menyesatkan — domainnya ada; yang tidak ada
+   adalah **kewenangan panel itu** atas catatan domain.
+2. WHOIS `whois.id` menjelaskan sebabnya: registrar domain ini adalah **PT Digital Registra
+   Indonesia** (`digitalregistra.co.id`, Registrar IANA ID **1**), **bukan** ArenHost. **ArenHost
+   adalah reseller.** Panel reseller di kasus ini tidak diberi hak tulis ke field nameserver.
+3. Status EPP domain: `addPeriod`, `clientTransferProhibited`, `serverTransferProhibited`. Baca ini
+   dengan tenang: dua status `TransferProhibited` **tidak** memblokir perubahan nameserver (itu
+   memblokir **transfer registrar**), jadi permintaanmu sah dan tidak perlu mencabut apa pun.
+   **Jangan minta unlock transfer** — kamu tidak memindahkan domain, kamu hanya mengganti NS.
+4. Nameserver tujuan sudah pasti dan sudah ditugaskan ke zona: **`sydney.ns.cloudflare.com`** +
+   **`syeef.ns.cloudflare.com`**. (Contoh `bella`/`rick` di tutorial mana pun **tidak berlaku**.)
+
+**Jalur yang benar, urut:**
+
+| Urutan | Ke siapa | Kenapa |
+|---|---|---|
+| **1 (coba dulu)** | **Tiket ke ArenHost** (support/billing panel ArenHost) | Sebagai reseller, ArenHost yang punya hubungan langsung dengan Digital Registra. Jalur paling cepat, tidak butuh bukti kepemilikan tambahan |
+| **2 (kalau ArenHost menolak atau diam >1×24 jam)** | **PT Digital Registra Indonesia** (`digitalregistra.co.id`) sebagai registrar tercatat | Registrar wajib melayani pemegang domain. Siapkan bukti kepemilikan: email kontak domain sesuai WHOIS + data pendaftaran |
+
+**Teks tiket siap salin — kirim ke ArenHost:**
+
+```text
+Subjek: Permintaan Perubahan Nameserver Domain fiezel.my.id ke Cloudflare
+
+Selamat siang Tim Support ArenHost,
+
+Saya pemilik domain fiezel.my.id yang hosting-nya juga berada di ArenHost.
+Saya ingin memindahkan pengelolaan DNS domain tersebut ke Cloudflare, dan mohon
+bantuan mengubah nameserver domain menjadi:
+
+  sydney.ns.cloudflare.com
+  syeef.ns.cloudflare.com
+
+Mohon nameserver lama (SRV1.ARENHOST.COM dan SRV2.ARENHOST.COM) DIHAPUS, jangan
+dibiarkan berdampingan dengan nameserver Cloudflare, karena campuran dua set
+nameserver menyebabkan jawaban DNS menjadi tidak konsisten.
+
+Latar belakang permintaan ini:
+- Saya sudah mencoba mengubahnya sendiri dari panel klien ArenHost, namun muncul
+  galat: "website doesn't exist for fiezel.my.id".
+- Dari hasil WHOIS (whois.id), registrar domain ini tercatat sebagai PT Digital
+  Registra Indonesia, sehingga saya memahami perubahan nameserver perlu diproses
+  dari sisi ArenHost sebagai reseller, atau diteruskan ke registrar.
+
+Catatan penting agar layanan tidak terganggu:
+- HOSTING TETAP DI ARENHOST. Saya tidak memindahkan hosting, tidak memindahkan
+  email, dan tidak melakukan transfer registrar. Yang berubah hanya nameserver.
+- Seluruh 27 record DNS yang aktif saat ini (termasuk A ke 195.88.211.212, MX
+  prioritas 0, SPF, DKIM, DMARC, serta subdomain cPanel seperti mail, webmail,
+  cpanel, whm, ftp, webdisk, autodiscover, autoconfig, cpcalendars, cpcontacts)
+  SUDAH saya salin lengkap ke Cloudflare dan sudah saya verifikasi identik.
+  Dengan demikian website dan email tetap berjalan normal setelah nameserver
+  aktif.
+- Status domain saat ini addPeriod, clientTransferProhibited, dan
+  serverTransferProhibited. Sepanjang pemahaman saya status tersebut membatasi
+  transfer registrar, bukan perubahan nameserver, sehingga permintaan ini
+  seharusnya dapat diproses tanpa perlu membuka kunci transfer.
+
+Mohon diinformasikan estimasi waktu prosesnya, dan mohon konfirmasi kembali
+kepada saya setelah perubahan dilakukan.
+
+Terima kasih atas bantuannya.
+
+Hormat saya,
+[nama pemilik domain]
+[email kontak domain sesuai WHOIS]
+[nomor akun / ID klien ArenHost]
+```
+
+**Kalau harus eskalasi ke Digital Registra:** pakai teks yang sama, ubah sapaan menjadi
+`Tim Support PT Digital Registra Indonesia`, dan tambahkan satu paragraf ini:
+
+```text
+Domain ini saya daftarkan melalui reseller ArenHost, namun panel reseller tidak
+dapat memproses perubahan nameserver. Karena PT Digital Registra Indonesia
+tercatat sebagai registrar domain fiezel.my.id pada WHOIS, saya mengajukan
+permintaan perubahan nameserver ini langsung kepada registrar. Saya siap
+melampirkan bukti kepemilikan domain yang diperlukan.
+```
+
+**Setelah tiket dikirim:**
+
+1. **Jangan menunggu sambil menganggur.** Seluruh pekerjaan Bagian 4 (D1, KV, Worker, secret) tidak
+   butuh nameserver dan **nol dampak murid** — kerjakan itu. Yang benar-benar terblokir sampai
+   nameserver aktif hanyalah custom domain `api.fiezel.my.id` / `owner.fiezel.my.id` (Bagian 2).
+2. Begitu ArenHost atau Digital Registra mengonfirmasi: Cloudflare → zona `fiezel.my.id` →
+   **Check nameservers now**. Aktivasi biasanya beberapa menit, bisa sampai 24 jam untuk resolver
+   yang keras kepala
    ([Cloudflare: change your nameservers](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/)).
+3. Verifikasi sendiri, jangan percaya balasan tiket saja:
+   `dig +short NS fiezel.my.id` harus menjawab **`sydney.ns.cloudflare.com`** dan
+   **`syeef.ns.cloudflare.com`**. Kalau masih `SRV1/SRV2.ARENHOST.COM`, ini **belum** selesai —
+   jangan lanjut ke Bagian 2 dan jangan menutup tiket.
+4. **Konsekuensi untuk rollback:** karena kamu tidak memegang tombol nameserver, rollback penuh di
+   (g) **juga lewat tiket** — bukan lagi hitungan menit, tapi jam sampai hari. Ini menaikkan nilai
+   langkah (b) dan menurunkan toleransi untuk coba-coba. Lihat catatan revisi di (g).
 
 **Situs tetap hidup selama proses ini** karena: resolver yang masih memakai ArenHost mendapat
 jawaban lama (IP `195.88.211.212`), resolver yang sudah pindah mendapat jawaban Cloudflare yang
@@ -179,10 +358,29 @@ akan menjatuhkan situs dengan Error 526. Rekomendasi runbook ini: **mulai dari F
 Full (strict) hanya setelah kamu memverifikasi sertifikat origin sendiri dengan
 `curl -vI --resolve fiezel.my.id:443:195.88.211.212 https://fiezel.my.id/`.
 
-Tambahan yang aman dinyalakan bersamaan: **Always Use HTTPS = On**, **Automatic HTTPS Rewrites =
-On**. Yang **JANGAN** dinyalakan sekarang: HSTS (kalau salah, tidak bisa dibatalkan cepat di sisi
-browser murid), Rocket Loader, dan minifikasi apa pun — ketiganya bisa merusak urutan boot
-aplikasi dan service worker.
+Yang **JANGAN** dinyalakan sekarang: HSTS (kalau salah, tidak bisa dibatalkan cepat di sisi browser
+murid), Rocket Loader, dan minifikasi apa pun — ketiganya bisa merusak urutan boot aplikasi dan
+service worker.
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SSL sudah diset, dan dua saklar HTTPS DIMATIKAN.**
+>
+> Kondisi zona sekarang: **SSL/TLS mode = Full** ✔ (sesuai rekomendasi di atas, sudah diterapkan).
+>
+> **Perubahan dari versi lama runbook:** versi lama menyuruh menyalakan **Always Use HTTPS** dan
+> **Automatic HTTPS Rewrites**. Keduanya sekarang **`off`** — dan itu **disengaja**:
+>
+> - `.htaccess` di origin ArenHost/LiteSpeed **sudah memaksa HTTPS sendiri** (301 dari HTTP ke
+>   HTTPS). Redirect itu sudah bekerja hari ini, tanpa Cloudflare.
+> - Menyalakan `always_use_https` berarti **dua pihak** melakukan redirect HTTPS yang sama. Ketika
+>   satu sisi salah membaca protokol — skenario yang persis sama dengan bahaya Flexible di atas —
+>   hasilnya **loop redirect**, dan loop redirect mematikan **seluruh** situs, bukan satu halaman.
+> - `automatic_https_rewrites` menulis ulang isi HTML/JS di jalur tepi. Untuk aplikasi yang bootnya
+>   bergantung pada urutan berkas dan invarian tiga titik (`SW_REV`, `DIAG_BUILD`,
+>   `FIEZEL_PAGE_BUILD`), menambah pihak yang menyunting berkas = menambah tersangka saat debugging.
+>
+> Aturannya: **satu pemaksa HTTPS saja, dan itu origin.** Jangan nyalakan kedua saklar ini
+> "karena kelihatannya bagus". Kalau suatu hari `.htaccess` dibersihkan dan origin **tidak lagi**
+> memaksa HTTPS, baru nyalakan `always_use_https` — dan uji ulang butir 4 di (f) hari itu juga.
 
 ### (e) Proxy status: mana yang abu-abu (DNS only), mana yang oranye (proxied)
 
@@ -193,6 +391,31 @@ aplikasi dan service worker.
 | `mail`, `MX`, `TXT` SPF/DKIM/DMARC | **WAJIB abu-abu (DNS only)** | Cloudflare hanya memproksikan HTTP/HTTPS. Memproksikan `mail` = **email berhenti bekerja**, dan `MX` yang menunjuk hostname proxied juga rusak |
 | `cpanel`, `webmail`, `ftp`, `autodiscover`, `webdisk` | **WAJIB abu-abu** | Port non-HTTP (2083, 21, 2077) tidak dilewatkan proxy. Kalau dioranyekan, kamu **kehilangan akses cPanel sendiri** |
 | `api.fiezel.my.id` | **Otomatis oranye** (dibuat sebagai Worker custom domain, Bagian 2) | Trafik memang harus masuk ke Worker |
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — 12 record yang tadinya ber-proxy SUDAH dimatikan proxy-nya.**
+>
+> Impor Cloudflare **menyalakan proxy (oranye) secara default** untuk record `A`/`CNAME` yang ia
+> temukan. Itu bukan pilihan kita, itu default vendor — dan di kasus ini defaultnya **berbahaya**.
+> Sudah dikoreksi hari ini: **12 record dikembalikan ke abu-abu (DNS only)**, mencakup
+> `mail`, `webmail`, `cpanel`, `whm`, `ftp`, `webdisk`, `autodiscover`, `autoconfig`,
+> `cpcalendars`, `cpcontacts`, ditambah `@` dan `www` (yang wajib abu-abu pada hari pindah).
+>
+> **Alasannya, tanpa dihaluskan — proxy Cloudflare hanya melewatkan port web standar:**
+>
+> - Layanan di atas **tidak** memakai port web: SMTP/IMAP/POP untuk `mail`/`webmail`, **2083/2087**
+>   untuk `cpanel`/`whm`, **21** untuk `ftp`, **2077/2078** untuk `webdisk`. Kalau di-proxy, port itu
+>   **tidak diteruskan sama sekali** ⇒ layanannya **MATI**, bukan "lambat".
+> - Yang mati bukan cuma milik murid — yang mati adalah **akses cPanel/WHM milikmu sendiri**. Itu
+>   artinya kamu kehilangan alat untuk memperbaiki keadaan tepat saat kamu membutuhkannya.
+> - `autodiscover`/`autoconfig` di-proxy ⇒ klien email (Outlook/Thunderbird/HP murid) berhenti bisa
+>   mengonfigurasi akun secara otomatis. Gejalanya muncul berhari-hari kemudian, jauh dari sebabnya.
+> - **Yang paling mematikan: `MX` yang menunjuk apex ber-proxy.** Kalau `@` oranye, hostname tujuan
+>   `MX` resolve ke **IP Cloudflare**, bukan ke server mail `195.88.211.212`. Cloudflare tidak
+>   menerima SMTP untuk domainmu ⇒ **email masuk berhenti diterima** — tanpa pesan galat ke kamu,
+>   dan pengirim hanya melihat bounce. Ini kombinasi paling sering merusak email saat migrasi.
+>
+> **Aturan permanen:** setelah setiap impor, setiap perubahan bulk, dan setiap kali kamu menambah
+> record baru — **periksa ulang kolom proxy**. Default vendor akan terus mencoba menyalakannya.
 
 **Risiko khusus PWA / service worker kalau `@` dijadikan oranye (proxied):**
 
@@ -306,8 +529,24 @@ atau email berhenti masuk, atau record penting ternyata hilang setelah aktivasi.
 
 **Rollback penuh (kembalikan nameserver):**
 
-1. Di registrar / Domain Manager, ubah nameserver kembali ke
-   **`srv1.arenhost.com`** dan **`srv2.arenhost.com`**. Hapus nameserver Cloudflare.
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — rollback nameserver JUGA lewat tiket.** Karena registrar
+> sebenarnya PT Digital Registra Indonesia dan panel ArenHost menolak menulis field nameserver
+> (langkah (c)), kamu **tidak bisa** mengembalikan nameserver sendiri dalam dua menit. Rollback
+> penuh = **kirim tiket lagi + tunggu**, jadi realistisnya **jam sampai hari**, bukan menit.
+>
+> Konsekuensi praktis yang harus kamu terima **sebelum** memulai Bagian 1:
+> - **Langkah 1-3 "coba yang murah dulu" di atas jadi jauh lebih penting** — itu satu-satunya
+>   rollback yang benar-benar ada di tanganmu, dan efeknya hitungan detik.
+> - **Verifikasi (b) bukan formalitas.** Kalau ada record yang salah setelah aktivasi, perbaikannya
+>   adalah mengedit record di Cloudflare (cepat, milikmu), **bukan** mundur ke ArenHost (lambat,
+>   milik orang lain).
+> - Siapkan teks tiket rollback **sebelum** hari pindah, bukan saat panik. Isinya cukup: minta
+>   nameserver dikembalikan ke `SRV1.ARENHOST.COM` + `SRV2.ARENHOST.COM` dan nameserver Cloudflare
+>   dihapus.
+
+1. Kirim tiket ke ArenHost (eskalasi ke Digital Registra kalau perlu) untuk mengubah nameserver
+   kembali ke **`SRV1.ARENHOST.COM`** dan **`SRV2.ARENHOST.COM`**, serta **menghapus** nameserver
+   Cloudflare. Jangan tinggalkan campuran.
 2. **Waktu propagasi:** kembali ke ArenHost mengikuti TTL record NS di registry — biasanya
    **beberapa menit s.d. beberapa jam**, dan sebagian resolver publik bisa memakan **hingga 24
    jam**. TTL 2 menit yang kamu set di langkah (b) mempercepat record biasa, **tapi tidak
@@ -330,6 +569,17 @@ kedua tidak mengulang sebab yang sama.
 
 **Prasyarat keras:** zona `fiezel.my.id` sudah **Active** di Cloudflare (Bagian 1 selesai, semua
 curl di (f) hijau).
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — BAGIAN INI MASIH TERBLOKIR.** Zona berstatus **`pending`**,
+> bukan `Active`, karena nameserver belum diganti (menunggu tiket, langkah 1(c)). Artinya:
+>
+> - `api.fiezel.my.id` dan `owner.fiezel.my.id` **belum bisa dibuat** — custom domain Worker hanya
+>   bisa dipasang pada zona aktif di akun yang sama.
+> - Worker `fiezel-api` dan `fiezel-owner` **sudah ter-deploy** dan bisa diuji lewat
+>   `*.workers.dev` (Bagian 4.0). Jadi urutan "deploy Worker dulu, route belakangan" di bawah ini
+>   memang sudah dijalankan pada bagian pertamanya — yang tersisa persis bagian route-nya.
+> - **Jangan mengakali blokade ini** dengan zona subdomain atau partial setup: sudah diuji dan tidak
+>   tersedia di plan Free (Bagian 1(a1)).
 
 ### Urutan wajib: deploy Worker DULU, route BELAKANGAN
 
@@ -443,6 +693,18 @@ npx wrangler@3 secret put VAPID_PUBLIC_KEY
 npx wrangler@3 secret list
 ```
 
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — secret SUDAH TERPASANG.** Worker `fiezel-api` sekarang punya
+> **9 Secret** aktif, sementara tabel di atas menyebut **7 nama**. Selisih itu **bukan** izin untuk
+> menebak: jalankan `npx wrangler@3 secret list` dan **cocokkan nama satu per satu** dengan tabel.
+> Dua kemungkinan, dan keduanya butuh tindakan berbeda:
+>
+> - **Nama tambahan yang memang disengaja** (mis. secret operasional yang belum masuk dokumen) →
+>   tambahkan barisnya ke tabel di atas hari itu juga, dengan kolom "untuk apa" yang jujur.
+> - **Nama sisa dari percobaan lama** → **hapus** (`npx wrangler@3 secret delete <NAMA>`). Secret
+>   yang tidak ada yang tahu fungsinya adalah secret yang tidak ada yang akan merotasinya.
+>
+> **Nilainya tetap tidak boleh pernah ditulis** — di dokumen ini, di repo, di tiket, atau di chat.
+
 **Membuat nilai acak yang layak** (jalankan lokal, tempelkan saat wrangler bertanya, jangan
 simpan di berkas):
 
@@ -473,7 +735,7 @@ Settings → Secrets and variables → Actions.
 
 | Nama | Sudah ada? | Untuk apa |
 |---|---|---|
-| `CLOUDFLARE_API_TOKEN` | **Sudah ada** | Deploy Worker + tulis R2. **Belum terverifikasi** apakah scope-nya cukup untuk membuat D1/KV/DO + mengaktifkan Workers AI (`reports/cf-a2-cf-existing.md` §(c)) |
+| `CLOUDFLARE_API_TOKEN` | **Sudah ada** | Deploy Worker + tulis R2. **🔄 27 Agu 2026: sudah terverifikasi** — izin untuk D1/KV/Workers AI **cukup**, tetapi izin **membuat zona TIDAK ada**. Rinciannya di Bagian 3.4 |
 | `CLOUDFLARE_API_TOKEN_API` | **Baru** | Token **terpisah** khusus deploy `fiezel-api`/`fiezel-owner`. Rekomendasi eksplisit: jangan pakai ulang token yang boleh menulis bucket audio (`reports/cf-a2-cf-existing.md` rekomendasi #4) |
 | `CLOUDFLARE_ACCOUNT_ID` | **Sudah ada** | ID akun |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_MODEL_ID` | Sudah ada | Produksi audio (tetap di Actions, **bukan** di Worker) |
@@ -493,13 +755,92 @@ Satu langkah higienis yang harus ditambahkan sendiri: workflow deploy Worker CF 
 punya gate aktor**, padahal workflow Puter punya. Tambahkan `if: github.actor == 'FIEZEL-APPS'` ke
 workflow deploy `fiezel-api` (`reports/cf-a2-cf-existing.md` rekomendasi #2).
 
+### 3.4 IZIN TOKEN API — apa yang terbukti bekerja, dan satu yang tidak
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — bagian ini BARU.** Menggantikan catatan lama "belum
+> terverifikasi" di tabel 3.3. Semua baris di bawah ini adalah hasil pemakaian nyata hari ini,
+> bukan tebakan dari dokumentasi.
+
+**Nilai token tidak ada di dokumen ini.** Yang dicatat hanya **nama izin** — itu bukan rahasia, dan
+mencatatnya menghemat satu jam trial-and-error di kemudian hari.
+
+| Izin (scope) | Terbukti dipakai untuk |
+|---|---|
+| **Workers Scripts** (edit) | `wrangler deploy` `fiezel-api` + `fiezel-owner`, `secret put`, `rollback` |
+| **Workers KV Storage** (edit) | Membuat namespace `fiezel-CFG`, tulis/baca `cfg:flags` |
+| **D1** (edit) | Membuat `fiezel-core` + `fiezel-stats`, menjalankan migrasi `--remote`, `d1 execute` |
+| **R2** (edit) | Tulis/baca bucket `fiezel-audio` (termasuk prefiks `tts/v1/`) |
+| **Workers AI** (read/run) | Menjalankan model TTS (Bagian 5 → uji model nyata) |
+| **Zone DNS** (edit) | Mengedit record di zona `fiezel.my.id`, mematikan proxy 12 record |
+| **Zone Settings** (edit) | Mengatur SSL mode = Full, `always_use_https`/`automatic_https_rewrites` = off |
+| **Workers Routes** (edit) | Menyiapkan route/custom domain — **efektif setelah zona `Active`** |
+
+**Satu izin yang TIDAK dimiliki token, dan konsekuensinya:**
+
+| Izin yang tidak ada | Akibat | Jalan yang harus dipakai |
+|---|---|---|
+| **`com.cloudflare.api.account.zone.create`** | Pembuatan zona **lewat API gagal**. Skrip apa pun yang mencoba `POST /zones` akan ditolak | **Dashboard.** Zona `fiezel.my.id` memang dibuat dari dashboard (Bagian 1(a)) |
+
+**Kenapa ini tidak diperbaiki dengan menambah izin:** menambahkan `zone.create` ke token yang juga
+boleh menulis Worker dan bucket audio berarti satu token bisa **membuat dan menghapus zona DNS
+seluruh akun**. Pembuatan zona terjadi **sekali dalam hidup proyek ini**; risikonya permanen.
+**Biarkan izin itu tidak ada** — satu klik dashboard sekali seumur proyek adalah harga yang murah.
+Prinsip yang sama berlaku pada rekomendasi token terpisah di tabel 3.3: token deploy Worker
+**tidak** boleh sekaligus token yang menulis bucket audio.
+
 ---
 
 ## Bagian 4 — CARA DEPLOY
 
 Semua langkah di bagian ini **nol dampak murid** sampai 4.6 (memutar flag). Itu memang desainnya.
 
+### 4.0 ✅ APA YANG SUDAH HIDUP DI AKUN (per 27 Agu 2026)
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — bagian ini BARU.** Sebagian besar Bagian 4 **sudah
+> dikerjakan**. Baca ini dulu supaya kamu tidak membuat ulang sumber daya yang sudah ada — membuat
+> D1 kedua bernama sama akan membuatmu memigrasikan database yang salah, dan gejalanya adalah
+> "tabel tidak ada" pada Worker yang jelas-jelas sudah dideploy.
+>
+> **Kenapa ini aman meski belum diumumkan:** semuanya hidup **tanpa nameserver dan tanpa route**.
+> Tidak ada satu pun murid yang bisa menyentuhnya, dan semua flag masih `off`. Ini persis urutan
+> aman yang dijanjikan di awal runbook: **infrastruktur dulu, nol dampak murid.**
+
+| Sumber daya | Nama | Isi / catatan |
+|---|---|---|
+| **D1** | `fiezel-core` | Tabel: `identity`, `session`, `anon_issue`, `quota_daily`, `quota_reservation` |
+| **D1** | `fiezel-stats` | Tabel: `metrics_daily`, `usage_daily`, `retention_daily`, `dau_dedup`, `pepper_state` |
+| **KV** | `fiezel-CFG` | Namespace untuk flag/config — binding `CFG` |
+| **Worker** | `fiezel-api` | **26 modul**, **9 Secret** terpasang, cron **`*/5 * * * *`** (rollup rutin) dan **`5 17 * * *`** (harian) |
+| **Worker** | `fiezel-owner` | Dashboard owner — belum punya route (menunggu zona aktif) |
+| **R2** | `fiezel-audio` | Sudah ada sebelumnya; prefiks baru `tts/v1/` sudah diuji tulis-baca (Bagian 5) |
+
+**Catat soal cron:** `*/5 * * * *` berjalan **tiap 5 menit** dan `5 17 * * *` berjalan **17:05 UTC =
+00:05 WIB**. Keduanya menghitung ke kuota request Free (Bagian 5 baris #5), jadi kalau angka request
+harian naik tanpa murid, cron adalah tersangka pertama — bukan bug.
+
+#### ⚠️ Analytics Engine BELUM diaktifkan — dan itu keputusan, bukan kelalaian
+
+- Mengaktifkan Analytics Engine **butuh sekali klik di dashboard**. Lewat API ia menolak dengan
+  **error `10089`**. Jangan buang waktu mencari izin token yang kurang — ini gerbang dashboard,
+  bukan gerbang izin ([Workers Analytics Engine](https://developers.cloudflare.com/analytics/analytics-engine/)).
+- **Binding AE sengaja DILEWATI** di `wrangler.toml` untuk sekarang. Worker yang punya binding ke
+  dataset AE yang belum aktif akan gagal saat menulis data point — dan kegagalan itu muncul di jalur
+  panas, bukan di waktu deploy.
+- **Yang harus jelas bagi siapa pun yang membaca ini:** Analytics Engine **hanya untuk event
+  operasional** (jejak latensi, hitung kejadian, debugging). **AE BUKAN sumber kebenaran DAU/MAU.**
+  Sumber kebenaran angka pengguna adalah **D1 `fiezel-stats`** (`metrics_daily`, `usage_daily`,
+  `retention_daily`, dedup lewat `dau_dedup`).
+- Konsekuensinya: **tidak menyalakan AE tidak menunda satu pun angka yang dilaporkan ke owner.**
+  Kalau nanti ada laporan DAU yang "menunggu Analytics Engine", laporan itu salah desain —
+  perbaiki laporannya, jangan nyalakan AE untuk menambalnya.
+
 ### 4.1 Buat D1 + jalankan migrasi
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SUDAH DIKERJAKAN.** `fiezel-core` dan `fiezel-stats` sudah
+> ada, migrasi sudah jalan, tabel sudah terverifikasi (daftar tabel di 4.0). **Jangan jalankan
+> `d1 create` lagi.** Langkah di bawah tetap ditulis lengkap sebagai referensi kalau kamu harus
+> membangun ulang dari nol — dan perintah `d1 execute` verifikasi tabel di akhir tetap berguna
+> kapan saja.
 
 ```bash
 cd FIEZEL-APPS/workers/api
@@ -536,6 +877,11 @@ kuota pakai `user_id`, analytics pakai token harian, tanpa kolom penghubung
 
 ### 4.2 Buat KV namespace
 
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SUDAH DIKERJAKAN.** Namespace **`fiezel-CFG`** sudah ada dan
+> sudah terikat sebagai binding `CFG`. Jangan buat namespace kedua — dua namespace dengan binding
+> yang sama adalah cara paling rapi untuk membuat kill switch-mu menulis ke tempat yang tidak dibaca
+> siapa pun.
+
 ```bash
 npx wrangler@3 kv namespace create CFG
 # Salin id yang dicetak ke [[kv_namespaces]] binding = "CFG" di wrangler.toml
@@ -549,6 +895,11 @@ pengguna kalau dipakai per-request (`reports/CF-MIGRATION-REPORT.md` ringkasan b
 
 ### 4.3 Deploy `workers/api`
 
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SUDAH TER-DEPLOY** (26 modul, 9 Secret, dua cron). **Tapi
+> `curl https://api.fiezel.my.id/health` di bawah ini BELUM BISA JALAN** — hostname itu belum ada
+> sampai zona `Active` (Bagian 2). Untuk sekarang uji lewat URL `*.workers.dev` Worker tersebut, dan
+> tetap tuntut jawaban `protocol":"1.7"` yang sama.
+
 ```bash
 cd FIEZEL-APPS/workers/api
 npx wrangler@3 deploy 2>&1 | tee deploy.log
@@ -561,6 +912,11 @@ curl -s https://api.fiezel.my.id/health
 ```
 
 ### 4.4 Deploy `workers/owner`
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — SUDAH TER-DEPLOY**, tanpa route. Uji gerbang kepemilikan di
+> bawah ini **wajib dijalankan lewat URL `*.workers.dev`** sekarang, jangan ditunda sampai hostname
+> `owner.fiezel.my.id` ada — kalau gerbangnya bocor, kamu ingin tahu **sebelum** hostname publik itu
+> lahir, bukan sesudah.
 
 ```bash
 cd FIEZEL-APPS/workers/owner
@@ -701,9 +1057,60 @@ menabrak batas harian — bukan bug.
 |---|---|---|---|---|
 | 1 | **CPU 10 ms / request** ([Workers limits](https://developers.cloudflare.com/workers/platform/limits/)) | AI/TTS gagal **acak** padahal internet baik: spinner lalu pesan galat, sering saat request pertama setelah idle. Login/`whoami` kadang gagal, kadang tidak. **Tidak konsisten** — inilah tanda khasnya | Workers & Pages → `fiezel-api` → **Metrics**: grafik **CPU Time** (lihat **p99**, bukan rata-rata) + jumlah **Errors**/status 1102 di **Logs** | **p99 CPU > 8 ms** atau ada **satu pun** error 1102 (exceeded CPU) di jam sibuk. Verifikasi HMAC + parse JSON secara dokumentasi memakai **10-20 ms** ⇒ jalur identitas praktis **tidak muat** di 10 ms. **Ini ambang yang paling mungkin tercapai lebih dulu.** Paid = 30 detik CPU |
 | 2 | **KV 1.000 tulis/hari** (kunci berbeda) ([KV limits](https://developers.cloudflare.com/kv/platform/limits/)) | Flag/kill switch **tidak mau berubah** saat kamu putar (`kv key put` gagal). Kalau breaker ikut memakai KV: circuit breaker macet di posisi lama ⇒ AI tetap mati padahal sudah sehat, atau tetap hidup padahal harus berhenti | Workers KV → namespace `CFG` → **Metrics** (writes/hari). Atau uji langsung: `wrangler kv key put ... --remote` → kalau error kuota, kamu sudah lewat | **> 700 tulis/hari** (70%). Kalau desainnya benar, KV hanya ditulis **beberapa kali sehari** (flag + breaker), jadi mendekati 1.000 = **ada bug**: sesuatu menulis KV per-request. **Periksa bug itu dulu sebelum upgrade** — upgrade menyembunyikan bug ini, tidak memperbaikinya. Paid = tulis tak terbatas |
-| 3 | **Workers AI 10.000 neuron/hari** ([Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)) | Sore/malam WIB: tombol AI menjawab "sedang sibuk"/gagal untuk **semua murid sekaligus**, lalu normal lagi jam 7 pagi. Suara neural berhenti dan jatuh ke suara robot bawaan | AI → **Workers AI** → grafik **Neurons used (today)** | **> 8.000 neuron/hari** (`GLOBAL_NEURON_CAP = 8000` memang disetel di bawah plafon). **Peringatan penting: 10.000 neuron/hari adalah kolam SELURUH AKUN, bukan per murid** — satu penyalahguna mengeringkannya untuk semua orang. Pada aura-1, 10.000 neuron ≈ **7.333 karakter TTS/hari untuk seluruh akun** ⇒ jelas tidak cukup untuk kelas. **Perbaikan yang benar bukan upgrade, tapi PRA-RENDER**: korpus 591.898 karakter = **US$9,07 sekali bayar** vs **US$529/bulan** runtime @1.000 pengguna. Upgrade Paid hanya menaikkan plafon (US$0,011/1.000 neuron di atas 10.000) — pra-render menghapus masalahnya |
+| 3 | **Workers AI 10.000 neuron/hari** ([Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)) | Sore/malam WIB: tombol AI menjawab "sedang sibuk"/gagal untuk **semua murid sekaligus**, lalu normal lagi jam 7 pagi. Suara neural berhenti dan jatuh ke suara robot bawaan | AI → **Workers AI** → grafik **Neurons used (today)** | **> 8.000 neuron/hari** (`GLOBAL_NEURON_CAP = 8000` memang disetel di bawah plafon). **Peringatan penting: 10.000 neuron/hari adalah kolam SELURUH AKUN, bukan per murid** — satu penyalahguna mengeringkannya untuk semua orang. Pada aura-1, 10.000 neuron ≈ **7.333 karakter TTS/hari untuk seluruh akun** ⇒ jelas tidak cukup untuk kelas. **Perbaikan yang benar bukan upgrade, tapi PRA-RENDER**: korpus 591.898 karakter = **US$9,07 sekali bayar** vs **US$529/bulan** runtime @1.000 pengguna. Upgrade Paid hanya menaikkan plafon (US$0,011/1.000 neuron di atas 10.000) — pra-render menghapus masalahnya. **🔄 27 Agu 2026: model nyata + hasil uji latensi ada di sub-bagian di bawah tabel ini** |
 | 4 | **50 subrequest / invocation** ([Workers limits](https://developers.cloudflare.com/workers/platform/limits/)) | Operasi berat gagal di tengah: batch pra-render berhenti, sesi listening panjang (mis. audiobook 1.484 kalimat) berhenti separuh jalan. Gejalanya **selalu di operasi besar**, tidak pernah di klik tunggal | Logs → cari exception "Too many subrequests" pada Worker/Cron | Ada **satu pun** "too many subrequests" pada jalur yang dipakai murid. Mitigasi tanpa uang dulu: batasi batch (±200 klip/invocation dengan cursor), dan pastikan **cache-hit TTS tidak melewati Worker** (balas URL public bucket ⇒ nol subrequest). Paid = 10.000 subrequest |
 | 5 | **100.000 request/hari** (bonus, jangan diabaikan) ([Workers limits](https://developers.cloudflare.com/workers/platform/limits/)) | **Halaman error Cloudflare 1027** — bukan pesan FIEZEL. Ini melanggar aturan produk "jangan pernah blank screen ke murid" | Workers & Pages → Metrics → **Requests (24h)** | **> 70.000 request/hari.** Kalau belum mau upgrade, set route ke **"fail open"** (request melewati Worker seolah tidak ada Worker) agar murid tidak melihat halaman 1027 |
+
+### 🔄 Model TTS NYATA di akun ini + hasil uji (27 Agu 2026)
+
+> **🔄 TEMUAN LAPANGAN 27 Agu 2026 — sub-bagian ini BARU.** Menggantikan penyebutan "aura-1" yang
+> tadinya generik. Sekarang ada daftar model yang **benar-benar tersedia** di akun ini dan **angka
+> nyata** dari satu uji, bukan estimasi dari dokumentasi.
+
+**Model TTS yang tersedia (terverifikasi ada di Workers AI akun ini):**
+
+| Model | Catatan |
+|---|---|
+| **`@cf/deepgram/aura-1`** | Pilihan **default untuk pra-render**. Paling cepat pada uji di bawah ([model aura-1](https://developers.cloudflare.com/workers-ai/models/aura-1/)) |
+| **`@cf/deepgram/aura-2-en`** | Kualitas Inggris generasi berikutnya; **~2,6× lebih lambat** pada uji yang sama |
+| **`@cf/deepgram/aura-2-es`** | Spanyol — tidak dipakai FIEZEL sekarang, dicatat supaya tidak dicari lagi |
+| **`@cf/myshell-ai/melotts`** | Alternatif; belum diukur di uji ini |
+
+**Uji nyata — satu kalimat, 84 karakter, MP3:**
+
+| Model | Latensi | Ukuran MP3 |
+|---|---|---|
+| `@cf/deepgram/aura-1` | **961 ms** | **25.704 byte** |
+| `@cf/deepgram/aura-2-en` | **2.510 ms** | **32.688 byte** |
+
+**Cara membaca angka ini — dan kenapa ini mengunci keputusan pra-render:**
+
+- **961 ms untuk 84 karakter berarti TTS runtime tidak layak.** Satu kalimat pendek saja hampir satu
+  detik; kalimat pelajaran yang lebih panjang akan terasa seperti aplikasi menggantung. Murid tidak
+  membaca angka latensi — mereka menekan tombol dua kali, lalu mengira aplikasinya rusak.
+- **2.510 ms pada aura-2-en menutup pintu "pakai yang paling bagus saja".** Naik kualitas = naik
+  latensi ±2,6× pada teks yang sama. Kalau kualitas aura-2 memang dibutuhkan, ia **harus**
+  pra-render — tidak ada versi "panggil saat dibutuhkan" yang nyaman.
+- **Ukuran byte penting untuk anggaran R2 dan untuk PWA offline.** ±25,7 KB per kalimat pendek
+  berarti korpus besar harus dihitung sebagai puluhan-ratusan MB, bukan "beberapa MB".
+- Ini **konsisten** dengan ambang neuron di baris #3 tabel di atas: batas Free 10.000 neuron/hari
+  adalah kolam **seluruh akun**, dan pada aura-1 harganya per **1.000 karakter** input
+  ([harga Workers AI](https://developers.cloudflare.com/workers-ai/platform/pricing/)). Runtime TTS
+  mengeringkan kolam itu untuk semua murid sekaligus. **Pra-render, bukan upgrade.**
+
+**Jalur penyimpanan pra-render sudah terbukti bekerja:**
+
+- Unggah hasil TTS ke **R2 `fiezel-audio`** dengan prefiks **`tts/v1/`** → **berhasil**, dan saat
+  dibaca ulang hasilnya **byte-identik** dengan yang diunggah. Artinya jalur
+  `Workers AI → R2 → klien` sudah tidak perlu diragukan lagi; yang tersisa hanya orkestrasi batch.
+- **Prefiks `tts/v1/` adalah kontrak versi, bukan hiasan.** Kalau model atau parameter suara berubah,
+  tulis ke `tts/v2/` — **jangan menimpa `v1/`**. Menimpa berarti PWA yang sudah men-cache audio lama
+  mencampur dua generasi suara dalam satu pelajaran, dan kamu tidak punya cara memutar balik.
+- **Batasi batch pra-render** ±200 klip per invocation dengan cursor — lihat baris #4 tabel di atas
+  (50 subrequest/invocation di Free). Ini bukan saran teoretis: batch besar akan mati di tengah dan
+  menyisakan korpus separuh terisi.
+- **Cache-hit TTS tidak boleh melewati Worker.** Balas URL bucket publik ⇒ nol subrequest, nol
+  neuron, nol CPU. Setiap cache-hit yang melewati Worker adalah biaya yang kamu bayar dua kali.
 
 ### Cara mengambil keputusan upgrade (aturan sederhana)
 
@@ -770,6 +1177,23 @@ Ingat: push = produksi dalam ≤5 menit. Tidak ada langkah "batalkan sebelum sam
 - [ ] Worker owner menolak non-owner (403/404, bukan 200)
 - [ ] Kamu tahu persis perintah kill switch-nya (4.7 nomor 1) dan sudah menyiapkannya di terminal
 
+**🔄 D. Gerbang DNS/zona — ditambahkan 27 Agu 2026** (jalankan kalau rilis ini menyentuh zona,
+record, atau setelan SSL):
+
+- [ ] **Proxy status masih benar.** Sepuluh hostname layanan non-web — `mail`, `webmail`, `cpanel`,
+      `whm`, `ftp`, `webdisk`, `autodiscover`, `autoconfig`, `cpcalendars`, `cpcontacts` — semuanya
+      **abu-abu (DNS only)**. Cek visual di tabel DNS Cloudflare. Satu saja oranye = email atau
+      cPanel akan mati.
+- [ ] `@` dan `www` **masih abu-abu** dan `A`-nya **`195.88.211.212`**.
+- [ ] `MX` **prioritas 0** utuh, dan hostname tujuannya **tidak** menunjuk record ber-proxy.
+- [ ] **DKIM masih 409 karakter** (kalau record TXT pernah disentuh di rilis ini).
+- [ ] SSL/TLS **Full**; `always_use_https` dan `automatic_https_rewrites` **tetap off** (origin yang
+      memaksa HTTPS — lihat 1(d)).
+- [ ] Nameserver: `dig +short NS fiezel.my.id`. Kalau masih `SRV1/SRV2.ARENHOST.COM`, **jangan**
+      mengklaim apa pun tentang `api.fiezel.my.id` — hostname itu belum ada.
+- [ ] Tidak ada yang mencoba menambah `api.fiezel.my.id` sebagai **zona** (1(a1) — tidak tersedia
+      di Free).
+
 **Batalkan rilis (jangan push) kalau:** ada satu gerbang merah, atau flag tidak `off`, atau
 `/health` tidak menjawab `protocol":"1.7"`, atau kamu belum tahu cara mematikannya.
 
@@ -827,7 +1251,9 @@ curl -s -o /dev/null -w "%{http_code}\n" -X PUT https://fiezel-audio.fitrajft.wo
 | AI/TTS gagal atau mahal | `transport`/`tts` → `off`. Klien kembali ke Puter yang masih hidup | Periksa neuron & CPU di dashboard (Bagian 5) |
 | Endpoint owner menjawab 200 tanpa kredensial | **Hapus route `owner.fiezel.my.id` sekarang** | `wrangler delete` Worker owner |
 | Worker error setelah deploy | `wrangler rollback` | Hapus route → flag `off` |
-| Email berhenti masuk | Bandingkan `MX`/`TXT` dengan `~/fiezel-dns-sebelum.txt`, perbaiki manual | Rollback nameserver |
+| Email berhenti masuk | **Cek kolom proxy dulu** (`mail` + `@` harus abu-abu — penyebab #1 sejak 27 Agu 2026), lalu bandingkan `MX`/`TXT` dengan `~/fiezel-dns-sebelum.txt` | Rollback nameserver **lewat tiket** (1g — jam, bukan menit) |
+| Akses cPanel/WHM/FTP hilang | Set `cpanel`, `whm`, `ftp`, `webdisk` → **abu-abu (DNS only)**. Port 2083/2087/21/2077 tidak lewat proxy | Akses lewat IP langsung `195.88.211.212:2083` sambil memperbaiki |
+| Loop redirect setelah menyalakan saklar HTTPS | **Matikan** `always_use_https` + `automatic_https_rewrites`; origin sudah memaksa HTTPS sendiri | SSL/TLS → **Full**; semua record HTTP → abu-abu |
 | Auto-deploy tidak jalan | Cek `~/fiezel-deploy.log`; pastikan baris cron `auto-deploy-fiezel` tidak dikomentari | Deploy manual dengan `~/deploy-fiezel.sh` |
 
 **Yang TIDAK boleh dilakukan saat panik:**
@@ -853,6 +1279,15 @@ Ini bukan pemanis; ini konsekuensi yang wajib tertulis (KONTRAK ANALYTICS, `EXEC
   identitas baru. Itu konsekuensi dari anonimitas, bukan bug.
 - **Free tier bisa saja tidak cukup.** Kalau ambang di Bagian 5 tersentuh, itu bukan kegagalan
   keputusan — itu data yang memang diminta untuk memutuskan US$5/bulan.
+- **🔄 27 Agu 2026 — Analytics Engine belum aktif, dan itu tidak mengurangi satu pun angka yang
+  kamu terima.** AE hanya mencatat **event operasional** (latensi, hitung kejadian, debugging).
+  Sumber kebenaran DAU/MAU/retensi adalah **D1 `fiezel-stats`**. Kalau suatu hari ada yang bilang
+  "angka pengguna menunggu Analytics Engine", itu tanda laporannya salah desain — bukan tanda AE
+  harus dinyalakan.
+- **🔄 27 Agu 2026 — satu langkah migrasi ada di tangan orang lain.** Perubahan nameserver harus
+  lewat tiket ke ArenHost/Digital Registra (Bagian 1c). Konsekuensinya jujur: **jadwal aktivasi dan
+  jadwal rollback penuh tidak bisa dijanjikan oleh runbook ini** — hanya jadwal persiapannya yang
+  bisa. Semua pekerjaan lain sudah disusun agar tetap berjalan sambil menunggu.
 
 ## Sumber
 
@@ -863,6 +1298,22 @@ owner), `cf-a2-cf-existing.md` (inventaris CF yang sudah ada: Worker `fiezel-aud
 `cf-b5-analytics.md` (skema agregat), `cf-b6-migration-plan.md` (fase, flag tiga-status, kill
 switch, urutan endpoint), `cf-c1-konsistensi.md` (putusan kontradiksi + angka kanonik).
 Di akar repo: `EXEC-BRIEF-CF.md` (keputusan owner), `FIEZEL-DEPLOY-ARENHOST.md` (hosting).
+
+**Bukti lapangan 27 Agu 2026** (tidak ada nilai rahasia/token yang dicatat di mana pun):
+
+- WHOIS `whois.id` untuk `fiezel.my.id`: registrar **PT Digital Registra Indonesia**
+  (`digitalregistra.co.id`), Registrar IANA ID 1, status `addPeriod` +
+  `clientTransferProhibited` + `serverTransferProhibited`, NS `SRV1/SRV2.ARENHOST.COM`.
+- Panel klien ArenHost: galat `website doesn't exist for fiezel.my.id` saat mengubah nameserver.
+- Dashboard Cloudflare: penolakan Add Site subdomain — "Please ensure you are providing the root
+  domain and not any subdomains"; zona `fiezel.my.id` status `pending`, NS ditugaskan
+  `sydney.ns.cloudflare.com` + `syeef.ns.cloudflare.com`, 27 record terimpor, 12 record dimatikan
+  proxy-nya, SSL = Full, `always_use_https` + `automatic_https_rewrites` = off.
+- API Cloudflare: error `10089` saat mengaktifkan Analytics Engine; token owner tanpa
+  `com.cloudflare.api.account.zone.create`.
+- Uji TTS: `@cf/deepgram/aura-1` 961 ms / 25.704 byte dan `@cf/deepgram/aura-2-en` 2.510 ms /
+  32.688 byte untuk satu kalimat 84 karakter; unggah R2 `fiezel-audio` prefiks `tts/v1/` byte-identik
+  saat dibaca ulang.
 
 **Dokumentasi Cloudflare** (batas & mode, diverifikasi 27 Agu 2026):
 
@@ -877,3 +1328,11 @@ Di akar repo: `EXEC-BRIEF-CF.md` (keputusan owner), `FIEZEL-DEPLOY-ARENHOST.md` 
 - Full (strict): https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full-strict/
 - Menambahkan domain (Add Site): https://developers.cloudflare.com/fundamentals/manage-domains/add-site/
 - Mengganti nameserver (full setup): https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/
+- **Subdomain setup = Enterprise saja** (Free/Pro/Business semuanya "No") — dasar peringatan 1(a1):
+  https://developers.cloudflare.com/dns/zone-setups/subdomain-setup/
+- **CNAME / partial setup = Business atau Enterprise** (Free/Pro "No"):
+  https://developers.cloudflare.com/dns/zone-setups/partial-setup/
+- Model TTS `@cf/deepgram/aura-1` (harga per 1.000 karakter input, keluaran MP3):
+  https://developers.cloudflare.com/workers-ai/models/aura-1/
+- Workers Analytics Engine (event operasional + SQL API; **bukan** sumber kebenaran DAU/MAU di
+  desain FIEZEL): https://developers.cloudflare.com/analytics/analytics-engine/
