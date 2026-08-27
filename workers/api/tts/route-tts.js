@@ -77,15 +77,23 @@
   var TTS_TIMEOUT_MS = 25000; // selaras CALL_TIMEOUT_MS; 35 s dinilai terlalu longgar (cf-a10 §6)
   var MAX_BODY_BYTES = 12000;
 
+  /**
+   * A8 · Naskah murid, satu kanon dengan `features/quota/quota-copy.js`: bahasa sehari-hari,
+   * "nggak" bukan "tidak", tanpa nama mesin, tanpa menyalahkan murid. Dijaga
+   * `quota-notice-a11y-test.js`.
+   */
   var POLITE = Object.freeze({
-    bad_json: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
-    invalid_input: 'Teks yang akan dibacakan belum lengkap.',
-    key_mismatch: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
-    too_long: 'Teksnya terlalu panjang untuk sekali dibacakan.',
-    quota_exceeded: 'Jatah suara hari ini sudah habis. Suara perangkat tetap bisa dipakai.',
-    breaker_open: 'Suara dari perangkat — layanan suara sedang istirahat sebentar.',
-    unavailable: 'Suara dari perangkat — audio belum tersedia untuk kalimat ini.',
-    body_too_big: 'Permintaan terlalu besar.'
+    bad_json: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
+    invalid_input: 'Teks yang mau dibacakan belum lengkap.',
+    key_mismatch: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
+    too_long: 'Kalimatnya kepanjangan untuk sekali dibacakan.',
+    quota_exceeded: 'Jatah suara hari ini sudah habis. Suara perangkatmu tetap bisa dipakai, dan jatahnya kembali sesudah tengah malam.',
+    // A8 TEMUAN BOHONG (§4 reports/add-a8-a11y.md): sebelum commit ini, penghitung jatah
+    // yang MATI dilaporkan ke murid sebagai "jatah suara hari ini sudah habis".
+    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suara perangkatmu tetap bisa dipakai — coba lagi sebentar lagi, ya.',
+    breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
+    unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
+    body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
   /** Single-flight per kunci, per isolate. */
@@ -280,10 +288,16 @@
         quotaChecked = true;
       }
       if (quota && quota.allowed === false) {
+        // A8: alasan sebenarnya menentukan kode DAN kalimatnya. `quota_unavailable` =
+        // catatan jatah yang mati, bukan jatah murid yang habis. `copyKey` disertakan
+        // supaya klien memakai naskah `features/quota/quota-copy.js`.
+        var quotaBroken = String((quota && quota.reason) || '') === 'quota_unavailable';
         return json(baseResponse({
           audioKey: identity.audioKey, objectName: objectName, chars: chars,
           source: 'unavailable', degraded: true, breaker: gate.phase,
-          error: 'quota_exceeded', message: POLITE.quota_exceeded,
+          error: quotaBroken ? 'quota_unavailable' : 'quota_exceeded',
+          copyKey: quotaBroken ? 'quota.unavailable' : 'quota.tts.exhausted',
+          message: quotaBroken ? POLITE.quota_unavailable : POLITE.quota_exceeded,
           retryAfter: Number(quota.retryAfter) || 3600, quotaCharged: false
         }), 429, { 'retry-after': String(Number(quota.retryAfter) || 3600) });
       }

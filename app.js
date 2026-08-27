@@ -1986,8 +1986,47 @@ function maybePresentPuterCreditNotice(){
   const at=Date.now();
   if(!shouldPresentPuterPopup({now:at,lastShownAt:readPuterPopupLastShown(),signedIn:false,listeningActive:false}))return false;
   markPuterPopupShown(at);
-  openModal(`<div class="modal-mark">FIEZEL</div><h2>Kredit AI Puter kamu habis</h2><p>Tenang &mdash; aplikasi tetap bisa kamu pakai penuh tanpa upgrade apa pun. Yang terdampak cuma tutor AI dan suara neural; materi, latihan, dan progresmu jalan seperti biasa. Kalau mau lanjut pakai fitur AI, opsi upgrade ada di akun Puter kamu.</p><div class="modal-actions"><a class="setup-link" id="puterCreditLearn" href="https://puter.com/settings/usage" target="_blank" rel="noopener"><i data-lucide="external-link"></i> Pelajari opsi upgrade</a><button type="button" class="primary" id="puterCreditClose">Oke, lanjut belajar</button></div>`);
-  $('puterCreditClose')?.addEventListener('click',closeModal);
+  /* A8 naskah + aksesibilitas. Tiga hal yang DIPERBAIKI di sini, semuanya pelanggaran kanon:
+     (1) judul lamanya menyebut nama layanan mesin ("Kredit AI Puter kamu habis") - murid
+         nggak pernah membaca nama mesin, dan nama itu juga bukan sesuatu yang bisa dia
+         perbaiki;
+     (2) di dalamnya ada TAUTAN `<a>` ke halaman pemakaian berbayar ("Pelajari opsi
+         upgrade") - itu permukaan bayar di panel jatah, dan `paymentEnabled=false`
+         ditegakkan sebagai KETIADAAN elemen, bukan tombol nonaktif;
+     (3) kalimatnya memakai "tidak" alih-alih "nggak".
+     Naskahnya sekarang milik features/quota/quota-copy.js, jadi satu perubahan kalimat
+     berlaku di semua permukaan sekaligus. */
+  return presentQuotaNotice({copyKey:'quota.ai.exhausted',spoken:true})
+}
+/**
+ * A8 · satu-satunya jalan menampilkan pemberitahuan jatah/suara ke murid.
+ *
+ * MENGAPA BUKAN showToast(): toast di app.js:2521 menghilang sendiri sesudah 2.600 ms. Itu
+ * cukup untuk "Terkirim, terima kasih!" dan NGGAK cukup untuk kalimat yang menjelaskan apa
+ * yang rusak, apa yang tetap jalan, dan apa yang harus dilakukan. Pemberitahuan ini menetap
+ * sampai murid menutupnya sendiri.
+ *
+ * ATURAN SENYAP SESI DENGAR: kalau sesi listening sedang berjalan, pemberitahuan ini nggak
+ * ditampilkan sama sekali - ia menunggu `onSessionEnd`. Wilayah `aria-live` yang berbicara di
+ * tengah kalimat soal listening merusak ujiannya (alasan lengkap di quota-copy.js §3).
+ *
+ * Fokus TIDAK dirampas: nggak ada `.focus()` di sini, jadi murid yang sedang mengisi jawaban
+ * tetap di kolomnya.
+ */
+function presentQuotaNotice(facts){
+  const copy=self.FiezelQuotaCopy;
+  const listeningActive=(()=>{try{return puterListeningActive()===true}catch{return false}})();
+  if(listeningActive)return false;
+  if(!copy?.build||!copy?.panelMarkup){
+    // Naskah cadangan kalau modulnya belum termuat. Ia tetap jujur dan tetap kanon, cuma
+    // lebih pendek - yang dilarang adalah kebisuan, bukan kalimat yang sederhana.
+    openModal(`<div class="modal-mark">FIEZEL</div><section class="fz-notice fz-notice-advisory" role="status" aria-live="polite" aria-atomic="true"><h2 class="fz-notice-title">Jatah hari ini sudah habis</h2><p class="fz-notice-body">Materi, latihan, dan progresmu tetap jalan seperti biasa. Jatahnya kembali sesudah tengah malam.</p><div class="fz-notice-actions"><button type="button" class="fz-notice-btn" id="quotaNoticeClose">Oke, lanjut belajar</button></div></section>`);
+    $('quotaNoticeClose')?.addEventListener('click',closeModal);
+    return true
+  }
+  const notice=copy.build(Object.assign({online:typeof navigator==='undefined'||navigator?.onLine!==false,listeningActive:false},facts||{}));
+  openModal(`<div class="modal-mark">FIEZEL</div>${copy.panelMarkup(notice)}`);
+  $('modalPanel')?.querySelector?.('[data-fz-notice-dismiss]')?.addEventListener('click',closeModal);
   return true
 }
 // Tenggat login. Keadaan 'pending' mematikan tombolnya, dan tidak ada apa pun yang
@@ -5427,7 +5466,22 @@ function closeModalNow(){if(!modalOpen)return false;modalOpen=false;uiSfx('close
 // entri riwayatnya dibuang supaya tekanan kembali berikutnya tidak jatuh pada modal yang
 // sudah tidak ada.
 function closeModal(){try{self.FiezelBackNav?.dismiss?.('modal')}catch{}return closeModalNow()}
-function aiErrorMessage(err){const code=String(err?.error||err?.code||'').toLowerCase();if(code==='popup_blocked')return'Popup login Puter diblokir browser. Izinkan popup untuk situs ini, lalu coba lagi.';if(code==='auth_window_closed')return'Login Puter dibatalkan. Coba lagi dan selesaikan proses login.';if(err?.name==='TimeoutError'||code==='timeout')return`Permintaan AI melewati batas waktu ${FIEZEL_AI_TIMEOUT_MS/1000} detik. Periksa koneksi, lalu coba lagi.`;const raw=err?.message||err?.msg||err?.error_description||err?.error||err;if(typeof raw==='string'&&raw.trim())return raw;try{const text=JSON.stringify(raw);return text&&text!=='{}'?text:'Layanan AI tidak tersedia.'}catch{return'Layanan AI tidak tersedia.'}}
+/* A8 · naskah kegagalan AI untuk MURID.
+
+   Versi sebelumnya meneruskan `err.message` provider apa adanya ke layar murid - dan kalau
+   itu kosong, JSON.stringify(err) mentah. Artinya murid bisa membaca kalimat Inggris berisi
+   nama mesin, kode angka, atau isi objek galat; naskah yang nggak pernah ditulis siapa pun
+   dan nggak bisa diperiksa gerbang mana pun. Sekarang setiap cabang mengembalikan kalimat
+   yang ditulis untuk murid, dan galat aslinya berhenti di console (untuk diagnostik), bukan
+   di layar. */
+function aiErrorMessage(err){const code=String(err?.error||err?.code||'').toLowerCase();try{if(err)console.debug('fiezel-ai-error',err)}catch{}
+  if(code==='popup_blocked')return'Jendela masuk akun diblokir peramban. Izinkan jendela pop-up untuk situs ini, lalu coba lagi.';
+  if(code==='auth_window_closed')return'Masuk akunnya belum selesai. Coba lagi, ya — tinggal satu langkah.';
+  if(err?.name==='TimeoutError'||code==='timeout')return'Jawabannya nggak datang dalam waktu yang wajar. Periksa sambungan internetmu lalu coba lagi.';
+  if(code==='quota_unavailable')return'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Coba lagi sebentar lagi, ya.';
+  if(code==='quota_exceeded')return'Jatah tanya-jawab hari ini sudah habis. Materi, latihan, dan progresmu tetap jalan seperti biasa.';
+  if(typeof navigator!=='undefined'&&navigator?.onLine===false)return'Perangkatmu sedang lepas dari internet. Latihan yang sudah tersimpan tetap bisa kamu kerjakan.';
+  return'Penjelasan AI-nya belum bisa dimuat sekarang. Ini bukan kesalahanmu — coba lagi sebentar lagi, ya.'}
 async function askFiezelAI(prompt,task='question'){
   if(CORE_AI_GATEWAY!=='core-only')throw new Error('Konfigurasi AI FIEZEL tidak valid.');
   if(typeof puter==='undefined'||!puter?.workers?.exec)throw new Error('AI belum siap. Login Puter dan koneksi internet diperlukan.');
@@ -5473,7 +5527,12 @@ function renderMarkdown(text){
   return out.join('')||'<p></p>'
 }
 function renderAIResult(title,text){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${esc(title)}</h2><div class="ai-answer">${renderMarkdown(text)}</div><p class="ai-disclosure"><i data-lucide="shield-check"></i> Konteks soal atau materi yang kamu buka diproses oleh Core AI untuk membuat penjelasan. Jangan masukkan data pribadi.</p><div class="modal-actions"><button class="primary" id="aiClose">Tutup</button></div>`;$('aiClose').onclick=closeModal;enhanceUI()}
-function renderAIError(title,err,retry){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${esc(title)}</h2><p>Penjelasan AI belum bisa dimuat. Pastikan Anda sudah login ke Puter dan koneksi internet aktif.</p><p class="muted">${esc(aiErrorMessage(err))}</p><div class="modal-actions">${retry?'<button id="aiRetry">Coba lagi</button>':''}<button class="primary" id="aiClose">Tutup</button></div>`;$('aiClose').onclick=closeModal;if(retry)$('aiRetry').onclick=retry;enhanceUI()}
+/* A8: "Pastikan Anda sudah login ke Puter" diganti. Dua pelanggaran sekaligus - sudut
+   pandang "Anda" (kanon memakai "kamu") dan nama mesin yang murid nggak perlu tahu - lalu
+   ditambah satu lagi: paragraf keduanya mencetak galat mentah. Wilayahnya diberi
+   role="status": penjelasan yang gagal dimuat itu informasi, bukan keadaan mendesak, jadi ia
+   nggak boleh memotong kalimat yang sedang dibaca pembaca layar. */
+function renderAIError(title,err,retry){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI</div><h2>${esc(title)}</h2><div role="status" aria-live="polite" aria-atomic="true"><p>Penjelasan AI-nya belum bisa dimuat. Pastikan kamu sudah masuk ke akunmu dan internetnya nyala.</p><p class="muted">${esc(aiErrorMessage(err))}</p></div><div class="modal-actions">${retry?'<button id="aiRetry">Coba lagi</button>':''}<button class="primary" id="aiClose">Tutup</button></div>`;$('aiClose').onclick=closeModal;if(retry)$('aiRetry').onclick=retry;enhanceUI()}
 function currentAIRequest(id,epoch){return id===aiRequestSeq&&epoch===modalEpoch}
 function aiProfileContext(){const s=buildLearningSnapshot();return{activeLevel:s.activeLevel||getActiveLevel(),estimatedLevel:s.estimatedLevel,totalAttempts:s.totalAttempts,totalAccuracy:s.totalAccuracy,domainAccuracy:Object.fromEntries(Object.entries(s.domains).map(([k,v])=>[k,v.recentAccuracy??v.accuracy])),weakSkills:s.weakSkills.slice(0,3),dueReviews:s.dueReviews,streakDays:s.streakDays,goalProfile:String(state.preferences?.goalProfile||'general').slice(0,30),timeZone:studyTimeZone()}}
 function renderCoachResult(text){$('modalPanel').innerHTML=`<div class="modal-mark">FIEZEL AI COACH</div><h2>${esc(personalize("Rencana {name}"))}</h2><div class="ai-answer coach-answer">${renderMarkdown(text)}</div><p class="ai-disclosure"><i data-lucide="shield-check"></i> Ini dibuat dari ringkasan latihanmu, bukan dari isi jawabanmu.</p><div class="modal-actions"><button id="coachMap">Peta belajar</button><button class="primary" id="coachStart">${state.adaptiveReady?'Mulai latihan':'Mulai tes awal'}</button></div>`;$('coachMap').onclick=()=>{closeModal();go('progress')};$('coachStart').onclick=()=>{closeModal();state.adaptiveReady?startAdaptive():go('test')};enhanceUI()}

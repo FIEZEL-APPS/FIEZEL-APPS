@@ -168,6 +168,13 @@ jobs:
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
+          # A8: naskah murid + aksesibilitas pemberitahuan jatah/suara. Diletakkan tepat
+          # sesudah tiga gerbang jatah karena ia menguji sisi yang mereka nggak sentuh sama
+          # sekali: bukan angkanya, tetapi KALIMAT yang dibaca murid ketika angkanya habis —
+          # istilah teknis, "nggak" vs "tidak", ketiadaan permukaan bayar, role="alert" yang
+          # terdaftar, larangan jalur toast 2.600 ms, varian jujur untuk keadaan tanpa suara,
+          # dan aturan senyap selama sesi listening berjalan.
+          node quota-notice-a11y-test.js
           node tts-key-test.js
           node ai-task-contract-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
