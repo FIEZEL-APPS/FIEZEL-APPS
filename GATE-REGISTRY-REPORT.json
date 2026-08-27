@@ -1,13 +1,13 @@
 {
   "gate": "gate-registry",
-  "generatedAt": "2026-08-27T19:01:23.701Z",
+  "generatedAt": "2026-08-27T19:56:20.797Z",
   "status": "PASS",
   "source": "reports/add-a10-kepatuhan.md §5.1, §5.3",
   "workflow": ".github/workflows/quality.yml",
   "counts": {
     "gateFilesInRepo": 148,
-    "nodeInvocationsInWorkflow": 152,
-    "evidenceGates": 150,
+    "nodeInvocationsInWorkflow": 153,
+    "evidenceGates": 151,
     "liveGatesNotEvidence": 2,
     "exclusions": 1,
     "pass": 10,
@@ -56,7 +56,7 @@
     {
       "id": "nol-gerbang-hantu",
       "status": "PASS",
-      "details": "152 invokasi node, semua berkasnya ada"
+      "details": "153 invokasi node, semua berkasnya ada"
     },
     {
       "id": "gerbang-live-terdaftar",
@@ -71,7 +71,7 @@
     {
       "id": "hitungan-bukti-tidak-memuat-gerbang-live",
       "status": "PASS",
-      "details": "evidenceGates=150, liveGatesNotEvidence=2 (total invokasi 152) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 150, BUKAN 152"
+      "details": "evidenceGates=151, liveGatesNotEvidence=2 (total invokasi 153) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 151, BUKAN 153"
     },
     {
       "id": "gerbang-live-merah-bila-env-diisi-tapi-rusak",

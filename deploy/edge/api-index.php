@@ -281,10 +281,21 @@ const ALLOW = [
 const FAST_TIMEOUT_PATHS = ['/health', '/healthz', '/api/config', '/api/tts/manifest',
                             '/api/user/me', '/api/quota'];
 
+// F6: jawaban GALAT milik proksi ini WAJIB membawa header CORS yang sama dengan jawaban
+// suksesnya. Alasannya bukan kerapian, ini bug yang terukur: tanpa `Access-Control-Allow-Origin`
+// pada 504/502/404/405, browser MENOLAK jawaban itu sebelum kode aplikasi melihatnya, dan yang
+// muncul di klien adalah `TypeError: Failed to fetch` — persis gejala yang membuat assert
+// `bridge-hop-stable` di gerbang E2E berbunyi "Failed to fetch 6057ms" padahal yang terjadi
+// adalah 504 jujur dari hop ini pada TIMEOUT_FAST_S=6 s. Jadi seluruh kerja F4 membuat proksi
+// "gagal cepat dan jujur" sia-sia di sisi klien: diagnosisnya dibuang oleh CORS.
+// `Vary: Origin` ikut supaya cache mana pun di jalur tidak menyilangkan jawaban antar origin.
 function fail(int $code, string $msg): never {
   http_response_code($code);
   header('Content-Type: application/json; charset=utf-8');
   header('Cache-Control: no-store');
+  header('Access-Control-Allow-Origin: https://fiezel.my.id');
+  header('Access-Control-Allow-Credentials: true');
+  header('Vary: Origin');
   echo json_encode(['error' => $msg], JSON_UNESCAPED_SLASHES);
   exit;
 }

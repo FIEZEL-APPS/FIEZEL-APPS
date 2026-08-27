@@ -102,11 +102,49 @@ self.FIEZEL_CF_CONFIG=Object.freeze({
 // hanya dengan tidak menutup tabnya.
 //
 // Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
+// BATAS WAKTU (F6). Angka di bawah bukan selera, ia hasil ukur terhadap jembatan hidup
+// `api.fiezel.my.id` pada 28 Agu 2026 (bukti lengkap di reports/fix-f6-client-timeout.md):
+//   - `GET /api/config` koneksi baru, 10 sampel: p95 = 1.41 s (handshake TLS 0.48-0.72 s).
+//   - koneksi hangat: 0.35-0.47 s. Dari dalam Chromium, boot dingin: 1.16-1.32 s.
+//   - `GET /api/quota` terautentikasi, jalur terlambat yang pernah terukur: 1.95 s.
+// `timeoutMs:2500` yang lama hanya menyisakan ~1.2 s di atas p95, dan itu terbukti
+// membatalkan permintaan yang sehat: dengan jawaban config ditunda, aplikasi memanggil
+// `controller.abort()` pada 2898 ms lalu mematikan SELURUH jalur CF sampai sesi berikutnya.
+// Anggaran baru 8000 ms dipilih dengan tiga alasan yang bisa diperiksa:
+//   1) margin >= 4x p95 terukur (8000 - 1410 = 6590 ms), jadi satu paket hilang plus satu
+//      handshake ulang tidak lagi terbaca sebagai "server mati";
+//   2) lebih besar daripada `TIMEOUT_FAST_S=6` di deploy/edge/api-index.php, jadi klien
+//      hidup lebih lama daripada proksinya sendiri dan MEMBACA 504-nya, bukan membatalkan
+//      lebih dulu dan kehilangan diagnosis;
+//   3) sama dengan `CLIENT_ABANDON_S=8` yang sudah jadi kontrak hop-by-hop F4.
+// Menaikkan angka ini TIDAK menahan boot: `cfConfigBootOnce()` menjadwalkan permintaan lewat
+// `requestIdleCallback`/`setTimeout` dan tidak pernah di-await; kegagalan apa pun (termasuk
+// batas waktu ini) jatuh ke `cfConfigFailed()` -> semua jalur CF MATI.
 self.FIEZEL_CF_REMOTE=Object.freeze({
   path:'/api/config',
   protocol:'1.7',
-  timeoutMs:2500,
+  timeoutMs:8000,
   mirrorTtlMs:300000,
   mirrorMinTtlMs:30000,
   mirrorKey:'fiezel-cf-flags-mirror-v1'
+});
+// Batas waktu per KELAS endpoint untuk transport CF (`cfWorkerFetch` di app.js). Sebelum F6
+// jalur ini tidak punya batas waktu SAMA SEKALI: satu jawaban yang tidak pernah datang
+// menggantung selamanya di perangkat murid dan yang "menyelamatkan" hanya kesabaran
+// pemanggil. Setiap nilai di bawah = latensi p95 terukur + margin yang disebut eksplisit:
+//   identity/quota/usage 8000 ms  = p95 1.41 s + 6.59 s margin (alasan sama dengan di atas)
+//   ai 30000 ms                   = sama dengan FIEZEL_AI_TIMEOUT_MS di app.js; generasi
+//                                   model memang bisa belasan detik, jadi memangkasnya di
+//                                   transport berarti membunuh jawaban yang sedang ditulis
+//   tts 12000 ms                  = sama dengan RENDER_TIMEOUT_MS di
+//                                   features/neural-voice/fiezel-cf-tts-transport.js, yang
+//                                   sudah punya jatuh-balik suara peramban
+self.FIEZEL_CF_TIMEOUTS=Object.freeze({
+  health:8000,
+  config:8000,
+  auth:8000,
+  quota:8000,
+  usage:8000,
+  ai:30000,
+  tts:12000
 });
