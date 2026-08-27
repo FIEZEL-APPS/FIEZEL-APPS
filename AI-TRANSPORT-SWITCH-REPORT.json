@@ -11,12 +11,12 @@
     {
       "name": "Blok transport AI bisa dipotong lewat sentinel AI-TASK-TRANSPORT-BEGIN/END",
       "status": "PASS",
-      "details": "begin=516110 end=532956"
+      "details": "begin=536943 end=554398"
     },
     {
       "name": "Fungsi render AI bisa dipotong dari app.js",
       "status": "PASS",
-      "details": "panjang=3615"
+      "details": "panjang=4811"
     },
     {
       "name": "Blok transport AI tidak menyentuh penyimpanan/DOM (efek samping klien = nol)",
@@ -446,12 +446,12 @@
     {
       "name": "(e) aiErrorMessage tidak lagi mengembalikan isi galat apa adanya",
       "status": "PASS",
-      "details": "Penjelasan AI belum bisa dimuat sekarang. Materi, latihan, dan progresmu tetap jalan seperti biasa."
+      "details": "Penjelasan AI-nya belum bisa dimuat sekarang. Ini bukan kesalahanmu — coba lagi sebentar lagi, ya."
     },
     {
       "name": "(e) naskahnya memakai kamu-POV, bukan \"Anda\" (aturan nada cf-b8 §2)",
       "status": "PASS",
-      "details": "Penjelasan AI belum bisa dimuat sekarang. Materi, latihan, dan progresmu tetap jalan seperti biasa."
+      "details": "Penjelasan AI-nya belum bisa dimuat sekarang. Ini bukan kesalahanmu — coba lagi sebentar lagi, ya."
     },
     {
       "name": "(e) kalimat \"Pastikan Anda sudah login ke Puter\" hilang dari modal galat",
