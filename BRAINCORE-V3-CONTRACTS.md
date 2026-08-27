@@ -78,3 +78,30 @@ Semua wiring modul baru WAJIB dibungkus availability-check + try/catch (pola cor
 6. Listening: hitung replayCount per item listening, teruskan ke kappa (replay>=3 -> diskon) dan ke FiezelListeningAdaptive.policy bila ada.
 7. Panel: coreBrainPanelMarkup menambah seksi OLM dari FiezelOLM.summarize (mastery+interval, miskonsepsi aktif, coaching kalibrasi) — tampilan saja.
 8. Script tag + precache utk fiezel-listening-adaptive.js dan cloze-bank-v1.json.
+
+# FASE 3 — Kontrak Gelombang C (berlaku aturan keras yang sama)
+
+## Kepemilikan file (EKSKLUSIF)
+- C1: features/brain/fiezel-item-calibration.js, item-calibration-test.js
+- C2: features/brain/fiezel-speaking-adaptive.js, speaking-adaptive-test.js
+- C3: features/brain/fiezel-olm.js, olm-test.js
+- C4: features/brain/fiezel-srl-coach.js, srl-coach-test.js
+- C5: app.js, index.html, sw.js
+- C6: adaptivity-simulation-v3.js
+- C7: BRAINCORE-V3-REPORT.md
+
+## API FINAL Fase 3
+- FiezelItemCalibration (SCHEMA 'fiezel-item-calibration-v1'): observe(state, {itemId, priorDifficulty, ability, ok, kappa}, nowMs) -> state' (Elo dua-sisi sisi item: delta_i -= Kb*(y - p) dengan Kb = 0.35/(1+0.08*n_i), p = successProbability 3PL; SHRINKAGE keras: |delta_i| <= 0.6 dari prior — clamp setiap update; kappa mengalikan langkah). effective(state, itemId, priorDifficulty) -> {difficulty, n, applied} — difficulty = prior + delta HANYA bila n_i >= 8, selain itu prior apa adanya (applied:false). Murni, tahan korup. Rationale brain3_item_calibration_*.
+- FiezelSpeakingAdaptive (mengikuti konsensus council: TANPA ONNX/ASR baru; pakai recognition existing sebagai target coverage, agregat saja, TANPA audio/transkrip): policy({coverageHistory:[{coverage 0..1, latencyMs, scaffold}], weakLessons:[skill], mastery}) -> {promptComplexity:'word'|'phrase'|'sentence'|'open', targetSkill, scaffold:'model_first'|'cue_only'|'free', rationale}. evidence({coverage, latencyMs, replays}) -> {kappa (<=0.6 selalu — bukti speaking selalu didiskon), signal:'strong'|'weak'|'noise'}. Satu dimensi naik per langkah seperti listening.
+- FiezelOLM tambahan (file sama, JANGAN ubah API summarize lama): negotiate(state, {claimId, action:'dispute'}, nowMs) -> {state', instruction} dengan instruction salah satu dari {type:'remeasure', targetSkill, probeCount:3, rationale:'brain3_olm_dispute_remeasure'} untuk klaim mastery/miskonsepsi, atau {type:'discount_evidence', target, rationale} untuk klaim memori; disputes tercatat di state dgn nowMs; summarize menandai klaim yang disputed ('sedang diukur ulang'). Murni.
+- FiezelSrlCoach (SCHEMA 'fiezel-srl-coach-v1'): sessionPlan(state, {suggestedFocus, sessionSize}, nowMs) -> {goalPrompt (pilihan tujuan: fokus lemah/review/bebas), rationale}. predictPrompt(state, {itemIndex, sessionSize}) -> null | {ask:'seberapa yakin?', scale:[0.25,0.5,0.75,0.95]} — MAKSIMAL 1 per sesi, hanya pada item ke-2..4, TIDAK PERNAH saat affect frustrated (terima opts.affect). reflect(state, {predictions:[{confidence, correct}], sessionAccuracy}, nowMs) -> {message kalibrasi spesifik-konten Indonesia, state'} — fading: jika 3 sesi berturut kalibrasi baik, prompt berhenti muncul 5 sesi (brain3_srl_faded). Murni.
+- Cloze practice: app menambah mode latihan 'cloze' — item dari cloze-bank-v1.json, input ketik, dinilai FiezelProductionGrader.grade; matchedDistractor -> umpan ledger miskonsepsi (kappa penuh, bukti produksi weight 1.5 di BKT); salah morfem (brain3_production_morpheme_miss) -> tutor reteach bentuk. Digerbang: hanya item yang BKT L>=0.6 pada skill-nya (recall belum siap sebelum recognition stabil, P8 Fable).
+- Step-tutor rendering: saat scaffold mencapai 'worked' pada soal grammar yang template-nya punya langkah (FiezelStepTutor.decompose), app menampilkan langkah bertahap sebagai teks tuntunan sebelum opsi (tampilan saja, jawaban tetap pilihan/ketikan yang sama).
+
+## Wiring C5 (app.js) — semua guarded try/catch, modul absen = perilaku lama
+1. Item calibration: observe() per jawaban grammar (kappa dari riwayat); buildAdaptivePool memakai effective() untuk difficulty kandidat grammar; state 'fiezel-item-calibration-v1'.
+2. Speaking: agregat coverage/latency dari Speaking Lab existing -> FiezelSpeakingAdaptive.evidence() masuk learner evidence dgn kappa-nya; policy() menentukan prompt berikutnya bila lab aktif. TANPA menyimpan audio/transkrip (jaga observability-privacy-test).
+3. OLM negotiated: tombol 'menurutku ini salah' pada klaim panel OLM -> FiezelOLM.negotiate; instruction remeasure -> antrikan forceConcept 3 probe pada skill itu di sesi berikutnya; discount_evidence -> tandai kappa 0.5 pada bukti terkait.
+4. SRL: goalPrompt saat mulai sesi; predictPrompt (pakai setConfidence existing sebagai input); reflect di akhir sesi -> pesan kalibrasi; state 'fiezel-srl-coach-v1'; hormati fading & larangan saat frustrated.
+5. Mode cloze + step-tutor rendering sesuai kontrak di atas.
+6. Script tag + precache modul baru (fiezel-item-calibration.js, fiezel-speaking-adaptive.js, fiezel-srl-coach.js).

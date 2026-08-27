@@ -1,6 +1,6 @@
 # Braincore v3 — Laporan Upgrade
 
-**Basis:** FIEZEL 5.19.0 · **Tanggal:** 2026-08-28 · **Status:** kontrak final (Fase 1 gelombang A + Fase 2 gelombang B), implementasi paralel berjalan — hasil test BELUM diverifikasi di dokumen ini
+**Basis:** FIEZEL 5.19.0 · **Tanggal:** 2026-08-28 · **Status:** kontrak final (Fase 1 gelombang A + Fase 2 gelombang B + Fase 3 gelombang C), implementasi paralel berjalan — hasil test BELUM diverifikasi di dokumen ini
 
 Dokumen ini menjawab satu pertanyaan: **apa yang diubah di Braincore v3, mengapa, dan bagaimana
 membuktikannya salah?** Ditulis dengan aturan yang sama seperti
@@ -194,35 +194,94 @@ bukan gate.
 
 ---
 
-## 7. Roadmap sisa (pasca-Fase 2)
+## 7. Fase 3 — Gelombang C: apa yang ditambahkan, dan mengapa
 
-Dua butir roadmap lama sudah diserap Fase 2 — **single-writer memory** kini kontrak B3, dan
-**listening adaptif** kini kontrak B6 (dengan diskon κ untuk replay berlebih via wiring B3;
-catatan polusi bahasa Inggris konten listening dari §7 laporan readiness v2 tetap berlaku
-sebagai diskon bukti, bukan pemblokir kebijakan). Yang tersisa, berurut:
+Kontrak Fase 3 ada di [BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md) bagian "FASE 3 —
+Kontrak Gelombang C". Seperti §2 dan §6, deskripsi di bawah adalah **kontrak yang mengikat
+pembangunnya, bukan laporan implementasi** — modul-modul C sedang dibangun paralel saat
+bagian ini ditulis, dan tidak ada satu pun hasil test yang diklaim di sini. Fase 3 menyerap
+tiga butir roadmap pasca-Fase 2 (kalibrasi item, speaking adaptif, negotiated OLM) — masing-
+masing dalam bentuk yang SUDAH bisa dipertanggungjawabkan pada satu perangkat, bukan bentuk
+idealnya yang menunggu data populasi (lihat §8).
 
-1. **Kalibrasi Elo dua-sisi via pipeline konten** — estimasi kesulitan item online
-   berdampingan dengan prior konten (shrinkage δ=0,6 usulan Opus). Tetap ditunda dengan mata
-   terbuka: Sonnet mengutip risiko divergensi pada perangkat tunggal
-   ([Keeping Elo Alive](https://pubmed.ncbi.nlm.nih.gov/40476309/)) dan jalur yang dipilih
-   adalah **feed pipeline konten antar-rilis**, bukan keputusan real-time di perangkat.
-   Keputusan final menunggu data κ dari Fase 1–2.
-2. **Speaking adaptif dengan ASR on-device opt-in** — hanya skor yang disimpan, audio dan
-   transkrip dibuang segera; digerbang ganda (opt-in unduhan + confidence gate), mengikuti
-   preseden neural voice. Sol menegaskan recognizer browser hanya boleh dinilai sebagai
-   *target coverage*, bukan kualitas pelafalan (`../model-council-gpt_5_6_sol.md` §7.10).
-3. **Negotiated OLM penuh** — OLM Fase 1 (A8) sengaja presentasi-saja; langkah berikutnya
-   adalah murid bisa melihat DAN menantang model tentang dirinya (klaim "saya sudah bisa ini"
-   memicu item verifikasi), sesuai kerangka
-   [Bull & Kay](https://pure-oai.bham.ac.uk/ws/portalfiles/portal/19588792/chap_2013_metacog.pdf).
+### 7.1 Per kontrak: yang ditambahkan dan MENGAPA
+
+| Kontrak (agent) | Yang ditambahkan | Mengapa (defek/celah yang ditutup) |
+|---|---|---|
+| `fiezel-item-calibration.js` (C1) | Elo dua-sisi **sisi item** dengan shrinkage keras: `observe()` menggeser delta item `delta_i -= Kb·(y−p)` dengan `Kb = 0,35/(1+0,08·n_i)` (p dari 3PL, κ mengalikan langkah); clamp `abs(delta_i) ≤ 0,6` dari prior pada SETIAP update; `effective()` menerapkan delta HANYA bila `n_i ≥ 8`, selain itu prior konten apa adanya (`applied:false`) | Ini Tahap B dari rancangan C1 Opus (`../model-council-claude_opus_5_0.md` §C1): update online `θ ← θ+K_θ(y−p̂)`, `b_i ← b_i−K_b(y−p̂)` dengan langkah meluruh `1/(1+γn)` — bentuk yang [direkomendasikan Pelánek](https://www.fi.muni.cz/~xpelanek/publications/CAE-elo.pdf) karena mengonvergenkan estimasi alih-alih membiarkannya berosilasi — plus shrinkage ke prior `clamp(b_i−b_i^(0), −δ, +δ)` dengan δ=0,6, versi murah dari [kalibrasi hierarkis untuk data jarang](https://pubmed.ncbi.nlm.nih.gov/36333627/). Shrinkage-nya KERAS karena Sonnet mendokumentasikan risiko yang persis mengenai FIEZEL: ketika hanya satu sisi Elo diperbarui sementara seleksi item bergantung pada rating yang sedang berubah, varians rating bisa membesar artifisial dan tidak konvergen ([Keeping Elo Alive](https://pubmed.ncbi.nlm.nih.gov/40476309/), dikutip `../model-council-claude_sonnet_5_0.md` §1.1). Pada N=1 murid, delta tanpa clamp adalah resep divergensi — maka clamp per-update + gerbang n≥8, dan kalibrasi *permanen* tetap milik pipeline konten (§8 butir 1) |
+| `fiezel-speaking-adaptive.js` (C2) | Speaking adaptif dari **agregat saja**: `policy({coverageHistory, weakLessons, mastery})` → kompleksitas prompt/target skill/scaffold, SATU dimensi naik per langkah (aturan yang sama dengan listening B6); `evidence({coverage, latencyMs, replays})` → κ **selalu ≤ 0,6** — bukti speaking permanen didiskon; TANPA ONNX, TANPA ASR baru, TANPA audio/transkrip disimpan | Keputusan sadar, bukan kelalaian, mengikuti dua vonis council yang independen. Sol §7.10 (`../model-council-gpt_5_6_sol.md`): recognizer browser existing "sebaiknya dinilai sebagai **target coverage**, bukan pronunciation quality"; yang boleh disimpan hanya agregat (token/structure hit, attempt count, latency bucket, recognizer confidence, scaffold level); "raw audio dan transcript tidak pernah disimpan". Dan Opus C10 (`../model-council-claude_opus_5_0.md`) menolak ONNX di brain dengan alasan ukuran yang eksplisit: "runtime `onnxruntime-web` sendiri sudah puluhan MB sebelum model, dan pengurangan ke ~8 MB butuh custom build ([diskusi ukuran WASM onnxruntime](https://github.com/microsoft/onnxruntime/discussions/24161); [ONNX Runtime Web](https://onnxruntime.ai/docs/tutorials/web/)); biaya itu sudah dibayar untuk Kokoro (~119 MB, opt-in), dan menambah beban serupa untuk keputusan yang dapat dihitung dengan regresi logistik 40 parameter adalah pertukaran yang buruk." Kualitas pelafalan yang tidak bisa diukur jujur → tidak diukur; coverage yang bisa → diukur dengan diskon |
+| `fiezel-olm.js` — negotiate (C3) | `negotiate(state, {claimId, action:'dispute'}, nowMs)`: murid menekan "menurutku ini salah" pada klaim panel OLM → instruksi `remeasure` (3 probe pada skill itu di sesi berikutnya) untuk klaim mastery/miskonsepsi, atau `discount_evidence` untuk klaim memori; klaim disputed ditandai "sedang diukur ulang" di `summarize` (API lama TIDAK berubah) | OLM Fase 1 (A8) sengaja presentasi-saja; ini langkah kedua yang dijanjikan roadmap: dari *open* ke *negotiated*. Justifikasinya bukan hanya pedagogis tapi juga **akurasi model** — sanggahan murid adalah bukti baru yang memicu pengukuran ulang, sesuai kerangka [Bull, negotiated learner modelling](https://pure-oai.bham.ac.uk/ws/portalfiles/portal/56790376/Bull_Negotiated_learner_modelling_to_maintain_today_s_learner_models_Research_and_Practice_in_Technology.pdf) yang dikutip Opus §C9: model yang bisa dibantah lebih akurat daripada model yang hanya bisa dilihat. Sanggahan TIDAK langsung mengubah taksiran (murid bukan oracle) — ia mengantrikan pengukuran, dan pengukuranlah yang memutuskan |
+| `fiezel-srl-coach.js` (C4) | Coach regulasi-diri tiga titik: `sessionPlan` (pilihan tujuan sesi), `predictPrompt` ("seberapa yakin?" — MAKSIMAL 1 per sesi, hanya item ke-2..4, TIDAK PERNAH saat affect frustrated), `reflect` (pesan kalibrasi spesifik-konten Indonesia di akhir sesi); FADING: 3 sesi berturut kalibrasi baik → prompt berhenti 5 sesi (`brain3_srl_faded`) | Scaffolding SRL adalah efek menengah yang murah: meta-analisis melaporkan [g = 0,587](https://pmc.ncbi.nlm.nih.gov/articles/PMC10075206/) untuk scaffolding regulasi belajar, [ES 0,438](https://link.springer.com/article/10.1007/s12564-016-9426-9) untuk scaffold SRL berbasis komputer, dan [0,69 untuk intervensi SRL daring/blended](https://www.tandfonline.com/doi/full/10.1080/0144929X.2022.2151935) — rentang 0,44–0,69 yang oleh Opus disebut "setara atau melebihi banyak perbaikan algoritmik, dengan biaya implementasi jauh lebih rendah" (`../model-council-claude_opus_5_0.md` §C9). Syarat Opus dipegang sebagai kontrak: prompt harus **spesifik-konten dan jarang** (bukan pengingat generik), tidak boleh muncul saat frustrasi (menambah beban saat murid gagal adalah kesalahan), dan fading — SRL coach yang tidak pernah mundur bukan coach, melainkan nag. Data `setConfidence` yang sudah ada akhirnya dipedagogikan |
+| `app.js`/`index.html`/`sw.js` (C5) | Wiring keempat modul di atas (guarded try/catch, modul absen = perilaku lama) PLUS dua fitur render: **mode cloze produksi** — item dari `cloze-bank-v1.json` (B7), input ketik, dinilai `FiezelProductionGrader.grade` (A14); `matchedDistractor` → ledger miskonsepsi, bukti produksi weight 1,5 di BKT; digerbang BKT L ≥ 0,6 per skill. Dan **step-tutor rendering** — saat scaffold mencapai `worked` pada template yang punya langkah, langkah `FiezelStepTutor` ditampilkan sebagai tuntunan bertahap sebelum opsi (tampilan saja) | Cloze menutup celah P8 Fable (`../model-council-claude_fable_5.md`): seluruh bukti FIEZEL adalah recognition, padahal efek testing ([Roediger & Karpicke 2006](https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x); [Karpicke & Roediger 2008, Science](https://web.mit.edu/educationgroup/HHMIEducationGroup/wp-content/uploads/2011/04/14-Karpicke-Roediger-2008.pdf)) menunjukkan retrieval aktif — bukan recognition berulang — yang mendorong retensi; gerbang L ≥ 0,6 menjaga urutan pedagogis (recall belum siap sebelum recognition stabil). Step-tutor rendering adalah titik di mana investasi A13 akhirnya menyentuh murid: granularitas langkah — bukan kefasihan bahasa — adalah sumber efek step-based d ≈ 0,76 vs answer-based d ≈ 0,31 ([VanLehn 2011](https://www.tandfonline.com/doi/abs/10.1080/00461520.2011.611369)). Semua state di kunci baru; `fiezel-sl-v1-state` dan `observability-privacy-test` tidak disentuh |
+
+`adaptivity-simulation-v3.js` (C6) dijalankan ulang terhadap kebijakan Fase 3 dengan seed
+yang sama — kalibrasi item dan gerbang cloze adalah kebijakan baru yang harus terbukti tidak
+memperburuk `difficultyOscillationPer10`, `accuracyGapVsTarget`, retensi hari-90, dan Brier.
+
+### 7.2 Gate baru Fase 3, per file test
+
+**Status semua gate Fase 3: terdaftar per kontrak, dijalankan pada integrasi akhir.** Sama
+seperti §5 dan §6.2, laporan ini tidak mengklaim satu pun hasil PASS/FAIL — penulisnya belum
+melihat hasilnya, dan mengklaim PASS yang belum dilihat adalah persis dosa yang laporan ini
+ada untuk mencegahnya.
+
+| Gate | Pemilik | Yang dibuktikan bila lulus |
+|---|---|---|
+| `node item-calibration-test.js` | C1 | `observe` murni dan tahan korup; langkah `Kb = 0,35/(1+0,08·n_i)` dikalikan κ; clamp `abs(delta) ≤ 0,6` dipegang di SETIAP update (bukan hanya di akhir); `effective` mengembalikan prior apa adanya (`applied:false`) selama `n_i < 8`; rationale `brain3_item_calibration_*` |
+| `node speaking-adaptive-test.js` | C2 | `policy` murni, satu dimensi naik per langkah; `evidence` mengembalikan κ ≤ 0,6 untuk SEMUA input (tidak ada jalur bukti speaking berbobot penuh); tidak ada dependensi audio/transkrip di API |
+| `node olm-test.js` | C3 | API `summarize` lama utuh; `negotiate` menghasilkan `remeasure` (probeCount 3) untuk klaim mastery/miskonsepsi dan `discount_evidence` untuk klaim memori; klaim disputed ditandai "sedang diukur ulang"; dispute tercatat dengan nowMs |
+| `node srl-coach-test.js` | C4 | `predictPrompt` maksimal 1 per sesi, hanya item ke-2..4, null saat `opts.affect` frustrated; `reflect` menghasilkan pesan kalibrasi Indonesia; fading 3-sesi-baik → 5 sesi diam (`brain3_srl_faded`) |
+| `node core-brain-v2-test.js` + `node regression-test.js` | C5 | Modul absen = perilaku identik hari ini; mode cloze hanya menyajikan item ber-BKT L ≥ 0,6; `fiezel-sl-v1-state` tidak disentuh; `observability-privacy-test` tetap PASS (tanpa audio/transkrip) |
+| `node adaptivity-simulation-v3.js` | C6 | Run berseed byte-identik; kebijakan Fase 3 tidak memperburuk `difficultyOscillationPer10`, `accuracyGapVsTarget`, retensi hari-90, dan Brier terhadap baseline Fase 2 |
+
+Gate lama (§5, §6.2) tetap wajib PASS untuk semua agent C — regresi berarti perbaiki
+pendekatan, bukan gate.
 
 ---
 
-## 8. Batas kejujuran laporan ini
+## 8. Roadmap sisa (pasca-Fase 3)
 
-Laporan ini ditulis oleh A15 (Fase 1) dan B8 (Fase 2), yang kepemilikannya hanya file ini.
-Yang bisa dijamin: kontrak, alasan desain, dan daftar gate di atas akurat terhadap
-[BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md), laporan council, dan temuan simulator
-A11. Yang TIDAK bisa dijamin dari sini: bahwa implementasi paralel memenuhi kontraknya. Itu
-tugas gate di §5 dan §6.2 — dan sampai semuanya dijalankan pada integrasi akhir dan PASS,
-status v3 yang jujur adalah **"dikontrak dan sedang dibangun"**, bukan "selesai".
+Tiga butir roadmap pasca-Fase 2 sudah diserap Fase 3, masing-masing dalam bentuk satu-perangkat
+yang jujur: **kalibrasi Elo dua-sisi** kini kontrak C1 (dengan shrinkage keras δ=0,6 dan
+gerbang n≥8 sebagai pagar divergensi), **speaking adaptif** kini kontrak C2 (varian tanpa-ASR,
+agregat saja), dan **negotiated OLM** kini kontrak C3. Yang tersisa setelah Fase 3 hanyalah
+hal-hal yang membutuhkan **data populasi** atau **keputusan produk** — bukan kode yang bisa
+ditulis hari ini:
+
+1. **Agregasi telemetri lintas-perangkat untuk kalibrasi item permanen.** Delta C1 di satu
+   perangkat adalah koreksi lokal yang sengaja dikekang; kalibrasi item yang *permanen* butuh
+   banyak murid. Opus sendiri menulis catatan kejujurannya: untuk satu siswa sinyal ini
+   "terlalu noisy untuk diandalkan sebagai kalibrasi permanen" dan jalurnya adalah "feed ke
+   pipeline konten, bukan langsung ke keputusan real-time siswa"
+   (`../model-council-claude_opus_5_0.md` §2.3); literatur menyebut estimasi kesulitan item
+   baru reliabel di kisaran 200–250 pelajar ([Pelánek](https://www.sciencedirect.com/science/article/abs/pii/S0360131511003058),
+   dikutip `../model-council-claude_sonnet_5_0.md`). Ini keputusan produk (telemetri anonim
+   antar-rilis vs tidak sama sekali), bukan pekerjaan brain.
+2. **ASR on-device opt-in — bila suatu saat dibenarkan.** C2 sengaja hidup tanpa ASR baru.
+   Sol membuka pintunya selebar satu kalimat: "opt-in local ONNX dapat diteliti kemudian,
+   tetapi bukan dependency" (`../model-council-gpt_5_6_sol.md` §7.10) — dan argumen ukuran
+   Opus C10 (puluhan MB runtime untuk keputusan regresi-logistik) tetap berlaku sampai ada
+   bukti bahwa skor pelafalan mengubah keputusan pedagogis yang tidak bisa diubah oleh
+   coverage. Bila dibenarkan: digerbang ganda (opt-in unduhan + confidence gate), hanya skor
+   disimpan, mengikuti preseden neural voice.
+3. **Evaluasi delayed post-test dunia nyata.** Semua metrik v3 hari ini adalah metrik
+   simulator dan proxy sesi. Urutan bukti Sol §11.4 (`../model-council-gpt_5_6_sol.md`)
+   berlaku sebelum brain diberi otoritas lebih: offline replay → shadow mode → bounded canary
+   → micro-randomized comparison → **delayed post-test dan transfer sebagai outcome primer**
+   → baru otoritas unlock/session-stop. Efek laboratorium (testing effect, interleaving)
+   tidak boleh dianggap otomatis terjadi di FIEZEL — harus diukur pada retensi/transfer
+   murid nyata ([evidence-based learning review](https://pmc.ncbi.nlm.nih.gov/articles/PMC10368606/);
+   [classroom interleaving study](https://pmc.ncbi.nlm.nih.gov/articles/PMC8589969/)). Ini
+   butuh murid, waktu kalender, dan keputusan produk tentang pengukuran — bukan modul baru.
+
+---
+
+## 9. Batas kejujuran laporan ini
+
+Laporan ini ditulis oleh A15 (Fase 1), B8 (Fase 2), dan C7 (Fase 3), yang kepemilikannya
+hanya file ini. Yang bisa dijamin: kontrak, alasan desain, dan daftar gate di atas akurat
+terhadap [BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md), laporan council, dan temuan
+simulator A11. Yang TIDAK bisa dijamin dari sini: bahwa implementasi paralel memenuhi
+kontraknya. Itu tugas gate di §5, §6.2, dan §7.2 — dan sampai semuanya dijalankan pada
+integrasi akhir dan PASS, status v3 yang jujur adalah **"dikontrak dan sedang dibangun"**,
+bukan "selesai".
