@@ -40,3 +40,40 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
   remotePushRequired:true,
   deploymentState:'validated'
 });
+// ── SAKELAR TRANSPORT CLOUDFLARE (m031-flags, cf-b1 §5.3 + cf-b6 pola P1) ────────────
+//
+// Worker `fiezel-api` SUDAH hidup (D1+KV, `/health` menjawab `protocol 1.7`, `/api/config`
+// menjawab semua flag false), TETAPI alamat tetapnya `api.fiezel.my.id` BELUM aktif
+// (menunggu nameserver) dan workers.dev sengaja dimatikan. Jadi yang dipasang di sini
+// adalah SAKELARNYA DALAM KEADAAN MATI, bukan jalur yang hidup: `base` kosong dan
+// `enabled:false`, sehingga `coreWorkerExec` di app.js tidak pernah menyentuh Cloudflare.
+//
+// FIELD BARU, BUKAN TIMPAAN. `FIEZEL_CORE_CONFIG.workerUrl` di atas TIDAK disentuh:
+// `remote-push-test.js:6` mengunci nilainya ke `^https://[a-z0-9-]+\.puter\.work$`, dan
+// mengarahkannya ke domain Cloudflare akan memerahkan gerbang push sekaligus memutus jalur
+// pengingat yang hari ini berjalan. Alamat CF hidup HANYA di `base` di bawah.
+//
+// Tiga status per endpoint (cf-b6 "Pola pagar rilis" P1), bukan boolean:
+//   'off'    = kode CF ada di bundel tapi tidak pernah dieksekusi. Jalur Puter hari ini
+//              melayani semuanya, tanpa satu pun fetch tambahan. Nol dampak murid.
+//   'shadow' = jawaban yang DIPAKAI murid tetap dari Puter; salinan permintaan dikirim ke
+//              CF dengan penanda dry-run, hasilnya DIBUANG dan hanya dibandingkan di konsol
+//              diagnostik. Tidak pernah ditampilkan, tidak pernah menggandakan efek samping.
+//   'on'     = CF menyajikan jawaban (dengan `credentials:'include'`).
+//
+// ROLLBACK SATU NILAI: `enabled:false` mematikan SELURUH jalur CF walau setiap endpoint
+// bernilai 'on'. Itu satu-satunya sakelar yang perlu diingat saat insiden di sisi klien.
+//
+// TAPI SAKELAR STATIS INI BUKAN KILL SWITCH SESUNGGUHNYA. Berkas ini ikut di-precache
+// service worker (`sw.js:35`, daftar ASSETS) dan dilayani cache-first, jadi mengubah
+// nilainya TIDAK menjangkau PWA yang sudah terpasang sampai `SW_REV` naik dan generasi
+// shell baru terpasang. Kill switch yang nyata ada di SERVER: `GET /api/config` pada Worker
+// CF (KV `cfg:flags`), dibaca sekali per boot dengan timeout pendek dan default = nilai
+// statis di bawah kalau gagal. Flag statis ini lapis KEDUA, bukan yang pertama.
+//
+// Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
+self.FIEZEL_CF_CONFIG=Object.freeze({
+  enabled:false,
+  base:'',
+  endpoints:Object.freeze({health:'off',config:'off',auth:'off',quota:'off',ai:'off',tts:'off',usage:'off'})
+});
