@@ -20,6 +20,24 @@ concurrency:
 
 jobs:
   deploy:
+    # Gate aktor. Pola ini BUKAN karangan baru: ia dikutip apa adanya dari
+    # deploy-core-worker.yml:17 dan configure-core.yml:12, dan bersaudara dengan
+    # audio-prerender-cf.yml:55. Empat berkas, satu bentuk, satu login owner.
+    #
+    # Kenapa baru sekarang: cf-a2 (reports/cf-a2-cf-existing.md, rekomendasi #2) mencatat
+    # asimetri yang tidak masuk akal — workflow yang menyentuh Puter bergerbang, sedangkan
+    # workflow yang men-deploy Worker CLOUDFLARE tidak. Padahal langkah di bawah memegang
+    # CLOUDFLARE_API_TOKEN, membuat/menulis bucket R2, MENIMPA Worker produksi
+    # fiezel-audio yang menyajikan 1.170 aset, dan `permissions: contents: write` di atas
+    # memberinya hak commit+push ke branch produksi. Siapa pun yang bisa menekan
+    # workflow_dispatch di repo ini bisa melakukan semuanya.
+    #
+    # Pemeriksaan github.event_name ikut disertakan meski hari ini satu-satunya pemicu
+    # adalah workflow_dispatch — persis seperti deploy-core-worker.yml:17. Alasannya:
+    # kalau nanti seseorang menambahkan `push:` atau `schedule:`, gerbang ini gagal
+    # tertutup (job tidak jalan) alih-alih diam-diam lolos karena github.actor pada
+    # pemicu otomatis bisa berupa aktor yang bukan owner.
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
