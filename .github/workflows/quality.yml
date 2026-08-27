@@ -165,6 +165,15 @@ jobs:
           # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
           # memuat nilai secret sungguhan.
           node edge-guard-test.js
+          # A3: kontrak Cron Trigger. Dijalankan tepat sesudah gerbang wiring/edge
+          # karena ia mengeksekusi Worker yang sama lewat jalur `scheduled()` dan
+          # bukan `fetch()` — sisi yang tidak pernah disentuh gerbang lain. Ia
+          # membuktikan: satu ekspresi cron = satu job, rollup dua kali tidak
+          # menurunkan angka, pepper lama benar-benar dihapus, `cron_run` mencatat
+          # sukses DAN gagal tanpa pesan galat mentah, `dau_dedup` kosong +
+          # `usage_daily` terisi = `collection_ok=0`, dan `/api/owner/cron-status`
+          # 403 tanpa kredensial owner. Butuh tools/cf-test-harness.js.
+          node cron-contract-test.js
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js

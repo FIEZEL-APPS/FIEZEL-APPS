@@ -12,6 +12,16 @@ sini yang menjadi urutan resmi.
 | `0001_identity.sql` | `fiezel-core` (binding `CORE_DB`) | `identity`, `session`, `anon_issue` |
 | `0001_quota.sql` | `fiezel-core` (binding `CORE_DB`) | `quota_daily`, `quota_reservation` |
 | `0002_analytics.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `metrics_daily`, `usage_daily`, `retention_daily`, `dau_dedup`, `pepper_state` |
+| `0003_cron.sql` | `fiezel-core` (binding `CORE_DB`) | `cron_run` |
+
+`0003_cron.sql` masuk `fiezel-core` dan bukan `fiezel-stats` karena dua alasan
+yang keduanya keras: (1) `analytics-privacy-test.js` menuntut database analytics
+memuat **tepat lima tabel** yang terdaftar di `analytics-tables.js`; (2) rollup
+yang gagal karena database analytics tidak bisa ditulis **tidak akan bisa
+mencatat kegagalannya sendiri di database yang sama**. Catatan kegagalan harus
+hidup di tempat lain daripada yang bisa gagal bersamanya. `cron_run` tidak punya
+satu pun kolom penghubung ke dunia analytics selain `day` (tanggal), jadi ia
+tidak membuka jalur JOIN yang dilarang.
 
 Dua berkas bernomor `0001` bukan kelalaian: keduanya lahir di fase yang sama dan
 tidak saling bergantung (`quota_daily` tidak punya foreign key ke `identity` —
@@ -47,7 +57,16 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0001_quota.sql
 
 # --- fiezel-stats: analytics agregat ---
 wrangler d1 execute fiezel-stats --remote --file=migrations/0002_analytics.sql
+
+# --- fiezel-core: catatan hasil cron (A3) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0003_cron.sql
 ```
+
+Sampai `0003_cron.sql` diterapkan, sweep dan rollup **tetap berjalan** tetapi
+tidak meninggalkan bukti: `recordCronRun()` menelan `D1_UNKNOWN_TABLE` dengan
+sengaja (observabilitas tidak boleh menjatuhkan job yang diobservasinya) dan
+`GET /api/owner/cron-status` menjawab `200` dengan `migrated:false`. Jadi
+`migrated:false` berarti "migrasi belum dijalankan", bukan "cron sehat".
 
 Ganti `--remote` dengan `--local` untuk `wrangler dev`. Semua berkas memakai
 `CREATE TABLE IF NOT EXISTS`, jadi menjalankannya ulang aman (idempoten).

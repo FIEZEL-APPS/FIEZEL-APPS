@@ -54,6 +54,12 @@ export const SQL = Object.freeze({
     'INSERT OR IGNORE INTO dau_dedup (day, token) VALUES (?1, ?2)',
   countDauTokens:
     'SELECT COUNT(*) AS n FROM dau_dedup WHERE day = ?1',
+  // Pagar kewarasan rollup (A3): apakah hari itu ADA pemakaian yang tercatat?
+  // Dipakai untuk membedakan "hari benar-benar sepi" (0 pemakaian, 0 token) dari
+  // "pengumpulan token rusak" (ada pemakaian, 0 token). Menghitung BARIS bucket
+  // agregat, bukan orang: `usage_daily` tidak memuat pengenal siapa pun.
+  countUsageRows:
+    'SELECT COUNT(*) AS n FROM usage_daily WHERE day = ?1',
   purgeDauDay:
     'DELETE FROM dau_dedup WHERE day = ?1',
   purgeDauOlderThan:
@@ -125,6 +131,12 @@ export async function applyAggregate(db, agg) {
 export async function countDauTokens(db, day) {
   const row = await db.prepare(SQL.countDauTokens).bind(day).first();
   return Number((row && (row.n ?? row.N)) || 0);
+}
+
+/** Jumlah baris bucket `usage_daily` pada satu hari (0 = tidak ada pemakaian). */
+export async function countUsageRows(db, day) {
+  const row = await db.prepare(SQL.countUsageRows).bind(day).first();
+  return Math.max(0, Math.trunc(Number(row && row.n) || 0));
 }
 
 /** Tulis nilai metrik apa adanya (bukan increment) — dipakai rollup agar idempoten. */
@@ -209,7 +221,7 @@ export function assertNoQuotaJoin(sql) {
 export default {
   ANALYTICS_TABLES, FORBIDDEN_TABLES, SQL,
   aggregateStatements, runStatements, applyAggregate,
-  countDauTokens, setMetric, setMetricAtLeast, readMetricRange,
+  countDauTokens, countUsageRows, setMetric, setMetricAtLeast, readMetricRange,
   purgeDauDedup, purgeDauDedupOlderThan, purgeUsageOlderThan, purgeRetentionOlderThan,
   readPepperState, writePepperState, assertNoQuotaJoin
 };

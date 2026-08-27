@@ -4,6 +4,7 @@
  * Cron: 00:05 WIB (= 17:05 UTC hari sebelumnya). Satu jalan, urutannya penting:
  *   1. hitung DAU hari itu dari `dau_dedup`  -> metrics_daily('dau')
  *   2. hitung batas WAU/MAU dari metrik harian (lihat catatan kejujuran di bawah)
+ *   2b. pagar kewarasan: 0 token + `usage_daily` terisi -> `collection_ok=0`
  *   3. HAPUS `dau_dedup` hari itu (dan sisa hari lama, jaring pengaman)
  *   4. rotasi pepper bila jatuh tempo (pepper dua putaran lalu hilang permanen)
  *   5. purge retensi: usage_daily > 90 hari, retention_daily > 400 hari
@@ -17,6 +18,9 @@
  *     terlambat: angka boleh bertambah, tidak boleh mundur.
  *   - `wau_*`/`mau_*` diturunkan dari `dau` yang sudah stabil, jadi hasilnya
  *     sama di setiap jalan.
+ *   - `collection_ok` (A3) dihitung dari nilai `dau` yang SUDAH TERSIMPAN, bukan
+ *     dari hitungan jalan ini, supaya jalan kedua (yang selalu menghitung 0
+ *     karena tokennya sudah dihapus) tidak menuduh pengumpulan rusak.
  * Satu-satunya urutan yang tidak boleh dibalik: DAU dihitung SEBELUM purge.
  *
  * ==========================================================================
@@ -37,7 +41,7 @@
 
 import { rotatePepperDue, rotatePepper, newPepper } from './analytics-core.js';
 import {
-  countDauTokens, setMetric, setMetricAtLeast, readMetricRange,
+  countDauTokens, countUsageRows, setMetric, setMetricAtLeast, readMetricRange,
   purgeDauDedup, purgeDauDedupOlderThan, purgeUsageOlderThan, purgeRetentionOlderThan,
   readPepperState, writePepperState
 } from './analytics-store-d1.js';
@@ -144,7 +148,10 @@ export async function runDailyRollup(db, opts = {}) {
   const now = Number(opts.now) || Date.now();
   // Default: hari yang baru saja selesai.
   const day = opts.day || dayKey(now - DAY_MS);
-  const summary = { day, dau: 0, wau: null, mau: null, purged: [], pepperRotated: false, ranAt: now };
+  const summary = {
+    day, dau: 0, wau: null, mau: null, purged: [], pepperRotated: false,
+    collectionOk: true, usageRows: 0, ranAt: now
+  };
 
   // 1. DAU dari token harian — HARUS sebelum purge.
   const dau = await countDauTokens(db, day);
@@ -155,6 +162,32 @@ export async function runDailyRollup(db, opts = {}) {
   //    dau hari ini ditulis, supaya jendela 7/30 hari memuat hari ini juga).
   const from30 = shiftDay(day, -29);
   const dauRows = await readMetricRange(db, 'dau', from30, day);
+
+  // 2b. PAGAR KEWARASAN (A3). Nol yang jujur dan nol yang menyesatkan terlihat
+  //     sama di dashboard, dan hanya satu di antaranya berarti sistemnya rusak:
+  //       - hari benar-benar sepi   -> 0 token DAN 0 baris `usage_daily`;
+  //       - pengumpulan token rusak -> 0 token TAPI `usage_daily` hari itu terisi.
+  //     Kasus kedua berarti event `day_active` tidak pernah sampai (klien tidak
+  //     mengirim `visitor_token`, atau `applyAggregate` gagal separuh), dan
+  //     menuliskan DAU=0 di sana adalah mengarang angka. Yang ditulis adalah
+  //     penanda `collection_ok=0`; dashboard WAJIB menolak menampilkan DAU hari
+  //     itu sebagai fakta.
+  //
+  //     Formulanya sengaja memakai nilai TERSIMPAN, bukan `dau` hasil hitung
+  //     jalan ini. Alasannya idempotensi: pada jalan kedua `dau_dedup` sudah
+  //     terhapus, jadi hitungan pasti 0 sementara `usage_daily` masih terisi.
+  //     Formula naif akan membalik `collection_ok` 1 -> 0 hanya karena rollup
+  //     dijalankan dua kali, dan pagar yang menuduh dirinya sendiri lebih buruk
+  //     daripada tidak ada pagar.
+  const usageRowsToday = await countUsageRows(db, day);
+  const storedDau = Math.max(0, Math.trunc(Number(
+    (dauRows.find((r) => r && r.day === day) || {}).value
+  ) || 0));
+  const collectionOk = !(dau === 0 && usageRowsToday > 0 && storedDau === 0);
+  summary.collectionOk = collectionOk;
+  summary.usageRows = usageRowsToday;
+  await setMetric(db, day, 'collection_ok', collectionOk ? 1 : 0);
+
   const wau = computeWauMauBounds(dauRows, day, 7);
   const mau = computeWauMauBounds(dauRows, day, 30);
   summary.wau = wau;
@@ -179,7 +212,11 @@ export async function runDailyRollup(db, opts = {}) {
     await writePepperState(db, next);
     summary.pepperRotated = true;
     // Setelah tulis ini, pepper dua putaran lalu tidak ada lagi di mana pun:
-    // baris pepper_state hanya memuat `current` + satu `previous`.
+    // baris pepper_state hanya memuat `current` + satu `previous`. `writePepper`
+    // menimpa KETIGA kolom sekaligus (`ON CONFLICT ... SET rotated_at, current,
+    // previous`), jadi nilai lama tidak tertinggal di kolom mana pun dan tidak
+    // ada tabel arsip pepper di skema. Ditegakkan `cron-contract-test.js` (c)
+    // dan `analytics-privacy-test.js`.
   }
 
   // 5. Purge retensi.
