@@ -155,7 +155,7 @@
     {
       "name": "penjaga statis: blok prefetch benar-benar ada di sumber",
       "status": "PASS",
-      "details": "2899 karakter kode hidup"
+      "details": "2901 karakter kode hidup"
     },
     {
       "name": "penjaga statis: jalur prefetch tidak menyebut prepare/ensureReady/prewarm sama sekali",

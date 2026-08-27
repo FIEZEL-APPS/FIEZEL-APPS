@@ -3,7 +3,7 @@
   "pass": true,
   "ownerLogin": "FIEZEL-APPS",
   "counts": {
-    "pass": 32,
+    "pass": 38,
     "fail": 0
   },
   "scanned": 15,
@@ -290,10 +290,12 @@
     },
     {
       "file": "quality.yml",
-      "usesSecrets": false,
-      "secretNames": [],
-      "looksLikeDeploy": false,
-      "needsGate": false,
+      "usesSecrets": true,
+      "secretNames": [
+        "FIEZEL_STAGING_EDGE"
+      ],
+      "looksLikeDeploy": true,
+      "needsGate": true,
       "hasGate": false,
       "gateLogins": [],
       "gateLines": [],
@@ -301,8 +303,8 @@
         "quality"
       ],
       "jobCount": 1,
-      "allowlisted": false,
-      "decision": "tidak terjaring — tidak butuh gate"
+      "allowlisted": true,
+      "decision": "terjaring, di-allowlist dengan alasan"
     }
   ],
   "checks": [
@@ -317,7 +319,7 @@
       "details": "terjaring karena kata kunci deploy. Tambahkan `if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'` pada tingkat job (pola deploy-core-worker.yml:17), atau daftarkan berkas ini di ALLOWLIST workflow-actor-gate-test.js dengan alasan."
     },
     {
-      "name": "D a6-a7-verifiers.yml di-allowlist tanpa memegang secrets",
+      "name": "D a6-a7-verifiers.yml di-allowlist: nol secrets, ATAU setiap langkah bersecret berpenjaga aktor",
       "status": "PASS",
       "details": "nol referensi secrets"
     },
@@ -332,7 +334,7 @@
       "details": "terjaring karena kata kunci deploy. Tambahkan `if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'` pada tingkat job (pola deploy-core-worker.yml:17), atau daftarkan berkas ini di ALLOWLIST workflow-actor-gate-test.js dengan alasan."
     },
     {
-      "name": "D a9-a14-autonomous-guardians.yml di-allowlist tanpa memegang secrets",
+      "name": "D a9-a14-autonomous-guardians.yml di-allowlist: nol secrets, ATAU setiap langkah bersecret berpenjaga aktor",
       "status": "PASS",
       "details": "nol referensi secrets"
     },
@@ -432,12 +434,42 @@
       "details": "1 job, 1 gate. Job tanpa gate di berkas pemegang kredensial adalah pintu belakang yang tampak tertutup."
     },
     {
+      "name": "H quality.yml: setiap langkah bersecret/live punya penjaga aktor tingkat langkah",
+      "status": "PASS",
+      "details": "[ok] CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_b | [ok] Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)"
+    },
+    {
+      "name": "A quality.yml punya penjaga aktor atau ada di allowlist",
+      "status": "PASS",
+      "details": "terjaring karena secrets: FIEZEL_STAGING_EDGE + kata kunci deploy. Tambahkan `if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'` pada tingkat job (pola deploy-core-worker.yml:17), atau daftarkan berkas ini di ALLOWLIST workflow-actor-gate-test.js dengan alasan."
+    },
+    {
+      "name": "D quality.yml di-allowlist: nol secrets, ATAU setiap langkah bersecret berpenjaga aktor",
+      "status": "PASS",
+      "details": "memegang FIEZEL_STAGING_EDGE tetapi SETIAP langkah bersecret/live berpenjaga aktor tingkat langkah (lihat cek H)"
+    },
+    {
+      "name": "D quality.yml punya alasan allowlist yang ditulis, bukan kosong",
+      "status": "PASS",
+      "details": "panjang alasan: 586 karakter"
+    },
+    {
       "name": "E entri allowlist a6-a7-verifiers.yml masih menunjuk berkas yang ada",
       "status": "PASS",
       "details": "ada"
     },
     {
       "name": "E entri allowlist a6-a7-verifiers.yml masih diperlukan",
+      "status": "PASS",
+      "details": "masih terjaring dan masih tanpa gate"
+    },
+    {
+      "name": "E entri allowlist quality.yml masih menunjuk berkas yang ada",
+      "status": "PASS",
+      "details": "ada"
+    },
+    {
+      "name": "E entri allowlist quality.yml masih diperlukan",
       "status": "PASS",
       "details": "masih terjaring dan masih tanpa gate"
     },

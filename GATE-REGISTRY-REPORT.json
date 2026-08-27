@@ -1,11 +1,11 @@
 {
   "gate": "gate-registry",
-  "generatedAt": "2026-08-27T19:56:20.797Z",
+  "generatedAt": "2026-08-27T20:47:53.270Z",
   "status": "PASS",
   "source": "reports/add-a10-kepatuhan.md §5.1, §5.3",
   "workflow": ".github/workflows/quality.yml",
   "counts": {
-    "gateFilesInRepo": 148,
+    "gateFilesInRepo": 149,
     "nodeInvocationsInWorkflow": 153,
     "evidenceGates": 151,
     "liveGatesNotEvidence": 2,
@@ -41,7 +41,7 @@
     {
       "id": "setiap-gerbang-terdaftar-atau-dikecualikan",
       "status": "PASS",
-      "details": "148 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
+      "details": "149 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
     },
     {
       "id": "setiap-pengecualian-beralasan",
