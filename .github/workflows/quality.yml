@@ -80,6 +80,7 @@ jobs:
           node voice-fallback-chain-test.js
           node voice-pipeline-gap-test.js
           node voice-prefetch-neural-test.js
+          node voice-callsite-prefetch-test.js
           node audio-asset-pipeline-test.js
           node product-audit.js
           node runtime-stage8-test.js

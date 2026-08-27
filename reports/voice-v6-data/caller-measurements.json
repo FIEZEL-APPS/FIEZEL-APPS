@@ -1,0 +1,871 @@
+{
+ "sentences": [
+  "The morning market opens before the sun clears the rooftops.",
+  "Sellers arrange fruit in careful rows while the first buyers arrive.",
+  "By seven the narrow lanes are already loud with bargaining.",
+  "Across the road a small kitchen serves rice and hot broth.",
+  "Students stop there before class because the food is quick and cheap.",
+  "When the rain begins everyone crowds under the same blue awning."
+ ],
+ "nextBlock": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+ "door": "features/neural-voice/fiezel-voice-say.js",
+ "runs": {
+  "per_sentence_no_prefetch": {
+   "metrics": {
+    "sayCalls": 6,
+    "renders": 6,
+    "audioSources": 6,
+    "firstSoundMs": 3407.4,
+    "meanSchedulingGapMs": 3750.6,
+    "meanAudibleGapMs": 4519.1,
+    "maxAudibleGapMs": 5212.5,
+    "totalSpanS": 39.32,
+    "audioS": 20.57,
+    "silentShare": 0.4769,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 4139.9,
+      "tailSilenceMs": 288.6,
+      "headSilenceMs": 214.5,
+      "audibleGapMs": 4643.0
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 3383.2,
+      "tailSilenceMs": 393.7,
+      "headSilenceMs": 406.9,
+      "audibleGapMs": 4183.8
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 3418.4,
+      "tailSilenceMs": 451.2,
+      "headSilenceMs": 383.2,
+      "audibleGapMs": 4252.8
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 4341.5,
+      "tailSilenceMs": 383.1,
+      "headSilenceMs": 487.9,
+      "audibleGapMs": 5212.5
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 3469.8,
+      "tailSilenceMs": 438.2,
+      "headSilenceMs": 395.6,
+      "audibleGapMs": 4303.6
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "per_sentence_no_prefetch",
+      "sentences": 6,
+      "wall": 4322.8
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "wall": 4322.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 60,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "wall": 4323.4
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 3403.1,
+      "audioSeconds": 3.8761,
+      "rtf": 0.878,
+      "headMs": 344.2,
+      "tailMs": 288.6,
+      "chars": 60,
+      "wall": 7726.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 5.781769,
+      "ctxNow": 5.781769,
+      "durationS": 3.267279,
+      "wall": 7730.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 10982.9
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "wall": 10982.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 68,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "wall": 10983.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 4137.9,
+      "audioSeconds": 4.5153,
+      "rtf": 0.916,
+      "headMs": 214.5,
+      "tailMs": 393.7,
+      "chars": 68,
+      "wall": 15121.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 13.188934,
+      "ctxNow": 13.188934,
+      "durationS": 3.931043,
+      "wall": 15123.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 19063.4
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "wall": 19063.4
+     },
+     {
+      "type": "generate_enter",
+      "chars": 59,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "wall": 19063.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3379.5,
+      "audioSeconds": 3.9405,
+      "rtf": 0.858,
+      "headMs": 406.9,
+      "tailMs": 451.2,
+      "chars": 59,
+      "wall": 22443.4
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 20.50322,
+      "ctxNow": 20.50322,
+      "durationS": 3.106395,
+      "wall": 22445.2
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 25541.9
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "wall": 25541.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 58,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "wall": 25542.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 3428.3,
+      "audioSeconds": 3.9241,
+      "rtf": 0.874,
+      "headMs": 383.2,
+      "tailMs": 383.1,
+      "chars": 58,
+      "wall": 28970.7
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 27.028027,
+      "ctxNow": 27.028027,
+      "durationS": 3.181814,
+      "wall": 28973.4
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 32160
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "wall": 32160
+     },
+     {
+      "type": "generate_enter",
+      "chars": 69,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "wall": 32160.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 4325.8,
+      "audioSeconds": 4.6537,
+      "rtf": 0.93,
+      "headMs": 487.9,
+      "tailMs": 438.2,
+      "chars": 69,
+      "wall": 36486.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 34.551293,
+      "ctxNow": 34.551293,
+      "durationS": 3.75161,
+      "wall": 36490.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 40240.1
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "wall": 40240.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "wall": 40240.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3459.9,
+      "audioSeconds": 3.9865,
+      "rtf": 0.868,
+      "headMs": 395.6,
+      "tailMs": 282.9,
+      "chars": 64,
+      "wall": 43700.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 41.772698,
+      "ctxNow": 41.772698,
+      "durationS": 3.331927,
+      "wall": 43702.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 47043.6
+     },
+     {
+      "type": "scenario_end",
+      "wall": 47043.6
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "sampleRate": 44100,
+      "length": 170935,
+      "headMs": 344.2,
+      "tailMs": 288.6
+     },
+     {
+      "index": 1,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "sampleRate": 44100,
+      "length": 199124,
+      "headMs": 214.5,
+      "tailMs": 393.7
+     },
+     {
+      "index": 2,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "sampleRate": 44100,
+      "length": 173777,
+      "headMs": 406.9,
+      "tailMs": 451.2
+     },
+     {
+      "index": 3,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "sampleRate": 44100,
+      "length": 173053,
+      "headMs": 383.2,
+      "tailMs": 383.1
+     },
+     {
+      "index": 4,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "sampleRate": 44100,
+      "length": 205230,
+      "headMs": 487.9,
+      "tailMs": 438.2
+     },
+     {
+      "index": 5,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "sampleRate": 44100,
+      "length": 175806,
+      "headMs": 395.6,
+      "tailMs": 282.9
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "per_sentence_prefetch": {
+   "metrics": {
+    "sayCalls": 6,
+    "renders": 6,
+    "audioSources": 6,
+    "firstSoundMs": 3452.8,
+    "meanSchedulingGapMs": 449.1,
+    "meanAudibleGapMs": 1147.5,
+    "maxAudibleGapMs": 1974.6,
+    "totalSpanS": 23.16,
+    "audioS": 20.91,
+    "silentShare": 0.0969,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 763.4,
+      "tailSilenceMs": 129.7,
+      "headSilenceMs": 238.8,
+      "audibleGapMs": 1131.9
+     },
+     {
+      "boundary": "2->3",
+      "schedulingGapMs": 9.8,
+      "tailSilenceMs": 107.5,
+      "headSilenceMs": 453,
+      "audibleGapMs": 570.3
+     },
+     {
+      "boundary": "3->4",
+      "schedulingGapMs": 321.6,
+      "tailSilenceMs": 396.6,
+      "headSilenceMs": 395.4,
+      "audibleGapMs": 1113.6
+     },
+     {
+      "boundary": "4->5",
+      "schedulingGapMs": 1129.9,
+      "tailSilenceMs": 456.6,
+      "headSilenceMs": 388.1,
+      "audibleGapMs": 1974.6
+     },
+     {
+      "boundary": "5->6",
+      "schedulingGapMs": 20.6,
+      "tailSilenceMs": 548.6,
+      "headSilenceMs": 377.7,
+      "audibleGapMs": 946.9
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "per_sentence_prefetch",
+      "sentences": 6,
+      "wall": 49363.4
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "wall": 49363.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 60,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "wall": 49364.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 3448.5,
+      "audioSeconds": 3.8761,
+      "rtf": 0.89,
+      "headMs": 284.4,
+      "tailMs": 129.7,
+      "chars": 60,
+      "wall": 52812.7
+     },
+     {
+      "type": "generate_enter",
+      "chars": 68,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "wall": 52812.8
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 50.874921,
+      "ctxNow": 50.874921,
+      "durationS": 3.485896,
+      "wall": 52816.3
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 56308.8
+     },
+     {
+      "type": "say_call",
+      "index": 1,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "wall": 56308.8
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 4254.6,
+      "audioSeconds": 4.5153,
+      "rtf": 0.942,
+      "headMs": 238.8,
+      "tailMs": 107.5,
+      "chars": 68,
+      "wall": 57067.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 59,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "wall": 57067.6
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 55.124172,
+      "ctxNow": 55.124172,
+      "durationS": 4.193016,
+      "wall": 57071.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 57071.7
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 3463.5,
+      "audioSeconds": 3.9405,
+      "rtf": 0.879,
+      "headMs": 453,
+      "tailMs": 396.6,
+      "chars": 59,
+      "wall": 60531.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 2,
+      "ok": true,
+      "wall": 60531.5
+     },
+     {
+      "type": "say_resolved",
+      "index": 1,
+      "spoke": true,
+      "wall": 61254.1
+     },
+     {
+      "type": "say_call",
+      "index": 2,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "wall": 61254.1
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 59.326984,
+      "ctxNow": 59.326984,
+      "durationS": 3.114989,
+      "wall": 61256.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 58,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "wall": 61257.8
+     },
+     {
+      "type": "say_resolved",
+      "index": 2,
+      "spoke": true,
+      "wall": 64388.9
+     },
+     {
+      "type": "say_call",
+      "index": 3,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "wall": 64389
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 3,
+      "elapsedMs": 3432,
+      "audioSeconds": 3.9241,
+      "rtf": 0.875,
+      "headMs": 395.4,
+      "tailMs": 456.6,
+      "chars": 58,
+      "wall": 64689.9
+     },
+     {
+      "type": "generate_enter",
+      "chars": 69,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "wall": 64689.9
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 62.763537,
+      "ctxNow": 62.763537,
+      "durationS": 3.096168,
+      "wall": 64701.6
+     },
+     {
+      "type": "prefetch_result",
+      "index": 3,
+      "ok": true,
+      "wall": 64701.7
+     },
+     {
+      "type": "say_resolved",
+      "index": 3,
+      "spoke": true,
+      "wall": 67803.1
+     },
+     {
+      "type": "say_call",
+      "index": 4,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "wall": 67803.1
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 4,
+      "elapsedMs": 4227.9,
+      "audioSeconds": 4.6537,
+      "rtf": 0.908,
+      "headMs": 388.1,
+      "tailMs": 548.6,
+      "chars": 69,
+      "wall": 68920.2
+     },
+     {
+      "type": "generate_enter",
+      "chars": 64,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "wall": 68920.2
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 66.989569,
+      "ctxNow": 66.989569,
+      "durationS": 3.741043,
+      "wall": 68939.2
+     },
+     {
+      "type": "prefetch_result",
+      "index": 4,
+      "ok": true,
+      "wall": 68939.3
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 5,
+      "elapsedMs": 3559.1,
+      "audioSeconds": 3.9865,
+      "rtf": 0.893,
+      "headMs": 377.7,
+      "tailMs": 350.2,
+      "chars": 64,
+      "wall": 72479.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 5,
+      "ok": true,
+      "wall": 72480.1
+     },
+     {
+      "type": "say_resolved",
+      "index": 4,
+      "spoke": true,
+      "wall": 72678.4
+     },
+     {
+      "type": "say_call",
+      "index": 5,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "wall": 72678.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 70.751202,
+      "ctxNow": 70.751202,
+      "durationS": 3.28263,
+      "wall": 72685.6
+     },
+     {
+      "type": "say_resolved",
+      "index": 5,
+      "spoke": true,
+      "wall": 75975.5
+     },
+     {
+      "type": "scenario_end",
+      "wall": 75975.5
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops.",
+      "sampleRate": 44100,
+      "length": 170935,
+      "headMs": 284.4,
+      "tailMs": 129.7
+     },
+     {
+      "index": 1,
+      "text": "Sellers arrange fruit in careful rows while the first buyers arrive.",
+      "sampleRate": 44100,
+      "length": 199124,
+      "headMs": 238.8,
+      "tailMs": 107.5
+     },
+     {
+      "index": 2,
+      "text": "By seven the narrow lanes are already loud with bargaining.",
+      "sampleRate": 44100,
+      "length": 173777,
+      "headMs": 453,
+      "tailMs": 396.6
+     },
+     {
+      "index": 3,
+      "text": "Across the road a small kitchen serves rice and hot broth.",
+      "sampleRate": 44100,
+      "length": 173053,
+      "headMs": 395.4,
+      "tailMs": 456.6
+     },
+     {
+      "index": 4,
+      "text": "Students stop there before class because the food is quick and cheap.",
+      "sampleRate": 44100,
+      "length": 205230,
+      "headMs": 388.1,
+      "tailMs": 548.6
+     },
+     {
+      "index": 5,
+      "text": "When the rain begins everyone crowds under the same blue awning.",
+      "sampleRate": 44100,
+      "length": 175806,
+      "headMs": 377.7,
+      "tailMs": 350.2
+     }
+    ],
+    "guardHits": []
+   }
+  },
+  "whole_text_prefetch": {
+   "metrics": {
+    "sayCalls": 1,
+    "renders": 3,
+    "audioSources": 2,
+    "firstSoundMs": 12395.1,
+    "meanSchedulingGapMs": 220.0,
+    "meanAudibleGapMs": 830.0,
+    "maxAudibleGapMs": 830.0,
+    "totalSpanS": 22.31,
+    "audioS": 22.09,
+    "silentShare": 0.0099,
+    "guardHits": [],
+    "boundaries": [
+     {
+      "boundary": "1->2",
+      "schedulingGapMs": 220.0,
+      "tailSilenceMs": 202.5,
+      "headSilenceMs": 407.5,
+      "audibleGapMs": 830.0
+     }
+    ]
+   },
+   "dump": {
+    "events": [
+     {
+      "type": "scenario_start",
+      "scenario": "whole_text_prefetch",
+      "sentences": 6,
+      "wall": 78141
+     },
+     {
+      "type": "say_call",
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops. Sellers arrange fruit in careful rows while the first buyers arrive. By seven the narrow lanes are already loud with bargaining. Across the road a small kitchen serves rice and hot broth. Students stop there before class because the food is quick and cheap. When the rain begins everyone crowds under the same blue awning.",
+      "wall": 78141.1
+     },
+     {
+      "type": "generate_enter",
+      "chars": 248,
+      "text": "The morning market opens before the sun clears the rooftops. Sellers arrange fruit in careful rows while the first buyers arrive. By seven the narrow lanes are already loud with bargaining. Across the road a small kitchen serves rice and hot broth.",
+      "wall": 78142.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 0,
+      "elapsedMs": 12389.8,
+      "audioSeconds": 14.9496,
+      "rtf": 0.829,
+      "headMs": 447.9,
+      "tailMs": 202.5,
+      "chars": 248,
+      "wall": 90532
+     },
+     {
+      "type": "generate_enter",
+      "chars": 109,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "wall": 90532
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 88.607347,
+      "ctxNow": 88.607347,
+      "durationS": 14.323197,
+      "wall": 90536.2
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 1,
+      "elapsedMs": 5963.3,
+      "audioSeconds": 7.0832,
+      "rtf": 0.842,
+      "headMs": 407.5,
+      "tailMs": 616.4,
+      "chars": 109,
+      "wall": 96495.5
+     },
+     {
+      "type": "generate_enter",
+      "chars": 134,
+      "text": "Students stop there before class because the food is quick and cheap. When the rain begins everyone crowds under the same blue awning.",
+      "wall": 96495.5
+     },
+     {
+      "type": "prefetch_result",
+      "index": 1,
+      "ok": true,
+      "wall": 96496.6
+     },
+     {
+      "type": "generate_ready",
+      "pcmIndex": 2,
+      "elapsedMs": 6983.8,
+      "audioSeconds": 8.6934,
+      "rtf": 0.803,
+      "headMs": 343.1,
+      "tailMs": 612.5,
+      "chars": 134,
+      "wall": 103479.5
+     },
+     {
+      "type": "source_start",
+      "startsAtCtx": 103.150544,
+      "ctxNow": 101.540862,
+      "durationS": 7.761882,
+      "wall": 103482.7
+     },
+     {
+      "type": "say_resolved",
+      "index": 0,
+      "spoke": true,
+      "wall": 112849.1
+     },
+     {
+      "type": "scenario_end",
+      "wall": 112849.1
+     }
+    ],
+    "notes": [
+     "engine booted, speech={\"streamSentences\":true,\"streamMaxWords\":26,\"silenceScale\":0.4}",
+     "door=/features/neural-voice/fiezel-voice-say.js"
+    ],
+    "pcmMeta": [
+     {
+      "index": 0,
+      "text": "The morning market opens before the sun clears the rooftops. Sellers arrange fruit in careful rows while the first buyers arrive. By seven the narrow lanes are already loud with bargaining. Across the road a small kitchen serves rice and hot broth.",
+      "sampleRate": 44100,
+      "length": 659277,
+      "headMs": 447.9,
+      "tailMs": 202.5
+     },
+     {
+      "index": 1,
+      "text": "The afternoon heat empties the lanes for an hour. Only the tea stall stays open, and its radio keeps playing.",
+      "sampleRate": 44100,
+      "length": 312369,
+      "headMs": 407.5,
+      "tailMs": 616.4
+     },
+     {
+      "index": 2,
+      "text": "Students stop there before class because the food is quick and cheap. When the rain begins everyone crowds under the same blue awning.",
+      "sampleRate": 44100,
+      "length": 383380,
+      "headMs": 343.1,
+      "tailMs": 612.5
+     }
+    ],
+    "guardHits": []
+   }
+  }
+ },
+ "bootSeconds": 1.95
+}

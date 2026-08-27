@@ -3711,6 +3711,46 @@ function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.s
 // akan melaporkan 'suara siap' padahal jalur yang dipakai pelajaran adalah yang lain.
 async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?'Tes selesai. Subtitle Indonesia muncul di bawah saat pelajaran berjalan.':'Suara tidak berbunyi. Periksa koneksi lalu coba lagi.';showToast(ok?'Suara terdengar.':'Suara belum berbunyi.')}catch(error){if(hint)hint.textContent=`Tes suara gagal: ${String(error?.message||error)}.`;showToast('Tes suara gagal. Buka Diagnostics untuk detail.')}finally{button.disabled=false;enhanceUI()}}
 
+/* =====================================================================================
+   V6 SISI PEMANGGIL - menghangatkan kalimat BERIKUTNYA (reports/voice-v6-callers.md)
+
+   Tiga perbaikan lapisan bawah sudah ter-merge dan terukur:
+     - FiezelVoiceSay.prefetch() benar-benar sampai ke mesin neural lokal
+       (reports/voice-v5-prefetch.md: jeda terdengar 4.510 ms -> 797 ms),
+     - prosody/service.planUtterance() menerima TEKS UTUH,
+     - pemutar memangkas keheningan dan menyambung antrean lintas panggilan
+       (reports/voice-v2-player.md).
+   Ketiganya tidak berbuah selama PEMANGGIL mengirim satu kalimat lalu menunggu bunyi
+   habis sebelum kalimat berikutnya digenerasi. Dua fungsi di bawah ini adalah bentuk
+   tunggal dari "hangatkan yang berikutnya" untuk seluruh app.js.
+
+   EMPAT PAGAR, dan semuanya sengaja:
+     1. TIDAK memicu unduhan model. Di sini TIDAK ADA prepare()/ensureReady()/prewarm().
+        Kontrak v5 sudah menjamin prefetch menjawab false dengan tenang selama aset
+        belum prepared, dan itu memang jawaban yang benar untuk murid baru.
+     2. Ditunda satu task (idle bila peramban punya requestIdleCallback). Mengajukan N+1
+        di giliran JS yang sama dengan say(N) membuat N+1 memesan mesin single-flight
+        lebih dulu - inversi antrean m025-47, pola yang sama dengan warmNext() Library.
+     3. Menghormati penghenti. Setiap pengajuan mencatat voicePrefetchGeneration; stop,
+        pindah layar, atau tab disembunyikan menaikkan angka itu, dan pengajuan yang
+        menganggur batal SEBELUM menyentuh pintu suara. Prefetch sendiri tidak pernah
+        berbunyi, jadi ini menjaga hal kedua: CPU tidak dipakai untuk kalimat yang sudah
+        tidak akan didengar siapa pun.
+     4. Senyap. Tidak ada toast, tidak ada subtitle, tidak ada galat yang menjalar.
+   ===================================================================================== */
+let voicePrefetchGeneration=0;
+function cancelVoicePrefetch(){voicePrefetchGeneration++;return voicePrefetchGeneration}
+function prefetchNextVoice(next,options){
+  const say=self.FiezelVoiceSay;
+  const english=String((typeof next==='string'?next:next&&next.en)||'').trim();
+  if(!english)return false;
+  if(!say||typeof say.prefetch!=='function')return false;
+  const generation=voicePrefetchGeneration,opts={...(options||{})};
+  const run=()=>{if(generation!==voicePrefetchGeneration)return;try{say.prefetch(english,opts)}catch{}};
+  if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:1200});
+  else setTimeout(run,0);
+  return true;
+}
 // m025-33 FIEZEL Classroom: Category -> Topic -> Classroom. Fiezel speaks English with
 // the mandatory neural engine; the Indonesian line is authored subtitle text, so the
 // lesson works fully even when the optional Indonesian bundle is not downloaded.
@@ -3732,7 +3772,16 @@ function classroomSubtitle(text){const el=$('classroomSubtitle');if(el)el.textCo
 // m025-96: Classroom sudah punya pasangan {en,id} sendiri, jadi barisnya dipakai
 // langsung dan tidak menghabiskan jatah terjemahan. Subtitle bawaan Classroom tetap
 // dipertahankan karena ia hidup di dalam kartu pelajaran, bukan di pita bawah layar.
-async function classroomSpeak(en,id){classroomSubtitle(id);const say=self.FiezelVoiceSay;if(!say?.say)return;if(classroomSpeaking)return;classroomSpeaking=true;try{await say.say({en,id},{speed:selectedNeuralRate()})}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=`Suara belum siap: ${String(e?.message||e)}. Subtitle tetap jalan.`}finally{classroomSpeaking=false}}
+// V6: `next` adalah teks Inggris yang akan dibacakan SESUDAH baris ini. Bila pemanggil
+// tidak menyebutkannya, urutan segmen Classroom deterministik, jadi kursor sesi diintip
+// lewat peekSegment() - accessor yang TIDAK memindahkan kursor (nextSegment() memindahkan,
+// dan itulah kenapa ia tidak bisa dipakai untuk mengintip).
+function classroomPeekNextText(){try{const seg=classroomSession&&classroomSession.peekSegment?classroomSession.peekSegment():null;return seg?seg.en:''}catch{return ''}}
+async function classroomSpeak(en,id,next){classroomSubtitle(id);const say=self.FiezelVoiceSay;if(!say?.say)return;if(classroomSpeaking)return;classroomSpeaking=true;try{const speed=selectedNeuralRate();const speaking=say.say({en,id},{speed});
+  // Diajukan SESUDAH say() berangkat, bukan sebelum: yang dihangatkan adalah kalimat
+  // berikutnya, dan yang harus lebih dulu memesan mesin adalah kalimat yang sedang didengar.
+  prefetchNextVoice(next===undefined?classroomPeekNextText():next,{speed});
+  await speaking}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=`Suara belum siap: ${String(e?.message||e)}. Subtitle tetap jalan.`}finally{classroomSpeaking=false}}
 // Tumpukan tutor/Classroom (81 KB) juga dimuat malas. Pembungkus ini yang menjembatani
 // dua kenyataan: ./features/tutor-classroom/fiezel-tutor-v3.js MENGGANTI global
 // `classroom` dengan renderernya sendiri saat ia dieksekusi, dan sekarang ia bisa saja
@@ -3789,15 +3838,20 @@ function wireClassroom(){
   // yang tahu cara naik kembali tepat satu tingkat, bukan keluar dari seluruh Classroom.
   document.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{const cat=b.dataset.cat;s.chooseCategory(cat);enterStage('classroom-topic',()=>{s.reset();s.chooseCategory(cat);renderClassroom()});renderClassroom()}));
   document.querySelectorAll('[data-lesson]').forEach(b=>b.addEventListener('click',()=>{const cat=s.snapshot().categoryId,lesson=b.dataset.lesson;s.chooseLesson(lesson);enterStage('classroom-lesson',()=>{s.reset();if(cat)s.chooseCategory(cat);s.chooseLesson(lesson);renderClassroom()});renderClassroom();const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)}));
-  document.querySelector('[data-back="category"]')?.addEventListener('click',()=>exitStage());
+  // Keluar dari pelajaran adalah penghenti: pengajuan prefetch yang masih menganggur
+  // dibatalkan di sini supaya CPU tidak menggenerasi kalimat yang tidak akan didengar.
+  document.querySelector('[data-back="category"]')?.addEventListener('click',()=>{cancelVoicePrefetch();exitStage()});
   document.querySelector('[data-replay]')?.addEventListener('click',()=>{const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)});
   document.querySelector('[data-next]')?.addEventListener('click',()=>{s.nextSegment();renderClassroom();const seg=s.currentSegment();if(seg)classroomSpeak(seg.en,seg.id)});
-  document.querySelector('[data-restart]')?.addEventListener('click',()=>{leaveAllStages();s.reset();renderClassroom()});
+  document.querySelector('[data-restart]')?.addEventListener('click',()=>{cancelVoicePrefetch();leaveAllStages();s.reset();renderClassroom()});
   document.querySelectorAll('[data-opt]').forEach(b=>b.addEventListener('click',()=>{
     const {result}=s.answer(Number(b.dataset.opt));
     const en=$('classroomFeedbackEn');if(en)en.textContent=result.feedback.en;
     classroomSubtitle(result.feedback.id);
-    classroomSpeak(result.feedback.en,result.feedback.id);
+    // Feedback kuis: TIDAK ada "kalimat berikutnya" yang bisa diketahui - kalimat sesudah
+    // ini lahir dari jawaban murid berikutnya, jadi next dikirim kosong DENGAN SENGAJA
+    // (menghangatkan tebakan berarti membakar CPU untuk teks yang mungkin tidak terpakai).
+    classroomSpeak(result.feedback.en,result.feedback.id,'');
     b.classList.add(result.correct?'is-correct':'is-wrong');
     document.querySelectorAll('[data-opt]').forEach(x=>{x.disabled=true});
     setTimeout(()=>{renderClassroom();if(s.snapshot().phase==='quiz'&&!s.snapshot().remediating){}},1400);
@@ -3843,7 +3897,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),stop:()=>self.FiezelVoiceSay?.stop?.()};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -4085,7 +4139,14 @@ function AudioService(){
  };
  return{
   isSupported:()=>!!self.FiezelVoiceSay||browserSupported,
-  stop(){self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},
+  stop(){cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.();if(browserSupported)speechSynthesis.cancel()},
+  /**
+   * V6: pintu hangat untuk Reading/Vocabulary/Grammar. Ia TIDAK menebak apa kalimat
+   * berikutnya - pemanggilnya yang tahu (flashcards tahu kartu sesudahnya, kuis tahu
+   * kolam soal sisanya), persis seperti dicatat reports/voice-v5-prefetch.md §3 baris 4.
+   * Tidak ada prepare()/ensureReady() di sini; false yang tenang adalah jawaban sah.
+   */
+  prefetch(next,options={}){return prefetchNextVoice(next,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})},
   /**
    * m026-BUG3 (cf-c1 K11). Sebelum perbaikan ini cabang SpeechSynthesisUtterance hanya
    * dipakai bila modul FiezelVoiceSay TIDAK ADA - dan sw.js mem-precache modul itu, jadi
@@ -4101,6 +4162,10 @@ function AudioService(){
    const viaDoor=typeof say==='function'
     ?Promise.resolve().then(()=>say.call(self.FiezelVoiceSay,text,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:options.locale})).catch(()=>false)
     :Promise.resolve(false);
+   // V6: `options.next` dihangatkan SESUDAH pemutaran diajukan - urutan ini yang menjaga
+   // mesin single-flight tetap milik kalimat yang sedang didengar (inversi antrean m025-47).
+   // stop() di atas sudah membatalkan generation sebelumnya, jadi pengajuan ini yang berlaku.
+   if(options.next)this.prefetch(options.next,{speed:options.speed,contentType:options.nextContentType||options.contentType,locale:options.locale});
    return viaDoor.then(result=>{
     if(result!==false&&result!==null&&result!==undefined)return result===true?{provider:'fiezel-voice-say'}:result;
     return Promise.resolve(browserPlay(text,options)).then(fallback=>{
@@ -4127,7 +4192,11 @@ function flashcards(level){
     $('backVocab').onclick=()=>{audio.stop();exitStage()};
     const flip=()=>{flipped=!flipped;$('flashcard').classList.toggle('flipped',flipped);haptic('tap')};
     $('flashcard').onclick=flip;$('flashcard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
-    $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word,{contentType:'word'})};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence'})};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
+    // V6 (voice-v5-prefetch.md §3 baris 5): kartu berikutnya sudah ada di memori, dan murid
+    // hampir selalu menekan "Dengar" lagi di kartu itu. Menghangatkan satu kartu ke depan
+    // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
+    const nextCard=pool[i+1]||null;
+    $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast('Progres tersimpan')};
     $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast('Ditandai dikuasai');i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
@@ -4750,7 +4819,13 @@ function quizLoop(cfg){
     // m026-BUG3: audio.play() kini menyelesaikan diri dengan null ketika SELURUH tangga
     // suara gagal, bukan menolak. Tanpa memeriksa hasilnya, catatan di bawah tombol akan
     // berbunyi "Putar ulang bila perlu" untuk rekaman yang tidak pernah berbunyi.
-    try{const played=await audio.play(q.script,{contentType:'listening'});
+    // V6 (voice-v5-prefetch.md §3 baris 6): soal berikutnya dipilih adaptif saat murid
+    // menekan Lanjut, jadi yang bisa dihangatkan adalah KANDIDAT listening berikutnya dari
+    // kolam sisa - untuk placement/preserveOrder ia pasti, untuk pemilihan adaptif ia
+    // tebakan yang murah. Diajukan sesudah audio soal sekarang berangkat, bukan di draw(),
+    // supaya tidak pernah bersaing dengan rekaman yang sedang ditunggu murid.
+    const nextListening=remaining.find(x=>x&&x.type==='listening'&&x.script&&x.script!==q.script);
+    try{const played=await audio.play(q.script,{contentType:'listening',next:nextListening?nextListening.script:''});
      note.textContent=played?'Putar ulang bila perlu.':'Suaranya belum berbunyi di perangkat ini. Pilihan tetap aku buka supaya kamu tidak terjebak, dan kamu boleh menekan Dengarkan lagi.';
      unlock()}
     catch(error){note.textContent=`Suara tidak berbunyi (${String(error?.message||error)}). Pilihan tetap dibuka.`;unlock()}
@@ -5425,7 +5500,7 @@ function cancelNeuralRelease(){if(neuralReleaseTimer){clearTimeout(neuralRelease
 // m025-96: pintu bicara baru ikut dibungkam di sini. Tanpa baris ini, suara terus
 // berbunyi setelah aplikasi disembunyikan - dan karena audionya kini dari elemen Audio,
 // bukan AudioContext, menangguhkan fxCtx pun tidak menghentikannya.
-function silenceNeuralVoice(){try{window.FiezelVoiceSay?.stop?.()}catch{}try{window.FiezelVoiceRuntime?.stop?.()}catch{}try{window.FiezelSupertonicVoice?.stop?.()}catch{}}
+function silenceNeuralVoice(){cancelVoicePrefetch();try{window.FiezelVoiceSay?.stop?.()}catch{}try{window.FiezelVoiceRuntime?.stop?.()}catch{}try{window.FiezelSupertonicVoice?.stop?.()}catch{}}
 document.addEventListener?.('visibilitychange',()=>{if(document.visibilityState==='hidden'){fxCtx?.suspend?.();silenceNeuralVoice();scheduleNeuralRelease()}else{cancelNeuralRelease();if(state.preferences?.feedbackSounds)fxCtx?.resume?.();warmNeuralVoice()}});
 function scheduleNeuralRelease(){
   cancelNeuralRelease();
