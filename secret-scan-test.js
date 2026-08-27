@@ -372,6 +372,34 @@ const HEURISTIC_PATH_ALLOWLIST = [
  */
 const TOKEN_ALLOWLIST = [
   {
+    /* Ditambahkan 28 Agu 2026: probe anti-vakum gerbang owner-edge-guard. Nilainya acak dan
+     * hanya masuk String.replace di memori. Digest didaftarkan PER BERKAS karena pemindai
+     * sengaja tidak memaafkan satu digest untuk semua berkas — itu pagar yang benar. */
+    digest: '42146fb399e993956e9321d8b7f9ccabece30ad236f762427ab1278f89dd36da',
+    file: 'owner-edge-guard-test.js',
+    reason: 'probe anti-vakum (d) pada gerbang owner-edge-guard, bentuk base64url — dipakai untuk MEMBUKTIKAN pemindai edge menangkap secret sungguhan, bukan secret produksi'
+  },
+  {
+    /* Ditambahkan 28 Agu 2026: probe anti-vakum gerbang owner-edge-guard. Nilainya acak dan
+     * hanya masuk String.replace di memori. Digest didaftarkan PER BERKAS karena pemindai
+     * sengaja tidak memaafkan satu digest untuk semua berkas — itu pagar yang benar. */
+    digest: 'e428dd01dc1a23a8c03ecb0ed32fd0de40141dbd3213a699a6546dd4c0048ca3',
+    file: 'owner-edge-guard-test.js',
+    reason: 'probe anti-vakum (d) pada gerbang owner-edge-guard, bentuk base64 ber-padding — dipakai untuk MEMBUKTIKAN pemindai edge menangkap secret sungguhan, bukan secret produksi'
+  },
+  {
+    /* Ditambahkan 28 Agu 2026 saat merge: paket owner (S4) dan paket pemindai (A4) dua-duanya
+     * hijau sendiri-sendiri, lalu bertabrakan — fixture ini lahir SESUDAH allowlist ditulis.
+     * Nilainya sengaja berprefiks `uji-` dan berakhir pada urutan hex+XYZ yang dapat dibaca
+     * manusia: ia mustahil menjadi secret produksi karena EDGE_SECRET sungguhan dihasilkan
+     * acak dan hidup HANYA di Worker secret + berkas di luar repo. Sudah diverifikasi
+     * terpisah bahwa nol nilai rahasia produksi muncul di repo. */
+    digest: 'a818bd4194c88225aa592af4c8dda9a9bde3c0090b6d98694acc49225d74a240',
+    file: 'owner-edge-guard-test.js',
+    reason: 'fixture EDGE_SECRET baris 168 pada gerbang owner-edge-guard — nilai berlabel `uji-` '
+      + 'yang hanya dipakai sebagai header tiruan di memori, bukan secret produksi mana pun'
+  },
+  {
     digest: 'b12ea51fe4a6fd366faed767c51ae5bb37b6d14778de537ce0e0fb3525589d83',
     file: 'edge-guard-test.js',
     reason: 'fixture (g) baris 425, bentuk base64url — bukti anti-vakum pemindai edge-guard; '
