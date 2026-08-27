@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+/* bump-build.mjs — ARBITER NOMOR BUILD.
+ *
+ * MASALAH YANG DITUTUP DI SINI, dengan bukti dari lapangan 28 Agu 2026: dalam satu malam
+ * dua jalur kerja bertabrakan LIMA KALI karena masing-masing MENGETIK nomor build sendiri
+ * ke sw.js, core-config.js, dan fiezel-diag-panel.js. Keduanya memilih m025-173, lalu
+ * keduanya memilih m025-174. Akibatnya bukan cuma repot merge: satu revisi service worker
+ * memayungi DUA daftar precache berbeda, jadi sebagian murid memegang shell cache campur.
+ *
+ * AGENTS-COORDINATION.md sudah melarang tabrakan sejak v1.2, dan tabrakan tetap terjadi.
+ * Aturan yang tidak ditegakkan alat bukan aturan. Jadi nomor build sekarang punya satu
+ * sumber (coordination/BUILD-VERSION.json) dan satu pintu (berkas ini).
+ *
+ * KENAPA INI MENYELESAIKAN TABRAKAN, bukan cuma memindahkannya: dua sesi yang menaikkan
+ * versi bersamaan tetap bertabrakan - tetapi konfliknya jatuh di berkas JSON delapan baris
+ * yang isinya cuma nomor dan pemilik. Itu konflik yang bisa dibaca dan diselesaikan dalam
+ * satu menit, bukan konflik di sw.js/style.css/app.js yang harus dibaca ratusan baris dan
+ * bisa membuang pekerjaan orang lain kalau salah pilih sisi.
+ *
+ * Pakai: node tools/bump-build.mjs "alasan singkat"        (naikkan dari origin/main)
+ *        node tools/bump-build.mjs --check                  (hanya periksa keselarasan)
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SUMBER = path.join(ROOT, 'coordination/BUILD-VERSION.json');
+
+const TITIK = [
+  { berkas: 'sw.js', pola: /(const SW_REV=')(m025-\d+)([^']*)(')/, gantiKe: 2 },
+  { berkas: 'core-config.js', pola: /(self\.FIEZEL_PAGE_BUILD=')(m025-\d+)(')/, gantiKe: 2 },
+  { berkas: 'features/neural-voice/fiezel-diag-panel.js', pola: /(var DIAG_BUILD = ')(m025-\d+)(')/, gantiKe: 2 }
+];
+
+const baca = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
+const nomor = (v) => Number(String(v).replace(/^m025-/, ''));
+
+function versiTerpasang() {
+  const hasil = {};
+  for (const t of TITIK) {
+    const m = baca(t.berkas).match(t.pola);
+    hasil[t.berkas] = m ? m[t.gantiKe] : null;
+  }
+  return hasil;
+}
+
+function versiSumber() {
+  return JSON.parse(fs.readFileSync(SUMBER, 'utf8')).version;
+}
+
+/* Versi di origin/main. Kalau git tidak bisa dihubungi (mode luring, sandbox tanpa remote),
+ * JANGAN diam-diam memakai versi lokal sebagai dasar: itu justru cara tabrakan lahir.
+ * Kembalikan null dan katakan terus terang bahwa dasarnya tidak terverifikasi. */
+function versiHulu() {
+  try {
+    execSync('git fetch origin main --quiet', { cwd: ROOT, stdio: 'ignore', timeout: 60000 });
+    // stderr dibungkam: kalau berkas ini belum ada di hulu, git mencetak "fatal:" yang
+    // terlihat seperti kerusakan padahal itu keadaan normal saat protokol baru mendarat.
+    const isi = execSync('git show origin/main:coordination/BUILD-VERSION.json', {
+      cwd: ROOT, encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'ignore']
+    });
+    return JSON.parse(isi).version;
+  } catch {
+    try {
+      const sw = execSync('git show origin/main:sw.js', {
+        cwd: ROOT, encoding: 'utf8', timeout: 30000, stdio: ['ignore', 'pipe', 'ignore']
+      });
+      const m = sw.match(/const SW_REV='(m025-\d+)/);
+      return m ? m[1] : null;
+    } catch {
+      return null;
+    }
+  }
+}
+
+function periksa() {
+  const terpasang = versiTerpasang();
+  const sumber = versiSumber();
+  const nilai = Object.values(terpasang);
+  const selaras = nilai.every((v) => v && v === sumber);
+  return { terpasang, sumber, selaras };
+}
+
+const argv = process.argv.slice(2);
+
+if (argv[0] === '--check') {
+  const { terpasang, sumber, selaras } = periksa();
+  console.log(JSON.stringify({ sumber, terpasang, selaras }, null, 2));
+  if (!selaras) {
+    console.error('TIDAK SELARAS: tiga penanda build harus sama dengan coordination/BUILD-VERSION.json.');
+    console.error('Perbaiki dengan: node tools/bump-build.mjs "<alasan>"  (atau selaraskan manual lalu jelaskan).');
+    process.exit(1);
+  }
+  console.log('Selaras.');
+  process.exit(0);
+}
+
+const alasan = argv.join(' ').trim();
+if (!alasan) {
+  console.error('Alasan wajib. Pakai: node tools/bump-build.mjs "alasan singkat"');
+  console.error('Alasan itu masuk ke coordination/BUILD-VERSION.json supaya sesi lain tahu nomor ini dipakai untuk apa.');
+  process.exit(1);
+}
+
+const hulu = versiHulu();
+const lokal = versiSumber();
+const dasar = hulu && nomor(hulu) >= nomor(lokal) ? hulu : lokal;
+const versiBaru = 'm025-' + (nomor(dasar) + 1);
+
+if (!hulu) {
+  console.warn('PERINGATAN: versi origin/main tidak bisa dibaca, jadi dasar diambil dari berkas lokal.');
+  console.warn('Nomor ini BELUM terbukti bebas tabrakan. Jalankan ulang setelah `git fetch` berhasil.');
+} else if (nomor(hulu) > nomor(lokal)) {
+  console.log('Hulu lebih tinggi (' + hulu + ' > ' + lokal + '): dasar diambil dari hulu. Ini mencegah tabrakan.');
+}
+
+for (const t of TITIK) {
+  const p = path.join(ROOT, t.berkas);
+  const isi = fs.readFileSync(p, 'utf8');
+  const m = isi.match(t.pola);
+  if (!m) {
+    console.error('Penanda build tidak ditemukan di ' + t.berkas + '. Bentuk kodenya berubah; perbarui TITIK di berkas ini.');
+    process.exit(1);
+  }
+  const baru = isi.replace(t.pola, (_all, a, _lama, ...sisa) => a + versiBaru + sisa.slice(0, sisa.length - 2).join(''));
+  fs.writeFileSync(p, baru);
+  console.log(t.berkas + ': ' + m[t.gantiKe] + ' -> ' + versiBaru);
+}
+
+const sumber = JSON.parse(fs.readFileSync(SUMBER, 'utf8'));
+sumber.version = versiBaru;
+sumber.claimedAt = new Date().toISOString();
+sumber.reason = alasan;
+fs.writeFileSync(SUMBER, JSON.stringify(sumber, null, 2) + '\n');
+console.log('coordination/BUILD-VERSION.json: ' + versiBaru + ' (' + alasan + ')');
+
+const akhir = periksa();
+if (!akhir.selaras) {
+  console.error('Gagal menyelaraskan. Jangan commit; periksa manual.');
+  process.exit(1);
+}
+console.log('Selaras. Commit keempat berkas bersama-sama.');

@@ -1,0 +1,29 @@
+{
+  "protocol": "coordination-claims-v1",
+  "updated": "2026-08-28T06:35:00+07:00",
+  "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
+  "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
+  "active": [
+    {
+      "sesi": "sesi-computer-086e9698",
+      "peran": "MASTER",
+      "paths": [
+        "coordination/",
+        "tools/bump-build.mjs",
+        "coordination-guard-test.js",
+        "MASTER-BROADCAST.md"
+      ],
+      "mulai": "2026-08-28T06:30:00+07:00",
+      "catatan": "Memasang penegak koordinasi + nightwatch. Tidak menyentuh app.js, sw.js, style.css, atau bank soal selain lewat arbiter versi."
+    }
+  ],
+  "finished": [
+    {
+      "sesi": "sesi-computer-086e9698",
+      "peran": "MASTER",
+      "paths": ["workers/api/", "deploy/edge/", "features/neural-voice/", "features/quota/"],
+      "selesai": "2026-08-28T06:00:00+07:00",
+      "catatan": "Rollout Cloudflare: 18 paket kerja, jembatan edge, rotasi kunci sesi 2x, E2E 24/24. Sudah di main."
+    }
+  ]
+}
