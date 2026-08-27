@@ -162,5 +162,19 @@ jobs:
           node owner-dashboard-test.js
           node tools/cf-test-harness.js
           node no-network-test.js
+          # `cf-live-selftest.js` membuktikan gerbang live di bawah ini bisa MERAH:
+          # ia menjalankannya terhadap server HTTP loopback yang meniru jawaban
+          # benar dan 20 variasi jawaban salah. Loopback murni (127.0.0.1, port 0),
+          # tanpa DNS, tanpa keluar mesin — karena itu ia terdaftar di
+          # SOCKET_ALLOWLIST `no-network-test.js` dan dijalankan SESUDAHNYA.
+          node cf-live-selftest.js
+          # SKIP sampai owner menyetel base URL Worker. Tanpa FIEZEL_CF_LIVE_BASE
+          # langkah ini mencetak alasan jujur lalu exit 0 — ia TIDAK memerahkan CI
+          # karena lingkungannya belum siap, dan ia TIDAK mengaku PASS (statusnya
+          # SKIP, `pass:null`). Untuk menjalankannya sungguhan, setel repository
+          # variable/secret FIEZEL_CF_LIVE_BASE ke https://api.fiezel.my.id (atau
+          # alamat *.workers.dev sementara) dan teruskan lewat `env:` pada step ini.
+          # Petunjuk lengkap: tools/cf-live-runner.md.
+          node cf-live-contract-test.js
           node release-audit-gate-test.js
           node cf-transport-test.js
