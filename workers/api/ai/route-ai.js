@@ -86,18 +86,32 @@
     return null;
   }
 
+  /**
+   * A8 · Naskah murid. Kanonnya sama dengan `features/quota/quota-copy.js`: bahasa
+   * sehari-hari, "nggak" bukan "tidak", tanpa nama mesin, dan tanpa menyalahkan murid.
+   * Kalimat di sini sengaja tetap tinggal di rute (bukan dipindah ke klien) karena ia
+   * dipakai untuk keadaan yang klien belum tentu bisa menyimpulkan sendiri — tetapi
+   * nadanya wajib satu suara dengan naskah klien, dan itu dijaga
+   * `quota-notice-a11y-test.js`.
+   */
   var POLITE = Object.freeze({
-    schema_mismatch: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
+    schema_mismatch: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
     unknown_task: 'Bantuan yang kamu minta belum tersedia.',
-    client_prompt_forbidden: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.',
-    input_required: 'Isi dulu bagian yang diminta.',
-    invalid_input: 'Ada bagian yang belum sesuai. Periksa lagi isinya.',
-    too_long: 'Tulisanmu terlalu panjang untuk sekali kirim. Coba potong sebagian.',
-    quota_exceeded: 'Jatah bantuan AI hari ini sudah habis. Coba lagi besok.',
-    breaker_open: 'Bantuan AI sedang istirahat sebentar. FIEZEL tetap menjawab dari materi.',
-    degraded: 'Mode hemat — jawaban ini dari FIEZEL, bukan AI.',
-    body_too_big: 'Permintaan terlalu besar.',
-    bad_json: 'Permintaan tidak dikenali. Muat ulang halaman lalu coba lagi.'
+    client_prompt_forbidden: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
+    input_required: 'Isi dulu bagian yang diminta, ya.',
+    invalid_input: 'Ada bagian yang belum sesuai. Periksa lagi isinya, ya.',
+    too_long: 'Tulisanmu kepanjangan untuk sekali kirim. Coba potong sebagian dulu.',
+    quota_exceeded: 'Jatah tanya-jawab hari ini sudah habis. Penjelasan dari materi tetap muncul, dan jatahnya kembali sesudah tengah malam.',
+    // A8 TEMUAN BOHONG (§4 reports/add-a8-a11y.md). Sebelum commit ini, keadaan
+    // "penghitung jatahnya sendiri yang rusak" (`reason:'quota_unavailable'`) dikirim ke
+    // murid dengan kalimat `quota_exceeded` — murid yang belum memakai apa pun dituduh
+    // sudah menghabiskan jatahnya, lengkap dengan saran "coba lagi besok" padahal
+    // retryAfter-nya 60 detik. Keadaannya sekarang punya kalimatnya sendiri.
+    quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Jawaban dari materi tetap muncul — coba lagi sebentar lagi, ya.',
+    breaker_open: 'Bantuan AI sedang istirahat sebentar. FIEZEL tetap menjawab dari materi, dan itu nggak pakai jatah.',
+    degraded: 'Jawaban ini aku susun dari materi, bukan dari AI. Isinya tetap boleh kamu pakai.',
+    body_too_big: 'Kirimanmu kebesaran untuk sekali kirim. Coba potong sebagian dulu.',
+    bad_json: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.'
   });
 
   var MAX_BODY_BYTES = 16000; // di atas payload terbesar (context_coach 8.000 B) dengan margin
@@ -260,13 +274,19 @@
         quotaChecked = true;
       }
       if (quota && quota.allowed === false) {
+        // A8: kode DAN kalimatnya mengikuti ALASAN sebenarnya. `quota_unavailable` berarti
+        // catatan jatahnya yang mati, bukan jatah murid yang habis; keduanya nggak boleh
+        // memakai satu kalimat yang sama. `copyKey` disertakan supaya klien bisa memakai
+        // naskah `features/quota/quota-copy.js` alih-alih kalimat kiriman ini.
+        var unavailable = String((quota && quota.reason) || '') === 'quota_unavailable';
         return json(baseResponse(taskName, {
           text: fallbackText,
           source: 'deterministic-fallback',
           degraded: true,
           breaker: gate.phase,
-          error: 'quota_exceeded',
-          message: POLITE.quota_exceeded,
+          error: unavailable ? 'quota_unavailable' : 'quota_exceeded',
+          copyKey: unavailable ? 'quota.unavailable' : 'quota.ai.exhausted',
+          message: unavailable ? POLITE.quota_unavailable : POLITE.quota_exceeded,
           retryAfter: Number(quota.retryAfter) || 3600,
           quotaChecked: true,
           usage: { inputTokens: 0, outputTokens: 0, ms: now() - started }

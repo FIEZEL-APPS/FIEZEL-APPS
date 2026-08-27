@@ -342,6 +342,10 @@ html.fz-booting body{overflow:hidden}
   <!-- m025-125: judul lesson grammar Bahasa Indonesia. Wajib sebelum app.js karena
        friendlySkillName() membacanya sejak render Grammar Hub yang pertama. -->
   <script defer src="./grammar-labels-id.js"></script>
+  <!-- A8: naskah murid + aturan aksesibilitas untuk pemberitahuan jatah/suara. Wajib SEBELUM
+       app.js karena presentQuotaNotice() memakainya, dan kalau ia belum ada app.js akan
+       terpaksa memakai naskah cadangan yang lebih miskin. -->
+  <script defer src="./features/quota/quota-copy.js"></script>
   <script defer src="./app.js"></script>
   <script defer src="./features/daily-target/fiezel-daily-target.js"></script>
   <script defer src="./features/skills-evidence/fiezel-skills-evidence.js"></script>
