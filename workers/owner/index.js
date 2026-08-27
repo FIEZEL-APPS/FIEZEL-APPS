@@ -156,6 +156,103 @@ function deny() {
   });
 }
 
+/* ============================ Penjaga jembatan edge (X-Fiezel-Edge) ====================== */
+// MASALAH NYATA. Worker ini minta `owner.fiezel.my.id` sebagai custom domain, tapi zona
+// `fiezel.my.id` belum ada di Cloudflare (nameserver di reseller; zona subdomain butuh
+// Enterprise). Jadi selama blokade itu, dashboard dijangkau lewat pola yang sudah terbukti untuk
+// `api.fiezel.my.id`: subdomain cPanel di origin ArenHost + proxy PHP
+// (`deploy/edge/owner-index.php`) yang meneruskan ke `fiezel-owner.fitrajft.workers.dev`.
+//
+// Akibatnya Worker ini hidup di DUA alamat, dan alamat `*.workers.dev` tidak bisa dimatikan
+// (proxy memanggilnya). Selama ia terbuka tanpa syarat, halaman masuk owner bisa ditembak
+// langsung tanpa lewat jembatan: rem login per-isolate bisa diputar dengan meminta isolate baru,
+// dan Cloudflare Access (yang dipasang PER HOSTNAME) sama sekali tidak berlaku di alamat
+// `workers.dev`. Artinya lapis kedua yang dijanjikan README §2 hanya nyata di jembatan.
+//
+// KENAPA DISALIN, BUKAN DIIMPOR. Penjaga yang sama sudah ada di `workers/api/mw-edge.js`. Impor
+// tidak mungkin: `workers/api` dan `workers/owner` adalah DUA Worker dengan graf modul, bundling,
+// dan deploy sendiri — tidak ada modul bersama di antara keduanya. Ini pola yang sama, dan alasan
+// yang sama, seperti `ctEq()` yang disalin ke arah sebaliknya (mw-edge.js menyalinnya dari berkas
+// ini). Kalau salah satu berubah, yang lain harus ikut; gerbang yang menjaganya:
+// `edge-guard-test.js` (sisi api) dan `owner-edge-guard-test.js` (sisi owner).
+
+const EDGE_HEADER = 'x-fiezel-edge';
+
+// Owner TIDAK punya path bebas header. `workers/api` membebaskan `/healthz` karena monitor
+// eksternal harus bisa melihat API murid hidup tanpa mengirim rahasia. Dashboard owner tidak
+// punya kebutuhan itu: kalau ia mati, yang terdampak satu orang, dan orang itu bisa melihatnya
+// dengan membuka halamannya. Daftar kosong = nol permukaan terbuka di `workers.dev`.
+const EDGE_FREE_PATHS = Object.freeze([]);
+
+// Secret yang terpasang, sudah dirapikan. String kosong/spasi dianggap TIDAK terpasang — kalau
+// tidak, `wrangler secret put` yang salah tempel akan mengunci dashboard di balik nilai yang
+// tidak diketahui siapa pun.
+function edgeSecret(env) {
+  const raw = env ? env.EDGE_SHARED_SECRET : null;
+  const trimmed = typeof raw === 'string' ? raw.trim() : '';
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+// Dua nilai saja, dan keduanya jujur:
+//   'on'  = setiap permintaan wajib membawa header jembatan yang benar.
+//   'off' = secret belum dipasang; Worker berjalan seperti sebelum penjaga ini ada.
+// Nilai ini TIDAK pernah dikirim ke klien mana pun (dashboard owner tidak punya `/health`), jadi
+// ia bukan oracle publik. Ia hanya untuk gerbang dan untuk log.
+function edgeGuardStatus(env) {
+  return edgeSecret(env) ? 'on' : 'off';
+}
+
+// Peringatan `off` dicatat SEKALI per isolate, bukan sekali per permintaan: satu baris log per
+// permintaan adalah cara tercepat membuat owner mematikan observability, dan owner yang mematikan
+// log tidak akan melihat peringatan apa pun lagi.
+let edgeWarnedThisIsolate = false;
+
+function resetEdgeWarningForTests() {
+  edgeWarnedThisIsolate = false;
+}
+
+function warnEdgeGuardOff() {
+  if (edgeWarnedThisIsolate) return;
+  edgeWarnedThisIsolate = true;
+  console.warn(
+    'fiezel-owner edgeGuard=off — EDGE_SHARED_SECRET belum dipasang. Alamat *.workers.dev TERBUKA: '
+    + 'halaman masuk owner bisa ditembak langsung tanpa lewat jembatan owner.fiezel.my.id, dan '
+    + 'Cloudflare Access tidak berlaku di sana. Jalankan: wrangler secret put EDGE_SHARED_SECRET. '
+    + 'Keadaan ini hanya sah selama masa transisi.'
+  );
+}
+
+// FAIL-CLOSED dengan cara yang SAMA seperti mw-edge.js:
+//  - begitu secret terpasang, SETIAP rute (termasuk halaman masuk) wajib berheader benar;
+//  - perbandingannya waktu-konstan (ctEq), karena header ini bisa dicoba tanpa batas dan
+//    operator kesetaraan biasa berhenti pada byte pertama yang berbeda -> waktunya membocorkan
+//    panjang prefiks yang cocok;
+//  - penolakannya memakai deny() yang SAMA dengan gate owner, sehingga bentuknya identik untuk
+//    header hilang, header salah, dan sesi owner tidak ada. Penyerang tidak bisa menyimpulkan
+//    apakah secret terpasang, header mana yang diperiksa, atau lapis mana yang menolaknya;
+//  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
+//    yang memicunya, dan tidak boleh membakar anggaran plan gratis.
+//
+// `off` BUKAN mode produksi. Ia ada semata supaya `wrangler deploy` yang dijalankan sebelum
+// `wrangler secret put EDGE_SHARED_SECRET` tidak mematikan dashboard di jendela antara dua
+// perintah itu. Selama `off`, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
+// (i) segera setelah secret dipasang, dan (ii) selamanya setelah nameserver pindah ke Cloudflare
+// dan custom domain menggantikan jembatan PHP (saat itu `workers_dev = false` menutup lubangnya
+// secara struktural, dan penjaga ini boleh menolak tanpa syarat atau dihapus).
+function edgeGuard(request, env, pathname) {
+  const configuredEdge = edgeSecret(env);
+  if (!configuredEdge) {
+    warnEdgeGuardOff();
+    return null;
+  }
+  if (EDGE_FREE_PATHS.includes(pathname)) return null;
+  const presentedEdge = request && request.headers && request.headers.get
+    ? request.headers.get(EDGE_HEADER)
+    : null;
+  if (ctEq(presentedEdge, configuredEdge)) return null;
+  return deny();
+}
+
 /* ============================ Rumus biaya (cf-a10) ======================================== */
 // Rumus, bukan angka ajaib. Semua asumsi ikut dikembalikan supaya UI bisa mencetaknya di kartu.
 //
@@ -601,6 +698,13 @@ async function handle(request, env, ctx, nowMs) {
   const path = url.pathname.replace(/\/+$/, '') || '/';
   const method = (request.method || 'GET').toUpperCase();
 
+  // --- [LAPIS 1] Penjaga jembatan edge. PALING LUAR: sebelum rute publik, sebelum sesi, sebelum
+  //     satu byte pun dibentuk. Lapis ini menjawab "siapa yang boleh memanggil Worker ini sama
+  //     sekali"; lapis 2 di bawah menjawab "siapa yang boleh melihat angkanya". Dua lapis, bukan
+  //     satu: header jembatan yang benar TIDAK PERNAH menggantikan sesi owner.
+  const edgeDenial = edgeGuard(request, env, path);
+  if (edgeDenial) return edgeDenial;
+
   // --- Halaman masuk: satu-satunya rute publik. Tetap fail-closed bila Secret belum dipasang.
   if (PUBLIC_ROUTES.includes(path)) {
     if (!configured(env)) return deny();
@@ -636,7 +740,7 @@ async function handle(request, env, ctx, nowMs) {
     return deny();
   }
 
-  // --- Default deny untuk SEMUA sisa rute, termasuk rute yang belum ada.
+  // --- [LAPIS 2] Default deny untuk SEMUA sisa rute, termasuk rute yang belum ada.
   //     Tidak satu byte data pun dibentuk sebelum baris ini lulus (bab 20, bab 32 #20).
   const session = await ownerSession(request, env, now);
   if (!session) return deny();
@@ -709,7 +813,8 @@ export default {
 };
 
 export {
-  handle, ctEq, sha256Hex, hmacHex, issueSession, verifySession, estimateCost,
+  handle, ctEq, edgeGuard, edgeGuardStatus, edgeSecret, resetEdgeWarningForTests,
+  EDGE_HEADER, EDGE_FREE_PATHS, sha256Hex, hmacHex, issueSession, verifySession, estimateCost,
   renderDashboard, renderLogin, readModel, periodRange, wibDay, dayShift,
   RATE_CARD, PERIODS, OWNER_ROUTES, PUBLIC_ROUTES, SESSION_COOKIE, SESSION_TTL_MS,
   RETENTION_MIN_COHORT, DEVICE_TRUTH,
