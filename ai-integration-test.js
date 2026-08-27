@@ -37,16 +37,6 @@ setTimeout(async()=>{try{
   context.renderAIResult('Uji','**<img src=x onerror=alert(1)>**');
   assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),
     'markdown tidak boleh membuka jalan bagi markup dari model');
-<<<<<<< HEAD
-  // S5: pelolosan HTML tetap diuji lewat jalur yang sama, tetapi teks bermarkupnya sekarang
-  // dititipkan pada JUDUL - bukan pada `err.message`. Sebabnya kontrak baru: isi galat
-  // provider TIDAK BOLEH sampai ke DOM sama sekali (temuan cf-a12), jadi menuntut versi
-  // ter-esc dari `err.message` muncul di layar berarti menuntut kebocoran yang baru saja
-  // ditutup. Judul berasal dari kode kami sendiri dan tetap harus diloloskan.
-  context.renderAIError('<img src=x onerror=x>',{message:'<svg onload=x>'});
-  assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),'AI error can inject HTML');
-  assert(!elements.modalPanel.innerHTML.includes('svg onload'),'isi galat provider masih dicetak ke DOM');
-=======
   context.renderAIError('<svg onload=x>',{message:'<img src=x onerror=x>'});
   // A8 menaikkan syaratnya. Dulu yang dijaga: pesan galat provider di-escape sebelum dicetak
   // (karena itu assert lama mencari '&lt;img'). Sekarang pesan provider TIDAK DICETAK SAMA
@@ -56,7 +46,6 @@ setTimeout(async()=>{try{
   assert(!elements.modalPanel.innerHTML.includes('<img')&&!elements.modalPanel.innerHTML.includes('&lt;img')
     &&!elements.modalPanel.innerHTML.includes('<svg')&&elements.modalPanel.innerHTML.includes('&lt;svg')
     &&/belum bisa dimuat/.test(elements.modalPanel.innerHTML),'AI error can inject HTML or leaks provider text');
->>>>>>> add/a8a11y
   context.renderAIError('Login',{error:'popup_blocked',msg:'blocked'},()=>{});
   assert(elements.modalPanel.innerHTML.includes('diblokir peramban')&&typeof elements.aiRetry.onclick==='function','structured auth error or retry action is not handled');
   context.puter.workers.exec=async(url,opts)=>{prompt=JSON.parse(opts.body).prompt;return response('Penjelasan kuis aman.')};
