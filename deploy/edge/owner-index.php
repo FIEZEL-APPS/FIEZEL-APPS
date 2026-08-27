@@ -41,15 +41,66 @@
  * - Galat mentah (curl/upstream) tidak pernah sampai ke pengguna; hanya `error_log`.
  * - Ini SEMENTARA. Begitu nameserver pindah ke Cloudflare, custom domain menggantikan berkas ini
  *   dan jembatan ini harus DIHAPUS (deploy/edge/README.md §7 PEMBONGKARAN), bukan dibiarkan menua.
+ *
+ * ==========================================================================================
+ * F4 — PERBAIKAN YANG DISALIN DARI JEMBATAN API (gantungan permintaan ke-3 di browser)
+ * ==========================================================================================
+ * Gerbang E2E browser mengukur pada jembatan `api`: `#1 200 1853ms | #2 200 943ms |
+ * #3 TIMEOUT 8002ms` — permintaan ketiga di SATU koneksi browser menggantung, tidak terlihat
+ * oleh `curl`. Berkas ini adalah SALINAN pola yang sama, jadi ia punya kelas cacat yang sama
+ * walaupun belum ada pengukuran browser untuk dashboard owner (ia dipakai satu orang, bukan
+ * murid, jadi ia tidak muncul di gerbang E2E). Menunggu bukti terpisah untuk berkas kembar
+ * berarti membiarkan cacat yang sudah diketahui hidup di tempat kedua. Yang ditutup:
+ *  [F4-1] sesi PHP ditutup tanpa syarat (lock sesi = permintaan berurutan diseriakan);
+ *  [F4-3] header hop-by-hop dibuang DUA ARAH (satu daftar `HOP_BY_HOP` + `hopByHop()`);
+ *  [F4-4] `Content-Length` upstream tidak pernah diteruskan (ia ada di daftar itu);
+ *  [F4-5] buffer nyasar dibuang di awal, badan ditulis SEKALI lalu di-flush, slot proses
+ *         dilepas dengan `fastcgi_finish_request()` bila ada;
+ *  [F4-2] `CONNECT_S` 8 -> 4 s, sama seperti jembatan api: leg yang diatur adalah
+ *         origin -> tepi Cloudflare (RTT puluhan ms), bukan leg pengguna -> origin.
+ * Alasan lengkap tiap butir ada di `api-index.php` (blok F4) supaya tidak ada dua versi
+ * penjelasan yang bisa berbeda. Sama seperti di sana: ini belum terbukti menutup apa pun
+ * sampai jembatan yang diperbarui diuji dari browser (README §5e).
  */
 
 declare(strict_types=1);
+
+// [F4-1] Sesi PHP tidak dipakai berkas ini (seluruh sesi owner hidup di Worker sebagai
+// cookie `fz_owner`), tetapi `session.auto_start=1` di origin memulainya sebelum baris ini —
+// dan sesi berarti lock berkas per cookie yang MENYERIAKAN permintaan berurutan. Dilepas di
+// sini, sebelum satu byte jaringan disentuh.
+if (function_exists('session_status') && session_status() === PHP_SESSION_ACTIVE) {
+  session_write_close();
+}
+
+// [F4-5] Buffer keluaran nyasar dibuang sebelum apa pun ditulis (belum ada satu byte pun
+// keluaran di sini, jadi tidak ada yang hilang).
+while (ob_get_level() > 0) { ob_end_clean(); }
+
+// [F4-3] Header hop-by-hop (RFC 9110 §7.6.1): milik SATU koneksi, tidak boleh diteruskan
+// perantara ke arah mana pun. `content-length` ikut [F4-4]: panjang hitungan upstream tidak
+// berlaku lagi sesudah hop ini, dan hanya lapisan web origin yang boleh menentukannya —
+// panjang yang salah membuat browser menunggu byte yang tidak akan datang, lalu permintaan
+// BERIKUTNYA di koneksi keep-alive itu ikut menggantung.
+const HOP_BY_HOP = ['connection','keep-alive','proxy-authenticate','proxy-authorization',
+                    'proxy-connection','te','trailer','trailers','transfer-encoding',
+                    'upgrade','content-length'];
+
+/** [F4-3] Benar untuk nama header yang tidak boleh menyeberangi hop ini. */
+function hopByHop(string $name): bool {
+  $n = strtolower(trim($name));
+  return in_array($n, HOP_BY_HOP, true) || str_starts_with($n, 'proxy-');
+}
 
 const UPSTREAM      = 'https://fiezel-owner.fitrajft.workers.dev';
 const EDGE_SECRET   = '__EDGE_SECRET__';   // disuntik saat pemasangan; jangan pernah masuk repo
 const MAX_BODY      = 8192;                // dashboard owner hanya menerima satu form login
 const TIMEOUT_S     = 25;
-const CONNECT_S     = 8;
+// [F4-2] 8 -> 4 s. Leg yang diatur konstanta ini adalah origin(ArenHost) -> tepi Cloudflare
+// (RTT puluhan ms), BUKAN leg pengguna -> origin (itu diatur timeout server web/browser).
+// Connect yang belum selesai dalam 4 s berarti DNS mati atau jalur keluar origin tersumbat;
+// gagal cepat dan jujur lebih baik daripada 8 s layar menunggu yang berakhir sama gagalnya.
+const CONNECT_S     = 4;
 
 // Endpoint yang boleh lewat. Default TOLAK: rute baru harus didaftarkan sadar.
 // SUMBER daftar ini: `workers/owner/index.js` (OWNER_ROUTES + PUBLIC_ROUTES). Kalau Worker
@@ -117,6 +168,14 @@ if (!empty($_SERVER['HTTP_COOKIE']))          $fwd[] = 'Cookie: ' . $_SERVER['HT
 if (!empty($_SERVER['HTTP_ORIGIN']))          $fwd[] = 'Origin: ' . $_SERVER['HTTP_ORIGIN'];
 if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $fwd[] = 'Accept-Language: ' . $_SERVER['HTTP_ACCEPT_LANGUAGE'];
 if (!empty($_SERVER['HTTP_USER_AGENT']))      $fwd[] = 'User-Agent: ' . $_SERVER['HTTP_USER_AGENT'];
+// [F4-3] ARAH NAIK: saringan hop-by-hop terakhir. Daftar di atas memang allowlist, jadi hari
+// ini ia membuang NOL header — dan itu gunanya: `$fwd[] = 'Connection: ...'` yang disisipkan
+// penyunting berikutnya tidak bisa lolos diam-diam.
+$fwd = array_values(array_filter($fwd, static function (string $line): bool {
+  $pos = strpos($line, ':');
+  return $pos === false ? true : !hopByHop(substr($line, 0, $pos));
+}));
+$fwd[] = 'Expect:';
 // IP murni TIDAK diteruskan. Worker owner tidak memakai IP untuk apa pun (rem login-nya
 // per-isolate, jejak auditnya tanpa IP), jadi meneruskannya hanya memperbesar permukaan data
 // pribadi tanpa satu pun manfaat.
@@ -180,6 +239,10 @@ foreach (explode("\r\n", $rawHeaders) as $line) {
   $rawName = trim(substr($line, 0, $pos));
   $name    = strtolower($rawName);
   $val     = trim(substr($line, $pos + 1));
+  // [F4-3] ARAH TURUN: denylist hop-by-hop diperiksa LEBIH DULU dan menang atas allowlist
+  // mana pun, jadi `transfer-encoding`/`content-length` tetap dibuang walau suatu hari salah
+  // masuk `$passThrough`.
+  if (hopByHop($name)) continue;
   // `Set-Cookie` boleh muncul berkali-kali, jadi ia TIDAK menimpa (replace=false).
   if ($name === 'set-cookie') { header('Set-Cookie: ' . $val, false); continue; }
   // Nama header dikirim ulang dengan ejaan ASLI dari upstream, bukan hasil ucfirst(): HTTP
@@ -187,5 +250,13 @@ foreach (explode("\r\n", $rawHeaders) as $line) {
   // seperti header lain, dan itu membuang waktu orang yang sedang menelusuri masalah.
   if (in_array($name, $passThrough, true)) header($rawName . ': ' . $val, true);
 }
+// [F4-3]/[F4-4] Apa pun yang dipasang lapisan lain untuk nama hop-by-hop dibuang tanpa
+// syarat; panjang badan hanya boleh ditentukan lapisan web origin atas byte yang SEBENARNYA
+// terkirim.
+foreach (HOP_BY_HOP as $hopName) { header_remove($hopName); }
 if (!headers_sent()) header('X-Fiezel-Edge-Hop: 1');
+
+// [F4-5] Badan ditulis SEKALI, didorong keluar, lalu slot proses dilepas.
 echo $payload;
+flush();
+if (function_exists('fastcgi_finish_request')) { fastcgi_finish_request(); }

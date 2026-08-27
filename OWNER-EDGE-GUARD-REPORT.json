@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-owner-edge-guard-report-v1",
-  "generatedAt": "2026-08-27T16:31:08.092Z",
+  "generatedAt": "2026-08-27T18:53:40.423Z",
   "pass": true,
   "counts": {
     "pass": 576,
@@ -2150,7 +2150,7 @@
     },
     {
       "ok": true,
-      "message": "(d) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk kZ8vQ2..."
+      "message": "(d) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk Qw7nR2..."
     },
     {
       "ok": true,
@@ -2158,7 +2158,7 @@
     },
     {
       "ok": true,
-      "message": "(d) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk aGVsbG..."
+      "message": "(d) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk b3duZX..."
     },
     {
       "ok": true,

@@ -483,6 +483,170 @@ diterapkan, gerbang CI yang menjaganya, dan **perintah siap-jalan** di §5c untu
 master. Sampai master menjalankan (1) dan (3), status yang benar adalah
 **"diperkirakan membaik, belum terbukti"** — bukan "lebih cepat".
 
+## 5e. F4 — CACAT PRODUKSI: **permintaan ke-3 menggantung di browser**
+
+> **Ini bukan catatan latensi.** §5–§5d bicara soal milidetik. Bagian ini bicara soal
+> permintaan yang **tidak pernah selesai**, dan itu pemblokir rollout.
+
+### 5e.1 Apa yang terukur
+
+Gerbang **E2E browser** (`tools/fiezel-e2e-bridge.mjs`, skenario `bridge-hop-stable`)
+menembak `/api/quota` **beruntun** dari satu halaman kosong, pada **satu koneksi**:
+
+```
+#1 200 1853ms | #2 200 943ms | #3 TIMEOUT 8002ms
+```
+
+Sifat temuan, semuanya penting untuk diagnosisnya:
+
+- **Reproducible** dari halaman kosong, pada **HTTP/2 maupun HTTP/1.1**.
+- **TIDAK terlihat oleh `curl`** apa adanya: satu proses `curl` = satu koneksi baru,
+  jadi ia tidak pernah menganyam beberapa permintaan di atas **satu** koneksi
+  keep-alive seperti browser. Karena itu `cf-live-contract-test.js` (33 assert HIJAU)
+  **tidak** menangkapnya, dan itu bukan kelemahan gerbang itu — ia menguji hal lain.
+- Artinya: aplikasi murid yang menembak `/api/config` → `/api/user/me` → `/api/quota`
+  berurutan **menggantung pada panggilan ketiga**. Yang dilihat murid bukan galat,
+  tetapi layar menunggu tanpa akhir.
+- `8002 ms` adalah **batas kesabaran klien** (`HOP_TIMEOUT` di gerbang E2E), bukan
+  jawaban server. Server tidak menjawab apa pun.
+
+### 5e.2 Lima hipotesis, dan mana yang benar-benar bisa dinilai dari kode
+
+| # | Hipotesis | Bisa dinilai dari kode? | Putusan |
+|---|---|---|---|
+| 1 | Lock sesi PHP (`session_start()`) menyeriakan permintaan dari cookie yang sama | sebagian | Kedua proxy **tidak pernah** memanggil `session_start()`. **Tetapi** `session.auto_start=1` di `php.ini`/`.user.ini` origin memulai sesi **sebelum** baris pertama berkas berjalan, dan sesi = **lock berkas per cookie**: #2 menunggu #1, #3 menunggu dua-duanya — tepat pola yang terukur. **Ditutup:** `session_write_close()` tanpa syarat di baris pertama eksekusi `[F4-1]`. |
+| 2 | cURL tanpa timeout / koneksi menggantung sampai batas atas | **ya** | `CURLOPT_TIMEOUT` + `CURLOPT_CONNECTTIMEOUT` **sudah** diset. Yang **salah** adalah angkanya: `/api/user/me` dan `/api/quota` mewarisi `TIMEOUT_S = 25 s`, sedangkan browser menyerah pada **8 s**. Proxy yang lebih sabar dari kliennya **memproduksi gantungan**: murid tidak pernah menerima galat. **Ditutup:** keduanya masuk `FAST_TIMEOUT_PATHS`, `TIMEOUT_FAST_S` **8 → 6 s**, plus klem `CLIENT_ABANDON_S` yang memaksa batas jalur cepat tetap di bawah batas klien `[F4-2]`. |
+| 3 | Badan tidak di-flush / `Content-Length` diteruskan salah sehingga browser menunggu byte yang tidak akan datang | **ya** | `Content-Length` upstream **tidak** ada di `$passThrough`, tetapi ketiadaan itu hanya kebetulan daftar — tidak ada yang **melarangnya**. Dan buffer keluaran bawaan hosting (`output_buffering`) bisa menahan badan. **Ditutup:** `content-length` masuk daftar wajib-buang + `header_remove()` tanpa syarat `[F4-4]`; buffer nyasar dibuang di awal, badan di-`echo` **sekali**, lalu `flush()` + `fastcgi_finish_request()` `[F4-5]`. |
+| 4 | Header hop-by-hop (`Connection`, `Keep-Alive`, `Upgrade`, …) diteruskan apa adanya ke klien | **ya** | Daftar `$passThrough` lama adalah allowlist, jadi hari ini nol hop-by-hop lolos — **tetapi tidak ada satu baris pun yang mencegah** `transfer-encoding` masuk daftar itu pada sunting berikutnya, dan tidak ada apa pun yang menyaring arah **naik**. **Ditutup:** satu daftar `HOP_BY_HOP` + `hopByHop()` dipakai **dua arah**, denylist **menang** atas allowlist `[F4-3]`. |
+| 5 | Batas proses PHP per pengguna cPanel (`LSAPI_CHILDREN`/entry process) menghabiskan slot | **TIDAK** | Tidak bisa dinilai maupun dibuktikan dari repo ini: ia hidup di konfigurasi origin yang hanya master bisa lihat. Yang bisa dilakukan dari kode hanya **mempersempit**-nya — `fastcgi_finish_request()` melepas slot proses segera sesudah badan terkirim, alih-alih menahannya sampai proses mati `[F4-5]`. Sisanya harus dibaca dari cPanel (**Resource Usage → Faults / Entry Processes**) sesudah 5e.4 dijalankan. |
+
+Dua sakelar transport A7 juga **dimatikan sementara**, dan alasannya bentuk cacatnya,
+bukan selera:
+
+- **`ENABLE_TCP_FASTOPEN = false`** `[F4-6]` — ia satu-satunya opsi di berkas itu yang
+  bisa **menambah** detik (middlebox membuang SYN berisi data ⇒ pemulihan lewat
+  retransmit) **dan** yang perilakunya **berubah sesudah beberapa koneksi**, karena
+  cookie TFO baru ada di kernel setelah koneksi pertama berhasil. "Dua lolos, ketiga
+  menggantung" adalah bentuk khas kelas itu. §5b.2 sudah menulis risikonya sejak awal.
+- **`ENABLE_GZIP_PASSTHROUGH = false`** `[F4-7]` — badan gzip yang diteruskan mentah
+  benar **hanya** bila lapisan web origin tidak meng-gzip ulang, dan itu **tidak bisa
+  dibuktikan dari PHP** (`zlib.output_compression` hanya mengetahui kompresi PHP, bukan
+  modul kompresi LiteSpeed). Kompresi ganda = badan yang gagal di-dekode browser,
+  gejalanya **menggantung**, dan `curl` yang tidak mengiklankan gzip **tidak pernah
+  melihatnya** — persis pola F4. Kodenya tetap ada; yang berubah satu konstanta, supaya
+  ia bisa dinyalakan lagi dengan **bukti**, bukan dari ingatan.
+
+Ini **menurunkan** target A7 (kedua sakelar itu penghematannya nyata). Pertukarannya
+disengaja: **respons yang benar lebih penting daripada respons yang cepat.** Nyalakan
+kembali satu per satu, masing-masing dengan satu jalannya gerbang E2E browser + satu
+pengukuran `tools/edge-latency-probe.mjs`.
+
+### 5e.3 Yang dijaga gerbang CI — dan yang TIDAK bisa dijaganya
+
+`edge-proxy-hopbyhop-test.js` (node murni, **nol jaringan**) memuat **kedua** sumber PHP
+sebagai teks dan meng-assert strukturnya: (a) daftar hop-by-hop dibuang dua arah;
+(b) timeout cURL diset dan angkanya **lebih pendek** dari batas 8 s yang membuat browser
+menyerah — angka itu dibaca dari `tools/fiezel-e2e-bridge.mjs`, bukan ditulis dua kali;
+(c) nol `session_start()` tanpa `session_write_close()`; (d) `Content-Length` tidak
+diteruskan mentah; (e) `__EDGE_SECRET__` tetap placeholder dan nol nilai berentropi tinggi
+yang ter-commit. Setiap detektor **dibuktikan bisa merah** oleh matriks racun di dalam
+berkas itu (pelanggaran disuntikkan ke salinan di memori; berkas repo tidak disentuh).
+
+**Batasnya, ditulis supaya tidak ada yang salah paham:** gerbang itu mencegah kelas cacat
+ini **kembali**. Ia **tidak** membuktikan cacat F4 **tertutup**. Assert atas teks tidak
+pernah menutup cacat runtime.
+
+### 5e.4 LANGKAH VERIFIKASI — wajib dijalankan pemilik SESUDAH berkas diunggah
+
+Unggah dulu versi baru **kedua** berkas dengan langkah §4 (api) dan §4A (owner) — secret
+tetap disuntik ke salinan `/tmp`, repo tidak disentuh. Simpan salinan lama supaya bisa
+dibalikkan: `ssh <USER>@<HOST> 'cp ~/public_html/api/index.php ~/api-index.php.f4-sebelum'`.
+
+**(1) Lima permintaan berurutan pada SATU koneksi.** Ini inti verifikasinya: `--next`
+menyuruh satu proses `curl` mengirim permintaan berikutnya **di koneksi yang sama**,
+sehingga ia meniru apa yang dilakukan browser. Lima `curl` terpisah **tidak** menguji hal
+ini dan akan selalu terlihat hijau.
+
+```bash
+# Satu proses, satu koneksi, lima permintaan berurutan.
+URL=https://api.fiezel.my.id/api/quota
+FMT='#%{num_connects} http=%{http_code} total=%{time_total}s ttfb=%{time_starttransfer}s reused=%{num_connects}\n'
+curl -s -o /dev/null -w "$FMT" "$URL" \
+  --next -s -o /dev/null -w "$FMT" "$URL" \
+  --next -s -o /dev/null -w "$FMT" "$URL" \
+  --next -s -o /dev/null -w "$FMT" "$URL" \
+  --next -s -o /dev/null -w "$FMT" "$URL"
+```
+
+Bentuk kedua, kalau `--next` tidak tersedia (curl tua) — ia **kurang kuat** karena setiap
+baris bisa memakai koneksi baru, jadi pakai hanya sebagai cadangan:
+
+```bash
+for i in 1 2 3 4 5; do
+  curl -s -o /dev/null -H 'Connection: keep-alive' \
+    -w "#$i http=%{http_code} total=%{time_total}s\n" \
+    https://api.fiezel.my.id/api/quota
+done
+```
+
+**Cara membaca hasilnya:**
+
+- **HIJAU** = **lima** baris muncul, `http=200` (atau `401` bila tanpa cookie — yang
+  penting **ada** kode statusnya), dan `total` setiap baris **di bawah ~3 s**.
+- **`num_connects=1` pada baris pertama dan `0` pada baris berikutnya** = koneksi memang
+  **dipakai ulang**. Kalau setiap baris menunjukkan koneksi baru, perintahnya belum
+  menguji cacat ini — periksa versi curl.
+- **MASIH RUSAK** = perintah berhenti mengeluarkan baris (menggantung), **atau** salah
+  satu `total` melonjak ke ~6 s / ~25 s. Perhatikan baris **ke-3**.
+- **`http=504` + `{"error":"upstream_timeout"}`** = **perbaikan bekerja sebagaimana
+  dirancang**, meski upstream masih lambat: proxy sekarang **kalah lebih dulu** dari
+  klien, jadi murid menerima galat yang bisa dicoba lagi, bukan gantungan. Yang harus
+  dikejar selanjutnya adalah **kenapa** upstream lambat, dengan `Server-Timing` di (2).
+- **`http=502`** = jalur origin → Cloudflare rusak (DNS/keluar origin), bukan gantungan.
+
+**(2) Di mana waktunya terbakar.** Jembatan mengirim `Server-Timing`; satu perintah
+memberi uraiannya tanpa menebak:
+
+```bash
+curl -sI https://api.fiezel.my.id/api/config | grep -i 'server-timing\|x-fiezel-edge-hop'
+# edge_tls besar  => biaya handshake per permintaan (§5b.1 poin 1; hanya §6 yang menghapusnya)
+# upstream_ttfb besar => Worker/Cloudflare yang lambat, bukan hop PHP
+```
+
+**(3) Header hop-by-hop benar-benar hilang dari jawaban.** Harus **nol** keluaran:
+
+```bash
+curl -sI https://api.fiezel.my.id/api/config \
+  | grep -iE '^(connection|keep-alive|transfer-encoding|te|trailer|upgrade|proxy-)'
+# HARUS: kosong
+```
+
+**(4) Kalau (1) masih merah, hipotesis 5 baru masuk giliran.** Buka cPanel →
+**Resource Usage** dan lihat **Entry Processes / Faults** pada jam pengujian. Angka
+`nproc`/entry-process yang tersentuh berarti batas proses per pengguna, dan itu **tidak**
+bisa diperbaiki dari repo — ia paket hosting atau `LSAPI_CHILDREN`. Lampirkan angkanya
+saat melapor; tanpa itu, langkah berikutnya hanya bisa menebak.
+
+**(5) Dan yang MENUTUP cacat ini, satu-satunya:** jalankan ulang gerbang E2E browser
+terhadap jembatan yang **sudah diperbarui**.
+
+```bash
+FIEZEL_E2E_BRIDGE_BASE=https://api.fiezel.my.id node tools/fiezel-e2e-bridge.mjs
+# Yang dicari: skenario `bridge-hop-stable` -> semua 5 panggilan 200 di bawah 8.000 ms.
+```
+
+### 5e.5 Pernyataan jujur
+
+**Cacat ini hanya terbukti tertutup sesudah gerbang E2E browser (langkah 5e.4 (5))
+dijalankan ulang terhadap jembatan yang sudah diperbarui. Analisis kode saja TIDAK
+menutupnya.** Yang ada di commit ini: diagnosis lima hipotesis, perbaikan atas semua yang
+bisa dinilai dari kode (1, 2, 3, 4 — dan penyempitan untuk 5), gerbang struktural yang
+mencegahnya kembali, serta perintah siap-jalan di atas. Agen tidak punya SSH/cPanel ke
+origin ArenHost (`MASTER-ONLY-GOVERNANCE.md`), jadi **nol** pengukuran "sesudah" boleh
+diklaim di sini. Status yang benar sampai master menjalankan 5e.4 adalah
+**"penyebab yang bisa dinilai dari kode sudah ditutup; gantungan belum terbukti hilang"**
+— bukan "sudah beres".
+
 ## 6. PEMBONGKARAN — begitu nameserver pindah ke Cloudflare
 
 Jembatan ini **harus dibongkar**, bukan dibiarkan menua. Urutannya penting: setiap
