@@ -511,3 +511,6 @@ jobs:
           node production-grader-test.js
           node r2-ux-overhaul-smoke-test.js
           node step-tutor-test.js
+          node item-calibration-test.js
+          node speaking-adaptive-test.js
+          node srl-coach-test.js

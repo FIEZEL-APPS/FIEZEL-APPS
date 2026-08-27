@@ -21,13 +21,11 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // pernah masuk precache pengguna lama.
 // m025-173: lapisan game & UX overhaul ikut fase ini - ASSETS bertambah (prasasti) dan
 // isi app.js/style.css/addon berubah, jadi revisi naik lagi di atas fase 2 braincore.
-// MERGE 28 Agu 2026: dua jalur kerja bertemu di sini. Hulu membawa lapisan game & UX
-// overhaul + braincore fase 2 (12 berkas precache baru); cabang ini membawa rollout
-// Cloudflare (transport TTS, pemberitahuan suara, naskah kuota). Keduanya SAMA-SAMA
-// menaikkan versi ke m025-173, jadi revisi digabung dan dinaikkan ke m025-174: dua
-// perubahan daftar precache di bawah satu revisi berarti sebagian pengguna memegang
-// shell campur. Daftar ASSETS adalah UNION nyata dari kedua sisi, bukan salah satunya.
-const SW_REV='m025-174-game-ux-plus-rollout-cf-20260828';
+// MERGE 28 Agu 2026 (kedua): hulu mendarat lagi dengan braincore fase 3 dan sudah memakai
+// m025-174, angka yang juga dipakai jalur rollout Cloudflare. Tabrakan versi berarti satu
+// revisi memayungi dua daftar precache berbeda, jadi revisi dinaikkan ke m025-175. Daftar
+// ASSETS tetap UNION nyata kedua sisi; nol entri dibuang.
+const SW_REV='m025-175-fase3-plus-rollout-cf-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -55,6 +53,11 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // (Catatan alat: pwa-cache-test membaca array ini dengan regex yang berhenti di titik koma
   // pertama - jangan menaruh titik koma di dalam komentar array ini.)
   './features/brain/fiezel-listening-adaptive.js','./cloze-bank-v1.json',
+  // Fase 3 (Wiring C5): tiga modul gelombang C - kalibrasi item (C1), speaking adaptif (C2),
+  // SRL coach (C4). Aturan yang sama dengan modul brain lain: masuk precache HANYA setelah
+  // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404. Berkas-berkas
+  // ini dijanjikan kontrak Fase 3 dan wajib mendarat bersama rilis ini.
+  './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js'];
 // m025-142 (B-11): pencocok ini SEMPAT dimatikan jadi `()=>false` dengan alasan "model lokal
 // sudah dihapus". Modelnya tidak dihapus - vendor/supertonic-3 masih 152 MB dan masih disajikan
