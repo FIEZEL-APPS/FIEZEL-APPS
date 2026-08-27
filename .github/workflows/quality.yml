@@ -488,3 +488,26 @@ jobs:
             echo "### staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
           fi
           node staging-live-test.js
+      - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
+        # Ditemukan gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
+        # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
+        # Semuanya dijalankan satu per satu lebih dulu dan lima belas-nya exit 0, jadi yang
+        # kurang cuma pendaftaran - bukan mutunya. Didaftarkan di satu langkah agar urutan
+        # aslinya terbaca; gate-registry-test.js yang menjaga supaya ini tidak terulang.
+        run: |
+          node affect-test.js
+          node cloze-bank-test.js
+          node confusion-matrix-test.js
+          node core-brain-v3-upgrade-test.js
+          node evidence-credibility-test.js
+          node item-prior-test.js
+          node listening-adaptive-test.js
+          node mastery-bkt-test.js
+          node misconception-ledger-test.js
+          node misconception-taxonomy-test.js
+          node olm-test.js
+          node p1-game-layer-smoke-test.js
+          node prasasti-test.js
+          node production-grader-test.js
+          node r2-ux-overhaul-smoke-test.js
+          node step-tutor-test.js
