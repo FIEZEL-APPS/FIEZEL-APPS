@@ -126,7 +126,7 @@
         "fitrajft-ux"
       ],
       "gateLines": [
-        55
+        64
       ],
       "jobs": [
         "prerender"
@@ -374,7 +374,7 @@
     {
       "name": "A audio-prerender-cf.yml punya penjaga aktor atau ada di allowlist",
       "status": "PASS",
-      "details": "gate di baris 55"
+      "details": "gate di baris 64"
     },
     {
       "name": "B audio-prerender-cf.yml membandingkan github.actor dengan login owner",
