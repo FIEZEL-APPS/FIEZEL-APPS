@@ -139,6 +139,46 @@
     return xs.length % 2 ? xs[mid] : (xs[mid - 1] + xs[mid]) / 2;
   }
 
+  /**
+   * Baseline waktu jawab yang BERGULIR, bukan beku di sampel pertama.
+   *
+   * Temuan council (gpt_5_6_sol §4.2): baseline lama diisi median SATU sampel lalu tidak
+   * pernah diperbarui karena kondisi `if (!s.baselineMs)`. Murid yang kebetulan lambat di
+   * soal pertama akan selamanya terbaca "cepat" sesudahnya. Di sini aturannya:
+   *   - sebelum ada tiga sampel sesi ini, pegang baseline bawaan (median sesi-sesi lalu);
+   *   - begitu sampelnya cukup, kebiasaan sesi INI yang dipercaya, dihitung ulang sebagai
+   *     median bergulir setiap jawaban - median, supaya satu jeda ke dapur tidak menggeser
+   *     seluruh sesi.
+   */
+  function currentBaseline(s) {
+    var st = s || {};
+    var times = Array.isArray(st.responseTimes) ? st.responseTimes : [];
+    var rolled = median(times);
+    if (times.length >= 3 && rolled > 0) return rolled;
+    var seeded = num(st.baselineMs, 0);
+    return seeded > 0 ? seeded : rolled;
+  }
+
+  // Kunci state miskonsepsi sesi adalah pasangan `konsep::miskonsepsi` (temuan council
+  // gpt_5_6_sol §4.1): nama miskonsepsi datang dari bank soal dan BISA sama pada dua konsep
+  // berbeda; kunci nama-saja membuat keduanya saling menimpa. Dua helper ini membaca kembali
+  // bagian-bagiannya, dan tetap menerima kunci lama tanpa '::' untuk kompatibilitas mundur.
+  function misKeyOf(concept, misconception) { return str(concept) + '::' + str(misconception); }
+  function misNameOf(key) {
+    var k = str(key);
+    var i = k.indexOf('::');
+    return i >= 0 ? k.slice(i + 2) : k;
+  }
+  function misConceptOf(key) {
+    var k = str(key);
+    var i = k.indexOf('::');
+    return i >= 0 ? k.slice(0, i) : '';
+  }
+  function uniq(list) {
+    var seen = {};
+    return list.filter(function (x) { if (seen[x]) return false; seen[x] = true; return true; });
+  }
+
   // =====================================================================================
   // D. TANGGA SCAFFOLDING
   // =====================================================================================
@@ -154,6 +194,10 @@
    * itu membiarkan orang tenggelam.
    */
   var LADDER = Object.freeze(['probe', 'hint', 'worked', 'tell']);
+  // Dua keberhasilan mandiri berturut-turut pada satu konsep = bukti bahwa bantuannya sudah
+  // boleh dikurangi. Kenapa DUA, bukan satu: satu jawaban benar pada pilihan ganda masih bisa
+  // keberuntungan seperempat; dua berturut tanpa bantuan sudah bukan.
+  var FADE_WINS_NEEDED = 2;
   function scaffoldLevel(input) {
     var s = input || {};
     // Yang dihitung adalah KEGAGALAN SEBELUMNYA pada konsep ini di episode ini, bukan berapa
@@ -176,6 +220,14 @@
     // soal yang sama. Contoh yang dikerjakan datang setelah dorongannya gagal, dan di situ ia
     // justru berguna karena murid sudah punya pertanyaan yang ingin dijawabnya.
     var start = mastery >= 65 ? 0 : 1;
+    // FADING (temuan Opus §3.4): tangga lama adalah eskalator satu arah - bantuan hanya bisa
+    // naik, tidak pernah turun, sehingga murid yang sudah membaik tetap disodori bantuan
+    // sebesar saat ia masih lemah. `fadeCredit` (dihitung record(): dua keberhasilan mandiri
+    // berturut pada konsep ini) menurunkan TITIK MULAI tangga satu anak tangga per kredit -
+    // tidak pernah di bawah `probe`, karena guru yang berhenti bertanya sama sekali bukan
+    // sedang memudarkan bantuan, ia sedang berhenti mengajar.
+    var fade = clamp(s.fadeCredit, 0, LADDER.length - 1);
+    start = Math.max(0, start - fade);
     var step = start + priorMisses + (repeated >= 2 ? 1 : 0);
     return LADDER[clamp(step, 0, LADDER.length - 1)];
   }
@@ -200,28 +252,54 @@
       missStreak: 0,
       responseTimes: [],
       baselineMs: num(opts.baselineMs, 0),
-      // Berapa kali tiap miskonsepsi muncul DALAM sesi ini. Dua kali berarti bukan kebetulan.
+      // Berapa kali tiap miskonsepsi muncul DALAM sesi ini, dikunci per pasangan
+      // `konsep::miskonsepsi`. Dua kali berarti bukan kebetulan - dan nama yang sama pada
+      // konsep berbeda TIDAK saling menimpa (temuan council gpt_5_6_sol §4.1).
       misconceptions: {},
-      // Konsep tempat tiap miskonsepsi muncul. Dipisah karena NAMA miskonsepsi datang dari
-      // bank soal ("habitual-aspect overgeneralization") dan sama sekali tidak memuat nama
-      // konsepnya - mencocokkan keduanya lewat pencarian teks akan selalu gagal diam-diam,
-      // dan terobosan murid tidak akan pernah terdeteksi.
+      // Konsep tempat tiap kunci miskonsepsi muncul. Konsepnya memang sudah tertulis di kunci,
+      // tetapi peta ini dipertahankan supaya pembaca state lama tidak perlu mem-parse kunci.
       misconceptionConcept: {},
       // Miskonsepsi yang sudah pernah muncul lalu berhasil dijawab benar - dipakai untuk
       // menamai terobosan, bukan sekadar menghitung skor.
       resolved: {},
-      // Penjelasan yang sudah dipakai untuk tiap konsep, supaya tidak diulang persis sama.
+      // Penjelasan (kunci `konsep::tangga`) yang sudah terbukti GAGAL: murid tetap salah
+      // setelah penjelasan itu diberikan. composeTurn membacanya untuk memilih variasi frasa
+      // yang berbeda - inilah yang membuat janji "tidak mengulang penjelasan yang gagal"
+      // menjadi nyata (temuan council gpt_5_6_sol §4.3: dulu peta ini dibuat tapi tak dibaca).
       explanationsUsed: {},
+      // Penjelasan terakhir yang dipakai composeTurn dan belum diketahui nasibnya. record()
+      // pada jawaban berikutnya di konsep yang sama yang memutuskan: gagal atau berhasil.
+      lastExplanation: null,
       attemptsOnConcept: {},
       // Kegagalan beruntun per konsep - dipakai tangga scaffolding, dan sengaja DIPISAH dari
       // attemptsOnConcept (yang dipakai selectNext untuk menyebar materi). Satu menghitung
       // kesulitan, satu menghitung paparan; menyatukannya membuat keduanya salah.
       missesOnConcept: {},
       lastConcept: '',
+      // Pemudaran bantuan (scaffold fading, temuan Opus §3.4): berapa keberhasilan MANDIRI
+      // (dinilai, tanpa bantuan tutor sebelumnya) beruntun per konsep, dan berapa anak tangga
+      // titik mulai bantuan konsep itu sudah boleh diturunkan. Kegagalan menghapus keduanya:
+      // kredit pemudaran adalah kepercayaan, dan kepercayaan yang baru saja dikhianati oleh
+      // jawaban salah tidak dicicil kembali - ia dibangun ulang dari nol.
+      fadeWins: {},
+      fadeCredit: {},
       lastWinAt: num(opts.now, 0),
       interventions: 0,
       log: []
     };
+    // Miskonsepsi persisten dari ledger lintas-sesi (options.priorMisconceptions =
+    // [{concept, misconception}]). Di-seed dengan hitungan 1 supaya kemunculan PERTAMA di
+    // sesi ini langsung terbaca sebagai yang kedua - persisten - bukan mulai dari nol lagi.
+    // Guru sungguhan tidak melupakan kekeliruan minggu lalu hanya karena hari berganti.
+    var prior = Array.isArray(opts.priorMisconceptions) ? opts.priorMisconceptions : [];
+    for (var i = 0; i < prior.length; i++) {
+      var p = prior[i] || {};
+      var pc = str(p.concept), pm = str(p.misconception);
+      if (!pc || !pm) continue;
+      var key = misKeyOf(pc, pm);
+      state.misconceptions[key] = 1;
+      state.misconceptionConcept[key] = pc;
+    }
     return state;
   }
 
@@ -230,7 +308,7 @@
     var s = state;
     var a = attempt || {};
     var scored = a.scored !== false;
-    var timing = classifyTiming(a.ms, s.baselineMs || median(s.responseTimes));
+    var timing = classifyTiming(a.ms, currentBaseline(s));
     var d = diagnose({
       correct: a.correct, chosenOption: a.chosenOption, optionMisconceptions: a.optionMisconceptions,
       skill: a.skill, timing: timing
@@ -243,9 +321,30 @@
     // denominator akurasi dan tanpa menggeser baseline waktu jawab sesi.
     if (scored) s.answered++;
     if (scored && num(a.ms) > 0) s.responseTimes.push(num(a.ms));
-    if (!s.baselineMs) s.baselineMs = median(s.responseTimes);
+    // "Mandiri" untuk pemudaran bantuan diputuskan SEBELUM lastExplanation dikonsumsi di
+    // bawah: kalau jawaban ini datang tepat setelah tutor memberi penjelasan pada konsep yang
+    // sama, keberhasilannya milik berdua - bukan bukti murid sudah bisa sendiri.
+    var assisted = !!(s.lastExplanation && str(s.lastExplanation.concept) === concept);
+    if (!s.fadeWins) s.fadeWins = {};
+    if (!s.fadeCredit) s.fadeCredit = {};
+    // Baseline dihitung ULANG setiap jawaban (median bergulir), bukan dibekukan di sampel
+    // pertama - lihat currentBaseline() dan temuan council gpt_5_6_sol §4.2.
+    s.baselineMs = currentBaseline(s);
     s.attemptsOnConcept[concept] = (s.attemptsOnConcept[concept] || 0) + 1;
     s.lastConcept = concept;
+
+    // Nasib penjelasan terakhir pada konsep ini diputuskan SEKARANG: kalau murid tetap salah
+    // setelah penjelasan itu diberikan, penjelasannya GAGAL dan kuncinya (konsep::tangga)
+    // dicatat supaya composeTurn tidak mengulanginya dengan frasa yang persis sama. Kalau
+    // murid benar, penjelasannya bekerja - tidak ada yang perlu dihindari.
+    if (!s.explanationsUsed) s.explanationsUsed = {};
+    if (s.lastExplanation && str(s.lastExplanation.concept) === concept) {
+      if (a.correct !== true) {
+        var expKey = str(s.lastExplanation.key);
+        s.explanationsUsed[expKey] = (s.explanationsUsed[expKey] || 0) + 1;
+      }
+      s.lastExplanation = null;
+    }
 
     if (d.correct) {
       if (scored) {
@@ -256,28 +355,55 @@
       s.lastWinAt = num(a.now, s.lastWinAt);
       // Terobosan: miskonsepsi yang tadi bikin gagal PADA KONSEP INI, sekarang dilewati.
       // Ini yang layak disebut namanya kepada murid - "yang tadi bikin kamu keliru, barusan
-      // kamu lewati". Pencocokannya lewat peta konsep, bukan lewat teks nama miskonsepsi.
+      // kamu lewati". Konsepnya dibaca dari peta (atau dari kunci komposit untuk state lama),
+      // bukan lewat teks nama miskonsepsi.
       var pending = Object.keys(s.misconceptions).filter(function (k) {
-        return s.misconceptions[k] > 0 && !s.resolved[k] && s.misconceptionConcept[k] === concept;
+        var kc = s.misconceptionConcept[k] != null ? str(s.misconceptionConcept[k]) : misConceptOf(k);
+        return s.misconceptions[k] > 0 && !s.resolved[k] && kc === concept;
       });
       for (var i = 0; i < pending.length; i++) s.resolved[pending[i]] = true;
       d.breakthrough = pending.length > 0;
       // Konsep yang sudah dilewati mengembalikan tangga bantuan ke awal: kalau nanti keliru
       // lagi, itu kesalahan pertama yang baru, bukan lanjutan dari episode yang sudah selesai.
       s.missesOnConcept[concept] = 0;
+      // PEMUDARAN BANTUAN: hanya keberhasilan yang DINILAI dan TANPA bantuan yang dihitung.
+      // Retry (scored:false) bukan bukti kemandirian - ia bukti bantuannya bekerja; dan
+      // keberhasilan berbantuan justru MEMUTUS rentetan, karena "berturut-turut mandiri"
+      // kehilangan maknanya kalau boleh diselingi keberhasilan yang dituntun.
+      if (scored && !assisted) {
+        s.fadeWins[concept] = (s.fadeWins[concept] || 0) + 1;
+        if (s.fadeWins[concept] >= FADE_WINS_NEEDED) {
+          s.fadeCredit[concept] = Math.min((s.fadeCredit[concept] || 0) + 1, LADDER.length - 1);
+          // Rentetan mulai dari nol lagi: kredit berikutnya menuntut dua bukti BARU.
+          s.fadeWins[concept] = 0;
+        }
+      } else if (assisted) {
+        s.fadeWins[concept] = 0;
+      }
     } else {
       if (scored) s.streak = 0;
       s.missStreak++;
-      s.misconceptions[d.misconception] = (s.misconceptions[d.misconception] || 0) + 1;
-      s.misconceptionConcept[d.misconception] = concept;
+      var misKey = misKeyOf(concept, d.misconception);
+      s.misconceptions[misKey] = (s.misconceptions[misKey] || 0) + 1;
+      s.misconceptionConcept[misKey] = concept;
       s.missesOnConcept[concept] = (s.missesOnConcept[concept] || 0) + 1;
       d.breakthrough = false;
+      // Kegagalan menghapus SELURUH kredit pemudaran konsep ini, bukan sekadar rentetannya.
+      // Bantuan yang sudah dipangkas ternyata dipangkas terlalu cepat - kembali ke titik
+      // mulai semula sampai murid membuktikan kemandiriannya lagi.
+      s.fadeWins[concept] = 0;
+      s.fadeCredit[concept] = 0;
     }
-    d.repeats = d.correct ? 0 : s.misconceptions[d.misconception];
+    d.repeats = d.correct ? 0 : s.misconceptions[misKeyOf(concept, d.misconception)];
     // Kegagalan SEBELUM yang ini - itulah yang menentukan seberapa tinggi bantuannya.
     d.priorMisses = d.correct ? 0 : Math.max(0, s.missesOnConcept[concept] - 1);
     d.concept = concept;
     d.scored = scored;
+    // Kredit pemudaran ikut keluar bersama diagnosis supaya pemanggil scaffoldLevel tidak
+    // perlu membongkar state sesi sendiri. Rationale hanya muncul saat kreditnya nyata -
+    // 'scaffold_faded' adalah klaim bahwa bantuan DITURUNKAN, bukan sekadar bisa diturunkan.
+    d.fadeCredit = num(s.fadeCredit[concept], 0);
+    if (d.fadeCredit > 0) d.scaffoldRationale = 'scaffold_faded';
     s.log.push({ concept: concept, correct: d.correct, timing: timing, misconception: d.misconception, scored: scored });
     if (s.log.length > 60) s.log.shift();
     return d;
@@ -316,21 +442,58 @@
     if (num(s.missStreak) >= MISS_STREAK_STOP) {
       return { move: 'reteach', reason: 'miss_streak', urgency: 'high', misconception: d.misconception };
     }
-    // 4. Satu salah: jangan langsung beri jawaban. Beri pijakan, lalu tanya lagi.
+    // 4. KEADAAN AFEKTIF (Fase 2, opts.affect dari FiezelAffect.assess). Empat keadaan,
+    //    empat tindakan BERBEDA - karena penyebabnya berbeda:
+    //      frustrated -> breathe : murid yang frustrasi tidak butuh soal berikutnya, ia butuh
+    //                             jeda; melanjutkan hanya menumpuk bukti bahwa ia "tidak bisa".
+    //      bored      -> stretch : bosan artinya soalnya di bawah kemampuan - dinaikkan, bukan
+    //                             disemangati. Semangat tidak menyembuhkan kurang tantangan.
+    //      gaming     -> continue + suggestModeSwitch : menebak-nebak sistematis tidak dihukum
+    //                             dengan berhenti (itu hadiah untuk yang ingin cepat selesai);
+    //                             sesinya jalan terus, tetapi mode soalnya disarankan diganti
+    //                             ke bentuk yang tidak bisa ditebak (produksi, bukan pilihan).
+    //      fatigued   -> wrapup  : lelah versi afek ditutup RAPI (bukan breathe darurat) dan
+    //                             hanya bila sisa soal masih panjang (remaining>2) - dua soal
+    //                             terakhir lebih baik diselesaikan daripada dipotong.
+    //    Blok ini sengaja SESUDAH aturan keselamatan 1-3 (lelah kognitif, miskonsepsi
+    //    persisten, rentetan salah) dan SEBELUM aturan stretch/continue: keselamatan tidak
+    //    boleh kalah oleh mood, tetapi mood boleh mengalahkan optimisasi kesulitan.
+    var affect = ctx.affect && typeof ctx.affect === 'object' ? str(ctx.affect.state) : str(ctx.affect);
+    if (affect === 'frustrated') {
+      return { move: 'breathe', reason: 'affect_frustrated', urgency: 'high' };
+    }
+    if (affect === 'bored') {
+      return { move: 'stretch', reason: 'affect_bored', urgency: 'normal' };
+    }
+    if (affect === 'gaming') {
+      return { move: 'continue', reason: 'affect_gaming', urgency: 'normal', suggestModeSwitch: true };
+    }
+    if (affect === 'fatigued' && remaining > 2) {
+      return { move: 'wrapup', reason: 'affect_fatigued', urgency: 'normal' };
+    }
+    // ('neutral', absen, atau fatigued dengan sisa <=2 soal: tidak mengubah apa pun.)
+    // 5. Satu salah: jangan langsung beri jawaban. Beri pijakan, lalu tanya lagi.
     if (!d.correct) {
       return { move: 'hint', reason: d.timing === 'guess' ? 'answered_too_fast' : 'first_miss', urgency: 'normal', misconception: d.misconception };
     }
-    // 5. Benar tetapi tersendat: konsepnya belum otomatis. Jangan naikkan kesulitan; kokohkan.
+    // 6. Benar tetapi tersendat: konsepnya belum otomatis. Jangan naikkan kesulitan; kokohkan.
     if (d.fragile) {
       return { move: 'consolidate', reason: 'correct_but_slow', urgency: 'low' };
     }
-    // 6. Terobosan layak disebut namanya. Kemajuan yang tidak pernah diucapkan tidak terasa
+    // 7. Terobosan layak disebut namanya. Kemajuan yang tidak pernah diucapkan tidak terasa
     //    sebagai kemajuan.
     if (d.breakthrough) {
       return { move: 'celebrate', reason: 'misconception_resolved', urgency: 'normal' };
     }
-    // 7. Beruntun benar dan cepat berarti soalnya sudah di bawah kemampuannya.
-    if (num(s.streak) >= FAST_CORRECT_STRETCH && (d.timing === 'retrieved' || d.timing === 'guess')) {
+    // 8. Beruntun benar dan cepat berarti soalnya sudah di bawah kemampuannya - TETAPI hanya
+    //    bila cepatnya karena MENGINGAT. Empat tebakan benar bukan penguasaan (temuan council
+    //    gpt_5_6_sol §4.2): pada empat opsi peluangnya seperempat per soal, dan menaikkan
+    //    kesulitan justru menghadiahi kebiasaan menebak. Tebakan beruntun dijawab dengan terus
+    //    berjalan sambil menamai polanya, bukan dengan stretch.
+    if (num(s.streak) >= FAST_CORRECT_STRETCH && d.timing === 'guess') {
+      return { move: 'continue', reason: 'streak_but_guessing', urgency: 'normal' };
+    }
+    if (num(s.streak) >= FAST_CORRECT_STRETCH && d.timing === 'retrieved') {
       return { move: 'stretch', reason: 'too_easy', urgency: 'low' };
     }
     if (remaining <= 0) return { move: 'wrapup', reason: 'pool_exhausted', urgency: 'normal' };
@@ -351,17 +514,70 @@
    *
    * Naskahnya memakai token {name} seperti seluruh naskah FIEZEL lainnya, dan pemanggil yang
    * menggantinya - modul ini tidak pernah menyentuh state murid.
+   *
+   * Argumen kedua (session) OPSIONAL: bila diberikan, composeTurn membaca `explanationsUsed`
+   * untuk MENGHINDARI frasa yang sudah terbukti gagal pada pasangan (konsep, tangga) ini,
+   * dan mencatat penjelasan yang barusan dipakai supaya record() bisa menilai nasibnya.
+   * Tanpa session perilakunya persis seperti sebelumnya - kompatibel mundur.
    */
-  function composeTurn(input) {
+  /**
+   * Tiga cara berbeda menjelaskan hal yang sama, untuk rotasi "jangan ulangi yang gagal"
+   * (temuan council gpt_5_6_sol §4.3): aturannya sendiri, kenapa pilihan tadi gagal, dan
+   * bentuk kontras jawaban murid vs bentuk benar. Yang kosong dilewati, supaya rotasi tidak
+   * pernah jatuh ke frasa hampa.
+   */
+  function explanationVariants(ex, it) {
+    var list = [];
+    if (clause(ex.rule)) list.push(clause(ex.rule));
+    var why = clause(ex.whyFails) || clause(it.whyFails);
+    if (why) list.push(why);
+    var chosen = clause(it.chosenOption);
+    var right = clause(it.correctAnswer || ex.correct);
+    if (chosen && right) list.push('Bandingkan langsung: jawabanmu "' + chosen + '" vs bentuk benar "' + right + '"');
+    return list;
+  }
+
+  /**
+   * Contoh yang BENAR-BENAR dikerjakan (temuan council gpt_5_6_sol §4.4): level `worked`
+   * dulu hanya mengutip ex.rule - label "aku kerjakan dulu" tidak cocok dengan isinya. Di
+   * sini langkahnya disusun sungguhan: pegang aturannya, terapkan ke kalimat contohnya, lalu
+   * tunjukkan bentuk yang keluar. Payload-nya dengan sendirinya berbeda dari `tell`, yang
+   * hanya membuka alasan jawaban benar tanpa langkah.
+   */
+  function workedExample(ex, it, ruleOverride, conceptLabel) {
+    var steps = [];
+    var rule = clause(ruleOverride) || clause(ex.rule);
+    if (rule) steps.push('Langkah 1 - pegang aturannya: ' + rule + '.');
+    var contoh = clause(it.sentence || ex.example);
+    if (contoh) steps.push('Langkah 2 - terapkan ke kalimatnya: "' + contoh + '".');
+    var benar = clause(it.correctAnswer || ex.correct);
+    if (benar) steps.push('Langkah 3 - jadi bentuk yang dipakai: "' + benar + '".');
+    if (!steps.length) return 'Inti ' + conceptLabel + ': ikuti bentuk yang diminta konteksnya.';
+    return steps.join(' ');
+  }
+
+  function composeTurn(input, session) {
     var it = input || {};
+    var s = session && typeof session === 'object' ? session : null;
     var move = str(it.move);
     var level = str(it.scaffold) || 'hint';
     var ex = it.explanation && typeof it.explanation === 'object' ? it.explanation : {};
     var whyFails = str(it.whyFails);
     var concept = str(it.conceptLabel) || 'materi ini';
+    // Kunci penjelasan memakai id konsep (bukan label tampilannya) supaya cocok dengan yang
+    // dicatat record(); label hanya jatuh sebagai cadangan untuk pemanggil lama.
+    var conceptKey = str(it.concept) || str(it.conceptLabel);
     var say = '';
     var ask = '';
     var reveal = false;
+
+    // Berapa kali penjelasan pada (konsep, tangga) ini sudah GAGAL - menentukan variasi frasa.
+    var expKey = conceptKey ? (conceptKey + '::' + level) : '';
+    var failed = s && expKey && s.explanationsUsed ? num(s.explanationsUsed[expKey], 0) : 0;
+    var variants = explanationVariants(ex, it);
+    // Kegagalan pertama menggeser ke varian pertama, berikutnya berputar - tidak pernah
+    // kembali ke frasa yang persis sama dua kali berturut-turut selama masih ada varian lain.
+    var rotated = failed > 0 && variants.length ? variants[(failed - 1) % variants.length] : '';
 
     if (move === 'hint' || move === 'reteach') {
       if (it.timing === 'guess') {
@@ -372,18 +588,23 @@
         say = 'Belum tepat, dan itu wajar di bagian ini.';
       }
       if (level === 'probe') {
-        ask = str(ex.howToAvoid) || 'Sebelum lihat pilihannya lagi - petunjuk waktu di kalimat itu yang mana?';
+        ask = rotated ? (rotated + '. Coba pikirkan lagi dari situ.')
+          : (str(ex.howToAvoid) || 'Sebelum lihat pilihannya lagi - petunjuk waktu di kalimat itu yang mana?');
       } else if (level === 'hint') {
-        ask = clause(ex.memoryCue) ? ('Pegangan singkatnya: ' + clause(ex.memoryCue) + '. Sekarang coba lagi.')
-          : 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.';
+        ask = rotated ? ('Cara lain melihatnya: ' + rotated + '. Sekarang coba lagi.')
+          : clause(ex.memoryCue) ? ('Pegangan singkatnya: ' + clause(ex.memoryCue) + '. Sekarang coba lagi.')
+            : 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.';
       } else if (level === 'worked') {
         say += ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.';
-        ask = str(ex.rule) || ('Inti ' + concept + ': ikuti bentuk yang diminta konteksnya.');
+        ask = workedExample(ex, it, rotated, concept);
       } else {
         say += ' Oke, aku buka sekarang.';
-        ask = str(ex.whyCorrect) || str(ex.rule) || '';
+        ask = rotated || str(ex.whyCorrect) || str(ex.rule) || '';
         reveal = true;
       }
+      // Catat penjelasan yang barusan dipakai. record() pada jawaban berikutnya di konsep
+      // yang sama yang memutuskan nasibnya: murid tetap salah = penjelasan ini gagal.
+      if (s && expKey) s.lastExplanation = { concept: conceptKey, scaffold: level, key: expKey };
     } else if (move === 'celebrate') {
       say = 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.';
     } else if (move === 'consolidate') {
@@ -414,6 +635,29 @@
    * `predict` diberikan pemanggil (biasanya Core Brain v2 successProbability) supaya modul
    * ini tidak menduplikasi model kemampuan - satu model, dua pemakai.
    */
+  /**
+   * PRNG mulberry32 - deterministik untuk seed yang sama, dan itulah alasannya dipilih:
+   * aturan keras modul melarang Math.random tanpa seed, karena keputusan yang tidak bisa
+   * diulang adalah keputusan yang tidak bisa diuji. 32-bit, cukup untuk memilih satu dari
+   * empat kandidat; bukan untuk kriptografi.
+   */
+  function mulberry32(seed) {
+    var a = seed | 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // Suhu softmax untuk pemilihan berseed. Rendah dengan sengaja: variasi yang diinginkan
+  // adalah "kadang soal terbaik KEDUA", bukan lotre - selisih skor 1 poin saja sudah membuat
+  // kandidat teratas ~17x lebih mungkin terpilih (e^(1/0.35)), jadi forceConcept dan penalti
+  // paparan tetap terasa deterministik dalam praktiknya.
+  var SOFTMAX_TEMPERATURE = 0.35;
+  var SOFTMAX_TOP_K = 4;
+
   function selectNext(pool, state, context) {
     var items = Array.isArray(pool) ? pool.filter(Boolean) : [];
     if (!items.length) return null;
@@ -441,6 +685,32 @@
       return { item: item, score: score, concept: concept, predicted: round(p, 3) };
     }).sort(function (a, b) { return b.score - a.score; });
 
+    // Fase 2: sampling berseed (temuan council: argmax murni membuat dua murid identik
+    // menerima urutan soal yang identik selamanya - sesi terasa seperti rel, bukan guru).
+    // Dengan opts.seed angka, pilihan diambil softmax bersuhu rendah di atas EMPAT kandidat
+    // teratas: cukup untuk variasi antar sesi, terlalu sempit untuk pernah menyodorkan soal
+    // yang buruk. Tanpa seed, jalurnya persis argmax lama - byte demi byte - supaya pemanggil
+    // yang belum ikut Fase 2 tidak berubah perilaku sedikit pun.
+    if (typeof ctx.seed === 'number' && isFinite(ctx.seed)) {
+      var top = scored.slice(0, SOFTMAX_TOP_K);
+      // Dikurangi skor tertinggi sebelum exp: matematis identik (ternormalisasi), numerik
+      // aman - skor sangat negatif tidak pernah menghasilkan exp() overflow/underflow ganjil.
+      var best = top[0].score;
+      var weights = [], total = 0, k;
+      for (k = 0; k < top.length; k++) {
+        var w = Math.exp((top[k].score - best) / SOFTMAX_TEMPERATURE);
+        weights.push(w);
+        total += w;
+      }
+      var roll = mulberry32(ctx.seed)() * total;
+      var acc = 0;
+      for (k = 0; k < top.length; k++) {
+        acc += weights[k];
+        if (roll < acc) return top[k].item;
+      }
+      return top[top.length - 1].item;
+    }
+
     return scored[0].item;
   }
 
@@ -452,8 +722,10 @@
     var s = state || {};
     var mis = s.misconceptions || {};
     var resolved = s.resolved || {};
-    var persistent = Object.keys(mis).filter(function (k) { return mis[k] >= 2 && !resolved[k]; });
-    var fixed = Object.keys(resolved);
+    // Kunci internal berbentuk `konsep::miskonsepsi`; yang dilaporkan keluar tetap NAMA
+    // miskonsepsinya saja, seperti sebelum kunci komposit - pembaca summarize tidak berubah.
+    var persistent = uniq(Object.keys(mis).filter(function (k) { return mis[k] >= 2 && !resolved[k]; }).map(misNameOf));
+    var fixed = uniq(Object.keys(resolved).map(misNameOf));
     var accuracy = s.answered ? Math.round((s.correct / s.answered) * 100) : null;
     var timings = (s.log || []).reduce(function (acc, row) { acc[row.timing] = (acc[row.timing] || 0) + 1; return acc; }, {});
     return {

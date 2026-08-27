@@ -304,12 +304,12 @@
     {
       "name": "(1) jawaban yang tidak pernah datang DIBATALKAN transport pada anggarannya, bukan digantung",
       "status": "PASS",
-      "details": "galat=AbortError setelah 122 ms (anggaran 120 ms)"
+      "details": "galat=AbortError setelah 121 ms (anggaran 120 ms)"
     },
     {
       "name": "(1) permintaan CF selalu dibawa dengan signal pembatal",
       "status": "PASS",
-      "details": "{\"url\":\"https://api.fiezel.my.id/api/quota\",\"at\":1787863795170,\"hasSignal\":true}"
+      "details": "{\"url\":\"https://api.fiezel.my.id/api/quota\",\"at\":1787866042134,\"hasSignal\":true}"
     },
     {
       "name": "(1) signal milik pemanggil diteruskan apa adanya (transport tidak merebut pembatalan)",
@@ -344,7 +344,7 @@
     {
       "name": "(4) batas waktu config TIDAK melempar; ia menjadi status unreachable dengan alasan \"timeout\"",
       "status": "PASS",
-      "details": "{\"status\":\"unreachable\",\"protocol\":\"\",\"flags\":null,\"enabled\":null,\"fetchedAt\":1787863795395,\"source\":\"error\",\"reason\":\"timeout\"}"
+      "details": "{\"status\":\"unreachable\",\"protocol\":\"\",\"flags\":null,\"enabled\":null,\"fetchedAt\":1787866042359,\"source\":\"error\",\"reason\":\"timeout\"}"
     },
     {
       "name": "(4) sesudah config gagal, SEMUA kelas endpoint mati walau flag statisnya semua on",
@@ -372,7 +372,7 @@
       "details": "threw=false"
     },
     {
-      "name": "Invarian build utuh: SW_REV, DIAG_BUILD, dan FIEZEL_PAGE_BUILD menunjuk versi yang sama (m025-173 / m025-173 / m025-173)",
+      "name": "Invarian build utuh: SW_REV, DIAG_BUILD, dan FIEZEL_PAGE_BUILD menunjuk versi yang sama (m025-174 / m025-174 / m025-174)",
       "status": "PASS",
       "details": "core-config.js + sw.js + diag-panel"
     }
