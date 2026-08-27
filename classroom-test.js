@@ -160,7 +160,13 @@ test('UI layer stays responsive and reduced-motion aware', () => {
   assert.ok(tutorCss.includes('@media (max-width:620px)')); assert.ok(tutorCss.includes('@media (prefers-reduced-motion:reduce)')); assert.ok(tutorCss.includes('@media (min-width:1000px)'));
 });
 test('integration loads correction after Tutor v3 and preserves five primary destinations', () => {
-  assert.ok(app.includes("'classroom'")); assert.ok(app.includes("onclick=\"go('classroom')\""));
+  // R2-3 (IMPLEMENTATION-R2-REPORT.md): pintu Classroom di Home DIKUNCI "Coming Soon" atas
+  // permintaan owner — tombolnya disabled tanpa onclick, jadi ekspektasi lama
+  // onclick="go('classroom')" sengaja diganti: view-nya harus tetap terdaftar, kartunya
+  // harus tetap ada (terkunci), dan tidak boleh ada navigasi dari kartu itu.
+  assert.ok(app.includes("'classroom'"));
+  assert.ok(app.includes('classroom-launch is-coming-soon'), 'kartu Classroom harus tampil terkunci Coming Soon');
+  assert.ok(!app.includes("onclick=\"go('classroom')\""), 'kartu Classroom tidak boleh lagi bernavigasi');
   assert.strictEqual((index.match(/class="nav"/g) || []).length + 1, 5);
   assert.ok(index.includes('./features/tutor-classroom/fiezel-tutor-v3.js'));
   // m025-95: tambalan suara Indonesia dihapus; Classroom kini bicara Inggris bersubtitle.

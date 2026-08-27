@@ -1,14 +1,14 @@
 {
   "schema": "fiezel-voice-pipeline-gap-v1",
-  "generatedAt": "2026-08-27T13:04:01.544Z",
+  "generatedAt": "2026-08-27T19:38:22.117Z",
   "generateLatencyMs": 120,
   "chunkCount": 4,
   "audioContexts": 1,
   "endedEvents": 0,
   "gapsBeforeSeconds": [
-    0.125,
     0.126,
-    0.125
+    0.126,
+    0.126
   ],
   "gapsAfterSeconds": [
     0.22,
@@ -16,24 +16,24 @@
     0.45
   ],
   "unintendedSilenceBeforeSeconds": [
-    0.285,
     0.286,
-    0.285
+    0.286,
+    0.286
   ],
   "unintendedSilenceAfterSeconds": [
     0,
     0,
     0
   ],
-  "averageUnintendedSilenceBeforeSeconds": 0.285333,
+  "averageUnintendedSilenceBeforeSeconds": 0.286,
   "averageUnintendedSilenceAfterSeconds": 0,
   "productionPattern": {
     "awaitingCallerGapsSeconds": [
-      0.126,
       0.125,
-      0.124
+      0.126,
+      0.127
     ],
-    "awaitingCallerAverageSeconds": 0.125,
+    "awaitingCallerAverageSeconds": 0.126,
     "prefetchingCallerGapsSeconds": [
       0.22,
       0.09,
@@ -49,10 +49,10 @@
     0.09,
     0.45
   ],
-  "averageGapBeforeSeconds": 0.125333,
+  "averageGapBeforeSeconds": 0.126,
   "averageGapAfterSeconds": 0.253333,
   "pipelineStats": {
-    "cursor": 3.5639999999999996,
+    "cursor": 3.566,
     "generation": 0,
     "scheduledCount": 5,
     "underruns": 0,
@@ -70,7 +70,7 @@
     {
       "name": "(a) generate potongan N+1 dimulai sebelum potongan N selesai digenerasi/berbunyi",
       "status": "PASS",
-      "details": "genStart={\"0\":1787835829554,\"1\":1787835829554,\"2\":1787835829681,\"3\":1787835829687} genEnd={\"0\":1787835829673,\"1\":1787835829681,\"2\":1787835829801,\"3\":1787835829809}"
+      "details": "genStart={\"0\":1787859490119,\"1\":1787859490119,\"2\":1787859490249,\"3\":1787859490254} genEnd={\"0\":1787859490240,\"1\":1787859490249,\"2\":1787859490370,\"3\":1787859490374}"
     },
     {
       "name": "(a2) pipa mengisi diri lebih dulu: generate potongan kedua mulai sebelum potongan pertama dijadwalkan",
@@ -90,7 +90,7 @@
     {
       "name": "(b2) setiap potongan dijadwalkan dengan start(when) pada waktu masa depan yang naik",
       "status": "PASS",
-      "details": "[0.158,0.702,1.116,1.89]"
+      "details": "[0.16,0.704,1.118,1.892]"
     },
     {
       "name": "(b3) celah antar potongan TEPAT sebesar jeda prosodi, tanpa sisa waktu generate",
@@ -100,7 +100,7 @@
     {
       "name": "(b4) tidak ada satu pun underrun pada latensi generate tetap 120 ms",
       "status": "PASS",
-      "details": "{\"cursor\":2.214,\"generation\":0,\"scheduledCount\":4,\"underruns\":0,\"lookahead\":2,\"maxQueued\":3,\"gaps\":{\"none\":0,\"clause\":0.09,\"sentence\":0.22,\"paragraph\":0.45},\"pending\":0}"
+      "details": "{\"cursor\":2.216,\"generation\":0,\"scheduledCount\":4,\"underruns\":0,\"lookahead\":2,\"maxQueued\":3,\"gaps\":{\"none\":0,\"clause\":0.09,\"sentence\":0.22,\"paragraph\":0.45},\"pending\":0}"
     },
     {
       "name": "(b5) sumber jalur pipa memakai start(startAt) dan tidak memasang onended",
@@ -240,7 +240,7 @@
     {
       "name": "(g) pengukuran: keheningan tak sengaja hilang sepenuhnya di jalur berpipa",
       "status": "PASS",
-      "details": "sebelumTakSengaja=0.285333s sesudahTakSengaja=0s"
+      "details": "sebelumTakSengaja=0.286s sesudahTakSengaja=0s"
     },
     {
       "name": "(g2) pengukuran: jeda yang tersisa persis jeda prosodi yang disengaja",
