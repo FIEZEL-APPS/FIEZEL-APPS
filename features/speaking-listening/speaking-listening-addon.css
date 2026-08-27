@@ -99,3 +99,9 @@ body.fz-stage-sl .fsl-feedback{padding-bottom:120px}
 /* Entri Pengaturan: baris statis (tanpa aksi), dua kalimat penjelasan. */
 .setting-row-static{cursor:default}
 .setting-row-static .setting-note{margin-top:3px;line-height:1.5;opacity:.9}
+
+/* R2-4: strip maskot untuk sesi tanpa fsl-player (speaking + latihan ujian) - maskot
+   hadir di atas panel soal seperti semua tipe sesi lain; dekorasi murni (aria-hidden). */
+.fsl-mascot-strip{display:flex;justify-content:center;margin:2px 0 6px}
+.fsl-mascot-strip .fsl-mascot-slot{width:46px;height:46px}
+.fsl-mascot-strip .fsl-mascot{width:46px;height:46px}

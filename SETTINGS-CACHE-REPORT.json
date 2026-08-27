@@ -1,7 +1,7 @@
 {
   "gate": "settings-cache-test",
   "spec": "reports/desain-test-baru.md §4",
-  "generatedAt": "2026-08-26T15:39:33.437Z",
+  "generatedAt": "2026-08-27T19:37:38.533Z",
   "pass": true,
   "total": 21,
   "failedCount": 0,

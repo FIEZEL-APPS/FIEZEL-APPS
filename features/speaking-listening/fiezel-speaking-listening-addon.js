@@ -31,6 +31,16 @@
       +'<svg class="fsl-wave" viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q 6 2 12 12 T 24 12 T 36 12 T 48 12 T 60 12 T 72 12 T 84 12 T 96 12 T 108 12 T 120 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
       +'<span class="fsl-replays" data-replays>Belum diputar</span></div>';
   }
+  /* R2-4: sesi speaking dan latihan ujian tidak punya fsl-player (tidak ada audio yang
+     dimainkan maskot), tetapi maskotnya tetap harus hadir DI ATAS panel soal seperti di
+     semua tipe sesi lain. Strip ini murni dekorasi (aria-hidden) dengan fallback paw yang
+     sama; ekspresinya digerakkan host lewat options.onAnswerFeedback -> FiezelPaw. */
+  function slMascotStripMarkup(){
+    const face=slPawReady()
+      ?'<fiezel-mascot class="fsl-mascot"></fiezel-mascot>'
+      :'<span class="fz-i" data-fz-icon="paw"></span>';
+    return '<div class="fsl-mascot-strip" aria-hidden="true"><span class="fsl-mascot-slot">'+face+'</span></div>';
+  }
 
   /* ---- Gem Terjemahan (reports/recon-listening-gems.md Bagian B) ---------------------
    *
@@ -591,6 +601,7 @@
       }).join('');
       this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card">
 <span class="fsl-kicker">Latihan ujian · ${esc(set.level)}</span>
+${slMascotStripMarkup()}
 <p class="fsl-timing"><b>${esc(format.label||'')}</b><span>Audio diputar ${allowedReplays}x saja · ${questions.length} soal</span><small>${esc(format.note||'')}</small></p>
 <h2>${esc(set.title||'')}</h2>
 <p class="fsl-privacy">Skrip disembunyikan sampai jawaban dinilai. ${esc(this.repo.listeningHonesty||'')}</p>
@@ -661,10 +672,10 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
       const source=item.sourceText?`<pre class="fsl-source">${esc(item.sourceText)}</pre>`:'';
       const adapted=item.sourceNote?`<p class="fsl-adapted">${esc(item.sourceNote)}</p>`:'';
       const timing=format?`<p class="fsl-timing"><b>${esc(format.label)}</b><span>Menyiapkan ${format.prepSeconds} detik · bicara ${format.speakSeconds} detik</span><small>${esc(format.note)}</small></p>`:'';
-      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · ${esc(item.level)}</span>${timing}<h2>${esc(item.instruction)}</h2>${questions}${bullets}${source}${adapted}${followUps}<p class="fsl-privacy">Penilaian otomatis hanya cakupan gagasan dari transkrip. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>`;
+      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · ${esc(item.level)}</span>${slMascotStripMarkup()}${timing}<h2>${esc(item.instruction)}</h2>${questions}${bullets}${source}${adapted}${followUps}<p class="fsl-privacy">Penilaian otomatis hanya cakupan gagasan dari transkrip. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>`;
       this.bindSpeakingControls(item);
     }
-    renderSpeaking(item,progress){const c=capabilities();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Speaking · ${esc(item.level)} · ${esc(item.mode)}</span><h2>${esc(item.instruction)}</h2>${item.targetText?`<p class="fsl-prompt">${esc(item.targetText)}</p>`:''}<p class="fsl-privacy">Penilaian otomatis hanya spoken production / target coverage. Ini bukan pengukuran phoneme/pronunciation.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri tanpa skor otomatis.'}</div><div data-feedback></div><div data-playback></div></article></section>`;
+    renderSpeaking(item,progress){const c=capabilities();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Speaking · ${esc(item.level)} · ${esc(item.mode)}</span>${slMascotStripMarkup()}<h2>${esc(item.instruction)}</h2>${item.targetText?`<p class="fsl-prompt">${esc(item.targetText)}</p>`:''}<p class="fsl-privacy">Penilaian otomatis hanya spoken production / target coverage. Ini bukan pengukuran phoneme/pronunciation.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri tanpa skor otomatis.'}</div><div data-feedback></div><div data-playback></div></article></section>`;
       this.bindSpeakingControls(item);
     }
     // m025-145: pengikatan kontrol suara dipakai bersama oleh latihan harian dan latihan
@@ -710,6 +721,11 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
     finishItem(item,result,prefix=''){
       const ms=now()-this.startedAt;this.store.record(this.domain,item,result,ms,this.replays);this.emitEvidence();const label=result.passed?'Lolos target item':'Belum mencapai target item';const note=this.domain==='speaking'?`Skor ${result.score}% hanya mengukur ${result.metric.replace(/_/g,' ')}; bukan pronunciation.`:`Skor ${result.score}%.`;
       const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback"><strong>${label}</strong><span>${esc(note)}</span>${this.domain==='listening'?`<p><b>Script:</b> ${esc(item.script)}</p><div data-translation hidden></div>`:`<p><b>Contoh respons:</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>Lanjut</button></div></div>`;
+      /* R2-4: kabar benar/salah untuk maskot dikirim lewat kait host, BUKAN langsung ke
+         FiezelPaw - host yang memegang gerbang reduced-motion/preferensi animasi
+         (pawReact), dan addon tidak boleh punya gerbang kedua yang bisa menyimpang.
+         Gagal-diam: maskot yang bermasalah tidak boleh merusak penilaian. */
+      try{if(typeof this.options.onAnswerFeedback==='function')this.options.onAnswerFeedback(!!result.passed)}catch(_){}
       /* Toggle terjemahan DIKECUALIKAN dari pemadaman tombol: blok feedback adalah satu-satunya
          fase di mana terjemahan boleh tampil, jadi mematikannya di sana harus tetap mungkin. */
       this.root.querySelectorAll('button').forEach(b=>{if(!b.hasAttribute('data-next')&&!b.hasAttribute('data-exit')&&!b.hasAttribute('data-translate-toggle'))b.disabled=true});this.root.querySelector('[data-next]')?.addEventListener('click',()=>{this.ephemeralTranscript='';this.index++;this.renderSession()});
