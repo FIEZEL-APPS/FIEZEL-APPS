@@ -1,0 +1,316 @@
+{
+  "schema": "fiezel-cron-contract-v1",
+  "pass": true,
+  "counts": {
+    "pass": 60,
+    "fail": 0
+  },
+  "clock": "2026-08-27T17:05:00.000Z",
+  "rollupDay": "2026-08-26",
+  "crons": {
+    "sweep": "*/5 * * * *",
+    "rollup": "5 17 * * *"
+  },
+  "checks": [
+    {
+      "name": "a ekspresi 5-menit menjalankan SWEEP",
+      "status": "PASS",
+      "details": "{\"cron\":\"*/5 * * * *\",\"quotaSweep\":{\"swept\":{\"reaped\":0,\"scanned\":0,\"hasMore\":false,\"malformed\":0},\"reconciled\":{\"day\":\"2026-08-28\",\"users\":0}},\"analyticsRollup\":null}"
+    },
+    {
+      "name": "a ekspresi 5-menit TIDAK menjalankan rollup (rollup harian bukan tiap 5 menit)",
+      "status": "PASS",
+      "details": "null"
+    },
+    {
+      "name": "a sweep meninggalkan TEPAT satu baris cron_run bernama quota_sweep",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null}]"
+    },
+    {
+      "name": "a sweep tanpa satu pun reservasi tetap SUKSES dengan rows_affected 0",
+      "status": "PASS",
+      "details": "{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null}"
+    },
+    {
+      "name": "a ekspresi harian menjalankan ROLLUP",
+      "status": "PASS",
+      "details": "{\"day\":\"2026-08-26\",\"dau\":0,\"wau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.14285714285714285},\"mau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.03333333333333333},\"purged\":[\"dau_dedup\",\"usage_daily\",\"retention_daily\"],\"pepperRotated\":true,\"collectionOk\":true,\"usageRows\":0,\"ranAt\":1787850300000}"
+    },
+    {
+      "name": "a ekspresi harian TIDAK menjalankan sweep",
+      "status": "PASS",
+      "details": "null"
+    },
+    {
+      "name": "a rollup meninggalkan baris cron_run bernama analytics_rollup",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null},{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null}]"
+    },
+    {
+      "name": "a kedua job tidak pernah tercatat pada jalan cron yang sama",
+      "status": "PASS",
+      "details": "[\"quota_sweep\",\"analytics_rollup\"]"
+    },
+    {
+      "name": "a cron tak dikenal menjalankan sweep DAN rollup",
+      "status": "PASS",
+      "details": "{\"s\":true,\"r\":true}"
+    },
+    {
+      "name": "a kedua ekspresi cron di wrangler.toml sama dengan yang diuji di sini",
+      "status": "PASS",
+      "details": "\"*/5 * * * *\", \"5 17 * * *\""
+    },
+    {
+      "name": "b rollup pertama menulis DAU dari token harian",
+      "status": "PASS",
+      "details": "{\"dau1\":3,\"out\":3}"
+    },
+    {
+      "name": "b rollup pertama MENGHAPUS token harian (kontrak privasi, bukan opsi)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "b rollup KEDUA tidak menurunkan DAU (tulis monoton MAX bertahan)",
+      "status": "PASS",
+      "details": "{\"dau1\":3,\"dau2\":3,\"out\":0}"
+    },
+    {
+      "name": "b rollup kedua tidak menurunkan batas WAU/MAU",
+      "status": "PASS",
+      "details": "{\"wau_lower\":3,\"mau_upper\":3}"
+    },
+    {
+      "name": "b tulis monoton dipakai untuk dau (setMetricMax ada di store)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "b jalan kedua tetap tercatat sebagai SUKSES di cron_run",
+      "status": "PASS",
+      "details": "[{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":3,\"error_class\":null},{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null}]"
+    },
+    {
+      "name": "c rollup merotasi pepper saat jatuh tempo",
+      "status": "PASS",
+      "details": "true"
+    },
+    {
+      "name": "c pepper DUA putaran lalu hilang dari SELURUH database analytics",
+      "status": "PASS",
+      "details": "[[{\"day\":\"2026-08-26\",\"metric\":\"dau\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"collection_ok\",\"value\":1},{\"day\":\"2026-08-26\",\"metric\":\"wau_lower\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"wau_upper\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"mau_lower\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"mau_upper\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"wau_mau_is_estimate\",\"value\":1}],[],[],[],[{\"id\":1,\"rotate"
+    },
+    {
+      "name": "c pepper putaran sebelumnya masih ada SATU putaran (jendela toleransi event tertahan)",
+      "status": "PASS",
+      "details": "{\"previous\":true,\"currentSama\":false}"
+    },
+    {
+      "name": "c rotasi berikutnya MENGHAPUS pepper lama, tidak menyimpannya",
+      "status": "PASS",
+      "details": "[[{\"day\":\"2026-08-26\",\"metric\":\"dau\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"collection_ok\",\"value\":1},{\"day\":\"2026-08-26\",\"metric\":\"wau_lower\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"wau_upper\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"mau_lower\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"mau_upper\",\"value\":0},{\"day\":\"2026-08-26\",\"metric\":\"wau_mau_is_estimate\",\"value\":1},{\"day\":\"2026-08-27\",\"metri"
+    },
+    {
+      "name": "c skema analytics tidak punya tabel arsip pepper",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "c baris pepper_state hanya memuat current + satu previous",
+      "status": "PASS",
+      "details": "[\"id\",\"rotated_at\",\"current\",\"previous\"]"
+    },
+    {
+      "name": "d rollup yang GAGAL tetap meninggalkan baris cron_run",
+      "status": "PASS",
+      "details": "[{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"d1_error\"}]"
+    },
+    {
+      "name": "d baris gagal ditandai ok=0 dengan KELAS galat, bukan pesan",
+      "status": "PASS",
+      "details": "{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"d1_error\"}"
+    },
+    {
+      "name": "d kegagalan rollup tidak menelan galat dari nilai balik scheduled()",
+      "status": "PASS",
+      "details": "{\"error\":\"Error\"}"
+    },
+    {
+      "name": "d rollup yang dilewati karena flag mati dicatat GAGAL berkelas flag_off",
+      "status": "PASS",
+      "details": "[{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"flag_off\"}]"
+    },
+    {
+      "name": "d tanpa migrasi 0003, sweep TETAP JALAN (pencatatan fail-soft)",
+      "status": "PASS",
+      "details": "{\"swept\":{\"reaped\":0,\"scanned\":0,\"hasMore\":false,\"malformed\":0},\"reconciled\":{\"day\":\"2026-08-28\",\"users\":0}}"
+    },
+    {
+      "name": "d pencatatan fail-soft TIDAK membuat tabel sendiri diam-diam",
+      "status": "PASS",
+      "details": "[\"identity\",\"session\",\"anon_issue\",\"quota_daily\",\"quota_reservation\"]"
+    },
+    {
+      "name": "e identitas uji berhasil diterbitkan (prasyarat pemindaian)",
+      "status": "PASS",
+      "details": "{\"userId\":\"0dda4384-3039-4d98-9570-08014fd275ce\",\"plan\":\"free\",\"class\":\"visitor\",\"issued\":true,\"issuedAt\":\"2026-08-27T17:05:00.000Z\",\"expiresAt\":\"2027-02-23T17:"
+    },
+    {
+      "name": "e cron_run hanya punya tujuh kolom operasional",
+      "status": "PASS",
+      "details": "[\"job\",\"day\",\"started_at\",\"finished_at\",\"ok\",\"rows_affected\",\"error_class\"]"
+    },
+    {
+      "name": "e ada baris gagal untuk dipindai (kalau tidak, pemindaian ini kosong)",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null},{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"d1_error\"}]"
+    },
+    {
+      "name": "e semua error_class berada di enum tertutup",
+      "status": "PASS",
+      "details": "[null,\"d1_error\"]"
+    },
+    {
+      "name": "e tidak ada jejak pesan galat mentah (SQL, nama tabel, stack)",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null},{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"\"}]"
+    },
+    {
+      "name": "e tidak ada pengenal murid di tabel",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":1,\"rows_affected\":0,\"error_class\":null},{\"job\":\"analytics_rollup\",\"day\":\"2026-08-27\",\"started_at\":1787850300000,\"finished_at\":1787850300000,\"ok\":0,\"rows_affected\":0,\"error_class\":\"d1_error\"}]"
+    },
+    {
+      "name": "e tidak ada satu pun kolom bernuansa data murid",
+      "status": "PASS",
+      "details": "[\"job\",\"day\",\"started_at\",\"finished_at\",\"ok\",\"rows_affected\",\"error_class\"]"
+    },
+    {
+      "name": "e migrasi 0003 tidak mendefinisikan kolom pengenal apa pun",
+      "status": "PASS",
+      "details": " \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n\nCREATE TABLE IF NOT EXISTS cron_run (\n  job           TEXT    NOT NULL,           \n  day           TEXT    NOT NULL,           \n  started_at    INTEGER NOT NULL,           \n  finished_a"
+    },
+    {
+      "name": "f pengumpulan rusak (0 token, usage terisi) menulis collection_ok=0",
+      "status": "PASS",
+      "details": "{\"collection_ok\":0,\"out\":{\"day\":\"2026-08-26\",\"dau\":0,\"wau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.14285714285714285},\"mau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.03333333333333333},\"purged\":[\"dau_dedup\",\"usage_daily\",\"retention_daily\"],\"pepperRotated\":true,\"collectionOk\":false,\"usageRows\":2,\"ranAt\":1787850300000}}"
+    },
+    {
+      "name": "f ringkasan rollup ikut mengaku collectionOk=false",
+      "status": "PASS",
+      "details": "false"
+    },
+    {
+      "name": "f pagar TIDAK menyembunyikan DAU nol yang menyesatkan (nilainya tetap 0, penandanya yang bicara)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "f hari yang benar-benar sepi (0 token, 0 usage) TIDAK dituduh rusak",
+      "status": "PASS",
+      "details": "{\"ok\":1}"
+    },
+    {
+      "name": "f jalan KEDUA tidak membalik collection_ok menjadi 0 (pagar tidak menuduh dirinya sendiri)",
+      "status": "PASS",
+      "details": "{\"okFirst\":1,\"okSecond\":1}"
+    },
+    {
+      "name": "g tanpa kredensial owner: 403 (bukan 200, bukan 404)",
+      "status": "PASS",
+      "details": "403 {\"error\":\"forbidden_owner\"}"
+    },
+    {
+      "name": "g penolakan tidak membocorkan satu pun angka cron",
+      "status": "PASS",
+      "details": "{\"error\":\"forbidden_owner\"}"
+    },
+    {
+      "name": "g token owner salah: 403",
+      "status": "PASS",
+      "details": "403"
+    },
+    {
+      "name": "g cookie murid bukan kredensial owner: 403",
+      "status": "PASS",
+      "details": "403"
+    },
+    {
+      "name": "g token owner benar: 200 dengan ringkasan dua job",
+      "status": "PASS",
+      "details": "200 {\"schema\":\"fiezel-cron-status-v1\",\"protocol\":\"1.7\",\"generatedAt\":1787850300000,\"window\":{\"days\":7,\"from\":\"2026-08-21\",\"to\":\"2026-08-27\"},\"migrated\":true,\"readError\":null,\"expected\":{\"quota_sweep\":{\"cr"
+    },
+    {
+      "name": "g ringkasan memuat sukses terakhir, jumlah gagal, dan baris terpengaruh",
+      "status": "PASS",
+      "details": "[{\"job\":\"quota_sweep\",\"runs\":1,\"ok\":1,\"failed\":0,\"rowsAffected\":0,\"lastRunAt\":1787850300000,\"lastSuccessAt\":1787850300000,\"lastSuccessDay\":\"2026-08-27\",\"staleDays\":0,\"errorClasses\":{},\"everSucceeded\":true},{\"job\":\"analytics_rollup\",\"runs\":1,\"ok\":1,\"failed\":0,\"rowsAffected\":0,\"lastRunAt\":1787850300000,\"lastSuccessAt\":1787850300000,\"lastSuccessDay\":\"2026-08-27\",\"staleDays\":0,\"errorClasses\":{},\"everSucceeded\":true}]"
+    },
+    {
+      "name": "g sukses cron yang baru saja terjadi terbaca di ringkasan",
+      "status": "PASS",
+      "details": "[[\"quota_sweep\",1,1787850300000],[\"analytics_rollup\",1,1787850300000]]"
+    },
+    {
+      "name": "g respons tidak memuat pesan galat mentah",
+      "status": "PASS",
+      "details": "{\"schema\":\"fiezel-cron-status-v1\",\"protocol\":\"1.7\",\"generatedAt\":1787850300000,\"window\":{\"days\":7,\"from\":\"2026-08-21\",\"to\":\"2026-08-27\"},\"migrated\":true,\"readError\":null,\"expected\":{\"quota_sweep\":{\"cr"
+    },
+    {
+      "name": "g Bearer juga diterima (satu token, dua cara kirim)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "g tanpa OWNER_TOKEN_HASH endpoint TERTUTUP, bukan terbuka",
+      "status": "PASS",
+      "details": "403"
+    },
+    {
+      "name": "g tabel belum dimigrasi: 200 dengan migrated:false (bukan 500, bukan klaim sehat)",
+      "status": "PASS",
+      "details": "200 {\"schema\":\"fiezel-cron-status-v1\",\"protocol\":\"1.7\",\"generatedAt\":1787850300000,\"window\":{\"days\":7,\"from\":\"2026-08-21\",\"to\":\"2026-08-27\"},\"migrated\":false,\"readError\":\"d1_error\",\"expected\":{\"quota_swee"
+    },
+    {
+      "name": "g gate owner memakai perbandingan waktu-konstan, bukan operator kesetaraan atas secret",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h rute status cron terdaftar lewat route-slots.js",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h modul cron-status.js mengekspor ROUTES dengan path owner",
+      "status": "PASS",
+      "details": "[[\"GET\",\"/api/owner/cron-status\"]]"
+    },
+    {
+      "name": "h migrasi 0003_cron.sql membuat tabel cron_run dengan tujuh kolom yang disepakati",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h MIGRATIONS.md menyebut database dan perintah untuk 0003",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h gerbang ini terdaftar di .github/workflows/quality.yml",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h ringkasan cron adalah fungsi MURNI (bisa diuji tanpa D1)",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "h kelas galat bebas TIDAK bisa diselundupkan ke ringkasan",
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}

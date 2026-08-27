@@ -247,6 +247,18 @@ export async function rollbackD1(db, { userId, token, now, reason }) {
  * Ini pengganti lease Durable Object yang ditulis dengan tangan (cf-b3 §1.4). Tanpa ini,
  * setiap Worker yang mati di tengah jalan mencuri satu slot murid sampai tengah malam.
  * WAJIB terpasang di HARI YANG SAMA dengan jalur D1 — bukan "nanti".
+ *
+ * AMAN DIJALANKAN DUA KALI dan AMAN SAAT KOSONG (A3):
+ *   - kosong: tidak ada lease kedaluwarsa -> tidak ada satu pun tulis, hasilnya
+ *     `{reaped:0, scanned:0, hasMore:false}`. Nol di sini adalah jawaban yang
+ *     benar, bukan kegagalan, dan `cron_run` mencatatnya sebagai sukses dengan
+ *     `rows_affected=0`;
+ *   - dua kali: tiap lease dikembalikan lewat SATU `db.batch` yang menurunkan
+ *     `held` DAN menghapus barisnya bersama-sama, jadi jalan kedua tidak lagi
+ *     melihat lease itu dan tidak bisa menurunkan `held` dua kali;
+ *   - `charges_json` rusak: lease itu DILEWATI (dihitung di `malformed`) alih-alih
+ *     melempar. Satu baris cacat tidak boleh menyandera semua lease lain —
+ *     itulah cara satu data buruk mengunci kuota seluruh kelas.
  */
 export async function sweepExpiredReservations(db, now, limit) {
   const cap = Number.isFinite(limit) ? limit : 500;
@@ -255,9 +267,22 @@ export async function sweepExpiredReservations(db, now, limit) {
     .bind(now, cap)
     .all();
   const rows = (expired && expired.results) || [];
+  if (rows.length === 0) return { reaped: 0, scanned: 0, hasMore: false, malformed: 0 };
   let reaped = 0;
+  let malformed = 0;
   for (const lease of rows) {
-    const charges = JSON.parse(lease.charges_json);
+    let charges;
+    try {
+      charges = JSON.parse(lease.charges_json);
+      if (!charges || typeof charges !== 'object') throw new TypeError('charges_json bukan objek');
+    } catch (_) {
+      // Baris lease yang isinya tidak bisa dibaca tidak bisa dikembalikan dengan
+      // benar; ia dihapus supaya tidak dipindai selamanya, dan `held` dibiarkan
+      // untuk diperbaiki `reconcileHeld` yang menurunkan ulang held dari tabel.
+      await db.prepare('DELETE FROM quota_reservation WHERE id = ?1').bind(lease.id).run();
+      malformed += 1;
+      continue;
+    }
     const params = { user_id: lease.user_id, day: lease.day, now };
     for (const b of Object.keys(charges)) params['amt_' + b] = charges[b];
     const built = namedToPositional(
@@ -271,7 +296,7 @@ export async function sweepExpiredReservations(db, now, limit) {
     ]);
     reaped += 1;
   }
-  return { reaped, scanned: rows.length, hasMore: rows.length >= cap };
+  return { reaped, scanned: rows.length, hasMore: rows.length >= cap, malformed };
 }
 
 /**

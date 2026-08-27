@@ -71,6 +71,9 @@ function makeDb(SQL) {
         return { results: [] };
       case SQL.countDauTokens:
         return { results: [{ n: [...t.dau].filter(k => k.startsWith(`${params[0]}|`)).length }] };
+      // A3: pagar kewarasan rollup membaca jumlah baris `usage_daily` hari itu.
+      case SQL.countUsageRows:
+        return { results: [{ n: [...t.usage.keys()].filter(k => k.startsWith(`${params[0]}|`)).length }] };
       case SQL.purgeDauDay:
         stats.deletes++;
         for (const k of [...t.dau]) if (k.startsWith(`${params[0]}|`)) t.dau.delete(k);
