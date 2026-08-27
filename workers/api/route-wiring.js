@@ -77,6 +77,9 @@ import { withCronRun, CRON_JOBS } from './cron-status.js';
 import './ai/ai-tasks.js';
 import './breaker/breaker.js';
 import './tts/tts-key.js';
+// A12/1: registry nama parameter provider TTS (`speaker`) + voice bawaan korpus. Sama-sama UMD
+// dan sama-sama dipakai `route-tts.js` lewat `globalThis`, jadi ia WAJIB disebut sebelum rutenya.
+import './tts/tts-provider-params.js';
 import * as routeAiNs from './ai/route-ai.js';
 import * as routeTtsNs from './tts/route-tts.js';
 
