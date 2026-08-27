@@ -50,10 +50,37 @@ FEATURE_AI        = "off"
 FEATURE_TTS       = "off"
 FEATURE_COACH     = "off"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
-# Sumber angka: cf-b3 §3 / cf-c1 K26.
-AI_LIMIT_PER_DAY  = "20"
-AI_LIMIT_PER_HOUR = "40"           # sama dengan AI_RATE_LIMIT_PER_HOUR lama
-TTS_CHARS_PER_DAY = "6000"
+#
+# 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.
+# Sampai commit ini nilainya AI_LIMIT_PER_DAY="20" dan TTS_CHARS_PER_DAY="6000", sedangkan
+# yang BENAR-BENAR ditegakkan adalah FREE_AI_DAILY_LIMIT=25 dan FREE_TTS_DAILY_CHARS=12000
+# (`quota/quota-config.js`). Angka di berkas inilah yang dikirim ke murid lewat
+# `GET /api/config` dan `GET /api/user/me` (`limits.aiPerDay`, `limits.ttsCharsPerDay`;
+# route-config.js:69-70, route-user.js:53-55) — jadi naskah kuota MEMBOHONGI murid: murid
+# diberi tahu jatahnya 20 padahal server memberi 25, dan 6.000 char padahal server memberi
+# 12.000. Murid berhenti sebelum jatahnya habis, dan pesan "sisa" tidak pernah cocok dengan
+# 429 yang sesungguhnya.
+#
+# ARAH PENYELARASAN, disengaja: NASKAH mengikuti PENEGAKAN, bukan sebaliknya.
+# `quota/quota-config.js` satu-satunya sumber kebenaran (bab 10) dan nilainya TIDAK
+# diturunkan — menurunkannya berarti memotong jatah murid demi merapikan dokumen.
+# Pasangan wajib-cocok ini ditegakkan gerbang `config-consistency-test.js`:
+#   AI_LIMIT_PER_DAY  <-> FREE_AI_DAILY_LIMIT   (quota-config.js:32)
+#   TTS_CHARS_PER_DAY <-> FREE_TTS_DAILY_CHARS  (quota-config.js:48)
+# Mengubah salah satu sisi sepihak = gerbang MERAH.
+AI_LIMIT_PER_DAY  = "25"           # == FREE_AI_DAILY_LIMIT (nilai yang ditegakkan)
+# AI_LIMIT_PER_HOUR TIDAK punya pasangan penegakan, dan itu dicatat, bukan didiamkan:
+# tidak ada batas AI per-JAM di quota-config.js. Yang ada hanya laju
+# FREE_AI_RATE_PER_MINUTE=8 (= 480/jam) dan batas HARIAN 25, dan 25/hari sudah mengikat jauh
+# lebih dulu daripada 40/jam — jadi angka 40 ini tidak pernah menjadi batas yang menolak
+# permintaan siapa pun. Var ini TETAP dikirim ke klien sebagai `limits.aiPerHour`
+# (route-user.js:54; `GET /api/config` tidak membawanya), jadi ia naskah murni tanpa
+# penegakan. Dibiarkan APA ADANYA di paket ini: menghapus var yang mungkin masih dibaca
+# konfigurasi produksi, atau menambah penegakan per-jam yang belum pernah diputuskan,
+# dua-duanya bukan keputusan sepihak. Terdaftar sebagai pengecualian BERALASAN di
+# config-consistency-test.js supaya tidak pernah lolos senyap.
+AI_LIMIT_PER_HOUR = "40"
+TTS_CHARS_PER_DAY = "12000"        # == FREE_TTS_DAILY_CHARS (nilai yang ditegakkan)
 GLOBAL_NEURON_CAP = "8000"         # < 10.000/hari alokasi gratis akun
 MAX_USERS         = "250"          # cermin fiezel-core-worker.js:5
 AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
