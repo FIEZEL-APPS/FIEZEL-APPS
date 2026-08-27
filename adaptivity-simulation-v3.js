@@ -90,6 +90,37 @@
  *   bocor), ATAU non-determinisme. Bila FiezelItemCalibration belum ada (C1
  *   belum mendarat), varian v3_kalibrasi dilewati dan gate kalibrasi SKIPPED
  *   dengan pesan jelas (bukan gagal) — pola feature-detect yang sama dengan B5.
+ *
+ * WAVE 3 — PENGERASAN MULTI-SEED (port dari pengerasan wave-2 yang dicabut saat
+ * rebase; jawaban atas 4 kelemahan council model-council-claude_opus_5_0.md §1.5):
+ *   1. MULTI-SEED: kesimpulan dari 1 seed adalah anekdot. Suite kini juga
+ *      dijalankan pada SEED_COUNT (50) seed turunan deterministik, berpasangan
+ *      antar-varian (murid laten identik per seed×profil), di ATAS suite
+ *      single-seed lama yang dipertahankan apa adanya (semua gate fase 2/3
+ *      lama tetap mengukur hal yang sama pada dunia yang sama).
+ *   2. PROFIL 3 → 9: tiga profil asli TIDAK diubah satu angka pun; enam profil
+ *      turunan dibangkitkan deterministik dari seed (jitter theta/laju/redaman/
+ *      drift/slip yang dijepit ke rentang waras) supaya kebijakan diuji pada
+ *      populasi, bukan pada tiga titik.
+ *   3. CENSORING: timeToMasteryDays yang null ATAU == horizon (SIM_DAYS)
+ *      ditandai `censored` — mastery tepat di hari terakhir tidak bisa
+ *      dibedakan dari "baru saja melewati horizon", jadi keduanya disensor.
+ *      Run tersensor DIKELUARKAN dari rata-rata timeToMastery (agregat & CI —
+ *      CI timeToMastery hanya pada pasangan yang dua-duanya mastery). Gate
+ *      censoring terpisah: FAIL MUTLAK bila satu varian tak pernah mastery
+ *      (di profil mana pun) pada MAYORITAS seed; FAIL relatif bila CI selisih
+ *      indikator censoring kandidat−baseline seluruhnya > margin praktis.
+ *      Tanpa ini, "36 hari" menyamarkan "tidak pernah" menjadi angka biasa.
+ *   4. AMBANG PRAKTIS: perbandingan float mentah (EPS=1e-9) diganti ambang
+ *      signifikansi praktis per metrik (var PRAKTIS) — selisih 1e-9 hari
+ *      bukan perbedaan pedagogis, itu derau pembulatan.
+ *   5. CI BOOTSTRAP: verdict antar-seed memakai FiezelStatGate.pairedBootstrap
+ *      (CI persentil 95%, seed deterministik) pada selisih berpasangan per
+ *      metrik — klaim menang/kalah harus keluar dari interval, bukan dari
+ *      selisih titik satu run.
+ *   Biaya runtime dijaga: skenario bank Fase 3 (mahal karena estimateAbility
+ *   per penyajian) dijalankan pada 3 profil ASLI per seed (tetap 50 pasangan
+ *   seed per varian); varian Fase 2 yang murah dijalankan pada semua 9 profil.
  */
 (function (root, factory) {
   var api = factory();
@@ -99,6 +130,9 @@
   'use strict';
 
   var brain = require('./features/brain/fiezel-core-brain.js');
+  // WAVE 3: inferensi CI antar-seed memakai modul stat gate resmi (gelombang 1) —
+  // bukan bootstrap tulisan tangan lokal, supaya satu implementasi yang diaudit.
+  var statGate = require('./features/brain/fiezel-stat-gate.js');
 
   var SCHEMA = 'fiezel-adaptivity-simulation-v3';
   var DAY = 86400000;
@@ -112,6 +146,51 @@
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
   function round(v, digits) { var f = Math.pow(10, digits); return Math.round(v * f) / f; }
+
+  // ===================================================================================
+  // WAVE 3 — AMBANG SIGNIFIKANSI PRAKTIS PER METRIK
+  // ===================================================================================
+  /**
+   * Pengganti EPS=1e-9: sebuah selisih baru dihitung "lebih baik/lebih buruk" bila
+   * melewati ambang yang BERARTI secara pedagogis. Angka-angka ini penilaian desain
+   * (didokumentasikan, bisa direvisi tanpa mengubah mekanisme gate), bukan hasil
+   * kalibrasi empiris:
+   *   - timeToMasteryDays 1.0 : di bawah satu hari, jadwal murid tidak berubah.
+   *   - accuracyGapVsTarget 0.02 : 2pp di sekitar target 0.80 tak teramati murid.
+   *   - difficultyOscillationPer10 0.5 : setengah perpindahan per 10 sesi ~ satu
+   *     perpindahan ekstra per 20 sesi — di bawah itu bukan "osilasi".
+   *   - retentionDay90 0.02 : 2pp retrievability, di bawah presisi model FSRS-lite.
+   *   - brier 0.01 : perbaikan kalibrasi prediksi di bawah 0.01 tidak mengubah
+   *     keputusan kebijakan mana pun (band akurasi selebar 25pp).
+   *   - falseDeclineRate 0.02 : 2pp evaluasi momentum.
+   *   - itemBiasRMSE 0.02 : pergeseran 0.02 pada skala kesulitan 1..6 menggeser
+   *     successProbability < 1pp — koreksi label di bawah itu tidak mengubah item
+   *     yang tersaji; kalibrasi yang cuma segitu tidak membayar kompleksitasnya.
+   *   - poolSeparationPct 5 : lima poin persen himpunan kandidat.
+   *   - censoringRate 0.05 : kandidat boleh tersensor sampai 5pp lebih sering
+   *     sebelum dianggap regresi mastery yang nyata (margin non-inferioritas).
+   */
+  var PRAKTIS = {
+    timeToMasteryDays: 1.0,
+    accuracyGapVsTarget: 0.02,
+    difficultyOscillationPer10: 0.5,
+    retentionDay90: 0.02,
+    brier: 0.01,
+    falseDeclineRate: 0.02,
+    itemBiasRMSE: 0.02,
+    poolSeparationPct: 5,
+    censoringRate: 0.05
+  };
+
+  // WAVE 3 — konfigurasi multi-seed. SEED_COUNT=50 (kontrak tugas ≥50);
+  // PROFIL_TURUNAN=6 → 3 asli + 6 turunan = 9 profil (kontrak 8..12);
+  // PROFIL_BANK=3: skenario bank Fase 3 memanggil estimateAbility per PENYAJIAN
+  // (O(riwayat²) per run, ~100ms) — dibatasi ke 3 profil ASLI per seed supaya
+  // runtime CLI tetap < 1 menit; tiap varian tetap dapat 50 seed berpasangan.
+  var SEED_COUNT = 50;
+  var PROFIL_TURUNAN = 6;
+  var PROFIL_BANK = 3;
+  var BOOT_ITERS = 3000;
 
   /**
    * Feature-detect dukungan momentum residual (kontrak Fase 2 milik B1):
@@ -660,6 +739,11 @@
       seed: seed,
       attempts: observed.length,
       timeToMasteryDays: masteryDay,                    // null = tidak tercapai dalam 35 hari
+      // WAVE 3 — penanda censoring: null ATAU tepat di horizon (SIM_DAYS) dianggap
+      // tersensor — mastery di hari terakhir tidak bisa dibedakan dari "lewat
+      // sehari", jadi memasukkannya ke rata-rata akan bias ke bawah. Agregat dan
+      // CI multi-seed WAJIB mengecualikan run dengan flag ini dari timeToMastery.
+      censored: masteryDay === null || masteryDay >= SIM_DAYS,
       observedAccuracy: round(akurasi, 4),
       accuracyGapVsTarget: round(Math.abs(akurasi - 0.8), 4),
       difficultyOscillationPer10: round(osilasiPer10, 3),
@@ -745,17 +829,18 @@
    *   timeToMastery ↓ (null dihitung 36 = melewati horizon), accuracyGapVsTarget ↓,
    *   oscillation ↓, retentionDay90 ↑, brier ↓.
    * Skor agregat: rata-rata antar profil per metrik, lalu v2 dibandingkan v1 dengan
-   * toleransi kecil (seri ≠ kalah). Gate gagal bila v2 kalah pada ≥3 dari 5 metrik.
+   * AMBANG PRAKTIS per metrik (WAVE 3: dulu EPS=1e-9 — selisih float mentah bukan
+   * perbedaan pedagogis; seri di dalam ambang ≠ kalah). Gate gagal bila v2 kalah
+   * pada ≥3 dari 5 metrik.
    */
   function bandingkan(hasilV1, hasilV2) {
     var METRIK = [
-      { nama: 'timeToMasteryDays', arah: 'turun', ambil: function (r) { return r.timeToMasteryDays == null ? SIM_DAYS + 1 : r.timeToMasteryDays; } },
-      { nama: 'accuracyGapVsTarget', arah: 'turun', ambil: function (r) { return r.accuracyGapVsTarget; } },
-      { nama: 'difficultyOscillationPer10', arah: 'turun', ambil: function (r) { return r.difficultyOscillationPer10; } },
-      { nama: 'retentionDay90', arah: 'naik', ambil: function (r) { return r.retentionDay90; } },
-      { nama: 'brier', arah: 'turun', ambil: function (r) { return r.brier; } }
+      { nama: 'timeToMasteryDays', arah: 'turun', praktis: PRAKTIS.timeToMasteryDays, ambil: function (r) { return r.timeToMasteryDays == null ? SIM_DAYS + 1 : r.timeToMasteryDays; } },
+      { nama: 'accuracyGapVsTarget', arah: 'turun', praktis: PRAKTIS.accuracyGapVsTarget, ambil: function (r) { return r.accuracyGapVsTarget; } },
+      { nama: 'difficultyOscillationPer10', arah: 'turun', praktis: PRAKTIS.difficultyOscillationPer10, ambil: function (r) { return r.difficultyOscillationPer10; } },
+      { nama: 'retentionDay90', arah: 'naik', praktis: PRAKTIS.retentionDay90, ambil: function (r) { return r.retentionDay90; } },
+      { nama: 'brier', arah: 'turun', praktis: PRAKTIS.brier, ambil: function (r) { return r.brier; } }
     ];
-    var EPS = 1e-9;
     var rows = [];
     var kalah = 0;
     for (var i = 0; i < METRIK.length; i++) {
@@ -763,9 +848,9 @@
       var a1 = 0, a2 = 0;
       for (var p = 0; p < hasilV1.length; p++) { a1 += m.ambil(hasilV1[p]); a2 += m.ambil(hasilV2[p]); }
       a1 /= hasilV1.length; a2 /= hasilV2.length;
-      var v2Kalah = m.arah === 'turun' ? (a2 > a1 + EPS) : (a2 < a1 - EPS);
+      var v2Kalah = m.arah === 'turun' ? (a2 > a1 + m.praktis) : (a2 < a1 - m.praktis);
       if (v2Kalah) kalah++;
-      rows.push({ metric: m.nama, arahLebihBaik: m.arah, v1: round(a1, 4), v2: round(a2, 4), v2LebihBuruk: v2Kalah });
+      rows.push({ metric: m.nama, arahLebihBaik: m.arah, praktis: m.praktis, v1: round(a1, 4), v2: round(a2, 4), v2LebihBuruk: v2Kalah });
     }
     return { rows: rows, v2KalahPada: kalah, totalMetrik: METRIK.length, v2KalahMayoritas: kalah > METRIK.length / 2 };
   }
@@ -779,17 +864,19 @@
    *      momentum jadi tuli, bukan jadi benar).
    */
   function bandingkanResidual(hasilLama, hasilResidual) {
-    var EPS = 1e-9;
+    // WAVE 3: EPS float mentah → ambang PRAKTIS — klaim "osilasi turun" wajib
+    // turun setidaknya setengah perpindahan per 10 sesi, dan "false-decline naik"
+    // baru dihitung naik bila melewati 2pp; di bawah itu derau, bukan efek.
     function rata(rows, ambil) { var s = 0; for (var i = 0; i < rows.length; i++) s += ambil(rows[i]); return rows.length ? s / rows.length : 0; }
     var oscLama = rata(hasilLama, function (r) { return r.difficultyOscillationPer10; });
     var oscRes = rata(hasilResidual, function (r) { return r.difficultyOscillationPer10; });
     var fdLama = rata(hasilLama, function (r) { return r.falseDeclineRate; });
     var fdRes = rata(hasilResidual, function (r) { return r.falseDeclineRate; });
-    var osilasiTurun = oscRes < oscLama - EPS;
-    var falseDeclineNaik = fdRes > fdLama + EPS;
+    var osilasiTurun = oscRes < oscLama - PRAKTIS.difficultyOscillationPer10;
+    var falseDeclineNaik = fdRes > fdLama + PRAKTIS.falseDeclineRate;
     return {
-      oscillation: { v2Lama: round(oscLama, 4), v2Residual: round(oscRes, 4), turun: osilasiTurun },
-      falseDecline: { v2Lama: round(fdLama, 4), v2Residual: round(fdRes, 4), naik: falseDeclineNaik },
+      oscillation: { v2Lama: round(oscLama, 4), v2Residual: round(oscRes, 4), praktis: PRAKTIS.difficultyOscillationPer10, turun: osilasiTurun },
+      falseDecline: { v2Lama: round(fdLama, 4), v2Residual: round(fdRes, 4), praktis: PRAKTIS.falseDeclineRate, naik: falseDeclineNaik },
       pass: osilasiTurun && !falseDeclineNaik
     };
   }
@@ -806,7 +893,12 @@
    * lama yang tidak boleh kembali — tapi ambang keras RMSE-lah yang menggagalkan.
    */
   function bandingkanKalibrasi(hasilTanpa, hasilKal) {
-    var EPS = 1e-9;
+    // WAVE 3: klaim "RMSE turun" kini wajib melewati ambang PRAKTIS.itemBiasRMSE
+    // (dulu EPS=1e-9): penurunan RMSE di bawah 0.02 pada skala kesulitan 1..6
+    // menggeser successProbability < 1pp — kalibrasi yang cuma segitu tidak
+    // membayar kompleksitasnya. Kalau gate ini jadi FAIL, itu temuan, bukan bug
+    // harness. Ambang shrinkage 0.6 TETAP memakai toleransi float 1e-9 — itu
+    // batas KONTRAK C1 yang eksak, bukan perbandingan efek.
     function rata(rows, ambil) {
       var s = 0, n = 0;
       for (var i = 0; i < rows.length; i++) { var v = ambil(rows[i]); if (v != null && isFinite(v)) { s += v; n++; } }
@@ -818,12 +910,13 @@
     for (var i = 0; i < hasilKal.length; i++) if (hasilKal[i].maxAbsDelta > maxDelta) maxDelta = hasilKal[i].maxAbsDelta;
     // terukur = dua-duanya punya item n>=8; tanpa itu klaim penurunan tidak berdasar.
     var terukur = rmseTanpa != null && rmseKal != null;
-    var turun = terukur && rmseKal < rmseTanpa - EPS;
+    var turun = terukur && rmseKal < rmseTanpa - PRAKTIS.itemBiasRMSE;
     var bocor = maxDelta > 0.6 + 1e-9;
     return {
       itemBiasRMSE: {
         tanpaKalibrasi: rmseTanpa == null ? null : round(rmseTanpa, 4),
         kalibrasi: rmseKal == null ? null : round(rmseKal, 4),
+        praktis: PRAKTIS.itemBiasRMSE,
         terukur: terukur,
         turun: turun
       },
@@ -876,6 +969,388 @@
       perbandingan: bandingkan(v1, v2Lama),
       perbandinganResidual: residualTersedia ? bandingkanResidual(v2Lama, v2Residual) : null,
       perbandinganKalibrasi: kalibrasiTersedia ? bandingkanKalibrasi(v3Tanpa, v3Kal) : null
+    };
+  }
+
+  // ===================================================================================
+  // 5b. WAVE 3 — MULTI-SEED + CENSORING + CI BOOTSTRAP ANTAR-SEED
+  // ===================================================================================
+  /** FNV-1a 32-bit atas string — digest murah untuk membandingkan unit multi-seed
+   *  tanpa menyimpan (apalagi mencetak) seluruh run mentah ke stdout. */
+  function fnv1a(str) {
+    var h = 0x811C9DC5;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+    }
+    return ('0000000' + h.toString(16)).slice(-8);
+  }
+
+  /**
+   * Profil populasi untuk satu seed: 3 profil ASLI apa adanya (referensi objek yang
+   * sama — gate lama tetap mengukur hal yang sama) + PROFIL_TURUNAN profil turunan
+   * dengan jitter deterministik dari seed. Konsumsi RNG per turunan KONSTAN (lima
+   * tarikan, dipakai atau tidak) supaya menambah parameter di masa depan tidak
+   * menggeser turunan lain — determinisme struktural, pola yang sama dengan
+   * buatBankItem. Jitter dijepit ke rentang waras supaya murid tetap plausibel:
+   * theta ±0.4, laju ±25%, redaman ±30%, drift ±0.02/hari, slip ±3pp.
+   */
+  function buatProfilMultiSeed(seed) {
+    var rng = mulberry32(((seed >>> 0) ^ 0x2545F491) >>> 0);
+    var profs = PROFILES.slice(); // 3 asli, TIDAK disalin-ubah — identitas dipertahankan
+    for (var v = 0; v < PROFIL_TURUNAN; v++) {
+      var basis = PROFILES[v % PROFILES.length];
+      var dTheta = (rng() * 2 - 1) * 0.4;
+      var fLaju = 1 + (rng() * 2 - 1) * 0.25;
+      var fRedam = 1 + (rng() * 2 - 1) * 0.30;
+      var dDrift = (rng() * 2 - 1) * 0.02;
+      var dSlip = (rng() * 2 - 1) * 0.03;
+      var thetaAwal = {};
+      for (var f = 0; f < FAMILIES.length; f++) {
+        thetaAwal[FAMILIES[f]] = round(clamp(basis.thetaAwal[FAMILIES[f]] + dTheta, 0.4, 4.5), 4);
+      }
+      profs.push({
+        id: basis.id + '_var' + (v + 1),
+        thetaAwal: thetaAwal,
+        lajuBelajar: round(clamp(basis.lajuBelajar * fLaju, 0.01, 0.2), 5),
+        redaman: round(clamp(basis.redaman * fRedam, 5, 200), 3),
+        driftHarian: round(clamp(basis.driftHarian + dDrift, -0.08, 0.05), 5),
+        slip: round(clamp(basis.slip + dSlip, 0.02, 0.2), 5)
+      });
+    }
+    return profs;
+  }
+
+  /** Seed turunan deterministik: seed dasar + i·konstanta-emas (Weyl sequence 32-bit)
+   *  — tersebar merata, tanpa tabrakan untuk jumlah kecil, dan reproducible. */
+  function turunkanSeeds(seedDasar, jumlah) {
+    var seeds = [];
+    for (var i = 0; i < jumlah; i++) seeds.push((((seedDasar >>> 0) + Math.imul(i + 1, 0x9E3779B1)) >>> 0));
+    return seeds;
+  }
+
+  /**
+   * Satu UNIT multi-seed = semua varian pada satu seed turunan. Pairing dijaga
+   * dengan derivasi seedProfil yang SAMA dengan jalankanSuite — tiap varian melihat
+   * murid laten identik per (seed, profil). Varian bank Fase 3 hanya pada
+   * PROFIL_BANK profil pertama (= 3 profil asli) demi runtime; lihat komentar
+   * konfigurasi di atas.
+   */
+  function jalankanUnitSeed(seedUnit, dukungan) {
+    var profs = buatProfilMultiSeed(seedUnit);
+    var bank = buatBankItem(seedUnit);
+    var runs = {
+      v1: [], v2Lama: [], v2Residual: dukungan.residual ? [] : null,
+      v3TanpaKalibrasi: [], v3Kalibrasi: dukungan.kalibrasi ? [] : null
+    };
+    for (var p = 0; p < profs.length; p++) {
+      var seedProfil = (seedUnit * 1000003 + p * 7919) >>> 0;
+      runs.v1.push(jalankanRun(profs[p], 'v1', seedProfil));
+      runs.v2Lama.push(jalankanRun(profs[p], 'v2_lama', seedProfil));
+      if (dukungan.residual) runs.v2Residual.push(jalankanRun(profs[p], 'v2_residual', seedProfil));
+      if (p < PROFIL_BANK) {
+        runs.v3TanpaKalibrasi.push(jalankanRun(profs[p], 'v3_tanpa_kalibrasi', seedProfil, { bank: bank, kalibrasi: false, kirimPredicted: dukungan.residual }));
+        if (dukungan.kalibrasi) runs.v3Kalibrasi.push(jalankanRun(profs[p], 'v3_kalibrasi', seedProfil, { bank: bank, kalibrasi: true, kirimPredicted: dukungan.residual }));
+      }
+    }
+    return { seed: seedUnit, profilIds: profs.map(function (pr) { return pr.id; }), runs: runs };
+  }
+
+  /**
+   * Ringkasan censoring per varian di seluruh unit:
+   *   - censoredRuns/totalRuns: proporsi run tersensor;
+   *   - seedsTanpaMastery: seed di mana varian TIDAK PERNAH mastery di profil mana
+   *     pun — dasar gate FAIL MUTLAK kontrak tugas ("tak pernah mastery di
+   *     mayoritas seed"): kebijakan yang tak bisa mengantar SATU murid pun ke
+   *     mastery pada mayoritas dunia bukan kebijakan, itu kerusakan.
+   */
+  function ringkasCensoring(units, kunci) {
+    var totalRuns = 0, censoredRuns = 0, seedsTanpaMastery = 0, seedCount = 0;
+    for (var u = 0; u < units.length; u++) {
+      var rows = units[u].runs[kunci];
+      if (!rows) continue;
+      seedCount++;
+      var adaMastery = false;
+      for (var i = 0; i < rows.length; i++) {
+        totalRuns++;
+        if (rows[i].censored) censoredRuns++; else adaMastery = true;
+      }
+      if (!adaMastery) seedsTanpaMastery++;
+    }
+    return {
+      variant: kunci,
+      seedCount: seedCount,
+      totalRuns: totalRuns,
+      censoredRuns: censoredRuns,
+      censoredRate: totalRuns ? round(censoredRuns / totalRuns, 4) : null,
+      seedsTanpaMastery: seedsTanpaMastery,
+      tanpaMasteryMayoritas: seedCount > 0 && seedsTanpaMastery > seedCount / 2
+    };
+  }
+
+  /**
+   * CI bootstrap berpasangan untuk SATU metrik antara dua varian yang urutan
+   * run-nya sejajar (unit & profil sama). saring(r) true → pasangan dibuang
+   * (dipakai untuk mengecualikan pasangan tersensor dari timeToMastery — kontrak
+   * censoring butir (c)). Verdict tiga-nilai dari CI 95% + ambang praktis:
+   *   kandidat_lebih_buruk : CI seluruhnya di sisi buruk DAN |meanDiff| > praktis;
+   *   kandidat_lebih_baik  : cermin sebaliknya;
+   *   inconclusive/setara  : selain itu — interval masih memeluk nol ATAU efeknya
+   *                          nyata secara statistik tapi remeh secara praktis.
+   */
+  function ciBerpasangan(runsBase, runsCand, spek, seedCI) {
+    var pairs = [];
+    var dibuang = 0;
+    var nMin = Math.min(runsBase.length, runsCand.length);
+    for (var i = 0; i < nMin; i++) {
+      if (spek.saring && (spek.saring(runsBase[i]) || spek.saring(runsCand[i]))) { dibuang++; continue; }
+      var a = spek.ambil(runsBase[i]);
+      var b = spek.ambil(runsCand[i]);
+      if (typeof a === 'number' && isFinite(a) && typeof b === 'number' && isFinite(b)) pairs.push([a, b]);
+    }
+    var boot = statGate.pairedBootstrap(pairs, BOOT_ITERS, seedCI);
+    var row = {
+      metric: spek.nama,
+      arahLebihBaik: spek.arah,
+      praktis: spek.praktis,
+      nPasangan: pairs.length,
+      dikecualikanCensor: dibuang,
+      ciSeed: seedCI
+    };
+    if (!boot || boot.insufficient) {
+      row.insufficient = true;
+      row.verdict = 'insufficient';
+      return row;
+    }
+    row.meanBase = round(rataDari(pairs, 0), 4);
+    row.meanKandidat = round(rataDari(pairs, 1), 4);
+    row.meanDiff = round(boot.meanDiff, 4);
+    row.ciLo = round(boot.ciLo, 4);
+    row.ciHi = round(boot.ciHi, 4);
+    var burukSig, baikSig;
+    if (spek.arah === 'turun') { // diff = kandidat - base; positif = kandidat lebih buruk
+      burukSig = boot.ciLo > 0 && boot.meanDiff > spek.praktis;
+      baikSig = boot.ciHi < 0 && boot.meanDiff < -spek.praktis;
+    } else {
+      burukSig = boot.ciHi < 0 && boot.meanDiff < -spek.praktis;
+      baikSig = boot.ciLo > 0 && boot.meanDiff > spek.praktis;
+    }
+    row.verdict = burukSig ? 'kandidat_lebih_buruk' : baikSig ? 'kandidat_lebih_baik' : 'inconclusive';
+    return row;
+  }
+
+  function rataDari(pairs, idx) {
+    var s = 0;
+    for (var i = 0; i < pairs.length; i++) s += pairs[i][idx];
+    return pairs.length ? s / pairs.length : 0;
+  }
+
+  /**
+   * Gate censoring multi-seed (kontrak tugas butir (c)):
+   *   MUTLAK  : varian mana pun yang tak pernah mastery pada MAYORITAS seed → FAIL.
+   *   RELATIF : per pasangan (baseline→kandidat), CI bootstrap selisih indikator
+   *             censoring; bila batas BAWAH CI > PRAKTIS.censoringRate, kandidat
+   *             TERBUKTI menyensor lebih sering melebihi margin → FAIL. Diperiksa
+   *             lewat CI, bukan selisih titik — konsisten dengan filosofi stat gate.
+   */
+  function gateCensoringMulti(ringkasan, ciRelatif) {
+    var alasan = [];
+    for (var i = 0; i < ringkasan.length; i++) {
+      if (ringkasan[i].tanpaMasteryMayoritas) {
+        alasan.push('varian ' + ringkasan[i].variant + ' tak pernah mastery pada ' + ringkasan[i].seedsTanpaMastery + '/' + ringkasan[i].seedCount + ' seed (mayoritas)');
+      }
+    }
+    var mutlakFail = alasan.length > 0;
+    for (var j = 0; j < ciRelatif.length; j++) {
+      var r = ciRelatif[j];
+      if (!r.insufficient && typeof r.ciLo === 'number' && r.ciLo > PRAKTIS.censoringRate) {
+        alasan.push('pasangan ' + r.pair + ': kandidat tersensor lebih sering secara signifikan (rate ' + r.meanBase + ' \u2192 ' + r.meanKandidat + ', CI selisih [' + r.ciLo + ', ' + r.ciHi + '] > margin ' + PRAKTIS.censoringRate + ')');
+      }
+    }
+    return {
+      pass: alasan.length === 0,
+      mutlakFail: mutlakFail,
+      alasan: alasan,
+      rationale: alasan.length === 0 ? 'brain3_sim_censoring_ok' : (mutlakFail ? 'brain3_sim_censoring_absolute' : 'brain3_sim_censoring_excess'),
+      confidence: alasan.length === 0 ? 0.9 : 0.95
+    };
+  }
+
+  /** Agregat multi-seed per varian — timeToMastery HANYA dari run tak-tersensor
+   *  (kontrak censoring butir (c): tersensor dikeluarkan dari rata-rata). */
+  function agregatMultiSeed(units, kunci) {
+    var rows = [];
+    for (var u = 0; u < units.length; u++) if (units[u].runs[kunci]) rows.push.apply(rows, units[u].runs[kunci]);
+    if (!rows.length) return null;
+    function rata(ambil) {
+      var s = 0, n = 0;
+      for (var i = 0; i < rows.length; i++) { var v = ambil(rows[i]); if (typeof v === 'number' && isFinite(v)) { s += v; n++; } }
+      return n ? round(s / n, 4) : null;
+    }
+    var ttmSum = 0, ttmN = 0, cen = 0;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].censored) { cen++; continue; }
+      ttmSum += rows[i].timeToMasteryDays; ttmN++;
+    }
+    return {
+      variant: kunci,
+      runs: rows.length,
+      timeToMasteryDaysUncensoredMean: ttmN ? round(ttmSum / ttmN, 4) : null,
+      uncensoredRuns: ttmN,
+      censoredRuns: cen,
+      accuracyGapVsTarget: rata(function (r) { return r.accuracyGapVsTarget; }),
+      difficultyOscillationPer10: rata(function (r) { return r.difficultyOscillationPer10; }),
+      retentionDay90: rata(function (r) { return r.retentionDay90; }),
+      brier: rata(function (r) { return r.brier; }),
+      falseDeclineRate: rata(function (r) { return r.falseDeclineRate; }),
+      itemBiasRMSE: rata(function (r) { return r.itemBiasRMSE; })
+    };
+  }
+
+  /**
+   * Suite multi-seed penuh: SEED_COUNT unit + ringkasan censoring + CI bootstrap per
+   * metrik per pasangan varian + verdict gate. Output TIDAK memuat run mentah
+   * (50×9×5 run akan membengkakkan stdout dan mempersulit diff CI) — hanya digest
+   * FNV-1a per unit, ringkasan, dan CI; determinisme tetap terjaga karena digest
+   * berubah bila SATU byte run mentah berubah.
+   */
+  function jalankanMultiSeed(seedDasar, dukungan, jumlahSeed) {
+    var n = (typeof jumlahSeed === 'number' && jumlahSeed >= 2) ? Math.floor(jumlahSeed) : SEED_COUNT;
+    var seeds = turunkanSeeds(seedDasar, n);
+    var units = [];
+    for (var i = 0; i < seeds.length; i++) units.push(jalankanUnitSeed(seeds[i], dukungan));
+
+    function gabung(kunci) {
+      var all = [];
+      for (var u = 0; u < units.length; u++) if (units[u].runs[kunci]) all.push.apply(all, units[u].runs[kunci]);
+      return all;
+    }
+    var v1 = gabung('v1');
+    var v2 = gabung('v2Lama');
+    var v2r = dukungan.residual ? gabung('v2Residual') : null;
+    var v3t = gabung('v3TanpaKalibrasi');
+    var v3k = dukungan.kalibrasi ? gabung('v3Kalibrasi') : null;
+
+    function seedCI(idx) { return (((seedDasar >>> 0) ^ Math.imul(idx + 17, 0x85EBCA6B)) >>> 0); }
+    var saringCensor = function (r) { return !!r.censored; };
+    var ambilCensor = function (r) { return r.censored ? 1 : 0; };
+
+    // --- pasangan utama v1 → v2_lama: lima metrik inti + indikator censoring ---
+    var metrikUtama = [
+      ciBerpasangan(v1, v2, { nama: 'timeToMasteryDays', arah: 'turun', praktis: PRAKTIS.timeToMasteryDays, ambil: function (r) { return r.timeToMasteryDays; }, saring: saringCensor }, seedCI(0)),
+      ciBerpasangan(v1, v2, { nama: 'accuracyGapVsTarget', arah: 'turun', praktis: PRAKTIS.accuracyGapVsTarget, ambil: function (r) { return r.accuracyGapVsTarget; } }, seedCI(1)),
+      ciBerpasangan(v1, v2, { nama: 'difficultyOscillationPer10', arah: 'turun', praktis: PRAKTIS.difficultyOscillationPer10, ambil: function (r) { return r.difficultyOscillationPer10; } }, seedCI(2)),
+      ciBerpasangan(v1, v2, { nama: 'retentionDay90', arah: 'naik', praktis: PRAKTIS.retentionDay90, ambil: function (r) { return r.retentionDay90; } }, seedCI(3)),
+      ciBerpasangan(v1, v2, { nama: 'brier', arah: 'turun', praktis: PRAKTIS.brier, ambil: function (r) { return r.brier; } }, seedCI(4))
+    ];
+    var burukUtama = 0;
+    for (var mu = 0; mu < metrikUtama.length; mu++) if (metrikUtama[mu].verdict === 'kandidat_lebih_buruk') burukUtama++;
+
+    var censorUtama = ciBerpasangan(v1, v2, { nama: 'censoredRate', arah: 'turun', praktis: PRAKTIS.censoringRate, ambil: ambilCensor }, seedCI(5));
+    censorUtama.pair = 'v1\u2192v2_lama';
+
+    // --- pasangan residual v2_lama → v2_residual ---
+    var metrikResidual = null, censorResidual = null;
+    if (dukungan.residual) {
+      metrikResidual = [
+        ciBerpasangan(v2, v2r, { nama: 'difficultyOscillationPer10', arah: 'turun', praktis: PRAKTIS.difficultyOscillationPer10, ambil: function (r) { return r.difficultyOscillationPer10; } }, seedCI(6)),
+        ciBerpasangan(v2, v2r, { nama: 'falseDeclineRate', arah: 'turun', praktis: PRAKTIS.falseDeclineRate, ambil: function (r) { return r.falseDeclineRate; } }, seedCI(7))
+      ];
+      censorResidual = ciBerpasangan(v2, v2r, { nama: 'censoredRate', arah: 'turun', praktis: PRAKTIS.censoringRate, ambil: ambilCensor }, seedCI(8));
+      censorResidual.pair = 'v2_lama\u2192v2_residual';
+    }
+
+    // --- pasangan kalibrasi v3_tanpa → v3_kalibrasi ---
+    var metrikKalibrasi = null, shrinkageMulti = null;
+    if (dukungan.kalibrasi) {
+      metrikKalibrasi = [
+        ciBerpasangan(v3t, v3k, { nama: 'itemBiasRMSE', arah: 'turun', praktis: PRAKTIS.itemBiasRMSE, ambil: function (r) { return r.itemBiasRMSE; } }, seedCI(9)),
+        ciBerpasangan(v3t, v3k, { nama: 'brier', arah: 'turun', praktis: PRAKTIS.brier, ambil: function (r) { return r.brier; } }, seedCI(10)),
+        ciBerpasangan(v3t, v3k, { nama: 'poolSeparationPct', arah: 'naik', praktis: PRAKTIS.poolSeparationPct, ambil: function (r) { return r.poolSeparationPct; } }, seedCI(11))
+      ];
+      var maxDeltaMulti = 0;
+      for (var vk = 0; vk < v3k.length; vk++) if (v3k[vk].maxAbsDelta > maxDeltaMulti) maxDeltaMulti = v3k[vk].maxAbsDelta;
+      shrinkageMulti = { maxAbsDelta: round(maxDeltaMulti, 4), batas: 0.6, bocor: maxDeltaMulti > 0.6 + 1e-9 };
+    }
+
+    // --- censoring: ringkasan per varian + gate ---
+    var kunciAktif = ['v1', 'v2Lama'];
+    if (dukungan.residual) kunciAktif.push('v2Residual');
+    kunciAktif.push('v3TanpaKalibrasi');
+    if (dukungan.kalibrasi) kunciAktif.push('v3Kalibrasi');
+    var censoringPerVarian = [];
+    for (var kv = 0; kv < kunciAktif.length; kv++) censoringPerVarian.push(ringkasCensoring(units, kunciAktif[kv]));
+    var ciCensor = [censorUtama];
+    if (censorResidual) ciCensor.push(censorResidual);
+    var gateCensor = gateCensoringMulti(censoringPerVarian, ciCensor);
+
+    var agregat = [];
+    for (var ka = 0; ka < kunciAktif.length; ka++) agregat.push(agregatMultiSeed(units, kunciAktif[ka]));
+
+    // Digest per unit (determinisme): berubah bila satu angka run mentah berubah.
+    var unitDigests = [];
+    for (var ud = 0; ud < units.length; ud++) unitDigests.push(fnv1a(JSON.stringify(units[ud])));
+
+    return {
+      seedDasar: seedDasar,
+      seedCount: seeds.length,
+      seeds: { pertama: seeds[0], terakhir: seeds[seeds.length - 1] },
+      profilesPerSeed: PROFILES.length + PROFIL_TURUNAN,
+      profilBankPerSeed: PROFIL_BANK,
+      bootstrapIters: BOOT_ITERS,
+      praktis: PRAKTIS,
+      runsPerVariant: { v1: v1.length, v2Lama: v2.length, v2Residual: v2r ? v2r.length : null, v3TanpaKalibrasi: v3t.length, v3Kalibrasi: v3k ? v3k.length : null },
+      aggregates: agregat,
+      censoring: { perVariant: censoringPerVarian, ciRelatif: ciCensor, gate: gateCensor },
+      utama: { pair: 'v1\u2192v2_lama', metrics: metrikUtama, kandidatBurukPada: burukUtama, totalMetrik: metrikUtama.length, mayoritasBuruk: burukUtama > metrikUtama.length / 2 },
+      residual: metrikResidual ? { pair: 'v2_lama\u2192v2_residual', metrics: metrikResidual } : null,
+      kalibrasi: metrikKalibrasi ? { pair: 'v3_tanpa\u2192v3_kalibrasi', metrics: metrikKalibrasi, shrinkage: shrinkageMulti } : null,
+      unitDigests: unitDigests,
+      digest: fnv1a(unitDigests.join('|'))
+    };
+  }
+
+  /**
+   * Verdict multi-seed — status per gate, pola tiga-status yang sama dengan Fase 2/3:
+   *   utama     : FAIL bila v2_lama TERBUKTI lebih buruk dari v1 (CI + praktis) pada
+   *               mayoritas metrik inti.
+   *   censoring : lihat gateCensoringMulti — FAIL mutlak/relatif.
+   *   residual  : SKIPPED tanpa dukungan; FAIL bila osilasi TIDAK terbukti membaik
+   *               (klaim keberadaan fitur, konsisten gate single-seed) ATAU
+   *               false-decline terbukti memburuk.
+   *   kalibrasi : SKIPPED tanpa modul; FAIL bila RMSE TIDAK terbukti turun melewati
+   *               ambang praktis ATAU shrinkage bocor di run mana pun.
+   */
+  function nilaiMultiSeed(ms, dukungan) {
+    var utamaStatus = ms.utama.mayoritasBuruk ? 'FAIL' : 'PASS';
+    var censoringStatus = ms.censoring.gate.pass ? 'PASS' : 'FAIL';
+    var residualStatus, kalibrasiStatus;
+    if (!dukungan.residual) residualStatus = 'SKIPPED';
+    else {
+      var osc = ms.residual.metrics[0], fd = ms.residual.metrics[1];
+      residualStatus = (osc.verdict === 'kandidat_lebih_baik' && fd.verdict !== 'kandidat_lebih_buruk') ? 'PASS' : 'FAIL';
+    }
+    if (!dukungan.kalibrasi) kalibrasiStatus = 'SKIPPED';
+    else {
+      var rmse = ms.kalibrasi.metrics[0];
+      kalibrasiStatus = (rmse.verdict === 'kandidat_lebih_baik' && !ms.kalibrasi.shrinkage.bocor) ? 'PASS' : 'FAIL';
+    }
+    var pass = utamaStatus !== 'FAIL' && censoringStatus !== 'FAIL' && residualStatus !== 'FAIL' && kalibrasiStatus !== 'FAIL';
+    var rationale = censoringStatus === 'FAIL' ? ms.censoring.gate.rationale
+      : utamaStatus === 'FAIL' ? 'brain3_sim_multiseed_v2_regression'
+        : residualStatus === 'FAIL' ? 'brain3_sim_multiseed_residual_no_improvement'
+          : kalibrasiStatus === 'FAIL' ? (ms.kalibrasi.shrinkage.bocor ? 'brain3_sim_multiseed_kalibrasi_shrinkage_leak' : 'brain3_sim_multiseed_kalibrasi_no_improvement')
+            : 'brain3_sim_multiseed_pass';
+    return {
+      pass: pass,
+      utama: utamaStatus,
+      censoring: censoringStatus,
+      residual: residualStatus,
+      kalibrasi: kalibrasiStatus,
+      rationale: rationale,
+      confidence: round((pass ? 0.9 : 0.95)
+        * (residualStatus === 'SKIPPED' ? 0.6 : 1)
+        * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1), 3)
     };
   }
 
@@ -960,6 +1435,24 @@
     var runB = jalankanSuite(seed);
     var deterministik = JSON.stringify(runA) === JSON.stringify(runB);
 
+    // WAVE 3 — suite multi-seed di atas suite single-seed. Dukungan fitur diambil
+    // dari deteksi runA (deteksi yang sama, bukan diulang — satu sumber kebenaran).
+    var dukungan = { residual: runA.residualSupported, kalibrasi: runA.calibrationSupported };
+    var t0Multi = Date.now(); // HANYA untuk log stderr; tidak pernah masuk stdout
+    var multi = jalankanMultiSeed(seed, dukungan);
+    // Determinisme multi-seed: menjalankan seluruh 50 unit dua kali menggandakan
+    // runtime tanpa menambah daya deteksi berarti — sumber keacakan liar akan
+    // muncul di unit MANA PUN. Spot-check: unit pertama dan terakhir dihitung
+    // ulang dan digest-nya wajib identik dengan yang tercatat; ditambah gate
+    // eksternal di adaptivity-simulation-v3-hardened-test.js yang menjalankan
+    // CLI ini dua kali penuh dan menuntut stdout byte-identik.
+    var seedsUlang = turunkanSeeds(seed, multi.seedCount);
+    var deterministikMulti =
+      fnv1a(JSON.stringify(jalankanUnitSeed(seedsUlang[0], dukungan))) === multi.unitDigests[0] &&
+      fnv1a(JSON.stringify(jalankanUnitSeed(seedsUlang[seedsUlang.length - 1], dukungan))) === multi.unitDigests[multi.unitDigests.length - 1];
+    var msMulti = Date.now() - t0Multi;
+    var multiVerdict = nilaiMultiSeed(multi, dukungan);
+
     var cmp = runA.perbandingan;
     var resGate = runA.perbandinganResidual; // null bila dukungan residual belum ada
 
@@ -1001,7 +1494,8 @@
       kalibrasiMessage = 'Kalibrasi item gagal membuktikan nilainya: ' + alasanKal.join('; ') + '.';
     }
 
-    var lulus = deterministik && !cmp.v2KalahMayoritas && residualStatus !== 'FAIL' && kalibrasiStatus !== 'FAIL';
+    var lulus = deterministik && deterministikMulti && !cmp.v2KalahMayoritas
+      && residualStatus !== 'FAIL' && kalibrasiStatus !== 'FAIL' && multiVerdict.pass;
 
     var ringkasan = {
       schema: SCHEMA,
@@ -1010,6 +1504,7 @@
       retentionEvaluatedAtDay: RETENTION_DAY,
       profiles: PROFILES.map(function (p) { return p.id; }),
       deterministic: deterministik,
+      deterministicMultiSeed: deterministikMulti,
       residualSupported: runA.residualSupported,
       calibrationSupported: runA.calibrationSupported,
       bank: runA.bank,
@@ -1029,23 +1524,34 @@
         detail: kalGate,
         message: kalibrasiMessage
       },
+      // WAVE 3 — blok multi-seed: ringkasan + CI + gate. Run mentah TIDAK dicetak
+      // (hanya digest) supaya stdout tetap bisa di-diff manusia; lihat jalankanMultiSeed.
+      multiSeed: multi,
+      multiSeedGate: multiVerdict,
       gate: {
         pass: lulus,
-        rationale: !deterministik ? 'brain3_sim_nondeterministic'
+        rationale: (!deterministik || !deterministikMulti) ? 'brain3_sim_nondeterministic'
           : cmp.v2KalahMayoritas ? 'brain3_sim_v2_regression'
             : residualStatus === 'FAIL' ? 'brain3_sim_residual_no_improvement'
               : kalibrasiStatus === 'FAIL' ? (kalGate.shrinkage.bocor ? 'brain3_sim_kalibrasi_shrinkage_leak' : 'brain3_sim_kalibrasi_no_improvement')
-                : 'brain3_sim_pass_residual_' + residualStatus.toLowerCase() + '_kalibrasi_' + kalibrasiStatus.toLowerCase(),
+                : !multiVerdict.pass ? multiVerdict.rationale
+                  : 'brain3_sim_pass_residual_' + residualStatus.toLowerCase() + '_kalibrasi_' + kalibrasiStatus.toLowerCase(),
         confidence: round((1 - cmp.v2KalahPada / cmp.totalMetrik)
           * (residualStatus === 'SKIPPED' ? 0.6 : 1)
-          * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1), 3)
+          * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1)
+          * (multiVerdict.pass ? 1 : 0.5), 3)
       }
     };
 
     // stdout HANYA JSON (supaya byte-identik gampang di-diff oleh CI); narasi ke stderr.
     process.stdout.write(JSON.stringify(ringkasan, null, 2) + '\n');
+    process.stderr.write('runtime multi-seed: ' + multi.seedCount + ' seed x ' + multi.profilesPerSeed + ' profil (+' + multi.profilBankPerSeed + ' profil bank) selesai dalam ' + msMulti + ' ms\n');
     if (!deterministik) {
       process.stderr.write('GAGAL: dua run dengan seed sama menghasilkan output berbeda.\n');
+      return 2;
+    }
+    if (!deterministikMulti) {
+      process.stderr.write('GAGAL: unit multi-seed dihitung ulang menghasilkan digest berbeda (non-determinisme).\n');
       return 2;
     }
     if (cmp.v2KalahMayoritas) {
@@ -1066,13 +1572,27 @@
     if (kalibrasiStatus === 'SKIPPED') {
       process.stderr.write('SKIPPED (gate kalibrasi): ' + kalibrasiMessage + '\n');
     }
-    process.stderr.write('AdaptivitySimulationV3: PASS (v2 kalah pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik; gate residual ' + residualStatus + '; gate kalibrasi ' + kalibrasiStatus + ')\n');
+    // WAVE 3 — gate multi-seed diperiksa TERAKHIR: gate single-seed lama tetap
+    // memutus lebih dulu (perilaku fase 3 dipertahankan), multi-seed menambah
+    // syarat, tidak menggantikan.
+    if (!multiVerdict.pass) {
+      var pesanMulti = 'GAGAL (gate multi-seed, ' + multiVerdict.rationale + '): utama=' + multiVerdict.utama + ' censoring=' + multiVerdict.censoring + ' residual=' + multiVerdict.residual + ' kalibrasi=' + multiVerdict.kalibrasi;
+      if (multi.censoring.gate.alasan.length) pesanMulti += ' — ' + multi.censoring.gate.alasan.join('; ');
+      process.stderr.write(pesanMulti + '\n');
+      process.stderr.write('AdaptivitySimulationV3: FAIL (multi-seed — temuan jujur, lihat field multiSeed di JSON)\n');
+      return 1;
+    }
+    process.stderr.write('AdaptivitySimulationV3: PASS (v2 kalah pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik; gate residual ' + residualStatus + '; gate kalibrasi ' + kalibrasiStatus + '; gate multi-seed PASS pada ' + multi.seedCount + ' seed)\n');
     return 0;
   }
 
   var api = {
     schema: SCHEMA,
     PROFILES: PROFILES,
+    PRAKTIS: PRAKTIS,
+    SEED_COUNT: SEED_COUNT,
+    PROFIL_TURUNAN: PROFIL_TURUNAN,
+    PROFIL_BANK: PROFIL_BANK,
     mulberry32: mulberry32,
     buatMurid: buatMurid,
     jawab: jawab,
@@ -1089,6 +1609,18 @@
     hitungPoolSeparation: hitungPoolSeparation,
     tabelMetrik: tabelMetrik,
     tabelKalibrasi: tabelKalibrasi,
+    // WAVE 3 — permukaan multi-seed (diekspor supaya test gate bisa menguji tiap
+    // bagian dengan data sintetis tanpa menjalankan 50 seed penuh).
+    fnv1a: fnv1a,
+    buatProfilMultiSeed: buatProfilMultiSeed,
+    turunkanSeeds: turunkanSeeds,
+    jalankanUnitSeed: jalankanUnitSeed,
+    ringkasCensoring: ringkasCensoring,
+    ciBerpasangan: ciBerpasangan,
+    gateCensoringMulti: gateCensoringMulti,
+    agregatMultiSeed: agregatMultiSeed,
+    jalankanMultiSeed: jalankanMultiSeed,
+    nilaiMultiSeed: nilaiMultiSeed,
     main: main
   };
 
