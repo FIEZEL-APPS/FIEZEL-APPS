@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-edge-proxy-contract-report-v1",
-  "generatedAt": "2026-08-27T16:55:42.579Z",
+  "generatedAt": "2026-08-27T18:59:12.757Z",
   "pass": true,
   "scope": "deploy/edge/api-index.php dipindai sebagai TEKS (tidak ada PHP di runner CI)",
   "cacheDecision": {
@@ -359,7 +359,7 @@
     },
     {
       "ok": true,
-      "message": "(h) TIMEOUT_FAST_S untuk GET kecil >= 5 s dan lebih pendek dari jalur model, dapat 8"
+      "message": "(h) TIMEOUT_FAST_S untuk GET kecil >= 5 s dan lebih pendek dari jalur model, dapat 6"
     },
     {
       "ok": true,
@@ -375,7 +375,7 @@
     },
     {
       "ok": true,
-      "message": "(h) batas pendek HANYA dipakai jalur GET yang ada di allowlist: /health,/healthz,/api/config,/api/tts/manifest"
+      "message": "(h) batas pendek HANYA dipakai jalur GET yang ada di allowlist: /health,/healthz,/api/config,/api/tts/manifest,/api/user/me,/api/quota"
     },
     {
       "ok": true,

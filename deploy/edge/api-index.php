@@ -24,6 +24,71 @@
  *   berkas ini dan jembatan ini harus dihapus, bukan dibiarkan menua.
  *
  * ==========================================================================
+ * F4 — CACAT PRODUKSI: PERMINTAAN KE-3 MENGGANTUNG DI BROWSER
+ * ==========================================================================
+ * Gerbang E2E browser (`tools/fiezel-e2e-bridge.mjs`, skenario `bridge-hop-stable`)
+ * menembak `/api/quota` BERUNTUN dari SATU halaman pada SATU koneksi dan mengukur:
+ *
+ *     #1 200 1853ms | #2 200 943ms | #3 TIMEOUT 8002ms
+ *
+ * Reproducible dari halaman kosong, pada HTTP/2 MAUPUN HTTP/1.1, dan TIDAK terlihat
+ * oleh `curl` (curl membuka koneksi baru per proses dan tidak menganyam beberapa
+ * permintaan di atas satu koneksi keep-alive). Artinya aplikasi murid yang menembak
+ * `/api/config` -> `/api/user/me` -> `/api/quota` berurutan MENGGANTUNG di panggilan
+ * ketiga. Itu pemblokir rollout.
+ *
+ * Yang BISA dinilai dari kode ini, dan sudah ditutup di bawah — masing-masing dengan
+ * penanda `[F4-n]` supaya bisa ditelusuri:
+ *
+ *  [F4-1] SESI PHP. Berkas ini tidak pernah memanggil `session_start()`, TETAPI
+ *         `session.auto_start=1` di php.ini/`.user.ini` origin akan memulai sesi
+ *         SEBELUM baris pertama berkas ini berjalan. Sesi berarti LOCK berkas per
+ *         cookie: permintaan kedua dari cookie yang sama menunggu yang pertama
+ *         melepas lock, dan permintaan ketiga menunggu dua-duanya => tepat pola
+ *         "dua lolos, yang ketiga menggantung". Karena itu sesi ditutup TANPA SYARAT
+ *         di baris pertama eksekusi, dan gerbang menuntut ketiadaan
+ *         `session_start()` tanpa `session_write_close()`.
+ *  [F4-2] BATAS KESABARAN vs BATAS BROWSER. `/api/user/me` dan `/api/quota` dulu
+ *         memakai `TIMEOUT_S` = 25 s, sedangkan browser menyerah pada 8 s. Jadi
+ *         upstream yang lambat MENJADI gantungan: murid tidak pernah melihat galat,
+ *         hanya layar menunggu. Sekarang keduanya masuk `FAST_TIMEOUT_PATHS` dan
+ *         `TIMEOUT_FAST_S` diturunkan 8 -> 6 s: proxy WAJIB kalah lebih dulu dari
+ *         browser, supaya hasilnya 504 yang jujur, bukan gantungan.
+ *  [F4-3] HEADER HOP-BY-HOP. `Connection`, `Keep-Alive`, `Transfer-Encoding`, `TE`,
+ *         `Trailer`, `Upgrade`, `Proxy-*` milik SATU hop; meneruskannya melanggar
+ *         RFC 9110 §7.6.1 dan adalah cara paling langsung membuat browser menunggu
+ *         byte yang tidak akan datang di koneksi yang di-keep-alive. Sekarang ada
+ *         satu daftar `HOP_BY_HOP` yang dipakai DUA ARAH (lihat `hopByHop()`).
+ *  [F4-4] `Content-Length` UPSTREAM TIDAK PERNAH DITERUSKAN. Panjang yang dihitung
+ *         upstream tidak berlaku lagi begitu badan melewati hop ini (dekompresi,
+ *         buffer, gzip ulang oleh lapisan web). Content-Length yang lebih besar dari
+ *         byte yang benar-benar terkirim = browser menunggu sisa yang tidak ada
+ *         SAMPAI koneksinya mati — dan permintaan berikutnya di koneksi itu ikut
+ *         mati. Panjang badan HANYA boleh ditentukan lapisan web origin.
+ *  [F4-5] BADAN DITULIS SEKALI LALU DI-FLUSH, dan slot proses dilepas secepatnya.
+ *         Buffer keluaran nyasar dibuang di awal; badan di-`echo` sekali; lalu
+ *         `flush()` + `fastcgi_finish_request()` bila ada.
+ *  [F4-6] TCP FAST OPEN DIMATIKAN. Ia satu-satunya sakelar transport di berkas ini
+ *         yang bisa MENAMBAH detik (middlebox membuang SYN berisi data => pemulihan
+ *         lewat retransmit), dan ia satu-satunya yang perilakunya BERUBAH sesudah
+ *         beberapa koneksi (cookie TFO baru ada di kernel setelah koneksi pertama
+ *         berhasil) — persis bentuk "dua lolos, ketiga menggantung". Sampai gerbang
+ *         E2E browser hijau, ia mati.
+ *  [F4-7] PASS-THROUGH GZIP DIMATIKAN sementara (satu konstanta, kode tetap ada).
+ *         Badan gzip yang diteruskan mentah bergantung pada satu asumsi tentang
+ *         lapisan web origin (tidak meng-gzip ulang) yang TIDAK BISA dibuktikan dari
+ *         PHP. Kompresi ganda menghasilkan badan yang gagal di-dekode browser —
+ *         gejalanya menggantung, dan `curl` tanpa `Accept-Encoding: gzip` tidak
+ *         pernah melihatnya. Aman dulu, cepat belakangan.
+ *
+ * KEJUJURAN YANG WAJIB DIBACA: hipotesis 5 (batas proses PHP per pengguna cPanel,
+ * `LSAPI_CHILDREN`/entry process) TIDAK BISA dinilai maupun ditutup dari berkas ini.
+ * Ia hanya bisa dipersempit ([F4-5] melepas slot lebih cepat) dan diukur dari origin.
+ * Dan tidak satu pun perbaikan di atas boleh disebut "terbukti menutup cacat" sampai
+ * gerbang E2E browser dijalankan ULANG terhadap jembatan yang sudah diunggah
+ * (deploy/edge/README.md §5e). Analisis kode tidak pernah menutup cacat runtime.
+ *
+ * ==========================================================================
  * A7 — ANGGARAN LATENSI HOP INI (diukur, bukan ditebak)
  * ==========================================================================
  * Terukur pada `/health`: 2.214 ms dingin, lalu 847-1.163 ms hangat. `/healthz`
@@ -84,6 +149,22 @@
 
 declare(strict_types=1);
 
+// [F4-1] SESI: berkas ini tidak butuh sesi PHP sama sekali (nol state di origin), dan
+// TIDAK memanggil `session_start()`. Tetapi `session.auto_start=1` di php.ini atau
+// `.user.ini` origin memulai sesi sebelum baris ini, dan sesi berarti lock berkas per
+// cookie: permintaan berurutan dari cookie yang SAMA diseriakan, dan yang ketiga
+// menunggu dua-duanya. Karena itu lock dilepas TANPA SYARAT di sini, sebelum satu byte
+// jaringan disentuh. Tidak ada apa pun di bawah yang membacanya kembali.
+if (function_exists('session_status') && session_status() === PHP_SESSION_ACTIVE) {
+  session_write_close();
+}
+
+// [F4-5] Buffer keluaran nyasar (mis. `output_buffering=4096` bawaan hosting) dibuang
+// SEBELUM apa pun ditulis. Belum ada satu byte pun keluaran pada titik ini, jadi tidak
+// ada yang hilang — yang dihapus hanya kemungkinan badan tertahan di buffer sementara
+// browser menunggu di koneksi yang di-keep-alive.
+while (ob_get_level() > 0) { ob_end_clean(); }
+
 const UPSTREAM      = 'https://fiezel-api.fitrajft.workers.dev';
 const EDGE_SECRET   = '__EDGE_SECRET__';   // disuntik saat pemasangan; jangan pernah masuk repo
 const MAX_BODY      = 131072;              // 128 KB; cap byte sesungguhnya tetap ditegakkan Worker
@@ -92,13 +173,24 @@ const MAX_BODY      = 131072;              // 128 KB; cap byte sesungguhnya teta
 // tidak boleh berbagi batas kesabaran.
 //   TIMEOUT_S      : jalur lambat yang sah (`/api/ai/task`, `/api/tts/render`).
 //                    Model bisa berpikir belasan detik; memotongnya = jawaban hilang.
-//   TIMEOUT_FAST_S : GET JSON kecil. Terukur 847-2.214 ms end-to-end, jadi 8 s
-//                    adalah ~4x kali margin terhadap ekor terburuk yang pernah
-//                    terlihat. Kalau `/healthz` belum menjawab dalam 8 s, ia TIDAK
-//                    akan menjawab dengan berguna — dan membiarkan murid menunggu
-//                    25 s untuk kegagalan yang sudah pasti adalah kekejaman UX.
+//   TIMEOUT_FAST_S : GET JSON kecil. Terukur 847-2.214 ms end-to-end.
+//                    [F4-2] ANGKANYA 8 -> 6 s, dan alasannya bukan selera: gerbang
+//                    E2E browser (dan aplikasi murid) MENYERAH pada 8.000 ms. Batas
+//                    proxy yang SAMA DENGAN batas klien berarti klien selalu menyerah
+//                    lebih dulu, dan yang dilihat murid adalah GANTUNGAN, bukan galat.
+//                    6 s masih ~2,7x ekor terburuk terukur (2.214 ms) DAN meninggalkan
+//                    ~2 s margin supaya 504 dari hop ini sampai ke browser sebelum
+//                    browser berhenti mendengarkan. Aturannya: TIMEOUT_FAST_S harus
+//                    tetap < 8 s selama batas klien 8 s.
 const TIMEOUT_S      = 25;
-const TIMEOUT_FAST_S = 8;
+const TIMEOUT_FAST_S = 6;
+
+// [F4-2] Batas kesabaran klien yang dilawan angka di atas, ditulis sebagai konstanta
+// supaya hubungan keduanya tidak hanya hidup di dalam komentar. SUMBER: `HOP_TIMEOUT`
+// di `tools/fiezel-e2e-bridge.mjs`. Kalau angka di sana berubah, angka ini ikut, dan
+// `edge-proxy-hopbyhop-test.js` butir (b) memerah bila TIMEOUT_FAST_S tidak lagi lebih
+// pendek darinya.
+const CLIENT_ABANDON_S = 8;
 
 // CONNECT_S: 8 s -> 4 s. Alasan angkanya, dan trade-off-nya:
 // Batas ini HANYA mengatur leg origin(Jakarta/ArenHost) -> tepi Cloudflare, BUKAN
@@ -119,8 +211,46 @@ const CONNECT_S      = 4;
 
 // TCP Fast Open: satu-satunya sakelar di bawah yang punya risiko nyata, jadi ia
 // punya sakelar sendiri supaya master bisa mematikannya tanpa mengutak-atik blok curl.
-// Lihat komentar di tempat pemakaiannya.
-const ENABLE_TCP_FASTOPEN = true;
+// [F4-6] DIMATIKAN. Ia satu-satunya opsi transport di berkas ini yang (i) bisa
+// MENAMBAH detik, bukan mengurangi, ketika middlebox membuang SYN berisi data, dan
+// (ii) perilakunya BERUBAH sesudah beberapa koneksi, karena cookie TFO baru ada di
+// kernel setelah koneksi pertama berhasil. Itu persis bentuk cacat yang terukur:
+// #1 dan #2 lolos, #3 menggantung. Ia baru boleh dinyalakan lagi kalau gerbang E2E
+// browser tetap hijau DAN `tools/edge-latency-probe.mjs` menunjukkan p95 membaik.
+const ENABLE_TCP_FASTOPEN = false;
+
+// [F4-7] Pass-through gzip: badan terkompresi diteruskan mentah ke murid. Ia benar
+// HANYA bila lapisan web origin tidak meng-gzip ULANG badan yang sudah gzip, dan itu
+// TIDAK BISA dibuktikan dari dalam PHP (`zlib.output_compression` di bawah hanya
+// memeriksa kompresi PHP, bukan modul kompresi LiteSpeed/Apache). Kompresi ganda
+// menghasilkan badan yang gagal di-dekode: gejalanya permintaan yang MENGGANTUNG, dan
+// `curl` — yang tidak mengiklankan gzip kecuali disuruh — tidak pernah melihatnya.
+// Karena cacat F4 tepat berbentuk itu, jalur ini dimatikan sampai gerbang E2E browser
+// hijau. Kodenya tetap ada (satu konstanta, bukan penghapusan) supaya bisa dinyalakan
+// kembali dengan bukti, bukan ditulis ulang dari ingatan.
+const ENABLE_GZIP_PASSTHROUGH = false;
+
+// [F4-3] HEADER HOP-BY-HOP — satu daftar, dipakai DUA ARAH.
+// RFC 9110 §7.6.1: header ini milik SATU koneksi dan tidak boleh diteruskan oleh
+// perantara. Meneruskan `Connection`/`Keep-Alive`/`Upgrade` ke klien membuat browser
+// menegosiasikan sifat koneksi yang tidak ada; meneruskan `Transfer-Encoding` atau
+// `Content-Length` upstream membuat browser menunggu byte yang tidak akan datang di
+// koneksi keep-alive — dan permintaan BERIKUTNYA di koneksi itu ikut menggantung.
+// `content-length` ada di daftar ini [F4-4]: panjang hitungan upstream tidak berlaku
+// lagi sesudah hop ini, dan hanya lapisan web origin yang boleh menentukannya.
+const HOP_BY_HOP = ['connection','keep-alive','proxy-authenticate','proxy-authorization',
+                    'proxy-connection','te','trailer','trailers','transfer-encoding',
+                    'upgrade','content-length'];
+
+/**
+ * [F4-3] Benar untuk nama header yang TIDAK BOLEH menyeberangi hop ini, ke arah mana pun.
+ * `proxy-*` diperiksa sebagai awalan, bukan hanya nama persis, karena keluarga itu
+ * terbuka (`Proxy-Support`, dst.).
+ */
+function hopByHop(string $name): bool {
+  $n = strtolower(trim($name));
+  return in_array($n, HOP_BY_HOP, true) || str_starts_with($n, 'proxy-');
+}
 
 // Endpoint yang boleh lewat. Default TOLAK: jalur baru harus didaftarkan sadar.
 const ALLOW = [
@@ -144,7 +274,12 @@ const ALLOW = [
 // Jalur yang boleh memakai batas kesabaran pendek: GET JSON kecil saja. Jalur yang
 // TIDAK terdaftar di sini otomatis memakai TIMEOUT_S penuh — default-nya sabar,
 // jadi menambah rute baru tidak bisa diam-diam memotong jawaban model.
-const FAST_TIMEOUT_PATHS = ['/health', '/healthz', '/api/config', '/api/tts/manifest'];
+// [F4-2] `/api/user/me` dan `/api/quota` DITAMBAHKAN. Keduanya GET JSON kecil yang
+// ditembak aplikasi murid saat boot, dan keduanya dulu mewarisi 25 s — tiga kali lebih
+// panjang dari 8 s kesabaran browser. Jalur yang boleh menunggu lebih lama dari klien
+// yang menunggunya bukan jalur lambat; ia jalur yang MENGGANTUNG.
+const FAST_TIMEOUT_PATHS = ['/health', '/healthz', '/api/config', '/api/tts/manifest',
+                            '/api/user/me', '/api/quota'];
 
 function fail(int $code, string $msg): never {
   http_response_code($code);
@@ -205,7 +340,9 @@ if ($method === 'POST') {
 $zlibSetting = (string) ini_get('zlib.output_compression');
 $zlibOn = $zlibSetting !== '' && $zlibSetting !== '0' && strtolower($zlibSetting) !== 'off';
 $clientAcceptsGzip = str_contains(strtolower($_SERVER['HTTP_ACCEPT_ENCODING'] ?? ''), 'gzip');
-$passThroughGzip = $clientAcceptsGzip && !$zlibOn;
+// [F4-7] Sakelar mati => cabang `identity` selalu dipakai: nol badan terkompresi yang
+// diteruskan, jadi nol peluang kompresi ganda.
+$passThroughGzip = ENABLE_GZIP_PASSTHROUGH && $clientAcceptsGzip && !$zlibOn;
 
 $fwd = [
   'X-Fiezel-Edge: ' . EDGE_SECRET,
@@ -217,6 +354,9 @@ $fwd = [
   'Accept-Encoding: ' . ($passThroughGzip ? 'gzip' : 'identity'),
 ];
 if ($method === 'POST') $fwd[] = 'Content-Type: ' . ($_SERVER['CONTENT_TYPE'] ?? 'application/json');
+// Catatan: `Content-Length` ke upstream TIDAK pernah disusun tangan; curl menghitungnya
+// sendiri dari `CURLOPT_POSTFIELDS`. Panjang hasil hitungan manual atas badan yang sudah
+// dipotong `MAX_BODY` adalah cara termudah membuat upstream menunggu byte ke-N+1. [F4-4]
 if (!empty($_SERVER['HTTP_COOKIE']))          $fwd[] = 'Cookie: ' . $_SERVER['HTTP_COOKIE'];
 if (!empty($_SERVER['HTTP_ORIGIN']))          $fwd[] = 'Origin: ' . $_SERVER['HTTP_ORIGIN'];
 if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) $fwd[] = 'Accept-Language: ' . $_SERVER['HTTP_ACCEPT_LANGUAGE'];
@@ -224,8 +364,27 @@ if (!empty($_SERVER['HTTP_USER_AGENT']))      $fwd[] = 'User-Agent: ' . $_SERVER
 // IP murni TIDAK diteruskan. Worker hanya butuh pengenal ber-hash untuk anti-abuse,
 // dan meneruskan IP mentah lewat header memperbesar permukaan data pribadi.
 
+// [F4-3] ARAH NAIK (murid -> upstream): saringan hop-by-hop terakhir. Daftar $fwd di
+// atas memang sudah allowlist, jadi hari ini saringan ini membuang NOL header — dan itu
+// justru gunanya: ia membuat penambahan `$fwd[] = 'Connection: ...'` oleh penyunting
+// berikutnya tidak bisa lolos diam-diam. Saringan yang hanya ada di kepala orang adalah
+// saringan yang hilang pada commit berikutnya.
+$fwd = array_values(array_filter($fwd, static function (string $line): bool {
+  $pos = strpos($line, ':');
+  return $pos === false ? true : !hopByHop(substr($line, 0, $pos));
+}));
+// Dan curl tidak boleh menambahkannya sendiri di belakang punggung kita.
+$fwd[] = 'Expect:';
+
 $url = UPSTREAM . $path . ($query !== null && $query !== '' ? '?' . $query : '');
 $timeout = in_array($path, FAST_TIMEOUT_PATHS, true) ? TIMEOUT_FAST_S : TIMEOUT_S;
+// [F4-2] KUNCI TERAKHIR, supaya hubungan "proxy kalah lebih dulu dari klien" tidak
+// hanya hidup di komentar: pada jalur cepat, batas total DIPAKSA tinggal di bawah
+// batas kesabaran klien walaupun seseorang menaikkan TIMEOUT_FAST_S tanpa membaca
+// alasannya. 2 s sisa itu jatah perjalanan 504 dari hop ini ke browser.
+if (in_array($path, FAST_TIMEOUT_PATHS, true) && $timeout >= CLIENT_ABANDON_S) {
+  $timeout = CLIENT_ABANDON_S - 2;
+}
 
 $ch = curl_init($url);
 $opts = [
@@ -354,14 +513,24 @@ $passThrough = ['content-type','cache-control','vary','etag','last-modified','re
 // diteruskan masih terkompresi, jadi murid wajib diberi tahu. Pada cabang `identity`
 // badan sudah polos dan meneruskan header ini akan merusak respons.
 if ($passThroughGzip) $passThrough[] = 'content-encoding';
+// [F4-3] ARAH TURUN (upstream -> murid). Urutannya penting: denylist hop-by-hop
+// diperiksa LEBIH DULU dan menang atas allowlist mana pun. Kalau suatu hari
+// `transfer-encoding` atau `content-length` masuk $passThrough karena salah sunting,
+// baris ini tetap membuangnya.
 foreach (explode("\r\n", $rawHeaders) as $line) {
   $pos = strpos($line, ':');
   if ($pos === false) continue;
   $name = strtolower(trim(substr($line, 0, $pos)));
   $val  = trim(substr($line, $pos + 1));
+  if (hopByHop($name)) continue;
   if ($name === 'set-cookie') { header('Set-Cookie: ' . $val, false); continue; }
   if (in_array($name, $passThrough, true)) header(ucfirst($name) . ': ' . $val, true);
 }
+// [F4-3]/[F4-4] Dan apa pun yang sudah dipasang lapisan lain (php.ini `header()`
+// bawaan, modul origin) untuk nama hop-by-hop dibuang tanpa syarat. `Content-Length`
+// termasuk: hanya lapisan web origin yang boleh menghitungnya untuk badan yang
+// SEBENARNYA terkirim, bukan angka yang diwarisi dari upstream.
+foreach (HOP_BY_HOP as $hopName) { header_remove($hopName); }
 if (!headers_sent()) {
   header('X-Fiezel-Edge-Hop: 1');
   // Format standar Server-Timing supaya angka hop ini bisa dibaca alat apa pun.
@@ -377,4 +546,14 @@ if (!headers_sent()) {
   // Hemat: 0 ms; mengurangi sidik jari versi PHP origin yang bocor cuma-cuma.
   header_remove('X-Powered-By');
 }
+
+// [F4-5] Badan ditulis SEKALI, lalu didorong keluar, lalu proses dilepas.
+// Satu `echo` (bukan potongan berulang) berarti tidak ada keadaan setengah-terkirim.
+// `flush()` mendorong byte melewati lapisan SAPI. `fastcgi_finish_request()` — ada di
+// LSAPI/PHP-FPM — mengakhiri respons dan MELEPAS slot proses per-pengguna cPanel
+// segera; itu satu-satunya hal yang bisa dilakukan dari dalam PHP untuk mempersempit
+// hipotesis batas proses (`LSAPI_CHILDREN`/entry process), yang selebihnya hanya bisa
+// diukur dari origin.
 echo $payload;
+flush();
+if (function_exists('fastcgi_finish_request')) { fastcgi_finish_request(); }
