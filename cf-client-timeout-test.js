@@ -416,8 +416,20 @@ function makeHarness(options = {}) {
   /* =======================================================================================
    * 4. Invarian rilis: paket ini tidak menaikkan versi build
    * ===================================================================================== */
-  assert(/FIEZEL_PAGE_BUILD='m025-172'/.test(SOURCES.config),
-    'Tidak ada bump invarian build di paket F6 (FIEZEL_PAGE_BUILD tetap m025-172)', 'core-config.js');
+  /* Assert ini SEMULA mengunci nilainya ke 'm025-172' sebagai pagar agar paket kerja ini tidak
+   * menaikkan versi build. Itu keliru: begitu master menaikkan versi secara sah, pagar seperti
+   * itu memerahkan gerbang tanpa ada yang rusak. Yang benar-benar merupakan kontrak adalah
+   * KESAMAAN tiga penanda (SW_REV, DIAG_BUILD, FIEZEL_PAGE_BUILD) - naik bersama, bukan diam
+   * bersama. Jadi yang dijaga sekarang itu, bukan satu angka tertentu. */
+  {
+    const page = (SOURCES.config.match(/FIEZEL_PAGE_BUILD='(m025-\d+)'/) || [])[1] || null;
+    const sw = (read('sw.js').match(/SW_REV='(m025-\d+)/) || [])[1] || null;
+    const diag = (read('features/neural-voice/fiezel-diag-panel.js')
+      .match(/DIAG_BUILD = '(m025-\d+)'/) || [])[1] || null;
+    assert(Boolean(page) && page === sw && page === diag,
+      'Invarian build utuh: SW_REV, DIAG_BUILD, dan FIEZEL_PAGE_BUILD menunjuk versi yang sama ('
+        + String(page) + ' / ' + String(sw) + ' / ' + String(diag) + ')', 'core-config.js + sw.js + diag-panel');
+  }
 
   const passed = results.filter(r => r.status === 'PASS').length;
   fs.writeFileSync(path.join(root, 'CF-CLIENT-TIMEOUT-REPORT.json'), JSON.stringify({
