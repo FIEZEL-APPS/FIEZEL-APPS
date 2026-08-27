@@ -1,0 +1,686 @@
+{
+  "schema": "fiezel-e2e-bridge-v1",
+  "status": "FAIL",
+  "pass": false,
+  "bridge": "https://api.fiezel.my.id",
+  "appHost": "fiezel.my.id",
+  "appDir": "/home/user/workspace/wt-a5e2e",
+  "cookieDomainDiharapkan": "fiezel.my.id",
+  "protokolDiharapkan": "1.7",
+  "browser": "147.0.7727.15",
+  "durasiMs": 71976,
+  "hostResolverRules": [
+    "MAP fiezel.my.id:443 127.0.0.1:35183"
+  ],
+  "skenarioDiminta": "semua",
+  "skenario": [
+    {
+      "skenario": "A-semua-off",
+      "cfg": {
+        "enabled": true,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "off",
+          "config": "off",
+          "auth": "off",
+          "quota": "off",
+          "ai": "off",
+          "tts": "off",
+          "usage": "off"
+        }
+      },
+      "bootMs": 3642,
+      "bootTextLen": 402,
+      "bootAddedNodes": 385,
+      "navError": "",
+      "permintaanJembatan": [],
+      "totalPermintaan": 69,
+      "screenshot": "/tmp/e2e-shots4/e2e-bridge-a-semua-off.png"
+    },
+    {
+      "skenario": "A2-enabled-false",
+      "cfg": {
+        "enabled": false,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "on",
+          "config": "on",
+          "auth": "on",
+          "quota": "on",
+          "ai": "on",
+          "tts": "on",
+          "usage": "on"
+        }
+      },
+      "bootMs": 3509,
+      "bootTextLen": 402,
+      "bootAddedNodes": 397,
+      "navError": "",
+      "permintaanJembatan": [],
+      "totalPermintaan": 108,
+      "screenshot": "/tmp/e2e-shots4/e2e-bridge-a2-enabled-false.png",
+      "panggilanQuota": "timeout (jalur non-CF)"
+    },
+    {
+      "skenario": "B-config-on",
+      "cfg": {
+        "enabled": true,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "off",
+          "config": "on",
+          "auth": "off",
+          "quota": "on",
+          "ai": "off",
+          "tts": "off",
+          "usage": "off"
+        }
+      },
+      "bootMs": 3525,
+      "bootTextLen": 402,
+      "bootAddedNodes": 385,
+      "navError": "",
+      "permintaanJembatan": [
+        "GET /api/quota"
+      ],
+      "totalPermintaan": 94,
+      "screenshot": "/tmp/e2e-shots4/e2e-bridge-b-config-on.png",
+      "configPayload": null,
+      "panggilanQuota": "{\"ok\":false,\"status\":401,\"body\":\"{\\\"error\\\":\\\"unauthenticated\\\"}\",\"ms\":1263,\"newRequests\":[{\"scenario\":\"B-config-on\",\"at\":1787853967797,\"method\":\"GET\",\"url\":\"https://api.fiezel.my.id/api/quota\",\"host\""
+    },
+    {
+      "skenario": "C0-pra-auth",
+      "cfg": {
+        "enabled": true,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "off",
+          "config": "off",
+          "auth": "off",
+          "quota": "on",
+          "ai": "off",
+          "tts": "off",
+          "usage": "off"
+        }
+      },
+      "bootMs": 3512,
+      "bootTextLen": 402,
+      "bootAddedNodes": 385,
+      "navError": "",
+      "permintaanJembatan": [
+        "GET /api/quota"
+      ],
+      "totalPermintaan": 70,
+      "panggilanQuota": "{\"ok\":false,\"status\":401,\"body\":\"{\\\"error\\\":\\\"unauthenticated\\\"}\",\"ms\":1506,\"newRequests\":[{\"scenario\":\"C0-pra-auth\",\"at\":1787853972785,\"method\":\"GET\",\"url\":\"https://api.fiezel.my.id/api/quota\",\"host\""
+    },
+    {
+      "skenario": "C-auth-on",
+      "cfg": {
+        "enabled": true,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "off",
+          "config": "off",
+          "auth": "on",
+          "quota": "on",
+          "ai": "off",
+          "tts": "off",
+          "usage": "off"
+        }
+      },
+      "bootMs": 3550,
+      "bootTextLen": 402,
+      "bootAddedNodes": 373,
+      "navError": "",
+      "permintaanJembatan": [
+        "POST /api/auth/anon",
+        "GET /api/quota"
+      ],
+      "totalPermintaan": 71,
+      "screenshot": "/tmp/e2e-shots4/e2e-bridge-c-auth-on.png",
+      "cookieJar": [
+        {
+          "name": "AWSALBCORS",
+          "domain": "api.puter.com",
+          "httpOnly": false,
+          "secure": true,
+          "sameSite": "None"
+        },
+        {
+          "name": "fz_id",
+          "domain": ".fiezel.my.id",
+          "httpOnly": true,
+          "secure": true,
+          "sameSite": "Lax"
+        }
+      ],
+      "latensi": {
+        "anonMs": 1413,
+        "replayMs": 881
+      }
+    },
+    {
+      "skenario": "D-hop-stabil",
+      "cfg": {
+        "enabled": true,
+        "base": "https://api.fiezel.my.id",
+        "endpoints": {
+          "health": "off",
+          "config": "off",
+          "auth": "off",
+          "quota": "on",
+          "ai": "off",
+          "tts": "off",
+          "usage": "off"
+        }
+      },
+      "bootMs": 3546,
+      "bootTextLen": 402,
+      "bootAddedNodes": 385,
+      "navError": "",
+      "permintaanJembatan": [
+        "GET /api/quota",
+        "GET /api/quota",
+        "GET /api/quota"
+      ],
+      "totalPermintaan": 96,
+      "hop": [
+        {
+          "ke": 1,
+          "status": 200,
+          "ms": 1853,
+          "timeout": false,
+          "error": ""
+        },
+        {
+          "ke": 2,
+          "status": 200,
+          "ms": 943,
+          "timeout": false,
+          "error": ""
+        },
+        {
+          "ke": 3,
+          "status": 0,
+          "ms": 8002,
+          "timeout": true,
+          "error": ""
+        }
+      ],
+      "cookieDisemai": 1
+    }
+  ],
+  "hostDisentuh": [
+    "api.fiezel.my.id",
+    "api.puter.com",
+    "browser.sentry-cdn.com",
+    "challenges.cloudflare.com",
+    "gui-cdn.puter.com",
+    "js.puter.com",
+    "js.sentry-cdn.com",
+    "o4509759649677312.ingest.us.sentry.io",
+    "plausible.io",
+    "puter-assets.b-cdn.net",
+    "puter.com"
+  ],
+  "counts": {
+    "pass": 16,
+    "fail": 6
+  },
+  "checks": [
+    {
+      "id": "browser-real",
+      "name": "Chromium sungguhan berjalan (anti-vakum: bukan hasil simulasi)",
+      "status": "PASS",
+      "details": "chromium 147.0.7727.15"
+    },
+    {
+      "id": "off-app-boots",
+      "name": "Skenario OFF: aplikasi benar-benar ter-render oleh JS (anti-vakum untuk \"nol permintaan\")",
+      "status": "PASS",
+      "details": "bootMs=3642 teksElemenTerbesar=402 char nodeDitambah=385"
+    },
+    {
+      "id": "off-no-bridge-request",
+      "name": "Skenario OFF: NOL permintaan ke jembatan (tidak ada kebocoran saat mati)",
+      "status": "PASS",
+      "details": "0 permintaan"
+    },
+    {
+      "id": "disabled-app-boots",
+      "name": "Rollback: aplikasi tetap ter-render dengan enabled:false",
+      "status": "PASS",
+      "details": "bootMs=3509 teksElemenTerbesar=402 char nodeDitambah=397"
+    },
+    {
+      "id": "disabled-no-bridge-request",
+      "name": "Rollback satu nilai: enabled:false ⇒ NOL permintaan jembatan walau semua endpoint \"on\"",
+      "status": "PASS",
+      "details": "0 permintaan"
+    },
+    {
+      "id": "config-called-once",
+      "name": "config \"on\": aplikasi memanggil /api/config TEPAT sekali per boot",
+      "status": "FAIL",
+      "details": "0 permintaan: (tidak ada)"
+    },
+    {
+      "id": "config-protocol",
+      "name": "config \"on\": jawaban /api/config membawa protocol 1.7",
+      "status": "FAIL",
+      "details": "aplikasi tidak pernah menerima jawaban /api/config"
+    },
+    {
+      "id": "config-flags-present",
+      "name": "config \"on\": jawaban membawa objek flags TIDAK kosong (anti-vakum untuk uji kemenangan flag)",
+      "status": "FAIL",
+      "details": "(tidak ada flags)"
+    },
+    {
+      "id": "config-non-blocking",
+      "name": "config \"on\": boot TIDAK diblokir (isi ter-render ≥100 ms sebelum jawaban /api/config yang ditunda 8000 ms tiba)",
+      "status": "FAIL",
+      "details": "bootReady=2026-08-27T18:05:43.806Z configTiba=(tidak pernah) selisih=0 ms margin=100 ms"
+    },
+    {
+      "id": "server-flag-wins",
+      "name": "Kill switch server MENANG: flags server false mengalahkan statis \"on\" (nol permintaan /api/quota ke jembatan)",
+      "status": "FAIL",
+      "details": "serverFlagsSemuaFalse=true permintaanQuotaKeJembatan=1 hasilPanggilan={\"ok\":false,\"status\":401,\"body\":\"{\\\"error\\\":\\\"unauthenticated\\\"}\",\"ms\":1263,\"newRequests\":[{\"scenario\":\"B-config-on\",\"at\":1787853967797,\"method\":\"GET\",\"url\":\"https://api.fiezel.my.id/api/quota\",\"host\""
+    },
+    {
+      "id": "quota-401-before-auth",
+      "name": "Anti-vakum: tanpa cookie, /api/quota dijawab 401 (jadi 200 sesudahnya memang karena cookie)",
+      "status": "PASS",
+      "details": "{\"ok\":false,\"status\":401,\"body\":\"{\\\"error\\\":\\\"unauthenticated\\\"}\",\"ms\":1506,\"newRequests\":[{\"scenario\":\"C0-pra-auth\",\"at\":1787853972785,\"method\":\"GET\",\"url\":\"https://api.fiezel.my.id/api/quota\",\"host\""
+    },
+    {
+      "id": "anon-200",
+      "name": "POST /api/auth/anon lewat transport aplikasi dijawab 200",
+      "status": "PASS",
+      "details": "{\"ok\":true,\"status\":200,\"body\":\"{\\\"userId\\\":\\\"8d6a635e-c225-47bd-8662-22766d851a25\\\",\\\"plan\\\":\\\"free\\\",\\\"class\\\":\\\"visitor\\\",\\\"issued\\\":true,\\\"issuedAt\\\":\\\"2026-08-27T18:06:19.974Z\\\",\\\"expiresAt\\\":\\\"2"
+    },
+    {
+      "id": "cookie-present",
+      "name": "Cookie fz_id BENAR-BENAR tersimpan di konteks browser (bukan hanya dikirim server)",
+      "status": "PASS",
+      "details": "AWSALBCORS@api.puter.com, fz_id@.fiezel.my.id"
+    },
+    {
+      "id": "cookie-httponly",
+      "name": "Cookie fz_id HttpOnly di jar browser",
+      "status": "PASS",
+      "details": "httpOnly=true"
+    },
+    {
+      "id": "cookie-secure",
+      "name": "Cookie fz_id Secure di jar browser",
+      "status": "PASS",
+      "details": "secure=true"
+    },
+    {
+      "id": "cookie-samesite-lax",
+      "name": "Cookie fz_id SameSite=Lax di jar browser",
+      "status": "PASS",
+      "details": "sameSite=Lax"
+    },
+    {
+      "id": "cookie-domain",
+      "name": "Cookie fz_id ber-Domain fiezel.my.id (bukan host-only: kalau host-only, identitas murid patah antar subdomain)",
+      "status": "PASS",
+      "details": "domain=.fiezel.my.id"
+    },
+    {
+      "id": "cookie-replayed",
+      "name": "Browser MEMASANG kembali cookie fz_id pada permintaan berikutnya (SameSite=Lax lintas subdomain, dinilai browser)",
+      "status": "PASS",
+      "details": "Cookie: fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlh"
+    },
+    {
+      "id": "quota-200-after-auth",
+      "name": "Dengan cookie itu, /api/quota dijawab 200 oleh jembatan",
+      "status": "PASS",
+      "details": "{\"ok\":true,\"status\":200,\"body\":\"{\\\"schema\\\":\\\"fiezel-quota-v1\\\",\\\"plan\\\":\\\"free\\\",\\\"paymentEnabled\\\":false,\\\"serverTime\\\":1787853980622,\\\"day\\\":\\\"2026-08-28\\\",\\\"resetAt\\\":1787936400000,\\\"resetTimezone\\\":\\\"Asia/Jakarta\\\",\\\"state\\\":\\\"ok\\\",\\\"b"
+    },
+    {
+      "id": "bridge-hop-stable",
+      "name": "Kestabilan hop: 3 panggilan /api/quota beruntun dari satu halaman semuanya dijawab 200 di bawah 8000 ms",
+      "status": "FAIL",
+      "details": "#1 200 1853ms | #2 200 943ms | #3 TIMEOUT 8002ms"
+    },
+    {
+      "id": "no-workers-dev",
+      "name": "NOL permintaan langsung ke *.workers.dev dari browser (aplikasi hanya menyentuh domainnya sendiri + jembatan)",
+      "status": "PASS",
+      "details": "0 permintaan"
+    },
+    {
+      "id": "scenarios-complete",
+      "name": "Semua skenario yang diminta dijalankan (6 dari 6; gerbang tidak boleh hijau karena berhenti di tengah)",
+      "status": "PASS",
+      "details": "A-semua-off, A2-enabled-false, B-config-on, C0-pra-auth, C-auth-on, D-hop-stabil"
+    }
+  ],
+  "network": [
+    {
+      "scenario": "A-semua-off",
+      "at": 1787853927375,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853931914,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936139,
+      "method": "GET",
+      "url": "https://puter.com/action/sign-in?embedded_in_popup=true&msg_id=1&request_auth=true",
+      "host": "puter.com",
+      "resourceType": "document",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936181,
+      "method": "GET",
+      "url": "https://gui-cdn.puter.com/bundle.min.js",
+      "host": "gui-cdn.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936182,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936183,
+      "method": "GET",
+      "url": "https://gui-cdn.puter.com/bundle.min.css",
+      "host": "gui-cdn.puter.com",
+      "resourceType": "stylesheet",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936183,
+      "method": "GET",
+      "url": "https://puter-assets.b-cdn.net/wallpaper.webp",
+      "host": "puter-assets.b-cdn.net",
+      "resourceType": "image",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936184,
+      "method": "GET",
+      "url": "https://js.sentry-cdn.com/4753503fdf9844755d3142e2992ee7d4.min.js",
+      "host": "js.sentry-cdn.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936184,
+      "method": "GET",
+      "url": "https://plausible.io/js/pa-mY9tcF8DhWIXnKuuHBvac.js",
+      "host": "plausible.io",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936253,
+      "method": "GET",
+      "url": "https://browser.sentry-cdn.com/9.47.1/bundle.tracing.min.js",
+      "host": "browser.sentry-cdn.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936739,
+      "method": "GET",
+      "url": "https://challenges.cloudflare.com/turnstile/v0/api.js",
+      "host": "challenges.cloudflare.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936739,
+      "method": "GET",
+      "url": "https://api.puter.com/version",
+      "host": "api.puter.com",
+      "resourceType": "xhr",
+      "cookieHeader": "AWSALBCORS=7rp8DYGUMqxQxD2IWuN1elrV96pghBp/2+zI9GzJ9B5aoOpitQIeFz3BwggcldgPK/hxYWguY82o9sAas6IG1O4/Ta8hkeOfVGBA5aAACotP7SJOawzYbDnVjrFU",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936740,
+      "method": "GET",
+      "url": "https://api.puter.com/read?file=%7E%2F.__puter_gui.json",
+      "host": "api.puter.com",
+      "resourceType": "xhr",
+      "cookieHeader": "AWSALB=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH; AWSALBCORS=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936740,
+      "method": "GET",
+      "url": "https://puter.com/get-gui-token",
+      "host": "puter.com",
+      "resourceType": "fetch",
+      "cookieHeader": "AWSALB=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB; AWSALBCORS=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936850,
+      "method": "GET",
+      "url": "https://gui-cdn.puter.com/fonts/Inter-Medium.ttf",
+      "host": "gui-cdn.puter.com",
+      "resourceType": "font",
+      "cookieHeader": "",
+      "headersRead": false
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936851,
+      "method": "GET",
+      "url": "https://gui-cdn.puter.com/fonts/Inter-Regular.ttf",
+      "host": "gui-cdn.puter.com",
+      "resourceType": "font",
+      "cookieHeader": "",
+      "headersRead": false
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936851,
+      "method": "GET",
+      "url": "https://api.puter.com/auth/oidc/providers",
+      "host": "api.puter.com",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936864,
+      "method": "GET",
+      "url": "https://challenges.cloudflare.com/turnstile/v0/b/e694063b5082/api.js",
+      "host": "challenges.cloudflare.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936887,
+      "method": "GET",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/a8gei/0x4AAAAAABvMyOLo9EwjFVzC/auto/fbE/new/normal?lang=auto",
+      "host": "challenges.cloudflare.com",
+      "resourceType": "document",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853936949,
+      "method": "GET",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/tdcbz/0x4AAAAAABvMyOLo9EwjFVzC/auto/fbE/new/normal?lang=auto",
+      "host": "challenges.cloudflare.com",
+      "resourceType": "document",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "A2-enabled-false",
+      "at": 1787853937910,
+      "method": "POST",
+      "url": "https://o4509759649677312.ingest.us.sentry.io/api/4509838076477440/envelope/?sentry_version=7&sentry_key=4753503fdf9844755d3142e2992ee7d4&sentry_client=sentry.javascript.browser%2F9.47.1",
+      "host": "o4509759649677312.ingest.us.sentry.io",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "B-config-on",
+      "at": 1787853940321,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "B-config-on",
+      "at": 1787853967797,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "C0-pra-auth",
+      "at": 1787853969311,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "C0-pra-auth",
+      "at": 1787853972785,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "C-auth-on",
+      "at": 1787853974558,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "C-auth-on",
+      "at": 1787853979049,
+      "method": "POST",
+      "url": "https://api.fiezel.my.id/api/auth/anon",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "C-auth-on",
+      "at": 1787853980466,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "headersRead": true
+    },
+    {
+      "scenario": "D-hop-stabil",
+      "at": 1787853981633,
+      "method": "GET",
+      "url": "https://js.puter.com/v2/",
+      "host": "js.puter.com",
+      "resourceType": "script",
+      "cookieHeader": "",
+      "headersRead": true
+    },
+    {
+      "scenario": "D-hop-stabil",
+      "at": 1787853985128,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "headersRead": true
+    },
+    {
+      "scenario": "D-hop-stabil",
+      "at": 1787853986983,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "headersRead": true
+    },
+    {
+      "scenario": "D-hop-stabil",
+      "at": 1787853987928,
+      "method": "GET",
+      "url": "https://api.fiezel.my.id/api/quota",
+      "host": "api.fiezel.my.id",
+      "resourceType": "fetch",
+      "cookieHeader": "",
+      "headersRead": false
+    }
+  ]
+}

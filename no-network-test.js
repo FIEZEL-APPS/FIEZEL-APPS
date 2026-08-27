@@ -44,14 +44,23 @@ const root = __dirname;
 //                               HTTP sungguhan; kalau tidak, jalur yang diuji bukan lagi
 //                               jalur HTTP gerbang itu. Port 0 = dipilih kernel, tanpa DNS,
 //                               tanpa keluar mesin.
-// Ketiganya loopback tanpa DNS eksternal, dan gerbang ini MEMBUKTIKAN sifat loopback itu
+//   e2e-bridge-selftest.js    - :require('node:https'), server.listen(0,'127.0.0.1'):
+//                               ia menyalakan APLIKASI TIRUAN + JEMBATAN TIRUAN untuk
+//                               membuktikan `tools/fiezel-e2e-bridge.mjs` (gerbang E2E
+//                               browser) benar-benar bisa merah: 21 skenario, satu benar
+//                               dan 20 salah. Servernya HARUS HTTPS sungguhan - browser
+//                               hanya menyimpan cookie `Secure` dari konteks aman, dan
+//                               seluruh bukti gerbang itu adalah soal cookie. Semua nama
+//                               host uji dipetakan ke 127.0.0.1 lewat
+//                               --host-resolver-rules Chromium: tanpa DNS, tanpa egress.
+// Keempatnya loopback tanpa DNS eksternal, dan gerbang ini MEMBUKTIKAN sifat loopback itu
 // (bukan mempercayainya). Menambah nama ke daftar ini adalah keputusan arsitektur, jadi
 // jumlahnya ikut di-assert.
 //
 // CATATAN CAKUPAN: pemindaian di bawah diperluas ke berkas `*-selftest.js`. Tanpa itu,
 // `cf-live-selftest.js` lolos hanya karena namanya tidak berakhiran `-test.js` — dan
 // "lolos karena nama berkas" adalah kebalikan dari daftar yang disengaja.
-const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js', 'cf-live-selftest.js']);
+const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js', 'cf-live-selftest.js', 'e2e-bridge-selftest.js']);
 
 // Kelas kedua yang berbeda secara MAKNA, bukan sekadar pengecualian kedua:
 //   prerender-dryrun-test.js - :33-38 require('https')/require('http') SEMATA-MATA untuk
@@ -300,13 +309,17 @@ check('Pola mock-lokal masih dipakai gerbang existing (≥8 berkas, koreksi cf-b
   shadowSafe.length >= 8, `${shadowSafe.length} berkas: ${shadowSafe.join(', ')}`);
 check('Setiap berkas allowlist benar-benar loopback dan masih benar-benar butuh socket',
   allowlistProblems.length === 0, allowlistProblems.join(' | ') || '0');
-check('Allowlist tetap tiga nama dan semuanya ada di repo',
-  SOCKET_ALLOWLIST.size === 3 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
+// Jumlahnya di-assert supaya penambahan nama tidak bisa menyelinap: 4 = tiga nama lama
+// ditambah `e2e-bridge-selftest.js` (paket A5, alasannya di header berkas ini). Menaikkan
+// angka ini tanpa menulis alasannya di header adalah pelonggaran, bukan keputusan.
+check('Allowlist tetap empat nama dan semuanya ada di repo',
+  SOCKET_ALLOWLIST.size === 4 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
   [...SOCKET_ALLOWLIST].join(', '));
 // Cakupan pemindaian ikut di-assert: kalau pola berkas dipersempit lagi, berkas
 // `*-selftest.js` akan kembali lolos karena namanya, dan allowlist di atas menjadi hiasan.
 check('Pemindaian mencakup berkas *-selftest.js (bukan hanya *-test.js/*-audit.js)',
-  files.includes('cf-live-selftest.js'), files.filter(f => /-selftest\.js$/.test(f)).join(', ') || '(tidak ada)');
+  files.includes('cf-live-selftest.js') && files.includes('e2e-bridge-selftest.js'),
+  files.filter(f => /-selftest\.js$/.test(f)).join(', ') || '(tidak ada)');
 check('Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket',
   TRAP_ONLY_ALLOWLIST.size === 1
   && [...TRAP_ONLY_ALLOWLIST].every(f => fs.existsSync(path.join(root, f)))
@@ -354,10 +367,53 @@ notes.push('Kelas ENV_GATED_LIVE_ALLOWLIST ada karena pemindai teks tidak bisa m
   + '`fetch(<variabel>)`; anggotanya didaftarkan dan diprobe, bukan dideteksi.');
 
 /* =======================================================================================
+ * 2c. Gerbang E2E browser di tools/ — TIDAK dipindai berkasnya, jadi diperiksa perilakunya
+ * =====================================================================================
+ * `tools/fiezel-e2e-bridge.mjs` menembak jembatan HIDUP dengan Chromium sungguhan. Ia lolos
+ * seluruh pemindaian di atas karena dua alasan yang sama-sama kebetulan: ia ada di `tools/`
+ * (bukan akar repo) dan berakhiran `.mjs` (bukan `-test.js`). "Lolos karena lokasi dan
+ * ekstensi" adalah kebalikan dari daftar yang disengaja, jadi berkas itu diperiksa di sini
+ * dengan syarat yang DIJALANKAN, bukan dipercaya.
+ */
+const E2E_GATE = 'tools/fiezel-e2e-bridge.mjs';
+const E2E_ENV_VAR = 'FIEZEL_E2E_BRIDGE_BASE';
+const E2E_SELFTEST = 'e2e-bridge-selftest.js';
+const e2eProblems = [];
+{
+  const abs = path.join(root, E2E_GATE);
+  if (!fs.existsSync(abs)) {
+    e2eProblems.push(E2E_GATE + ' tidak ada di repo');
+  } else {
+    const code = stripComments(fs.readFileSync(abs, 'utf8'));
+    if (!code.includes(E2E_ENV_VAR)) e2eProblems.push(E2E_GATE + ' tidak membaca ' + E2E_ENV_VAR);
+    // Satu URL remote bawaan sudah cukup mengubah "SKIP di CI" menjadi "tembak produksi".
+    if (/\|\|\s*['"`]https?:\/\//.test(code)) e2eProblems.push(E2E_GATE + ' punya URL remote sebagai nilai bawaan');
+    const probe = require('child_process').spawnSync(process.execPath, [abs], {
+      cwd: root,
+      encoding: 'utf8',
+      timeout: 60000,
+      env: Object.assign({}, process.env, { [E2E_ENV_VAR]: '' })
+    });
+    if (probe.status !== 0) e2eProblems.push(E2E_GATE + ' tidak exit 0 tanpa ' + E2E_ENV_VAR + ' (exit=' + probe.status + ')');
+    if (!/SKIP/.test(String(probe.stdout || ''))) e2eProblems.push(E2E_GATE + ' tidak mencetak label SKIP tanpa ' + E2E_ENV_VAR);
+  }
+}
+check('Gerbang E2E browser memenuhi syarat env-gated (baca env, SKIP bersih, tanpa URL bawaan)',
+  e2eProblems.length === 0, e2eProblems.join(' | ') || '0');
+
+// Catatan jujur: pemindaian berkas di atas tidak menjangkau `tools/**`. Blok 2c hanya
+// menutup SATU berkas di sana yang memang menembak jaringan atas kehendak sendiri.
+/* =======================================================================================
  * 3. Gerbang ini terdaftar di CI
  * ===================================================================================== */
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8');
 check('Gerbang ini terdaftar di quality.yml', workflow.includes('node no-network-test.js'), 'quality.yml');
+// Pilihan yang disengaja dan karena itu di-assert dua arah: self-test-nya WAJIB ada di CI
+// (kalau tidak, gerbang E2E-nya tidak pernah dibuktikan bisa merah), dan gerbang E2E-nya
+// WAJIB TIDAK ada di CI (kalau ada, setiap push menembak jembatan produksi dengan browser).
+check('Self-test E2E browser terdaftar di quality.yml, gerbang live browser-nya TIDAK',
+  workflow.includes('node ' + E2E_SELFTEST) && !workflow.includes('node ' + E2E_GATE),
+  'selftest=' + workflow.includes('node ' + E2E_SELFTEST) + ' gerbangLive=' + workflow.includes('node ' + E2E_GATE));
 check('Gerbang live dan self-test-nya terdaftar di quality.yml',
   workflow.includes('node cf-live-contract-test.js') && workflow.includes('node cf-live-selftest.js'),
   'quality.yml');
