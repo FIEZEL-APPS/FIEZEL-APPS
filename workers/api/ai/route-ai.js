@@ -23,6 +23,25 @@
  *
  * 3. TIMEOUT ADA DI SERVER. Hari ini timeout hanya di klien (`app.js:5130` 30 s, `:3880` 25 s),
  *    yang berarti Worker tetap menunggu — dan tetap membayar — sesudah klien menyerah.
+ *
+ * 4. JAWABAN KOSONG ADALAH KEGAGALAN, BUKAN SUKSES. Workers AI mengembalikan DUA bentuk
+ *    jawaban: `result.response` (llama-*) dan `result.choices[0].message.content` (granite,
+ *    gemma, sea-lion). Membaca satu bentuk saja menghasilkan string kosong SECARA SENYAP —
+ *    murid melihat kotak jawaban kosong, bukan galat, dan tokennya tetap dibayar. Karena itu
+ *    pembacaan dipusatkan di `AiTasks.readModelText()` dan hasil kosong SELALU jatuh ke
+ *    fallback deterministik dengan sebab yang dicatat (`empty_output`).
+ *
+ * 5. ISI REASONING TIDAK PERNAH SAMPAI KE MURID. `@cf/google/gemma-4-26b-a4b-it` menghabiskan
+ *    seluruh anggaran token di `message.reasoning_content` dan mengembalikan `content` kosong
+ *    dengan `finish_reason:"length"`. Itu kegagalan model dengan nama sendiri
+ *    (`reasoning_overflow`), bukan bahan jawaban: menampilkan monolog internal model kepada
+ *    murid SMP adalah kebocoran sekaligus kekacauan pedagogis.
+ *
+ * 6. MUTU KELUARAN ADALAH KONTRAK. Sesudah jawaban diterima ia masih harus lulus
+ *    `AiTasks.checkOutputContract()`: batas kalimat yang diminta, kanon kata FIEZEL ("nggak",
+ *    bukan "tidak"), dan tidak kosong. Yang gagal TIDAK ditampilkan — ia diganti fallback
+ *    deterministik dan sebabnya dicatat. Bukti bahwa ini perlu: llama-3.1-8b tetap
+ *    mengeluarkan 7-8 kalimat meski promptnya menulis maksimal 6.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -115,19 +134,15 @@
     return out;
   }
 
-  /** Membaca teks dari bentuk keluaran Workers AI yang berbeda-beda antar model. */
+  /**
+   * Pembacaan bentuk jawaban tinggal SATU tempat: `AiTasks.readModelText()`. Versi lama fungsi ini
+   * membaca `result.response` lebih dulu lalu `choices[0].message.content`, tetapi ia membuang
+   * `reasoning_content` dan `finish_reason` — sehingga model yang membakar seluruh anggaran token
+   * di reasoning tampak seperti "model diam", bukan seperti kegagalan yang perlu dicatat namanya.
+   * Wrapper ini dipertahankan untuk pemanggil lama dan tetap mengembalikan string.
+   */
   function readProviderText(result) {
-    if (result == null) return '';
-    if (typeof result === 'string') return result;
-    if (typeof result.response === 'string') return result.response;
-    if (typeof result.result === 'string') return result.result;
-    if (result.result && typeof result.result.response === 'string') return result.result.response;
-    if (Array.isArray(result.choices) && result.choices[0]) {
-      var c = result.choices[0];
-      if (c.message && typeof c.message.content === 'string') return c.message.content;
-      if (typeof c.text === 'string') return c.text;
-    }
-    return '';
+    return AiTasks.readModelText(result).text;
   }
 
   /**
@@ -269,17 +284,71 @@
     if (spec.jsonMode) payload.response_format = { type: 'json_object' };
 
     var text = '';
-    var failureKind = '';
+    var failureKind = '';   // kosakata breaker (daftar tertutup FAILURE_KINDS)
+    var failureReason = ''; // kosakata KAMI: sebab spesifik yang dicatat dan boleh dikirim klien
+    var qualityRejected = false;
     try {
       var result = await callProvider(env, model.id, payload, spec.timeoutMs);
-      text = String(readProviderText(result) || '').trim();
-      if (!text) failureKind = 'empty_body';
+      // DUA BENTUK JAWABAN dibaca sekaligus; `reasoning` hanya untuk klasifikasi sebab dan
+      // TIDAK pernah menjadi kandidat teks jawaban.
+      var read = AiTasks.readModelText(result);
+      text = String(read.text || '').trim();
+      var modelFailure = AiTasks.classifyModelFailure(read);
+      if (modelFailure) {
+        // `reasoning_overflow` maupun `empty_output` sama-sama badan kosong bagi breaker —
+        // `empty_body` adalah satu-satunya anggota FAILURE_KINDS yang menggambarkannya, dan
+        // breaker.js sengaja tidak disentuh dari paket kerja ini. Sebab spesifiknya tetap
+        // terekam terpisah di `failureReason`, jadi owner bisa membedakan model yang mati
+        // dari model yang membakar anggarannya di reasoning.
+        failureKind = 'empty_body';
+        failureReason = modelFailure;
+        text = '';
+      } else {
+        // KONTRAK MUTU: batas kalimat, kanon kata, tidak kosong. Provider SEHAT di sini — yang
+        // gagal adalah jawabannya — jadi ini TIDAK menghitung kegagalan breaker: membuka breaker
+        // karena satu jawaban terlalu panjang akan mematikan AI untuk semua murid tanpa sebab
+        // transport. Yang terjadi: jawaban dibuang, fallback deterministik dipakai, sebab dicatat.
+        var verdictOut = AiTasks.checkOutputContract(taskName, text);
+        if (!verdictOut.ok) {
+          qualityRejected = true;
+          failureReason = verdictOut.reason;
+          text = '';
+        }
+      }
     } catch (error) {
       failureKind = Breaker.classify(signalFromError(error)) || 'unavailable';
+      failureReason = failureKind;
     }
 
     var inTokens = AiTasks.estimateTokens(prompt);
     var outTokens = AiTasks.estimateTokens(text);
+
+    if (typeof deps.recordFailure === 'function' && (failureKind || qualityRejected)) {
+      // Dicatat server-side, tidak menggagalkan jawaban. Inilah satu-satunya jejak yang
+      // membedakan "AI mati" dari "AI menjawab tetapi jawabannya ditolak".
+      try {
+        deps.recordFailure({
+          kind: 'ai', task: taskName, model: model.id,
+          reason: failureReason, breakerCounted: !!failureKind, ms: now() - started
+        });
+      } catch (_) { /* telemetri gagal bukan alasan menggagalkan jawaban */ }
+    }
+
+    if (qualityRejected) {
+      // Provider dinyatakan sehat (jawabannya datang, hanya tidak layak tampil).
+      var healthyQ = Breaker.onSuccess(gate.state, now());
+      if (store) await store.save(breakerTarget, healthyQ, now(), { changed: gate.phase !== 'CLOSED' });
+      return json(baseResponse(taskName, {
+        text: fallbackText,
+        source: 'deterministic-fallback',
+        degraded: true,
+        breaker: Breaker.snapshot(healthyQ, now()).breaker,
+        message: POLITE.degraded,
+        reason: failureReason,
+        quotaChecked: quotaChecked,
+        usage: { inputTokens: inTokens, outputTokens: 0, ms: now() - started }
+      }), 200);
+    }
 
     if (failureKind) {
       var failed = Breaker.onFailure(gate.state, failureKind, now(), 0);
@@ -291,6 +360,7 @@
         degraded: true,
         breaker: snap.breaker,
         message: POLITE.degraded,
+        reason: failureReason,
         retryAfter: snap.retryAfter,
         quotaChecked: quotaChecked,
         usage: { inputTokens: inTokens, outputTokens: 0, ms: now() - started }

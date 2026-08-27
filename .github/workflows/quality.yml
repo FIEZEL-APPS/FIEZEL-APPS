@@ -157,6 +157,13 @@ jobs:
           node quota-reset-test.js
           node tts-key-test.js
           node ai-task-contract-test.js
+          # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
+          # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
+          # yang di atas menjaga bentuk PERMINTAAN (klien tidak mengirim prompt), yang ini menjaga
+          # bentuk JAWABAN (dua bentuk terbaca, kosong = gagal, reasoning tidak pernah tampil,
+          # batas kalimat dan kanon kata ditegakkan). Ia butuh tools/cf-test-harness.js yang sudah
+          # dijalankan sebagai self-test di bawah.
+          node ai-response-shape-test.js
           node breaker-test.js
           node prerender-dryrun-test.js
           node owner-dashboard-test.js

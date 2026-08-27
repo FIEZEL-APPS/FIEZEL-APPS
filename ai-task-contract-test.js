@@ -132,21 +132,62 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
   check('Task frekuensi tertinggi memakai model termurah',
     AiTasks.get('translate_subtitle').model.id === AiTasks.MODELS.cheap.id,
     AiTasks.get('translate_subtitle').model.id);
-  check('Model penalaran mahal hanya untuk dua task 4/jam',
-    EXPECTED_TASKS.filter((t) => AiTasks.get(t).model.id === AiTasks.MODELS.reasoning.id).sort().join(',') ===
-      'context_coach,writing_feedback',
-    EXPECTED_TASKS.filter((t) => AiTasks.get(t).model.id === AiTasks.MODELS.reasoning.id).join(','));
+  // DIPERBARUI OLEH BUKTI PENGUJIAN LANGSUNG (bukan lagi asumsi harga). Assert ini dulu berbunyi
+  // "model penalaran hanya untuk dua task 4/jam" — pembagian yang murni ekonomis. Benchmark hari
+  // ini membalik pertimbangannya: granite (US$0,017/M) SALAH FAKTA pada analisa murid (present
+  // perfect 48% disebut "kekuatan" berdampingan dengan simple present 92%), dan llama-3.1-8b
+  // melewati batas kalimat (7-8 dari maksimal 6) sambil menjadi yang paling lambat (8,4-10,8 s).
+  // llama-3.3-70b satu-satunya yang patuh batas (6 dan 4 kalimat), memakai "kamu"/"nggak", dan
+  // akurat, di 4,1-9,6 s dengan harga masuk US$0,293/M. Karena itu batasnya sekarang bukan
+  // frekuensi, tetapi apakah task menyatakan sesuatu tentang KEBENARAN.
+  check('Semua task kebenaran memakai llama-3.3-70b (bukti benchmark, bukan asumsi)',
+    AiTasks.TRUTH_TASKS.every((t) => AiTasks.get(t).model.id === AiTasks.MODELS.reasoning.id) &&
+    AiTasks.MODELS.reasoning.id === '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+    AiTasks.TRUTH_TASKS.map((t) => `${t}=${AiTasks.get(t).model.id}`).join(' '));
+  check('Task ringan tanpa kebenaran pedagogis boleh memakai model murah',
+    AiTasks.get('translate_subtitle').model.id === AiTasks.MODELS.cheap.id &&
+    !AiTasks.isTruthTask('translate_subtitle'),
+    AiTasks.get('translate_subtitle').model.id);
+  // Granite tidak boleh masuk tugas analisa lewat pintu mana pun — termasuk pintu degradasi.
+  check('Granite TIDAK dipakai tugas analisa, baik sebagai model maupun tier degradasi',
+    AiTasks.TRUTH_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.cheap.id)),
+    AiTasks.TRUTH_TASKS.map((t) => AiTasks.modelsUsedBy(t).map((m) => m.id).join('+')).join(' '));
+  check('sea-lion tercatat sebagai KANDIDAT yang butuh uji lanjutan dan tidak dipakai task mana pun',
+    AiTasks.MODELS.candidate.id === '@cf/aisingapore/gemma-sea-lion-v4-27b-it' &&
+    AiTasks.MODELS.candidate.usedByTasks === false &&
+    EXPECTED_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.candidate.id)),
+    AiTasks.MODELS.candidate.id);
+  check('gemma-4-26b (reasoning overflow) tercatat DITOLAK dan tidak dipakai task mana pun',
+    AiTasks.MODELS.rejected.id === '@cf/google/gemma-4-26b-a4b-it' &&
+    EXPECTED_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.rejected.id)),
+    AiTasks.MODELS.rejected.id);
+  // Angka wajib ada di komentar keputusan, bukan hanya di kepala orang yang mengukurnya.
+  {
+    const srcModels = fs.readFileSync(path.join(root, 'workers/api/ai/ai-tasks.js'), 'utf8');
+    check('Alasan + angka benchmark tertulis di komentar registry',
+      ['0,293', '0,351', '0,152', '0,017', '3,1-3,7', '8,4-10,8', '4,1-9,6', '48%', '92%', 'uji lanjutan']
+        .every((needle) => srcModels.includes(needle)),
+      'angka terukur ikut ditulis');
+  }
 
   // Jatah gratis 10.000 neuron/hari: begitu ambang lunak terlewat, semua task turun ke tier murah
   // SEBELUM tagihan muncul.
   check('Jatah neuron harian gratis dipaku sebagai konstanta',
     AiTasks.NEURONS.dailyFree === 10000 && AiTasks.NEURONS.softLimit < AiTasks.NEURONS.dailyFree,
     `${AiTasks.NEURONS.softLimit}/${AiTasks.NEURONS.dailyFree}`);
-  check('Jatah harian terlampaui ⇒ model murah, bukan model mahal',
-    EXPECTED_TASKS.every((t) => AiTasks.pickModel(t, { neuronsUsedToday: 9000 }).id === AiTasks.MODELS.cheap.id),
+  check('Jatah harian terlampaui ⇒ turun ke tier degradasi task, bukan tetap di 70b',
+    EXPECTED_TASKS.every((t) => AiTasks.pickModel(t, { neuronsUsedToday: 9000 }).id === AiTasks.get(t).cheapModel.id) &&
+    EXPECTED_TASKS.every((t) => AiTasks.pickModel(t, { neuronsUsedToday: 9000 }).id !== AiTasks.MODELS.reasoning.id),
     'degradasi berbayar-murah sebelum fallback');
-  check('HALF-OPEN memakai probe termurah',
-    AiTasks.pickModel('writing_feedback', { breaker: 'HALF_OPEN' }).id === AiTasks.MODELS.cheap.id,
+  // Tier degradasi tugas kebenaran SENGAJA bukan yang termurah: granite lebih murah tetapi salah
+  // fakta, dan jawaban salah yang murah lebih mahal daripada jawaban yang ditolak lalu diganti
+  // fallback deterministik. llama-3.1-8b hanya melanggar panjang — pelanggaran yang tertangkap.
+  check('Degradasi tugas kebenaran TIDAK pernah mendarat di granite',
+    AiTasks.TRUTH_TASKS.every((t) => AiTasks.pickModel(t, { neuronsUsedToday: 9000 }).id !== AiTasks.MODELS.cheap.id),
+    AiTasks.TRUTH_TASKS.map((t) => AiTasks.pickModel(t, { neuronsUsedToday: 9000 }).id).join(','));
+  check('HALF-OPEN memakai probe murah, dan tidak pernah 70b',
+    AiTasks.pickModel('writing_feedback', { breaker: 'HALF_OPEN' }).id === AiTasks.get('writing_feedback').cheapModel.id &&
+    AiTasks.pickModel('writing_feedback', { breaker: 'HALF_OPEN' }).id !== AiTasks.MODELS.reasoning.id,
     'probe tidak boleh memakai 70b');
 
   check('Payload context_coach dibatasi 8.000 B (turun dari 100.000 B)',
@@ -172,6 +213,28 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
   check('Teks melebihi maxLength ⇒ ditolak', tooLong.ok === false, (tooLong.errors || []).join(','));
 }
 
+// --- 4b. KONTRAK MUTU KELUARAN SEBAGAI NILAI, BUKAN HARAPAN -----------------------------
+// Rinciannya diuji di ai-response-shape-test.js; di sini yang dijaga adalah bahwa batas dan
+// daftar katanya benar-benar SATU tempat yang bisa disetel, dan setiap task punya batasnya.
+{
+  const C = AiTasks.OUTPUT_CONTRACT;
+  check('Batas mutu keluaran terpusat di satu konstanta yang bisa disetel',
+    C && Object.isFrozen(C) && C.sentenceLimits && Array.isArray(C.bannedWords) && C.preferredWord === 'nggak',
+    JSON.stringify({ bannedWords: C.bannedWords, preferred: C.preferredWord }));
+  for (const task of EXPECTED_TASKS) {
+    const limit = AiTasks.sentenceLimitFor(task);
+    check(`[${task}] batas kalimat dieja di kontrak (0 = sengaja tidak dibatasi)`,
+      Number.isFinite(limit) && limit >= 0 && AiTasks.get(task).maxSentences === limit, String(limit));
+  }
+  check('Prompt memakai batas kalimat dari kontrak yang sama, bukan angka yang diketik ulang',
+    /maksimal 6 kalimat/.test(AiTasks.buildPrompt('tutor_turn', VALID_INPUT.tutor_turn, 'id')) &&
+    /maksimal 4 kalimat/.test(AiTasks.buildPrompt('context_coach', VALID_INPUT.context_coach, 'id')),
+    'satu sumber batas untuk permintaan dan penegakan');
+  check('Prompt tugas naskah meminta "nggak", kanon repo',
+    AiTasks.OUTPUT_CONTRACT.styleCheckedTasks.every((t) => /nggak/.test(AiTasks.buildPrompt(t, VALID_INPUT[t], 'id'))),
+    'kanon diminta di prompt DAN ditegakkan sesudah jawaban');
+}
+
 // --- 5. SETIAP TASK PUNYA FALLBACK DETERMINISTIK ---------------------------------------
 {
   for (const task of EXPECTED_TASKS) {
@@ -189,6 +252,15 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
         typeof a === 'string' && a.length > 30, a.slice(0, 60));
     }
   }
+  // Gerbang yang menuntut jawaban model lulus kontrak tetapi membiarkan fallbacknya sendiri
+  // melanggar kontrak itu adalah gerbang yang berbohong. Kecuali translate_subtitle, yang
+  // kekosongannya memang disengaja.
+  for (const task of EXPECTED_TASKS.filter((t) => t !== 'translate_subtitle')) {
+    const verdict = AiTasks.checkOutputContract(task, AiTasks.fallbackFor(task, VALID_INPUT[task]));
+    check(`[${task}] fallback deterministik LULUS pemeriksa kontrak yang sama`,
+      verdict.ok === true, `${verdict.reason} (${verdict.sentences}/${verdict.limit})`);
+  }
+
   check('Fallback tidak menyentuh jaringan, jam, atau acak',
     !/fetch\(|Date\.now\(|Math\.random\(/.test(
       fs.readFileSync(path.join(root, 'workers/api/ai/ai-tasks.js'), 'utf8')
