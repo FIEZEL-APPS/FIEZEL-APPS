@@ -185,6 +185,17 @@ jobs:
           # `usage_daily` terisi = `collection_ok=0`, dan `/api/owner/cron-status`
           # 403 tanpa kredensial owner. Butuh tools/cf-test-harness.js.
           node cron-contract-test.js
+          # A7: kontrak proxy PHP jembatan. Dijalankan TEPAT SESUDAH edge-guard-test.js
+          # karena keduanya menjaga jembatan yang sama dari dua sisi: yang di atas menjaga
+          # sisi WORKER (siapa yang boleh memanggil, /healthz minimal, nol nilai secret di
+          # artefak), yang ini menjaga sisi PROXY (allowlist 13 jalur tetap default-tolak,
+          # X-Fiezel-Edge tetap dikirim, nol cache pada jalur identitas/kuota/Set-Cookie,
+          # IP mentah tidak diteruskan, galat curl mentah tidak pernah sampai ke murid,
+          # FOLLOWLOCATION tetap false, dan setiap sakelar transport baru punya komentar
+          # alasan). Ia memindai berkas PHP sebagai TEKS — tidak ada PHP di runner ini, dan
+          # memasangnya demi satu berkas bukan pertukaran yang sehat; batas itu ditulis di
+          # kepala gerbangnya, bukan disembunyikan.
+          node edge-proxy-contract-test.js
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
