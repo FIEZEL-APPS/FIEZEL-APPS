@@ -20,7 +20,7 @@
     {
       "name": "app.js: AudioService bisa diambil sebagai blok sumber utuh",
       "status": "PASS",
-      "details": "3970 char"
+      "details": "3002 char"
     },
     {
       "name": "app.js: cadangan TIDAK lagi bersyarat \"modul FiezelVoiceSay absen\"",
@@ -40,7 +40,7 @@
     {
       "name": "penjaga: kata kunci precache neural tetap DILARANG di daftar ASSETS service worker",
       "status": "PASS",
-      "details": "112 aset shell, nol aset neural"
+      "details": "110 aset shell, nol aset neural"
     },
     {
       "name": "penjaga: aset neural tetap punya jalur cache sendiri di service worker",
@@ -125,12 +125,7 @@
     {
       "name": "voice-say: status() melaporkan lapisan peramban, jadi kebisuan bisa didiagnosis",
       "status": "PASS",
-      "details": "{\"schema\":\"fiezel-voice-say-v1\",\"assetsReady\":false,\"assetCount\":0,\"voiceReady\":false,\"localFallbackReady\":false,\"browserFallbackReady\":true,\"browserBreakerOpen\":false,\"browserBreakerCooldownMs\":60000,\"subtitleReady\":false,\"translatorReady\":false,\"cfVoiceEnabled\":false,\"cfVoiceMode\":\"off\"}"
-    },
-    {
-      "name": "voice-say: Puter yang menjawab false (bukan melempar) tetap turun ke lapisan bawah",
-      "status": "PASS",
-      "details": "say()=true speechSynthesis.speak=1"
+      "details": "{\"schema\":\"fiezel-voice-say-v1\",\"assetsReady\":false,\"assetCount\":0,\"voiceReady\":false,\"localFallbackReady\":false,\"browserFallbackReady\":true,\"browserBreakerOpen\":false,\"browserBreakerCooldownMs\":60000,\"subtitleReady\":false,\"translatorReady\":false}"
     },
     {
       "name": "addon: replay dikembalikan di catch — item TIDAK terkunci setelah kegagalan berulang",
@@ -178,6 +173,16 @@
       "details": "index 0 -> 1"
     },
     {
+      "name": "voice-say: Puter yang menjawab false (bukan melempar) tetap turun ke lapisan bawah",
+      "status": "PASS",
+      "details": "say()=true speechSynthesis.speak=1"
+    },
+    {
+      "name": "addon: audio yang BERBUNYI tetap menghitung replay dan membuka jawaban",
+      "status": "PASS",
+      "details": "replays=1 work.disabled=false"
+    },
+    {
       "name": "voice-say: aset siap → mesin neural dicoba dulu, lalu turun ke peramban bila ia gagal",
       "status": "PASS",
       "details": "runtime.speak=1 speechSynthesis.speak=1"
@@ -186,11 +191,6 @@
       "name": "voice-say: mesin neural yang BERHASIL tidak diikuti suara peramban dua kali",
       "status": "PASS",
       "details": "runtime.speak=1 speechSynthesis.speak=0"
-    },
-    {
-      "name": "addon: audio yang BERBUNYI tetap menghitung replay dan membuka jawaban",
-      "status": "PASS",
-      "details": "replays=1 work.disabled=false"
     },
     {
       "name": "addon: say() yang menjawab false dihitung GAGAL, bukan sukses senyap",

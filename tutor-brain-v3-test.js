@@ -199,11 +199,41 @@ test('benar tetapi lambat dimantapkan dulu, tidak langsung dinaikkan', () => {
 });
 
 test('beruntun benar dan cepat dinaikkan — soal di bawah kemampuan membuang giliran', () => {
+  // Gate ini DIPERBARUI mengikuti temuan council (gpt_5_6_sol §4.2): baseline waktu jawab
+  // kini median BERGULIR, bukan beku di sampel pertama. Karena itu "cepat" harus dibuktikan
+  // relatif terhadap kebiasaan yang sudah terbentuk di sesi ini - tiga jawaban wajar dulu,
+  // baru rentetan cepat; murid yang SELALU 3 detik memang bukan murid yang sedang mengingat.
   const s = session();
+  for (let i = 0; i < 3; i++) answer(s, { correct: true, chosenOption: 'is preparing', ms: 8000 });
   let d;
-  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 3000 });
+  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 2000 });
   assert.strictEqual(d.timing, 'retrieved');
   assert.strictEqual(T.decideMove(s, d, { remaining: 5 }).move, 'stretch');
+});
+
+test('empat tebakan benar TIDAK menaikkan kesulitan — tebakan bukan penguasaan', () => {
+  // Temuan council terverifikasi (gpt_5_6_sol §4.2): decideMove lama menganggap `retrieved`
+  // ATAU `guess` sebagai alasan stretch setelah streak empat, jadi empat tebakan benar
+  // (peluang seperempat per soal) bisa menaikkan kesulitan. Gate lama ikut mengizinkannya.
+  // Sekarang: tebakan cepat beruntun terus berjalan sambil polanya dinamai, bukan di-stretch.
+  const s = session();
+  let d;
+  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 1000 });
+  assert.strictEqual(d.timing, 'guess');
+  const move = T.decideMove(s, d, { remaining: 5 });
+  assert.strictEqual(move.move, 'continue', 'tebakan beruntun tidak boleh menaikkan kesulitan');
+  assert.strictEqual(move.reason, 'streak_but_guessing');
+});
+
+test('baseline waktu jawab bergulir mengikuti sesi, tidak beku di sampel pertama', () => {
+  // Temuan council (gpt_5_6_sol §4.2): baseline lama diisi sekali lalu tidak pernah
+  // diperbarui karena `if (!s.baselineMs)`. Murid yang ternyata lambat di sesi ini harus
+  // membuat baselinenya ikut melambat - sehingga 9 detik terbaca CEPAT baginya, bukan wajar.
+  const s = session(); // seed 8000 dari sesi lalu
+  for (let i = 0; i < 3; i++) answer(s, { correct: true, chosenOption: 'is preparing', ms: 20000 });
+  assert.strictEqual(s.baselineMs, 20000, 'baseline tidak mengikuti median sesi berjalan');
+  const d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 9000 });
+  assert.strictEqual(d.timing, 'retrieved', 'baseline beku membuat 9 detik terbaca wajar, padahal muridnya lambat');
 });
 
 test('murid lelah dihentikan, bukan dimudahkan — dan itu mengalahkan tindakan lain', () => {
@@ -225,6 +255,38 @@ test('soal habis ditutup, tidak dibiarkan menggantung', () => {
   const s = session();
   const d = answer(s, { correct: true, chosenOption: 'is preparing' });
   assert.strictEqual(T.decideMove(s, d, { remaining: 0 }).move, 'wrapup');
+});
+
+test('nama miskonsepsi yang sama di konsep berbeda tidak saling menimpa', () => {
+  // Temuan council (gpt_5_6_sol §4.1): kunci state dulu nama-saja, jadi miskonsepsi bernama
+  // sama pada dua konsep saling menimpa dan salah satu kali di tiap konsep sudah terbaca
+  // "dua kali". Kuncinya kini pasangan konsep::miskonsepsi.
+  const s = session();
+  answer(s, { concept: 'articles', skill: 'articles' });
+  const d2 = answer(s);
+  assert.strictEqual(d2.repeats, 1, 'hitungan dari konsep lain bocor ke konsep ini');
+  assert.strictEqual(T.decideMove(s, d2, { remaining: 8 }).move, 'hint', 'satu kali per konsep belum pola');
+  // Benar di satu konsep hanya menyelesaikan pasangan konsep itu, bukan semua yang senama.
+  const win = answer(s, { correct: true, chosenOption: 'is preparing', concept: 'articles', skill: 'articles' });
+  assert.strictEqual(win.breakthrough, true);
+  const d3 = answer(s);
+  assert.strictEqual(d3.repeats, 2, 'hitungan konsep ini ikut terhapus oleh terobosan konsep lain');
+});
+
+test('miskonsepsi persisten dari ledger langsung terdeteksi pada kemunculan pertama sesi ini', () => {
+  // Perbaikan (5): createSession menerima options.priorMisconceptions dari ledger persisten
+  // dan men-seed hitungan 1 - guru tidak melupakan kekeliruan minggu lalu hanya karena hari
+  // berganti. Kemunculan pertama di sesi ini adalah bukti KEDUA, langsung persisten.
+  const s = T.createSession({
+    now: NOW, baselineMs: 8000,
+    priorMisconceptions: [{ concept: 'present_simple_vs_continuous', misconception: MAP.prepares }]
+  });
+  const d = answer(s);
+  assert.strictEqual(d.repeats, 2, 'seed dari ledger tidak terhitung');
+  const move = T.decideMove(s, d, { remaining: 8 });
+  assert.strictEqual(move.move, 'reteach');
+  assert.strictEqual(move.reason, 'persistent_misconception');
+  assert.strictEqual(move.misconception, MAP.prepares);
 });
 
 // ---------------------------------------------------------------------------------------
@@ -317,6 +379,66 @@ test('tidak satu pun naskah tutor keluar dalam bahasa Inggris', () => {
   }));
 });
 
+// Bahan penjelasan yang dipakai gate rotasi "jangan ulangi yang gagal" di bawah ini.
+const EXPLAIN_INPUT = {
+  move: 'hint', scaffold: 'hint', concept: 'present_simple_vs_continuous',
+  conceptLabel: 'bentuk sedang berlangsung',
+  whyFails: 'menganggap penanda waktu sebagai hiasan',
+  explanation: { rule: 'Kejadian yang sedang berlangsung memakai bentuk sedang', memoryCue: 'Lihat penanda waktunya dulu' },
+  chosenOption: 'prepares', correctAnswer: 'is preparing'
+};
+
+test('penjelasan yang gagal tidak pernah diulang dengan frasa yang sama', () => {
+  // Temuan council (gpt_5_6_sol §4.3): `explanationsUsed` dulu dibuat tetapi tidak pernah
+  // dibaca atau diperbarui - janji "tidak mengulang penjelasan yang gagal" kosong. Sekarang:
+  // record() mencatat kunci konsep::tangga yang GAGAL (murid tetap salah setelahnya), dan
+  // composeTurn(input, session) memilih variasi frasa berbeda setiap kali.
+  const s = session();
+  answer(s);
+  const turn1 = T.composeTurn(EXPLAIN_INPUT, s);
+  answer(s); // masih salah -> penjelasan turn1 resmi GAGAL
+  assert.strictEqual(s.explanationsUsed['present_simple_vs_continuous::hint'], 1,
+    'kegagalan penjelasan tidak tercatat');
+  const turn2 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.notStrictEqual(turn2.ask, turn1.ask, 'penjelasan yang gagal diulang persis sama');
+  answer(s); // salah lagi -> turn2 juga gagal, frasa harus berputar lagi
+  const turn3 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.notStrictEqual(turn3.ask, turn2.ask, 'rotasi berhenti setelah satu variasi');
+  answer(s); // gagal ketiga -> giliran bentuk kontras jawaban murid vs bentuk benar
+  const turn4 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.ok(turn4.ask.indexOf('jawabanmu "prepares"') >= 0 && turn4.ask.indexOf('is preparing') >= 0,
+    'bentuk kontras jawabanmu-vs-bentuk-benar tidak pernah muncul: ' + turn4.ask);
+});
+
+test('penjelasan yang BERHASIL tidak dicap gagal', () => {
+  const s = session();
+  answer(s);
+  T.composeTurn(EXPLAIN_INPUT, s);
+  answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.ok(!s.explanationsUsed['present_simple_vs_continuous::hint'],
+    'penjelasan yang bekerja ikut masuk daftar hindaran');
+});
+
+test('level worked benar-benar berisi contoh yang dikerjakan, bukan sekadar mengutip aturan', () => {
+  // Temuan council (gpt_5_6_sol §4.4): dulu `worked` berkata "aku kerjakan satu yang mirip"
+  // tetapi hanya menyodorkan ex.rule - label tidak cocok dengan isinya. Sekarang langkahnya
+  // disusun sungguhan: aturan, kalimat contoh, lalu bentuk yang benar - dan payload-nya
+  // berbeda dari `tell`.
+  const input = {
+    move: 'hint', scaffold: 'worked', whyFails: 'belum cocok dengan konteks kalimat',
+    explanation: { rule: 'Kejadian yang sedang berlangsung memakai bentuk sedang', whyCorrect: 'Penanda waktunya menunjuk kejadian sekarang' },
+    sentence: 'Look! She ___ dinner', correctAnswer: 'is preparing'
+  };
+  const worked = T.composeTurn(input);
+  const told = T.composeTurn(Object.assign({}, input, { scaffold: 'tell' }));
+  ['Langkah 1', 'Langkah 2', 'Langkah 3'].forEach(step =>
+    assert.ok(worked.ask.indexOf(step) >= 0, step + ' hilang dari contoh yang dikerjakan: ' + worked.ask));
+  assert.ok(worked.ask.indexOf('Look! She ___ dinner') >= 0, 'kalimat contohnya tidak ikut dikerjakan');
+  assert.ok(worked.ask.indexOf('is preparing') >= 0, 'langkah terakhir tidak menunjukkan bentuk yang keluar');
+  assert.notStrictEqual(worked.ask, told.ask, 'worked dan tell menyodorkan payload yang sama');
+  assert.strictEqual(worked.reveal, false, 'worked bukan tangga pembuka jawaban');
+});
+
 test('naskah tidak pernah keluar dengan titik ganda', () => {
   const turn = T.composeTurn({
     move: 'hint', scaffold: 'hint', whyFails: 'belum cocok dengan konteks kalimat.',
@@ -391,5 +513,175 @@ test('modul tutor ikut dimuat halaman dan ikut di-precache service worker', () =
   assert.ok(tutor < app, 'modul tutor harus dimuat sebelum app.js');
 });
 
+// ---------------------------------------------------------------------------------------
+// I. FASE 2 — AFEK: empat keadaan, empat tindakan berbeda, dan keselamatan tetap menang
+// ---------------------------------------------------------------------------------------
+test('empat keadaan afek menghasilkan empat intervensi BERBEDA, netral tidak mengubah apa pun', () => {
+  // Kontrak Fase 2: frustrated->breathe, bored->stretch, gaming->continue+suggestModeSwitch,
+  // fatigued->wrapup. Sebuah decideMove yang menjawab semuanya dengan 'continue' akan lulus
+  // tes keberadaan - karena itu yang diuji adalah PERBEDAAN keputusannya.
+  const s = session();
+  const d = answer(s, { correct: true, chosenOption: 'is preparing' });
+  const mk = state => T.decideMove(s, d, { remaining: 8, affect: { state } });
+  const frustrated = mk('frustrated'), bored = mk('bored'), gaming = mk('gaming'), fatigued = mk('fatigued');
+  assert.strictEqual(frustrated.move, 'breathe');
+  assert.strictEqual(frustrated.reason, 'affect_frustrated');
+  assert.strictEqual(bored.move, 'stretch');
+  assert.strictEqual(bored.reason, 'affect_bored');
+  assert.strictEqual(gaming.move, 'continue');
+  assert.strictEqual(gaming.reason, 'affect_gaming');
+  assert.strictEqual(gaming.suggestModeSwitch, true, 'gaming harus menyarankan ganti mode soal');
+  assert.strictEqual(fatigued.move, 'wrapup');
+  assert.strictEqual(fatigued.reason, 'affect_fatigued');
+  const distinct = new Set([frustrated, bored, gaming, fatigued].map(m => m.move + ':' + (m.suggestModeSwitch === true)));
+  assert.strictEqual(distinct.size, 4, 'empat keadaan harus menghasilkan empat intervensi berbeda');
+  // Netral dan absen identik dengan perilaku lama - tanpa flag apa pun.
+  const neutral = mk('neutral'), absent = T.decideMove(s, d, { remaining: 8 });
+  assert.deepStrictEqual(neutral, absent, 'neutral harus identik dengan tanpa affect');
+  assert.strictEqual(neutral.move, 'continue');
+  assert.strictEqual(neutral.reason, 'on_track');
+  assert.ok(!('suggestModeSwitch' in neutral), 'flag gaming bocor ke keadaan netral');
+});
+
+test('afek fatigued hanya menutup sesi bila sisa soal masih panjang (remaining>2)', () => {
+  const s = session();
+  const d = answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.strictEqual(T.decideMove(s, d, { remaining: 3, affect: { state: 'fatigued' } }).move, 'wrapup');
+  const short = T.decideMove(s, d, { remaining: 2, affect: { state: 'fatigued' } });
+  assert.notStrictEqual(short.move, 'wrapup', 'dua soal terakhir lebih baik diselesaikan daripada dipotong');
+  assert.strictEqual(short.reason, 'on_track', 'sisa pendek harus jatuh ke perilaku lama tanpa perubahan');
+});
+
+test('aturan keselamatan tetap menang atas afek: miskonsepsi persisten, rentetan salah, lelah kognitif', () => {
+  // Murid yang bosan TAPI mengulang miskonsepsi yang sama tetap diajar ulang - mood tidak
+  // boleh membatalkan keselamatan. Ketiga aturan lama diuji satu per satu melawan afek.
+  const s1 = session();
+  answer(s1);
+  const d1 = answer(s1);
+  const m1 = T.decideMove(s1, d1, { remaining: 8, affect: { state: 'bored' } });
+  assert.strictEqual(m1.move, 'reteach');
+  assert.strictEqual(m1.reason, 'persistent_misconception');
+  const s2 = session();
+  const opts = ['prepares', 'has prepared', 'prepare'];
+  let d2; opts.forEach(chosenOption => { d2 = answer(s2, { chosenOption }); });
+  const m2 = T.decideMove(s2, d2, { remaining: 8, affect: { state: 'gaming' } });
+  assert.strictEqual(m2.move, 'reteach');
+  assert.strictEqual(m2.reason, 'miss_streak');
+  assert.ok(!m2.suggestModeSwitch, 'flag gaming tidak boleh menempel pada keputusan keselamatan');
+  const s3 = session();
+  for (let i = 0; i < 6; i++) answer(s3, { correct: true, chosenOption: 'is preparing' });
+  const d3 = answer(s3);
+  const m3 = T.decideMove(s3, d3, { remaining: 8, fatigue: 'fatigued', affect: { state: 'bored' } });
+  assert.strictEqual(m3.move, 'breathe');
+  assert.strictEqual(m3.reason, 'cognitive_load_high');
+});
+
+// ---------------------------------------------------------------------------------------
+// J. FASE 2 — SCAFFOLD FADING: tangga bukan eskalator satu arah
+// ---------------------------------------------------------------------------------------
+test('dua keberhasilan mandiri berturut menurunkan titik mulai tangga satu anak tangga', () => {
+  // Temuan Opus §3.4: tangga lama hanya bisa naik. Murid mastery rendah selamanya mulai dari
+  // `hint` betapapun ia sudah membuktikan diri. Dua sukses mandiri (dinilai, tanpa bantuan
+  // tutor sebelumnya) kini menurunkan titik mulai ke `probe` - dan tidak pernah lebih rendah.
+  const s = session();
+  let d = answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.strictEqual(d.fadeCredit, 0, 'satu sukses belum boleh memudarkan bantuan');
+  d = answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.strictEqual(d.fadeCredit, 1, 'dua sukses mandiri berturut harus memberi kredit fading');
+  assert.strictEqual(d.scaffoldRationale, 'scaffold_faded', 'rationale scaffold_faded hilang');
+  assert.strictEqual(
+    T.scaffoldLevel({ priorMisses: 0, mastery: 10, misconceptionRepeats: 0, fadeCredit: d.fadeCredit }),
+    'probe', 'titik mulai murid mastery rendah harus turun dari hint ke probe');
+  // Tidak pernah di bawah probe: kredit menumpuk tidak menghasilkan "tanpa bantuan sama sekali".
+  assert.strictEqual(
+    T.scaffoldLevel({ priorMisses: 0, mastery: 80, misconceptionRepeats: 0, fadeCredit: 3 }),
+    'probe', 'fading tidak boleh turun melewati probe');
+});
+
+test('kegagalan menghapus kredit fading — kepercayaan dibangun ulang dari nol', () => {
+  const s = session();
+  answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.strictEqual(answer(s, { correct: true, chosenOption: 'is preparing' }).fadeCredit, 1);
+  const miss = answer(s);
+  assert.strictEqual(miss.fadeCredit, 0, 'kegagalan harus menghapus kredit, bukan menyisakannya');
+  assert.ok(!miss.scaffoldRationale, 'rationale fading tidak boleh menempel setelah kredit hangus');
+  assert.strictEqual(
+    T.scaffoldLevel({ priorMisses: 0, mastery: 10, misconceptionRepeats: 0, fadeCredit: miss.fadeCredit }),
+    'hint', 'titik mulai harus kembali ke semula setelah gagal');
+  // Dan satu sukses SETELAH gagal belum cukup - butuh dua bukti baru.
+  assert.strictEqual(answer(s, { correct: true, chosenOption: 'is preparing' }).fadeCredit, 0);
+});
+
+test('sukses yang tidak mandiri tidak dihitung: retry tanpa nilai dan jawaban tepat setelah bantuan', () => {
+  // Retry (scored:false) membuktikan bantuannya bekerja, bukan muridnya mandiri; dan sukses
+  // persis setelah composeTurn memberi penjelasan pada konsep itu adalah sukses berdua.
+  const s1 = session();
+  answer(s1, { correct: true, chosenOption: 'is preparing', scored: false });
+  const d1 = answer(s1, { correct: true, chosenOption: 'is preparing', scored: false });
+  assert.strictEqual(d1.fadeCredit, 0, 'retry tanpa nilai ikut terhitung sebagai bukti mandiri');
+  const s2 = session();
+  answer(s2);
+  T.composeTurn(EXPLAIN_INPUT, s2); // tutor baru saja membantu konsep ini
+  answer(s2, { correct: true, chosenOption: 'is preparing' }); // sukses berbantuan
+  const d2 = answer(s2, { correct: true, chosenOption: 'is preparing' }); // baru satu bukti mandiri
+  assert.strictEqual(d2.fadeCredit, 0, 'sukses berbantuan ikut terhitung sebagai bukti mandiri');
+});
+
+test('kredit fading dihitung per konsep, tidak bocor ke konsep lain', () => {
+  const s = session();
+  answer(s, { correct: true, chosenOption: 'is preparing' });
+  answer(s, { correct: true, chosenOption: 'is preparing' });
+  const other = answer(s, { correct: true, chosenOption: 'ok', concept: 'articles', skill: 'articles' });
+  assert.strictEqual(other.fadeCredit, 0, 'kredit konsep lain bocor ke konsep ini');
+});
+
+// ---------------------------------------------------------------------------------------
+// K. FASE 2 — PEMILIHAN BERSEED: variasi yang bisa diulang, bukan lotre
+// ---------------------------------------------------------------------------------------
+// Kolam seragam: tanpa predict semua kandidat berskor sama, jadi softmax-nya rata dan hanya
+// seed yang menentukan - tempat paling telanjang untuk menguji determinisme dan variasinya.
+const UNIFORM_POOL = [
+  { id: 'u1', concept: 'k1' }, { id: 'u2', concept: 'k2' },
+  { id: 'u3', concept: 'k3' }, { id: 'u4', concept: 'k4' }
+];
+
+test('seed yang sama selalu memilih soal yang sama — deterministik, bisa diuji ulang', () => {
+  for (let seed = 0; seed < 10; seed++) {
+    const a = T.selectNext(UNIFORM_POOL, session(), { seed });
+    const b = T.selectNext(UNIFORM_POOL, session(), { seed });
+    assert.strictEqual(a.id, b.id, 'seed ' + seed + ' menghasilkan pilihan berbeda pada dua panggilan');
+  }
+});
+
+test('seed berbeda pada kolam seragam bisa memilih soal berbeda — argmax murni adalah rel', () => {
+  const picks = new Set();
+  for (let seed = 1; seed <= 32; seed++) picks.add(T.selectNext(UNIFORM_POOL, session(), { seed }).id);
+  assert.ok(picks.size > 1, 'seluruh seed memilih soal yang sama - samplingnya tidak hidup');
+});
+
+test('tanpa seed perilakunya tetap argmax lama, dan seed tidak pernah mengalahkan skor yang jauh unggul', () => {
+  // Tanpa seed: kandidat berskor tertinggi, titik. Persis jalur lama.
+  const predict = item => (item.id === 'u2' ? 0.8 : 0.4);
+  assert.strictEqual(T.selectNext(UNIFORM_POOL, session(), { predict }).id, 'u2');
+  // Dengan seed, forceConcept (+6 skor) tetap menang praktis selalu: suhu 0.35 membuat
+  // selisih sebesar itu ~e^17 kali lebih mungkin - sampling menambah variasi di antara yang
+  // SETARA, bukan mengacak keputusan pedagogis.
+  for (let seed = 0; seed < 20; seed++) {
+    const picked = T.selectNext(UNIFORM_POOL, session(), { seed, forceConcept: 'k3' });
+    assert.strictEqual(picked.id, 'u3', 'seed ' + seed + ' mengalahkan forceConcept');
+  }
+});
+
+test('sampling berseed tidak pernah keluar dari empat kandidat teratas', () => {
+  // Kolam delapan soal, empat terbawah dibuat jelas buruk (peluang sukses jauh dari target).
+  const pool = [];
+  for (let i = 1; i <= 8; i++) pool.push({ id: 'p' + i, concept: 'c' + i });
+  const predict = item => (Number(item.id.slice(1)) <= 4 ? 0.8 : 0.1);
+  for (let seed = 0; seed < 40; seed++) {
+    const picked = T.selectNext(pool, session(), { seed, predict });
+    assert.ok(Number(picked.id.slice(1)) <= 4, 'seed ' + seed + ' memilih kandidat di luar empat teratas: ' + picked.id);
+  }
+});
+
 if (failures) { console.error('\n' + failures + ' gate gagal.'); process.exit(1); }
-console.log('\nTutor Brain v3: semua gate lolos.');
+console.log('\nTutor Brain v3: PASS');
