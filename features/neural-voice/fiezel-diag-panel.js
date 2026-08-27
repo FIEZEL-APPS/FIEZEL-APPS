@@ -99,6 +99,17 @@
       puterLoaded: safe(function(){ return typeof root.puter !== 'undefined' && !!root.puter; }),
       puterWorkersLoaded: safe(function(){ return !!(root.puter && root.puter.workers); }),
       puterAuth: collectPuterAuth(),
+      // m031-killswitch: keadaan GABUNGAN kill switch Cloudflare, dibaca dari sumbernya
+      // (app.js blok CF-KILLSWITCH) dan bukan diparse ulang di sini. Owner butuh empat hal
+      // dalam satu tampilan saat memutar sakelar: flag statis di berkas, flag yang dijawab
+      // server, hasil gabungan yang BENAR-BENAR dipakai transport, dan kapan terakhir
+      // diambil - tanpa itu "sudah saya matikan" adalah klaim yang tidak bisa diperiksa
+      // dari perangkat yang tidak punya Web Inspector.
+      cfKillSwitch: safe(function(){
+        var gate = root.FiezelCfKillSwitch;
+        if (!gate || typeof gate.snapshot !== 'function') return '(kill switch CF belum dimuat)';
+        return gate.snapshot();
+      }),
       localStorageKeys: safe(function(){ return Object.keys(root.localStorage); }, []),
       target: safe(function(){ return root.localStorage.getItem(KEY); }, null),
       runtimeStatus: safe(function(){
