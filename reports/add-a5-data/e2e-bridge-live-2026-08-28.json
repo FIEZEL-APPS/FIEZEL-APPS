@@ -334,7 +334,7 @@
       "id": "cookie-replayed",
       "name": "Browser MEMASANG kembali cookie fz_id pada permintaan berikutnya (SameSite=Lax lintas subdomain, dinilai browser)",
       "status": "PASS",
-      "details": "Cookie: fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlh"
+      "details": "Cookie: fz_id=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>"
     },
     {
       "id": "quota-200-after-auth",
@@ -479,7 +479,7 @@
       "url": "https://api.puter.com/version",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALBCORS=7rp8DYGUMqxQxD2IWuN1elrV96pghBp/2+zI9GzJ9B5aoOpitQIeFz3BwggcldgPK/hxYWguY82o9sAas6IG1O4/Ta8hkeOfVGBA5aAACotP7SJOawzYbDnVjrFU",
+      "cookieHeader": "AWSALBCORS=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {
@@ -489,7 +489,7 @@
       "url": "https://api.puter.com/read?file=%7E%2F.__puter_gui.json",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALB=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH; AWSALBCORS=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH",
+      "cookieHeader": "AWSALB=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>; AWSALBCORS=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {
@@ -499,7 +499,7 @@
       "url": "https://puter.com/get-gui-token",
       "host": "puter.com",
       "resourceType": "fetch",
-      "cookieHeader": "AWSALB=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB; AWSALBCORS=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB",
+      "cookieHeader": "AWSALB=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>; AWSALBCORS=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {
@@ -639,7 +639,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {
@@ -659,7 +659,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {
@@ -669,7 +669,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<DIREDAKSI-F4: nilai cookie sungguhan tidak boleh ada di repo>",
       "headersRead": true
     },
     {

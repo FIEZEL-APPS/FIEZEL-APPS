@@ -215,6 +215,21 @@ jobs:
           # memasangnya demi satu berkas bukan pertukaran yang sehat; batas itu ditulis di
           # kepala gerbangnya, bukan disembunyikan.
           node edge-proxy-contract-test.js
+          # F4: gerbang cacat "permintaan ke-3 menggantung". Dijalankan TEPAT SESUDAH
+          # edge-proxy-contract-test.js karena ia menjaga berkas PHP yang sama dari sudut
+          # yang berbeda: yang di atas menjaga KEBIJAKAN (siapa boleh lewat, apa yang
+          # di-cache), yang ini menjaga TRANSPORT — header hop-by-hop dibuang DUA ARAH,
+          # batas cURL lebih pendek dari batas 8 s yang membuat browser
+          # menyerah (angkanya dibaca dari tools/fiezel-e2e-bridge.mjs, bukan ditulis dua
+          # kali), nol session_start() tanpa session_write_close(), Content-Length tidak
+          # diteruskan mentah, badan ditulis sekali lalu di-flush, dan placeholder secret
+          # tetap placeholder. Ia memuat KEDUA proxy (api + owner) sebagai TEKS dan
+          # membuktikan setiap detektornya bisa MERAH lewat matriks racun di memori.
+          # Batasnya ditulis di kepala gerbangnya: ia mencegah kelas cacat ini KEMBALI, ia
+          # TIDAK membuktikan cacat F4 tertutup — itu hanya terbukti sesudah gerbang E2E
+          # browser dijalankan ulang terhadap jembatan yang sudah diunggah (deploy/edge/
+          # README.md §5e.4).
+          node edge-proxy-hopbyhop-test.js
           # A4: pemindai rahasia SELURUH repo. Dijalankan tepat sesudah edge-guard karena
           # keduanya menjaga permukaan yang sama dari dua jangkauan berbeda: edge-guard
           # menjaga SATU berkas (`deploy/edge/api-index.php`) secara mendalam, gerbang ini
