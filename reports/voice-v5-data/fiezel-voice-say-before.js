@@ -32,11 +32,6 @@
  * mengembalikan false alih-alih meneruskan ke bawah. Penjaga unduhan 152 MB di L3 tidak
  * disentuh - lihat localEngine() dan speakWithBrowser().
  *
- * PREFETCH MENGIKUTI TANGGA YANG SAMA (v5). prefetch() menghangatkan kalimat BERIKUTNYA
- * lewat L1 -> L2 -> L3, tanpa L4 dan tanpa subtitle. Ia tidak boleh memicu unduhan model:
- * lihat blok komentar di atas prefetch() untuk pagar 152 MB, batas konkurensi, dan
- * deduplikasi teks kanonik.
- *
  * URUTANNYA DISENGAJA. Subtitle diminta lebih dulu, tetapi TIDAK ditunggu: suara mulai
  * berbunyi saat itu juga, dan barisnya menyusul begitu datang. Menunggu terjemahan
  * sebelum berbunyi akan menambah jeda sebelum setiap kalimat, dan membuat kegagalan
@@ -305,160 +300,23 @@
     });
   }
 
-  // =========================================================================================
-  // PREFETCH — v5. Sampai perbaikan ini prefetch berhenti di L2 dan mesin neural di
-  // perangkat TIDAK PERNAH ikut dihangatkan (reports/voice-v1-audit.md §4). Akibatnya
-  // terukur: kalimat berikutnya baru mulai digenerasi sesudah audio kalimat sekarang habis,
-  // dan jeda terdengar rata-rata 4.422 ms. Dengan prefetch yang benar-benar sampai ke mesin
-  // neural, audit yang sama mengukur 777 ms (skenario A2).
-  //
-  // TIGA PAGAR YANG TIDAK BOLEH RUNTUH DI SINI:
-  //
-  //   1. PENJAGA 152 MB. Prefetch neural HANYA lewat localEngine(), yang mengembalikan null
-  //      selama status().prepared/ready belum benar. Prefetch TIDAK BOLEH memanggil
-  //      prepare(), ensureReady(), prewarm(), atau apa pun yang bisa memulai unduhan model
-  //      152 MB. Pekerjaan spekulatif tidak berhak menghabiskan kuota data murid tanpa
-  //      persetujuannya - dan murid tidak pernah menekan apa pun untuk memicu prefetch.
-  //      Kalau mesin belum prepared, jawabannya false DENGAN TENANG, titik.
-  //   2. TIDAK MENGHAMBAT DAN TIDAK PERNAH MELEMPAR. Pemanggil boleh mengabaikan hasilnya;
-  //      janji yang dikembalikan tidak pernah reject, dan kegagalan apa pun sepenuhnya
-  //      senyap terhadap murid (tidak ada toast, tidak ada subtitle, tidak ada breaker).
-  //   3. TIDAK MENULIS APA PUN. Prefetch tidak menyentuh pita subtitle (jadi penerjemah
-  //      tidak dipanggil dan jatah AI tidak terpakai), tidak menyentuh pemutar, dan tidak
-  //      pernah menyalakan L4 speechSynthesis - suara peramban tidak punya cache, jadi
-  //      menghangatkannya berarti membunyikannya lebih awal. Kredit ElevenLabs juga aman:
-  //      L1 hanya mengambil berkas yang SUDAH ada di manifest, dan tak satu pun mesin di
-  //      bawahnya memanggil ElevenLabs.
-  //
-  // URUTAN LAPISANNYA SAMA DENGAN say(): aset R2 -> Puter -> neural lokal. Menembak neural
-  // langsung akan menghangatkan mesin yang tidak akan dipakai untuk kalimat yang sudah punya
-  // aset, dan itu membakar CPU ponsel murah untuk hasil yang dibuang.
-
-  // Ponsel kelas bawah tersedak bila dua-tiga generasi neural jalan bersamaan, dan mesin
-  // neural sendiri single-flight (fiezel-neural-voice.js:286-290): prefetch keempat hanya
-  // akan mengantre dan menua. Satu di depan sudah cukup untuk menutup jeda pada RTF ~0,9;
-  // dua memberi sedikit ruang bila lapisan L1 yang lambat.
-  var PREFETCH_MAX_INFLIGHT = 2;
-  var prefetchInflight = 0;
-  // key kanonik -> janji yang sedang berjalan. Pemanggil yang meminta teks yang sama dua
-  // kali (Library warmNext dipanggil ulang setelah replay, quiz yang digambar dua kali)
-  // menerima janji yang SAMA, bukan generasi kedua.
-  var prefetchPending = Object.create(null);
-
-  /**
-   * Kunci teks kanonik. Beda spasi, beda huruf besar-kecil, dan tanda kutip melengkung
-   * bukan kalimat yang berbeda bagi mesin suara, jadi ia tidak boleh menjadi prefetch
-   * kedua. Locale/contentType/voice/speed ikut karena hasil render-nya memang berbeda.
-   */
-  function prefetchKey(english, opts) {
-    var canonical = String(english)
-      .replace(/[\u2018\u2019]/g, "'")
-      .replace(/[\u201C\u201D]/g, '"')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
-    var voice = opts.voice && typeof opts.voice === 'object' ? (opts.voice.name || 'obj') : (opts.voice || '');
-    return [
-      canonical,
-      opts.locale || 'en-US',
-      opts.contentType || 'sentence',
-      String(voice),
-      String(opts.speed || '')
-    ].join('\u0001');
-  }
-
-  /**
-   * L3 hangat - satu-satunya cabang yang menyentuh mesin neural, dan ia lewat pintu yang
-   * sama dengan speakWithLocal(): localEngine().
-   *
-   * PENJAGA 152 MB. Perhatikan yang TIDAK ada di sini: tidak ada rt.prepare(), tidak ada
-   * ensureReady(), tidak ada prewarm(), tidak ada refreshPreparedFlag(). localEngine()
-   * membaca status() dan menjawab null selama aset belum prepared/ready, dan null di sini
-   * berarti Promise.resolve(false) - BUKAN unduhan 152 MB di latar belakang. Siapa pun yang
-   * kelak ingin "memperbaiki" prefetch yang selalu false pada murid baru: itu bukan bug,
-   * itulah pagarnya. Murid baru mendapat suara dari L1/L2/L4, bukan dari unduhan diam-diam.
-   */
-  function prefetchWithLocal(english, opts) {
-    var local = localEngine();
-    if (!local || typeof local.prefetch !== 'function') return Promise.resolve(false);
-    try {
-      return Promise.resolve(local.prefetch(english, {
-        speed: opts.speed,
-        voice: opts.voice,
-        lang: opts.lang,
-        intent: opts.intent
-      })).then(function (ok) { return ok !== false && ok != null; }, function () { return false; });
-    } catch (_) {
-      return Promise.resolve(false);
-    }
-  }
-
-  /** L2 hangat, dengan memo kredit yang sama seperti speakWithEngine(). */
-  function prefetchWithEngine(english, opts) {
-    var voice = engine();
-    if (!voice || typeof voice.prefetch !== 'function') return prefetchWithLocal(english, opts);
-    var credit = null;
-    try { credit = typeof voice.creditStatus === 'function' ? voice.creditStatus() : null; } catch (_) { credit = null; }
-    // Memo kredit habis: jangan panggil Puter lagi di sesi ini, apalagi untuk pekerjaan
-    // spekulatif yang tidak diminta murid.
-    if (credit && credit.outOfCredit) return prefetchWithLocal(english, opts);
-    try {
-      return Promise.resolve(voice.prefetch(english, opts)).then(function (ok) {
-        if (ok) return true;
-        return prefetchWithLocal(english, opts);
-      }, function () {
-        return prefetchWithLocal(english, opts);
-      });
-    } catch (_) {
-      return prefetchWithLocal(english, opts);
-    }
-  }
-
-  /**
-   * Menyiapkan kalimat berikutnya lebih awal. Diam bila mesin tidak mendukungnya.
-   *
-   * @returns {Promise<boolean>} tidak pernah reject. false berarti "tidak ada yang bisa
-   *          dihangatkan", dan itu keadaan yang sah - bukan galat yang perlu dilaporkan.
-   */
+  /** Menyiapkan kalimat berikutnya lebih awal. Diam bila mesin tidak mendukungnya. */
   function prefetch(input, options) {
     var english = text(typeof input === 'string' ? input : (input && input.en));
     if (!english) return Promise.resolve(false);
     var opts = options || {};
-    var key = prefetchKey(english, opts);
-
-    // Deduplikasi: teks yang sama yang masih dihangatkan tidak dihangatkan dua kali.
-    if (prefetchPending[key]) return prefetchPending[key];
-    // Batas konkurensi. Menjawab false lebih baik daripada mengantre: kalimat yang
-    // ditolak di sini akan tetap digenerasi oleh say()-nya sendiri, dan ponsel murah
-    // tidak dipaksa menjalankan tiga generasi sekaligus.
-    if (prefetchInflight >= PREFETCH_MAX_INFLIGHT) return Promise.resolve(false);
 
     var store = assets();
-    var run;
-    try {
-      var ahead = store
-        ? Promise.resolve(store.prefetch({ text: english, locale: opts.locale || 'en-US', contentType: opts.contentType || 'sentence' }))
-        : Promise.resolve(false);
-      run = ahead.then(function (cached) {
-        if (cached) return true;
-        return prefetchWithEngine(english, opts);
-      }, function () {
-        // Resolver gagal (manifest/jaringan) bukan alasan melewatkan lapisan di bawahnya:
-        // justru kalimat inilah yang paling butuh mesin di perangkat.
-        return prefetchWithEngine(english, opts);
-      });
-    } catch (_) {
-      run = Promise.resolve(false);
-    }
+    var ahead = store
+      ? store.prefetch({ text: english, locale: opts.locale || 'en-US', contentType: opts.contentType || 'sentence' })
+      : Promise.resolve(false);
 
-    prefetchInflight++;
-    prefetchPending[key] = run = run.then(function (ok) { return ok === true; }, function () { return false; })
-      .then(function (ok) {
-        prefetchInflight--;
-        delete prefetchPending[key];
-        return ok;
-      });
-    return run;
+    return ahead.then(function (cached) {
+      if (cached) return true;
+      var voice = engine();
+      if (!voice || typeof voice.prefetch !== 'function') return false;
+      return voice.prefetch(english, opts);
+    }).catch(function () { return false; });
   }
 
   function stop() {
