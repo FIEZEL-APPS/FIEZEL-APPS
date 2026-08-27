@@ -2028,11 +2028,82 @@ function selectLoginMessage(){
 }
 function pushSupported(){return typeof navigator!=='undefined'&&'serviceWorker'in navigator&&typeof PushManager!=='undefined'}
 function base64UrlBytes(value){const pad='='.repeat((4-value.length%4)%4),raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/')),out=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)out[i]=raw.charCodeAt(i);return out}
-// Dulu baris terakhirnya langsung melempar 'puter_workers_unavailable' begitu global
-// `puter` tidak terlihat. Dengan SDK yang async, itu berarti setiap panggilan Core Brain
-// pada detik-detik pertama boot - termasuk pendaftaran remote push di ekor openApp() -
-// gagal pada boot yang sebenarnya sehat, hanya lebih lambat. SDK-nya ditunggu dulu.
-async function coreWorkerExec(path,options={}){if(!CORE_WORKER_URL)throw new Error('core_worker_not_configured');const url=CORE_WORKER_URL+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await awaitPuter();if(sdk?.workers?.exec)return sdk.workers.exec(url,options);throw new Error('puter_workers_unavailable')}
+/* CF-TRANSPORT-BEGIN — sakelar transport Cloudflare (core-config.js: FIEZEL_CF_CONFIG).
+ * Blok ini adalah PRA-CABANG di depan jalur Puter, bukan penulisan ulang jalur itu:
+ * `corePuterExec` di bawah memuat badan `coreWorkerExec` HARI INI apa adanya (termasuk
+ * ekor `const sdk=await awaitPuter();…` yang dijaga boot-order-test.js:273).
+ *
+ * Keadaan hari ini: `enabled:false` + `base:''` ⇒ `cfEndpointMode()` selalu 'off' ⇒ nol
+ * fetch tambahan, nol perubahan perilaku. Kode ada, jalurnya mati.
+ *
+ * `protocol:'1.7'` TIDAK dilonggarkan di mana pun: tiga pemeriksaan pemanggil
+ * (`policy_protocol_mismatch`, health `protocol_mismatch`, `coach_protocol_mismatch`)
+ * berjalan sama saja atas Response dari CF maupun dari Puter, karena bentuk kembalian
+ * `fetch()` sudah Response-like (`r.ok`, `r.status`, `r.json()`).
+ *
+ * Kill switch sesungguhnya ada di server (`GET /api/config` pada Worker CF): berkas
+ * core-config.js ikut precache `sw.js:35` dan dilayani cache-first, jadi sakelar statis
+ * hanya lapis kedua. Lihat komentar panjang di core-config.js.
+ */
+const CF_CONFIG=self.FIEZEL_CF_CONFIG||{};
+const CF_BASE=String(CF_CONFIG.base||'').trim().replace(/\/$/,'');
+// SATU nilai mematikan semuanya: enabled=false ⇒ tidak ada mode selain 'off', walau setiap
+// endpoint bernilai 'on'. Alamat kosong diperlakukan sama (tidak ada tujuan = tidak ada CF).
+const CF_ENABLED=CF_CONFIG.enabled===true&&CF_BASE!=='';
+// Peta path -> nama flag endpoint. Path yang TIDAK terpetakan (mis. /api/push/subscribe,
+// yang terikat VAPID dan MAX_USERS) selamanya 'off': menambah jalur CF harus keputusan
+// eksplisit di peta ini, bukan efek samping dari pencocokan longgar.
+const CF_ENDPOINT_ROUTES=[[/^\/health$/,'health'],[/^\/api\/config(?:\/|$)/,'config'],[/^\/api\/auth(?:\/|$)/,'auth'],[/^\/api\/quota(?:\/|$)/,'quota'],[/^\/api\/(?:ai|coach)(?:\/|$)/,'ai'],[/^\/api\/tts(?:\/|$)/,'tts'],[/^\/api\/(?:usage|activity|feedback|policy)(?:\/|$)/,'usage']];
+function cfEndpointKey(path){const p=String(path||'');for(const [pattern,key] of CF_ENDPOINT_ROUTES)if(pattern.test(p))return key;return ''}
+function cfEndpointMode(path){
+  if(!CF_ENABLED)return 'off';
+  const key=cfEndpointKey(path);if(!key)return 'off';
+  const mode=String(CF_CONFIG.endpoints?.[key]||'off');
+  // Nilai asing (typo, nilai lama) jatuh ke 'off'. Flag yang tidak dikenali harus berarti
+  // aman, bukan berarti hidup.
+  return mode==='on'||mode==='shadow'?mode:'off';
+}
+function cfWorkerFetch(path,options={}){return fetch(CF_BASE+String(path),{...options,credentials:'include',mode:'cors',cache:'no-store'})}
+// Catatan shadow, HANYA ke konsol diagnostik. Tidak pernah ke UI, tidak pernah ke state.
+function cfShadowLog(path,puterStatus,cfStatus){try{console.debug('[cf-shadow]',String(path),'puter='+puterStatus,'cf='+cfStatus,puterStatus===cfStatus?'match':'diff')}catch{}}
+// Mode 'shadow': jawaban murid TETAP dari Puter (lihat coreWorkerExec di bawah). Fungsi ini
+// hanya mengirim SALINAN permintaan ke CF dan MEMBUANG hasilnya.
+// Tiga hal yang dijaga di sini, karena inilah yang bisa melukai murid:
+//   1. Hasil CF tidak pernah dikembalikan ke pemanggil dan body-nya tidak pernah dibaca
+//      (tidak ada .json()/.text()), jadi mustahil menjadi jawaban yang ditampilkan.
+//   2. Efek samping tidak digandakan: salinan membawa penanda dry-run `X-Fiezel-Shadow: 1`;
+//      kontrak Worker CF adalah memperlakukan permintaan bertanda itu sebagai read-only
+//      (tidak menulis progres/kuota/analytics). Frontend juga tidak menulis apa pun di sini
+//      - tanpa save(), tanpa localStorage, tanpa render.
+//   3. Satu permintaan bayangan per satu panggilan, tanpa retry: shadow tidak boleh
+//      menggandakan beban maupun biaya.
+function cfShadowProbe(path,options,answer){
+  let shadow=null;
+  try{shadow=cfWorkerFetch(path,{...options,headers:{...(options?.headers||{}),'X-Fiezel-Shadow':'1'},keepalive:true})}catch{return}
+  if(!shadow||typeof shadow.then!=='function')return;
+  try{shadow.catch(()=>{})}catch{}
+  try{
+    Promise.allSettled([Promise.resolve(answer),shadow]).then(pair=>{
+      const puterStatus=pair[0]?.status==='fulfilled'?Number(pair[0].value?.status||0):0;
+      const cfStatus=pair[1]?.status==='fulfilled'?Number(pair[1].value?.status||0):0;
+      cfShadowLog(path,puterStatus,cfStatus)
+    }).catch(()=>{})
+  }catch{}
+}
+// Jalur Puter hari ini, dipindahkan APA ADANYA (dulu badan coreWorkerExec). Dulu baris
+// terakhirnya langsung melempar 'puter_workers_unavailable' begitu global `puter` tidak
+// terlihat; dengan SDK yang async itu berarti setiap panggilan Core Brain pada detik-detik
+// pertama boot gagal pada boot yang sebenarnya sehat. SDK-nya ditunggu dulu.
+async function corePuterExec(path,options={}){if(!CORE_WORKER_URL)throw new Error('core_worker_not_configured');const url=CORE_WORKER_URL+path;if(self.puter?.workers?.exec)return puter.workers.exec(url,options);const sdk=await awaitPuter();if(sdk?.workers?.exec)return sdk.workers.exec(url,options);throw new Error('puter_workers_unavailable')}
+async function coreWorkerExec(path,options={}){
+  const mode=cfEndpointMode(path);
+  if(mode==='on')return cfWorkerFetch(path,options);
+  if(mode!=='shadow')return corePuterExec(path,options);   // 'off' = jalur hari ini, nol tambahan
+  const answer=corePuterExec(path,options);                 // jawaban murid: Puter, selalu
+  cfShadowProbe(path,options,answer);                       // salinan ke CF, hasilnya dibuang
+  return answer;
+}
+/* CF-TRANSPORT-END */
 async function coreBrainHealth(){
   if(!CORE_WORKER_URL)return {ok:false,reason:'not_configured'};
   try{const r=await fetch(CORE_WORKER_URL+'/health',{cache:'no-store'});const data=await r.json().catch(()=>({}));if(!r.ok||data?.status!=='ok')return {ok:false,reason:`health_${r.status}`};if(String(data.protocol||'')!==CORE_PROTOCOL_VERSION)return {ok:false,reason:'protocol_mismatch',expected:CORE_PROTOCOL_VERSION,actual:String(data.protocol||'')};return {ok:true,data}}catch(error){return {ok:false,reason:String(error?.message||error)}}

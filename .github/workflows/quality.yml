@@ -164,3 +164,4 @@ jobs:
           node no-network-test.js
           node release-audit-gate-test.js
           node cf-transport-test.js
+          node cf-shadow-mode-test.js
