@@ -245,7 +245,7 @@
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): GET /api/usage/pepper",
       "status": "PASS",
-      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"d73e09e50367e4b2243bae84e4047b035f0572e54d4ab8e4b1db73b3cd7e34d6\",\"rotatesAtMs\":"
+      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"a7f5d82bbc38107de106ab2776b63ca2ed0d402b8d2c58ed1d8369effbe02b3a\",\"rotatesAtMs\":"
     },
     {
       "name": "A rute kuota menjawab 200 dengan amplop fiezel-quota-v1",
@@ -335,7 +335,7 @@
     {
       "name": "B penolakan tercatat di kolom denied atau tidak menaikkan used",
       "status": "PASS",
-      "details": "{\"user_id\":\"0d49fb9d-80f4-46dd-a49f-0487687f4d40\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
+      "details": "{\"user_id\":\"19ddbefe-0894-4654-a421-190593143cc3\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
     },
     {
       "name": "C render pertama (cache MISS) berhasil",
@@ -405,7 +405,7 @@
     {
       "name": "D scheduled(cron sweep) mengembalikan hasil sweep kuota",
       "status": "PASS",
-      "details": "{\"swept\":{\"reaped\":1,\"scanned\":1,\"hasMore\":false},\"reconciled\":{\"day\":\"2026-08-27\",\"users\":1}}"
+      "details": "{\"swept\":{\"reaped\":1,\"scanned\":1,\"hasMore\":false,\"malformed\":0},\"reconciled\":{\"day\":\"2026-08-27\",\"users\":1}}"
     },
     {
       "name": "D sweep MENGEMBALIKAN slot: ai_held kembali 0",
@@ -430,7 +430,7 @@
     {
       "name": "D scheduled(cron rollup) menjalankan rollup analytics harian",
       "status": "PASS",
-      "details": "{\"day\":\"2026-08-26\",\"dau\":0,\"wau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.14285714285714285},\"mau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.03333333333333333},\"purged\":[\"dau_dedup\",\"usage_daily\",\"retention_daily\"],\"pepperRotated\":true,\"ranAt\":1787799600000}"
+      "details": "{\"day\":\"2026-08-26\",\"dau\":0,\"wau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.14285714285714285},\"mau\":{\"lower\":0,\"upper\":0,\"days\":1,\"coverage\":0.03333333333333333},\"purged\":[\"dau_dedup\",\"usage_daily\",\"retention_daily\"],\"pepperRotated\":true,\"collectionOk\":true,\"usageRows\":0,\"ranAt\":1787799600000}"
     },
     {
       "name": "D rollup MEROTASI pepper (hari-1 tidak bisa disambung ke hari-2)",
@@ -460,7 +460,7 @@
     {
       "name": "E dua identitas uji berbeda",
       "status": "PASS",
-      "details": "bdbeefdd-9668-43ff-90ac-be567f86c66a vs 9aeb58ea-6abe-4ddc-a007-2e36a731f97e"
+      "details": "57dc8910-f869-4999-a7bf-fe08f7386b92 vs bd8592da-7ceb-4b37-ac68-ca8224d71fc9"
     },
     {
       "name": "E kuota Alice mencerminkan pemakaiannya sendiri (5 AI)",
