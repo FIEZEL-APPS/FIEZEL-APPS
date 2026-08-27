@@ -415,6 +415,7 @@ jobs:
           # ALASAN TERTULIS di dalam gerbang itu. Ia juga meng-assert bahwa dua gerbang
           # live tidak boleh dihitung sebagai bukti.
           node gate-registry-test.js
+          node coordination-guard-test.js
 
       # =================================================================================
       # F5 — GERBANG LIVE: SKIP YANG TERLIHAT, DAN CARA MENJALANKANNYA DENGAN SENGAJA
