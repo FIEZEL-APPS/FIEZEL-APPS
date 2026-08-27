@@ -299,4 +299,15 @@ jobs:
           node cf-config-killswitch-test.js
           node cf-shadow-ledger-test.js
           node ai-transport-switch-test.js
+          # A9: gerbang rencana rollout. Diletakkan tepat sesudah dua gerbang sakelar transport
+          # karena ia menguji sisi KETIGA dari sakelar yang sama: bukan bentuknya
+          # (`cf-transport-test.js`) dan bukan perilakunya (`cf-shadow-mode-test.js`), tetapi
+          # apakah URUTAN PENYALAANNYA bisa dieksekusi tanpa menebak — ambang batal berupa angka
+          # per langkah, prosedur pembatalan < 60 detik, dan daftar prasyarat yang BELUM
+          # terpenuhi yang masih terverifikasi benar terhadap repo. Ia juga menjalankan
+          # `tools/flag-plan-check.mjs` terhadap fixture untuk membuktikan kalkulator keadaan
+          # efektif itu benar-benar menangkap kombinasi berbahaya (ai on tanpa auth, ai on tanpa
+          # kuota, endpoint hidup tanpa kill switch yang terbaca) dan bersih pada keadaan repo
+          # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
+          node rollout-plan-test.js
           node workflow-actor-gate-test.js
