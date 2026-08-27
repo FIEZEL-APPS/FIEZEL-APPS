@@ -31,6 +31,70 @@
   var session = null;
   var narrating = false;
   var narrationToken = 0;
+  /* =========================== V6 audiobook: TEKS UTUH ==============================
+     Sampai V6 narasi mengirim SATU KALIMAT per say() lalu menunggu bunyinya habis. Itu
+     yang mematikan seluruh mesin gapless di bawahnya: chunks.length === 1 membuat `joined`
+     false, penjadwalan berkelanjutan dan pemangkasan senyap tidak menyala
+     (reports/voice-v3-chunk.md §1-§3, reports/voice-v2-player.md §1), dan setiap titik
+     membayar satu batas generasi penuh (~4,5 detik, reports/voice-v1-audit.md §1).
+
+     Sekarang narasi mengirim BLOK: kalimat-kalimat berurutan di dalam SATU bab, digabung
+     sampai anggaran karakter, satu say() untuk seluruh blok. Pemecahan sesungguhnya
+     dikerjakan lapisan bawah lewat planUtterance (180-260 char per potongan), yang memang
+     kontrak V3.
+
+     900 char: kira-kira 4-5 potongan anggaran. Cukup panjang untuk membuat pipelining
+     bermakna, cukup pendek supaya jeda dan pindah kalimat manual tetap terasa responsif.
+
+     TAPI blok besar TIDAK boleh dipakai untuk blok PERTAMA, dan ini bukan tebakan - ia
+     terukur di reports/voice-v6-data/caller-measurements.json: mengirim teks 248 char
+     sebagai potongan pertama membuat suara pertama datang 12.395 ms setelah murid menekan
+     putar, sementara satu kalimat 60 char datang 3.407 ms. Tidak ada satu pun jeda
+     antar-kalimat yang layak dibayar dengan 12 detik dead air di awal.
+
+     Karena itu anggarannya TUMBUH, dan angka pertumbuhannya diturunkan dari pengukuran,
+     bukan dari selera. Mesin berjalan pada RTF ~0,865 dan ~15,4 char/detik
+     (reports/voice-v6-data/): menghangatkan potongan pertama blok berikutnya memakan
+     ~0,056 detik/char, sedangkan blok yang sedang berbunyi memberi ~0,065 detik/char
+     penutup. Jadi blok N menutupi generasi potongan pembuka blok N+1 selama
+
+         panjang(potongan pembuka N+1) <= 1,15 x panjang(blok N)
+
+     Tangga tetap yang terlalu berani membuktikan pentingnya batas itu: dengan 80 -> 200
+     char, batas pertama diukur 7.351 ms - karena blok 60 char hanya memberi 3,2 detik
+     penutup untuk generasi 9,7 detik. Tangga di bawah karena itu proporsional terhadap blok
+     SEBELUMNYA, dan langsung melompat ke ukuran penuh begitu blok terakhir >= 224 char,
+     yaitu titik di mana potongan mana pun (dibatasi 260 char oleh planUtterance) sudah
+     tertutup.
+
+     Konsekuensi yang harus dikatakan terang: untuk beberapa kalimat pertama sebuah buku,
+     narasi V6 berperilaku seperti V5 - satu blok satu kalimat, jeda ~1,1 detik - dan baru
+     menyatu mendekati 0,22 detik ketika bloknya sudah tumbuh. Itu memang harga yang dipilih:
+     suara pertama 3,4 detik lebih penting daripada batas kalimat kedua.
+
+     SOROTAN TETAP PER KALIMAT. Ia tidak dibuang - ia digerakkan penanda batas dari
+     planUtterance, lihat scheduleBlockHighlight(). */
+  var BLOCK_MAX_CHARS = 900;
+  var LEAD_BLOCK_CHARS = 80;
+  /* 1,15 = 0,065/0,056 dari pengukuran di atas. 224 = 260/1,15, yaitu panjang blok terkecil
+     yang sudah menutupi potongan terpanjang yang mungkin. */
+  var RAMP_COVER_FACTOR = 1.15;
+  var RAMP_SETTLED_CHARS = 224;
+  function nextBlockBudget(previousChars) {
+    var prev = Math.max(0, Number(previousChars) || 0);
+    if (prev >= RAMP_SETTLED_CHARS) return BLOCK_MAX_CHARS;
+    return Math.max(LEAD_BLOCK_CHARS, Math.round(prev * RAMP_COVER_FACTOR));
+  }
+  /* Laju bicara terukur, bukan angka karangan: 384 karakter teks uji menghasilkan 24,90 s
+     audio bersih pada speed 1 (reports/voice-v5-data/, dipakai juga di
+     reports/voice-v1-audit.md) = 15,4 char/detik. Ia dipakai HANYA untuk menjadwalkan
+     sorotan, tidak pernah untuk menjadwalkan suara. */
+  var NARRATION_CHARS_PER_SECOND = 15.4;
+  /* Jeda prosodi milik pemutar (PROSODY_GAP di fiezel-web-audio-player.js /
+     fiezel-prosody.js). Disalin sebagai detik supaya sorotan ikut memperhitungkan seam yang
+     memang disengaja, bukan menganggap bicara berjalan tanpa henti. */
+  var BOUNDARY_GAP_S = { none: 0, comma: 0.09, clause: 0.09, sentence: 0.22, paragraph: 0.45 };
+  var highlightTimers = [];
 
   function mount() { return doc.getElementById('app'); }
   function esc(value) {
@@ -154,64 +218,188 @@
   }
 
   /**
+   * V6: satu blok narasi = kalimat berurutan DI DALAM SATU BAB sampai anggaran karakter.
+   *
+   * Batas bab tidak pernah dilewati: judul bab adalah pindah konteks, dan menggabungkannya
+   * ke dalam satu ucapan akan membuat bab berikutnya berbunyi sebelum kepalanya terlihat.
+   * Terjemahan Indonesia ikut digabung dari pasangan {en,id} yang SUDAH ada di
+   * library-books-v1.json - jadi pita subtitle tetap tidak perlu memanggil penerjemah dan
+   * jatah permintaan AI tetap utuh.
+   */
+  function blockAt(startIndex, budget) {
+    if (!session) return null;
+    var list = session.sentences();
+    var first = list[Math.max(0, Number(startIndex) || 0)];
+    if (!first) return null;
+    var cap = Math.min(BLOCK_MAX_CHARS, Number(budget) || BLOCK_MAX_CHARS);
+    var picked = [first];
+    var chars = String(first.en || '').length;
+    for (var i = first.index + 1; i < list.length; i++) {
+      var s = list[i];
+      if (!s || s.chapterIndex !== first.chapterIndex) break;
+      var len = String(s.en || '').length;
+      if (chars + 1 + len > cap) break;
+      picked.push(s);
+      chars += 1 + len;
+    }
+    return {
+      sentences: picked,
+      from: picked[0].index,
+      to: picked[picked.length - 1].index,
+      text: picked.map(function (s) { return String(s.en || '').trim(); }).join(' '),
+      translation: picked.map(function (s) { return String(s.id || '').trim(); }).filter(Boolean).join(' ')
+    };
+  }
+
+  /** Rencana potongan bertanda batas untuk TEKS UTUH satu blok. Murni; tidak memutar apa pun. */
+  function planBlock(text) {
+    var prosody = root.FiezelProsody;
+    if (!prosody || typeof prosody.planUtterance !== 'function') return null;
+    try { return prosody.planUtterance(text); } catch (_) { return null; }
+  }
+
+  function clearHighlightTimers() {
+    while (highlightTimers.length) {
+      try { root.clearTimeout(highlightTimers.pop()); } catch (_) {}
+    }
+  }
+
+  /**
+   * V6: sorotan per kalimat TANPA satu panggilan suara per kalimat.
+   *
+   * Kalimat pertama disorot langsung; sisanya dijadwalkan dari posisi karakternya di dalam
+   * teks blok dibagi laju bicara terukur, DITAMBAH jeda prosodi setiap seam potongan yang
+   * sudah dilewati - dan seam itu adalah penanda batas dari planUtterance (chunk.boundary).
+   *
+   * BATAS KEJUJURAN, ditulis di sini supaya tidak ada yang menjualnya lebih tinggi: ini
+   * ESTIMASI, bukan pengukuran. Pintu suara bersama tidak memberi pemanggil kait kemajuan
+   * per potongan, jadi sorotan bisa bergeser bila laju model berbeda dari 15,4 char/detik.
+   * Yang tidak boleh terjadi - dan tidak terjadi - adalah sorotan berjalan sesudah murid
+   * menekan jeda: setiap timer memeriksa token narasi lebih dulu dan stopNarration()
+   * membatalkan semuanya.
+   */
+  function scheduleBlockHighlight(block, plan, token) {
+    clearHighlightTimers();
+    if (!block || !block.sentences || !block.sentences.length) return 0;
+    highlight(block.from, true);
+    var rate = Number(currentRate()) || 1;
+    var cps = NARRATION_CHARS_PER_SECOND * rate;
+    var seams = [];
+    if (plan && plan.chunks) {
+      var at = 0;
+      plan.chunks.forEach(function (chunk) {
+        at += Number(chunk.chars || String(chunk.text || '').length);
+        seams.push({ at: at, boundary: chunk.boundary });
+      });
+    }
+    var offset = String(block.sentences[0].en || '').trim().length + 1;
+    var scheduled = 0;
+    for (var i = 1; i < block.sentences.length; i++) {
+      var gap = 0;
+      for (var s = 0; s < seams.length; s++) if (seams[s].at <= offset) gap += BOUNDARY_GAP_S[seams[s].boundary] || 0;
+      var delay = Math.max(0, (offset / cps + gap) * 1000);
+      highlightTimers.push(root.setTimeout((function (index) {
+        return function () {
+          if (!narrating || token !== narrationToken) return;
+          highlight(index, true);
+        };
+      }(block.sentences[i].index)), delay));
+      scheduled++;
+      offset += String(block.sentences[i].en || '').trim().length + 1;
+    }
+    return scheduled;
+  }
+
+  /**
    * m025-47: prefetch is intentionally deferred by one task. The public runtime has
    * readiness/audibility wrappers around the core service; issuing N+1 in the same JS
    * turn as speak(N) allowed N+1 to reserve the single-flight engine before N reached it.
    * That is the exact queue inversion behind the 10-15 second sentence gap.
    */
-  function warmNext(token) {
+  function warmNext(token, index, budget) {
     setTimeout(function () {
       if (!narrating || token !== narrationToken || !session) return;
       var say = root.FiezelVoiceSay;
       if (!say || typeof say.prefetch !== 'function') return;
-      var snap = session.snapshot();
-      var upcoming = session.sentences()[snap.sentenceIndex + 1];
-      if (!upcoming) return;
-      try { say.prefetch(upcoming.en, narrationOptions()); } catch (_) {}
+      // V6: yang dihangatkan adalah BLOK berikutnya, bukan kalimat berikutnya. Bentuknya
+      // harus sama persis dengan yang nanti dikirim ke say(), kalau tidak kunci dedup/cache
+      // di pintu suara tidak akan cocok dan pekerjaannya terbuang.
+      var upcoming = blockAt(index == null ? session.snapshot().sentenceIndex + 1 : index, budget);
+      if (!upcoming || !upcoming.text) return;
+      try { say.prefetch(upcoming.text, narrationOptions()); } catch (_) {}
     }, 0);
   }
 
   function stopNarration() {
     narrationToken++;
     narrating = false;
+    clearHighlightTimers();
     if (session) session.pause();
     try { root.FiezelVoiceSay && root.FiezelVoiceSay.stop && root.FiezelVoiceSay.stop(); } catch (_) {}
     updatePlayButton();
   }
 
   /**
-   * Reads sentence by sentence. Each step re-checks its token, so pressing pause or
-   * leaving the screen stops the book instead of letting a queued sentence play on.
+   * V6: membacakan BLOK per blok, bukan kalimat per kalimat.
+   *
+   * Yang berubah cuma satu hal, tapi hal itu menentukan semuanya: `speak()` menerima teks
+   * utuh satu blok, jadi planUtterance di bawahnya punya bahan untuk memotong di batas
+   * alami, pemutar menyambung potongan tanpa senyap, dan hanya batas antar-BLOK yang
+   * membayar generasi - dan batas itu pun sudah dihangatkan lebih dulu oleh warmNext().
+   *
+   * Yang TIDAK berubah: setiap langkah tetap memeriksa tokennya, jadi menekan jeda atau
+   * meninggalkan layar menghentikan buku, bukan membiarkan blok yang sudah diantre berbunyi
+   * belakangan. Sorotan per kalimat juga tidak berubah dari sisi murid.
    */
   async function narrate() {
     var token = ++narrationToken;
     narrating = true;
     session.play();
     updatePlayButton();
+    // Anggaran dihitung dari blok SEBELUMNYA, bukan dari posisi di buku: yang mahal adalah
+    // blok PERTAMA sesudah murid menekan putar, dan itu terjadi juga ketika ia melompat ke
+    // tengah buku lalu memutar lagi.
+    var budget = LEAD_BLOCK_CHARS;
     while (narrating && token === narrationToken) {
-      var sentence = session.current();
-      if (!sentence) break;
-      highlight(sentence.index, true);
-      var speaking = speak(sentence);
-      warmNext(token);
+      var snap = session.snapshot();
+      var block = blockAt(snap.sentenceIndex, budget);
+      if (!block || !block.text) break;
+      var plan = planBlock(block.text);
+      scheduleBlockHighlight(block, plan, token);
+      var speaking = speak({ en: block.text, id: block.translation });
+      // Anggaran yang dioper ke warmNext HARUS anggaran yang nanti benar-benar dipakai,
+      // kalau tidak teks yang dihangatkan berbeda dari teks yang dikirim dan kunci dedup
+      // di pintu suara tidak cocok.
+      var upcomingBudget = nextBlockBudget(block.text.length);
+      warmNext(token, block.to + 1, upcomingBudget);
+      budget = upcomingBudget;
       try {
         await speaking;
       } catch (error) {
+        clearHighlightTimers();
         narrating = false;
         session.pause();
         setStatus('Suara tidak bisa dimuat. Periksa koneksi lalu tekan putar lagi.');
         updatePlayButton();
         return;
       }
+      clearHighlightTimers();
       if (!narrating || token !== narrationToken) return;
-      var following = session.next();
-      saveProgress();
-      if (!following) {
+      // Blok selesai berarti kalimat terakhirnya sudah dibacakan: sorotan dan kursor
+      // dipindahkan ke sana sebelum menghitung blok berikutnya, supaya progres yang
+      // disimpan tidak pernah lebih maju daripada yang benar-benar terdengar.
+      var total = session.sentences().length;
+      if (block.to >= total - 1) {
+        session.goTo(total - 1);
+        saveProgress();
+        highlight(total - 1, true);
         narrating = false;
         setStatus('Selesai. Buku ini sudah dibacakan sampai habis.');
         updatePlayButton();
         return;
       }
+      session.goTo(block.to + 1);
+      saveProgress();
       renderProgress();
     }
   }
