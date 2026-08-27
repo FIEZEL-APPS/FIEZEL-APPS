@@ -79,6 +79,10 @@ const MASTERY_THRESHOLD=80;
 // dikerjakan, bukan sekadar dibuka.
 const GRAMMAR_UNLOCK_MASTERY=60;
 const GRAMMAR_SESSION_SIZE=25;
+/* R2-2: gerbang "Lewati materi" — 5 soal dari templat lesson itu sendiri, tanpa petunjuk,
+   lulus minimal 4. Filosofi level-trust yang sama dengan Ujian Skip Level: tidak ada
+   lompatan gratis, yang ada bukti yang lebih pendek. */
+const LESSON_SKIP_GATE_SIZE=5,LESSON_SKIP_GATE_PASS=4;
 /* ---- m028-06 LEVEL GUARD & UJIAN SKIP LEVEL (kontrak owner F4) ------------------------
  *
  * OWNER: level yang belum dibuktikan boleh dijajal, tetapi tidak boleh dibiarkan diam-diam.
@@ -784,7 +788,7 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1195,14 +1199,28 @@ function setConfidence(value){const h=state.history[state.history.length-1];if(!
    pelajaran". Karena itu ada "Baca penjelasan dulu" yang menutup popup tanpa memaksa
    memilih - penjelasan jawabannya memang ada di halaman di baliknya, dan tombol Lanjut di
    kepala layar tetap hidup. Yang ditahan hanya jalan PINTASNYA, bukan satu-satunya jalan.
+
+   R2-5 (laporan owner): dulu popup ini dibuka DI DALAM reveal(), sesudah panel ANALYZING
+   700ms - di layar sungguhan scrim popup naik tepat saat "FIEZEL menyiapkan pembahasannya"
+   selesai tercat, jadi janji analisisnya tertutup vonis keyakinan. Urutannya dibalik:
+   jawab -> popup keyakinan -> BARU panel analyzing + pembahasan, lewat kelanjutan yang
+   dititipkan di confidencePopThen. Analyzing tidak pernah lagi berbagi layar dengan popup.
    -------------------------------------------------------------------------- */
+let confidencePopThen=null;
 function closeConfidencePop(){
+  // Menutup popup MEMBATALKAN kelanjutan yang belum diambil (keluar kuis / pindah soal):
+  // reveal untuk soal yang layarnya sudah pergi hanya akan menggambar ke DOM mati.
+  confidencePopThen=null;
   const pop=$('confidencePop');if(!pop)return;
   pop.classList.add('is-out');
   setTimeout(()=>{try{pop.remove()}catch(_){}},220)
 }
 function openConfidencePop(ok){
+  // Kelanjutan dititipkan pemanggil SEBELUM popup dibuka; closeConfidencePop() membatalkan
+  // titipan (itu tugasnya untuk jalan keluar), jadi di sini ia diselamatkan dulu.
+  const then=confidencePopThen;
   closeConfidencePop();
+  confidencePopThen=then;
   const pop=document.createElement('div');
   pop.id='confidencePop';pop.className='confidence-pop';
   pop.setAttribute('role','dialog');pop.setAttribute('aria-modal','true');
@@ -1216,25 +1234,33 @@ function openConfidencePop(ok){
         <button type="button" onclick="setConfidence(2)"><span>2</span>Lumayan yakin</button>
         <button type="button" onclick="setConfidence(3)"><span>3</span>Yakin sekali</button>
       </div>
-      <button type="button" class="confidence-skip" onclick="closeConfidencePop()">Baca penjelasan dulu</button>
+      <button type="button" class="confidence-skip" onclick="confidencePopNext()">Lewati, langsung ke pembahasan</button>
     </div>
   </div>`;
   document.body.appendChild(pop);
   enhanceUI();
+  // R2 bug-hunt #2: dialog aria-modal dibuka tanpa memindahkan fokus - pengguna keyboard
+  // tertinggal di tombol pilihan yang baru saja dimatikan. Fokus diantar ke skala pertama,
+  // pola waktu yang sama dengan confidencePopAnswered.
+  setTimeout(()=>{try{pop.querySelector('.confidence-scale button')?.focus()}catch(_){}},60);
 }
 /** Pilihan diambil: skalanya diganti tombol Lanjut, di popup yang sama. */
 function confidencePopAnswered(value){
   const ask=$('confidenceAsk');if(!ask)return;
   const label=value===1?'Masih ragu':value===2?'Lumayan yakin':'Yakin sekali';
   ask.innerHTML=`<p class="confidence-saved"><i data-lucide="check"></i> ${esc(label)} — kecatat</p>
-    <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">Lanjut <i data-lucide="arrow-right"></i></button>`;
+    <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">Lihat pembahasan <i data-lucide="arrow-right"></i></button>`;
   enhanceUI();
   setTimeout(()=>{$('confidencePop')?.querySelector('.confidence-go')?.focus()},60)
 }
-/** Satu-satunya jalan maju dari popup: menekan tombol Lanjut yang sudah ada di layar
- *  kuis, supaya tidak ada dua jalur berbeda yang bisa menyimpang. */
+/** Satu-satunya jalan maju dari popup. R2-5: popup kini tampil SEBELUM pembahasan, jadi
+ *  jalan majunya adalah kelanjutan yang dititipkan (analyzing -> reveal). Kalau tidak ada
+ *  kelanjutan (jalur lama), ia jatuh ke tombol Lanjut di layar kuis - satu jalur cadangan,
+ *  bukan dua jalur yang menyimpang. */
 function confidencePopNext(){
+  const then=confidencePopThen;confidencePopThen=null;
   closeConfidencePop();
+  if(typeof then==='function'){then();return}
   $('quizNext')?.click()
 }
 /* Braincore v3: taksiran kesulitan 1..6 sebuah materi untuk model memori FSRS-lite -
@@ -2398,7 +2424,14 @@ function unlockFeedbackAudio(){if(!feedbackSoundsOn())return false;try{if(fxCtx)
 // matters may be the very first tap of the session. Resume on any early interaction.
 function bindAudioUnlockGestures(){if(bindAudioUnlockGestures.bound)return;bindAudioUnlockGestures.bound=true;const wake=()=>{unlockFeedbackAudio()};['pointerdown','touchstart','keydown'].forEach(name=>document.addEventListener?.(name,wake,{passive:true}))}
 function feedbackTone(freq,at,duration=.24,type='sine'){if(!fxCtx||!fxGain)return;const oscillator=fxCtx.createOscillator(),gain=fxCtx.createGain();oscillator.type=type;oscillator.frequency.setValueAtTime(freq,at);gain.gain.setValueAtTime(.0001,at);gain.gain.exponentialRampToValueAtTime(.6,at+.012);gain.gain.exponentialRampToValueAtTime(.0001,at+duration);oscillator.connect(gain);gain.connect(fxGain);oscillator.start(at);oscillator.stop(at+duration+.02)}
-function playFeedbackSound(kind){if(!feedbackSoundsOn()||!unlockFeedbackAudio())return false;try{const now=fxCtx.currentTime+.01;if(kind==='success')[[523.25,0],[659.25,.085],[783.99,.17],[1046.5,.26]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.3,i>1?'triangle':'sine'));else if(kind==='error')[[220,0],[164.81,.14],[110,.28]].forEach(([freq,offset],i)=>feedbackTone(freq,now+offset,.34,i===2?'sawtooth':'triangle'));else feedbackTone(392,now,.12,'sine');return true}catch{return false}}
+// P0-2 (audit §6/§13, SFX spec §1.2 register R2): satu keluarga nada untuk seluruh aplikasi.
+// Arpeggio C mayor + sawtooth yang lama membuat FIEZEL terdengar seperti dua produk —
+// identitas bunyinya adalah SATU motif F add9 (fiezel-ui-sfx.js). Sekarang:
+//   benar = F4→A4→C5 (349.23/440/523.25 Hz) — tiga nada pertama `celebrate`, kontur naik, ±350ms;
+//   salah = A4→F4 (440/349.23 Hz) sine lembut, ±300ms — energi diturunkan, bukan buzzer, TANPA sawtooth;
+//   selain itu = satu nada F4 netral (bukan lagi G4/392 Hz yang di luar keluarga).
+// Gerbang feedbackSounds + disiplin suspended-context (unlockFeedbackAudio) TIDAK berubah.
+function playFeedbackSound(kind){if(!feedbackSoundsOn()||!unlockFeedbackAudio())return false;try{const now=fxCtx.currentTime+.01;if(kind==='success')[[349.23,0],[440,.11],[523.25,.22]].forEach(([freq,offset])=>feedbackTone(freq,now+offset,.28,'sine'));else if(kind==='error')[[440,0],[349.23,.15]].forEach(([freq,offset])=>feedbackTone(freq,now+offset,.3,'sine'));else feedbackTone(349.23,now,.12,'sine');return true}catch{return false}}
 function showAnswerBurst(ok){const burst=$('answerBurst');if(!burst)return;clearTimeout(showAnswerBurst.timer);burst.className=`answer-burst ${ok?'success':'error'}`;burst.innerHTML=`<span class="answer-burst-icon"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i></span><strong>${ok?'Benar!':'Belum tepat'}</strong><small>${ok?'Mantap, polanya sudah terbaca.':'Tenang, kita bedah jawabannya.'}</small>`;burst.classList?.remove?.('hidden');refreshIcons();const show=()=>burst.classList?.add?.('show');if(window.requestAnimationFrame)window.requestAnimationFrame(show);else setTimeout(show,16);showAnswerBurst.timer=setTimeout(()=>{burst.classList?.remove?.('show');setTimeout(()=>burst.classList?.add?.('hidden'),320)},1500)}
 // m026-01: reaksi maskot dititipkan DI SINI, bukan di answer() atau record(). Fungsi ini
 // sudah menjadi corong tunggal untuk getar + suara + kilas jawaban, jadi setiap tempat
@@ -3829,16 +3862,20 @@ function skillHubMarkup(){
 function homeStatStripMarkup(level,streak,attempts,review){
   const done=Math.min(Number(attempts)||0,MEANINGFUL_ATTEMPTS);
   const pct=Math.round(done/MEANINGFUL_ATTEMPTS*100);
+  // R2-6: gem ikut jadi keping kecil di sini — saldo yang bisa naik-turun karena dipakai,
+  // syarat yang sama dengan keping lain. Nol gem tidak diberi keping (aturan runtun nol).
+  const gems=gemsBalance();
   const chips=[
     `<span class="hero-stat is-level"><b>${esc(level)}</b><small>Level</small></span>`,
     Number(streak)>0?`<span class="hero-stat is-streak"><b><i data-lucide="flame"></i>${Number(streak)}</b><small>Runtun</small></span>`:'',
     `<span class="hero-stat is-daily"><b><span class="hero-ring" style="--v:${pct}"></span>${done}/${MEANINGFUL_ATTEMPTS}</b><small>Hari ini</small></span>`,
+    gems>0?`<span class="hero-stat is-gems"><b><i data-lucide="gem"></i>${gems}</b><small>Gem</small></span>`:'',
     Number(review)>0?`<span class="hero-stat is-review"><b>${Number(review)}</b><small>Review</small></span>`:''
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
 function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
-   benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),acc=snapshot.totalAccuracy??0,mastered=snapshot.domains.vocabulary.mastered,review=snapshot.dueReviews,level=activeLevel,mission=Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100)),primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
+   benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),review=snapshot.dueReviews,level=activeLevel,primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
   <div class="launcher-meta"><span class="live-signal"></span><span>FIEZEL PERSONAL · ${esc(todayLabel())}</span><button type="button" class="home-level-context" onclick="openLevelPanel()">${esc(activeLevel)} · semua materi · ganti</button>${celestialStatusMarkup()}</div>
@@ -3852,31 +3889,26 @@ function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama k
          yang membuat layar pertama terbaca ramai. Yang dihapus tombolnya, bukan jalannya:
          tautan Coach tetap ada dan tetap satu ketukan. -->
   </div>
+  <!-- R2-6 (owner: "Home terlalu ramai, tidak ada fokus"): strip Coach ini SEKARANG adalah
+       panel "SESI BERIKUTNYA · DIPILIH PAW" — satu ajakan utama di puncak layar, dari policy
+       adaptif yang SAMA dengan panel NEXT SESSION di Peta Belajar (buildAdaptivePolicy),
+       jadi dua layar tidak pernah menyarankan dua hal berbeda. -->
   <aside class="coach-strip">
     ${pawFaceMarkup()}
     <div class="coach-strip-say">
-      <small>Kata FIEZEL</small>
-      <b>${esc(state.adaptiveReady?signal.title:'Aku belum kenal kamu. Coba tes singkat dulu, ya.')}</b>
+      <small>${state.adaptiveReady?'Sesi berikutnya · dipilih Paw':'Kata FIEZEL'}</small>
+      <b>${esc(state.adaptiveReady?(policy?`${policy.targetSkill?friendlySkillName(policy.targetSkill):friendlySkillName(policy.primaryDomain)} · ${policy.sessionSize} soal · ±${policy.estimatedMinutes} menit`:signal.title):'Aku belum kenal kamu. Coba tes singkat dulu, ya.')}</b>
     </div>
-    <button class="primary luxe coach-strip-go" onclick="${primaryAction}">${state.adaptiveReady?'Gas, mulai':'Cari tahu level kamu'} <i data-lucide="arrow-up-right"></i></button>
+    <button class="primary luxe coach-strip-go" onclick="${primaryAction}">${state.adaptiveReady?'Mulai sesi ini':'Cari tahu level kamu'} <i data-lucide="arrow-up-right"></i></button>
     <button type="button" class="coach-strip-more" onclick="askCoachAI()">Lihat detail <i data-lucide="arrow-right"></i></button>
   </aside>
 </div>
+<!-- R2-6: blok home-overview ("Selesaikan ritme hari ini" + empat kotak statistik) dan blok
+     "Rencana kamu" (journeyMarkup) DIHAPUS dari Home: cincin misi harian sudah hidup sebagai
+     keping ber-cincin di hero-stats (satu-satunya tempatnya sekarang), statistik Level/Runtun
+     juga sudah di keping hero, dan rencana mingguan pindah ke Peta Belajar → Ringkasan —
+     tempat ia dibaca saat dicari, bukan dilewati setiap hari. -->
 ${skillHubMarkup()}
-<div class="home-overview">
-  <div class="mission-panel">
-    <div class="mission-ring" style="--mission:${mission}%"><div><strong>${Math.min(state.daily?.attempts||0,MEANINGFUL_ATTEMPTS)}</strong><span>/ ${MEANINGFUL_ATTEMPTS}</span></div></div>
-    <div><h3>${state.daily?.meaningful?'Target bermakna tercapai':'Selesaikan ritme hari ini'}</h3><p>${review?`${review} materi menunggu review. `:''}${state.daily?.meaningful?'Latihan hari ini sudah cukup untuk menjaga streak.':'Lima jawaban bermakna menjaga progres tetap terukur.'}</p></div>
-  </div>
-  <!-- m025-115 (brief bagian 5): "badge streak yang terasa didapat, bukan cuma angka
-       statis". Runtun adalah satu-satunya angka di sini yang benar-benar bisa HILANG
-       kalau berhenti sehari, jadi ia yang dapat bidang koral dan ikon api - satu-satunya
-       tempat aksen kedua muncul sebagai bidang penuh di Home. Nol runtun tidak diberi
-       badge: memberi lencana untuk sesuatu yang belum dikerjakan justru membuat lencananya
-       tidak berarti. -->
-  <div class="home-stats"><div>${stat('Level',level)}</div><div>${stat('Akurasi',acc+'%')}</div><div>${stat('Dikuasai',mastered)}</div><div>${state.streak>0?`<small>Runtun</small><strong class="streak-badge"><i class="fz-i" data-fz-icon="flame"></i>${state.streak} hari</strong>`:stat('Runtun','0 hari')}</div></div>
-</div>
-${journeyMarkup()}
 <div class="home-section-head"><div><h2>Pilih fokus hari ini</h2></div><button class="text-button" onclick="go('progress')">Lihat peta belajar <i data-lucide="arrow-right"></i></button></div>
 <div class="learning-launcher">
   <button class="launch-card vocab-launch" onclick="go('vocab')"><span class="launch-icon"><i class="fz-i" data-fz-icon="vocab" aria-hidden="true"></i></span><span><small>${activeV.length.toLocaleString()} kata · ${esc(activeLevel)}</small><b>Vocabulary</b></span><i data-lucide="arrow-up-right"></i></button>
@@ -3887,10 +3919,53 @@ ${journeyMarkup()}
        gridnya terbaca patah. Keterangannya dipendekkan ke bentuk yang sama dengan
        tetangganya (jumlah + jenis); rincian "terjemahan sekali ketuk" dan "subtitle
        Indonesia" tetap terbaca di halaman fiturnya masing-masing, satu ketukan dari sini. -->
-  <button class="launch-card library-launch" onclick="go('library')"><span class="launch-icon"><i class="fz-i" data-fz-icon="library" aria-hidden="true"></i></span><span><small>9 buku · audiobook</small><b>Perpustakaan</b></span><i data-lucide="arrow-up-right"></i></button><button class="launch-card classroom-launch" onclick="go('classroom')"><span class="launch-icon"><i class="fz-i" data-fz-icon="classroom" aria-hidden="true"></i></span><span><small>Materi · subtitle</small><b>Classroom</b></span><i data-lucide="arrow-up-right"></i></button>
+  <button class="launch-card library-launch" onclick="go('library')"><span class="launch-icon"><i class="fz-i" data-fz-icon="library" aria-hidden="true"></i></span><span><small>9 buku · audiobook</small><b>Perpustakaan</b></span><i data-lucide="arrow-up-right"></i></button><!-- R2-3: pintu Classroom DIKUNCI atas permintaan owner — fiturnya belum siap dirilis.
+       Tombolnya disabled (bukan dihapus) supaya murid tahu fiturnya ADA dan sedang datang;
+       tidak ada navigasi, tidak ada onclick. renderer classroom() tetap utuh di baliknya. -->
+  <button class="launch-card classroom-launch is-coming-soon" disabled aria-disabled="true" title="Classroom belum dibuka — coming soon"><span class="launch-icon"><i class="fz-i" data-fz-icon="classroom" aria-hidden="true"></i></span><span><small>Coming Soon</small><b>Classroom</b></span><span class="coming-soon-tag">SEGERA</span></button>
   <button class="launch-card skills-launch" onclick="go('skills')"><span class="launch-icon"><i class="fz-i" data-fz-icon="skills" aria-hidden="true"></i></span><span><small>72 latihan · A1–C2</small><b>Speaking + Listening</b></span><i data-lucide="arrow-up-right"></i></button>
 </div>
-</section>`)}
+</section>`);
+  // P1-2 Ritual Pembuka Harian: sekali per hari belajar, setelah Home tercat — tidak
+  // pernah memblokir navigasi (overlay yang pamit sendiri, lihat maybeShowDailyRitual).
+  setTimeout(()=>{try{maybeShowDailyRitual()}catch(_){}},260);
+  // P1 Prasasti: streak harian dan buku yang baru tamat menambah bukti di luar sesi kuis,
+  // jadi Home juga titik ukir. Jeda melewati jendela ritual supaya dua kartu tidak menumpuk.
+  setTimeout(()=>{try{checkPrasasti('home')}catch(_){}},4200);
+}
+/* P1-2 RITUAL PEMBUKA HARIAN (audit §10 butir 1 + §14 P1-2). Sekali per hari belajar
+   (kunci: state.ritualMeta.lastDay, zona waktu belajar studyDayKey yang sama dengan streak):
+   sapaan bernama + kondisi streak + 2–3 blok "rencana hari ini" dari buildTodayPlan yang
+   deterministik + SATU tombol Mulai. Aturan tegas dari spek: bisa dilewati dengan tap,
+   pamit sendiri ±3 detik, tidak pernah menghalangi navigasi, dan maskot menyapa — BUKAN
+   menyambut dengan rasa bersalah. Kunjungan kedua di hari yang sama langsung Home biasa. */
+function dismissDailyRitual(){const el=document.getElementById('fzRitual');if(!el)return false;clearTimeout(el._fzAutoClose);el.classList.add('is-leaving');setTimeout(()=>{try{el.remove()}catch(_){}},280);return true}
+window.dismissDailyRitual=dismissDailyRitual;
+function startFromRitual(){dismissDailyRitual();if(state.adaptiveReady)startAdaptive();else go('test');return true}
+window.startFromRitual=startFromRitual;
+function maybeShowDailyRitual(now=Date.now()){
+  if(state.view!=='home')return false;
+  if(document.getElementById('fzRitual'))return false;
+  const today=studyDayKey(now);
+  const meta=state.ritualMeta&&typeof state.ritualMeta==='object'?state.ritualMeta:{lastDay:''};
+  if(meta.lastDay===today)return false;
+  // Ditandai SEBELUM tampil: apa pun yang terjadi pada overlay-nya, ritual tidak pernah
+  // menagih dua kali di hari yang sama.
+  state.ritualMeta={lastDay:today};save();
+  let blocks='';try{const built=buildPersonalJourney(now);blocks=(built?.plan?.blocks||[]).slice(0,3).map((b,i)=>`<li class="fz-ritual-block" style="--ri:${i}"><b>${b.questions} ${esc(JOURNEY_BLOCK_LABELS[b.kind]||b.kind)}</b><span>${esc(b.why)}</span></li>`).join('')}catch(_){blocks=''}
+  const streak=Number(state.streak)||0;
+  const host=document.createElement('div');host.id='fzRitual';host.className='fz-ritual';host.setAttribute('role','dialog');host.setAttribute('aria-label','Rencana hari ini');
+  host.innerHTML=`<div class="fz-ritual-card"><div class="fz-ritual-paw">${pawFaceMarkup()}</div><p class="fz-ritual-hi">Halo, ${esc(learnerName())}.</p>${streak>0?`<p class="fz-ritual-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> Runtun ${streak} hari — jaga nyalanya.</p>`:''}<small class="fz-ritual-mark">RENCANA HARI INI</small>${blocks?`<ul class="fz-ritual-blocks">${blocks}</ul>`:`<p class="fz-ritual-empty">${state.placementDone?'Rencana harimu menyesuaikan begitu kamu mulai berlatih.':'Mulai dari tes penempatan biar rencananya pas untukmu.'}</p>`}<div class="fz-ritual-actions"><button class="primary" onclick="startFromRitual()">Mulai <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="dismissDailyRitual()">Nanti dulu</button></div></div>`;
+  // Tap di luar kartu = lewati. Kartu tidak pernah menahan murid.
+  host.addEventListener('click',e=>{if(e.target===host)dismissDailyRitual()});
+  document.body.appendChild(host);enhanceUI();
+  try{host.querySelector('button.primary')?.focus()}catch(_){}
+  // Maskot menyapa lewat corong pawReact (gerbang reduced-motion tunggal): 'wake' → greeting.
+  try{pawReact('wake')}catch(_){}
+  // ±3 detik lalu pamit sendiri — ritual tidak pernah menjadi pintu yang harus dibuka.
+  host._fzAutoClose=setTimeout(()=>{try{dismissDailyRitual()}catch(_){}},3200);
+  return true;
+}
 // R2 Personal Learning Journey. The plan itself is decided by features/personal-journey,
 // which is pure and deterministic; app.js only supplies evidence and renders the result.
 // Nothing here may re-decide priority, because the roadmap requires the ordering to stay
@@ -3953,6 +4028,9 @@ function journeyMarkup(now=Date.now()){
   </div>
   <div class="journey-today">
     <small>HARI INI</small>
+    <!-- R2-6: cincin misi harian pindah ke sini dari Home (blok "Selesaikan ritme hari ini"
+         dihapus) - ia hidup persis di samping rencana hari yang dia ukur. -->
+    <div class="journey-ring-row"><div class="mission-ring" style="--mission:${Math.min(100,Math.round((state.daily?.attempts||0)/MEANINGFUL_ATTEMPTS*100))}%"><div><strong>${Math.min(state.daily?.attempts||0,MEANINGFUL_ATTEMPTS)}</strong><span>/ ${MEANINGFUL_ATTEMPTS}</span></div></div><p>${state.daily?.meaningful?'Target bermakna hari ini tercapai.':'Lima jawaban bermakna menjaga progres tetap terukur.'}</p></div>
     <ul class="journey-blocks">${blocks}</ul>
     <p class="journey-target">${plan.questionsTarget} soal, kira-kira ${plan.minutesTarget} menit</p>
     ${plan.recovery.needed?`<p class="journey-recovery">Sengaja pendek hari ini biar kamu selesai${plan.recovery.daysAway?`, soalnya ${plan.recovery.daysAway} hari kamu libur`:''}.</p>`:''}
@@ -4556,7 +4634,10 @@ function gemsHook(){
       save();
       try{showToast(g.toastFor(meta?.streak,n))}catch(_){}
       try{celebrate()}catch(_){}
-      pawReact('correct-streak');
+      // P0-3 bugfix: 'correct-streak' bukan event maskot yang dikenal (daftar resmi di
+      // fiezel-mascot.js react()), jadi maskot diam justru pada momen gem terbit.
+      // 'badge-earned' → proud adalah event resmi untuk pengakuan seperti ini.
+      pawReact('badge-earned');
       return n;
     },
     spend:(cost,reason)=>{
@@ -4566,7 +4647,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},gems:gemsHook(),/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -4619,6 +4700,7 @@ function writing(){
   if(!prompt){setApp(`<section class="fade writing-page"><div class="section-head"><div><h1>Writing</h1><p>Belum ada topik writing untuk level ${esc(getActiveLevel())}.</p></div>${levelControlMarkup()}</div></section>`);return}
   setApp(`<section class="fade writing-page">
 <div class="skill-page-hero skill-writing"><span class="skill-badge">SKILL INTI TES · ${esc(getActiveLevel())}</span><h1>Writing</h1><p>Tulis dulu apa adanya. Rapihnya urusan nanti - yang penting jadi.</p><button type="button" class="active-level-control" onclick="openLevelPanel()"><span>Level belajar</span><strong>${esc(getActiveLevel())}</strong><small>Ganti</small></button></div>
+<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>
 <div class="card writing-prompt">
   <span class="skill-badge">TOPIK ${esc(prompt.level)} · ${done}/${WRITING_WEEKLY_TARGET} minggu ini</span>
   ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>Minimal ${exam.minWords} kata · ${exam.minutes} menit</span><small>${esc(exam.note)}</small></p>`:''}
@@ -4648,6 +4730,8 @@ async function requestWritingFeedback(prompt){
   if(words<15){showToast('Tulis minimal 15 kata dulu, biar ada yang bisa dibaca FIEZEL.');return}
   writingSaveDraft(text);
   host.innerHTML=`<div class="card"><b>FIEZEL lagi baca tulisanmu…</b><p class="muted">Sebentar ya.</p></div>`;
+  // R2-4: maskot ikut "membaca" — lewat corong pawSetState (gerbang reduced-motion tunggal).
+  pawSetState('thinking',{hold:2400});
   const exam=writingExamTask(prompt),criteria=writingRubricCriteria();
   const rubricBrief=criteria.map(c=>`- ${c.label} (${c.labelEn}): ${c.asks}`).join('\n');
   const scaleBrief=criteria.length?`Skala 0-4 untuk SETIAP kriteria. Acuan singkat 4: ${criteria[0].levels[4]}`:'Skala 0-4 untuk setiap kriteria.';
@@ -4678,6 +4762,7 @@ Aturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan 
     host.innerHTML=`<div class="card">${renderMarkdown(String(answer))}<p class="ai-disclosure"><i data-lucide="shield-check"></i> Tulisan dan konteks tugas yang kamu kirim diproses oleh Core AI. Jangan masukkan data pribadi.</p></div>`;
     saveWritingEntry(prompt,words);
     celebrate();
+    pawReact('lesson-complete');
     showToast('Tulisan tercatat. Mantap.');
   }catch(error){
     saveWritingEntry(prompt,words);
@@ -4763,6 +4848,117 @@ function celebrate(){
   document.body.appendChild(host);
   setTimeout(()=>host.remove(),2400);
   return true;
+}
+// P0-1 (audit §5, SFX spec §1.4 butir 5): anggaran seremonial — maksimal SATU konfeti
+// Major per sesi kuis. Gem yang terbit di tengah sesi dan layar hasil memakai pintu
+// yang sama, jadi dua momen besar dalam satu sesi tidak pernah menjadi dua hujan konfeti.
+// Bendera direset di awal quizLoop, bukan di sini, supaya sesi baru mulai dengan jatah baru.
+let quizMajorFired=false;
+function quizMajorCelebrate(){if(quizMajorFired)return false;quizMajorFired=true;return celebrate()}
+// P0-1 (audit §5): "angka tidak pernah melompat" — skor di layar hasil dihitung naik
+// 0→n% selama 600ms ease-out. Kurangi-gerak / preferences.motion===false => teks final
+// seketika, pola gerbang yang sama dengan celebrate(). Nilai final untuk pembaca layar
+// dipegang aria-label pada induknya, jadi animasi ini murni visual.
+function countUpScore(el,target){
+  if(!el)return false;
+  const goal=Math.max(0,Math.round(Number(target)||0)),final=`${goal}%`;
+  if(prefersReducedMotion()||state.preferences?.motion===false||typeof setTimeout!=='function'){el.textContent=final;return false}
+  const t0=Date.now(),dur=600;
+  const tick=()=>{const p=Math.min(1,(Date.now()-t0)/dur),eased=1-Math.pow(1-p,3);el.textContent=`${Math.round(goal*eased)}%`;if(p<1)setTimeout(tick,24)};
+  el.textContent='0%';setTimeout(tick,24);
+  return true;
+}
+/* P0-3 (audit §13): gem lintas domain. Kuis vocab/grammar/reading kini memberi gem lewat
+   LEDGER YANG SAMA dengan Listening — aturan tetap kontrak GEMS_RULES tanpa perubahan
+   angka (5 benar beruntun = +2, maks 2 hadiah/sesi, dijaga gemsAward yang murni); hanya
+   reason-nya yang membedakan domain: 'quiz_streak_5'. Momen hadiahnya sama dengan
+   gemsHook Listening: toast toastFor + konfeti + maskot bangga ('badge-earned'→proud) —
+   konfetinya lewat quizMajorCelebrate() supaya anggaran 1 Major/sesi (P0-1) tetap terjaga. */
+function awardQuizGems(streak,awardsThisSession,sessionId){
+  const g=gemsCore();if(!g)return 0;
+  const amount=g.gemsAward(streak,awardsThisSession);
+  if(!amount)return 0;
+  state.gems=g.gemsEarn(state.gems,amount,'quiz_streak_5',Date.now(),sessionId,getActiveLevel());
+  save();
+  try{showToast(g.toastFor(streak,amount))}catch(_){}
+  try{quizMajorCelebrate()}catch(_){}
+  pawReact('badge-earned');
+  return amount;
+}
+/* P1 PRASASTI (audit §9/§14): lencana berbasis bukti. Aturannya hidup di modul murni
+   features/prasasti/fiezel-prasasti-core.js (pola gems-core): app.js hanya MENGUMPULKAN
+   bukti dari state kanonik dan MERAYAKAN hasilnya. Tidak ada satu pun lencana yang bisa
+   terbit tanpa bukti belajar — sesuai filosofi "reward = pengakuan atas bukti". */
+function prasastiCore(){try{return self.FiezelPrasasti||null}catch(_){return null}}
+function prasastiState(){const core=prasastiCore();if(core)return core.sanitizePrasasti(state.prasasti);const cur=state.prasasti;return cur&&typeof cur==='object'&&cur.earned&&typeof cur.earned==='object'?cur:{schema:'fiezel-prasasti-v1',earned:{}}}
+// Bukti dihitung dari data yang SUDAH ada — sessionHistory, levelTrust, streak, mastery
+// grammar, ledger gem, dan progres Perpustakaan (kunci localStorage milik modul library,
+// dibaca apa adanya tanpa diubah). Tidak ada penghitung baru yang bisa dimanipulasi.
+function prasastiEvidence(){
+  let booksFinished=0;try{const raw=JSON.parse(localStorage.getItem('fiezel-library-progress-v1')||'null');booksFinished=Object.values(raw?.books||{}).filter(b=>b&&b.finished===true).length}catch(_){booksFinished=0}
+  const exams=levelTrustState(state).exams||{};
+  return{
+    lessonSessions:(state.sessionHistory||[]).filter(s=>s?.type==='grammar').length,
+    examsPassed:Object.values(exams).filter(x=>x?.passed===true).length,
+    booksFinished,
+    streakDays:Number(state.streak)||0,
+    masteredLessons:Object.values(state.grammar||{}).filter(b=>b?.total&&Number(b.mastery)>=MASTERY_THRESHOLD).length,
+    gemAwardSessions:new Set((state.gems?.ledger||[]).filter(e=>Number(e?.delta)>0&&e?.sessionId).map(e=>e.sessionId)).size
+  };
+}
+// Ikon prasasti = SVG inline milik FIEZEL sendiri (stroke currentColor), tanpa aset
+// eksternal — siluet terkunci cukup diberi warna redup lewat CSS, markupnya sama.
+function prasastiIconSvg(id){
+  const P={
+    lesson_pertama:'<path d="M12 3l2.4 5.2 5.6.7-4.1 3.9 1.1 5.6-5-2.8-5 2.8 1.1-5.6L4 8.9l5.6-.7z"/>',
+    ujian_lulus:'<path d="M6 4h12v5a6 6 0 0 1-12 0z"/><path d="M9 20h6M12 15v5M4 6h2m12 0h2"/>',
+    buku_tamat:'<path d="M5 4h9a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3z"/><path d="M9 9h5M9 12h5"/>',
+    runtun_7:'<path d="M12 3c1 3-3 4.5-3 8a3 3 0 0 0 6 0c0-1.5-.8-2.5-.8-2.5C16.5 9.8 17 11 17 13a5 5 0 0 1-10 0c0-4.5 4-6 5-10z"/>',
+    runtun_30:'<path d="M12 3c1 3-3 4.5-3 8a3 3 0 0 0 6 0c0-1.5-.8-2.5-.8-2.5C16.5 9.8 17 11 17 13a5 5 0 0 1-10 0c0-4.5 4-6 5-10z"/><path d="M9 20h6"/>',
+    runtun_100:'<path d="M12 3c1 3-3 4.5-3 8a3 3 0 0 0 6 0c0-1.5-.8-2.5-.8-2.5C16.5 9.8 17 11 17 13a5 5 0 0 1-10 0c0-4.5 4-6 5-10z"/><path d="M7 20h10M9 17.5h6"/>',
+    sepuluh_dikuasai:'<circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.4 2.4 4.6-5.4"/>',
+    gem_lima_sesi:'<path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18M12 20L8.5 9M12 20L15.5 9"/>'
+  };
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[id]||P.lesson_pertama}</svg>`;
+}
+// Momen lencana: SATU kartu untuk semua lencana yang jatuh bersamaan (audit §5:
+// "kalau dua milestone jatuh bersamaan, gabungkan dalam satu layar"), bisa di-tap-skip.
+function dismissPrasastiMoment(){const el=document.getElementById('fzPrasasti');if(!el)return false;el.classList.add('is-leaving');setTimeout(()=>{try{el.remove()}catch(_){}},280);return true}
+window.dismissPrasastiMoment=dismissPrasastiMoment;
+function showPrasastiMoment(fresh){
+  if(!Array.isArray(fresh)||!fresh.length)return false;
+  if(document.getElementById('fzPrasasti'))return false;
+  const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-label','Prasasti baru terukir');
+  host.innerHTML=`<div class="fz-prasasti-card"><div class="modal-mark">PRASASTI BARU</div>${fresh.map(b=>`<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><p>${esc(b.desc)}</p></div>`).join('')}<p class="fz-prasasti-note">Terukir dari bukti belajarmu. Lihat semuanya di Peta Belajar.</p><button class="primary" onclick="dismissPrasastiMoment()">Simpan di galeri <i data-lucide="arrow-right"></i></button></div>`;
+  host.addEventListener('click',e=>{if(e.target===host)dismissPrasastiMoment()});
+  document.body.appendChild(host);enhanceUI();
+  try{host.querySelector('button.primary')?.focus()}catch(_){}
+  // Resep momen dari spek: kartu + maskot proud + konfeti + akor penuh. Konfeti dan
+  // maskot lewat gerbang reduced-motion yang sudah ada (celebrate()/pawReact); bunyi
+  // lewat uiSfx yang menghormati preferensi feedbackSounds.
+  uiSfx('celebrate');
+  try{celebrate()}catch(_){}
+  pawReact('badge-earned');
+  return true;
+}
+function checkPrasasti(origin='app'){
+  const core=prasastiCore();if(!core)return[];
+  // Jangan menumpuk kartu di atas ritual pembuka — lencana yang tertunda akan terukir
+  // pada pemeriksaan berikutnya (finishQuiz / kunjungan Home), buktinya tidak hangus.
+  if(document.getElementById('fzRitual'))return[];
+  const settled=core.settle(prasastiState(),prasastiEvidence(),Date.now());
+  if(!settled.fresh.length)return[];
+  state.prasasti=settled.prasasti;save();
+  showPrasastiMoment(settled.fresh);
+  return settled.fresh;
+}
+// Galeri untuk Peta Belajar: yang terukir tampil penuh, yang belum tampil sebagai
+// siluet + petunjuk cara mendapatkannya — tujuan berikutnya terlihat, bukan disembunyikan.
+function prasastiGalleryMarkup(){
+  const core=prasastiCore();if(!core)return '<p class="muted">Galeri prasasti belum dapat dimuat.</p>';
+  const earned=prasastiState().earned||{};
+  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'';return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(b.title)}: ${at?`terukir ${when}`:'belum terukir. '+b.hint}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><span class="prasasti-hint">${esc(at?when:b.hint)}</span></div>`}).join('');
+  return `<div class="prasasti-grid">${cells}</div><p class="map-note"><span>Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.</span></p>`;
 }
 async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbuka setelah tes awal selesai.');return}const policy=await resolveAdaptivePolicy();const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy,4);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');
  /* Fase 3 (C5 butir 2): sesi adaptif menyisipkan 1-2 soal cloze PRODUKSI bila bank tersedia
@@ -4966,7 +5162,59 @@ function makeVocabQuestion(v,preferType){
   return{id:`vocab-${v.id}-${type}-${Date.now()}-${Math.random()}`,type:'vocab',level:v.level,skill:`vocabulary_${type}`,target:v.id,difficulty:LEVELS.indexOf(v.level)+1,canary:v.canary||null,question:q,options,answerIndex:options.indexOf(answer),explain:{why,rule,avoid:`Baca seluruh kalimat, lalu bayangkan situasinya sebelum memilih arti “${v.word}”.`,memory:`Ingat pasangan singkat ini: ${v.word} berarti ${v.meaning}.`,distractor:'Pilihan lain memang terlihat mirip atau berada di level yang sama, tetapi maknanya tidak cocok dengan kata target dalam konteks soal ini.'}}
 }
 
-function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);shell('Grammar Hub',`${skills.length} lesson terurut untuk level ${level}. Mulai dari urutan pertama agar prasyaratnya tidak terlewat.`,`<div class="grammar-level-note"><b>Jalur ${esc(level)}</b><span>${esc(levelDescriptor(level))}</span><small>Soal pilihan boleh bervariasi, tetapi urutan lesson mengikuti kurikulum dan prasyarat.</small></div><div class="grid grammar-grid">${skills.map((k,index)=>{const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=meta?.title||friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?`Prasyarat: ${meta.prerequisites.map(friendlySkillName).join(', ')}`:'Fondasi awal';const unlock=lessonUnlockState(k);return card(`<div class="row"><b>${index+1}. ${esc(title)}</b><span>${esc(level)}</span></div><p class="muted">${esc(prerequisites)} · Fokus: ${esc(family)}.</p>${unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>Mastery ${state.grammar[k]?.mastery||0}%</span>${unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(unlock))}">Terkunci <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(k)}')">Buka lesson <i data-lucide="arrow-right"></i></button>`}</div>`,unlock.locked?'lesson-locked':'')}).join('')}</div>`)}
+/* P1-1 JALUR LESSON BERSIMPUL (audit §8 butir 2 + §14 P1-1). Grammar Hub dirender sebagai
+   jalur bersimpul vertikal, bukan daftar kartu: node selesai terisi, node aktif berdenyut
+   (dimatikan pada reduced-motion), node terkunci membawa alasan prasyarat lessonLockMessage
+   yang sama, ujung jalur = node emas Ujian Skip Level. Data 100% dari kurikulum + mastery +
+   levelTrust yang ada — representasi baru dari data lama, TIDAK mengubah aturan unlock.
+   Aksesibilitas: toggle "tampilan daftar" merender kartu berurutan yang lama, node fokusable
+   dengan aria-label status. Maskot berdiri di dekat node aktif (pawFaceMarkup, aturan §7.2). */
+let grammarHubListView=false;
+function toggleGrammarHubView(){grammarHubListView=!grammarHubListView;grammar();enhanceUI()}
+window.toggleGrammarHubView=toggleGrammarHubView;
+function grammar(){const level=getActiveLevel(),entries=grammarItemsForLevel(level).slice().sort((a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)),skills=entries.map(x=>x.skill).filter((x,i,a)=>a.indexOf(x)===i);
+  const examEntry=levelTrustState(state).exams[level]||null;
+  const rows=skills.map((k,index)=>{
+    const entry=entries.find(x=>x.skill===k)||{},item=entry.item||G[k]?.[0]||[],family=grammarFamilyLabel(item),meta=grammarCurriculumEntry(k)||entry,title=meta?.title||friendlySkillName(k),prerequisites=Array.isArray(meta?.prerequisites)&&meta.prerequisites.length?`Prasyarat: ${meta.prerequisites.map(friendlySkillName).join(', ')}`:'Fondasi awal';
+    const unlock=lessonUnlockState(k),mastery=state.grammar[k]?.mastery||0,touched=!!state.grammar[k]?.total;
+    return{k,index,title,family,prerequisites,unlock,mastery,
+      mastered:mastery>=MASTERY_THRESHOLD,
+      completed:mastery>=GRAMMAR_UNLOCK_MASTERY,
+      examVerified:!touched&&!unlock.locked&&!!examEntry?.passed};
+  });
+  // Node aktif = simpul pertama yang terbuka tapi belum menembus ambang unlock — pintu
+  // berikutnya di kurikulum. Jalur ter-scroll otomatis ke sana (lihat setTimeout di bawah).
+  const current=rows.find(r=>!r.unlock.locked&&!r.completed&&!r.examVerified)||null;
+  let lockNoteShown=false;
+  const pathSteps=rows.map(r=>{
+    const stateClass=r.unlock.locked?'is-locked':r.mastered?'is-mastered':r.completed?'is-completed':'is-available';
+    const isCurrent=current&&current.k===r.k;
+    const statusText=r.unlock.locked?`Terkunci. ${lessonLockMessage(r.unlock)}`:r.mastered?`Dikuasai, mastery ${r.mastery}%.`:r.completed?`Selesai, mastery ${r.mastery}%.`:`Terbuka, mastery ${r.mastery}%.`;
+    // Alasan prasyarat ditampilkan utuh hanya pada gerbang PERTAMA yang tertutup — sisanya
+    // cukup lewat title/aria; menuliskan kalimat yang sama di sepuluh node adalah kebisingan.
+    const showLockNote=r.unlock.locked&&!lockNoteShown;if(showLockNote)lockNoteShown=true;
+    const nodeButton=r.unlock.locked
+      ?`<button class="path-node" disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}" aria-label="Lesson ${r.index+1}: ${esc(r.title)}. ${esc(statusText)}"><span class="path-ring" style="--pm:${r.mastery}"><i data-lucide="lock"></i></span></button>`
+      :`<button class="path-node" onclick="openGrammarLesson('${esc(r.k)}')" aria-label="Lesson ${r.index+1}: ${esc(r.title)}. ${esc(statusText)}"><span class="path-ring" style="--pm:${r.mastery}">${r.mastered?'<i data-lucide="check"></i>':`<b>${r.index+1}</b>`}</span></button>`;
+    // R2-2: "Lewati materi" pada node yang belum selesai (terbuka ATAU terkunci) — gerbang
+    // bukti 5 soal dari templat lesson itu sendiri, bukan lompatan gratis (openLessonSkipGate).
+    const skipLink=!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')" aria-label="Lewati materi ${esc(r.title)} lewat gerbang bukti ${LESSON_SKIP_GATE_SIZE} soal"><i data-lucide="fast-forward"></i> Lewati materi</button>`:'';
+    return `<li class="path-step ${stateClass}${isCurrent?' is-current':''}">${nodeButton}<div class="path-label"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(r.family)} · Mastery ${r.mastery}%${r.examVerified?' · terverifikasi ujian':''}${isCurrent?' · kamu di sini':''}</span>${showLockNote?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}${skipLink}</div>${isCurrent?`<span class="path-mascot" aria-hidden="true">${pawFaceMarkup()}</span>`:''}</li>`;
+  }).join('');
+  // Ujung jalur: node Ujian Skip Level bergaya emas — tujuan jangka menengah terlihat
+  // dari simpul pertama. Panelnya panel ujian yang sudah ada (openActiveLevelExamPanel).
+  const examStep=`<li class="path-step path-step-exam ${examEntry?.passed?'is-mastered':'is-available'}"><button class="path-node path-node-exam" onclick="openActiveLevelExamPanel()" aria-label="Ujian Skip Level. ${examEntry?.passed?'Sudah lulus.':'Ujung jalur level ini.'}"><span class="path-ring path-ring-gold">${examEntry?.passed?'<i data-lucide="check"></i>':'<i data-lucide="award"></i>'}</span></button><div class="path-label"><b>Ujian Skip Level</b><span>${examEntry?.passed?'Lulus — level terverifikasi dari bukti.':'Ujung jalur: buktikan levelmu, tanpa petunjuk.'}</span></div></li>`;
+  // Tampilan daftar (aksesibilitas P1-1): kartu berurutan yang lama, data & penguncian sama.
+  const listBody=`<div class="grid grammar-grid">${rows.map(r=>card(`<div class="row"><b>${r.index+1}. ${esc(r.title)}</b><span>${esc(level)}</span></div><p class="muted">${esc(r.prerequisites)} · Fokus: ${esc(r.family)}.</p>${r.unlock.locked?`<p class="lesson-lock-note"><i data-lucide="lock"></i><span>${esc(lessonLockMessage(r.unlock))}</span></p>`:''}<div class="lesson-card-foot"><span>Mastery ${r.mastery}%</span>${!r.completed&&!r.examVerified?`<button type="button" class="lesson-skip-link" onclick="openLessonSkipGate('${esc(r.k)}')"><i data-lucide="fast-forward"></i> Lewati materi</button>`:''}${r.unlock.locked?`<button disabled aria-disabled="true" title="${esc(lessonLockMessage(r.unlock))}">Terkunci <i data-lucide="lock"></i></button>`:`<button onclick="openGrammarLesson('${esc(r.k)}')">Buka lesson <i data-lucide="arrow-right"></i></button>`}</div>`,r.unlock.locked?'lesson-locked':'')).join('')}</div>`;
+  const pathBody=`<ol class="lesson-path" aria-label="Jalur lesson level ${esc(level)}">${pathSteps}${examStep}</ol>`;
+  // R2-1: node emas Ujian Skip Level duduk di UJUNG jalur — tak terlihat tanpa scroll
+  // panjang. Chip lengket di puncak hub memanggil panel ujian yang SAMA, node ujungnya tetap.
+  const examChip=`<button type="button" class="exam-entry-chip${examEntry?.passed?' is-passed':''}" onclick="openActiveLevelExamPanel()" aria-label="Ujian Skip Level level ${esc(level)}. ${examEntry?.passed?'Sudah lulus.':'Buka panel ujian.'}"><i data-lucide="${examEntry?.passed?'badge-check':'award'}"></i><span><b>Ujian Skip Level</b><small>${examEntry?.passed?'Lulus — level terverifikasi':'Merasa sudah bisa? Buktikan kapan saja'}</small></span><i data-lucide="arrow-right"></i></button>`;
+  shell('Grammar Hub',`${skills.length} lesson terurut untuk level ${level}. Mulai dari urutan pertama agar prasyaratnya tidak terlewat.`,`<div class="grammar-level-note"><b>Jalur ${esc(level)}</b><span>${esc(levelDescriptor(level))}</span><small>Soal pilihan boleh bervariasi, tetapi urutan lesson mengikuti kurikulum dan prasyarat.</small></div><div class="grammar-hub-tools">${examChip}<div class="path-view-toggle"><button type="button" onclick="toggleGrammarHubView()" aria-pressed="${grammarHubListView}"><i data-lucide="${grammarHubListView?'route':'list'}"></i> ${grammarHubListView?'Tampilan jalur':'Tampilan daftar'}</button></div></div>${grammarHubListView?listBody:pathBody}`);
+  // Auto-scroll ke node aktif — sesudah renderInner mengembalikan scroll ke atas.
+  // Reduced-motion: lompat tanpa animasi (behavior 'auto'), bukan tanpa fungsi.
+  if(!grammarHubListView&&current)setTimeout(()=>{try{document.querySelector('.path-step.is-current')?.scrollIntoView({block:'center',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch(_){}},140);
+}
 function openGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));if(!(G[skill]||[]).length)return showToast('Lesson ini belum memiliki materi.');enterStage('grammar-lesson',()=>renderGrammarLesson(skill));renderGrammarLesson(skill)}
 function renderGrammarLesson(skill){const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);const lessonUnlock=lessonUnlockState(skill);if(lessonUnlock.locked)return showToast(lessonLockMessage(lessonUnlock));const arr=G[skill]||[];if(!arr.length)return showToast('Lesson ini belum memiliki materi.');const item=arr[0],base=item[0],opts=item[1]||[],correct=opts[item[2]],rule=grammarRuleIndonesian(item),clue=grammarClue(base),curriculum=grammarCurriculumEntry(skill)||meta;const prereq=Array.isArray(curriculum.prerequisites)&&curriculum.prerequisites.length?`Prasyarat: ${curriculum.prerequisites.map(friendlySkillName).join(', ')}`:'Ini lesson fondasi pertama.';shell(friendlySkillName(skill),`${meta.level} · urutan ${meta.sequence||'-'} · ${curriculum.unit||'fondasi'} · ${GRAMMAR_SESSION_SIZE} mode latihan`,`${card(`<div class="eyebrow">PAHAMI DULU · URUTAN ${meta.sequence||'-'}</div><h2 class="lesson-title">${esc(curriculum.title||friendlySkillName(skill))}</h2><p class="muted">${esc(prereq)}</p><p>${esc(rule)}</p><div class="lesson-example"><span>Contoh</span><h3>${esc(base)}</h3><p>Jawaban yang pas: <strong>${esc(correct)}</strong>. ${esc(clue)}</p></div><p class="memory-tip"><i data-lucide="lightbulb"></i><span>Jangan buru-buru menghafal rumus. Temukan dulu petunjuk waktu, maksud kalimat, dan hubungan antarbagian.</span></p>`,'grammar-lesson-card')}<div class="practice-contract"><div><h3>${GRAMMAR_SESSION_SIZE} mode latihan terfokus</h3><p>Semua soal tetap menguji konsep lesson ini melalui penerapan, diagnosis distraktor, perbandingan, penjelasan aturan, dan cek penguasaan.</p></div><button onclick="practiceSkill('${esc(skill)}')" class="primary">Mulai ${GRAMMAR_SESSION_SIZE} soal <i data-lucide="arrow-right"></i></button></div><div class="toolbar"><button onclick="exitStage()"><i data-lucide="arrow-left"></i> Kembali ke Grammar Hub</button></div>`)}
 // m025-155: seleksi mode-coverage-first. Loop lama variant-major hanya kebetulan mencapai
@@ -4978,6 +5226,34 @@ function buildGrammarLessonQuestions(skill,count=GRAMMAR_SESSION_SIZE){const met
   for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length&&unique.length<count;variant++)for(const item of own){if(unique.length>=count)break;take(makeGrammarQuestion(skill,item,variant,skill))}
   return unique}
 function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level||'')!==getActiveLevel())return showToast(`Pilih lesson ${getActiveLevel()} terlebih dahulu.`);const unlock=lessonUnlockState(skill);if(unlock.locked)return showToast(lessonLockMessage(unlock));const questions=buildGrammarLessonQuestions(skill,GRAMMAR_SESSION_SIZE);if(questions.length<GRAMMAR_SESSION_SIZE)return showToast(`Lesson ini baru memiliki ${questions.length} soal valid.`);quizLoop({type:'grammar',count:GRAMMAR_SESSION_SIZE,pool:questions,factory:item=>item,preserveOrder:true})}
+/* ---- R2-2 GERBANG "LEWATI MATERI" ------------------------------------------------------
+ * OWNER: murid yang sudah menguasai satu materi tertentu (mis. kata sandang) harus bisa
+ * melewatinya TANPA pindah level. Filosofinya sama dengan Ujian Skip Level: lompatan
+ * dibayar dengan bukti — LESSON_SKIP_GATE_SIZE soal dari templat lesson itu sendiri,
+ * tanpa petunjuk dan tanpa percobaan kedua (cfg.noHints, jalur yang sama dengan ujian),
+ * lulus minimal LESSON_SKIP_GATE_PASS. Lulus = mastery lesson diangkat ke ambang unlock
+ * (kalau bukti aktualnya lebih tinggi, angka aktual yang dipakai — updateMastery sudah
+ * mencatat tiap jawaban gerbang sebagai bukti biasa), jadi lesson berikutnya terbuka
+ * lewat lessonUnlockState() yang TIDAK berubah. Gerbang sengaja MENEROBOS kunci prasyarat:
+ * ia memang pintu untuk murid yang materinya sudah dikuasai dari luar jalur. */
+function openLessonSkipGate(skill){
+  const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
+  if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);
+  const mastery=state.grammar[skill]?.mastery||0,title=grammarCurriculumEntry(skill)?.title||friendlySkillName(skill);
+  if(mastery>=GRAMMAR_UNLOCK_MASTERY)return showToast('Materi ini sudah selesai — tidak ada yang perlu dilewati.');
+  const questions=buildGrammarLessonQuestions(skill,LESSON_SKIP_GATE_SIZE);
+  if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid — gerbangnya belum bisa dibuka.`);
+  openModal(`<div class="modal-mark">FIEZEL LEWATI MATERI</div><h2>Lewati “${esc(title)}”?</h2><p>Sudah menguasai materi ini dari tempat lain? Buktikan dulu — tidak ada lompatan gratis, sama seperti Ujian Skip Level.</p><ul class="level-exam-facts"><li>${LESSON_SKIP_GATE_SIZE} soal dari materi ini, diacak dari templat lessonnya</li><li>Tanpa petunjuk, tanpa percobaan kedua</li><li>Benar minimal ${LESSON_SKIP_GATE_PASS} → materi ditandai selesai, lesson berikutnya terbuka</li><li>Belum lulus? Tidak ada penalti — materinya tetap menunggumu di jalur</li></ul><div class="modal-actions"><button type="button" id="lessonSkipCancel">Nanti dulu</button><button type="button" class="primary" id="lessonSkipStart">Mulai gerbang bukti</button></div>`);
+  $('lessonSkipCancel').onclick=closeModal;
+  $('lessonSkipStart').onclick=()=>{closeModal();startLessonSkipGate(skill)};
+  enhanceUI();
+}
+function startLessonSkipGate(skill){
+  const questions=buildGrammarLessonQuestions(skill,LESSON_SKIP_GATE_SIZE);
+  if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid.`);
+  quizLoop({type:'grammar-skip',count:LESSON_SKIP_GATE_SIZE,pool:questions,factory:x=>x,preserveOrder:true,noHints:true,skipGateSkill:skill});
+}
+window.openLessonSkipGate=openLessonSkipGate;window.startLessonSkipGate=startLessonSkipGate;
 // m025-150: pilihan yang DIPINJAM dari lesson lain butuh alasannya sendiri. Melewatkannya
 // ke grammarOptionReason() salah alamat: fungsi itu mendiagnosis BENTUK kata kerja, jadi
 // sebuah kalimat aturan pun dijelaskan sebagai "belum cocok dengan waktu, fungsi, atau
@@ -5457,6 +5733,14 @@ function quizLoop(cfg){
  questions.forEach(x=>{x.concept=quizConcept(x)});
  const planned=Math.min(Math.max(1,Number(cfg.count)||questions.length),questions.length);
  beginLearningSession(cfg,planned);
+ // P0-1: jatah konfeti Major direset per sesi. P0-3: runtun gem lintas domain hidup di
+ // closure sesi ini — placement dan Ujian Skip Level dikecualikan karena keduanya alat
+ // UKUR, bukan sesi latihan; hadiah di tengah pengukuran mengubah perilaku yang diukur.
+ quizMajorFired=false;
+ let gemStreak=0,gemAwards=0;
+ // R2-2: gerbang "Lewati materi" juga alat UKUR — gem di tengah gerbang mengubah perilaku
+ // yang sedang diukur, aturan yang sama dengan placement dan Ujian Skip Level.
+ const gemSessionId=`qz-${Date.now().toString(36)}`,gemsEligible=!cfg.placement&&cfg.type!=='level-exam'&&cfg.type!=='grammar-skip';
 
  // Kolam sisa, bukan antrean. Inilah yang membuat pemilihan berikutnya bisa hidup.
  const remaining=questions.slice();
@@ -5474,7 +5758,7 @@ function quizLoop(cfg){
   * lagi, ia butuh satu hal dijelaskan sekali dengan tenang.
   */
  const teach=info=>{
-  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked}</span><em>/ ${planned}</em></div><span class="quiz-teach-flag">Jeda mengajar</span></div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>AJAR ULANG</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${esc(info.rule)}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">Oke, aku siap coba lagi <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
+  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked}</span><em>/ ${planned}</em></div><span class="quiz-teach-flag">Jeda mengajar</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>AJAR ULANG</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${esc(info.rule)}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">Oke, aku siap coba lagi <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
   $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
   $('teachNext').onclick=()=>{pendingCard=null;draw()};
   enhanceUI();
@@ -5520,7 +5804,7 @@ function quizLoop(cfg){
   }catch{}
   answer.locked=false;answer.retryOf='';answer.scaffold='';answer.timing='';
   const opts=q.options||[];
-  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`)} </section>`);
+  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`)} </section>`);
   $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   /* Fase 3 (C5 butir 2): soal cloze tidak punya opsi - murid MENGETIK jawabannya. Satu
@@ -5604,7 +5888,8 @@ function quizLoop(cfg){
   speak(turn);
   answer.locked=true;
   $('quizNext').disabled=false;
-  openConfidencePop(ok);
+  // R2-5: popup keyakinan TIDAK lagi dibuka di sini - ia sudah selesai SEBELUM panel
+  // analyzing berjalan (lihat answer()), jadi pembahasan ini tercat di layar yang bersih.
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
   // m025-126: `breathe` berhenti menjadi kalimat dan menjadi PILIHAN.
   //
@@ -5650,6 +5935,10 @@ function quizLoop(cfg){
   // dan model kemampuan yang berdiri di atasnya ikut keliru.
   if(firstTry){
    if(ok)score++;
+   // P0-3: runtun dihitung dari jawaban percobaan pertama — sinyal yang sama dengan skor.
+   // Kartu reteach tidak lewat sini (ia layar mengajar, bukan jawaban), jadi runtun otomatis
+   // beku selama jeda mengajar. Salah = reset runtun, tanpa penalti lain.
+   if(gemsEligible){if(ok){gemStreak++;if(awardQuizGems(gemStreak,gemAwards,gemSessionId))gemAwards++}else gemStreak=0}
    // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
    // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
    if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
@@ -5690,7 +5979,13 @@ function quizLoop(cfg){
   }
   // m028 fase3: penilaian final lewat jeda analyzing dulu. Cabang retry di atas
   // sengaja TIDAK melewatinya - ia bukan penilaian, ia pijakan.
-  showCoreAnalyzing(()=>reveal(q,j,ok));
+  // R2-5: urutannya kini keyakinan DULU, analyzing KEMUDIAN. Dulu keduanya bertumpuk:
+  // reveal() membuka popup tepat setelah panel "FIEZEL menyiapkan pembahasannya" tercat,
+  // dan scrim popup menutupinya. Pilihan dimatikan sekarang juga supaya tidak ada jendela
+  // ketukan kedua selama popup hidup (answer.locked baru true di dalam reveal()).
+  document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
+  confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
+  openConfidencePop(ok);
  }
 
  /* Fase 3 (C5 butir 2): jalur jawaban CLOZE - produksi ketik, SATU percobaan (yang diukur
@@ -5804,6 +6099,16 @@ function finishQuiz(cfg,score,total,tutorReport){
      gagal hanya memberi jeda 24 jam untuk level itu. */
   let examVerdict=null;
   if(cfg&&cfg.type==='level-exam'&&cfg.levelScope){try{examVerdict=levelExamSettle(cfg.levelScope,score,total,accuracy)}catch(_){examVerdict=null}}
+  /* R2-2: penilaian gerbang "Lewati materi". Lulus (>=LESSON_SKIP_GATE_PASS benar) mengangkat
+     mastery lesson ke ambang unlock — TIDAK menimpa bukti yang lebih tinggi; tiap jawaban
+     gerbang sudah tercatat lewat updateMastery seperti jawaban biasa, jadi angka aktual yang
+     lebih besar menang. Gagal tidak menghukum apa pun: buktinya tetap tersimpan sebagai bukti. */
+  let skipVerdict=null;
+  if(cfg&&cfg.type==='grammar-skip'&&cfg.skipGateSkill){
+    const passed=score>=LESSON_SKIP_GATE_PASS,judul=grammarCurriculumEntry(cfg.skipGateSkill)?.title||friendlySkillName(cfg.skipGateSkill);
+    if(passed){const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.mastery=Math.max(Number(b.mastery)||0,GRAMMAR_UNLOCK_MASTERY);b.skippedAt=Date.now();state.grammar[cfg.skipGateSkill]=b}
+    skipVerdict={passed,message:passed?`Bukti diterima: ${score}/${total} benar. “${judul}” ditandai selesai — lesson berikutnya terbuka.`:`Baru ${score}/${total} benar — gerbang ini butuh minimal ${LESSON_SKIP_GATE_PASS}. Materinya tetap menunggumu di jalur, tanpa penalti.`};
+  }
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
@@ -5821,6 +6126,12 @@ function finishQuiz(cfg,score,total,tutorReport){
   // m026-01: menempel pada uiSfx('celebrate') dengan sengaja - keduanya perayaan yang
   // sama, dan keduanya hanya berjalan pada penutupan sesi yang MEMANG tampil di layar.
   pawReact('lesson-complete');
+  // P0-1 (audit §5/§13): penyelesaian sesi adalah momen Major — konfeti ringan untuk
+  // penyelesaian yang kuat (ambang 70% yang sama dengan haptic 'success' di atas), lewat
+  // pintu beranggaran quizMajorCelebrate(): kalau gem sudah menghujani konfeti di tengah
+  // sesi, layar hasil tidak menghujani konfeti kedua. Sesi yang ditinggalkan tidak pernah
+  // sampai ke fungsi ini, jadi tidak ada selebrasi hantu. Kurangi-gerak dijaga celebrate().
+  if(accuracy>=70)try{quizMajorCelebrate()}catch(_){}
   // m028 fase3 (PATCH-PLAN §6): layar selesai dulu satu jalan keluar - "Kembali ke Home".
   // Murid yang baru saja menyelesaikan sesi dan masih mau lanjut harus kembali ke Home
   // dulu lalu mencari pintunya sendiri. Tujuan lanjutan diambil dari policy adaptif yang
@@ -5828,14 +6139,24 @@ function finishQuiz(cfg,score,total,tutorReport){
   // menyarankan dua hal yang berbeda. Tes penempatan TIDAK diberi tombol lanjut: hasilnya
   // adalah levelnya, dan langkah setelahnya bukan "satu sesi lagi".
   let nextDomain='';
-  if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=p?.primaryDomain==='vocab'?'vocab':p?.primaryDomain==='reading'?'reading':'grammar'}catch(_){nextDomain='grammar'}}
+  // R2 bug-hunt #1: primaryDomain policy bernilai 'vocabulary' (sanitizeAdaptivePolicy),
+  // BUKAN 'vocab' — perbandingan lama tidak pernah cocok, jadi murid berpolicy kosakata
+  // selalu diarahkan ke Grammar. Kedua ejaan diterima supaya kompatibel dua arah.
+  if(!cfg.placement){try{const p=buildAdaptivePolicy();nextDomain=(p?.primaryDomain==='vocab'||p?.primaryDomain==='vocabulary')?'vocab':p?.primaryDomain==='reading'?'reading':'grammar'}catch(_){nextDomain='grammar'}}
   // F1 placement: layar hasil MENYEBUT levelnya. Sebelum perbaikan ini layar "Tes level selesai"
   // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip
   // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,
   // beserta band mana yang menjadi dasarnya.
   const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">LEVEL KAMU</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span></div>${placementBands?`<div class="result-bands"><small>Bukti per band (benar / ditanyakan pada percobaan pertama):</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>Level naik satu band hanya kalau band itu lulus, mulai dari A1. Menebak tidak cukup.</small></div>`:''}${placementAdopted?`<p class="muted">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="muted">Level aktifmu sekarang <b>${esc(placementManualLevel)}</b> karena kamu memilihnya sendiri. Hasil tes ini menunjukkan <b>${esc(placementLevelName)}</b>.</p>`:''}`:'';
   const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&amp;&amp;go('home')">Ikuti hasil tes (${esc(placementLevelName)}) <i data-lucide="arrow-right"></i></button>`:'';
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':cfg.type==='level-exam'?`${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai`:'Latihan selesai'}</h2><div class="ring-row"><div class="score">${accuracy}%</div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${outcomeLine}${srlLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':cfg.type==='level-exam'?`${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai`:cfg.type==='grammar-skip'?'Gerbang lewati materi selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${outcomeLine}${srlLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
+  // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
+  try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}
+  // P1 Prasasti: bukti baru saja bertambah (sesi masuk sessionHistory, mastery ter-update,
+  // examVerdict sudah dinilai) — inilah titik ukir utama. Jeda pendek supaya layar hasil
+  // sempat tercat dan momen lencana tidak bertabrakan dengan konfeti penyelesaian.
+  setTimeout(()=>{try{checkPrasasti('session')}catch(_){}},900);
   // Satu pesan saja. Untuk tes penempatan yang penting adalah levelnya, bukan pujian sesi.
   showToast(cfg.placement&&placementLevelName?`Hasil tes: level ${placementLevelName}.`:accuracy>=70?'Sesi bagus. Catatanmu diperbarui.':'Progres tersimpan untuk rekomendasi berikutnya.');
   sendCreatorReport('session_complete');
@@ -5976,7 +6297,8 @@ function nextSessionPanelMarkup(){
   try{p=buildAdaptivePolicy()}catch(_){return ''}
   if(!p)return '';
   const fokus=p.targetSkill?friendlySkillName(p.targetSkill):friendlySkillName(p.primaryDomain);
-  const view=p.primaryDomain==='vocab'?'vocab':p.primaryDomain==='reading'?'reading':'grammar';
+  // R2 bug-hunt #1 (tempat kedua): 'vocabulary' adalah ejaan resmi domain policy.
+  const view=(p.primaryDomain==='vocab'||p.primaryDomain==='vocabulary')?'vocab':p.primaryDomain==='reading'?'reading':'grammar';
   const ukuran=Number(p.sessionSize)||0,menit=Number(p.estimatedMinutes)||0;
   const takaran=ukuran?`<b>${ukuran} soal${menit?` · \u00b1${menit} menit`:''}</b>`:'';
   return `<section class="core-panel next-session">
@@ -6006,9 +6328,10 @@ function progress(){
  // out entirely - it is app/install health, not learning progress, and now lives
  // in Settings (see openSettings()).
  const tabContent={
-  overview:`<div class="grid">${nextSessionPanelMarkup()}<div><h3>Peta Belajar</h3>${mapCards}</div>
+  overview:`<div class="grid">${nextSessionPanelMarkup()}${journeyMarkup()}<div><h3>Peta Belajar</h3>${mapCards}</div>
    ${card(`<h3>Ulangan Pintar</h3>${due.length?due.map(([k,x])=>`<div class="row"><span>${esc(friendlySkillName(k))}</span><span>${x.mastery||0}% dikuasai · risiko lupa ${Math.round(forgettingProbability(x)*100)}%</span></div>`).join('<hr>'):'<p class="muted">Belum ada materi yang perlu diulang sekarang.</p>'}`)}
    ${card(`<h3>Laporan Diagnostik</h3>${diagHtml}`)}
+   ${card(`<h3>Prasasti</h3><p class="muted">Lencana bukti belajar — yang redup menunjukkan cara mendapatkannya.</p>${prasastiGalleryMarkup()}`,'prasasti-gallery-card')}
    </div>`,
   analysis:`<div class="grid">
    ${card(`<h3>Lab Kesalahan</h3>${patterns.length?patterns.map(x=>`<div class="row"><span>${esc(friendlySkillName(x.key))}</span><b>${x.errors} salah · ${Math.round(x.rate*100)}%</b></div>${x.common?`<p class="muted">Pilihan yang paling sering muncul: “${esc(x.common)}” (${x.count} kali)</p>`:''}`).join('<hr>'):'<p class="muted">Belum ada pola kesalahan yang berulang.</p>'}`)}

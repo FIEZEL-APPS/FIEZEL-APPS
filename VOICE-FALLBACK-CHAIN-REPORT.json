@@ -40,7 +40,7 @@
     {
       "name": "penjaga: kata kunci precache neural tetap DILARANG di daftar ASSETS service worker",
       "status": "PASS",
-      "details": "109 aset shell, nol aset neural"
+      "details": "110 aset shell, nol aset neural"
     },
     {
       "name": "penjaga: aset neural tetap punya jalur cache sendiri di service worker",
