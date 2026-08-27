@@ -1,6 +1,6 @@
 {
   "gate": "voice-callsite-prefetch",
-  "generatedAt": "2026-08-27T14:10:43.383Z",
+  "generatedAt": "2026-08-27T18:55:38.966Z",
   "status": "PASS",
   "sources": [
     "reports/voice-v1-audit.md#1",
@@ -8,9 +8,44 @@
     "reports/voice-v3-chunk.md#3",
     "reports/voice-v2-player.md#1"
   ],
+  "metrics": {
+    "catatan": "DUA metrik berbeda, jangan dirangkai jadi satu tren. jedaTerdengar = keheningan yang didengar murid (batas ATAS: memuat keheningan kepala/ekor PCM yang dipangkas pemutar). jedaPenjadwalan = selisih bunyi-selesai ke bunyi-berikutnya-dijadwalkan.",
+    "v5MesinPrefetch": {
+      "metrik": "jedaTerdengar (meanAudibleGapMs)",
+      "diukurBagaimana": "reports/voice-v5-data/harness-door.html + measure_door.py, mesin supertonic-3 lokal",
+      "data": "reports/voice-v5-data/door-measurements.json",
+      "pola": "pintu suara per kalimat",
+      "sebelumMs": 4510.7,
+      "sesudahMs": 797.2,
+      "mengukurPekerjaan": "V5 - prefetch() sampai ke mesin neural lokal. BUKAN pekerjaan sisi pemanggil yang dijaga gerbang ini.",
+      "berlakuUntukProduksi": false
+    },
+    "v6SisiPemanggil": {
+      "metrik": "jedaPenjadwalan (meanSchedulingGapMs)",
+      "diukurBagaimana": "reports/voice-v6-data/harness-callers.html + measure_callers.py",
+      "data": "reports/voice-v6-data/caller-measurements.json",
+      "pola": "satu kalimat per panggilan - classroom, tutor, flashcards, kuis",
+      "sebelumMs": 3750.6,
+      "sesudahMs": 449.1,
+      "porsiSunyiSebelum": 0.4769,
+      "porsiSunyiSesudah": 0.0969,
+      "mengukurPekerjaan": "V6 - pemanggil menghangatkan item BERIKUTNYA. Inilah metrik gerbang ini.",
+      "berlakuUntukProduksi": "ya untuk classroom/tutor/flashcards/kuis; TIDAK untuk narasi Library"
+    },
+    "v6NarasiLibraryTerkirim": {
+      "metrik": "jedaPenjadwalan + jedaTerdengar",
+      "diukurBagaimana": "reports/voice-v6-data/measure_blocks.py pada library-books-v1.json, 18 kalimat pertama",
+      "data": "reports/voice-v6-data/block-measurements.json",
+      "pola": "blok bertangga LEAD_BLOCK_CHARS 80, RAMP_COVER_FACTOR 1.15 - konfigurasi yang BENAR-BENAR dikirim",
+      "jedaPenjadwalanMs": 560.6,
+      "jedaTerdengarMs": 1286,
+      "porsiSunyi": 0.126,
+      "suaraPertamaMs": 2816.8,
+      "mengukurPekerjaan": "V6 pada pola yang dipakai Library di produksi - lebih mahal daripada 449,1 ms, dan itu angka yang berlaku.",
+      "berlakuUntukProduksi": true
+    }
+  },
   "measured": {
-    "jedaTerdengarSebelumMs": 4510.7,
-    "jedaTerdengarSesudahMs": 797.2,
     "contohBlokAudiobook": {
       "buku": "The Three Little Pigs",
       "kalimat": 12,
