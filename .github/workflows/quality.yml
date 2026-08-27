@@ -206,6 +206,17 @@ jobs:
           # memasangnya demi satu berkas bukan pertukaran yang sehat; batas itu ditulis di
           # kepala gerbangnya, bukan disembunyikan.
           node edge-proxy-contract-test.js
+          # A4: pemindai rahasia SELURUH repo. Dijalankan tepat sesudah edge-guard karena
+          # keduanya menjaga permukaan yang sama dari dua jangkauan berbeda: edge-guard
+          # menjaga SATU berkas (`deploy/edge/api-index.php`) secara mendalam, gerbang ini
+          # menjaga SEMUA berkas yang dilacak git — kunci ber-prefiks (sk-/pk_/ghp_/cfut_/
+          # AIza), JWT, blok PEM, hash bcrypt, token base64url berentropi tinggi, dan
+          # `password=`/`secret=`/`token=` bernilai literal. Ia juga menegakkan higiene git:
+          # `.gitignore` memuat berkas laporan bergantung-lingkungan, tidak ada `.env` atau
+          # `*.bak`/`*.orig`/`*.rej` yang terlacak, dan `deploy/edge/*.php` tetap placeholder.
+          # BATAS yang dilaporkan apa adanya: ia memindai working tree, BUKAN riwayat commit
+          # (perintah manual untuk owner ada di reports/add-a4-secret-scan.md).
+          node secret-scan-test.js
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
