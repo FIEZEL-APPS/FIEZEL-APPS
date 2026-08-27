@@ -200,6 +200,13 @@ jobs:
           node quota-manipulation-test.js
           node quota-reset-test.js
           node tts-key-test.js
+          # A12: gerbang kontrak provider TTS. Wajib tepat sesudah tts-key-test.js karena keduanya
+          # menjaga sisi berlawanan dari SATU invarian biaya: yang di atas menjaga bagaimana voiceId
+          # masuk kunci cache, yang ini menjaga bahwa voiceId yang SAMA benar-benar berangkat ke
+          # provider. Cacat produksi yang melahirkannya (route-tts memanggil {text} saja, pra-render
+          # memanggil {text,speaker}) hijau di kedua gerbang lama: 100% render menjawab
+          # source:"unavailable", bytes:0, dan tidak ada gerbang yang memeriksa isi permintaan.
+          node tts-provider-contract-test.js
           node ai-task-contract-test.js
           # V4: gerbang bentuk jawaban Workers AI + kontrak mutu keluaran. Dijalankan tepat
           # sesudah gerbang kontrak task karena keduanya menguji berkas yang sama dari dua sisi:
@@ -207,6 +214,10 @@ jobs:
           # bentuk JAWABAN (dua bentuk terbaca, kosong = gagal, reasoning tidak pernah tampil,
           # batas kalimat dan kanon kata ditegakkan). Ia butuh tools/cf-test-harness.js yang sudah
           # dijalankan sebagai self-test di bawah.
+          # A12 memperluasnya dengan dua hal yang tidak bisa dilihat dari bentuk jawaban saja:
+          # `quotaCharged` wajib ada dan bertipe boolean di SETIAP jalur route-ai.js, dan keluaran
+          # kosong ("{}" dari jsonMode, whitespace, JSON kosong) tidak pernah dinyatakan sukses
+          # sekaligus kuotanya DIKEMBALIKAN.
           node ai-response-shape-test.js
           node breaker-test.js
           node prerender-dryrun-test.js

@@ -1,0 +1,71 @@
+{
+  "schema": "fiezel-a12-red-proof-v1",
+  "semuaMerah": true,
+  "pulihHijau": true,
+  "matrix": [
+    {
+      "cacat": "D1 voiceId tidak diteruskan ke provider (cacat staging asli)",
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D1b voice bawaan runtime beda dari korpus pra-render",
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D1c nama parameter route-tts menyimpang dari pra-render",
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D1d mesin tak dikenal ditebak menjadi {text} alih-alih melempar",
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D1e cache hit mengaku menagih kuota",
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D2 quotaCharged hilang dari jalur penolakan kuota 429",
+      "gerbang": "ai-response-shape-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D2b jalur sukses mengaku TIDAK menagih (field jadi konstanta tak berguna)",
+      "gerbang": "ai-response-shape-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D3 keluaran kosong dideteksi dengan .trim() saja (lolos \"{}\" dari jsonMode)",
+      "gerbang": "ai-response-shape-test.js",
+      "exit": 1,
+      "merah": true
+    },
+    {
+      "cacat": "D3b keluaran kosong ditolak tapi kuota TIDAK dikembalikan",
+      "gerbang": "ai-response-shape-test.js",
+      "exit": 1,
+      "merah": true
+    }
+  ],
+  "sesudahPemulihan": [
+    {
+      "gerbang": "tts-provider-contract-test.js",
+      "exit": 0
+    },
+    {
+      "gerbang": "ai-response-shape-test.js",
+      "exit": 0
+    }
+  ]
+}

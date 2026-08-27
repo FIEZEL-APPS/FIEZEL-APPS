@@ -37,6 +37,17 @@
     return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelBreaker;
   }());
 
+  /**
+   * A12/1 — nama parameter provider dan voice bawaan TIDAK lagi dieja di berkas ini. Keduanya
+   * datang dari `tts-provider-params.js`, berkas yang SAMA yang dipakai `tools/prerender-tts.mjs`.
+   * Sebelum A12, baris `env.AI.run(engineId, { text: text })` membuang `voiceId` yang sudah masuk
+   * kunci cache: 100% render menjawab `source:"unavailable"`, `bytes:0`, dan kuota tidak bergerak.
+   */
+  var ProviderParams = (function () {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('./tts-provider-params.js');
+    return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelTtsProviderParams;
+  }());
+
   /** Sama alasannya dengan route-ai.js: E5 dan paket kuota harus bisa di-merge dalam urutan apa pun. */
   function resolveEnforceQuota(deps) {
     var d = deps || {};
@@ -157,12 +168,21 @@
     return payload.byteLength || payload.length || 0;
   }
 
-  async function callEngine(env, engineId, text, timeoutMs) {
+  /**
+   * Badan permintaan dibangun `ProviderParams.buildProviderInput()`, jadi `voiceId` yang dihash ke
+   * kunci cache adalah `voiceId` yang benar-benar diterima provider — di bawah nama parameter yang
+   * benar untuk mesin itu (`speaker` untuk keluarga aura). Menuliskannya inline di sini kembali =
+   * mengembalikan cacat A12/1.
+   */
+  async function callEngine(env, engineId, text, voiceId, locale, timeoutMs) {
     var options = {};
     if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
       options.signal = AbortSignal.timeout(timeoutMs);
     }
-    var run = env.AI.run(engineId, { text: text }, options);
+    var input = ProviderParams.buildProviderInput({
+      engineId: engineId, text: text, voiceId: voiceId, locale: locale
+    });
+    var run = env.AI.run(engineId, input, options);
     var timer;
     var guard = new Promise(function (_, reject) {
       timer = setTimeout(function () {
@@ -210,7 +230,10 @@
       identity = TtsKey.build({
         text: body.text,
         locale: body.locale,
-        voiceId: body.voiceId,
+        // A12/1 — voice bawaan datang dari registry bersama, BUKAN dari string di berkas ini.
+        // Nilainya wajib sama dengan yang dipakai pra-render (`aura-asteria-en`), sebab kunci
+        // cache mem-hash `voiceId`: bawaan yang berbeda = seluruh korpus dianggap belum ada.
+        voiceId: body.voiceId || ProviderParams.defaultVoiceIdFor(engine.id),
         engineId: engine.id,
         engineVersion: body.engineVersion || engine.engineVersion,
         contentType: body.contentType,
@@ -300,7 +323,9 @@
       var bytes = null;
       var failureKind = '';
       try {
-        var result = await callEngine(env, engine.id, identity.canonicalText, TTS_TIMEOUT_MS);
+        var result = await callEngine(
+          env, engine.id, identity.canonicalText, identity.voiceId, identity.locale, TTS_TIMEOUT_MS
+        );
         bytes = toBytes(result);
         if (!bytes || byteSize(bytes) < 512) failureKind = 'empty_body';
       } catch (error) {
@@ -442,6 +467,10 @@
     ROUTES: Object.freeze({ render: '/api/tts/render', manifest: '/api/tts/manifest' }),
     ENGINES: ENGINES,
     DEFAULT_ENGINE: DEFAULT_ENGINE,
+    PROVIDER_PARAMS: ProviderParams.PROVIDER_PARAMS,
+    buildProviderInput: ProviderParams.buildProviderInput,
+    defaultVoiceIdFor: ProviderParams.defaultVoiceIdFor,
+    callEngine: callEngine,
     CHEAP_ENGINE: CHEAP_ENGINE,
     TTS_TIMEOUT_MS: TTS_TIMEOUT_MS,
     POLITE: POLITE,
