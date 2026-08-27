@@ -1,4 +1,4 @@
-# `deploy/edge/` — JEMBATAN SEMENTARA `api.fiezel.my.id` → Worker Cloudflare
+# `deploy/edge/` — JEMBATAN SEMENTARA `api.fiezel.my.id` + `owner.fiezel.my.id` → Worker Cloudflare
 
 > **🔄 TEMUAN LAPANGAN 27 Agu 2026 — direktori ini BARU.** Ia mencatat satu artefak
 > deployment yang sebelumnya hanya hidup di origin dan tidak bisa diaudit siapa pun.
@@ -9,12 +9,20 @@
 
 | Berkas | Dipasang di | Keterangan |
 |---|---|---|
-| `api-index.php` | `~/public_html/api/index.php` (cPanel ArenHost) | Proxy penerus. Nilai secret di repo adalah placeholder `__EDGE_SECRET__`. |
+| `api-index.php` | `~/public_html/api/index.php` (cPanel ArenHost) | Proxy penerus ke Worker `fiezel-api`. Nilai secret di repo adalah placeholder `__EDGE_SECRET__`. |
+| `owner-index.php` | `~/public_html/owner/index.php` (cPanel ArenHost) | Proxy penerus ke Worker `fiezel-owner` (dashboard owner, **HTML**). Pola sama, allowlist berbeda. Placeholder yang sama. |
 
 **Nilai `EDGE_SHARED_SECRET` yang sungguhan TIDAK ADA di repo ini dan tidak boleh
 pernah masuk.** Yang tercatat hanya placeholder dan cara menyuntiknya saat
-pemasangan. Gerbang `edge-guard-test.js` butir (g) memindai berkas ini untuk
-memastikan itu tetap benar.
+pemasangan. Gerbang `edge-guard-test.js` butir (g) memindai `api-index.php` dan
+`owner-edge-guard-test.js` butir (d) memindai `owner-index.php` untuk memastikan itu
+tetap benar.
+
+**Dua proxy, dua nilai secret yang BERBEDA.** `fiezel-api` dan `fiezel-owner` adalah dua
+Worker dengan penyimpanan Secret sendiri-sendiri. Memakai satu nilai untuk keduanya tidak
+memberi kemudahan apa pun (keduanya di-`sed` saat pemasangan) tetapi menyatukan radius
+ledakan: satu berkas PHP yang terbaca sebagai teks akan membuka **kedua** Worker. Jadi:
+terbitkan dua nilai.
 
 ---
 
@@ -173,6 +181,126 @@ Monitor eksternal (UptimeRobot dsb.) **wajib** diarahkan ke `/healthz`, bukan
 **Rotasi secret:** pasang nilai baru di proxy lebih dulu (langkah 2-4), lalu
 `wrangler secret put`. Urutan terbalik = jendela 403 untuk seluruh murid.
 
+## 4A. Cara memasang jembatan `owner.fiezel.my.id`
+
+Masalahnya persis sama, satu tingkat lebih parah: Worker `fiezel-owner` **sudah
+ter-deploy** tetapi `owner.fiezel.my.id` **tidak bisa** dibuat sebagai custom domain
+(zona `fiezel.my.id` belum di Cloudflare — §1), sehingga dashboard analytics owner
+**tidak bisa diakses sama sekali**. Dashboard tanpa hostname sama dengan dashboard yang
+tidak pernah dibangun.
+
+Jadi pola yang sama dipakai — **disalin, bukan ditemukan ulang**: subdomain cPanel `owner`
+di origin ArenHost yang sama + `owner-index.php` yang meneruskan ke
+`https://fiezel-owner.fitrajft.workers.dev`.
+
+**Beda yang perlu diketahui sebelum memasang:**
+
+- **Jawabannya HTML, bukan JSON.** `Content-Type: text/html; charset=utf-8` harus lewat
+  utuh, dan **header keamanan yang dipasang Worker wajib ikut lewat**:
+  `Content-Security-Policy` (ketat: `default-src 'none'`), `X-Robots-Tag: noindex`,
+  `Referrer-Policy: no-referrer`, `X-Content-Type-Options: nosniff`. Proxy yang
+  menjatuhkan CSP mengubah halaman ber-CSP ketat menjadi halaman tanpa CSP **tanpa satu
+  pun tanda yang terlihat** — halamannya tetap tampil benar. Karena itu keempat header itu
+  ada di `$passThrough`, dan `owner-edge-guard-test.js` butir (c) mengambil header dari
+  respons Worker yang sungguhan lalu menuntut setiap satu di antaranya ada di daftar itu.
+- **`Location` + `Set-Cookie` wajib lewat, redirect TIDAK diikuti proxy.** Login yang
+  berhasil menjawab `303 → /` sambil memasang cookie `fz_owner`. Kalau curl mengikuti
+  redirect sendiri (`CURLOPT_FOLLOWLOCATION = true`), cookie itu mati di proses PHP dan
+  login yang berhasil terlihat seperti login yang gagal.
+- **Nol header CORS.** Dashboard owner adalah HTML pihak pertama tanpa fetch lintas asal;
+  menambahkan CORS hanya memperluas permukaan yang tidak dipakai siapa pun.
+- **Allowlist-nya rute dashboard owner** (`/`, `/login` GET+POST, `/logout`,
+  `/api/summary`, `/api/series`, `/api/retention`, `/api/cost`) — sumbernya `OWNER_ROUTES`
+  + `PUBLIC_ROUTES` di `workers/owner/index.js`, dan gerbang membandingkan dua daftar itu.
+  Rute Worker yang lupa didaftarkan akan 404 di origin; rute karangan di allowlist
+  memerahkan CI.
+- **`/healthz` TIDAK ada di sini.** Dashboard owner tidak dipantau monitor eksternal, jadi
+  penjaga edge owner punya **nol** path bebas header (`EDGE_FREE_PATHS = []`).
+
+```bash
+# 0. Buat subdomain di cPanel: Domains → Create A New Domain
+#    Domain: owner.fiezel.my.id
+#    Document Root: public_html/owner        <-- DOCROOT TERPISAH, jangan di dalam public_html/api
+#    Alasannya bukan kerapian: satu docroot berarti satu .htaccess dan satu allowlist untuk
+#    dua permukaan yang sangat berbeda (API murid vs angka bisnis). Salah satu longgar =
+#    keduanya longgar.
+
+# 1. Terbitkan secret KHUSUS owner (jangan pakai ulang nilai jembatan api — lihat §2).
+SECRET_OWNER="$(node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))")"
+
+# 2. URUTAN: PROXY dulu, Worker belakangan. Sama seperti §4, dan alasannya sama — begitu
+#    Worker owner punya EDGE_SHARED_SECRET, ia menolak 403 SEMUA permintaan tanpa header,
+#    termasuk halaman masuk. Kalau proxy belum mengirim header, jendela antara dua langkah
+#    itu = dashboard mati total.
+
+# 3. Suntik secret ke salinan lokal, JANGAN ke berkas repo.
+sed "s|__EDGE_SECRET__|$SECRET_OWNER|" deploy/edge/owner-index.php > /tmp/fz-owner-index.php
+grep -c '__EDGE_SECRET__' /tmp/fz-owner-index.php   # HARUS: 0
+git status --short deploy/edge/                     # HARUS: kosong (repo tak tersentuh)
+
+# 4. Unggah ke docroot subdomain owner.
+scp /tmp/fz-owner-index.php <USER>@<HOST>:~/public_html/owner/index.php
+shred -u /tmp/fz-owner-index.php 2>/dev/null || rm -f /tmp/fz-owner-index.php
+
+# 5. Izin berkas. 644, BUKAN 664/666: berkas ini memuat secret di hosting bersama.
+ssh <USER>@<HOST> 'chmod 644 ~/public_html/owner/index.php && ls -l ~/public_html/owner/index.php'
+```
+
+`.htaccess` di `~/public_html/owner/.htaccess` — sama polanya dengan `api`, dan blok
+`FilesMatch` **bukan hiasan**: editor berkas cPanel membuat `index.php.bak`, dan berkas
+`.bak` **DISAJIKAN sebagai teks** oleh Apache. Di jembatan owner, teks itu memuat secret
+jembatan.
+
+```apache
+# owner.fiezel.my.id — seluruh permintaan masuk ke satu proxy.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Jangan pernah menyajikan berkas lain dari direktori ini (mis. index.php.bak yang dibuat
+# editor cPanel — berkas .bak DISAJIKAN sebagai teks, dan itu membocorkan secret ke publik).
+<FilesMatch "\.(bak|orig|save|swp|old|php~|dist)$">
+  Require all denied
+</FilesMatch>
+
+# Header rahasia tidak boleh bisa disuntikkan dari luar ke proxy ini.
+RequestHeader unset X-Fiezel-Edge
+```
+
+Lalu pasang secret yang **sama dengan `$SECRET_OWNER`** di Worker owner, dan verifikasi:
+
+```bash
+cd workers/owner && npx wrangler@3 secret put EDGE_SHARED_SECRET   # tempel $SECRET_OWNER
+
+# (a) Lewat jembatan: halaman masuk hidup, HTML, ber-CSP, dan noindex.
+curl -si https://owner.fiezel.my.id/login | grep -iE 'HTTP/|content-type|content-security-policy|x-robots-tag'
+# HARUS: 200 · text/html; charset=utf-8 · default-src 'none' · noindex
+
+# (b) Langsung ke workers.dev tanpa header: HARUS 403 di SEMUA rute, termasuk /login.
+for p in / /login /logout /api/summary /api/series /api/retention /api/cost; do
+  curl -s -o /dev/null -w "$p %{http_code}\n" https://fiezel-owner.fitrajft.workers.dev$p
+done
+# HARUS: 403 semuanya
+
+# (c) Login sungguhan lewat jembatan: 303 + cookie fz_owner pihak pertama.
+curl -si -X POST https://owner.fiezel.my.id/login -d 't=<TOKEN_OWNER>' | grep -iE 'HTTP/|location|set-cookie'
+# HARUS: 303 · location: / · set-cookie: fz_owner=...; HttpOnly; Secure; SameSite=Strict
+
+# (d) Dan lapis kedua tetap berdiri: header edge benar TIDAK menggantikan sesi owner.
+curl -s -o /dev/null -w '%{http_code}\n' -H "X-Fiezel-Edge: $SECRET_OWNER" \
+  https://fiezel-owner.fitrajft.workers.dev/api/summary
+# HARUS: 403 (tidak ada cookie sesi)
+```
+
+**Rotasi secret owner:** sama seperti §4 — nilai baru di proxy lebih dulu (langkah 3-5),
+lalu `wrangler secret put`. Urutan terbalik = jendela 403 untuk seluruh dashboard.
+
+**Lapis kedua (Cloudflare Access) jujur soal batasnya:** Access dipasang **per hostname**.
+Selama dashboard dijangkau lewat `owner.fiezel.my.id` di origin ArenHost, Access Cloudflare
+**tidak** berada di jalur itu, dan alamat `*.workers.dev` juga tidak terlindung olehnya.
+Yang menutup alamat `workers.dev` selama masa jembatan hanyalah `EDGE_SHARED_SECRET`.
+Access baru menjadi lapis nyata sesudah pembongkaran (§6 langkah 3a).
+
 ## 5. Harga yang dibayar — dicatat jujur, bukan disembunyikan
 
 - **Latensi.** Hop PHP tambahan terukur pada `/health`: **2.214 ms** saat dingin,
@@ -205,6 +333,16 @@ langkah aman untuk dibatalkan sampai langkah 5.
    Remove, lalu hapus direktorinya:
    `ssh <USER>@<HOST> 'rm -rf ~/public_html/api'`. Berkas itu memuat secret; jangan
    ditinggalkan sebagai `index.php.bak`.
+3a. **Jembatan owner dibongkar terpisah, urutannya sama:** hapus subdomain cPanel
+   `owner.fiezel.my.id` (cPanel → Domains → Remove) dan jalankan
+   `ssh <USER>@<HOST> 'rm -rf ~/public_html/owner'` **lebih dulu**, baru aktifkan kembali
+   `[[routes]] pattern = "owner.fiezel.my.id", custom_domain = true` di
+   `workers/owner/wrangler.toml` lalu `cd workers/owner && npx wrangler@3 deploy` — record
+   DNS lama bertabrakan dengan record proxied yang dibuat Wrangler, persis seperti kasus
+   `api`. Verifikasi sebelum lanjut: `dig +short A owner.fiezel.my.id` menunjuk IP
+   Cloudflare, `curl -si https://owner.fiezel.my.id/login` tetap 200 + `text/html` + CSP
+   ketat + `noindex`, dan login masih memasang cookie `fz_owner`. Sesudah hostname resmi
+   berdiri, barulah Cloudflare Access di `owner.fiezel.my.id` menjadi lapis yang nyata.
 4. **Verifikasi jalur baru** sebelum menutup pintu lama:
    ```bash
    dig +short A api.fiezel.my.id     # HARUS IP Cloudflare, bukan 195.88.211.212
@@ -219,7 +357,14 @@ langkah aman untuk dibatalkan sampai langkah 5.
    lalu deploy. Sesudah ini `https://fiezel-api.fitrajft.workers.dev` mati, dan
    lubang yang dijelaskan §3 hilang **secara struktural**, bukan karena header.
 6. **Bersihkan sisa-sisanya:**
-   - hapus `EDGE_SHARED_SECRET`: `npx wrangler@3 secret delete EDGE_SHARED_SECRET`;
+   - hapus `EDGE_SHARED_SECRET` di **kedua** Worker:
+     `cd workers/api && npx wrangler@3 secret delete EDGE_SHARED_SECRET` lalu
+     `cd workers/owner && npx wrangler@3 secret delete EDGE_SHARED_SECRET`;
+   - `workers/owner/index.js`: penjaga edge yang disalin ke sana (`edgeGuard`,
+     `EDGE_FREE_PATHS`, mode `off`) kehilangan alasan hidupnya bersamaan dengan
+     `mw-edge.js` — hapus, satu keputusan sadar untuk kedua Worker;
+   - hapus `deploy/edge/owner-index.php` bersama `api-index.php`, dan setel
+     `workers_dev = false` untuk `fiezel-owner` juga;
    - arahkan monitor eksternal dari `/healthz` ke `/healthz` di hostname baru
      (rutenya tetap berguna, dan tetap boleh publik);
    - `workers/api/mw-edge.js`: sesudah langkah 5, mode `off` **tidak punya alasan
@@ -238,7 +383,13 @@ langkah aman untuk dibatalkan sampai langkah 5.
   (jembatan ini).
 - `workers/api/mw-edge.js` — penegakan header + alasan mode `off`.
 - `workers/api/route-health.js` — kenapa `/health` dilindungi dan `/healthz` tidak.
-- `edge-guard-test.js` — gerbang CI yang menjaga semua klaim di atas.
+- `edge-guard-test.js` — gerbang CI yang menjaga semua klaim jembatan `api` di atas.
+- `owner-edge-guard-test.js` — gerbang CI jembatan `owner`: semua rute 403 tanpa header
+  edge, 403 tanpa sesi owner walau header benar (dua lapis), header keamanan HTML lolos
+  daftar pass-through, `owner-index.php` bebas nilai secret, perbandingan waktu-konstan.
+- `workers/owner/index.js` — penjaga edge sisi owner (disalin dari `mw-edge.js`, alasan
+  penyalinannya ditulis di berkasnya) + gate sesi owner.
+- `workers/owner/README.md` — Secret gate owner, cara login, dan batas kejujuran metrik.
 - Cloudflare, custom domain Worker butuh zona di akun yang sama:
   https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
 - Public suffix list memuat `workers.dev` (karena itu cookie lintas situs):
