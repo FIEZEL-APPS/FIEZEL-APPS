@@ -147,6 +147,21 @@
       return l.segments[state.segmentIndex] || null;
     }
 
+    /**
+     * V6: mengintip segmen SESUDAH yang sekarang tanpa memindahkan kursor.
+     *
+     * nextSegment() di bawah memindahkan kursor - itu perintah, bukan pertanyaan - jadi ia
+     * tidak bisa dipakai untuk menghangatkan kalimat berikutnya (reports/voice-v5-prefetch.md
+     * §3 baris 1 mencatat justru ketiadaan accessor ini sebagai penghalangnya). Ia
+     * mengembalikan null di ujung pelajaran dan di fase mana pun selain 'teach', sehingga
+     * pemanggil tidak punya cara menghangatkan sesuatu yang tidak akan dibacakan.
+     */
+    function peekSegment() {
+      var l = lesson();
+      if (!l || state.phase !== 'teach') return null;
+      return l.segments[state.segmentIndex + 1] || null;
+    }
+
     function nextSegment() {
       var l = lesson();
       if (!l || state.phase !== 'teach') return snapshot();
@@ -254,6 +269,7 @@
       chooseCategory: chooseCategory,
       chooseLesson: chooseLesson,
       currentSegment: currentSegment,
+      peekSegment: peekSegment,
       nextSegment: nextSegment,
       currentQuestion: currentQuestion,
       answer: answer,
