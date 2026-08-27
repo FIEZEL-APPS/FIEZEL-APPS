@@ -242,6 +242,16 @@ jobs:
           # alamat *.workers.dev sementara) dan teruskan lewat `env:` pada step ini.
           # Petunjuk lengkap: tools/cf-live-runner.md.
           node cf-live-contract-test.js
+          # SKIP sampai owner menyetel base URL Worker STAGING. Langkah ini menembak
+          # runtime Cloudflare sungguhan dan MENULIS state (kuota harian, objek audio,
+          # baris analytics), jadi ia hanya boleh berjalan terhadap lingkungan staging
+          # yang terpisah dari data murid — dan ia menolak berjalan kalau `/health`
+          # tidak mengaku staging. Tanpa FIEZEL_STAGING_BASE + FIEZEL_STAGING_EDGE ia
+          # mencetak alasan jujur lalu exit 0 (SKIP, `pass:null`), bukan PASS.
+          # Rahasia header edge TIDAK boleh masuk CI publik: kalau owner memang mau
+          # menjalankannya di CI, ia harus lewat repository secret dan `env:` pada step
+          # ini, bukan lewat berkas di repo.
+          node staging-live-test.js
           node release-audit-gate-test.js
           node cf-transport-test.js
           node cf-shadow-mode-test.js
