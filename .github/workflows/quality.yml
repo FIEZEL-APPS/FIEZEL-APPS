@@ -204,4 +204,5 @@ jobs:
           # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
           # menjalankan blok kill switch DAN blok transport bersama-sama.
           node cf-config-killswitch-test.js
+          node cf-shadow-ledger-test.js
           node workflow-actor-gate-test.js
