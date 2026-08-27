@@ -413,7 +413,14 @@ function scanForPii(value, trail, hits) {
 
     // Tanda tangan diubah 1 karakter => diperlakukan seperti tidak ada.
     const value = cookieValue(first.cookie);
-    const tampered = value.slice(0, -1) + (value.slice(-1) === 'A' ? 'B' : 'A');
+    // A12: dulu karakter TERAKHIR yang diubah. Karakter terakhir base64url bisa memuat bit yang
+    // TIDAK signifikan (padding implisit), jadi `A`→`B` di sana kadang mendekode ke byte yang
+    // SAMA dan tanda tangannya tetap sah — gerbang ini merah ±1 dari 8 jalan tanpa ada cacat
+    // produksi. Yang diubah sekarang karakter di TENGAH segmen tanda tangan: seluruh bitnya
+    // signifikan, jadi byte-nya pasti berubah dan assert-nya deterministik.
+    const dot = value.lastIndexOf('.');
+    const cut = dot + 1 + Math.floor((value.length - dot - 1) / 2);
+    const tampered = value.slice(0, cut) + (value.charAt(cut) === 'A' ? 'B' : 'A') + value.slice(cut + 1);
     const bad = await call(worker, env, 'GET', '/api/user/me', { cookie: 'fz_id=' + tampered });
     assert(bad.response.status === 401, 'cookie dengan tanda tangan diubah = 401');
     assert(bad.json.error === 'unauthenticated', 'galat cookie palsu identik dengan galat tanpa cookie (anti-oracle)');
