@@ -253,11 +253,25 @@ check(
   /notifySessionEnd\('exit'\)/.test(addon) && /notifySessionEnd\('complete'\)/.test(addon),
   'renderComplete()/exit() adalah dua satu-satunya cara sesi berakhir'
 );
+/* A8 (naskah + aksesibilitas) MENGUBAH tiga hal yang dulu diperiksa di sini, dan assert-nya
+   ikut berubah bersama naskahnya — bukan dilonggarkan:
+     - judul "Kredit AI Puter kamu habis" menyebut nama layanan mesin. Kanon naskah murid
+       melarangnya (istilah teknis: nama mesin), dan nama itu juga bukan sesuatu yang bisa
+       diperbaiki murid. Judulnya kini datang dari features/quota/quota-copy.js.
+     - "Pelajari opsi upgrade" adalah TAUTAN <a> ke halaman pemakaian berbayar. Itu permukaan
+       bayar di panel jatah; `paymentEnabled=false` ditegakkan sebagai KETIADAAN elemen. Jadi
+       yang diperiksa sekarang justru KEBALIKANNYA: tautan itu harus HILANG.
+     - yang TETAP dijaga persis seperti dulu: pemberitahuannya milik FIEZEL (bukan dialog SDK),
+       ia nggak pernah memanggil requestUpgrade, dan ia tetap mengatakan aplikasinya jalan
+       penuh tanpa bayar apa pun.
+   Naskah lengkapnya sekarang punya gerbangnya sendiri: quota-notice-a11y-test.js. */
 check(
-  'Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK',
-  /Kredit AI Puter kamu habis/.test(app) && /Oke, lanjut belajar/.test(app) && /Pelajari opsi upgrade/.test(app) &&
+  'Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK, dan tanpa permukaan bayar',
+  /presentQuotaNotice\(\{copyKey:'quota\.ai\.exhausted'/.test(app) &&
+  /Oke, lanjut belajar/.test(app) &&
+  !/Pelajari opsi upgrade/.test(app) && !/puter\.com\/settings\/usage/.test(app) &&
   !/puter\.ui\.requestUpgrade/.test(app),
-  'FIEZEL tetap jalan penuh tanpa upgrade - naskahnya harus mengatakan itu'
+  'FIEZEL tetap jalan penuh tanpa bayar - naskahnya mengatakan itu, dan tautan berbayarnya hilang'
 );
 
 /* ---- ringkasan -------------------------------------------------------------------------- */
