@@ -14,6 +14,17 @@
  *   (d) tidak ada satu pun angka penguasaan/retrievability tanpa interval
  *       ketidakpastian yang menyertainya;
  *   (e) input null/kosong aman — cermin tidak boleh pecah hanya karena datanya belum ada.
+ *
+ * GATE v3 — NEGOTIATED LEARNER MODEL (council C9 opus): sanggahan murid bukan tombol
+ * keluhan, melainkan bukti bahwa model dan realitas berbeda — obatnya pengukuran ulang,
+ * bukan debat. Gate baru memeriksa:
+ *   (n-a) claimId stabil (dua summarize identik) & unik dalam satu ringkasan;
+ *   (n-b) dispute klaim mastery/miskonsepsi -> instruksi remeasure dengan targetSkill benar;
+ *   (n-c) dispute klaim memori -> instruksi discount_evidence dengan target benar;
+ *   (n-d) dispute ganda pada klaim sama dalam 7 hari -> noop (anti spam remeasure);
+ *   (n-e) summarize menandai klaim pending 'sedang diukur ulang' + canDispute:false,
+ *         dan resolveDispute membukanya kembali;
+ *   (n-f) state negosiasi korup tidak pernah melempar — disanitasi, bukan dipercaya.
  */
 const assert = require('assert');
 const olm = require('./features/brain/fiezel-olm.js');
@@ -254,6 +265,182 @@ test('modul murni: summarize tidak bergantung Date.now (hasil identik untuk nowM
   const b = JSON.stringify(olm.summarize(input, NOW));
   assert.strictEqual(a, b);
   assert.strictEqual(olm.summarize(input, NOW).generatedAt, NOW);
+});
+
+/* ================= GATE v3 — negotiated learner model ================= */
+
+/** Fixture ringkasan lengkap: mastery + miskonsepsi + memori + kalibrasi. */
+function fullInput(extra) {
+  const base = {
+    bkt: { lessons: {
+      tense_aspect: { L: 0.8, n: 12, family: 'tense' },
+      articles: { L: 0.5, n: 9 }
+    } },
+    ledger: {
+      active: [{ concept: 'third_conditional', misconception: 'would went', canonical: 'would have gone', belief: 0.85, evidenceCount: 5 }],
+      resolved: [{ concept: 'articles', misconception: 'a apple' }],
+      total: 2
+    },
+    memory: [{ id: 'grammar:skill', stability: 3, lastReviewMs: NOW - 10 * DAY, reps: 2 }],
+    calibration: calibPairs(25, 0.9, 0.6)
+  };
+  return Object.assign(base, extra || {});
+}
+
+/** Kumpulkan semua claimId dari satu ringkasan. */
+function allClaimIds(out) {
+  const ids = [];
+  out.mastery.entries.forEach((e) => ids.push(e.claimId));
+  out.misconceptions.active.forEach((e) => ids.push(e.claimId));
+  out.misconceptions.resolved.forEach((e) => ids.push(e.claimId));
+  out.review.top.forEach((e) => ids.push(e.claimId));
+  ids.push(out.calibration.claimId);
+  return ids;
+}
+
+test('(n-a) setiap klaim membawa claimId string dengan format terdokumentasi', () => {
+  const out = olm.summarize(fullInput(), NOW);
+  const ids = allClaimIds(out);
+  ids.forEach((id) => assert.ok(typeof id === 'string' && id.length > 0, 'claimId kosong: ' + id));
+  assert.ok(ids.indexOf('mastery:tense_aspect') !== -1, ids.join(','));
+  assert.ok(ids.indexOf('misconception:third_conditional::would went') !== -1, ids.join(','));
+  assert.ok(ids.indexOf('memory:grammar:skill') !== -1, ids.join(','));
+});
+
+test('(n-a) claimId STABIL antar pemanggilan dan UNIK dalam satu ringkasan', () => {
+  const a = allClaimIds(olm.summarize(fullInput(), NOW));
+  const b = allClaimIds(olm.summarize(fullInput(), NOW));
+  // Stabil: identitas klaim tidak boleh berganti antar render, kalau tidak dispute
+  // yang tercatat kemarin tidak akan pernah cocok dengan klaim yang tampil hari ini.
+  assert.deepStrictEqual(a, b);
+  // Unik: dua klaim dengan claimId sama berarti satu tombol membantah dua hal.
+  assert.strictEqual(new Set(a).size, a.length, 'claimId duplikat: ' + a.join(','));
+});
+
+test('(n-b) dispute klaim mastery -> remeasure dengan targetSkill benar dan probeCount 3', () => {
+  const r = olm.negotiate(null, { claimId: 'mastery:tense_aspect', action: 'dispute' }, NOW);
+  assert.strictEqual(r.instruction.type, 'remeasure');
+  assert.strictEqual(r.instruction.targetSkill, 'tense_aspect');
+  assert.strictEqual(r.instruction.probeCount, 3);
+  assert.strictEqual(r.instruction.rationale, 'brain3_olm_dispute_remeasure');
+  // Sanggahan tercatat {claimId, at} di state baru yang serializable.
+  assert.strictEqual(r.state.schema, 'fiezel-olm-negotiation-v1');
+  assert.deepStrictEqual(r.state.disputes, [{ claimId: 'mastery:tense_aspect', at: NOW }]);
+  assert.strictEqual(JSON.stringify(r.state), JSON.stringify(JSON.parse(JSON.stringify(r.state))));
+});
+
+test('(n-b) dispute klaim miskonsepsi -> remeasure menarget KONSEPNYA (bagian sebelum ::)', () => {
+  const r = olm.negotiate(null, { claimId: 'misconception:third_conditional::would went', action: 'dispute' }, NOW);
+  assert.strictEqual(r.instruction.type, 'remeasure');
+  assert.strictEqual(r.instruction.targetSkill, 'third_conditional');
+  assert.strictEqual(r.instruction.probeCount, 3);
+});
+
+test('(n-c) dispute klaim memori -> discount_evidence dengan target benar (id boleh mengandung :)', () => {
+  const r = olm.negotiate(null, { claimId: 'memory:grammar:skill', action: 'dispute' }, NOW);
+  assert.strictEqual(r.instruction.type, 'discount_evidence');
+  assert.strictEqual(r.instruction.target, 'grammar:skill');
+  assert.strictEqual(r.instruction.rationale, 'brain3_olm_dispute_discount');
+  assert.deepStrictEqual(r.state.disputes, [{ claimId: 'memory:grammar:skill', at: NOW }]);
+});
+
+test('(n-d) dispute GANDA pada klaim sama dalam 7 hari -> noop pending, state tidak menumpuk', () => {
+  const first = olm.negotiate(null, { claimId: 'mastery:articles', action: 'dispute' }, NOW);
+  const again = olm.negotiate(first.state, { claimId: 'mastery:articles', action: 'dispute' }, NOW + 6 * DAY);
+  assert.strictEqual(again.instruction.type, 'noop');
+  assert.strictEqual(again.instruction.rationale, 'brain3_olm_dispute_pending');
+  assert.strictEqual(again.state.disputes.length, 1);
+  assert.strictEqual(again.state.disputes[0].at, NOW); // catatan lama utuh, tidak di-reset
+  // Setelah 7 hari sanggahan kedaluwarsa: boleh dibantah lagi, instruksi terbit ulang.
+  const later = olm.negotiate(first.state, { claimId: 'mastery:articles', action: 'dispute' }, NOW + 8 * DAY);
+  assert.strictEqual(later.instruction.type, 'remeasure');
+  assert.strictEqual(later.state.disputes.length, 1);
+  assert.strictEqual(later.state.disputes[0].at, NOW + 8 * DAY);
+});
+
+test('(n-d) negotiate IMMUTABLE: state masukan tidak pernah dimutasi', () => {
+  const first = olm.negotiate(null, { claimId: 'mastery:articles', action: 'dispute' }, NOW);
+  const frozen = Object.freeze({ schema: first.state.schema, disputes: Object.freeze([Object.freeze(first.state.disputes[0])]) });
+  const before = JSON.stringify(frozen);
+  const r = olm.negotiate(frozen, { claimId: 'memory:grammar:skill', action: 'dispute' }, NOW + 1 * DAY);
+  assert.strictEqual(JSON.stringify(frozen), before);
+  assert.strictEqual(r.state.disputes.length, 2);
+  assert.notStrictEqual(r.state, frozen);
+});
+
+test("(n-e) summarize menandai klaim pending: label 'sedang diukur ulang' + canDispute:false", () => {
+  const d1 = olm.negotiate(null, { claimId: 'mastery:tense_aspect', action: 'dispute' }, NOW - 1 * DAY);
+  const d2 = olm.negotiate(d1.state, { claimId: 'memory:grammar:skill', action: 'dispute' }, NOW - 1 * DAY);
+  const out = olm.summarize(fullInput({ negotiation: d2.state }), NOW);
+  const disputed = out.mastery.entries.find((e) => e.lesson === 'tense_aspect');
+  assert.strictEqual(disputed.label, 'sedang diukur ulang');
+  assert.strictEqual(disputed.canDispute, false);
+  assert.strictEqual(disputed.disputed, true);
+  const mem = out.review.top.find((e) => e.id === 'grammar:skill');
+  assert.strictEqual(mem.label, 'sedang diukur ulang');
+  assert.strictEqual(mem.canDispute, false);
+  // Klaim LAIN tidak ikut terkunci.
+  const other = out.mastery.entries.find((e) => e.lesson === 'articles');
+  assert.strictEqual(other.canDispute, true);
+  assert.ok(!other.disputed);
+  // Sanggahan kedaluwarsa (>7 hari) tidak lagi menandai apa pun.
+  const stale = olm.summarize(fullInput({ negotiation: d2.state }), NOW + 8 * DAY);
+  assert.strictEqual(stale.mastery.entries.find((e) => e.lesson === 'tense_aspect').canDispute, true);
+});
+
+test('(n-e) resolveDispute menutup sanggahan: klaim kembali normal dan bisa dibantah lagi', () => {
+  const d = olm.negotiate(null, { claimId: 'mastery:tense_aspect', action: 'dispute' }, NOW);
+  const resolved = olm.resolveDispute(d.state, 'mastery:tense_aspect', NOW + 1 * DAY);
+  assert.deepStrictEqual(resolved.disputes, []);
+  const out = olm.summarize(fullInput({ negotiation: resolved }), NOW + 1 * DAY);
+  const e = out.mastery.entries.find((x) => x.lesson === 'tense_aspect');
+  assert.strictEqual(e.canDispute, true);
+  assert.ok(!e.disputed);
+  assert.strictEqual(e.label, 'dari model BKT'); // label lama pulih, bukan 'sedang diukur ulang'
+  // Setelah resolve, dispute baru pada klaim sama sah kembali (bukan noop pending).
+  const again = olm.negotiate(resolved, { claimId: 'mastery:tense_aspect', action: 'dispute' }, NOW + 2 * DAY);
+  assert.strictEqual(again.instruction.type, 'remeasure');
+});
+
+test('(n-f) state negosiasi korup aman: disanitasi tanpa melempar, entri cacat dibuang', () => {
+  const corrupt = [
+    null, undefined, 42, 'rusak', [],
+    { disputes: 'bukan array' },
+    { schema: 'salah', disputes: [{ claimId: '', at: NOW }, { claimId: 'mastery:x' }, { at: NOW }, null, 7,
+      { claimId: 'mastery:tense_aspect', at: NOW - 1 * DAY }] }
+  ];
+  corrupt.forEach((st) => {
+    const r = olm.negotiate(st, { claimId: 'mastery:baru', action: 'dispute' }, NOW);
+    assert.strictEqual(r.instruction.type, 'remeasure');
+    assert.strictEqual(r.state.schema, 'fiezel-olm-negotiation-v1');
+    assert.ok(Array.isArray(r.state.disputes));
+    const rd = olm.resolveDispute(st, 'mastery:baru', NOW);
+    assert.ok(Array.isArray(rd.disputes));
+    // summarize dengan negotiation korup juga tidak boleh melempar.
+    const out = olm.summarize(fullInput({ negotiation: st }), NOW);
+    assert.strictEqual(out.schema, 'fiezel-olm-v1');
+  });
+  // Entri valid di tengah sampah tetap terbaca: klaim itu pending.
+  const mixed = corrupt[6];
+  const out = olm.summarize(fullInput({ negotiation: mixed }), NOW);
+  assert.strictEqual(out.mastery.entries.find((e) => e.lesson === 'tense_aspect').canDispute, false);
+});
+
+test('(n-f) permintaan cacat -> noop invalid: tanpa claimId, action asing, klaim tak dikenal, nowMs bukan angka', () => {
+  assert.strictEqual(olm.negotiate(null, null, NOW).instruction.type, 'noop');
+  assert.strictEqual(olm.negotiate(null, { action: 'dispute' }, NOW).instruction.type, 'noop');
+  assert.strictEqual(olm.negotiate(null, { claimId: 'mastery:x', action: 'setuju' }, NOW).instruction.type, 'noop');
+  assert.strictEqual(olm.negotiate(null, { claimId: 'mastery:x', action: 'dispute' }, 'besok').instruction.type, 'noop');
+  const unknown = olm.negotiate(null, { claimId: 'calibration:overall', action: 'dispute' }, NOW);
+  assert.strictEqual(unknown.instruction.type, 'noop');
+  assert.deepStrictEqual(unknown.state.disputes, []); // tidak ada instruksi -> tidak ada catatan
+});
+
+test('API lama utuh: summarize TANPA field negotiation berperilaku persis seperti sebelumnya', () => {
+  const out = olm.summarize(fullInput(), NOW);
+  out.mastery.entries.forEach((e) => assert.strictEqual(e.canDispute, true));
+  out.review.top.forEach((e) => assert.strictEqual(e.canDispute, true));
+  assert.ok(!out.mastery.entries.some((e) => e.disputed), 'tanpa negotiation tidak ada yang disputed');
 });
 
 if (failures > 0) {
