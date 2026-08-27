@@ -71,6 +71,16 @@ jobs:
           node analytics-privacy-test.js
           node analytics-aggregate-test.js
           node analytics-server-only-test.js
+          # A2: sisi KLIEN dari kontrak analytics. Tiga gerbang di atas menjaga Worker; yang ini
+          # menjaga tempat jaminannya sebenarnya dieksekusi — perangkat murid. Ia menjalankan
+          # `features/analytics/fiezel-analytics-client.js` di dalam `vm` (tanpa jaringan, tanpa
+          # localStorage/navigator nyata) lalu menuntut: installId tidak pernah masuk payload,
+          # sepuluh event server-only ditolak klien, field asing dibuang, flag `usage` bukan 'on'
+          # = nol permintaan DAN nol akses penyimpanan, antrean offline punya cap yang membuang
+          # yang tertua, token berubah saat pepper berubah, dan nol pola PII di seluruh payload.
+          # Diletakkan tepat sesudah gerbang server-only supaya kedua sisi kontrak yang sama
+          # gagal bersebelahan di UI Actions, bukan terpisah 60 baris.
+          node analytics-client-test.js
           node a11y-test.js
           node contrast-test.js
           node pastel-field-contrast-test.js
