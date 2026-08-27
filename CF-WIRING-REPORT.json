@@ -220,7 +220,7 @@
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): POST /api/ai/task",
       "status": "PASS",
-      "details": "200 {\"schema\":\"fiezel-ai-response-v2\",\"task\":\"tutor_turn\",\"text\":\"jawaban-palsu-ff84a6ce\",\"source\":\"provider\",\"degraded\":fal"
+      "details": "200 {\"schema\":\"fiezel-ai-response-v2\",\"task\":\"tutor_turn\",\"text\":\"jawaban-palsu-d375689b\",\"source\":\"provider\",\"degraded\":fal"
     },
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): POST /api/tts/render",
@@ -245,7 +245,7 @@
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): GET /api/usage/pepper",
       "status": "PASS",
-      "details": "200 {\"ok\":true,\"day\":\"2026-08-26\",\"pepper\":\"246771da8629f45231a9f14e70a0cf6300656fc7f2d7f9a5d35940500a4eeded\",\"rotatesAtMs\":"
+      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"d73e09e50367e4b2243bae84e4047b035f0572e54d4ab8e4b1db73b3cd7e34d6\",\"rotatesAtMs\":"
     },
     {
       "name": "A rute kuota menjawab 200 dengan amplop fiezel-quota-v1",
@@ -335,7 +335,7 @@
     {
       "name": "B penolakan tercatat di kolom denied atau tidak menaikkan used",
       "status": "PASS",
-      "details": "{\"user_id\":\"a95ce83b-70c7-4494-a52b-74e6c5b9047d\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
+      "details": "{\"user_id\":\"0d49fb9d-80f4-46dd-a49f-0487687f4d40\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
     },
     {
       "name": "C render pertama (cache MISS) berhasil",
@@ -460,7 +460,7 @@
     {
       "name": "E dua identitas uji berbeda",
       "status": "PASS",
-      "details": "7903909e-64be-4f83-887b-b8dbf5bcc297 vs ee308e56-a6bd-4650-b5a6-74e5613e630c"
+      "details": "bdbeefdd-9668-43ff-90ac-be567f86c66a vs 9aeb58ea-6abe-4ddc-a007-2e36a731f97e"
     },
     {
       "name": "E kuota Alice mencerminkan pemakaiannya sendiri (5 AI)",
