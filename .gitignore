@@ -57,3 +57,4 @@ CF-SHADOW-MODE-REPORT.json
 # tapi jejak lingkungan seperti ini tetap tidak punya urusan di dalam git.
 STAGING-LIVE-REPORT.json
 CF-CONFIG-KILLSWITCH-REPORT.json
+CF-SHADOW-LEDGER-REPORT.json
