@@ -2,6 +2,40 @@ name: FIEZEL Quality Gate
 on:
   push:
   pull_request:
+  # F5: satu-satunya cara SENGAJA menjalankan gerbang live dari CI.
+  #
+  # Sebelum ini `quality.yml` memanggil `cf-live-contract-test.js` dan
+  # `staging-live-test.js` tanpa meneruskan env apa pun, jadi keduanya SELALU
+  # SKIP dan angka "semua gerbang hijau" mengandung dua langkah yang tidak
+  # menguji satu byte pun runtime Cloudflare (temuan reports/add-a10-kepatuhan.md
+  # §5.1). Jawabannya BUKAN menyalakannya pada setiap push: CI publik yang
+  # menembak produksi setiap kali seseorang commit adalah beban yang kita
+  # timpakan ke murid, bukan pengujian — dan `health-probe-test.js` memang
+  # meng-assert larangan itu.
+  #
+  # Karena itu jalurnya dibuat MANUAL dan ber-input: owner menekan "Run
+  # workflow", mengisi base URL, dan hanya pada jalan itu gerbang live berjalan
+  # sungguhan (dan MERAH kalau kontraknya patah). Dikosongkan = SKIP eksplisit,
+  # sama seperti push biasa.
+  workflow_dispatch:
+    inputs:
+      cf_live_base:
+        description: >-
+          Base URL Worker fiezel-api untuk cf-live-contract-test.js
+          (mis. https://api.fiezel.my.id). Kosongkan untuk tetap SKIP.
+          Gerbang ini hanya MEMBACA (GET/OPTIONS + sesi anon), tidak menulis
+          state murid.
+        required: false
+        default: ''
+      staging_base:
+        description: >-
+          Base URL lingkungan STAGING untuk staging-live-test.js. Gerbang ini
+          MENULIS state (kuota harian, objek audio, baris analytics) dan menolak
+          berjalan kalau /health tidak mengaku staging — JANGAN isi dengan
+          produksi. Butuh secret FIEZEL_STAGING_EDGE terpasang di repo.
+          Kosongkan untuk tetap SKIP.
+        required: false
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -105,6 +139,15 @@ jobs:
           node grammar-quality-audit.js
           node content-integrity-audit.js
           node content-integrity-gate-test.js
+          # F5: ADA di repo sejak m025-124 dan LULUS, tetapi tidak pernah dipanggil satu pun
+          # workflow (temuan reports/add-a10-kepatuhan.md §5.3). Didaftarkan di sini, bersebelahan
+          # dengan dua gerbang integritas konten di atas, karena ia menjaga permukaan yang sama
+          # dari sisi BAHASA: nol judul skill berupa kunci mentah, grammar-labels-id.js dimuat
+          # sebelum app.js dan ikut di-precache SW, dan setiap penjelasan/alasan distraktor punya
+          # versi Bahasa Indonesia yang menunjuk template yang benar-benar ada. Kelas gerbang yang
+          # paling langsung menjaga "murid tidak belajar sesuatu yang salah" adalah kelas yang
+          # paling tidak boleh berada di luar CI.
+          node bank-soal-audit-test.js
           node grammar-memory-scope-test.js
           node grammar-curriculum-test.js
           node level-grammar-contract-test.js
@@ -121,6 +164,12 @@ jobs:
           node e2e-level-grammar-test.js
           node notification-reminder-test.js
           node remote-push-test.js
+          # F5: gerbang kedua yang ada tapi tidak terdaftar (reports/add-a10-kepatuhan.md §5.3).
+          # Diletakkan tepat sesudah dua gerbang pemberitahuan/push karena ia menjaga jalur yang
+          # sama dari sisi PERSETUJUAN: gestur tangkap laporan tetap terisolasi, laporan otomatis
+          # tidak pernah interaktif, laporan sesi/harian tetap tertunda (bukan hilang) tanpa auth,
+          # dan persetujuan eksplisit tidak pernah dilangkahi.
+          node app-report-control-path-test.js
           node core-brain-test.js
           node core-brain-v2-test.js
           node tutor-brain-v3-test.js
@@ -282,24 +331,15 @@ jobs:
           # tanpa DNS, tanpa keluar mesin — karena itu ia terdaftar di
           # SOCKET_ALLOWLIST `no-network-test.js` dan dijalankan SESUDAHNYA.
           node cf-live-selftest.js
-          # SKIP sampai owner menyetel base URL Worker. Tanpa FIEZEL_CF_LIVE_BASE
-          # langkah ini mencetak alasan jujur lalu exit 0 — ia TIDAK memerahkan CI
-          # karena lingkungannya belum siap, dan ia TIDAK mengaku PASS (statusnya
-          # SKIP, `pass:null`). Untuk menjalankannya sungguhan, setel repository
-          # variable/secret FIEZEL_CF_LIVE_BASE ke https://api.fiezel.my.id (atau
-          # alamat *.workers.dev sementara) dan teruskan lewat `env:` pada step ini.
-          # Petunjuk lengkap: tools/cf-live-runner.md.
-          node cf-live-contract-test.js
-          # SKIP sampai owner menyetel base URL Worker STAGING. Langkah ini menembak
-          # runtime Cloudflare sungguhan dan MENULIS state (kuota harian, objek audio,
-          # baris analytics), jadi ia hanya boleh berjalan terhadap lingkungan staging
-          # yang terpisah dari data murid — dan ia menolak berjalan kalau `/health`
-          # tidak mengaku staging. Tanpa FIEZEL_STAGING_BASE + FIEZEL_STAGING_EDGE ia
-          # mencetak alasan jujur lalu exit 0 (SKIP, `pass:null`), bukan PASS.
-          # Rahasia header edge TIDAK boleh masuk CI publik: kalau owner memang mau
-          # menjalankannya di CI, ia harus lewat repository secret dan `env:` pada step
-          # ini, bukan lewat berkas di repo.
-          node staging-live-test.js
+          # F5: DUA gerbang live (`cf-live-contract-test.js`, `staging-live-test.js`)
+          # DIPINDAH KELUAR dari blok ini, menjadi step bernama sendiri di bawah.
+          # Alasannya bukan kosmetik. Selama keduanya berada di tengah ~150 baris
+          # `node …`, kondisi SKIP-nya tidak terlihat siapa pun: langkah "Core
+          # validation" berwarna hijau, dan pembaca menyimpulkan runtime Cloudflare
+          # sudah terbukti padahal nol byte pernah menyentuhnya. Sebagai step
+          # sendiri, SKIP-nya punya nama, alasan, dan ringkasan di UI Actions.
+          # `gate-registry-test.js` meng-assert bahwa keduanya TIDAK dihitung
+          # sebagai bukti selama env-nya kosong.
           # `e2e-bridge-selftest.js` membuktikan gerbang E2E BROWSER
           # (`tools/fiezel-e2e-bridge.mjs`) bisa MERAH: ia menjalankannya terhadap
           # aplikasi tiruan + jembatan HTTPS loopback dalam 21 skenario (satu benar,
@@ -346,3 +386,71 @@ jobs:
           # hari ini. Nol jaringan; fixture ditulis ke direktori temporer OS.
           node rollout-plan-test.js
           node workflow-actor-gate-test.js
+          # F5: gerbang meta pendaftaran. Diletakkan PALING AKHIR dengan sengaja — ia
+          # membaca berkas workflow ini sendiri dan membandingkannya dengan seluruh
+          # berkas uji yang dilacak git, jadi ia hanya berarti setelah semua entri di
+          # atas ada. Ia membuat kelas cacat "gerbang ada di repo tapi tidak pernah
+          # dijalankan CI" (§5.3 add-a10) mustahil terulang tanpa terlihat: setiap
+          # berkas uji WAJIB terdaftar di sini ATAU punya entri pengecualian dengan
+          # ALASAN TERTULIS di dalam gerbang itu. Ia juga meng-assert bahwa dua gerbang
+          # live tidak boleh dihitung sebagai bukti.
+          node gate-registry-test.js
+
+      # =================================================================================
+      # F5 — GERBANG LIVE: SKIP YANG TERLIHAT, DAN CARA MENJALANKANNYA DENGAN SENGAJA
+      # =================================================================================
+      # Kedua step di bawah ini SENGAJA berdiri sendiri. Pada push/PR biasa keduanya
+      # SKIP dan mengatakannya dengan lantang (nama step + alasan + baris ringkasan di
+      # $GITHUB_STEP_SUMMARY), sehingga tidak ada lagi "hijau" yang diam-diam berisi
+      # gerbang yang tidak menguji apa pun. Pada `workflow_dispatch` dengan input terisi,
+      # keduanya berjalan sungguhan dan MERAH kalau kontraknya patah — gerbangnya sendiri
+      # yang menegakkan itu (`cf-live-contract-test.js` exit 1 pada assert gagal;
+      # `staging-live-test.js` exit 1 bahkan bila base URL diisi tapi tidak sah).
+      - name: 'CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_base)'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
+          # `no-network-test.js`: satu `|| 'https://…'` akan mengubah CI publik menjadi
+          # penembak produksi pada setiap push.
+          FIEZEL_CF_LIVE_BASE: ${{ github.event.inputs.cf_live_base }}
+        run: |
+          if [ -z "${FIEZEL_CF_LIVE_BASE}" ]; then
+            echo '::notice title=cf-live-contract-test.js SKIP::FIEZEL_CF_LIVE_BASE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### cf-live-contract-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_CF_LIVE_BASE` tidak diset, jadi tidak ada Worker hidup untuk diuji.'
+              echo 'Yang BELUM terbukti pada jalan ini: rute terpasang di edge, `Set-Cookie fz_id` lolos utuh'
+              echo 'melewati Cloudflare, `ALLOWED_ORIGINS`/`COOKIE_DOMAIN` benar-benar ter-deploy, cap byte'
+              echo 'ditegakkan sebelum body dibaca. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `cf_live_base`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang live SUNGGUHAN terhadap ${FIEZEL_CF_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### cf-live-contract-test.js — dijalankan terhadap \`${FIEZEL_CF_LIVE_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node cf-live-contract-test.js
+      - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
+        env:
+          FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
+          # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
+          # pernah dari berkas di repo dan tidak pernah dari input yang terlihat di UI.
+          # Kalau secret-nya belum dipasang, nilainya kosong dan gerbangnya SKIP.
+          FIEZEL_STAGING_EDGE: ${{ secrets.FIEZEL_STAGING_EDGE }}
+        run: |
+          if [ -z "${FIEZEL_STAGING_BASE}" ] || [ -z "${FIEZEL_STAGING_EDGE}" ]; then
+            echo '::notice title=staging-live-test.js SKIP::FIEZEL_STAGING_BASE dan/atau secret FIEZEL_STAGING_EDGE kosong — gerbang ini TIDAK menguji runtime Cloudflare pada jalan ini.'
+            {
+              echo '### staging-live-test.js — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_STAGING_BASE` dan/atau secret `FIEZEL_STAGING_EDGE` tidak terisi.'
+              echo 'Gerbang ini MENULIS state (kuota harian, objek audio, baris analytics), jadi ia hanya boleh'
+              echo 'menembak lingkungan staging yang terpisah dari data murid — dan ia menolak berjalan kalau'
+              echo '`/health` tidak mengaku staging.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan gerbang staging SUNGGUHAN terhadap ${FIEZEL_STAGING_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node staging-live-test.js

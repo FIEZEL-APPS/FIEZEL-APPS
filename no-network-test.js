@@ -433,17 +433,32 @@ check('Self-test E2E browser terdaftar di quality.yml, gerbang live browser-nya 
 check('Gerbang live dan self-test-nya terdaftar di quality.yml',
   workflow.includes('node cf-live-contract-test.js') && workflow.includes('node cf-live-selftest.js'),
   'quality.yml');
-check('quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL',
-  /SKIP sampai owner menyetel base URL/.test(workflow) && workflow.includes(LIVE_ENV_VAR),
-  'komentar SKIP + ' + LIVE_ENV_VAR);
-// Gerbang staging punya asertnya sendiri, bukan menumpang assert di atas: yang perlu
-// terlihat di CI bukan hanya "ada langkah SKIP", tetapi bahwa langkah yang MENULIS
-// state nyata itu memang mati secara bawaan.
-check('Gerbang staging live terdaftar di quality.yml sebagai langkah yang SKIP secara bawaan',
-  workflow.includes('node staging-live-test.js')
-  && /SKIP sampai owner menyetel base URL Worker STAGING/.test(workflow)
-  && workflow.includes(STAGING_ENV_VAR),
-  'komentar SKIP STAGING + ' + STAGING_ENV_VAR);
+// F5: dua assert di bawah ini DULU memeriksa kalimat komentar literal ("SKIP sampai owner
+// menyetel base URL") sebagai bukti bahwa langkah live mati secara bawaan. Itu proksi yang
+// lemah dari dua arah: komentar bisa benar sementara mekanismenya salah (dan memang begitu
+// keadaannya — `quality.yml` tidak meneruskan env-nya sama sekali, temuan
+// reports/add-a10-kepatuhan.md §5.1), dan mekanismenya bisa benar sementara kalimatnya
+// diubah. Sekarang yang di-assert adalah MEKANISMENYA: env live datang dari input
+// `workflow_dispatch` (yang pada push/PR bernilai kosong = SKIP) dan TIDAK PERNAH dari URL
+// yang dipaku di dalam workflow. Bentuk step-nya sendiri (nama menyebut SKIP, alasan
+// dicetak, gerbang live tidak dihitung sebagai bukti) dijaga `gate-registry-test.js`.
+for (const [label, envVar, inputName] of [
+  ['live', LIVE_ENV_VAR, 'cf_live_base'],
+  ['staging', STAGING_ENV_VAR, 'staging_base']
+]) {
+  const problems = [];
+  if (!new RegExp(`${envVar}\\s*:`).test(workflow)) problems.push(`${envVar} tidak diteruskan lewat env: di quality.yml`);
+  if (new RegExp(`${envVar}\\s*:\\s*['"\`]?https?://`).test(workflow)) {
+    problems.push(`${envVar} punya URL remote yang dipaku di workflow — itu mengubah CI publik menjadi penembak produksi setiap push`);
+  }
+  if (!/workflow_dispatch\s*:/.test(workflow)) problems.push('quality.yml tidak punya workflow_dispatch, jadi tidak ada cara SENGAJA menjalankan gerbang live');
+  if (!new RegExp(`${envVar}\\s*:\\s*\\$\\{\\{\\s*github\\.event\\.inputs\\.${inputName}\\s*\\}\\}`).test(workflow)) {
+    problems.push(`${envVar} tidak terikat ke input workflow_dispatch \`${inputName}\` — tanpa itu "SKIP secara bawaan" tidak punya mekanisme, hanya janji`);
+  }
+  check(`Env gerbang ${label} datang dari input workflow_dispatch, bukan URL yang dipaku (SKIP secara bawaan pada push/PR)`,
+    problems.length === 0, problems.join(' | ') || `${envVar} <- github.event.inputs.${inputName}`);
+}
+check('Gerbang staging live terdaftar di quality.yml', workflow.includes('node staging-live-test.js'), 'quality.yml');
 
 // CATATAN JUJUR, bukan assert: lapis 1 (berkas ini) hanya membaca TEKS. Panggilan jaringan
 // yang dibangun secara dinamis lolos darinya. Penahan sesungguhnya adalah lapis 3 —
