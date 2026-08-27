@@ -297,6 +297,14 @@ html.fz-booting body{overflow:hidden}
        lain: defer, murni fungsi. Pengaitnya di app.js guarded - berkas belum tiba/gagal
        dimuat berarti listening berjalan persis seperti hari ini. -->
   <script defer src="./features/brain/fiezel-listening-adaptive.js"></script>
+  <!-- Fase 3 (Wiring C5): tiga modul gelombang C - kalibrasi kesulitan item (C1), speaking
+       adaptif dari agregat coverage (C2), dan coach regulasi belajar/SRL (C4). Pola muat
+       identik dengan modul brain lain: defer, murni fungsi, tanpa jaringan. SEMUA pengait
+       di app.js dijaga availability-check + try/catch - berkas yang belum tiba atau gagal
+       dimuat berarti aplikasi berjalan persis seperti sebelum Fase 3. -->
+  <script defer src="./features/brain/fiezel-item-calibration.js"></script>
+  <script defer src="./features/brain/fiezel-speaking-adaptive.js"></script>
+  <script defer src="./features/brain/fiezel-srl-coach.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
