@@ -75,8 +75,24 @@ const RE_TRAP_INSTALL = /\b(?:https?|net|tls)\s*\.\s*(?:request|get|connect)\s*=
 // dipercaya: harus membaca env gerbangnya, harus exit 0 tanpa env itu, dan tidak boleh
 // punya URL remote bawaan (satu `|| 'https://api...'` akan membuat CI publik menembak
 // produksi pada setiap push).
-const ENV_GATED_LIVE_ALLOWLIST = new Set(['cf-live-contract-test.js']);
+//   staging-live-test.js      - anggota KEDUA kelas ini, dan ia menembak lebih jauh:
+//                              selain membaca, ia MENULIS state nyata (kuota harian,
+//                              objek audio, baris analytics) di Worker
+//                              `fiezel-api-staging`. Karena itu env gerbangnya
+//                              berbeda (`FIEZEL_STAGING_BASE`) dan syaratnya sama
+//                              kerasnya: baca env, SKIP bersih tanpa env, tanpa URL
+//                              bawaan. Ia juga butuh rahasia header edge yang TIDAK
+//                              BOLEH ada di CI publik — satu alasan tambahan kenapa
+//                              SKIP-nya harus terbukti, bukan dijanjikan.
+// Env-nya PER BERKAS, bukan satu konstanta global: `cf-live-contract-test.js` dan
+// `staging-live-test.js` menembak dua lingkungan berbeda, dan menyamakan nama env
+// keduanya akan membuat satu variabel menyalakan gerbang yang tidak dimaksud.
+const ENV_GATED_LIVE_ALLOWLIST = new Map([
+  ['cf-live-contract-test.js', 'FIEZEL_CF_LIVE_BASE'],
+  ['staging-live-test.js', 'FIEZEL_STAGING_BASE']
+]);
 const LIVE_ENV_VAR = 'FIEZEL_CF_LIVE_BASE';
+const STAGING_ENV_VAR = 'FIEZEL_STAGING_BASE';
 
 const checks = [];
 const notes = [];
@@ -317,12 +333,12 @@ check('Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih denga
  * 2b. Kelas gerbang "live" ber-env: syaratnya diperiksa, bukan dipercaya
  * ===================================================================================== */
 const liveProblems = [];
-for (const file of ENV_GATED_LIVE_ALLOWLIST) {
+for (const [file, envVar] of ENV_GATED_LIVE_ALLOWLIST) {
   const abs = path.join(root, file);
   if (!fs.existsSync(abs)) { liveProblems.push(file + ' terdaftar tapi tidak ada di repo'); continue; }
   const raw = fs.readFileSync(abs, 'utf8');
   const code = stripComments(raw);
-  if (!code.includes(LIVE_ENV_VAR)) liveProblems.push(file + ' tidak membaca ' + LIVE_ENV_VAR);
+  if (!code.includes(envVar)) liveProblems.push(file + ' tidak membaca ' + envVar);
   // URL remote sebagai NILAI BAWAAN (`env.X || 'https://…'`) dilarang: itu yang mengubah
   // "SKIP di CI" menjadi "tembak produksi di setiap push".
   if (/\|\|\s*['"`]https?:\/\//.test(code)) liveProblems.push(file + ' punya URL remote sebagai nilai bawaan');
@@ -337,15 +353,15 @@ for (const file of ENV_GATED_LIVE_ALLOWLIST) {
     cwd: root,
     encoding: 'utf8',
     timeout: 30000,
-    env: Object.assign({}, process.env, { [LIVE_ENV_VAR]: '' })
+    env: Object.assign({}, process.env, { [envVar]: '' })
   });
-  if (probe.status !== 0) liveProblems.push(file + ' tidak exit 0 tanpa ' + LIVE_ENV_VAR + ' (exit=' + probe.status + ')');
-  if (!/SKIP/.test(String(probe.stdout || ''))) liveProblems.push(file + ' tidak mencetak label SKIP tanpa ' + LIVE_ENV_VAR);
+  if (probe.status !== 0) liveProblems.push(file + ' tidak exit 0 tanpa ' + envVar + ' (exit=' + probe.status + ')');
+  if (!/SKIP/.test(String(probe.stdout || ''))) liveProblems.push(file + ' tidak mencetak label SKIP tanpa ' + envVar);
 }
 check('Gerbang live ber-env memenuhi syaratnya (baca env, SKIP bersih, tanpa URL bawaan)',
   liveProblems.length === 0, liveProblems.join(' | ') || '0');
-check('Kelas live ber-env tetap satu nama dan terdaftar di quality.yml sebagai langkah SKIP',
-  ENV_GATED_LIVE_ALLOWLIST.size === 1, [...ENV_GATED_LIVE_ALLOWLIST].join(', '));
+check('Kelas live ber-env tetap dua nama dan terdaftar di quality.yml sebagai langkah SKIP',
+  ENV_GATED_LIVE_ALLOWLIST.size === 2, [...ENV_GATED_LIVE_ALLOWLIST].map(([f, e]) => f + ' (' + e + ')').join(', '));
 // Catatan jujur, bukan assert: pemindai teks di berkas ini TIDAK bisa membedakan
 // `fetch(variabel)` yang menembak produksi dari yang menembak loopback. Kelas di atas
 // menutup celah itu dengan pendaftaran eksplisit + probe SKIP, bukan dengan deteksi.
@@ -364,6 +380,14 @@ check('Gerbang live dan self-test-nya terdaftar di quality.yml',
 check('quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL',
   /SKIP sampai owner menyetel base URL/.test(workflow) && workflow.includes(LIVE_ENV_VAR),
   'komentar SKIP + ' + LIVE_ENV_VAR);
+// Gerbang staging punya asertnya sendiri, bukan menumpang assert di atas: yang perlu
+// terlihat di CI bukan hanya "ada langkah SKIP", tetapi bahwa langkah yang MENULIS
+// state nyata itu memang mati secara bawaan.
+check('Gerbang staging live terdaftar di quality.yml sebagai langkah yang SKIP secara bawaan',
+  workflow.includes('node staging-live-test.js')
+  && /SKIP sampai owner menyetel base URL Worker STAGING/.test(workflow)
+  && workflow.includes(STAGING_ENV_VAR),
+  'komentar SKIP STAGING + ' + STAGING_ENV_VAR);
 
 // CATATAN JUJUR, bukan assert: lapis 1 (berkas ini) hanya membaca TEKS. Panggilan jaringan
 // yang dibangun secara dinamis lolos darinya. Penahan sesungguhnya adalah lapis 3 —
