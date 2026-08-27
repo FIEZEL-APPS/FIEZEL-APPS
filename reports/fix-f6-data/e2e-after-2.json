@@ -362,7 +362,7 @@
       "id": "cookie-replayed",
       "name": "Browser MEMASANG kembali cookie fz_id pada permintaan berikutnya (SameSite=Lax lintas subdomain, dinilai browser)",
       "status": "PASS",
-      "details": "Cookie: fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6ImZlNTRiNGQ3LTAwMTgtNDU5NS04NGIwLTE4N2MxZTY2ZDkyYSIsImlh"
+      "details": "Cookie: fz_id=<REDAKSI len=84 sha256=18d1ad39e5b8>"
     },
     {
       "id": "quota-200-after-auth",
@@ -507,7 +507,7 @@
       "url": "https://api.puter.com/version",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALBCORS=LyIaQzo62a9E44U2GHQAJ5L3QzXJOK0/pTApqJa3+BTCPO5ZWggB6yHmToeGSt9Px9TrKfWZcSThyXiQfy5BxWPE5J9vXMACuRhQWj71pkDfLjiy1k69XrKzyVj1",
+      "cookieHeader": "AWSALBCORS=<REDAKSI len=124 sha256=2d7df5e21986>",
       "headersRead": true
     },
     {
@@ -517,7 +517,7 @@
       "url": "https://api.puter.com/read?file=%7E%2F.__puter_gui.json",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALB=F4ICP12n1pkGB8mwrdAfvRf4UpObKQgluZPOQG7PDX1RCk9FBBPu9XaKNxO5eHNnftVZU+LDfI/ZDIDUwqXd85DyLBXEqIFES8iwx1D0cwxTowMdQCr4bG/1MJeg; AWSALBCORS=F4ICP12n1pkGB8mwrdAfvRf4UpObKQgluZPOQG7PDX1RCk9FBBPu9XaKNxO5eHNnftVZU+LDfI/ZDIDUwqXd85DyLBXEqIFES8iwx1D0cwxTowMdQCr4bG/1MJeg",
+      "cookieHeader": "AWSALB=<REDAKSI len=124 sha256=6fb1084dcbdc>; AWSALBCORS=<REDAKSI len=124 sha256=6fb1084dcbdc>",
       "headersRead": true
     },
     {
@@ -527,7 +527,7 @@
       "url": "https://puter.com/get-gui-token",
       "host": "puter.com",
       "resourceType": "fetch",
-      "cookieHeader": "AWSALB=5wvAXBq9R1sjfUZQtWPTH8owxrPCQ14eJPnc/Cwr5iU9rwwIAJ+3TNaiScukwpmMFH5UIfRbq/3XWzvPeKzqjUF6cirG6ZSrCUkNLufjYjrH6ZdAYKu09+qifW1b; AWSALBCORS=5wvAXBq9R1sjfUZQtWPTH8owxrPCQ14eJPnc/Cwr5iU9rwwIAJ+3TNaiScukwpmMFH5UIfRbq/3XWzvPeKzqjUF6cirG6ZSrCUkNLufjYjrH6ZdAYKu09+qifW1b",
+      "cookieHeader": "AWSALB=<REDAKSI len=124 sha256=40f9bd0bbe1f>; AWSALBCORS=<REDAKSI len=124 sha256=40f9bd0bbe1f>",
       "headersRead": true
     },
     {
@@ -574,7 +574,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860726232,
       "method": "GET",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/ma41t/0x4AAAAAABvMyOLo9EwjFVzC/auto/fbE/new/normal?lang=auto",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=84 sha256=3a6b5a9d5921>",
       "host": "challenges.cloudflare.com",
       "resourceType": "document",
       "cookieHeader": "",
@@ -584,7 +584,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860726286,
       "method": "GET",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/turnstile/f/av0/rch/awqn8/0x4AAAAAABvMyOLo9EwjFVzC/auto/fbE/new/normal?lang=auto",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=84 sha256=e11e171ee47a>",
       "host": "challenges.cloudflare.com",
       "resourceType": "document",
       "cookieHeader": "",
@@ -604,7 +604,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860726579,
       "method": "POST",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/1191530422:1787857823:sFh_oxAqr-l2fJBQP-vfyFySJF-nIRys7_bkd-ggDEI/a31da722eb4baeda/QPIgtpXDKfFsHwiYuM.naQbG.hDW4nw1RhLUBsyWSYE-1787860726-1.2.1.1-CexYuyW0vriFB_eEgQb5ShChKBlHFOBNBoCNBdJatyOKtv5P.TD7hXw3imaxpOYr",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=217 sha256=90e6f9c03801>",
       "host": "challenges.cloudflare.com",
       "resourceType": "xhr",
       "cookieHeader": "",
@@ -624,7 +624,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860726987,
       "method": "GET",
-      "url": "https://brunhild.challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/i/a31da722eb4baeda/QPIgtpXDKfFsHwiYuM.naQbG.hDW4nw1RhLUBsyWSYE-1787860726-1.2.1.1-CexYuyW0vriFB_eEgQb5ShChKBlHFOBNBoCNBdJatyOKtv5P.TD7hXw3imaxpOYr",
+      "url": "https://brunhild.challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=150 sha256=57ae69dc9f72>",
       "host": "brunhild.challenges.cloudflare.com",
       "resourceType": "fetch",
       "cookieHeader": "",
@@ -634,7 +634,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860727008,
       "method": "GET",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/pat/a31da722eb4baeda/1787860726530/f73dba6de21e3caf4450549b173ab1151548faeb5bf5809f48ad8345ee2304de/QCjNathUQLZDan_ii1B4yk1Knq4JT0vUAQuyJ4huh6A-1787860726-1.3.1.1-2mzP0d_9cd_Clw4rvgdT42TBeSlcjdB7o1kxi.qinSCJqHSBs930liMeDWMEdbv0fpX.xekdvhCMvAX0YG1K0X6ku4jOsihmusRFJg3HoBdLq86e4_L9Y9lD7Ps2Xvoz3IKGDNIks26k12jglZtEg.GN7lxY8DM_673DdZo4ML8nGedDljAd5dgVMGL3EkDA12x5BRnHtiyu_r5X1NyxHs54j.7vQGopYYO95KbAvroAhzdy8Q2n2cJ2s3pZMtt06go00MhPqsG1KbnHS0cOfVOU3EyGLMU0QbEuycbUpwZsf9nI7dvcE4FDvniQrM3e.acLr4t9UM7xp1QWZqui0baEPFLE3weaMVVBk259WIerieV4JRw9YHO03DThJ4N4yqp51ZhEWAZVe4i.xI1y8vhSWK8xbwVftsp_fumRoe7QcKe2clCWp.VdzU7wgVNjx194JWlH3lfqKQtRNTNSYe1W23PR02NXCJHRiLOzWO.EZ1UrQ9Zkj9H60r3AX2hMhBavNv9PxxJuno39vb7L4XNT6MyH7dG6gkrA6qcHVfRwQkP_9.OBneW7pWeM5uaIReFv0Pv5qZTI5kLRyWjnvBCHVsWZx8BfGYl4czRYmEz1X6BXZmq.ru4vIEL.8mis2rYzDDdcS8jctpWh00mLJDZVuzj66ffWUI2yXsxK0AO4Fv6TDgWLmx120UFg80ViHfRRqEI88lnELsZ9smrGKM.0rP7_xRpRR6wU0l_NiAUp4FMTc0tYfia5ckUToYul9LXmEC0tPp2tehgDPBaXf8D.h7q8SqTJONWghhpKRkakzA208Mst4TrBOOoDwxpz",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=999 sha256=7c3d5c5997ec>",
       "host": "challenges.cloudflare.com",
       "resourceType": "fetch",
       "cookieHeader": "",
@@ -654,7 +654,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860727490,
       "method": "POST",
-      "url": "https://o4509759649677312.ingest.us.sentry.io/api/4509838076477440/envelope/?sentry_version=7&sentry_key=4753503fdf9844755d3142e2992ee7d4&sentry_client=sentry.javascript.browser%2F9.47.1",
+      "url": "https://o4509759649677312.ingest.us.sentry.io/api/4509838076477440/envelope/?sentry_version=7&sentry_key=<REDAKSI len=32 sha256=fff5e02bbadf>&sentry_client=<REDAKSI len=25 sha256=e6eee004624d>%2F9.47.1",
       "host": "o4509759649677312.ingest.us.sentry.io",
       "resourceType": "fetch",
       "cookieHeader": "",
@@ -664,7 +664,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860728088,
       "method": "GET",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/ci/a31da722eb4baeda/1787860726533/xjQD3_ar3tNMMFtpr.RimxvBOCnWqi81hWa_sCbCafM-1787860726-1.3.1.1-YBCFfzjQl9h1RQeygS16EoR78BZht8LZ0CIaTuoYmQAuMrL.dBCgrqXk0acBRGznYusxriI1wp.rn6ycoisbWM_ESR9yVsfQ1CY0Tz28WuKOfRTzuvKw.gm15XYJIb5pEg.6Cy_7u1wG9MJr.fC.8T7JUkThkjkbRpB8CF_z_tlqk4KIddZ3Hsf9IKUnGSOIZ8CPWQb017eQIOU9DiD65dGHaeLPhgFaZttmsxkl7zIZoHs4EzN_569NBlHi_WY3.ORkzxdgGFs.ISXfplbSd2bWVj1HE0pu9BPEouUzFKvqufeqKKZ.eygHAHXdVvG5aO.294ItCCH7x9msJiPkT5EjvbY4gdGrmTTOD9adV4l.2yyS819dEYDoLegLYh028a8inlriswxTecI7aICeI.Rw686eiy.PrK78e17LkJBXq1mdsGhlY8S2JMImAt6uPkRhlfNFTXmimMlL8CfA2M_81iwhJ_byNoHm0P5dzDdzBFwvj5852lRLkc0j2kRP05jZi4WPEJkfoZYDEV.Nb.cL1YVBvOVwHb0m_EYNn8lgE2vbC993K6jID7Z.yWKFCftfjAxndtoU3rO5F8Ec6tL8mV7SmJ4TfgwQy0E2DGSPYXkONjoAnuDJEVbWdbjWGKC5TvuCetpWpypvtKr8UxrcQxWfpHr1eaQGej42hlGxdB_uWD5S_9E_7qSfAcUmvM2bmFZJM4F9Wu4YGYEY1W7a6nXq6xWgNbLhParXWKk",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=848 sha256=c26c3c31fc4b>",
       "host": "challenges.cloudflare.com",
       "resourceType": "image",
       "cookieHeader": "",
@@ -684,7 +684,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787860728443,
       "method": "POST",
-      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/1191530422:1787857823:sFh_oxAqr-l2fJBQP-vfyFySJF-nIRys7_bkd-ggDEI/a31da722eb4baeda/QPIgtpXDKfFsHwiYuM.naQbG.hDW4nw1RhLUBsyWSYE-1787860726-1.2.1.1-CexYuyW0vriFB_eEgQb5ShChKBlHFOBNBoCNBdJatyOKtv5P.TD7hXw3imaxpOYr",
+      "url": "https://challenges.cloudflare.com/cdn-cgi/challenge-platform/<REDAKSI-JALUR len=14 sha256=68114109b633> len=217 sha256=90e6f9c03801>",
       "host": "challenges.cloudflare.com",
       "resourceType": "xhr",
       "cookieHeader": "",
@@ -797,7 +797,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6ImZlNTRiNGQ3LTAwMTgtNDU5NS04NGIwLTE4N2MxZTY2ZDkyYSIsImlhdCI6MTc4Nzg2MDc0OH0.S6RGBvUcrsNjpb06zxot6JDWZsWvRkM3DMvejzVJ7Og",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=1daf03f567c1>",
       "headersRead": true
     },
     {
@@ -827,7 +827,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6ImZlNTRiNGQ3LTAwMTgtNDU5NS04NGIwLTE4N2MxZTY2ZDkyYSIsImlhdCI6MTc4Nzg2MDc0OH0.S6RGBvUcrsNjpb06zxot6JDWZsWvRkM3DMvejzVJ7Og",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=1daf03f567c1>",
       "headersRead": true
     },
     {
@@ -837,7 +837,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6ImZlNTRiNGQ3LTAwMTgtNDU5NS04NGIwLTE4N2MxZTY2ZDkyYSIsImlhdCI6MTc4Nzg2MDc0OH0.S6RGBvUcrsNjpb06zxot6JDWZsWvRkM3DMvejzVJ7Og",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=1daf03f567c1>",
       "headersRead": true
     },
     {
@@ -847,8 +847,9 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6ImZlNTRiNGQ3LTAwMTgtNDU5NS04NGIwLTE4N2MxZTY2ZDkyYSIsImlhdCI6MTc4Nzg2MDc0OH0.S6RGBvUcrsNjpb06zxot6JDWZsWvRkM3DMvejzVJ7Og",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=1daf03f567c1>",
       "headersRead": true
     }
-  ]
+  ],
+  "catatanRedaksi": "Nilai cookie sesi (fz_id, AWSALB, AWSALBCORS) dan jalur tantangan Cloudflare diredaksi oleh tools/redact-live-cookies.mjs. Nama cookie, panjang, dan sha256 12-karakter dipertahankan supaya bukti \"cookie mana ke host mana\" tetap bisa diperiksa. Riwayat git MASIH memuat nilai asli untuk berkas yang sudah pernah ter-commit; token itu harus dianggap bocor dan dirotasi owner."
 }
