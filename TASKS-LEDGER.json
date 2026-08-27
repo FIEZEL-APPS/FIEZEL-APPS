@@ -330,6 +330,7 @@
       "scope": {
         "files_allowed": [
           "release-audit.py",
+          "paw-mascot-test.js",
           "TASKS-LEDGER.json"
         ],
         "files_forbidden": [
@@ -337,7 +338,7 @@
           ".github/workflows/audio-*.yml",
           "sw.js"
         ],
-        "objective": "Pulihkan deteksi gate render yang tetap valid setelah kode memakai guard tambahan sebelum validateQuestion.",
+        "objective": "Pulihkan quality gate yang gagal karena deteksi render-time integrity dan assertion mascot popup yang stale, tanpa mengubah runtime behavior.",
         "forbidden_actions": [
           "Jangan mengubah area neural voice yang dikunci T-026.",
           "Jangan melonggarkan gate konten atau mengubah ambang kualitas.",
@@ -345,6 +346,7 @@
         ],
         "done_when": [
           "Pemeriksaan regex mendeteksi guard validateQuestion(...).ok sebelum continue.",
+          "Mascot gate menemukan callback confidencePopAnswered dalam fungsi setConfidence.",
           "Semua gate lokal yang relevan hijau dan CI Quality Gate pada head main hijau.",
           "Pages live menyajikan commit merge terbaru."
         ],
@@ -354,8 +356,8 @@
           "Pages build dan live marker setelah merge"
         ]
       },
-      "evidence": "Root cause confirmed: release-audit.py mencari literal if(!validateQuestion(q).ok)continue, tetapi main memakai if(!q||!validateQuestion(q).ok)continue; guard runtime tetap ada.",
-      "note": "Perbaikan dibatasi ke release-audit.py; tidak menyentuh fitur neural voice, SW, atau workflow audio yang dikunci T-026."
+      "evidence": "Root cause confirmed: release-audit.py mencari literal yang tidak lagi cocok dengan guard tambahan; paw-mascot-test.js membatasi pencarian callback setConfidence ke 900 karakter, sementara fungsi runtime sudah 1085 karakter sebelum callback karena hook SRL/scheduling.",
+      "note": "Perbaikan dibatasi ke dua assertion gate; tidak menyentuh runtime app.js, fitur neural voice, SW, atau workflow audio yang dikunci T-026."
     }
   ],
   "last_report": {
