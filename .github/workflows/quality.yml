@@ -261,4 +261,5 @@ jobs:
           # menjalankan blok kill switch DAN blok transport bersama-sama.
           node cf-config-killswitch-test.js
           node cf-shadow-ledger-test.js
+          node ai-transport-switch-test.js
           node workflow-actor-gate-test.js
