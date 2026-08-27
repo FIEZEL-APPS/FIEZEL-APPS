@@ -52,7 +52,16 @@ jobs:
     # Gate aktor: bukan sekadar "hanya kolaborator". Repositori ini auto-deploy ke produksi tiap
     # 5 menit dan workflow ini memegang token Cloudflare; siapa pun yang bisa menjalankannya bisa
     # membelanjakan anggaran AI owner.
-    if: github.actor == 'FIEZEL-APPS'
+    #
+    # Polanya disamakan HURUF DEMI HURUF dengan deploy-core-worker.yml:17 —
+    # `github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'`. Syarat
+    # event_name itu bukan hiasan meski `on:` hari ini hanya berisi workflow_dispatch: begitu
+    # seseorang menambahkan satu pemicu lain (schedule untuk "melanjutkan batch", atau
+    # workflow_run sesudah konten diperbarui), `github.actor` pada pemicu otomatis menjadi aktor
+    # commit terakhir — dan gate berbasis aktor sendirian akan lolos untuk jalan yang tidak pernah
+    # ditekan siapa pun. Menuliskan keduanya membuat penambahan pemicu itu gagal tertutup, bukan
+    # membelanjakan dolar sendiri.
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,6 +75,10 @@ jobs:
         run: |
           node tts-key-test.js
           node prerender-dryrun-test.js
+          # Gerbang aritmetika: 604.962 karakter, 5.657 objek/286.851 karakter sesudah dedup,
+          # biaya aura-1 dan aura-2-en, daftar frasa berisiko, dan override model per-item.
+          # Node murni, nol jaringan, nol rahasia.
+          node prerender-plan-test.js
 
       # Masukan pengguna TIDAK PERNAH ditanam langsung ke dalam run:. Ia lewat env, dibaca sebagai
       # variabel shell yang dikutip. Langkah Produksi di bawah memegang CLOUDFLARE_API_TOKEN; satu
