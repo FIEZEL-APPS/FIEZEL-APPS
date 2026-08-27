@@ -77,3 +77,36 @@ self.FIEZEL_CF_CONFIG=Object.freeze({
   base:'',
   endpoints:Object.freeze({health:'off',config:'off',auth:'off',quota:'off',ai:'off',tts:'off',usage:'off'})
 });
+// ── KILL SWITCH SERVER: parameter pengambil `GET /api/config` (m031-killswitch) ────────
+//
+// Blok di ATAS adalah DEFAULT PEMASANGAN, bukan kill switch: ia ikut precache service
+// worker (`sw.js:35`) dan dilayani cache-first, jadi mengubahnya tidak menjangkau PWA yang
+// sudah terpasang sampai `SW_REV` naik. Kill switch yang nyata ada di server dan sekarang
+// KLIEN benar-benar membacanya: `GET <base>/api/config` (Worker `fiezel-api`,
+// `workers/api/route-config.js`, KV `cfg:flags`, `Cache-Control: no-store`).
+//
+// ATURAN PENGGABUNGAN — AND, BUKAN OR. Flag server hanya bisa MEMATIKAN. Ia TIDAK BISA
+// menyalakan apa pun yang di blok atas bernilai 'off'. Alasannya bukan kerapian: satu
+// server yang disusupi (atau satu nilai KV salah ketik oleh owner yang sedang panik) tidak
+// boleh bisa menyalakan jalur AI/TTS/kuota di perangkat murid. Yang mati di berkas ini
+// mati selamanya sampai ada rilis; yang hidup di berkas ini masih bisa dimatikan server
+// dalam hitungan menit. Kedua arah itu tidak simetris dengan sengaja.
+//
+// PROTOKOL: kalau jawaban server bukan `protocol:'1.7'`, SELURUH jalur CF dianggap MATI —
+// bukan diteruskan dengan flag yang bentuknya belum tentu kita pahami.
+//
+// CERMIN: hasilnya disimpan di memori dan di `sessionStorage` (BUKAN localStorage) dengan
+// umur maksimum 5 menit, dibatasi keras di klien walau server mengaku ttlSeconds lebih
+// panjang. Kill switch harus menjangkau perangkat dalam hitungan menit, bukan hari, dan
+// cermin yang hidup lebih lama daripada itu adalah kill switch yang bisa diabaikan murid
+// hanya dengan tidak menutup tabnya.
+//
+// Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
+self.FIEZEL_CF_REMOTE=Object.freeze({
+  path:'/api/config',
+  protocol:'1.7',
+  timeoutMs:2500,
+  mirrorTtlMs:300000,
+  mirrorMinTtlMs:30000,
+  mirrorKey:'fiezel-cf-flags-mirror-v1'
+});

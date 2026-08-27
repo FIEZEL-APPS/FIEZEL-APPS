@@ -199,4 +199,9 @@ jobs:
           node release-audit-gate-test.js
           node cf-transport-test.js
           node cf-shadow-mode-test.js
+          # Kill switch server (`GET /api/config`): penggabungan AND (server hanya bisa
+          # mematikan), protokol 1.7 wajib cocok, cermin maks 5 menit di sessionStorage,
+          # dan boot tidak diblokir. Dijalankan sesudah dua gerbang di atas karena ia
+          # menjalankan blok kill switch DAN blok transport bersama-sama.
+          node cf-config-killswitch-test.js
           node workflow-actor-gate-test.js
