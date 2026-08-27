@@ -313,6 +313,68 @@
   }
 
   /**
+   * A12/3 — "KOSONG" ADALAH KELAS, BUKAN SATU NILAI.
+   *
+   * Uji staging 22 dari 25 tagihan `writing_feedback`: model menjawab `text:"{}"` dengan
+   * `outputTokens:1`, dan jalur lama menyatakannya SUKSES karena `"{}"`.trim() tidak kosong.
+   * Artinya murid dibebani jatah harian untuk jawaban yang tidak berisi apa pun — dan
+   * `writing_feedback` justru `jsonMode:true`, jadi bungkus JSON kosong adalah bentuk kegagalan
+   * yang PALING mungkin, bukan yang paling aneh.
+   *
+   * Yang dihitung kosong, semuanya:
+   *   - string kosong dan whitespace saja (termasuk NBSP/ZWSP yang terbawa dari model);
+   *   - `{}` / `[]` / `{ }` / `null` / `""` — juga di dalam pagar kode ```json … ```;
+   *   - JSON sah yang MENGURAI menjadi objek/array kosong, null, atau string kosong;
+   *   - JSON sah yang seluruh nilainya kosong (`{"feedback":""}`, `{"a":[],"b":{}}`) — satu
+   *     bungkus dengan nol isi tetap nol isi bagi murid.
+   * Aturan pengikat dari brief owner: kalau harus salah, salah ke arah murid. Menyatakan
+   * sesuatu kosong dan me-ROLLBACK kuota hanya membuat murid kehilangan satu jawaban yang
+   * memang tidak berisi; menyatakannya sukses membuat ia kehilangan jatah.
+   */
+  function stripCodeFence(text) {
+    var t = s(text).trim();
+    var m = /^```[a-zA-Z0-9_-]*\s*([\s\S]*?)\s*```$/.exec(t);
+    return m ? m[1].trim() : t;
+  }
+
+  function jsonValueIsEmpty(value, depth) {
+    if (value == null) return true;
+    if (typeof value === 'string') return s(value).trim() === '';
+    if (typeof value === 'number' || typeof value === 'boolean') return false;
+    if (depth > 4) return false; // struktur dalam: berhenti menilai, anggap berisi
+    if (Array.isArray(value)) {
+      if (!value.length) return true;
+      for (var i = 0; i < value.length; i++) if (!jsonValueIsEmpty(value[i], depth + 1)) return false;
+      return true;
+    }
+    if (typeof value === 'object') {
+      var keys = Object.keys(value);
+      if (!keys.length) return true;
+      for (var j = 0; j < keys.length; j++) if (!jsonValueIsEmpty(value[keys[j]], depth + 1)) return false;
+      return true;
+    }
+    return false;
+  }
+
+  function isEmptyOutput(text) {
+    var raw = s(text);
+    // Whitespace "tak terlihat" dirapikan lebih dulu: NBSP dan ZWSP membuat `.trim()` bohong.
+    var t = raw.replace(/[\u00a0\u2007\u202f\u200b\u200c\u200d\ufeff]/g, ' ').trim();
+    if (!t) return true;
+    var body = stripCodeFence(t);
+    if (!body) return true;
+    if (/^(null|undefined)$/i.test(body)) return true;
+    var first = body.charAt(0);
+    if (first === '{' || first === '[' || first === '"') {
+      var parsed;
+      try { parsed = JSON.parse(body); } catch (_) { return false; } // JSON rusak = bukan kosong,
+      // ia kegagalan bentuk lain dan diurus kontrak mutu, bukan kelas ini.
+      return jsonValueIsEmpty(parsed, 0);
+    }
+    return false;
+  }
+
+  /**
    * Kegagalan tingkat MODEL (bukan tingkat mutu bahasa): jawaban kosong, atau anggaran token
    * habis di reasoning. `@cf/google/gemma-4-26b-a4b-it` melakukan yang kedua hari ini:
    * `content` kosong, `finish_reason:"length"`, seluruh keluaran ada di `reasoning_content`.
@@ -320,8 +382,8 @@
    */
   function classifyModelFailure(read) {
     var r = read || {};
-    var text = s(r.text).trim();
-    if (text) return '';
+    // A12/3: kosong diuji dengan `isEmptyOutput`, bukan `.trim()`. `"{}"` lolos `.trim()`.
+    if (!isEmptyOutput(r.text)) return '';
     if (s(r.reasoning).trim()) return OUTPUT_FAILURES.reasoningOverflow;
     return OUTPUT_FAILURES.empty;
   }
@@ -337,7 +399,9 @@
     var t = s(text).trim();
     var limit = (options && Number.isFinite(options.sentenceLimit)) ? options.sentenceLimit : sentenceLimitFor(name);
     var sentences = countSentences(t);
-    if (!t) return { ok: false, reason: OUTPUT_FAILURES.empty, sentences: 0, limit: limit, words: [] };
+    // Pemeriksa kedua memakai definisi kosong yang SAMA (A12/3). Dua definisi berbeda di dua
+    // pemeriksa adalah cara cacat ini kembali diam-diam.
+    if (isEmptyOutput(t)) return { ok: false, reason: OUTPUT_FAILURES.empty, sentences: 0, limit: limit, words: [] };
     if (limit > 0 && sentences > limit + OUTPUT_CONTRACT.sentenceTolerance) {
       return { ok: false, reason: OUTPUT_FAILURES.sentenceLimit, sentences: sentences, limit: limit, words: [] };
     }
@@ -831,6 +895,7 @@
     estimateCostUsd: estimateCostUsd,
     byteLength: byteLength,
     readModelText: readModelText,
+    isEmptyOutput: isEmptyOutput,
     classifyModelFailure: classifyModelFailure,
     checkOutputContract: checkOutputContract,
     countSentences: countSentences,
