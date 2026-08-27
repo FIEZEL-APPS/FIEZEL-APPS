@@ -34,3 +34,11 @@ fiezel-autonomy-config.json
 .claude/launch.json
 .reading-new/parts/
 RELEASE-AUDIT-GATE-REPORT.json
+
+# Laporan cf-live-contract-test.js (`--report`). Isinya BERGANTUNG LINGKUNGAN:
+# base URL Worker, status per assert, dan daftar permintaan yang benar-benar
+# ditembakkan. Dua orang yang menjalankannya terhadap dua deployment berbeda akan
+# menghasilkan isi berbeda tanpa satu pun perubahan kode, jadi men-commit-nya
+# hanya menghasilkan konflik dan bukti yang menyesatkan ("hijau di repo" padahal
+# hijaunya milik lingkungan orang lain). Buktinya hidup di CI/terminal, bukan di git.
+CF-LIVE-REPORT.json
