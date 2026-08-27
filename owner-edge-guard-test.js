@@ -453,10 +453,14 @@ function proxyForward(workerHeaders, list) {
       return new Set(token.split('')).size >= 12;
     });
 
+    /* Nilai probe ini SENGAJA berbeda dari kembarannya di edge-guard-test.js. Pemindai
+     * rahasia memaafkan digest PER BERKAS, jadi menyalin fixture yang sama ke dua berkas
+     * membuat salinan kedua tidak berentri dan gerbang merah dengan benar. Membuat nilainya
+     * berbeda lebih jujur daripada melonggarkan pemindai agar satu digest berlaku global. */
     for (const injected of [
-      'kZ8vQ2m-Lp4TxYs7Rw9NcBd1FgHj3KlMnOpQrStUvWx',
+      'Qw7nR2t-Yp5MxZa8Sd3JhFg6KvBcNmLqTuVwXyZ',
       '3f9a1c7e5b2d8046a1c3e5f7091b2d4c6e8f0a1b',
-      'aGVsbG8rd29ybGQvc2VjcmV0K3ZhbHVlPT0xMjM0NTY3OA==',
+      'b3duZXItcHJvYmUvdmFsdWUrZm9yLWd1YXJkPT0Ng==',
     ]) {
       const poisonedPhp = phpSource.replace('__EDGE_SECRET__', injected);
       assert(scanSecretLike(poisonedPhp).includes(injected),
