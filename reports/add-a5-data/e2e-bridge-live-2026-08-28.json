@@ -334,7 +334,7 @@
       "id": "cookie-replayed",
       "name": "Browser MEMASANG kembali cookie fz_id pada permintaan berikutnya (SameSite=Lax lintas subdomain, dinilai browser)",
       "status": "PASS",
-      "details": "Cookie: fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlh"
+      "details": "Cookie: fz_id=<REDAKSI len=84 sha256=1c29b43f9e5a>"
     },
     {
       "id": "quota-200-after-auth",
@@ -479,7 +479,7 @@
       "url": "https://api.puter.com/version",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALBCORS=7rp8DYGUMqxQxD2IWuN1elrV96pghBp/2+zI9GzJ9B5aoOpitQIeFz3BwggcldgPK/hxYWguY82o9sAas6IG1O4/Ta8hkeOfVGBA5aAACotP7SJOawzYbDnVjrFU",
+      "cookieHeader": "AWSALBCORS=<REDAKSI len=124 sha256=4ea4e4b31477>",
       "headersRead": true
     },
     {
@@ -489,7 +489,7 @@
       "url": "https://api.puter.com/read?file=%7E%2F.__puter_gui.json",
       "host": "api.puter.com",
       "resourceType": "xhr",
-      "cookieHeader": "AWSALB=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH; AWSALBCORS=qmd89eljDFOLL23UVKjLizqMKM/aHpeXOTJCwUf+rJRmxrmxFZLpZUIeHCnK3sCbkxno4azUTnR1hWBZKhEOFgZVfUAXfQGp7h5FCUIWhdDtQmvNfaQrbbU8vdSH",
+      "cookieHeader": "AWSALB=<REDAKSI len=124 sha256=3889c83ba8cd>; AWSALBCORS=<REDAKSI len=124 sha256=3889c83ba8cd>",
       "headersRead": true
     },
     {
@@ -499,7 +499,7 @@
       "url": "https://puter.com/get-gui-token",
       "host": "puter.com",
       "resourceType": "fetch",
-      "cookieHeader": "AWSALB=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB; AWSALBCORS=eHqhm63USRo4jaEA+BAGcq3foZLjOFYx0ErP+LMSwt7o2o8KkcCmUnJNhs5Gap+yPgaIPcffU2cg0dkl8IV8NL5ExR91Q6AVstu2YCKT0nE6++mJeekt9tGpGlEB",
+      "cookieHeader": "AWSALB=<REDAKSI len=124 sha256=5a242efaaadc>; AWSALBCORS=<REDAKSI len=124 sha256=5a242efaaadc>",
       "headersRead": true
     },
     {
@@ -566,7 +566,7 @@
       "scenario": "A2-enabled-false",
       "at": 1787853937910,
       "method": "POST",
-      "url": "https://o4509759649677312.ingest.us.sentry.io/api/4509838076477440/envelope/?sentry_version=7&sentry_key=4753503fdf9844755d3142e2992ee7d4&sentry_client=sentry.javascript.browser%2F9.47.1",
+      "url": "https://o4509759649677312.ingest.us.sentry.io/api/4509838076477440/envelope/?sentry_version=7&sentry_key=<REDAKSI len=32 sha256=fff5e02bbadf>&sentry_client=<REDAKSI len=25 sha256=e6eee004624d>%2F9.47.1",
       "host": "o4509759649677312.ingest.us.sentry.io",
       "resourceType": "fetch",
       "cookieHeader": "",
@@ -639,7 +639,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=91251919e19d>",
       "headersRead": true
     },
     {
@@ -659,7 +659,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=91251919e19d>",
       "headersRead": true
     },
     {
@@ -669,7 +669,7 @@
       "url": "https://api.fiezel.my.id/api/quota",
       "host": "api.fiezel.my.id",
       "resourceType": "fetch",
-      "cookieHeader": "fz_id=eyJ2IjoxLCJraWQiOjIsInN1YiI6IjhkNmE2MzVlLWMyMjUtNDdiZC04NjYyLTIyNzY2ZDg1MWEyNSIsImlhdCI6MTc4Nzg1Mzk3OX0.SSqGDhh4xk_TXjcYoXnfg_IQXCrxRZdflqtxHrt8ZmA",
+      "cookieHeader": "fz_id=<REDAKSI len=147 sha256=91251919e19d>",
       "headersRead": true
     },
     {
@@ -682,5 +682,6 @@
       "cookieHeader": "",
       "headersRead": false
     }
-  ]
+  ],
+  "catatanRedaksi": "Nilai cookie sesi (fz_id, AWSALB, AWSALBCORS) diredaksi oleh tools/redact-a5-live-cookies.mjs pada pekerjaan F5 kebersihan. Nama cookie, panjang, dan sha256 12-karakter dipertahankan agar bukti \"cookie mana ke host mana\" tetap bisa diperiksa. Riwayat git MASIH memuat nilai aslinya; token itu harus dianggap bocor dan dirotasi. Lihat reports/fix-f5-kebersihan.md."
 }
