@@ -46,6 +46,12 @@
  * SLOT 5 (warisan Puter) BELUM ada dan itu bukan kelalaian: `/api/policy/*`,
  * `/api/activity`, `/api/feedback`, `/api/push/*` masih dilayani Worker Puter.
  * Memindahkannya adalah paket kerja tersendiri.
+ *
+ * SLOT 6 (STATUS CRON) TERPASANG sebagai array `ROUTES` sungguhan — jalur yang
+ * dirancang berkas ini sejak awal. Ia TIDAK lewat `route-wiring.js` karena
+ * `/api/owner/cron-status` tidak butuh jembatan kuota, tidak butuh identitas
+ * murid, dan tidak boleh masuk daftar rute berbiaya; gerbangnya adalah gate
+ * owner di dalam modulnya sendiri (`cron-status.js`).
  */
 import { buildExtraRoutes } from './route-wiring.js';
 
@@ -57,8 +63,11 @@ import { buildExtraRoutes } from './route-wiring.js';
 /* --- SLOT 5: WARISAN PUTER (route-legacy.js) — /api/policy/*, /api/activity,
  *             /api/feedback, /api/push/*                             [BELUM] */
 // import { ROUTES as LEGACY_ROUTES } from './route-legacy.js';
+/* --- SLOT 6: STATUS CRON (cron-status.js) — /api/owner/cron-status   [TERPASANG] */
+import { ROUTES as CRON_STATUS_ROUTES } from './cron-status.js';
 
 export const EXTRA_ROUTES = [
   ...buildExtraRoutes(),  /* SLOT 1-4 */
   // ...LEGACY_ROUTES,    /* SLOT 5 */
+  ...CRON_STATUS_ROUTES,  /* SLOT 6 */
 ];

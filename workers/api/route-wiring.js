@@ -65,6 +65,8 @@ import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
 import { scheduledAnalytics } from './analytics/rollup.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
+// A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
+import { withCronRun, CRON_JOBS } from './cron-status.js';
 
 // URUTAN IMPOR INI BERMAKNA. `ai-tasks.js`, `breaker.js`, dan `tts-key.js`
 // berformat UMD: di bawah ESM murni mereka menaruh dirinya di
@@ -453,11 +455,22 @@ export async function runScheduled(event, env, executionCtx, now) {
   const wantSweep = cron === CRON_QUOTA_SWEEP || cron !== CRON_ANALYTICS_ROLLUP;
   const wantRollup = cron === CRON_ANALYTICS_ROLLUP || cron !== CRON_QUOTA_SWEEP;
 
+  // A3: tiap job dibungkus `withCronRun` supaya SUKSES DAN GAGAL meninggalkan
+  // satu baris `cron_run` di `fiezel-core`. Pembungkusnya tidak mengubah nilai
+  // balik job dan tidak menelan galat (ia mencatat lalu melempar ulang), jadi
+  // `try/catch` per job di bawah tetap satu-satunya penentu bentuk `out`.
+  // Pencatatannya sendiri fail-soft: kalau `migrations/0003_cron.sql` belum
+  // diterapkan, job tetap jalan. Rincian di `cron-status.js`.
   if (wantSweep) {
-    try { out.quotaSweep = await runQuotaSweep(env, at); } catch (e) { out.quotaSweep = { error: e && e.name }; }
+    try {
+      out.quotaSweep = await withCronRun(quotaDb(env), CRON_JOBS.QUOTA_SWEEP, at, () => runQuotaSweep(env, at));
+    } catch (e) { out.quotaSweep = { error: e && e.name }; }
   }
   if (wantRollup) {
-    try { out.analyticsRollup = await runAnalyticsRollup(event, env, executionCtx); } catch (e) { out.analyticsRollup = { error: e && e.name }; }
+    try {
+      out.analyticsRollup = await withCronRun(quotaDb(env), CRON_JOBS.ANALYTICS_ROLLUP, at,
+        () => runAnalyticsRollup(event, env, executionCtx));
+    } catch (e) { out.analyticsRollup = { error: e && e.name }; }
   }
   return out;
 }
