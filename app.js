@@ -4009,7 +4009,7 @@ function buildLevelExamQuestions(examLevel){
   for(const type of Object.keys(LEVEL_EXAM_BLUEPRINT)){
     const need=LEVEL_EXAM_BLUEPRINT[type];let added=0;
     for(const q of pools[type]||[]){
-      if(!q||!validateQuestion(q).ok)continue;
+      if(!q)continue;if(!validateQuestion(q).ok)continue;
       const signature=sigQ(q);
       if(seen.has(signature))continue;
       seen.add(signature);
@@ -5992,7 +5992,7 @@ async function buildPlacement(){
       let added=0;
       for(const source of candidates[type]){
         const q=build[type](source);
-        if(!q||!validateQuestion(q).ok)continue;
+        if(!q)continue;if(!validateQuestion(q).ok)continue;
         const sig=sigQ(q);
         if(seen.has(sig))continue;
         seen.add(sig);
