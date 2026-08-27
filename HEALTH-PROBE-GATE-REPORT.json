@@ -1,0 +1,258 @@
+{
+  "schema": "fiezel-health-probe-gate-v1",
+  "pass": true,
+  "probe": "tools/fiezel-health-probe.mjs",
+  "doc": "tools/fiezel-health-probe.md",
+  "selftestScenarios": 13,
+  "counts": {
+    "pass": 49,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "Probe ada di tools/fiezel-health-probe.mjs",
+      "status": "PASS",
+      "details": "tools/fiezel-health-probe.mjs"
+    },
+    {
+      "name": "Probe lolos `node --check`",
+      "status": "PASS",
+      "details": "node --check"
+    },
+    {
+      "name": "Probe hanya mengimpor modul bawaan `node:` (nol dependency)",
+      "status": "PASS",
+      "details": "node:dns/promises, node:tls, node:fs, node:http"
+    },
+    {
+      "name": "Probe tidak memakai require() dari paket npm",
+      "status": "PASS",
+      "details": "tanpa require paket"
+    },
+    {
+      "name": "Kode probe tidak menyentuh nama/mekanisme rahasia (secret, header edge, token akun)",
+      "status": "PASS",
+      "details": "0 temuan"
+    },
+    {
+      "name": "Sumber mentah probe (komentar ikut) tidak memuat NILAI rahasia apa pun",
+      "status": "PASS",
+      "details": "0 temuan"
+    },
+    {
+      "name": "Pemindai nama rahasia terbukti bisa merah (fixture bocor tertangkap)",
+      "status": "PASS",
+      "details": "fixture nama tertangkap"
+    },
+    {
+      "name": "Pemindai nilai rahasia terbukti bisa merah (fixture bocor di komentar tertangkap)",
+      "status": "PASS",
+      "details": "fixture nilai tertangkap"
+    },
+    {
+      "name": "Probe tidak membaca process.env sama sekali (hanya argv)",
+      "status": "PASS",
+      "details": "process.env absen, argv dipakai"
+    },
+    {
+      "name": "Semua host di dalam probe berada di himpunan yang diizinkan",
+      "status": "PASS",
+      "details": "ditemukan: api.fiezel.my.id, fiezel-api.fitrajft.workers.dev, fiezel.my.id, 127.0.0.1"
+    },
+    {
+      "name": "Probe tidak menyebut alamat internal Cloudflare selain workers.dev yang diuji 403",
+      "status": "PASS",
+      "details": "0 temuan"
+    },
+    {
+      "name": "workers.dev disebut PERSIS untuk pemeriksaan penjaga (403), bukan sebagai jalur data",
+      "status": "PASS",
+      "details": "targets.workersDev + statusDiharapkan 403"
+    },
+    {
+      "name": "`/health` diperiksa lewat jembatan api.fiezel.my.id, bukan langsung ke Worker",
+      "status": "PASS",
+      "details": "bridge+/health untuk payload, workersDev+/health hanya untuk 403"
+    },
+    {
+      "name": "`/healthz` dipakai sebagai jalur bebas-header",
+      "status": "PASS",
+      "details": "bridge+/healthz"
+    },
+    {
+      "name": "Selftest agregat exit 0 dan seluruh skenario PASS",
+      "status": "PASS",
+      "details": "exit=0 total=13 gagal=0"
+    },
+    {
+      "name": "Selftest agregat menguji minimal 10 skenario (satu skenario bukan bukti)",
+      "status": "PASS",
+      "details": "13"
+    },
+    {
+      "name": "Selftest agregat nol percobaan ke host non-loopback",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "Probe memasang penolakan host non-loopback di lapis I/O selftest",
+      "status": "PASS",
+      "details": "penjaga isLoopback + pelanggaran dicatat"
+    },
+    {
+      "name": "Lapis selftest memakai server HTTP loopback sungguhan (port 0, 127.0.0.1)",
+      "status": "PASS",
+      "details": "listen(0,'127.0.0.1')"
+    },
+    {
+      "name": "Modul socket hanya dipakai lewat impor bawaan node: (tls untuk sertifikat, http hanya untuk selftest)",
+      "status": "PASS",
+      "details": "impor: node:dns/promises, node:tls, node:fs, node:http"
+    },
+    {
+      "name": "Skenario `sehat`: workers.dev 403 dinilai OK (arah tidak terbalik)",
+      "status": "PASS",
+      "details": "OK"
+    },
+    {
+      "name": "Skenario `workers_dev_terbuka`: 200 dinilai KRITIS (BUKAN OK)",
+      "status": "PASS",
+      "details": "KRITIS"
+    },
+    {
+      "name": "Skenario `workers_dev_terbuka`: exit non-nol dan `penjaga_workers_dev` terdaftar di kritis",
+      "status": "PASS",
+      "details": "exit=1 kritis=penjaga_workers_dev"
+    },
+    {
+      "name": "Pesan 200 pada workers.dev menyebut celahnya, bukan hanya kode status",
+      "status": "PASS",
+      "details": "HTTP 200 — PENJAGA EDGE MATI. Alamat workers.dev terbuka: siapa pun bisa POST /a"
+    },
+    {
+      "name": "Skenario `workers_dev_terbuka` tetap nol jaringan luar",
+      "status": "PASS",
+      "details": "http://127.0.0.1:41563/x/site/ http://127.0.0.1:41563/x/site/app/ http://127.0.0.1:41563/x/bridge/health http://127.0.0.1:41563/x/bridge/healthz http://127.0.0.1:41563/x/wd/health tls://api.fiezel.my.id dns://fixture"
+    },
+    {
+      "name": "Skenario `sehat`: exit 0, nol kritis, nol peringatan",
+      "status": "PASS",
+      "details": "exit=0 kritis=0 peringatan=0"
+    },
+    {
+      "name": "Skenario `sehat` tetap nol jaringan luar dan semua target loopback/fixture",
+      "status": "PASS",
+      "details": "http://127.0.0.1:33319/x/site/ http://127.0.0.1:33319/x/site/app/ http://127.0.0.1:33319/x/bridge/health http://127.0.0.1:33319/x/bridge/healthz http://127.0.0.1:33319/x/wd/health tls://api.fiezel.my.id dns://fixture"
+    },
+    {
+      "name": "Setiap kegagalan KRITIS membuat exit non-nol (6 skenario)",
+      "status": "PASS",
+      "details": "penjaga_off, protokol_tidak_cocok, situs_mati, api_mati, sertifikat_kedaluwarsa, mx_hilang"
+    },
+    {
+      "name": "PERINGATAN saja TIDAK memerahkan exit code (4 skenario)",
+      "status": "PASS",
+      "details": "latensi_tinggi, sertifikat_mendekat, spf_hilang, workers_dev_404"
+    },
+    {
+      "name": "Mode bawaan mencetak ringkasan manusia (Bahasa Indonesia) DAN blok JSON",
+      "status": "PASS",
+      "details": "exit=0"
+    },
+    {
+      "name": "`--json` mencetak JSON murni yang bisa diurai alat lain",
+      "status": "PASS",
+      "details": "fiezel-health-probe-v1"
+    },
+    {
+      "name": "Delapan pemeriksaan yang diminta semuanya ada di laporan",
+      "status": "PASS",
+      "details": "situs_utama, situs_aplikasi, jembatan_health, jembatan_healthz, penjaga_workers_dev, sertifikat_api, dns_mx, dns_spf, batas_plan_gratis"
+    },
+    {
+      "name": "Setiap pemeriksaan melaporkan latensinya sendiri",
+      "status": "PASS",
+      "details": "ms numerik di semua pemeriksaan"
+    },
+    {
+      "name": "Setiap kegagalan membawa TINDAKAN (runbook per gejala), bukan hanya status",
+      "status": "PASS",
+      "details": "tindakan terisi"
+    },
+    {
+      "name": "`/health` diperiksa sampai isi payload: protocol 1.7 + edgeGuard on",
+      "status": "PASS",
+      "details": "protocol + edgeGuard di-assert"
+    },
+    {
+      "name": "Batas plan gratis dilaporkan sebagai INFO yang jujur (tidak diukur tanpa token)",
+      "status": "PASS",
+      "details": "INFO + tiga ambang plan gratis"
+    },
+    {
+      "name": "Acuan latensi probe cocok dengan angka terukur di deploy/edge/README.md §5",
+      "status": "PASS",
+      "details": "hangat 1163 ms / dingin 2214 ms"
+    },
+    {
+      "name": "Ambang PERINGATAN latensi = 2x acuan hangat",
+      "status": "PASS",
+      "details": "faktor 2x"
+    },
+    {
+      "name": "Sertifikat: ambang peringatan 21 hari, kedaluwarsa = KRITIS",
+      "status": "PASS",
+      "details": "21 hari / <=0 kritis"
+    },
+    {
+      "name": "Gerbang ini terdaftar di quality.yml",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "quality.yml memanggil probe dalam mode selftest",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "TIDAK ada pemanggilan probe tanpa --selftest di CI (kalau ada, setiap push menembak produksi)",
+      "status": "PASS",
+      "details": "node tools/fiezel-health-probe.mjs --selftest"
+    },
+    {
+      "name": "Dokumen tools/fiezel-health-probe.md ada",
+      "status": "PASS",
+      "details": "9990 byte"
+    },
+    {
+      "name": "Dokumen menjelaskan cara menjalankan (produksi + selftest)",
+      "status": "PASS",
+      "details": "perintah tercantum"
+    },
+    {
+      "name": "Dokumen menjelaskan arti tiap status (OK/PERINGATAN/KRITIS/INFO) dan exit code",
+      "status": "PASS",
+      "details": "semua status dijelaskan"
+    },
+    {
+      "name": "Dokumen punya runbook per gejala untuk kedelapan pemeriksaan",
+      "status": "PASS",
+      "details": "lengkap"
+    },
+    {
+      "name": "Dokumen menegaskan aturan \"nol rahasia\" dan alasan /healthz",
+      "status": "PASS",
+      "details": "aturan rahasia + /healthz"
+    },
+    {
+      "name": "Pemindai no-network memang tidak mencakup tools/ (jadi §4+§9 yang menjaga, dan itu dicatat)",
+      "status": "PASS",
+      "details": "cakupan: berkas gerbang di akar repo"
+    },
+    {
+      "name": "Gerbang ini sendiri tidak menembak jaringan (hanya spawn probe dalam selftest)",
+      "status": "PASS",
+      "details": "tanpa socket, tanpa fetch remote"
+    }
+  ]
+}
