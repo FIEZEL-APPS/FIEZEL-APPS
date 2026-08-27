@@ -47,8 +47,95 @@ export const CANONICAL = Object.freeze({
   usdPer1kChars: 0.015,
   bytesPerChar: 925,
   neuronsPerChar: 825000 / 604962,
-  freeNeuronsPerDay: 10000
+  freeNeuronsPerDay: 10000,
+  // Sesudah dedup kunci v2: 6.640 baris bank ⇒ 5.657 objek unik yang BELUM ada di R2,
+  // 286.851 karakter. Ini angka yang benar-benar akan dibayar pada jalan pertama; 604.962
+  // adalah ukuran korpus, bukan tagihan. Keduanya dipaku supaya pergeseran bank terlihat.
+  uniqueObjectsPending: 5657,
+  pendingChars: 286851,
+  // Estimasi durasi audio. INI ESTIMASI, bukan pengukuran: 14,5 karakter/detik ≈ 175 kata/menit
+  // pada 5,9 karakter/kata, kecepatan bicara aura yang biasa. Dipakai hanya untuk memberi owner
+  // rasa "berapa jam audio yang ia beli", tidak dipakai untuk menghitung biaya apa pun.
+  charsPerSecond: 14.5
 });
+
+/**
+ * MODEL YANG BOLEH DIPAKAI — harga dari API Cloudflare, latensi/ukuran dari uji nyata 84 karakter,
+ * WER dari transkripsi ulang Whisper. Tidak satu pun angka di blok ini ditebak.
+ *
+ * Bacaan pentingnya: aura-2-en dua kali lipat harganya (US$0,030 vs US$0,015 per 1.000 karakter)
+ * dan 2,6× lebih lambat (2.510 ms vs 961 ms untuk 84 karakter), tetapi WER-nya separuh
+ * (0,018 vs 0,038). Karena itu bawaannya aura-1 untuk korpus, dan aura-2-en dipakai TERARAH pada
+ * frasa yang terbukti salah dilafalkan aura-1 (lihat RISKY_PHRASES). Membayar dua kali lipat
+ * untuk 604.962 karakter demi memperbaiki puluhan kalimat adalah pemborosan; membayarnya untuk
+ * puluhan kalimat itu saja adalah harga yang wajar.
+ */
+export const MODELS = Object.freeze({
+  '@cf/deepgram/aura-1': Object.freeze({
+    id: '@cf/deepgram/aura-1',
+    engineVersion: 'cf-aura-1@v1',
+    voiceId: 'aura-asteria-en',
+    usdPer1kChars: 0.015,
+    probe: Object.freeze({ chars: 84, ms: 961, bytes: 25704 }),
+    wer: 0.038,
+    role: 'default'
+  }),
+  '@cf/deepgram/aura-2-en': Object.freeze({
+    id: '@cf/deepgram/aura-2-en',
+    engineVersion: 'cf-aura-2-en@v1',
+    voiceId: 'aura-2-thalia-en',
+    usdPer1kChars: 0.030,
+    probe: Object.freeze({ chars: 84, ms: 2510, bytes: 32688 }),
+    wer: 0.018,
+    role: 'accuracy'
+  })
+});
+
+/**
+ * MODEL YANG DITOLAK, dengan alasan yang bisa diperiksa. Ditulis sebagai data, bukan sebagai
+ * catatan di README, supaya `--model` tidak bisa memilihnya diam-diam pada jalan berbayar.
+ */
+export const REJECTED_MODELS = Object.freeze({
+  '@cf/myshell-ai/melotts': Object.freeze({
+    id: '@cf/myshell-ai/melotts',
+    reason: 'gagal HTTP 500 pada 3 dari 4 kalimat uji walau diulang 3×, dan keluarannya WAV ' +
+      'base64 — bukan MP3 yang dilayani worker audio (nama objek <sha256>.mp3).',
+    evidence: '3/4 kalimat 500 setelah 3 percobaan; container=wav-base64'
+  })
+});
+
+export function modelOf(id) {
+  const key = String(id || ENGINE.id);
+  if (REJECTED_MODELS[key]) throw new Error(`model_rejected: ${key} — ${REJECTED_MODELS[key].reason}`);
+  const model = MODELS[key];
+  if (!model) throw new Error(`model_unknown: ${key}`);
+  return model;
+}
+
+/**
+ * FRASA BERISIKO. Temuan yang memaksa daftar ini ada: aura-1 melafalkan "On balance" cukup
+ * bersambung sehingga Whisper menuliskannya "Unbalanced" — arti yang BERLAWANAN dengan maksud
+ * stem soal. aura-2-en membacanya benar. Frasa itu kini menjadi awalan puluhan stem C1 di
+ * `reading-bank.json`, jadi salah lafal satu frasa merusak seluruh keluarga soal sekaligus.
+ *
+ * Pola yang dikumpulkan di bawah semuanya sejenis dan sebabnya sama: preposisi satu suku kata
+ * yang melebur ke kata berikutnya sampai ASR (dan telinga murid) mendengar SATU kata dengan arti
+ * lain — on balance/unbalanced, on going/ongoing, on set/onset, in depth/indepth, on line/online.
+ * Deteksinya otomatis atas bank, bukan daftar tangan berisi id soal, karena bank berubah dan
+ * daftar tangan akan menua tanpa suara.
+ */
+export const RISKY_PHRASES = Object.freeze([
+  Object.freeze({ phrase: 'On balance', heardAs: 'Unbalanced', severity: 'confirmed', evidence: 'transkripsi ulang Whisper atas keluaran aura-1' }),
+  Object.freeze({ phrase: 'On going', heardAs: 'Ongoing', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' }),
+  Object.freeze({ phrase: 'On set', heardAs: 'Onset', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' }),
+  Object.freeze({ phrase: 'On line', heardAs: 'Online', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' }),
+  Object.freeze({ phrase: 'On board', heardAs: 'Onboard', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' }),
+  Object.freeze({ phrase: 'In depth', heardAs: 'Indepth', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' }),
+  Object.freeze({ phrase: 'In balance', heardAs: 'Imbalance', severity: 'suspected', evidence: 'pola lebur preposisi yang sama' })
+]);
+
+/** Model yang WAJIB dipakai untuk teks berisiko: yang WER-nya separuh dan melafalkannya benar. */
+export const RISK_MODEL_ID = '@cf/deepgram/aura-2-en';
 
 export const ENGINE = Object.freeze({
   id: '@cf/deepgram/aura-1',
@@ -61,7 +148,8 @@ export const ENGINE = Object.freeze({
 const BANKS = Object.freeze({
   listening: 'features/speaking-listening/listening-bank-v1.json',
   book: 'features/library/library-books-v1.json',
-  vocabulary: 'vocabulary-master.json'
+  vocabulary: 'vocabulary-master.json',
+  reading: 'reading-bank.json'
 });
 
 function readJson(rel) {
@@ -144,10 +232,132 @@ export function censusCorpus(options = {}) {
     totalChars,
     byDomain,
     costUsd: (totalChars / 1000) * CANONICAL.usdPer1kChars,
+    // Kedua harga dilaporkan berdampingan supaya keputusan model tidak perlu dihitung tangan:
+    // aura-1 US$0,015/1.000 karakter, aura-2-en US$0,030/1.000 karakter (harga API Cloudflare).
+    costByModel: Object.fromEntries(Object.values(MODELS).map((m) =>
+      [m.id, (totalChars / 1000) * m.usdPer1kChars])),
     estimatedBytes: totalChars * CANONICAL.bytesPerChar,
+    estimatedBytesByModel: Object.fromEntries(Object.values(MODELS).map((m) =>
+      [m.id, Math.round(totalChars * (m.probe.bytes / m.probe.chars))])),
+    estimatedSeconds: totalChars / CANONICAL.charsPerSecond,
+    estimatedRenderMsByModel: Object.fromEntries(Object.values(MODELS).map((m) =>
+      [m.id, Math.round(totalChars * (m.probe.ms / m.probe.chars))])),
     estimatedNeurons: Math.round(totalChars * CANONICAL.neuronsPerChar),
     freeDaysNeeded: Math.ceil((totalChars * CANONICAL.neuronsPerChar) / CANONICAL.freeNeuronsPerDay)
   };
+}
+
+/**
+ * Deteksi otomatis frasa berisiko. Dicari di DUA tempat, dan pemisahan itu penting:
+ *
+ *   - baris korpus TTS (listening/book/vocabulary) — ini yang benar-benar akan dirender, jadi
+ *     temuan di sini langsung menjadi override model per-item (aura-2-en) di rencana;
+ *   - `reading-bank.json` — stem soal reading TIDAK ikut korpus pra-render hari ini, tetapi ia
+ *     tempat frasa "On balance" berkembang biak. Kalau suatu hari stem itu dibunyikan (tombol
+ *     baca-nyaring soal), ia HARUS lewat aura-2-en atau diverifikasi manual. Karena itu ia
+ *     dilaporkan sebagai `manual_verify`, bukan disembunyikan.
+ *
+ * Pencocokan tidak sensitif huruf besar dan menuntut batas kata, supaya "balance" biasa atau
+ * "onset" yang memang satu kata tidak ikut tertangkap.
+ */
+function riskyMatcher(phrase) {
+  const parts = String(phrase).trim().split(/\s+/).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return new RegExp(`\\b${parts.join('\\s+')}\\b`, 'i');
+}
+
+export function scanRiskyPhrases(options = {}) {
+  const rows = options.rows || collectCorpus(options);
+  const matchers = RISKY_PHRASES.map((r) => ({ ...r, re: riskyMatcher(r.phrase) }));
+  const corpusHits = [];
+  const readingHits = [];
+  const byPhrase = {};
+
+  const bump = (phrase) => { byPhrase[phrase] = (byPhrase[phrase] || 0) + 1; };
+
+  for (const row of rows) {
+    for (const m of matchers) {
+      if (!m.re.test(row.text)) continue;
+      corpusHits.push({
+        phrase: m.phrase, heardAs: m.heardAs, severity: m.severity, evidence: m.evidence,
+        where: 'corpus', domain: row.domain, sourceId: row.sourceId, text: row.text,
+        action: 'render_with_' + RISK_MODEL_ID, model: RISK_MODEL_ID
+      });
+      bump(m.phrase);
+      break;
+    }
+  }
+
+  let readingItems = 0;
+  try {
+    const bank = readJson(BANKS.reading);
+    const items = Array.isArray(bank) ? bank : (bank.items || []);
+    for (const item of items) {
+      const level = String(item.level || '');
+      const candidates = [];
+      if (typeof item.text === 'string') candidates.push(['text', item.text]);
+      for (const q of item.qs || []) {
+        const stem = Array.isArray(q) ? q[0] : (q && q.q);
+        if (typeof stem === 'string') candidates.push(['stem', stem]);
+      }
+      let itemFlagged = false;
+      for (const [kind, text] of candidates) {
+        for (const m of matchers) {
+          if (!m.re.test(text)) continue;
+          readingHits.push({
+            phrase: m.phrase, heardAs: m.heardAs, severity: m.severity, evidence: m.evidence,
+            where: 'reading-bank', kind, level, sourceId: String(item.id || ''), text,
+            action: 'render_with_' + RISK_MODEL_ID + '_or_manual_verify', model: RISK_MODEL_ID
+          });
+          bump(m.phrase);
+          itemFlagged = true;
+          break;
+        }
+      }
+      if (itemFlagged) readingItems += 1;
+    }
+  } catch (_) { /* reading-bank absen bukan galat pipeline audio */ }
+
+  const hits = corpusHits.concat(readingHits);
+  return {
+    phrases: RISKY_PHRASES.map((r) => r.phrase),
+    hits,
+    corpusHits,
+    readingHits,
+    readingItems,
+    byPhrase,
+    riskModelId: RISK_MODEL_ID,
+    // Kunci override yang dipakai buildPlan: teks kanonik ⇒ model. Teks, bukan sourceId, karena
+    // kalimat berisiko yang sama bisa muncul di dua bank dengan id berbeda dan keduanya harus
+    // memakai model yang sama — kalau tidak, satu kalimat dibayar dua kali dengan dua kunci.
+    overrides: corpusHits.reduce((acc, hit) => {
+      acc[TtsKey.canonicalText(hit.text)] = RISK_MODEL_ID;
+      return acc;
+    }, {})
+  };
+}
+
+/**
+ * Override model per-item. Tiga sumber, urutan menang dari yang paling eksplisit:
+ *   1. `overrides['<domain>:<sourceId>']` atau `overrides['<sourceId>']` — tangan owner;
+ *   2. `overrides['text:<teks kanonik>']` atau kunci teks kanonik langsung;
+ *   3. deteksi frasa berisiko (otomatis, bisa dimatikan `--no-risk-override`);
+ *   4. bawaan `--model` / ENGINE (aura-1).
+ */
+export function resolveModelFor(row, options = {}) {
+  const overrides = options.overrides || {};
+  const canonical = TtsKey.canonicalText(row.text);
+  const candidates = [
+    overrides[`${row.domain}:${row.sourceId}`],
+    overrides[String(row.sourceId)],
+    overrides[`text:${canonical}`],
+    overrides[canonical],
+    (options.riskOverrides || {})[canonical],
+    options.engineId
+  ];
+  for (const candidate of candidates) {
+    if (candidate) return modelOf(candidate);
+  }
+  return modelOf(ENGINE.id);
 }
 
 export function loadManifest() {
@@ -177,29 +387,57 @@ export function buildPlan(options = {}) {
   const extra = options.existingKeys instanceof Set ? options.existingKeys : new Set();
   const limit = Number(options.limit || 0);
 
+  // Override risiko dihidupkan BAWAAN. Mematikannya harus disengaja (`riskOverride: false` /
+  // `--no-risk-override`), karena keadaan bawaan yang aman di sini berarti soal C1 tidak
+  // terdengar berlawanan arti.
+  const risk = options.riskOverride === false
+    ? { overrides: {}, corpusHits: [], readingHits: [], hits: [], byPhrase: {}, phrases: RISKY_PHRASES.map((r) => r.phrase), readingItems: 0, riskModelId: RISK_MODEL_ID }
+    : scanRiskyPhrases({ ...options, rows });
+
   const pending = [];
   const seen = new Set();
   let duplicates = 0;
   let ready = 0;
   let plannedChars = 0;
+  let plannedCostUsd = 0;
+  let overridden = 0;
+  const byModel = {};
 
   for (const row of rows) {
+    // Model per-item diselesaikan SEBELUM kunci dihitung, karena engineId/engineVersion masuk
+    // hash: satu kalimat yang dipindah ke aura-2-en memang objek berbeda dan memang berbayar
+    // sendiri. Itu bukan cacat kunci, itu artinya kunci jujur soal apa yang tersimpan.
+    const model = resolveModelFor(row, { ...options, riskOverrides: risk.overrides });
     const identity = TtsKey.build({
       text: row.text,
       locale: options.locale || ENGINE.locale,
-      voiceId: options.voiceId || ENGINE.voiceId,
-      engineId: options.engineId || ENGINE.id,
-      engineVersion: options.engineVersion || ENGINE.engineVersion,
+      voiceId: options.voiceId || model.voiceId,
+      engineId: model.id,
+      engineVersion: options.engineVersion || model.engineVersion,
       contentType: row.contentType,
       settings: ENGINE.settings
     });
-    const entry = { ...row, audioKey: identity.audioKey, objectName: TtsKey.objectName(identity), chars: identity.canonicalText.length, canonicalText: identity.canonicalText };
+    const chars = identity.canonicalText.length;
+    const entry = {
+      ...row, audioKey: identity.audioKey, objectName: TtsKey.objectName(identity),
+      chars, canonicalText: identity.canonicalText,
+      modelId: model.id, engineVersion: identity.engineVersion, voiceId: identity.voiceId,
+      usdPer1kChars: model.usdPer1kChars,
+      costUsd: (chars / 1000) * model.usdPer1kChars,
+      overridden: model.id !== ENGINE.id
+    };
     if (seen.has(identity.audioKey)) { duplicates += 1; continue; }
     seen.add(identity.audioKey);
     if (known.has(identity.audioKey) || extra.has(identity.audioKey)) { ready += 1; continue; }
     if (limit > 0 && pending.length >= limit) continue;
     pending.push(entry);
-    plannedChars += entry.chars;
+    plannedChars += chars;
+    plannedCostUsd += entry.costUsd;
+    if (entry.overridden) overridden += 1;
+    byModel[model.id] = byModel[model.id] || { items: 0, chars: 0, costUsd: 0 };
+    byModel[model.id].items += 1;
+    byModel[model.id].chars += chars;
+    byModel[model.id].costUsd += entry.costUsd;
   }
 
   return {
@@ -211,15 +449,35 @@ export function buildPlan(options = {}) {
     ready,
     pending,
     plannedChars,
-    plannedCostUsd: (plannedChars / 1000) * CANONICAL.usdPer1kChars,
-    plannedBytes: plannedChars * CANONICAL.bytesPerChar
+    // Biaya campuran: aura-1 untuk mayoritas, aura-2-en untuk item berisiko. Dua kolom di bawah
+    // memberi batas atas/bawah yang jujur kalau owner memilih satu model untuk semuanya.
+    plannedCostUsd,
+    plannedCostAllAura1Usd: (plannedChars / 1000) * MODELS['@cf/deepgram/aura-1'].usdPer1kChars,
+    plannedCostAllAura2Usd: (plannedChars / 1000) * MODELS['@cf/deepgram/aura-2-en'].usdPer1kChars,
+    byModel,
+    overridden,
+    risky: {
+      phrases: risk.phrases,
+      corpusHits: risk.corpusHits.length,
+      readingHits: risk.readingHits.length,
+      readingItems: risk.readingItems,
+      byPhrase: risk.byPhrase,
+      model: RISK_MODEL_ID,
+      hits: risk.hits
+    },
+    plannedBytes: plannedChars * CANONICAL.bytesPerChar,
+    plannedSeconds: plannedChars / CANONICAL.charsPerSecond
   };
 }
 
 function formatReport(census, plan, opts) {
   const lines = [];
   lines.push('FIEZEL pra-render TTS — rencana');
-  lines.push(`  mesin        : ${opts.engineId || ENGINE.id} (${opts.engineVersion || ENGINE.engineVersion})`);
+  // engineVersion diambil dari catatan MODEL, bukan dari ENGINE bawaan: `--model=aura-2-en`
+  // dengan label versi "cf-aura-1@v1" di header adalah laporan yang berbohong tentang apa yang
+  // masuk kunci.
+  const headModel = modelOf(opts.engineId || ENGINE.id);
+  lines.push(`  mesin        : ${headModel.id} (${opts.engineVersion || headModel.engineVersion})`);
   lines.push(`  kunci        : ${TtsKey.SCHEMA} (speed DIKELUARKAN dari kunci)`);
   lines.push(`  korpus       : ${census.items} kalimat, ${census.totalChars} karakter`);
   for (const [domain, v] of Object.entries(census.byDomain)) {
@@ -229,9 +487,54 @@ function formatReport(census, plan, opts) {
   lines.push(`  duplikat     : ${plan.duplicates} (kunci sama, dibayar sekali)`);
   lines.push(`  belum ada    : ${plan.pending.length}  (${plan.plannedChars} karakter)`);
   lines.push(`  biaya        : US$${plan.plannedCostUsd.toFixed(2)} untuk batch ini; seluruh korpus US$${census.costUsd.toFixed(2)}`);
+
+  // --- LAPORAN BIAYA DUA MODEL. Harga API Cloudflare, bukan taksiran. -------------------
+  const aura1 = MODELS['@cf/deepgram/aura-1'];
+  const aura2 = MODELS['@cf/deepgram/aura-2-en'];
+  const hours = (s) => `${(s / 3600).toFixed(1)} jam`;
+  lines.push('  biaya per model (harga API Cloudflare, per 1.000 karakter):');
+  for (const model of [aura1, aura2]) {
+    const batch = (plan.plannedChars / 1000) * model.usdPer1kChars;
+    lines.push(`    - ${model.id.padEnd(24)} US$${model.usdPer1kChars.toFixed(3)}/1k  ` +
+      `batch US$${batch.toFixed(2)}  korpus US$${census.costByModel[model.id].toFixed(2)}  ` +
+      `WER ${model.wer.toFixed(3)}  probe ${model.probe.ms} ms/${model.probe.chars} char`);
+  }
+  lines.push(`    campuran terpakai (aura-1 + override risiko aura-2-en): US$${plan.plannedCostUsd.toFixed(2)} ` +
+    `(${plan.overridden} item dipindah ke ${RISK_MODEL_ID})`);
+  for (const [id, v] of Object.entries(plan.byModel)) {
+    lines.push(`      · ${id.padEnd(24)} ${String(v.items).padStart(5)} item  ${String(v.chars).padStart(7)} char  US$${v.costUsd.toFixed(2)}`);
+  }
+  lines.push(`  model DITOLAK : ${Object.keys(REJECTED_MODELS).join(', ')} — ${REJECTED_MODELS['@cf/myshell-ai/melotts'].evidence}`);
+
+  // --- DURASI AUDIO dan WAKTU RENDER ---------------------------------------------------
+  lines.push(`  durasi audio : ±${hours(plan.plannedSeconds)} batch ini; korpus ±${hours(census.estimatedSeconds)} ` +
+    `(estimasi ${CANONICAL.charsPerSecond} karakter/detik, bukan pengukuran)`);
+  lines.push(`  waktu render : ±${(census.estimatedRenderMsByModel[aura1.id] / 3600000).toFixed(1)} jam berurutan di aura-1; ` +
+    `±${(census.estimatedRenderMsByModel[aura2.id] / 3600000).toFixed(1)} jam di aura-2-en (dari probe nyata 84 karakter)`);
+
+  // --- PENYIMPANAN R2 -----------------------------------------------------------------
   lines.push(`  ukuran R2    : ±${(plan.plannedBytes / 1e9).toFixed(3)} GB batch ini; korpus ±${(census.estimatedBytes / 1e9).toFixed(2)} GB (free tier 10 GB)`);
+  lines.push(`                 kalibrasi 925 byte/karakter (273 aset nyata). Probe Workers AI memberi ` +
+    `${Math.round(aura1.probe.bytes / aura1.probe.chars)} byte/char (aura-1) dan ` +
+    `${Math.round(aura2.probe.bytes / aura2.probe.chars)} byte/char (aura-2-en) ⇒ korpus ±` +
+    `${(census.estimatedBytesByModel[aura1.id] / 1e9).toFixed(2)}–${(census.estimatedBytesByModel[aura2.id] / 1e9).toFixed(2)} GB. ` +
+    'Angka 925 dipakai sebagai batas atas; ketiganya jauh di dalam 10 GB.');
+
+  // --- FRASA BERISIKO ------------------------------------------------------------------
+  lines.push(`  frasa risiko : ${plan.risky.corpusHits} baris korpus + ${plan.risky.readingHits} stem/teks reading-bank ` +
+    `(${plan.risky.readingItems} soal) wajib ${plan.risky.model} atau verifikasi manual`);
+  for (const [phrase, n] of Object.entries(plan.risky.byPhrase)) {
+    lines.push(`      · "${phrase}" ${n} kemunculan`);
+  }
+  if (!Object.keys(plan.risky.byPhrase).length) lines.push('      · tidak ada kemunculan pada filter ini');
+  lines.push('                 Sebabnya terukur: aura-1 membaca "On balance" sampai Whisper menuliskan ' +
+    '"Unbalanced" — arti berlawanan pada stem soal C1. aura-2-en benar.');
+
+  // --- JATAH GRATIS -------------------------------------------------------------------
   lines.push(`  neuron       : ±${census.estimatedNeurons} untuk seluruh korpus = ${census.freeDaysNeeded} hari jatah gratis (10.000/hari).`);
   lines.push('               JATAH GRATIS TIDAK CUKUP — pra-render adalah biaya yang dibelanjakan, bukan ditunggu.');
+  lines.push(`               Workers AI Free = ${CANONICAL.freeNeuronsPerDay} neuron/hari untuk SELURUH akun; korpus butuh ` +
+    `±${census.estimatedNeurons} neuron. Pra-render WAJIB dibayar sekali (US$${census.costByModel[aura1.id].toFixed(2)} di aura-1).`);
   return lines.join('\n');
 }
 
@@ -282,11 +585,15 @@ async function r2Put(env, key, body) {
   return 'r2_put_exhausted';
 }
 
-async function workersAiTts(env, text) {
-  const response = await fetch(`${R2_API}/${env.accountId}/ai/run/${ENGINE.id}`, {
+async function workersAiTts(env, text, modelId) {
+  // modelOf melempar untuk model yang DITOLAK (melotts) dan yang tak dikenal. Penjagaan ini di
+  // sini, tepat sebelum satu-satunya panggilan berbayar, bukan di parseArgs saja — override
+  // per-item bisa datang dari berkas JSON yang tidak lewat parseArgs.
+  const model = modelOf(modelId);
+  const response = await fetch(`${R2_API}/${env.accountId}/ai/run/${model.id}`, {
     method: 'POST',
     headers: { authorization: `Bearer ${env.token}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ text, speaker: env.speaker || ENGINE.voiceId })
+    body: JSON.stringify({ text, speaker: env.speaker || model.voiceId })
   });
   if (!response.ok) return { error: `ai_${response.status}` };
   const buffer = Buffer.from(await response.arrayBuffer());
@@ -304,8 +611,17 @@ function writeManifestAtomic(doc) {
   fs.renameSync(tmp, MANIFEST_PATH);
 }
 
+/**
+ * `--override` bisa diulang: `--override=listening:l0042=@cf/deepgram/aura-2-en`.
+ * `--overrides-file` menerima JSON {"<domain>:<sourceId>"|"text:<teks>": "<modelId>"}.
+ * Keduanya diperiksa terhadap MODELS/REJECTED_MODELS saat dibaca, supaya salah ketik model
+ * gagal SEBELUM ada dolar yang bergerak, bukan di tengah batch.
+ */
 function parseArgs(argv) {
-  const out = { content: 'all', limit: 0, budgetUsd: 1.0, apply: false, bookId: '' };
+  const out = {
+    content: 'all', limit: 0, budgetUsd: 1.0, apply: false, bookId: '',
+    engineId: '', overrides: {}, riskOverride: true
+  };
   for (const arg of argv) {
     const m = /^--([a-z-]+)(?:=(.*))?$/.exec(arg);
     if (!m) continue;
@@ -315,6 +631,18 @@ function parseArgs(argv) {
     else if (name === 'limit') out.limit = Number(value || 0);
     else if (name === 'budget-usd') out.budgetUsd = Number(value || 0);
     else if (name === 'book-id') out.bookId = String(value || '');
+    else if (name === 'model') out.engineId = modelOf(value).id;
+    else if (name === 'no-risk-override') out.riskOverride = false;
+    else if (name === 'override') {
+      const at = String(value || '').lastIndexOf('=');
+      if (at > 0) {
+        const target = String(value).slice(0, at);
+        out.overrides[target] = modelOf(String(value).slice(at + 1)).id;
+      }
+    } else if (name === 'overrides-file') {
+      const doc = JSON.parse(fs.readFileSync(String(value), 'utf8'));
+      for (const [target, modelId] of Object.entries(doc)) out.overrides[target] = modelOf(modelId).id;
+    }
   }
   return out;
 }
@@ -323,7 +651,10 @@ export async function main(argv = process.argv.slice(2)) {
   const opts = parseArgs(argv);
   const census = censusCorpus({ content: opts.content, bookId: opts.bookId });
   const manifest = loadManifest();
-  const plan = buildPlan({ content: opts.content, bookId: opts.bookId, limit: opts.limit, manifest });
+  const plan = buildPlan({
+    content: opts.content, bookId: opts.bookId, limit: opts.limit, manifest,
+    engineId: opts.engineId || '', overrides: opts.overrides, riskOverride: opts.riskOverride
+  });
 
   console.log(formatReport(census, plan, opts));
 
@@ -353,6 +684,7 @@ export async function main(argv = process.argv.slice(2)) {
   let recovered = 0;
   let failed = 0;
   let spentChars = 0;
+  let spentUsd = 0;
 
   for (const entry of plan.pending) {
     // HEAD SEBELUM PROVIDER, setiap kali. Manifest lokal bisa tertinggal dari R2 (push manifest
@@ -361,22 +693,26 @@ export async function main(argv = process.argv.slice(2)) {
     if (head.bytes) {
       manifest.assets[entry.audioKey] = {
         state: 'ready', url: `a/${entry.objectName}`, bytes: head.bytes, chars: entry.chars,
-        domain: entry.domain, sourceId: entry.sourceId, engineId: ENGINE.id,
-        engineVersion: ENGINE.engineVersion, voiceId: ENGINE.voiceId, contentType: entry.contentType
+        domain: entry.domain, sourceId: entry.sourceId, engineId: entry.modelId,
+        engineVersion: entry.engineVersion, voiceId: entry.voiceId, contentType: entry.contentType
       };
       recovered += 1;
       continue;
     }
     if (head.error) { failed += 1; continue; }
 
-    if (((spentChars + entry.chars) / 1000) * CANONICAL.usdPer1kChars > opts.budgetUsd) {
+    // Anggaran dihitung dengan harga MODEL ITEM ITU, bukan harga bawaan: item yang dipindah ke
+    // aura-2-en berbiaya dua kali, dan menghitungnya dengan tarif aura-1 akan melewati batas
+    // anggaran tanpa satu pun peringatan.
+    if (spentUsd + entry.costUsd > opts.budgetUsd) {
       console.log('Anggaran batch tercapai; berhenti dengan rapi.');
       break;
     }
 
-    const audio = await workersAiTts(env, entry.canonicalText);
+    const audio = await workersAiTts(env, entry.canonicalText, entry.modelId);
     if (audio.error) { failed += 1; continue; }
     spentChars += entry.chars;
+    spentUsd += entry.costUsd;
 
     const putError = await r2Put(env, entry.objectName, audio.bytes);
     if (putError) { failed += 1; continue; }
@@ -389,8 +725,11 @@ export async function main(argv = process.argv.slice(2)) {
 
     manifest.assets[entry.audioKey] = {
       state: 'ready', url: `a/${entry.objectName}`, bytes: verify.bytes, chars: entry.chars,
-      domain: entry.domain, sourceId: entry.sourceId, engineId: ENGINE.id,
-      engineVersion: ENGINE.engineVersion, voiceId: ENGINE.voiceId, contentType: entry.contentType
+      domain: entry.domain, sourceId: entry.sourceId, engineId: entry.modelId,
+      engineVersion: entry.engineVersion, voiceId: entry.voiceId, contentType: entry.contentType,
+      // Kenapa item ini memakai model lain dicatat di manifest, bukan hanya di log CI: enam bulan
+      // dari sekarang "kenapa 12 objek ini aura-2-en?" harus terjawab dari katalog itu sendiri.
+      riskOverride: entry.overridden ? 'risky_phrase' : undefined
     };
     produced += 1;
   }
@@ -403,7 +742,7 @@ export async function main(argv = process.argv.slice(2)) {
   manifest.version = Number(manifest.version || 1) + 1;
   writeManifestAtomic(manifest);
 
-  console.log(`\nselesai: ${produced} aset baru (US$${((spentChars / 1000) * CANONICAL.usdPer1kChars).toFixed(2)}), ` +
+  console.log(`\nselesai: ${produced} aset baru (US$${spentUsd.toFixed(2)}, ${spentChars} karakter), ` +
     `${recovered} dipulihkan dari R2 tanpa biaya, ${failed} gagal, manifest v${manifest.version}`);
   return failed > 0 ? 1 : 0;
 }
