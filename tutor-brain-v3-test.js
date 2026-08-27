@@ -199,11 +199,41 @@ test('benar tetapi lambat dimantapkan dulu, tidak langsung dinaikkan', () => {
 });
 
 test('beruntun benar dan cepat dinaikkan — soal di bawah kemampuan membuang giliran', () => {
+  // Gate ini DIPERBARUI mengikuti temuan council (gpt_5_6_sol §4.2): baseline waktu jawab
+  // kini median BERGULIR, bukan beku di sampel pertama. Karena itu "cepat" harus dibuktikan
+  // relatif terhadap kebiasaan yang sudah terbentuk di sesi ini - tiga jawaban wajar dulu,
+  // baru rentetan cepat; murid yang SELALU 3 detik memang bukan murid yang sedang mengingat.
   const s = session();
+  for (let i = 0; i < 3; i++) answer(s, { correct: true, chosenOption: 'is preparing', ms: 8000 });
   let d;
-  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 3000 });
+  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 2000 });
   assert.strictEqual(d.timing, 'retrieved');
   assert.strictEqual(T.decideMove(s, d, { remaining: 5 }).move, 'stretch');
+});
+
+test('empat tebakan benar TIDAK menaikkan kesulitan — tebakan bukan penguasaan', () => {
+  // Temuan council terverifikasi (gpt_5_6_sol §4.2): decideMove lama menganggap `retrieved`
+  // ATAU `guess` sebagai alasan stretch setelah streak empat, jadi empat tebakan benar
+  // (peluang seperempat per soal) bisa menaikkan kesulitan. Gate lama ikut mengizinkannya.
+  // Sekarang: tebakan cepat beruntun terus berjalan sambil polanya dinamai, bukan di-stretch.
+  const s = session();
+  let d;
+  for (let i = 0; i < 4; i++) d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 1000 });
+  assert.strictEqual(d.timing, 'guess');
+  const move = T.decideMove(s, d, { remaining: 5 });
+  assert.strictEqual(move.move, 'continue', 'tebakan beruntun tidak boleh menaikkan kesulitan');
+  assert.strictEqual(move.reason, 'streak_but_guessing');
+});
+
+test('baseline waktu jawab bergulir mengikuti sesi, tidak beku di sampel pertama', () => {
+  // Temuan council (gpt_5_6_sol §4.2): baseline lama diisi sekali lalu tidak pernah
+  // diperbarui karena `if (!s.baselineMs)`. Murid yang ternyata lambat di sesi ini harus
+  // membuat baselinenya ikut melambat - sehingga 9 detik terbaca CEPAT baginya, bukan wajar.
+  const s = session(); // seed 8000 dari sesi lalu
+  for (let i = 0; i < 3; i++) answer(s, { correct: true, chosenOption: 'is preparing', ms: 20000 });
+  assert.strictEqual(s.baselineMs, 20000, 'baseline tidak mengikuti median sesi berjalan');
+  const d = answer(s, { correct: true, chosenOption: 'is preparing', ms: 9000 });
+  assert.strictEqual(d.timing, 'retrieved', 'baseline beku membuat 9 detik terbaca wajar, padahal muridnya lambat');
 });
 
 test('murid lelah dihentikan, bukan dimudahkan — dan itu mengalahkan tindakan lain', () => {
@@ -225,6 +255,38 @@ test('soal habis ditutup, tidak dibiarkan menggantung', () => {
   const s = session();
   const d = answer(s, { correct: true, chosenOption: 'is preparing' });
   assert.strictEqual(T.decideMove(s, d, { remaining: 0 }).move, 'wrapup');
+});
+
+test('nama miskonsepsi yang sama di konsep berbeda tidak saling menimpa', () => {
+  // Temuan council (gpt_5_6_sol §4.1): kunci state dulu nama-saja, jadi miskonsepsi bernama
+  // sama pada dua konsep saling menimpa dan salah satu kali di tiap konsep sudah terbaca
+  // "dua kali". Kuncinya kini pasangan konsep::miskonsepsi.
+  const s = session();
+  answer(s, { concept: 'articles', skill: 'articles' });
+  const d2 = answer(s);
+  assert.strictEqual(d2.repeats, 1, 'hitungan dari konsep lain bocor ke konsep ini');
+  assert.strictEqual(T.decideMove(s, d2, { remaining: 8 }).move, 'hint', 'satu kali per konsep belum pola');
+  // Benar di satu konsep hanya menyelesaikan pasangan konsep itu, bukan semua yang senama.
+  const win = answer(s, { correct: true, chosenOption: 'is preparing', concept: 'articles', skill: 'articles' });
+  assert.strictEqual(win.breakthrough, true);
+  const d3 = answer(s);
+  assert.strictEqual(d3.repeats, 2, 'hitungan konsep ini ikut terhapus oleh terobosan konsep lain');
+});
+
+test('miskonsepsi persisten dari ledger langsung terdeteksi pada kemunculan pertama sesi ini', () => {
+  // Perbaikan (5): createSession menerima options.priorMisconceptions dari ledger persisten
+  // dan men-seed hitungan 1 - guru tidak melupakan kekeliruan minggu lalu hanya karena hari
+  // berganti. Kemunculan pertama di sesi ini adalah bukti KEDUA, langsung persisten.
+  const s = T.createSession({
+    now: NOW, baselineMs: 8000,
+    priorMisconceptions: [{ concept: 'present_simple_vs_continuous', misconception: MAP.prepares }]
+  });
+  const d = answer(s);
+  assert.strictEqual(d.repeats, 2, 'seed dari ledger tidak terhitung');
+  const move = T.decideMove(s, d, { remaining: 8 });
+  assert.strictEqual(move.move, 'reteach');
+  assert.strictEqual(move.reason, 'persistent_misconception');
+  assert.strictEqual(move.misconception, MAP.prepares);
 });
 
 // ---------------------------------------------------------------------------------------
@@ -315,6 +377,66 @@ test('tidak satu pun naskah tutor keluar dalam bahasa Inggris', () => {
     const text = allText(T.composeTurn({ move, scaffold, whyFails: 'belum cocok dengan konteks kalimat', explanation: {} }));
     assert.ok(!EN_ONLY.test(text), 'naskah berbahasa Inggris pada ' + move + '/' + scaffold + ': ' + text);
   }));
+});
+
+// Bahan penjelasan yang dipakai gate rotasi "jangan ulangi yang gagal" di bawah ini.
+const EXPLAIN_INPUT = {
+  move: 'hint', scaffold: 'hint', concept: 'present_simple_vs_continuous',
+  conceptLabel: 'bentuk sedang berlangsung',
+  whyFails: 'menganggap penanda waktu sebagai hiasan',
+  explanation: { rule: 'Kejadian yang sedang berlangsung memakai bentuk sedang', memoryCue: 'Lihat penanda waktunya dulu' },
+  chosenOption: 'prepares', correctAnswer: 'is preparing'
+};
+
+test('penjelasan yang gagal tidak pernah diulang dengan frasa yang sama', () => {
+  // Temuan council (gpt_5_6_sol §4.3): `explanationsUsed` dulu dibuat tetapi tidak pernah
+  // dibaca atau diperbarui - janji "tidak mengulang penjelasan yang gagal" kosong. Sekarang:
+  // record() mencatat kunci konsep::tangga yang GAGAL (murid tetap salah setelahnya), dan
+  // composeTurn(input, session) memilih variasi frasa berbeda setiap kali.
+  const s = session();
+  answer(s);
+  const turn1 = T.composeTurn(EXPLAIN_INPUT, s);
+  answer(s); // masih salah -> penjelasan turn1 resmi GAGAL
+  assert.strictEqual(s.explanationsUsed['present_simple_vs_continuous::hint'], 1,
+    'kegagalan penjelasan tidak tercatat');
+  const turn2 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.notStrictEqual(turn2.ask, turn1.ask, 'penjelasan yang gagal diulang persis sama');
+  answer(s); // salah lagi -> turn2 juga gagal, frasa harus berputar lagi
+  const turn3 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.notStrictEqual(turn3.ask, turn2.ask, 'rotasi berhenti setelah satu variasi');
+  answer(s); // gagal ketiga -> giliran bentuk kontras jawaban murid vs bentuk benar
+  const turn4 = T.composeTurn(EXPLAIN_INPUT, s);
+  assert.ok(turn4.ask.indexOf('jawabanmu "prepares"') >= 0 && turn4.ask.indexOf('is preparing') >= 0,
+    'bentuk kontras jawabanmu-vs-bentuk-benar tidak pernah muncul: ' + turn4.ask);
+});
+
+test('penjelasan yang BERHASIL tidak dicap gagal', () => {
+  const s = session();
+  answer(s);
+  T.composeTurn(EXPLAIN_INPUT, s);
+  answer(s, { correct: true, chosenOption: 'is preparing' });
+  assert.ok(!s.explanationsUsed['present_simple_vs_continuous::hint'],
+    'penjelasan yang bekerja ikut masuk daftar hindaran');
+});
+
+test('level worked benar-benar berisi contoh yang dikerjakan, bukan sekadar mengutip aturan', () => {
+  // Temuan council (gpt_5_6_sol §4.4): dulu `worked` berkata "aku kerjakan satu yang mirip"
+  // tetapi hanya menyodorkan ex.rule - label tidak cocok dengan isinya. Sekarang langkahnya
+  // disusun sungguhan: aturan, kalimat contoh, lalu bentuk yang benar - dan payload-nya
+  // berbeda dari `tell`.
+  const input = {
+    move: 'hint', scaffold: 'worked', whyFails: 'belum cocok dengan konteks kalimat',
+    explanation: { rule: 'Kejadian yang sedang berlangsung memakai bentuk sedang', whyCorrect: 'Penanda waktunya menunjuk kejadian sekarang' },
+    sentence: 'Look! She ___ dinner', correctAnswer: 'is preparing'
+  };
+  const worked = T.composeTurn(input);
+  const told = T.composeTurn(Object.assign({}, input, { scaffold: 'tell' }));
+  ['Langkah 1', 'Langkah 2', 'Langkah 3'].forEach(step =>
+    assert.ok(worked.ask.indexOf(step) >= 0, step + ' hilang dari contoh yang dikerjakan: ' + worked.ask));
+  assert.ok(worked.ask.indexOf('Look! She ___ dinner') >= 0, 'kalimat contohnya tidak ikut dikerjakan');
+  assert.ok(worked.ask.indexOf('is preparing') >= 0, 'langkah terakhir tidak menunjukkan bentuk yang keluar');
+  assert.notStrictEqual(worked.ask, told.ask, 'worked dan tell menyodorkan payload yang sama');
+  assert.strictEqual(worked.reveal, false, 'worked bukan tangga pembuka jawaban');
 });
 
 test('naskah tidak pernah keluar dengan titik ganda', () => {

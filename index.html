@@ -280,6 +280,19 @@ html.fz-booting body{overflow:hidden}
        jawaban PERTAMA murid, jadi menunggunya tiba berarti soal pertama setiap sesi
        berjalan tanpa tutor. Berkasnya ~11 KB, murni fungsi, tanpa jaringan. -->
   <script defer src="./features/brain/fiezel-tutor-brain.js"></script>
+  <!-- Braincore v3. Sembilan modul penalaran baru, pola muat sama dengan Core Brain: defer,
+       tidak malas, murni fungsi tanpa jaringan. Seluruh pengaitnya di app.js dijaga
+       availability-check + try/catch - berkas yang belum tiba (atau gagal dimuat) berarti
+       aplikasi berjalan persis seperti hari ini, bukan aplikasi yang mati. -->
+  <script defer src="./features/brain/fiezel-misconception-ledger.js"></script>
+  <script defer src="./features/brain/fiezel-item-prior.js"></script>
+  <script defer src="./features/brain/fiezel-evidence-credibility.js"></script>
+  <script defer src="./features/brain/fiezel-mastery-bkt.js"></script>
+  <script defer src="./features/brain/fiezel-olm.js"></script>
+  <script defer src="./features/brain/fiezel-affect.js"></script>
+  <script defer src="./features/brain/fiezel-confusion-matrix.js"></script>
+  <script defer src="./features/brain/fiezel-step-tutor.js"></script>
+  <script defer src="./features/brain/fiezel-production-grader.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>

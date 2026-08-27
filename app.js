@@ -1135,7 +1135,7 @@ function record(q,ok,ms,selectedIndex){
    bukan menjadwalkan ulang di atas hasilnya. Tanpa itu satu jawaban salah dihitung dua kali:
    dua lapse, dan interval yang memendek dua kali. Embernya dibaca dari riwayat (reviewBucket)
    alih-alih ditebak, karena tebakan lama membuat jawaban listening menulis ke state.reading. */
-function setConfidence(value){const h=state.history[state.history.length-1];if(!h||h.confidence!=null)return;h.confidence=value;state.confidenceHistory.push({confidence:value,ok:h.ok,at:h.at,level:h.level||getActiveLevel(),skill:h.skill,type:h.type,errorTag:h.errorTag});if(state.confidenceHistory.length>500)state.confidenceHistory.shift();const bucket=String(h.reviewBucket||(h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'')),key=String(h.reviewKey||h.target||'');if(bucket&&key&&state[bucket]?.[key]){const b=state[bucket][key],event=b.lastSchedule;if(event&&Number(event.at)===Number(h.at)){scheduleNext(b,h.ok,h.ms,value,{now:event.at,baseStability:event.baseStability,baseLapses:event.baseLapses,baseLapseBurden:event.baseLapseBurden});state[bucket][key]=b}}save();confidencePopAnswered(value)}
+function setConfidence(value){const h=state.history[state.history.length-1];if(!h||h.confidence!=null)return;h.confidence=value;state.confidenceHistory.push({confidence:value,ok:h.ok,at:h.at,level:h.level||getActiveLevel(),skill:h.skill,type:h.type,errorTag:h.errorTag});if(state.confidenceHistory.length>500)state.confidenceHistory.shift();const bucket=String(h.reviewBucket||(h.type==='vocab'?'vocab':h.type==='grammar'?'grammar':'')),key=String(h.reviewKey||h.target||'');if(bucket&&key&&state[bucket]?.[key]){const b=state[bucket][key],event=b.lastSchedule;if(event&&Number(event.at)===Number(h.at)){scheduleNext(b,h.ok,h.ms,value,{now:event.at,baseStability:event.baseStability,baseLapses:event.baseLapses,baseLapseBurden:event.baseLapseBurden,baseStabilityDays:event.baseStabilityDays,baseLastSeen:event.baseLastSeen,difficulty:event.difficulty});state[bucket][key]=b}}save();confidencePopAnswered(value)}
 /* ==========================================================================
    m025-133 popup keyakinan
    ==========================================================================
@@ -1199,6 +1199,15 @@ function confidencePopNext(){
   closeConfidencePop();
   $('quizNext')?.click()
 }
+/* Braincore v3: taksiran kesulitan 1..6 sebuah materi untuk model memori FSRS-lite -
+   grammar memakai level CEFR lesson-nya, selebihnya level murid saat ini. Satu sumber
+   kebenaran yang sama dengan coreBrainMemory(), supaya dua pembaca tidak pelan-pelan beda. */
+function memoryItemDifficulty(bucket,key){
+  try{
+    if(bucket==='grammar'){const item=GRAMMAR_ITEMS.find(x=>x.skill===key);if(item)return Math.max(1,LEVELS.indexOf(item.level)+1)}
+  }catch{}
+  return Math.max(1,Math.min(6,Number(state.level||3)))
+}
 function dueItems(){const level=getActiveLevel();return [['vocab',state.vocab],['grammar',state.grammar],['reading',state.reading]].flatMap(([type,bucket])=>Object.entries(bucket||{}).filter(([key,x])=>x?.nextReview&&x.nextReview<=Date.now()&&(contentLevelFor(type,key)||level)===level))}
 function forgettingProbability(b){if(!b?.total)return 0;const stability=Math.max(.25,b.stability||1);const ageDays=Math.max(0,(Date.now()-(b.lastSeen||Date.now()))/86400000);return Math.min(.99,1-Math.exp(-ageDays/stability))}
 /**
@@ -1214,17 +1223,44 @@ function forgettingProbability(b){if(!b?.total)return 0;const stability=Math.max
 function scheduleNext(b,ok,ms,confidence,options={}){
   const now=Math.max(0,Number(options.now)||Date.now()),speed=Math.max(.5,Math.min(2,12000/Math.max(1500,ms||6000))),confFactor=confidence===3?(ok?1.12:.82):confidence===1?(ok?0.9:1.12):1;
   const stability=Math.max(.25,Number(options.baseStability??b.stability)||1),baseLapses=Math.max(0,Number(options.baseLapses??b.lapses)||0),baseBurden=Math.max(0,Number(options.baseLapseBurden??b.lapseBurden??b.lapses)||0);
+  const prevSeen=Math.max(0,Number(options.baseLastSeen??b.lastSeen)||0);
   if(ok)b.stability=Math.min(365,stability*(1.25+0.15*speed)*confFactor);else b.stability=Math.max(.25,stability*.42);
   b.lapses=baseLapses+(ok?0:1);b.lapseBurden=ok?Math.max(0,baseBurden*.65):Math.min(12,baseBurden*.7+1);
   const interval=ok?Math.max(b.mastery>=MASTERY_THRESHOLD?30:.5,b.stability):Math.min(1,Math.max(.25,b.stability));
   b.nextReview=now+interval*86400000;b.lastSeen=now;b.lastWrong=ok?b.lastWrong:now;
+  /* Braincore v3 (temuan T4 council): dua model memori hidup bersamaan dan yang menulis
+     jadwal adalah yang lebih lemah. Langkah transisi yang aman: FSRS-lite dari Core Brain
+     menulis stabilitasnya ke SIDECAR b.stabilityDays - field baru, dibaca coreBrainMemory()
+     dan halfLife() modul - TANPA menyentuh nextReview v1 dulu. Seluruhnya dijaga
+     availability-check + try/catch: tanpa modul, perilaku identik hari ini. */
+  try{
+    const brain=self.FiezelCoreBrain;
+    if(brain&&typeof brain.updateMemory==='function'){
+      const priorDays=Number(options.baseStabilityDays??b.stabilityDays);
+      const difficulty=Math.max(1,Math.min(6,Number(options.difficulty)||Number(state.level||3)));
+      // Prior: stabilitas FSRS yang sudah ada; kalau belum pernah ditulis, half-life model
+      // lama (formula modul bila tersedia, kalau tidak stabilitas v1) supaya transisinya mulus.
+      let prior=priorDays>0?priorDays:0;
+      if(!(prior>0)&&typeof brain.halfLife==='function'){
+        const h=Number(brain.halfLife({successes:Math.max(0,Number(b.correct??b.streak)||0),lapses:baseLapses,lapseBurden:baseBurden,difficulty}));
+        if(Number.isFinite(h)&&h>0)prior=h;
+      }
+      if(!(prior>0))prior=stability;
+      // Retrievability SAAT review: peluang materi masih teringat ketika soalnya muncul.
+      const ageDays=prevSeen>0?Math.max(0,(now-prevSeen)/86400000):0;
+      const retr=typeof brain.retrievability==='function'?Number(brain.retrievability(prior,ageDays)):Math.exp(-ageDays/Math.max(.05,prior));
+      const updated=brain.updateMemory({stability:prior,retrievability:Math.max(0,Math.min(1,Number(retr)||0)),difficulty,ok:!!ok});
+      const nextDays=Number(updated?.stability);
+      if(Number.isFinite(nextDays)&&nextDays>0)b.stabilityDays=Math.max(.05,Math.min(365,nextDays));
+    }
+  }catch{}
   return b;
 }
-function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now()){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};const baseStability=Math.max(.25,Number(b.stability)||1),baseLapses=Math.max(0,Number(b.lapses)||0),baseLapseBurden=Math.max(0,Number(b.lapseBurden??b.lapses)||0);b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;
+function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now()){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0,nextReview:0,stability:1,lapses:0,lapseBurden:0,lastSeen:0,lastWrong:0};const baseStability=Math.max(.25,Number(b.stability)||1),baseLapses=Math.max(0,Number(b.lapses)||0),baseLapseBurden=Math.max(0,Number(b.lapseBurden??b.lapses)||0),baseStabilityDays=Number(b.stabilityDays)>0?Number(b.stabilityDays):0,baseLastSeen=Math.max(0,Number(b.lastSeen)||0),itemDifficulty=memoryItemDifficulty(bucket,key);b.total++;if(ok){b.correct++;b.streak++}else b.streak=0;
   // m025-35: a teacher notices a run of misses. Tracked here because every answer in
   // the app passes through updateMastery, so no call site can forget to report.
   state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
-  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,ok:!!ok,ms:Math.max(0,Number(ms)||0)};state[bucket][key]=b;save()}
+  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};state[bucket][key]=b;save()}
 function markMastered(bucket,key){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;state[bucket][key]=b;save()}
 function dailyBrief(){const due=dueItems();const profile=getDiagnosticProfile();const weak=Object.entries(profile.weakSkills).sort((a,b)=>b[1].score-a[1].score)[0]?.[0];return {review:due.length,weak:weak||'Belum ada pola',goal:state.adaptiveReady?'12 soal adaptif':'Mulai tes awal'} }
 function getDiagnosticProfile(){
@@ -1340,10 +1376,17 @@ function coreBrainSessionAttempts(limit=32){
 /**
  * Materi yang masih hidup di ingatan, untuk model paruh-waktu.
  *
- * `successes` memakai `streak` (benar berturut-turut SEJAK kesalahan terakhir), bukan
- * `correct` total: yang melebarkan jarak ulangan adalah rentetan berhasil, dan satu
- * kesalahan memang harus mengembalikannya ke awal. Materi yang sudah dikuasai tidak ikut -
- * ia tidak punya jadwal ulang lagi.
+ * `successes` memakai hitungan benar KUMULATIF (`correct`), bukan `streak`. Temuan council
+ * (braincore v3): streak yang kembali ke nol pada satu kesalahan membuat model paruh-waktu
+ * menganggap materi yang sudah puluhan kali benar sebagai materi baru - padahal riwayat
+ * keberhasilan panjang itulah yang menstabilkan ingatan. Satu kesalahan sudah dihukum lewat
+ * `lapses` dan `lapseBurden`; menghukumnya dua kali lewat successes membuat jadwalnya salah.
+ * `streak` tetap jadi cadangan untuk state lama yang belum punya `correct`.
+ *
+ * `stability` (sidecar b.stabilityDays, ditulis scheduleNext lewat FiezelCoreBrain.updateMemory)
+ * diteruskan bila ada: halfLife() modul memakainya langsung, sehingga model FSRS-lite yang
+ * lebih akurat itu yang membaca - tanpa mengubah jadwal v1. Materi yang sudah dikuasai tidak
+ * ikut - ia tidak punya jadwal ulang lagi.
  */
 function coreBrainMemory(){
   const rows=[],active=getActiveLevel(),levelOf=key=>{const item=GRAMMAR_ITEMS.find(x=>x.skill===key);return item?LEVELS.indexOf(item.level)+1:0};
@@ -1351,8 +1394,13 @@ function coreBrainMemory(){
     for(const [key,b] of Object.entries(state[bucket]||{})){
       if(!b?.total||(contentLevelFor(bucket,key)||active)!==active)continue;
       const difficulty=bucket==='grammar'?levelOf(key):0;
+      const stabilityDays=Number(b.stabilityDays);
       rows.push({id:`${bucket}:${key}`,domain,skill:key,
-        successes:Math.max(0,Number(b.streak||0)),
+        successes:Math.max(0,Number(b.correct??b.streak)||0),
+        // Sidecar braincore v3: bila FSRS-lite sudah menulis stabilitasnya, halfLife() modul
+        // memakai angka ini langsung. Bila belum ada, field-nya tidak dikirim sama sekali
+        // supaya modul jatuh ke formula lamanya (kompat mundur).
+        ...(stabilityDays>0?{stability:stabilityDays}:{}),
         lapses:Math.max(0,Number(b.lapses||0)),
         lapseBurden:Math.max(0,Number(b.lapseBurden??b.lapses)||0),
         difficulty:difficulty>0?difficulty:Math.max(1,Math.min(6,Number(state.level||3))),
@@ -1435,13 +1483,59 @@ function coreBrainDigest(now=Date.now()){
 function tutorAvailable(){return !!self.FiezelTutorBrain}
 /** Identitas konsep sebuah soal - dipakai untuk mengelompokkan miskonsepsi lintas soal. */
 function quizConcept(q){return String(q?.lessonSkill||q?.conceptId||q?.skill||q?.type||'')}
+/* ---- Braincore v3 (temuan T5 council): buku besar miskonsepsi LINTAS SESI --------------
+ * Tutor Brain v3 mengingat miskonsepsi hanya selama satu sesi lalu amnesia total. Modul
+ * FiezelMisconceptionLedger (murni, tanpa storage) memegang matematikanya; app.js memegang
+ * persistensinya di kunci localStorage BARU 'fiezel-misconception-ledger-v1' - terpisah dari
+ * state utama dan dari fiezel-sl-v1-state, sesuai kontrak Braincore v3. Setiap pengait
+ * dijaga availability-check + try/catch: tanpa modul, perilaku identik hari ini. */
+const MISCONCEPTION_LEDGER_KEY='fiezel-misconception-ledger-v1';
+function misconceptionLedgerAvailable(){return !!self.FiezelMisconceptionLedger}
+function misconceptionLedgerRead(){
+  if(!misconceptionLedgerAvailable())return null;
+  try{const raw=localStorage.getItem(MISCONCEPTION_LEDGER_KEY);return raw?JSON.parse(raw):null}catch{return null}
+}
+function misconceptionLedgerWrite(ledger){
+  if(!ledger)return;
+  try{localStorage.setItem(MISCONCEPTION_LEDGER_KEY,JSON.stringify(ledger))}catch{}
+}
+/** Miskonsepsi yang masih AKTIF menurut buku besar (gate modul: >=3 bukti, >=2 sesi, belief>=0.7). */
+function misconceptionLedgerActive(now=Date.now()){
+  if(!misconceptionLedgerAvailable())return [];
+  try{const rows=self.FiezelMisconceptionLedger.active(misconceptionLedgerRead(),now);return Array.isArray(rows)?rows:[]}catch{return []}
+}
+/** Keluarga grammar sebuah soal - buku besar mengelompokkan bukti di tingkat keluarga. */
+function quizFamily(q){
+  try{const skill=String(q?.lessonSkill||q?.skill||'');return String(GRAMMAR_ITEMS.find(x=>x.skill===skill)?.family||'')}catch{return ''}
+}
+/** Satu bukti masuk buku besar: dipanggil dari tutorObserve untuk jawaban benar DAN salah -
+ *  jawaban benar pada konsep yang sama justru menurunkan keyakinan miskonsepsinya. */
+function misconceptionLedgerRecord(session,q,diagnosis,ok){
+  if(!misconceptionLedgerAvailable())return;
+  try{
+    const L=self.FiezelMisconceptionLedger,now=Date.now();
+    const ledger=L.update(misconceptionLedgerRead(),{
+      concept:quizConcept(q),
+      family:quizFamily(q),
+      misconception:String(diagnosis?.misconception||''),
+      correct:!!ok,
+      timing:String(diagnosis?.timing||''),
+      sessionId:String(session?.startedAt||state.activeSession?.startedAt||'')
+    },now);
+    misconceptionLedgerWrite(ledger);
+  }catch{}
+}
 function tutorSession(){
   if(!tutorAvailable())return null;
   try{
     // Baseline waktu jawab diambil dari kebiasaan murid SENDIRI, bukan ambang tetap: murid
     // yang memang lambat membaca tidak boleh selamanya terbaca "tersendat".
     const median=Number(remoteLearnerEvidenceSnapshot()?.behavior?.medianResponseMs||0);
-    return self.FiezelTutorBrain.createSession({now:Date.now(),baselineMs:median>0?median:0})
+    // Braincore v3 (T5): miskonsepsi aktif dari buku besar lintas sesi ikut masuk sebagai
+    // prior - tutor tidak lagi memulai setiap sesi dengan amnesia. Guarded: tanpa modul
+    // ledger, argumen ini tidak dikirim dan createSession berjalan persis seperti dulu.
+    const priorMisconceptions=misconceptionLedgerActive();
+    return self.FiezelTutorBrain.createSession({now:Date.now(),baselineMs:median>0?median:0,...(priorMisconceptions.length?{priorMisconceptions}:{})})
   }catch{return null}
 }
 /**
@@ -1473,6 +1567,11 @@ function tutorObserve(session,q,pickedIndex,ok,ms,ctx={}){
       skill:q?.skill||'',concept:quizConcept(q),ms,now:Date.now(),scored:ctx.scored!==false
     });
     const decision=T.decideMove(session,diagnosis,{remaining:Number(ctx.remaining)||0,fatigue:coreBrainSnapshot()?.fatigue?.state||''});
+    // Braincore v3 (T5): setiap diagnosis juga menjadi bukti di buku besar lintas sesi.
+    // Hanya jawaban ternilai (bukan retry) - retry adalah bukti scaffolding, bukan bukti
+    // keyakinan murid. Fungsi ini punya try/catch sendiri: gagal menulis ledger tidak boleh
+    // menggagalkan keputusan tutor.
+    if(ctx.scored!==false)misconceptionLedgerRecord(session,q,diagnosis,ok);
     const mastery=Number(state.grammar?.[q?.lessonSkill||q?.skill]?.mastery||state.vocab?.[q?.target]?.mastery||0);
     const scaffold=T.scaffoldLevel({
       priorMisses:Number(diagnosis.priorMisses||0),
@@ -1575,7 +1674,21 @@ function tutorSummary(session){
 function applyCoreBrain(policy,now=Date.now()){
   const snapshot=coreBrainSnapshot(now);
   if(!snapshot)return policy;
-  try{return self.FiezelCoreBrain.refinePolicy(policy,snapshot)}catch{return policy}
+  try{
+    const refined=self.FiezelCoreBrain.refinePolicy(policy,snapshot);
+    /* Braincore v3 (T2/T3): teruskan target kesulitan KONTINU dari jendela tantangan ke
+       kebijakan, supaya buildAdaptivePool menghukum jarak ke target sesungguhnya - bukan ke
+       pembulatannya. Pergeseran integer yang dilakukan planSession (declining/plateau/improving)
+       ikut dipindahkan ke nilai kontinunya supaya keduanya tetap satu keputusan. */
+    try{
+      const win=snapshot.challenge,exact=Number(win?.exactDifficulty);
+      if(refined&&Number.isFinite(exact)&&exact>0){
+        const shift=Number(refined.targetDifficulty)-Number(win.targetDifficulty);
+        refined.exactDifficulty=Math.max(1,Math.min(6,exact+(Number.isFinite(shift)?shift:0)));
+      }
+    }catch{}
+    return refined
+  }catch{return policy}
 }
 window.__fiezelCoreBrainSnapshot=()=>coreBrainSnapshot();
 function buildAdaptivePolicy(now=Date.now()){return applyCoreBrain(deriveAdaptivePolicy({snapshot:buildLearningSnapshot(),evidence:remoteLearnerEvidenceSnapshot(now),outcomes:recentPolicyOutcomes(5),now}),now)}
@@ -1599,10 +1712,28 @@ function reportStatusLabel(){if(!state.preferences?.reportConsent)return'Laporan
    pernah benar-benar dipilih - ia satu-satunya yang tersisa. Panjang sesi tidak berubah. */
 function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplier=1){
  if(!state.adaptiveReady)return [];const profile=getDiagnosticProfile(),level=getActiveLevel(),candidates=[],seen=new Set(),now=Date.now(),primary=normalizePolicyDomain(policy?.primaryDomain),secondary=normalizePolicyDomain(policy?.secondaryDomain),targetSkill=String(policy?.targetSkill||'');
- const add=(q,baseScore,meta={})=>{if(!q||!q.options||q.answerIndex<0||seen.has(sigQ(q)))return;seen.add(sigQ(q));const domain=normalizePolicyDomain(q.type),skill=String(q.lessonSkill||q.skill||''),difficulty=Number(q.difficulty||LEVELS.indexOf(level)+1),measured=!!meta.measured,due=!!meta.due,risk=Number(meta.risk||0);let score=Number(baseScore||0);if(domain===primary)score+=8;if(domain===secondary)score+=3;if(targetSkill&&(skill===targetSkill||skill.includes(targetSkill)||targetSkill.includes(skill)))score+=14;if(due)score+=8+Number(policy?.reviewShare||0)*8;score+=risk*7;if(policy?.avoidNewContent&&!measured)score-=10;score-=Math.abs(difficulty-Number(policy?.targetDifficulty||difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};
+ const add=(q,baseScore,meta={})=>{if(!q||!q.options||q.answerIndex<0||seen.has(sigQ(q)))return;seen.add(sigQ(q));const domain=normalizePolicyDomain(q.type),skill=String(q.lessonSkill||q.skill||''),difficulty=Number(q.difficulty||LEVELS.indexOf(level)+1),measured=!!meta.measured,due=!!meta.due,risk=Number(meta.risk||0);let score=Number(baseScore||0);if(domain===primary)score+=8;if(domain===secondary)score+=3;if(targetSkill&&(skill===targetSkill||skill.includes(targetSkill)||targetSkill.includes(skill)))score+=14;if(due)score+=8+Number(policy?.reviewShare||0)*8;score+=risk*7;if(policy?.avoidNewContent&&!measured)score-=10;
+ /* Braincore v3 (temuan T2/T3 council): targetDifficulty yang dibulatkan ke integer membuat
+    target sukses aktual berayun 0,47..0,89. Term penalti memakai target KONTINU
+    (exactDifficulty dari jendela tantangan Core Brain) bila ada; targetDifficulty integer
+    tetap jadi cadangan supaya perilaku tanpa modul identik. */
+ const targetD=Number(policy?.exactDifficulty??policy?.targetDifficulty);
+ score-=Math.abs(difficulty-(Number.isFinite(targetD)&&targetD>0?targetD:difficulty))*1.4;candidates.push({q,score,domain,skill,measured,due,risk})};
  for(const v of V){if(v.level!==level)continue;const b=state.vocab[v.id],due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;const risk=forgettingProbability(b),score=(profile.weakTargets[v.id]||0)*3+risk*6+(100-(b.mastery||0))*.04;const q=makeVocabQuestion(v);q.difficulty=LEVELS.indexOf(v.level)+1;add(q,score,{measured:true,due,risk})}
- for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?Math.min(8,GRAMMAR_PRACTICE_MODES.length):1;for(let variant=0;variant<variants;variant++)add(makeGrammarQuestion(skill,item,variant,skill),score-variant*.05,{measured:true,due,risk})}}
- for(const r of R){if(r.level!==level)continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){const skill=`reading_${(q0?.[3]&&typeof q0[3]==='object'&&q0[3].type)||'detail'}`/* m025-163: q0 itu TUPLE - q0.skill/q0.type selalu undefined, semua soal reading diskor sebagai reading_detail (temuan Fable) */,risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2);add(makeReadingQuestion(r,q0,i),score,{measured:!!b,due,risk})}}
+ for(const [skill,b] of Object.entries(state.grammar)){const grammarMeta=GRAMMAR_ITEMS.find(x=>x.skill===skill);if(grammarMeta?.level!==level)continue;const due=!!(b?.nextReview&&b.nextReview<=now);if(!b?.total||(b.mastery>=MASTERY_THRESHOLD&&!due))continue;for(const item of (G[skill]||[])){const risk=forgettingProbability(b),score=(profile.weakSkills[skill]?.score||0)*10+risk*6+(100-b.mastery)*.04,variants=targetSkill===skill?Math.min(8,GRAMMAR_PRACTICE_MODES.length):1;for(let variant=0;variant<variants;variant++){const q=makeGrammarQuestion(skill,item,variant,skill);
+  /* Braincore v3 (temuan T1 council): semua item ber-difficulty = indeks level CEFR, jadi IRT
+     berdegenerasi menjadi pelacak akurasi. FiezelItemPrior memberi variansi kesulitan NYATA
+     per mode latihan (teach_back lebih berat daripada recognition dasar). Dijaga penuh:
+     tanpa modul, q.difficulty tetap nilai lama dari makeGrammarQuestion. */
+  try{const prior=Number(self.FiezelItemPrior?.difficultyFor?.({level:q.level,mode:q.practiceMode||GRAMMAR_PRACTICE_MODES[variant%GRAMMAR_PRACTICE_MODES.length],domain:'grammar'}));if(Number.isFinite(prior)&&prior>0)q.difficulty=prior}catch{}
+  add(q,score-variant*.05,{measured:true,due,risk})}}}
+ for(const r of R){if(r.level!==level)continue;const b=state.reading[r.id],due=!!(b?.nextReview&&b.nextReview<=now);if(b?.mastery>=MASTERY_THRESHOLD&&!due)continue;for(const [i,q0] of (r.qs||[]).entries()){
+  /* m025-163: q0 itu TUPLE [stem, options, answerIndex, meta] - q0.skill/q0.type selalu
+     undefined, dulu semua soal reading diskor sebagai reading_detail (temuan Fable/council).
+     Tipe dibaca dari meta di indeks 3; kalau bank tidak menyimpannya, diturunkan dari teks
+     pertanyaan lewat readingSkill() - RUMUS YANG SAMA dengan makeReadingQuestion, supaya
+     skill di kolam ini selalu identik dengan q.skill soal yang dihasilkannya. */
+  const meta0=q0?.[3]&&typeof q0[3]==='object'?q0[3]:null,skill=`reading_${(meta0&&meta0.type)||readingSkill(q0?.[0])||'detail'}`,risk=b?forgettingProbability(b):0,score=(profile.weakSkills[skill]?.score||0)*10+(b?risk*6:2);add(makeReadingQuestion(r,q0,i),score,{measured:!!b,due,risk})}}
  const requested=Math.max(1,Math.round(Number(count)||1)),limit=Math.max(requested,Math.min(candidates.length,requested*Math.max(1,Math.min(5,Math.round(Number(reservoirMultiplier)||1))))),ranked=candidates.sort((a,b)=>b.score-a.score),result=[],picked=new Set(),take=(fn,n)=>{for(const x of ranked){if(result.length>=limit||n<=0)break;if(picked.has(x)||!fn(x))continue;picked.add(x);result.push(x.q);n--}};
  if(targetSkill)take(x=>x.skill===targetSkill||x.skill.includes(targetSkill)||targetSkill.includes(x.skill),Math.ceil(limit*.4));
  if(primary)take(x=>x.domain===primary,Math.ceil(limit*.55)-result.filter(q=>normalizePolicyDomain(q.type)===primary).length);
@@ -5534,7 +5665,7 @@ prefetchPlacementListening();
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
 document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
