@@ -103,7 +103,20 @@ wrangler secret put PUTER_CLAIM_SECRET_CURRENT   # verifikasi tiket klaim dari W
 wrangler secret put PUTER_CLAIM_SECRET_PREVIOUS  # opsional, untuk rotasi
 wrangler secret put IDENTITY_PEPPER              # pepper HMAC untuk pengenal turunan
 wrangler secret put TURNSTILE_SECRET             # dipakai fase penahan penyalahgunaan
+wrangler secret put EDGE_SHARED_SECRET           # header X-Fiezel-Edge dari proxy jembatan origin
 ```
+
+`EDGE_SHARED_SECRET` menutup lubang khusus masa transisi: selama zona
+`fiezel.my.id` belum di Cloudflare, `api.fiezel.my.id` adalah proxy PHP di origin
+ArenHost (`deploy/edge/api-index.php`) yang meneruskan ke
+`https://fiezel-api.fitrajft.workers.dev`. Alamat `*.workers.dev` itu publik.
+Tanpa secret ini, siapa pun bisa memanggilnya langsung, melewati jembatan, dan
+menerbitkan identitas anonim tanpa batas — tiap penerbitan menulis baris D1 dan
+membawa jatah gratisnya sendiri. Dengan secret terpasang, `mw-edge.js` menolak
+403 setiap permintaan tanpa header yang cocok (perbandingan waktu-konstan),
+kecuali `/healthz`. Tanpa secret, Worker tetap jalan dan `/health` melaporkan
+`edgeGuard:"off"` — keadaan itu hanya sah selama masa transisi. Nilainya harus
+sama dengan yang disuntik ke proxy; lihat `deploy/edge/README.md`.
 
 Cara membuat nilainya:
 

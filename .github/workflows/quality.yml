@@ -156,6 +156,15 @@ jobs:
           node puter-popup-once-test.js
           node cf-api-contract-test.js
           node cf-wiring-test.js
+          # E9: penjaga jembatan edge. Dijalankan tepat sesudah dua gerbang kontrak Worker
+          # karena ia menguji berkas yang sama (`workers/api/index.js`, `route-health.js`) dari
+          # sisi ketiga: siapa yang BOLEH memanggil Worker sama sekali. Selama zona
+          # `fiezel.my.id` belum di Cloudflare, `api.fiezel.my.id` adalah proxy PHP di origin
+          # dan alamat `*.workers.dev` tetap publik — gerbang ini yang menjaga header bersama
+          # `X-Fiezel-Edge` benar-benar ditegakkan (waktu-konstan), bahwa `/healthz` tidak
+          # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
+          # memuat nilai secret sungguhan.
+          node edge-guard-test.js
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
