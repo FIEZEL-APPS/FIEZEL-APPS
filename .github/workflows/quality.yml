@@ -180,6 +180,15 @@ jobs:
           node breaker-test.js
           node prerender-dryrun-test.js
           node owner-dashboard-test.js
+          # S4: gerbang jembatan `owner.fiezel.my.id`. Ditempatkan TEPAT sesudah
+          # `owner-dashboard-test.js` karena keduanya menguji `workers/owner/index.js`, tetapi
+          # dari dua sisi berbeda: yang di atas menjaga siapa yang boleh MELIHAT angka (sesi
+          # owner), yang ini menjaga siapa yang boleh MEMANGGIL Worker sama sekali (header
+          # jembatan `X-Fiezel-Edge`) — dan bahwa dua lapis itu tidak saling menggantikan.
+          # Ia juga membuktikan header keamanan HTML (CSP ketat, noindex) tidak hilang di
+          # perjalanan lewat daftar pass-through `deploy/edge/owner-index.php`, dan bahwa
+          # berkas PHP itu tidak pernah memuat nilai secret sungguhan.
+          node owner-edge-guard-test.js
           node tools/cf-test-harness.js
           node no-network-test.js
           # `cf-live-selftest.js` membuktikan gerbang live di bawah ini bisa MERAH:
