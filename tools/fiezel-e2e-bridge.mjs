@@ -130,10 +130,17 @@ const HOP_TIMEOUT = 8000;
 const checks = [];
 const network = [];
 let failed = false;
-const check = (id, name, ok, details) => {
-  checks.push({ id, name, status: ok ? 'PASS' : 'FAIL', details: String(details) });
-  if (!ok) failed = true;
+// Tiga status, bukan dua. `INCONCLUSIVE` ada karena satu assert di gerbang ini
+// (presedensi flag server dua arah) hanya bisa diuji kalau KEADAAN SERVER memungkinkan:
+// ia butuh sekurangnya satu flag server bernilai true DAN satu bernilai false dalam putaran
+// yang sama. Kalau keadaan itu tidak ada, satu-satunya jawaban jujur adalah "tidak bisa
+// disimpulkan" — dan itu BUKAN lulus. Karena itu `INCONCLUSIVE` ikut menjatuhkan `failed`:
+// gerbang yang tidak bisa membuktikan sesuatu tidak boleh mengaku hijau.
+const checkStatus = (id, name, status, details) => {
+  checks.push({ id, name, status, details: String(details) });
+  if (status !== 'PASS') failed = true;
 };
+const check = (id, name, ok, details) => checkStatus(id, name, ok ? 'PASS' : 'FAIL', details);
 
 function writeReport(extra) {
   const report = {
@@ -141,7 +148,8 @@ function writeReport(extra) {
     ...extra,
     counts: {
       pass: checks.filter(c => c.status === 'PASS').length,
-      fail: checks.filter(c => c.status === 'FAIL').length
+      fail: checks.filter(c => c.status === 'FAIL').length,
+      inconclusive: checks.filter(c => c.status === 'INCONCLUSIVE').length
     },
     checks,
     network
@@ -618,9 +626,12 @@ try {
   });
 
   /* --- B. config 'on': sekali per boot, tidak memblokir, flag server MENANG ------------- */
+  // Statis SEMUA 'on' dengan sengaja: itu batas ATAS yang paling agresif yang bisa dipasang
+  // klien. Dengan begitu setiap keputusan "tidak jadi memanggil" pada putaran ini HANYA bisa
+  // datang dari flag server, bukan dari konfigurasi klien.
   await withScenario({
     name: 'B-config-on',
-    cfg: { enabled: true, base: BRIDGE_ORIGIN, endpoints: { ...OFF, config: 'on', quota: 'on' } },
+    cfg: { enabled: true, base: BRIDGE_ORIGIN, endpoints: { health: 'on', config: 'on', auth: 'on', quota: 'on', ai: 'on', tts: 'on', usage: 'on' } },
     delayConfig: true
   }, async api => {
     const shot = await api.shot('b-config-on');
@@ -651,26 +662,131 @@ try {
       api.boot.readyEpoch > 0 && fulfilled > 0 && (fulfilled - api.boot.readyEpoch) > NONBLOCK_MARGIN,
       `bootReady=${api.boot.readyEpoch ? new Date(api.boot.readyEpoch).toISOString() : '(tidak pernah)'} configTiba=${fulfilled ? new Date(fulfilled).toISOString() : '(tidak pernah)'} selisih=${fulfilled && api.boot.readyEpoch ? Math.round(fulfilled - api.boot.readyEpoch) : 0} ms margin=${NONBLOCK_MARGIN} ms`);
 
-    // Kemenangan flag server: statis quota='on', tetapi jembatan menjawab flags semuanya
-    // false ⇒ panggilan kuota TIDAK boleh menyentuh jembatan.
-    //
+    /* ===================================================================================
+     * PRESEDENSI FLAG SERVER, DUA ARAH — pengganti assert `server-flag-wins` yang lama
+     * =================================================================================
+     * VERSI LAMA menuntut jembatan menjawab `flags` SEMUANYA false, lalu membuktikan satu
+     * hal saja: statis 'on' + server false ⇒ nol permintaan. Dua cacat serius:
+     *
+     *   1. Ia menuntut KEADAAN KV yang bertentangan dengan keadaan yang dibutuhkan 12 assert
+     *      lain di putaran yang sama (`cfg:flags` tahap rollout R2–R3 memang berisi
+     *      cfApiEnabled/cfIdentityEnabled/cfQuotaEnabled = true). Satu putaran tidak bisa
+     *      menuntut dua keadaan KV sekaligus, jadi assert itu terkunci merah selamanya
+     *      bukan karena produk salah.
+     *   2. Premisnya bisa dipenuhi oleh KEDIAMAN: `serverSaysOff = !flags || ...` berarti
+     *      `flags` null (jawaban /api/config tidak pernah tiba) DIHITUNG memenuhi premis,
+     *      dan nol permintaan karena aplikasi mati DIHITUNG lulus. Hijaunya yang lama
+     *      memang HIJAU BOHONG (lihat reports/fix-f6-client-timeout.md).
+     *
+     * VERSI INI memakai kenyataan yang lebih kuat: flag server TIDAK seragam. Pada keadaan
+     * KV hari ini `cfQuotaEnabled`/`cfIdentityEnabled` = true sementara
+     * `cfAiEnabled`/`cfTtsEnabled`/`cfAnalyticsEnabled` = false. Dengan statis SEMUA 'on',
+     * satu putaran bisa membuktikan presedensi ke DUA arah sekaligus:
+     *
+     *   - endpoint yang flag servernya TRUE  ⇒ WAJIB ada permintaan ke jembatan;
+     *   - endpoint yang flag servernya FALSE ⇒ WAJIB NOL permintaan ke jembatan.
+     *
+     * Itu bukti yang lebih keras, karena aplikasi yang DIAM (nol permintaan untuk semua)
+     * langsung merah di arah pertama, dan aplikasi yang mengabaikan flag server langsung
+     * merah di arah kedua. Tidak ada satu pun keadaan di mana "tidak terjadi apa-apa"
+     * terbaca sebagai lulus.
+     *
+     * Dan kalau keadaan KV kebetulan SERAGAM (semua true atau semua false), presedensi dua
+     * arah memang TIDAK bisa diuji pada putaran itu. Jawabannya `INCONCLUSIVE`, bukan lulus.
+     *
+     * Peta flag di bawah adalah salinan `CF_SERVER_FLAG_FOR`/`CF_SERVER_KILL_FOR` di app.js:
+     * gerbang menghitung sendiri apa yang SEHARUSNYA hidup dari jawaban server, lalu
+     * membandingkannya dengan apa yang benar-benar terjadi di kabel.
+     */
     // Jawaban /api/config ditunggu DULU. Tanpa penantian ini yang teruji hanyalah lomba
-    // (panggilan kuota bisa jatuh sebelum flag server sempat tiba), dan gerbang yang menguji
-    // lomba akan berkedip merah-hijau tanpa ada yang berubah. Yang mau diuji adalah ATURANnya:
-    // sesudah flag server diketahui, statis 'on' harus kalah.
+    // (panggilan bisa jatuh sebelum flag server sempat tiba), dan gerbang yang menguji lomba
+    // akan berkedip merah-hijau tanpa ada yang berubah.
     const configDeadline = Date.now() + CONFIG_DELAY + 10000;
     while (Date.now() < configDeadline && !api.responses.some(r => r.url.startsWith(BRIDGE_ORIGIN + '/api/config'))) {
       await api.page.waitForTimeout(100);
     }
     await api.page.waitForTimeout(300); // jeda kecil: halaman perlu satu putaran untuk menyimpan flag
-    const serverSaysOff = !flags || Object.values(flags).every(v => v === false);
-    const before = api.bridgeRequests('/api/quota').length;
-    const call = await api.call('/api/quota', {}, 6000);
-    const after = api.bridgeRequests('/api/quota').length;
-    check('server-flag-wins', 'Kill switch server MENANG: flags server false mengalahkan statis "on" (nol permintaan /api/quota ke jembatan)',
-      serverSaysOff && after === before && after === 0,
-      `serverFlagsSemuaFalse=${serverSaysOff} permintaanQuotaKeJembatan=${after} hasilPanggilan=${JSON.stringify(call).slice(0, 200)}`);
-    return { screenshot: shot, configPayload: payload, panggilanQuota: call.timeout ? 'timeout (diharapkan: jalur non-CF)' : JSON.stringify(call).slice(0, 200) };
+
+    const SERVER_FLAG_FOR = { auth: 'cfIdentityEnabled', quota: 'cfQuotaEnabled', ai: 'cfAiEnabled', tts: 'cfTtsEnabled', usage: 'cfAnalyticsEnabled' };
+    const SERVER_KILL_FOR = { ai: ['ai', 'coach'], tts: ['tts'], usage: ['analytics'] };
+    const PROBE = {
+      auth: { path: '/api/auth/anon', options: { method: 'POST' }, prefix: '/api/auth' },
+      quota: { path: '/api/quota', options: {}, prefix: '/api/quota' },
+      ai: { path: '/api/ai/task', options: { method: 'POST' }, prefix: '/api/ai' },
+      tts: { path: '/api/tts', options: { method: 'POST' }, prefix: '/api/tts' },
+      usage: { path: '/api/usage', options: {}, prefix: '/api/usage' }
+    };
+    const kill = payload && typeof payload.enabled === 'object' && payload.enabled ? payload.enabled : null;
+    // Salinan aturan app.js: sakelar induk, lalu flag bernama, lalu lapis `enabled` yang
+    // hanya bisa mematikan. `!== true` (bukan `=== false`) disengaja: flag absen = mati.
+    const serverAllows = key => {
+      if (!flags) return false;
+      if (flags.cfApiEnabled !== true) return false;
+      if (flags[SERVER_FLAG_FOR[key]] !== true) return false;
+      for (const feature of (SERVER_KILL_FOR[key] || [])) if (kill && kill[feature] === false) return false;
+      return true;
+    };
+    const endpointKeys = Object.keys(SERVER_FLAG_FOR);
+    const harusSampai = flags ? endpointKeys.filter(serverAllows) : [];
+    const harusNol = flags ? endpointKeys.filter(k => !serverAllows(k)) : [];
+    const flagDump = flags ? endpointKeys.map(k => `${k}:${SERVER_FLAG_FOR[k]}=${flags[SERVER_FLAG_FOR[k]] === true}`).join(' ') : '(tidak ada flags)';
+    const partisi = `induk cfApiEnabled=${flags ? flags.cfApiEnabled === true : '(n/a)'} | ${flagDump} | harusSampai=[${harusSampai.join(',')}] harusNol=[${harusNol.join(',')}]`;
+
+    const IDS = ['server-flag-partition', 'server-flag-wins-off', 'server-flag-wins-on'];
+    const NAMES = {
+      'server-flag-partition': 'Premis presedensi dua arah tersedia: jawaban /api/config SUNGGUHAN tiba dan flag server TIDAK seragam (≥1 true DAN ≥1 false)',
+      'server-flag-wins-off': 'Kill switch server MENANG: endpoint yang flag servernya false ⇒ NOL permintaan ke jembatan, walau statis klien "on"',
+      'server-flag-wins-on': 'Bukan diam-diam mati: endpoint yang flag servernya true ⇒ permintaan BENAR-BENAR sampai ke jembatan, dengan statis klien "on" yang sama'
+    };
+    let presedensi = [];
+    if (!flags || Object.keys(flags).length === 0) {
+      // SYARAT 1: kegagalan "aplikasi diam" TIDAK BOLEH lagi terbaca sebagai lulus. Tanpa
+      // flag yang sungguhan tiba, ketiga assert ini MERAH — bukan INCONCLUSIVE, karena
+      // "jawaban config tidak pernah diterima aplikasi" adalah cacat, bukan keadaan KV.
+      for (const id of IDS) {
+        check(id, NAMES[id], false,
+          'flag server TIDAK diterima aplikasi (flags null/kosong) — premis tidak terbukti, jadi MERAH, bukan lulus. ' + partisi);
+      }
+    } else if (harusSampai.length === 0 || harusNol.length === 0) {
+      // SYARAT 3: seluruh flag bernilai sama ⇒ presedensi dua arah tidak bisa diuji putaran
+      // ini. Dilaporkan eksplisit dan TIDAK dihitung lulus (checkStatus menjatuhkan `failed`).
+      for (const id of IDS) {
+        checkStatus(id, NAMES[id], 'INCONCLUSIVE',
+          `flag server SERAGAM, presedensi dua arah tidak bisa diuji pada keadaan KV ini. ${partisi}`);
+      }
+    } else {
+      // Arah "harus nol" dijalankan LEBIH DULU: kalau aplikasi bocor, kebocorannya terlihat
+      // sebelum panggilan sah menambah permintaan ke jembatan pada koneksi yang sama.
+      for (const key of [...harusNol, ...harusSampai]) {
+        const probe = PROBE[key];
+        const wajibSampai = harusSampai.includes(key);
+        const before = api.bridgeRequests(probe.prefix).length;
+        // Endpoint yang harus MATI jatuh ke jalur non-CF (Puter) yang bisa menggantung; batas
+        // pendek cukup, karena yang diukur adalah ADA/TIDAK ADA permintaan ke jembatan.
+        const call = await api.call(probe.path, probe.options, wajibSampai ? 8000 : 4000);
+        const after = api.bridgeRequests(probe.prefix).length;
+        presedensi.push({
+          endpoint: key,
+          flagServer: SERVER_FLAG_FOR[key],
+          nilaiFlag: flags[SERVER_FLAG_FOR[key]] === true,
+          statisKlien: 'on',
+          harus: wajibSampai ? 'sampai ke jembatan' : 'nol permintaan',
+          permintaanBaru: after - before,
+          statusHttp: call.status || 0,
+          timeout: !!call.timeout,
+          ms: call.ms
+        });
+      }
+      const bocor = presedensi.filter(p => p.harus === 'nol permintaan' && p.permintaanBaru > 0);
+      const bisu = presedensi.filter(p => p.harus === 'sampai ke jembatan' && p.permintaanBaru < 1);
+      const rekap = presedensi.map(p => `${p.endpoint}(${p.flagServer}=${p.nilaiFlag}) ${p.harus} → ${p.permintaanBaru} permintaan${p.timeout ? ' TIMEOUT' : ' status ' + p.statusHttp}`).join(' | ');
+      check('server-flag-partition', NAMES['server-flag-partition'], true, partisi);
+      check('server-flag-wins-off', NAMES['server-flag-wins-off'], bocor.length === 0,
+        (bocor.length ? 'BOCOR: ' + bocor.map(p => p.endpoint).join(',') + ' — ' : '') + rekap);
+      check('server-flag-wins-on', NAMES['server-flag-wins-on'], bisu.length === 0,
+        (bisu.length ? 'TIDAK SAMPAI: ' + bisu.map(p => p.endpoint).join(',') + ' — ' : '') + rekap);
+    }
+    return { screenshot: shot, configPayload: payload, presedensiFlagServer: presedensi, partisiFlag: partisi };
   });
 
   /* --- C0. Anti-vakum, konteks SENDIRI: tanpa cookie, /api/quota harus 401 -------------- */
@@ -758,9 +874,17 @@ check('no-workers-dev', 'NOL permintaan langsung ke *.workers.dev dari browser (
 check('scenarios-complete', `Semua skenario yang diminta dijalankan (${EXPECTED_SCENARIOS} dari ${ALL_SCENARIOS.length}; gerbang tidak boleh hijau karena berhenti di tengah)`,
   scenarioLog.length === EXPECTED_SCENARIOS, scenarioLog.map(s => s.skenario).join(', ') || '(tidak ada)');
 
+// Tiga hasil, dan urutannya penting: satu assert MERAH selalu mengalahkan INCONCLUSIVE
+// (cacat lebih penting daripada premis yang tidak tersedia), dan INCONCLUSIVE selalu
+// mengalahkan PASS. `pass` tetap false pada INCONCLUSIVE: gerbang ini tidak pernah
+// mengubah "tidak bisa disimpulkan" menjadi lulus.
+const hardFail = checks.some(c => c.status === 'FAIL');
+const inconclusive = checks.some(c => c.status === 'INCONCLUSIVE');
+const overallStatus = hardFail ? 'FAIL' : (inconclusive ? 'INCONCLUSIVE' : 'PASS');
 const report = writeReport({
-  status: failed ? 'FAIL' : 'PASS',
-  pass: !failed,
+  status: overallStatus,
+  pass: overallStatus === 'PASS',
+  inconclusiveIds: checks.filter(c => c.status === 'INCONCLUSIVE').map(c => c.id),
   bridge: BRIDGE_ORIGIN,
   appHost: APP_HOST,
   appDir: APP_DIR,
@@ -773,8 +897,14 @@ const report = writeReport({
   skenario: scenarioLog,
   hostDisentuh: [...new Set(network.map(r => r.host))].sort()
 });
+const total = report.counts.pass + report.counts.fail + report.counts.inconclusive;
 console.log(JSON.stringify(report, null, 2));
-console.log(failed
-  ? `E2E jembatan: MERAH (${report.counts.fail} dari ${report.counts.pass + report.counts.fail} assert) terhadap ${BRIDGE_ORIGIN}`
-  : `E2E jembatan: HIJAU (${report.counts.pass} assert) terhadap ${BRIDGE_ORIGIN}`);
+if (overallStatus === 'FAIL') {
+  console.log(`E2E jembatan: MERAH (${report.counts.fail} dari ${total} assert) terhadap ${BRIDGE_ORIGIN}`);
+} else if (overallStatus === 'INCONCLUSIVE') {
+  console.log(`E2E jembatan: INCONCLUSIVE (${report.counts.inconclusive} dari ${total} assert tidak bisa disimpulkan: ${report.inconclusiveIds.join(', ')}) terhadap ${BRIDGE_ORIGIN}`);
+  console.log('INCONCLUSIVE BUKAN HIJAU: premis assert itu tidak tersedia pada keadaan server saat diuji, jadi tidak ada yang terbukti.');
+} else {
+  console.log(`E2E jembatan: HIJAU (${report.counts.pass} assert) terhadap ${BRIDGE_ORIGIN}`);
+}
 if (failed) process.exitCode = 1;
