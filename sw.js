@@ -16,7 +16,10 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // tipografi, cleanup token pastel) + berkas font baru Fredoka-var.woff2. style.css
 // dan assets/fonts ada di shell, jadi revisi HARUS naik. Naik SEKALI untuk seluruh
 // fase, bukan per kelompok: tiap kenaikan memaksa unduh ulang cangkang.
-const SW_REV='m025-172-jembatan-edge-api-20260827';
+// Fase 2 (B3): revisi dinaikkan karena daftar precache berubah (listening adaptif + cloze
+// bank) - tanpa menaikkan SW_REV, shell cache lama tetap dipakai dan berkas baru tidak
+// pernah masuk precache pengguna lama.
+const SW_REV='braincore-v3-fase2-b3-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -37,7 +40,13 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // Braincore v3: sembilan modul penalaran baru ikut precache shell - PWA ini offline-first,
   // dan modul brain yang tidak ter-cache berarti murid offline kehilangan lapisan adaptifnya
   // secara diam-diam padahal berkasnya kecil dan murni fungsi.
-  './features/brain/fiezel-misconception-ledger.js','./features/brain/fiezel-item-prior.js','./features/brain/fiezel-evidence-credibility.js','./features/brain/fiezel-mastery-bkt.js','./features/brain/fiezel-olm.js','./features/brain/fiezel-affect.js','./features/brain/fiezel-confusion-matrix.js','./features/brain/fiezel-step-tutor.js','./features/brain/fiezel-production-grader.js'];
+  './features/brain/fiezel-misconception-ledger.js','./features/brain/fiezel-item-prior.js','./features/brain/fiezel-evidence-credibility.js','./features/brain/fiezel-mastery-bkt.js','./features/brain/fiezel-olm.js','./features/brain/fiezel-affect.js','./features/brain/fiezel-confusion-matrix.js','./features/brain/fiezel-step-tutor.js','./features/brain/fiezel-production-grader.js',
+  // Fase 2 (B3 butir 8): modul listening adaptif + bank cloze (B6/B7). Ikut precache karena
+  // dipakai kebijakan sesi offline. Ingat: cache.addAll gagal total bila salah satu 404,
+  // jadi entri ini baru boleh mendarat ketika berkasnya ada di repo - dan keduanya sudah ada.
+  // (Catatan alat: pwa-cache-test membaca array ini dengan regex yang berhenti di titik koma
+  // pertama - jangan menaruh titik koma di dalam komentar array ini.)
+  './features/brain/fiezel-listening-adaptive.js','./cloze-bank-v1.json'];
 // m025-142 (B-11): pencocok ini SEMPAT dimatikan jadi `()=>false` dengan alasan "model lokal
 // sudah dihapus". Modelnya tidak dihapus - vendor/supertonic-3 masih 152 MB dan masih disajikan
 // dari origin yang sama. Selama pencocoknya mati, setiap permintaan ke berkas itu jatuh ke
