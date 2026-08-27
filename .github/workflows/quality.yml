@@ -167,6 +167,15 @@ jobs:
           node puter-popup-once-test.js
           node cf-api-contract-test.js
           node cf-wiring-test.js
+          # A6/D1: kontrak SKEMA D1. Dijalankan tepat sesudah `cf-wiring-test.js` karena
+          # keduanya membaca berkas yang sama (`workers/api/migrations/*.sql`) dari dua sisi:
+          # yang di atas menjaga PENYAMBUNGAN (binding, salinan byte-identik, nama tabel tidak
+          # bertabrakan), yang ini menjaga ISI SKEMA — setiap tabel yang dipakai kode ada
+          # migrasinya, tidak ada kolom penghubung antara tabel kuota dan tabel analytics,
+          # setiap indeks baru punya kueri yang benar-benar memakainya, tidak ada DELETE/DROP
+          # tanpa WHERE+LIMIT di migrasi baru, dan `tools/d1-schema-check.mjs` terbukti bisa
+          # MERAH (diuji dengan fixture rusak, bukan hanya fixture benar).
+          node d1-schema-contract-test.js
           # E9: penjaga jembatan edge. Dijalankan tepat sesudah dua gerbang kontrak Worker
           # karena ia menguji berkas yang sama (`workers/api/index.js`, `route-health.js`) dari
           # sisi ketiga: siapa yang BOLEH memanggil Worker sama sekali. Selama zona
