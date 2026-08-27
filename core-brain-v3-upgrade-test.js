@@ -233,6 +233,259 @@ test('TARGET_SUCCESS 0.80 didokumentasikan sebagai prior desirable-difficulty, b
   assert.ok(/desirable\s+difficulty/i.test(source), 'komentar harus menyatakan 0.80 sebagai prior desirable difficulty');
 });
 
+// =============================================================================================
+// FASE 2 (B1) — momentum residual (council fable §2.4 / P5) + credibility & sd Glicko
+// =============================================================================================
+
+// ---- 8a. momentum residual: tren tidak lagi terkonfounding kebijakan adaptifnya sendiri ----
+
+test('theta naik di bawah kebijakan penjepit akurasi 0.80 -> residual improving, akurasi mentah plateau', () => {
+  // Council fable §2.4: Model B menyetel kesulitan agar akurasi teramati menempel 0.80,
+  // jadi murid yang belajar pesat terlihat datar. Fixture: 8 blok, akurasi per blok
+  // KONSTAN 0.8 (4 benar dari 5), tetapi `predicted` saat penyajian makin rendah karena
+  // taksiran model tertinggal di belakang theta yang naik linier — residual (ok-predicted)
+  // positif dan membesar sistematis.
+  const rows = [];
+  for (let b = 0; b < 8; b++) {
+    for (let j = 0; j < 5; j++) {
+      rows.push({
+        at: NOW - (40 - (b * 5 + j)) * 3600000,
+        ok: j !== 4, // tiap blok: 4 benar, 1 salah -> akurasi blok selalu 0.8
+        predicted: 0.8 - 0.035 * b, // prediksi konstan per blok tapi makin di bawah realita
+        type: 'grammar', difficulty: 3
+      });
+    }
+  }
+  const residual = brain.momentum(rows);
+  assert.strictEqual(residual.basis, 'residual', 'semua baris punya predicted -> basis residual');
+  assert.strictEqual(residual.state, 'improving',
+    'residual positif sistematis harus terbaca improving, dapat ' + residual.state + ' slope=' + residual.slope);
+  assert.ok(residual.slope >= 0.03, 'slope residual ' + residual.slope + ' harus >= ambang 0.03');
+  // Baris yang sama TANPA predicted: tren akurasi mentah buta terhadap kemajuan ini.
+  const stripped = rows.map(({ predicted, ...rest }) => rest);
+  const raw = brain.momentum(stripped);
+  assert.strictEqual(raw.basis, 'accuracy');
+  assert.strictEqual(raw.state, 'plateau', 'akurasi mentah konstan 0.8 harus plateau, dapat ' + raw.state);
+});
+
+test('basis residual butuh >=60% baris ber-predicted; di bawah itu jatuh ke akurasi', () => {
+  const make = (withPredicted) => {
+    const rows = [];
+    for (let i = 0; i < 40; i++) {
+      const row = { at: NOW - (40 - i) * 3600000, ok: i % 5 !== 4 };
+      if (i < withPredicted) row.predicted = 0.7;
+      rows.push(row);
+    }
+    return rows;
+  };
+  assert.strictEqual(brain.momentum(make(24)).basis, 'residual', '24/40 = 60% tepat -> residual');
+  assert.strictEqual(brain.momentum(make(23)).basis, 'accuracy', '23/40 < 60% -> perilaku lama');
+  // predicted di luar 0..1 atau bukan angka tidak dihitung sebagai prediksi valid.
+  const junk = make(0).map(r => ({ ...r, predicted: 'x' }));
+  assert.strictEqual(brain.momentum(junk).basis, 'accuracy');
+});
+
+// ---- 8a-bis. ambang residual ASIMETRIS (tindak lanjut gate simulator B5) -------------------
+
+// Pembentuk fixture: tiap baris membawa residual PERSIS m (m>=0: benar dengan predicted 1-m;
+// m<0: salah dengan predicted -m), lima baris per blok -> mean blok = m. Dengan begitu slope
+// dan r^2 deret residual bisa dikontrol angka per angka.
+function rowsFromBlockMeans(means) {
+  const rows = [];
+  const n = means.length * 5;
+  let idx = 0;
+  for (const m of means) {
+    for (let j = 0; j < 5; j++) {
+      const at = NOW - (n - idx) * 3600000;
+      idx++;
+      if (m >= 0) rows.push({ at, ok: true, predicted: 1 - m });
+      else rows.push({ at, ok: false, predicted: -m });
+    }
+  }
+  return rows;
+}
+
+test('taksiran yang menyusul murid membaik TIDAK berlabel declining (slope -0.03..-0.05 -> plateau)', () => {
+  // Temuan simulator B5 (B5-adaptivity-simulation-v3-phase2-findings.md): pada murid yang
+  // theta-nya naik, taksiran kemampuan menyusul lalu sedikit melampaui kinerja nyata —
+  // residual bergerak dari positif ke sedikit negatif dengan kemiringan landai. Ambang
+  // simetris ±0.03 mencap ini 'declining' (false decline 0.051->0.091 di simulator);
+  // ambang asimetris menyebutnya plateau: menahan kesulitan, bukan menurunkannya.
+  const catchup = [0.10, 0.0686, 0.0371, 0.0057, -0.0257, -0.0571, -0.0886, -0.12];
+  const read = brain.momentum(rowsFromBlockMeans(catchup));
+  assert.strictEqual(read.basis, 'residual');
+  assert.ok(read.slope <= -0.03 && read.slope > -0.06,
+    'prasyarat tes: slope di pita bekas-declining (dapat ' + read.slope + ')');
+  assert.strictEqual(read.state, 'plateau',
+    'taksiran menyusul harus plateau, dapat ' + read.state + ' (slope ' + read.slope + ', r2 ' + read.r2 + ')');
+});
+
+test('slope curam tapi berderau (r2 < 0.4) juga bukan declining — kemiringan harus nyata', () => {
+  const noisy = [0.42, -0.3, 0.36, -0.42, 0.06, -0.36, 0.18, -0.48];
+  const read = brain.momentum(rowsFromBlockMeans(noisy));
+  assert.strictEqual(read.basis, 'residual');
+  assert.ok(read.slope <= -0.06, 'prasyarat tes: slope memang curam (dapat ' + read.slope + ')');
+  assert.ok(read.r2 < 0.4, 'prasyarat tes: r2 memang rendah (dapat ' + read.r2 + ')');
+  assert.strictEqual(read.state, 'plateau', 'derau blok bukan bukti kemunduran, dapat ' + read.state);
+});
+
+test('murid yang benar-benar memburuk tetap declining, dan improving tetap cukup +0.03', () => {
+  // Asimetri tidak boleh membutakan arah turun yang sungguhan: residual yang melorot curam
+  // (slope -0.06) dan konsisten (r2 = 1) tetap declining.
+  const decline = [0.14, 0.08, 0.02, -0.04, -0.10, -0.16, -0.22, -0.28];
+  const worse = brain.momentum(rowsFromBlockMeans(decline));
+  assert.strictEqual(worse.state, 'declining',
+    'kemunduran nyata harus tetap terbaca: ' + worse.state + ' (slope ' + worse.slope + ', r2 ' + worse.r2 + ')');
+  assert.ok(worse.slope <= -0.06 && worse.r2 >= 0.4, 'prasyarat tes: memenuhi kedua syarat declining');
+  // Arah naik tidak berubah ambangnya — cerminan fixture yang sama.
+  const improve = brain.momentum(rowsFromBlockMeans(decline.slice().reverse()));
+  assert.strictEqual(improve.state, 'improving', 'improving tetap slope >= +0.03');
+  // residualStreak: bahan histeresis pemanggil — blok beruntun terakhir yang setanda.
+  assert.strictEqual(worse.residualStreak, -5, '5 blok terakhir di bawah prediksi -> -5');
+  assert.strictEqual(improve.residualStreak, 3, 'deret terbalik: 3 blok terakhir di atas prediksi -> +3');
+  // Field ini HANYA milik basis residual — basis accuracy tetap bentuk lama.
+  const plain = decline.map((m, i) => ({ at: NOW - (8 - i) * 3600000 * 5, ok: i < 4 }));
+  assert.ok(!('residualStreak' in brain.momentum(plain.concat(plain).concat(plain))),
+    'basis accuracy tidak boleh membawa residualStreak');
+});
+
+// ---- 8b. credibility: bukti berkualitas rendah menggeser kemampuan lebih sedikit ----------
+
+test('200 baris credibility 0.3 menggeser ability < separuh dibanding credibility 1.0', () => {
+  // Kontrak Fase 2: credibility mengalikan bobot langkah (recency*credibility). Fixture:
+  // 200 jawaban benar harian pada soal di atas kemampuan — sinyal "naik" yang identik,
+  // hanya kredibilitasnya yang berbeda (mis. semua berlabel tebakan kappa=0.3).
+  const make = (credibility) => {
+    const rows = [];
+    for (let i = 0; i < 200; i++) {
+      rows.push({ at: NOW - (200 - i) * DAY, ok: true, difficulty: 4, credibility });
+    }
+    return rows;
+  };
+  const prior = 1.5;
+  const full = brain.estimateAbility(make(1), { now: NOW, prior });
+  const weak = brain.estimateAbility(make(0.3), { now: NOW, prior });
+  const shiftFull = full.ability - prior;
+  const shiftWeak = weak.ability - prior;
+  assert.ok(shiftFull > 0.5, 'prasyarat tes: bukti penuh harus menggeser berarti (dapat ' + shiftFull + ')');
+  assert.ok(shiftWeak > 0, 'bukti lemah tetap menggeser searah, hanya lebih sedikit');
+  assert.ok(shiftWeak < 0.5 * shiftFull,
+    'geser credibility 0.3 (' + shiftWeak.toFixed(3) + ') harus < separuh geser credibility 1.0 (' + shiftFull.toFixed(3) + ')');
+  // Default 1: baris TANPA field credibility identik dengan credibility eksplisit 1.0.
+  const bare = brain.estimateAbility(make(1).map(({ credibility, ...rest }) => rest), { now: NOW, prior });
+  assert.deepStrictEqual(bare, full, 'tanpa field credibility harus identik dengan credibility 1');
+});
+
+test('semantik lama estimateAbility utuh: field v2 identik angka per angka + sd terjepit', () => {
+  // Snapshot dihitung dari kode SEBELUM upgrade Fase 2 (fixture 24 jawaban per jam,
+  // pola 5-benar-3-salah, difficulty 3, prior 3). Kalau salah satu bergeser, semantik
+  // confidence/ability lama sudah berubah — dan itu dilarang kontrak.
+  const rows = [];
+  for (let i = 0; i < 24; i++) rows.push({ at: NOW - (24 - i) * 3600000, ok: i % 8 < 5, difficulty: 3 });
+  const out = brain.estimateAbility(rows, { now: NOW, prior: 3 });
+  assert.strictEqual(out.ability, 3.018);
+  assert.strictEqual(out.evidence, 24);
+  assert.strictEqual(out.effectiveEvidence, 23.59);
+  assert.strictEqual(out.confidence, 0.983);
+  assert.strictEqual(out.level, 'B1');
+  // Keluaran baru: sd dalam jepitan kontrak, sdConfidence = 1 - sd/1.2.
+  assert.ok(out.sd >= 0.15 && out.sd <= 1.2, 'sd ' + out.sd + ' di luar 0.15..1.2');
+  assert.strictEqual(out.sdConfidence, Math.round((1 - out.sd / 1.2) * 1000) / 1000);
+  // Tanpa bukti sama sekali: ketidakpastian penuh, bukan keyakinan palsu.
+  const cold = brain.estimateAbility([], { now: NOW });
+  assert.strictEqual(cold.sd, 1.2);
+  assert.strictEqual(cold.sdConfidence, 0);
+});
+
+// ---- 8c. sd gaya Glicko: senggang melebarkan, bukti on-target menyempitkan ----------------
+
+test('sd naik >=25% setelah 30 hari senggang, lalu turun lagi dengan bukti on-target', () => {
+  // 80 jawaban per jam pada soal setingkat kemampuan (informasi Fisher maksimal) menekan
+  // sd jauh di bawah sd0. Lalu murid menghilang 30 hari: sd' = sqrt(sd^2 + 0.03^2*30).
+  const on = [];
+  for (let i = 0; i < 80; i++) on.push({ at: NOW - (80 - i) * 3600000, ok: i % 8 < 5, difficulty: 3 });
+  const fresh = brain.estimateAbility(on, { now: NOW, prior: 3 });
+  const idle = brain.estimateAbility(on, { now: NOW + 30 * DAY, prior: 3 });
+  assert.ok(fresh.sd < 0.25, 'prasyarat tes: bukti padat on-target harus menekan sd (dapat ' + fresh.sd + ')');
+  assert.ok(idle.sd >= 1.25 * fresh.sd,
+    '30 hari senggang: sd ' + fresh.sd + ' -> ' + idle.sd + ', kenaikan < 25%');
+  assert.ok(idle.sdConfidence < fresh.sdConfidence, 'sdConfidence harus ikut turun saat senggang');
+  // Bukti on-target SETELAH senggang menyempitkan kembali — dua arah, seperti Glicko.
+  const back = on.concat(Array.from({ length: 12 }, (_, i) =>
+    ({ at: NOW + 30 * DAY + i * 3600000, ok: i % 8 < 5, difficulty: 3 })));
+  const recovered = brain.estimateAbility(back, { now: NOW + 30 * DAY + 12 * 3600000, prior: 3 });
+  assert.ok(recovered.sd < idle.sd,
+    'bukti baru harus menurunkan sd: ' + idle.sd + ' -> ' + recovered.sd);
+});
+
+test('24 jawaban off-target (P>0.95) -> sdConfidence lebih rendah daripada 24 on-target', () => {
+  // Inti informasi Fisher 3PL: benar di soal yang hampir pasti benar tidak membedakan
+  // apa-apa. 24 jawaban gampang tidak boleh memberi keyakinan rentang yang sama dengan
+  // 24 jawaban setingkat kemampuan — padahal confidence lama menghitung keduanya sama.
+  assert.ok(brain.successProbability(3, 1) > 0.95, 'prasyarat tes: soal difficulty 1 bagi ability 3 memang P>0.95');
+  const onTarget = [];
+  const offTarget = [];
+  for (let i = 0; i < 24; i++) {
+    onTarget.push({ at: NOW - (24 - i) * 3600000, ok: i % 8 < 5, difficulty: 3 });
+    offTarget.push({ at: NOW - (24 - i) * 3600000, ok: true, difficulty: 1 });
+  }
+  const near = brain.estimateAbility(onTarget, { now: NOW, prior: 3 });
+  const easy = brain.estimateAbility(offTarget, { now: NOW, prior: 3 });
+  assert.ok(easy.sdConfidence < near.sdConfidence,
+    'off-target sdConfidence ' + easy.sdConfidence + ' harus < on-target ' + near.sdConfidence);
+  assert.ok(easy.sd > near.sd, 'sd off-target ' + easy.sd + ' harus > sd on-target ' + near.sd);
+});
+
+// ---- 8d. kompat mundur: tanpa predicted, keluaran momentum identik versi sebelum Fase 2 ----
+
+test('tanpa predicted, momentum identik angka per angka dengan versi sebelum Fase 2', () => {
+  // Snapshot dihitung dengan kode pra-Fase-2 pada fixture deterministik di bawah. Semua
+  // field lama harus sama persis; satu-satunya tambahan adalah basis:"accuracy".
+  const fx = (pattern, opts) => brain.momentum(
+    pattern.map((ok, i) => ({ at: NOW - (pattern.length - i) * 3600000, ok: !!ok, type: 'grammar', difficulty: 3 })),
+    opts);
+  const p1 = [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1];
+  const p2 = [1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1];
+  const p3 = [0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1];
+  const expected = [
+    [fx(p1), { state: 'plateau', slope: 0.0286, r2: 0.4286, blocks: 8, attempts: 40, latest: 0.8, confidence: 0.629, basis: 'accuracy' }],
+    [fx(p2), { state: 'unknown', slope: 0, r2: 0, blocks: 2, attempts: 12, confidence: 0, basis: 'accuracy' }],
+    [fx(p3), { state: 'improving', slope: 0.14, r2: 0.8909, blocks: 4, attempts: 23, latest: 0.8, confidence: 0.619, basis: 'accuracy' }],
+    [fx(p1, { block: 7 }), { state: 'improving', slope: 0.0429, r2: 0.75, blocks: 5, attempts: 40, latest: 0.857, confidence: 0.698, basis: 'accuracy' }]
+  ];
+  for (const [actual, want] of expected) {
+    assert.deepStrictEqual(actual, want, 'momentum tanpa predicted bergeser: ' + JSON.stringify(actual));
+  }
+});
+
+// ---- 8e. analyze meneruskan predicted/credibility apa adanya --------------------------------
+
+test('analyze meneruskan predicted ke momentum dan credibility ke estimateAbility', () => {
+  const rows = [];
+  for (let b = 0; b < 8; b++) {
+    for (let j = 0; j < 5; j++) {
+      rows.push({
+        at: NOW - (40 - (b * 5 + j)) * 3600000,
+        ok: j !== 4,
+        predicted: 0.8 - 0.035 * b,
+        credibility: 0.7,
+        type: 'grammar', difficulty: 3
+      });
+    }
+  }
+  const out = brain.analyze({ now: NOW, attempts: rows });
+  assert.strictEqual(out.momentum.basis, 'residual', 'analyze harus meneruskan predicted ke momentum');
+  assert.strictEqual(out.momentum.state, 'improving');
+  assert.strictEqual(out.domains.grammar.momentum.basis, 'residual', 'momentum per domain ikut residual');
+  assert.ok(isFinite(out.ability.sd) && out.ability.sd >= 0.15 && out.ability.sd <= 1.2, 'ability.sd hadir dan terjepit');
+  assert.ok(isFinite(out.ability.sdConfidence), 'ability.sdConfidence hadir');
+  // Credibility benar-benar sampai: baris sama dengan credibility 1 menggeser lebih jauh.
+  const strong = brain.analyze({ now: NOW, attempts: rows.map(r => ({ ...r, credibility: 1 })) });
+  const prior = 1.5;
+  assert.ok(Math.abs(out.ability.ability - prior) < Math.abs(strong.ability.ability - prior),
+    'credibility 0.7 harus menggeser ability lebih sedikit daripada credibility 1');
+});
+
 console.log('');
 if (failures) { console.error('FIEZEL Core Brain v3 upgrade: FAIL (' + failures + ')'); process.exit(1); }
 console.log('FIEZEL Core Brain v3 upgrade: PASS');
