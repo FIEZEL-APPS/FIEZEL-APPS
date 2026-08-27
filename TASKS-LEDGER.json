@@ -326,7 +326,7 @@
       "id": "T-027",
       "title": "Nightwatch: perbaiki deteksi render-time integrity pada release audit",
       "owner": "nightwatch",
-      "status": "in_progress",
+      "status": "blocked",
       "scope": {
         "files_allowed": [
           "release-audit.py",
@@ -356,14 +356,14 @@
           "Pages build dan live marker setelah merge"
         ]
       },
-      "evidence": "Root cause confirmed: release-audit.py mencari literal yang tidak lagi cocok dengan guard tambahan; paw-mascot-test.js membatasi pencarian callback setConfidence ke 900 karakter, sementara fungsi runtime sudah 1085 karakter sebelum callback karena hook SRL/scheduling.",
-      "note": "Perbaikan dibatasi ke dua assertion gate; tidak menyentuh runtime app.js, fitur neural voice, SW, atau workflow audio yang dikunci T-026."
+      "evidence": "Root cause confirmed and both scoped gates fixed. Local required gates PASS; CI release-audit and core validation PASS on ee079b2. CI MASTER Authority Guard FAILS because PR author FIEZEL-APPS is not the required MASTER owner fitrajft-ux; no merge performed.",
+      "note": "BLOCKED at repository authority policy, not code quality. PR #227 remains open. Do not bypass the MASTER-only authority guard; owner/main coordinator must re-authenticate or decide how to land the fix."
     }
   ],
   "last_report": {
-    "by": "master (single-agent) — m025-46",
-    "time": "2026-08-19T10:15:00+07:00",
-    "summary": "Redesign masuk aplikasi. Dua pelajaran untuk dicatat. (1) Suite tidak melihat warna: tombol utama seluruh aplikasi masih biru setelah 66 test hijau, dan hanya ketahuan setelah halaman benar-benar dirender. (2) Ada overflow horizontal yang memotong panel di sisi kanan pada 393px MAUPUN 430px - dibuktikan ADA JUGA di build sebelum redesign, jadi bukan regresi, tapi nyata di produksi sekarang dan belum diperbaiki."
+    "by": "FIEZEL Nightwatch",
+    "time": "2026-08-28T05:34:00+07:00",
+    "summary": "Nightwatch found and fixed two stale quality assertions without touching T-026 locked neural/audio areas. PR #227 quality release audit and core validation passed, but MASTER-only authority guard rejected the PR author FIEZEL-APPS; merge is blocked pending owner authority."
   },
   "missions": [
     {
