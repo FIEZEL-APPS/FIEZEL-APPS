@@ -1,6 +1,6 @@
 # Braincore v3 — Laporan Upgrade
 
-**Basis:** FIEZEL 5.19.0 · **Tanggal:** 2026-08-28 · **Status:** kontrak final, implementasi paralel berjalan — hasil test BELUM diverifikasi di dokumen ini
+**Basis:** FIEZEL 5.19.0 · **Tanggal:** 2026-08-28 · **Status:** kontrak final (Fase 1 gelombang A + Fase 2 gelombang B), implementasi paralel berjalan — hasil test BELUM diverifikasi di dokumen ini
 
 Dokumen ini menjawab satu pertanyaan: **apa yang diubah di Braincore v3, mengapa, dan bagaimana
 membuktikannya salah?** Ditulis dengan aturan yang sama seperti
@@ -151,32 +151,78 @@ integrasi" (kenaikan dari momentum tertelan `min()` di `refinePolicy`).
 
 ---
 
-## 6. Roadmap sisa (Fase 2–3 sintesis council)
+## 6. Fase 2 — Gelombang B: apa yang ditambahkan, dan mengapa
 
-Yang di atas adalah Fase 0–1 (perbaikan defek + fondasi bukti + model murid awal). Yang
-sengaja ditunda, berurut:
+Kontrak Fase 2 ada di [BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md) bagian "FASE 2 —
+Kontrak Gelombang B". Seperti §2, deskripsi di bawah adalah **kontrak yang mengikat
+pembangunnya, bukan laporan implementasi** — modul-modul B sedang dibangun paralel saat
+bagian ini ditulis, dan tidak ada satu pun hasil test yang diklaim di sini. Setiap baris
+dipilih untuk menutup defek atau celah spesifik yang terdokumentasi, bukan karena "bagus
+kalau ada".
 
-1. **Single-writer memory penuh** — satu mesin DSR/FSRS-lite sebagai satu-satunya penulis
-   `nextReview` di seluruh aplikasi, dengan gate "hanya satu penulis"; hari ini masih ada dua
-   definisi memori (v1 otoritas, v2 advisory) yang bentuk fungsionalnya pun berbeda.
-2. **Kalibrasi Elo dua-sisi** — estimasi kesulitan item online berdampingan dengan prior
-   konten (shrinkage δ=0,6 usulan Opus). Ditunda dengan mata terbuka: Sonnet mengutip risiko
-   divergensi pada perangkat tunggal ([Keeping Elo Alive](https://pubmed.ncbi.nlm.nih.gov/40476309/))
-   dan menyarankan menjadikannya feed pipeline konten antar-rilis dulu, bukan keputusan
-   real-time. Keputusan final menunggu data κ dari Fase 1.
-3. **Listening/speaking adaptif** — listening bisa diadaptasi tanpa model apa pun (kecepatan
-   putar, jumlah replay, panjang klip sebagai variabel kesulitan); speaking butuh ASR
-   on-device opt-in dengan hanya skor yang disimpan, audio dibuang segera. Keduanya digerbang
-   ganda (opt-in + confidence) dan **ditahan sampai audit polusi bahasa Inggris konten
-   listening selesai** — 842 pertanyaan berbahasa Inggris membuat bukti dari domain itu belum
-   layak dipercaya, persis alasan §7 laporan readiness v2.
+### 6.1 Per kontrak: yang ditambahkan dan MENGAPA
+
+| Kontrak (agent) | Yang ditambahkan | Mengapa (defek/celah yang ditutup) |
+|---|---|---|
+| `fiezel-core-brain.js` — momentum residual (B1) | `momentum(attempts)`: bila ≥60% baris membawa `predicted` (prediksi P saat penyajian), tren dihitung pada **residual** `(ok?1:0)−predicted` per blok, ambang slope ±0,03, field `basis:'residual'`; tanpa `predicted` → perilaku lama (`basis:'accuracy'`) | Simulator A11 mendokumentasikan **osilasi targetDifficulty v2 = 4,22 perubahan/10 sesi vs v1 = 2,84** (metrik `difficultyOscillationPer10`, seed 42): logika plateau_break/trend memantul ±1 karena momentum dihitung dari akurasi mentah — padahal ketika kebijakan sengaja menahan akurasi di 0,80, akurasi mentah *pasti* berayun di sekitar 0,80 tanpa berarti muridnya berubah. Residual memisahkan "murid membaik/memburuk relatif terhadap prediksi" dari "kebijakan bekerja sesuai target" |
+| `fiezel-core-brain.js` — `sd` gaya Glicko (B1) | `estimateAbility` mengeluarkan `sd` (deviasi: naik `sqrt(sd²+0,03²·hariMenganggur)` saat senggang, turun mengikuti informasi Fisher per jawaban; sd0=1,2, sdMax=1,2, sdMin=0,15) dan `sdConfidence = 1 − sd/sdMax`; semantik `confidence` lama TIDAK diubah | Menutup T7 Opus (`../model-council-claude_opus_5_0.md` §2.7): probe membuktikan `confidence` v2 adalah fungsi volume attempt semata (`weightedEvidence/24`) — 24 jawaban lempar-koin cukup untuk membuat brain 98% "yakin". Confidence yang benar adalah turunan presisi posterior (informasi Fisher), bukan hitungan; dan ketidakpastian harus *naik lagi* saat murid menganggur |
+| `fiezel-core-brain.js` — bobot `credibility` (B1) | Baris riwayat boleh membawa `credibility` (0..1, default 1) yang mengalikan bobot langkah estimator (recency×credibility) | Meneruskan κ dari `fiezel-evidence-credibility.js` (A12) sampai ke estimator: bukti tercemar (guess, beban bahasa, replay berlebih) selama ini didiskon di ledger tapi masih masuk penuh ke taksiran kemampuan |
+| `fiezel-tutor-brain.js` — afek + fading (B2) | `decideMove` membaca `opts.affect` SEBELUM aturan stretch/continue: frustrated→breathe, bored→stretch, gaming→continue+`suggestModeSwitch`, fatigued→wrapup (hanya bila remaining>2); aturan keselamatan lama tetap menang. Scaffold FADING: dua keberhasilan independen berturut pada konsep → titik mulai tangga turun satu anak tangga (tak pernah di bawah probe), rationale `scaffold_faded`. `selectNext` dengan `opts.seed` → softmax suhu 0,35 atas 4 kandidat teratas (mulberry32 berseed) | Menutup temuan Opus §3.4 (`../model-council-claude_opus_5_0.md`): `decideMove` adalah pohon prioritas tetap yang buta terhadap keadaan murid, dan `scaffoldLevel` **tidak pernah turun** — "eskalator satu arah menuju tell", padahal fading adalah separuh definisi scaffolding. Deteksi afek dari A9 (Fase 1) baru berguna kalau intervensinya benar-benar berbeda per keadaan; softmax berseed memecah determinisme exposure tanpa mengorbankan testabilitas |
+| `app.js`/`index.html`/`sw.js` — single-writer memory (B3) | `scheduleNext` memakai stability FSRS + `nextReviewGapDays` sebagai penulis `nextReview` TUNGGAL bila `FiezelCoreBrain.updateMemory` tersedia; `forgettingProbability` dari model yang sama; field legacy tetap ditulis untuk rollback; tanpa modul → jalur lama utuh. Plus wiring: `predicted`+κ ke baris riwayat, BKT shadow, confusion matrix, afek→`decideMove` (targetSuccess frustrated 0,90 / bored 0,75), replayCount listening, panel OLM, precache modul baru | Menutup T4 Opus (`../model-council-claude_opus_5_0.md`, vonis "Fatal"): dua model memori hidup bersamaan dan **yang menulis jadwal adalah yang lebih lemah** (SM-2 turunan v1), sementara model half-life v2 hanya membaca. Gate pencegah kambuh: hanya satu fungsi di seluruh basis kode yang menulis `nextReview` |
+| `adaptivity-simulation-v3.js` (B5) | Simulator berseed yang sama dijalankan ulang terhadap kebijakan Fase 2; metrik `difficultyOscillationPer10` adalah angka yang harus turun | Angka 4,22 vs 2,84 di atas adalah klaim yang bisa dibantah — dan satu-satunya cara membantahnya (atau membuktikan momentum residual bekerja) adalah run berseed yang sama pada murid sintetis yang sama |
+| `fiezel-listening-adaptive.js` (B6) | `policy({mastery, replayHistory, targetSuccess})` → `{rateBand, replayQuota, clipLength, rationale}`; murni; kesulitan listening = kecepatan + replay + panjang klip, dikontrol aturan 0,80; **satu dimensi berubah per langkah** | Dari Sol §7.10 (`../model-council-gpt_5_6_sol.md`): kalau murid gagal, turunkan kecepatan ATAU kompleksitas — bukan keduanya sekaligus — supaya diagnosis tetap *identifiable*; mengubah dua dimensi serentak membuat mustahil tahu dimensi mana yang menyebabkan perubahan hasil. Listening bisa diadaptasi hari ini tanpa model apa pun (nol biaya runtime) |
+| `tools/build-cloze-bank.js` + `cloze-bank-v1.json` (B7) | Bank cloze ≥200 item lintas level dari kalimat target `grammar-templates.json` (schema `fiezel-cloze-bank-v1`); jawaban blank = jawaban benar template; distraktor dibawa beserta label miskonsepsinya (untuk `FiezelProductionGrader` + ledger) | Dari P8 Fable (`../model-council-claude_fable_5.md`): seluruh bukti FIEZEL hari ini adalah recognition (pilihan ganda), padahal efek testing klasik [Roediger & Karpicke 2006](https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x) dan tindak lanjutnya [Karpicke & Roediger 2008 di Science](https://web.mit.edu/educationgroup/HHMIEducationGroup/wp-content/uploads/2011/04/14-Karpicke-Roediger-2008.pdf) menunjukkan retrieval aktif — bukan studi/recognition berulang — yang mendorong retensi jangka panjang. Konversi dari 139 template yang sudah punya kalimat target sebagian besar mekanis, dan grader-nya (A14) sudah dikontrak di Fase 1 |
+
+### 6.2 Gate baru Fase 2, per file test
+
+**Status semua gate Fase 2: terdaftar per kontrak, dijalankan pada integrasi akhir.** Sama
+seperti §5, laporan ini tidak mengklaim satu pun hasil PASS/FAIL — penulisnya belum melihat
+hasilnya, dan mengklaim PASS yang belum dilihat adalah persis dosa yang laporan ini ada untuk
+mencegahnya.
+
+| Gate | Pemilik | Yang dibuktikan bila lulus |
+|---|---|---|
+| `node core-brain-v3-upgrade-test.js` | B1 | Momentum `basis:'residual'` aktif bila ≥60% baris ber-`predicted`, ambang ±0,03; fallback `basis:'accuracy'` utuh; `sd` naik saat senggang/turun per jawaban dalam [0,15; 1,2]; `sdConfidence` konsisten; `credibility` default 1 tidak mengubah hasil lama |
+| `node tutor-brain-v3-test.js` | B2 | Empat intervensi afek dengan rationale `affect_*` dan preseden aturan keselamatan lama; `scaffold_faded` turun satu anak tangga setelah dua sukses independen, tak pernah di bawah probe; `selectNext` berseed deterministik, tanpa seed = argmax lama |
+| `node core-brain-v2-test.js` + `node regression-test.js` | B3 | Modul absen = perilaku identik hari ini; `fiezel-sl-v1-state` tidak disentuh; satu-satunya penulis `nextReview` adalah jalur `nextReviewGapDays` saat modul tersedia |
+| `node adaptivity-simulation-v3.js` | B5 | Run berseed byte-identik (exit 2 bila tidak); `difficultyOscillationPer10` turun dari 4,22 tanpa mengorbankan `accuracyGapVsTarget`, retensi hari-90, dan Brier |
+| `node listening-adaptive-test.js` | B6 | Policy murni, keluaran `{rateBand, replayQuota, clipLength}` valid, rationale `brain3_listening_*`, dan hanya SATU dimensi berubah per langkah |
+| `node cloze-bank-test.js` | B7 | Schema `fiezel-cloze-bank-v1`, ≥200 item lintas level, setiap `blank.answer` = jawaban benar template asal, setiap distraktor berlabel miskonsepsi |
+
+Gate lama (§5) tetap wajib PASS untuk semua agent B — regresi berarti perbaiki pendekatan,
+bukan gate.
 
 ---
 
-## 7. Batas kejujuran laporan ini
+## 7. Roadmap sisa (pasca-Fase 2)
 
-Laporan ini ditulis oleh A15, yang kepemilikannya hanya file ini. Yang bisa dijamin: kontrak,
-alasan desain, dan daftar gate di atas akurat terhadap [BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md)
-dan laporan council. Yang TIDAK bisa dijamin dari sini: bahwa implementasi paralel memenuhi
-kontraknya. Itu tugas gate di §5 — dan sampai semuanya dijalankan pada integrasi akhir dan
-PASS, status v3 yang jujur adalah **"dikontrak dan sedang dibangun"**, bukan "selesai".
+Dua butir roadmap lama sudah diserap Fase 2 — **single-writer memory** kini kontrak B3, dan
+**listening adaptif** kini kontrak B6 (dengan diskon κ untuk replay berlebih via wiring B3;
+catatan polusi bahasa Inggris konten listening dari §7 laporan readiness v2 tetap berlaku
+sebagai diskon bukti, bukan pemblokir kebijakan). Yang tersisa, berurut:
+
+1. **Kalibrasi Elo dua-sisi via pipeline konten** — estimasi kesulitan item online
+   berdampingan dengan prior konten (shrinkage δ=0,6 usulan Opus). Tetap ditunda dengan mata
+   terbuka: Sonnet mengutip risiko divergensi pada perangkat tunggal
+   ([Keeping Elo Alive](https://pubmed.ncbi.nlm.nih.gov/40476309/)) dan jalur yang dipilih
+   adalah **feed pipeline konten antar-rilis**, bukan keputusan real-time di perangkat.
+   Keputusan final menunggu data κ dari Fase 1–2.
+2. **Speaking adaptif dengan ASR on-device opt-in** — hanya skor yang disimpan, audio dan
+   transkrip dibuang segera; digerbang ganda (opt-in unduhan + confidence gate), mengikuti
+   preseden neural voice. Sol menegaskan recognizer browser hanya boleh dinilai sebagai
+   *target coverage*, bukan kualitas pelafalan (`../model-council-gpt_5_6_sol.md` §7.10).
+3. **Negotiated OLM penuh** — OLM Fase 1 (A8) sengaja presentasi-saja; langkah berikutnya
+   adalah murid bisa melihat DAN menantang model tentang dirinya (klaim "saya sudah bisa ini"
+   memicu item verifikasi), sesuai kerangka
+   [Bull & Kay](https://pure-oai.bham.ac.uk/ws/portalfiles/portal/19588792/chap_2013_metacog.pdf).
+
+---
+
+## 8. Batas kejujuran laporan ini
+
+Laporan ini ditulis oleh A15 (Fase 1) dan B8 (Fase 2), yang kepemilikannya hanya file ini.
+Yang bisa dijamin: kontrak, alasan desain, dan daftar gate di atas akurat terhadap
+[BRAINCORE-V3-CONTRACTS.md](BRAINCORE-V3-CONTRACTS.md), laporan council, dan temuan simulator
+A11. Yang TIDAK bisa dijamin dari sini: bahwa implementasi paralel memenuhi kontraknya. Itu
+tugas gate di §5 dan §6.2 — dan sampai semuanya dijalankan pada integrasi akhir dan PASS,
+status v3 yang jujur adalah **"dikontrak dan sedang dibangun"**, bukan "selesai".
