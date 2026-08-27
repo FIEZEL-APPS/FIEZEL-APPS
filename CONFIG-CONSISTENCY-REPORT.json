@@ -1,0 +1,164 @@
+{
+  "gate": "config-consistency-test.js",
+  "generatedAt": "2026-08-27T17:25:52.541Z",
+  "runbook": "docs/CF-MIGRATION-RUNBOOK.md",
+  "clientFlagKeys": [
+    "cfApiEnabled",
+    "cfAiEnabled",
+    "cfTtsEnabled",
+    "cfQuotaEnabled",
+    "cfAnalyticsEnabled",
+    "cfIdentityEnabled"
+  ],
+  "killSwitchKeys": [
+    "ai",
+    "tts",
+    "coach",
+    "analytics"
+  ],
+  "kvExamplesChecked": 5,
+  "limitPairs": [
+    {
+      "naskah": "AI_LIMIT_PER_DAY=25",
+      "penegakan": "FREE_AI_DAILY_LIMIT=25",
+      "cocok": true
+    },
+    {
+      "naskah": "TTS_CHARS_PER_DAY=12000",
+      "penegakan": "FREE_TTS_DAILY_CHARS=12000",
+      "cocok": true
+    }
+  ],
+  "unpairedLimitVars": [
+    {
+      "varName": "AI_LIMIT_PER_HOUR",
+      "reason": "tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FREE_AI_RATE_PER_MINUTE=8 (=480/jam) dan harian 25, dan 25/hari mengikat jauh lebih dulu daripada 40/jam. Var ini TETAP dikirim ke klien sebagai limits.aiPerHour (route-user.js:54), jadi naskah tanpa penegakan — dibiarkan apa adanya, tidak didiamkan."
+    },
+    {
+      "varName": "GLOBAL_NEURON_CAP",
+      "reason": "plafon jatah AKUN Cloudflare (bukan per murid); pasangannya ACCOUNT_DAILY_NEURON_BUDGET=10000 SENGAJA lebih besar — 8.000 disetel DI BAWAH plafon sebagai margin, jadi \"cocok\" justru salah."
+    },
+    {
+      "varName": "MAX_USERS",
+      "reason": "batas kapasitas pemasangan (cermin fiezel-core-worker.js:5), bukan kuota per-pengguna; tidak ada padanan di quota-config.js."
+    }
+  ],
+  "checks": [
+    {
+      "name": "Gerbang ini terdaftar di .github/workflows/quality.yml",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "CLIENT_FLAG_DEFAULTS terbaca dari workers/api/schema.js",
+      "status": "PASS",
+      "details": "cfApiEnabled,cfAiEnabled,cfTtsEnabled,cfQuotaEnabled,cfAnalyticsEnabled,cfIdentityEnabled"
+    },
+    {
+      "name": "KILL_SWITCH_DEFAULTS terbaca dari workers/api/schema.js",
+      "status": "PASS",
+      "details": "ai,tts,coach,analytics"
+    },
+    {
+      "name": "Blok kode runbook bisa dipindai",
+      "status": "PASS",
+      "details": "38 blok kode"
+    },
+    {
+      "name": "Runbook memuat contoh KV cfg:flags yang bisa diperiksa gerbang",
+      "status": "PASS",
+      "details": "5 contoh ditemukan"
+    },
+    {
+      "name": "(b) NOL contoh KV bentuk datar — setiap contoh bersarang di `flags`/`enabled`",
+      "status": "PASS",
+      "details": "5 contoh, semua bersarang"
+    },
+    {
+      "name": "Blok kode yang berbicara tentang flag/konfigurasi teridentifikasi",
+      "status": "PASS",
+      "details": "8 blok"
+    },
+    {
+      "name": "(a) Setiap kunci flag di blok kode runbook ada di CLIENT_FLAG_DEFAULTS/KILL_SWITCH_DEFAULTS",
+      "status": "PASS",
+      "details": "semua kunci dikenal"
+    },
+    {
+      "name": "(d) Nilai flag di contoh runbook BOOLEAN, bukan string \"off\"/\"on\"/\"shadow\"",
+      "status": "PASS",
+      "details": "semua boolean"
+    },
+    {
+      "name": "Nama datar lama (transport/quotaUi/identity/...) TIDAK dipakai sebagai kunci JSON di blok kode",
+      "status": "PASS",
+      "details": "tidak ada"
+    },
+    {
+      "name": "Runbook menandai perbaikan ini dengan penanda temuan lapangan",
+      "status": "PASS",
+      "details": "penanda \"🔄 TEMUAN LAPANGAN 28 Agu 2026\""
+    },
+    {
+      "name": "Runbook §4.5 menjelaskan bahwa perintah lama gagal DIAM-DIAM (bukan sekadar diganti)",
+      "status": "PASS",
+      "details": "menyebut route-config.js:53-54 + mergeFlags"
+    },
+    {
+      "name": "Runbook memuat perintah verifikasi curl untuk /api/config",
+      "status": "PASS",
+      "details": "curl /api/config"
+    },
+    {
+      "name": "Runbook memuat contoh MENYALAKAN satu endpoint dan contoh MEMATIKAN darurat",
+      "status": "PASS",
+      "details": "kedua contoh ada di §4.6 dan §4.7"
+    },
+    {
+      "name": "(c) AI_LIMIT_PER_DAY (naskah) == FREE_AI_DAILY_LIMIT (penegakan)",
+      "status": "PASS",
+      "details": "naskah=25 penegakan=25 — limits.aiPerDay dikirim ke murid (route-config.js:69, route-user.js:53) dan dipakai naskah kuota; penegakannya quota-config.js"
+    },
+    {
+      "name": "(c) TTS_CHARS_PER_DAY (naskah) == FREE_TTS_DAILY_CHARS (penegakan)",
+      "status": "PASS",
+      "details": "naskah=12000 penegakan=12000 — limits.ttsCharsPerDay dikirim ke murid (route-config.js:70, route-user.js:55); penegakannya quota-config.js"
+    },
+    {
+      "name": "Penegakan FREE_AI_DAILY_LIMIT tidak DITURUNKAN (>= 25, cf-a10 §6)",
+      "status": "PASS",
+      "details": "25"
+    },
+    {
+      "name": "Penegakan FREE_TTS_DAILY_CHARS tidak DITURUNKAN (>= 12000, cf-a10 §6)",
+      "status": "PASS",
+      "details": "12000"
+    },
+    {
+      "name": "Setiap var batas di [vars] dipetakan ke penegakan ATAU dikecualikan dengan alasan tertulis",
+      "status": "PASS",
+      "details": "2 dipetakan, 3 dikecualikan beralasan"
+    },
+    {
+      "name": "Pengecualian AI_LIMIT_PER_HOUR membawa alasan (bukan didiamkan)",
+      "status": "PASS",
+      "details": "tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FRE…"
+    },
+    {
+      "name": "Pengecualian GLOBAL_NEURON_CAP membawa alasan (bukan didiamkan)",
+      "status": "PASS",
+      "details": "plafon jatah AKUN Cloudflare (bukan per murid); pasangannya ACCOUNT_DAILY_NEURON_BUDGET=10…"
+    },
+    {
+      "name": "Pengecualian MAX_USERS membawa alasan (bukan didiamkan)",
+      "status": "PASS",
+      "details": "batas kapasitas pemasangan (cermin fiezel-core-worker.js:5), bukan kuota per-pengguna; tid…"
+    },
+    {
+      "name": "wrangler.toml menjelaskan arah penyelarasan (naskah mengikuti penegakan)",
+      "status": "PASS",
+      "details": "komentar menunjuk quota-config.js + gerbang ini"
+    }
+  ],
+  "result": "PASS"
+}

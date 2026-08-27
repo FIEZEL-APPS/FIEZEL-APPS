@@ -246,9 +246,13 @@ function makeEnv(clock, extra = {}) {
     FEATURE_AI: 'off',
     FEATURE_TTS: 'off',
     FEATURE_COACH: 'off',
-    AI_LIMIT_PER_DAY: '20',
+    // Cermin nilai wrangler.toml [vars] APA ADANYA. 🔄 28 Agu 2026: dulu '20'/'6000' di sini
+    // sementara penegakan quota-config.js memberi 25/12000 — harness ikut mengabadikan naskah
+    // yang membohongi murid. Sekarang keduanya = nilai yang benar-benar ditegakkan, dan
+    // config-consistency-test.js menjaga pasangannya tetap cocok.
+    AI_LIMIT_PER_DAY: '25',
     AI_LIMIT_PER_HOUR: '40',
-    TTS_CHARS_PER_DAY: '6000',
+    TTS_CHARS_PER_DAY: '12000',
     SESSION_HMAC_KEY_CURRENT: SECRET_CURRENT,
     SESSION_HMAC_KEY_PREVIOUS: SECRET_PREVIOUS,
     PUTER_CLAIM_SECRET_CURRENT: CLAIM_SECRET,
@@ -398,7 +402,7 @@ function scanForPii(value, trail, hits) {
     assert(me.json.class === 'visitor' && me.json.plan === 'free', '/api/user/me kelas & plan dari SERVER');
     assert(me.json.entitlements && me.json.entitlements.ai === false,
       'entitlement AI default MATI (fitur baru wajib di belakang flag OFF)');
-    assert(me.json.limits && me.json.limits.aiPerDay === 20, '/api/user/me membawa angka limit dari vars');
+    assert(me.json.limits && me.json.limits.aiPerDay === 25, '/api/user/me membawa angka limit dari vars');
     assert(!('quota' in me.json), 'kuota TIDAK di /api/user/me (GET /api/quota satu-satunya sumber)');
 
     // Tanpa cookie: 401 generik, TANPA menerbitkan identitas baru.
