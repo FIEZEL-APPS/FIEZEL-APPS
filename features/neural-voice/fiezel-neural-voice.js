@@ -5,10 +5,23 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  /**
+   * m025-v3: whitespace still collapses, but a BLANK LINE survives as "\n\n".
+   *
+   * The old form flattened every run of whitespace, so by the time the splitter saw a
+   * reading passage the paragraph structure was already gone and a paragraph break was
+   * indistinguishable from a space. A paragraph is the one boundary a learner actually
+   * expects to hear, so it has to reach the chunker. No chunk ever contains the marker:
+   * the chunker cuts on it, and each chunk it emits is single-line text.
+   */
   function normalizeText(input, maxChars) {
     const text = String(input == null ? '' : input)
       .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ' ')
-      .replace(/\s+/g, ' ')
+      .replace(/\r\n?/g, '\n')
+      .replace(/[^\S\n]+/g, ' ')
+      .replace(/ ?\n ?/g, '\n')
+      .replace(/\n{2,}/g, '\n\n')
+      .replace(/(?<!\n)\n(?!\n)/g, ' ')
       .trim();
     if (!text) throw new Error('TTS text is empty');
     if (text.length > maxChars) throw new Error('TTS text exceeds bounded input limit');
@@ -194,6 +207,74 @@
     return bounded.length ? bounded : [String(text || '').trim()].filter(Boolean);
   }
 
+  /**
+   * m025-v3 BUDGET PLAN — the replacement for one-chunk-per-full-stop.
+   *
+   * planStream above is kept byte-for-byte because the m025-48 evidence and the Apple
+   * slice policy are defined in terms of it; this is the strategy that actually runs when
+   * a prosody chunker is available. The whole difference is the unit: `planStream` cuts at
+   * every terminator, this packs adjacent sentences up to a character budget, so a full
+   * stop stops being a place where the learner waits.
+   *
+   * Returns markers as DATA — [{text, boundary}] with boundary in
+   * 'comma' | 'sentence' | 'paragraph' — so the player layer can spend the right pause at
+   * each seam. Nothing here inserts silence.
+   */
+  function planBudget(text, options) {
+    const opts = options || {};
+    const chunker = opts.chunker;
+    if (!chunker || typeof chunker.groupChunks !== 'function') return null;
+    const budget = chunker.CHUNK_CHARS || {};
+    const max = Number(opts.maxChars) > 0 ? Math.floor(Number(opts.maxChars)) : Number(budget.max) || 260;
+    const target = Number(opts.targetChars) > 0 ? Math.floor(Number(opts.targetChars)) : Number(budget.target) || 220;
+    const grouped = chunker.groupChunks(text, { max, target, lang: opts.lang || '' });
+    const plan = grouped.map((chunk) => ({
+      text: String(chunk.text || '').trim(),
+      boundary: chunk.boundary || 'sentence'
+    })).filter((entry) => entry.text.length > 0);
+    if (!plan.length) {
+      const flat = String(text || '').replace(/\s+/g, ' ').trim();
+      return flat ? [{ text: flat, boundary: 'paragraph' }] : [];
+    }
+    // The Apple slice keeps its own hard character cap. Bounding here rather than inside
+    // the chunker keeps the chunker device-independent and pure.
+    const hardChars = Number(opts.hardChars) > 0 ? Math.floor(Number(opts.hardChars)) : 0;
+    if (!hardChars) return plan;
+    const bounded = [];
+    for (const entry of plan) {
+      const pieces = splitByHardChars([entry.text], hardChars);
+      pieces.forEach((piece, at) => bounded.push({
+        text: piece,
+        // A cut the hard cap forced is a clause seam, not a sentence end; only the last
+        // piece still ends where the planned chunk ended.
+        boundary: at === pieces.length - 1 ? entry.boundary : 'comma'
+      }));
+    }
+    return bounded;
+  }
+
+  /**
+   * The fast lead-in (m025-74) applied to a marked plan instead of to bare strings: the
+   * opening chunk is shortened so time-to-first-word is short, and the seam it creates is
+   * labelled a clause seam because that is what it is - the sentence has not ended there.
+   */
+  function withFastLeadInPlan(plan, leadInChars, hardCap) {
+    const limit = Number(leadInChars) > 0 ? Math.floor(Number(leadInChars)) : 0;
+    if (!limit || !plan || !plan.length) return plan;
+    const texts = withFastLeadIn(plan.map((entry) => entry.text), limit, hardCap);
+    // Nothing was reshaped: the opening chunk was already short enough.
+    if (texts.length === plan.length && texts[0] === plan[0].text) return plan;
+    // Either way the head is a mid-sentence seam, so it is marked as a clause boundary and
+    // never as a sentence or paragraph one. What differs is where the rest lines up: when
+    // the leftover tail was merged into the next planned chunk the count is unchanged, so
+    // chunk i still ends where plan[i] ended; when it stands alone the plan shifts by one.
+    const merged = texts.length === plan.length;
+    return texts.map((text, i) => ({
+      text,
+      boundary: i === 0 ? 'comma' : (merged ? plan[i].boundary : plan[i - 1].boundary)
+    }));
+  }
+
   function canUseSpeechSynthesis(env) {
     return Boolean(env && env.speechSynthesis && env.SpeechSynthesisUtterance);
   }
@@ -251,12 +332,43 @@
     // Panjang potongan pembuka: cukup untuk satu frasa wajar, cukup pendek supaya kata pertama
     // terdengar dalam sekitar sepertiga waktu potongan penuh.
     const leadInChars = appleHardChunkChars ? Math.max(24, Math.round(appleHardChunkChars / 3)) : 0;
+    // m025-v3 character budget. Configurable, and overridable per engine, because the safe
+    // ceiling is a property of the model, not of this file.
+    const chunkBudgetChars = Number(options.chunkMaxChars) > 0
+      ? Math.floor(Number(options.chunkMaxChars))
+      : (config.limits && Number(config.limits.chunkMaxChars) > 0 ? Math.floor(Number(config.limits.chunkMaxChars)) : 0);
+    const chunkTargetChars = Number(options.chunkTargetChars) > 0
+      ? Math.floor(Number(options.chunkTargetChars))
+      : (config.limits && Number(config.limits.chunkTargetChars) > 0 ? Math.floor(Number(config.limits.chunkTargetChars)) : 0);
+    // m025-v3: opt-out only. Budget grouping is the default whenever a chunker is present,
+    // because per-full-stop chunking is the delay OWNER reports.
+    const budgetChunking = options.budgetChunking !== false;
+    /**
+     * @returns {Array<{text:string, boundary:('comma'|'sentence'|'paragraph')}>}
+     *   The boundary marker travels WITH the chunk instead of being re-derived downstream,
+     *   which is what lets the player pause correctly at a seam whose punctuation was
+     *   consumed by the split (a hard-cap cut, or the fast lead-in head).
+     */
     function planChunks(text) {
+      if (streamSentences && budgetChunking) {
+        const plan = planBudget(text, {
+          chunker: prosody,
+          maxChars: chunkBudgetChars,
+          targetChars: chunkTargetChars,
+          hardChars: appleHardChunkChars
+        });
+        // Hanya potongan pembuka yang dipendekkan; sisanya dibiarkan apa adanya.
+        if (plan && plan.length) return withFastLeadInPlan(plan, leadInChars, appleHardChunkChars);
+      }
       const planned = streamSentences
         ? planStream(text, { maxWords: streamMaxWords, hardChars: appleHardChunkChars })
         : splitIntoChunks(text, targetWords, hardWords, appleHardChunkChars);
       // Hanya potongan pembuka yang dipendekkan; sisanya dibiarkan apa adanya.
-      return withFastLeadIn(planned, leadInChars, appleHardChunkChars);
+      return withFastLeadIn(planned, leadInChars, appleHardChunkChars).map((chunkText) => ({
+        text: chunkText,
+        // Legacy strategies cut at terminators, so the marker is read back off the text.
+        boundary: /[.!?\u2026]["'\u201d\u2019)\]]*$/.test(String(chunkText).trim()) ? 'sentence' : 'comma'
+      }));
     }
     /**
      * Silence to leave before a line, decided by how the previous one ended.
@@ -368,7 +480,7 @@
       if (!adapter) return false;
       const text = normalizeText(input, maxChars);
       if (!text) return false;
-      const chunks = planChunks(text);
+      const chunks = planChunks(text).map((entry) => entry.text);
       // Multi-chunk text already prefetches internally once it starts playing.
       if (chunks.length !== 1) return false;
       const voice = options.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
@@ -432,8 +544,21 @@
       const callGeneration = ++generation;
       const requestId = 'nv-' + Date.now().toString(36) + '-' + (++requestSequence).toString(36);
       const voice = speakOptions.voice || (config.voices && config.voices.fiezelPrimary) || 'af_heart';
-      const chunks = planChunks(text);
-      diag({ phase: 'chunk_plan', requestId, chunkCount: chunks.length, hardChunkChars: appleHardChunkChars || null, maxChunkChars: chunks.reduce((max, chunk) => Math.max(max, chunk.length), 0) });
+      const plan = planChunks(text);
+      const chunks = plan.map((entry) => entry.text);
+      // How each chunk ENDS: 'comma' | 'sentence' | 'paragraph'. Data only - the pause
+      // itself belongs to the player layer, which is the only place that knows the
+      // schedule this seam lands in.
+      const boundaries = plan.map((entry) => entry.boundary);
+      diag({
+        phase: 'chunk_plan', requestId, chunkCount: chunks.length,
+        hardChunkChars: appleHardChunkChars || null,
+        maxChunkChars: chunks.reduce((max, chunk) => Math.max(max, chunk.length), 0),
+        avgChunkChars: chunks.length ? Math.round(chunks.reduce((sum, chunk) => sum + chunk.length, 0) / chunks.length) : 0,
+        strategy: streamSentences && budgetChunking && prosody && typeof prosody.groupChunks === 'function'
+          ? 'character-budget-v3' : (streamSentences ? 'per-sentence-m025-48' : 'apple-slice'),
+        boundaries
+      });
 
       if (!adapter) {
         if (config.fallback && config.fallback.browserSpeechSynthesis) {
@@ -597,13 +722,19 @@
             // with the engine's own lead-in and tail-out trimmed so that pause is the
             // only silence between them.
             const gapMs = gapBefore(chunks[chunkIndex - 1], speakOptions.lang || '');
+            // The seam this chunk is joined ON: the boundary kind the PREVIOUS chunk ended
+            // with. Handed over as a marker so the player can spend a comma-sized lift, a
+            // sentence-sized breath or a paragraph-sized pause without having to guess it
+            // back from text it never sees.
+            const boundary = chunkIndex > 0 ? boundaries[chunkIndex - 1] : null;
+            const boundaryAfter = boundaries[chunkIndex] || null;
             // Trimming exists to control a SEAM. A line rendered on its own has none, so
             // it is played exactly as the model delivered it - the Library reads one
             // sentence per call, and cutting its tail there would take away the pause
             // between two sentences instead of governing it.
             const joined = chunks.length > 1;
             const playback = await playAudio(audio, streamSentences
-              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined }
+              ? { signalGeneration: callGeneration, continuous: joined && chunkIndex > 0, gapMs, trim: joined, boundary, boundaryAfter }
               : { signalGeneration: callGeneration });
             scheduled.push({ playback, chunkIndex, startedAt: playbackStartedAt });
             activeStop = stopScheduled;
@@ -643,8 +774,55 @@
       }
     }
 
-    return Object.freeze({ speak, stop, prefetch, splitIntoChunks: (text) => planChunks(text) });
+    /**
+     * m025-v3: the WHOLE-TEXT contract, exposed so a caller can see - before it decides
+     * how to call speak() - what one call for the full passage would cost.
+     *
+     * The V1 audit on the real supertonic-3 engine measured 4422 ms average audible gap
+     * for the production shape (one speak() per sentence) against 647 ms when the entire
+     * text goes into ONE speak(). The reason is structural: with one sentence per call
+     * `chunks.length === 1`, so `joined` is false and continuous scheduling, silence
+     * trimming and prosody gaps are all switched off. Passing whole text here is what
+     * turns them back on.
+     *
+     * @param {string} text whole passage or script; blank lines mean paragraphs
+     * @returns {{chunks: Array<{text:string, boundary:string}>, stats: object}}
+     */
+    function planUtterance(text) {
+      const normalized = normalizeText(text);
+      const plan = planChunks(normalized).map((entry) => ({ text: entry.text, boundary: entry.boundary }));
+      const chars = plan.reduce((sum, entry) => sum + entry.text.length, 0);
+      const sentences = prosody && typeof prosody.planUtterance === 'function'
+        ? prosody.planUtterance(normalized).stats.sentences
+        : planStream(normalized, { maxWords: Number.MAX_SAFE_INTEGER }).length;
+      return {
+        chunks: plan,
+        stats: {
+          chunks: plan.length,
+          sentences,
+          chars,
+          avgChars: plan.length ? Math.round(chars / plan.length) : 0,
+          // One boundary fewer is one wait fewer, so this is the number that matters.
+          boundariesRemoved: Math.max(0, sentences - plan.length),
+          boundaries: plan.map((entry) => entry.boundary),
+          strategy: streamSentences && budgetChunking ? 'character-budget-v3' : (streamSentences ? 'per-sentence-m025-48' : 'apple-slice')
+        }
+      };
+    }
+
+    return Object.freeze({
+      speak, stop, prefetch,
+      // Kept string-shaped: every existing caller asks this for the text it will hear.
+      splitIntoChunks: (text) => planChunks(text).map((entry) => entry.text),
+      // The same plan with its boundary markers, for callers that schedule the seams.
+      planChunks: (text) => planChunks(text).map((entry) => ({ text: entry.text, boundary: entry.boundary })),
+      // Whole text in, ordered marked chunks plus the before/after counts out.
+      planUtterance
+    });
   }
 
-  return Object.freeze({ normalizeText, splitIntoChunks, withFastLeadIn, createVoiceService });
+  return Object.freeze({
+    normalizeText, splitIntoChunks, planStream, planBudget, withFastLeadIn, withFastLeadInPlan,
+    createVoiceService
+  });
 });
