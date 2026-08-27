@@ -245,7 +245,7 @@
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): GET /api/usage/pepper",
       "status": "PASS",
-      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"a7f5d82bbc38107de106ab2776b63ca2ed0d402b8d2c58ed1d8369effbe02b3a\",\"rotatesAtMs\":"
+      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"70309f7d521358562f9360f1c0754c105f9411d2d493867edc9be16136d19cf0\",\"rotatesAtMs\":"
     },
     {
       "name": "A rute kuota menjawab 200 dengan amplop fiezel-quota-v1",
@@ -335,7 +335,7 @@
     {
       "name": "B penolakan tercatat di kolom denied atau tidak menaikkan used",
       "status": "PASS",
-      "details": "{\"user_id\":\"19ddbefe-0894-4654-a421-190593143cc3\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
+      "details": "{\"user_id\":\"247adac6-7f95-4f13-b4ba-bf671e132528\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
     },
     {
       "name": "C render pertama (cache MISS) berhasil",
@@ -460,7 +460,7 @@
     {
       "name": "E dua identitas uji berbeda",
       "status": "PASS",
-      "details": "57dc8910-f869-4999-a7bf-fe08f7386b92 vs bd8592da-7ceb-4b37-ac68-ca8224d71fc9"
+      "details": "eeb46f9f-43ea-4fb5-9160-1aa8114c3139 vs e4b6c492-0cd8-4794-bff3-55715ac09ae1"
     },
     {
       "name": "E kuota Alice mencerminkan pemakaiannya sendiri (5 AI)",

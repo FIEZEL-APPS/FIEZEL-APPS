@@ -37,6 +37,13 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const TtsKey = require(path.join(ROOT, 'workers/api/tts/tts-key.js'));
+/**
+ * A12/1 — nama parameter provider (`speaker` untuk keluarga aura) dan voice bawaan hidup di SATU
+ * berkas bersama dengan runtime, supaya jalur pra-render dan `POST /api/tts/render` tidak bisa
+ * menyimpang. Penyimpangan itulah cacatnya: `voiceId` masuk kunci cache, tidak pernah sampai ke
+ * provider, dan aset yang sudah dibayar dianggap belum ada.
+ */
+export const ProviderParams = require(path.join(ROOT, 'workers/api/tts/tts-provider-params.js'));
 
 export const MANIFEST_PATH = path.join(ROOT, 'audio/manifest-tts-v2.json');
 
@@ -585,15 +592,29 @@ async function r2Put(env, key, body) {
   return 'r2_put_exhausted';
 }
 
-async function workersAiTts(env, text, modelId) {
+/**
+ * DIEKSPOR sejak A12 dengan satu alasan: `tts-provider-contract-test.js` memanggil jalur INI
+ * (dengan `fetch` global distub) lalu membandingkan badan permintaannya dengan badan yang dikirim
+ * `route-tts.js`. Tanpa itu, "kedua jalur cocok" hanya bisa diuji dengan menuliskan daftar
+ * parameter untuk KEDUA kalinya di dalam gerbang — tepat duplikasi yang melahirkan cacat ini.
+ */
+export async function workersAiTts(env, text, modelId) {
   // modelOf melempar untuk model yang DITOLAK (melotts) dan yang tak dikenal. Penjagaan ini di
   // sini, tepat sebelum satu-satunya panggilan berbayar, bukan di parseArgs saja — override
   // per-item bisa datang dari berkas JSON yang tidak lewat parseArgs.
   const model = modelOf(modelId);
+  // Badan permintaan dibangun registry bersama, bukan literal di sini. `FIEZEL_TTS_SPEAKER`
+  // tetap boleh menimpa voice — dan kalau ia dipakai, kuncinya memang harus berbeda.
+  const input = ProviderParams.buildProviderInput({
+    engineId: model.id,
+    text,
+    voiceId: env.speaker || model.voiceId,
+    locale: ENGINE.locale
+  });
   const response = await fetch(`${R2_API}/${env.accountId}/ai/run/${model.id}`, {
     method: 'POST',
     headers: { authorization: `Bearer ${env.token}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ text, speaker: env.speaker || model.voiceId })
+    body: JSON.stringify(input)
   });
   if (!response.ok) return { error: `ai_${response.status}` };
   const buffer = Buffer.from(await response.arrayBuffer());

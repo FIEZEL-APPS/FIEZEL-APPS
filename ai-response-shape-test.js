@@ -322,6 +322,137 @@ const F = AiTasks.OUTPUT_FAILURES;
       !/'tidak'/.test(srcRoute) && !/maxSentences\s*[:=]\s*\d/.test(srcRoute), 'satu sumber konstanta');
   }
 
+  // --- 9. A12/2 — `quotaCharged` DI SETIAP JALUR, BERTIPE BOOLEAN ----------------------
+  // Cacat produksi: `route-tts.js` menyertakan `quotaCharged` di lima tempat, `route-ai.js` tidak
+  // menyertakannya sama sekali. Klien jadi tidak bisa membedakan penolakan yang MENAGIH dari yang
+  // tidak, dan itu satu-satunya cara jujur menampilkan sisa jatah tanpa polling `/api/quota`.
+  {
+    const post = async (bodyText, deps, headers) => {
+      const built = harness.makeEnv({ ai: { answers: {} } });
+      const request = new Request('https://api.fiezel.my.id/api/ai/task', {
+        method: 'POST', body: bodyText, headers: headers || { 'content-type': 'application/json' }
+      });
+      const response = await RouteAi.handleAiTask({ request, env: built.env, ctx: built.ctx, deps: deps || {} });
+      return { status: response.status, body: await response.json() };
+    };
+
+    const envelopes = [];
+    envelopes.push(['bad_json (badan bukan JSON)', await post('{bukan json')]);
+    envelopes.push(['body_too_big (413)', await post(JSON.stringify({
+      schema: 'fiezel-ai-task-v2', task: 'tutor_turn', input: { question: 'x'.repeat(20000) }
+    }))]);
+    envelopes.push(['skema tidak sah (400)', await post(JSON.stringify({ schema: 'salah', task: 'tutor_turn', input: {} }))]);
+    envelopes.push(['input tidak lengkap (400)', await post(JSON.stringify(req('tutor_turn', { question: '' })))]);
+    envelopes.push(['kuota habis (429)', await post(JSON.stringify(req('tutor_turn')), {
+      enforceQuota: async () => ({ allowed: false, reason: 'daily_cap', retryAfter: 1800 })
+    })]);
+    envelopes.push(['modul kuota meledak (dianggap habis)', await post(JSON.stringify(req('tutor_turn')), {
+      enforceQuota: async () => { throw new Error('D1 mati'); }
+    })]);
+    // Keadaan OPEN dibangun lewat modul breaker SUNGGUHAN. Objek breaker karangan sendiri ditolak
+    // `clone()` (skema tidak cocok) dan diam-diam menjadi CLOSED — jalur yang ingin diuji tidak
+    // akan pernah tereksekusi, dan gerbangnya hijau tanpa menguji apa pun.
+    const Breaker = require(path.join(root, 'workers/api/breaker/breaker.js'));
+    const openState = Object.assign(Breaker.initialState(Date.now()), {
+      state: 'OPEN', openedAt: Date.now(), openedUntil: Date.now() + 60000, openings: 1
+    });
+    envelopes.push(['breaker OPEN (mode hemat)', await post(JSON.stringify(req('tutor_turn')), {
+      breakerStore: { load: async () => openState, save: async () => {} }
+    })]);
+    const okRun = await run('translate_subtitle', { response: 'Hujan turun dan aku ada di gerbang sekolah.' },
+      { enforceQuota: async () => ({ allowed: true }) });
+    envelopes.push(['sukses (provider menjawab)', okRun]);
+    envelopes.push(['ditolak mutu (kata terlarang)', await run('tutor_turn', { response: 'Ini jawaban yang tidak boleh tampil.' },
+      { enforceQuota: async () => ({ allowed: true }) })]);
+    envelopes.push(['provider gagal', await run('tutor_turn', () => { throw new Error('provider mati'); },
+      { enforceQuota: async () => ({ allowed: true }) })]);
+
+    const missing = envelopes.filter(([, r]) => typeof r.body.quotaCharged !== 'boolean').map(([n]) => n);
+    check('SETIAP jalur route-ai.js membawa quotaCharged bertipe boolean',
+      missing.length === 0,
+      missing.length ? 'tanpa quotaCharged: ' + missing.join(' | ') : envelopes.length + ' jalur diperiksa');
+
+    // Nilainya harus BERARTI, bukan konstanta. Kalau semuanya `false`, gerbang di atas lulus tapi
+    // field-nya tidak berguna; kalau penolakan `true`, murid ditagih untuk jawaban yang tidak ada.
+    const charged = new Map(envelopes.map(([n, r]) => [n, r.body.quotaCharged]));
+    check('quotaCharged TRUE hanya pada jalur sukses (jawaban benar-benar terkirim)',
+      charged.get('sukses (provider menjawab)') === true, 'sukses=' + charged.get('sukses (provider menjawab)'));
+    const wrongTrue = [...charged].filter(([n, v]) => n !== 'sukses (provider menjawab)' && v === true).map(([n]) => n);
+    check('TIDAK ADA jalur penolakan yang menagih (semua penolakan quotaCharged:false)',
+      wrongTrue.length === 0, wrongTrue.join(' | ') || 'nol penolakan menagih');
+    const openEnv = envelopes.find(([n]) => n === 'breaker OPEN (mode hemat)')[1];
+    check('jalur breaker OPEN benar-benar tereksekusi (bukan fixture yang diam-diam jadi CLOSED)',
+      openEnv.body.breaker === 'OPEN' && openEnv.body.source === 'deterministic-fallback',
+      `${openEnv.body.breaker} ${openEnv.body.source}`);
+    const q429 = envelopes.find(([n]) => n === 'kuota habis (429)')[1];
+    check('penolakan kuota tetap 429 DAN tidak menagih (reserve gagal = tidak ada reservasi)',
+      q429.status === 429 && q429.body.quotaCharged === false && q429.body.quotaChecked === true,
+      `${q429.status} charged=${q429.body.quotaCharged}`);
+  }
+
+  // --- 10. A12/3 — KELUARAN KOSONG TIDAK PERNAH SUKSES, DAN KUOTA DIKEMBALIKAN ---------
+  // Uji staging: 22 dari 25 tagihan `writing_feedback` mengembalikan `text:"{}"` dengan
+  // `outputTokens:1` dan DINYATAKAN SUKSES. Murid dibebani jatah untuk jawaban tanpa isi.
+  // `jsonMode:true` membuat bentuk kosongnya `"{}"`, bukan `""`, jadi pemeriksaan `!text.trim()`
+  // melewatkannya seluruhnya. Aturan owner: kalau harus salah, salah ke arah murid.
+  {
+    const EMPTY_SHAPES = [
+      ['{} (bentuk kosong khas jsonMode)', '{}'],
+      ['{ } dengan spasi', '{ }'],
+      ['string kosong', ''],
+      ['whitespace saja', '   \n\t  '],
+      ['NBSP + ZWSP (tampak kosong di layar)', '\u00a0\u200b'],
+      ['array kosong', '[]'],
+      ['null literal', 'null'],
+      ['JSON berpagar ```json {}```', '```json\n{}\n```'],
+      ['objek dengan semua nilai kosong', '{"feedback":"","suggestions":[]}']
+    ];
+    const wrong = [];
+    const notRolled = [];
+    for (const [label, text] of EMPTY_SHAPES) {
+      check(`AiTasks.isEmptyOutput mengenali ${label} sebagai KOSONG`,
+        AiTasks.isEmptyOutput(text) === true, JSON.stringify(text));
+      const rolls = [];
+      const r = await run('writing_feedback', { response: text }, {
+        enforceQuota: async () => ({ allowed: true }),
+        rollbackQuota: (info) => { rolls.push(info); return true; }
+      });
+      if (r.body.source === 'provider' || r.body.degraded !== true || r.body.quotaCharged !== false) {
+        wrong.push(`${label} -> source=${r.body.source} degraded=${r.body.degraded} charged=${r.body.quotaCharged}`);
+      }
+      if (rolls.length !== 1 || r.body.quotaRolledBack !== true) {
+        notRolled.push(`${label} -> rollback=${rolls.length} flag=${r.body.quotaRolledBack}`);
+      }
+      if (text === '{}') {
+        check('keluaran "{}" memberi murid teks fallback yang berisi, bukan layar kosong',
+          r.body.text === AiTasks.fallbackFor('writing_feedback', VALID_INPUT.writing_feedback) && r.body.text.length > 30,
+          r.body.text.slice(0, 45));
+        check('sebabnya dieja empty_output, bisa dibedakan dari model yang mati',
+          r.body.reason === F.empty, String(r.body.reason));
+        check('usage keluaran dilaporkan 0 token, bukan outputTokens:1 seperti staging',
+          r.body.usage && r.body.usage.outputTokens === 0, JSON.stringify(r.body.usage));
+      }
+    }
+    check('TIDAK ADA bentuk kosong yang dinyatakan sukses (cacat A12/3)',
+      wrong.length === 0, wrong.join(' | ') || EMPTY_SHAPES.length + ' bentuk diperiksa');
+    check('SETIAP bentuk kosong MENGEMBALIKAN kuota (rollback dipanggil tepat sekali)',
+      notRolled.length === 0, notRolled.join(' | ') || 'rollback di semua bentuk');
+
+    // Sisi sebaliknya, dan ini yang menjaga gerbang tetap berguna: isi yang sah TIDAK boleh
+    // dianggap kosong. Pemeriksa yang menolak segalanya sama merusaknya dengan yang meloloskan.
+    const NON_EMPTY = ['{"feedback":"Kalimatmu udah rapi."}', '0', 'false', '{"a":{"b":"isi"}}', '{rusak', 'Kalimatmu udah rapi kok.'];
+    const falsePositive = NON_EMPTY.filter((t) => AiTasks.isEmptyOutput(t) === true);
+    check('isi yang SAH tidak salah dianggap kosong (termasuk "0", "false", JSON rusak)',
+      falsePositive.length === 0, falsePositive.join(' | ') || NON_EMPTY.length + ' bentuk diperiksa');
+
+    const good = await run('writing_feedback',
+      { response: '{"feedback":"Kalimatmu udah rapi, cuma tanda bacanya kurang. Coba tambahin titik di akhir. Kamu nggak perlu ubah bagian lain."}' },
+      { enforceQuota: async () => ({ allowed: true }), rollbackQuota: () => true });
+    check('jawaban writing_feedback yang BERISI tetap sukses dan MENAGIH (gerbang tidak menolak semua)',
+      good.body.source === 'provider' && good.body.degraded === false && good.body.quotaCharged === true,
+      `${good.body.source} charged=${good.body.quotaCharged} ${String(good.body.reason || '')}`);
+  }
+
   const report = {
     status: failed ? 'NOT READY' : 'PASS',
     gate: 'ai-response-shape-test',

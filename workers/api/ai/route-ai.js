@@ -116,6 +116,41 @@
 
   var MAX_BODY_BYTES = 16000; // di atas payload terbesar (context_coach 8.000 B) dengan margin
 
+  /**
+   * A12/2 — `quotaCharged` WAJIB ADA DI SETIAP AMPLOP, penolakan maupun sukses.
+   *
+   * `route-tts.js` sudah menyertakannya di lima tempat; berkas ini tidak menyertakannya sama
+   * sekali. Akibatnya klien tidak bisa membedakan penolakan yang MENAGIH dari yang tidak, dan
+   * `quotaCharged` adalah satu-satunya cara jujur menampilkan sisa kuota tanpa polling
+   * `/api/quota` setiap kali (kontrak yang sama yang dijanjikan `route-quota.js`).
+   *
+   * ARTINYA HARUS PERSIS: `quotaCharged:true` berarti satu unit jatah murid benar-benar
+   * berkurang. Ia BUKAN sinonim `quotaChecked` (yang hanya berarti "gerbang kuota dijalankan").
+   *
+   * Kenapa nilainya bisa dijamin: `workers/api/route-wiring.js:settleQuota()` menyelesaikan
+   * reservasi dengan melihat AMPLOP jawaban — `providerFailed(body)` true (`source` =
+   * `deterministic-fallback`/`unavailable`, atau `degraded:true`) ⇒ `rollback`, selain itu
+   * `commit`. Jadi predikat di bawah dieja mengikuti predikat itu, bukan menebaknya. Kalau salah
+   * satu berubah tanpa yang lain, `ai-response-shape-test.js` merah.
+   *
+   * `deps.rollbackQuota` opsional: pemanggil yang TIDAK lewat wiring (uji, worker lain) bisa
+   * menyuntikkan pembatal eksplisit. Kalau tidak ada, rollback tetap terjadi lewat amplop.
+   */
+  function releaseQuota(deps, info) {
+    var d = deps || {};
+    var fn = typeof d.rollbackQuota === 'function' ? d.rollbackQuota : null;
+    if (!fn) {
+      var g = typeof globalThis !== 'undefined' ? globalThis : {};
+      if (typeof g.FIEZEL_ROLLBACK_QUOTA === 'function') fn = g.FIEZEL_ROLLBACK_QUOTA;
+    }
+    if (!fn) return false;
+    try {
+      var out = fn(info);
+      if (out && typeof out.catch === 'function') out.catch(function () {});
+    } catch (_) { /* pembatal yang meledak tidak boleh menggagalkan jawaban murid */ }
+    return true;
+  }
+
   function json(payload, status, headers) {
     var h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' };
     if (headers) Object.keys(headers).forEach(function (k) { h[k] = headers[k]; });
@@ -141,6 +176,9 @@
       source: 'deterministic-fallback',
       degraded: true,
       breaker: 'CLOSED',
+      // A12/2 — bawaan amplop, bukan tambahan per jalur: sebuah jalur baru yang lupa mengejanya
+      // tetap jujur (tidak menagih) alih-alih menghilangkan field-nya dari kontrak.
+      quotaCharged: false,
       usage: { inputTokens: 0, outputTokens: 0, ms: 0 },
       protocol: '2.0'
     };
@@ -209,14 +247,15 @@
     try {
       raw = await a.request.text();
     } catch (_) {
-      return json(baseResponse('', { error: 'bad_request', message: POLITE.bad_json }), 400);
+      // Kuota belum disentuh sama sekali di titik ini.
+      return json(baseResponse('', { error: 'bad_request', message: POLITE.bad_json, quotaCharged: false }), 400);
     }
     if (AiTasks.byteLength(raw || '') > MAX_BODY_BYTES) {
-      return json(baseResponse('', { error: 'body_too_big', message: POLITE.body_too_big }), 413);
+      return json(baseResponse('', { error: 'body_too_big', message: POLITE.body_too_big, quotaCharged: false }), 413);
     }
     var body;
     try { body = JSON.parse(raw || '{}'); } catch (_) {
-      return json(baseResponse('', { error: 'bad_json', message: POLITE.bad_json }), 400);
+      return json(baseResponse('', { error: 'bad_json', message: POLITE.bad_json, quotaCharged: false }), 400);
     }
 
     var verdict = AiTasks.validate(body);
@@ -225,7 +264,7 @@
       // Daftar galat rinci TIDAK dikirim ke klien; ia hanya untuk log server-side. Yang dikirim
       // satu kode + satu kalimat sopan.
       return json(baseResponse(verdict.task || '', {
-        error: code, message: POLITE[code], degraded: true
+        error: code, message: POLITE[code], degraded: true, quotaCharged: false
       }), 400);
     }
 
@@ -249,6 +288,9 @@
         breaker: gate.phase,
         message: POLITE.breaker_open,
         retryAfter: Math.max(1, Math.ceil(gate.retryAfterMs / 1000)),
+        // Breaker OPEN mendahului kuota dengan sengaja: provider yang terbukti mati tidak
+        // memakan satu pun jatah, jadi nilai ini strukturnya SELALU false.
+        quotaCharged: false,
         usage: { inputTokens: 0, outputTokens: 0, ms: now() - started }
       }), 200);
     }
@@ -289,6 +331,9 @@
           message: unavailable ? POLITE.quota_unavailable : POLITE.quota_exceeded,
           retryAfter: Number(quota.retryAfter) || 3600,
           quotaChecked: true,
+          // Penolakan kuota TIDAK menagih: `reserve` gagal, tidak ada reservasi yang dibuat.
+          // Inilah perbedaan yang klien tidak bisa lihat sebelum A12.
+          quotaCharged: false,
           usage: { inputTokens: 0, outputTokens: 0, ms: now() - started }
         }), 429, { 'retry-after': String(Number(quota.retryAfter) || 3600) });
       }
@@ -355,6 +400,12 @@
     }
 
     if (qualityRejected) {
+      // A12/3 — jawaban yang tidak layak tampil (termasuk `"{}"`, kosong, whitespace, JSON
+      // kosong) TIDAK menagih. Reservasi dibatalkan, bukan di-commit: murid tidak boleh
+      // kehilangan jatah untuk jawaban yang tidak berisi apa pun.
+      var rolledBackQ = quotaChecked && releaseQuota(deps, {
+        kind: 'ai', task: taskName, reason: failureReason, request: a.request, env: env, ctx: a.ctx
+      });
       // Provider dinyatakan sehat (jawabannya datang, hanya tidak layak tampil).
       var healthyQ = Breaker.onSuccess(gate.state, now());
       if (store) await store.save(breakerTarget, healthyQ, now(), { changed: gate.phase !== 'CLOSED' });
@@ -366,11 +417,19 @@
         message: POLITE.degraded,
         reason: failureReason,
         quotaChecked: quotaChecked,
+        quotaCharged: false,
+        quotaRolledBack: !!rolledBackQ,
         usage: { inputTokens: inTokens, outputTokens: 0, ms: now() - started }
       }), 200);
     }
 
     if (failureKind) {
+      // Provider gagal/timeout/senyap: reservasi dibatalkan (`quota-core.js` §"Kegagalan
+      // provider = rollback(), BUKAN 429").
+      var rolledBackF = quotaChecked && releaseQuota(deps, {
+        kind: 'ai', task: taskName, reason: failureReason || failureKind,
+        request: a.request, env: env, ctx: a.ctx
+      });
       var failed = Breaker.onFailure(gate.state, failureKind, now(), 0);
       if (store) await store.save(breakerTarget, failed, now(), { changed: true, transition: true });
       var snap = Breaker.snapshot(failed, now());
@@ -383,6 +442,8 @@
         reason: failureReason,
         retryAfter: snap.retryAfter,
         quotaChecked: quotaChecked,
+        quotaCharged: false,
+        quotaRolledBack: !!rolledBackF,
         usage: { inputTokens: inTokens, outputTokens: 0, ms: now() - started }
       });
       // Tetap 200: murid mendapat jawaban, hanya jawabannya bukan dari AI.
@@ -410,6 +471,10 @@
       degraded: false,
       breaker: Breaker.snapshot(healthy, now()).breaker,
       quotaChecked: quotaChecked,
+      // SATU-SATUNYA jalur yang menagih: jawaban provider yang lolos kontrak mutu dan benar-benar
+      // dikirim ke murid. `false` di sini ketika gerbang kuota belum terpasang (`quotaChecked`
+      // false) — jejaknya tetap terlihat, tidak disamarkan menjadi "tertagih".
+      quotaCharged: quotaChecked === true,
       usage: { inputTokens: inTokens, outputTokens: outTokens, ms: now() - started }
     }), 200);
   }
@@ -442,6 +507,7 @@
     registerAiRoutes: registerAiRoutes,
     handleAiTask: handleAiTask,
     resolveEnforceQuota: resolveEnforceQuota,
+    releaseQuota: releaseQuota,
     readProviderText: readProviderText,
     signalFromError: signalFromError
   });
