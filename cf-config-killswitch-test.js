@@ -559,8 +559,19 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   /* ===================================================================================
    * 6. Invarian build tidak ikut naik (wewenang MASTER saat merge)
    * ================================================================================= */
-  check('tidak ada bump invarian build di paket ini (FIEZEL_PAGE_BUILD tetap m025-172)',
-    /FIEZEL_PAGE_BUILD='m025-172'/.test(config), 'core-config.js');
+  /* Dulu: "FIEZEL_PAGE_BUILD tetap m025-172" - pagar agar paket kerja tidak menaikkan versi.
+   * Pagar itu memerahkan gerbang begitu master menaikkan versi secara sah, padahal tidak ada
+   * yang rusak. Kontrak sesungguhnya adalah tiga penanda menunjuk versi yang SAMA. */
+  {
+    const page = (config.match(/FIEZEL_PAGE_BUILD='(m025-\d+)'/) || [])[1] || null;
+    const swSrc = read('sw.js');
+    const diagSrc = read('features/neural-voice/fiezel-diag-panel.js');
+    const sw = (swSrc.match(/SW_REV='(m025-\d+)/) || [])[1] || null;
+    const diag = (diagSrc.match(/DIAG_BUILD = '(m025-\d+)'/) || [])[1] || null;
+    check('invarian build utuh: SW_REV = DIAG_BUILD = FIEZEL_PAGE_BUILD',
+      Boolean(page) && page === sw && page === diag,
+      String(page) + ' / ' + String(sw) + ' / ' + String(diag));
+  }
 
   /* ================================================================================= */
   const report = {

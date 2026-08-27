@@ -427,6 +427,13 @@ jobs:
       # yang menegakkan itu (`cf-live-contract-test.js` exit 1 pada assert gagal;
       # `staging-live-test.js` exit 1 bahkan bila base URL diisi tapi tidak sah).
       - name: 'CF live contract gate (SKIP kecuali workflow_dispatch dengan cf_live_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
@@ -452,6 +459,13 @@ jobs:
           fi
           node cf-live-contract-test.js
       - name: 'Staging live gate (SKIP kecuali workflow_dispatch dengan staging_base)'
+        # Penjaga aktor per-LANGKAH, bukan per-workflow. `quality.yml` harus tetap
+        # berjalan untuk setiap push dan setiap PR dari siapa pun - itu justru gunanya.
+        # Yang perlu dijaga hanya DUA langkah yang bisa menembak sistem hidup dan
+        # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
+        # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
+        # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
         env:
           FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
           # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak

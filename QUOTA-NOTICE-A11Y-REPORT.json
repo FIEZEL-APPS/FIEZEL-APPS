@@ -1,11 +1,11 @@
 {
   "schema": "fiezel-quota-notice-a11y-v1",
-  "generatedAt": "2026-08-27T17:03:54.359Z",
+  "generatedAt": "2026-08-27T20:48:52.623Z",
   "pass": true,
   "corpus": {
     "module": 77,
     "routes": 21,
-    "app": 9
+    "app": 5
   },
   "urgentKeys": [
     "session.expired"

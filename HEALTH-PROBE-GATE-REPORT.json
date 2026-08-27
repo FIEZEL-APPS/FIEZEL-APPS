@@ -132,7 +132,7 @@
     {
       "name": "Skenario `workers_dev_terbuka` tetap nol jaringan luar",
       "status": "PASS",
-      "details": "http://127.0.0.1:41563/x/site/ http://127.0.0.1:41563/x/site/app/ http://127.0.0.1:41563/x/bridge/health http://127.0.0.1:41563/x/bridge/healthz http://127.0.0.1:41563/x/wd/health tls://api.fiezel.my.id dns://fixture"
+      "details": "http://127.0.0.1:34843/x/site/ http://127.0.0.1:34843/x/site/app/ http://127.0.0.1:34843/x/bridge/health http://127.0.0.1:34843/x/bridge/healthz http://127.0.0.1:34843/x/wd/health tls://api.fiezel.my.id dns://fixture"
     },
     {
       "name": "Skenario `sehat`: exit 0, nol kritis, nol peringatan",
@@ -142,7 +142,7 @@
     {
       "name": "Skenario `sehat` tetap nol jaringan luar dan semua target loopback/fixture",
       "status": "PASS",
-      "details": "http://127.0.0.1:33319/x/site/ http://127.0.0.1:33319/x/site/app/ http://127.0.0.1:33319/x/bridge/health http://127.0.0.1:33319/x/bridge/healthz http://127.0.0.1:33319/x/wd/health tls://api.fiezel.my.id dns://fixture"
+      "details": "http://127.0.0.1:40917/x/site/ http://127.0.0.1:40917/x/site/app/ http://127.0.0.1:40917/x/bridge/health http://127.0.0.1:40917/x/bridge/healthz http://127.0.0.1:40917/x/wd/health tls://api.fiezel.my.id dns://fixture"
     },
     {
       "name": "Setiap kegagalan KRITIS membuat exit non-nol (6 skenario)",

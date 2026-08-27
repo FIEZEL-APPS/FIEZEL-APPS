@@ -1,6 +1,6 @@
 {
   "gate": "voice-callsite-prefetch",
-  "generatedAt": "2026-08-27T18:55:38.966Z",
+  "generatedAt": "2026-08-27T20:54:37.302Z",
   "status": "PASS",
   "sources": [
     "reports/voice-v1-audit.md#1",

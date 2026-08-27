@@ -85,11 +85,48 @@ const ALLOWLIST = {
     'lalu membandingkan angka. Ia tidak memanggil satu pun API pihak ketiga. Memberinya gate ' +
     'aktor justru MERUSAK fungsinya: verifier PR harus jalan untuk PR siapa pun — kalau ia ' +
     'hanya jalan untuk owner, kontribusi luar tidak pernah diverifikasi.',
+  'quality.yml':
+    'Terjaring karena F5 menambahkan workflow_dispatch beserta dua langkah live yang membaca ' +
+    'secrets.FIEZEL_STAGING_EDGE. Penjaga aktor tingkat JOB dilarang di sini: quality.yml ' +
+    'adalah gerbang mutu untuk SETIAP push dan SETIAP PR, jadi menggerbanginya ke satu aktor ' +
+    'akan mematikan 150+ gerbang untuk kontributor lain - obatnya lebih buruk dari ' +
+    'penyakitnya. Yang dijaga adalah DUA langkah live-nya, masing-masing dengan penjaga ' +
+    'aktor pada tingkat LANGKAH, dan itu TIDAK dipercaya dari alasan ini: cek (H) ' +
+    'memverifikasinya di sumber, jadi mencabut penjaga langkah tetap memerahkan gerbang ini.',
   'a9-a14-autonomous-guardians.yml':
     'Sama persis: kata "deploy" hanya ada di dalam satu `echo` yang menjelaskan bahwa A14 ' +
     '"never grants merge/deploy authority". Nol `secrets.`, `pull_request` saja, reviewer ' +
     'deterministik baca-saja. Gate aktor akan membuat penjaga PR berhenti menjaga PR orang lain.'
 };
+
+
+/* CEK (H) — allowlist BUKAN surat bebas.
+ *
+ * Entri allowlist sebelumnya hanya berupa kalimat; tidak ada yang memeriksa apakah
+ * alasannya masih benar. Untuk `quality.yml` alasannya bergantung pada satu fakta yang bisa
+ * hilang dalam satu suntingan: dua langkah live-nya punya penjaga aktor tingkat LANGKAH.
+ * Jadi fakta itu diverifikasi di sumber, bukan dipercaya dari prosa. Kalau seseorang
+ * mencabut `if:` dari langkah live, gerbang ini merah walau berkasnya ber-allowlist.
+ */
+function periksaPenjagaLangkah(file, source, checkFn) {
+  const perluPenjaga = [];
+  const blokLangkah = source.split(/^      - name: /m).slice(1);
+  for (const blok of blokLangkah) {
+    const nama = (blok.split('\n')[0] || '').replace(/^'|'$/g, '').slice(0, 70);
+    const sentuhSecret = /secrets\./.test(blok);
+    const sentuhLive = /(cf-live-contract-test|staging-live-test)\.js/.test(blok);
+    if (!sentuhSecret && !sentuhLive) continue;
+    const berpenjaga = /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==/.test(blok);
+    perluPenjaga.push({ nama, berpenjaga });
+  }
+  checkFn(
+    'H ' + file + ': setiap langkah bersecret/live punya penjaga aktor tingkat langkah',
+    perluPenjaga.length > 0 && perluPenjaga.every((x) => x.berpenjaga),
+    perluPenjaga.length === 0
+      ? 'TIDAK ADA langkah bersecret/live yang terdeteksi — alasan allowlist jadi tak terverifikasi'
+      : perluPenjaga.map((x) => (x.berpenjaga ? '[ok] ' : '[TANPA PENJAGA] ') + x.nama).join(' | ')
+  );
+}
 
 /* ============================================================ pelaporan ================ */
 
@@ -272,6 +309,11 @@ const ACTOR_COMPARE = /github\.actor\s*==\s*'([^']+)'/;
             : 'TERJARING TANPA GATE'
     });
 
+    /* --- H. allowlist yang menyentuh secret WAJIB berpenjaga per-langkah ----- */
+    if (allowReason !== null && (usesSecrets || /(cf-live-contract-test|staging-live-test)\.js/.test(body))) {
+      periksaPenjagaLangkah(file, body, check);
+    }
+
     /* --- A. aturan utama ---------------------------------------------------- */
     if (needsGate && !hasGate) {
       check(
@@ -317,13 +359,30 @@ const ACTOR_COMPARE = /github\.actor\s*==\s*'([^']+)'/;
 
     /* --- D. allowlist tidak boleh memaafkan pemegang secrets ---------------- */
     if (allowReason !== null) {
+      /* Aturan D SEMULA: "di-allowlist berarti WAJIB nol secrets". Premis itu benar untuk dua
+       * entri pertama (false positive gara-gara kata "deploy"), tetapi ia melarang satu kasus
+       * yang sah dan justru lebih aman: workflow yang HARUS jalan untuk semua orang (gerbang
+       * mutu tiap push) sementara segelintir langkahnya memegang secret dan sudah dijaga pada
+       * tingkat LANGKAH. Menolak kasus itu memaksa dua pilihan yang lebih buruk — gerbangi
+       * seluruh job (150+ gerbang mati untuk kontributor lain) atau buang langkah live-nya
+       * (kembali ke keadaan yang membuat "semua hijau" mengandung gerbang yang tidak menguji
+       * apa pun). Jadi D sekarang tunduk pada cek H: memegang secret boleh, TAPI hanya kalau
+       * SETIAP langkah bersecret/live berpenjaga aktor, dan itu diverifikasi di sumber. */
+      const langkahBersecretTakBerpenjaga = usesSecrets
+        ? body.split(/^      - name: /m).slice(1).filter((blok) => {
+            const sentuh = /secrets\./.test(blok) || /(cf-live-contract-test|staging-live-test)\.js/.test(blok);
+            if (!sentuh) return false;
+            return !/if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==/.test(blok);
+          }).length
+        : 0;
       check(
-        'D ' + file + ' di-allowlist tanpa memegang secrets',
-        !usesSecrets,
-        usesSecrets
-          ? 'berkas ini mereferensikan ' + secretNames.join(', ') +
-            ' — allowlist bukan tempatnya; pasang gate.'
-          : 'nol referensi secrets'
+        'D ' + file + ' di-allowlist: nol secrets, ATAU setiap langkah bersecret berpenjaga aktor',
+        !usesSecrets || langkahBersecretTakBerpenjaga === 0,
+        !usesSecrets
+          ? 'nol referensi secrets'
+          : langkahBersecretTakBerpenjaga === 0
+            ? 'memegang ' + secretNames.join(', ') + ' tetapi SETIAP langkah bersecret/live berpenjaga aktor tingkat langkah (lihat cek H)'
+            : langkahBersecretTakBerpenjaga + ' langkah memegang secret TANPA penjaga aktor — allowlist bukan tempatnya; pasang penjaga per langkah atau gate job.'
       );
       check(
         'D ' + file + ' punya alasan allowlist yang ditulis, bukan kosong',
