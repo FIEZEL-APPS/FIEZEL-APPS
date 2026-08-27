@@ -3,12 +3,38 @@
  * V6 GERBANG SISI PEMANGGIL (voice-callsite-prefetch-test.js)
  *
  * KENAPA BERKAS INI ADA. Tiga agen sebelumnya memperbaiki MESIN suara: prefetch() kini
- * benar-benar menyentuh mesin neural lokal (reports/voice-v5-prefetch.md, jeda terukur
- * 4.510 ms -> 797 ms), planUtterance() menerima TEKS UTUH dan mengembalikan potongan
- * bertanda batas (reports/voice-v3-chunk.md), dan pemutar menyambung antrean lintas
- * panggilan sambil memangkas senyap (reports/voice-v2-player.md). Ketiganya tidak berbuah
- * apa pun selama PEMANGGIL tetap mengirim satu kalimat per panggilan dan tidak pernah
- * menghangatkan kalimat berikutnya - itulah daftar yang ditulis voice-v5-prefetch.md §3.
+ * benar-benar menyentuh mesin neural lokal (reports/voice-v5-prefetch.md), planUtterance()
+ * menerima TEKS UTUH dan mengembalikan potongan bertanda batas (reports/voice-v3-chunk.md),
+ * dan pemutar menyambung antrean lintas panggilan sambil memangkas senyap
+ * (reports/voice-v2-player.md). Ketiganya tidak berbuah apa pun selama PEMANGGIL tetap
+ * mengirim satu kalimat per panggilan dan tidak pernah menghangatkan kalimat berikutnya -
+ * itulah daftar yang ditulis voice-v5-prefetch.md §3.
+ *
+ * ANGKA MANA UNTUK PEKERJAAN MANA - jangan dirangkai (temuan add-a10-kepatuhan.md KB-6).
+ * Ada DUA metrik jeda di paket suara ini, dan keduanya pernah dikutip sebagai satu tren
+ * perbaikan. Itu salah, dan koreksinya bukan menghapus angkanya melainkan melabelinya:
+ *
+ *   - JEDA TERDENGAR (meanAudibleGapMs) = keheningan yang benar-benar didengar murid,
+ *     dihitung dari sinyal PCM termasuk keheningan kepala/ekor yang justru DIPANGKAS
+ *     pemutar di jalur tersambung. Ia batas ATAS, bukan jeda nyata.
+ *     Angka V5: 4.510,7 -> 797,2 ms (reports/voice-v5-prefetch.md §2, harness-door.html +
+ *     measure_door.py, reports/voice-v5-data/door-measurements.json). Itu mengukur
+ *     perbaikan MESIN prefetch V5 - BUKAN pekerjaan sisi-pemanggil yang dijaga berkas ini.
+ *
+ *   - JEDA PENJADWALAN (meanSchedulingGapMs) = selisih antara satu bunyi selesai dan bunyi
+ *     berikutnya dijadwalkan. Ia metrik V6, dan ia yang mengukur pekerjaan sisi pemanggil.
+ *     Angka V6 pola SATU KALIMAT per panggilan (classroom, tutor, flashcards, kuis):
+ *     3.750,6 -> 449,1 ms; porsi sunyi 47,7% -> 9,7% (reports/voice-v6-callers.md §4,
+ *     harness-callers.html + measure_callers.py, voice-v6-data/caller-measurements.json).
+ *
+ * DAN ANGKA MANA YANG BERLAKU UNTUK PRODUKSI. Konfigurasi narasi Library yang benar-benar
+ * dikirim adalah blok bertangga (LEAD_BLOCK_CHARS 80, RAMP_COVER_FACTOR 1,15), bukan pola
+ * satu-kalimat-per-panggilan. Ia membayar lebih: jeda penjadwalan 560,6 ms, jeda terdengar
+ * 1.286,0 ms, porsi sunyi 12,6%, suara pertama 2.816,8 ms (reports/voice-v6-callers.md §5,
+ * measure_blocks.py, voice-v6-data/block-measurements.json). Jadi 449 ms adalah angka pola
+ * pemanggil, dan 560,6 ms adalah angka yang berlaku untuk narasi Library di produksi.
+ * Mengutip "3.750 -> 449" untuk Library, atau merangkainya dengan "4.510 -> 797", adalah
+ * dua kesalahan berbeda; keduanya dilarang di sini.
  *
  * Kelas bug yang dijaga bukan "fungsinya tidak ada" tapi "fungsinya ada dan tidak dipanggil
  * dari tempat yang penting". Karena itu pemindaiannya SPESIFIK - nama pemanggil, nama
@@ -477,9 +503,53 @@ const report = {
     'reports/voice-v3-chunk.md#3',
     'reports/voice-v2-player.md#1'
   ],
+  // Blok ini SENGAJA tidak lagi bernama `measured` dengan dua angka telanjang. Bentuk lamanya
+  // (`jedaTerdengarSebelumMs: 4510.7` / `jedaTerdengarSesudahMs: 797.2`) menaruh metrik V5
+  // ke dalam laporan gerbang V6 tanpa menyebut metriknya, patternnya, atau angka mana yang
+  // berlaku untuk produksi - persis perangkaian yang dilarang add-a10-kepatuhan.md KB-6.
+  // Angkanya TIDAK dihapus; masing-masing sekarang membawa metrik, cara ukur, pola
+  // pemanggilan, dan status produksinya sendiri.
+  metrics: {
+    catatan:
+      'DUA metrik berbeda, jangan dirangkai jadi satu tren. jedaTerdengar = keheningan yang ' +
+      'didengar murid (batas ATAS: memuat keheningan kepala/ekor PCM yang dipangkas pemutar). ' +
+      'jedaPenjadwalan = selisih bunyi-selesai ke bunyi-berikutnya-dijadwalkan.',
+    v5MesinPrefetch: {
+      metrik: 'jedaTerdengar (meanAudibleGapMs)',
+      diukurBagaimana: 'reports/voice-v5-data/harness-door.html + measure_door.py, mesin supertonic-3 lokal',
+      data: 'reports/voice-v5-data/door-measurements.json',
+      pola: 'pintu suara per kalimat',
+      sebelumMs: 4510.7,
+      sesudahMs: 797.2,
+      mengukurPekerjaan: 'V5 - prefetch() sampai ke mesin neural lokal. BUKAN pekerjaan sisi pemanggil yang dijaga gerbang ini.',
+      berlakuUntukProduksi: false
+    },
+    v6SisiPemanggil: {
+      metrik: 'jedaPenjadwalan (meanSchedulingGapMs)',
+      diukurBagaimana: 'reports/voice-v6-data/harness-callers.html + measure_callers.py',
+      data: 'reports/voice-v6-data/caller-measurements.json',
+      pola: 'satu kalimat per panggilan - classroom, tutor, flashcards, kuis',
+      sebelumMs: 3750.6,
+      sesudahMs: 449.1,
+      porsiSunyiSebelum: 0.4769,
+      porsiSunyiSesudah: 0.0969,
+      mengukurPekerjaan: 'V6 - pemanggil menghangatkan item BERIKUTNYA. Inilah metrik gerbang ini.',
+      berlakuUntukProduksi: 'ya untuk classroom/tutor/flashcards/kuis; TIDAK untuk narasi Library'
+    },
+    v6NarasiLibraryTerkirim: {
+      metrik: 'jedaPenjadwalan + jedaTerdengar',
+      diukurBagaimana: 'reports/voice-v6-data/measure_blocks.py pada library-books-v1.json, 18 kalimat pertama',
+      data: 'reports/voice-v6-data/block-measurements.json',
+      pola: 'blok bertangga LEAD_BLOCK_CHARS 80, RAMP_COVER_FACTOR 1.15 - konfigurasi yang BENAR-BENAR dikirim',
+      jedaPenjadwalanMs: 560.6,
+      jedaTerdengarMs: 1286.0,
+      porsiSunyi: 0.126,
+      suaraPertamaMs: 2816.8,
+      mengukurPekerjaan: 'V6 pada pola yang dipakai Library di produksi - lebih mahal daripada 449,1 ms, dan itu angka yang berlaku.',
+      berlakuUntukProduksi: true
+    }
+  },
   measured: {
-    jedaTerdengarSebelumMs: 4510.7,
-    jedaTerdengarSesudahMs: 797.2,
     contohBlokAudiobook: {
       buku: book.title,
       kalimat: firstBlock.sentences.length,

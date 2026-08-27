@@ -4015,13 +4015,30 @@ async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.Fiez
 
    Tiga perbaikan lapisan bawah sudah ter-merge dan terukur:
      - FiezelVoiceSay.prefetch() benar-benar sampai ke mesin neural lokal
-       (reports/voice-v5-prefetch.md: jeda terdengar 4.510 ms -> 797 ms),
+       (V5, metrik JEDA TERDENGAR: 4.510,7 -> 797,2 ms; reports/voice-v5-prefetch.md §2,
+       harness-door.html + measure_door.py. Itu angka pekerjaan V5, BUKAN angka
+       pekerjaan sisi-pemanggil di bawah - dua metrik berbeda, jangan dirangkai),
      - prosody/service.planUtterance() menerima TEKS UTUH,
      - pemutar memangkas keheningan dan menyambung antrean lintas panggilan
        (reports/voice-v2-player.md).
-   Ketiganya tidak berbuah selama PEMANGGIL mengirim satu kalimat lalu menunggu bunyi
-   habis sebelum kalimat berikutnya digenerasi. Dua fungsi di bawah ini adalah bentuk
-   tunggal dari "hangatkan yang berikutnya" untuk seluruh app.js.
+
+   ANGKA UNTUK PEKERJAAN DI BAWAH INI, dan mana yang berlaku untuk produksi
+   (pelabelan diperbaiki setelah reports/add-a10-kepatuhan.md KB-6; nol angka dihapus):
+     - metrik V6 adalah JEDA PENJADWALAN (meanSchedulingGapMs), bukan jeda terdengar.
+     - pola SATU KALIMAT per panggilan (classroom, tutor, flashcards, kuis):
+       3.750,6 -> 449,1 ms, porsi sunyi 47,69% -> 9,69%
+       (reports/voice-v6-callers.md §4, voice-v6-data/caller-measurements.json).
+     - pola NARASI LIBRARY yang benar-benar dikirim - blok bertangga
+       (LEAD_BLOCK_CHARS 80, RAMP_COVER_FACTOR 1,15) - membayar lebih dan itulah
+       angka produksi untuk Library: jeda penjadwalan 560,6 ms, jeda terdengar
+       1.286,0 ms, porsi sunyi 12,6%, suara pertama 2.816,8 ms
+       (reports/voice-v6-callers.md §5, voice-v6-data/block-measurements.json).
+     Jadi "449 ms" TIDAK boleh dikutip sebagai angka Library, dan "4.510 -> 797"
+     TIDAK boleh dirangkai dengan "3.750 -> 449" sebagai satu tren.
+
+   Ketiga perbaikan lapisan bawah itu tidak berbuah selama PEMANGGIL mengirim satu
+   kalimat lalu menunggu bunyi habis sebelum kalimat berikutnya digenerasi. Dua fungsi
+   di bawah ini adalah bentuk tunggal dari "hangatkan yang berikutnya" untuk seluruh app.js.
 
    EMPAT PAGAR, dan semuanya sengaja:
      1. TIDAK memicu unduhan model. Di sini TIDAK ADA prepare()/ensureReady()/prewarm().
