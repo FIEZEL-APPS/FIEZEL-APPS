@@ -3,6 +3,12 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+# Artefak merge/patch. Bukan sekadar sampah: `*.orig`/`*.rej` adalah SALINAN UTUH
+# versi lain sebuah berkas, jadi berkas yang placeholder-nya sudah dibersihkan bisa
+# tetap memuat nilai sungguhan di dalam salinan ini. `secret-scan-test.js` meng-assert
+# ketiganya diabaikan DAN tidak ada satu pun yang terlacak git.
+*.orig
+*.rej
 node_modules/
 __pycache__/
 *.pyc
