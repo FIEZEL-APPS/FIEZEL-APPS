@@ -114,7 +114,11 @@ for name,needle in [('Central question integrity guard','function validateQuesti
 # DAN cabang cloze punya validasinya sendiri (pertanyaan + jawaban + skill), sehingga soal cacat
 # tidak pernah sampai ke murid lewat tipe apa pun. Kalau seseorang menghapus penjaga di salah
 # satu situs, jumlahnya turun dan audit merah.
-render_guards = re.findall(r'if\(!q\|\|!validateQuestion\(q\)\.ok\)continue', app)
+# Dua bentuk penjaga yang sah hidup berdampingan di repo: gabungan `if(!q||!validate...)` dan
+# terpisah `if(!q)continue;if(!validate...)`. Hulu memakai bentuk terpisah, jalur ini pernah
+# memakai bentuk gabungan. Yang penting BUKAN bentuknya, melainkan bahwa setiap loop render
+# menolak soal cacat sebelum dipakai — jadi keduanya dihitung.
+render_guards = re.findall(r'if\(!validateQuestion\(q\)\.ok\)continue', app)
 cloze_guard = re.search(
     r"q\?\.type===\'cloze\'\?!!\(q\.question&&q\.clozeAnswer&&\(q\.lessonSkill\|\|q\.skill\)\):validateQuestion\(q\)\.ok",
     app)
