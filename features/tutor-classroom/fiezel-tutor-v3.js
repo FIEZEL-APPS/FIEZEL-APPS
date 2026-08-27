@@ -484,6 +484,8 @@
     var pack = null;
     var session = null;
     var voiceBusy = false;
+    // V6: penanda pembatalan untuk pengajuan hangat yang masih menganggur (lihat stopVoice).
+    var prefetchGeneration = 0;
     var mount = function () { return root.document.getElementById('app'); };
 
     function readLocal(key, fallback) {
@@ -523,6 +525,41 @@
     function stopVoice() {
       try { if (root.FiezelVoiceRuntime && typeof root.FiezelVoiceRuntime.stop === 'function') root.FiezelVoiceRuntime.stop(); } catch (_) {}
       voiceBusy = false;
+      // V6: penghenti juga membatalkan pengajuan hangat yang masih menganggur. Prefetch
+      // tidak pernah berbunyi, jadi yang dijaga di sini adalah CPU ponsel: tidak ada
+      // generasi untuk beat yang murid sudah tinggalkan.
+      prefetchGeneration++;
+    }
+
+    /**
+     * V6 (reports/voice-v5-prefetch.md §3 baris 2): paket materi sudah dimuat penuh, jadi
+     * beat BERIKUTNYA sudah diketahui - `session.beats()` publik dan `beatIndex` ada di
+     * snapshot. Sebelum ini tidak ada satu pun kata prefetch di berkas ini, dan setiap beat
+     * membayar penuh ~4,5 detik generasi (audit V1 §1).
+     *
+     * PAGAR: tidak ada prepare()/ensureReady() di sini - kontrak v5 sudah menjawab false
+     * dengan tenang selama aset belum prepared, dan itu memang jawaban yang benar. Pengajuan
+     * ditunda satu task supaya beat yang SEDANG dibacakan memesan mesin single-flight lebih
+     * dulu (inversi antrean m025-47), dan dibatalkan bila stopVoice() sudah lewat.
+     */
+    function prefetchNextBeat(speedFactor) {
+      var say = root.FiezelVoiceSay;
+      if (!say || typeof say.prefetch !== 'function') return false;
+      var upcoming = null;
+      try {
+        var snap = session.snapshot();
+        if (snap.phase !== 'teach') return false;
+        upcoming = session.beats()[Number(snap.beatIndex) + 1] || null;
+      } catch (_) { return false; }
+      if (!upcoming || !upcoming.en) return false;
+      var generation = ++prefetchGeneration;
+      var speed = Math.max(.55, Math.min(1.25, baseSpeed() * (speedFactor || 1)));
+      var defer = typeof root.setTimeout === 'function' ? root.setTimeout : setTimeout;
+      defer(function () {
+        if (generation !== prefetchGeneration) return;
+        try { say.prefetch(upcoming.en, { speed: speed }); } catch (_) {}
+      }, 0);
+      return true;
     }
     async function speak(pair, speedFactor) {
       if (!pair || !pair.en || voiceBusy) return;
@@ -540,9 +577,14 @@
         // Subtitle tutor sudah digambar di atas dari pair.id, jadi barisnya dioper
         // ikut supaya pita subtitle bersama tidak memanggil penerjemah untuk teks
         // yang terjemahannya sudah ada.
-        await root.FiezelVoiceSay.say({ en: pair.en, id: pair.id || pair.idText || '' }, {
+        var speaking = root.FiezelVoiceSay.say({ en: pair.en, id: pair.id || pair.idText || '' }, {
           speed: Math.max(.55, Math.min(1.25, baseSpeed() * (speedFactor || 1)))
         });
+        // Diajukan sesudah say() berangkat dan SEBELUM ditunggu: menunggunya lebih dulu
+        // berarti generasi beat berikutnya baru mulai setelah bunyi sekarang habis - pola
+        // persis yang diukur audit V1 sebagai jeda 4,5 detik per batas.
+        prefetchNextBeat(speedFactor);
+        await speaking;
         if (note) note.textContent = 'Siap untuk pertanyaan berikutnya.';
       } catch (error) {
         if (note) note.textContent = 'Suara tidak berbunyi. Subtitle dan lesson state tetap aman.';
