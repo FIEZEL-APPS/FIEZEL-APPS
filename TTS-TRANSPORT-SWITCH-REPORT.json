@@ -15,7 +15,7 @@
     "reports/cf-b8-ux-quota.md"
   ],
   "counts": {
-    "pass": 31,
+    "pass": 33,
     "fail": 0
   },
   "checks": [
@@ -42,7 +42,7 @@
     {
       "name": "(b) flag on: urutan tangga = cache klien → aset R2 → /api/tts/render → Puter → speechSynthesis",
       "status": "PASS",
-      "details": "[\"cache-open:fiezel-cf-tts-url-v1\",\"resolver.resolve\",\"fetch:https://api.fiezel.my.id/api/tts/render\",\"puter.speak\",\"speechSynthesis.speak\"]"
+      "details": "[\"cache-open:fiezel-cf-tts-url-v1\",\"resolver.resolve\",\"fetch-mock:https://api.fiezel.my.id/api/tts/render\",\"puter.speak\",\"speechSynthesis.speak\"]"
     },
     {
       "name": "(b) flag on: sisipan tepat di /api/tts/render pada basis CF, satu permintaan saja",
@@ -92,7 +92,7 @@
     {
       "name": "(f) 429 jatuh ke lapisan berikutnya — murid TETAP mendengar sesuatu",
       "status": "PASS",
-      "details": "say()=true puter=1 synth=1 jejak=[\"cache-open:fiezel-cf-tts-url-v1\",\"resolver.resolve\",\"fetch:https://api.fiezel.my.id/api/tts/render\",\"puter.speak\",\"speechSynthesis.speak\",\"notice:quota.tts.exhausted:spoken\"]"
+      "details": "say()=true puter=1 synth=1 jejak=[\"cache-open:fiezel-cf-tts-url-v1\",\"resolver.resolve\",\"fetch-mock:https://api.fiezel.my.id/api/tts/render\",\"puter.speak\",\"speechSynthesis.speak\",\"notice:quota.tts.exhausted:spoken\"]"
     },
     {
       "name": "(f) 429 memunculkan naskah kuota, dan naskahnya TIDAK mengunci item / tidak menghitung replay",
@@ -107,7 +107,7 @@
     {
       "name": "(f) tanpa suara sama sekali: naskahnya JUJUR (bukan \"pakai suara perangkat\") dan tetap tidak mengunci",
       "status": "PASS",
-      "details": "{\"schema\":\"fiezel-cf-voice-notice-v1\",\"copyKey\":\"quota.tts.exhausted\",\"resolvedKey\":\"quota.tts.exhausted\",\"tone\":\"quota\",\"spoken\":false,\"layer\":\"\",\"title\":\"Jatah suara hari ini sudah habis\",\"body\":\"Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam. Jatah berikutnya mulai jam 00.36 WIB.\",\"reassurance\":\"Item ini tidak dinilai dan tidak dikunci.\",\"severity\":\"advisory\",\"locksItem\":false,\"countsReplay\":false}"
+      "details": "{\"schema\":\"fiezel-cf-voice-notice-v1\",\"copyKey\":\"quota.tts.exhausted\",\"resolvedKey\":\"quota.tts.exhausted\",\"tone\":\"quota\",\"spoken\":false,\"layer\":\"\",\"title\":\"Jatah suara hari ini sudah habis\",\"body\":\"Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam. Jatah berikutnya mulai jam 01.01 WIB.\",\"reassurance\":\"Item ini tidak dinilai dan tidak dikunci.\",\"severity\":\"advisory\",\"locksItem\":false,\"countsReplay\":false}"
     },
     {
       "name": "(g) prefetch ikut memakai jalur CF saat flag on",
@@ -138,6 +138,16 @@
       "name": "(g) prefetch dengan mesin neural SUDAH prepared tetap tidak menyentuh prepare()/ensureReady()",
       "status": "PASS",
       "details": "prepare=0 ensureReady=0"
+    },
+    {
+      "name": "penjaga: mock fetch lokal MELEMPAR untuk URL di luar endpoint render (kebocoran tidak bisa senyap)",
+      "status": "PASS",
+      "details": "cfTtsRenderFetchMock: URL tak diharapkan (hanya https://api.fiezel.my.id/api/tts/render yang ditiru): https://tidak-diharapkan.example.com/api/tts/render"
+    },
+    {
+      "name": "penjaga: sepanjang gerbang ini, mock fetch lokal hanya pernah dipanggil untuk endpoint render CF",
+      "status": "PASS",
+      "details": "[]"
     },
     {
       "name": "penjaga: transport CF melarang seluruh keluarga field pemutaran, bukan hanya speed",
