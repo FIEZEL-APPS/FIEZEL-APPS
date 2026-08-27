@@ -267,6 +267,308 @@
     return out.filter(Boolean);
   }
 
+  /* ------------------------------------------------------------------------------- *
+   * m025-v3 CHARACTER-BUDGET CHUNKER
+   *
+   * OWNER's report: "setiap akhir kalimat, setiap ada titik, setiap menyambung ke
+   * kalimat atau paragraf baru, selalu delay."
+   *
+   * That is not a mystery, it is arithmetic. `phrases()` above and `planStream()` in
+   * fiezel-neural-voice.js both cut at EVERY sentence terminator, so a B1 reading
+   * passage of 1044 characters becomes 13 chunks averaging 79 characters. Each chunk is
+   * one full generate round trip plus one scheduling seam, so a full stop is literally a
+   * place where the learner waits. Thirteen sentences means thirteen chances to hear it.
+   *
+   * The fix is to stop treating punctuation as the unit of synthesis. Punctuation is a
+   * PROSODY signal (the duration predictor still needs it inside the text, which is why
+   * punctuate() is untouched); the unit of synthesis should be as much text as the model
+   * can render safely in one pass. So adjacent sentences are packed up to a character
+   * budget, and only structural things force a cut.
+   *
+   * Why these numbers:
+   *   max 260  - the safe ceiling. The active sherpa/VITS path re-shapes anything it is
+   *              given into <=160-char phrase units internally (PHRASE_MAX_CHARS in
+   *              fiezel-sherpa-vits-adapter.js), and those seams are inside ONE
+   *              generate call - free. What is not free is a chunk so long that
+   *              time-to-first-word grows: at the measured realtime factor ~0.25, 260
+   *              characters is roughly 2-3 seconds of inference, still under the wait a
+   *              learner reads as "instant", while 13 short chunks pay that startup 13
+   *              times.
+   *   target 220 - packing aims here, not at max, so paragraphs divide into similar-sized
+   *              chunks instead of full-full-crumb. A short tail chunk is the m025-73
+   *              defect: half a second of audio that still costs a whole generate, so
+   *              playback cannot hide the next render behind it.
+   *   min 180  - documentation of the intended floor for a packed chunk; a chunk may be
+   *              shorter only because a paragraph or the text itself ended there.
+   * All three are tunable via options; nothing downstream hardcodes them.
+   * ------------------------------------------------------------------------------- */
+  var CHUNK_CHARS = Object.freeze({ min: 180, target: 220, max: 260 });
+
+  // The boundary kinds a chunk may end on. This is DATA for the player layer: this module
+  // deliberately inserts no silence of its own for budget chunks - it only says what kind
+  // of seam the chunk ends with, so the player can spend the right pause there.
+  var BOUNDARY = Object.freeze({ comma: 'comma', sentence: 'sentence', paragraph: 'paragraph' });
+
+  // Tokens that end in a full stop WITHOUT ending a sentence. Splitting "Mr. Smith" at
+  // the dot produces a one-word chunk and a pause in the middle of a name - audible, and
+  // exactly the kind of false boundary this pass exists to remove.
+  var ABBREVIATIONS = Object.freeze({
+    mr: 1, mrs: 1, ms: 1, mx: 1, dr: 1, prof: 1, sr: 1, jr: 1, st: 1, vs: 1, etc: 1,
+    al: 1, fig: 1, no: 1, nos: 1, approx: 1, dept: 1, est: 1, inc: 1, ltd: 1, co: 1,
+    corp: 1, univ: 1, min: 1, max: 1, vol: 1, ch: 1, pp: 1, ed: 1, eds: 1, cf: 1,
+    jan: 1, feb: 1, mar: 1, apr: 1, jun: 1, jul: 1, aug: 1, sep: 1, sept: 1, oct: 1,
+    nov: 1, dec: 1, mon: 1, tue: 1, tues: 1, wed: 1, thu: 1, thur: 1, thurs: 1, fri: 1,
+    sat: 1, sun: 1, phd: 1, am: 1, pm: 1,
+    // Indonesian, because the tutor speaks it: "Bpk. Ahmad", "dll.", "hlm. 12".
+    dll: 1, dsb: 1, dkk: 1, hlm: 1, bpk: 1, sdr: 1, sdri: 1, tsb: 1, yth: 1, ttd: 1,
+    drs: 1, ir: 1, hj: 1, kpd: 1, pt: 1, cv: 1, jl: 1, rs: 1, tgl: 1, ybs: 1, sbb: 1
+  });
+
+  var TERMINATORS = '.!?\u2026';
+  var CLOSERS = '"\'\u201d\u2019)]\u00bb\u203a';
+
+  /**
+   * The token immediately before a full stop, lowercased. The argument must EXCLUDE the
+   * stop itself: the character class below accepts an inner dot on purpose (that is how
+   * "e.g" and "U.S" are recognised), so feeding it the trailing dot would make every
+   * sentence look like an abbreviation.
+   */
+  function tokenBeforeStop(textUpToStop) {
+    var match = /([A-Za-z\u00c0-\u024f][A-Za-z\u00c0-\u024f.'\u2019-]*)$/.exec(textUpToStop);
+    return match ? match[1].toLowerCase() : '';
+  }
+
+  function isAbbreviationStop(textUpToStop) {
+    var token = tokenBeforeStop(textUpToStop);
+    if (!token) return false;
+    // "e.g", "i.e", "U.S", "a.m" - a token that already contains a dot is an abbreviation
+    // being spelled out, never a finished sentence.
+    if (token.indexOf('.') >= 0) return true;
+    // A lone initial: "J. K. Rowling".
+    if (token.length === 1) return true;
+    return Object.prototype.hasOwnProperty.call(ABBREVIATIONS, token) === true;
+  }
+
+  /**
+   * Sentence segmentation that refuses the three false boundaries OWNER can hear.
+   *
+   * A full stop ends a sentence only when it is not a decimal point ("3.5"), not part of
+   * an abbreviation ("Mr.", "e.g."), and is followed by end-of-text or whitespace plus
+   * something that can start a sentence. Pure: same string in, same array out.
+   */
+  function splitSentences(text) {
+    var source = String(text == null ? '' : text);
+    var out = [];
+    var start = 0;
+    for (var i = 0; i < source.length; i++) {
+      var ch = source.charAt(i);
+      if (TERMINATORS.indexOf(ch) < 0) continue;
+      var end = i;
+      while (end + 1 < source.length && TERMINATORS.indexOf(source.charAt(end + 1)) >= 0) end += 1;
+      var close = end;
+      while (close + 1 < source.length && CLOSERS.indexOf(source.charAt(close + 1)) >= 0) close += 1;
+      var head = source.slice(start, i);
+      var after = source.slice(close + 1);
+      var single = end === i && ch === '.';
+      // "3.5" / "1.000" - a decimal point is arithmetic, not a sentence end.
+      if (single && /\d\s*$/.test(head) && /^\d/.test(after)) { i = close; continue; }
+      // A stop glued to the next word ("file.txt") is not a boundary either.
+      if (after.length && !/^\s/.test(after)) { i = close; continue; }
+      if (single && isAbbreviationStop(head)) { i = close; continue; }
+      var next = /^\s*(\S)/.exec(after);
+      // A lowercase continuation means the stop belonged to the previous token.
+      if (next && /[a-z\u00df-\u00ff]/.test(next[1])) { i = close; continue; }
+      var piece = source.slice(start, close + 1).trim();
+      if (piece) out.push(piece);
+      start = close + 1;
+      i = close;
+    }
+    var tail = source.slice(start).trim();
+    if (tail) out.push(tail);
+    return out;
+  }
+
+  /** Paragraphs survive as boundaries: a blank line is a real structural pause. */
+  function splitParagraphs(text) {
+    return String(text == null ? '' : text)
+      .replace(/\r\n?/g, '\n')
+      .split(/\n[ \t]*\n+/)
+      .map(function (part) { return part.replace(/\s+/g, ' ').trim(); })
+      .filter(Boolean);
+  }
+
+  function boundaryOf(unit) {
+    return /[.!?\u2026]["'\u201d\u2019)\]\u00bb\u203a]*$/.test(unit) ? BOUNDARY.sentence : BOUNDARY.comma;
+  }
+
+  /**
+   * A sentence longer than the budget is cut at clause punctuation - where a speaker
+   * breathes anyway - and only then, as a last resort, on WORD boundaries. Never inside a
+   * word: a half word is not recoverable by any pause the player could add.
+   */
+  function splitOversized(sentence, max) {
+    var parts = sentence.split(/(?<=[,;:])\s+/);
+    var packed = [];
+    var buffer = '';
+    parts.forEach(function (part) {
+      var merged = buffer ? buffer + ' ' + part : part;
+      if (buffer && merged.length > max) { packed.push(buffer); buffer = part; }
+      else buffer = merged;
+    });
+    if (buffer) packed.push(buffer);
+    var out = [];
+    packed.forEach(function (part) {
+      if (part.length <= max) { out.push(part); return; }
+      var words = part.split(/\s+/);
+      var line = '';
+      words.forEach(function (word) {
+        var merged = line ? line + ' ' + word : word;
+        // A single word above the budget still goes out whole - overflowing the budget is
+        // recoverable, cutting a word is not.
+        if (line && merged.length > max) { out.push(line); line = word; }
+        else line = merged;
+      });
+      if (line) out.push(line);
+    });
+    return out.filter(Boolean);
+  }
+
+  /**
+   * Groups text into synthesis chunks by CHARACTER BUDGET instead of by punctuation.
+   *
+   * @param {string} text raw text; blank lines are honoured as paragraph boundaries
+   * @param {object} [options] {max, target, lang, punctuate}
+   * @returns {Array<object>} [{index, text, chars, boundary, paragraphIndex, endsParagraph,
+   *   units}] - `boundary` is one of 'comma' | 'sentence' | 'paragraph' and describes how
+   *   this chunk ENDS, for the player to spend a pause on. No silence is added here.
+   *
+   * Pure: no clock, no randomness, no network, no DOM. Same input, same output.
+   */
+  function groupChunks(text, options) {
+    var opts = options || {};
+    var max = Number(opts.max) > 0 ? Math.floor(Number(opts.max)) : CHUNK_CHARS.max;
+    var target = Number(opts.target) > 0 ? Math.floor(Number(opts.target)) : CHUNK_CHARS.target;
+    if (target > max) target = max;
+    var paragraphs = splitParagraphs(text);
+    var chunks = [];
+    paragraphs.forEach(function (paragraph, paragraphIndex) {
+      var body = opts.punctuate === true ? punctuate(paragraph, opts.lang) : paragraph;
+      var sentences = splitSentences(body);
+      if (!sentences.length) return;
+      var units = [];
+      sentences.forEach(function (sentence) {
+        if (sentence.length <= max) { units.push({ text: sentence, boundary: boundaryOf(sentence) }); return; }
+        var pieces = splitOversized(sentence, max);
+        pieces.forEach(function (piece, at) {
+          units.push({
+            text: piece,
+            // Only the closing piece carries the sentence's own boundary; the seams the
+            // split created are clause seams, and the player should treat them as such.
+            boundary: at === pieces.length - 1 ? boundaryOf(sentence) : BOUNDARY.comma
+          });
+        });
+      });
+      // Balanced packing. Filling to `max` greedily leaves a crumb at the end of the
+      // paragraph, and a crumb costs a full generate while buying almost no playback time
+      // to hide the next one behind (m025-73). Dividing the paragraph into equal-ish
+      // pieces keeps every chunk long enough to cover its successor's render.
+      var total = units.reduce(function (sum, unit) { return sum + unit.text.length + 1; }, -1);
+      var pieceCount = Math.max(1, Math.ceil(total / max));
+      var soft = Math.min(max, Math.max(1, Math.ceil(total / pieceCount)));
+      if (soft > target && pieceCount === 1) soft = max;
+      var current = null;
+      var currentUnits = 0;
+      function flush() {
+        if (!current) return;
+        chunks.push({
+          index: chunks.length,
+          text: current.text,
+          chars: current.text.length,
+          boundary: current.boundary,
+          paragraphIndex: paragraphIndex,
+          endsParagraph: current.boundary === BOUNDARY.paragraph,
+          units: currentUnits
+        });
+        current = null;
+        currentUnits = 0;
+      }
+      units.forEach(function (unit) {
+        if (!current) { current = { text: unit.text, boundary: unit.boundary }; currentUnits = 1; }
+        else {
+          var merged = current.text + ' ' + unit.text;
+          // Two conditions, in this order on purpose: `max` is the model's safe ceiling and
+          // is never crossed, while `soft` only decides when it is SENSIBLE to move on, so
+          // a paragraph divides into similar-sized chunks instead of full-full-crumb. A
+          // short chunk is only harmless as the LAST one, where there is no next render
+          // left for it to fail to cover.
+          if (merged.length <= max && current.text.length < soft) {
+            current.text = merged;
+            current.boundary = unit.boundary;
+            currentUnits += 1;
+          } else {
+            flush();
+            current = { text: unit.text, boundary: unit.boundary };
+            currentUnits = 1;
+          }
+        }
+      });
+      // The last chunk of a paragraph ends ON the paragraph break, whatever its sentence
+      // punctuation was, and a paragraph break is always a chunk break.
+      if (current) current.boundary = BOUNDARY.paragraph;
+      flush();
+    });
+    return chunks;
+  }
+
+  /** Convenience: just the strings, for callers that do not need the markers. */
+  function chunkTexts(text, options) {
+    return groupChunks(text, options).map(function (chunk) { return chunk.text; });
+  }
+
+  /**
+   * THE WHOLE-TEXT ENTRY POINT.
+   *
+   * The V1 audit measured the real engine (supertonic-3): the average audible gap in
+   * production is 4422 ms, but if the ENTIRE text is handed to one speak() call it drops
+   * to 647 ms. The reason is not the chunk size at all - it is that every caller today
+   * sends one sentence per call, so chunks.length === 1, and the whole gapless machine
+   * (streaming schedule, SCHEDULE_DEPTH, trimming, GAP_MS) is switched off by
+   * `joined = chunks.length > 1`.
+   *
+   * So the grouping in this module only pays off if a caller can hand over a WHOLE
+   * passage. This function is that contract: give it a paragraph, a page or a full
+   * script - it returns the ordered chunk list with its boundary markers plus the counts
+   * needed to show the win, and it never needs the network, a clock or the DOM.
+   *
+   * @param {string} text whole text; blank lines are paragraph boundaries
+   * @param {object} [options] {max, target, lang, punctuate}
+   * @returns {{chunks: Array<object>, stats: object}}
+   */
+  function planUtterance(text, options) {
+    var chunks = groupChunks(text, options);
+    var paragraphs = splitParagraphs(text);
+    var sentences = paragraphs.reduce(function (sum, paragraph) {
+      return sum + splitSentences(paragraph).length;
+    }, 0);
+    var chars = chunks.reduce(function (sum, chunk) { return sum + chunk.chars; }, 0);
+    return {
+      chunks: chunks,
+      stats: Object.freeze({
+        chunks: chunks.length,
+        sentences: sentences,
+        paragraphs: paragraphs.length,
+        chars: chars,
+        avgChars: chunks.length ? Math.round(chars / chunks.length) : 0,
+        maxChars: chunks.reduce(function (max, chunk) { return Math.max(max, chunk.chars); }, 0),
+        // What the old strategy would have cost. Every chunk NOT emitted is one boundary
+        // that can no longer produce a wait.
+        perSentenceChunks: sentences,
+        boundariesRemoved: Math.max(0, sentences - chunks.length),
+        boundaries: chunks.map(function (chunk) { return chunk.boundary; })
+      })
+    };
+  }
+
   /** Silence that should follow a unit, based on how it ends. */
   function pauseAfter(phrase) {
     return /[.!?…]$/.test(String(phrase || '').trim()) ? PAUSE_MS.sentence : PAUSE_MS.clause;
@@ -423,6 +725,14 @@
   return Object.freeze({
     PAUSE_MS: PAUSE_MS,
     GAP_MS: GAP_MS,
+    CHUNK_CHARS: CHUNK_CHARS,
+    BOUNDARY: BOUNDARY,
+    ABBREVIATIONS: ABBREVIATIONS,
+    splitSentences: splitSentences,
+    splitParagraphs: splitParagraphs,
+    groupChunks: groupChunks,
+    chunkTexts: chunkTexts,
+    planUtterance: planUtterance,
     EMOTION: EMOTION,
     PROFILES: PROFILES,
     CONTOUR_MIN: CONTOUR_MIN,
