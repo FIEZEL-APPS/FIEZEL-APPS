@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-edge-proxy-contract-report-v1",
-  "generatedAt": "2026-08-27T18:59:12.757Z",
+  "generatedAt": "2026-08-27T19:56:09.882Z",
   "pass": true,
   "scope": "deploy/edge/api-index.php dipindai sebagai TEKS (tidak ada PHP di runner CI)",
   "cacheDecision": {

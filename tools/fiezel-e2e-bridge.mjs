@@ -104,7 +104,14 @@ const SHOT_DIR = env.FIEZEL_E2E_SHOT_DIR ? path.resolve(env.FIEZEL_E2E_SHOT_DIR)
 // Penundaan buatan atas jawaban /api/config. Harus JAUH lebih besar dari waktu boot
 // aplikasi nyata (terukur ~3,5 s di ponsel 390px), kalau tidak assert `config-non-blocking`
 // jadi lomba antara boot lambat dan jawaban cepat, bukan uji pemblokiran.
-const CONFIG_DELAY = Number(env.FIEZEL_E2E_CONFIG_DELAY || 8000);
+// F6: bawaannya diturunkan 8000 -> 4500 ms. 8000 ms sama dengan anggaran klien untuk
+// `/api/config` (core-config.js `timeoutMs`), jadi penundaan sebesar itu SELALU dibatalkan
+// klien dan assert `config-protocol`/`config-flags-present`/`config-non-blocking` tidak
+// pernah bisa hijau: yang diuji jadi "apakah klien menyerah", bukan "apakah boot ditahan".
+// 4500 ms tetap ~1 s di atas waktu boot terukur (~3,5 s) plus NONBLOCK_MARGIN, jadi jawaban
+// config masih pasti datang SESUDAH render, dan 4500 + latensi terburuk 2,0 s = 6,5 s masih
+// di bawah anggaran 8000 ms. Assert-nya tidak dilunakkan; hanya penundaannya dibuat mungkin.
+const CONFIG_DELAY = Number(env.FIEZEL_E2E_CONFIG_DELAY || 4500);
 // Margin kejujuran: "render mendahului jawaban config" hanya dihitung bukti kalau
 // selisihnya di luar jitter pengukuran.
 const NONBLOCK_MARGIN = 100;
@@ -563,7 +570,16 @@ const startedAt = Date.now();
 
 async function launchBrowser() {
   const b = await chromium.launch({
-    args: [`--host-resolver-rules=${hostRules.join(',')}`, '--no-sandbox', '--disable-dev-shm-usage']
+    // F6: `--disable-quic` WAJIB, dan ini bukan menyembunyikan kegagalan. Jawaban asal
+    // mengiklankan `alt-svc: h3=":443"; ma=2592000`, jadi Chromium memindahkan permintaan
+    // KEDUA dan seterusnya ke HTTP/3 - sementara UDP/443 dari lingkungan uji ini adalah
+    // lubang hitam. Eksperimen terkontrol (tools/f6-hop-isolate.mjs, 2 vs 2 pengulangan):
+    // tanpa flag ini tiga hop `/api/quota` TIDAK PERNAH dijawab (>24 s), dengan flag ini
+    // ketiganya 200 dalam 0,9-1,7 s. Kontrolnya bukan hanya jembatan kita: host lain yang
+    // h3-nya sehat pun menggantung 39 s dari sandbox ini sebelum jatuh balik ke h2.
+    // Jadi tanpa flag ini `bridge-hop-stable` mengukur UDP lingkungan uji, bukan kestabilan
+    // hop jembatan - dan itu assert yang bohong ke dua arah.
+    args: [`--host-resolver-rules=${hostRules.join(',')}`, '--no-sandbox', '--disable-dev-shm-usage', '--disable-quic']
   });
   if (!browserVersion) {
     browserVersion = b.version();

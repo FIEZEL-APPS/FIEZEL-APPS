@@ -2311,7 +2311,25 @@ function cfEndpointMode(path){
   if(self.FiezelCfKillSwitch?.allows?.(key)!==true)return 'off';
   return staticMode;
 }
-function cfWorkerFetch(path,options={}){return fetch(CF_BASE+String(path),{...options,credentials:'include',mode:'cors',cache:'no-store'})}
+/* F6: batas waktu EKSPLISIT per kelas endpoint. Sebelum ini `cfWorkerFetch` memanggil `fetch`
+ * tanpa `signal` sama sekali, jadi satu jawaban yang tidak pernah datang menggantung sampai
+ * peramban menyerah sendiri (menit, bukan detik) — dan di layar murid itu terlihat sebagai
+ * aplikasi yang membeku tanpa pesan. Angkanya dari `core-config.js:FIEZEL_CF_TIMEOUTS`
+ * (p95 terukur + margin yang ditulis di sana), bukan dari perasaan.
+ * Kalau pemanggil sudah membawa `signal` sendiri, punyanya yang dipakai: transport tidak
+ * boleh merebut pembatalan dari lapisan di atasnya (mis. jalur AI yang punya `Promise.race`). */
+const CF_TIMEOUTS=self.FIEZEL_CF_TIMEOUTS||{};
+// Jaring terakhir kalau core-config.js versi lama masih ter-cache di perangkat: 8000 ms, sama
+// dengan kelas identity/quota. Nol atau nilai asing TIDAK boleh berarti "tanpa batas".
+const CF_TIMEOUT_FALLBACK_MS=8000;
+function cfTimeoutFor(path){const raw=Number(CF_TIMEOUTS[cfEndpointKey(path)]);return raw>0?raw:CF_TIMEOUT_FALLBACK_MS}
+function cfWorkerFetch(path,options={}){
+  let controller=null;
+  try{if(!options?.signal&&typeof AbortController==='function')controller=new AbortController()}catch{controller=null}
+  const timer=controller?setTimeout(()=>{try{controller.abort()}catch{}},cfTimeoutFor(path)):null;
+  const request=fetch(CF_BASE+String(path),{...options,credentials:'include',mode:'cors',cache:'no-store',signal:controller?controller.signal:options?.signal});
+  return timer?request.finally(()=>{try{clearTimeout(timer)}catch{}}):request;
+}
 // Catatan shadow, HANYA ke konsol diagnostik. Tidak pernah ke UI, tidak pernah ke state.
 function cfShadowLog(path,puterStatus,cfStatus,note){try{console.debug('[cf-shadow]',String(path),'puter='+puterStatus,'cf='+cfStatus,puterStatus===cfStatus?'match':'diff',note?String(note):'sent')}catch{}}
 // ---- S2: pagar bayangan. Bayangan TIDAK BOLEH menyakiti murid. ----------------------
