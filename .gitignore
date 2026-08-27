@@ -42,3 +42,4 @@ RELEASE-AUDIT-GATE-REPORT.json
 # hanya menghasilkan konflik dan bukti yang menyesatkan ("hijau di repo" padahal
 # hijaunya milik lingkungan orang lain). Buktinya hidup di CI/terminal, bukan di git.
 CF-LIVE-REPORT.json
+CF-SHADOW-MODE-REPORT.json
