@@ -166,6 +166,16 @@ jobs:
           # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
           # memuat nilai secret sungguhan.
           node edge-guard-test.js
+          # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
+          # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
+          # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
+          # untuk kegagalan kritis), sedangkan baris di bawahnya menjalankan self-test probe
+          # itu sendiri terhadap server loopback. TIDAK ADA pemanggilan probe tanpa
+          # `--selftest` di CI: mode produksi menembak api.fiezel.my.id sungguhan, dan
+          # CI publik yang menembak produksi pada setiap push adalah beban yang kita
+          # timpakan ke murid, bukan pengujian. Gerbangnya meng-assert larangan itu.
+          node health-probe-test.js
+          node tools/fiezel-health-probe.mjs --selftest
           node quota-core-test.js
           node quota-manipulation-test.js
           node quota-reset-test.js
