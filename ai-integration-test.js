@@ -38,9 +38,16 @@ setTimeout(async()=>{try{
   assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),
     'markdown tidak boleh membuka jalan bagi markup dari model');
   context.renderAIError('<svg onload=x>',{message:'<img src=x onerror=x>'});
-  assert(!elements.modalPanel.innerHTML.includes('<img')&&elements.modalPanel.innerHTML.includes('&lt;img'),'AI error can inject HTML');
+  // A8 menaikkan syaratnya. Dulu yang dijaga: pesan galat provider di-escape sebelum dicetak
+  // (karena itu assert lama mencari '&lt;img'). Sekarang pesan provider TIDAK DICETAK SAMA
+  // SEKALI - murid membaca kalimat yang ditulis untuknya, dan galat aslinya berhenti di
+  // console. Jadi yang dijaga: markup dari provider nggak muncul dalam bentuk apa pun (mentah
+  // maupun ter-escape), judulnya tetap di-escape, dan naskah murid tetap ada.
+  assert(!elements.modalPanel.innerHTML.includes('<img')&&!elements.modalPanel.innerHTML.includes('&lt;img')
+    &&!elements.modalPanel.innerHTML.includes('<svg')&&elements.modalPanel.innerHTML.includes('&lt;svg')
+    &&/belum bisa dimuat/.test(elements.modalPanel.innerHTML),'AI error can inject HTML or leaks provider text');
   context.renderAIError('Login',{error:'popup_blocked',msg:'blocked'},()=>{});
-  assert(elements.modalPanel.innerHTML.includes('diblokir browser')&&typeof elements.aiRetry.onclick==='function','structured auth error or retry action is not handled');
+  assert(elements.modalPanel.innerHTML.includes('diblokir peramban')&&typeof elements.aiRetry.onclick==='function','structured auth error or retry action is not handled');
   context.puter.workers.exec=async(url,opts)=>{prompt=JSON.parse(opts.body).prompt;return response('Penjelasan kuis aman.')};
   await context.explainWithAI({question:'She ___ daily.',options:['go','goes'],answerIndex:1,difficulty:1,explain:{rule:'Simple present.'}},0);
   assert(prompt.includes('Jawaban siswa: go')&&prompt.includes('Jawaban benar: goes'),'quiz AI prompt lost answer context');
@@ -48,7 +55,7 @@ setTimeout(async()=>{try{
   assert(prompt.includes('Kata: "careful"')&&prompt.includes('Contoh yang sudah ada'),'vocabulary AI prompt lost word context');
   assert(prompt.includes('Hindari gaya buku teks')&&prompt.includes('kalimat pendek'),'vocabulary AI prompt lost natural Indonesian style contract');
   let lateResolve;context.puter.workers.exec=()=>new Promise(resolve=>lateResolve=resolve);const late=context.explainWithAI({question:'Late?',options:['No','Yes'],answerIndex:1,difficulty:1,explain:{rule:'Test.'}},0);context.openModal('<p>Modal yang lebih baru</p>');lateResolve(response('Respons lama'));await late;assert(elements.modalPanel.innerHTML.includes('Modal yang lebih baru')&&!elements.modalPanel.innerHTML.includes('Respons lama'),'stale AI response overwrote a newer modal');
-  const realSetTimeout=context.setTimeout;context.setTimeout=(fn,ms)=>realSetTimeout(fn,Math.min(ms,5));context.puter.workers.exec=()=>new Promise(()=>{});let timedOut=false;try{await context.askFiezelAI('uji timeout')}catch(e){timedOut=context.aiErrorMessage(e).includes('batas waktu')}finally{context.setTimeout=realSetTimeout}assert(timedOut,'AI request timeout is not enforced');
+  const realSetTimeout=context.setTimeout;context.setTimeout=(fn,ms)=>realSetTimeout(fn,Math.min(ms,5));context.puter.workers.exec=()=>new Promise(()=>{});let timedOut=false;try{await context.askFiezelAI('uji timeout')}catch(e){timedOut=/nggak datang dalam waktu yang wajar/.test(context.aiErrorMessage(e))}finally{context.setTimeout=realSetTimeout}assert(timedOut,'AI request timeout is not enforced');
   context.flashcards('A1');assert(elements.app.innerHTML.includes('id="aiWord"')&&typeof elements.aiWord.onclick==='function','flashcard AI button is not wired');
   context.FIEZEL_CORE_CONFIG.workerUrl='';delete context.puter;let failed=false;try{await context.askFiezelAI('uji gagal')}catch(e){failed=/AI belum siap|Core Brain/.test(e.message)}assert(failed,'missing Core/Puter error is not handled');
   console.log(JSON.stringify({status:'PASS',checks:{scriptOrder:true,coreOnlyGateway:true,serverModelOwnership:true,htmlEscaping:true,structuredAuthError:true,retryAction:true,quizPrompt:true,vocabularyPrompt:true,staleResponseGuard:true,requestTimeout:true,flashcardButton:true,errorFallback:true}},null,2));
