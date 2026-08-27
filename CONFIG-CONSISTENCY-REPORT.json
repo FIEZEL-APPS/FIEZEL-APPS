@@ -1,6 +1,6 @@
 {
   "gate": "config-consistency-test.js",
-  "generatedAt": "2026-08-27T17:21:22.137Z",
+  "generatedAt": "2026-08-27T17:25:52.541Z",
   "runbook": "docs/CF-MIGRATION-RUNBOOK.md",
   "clientFlagKeys": [
     "cfApiEnabled",
@@ -32,7 +32,7 @@
   "unpairedLimitVars": [
     {
       "varName": "AI_LIMIT_PER_HOUR",
-      "reason": "tidak ada batas per-jam yang ditegakkan (laju AI ditegakkan FREE_AI_RATE_PER_MINUTE=8 = 480/jam) dan var ini tidak dibaca satu pun jalur naskah: `limits` hanya membawa aiPerDay & ttsCharsPerDay. Peninggalan AI_RATE_LIMIT_PER_HOUR lama."
+      "reason": "tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FREE_AI_RATE_PER_MINUTE=8 (=480/jam) dan harian 25, dan 25/hari mengikat jauh lebih dulu daripada 40/jam. Var ini TETAP dikirim ke klien sebagai limits.aiPerHour (route-user.js:54), jadi naskah tanpa penegakan — dibiarkan apa adanya, tidak didiamkan."
     },
     {
       "varName": "GLOBAL_NEURON_CAP",
@@ -142,7 +142,7 @@
     {
       "name": "Pengecualian AI_LIMIT_PER_HOUR membawa alasan (bukan didiamkan)",
       "status": "PASS",
-      "details": "tidak ada batas per-jam yang ditegakkan (laju AI ditegakkan FREE_AI_RATE_PER_MINUTE=8 = 48…"
+      "details": "tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FRE…"
     },
     {
       "name": "Pengecualian GLOBAL_NEURON_CAP membawa alasan (bukan didiamkan)",
