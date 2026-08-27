@@ -53,12 +53,19 @@ const notice = require(path.join(root, NOTICE_PATH));
 const CF_BASE = 'https://api.fiezel.my.id';
 const AUDIO_BASE = 'https://audio.fiezel.my.id';
 const R2_URL = AUDIO_BASE + '/a/2f6c9a11deadbeef.mp3';
+// SATU-SATUNYA alamat yang boleh dilewatkan mock jaringan lokal di bawah. Apa pun selain ini
+// MELEMPAR: gerbang ini tidak punya alasan sah untuk menyentuh alamat lain, dan mock yang
+// permisif adalah tempat kebocoran bersembunyi.
+const RENDER_URL = CF_BASE + '/api/tts/render';
 // Jembatan PHP origin: JSON kecil boleh lewat sini, byte audio TIDAK BOLEH (wrangler.toml:
 // cache-hit dijawab dengan URL publik, bukan dengan mem-proxy byte).
 const BRIDGE_URL = 'https://fiezel.my.id/api/index.php?path=/api/tts/audio';
 
 const checks = [];
 let failed = false;
+// Setiap URL yang sampai ke mock jaringan lokal di luar `RENDER_URL` dicatat DI SINI selain
+// dilempar, supaya kebocoran tidak bisa hilang ditelan `try/catch` kode produksi.
+const unexpectedFetchUrls = [];
 const check = (name, ok, details) => {
   checks.push({ name, status: ok ? 'PASS' : 'FAIL', details: String(details == null ? '' : details) });
   if (!ok) failed = true;
@@ -111,6 +118,33 @@ function harness(options) {
     }
   };
 
+  /**
+   * Mock jaringan LOKAL yang eksplisit dan bernama, didefinisikan SEBELUM disuntikkan ke
+   * konteks vm — bentuk `fetch: <pengenal lokal yang mendahului>` yang memang dikenali
+   * `no-network-test.js` (aturan (c) pada detektor sadar-shadow di sana). Ia BUKAN pembungkus
+   * `globalThis.fetch`: tidak ada satu pun jalur di dalamnya yang meneruskan panggilan ke
+   * jaringan nyata, dan URL selain endpoint render CF membuatnya MELEMPAR.
+   */
+  function cfTtsRenderFetchMock(url, init) {
+    const target = String(url);
+    calls.fetches.push(target);
+    trace.push('fetch-mock:' + target);
+    if (target !== RENDER_URL) {
+      unexpectedFetchUrls.push(target);
+      throw new Error('cfTtsRenderFetchMock: URL tak diharapkan (hanya ' + RENDER_URL + ' yang ditiru): ' + target);
+    }
+    let body = null;
+    try { body = JSON.parse((init && init.body) || 'null'); } catch (_) { body = '<unparseable>'; }
+    calls.bodies.push(body);
+    if (opts.renderThrows) return Promise.reject(new Error('network_down'));
+    const status = opts.renderStatus == null ? 200 : opts.renderStatus;
+    const payload = opts.renderPayload || {
+      schema: 'fiezel-tts-response-v2', audioKey: 'a'.repeat(64), url: R2_URL,
+      source: 'cache', degraded: false, quotaCharged: false
+    };
+    return Promise.resolve({ status, json: () => Promise.resolve(payload) });
+  }
+
   const sandbox = {
     console,
     setTimeout: (fn, ms) => { const t = setTimeout(fn, ms); timers.add(t); return t; },
@@ -125,20 +159,7 @@ function harness(options) {
       audioBase: AUDIO_BASE,
       endpoints: { health: 'off', config: 'off', auth: 'off', quota: 'off', ai: 'off', tts: opts.flag === 'on' ? 'on' : 'off', usage: 'off' }
     },
-    fetch(url, init) {
-      calls.fetches.push(String(url));
-      trace.push('fetch:' + String(url));
-      let body = null;
-      try { body = JSON.parse((init && init.body) || 'null'); } catch (_) { body = '<unparseable>'; }
-      calls.bodies.push(body);
-      if (opts.renderThrows) return Promise.reject(new Error('network_down'));
-      const status = opts.renderStatus == null ? 200 : opts.renderStatus;
-      const payload = opts.renderPayload || {
-        schema: 'fiezel-tts-response-v2', audioKey: 'a'.repeat(64), url: R2_URL,
-        source: 'cache', degraded: false, quotaCharged: false
-      };
-      return Promise.resolve({ status, json: () => Promise.resolve(payload) });
-    },
+    fetch: cfTtsRenderFetchMock,
     FiezelAudioResolver: opts.noResolver ? undefined : {
       resolve() {
         trace.push('resolver.resolve');
@@ -244,14 +265,14 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   const onSpoke = await on.api.say('Good morning.', { locale: 'en-US' });
   const iCache = idx(on.trace, 'cache-open');
   const iAsset = idx(on.trace, 'resolver.resolve');
-  const iRender = idx(on.trace, 'fetch:');
+  const iRender = idx(on.trace, 'fetch-mock:');
   const iPuter = idx(on.trace, 'puter.speak');
   const iSynth = idx(on.trace, 'speechSynthesis.speak');
   check('(b) flag on: urutan tangga = cache klien → aset R2 → /api/tts/render → Puter → speechSynthesis',
     onSpoke === true && iCache === 0 && iAsset > iCache && iRender > iAsset && iPuter > iRender && iSynth > iPuter,
     JSON.stringify(on.trace));
   check('(b) flag on: sisipan tepat di /api/tts/render pada basis CF, satu permintaan saja',
-    on.cfFetches().length === 1 && on.cfFetches()[0] === CF_BASE + '/api/tts/render',
+    on.cfFetches().length === 1 && on.cfFetches()[0] === RENDER_URL,
     JSON.stringify(on.cfFetches()));
   check('(b) flag on: aset R2 yang SUDAH ada tidak pernah memanggil render (yang gratis tetap gratis)',
     await (async () => {
@@ -358,7 +379,7 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   const pre = harness({ flag: 'on', prepared: false, renderPayload: { url: R2_URL, source: 'cache' } });
   const preOk = await pre.api.prefetch('Next sentence.', { locale: 'en-US', speed: 1.25 });
   check('(g) prefetch ikut memakai jalur CF saat flag on',
-    preOk === true && pre.cfFetches().length === 1 && pre.cfFetches()[0] === CF_BASE + '/api/tts/render',
+    preOk === true && pre.cfFetches().length === 1 && pre.cfFetches()[0] === RENDER_URL,
     `prefetch()=${preOk} fetchCF=${JSON.stringify(pre.cfFetches())}`);
   check('(g) prefetch TIDAK memanggil prepare()/ensureReady() — pagar 152 MB utuh',
     pre.calls.prepare === 0 && pre.calls.ensureReady === 0,
@@ -388,6 +409,22 @@ const idx = (trace, needle) => trace.findIndex((entry) => entry.indexOf(needle) 
   prePrepared.done();
 
   /* ---------------------------------------------------------------- penjaga statis -------- */
+
+  // Anti-vakum untuk mock-nya sendiri: mock yang "aman karena katanya aman" tidak berguna.
+  // URL asing harus MELEMPAR, dan lemparannya harus tercatat, supaya kebocoran tidak pernah
+  // lolos diam-diam lewat `try/catch` di jalur render produksi.
+  const trapHarness = harness({ flag: 'on' });
+  const strangeUrl = 'https://tidak-diharapkan.example.com/api/tts/render';
+  let trapMessage = '';
+  try { trapHarness.sandbox.fetch(strangeUrl, { method: 'POST', body: '{}' }); } catch (error) { trapMessage = String(error && error.message); }
+  const trapLogged = unexpectedFetchUrls[unexpectedFetchUrls.length - 1] === strangeUrl;
+  if (trapLogged) unexpectedFetchUrls.pop();
+  check('penjaga: mock fetch lokal MELEMPAR untuk URL di luar endpoint render (kebocoran tidak bisa senyap)',
+    /URL tak diharapkan/.test(trapMessage) && trapLogged && trapHarness.calls.bodies.length === 0,
+    trapMessage || '(mock tidak melempar)');
+  trapHarness.done();
+  check('penjaga: sepanjang gerbang ini, mock fetch lokal hanya pernah dipanggil untuk endpoint render CF',
+    unexpectedFetchUrls.length === 0, JSON.stringify(unexpectedFetchUrls));
 
   check('penjaga: transport CF melarang seluruh keluarga field pemutaran, bukan hanya speed',
     /FORBIDDEN_FIELDS[\s\S]{0,200}playbackRate[\s\S]{0,120}gain/.test(TRANSPORT),

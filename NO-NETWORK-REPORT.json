@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
-  "scanned": 128,
+  "scanned": 144,
   "allowlist": [
     "http-smoke-test.js",
     "e2e-level-grammar-test.js",
@@ -102,7 +102,7 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
-      "details": "files=128"
+      "details": "files=144"
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
