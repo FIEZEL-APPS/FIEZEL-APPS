@@ -196,6 +196,23 @@ jobs:
           # alamat *.workers.dev sementara) dan teruskan lewat `env:` pada step ini.
           # Petunjuk lengkap: tools/cf-live-runner.md.
           node cf-live-contract-test.js
+          # `e2e-bridge-selftest.js` membuktikan gerbang E2E BROWSER
+          # (`tools/fiezel-e2e-bridge.mjs`) bisa MERAH: ia menjalankannya terhadap
+          # aplikasi tiruan + jembatan HTTPS loopback dalam 21 skenario (satu benar,
+          # 20 salah), dan menuntut kegagalannya jatuh pada id assert yang tepat.
+          # Loopback murni: semua nama host uji dipetakan ke 127.0.0.1 lewat
+          # --host-resolver-rules, jadi tanpa DNS dan tanpa keluar mesin. Karena itu
+          # namanya ada di SOCKET_ALLOWLIST `no-network-test.js` dan langkah ini
+          # dijalankan SESUDAHNYA. Kalau playwright/Chromium tidak terpasang di
+          # runner, ia mencetak SKIP dan exit 0 — ketiadaan browser di runner bukan
+          # cacat produk.
+          #
+          # `tools/fiezel-e2e-bridge.mjs` sendiri SENGAJA TIDAK didaftarkan di CI.
+          # Ia menembak jembatan HIDUP (api.fiezel.my.id) dengan browser sungguhan:
+          # mendaftarkannya berarti setiap push memaksa produksi melayani sesi anon
+          # baru dan membuat CI merah karena jaringan, bukan karena kode. Cara
+          # menjalankannya ada di reports/add-a5-e2e.md dan tools/cf-live-runner.md.
+          node e2e-bridge-selftest.js
           node release-audit-gate-test.js
           node cf-transport-test.js
           node cf-shadow-mode-test.js
