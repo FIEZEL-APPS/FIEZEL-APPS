@@ -50,8 +50,22 @@ run_case 'quota-config FREE_AI_DAILY_LIMIT 25 -> 20 (penegakan diturunkan sepiha
 run_case 'quota-config FREE_TTS_DAILY_CHARS 12000 -> 20000 (penegakan dinaikkan sepihak)' \
   sed -i 's/FREE_TTS_DAILY_CHARS: 12000,/FREE_TTS_DAILY_CHARS: 20000,/' "$QUOTA"
 
-run_case 'runbook: kembalikan bentuk KV DATAR {"transport":"off",...}' \
-  sed -i 's|.*--binding=CFG "cfg:flags" \\\\$|npx wrangler@3 kv key put --binding=CFG "cfg:flags" '"'"'{"transport":"off","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}'"'"' \\\\|' "$RUNBOOK"
+# Suntikan ini memakai python, bukan sed: argumen JSON penuh kutip tunggal/ganda, dan sed yang
+# gagal mencocokkan akan diam-diam TIDAK mengubah apa pun — kasus uji yang tidak menyuntik
+# apa-apa akan terbaca sebagai "gerbang buta" padahal gerbangnya tidak pernah diuji.
+inject_flat_kv() {
+  python3 - "$RUNBOOK" <<'PY'
+import sys
+p = sys.argv[1]
+s = open(p).read()
+good = '\'{"flags":{"cfApiEnabled":false,"cfAiEnabled":false,"cfTtsEnabled":false,"cfQuotaEnabled":false,"cfAnalyticsEnabled":false,"cfIdentityEnabled":false},"enabled":{"ai":false,"tts":false,"coach":false,"analytics":false}}\''
+bad = '\'{"transport":"off","tts":"off","identity":"off","quotaUi":"off","analytics":"off"}\''
+assert good in s, 'contoh KV bersarang tidak ditemukan — skrip bukti perlu diperbarui'
+open(p, 'w').write(s.replace(good, bad, 1))
+PY
+}
+
+run_case 'runbook: kembalikan bentuk KV DATAR {"transport":"off",...}' inject_flat_kv
 
 run_case 'runbook: satu nilai boolean diganti string "off"' \
   sed -i '0,/"cfTtsEnabled":false/s//"cfTtsEnabled":"off"/' "$RUNBOOK"

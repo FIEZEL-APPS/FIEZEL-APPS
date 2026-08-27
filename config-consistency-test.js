@@ -301,7 +301,7 @@ const LIMIT_PAIRS = [
 const UNPAIRED_LIMIT_VARS = [
   {
     varName: 'AI_LIMIT_PER_HOUR',
-    reason: 'tidak ada batas per-jam yang ditegakkan (laju AI ditegakkan FREE_AI_RATE_PER_MINUTE=8 = 480/jam) dan var ini tidak dibaca satu pun jalur naskah: `limits` hanya membawa aiPerDay & ttsCharsPerDay. Peninggalan AI_RATE_LIMIT_PER_HOUR lama.'
+    reason: 'tidak ada batas AI per-JAM di quota-config.js untuk dipasangkan; yang ditegakkan hanya FREE_AI_RATE_PER_MINUTE=8 (=480/jam) dan harian 25, dan 25/hari mengikat jauh lebih dulu daripada 40/jam. Var ini TETAP dikirim ke klien sebagai limits.aiPerHour (route-user.js:54), jadi naskah tanpa penegakan — dibiarkan apa adanya, tidak didiamkan.'
   },
   {
     varName: 'GLOBAL_NEURON_CAP',

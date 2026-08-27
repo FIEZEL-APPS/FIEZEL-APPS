@@ -70,10 +70,15 @@ FEATURE_COACH     = "off"
 # Mengubah salah satu sisi sepihak = gerbang MERAH.
 AI_LIMIT_PER_DAY  = "25"           # == FREE_AI_DAILY_LIMIT (nilai yang ditegakkan)
 # AI_LIMIT_PER_HOUR TIDAK punya pasangan penegakan, dan itu dicatat, bukan didiamkan:
-# penegakan laju AI memakai FREE_AI_RATE_PER_MINUTE=8 (= 480/jam), sedangkan batas HARIAN 25
-# sudah mengikat jauh lebih dulu daripada 40/jam. Var ini peninggalan AI_RATE_LIMIT_PER_HOUR
-# lama, tidak dibaca satu pun jalur naskah (`limits` hanya membawa aiPerDay &
-# ttsCharsPerDay), dan terdaftar sebagai pengecualian BERALASAN di config-consistency-test.js.
+# tidak ada batas AI per-JAM di quota-config.js. Yang ada hanya laju
+# FREE_AI_RATE_PER_MINUTE=8 (= 480/jam) dan batas HARIAN 25, dan 25/hari sudah mengikat jauh
+# lebih dulu daripada 40/jam — jadi angka 40 ini tidak pernah menjadi batas yang menolak
+# permintaan siapa pun. Var ini TETAP dikirim ke klien sebagai `limits.aiPerHour`
+# (route-user.js:54; `GET /api/config` tidak membawanya), jadi ia naskah murni tanpa
+# penegakan. Dibiarkan APA ADANYA di paket ini: menghapus var yang mungkin masih dibaca
+# konfigurasi produksi, atau menambah penegakan per-jam yang belum pernah diputuskan,
+# dua-duanya bukan keputusan sepihak. Terdaftar sebagai pengecualian BERALASAN di
+# config-consistency-test.js supaya tidak pernah lolos senyap.
 AI_LIMIT_PER_HOUR = "40"
 TTS_CHARS_PER_DAY = "12000"        # == FREE_TTS_DAILY_CHARS (nilai yang ditegakkan)
 GLOBAL_NEURON_CAP = "8000"         # < 10.000/hari alokasi gratis akun
