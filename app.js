@@ -2274,7 +2274,52 @@ function cfEndpointMode(path){
 }
 function cfWorkerFetch(path,options={}){return fetch(CF_BASE+String(path),{...options,credentials:'include',mode:'cors',cache:'no-store'})}
 // Catatan shadow, HANYA ke konsol diagnostik. Tidak pernah ke UI, tidak pernah ke state.
-function cfShadowLog(path,puterStatus,cfStatus){try{console.debug('[cf-shadow]',String(path),'puter='+puterStatus,'cf='+cfStatus,puterStatus===cfStatus?'match':'diff')}catch{}}
+function cfShadowLog(path,puterStatus,cfStatus,note){try{console.debug('[cf-shadow]',String(path),'puter='+puterStatus,'cf='+cfStatus,puterStatus===cfStatus?'match':'diff',note?String(note):'sent')}catch{}}
+// ---- S2: pagar bayangan. Bayangan TIDAK BOLEH menyakiti murid. ----------------------
+// Bayangan adalah beban yang tidak diminta murid dan hasilnya tidak pernah dia lihat: satu
+// permintaan jaringan tambahan, memakai kuota data dan baterai miliknya. Karena itu ia
+// dibatasi keras dan mematikan dirinya sendiri saat perangkat sedang tidak sanggup.
+// Batas boleh diatur lewat `FIEZEL_CF_CONFIG.shadow` (kunci itu BELUM ada di core-config.js
+// hari ini, jadi yang berlaku adalah nilai bawaan di bawah). Setiap nilai dikurung dalam
+// rentang: flag yang salah tulis tidak boleh bisa membuka keran.
+const CF_SHADOW_DEFAULT_GAP_MS=3000,CF_SHADOW_DEFAULT_MAX=40,CF_SHADOW_LOW_BATTERY=0.2;
+function cfShadowLimit(name,fallback,min,max){const raw=Number(CF_CONFIG.shadow?.[name]);if(!Number.isFinite(raw))return fallback;return Math.min(max,Math.max(min,Math.round(raw)))}
+const CF_SHADOW_MIN_GAP_MS=cfShadowLimit('minGapMs',CF_SHADOW_DEFAULT_GAP_MS,50,600000);
+const CF_SHADOW_MAX_PER_SESSION=cfShadowLimit('maxPerSession',CF_SHADOW_DEFAULT_MAX,1,10000);
+// Penghitung SESI (variabel modul, bukan penyimpanan): sengaja hilang saat muat ulang, karena
+// yang dibatasi adalah beban satu sesi pemakaian, dan transport ini dilarang menulis apa pun.
+let cfShadowSent=0,cfShadowLastAt=0,cfShadowSkipped=0,cfShadowBattery=null;
+function cfShadowNow(){try{return Date.now()}catch{return 0}}
+// Battery Status API menjawab lewat Promise, sedangkan keputusan kirim/tidak harus diambil
+// serentak. Jadi nilainya diambil SEKALI di awal dan yang dipakai adalah keadaan terakhir
+// yang diketahui; kalau API-nya tidak ada (Safari/iOS), syarat baterai dilewati begitu saja.
+(function cfShadowPowerWatch(){const nav=self.navigator;if(!nav)return;try{if(typeof nav.getBattery==='function'){const p=nav.getBattery();if(p&&typeof p.then==='function')p.then(b=>{cfShadowBattery=b}).catch(()=>{})}else if(nav.battery)cfShadowBattery=nav.battery}catch{}})();
+function cfShadowGate(at){
+  const nav=self.navigator;
+  if(nav&&nav.onLine===false)return 'offline';               // offline: jawaban murid saja yang berhak mencoba
+  const b=cfShadowBattery,level=b?Number(b.level):NaN;
+  if(b&&b.charging===false&&Number.isFinite(level)&&level<=CF_SHADOW_LOW_BATTERY)return 'battery-low';
+  if(cfShadowSent>=CF_SHADOW_MAX_PER_SESSION)return 'session-cap';  // berhenti TOTAL setelah N per sesi
+  if(cfShadowSent>0&&at-cfShadowLastAt<CF_SHADOW_MIN_GAP_MS)return 'rate';
+  return 'ok';
+}
+// Dibaca gerbang cf-shadow-ledger-test.js dan boleh dibaca panel diagnostik. Angka saja.
+function cfShadowPolicy(){return{minGapMs:CF_SHADOW_MIN_GAP_MS,maxPerSession:CF_SHADOW_MAX_PER_SESSION,lowBattery:CF_SHADOW_LOW_BATTERY,sent:cfShadowSent,skipped:cfShadowSkipped,gate:cfShadowGate(cfShadowNow())}}
+// Penanda waktu per sisi, supaya selisih latensi Puter vs CF bisa dibandingkan. Diukur dari
+// saat cabang bayangan dimulai — jadi ini latensi yang DIRASAKAN klien, bukan waktu server.
+function cfShadowStamp(promise,at){return Promise.resolve(promise).then(v=>({ok:true,value:v,ms:cfShadowNow()-at}),()=>({ok:false,value:null,ms:cfShadowNow()-at}))}
+// Penyerahan bukti ke buku besar (features/cf-shadow/fiezel-shadow-ledger.js). Modul itu yang
+// memegang seluruh aturan privasi: allowlist field, agregat-bukan-riwayat, batas ukuran.
+// Kalau modulnya belum dimuat, bayangan tetap jalan dan buktinya saja yang tidak terkumpul —
+// transport tidak menyimpan cadangan apa pun sendiri.
+// Kedua respons diserahkan sebagai argumen TRANSIEN hanya untuk perbandingan BENTUK; ledger
+// membacanya lewat `clone()` saja, jadi badan jawaban yang sedang dipakai murid tidak pernah
+// dihabiskan di sini.
+function cfShadowLedger(path,puterStatus,cfStatus,puterMs,cfMs,puterRes,cfRes){
+  const ledger=self.FiezelShadowLedger;
+  if(!ledger||typeof ledger.observe!=='function')return;
+  try{ledger.observe({endpoint:cfEndpointKey(path),puterStatus,cfStatus,puterMs,cfMs,puterResponse:puterRes,cfResponse:cfRes})}catch{}
+}
 // Mode 'shadow': jawaban murid TETAP dari Puter (lihat coreWorkerExec di bawah). Fungsi ini
 // hanya mengirim SALINAN permintaan ke CF dan MEMBUANG hasilnya.
 // Tiga hal yang dijaga di sini, karena inilah yang bisa melukai murid:
@@ -2287,15 +2332,21 @@ function cfShadowLog(path,puterStatus,cfStatus){try{console.debug('[cf-shadow]',
 //   3. Satu permintaan bayangan per satu panggilan, tanpa retry: shadow tidak boleh
 //      menggandakan beban maupun biaya.
 function cfShadowProbe(path,options,answer){
+  // Pagar dulu, permintaan kemudian: yang ditolak di sini TIDAK pernah menjadi fetch, jadi
+  // batas laju benar-benar mengurangi beban, bukan hanya mengurangi catatan.
+  const at=cfShadowNow(),gate=cfShadowGate(at);
+  if(gate!=='ok'){cfShadowSkipped++;cfShadowLog(path,0,0,gate);return}
+  cfShadowSent++;cfShadowLastAt=at;
   let shadow=null;
   try{shadow=cfWorkerFetch(path,{...options,headers:{...(options?.headers||{}),'X-Fiezel-Shadow':'1'},keepalive:true})}catch{return}
   if(!shadow||typeof shadow.then!=='function')return;
   try{shadow.catch(()=>{})}catch{}
   try{
-    Promise.allSettled([Promise.resolve(answer),shadow]).then(pair=>{
-      const puterStatus=pair[0]?.status==='fulfilled'?Number(pair[0].value?.status||0):0;
-      const cfStatus=pair[1]?.status==='fulfilled'?Number(pair[1].value?.status||0):0;
-      cfShadowLog(path,puterStatus,cfStatus)
+    Promise.all([cfShadowStamp(answer,at),cfShadowStamp(shadow,at)]).then(pair=>{
+      const puterStatus=pair[0].ok?Number(pair[0].value?.status||0):0;
+      const cfStatus=pair[1].ok?Number(pair[1].value?.status||0):0;
+      cfShadowLog(path,puterStatus,cfStatus);
+      cfShadowLedger(path,puterStatus,cfStatus,pair[0].ms,pair[1].ms,pair[0].value,pair[1].value)
     }).catch(()=>{})
   }catch{}
 }
