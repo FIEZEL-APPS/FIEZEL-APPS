@@ -19,7 +19,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // Fase 2 (B3): revisi dinaikkan karena daftar precache berubah (listening adaptif + cloze
 // bank) - tanpa menaikkan SW_REV, shell cache lama tetap dipakai dan berkas baru tidak
 // pernah masuk precache pengguna lama.
-const SW_REV='braincore-v3-fase2-b3-20260828';
+const SW_REV='braincore-v3-fase3-c5-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -46,7 +46,12 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // jadi entri ini baru boleh mendarat ketika berkasnya ada di repo - dan keduanya sudah ada.
   // (Catatan alat: pwa-cache-test membaca array ini dengan regex yang berhenti di titik koma
   // pertama - jangan menaruh titik koma di dalam komentar array ini.)
-  './features/brain/fiezel-listening-adaptive.js','./cloze-bank-v1.json'];
+  './features/brain/fiezel-listening-adaptive.js','./cloze-bank-v1.json',
+  // Fase 3 (Wiring C5): tiga modul gelombang C - kalibrasi item (C1), speaking adaptif (C2),
+  // SRL coach (C4). Aturan yang sama dengan modul brain lain: masuk precache HANYA setelah
+  // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404. Berkas-berkas
+  // ini dijanjikan kontrak Fase 3 dan wajib mendarat bersama rilis ini.
+  './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js'];
 // m025-142 (B-11): pencocok ini SEMPAT dimatikan jadi `()=>false` dengan alasan "model lokal
 // sudah dihapus". Modelnya tidak dihapus - vendor/supertonic-3 masih 152 MB dan masih disajikan
 // dari origin yang sama. Selama pencocoknya mati, setiap permintaan ke berkas itu jatuh ke
