@@ -1,11 +1,16 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
+<<<<<<< HEAD
   "scanned": 144,
+=======
+  "scanned": 128,
+>>>>>>> add/a5e2e
   "allowlist": [
     "http-smoke-test.js",
     "e2e-level-grammar-test.js",
-    "cf-live-selftest.js"
+    "cf-live-selftest.js",
+    "e2e-bridge-selftest.js"
   ],
   "shadowSafeGates": [
     "adaptive-policy-test.js",
@@ -25,7 +30,11 @@
     "Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3."
   ],
   "counts": {
+<<<<<<< HEAD
     "pass": 36,
+=======
+    "pass": 37,
+>>>>>>> add/a5e2e
     "fail": 0
   },
   "checks": [
@@ -102,12 +111,20 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
+<<<<<<< HEAD
       "details": "files=144"
+=======
+      "details": "files=128"
+>>>>>>> add/a5e2e
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
       "status": "PASS",
+<<<<<<< HEAD
       "details": "start=13423 end=15191"
+=======
+      "details": "start=13121 end=14889"
+>>>>>>> add/a5e2e
     },
     {
       "name": "Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya",
@@ -165,14 +182,14 @@
       "details": "0"
     },
     {
-      "name": "Allowlist tetap tiga nama dan semuanya ada di repo",
+      "name": "Allowlist tetap empat nama dan semuanya ada di repo",
       "status": "PASS",
-      "details": "http-smoke-test.js, e2e-level-grammar-test.js, cf-live-selftest.js"
+      "details": "http-smoke-test.js, e2e-level-grammar-test.js, cf-live-selftest.js, e2e-bridge-selftest.js"
     },
     {
       "name": "Pemindaian mencakup berkas *-selftest.js (bukan hanya *-test.js/*-audit.js)",
       "status": "PASS",
-      "details": "cf-live-selftest.js"
+      "details": "cf-live-selftest.js, e2e-bridge-selftest.js"
     },
     {
       "name": "Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket",
@@ -190,9 +207,19 @@
       "details": "cf-live-contract-test.js (FIEZEL_CF_LIVE_BASE), staging-live-test.js (FIEZEL_STAGING_BASE)"
     },
     {
+      "name": "Gerbang E2E browser memenuhi syarat env-gated (baca env, SKIP bersih, tanpa URL bawaan)",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
       "name": "Gerbang ini terdaftar di quality.yml",
       "status": "PASS",
       "details": "quality.yml"
+    },
+    {
+      "name": "Self-test E2E browser terdaftar di quality.yml, gerbang live browser-nya TIDAK",
+      "status": "PASS",
+      "details": "selftest=true gerbangLive=false"
     },
     {
       "name": "Gerbang live dan self-test-nya terdaftar di quality.yml",
