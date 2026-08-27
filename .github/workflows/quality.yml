@@ -179,6 +179,12 @@ jobs:
           node ai-response-shape-test.js
           node breaker-test.js
           node prerender-dryrun-test.js
+          # A1: gerbang aritmetika pra-render. Dijalankan tepat sesudah gerbang dry-run karena
+          # keduanya menguji tools/prerender-tts.mjs dari dua sisi: yang di atas menjaga BENTUK
+          # (dry-run kering, workflow bergate, manifest terpisah), yang ini menjaga ANGKA (korpus
+          # 604.962 karakter, 5.657 objek/286.851 karakter sesudah dedup, harga aura-1 vs
+          # aura-2-en, daftar frasa berisiko "On balance", override model per-item).
+          node prerender-plan-test.js
           node owner-dashboard-test.js
           node tools/cf-test-harness.js
           node no-network-test.js
