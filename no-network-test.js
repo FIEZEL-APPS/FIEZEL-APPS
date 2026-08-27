@@ -37,10 +37,21 @@ const root = __dirname;
 //   http-smoke-test.js        - menyalakan server loopback untuk memeriksa aset HTTP nyata
 //   e2e-level-grammar-test.js - :12 require('http'), :37 server.listen(0,'127.0.0.1'),
 //                               :82 WebSocket ke CDP Chromium lokal
-// Keduanya loopback tanpa DNS eksternal, dan gerbang ini MEMBUKTIKAN sifat loopback itu
+//   cf-live-selftest.js       - :41 require('node:http'), server.listen(0,'127.0.0.1'):
+//                               ia menyalakan Worker `fiezel-api` TIRUAN untuk membuktikan
+//                               `cf-live-contract-test.js` benar-benar bisa merah (21
+//                               skenario: satu benar, 20 salah). Server tiruan HARUS server
+//                               HTTP sungguhan; kalau tidak, jalur yang diuji bukan lagi
+//                               jalur HTTP gerbang itu. Port 0 = dipilih kernel, tanpa DNS,
+//                               tanpa keluar mesin.
+// Ketiganya loopback tanpa DNS eksternal, dan gerbang ini MEMBUKTIKAN sifat loopback itu
 // (bukan mempercayainya). Menambah nama ke daftar ini adalah keputusan arsitektur, jadi
 // jumlahnya ikut di-assert.
-const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js']);
+//
+// CATATAN CAKUPAN: pemindaian di bawah diperluas ke berkas `*-selftest.js`. Tanpa itu,
+// `cf-live-selftest.js` lolos hanya karena namanya tidak berakhiran `-test.js` — dan
+// "lolos karena nama berkas" adalah kebalikan dari daftar yang disengaja.
+const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.js', 'cf-live-selftest.js']);
 
 // Kelas kedua yang berbeda secara MAKNA, bukan sekadar pengecualian kedua:
 //   prerender-dryrun-test.js - :33-38 require('https')/require('http') SEMATA-MATA untuk
@@ -52,6 +63,20 @@ const SOCKET_ALLOWLIST = new Set(['http-smoke-test.js', 'e2e-level-grammar-test.
 // `https.request = trap(...)` bukan panggilan, jadi detektor panggilan tidak dilonggarkan).
 const TRAP_ONLY_ALLOWLIST = new Set(['prerender-dryrun-test.js']);
 const RE_TRAP_INSTALL = /\b(?:https?|net|tls)\s*\.\s*(?:request|get|connect)\s*=/;
+
+// KELAS KETIGA — dan ia ada karena kejujuran, bukan karena pemindai menuntutnya.
+//   cf-live-contract-test.js - satu-satunya gerbang yang SENGAJA menembak host
+//                              non-loopback: ia menguji Worker `fiezel-api` yang hidup
+//                              lewat HTTP nyata (batas kejujuran reports/exec-wiring.md §6).
+// Berkas itu TIDAK terdeteksi pemindai di bawah: ia tidak me-`require` modul socket dan
+// URL-nya datang dari `process.env`, bukan dari literal. Artinya ia akan lolos DIAM-DIAM,
+// dan itu justru yang tidak boleh terjadi — gerbang ini akan tampak melindungi sesuatu
+// yang sudah bocor. Jadi namanya didaftarkan di sini dengan syarat yang DIPERIKSA, bukan
+// dipercaya: harus membaca env gerbangnya, harus exit 0 tanpa env itu, dan tidak boleh
+// punya URL remote bawaan (satu `|| 'https://api...'` akan membuat CI publik menembak
+// produksi pada setiap push).
+const ENV_GATED_LIVE_ALLOWLIST = new Set(['cf-live-contract-test.js']);
+const LIVE_ENV_VAR = 'FIEZEL_CF_LIVE_BASE';
 
 const checks = [];
 const notes = [];
@@ -222,7 +247,7 @@ check('Detektor menangkap penyuntikan eksplisit dari globalThis', kinds(FIXTURES
  * 2. Pemindaian repo yang sesungguhnya
  * ===================================================================================== */
 const SELF = path.basename(__filename);
-const files = fs.readdirSync(root).filter(f => /-(test|audit)\.js$/.test(f)).sort();
+const files = fs.readdirSync(root).filter(f => /-(test|audit|selftest)\.js$/.test(f)).sort();
 check('Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)', files.length >= 100, `files=${files.length}`);
 
 // Berkas ini SENDIRI memuat contoh pelanggaran di dalam FIXTURES — itu memang tugasnya.
@@ -275,9 +300,13 @@ check('Pola mock-lokal masih dipakai gerbang existing (≥8 berkas, koreksi cf-b
   shadowSafe.length >= 8, `${shadowSafe.length} berkas: ${shadowSafe.join(', ')}`);
 check('Setiap berkas allowlist benar-benar loopback dan masih benar-benar butuh socket',
   allowlistProblems.length === 0, allowlistProblems.join(' | ') || '0');
-check('Allowlist tetap dua nama dan keduanya ada di repo',
-  SOCKET_ALLOWLIST.size === 2 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
+check('Allowlist tetap tiga nama dan semuanya ada di repo',
+  SOCKET_ALLOWLIST.size === 3 && [...SOCKET_ALLOWLIST].every(f => fs.existsSync(path.join(root, f))),
   [...SOCKET_ALLOWLIST].join(', '));
+// Cakupan pemindaian ikut di-assert: kalau pola berkas dipersempit lagi, berkas
+// `*-selftest.js` akan kembali lolos karena namanya, dan allowlist di atas menjadi hiasan.
+check('Pemindaian mencakup berkas *-selftest.js (bukan hanya *-test.js/*-audit.js)',
+  files.includes('cf-live-selftest.js'), files.filter(f => /-selftest\.js$/.test(f)).join(', ') || '(tidak ada)');
 check('Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih dengan allowlist socket',
   TRAP_ONLY_ALLOWLIST.size === 1
   && [...TRAP_ONLY_ALLOWLIST].every(f => fs.existsSync(path.join(root, f)))
@@ -285,10 +314,56 @@ check('Daftar jerat tetap satu nama, ada di repo, dan tidak tumpang-tindih denga
   [...TRAP_ONLY_ALLOWLIST].join(', '));
 
 /* =======================================================================================
+ * 2b. Kelas gerbang "live" ber-env: syaratnya diperiksa, bukan dipercaya
+ * ===================================================================================== */
+const liveProblems = [];
+for (const file of ENV_GATED_LIVE_ALLOWLIST) {
+  const abs = path.join(root, file);
+  if (!fs.existsSync(abs)) { liveProblems.push(file + ' terdaftar tapi tidak ada di repo'); continue; }
+  const raw = fs.readFileSync(abs, 'utf8');
+  const code = stripComments(raw);
+  if (!code.includes(LIVE_ENV_VAR)) liveProblems.push(file + ' tidak membaca ' + LIVE_ENV_VAR);
+  // URL remote sebagai NILAI BAWAAN (`env.X || 'https://…'`) dilarang: itu yang mengubah
+  // "SKIP di CI" menjadi "tembak produksi di setiap push".
+  if (/\|\|\s*['"`]https?:\/\//.test(code)) liveProblems.push(file + ' punya URL remote sebagai nilai bawaan');
+  if (SOCKET_ALLOWLIST.has(file) || TRAP_ONLY_ALLOWLIST.has(file)) {
+    liveProblems.push(file + ' tidak boleh berada di dua kelas allowlist sekaligus');
+  }
+  // Ia harus benar-benar exit 0 tanpa env — dan itu diperiksa dengan MENJALANKANNYA,
+  // bukan dengan membaca janji di komentarnya. `cf-live-selftest.js` menguji hal yang
+  // sama lebih dalam; di sini cukup satu bukti murah supaya klaim "tidak memerahkan CI"
+  // tidak hanya tertulis.
+  const probe = require('child_process').spawnSync(process.execPath, [abs], {
+    cwd: root,
+    encoding: 'utf8',
+    timeout: 30000,
+    env: Object.assign({}, process.env, { [LIVE_ENV_VAR]: '' })
+  });
+  if (probe.status !== 0) liveProblems.push(file + ' tidak exit 0 tanpa ' + LIVE_ENV_VAR + ' (exit=' + probe.status + ')');
+  if (!/SKIP/.test(String(probe.stdout || ''))) liveProblems.push(file + ' tidak mencetak label SKIP tanpa ' + LIVE_ENV_VAR);
+}
+check('Gerbang live ber-env memenuhi syaratnya (baca env, SKIP bersih, tanpa URL bawaan)',
+  liveProblems.length === 0, liveProblems.join(' | ') || '0');
+check('Kelas live ber-env tetap satu nama dan terdaftar di quality.yml sebagai langkah SKIP',
+  ENV_GATED_LIVE_ALLOWLIST.size === 1, [...ENV_GATED_LIVE_ALLOWLIST].join(', '));
+// Catatan jujur, bukan assert: pemindai teks di berkas ini TIDAK bisa membedakan
+// `fetch(variabel)` yang menembak produksi dari yang menembak loopback. Kelas di atas
+// menutup celah itu dengan pendaftaran eksplisit + probe SKIP, bukan dengan deteksi.
+// Deteksi sungguhan tetap menunggu lapis 3 (lihat catatan di bawah).
+notes.push('Kelas ENV_GATED_LIVE_ALLOWLIST ada karena pemindai teks tidak bisa melihat '
+  + '`fetch(<variabel>)`; anggotanya didaftarkan dan diprobe, bukan dideteksi.');
+
+/* =======================================================================================
  * 3. Gerbang ini terdaftar di CI
  * ===================================================================================== */
 const workflow = fs.readFileSync(path.join(root, '.github/workflows/quality.yml'), 'utf8');
 check('Gerbang ini terdaftar di quality.yml', workflow.includes('node no-network-test.js'), 'quality.yml');
+check('Gerbang live dan self-test-nya terdaftar di quality.yml',
+  workflow.includes('node cf-live-contract-test.js') && workflow.includes('node cf-live-selftest.js'),
+  'quality.yml');
+check('quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL',
+  /SKIP sampai owner menyetel base URL/.test(workflow) && workflow.includes(LIVE_ENV_VAR),
+  'komentar SKIP + ' + LIVE_ENV_VAR);
 
 // CATATAN JUJUR, bukan assert: lapis 1 (berkas ini) hanya membaca TEKS. Panggilan jaringan
 // yang dibangun secara dinamis lolos darinya. Penahan sesungguhnya adalah lapis 3 —
