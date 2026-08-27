@@ -19,9 +19,14 @@
  *    BAR DENGAN LEBAR, bukan titik.
  * 2. KLAIM DI BAWAH AMBANG BUKTI TIDAK BOLEH TERDENGAR SEPERTI PERNYATAAN. Bukti tipis keluar
  *    sebagai status 'belum cukup data' dengan mean/interval null — bukan angka yang seolah tahu.
- * 3. SEMUA ENTRI BISA DIBANTAH. Murid berhak menekan "menurutku ini salah"; setiap entri
- *    membawa canDispute:true. AKSI sanggahan (menaikkan varians, memicu pengukuran ulang)
- *    adalah milik aplikasi, BUKAN modul ini — di sini hanya sinyal bahwa tombolnya sah tampil.
+ * 3. SEMUA ENTRI BISA DIBANTAH — DAN SANGGAHAN PUNYA KONSEKUENSI. Murid berhak menekan
+ *    "menurutku ini salah"; setiap entri membawa canDispute + claimId stabil. Sejak v3
+ *    (negotiated learner model, council C9 opus): sanggahan BUKAN sekadar tombol keluhan.
+ *    Sanggahan menaikkan varians klaim itu dan memicu pengukuran ulang, karena murid yang
+ *    membantah adalah sumber informasi tentang KESALAHAN MODEL — justifikasinya bukan cuma
+ *    pedagogis tapi akurasi model (Bull, negotiated learner modelling). negotiate() di sini
+ *    menerjemahkan sanggahan menjadi INSTRUKSI untuk app (remeasure / discount_evidence);
+ *    eksekusi probe & diskon tetap milik aplikasi.
  * 4. PRESENTASI MURNI. Modul ini tidak mengambil keputusan sesi apa pun, tidak menulis state,
  *    tidak menyentuh DOM/jaringan/waktu global. Ia menerima data dan mengembalikan struktur
  *    tampilan. Risiko regresi terhadap kebijakan sesi: nol, karena tidak ada jalurnya.
@@ -42,7 +47,27 @@
   'use strict';
 
   var SCHEMA = 'fiezel-olm-v1';
+  // Skema state negosiasi (catatan sanggahan). Terpisah dari SCHEMA presentasi karena
+  // ini satu-satunya bagian OLM yang PERSISTEN: summarize tetap tanpa-state, tapi daftar
+  // sanggahan harus hidup lintas sesi supaya "sedang diukur ulang" tidak hilang saat reload.
+  var NEGOTIATION_SCHEMA = 'fiezel-olm-negotiation-v1';
   var DAY_MS = 86400000;
+
+  // Sanggahan dianggap MASIH BERJALAN selama 7 hari. Kenapa dibatasi: kalau app gagal
+  // menjalankan probe (murid tidak kembali, modul absen), klaim tidak boleh terkunci
+  // "sedang diukur ulang" selamanya — setelah 7 hari sanggahan kedaluwarsa dan klaim
+  // kembali bisa dibantah. Dalam jendela itu, sanggahan ganda pada klaim yang sama
+  // ditolak (noop) supaya murid tidak bisa spam remeasure.
+  var DISPUTE_PENDING_DAYS = 7;
+  var DISPUTE_PENDING_MS = DISPUTE_PENDING_DAYS * DAY_MS;
+
+  // Jumlah probe pengukuran ulang per sanggahan. 3 mengikuti disiplin ambang bukti
+  // MIN_MASTERY_EVIDENCE: klaim baru boleh direvisi oleh minimal jumlah bukti yang sama
+  // dengan yang dibutuhkan untuk membuatnya.
+  var DISPUTE_PROBE_COUNT = 3;
+
+  // Label yang dipakai summarize untuk klaim yang sanggahannya masih berjalan.
+  var TEXT_REMEASURING = 'sedang diukur ulang';
 
   // Ambang bukti: di bawah ini sebuah klaim penguasaan belum boleh berbentuk angka.
   // 3 mengikuti disiplin Core Brain v2 ("model yang percaya diri di atas tiga jawaban
@@ -111,7 +136,9 @@
     if (lessons) {
       Object.keys(lessons).forEach(function (id) {
         var v = lessons[id];
-        var entry = { lesson: id, family: null, canDispute: true };
+        // claimId stabil: identitas klaim untuk negotiate(). Stabil karena hanya turunan
+        // dari id lesson — dua kali summarize pada data sama menghasilkan claimId sama.
+        var entry = { lesson: id, family: null, canDispute: true, claimId: 'mastery:' + id };
         if (v && typeof v === 'object' && isNum(v.L)) {
           // Sumber BKT: punya hitungan bukti n, interval menyempit dengan bukti.
           var n = isNum(v.n) ? v.n : 0;
@@ -221,6 +248,7 @@
         evidenceCount: (m && isNum(m.evidenceCount)) ? m.evidenceCount : null,
         text: misconceptionText(m),
         canDispute: true,
+        claimId: misconceptionClaimId(m),
         rationale: 'brain3_olm_misconception_active'
       };
     });
@@ -230,6 +258,7 @@
         misconception: m && m.misconception ? m.misconception : null,
         text: resolvedText(m),
         canDispute: true,
+        claimId: misconceptionClaimId(m),
         rationale: 'brain3_olm_misconception_resolved'
       };
     });
@@ -270,8 +299,13 @@
       // tentang ingatannya sendiri — pita minimal 0.05 supaya tidak pernah jadi titik.
       var reps = isNum(it.reps) ? it.reps : 0;
       var half = clamp(0.5 / Math.sqrt(reps + 2), 0.05, 0.35);
+      var itemId = it.id || it.lesson || it.concept || null;
       scored.push({
-        id: it.id || it.lesson || it.concept || null,
+        id: itemId,
+        // Klaim tanpa nama tidak bisa dibantah: negotiate butuh identitas target untuk
+        // mendiskon bukti yang tepat. Maka claimId hanya ada bila item punya id.
+        claimId: itemId ? 'memory:' + itemId : null,
+        canDispute: !!itemId,
         retrievability: {
           mean: round3(clamp(r, 0, 1)),
           low: round3(clamp(r - half, 0, 1)),
@@ -279,7 +313,6 @@
         },
         elapsedDays: round3(elapsedDays),
         atRisk: r < AT_RISK_RETRIEVABILITY,
-        canDispute: true,
         rationale: 'brain3_olm_review_item'
       });
     });
@@ -323,6 +356,7 @@
         status: 'insufficient_data',
         pairs: pairs.length,
         canDispute: true,
+        claimId: 'calibration:overall',
         rationale: 'brain3_olm_calibration_insufficient'
       };
     }
@@ -371,8 +405,164 @@
       tone: tone,
       message: message,
       canDispute: true,
+      claimId: 'calibration:overall',
       rationale: rationale
     };
+  }
+
+  /* ================================================================
+   * 5) NEGOSIASI MODEL — negotiated learner model (council C9 opus).
+   *
+   * KENAPA SANGGAHAN MURID MENGUBAH MODEL, bukan cuma UI: murid yang menekan
+   * "menurutku ini salah" sedang memberikan BUKTI bahwa model dan realitas berbeda —
+   * salah satu dari keduanya keliru. Cara jujur menyelesaikannya bukan berdebat,
+   * melainkan MENGUKUR ULANG: naikkan ketidakpastian klaim itu, lalu kumpulkan bukti
+   * segar (3 probe) yang memutuskan siapa yang benar. Kalau murid benar, model
+   * terkoreksi; kalau model benar, murid melihat buktinya sendiri. Dua-duanya menang.
+   *
+   * Modul ini MURNI: negotiate tidak menjalankan probe dan tidak mendiskon bukti —
+   * ia mengembalikan INSTRUKSI untuk app (kontrak wiring C5) plus state baru yang
+   * mencatat sanggahan. State selalu immutable-copy dan serializable (JSON polos).
+   * ================================================================ */
+
+  function misconceptionClaimId(m) {
+    // Format 'misconception:<concept>::<label>' — '::' dipilih sebagai pemisah karena
+    // ':' tunggal sudah dipakai di dalam id konsep (mis. 'grammar:skill').
+    var concept = (m && m.concept) ? String(m.concept) : 'konsep';
+    var label = (m && m.misconception) ? String(m.misconception) : 'pola';
+    return 'misconception:' + concept + '::' + label;
+  }
+
+  /**
+   * Bersihkan state negosiasi menjadi bentuk kanonik. Tahan korup: apa pun bentuk
+   * masukannya (null, string, disputes bukan array, entri tanpa claimId/at), keluarannya
+   * selalu {schema, disputes:[{claimId, at}]} yang valid. Entri korup DIBUANG, bukan
+   * ditebak — sanggahan tanpa identitas atau tanpa waktu tidak bisa dieksekusi jujur.
+   */
+  function sanitizeNegotiation(state) {
+    var out = { schema: NEGOTIATION_SCHEMA, disputes: [] };
+    if (state && typeof state === 'object' && Array.isArray(state.disputes)) {
+      state.disputes.forEach(function (d) {
+        if (d && typeof d === 'object' &&
+            typeof d.claimId === 'string' && d.claimId.length &&
+            isNum(d.at)) {
+          out.disputes.push({ claimId: d.claimId, at: d.at });
+        }
+      });
+    }
+    return out;
+  }
+
+  /** Sanggahan masih berjalan bila usianya < 7 hari. */
+  function disputePending(d, nowMs) {
+    return isNum(nowMs) && nowMs >= d.at && (nowMs - d.at) < DISPUTE_PENDING_MS;
+  }
+
+  /** Peta claimId -> true untuk semua sanggahan yang masih berjalan. */
+  function pendingMap(state, nowMs) {
+    var map = {};
+    sanitizeNegotiation(state).disputes.forEach(function (d) {
+      if (disputePending(d, nowMs)) map[d.claimId] = true;
+    });
+    return map;
+  }
+
+  /**
+   * Terjemahkan claimId menjadi instruksi untuk app. Jenis klaim menentukan obatnya:
+   * - mastery/miskonsepsi -> REMEASURE: klaim ini lahir dari inferensi (BKT/ledger),
+   *   jadi jalan koreksinya adalah bukti segar — 3 probe pada skill itu.
+   * - memori -> DISCOUNT_EVIDENCE: klaim retrievability lahir dari riwayat review,
+   *   dan kalau murid bilang "aku masih ingat ini", yang patut diragukan adalah bobot
+   *   bukti lama — bukan mengukur ulang seluruh skill.
+   * - selain itu (termasuk kalibrasi agregat) -> noop: tidak ada aksi model tunggal
+   *   yang jujur untuk klaim agregat, jadi jangan berpura-pura ada.
+   */
+  function instructionFor(claimId) {
+    if (claimId.indexOf('mastery:') === 0) {
+      var skill = claimId.slice('mastery:'.length);
+      if (skill) {
+        return { type: 'remeasure', targetSkill: skill, probeCount: DISPUTE_PROBE_COUNT, rationale: 'brain3_olm_dispute_remeasure' };
+      }
+    } else if (claimId.indexOf('misconception:') === 0) {
+      // targetSkill = konsepnya (bagian sebelum '::') — probe menguji konsep, bukan labelnya.
+      var concept = claimId.slice('misconception:'.length).split('::')[0];
+      if (concept) {
+        return { type: 'remeasure', targetSkill: concept, probeCount: DISPUTE_PROBE_COUNT, rationale: 'brain3_olm_dispute_remeasure' };
+      }
+    } else if (claimId.indexOf('memory:') === 0) {
+      var target = claimId.slice('memory:'.length);
+      if (target) {
+        return { type: 'discount_evidence', target: target, rationale: 'brain3_olm_dispute_discount' };
+      }
+    }
+    return { type: 'noop', rationale: 'brain3_olm_dispute_unknown_claim' };
+  }
+
+  /**
+   * negotiate(state, {claimId, action:'dispute'}, nowMs) -> {state, instruction}
+   *
+   * Murni & immutable: state masukan TIDAK PERNAH dimutasi; keluaran selalu salinan
+   * kanonik baru. Sanggahan ganda pada klaim yang sama dalam 7 hari -> noop 'pending'
+   * (pengukuran ulang yang pertama masih berjalan; menumpuknya tidak menambah informasi).
+   * Sanggahan kedaluwarsa (>7 hari tanpa resolve) boleh dibantah lagi — catatannya
+   * diperbarui, instruksi diterbitkan ulang.
+   */
+  function negotiate(state, request, nowMs) {
+    var clean = sanitizeNegotiation(state);
+    var claimId = (request && typeof request.claimId === 'string' && request.claimId.length) ? request.claimId : null;
+    var action = request ? request.action : null;
+    if (!claimId || action !== 'dispute' || !isNum(nowMs)) {
+      // Permintaan cacat: jangan menebak niat murid — kembalikan state apa adanya.
+      return { state: clean, instruction: { type: 'noop', rationale: 'brain3_olm_dispute_invalid' } };
+    }
+    var instruction = instructionFor(claimId);
+    if (instruction.type === 'noop') {
+      return { state: clean, instruction: instruction };
+    }
+    var existing = null;
+    for (var i = 0; i < clean.disputes.length; i++) {
+      if (clean.disputes[i].claimId === claimId) { existing = clean.disputes[i]; break; }
+    }
+    if (existing && disputePending(existing, nowMs)) {
+      // Pengukuran ulang pertama masih berjalan — sanggahan kedua tidak menambah bukti.
+      return { state: clean, instruction: { type: 'noop', rationale: 'brain3_olm_dispute_pending' } };
+    }
+    var disputes = clean.disputes
+      .filter(function (d) { return d.claimId !== claimId; })
+      .concat([{ claimId: claimId, at: nowMs }]);
+    return {
+      state: { schema: NEGOTIATION_SCHEMA, disputes: disputes },
+      instruction: instruction
+    };
+  }
+
+  /**
+   * resolveDispute(state, claimId, nowMs) -> state'
+   * Dipanggil app SETELAH probe pengukuran ulang selesai (atau bukti selesai didiskon):
+   * catatan sanggahan dihapus sehingga klaim kembali tampil normal dan bisa dibantah
+   * lagi bila murid masih tidak setuju dengan hasil barunya. Murni & tahan korup.
+   */
+  function resolveDispute(state, claimId, nowMs) {
+    var clean = sanitizeNegotiation(state);
+    if (typeof claimId !== 'string' || !claimId.length) return clean;
+    return {
+      schema: NEGOTIATION_SCHEMA,
+      disputes: clean.disputes.filter(function (d) { return d.claimId !== claimId; })
+    };
+  }
+
+  /**
+   * Tandai entri yang sanggahannya masih berjalan. Kenapa canDispute:false selama
+   * pending: klaim yang sedang diukur ulang belum punya jawaban baru — membantahnya
+   * lagi hanya menumpuk antrean probe tanpa informasi baru.
+   */
+  function markDisputed(entry, pending) {
+    if (entry && entry.claimId && pending[entry.claimId]) {
+      entry.disputed = true;
+      entry.canDispute = false;
+      entry.label = TEXT_REMEASURING;
+    }
+    return entry;
   }
 
   /**
@@ -384,7 +574,7 @@
    */
   function summarize(state, nowMs) {
     var s = (state && typeof state === 'object') ? state : {};
-    return {
+    var out = {
       schema: SCHEMA,
       generatedAt: isNum(nowMs) ? nowMs : null,
       disputeHint: DISPUTE_HINT,
@@ -394,14 +584,31 @@
       calibration: calibrationSection(s.calibration),
       rationale: 'brain3_olm_summary'
     };
+    // Field OPSIONAL baru (API lama tidak berubah): bila app menitipkan state negosiasi
+    // di s.negotiation, klaim yang sanggahannya masih berjalan ditandai 'sedang diukur
+    // ulang' dan tombol bantahnya disembunyikan (canDispute:false) sampai resolveDispute.
+    if (s.negotiation) {
+      var pending = pendingMap(s.negotiation, nowMs);
+      out.mastery.entries.forEach(function (e) { markDisputed(e, pending); });
+      out.misconceptions.active.forEach(function (e) { markDisputed(e, pending); });
+      out.misconceptions.resolved.forEach(function (e) { markDisputed(e, pending); });
+      out.review.top.forEach(function (e) { markDisputed(e, pending); });
+      markDisputed(out.calibration, pending);
+    }
+    return out;
   }
 
   return {
     SCHEMA: SCHEMA,
+    NEGOTIATION_SCHEMA: NEGOTIATION_SCHEMA,
     MIN_MASTERY_EVIDENCE: MIN_MASTERY_EVIDENCE,
     MIN_CALIBRATION_PAIRS: MIN_CALIBRATION_PAIRS,
     CALIBRATION_BIAS_THRESHOLD: CALIBRATION_BIAS_THRESHOLD,
     AT_RISK_RETRIEVABILITY: AT_RISK_RETRIEVABILITY,
-    summarize: summarize
+    DISPUTE_PENDING_DAYS: DISPUTE_PENDING_DAYS,
+    DISPUTE_PROBE_COUNT: DISPUTE_PROBE_COUNT,
+    summarize: summarize,
+    negotiate: negotiate,
+    resolveDispute: resolveDispute
   };
 });
