@@ -47,7 +47,33 @@
   });
 
   /**
-   * Model + alasan + biaya. Harga dari cf-a10 §2 / cf-a11 §3.2.
+   * Model + alasan + biaya.
+   *
+   * SUMBER ANGKA DI BAWAH BUKAN KATALOG, TETAPI PENGUJIAN LANGSUNG KE WORKERS AI. Semua model
+   * dipanggil pada dua tugas FIEZEL nyata (penjelasan soal + analisa murid), semuanya HTTP 200 —
+   * jadi "berjalan" bukan pembeda; mutu jawabannya yang membedakan. Ringkasan terukur (bukti dan
+   * kutipan lengkap: reports/voice-v4-aifix.md):
+   *
+   *   @cf/meta/llama-3.3-70b-instruct-fp8-fast — patuh batas kalimat (6 dan 4 kalimat), pakai
+   *       "kamu" dan "nggak", akurat secara pedagogis, 4,1-9,6 detik, harga masuk US$0,293/M.
+   *       => DIPAKAI untuk setiap tugas yang menuntut KEBENARAN.
+   *   @cf/aisingapore/gemma-sea-lion-v4-27b-it — nada Indonesia paling alami dan PALING CEPAT
+   *       (3,1-3,7 detik), harga masuk US$0,351/M, TETAPI membuat kesalahan pedagogis: menyebut
+   *       jawaban salah "nggak salah banget sih". => KANDIDAT, belum dipercaya (MODELS.candidate).
+   *   @cf/meta/llama-3.1-8b-instruct-fp8 — bertele-tele, MELEWATI batas kalimat (7-8 dari
+   *       maksimal 6), paling lambat (8,4-10,8 detik), harga masuk US$0,152/M. => hanya tier
+   *       degradasi; pelanggaran panjangnya ditangkap `checkOutputContract()`.
+   *   @cf/ibm-granite/granite-4.0-h-micro — termurah (US$0,017/M) tetapi SALAH FAKTA: menyebut
+   *       present perfect 48% sebagai "kekuatan" berdampingan dengan simple present 92%.
+   *       => DILARANG untuk tugas analisa; hanya untuk tugas yang tidak pernah menilai murid.
+   *   @cf/google/gemma-4-26b-a4b-it — TIDAK DIPAKAI: `message.content` kosong dengan
+   *       `finish_reason:"length"` karena seluruh anggaran token habis di `reasoning_content`
+   *       (MODELS.rejected + `classifyModelFailure()` => `reasoning_overflow`).
+   *
+   * `responseShape` bukan hiasan: `llama` mengembalikan `result.response`, `openai` mengembalikan
+   * `result.choices[0].message.content`. Kode yang hanya membaca satu bentuk mengembalikan STRING
+   * KOSONG secara senyap, dan murid melihat kotak kosong alih-alih galat. `readModelText()` di
+   * bawah membaca keduanya, dan kosong SELALU dihitung kegagalan.
    */
   var MODELS = Object.freeze({
     cheap: Object.freeze({
@@ -55,26 +81,76 @@
       priceInPerMillionUsd: 0.017,
       priceOutPerMillionUsd: 0.112,
       neuronsPerRequest: 3.8,
-      reason: 'Termurah di katalog. Dipakai untuk frekuensi tertinggi dan sebagai tier degradasi ' +
-              'saat breaker HALF-OPEN atau jatah neuron harian terlampaui: ±2.600 permintaan/hari ' +
-              'masih di dalam 10.000 neuron gratis.'
+      responseShape: 'openai',
+      pedagogicallyTrusted: false,
+      reason: 'Termurah di katalog (US$0,017/M masuk), dan itu satu-satunya kelebihannya. Diuji ' +
+              'hari ini pada analisa murid ia SALAH FAKTA: menyebut present perfect 48% sebagai ' +
+              '"kekuatan" berdampingan dengan simple present 92%. Karena itu ia hanya untuk tugas ' +
+              'yang tidak pernah menilai murid (terjemahan subtitle bank) dan DILARANG menjadi ' +
+              'model maupun tier degradasi tugas analisa.'
     }),
     standard: Object.freeze({
-      id: '@cf/meta/llama-3.1-8b-instruct-fp8-fast',
-      priceInPerMillionUsd: 0.045,
+      id: '@cf/meta/llama-3.1-8b-instruct-fp8',
+      priceInPerMillionUsd: 0.152,
       priceOutPerMillionUsd: 0.384,
       neuronsPerRequest: 12.5,
-      reason: 'US$0,045/M in + US$0,384/M out; ±800 permintaan/hari di dalam jatah gratis. ' +
-              'Pada 1.000 pengguna seluruh LLM hanya US$3,01/bulan (1,9% total biaya).'
+      responseShape: 'llama',
+      pedagogicallyTrusted: false,
+      reason: 'US$0,152/M masuk; ±800 permintaan/hari di dalam jatah gratis. Diuji hari ini: tidak ' +
+              'salah fakta, tetapi bertele-tele, MELEWATI batas kalimat (7-8 dari maksimal 6), dan ' +
+              'paling lambat (8,4-10,8 detik). Dipakai sebagai tier degradasi tugas kebenaran — ' +
+              'bukan karena bagus, tetapi karena pelanggaran panjangnya terdeteksi pemeriksa ' +
+              'kontrak keluaran lalu jatuh ke fallback deterministik, sementara granite yang lebih ' +
+              'murah justru menyampaikan fakta yang salah dengan yakin.'
     }),
     reasoning: Object.freeze({
       id: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
       priceInPerMillionUsd: 0.293,
       priceOutPerMillionUsd: 2.253,
       neuronsPerRequest: 60,
-      reason: 'Hanya untuk dua task berfrekuensi paling rendah (4/jam). Memakai 70b untuk SEMUA ' +
-              'task hanya +9,3% total (cf-a10 §4); memakainya di dua task ini berarti selisih di ' +
-              'bawah US$2/bulan @1.000 pengguna — mahal hanya di tempat mutunya paling terasa.'
+      responseShape: 'llama',
+      pedagogicallyTrusted: true,
+      reason: 'Satu-satunya model yang lulus dua tugas FIEZEL hari ini: patuh batas kalimat (6 dan ' +
+              '4 kalimat), memakai "kamu" dan "nggak" sesuai naskah, akurat secara pedagogis, ' +
+              '4,1-9,6 detik, harga masuk US$0,293/M. Karena itu SEMUA tugas yang menuntut ' +
+              'kebenaran memakainya. 60 neuron/permintaan ⇒ ±165 permintaan/hari di jatah gratis; ' +
+              'yang memotong adalah NEURONS.softLimit, bukan menukar kebenaran dengan harga sejak ' +
+              'permintaan pertama.'
+    }),
+    /**
+     * KANDIDAT, BELUM DIPERCAYA — sengaja tidak dirujuk task mana pun (`usedByTasks:false`).
+     * Ia tercepat dan nadanya paling Indonesia, tetapi satu kesalahan pedagogis terukur sudah
+     * cukup menahan promosinya: pada jawaban murid yang SALAH ia menulis "nggak salah banget sih".
+     * Untuk aplikasi yang menilai, itu bukan gaya bahasa — itu informasi yang salah.
+     * UJI LANJUTAN yang wajib lulus sebelum ia dipercaya: >=50 kasus jawaban salah tanpa satu pun
+     * pelunakan benar/salah, plus lulus `checkOutputContract()` pada dua tugas kebenaran.
+     */
+    candidate: Object.freeze({
+      id: '@cf/aisingapore/gemma-sea-lion-v4-27b-it',
+      priceInPerMillionUsd: 0.351,
+      priceOutPerMillionUsd: 0.351,
+      neuronsPerRequest: 30,
+      responseShape: 'openai',
+      pedagogicallyTrusted: false,
+      usedByTasks: false,
+      reason: 'Kandidat yang perlu UJI LANJUTAN sebelum dipercaya: tercepat (3,1-3,7 detik), nada ' +
+              'Indonesia paling alami, harga masuk US$0,351/M — tetapi terbukti membuat kesalahan ' +
+              'pedagogis dengan menyebut jawaban salah "nggak salah banget sih". Kecepatan tidak ' +
+              'menebus jawaban yang menyesatkan murid, jadi ia menunggu di sini.'
+    }),
+    /** DITOLAK, disimpan sebagai bukti supaya tidak ada yang mencobanya lagi tanpa membaca ini. */
+    rejected: Object.freeze({
+      id: '@cf/google/gemma-4-26b-a4b-it',
+      priceInPerMillionUsd: 0,
+      priceOutPerMillionUsd: 0,
+      neuronsPerRequest: 0,
+      responseShape: 'openai',
+      pedagogicallyTrusted: false,
+      usedByTasks: false,
+      reason: 'DITOLAK: `message.content` kosong dengan `finish_reason:"length"` sementara seluruh ' +
+              'anggaran token habis di `message.reasoning_content`. Murid melihat kotak kosong dan ' +
+              'owner tetap dibayari token. Kegagalan ini punya nama sendiri di kode: ' +
+              'OUTPUT_FAILURES.reasoningOverflow — dan isi reasoning tidak pernah ditampilkan.'
     })
   });
 
@@ -108,6 +184,174 @@
   var LEVELS = Object.freeze(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
 
   // --------------------------------------------------------------------------------------
+  // KONTRAK MUTU KELUARAN — SATU TEMPAT, BUKAN HARAPAN
+  //
+  // Semua angka dan daftar kata yang mengikat jawaban model hidup di sini, sekali. Alasannya
+  // terbukti dari pengujian hari ini: batas kalimat yang hanya ditulis di dalam kalimat prompt
+  // TIDAK ditaati semua model (llama-3.1-8b mengeluarkan 7-8 kalimat dari maksimal 6), dan
+  // naskah FIEZEL yang mewajibkan "nggak" tidak berlaku hanya karena promptnya memintanya.
+  // Karena itu batas yang sama dipakai DUA kali: sebagai kalimat di prompt (permintaan) dan
+  // sebagai pemeriksa pasca-jawaban (penegakan). Yang gagal diperiksa tidak ditampilkan ke
+  // murid — ia jatuh ke fallback deterministik dan sebabnya dicatat.
+  // --------------------------------------------------------------------------------------
+
+  /** Nama kegagalan keluaran. Dieja sebagai nilai supaya bisa di-assert dan dicatat, bukan prosa. */
+  var OUTPUT_FAILURES = Object.freeze({
+    empty: 'empty_output',                       // kedua bentuk jawaban kosong ⇒ BUKAN sukses
+    reasoningOverflow: 'reasoning_overflow',      // content kosong + reasoning_content terisi
+    sentenceLimit: 'sentence_limit_exceeded',     // melebihi batas kalimat yang diminta
+    bannedWord: 'banned_word'                    // memakai kata yang dilarang naskah FIEZEL
+  });
+
+  /**
+   * Satu-satunya sumber batas mutu keluaran.
+   *   sentenceLimits — batas kalimat per task. Angka 6 (penjelasan soal) dan 4 (analisa murid)
+   *     adalah batas yang benar-benar diuji hari ini; llama-3.3-70b mematuhinya, llama-3.1-8b
+   *     tidak. `0` berarti tidak dibatasi (terjemahan subtitle mengikuti panjang kalimat asli).
+   *   bannedWords — kanon repo: naskah FIEZEL memakai "nggak", bukan "tidak" (app.js:118 dst).
+   *     Kata dicocokkan sebagai KATA UTUH supaya "tidaklah"/"pertidaksamaan" tidak ikut kena.
+   *   styleCheckedTasks — task yang naskahnya wajib mengikuti kanon itu. `translate_subtitle`
+   *     sengaja di luar: ia menerjemahkan kalimat bank apa adanya, dan memaksa "nggak" di sana
+   *     akan merusak ketepatan terjemahan, bukan memperbaiki nada.
+   */
+  var OUTPUT_CONTRACT = Object.freeze({
+    sentenceLimits: Object.freeze({
+      tutor_turn: 6,          // penjelasan soal — batas terukur pada benchmark hari ini
+      writing_feedback: 8,    // 2 kekuatan + 2 perbaikan + contoh ⇒ 8 kalimat cukup
+      context_coach: 4,       // analisa murid — batas terukur pada benchmark hari ini
+      session_recap: 3,       // maksimal 3 poin, satu kalimat per poin
+      translate_subtitle: 0   // 0 = tidak dibatasi
+    }),
+    bannedWords: Object.freeze(['tidak']),
+    preferredWord: 'nggak',
+    styleCheckedTasks: Object.freeze(['tutor_turn', 'writing_feedback', 'context_coach', 'session_recap']),
+    // Ambang toleransi kalimat = 0: batas adalah batas. Kalau suatu saat ini perlu dilonggarkan,
+    // ia dilonggarkan DI SINI, bukan di lima tempat.
+    sentenceTolerance: 0,
+    failures: OUTPUT_FAILURES
+  });
+
+  function sentenceLimitFor(taskName) {
+    var n = OUTPUT_CONTRACT.sentenceLimits[s(taskName)];
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  /**
+   * Hitung kalimat tanpa tertipu daftar bernomor. "1. past simple" bukan kalimat; segmen yang
+   * tidak memuat kata (>=3 huruf) tidak dihitung. Tanpa aturan ini, pemeriksa akan menolak
+   * jawaban berpoin yang justru paling mudah dibaca murid.
+   */
+  function countSentences(text) {
+    var t = s(text).replace(/\s+/g, ' ').trim();
+    if (!t) return 0;
+    // Penanda daftar ("1.", "2)", "- ") dibuang DULU: titik di belakang angka bukan akhir kalimat,
+    // dan tanpa langkah ini satu poin bernomor terhitung sebagai dua kalimat.
+    t = t.replace(/(^|\s)[0-9]+[.)]\s*/g, '$1').replace(/(^|\s)[-\u2022]\s+/g, '$1').trim();
+    if (!t) return 0;
+    var parts = t.split(/[.!?\u2026]+/);
+    var n = 0;
+    for (var i = 0; i < parts.length; i++) {
+      if (/[A-Za-z\u00C0-\u024F]{3,}/.test(parts[i])) n += 1;
+    }
+    return n;
+  }
+
+  function bannedWordsIn(text) {
+    var found = [];
+    var t = s(text);
+    for (var i = 0; i < OUTPUT_CONTRACT.bannedWords.length; i++) {
+      var w = OUTPUT_CONTRACT.bannedWords[i];
+      // \b tidak cukup untuk pola Indonesia berimbuhan ("tidaklah"); batasnya dieja sendiri.
+      var re = new RegExp('(^|[^A-Za-z0-9])' + w + '($|[^A-Za-z0-9])', 'i');
+      if (re.test(t)) found.push(w);
+    }
+    return found;
+  }
+
+  /**
+   * BENTUK JAWABAN WORKERS AI ADA DUA, dan itu fakta terukur bukan dugaan:
+   *   - `@cf/meta/llama-*`            ⇒ `result.response` (string)
+   *   - granite / gemma / sea-lion    ⇒ `result.choices[0].message.content` (bentuk OpenAI)
+   * Kode yang hanya membaca satu bentuk mengembalikan string kosong SECARA SENYAP: murid melihat
+   * kotak jawaban kosong, bukan galat, dan owner tetap membayar tokennya. Fungsi ini membaca
+   * keduanya dan SELALU melaporkan `reasoning` + `finishReason` supaya kegagalan
+   * `reasoning_overflow` bisa dibedakan dari "model hanya diam".
+   *
+   * `reasoning` dikembalikan HANYA untuk diklasifikasikan dan dicatat sebagai sebab; ia tidak
+   * pernah menjadi teks jawaban (lihat `route-ai.js`, dan gerbang ai-response-shape-test.js).
+   */
+  function readModelText(result) {
+    var out = { text: '', reasoning: '', finishReason: '', shape: 'unknown' };
+    if (result == null) return out;
+    if (typeof result === 'string') { out.text = result; out.shape = 'string'; return out; }
+
+    var r = result;
+    // Beberapa pembungkus meletakkan payload di `result.result`.
+    if (r.result && typeof r.result === 'object' && (r.result.response !== undefined || r.result.choices !== undefined)) r = r.result;
+    if (typeof r.result === 'string') { out.text = r.result; out.shape = 'llama'; return out; }
+
+    if (typeof r.response === 'string' && r.response !== '') {
+      out.text = r.response; out.shape = 'llama';
+    }
+    if (Array.isArray(r.choices) && r.choices[0]) {
+      var c = r.choices[0];
+      var m = c.message || {};
+      if (!out.text) {
+        if (typeof m.content === 'string') { out.text = m.content; out.shape = 'openai'; }
+        else if (typeof c.text === 'string') { out.text = c.text; out.shape = 'openai'; }
+      }
+      if (typeof m.reasoning_content === 'string') out.reasoning = m.reasoning_content;
+      else if (typeof m.reasoning === 'string') out.reasoning = m.reasoning;
+      if (typeof c.finish_reason === 'string') out.finishReason = c.finish_reason;
+      if (out.shape === 'unknown') out.shape = 'openai';
+    }
+    if (!out.reasoning && typeof r.reasoning_content === 'string') out.reasoning = r.reasoning_content;
+    if (!out.finishReason && typeof r.finish_reason === 'string') out.finishReason = r.finish_reason;
+    if (out.shape === 'unknown' && typeof r.response === 'string') out.shape = 'llama';
+    out.text = s(out.text);
+    return out;
+  }
+
+  /**
+   * Kegagalan tingkat MODEL (bukan tingkat mutu bahasa): jawaban kosong, atau anggaran token
+   * habis di reasoning. `@cf/google/gemma-4-26b-a4b-it` melakukan yang kedua hari ini:
+   * `content` kosong, `finish_reason:"length"`, seluruh keluaran ada di `reasoning_content`.
+   * Keduanya WAJIB dihitung gagal — jawaban kosong tidak pernah lolos sebagai sukses.
+   */
+  function classifyModelFailure(read) {
+    var r = read || {};
+    var text = s(r.text).trim();
+    if (text) return '';
+    if (s(r.reasoning).trim()) return OUTPUT_FAILURES.reasoningOverflow;
+    return OUTPUT_FAILURES.empty;
+  }
+
+  /**
+   * Pemeriksa pasca-jawaban. Kontrak, bukan harapan: yang lolos ditampilkan, yang gagal jatuh ke
+   * fallback deterministik dengan sebab yang dicatat. Mengembalikan
+   * `{ ok, reason, sentences, limit, words }` — `reason` memakai vokabuler kami sendiri, jadi ia
+   * aman dikirim ke klien (tidak memuat nama model, ID akun, atau kalimat galat provider).
+   */
+  function checkOutputContract(taskName, text, options) {
+    var name = resolveTaskName(taskName) || s(taskName);
+    var t = s(text).trim();
+    var limit = (options && Number.isFinite(options.sentenceLimit)) ? options.sentenceLimit : sentenceLimitFor(name);
+    var sentences = countSentences(t);
+    if (!t) return { ok: false, reason: OUTPUT_FAILURES.empty, sentences: 0, limit: limit, words: [] };
+    if (limit > 0 && sentences > limit + OUTPUT_CONTRACT.sentenceTolerance) {
+      return { ok: false, reason: OUTPUT_FAILURES.sentenceLimit, sentences: sentences, limit: limit, words: [] };
+    }
+    if (OUTPUT_CONTRACT.styleCheckedTasks.indexOf(name) !== -1) {
+      var words = bannedWordsIn(t);
+      if (words.length) {
+        return { ok: false, reason: OUTPUT_FAILURES.bannedWord + ':' + words[0], sentences: sentences, limit: limit, words: words };
+      }
+    }
+    return { ok: true, reason: '', sentences: sentences, limit: limit, words: [] };
+  }
+
+
+  // --------------------------------------------------------------------------------------
   // FALLBACK DETERMINISTIK
   // Semuanya fungsi murni atas `input`: tanpa jaringan, tanpa jam, tanpa acak. Sifat murni itu
   // yang membuat gerbang bisa membuktikan bahwa "AI mati" tetap menghasilkan kalimat yang sama
@@ -137,7 +381,9 @@
     if (avg > 0 && avg < 6) notes.push('Kalimatmu pendek-pendek; coba gabungkan dua kalimat dengan "because" atau "so".');
     if (!/[.!?]\s*$/.test(text.trim())) notes.push('Tutup tulisanmu dengan tanda baca akhir.');
     if (!/^[A-Z]/.test(text.trim())) notes.push('Mulai tulisan dengan huruf kapital.');
-    notes.push('Mode hemat: ini pemeriksaan bentuk, belum penilaian isi. Skor tidak dicatat.');
+    // Kanon repo: naskah FIEZEL memakai "nggak", bukan "tidak" (OUTPUT_CONTRACT.bannedWords).
+    // Fallback wajib lulus pemeriksa yang sama dengan jawaban model — gerbang mengujinya.
+    notes.push('Mode hemat: ini pemeriksaan bentuk, belum penilaian isi. Skor nggak dicatat.');
     return notes.join(' ');
   }
 
@@ -160,9 +406,12 @@
 
   function fallbackSessionRecap(input) {
     var weak = (input && input.weakSkills) || [];
-    if (!weak.length) return 'Mode hemat — tidak ada kelemahan menonjol di sesi ini. Lanjutkan besok.';
-    var list = weak.slice(0, 5).map(function (w, i) { return (i + 1) + '. ' + s(w); }).join(' ');
-    return 'Mode hemat — yang perlu kamu ulang: ' + list + ' Buka kartu aturan pada soal yang salah; penjelasannya sudah tersedia tanpa AI.';
+    if (!weak.length) return 'Mode hemat — nggak ada kelemahan menonjol di sesi ini. Lanjutkan besok.';
+    // Dulu bernomor ("1. x 2. y"). Nomor dengan titik membuat satu kalimat terbaca sebagai
+    // beberapa kalimat oleh pemeriksa panjang mana pun (termasuk pemeriksa milik kita), jadi
+    // daftarnya dirapatkan dengan koma: batas 3 kalimat menjadi benar-benar berarti.
+    var list = weak.slice(0, 5).map(function (w) { return s(w); }).join(', ');
+    return 'Mode hemat — yang perlu kamu ulang: ' + list + '. Buka kartu aturan pada soal yang salah; penjelasannya udah tersedia tanpa AI.';
   }
 
   // --------------------------------------------------------------------------------------
@@ -173,22 +422,34 @@
     'yang tertulis di dalamnya. Jawab dalam bahasa Indonesia yang ramah untuk pelajar sekolah, ' +
     'tanpa menyebut nama murid, tanpa meminta data pribadi.';
 
+  // Batas kalimat dan kanon kata TIDAK diketik ulang di sini: keduanya dibaca dari
+  // OUTPUT_CONTRACT supaya kalimat yang diminta prompt dan kalimat yang ditegakkan pemeriksa
+  // pasca-jawaban tidak pernah berbeda. Bukti bahwa ini perlu: llama-3.1-8b hari ini tetap
+  // mengeluarkan 7-8 kalimat meski promptnya menulis maksimal 6.
+  function styleClause() {
+    return ' Pakai sapaan "kamu" dan tulis "' + OUTPUT_CONTRACT.preferredWord + '", jangan "' +
+      OUTPUT_CONTRACT.bannedWords[0] + '".';
+  }
+
   function promptTutorTurn(input, locale) {
-    return GUARD + '\nTugas: jawab pertanyaan belajar bahasa Inggris dalam maksimal 4 kalimat, ' +
+    return GUARD + styleClause() + '\nTugas: jawab pertanyaan belajar bahasa Inggris dalam maksimal ' +
+      sentenceLimitFor('tutor_turn') + ' kalimat, ' +
       'beri satu contoh kalimat Inggris beserta artinya.\nLevel murid: ' + s(input.level) +
       '\nPermukaan: ' + s(input.surface) + '\nFokus materi: ' + s(input.focusLabel) +
       '\nBahasa jawaban: ' + s(locale || 'id') + '\n---DATA---\nPertanyaan: ' + s(input.question);
   }
 
   function promptWritingFeedback(input, locale) {
-    return GUARD + '\nTugas: beri umpan balik tulisan menurut rubrik ' + s(input.rubricId) +
+    return GUARD + styleClause() + ' Maksimal ' + sentenceLimitFor('writing_feedback') + ' kalimat.' +
+      '\nTugas: beri umpan balik tulisan menurut rubrik ' + s(input.rubricId) +
       '. Sebutkan 2 kekuatan dan 2 perbaikan konkret dengan contoh perbaikannya. ' +
       'JANGAN memberi skor angka.\nLevel: ' + s(input.level) + '\nPrompt: ' + s(input.promptId) +
       '\nBahasa: ' + s(locale || 'id') + '\n---DATA---\n' + s(input.text);
   }
 
   function promptContextCoach(input, locale) {
-    return GUARD + '\nTugas: satu paragraf saran belajar untuk hari ini, maksimal 3 kalimat, ' +
+    return GUARD + styleClause() + '\nTugas: satu paragraf saran belajar untuk hari ini, maksimal ' +
+      sentenceLimitFor('context_coach') + ' kalimat, ' +
       'berdasarkan ringkasan kemajuan agregat di bawah. Jangan menyebut angka mentah.' +
       '\nBahasa: ' + s(locale || 'id') + '\n---DATA---\n' + JSON.stringify({
         snapshot: input.snapshot, evidence: input.evidence, policy: input.policy,
@@ -203,7 +464,8 @@
   }
 
   function promptSessionRecap(input, locale) {
-    return GUARD + '\nTugas: rangkum kelemahan sesi menjadi maksimal 3 poin, masing-masing satu ' +
+    return GUARD + styleClause() + '\nTugas: rangkum kelemahan sesi menjadi maksimal ' +
+      sentenceLimitFor('session_recap') + ' poin, masing-masing satu ' +
       'kalimat saran latihan. Keluarkan JSON {"points":["..."]}\nLevel: ' + s(input.level) +
       '\nBahasa: ' + s(locale || 'id') + '\n---DATA---\nweakSkills: ' +
       JSON.stringify(input.weakSkills || []);
@@ -236,8 +498,18 @@
       cache: CACHE.NONE, // percakapan; anti-repetisi disengaja. Hanya dedup in-flight per sha256(input)
       cacheTtlSeconds: 0,
       dedupInFlight: true,
-      model: MODELS.standard,
-      cheapModel: MODELS.cheap,
+      // TUGAS KEBENARAN (penjelasan soal). Naik dari llama-3.1-8b ke llama-3.3-70b karena
+      // benchmark hari ini: 8b bertele-tele dan melewati batas kalimat (7-8 dari maksimal 6),
+      // 8,4-10,8 detik; 70b patuh 6 kalimat, memakai "kamu"/"nggak", akurat, 4,1-9,6 detik
+      // (US$0,293/M masuk). Jawaban yang salah pada penjelasan soal langsung diajarkan ulang
+      // murid, jadi harga bukan variabel yang boleh menang di sini.
+      model: MODELS.reasoning,
+      // Tier degradasi BUKAN granite: granite salah fakta pada tugas sejenis (present perfect
+      // 48% disebut "kekuatan"). 8b hanya melanggar panjang — pelanggaran yang tertangkap
+      // checkOutputContract() lalu jatuh ke fallback deterministik, bukan yang menyesatkan.
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.tutor_turn,
+      enforceStyleWords: true,
       jsonMode: false,
       prompt: promptTutorTurn,
       fallback: fallbackTutorTurn
@@ -260,8 +532,12 @@
       cache: CACHE.NONE,
       cacheTtlSeconds: 0,
       dedupInFlight: true,
+      // TUGAS KEBENARAN (umpan balik writing) — 70b sesuai bukti benchmark; granite dilarang
+      // total di sini karena umpan balik yang salah fakta lebih buruk daripada tanpa umpan balik.
       model: MODELS.reasoning,
-      cheapModel: MODELS.cheap,
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.writing_feedback,
+      enforceStyleWords: true,
       jsonMode: true,
       prompt: promptWritingFeedback,
       fallback: fallbackWritingFeedback
@@ -289,8 +565,14 @@
       cacheTtlSeconds: 21600, // 6 jam ATAU sampai policyId/outcomeId/snapshotAttempts berubah
       cacheKeyFields: Object.freeze(['policyId', 'outcomeId', 'snapshotAttempts']),
       dedupInFlight: true,
+      // TUGAS KEBENARAN PALING SENSITIF (analisa murid). Justru di task inilah granite
+      // terbukti SALAH FAKTA hari ini, dan sea-lion — walau tercepat (3,1-3,7 detik) dan
+      // paling alami — melunakkan jawaban salah menjadi "nggak salah banget sih". 70b patuh
+      // 4 kalimat dan akurat, jadi ia yang dipakai; sea-lion menunggu uji lanjutan.
       model: MODELS.reasoning,
-      cheapModel: MODELS.cheap,
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.context_coach,
+      enforceStyleWords: true,
       jsonMode: false,
       prompt: promptContextCoach,
       fallback: fallbackContextCoach
@@ -311,8 +593,15 @@
       cache: CACHE.SHARED_PERMANENT,
       cacheTtlSeconds: 0, // 0 = permanen
       dedupInFlight: true,
-      model: MODELS.cheap, // frekuensi tertinggi ⇒ model termurah (±2.600 permintaan/hari gratis)
+      // TUGAS RINGAN, TIDAK MENYENTUH KEBENARAN PEDAGOGIS: ia menerjemahkan kalimat bank yang
+      // sudah divalidasi manusia, tidak menilai murid dan tidak menjelaskan aturan. Ini
+      // satu-satunya tempat granite masih boleh dipakai — frekuensi tertinggi, US$0,017/M,
+      // ±2.600 permintaan/hari di jatah gratis. Kesalahan faktanya pada analisa murid tidak
+      // berlaku di sini karena tidak ada fakta pedagogis yang ia karang.
+      model: MODELS.cheap,
       cheapModel: MODELS.cheap,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.translate_subtitle, // 0 = mengikuti kalimat asli
+      enforceStyleWords: false, // terjemahan verbatim: memaksa "nggak" merusak ketepatan
       jsonMode: false,
       prompt: promptTranslateSubtitle,
       fallback: fallbackTranslateSubtitle
@@ -337,8 +626,13 @@
       cacheTtlSeconds: 2592000, // 30 hari
       cacheKeyFields: Object.freeze(['level', 'bankVersion', 'weakSkills']),
       dedupInFlight: true,
-      model: MODELS.standard,
-      cheapModel: MODELS.cheap,
+      // MENYENTUH KEBENARAN: rangkuman ini menyebut apa yang murid kuasai dan tidak. Persis
+      // jenis pernyataan yang granite bikin salah (48% disebut "kekuatan"), jadi 70b — cache
+      // bersama 30 hari membuat biayanya kecil: satu panggilan dipakai banyak murid.
+      model: MODELS.reasoning,
+      cheapModel: MODELS.standard,
+      maxSentences: OUTPUT_CONTRACT.sentenceLimits.session_recap,
+      enforceStyleWords: true,
       jsonMode: true,
       prompt: promptSessionRecap,
       fallback: fallbackSessionRecap
@@ -487,6 +781,23 @@
     return spec.model;
   }
 
+  /**
+   * Task yang jawabannya menyatakan sesuatu tentang KEBENARAN (benar/salah, kuat/lemah,
+   * aturan tata bahasa). Dipakai gerbang untuk membuktikan granite tidak menyusup ke
+   * salah satu tier task ini — termasuk tier degradasi, karena degradasi yang salah fakta
+   * bukan degradasi, ia kerusakan.
+   */
+  var TRUTH_TASKS = Object.freeze(['tutor_turn', 'writing_feedback', 'context_coach', 'session_recap']);
+
+  function isTruthTask(taskName) { return TRUTH_TASKS.indexOf(resolveTaskName(taskName)) !== -1; }
+
+  /** Semua model yang benar-benar dirujuk registry (untuk assert "granite bukan di sini"). */
+  function modelsUsedBy(taskName) {
+    var spec = get(taskName);
+    if (!spec) throw new Error('unknown_task');
+    return [spec.model, spec.cheapModel];
+  }
+
   /** Perkiraan biaya satu permintaan (US$) — dipakai dashboard owner dan uji biaya. */
   function estimateCostUsd(taskName, inTokens, outTokens) {
     var spec = get(taskName);
@@ -502,6 +813,9 @@
     NEURONS: NEURONS,
     MODELS: MODELS,
     CACHE: CACHE,
+    OUTPUT_CONTRACT: OUTPUT_CONTRACT,
+    OUTPUT_FAILURES: OUTPUT_FAILURES,
+    TRUTH_TASKS: TRUTH_TASKS,
     TASKS: TASKS,
     ALIASES: ALIASES,
     FORBIDDEN_FIELDS: FORBIDDEN_FIELDS,
@@ -515,6 +829,14 @@
     pickModel: pickModel,
     estimateTokens: estimateTokens,
     estimateCostUsd: estimateCostUsd,
-    byteLength: byteLength
+    byteLength: byteLength,
+    readModelText: readModelText,
+    classifyModelFailure: classifyModelFailure,
+    checkOutputContract: checkOutputContract,
+    countSentences: countSentences,
+    bannedWordsIn: bannedWordsIn,
+    sentenceLimitFor: sentenceLimitFor,
+    isTruthTask: isTruthTask,
+    modelsUsedBy: modelsUsedBy
   });
 }));
