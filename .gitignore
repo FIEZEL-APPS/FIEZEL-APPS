@@ -43,3 +43,10 @@ RELEASE-AUDIT-GATE-REPORT.json
 # hijaunya milik lingkungan orang lain). Buktinya hidup di CI/terminal, bukan di git.
 CF-LIVE-REPORT.json
 CF-SHADOW-MODE-REPORT.json
+
+# Laporan staging-live-test.js (`--report`). Alasan yang sama seperti di atas, plus
+# satu yang lebih keras: isinya merekam percakapan HTTP nyata ke Worker staging
+# (jalur, status, waktu). Ia TIDAK memuat nilai rahasia edge — gerbang itu memindai
+# laporannya sendiri sebelum menulis dan menolak menulis kalau rahasianya muncul —
+# tapi jejak lingkungan seperti ini tetap tidak punya urusan di dalam git.
+STAGING-LIVE-REPORT.json

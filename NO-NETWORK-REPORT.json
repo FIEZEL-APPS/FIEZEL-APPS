@@ -1,7 +1,7 @@
 {
   "schema": "fiezel-no-network-v1",
   "pass": true,
-  "scanned": 127,
+  "scanned": 128,
   "allowlist": [
     "http-smoke-test.js",
     "e2e-level-grammar-test.js",
@@ -25,7 +25,7 @@
     "Lapis 3 (tools/no-net-preload.js via NODE_OPTIONS) BELUM dipasang — gerbang ini hanya memindai teks. Lihat cf-b7 §5.3."
   ],
   "counts": {
-    "pass": 35,
+    "pass": 36,
     "fail": 0
   },
   "checks": [
@@ -102,12 +102,12 @@
     {
       "name": "Pemindaian menemukan seluruh gerbang (kalau nol, pemindainya rusak)",
       "status": "PASS",
-      "details": "files=127"
+      "details": "files=128"
     },
     {
       "name": "Blok FIXTURES gerbang ini bisa dipotong untuk pemindaian-diri",
       "status": "PASS",
-      "details": "start=12314 end=14082"
+      "details": "start=13423 end=15191"
     },
     {
       "name": "Gerbang ini sendiri tidak menyentuh jaringan di luar fixture-nya",
@@ -185,9 +185,9 @@
       "details": "0"
     },
     {
-      "name": "Kelas live ber-env tetap satu nama dan terdaftar di quality.yml sebagai langkah SKIP",
+      "name": "Kelas live ber-env tetap dua nama dan terdaftar di quality.yml sebagai langkah SKIP",
       "status": "PASS",
-      "details": "cf-live-contract-test.js"
+      "details": "cf-live-contract-test.js (FIEZEL_CF_LIVE_BASE), staging-live-test.js (FIEZEL_STAGING_BASE)"
     },
     {
       "name": "Gerbang ini terdaftar di quality.yml",
@@ -203,6 +203,11 @@
       "name": "quality.yml menyebut bahwa langkah live SKIP sampai owner menyetel base URL",
       "status": "PASS",
       "details": "komentar SKIP + FIEZEL_CF_LIVE_BASE"
+    },
+    {
+      "name": "Gerbang staging live terdaftar di quality.yml sebagai langkah yang SKIP secara bawaan",
+      "status": "PASS",
+      "details": "komentar SKIP STAGING + FIEZEL_STAGING_BASE"
     }
   ]
 }
