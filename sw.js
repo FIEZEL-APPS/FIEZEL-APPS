@@ -25,7 +25,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // m025-174, angka yang juga dipakai jalur rollout Cloudflare. Tabrakan versi berarti satu
 // revisi memayungi dua daftar precache berbeda, jadi revisi dinaikkan ke m025-175. Daftar
 // ASSETS tetap UNION nyata kedua sisi; nol entri dibuang.
-const SW_REV='m025-175-fase3-plus-rollout-cf-20260828';
+const SW_REV='m025-176-integritas-render-audit-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
