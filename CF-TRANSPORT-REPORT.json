@@ -1,13 +1,13 @@
 {
   "schema": "fiezel-cf-transport-v1",
   "pass": true,
-  "skipped": true,
-  "cfFlagsInstalled": false,
-  "requireCfFlags": false,
+  "skipped": false,
+  "cfFlagsInstalled": true,
+  "requireCfFlags": true,
   "counts": {
-    "pass": 7,
+    "pass": 25,
     "fail": 0,
-    "skip": 3
+    "skip": 0
   },
   "checks": [
     {
@@ -36,7 +36,7 @@
       "details": "https://fiezel-core.puter.work"
     },
     {
-      "name": "Tidak ada URL Cloudflare hardcode di app.js (alamat hanya boleh dari FIEZEL_CF_CONFIG.baseUrl)",
+      "name": "Tidak ada URL Cloudflare hardcode di app.js (alamat hanya boleh dari FIEZEL_CF_CONFIG.base)",
       "status": "PASS",
       "details": "0"
     },
@@ -46,19 +46,94 @@
       "details": "0"
     },
     {
+      "name": "FIEZEL_CF_CONFIG bisa dibaca sebagai objek",
+      "status": "PASS",
+      "details": "object"
+    },
+    {
       "name": "Struktur FIEZEL_CF_CONFIG",
-      "status": "SKIP",
-      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+      "status": "PASS",
+      "details": "keys=enabled|base|endpoints endpoints=health=off,config=off,auth=off,quota=off,ai=off,tts=off,usage=off"
+    },
+    {
+      "name": "FIEZEL_CF_CONFIG dibekukan (Object.freeze) seperti FIEZEL_CORE_CONFIG",
+      "status": "PASS",
+      "details": "cf=true endpoints=true"
+    },
+    {
+      "name": "FIEZEL_CF_CONFIG memakai field BARU dan tidak menyentuh workerUrl",
+      "status": "PASS",
+      "details": "enabled, base, endpoints"
+    },
+    {
+      "name": "endpoints memuat tujuh sakelar yang dijanjikan (health/config/auth/quota/ai/tts/usage)",
+      "status": "PASS",
+      "details": "lengkap"
+    },
+    {
+      "name": "setiap endpoint bernilai \"off\" | \"shadow\" | \"on\" (kosakata cf-b6 P1)",
+      "status": "PASS",
+      "details": "0"
     },
     {
       "name": "Semua nilai flag CF default OFF",
-      "status": "SKIP",
-      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+      "status": "PASS",
+      "details": "enabled=false base=\"\" hidup=0"
+    },
+    {
+      "name": "enabled === false (sakelar induk mati)",
+      "status": "PASS",
+      "details": "false"
+    },
+    {
+      "name": "base kosong — alamat CF belum diaktifkan (api.fiezel.my.id menunggu nameserver)",
+      "status": "PASS",
+      "details": "base=\"\""
+    },
+    {
+      "name": "NOL endpoint bernilai shadow/on",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "Tidak ada bendera boolean yang default true",
+      "status": "PASS",
+      "details": "0"
+    },
+    {
+      "name": "base, kalau diisi, https dan di bawah fiezel.my.id (bukan workers.dev)",
+      "status": "PASS",
+      "details": ""
     },
     {
       "name": "Jalur rollback CF ada dan hidup",
-      "status": "SKIP",
-      "details": "FIEZEL_CF_CONFIG BELUM TERPASANG di core-config.js. Sakelar CF ditulis paket kerja lain (cf-b1 §5.3, PHASE C); gerbang ini tidak memverifikasi struktur flag, nilai default, maupun jalur rollback. Jangan bacakan sebagai bukti bahwa flag CF aman."
+      "status": "PASS",
+      "details": "enabled dibaca app.js=true gerbang mode=true"
+    },
+    {
+      "name": "Rollback satu nilai dibaca app.js (bukan flag mati)",
+      "status": "PASS",
+      "details": "cari CF_CONFIG.enabled===true di app.js"
+    },
+    {
+      "name": "Mode endpoint dikunci di belakang sakelar induk (enabled:false ⇒ selalu off)",
+      "status": "PASS",
+      "details": "cari CF_ENABLED … return 'off' di app.js"
+    },
+    {
+      "name": "Gerbang perilaku shadow/off terdaftar di quality.yml (bukan hanya pemeriksaan teks)",
+      "status": "PASS",
+      "details": "quality.yml"
+    },
+    {
+      "name": "app.js membaca alamat CF hanya dari FIEZEL_CF_CONFIG",
+      "status": "PASS",
+      "details": "cari FIEZEL_CF_CONFIG…base di app.js"
+    },
+    {
+      "name": "Batas sakelar statis didokumentasikan di core-config.js (bukan diklaim kill switch instan)",
+      "status": "PASS",
+      "details": "komentar di core-config.js"
     }
   ]
 }
