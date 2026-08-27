@@ -89,5 +89,8 @@ const ok=m=>console.log('ok - '+m);
   ok('canonical content files remain immutable');
   const proof={schema:promotion.PROMOTION_SCHEMA,version:input.version,status:'PASS',patchId:candidate.patchId,thresholds:promote.thresholds,statGateWired:true,nullScenarioNeverPromotes:true,thinDataHolds:true,indefiniteHoldIsValidOutcome:true,eightAttemptIsRuntimeSafetyOnly:true,provenRegressionRejects:true,absoluteFloorHolds:true,postPromotionRollback:true,priorRuntimeRollbackBlocksPromotion:true,privacyFailClosed:true,auditableBoundedLedger:true,canonicalImmutable:true,activeOverlayOnly:true};
   fs.writeFileSync(path.join(__dirname,'CONTENT-PROMOTION-PROOF.json'),JSON.stringify(proof,null,2)+'\n');
+  // Dua baris penutup: baris pertama dituntut release-audit.py ('FIEZEL content
+  // promotion: PASS'), baris kedua kontrak gerbang wave (akhiran '<Nama>: PASS').
+  console.log('FIEZEL content promotion: PASS');
   console.log('ContentPromotion: PASS');
 })().catch(e=>{console.error('ContentPromotion: FAIL\n'+e.stack);process.exit(1)});
