@@ -1,0 +1,297 @@
+{
+ "schema": "fiezel-a6-d1-index-plans-v1",
+ "cara_reproduksi": "python3 analysis/a6-d1-index-plans.py (SQLite lokal, nol jaringan)",
+ "catatan": "D1 adalah SQLite, jadi EXPLAIN QUERY PLAN di sini adalah bukti STRUKTURAL (indeks mana yang dipakai), bukan bukti latensi produksi.",
+ "sqlite_version": "3.50.4",
+ "fiezel-core (sebelum 0004)": [
+  {
+   "kueri": "reserve gate (jalur panas)",
+   "sql": "UPDATE quota_daily SET ai_held = ai_held + ?, touched_at = ? WHERE user_id = ? AND day = ? AND ai_used + ai_held + ? <= ?",
+   "plan": [
+    "SEARCH quota_daily USING INDEX sqlite_autoindex_quota_daily_1 (user_id=? AND day=?)"
+   ]
+  },
+  {
+   "kueri": "baca baris kuota (denyScope/loadState)",
+   "sql": "SELECT * FROM quota_daily WHERE user_id = ? AND day = ?",
+   "plan": [
+    "SEARCH quota_daily USING INDEX sqlite_autoindex_quota_daily_1 (user_id=? AND day=?)"
+   ]
+  },
+  {
+   "kueri": "reconcileHeld: user hari ini",
+   "sql": "SELECT user_id FROM quota_daily WHERE day = ?",
+   "plan": [
+    "SEARCH quota_daily USING INDEX idx_quota_daily_day (day=?)"
+   ]
+  },
+  {
+   "kueri": "retensi quota_daily (batched)",
+   "sql": "DELETE FROM quota_daily WHERE rowid IN (SELECT rowid FROM quota_daily WHERE day < ? LIMIT 500)",
+   "plan": [
+    "SEARCH quota_daily USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SEARCH quota_daily USING COVERING INDEX idx_quota_daily_day (day<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "sweep lease kedaluwarsa",
+   "sql": "SELECT * FROM quota_reservation WHERE expires_at <= ? ORDER BY expires_at LIMIT ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_expires (expires_at<?)"
+   ]
+  },
+  {
+   "kueri": "lease per token (commit/rollback)",
+   "sql": "SELECT * FROM quota_reservation WHERE id = ? AND user_id = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX sqlite_autoindex_quota_reservation_1 (id=?)"
+   ]
+  },
+  {
+   "kueri": "lease per hari (reconcileHeld)",
+   "sql": "SELECT * FROM quota_reservation WHERE day = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_day (day=?)"
+   ]
+  },
+  {
+   "kueri": "lease per user+hari (loadState)",
+   "sql": "SELECT * FROM quota_reservation WHERE user_id = ? AND day = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_user_day (user_id=? AND day=?)"
+   ]
+  },
+  {
+   "kueri": "identity per sub",
+   "sql": "SELECT sub, created_at FROM identity WHERE sub = ?",
+   "plan": [
+    "SEARCH identity USING INDEX sqlite_autoindex_identity_1 (sub=?)"
+   ]
+  },
+  {
+   "kueri": "identity touch last_seen",
+   "sql": "UPDATE identity SET last_seen_day = ? WHERE sub = ? AND last_seen_day <> ?",
+   "plan": [
+    "SEARCH identity USING INDEX sqlite_autoindex_identity_1 (sub=?)"
+   ]
+  },
+  {
+   "kueri": "identity per legacy_ref_hmac (klaim)",
+   "sql": "SELECT sub FROM identity WHERE legacy_ref_hmac = ?",
+   "plan": [
+    "SEARCH identity USING INDEX ux_identity_legacy (legacy_ref_hmac=?)"
+   ]
+  },
+  {
+   "kueri": "retensi session (batched)",
+   "sql": "DELETE FROM session WHERE rowid IN (SELECT rowid FROM session WHERE expires_at < ? LIMIT 500)",
+   "plan": [
+    "SEARCH session USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SEARCH session USING COVERING INDEX ix_session_expires (expires_at<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "retensi anon_issue (batched)",
+   "sql": "DELETE FROM anon_issue WHERE (day, ip_hmac) IN (SELECT day, ip_hmac FROM anon_issue WHERE day < ? LIMIT 1000)",
+   "plan": [
+    "SEARCH anon_issue USING PRIMARY KEY (day=? AND ip_hmac=?)",
+    "LIST SUBQUERY 2",
+    "SEARCH anon_issue USING PRIMARY KEY (day<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "scrub issue_ip_hmac (batched)",
+   "sql": "UPDATE identity SET issue_ip_hmac = NULL WHERE rowid IN (SELECT rowid FROM identity WHERE issue_ip_hmac IS NOT NULL AND created_at < ? LIMIT 500)",
+   "plan": [
+    "SEARCH identity USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SCAN identity",
+    "CREATE BLOOM FILTER"
+   ]
+  }
+ ],
+ "fiezel-core (sesudah 0004)": [
+  {
+   "kueri": "reserve gate (jalur panas)",
+   "sql": "UPDATE quota_daily SET ai_held = ai_held + ?, touched_at = ? WHERE user_id = ? AND day = ? AND ai_used + ai_held + ? <= ?",
+   "plan": [
+    "SEARCH quota_daily USING INDEX sqlite_autoindex_quota_daily_1 (user_id=? AND day=?)"
+   ]
+  },
+  {
+   "kueri": "baca baris kuota (denyScope/loadState)",
+   "sql": "SELECT * FROM quota_daily WHERE user_id = ? AND day = ?",
+   "plan": [
+    "SEARCH quota_daily USING INDEX sqlite_autoindex_quota_daily_1 (user_id=? AND day=?)"
+   ]
+  },
+  {
+   "kueri": "reconcileHeld: user hari ini",
+   "sql": "SELECT user_id FROM quota_daily WHERE day = ?",
+   "plan": [
+    "SEARCH quota_daily USING COVERING INDEX idx_quota_daily_day_user (day=?)"
+   ]
+  },
+  {
+   "kueri": "retensi quota_daily (batched)",
+   "sql": "DELETE FROM quota_daily WHERE rowid IN (SELECT rowid FROM quota_daily WHERE day < ? LIMIT 500)",
+   "plan": [
+    "SEARCH quota_daily USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SEARCH quota_daily USING COVERING INDEX idx_quota_daily_day_user (day<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "sweep lease kedaluwarsa",
+   "sql": "SELECT * FROM quota_reservation WHERE expires_at <= ? ORDER BY expires_at LIMIT ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_expires (expires_at<?)"
+   ]
+  },
+  {
+   "kueri": "lease per token (commit/rollback)",
+   "sql": "SELECT * FROM quota_reservation WHERE id = ? AND user_id = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX sqlite_autoindex_quota_reservation_1 (id=?)"
+   ]
+  },
+  {
+   "kueri": "lease per hari (reconcileHeld)",
+   "sql": "SELECT * FROM quota_reservation WHERE day = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_day_user (day=?)"
+   ]
+  },
+  {
+   "kueri": "lease per user+hari (loadState)",
+   "sql": "SELECT * FROM quota_reservation WHERE user_id = ? AND day = ?",
+   "plan": [
+    "SEARCH quota_reservation USING INDEX idx_quota_reservation_day_user (day=? AND user_id=?)"
+   ]
+  },
+  {
+   "kueri": "identity per sub",
+   "sql": "SELECT sub, created_at FROM identity WHERE sub = ?",
+   "plan": [
+    "SEARCH identity USING INDEX sqlite_autoindex_identity_1 (sub=?)"
+   ]
+  },
+  {
+   "kueri": "identity touch last_seen",
+   "sql": "UPDATE identity SET last_seen_day = ? WHERE sub = ? AND last_seen_day <> ?",
+   "plan": [
+    "SEARCH identity USING INDEX sqlite_autoindex_identity_1 (sub=?)"
+   ]
+  },
+  {
+   "kueri": "identity per legacy_ref_hmac (klaim)",
+   "sql": "SELECT sub FROM identity WHERE legacy_ref_hmac = ?",
+   "plan": [
+    "SEARCH identity USING INDEX ux_identity_legacy (legacy_ref_hmac=?)"
+   ]
+  },
+  {
+   "kueri": "retensi session (batched)",
+   "sql": "DELETE FROM session WHERE rowid IN (SELECT rowid FROM session WHERE expires_at < ? LIMIT 500)",
+   "plan": [
+    "SEARCH session USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SEARCH session USING COVERING INDEX ix_session_expires (expires_at<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "retensi anon_issue (batched)",
+   "sql": "DELETE FROM anon_issue WHERE (day, ip_hmac) IN (SELECT day, ip_hmac FROM anon_issue WHERE day < ? LIMIT 1000)",
+   "plan": [
+    "SEARCH anon_issue USING PRIMARY KEY (day=? AND ip_hmac=?)",
+    "LIST SUBQUERY 2",
+    "SEARCH anon_issue USING PRIMARY KEY (day<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "scrub issue_ip_hmac (batched)",
+   "sql": "UPDATE identity SET issue_ip_hmac = NULL WHERE rowid IN (SELECT rowid FROM identity WHERE issue_ip_hmac IS NOT NULL AND created_at < ? LIMIT 500)",
+   "plan": [
+    "SEARCH identity USING INTEGER PRIMARY KEY (rowid=?)",
+    "LIST SUBQUERY 1",
+    "SCAN identity",
+    "CREATE BLOOM FILTER"
+   ]
+  }
+ ],
+ "fiezel-stats (tidak diubah 0004)": [
+  {
+   "kueri": "baca rentang metrik (dasbor)",
+   "sql": "SELECT day, value FROM metrics_daily WHERE metric = ? AND day >= ? AND day <= ? ORDER BY day",
+   "plan": [
+    "SEARCH metrics_daily USING INDEX idx_metrics_metric (metric=? AND day>? AND day<?)"
+   ]
+  },
+  {
+   "kueri": "hitung DAU (rollup)",
+   "sql": "SELECT COUNT(*) AS n FROM dau_dedup WHERE day = ?",
+   "plan": [
+    "SEARCH dau_dedup USING PRIMARY KEY (day=?)"
+   ]
+  },
+  {
+   "kueri": "purge dau hari itu (rollup)",
+   "sql": "DELETE FROM dau_dedup WHERE day = ?",
+   "plan": [
+    "SEARCH dau_dedup USING PRIMARY KEY (day=?)"
+   ]
+  },
+  {
+   "kueri": "purge dau lama (batched)",
+   "sql": "DELETE FROM dau_dedup WHERE (day, token) IN (SELECT day, token FROM dau_dedup WHERE day <= ? LIMIT 1000)",
+   "plan": [
+    "SEARCH dau_dedup USING PRIMARY KEY (day=? AND token=?)",
+    "LIST SUBQUERY 2",
+    "SEARCH dau_dedup USING PRIMARY KEY (day<?)",
+    "CREATE BLOOM FILTER"
+   ]
+  },
+  {
+   "kueri": "purge usage lama",
+   "sql": "DELETE FROM usage_daily WHERE day < ?",
+   "plan": [
+    "SEARCH usage_daily USING PRIMARY KEY (day<?)"
+   ]
+  },
+  {
+   "kueri": "purge retention lama",
+   "sql": "DELETE FROM retention_daily WHERE cohort_day < ?",
+   "plan": [
+    "SEARCH retention_daily USING PRIMARY KEY (cohort_day<?)"
+   ]
+  },
+  {
+   "kueri": "baca pepper",
+   "sql": "SELECT rotated_at, current, previous FROM pepper_state WHERE id = 1",
+   "plan": [
+    "SEARCH pepper_state USING INTEGER PRIMARY KEY (rowid=?)"
+   ]
+  }
+ ],
+ "byte_per_baris_terukur_20000_baris_sesudah_VACUUM": {
+  "quota_daily (indeks day — sebelum 0004)": 154.2,
+  "quota_daily (indeks day,user_id — sesudah 0004)": 191.7,
+  "quota_reservation (3 indeks — sebelum 0004)": 275.3,
+  "quota_reservation (2 indeks — sesudah 0004)": 257.2,
+  "identity": 323.0,
+  "session": 195.0,
+  "anon_issue": 50.8,
+  "dau_dedup": 48.3,
+  "metrics_daily (+idx_metrics_metric)": 62.7,
+  "usage_daily": 44.9,
+  "retention_daily (+idx_retention_cohort)": 38.1
+ }
+}
