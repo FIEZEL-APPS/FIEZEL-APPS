@@ -136,7 +136,7 @@
     // penuh dan bukan salah murid, jadi kalimatnya nggak boleh meniru dua-duanya:
     // "penuh" akan menyuruh murid menunggu tengah malam untuk sesuatu yang menunggu
     // tidak memperbaiki, dan "jatahmu habis" adalah tuduhan yang salah.
-    ai_budget_missing: 'Bantuan AI belum bisa dipakai karena setelan di server belum lengkap. Ini bukan salah kamu, jatahmu utuh, dan penjelasan dari materi tetap muncul.'
+    ai_budget_missing: 'Bantuan AI belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Ini bukan salah kamu, jatahmu utuh, dan penjelasan dari materi tetap muncul.'
   });
 
   var MAX_BODY_BYTES = 16000; // di atas payload terbesar (context_coach 8.000 B) dengan margin

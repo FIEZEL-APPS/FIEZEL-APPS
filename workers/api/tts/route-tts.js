@@ -122,11 +122,11 @@
     account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
     // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
     // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
-    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena setelan di server belum lengkap. Jatahmu utuh.',
+    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena penyiapan di sisi kami belum lengkap. Jatahmu utuh.',
     // S3 - FLAG TTS MATI. Bukan jatah murid, bukan jatah akun, bukan kesalahan murid, dan
     // bukan soal waktu: pemilik aplikasi belum menyalakan suara premium. Kalimatnya tidak
     // boleh menjanjikan "coba lagi nanti", karena menunggu tidak mengubah apa pun.
-    tts_disabled: 'Suara dari perangkatmu dulu — suara premium sedang dimatikan di server, bukan karena jatahmu. Jatahmu utuh.',
+    tts_disabled: 'Suara dari perangkatmu dulu — suara premium sedang kami matikan sementara, bukan karena jatahmu. Jatahmu utuh.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
