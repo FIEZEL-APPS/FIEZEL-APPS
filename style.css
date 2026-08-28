@@ -4122,3 +4122,6 @@ body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24
 .social-empty{text-align:center;padding:18px 8px}
 .social-countdown{display:flex;align-items:center;gap:6px}
 .social-summary .modal-actions{margin-top:8px}
+
+/* G15-07 (wave2): scope instrumen di bawah nama level hasil placement */
+.result-level-scope{display:block;font-size:.72rem;font-weight:500;opacity:.75;margin-top:2px;letter-spacing:.01em}
