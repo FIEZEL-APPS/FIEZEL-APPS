@@ -176,3 +176,80 @@ back clean at an unchanged SHA, the remaining findings are all P2/P3 and the ver
 **CONDITIONAL GO**. Nothing found in the repository, the test suite, the runtime, the PWA, or
 Braincore argues against shipping — the blocker is missing evidence, and one leakage class that
 is only half closed.
+
+
+---
+
+# ADENDUM — REMEDIASI (28 Agu 2026, sesudah audit)
+
+Owner memberi wewenang remediasi dan mengungkap satu fakta yang mengubah tiga temuan
+sekaligus: **akun GitHub owner sudah berganti dari `fitrajft-ux` ke `FIEZEL-APPS`.**
+
+Semua pekerjaan di bawah dilakukan di atas `origin/main` yang sudah maju ke `5fcdcc1`
+(sepuluh commit dari sesi agent lain mendarat selama audit berjalan), dan seluruh wilayah
+yang disentuh didaftarkan lebih dulu di `coordination/CLAIMS.json` — nol tabrakan path
+dengan lima sesi aktif lain (`coordination-guard-test.js` 24/24 PASS).
+
+## Yang ganti nama akun sebenarnya rusak
+
+Nama lama masih dipaku di **11 tempat aktif**, dan akibatnya lebih luas dari F-5:
+
+| Tempat | Akibat |
+|---|---|
+| `master-authority-guard.yml` `OWNER=` | merah di **setiap** push ke main — inilah F-5 seutuhnya |
+| `quality.yml` × 3 langkah live | `github.actor == 'fitrajft-ux'` ⇒ **tidak bisa dijalankan siapa pun**, termasuk owner. F-3 naik dari "belum pernah dijalankan" menjadi "mustahil dijalankan" |
+| `deploy-core-worker`, `configure-core`, `audio-generate`, `audio-deploy-worker`, `audio-prerender-cf` | jalur deploy & pipeline audio mati untuk dispatch manual |
+| `push-reminders.yml` | **tidak terdampak** — jadwalnya digerbangi `vars.FIEZEL_REMOTE_PUSH_ENABLED`, bukan aktor. Pengingat murid aman |
+| `ALLOWED_ORIGINS` = `fitrajft-ux.github.io` | origin yang **tidak lagi dikuasai owner** ada di allowlist CORS produksi |
+| `workflow-actor-gate-test.js`, `prerender-plan-test.js`, `prerender-dryrun-test.js` | tiga gerbang meng-**assert** nama lama; memperbaiki workflow tanpa ini justru memerahkan CI |
+
+`fitrajft.workers.dev` **tidak** ikut diubah — itu subdomain akun Cloudflare, bukan GitHub.
+
+## Status temuan sesudah remediasi
+
+| ID | Sebelum | Sesudah | Bukti |
+|----|---------|---------|-------|
+| **F-1** prompt scaffold | P1 OPEN — 6 dari 8 bentuk lolos ke murid + menagih kuota | **TERTUTUP** | `SCAFFOLD_ECHO_PATTERNS` diperlebar dari 2 pola menjadi 13 pasti + 3 samar berambang. Diuji: **11/11 bentuk bocor tertangkap, 0/8 teks sah salah dituduh**, seluruh fallback bersih. Dikunci di `ai-response-shape-test.js` (korpus bocor 4→13, korpus sah 4→9) |
+| **F-2** paritas produksi | P1 UNVERIFIED — tak ada cara membuktikan | **MEKANISME ADA** (menunggu secret owner) | `tools/deploy-site-verify.mjs` menarik `core-config.js` + `sw.js` dari situs hidup dan menuntut penandanya cocok; diuji dua arah (cocok → exit 0, beda → exit 1). Berjalan otomatis di akhir tiap deploy |
+| **F-3** gerbang live | P1 OPEN — mustahil dijalankan | **SEBAGIAN TERTUTUP** | Gerbang aktor sudah menunjuk `FIEZEL-APPS`, jadi ketiganya **bisa** di-dispatch owner sekarang. Sisa: pemasangan playwright agar `e2e-bridge-selftest.js` berhenti SKIP |
+| **F-5** authority guard | P2 merah tiap push | **TERTUTUP** | `OWNER='FIEZEL-APPS'` |
+| **BARU** penerbit situs | tidak terdeteksi audit awal | **DIBANGUN** | Repo tidak punya **nol** jalur ke `fiezel.my.id/app/`. Ditutup, lihat bawah |
+
+## Penerbit situs — lubang yang lebih besar dari yang dilaporkan
+
+Komentar di `workers/api/wrangler.toml` menjadikan "main auto-deploy ke produksi tiap 5 menit"
+sebagai **dasar** aturan produksi (fitur baru wajib di belakang flag OFF). Penyisiran seluruh
+`.github/workflows/` menemukan **nol** mekanisme seperti itu: nol scp, nol rsync, nol FTP, nol
+`deploy-pages`. Aturan produksi yang menumpu pada mekanisme yang tidak bisa ditunjukkan bukan
+aturan — dan itulah akar F-2.
+
+Yang dibangun:
+
+- **`.github/workflows/deploy-site.yml`** — dipicu `workflow_run` atas *FIEZEL Quality Gate*,
+  hanya bila `conclusion == 'success'`, hanya cabang `main`, hanya aktor owner, dan
+  meng-checkout `head_sha` yang **benar-benar lulus** (bukan main terbaru).
+- **Urutan dua gelombang**: seluruh aset lebih dulu dengan `--exclude=sw.js`, lalu `sw.js`
+  sendirian paling akhir. `sw.js` mem-precache 157 berkas lewat `caches.addAll` — mendaratkan
+  ia lebih dulu berarti generasi baru menyimpan bita lama di bawah revisi baru, persis kondisi
+  yang dilarang §22.
+- **`deploy/site-exclude.txt`** — satu sumber daftar kecualian, dibaca workflow, `.cpanel.yml`,
+  dan gerbangnya sekaligus.
+- **`.cpanel.yml`** — jalur cPanel Git Version Control, tanpa satu pun secret di GitHub,
+  urutan identik.
+- **`deploy-site-gate-test.js`** (22/22 PASS, terdaftar di `quality.yml`) — membuktikan:
+  `sw.js` benar diunggah terakhir; daftar kecualian **nol** memakan entri `ASSETS`
+  (157 entri diuji terhadap 24 pola); `validator.js` tidak ikut terbuang walau namanya mirip
+  gerbang; deploy hanya jalan sesudah gerbang mutu hijau; kredensial hanya dari `secrets.`;
+  SKIP bersuara saat secret belum ada; dan `.cpanel.yml` memakai urutan yang sama.
+- **`deploy/SITE-DEPLOY.md`** — runbook owner.
+
+## Yang MASIH menghalangi GO
+
+1. **Secret hosting belum terpasang** (`FIEZEL_DEPLOY_HOST/USER/SSH_KEY/PATH`), atau
+   konfirmasi bahwa cPanel Git Version Control sudah aktif. Sampai salah satunya ada, deploy
+   SKIP dan paritas tetap UNVERIFIED. Langkahnya di `deploy/SITE-DEPLOY.md`.
+2. **Tiga gerbang live belum dijalankan** di SHA mana pun. Sekarang sudah *bisa*.
+3. **F-4** (ambang latensi Safari) dan **F-6/F-7/F-8/F-9** belum disentuh — semuanya P2/P3.
+
+Verdict audit tetap **NO-GO** sampai (1) dan (2) selesai: bukan karena ada yang rusak, tetapi
+karena paritas produksi masih belum pernah dibuktikan satu kali pun.
