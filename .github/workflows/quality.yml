@@ -596,6 +596,14 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Wave E4: post-test tertunda / probe retensi (fiezel-post-test)'
+        # Modul murni baru features/brain/fiezel-post-test.js: penjadwal probe retensi
+        # deterministik (offset 3/7/21 hari, jitter seeded per lessonId+userSeed) +
+        # evaluator kalibrasi retensi (Brier, flag mastery rapuh, rekomendasi half-life
+        # ADVISORY — penulisan memori tetap milik single-writer FSRS). Gate memeriksa
+        # oracle manual, determinisme byte-identik, ketahanan input korup, dan properti
+        # "probe tidak pernah dijadwalkan untuk lesson tanpa mastery".
+        run: node fiezel-post-test-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
