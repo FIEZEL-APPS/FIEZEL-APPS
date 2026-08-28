@@ -91,6 +91,11 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // LOCALE_TH_CACHE di bawah. (Catatan alat yang sama dengan blok lain: jangan menaruh
   // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
   './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js',
+  // W4-QA (handoff W4-MERGE butir 3): loader th dimuat SEMUA locale dari index.html (guard
+  // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') — jadi ia
+  // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
+  // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
+  './features/i18n/fiezel-th-loader.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.
@@ -143,8 +148,19 @@ const isLocaleThAsset=request=>{
   if(!request?.url)return false;
   try{
     const p=new URL(request.url).pathname;
+    // W4-QA (handoff impl/handoff/W4-MERGE.md): regex dataset diperluas grammar→
+    // (grammar|vocabulary) supaya /vocabulary-th.json root ikut tercakup — tanpa ini murid
+    // th offline kehilangan arti kosakata (temuan W4-MERGE §3 butir 2). CATATAN: bentuk
+    // persis usulan handoff (`(?:grammar|vocabulary)-[a-z0-9-]*-th`) TIDAK cocok dengan
+    // /vocabulary-th.json — ia menuntut segmen ekstra di antara nama dan -th — jadi segmen
+    // tengahnya dibuat opsional per-kata: (?:-[a-z0-9]+)*?-th (diverifikasi replika matcher
+    // atas 17 entri manifest locale-assets-th.json, semua tercakup). naskah-th-brain.js
+    // (tabel naskah Thai modul brain, W3-BRAIN-TH) juga belum cocok pola mana pun, jadi
+    // ditambah pencocok prefix naskah-th- — pola prefix, bukan nama literal, mengikuti
+    // konvensi copy-th- di atasnya agar berkas naskah th berikutnya otomatis tercakup.
     return p.includes('/features/i18n/copy-th-')
-      ||/\/grammar-[a-z0-9-]*-th\.(?:js|json)$/.test(p)
+      ||p.includes('/features/i18n/naskah-th-')
+      ||/\/(?:grammar|vocabulary)(?:-[a-z0-9]+)*?-th\.(?:js|json)$/.test(p)
       ||p.includes('/assets/fonts/NotoSansThaiLooped');
   }catch{return false}
 };
