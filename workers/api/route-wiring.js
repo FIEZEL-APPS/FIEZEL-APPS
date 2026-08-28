@@ -68,6 +68,7 @@ import { QUOTA_CONFIG } from './quota/quota-config.js';
 import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/route-quota.js';
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
+import { registerLearningRoutes } from './learning/route-learning.js';
 import { scheduledAnalytics } from './analytics/rollup.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
@@ -473,6 +474,17 @@ function wrapAnalytics(handler) {
 }
 
 /**
+ * [E1-wave-E] Lane telemetri belajar: env analytics yang SAMA (fiezel-stats;
+ * kontrak privasi "tidak bisa di-join dengan kuota" berlaku utuh), plus
+ * `now: ctx.now` — jam route-learning.js masuk sebagai parameter, sejalan
+ * dengan prasasti "jam sebagai PARAMETER" di index.js.
+ */
+function wrapLearning(handler) {
+  return async (ctx) =>
+    handler({ request: requestFor(ctx), env: analyticsEnv(ctx.env), ctx: ctx.executionCtx, now: ctx.now });
+}
+
+/**
  * AI/TTS: identitas WAJIB (tanpa subjek tidak ada kuota yang bisa ditagih, dan
  * tanpa kuota jalur ini adalah pintu biaya terbuka), lalu handler dipanggil
  * dengan konvensi posisional, lalu reservasi kuota diselesaikan.
@@ -516,6 +528,12 @@ export function buildExtraRoutes() {
   //      modul E4 sendiri yang menjawab 202 `{disabled:true}`, dan itu penting
   //      supaya klien lama tidak melihat 404 lalu mengulang tanpa henti.
   registerAnalyticsRoutes(collector(routes, wrapAnalytics));
+
+  // [E1-wave-E] TELEMETRI BELAJAR — POST /api/learning/events. Sisi server
+  //      untuk transport klien PR #226 (fiezel-learning-transport.js). Seperti
+  //      analytics: tetap terdaftar walau LEARNING_ENABLED=off — modulnya
+  //      sendiri menjawab 202 {disabled:true} supaya klien tidak retry 404.
+  registerLearningRoutes(collector(routes, wrapLearning));
 
   // [E5] AI + TTS. `deps.enforceQuota` diselesaikan PER PERMINTAAN.
   const aiSink = [];

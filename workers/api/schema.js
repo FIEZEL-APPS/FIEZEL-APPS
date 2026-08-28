@@ -52,7 +52,12 @@ export const BYTE_LIMITS = Object.freeze({
   '/api/quota': 512,            // GET, tanpa body
   '/api/usage/events': 16384,   // batch event klien; sama dengan /api/usage/event (tunggal) yang digantikannya
   '/api/usage/retention': 2048, // {cohort_day, day_index} + amplop
-  '/api/usage/pepper': 512      // GET, tanpa body
+  '/api/usage/pepper': 512,     // GET, tanpa body
+  // --- lane telemetri belajar (Wave E1) ---------------------------------------
+  // Cap luar 2x cap internal 8 KB route-learning.js (pola /api/usage/events):
+  // mw-guard memotong banjir mentah SEBELUM routing, handler mengukur byte
+  // sesungguhnya dan menegakkan kontrak 8 KB milik transport klien PR #226.
+  '/api/learning/events': 16384
 });
 
 /** Cap terakhir untuk path yang tidak terdaftar: kecil, sengaja. */

@@ -766,10 +766,17 @@ const statsRows = renderRows(statsSchema);
 
 const OWNER_QUERIES = path.join(REPO, 'workers', 'owner', 'queries.js');
 
-// Lima tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
+// Tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
 // daftar yang diambil dari kode owner, supaya menambah tabel tidak bisa lolos hanya karena kode
 // owner ikut diubah. `analytics-privacy-test.js` mengunci sisi database; ini mengunci sisi kueri.
-const STATS_TABLES_EXPECTED = ['dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
+// [E1-WAVE-E-0007-20260829] +4 tabel `learning_*` (0007_learning_events.sql, lane telemetri
+// belajar /api/learning/events): dedup idempotensi (batch+event), counter agregat harian, dan
+// rem laju anon. Keempatnya TIDAK owner-readable (lihat OWNER_READABLE — tidak berubah) dan
+// tidak punya kolom penghubung (dijaga ddl_analytics_tanpa_kolom_penghubung di bawah).
+const STATS_TABLES_EXPECTED = [
+  'dau_dedup', 'learning_batch_dedup', 'learning_daily', 'learning_event_dedup', 'learning_rate',
+  'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'
+];
 
 // Tabel yang boleh DIBACA dashboard owner: hanya yang agregat. `dau_dedup` (token per-perangkat)
 // dan `pepper_state` (bahan rahasia HMAC) ada di database yang sama dan justru karena itu harus
@@ -829,13 +836,13 @@ function ownerQuerySql() {
     });
   }
 
-  // Kunci #0: parser DDL benar-benar melihat lima tabel stats. Kalau tidak, semua kesimpulan di
-  // bawah dibangun di atas skema yang tidak lengkap.
+  // Kunci #0: parser DDL benar-benar melihat SEMUA tabel stats (5 analytics + 4 learning).
+  // Kalau tidak, semua kesimpulan di bawah dibangun di atas skema yang tidak lengkap.
   const statsFound = [...statsSchema.tables.keys()].sort();
   check('skema_stats_tepat_lima_tabel',
     statsFound.join(',') === STATS_TABLES_EXPECTED.join(','), {
       diharapkan: STATS_TABLES_EXPECTED, ditemukan: statsFound,
-      otoritas: 'workers/api/migrations/0002_analytics.sql'
+      otoritas: 'workers/api/migrations/0002_analytics.sql + 0007_learning_events.sql'
     });
 
   const bentuk = {};
@@ -976,10 +983,13 @@ function ownerQuerySql() {
     const idx = [...statsSchema.indexes.values()].map((i) => ({ nama: i.name, tabel: i.table, kolom: i.columns, berkas: i.file }));
     const fileIdx = [...new Set(idx.map((i) => i.berkas))];
     check('indeks_stats_berasal_dari_migrasi_yang_sudah_jalan',
-      fileIdx.every((f) => /000[12]_/.test(f)), {
+      fileIdx.every((f) => /000[127]_/.test(f)), {
         indeks: idx, berkas: fileIdx,
         catatan: '0004_indexes.sql adalah migrasi fiezel-core dan BELUM diterapkan; kueri owner '
-          + 'tidak boleh bergantung padanya. Nol prasyarat indeks baru.'
+          + 'tidak boleh bergantung padanya. [E1-WAVE-E-0007-20260829] 0007_learning_events.sql '
+          + 'ikut diizinkan: dua indeks day-nya HANYA melayani purge TTL di jalur tulis '
+          + 'route-learning.js, bukan kueri owner, dan migrasinya wajib jalan sebelum '
+          + 'LEARNING_ENABLED dinyalakan (fail-closed, lihat MIGRATIONS.md).'
       });
   }
 }

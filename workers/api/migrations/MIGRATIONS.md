@@ -15,6 +15,14 @@ sini yang menjadi urutan resmi.
 | `0003_cron.sql` | `fiezel-core` (binding `CORE_DB`) | `cron_run` |
 | `0004_indexes.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
 | `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
+| `0007_learning_events.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `learning_batch_dedup`, `learning_event_dedup`, `learning_daily`, `learning_rate` |
+
+Nomor `0006` SENGAJA dilewati: ia sudah diklaim `0006_analytics_batch_dedup.sql`
+di branch `brain-learning-infra-v1` (PR #226) yang saat `0007` ditulis belum
+merged. Memakai `0006` di sini berarti dua migrasi berbeda dengan nomor sama
+begitu PR itu mendarat — persis kelas cacat "dua daftar yang tidak saling tahu"
+yang didokumentasikan di bawah. Tidak ada tabrakan nama tabel: `0007` memprefiks
+semua tabelnya dengan `learning_`.
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -72,7 +80,17 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0003_cron.sql
 
 # --- fiezel-core: pagar neuron tingkat AKUN (P3) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0005_ai_account_budget.sql
+
+# --- fiezel-stats: lane telemetri belajar (Wave E1) ---
+wrangler d1 execute fiezel-stats --remote --file=migrations/0007_learning_events.sql
 ```
+
+`0007_learning_events.sql` WAJIB diterapkan SEBELUM `LEARNING_ENABLED` dinyalakan.
+Endpoint `/api/learning/events` (`learning/route-learning.js`) FAIL-CLOSED: tanpa
+tabelnya, setiap batch dijawab `503` dan transport klien (PR #226) mengantre ulang
+dengan `eventId` yang sama — tidak ada data hilang, tidak ada hitung ganda, dan
+tidak ada jawaban sukses palsu. Selama flag masih `off`, endpoint menjawab `202
+{disabled:true}` tanpa menyentuh D1, jadi urutan deploy kode vs migrasi bebas.
 
 `0005_ai_account_budget.sql` WAJIB diterapkan SEBELUM `cfAiEnabled` dinyalakan.
 Pagar neuron tingkat akun di `ai/ai-account-budget.js` FAIL-CLOSED: kalau tabel
