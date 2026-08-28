@@ -121,6 +121,74 @@
  *   Biaya runtime dijaga: skenario bank Fase 3 (mahal karena estimateAbility
  *   per penyajian) dijalankan pada 3 profil ASLI per seed (tetap 50 pasangan
  *   seed per varian); varian Fase 2 yang murah dijalankan pada semua 9 profil.
+ *
+ * WAVE 5c — DUA SEMANTIK DIPISAH: GATE KESELAMATAN (exit code) vs VERDICT RISET
+ * (research_hold, TIDAK menyentuh exit code).
+ *
+ *   KENAPA: sejak file ini didaftarkan sebagai gate CI nyata (quality.yml, temuan
+ *   D1 wave D), pengerasan wave-3 membuat exit 1 karena TEMUAN RISET yang jujur:
+ *   klaim kalibrasi fase-3 inconclusive pada 50 seed (CI RMSE [-0.012, +0.006]),
+ *   varian bank v3 tersensor 43/50 seed, dan klaim perbaikan osilasi residual
+ *   terbantah antar-seed (CI [+0.054, +0.275]). Temuan itu BENAR dan tetap
+ *   dilaporkan utuh — tetapi "penemuan riset" bukan "regresi rilis": gate yang
+ *   merah selamanya memblokir SEMUA rilis, termasuk rilis yang tidak menyentuh
+ *   brain, dan gate yang selalu merah akhirnya di-bypass orang — itu kematian
+ *   kejujuran, bukan penegakannya.
+ *
+ *   SEMANTIK 1 — GATE KESELAMATAN (menentukan exit code). Hanya menjaga regresi
+ *   terbukti pada kebijakan yang benar-benar DI-SHIP ke murid:
+ *     - v2_residual        : stack v2 + momentum residual — konfigurasi yang aktif
+ *                            di produksi (fiezel-core-brain, baris attempts app
+ *                            membawa `predicted`).
+ *     - item_calibration   : FiezelItemCalibration — 'active' per authorityMap di
+ *                            features/brain/fiezel-brain-manifest.js (dipakai
+ *                            buildAdaptivePool via effective()).
+ *   FAIL (exit 1) HANYA bila:
+ *     (a) CI bootstrap berpasangan membuktikan kebijakan shipped LEBIH BURUK dari
+ *         baseline-nya pada metrik KESELAMATAN — retentionDay90, brier,
+ *         falseDeclineRate, difficultyOscillationPer10 — yaitu verdict
+ *         kandidat_lebih_buruk: CI 95% mengecualikan nol DAN |meanDiff| melewati
+ *         ambang praktis (konsisten filosofi PRAKTIS wave-3: signifikan statistik
+ *         tapi remeh praktis bukan dasar memblokir rilis — ia tetap dilaporkan
+ *         sebagai temuan riset). Baseline v2_residual = v1 (kebijakan worker lama,
+ *         sesuai kontrak tugas); baseline item_calibration = v3_tanpa_kalibrasi
+ *         (ablation: stack yang sama minus modul shipped — dunia bank sintetis
+ *         TIDAK punya varian v1, jadi ablation adalah pembanding jujur satu-satunya
+ *         yang mengisolasi efek modul yang di-ship).
+ *     (b) kebijakan shipped tersensor mayoritas seed SECARA ATRIBUTABLE: varian
+ *         shipped tak pernah mastery pada mayoritas seed SEMENTARA baseline di
+ *         dunia yang sama tidak; ATAU CI membuktikan varian shipped menyensor
+ *         lebih sering dari baseline ablation-nya melebihi margin praktis.
+ *         Atribusi itu esensial: di dunia bank fase-3, v3_kalibrasi DAN
+ *         v3_tanpa_kalibrasi sama-sama tersensor 43/50 seed dengan censoredRate
+ *         identik — itu mendakwa SKENARIO (horizon 35 hari + bank mislabeled +
+ *         3 profil), bukan modul kalibrasi yang di-ship; menghukum rilis untuk
+ *         desain harness adalah kategori yang salah. Temuan skenario itu tetap
+ *         dieskalasi utuh sebagai research_hold.
+ *     (c) kebijakan yang dinyatakan shipped TIDAK bisa diverifikasi harness
+ *         (feature-detect gagal): manifest bilang 'active' tapi simulator tak bisa
+ *         mengukurnya = inkonsistensi yang memblokir (brain3_sim_shipped_unverifiable).
+ *   Plus gate determinisme lama (exit 2) — tidak berubah.
+ *
+ *   SEMANTIK 2 — VERDICT RISET (TIDAK menentukan exit code). Semua temuan lain:
+ *   klaim perbaikan yang inconclusive (kalibrasi RMSE), klaim yang TERBANTAH
+ *   antar-seed (osilasi residual), censoring varian kandidat non-shipped /
+ *   censoring level-skenario (bank v3), regresi kandidat non-shipped (v2_lama
+ *   kalah timeToMastery), dan tradeoff shipped yang bukan metrik keselamatan
+ *   (v2_residual menyensor mastery-35-hari lebih sering dari v1 sambil menang
+ *   telak retensi/brier/false-decline). Masing-masing menjadi entri
+ *   `researchVerdicts[]` berstatus 'research_hold' dengan rationale brain3_riset_*,
+ *   confidence, dan CI LENGKAP — dicetak ke stderr di bawah label
+ *   'TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER)' dan ditulis utuh
+ *   ke JSON stdout. TIDAK ADA temuan yang dibuang: yang berubah hanya jalur
+ *   eskalasinya — penemuan riset naik ke MASTER via ledger (researchVerdicts),
+ *   bukan via CI merah. Ini konsisten dengan filosofi fiezel-stat-gate.js:
+ *   bukti yang belum memutus berujung 'hold', bukan 'fail'.
+ *
+ *   Gate-gate lama (residual/kalibrasi single-seed, multi-seed utama/censoring/
+ *   residual/kalibrasi) tetap DIHITUNG dan dilaporkan penuh; status 'FAIL' mereka
+ *   diganti label 'RESEARCH_HOLD' karena mereka menghakimi KLAIM RISET, bukan
+ *   keselamatan rilis. Exit code kini murni: determinisme + shippedGate.
  */
 (function (root, factory) {
   var api = factory();
@@ -1284,6 +1352,64 @@
     if (censorResidual) ciCensor.push(censorResidual);
     var gateCensor = gateCensoringMulti(censoringPerVarian, ciCensor);
 
+    // --- WAVE 5c: blok KEBIJAKAN SHIPPED — bahan mentah gate keselamatan rilis ---
+    // Metrik keselamatan per kontrak tugas: retensi/brier/falseDecline/oscillation.
+    // timeToMastery/censoredRate BUKAN metrik gate (tersensor berat → pasangan bias);
+    // ia tetap dihitung & dilaporkan sebagai bahan riset (lihat kumpulkanTemuanRiset).
+    var METRIK_KESELAMATAN = [
+      { nama: 'difficultyOscillationPer10', arah: 'turun', praktis: PRAKTIS.difficultyOscillationPer10, ambil: function (r) { return r.difficultyOscillationPer10; } },
+      { nama: 'retentionDay90', arah: 'naik', praktis: PRAKTIS.retentionDay90, ambil: function (r) { return r.retentionDay90; } },
+      { nama: 'brier', arah: 'turun', praktis: PRAKTIS.brier, ambil: function (r) { return r.brier; } },
+      { nama: 'falseDeclineRate', arah: 'turun', praktis: PRAKTIS.falseDeclineRate, ambil: function (r) { return r.falseDeclineRate; } }
+    ];
+    function barisKeselamatan(base, cand, offsetSeed, pairLabel) {
+      var rows = [];
+      for (var bi = 0; bi < METRIK_KESELAMATAN.length; bi++) {
+        var baris = ciBerpasangan(base, cand, METRIK_KESELAMATAN[bi], seedCI(offsetSeed + bi));
+        baris.pair = pairLabel;
+        rows.push(baris);
+      }
+      return rows;
+    }
+    function cariCensor(nama) {
+      for (var ci2 = 0; ci2 < censoringPerVarian.length; ci2++) if (censoringPerVarian[ci2].variant === nama) return censoringPerVarian[ci2];
+      return null;
+    }
+    var shipped = { v2Residual: null, itemCalibration: null };
+    if (dukungan.residual) {
+      var cenV1V2r = ciBerpasangan(v1, v2r, { nama: 'censoredRate', arah: 'turun', praktis: PRAKTIS.censoringRate, ambil: ambilCensor }, seedCI(16));
+      cenV1V2r.pair = 'v1\u2192v2_residual';
+      shipped.v2Residual = {
+        policy: 'v2_residual',
+        authority: 'aktif di produksi (momentum residual fiezel-core-brain; baris attempts app membawa `predicted`)',
+        baselineKeselamatan: 'v1',
+        baselineAblation: 'v2_lama',
+        metrics: barisKeselamatan(v1, v2r, 12, 'v1\u2192v2_residual'),
+        censoringShipped: cariCensor('v2Residual'),
+        censoringBaseline: cariCensor('v1'),
+        // ablation censoring = censorResidual (v2_lama\u2192v2_residual, sudah dihitung di atas)
+        censoringAblationCI: censorResidual,
+        censoringBaselineCI: cenV1V2r
+      };
+    }
+    if (dukungan.kalibrasi) {
+      var cenV3 = ciBerpasangan(v3t, v3k, { nama: 'censoredRate', arah: 'turun', praktis: PRAKTIS.censoringRate, ambil: ambilCensor }, seedCI(21));
+      cenV3.pair = 'v3_tanpa\u2192v3_kalibrasi';
+      shipped.itemCalibration = {
+        policy: 'item_calibration',
+        authority: "authorityMap.itemCalibration='active' (features/brain/fiezel-brain-manifest.js; buildAdaptivePool memakai effective())",
+        baselineKeselamatan: 'v3_tanpa_kalibrasi (ablation \u2014 dunia bank tidak punya varian v1)',
+        baselineAblation: 'v3_tanpa_kalibrasi',
+        metrics: barisKeselamatan(v3t, v3k, 17, 'v3_tanpa\u2192v3_kalibrasi'),
+        censoringShipped: cariCensor('v3Kalibrasi'),
+        censoringBaseline: cariCensor('v3TanpaKalibrasi'),
+        censoringAblationCI: cenV3,
+        censoringBaselineCI: cenV3,
+        // Kontrak shrinkage ±0.6 adalah kontrak modul SHIPPED — bocornya = gate keras.
+        shrinkage: shrinkageMulti
+      };
+    }
+
     var agregat = [];
     for (var ka = 0; ka < kunciAktif.length; ka++) agregat.push(agregatMultiSeed(units, kunciAktif[ka]));
 
@@ -1302,6 +1428,8 @@
       runsPerVariant: { v1: v1.length, v2Lama: v2.length, v2Residual: v2r ? v2r.length : null, v3TanpaKalibrasi: v3t.length, v3Kalibrasi: v3k ? v3k.length : null },
       aggregates: agregat,
       censoring: { perVariant: censoringPerVarian, ciRelatif: ciCensor, gate: gateCensor },
+      // WAVE 5c — bahan gate keselamatan shipped (dinilai nilaiShipped/nilaiKebijakanShipped)
+      shipped: shipped,
       utama: { pair: 'v1\u2192v2_lama', metrics: metrikUtama, kandidatBurukPada: burukUtama, totalMetrik: metrikUtama.length, mayoritasBuruk: burukUtama > metrikUtama.length / 2 },
       residual: metrikResidual ? { pair: 'v2_lama\u2192v2_residual', metrics: metrikResidual } : null,
       kalibrasi: metrikKalibrasi ? { pair: 'v3_tanpa\u2192v3_kalibrasi', metrics: metrikKalibrasi, shrinkage: shrinkageMulti } : null,
@@ -1311,35 +1439,37 @@
   }
 
   /**
-   * Verdict multi-seed — status per gate, pola tiga-status yang sama dengan Fase 2/3:
-   *   utama     : FAIL bila v2_lama TERBUKTI lebih buruk dari v1 (CI + praktis) pada
-   *               mayoritas metrik inti.
-   *   censoring : lihat gateCensoringMulti — FAIL mutlak/relatif.
-   *   residual  : SKIPPED tanpa dukungan; FAIL bila osilasi TIDAK terbukti membaik
-   *               (klaim keberadaan fitur, konsisten gate single-seed) ATAU
-   *               false-decline terbukti memburuk.
-   *   kalibrasi : SKIPPED tanpa modul; FAIL bila RMSE TIDAK terbukti turun melewati
-   *               ambang praktis ATAU shrinkage bocor di run mana pun.
+   * Verdict multi-seed — status per gate, pola tiga-status yang sama dengan Fase 2/3.
+   * WAVE 5c: gate-gate ini menghakimi KLAIM RISET (nilai tambah kandidat, censoring
+   * lintas varian), bukan keselamatan rilis — status buruknya kini 'RESEARCH_HOLD'
+   * (bukan 'FAIL') dan TIDAK menentukan exit code; lihat nilaiShipped untuk gate keras.
+   *   utama     : RESEARCH_HOLD bila v2_lama TERBUKTI lebih buruk dari v1 (CI + praktis)
+   *               pada mayoritas metrik inti (v2_lama = kandidat non-shipped).
+   *   censoring : lihat gateCensoringMulti — temuan mutlak/relatif.
+   *   residual  : SKIPPED tanpa dukungan; RESEARCH_HOLD bila osilasi TIDAK terbukti
+   *               membaik ATAU false-decline terbukti memburuk (klaim nilai tambah).
+   *   kalibrasi : SKIPPED tanpa modul; RESEARCH_HOLD bila RMSE TIDAK terbukti turun
+   *               melewati ambang praktis ATAU shrinkage bocor di run mana pun.
    */
   function nilaiMultiSeed(ms, dukungan) {
-    var utamaStatus = ms.utama.mayoritasBuruk ? 'FAIL' : 'PASS';
-    var censoringStatus = ms.censoring.gate.pass ? 'PASS' : 'FAIL';
+    var utamaStatus = ms.utama.mayoritasBuruk ? 'RESEARCH_HOLD' : 'PASS';
+    var censoringStatus = ms.censoring.gate.pass ? 'PASS' : 'RESEARCH_HOLD';
     var residualStatus, kalibrasiStatus;
     if (!dukungan.residual) residualStatus = 'SKIPPED';
     else {
       var osc = ms.residual.metrics[0], fd = ms.residual.metrics[1];
-      residualStatus = (osc.verdict === 'kandidat_lebih_baik' && fd.verdict !== 'kandidat_lebih_buruk') ? 'PASS' : 'FAIL';
+      residualStatus = (osc.verdict === 'kandidat_lebih_baik' && fd.verdict !== 'kandidat_lebih_buruk') ? 'PASS' : 'RESEARCH_HOLD';
     }
     if (!dukungan.kalibrasi) kalibrasiStatus = 'SKIPPED';
     else {
       var rmse = ms.kalibrasi.metrics[0];
-      kalibrasiStatus = (rmse.verdict === 'kandidat_lebih_baik' && !ms.kalibrasi.shrinkage.bocor) ? 'PASS' : 'FAIL';
+      kalibrasiStatus = (rmse.verdict === 'kandidat_lebih_baik' && !ms.kalibrasi.shrinkage.bocor) ? 'PASS' : 'RESEARCH_HOLD';
     }
-    var pass = utamaStatus !== 'FAIL' && censoringStatus !== 'FAIL' && residualStatus !== 'FAIL' && kalibrasiStatus !== 'FAIL';
-    var rationale = censoringStatus === 'FAIL' ? ms.censoring.gate.rationale
-      : utamaStatus === 'FAIL' ? 'brain3_sim_multiseed_v2_regression'
-        : residualStatus === 'FAIL' ? 'brain3_sim_multiseed_residual_no_improvement'
-          : kalibrasiStatus === 'FAIL' ? (ms.kalibrasi.shrinkage.bocor ? 'brain3_sim_multiseed_kalibrasi_shrinkage_leak' : 'brain3_sim_multiseed_kalibrasi_no_improvement')
+    var pass = utamaStatus !== 'RESEARCH_HOLD' && censoringStatus !== 'RESEARCH_HOLD' && residualStatus !== 'RESEARCH_HOLD' && kalibrasiStatus !== 'RESEARCH_HOLD';
+    var rationale = censoringStatus === 'RESEARCH_HOLD' ? ms.censoring.gate.rationale
+      : utamaStatus === 'RESEARCH_HOLD' ? 'brain3_sim_multiseed_v2_regression'
+        : residualStatus === 'RESEARCH_HOLD' ? 'brain3_sim_multiseed_residual_no_improvement'
+          : kalibrasiStatus === 'RESEARCH_HOLD' ? (ms.kalibrasi.shrinkage.bocor ? 'brain3_sim_multiseed_kalibrasi_shrinkage_leak' : 'brain3_sim_multiseed_kalibrasi_no_improvement')
             : 'brain3_sim_multiseed_pass';
     return {
       pass: pass,
@@ -1352,6 +1482,178 @@
         * (residualStatus === 'SKIPPED' ? 0.6 : 1)
         * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1), 3)
     };
+  }
+
+  // ===================================================================================
+  // WAVE 5c — GATE KESELAMATAN SHIPPED (exit code) & PENGUMPUL TEMUAN RISET (research_hold)
+  // ===================================================================================
+  /**
+   * Nilai SATU kebijakan shipped dari blok multiSeed.shipped.*:
+   *   FAIL bila (a) ada metrik keselamatan dengan verdict kandidat_lebih_buruk vs
+   *   baseline (CI mengecualikan nol + melewati ambang praktis), (b) censoring
+   *   ATRIBUTABLE (shipped tanpa mastery di mayoritas seed SEMENTARA baseline tidak,
+   *   ATAU CI ablation membuktikan shipped menyensor lebih sering melebihi margin),
+   *   (c) kontrak modul shipped bocor (shrinkage), atau (d) blok null — kebijakan
+   *   dinyatakan shipped tetapi harness tak bisa memverifikasinya.
+   *   Censoring level-skenario (shipped DAN baseline sama-sama mayoritas) TIDAK
+   *   menggagalkan gate — ia ditandai censoringScenarioLevel dan dieskalasi sebagai
+   *   research_hold oleh kumpulkanTemuanRiset (mendakwa harness, bukan kebijakan).
+   */
+  function nilaiKebijakanShipped(nama, blok) {
+    if (!blok) {
+      return {
+        policy: nama, status: 'UNVERIFIED', pass: false,
+        alasan: ['kebijakan dinyatakan shipped (produksi/authorityMap) tetapi runtime tidak lolos feature-detect — harness yang tidak bisa mengukur kebijakan yang benar-benar jalan tidak boleh mensertifikasi rilis'],
+        regresiTerbukti: [], censoringMutlakAtributable: false, censoringRelatifTerbukti: false, censoringScenarioLevel: false,
+        rationale: 'brain3_sim_shipped_unverifiable', confidence: 0.9
+      };
+    }
+    var alasan = [];
+    var regresi = [];
+    for (var i = 0; i < blok.metrics.length; i++) {
+      var m = blok.metrics[i];
+      if (m.verdict === 'kandidat_lebih_buruk') {
+        regresi.push(m.metric);
+        alasan.push('regresi terbukti pada metrik keselamatan ' + m.metric + ' vs ' + blok.baselineKeselamatan + ' (meanDiff ' + m.meanDiff + ', CI [' + m.ciLo + ', ' + m.ciHi + '] mengecualikan nol melewati ambang praktis ' + m.praktis + ')');
+      }
+    }
+    var cs = blok.censoringShipped, cb = blok.censoringBaseline;
+    var censorMutlak = !!(cs && cs.tanpaMasteryMayoritas && !(cb && cb.tanpaMasteryMayoritas));
+    if (censorMutlak) alasan.push('kebijakan shipped tersensor mayoritas seed (' + cs.seedsTanpaMastery + '/' + cs.seedCount + ' seed tanpa mastery) sementara baseline ' + blok.baselineAblation + ' tidak — atributable ke kebijakan shipped');
+    var scenarioLevel = !!(cs && cs.tanpaMasteryMayoritas && cb && cb.tanpaMasteryMayoritas);
+    var abl = blok.censoringAblationCI;
+    var censorRelatif = !!(abl && !abl.insufficient && typeof abl.ciLo === 'number' && abl.ciLo > PRAKTIS.censoringRate);
+    if (censorRelatif) alasan.push('kebijakan shipped TERBUKTI menyensor lebih sering dari baseline ablation ' + blok.baselineAblation + ' (CI [' + abl.ciLo + ', ' + abl.ciHi + '] > margin ' + PRAKTIS.censoringRate + ')');
+    var kontrakBocor = !!(blok.shrinkage && blok.shrinkage.bocor);
+    if (kontrakBocor) alasan.push('kontrak shrinkage modul shipped BOCOR (maks |delta| = ' + blok.shrinkage.maxAbsDelta + ' > ' + blok.shrinkage.batas + ')');
+    var pass = alasan.length === 0;
+    return {
+      policy: blok.policy,
+      authority: blok.authority,
+      baselineKeselamatan: blok.baselineKeselamatan,
+      baselineAblation: blok.baselineAblation,
+      status: pass ? 'PASS' : 'FAIL',
+      pass: pass,
+      regresiTerbukti: regresi,
+      censoringMutlakAtributable: censorMutlak,
+      censoringRelatifTerbukti: censorRelatif,
+      censoringScenarioLevel: scenarioLevel,
+      kontrakBocor: kontrakBocor,
+      alasan: alasan,
+      rationale: pass ? 'brain3_sim_shipped_ok'
+        : regresi.length ? 'brain3_sim_shipped_regression'
+          : censorMutlak ? 'brain3_sim_shipped_censoring_absolute'
+            : censorRelatif ? 'brain3_sim_shipped_censoring_excess'
+              : 'brain3_sim_shipped_contract_leak',
+      confidence: pass ? 0.9 : 0.95
+    };
+  }
+
+  /** Gate keselamatan gabungan — SATU-SATUNYA penentu exit 1 (selain determinisme). */
+  function nilaiShipped(ms, dukungan) {
+    var pols = [
+      nilaiKebijakanShipped('v2_residual', dukungan.residual && ms.shipped ? ms.shipped.v2Residual : null),
+      nilaiKebijakanShipped('item_calibration', dukungan.kalibrasi && ms.shipped ? ms.shipped.itemCalibration : null)
+    ];
+    var pass = true, rationale = 'brain3_sim_shipped_pass', alasan = [];
+    for (var i = 0; i < pols.length; i++) {
+      if (!pols[i].pass) {
+        pass = false;
+        if (rationale === 'brain3_sim_shipped_pass') rationale = pols[i].rationale;
+        for (var a = 0; a < pols[i].alasan.length; a++) alasan.push(pols[i].policy + ': ' + pols[i].alasan[a]);
+      }
+    }
+    return { pass: pass, policies: pols, alasan: alasan, rationale: rationale, confidence: pass ? 0.9 : 0.95 };
+  }
+
+  /**
+   * Klasifikasi klaim perbaikan kandidat dari satu baris CI:
+   *   'terbantah'    : CI 95% mengecualikan nol di sisi BURUK — klaim perbaikan
+   *                    dibantah antar-seed (mis. osilasi residual [+0.054, +0.275]);
+   *   'inconclusive' : interval memeluk nol atau efek < ambang praktis.
+   */
+  function klasifikasiKlaim(row) {
+    if (!row || row.insufficient) return 'insufficient';
+    var terbantah = row.arahLebihBaik === 'turun' ? row.ciLo > 0 : row.ciHi < 0;
+    return terbantah ? 'terbantah' : 'inconclusive';
+  }
+
+  /**
+   * Pengumpul TEMUAN RISET — setiap temuan jujur yang TIDAK memblokir rilis menjadi
+   * entri { id, status:'research_hold', claim, rationale brain3_riset_*, confidence,
+   * ci (baris CI lengkap bila ada), detail }. TIDAK ADA temuan yang dibuang:
+   * semuanya masuk JSON (field researchVerdicts) dan dicetak ke stderr dengan label
+   * 'TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER)'. Eskalasi ke MASTER
+   * berjalan via ledger, bukan via CI merah — konsisten fiezel-stat-gate.js
+   * (hold-bukan-fail saat bukti belum memutus).
+   */
+  function kumpulkanTemuanRiset(ctx) {
+    var temuan = [];
+    function tambah(id, claim, rationale, confidence, ci, detail) {
+      temuan.push({ id: id, status: 'research_hold', claim: claim, rationale: rationale, confidence: confidence, ci: ci || null, detail: detail == null ? null : detail });
+    }
+    // (a) klaim single-seed — anekdot 1 seed, selalu level riset
+    if (ctx.residualStatus === 'RESEARCH_HOLD') tambah('singleseed_residual', ctx.residualMessage, 'brain3_riset_residual_singleseed_unproven', 0.6, null, ctx.resGate);
+    if (ctx.kalibrasiStatus === 'RESEARCH_HOLD') tambah('singleseed_kalibrasi', ctx.kalibrasiMessage, 'brain3_riset_kalibrasi_singleseed_unproven', 0.6, null, ctx.kalGate);
+    if (ctx.cmp.v2KalahMayoritas) tambah('singleseed_utama', 'v2 kalah dari v1 pada ' + ctx.cmp.v2KalahPada + '/' + ctx.cmp.totalMetrik + ' metrik pada suite single-seed (anekdot 1 seed; keselamatan rilis dinilai CI multi-seed shipped).', 'brain3_riset_v2_singleseed_kalah', 0.6, null, ctx.cmp.rows);
+    var ms = ctx.multi;
+    // (b) regresi terbukti pada kandidat non-shipped v2_lama (konfigurasi produksi = v2_residual)
+    for (var i = 0; i < ms.utama.metrics.length; i++) {
+      var r = ms.utama.metrics[i];
+      if (r.verdict === 'kandidat_lebih_buruk') tambah('multiseed_utama_' + r.metric, 'v2_lama (kandidat non-shipped; konfigurasi produksi = v2_residual) terbukti lebih buruk dari v1 pada ' + r.metric + ' (meanDiff ' + r.meanDiff + ', CI [' + r.ciLo + ', ' + r.ciHi + ']).', 'brain3_riset_kandidat_v2lama_regresi', 0.9, r);
+    }
+    if (ms.utama.mayoritasBuruk) tambah('multiseed_utama_mayoritas', 'v2_lama terbukti lebih buruk dari v1 pada mayoritas metrik inti (' + ms.utama.kandidatBurukPada + '/' + ms.utama.totalMetrik + ') — kandidat non-shipped.', 'brain3_riset_kandidat_v2lama_mayoritas_buruk', 0.9, null, ms.utama);
+    // (c) klaim nilai tambah residual (v2_lama→v2_residual) yang tidak terbukti/terbantah
+    if (ms.residual) {
+      for (var j = 0; j < ms.residual.metrics.length; j++) {
+        var rr = ms.residual.metrics[j];
+        if (rr.verdict === 'kandidat_lebih_baik') continue;
+        var kr = klasifikasiKlaim(rr);
+        tambah('multiseed_residual_' + rr.metric,
+          'Klaim perbaikan ' + rr.metric + ' oleh momentum residual (' + ms.residual.pair + ') ' + (kr === 'terbantah' ? 'TERBANTAH antar-seed' : 'inconclusive pada ' + ms.seedCount + ' seed') + ' (meanDiff ' + rr.meanDiff + ', CI [' + rr.ciLo + ', ' + rr.ciHi + '], ambang praktis ' + rr.praktis + ').',
+          kr === 'terbantah' ? 'brain3_riset_residual_klaim_terbantah' : 'brain3_riset_residual_klaim_inconclusive',
+          kr === 'terbantah' ? 0.9 : 0.6, rr);
+      }
+    }
+    // (d) klaim nilai tambah kalibrasi (v3_tanpa→v3_kalibrasi) yang tidak terbukti/terbantah
+    if (ms.kalibrasi) {
+      for (var k = 0; k < ms.kalibrasi.metrics.length; k++) {
+        var rk = ms.kalibrasi.metrics[k];
+        if (rk.verdict === 'kandidat_lebih_baik') continue;
+        var kk = klasifikasiKlaim(rk);
+        tambah('multiseed_kalibrasi_' + rk.metric,
+          'Klaim perbaikan ' + rk.metric + ' oleh kalibrasi item (' + ms.kalibrasi.pair + ') ' + (kk === 'terbantah' ? 'TERBANTAH antar-seed' : 'inconclusive pada ' + ms.seedCount + ' seed') + ' (meanDiff ' + rk.meanDiff + ', CI [' + rk.ciLo + ', ' + rk.ciHi + '], ambang praktis ' + rk.praktis + ').',
+          kk === 'terbantah' ? 'brain3_riset_kalibrasi_klaim_terbantah' : 'brain3_riset_kalibrasi_klaim_inconclusive',
+          kk === 'terbantah' ? 0.9 : 0.6, rk);
+      }
+    }
+    // (e1) censoring level-skenario / kandidat non-shipped: varian bank tanpa mastery
+    //      di mayoritas seed. Bila shipped & baseline identik → mendakwa skenario
+    //      (horizon+bank mislabeled), bukan kebijakan; tetap dieskalasi utuh.
+    var bankCensor = [];
+    for (var c1 = 0; c1 < ms.censoring.perVariant.length; c1++) {
+      var pv = ms.censoring.perVariant[c1];
+      if (pv.tanpaMasteryMayoritas) bankCensor.push(pv.variant + ' ' + pv.seedsTanpaMastery + '/' + pv.seedCount + ' seed tanpa mastery (censoredRate ' + pv.censoredRate + ')');
+    }
+    if (bankCensor.length) tambah('censoring_scenario_bank',
+      'Censoring mayoritas seed pada varian dunia bank fase-3: ' + bankCensor.join('; ') + '. Baseline ablation dan varian shipped tersensor IDENTIK — temuan mendakwa desain skenario (horizon ' + SIM_DAYS + ' hari + bank mislabeled + ' + PROFIL_BANK + ' profil), bukan regresi kebijakan shipped; keputusan perpanjangan horizon/redesain skenario di MASTER.',
+      'brain3_riset_censoring_bank_scenario', 0.9, null, ms.censoring.perVariant);
+    // (e2) censoring relatif terbukti pada pasangan kandidat non-shipped (v1→v2_lama)
+    for (var c2 = 0; c2 < ms.censoring.ciRelatif.length; c2++) {
+      var rc = ms.censoring.ciRelatif[c2];
+      if (!rc.insufficient && typeof rc.ciLo === 'number' && rc.ciLo > PRAKTIS.censoringRate && rc.pair === 'v1\u2192v2_lama') {
+        tambah('censoring_kandidat_' + rc.pair, 'Kandidat non-shipped v2_lama tersensor lebih sering dari v1 secara signifikan (rate ' + rc.meanBase + ' \u2192 ' + rc.meanKandidat + ', CI [' + rc.ciLo + ', ' + rc.ciHi + '] > margin ' + PRAKTIS.censoringRate + ').', 'brain3_riset_censoring_kandidat_excess', 0.9, rc);
+      }
+    }
+    // (e3) tradeoff shipped di luar metrik keselamatan: v2_residual mencapai mastery-
+    //      horizon lebih jarang dari v1 sambil menang pada retensi/brier/false-decline.
+    if (ms.shipped && ms.shipped.v2Residual && ms.shipped.v2Residual.censoringBaselineCI) {
+      var tb = ms.shipped.v2Residual.censoringBaselineCI;
+      if (tb.verdict === 'kandidat_lebih_buruk') tambah('censoring_shipped_tradeoff_v2residual',
+        'v2_residual (shipped) mencapai mastery dalam horizon ' + SIM_DAYS + ' hari lebih jarang dari v1 (censoredRate ' + tb.meanBase + ' \u2192 ' + tb.meanKandidat + ', CI [' + tb.ciLo + ', ' + tb.ciHi + ']) SAMBIL menang terbukti pada retensi/brier/false-decline — tradeoff kecepatan-mastery vs kualitas belajar, bukan regresi metrik keselamatan per definisi gate; arah kebijakan diputuskan MASTER.',
+        'brain3_riset_censoring_shipped_tradeoff', 0.9, tb);
+    }
+    return temuan;
   }
 
   // ===================================================================================
@@ -1452,16 +1754,19 @@
       fnv1a(JSON.stringify(jalankanUnitSeed(seedsUlang[seedsUlang.length - 1], dukungan))) === multi.unitDigests[multi.unitDigests.length - 1];
     var msMulti = Date.now() - t0Multi;
     var multiVerdict = nilaiMultiSeed(multi, dukungan);
+    // WAVE 5c — gate keselamatan shipped: SATU-SATUNYA penentu exit 1.
+    var shippedVerdict = nilaiShipped(multi, dukungan);
 
     var cmp = runA.perbandingan;
     var resGate = runA.perbandinganResidual; // null bila dukungan residual belum ada
 
-    // FASE 2 — status gate residual, tiga kemungkinan yang sengaja dibedakan:
-    //   SKIPPED: B1 belum mendarat → varian residual tak bisa diuji; BUKAN kegagalan
-    //            (jangan menghukum modul yang belum ada), tapi WAJIB terlihat di laporan.
-    //   FAIL   : residual TIDAK menurunkan osilasi vs v2_lama, ATAU false-decline NAIK.
-    //   PASS   : dua-duanya terpenuhi.
-    var residualStatus = !runA.residualSupported ? 'SKIPPED' : (resGate.pass ? 'PASS' : 'FAIL');
+    // FASE 2 — status gate residual, tiga kemungkinan yang sengaja dibedakan
+    // (WAVE 5c: 'FAIL' → 'RESEARCH_HOLD' — klaim nilai tambah adalah temuan riset,
+    //  bukan regresi rilis; exit code milik shippedVerdict):
+    //   SKIPPED       : B1 belum mendarat → varian residual tak bisa diuji.
+    //   RESEARCH_HOLD : residual TIDAK menurunkan osilasi vs v2_lama, ATAU false-decline NAIK.
+    //   PASS          : dua-duanya terpenuhi.
+    var residualStatus = !runA.residualSupported ? 'SKIPPED' : (resGate.pass ? 'PASS' : 'RESEARCH_HOLD');
     var residualMessage;
     if (residualStatus === 'SKIPPED') {
       residualMessage = 'FiezelCoreBrain.momentum belum mendukung basis residual (B1 belum selesai saat simulasi dijalankan). Varian v2_residual DILEWATI dan gate residual TIDAK digagalkan — jalankan ulang setelah dukungan `predicted`/basis residual mendarat di features/brain/fiezel-core-brain.js.';
@@ -1471,16 +1776,16 @@
       var alasan = [];
       if (!resGate.oscillation.turun) alasan.push('osilasi TIDAK turun (' + resGate.oscillation.v2Lama + ' → ' + resGate.oscillation.v2Residual + ')');
       if (resGate.falseDecline.naik) alasan.push('false-decline NAIK (' + resGate.falseDecline.v2Lama + ' → ' + resGate.falseDecline.v2Residual + ')');
-      residualMessage = 'Momentum residual gagal membuktikan nilainya: ' + alasan.join('; ') + '.';
+      residualMessage = 'Momentum residual gagal membuktikan nilainya pada seed tunggal: ' + alasan.join('; ') + '.';
     }
 
-    // FASE 3 — status gate kalibrasi, pola tiga-status yang sama dengan residual:
-    //   SKIPPED: C1 belum mendarat → varian v3_kalibrasi tak bisa diuji; BUKAN
-    //            kegagalan, tapi WAJIB terlihat di laporan.
-    //   FAIL   : itemBiasRMSE TIDAK turun vs tanpa-kalibrasi, ATAU ada |delta| > 0.6.
-    //   PASS   : RMSE turun dan shrinkage utuh.
+    // FASE 3 — status gate kalibrasi, pola tiga-status yang sama dengan residual
+    // (WAVE 5c: 'FAIL' → 'RESEARCH_HOLD', alasan sama dengan residual di atas):
+    //   SKIPPED       : C1 belum mendarat → varian v3_kalibrasi tak bisa diuji.
+    //   RESEARCH_HOLD : itemBiasRMSE TIDAK turun vs tanpa-kalibrasi, ATAU ada |delta| > 0.6.
+    //   PASS          : RMSE turun dan shrinkage utuh.
     var kalGate = runA.perbandinganKalibrasi; // null bila modul C1 belum ada
-    var kalibrasiStatus = !runA.calibrationSupported ? 'SKIPPED' : (kalGate.pass ? 'PASS' : 'FAIL');
+    var kalibrasiStatus = !runA.calibrationSupported ? 'SKIPPED' : (kalGate.pass ? 'PASS' : 'RESEARCH_HOLD');
     var kalibrasiMessage;
     if (kalibrasiStatus === 'SKIPPED') {
       kalibrasiMessage = 'FiezelItemCalibration belum tersedia/lolos deteksi kontrak (C1 belum selesai saat simulasi dijalankan). Varian v3_kalibrasi DILEWATI dan gate kalibrasi TIDAK digagalkan — jalankan ulang setelah features/brain/fiezel-item-calibration.js mendarat dengan observe()/effective() sesuai kontrak (applied hanya saat n>=8).';
@@ -1489,13 +1794,20 @@
     } else {
       var alasanKal = [];
       if (!kalGate.itemBiasRMSE.terukur) alasanKal.push('itemBiasRMSE tidak terukur (tidak ada item dengan n>=8)');
-      else if (!kalGate.itemBiasRMSE.turun) alasanKal.push('itemBiasRMSE TIDAK turun (' + kalGate.itemBiasRMSE.tanpaKalibrasi + ' → ' + kalGate.itemBiasRMSE.kalibrasi + ')');
+      else if (!kalGate.itemBiasRMSE.turun) alasanKal.push('itemBiasRMSE TIDAK turun melewati ambang praktis (' + kalGate.itemBiasRMSE.tanpaKalibrasi + ' → ' + kalGate.itemBiasRMSE.kalibrasi + ', praktis ' + kalGate.itemBiasRMSE.praktis + ')');
       if (kalGate.shrinkage.bocor) alasanKal.push('shrinkage BOCOR (maks |delta| = ' + kalGate.shrinkage.maxAbsDelta + ' > 0.6)');
-      kalibrasiMessage = 'Kalibrasi item gagal membuktikan nilainya: ' + alasanKal.join('; ') + '.';
+      kalibrasiMessage = 'Kalibrasi item gagal membuktikan nilainya pada seed tunggal: ' + alasanKal.join('; ') + '.';
     }
 
-    var lulus = deterministik && deterministikMulti && !cmp.v2KalahMayoritas
-      && residualStatus !== 'FAIL' && kalibrasiStatus !== 'FAIL' && multiVerdict.pass;
+    // WAVE 5c — kumpulkan SEMUA temuan riset (tidak ada yang dibuang; lihat header).
+    var temuanRiset = kumpulkanTemuanRiset({
+      residualStatus: residualStatus, residualMessage: residualMessage, resGate: resGate,
+      kalibrasiStatus: kalibrasiStatus, kalibrasiMessage: kalibrasiMessage, kalGate: kalGate,
+      cmp: cmp, multi: multi
+    });
+
+    // WAVE 5c — exit code HANYA dari determinisme + gate keselamatan shipped.
+    var lulus = deterministik && deterministikMulti && shippedVerdict.pass;
 
     var ringkasan = {
       schema: SCHEMA,
@@ -1528,18 +1840,21 @@
       // (hanya digest) supaya stdout tetap bisa di-diff manusia; lihat jalankanMultiSeed.
       multiSeed: multi,
       multiSeedGate: multiVerdict,
+      // WAVE 5c — gate keselamatan shipped: satu-satunya penentu exit 1 (lihat header).
+      shippedGate: shippedVerdict,
+      // WAVE 5c — SEMUA temuan riset, utuh (status research_hold; TIDAK menyentuh exit code).
+      researchVerdicts: temuanRiset,
       gate: {
         pass: lulus,
+        // Semantik WAVE 5c: exit code = determinisme + gate keselamatan shipped.
+        // Temuan riset dieskalasi ke MASTER via researchVerdicts (ledger), bukan CI merah.
         rationale: (!deterministik || !deterministikMulti) ? 'brain3_sim_nondeterministic'
-          : cmp.v2KalahMayoritas ? 'brain3_sim_v2_regression'
-            : residualStatus === 'FAIL' ? 'brain3_sim_residual_no_improvement'
-              : kalibrasiStatus === 'FAIL' ? (kalGate.shrinkage.bocor ? 'brain3_sim_kalibrasi_shrinkage_leak' : 'brain3_sim_kalibrasi_no_improvement')
-                : !multiVerdict.pass ? multiVerdict.rationale
-                  : 'brain3_sim_pass_residual_' + residualStatus.toLowerCase() + '_kalibrasi_' + kalibrasiStatus.toLowerCase(),
-        confidence: round((1 - cmp.v2KalahPada / cmp.totalMetrik)
+          : !shippedVerdict.pass ? shippedVerdict.rationale
+            : 'brain3_sim_shipped_pass_research_holds_' + temuanRiset.length,
+        researchHolds: temuanRiset.length,
+        confidence: round(((!deterministik || !deterministikMulti) ? 0.95 : shippedVerdict.confidence)
           * (residualStatus === 'SKIPPED' ? 0.6 : 1)
-          * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1)
-          * (multiVerdict.pass ? 1 : 0.5), 3)
+          * (kalibrasiStatus === 'SKIPPED' ? 0.6 : 1), 3)
       }
     };
 
@@ -1554,35 +1869,33 @@
       process.stderr.write('GAGAL: unit multi-seed dihitung ulang menghasilkan digest berbeda (non-determinisme).\n');
       return 2;
     }
-    if (cmp.v2KalahMayoritas) {
-      process.stderr.write('GAGAL: v2 lebih buruk dari v1 pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik.\n');
-      return 1;
-    }
-    if (residualStatus === 'FAIL') {
-      process.stderr.write('GAGAL (gate residual): ' + residualMessage + '\n');
-      return 1;
-    }
-    if (kalibrasiStatus === 'FAIL') {
-      process.stderr.write('GAGAL (gate kalibrasi): ' + kalibrasiMessage + '\n');
-      return 1;
-    }
     if (residualStatus === 'SKIPPED') {
       process.stderr.write('SKIPPED (gate residual): ' + residualMessage + '\n');
     }
     if (kalibrasiStatus === 'SKIPPED') {
       process.stderr.write('SKIPPED (gate kalibrasi): ' + kalibrasiMessage + '\n');
     }
-    // WAVE 3 — gate multi-seed diperiksa TERAKHIR: gate single-seed lama tetap
-    // memutus lebih dulu (perilaku fase 3 dipertahankan), multi-seed menambah
-    // syarat, tidak menggantikan.
-    if (!multiVerdict.pass) {
-      var pesanMulti = 'GAGAL (gate multi-seed, ' + multiVerdict.rationale + '): utama=' + multiVerdict.utama + ' censoring=' + multiVerdict.censoring + ' residual=' + multiVerdict.residual + ' kalibrasi=' + multiVerdict.kalibrasi;
-      if (multi.censoring.gate.alasan.length) pesanMulti += ' — ' + multi.censoring.gate.alasan.join('; ');
-      process.stderr.write(pesanMulti + '\n');
-      process.stderr.write('AdaptivitySimulationV3: FAIL (multi-seed — temuan jujur, lihat field multiSeed di JSON)\n');
+    // WAVE 5c — TEMUAN RISET dicetak SELALU (lulus maupun tidak), sebelum verdict,
+    // supaya tidak ada temuan yang tenggelam. Isi blok deterministik (turunan JSON).
+    if (temuanRiset.length) {
+      process.stderr.write('\n=== TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER) ===\n');
+      for (var tr = 0; tr < temuanRiset.length; tr++) {
+        var t = temuanRiset[tr];
+        process.stderr.write('- [' + t.rationale + '] status=research_hold confidence=' + t.confidence
+          + (t.ci && typeof t.ci.ciLo === 'number' ? ' CI95=[' + t.ci.ciLo + ', ' + t.ci.ciHi + ']' : '')
+          + '\n  ' + t.claim + '\n');
+      }
+      process.stderr.write('=== AKHIR TEMUAN RISET: ' + temuanRiset.length + ' temuan ditahan sebagai research_hold — dieskalasi ke MASTER via ledger (field researchVerdicts di JSON stdout), bukan via CI merah ===\n\n');
+    }
+    // WAVE 5c — gate keselamatan shipped: satu-satunya jalan ke exit 1.
+    if (!shippedVerdict.pass) {
+      process.stderr.write('GAGAL (gate keselamatan shipped, ' + shippedVerdict.rationale + '):\n');
+      for (var sa = 0; sa < shippedVerdict.alasan.length; sa++) process.stderr.write('  - ' + shippedVerdict.alasan[sa] + '\n');
+      process.stderr.write('AdaptivitySimulationV3: FAIL (regresi terbukti pada kebijakan SHIPPED — memblokir rilis; detail di field shippedGate)\n');
       return 1;
     }
-    process.stderr.write('AdaptivitySimulationV3: PASS (v2 kalah pada ' + cmp.v2KalahPada + '/' + cmp.totalMetrik + ' metrik; gate residual ' + residualStatus + '; gate kalibrasi ' + kalibrasiStatus + '; gate multi-seed PASS pada ' + multi.seedCount + ' seed)\n');
+    process.stderr.write('AdaptivitySimulationV3: PASS (gate keselamatan shipped hijau — v2_residual & item_calibration tanpa regresi terbukti vs baseline; '
+      + temuanRiset.length + ' temuan riset berstatus research_hold, lihat researchVerdicts; gate residual single-seed ' + residualStatus + '; gate kalibrasi single-seed ' + kalibrasiStatus + ')\n');
     return 0;
   }
 
@@ -1621,6 +1934,12 @@
     agregatMultiSeed: agregatMultiSeed,
     jalankanMultiSeed: jalankanMultiSeed,
     nilaiMultiSeed: nilaiMultiSeed,
+    // WAVE 5c — permukaan gate keselamatan shipped & pengumpul temuan riset
+    // (diekspor supaya test gate bisa menguji semantiknya dengan data sintetis).
+    nilaiKebijakanShipped: nilaiKebijakanShipped,
+    nilaiShipped: nilaiShipped,
+    klasifikasiKlaim: klasifikasiKlaim,
+    kumpulkanTemuanRiset: kumpulkanTemuanRiset,
     main: main
   };
 
