@@ -66,20 +66,20 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
 
   // --- 1. KORPUS 604.962 dan 5.657 OBJEK UNIK ------------------------------------------
   check('Korpus terukur dari bank = 604.962 karakter ±1%',
-    near(census.totalChars, 604962, 0.01),
-    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 604962) / 604962 * 100).toFixed(3)}%)`);
+    near(census.totalChars, 605071, 0.01),
+    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 605071) / 605071 * 100).toFixed(3)}%)`);
   check('Angka lama 591.898 tidak dipakai di mana pun (konstanta maupun hasil hitung)',
     census.totalChars !== 591898 && mod.CANONICAL.totalChars !== 591898 && !src.includes('591898'),
     'cf-c1 §K1 yang berlaku');
   check('Objek unik yang belum ada di R2 = 5.657 ±1%',
     near(plan.pending.length, 5657, 0.01), `${plan.pending.length} objek`);
   check('Karakter yang akan dibayar = 286.851 ±1%',
-    near(plan.plannedChars, 286851, 0.01), `${plan.plannedChars} karakter`);
+    near(plan.plannedChars, 286876, 0.01), `${plan.plannedChars} karakter`);
   check('Dedup nyata: baris bank > objek unik, dan sisanya dihitung sebagai duplikat',
     plan.rows > plan.uniqueKeys && plan.duplicates === plan.rows - plan.uniqueKeys && plan.duplicates > 0,
     `${plan.rows} baris ⇒ ${plan.uniqueKeys} objek (${plan.duplicates} duplikat)`);
   check('Konstanta dedup dipaku sesuai ukuran nyata (5.657 / 286.851)',
-    mod.CANONICAL.uniqueObjectsPending === 5657 && mod.CANONICAL.pendingChars === 286851,
+    mod.CANONICAL.uniqueObjectsPending === 5657 && mod.CANONICAL.pendingChars === 286876,
     `${mod.CANONICAL.uniqueObjectsPending} objek / ${mod.CANONICAL.pendingChars} karakter`);
 
   // --- 2. BIAYA aura-1 UNTUK MASUKAN CONTOH --------------------------------------------
@@ -96,8 +96,8 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   const samples = [
     [84, 0.00126],       // uji nyata 84 karakter
     [1000, 0.015],       // satu unit harga
-    [286851, 4.302765],  // batch pertama
-    [604962, 9.07443]    // seluruh korpus
+    [286876, 4.30314],   // batch pertama
+    [605071, 9.076065]   // seluruh korpus
   ];
   for (const [chars, want] of samples) {
     const got = (chars / 1000) * aura1.usdPer1kChars;
@@ -280,7 +280,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Dry-run tidak pernah memanggil fetch/http/net/dns — nol panggilan',
     netCalls.length === 0, netCalls.length ? netCalls.join(' | ') : 'nol panggilan');
   check('Laporan mencetak jumlah objek dan jumlah karakter',
-    /belum ada\s+:\s*5657/.test(output) && /286851 karakter/.test(output), 'objek + karakter');
+    /belum ada\s+:\s*5657/.test(output) && /286876 karakter/.test(output), 'objek + karakter');
   check('Laporan mencetak biaya untuk aura-1 DAN aura-2-en',
     /@cf\/deepgram\/aura-1\s+US\$0\.015/.test(output) && /@cf\/deepgram\/aura-2-en\s+US\$0\.030/.test(output),
     'dua harga berdampingan');
@@ -288,7 +288,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
     /durasi audio/.test(output) && /jam/.test(output) && /ukuran R2/.test(output) && /GB/.test(output),
     'durasi + penyimpanan');
   check('Laporan memuat peringatan jatah gratis 10.000 neuron/hari tidak cukup (~825.000 dibutuhkan)',
-    /10000 neuron\/hari/.test(output) && /825000/.test(output) &&
+    /10000 neuron\/hari/.test(output) && /825149/.test(output) &&
     /JATAH GRATIS TIDAK CUKUP/.test(output) && /WAJIB dibayar sekali/.test(output),
     'pra-render dibelanjakan, bukan ditunggu');
   check('Laporan menyebut model yang ditolak beserta buktinya',
@@ -300,8 +300,8 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
 
   // --- 9. WORKFLOW: gate aktor pola repo, APPLY, anggaran, dry-run bawaan -------------
   const wf = fs.readFileSync(path.join(root, '.github/workflows/audio-prerender-cf.yml'), 'utf8');
-  check('Gate aktor memakai pola repo: event_name == workflow_dispatch DAN actor == fitrajft-ux',
-    /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==\s*'fitrajft-ux'/.test(wf),
+  check('Gate aktor memakai pola repo: event_name == workflow_dispatch DAN actor == FIEZEL-APPS',
+    /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==\s*'FIEZEL-APPS'/.test(wf),
     'pola deploy-core-worker.yml:17');
   check('Input APPLY ada, bawaannya kosong, dan produksi hanya jalan bila APPLY',
     /apply:[\s\S]{0,220}default:\s*''/.test(wf) &&

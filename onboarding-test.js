@@ -394,16 +394,21 @@ test('perkenalan tampil walau komponen maskot tidak ada', () => {
 // jadi acak atau seragam, maskotnya kembali jadi hiasan dan tes ini yang jatuh lebih dulu.
 test('setiap langkah membawa pose maskot yang kontekstual, bukan acak', () => {
   const env = fakeEnv();
-  const intent = (html) => (String(html).match(/data-ob-mascot-intent="([a-z]+)"/) || [])[1];
+  // Niat boleh memakai nama state pustaka master yang bertanda hubung (lesson-start,
+  // welcome-back) - regexnya mengikuti (Fase 6 desain-ulang PAW).
+  const intent = (html) => (String(html).match(/data-ob-mascot-intent="([a-z-]+)"/) || [])[1];
   assert.strictEqual(intent(onboarding.nameMarkup(env, '')), 'greeting', 'langkah nama harus menyapa');
-  assert.strictEqual(intent(onboarding.carouselMarkup(env, 0)), 'curious');
+  assert.strictEqual(intent(onboarding.carouselMarkup(env, 0)), 'lesson-start',
+    'slide pembuka memakai niat pembuka sesi; sebelum rig baru mendarat ia luruh ke curious lewat MASCOT_CHAIN');
   assert.strictEqual(intent(onboarding.carouselMarkup(env, 1)), 'listening',
     'slide suara neural harus memakai pose mendengarkan');
   assert.strictEqual(intent(onboarding.goalMarkup(env, '', '')), 'curious');
   assert.strictEqual(intent(onboarding.goalMarkup(env, 'school', '')), 'observing',
     'setelah tujuan dipilih, maskot mengamati pilihan level');
   assert.strictEqual(intent(onboarding.placementMarkup(env)), 'encouraging');
-  assert.strictEqual(intent(onboarding.scheduleMarkup(env)), 'sleepy');
+  // Langkah pengingat: calm - "at ease", bukan bosan (spesifikasi 11 §2.2 langkah 5);
+  // sebelum rig Direction C mendarat, MASCOT_CHAIN meluruhkannya ke sleepy.
+  assert.strictEqual(intent(onboarding.scheduleMarkup(env)), 'calm');
   assert.strictEqual(intent(onboarding.summaryMarkup(env, 'Ayu', 'school', 'A2', false)), 'celebrating');
   // Kurangi-gerak: pose yang tenang dipakai SEJAK cat pertama, bukan lompatan yang lalu
   // dibekukan setengah jalan oleh CSS.

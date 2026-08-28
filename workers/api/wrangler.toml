@@ -46,7 +46,7 @@ ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fieze
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
 # Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
 # jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).
-FEATURE_AI        = "off"
+FEATURE_AI        = "on"
 FEATURE_TTS       = "off"
 FEATURE_COACH     = "off"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.

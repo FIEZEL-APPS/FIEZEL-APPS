@@ -141,22 +141,22 @@
     error_system:           { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
     lesson_start:           { gain: 1.0, cooldownMs: 1000,  caller: 'app' },
     lesson_complete:        { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
-    level_up:               { gain: 1.0, cooldownMs: 3000,  caller: 'preview' },
+    level_up:               { gain: 1.0, cooldownMs: 3000,  caller: 'app' },      // [SFX-WIRING] milestone once-ever non-streak (pawMilestone app.js)
     streak_5:               { gain: 1.0, cooldownMs: 1500,  caller: 'app' },
-    streak_10:              { gain: 1.0, cooldownMs: 1500,  caller: 'preview' },
+    streak_10:              { gain: 1.0, cooldownMs: 1500,  caller: 'app' },      // [SFX-WIRING] milestone runtun hari 7/30/100 (pawStreakWatch)
     xp_gain:                { gain: 1.0, cooldownMs: 80,    caller: 'app' },
     exam_complete:          { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
     exam_pass:              { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
     exam_result_reveal:     { gain: 1.0, cooldownMs: 1500,  caller: 'preview' },
     exam_score_tick:        { gain: 1.0, cooldownMs: 0,     caller: 'preview' },
     notif_general:          { gain: 1.0, cooldownMs: 4000,  caller: 'app' },
-    notif_achievement:      { gain: 1.0, cooldownMs: 4000,  caller: 'preview' },
+    notif_achievement:      { gain: 1.0, cooldownMs: 4000,  caller: 'app' },      // [SFX-WIRING] prasasti/lencana terbit (presentPrasastiMoment)
     notif_streak_reminder:  { gain: 1.0, cooldownMs: 4000,  caller: 'app' },
     // PUTUSAN OWNER: paw_greet = bunyi tanda tangan. Sekali per sesi cukup - sapaan yang
     // diulang berhenti terdengar sebagai sapaan.
     paw_greet:              { gain: 1.0, cooldownMs: 8000,  maxPerSession: 2, caller: 'app' },
     // Entrance ≥8 dtk antar-bunyi, sekali per mount (14 §3.2) - cooldown yang menjaganya.
-    paw_appear:             { gain: 1.0, cooldownMs: 8000,  caller: 'module' },
+    paw_appear:             { gain: 1.0, cooldownMs: 8000,  caller: 'module' },   // [SFX-WIRING] coach-bubble + slot paw + onboarding
     // Encourage: maksimal 2/sesi, jarak ≥20 dtk (09 §4 / 14 §3.2).
     paw_encourage:          { gain: 1.0, cooldownMs: 20000, maxPerSession: 2, caller: 'app' },
     paw_celebrate:          { gain: 1.0, cooldownMs: 3000,  caller: 'app' },
