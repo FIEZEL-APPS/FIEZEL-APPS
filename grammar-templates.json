@@ -906,7 +906,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Select past continuous for a longer background action interrupted by a shorter past-simple event",
       "misconceptionTargeted": "Learner picks past simple for both clauses because both events are 'in the past', ignoring which action was already in progress",
-      "reasoningOperation": "identify background/interrupting relationship -> assign aspect to each clause",
+      "reasoningOperation": "identify background/interrupting relationship -> match the aspect to each clause",
       "stem": "I ___ dinner when the power suddenly went out.",
       "options": [
         "cooked",
@@ -2082,7 +2082,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use the gerund after a preposition and the to-infinitive to express purpose, without confusing the two structures",
       "misconceptionTargeted": "Learner inserts 'to' directly after a preposition instead of switching to the gerund form required after prepositions",
-      "reasoningOperation": "decide whether the phrase answers 'why' (purpose -> to-infinitive) or follows a preposition (-> gerund) -> choose the form",
+      "reasoningOperation": "decide whether the phrase answers 'why' with a purpose to-infinitive or follows a preposition with a gerund -> choose the form",
       "stem": "She left work early ___ time to prepare for the interview.",
       "options": [
         "for having",
@@ -4322,7 +4322,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner distinguishes causative 'have something done' (arranging for someone else to do it) from ordinary passive voice.",
       "misconceptionTargeted": "Learners use plain passive when the sentence actually needs the causative structure to show the subject arranged the action.",
-      "reasoningOperation": "First test whether this is a plain passive with was/were + past participle; if the subject arranged the service, switch the auxiliary to 'had' in the causative frame had + object + past participle.",
+      "reasoningOperation": "check whether this is a plain passive with was/were + past participle; convert the auxiliary to 'had' in the causative frame had + object + past participle when the subject arranged the service",
       "stem": "We ___ our roof repaired last week after the storm damaged it.",
       "options": [
         "had",
@@ -5778,7 +5778,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner selects the correct complementation pattern for reporting verbs that require a gerund or preposition + gerund (deny + gerund; apologize for + gerund).",
       "misconceptionTargeted": "Learners apply the generic 'reporting verb + that-clause' pattern to verbs that actually require gerund complementation.",
-      "reasoningOperation": "Recognize the specific complementation pattern fixed to each reporting verb (deny + gerund; apologize for + gerund) rather than defaulting to 'that'.",
+      "reasoningOperation": "Recognize the specific complementation pattern fixed to each reporting verb (deny + gerund, apologize for + gerund) rather than defaulting to 'that'.",
       "stem": "He apologized ____ late to the meeting.",
       "options": [
         "for being",
@@ -6730,7 +6730,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "A plural noun phrase, two books, requires are.",
       "misconceptionTargeted": "Learner keeps singular 'is' after 'there' even though the real subject 'two books' is plural, or reaches for the bare form 'be' or the past form 'was'.",
-      "reasoningOperation": "look past 'there' to the noun phrase that follows -> identify 'two books' as plural -> select are",
+      "reasoningOperation": "locate the noun phrase after 'there' -> identify 'two books' as plural -> select are",
       "stem": "There ___ two books on the table.",
       "options": [
         "is",
@@ -6898,7 +6898,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Construct a mixed conditional in which an unreal past decision controls a hypothetical future event.",
       "misconceptionTargeted": "Learner forces both clauses into the same time frame and loses the past-to-future relationship.",
-      "reasoningOperation": "date the unreal condition in the past -> date the consequence in the future -> combine past perfect with would be + -ing",
+      "reasoningOperation": "place the unreal condition in the past -> place the consequence in the future -> combine past perfect with would be + -ing",
       "stem": "Which completion presents the start as something that would still be under way on that future day? If the board had approved the budget last month, construction ___ next Monday.",
       "options": [
         "would be starting",
@@ -7906,7 +7906,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Mark ownership with apostrophe + s attached to the owner's name",
       "misconceptionTargeted": "Learner shows possession by putting two nouns side by side as in 'tas Sinta', or writes a plural-looking -s without the apostrophe",
-      "reasoningOperation": "identify the owner and the thing owned -> attach 's to the owner's name and place it before the noun",
+      "reasoningOperation": "identify the owner and the thing owned -> add 's to the owner's name and place it before the noun",
       "stem": "Is this ___ bag? She was sitting here a minute ago.",
       "options": [
         "Sinta",
@@ -8466,7 +8466,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use sentential 'which' after a comma to comment on a whole preceding clause",
       "misconceptionTargeted": "Learner reaches for 'what', 'that', or a fresh pronoun to refer back to a whole clause, mapping Indonesian 'yang' onto the wrong English word",
-      "reasoningOperation": "check what the relative points back to, a noun or the whole previous clause -> after a comma, select 'which' for a clause antecedent",
+      "reasoningOperation": "check what the relative points back to, a noun or the whole previous clause -> select 'which' after the comma for a clause antecedent",
       "stem": "The shipment arrived nine days late, ___ forced the plant to halt its assembly line.",
       "options": [
         "what",
@@ -8522,7 +8522,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use generic 'the' with a singular noun for statements about a species or class as a whole",
       "misconceptionTargeted": "Learner picks an article or determiner that quantifies individual animals, although extinction is a property of the class itself",
-      "reasoningOperation": "test whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
+      "reasoningOperation": "check whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
       "stem": "___ Sumatran tiger is now on the brink of extinction, with fewer than four hundred individuals left in the wild.",
       "options": [
         "A",
@@ -8576,6 +8576,6 @@
   "indonesianCoverage": {
     "translated": 153,
     "total": 153,
-    "updatedAt": "2026-08-27"
+    "updatedAt": "2026-08-28"
   }
 }
