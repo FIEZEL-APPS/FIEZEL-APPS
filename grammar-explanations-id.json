@@ -3533,6 +3533,30 @@
           "whyFails": "“Any Sumatran tiger” nyuruh milih ekor sembarang, padahal kalimatnya ngeklaim spesiesnya sebagai unit."
         }
       }
+    },
+    "CM-005": {
+      "objective": "Ingat kalau good dan bad punya bentuk banding khusus: better dan worse, bukan pola -er atau “more” biasa.",
+      "misconception": "Kamu bikin bentuk banding good dan bad pakai pola biasa kayak “more good” atau “gooder”.",
+      "reasoning": "kenali kata sifat yang bentuk bandingnya khusus → panggil bentuk banding hafalannya",
+      "rule": "Beberapa kata sifat punya bentuk banding khusus: good jadi better, bad jadi worse, far jadi farther. Kata-kata ini nolak akhiran -er dan kata “more”.",
+      "whyCorrect": "“Better ... than” itu bentuk banding khusus dari “good”, pas banget buat mbandingin dua olahraga.",
+      "whyOthersFail": "“More good” dan “gooder” maksa pola biasa ke kata yang bentuknya khusus. “Best” malah nunjuk juara kelompok, bukan mbandingin dua hal.",
+      "howToAvoid": "Sebelum nambah -er atau “more”, cek dulu: kata sifatnya masuk daftar bentuk khusus atau nggak. Kalau iya, panggil bentuk hafalannya.",
+      "memoryCue": "Good jadi better, bad jadi worse. Hafalin pasangannya kayak hafal lawan kata.",
+      "distractors": {
+        "more good": {
+          "misconception": "pola “more + kata sifat” dipakai padahal kata sifatnya punya bentuk banding khusus.",
+          "whyFails": "“good” nggak pernah digandeng “more”, bentuk bandingnya memang kata khusus “better”."
+        },
+        "gooder": {
+          "misconception": "akhiran -er dipaksakan ke kata sifat yang bentuk bandingnya khusus.",
+          "whyFails": "kata “gooder” nggak ada di bahasa Inggris, “good” berubah total jadi “better”."
+        },
+        "best": {
+          "misconception": "bentuk juara kelompok dipakai padahal “than” minta bentuk banding dua hal.",
+          "whyFails": "“best” nunjuk juara satu kelompok, nggak bisa digandeng “than” buat dua hal."
+        }
+      }
     }
   }
 }

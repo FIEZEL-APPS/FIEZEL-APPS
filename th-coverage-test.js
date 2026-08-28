@@ -17,7 +17,7 @@
  *      th-only yang SAH hanya 2 kunci gems (W2-INT §3: padanan id-nya FUNGSI perakit).
  *   2. naskah-th-brain.js vs tabel internal 6 modul brain — kunci 1:1 dua arah per domain
  *      (kontrak W3-BRAIN-TH: kunci = kode rationale / kunci 'brain-*.…' modul).
- *   3. grammar-explanations-th.json vs grammar-templates.json — 153/153 id template, urutan
+ *   3. grammar-explanations-th.json vs grammar-templates.json — 154/154 id template, urutan
  *      bank, kunci distraktor byte-identik dengan opsi distraktor bank (klaim W4-MERGE §1),
  *      8 bidang wajib terisi, dan semua nilai ber-aksara Thai (banding ke padanan
  *      grammar-explanations-id.json untuk pengecualian locale-netral, mis. memoryCue yang
@@ -210,8 +210,8 @@ check('grammar: skema & status DRAFT AI ada di header',
 
 const bankIds = bank.templates.map((t) => t.id);
 const thIds = Object.keys(grammarTh.templates || {});
-check('grammar: 153/153 id template, urut bank, tanpa selisih',
-  bankIds.length === 153 && thIds.length === 153 && bankIds.join('|') === thIds.join('|'),
+check('grammar: 154/154 id template, urut bank, tanpa selisih',
+  bankIds.length === 154 && thIds.length === 154 && bankIds.join('|') === thIds.join('|'),
   'bank=' + bankIds.length + ' th=' + thIds.length);
 
 const BIDANG_WAJIB = ['objective', 'misconception', 'reasoning', 'rule', 'whyCorrect', 'whyOthersFail', 'howToAvoid', 'memoryCue'];

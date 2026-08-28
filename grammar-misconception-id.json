@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "note": "Diagnosis Indonesia untuk tiap nama miskonsepsi di grammar-templates.json. Kunci = nama miskonsepsi apa adanya dari bank soal (bahasa Inggris, tidak pernah ditampilkan ke murid). Nilai = klausa Indonesia berhuruf kecil di awal, dirangkai sebagai `\"pilihan\" <klausa>` di panel jawaban dan sebagai `Ini yang bikin pilihan tadi gagal - <klausa>` oleh tutor.",
-  "count": 458,
+  "count": 461,
   "diagnoses": {
     "adds a dummy cleft subject and creates two competing subjects": "nambah 'it', padahal klausa 'what'-nya udah jadi subjek, akibatnya subjeknya dobel.",
     "adds emphatic do but does not invert it with the subject": "udah pakai kata bantu penegas, tapi posisinya masih sesudah subjek, jadi inversinya belum terjadi.",
@@ -460,6 +460,9 @@
     "starting a fresh pronoun clause and splicing two sentences together in a non-standard join": "mulai klausa baru pakai kata ganti, jadinya dua kalimat utuh cuma ditempel koma doang.",
     "using the indefinite article for a claim about the whole species, which only fits one-member-at-a-time statements": "pakai artikel tak tentu buat klaim soal satu spesies utuh, padahal satu ekor doang nggak bisa dibilang nyaris punah.",
     "spreading the claim over each countable member, though dying out can only be true of the class": "nyebarin klaimnya ke tiap ekor satu per satu, padahal kepunahan cuma bisa bener buat kelasnya sebagai kesatuan.",
-    "picking the free-choice quantifier, which selects random members rather than naming the species": "milih kata yang nunjuk anggota acak mana aja, padahal kalimatnya ngomongin spesiesnya sebagai satu kesatuan."
+    "picking the free-choice quantifier, which selects random members rather than naming the species": "milih kata yang nunjuk anggota acak mana aja, padahal kalimatnya ngomongin spesiesnya sebagai satu kesatuan.",
+    "regular 'more + adjective' pattern applied to an irregular adjective": "maksa pola 'more + kata sifat', padahal 'good' punya bentuk banding khusus, yaitu 'better'.",
+    "regular -er ending forced onto an irregular adjective": "nempel akhiran -er ke kata sifat yang bentuknya khusus, jadinya muncul kata yang nggak ada.",
+    "superlative 'best' used where 'than' demands a comparative": "pakai bentuk juara kelompok, padahal 'than' minta bentuk banding buat dua hal."
   }
 }

@@ -68,7 +68,7 @@ assert(/window\.__getFiezelState/.test(app),'test state hook missing');
 assert(V.length===1765,'active vocabulary master count changed unexpectedly');
 assert(V.filter(v=>v.status==='complete').length===1765,'active vocabulary contains incomplete records');
 assert(V.some(v=>v.level==='C2'&&v.status==='complete'),'C2 vocabulary is missing');
-assert(Object.keys(G).length===153,'grammar skills changed unexpectedly');
+assert(Object.keys(G).length===154,'grammar skills changed unexpectedly');
 assert(R.length===300,'reading bank unexpectedly reduced');
 for(const r of R)for(const q of r.qs||[]){assert(Array.isArray(q[1])&&q[1].length>=2,'reading question has too few options');const opts=q[1].map(x=>String(x).trim().toLowerCase());assert(new Set(opts).size===opts.length,`duplicate reading options in ${r.id}`);assert(Number.isInteger(q[2])&&q[2]>=0&&q[2]<q[1].length,`invalid reading answer in ${r.id}`)}
 
