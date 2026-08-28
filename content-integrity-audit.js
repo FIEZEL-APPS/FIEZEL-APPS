@@ -482,7 +482,7 @@ function bootApp() {
   const index = new Map();
   (function walk(dir) {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (['node_modules', '.git', 'vendor', 'assets', 'docs'].includes(e.name)) continue;
+      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: level-grammar-contract-test.js)
       const full = path.join(dir, e.name);
       if (e.isDirectory()) walk(full); else if (!index.has(e.name)) index.set(e.name, full);
     }
