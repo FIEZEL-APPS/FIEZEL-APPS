@@ -48,6 +48,19 @@
     return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelTtsProviderParams;
   }());
 
+  /**
+   * S2 - SATU-SATUNYA PINTU KE MODEL, sama seperti `route-ai.js`. Berkas ini dulu
+   * memanggil `env.AI.run(engineId, ...)` LANGSUNG dan TIDAK punya pagar neuron akun
+   * sama sekali - padahal mesin TTS-nya (`@cf/deepgram/aura-1`, `@cf/myshell-ai/melotts`)
+   * berjalan di binding Workers AI yang SAMA dan menghabiskan kolam 10.000 neuron/hari
+   * yang sama. Jadi jalur ini adalah lubang yang lebih lebar daripada dep opsional di
+   * `route-ai.js`: di sana plafonnya bisa lupa disambung, di sini ia tidak ada.
+   */
+  var ModelCallGate = (function () {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('../ai/model-call-gate.js');
+    return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelModelCallGate;
+  }());
+
   /** Sama alasannya dengan route-ai.js: E5 dan paket kuota harus bisa di-merge dalam urutan apa pun. */
   function resolveEnforceQuota(deps) {
     var d = deps || {};
@@ -104,6 +117,12 @@
     quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suara perangkatmu tetap bisa dipakai — coba lagi sebentar lagi, ya.',
     breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
     unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
+    // S2 - jatah neuron AKUN (bukan jatah murid) penuh: suara perangkat tetap jalan dan
+    // jatah murid TIDAK dipotong, jadi kalimatnya harus mengatakan dua hal itu.
+    account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
+    // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
+    // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
+    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena setelan di server belum lengkap. Jatahmu utuh.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
@@ -182,7 +201,7 @@
    * benar untuk mesin itu (`speaker` untuk keluarga aura). Menuliskannya inline di sini kembali =
    * mengembalikan cacat A12/1.
    */
-  async function callEngine(env, engineId, text, voiceId, locale, timeoutMs) {
+  async function callEngine(env, engineId, text, voiceId, locale, timeoutMs, reservation) {
     var options = {};
     if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
       options.signal = AbortSignal.timeout(timeoutMs);
@@ -190,7 +209,11 @@
     var input = ProviderParams.buildProviderInput({
       engineId: engineId, text: text, voiceId: voiceId, locale: locale
     });
-    var run = env.AI.run(engineId, input, options);
+    // S2 - lewat chokepoint, dengan tanda terima reservasi neuron akun. Tanpa tanda
+    // terima yang sah ini MELEMPAR dan mesin TTS tidak pernah disentuh.
+    var run = ModelCallGate.runReservedModel({
+      env: env, modelId: engineId, input: input, options: options, reservation: reservation
+    });
     var timer;
     var guard = new Promise(function (_, reject) {
       timer = setTimeout(function () {
@@ -208,6 +231,46 @@
     var status = Number(e.status || (e.response && e.response.status) || 0);
     if (status) return { status: status };
     return { networkError: true };
+  }
+
+  /**
+   * S2 - detik sampai 00:00 UTC. Jatah neuron akun berganti menurut UTC (jam vendor),
+   * BUKAN menurut reset jatah murid (Asia/Jakarta). Menjanjikan jam yang salah = janji
+   * palsu ke murid, dan murid akan mencoba lagi terlalu awal lalu ditolak lagi.
+   */
+  function secondsToUtcMidnight(nowMs) {
+    var ms = Number(nowMs) || 0;
+    var d = new Date(ms);
+    var next = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
+    return Math.max(1, Math.ceil((next - ms) / 1000));
+  }
+
+  /**
+   * S2 - AMPLOP PENOLAKAN PAGAR NEURON AKUN untuk jalur TTS.
+   *
+   * 503, bukan 429: 429 adalah bahasa "jatah MURID", dan ini bukan jatah murid. Yang
+   * tidak boleh berubah di cabang mana pun: `quotaCharged:false` - jatah suara murid
+   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi. Murid
+   * tetap punya jalan keluar yang nyata: suara perangkat (`speechSynthesis`), yang sudah
+   * menjadi jalur cadangan sah di aplikasi ini.
+   */
+  function accountDenied(identity, objectName, chars, phase, reason, started, now) {
+    var capReached = String(reason) === 'ai_account_cap';
+    var transient = reason === 'ai_budget_unreadable' || reason === 'ai_budget_store_missing';
+    var retryAfter = capReached ? secondsToUtcMidnight(started) : (transient ? 60 : 0);
+    var extra = {
+      audioKey: identity.audioKey, objectName: objectName, chars: chars,
+      source: 'unavailable', degraded: true, breaker: phase,
+      error: 'service_degraded',
+      copyKey: capReached ? 'tts.accountBudget' : 'tts.unavailable',
+      reason: String(reason || 'ai_account_cap'),
+      message: capReached ? POLITE.account_budget : POLITE.account_missing,
+      quotaChecked: false,
+      quotaCharged: false,
+      ms: now() - started
+    };
+    if (retryAfter) extra.retryAfter = retryAfter;
+    return json(baseResponse(extra), 503, retryAfter ? { 'retry-after': String(retryAfter) } : null);
   }
 
   async function handleRender(args) {
@@ -333,23 +396,60 @@
       return json(baseResponse(Object.assign({}, shared, { source: 'cache', coalesced: true })), 200);
     }
 
+    // LANGKAH 5b — S2: PAGAR NEURON AKUN, WAJIB. Urutannya disengaja: SESUDAH
+    // single-flight (permintaan yang digabungkan tidak memanggil mesin, jadi tidak boleh
+    // memesan neuron lagi) dan SESUDAH kuota murid (murid yang jatahnya habis tidak boleh
+    // ikut menghabiskan jatah akun). Biaya neuronnya diturunkan di tempat perakitan dari
+    // `chars` + `freeCharsPerDay` mesin yang BENAR-BENAR dipakai, bukan dari konstanta
+    // yang dieja di sini - supaya harga tidak bisa menyimpang dari mesinnya.
+    var accountBudget = typeof deps.accountBudget === 'function' ? deps.accountBudget : null;
+    if (!accountBudget) {
+      return accountDenied(identity, objectName, chars, gate.phase, 'ai_budget_dep_missing', started, now);
+    }
+    var reserved;
+    try {
+      reserved = await accountBudget({
+        env: env, ctx: a.ctx, request: a.request, kind: 'tts',
+        chars: chars, freeCharsPerDay: engine.freeCharsPerDay, engineId: engine.id, now: started
+      });
+    } catch (_) {
+      reserved = { allowed: false, reason: 'ai_budget_unreadable' };
+    }
+    if (!reserved || reserved.allowed !== true) {
+      return accountDenied(identity, objectName, chars, gate.phase,
+        String((reserved && reserved.reason) || 'ai_account_cap'), started, now);
+    }
+    if (!ModelCallGate.isReservation(reserved)) {
+      return accountDenied(identity, objectName, chars, gate.phase, 'ai_budget_receipt_invalid', started, now);
+    }
+
     var work = (async function () {
       var bytes = null;
       var failureKind = '';
+      var engineThrew = null;
       try {
         var result = await callEngine(
-          env, engine.id, identity.canonicalText, identity.voiceId, identity.locale, TTS_TIMEOUT_MS
+          env, engine.id, identity.canonicalText, identity.voiceId, identity.locale, TTS_TIMEOUT_MS,
+          reserved
         );
         bytes = toBytes(result);
         if (!bytes || byteSize(bytes) < 512) failureKind = 'empty_body';
       } catch (error) {
+        engineThrew = error;
         failureKind = Breaker.classify(signalFromError(error)) || 'unavailable';
       }
 
       if (failureKind) {
+        // S2 - neuron dilepas HANYA kalau panggilan tidak pernah sampai ke mesin. Timeout
+        // dan `empty_body` TIDAK dilepas: mesin sudah bekerja, neuronnya sudah terbelanja.
+        var released = false;
+        if (engineThrew && ModelCallGate.releasableFailure(engineThrew)) {
+          released = await ModelCallGate.releaseReservation(reserved, failureKind);
+        }
         var failed = Breaker.onFailure(gate.state, failureKind, now(), 0);
         if (store) await store.save(target, failed, now(), { changed: true, transition: true });
         return {
+          accountNeuronsReleased: !!released,
           audioKey: identity.audioKey, objectName: objectName, chars: chars,
           source: 'unavailable', degraded: true,
           breaker: Breaker.snapshot(failed, now()).breaker,
@@ -488,6 +588,8 @@
     CHEAP_ENGINE: CHEAP_ENGINE,
     TTS_TIMEOUT_MS: TTS_TIMEOUT_MS,
     POLITE: POLITE,
+    accountDenied: accountDenied,
+    secondsToUtcMidnight: secondsToUtcMidnight,
     registerTtsRoutes: registerTtsRoutes,
     handleRender: handleRender,
     handleManifest: handleManifest,
