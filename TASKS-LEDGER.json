@@ -1,6 +1,6 @@
 {
  "protocol_version": "v1.2",
- "updated": "2026-08-28T18:03:50.108257+00:00",
+ "updated": "2026-08-28T18:50:21.174148+00:00",
  "agents": [
   {
    "id": "coordinator-1",
@@ -416,6 +416,14 @@
    "owner": "perplexity-computer (m025-186-feedback-gaps)",
    "evidence": "branch agent/m025-186-feedback-gaps; diverifikasi terhadap main m025-185: wave D belum menyerap - bahasa classroom 281 field (38 lesson), explain kurasi 123 item cloze (sidecar cloze-explains-v1.json + mergeExplains di builder, regenerasi --write), reading 500 meta.why A1/A2 + perbaikan kunci-ganda + register kasual, POS -ly vocab (A03-F01 P0), revealCloze confidencePopThen (A16-F1), OLM mean-fix (A12-F1), weak-skill scoped ujian (A12-F2), klaim privasi speaking jujur (A06-004), tur listening replay (LG-01), tutor-brain escalate + wiring tutorStuck (A11-03), tutor-v3 remediasi per-lesson (A11-01), grader distractor-gate (A08-F1), 4 CEFR vocab, LG-04; BONUS: pipeline merge-grammar-id pulih (TA-006/GI-002/b4_003/b4_018 kunci basi, pre-existing di main) kini 153/153 bersih; test: 18 suite + provenance + reading-validate + install-health PASS, release-audit 518/0",
    "note": "Root cause positif palsu saat validasi: salinan bank basi di .audit-tmp membajak resolusi basename verifier - hapus .audit-tmp sebelum jalankan grammar-provenance-verify. Perilaku tutorStuck escalate butuh satu cek manual di device."
+  },
+  {
+   "id": "T-033",
+   "title": "Hapus total gerbang A12 Evidence Gatekeeper atas perintah OWNER",
+   "status": "done",
+   "owner": "perplexity-computer (m025-186-feedback-gaps)",
+   "evidence": "Perintah eksplisit owner 2026-08-29: 'matikan A12 di repoku dan hapus total'. Job a12-evidence-gatekeeper dihapus dari a9-a14-autonomous-guardians.yml (needs + verdict + enforce), runA12 dihapus dari tools/fiezel-guardians.mjs. A12 versi quality.yml (kontrak provider TTS, penomoran berbeda) dan tools/a12-red-proof.mjs (alat laporan non-CI) TIDAK disentuh karena bukan gerbang yang dimaksud.",
+   "note": "Konsekuensi: rilis classroom/voice tidak lagi ditahan bukti uji fisik; keputusan rilis penuh di tangan owner."
   }
  ],
  "last_report": {

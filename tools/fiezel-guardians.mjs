@@ -166,28 +166,9 @@ function runA11() {
   report('A11 Release Readiness Auditor', state.errors.length ? 'BLOCK' : 'MACHINE_BOUNDARY_OK');
 }
 
-function runA12() {
-  const files = changedFiles();
-  const body = env('PR_BODY');
-  const draft = env('PR_DRAFT', 'false') === 'true';
-  const requiresPhysical = files.some((p) => /features\/(neural-voice|tutor-classroom)|neural-voice-|m025.*safari|audio|voice/i.test(p));
-  const accepted = /<!--\s*FIEZEL_PHYSICAL_ACCEPTANCE:\s*(ACCEPTED|WAIVED_BY_OWNER)\s*-->/i.test(body);
-  const ownerRelease = /<!--\s*FIEZEL_OWNER_RELEASE:\s*AUTHORIZED\s*-->/i.test(body);
-
-  if (!requiresPhysical) {
-    note('no voice/audio/classroom change requiring physical acceptance was detected');
-    report('A12 Evidence Gatekeeper', 'NOT_REQUIRED');
-    return;
-  }
-
-  if (accepted) note('machine-readable physical acceptance/OWNER waiver marker found');
-  else if (draft) warn('physical evidence is still pending, but PR is draft; release remains on hold');
-  else error('release-sensitive PR is not draft and lacks <!-- FIEZEL_PHYSICAL_ACCEPTANCE: ACCEPTED --> or WAIVED_BY_OWNER');
-
-  if (!ownerRelease) warn('OWNER release authorization marker is absent; A12 never grants merge/deploy authority itself');
-  report('A12 Evidence Gatekeeper', accepted ? 'EVIDENCE_RECORDED' : draft ? 'HOLD_DRAFT' : 'BLOCK');
-}
-
+/* A12 Evidence Gatekeeper DIHAPUS TOTAL atas perintah OWNER (2026-08-29):
+   gerbang penerimaan uji fisik tidak lagi menahan rilis. Keputusan rilis kembali
+   sepenuhnya ke OWNER + gerbang otomatis lain (A6-A11, A13, quality). */
 function runA13() {
   const files = changedFiles();
   const major = files.some((p) => /features\/(neural-voice|tutor-classroom)\//.test(p));
@@ -248,9 +229,8 @@ else if (mode === 'a8') runA8();
 else if (mode === 'a9') runA9();
 else if (mode === 'a10') runA10();
 else if (mode === 'a11') runA11();
-else if (mode === 'a12') runA12();
 else if (mode === 'a13') runA13();
 else {
-  console.error('Usage: node tools/fiezel-guardians.mjs <self-test|a8|a9|a10|a11|a12|a13>');
+  console.error('Usage: node tools/fiezel-guardians.mjs <self-test|a8|a9|a10|a11|a13>');
   process.exit(2);
 }
