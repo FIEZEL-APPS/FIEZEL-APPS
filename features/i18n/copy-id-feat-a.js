@@ -304,6 +304,32 @@
     'brain-srl.calib-good': 'Taksiranmu di ' + '{name}' + ' (' + '{conf}' + ') cocok dengan hasilnya (' + '{acc}' + '). Cara menaksir seperti ini layak dipertahankan — lanjutkan menaksir sebelum melihat kunci.',
     'brain-srl.reflect-no-data': 'Sesi ini tidak ada taksiran keyakinan yang bisa dibandingkan dengan hasil.',
     'brain-srl.faded-note': ' Tiga sesi berturut-turut taksiranmu akurat, jadi pertanyaan ' + 'keyakinan akan berhenti muncul selama ' + '{n}' + ' sesi ke depan.',
+
+    // ---------- W2-REGEN: entri tunda gelombang regen baseline ----------
+    // features/library/fiezel-library-ui.js:253
+    'pustaka.berlaku-from-kalimat-upcoming': '. Berlaku dari kalimat berikutnya.',
+    // features/library/fiezel-library-ui.js:525
+    'pustaka.dongeng-dan-novel-pendek': '<p>Dongeng dan novel pendek dengan audiobook dan terjemahan sekali ketuk. Ketuk kalimat mana pun untuk melihat artinya.</p>',
+    // features/library/fiezel-library-ui.js:827
+    'pustaka.fiezel-pending-can-menjawab': 'Fiezel belum bisa menjawab pertanyaan itu sekarang.',
+    // features/library/fiezel-library-ui.js:498
+    'pustaka.finish-buku-this-done': 'Selesai. Buku ini sudah dibacakan sampai habis.',
+    // features/library/fiezel-library-ui.js:668
+    'pustaka.next-from-kalimat': 'Lanjut dari kalimat ',
+    // features/library/fiezel-library-ui.js:857
+    'pustaka.perpustakaan-pending-can-dimuat': '<section class="fade library-page"><div class="card"><b>Perpustakaan belum bisa dimuat.</b>',
+    // features/library/fiezel-library-ui.js:483
+    'pustaka.suara-tidak-bisa-dimuat': 'Suara tidak bisa dimuat. Periksa koneksi lalu tekan putar lagi.',
+    // features/library/fiezel-library-ui.js:243
+    'pustaka.tap-for-mengganti': ', ketuk untuk mengganti',
+    // features/library/fiezel-library-ui.js:551
+    'pustaka.tap-for-mengganti-data': ', ketuk untuk mengganti" data-rate="',
+    // features/library/fiezel-library-ui.js:552
+    'pustaka.tap-kalimat-for-arti': '<p class="library-status" id="libraryStatus">Ketuk kalimat untuk arti, atau putar audiobook.</p>',
+    // features/library/fiezel-library-ui.js:705
+    'pustaka.translate': '<span class="library-translation-mark">TERJEMAHAN</span>',
+    // features/library/fiezel-library-ui.js:703
+    'pustaka.translate-kalimat': 'Terjemahan kalimat'
   });
 
   // Ekspor untuk rantai require Node: modul features me-require berkas ini dan langsung

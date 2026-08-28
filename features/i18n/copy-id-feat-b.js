@@ -33,20 +33,20 @@
   I18N.registerCopy('id', {
     // ---------- features/ui/fiezel-ui-manager.js (empty state) ----------
     'ui.empty-title': 'Belum ada konten',
-    'ui.empty-desc': 'Mulai \u0062elajar \u0075ntuk melihat progres',
+    'ui.empty-desc': 'Mulai belajar untuk melihat progres',
     'ui.empty-action': 'Mulai',
 
     // ---------- features/skills-evidence/fiezel-skills-evidence.js ----------
-    'skills.practice-score-label': 'skor \u006Catihan',
+    'skills.practice-score-label': 'skor latihan',
     'skills.target-coverage-label': 'cakupan target',
 
     // ---------- features/personal-journey/fiezel-personal-journey.js ----------
     'journey.goal-school-label': 'Sekolah',
     'journey.goal-school-p1': 'Grammar dasar stabil',
-    'journey.goal-school-p2': '\u004Bosakata \u0068arian dan kelas',
+    'journey.goal-school-p2': 'Kosakata harian dan kelas',
     'journey.goal-school-p3': 'Reading teks pendek',
     'journey.goal-it-label': 'IT dan teknologi',
-    'journey.goal-it-p1': '\u004Bosakata teknis dasar',
+    'journey.goal-it-p1': 'Kosakata teknis dasar',
     'journey.goal-it-p2': 'Baca panduan teknis',
     'journey.goal-it-p3': 'Grammar buat langkah-langkah',
     'journey.goal-scholarship-label': 'Beasiswa',
@@ -57,29 +57,29 @@
     'journey.goal-exam-p1': 'Baca teks sekolah',
     'journey.goal-exam-p2': 'Nyatet sambil dengerin',
     'journey.goal-exam-p3': 'Grammar yang rapi',
-    'journey.goal-exam-note': 'FIEZEL \u006Eggak menebak skor IELTS/TOEFL \u006Bamu. Yang ditampilkan cuma apa \u0079ang harus \u0062isa dulu.',
-    'journey.goal-note-default': 'Ini daftar \u0079ang harus \u006Bamu \u0062isa dulu, bukan tebakan nilai ujian.',
+    'journey.goal-exam-note': 'FIEZEL nggak menebak skor IELTS/TOEFL kamu. Yang ditampilkan cuma apa yang harus bisa dulu.',
+    'journey.goal-note-default': 'Ini daftar yang harus kamu bisa dulu, bukan tebakan nilai ujian.',
     'journey.rat-due-reviews': 'ada materi yang harus diulang',
-    'journey.rat-forgetting-risk': 'ada materi yang \u006Dulai \u006Bamu lupa',
-    'journey.rat-weak-skill': 'ada bagian yang \u006Dasih sering \u0073alah',
+    'journey.rat-forgetting-risk': 'ada materi yang mulai kamu lupa',
+    'journey.rat-weak-skill': 'ada bagian yang masih sering salah',
     'journey.rat-recurring-error': 'kesalahan yang sama muncul terus',
-    'journey.rat-abandonment-risk': '\u006Catihan sering \u006Eggak \u006Bamu selesaikan',
-    'journey.rat-consistency-risk': 'dua minggu ini \u006Bamu jarang \u006Catihan',
-    'journey.rat-confidence-gap': '\u006Bamu ngerasa bisa, tapi hasilnya \u0062elum',
-    'journey.rat-calm-pacing': '\u006Bamu masih lama mikirnya',
-    'journey.rat-session-interrupted': 'ada \u006Catihan yang \u0062elum \u006Bamu selesaikan',
+    'journey.rat-abandonment-risk': 'latihan sering nggak kamu selesaikan',
+    'journey.rat-consistency-risk': 'dua minggu ini kamu jarang latihan',
+    'journey.rat-confidence-gap': 'kamu ngerasa bisa, tapi hasilnya belum',
+    'journey.rat-calm-pacing': 'kamu masih lama mikirnya',
+    'journey.rat-session-interrupted': 'ada latihan yang belum kamu selesaikan',
     'journey.rat-balanced-progression': 'semuanya lagi aman',
     'journey.rat-evidence-thin': 'catatan latihanmu belum cukup',
     'journey.rat-all-clear': 'Semuanya aman, jadi minggu ini santai dulu.',
     'journey.rat-reasons': 'Soalnya {reasons}.',
-    'journey.basis-sl-practice': '{n} \u006Catihan tercatat pada skill ini.',
-    'journey.basis-sl-pending': '\u004Catihan Speaking dan Listening dicatat terpisah, \u0062elum masuk peta \u0069ni.',
-    'journey.basis-answers': '{n} \u006Aawaban tercatat pada skill ini.',
-    'journey.basis-none': 'Belum ada \u006Aawaban \u0064i bagian \u0069ni.',
-    'journey.why-review': 'Yang hampir \u006Bamu lupa didulukan.',
+    'journey.basis-sl-practice': '{n} latihan tercatat pada skill ini.',
+    'journey.basis-sl-pending': 'Latihan Speaking dan Listening dicatat terpisah, belum masuk peta ini.',
+    'journey.basis-answers': '{n} jawaban tercatat pada skill ini.',
+    'journey.basis-none': 'Belum ada jawaban di bagian ini.',
+    'journey.why-review': 'Yang hampir kamu lupa didulukan.',
     'journey.why-focus-skill': 'Fokus minggu ini: {skill}.',
     'journey.why-focus-domain': 'Fokus pada domain {domain}.',
-    'journey.why-transfer': '\u0053oal campur biar \u006Eggak kaku.',
+    'journey.why-transfer': 'Soal campur biar nggak kaku.',
 
     // ---------- features/onboarding/fiezel-tour.js ----------
     // Copy VERBATIM dari reports/copy-tour-gems.md; tours-test.js membandingkan karakter
@@ -125,14 +125,14 @@
     'onboarding.stepper-aria': 'Kemajuan perkenalan',
     'onboarding.btn-back': 'Kembali',
     'onboarding.name-field-label': 'Nama panggilan',
-    'onboarding.name-placeholder': 'Tulis nama \u006Bamu',
-    'onboarding.name-aria': 'Nama panggilan \u006Bamu',
+    'onboarding.name-placeholder': 'Tulis nama kamu',
+    'onboarding.name-aria': 'Nama panggilan kamu',
     'onboarding.greet-schedule': 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.',
-    'onboarding.schedule-title': 'Kapan \u006Bamu ingin \u0062elajar?',
-    'onboarding.schedule-body': '\u0041ku ingetin \u006Bamu \u0062elajar ya, biar streak-nya \u006Eggak putus.',
-    'onboarding.schedule-note': 'Notifikasi \u0062elajar: Aktif. Waktunya \u0061ku yang \u0070ilih otomatis \u0064ari kebiasaan belajarmu sendiri, bukan jadwal tetap \u0079ang \u006Bamu atur manual - jadi pengingatnya selalu pas \u0064engan caramu \u0062elajar, bukan jam \u0079ang dipilih sekali lalu dilupakan.',
-    'onboarding.summary-bubble': 'Sudah beres \u0073emua. \u0049ni rangkumannya.',
-    'onboarding.summary-ready-named': '{name}, siap \u0062elajar bersama FIEZEL!',
+    'onboarding.schedule-title': 'Kapan kamu ingin belajar?',
+    'onboarding.schedule-body': 'Aku ingetin kamu belajar ya, biar streak-nya nggak putus.',
+    'onboarding.schedule-note': 'Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.',
+    'onboarding.summary-bubble': 'Sudah beres semua. Ini rangkumannya.',
+    'onboarding.summary-ready-named': '{name}, siap belajar bersama FIEZEL!',
     'onboarding.summary-ready': 'Siap belajar bersama FIEZEL!',
     'onboarding.not-set': 'Belum dipilih',
     'onboarding.summary-name-label': 'Nama',
@@ -140,7 +140,7 @@
     'onboarding.summary-level-label': 'Perkiraan level',
     'onboarding.summary-reminder-label': 'Pengingat',
     'onboarding.reminder-on': 'Aktif',
-    'onboarding.summary-streak-zero': '0 hari \u00b7 \u006Dulai sekarang!',
+    'onboarding.summary-streak-zero': '0 hari · mulai sekarang!',
     'onboarding.btn-start': 'Mulai Belajar',
     'onboarding.btn-skip': 'Lewati',
 
@@ -166,48 +166,48 @@
     'skillslab.btn-back': 'Kembali',
 
     // ---------- features/tutor-classroom/fiezel-tutor-dialog.js (tabel ANSWERS + fallback) ----------
-    'tutor.ans-meaning-1': 'Oke. {topic} intinya begini: {formula}. Jadi kalau \u006Bamu lihat pola \u0069tu, \u006Bamu \u0073edang melihat {topic}.',
-    'tutor.ans-meaning-2': 'Gampangnya begini. {topic} dipakai untuk pola {formula}. Contoh \u0079ang paling jelas: {firstExample}',
-    'tutor.ans-meaning-3': '\u0041ku jelaskan dari sisi lain ya. \u0059ang perlu \u006Bamu pegang \u0064ari {topic} cuma satu, yaitu {formula}. Sisanya hanya variasi.',
-    'tutor.ans-why-1': 'Alasannya ada di polanya. {topic} menuntut bentuk {formula}, jadi \u006Balau bentuknya berubah, kalimatnya jadi \u0073alah.',
-    'tutor.ans-why-2': 'Bukan hafalan, ini \u0073oal fungsi. {topic} dipakai supaya maknanya jelas, \u0064an bentuk {formula} \u0079ang menjaga kejelasan \u0069tu.',
-    'tutor.ans-why-3': 'Coba bandingkan \u0064engan contohnya: {firstExample}. \u004Balau polanya diubah, maknanya ikut berubah, \u0064an itulah kenapa aturannya ada.',
-    'tutor.ans-example-1': 'Contohnya: {firstExample}. Sekarang coba \u006Bamu ganti subjeknya, polanya tetap {formula}.',
-    'tutor.ans-example-2': 'Ini satu \u006Cagi supaya makin jelas: {secondExample}. Perhatikan bagian \u0079ang mengikuti polanya.',
-    'tutor.ans-example-3': 'Ambil dari kalimat \u0079ang tadi kita bahas: {beatEn}. \u0049tu contoh {topic} \u0079ang hidup, bukan contoh buatan.',
-    'tutor.ans-difference-1': 'Bedanya ada di fungsi, bukan \u0064i kata. \u0059ang satu mengikuti pola {formula}, \u0079ang lain tidak, jadi maknanya bergeser.',
-    'tutor.ans-difference-2': 'Cara membedakannya: lihat polanya dulu. Kalau cocok \u0064engan {formula}, \u0069tu {topic}. \u004Balau tidak, \u0069tu bentuk lain.',
-    'tutor.ans-difference-3': 'Pakai contoh ini \u0075ntuk memisahkan keduanya: {firstExample}. Ganti satu bagian saja, \u0064an \u006Bamu langsung dengar bedanya.',
-    'tutor.ans-translate-1': 'Dalam \u0062ahasa Inggris, kalimat seperti itu mengikuti pola {formula}. Jadi bentuknya seperti \u0069ni: {firstExample}',
-    'tutor.ans-translate-2': 'Terjemahannya jangan kata per kata. Susun dulu polanya, {formula}, \u0062aru isi katanya. Hasilnya: {firstExample}',
-    'tutor.ans-translate-3': 'Kalau diterjemahkan \u0064engan pola \u0079ang \u0062enar, jadinya {firstExample}. Perhatikan urutannya, karena \u0062ahasa Inggris ketat \u0073oal urutan.',
-    'tutor.ans-pronounce-1': '\u0044engarkan \u0061ku dulu, lalu tiru: {firstExample}. \u0055capkan pelan, jangan dikejar cepat.',
-    'tutor.ans-pronounce-2': 'Kuncinya di tekanan kata. \u0041ku \u0075capkan sekali \u006Cagi: {firstExample}. Tirukan \u0064engan ritme \u0079ang sama.',
-    'tutor.ans-pronounce-3': '\u0055capkan per potongan dulu, \u0062aru satu kalimat penuh: {firstExample}',
-    'tutor.ans-when-1': '{topic} dipakai saat maknanya menuntut pola {formula}. \u004Balau situasinya lain, bentuknya juga lain.',
-    'tutor.ans-when-2': 'Patokannya sederhana: kalau kalimatmu cocok \u0064engan {firstExample}, berarti \u0069ni waktunya memakai {topic}.',
-    'tutor.ans-when-3': 'Jangan lihat waktunya saja, lihat maksudmu. Itu \u0079ang menentukan kapan {topic} dipakai.',
-    'tutor.ans-repeat-1': 'Baik, \u0061ku \u0075langi. {beatId}',
+    'tutor.ans-meaning-1': 'Oke. {topic} intinya begini: {formula}. Jadi kalau kamu lihat pola itu, kamu sedang melihat {topic}.',
+    'tutor.ans-meaning-2': 'Gampangnya begini. {topic} dipakai untuk pola {formula}. Contoh yang paling jelas: {firstExample}',
+    'tutor.ans-meaning-3': 'Aku jelaskan dari sisi lain ya. Yang perlu kamu pegang dari {topic} cuma satu, yaitu {formula}. Sisanya hanya variasi.',
+    'tutor.ans-why-1': 'Alasannya ada di polanya. {topic} menuntut bentuk {formula}, jadi kalau bentuknya berubah, kalimatnya jadi salah.',
+    'tutor.ans-why-2': 'Bukan hafalan, ini soal fungsi. {topic} dipakai supaya maknanya jelas, dan bentuk {formula} yang menjaga kejelasan itu.',
+    'tutor.ans-why-3': 'Coba bandingkan dengan contohnya: {firstExample}. Kalau polanya diubah, maknanya ikut berubah, dan itulah kenapa aturannya ada.',
+    'tutor.ans-example-1': 'Contohnya: {firstExample}. Sekarang coba kamu ganti subjeknya, polanya tetap {formula}.',
+    'tutor.ans-example-2': 'Ini satu lagi supaya makin jelas: {secondExample}. Perhatikan bagian yang mengikuti polanya.',
+    'tutor.ans-example-3': 'Ambil dari kalimat yang tadi kita bahas: {beatEn}. Itu contoh {topic} yang hidup, bukan contoh buatan.',
+    'tutor.ans-difference-1': 'Bedanya ada di fungsi, bukan di kata. Yang satu mengikuti pola {formula}, yang lain tidak, jadi maknanya bergeser.',
+    'tutor.ans-difference-2': 'Cara membedakannya: lihat polanya dulu. Kalau cocok dengan {formula}, itu {topic}. Kalau tidak, itu bentuk lain.',
+    'tutor.ans-difference-3': 'Pakai contoh ini untuk memisahkan keduanya: {firstExample}. Ganti satu bagian saja, dan kamu langsung dengar bedanya.',
+    'tutor.ans-translate-1': 'Dalam bahasa Inggris, kalimat seperti itu mengikuti pola {formula}. Jadi bentuknya seperti ini: {firstExample}',
+    'tutor.ans-translate-2': 'Terjemahannya jangan kata per kata. Susun dulu polanya, {formula}, baru isi katanya. Hasilnya: {firstExample}',
+    'tutor.ans-translate-3': 'Kalau diterjemahkan dengan pola yang benar, jadinya {firstExample}. Perhatikan urutannya, karena bahasa Inggris ketat soal urutan.',
+    'tutor.ans-pronounce-1': 'Dengarkan aku dulu, lalu tiru: {firstExample}. Ucapkan pelan, jangan dikejar cepat.',
+    'tutor.ans-pronounce-2': 'Kuncinya di tekanan kata. Aku ucapkan sekali lagi: {firstExample}. Tirukan dengan ritme yang sama.',
+    'tutor.ans-pronounce-3': 'Ucapkan per potongan dulu, baru satu kalimat penuh: {firstExample}',
+    'tutor.ans-when-1': '{topic} dipakai saat maknanya menuntut pola {formula}. Kalau situasinya lain, bentuknya juga lain.',
+    'tutor.ans-when-2': 'Patokannya sederhana: kalau kalimatmu cocok dengan {firstExample}, berarti ini waktunya memakai {topic}.',
+    'tutor.ans-when-3': 'Jangan lihat waktunya saja, lihat maksudmu. Itu yang menentukan kapan {topic} dipakai.',
+    'tutor.ans-repeat-1': 'Baik, aku ulangi. {beatId}',
     'tutor.ans-repeat-2': 'Sekali lagi, pelan-pelan. {beatId}',
-    'tutor.ans-repeat-3': '\u0041ku ulang dengan kalimat \u0079ang sama supaya \u006Bamu \u0062isa mengikuti. {beatId}',
-    'tutor.ans-slower-1': 'Oke, \u0061ku pelankan. {beatId}',
-    'tutor.ans-slower-2': '\u0041ku turunkan kecepatannya ya. \u0044engarkan lagi: {beatId}',
+    'tutor.ans-repeat-3': 'Aku ulang dengan kalimat yang sama supaya kamu bisa mengikuti. {beatId}',
+    'tutor.ans-slower-1': 'Oke, aku pelankan. {beatId}',
+    'tutor.ans-slower-2': 'Aku turunkan kecepatannya ya. Dengarkan lagi: {beatId}',
     'tutor.ans-slower-3': 'Pelan saja, tidak usah buru-buru. {beatId}',
     'tutor.ans-confused-1': 'Tidak apa-apa, kita mundur satu langkah. Lupakan istilahnya, pegang polanya dulu: {formula}.',
-    'tutor.ans-confused-2': 'Wajar bingung di bagian \u0069ni. Kita pakai satu contoh konkret saja: {firstExample}. \u0044ari situ aturannya \u0061kan masuk sendiri.',
+    'tutor.ans-confused-2': 'Wajar bingung di bagian ini. Kita pakai satu contoh konkret saja: {firstExample}. Dari situ aturannya akan masuk sendiri.',
     'tutor.ans-confused-3': 'Kalau terasa berat, berarti terlalu banyak sekaligus. Ambil satu hal dulu: {formula}. Sisanya nanti.',
-    'tutor.ans-exam-1': 'Ini relevan \u0075ntuk TOEFL \u0064an IELTS. {topic} muncul \u0064i bagian structure \u0064an writing, jadi polanya harus otomatis, bukan dipikir.',
-    'tutor.ans-exam-2': 'Di ujian, \u0079ang diuji bukan hafalan aturannya, tetapi kecepatanmu mengenali pola {formula} \u0064i dalam kalimat panjang.',
-    'tutor.ans-exam-3': 'Untuk \u0074arget TOEFL \u0064an IELTS, materi seperti {topic} adalah fondasi. \u004Balau \u0069ni goyah, bagian sulitnya \u0061kan ikut goyah.',
-    'tutor.ans-greeting-1': 'Halo {name}. \u0041ku siap. Mau \u0061ku jelaskan bagian mana dari {topic}?',
-    'tutor.ans-greeting-2': 'Hai. Kita sedang \u0064i {topic}. Tanyakan apa saja, \u0061ku jawab.',
-    'tutor.ans-greeting-3': 'Halo. Kalau ada \u0079ang mengganjal \u0064i {topic}, sekarang waktunya bertanya.',
-    'tutor.ans-open-1': 'Pertanyaanmu \u0061ku hubungkan ke materi \u0069ni dulu. Inti {topic} adalah {formula}, \u0064an \u0064ari situ kita \u0062isa uji kalimatmu.',
-    'tutor.ans-open-2': 'Boleh. \u0041ku jawab lewat contoh supaya tidak abstrak: {firstExample}. Kalau maksudmu berbeda, katakan bagian mana \u0079ang \u006Bamu maksud.',
-    'tutor.ans-open-3': '\u0041ku tangkap arah pertanyaanmu. Yang relevan \u0064i sini pola {formula}. \u0043oba sebutkan satu kalimatmu sendiri, nanti \u0061ku koreksi.',
-    'tutor.ans-empty-1': '\u0041ku belum menangkap suaranya. Tekan tombolnya \u006Cagi lalu bicara sedikit lebih dekat ya.',
-    'tutor.ans-empty-2': 'Suaranya belum masuk. \u0043oba sekali \u006Cagi, agak pelan \u0064an jelas.',
-    'tutor.ans-empty-3': 'Belum ada \u0079ang terdengar. Tekan \u0064an bicara setelah tombolnya menyala.',
+    'tutor.ans-exam-1': 'Ini relevan untuk TOEFL dan IELTS. {topic} muncul di bagian structure dan writing, jadi polanya harus otomatis, bukan dipikir.',
+    'tutor.ans-exam-2': 'Di ujian, yang diuji bukan hafalan aturannya, tetapi kecepatanmu mengenali pola {formula} di dalam kalimat panjang.',
+    'tutor.ans-exam-3': 'Untuk target TOEFL dan IELTS, materi seperti {topic} adalah fondasi. Kalau ini goyah, bagian sulitnya akan ikut goyah.',
+    'tutor.ans-greeting-1': 'Halo {name}. Aku siap. Mau aku jelaskan bagian mana dari {topic}?',
+    'tutor.ans-greeting-2': 'Hai. Kita sedang di {topic}. Tanyakan apa saja, aku jawab.',
+    'tutor.ans-greeting-3': 'Halo. Kalau ada yang mengganjal di {topic}, sekarang waktunya bertanya.',
+    'tutor.ans-open-1': 'Pertanyaanmu aku hubungkan ke materi ini dulu. Inti {topic} adalah {formula}, dan dari situ kita bisa uji kalimatmu.',
+    'tutor.ans-open-2': 'Boleh. Aku jawab lewat contoh supaya tidak abstrak: {firstExample}. Kalau maksudmu berbeda, katakan bagian mana yang kamu maksud.',
+    'tutor.ans-open-3': 'Aku tangkap arah pertanyaanmu. Yang relevan di sini pola {formula}. Coba sebutkan satu kalimatmu sendiri, nanti aku koreksi.',
+    'tutor.ans-empty-1': 'Aku belum menangkap suaranya. Tekan tombolnya lagi lalu bicara sedikit lebih dekat ya.',
+    'tutor.ans-empty-2': 'Suaranya belum masuk. Coba sekali lagi, agak pelan dan jelas.',
+    'tutor.ans-empty-3': 'Belum ada yang terdengar. Tekan dan bicara setelah tombolnya menyala.',
     'tutor.topic-fallback': 'materi ini',
     'tutor.ask-kicker': 'TANYA FIEZEL',
 
@@ -224,65 +224,139 @@
     'tutor.mic-blocked': 'Mikrofon tidak bisa dipakai. Ketik saja.',
     'tutor.listening-now': 'Mendengarkan\u2026 bicara sekarang',
     'tutor.sheet-title': 'Tanya apa saja',
-    'tutor.sheet-body': 'Perangkat ini \u0062elum mengizinkan input suara, jadi ketik pertanyaanmu. Fiezel tetap menjawab \u0064engan suara.',
+    'tutor.sheet-body': 'Perangkat ini belum mengizinkan input suara, jadi ketik pertanyaanmu. Fiezel tetap menjawab dengan suara.',
     'tutor.sheet-placeholder': 'Contoh: kenapa bukan I have went?',
     'tutor.btn-cancel': 'Batal',
     'tutor.btn-ask': 'Tanya',
 
     // ---------- features/tutor-classroom/fiezel-tutor-v3.js (skrip pelajaran + status suara) ----------
-    'tutorv3.script-4': 'Kita taruh di garis waktu. Tindakannya dimulai sebelum sekarang, tetapi hasilnya sampai \u006Be masa kini. Hubungan itulah poinnya.',
-    'tutorv3.script-6': 'Kita buat konkret. Bayangkan kuncinya masih hilang sampai sekarang. Present perfect membantu menghubungkan kejadian \u0073ebelumnya \u0064engan situasi \u0079ang \u006Dasih berlaku sekarang.',
-    'tutorv3.script-7': '\u004Bamu sedang memisahkan dua fungsi \u0064ari kata kerja \u0079ang sama. Went adalah bentuk lampau biasa. Setelah have \u0061tau has, \u0062ahasa Inggris membutuhkan bentuk ketiga, jadi kita mengatakan I have gone, bukan I have went.',
-    'tutorv3.script-8': 'Gunakan has untuk he, she, \u0064an it. Gunakan have \u0075ntuk I, you, we, \u0064an they. Maknanya tetap sama; subjek \u0079ang menentukan kata bantu \u0069tu.',
-    'tutorv3.script-9': 'Pertanyaan yang berguna bukan hanya kapan kejadiannya. Tanyakan apakah hasilnya \u006Dasih terhubung \u0064engan sekarang. Jika iya, present perfect sering menjadi pilihan \u0079ang lebih tepat.'
+    'tutorv3.script-4': 'Kita taruh di garis waktu. Tindakannya dimulai sebelum sekarang, tetapi hasilnya sampai ke masa kini. Hubungan itulah poinnya.',
+    'tutorv3.script-6': 'Kita buat konkret. Bayangkan kuncinya masih hilang sampai sekarang. Present perfect membantu menghubungkan kejadian sebelumnya dengan situasi yang masih berlaku sekarang.',
+    'tutorv3.script-7': 'Kamu sedang memisahkan dua fungsi dari kata kerja yang sama. Went adalah bentuk lampau biasa. Setelah have atau has, bahasa Inggris membutuhkan bentuk ketiga, jadi kita mengatakan I have gone, bukan I have went.',
+    'tutorv3.script-8': 'Gunakan has untuk he, she, dan it. Gunakan have untuk I, you, we, dan they. Maknanya tetap sama; subjek yang menentukan kata bantu itu.',
+    'tutorv3.script-9': 'Pertanyaan yang berguna bukan hanya kapan kejadiannya. Tanyakan apakah hasilnya masih terhubung dengan sekarang. Jika iya, present perfect sering menjadi pilihan yang lebih tepat.',
+
+    // ---------- W2-REGEN: entri tunda gelombang regen baseline ----------
+    // features/ui/fiezel-coach-bubble.js:153
+    'coach.choose-topik-yg-paling-bikin': 'Pilih topik yang paling bikin penasaran.',
+    // features/ui/fiezel-coach-bubble.js:160
+    'coach.day-jangan-putus-day-this': ' hari. Jangan putus hari ini ya.',
+    // features/ui/fiezel-coach-bubble.js:176
+    'coach.day-lima-answer-bermakna-udah': ' hari. Lima jawaban bermakna udah cukup buat jaga hari ini.',
+    // features/ui/fiezel-coach-bubble.js:173
+    'coach.day-this-paling-enak-start': 'Hari ini paling enak mulai dari ',
+    // features/ui/fiezel-coach-bubble.js:302
+    'coach.fiezel-pembimbing-you': '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>',
+    // features/ui/fiezel-coach-bubble.js:149
+    'coach.ga-ada-yang-dengerin-selain': 'Ga ada yang dengerin selain kamu dan gue.',
+    // features/ui/fiezel-coach-bubble.js:349
+    'coach.gimana-cara-cepat-inget-vocab': 'Gimana cara cepat inget kosakata baru?',
+    // features/ui/fiezel-coach-bubble.js:178
+    'coach.gue-again-ga-can-nyambung': 'Gue lagi ga bisa nyambung ke otak AI-nya (butuh login Puter + internet). Tapi latihannya jalan terus kok — mau gue temenin mulai dari mana?',
+    // features/ui/fiezel-coach-bubble.js:144
+    'coach.gue-udah-siapin-rencana-hari': 'Gue udah siapin rencana hari ini, tinggal jalan.',
+    // features/ui/fiezel-coach-bubble.js:145
+    'coach.kata-new-that-kayak-koin': 'Kata baru itu kayak koin — dikumpulin dikit-dikit.',
+    // features/ui/fiezel-coach-bubble.js:348
+    'coach.kenapa-me-sering-wrong-at': 'Kenapa aku sering salah di grammar? Jelaskan singkat.',
+    // features/ui/fiezel-coach-bubble.js:348
+    'coach.kenapa-me-wrong-terus-at': 'Kenapa aku salah terus di sini?',
+    // features/ui/fiezel-coach-bubble.js:170
+    'coach.level-estimasi-you-sekarang': 'Level estimasi kamu sekarang ',
+    // features/ui/fiezel-coach-bubble.js:346
+    'coach.level-kemampuan-me-sekarang-at': 'Level kemampuan aku sekarang di mana?',
+    // features/ui/fiezel-coach-bubble.js:346
+    'coach.level-me-sekarang': 'Level aku sekarang?',
+    // features/ui/fiezel-coach-bubble.js:161
+    'coach.materi-nunggu-review-that-yg': ' materi nunggu review — itu yang paling cepat naikin skor.',
+    // features/ui/fiezel-coach-bubble.js:144
+    'coach.mau-start-from-mana-day': 'Mau mulai dari mana hari ini?',
+    // features/ui/fiezel-coach-bubble.js:345
+    'coach.me-harus-start-from-mana': 'Aku harus mulai dari mana?',
+    // features/ui/fiezel-coach-bubble.js:345
+    'coach.me-harus-start-study-from': 'Aku harus mulai belajar dari mana hari ini?',
+    // features/ui/fiezel-coach-bubble.js:149
+    'coach.ngomong-aja-dulu-wrong-that': 'Ngomong aja dulu, salah itu bagian dari latihan.',
+    // features/ui/fiezel-coach-bubble.js:413
+    'coach.pembimbing-you': 'pembimbing kamu',
+    // features/ui/fiezel-coach-bubble.js:173
+    'coach.practice-singkat': 'latihan singkat',
+    // features/ui/fiezel-coach-bubble.js:145
+    'coach.review-dulu-yang-hampir-lupa': 'Review dulu yang hampir lupa, baru tambah baru.',
+    // features/ui/fiezel-coach-bubble.js:176
+    'coach.streak-you': 'Runtun kamu ',
+    // features/ui/fiezel-coach-bubble.js:147
+    'coach.tap-kalimat-yg-bikin-bingung': 'Ketuk kalimat yang bikin bingung, gue jelasin.',
+    // features/ui/fiezel-coach-bubble.js:152
+    'coach.tap-kalimatnya-if-mau-lihat': 'Ketuk kalimatnya kalau mau lihat artinya.',
+    // features/ui/fiezel-coach-bubble.js:350
+    'coach.tolong-cek-tulisan-lang-inggrisku': 'Tolong cek tulisan bahasa Inggrisku dan kasih satu perbaikan paling penting.',
+    // features/ui/fiezel-coach-bubble.js:146
+    'coach.wrong-at-grammar-that-wajar': 'Salah di grammar itu wajar, yang penting ngerti kenapanya.',
+    // features/ui/fiezel-coach-bubble.js:154
+    'coach.yg-merah-bukan-aib-that': 'Yang merah bukan aib, itu yang bakal kita kerjain.',
+    // features/onboarding/fiezel-onboarding.js:568
+    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>',
+    // features/onboarding/fiezel-onboarding.js:550
+    'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>',
+    // features/onboarding/fiezel-onboarding.js:552
+    'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>',
+    // features/onboarding/fiezel-onboarding.js:480
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>',
+    // features/onboarding/fiezel-onboarding.js:553
+    'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>',
+    // features/onboarding/fiezel-onboarding.js:570
+    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">Isinya 25 soal listening, grammar, dan vocabulary - tanpa teks bacaan - dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>',
+    // features/onboarding/fiezel-onboarding.js:569
+    'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>',
+    // features/onboarding/fiezel-onboarding.js:481
+    'onboarding.me-pakai-namamu-buat-nyapa': '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>',
+    // features/onboarding/fiezel-onboarding.js:490
+    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">Nama ini disimpan di HP kamu, dan cuma ikut ke akun FIEZEL kamu sendiri supaya pengingat belajar bisa nyapa kamu. Nggak dibagi ke siapa pun.</p>',
+    // features/onboarding/fiezel-onboarding.js:491
+    'onboarding.next': 'Lanjut',
+    // features/onboarding/fiezel-onboarding.js:523
+    'onboarding.next-l523': 'Lanjut',
+    // features/onboarding/fiezel-onboarding.js:554
+    'onboarding.next-l554': 'Lanjut',
+    // features/onboarding/fiezel-onboarding.js:591
+    'onboarding.next-l591': 'Lanjut',
+    // features/onboarding/fiezel-onboarding.js:566
+    'onboarding.santai-this-bukan-ujian-can': 'Santai, ini bukan ujian. Bisa kamu hentikan kapan saja.',
+    // features/onboarding/fiezel-onboarding.js:478
+    'onboarding.senang-ketemu-you-kita-start': 'Senang ketemu kamu! Kita mulai dari yang paling gampang.',
+    // features/onboarding/fiezel-onboarding.js:548
+    'onboarding.tujuanmu-yang-menentukan-materi-mana': 'Tujuanmu yang menentukan materi mana yang kamu dapat dulu.',
+    // features/onboarding/fiezel-onboarding.js:274
+    'onboarding.upcoming': ' · berikutnya: ',
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:700
+    'skillslab.audio-hanya-berada-di-memory': '<audio class="fsl-audio" controls src="{url}"></audio><p class="fsl-privacy">Audio hanya berada di memory browser dan URL blob sementara; tidak disimpan ke state.</p>',
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:658
+    'skillslab.audio-tidak-can-diputar-item': 'Audio tidak bisa diputar: {message}. Soal tetap terkunci.',
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:668
+    'skillslab.from-right-this-skor-practice': '<div class="fsl-exam-result"><b>{correct} dari {total} benar.</b><p class="fsl-privacy">Ini skor latihan, bukan band IELTS atau skor TOEFL - konversinya berbeda tiap sesi ujian dan menirunya di sini akan mengarang angka.</p></div>',
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:615
+    'skillslab.practice-ujian-audio-diputar-saja': `<section class="fsl-shell"><div class="fsl-progress"><span style="width:{progress}%"></span></div><article class="fsl-card">
+<span class="fsl-kicker">Latihan ujian · {level}</span>
+{slMascotStripMarkup}
+<p class="fsl-timing"><b>{label}</b><span>Audio diputar {allowedReplays}x saja · {length} soal</span><small>{note}</small></p>
+<h2>{title}</h2>
+<p class="fsl-privacy">Skrip disembunyikan sampai jawaban dinilai. {listeningHonesty}</p>
+<div class="fsl-actions"><button class="fsl-primary" data-play>Putar audio</button><button data-exit>Keluar</button></div>
+<div data-rec-status class="fsl-status">Audio belum diputar.</div>
+{label2}
+<fieldset class="fsl-work" data-work disabled{hidden}><ol class="fsl-exam-list">{questionMarkup}</ol>
+<div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div></fieldset>
+<div data-feedback class="fsl-feedback"></div></article></section>`,
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:688
+    'skillslab.practice-ujian-penilaian-otomatis-hanya': '<section class="fsl-shell"><div class="fsl-progress"><span style="width:{progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · {level}</span>{slMascotStripMarkup}{timing}<h2>{instruction}</h2>{questions}{bullets}{source}{adapted}{followUps}<p class="fsl-privacy">Penilaian otomatis hanya cakupan gagasan dari transkrip. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL.</p><div class="fsl-actions">{button}{button2}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">{mandiri}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>',
+    // features/speaking-listening/fiezel-speaking-listening-addon.js:758
+    'skillslab.session-complete-selesai-evidence-sidecar': '<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">Session complete</span><h2>{Speaking} selesai</h2><p>Evidence sidecar saat ini: {attempts} attempt · average {averageScore}% · pass rate {passRate}%.</p><p class="fsl-privacy">Tidak ada raw audio, transcript, atau jawaban dictation yang disimpan di state.</p><div class="fsl-actions"><button class="fsl-primary" data-home>Kembali ke lab</button></div></article></section>',
+    // features/onboarding/fiezel-tour.js:380
+    'tour.next': 'Lanjut',
+    // features/tutor-classroom/fiezel-tutor-v3.js:587
+    'tutor.v3-siap-for-pertanyaan-upcoming': 'Siap untuk pertanyaan berikutnya.',
+    // features/tutor-classroom/fiezel-tutor-v3.js:570
+    'tutor.v3-suara-pending-siap-teks-lesson': 'Suara belum siap. Teks pelajaran tetap dapat digunakan.'
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // >>> GATE-COMPAT (dibuat otomatis oleh impl/plans/w2featb_postprocess.py) <<<
-  // Literal baseline yang bentuk aslinya sudah dipecah/diberi placeholder di atas.
-  // Fungsi ini TIDAK PERNAH dipanggil; isinya hanya agar himpunan literal beku
-  // id-golden-snapshot-test.js tetap utuh sampai orkestrator meregenerasi baseline.
-  function __fiezelGateCompatFeatB() {
-    return [
-    ` jawaban tercatat pada skill ini.`,
-    ` latihan tercatat pada skill ini.`,
-    `, siap belajar bersama FIEZEL!`,
-    `<div class="fiezel-summary-row"><b>Streak</b><span>0 hari · mulai sekarang!</span></div>`,
-    `<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>`,
-    `<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>`,
-    `<p class="fiezel-greet-bubble">Sudah beres semua. Ini rangkumannya.</p>`,
-    `<p class="fiezel-note">Notifikasi belajar: Aktif. Waktunya aku yang pilih otomatis dari kebiasaan belajarmu sendiri, bukan jadwal tetap yang kamu atur manual - jadi pengingatnya selalu pas dengan caramu belajar, bukan jam yang dipilih sekali lalu dilupakan.</p>`,
-    `<p>Perangkat ini belum mengizinkan input suara, jadi ketik pertanyaanmu. Fiezel tetap menjawab dengan suara.</p>`,
-    `Belum ada jawaban di bagian ini.`,
-    `FIEZEL nggak menebak skor IELTS/TOEFL kamu. Yang ditampilkan cuma apa yang harus bisa dulu.`,
-    `Ini daftar yang harus kamu bisa dulu, bukan tebakan nilai ujian.`,
-    `Kosakata harian dan kelas`,
-    `Kosakata teknis dasar`,
-    `Latihan Speaking dan Listening dicatat terpisah, belum masuk peta ini.`,
-    `Mulai belajar untuk melihat progres`,
-    `Soal campur biar nggak kaku.`,
-    `Yang hampir kamu lupa didulukan.`,
-    `ada bagian yang masih sering salah`,
-    `ada latihan yang belum kamu selesaikan`,
-    `ada materi yang mulai kamu lupa`,
-    `dua minggu ini kamu jarang latihan`,
-    `kamu masih lama mikirnya`,
-    `kamu ngerasa bisa, tapi hasilnya belum`,
-    `latihan sering nggak kamu selesaikan`,
-    `skor latihan`,
-    ];
-  }
-  // >>> AKHIR GATE-COMPAT <<<
 }());

@@ -645,18 +645,7 @@
           : `<input class="fsl-input" data-q="${index}" autocomplete="off" spellcheck="false" placeholder="Tulis jawabanmu…">`;
         return `<li class="fsl-exam-q" data-question="${index}"><p><b>${index+1}.</b> ${esc(question.prompt)}</p>${body}<div class="fsl-q-feedback" data-q-feedback="${index}"></div></li>`;
       }).join('');
-      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card">
-<span class="fsl-kicker">Latihan ujian · ${esc(set.level)}</span>
-${slMascotStripMarkup()}
-<p class="fsl-timing"><b>${esc(format.label||'')}</b><span>Audio diputar ${allowedReplays}x saja · ${questions.length} soal</span><small>${esc(format.note||'')}</small></p>
-<h2>${esc(set.title||'')}</h2>
-<p class="fsl-privacy">Skrip disembunyikan sampai jawaban dinilai. ${esc(this.repo.listeningHonesty||'')}</p>
-<div class="fsl-actions"><button class="fsl-primary" data-play>Putar audio</button><button data-exit>Keluar</button></div>
-<div data-rec-status class="fsl-status">Audio belum diputar.</div>
-${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpan)<textarea class="fsl-notes" data-notes rows="5" placeholder="Catat sambil mendengar…"></textarea></label>'}
-<fieldset class="fsl-work" data-work disabled${visibleDuringAudio?'':' hidden'}><ol class="fsl-exam-list">${questionMarkup}</ol>
-<div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div></fieldset>
-<div data-feedback class="fsl-feedback"></div></article></section>`;
+      this.root.innerHTML=`${T('skillslab.practice-ujian-audio-diputar-saja',{progress:progress,level:esc(set.level),slMascotStripMarkup:slMascotStripMarkup(),label:esc(format.label||''),allowedReplays:allowedReplays,length:questions.length,note:esc(format.note||''),title:esc(set.title||''),listeningHonesty:esc(this.repo.listeningHonesty||''),label2:visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpan)<textarea class="fsl-notes" data-notes rows="5" placeholder="Catat sambil mendengar…"></textarea></label>',hidden:visibleDuringAudio?'':' hidden',questionMarkup:questionMarkup})}`;
 
       const responses=new Array(questions.length).fill(undefined);
       const work=this.root.querySelector('[data-work]');
@@ -688,7 +677,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
         }catch(error){
           // Audio gagal berarti soalnya TIDAK boleh terbuka: menjawab tanpa mendengar bukan latihan.
           this.replays--;button.disabled=false;
-          status.textContent=`Audio tidak bisa diputar: ${esc(error.message||error)}. Soal tetap terkunci.`;
+          status.textContent=`${T('skillslab.audio-tidak-can-diputar-item',{message:esc(error.message||error)})}`;
           this.store.noteCapability('tts','unavailable');
           return;
         }
@@ -698,7 +687,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
 
       this.root.querySelector('[data-submit]').addEventListener('click',()=>{
         const result=scoreListeningExamSet(set,responses);
-        const detail=`<div class="fsl-exam-result"><b>${result.correct} dari ${result.total} benar.</b><p class="fsl-privacy">Ini skor latihan, bukan band IELTS atau skor TOEFL - konversinya berbeda tiap sesi ujian dan menirunya di sini akan mengarang angka.</p></div>`;
+        const detail=`${T('skillslab.from-right-this-skor-practice',{correct:result.correct,total:result.total})}`;
         questions.forEach((question,index)=>{
           const row=result.rows[index],host=this.root.querySelector(`[data-q-feedback="${index}"]`);
           if(!host)return;
@@ -718,7 +707,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
       const source=item.sourceText?`<pre class="fsl-source">${esc(item.sourceText)}</pre>`:'';
       const adapted=item.sourceNote?`<p class="fsl-adapted">${esc(item.sourceNote)}</p>`:'';
       const timing=format?`<p class="fsl-timing"><b>${esc(format.label)}</b><span>Menyiapkan ${format.prepSeconds} detik · bicara ${format.speakSeconds} detik</span><small>${esc(format.note)}</small></p>`:'';
-      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · ${esc(item.level)}</span>${slMascotStripMarkup()}${timing}<h2>${esc(item.instruction)}</h2>${questions}${bullets}${source}${adapted}${followUps}<p class="fsl-privacy">Penilaian otomatis hanya cakupan gagasan dari transkrip. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>`;
+      this.root.innerHTML=`${T('skillslab.practice-ujian-penilaian-otomatis-hanya',{progress:progress,level:esc(item.level),slMascotStripMarkup:slMascotStripMarkup(),timing:timing,instruction:esc(item.instruction),questions:questions,bullets:bullets,source:source,adapted:adapted,followUps:followUps,button:c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':'',button2:c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':'',mandiri:c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'})}`;
       this.bindSpeakingControls(item);
     }
     renderSpeaking(item,progress){const c=capabilities();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Speaking · ${esc(item.level)} · ${esc(item.mode)}</span>${slMascotStripMarkup()}<h2>${esc(item.instruction)}</h2>${item.targetText?`<p class="fsl-prompt">${esc(item.targetText)}</p>`:''}<p class="fsl-privacy">Penilaian otomatis hanya spoken production / target coverage. Ini bukan pengukuran phoneme/pronunciation.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri tanpa skor otomatis.'}</div><div data-feedback></div><div data-playback></div></article></section>`;
@@ -730,7 +719,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
     bindSpeakingControls(item){
       this.root.querySelector('[data-exit]').addEventListener('click',()=>this.exit());
       this.root.querySelector('[data-recognize]')?.addEventListener('click',async e=>{e.currentTarget.disabled=true;this.root.querySelector('[data-rec-status]').textContent=T('skillslab.rec-listening');try{const r=await this.recognition.listen();this.ephemeralTranscript=r.transcript;const result=scoreSpeaking(item,r.transcript);this.store.noteCapability('speechRecognition','ok');this.root.querySelector('[data-rec-status]').textContent=T('skillslab.rec-received');this.finishItem(item,result,`<div class="fsl-transcript">${esc(r.transcript)}</div>`)}catch(err){this.store.noteCapability('speechRecognition','unavailable');this.root.querySelector('[data-rec-status]').textContent=`Tidak dapat menilai otomatis: ${esc(err.message)}.`;e.currentTarget.disabled=false}});
-      this.root.querySelector('[data-record]')?.addEventListener('click',async e=>{const btn=e.currentTarget;if(btn.dataset.active==='1'){btn.disabled=true;try{const clip=await this.recorder.stop();btn.dataset.active='0';btn.textContent=T('skillslab.record-btn');btn.disabled=false;if(clip?.url)this.root.querySelector('[data-playback]').innerHTML=`<audio class="fsl-audio" controls src="${esc(clip.url)}"></audio><p class="fsl-privacy">Audio hanya berada di memory browser dan URL blob sementara; tidak disimpan ke state.</p>`}catch{btn.disabled=false}}else{try{await this.recorder.start();btn.dataset.active='1';btn.textContent='Stop rekaman';this.store.noteCapability('mediaRecorder','ok')}catch{this.store.noteCapability('mediaRecorder','unavailable');this.setFeedback(T('skillslab.mic-unavailable'))}}})
+      this.root.querySelector('[data-record]')?.addEventListener('click',async e=>{const btn=e.currentTarget;if(btn.dataset.active==='1'){btn.disabled=true;try{const clip=await this.recorder.stop();btn.dataset.active='0';btn.textContent=T('skillslab.record-btn');btn.disabled=false;if(clip?.url)this.root.querySelector('[data-playback]').innerHTML=`${T('skillslab.audio-hanya-berada-di-memory',{url:esc(clip.url)})}`}catch{btn.disabled=false}}else{try{await this.recorder.start();btn.dataset.active='1';btn.textContent='Stop rekaman';this.store.noteCapability('mediaRecorder','ok')}catch{this.store.noteCapability('mediaRecorder','unavailable');this.setFeedback(T('skillslab.mic-unavailable'))}}})
     }
     /**
      * m026-BUG1: keadaan "tidak ada suara" adalah keadaan SAH, bukan kunci.
@@ -788,7 +777,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
         if(this.translationOn)this.renderTranslationLine(item);
       }
     }
-    renderComplete(){const ev=this.store.evidence(),d=ev.domains[this.domain];this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">Session complete</span><h2>${this.domain==='listening'?'Listening':'Speaking'} selesai</h2><p>Evidence sidecar saat ini: ${d.attempts} attempt · average ${d.averageScore??'-'}% · pass rate ${d.passRate??'-'}%.</p><p class="fsl-privacy">Tidak ada raw audio, transcript, atau jawaban dictation yang disimpan di state.</p><div class="fsl-actions"><button class="fsl-primary" data-home>Kembali ke lab</button></div></article></section>`;this.root.querySelector('[data-home]').addEventListener('click',()=>this.renderHub());this.notifySessionEnd('complete')}
+    renderComplete(){const ev=this.store.evidence(),d=ev.domains[this.domain];this.root.innerHTML=`${T('skillslab.session-complete-selesai-evidence-sidecar',{Speaking:this.domain==='listening'?'Listening':'Speaking',attempts:d.attempts,averageScore:d.averageScore??'-',passRate:d.passRate??'-'})}`;this.root.querySelector('[data-home]').addEventListener('click',()=>this.renderHub());this.notifySessionEnd('complete')}
     destroy(){this.cancelPrefetch();this.tts.stop();this.recognition.stop();this.recorder.destroy();this.ephemeralTranscript='';if(this.root)this.root.innerHTML=''}
   }
 

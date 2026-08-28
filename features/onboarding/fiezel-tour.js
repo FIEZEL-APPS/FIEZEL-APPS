@@ -391,7 +391,7 @@
         + '<p>' + escapeHtml(current.body) + '</p>'
         + '<div class="fz-tour-actions">'
         + '<button type="button" class="fz-tour-skip" data-tour-skip>Lewati</button>'
-        + '<button type="button" class="fz-tour-next" data-tour-next>' + (isLast ? 'Siap!' : 'Lanjut') + '</button>'
+        + '<button type="button" class="fz-tour-next" data-tour-next>' + (isLast ? 'Siap!' : T('tour.next')) + '</button>'
         + '</div></div>';
 
       // Kartu penjelasan diletakkan di paruh layar yang BERLAWANAN dengan target, supaya ia

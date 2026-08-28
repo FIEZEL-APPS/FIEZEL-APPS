@@ -286,7 +286,7 @@
     return '<div class="fiezel-stepper">'
       + '<span class="fiezel-stepper-eyebrow">' + T('onboarding.stepper-eyebrow', { current: current, total: STEP_LABELS.length }) + '</span>'
       + '<span class="fiezel-stepper-names"><b>' + escapeHtml(STEP_LABELS[current - 1]) + '</b>'
-      + (current < STEP_LABELS.length ? ' · berikutnya: ' + escapeHtml(STEP_LABELS[current]) : ' · terakhir') + '</span>'
+      + (current < STEP_LABELS.length ? T('onboarding.upcoming') + escapeHtml(STEP_LABELS[current]) : ' · terakhir') + '</span>'
       + '<div class="fiezel-segments" role="progressbar" aria-valuemin="1" aria-valuemax="'
       + STEP_LABELS.length + '" aria-valuenow="' + current + '" aria-label="' + T('onboarding.stepper-aria') + '">'
       + bars + '</div></div>';
@@ -490,10 +490,10 @@
       + stepper(1)
       // Langkah nama = sapaan. Maskot melambaikan tangan sekali (greeting), lalu diam di
       // pose itu - bukan melambai terus-terusan di atas kolom yang sedang diisi.
-      + greet(env, 'greeting', 'Senang ketemu kamu! Kita mulai dari yang paling gampang.')
+      + greet(env, 'greeting', T('onboarding.senang-ketemu-you-kita-start'))
       + '<div class="fiezel-sheet" data-ob-step="name">'
-      + '<h2 class="fiezel-title">Halo! Aku Fiezel. Nama kamu siapa?</h2>'
-      + '<p class="fiezel-body">Aku pakai namamu buat nyapa kamu tiap hari, jadi belajarnya berasa punya kamu sendiri.</p>'
+      + T('onboarding.halo-me-fiezel-nama-you')
+      + T('onboarding.me-pakai-namamu-buat-nyapa')
       + '<label class="fiezel-field"><span>' + T('onboarding.name-field-label') + '</span>'
       + '<input type="text" data-ob-name value="' + escapeHtml(typed || '') + '" maxlength="' + NAME_MAX + '"'
       + ' placeholder="' + T('onboarding.name-placeholder') + '" autocomplete="given-name" autocapitalize="words"'
@@ -502,8 +502,8 @@
       // ia ikut ke Core Brain di akun FIEZEL murid sendiri supaya pengingat push bisa
       // menyapa namanya. Menuliskan "nggak dikirim ke mana-mana" akan menjadi janji yang
       // dilanggar oleh kode di app.js (remoteActivitySnapshot).
-      + '<p class="fiezel-note">Nama ini disimpan di HP kamu, dan cuma ikut ke akun FIEZEL kamu sendiri supaya pengingat belajar bisa nyapa kamu. Nggak dibagi ke siapa pun.</p>'
-      + btn('Lanjut', 'data-ob-advance' + (clean ? '' : ' disabled'))
+      + T('onboarding.nama-this-disimpan-at-hp')
+      + btn(T('onboarding.next'), 'data-ob-advance' + (clean ? '' : ' disabled'))
       + '</div>';
   }
 
@@ -535,7 +535,7 @@
       + '<button type="button" class="fiezel-carousel-arrow" data-ob-carousel-next' + (isLast ? ' disabled' : '') + '>'
       + glyph('chevron-right') + '</button>'
       + '</div>'
-      + btn('Lanjut', 'data-ob-advance')
+      + btn(T('onboarding.next-l523'), 'data-ob-advance')
       + '</div>';
   }
 
@@ -560,13 +560,13 @@
       // terpilih dan enam chip level muncul, pekerjaannya berubah: ia menimbang jawaban
       // murid, bukan lagi menawarkan pilihan - karena itu posenya juga berubah.
       + greet(env, selectedGoal ? 'observing' : 'curious',
-        'Tujuanmu yang menentukan materi mana yang kamu dapat dulu.')
+        T('onboarding.tujuanmu-yang-menentukan-materi-mana'))
       + '<div class="fiezel-sheet" data-ob-step="3">'
-      + '<h2 class="fiezel-title">Apa tujuan kamu belajar?</h2>'
+      + T('onboarding.apa-tujuan-you-study')
       + '<div class="fiezel-goal-grid">' + cards + '</div>'
-      + (selectedGoal ? '<p class="fiezel-note">Berapa perkiraan level bahasa Inggrismu sekarang?</p>' + levelRow
-        + '<p class="fiezel-note">Ini cuma perkiraan awal darimu sendiri, akan disesuaikan otomatis setelah kamu mengerjakan latihan - bukan hasil tes.</p>' : '')
-      + btn('Lanjut', 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
+      + (selectedGoal ? T('onboarding.berapa-perkiraan-level-lang-inggrismu') + levelRow
+        + T('onboarding.ini-cuma-perkiraan-awal-darimu') : '')
+      + btn(T('onboarding.next-l554'), 'data-ob-advance' + (selectedGoal ? '' : ' disabled'))
       + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
       + '</div>';
   }
@@ -578,11 +578,11 @@
     return reveal(env)
       + topbar(true)
       + stepper(4)
-      + greet(env, 'encouraging', 'Santai, ini bukan ujian. Bisa kamu hentikan kapan saja.')
+      + greet(env, 'encouraging', T('onboarding.santai-this-bukan-ujian-can'))
       + '<div class="fiezel-sheet" data-ob-step="4">'
-      + '<h2 class="fiezel-title">Apa level bahasa kamu?</h2>'
-      + '<p class="fiezel-body">Kerjakan santai aja, ini bukan ujian — cuma buat aku kenal kemampuanmu.</p>'
-      + '<p class="fiezel-note">Isinya 25 soal listening, grammar, dan vocabulary - tanpa teks bacaan - dan bisa kamu hentikan kapan saja. Hasilnya menjadi levelmu yang sesungguhnya di FIEZEL, menggantikan perkiraan awal tadi.</p>'
+      + T('onboarding.apa-level-lang-you')
+      + T('onboarding.kerjakan-santai-aja-ini-bukan')
+      + T('onboarding.isinya-item-listening-grammar-and')
       + btn('Mulai tes penempatan', 'data-ob-primary')
       + btn('Lewati langkah ini', 'data-ob-step-skip', 'ghost')
       + '</div>';
@@ -603,7 +603,7 @@
       + '<h2 class="fiezel-title">' + T('onboarding.schedule-title') + '</h2>'
       + '<p class="fiezel-body">' + T('onboarding.schedule-body') + '</p>'
       + '<p class="fiezel-note">' + T('onboarding.schedule-note') + '</p>'
-      + btn('Lanjut', 'data-ob-advance')
+      + btn(T('onboarding.next-l591'), 'data-ob-advance')
       + '</div>';
   }
 

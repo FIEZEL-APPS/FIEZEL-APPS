@@ -139,6 +139,48 @@
     // app.js:3725 — toast boot: push belum tersambung
     'sys.core-push-belum': 'Core Brain aktif, tetapi remote push belum tersambung.',
     // app.js:2243 — eyebrow tuntunan langkah (kapital = bagian naskah, bukan CSS)
-    'tutor.tuntunan-eyebrow': 'TUNTUNAN LANGKAH'
+    'tutor.tuntunan-eyebrow': 'TUNTUNAN LANGKAH',
+
+    // ---------- W2-REGEN: entri tunda gelombang regen baseline ----------
+    // app.js:3994 — judul kartu jawaban
+    'ask.answer-judul': 'Jawaban FIEZEL',
+    // app.js:3994 — disclosure AI (spasi ikon-teks tetap di template)
+    'ask.disclosure': 'Pertanyaan dan konteks materi yang kamu buka diproses oleh Core AI. Jangan masukkan data pribadi.',
+    // app.js:4000 — judul galat tanya
+    'ask.galat-judul': 'Belum bisa menjawab sekarang.',
+    // app.js:3954 — intro; HTML-TRUSTED (<b>), esc() tetap di pemanggil (mini-desain plan)
+    'ask.intro': 'Tanya apa saja yang belum kamu mengerti, pakai bahasa sehari-hari. Misalnya <b>kenapa pakai did bukan do</b>. Materi terkait dibatasi ke level {level}.',
+    // app.js:3954 — judul halaman Tanya FIEZEL
+    'ask.judul': 'Tanya FIEZEL',
+    // app.js:3955 — aria-label tombol kirim
+    'ask.kirim-aria': 'Kirim pertanyaan',
+    // app.js:4000 — tombol minta materi (spasi ikon-teks tetap di template)
+    'ask.minta-materi': 'Minta materi ini',
+    // app.js:3955 — placeholder input tanya
+    'ask.placeholder': 'Tulis pertanyaanmu…',
+    // app.js:2754 — tombol error; slug netral (coba+lagi = 2 COMMON lexer gerbang)
+    'auth.tombol-retry': 'Coba lagi',
+    // app.js:2498 — fallback whyFails; kutip tipografis “ ” WAJIB byte-identik
+    'grammar.alasan-salah-fallback': '“{pilihan}” belum memenuhi aturan grammar yang sedang diuji pada kalimat ini.',
+    // app.js:2430 — kartu coach lokal; p.summary dari fallback policy (koordinasi lintas segmen)
+    'home.coach-fokus': '{ringkasan} Fokus: {fokus}. {jumlahSoal} soal, sekitar {menit} menit.',
+    // app.js:2038 — olmDispute() toast konfirmasi remeasure (precompute jumlahSoal, mini-desain plan)
+    'progress.olm-ukur-ulang': 'Oke. Kita ukur ulang {skill} lewat {jumlahSoal} soal di sesi berikutnya.',
+    // app.js:2608 — vonis kilas jawaban salah
+    'quiz.burst-miss': 'Belum tepat',
+    // app.js:2608 — subteks vonis salah
+    'quiz.burst-miss-sub': 'Tenang, kita bedah jawabannya.',
+    // app.js:2608 — vonis kilas jawaban benar
+    'quiz.burst-ok': 'Benar!',
+    // app.js:2608 — subteks vonis benar
+    'quiz.burst-ok-sub': 'Mantap, polanya sudah terbaca.',
+    // app.js:2905 — badan modal fallback jatah
+    'quota.fallback-badan': 'Materi, latihan, dan progresmu tetap jalan seperti biasa. Jatahnya kembali sesudah tengah malam.',
+    // app.js:2905 — judul modal fallback jatah (naskah utama di features/quota/quota-copy.js)
+    'quota.fallback-judul': 'Jatah hari ini sudah habis',
+    // app.js:2905 — tombol modal fallback jatah
+    'quota.fallback-tombol': 'Oke, lanjut belajar',
+    // app.js:2435 — status laporan: default
+    'settings.laporan-siap': 'Siap mengirim otomatis'
   });
 }());
