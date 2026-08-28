@@ -54,14 +54,12 @@ context.window = context; context.self = context;
 context.FIEZEL_VERSION = JSON.parse(fs.readFileSync(path.join(root, 'VERSION.json'), 'utf8')).version;
 context.window.scrollTo = () => {}; context.window.requestAnimationFrame = fn => fn();
 vm.createContext(context);
-/* 2026-08-29 adaptasi i18n m025-186: urutan muat index.html ditiru (fiezel-i18n + copy-id-*
-   sebelum app.js) - app.js memanggil FiezelI18n.t() saat parse. Pola AI-20 F06. */
-const i18nDir = path.join(root, 'features', 'i18n');
-if (fs.existsSync(path.join(i18nDir, 'fiezel-i18n.js'))) {
-  vm.runInContext(fs.readFileSync(path.join(i18nDir, 'fiezel-i18n.js'), 'utf8'), context, { filename: 'fiezel-i18n.js' });
-  for (const f of fs.readdirSync(i18nDir).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
-    vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), context, { filename: f });
-}
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
+
 vm.runInContext(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), context, { filename: 'app.js' });
 
 const validate = context.__fiezelAudit.validateQuestion;

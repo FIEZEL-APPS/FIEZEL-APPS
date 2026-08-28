@@ -447,6 +447,22 @@ check('S13 · Home menampilkan status mode percobaan / terkunci', /activeLevelTr
 // demotionBody, lockedFeature, examDesc, entryChip, entryExam, entryLater, probationBody)
 // supaya ikatan cek ini tidak putus. Regex kunci di bawah menoleransi bentuk keduanya
 // (warn5: di app.js maupun 'level.warn5': di copy-map).
+
+/* Hotfix CI pasca-#242 (lanjutan AI-20 F06 kategori 2a): nilai LEVEL_GUARD_COPY kini hidup di
+   copy-map sebagai FiezelI18n.t('kunci'). Resolver ini mengganti referensi t() dengan nilai id
+   VERBATIM dari features/i18n/copy-id-*.js sehingga semua asersi kunci->nilai di bawah tetap
+   menguji teks yang benar-benar dilihat murid (byte-identik, dijaga id-golden-snapshot). */
+function resolveI18nRefs(text){
+  const dir=path.join(root,'features','i18n');
+  if(!fs.existsSync(dir))return text;
+  const map={};
+  for(const n of fs.readdirSync(dir).filter(n=>/^copy-id-.*\.js$/.test(n))){
+    const src=fs.readFileSync(path.join(dir,n),'utf8');
+    const re=/'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;let m;
+    while((m=re.exec(src)))map[m[1]]=m[2];
+  }
+  return text.replace(/FiezelI18n\.t\('((?:[^'\\]|\\.)+)'\)/g,(w,k)=>Object.prototype.hasOwnProperty.call(map,k)?"'"+map[k]+"'":w);
+}
 let copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
 if (!copyBlock) {
   const levelCopyPath = path.join(root, 'features', 'i18n', 'copy-id-level.js');

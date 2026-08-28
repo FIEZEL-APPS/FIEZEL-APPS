@@ -2,6 +2,12 @@ import json,re,hashlib,subprocess,collections,os
 from pathlib import Path
 ROOT=Path(__file__).parent
 AUDIT_TMP=ROOT/'.audit-tmp'
+# Bersihkan litter run sebelumnya SEBELUM dipakai: tes adoption/rehearsal menulis snapshot
+# grammar-templates.json ke sini dan tidak cleanup, lalu harness walk basename-first-wins
+# (content-integrity-audit dkk.) menangkap snapshot basi itu alih-alih file kanonik root -
+# 14 lesson palsu 0/25 pada 2026-08-29 berasal persis dari sini.
+import shutil as _shutil
+if AUDIT_TMP.exists(): _shutil.rmtree(AUDIT_TMP, ignore_errors=True)
 AUDIT_TMP.mkdir(exist_ok=True)
 os.environ['TMPDIR']=str(AUDIT_TMP)
 PASS=True; checks=[]

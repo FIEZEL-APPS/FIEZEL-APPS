@@ -366,6 +366,25 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/brain/fiezel-item-calibration.js"></script>
   <script defer src="./features/brain/fiezel-speaking-adaptive.js"></script>
   <script defer src="./features/brain/fiezel-srl-coach.js"></script>
+  <!-- brain-learning-infra: lima modul infrastruktur belajar (stat-gate, manifest, config,
+       metrik belajar, digest metrik). Pola muat identik dengan modul brain lain: defer,
+       murni fungsi, tanpa jaringan. stat-gate dimuat PERTAMA karena manifest/config/metrik
+       membacanya saat evaluasi; semua pengait di app.js dijaga availability-check +
+       try/catch - berkas yang belum tiba berarti aplikasi berjalan persis seperti hari ini. -->
+  <script defer src="./features/brain/fiezel-stat-gate.js"></script>
+  <script defer src="./features/brain/fiezel-brain-manifest.js"></script>
+  <script defer src="./features/brain/fiezel-brain-config.js"></script>
+  <script defer src="./features/brain/fiezel-learning-metrics.js"></script>
+  <script defer src="./features/brain/fiezel-metrics-digest.js"></script>
+  <!-- brain-learning-infra: lane telemetri belajar (config → events → queue → transport).
+       Urutan penting: transport membaca queue, queue membaca events, semuanya membaca
+       config, jadi config dimuat paling awal. Dimuat SEBELUM app.js dengan pola defer
+       yang sama; pengaitnya di app.js guarded - tanpa berkas ini telemetri diam,
+       aplikasi tidak berubah perilaku. -->
+  <script defer src="./features/telemetry/fiezel-telemetry-config.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-events.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-queue.js"></script>
+  <script defer src="./features/telemetry/fiezel-learning-transport.js"></script>
   <script defer src="./features/brand/fiezel-choreography.js"></script>
   <script defer src="./features/audio/fiezel-ui-sfx.js"></script>
   <script defer src="./features/library/fiezel-library.js"></script>
