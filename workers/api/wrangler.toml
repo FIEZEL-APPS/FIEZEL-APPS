@@ -89,7 +89,7 @@ AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
 # tanpa henti) tetapi tidak satu baris pun ditulis, dan cron rollup keluar
 # lewat `{skipped:'flag_off'}`. Owner menyalakannya dengan:
 #   wrangler deploy   (setelah mengubah nilai ini)  ATAU  var override di dashboard.
-ANALYTICS_ENABLED = "off"
+ANALYTICS_ENABLED = "on"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
