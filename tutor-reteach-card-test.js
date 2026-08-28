@@ -128,8 +128,12 @@ test('kartu menahan alur SEBELUM soal berikutnya digambar', () => {
 });
 
 test('tombol lanjut di kartu membuang kartunya, jadi ia tidak bisa muncul dua kali', () => {
-  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;(?:start=Date\.now\(\);)?draw\(\)\}/.test(APP),
-    'tombol lanjut tidak mengosongkan pendingCard sebelum menggambar');
+  // m025-180: assert DIPERKETAT, bukan dilonggarkan - tombol lanjut kini juga wajib me-reset
+  // timer soal (start=Date.now()) sebelum menggambar, supaya waktu membaca kartu reteach tidak
+  // mencemari response-time soal berikutnya (bukti: audit A14 teach-card timing). Kartu tetap
+  // wajib dikosongkan lebih dulu, jadi properti lama tercakup penuh oleh properti baru.
+  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;start=Date\.now\(\);draw\(\)\}/.test(APP),
+    'tombol lanjut tidak mengosongkan pendingCard DAN me-reset timer sebelum menggambar');
 });
 
 test('kartu punya jalan keluar yang sama dengan layar kuis', () => {
