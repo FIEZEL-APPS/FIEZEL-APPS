@@ -281,6 +281,21 @@ html.fz-booting body{overflow:hidden}
        menambahkannya ke precache sw.js. -->
   <script defer src="./features/i18n/fiezel-i18n.js"></script>
   <script defer src="./features/i18n/copy-id-core.js"></script>
+  <!-- W2-INT: SEMUA copy-map id Gelombang 2 dimuat di sini — SESUDAH copy-id-core.js,
+       SEBELUM modul features/* dan app.js (kontrak handoff W2-APP-A..D, W2-FEAT-A/B,
+       W2-STATE; modul features non-pure memanggil t() saat definisi tabel, jadi copy
+       yang telat = kunci mentah tampil ke murid). Urutan register antar copy-id bebas
+       (fiezel-i18n.js menolak kunci ganda), tapi urutan tulis ini dipertahankan sama
+       dengan harness tes W2-TEST-A: core → app-a..d → feat-a/b → quota → settings-locale. -->
+  <script defer src="./features/i18n/copy-id-app-a.js"></script>
+  <script defer src="./features/i18n/copy-id-app-b.js"></script>
+  <script defer src="./features/i18n/copy-id-app-c.js"></script>
+  <script defer src="./features/i18n/copy-id-app-d.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-a.js"></script>
+  <script defer src="./features/i18n/copy-id-feat-b.js"></script>
+  <script defer src="./features/i18n/copy-id-gems.js"></script>
+  <script defer src="./features/i18n/copy-id-quota.js"></script>
+  <script defer src="./features/i18n/copy-id-settings-locale.js"></script>
   <!-- FIEZEL_I18N_END -->
   <script defer src="./features/diagnostics/fiezel-diagnostic-targets.js"></script>
   <script defer src="./features/diagnostics/fiezel-diagnostic-bus.js"></script>

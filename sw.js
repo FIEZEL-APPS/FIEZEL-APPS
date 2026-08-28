@@ -81,14 +81,16 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
   // Wave 1 i18n (AI-02 / AI-13 F02): runtime i18n + copy-map Indonesia ikut shell - PWA ini
   // offline-first dan copy-map yang tidak ter-precache berarti murid id offline kehilangan
-  // seluruh naskah antarmukanya. Daftar domain copy-id di bawah PROVISIONAL sampai Wave 2
-  // mengunci daftar final (koordinasi lewat impl/handoff/W1-SW.md). Aturan lama tetap
+  // seluruh naskah antarmukanya. Daftar domain copy-id di bawah adalah daftar FINAL Wave 2
+  // (W2-INT merekonsiliasi nama provisional lama copy-id-login/home/dst yang tidak pernah
+  // dibuat — handoff W2-APP-B §2 / W2-FEAT-B §1, koordinasi impl/handoff/W1-SW.md) dan
+  // setiap path sudah diverifikasi ada di disk oleh skrip W2-INT. Aturan lama tetap
   // berlaku keras di sini: cache.addAll gagal total bila satu saja 404, jadi gelombang ini
   // baru boleh dirilis setelah SEMUA berkas ini benar-benar ada di repo. Aset Thai
   // (copy-th-*, grammar-explanations-th, font Thai) SENGAJA tidak di sini - lihat
   // LOCALE_TH_CACHE di bawah. (Catatan alat yang sama dengan blok lain: jangan menaruh
   // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
-  './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-login.js','./features/i18n/copy-id-home.js','./features/i18n/copy-id-grammar.js','./features/i18n/copy-id-settings.js','./features/i18n/copy-id-progress.js','./features/i18n/copy-id-quiz.js','./features/i18n/copy-id-onboarding.js','./features/i18n/copy-id-tutor.js',
+  './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.

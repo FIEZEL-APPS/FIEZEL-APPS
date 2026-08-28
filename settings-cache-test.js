@@ -92,6 +92,16 @@ if (!clearBlock) {
 }
 
 // ------------------------------------------------- S4: fixture behavioral (vm, hermetis) -
+// m025-182 (W2-STATE, pola W1-TESTPLAN 2b — HARNESS kondisional): blok clearAppCache kini
+// memanggil FiezelI18n.t(...) (kalimatnya dipindah Wave 2 ke copy-map byte-identik), jadi
+// runtime i18n + union copy-id dimuat ke vm SEBELUM blok. Kalau berkasnya belum ada,
+// harness kosong dan sandbox berjalan persis seperti sebelumnya. Asersi Indonesia S4e
+// TIDAK berubah: kalimat toast tetap byte-identik, hanya sumbernya kini copy-map.
+const i18nRuntimePath = path.join(i18nDir, 'fiezel-i18n.js');
+const i18nHarness = fs.existsSync(i18nRuntimePath)
+  ? fs.readFileSync(i18nRuntimePath, 'utf8') + '\n' + copyIdUnion
+  : '';
+
 if (clearBlock) {
   const store = {
     'fiezel-v4-state': '{"level":"B1","xp":1200}',
@@ -133,6 +143,7 @@ if (clearBlock) {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
+  if (i18nHarness) vm.runInContext(i18nHarness, sandbox, { timeout: 2000 });
   vm.runInContext(clearBlock, sandbox, { timeout: 2000 });
   vm.runInContext('globalThis.__result=clearAppCache()', sandbox, { timeout: 2000 });
   sandbox.__result.then(result => {
@@ -167,6 +178,7 @@ if (clearBlock) {
     };
     sandbox2.self = sandbox2; sandbox2.window = sandbox2; sandbox2.globalThis = sandbox2;
     vm.createContext(sandbox2);
+    if (i18nHarness) vm.runInContext(i18nHarness, sandbox2, { timeout: 2000 });
     vm.runInContext(clearBlock, sandbox2, { timeout: 2000 });
     vm.runInContext('globalThis.__result=clearAppCache()', sandbox2, { timeout: 2000 });
     return sandbox2.__result.then(() => {
