@@ -80,6 +80,13 @@ jobs:
             toml = toml.replace(blok, '# (blok LEARNING_DB dilepas saat deploy: database fiezel-learning belum ada di akun)\n');
             console.log('LEARNING_DB tidak ada di worker live: blok dilepas, modul learning tetap mati (fail-closed).');
           }
+          // ROUTES: custom domain api.fiezel.my.id SUDAH menempel pada worker live dan
+          // lampiran itu bertahan lintas deploy. Token CI tidak berizin Zone->Workers
+          // Routes (error 10000), jadi blok routes dilepas saat deploy: kode+vars tetap
+          // terkirim, alamat publik tidak berubah. Mengubah route tetap urusan owner.
+          const rblok = /routes\s*=\s*\[[\s\S]*?\]\s*\n/;
+          if (!rblok.test(toml)) { console.error('blok routes tidak ditemukan untuk dilepas'); process.exit(1); }
+          toml = toml.replace(rblok, '# (blok routes dilepas saat deploy: token CI tanpa izin zona; custom domain live tetap menempel)\n');
           if (toml.includes('<isi setelah')) { console.error('masih ada placeholder yang tidak tertangani'); process.exit(1); }
           fs.writeFileSync('wrangler.toml', toml);
           JS
