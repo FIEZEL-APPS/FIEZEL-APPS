@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T17:00:00+07:00",
+  "updated": "2026-08-28T17:45:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -36,25 +36,6 @@
       ],
       "mulai": "2026-08-28T06:30:00+07:00",
       "catatan": "Penegak koordinasi, siaran, arbiter versi, nightwatch."
-    },
-    {
-      "sesi": "sesi-computer-086e9698/P3",
-      "peran": "worker MASTER",
-      "paths": [
-        "workers/api/ai/",
-        "workers/api/mw-flags.js"
-      ],
-      "mulai": "2026-08-28T16:00:00+07:00",
-      "catatan": "Tegakkan cfAiEnabled di server (lubang biaya) + betulkan 3 tipe task yang tidak menyampaikan jawaban."
-    },
-    {
-      "sesi": "sesi-computer-086e9698/D2",
-      "peran": "worker MASTER",
-      "paths": [
-        "workers/owner/queries.js"
-      ],
-      "mulai": "2026-08-28T16:00:00+07:00",
-      "catatan": "Selaraskan kueri dashboard dengan skema analytics yang benar-benar ada."
     }
   ],
   "finished": [
@@ -110,6 +91,24 @@
       ],
       "selesai": "2026-08-28T17:00:00+07:00",
       "catatan": "Pemancar analytics dipasang; gerbang yang MENGUNCI bug dibalik; bug kirim-ganda yang menggembungkan DAU ditutup. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/P3",
+      "peran": "worker MASTER",
+      "paths": [
+        "(lihat commit)"
+      ],
+      "selesai": "2026-08-28T17:45:00+07:00",
+      "catatan": "Penegakan flag AI + plafon neuron akun + 3 tipe task diperbaiki + quotaRolledBack jujur. Sudah di main; migrasi 0005 sudah diterapkan; 403 ai_disabled terbukti dari luar."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/D2",
+      "peran": "worker MASTER",
+      "paths": [
+        "(lihat commit)"
+      ],
+      "selesai": "2026-08-28T17:45:00+07:00",
+      "catatan": "Kueri dashboard diselaraskan ke skema nyata; 20 nama metrik yang tidak pernah ditulis siapa pun dibuang; 10 panel ditandai tidak-terukur. Sudah di main."
     }
   ],
   "menunggu_izin": [
