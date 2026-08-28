@@ -9,7 +9,7 @@
  * ────────────────────────────────────────────────────────────────────────────────────────
  * `reports/cf-a2-cf-existing.md` §(d) menemukan asimetri: workflow yang menyentuh Puter
  * (`deploy-core-worker.yml:17`, `configure-core.yml:12`, `push-reminders.yml:15`) bergerbang
- * `github.actor == 'FIEZEL-APPS'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
+ * `github.actor == '<login owner>'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
  * yang memegang kunci ElevenLabs TIDAK. Rekomendasi #2 laporan itu: pasang gate yang sama.
  * `reports/cf-a7-security.md` §2 dan §6 menaikkan urgensinya: token-token itu punya blast
  * radius akun penuh, dan workflow pemegangnya juga `git push` ke branch produksi.
@@ -54,16 +54,16 @@ const WORKFLOW_DIR = path.join(root, '.github', 'workflows');
  * (deploy-core-worker.yml, configure-core.yml, push-reminders.yml, audio-prerender-cf.yml,
  * master-authority-guard.yml). Governance-nya di MASTER-ONLY-GOVERNANCE.md.
  *
- * m025-180: akun GitHub di-rename `FIEZEL-APPS` -> `FIEZEL-APPS`. Rename itu MEMATIKAN setiap
- * gerbang ini tanpa satu pun gejala di CI: job yang `if`-nya tidak lagi cocok TIDAK gagal, ia
- * di-SKIP, dan workflow-nya tetap hijau — jadi owner menekan "Run workflow", melihat centang
- * hijau, dan tidak ada yang ter-deploy. Satu-satunya yang gagal keras adalah
- * master-authority-guard.yml, karena ia membandingkan di bash (`!=`), bukan di ekspresi
- * GitHub: setiap push ke `main` oleh owner berubah jadi exit 1.
+ * KENAPA LOGIN INI PUNYA PENJAGA SENDIRI (m025-180): mengganti nama akun GitHub MEMATIKAN
+ * setiap gerbang aktor tanpa satu pun gejala di CI. Job yang `if`-nya tidak lagi cocok TIDAK
+ * gagal — ia di-SKIP, dan workflow-nya tetap hijau, jadi owner menekan "Run workflow",
+ * melihat centang hijau, dan tidak ada yang ter-deploy. Satu-satunya yang gagal keras adalah
+ * `master-authority-guard.yml`, karena ia membandingkan di bash (`!=`) alih-alih di ekspresi
+ * GitHub: setiap push ke `main` oleh owner sendiri berubah jadi exit 1.
  *
- * `subdomain produksi fitrajft.workers.dev` di catatan lama SENGAJA tidak ikut diganti: itu
- * subdomain akun CLOUDFLARE (audio/manifest.json:5), bukan login GitHub, dan rename GitHub
- * tidak menyentuhnya.
+ * Subdomain Cloudflare `*.workers.dev` (audio/manifest.json:5) adalah benda yang BERBEDA dan
+ * tidak ikut berubah: ia milik akun Cloudflare, bukan GitHub, dan hanya bisa diganti dari
+ * dashboard Cloudflare.
  */
 const OWNER_LOGIN = 'FIEZEL-APPS';
 

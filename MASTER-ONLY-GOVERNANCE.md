@@ -1,11 +1,11 @@
 # FIEZEL MASTER-ONLY WRITE AUTHORITY
 
 Status: ENFORCED POLICY
-Owner identity: `FIEZEL-APPS`
-Owner identity history: renamed from `FIEZEL-APPS` on 2026-08-28 (same GitHub account, id
-315542995). The rename is recorded rather than erased because every actor gate in
-`.github/workflows/` compares against this login by literal string, and a reader auditing an
-older run needs to know which login was in force at the time.
+Owner identity: `FIEZEL-APPS` (GitHub account id 315542995)
+Owner identity is matched by LITERAL STRING in every actor gate under `.github/workflows/`,
+so a change of login silently disables them: a job whose `if` no longer matches is SKIPPED,
+not failed, and the workflow still reports green. `workflow-actor-gate-test.js` therefore
+reads the repository owner from the git remote and fails loudly when the two disagree.
 Control model: single MASTER executor; all other internal/external helpers are advisory-only.
 
 ## 1. Sole write authority

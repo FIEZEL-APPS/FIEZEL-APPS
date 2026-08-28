@@ -24,9 +24,6 @@ Total waktu: sekitar 30–60 menit. Ikuti urutan; tulis hasilnya di Bagian 5.
 6. **Catat jam mulai**.
 
 Alamat aplikasi (Safari): `https://fiezel-apps.github.io/FIEZEL-APPS/`
-(akun GitHub di-rename 2026-08-28; alamat lama `fiezel-apps.github.io` masih diarahkan ulang
-oleh GitHub, tetapi PWA yang terlanjur terpasang dari sana tetap berjalan di ORIGIN LAMA —
-penyimpanan, service worker, dan token Puter-nya terpisah.)
 (gunakan alamat/manajemen bookmark yang biasa dipakai).
 
 Catatan: versi aplikasi tampil di pojok kanan atas aplikasi sebagai `v5.19.0`.
@@ -56,10 +53,7 @@ Lakukan urutan ini:
 Hapus data website Safari untuk situs ini (jarang perlu):
 
 1. Pengaturan → Safari → Lanjutan → **Data Situs Web**.
-2. Cari `fiezel-apps.github.io` DAN `fiezel-apps.github.io` (atau entri "FIEZEL") → geser ke kiri
-   → **Hapus** → konfirmasi. Keduanya perlu dicari: perangkat yang pernah memasang aplikasi
-   sebelum rename menyimpan datanya di origin lama, dan menghapus salah satunya saja
-   meninggalkan separuh keadaan lama yang tidak terlihat.
+2. Cari `fiezel-apps.github.io` (atau entri "FIEZEL") → geser ke kiri → **Hapus** → konfirmasi.
    > ⚠️ **Penting**: langkah ini menghapus data belajar lokal (progres tersimpan di
    > localStorage Safari). Lakukan **hanya** jika "buka 2x" tidak cukup, dan lebih baik
    > minta konfirmasi coordinator dulu jika progres dianggap berharga.
