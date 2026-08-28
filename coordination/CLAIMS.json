@@ -42,11 +42,13 @@
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
       "paths": [
         "DESIGN-SYSTEM.md",
+        "FIEZEL-PRODUCTION-UIUX-AUDIT.md",
         "app.js",
         "features/ui/fiezel-back-nav.js",
         "index.html",
         "paw-mascot-test.js",
         "r2-ux-overhaul-smoke-test.js",
+        "reports/uiux-2026-08-28/",
         "style.css"
       ],
       "mulai": "2026-08-28T16:55:00+07:00",
