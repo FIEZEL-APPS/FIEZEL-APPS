@@ -193,6 +193,26 @@
     }).catch(function () { return ''; });
   }
 
+  /* ========================================================================================
+     FASE 11 (17 R-2a) — kabel siaran ke jembatan bicara maskot. Fasad hanya MELAPOR lewat
+     CustomEvent 'fiezel-speech' di document; ia tidak menunggu pendengar, tidak pernah
+     melempar, dan TIDAK mengubah tangga suara satu keputusan pun (G8: sistem suara tidak
+     pernah diganti). detail = { phase:'start'|'progress'|'end'|'interrupt'|'silent',
+     layer:0..5, currentTime?, duration? }; layer 0 = level fasad (resolusi janji/stop),
+     bukan lapisan audio tertentu. Jembatan: features/neural-voice/fiezel-speech-bridge.js.
+     ======================================================================================== */
+  function emitSpeech(phase, layer, extra) {
+    try {
+      var d = { phase: phase, layer: layer };
+      if (extra) { for (var k in extra) { if (Object.prototype.hasOwnProperty.call(extra, k)) d[k] = extra[k]; } }
+      (root.document || root).dispatchEvent(new CustomEvent('fiezel-speech', { detail: d }));
+    } catch (_) { /* jembatan absen/gagal bukan urusan tangga suara */ }
+  }
+  /* Resolusi janji say() adalah otoritas "giliran bicara selesai" (14 §1.4): true → end,
+     false → silent (L5 teks-tanpa-suara: mulut TIDAK PERNAH dianimasikan). Nilai janji
+     diteruskan apa adanya — pengamat murni, bukan percabangan tangga. */
+  function reportTurn(spoke) { emitSpeech(spoke === true ? 'end' : 'silent', spoke === true ? 0 : 5); return spoke; }
+
   /**
    * @param {string|object} input teks Inggris, atau {en, id} bila terjemahannya
    *        sudah tersedia seperti pada dialog tutor
@@ -218,8 +238,8 @@
 
     // Saat flag 'off' baris ini adalah SATU-SATUNYA percabangan tambahan di seluruh jalur
     // bicara, dan ia langsung masuk ke L1 seperti hari ini.
-    if (!cfEnabled()) return speakFromAssets(english, opts, band_);
-    return cfCachedFirst(english, opts, band_);
+    if (!cfEnabled()) return speakFromAssets(english, opts, band_).then(reportTurn, function (e) { reportTurn(false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
+    return cfCachedFirst(english, opts, band_).then(reportTurn, function (e) { reportTurn(false); throw e; }); // FASE 11: pengamat resolusi, bukan cabang
   }
 
   /**
@@ -260,6 +280,7 @@
         speed: opts.speed,
         onProgress: function (currentTime, duration) {
           if (band_) band_.update(currentTime, duration);
+          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio C0/C1/L1
         }
       })).then(function (played) {
         if (played) { if (band_) band_.end(); return true; }
@@ -288,6 +309,7 @@
         speed: opts.speed,
         onProgress: function (currentTime, duration) {
           if (band_) band_.update(currentTime, duration);
+          emitSpeech('progress', 1, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio L1
         }
       }).then(function (played) {
         // Berkas ada di manifest tetapi gagal diputar - jaringan putus, atau autoplay
@@ -397,6 +419,7 @@
       voice: opts.voice,
       onProgress: function (currentTime, duration) {
         if (band_) band_.update(currentTime, duration);
+        emitSpeech('progress', 2, { currentTime: currentTime, duration: duration }); // FASE 11: jam audio L2
       }
     }).then(function (done) {
       // m026-BUG2b. Mesin Puter tidak selalu MELEMPAR ketika ia gagal - pada kehabisan waktu
@@ -427,6 +450,7 @@
     // gagal. Yang berubah hanya apa yang terjadi SESUDAH null - dulu jalurnya berhenti di
     // sini dengan false, dan itulah kenapa murid baru mendapat SENYAP TOTAL (cf-c1 K10).
     if (!local) return speakWithBrowser(english, opts, band_);
+    emitSpeech('start', 3, { duration: english.length / (14.5 * (Number(opts.speed) > 0 ? Number(opts.speed) : 1)) }); // FASE 11: L3 tanpa onProgress — durasi taksiran 14 §1.3
     return local.speak(english, {
       speed: opts.speed,
       voice: opts.voice
@@ -488,7 +512,7 @@
       var rate = Number(opts.speed);
       utterance.rate = rate > 0 ? rate : 1;
       if (opts.voice && typeof opts.voice === 'object') { try { utterance.voice = opts.voice; } catch (_) {} }
-      utterance.onstart = function () { started = true; if (timer) { clearTimeout(timer); timer = null; } };
+      utterance.onstart = function () { started = true; if (timer) { clearTimeout(timer); timer = null; } emitSpeech('start', 4); }; // FASE 11: L4 bicara HANYA sejak onstart (14 §1.3)
       utterance.onend = function () { settle(true); };
       utterance.onerror = function () { settle(false); };
       timer = setTimeout(function () { settle(false); }, BROWSER_BREAKER_MS);
@@ -703,6 +727,7 @@
   }
 
   function stop() {
+    emitSpeech('interrupt', 0); // FASE 11: stop() = interupsi giliran — mulut snap tutup (14 §1.4)
     var store = assets();
     if (store && typeof store.stop === 'function') { try { store.stop(); } catch (_) {} }
     var voice = engine();

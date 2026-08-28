@@ -37,7 +37,7 @@ jobs:
     # kalau nanti seseorang menambahkan `push:` atau `schedule:`, gerbang ini gagal
     # tertutup (job tidak jalan) alih-alih diam-diam lolos karena github.actor pada
     # pemicu otomatis bisa berupa aktor yang bukan owner.
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -113,7 +113,7 @@ test('build deterministik: dua kali build identik byte, dan file di disk sinkron
 test('setiap template masuk items ATAU rejected dengan alasan tercatat', () => {
   const inItems = new Set(bank.items.map((it) => it.templateId));
   const inRejected = new Set(bank.rejected.map((r) => r.templateId));
-  const reasons = new Set(['no_blank_marker', 'multi_blank', 'answer_too_short', 'answer_ambiguous']);
+  const reasons = new Set(['no_blank_marker', 'multi_blank', 'answer_too_short', 'answer_ambiguous', 'answer_not_typable']);
   bank.rejected.forEach((r) => {
     assert.ok(reasons.has(r.reason), r.templateId + ': alasan tolak tak dikenal "' + r.reason + '"');
     assert.ok(typeof r.detail === 'string' && r.detail.length > 0, r.templateId + ': detail tolakan kosong');

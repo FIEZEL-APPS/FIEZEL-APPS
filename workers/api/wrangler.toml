@@ -39,14 +39,14 @@ SERVICE_NAME      = "fiezel-api"
 API_VERSION       = "cf-api-1"
 AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
 # Allowlist CORS eksplisit. BUKAN pantulan Origin, BUKAN "*".
-# Catatan jujur: `fitrajft-ux.github.io` ada di public suffix list => cross-site,
+# Catatan jujur: `fiezel-apps.github.io` ada di public suffix list => cross-site,
 # jadi cookie identitas TIDAK akan terkirim dari sana. Cermin GitHub Pages tetap
 # bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
-ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fitrajft-ux.github.io"
+ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
 # Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
 # jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).
-FEATURE_AI        = "off"
+FEATURE_AI        = "on"
 FEATURE_TTS       = "off"
 FEATURE_COACH     = "off"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
@@ -154,13 +154,14 @@ bucket_name = "fiezel-audio"
 [ai]
 binding = "AI"
 
-# --- Analytics Engine -------------------------------------------------------
-# Event OPERASIONAL saja (ai_call, tts_call, cache_hit/miss, quota_denied,
-# circuit_open). Bukan sumber kebenaran DAU/MAU. Kontrak privasi: tidak ada
-# `index1 = user_id`; pengenal harian ber-pepper saja, dan pepper dirotasi 24 jam.
-[[analytics_engine_datasets]]
-binding = "AE"
-dataset = "fiezel_events"
+# --- Analytics Engine: DIHAPUS (m025-176) -------------------------------------
+# Binding `AE` (dataset fiezel_events) dulu dideklarasikan di sini untuk event
+# operasional, tetapi TIDAK ADA satu baris kode pun di workers/api yang memakai
+# `env.AE`/`writeDataPoint` — deklarasi mati. Efek nyatanya: `wrangler deploy`
+# gagal keras (code 10089) di akun yang belum mengaktifkan Analytics Engine.
+# Kalau suatu saat event operasional benar-benar ditulis, kembalikan blok
+# `[[analytics_engine_datasets]]` BERSAMA kodenya, dan pertahankan kontrak
+# privasi: tanpa `index1 = user_id`, pengenal harian ber-pepper rotasi 24 jam.
 
 # --- CRON -------------------------------------------------------------------
 # DUA trigger, dan keduanya wajib. Handler-nya `scheduled()` di `index.js`,
@@ -249,9 +250,16 @@ crons = ["*/5 * * * *", "5 17 * * *"]
 # ditulis di [vars] berkas ini; kalau dibutuhkan, pasang sadar-sadar dan hapus
 # lagi. Lihat `workers/api/mw-edge.js` dan `deploy/edge/README.md`.
 #
-# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17, audit D3 HIGH-2 —
-# lihat `workers/api/rate-anon.js`; default dipakai bila tidak disetel):
-#   ANON_ISSUE_LIMIT_PER_HOUR        = "5"   # per IP, saat gerbang edge off/dev
-#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR = "30"  # TOTAL/jam di belakang jembatan (satu IP bersama)
-#   ANON_JITTER_MAX_MS               = "150" # jitter respons /api/auth/anon; "0" mematikan
+# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17 audit D3 HIGH-2, direvisi
+# paket S1 28 Agu 2026 — lihat `workers/api/rate-anon.js`; default dipakai bila
+# tidak disetel). Cabang tarif dipilih dari `ctx.edgePath` (jalur yang BENAR-BENAR
+# dipakai permintaan), bukan dari ada/tidaknya `EDGE_SHARED_SECRET`:
+#   ANON_ISSUE_LIMIT_PER_HOUR          = "15"  # per IP, JENDELA BERGULIR 1 jam (jalur langsung)
+#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR   = "30"  # TOTAL/jam, HANYA saat edgePath="header" (proxy PHP: satu IP bersama)
+#   ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR = "5"   # saat D1 tak terbaca; otomatis dijepit <= batas normal
+#   ANON_JITTER_MAX_MS                 = "150" # jitter respons /api/auth/anon; "0" mematikan
+# Satu kelas (30-40 murid) yang onboarding serentak di SATU wifi sekolah akan kena
+# 429 mulai murid ke-16. Untuk sesi kelas terjadwal, setel sementara
+# ANON_ISSUE_LIMIT_PER_HOUR = "60" lalu hapus lagi; penutup permanennya Turnstile
+# atau WAF rate-rule per ASN (lihat reports/work-s1-auth-anon.md).
 # ============================================================================

@@ -102,12 +102,19 @@ const MUTATIONS = [
     expect: ['(h9)']
   },
   {
-    id: 'M11-owner-ikut-meloloskan-hostname',
+    // DIBALIK 28 Agu 2026. Mutasi ini dulu menyuntikkan jalur hostname ke Worker OWNER dan
+    // menuntut butir (f) merah, karena saat itu `owner.fiezel.my.id` MASIH difrontkan proxy PHP
+    // dan jalur hostname di sana memang salah. Custom domain owner sekarang aktif, jadi owner
+    // BERHAK punya jalur itu — dan mutasi lama menjadi pernyataan yang keliru. Yang masih perlu
+    // dijaga dari sisi asimetri adalah arah sebaliknya: daftar hostname tepercaya kedua Worker
+    // tidak boleh saling bocor. Bukti merah lengkap untuk jalur owner ada di
+    // reports/d3-owner-guard-red-proof.mjs.
+    id: 'M11-daftar-hostname-owner-bocor-ke-hostname-api',
     gate: 'owner-edge-guard-test.js',
     file: OWNER,
-    from: 'function edgeGuard(request, env, pathname) {',
-    to: "const TRUSTED_EDGE_HOSTS = ['owner.fiezel.my.id'];\nfunction isTrustedEdgeHost(h) { return TRUSTED_EDGE_HOSTS.includes(String(h).toLowerCase()); }\nfunction edgeGuard(request, env, pathname) {\n  if (isTrustedEdgeHost(new URL(request.url).hostname)) return null; // MUTASI",
-    expect: ['(f)']
+    from: "const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id']);",
+    to: "const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id', 'api.fiezel.my.id']);",
+    expect: ['(g-a)', '(g-c)']
   }
 ];
 
@@ -151,7 +158,7 @@ for (const m of MUTATIONS) {
     gate: m.gate,
     exit: run.exit,
     merah: run.exit !== 0,
-    butirYangJatuh: Array.from(new Set(failed.map((msg) => (/^\([a-z0-9]+\)/.exec(msg) || ['(?)'])[0]))).sort(),
+    butirYangJatuh: Array.from(new Set(failed.map((msg) => (/^\((?:g-)?[a-z0-9*]+\)/.exec(msg) || ['(?)'])[0]))).sort(),
     contohAssertMerah: failed.slice(0, 3),
     butirDiharapkanJatuh: m.expect,
     butirDiharapkanYangBenarJatuh: hitGroups,

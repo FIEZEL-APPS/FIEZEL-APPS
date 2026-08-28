@@ -48,6 +48,19 @@
     return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelTtsProviderParams;
   }());
 
+  /**
+   * S2 - SATU-SATUNYA PINTU KE MODEL, sama seperti `route-ai.js`. Berkas ini dulu
+   * memanggil `env.AI.run(engineId, ...)` LANGSUNG dan TIDAK punya pagar neuron akun
+   * sama sekali - padahal mesin TTS-nya (`@cf/deepgram/aura-1`, `@cf/myshell-ai/melotts`)
+   * berjalan di binding Workers AI yang SAMA dan menghabiskan kolam 10.000 neuron/hari
+   * yang sama. Jadi jalur ini adalah lubang yang lebih lebar daripada dep opsional di
+   * `route-ai.js`: di sana plafonnya bisa lupa disambung, di sini ia tidak ada.
+   */
+  var ModelCallGate = (function () {
+    if (typeof module === 'object' && module.exports && typeof require === 'function') return require('../ai/model-call-gate.js');
+    return (typeof globalThis !== 'undefined' ? globalThis : {}).FiezelModelCallGate;
+  }());
+
   /** Sama alasannya dengan route-ai.js: E5 dan paket kuota harus bisa di-merge dalam urutan apa pun. */
   function resolveEnforceQuota(deps) {
     var d = deps || {};
@@ -104,6 +117,16 @@
     quota_unavailable: 'Aku belum bisa membaca sisa jatahmu, jadi jatahmu kemungkinan besar masih utuh. Suara perangkatmu tetap bisa dipakai — coba lagi sebentar lagi, ya.',
     breaker_open: 'Suara dari perangkatmu dulu — layanan suara sedang istirahat sebentar. Ini bukan kesalahanmu.',
     unavailable: 'Suara dari perangkatmu dulu — audio belum tersedia untuk kalimat ini.',
+    // S2 - jatah neuron AKUN (bukan jatah murid) penuh: suara perangkat tetap jalan dan
+    // jatah murid TIDAK dipotong, jadi kalimatnya harus mengatakan dua hal itu.
+    account_budget: 'Suara dari perangkatmu dulu — pembuatan suara sedang penuh untuk hari ini, bukan karena jatahmu. Jatahmu nggak berkurang.',
+    // S2 - pagar neuron akun BELUM TERPASANG (dep tidak disuntikkan / tanda terima tidak
+    // sah). Salah pasang, bukan jatah penuh, dan bukan salah murid.
+    account_missing: 'Suara dari perangkatmu dulu — pembuatan suara belum bisa dipakai karena setelan di server belum lengkap. Jatahmu utuh.',
+    // S3 - FLAG TTS MATI. Bukan jatah murid, bukan jatah akun, bukan kesalahan murid, dan
+    // bukan soal waktu: pemilik aplikasi belum menyalakan suara premium. Kalimatnya tidak
+    // boleh menjanjikan "coba lagi nanti", karena menunggu tidak mengubah apa pun.
+    tts_disabled: 'Suara dari perangkatmu dulu — suara premium sedang dimatikan di server, bukan karena jatahmu. Jatahmu utuh.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim.'
   });
 
@@ -121,6 +144,15 @@
     return base ? base + '/a/' + objectName : 'a/' + objectName;
   }
 
+  /**
+   * S3 - BAWAAN AMPLOP YANG JUJUR.
+   *
+   * `quotaChecked`, `quotaCharged`, `accountNeuronsReserved`, dan `accountNeuronsReleased`
+   * ada DI BAWAAN, bukan ditambahkan per jalur. Alasannya cacat yang paket ini tutup:
+   * jalur yang lupa mengeja field ini dulu menghilangkannya dari kontrak, dan klien
+   * membaca `undefined` sebagai "tidak tahu". Bawaan `false` berarti jalur baru yang lupa
+   * tetap JUJUR (tidak mengaku menagih, tidak mengaku memesan neuron) alih-alih diam.
+   */
   function baseResponse(extra) {
     var out = {
       schema: 'fiezel-tts-response-v2',
@@ -133,6 +165,10 @@
       breaker: 'CLOSED',
       bytes: 0,
       chars: 0,
+      quotaChecked: false,
+      quotaCharged: false,
+      accountNeuronsReserved: false,
+      accountNeuronsReleased: false,
       protocol: '2.0'
     };
     if (extra) Object.keys(extra).forEach(function (k) { out[k] = extra[k]; });
@@ -161,19 +197,112 @@
     return null;
   }
 
+  /**
+   * S3 - BASE64 DIBONGKAR DI SINI, BUKAN DILEWATKAN APA ADANYA.
+   *
+   * CACAT YANG INI TUTUP (ditemukan paket S3 saat memeriksa apakah `bytes` mencerminkan
+   * kenyataan): sebagian mesin menjawab `{audio:"<base64>"}`. Versi lama mengembalikan
+   * STRING itu apa adanya, lalu:
+   *   1. `byteSize()` melaporkan `length * 0.75` - PERKIRAAN, dan perkiraan yang salah
+   *      (base64 berpadding memberi hasil beda dari byte sebenarnya);
+   *   2. `env.AUDIO.put(objectName, "<base64>")` menyimpan TEKS base64 ke R2 dengan
+   *      `content-type: audio/mpeg`. Objeknya bukan MP3, dan ukurannya = panjang teks.
+   * Akibatnya `bytes` pada render (0,75x) dan `bytes` pada cache hit berikutnya
+   * (`existing.size` = panjang teks base64) MELAPORKAN DUA ANGKA BERBEDA UNTUK ASET YANG
+   * SAMA. Dua-duanya tidak bisa benar.
+   *
+   * Sesudah ini: base64 dibongkar menjadi byte NYATA sebelum diukur dan sebelum ditulis,
+   * jadi `bytes` = `byteLength` yang benar-benar dikirim ke R2, dan cache hit atas objek
+   * yang sama melaporkan angka yang sama.
+   */
+  function decodeBase64(text) {
+    var raw = String(text || '').replace(/^data:[^,]*,/, '').replace(/\s+/g, '');
+    if (!raw) return null;
+    try {
+      if (typeof atob === 'function') {
+        var bin = atob(raw);
+        var out = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i += 1) out[i] = bin.charCodeAt(i);
+        return out;
+      }
+      if (typeof Buffer !== 'undefined' && typeof Buffer.from === 'function') {
+        return new Uint8Array(Buffer.from(raw, 'base64'));
+      }
+    } catch (_) { /* bukan base64 yang sah */ }
+    return null;
+  }
+
   function toBytes(result) {
     if (!result) return null;
     if (result instanceof ArrayBuffer) return new Uint8Array(result);
     if (result && result.audio instanceof ArrayBuffer) return new Uint8Array(result.audio);
-    if (result && typeof result.audio === 'string') return result.audio; // base64 dari sebagian model
+    if (result && typeof result.audio === 'string') return decodeBase64(result.audio);
     if (result && result.byteLength !== undefined) return result;
     return null;
   }
 
   function byteSize(payload) {
     if (!payload) return 0;
-    if (typeof payload === 'string') return Math.floor(payload.length * 0.75); // perkiraan base64
+    if (typeof payload === 'string') return 0; // string tidak pernah dilaporkan sebagai audio (lihat decodeBase64)
     return payload.byteLength || payload.length || 0;
+  }
+
+  /* =================================================================== S3: KEJUJURAN JATAH */
+  /**
+   * S3 - CACAT 2, DAN INI SATU-SATUNYA TEMPAT `quotaCharged` LAHIR DI BERKAS INI.
+   *
+   * BUKTI CACATNYA (produksi hidup, 28 Agu 2026, dua permintaan berbeda):
+   *   {"text":"hello","voiceId":"aura-asteria-en"}                  -> 200, source:"unavailable",
+   *      bytes:0, degraded:true, quotaCharged:TRUE
+   *   {"text":"the quick brown fox jumps over the lazy dog again"} -> 200, source:"unavailable",
+   *      bytes:0, chars:49, quotaCharged:TRUE
+   *   GET /api/quota SEBELUM dan SESUDAH keduanya: ttsChars.used = 0, remaining = 12000.
+   * Amplopnya mengaku menagih; buku jatah tidak bergerak satu karakter pun.
+   *
+   * SEBABNYA: `quotaCharged: quotaChecked`. `quotaChecked` hanya berarti "gerbang kuota
+   * DIJALANKAN", sedangkan reservasi yang dibuat gerbang itu DIBATALKAN sesudah handler
+   * selesai oleh `route-wiring.js:settleQuota()` setiap kali amplopnya `source:'unavailable'`
+   * atau `degraded:true`. Jadi dua field itu tidak pernah bersinonim, dan menyamakannya
+   * membuat amplop mengaku menagih justru pada jalur yang PASTI dibatalkan.
+   *
+   * KENAPA PENTING, BUKAN KOSMETIK: klien memakai `quotaCharged` untuk memutakhirkan cermin
+   * jatah lokal dan menampilkan sisa jatah ke murid. Amplop yang bohong membuat murid
+   * melihat jatahnya terpotong padahal tidak, lalu berhenti memakai fitur yang masih boleh
+   * dia pakai.
+   *
+   * ARAH PERBAIKANNYA: LAPORANNYA, bukan penagihannya. Render nol byte TIDAK BOLEH menagih
+   * apa pun - mandat mengikat: kalau harus salah, salah ke arah murid.
+   */
+  function newQuotaLedger() {
+    return { checked: false, rollbackRequested: false };
+  }
+
+  /** SATU-SATUNYA sumber nilai `quotaCharged`. Tidak ada jalur yang mengejanya sendiri. */
+  function chargedFor(ledger) {
+    return ledger.checked === true && ledger.rollbackRequested !== true;
+  }
+
+  /**
+   * Minta pembatalan reservasi kuota, lalu CATAT permintaan itu supaya amplop tidak bisa
+   * mengaku menagih sesudahnya.
+   *
+   * `rollbackRequested` disetel WALAU jembatan pembatal tidak ada. Itu sengaja: kalau kami
+   * tidak yakin reservasinya bertahan, satu-satunya laporan yang aman bagi murid adalah
+   * "tidak ditagih". Dan memang begitu kenyataannya di jalur nyata - `settleQuota()`
+   * membatalkan setiap amplop yang `providerFailed()`, yaitu tepat jalur-jalur ini.
+   */
+  async function requestQuotaRollback(deps, ledger, info) {
+    if (ledger.checked !== true) return false;
+    ledger.rollbackRequested = true;
+    var fn = deps && typeof deps.rollbackQuota === 'function' ? deps.rollbackQuota : null;
+    if (!fn) return false;
+    try {
+      var out = await fn(info);
+      if (out && typeof out.then === 'function') out = await out;
+      return out !== false;
+    } catch (_) {
+      return false;
+    }
   }
 
   /**
@@ -182,7 +311,7 @@
    * benar untuk mesin itu (`speaker` untuk keluarga aura). Menuliskannya inline di sini kembali =
    * mengembalikan cacat A12/1.
    */
-  async function callEngine(env, engineId, text, voiceId, locale, timeoutMs) {
+  async function callEngine(env, engineId, text, voiceId, locale, timeoutMs, reservation) {
     var options = {};
     if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
       options.signal = AbortSignal.timeout(timeoutMs);
@@ -190,7 +319,11 @@
     var input = ProviderParams.buildProviderInput({
       engineId: engineId, text: text, voiceId: voiceId, locale: locale
     });
-    var run = env.AI.run(engineId, input, options);
+    // S2 - lewat chokepoint, dengan tanda terima reservasi neuron akun. Tanpa tanda
+    // terima yang sah ini MELEMPAR dan mesin TTS tidak pernah disentuh.
+    var run = ModelCallGate.runReservedModel({
+      env: env, modelId: engineId, input: input, options: options, reservation: reservation
+    });
     var timer;
     var guard = new Promise(function (_, reject) {
       timer = setTimeout(function () {
@@ -210,12 +343,92 @@
     return { networkError: true };
   }
 
+  /**
+   * S2 - detik sampai 00:00 UTC. Jatah neuron akun berganti menurut UTC (jam vendor),
+   * BUKAN menurut reset jatah murid (Asia/Jakarta). Menjanjikan jam yang salah = janji
+   * palsu ke murid, dan murid akan mencoba lagi terlalu awal lalu ditolak lagi.
+   */
+  function secondsToUtcMidnight(nowMs) {
+    var ms = Number(nowMs) || 0;
+    var d = new Date(ms);
+    var next = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + 1, 0, 0, 0, 0);
+    return Math.max(1, Math.ceil((next - ms) / 1000));
+  }
+
+  /**
+   * S2 - AMPLOP PENOLAKAN PAGAR NEURON AKUN untuk jalur TTS.
+   *
+   * 503, bukan 429: 429 adalah bahasa "jatah MURID", dan ini bukan jatah murid. Yang
+   * tidak boleh berubah di cabang mana pun: `quotaCharged:false` - jatah suara murid
+   * tidak dipotong sedikit pun, karena tidak ada satu byte audio yang diproduksi. Murid
+   * tetap punya jalan keluar yang nyata: suara perangkat (`speechSynthesis`), yang sudah
+   * menjadi jalur cadangan sah di aplikasi ini.
+   */
+  function accountDenied(identity, objectName, chars, phase, reason, started, now, ledger) {
+    var capReached = String(reason) === 'ai_account_cap';
+    var transient = reason === 'ai_budget_unreadable' || reason === 'ai_budget_store_missing';
+    var retryAfter = capReached ? secondsToUtcMidnight(started) : (transient ? 60 : 0);
+    var extra = {
+      audioKey: identity.audioKey, objectName: objectName, chars: chars,
+      source: 'unavailable', degraded: true, breaker: phase,
+      error: 'service_degraded',
+      copyKey: capReached ? 'tts.accountBudget' : 'tts.unavailable',
+      reason: String(reason || 'ai_account_cap'),
+      message: capReached ? POLITE.account_budget : POLITE.account_missing,
+      // S3 - `quotaChecked` DULU selalu dieja `false` di sini, padahal gerbang kuota murid
+      // memang sudah dijalankan sebelum pagar akun (lihat urutan LANGKAH 4 -> 5b). Itu
+      // bohong ke arah yang berlawanan dari CACAT 2: mengaku tidak memeriksa padahal
+      // memeriksa. Sekarang ia melaporkan keadaan buku jatah yang sebenarnya, sementara
+      // `quotaCharged` tetap false KARENA reservasinya dibatalkan - bukan karena dieja.
+      quotaChecked: ledger ? ledger.checked === true : false,
+      quotaCharged: ledger ? chargedFor(ledger) : false,
+      accountNeuronsReserved: false,
+      accountNeuronsReleased: false,
+      ms: now() - started
+    };
+    if (retryAfter) extra.retryAfter = retryAfter;
+    return json(baseResponse(extra), 503, retryAfter ? { 'retry-after': String(retryAfter) } : null);
+  }
+
+  /**
+   * S3 - AMPLOP PENOLAKAN FLAG TTS. Bentuknya SENGAJA cerminan `RouteAi.aiDisabledResponse`:
+   * 403 (bukan 429, bukan 503), `error`/`copyKey`/`reason`/`message`, `quotaChecked:false`,
+   * `quotaCharged:false`, dan TANPA `retryAfter` sama sekali.
+   *
+   * KENAPA TANPA `retryAfter`: menunggu tidak mengubah apa pun. Flag hanya berubah kalau
+   * pemilik aplikasi mengubahnya, jadi `retryAfter` apa pun adalah janji yang tidak bisa
+   * ditepati - dan klien yang mempercayainya akan mencoba lagi selamanya.
+   *
+   * KENAPA 403: 429 adalah bahasa "jatah", dan ini bukan soal jatah murid. Amplop ini tidak
+   * menagih apa pun, dan itu benar secara struktur: ia dikembalikan dari `route-wiring.js`
+   * SEBELUM handler ini berjalan, jadi badan permintaan belum diparsing, gerbang kuota belum
+   * dipanggil, neuron akun belum dipesan, dan `env.AI` belum disentuh.
+   */
+  function ttsDisabledResponse(args) {
+    var a = args || {};
+    var body = baseResponse({
+      source: 'unavailable',
+      degraded: true,
+      bytes: 0,
+      chars: 0,
+      error: 'tts_disabled',
+      copyKey: 'tts.disabled',
+      reason: String(a.reason || 'tts_flag_off'),
+      message: POLITE.tts_disabled,
+      quotaChecked: false,
+      quotaCharged: false
+    });
+    return json(body, 403, a.headers || null);
+  }
+
   async function handleRender(args) {
     var a = args || {};
     var env = a.env || {};
     var deps = a.deps || {};
     var now = typeof deps.now === 'function' ? deps.now : function () { return Date.now(); };
     var started = now();
+    // S3 - buku besar kejujuran jatah untuk permintaan INI. Satu objek, satu sumber.
+    var ledger = newQuotaLedger();
 
     var raw;
     try { raw = await a.request.text(); } catch (_) {
@@ -280,7 +493,37 @@
       }), 200);
     }
 
-    // LANGKAH 3 — breaker
+    // LANGKAH 3 — SINGLE-FLIGHT, dan posisinya SENGAJA dipindah ke sebelum kuota.
+    //
+    // S3 - CACAT KETIGA, ditemukan paket ini: dulu penggabungan dilakukan SESUDAH LANGKAH 4
+    // (kuota). Akibatnya permintaan yang digabungkan TETAP memesan lalu meng-commit jatah
+    // murid untuk audio yang tidak pernah ia minta dibuat - N permintaan bersamaan atas
+    // aset yang SAMA menagih N kali untuk satu render. Lebih buruk: amplopnya menyalin
+    // `shared` apa adanya lalu menimpanya `source:'cache'`, sehingga (a) `quotaCharged`
+    // milik pemimpin dipakai untuk permintaan yang tidak menagih apa pun, dan (b) pemimpin
+    // yang GAGAL (`source:'unavailable'`) tersaji sebagai `source:'cache'` - yang membuat
+    // `providerFailed()` di `route-wiring.js` menjawab false, jadi jatahnya benar-benar
+    // DI-COMMIT untuk nol byte audio.
+    //
+    // Memindahkannya ke SINI membuat kejujurannya struktural: permintaan yang digabungkan
+    // tidak pernah menyentuh gerbang kuota, jadi tidak ada yang bisa ditagih, dan
+    // `ledger.checked` tetap false tanpa perlu dieja.
+    if (inFlight.has(identity.audioKey)) {
+      var shared = await inFlight.get(identity.audioKey);
+      var leaderFailed = !shared || shared.failed === true || Number(shared.bytes || 0) <= 0;
+      // Hasil pemimpin dilaporkan APA ADANYA soal berhasil/gagal. Yang TIDAK diwarisi:
+      // seluruh field akuntansi - itu milik permintaan pemimpin, bukan permintaan ini.
+      return json(baseResponse(leaderFailed ? {
+        audioKey: identity.audioKey, objectName: objectName, chars: chars,
+        source: 'unavailable', degraded: true, message: POLITE.unavailable, coalesced: true
+      } : {
+        audioKey: identity.audioKey, objectName: objectName, url: assetUrl(env, objectName),
+        source: 'cache', degraded: false, bytes: Number(shared.bytes || 0), chars: chars,
+        coalesced: true
+      }), 200);
+    }
+
+    // LANGKAH 4 — breaker
     var target = 'tts:' + engine.id;
     var store = deps.breakerStore || null;
     var prev = store ? await store.load(target, started) : Breaker.initialState(started);
@@ -295,9 +538,8 @@
       }), 200);
     }
 
-    // LANGKAH 4 — kuota, satu-satunya titik pemeriksaan
+    // LANGKAH 5 — kuota, satu-satunya titik pemeriksaan
     var enforceQuota = resolveEnforceQuota(deps);
-    var quotaChecked = false;
     if (enforceQuota) {
       var quota;
       try {
@@ -305,55 +547,103 @@
           env: env, ctx: a.ctx, request: a.request,
           kind: 'tts', chars: chars, engineId: engine.id, audioKey: identity.audioKey
         });
-        quotaChecked = true;
+        ledger.checked = true;
       } catch (_) {
         quota = { allowed: false, reason: 'quota_unavailable', retryAfter: 60 };
-        quotaChecked = true;
+        // Gerbang yang MELEMPAR tidak meninggalkan reservasi. `checked` tetap false supaya
+        // amplop tidak mengaku memeriksa buku yang tidak pernah bergerak.
       }
       if (quota && quota.allowed === false) {
         // A8: alasan sebenarnya menentukan kode DAN kalimatnya. `quota_unavailable` =
         // catatan jatah yang mati, bukan jatah murid yang habis. `copyKey` disertakan
         // supaya klien memakai naskah `features/quota/quota-copy.js`.
         var quotaBroken = String((quota && quota.reason) || '') === 'quota_unavailable';
+        // Jatah habis = TIDAK ADA reservasi yang dibuat oleh gerbang, jadi tidak ada yang
+        // bisa ditagih. `checked` boleh true (pemeriksaannya nyata), `charged` wajib false.
         return json(baseResponse({
           audioKey: identity.audioKey, objectName: objectName, chars: chars,
           source: 'unavailable', degraded: true, breaker: gate.phase,
           error: quotaBroken ? 'quota_unavailable' : 'quota_exceeded',
           copyKey: quotaBroken ? 'quota.unavailable' : 'quota.tts.exhausted',
           message: quotaBroken ? POLITE.quota_unavailable : POLITE.quota_exceeded,
-          retryAfter: Number(quota.retryAfter) || 3600, quotaCharged: false
+          retryAfter: Number(quota.retryAfter) || 3600,
+          quotaChecked: ledger.checked === true, quotaCharged: false
         }), 429, { 'retry-after': String(Number(quota.retryAfter) || 3600) });
       }
     }
 
-    // LANGKAH 5 — single-flight. Prefetch N+1 Library dan Cache API klien sering datang bersamaan;
-    // tanpa ini keduanya membayar untuk objek yang sama.
-    if (inFlight.has(identity.audioKey)) {
-      var shared = await inFlight.get(identity.audioKey);
-      return json(baseResponse(Object.assign({}, shared, { source: 'cache', coalesced: true })), 200);
+    // LANGKAH 6 — S2: PAGAR NEURON AKUN, WAJIB. Urutannya disengaja: SESUDAH
+    // single-flight (permintaan yang digabungkan tidak memanggil mesin, jadi tidak boleh
+    // memesan neuron lagi) dan SESUDAH kuota murid (murid yang jatahnya habis tidak boleh
+    // ikut menghabiskan jatah akun). Biaya neuronnya diturunkan di tempat perakitan dari
+    // `chars` + `freeCharsPerDay` mesin yang BENAR-BENAR dipakai, bukan dari konstanta
+    // yang dieja di sini - supaya harga tidak bisa menyimpang dari mesinnya.
+    //
+    // S3 - setiap penolakan di blok ini MEMBATALKAN reservasi kuota murid lebih dulu
+    // (`requestQuotaRollback`), lalu melaporkan hasilnya. Tanpa itu amplop akan mengaku
+    // menagih (`checked` true) untuk render yang tidak pernah menghasilkan satu byte pun.
+    var accountBudget = typeof deps.accountBudget === 'function' ? deps.accountBudget : null;
+    if (!accountBudget) {
+      await requestQuotaRollback(deps, ledger, { request: a.request, reason: 'tts_budget_dep_missing' });
+      return accountDenied(identity, objectName, chars, gate.phase, 'ai_budget_dep_missing', started, now, ledger);
+    }
+    var reserved;
+    try {
+      reserved = await accountBudget({
+        env: env, ctx: a.ctx, request: a.request, kind: 'tts',
+        chars: chars, freeCharsPerDay: engine.freeCharsPerDay, engineId: engine.id, now: started
+      });
+    } catch (_) {
+      reserved = { allowed: false, reason: 'ai_budget_unreadable' };
+    }
+    if (!reserved || reserved.allowed !== true) {
+      await requestQuotaRollback(deps, ledger, { request: a.request, reason: 'tts_account_denied' });
+      return accountDenied(identity, objectName, chars, gate.phase,
+        String((reserved && reserved.reason) || 'ai_account_cap'), started, now, ledger);
+    }
+    if (!ModelCallGate.isReservation(reserved)) {
+      await requestQuotaRollback(deps, ledger, { request: a.request, reason: 'tts_budget_receipt_invalid' });
+      return accountDenied(identity, objectName, chars, gate.phase, 'ai_budget_receipt_invalid', started, now, ledger);
     }
 
     var work = (async function () {
       var bytes = null;
       var failureKind = '';
+      var engineThrew = null;
       try {
         var result = await callEngine(
-          env, engine.id, identity.canonicalText, identity.voiceId, identity.locale, TTS_TIMEOUT_MS
+          env, engine.id, identity.canonicalText, identity.voiceId, identity.locale, TTS_TIMEOUT_MS,
+          reserved
         );
         bytes = toBytes(result);
         if (!bytes || byteSize(bytes) < 512) failureKind = 'empty_body';
       } catch (error) {
+        engineThrew = error;
         failureKind = Breaker.classify(signalFromError(error)) || 'unavailable';
       }
 
       if (failureKind) {
+        // S2 - neuron dilepas HANYA kalau panggilan tidak pernah sampai ke mesin. Timeout
+        // dan `empty_body` TIDAK dilepas: mesin sudah bekerja, neuronnya sudah terbelanja.
+        var released = false;
+        if (engineThrew && ModelCallGate.releasableFailure(engineThrew)) {
+          released = await ModelCallGate.releaseReservation(reserved, failureKind);
+        }
         var failed = Breaker.onFailure(gate.state, failureKind, now(), 0);
         if (store) await store.save(target, failed, now(), { changed: true, transition: true });
+        // S3 - INI JALUR YANG BOHONG DI PRODUKSI. Nol byte audio, `source:'unavailable'`,
+        // dan dulu `quotaCharged: quotaChecked` = true - padahal `settleQuota()` PASTI
+        // membatalkan reservasinya karena `providerFailed()` melihat `source:'unavailable'`.
+        // Sekarang pembatalannya DIMINTA di sini, dan `chargedFor()` melaporkan akibatnya.
+        await requestQuotaRollback(deps, ledger, { request: a.request, reason: 'tts_' + failureKind });
         return {
+          accountNeuronsReserved: true,
+          accountNeuronsReleased: !!released,
           audioKey: identity.audioKey, objectName: objectName, chars: chars,
-          source: 'unavailable', degraded: true,
+          source: 'unavailable', degraded: true, bytes: 0,
           breaker: Breaker.snapshot(failed, now()).breaker,
-          message: POLITE.unavailable, quotaCharged: quotaChecked, failed: true
+          message: POLITE.unavailable,
+          quotaChecked: ledger.checked === true, quotaCharged: chargedFor(ledger), failed: true
         };
       }
 
@@ -375,10 +665,17 @@
         } catch (_) {
           // Objek gagal ditulis: audionya tetap dikirim ke klien untuk sesi ini, tapi TIDAK
           // dicatat sebagai ready. Mencatatnya akan membuat manifest berjanji sesuatu yang 404.
+          // S3 - audio NYATA dikirim ke murid untuk sesi ini, tapi `degraded:true` membuat
+          // `providerFailed()` membatalkan reservasinya, jadi buku jatah tidak bergerak.
+          // Karena itu amplopnya wajib bilang tidak menagih. Arah salahnya menguntungkan
+          // murid (dia dapat audio gratis), dan itu memang arah yang diwajibkan mandat.
+          await requestQuotaRollback(deps, ledger, { request: a.request, reason: 'tts_store_failed' });
           return {
+            accountNeuronsReserved: true,
             audioKey: identity.audioKey, objectName: objectName, chars: chars,
             source: 'provider', degraded: true, breaker: 'CLOSED',
-            bytes: byteSize(bytes), stored: false, quotaCharged: quotaChecked
+            bytes: byteSize(bytes), stored: false,
+            quotaChecked: ledger.checked === true, quotaCharged: chargedFor(ledger)
           };
         }
       }
@@ -394,10 +691,14 @@
         })).catch(function () {}));
       }
 
+      // Satu-satunya jalur yang benar-benar menagih: audio nyata, tersimpan, tidak degraded,
+      // jadi `settleQuota()` meng-commit reservasinya.
       return {
+        accountNeuronsReserved: true,
         audioKey: identity.audioKey, objectName: objectName, url: assetUrl(env, objectName),
         source: 'provider', degraded: false, breaker: 'CLOSED',
-        bytes: byteSize(bytes), chars: chars, stored: true, quotaCharged: quotaChecked
+        bytes: byteSize(bytes), chars: chars, stored: true,
+        quotaChecked: ledger.checked === true, quotaCharged: chargedFor(ledger)
       };
     }());
 
@@ -488,6 +789,9 @@
     CHEAP_ENGINE: CHEAP_ENGINE,
     TTS_TIMEOUT_MS: TTS_TIMEOUT_MS,
     POLITE: POLITE,
+    ttsDisabledResponse: ttsDisabledResponse,
+    accountDenied: accountDenied,
+    secondsToUtcMidnight: secondsToUtcMidnight,
     registerTtsRoutes: registerTtsRoutes,
     handleRender: handleRender,
     handleManifest: handleManifest,

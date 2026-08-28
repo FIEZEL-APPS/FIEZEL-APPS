@@ -1,16 +1,61 @@
+<!-- HASIL GENERATE - jangan diedit tangan. Sumber tunggal: features/mascot/fiezel-mascot.js (aturan E5/G11). Regenerasi: node tools/export-mascot.mjs -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="56 -10 208 216" role="img" aria-label="PAW — ikon kepala maskot FIEZEL">
-  <g>
-    <path d="M76 66 L 95 0 L 140 34 Z" fill="#FFD94F"/>
-    <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
-    <path d="M244 66 L 225 0 L 180 34 Z" fill="#FFD94F"/>
-    <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+  <defs>
+    <clipPath id="fzcEyeL-x-head">
+      <circle cx="126" cy="98" r="16"/>
+    </clipPath>
+    <clipPath id="fzcEyeR-x-head">
+      <circle cx="194" cy="98" r="16"/>
+    </clipPath>
+  </defs>
+  <g class="fz-head">
+    <g class="fz-ear fz-ear-l">
+      <path d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+      <path d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+    </g>
+    <g class="fz-ear fz-ear-r">
+      <path d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+      <path d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+    </g>
     <circle cx="160" cy="106" r="88" fill="#FFD94F"/>
-    <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
-    <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
-    <circle cx="102" cy="126" r="11" fill="#F0A0AC"/>
-    <circle cx="218" cy="126" r="11" fill="#F0A0AC"/>
-    <g><circle cx="126" cy="98" r="14.5" fill="#33201F"/><circle cx="130" cy="93" r="5" fill="#fff"/><circle cx="122" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
-    <g><circle cx="194" cy="98" r="14.5" fill="#33201F"/><circle cx="198" cy="93" r="5" fill="#fff"/><circle cx="190" cy="103" r="2.6" fill="#fff" opacity=".7"/></g>
-    <path d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+    <g class="fz-face">
+      <ellipse cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+      <path d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+      <circle class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+      <circle class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+      <g class="fz-eyes">
+        <g class="fz-eye-open">
+          <g class="fz-eye fz-eye-l">
+            <circle cx="126" cy="98" r="16" fill="#33201F"/>
+            <g class="fz-pupil" clip-path="url(#fzcEyeL-x-head)">
+              <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+              <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+            </g>
+            <g class="fz-lid-up" clip-path="url(#fzcEyeL-x-head)">
+              <circle cx="126" cy="62" r="17" fill="#FFD94F"/>
+            </g>
+            <g class="fz-lid-low" clip-path="url(#fzcEyeL-x-head)">
+              <circle cx="126" cy="134" r="17" fill="#FFD94F"/>
+            </g>
+          </g>
+          <g class="fz-eye fz-eye-r">
+            <circle cx="194" cy="98" r="16" fill="#33201F"/>
+            <g class="fz-pupil" clip-path="url(#fzcEyeR-x-head)">
+              <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+              <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+            </g>
+            <g class="fz-lid-up" clip-path="url(#fzcEyeR-x-head)">
+              <circle cx="194" cy="62" r="17" fill="#FFD94F"/>
+            </g>
+            <g class="fz-lid-low" clip-path="url(#fzcEyeR-x-head)">
+              <circle cx="194" cy="134" r="17" fill="#FFD94F"/>
+            </g>
+          </g>
+        </g>
+      </g>
+      <g class="fz-mouth">
+        <path class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+      </g>
+    </g>
   </g>
 </svg>

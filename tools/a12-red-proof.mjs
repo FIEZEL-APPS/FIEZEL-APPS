@@ -80,8 +80,8 @@ const CASES = [
     // `failureKind`, bukan `qualityRejected`. Kedua cabang dipatch supaya matriks tidak
     // "hijau karena salah sasaran".
     patches: [
-      [R('workers/api/ai/route-ai.js'), 'var rolledBackQ = quotaChecked && releaseQuota(deps, {', 'var rolledBackQ = false && releaseQuota(deps, {'],
-      [R('workers/api/ai/route-ai.js'), 'var rolledBackF = quotaChecked && releaseQuota(deps, {', 'var rolledBackF = false && releaseQuota(deps, {']
+      [R('workers/api/ai/route-ai.js'), 'var rolledBackQ = quotaChecked && await releaseQuota(deps, {', 'var rolledBackQ = false && await releaseQuota(deps, {'],
+      [R('workers/api/ai/route-ai.js'), 'var rolledBackF = quotaChecked && await releaseQuota(deps, {', 'var rolledBackF = false && await releaseQuota(deps, {']
     ],
     gates: ['ai-response-shape-test.js']
   }

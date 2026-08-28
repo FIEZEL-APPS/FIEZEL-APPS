@@ -8,7 +8,7 @@ const source=fs.readFileSync(path.join(__dirname,'features/neural-voice/fiezel-d
 function element(tag){return{tagName:tag,children:[],listeners:{},dataset:{},id:'',className:'',type:'',textContent:'',value:'',classList:{add(){},remove(){}},setAttribute(k,v){this.dataset[k]=v},appendChild(x){this.children.push(x);return x},addEventListener(k,v){this.listeners[k]=v}}}
 const store={
   'puter.auth.token.v2':'SENTINEL-STORED-TOKEN',
-  'puter.auth.token.origin.v2':'https://fitrajft-ux.github.io',
+  'puter.auth.token.origin.v2':'https://fiezel-apps.github.io',
   'fiezel-neural-voice-diagnostics-v1':'[]'
 };
 const body=element('body');
@@ -16,9 +16,9 @@ const ctx={
   console,Promise,JSON,Date,Object,String,setTimeout,
   document:{readyState:'complete',body,createElement:element,addEventListener(){}},
   location:{
-    origin:'https://fitrajft-ux.github.io',
+    origin:'https://fiezel-apps.github.io',
     pathname:'/FIEZEL-APPS/',
-    href:'https://fitrajft-ux.github.io/FIEZEL-APPS/?auth=SENTINEL-URL-QUERY#SENTINEL-URL-HASH'
+    href:'https://fiezel-apps.github.io/FIEZEL-APPS/?auth=SENTINEL-URL-QUERY#SENTINEL-URL-HASH'
   },
   navigator:{userAgent:'iPhone',standalone:true},
   matchMedia:()=>({matches:true}),
@@ -42,10 +42,10 @@ setTimeout(()=>{
     assert.equal(dump.puterAuth.authTokenPresent,true);
     assert.equal(dump.puterAuth.isSignedIn,true);
     assert.equal(dump.puterAuth.storedTokenV2Present,true);
-    assert.equal(dump.puterAuth.storedTokenOrigin,'https://fitrajft-ux.github.io');
+    assert.equal(dump.puterAuth.storedTokenOrigin,'https://fiezel-apps.github.io');
     assert.equal(dump.puterAuth.apiOrigin,'https://api.puter.com');
     assert.equal(dump.puterAuth.defaultGUIOrigin,'https://puter.com');
-    assert.equal(dump.href,'https://fitrajft-ux.github.io/FIEZEL-APPS/','diagnostics href must export origin + pathname only');
+    assert.equal(dump.href,'https://fiezel-apps.github.io/FIEZEL-APPS/','diagnostics href must export origin + pathname only');
     assert.ok(!raw.includes('SENTINEL-STORED-TOKEN'),'stored token content must never be exported');
     assert.ok(!raw.includes('SENTINEL-RUNTIME-TOKEN'),'runtime token content must never be exported');
     assert.ok(!raw.includes('SENTINEL-URL-QUERY'),'URL query content must never be exported');

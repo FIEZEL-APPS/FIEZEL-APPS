@@ -126,11 +126,18 @@ secret terpasang. Nilai secret harus sama dengan yang disuntik ke proxy; lihat
 `deploy/edge/README.md`.
 
 Penerbitan identitas di `POST /api/auth/anon` juga dibatasi laju (audit D3
-HIGH-2, `rate-anon.js`): default 5/jam per IP saat dev, dan 30/jam TOTAL di
-belakang jembatan (proxy PHP sengaja tidak meneruskan IP murid, jadi semua
-lalu lintas jembatan berbagi satu ember). Var `ANON_ISSUE_LIMIT_PER_HOUR`,
-`ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR`, dan `ANON_JITTER_MAX_MS` mengatur angkanya;
-panggilan ber-cookie sah tidak pernah kena batas ini.
+HIGH-2, `rate-anon.js`; angkanya direvisi paket S1, 28 Agu 2026): **15 per IP
+per JENDELA BERGULIR 1 jam** di jalur langsung (custom domain), dan 30/jam TOTAL
+hanya kalau permintaan benar-benar datang lewat jembatan PHP (`edgePath="header"`;
+proxy itu sengaja tidak meneruskan IP murid, jadi semua lalu lintasnya berbagi
+satu ember). Cabang tarif dipilih dari `ctx.edgePath` yang ditulis `mw-edge.js`,
+BUKAN dari ada/tidaknya `EDGE_SHARED_SECRET` — kesalahan itulah yang membuat
+jalur langsung sempat memakai 30/jam di produksi. Kalau D1 tidak terbaca,
+pembatas tidak hilang: ia pindah ke memori isolate dengan batas DIPERKETAT (5).
+Var `ANON_ISSUE_LIMIT_PER_HOUR`, `ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR`,
+`ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR`, dan `ANON_JITTER_MAX_MS` mengatur angkanya;
+panggilan ber-cookie sah tidak pernah kena batas ini. Gerbangnya:
+`rate-anon-test.js`.
 
 Cara membuat nilainya:
 

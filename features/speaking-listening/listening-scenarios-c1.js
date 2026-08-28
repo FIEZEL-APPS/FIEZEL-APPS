@@ -46,7 +46,7 @@ module.exports = { level: 'C1', scenarios: [
 ['Devika','office of a former mentor','Advice that has aged badly',
  'I am Devika. My mentor built her career by never turning down work, and she gave me that advice with complete sincerity. It was excellent advice in a market where visibility was scarce and contracts were plentiful. In mine, the scarce resource is attention, and saying yes to everything is how people become uniformly mediocre. I do not think she was wrong. I think she was right about a world that no longer exists.',
  ['What is Devika mainly talking about?','Advice about never refusing work that suited a different market','A mentor who deliberately gave her some misleading guidance','A career built entirely on refusing almost every offer of work','A career that she built by accepting every single piece of work'],
- ['What was the mentor advice?','Never to refuse any work offered','To specialize as early as possible','To ignore the state of the market','To turn down most opportunities'],
+ ['What was the mentor\'s advice?','Never to refuse any work offered','To specialize as early as possible','To ignore the state of the market','To turn down most opportunities'],
  ['What does Devika identify as scarce in her own market?','Attention','Contracts','Visibility','Mentors'],
  ['How does she characterize her mentor?','As correct about a different set of conditions','As careless with the advice that she once gave','As someone who never understood the market','As deliberately unhelpful to younger workers'],
  ["Which sentence means the same as “she was right about a world that no longer exists”?",'Her judgment fitted circumstances that have since changed','Her advice was already mistaken even at the time she gave it','She had never worked in that market herself at all','The world she described has not changed in any way'],
@@ -80,7 +80,7 @@ module.exports = { level: 'C1', scenarios: [
 ],
 
 ['Hyewon','desk with a draft written by software','A tool that writes the first draft',
- 'I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.',
+ 'I am Hyewon. I now use a language tool for first drafts, and my output has roughly doubled while my satisfaction has fallen. Editing something adequate is faster than writing something from nothing, but it starts me inside somebody else\'s structure. What I have started doing is writing my own outline before I let the tool near the page, which costs twenty minutes and gives me back the part of the work I actually wanted.',
  ['What is Hyewon mainly talking about?','Keeping her own structure while a tool writes her first drafts','A language tool that she built herself for her own writing desk','Twenty minutes that she saves on every article she writes','Output that has fallen by half since she started using it'],
  ['What has happened to her output?','It has approximately doubled','It has fallen by half','It has stayed the same','It has become impossible to measure'],
  ['What is the problem she identifies with editing a draft?','It begins from a structure that is not hers','It always takes longer than writing does','The tool refuses to accept any corrections','The drafts always contain factual errors'],
@@ -90,11 +90,11 @@ module.exports = { level: 'C1', scenarios: [
 
 ['Idris','desk with an anonymous review to submit','Writing a review he must sign privately',
  'My name is Idris. I reviewed a paper whose central claim I think is wrong, by an author whose earlier work I admire and who will probably guess it was me. The temptation to soften the review is not about fear; it is about not wanting to be unkind. I wrote what I actually think and added, in the comments to the editor, that the flaw is repairable and the work deserves a second look.',
- ['What is Idris mainly talking about?','Writing an honest review of work by somebody he respects','A paper that he submitted anonymously under a different name','An editor who asked him to reject a colleague paper','A review that he decided in the end not to write'],
+ ['What is Idris mainly talking about?','Writing an honest review of work by somebody he respects','A paper that he submitted anonymously under a different name','An editor who asked him to reject a colleague\'s paper','A review that he decided in the end not to write'],
  ['What did he add in the comments to the editor?','That the flaw could be repaired','That the paper should be rejected','That he knew the author personally','That he could not review it fairly'],
  ['Why was he tempted to soften the review?','He did not want to hurt the author','He was afraid of professional retaliation','He was uncertain about the flaw','The editor had asked him to be gentle'],
  ['What does his final decision reveal?','He separates kindness from accuracy','He values the friendship above the work','He has no confidence in his own judgment','He wanted the paper rejected quickly'],
- ["Which sentence means the same as “is not about fear”?",'His hesitation had a different source','He was frightened of the consequences','He felt no hesitation whatsoever','He was afraid of the editor reaction'],
+ ["Which sentence means the same as “is not about fear”?",'His hesitation had a different source','He was frightened of the consequences','He felt no hesitation whatsoever','He was afraid of the editor\'s reaction'],
 ],
 
 ['Joana','editing suite with a consent form','A subject who withdrew consent',
@@ -188,10 +188,10 @@ module.exports = { level: 'C1', scenarios: [
 ],
 
 ['Thandi','community hall with a language class register','Reviving a language nobody needs',
- 'I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.',
+ 'I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother\'s letters without a translator, and I am not going to pretend that is an economic argument.',
  ['What is Thandi mainly talking about?','Why she defends the Saturday language classes without an economic reason','A grandmother who taught four hundred other people how to read','A parent who refused to let her daughter attend the Saturday morning classes','Letters that she translates for the whole community every week'],
  ['How many speakers does the language have?','About four hundred people','Around four thousand people','Fewer than fifty remaining speakers','The number is not known at all'],
- ['How does she answer the parent question?','She agrees that it brings no financial return','She argues it will improve job prospects','She refuses to discuss the matter with the parent','She claims the language is growing'],
+ ['How does she answer the parent\'s question?','She agrees that it brings no financial return','She argues it will improve job prospects','She refuses to discuss the matter with the parent','She claims the language is growing'],
  ['What value does she offer instead?','Direct access to her own family writing','The chance to teach the language later','Improved performance in other subjects','A qualification recognized by employers'],
  ["Which sentence means the same as “I am not going to pretend that is an economic argument”?",'She declines to dress the reason up as financial','She insists the reason is purely financial','She refuses to give the parent any reason at all','She believes the argument is about money alone'],
 ]
@@ -207,7 +207,7 @@ module.exports = { level: 'C1', scenarios: [
 ],
 
 ['Valeria','engineering team retrospective','Reviews that never say no',
- 'I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.',
+ 'I am Valeria. Our code reviews approve almost everything, and the team reads that as a sign of high standards among the authors. The defect rate says otherwise. What I think is happening is that rejecting a colleague\'s work in writing feels personal, so people leave a comment and approve anyway. I have started asking reviewers to state one thing they would change even when they approve, which sounds trivial and has already caught two real problems.',
  ['What is Valeria mainly talking about?','Code reviews that approve everything while defects continue','A team that rejects almost every change that is submitted to it','A defect rate that fell sharply after she joined the team','Two problems that her own code introduced only last month'],
  ['What does the defect rate suggest?','The reviews are not catching the defects','The authors write unusually good code every time','Reviews are taking far too long','The measurement itself is unreliable'],
  ['Why does she think reviewers approve anyway?','Written rejection feels like a personal criticism','They do not have the time to read the code','They are not permitted to reject any of the changes','They trust the automated testing completely'],
@@ -226,7 +226,7 @@ module.exports = { level: 'C1', scenarios: [
 
 ['Ximena','kitchen table with two school reports','A child whose languages swapped',
  'I am Ximena. My daughter spoke our home language more fluently than the school language until she was seven, and within two years that reversed completely. She now searches for words in the language she used to dream in. Nobody made a decision; school, friends and television all pull one way for six hours a day and I pull the other way for one. I am not blaming anyone, and I do want to name what happened.',
- ['What is Ximena mainly talking about?','A reversal in the language her daughter now speaks more fluently','A school that forbade her daughter from speaking the home language','A choice she made about her daughter school friends','Two whole years in which her daughter stopped talking'],
+ ['What is Ximena mainly talking about?','A reversal in the language her daughter now speaks more fluently','A school that forbade her daughter from speaking the home language','A choice she made about her daughter\'s school friends','Two whole years in which her daughter stopped talking'],
  ['What was true until her daughter was seven?','The home language was the stronger one','Both languages were equally strong','She spoke only the school language','She had not begun to speak at all yet'],
  ['What explanation does Ximena give?','Exposure is heavily weighted towards one side','Her daughter deliberately chose one language','The school actively discouraged the other','The home language is much harder to learn'],
  ['What is her attitude in describing this?','She wants it acknowledged rather than blamed','She holds the school entirely responsible','She regrets ever speaking the home language','She believes the change will soon reverse'],
@@ -364,7 +364,7 @@ module.exports = { level: 'C1', scenarios: [
  ['What is Mireille mainly talking about?','A reformulation judged against memory rather than against the old formula','A regulator who banned the whole fragrance from sale in every market','Customers who preferred the new version almost immediately','A fragrance that she created from nothing in nineteen seventy'],
  ['Why did she have to rebuild the fragrance?','A material was restricted by a regulator','Customers had asked for a new version','The original formula had been completely lost','The company wanted to reduce costs'],
  ['What does she claim about her version?','It is chemically closer to the original than recent batches','It is identical to the original nineteen seventy formula in every way','It uses none of the original materials at all','It was rejected by the same regulator as well'],
- ['What does she say customers are comparing it with?','Their recollection of the scent','The formula printed on the box','A competitor fragrance','The regulator official description'],
+ ['What does she say customers are comparing it with?','Their recollection of the scent','The formula printed on the box','A competitor fragrance','The regulator\'s official description'],
  ["Which sentence means the same as “I cannot reformulate that”?",'A memory is not something she can adjust','The formula cannot be changed again','Customers refuse to accept any change','The regulator will not permit a reformulation'],
 ],
 

@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-g1-custom-domain-red-proof-v1",
-  "generatedAt": "2026-08-28T07:11:31.365Z",
+  "generatedAt": "2026-08-28T12:50:31.045Z",
   "mutations": [
     {
       "id": "M1-hostname-tepercaya-dimatikan",
@@ -251,23 +251,26 @@
       "ok": true
     },
     {
-      "id": "M11-owner-ikut-meloloskan-hostname",
+      "id": "M11-daftar-hostname-owner-bocor-ke-hostname-api",
       "gate": "owner-edge-guard-test.js",
       "exit": 1,
       "merah": true,
       "butirYangJatuh": [
-        "(f)"
+        "(g-a)",
+        "(g-c)"
       ],
       "contohAssertMerah": [
-        "(f) penjaga owner TIDAK punya jalur hostname-tepercaya (owner belum custom domain)",
-        "(f) https://owner.fiezel.my.id/login tanpa header edge tetap 403 (owner belum punya jalur hostname), dapat 200",
-        "(f) penolakan owner tetap satu bentuk galat"
+        "(g-a) TRUSTED_EDGE_HOSTS identik dengan route custom_domain di wrangler.toml, dapat [\"owner.fiezel.my.id\",\"api.fiezel.my.id\"]",
+        "(g-c) api.fiezel.my.id bukan hostname tepercaya",
+        "(g-c) api.fiezel.my.id/ [header edge benar + sesi sah] → 200, seharusnya 403 (default-deny hostname)"
       ],
       "butirDiharapkanJatuh": [
-        "(f)"
+        "(g-a)",
+        "(g-c)"
       ],
       "butirDiharapkanYangBenarJatuh": [
-        "(f)"
+        "(g-a)",
+        "(g-c)"
       ],
       "ok": true
     }

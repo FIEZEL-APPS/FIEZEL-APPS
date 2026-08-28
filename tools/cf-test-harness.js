@@ -46,15 +46,30 @@ function fakeClock(startIso) {
 // `writable:false` (default) meniru Worker aset yang read-only menurut headernya sendiri
 // (workers/fiezel-audio-worker.js:7-17): `put`/`delete` MELEMPAR dan hitungannya tetap
 // dicatat, jadi "nol tulis" bisa di-assert sebagai angka, bukan sebagai harapan.
+// S3 - UKURAN OBJEK DIHITUNG PER BYTE, TERMASUK UNTUK BODY BINER.
+// Sebelumnya `size` selalu `Buffer.byteLength(String(body))`. Untuk `Uint8Array`,
+// `String(body)` menghasilkan "97,117,100,..." - jadi objek 4.096 byte dilaporkan ~15.000
+// byte. Akibatnya R2 palsu ini MENYEMBUNYIKAN cacat yang persis dicari paket S3: apakah
+// `bytes` di amplop TTS sama dengan yang benar-benar ditulis. Bucket palsu yang berbohong
+// tentang ukuran membuat gerbang tidak bisa membedakan byte audio dari teks base64.
+function r2BodySize(body) {
+  if (body == null) return 0;
+  if (typeof body === 'string') return Buffer.byteLength(body);
+  if (body instanceof ArrayBuffer) return body.byteLength;
+  if (typeof body.byteLength === 'number') return body.byteLength;
+  if (typeof body.length === 'number' && typeof body !== 'function') return body.length;
+  return Buffer.byteLength(String(body));
+}
+
 function fakeR2({ objects = new Map(), etag = '"tetap"', writable = false } = {}) {
   const calls = { get: [], put: [], delete: [], head: [], list: 0 };
   const store = objects instanceof Map ? objects : new Map(Object.entries(objects));
   const normalize = value => {
     if (typeof value === 'string') return { body: value, size: Buffer.byteLength(value) };
     if (value && typeof value === 'object' && 'body' in value) {
-      return { body: value.body, size: value.size != null ? value.size : Buffer.byteLength(String(value.body || '')), httpMetadata: value.httpMetadata };
+      return { body: value.body, size: value.size != null ? value.size : r2BodySize(value.body), httpMetadata: value.httpMetadata };
     }
-    return { body: value, size: 0 };
+    return { body: value, size: r2BodySize(value) };
   };
   for (const [k, v] of [...store]) store.set(k, normalize(v));
 
@@ -86,7 +101,7 @@ function fakeR2({ objects = new Map(), etag = '"tetap"', writable = false } = {}
     async put(key, body, options) {
       calls.put.push(key);
       if (!writable) throw new Error('R2_WRITE_FORBIDDEN: ' + key);
-      store.set(key, normalize({ body, size: Buffer.byteLength(String(body || '')), httpMetadata: options && options.httpMetadata }));
+      store.set(key, normalize({ body, size: r2BodySize(body), httpMetadata: options && options.httpMetadata }));
       return { key, httpEtag: etag };
     },
     async delete(key) {

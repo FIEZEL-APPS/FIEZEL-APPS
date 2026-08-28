@@ -58,7 +58,7 @@ jobs:
     # Yang TIDAK diubah: ketiadaan pemicu otomatis (cf-a2 "Yang TIDAK boleh diubah") dan
     # gerbang `apply == 'APPLY'` per langkah. Gate aktor adalah lapis tambahan, bukan
     # pengganti persetujuan manusia.
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
