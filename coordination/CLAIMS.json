@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T19:40:00+07:00",
+  "updated": "2026-08-28T20:10:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -49,17 +49,6 @@
       ],
       "mulai": "2026-08-28T16:55:00+07:00",
       "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER."
-    },
-    {
-      "sesi": "sesi-computer-086e9698/D3",
-      "peran": "worker MASTER",
-      "paths": [
-        "workers/owner/index.js",
-        "owner-edge-guard-test.js",
-        "workers/owner/DEPLOY.md"
-      ],
-      "mulai": "2026-08-28T19:40:00+07:00",
-      "catatan": "Worker fiezel-owner SUDAH kudeploy + custom domain owner.fiezel.my.id aktif, tapi 403: penjaga tepi menuntut header jembatan PHP yang sudah tidak ada di jalur itu. Perlu pengenalan custom domain seperti workers/api, TANPA membuka workers.dev."
     }
   ],
   "finished": [
@@ -167,6 +156,17 @@
       ],
       "selesai": "2026-08-28T18:20:00+07:00",
       "catatan": "Flag TTS ditegakkan (403 tts_disabled terbukti), quotaCharged berhenti bohong, penggabungan permintaan kembar dipindah ke depan pagar kuota."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/D3",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/owner/index.js",
+        "owner-edge-guard-test.js",
+        "workers/owner/DEPLOY.md"
+      ],
+      "selesai": "2026-08-28T20:10:00+07:00",
+      "catatan": "Dashboard owner HIDUP di https://owner.fiezel.my.id (login 303 -> dashboard 200). Penjaga tepi mengenali hostname kanonik; workers.dev tetap ditolak. Klaim D3 soal metrics_daily bentuk LEBAR TERBUKTI SALAH: kueri dan D1 produksi dua-duanya bentuk PANJANG."
     }
   ],
   "menunggu_izin": [
