@@ -14,6 +14,7 @@ sini yang menjadi urutan resmi.
 | `0002_analytics.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `metrics_daily`, `usage_daily`, `retention_daily`, `dau_dedup`, `pepper_state` |
 | `0003_cron.sql` | `fiezel-core` (binding `CORE_DB`) | `cron_run` |
 | `0004_indexes.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
+| `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -68,7 +69,17 @@ wrangler d1 execute fiezel-stats --remote --file=migrations/0002_analytics.sql
 
 # --- fiezel-core: catatan hasil cron (A3) ---
 wrangler d1 execute fiezel-core --remote --file=migrations/0003_cron.sql
+
+# --- fiezel-core: pagar neuron tingkat AKUN (P3) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0005_ai_account_budget.sql
 ```
+
+`0005_ai_account_budget.sql` WAJIB diterapkan SEBELUM `cfAiEnabled` dinyalakan.
+Pagar neuron tingkat akun di `ai/ai-account-budget.js` FAIL-CLOSED: kalau tabel
+`ai_account_day` belum ada, setiap permintaan AI ditolak dengan `degraded:true`
+dan murid tetap mendapat jawaban dari materi. Itu disengaja — pipa biaya yang
+tidak bisa diukur tidak boleh dibuka. Bandingkan dengan `0003_cron.sql` yang
+fail-SOFT: yang di sana adalah observabilitas, yang di sini adalah dompet.
 
 Sampai `0003_cron.sql` diterapkan, sweep dan rollup **tetap berjalan** tetapi
 tidak meninggalkan bukti: `recordCronRun()` menelan `D1_UNKNOWN_TABLE` dengan
