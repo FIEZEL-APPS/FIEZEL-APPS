@@ -292,6 +292,16 @@ html.fz-booting body{overflow:hidden}
        customElements.get('fiezel-mascot'). Kalau berkas ini datang belakangan, kedua
        tempat itu jatuh ke ikon paw cadangan dan tidak pernah naik lagi. -->
   <script defer src="./features/mascot/fiezel-mascot.js"></script>
+  <!-- [FASE 7] Lapisan slot PAW panel (12-lesson-layer.md). Dimuat SETELAH
+       fiezel-mascot.js (ia bertanya FiezelPaw.ready() sebelum memesan ruang) dan
+       SEBELUM app.js (render kuis membaca self.FiezelPawSlot pra-cat). Tanpa berkas
+       ini app.js jatuh mulus ke wajah quiz-mascot lama - tidak ada yang patah. -->
+  <script defer src="./features/mascot/fiezel-paw-slot.js"></script>
+  <!-- Lapisan outfit kontekstual PAW (G5' — registry terkurasi, 19-outfit-system).
+       Menyuntik item ke jangkar fz-outfit-* DARI LUAR komponen; deterministik,
+       bukan ekonomi hadiah; kill switch localStorage fzPawOutfits. Tanpa berkas
+       ini PAW tampil polos - tidak ada yang patah. -->
+  <script defer src="./features/mascot/fiezel-paw-outfit.js"></script>
   <script defer src="./features/ui/fiezel-coach-bubble.js"></script>
   <!-- m025-117 Core Brain v2. Dimuat SEBELUM app.js dan tidak ikut dimuat malas: kebijakan
        sesi pertama sudah membutuhkannya, dan tanpa itu murid akan mendapat satu sesi dengan
@@ -361,6 +371,11 @@ html.fz-booting body{overflow:hidden}
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-cf-tts-transport.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-cf-voice-notice.js"></script>
   <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-voice-say.js"></script>
+  <!-- FASE 11: jembatan bicara→maskot. Menumpang grup malas suara karena ia hanya
+       berguna ketika pintu bicara hidup; ia mendengar CustomEvent, jadi urutannya di
+       dalam grup tidak sensitif — diletakkan tepat sesudah pintu bicara supaya event
+       pertama pun sudah ada pendengarnya. -->
+  <script type="fiezel/lazy" data-fiezel-lazy="voice" src="./features/neural-voice/fiezel-speech-bridge.js"></script>
   <!-- m025-121 mesin cadangan di perangkat. Urutannya penting dan bukan selera:
        persona -> adapter -> mesin -> pemutar -> hotfix -> bootstrap -> tambalan cache,
        persis urutan yang berlaku sebelum m025-100 menghapusnya. Semuanya MALAS dan

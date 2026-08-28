@@ -6,6 +6,8 @@
     "web-push": "3.6.7"
   },
   "scripts": {
+    "mascot:export": "node tools/export-mascot.mjs",
+    "mascot:check": "node tools/export-mascot.mjs --check",
     "test:gems": "node gems-test.js",
     "test:grammar-curriculum": "node grammar-curriculum-test.js",
     "test:grammar-unlock": "node grammar-unlock-test.js",

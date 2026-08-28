@@ -58,6 +58,11 @@
   </div>
 
   <div id="catalog"></div>
+
+  <h2>Momen karakter</h2>
+  <p class="cat-lead">Pemetaan MENGIKAT momen karakter &rarr; bunyi (20 &sect;4, wiring impl-11).
+    Tombolnya memutar bunyi yang sama persis dengan yang dipicu momen itu di aplikasi.</p>
+  <div class="list" id="moments"></div>
 </div>
 
 <script src="./features/brand/fiezel-choreography.js"></script>
@@ -82,8 +87,8 @@
       ['lesson_complete', 'Sesi selesai', 'Fanfare kecil penutup sesi latihan. Menggantikan akor celebrate lama.', ''],
       ['xp_gain', 'Progres tercatat', 'Kilau satu nada saat XP/tulisan tersimpan.', 'preload'],
       ['streak_5', 'Streak 5 beruntun', 'Perayaan mikro streak jawaban dalam sesi.', ''],
-      ['streak_10', 'Streak 10', 'Tingkatan berikutnya. Belum ada momen visual streak-10 di produk.', 'cadangan'],
-      ['level_up', 'Naik level', 'Fanfare besar. Momen naik-level saat ini = lulus ujian (satu momen satu bunyi, exam_pass yang dipakai).', 'cadangan']
+      ['streak_10', 'Streak 10', 'Motif streak dengan mahkota - milestone runtun HARI 7/30/100 (once-ever, pawStreakWatch).', ''],
+      ['level_up', 'Naik level', 'Fanfare besar - milestone once-ever non-streak (mis. level-c2). Lulus ujian tetap milik exam_pass (satu momen satu bunyi).', '']
     ]],
     ['Ujian', 'Skip Level dan tes penempatan.', [
       ['exam_complete', 'Ujian selesai', 'Penutup netral: selesai belum tentu lulus, dan bunyi tidak boleh berbohong. Juga untuk tes penempatan.', ''],
@@ -94,7 +99,7 @@
     ['Notifikasi', 'Hanya menemani notifikasi yang benar-benar tampil.', [
       ['notif_general', 'Notifikasi umum', 'Nada sopan dua nada untuk pengingat belajar biasa.', ''],
       ['notif_streak_reminder', 'Streak terancam', 'Sedikit lebih mendesak - dipakai jalur pengingat inactivity.', ''],
-      ['notif_achievement', 'Pencapaian', 'Notifikasi lencana/pencapaian. Belum ada jalur lencana di aplikasi.', 'cadangan']
+      ['notif_achievement', 'Pencapaian', 'Prasasti baru terukir - kartu lencana berbasis bukti belajar.', '']
     ]],
     ['Suara Paw', 'Vokalisasi maskot - kalimba yang "berbicara", bukan efek UI.', [
       ['paw_greet', 'Sapaan Paw', 'BUNYI TANDA TANGAN (putusan OWNER). Onboarding, pembukaan, dan slot signature apa pun.', 'signature'],
@@ -146,6 +151,42 @@
     return ok;
   }
   document.getElementById('motif').onclick = function () { audition('paw_greet'); };
+
+  // Momen karakter (impl-11): [momen, bunyi, keterangan pemicu]. Setiap baris = satu
+  // pemetaan mengikat 20-sfx-system.md §4 yang benar-benar terpasang di kode.
+  var MOMENTS = [
+    ['Sapaan kembali (welcome-back)', 'paw_greet', 'Kembali setelah ≥4 jam / hari baru → maskot menyapa; bunyi hanya saat reaksinya menyala (app.js pawGreetReturn).'],
+    ['Gerbang level & nama tersimpan', 'paw_greet', 'Momen onboard di gerbang level dan setelah nama diisi - slot signature (app.js).'],
+    ['Kelahiran gelembung pembimbing', 'paw_appear', 'Gelembung coach lahir / panel dibuka; diam saat kurangi-gerak (fiezel-coach-bubble.js born()).'],
+    ['Slot PAW di panel kuis lahir', 'paw_appear', 'SEKALI per sesi kuis, ditunda 650 ms setelah lesson_start; layar buntu langsung (fiezel-paw-slot.js).'],
+    ['Maskot perkenalan lahir', 'paw_appear', 'Kelahiran pertama maskot onboarding, sekali per mount (fiezel-onboarding.js).'],
+    ['Jawaban benar', 'answer_correct', 'Vonis benar - satu-satunya pemilik momen ini (answerFeedbackSignal).'],
+    ['Jawaban salah', 'answer_wrong', 'Vonis salah - lapisan karakter tetap senyap (answerFeedbackSignal).'],
+    ['Beat khawatir: ≥2 salah beruntun', 'paw_encourage', '±1,1 dtk setelah answer_wrong, hanya saat suara tutor diam; jatah 2×/sesi · ≥20 dtk.'],
+    ['Streak harian putus', 'paw_encourage', '"Tidak apa-apa" saat rantai hari jatuh; hanya saat suara tutor diam (pawStreakWatch).'],
+    ['Milestone runtun hari 7/30/100', 'streak_10', 'Once-ever per ambang - motif streak bermahkota (pawStreakWatch + pawMilestone).'],
+    ['Milestone once-ever lain (level-c2)', 'level_up', 'Kunci milestone non-streak, non-placement (pawMilestone).'],
+    ['Sesi kuis dimulai', 'lesson_start', 'Soal pertama akan tampil (quizLoop).'],
+    ['Sesi latihan selesai', 'lesson_complete', 'Penutup finishQuiz jalur latihan biasa.'],
+    ['Ujian selesai (belum tentu lulus)', 'exam_complete', 'Skip Level gagal / tes penempatan - bunyi tidak boleh berbohong (finishQuiz).'],
+    ['Ujian LULUS + Paw ikut merayakan', 'exam_pass', 'Fanfare terbesar; paw_celebrate menumpanginya - dua lapis maksimal (finishQuiz).'],
+    ['Perayaan akhir perkenalan', 'paw_celebrate', 'Lompatan celebrating langkah 6 onboarding, sekali per mount (fiezel-onboarding.js).'],
+    ['Gem terbit (streak jawaban 5)', 'streak_5', 'Momen reward gem di kuis & Skills Lab (awardQuizGems / gemsHook).'],
+    ['Prasasti baru terukir', 'notif_achievement', 'Kartu lencana berbasis bukti (presentPrasastiMoment) - bukan lesson_complete kedua.']
+  ];
+  var momentsHost = document.getElementById('moments');
+  MOMENTS.forEach(function (m) {
+    var moment = m[0], name = m[1], desc = m[2];
+    var row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = '<span class="meta"><b>' + moment + '</b><small>' + desc + '</small>' +
+      '<span class="fname">' + name + ' · assets/audio/sfx/' + name + '.ogg</span></span>';
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.textContent = 'Putar';
+    btn.onclick = function () { audition(name); };
+    row.appendChild(btn);
+    momentsHost.appendChild(row);
+  });
 </script>
 </body>
 </html>
