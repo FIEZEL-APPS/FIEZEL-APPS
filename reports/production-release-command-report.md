@@ -253,3 +253,71 @@ Yang dibangun:
 
 Verdict audit tetap **NO-GO** sampai (1) dan (2) selesai: bukan karena ada yang rusak, tetapi
 karena paritas produksi masih belum pernah dibuktikan satu kali pun.
+
+
+---
+
+# ADENDUM 2 — `main` MERAH (temuan baru, 28 Agu 2026, sesudah rebase)
+
+Saat me-rebase remediasi ke `origin/main` yang sudah maju ke `29adbf3`, suite tidak lagi hijau.
+Diukur tiga kali secara terpisah untuk memisahkan "ulah saya" dari "sudah rusak":
+
+| Pohon | Hasil |
+|---|---|
+| `origin/main` **polos** (29adbf3) | 10 gerbang MERAH |
+| `origin/main` + **patch saya** | **10 gerbang MERAH yang sama persis** |
+| Direktori kerja saya | 12 merah — dua tambahan terbukti pencemaran artefak, bukan kode |
+
+**Perubahan saya menambah NOL kegagalan.** Dua gerbang yang sempat merah di direktori kerja
+saya (`content-integrity-audit.js`, `content-integrity-gate-test.js`) lulus begitu patch yang
+sama diterapkan ke worktree bersih — penyebabnya berkas `*-REPORT.json` sisa dari ratusan
+jalan gerbang di sesi ini, bukan diff-nya.
+
+## Sepuluh gerbang yang merah di `main`
+
+`product-audit.js` · `runtime-stage8-test.js` · `lesson-experience-test.js` ·
+`tutor-reteach-card-test.js` · `http-smoke-test.js` · `quota-notice-a11y-test.js` ·
+`mastery-bkt-test.js` · `prerender-dryrun-test.js` · `prerender-plan-test.js` ·
+`release-audit-gate-test.js`
+
+## Commit penyebabnya
+
+**`a92e0cb` — "[5.19.0] assessment QA: 20-agent audit repairs + 14 template grammar baru +
+cloze alternates (pre-merge snapshot)"**, leluhur `29adbf3` (diverifikasi
+`git merge-base --is-ancestor`). Bisect per-commit atas dua gerbang termurah
+(`mastery-bkt-test.js` 46 ms, `http-smoke-test.js` 185 ms) menunjuk commit ini: semua commit
+sebelumnya hijau, commit ini merah.
+
+Ia menyentuh `app.js` (+185 baris) dan bank konten sekaligus. Galat intinya:
+
+```
+FIEZEL HTTP smoke test: FAIL
+Error: HTTP grammar payload violates the 5.19.0 schema contract
+```
+
+Dan ia menjelaskan kegagalan pra-render yang sesi lain sebut "pre-existing": korpus terukur
+`605071` vs konstanta dipaku `604962` — selisih **109 karakter**, konsisten dengan
+"14 template grammar baru" di judul commit yang sama. Jadi keduanya satu akar, bukan dua.
+
+Catatan tambahan: commit itu juga men-commit artefak `*-REPORT.json` yang dihasilkan ulang
+(`GATE-REGISTRY-REPORT.json`, `GRAMMAR-*-REPORT.json`, dan lima lainnya) — persis yang
+dilarang `coordination-guard-test.js` aturan (G) karena menjadi sumber konflik palsu.
+
+## Akibat langsung pada rantai deploy yang baru dibangun
+
+`deploy-site.yml` sengaja hanya menyala sesudah *FIEZEL Quality Gate* HIJAU. Selama sepuluh
+gerbang di atas merah, **penerbitan ke `fiezel.my.id/app/` tidak akan pernah jalan.** Itu
+interlock-nya bekerja sebagaimana dirancang, bukan cacat — tetapi artinya memerahkan `main`
+sekarang setara dengan membekukan rilis.
+
+## Yang harus dikerjakan, berurutan
+
+1. **Perbaiki `a92e0cb`** — mulai dari `http-smoke-test.js` (galat skema paling eksplisit),
+   lalu selaraskan konstanta korpus pra-render `604962` → nilai bank yang sebenarnya, SETELAH
+   memastikan pertumbuhan 109 karakter itu memang disengaja. Jangan longgarkan assert-nya.
+2. **Baru** pasang secret hosting (`deploy/SITE-DEPLOY.md`) — sebelum langkah 1 selesai,
+   deploy tetap tidak menyala walau secretnya sudah ada.
+3. Jalankan tiga gerbang live di SHA yang sudah hijau.
+
+Verdict tetap **NO-GO**, dan sekarang alasannya bertambah satu yang jauh lebih sederhana
+daripada semua temuan audit: **gerbang mutu `main` sendiri sedang merah.**
