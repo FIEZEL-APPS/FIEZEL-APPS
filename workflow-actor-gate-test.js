@@ -9,7 +9,7 @@
  * ────────────────────────────────────────────────────────────────────────────────────────
  * `reports/cf-a2-cf-existing.md` §(d) menemukan asimetri: workflow yang menyentuh Puter
  * (`deploy-core-worker.yml:17`, `configure-core.yml:12`, `push-reminders.yml:15`) bergerbang
- * `github.actor == 'fitrajft-ux'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
+ * `github.actor == 'FIEZEL-APPS'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
  * yang memegang kunci ElevenLabs TIDAK. Rekomendasi #2 laporan itu: pasang gate yang sama.
  * `reports/cf-a7-security.md` §2 dan §6 menaikkan urgensinya: token-token itu punya blast
  * radius akun penuh, dan workflow pemegangnya juga `git push` ke branch produksi.
@@ -55,7 +55,8 @@ const WORKFLOW_DIR = path.join(root, '.github', 'workflows');
  * audio-prerender-cf.yml:55) dan cocok dengan subdomain produksi `fitrajft.workers.dev`
  * (audio/manifest.json:5). Governance-nya di MASTER-ONLY-GOVERNANCE.md.
  */
-const OWNER_LOGIN = 'fitrajft-ux';
+// m025-176: username lama 'fitrajft-ux' sudah diganti menjadi 'FIEZEL-APPS' oleh pemilik.
+const OWNER_LOGIN = 'FIEZEL-APPS';
 
 /** Kata kunci yang menandai "workflow ini bisa mengubah infrastruktur". */
 const DEPLOY_PATTERNS = [
