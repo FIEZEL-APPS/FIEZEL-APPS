@@ -85,8 +85,25 @@ check('Bank carries an explicit no-prediction statement', /tidak memprediksi sko
 const feedbackBlock = sourceBlock('requestWritingFeedback');
 check('AI prompt forbids band and score claims', /jangan menyebut band IELTS atau skor TOEFL/i.test(feedbackBlock), 'AI tidak boleh mengarang band');
 check('AI prompt asks for the same rubric the learner sees', /writingRubricCriteria\s*\(/.test(feedbackBlock) && /0-4/.test(feedbackBlock), 'rubrik murid dan rubrik AI harus satu sumber');
+
+/* Hotfix CI pasca-#242 (lanjutan AI-20 F06 kategori 2a): nilai naskah review kini hidup di
+   copy-map sebagai FiezelI18n.t('kunci'). Resolver ini mengganti referensi t() dengan nilai id
+   VERBATIM dari features/i18n/copy-id-*.js sehingga semua asersi kunci->nilai di bawah tetap
+   menguji teks yang benar-benar dilihat murid (byte-identik, dijaga id-golden-snapshot). */
+function resolveI18nRefs(text){
+  const dir=path.join(root,'features','i18n');
+  if(!fs.existsSync(dir))return text;
+  const map={};
+  for(const n of fs.readdirSync(dir).filter(n=>/^copy-id-.*\.js$/.test(n))){
+    const src=fs.readFileSync(path.join(dir,n),'utf8');
+    const re=/'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;let m;
+    while((m=re.exec(src)))map[m[1]]=m[2];
+  }
+  return text.replace(/FiezelI18n\.t\('((?:[^'\\]|\\.)+)'\)/g,(w,k)=>Object.prototype.hasOwnProperty.call(map,k)?"'"+map[k]+"'":w);
+}
 const reviewBlock = sourceBlock('writingLocalReview');
-check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlock) && /bukan penilaian bahasa dan bukan skor/i.test(reviewBlock), 'cek offline hanya boleh mengaku memeriksa bentuk');
+const reviewBlockResolved=resolveI18nRefs(reviewBlock||'');
+check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlockResolved) && /bukan penilaian bahasa dan bukan skor/i.test(reviewBlockResolved), 'cek offline hanya boleh mengaku memeriksa bentuk');
 
 // --- 4b. jalur Cloudflare (worker) --------------------------------------------------------
 // Jalur default saat transport task menyala adalah Worker (app.js:7223), bukan Puter — dan
@@ -136,6 +153,13 @@ check('Form checker is exposed as pure functions', blocks.every(Boolean), blocks
 function runChecklist(prompt, text) {
   const sandbox = { WRITING_BANK: bank };
   vm.createContext(sandbox);
+vm.runInContext("if(typeof globalThis.self==='undefined')globalThis.self=globalThis;if(typeof globalThis.window==='undefined')globalThis.window=globalThis;",sandbox);
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),sandbox,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),sandbox,{filename:__n});}}
+
   vm.runInContext(blocks.join('\n'), sandbox, { timeout: 2000 });
   sandbox.__prompt = prompt;
   sandbox.__text = text;
