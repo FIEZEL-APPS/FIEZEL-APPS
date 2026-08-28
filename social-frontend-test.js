@@ -153,6 +153,17 @@ function freshCore(opts={}){
   ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(t){this.text=t};
   ctx.FIEZEL_CF_CONFIG={base:'https://api.test'};
   vm.createContext(ctx);
+  // Pola W1-TESTPLAN 2b (sama dengan regression-test.js/settings-cache-test.js): app.js kini
+  // memanggil FiezelI18n.t(...) untuk naskah yang PINDAH ke copy-map (Wave i18n #242), jadi
+  // runtime i18n + seluruh copy-id dimuat ke vm SEBELUM app.js — meniru urutan <script defer>
+  // index.html. Kalau berkasnya belum ada, harness kosong = perilaku lama.
+  const i18nDir=path.join(root,'features/i18n');
+  const i18nRuntimePath=path.join(i18nDir,'fiezel-i18n.js');
+  if(fs.existsSync(i18nRuntimePath)){
+    vm.runInContext(fs.readFileSync(i18nRuntimePath,'utf8'),ctx,{filename:'fiezel-i18n.js'});
+    for(const f of fs.readdirSync(i18nDir).filter(f=>/^copy-id-.*\.js$/.test(f)).sort())
+      vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),ctx,{filename:f});
+  }
   vm.runInContext(gems,ctx,{filename:'gems-core.js'});
   vm.runInContext(prasasti,ctx,{filename:'fiezel-prasasti-core.js'});
   vm.runInContext(socialSrc,ctx,{filename:'fiezel-social.js'});
