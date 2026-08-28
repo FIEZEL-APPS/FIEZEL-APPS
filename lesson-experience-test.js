@@ -27,7 +27,10 @@ const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'
 
 setTimeout(()=>{try{
   const skills=grammar.templates.map(x=>x.subskill);
-  assert(new Set(skills).size===139,'grammar skill fixture changed unexpectedly');
+  /* m025-182: 153, bukan 139. Bank grammar tumbuh dan angka ini tidak ikut - gerbang MERAH
+     di `main` tanpa ada yang rusak. regression-test.js:56 dan release-audit.py sama-sama
+     melaporkan 153 pada berkas yang SAMA. */
+  assert(new Set(skills).size===153,'grammar skill fixture changed unexpectedly');
   const runtimeState=context.__getFiezelState();
   const previousActiveLevel=runtimeState.preferences.activeLevel||'';
   const previousLevelMode=runtimeState.preferences.levelMode||'placement';

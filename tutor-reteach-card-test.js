@@ -128,8 +128,27 @@ test('kartu menahan alur SEBELUM soal berikutnya digambar', () => {
 });
 
 test('tombol lanjut di kartu membuang kartunya, jadi ia tidak bisa muncul dua kali', () => {
-  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;draw\(\)\}/.test(APP),
-    'tombol lanjut tidak mengosongkan pendingCard sebelum menggambar');
+  /* m025-182: yang dijaga adalah URUTANNYA, bukan bentuk persis kalimatnya.
+   *
+   * Bentuk lama menuntut badan handler SAMA PERSIS dengan `pendingCard=null;draw()`, jadi ia
+   * MERAH begitu ada yang menambahkan satu pernyataan sah di antaranya - dan itulah yang
+   * terjadi: `start=Date.now()` disisipkan supaya waktu jawab soal berikutnya dihitung dari
+   * saat murid MELANJUTKAN, bukan dari saat kartu muncul. Perilaku yang dijaga gerbang ini
+   * tidak berubah sedikit pun, hanya bentuk kalimatnya.
+   *
+   * Assertion yang pecah karena penambahan yang benar melatih orang untuk mengubah gerbang
+   * agar cocok, bukan membaca apa yang dijaganya. Invariannya sekarang dinyatakan langsung:
+   * `pendingCard` dikosongkan, `draw()` dipanggil, dan yang pertama terjadi SEBELUM yang
+   * kedua - urutan terbalik akan membuat kartu bisa muncul dua kali, dan itu tetap MERAH. */
+  const handler = APP.match(/\$\('teachNext'\)\.onclick=\(\)=>\{([^}]*)\}/);
+  assert.ok(handler, 'handler tombol lanjut tidak terbaca');
+  const badan = handler[1];
+  const kosongkan = badan.indexOf('pendingCard=null');
+  const gambar = badan.indexOf('draw()');
+  assert.ok(kosongkan !== -1, 'tombol lanjut tidak mengosongkan pendingCard sama sekali');
+  assert.ok(gambar !== -1, 'tombol lanjut tidak memanggil draw()');
+  assert.ok(kosongkan < gambar,
+    'pendingCard dikosongkan SESUDAH draw() - kartu masih bisa muncul dua kali: ' + badan);
 });
 
 test('kartu punya jalan keluar yang sama dengan layar kuis', () => {
