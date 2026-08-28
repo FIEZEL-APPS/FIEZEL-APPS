@@ -63,7 +63,7 @@
       "segments": [
         {
           "en": "I have a pen. She is an engineer.",
-          "id": "A dan an dipakai untuk benda tunggal yang belum tentu diketahui pendengar."
+          "id": "A dan an dipakai untuk satu benda. Pendengarnya belum tentu tahu benda yang mana."
         },
         {
           "en": "A book, a car, an apple, an hour.",
@@ -75,7 +75,7 @@
         },
         {
           "en": "I bought a book. The book is about English.",
-          "id": "Pola yang sering muncul: sebutkan pertama dengan a, sesudah itu pakai the."
+          "id": "Pola yang sering muncul: sebut pertama pakai a, sesudah itu pakai the."
         }
       ],
       "questions": [
@@ -89,7 +89,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Engineer starts with a vowel sound, so we use an.",
-            "id": "Engineer diawali bunyi vokal, jadi memakai an."
+            "id": "Engineer mulai dengan bunyi vokal, jadi pakai an."
           },
           "remediate": {
             "en": "Listen to the first sound, not the first letter.",
@@ -106,11 +106,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "The book is already known from the first sentence, so it takes the.",
-            "id": "Bukunya sudah diketahui dari kalimat pertama, jadi memakai the."
+            "id": "Bukunya udah disebut di kalimat pertama, jadi pakai the."
           },
           "remediate": {
             "en": "Second mention of the same thing takes the.",
-            "id": "Penyebutan kedua untuk benda yang sama memakai the."
+            "id": "Benda yang sama disebut kedua kali? Pakai the."
           }
         },
         {
@@ -123,7 +123,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "University starts with a you sound, which is a consonant sound, so a is correct.",
-            "id": "University diawali bunyi you yang termasuk bunyi konsonan, jadi a yang benar."
+            "id": "University mulai dengan bunyi you. Itu bunyi konsonan, jadi pakai a."
           },
           "remediate": {
             "en": "Say the word aloud and listen to its first sound.",
@@ -149,11 +149,11 @@
       "segments": [
         {
           "en": "I can swim. She can speak English.",
-          "id": "Can dipakai untuk menyatakan kemampuan."
+          "id": "Can dipakai buat bilang kamu bisa melakukan sesuatu."
         },
         {
           "en": "Can is always followed by the base verb.",
-          "id": "Setelah can, kata kerja selalu bentuk dasar. Tidak ada tambahan s dan tidak ada to."
+          "id": "Setelah can, kata kerja selalu bentuk dasar. Nggak pakai s, nggak pakai to."
         },
         {
           "en": "She cannot drive. She can't drive.",
@@ -161,7 +161,7 @@
         },
         {
           "en": "Can you help me, please?",
-          "id": "Can juga dipakai untuk meminta tolong dengan sopan."
+          "id": "Can juga dipakai buat minta tolong dengan sopan."
         }
       ],
       "questions": [
@@ -175,11 +175,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "After can the verb has no s and no to.",
-            "id": "Setelah can, kata kerja tanpa s dan tanpa to."
+            "id": "Setelah can, kata kerjanya polos: tanpa s, tanpa to."
           },
           "remediate": {
             "en": "Can is a helper, so the main verb stays plain.",
-            "id": "Can adalah kata bantu, jadi kata kerja utamanya tetap polos."
+            "id": "Can itu kata bantu, jadi kata kerja utamanya tetap polos."
           }
         },
         {
@@ -192,11 +192,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Can never takes s and is never followed by to.",
-            "id": "Can tidak pernah memakai s dan tidak pernah diikuti to."
+            "id": "Can nggak pernah pakai s dan nggak pernah diikuti to."
           },
           "remediate": {
             "en": "Modal verbs do not change with the subject.",
-            "id": "Kata kerja modal tidak berubah mengikuti subjek."
+            "id": "Kata kerja modal seperti can nggak berubah mengikuti subjek."
           }
         },
         {
@@ -209,11 +209,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Can't is the negative of can: not able.",
-            "id": "Can't adalah bentuk negatif dari can: tidak bisa."
+            "id": "Can't itu bentuk negatif dari can, artinya nggak bisa."
           },
           "remediate": {
             "en": "Can't is a short form of cannot.",
-            "id": "Can't adalah singkatan dari cannot."
+            "id": "Can't itu singkatan dari cannot."
           }
         }
       ]
@@ -235,19 +235,19 @@
       "segments": [
         {
           "en": "I have got two sisters. She has got a new phone.",
-          "id": "Have got dipakai untuk kepemilikan, dan sangat umum dalam percakapan."
+          "id": "Have got dipakai buat bilang kamu punya sesuatu. Sering banget muncul di percakapan."
         },
         {
           "en": "He, she and it use has got.",
-          "id": "Sama seperti tadi, orang ketiga tunggal memakai bentuk berbeda, yaitu has."
+          "id": "Sama seperti tadi: he, she, dan it pakai bentuk beda, yaitu has."
         },
         {
           "en": "I have not got a car. She has not got time.",
-          "id": "Bentuk negatifnya menyisipkan not di antara have dan got."
+          "id": "Bentuk negatifnya: sisipkan not di antara have dan got."
         },
         {
           "en": "Have you got a pen? Has he got a car?",
-          "id": "Untuk bertanya, pindahkan have atau has ke depan subjek."
+          "id": "Mau bertanya? Pindahkan have atau has ke depan subjek."
         }
       ],
       "questions": [
@@ -261,11 +261,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "She takes has got.",
-            "id": "She memakai has got."
+            "id": "She pakai has got."
           },
           "remediate": {
             "en": "He, she and it always take has.",
-            "id": "He, she, dan it selalu memakai has."
+            "id": "He, she, dan it selalu pakai has."
           }
         },
         {
@@ -278,11 +278,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Have moves in front of the subject to ask.",
-            "id": "Have pindah ke depan subjek untuk bertanya."
+            "id": "Untuk bertanya, have pindah ke depan subjek."
           },
           "remediate": {
             "en": "Do is not used together with have got.",
-            "id": "Do tidak dipakai bersama have got."
+            "id": "Do nggak dipakai bareng have got."
           }
         },
         {
@@ -299,7 +299,7 @@
           },
           "remediate": {
             "en": "Not sits between have and got.",
-            "id": "Not berada di antara have dan got."
+            "id": "Not duduk di antara have dan got."
           }
         }
       ]
@@ -325,15 +325,15 @@
         },
         {
           "en": "Most regular verbs just add ed.",
-          "id": "Sebagian besar kata kerja beraturan hanya menambahkan ed."
+          "id": "Kebanyakan kata kerja beraturan cuma ditambah ed."
         },
         {
           "en": "Study becomes studied. Stop becomes stopped.",
-          "id": "Ada penyesuaian ejaan: y berubah jadi ied, dan konsonan akhir kadang digandakan."
+          "id": "Kadang ejaannya berubah: y jadi ied, dan huruf akhir kadang didobel."
         },
         {
           "en": "I did not work. Did you work yesterday?",
-          "id": "Dalam bentuk negatif dan pertanyaan, did yang membawa masa lampau, jadi kata kerjanya kembali ke bentuk dasar."
+          "id": "Di kalimat negatif dan tanya, did yang bawa makna lampau. Kata kerjanya balik ke bentuk dasar."
         }
       ],
       "questions": [
@@ -347,11 +347,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Consonant plus y becomes ied.",
-            "id": "Konsonan lalu y berubah menjadi ied."
+            "id": "Huruf akhirnya konsonan lalu y, jadi y berubah jadi ied: studied."
           },
           "remediate": {
             "en": "Change y to i before ed.",
-            "id": "Ubah y menjadi i sebelum ed."
+            "id": "Ubah y jadi i dulu, baru tambah ed."
           }
         },
         {
@@ -364,11 +364,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Did already marks the past, so the verb stays in the base form.",
-            "id": "Did sudah menandai masa lampau, jadi kata kerjanya tetap bentuk dasar."
+            "id": "Did udah menandai lampau, jadi kata kerjanya tetap work, bukan worked."
           },
           "remediate": {
             "en": "Only one word carries the past tense.",
-            "id": "Hanya satu kata yang membawa penanda lampau."
+            "id": "Cukup satu kata yang bawa tanda lampau."
           }
         },
         {
@@ -381,11 +381,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Yesterday signals the past, so we add ed.",
-            "id": "Kata yesterday menandakan lampau, jadi tambahkan ed."
+            "id": "Ada kata yesterday, jadi pakai bentuk lampau: played."
           },
           "remediate": {
             "en": "Look for a past time word in the sentence.",
-            "id": "Cari kata penanda waktu lampau dalam kalimatnya."
+            "id": "Cari kata penanda waktu lampau di kalimatnya."
           }
         }
       ]
@@ -407,19 +407,19 @@
       "segments": [
         {
           "en": "I was at home yesterday. They were at school.",
-          "id": "Was dan were adalah bentuk lampau dari to be."
+          "id": "Was dan were itu bentuk lampau dari to be."
         },
         {
           "en": "I was, he was, she was, it was. You were, we were, they were.",
-          "id": "I dan orang ketiga tunggal memakai was. Sisanya memakai were."
+          "id": "I, he, she, dan it pakai was. Sisanya pakai were."
         },
         {
           "en": "I was not tired. They were not late.",
-          "id": "Bentuk negatifnya menambahkan not sesudah was atau were."
+          "id": "Bentuk negatifnya: tambah not sesudah was atau were."
         },
         {
           "en": "Was she happy? Were you at home?",
-          "id": "Untuk bertanya, pindahkan was atau were ke depan subjek."
+          "id": "Mau bertanya? Pindahkan was atau were ke depan subjek."
         }
       ],
       "questions": [
@@ -437,7 +437,7 @@
           },
           "remediate": {
             "en": "Plural subjects take were.",
-            "id": "Subjek jamak memakai were."
+            "id": "Subjek jamak pakai were."
           }
         },
         {
@@ -450,11 +450,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "She takes was in the past.",
-            "id": "She memakai was untuk bentuk lampau."
+            "id": "She pakai was di bentuk lampau."
           },
           "remediate": {
             "en": "I, he, she and it take was.",
-            "id": "I, he, she, dan it memakai was."
+            "id": "I, he, she, dan it pakai was."
           }
         },
         {
@@ -467,11 +467,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Were moves in front of the subject.",
-            "id": "Were pindah ke depan subjek."
+            "id": "Di pertanyaan, were pindah ke depan subjek: Were you at home?"
           },
           "remediate": {
             "en": "Did is never used together with was or were.",
-            "id": "Did tidak pernah dipakai bersama was atau were."
+            "id": "Did nggak pernah dipakai bareng was atau were."
           }
         }
       ]
@@ -493,19 +493,19 @@
       "segments": [
         {
           "en": "One book, two books. One car, two cars.",
-          "id": "Bentuk jamak paling umum hanya menambahkan huruf s."
+          "id": "Bentuk jamak paling umum cuma ditambah huruf s."
         },
         {
           "en": "One box, two boxes. One watch, two watches.",
-          "id": "Kalau kata berakhir dengan s, x, ch, sh, atau o, tambahkan es."
+          "id": "Kalau kata berakhir s, x, ch, atau sh, tambahkan es. Kata berakhiran o umumnya juga pakai es, contohnya tomatoes dan heroes. Tapi kata serapan seperti photos, pianos, dan videos cukup pakai s."
         },
         {
           "en": "City becomes cities. Baby becomes babies.",
-          "id": "Kalau berakhir konsonan lalu y, ubah y menjadi i lalu tambahkan es."
+          "id": "Kalau akhirnya konsonan lalu y, ubah y jadi i, lalu tambah es."
         },
         {
           "en": "Man becomes men. Child becomes children.",
-          "id": "Beberapa kata tidak beraturan dan harus dihafal."
+          "id": "Beberapa kata nggak ikut aturan, jadi harus dihafal. Contohnya man jadi men."
         }
       ],
       "questions": [
@@ -519,11 +519,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Words ending in x take es.",
-            "id": "Kata yang berakhir x memakai es."
+            "id": "Box berakhir dengan x, jadi jamaknya pakai es: boxes."
           },
           "remediate": {
             "en": "After s, x, ch and sh we add es.",
-            "id": "Setelah s, x, ch, dan sh kita tambahkan es."
+            "id": "Akhiran s, x, ch, dan sh selalu ditambah es."
           }
         },
         {
@@ -536,11 +536,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Consonant plus y becomes ies.",
-            "id": "Konsonan lalu y berubah menjadi ies."
+            "id": "City berakhir konsonan lalu y, jadi y berubah: cities."
           },
           "remediate": {
             "en": "Change y to i, then add es.",
-            "id": "Ubah y menjadi i, lalu tambahkan es."
+            "id": "Ubah y jadi i, lalu tambah es."
           }
         },
         {
@@ -553,11 +553,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "Child is irregular: the plural is children.",
-            "id": "Child tidak beraturan: bentuk jamaknya children."
+            "id": "Child nggak ikut aturan: jamaknya children."
           },
           "remediate": {
             "en": "Some very common nouns do not follow the s rule.",
-            "id": "Beberapa kata benda umum tidak mengikuti aturan s."
+            "id": "Beberapa kata benda umum nggak ikut aturan s."
           }
         }
       ]
@@ -579,11 +579,11 @@
       "segments": [
         {
           "en": "The keys are in the bag.",
-          "id": "In dipakai untuk sesuatu yang berada di dalam ruang atau wadah."
+          "id": "In dipakai kalau bendanya ada di dalam ruang atau wadah."
         },
         {
           "en": "The book is on the table.",
-          "id": "On dipakai untuk sesuatu yang menempel pada permukaan."
+          "id": "On dipakai kalau bendanya nempel di permukaan."
         },
         {
           "en": "I am at the bus stop. She is at school.",
@@ -605,11 +605,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "A table is a surface, so we use on.",
-            "id": "Meja adalah permukaan, jadi memakai on."
+            "id": "Meja itu permukaan, jadi pakai on."
           },
           "remediate": {
             "en": "Ask if it is inside, on a surface, or at a point.",
-            "id": "Tanyakan apakah di dalam, di permukaan, atau di satu titik."
+            "id": "Tanya dulu: di dalam, di permukaan, atau di satu titik?"
           }
         },
         {
@@ -622,11 +622,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "A bag is a container, so we use in.",
-            "id": "Tas adalah wadah, jadi memakai in."
+            "id": "Tas itu wadah, jadi pakai in."
           },
           "remediate": {
             "en": "Inside something is always in.",
-            "id": "Berada di dalam sesuatu selalu memakai in."
+            "id": "Ada di dalam sesuatu? Pakai in."
           }
         },
         {
@@ -639,11 +639,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "A bus stop is treated as a point, so we use at.",
-            "id": "Halte dianggap satu titik, jadi memakai at."
+            "id": "Halte dihitung satu titik, jadi pakai at."
           },
           "remediate": {
             "en": "A specific meeting point takes at.",
-            "id": "Titik pertemuan yang spesifik memakai at."
+            "id": "Titik ketemu yang spesifik pakai at."
           }
         }
       ]
@@ -673,11 +673,11 @@
         },
         {
           "en": "At seven o'clock, at night, at the weekend.",
-          "id": "At dipakai untuk jam dan beberapa ungkapan tetap."
+          "id": "At dipakai untuk jam dan beberapa ungkapan tetap, seperti at night."
         },
         {
           "en": "Notice: in the morning, but at night.",
-          "id": "Perhatikan satu pengecualian penting: in the morning, tetapi at night."
+          "id": "Hati-hati satu pengecualian penting: in the morning, tapi at night."
         }
       ],
       "questions": [
@@ -691,11 +691,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "Clock times take at.",
-            "id": "Waktu jam memakai at."
+            "id": "Eight o'clock itu jam, jadi pakai at."
           },
           "remediate": {
             "en": "A clock time is always at.",
-            "id": "Waktu jam selalu memakai at."
+            "id": "Jam selalu pakai at."
           }
         },
         {
@@ -708,11 +708,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Months take in.",
-            "id": "Nama bulan memakai in."
+            "id": "May itu nama bulan, jadi pakai in."
           },
           "remediate": {
             "en": "Months and years take in.",
-            "id": "Bulan dan tahun memakai in."
+            "id": "Bulan dan tahun pakai in."
           }
         },
         {
@@ -725,11 +725,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Days of the week take on.",
-            "id": "Nama hari memakai on."
+            "id": "Monday itu nama hari, jadi pakai on."
           },
           "remediate": {
             "en": "Days and dates take on.",
-            "id": "Hari dan tanggal memakai on."
+            "id": "Hari dan tanggal pakai on."
           }
         }
       ]
@@ -751,19 +751,19 @@
       "segments": [
         {
           "en": "I am studying now. She is cooking dinner.",
-          "id": "Present continuous dipakai untuk kejadian yang sedang berlangsung sekarang."
+          "id": "Present continuous dipakai untuk kejadian yang lagi berlangsung sekarang."
         },
         {
           "en": "The pattern is be plus verb plus ing.",
-          "id": "Polanya adalah to be, lalu kata kerja ditambah ing. Keduanya harus ada."
+          "id": "Polanya: to be, lalu kata kerja plus ing. Dua-duanya wajib ada."
         },
         {
           "en": "I work every day, but today I am studying.",
-          "id": "Bandingkan dengan present simple: work adalah kebiasaan, am studying adalah sekarang."
+          "id": "Bandingkan dengan present simple: work itu kebiasaan, am studying itu sekarang."
         },
         {
           "en": "Are you listening? She is not sleeping.",
-          "id": "Bertanya dan menyangkal dilakukan lewat to be, bukan lewat kata kerja utama."
+          "id": "Untuk bertanya atau menyangkal, mainkan to be-nya, bukan kata kerja utamanya."
         }
       ],
       "questions": [
@@ -777,7 +777,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Now signals an action in progress, so we use is cooking.",
-            "id": "Kata now menandakan aksi yang sedang berjalan, jadi memakai is cooking."
+            "id": "Ada kata now, artinya lagi berlangsung. Jadi pakai is cooking."
           },
           "remediate": {
             "en": "Present continuous always needs be plus ing.",
@@ -798,7 +798,7 @@
           },
           "remediate": {
             "en": "Do not drop be, and do not drop ing.",
-            "id": "Jangan menghilangkan to be, dan jangan menghilangkan ing."
+            "id": "Jangan buang to be, jangan buang ing."
           }
         },
         {
@@ -811,11 +811,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Present simple describes a habit; continuous describes right now.",
-            "id": "Present simple menggambarkan kebiasaan; continuous menggambarkan saat ini."
+            "id": "He reads every night itu kebiasaan, jadi present simple. Continuous untuk yang lagi terjadi."
           },
           "remediate": {
             "en": "Ask yourself: every day, or at this moment?",
-            "id": "Tanyakan pada dirimu: setiap hari, atau saat ini?"
+            "id": "Tanya dirimu: setiap hari, atau lagi sekarang?"
           }
         }
       ]
@@ -841,7 +841,7 @@
         },
         {
           "en": "He, she and it add s to the verb.",
-          "id": "Jebakan terbesarnya ada di orang ketiga tunggal: kata kerjanya ditambah s."
+          "id": "Jebakan paling besar ada di he, she, dan it: kata kerjanya ditambah s."
         },
         {
           "en": "He does not work on Sunday. They do not work at night.",
@@ -849,7 +849,7 @@
         },
         {
           "en": "Do you work here? Does she work here?",
-          "id": "Untuk bertanya, mulai dengan do atau does. Kata kerjanya kembali ke bentuk dasar."
+          "id": "Mau bertanya? Mulai dengan do atau does. Kata kerjanya balik ke bentuk dasar."
         }
       ],
       "questions": [
@@ -863,11 +863,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "She is third person singular, so the verb takes s.",
-            "id": "She itu orang ketiga tunggal, jadi kata kerjanya ditambah s."
+            "id": "She itu orang ketiga tunggal, jadi kata kerjanya ditambah s: works."
           },
           "remediate": {
             "en": "He, she and it add s in the present simple.",
-            "id": "He, she, dan it menambahkan s pada present simple."
+            "id": "He, she, dan it menambah s di present simple."
           }
         },
         {
@@ -880,11 +880,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "With he we use does not, and the verb stays in its base form.",
-            "id": "Dengan he kita memakai does not, dan kata kerjanya tetap bentuk dasar."
+            "id": "Dengan he kita pakai does not, dan kata kerjanya tetap bentuk dasar."
           },
           "remediate": {
             "en": "Does already carries the s, so the verb does not.",
-            "id": "Does sudah membawa s, jadi kata kerjanya tidak lagi memakai s."
+            "id": "Does udah bawa s, jadi kata kerjanya nggak perlu s lagi."
           }
         },
         {
@@ -897,11 +897,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "After does the verb returns to its base form: work.",
-            "id": "Setelah does, kata kerja kembali ke bentuk dasar: work."
+            "id": "Setelah does, kata kerja balik ke bentuk dasar: work."
           },
           "remediate": {
             "en": "Never put s on the verb after does.",
-            "id": "Jangan menambahkan s pada kata kerja setelah does."
+            "id": "Jangan tambah s di kata kerja setelah does."
           }
         }
       ]
@@ -931,11 +931,11 @@
         },
         {
           "en": "This is my book. This book is mine.",
-          "id": "Perhatikan bedanya. My selalu bersama kata benda, sedangkan mine berdiri sendiri."
+          "id": "Lihat bedanya: my selalu bareng kata benda, mine berdiri sendiri."
         },
         {
           "en": "Her name is Sari. His name is Dani.",
-          "id": "Dalam bahasa Inggris, kepemilikan mengikuti pemiliknya, bukan bendanya."
+          "id": "Kata miliknya ikut pemiliknya: Sari perempuan, jadi her. Dani laki-laki, jadi his."
         }
       ],
       "questions": [
@@ -949,11 +949,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Before a noun we use the possessive adjective her.",
-            "id": "Sebelum kata benda kita memakai kata kepemilikan her."
+            "id": "Sebelum kata benda name, kita pakai kata milik: her."
           },
           "remediate": {
             "en": "A word before a noun must be my, your, his, her, our or their.",
-            "id": "Kata sebelum kata benda harus my, your, his, her, our, atau their."
+            "id": "Untuk milik sebelum kata benda, pilih my, your, his, her, our, atau their."
           }
         },
         {
@@ -966,7 +966,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "With no noun after it, we use mine.",
-            "id": "Kalau tidak ada kata benda sesudahnya, kita memakai mine."
+            "id": "Nggak ada kata benda sesudahnya, jadi pakai mine."
           },
           "remediate": {
             "en": "My needs a noun; mine stands alone.",
@@ -983,7 +983,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "The subject of the sentence is I.",
-            "id": "Subjek kalimatnya adalah I."
+            "id": "Yang jadi subjek kalimat itu I, bukan me atau my."
           },
           "remediate": {
             "en": "Use I as the subject, me as the object.",
@@ -1009,7 +1009,7 @@
       "segments": [
         {
           "en": "What, where, when, who, why, how.",
-          "id": "Enam kata tanya ini menutup hampir semua kebutuhan percakapan dasar."
+          "id": "Enam kata tanya ini cukup untuk hampir semua percakapan dasar."
         },
         {
           "en": "What is your name? Where do you live?",
@@ -1035,7 +1035,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Where asks about place.",
-            "id": "Where menanyakan tempat."
+            "id": "Where menanyakan tempat, jadi Where do you live yang cocok."
           },
           "remediate": {
             "en": "Match the question word to the information you need.",
@@ -1069,11 +1069,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Who asks about a person.",
-            "id": "Who menanyakan orang."
+            "id": "Guru itu orang, jadi pakai who."
           },
           "remediate": {
             "en": "A person is always who.",
-            "id": "Untuk orang selalu memakai who."
+            "id": "Untuk menanyakan orang, pakai who."
           }
         }
       ]
@@ -1095,15 +1095,15 @@
       "segments": [
         {
           "en": "I have some water. I have some friends here.",
-          "id": "Some dipakai dalam kalimat positif, untuk jumlah yang tidak disebut pasti."
+          "id": "Some dipakai di kalimat positif, untuk jumlah yang nggak disebut pasti."
         },
         {
           "en": "I do not have any money. Do you have any questions?",
-          "id": "Any dipakai dalam kalimat negatif dan pertanyaan."
+          "id": "Any biasanya dipakai di kalimat negatif dan pertanyaan. Tawaran sopan tetap pakai some, misalnya Would you like some tea?"
         },
         {
           "en": "Countable: one book, two books. Uncountable: water, rice, money.",
-          "id": "Kata benda terhitung bisa dihitung satu per satu; kata benda tak terhitung tidak bisa."
+          "id": "Kata benda terhitung bisa dihitung satu per satu. Yang tak terhitung nggak bisa."
         },
         {
           "en": "How many books? How much water?",
@@ -1121,11 +1121,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Negatives take any.",
-            "id": "Kalimat negatif memakai any."
+            "id": "Kalimatnya negatif: don't have. Jadi pakai any."
           },
           "remediate": {
             "en": "Some is for positive sentences.",
-            "id": "Some dipakai untuk kalimat positif."
+            "id": "Some dipakai di kalimat positif."
           }
         },
         {
@@ -1138,11 +1138,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Books are countable, so we use how many.",
-            "id": "Books bisa dihitung, jadi memakai how many."
+            "id": "Books bisa dihitung, jadi pakai how many."
           },
           "remediate": {
             "en": "Countable nouns take how many.",
-            "id": "Kata benda terhitung memakai how many."
+            "id": "Kata benda terhitung pakai how many."
           }
         },
         {
@@ -1155,7 +1155,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Water is uncountable, so it has no plural and no a.",
-            "id": "Water tidak terhitung, jadi tanpa bentuk jamak dan tanpa a."
+            "id": "Water nggak bisa dihitung, jadi nggak ada bentuk jamak dan nggak pakai a."
           },
           "remediate": {
             "en": "Uncountable nouns stay singular.",
@@ -1181,19 +1181,19 @@
       "segments": [
         {
           "en": "There is a book on the desk.",
-          "id": "There is dipakai untuk menyatakan ada, dengan benda tunggal."
+          "id": "There is dipakai buat bilang ada sesuatu, untuk benda tunggal."
         },
         {
           "en": "There are two books on the desk.",
-          "id": "Untuk benda jamak, gunakan there are."
+          "id": "Untuk benda jamak, pakai there are."
         },
         {
           "en": "There is not any milk. There are not any chairs.",
-          "id": "Bentuk negatifnya menambahkan not, dan sering dipakai bersama any."
+          "id": "Bentuk negatifnya tambah not, dan sering muncul bareng any."
         },
         {
           "en": "Is there a bank near here? Are there any questions?",
-          "id": "Untuk bertanya, pindahkan is atau are ke depan there."
+          "id": "Mau bertanya? Pindahkan is atau are ke depan there."
         }
       ],
       "questions": [
@@ -1207,11 +1207,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Three chairs is plural, so we use there are.",
-            "id": "Three chairs itu jamak, jadi memakai there are."
+            "id": "Three chairs itu jamak, jadi pakai there are."
           },
           "remediate": {
             "en": "Count the noun first, then choose is or are.",
-            "id": "Hitung benda dulu, baru pilih is atau are."
+            "id": "Hitung bendanya dulu, baru pilih is atau are."
           }
         },
         {
@@ -1224,11 +1224,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Questions move is in front of there.",
-            "id": "Dalam pertanyaan, is pindah ke depan there."
+            "id": "Di pertanyaan, is pindah ke depan there: Is there…?"
           },
           "remediate": {
             "en": "Ask with Is there or Are there.",
-            "id": "Bertanya dengan Is there atau Are there."
+            "id": "Bertanya pakai Is there atau Are there."
           }
         },
         {
@@ -1245,7 +1245,7 @@
           },
           "remediate": {
             "en": "There have is never used to say something exists.",
-            "id": "There have tidak pernah dipakai untuk menyatakan keberadaan."
+            "id": "There have nggak pernah dipakai buat bilang ada sesuatu."
           }
         }
       ]
@@ -1267,15 +1267,15 @@
       "segments": [
         {
           "en": "I am a student. She is my teacher. They are from Bandung.",
-          "id": "Kita mulai dari kata kerja paling dasar dalam bahasa Inggris, yaitu to be."
+          "id": "Kita mulai dari kata kerja paling dasar di bahasa Inggris: to be."
         },
         {
           "en": "I am, you are, he is, she is, it is, we are, they are.",
-          "id": "Bentuknya mengikuti subjek. I memakai am, he, she, dan it memakai is, sisanya memakai are."
+          "id": "Bentuknya ikut subjek. I pakai am. He, she, dan it pakai is. Sisanya pakai are."
         },
         {
           "en": "I am not tired. She is not late.",
-          "id": "Untuk bentuk negatif, tambahkan not sesudah to be. Bukan sebelum."
+          "id": "Bentuk negatif: tambah not sesudah to be, bukan sebelum."
         },
         {
           "en": "Are you ready? Is she a doctor?",
@@ -1293,7 +1293,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "He, she and it always take is.",
-            "id": "He, she, dan it selalu memakai is."
+            "id": "She masuk kelompok he, she, it. Jadi pakai is."
           },
           "remediate": {
             "en": "Look at the subject first, then choose the form of be.",
@@ -1310,11 +1310,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "They is plural, so it takes are.",
-            "id": "They itu jamak, jadi memakai are."
+            "id": "They itu jamak, jadi pakai are."
           },
           "remediate": {
             "en": "Plural subjects take are.",
-            "id": "Subjek jamak memakai are."
+            "id": "Subjek jamak pakai are."
           }
         },
         {
@@ -1327,7 +1327,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "In a question be moves in front of the subject: Are you ready?",
-            "id": "Dalam pertanyaan, to be pindah ke depan subjek: Are you ready?"
+            "id": "Di pertanyaan, to be pindah ke depan subjek: Are you ready?"
           },
           "remediate": {
             "en": "Move am, is or are before the subject to ask.",
@@ -1352,19 +1352,19 @@
       "segments": [
         {
           "en": "Let's look at the present perfect.",
-          "id": "Mari kita lihat present perfect."
+          "id": "Sekarang kita lihat present perfect."
         },
         {
           "en": "The basic pattern is subject, have or has,",
-          "id": "Polanya adalah subjek, have atau has,"
+          "id": "Polanya: subjek, lalu have atau has,"
         },
         {
           "en": "then the past participle, the third form of the verb.",
-          "id": "lalu past participle atau kata kerja bentuk ketiga."
+          "id": "lalu past participle, alias kata kerja bentuk ketiga."
         },
         {
           "en": "We use it when the time is not important, only the result.",
-          "id": "Kita memakainya saat waktunya tidak penting, hanya hasilnya."
+          "id": "Kita pakai ini saat waktunya nggak penting, yang penting hasilnya."
         }
       ],
       "questions": [
@@ -1377,8 +1377,8 @@
           ],
           "answerIndex": 1,
           "explain": {
-            "en": "Gone is the past participle. Went is the simple past, so it cannot follow have.",
-            "id": "Gone adalah past participle. Went itu simple past, jadi tidak bisa mengikuti have."
+            "en": "Gone is the past participle. Went is the past simple, so it cannot follow have.",
+            "id": "Gone itu past participle. Went itu past simple, jadi nggak bisa ikut have."
           },
           "remediate": {
             "en": "Remember: have or has is always followed by the third form.",
@@ -1395,11 +1395,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "She is third person singular, so we use has.",
-            "id": "She itu orang ketiga tunggal, jadi memakai has."
+            "id": "She itu orang ketiga tunggal, jadi pakai has."
           },
           "remediate": {
             "en": "He, she and it always take has, not have.",
-            "id": "He, she, dan it selalu memakai has, bukan have."
+            "id": "He, she, dan it selalu pakai has, bukan have."
           }
         }
       ]
@@ -1425,11 +1425,11 @@
         },
         {
           "en": "Red, blue, green, black, white.",
-          "id": "Warna diletakkan sebelum kata bendanya, misalnya a red shirt."
+          "id": "Warna ditaruh sebelum kata bendanya, misalnya a red shirt."
         },
         {
           "en": "She is wearing a blue jacket today.",
-          "id": "Kata kerjanya adalah wear. Untuk sekarang, gunakan is wearing."
+          "id": "Kata kerjanya wear. Untuk yang lagi dipakai sekarang, pakai is wearing."
         },
         {
           "en": "A pair of shoes, a pair of trousers.",
@@ -1447,7 +1447,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "The colour comes before the noun.",
-            "id": "Warna diletakkan sebelum kata benda."
+            "id": "Warna ditaruh sebelum kata benda: a red shirt."
           },
           "remediate": {
             "en": "Adjective first, then the noun.",
@@ -1464,11 +1464,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "For clothes on the body we use wear.",
-            "id": "Untuk pakaian yang sedang dikenakan, kita memakai wear."
+            "id": "Untuk pakaian yang lagi dipakai di badan, kata kerjanya wear."
           },
           "remediate": {
             "en": "Wear is the verb for clothes.",
-            "id": "Wear adalah kata kerja untuk pakaian."
+            "id": "Wear itu kata kerja khusus pakaian."
           }
         },
         {
@@ -1481,11 +1481,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Shoes come in twos, so we say a pair of shoes.",
-            "id": "Sepatu berpasangan, jadi kita berkata a pair of shoes."
+            "id": "Sepatu selalu sepasang, jadi bilangnya a pair of shoes."
           },
           "remediate": {
             "en": "Two-part items take a pair of.",
-            "id": "Benda berpasangan memakai a pair of."
+            "id": "Benda berpasangan pakai a pair of."
           }
         }
       ]
@@ -1507,19 +1507,19 @@
       "segments": [
         {
           "en": "I get up at six o'clock. I have breakfast at seven.",
-          "id": "Rutinitas harian selalu memakai present simple, karena ini kebiasaan."
+          "id": "Rutinitas harian pakai present simple, karena ini kebiasaan."
         },
         {
           "en": "Get up, take a shower, have breakfast, go to work.",
-          "id": "Kata kerja rutinitas biasanya berpasangan dengan kata lain, jadi hafalkan pasangannya."
+          "id": "Kata kerja rutinitas biasanya punya pasangan tetap, jadi hafalkan pasangannya."
         },
         {
           "en": "Always, usually, often, sometimes, never.",
-          "id": "Kata keterangan frekuensi ini diletakkan sebelum kata kerja utama."
+          "id": "Kata frekuensi ini ditaruh sebelum kata kerja utama."
         },
         {
           "en": "I always get up early. I am never late.",
-          "id": "Perhatikan satu pengecualian: dengan to be, kata frekuensi diletakkan sesudahnya."
+          "id": "Ada satu pengecualian: dengan to be, kata frekuensinya ditaruh sesudahnya."
         }
       ],
       "questions": [
@@ -1533,11 +1533,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Every day signals a habit, so present simple is correct.",
-            "id": "Every day menandakan kebiasaan, jadi present simple yang benar."
+            "id": "Ada every day, tandanya kebiasaan. Jadi present simple: get."
           },
           "remediate": {
             "en": "Habits use the present simple.",
-            "id": "Kebiasaan memakai present simple."
+            "id": "Kebiasaan pakai present simple."
           }
         },
         {
@@ -1550,7 +1550,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Frequency adverbs sit before the main verb.",
-            "id": "Kata keterangan frekuensi berada sebelum kata kerja utama."
+            "id": "Always ditaruh sebelum kata kerja utama get up."
           },
           "remediate": {
             "en": "Before the main verb, after be.",
@@ -1567,11 +1567,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "The fixed phrase is have breakfast.",
-            "id": "Frasa tetapnya adalah have breakfast."
+            "id": "Frasa tetapnya have breakfast, bukan make atau do."
           },
           "remediate": {
             "en": "Learn routine verbs together with their partner word.",
-            "id": "Hafalkan kata kerja rutinitas bersama pasangan katanya."
+            "id": "Hafalkan kata kerja rutinitas bareng pasangannya."
           }
         }
       ]
@@ -1605,7 +1605,7 @@
         },
         {
           "en": "This is my wife. This is my husband.",
-          "id": "Untuk pasangan, gunakan wife untuk istri dan husband untuk suami."
+          "id": "Untuk pasangan: wife itu istri, husband itu suami."
         }
       ],
       "questions": [
@@ -1619,11 +1619,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Your mother's sister is your aunt.",
-            "id": "Saudara perempuan ibumu adalah aunt."
+            "id": "Saudara perempuan ibumu itu aunt."
           },
           "remediate": {
             "en": "Aunt is the sister of a parent.",
-            "id": "Aunt adalah saudara perempuan dari orang tua."
+            "id": "Aunt itu saudara perempuan dari orang tuamu."
           }
         },
         {
@@ -1636,7 +1636,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Siblings covers brothers and sisters.",
-            "id": "Siblings mencakup saudara laki-laki dan perempuan."
+            "id": "Siblings mencakup kakak dan adik, laki-laki maupun perempuan."
           },
           "remediate": {
             "en": "Parents means mother and father.",
@@ -1653,7 +1653,7 @@
           "answerIndex": 0,
           "explain": {
             "en": "The child of an uncle or aunt is a cousin.",
-            "id": "Anak dari paman atau bibi adalah cousin."
+            "id": "Anak dari paman atau bibimu itu cousin."
           },
           "remediate": {
             "en": "Cousin is used for both boys and girls.",
@@ -1683,15 +1683,15 @@
         },
         {
           "en": "Rice, bread, water, coffee.",
-          "id": "Sebagian lagi tidak bisa dihitung langsung, jadi tidak memakai bentuk jamak."
+          "id": "Sebagian lagi nggak bisa dihitung langsung, jadi nggak punya bentuk jamak."
         },
         {
           "en": "A cup of tea, a glass of water, a bowl of rice.",
-          "id": "Untuk menghitung yang tak terhitung, gunakan wadahnya: a cup of, a glass of, a bowl of."
+          "id": "Untuk menghitung yang tak terhitung, pakai wadahnya: a cup of, a glass of, a bowl of."
         },
         {
           "en": "I would like a coffee, please. Can I have the bill?",
-          "id": "Dua kalimat ini paling sering dipakai saat memesan makanan."
+          "id": "Dua kalimat ini paling sering dipakai waktu pesan makanan."
         }
       ],
       "questions": [
@@ -1705,7 +1705,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Rice is uncountable, so we count the container.",
-            "id": "Rice tidak terhitung, jadi yang dihitung wadahnya."
+            "id": "Rice nggak bisa dihitung, jadi yang dihitung wadahnya: two bowls of rice."
           },
           "remediate": {
             "en": "Use a cup, glass or bowl to count uncountable food.",
@@ -1722,11 +1722,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Glass starts with a consonant sound, so a is correct.",
-            "id": "Glass diawali bunyi konsonan, jadi a yang benar."
+            "id": "Glass mulai dengan bunyi konsonan, jadi pakai a."
           },
           "remediate": {
             "en": "Choose a or an by the sound of the next word.",
-            "id": "Pilih a atau an berdasarkan bunyi kata berikutnya."
+            "id": "Pilih a atau an dari bunyi kata berikutnya."
           }
         },
         {
@@ -1739,11 +1739,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Would like plus please is the polite form.",
-            "id": "Would like ditambah please adalah bentuk sopan."
+            "id": "Would like plus please itu bentuk sopannya."
           },
           "remediate": {
             "en": "Polite ordering uses would like, not give me.",
-            "id": "Memesan dengan sopan memakai would like, bukan give me."
+            "id": "Pesan yang sopan pakai would like, bukan give me."
           }
         }
       ]
@@ -1765,7 +1765,7 @@
       "segments": [
         {
           "en": "I am a teacher. She is a nurse. He is an engineer.",
-          "id": "Untuk menyebut pekerjaan, gunakan to be lalu a atau an."
+          "id": "Untuk menyebut pekerjaan, pakai to be lalu a atau an."
         },
         {
           "en": "A doctor works in a hospital. A teacher works in a school.",
@@ -1777,7 +1777,7 @@
         },
         {
           "en": "What do you do? I am a student.",
-          "id": "What do you do adalah cara umum menanyakan pekerjaan seseorang."
+          "id": "What do you do itu cara umum menanyakan pekerjaan orang."
         }
       ],
       "questions": [
@@ -1791,7 +1791,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Engineer begins with a vowel sound, so an is used.",
-            "id": "Engineer diawali bunyi vokal, jadi memakai an."
+            "id": "Engineer mulai dengan bunyi vokal, jadi pakai an."
           },
           "remediate": {
             "en": "Job words after be always need a or an.",
@@ -1808,7 +1808,7 @@
           "answerIndex": 0,
           "explain": {
             "en": "A nurse works in a hospital.",
-            "id": "Perawat bekerja di rumah sakit."
+            "id": "Nurse itu perawat, dan perawat kerjanya di rumah sakit."
           },
           "remediate": {
             "en": "Match the job to its usual workplace.",
@@ -1825,11 +1825,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "It asks about your job.",
-            "id": "Pertanyaan itu menanyakan pekerjaanmu."
+            "id": "What do you do menanyakan pekerjaanmu, bukan kegiatanmu sekarang."
           },
           "remediate": {
             "en": "It is the standard way to ask about work.",
-            "id": "Itu cara baku untuk menanyakan pekerjaan."
+            "id": "Itu cara paling umum menanyakan pekerjaan."
           }
         }
       ]
@@ -1851,19 +1851,19 @@
       "segments": [
         {
           "en": "One, two, three… thirteen, fourteen, fifteen.",
-          "id": "Kita mulai dari angka, karena hampir semua percakapan dasar memakainya."
+          "id": "Kita mulai dari angka, karena hampir semua percakapan dasar pakai angka."
         },
         {
           "en": "Thirteen and thirty sound similar but are very different numbers.",
-          "id": "Hati-hati dengan pasangan teen dan ty. Thirteen tiga belas, thirty tiga puluh. Tekanannya berbeda."
+          "id": "Hati-hati dengan pasangan teen dan ty. Thirteen tiga belas, thirty tiga puluh. Tekanannya beda."
         },
         {
           "en": "It is seven o'clock. It is half past seven. It is a quarter to eight.",
-          "id": "Untuk jam, pakai o'clock, half past untuk lewat tiga puluh menit, dan quarter untuk lima belas menit."
+          "id": "Untuk jam pas, pakai o'clock. Lewat tiga puluh menit: half past. Lima belas menit: quarter."
         },
         {
           "en": "My birthday is on the third of May, nineteen ninety-nine.",
-          "id": "Tanggal dibaca dengan bilangan tingkat, dan tahun dibaca berpasangan."
+          "id": "Tanggal dibaca pakai bilangan tingkat seperti third. Tahun dibaca dua-dua: nineteen, ninety-nine."
         }
       ],
       "questions": [
@@ -1894,11 +1894,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Thirty minutes after seven is half past seven.",
-            "id": "Tiga puluh menit setelah pukul tujuh adalah half past seven."
+            "id": "7:30 itu tiga puluh menit lewat dari jam tujuh: half past seven."
           },
           "remediate": {
             "en": "Half past means thirty minutes after the hour.",
-            "id": "Half past berarti tiga puluh menit setelah jam itu."
+            "id": "Half past artinya lewat tiga puluh menit."
           }
         },
         {
@@ -1911,11 +1911,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Dates take on.",
-            "id": "Tanggal memakai on."
+            "id": "3 May itu tanggal, jadi pakai on."
           },
           "remediate": {
             "en": "Days and dates always take on.",
-            "id": "Hari dan tanggal selalu memakai on."
+            "id": "Hari dan tanggal pakai on."
           }
         }
       ]
@@ -1941,7 +1941,7 @@
         },
         {
           "en": "Go straight. Turn left. Turn right.",
-          "id": "Tiga perintah arah ini sudah cukup untuk sebagian besar situasi."
+          "id": "Tiga perintah arah ini udah cukup untuk kebanyakan situasi."
         },
         {
           "en": "The bank is next to the school, opposite the market.",
@@ -1949,7 +1949,7 @@
         },
         {
           "en": "Excuse me, where is the station?",
-          "id": "Kalimat ini pembuka yang sopan saat bertanya arah kepada orang asing."
+          "id": "Kalimat ini pembuka sopan waktu tanya arah ke orang yang belum kamu kenal."
         }
       ],
       "questions": [
@@ -1967,7 +1967,7 @@
           },
           "remediate": {
             "en": "Next to is about position at the side.",
-            "id": "Next to berkaitan dengan posisi di samping."
+            "id": "Next to itu soal posisi di samping."
           }
         },
         {
@@ -1980,11 +1980,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Go straight means continue forward.",
-            "id": "Go straight berarti terus lurus ke depan."
+            "id": "Go straight artinya jalan lurus terus."
           },
           "remediate": {
             "en": "Straight means without turning.",
-            "id": "Straight berarti tanpa berbelok."
+            "id": "Straight artinya nggak belok."
           }
         },
         {
@@ -1997,11 +1997,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Excuse me opens the question politely and the word order is correct.",
-            "id": "Excuse me membuka pertanyaan dengan sopan dan urutan katanya benar."
+            "id": "Excuse me bikin pertanyaannya sopan, dan urutan katanya benar."
           },
           "remediate": {
             "en": "Keep the order: where is the plus place.",
-            "id": "Pertahankan urutannya: where is the lalu tempatnya."
+            "id": "Jaga urutannya: where is the, lalu nama tempatnya."
           }
         }
       ]
@@ -2023,19 +2023,19 @@
       "segments": [
         {
           "en": "It is hot. It is cold. It is windy.",
-          "id": "Untuk cuaca, kalimat selalu dimulai dengan it is."
+          "id": "Kalimat cuaca biasanya dimulai dengan it is."
         },
         {
           "en": "It is raining now. It rains a lot in December.",
-          "id": "Rain bisa menjadi kata kerja. Sekarang memakai is raining, kebiasaan memakai rains."
+          "id": "Rain bisa jadi kata kerja. Lagi hujan sekarang: is raining. Sering hujan: rains."
         },
         {
           "en": "Sunny, cloudy, rainy, windy.",
-          "id": "Akhiran y mengubah kata benda cuaca menjadi kata sifat."
+          "id": "Tambah akhiran y, kata benda cuacanya jadi kata sifat: sun jadi sunny."
         },
         {
           "en": "In Indonesia there are two seasons: the dry season and the rainy season.",
-          "id": "Di Indonesia ada dua musim, jadi kosakata inilah yang paling sering kamu butuhkan."
+          "id": "Di Indonesia ada dua musim, jadi kosakata ini yang paling sering kamu pakai."
         }
       ],
       "questions": [
@@ -2049,11 +2049,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Weather sentences begin with it is.",
-            "id": "Kalimat cuaca dimulai dengan it is."
+            "id": "Buat cuaca, mulai dengan it is: It is hot."
           },
           "remediate": {
             "en": "Weather always uses it as the subject.",
-            "id": "Cuaca selalu memakai it sebagai subjek."
+            "id": "Kalimat cuaca pakai it sebagai subjek."
           }
         },
         {
@@ -2066,11 +2066,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Sunny describes a lot of sun.",
-            "id": "Sunny menggambarkan banyak sinar matahari."
+            "id": "Sunny artinya banyak matahari."
           },
           "remediate": {
             "en": "Add y to the weather noun to describe the day.",
-            "id": "Tambahkan y pada kata benda cuaca untuk menggambarkan harinya."
+            "id": "Tambah y di kata benda cuacanya: sun jadi sunny."
           }
         },
         {
@@ -2083,11 +2083,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "It is third person singular, so the verb takes s.",
-            "id": "It itu orang ketiga tunggal, jadi kata kerjanya ditambah s."
+            "id": "It itu orang ketiga tunggal, jadi kata kerjanya ditambah s: rains."
           },
           "remediate": {
             "en": "A repeated fact uses the present simple.",
-            "id": "Fakta yang berulang memakai present simple."
+            "id": "Kebiasaan atau fakta berulang pakai present simple."
           }
         }
       ]
@@ -2108,7 +2108,7 @@
       "segments": [
         {
           "en": "A word family is one root in different forms.",
-          "id": "Word family adalah satu akar kata dalam bentuk berbeda."
+          "id": "Word family itu satu akar kata dalam beberapa bentuk."
         },
         {
           "en": "Decide is the verb, decision is the noun, decisive is the adjective.",
@@ -2116,7 +2116,7 @@
         },
         {
           "en": "Knowing the family lets you say the same idea in many ways.",
-          "id": "Menguasai satu keluarga kata membuatmu bisa mengungkapkan ide yang sama dengan banyak cara."
+          "id": "Hafal satu keluarga kata, kamu bisa bilang ide yang sama dengan banyak cara."
         }
       ],
       "questions": [
@@ -2130,7 +2130,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Decision is the noun. Decisive is an adjective.",
-            "id": "Decision adalah kata benda. Decisive adalah kata sifat."
+            "id": "Decision itu kata benda. Decisive itu kata sifat, jadi bukan jawabannya."
           },
           "remediate": {
             "en": "Nouns often end in -sion or -tion.",
@@ -2156,11 +2156,11 @@
       "segments": [
         {
           "en": "My name is Rina. I am twenty-two years old. I live in Bandung and I work in a hospital.",
-          "id": "Teks profil selalu berisi empat informasi: nama, umur, tempat tinggal, dan pekerjaan."
+          "id": "Teks profil biasanya berisi empat hal: nama, umur, tempat tinggal, dan pekerjaan."
         },
         {
           "en": "Read for the four facts first, not for every word.",
-          "id": "Baca untuk mencari empat fakta itu dulu, jangan menerjemahkan setiap kata."
+          "id": "Cari empat fakta itu dulu. Nggak usah terjemahkan tiap kata."
         },
         {
           "en": "I live in Bandung tells you the city. I work in a hospital tells you the job.",
@@ -2168,7 +2168,7 @@
         },
         {
           "en": "She is a nurse, so she works in a hospital.",
-          "id": "Kadang jawabannya tidak tertulis langsung, tetapi bisa disimpulkan dari kata kuncinya."
+          "id": "Kadang jawabannya nggak tertulis langsung. Tapi kamu bisa menebaknya dari kata kunci."
         }
       ],
       "questions": [
@@ -2182,11 +2182,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "A hospital worker in an A1 text is usually a nurse or a doctor.",
-            "id": "Orang yang bekerja di rumah sakit dalam teks A1 biasanya perawat atau dokter."
+            "id": "Rina kerja di rumah sakit, jadi kemungkinan besar dia a nurse."
           },
           "remediate": {
             "en": "Use the workplace to guess the job.",
-            "id": "Gunakan tempat kerjanya untuk menebak pekerjaannya."
+            "id": "Pakai tempat kerjanya buat menebak pekerjaannya."
           }
         },
         {
@@ -2199,7 +2199,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Live in plus a place names the city.",
-            "id": "Live in ditambah nama tempat menunjukkan kotanya."
+            "id": "Live in plus nama tempat itu yang menunjukkan kota."
           },
           "remediate": {
             "en": "Look for live in when a question asks about place.",
@@ -2216,11 +2216,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "The text says twenty-two years old.",
-            "id": "Teksnya menyebut twenty-two years old."
+            "id": "Teksnya bilang twenty-two years old, jadi umurnya dua puluh dua."
           },
           "remediate": {
             "en": "Numbers in a profile answer the age question.",
-            "id": "Angka dalam profil menjawab pertanyaan umur."
+            "id": "Cari angka di profil buat menjawab soal umur."
           }
         }
       ]
@@ -2246,11 +2246,11 @@
         },
         {
           "en": "The middle line always carries the request or the information.",
-          "id": "Bagian tengah selalu berisi permintaan atau informasi utamanya."
+          "id": "Bagian tengah biasanya isi utamanya: permintaan atau informasi."
         },
         {
           "en": "Can you come at four? is a request, not a fact.",
-          "id": "Kalimat tanya dengan can you adalah permintaan, bukan pernyataan."
+          "id": "Kalimat tanya dengan can you itu permintaan, bukan sekadar pernyataan."
         },
         {
           "en": "See you, Best regards, Thanks.",
@@ -2268,11 +2268,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Can you come is an invitation or request.",
-            "id": "Can you come adalah undangan atau permintaan."
+            "id": "Can you come itu ajakan: Rina mengundang Dani datang."
           },
           "remediate": {
             "en": "Look at the middle line to find the purpose.",
-            "id": "Lihat bagian tengah untuk menemukan tujuannya."
+            "id": "Lihat bagian tengah pesan buat menemukan tujuannya."
           }
         },
         {
@@ -2285,11 +2285,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "See you plus the name closes the message.",
-            "id": "See you ditambah nama adalah penutup pesan."
+            "id": "See you, Rina ada di akhir dan pakai nama pengirim. Itu penutup."
           },
           "remediate": {
             "en": "The closing is the last line with the sender's name.",
-            "id": "Penutup adalah baris terakhir dengan nama pengirim."
+            "id": "Penutup itu baris terakhir yang ada nama pengirimnya."
           }
         },
         {
@@ -2302,7 +2302,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Yes plus the time accepts the invitation.",
-            "id": "Yes ditambah waktunya berarti menerima undangan."
+            "id": "Yes, see you at four berarti setuju datang jam empat. Itu menerima undangan."
           },
           "remediate": {
             "en": "An acceptance repeats the time.",
@@ -2328,11 +2328,11 @@
       "segments": [
         {
           "en": "No smoking. No parking. No entry.",
-          "id": "Papan larangan sering memakai pola no ditambah kata kerja ing."
+          "id": "Papan larangan sering pakai pola no plus kata kerja ing."
         },
         {
           "en": "Open 8 a.m. to 5 p.m. Closed on Sunday.",
-          "id": "Papan jam buka memakai open dan closed dengan waktu di belakangnya."
+          "id": "Papan jam buka pakai open dan closed, dengan waktunya di belakang."
         },
         {
           "en": "Push. Pull. Exit. Entrance.",
@@ -2340,7 +2340,7 @@
         },
         {
           "en": "Out of order means the machine does not work.",
-          "id": "Out of order berarti alatnya sedang rusak, bukan berarti tidak rapi."
+          "id": "Out of order artinya alatnya lagi rusak, bukan berarti berantakan."
         }
       ],
       "questions": [
@@ -2354,7 +2354,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "No plus verb-ing is a prohibition.",
-            "id": "No ditambah kata kerja ing adalah larangan."
+            "id": "No plus parking artinya dilarang parkir di situ."
           },
           "remediate": {
             "en": "No at the start of a sign means do not.",
@@ -2371,11 +2371,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Closed on Sunday means it is open on the other days.",
-            "id": "Closed on Sunday berarti buka pada hari lainnya."
+            "id": "Closed on Sunday artinya tutup hari Minggu saja. Hari lain buka, jadi Monday bisa."
           },
           "remediate": {
             "en": "Read what the sign excludes.",
-            "id": "Baca hari apa yang dikecualikan papan itu."
+            "id": "Cek hari apa yang disebut tutup di papannya."
           }
         },
         {
@@ -2388,7 +2388,7 @@
           "answerIndex": 0,
           "explain": {
             "en": "Out of order means it is not working.",
-            "id": "Out of order berarti sedang tidak berfungsi."
+            "id": "Out of order artinya lagi rusak, nggak berfungsi."
           },
           "remediate": {
             "en": "It is a fixed phrase about machines.",
@@ -2414,7 +2414,7 @@
       "segments": [
         {
           "en": "The train departs at seven fifteen and arrives at nine forty.",
-          "id": "Dalam jadwal, kata kuncinya adalah departs untuk berangkat dan arrives untuk tiba."
+          "id": "Di jadwal, kata kuncinya departs untuk berangkat dan arrives untuk tiba."
         },
         {
           "en": "Departs means leaves. Arrives means comes.",
@@ -2422,7 +2422,7 @@
         },
         {
           "en": "Read the row first, then the column.",
-          "id": "Cara membaca tabel: temukan barisnya dulu, baru kolom waktunya."
+          "id": "Cara baca tabel: cari barisnya dulu, baru kolom waktunya."
         },
         {
           "en": "Platform 3, gate 12, seat 14A.",
@@ -2440,11 +2440,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Departs means leaves.",
-            "id": "Departs berarti berangkat."
+            "id": "Departs artinya berangkat atau pergi, sama dengan leaves."
           },
           "remediate": {
             "en": "Departure is the start of a journey.",
-            "id": "Departure adalah awal perjalanan."
+            "id": "Departure itu awal perjalanan."
           }
         },
         {
@@ -2457,7 +2457,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "From 07:15 to 09:40 is two hours and twenty-five minutes.",
-            "id": "Dari 07:15 sampai 09:40 adalah dua jam dua puluh lima menit."
+            "id": "Dari 07:15 ke 09:40 itu dua jam dua puluh lima menit."
           },
           "remediate": {
             "en": "Count the full hours first, then the minutes.",
@@ -2474,7 +2474,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Trains are boarded from a platform.",
-            "id": "Kereta dinaiki dari platform."
+            "id": "Kereta ditunggu di platform, bukan di gate."
           },
           "remediate": {
             "en": "Gate is for planes, platform is for trains.",
@@ -2499,7 +2499,7 @@
       "segments": [
         {
           "en": "The main idea is what the whole paragraph is about.",
-          "id": "Main idea adalah inti dari keseluruhan paragraf."
+          "id": "Main idea itu inti dari seluruh paragraf."
         },
         {
           "en": "It is not one detail or one example.",
@@ -2507,7 +2507,7 @@
         },
         {
           "en": "Ask yourself: which sentence could summarise all the others?",
-          "id": "Tanyakan: kalimat mana yang bisa merangkum semuanya?"
+          "id": "Tanya dirimu: kalimat mana yang bisa merangkum semuanya?"
         }
       ],
       "questions": [
@@ -2521,7 +2521,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Every other sentence supports the main idea.",
-            "id": "Semua kalimat lain mendukung main idea."
+            "id": "Main idea itu ide yang didukung semua kalimat lain, bukan satu detail."
           },
           "remediate": {
             "en": "If a sentence only appears once and adds a fact, it is a detail.",
@@ -2547,19 +2547,19 @@
       "segments": [
         {
           "en": "Open your book. Close the door. Listen and repeat.",
-          "id": "Kalimat instruksi selalu dimulai dengan kata kerja dasar, tanpa subjek."
+          "id": "Kalimat instruksi dimulai dengan kata kerja dasar, tanpa subjek."
         },
         {
           "en": "There is no subject, so the first word is the action.",
-          "id": "Karena tidak ada subjek, kata pertamanya adalah aksinya. Itu kunci menyimaknya."
+          "id": "Karena nggak ada subjek, kata pertamanya langsung aksinya. Itu kunci menyimaknya."
         },
         {
           "en": "Please write your name at the top.",
-          "id": "Kata please membuatnya lebih sopan, tetapi strukturnya tetap sama."
+          "id": "Kata please bikin lebih sopan, tapi strukturnya tetap sama."
         },
         {
           "en": "Don't write on this page.",
-          "id": "Untuk larangan, tambahkan don't di depan kata kerjanya."
+          "id": "Untuk larangan, tambah don't di depan kata kerjanya."
         }
       ],
       "questions": [
@@ -2573,11 +2573,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "A verb at the start with no subject is an instruction.",
-            "id": "Kata kerja di awal tanpa subjek berarti instruksi."
+            "id": "Open ada di awal tanpa subjek. Itu ciri instruksi."
           },
           "remediate": {
             "en": "No subject plus base verb equals an imperative.",
-            "id": "Tanpa subjek ditambah kata kerja dasar berarti kalimat perintah."
+            "id": "Kata kerja dasar tanpa subjek itu kalimat perintah."
           }
         },
         {
@@ -2590,7 +2590,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Don't plus verb forbids the action.",
-            "id": "Don't ditambah kata kerja melarang tindakan itu."
+            "id": "Don't plus kata kerja artinya dilarang: jangan menulis di situ."
           },
           "remediate": {
             "en": "Prohibitions start with don't.",
@@ -2607,7 +2607,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "And joins two steps in order: listen first, repeat second.",
-            "id": "Kata and menyambung dua langkah berurutan: menyimak dulu, lalu mengulang."
+            "id": "And menyambung dua langkah urut: listen dulu, repeat kedua."
           },
           "remediate": {
             "en": "Follow the order of the verbs you hear.",
@@ -2633,7 +2633,7 @@
       "segments": [
         {
           "en": "Fifteen and fifty. Sixteen and sixty.",
-          "id": "Kesalahan menyimak paling sering di A1 adalah pasangan teen dan ty."
+          "id": "Salah dengar paling sering di A1: pasangan teen dan ty."
         },
         {
           "en": "In fifteen the stress is at the end. In fifty the stress is at the front.",
@@ -2645,12 +2645,12 @@
         },
         {
           "en": "Phone numbers are read digit by digit.",
-          "id": "Nomor telepon dibaca satu per satu, bukan sebagai bilangan besar."
+          "id": "Nomor telepon dibaca satu per satu angka, bukan sebagai bilangan besar."
         }
       ],
       "questions": [
         {
-          "prompt": "You hear FIF-teen. Which number is it?",
+          "prompt": "You hear fif-TEEN. Which number is it?",
           "options": [
             "15",
             "50",
@@ -2659,7 +2659,7 @@
           "answerIndex": 0,
           "explain": {
             "en": "Stress at the end means the teen number, 15.",
-            "id": "Tekanan di belakang berarti angka teen, yaitu 15."
+            "id": "Tekanannya di belakang: fif-TEEN. Itu angka teen, jadi 15."
           },
           "remediate": {
             "en": "Listen to which part is louder and longer.",
@@ -2676,11 +2676,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Phone numbers are read digit by digit.",
-            "id": "Nomor telepon dibaca digit per digit."
+            "id": "Nomor telepon dibaca satu-satu: zero eight one two."
           },
           "remediate": {
             "en": "Never group phone digits into big numbers.",
-            "id": "Jangan menggabungkan digit telepon menjadi bilangan besar."
+            "id": "Jangan gabungkan digit telepon jadi bilangan besar."
           }
         },
         {
@@ -2697,7 +2697,7 @@
           },
           "remediate": {
             "en": "Decide teen or ty first, then add the unit.",
-            "id": "Tentukan teen atau ty dulu, baru tambahkan satuannya."
+            "id": "Tentukan teen atau ty dulu, baru pasang ribuannya."
           }
         }
       ]
@@ -2719,7 +2719,7 @@
       "segments": [
         {
           "en": "Go straight for two hundred metres, then turn right at the corner.",
-          "id": "Saat menyimak arah, tandai kata kerja perintahnya, bukan seluruh kalimat."
+          "id": "Waktu menyimak arah, tangkap kata kerja perintahnya, nggak usah seluruh kalimat."
         },
         {
           "en": "Go, turn, take, cross.",
@@ -2731,7 +2731,7 @@
         },
         {
           "en": "If you miss it, ask: Sorry, could you repeat that?",
-          "id": "Kalau tertinggal, mintalah pengulangan dengan could you repeat that."
+          "id": "Kalau ketinggalan, minta ulang pakai could you repeat that."
         }
       ],
       "questions": [
@@ -2745,7 +2745,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "The instruction verb is turn, and the direction is right.",
-            "id": "Kata kerja perintahnya turn, dan arahnya right."
+            "id": "Kata perintahnya turn, arahnya right. Jadi kamu belok kanan."
           },
           "remediate": {
             "en": "Catch the verb first, then the direction word.",
@@ -2762,7 +2762,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "On your left describes where the place finally is.",
-            "id": "On your left menjelaskan posisi akhir tempatnya."
+            "id": "It's on your left kasih tahu posisi akhirnya: di kiri kamu."
           },
           "remediate": {
             "en": "Position phrases start with on, next to or opposite.",
@@ -2779,11 +2779,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Could you repeat that, please? is the standard request.",
-            "id": "Could you repeat that, please? adalah permintaan bakunya."
+            "id": "Could you repeat that, please? itu cara sopan minta diulang."
           },
           "remediate": {
             "en": "Polite requests use could you.",
-            "id": "Permintaan sopan memakai could you."
+            "id": "Permintaan sopan pakai could you."
           }
         }
       ]
@@ -2805,19 +2805,19 @@
       "segments": [
         {
           "en": "Excuse me, where is the bank?",
-          "id": "Excuse me adalah pembuka yang aman untuk bertanya kepada orang asing."
+          "id": "Excuse me itu pembuka aman buat bertanya ke orang yang belum kamu kenal."
         },
         {
           "en": "Could you help me, please? Could you speak more slowly?",
-          "id": "Could you membuat permintaan terdengar sopan, lebih halus daripada can you."
+          "id": "Could you bikin permintaan terdengar sopan, lebih halus daripada can you."
         },
         {
           "en": "Sorry, I don't understand. Could you repeat that?",
-          "id": "Dua kalimat ini menyelamatkanmu saat percakapan terasa terlalu cepat."
+          "id": "Dua kalimat ini menolong kamu waktu percakapan terasa terlalu cepat."
         },
         {
           "en": "Thank you. You're welcome.",
-          "id": "Selalu tutup dengan terima kasih, dan kenali jawabannya you're welcome."
+          "id": "Tutup dengan thank you, dan kenali balasannya: you're welcome."
         }
       ],
       "questions": [
@@ -2831,7 +2831,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Excuse me is the polite opener.",
-            "id": "Excuse me adalah pembuka yang sopan."
+            "id": "Excuse me itu pembuka yang sopan."
           },
           "remediate": {
             "en": "Openers matter as much as the question itself.",
@@ -2848,7 +2848,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Could you plus please is the polite request form.",
-            "id": "Could you ditambah please adalah bentuk permintaan yang sopan."
+            "id": "Could you plus please itu bentuk minta yang sopan."
           },
           "remediate": {
             "en": "Use could you for every polite request.",
@@ -2865,7 +2865,7 @@
           "answerIndex": 0,
           "explain": {
             "en": "You're welcome is the standard reply.",
-            "id": "You're welcome adalah jawaban bakunya."
+            "id": "Balasan umum untuk thank you itu you're welcome."
           },
           "remediate": {
             "en": "Learn the pair: thank you and you're welcome.",
@@ -2895,15 +2895,15 @@
         },
         {
           "en": "Say the three sentences in that order every time.",
-          "id": "Ucapkan ketiganya dalam urutan yang sama setiap kali, supaya menjadi refleks."
+          "id": "Ucapkan tiga-tiganya dengan urutan sama setiap kali, biar jadi refleks."
         },
         {
           "en": "Nice to meet you. Nice to meet you too.",
-          "id": "Penutupnya nice to meet you, dan jawabannya menambahkan kata too."
+          "id": "Penutupnya nice to meet you. Balasannya tinggal tambah too."
         },
         {
           "en": "And you? What about you?",
-          "id": "Setelah memperkenalkan diri, kembalikan pertanyaannya supaya percakapan berlanjut."
+          "id": "Habis kenalan, balikkan pertanyaannya biar obrolan jalan terus."
         }
       ],
       "questions": [
@@ -2917,11 +2917,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "From plus a place gives your origin.",
-            "id": "From ditambah nama tempat menyebut asalmu."
+            "id": "I'm from Bandung pakai from plus tempat. Itu yang menyebut asal."
           },
           "remediate": {
             "en": "Origin always uses from.",
-            "id": "Asal selalu memakai from."
+            "id": "Asal selalu pakai from."
           }
         },
         {
@@ -2934,11 +2934,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "The standard reply adds too.",
-            "id": "Jawaban bakunya menambahkan kata too."
+            "id": "Balasannya tinggal ulang plus too: Nice to meet you too."
           },
           "remediate": {
             "en": "Mirror the greeting and add too.",
-            "id": "Ulangi sapaannya dan tambahkan too."
+            "id": "Ulangi sapaannya, lalu tambah too."
           }
         },
         {
@@ -2951,11 +2951,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "And you? passes the turn back.",
-            "id": "And you? mengembalikan giliran bicara."
+            "id": "And you? itu cara singkat mengembalikan giliran bicara."
           },
           "remediate": {
             "en": "A short return question keeps the conversation going.",
-            "id": "Pertanyaan balik yang pendek membuat percakapan berlanjut."
+            "id": "Pertanyaan balik pendek bikin obrolan terus jalan."
           }
         }
       ]
@@ -2977,11 +2977,11 @@
       "segments": [
         {
           "en": "I'd like a coffee, please. Can I have some water?",
-          "id": "Dua pola ini sudah cukup untuk memesan apa pun dengan sopan."
+          "id": "Dua pola ini udah cukup buat pesan apa pun dengan sopan."
         },
         {
           "en": "I'd like is short for I would like.",
-          "id": "I'd like adalah singkatan dari I would like, dan terdengar lebih sopan daripada I want."
+          "id": "I'd like itu singkatan I would like. Kedengarannya lebih sopan daripada I want."
         },
         {
           "en": "How much is it? Can I have the bill, please?",
@@ -3003,11 +3003,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "I'd like plus please is the polite standard.",
-            "id": "I'd like ditambah please adalah bentuk sopan yang baku."
+            "id": "I'd like plus please itu cara pesan paling sopan."
           },
           "remediate": {
             "en": "I want sounds direct and impolite in a shop.",
-            "id": "I want terdengar terlalu langsung dan kurang sopan di toko."
+            "id": "I want kedengaran terlalu langsung, kurang sopan di toko."
           }
         },
         {
@@ -3020,7 +3020,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "Price is uncountable, so we ask how much.",
-            "id": "Harga tidak terhitung, jadi kita bertanya how much."
+            "id": "Harga itu nggak dihitung satu-satu, jadi tanyanya how much."
           },
           "remediate": {
             "en": "How many counts items, how much asks price.",
@@ -3037,11 +3037,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "To take away means to take the food out of the shop.",
-            "id": "To take away berarti makanannya dibawa keluar."
+            "id": "To take away artinya makanannya dibawa pulang, nggak dimakan di tempat."
           },
           "remediate": {
             "en": "For here means eating in the shop.",
-            "id": "For here berarti makan di tempat."
+            "id": "For here artinya makan di tempat."
           }
         }
       ]
@@ -3067,15 +3067,15 @@
         },
         {
           "en": "In multiple choice, read every option before you answer.",
-          "id": "Dalam pilihan ganda, baca semua pilihan dulu. Pilihan pertama sering sengaja dibuat menggoda."
+          "id": "Di pilihan ganda, baca semua pilihan dulu. Pilihan pertama sering sengaja dibikin menggoda."
         },
         {
           "en": "In a gap fill, check the word class the gap needs.",
-          "id": "Dalam isian, periksa jenis kata yang dibutuhkan: kata benda, kata kerja, atau kata sifat."
+          "id": "Di soal isian, cek jenis kata yang dibutuhkan: kata benda, kata kerja, atau kata sifat."
         },
         {
           "en": "Not given means the text simply does not say.",
-          "id": "Not given berarti teksnya memang tidak menyebutkan, bukan berarti salah. Ini jebakan paling umum."
+          "id": "Not given artinya teksnya memang nggak menyebutkan, bukan berarti salah. Ini jebakan paling umum."
         }
       ],
       "questions": [
@@ -3089,11 +3089,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "If the text does not say it, the answer is Not Given.",
-            "id": "Kalau teksnya tidak menyebutkan, jawabannya Not Given."
+            "id": "Teksnya nggak menyebutkan faktanya, jadi jawabannya Not Given."
           },
           "remediate": {
             "en": "False means the text says the opposite.",
-            "id": "False berarti teksnya menyatakan sebaliknya."
+            "id": "False cuma kalau teksnya bilang sebaliknya."
           }
         },
         {
@@ -3106,11 +3106,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "Reading every option prevents the trap answer.",
-            "id": "Membaca semua pilihan mencegah terjebak pilihan pengecoh."
+            "id": "Baca semua pilihan dulu biar nggak kejebak pengecoh."
           },
           "remediate": {
             "en": "The first option is often deliberately attractive.",
-            "id": "Pilihan pertama sering sengaja dibuat menarik."
+            "id": "Pilihan pertama sering sengaja dibikin menarik."
           }
         },
         {
@@ -3123,11 +3123,11 @@
           "answerIndex": 0,
           "explain": {
             "en": "Check whether the gap needs a noun, a verb or an adjective.",
-            "id": "Periksa apakah isiannya butuh kata benda, kata kerja, atau kata sifat."
+            "id": "Cek dulu: isiannya butuh kata benda, kata kerja, atau kata sifat?"
           },
           "remediate": {
             "en": "Grammar decides which word can fit the gap.",
-            "id": "Tata bahasa menentukan kata mana yang cocok untuk isian itu."
+            "id": "Tata bahasanya yang menentukan kata mana yang pas di isian itu."
           }
         }
       ]
@@ -3149,7 +3149,7 @@
       "segments": [
         {
           "en": "TOEFL and IELTS both test four skills: listening, reading, writing and speaking.",
-          "id": "Kedua tes ini menguji empat keterampilan yang sama. Itu sebabnya A1 pun sudah relevan."
+          "id": "Dua tes ini menguji empat keterampilan yang sama. Makanya A1 pun udah relevan."
         },
         {
           "en": "TOEFL iBT is taken on a computer. IELTS speaking is a face to face interview.",
@@ -3157,11 +3157,11 @@
         },
         {
           "en": "Scores are bands or points, not pass or fail.",
-          "id": "Tidak ada lulus atau gagal. Yang ada adalah skor, jadi tugasmu menaikkan skornya."
+          "id": "Nggak ada lulus atau gagal. Yang ada cuma skor, jadi tugasmu menaikkan skor."
         },
         {
           "en": "Your A1 foundation decides how fast you can move up.",
-          "id": "Fondasi A1 inilah yang menentukan seberapa cepat kamu bisa naik ke tingkat berikutnya."
+          "id": "Fondasi A1 ini yang menentukan seberapa cepat kamu naik tingkat."
         }
       ],
       "questions": [
@@ -3175,11 +3175,11 @@
           "answerIndex": 2,
           "explain": {
             "en": "Both test listening, reading, writing and speaking.",
-            "id": "Keduanya menguji listening, reading, writing, dan speaking."
+            "id": "Dua-duanya menguji empat skill: listening, reading, writing, dan speaking."
           },
           "remediate": {
             "en": "Count the four skills.",
-            "id": "Hitung keempat keterampilannya."
+            "id": "Hitung empat keterampilannya."
           }
         },
         {
@@ -3192,7 +3192,7 @@
           "answerIndex": 1,
           "explain": {
             "en": "IELTS speaking is an interview with an examiner.",
-            "id": "Speaking IELTS berupa wawancara dengan penguji."
+            "id": "Speaking IELTS itu wawancara langsung dengan penguji."
           },
           "remediate": {
             "en": "TOEFL speaking is recorded on a computer.",
@@ -3209,11 +3209,11 @@
           "answerIndex": 1,
           "explain": {
             "en": "There is no pass or fail; you receive a score.",
-            "id": "Tidak ada lulus atau gagal; kamu menerima skor."
+            "id": "Nggak ada lulus atau gagal. Kamu cuma menerima skor."
           },
           "remediate": {
             "en": "Institutions set the score they require.",
-            "id": "Institusi yang menetapkan skor minimum yang dibutuhkan."
+            "id": "Kampus atau institusi yang menetapkan skor minimum."
           }
         }
       ]
