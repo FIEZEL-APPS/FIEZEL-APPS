@@ -98,6 +98,26 @@
       return env.FiezelUiSfx.play(name, env) === true;
     } catch (_) { return false; }
   }
+  /**
+   * Nada pembuka splash_intro - SATU titik masuk per tayangan (audit 2026-08-28).
+   * Dulu ada dua jalur dan dua-duanya mati di produksi: (1) ketukan t=0 dibuang
+   * penjaga basi karena jam mulai pada startOffset ≈ waktu boot (selalu > 120 ms
+   * di boot nyata - load() mengunduh ~2,7 MB JSON dulu); (2) panggilan langsung
+   * disyaratkan !motion, yang false di semua peramban berfungsi. Akibatnya
+   * splash_intro TIDAK PERNAH diminta, bahkan di lingkungan yang MENGIZINKAN
+   * autoplay (PWA terpasang). Kini fasad playOnce() mencoba TANPA GESTUR lebih
+   * dulu, lalu menyiagakan dengan tenggat umur splash bila terblokir; play()
+   * lama tetap dipakai bila fasad belum punya playOnce (deploy parsial).
+   */
+  function requestIntro(env, windowMs) {
+    try {
+      var facade = env && env.FiezelUiSfx;
+      if (!facade) return false;
+      if (typeof facade.playOnce === 'function') return facade.playOnce('splash_intro', env, { windowMs: windowMs }) === true;
+      if (typeof facade.play === 'function') return facade.play('splash_intro', env) === true;
+    } catch (_) { /* splash harus utuh tanpa bunyi */ }
+    return false;
+  }
   function cancelChime(env) {
     try { if (env && env.FiezelUiSfx && typeof env.FiezelUiSfx.cancelPending === 'function') env.FiezelUiSfx.cancelPending(); }
     catch (_) { /* membatalkan bunyi tidak boleh menggagalkan penutupan splash */ }
@@ -465,6 +485,12 @@
       for (var i = 0; i < beats.length; i++) {
         (function (b) {
           if (!b.sound || !b.strong) return;
+          /* splash_intro TIDAK lagi dipicu dari ketukan (audit 2026-08-28): jam
+             mulai pada startOffset ≈ waktu boot, sehingga ketukan t=0 SELALU
+             basi di boot nyata - itulah akar "SFX splash tidak pernah berbunyi".
+             Titik masuknya kini satu: requestIntro() di show(). Ketukannya tetap
+             di tabel sebagai metadata visual (equalizer + tes koreografi). */
+          if (b.sound === 'splash_intro') return;
           clock.schedule(b.at, function (tAt) {
             if (clock.now() - tAt <= SKIP_STALE_MS) playSfx(env, b.sound);
           });
@@ -649,9 +675,19 @@
          diloncati, bukan diulang (adopsi lambat → langsung dekat cap). */
       startOffset: Math.max(0, VISIBLE_MS - visibleMs),
       ready: false, stampStarted: false, frozen: false, closed: false,
+      introRequested: false,
       clock: null, skip: null, cleanup: [],
       finish: function () { close(); }
     };
+
+    /* Persiapan audio berjalan PARALEL dengan penataan DOM: konteks + dekode
+       splash_intro dimulai sekarang; keputusan bunyi/siaga diambil di bawah,
+       setelah jalur gerak diketahui. Kegagalan ditelan - splash utuh tanpa bunyi. */
+    try {
+      if (opts.silent !== true && target.FiezelUiSfx && typeof target.FiezelUiSfx.prepare === 'function') {
+        target.FiezelUiSfx.prepare('splash_intro', target);
+      }
+    } catch (_) {}
 
     var closed = false;
     var timer = null;
@@ -710,13 +746,16 @@
       } catch (_) {}
     }
 
-    /* Nada pembuka splash_intro.ogg lewat fasad — hanya bila jamnya masih
-       dekat awal: fasad tidak bisa memutar dari tengah berkas, jadi adopsi
-       yang sudah terlambat memilih HENING daripada bunyi yang melenceng
-       dari gerak. (Ketukannya juga terjadwal di jalur gerak dengan penjaga
-       basi yang sama — playSfx idempoten per tayangan lewat fasad.) */
-    if (opts.silent !== true && !ctl.frozen && ctl.startOffset <= SKIP_STALE_MS && !motion) {
-      playSfx(target, 'splash_intro');
+    /* Nada pembuka: SATU permintaan per tayangan, TIDAK lagi bergantung pada
+       startOffset (audit 2026-08-28 - syarat lama membuatnya tak pernah diminta
+       di boot nyata). Zero-gesture dicoba lebih dulu oleh fasad; bila terblokir,
+       ia disiagakan dengan tenggat = sisa umur tayang dan berbunyi pada izin/
+       gestur asli pertama. close() → cancelChime() tetap pagar terakhirnya
+       (m025-84: tidak ada bunyi liar setelah splash tertutup). Mode beku QA
+       (?t=) tetap senyap. */
+    if (opts.silent !== true && !ctl.frozen && !ctl.introRequested) {
+      ctl.introRequested = true;
+      requestIntro(target, visibleMs);
     }
 
     /* Pewaktu pengaman: pada jalur gerak, cap PAW selalu menutup lebih dulu

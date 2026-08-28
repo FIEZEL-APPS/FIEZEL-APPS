@@ -8293,6 +8293,14 @@ function installBackNav(){
 }
 bindUiSfxDelegation();
 installBackNav();
+// Audit splash-SFX 2026-08-28: konteks audio + dekode splash_intro disiapkan SEBELUM
+// load() mengunduh ~2,7 MB JSON. Di lingkungan yang mengizinkan autoplay (PWA terpasang
+// Android/desktop, MEI tinggi) konteks yang dibuat di sini lahir 'running', sehingga nada
+// pembuka bisa berbunyi TANPA GESTUR saat splash tampil. Di lingkungan terblokir hanya
+// dekodenya yang berjalan - izin dan persiapan adalah dua hal terpisah, dan tidak ada
+// satu nada pun yang dijadwalkan dari sini (m025-84 utuh). Preferensi feedbackSounds
+// sudah terbaca: __getFiezelState terpasang beberapa baris di atas.
+try{self.FiezelUiSfx?.prepare?.('splash_intro',self)}catch(_){}
 // m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
 // galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
 // hanya melihat layar sambutan yang menggantung selamanya.
