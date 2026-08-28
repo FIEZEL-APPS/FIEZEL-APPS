@@ -170,8 +170,15 @@ check('The renderer takes its replay limit from the exam format, not the daily c
 check('The renderer honours the TOEFL hidden-questions rule',
   /questionsVisibleDuringAudio/.test(renderer) && /data-notes/.test(renderer),
   'soal disembunyikan sampai audio habis, dan murid diberi tempat mencatat');
+// 2026-08-29 merge overhaul×m025-186 (Wave 2 i18n): kalimat kunci 'Soal tetap terkunci'
+// pindah byte-identik ke features/i18n/copy-id-feat-b.js ('skillslab.audio-tidak-can-diputar-item')
+// saat ekstraksi copy — kontraknya kini dinilai pada UNION renderer + copy-map id (pola yang
+// sama dengan r2-ux-overhaul-smoke-test), dan renderer tetap WAJIB memegang this.replays--
+// sendiri: logika jatah putar tidak boleh ikut pindah ke berkas copy. Merah yang sama sudah
+// ada di origin/main pra-merge; tidak ada assert yang dihapus.
+const copyIdUnionForRenderer = fs.readdirSync(path.join(root, 'features/i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort().map(n => fs.readFileSync(path.join(root, 'features/i18n', n), 'utf8')).join('\n');
 check('Failed audio keeps the questions locked',
-  /Soal tetap terkunci/.test(renderer) && /this\.replays--/.test(renderer),
+  /Soal tetap terkunci/.test(renderer + '\n' + copyIdUnionForRenderer) && /this\.replays--/.test(renderer),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
 check('Exam sessions are level-scoped like everything else',
   /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');

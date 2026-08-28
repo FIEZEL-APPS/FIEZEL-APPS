@@ -41,8 +41,9 @@
  * dengan kappa; modul ini sendiri tidak menyentuh model apa pun.
  *
  * `classifyLangLoad()` adalah heuristik runtime untuk menentukan beban bahasa sebuah item
- * ('id' | 'assisted' | 'full_en') dari teks stem + opsi, dipakai saat field offline
- * `langLoad` belum tersedia di bank soal.
+ * ('id' | 'th' | 'assisted' | 'full_en') dari teks stem + opsi, dipakai saat field offline
+ * `langLoad` belum tersedia di bank soal. 'th' (bantuan-L1 Thai) adalah nilai ADDITIVE
+ * hasil perbaikan audit AI-08 F05 / AI-10 F01; jalur 'id' tidak berubah sedikit pun.
  *
  * BATAS YANG DIJAGA
  * -----------------
@@ -74,6 +75,12 @@
     LANG_FULL_EN_LOW: 0.45,  // A1/A2 pada soal Inggris penuh: separuh lebih kegagalan adalah kegagalan membaca soal.
     LANG_FULL_EN_HIGH: 0.85, // B1+ pada soal Inggris penuh: beban bahasa ada tetapi kecil.
     LANG_ASSISTED: 0.8,  // Campuran EN dengan dukungan Indonesia: diskon ringan.
+    // Item berdukungan Thai penuh: paralel dengan 'id', yang faktornya implisit 1 (tanpa
+    // diskon) di langComponent. Nilai konservatif = nilai id. PERHATIAN: ini TRANSFER
+    // EDITORIAL dari kalibrasi Indonesia, BUKAN angka terukur untuk murid Thai — jarak
+    // Thai<->Inggris (aksara, nol kognat, urutan kata) bisa membuat transfer ini salah;
+    // WAJIB direkalibrasi begitu data pilot Thai ada (audit AI-10 F02/F03).
+    LANG_TH: 1,
     REPLAY: 0.6,         // Listening benar setelah >=3 replay: paham, tetapi bukan bukti setara sekali putar (C10).
     REJECTED: 0          // evidence_mismatch: bukti dibuang, bukan didiskon.
   });
@@ -145,6 +152,10 @@
       return LOW_LEVELS[lv] ? KAPPA.LANG_FULL_EN_LOW : KAPPA.LANG_FULL_EN_HIGH;
     }
     if (langLoad === 'assisted') return KAPPA.LANG_ASSISTED;
+    // 'th' = bantuan-L1 Thai penuh, paralel 'id' (audit AI-08 F05 / AI-10 F01). Ditulis
+    // sebagai cabang eksplisit + konstanta bernama supaya rekalibrasi Thai kelak terjadi
+    // di SATU tempat (tabel KAPPA), bukan lewat menambah cabang if baru.
+    if (langLoad === 'th') return KAPPA.LANG_TH;
     // 'id', tidak diketahui, atau tidak diisi: tanpa bukti beban bahasa, jangan mendiskon.
     return 1;
   }
@@ -190,7 +201,7 @@
   }
 
   /**
-   * classifyLangLoad({stem, options, learnerLevel}) -> 'id' | 'assisted' | 'full_en'
+   * classifyLangLoad({stem, options, learnerLevel}) -> 'id' | 'th' | 'assisted' | 'full_en'
    *
    * Heuristik murni: gabungkan stem + semua opsi, tokenisasi kata, hitung rasio kata yang
    * dikenali sebagai Indonesia (daftar ID_WORDS). Rasio tinggi -> item berdukungan
@@ -216,6 +227,33 @@
       }
     }
     var text = parts.join(' ').toLowerCase();
+
+    // Deteksi aksara Thai (audit AI-08 F05 / AI-10 F01, P0) — WAJIB berjalan SEBELUM
+    // tokenizer Latin di bawah, karena regex token [a-z\u00c0-\u024f] membuang karakter
+    // Thai secara diam-diam: item berdukungan Thai tampak "Inggris penuh" (kappa 0.45
+    // untuk A1/A2) dan item Thai penuh tampak kosong (lolos sebagai 'id'). Keduanya
+    // meracuni seluruh pembobotan bukti (BKT, kalibrasi item, ledger) tanpa satu error.
+    //
+    // Ukurannya rasio KARAKTER, bukan kata: Thai ditulis tanpa spasi sehingga pendekatan
+    // daftar-kata ala ID_WORDS tidak mungkin dipakai; rasio aksara \u0E00-\u0E7F terhadap
+    // seluruh karakter pembawa-bahasa (Thai + Latin) adalah padanan terdekat rasio kata
+    // Indonesia, dan memakai AMBANG YANG SAMA (TH_ID / TH_ASSISTED) supaya kedua jalur
+    // deteksi setara secara editorial. Teks tanpa satu pun karakter Thai melewati blok
+    // ini tanpa efek apa pun — perilaku id/en byte-identik dengan sebelumnya.
+    var thaiChars = text.match(/[\u0e00-\u0e7f]/g);
+    if (thaiChars) {
+      var latinChars = text.match(/[a-z\u00c0-\u024f]/g);
+      var langChars = thaiChars.length + (latinChars ? latinChars.length : 0);
+      var thaiRatio = thaiChars.length / langChars;
+      // >= TH_ID: didominasi Thai -> bantuan-L1 penuh ('th', paralel 'id').
+      if (thaiRatio >= TH_ID) return 'th';
+      // >= TH_ASSISTED: dukungan Thai nyata (mis. stem Thai + opsi EN) -> 'assisted';
+      // enum 'assisted' sudah netral-bahasa dan diskonnya (0.8) berlaku sama.
+      if (thaiRatio >= TH_ASSISTED) return 'assisted';
+      // Rasio Thai nyaris nol (satu-dua karakter nyasar): jatuh ke jalur Latin di bawah,
+      // sama seperti kata pinjaman Indonesia tidak boleh meloloskan soal EN penuh.
+    }
+
     // Tokenisasi: hanya huruf (termasuk aksen dasar); angka dan tanda baca bukan bukti bahasa.
     var tokens = text.match(/[a-z\u00c0-\u024f]+/g) || [];
     if (!tokens.length) return 'id';

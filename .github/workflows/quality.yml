@@ -124,6 +124,14 @@ jobs:
           # Diletakkan tepat sesudah gerbang server-only supaya kedua sisi kontrak yang sama
           # gagal bersebelahan di UI Actions, bukan terpisah 60 baris.
           node analytics-client-test.js
+          # T-031: gerbang NAMA GLOBAL. Ia memindai SUMBER seluruh repo (bukan daftar tangan)
+          # dan menuntut satu pemilik per nama global: `FiezelAnalytics` hanya boleh ditugaskan
+          # modul analytics, `FiezelABAnalytics` hanya oleh modul A/B. Cacat yang melahirkannya:
+          # modul A/B merebut `window.FiezelAnalytics` lewat <script defer>, jadi pemuat analytics
+          # di idle menerima objek asing dan modul asli tidak pernah diunduh — analytics murid
+          # mati total tanpa satu pun galat konsol. Diletakkan bersebelahan dengan gerbang klien
+          # analytics supaya kedua sisi cacat yang sama gagal berdampingan.
+          node global-name-collision-test.js
           node a11y-test.js
           node contrast-test.js
           node pastel-field-contrast-test.js
@@ -587,6 +595,18 @@ jobs:
           node item-calibration-test.js
           node speaking-adaptive-test.js
           node srl-coach-test.js
+          node cors-envelope-test.js
+      - name: 'Gerbang multilingual Thai m025-186 (didaftarkan saat merge 2026-08-29)'
+        # Ditemukan gate-registry-test.js saat merge work/uiux-overhaul × origin/main
+        # (29 Agu 2026): empat berkas uji Wave 1–4 multilingual Thai mendarat lewat PR #242
+        # tanpa pernah dipanggil CI — pola yang sama persis dengan lima belas gerbang
+        # braincore di step sebelumnya. Keempatnya dijalankan satu per satu lebih dulu dan
+        # exit 0 di pohon merge ini, jadi yang kurang cuma pendaftaran — bukan mutunya.
+        run: |
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node audio-locale-guard-test.js
+          node th-coverage-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola

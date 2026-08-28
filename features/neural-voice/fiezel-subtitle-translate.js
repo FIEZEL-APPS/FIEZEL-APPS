@@ -51,14 +51,37 @@
   }
 
   /**
+   * Locale sasaran terjemahan, dibaca dari atribut <html lang> yang diset app.js
+   * (m025-182 W2-STATE). SENGAJA bukan dari modul i18n: berkas ini tinggal di zona audio
+   * dan gerbang audio-locale-guard melarang zona ini menyentuh plumbing locale UI supaya
+   * tidak ada jalur yang membocorkannya ke opsi audio (AI-17 F02). Nilai ini hanya
+   * menentukan BAHASA SUBTITLE (teks), tidak pernah menyentuh kunci audio.
+   */
+  function docLocale() {
+    try {
+      var raw = root.document && root.document.documentElement && root.document.documentElement.lang;
+      return /^th(-|$)/i.test(String(raw || '')) ? 'th' : 'id';
+    } catch (_) { return 'id'; }
+  }
+
+  /**
    * Kunci dihitung dari teks yang sudah dinormalkan, sehingga perbedaan spasi atau
    * baris baru tidak melahirkan dua entri untuk kalimat yang sama.
+   *
+   * AI-11 F07 (audit v2): simpanan ini device-global, sedangkan ISINYA kalimat berbahasa
+   * murid — tanpa dimensi locale, murid Thai di perangkat yang sama akan disuguhi kalimat
+   * Indonesia dari simpanan selamanya. Maka kunci diberi dimensi locale secara ADDITIF:
+   * bentuk lama TANPA awalan adalah milik id (baseline emas), sehingga seluruh entri lama
+   * murid Indonesia tetap terbaca tanpa migrasi; locale lain memakai awalan '<locale>:'.
+   * Nama kunci localStorage (STORE_KEY) dan schema TIDAK berubah.
    */
-  function keyOf(text) {
+  function keyOf(text, locale) {
     var raw = normalize(text);
     var h = 5381;
     for (var i = 0; i < raw.length; i++) h = ((h << 5) + h + raw.charCodeAt(i)) | 0;
-    return (h >>> 0).toString(36) + '-' + raw.length;
+    var base = (h >>> 0).toString(36) + '-' + raw.length;
+    var loc = String(locale || docLocale());
+    return loc === 'id' ? base : loc + ':' + base;
   }
 
   /* ---- simpanan -------------------------------------------------------- */
@@ -99,9 +122,9 @@
     persist();
   }
 
-  function cached(text) {
+  function cached(text, locale) {
     var store = load();
-    var hit = store.entries[keyOf(text)];
+    var hit = store.entries[keyOf(text, locale)];
     return typeof hit === 'string' ? hit : '';
   }
 
@@ -152,10 +175,15 @@
     if (!source) return Promise.resolve('');
     if (source.length > MAX_CHARS) return Promise.resolve('');
 
-    var hit = cached(source);
+    // Sasaran dibekukan SEKALI di awal supaya kunci simpanan, penggabungan inflight,
+    // dan badan permintaan selalu memakai locale yang sama meski murid berganti bahasa
+    // di tengah permintaan yang sedang berjalan.
+    var target = docLocale();
+
+    var hit = cached(source, target);
     if (hit) return Promise.resolve(hit);
 
-    var key = keyOf(source);
+    var key = keyOf(source, target);
     // Satu bacaan bisa memicu dua pemanggil sekaligus (mulai memutar dan menyiapkan
     // tampilan). Tanpa penggabungan ini keduanya akan memakan dua jatah untuk hasil
     // yang sama persis.
@@ -165,10 +193,16 @@
     if (!exec) return Promise.resolve('');
 
     var request = withTimeout(Promise.resolve().then(function () {
+      // Untuk id badan permintaan byte-identik dengan jalur lama (tanpa bidang baru) —
+      // baseline emas tidak berubah sedikit pun. Bidang `target` hanya ikut untuk locale
+      // non-id, additive terhadap kontrak Worker: server hari ini mengabaikannya dan tetap
+      // menjawab Indonesia; dukungan sisi Worker adalah milik W3-PROMPTS-CF
+      // (lihat impl/handoff/W3-PROMPTS-CF.md).
+      var payload = target === 'id' ? { text: source } : { text: source, target: target };
       return exec(ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: source })
+        body: JSON.stringify(payload)
       });
     }), TIMEOUT_MS).then(readText).then(function (text) {
       var value = String(text || '').trim();

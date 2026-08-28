@@ -199,10 +199,43 @@ async function handle(request, env, executionCtx) {
  * bagian kontrak keamanan dan hanya boleh lahir dari `mw-identity.buildCookie`.
  */
 function withCookies(response, ctx) {
-  if (!ctx.cookies.length) return response;
+  const needCors = needsCorsHeaders(response, ctx);
+  if (!ctx.cookies.length && !needCors) return response;
   const headers = new Headers(response.headers);
   for (const cookie of ctx.cookies) headers.append('set-cookie', cookie);
+  if (needCors) for (const [k, v] of Object.entries(ctx.corsHeaders)) headers.set(k, v);
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+}
+
+/**
+ * CORS DITEMPELKAN DI SATU TITIK LUAR, UNTUK SEMUA RUTE.
+ *
+ * Sebelum ini setiap pembungkus rute bertanggung jawab menempelkan `ctx.corsHeaders`
+ * sendiri, dan `wrapAnalytics` di `route-wiring.js` TIDAK melakukannya. Akibatnya
+ * jawaban dari handler analytics keluar TANPA `Access-Control-Allow-Origin`, sehingga
+ * peramban murid memblokir pembacaannya.
+ *
+ * Gejalanya menipu dan itulah sebab cacat ini mahal ditemukan: preflight `OPTIONS`
+ * MENJAWAB dengan CORS lengkap (204 + allow-origin + allow-methods), `curl` melihat
+ * 200/202 yang sehat karena curl tidak menegakkan CORS, dan modul klien melaporkan
+ * dirinya `loaded:true` tanpa galat. Yang gagal hanya PEMBACAAN jawaban di peramban.
+ * Terukur di produksi: GET /api/usage/pepper 200 tanpa allow-origin -> peramban
+ * menolak dengan ERR_FAILED, klien tidak pernah dapat pepper, jadi NOL event terkirim
+ * seumur sesi. Owner melihat nol data dan wajar menyimpulkan nol pengguna.
+ *
+ * Menambal `wrapAnalytics` saja akan memperbaiki gejala hari ini dan meninggalkan
+ * kelas bugnya utuh: pembungkus BERIKUTNYA yang lupa akan mengulang cacat yang sama,
+ * senyap. Jadi penempelan dipindah ke sini, tempat SEMUA respons handler lewat.
+ *
+ * Handler yang sudah menempelkan sendiri TIDAK ditimpa: kalau `access-control-allow-origin`
+ * sudah ada, keputusan handler dihormati. Origin yang tidak diizinkan menghasilkan
+ * `ctx.corsHeaders` kosong dari `mw-guard.corsHeaders()`, jadi baris ini tidak pernah
+ * bisa membocorkan izin ke origin asing.
+ */
+function needsCorsHeaders(response, ctx) {
+  if (!response || !ctx || !ctx.corsHeaders) return false;
+  if (!Object.keys(ctx.corsHeaders).length) return false;
+  return !response.headers.has('access-control-allow-origin');
 }
 
 export default {

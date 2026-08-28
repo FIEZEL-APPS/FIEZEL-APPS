@@ -119,6 +119,21 @@ const sandbox = {
 let sandboxReady = false;
 try {
   vm.createContext(sandbox);
+  // 2026-08-29 merge overhaul×m025-186 (Wave 2 i18n): blok level guard kini membangun
+  // teksnya lewat FiezelI18n.t() (mis. 'level.entry-pilih-judul'), jadi sandbox memuat
+  // runtime i18n + copy-map id SUNGGUHAN lebih dulu — copy yang sama dengan UI, prinsip
+  // m025-166 di atas; tanpa ini evaluasi blok mati (merah yang sama ada di origin/main).
+  sandbox.self = sandbox;
+  vm.runInContext(fs.readFileSync(path.join(root, 'features/i18n/fiezel-i18n.js'), 'utf8'), sandbox, { filename: 'features/i18n/fiezel-i18n.js' });
+  for (const f of fs.readdirSync(path.join(root, 'features/i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(root, 'features/i18n', f), 'utf8'), sandbox, { filename: 'features/i18n/' + f });
+  // …dan LEVEL_GUARD_COPY dievaluasi ULANG di sandbox ber-i18n: IIFE di atas berjalan
+  // sebelum copy-map ada (runInNewContext tanpa FiezelI18n) sehingga menghasilkan {} —
+  // di sini bloknya diselesaikan seperti yang dilihat murid.
+  {
+    const lgBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
+    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '').replace(/;\s*$/, '') + ')', sandbox, { timeout: 2000 });
+  }
   vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
   sandboxReady = true;
 } catch (error) {
@@ -420,15 +435,39 @@ const homeBlock = sourceBlock('home');
 check('S13 · Home menampilkan status mode percobaan / terkunci', /activeLevelTrust(Line)?Markup\(\)/.test(homeBlock),
   'murid harus tahu statusnya tanpa harus membuka panel level');
 
-const copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
+// AI-20 F06 (kategori 2a, UNION repoint): blok LEVEL_GUARD_COPY boleh PINDAH ke copy-map
+// features/i18n/copy-id-level.js dengan nilai byte-identik (dijaga id-golden-snapshot-test.js).
+// Kalau bloknya tidak lagi ditemukan di app.js, blok registrasi copy-map dipakai sebagai
+// sumber teks — SEMUA sub-cek S14/S14b/S15 (kunci wajib, nilai id verbatim, sinkron angka)
+// tetap berjalan utuh atas teks itu. Syarat untuk W2-APP (lihat impl/handoff/W2-APP.md):
+// slug kunci di copy-map WAJIB mempertahankan nama anggota LEVEL_GUARD_COPY (warn5, warn8,
+// demotionBody, lockedFeature, examDesc, entryChip, entryExam, entryLater, probationBody)
+// supaya ikatan cek ini tidak putus. Regex kunci di bawah menoleransi bentuk keduanya
+// (warn5: di app.js maupun 'level.warn5': di copy-map).
+let copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
+if (!copyBlock) {
+  const levelCopyPath = path.join(root, 'features', 'i18n', 'copy-id-level.js');
+  if (fs.existsSync(levelCopyPath)) {
+    copyBlock = fs.readFileSync(levelCopyPath, 'utf8').match(/registerCopy\(\s*'id'\s*,\s*\{[\s\S]*?\}\s*\)/);
+  }
+}
 const copyText = copyBlock ? copyBlock[0] : '';
-check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5:/.test(copyText) && /warn8:/.test(copyText) && /demotionBody:/.test(copyText) && /lockedFeature:/.test(copyText) && /examDesc:/.test(copyText),
+// 2026-08-29 merge overhaul×m025-186 (Wave 2 i18n): LEVEL_GUARD_COPY kini merujuk
+// FiezelI18n.t() dan kalimatnya tinggal di features/i18n/copy-id-app-a.js dengan slug baru
+// (level.entry-ikuti-ujian, …) — bukan copy-id-level.js dengan nama anggota seperti yang
+// diantisipasi blok komentar W2-APP di atas, jadi regex bentuk-sumber tidak pernah bisa
+// hijau lagi (merah yang sama ada di origin/main pra-merge). Kontrak S14/S14b/S15 TIDAK
+// berubah: ia kini diukur pada NILAI copy yang benar-benar diselesaikan runtime lewat
+// sandbox ber-i18n (lebih ketat dari cek bentuk sumber — kunci yang salah ketik pun merah).
+const LGC = (sandbox.LEVEL_GUARD_COPY && typeof sandbox.LEVEL_GUARD_COPY === 'object') ? sandbox.LEVEL_GUARD_COPY : {};
+const lgcResolved = name => typeof LGC[name] === 'string' && LGC[name].trim().length > 0 && !/^level\./.test(LGC[name]);
+check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', ['warn5', 'warn8', 'demotionBody', 'lockedFeature', 'examDesc'].every(lgcResolved),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
 check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
-  /entryChip:/.test(copyText) && /entryExam:'Ikuti ujian'/.test(copyText) && /entryLater:'Nanti aja'/.test(copyText) &&
-  (copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length <= 90,
-  `panjang probationBody sekarang ${(copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
-check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(copyText),
+  lgcResolved('entryChip') && LGC.entryExam === 'Ikuti ujian' && LGC.entryLater === 'Nanti aja' &&
+  lgcResolved('probationBody') && String(LGC.probationBody || '').length <= 90,
+  `panjang probationBody sekarang ${String(LGC.probationBody || '').length} karakter — satu kalimat, bukan artikel`);
+check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(Object.values(LGC).join('\n') + '\n' + copyText),
   `teks harus menulis ${EXAM_PASS}% supaya tidak menjanjikan ambang yang berbeda dari kode`);
 
 // ---------------------------------------------------------------------------

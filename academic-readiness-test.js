@@ -7,6 +7,19 @@
  */
 const assert = require('assert');
 const fs = require('fs');
+// HARNESS i18n kondisional (AI-20 F06 kategori 2b): kalau modul academic kelak ikut
+// ekstraksi copy-map, ia memanggil FiezelI18n lewat global — pasang runtime + copy-id
+// SEBELUM require modulnya, meniru urutan <script defer> index.html. existsSync = hijau
+// dua arah: tanpa berkas i18n perilaku tes identik dengan sebelumnya, dan SEMUA asersi
+// copy hasil build modul di bawah tetap byte-identik.
+if (fs.existsSync('./features/i18n/fiezel-i18n.js')) {
+  // copy-map UMD-lite membaca self.FiezelI18n (pola browser); di Node, self belum ada.
+  if (typeof globalThis.self === 'undefined') globalThis.self = globalThis;
+  globalThis.FiezelI18n = require('./features/i18n/fiezel-i18n.js');
+  for (const name of fs.readdirSync('./features/i18n').filter(n => /^copy-id-.*\.js$/.test(n)).sort()) {
+    require('./features/i18n/' + name);
+  }
+}
 const academic = require('./features/academic-readiness/fiezel-academic-readiness.js');
 
 let failures = 0;

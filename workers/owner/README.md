@@ -34,9 +34,20 @@ karena `sw.js` mem-precache daftar ASSETS-nya ke perangkat murid, dan setiap per
 repo memaksa naiknya tiga invarian build.
 
 **Beda yang disengaja dari cf-b5 §5.1:** dokumen itu menyarankan `/owner` mengembalikan **404**
-untuk non-owner. Di sini **semua** rute mengembalikan **403** seragam, karena brief eksekusi
-(bab 32 #20) meminta "semua rute 403 tanpa sesi valid" dan itu yang diassert gerbang. Kerahasiaan
-keberadaan halaman tidak hilang karena ia berada di hostname terpisah dan `noindex`.
+untuk non-owner. Di sini rute API dan rute tak dikenal mengembalikan **403** seragam, karena brief
+eksekusi (bab 32 #20) meminta "semua rute 403 tanpa sesi valid" dan itu yang diassert gerbang.
+Kerahasiaan keberadaan halaman tidak hilang karena ia berada di hostname terpisah dan `noindex`.
+
+**Satu pengecualian, ditambahkan 28 Agu 2026 (D4):** `GET /` tanpa sesi menjawab **303 ke
+`/login`**, bukan 403. Sebelumnya owner yang membuka `https://owner.fiezel.my.id` disambut
+`{"error":"forbidden"}` dan harus tahu sendiri untuk mengetik `/login` — pesan galat untuk
+pemilik pintu. Yang dijaga agar tidak melemah:
+- Pengalihan terjadi **sesudah** penjaga tepi lapis 1. `*.workers.dev` dan host tak dikenal tetap
+  403; mereka tidak pernah sampai ke cabang ini.
+- Jawabannya **byte-identik** entah `OWNER_TOKEN_HASH` sudah dipasang atau belum, tanpa body,
+  tanpa `Set-Cookie`, tanpa header diagnostik. Jadi ia tidak membocorkan apakah dashboard sudah
+  dikonfigurasi.
+- Hanya `GET /`. Semua rute lain, termasuk `/api/*` dan rute tak dikenal, tetap 403 default-deny.
 
 ---
 
@@ -65,9 +76,12 @@ wrangler deploy
 "Dashboard ini akan kosong, dan itu benar".
 
 `wrangler.toml` hanya memuat **nama** binding — nol nilai rahasia, nol `[vars]`.
-Bila `OWNER_TOKEN_HASH` atau `OWNER_SESSION_KEY` belum dipasang, **setiap** rute (termasuk
-halaman masuk) mengembalikan 403. Itu sekaligus bentuk "fitur baru default OFF": tanpa Secret,
-dashboard mati total.
+Bila `OWNER_TOKEN_HASH` atau `OWNER_SESSION_KEY` belum dipasang, setiap rute yang mengeluarkan
+data — termasuk halaman masuk — mengembalikan 403. Itu sekaligus bentuk "fitur baru default OFF":
+tanpa Secret, dashboard mati total. Satu-satunya yang tidak 403 adalah `GET /`, yang mengalihkan
+ke `/login` **dengan respons byte-identik entah Secret sudah dipasang atau belum** — justru supaya
+ia tidak bisa dipakai memeriksa apakah dashboard sudah dikonfigurasi (§1). Pengalihan itu tidak
+membawa data dan tidak memberi akses; pemeriksaan Secret tetap terjadi di `/login`.
 
 Disarankan (lapis kedua): Cloudflare Access → Application dengan hostname `owner.fiezel.my.id`,
 policy satu surel owner + MFA. Gate aplikasi tetap wajib; Access tidak menggantikannya.
@@ -105,11 +119,15 @@ Rotasi: jalankan ulang dua perintah di atas, `wrangler secret put OWNER_TOKEN_HA
    **sha256** terhadap `OWNER_TOKEN_HASH`, dengan **perbandingan waktu-konstan**.
 3. Berhasil → cookie sesi `fz_owner` (`HttpOnly; Secure; SameSite=Strict`) berumur **30 menit**,
    diperbarui otomatis setiap kali dashboard dibuka. Gagal → 403, tanpa cookie.
-4. `/logout` mematikan cookie.
+4. Sesudah **5 percobaan gagal** dari sumber yang sama dalam jendela bergulir 10 menit, `POST
+   /login` menjawab **429** dengan `Retry-After: 120` sampai jendela bergulir. Embernya per-sumber
+   (IP ter-HMAC), jadi percobaan orang lain tidak memakan kuota owner — lihat §5 #13.
+5. `/logout` mematikan cookie.
 
 Rute yang ada: `/` (HTML dashboard, `?period=today|7d|30d|90d`), `/api/summary`, `/api/series`,
-`/api/retention`, `/api/cost`, `/logout`. **Semuanya** 403 tanpa sesi owner yang sah; rute yang
-tidak dikenal juga 403 (default deny), sehingga rute baru tidak bisa lupa dipagari.
+`/api/retention`, `/api/cost`, `/logout`. Tanpa sesi owner yang sah: `GET /` → **303 ke `/login`**
+(lihat §1), sisanya → **403**; rute yang tidak dikenal juga 403 (default deny), sehingga rute baru
+tidak bisa lupa dipagari.
 
 ---
 
@@ -163,12 +181,31 @@ ketidakpastian yang harus diketahui owner, bukan dipoles:
 11. **Panel latensi p50/p95 dan cache/error 90 hari (Analytics Engine) belum dibangun.** Membaca AE
     butuh SQL API + token akun (binding AE hanya bisa **menulis**), dan retensi AE hanya 3 bulan.
     Binding AE di sini dipakai **hanya** untuk jejak audit akses owner (tanpa IP, tanpa identitas).
-12. **Sesi owner stateless (HMAC).** Nol tulis KV/D1 → aman untuk plan GRATIS
-    (batas 1.000 tulis KV/hari tidak tersentuh). Konsekuensinya: mencabut sesi sebelum kedaluwarsa
-    hanya bisa dengan memutar `OWNER_SESSION_KEY`. Umur 30 menit dipilih agar jendela itu kecil.
-13. **Rem percobaan login bersifat per-isolate (dalam memori)**, jadi ia menyulitkan penebakan
-    cepat pada satu isolate, bukan akuntansi global. Pertahanan sebenarnya: token acak 32 byte +
-    Cloudflare Access.
+12. **Sesi owner stateless (HMAC).** Sesi nol tulis KV/D1. Konsekuensinya: mencabut sesi sebelum
+    kedaluwarsa hanya bisa dengan memutar `OWNER_SESSION_KEY`. Umur 30 menit dipilih agar jendela
+    itu kecil.
+13. **Rem percobaan login sekarang terkumpul lintas isolate lewat KV `fiezel-CFG`** (diganti
+    28 Agu 2026, D4). Sebelumnya rem ini `Map` di lingkup modul = memori PER-ISOLATE, dan
+    buktinya: 12 percobaan token salah berturut-turut ke produksi menghasilkan **403 dua belas
+    kali, nol 429**. Rem itu dekoratif. Yang berlaku sekarang:
+    - Kunci ember **per-sumber**, bukan satu string global. Sumber = `CF-Connecting-IP` (hanya
+      dipercaya karena hostname sudah dipaksa lewat penjaga tepi lapis 1), **di-HMAC dengan
+      `RATE_SALT`** lalu dipotong 128 bit, mengikuti pola `workers/api/rate-anon.js`. IP mentah
+      tidak pernah masuk penyimpanan maupun log. Akibat lain: penyerang tidak lagi bisa mengunci
+      owner keluar dari dashboardnya sendiri, karena ember penyerang bukan ember owner.
+    - **5 percobaan gagal per jendela bergulir 10 menit** (5 ember 2 menit). Pulih bertahap: satu
+      percobaan kembali tiap 2 menit, jendela penuh bersih dalam 10 menit. Owner yang salah tempel
+      token tidak bisa terkunci selamanya.
+    - Tulis KV hanya pada percobaan **GAGAL**; login berhasil dan permintaan yang sudah ditolak
+      429 nol tulis. Satu sumber yang menyerang tanpa henti = 720 tulis/hari dari kuota 1.000/hari.
+    - KV **eventually consistent** (baca ber-`cacheTtl` 30 detik), jadi di jendela lag beberapa
+      percobaan bisa lolos pada isolate yang baru. Angka dan hitungannya ada di bab "PENYIMPANAN
+      YANG DIPILIH" `index.js` dan di `reports/work-d4-owner-brake.md`.
+    - Galat KV pada jalur rem **fail-open** (permintaan diteruskan ke pemeriksaan token, bukan
+      ditolak) — kebalikan dari jalur murid yang fail-closed. Alasannya di laporan D4.
+    Yang rem ini **TIDAK** cegah: token yang sudah BOCOR. Satu percobaan dengan token benar
+    langsung masuk. Pertahanan untuk itu adalah rotasi token + Cloudflare Access (lapis 2, masih
+    menunggu satu klik owner).
 
 ---
 
