@@ -14498,7 +14498,7 @@
         "How did car journeys compare with bus journeys once the lane opened?",
         [
           "cars lost a couple of minutes while buses saved about four",
-          "cars lost about nine minutes while buses saved a couple",
+          "cars and buses both saved about nine minutes after the change",
           "cars kept their old times while buses saved about nine minutes",
           "cars lost a couple of minutes while buses saved about nine"
         ],
@@ -14509,7 +14509,7 @@
           "answer": "cars lost a couple of minutes while buses saved about nine",
           "patternId": "b2a-r0152-3-comparison",
           "why": "Mobil cuma nambah dua menit sementara bus turun dari 31 ke 22 menit, jadi kerugian mobil kecil dan hematan bus sembilan menit.",
-          "whyOthersFail": "Ketiganya pola hasil yang masuk akal buat lajur bus, tapi angka teksnya beda: “fell from 31 minutes to 22” bikin hematan bus sembilan menit, bukan empat dan bukan cuma dua; dan “car journeys grew longer by only two minutes” nunjukin waktu mobil tetap berubah, jadi bukan sama seperti dulu."
+          "whyOthersFail": "Ketiganya pola hasil yang masuk akal buat lajur bus, tapi angka teksnya beda: “fell from 31 minutes to 22” bikin hematan bus sembilan menit, bukan empat; dan “car journeys grew longer by only two minutes” nunjukin mobil justru nambah waktu — bukan ikut hemat sembilan menit dan bukan tetap seperti dulu."
         }
       ],
       [
@@ -18001,7 +18001,7 @@
         [
           "Video needs a screen in view, while talk needs only time.",
           "Video needs a screen in view, while talk needs a still listener.",
-          "Talk needs a screen in view, while video needs only patience.",
+          "Talk needs a screen in view, while video needs only time.",
           "Video needs a screen in view, while talk needs costly headphones."
         ],
         0,
@@ -25896,7 +25896,7 @@
         [
           "The shared catalogue can widen while each listener's range widens with it.",
           "The shared catalogue can widen while each listener's own range narrows.",
-          "Each listener's range can widen while the shared catalogue quietly narrows.",
+          "Each listener's own range can widen while the shared catalogue narrows.",
           "The shared catalogue can narrow while each listener's range stays where it was."
         ],
         1,
