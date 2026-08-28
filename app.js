@@ -664,7 +664,7 @@ function vocabWordForms(word){
   for(const raw of String(word||'').split('/')){
     const b=raw.trim().toLowerCase();if(!b)continue;
     out.add(b);
-    if(/s/.test(b))continue; // frasa dipakai apa adanya, tanpa tebakan infleksi
+    if(/\s/.test(b))continue; // frasa (mengandung spasi) dipakai apa adanya, tanpa tebakan infleksi — m025-177: /s/ lama menguji HURUF s dan mematikan infleksi 531 kata
     out.add(b+'s');out.add(b+'es');out.add(b+'ed');out.add(b+'ing');out.add(b+'d');
     if(b.endsWith('y')){const t=b.slice(0,-1);out.add(t+'ies');out.add(t+'ied');out.add(t+'ier');out.add(t+'iest')}
     if(b.endsWith('e')){const t=b.slice(0,-1);out.add(t+'ing');out.add(t+'ed');out.add(t+'er');out.add(t+'est')}
@@ -839,7 +839,13 @@ function lessonUnlockState(skill,sourceState=state){
   // Lesson tanpa prasyarat SELALU terbuka. Tanpa aturan ini, murid baru bisa terkunci total di
   // level yang lesson pertamanya belum pernah disentuh.
   if(!prerequisites.length)return{skill:key,locked:false,threshold,missing:[],reason:meta?'foundation':'unmapped'};
-  const missing=prerequisites.filter(x=>grammarMastery(x,sourceState)<threshold).map(x=>({skill:x,mastery:grammarMastery(x,sourceState)}));
+  /* m025-177 (audit skip A07): bukti gerbang "Lewati materi" harus AWET. updateMastery
+     menghitung ulang mastery dari rasio mentah tiap jawaban review, jadi angka bisa turun
+     lagi di bawah ambang dan diam-diam MENGUNCI ULANG lesson berikutnya — melanggar janji
+     "lesson berikutnya terbuka". Prasyarat kini juga terpenuhi oleh skippedAt (gerbang
+     sudah lulus); angka mastery yang tampil tetap jujur mengikuti bukti terbaru. */
+  const skipVerified=x=>!!sourceState?.grammar?.[String(x||'')]?.skippedAt;
+  const missing=prerequisites.filter(x=>grammarMastery(x,sourceState)<threshold&&!skipVerified(x)).map(x=>({skill:x,mastery:grammarMastery(x,sourceState)}));
   return{skill:key,locked:missing.length>0,threshold,missing,reason:missing.length?'prerequisite_not_mastered':'prerequisite_mastered'}
 }
 function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unlock.missing.map(x=>friendlySkillName(x.skill)).join(', ');return `Selesaikan dulu ${names} sampai mastery ${unlock.threshold}%.`}
@@ -1143,10 +1149,18 @@ function policyTargetMastery(policy){
 }
 function recentSkillAccuracy(skill,before=Infinity,limit=20,level=getActiveLevel()){const key=String(skill||'');if(!key)return null;const xs=(state.history||[]).filter(h=>Number(h?.at||0)<before&&historyMatchesActive(h,level)&&(String(h.skill||'')===key||String(h.target||'')===key)).slice(-limit);return xs.length?Math.round(xs.filter(h=>h.ok).length/xs.length*100):null}
 function beginLearningSession(cfg,total){
-  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};save();return state.activeSession
+  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};save();return state.activeSession
 }
 function abandonActiveSession(reason='exit'){
-  const a=state.activeSession;if(!a)return false;const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);return true
+  const a=state.activeSession;if(!a)return false;const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};
+  /* m025-177 (audit skip RT20-02/A13): meninggalkan alat ukur di tengah jalan dulu GRATIS —
+     tanpa catatan percobaan dan tanpa cooldown, ujian bisa di-reroll tanpa batas di hari yang
+     sama (buka, intip soal, keluar kalau terasa berat). Kini: sudah menjawab >=1 soal berarti
+     percobaannya terpakai — level-exam mencatat gagal + jeda 24 jam, gerbang lewati materi
+     menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
+  if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
+  if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);return true
 }
 function completeActiveSession(cfg,score,total){
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
@@ -4048,7 +4062,7 @@ function levelTrustNoteMistake(q){
   const sessionType=String(state.activeSession?.type||'');
   /* Kesalahan di dalam ujian tidak menular ke guard (rekomendasi 7 riset): ujian menilai,
      bukan menghukum. Placement pun tidak - ia justru sumber bukti. */
-  if(sessionType==='placement'||sessionType==='level-exam')return false;
+  if(sessionType==='placement'||sessionType==='level-exam'||sessionType==='grammar-skip')return false; // m025-177: gerbang lewati materi juga alat ukur — janji "tanpa penalti" harus benar
   const level=String(q?.level||getActiveLevel());
   if(!LEVELS.includes(level)||levelTrustGap(level)<=0)return false;
   const trust=levelTrustState(state),now=Date.now();
@@ -4105,8 +4119,13 @@ function buildLevelExamQuestions(examLevel){
   if(!LEVELS.includes(target))throw new Error('Level ujian tidak dikenal.');
   /* Bank besar + acak tiap percobaan (rekomendasi 8 riset): grammar memakai seluruh mode
      latihan dari tiap template level itu, jadi kolamnya jauh lebih besar dari 25. */
-  const grammarEntries=shuffle(grammarItemsForLevel(target)),grammarPool=[];
-  for(let variant=0;variant<GRAMMAR_PRACTICE_MODES.length;variant++)for(const entry of grammarEntries)grammarPool.push(makeGrammarQuestion(entry.skill,entry.item,variant,entry.skill));
+  const grammarEntries=grammarItemsForLevel(target),grammarPool=[];
+  /* m025-177 (audit skip A02/A14): urutan lama variant-major membuat 10 slot grammar SELALU
+     berisi mode-0 (apply_form) — 24 mode lain tidak pernah terjangkau, dan C2 (7 templat)
+     mengulang stem yang sama persis di satu ujian. Kini urutan MODE diacak per percobaan dan
+     tiap pass mengocok ulang templat: pass pertama menjangkau tiap templat sekali
+     (stratifikasi), kekurangan slot diisi pass mode berikutnya dengan stem yang berbeda. */
+  for(const variant of shuffle(GRAMMAR_PRACTICE_MODES.map((_,i)=>i)))for(const entry of shuffle([...grammarEntries]))grammarPool.push(makeGrammarQuestion(entry.skill,entry.item,variant,entry.skill));
   const pools={
     grammar:grammarPool,
     vocab:shuffle(V.filter(v=>v.level===target&&v.meaning)).map(v=>makeVocabQuestion(v)),
@@ -5691,20 +5710,35 @@ function practiceSkill(skill){if((GRAMMAR_ITEMS.find(x=>x.skill===skill)?.level|
  * mencatat tiap jawaban gerbang sebagai bukti biasa), jadi lesson berikutnya terbuka
  * lewat lessonUnlockState() yang TIDAK berubah. Gerbang sengaja MENEROBOS kunci prasyarat:
  * ia memang pintu untuk murid yang materinya sudah dikuasai dari luar jalur. */
+/* m025-177 (audit skip A07/A08/A14/A17/A20): gerbang TIDAK lagi memakai urutan mode
+ * deterministik latihan (mode 0..4 templat yang sama, byte-identik tiap percobaan — gagal
+ * sekali, hafal set-nya, lulus percobaan kedua). Seluruh pool valid lesson dikumpulkan dulu,
+ * lalu diambil LESSON_SKIP_GATE_SIZE secara ACAK, jadi klaim "diacak dari templat lessonnya"
+ * di modal kini benar. Gagal (atau kabur setelah menjawab) memberi jeda 24 jam per lesson. */
+function buildLessonSkipGateQuestions(skill,count=LESSON_SKIP_GATE_SIZE){
+  return shuffle(buildGrammarLessonQuestions(skill,Number.MAX_SAFE_INTEGER)).slice(0,count);
+}
+function lessonSkipGateCooldownRemaining(skill,now=Date.now()){
+  return Math.max(0,Math.floor(Number(state.grammar[String(skill||'')]?.skipGateCooldownUntil||0))-now);
+}
 function openLessonSkipGate(skill){
   const meta=GRAMMAR_ITEMS.find(x=>x.skill===skill);
   if(!meta||meta.level!==getActiveLevel())return showToast(`Lesson ini hanya tersedia pada level ${getActiveLevel()}.`);
   const mastery=state.grammar[skill]?.mastery||0,title=grammarCurriculumEntry(skill)?.title||friendlySkillName(skill);
   if(mastery>=GRAMMAR_UNLOCK_MASTERY)return showToast('Materi ini sudah selesai — tidak ada yang perlu dilewati.');
-  const questions=buildGrammarLessonQuestions(skill,LESSON_SKIP_GATE_SIZE);
+  const gateWait=lessonSkipGateCooldownRemaining(skill);
+  if(gateWait>0)return showToast(`Gerbang materi ini bisa dicoba lagi ${levelExamCooldownLabel(gateWait)}.`);
+  const questions=buildLessonSkipGateQuestions(skill);
   if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid — gerbangnya belum bisa dibuka.`);
-  openModal(`<div class="modal-mark">FIEZEL LEWATI MATERI</div><h2>Lewati “${esc(title)}”?</h2><p>Sudah menguasai materi ini dari tempat lain? Buktikan dulu — tidak ada lompatan gratis, sama seperti Ujian Skip Level.</p><ul class="level-exam-facts"><li>${LESSON_SKIP_GATE_SIZE} soal dari materi ini, diacak dari templat lessonnya</li><li>Tanpa petunjuk, tanpa percobaan kedua</li><li>Benar minimal ${LESSON_SKIP_GATE_PASS} → materi ditandai selesai, lesson berikutnya terbuka</li><li>Belum lulus? Tidak ada penalti — materinya tetap menunggumu di jalur</li></ul><div class="modal-actions"><button type="button" id="lessonSkipCancel">Nanti dulu</button><button type="button" class="primary" id="lessonSkipStart">Mulai gerbang bukti</button></div>`);
+  openModal(`<div class="modal-mark">FIEZEL LEWATI MATERI</div><h2>Lewati “${esc(title)}”?</h2><p>Sudah menguasai materi ini dari tempat lain? Buktikan dulu — tidak ada lompatan gratis, sama seperti Ujian Skip Level.</p><ul class="level-exam-facts"><li>${LESSON_SKIP_GATE_SIZE} soal dari materi ini, diacak dari templat lessonnya</li><li>Tanpa petunjuk · keluar di tengah jalan = percobaannya terpakai</li><li>Benar minimal ${LESSON_SKIP_GATE_PASS} → materi ditandai selesai, lesson berikutnya terbuka</li><li>Belum lulus? Progresmu aman — gerbangnya membuka lagi setelah 24 jam, materinya tetap menunggumu di jalur</li></ul><div class="modal-actions"><button type="button" id="lessonSkipCancel">Nanti dulu</button><button type="button" class="primary" id="lessonSkipStart">Mulai gerbang bukti</button></div>`);
   $('lessonSkipCancel').onclick=closeModal;
   $('lessonSkipStart').onclick=()=>{closeModal();startLessonSkipGate(skill)};
   enhanceUI();
 }
 function startLessonSkipGate(skill){
-  const questions=buildGrammarLessonQuestions(skill,LESSON_SKIP_GATE_SIZE);
+  const gateWait=lessonSkipGateCooldownRemaining(skill);
+  if(gateWait>0)return showToast(`Gerbang materi ini bisa dicoba lagi ${levelExamCooldownLabel(gateWait)}.`);
+  const questions=buildLessonSkipGateQuestions(skill);
   if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid.`);
   quizLoop({type:'grammar-skip',count:LESSON_SKIP_GATE_SIZE,pool:questions,factory:x=>x,preserveOrder:true,noHints:true,skipGateSkill:skill});
 }
@@ -5860,6 +5894,12 @@ function makeReadingQuestion(r,q,i){
   // m025-163: TFNS jujur - klaim Inggris (objek yang diuji) tampil verbatim di stem;
   // tanpa klaim, soal TFNS cuma pilihan ganda tanpa soal.
   if(type==='true_false_not_stated'&&meta.claim)stem=`pernyataan ini benar, salah, atau tidak disebutkan? “${String(meta.claim).trim()}”`;
+  /* m025-177 (audit skip A05): stem generik menggantikan pertanyaan Inggris asli bank dan
+     membuat sebagian soal detail/inference punya dua pilihan yang sama-sama didukung teks
+     (kunci ganda di ujian berskor). Pertanyaan aslinya kini ditanam verbatim — pola
+     kejujuran yang sama dengan TFNS m025-163 — sehingga kuncinya kembali tunggal. */
+  const originalText=String(original||'').trim();
+  if(originalText&&!stem.includes('“'))stem=`${stem} Pertanyaan aslinya: “${originalText}”`;
   const opts=uniqueReadingOptions(r,q,q[2]);
   // m025-163: skala tetap tidak diacak (True/False/Not stated kehilangan makna urutannya).
   const shuffled=meta.fixedOptions===true?opts.map(x=>({x,ok:norm(x)===norm(answerText)})):shuffle(opts.map(x=>({x,ok:norm(x)===norm(answerText)})));
@@ -6131,6 +6171,11 @@ async function buildPlacement(){
 }
 
 async function startPlacement(){
+  /* m025-177 (audit skip A13/A14): placement adalah kanal verifikasi (kontrak owner 3),
+     tapi tanpa jeda ia menjadi jalan memutar mengitari cooldown Ujian Skip Level (ulang
+     terus sampai band atas lolos). Tes pertama tetap bebas; pengulangan diberi jeda 24 jam
+     yang sama dengan ujian. */
+  if(state.placementDone){const wait=Math.max(0,Number(state.placementLastAt||0)+LEVEL_EXAM_COOLDOWN_MS-Date.now());if(wait>0)return showToast(`Tes level bisa diulang ${levelExamCooldownLabel(wait)}.`)}
   let qs=[];
   try{qs=await buildPlacement()}catch(error){return showToast(`Tes belum bisa dijalankan: ${String(error?.message||error)}`)}
   // Enam dari 25 soal berasal dari bank listening yang diambil lewat jaringan. Kalau bank
@@ -6370,7 +6415,10 @@ function quizLoop(cfg){
   // adalah potongan tes yang paling mudah. Simulasi recon §c: benar 4 dari 7 -> 57% -> B1;
   // 5 dari 7 -> 71% -> B2; 4 dari 5 -> 80% -> C1. Sesi belajar boleh disudahi kapan saja;
   // pengukuran tidak boleh, karena hasilnya menempel ke seluruh kurikulum murid sesudahnya.
-  if(answer.breathe&&!breatheOffered&&!cfg.placement){
+  // m025-177 (audit skip A01/A13/A20): breathe juga TIDAK ditawarkan di alat ukur lain —
+  // level-exam bisa ter-settle dari ~8 jawaban (7/8=88%>=80 memverifikasi level), dan
+  // grammar-skip dikecualikan sekalian sebagai pagar masa depan. Sesi BELAJAR tetap bebas.
+  if(answer.breathe&&!breatheOffered&&!cfg.placement&&cfg.type!=='level-exam'&&cfg.type!=='grammar-skip'){
    breatheOffered=true;answer.breathe=false;
    const host=$('tutorTurn');
    if(host){
@@ -6538,7 +6586,7 @@ function finishQuiz(cfg,score,total,tutorReport){
   // dipercaya. Satu angka level tanpa bandnya adalah kesimpulan tanpa dasar.
   if(cfg.placement)state.placementBands=placementBands;
   const placementWasDone=!!state.placementDone;
-  if(cfg.placement){state.level=accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
+  if(cfg.placement){state.level=accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
   // Hasil tes vs level yang dipilih sendiri di onboarding. `getActiveLevel()` mendahulukan
   // `preferences.activeLevel`, jadi tanpa penyelesaian di sini seluruh perbaikan skoring tidak
   // akan pernah terlihat oleh murid yang keburu menebak levelnya sendiri di layar perkenalan.
@@ -6569,8 +6617,11 @@ function finishQuiz(cfg,score,total,tutorReport){
   let skipVerdict=null;
   if(cfg&&cfg.type==='grammar-skip'&&cfg.skipGateSkill){
     const passed=score>=LESSON_SKIP_GATE_PASS,judul=grammarCurriculumEntry(cfg.skipGateSkill)?.title||friendlySkillName(cfg.skipGateSkill);
-    if(passed){const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.mastery=Math.max(Number(b.mastery)||0,GRAMMAR_UNLOCK_MASTERY);b.skippedAt=Date.now();state.grammar[cfg.skipGateSkill]=b}
-    skipVerdict={passed,message:passed?`Bukti diterima: ${score}/${total} benar. “${judul}” ditandai selesai — lesson berikutnya terbuka.`:`Baru ${score}/${total} benar — gerbang ini butuh minimal ${LESSON_SKIP_GATE_PASS}. Materinya tetap menunggumu di jalur, tanpa penalti.`};
+    if(passed){const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.mastery=Math.max(Number(b.mastery)||0,GRAMMAR_UNLOCK_MASTERY);b.skippedAt=Date.now();b.skipGateCooldownUntil=0;state.grammar[cfg.skipGateSkill]=b}
+    /* m025-177 (audit skip A13/A20): gagal kini memberi jeda 24 jam per lesson (anti hafal-
+       set + coba lagi detik itu juga); progres dan bukti jawaban tetap utuh. */
+    else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
+    skipVerdict={passed,message:passed?`Bukti diterima: ${score}/${total} benar. “${judul}” ditandai selesai — lesson berikutnya terbuka.`:`Baru ${score}/${total} benar — gerbang ini butuh minimal ${LESSON_SKIP_GATE_PASS}. Progresmu aman, dan gerbangnya bisa dicoba lagi setelah 24 jam — materinya tetap menunggumu di jalur.`};
   }
   state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
