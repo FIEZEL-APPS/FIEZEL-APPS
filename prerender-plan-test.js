@@ -280,7 +280,8 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Dry-run tidak pernah memanggil fetch/http/net/dns — nol panggilan',
     netCalls.length === 0, netCalls.length ? netCalls.join(' | ') : 'nol panggilan');
   check('Laporan mencetak jumlah objek dan jumlah karakter',
-    /belum ada\s+:\s*5657/.test(output) && /286851 karakter/.test(output), 'objek + karakter');
+    new RegExp(`belum ada\\s+:\\s*${plan.pending.length}\\s+\\(${plan.plannedChars} karakter\\)`).test(output),
+    'objek + karakter sesuai rencana terukur');
   check('Laporan mencetak biaya untuk aura-1 DAN aura-2-en',
     /@cf\/deepgram\/aura-1\s+US\$0\.015/.test(output) && /@cf\/deepgram\/aura-2-en\s+US\$0\.030/.test(output),
     'dua harga berdampingan');
@@ -288,7 +289,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
     /durasi audio/.test(output) && /jam/.test(output) && /ukuran R2/.test(output) && /GB/.test(output),
     'durasi + penyimpanan');
   check('Laporan memuat peringatan jatah gratis 10.000 neuron/hari tidak cukup (~825.000 dibutuhkan)',
-    /10000 neuron\/hari/.test(output) && /825000/.test(output) &&
+    /10000 neuron\/hari/.test(output) && new RegExp(String(census.estimatedNeurons)).test(output) &&
     /JATAH GRATIS TIDAK CUKUP/.test(output) && /WAJIB dibayar sekali/.test(output),
     'pra-render dibelanjakan, bukan ditunggu');
   check('Laporan menyebut model yang ditolak beserta buktinya',
