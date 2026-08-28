@@ -36,6 +36,23 @@
   var LOG_LIMIT = 40;
   var ASK_TIMEOUT = 12000; /* lewat ini, jawaban lokal yang menjawab */
 
+  /* impl-04 (kontrak emitHandoff): kelahiran gelembung dijahit ke event serah terima
+   * onboarding. Pendengarnya dipasang di LINGKUP MODUL, bukan di install() - pada boot
+   * pertama install() bisa baru berjalan setelah "Mulai Belajar" ditekan, dan event
+   * yang sudah lewat tidak bisa didengar ulang. Yang datang sebelum install() direkam
+   * dan dikonsumsi sekali saat gelembungnya benar-benar dipasang. */
+  var HANDOFF_EVENT = 'fiezel-onboarding-paw-handoff';
+  var HANDOFF_FRESH_MS = 6000;  /* rekaman lebih tua dari ini dianggap basi */
+  var lastHandoff = null;
+  var handoffReceiver = null;
+  try {
+    doc.addEventListener(HANDOFF_EVENT, function (e) {
+      var detail = (e && e.detail) || {};
+      lastHandoff = { detail: detail, at: Date.now() };
+      if (typeof handoffReceiver === 'function') handoffReceiver(detail);
+    });
+  } catch (_) { /* tanpa addEventListener kelahiran biasa (born saat pasang) tetap jalan */ }
+
   function esc(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
@@ -210,10 +227,49 @@
       // [ADAPTASI] OA-7 §4: paw_appear menemani kelahiran maskot. Penjatahannya (≥8 dtk
       // antar-bunyi, 14 §3.2) dijaga manifest SFX, bukan di sini - born() cukup jujur
       // memanggil, mesinlah yang memutuskan pantas-tidaknya berbunyi.
-      try { if (typeof self !== 'undefined' && self.FiezelUiSfx) self.FiezelUiSfx.play('paw_appear', typeof window !== 'undefined' ? window : self); } catch (_) {}
+      // [ADAPTASI-SFX] 14 §3.1 aturan 3: saat kurangi-gerak (OS atau preferensi aplikasi)
+      // animasi kelahirannya ditekan CSS - pop tanpa ledakan adalah bunyi yatim, jadi
+      // bunyinya ikut diam. reduceMotionNow() hoisted dari bawah, satu ambang yang sama.
+      try { if (!reduceMotionNow(null) && typeof self !== 'undefined' && self.FiezelUiSfx) self.FiezelUiSfx.play('paw_appear', typeof window !== 'undefined' ? window : self); } catch (_) {}
       if (bornTimer) clearTimeout(bornTimer);
       bornTimer = setTimeout(function () { host.classList.remove('is-paw-born'); }, 960);
     }
+
+    /**
+     * impl-04 - KELAHIRAN POP pasca-onboarding (penerima 'fiezel-onboarding-paw-handoff').
+     * Kontrak detail: {via:'finish', animated, reduceMotion, durationMs, bubbleDelayMs}.
+     * PAW menyusut ke sudut (320ms) dan gelembung lahir dengan pop kecil bubbleDelayMs
+     * setelah penyusutan dimulai - disembunyikan DULU (is-prebirth) supaya yang dilihat
+     * murid adalah kelahiran, bukan gelembung yang ternyata sudah menunggu dari tadi.
+     * Kurangi-gerak: kelahirannya fade (10 §2 - kemunculan minimal fade, tanpa pop).
+     */
+    var birthTimer = null;
+    function reduceMotionNow(detail) {
+      if (detail && detail.reduceMotion === true) return true;
+      try { if (global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches) return true; } catch (_) {}
+      try { return doc.body.classList.contains('reduce-motion'); } catch (_) { return false; }
+    }
+    function birthPop(detail) {
+      var delay = Number(detail && detail.bubbleDelayMs);
+      if (!isFinite(delay) || delay < 0) delay = 120; /* nilai kontrak impl-04 sebagai cadangan */
+      peek.hidden = true;                 /* sapaan tidak boleh mendahului kelahiran */
+      bubble.classList.add('is-prebirth');
+      if (birthTimer) clearTimeout(birthTimer);
+      birthTimer = setTimeout(function () {
+        bubble.classList.remove('is-prebirth', 'is-paw-birth', 'is-paw-birth-fade');
+        void bubble.offsetWidth;          /* pola restart animasi yang sama dengan born() */
+        if (reduceMotionNow(detail)) {
+          bubble.classList.add('is-paw-birth-fade');  /* fade saja - nol gerak */
+        } else {
+          bubble.classList.add('is-paw-birth');
+          /* pop + bunyi paw_appear lewat jalur kelahiran yang SUDAH ada - satu sumber */
+          born(bubble);
+        }
+        setTimeout(function () { bubble.classList.remove('is-paw-birth', 'is-paw-birth-fade'); }, 760);
+      }, delay);
+    }
+    /* Penyambungan penerimanya ada DI BAWAH pembuatan peek - birthPop memegang peek
+     * lewat closure dan jalur konsumsi-langsung berjalan sinkron saat install(). */
 
     var shiftTimer = null;
     function setScene(view) {
@@ -231,6 +287,11 @@
     peek.className = 'fz-coach-peek';
     peek.hidden = true;
     peek.setAttribute('role', 'status');
+
+    /* impl-04: penerima kelahiran aktif begitu gelembung + peek siap. Boot pertama:
+     * event bisa sudah terpancar SEBELUM install() - rekaman segar dikonsumsi sekali. */
+    handoffReceiver = birthPop;
+    if (lastHandoff && Date.now() - lastHandoff.at < HANDOFF_FRESH_MS) birthPop(lastHandoff.detail);
 
     var sheet = doc.createElement('div');
     sheet.className = 'fz-coach-sheet';
@@ -390,6 +451,8 @@
         }
       },
       say: function (text) { showPeek(text); },
+      /** Jalur uji kelahiran pop (QA impl-04); produksi memakai event handoff. */
+      birth: function (detail) { birthPop(detail); },
       context: function () { return Object.assign({}, context); },
       /** Karakter gerak yang sedang dipakai. Dipakai gerbang dan Diagnostics. */
       scene: function () { return bubble.getAttribute('data-fz-scene') || 'home'; }

@@ -1,0 +1,19 @@
+{
+  "generator": "tools/export-mascot.mjs",
+  "rig": "5fb6293402a49e97ae00c4277af49d3ddee51e4ad38234e6467ec309d04b7a8a",
+  "files": {
+    "assets/brand/fiezel-paw.svg": "2064b3d10991d20cddf8cc595a987f70b20b4711d05b74d3066df037b2420727",
+    "assets/brand/paw-mascot-full.svg": "8a6f27be9926748383afef92ef6c5435493c73658b86b82d105b639ecd5ad1a2",
+    "assets/brand/paw-mascot-head.svg": "a0a253e446db351528daa2cbe1048cbaf6a271e305dff6463696762f2bcccb46",
+    "assets/marketing/mascot-poses/paw-mascot-full-celebrating.svg": "186f22be7f1b8c3c36fa749c27c86112b8f508be8851f52ef81e8a0c74d07eb4",
+    "assets/marketing/mascot-poses/paw-mascot-head-listening.svg": "1a6d58104b0b1932db298b7fb0155e4f57d1be25754743523f082d80640a41ec",
+    "assets/marketing/mascot-poses/paw-mascot-head-proud.svg": "3104041e2c7e3e1c819afac2ad8108d54ec10e60b0a6c183b93f71f032e2cd8a",
+    "assets/brand/paw-mascot-full-512.png": "beb8324c5389789074e316125c80ce2a0a1976150cf5e045d81f749afbbfa9c4",
+    "assets/brand/paw-mascot-head-512.png": "c9cb76dbc78826f0b9298f33c9f8b3c3a7f1f9a8096ba19e12ebaa02f88c1267",
+    "website/assets/brand/fiezel-paw.svg": "2064b3d10991d20cddf8cc595a987f70b20b4711d05b74d3066df037b2420727",
+    "website/assets/brand/paw-mascot-full.svg": "8a6f27be9926748383afef92ef6c5435493c73658b86b82d105b639ecd5ad1a2",
+    "website/assets/brand/paw-mascot-head.svg": "a0a253e446db351528daa2cbe1048cbaf6a271e305dff6463696762f2bcccb46",
+    "website/assets/mascot/fiezel-mascot.js": "3626724ecfacf7e91dbc957d8b06f28fb5a8fba4dcf1effed1adfe4c029250f6",
+    "website/assets/mascot/fiezel-motion.css": "78a5250387914588293d567ae328fe5756f36e8fc1d7927dfc92832f4a7612ad"
+  }
+}

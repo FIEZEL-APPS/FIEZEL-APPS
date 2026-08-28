@@ -30,6 +30,7 @@ const ICONS = read('features/ui/fiezel-icons.js');
 const BUBBLE = read('features/ui/fiezel-coach-bubble.js');
 const CSS = read('style.css');
 const ASSET = read('assets/brand/fiezel-paw.svg');
+const RIG = read('features/mascot/fiezel-mascot.js');
 
 /**
  * Potongan definisi ikon paw saja.
@@ -86,6 +87,50 @@ test('hanya ada SATU sumber bentuk PAW, dan keduanya identik', () => {
     }
   }
   if (inline.pad !== asset.pad) throw new Error('bantalan menyimpang antara ikon dan berkas aset');
+});
+
+/**
+ * Potongan grup emblem dada di dalam rig maskot penuh (fiezel-mascot.js).
+ *
+ * Rig punya rect lain yang lolos regex balok (kaki 48x22, headphone) — jadi yang
+ * diiris HANYA grup fz-pawprint, dari pembukanya sampai penutup grup pertama.
+ */
+function rigEmblemBlock() {
+  const start = RIG.indexOf('id="fz-pawprint');
+  if (start === -1) throw new Error('grup fz-pawprint tidak ada di rig maskot');
+  const end = RIG.indexOf('</g>', start);
+  return RIG.slice(start, end);
+}
+
+test('emblem dada maskot = glyph fiezel-paw.svg, koordinat APA ADANYA', () => {
+  // Keputusan OWNER (proof sheet v2): glyph paw hanya di dada, dan wujudnya
+  // instansi PERSIS dari aset kanonik — bukan gambar ulang yang mirip.
+  const emblem = shapeOf(rigEmblemBlock());
+  const asset = shapeOf(ASSET);
+  if (emblem.bars.length !== 4) {
+    throw new Error('emblem dada punya ' + emblem.bars.length + ' balok, glyph kanonik punya empat');
+  }
+  for (let i = 0; i < 4; i++) {
+    if (emblem.bars[i] !== asset.bars[i]) {
+      throw new Error('balok ' + (i + 1) + ' emblem dada menyimpang dari aset:\n      rig   '
+        + emblem.bars[i] + '\n      aset  ' + asset.bars[i]);
+    }
+  }
+  if (emblem.pad !== asset.pad) throw new Error('bantalan emblem dada menyimpang dari aset');
+});
+
+test('glyph paw di rig hanya SATU: di dada — tangan polos', () => {
+  // Aturan chest-only. Dua instansi glyph di badan berarti seseorang mengembalikan
+  // bantalan tangan (fz-pads) yang sudah dipensiunkan OWNER.
+  const n = (RIG.match(/M12\.6 14/g) || []).length;
+  if (n !== 1) throw new Error('jalur bantalan glyph muncul ' + n + ' kali di rig, harusnya tepat satu (dada)');
+  if (/class="[^"]*fz-pads/.test(RIG)) {
+    throw new Error('kelas fz-pads masih ada di rig; bantalan tangan sudah pensiun');
+  }
+  // Aproksimasi emblem lama (elips rx=10 ry=8) tidak boleh kembali menggantikan glyph asli.
+  if (/rx="10" ry="8"/.test(RIG)) {
+    throw new Error('aproksimasi emblem lama (rx="10" ry="8") masih ada di rig');
+  }
 });
 
 test('tidak ada emoji sebagai bentuk PAW', () => {
