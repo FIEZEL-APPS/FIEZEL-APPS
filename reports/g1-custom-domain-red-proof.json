@@ -1,0 +1,280 @@
+{
+  "schema": "fiezel-g1-custom-domain-red-proof-v1",
+  "generatedAt": "2026-08-28T07:11:31.365Z",
+  "mutations": [
+    {
+      "id": "M1-hostname-tepercaya-dimatikan",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h1)",
+        "(h2)",
+        "(h5)"
+      ],
+      "contohAssertMerah": [
+        "(h1) hostname tepercaya LOLOS tanpa header X-Fiezel-Edge: /health 200, dapat 403",
+        "(h1) /health melaporkan edgeGuardPath:\"custom-domain\", dapat undefined",
+        "(h1) edgeGuard TETAP \"on\" di jalur custom domain (probe hidup membaca field ini)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h1)",
+        "(h2)",
+        "(h5)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h1)",
+        "(h2)",
+        "(h5)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M2-default-allow-hostname-asing",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h4)",
+        "(h6)"
+      ],
+      "contohAssertMerah": [
+        "(h4) hostname asing tanpa header ditolak 403 forbidden_edge, dapat 200",
+        "(h4) DEFAULT-DENY: hostname asing ditolak WALAU header sah, dapat 200",
+        "(h4) bentuk galat hostname asing IDENTIK dengan penolakan workers.dev — gerbang tidak memetakan hostname"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h4)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h4)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M3-workers-dev-diloloskan-tanpa-header",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(a)",
+        "(b)",
+        "(e)",
+        "(f)",
+        "(h3)",
+        "(h4)",
+        "(h6)"
+      ],
+      "contohAssertMerah": [
+        "(a) GET /health tanpa header X-Fiezel-Edge ditolak 403, dapat 200",
+        "(a) galat bernama forbidden_edge",
+        "(a) penolakan tidak membocorkan capabilities"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h3)",
+        "(h6)",
+        "(a)",
+        "(b)",
+        "(e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h3)",
+        "(h6)",
+        "(a)",
+        "(b)",
+        "(e)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M4-health-dibebaskan-dari-gerbang",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(a)",
+        "(b)",
+        "(c)",
+        "(d)",
+        "(e)",
+        "(f)",
+        "(h1)",
+        "(h2)",
+        "(h3)",
+        "(h4)",
+        "(h5)",
+        "(h6)"
+      ],
+      "contohAssertMerah": [
+        "(a) GET /health tanpa header X-Fiezel-Edge ditolak 403, dapat 200",
+        "(a) galat bernama forbidden_edge",
+        "(a) penolakan tidak membocorkan capabilities"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h6)",
+        "(f)",
+        "(d)",
+        "(a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h6)",
+        "(f)",
+        "(d)",
+        "(a)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M5-jalur-tidak-dilaporkan-di-health",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(c)",
+        "(h1)",
+        "(h2)",
+        "(h5)"
+      ],
+      "contohAssertMerah": [
+        "(c) /health melaporkan edgeGuardPath:\"header\" saat lolos lewat jembatan PHP, dapat undefined",
+        "(h1) /health melaporkan edgeGuardPath:\"custom-domain\", dapat undefined",
+        "(h2) jalurnya tetap dilaporkan \"custom-domain\" tanpa secret"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h1)",
+        "(h5)",
+        "(h9)",
+        "(c)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h1)",
+        "(h5)",
+        "(c)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M6-daftar-hostname-menyimpang-dari-wrangler",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h7)"
+      ],
+      "contohAssertMerah": [
+        "(h7) TRUSTED_EDGE_HOSTS == custom_domain di wrangler.toml: kode=[api.fiezel.my.id,api2.fiezel.my.id] toml=[api.fiezel.my.id]"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h7)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h7)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M7-pencocokan-hostname-jadi-substring",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h8)"
+      ],
+      "contohAssertMerah": [
+        "(h8) sufiks jahat (api.fiezel.my.id.jahat.example) BUKAN hostname tepercaya",
+        "(h8) prefiks jahat bukan hostname tepercaya"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h8)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h8)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M8-hostname-dibaca-dari-header-yang-bisa-dipalsukan",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h7)"
+      ],
+      "contohAssertMerah": [
+        "(h7) gerbang tidak pernah membaca hostname dari header yang bisa dipalsukan klien"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h7)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h7)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M9-bentuk-galat-hostname-asing-dibedakan",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h4)"
+      ],
+      "contohAssertMerah": [
+        "(h4) hostname asing tanpa header ditolak 403 forbidden_edge, dapat 403",
+        "(h4) bentuk galat hostname asing IDENTIK dengan penolakan workers.dev — gerbang tidak memetakan hostname"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h4)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h4)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M10-syarat-penghapusan-jalur-header-dihapus-dari-kode",
+      "gate": "edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(h9)"
+      ],
+      "contohAssertMerah": [
+        "(h9) mw-edge.js menulis KAPAN jalur header boleh dihapus"
+      ],
+      "butirDiharapkanJatuh": [
+        "(h9)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(h9)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M11-owner-ikut-meloloskan-hostname",
+      "gate": "owner-edge-guard-test.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(f)"
+      ],
+      "contohAssertMerah": [
+        "(f) penjaga owner TIDAK punya jalur hostname-tepercaya (owner belum custom domain)",
+        "(f) https://owner.fiezel.my.id/login tanpa header edge tetap 403 (owner belum punya jalur hostname), dapat 200",
+        "(f) penolakan owner tetap satu bentuk galat"
+      ],
+      "butirDiharapkanJatuh": [
+        "(f)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(f)"
+      ],
+      "ok": true
+    }
+  ],
+  "pulihSesudahSemuaMutasi": {
+    "edge-guard-test.js": 0,
+    "owner-edge-guard-test.js": 0
+  },
+  "pass": true
+}

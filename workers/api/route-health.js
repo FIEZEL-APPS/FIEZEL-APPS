@@ -17,7 +17,7 @@
  */
 
 import { PROTOCOL, CAPABILITIES } from './schema.js';
-import { edgeGuardStatus } from './mw-edge.js';
+import { edgeGuardStatus, edgeGuardPath } from './mw-edge.js';
 import { jsonResponse } from './errors.js';
 
 export function routeHealth(ctx) {
@@ -37,6 +37,20 @@ export function routeHealth(ctx) {
       // Aman diumumkan di sini justru karena `/health` sendiri ikut dilindungi
       // gerbang: pembacanya sudah lewat jembatan.
       edgeGuard: edgeGuardStatus(ctx.env),
+      // JALUR yang benar-benar dipakai permintaan ini untuk lolos gerbang edge:
+      //   'custom-domain' = tiba di hostname tepercaya (`api.fiezel.my.id`)
+      //                     TANPA header — jalur UTAMA sesudah zona Cloudflare
+      //                     aktif dan custom domain menggantikan jembatan PHP;
+      //   'header'        = tiba lewat proxy PHP dengan `X-Fiezel-Edge` sah —
+      //                     jalur CADANGAN selama cache DNS lama masih ada;
+      //   'off'           = mode transisi eksplisit (tidak ada penegakan).
+      // Dipisah dari `edgeGuard` dengan sengaja: `edgeGuard` adalah kontrak
+      // on/off yang sudah dibaca `tools/fiezel-health-probe.mjs` dan
+      // `staging-live-test.js`, sedangkan field ini menjawab pertanyaan yang
+      // berbeda — "lewat mana permintaan ini masuk" — supaya keadaan nyata
+      // terbaca dan pembongkaran jembatan tidak perlu ditebak. Aman diumumkan
+      // di sini karena `/health` sendiri ikut dilindungi gerbang.
+      edgeGuardPath: edgeGuardPath(ctx),
       // Waktu SERVER. Klien tidak boleh menghitung reset kuota dari jamnya
       // sendiri (cf-b2 §5): itu yang membuat cooldown 24 jam hari ini bisa
       // dihapus hanya dengan membersihkan localStorage.

@@ -5,6 +5,52 @@
 > **Sifatnya SEMENTARA.** Bagian "PEMBONGKARAN" di bawah bukan lampiran — ia adalah
 > alasan direktori ini boleh ada.
 
+## 🔄 TEMUAN LAPANGAN 28 Agu 2026 — JEMBATAN `api` KINI **JALUR CADANGAN**, BUKAN JALUR UTAMA
+
+STATUS BERUBAH. Yang sudah terverifikasi di DNS publik dan di Cloudflare:
+
+- Nameserver `fiezel.my.id` **sudah pindah ke Cloudflare** (`dig NS` menjawab
+  `sydney.ns.cloudflare.com` / `syeef.ns.cloudflare.com`, SOA `dns.cloudflare.com`).
+- Worker `fiezel-api` **sudah terikat sebagai custom domain** ke `api.fiezel.my.id`
+  (record `AAAA 100::` proxied + sertifikat edge terbit).
+- Status zona di dashboard Cloudflare **masih `pending`** — verifikasi otomatisnya
+  belum jalan, dan token yang tersedia bagi agen tidak punya izin memicunya. Jadi
+  tanggal "aktif" **belum bisa diklaim dari sini**; yang bisa diklaim hanya bahwa
+  pengikatannya sudah ada.
+
+Konsekuensi yang harus dibaca sebelum menyentuh apa pun di direktori ini:
+
+| | Sebelum 28 Agu 2026 | Sekarang |
+|---|---|---|
+| Jalur permintaan murid | browser → **PHP `api-index.php`** → `*.workers.dev` | browser → **Worker langsung** (custom domain) |
+| Header `X-Fiezel-Edge` | ADA di setiap permintaan | **TIDAK ADA** di jalur utama |
+| Peran `deploy/edge/` | JALUR UTAMA | **JALUR CADANGAN** (hanya dipakai permintaan yang masih memegang cache DNS lama) |
+| Penjaga di Worker | header saja | **hostname tepercaya ATAU header**, hostname lain default-deny |
+
+`workers/api/mw-edge.js` sudah menyesuaikan diri **tanpa mematikan pagarnya**: hostname
+tepercaya (`TRUSTED_EDGE_HOSTS`, satu sumber kebenaran, wajib sama dengan
+`custom_domain` di `workers/api/wrangler.toml`) lolos tanpa header; `*.workers.dev`
+**tetap 403** tanpa header; hostname yang tidak dikenal **ditolak walau headernya sah**.
+`/health` melaporkan jalur yang benar-benar dipakai lewat field baru
+`edgeGuardPath`: `"custom-domain"` (utama), `"header"` (cadangan), `"off"` (transisi).
+Field lama `edgeGuard` **tetap** `"on"`/`"off"` karena probe hidup
+(`tools/fiezel-health-probe.mjs`, `staging-live-test.js`) menilai `!== "on"` sebagai
+KRITIS.
+
+Cara membaca keadaan nyata, bukan menebaknya:
+
+```bash
+curl -s https://api.fiezel.my.id/health | grep -o '"edgeGuardPath":"[a-z-]*"'
+# "custom-domain" = sudah lewat Cloudflare langsung (jembatan TIDAK dipakai)
+# "header"        = masih lewat PHP di origin ArenHost (cache DNS lama)
+```
+
+**Jangan mencabut jembatan ini sampai jawaban di atas konsisten `custom-domain`**
+untuk periode pengamatan penuh. Sisi `owner` **belum menjadi custom domain** sama
+sekali — `owner.fiezel.my.id` masih 100% bergantung pada `owner-index.php`, dan
+penjaga owner **sengaja tidak** punya jalur hostname-tepercaya
+(`owner-edge-guard-test.js` butir (f) menjaga asimetri itu).
+
 ## Isi
 
 | Berkas | Dipasang di | Keterangan |
@@ -651,6 +697,30 @@ diklaim di sini. Status yang benar sampai master menjalankan 5e.4 adalah
 
 Jembatan ini **harus dibongkar**, bukan dibiarkan menua. Urutannya penting: setiap
 langkah aman untuk dibatalkan sampai langkah 5.
+
+> **🔄 28 Agu 2026 — langkah 1 dan 2 sudah SEBAGIAN dijalankan.** Nameserver sudah di
+> Cloudflare dan custom domain `api.fiezel.my.id` sudah terikat ke Worker, tetapi zona
+> masih `pending` sehingga langkah 3 dan sesudahnya **BELUM boleh** dijalankan. Urutan
+> yang masih berlaku ada di bawah; yang berubah hanya titik mulainya.
+>
+> **Daftar periksa penghapusan jalur header `X-Fiezel-Edge` (semua wajib benar):**
+> 1. zona `fiezel.my.id` berstatus **Active**;
+> 2. `dig +short A api.fiezel.my.id` hanya menjawab IP Cloudflare (bukan
+>    `195.88.211.212`) lebih lama dari TTL record lama;
+> 3. `curl -s https://api.fiezel.my.id/health` melaporkan
+>    `"edgeGuardPath":"custom-domain"` secara konsisten, **nol** `"header"`;
+> 4. `workers_dev = false` sudah ter-deploy (`*.workers.dev` mati secara struktural);
+> 5. `deploy/edge/api-index.php` sudah dicabut dari origin.
+>
+> Sesudah kelimanya benar: hapus jalur header di `workers/api/mw-edge.js`
+> (`EDGE_HEADER`, `ctEq`, `edgeSecret`, mode `off`) **dan** hapus var
+> `ALLOW_NO_EDGE_SECRET` dari konfigurasi — **dihapus, bukan disetel `"false"`**;
+> var yang masih ada akan dianggap sah oleh gerbang berikutnya. Lalu hapus Secret
+> `EDGE_SHARED_SECRET` di kedua Worker. Yang **tetap tinggal**: penegakan hostname
+> (`TRUSTED_EDGE_HOSTS`) dan `EDGE_FREE_PATHS = ['/healthz']`.
+>
+> **KEPUTUSANNYA MILIK OWNER**, dieksekusi MASTER (`MASTER-ONLY-GOVERNANCE.md`) —
+> bukan oleh paket kerja yang kebetulan sedang menyentuh berkas ini.
 
 1. **Tunggu zona `fiezel.my.id` berstatus `Active`** di Cloudflare (bukan
    `pending`), dan semua curl verifikasi `docs/CF-MIGRATION-RUNBOOK.md` Bagian 1(f)

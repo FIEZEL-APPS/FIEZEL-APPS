@@ -565,6 +565,46 @@ function proxyForward(workerHeaders, list) {
       '(e) index.js menyatakan mode off hanya sah selama masa transisi dan bukan mode produksi');
   }
 
+  /* ==================================================================================
+   * (f) 🔄 TEMUAN LAPANGAN 28 Agu 2026 — ASIMETRI API vs OWNER (BAGIAN INI BARU).
+   *
+   * `api.fiezel.my.id` SUDAH terikat sebagai custom domain Worker, sehingga
+   * `workers/api/mw-edge.js` kini meloloskan HOSTNAME TEPERCAYA tanpa header.
+   * `owner.fiezel.my.id` BELUM: ia masih subdomain cPanel + `owner-index.php`.
+   * Karena itu penjaga owner TIDAK BOLEH ikut-ikutan meloloskan hostname — kalau
+   * ikut, dashboard owner terbuka di sebuah hostname yang belum pernah berdiri di
+   * Cloudflare dan belum dilindungi Cloudflare Access. Asimetri ini disengaja,
+   * dan gerbang inilah yang menjaganya tetap disengaja.
+   * ================================================================================ */
+  {
+    assert(!/TRUSTED_EDGE_HOSTS|isTrustedEdgeHost/.test(indexSource),
+      '(f) penjaga owner TIDAK punya jalur hostname-tepercaya (owner belum custom domain)');
+
+    // Permintaan yang tiba di hostname owner "resmi" TANPA header tetap 403:
+    // satu-satunya jalur sah owner hari ini adalah proxy PHP + header.
+    for (const host of ['https://owner.fiezel.my.id', 'https://fiezel-owner.fitrajft.workers.dev']) {
+      const res = await mod.handle(new Request(host + '/login'), makeEnv(), {}, NOW);
+      assert(res.status === 403,
+        '(f) ' + host + '/login tanpa header edge tetap 403 (owner belum punya jalur hostname), dapat ' + res.status);
+      const body = await res.clone().text();
+      assert(/forbidden_edge|Permintaan ini harus lewat/.test(body) || res.status === 403,
+        '(f) penolakan owner tetap satu bentuk galat');
+    }
+
+    // Dan header sah tetap SATU-SATUNYA pembuka lapis pertama owner.
+    const viaHeader = await mod.handle(
+      makeRequest('/login', { headers: { 'x-fiezel-edge': EDGE_SECRET } }), makeEnv(), {}, NOW);
+    assert(viaHeader.status === 200,
+      '(f) jalur header sah tetap membuka lapis pertama owner, dapat ' + viaHeader.status);
+
+    // Dokumen wajib menyatakan asimetrinya, supaya orang berikutnya tidak
+    // "menyelaraskan" kedua penjaga tanpa tahu owner belum punya hostname.
+    assert(/CADANGAN|cadangan/.test(readmeSource),
+      '(f) README menyatakan jembatan PHP kini jalur CADANGAN untuk `api`');
+    assert(/owner[^\n]*belum[^\n]*custom domain|belum menjadi custom domain/i.test(readmeSource),
+      '(f) README menyatakan `owner` BELUM custom domain (asimetri dengan `api`)');
+  }
+
   /* ---------- README pemasangan + pembongkaran ---------------------------------------- */
   {
     for (const [pattern, label] of [
