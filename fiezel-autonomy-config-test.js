@@ -46,7 +46,7 @@ function check(name,ok,details){if(ok){pass++}else{fail++;console.error(`FAIL ${
   const c1=sanitizeConfig({autonomyLevel:'advisory'});
   const c2=sanitizeConfig({autonomyLevel:'advisory'});
   check('deterministic',JSON.stringify(c1)===JSON.stringify(c2),'differs');
-  check('default thresholds pinned',JSON.stringify(c1.thresholds)===JSON.stringify({minExposureSessions:3,minControlAttempts:8,minCanaryAttempts:8,minCanaryAccuracy:70,maxCanaryRegressionPp:5,minPostPromotionAttempts:5,minPostPromotionAccuracy:60,maxPostPromotionRegressionPp:10}),JSON.stringify(c1.thresholds));
+  check('default thresholds pinned',JSON.stringify(c1.thresholds)===JSON.stringify({minExposureSessions:3,minControlAttempts:8,minCanaryAttempts:8,minCanaryAccuracy:70,maxCanaryRegressionPp:5,minNPerArm:25,minPostPromotionAttempts:5,minPostPromotionAccuracy:60,maxPostPromotionRegressionPp:10}),JSON.stringify(c1.thresholds));
 }
 console.log(`FIEZEL Autonomy Config: ${pass} PASS / ${fail} FAIL`);
 process.exitCode=fail?1:0;
