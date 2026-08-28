@@ -2,7 +2,7 @@
   "schema": "fiezel-listening-exam-v1",
   "schemaVersion": "1.0.0",
   "version": "1.0.0",
-  "count": 6,
+  "count": 8,
   "honesty": "FIEZEL tidak memprediksi band IELTS atau skor TOEFL. Audio dihasilkan text-to-speech dari skrip orisinal, bukan rekaman ujian asli: satu suara untuk semua pembicara, dan tanpa ragam aksen yang dipakai ujian sebenarnya. Yang dilatih di sini bentuk soal, tekanan sekali dengar, dan mencatat - bukan pembiasaan aksen.",
   "audioSource": {
     "kind": "tts_original_script",
@@ -686,6 +686,221 @@
       ],
       "wordCount": 625,
       "questionCount": 6
+    },
+    {
+      "id": "lx-ielts-s2-v2",
+      "exam": "ielts_listening_s2",
+      "level": "B1",
+      "title": "Pengarahan anggota baru museum kota",
+      "script": "You will hear a member of staff welcoming new members to a city museum.\n\nGood morning, everyone, and welcome. My name is Dewi, and I run the membership desk, so if you forget everything else I say today, just remember my name and come and find me.\n\nLet me start with the building. The museum has three floors. The ground floor is where you'll spend most of your time at first. The main gallery is there, straight ahead of you as you come in, and it holds the permanent collection — the objects that are always here. The children's discovery room is on the ground floor too, at the back of the building, behind the stairs, away from the entrance noise. It's the one room where the objects are meant to be handled, so nobody will tell your children off for touching things in there.\n\nThe first floor is for temporary exhibitions. Those change three or four times a year. Your membership covers them — you don't pay anything extra — but at busy times you may still need a timed ticket, which you can pick up at the front desk on your way in.\n\nThe second floor is staff only, I'm afraid. That's where the stores are, and most of the collection — far more than we can show at once — lives up there. If there's an object you've read about and you'd like to see it, please don't go up. Ask at the front desk instead, and we'll arrange a viewing for you, usually within about two weeks.\n\nNow, your card. As a member you come in free, as often as you like, and you can bring two guests with you each month at half price. The card itself takes about a week to arrive in the post. Until it does, the welcome letter you received today works as a temporary card, so keep it in your bag.\n\nA few practical things. Photography is allowed everywhere except the temporary exhibitions, but never with a flash. Large bags have to go in the lockers beside the cloakroom, on the right as you come in. The lockers take a coin, and you get the coin back when you open them again.\n\nOpening hours. We're open from nine in the morning until five in the evening, every day except Mondays. And there's one more exception: on the first Tuesday of every month we open late, at one o'clock, because the morning is used for cleaning the galleries. People forget this all the time, so write it down now.\n\nFinally, the one rule I'm strict about. Your membership card is yours and nobody else's. Please don't lend it to anyone — not to your sister, not to your best friend, not to anyone at all. Every card is checked against a name at the desk, and every year somebody stands in front of me, embarrassed, with a borrowed card we've had to keep. If a friend loves the museum, bring them in as one of your monthly guests — or better still, make them a member.",
+      "questions": [
+        {
+          "id": "lx-s2v2-1",
+          "type": "multiple_choice",
+          "answerType": "choice",
+          "prompt": "How many guests can a member bring each month at half price?",
+          "options": [
+            "Four",
+            "One",
+            "Two",
+            "Three"
+          ],
+          "answerIndex": 2,
+          "explain": "\"You can bring two guests with you each month at half price.\" Bukan gratis - setengah harga."
+        },
+        {
+          "id": "lx-s2v2-2",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where is the children's discovery room?",
+          "options": [
+            "At the back of the ground floor, behind the stairs",
+            "On the first floor",
+            "On the second floor",
+            "Beside the cloakroom"
+          ],
+          "answerIndex": 0,
+          "explain": "\"At the back of the building, behind the stairs\" - satu-satunya ruangan yang bendanya memang boleh disentuh."
+        },
+        {
+          "id": "lx-s2v2-3",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What should members do to see an object kept in the stores?",
+          "options": [
+            "Go up to the second floor",
+            "Buy a timed ticket",
+            "Wait for a temporary exhibition",
+            "Ask at the front desk to arrange a viewing"
+          ],
+          "answerIndex": 3,
+          "explain": "Lantai dua khusus staf - jangan naik; minta di meja depan dan viewing diatur sekitar dua minggu."
+        },
+        {
+          "id": "lx-s2v2-4",
+          "type": "location",
+          "answerType": "choice",
+          "prompt": "Where are the lockers for large bags?",
+          "options": [
+            "Behind the main gallery",
+            "Beside the cloakroom, on the right as you come in",
+            "At the membership desk",
+            "On the first floor"
+          ],
+          "answerIndex": 1,
+          "explain": "\"Beside the cloakroom, on the right as you come in.\" Koinnya kembali saat lokernya dibuka lagi."
+        },
+        {
+          "id": "lx-s2v2-5",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "What happens on the first Tuesday of every month?",
+          "options": [
+            "The museum is closed all day",
+            "Members' cards are checked",
+            "Entry is free for everyone",
+            "The museum opens late, at one o'clock"
+          ],
+          "answerIndex": 3,
+          "explain": "Selasa pertama tiap bulan buka siang pukul satu karena paginya galeri dibersihkan. Jebakannya: yang tutup sepanjang hari itu hari Senin."
+        },
+        {
+          "id": "lx-s2v2-6",
+          "type": "attitude",
+          "answerType": "choice",
+          "prompt": "What is the one rule the speaker says she is strict about?",
+          "options": [
+            "Members must never lend their card to anyone",
+            "Photography is never allowed",
+            "Children must not touch the objects",
+            "Guests must pay full price"
+          ],
+          "answerIndex": 0,
+          "explain": "\"Your membership card is yours and nobody else's.\" Kartu pinjaman akan ditahan di meja depan."
+        }
+      ],
+      "wordCount": 508,
+      "questionCount": 6
+    },
+    {
+      "id": "lx-ielts-s4-v2",
+      "exam": "ielts_listening_s4",
+      "level": "C2",
+      "title": "Kuliah: kina dan monopoli obat malaria",
+      "script": "You will hear part of a lecture on the history of quinine production.\n\nFor about three hundred years, the only reliable treatment for malaria came from one source: the bark of the cinchona tree, which grows wild on the eastern slopes of the Andes, in South America. The bark was ground into a bitter powder, and later the active compound — quinine — was extracted from it directly. Whoever controlled the bark, in other words, controlled the treatment of the deadliest disease on Earth. It would be reasonable to assume that South America, holding the trees, held that control indefinitely. It did not, and the way it lost that control is the subject of today's lecture.\n\nBy the middle of the nineteenth century, the colonial powers of Europe had an enormous appetite for quinine, because their empires ran through malarial country, and both the British and the Dutch tried to solve the problem the same way: take the tree out of the Andes and grow it on plantations in Asia. The British planted extensively in India. The Dutch planted in the highlands of Java. And here is the first twist in the story: for years, both projects were failures — not because the trees died, but because they lived. They grew perfectly well. Their bark simply contained almost no quinine. The species the Europeans had managed to obtain were, pharmacologically speaking, the wrong trees.\n\nThe turning point came in eighteen sixty-five, when an English trader named Charles Ledger obtained a quantity of seed from a variety with an extraordinarily high quinine content. He offered the seeds to the British government, which — and one savours the irony — declined them. So Ledger sold them to the Dutch, for a modest sum, and the Dutch planted them in Java. That single purchase turned out to be one of the most consequential bargains of the nineteenth century. The Ledger variety thrived in the volcanic soil of the Javanese highlands, and its bark was many times richer in quinine than anything the British had planted.\n\nI should pause here for a small digression, though it is a telling one. The Indonesian word for the tree is kina — and that word is not Dutch, and it is not Malay in origin. It descends from the old Quechua name the tree carried in the Andes. The plant crossed the world, changed hands, changed continents — and kept its name the whole way. Languages, like bark, preserve things.\n\nNow, concentration. By the nineteen-thirties, the plantations of Java supplied roughly ninety percent of the world's quinine. Ninety percent — of the only effective malaria drug — from the highlands of one island. A cartel based in Amsterdam set the world price. One is tempted to call this a triumph of agricultural planning, and in a sense it was. But a supply that concentrated is not strength. It is exposure, wearing strength's clothes.\n\nThe exposure was demonstrated in nineteen forty-two, when Japan occupied Java and the Allied powers lost, at a single stroke, almost the entire world supply. Soldiers were fighting in the most malarial regions on the planet with no access to the drug. The response was a crash programme of chemistry: within a few years, synthetic substitutes had been developed and manufactured at scale, and quinine's monopoly was over — permanently.\n\nSo what should you carry out of this lecture? Not the dates, and not the botany. Carry the shape of the argument: a monopoly built on a living crop, in a single place, is a monopoly waiting for a single bad year — or a single bad war. Concentration looks like power until the day it becomes the precise mechanism of collapse.",
+      "questions": [
+        {
+          "id": "lx-s4v2-1",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "For centuries, the drug was extracted from the tree's ______.",
+          "accept": [
+            "bark",
+            "the bark"
+          ],
+          "explain": "\"The bark of the cinchona tree\" - obatnya diambil dari kulit kayunya, bukan daun atau akarnya."
+        },
+        {
+          "id": "lx-s4v2-2",
+          "type": "detail",
+          "answerType": "choice",
+          "prompt": "Why were the early British and Dutch plantations failures?",
+          "options": [
+            "The trees died in the Asian climate",
+            "The trees grew well but their bark contained almost no quinine",
+            "Local farmers refused to plant them",
+            "The seeds were stolen before they could be planted"
+          ],
+          "answerIndex": 1,
+          "explain": "\"Not because the trees died, but because they lived.\" Pohonnya subur - kandungan kuininnya yang nyaris nol."
+        },
+        {
+          "id": "lx-s4v2-3",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "The turning point came in ______, when Ledger obtained the seeds.",
+          "accept": [
+            "1865",
+            "eighteen sixty five",
+            "eighteen sixtyfive",
+            "eighteen sixty-five"
+          ],
+          "explain": "\"The turning point came in eighteen sixty-five.\" Di lembar jawaban, tulis 1865.",
+          "spokenAs": "eighteen sixty-five"
+        },
+        {
+          "id": "lx-s4v2-4",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "After the British declined them, Ledger sold the seeds to the ______.",
+          "accept": [
+            "dutch",
+            "the dutch",
+            "dutch government",
+            "the dutch government",
+            "netherlands",
+            "the netherlands",
+            "netherlands government",
+            "holland"
+          ],
+          "explain": "Inggris menolak benihnya - \"one savours the irony\" - lalu Ledger menjualnya murah ke Belanda."
+        },
+        {
+          "id": "lx-s4v2-5",
+          "type": "organization",
+          "answerType": "choice",
+          "prompt": "Why does the lecturer mention the Indonesian word \"kina\"?",
+          "options": [
+            "To correct a common mispronunciation",
+            "To show how strongly Dutch shaped Indonesian",
+            "To show the tree kept its Andean name as it crossed the world",
+            "To explain how quinine got its chemical name"
+          ],
+          "answerIndex": 2,
+          "explain": "Digresi itu menunjukkan nama Quechua dari Andes ikut menyeberang bersama pohonnya - \"languages, like bark, preserve things\"."
+        },
+        {
+          "id": "lx-s4v2-6",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "By the 1930s, Java supplied roughly ______ percent of the world's quinine.",
+          "accept": [
+            "90",
+            "ninety",
+            "90 percent",
+            "ninety percent",
+            "90 per cent",
+            "ninety per cent"
+          ],
+          "explain": "\"Roughly ninety percent\" - sembilan puluh persen pasokan dunia dari dataran tinggi satu pulau."
+        },
+        {
+          "id": "lx-s4v2-7",
+          "type": "note_completion",
+          "answerType": "completion",
+          "prompt": "After 1942, a crash programme of chemistry produced ______ substitutes for quinine.",
+          "accept": [
+            "synthetic"
+          ],
+          "explain": "\"Synthetic substitutes had been developed and manufactured at scale\" - dan monopoli kuinin tamat permanen."
+        },
+        {
+          "id": "lx-s4v2-8",
+          "type": "gist",
+          "answerType": "choice",
+          "prompt": "What does the lecturer most want the audience to take away?",
+          "options": [
+            "A monopoly concentrated in one place looks like power until it becomes the mechanism of collapse",
+            "The exact dates of the quinine trade",
+            "That the British government made a historic mistake",
+            "How synthetic drugs are manufactured"
+          ],
+          "answerIndex": 0,
+          "explain": "\"Carry the shape of the argument\" - konsentrasi tampak seperti kekuatan sampai hari ia menjadi mekanisme keruntuhannya sendiri."
+        }
+      ],
+      "wordCount": 610,
+      "questionCount": 8
     }
   ]
 }

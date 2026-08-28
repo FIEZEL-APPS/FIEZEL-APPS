@@ -49,10 +49,11 @@ export const MANIFEST_PATH = path.join(ROOT, 'audio/manifest-tts-v2.json');
 
 /** Angka kanonik cf-c1 §K1, dimutakhirkan m025-177: bank listening tumbuh +109 karakter
  * (414.779 -> 414.888; perbaikan konten skip-integrity-repair), total 604.962 -> 605.071,
+ * lalu m025-188 gen2 (+100 kosakata C1 kurasi: word+example masuk korpus) total 605.071 -> 614.055,
  * pending dedup 286.851 -> 286.876 (objek tetap 5.657). Dipaku supaya penyimpangan korpus
  * berikutnya terlihat sebagai gagal uji, bukan lolos diam-diam. */
 export const CANONICAL = Object.freeze({
-  totalChars: 605071,
+  totalChars: 614055,
   byDomain: Object.freeze({ listening: 414888, book: 101749, vocabulary_word: 13602, vocabulary_example: 74832 }),
   usdPer1kChars: 0.015,
   bytesPerChar: 925,
@@ -61,8 +62,8 @@ export const CANONICAL = Object.freeze({
   // Sesudah dedup kunci v2: 6.640 baris bank ⇒ 5.657 objek unik yang BELUM ada di R2,
   // 286.876 karakter. Ini angka yang benar-benar akan dibayar pada jalan pertama; 604.962
   // adalah ukuran korpus, bukan tagihan. Keduanya dipaku supaya pergeseran bank terlihat.
-  uniqueObjectsPending: 5657,
-  pendingChars: 286876,
+  uniqueObjectsPending: 5857,
+  pendingChars: 295860,
   // Estimasi durasi audio. INI ESTIMASI, bukan pengukuran: 14,5 karakter/detik ≈ 175 kata/menit
   // pada 5,9 karakter/kata, kecepatan bicara aura yang biasa. Dipakai hanya untuk memberi owner
   // rasa "berapa jam audio yang ia beli", tidak dipakai untuk menghitung biaya apa pun.
