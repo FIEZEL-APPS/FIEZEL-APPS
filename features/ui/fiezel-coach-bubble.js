@@ -90,8 +90,14 @@
   /** Wajah PAW. Maskot memakai kelasnya SENDIRI (fz-coach-mascot), bukan
    *  fz-coach-face - style.css memaku fz-coach-face ke 30px/22px untuk ikon
    *  paw, dan ukuran itu salah untuk maskot yang perlu dipotong ke kepalanya. */
+  /** I11 (O3 §6, P0-2): maskot DIJEPIT ke wadahnya lewat style inline. Tanpa ini
+   *  <fiezel-mascot> memakai ukuran alaminya dari fiezel-motion.css (.fz-mascot
+   *  width:200px, terukur 96x90 di FAB 58x58) dan meluber menutupi CTA Speaking
+   *  serta tab Peta. Inline dipilih karena style.css milik agen lain; 100%/100%
+   *  mengikuti wadah mana pun (FAB 58/46px, avatar panel 38px), dan SVG di dalamnya
+   *  menskalakan lewat viewBox tanpa distorsi. */
   function pawFace(fallbackClass) {
-    if (pawReady()) return '<fiezel-mascot class="fz-coach-mascot" aria-hidden="true"></fiezel-mascot>';
+    if (pawReady()) return '<fiezel-mascot class="fz-coach-mascot" style="width:100%;height:100%" aria-hidden="true"></fiezel-mascot>';
     return '<span class="fz-i ' + String(fallbackClass || '') + '" aria-hidden="true">' + icon('paw') + '</span>';
   }
 
@@ -101,6 +107,22 @@
    *  mengenal :has() tidak kebagian kuning-di-atas-kuning. */
   function pawHost(baseClass) {
     return baseClass + (pawReady() ? ' has-mascot' : '');
+  }
+
+  /** I11: mode pelajaran aktif (layar tanpa gangguan, O1-004). style.css sudah
+   *  menyembunyikan gelembung+peek di bawah body.fz-lesson-mode; modulnya sendiri
+   *  tidak boleh diam-diam membuka panel atau menyapa di baliknya - termasuk di
+   *  layar hasil, yang tetap ber-lesson-mode sampai go(). Sumber kebenarannya
+   *  ekspor FiezelStage.lessonMode() (app.js), kelas body sebagai cadangan. */
+  function lessonActive() {
+    try {
+      var stage = global.FiezelStage;
+      if (stage && typeof stage.lessonMode === 'function') return stage.lessonMode() === true;
+    } catch (_) {}
+    try {
+      return !!(doc.body && doc.body.classList && typeof doc.body.classList.contains === 'function'
+        && doc.body.classList.contains('fz-lesson-mode'));
+    } catch (_) { return false; }
   }
 
   /** Memanggil corong maskot tanpa pernah melempar. Reaksi gerak tidak boleh
@@ -299,7 +321,12 @@
     sheet.innerHTML =
       '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="Pembimbing FIEZEL">' +
         '<div class="fz-coach-head">' +
-          '<span class="' + pawHost('fz-coach-avatar') + '">' + pawFace('fz-coach-face') + '</span>' +
+          /* I11 (O3 §6): kepala panel lahir dengan IKON statis, bukan <fiezel-mascot>.
+           * Instance maskot kedua yang dulu dipasang di sini hidup permanen 0x0 di balik
+           * sheet[hidden] - timer blink/idle-nya tetap berjalan (bocor). Maskotnya kini
+           * dipasang saat panel DIBUKA dan dibongkar saat ditutup (lihat mount/unmount
+           * di bawah); disconnectedCallback maskot membersihkan semua timernya. */
+          '<span class="fz-coach-avatar"><span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span></span>' +
           '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>' +
           '<button type="button" class="fz-coach-close" aria-label="Tutup">✕</button>' +
         '</div>' +
@@ -358,6 +385,7 @@
     }
 
     function showPeek(text) {
+      if (lessonActive()) return; /* I11: tidak menyapa di atas pelajaran atau layar hasil */
       if (sheet.hidden === false) return;
       peek.textContent = oneLine(text);
       peek.hidden = false;
@@ -365,10 +393,29 @@
       peekTimer = setTimeout(function () { peek.hidden = true; }, PEEK_MS);
     }
 
+    /* I11: pasang/bongkar wajah maskot kepala panel mengikuti buka/tutupnya sheet,
+     * supaya tidak ada instance 0x0 yang hidup diam-diam di balik panel tertutup. */
+    function mountAvatarFace() {
+      var avatar = sheet.querySelector('.fz-coach-avatar');
+      if (!avatar) return;
+      if (pawReady() && !avatar.querySelector('.fz-coach-mascot')) {
+        avatar.className = pawHost('fz-coach-avatar');
+        avatar.innerHTML = pawFace('fz-coach-face');
+      }
+    }
+    function unmountAvatarFace() {
+      var avatar = sheet.querySelector('.fz-coach-avatar');
+      if (!avatar || !avatar.querySelector('.fz-coach-mascot')) return;
+      avatar.className = 'fz-coach-avatar';
+      avatar.innerHTML = '<span class="fz-i fz-coach-face" aria-hidden="true">' + icon('paw') + '</span>';
+    }
+
     function open() {
+      if (lessonActive()) return; /* I11: panel tidak pernah membuka di atas pelajaran/hasil */
       peek.hidden = true;
       sheet.hidden = false;
       doc.body.classList.add('fz-coach-open');
+      mountAvatarFace();
       // Wajah di kepala panel adalah marka KEDUA, dan ia memang baru muncul detik ini.
       born(sheet.querySelector('.fz-coach-avatar'));
       // Panel baru dibuka: maskot menyapa sekali. 'onboard' dipilih, bukan setState
@@ -383,6 +430,7 @@
     function close() {
       sheet.hidden = true;
       doc.body.classList.remove('fz-coach-open');
+      unmountAvatarFace(); /* I11: instance maskot panel dibongkar, tidak bocor 0x0 */
     }
 
     async function ask(question) {
@@ -432,6 +480,22 @@
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input.value); }
     });
     doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
+
+    /* I11 (O1-004): saat mode pelajaran MENYALA - stage kuis/sesi dimulai - panel yang
+     * sedang terbuka ditutup dan sapaan yang sedang tampil dibungkam, supaya tidak ada
+     * lapisan pembimbing yang tersisa/berpindah di atas soal maupun layar hasil. Pengamatnya
+     * opsional: tanpa MutationObserver, penjaga lessonActive() di open/showPeek tetap ada. */
+    try {
+      if (typeof global.MutationObserver === 'function' && doc.body) {
+        var lessonWatch = new global.MutationObserver(function () {
+          if (!lessonActive()) return;
+          if (!sheet.hidden) close();
+          peek.hidden = true;
+          clearTimeout(peekTimer);
+        });
+        lessonWatch.observe(doc.body, { attributes: true, attributeFilter: ['class'] });
+      }
+    } catch (_) {}
 
     var api = {
       open: open,

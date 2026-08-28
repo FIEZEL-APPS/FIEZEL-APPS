@@ -413,7 +413,11 @@ check('S12 · finishQuiz menyambungkan ujian dan placement ke level trust', /lev
   'hasil ujian dan hasil placement sama-sama tersimpan sebagai bukti');
 
 const homeBlock = sourceBlock('home');
-check('S13 · Home menampilkan banner mode percobaan / terkunci', /activeLevelTrustMarkup\(\)/.test(homeBlock),
+/* 2026-08-29 overhaul I12 (O6 #5, O1-005): banner trust 200px di Home diciutkan menjadi baris
+   activeLevelTrustLineMarkup() — status tetap tampil tanpa membuka panel level (niat asli S13),
+   tapi tombol primernya pindah ke CTA hero supaya Home tidak pernah punya dua tombol primer.
+   Assertion diperluas STRUKTURAL (menerima varian Line), tidak dihapus. */
+check('S13 · Home menampilkan status mode percobaan / terkunci', /activeLevelTrust(Line)?Markup\(\)/.test(homeBlock),
   'murid harus tahu statusnya tanpa harus membuka panel level');
 
 const copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
