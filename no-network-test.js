@@ -417,8 +417,52 @@ const e2eProblems = [];
 check('Gerbang E2E browser memenuhi syarat env-gated (baca env, SKIP bersih, tanpa URL bawaan)',
   e2eProblems.length === 0, e2eProblems.join(' | ') || '0');
 
-// Catatan jujur: pemindaian berkas di atas tidak menjangkau `tools/**`. Blok 2c hanya
-// menutup SATU berkas di sana yang memang menembak jaringan atas kehendak sendiri.
+/* =======================================================================================
+ * 2d. Pembukti AI live di tools/ — sama kelasnya dengan 2c, dan LEBIH mahal
+ * =====================================================================================
+ * `tools/ai-live-verify.mjs` menembak `POST /api/ai/task` di Worker HIDUP dan setiap tipe
+ * task adalah SATU panggilan model sungguhan. Ia lolos seluruh pemindaian di atas karena
+ * alasan kebetulan yang sama dengan 2c (ada di `tools/`, berakhiran `.mjs`), jadi ia juga
+ * diperiksa dengan syarat yang DIJALANKAN.
+ *
+ * Bedanya dari 2c bukan gaya, tapi akibat: kalau berkas ini bocor ke jalur per-push, setiap
+ * commit siapa pun membelanjakan jatah neuron AKUN Cloudflare (10.000/hari untuk SELURUH
+ * akun) dan menghabiskan kuota harian sebuah identitas murid. Karena itu dua hal di-assert
+ * bersamaan di bawah: ia SKIP bersih tanpa env, DAN di `quality.yml` ia hanya ada sebagai
+ * langkah `workflow_dispatch` bergerbang aktor.
+ */
+const AI_LIVE_GATE = 'tools/ai-live-verify.mjs';
+const AI_LIVE_ENV_VAR = 'FIEZEL_AI_LIVE_BASE';
+const aiLiveProblems = [];
+{
+  const abs = path.join(root, AI_LIVE_GATE);
+  if (!fs.existsSync(abs)) {
+    aiLiveProblems.push(AI_LIVE_GATE + ' tidak ada di repo');
+  } else {
+    const code = stripComments(fs.readFileSync(abs, 'utf8'));
+    if (!code.includes(AI_LIVE_ENV_VAR)) aiLiveProblems.push(AI_LIVE_GATE + ' tidak membaca ' + AI_LIVE_ENV_VAR);
+    if (/\|\|\s*['"`]https?:\/\//.test(code)) aiLiveProblems.push(AI_LIVE_GATE + ' punya URL remote sebagai nilai bawaan');
+    const probe = require('child_process').spawnSync(process.execPath, [abs], {
+      cwd: root,
+      encoding: 'utf8',
+      timeout: 30000,
+      env: Object.assign({}, process.env, { [AI_LIVE_ENV_VAR]: '' })
+    });
+    if (probe.status !== 0) aiLiveProblems.push(AI_LIVE_GATE + ' tidak exit 0 tanpa ' + AI_LIVE_ENV_VAR + ' (exit=' + probe.status + ')');
+    if (!/SKIP/.test(String(probe.stdout || ''))) aiLiveProblems.push(AI_LIVE_GATE + ' tidak mencetak label SKIP tanpa ' + AI_LIVE_ENV_VAR);
+    // SKIP wajib jujur: exit 0 dengan `pass:null`, bukan `pass:true`. Alat berbayar yang
+    // melaporkan dirinya LULUS tanpa pernah memanggil apa pun adalah cara termudah
+    // membangun kepercayaan palsu pada "AI sudah terbukti hidup".
+    if (/"pass"\s*:\s*true/.test(String(probe.stdout || ''))) {
+      aiLiveProblems.push(AI_LIVE_GATE + ' mengaku pass saat SKIP');
+    }
+  }
+}
+check('Pembukti AI live memenuhi syarat env-gated (baca env, SKIP bersih, tanpa URL bawaan)',
+  aiLiveProblems.length === 0, aiLiveProblems.join(' | ') || '0');
+
+// Catatan jujur: pemindaian berkas di atas tidak menjangkau `tools/**`. Blok 2c dan 2d
+// menutup DUA berkas di sana yang memang menembak jaringan atas kehendak sendiri.
 /* =======================================================================================
  * 3. Gerbang ini terdaftar di CI
  * ===================================================================================== */
@@ -433,6 +477,19 @@ check('Self-test E2E browser terdaftar di quality.yml, gerbang live browser-nya 
 check('Gerbang live dan self-test-nya terdaftar di quality.yml',
   workflow.includes('node cf-live-contract-test.js') && workflow.includes('node cf-live-selftest.js'),
   'quality.yml');
+// Pembukti AI live BOLEH ada di quality.yml, tapi HANYA di dalam langkah bergerbang aktor +
+// `workflow_dispatch`. Diperiksa di sumber: potongan langkah yang memanggilnya wajib membawa
+// `if:` itu. `workflow-actor-gate-test.js` cek (H) memeriksa hal yang sama dari sisi lain,
+// jadi mencabut gerbangnya memerahkan dua gerbang, bukan satu.
+{
+  const langkah = workflow.split(/^      - name: /m).slice(1)
+    .filter((blok) => blok.includes('node ' + AI_LIVE_GATE));
+  const bergerbang = langkah.filter((blok) =>
+    /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==/.test(blok));
+  check('Pembukti AI live hanya jalan lewat workflow_dispatch bergerbang aktor (bukan tiap push)',
+    langkah.length === 1 && bergerbang.length === 1,
+    'langkah=' + langkah.length + ' bergerbang=' + bergerbang.length);
+}
 // F5: dua assert di bawah ini DULU memeriksa kalimat komentar literal ("SKIP sampai owner
 // menyetel base URL") sebagai bukti bahwa langkah live mati secara bawaan. Itu proksi yang
 // lemah dari dua arah: komentar bisa benar sementara mekanismenya salah (dan memang begitu
