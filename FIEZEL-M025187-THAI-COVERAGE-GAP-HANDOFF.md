@@ -65,6 +65,90 @@ nilai kanon `id` yang benar-benar terdaftar lewat `registerCopy('id', …)`:
 
 ---
 
+## 1b. P0 — MURID TH TIDAK BISA MASUK TES PENEMPATAN SAMA SEKALI
+
+**Gejala owner:** murid th menekan Tes Level (25 soal), muncul toast
+`Placement blueprint shortfall C1/vocab: 0/1`. Tes tidak pernah mulai. Ini BUKAN masalah
+terjemahan — ini logika yang rusak untuk aksara non-Latin, dan ia lebih gawat dari 594
+literal di atas karena memblokir seluruh permukaan asesmen.
+
+### Akar masalah — satu baris
+
+`app.js:309`
+
+```js
+const value = key.toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+```
+
+`norm()` membuang SEMUA karakter di luar `[a-z0-9 ]`. Untuk teks Thai hasilnya
+**string kosong**. `norm()` dipakai 62 kali di `app.js` dan berdiri tepat di jalur asesmen:
+
+- `validateQuestion` (`app.js:772`): `if(opts.some(x=>!x) || new Set(opts).size!==opts.length)`
+  → **`duplicate/empty options`**. Empat pilihan arti Thai semuanya ter-normalisasi jadi `''`
+  → satu kosong dan empat duplikat sekaligus. Setiap soal vocab th ditolak.
+- `sigQ()` (`app.js:313`): tanda tangan soal ikut kosong → dedupe `seen` menganggap semua
+  soal vocab th sebagai soal yang sama.
+- `makeVocabQuestion` (`app.js:6297–6315`): `uniqueByNorm`, `ownMeaningKey`, `glossesOf`,
+  `sharesGloss` — seluruh pemilihan pengecoh bekerja di atas string kosong.
+- `buildPlacement` (`app.js:6915`): kandidat habis tanpa satu pun lolos →
+  `throw new Error('Placement blueprint shortfall …')` → `startPlacement` menangkapnya dan
+  hanya menampilkan toast. Murid tidak punya jalan masuk.
+
+### Kenapa yang dilaporkan C1, bukan A1
+
+Diverifikasi terhadap data nyata (`vocabulary-master.json` + `vocabulary-th.json`, 1.765 entri
+dengan padanan Thai LENGKAP 100% — datanya tidak salah):
+
+| Level | Kandidat | Gloss th yang `norm()`-nya tidak kosong | Gloss unik | Butuh |
+|---|---:|---:|---:|---:|
+| A1 | 217 | 4 | 4 | 3 |
+| A2 | 310 | 2 | 2 | 2 |
+| B1 | 519 | 2 | 2 | 2 |
+| B2 | 576 | 5 | 4 | 2 |
+| **C1** | **42** | **0** | **0** | **1** |
+| **C2** | **101** | **0** | **0** | **1** |
+
+Hanya **13 dari 1.765** gloss Thai yang selamat, dan semata karena kebetulan memuat pecahan
+Latin di dalam kurungan — mis. `are = เป็น; อยู่; คือ (รูปของ 'to be' สำหรับ 'you/we/they')`
+→ `norm()` → `"to be you we they"`. Itu sisa sampah, bukan arti. Band A1–B2 lolos secara
+kebetulan lewat serpihan ini; C1 dan C2 tidak punya satu pun, jadi **C1 adalah titik henti
+keras pertama**. Artinya: angka `0/1` di pesan galat itu bukan kekurangan data, melainkan
+`norm()` yang menghapus seluruh bank.
+
+### Radius ledakan di luar placement
+
+- Seluruh sesi vocab th (latihan harian, review, adaptif) memakai `makeVocabQuestion` +
+  `validateQuestion` yang sama.
+- `contentIntegrityGate` → `contentLanguageFrame` (`app.js:735`) menghitung kata id vs en di
+  atas `norm()`; teks Thai selalu `'neutral'`, jadi gerbang belahan bahasa **buta total** untuk
+  th — persis gerbang yang seharusnya menangkap kolase tiga bahasa.
+- `features/search/fiezel-search.js:82` memakai pola `[^a-z0-9'/\s-]` yang sama → indeks
+  pencarian th ikut kosong.
+
+### Yang WAJIB dikerjakan (masuk prompt sebagai W5-0, sebelum gelombang lain)
+
+1. Jadikan `norm()` sadar-Unicode. Pertahankan lipatan huruf besar/kecil dan pembuangan tanda
+   baca, tapi **simpan huruf Thai**: pakai kelas properti Unicode (`\p{L}\p{N}` dengan flag
+   `u`) alih-alih daftar putih `a-z0-9`. Verifikasi memo `NORM_MEMO` tetap benar.
+2. Buktikan `norm()` untuk teks Indonesia menghasilkan keluaran **byte-identik** dengan hari
+   ini — ia menyentuh dedupe, pemilihan pengecoh, dan gerbang integritas; perubahan diam-diam
+   di jalur id akan menggeser soal murid Indonesia. Ini syarat lulus, bukan catatan kaki.
+3. `contentLanguageFrame`: tambahkan pengenalan kerangka Thai supaya gerbang belahan bahasa
+   hidup untuk th, bukan sekadar berhenti menolak.
+4. Selaraskan `fiezel-search.js:82` dengan pola yang sama.
+5. Gerbang baru `th-placement-test.js`: rakit `buildPlacement()` di bawah locale th dengan
+   dataset asli dan tuntut 25 soal terbangun penuh, blueprint terpenuhi di **keenam** band.
+   Merah bila ada band yang shortfall. Tanpa gerbang ini, tidak ada yang mencegahnya kembali.
+6. Sapu jalur asesmen lain untuk asumsi aksara Latin yang sejenis: `speaking-listening`
+   `normalizeText` (`:182`), `listening-quality.js:23`, `fiezel-prosody.js:183`. Tentukan mana
+   yang memang HARUS Latin (penilaian ucapan bahasa Inggris — biarkan) dan mana yang menilai
+   teks murid (perbaiki). Tulis keputusannya per berkas, jangan diseragamkan.
+
+**Prioritas: W5-0 mendahului W5-A sampai W5-D.** Menerjemahkan tombol tidak ada gunanya
+selama murid th tidak bisa masuk ke sesi asesmen mana pun.
+
+---
+
 ## 2. PROMPT UNTUK AI DEV THAI
 
 > Salin blok di bawah utuh sebagai instruksi kerja.
@@ -106,6 +190,30 @@ HUKUM BESI (melanggar = tolak PR, ini bukan preferensi)
    header setiap berkas th baru, seperti yang sudah dilakukan grammar-explanations-th.
 
 GELOMBANG KERJA (satu PR per gelombang, tiap PR hijau penuh sebelum lanjut)
+Urutan wajib: W5-0 lebih dulu. Menerjemahkan tombol tidak ada gunanya selama murid th
+tidak bisa masuk ke sesi asesmen mana pun.
+
+W5-0 · P0 PEMBLOKIR — murid th tidak bisa masuk tes penempatan (KERJAKAN DULUAN)
+  Gejala: toast "Placement blueprint shortfall C1/vocab: 0/1"; tes 25 soal tidak pernah mulai.
+  Akar: app.js:309 norm() membuang semua karakter di luar [a-z0-9 ], jadi SETIAP gloss Thai
+  menjadi string kosong. validateQuestion (app.js:772) lalu menolak tiap soal vocab th dengan
+  'duplicate/empty options', buildPlacement (app.js:6915) kehabisan kandidat dan melempar.
+  Hanya 13 dari 1.765 gloss th yang selamat — semata karena memuat pecahan Latin di dalam
+  kurungan; C1 dan C2 tidak punya satu pun, karena itu C1 titik henti keras pertama.
+  Datanya TIDAK salah: vocabulary-th.json menutup 1.765/1.765 entri.
+  Kerjakan:
+   1. norm() sadar-Unicode (\p{L}\p{N} + flag u), huruf Thai dipertahankan; NORM_MEMO tetap benar.
+   2. BUKTIKAN keluaran norm() untuk teks Indonesia byte-identik dengan sekarang — ia menyentuh
+      dedupe sigQ, pemilihan pengecoh, dan contentIntegrityGate; pergeseran diam-diam di jalur
+      id menggeser soal murid Indonesia. Ini syarat lulus.
+   3. contentLanguageFrame (app.js:735) kenali kerangka Thai — sekarang teks th selalu
+      'neutral', jadi gerbang belahan bahasa buta persis untuk locale yang paling butuh.
+   4. features/search/fiezel-search.js:82 pakai pola yang sama; indeks pencarian th ikut kosong.
+   5. Gerbang baru th-placement-test.js: buildPlacement() di locale th wajib merakit 25 soal
+      penuh, blueprint terpenuhi di keenam band, merah bila ada shortfall.
+   6. Sapu asumsi aksara Latin sejenis di jalur asesmen lain: speaking-listening normalizeText
+      (:182), listening-quality.js:23, fiezel-prosody.js:183. Putuskan per berkas mana yang
+      memang harus Latin (penilaian ucapan Inggris) dan mana yang menilai teks murid.
 
 W5-A · Permukaan murid dengan NOL i18n — prioritas tertinggi, dampak terbesar
   1. grammar-labels-id.js (130) → ekstrak ke copy-id-grammar-labels.js +
