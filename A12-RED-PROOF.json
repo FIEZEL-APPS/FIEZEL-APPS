@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-a12-red-proof-v1",
-  "semuaMerah": true,
+  "semuaMerah": false,
   "pulihHijau": true,
   "matrix": [
     {
@@ -53,9 +53,10 @@
     },
     {
       "cacat": "D3b keluaran kosong ditolak tapi kuota TIDAK dikembalikan",
-      "gerbang": "ai-response-shape-test.js",
-      "exit": 1,
-      "merah": true
+      "gerbang": "-",
+      "exit": "PATCH_TIDAK_COCOK",
+      "merah": false,
+      "jangkar": "var rolledBackQ = quotaChecked && releaseQuota(deps, {"
     }
   ],
   "sesudahPemulihan": [
