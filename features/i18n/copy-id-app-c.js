@@ -324,6 +324,318 @@
     // app.js:5808 — vocab(): tombol flashcards
     'vocab.buka-flashcards': 'Buka flashcards',
     // app.js:5935 — startVocabQuiz: toast kosong
-    'vocab.quiz-kosong': 'Vocabulary {level} belum tersedia.'
+    'vocab.quiz-kosong': 'Vocabulary {level} belum tersedia.',
+
+    // ---------- W2-REGEN: entri tunda gelombang regen baseline ----------
+    // app.js:5791 — startAdaptive: toast belum tes
+    'adaptif.toast-belum-tes': 'Latihan terbuka setelah tes awal selesai.',
+    // app.js:5802 — startAdaptive: toast mulai
+    'adaptif.toast-mulai': '{judul} · {jumlah} soal',
+    // app.js:5791 — startAdaptive: toast pool kurang
+    'adaptif.toast-pool-kurang': 'Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.',
+    // app.js:5222 — accountSettingsMarkup: judul kartu
+    'akun.judul': 'Akun Puter',
+    // app.js:5222 — accountSettingsMarkup: keterangan kartu
+    'akun.keterangan': 'Progres belajar, streak, dan tutor AI tersimpan di akun ini.',
+    // app.js:5222 — accountSettingsMarkup: sub belum
+    'akun.sub-belum': 'Belum ada akun tersambung',
+    // app.js:5222 — accountSettingsMarkup: sub tersambung
+    'akun.sub-tersambung': 'Tersambung di perangkat ini',
+    // app.js:4949 — runBackupImport: catatan gabung
+    'backup.catatan-gabung': 'Progres di perangkat ini tidak dibuang. Materi yang ada di kedua sisi diambil yang paling maju.',
+    // app.js:4931 — runBackupExport: sukses
+    'backup.dibuat': 'berkas {nama} dibuat. Simpan di tempat yang kamu percaya.',
+    // app.js:4911 — continuitySettingsMarkup: judul
+    'backup.judul': 'Backup dan pemulihan',
+    // app.js:4911 — continuitySettingsMarkup: keterangan
+    'backup.keterangan': 'Berkas terenkripsi yang kamu simpan sendiri. FIEZEL tidak mengirimnya ke mana pun.',
+    // app.js:4912 — continuitySettingsMarkup: label sandi
+    'backup.label-sandi': 'Kata sandi backup (minimal 8 karakter)',
+    // app.js:4913 — continuitySettingsMarkup: peringatan sandi
+    'backup.peringatan-sandi': 'Kalau kata sandi ini hilang, backup tidak bisa dibuka lagi. FIEZEL tidak menyimpan salinannya.',
+    // app.js:4912 — continuitySettingsMarkup: placeholder sandi
+    'backup.placeholder-sandi': 'Kata sandi untuk membuka berkas ini',
+    // app.js:4944 — runBackupImport: pratinjau baru
+    'backup.pv-baru': 'Jawaban baru',
+    // app.js:4947 — runBackupImport: pratinjau lokal
+    'backup.pv-lokal': 'Hanya di perangkat ini',
+    // app.js:4963 — confirmRestore: selesai
+    'backup.selesai': 'selesai. Riwayat {sebelum} menjadi {sesudah} jawaban.',
+    // app.js:4844 — unifiedSkillsMarkup: fallback
+    'diag.belum-tersambung': 'Bukti Speaking dan Listening belum tersambung ke peta ini.',
+    // app.js:4846 — unifiedSkillsMarkup: baris kosong
+    'diag.no-practice': 'Belum ada latihan tercatat',
+    // app.js:4861 — unifiedSkillsMarkup: paragraf penutup
+    'diag.penutup': 'Skor latihan dan cakupan target adalah dua hal berbeda: yang satu seberapa baik hasilnya, yang lain seberapa banyak materinya sudah disentuh. FIEZEL tidak menilai pengucapan, dan tidak menyimpan rekaman suara atau transkrip.',
+    // app.js:4856 — unifiedSkillsMarkup: latihan tercatat
+    'diag.practice-logged': 'Latihan tercatat',
+    // app.js:4853 — unifiedSkillsMarkup: header skor
+    'diag.practice-score': ' · skor latihan',
+    // app.js:5900 — flashcards: eyebrow arti
+    'flash.arti': 'ARTI',
+    // app.js:5900 — flashcards: tombol dengar kalimat
+    'flash.dengar-kalimat': 'Dengar kalimat',
+    // app.js:5900 — flashcards: tombol dengar kata
+    'flash.dengar-kata': 'Dengar kata',
+    // app.js:5900 — flashcards: petunjuk geser
+    'flash.geser': 'Geser ke kiri atau kanan untuk berpindah kartu',
+    // app.js:5894 — flashcards: toast kosong
+    'flash.kosong': 'Belum ada vocabulary {level} yang siap dipelajari.',
+    // app.js:5900 — flashcards: fonetik fallback
+    'flash.pelafalan-kosong': 'Pelafalan belum tersedia',
+    // app.js:5900 — baris status kartu flashcard
+    'flash.status': 'Status: {status}',
+    // app.js:5900 — status kartu: sedang dipelajari
+    'flash.status-learning': 'Sedang dipelajari',
+    // app.js:5900 — status kartu: dikuasai
+    'flash.status-mastered': 'Dikuasai',
+    // app.js:5900 — status kartu: baru
+    'flash.status-new': 'Baru',
+    // app.js:5900 — flashcards: tombol masih belajar
+    'flash.still-learning': 'Masih belajar',
+    // app.js:5900 — flashcards: tombol dikuasai
+    'flash.sudah-dikuasai': 'Sudah dikuasai',
+    // app.js:5900 — flashcards: tombol tanya AI
+    'flash.tanya-ai': 'Tanya AI',
+    // app.js:5900 — flashcards: petunjuk flip belakang
+    'flash.tap-back': 'Ketuk untuk kembali ke kata',
+    // app.js:5900 — flashcards: petunjuk flip depan
+    'flash.tap-meaning': 'Ketuk untuk melihat arti',
+    // app.js:5892 — flashcards: toast level terkunci
+    'flash.terkunci': 'Flashcards dikunci ke level {level}.',
+    // app.js:4677 — home: sapaan belum kenal
+    'home.belum-kenal': 'Aku belum kenal kamu. Coba tes singkat dulu, ya.',
+    // app.js:4679 — home: CTA placement
+    'home.cari-level': 'Cari tahu level kamu',
+    // app.js:4702 — home: kartu classroom terkunci
+    'home.classroom-tutup': 'Classroom belum dibuka — coming soon',
+    // app.js:4692 — home: kartu grammar
+    'home.kartu-grammar': '{jumlah} lesson · {level}',
+    // app.js:4699 — home: kartu perpustakaan
+    'home.kartu-perpus': '9 buku · audiobook',
+    // app.js:4693 — home: kartu reading
+    'home.kartu-reading': '{jumlah} bacaan · {level}',
+    // app.js:4703 — home: kartu skills
+    'home.kartu-skills': '72 latihan · A1–C2',
+    // app.js:4691 — home: kartu vocab
+    'home.kartu-vocab': '{jumlah} kata · {level}',
+    // app.js:4676 — home: label strip coach fallback
+    'home.kata-fiezel': 'Kata FIEZEL',
+    // app.js:4647 — homeStatStripMarkup: keping runtun
+    'home.keping-streak': 'Runtun',
+    // app.js:4648 — homeStatStripMarkup: keping harian
+    'home.keping-today': 'Hari ini',
+    // app.js:4658 — home: tombol konteks level
+    'home.konteks-level': '{level} · semua materi · ganti',
+    // app.js:4680 — home: tombol detail
+    'home.lihat-detail': 'Lihat detail',
+    // app.js:4689 — home: tautan peta
+    'home.lihat-peta': 'Lihat peta belajar',
+    // app.js:4658 — home: meta baris atas
+    'home.meta-tanggal': 'FIEZEL PERSONAL · {tanggal}',
+    // app.js:4679 — home: CTA utama
+    'home.mulai-sesi': 'Mulai sesi ini',
+    // app.js:4689 — home: judul seksi fokus
+    'home.pilih-fokus': 'Pilih fokus hari ini',
+    // app.js:4677 — ringkasan sesi rekomendasi coach
+    'home.ringkas-sesi': '{skill} · {items} soal · ±{menit} menit',
+    // app.js:4702 — home: tag segera
+    'home.segera': 'SEGERA',
+    // app.js:4676 — home: label strip coach
+    'home.sesi-next': 'Sesi berikutnya · dipilih Paw',
+    // app.js:4614 — skillHubMarkup: fallback belum diukur
+    'home.skill-belum-diukur': 'Belum diukur · mulai di sini',
+    // app.js:4813 — journeyMarkup: estimasi hari
+    'journey.estimasi': '{items} soal, kira-kira {menit} menit',
+    // app.js:4826 — home-fold: ringkasan peta
+    'journey.fold-peta': 'Peta belajar',
+    // app.js:4830 — home-fold: ringkasan target
+    'journey.fold-target': 'Target kamu · {label}',
+    // app.js:4799 — journeyMarkup: judul seksi
+    'journey.judul': 'Rencana kamu',
+    // app.js:4802 — journeyMarkup: label minggu
+    'journey.minggu-ini': 'MINGGU INI',
+    // app.js:4814 — pesan recovery rencana harian
+    'journey.recovery': 'Sengaja pendek hari ini biar kamu selesai{ekor}.',
+    // app.js:4814 — ekor recovery bila ada hari libur
+    'journey.recovery-away': ', soalnya {days} hari kamu libur',
+    // app.js:4815 — journeyMarkup: CTA
+    'journey.start-today': 'Mulai hari ini',
+    // app.js:4804 — journeyMarkup: target misi
+    'journey.target-misi': '{days} hari · {items} soal',
+    // app.js:4811 — journeyMarkup: target belum
+    'journey.target-pending': 'Lima jawaban bermakna menjaga progres tetap terukur.',
+    // app.js:4811 — journeyMarkup: target tercapai
+    'journey.target-tercapai': 'Target bermakna hari ini tercapai.',
+    // app.js:4760 — setGoalProfile: toast
+    'journey.toast-tujuan': 'Tujuan belajar: {label}',
+    // app.js:4808 — journeyMarkup: label hari
+    'journey.today': 'HARI INI',
+    // app.js:5371 — renderClassroom: penunjuk bagian
+    'kelas.bagian': 'Bagian {idx} dari {total}',
+    // app.js:5382 — renderClassroom: judul halaman
+    'kelas.judul': 'Belajar dengan suara Inggris + subtitle Indonesia',
+    // app.js:5370 — tombol lanjut segmen classroom
+    'kelas.next': 'Lanjut',
+    // app.js:5377 — renderClassroom: penunjuk soal
+    'kelas.q-index': 'Soal {idx} dari {total}',
+    // app.js:5377 — renderClassroom: remediasi
+    'kelas.remediasi': ' · coba lagi setelah penjelasan',
+    // app.js:5370 — renderClassroom: tombol ulangi suara
+    'kelas.replay-audio': 'Ulangi suara',
+    // app.js:5379 — renderClassroom: skor
+    'kelas.skor': 'Skor {persen}%',
+    // app.js:5379 — renderClassroom: rincian skor
+    'kelas.skor-rinci': '{right} benar dari {total} soal.',
+    // app.js:5370 — tombol mulai latihan classroom
+    'kelas.start-practice': 'Mulai latihan',
+    // app.js:5382 — renderClassroom: sub judul
+    'kelas.sub-judul': 'Pilih materi dulu, lalu Fiezel menerangkan di level {level}.',
+    // app.js:5364 — renderClassroom: topik kosong
+    'kelas.topik-kosong': 'Topik untuk kategori ini belum tersedia.',
+    // app.js:5380 — renderClassroom: tombol topik lain
+    'kelas.topik-lain': 'Pilih topik lain',
+    // app.js:4318 — kalimat penutup CTA ujian
+    'level.all-proven': 'Semua level sudah kamu buktikan.',
+    // app.js:4292 — levelControlMarkup: aria-label tombol
+    'level.aria-ganti': 'Ganti level belajar',
+    // app.js:4318 — CTA saat semua level terverifikasi (badge=examBadge)
+    'level.badge-c2': '{badge} sampai C2',
+    // app.js:4415 — levelGuardWarn: tombol lanjut
+    'level.continue-practice': 'Lanjut latihan',
+    // app.js:4318 — openLevelPanel: rincian CTA ujian
+    'level.cta-rincian': '{jumlah} soal · grammar {grammar}, kosakata {vocab}, bacaan {bacaan} · lulus {lulus}%',
+    // app.js:4444 — openDemotionModal: paragraf kunci
+    'level.demosi-terkunci': 'Level {from} dan semua level di atas {verif} terkunci sampai kamu lulus {judul}.',
+    // app.js:4481 — buildLevelExamQuestions: Error bank kurang
+    'level.err-bank-kurang': 'Bank ujian {level}/{tipe} baru punya {ada} dari {butuh} soal.',
+    // app.js:4527 — openActiveLevelExamPanel: fakta 2
+    'level.fakta-acak': 'Soal diacak dari bank level {level} setiap percobaan',
+    // app.js:4527 — openActiveLevelExamPanel: fakta 4
+    'level.fakta-jeda': 'Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh',
+    // app.js:4527 — openActiveLevelExamPanel: fakta 1
+    'level.fakta-komposisi': '{jumlah} soal: grammar {grammar}, kosakata {vocab}, bacaan {bacaan}',
+    // app.js:4527 — openActiveLevelExamPanel: fakta 3
+    'level.fakta-lulus': 'Lulus mulai {lulus}% · tanpa petunjuk, tanpa percobaan kedua',
+    // app.js:4518 — levelExamSettle: pesan gagal
+    'level.gagal-skor': ' Skor kamu {skor}/{total} ({akurasi}%), lulusnya mulai {lulus}%.',
+    // app.js:4292 — levelControlMarkup: sub-label
+    'level.ganti': 'Ganti',
+    // app.js:4319 — openLevelPanel: judul modal
+    'level.judul-panel': 'Pilih level belajar',
+    // app.js:4415 — levelGuardWarn: judul modal
+    'level.judul-warn': 'Level {level} · salah {miss}/{batas}',
+    // app.js:4292 — levelControlMarkup: label tombol
+    'level.label-tombol': 'Level belajar',
+    // app.js:4514 — levelExamSettle: pesan lulus (sambungan)
+    'level.pass-next': ' Ujian {level} sudah kebuka kalau mau lanjut.',
+    // app.js:4319 — openLevelPanel: paragraf modal
+    'level.penjelasan-panel': 'Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.',
+    // app.js:4319 — openLevelPanel: sumber level (placement)
+    'level.sumber-placement': 'Saat ini mengikuti hasil placement: <b>{placement}</b>. Level terverifikasi: <b>{verif}</b>.',
+    // app.js:4296 — setActiveLevel: toast sukses
+    'level.toast-aktif': 'Level belajar aktif: {level}',
+    // app.js:4522 — toast semua level terverifikasi
+    'level.toast-c2': '{badge} sampai C2 — tidak ada level yang perlu diuji lagi.',
+    // app.js:4489 — startLevelExam: toast cooldown
+    'level.toast-cooldown': '{judul} {level} bisa diulang {jeda}.',
+    // app.js:4428 — levelGuardDemote: toast ditahan saat kuis
+    'level.toast-demosi': 'Kita mundur ke {level} dulu — semua progresmu tetap tersimpan.',
+    // app.js:4496 — startLevelExam: toast mulai ujian
+    'level.toast-mulai-ujian': '{judul} {level} · {jumlah} soal tanpa petunjuk',
+    // app.js:4414 — levelGuardWarn: toast peringatan
+    'level.toast-warn': 'Salah {miss} dari {batas} di {level}. PAW menemani.',
+    // app.js:4318 — openLevelPanel: tombol cooldown
+    'level.tombol-cooldown': 'Bisa diulang {jeda}',
+    // app.js:4024 — openFeedback: tombol batal
+    'masukan.batal': 'Batal',
+    // app.js:4024 — openFeedback: judul modal
+    'masukan.judul': 'Kirim masukan',
+    // app.js:4024 — openFeedback: tombol kirim
+    'masukan.kirim': 'Kirim',
+    // app.js:4024 — openFeedback: label textarea
+    'masukan.label-pesan': 'Pesan',
+    // app.js:4024 — openFeedback: paragraf modal
+    'masukan.penjelasan': 'Materi yang belum ada, soal yang keliru, atau apa pun yang mengganggu. Tidak ada data belajarmu yang ikut terkirim.',
+    // app.js:4024 — openFeedback: placeholder textarea
+    'masukan.placeholder': 'Contoh: belum ada materi tentang passive voice bentuk lampau.',
+    // app.js:5756 — showPrasastiMoment: catatan
+    'prasasti.catatan': 'Terukir dari bukti belajarmu. Lihat semuanya di Peta Belajar.',
+    // app.js:5789 — prasastiGalleryMarkup: catatan galeri
+    'prasasti.catatan-galeri': 'Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.',
+    // app.js:5756 — showPrasastiMoment: tombol simpan
+    'prasasti.simpan': 'Simpan di galeri',
+    // app.js:4735 — ritual: baris runtun
+    'ritual.streak': 'Runtun {days} hari — jaga nyalanya.',
+    // app.js:4998 — installHealthReportMarkup: catatan privasi
+    'sehat.catatan-privasi': 'Pemeriksaan ini hanya melihat keadaan pemasangan aplikasi. Tidak ada riwayat jawaban atau isi belajar yang dibaca.',
+    // app.js:5003 — refreshInstallHealth: gagal
+    'sehat.gagal': 'Pemeriksaan instalasi tidak bisa diselesaikan di perangkat ini.',
+    // app.js:4885 — academicReadinessMarkup: fallback error
+    'siap.gagal-tampil': 'Peta kesiapan akademik belum bisa ditampilkan.',
+    // app.js:4882 — academicReadinessMarkup: h4 reading
+    'siap.h-reading': 'Jalur reading akademik',
+    // app.js:4884 — academicReadinessMarkup: h4 kosakata
+    'siap.h-vocab': 'Jalur kosakata IT dan kampus',
+    // app.js:4882 — academicReadinessMarkup: keterangan jalur
+    'siap.ket-jalur': '{jumlah} bacaan bertema sains, lingkungan, dan teknologi dari bank yang sudah ada.',
+    // app.js:5460 — skillsLab: badge
+    'skills.badge': 'SKILL INTI TES',
+    // app.js:5460 — skillsLab: catatan level
+    'skills.catatan-level': 'Level aktif: <b>{level}</b> · atur dari tombol Level belajar',
+    // app.js:5460 — skillsLab: lead hub
+    'skills.lead-hub': 'Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.',
+    // app.js:5460 — skillsLab: memuat bank
+    'skills.memuat': 'Memuat bank latihan…',
+    // app.js:5234 — neuralVoiceStatusMarkup: keterangan subtitle
+    'suara.ket-subtitle': 'Setiap kalimat Inggris dibacakan dan diberi subtitle Indonesia di bawahnya. Tidak ada yang perlu diunduh.',
+    // app.js:5518 — writing(): badge topik
+    'tulis.badge-topik': 'TOPIK {level} · {done}/{goal} minggu ini',
+    // app.js:5632 — writingFormChecklist: di bawah batas ujian
+    'tulis.cek-bawah-batas': '{kata} kata, di bawah batas {label} ({min}). Di ujian aslinya ini kena penalti sebelum isinya dinilai.',
+    // app.js:5651 — writingLocalReview: judul kartu offline
+    'tulis.cek-judul': 'Cek bentuk FIEZEL (offline)',
+    // app.js:5651 — writingLocalReview: keterangan offline
+    'tulis.cek-keterangan': 'Ini pemeriksaan BENTUK terhadap kriteria rubrik, bukan penilaian bahasa dan bukan skor. Dua kriteria terakhir memang tidak bisa dihitung tanpa membaca - itu bagian AI.',
+    // app.js:5642 — writingFormChecklist: klausa kompleks
+    'tulis.cek-klausa': 'Terhitung {klausa} penanda klausa kompleks dan kalimat terpanjang {terpanjang} kata. Ketepatannya hanya bisa dinilai dengan membaca - itu bagian AI.',
+    // app.js:5633 — writingFormChecklist: kurang dari target
+    'tulis.cek-kurang': '{kata} kata, masih {kurang} kata di bawah target {goal}.',
+    // app.js:5644 — writingFormChecklist: nada/ejaan
+    'tulis.cek-nada': 'Nada dan ejaan tidak bisa dihitung dari bentuk. Minta masukan AI untuk bagian ini.',
+    // app.js:5637 — writingFormChecklist: paragraf kurang
+    'tulis.cek-paragraf-kurang': 'Baru {jumlah} paragraf. Esai ujian biasanya butuh pembuka, isi yang terbagi, dan penutup.',
+    // app.js:5636 — writingFormChecklist: paragraf cukup
+    'tulis.cek-paragraf-ok': '{jumlah} paragraf - strukturnya sudah terbaca.',
+    // app.js:5634 — writingFormChecklist: target terpenuhi
+    'tulis.cek-penuh': '{kata} kata, target {goal} terpenuhi.',
+    // app.js:5651 — writingLocalReview: tersimpan minggu ini
+    'tulis.cek-tersimpan': 'Tersimpan sebagai latihan minggu ini ({done}/{goal}).',
+    // app.js:5577 — requestWritingFeedback: disclosure
+    'tulis.disclosure': 'Tulisan dan konteks tugas yang kamu kirim diproses oleh Core AI. Jangan masukkan data pribadi.',
+    // app.js:5588 — requestWritingFeedback: kartu gagal AI
+    'tulis.gagal-ai': 'Masukan AI belum bisa diambil.',
+    // app.js:5513 — writing(): halaman kosong
+    'tulis.kosong': 'Belum ada topik writing untuk level {level}.',
+    // app.js:5515 — writing(): badge + lead
+    'tulis.lead': 'Tulis dulu apa adanya. Rapihnya urusan nanti - yang penting jadi.',
+    // app.js:5920 — reviewVocab: toast kosong
+    'ulangan.kosong': 'Belum ada review yang jatuh tempo.',
+    // app.js:4527 — openActiveLevelExamPanel: tombol nanti
+    'umum.nanti-dulu': 'Nanti dulu',
+    // app.js:5808 — vocab(): catatan ganti level
+    'vocab.ganti-level': 'Ganti level dari tombol di atas.',
+    // app.js:5808 — vocab(): keterangan mastered
+    'vocab.ket-mastered': '{jumlah} mastered · bank level lain tetap tersimpan, tetapi tidak ditampilkan.',
+    // app.js:5808 — vocab(): kosong
+    'vocab.kosong': 'Belum tersedia untuk level ini.',
+    // app.js:5808 — vocab(): hitungan kata
+    'vocab.n-kata': '{jumlah} kata',
+    // app.js:5808 — vocab(): tombol review
+    'vocab.review-due': ' Review Due ({jumlah})</button>',
+    // app.js:5808 — vocab(): subjudul shell
+    'vocab.subjudul': '{jumlah} kata level {level}. Semua latihan mengikuti level belajar aktif.',
+    // app.js:5808 — vocab(): tombol uji
+    'vocab.uji': ' Uji Vocabulary {level}</button>'
   });
 }());

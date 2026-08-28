@@ -709,6 +709,170 @@
     // app.js:655 — PART_OF_SPEECH_ID.pronoun
     'vocab.jenis-kata-pronoun': 'kata ganti',
     // app.js:655 — PART_OF_SPEECH_ID.verb
-    'vocab.jenis-kata-verb': 'kata kerja'
+    'vocab.jenis-kata-verb': 'kata kerja',
+
+    // ---------- W2-REGEN: entri tunda gelombang regen baseline ----------
+    // app.js:323 — GRAMMAR_FAMILY_RULES.advanced_grammar
+    'grammar.aturan-keluarga-advanced-grammar': 'Baca makna kalimat secara utuh sebelum melihat bentuknya. Pada pola tingkat lanjut, penekanan, urutan kejadian, dan hubungan antarklausa sama pentingnya dengan rumus.',
+    // app.js:316 — GRAMMAR_FAMILY_RULES.articles_determiners
+    'grammar.aturan-keluarga-articles-determiners': 'Perhatikan apakah benda yang dibicarakan masih umum, sudah jelas, dapat dihitung, tunggal, atau jamak. Dari situ baru tentukan a, an, the, atau penentu lain.',
+    // app.js:322 — GRAMMAR_FAMILY_RULES.comparison
+    'grammar.aturan-keluarga-comparison': 'Pastikan jumlah hal yang dibandingkan. Comparative dipakai untuk dua hal, sedangkan superlative dipakai untuk memilih satu dari kelompok yang lebih besar.',
+    // app.js:313 — GRAMMAR_FAMILY_RULES.conditionals
+    'grammar.aturan-keluarga-conditionals': 'Kalimat pengandaian punya pasangan bentuk yang berbeda. Tentukan dulu apakah situasinya fakta, masih mungkin terjadi, hanya bayangan, atau sudah terlambat diubah.',
+    // app.js:324 — GRAMMAR_FAMILY_RULES.core_grammar
+    'grammar.aturan-keluarga-core-grammar': 'Mulai dari subjek, kata kerja utama, dan waktu kejadian. Setelah itu, cocokkan bentuk yang membuat makna kalimat lengkap dan wajar.',
+    // app.js:326 — GRAMMAR_FAMILY_RULES.emphasis_inversion
+    'grammar.aturan-keluarga-emphasis-inversion': 'Inversi mengubah urutan biasa untuk memberi penekanan. Perhatikan kata pemicu di awal kalimat dan auxiliary yang harus mengikuti.',
+    // app.js:320 — GRAMMAR_FAMILY_RULES.error_correction
+    'grammar.aturan-keluarga-error-correction': 'Cari inti subjek dan kata kerjanya lebih dulu, lalu periksa tense, agreement, artikel, dan susunan kata. Ubah hanya bagian yang memang salah.',
+    // app.js:318 — GRAMMAR_FAMILY_RULES.gerunds_infinitives
+    'grammar.aturan-keluarga-gerunds-infinitives': 'Sebagian kata kerja diikuti bentuk -ing, sebagian lain diikuti to ditambah kata kerja dasar. Ada juga yang menerima keduanya tetapi maknanya berubah.',
+    // app.js:325 — GRAMMAR_FAMILY_RULES.linking_devices
+    'grammar.aturan-keluarga-linking-devices': 'Kata penghubung harus sesuai dengan hubungan antargagasan, misalnya tambahan, perlawanan, sebab, akibat, atau urutan.',
+    // app.js:312 — GRAMMAR_FAMILY_RULES.modals
+    'grammar.aturan-keluarga-modals': 'Kata seperti must, can, may, should, dan might membawa maksud yang berbeda, misalnya kewajiban, izin, saran, atau kemungkinan. Pilih yang paling cocok dengan maksud seluruh kalimat.',
+    // app.js:314 — GRAMMAR_FAMILY_RULES.passive
+    'grammar.aturan-keluarga-passive': 'Dalam kalimat pasif, perhatian diarahkan ke tindakan atau hasilnya. Pola dasarnya adalah be ditambah past participle, lalu pelaku hanya disebut jika memang penting.',
+    // app.js:317 — GRAMMAR_FAMILY_RULES.prepositions
+    'grammar.aturan-keluarga-prepositions': 'Kata depan dipilih dari hubungan makna, bukan terjemahan kata per kata. Lihat apakah kalimat membicarakan waktu, tempat, arah, cara, atau hubungan tertentu.',
+    // app.js:319 — GRAMMAR_FAMILY_RULES.question_negation
+    'grammar.aturan-keluarga-question-negation': 'Cek auxiliary, tense, subjek, dan apakah kalimatnya positif atau negatif. Empat hal ini menentukan susunan pertanyaan atau tag yang tepat.',
+    // app.js:321 — GRAMMAR_FAMILY_RULES.relative_clauses
+    'grammar.aturan-keluarga-relative-clauses': 'Tentukan apakah klausa relatif dibutuhkan untuk mengenali orang atau benda yang dimaksud, atau hanya memberi informasi tambahan. Koma biasanya menjadi petunjuk penting.',
+    // app.js:315 — GRAMMAR_FAMILY_RULES.reported_speech
+    'grammar.aturan-keluarga-reported-speech': 'Saat ucapan dipindahkan menjadi kalimat tidak langsung, sudut pandang, urutan kata, penunjuk waktu, dan tense kadang perlu bergeser agar tetap masuk akal.',
+    // app.js:311 — GRAMMAR_FAMILY_RULES.tense_aspect
+    'grammar.aturan-keluarga-tense-aspect': 'Fokusnya ada pada kapan sebuah tindakan terjadi dan apakah tindakannya rutin, sedang berlangsung, sudah selesai, atau terjadi lebih dulu. Cari petunjuk waktunya sebelum memilih bentuk kata kerja.',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.advanced_grammar
+    'grammar.keluarga-advanced-grammar': 'pola grammar tingkat lanjut',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.articles_determiners
+    'grammar.keluarga-articles-determiners': 'artikel dan penentu kata benda',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.comparison
+    'grammar.keluarga-comparison': 'perbandingan',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.conditionals
+    'grammar.keluarga-conditionals': 'kalimat pengandaian',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.core_grammar
+    'grammar.keluarga-core-grammar': 'pola grammar dasar',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.emphasis_inversion
+    'grammar.keluarga-emphasis-inversion': 'penekanan dan inversi',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.error_correction
+    'grammar.keluarga-error-correction': 'mencari dan memperbaiki kesalahan',
+    // app.js:372 — grammarFamilyLabel() fallback
+    'grammar.keluarga-fallback': 'pola grammar',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.gerunds_infinitives
+    'grammar.keluarga-gerunds-infinitives': 'gerund dan infinitive',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.linking_devices
+    'grammar.keluarga-linking-devices': 'kata penghubung',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.modals
+    'grammar.keluarga-modals': 'kata kerja bantu',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.nouns
+    'grammar.keluarga-nouns': 'kata benda',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.passive
+    'grammar.keluarga-passive': 'kalimat pasif',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.possession
+    'grammar.keluarga-possession': 'kepemilikan',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.prepositions
+    'grammar.keluarga-prepositions': 'kata depan',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.pronouns_determiners
+    'grammar.keluarga-pronouns-determiners': 'kata ganti dan penentu',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.quantifiers
+    'grammar.keluarga-quantifiers': 'kata penunjuk jumlah',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.question_formation
+    'grammar.keluarga-question-formation': 'menyusun pertanyaan',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.question_negation
+    'grammar.keluarga-question-negation': 'pertanyaan dan bentuk negatif',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.relative_clauses
+    'grammar.keluarga-relative-clauses': 'klausa relatif',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.reported_speech
+    'grammar.keluarga-reported-speech': 'kalimat tidak langsung',
+    // app.js:309 — GRAMMAR_FAMILY_LABELS.tense_aspect
+    'grammar.keluarga-tense-aspect': 'waktu dan keadaan tindakan',
+    // app.js:630 — grammarExercise v8 stem
+    'grammar.mode-avoid-stem': `Strategi mana yang paling bantu biar kesalahan di lesson {judulLesson} nggak keulang?`,
+    // app.js:581 — grammarExercise v1 stem
+    'grammar.mode-complete-stem': `Pilih versi lengkap yang pas sama pola {judulLesson}:\n{stem}`,
+    // app.js:636 — grammarExercise v18-20 correctWhy
+    'grammar.mode-contrast-benar': `Perbandingan yang bener nunjukin {kunciDikutip} jawabannya, terus nunjuk di mana {opsiDikutip} melesetnya.`,
+    // app.js:636 — grammarExercise v18-20 expl
+    'grammar.mode-contrast-expl-kebalik': `Kebalik: justru {kunciDikutip} yang jaga maksud kalimatnya, {opsiDikutip} yang meleset.`,
+    // app.js:636 — grammarExercise v18-20 expl
+    'grammar.mode-contrast-expl-keliru': `Keliru: lesson ini memang nguji perbandingan itu, dan {kunciDikutip} jawaban yang bener.`,
+    // app.js:636 — grammarExercise v18-20 expl
+    'grammar.mode-contrast-expl-sepadan': `Dua-duanya nggak sepadan; cuma {kunciDikutip} yang cocok sama kalimat ini.`,
+    // app.js:636 — grammarExercise v18-20 OPSI distraktor
+    'grammar.mode-contrast-opsi-kebalik': `{opsiDikutip} pas, dan {kunciDikutip} malah ngubah maksud kalimatnya.`,
+    // app.js:636 — grammarExercise v18-20 stem (contrast_distractor)
+    'grammar.mode-contrast-stem': `Perbandingan mana yang pas antara {kunciDikutip} dan {opsiDikutip}?\n{stem}`,
+    // app.js:650 — grammarExercise v22 stem (locate_decision_cue)
+    'grammar.mode-cue-stem': `Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n{stem}`,
+    // app.js:633 — grammarExercise v9-11 expl
+    'grammar.mode-diagnose-expl-kunci': `Ini alasan kenapa {kunciDikutip} bener; padahal soal nanya kenapa {opsiDikutip} meleset.`,
+    // app.js:633 — grammarExercise v9-11 expl lain
+    'grammar.mode-diagnose-expl-lain': `Ini penjelasan buat pilihan {opsiLainDikutip}, bukan buat {opsiDikutip}.`,
+    // app.js:633 — grammarExercise v9-11 stem (diagnose_distractor)
+    'grammar.mode-diagnose-stem': `Temanmu milih {opsiDikutip}. Alasan mana yang paling pas jelasin kenapa pilihan itu meleset?\n{stem}`,
+    // app.js:644 — grammarExercise v21 expl
+    'grammar.mode-family-expl': `Label {labelDikutip} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga {labelKeluargaDikutip}.`,
+    // app.js:644 — grammarExercise v21 stem (classify_family)
+    'grammar.mode-family-stem': `Contoh ini terutama termasuk keluarga grammar yang mana?\n{stem}`,
+    // app.js:612 — grammarExercise v2 stem
+    'grammar.mode-justify-stem': `Kenapa {kunciDikutip} jadi jawaban paling pas di contoh ini?\n{stem}`,
+    // app.js:634 — grammarExercise v12-14 correctWhy
+    'grammar.mode-label-benar': `Label itu pas sama pola salah di balik pilihan {opsiDikutip}.`,
+    // app.js:634 — grammarExercise v12-14 expl
+    'grammar.mode-label-expl-keliru': `{opsiDikutip} memang keliru, jadi label “jawaban benar, nggak ada kesalahan mikir” jelas nggak berlaku buatnya.`,
+    // app.js:634 — grammarExercise v12-14 expl lain
+    'grammar.mode-label-expl-lain': `Label ini nunjukin kesalahan mikir di balik pilihan {opsiLainDikutip}, bukan {opsiDikutip}.`,
+    // app.js:634 — grammarExercise v12-14 stem (label_misconception)
+    'grammar.mode-label-stem': `Label kesalahan mana yang paling pas buat pilihan {opsiDikutip}?\n{stem}`,
+    // app.js:653 — grammarExercise v24 stem (mastery_check)
+    'grammar.mode-mastery-stem': `Rencana cek mandiri mana yang paling pas sebelum kamu nuntasin lesson {judulLesson}?`,
+    // app.js:623 — grammarExercise v7 stem
+    'grammar.mode-memory-stem': `Pengingat singkat mana yang paling nyambung sama contoh ini?\n{stem}`,
+    // app.js:618 — grammarExercise v4 stem
+    'grammar.mode-objective-stem': `Tujuan belajar mana yang paling nyambung sama soal ini?\n{stem}`,
+    // app.js:619 — grammarExercise v5 stem
+    'grammar.mode-reasoning-stem': `Urutan mikir mana yang paling aman sebelum kamu jawab?\n{stem}`,
+    // app.js:635 — grammarExercise v15-17 stem (repair_distractor)
+    'grammar.mode-repair-stem': `Jawaban {opsiDikutip} belum pas. Pilih perbaikan yang tetap jaga maksud kalimatnya:\n{stem}`,
+    // app.js:617 — grammarExercise v3 stem
+    'grammar.mode-rule-stem': `Aturan mana yang paling pas jelasin jawaban di contoh ini?\n{stem}`,
+    // app.js:652 — grammarExercise v23 stem (teach_back)
+    'grammar.mode-teach-stem': `Ringkasan ajar mana yang paling pas buat jelasin lesson {judulLesson} ke temanmu?`,
+    // app.js:374 — grammarClue()
+    'grammar.petunjuk-clue': `Petunjuk pentingnya adalah “{petunjuk}”.`,
+    // app.js:374 — grammarClue() fallback
+    'grammar.petunjuk-umum': 'Petunjuknya ada pada hubungan makna, subjek, dan bentuk kata kerja dalam satu kalimat penuh.',
+    // app.js:336 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-baca-penuh': `Baca satu kalimat penuh sebelum menjawab. Pilihan mana yang paling cocok?\n{stem}`,
+    // app.js:332 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-cek-nama': `{name} sedang mengecek grammar kalimat ini. Bagian kosongnya sebaiknya diisi dengan apa?\n{stem}`,
+    // app.js:330 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-lengkapi': `Lengkapi kalimat berikut dengan bentuk yang paling tepat:\n{stem}`,
+    // app.js:331 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-makna': `Perhatikan makna kalimatnya, lalu pilih jawaban yang paling pas:\n{stem}`,
+    // app.js:333 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-natural': `Pilih bentuk yang membuat kalimat berikut terdengar benar dan natural:\n{stem}`,
+    // app.js:334 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-petunjuk': `Cari petunjuk waktu, subjek, atau maksud kalimat, lalu lengkapi bagian kosong:\n{stem}`,
+    // app.js:335 — GRAMMAR_PROMPTS[]
+    'grammar.prompt-pola': `Manakah pilihan yang mengikuti pola grammar dengan tepat?\n{stem}`,
+    // app.js:551 — completeGrammarStem() fallback
+    'grammar.stem-answer-fallback': `{stem} — jawaban: {opsi}`,
+    // app.js:915 — levelEntryChoiceCopy() title
+    'level.entry-pilih-judul': `Mau belajar di {level}? Sedikit lagi.`,
+    // app.js:917 — levelEntryChoiceCopy() deferToast
+    'level.entry-tunda-toast': `Oke, kita mulai dari {levelAwal} dulu. {level} nungguin kamu abis lulus ujian {ujian}.`,
+    // app.js:1516 — deriveAdaptivePolicy() steps
+    'policy.langkah-review': `Mulai dari review berisiko tinggi ({persenReview}% sesi).`,
+    // app.js:1516 — deriveAdaptivePolicy() steps
+    'policy.langkah-target': `Target {jumlahSoal} soal · difficulty {tingkat} · pace {tempo}.`,
+    // app.js:1918 — makeClozeQuestion() explain.rule
+    'quiz.cloze-rule': `Jawaban yang tepat: "{isian}".`,
+    // app.js:1302 — openConfidencePop() vonis benar
+    'quiz.vonis-benar': 'Benar, mantap!',
+    // app.js:1302 — openConfidencePop() vonis salah
+    'quiz.vonis-salah': 'Belum tepat, nggak apa-apa.'
   });
 }());

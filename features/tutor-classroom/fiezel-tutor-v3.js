@@ -580,7 +580,7 @@
       var note = root.document.getElementById('tutorVoiceState');
       // m025-100: lewat pintu bicara bersama, bukan mesin lokal.
       if (!root.FiezelVoiceSay || typeof root.FiezelVoiceSay.say !== 'function') {
-        if (note) note.textContent = 'Suara belum siap. Teks pelajaran tetap dapat digunakan.';
+        if (note) note.textContent = T('tutor.v3-suara-pending-siap-teks-lesson');
         return;
       }
       voiceBusy = true;
@@ -597,7 +597,7 @@
         // persis yang diukur audit V1 sebagai jeda 4,5 detik per batas.
         prefetchNextBeat(speedFactor);
         await speaking;
-        if (note) note.textContent = 'Siap untuk pertanyaan berikutnya.';
+        if (note) note.textContent = T('tutor.v3-siap-for-pertanyaan-upcoming');
       } catch (error) {
         if (note) note.textContent = 'Suara tidak berbunyi. Subtitle dan lesson state tetap aman.';
       } finally {
