@@ -77,7 +77,49 @@ if (typeof shaLokal === 'string' && typeof shaHulu === 'string') {
   }
 }
 
-if (!LURING) {
+/* CI dinilai untuk SHA origin/main, BUKAN untuk run terbaru di daftar.
+ *
+ * Versi pertama memakai `gh run list` lalu mengambil entri quality paling atas. Itu salah, dan
+ * terbukti salah di lapangan: daftar itu memuat run untuk commit antara dan untuk cabang sesi
+ * lain, jadi nightwatch melaporkan CI_MERAH (kritis) untuk commit yang sudah tergantikan
+ * sementara HEAD main sebenarnya hijau. Alarm palsu berulang lebih buruk daripada tidak ada
+ * alarm: ia melatih orang mengabaikan laporan. */
+if (!LURING && typeof shaHulu === 'string' && /^[0-9a-f]{7,40}$/.test(shaHulu)) {
+  const cr = shAman('gh api "repos/FIEZEL-APPS/FIEZEL-APPS/commits/' + shaHulu + '/check-runs?per_page=30" 2>/dev/null');
+  if (typeof cr === 'string' && cr.startsWith('{')) {
+    try {
+      const daftar = (JSON.parse(cr).check_runs || []).map((c) => ({
+        nama: c.name, status: c.status, hasil: c.conclusion
+      }));
+      catatan.push({ ciPadaMain: { sha: shaHulu.slice(0, 8), jumlahCheck: daftar.length } });
+
+      const quality = daftar.filter((c) => /^quality$/i.test(c.nama));
+      if (quality.length === 0) {
+        lapor('peringatan', 'CI_BELUM_ADA', 'Belum ada check `quality` untuk HEAD main ' + shaHulu.slice(0, 8) + '. Jangan simpulkan hijau dari ketiadaan check.', daftar.map((c) => c.nama).slice(0, 10));
+      } else if (quality.some((c) => c.hasil === 'failure')) {
+        lapor('kritis', 'CI_MERAH', 'Check `quality` MERAH pada HEAD main ' + shaHulu.slice(0, 8) + '. Jangan menumpuk pekerjaan di atas main yang merah.', quality);
+      } else if (quality.every((c) => c.status !== 'completed')) {
+        lapor('peringatan', 'CI_BERJALAN', 'Check `quality` masih berjalan pada HEAD main ' + shaHulu.slice(0, 8) + '; belum boleh dianggap hijau.', quality);
+      }
+
+      /* `MASTER-only authority` dikecualikan DENGAN SENGAJA: ia gagal karena atribusi aktor pada
+       * push agen, bukan karena ada yang rusak, dan itu sudah diverifikasi terpisah. Menaikkannya
+       * jadi temuan tiap jam hanya menghasilkan kebisingan yang menutupi temuan sungguhan. */
+      const lainMerah = daftar.filter((c) => c.hasil === 'failure' && !/^quality$/i.test(c.nama) && !/authority/i.test(c.nama));
+      if (lainMerah.length) {
+        lapor('peringatan', 'CHECK_LAIN_MERAH', lainMerah.length + ' check non-quality merah pada HEAD main.', lainMerah);
+      }
+    } catch (e) {
+      lapor('peringatan', 'CI_TAK_TERBACA', 'Jawaban check-runs tidak bisa dibaca.', String(e.message).slice(0, 200));
+    }
+  } else {
+    lapor('peringatan', 'CI_TAK_TERJANGKAU', 'Status CI untuk HEAD main tidak bisa diambil (403, batas laju, atau izin). Jangan simpulkan CI hijau dari ketiadaan data.', cr && cr.galat ? String(cr.galat).slice(0, 200) : String(cr).slice(0, 200));
+  }
+}
+
+/* Blok lama berbasis `gh run list` DIMATIKAN, bukan dihapus, supaya alasan matinya terbaca di
+ * tempat kejadian. Jangan dinyalakan lagi: penilaian CI harus terikat pada SHA. */
+if (false) {
   const ci = shAman('gh run list --limit 8 --json name,status,conclusion,headSha 2>/dev/null');
   if (typeof ci === 'string' && ci.startsWith('[')) {
     try {
