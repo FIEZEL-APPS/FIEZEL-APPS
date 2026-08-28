@@ -64,20 +64,31 @@ test('jarak antarketukan TIMPANG, bukan rata - jarak rata terdengar seperti bip'
 });
 
 test('CSS membaca jeda dari jam bersama, bukan dari angka yang ditulis ulang', () => {
-  for (const b of choreo.BEATS) {
-    if (b.id === 'b8') continue; // tagline dirujuk lewat rise, diperiksa terpisah di bawah
-    assert.ok(new RegExp('var\\(' + b.css + '\\b').test(css),
-      b.css + ' tidak pernah dipakai di style.css - jeda ketukan ini pasti masih berupa angka');
+  // v4 (OA-6): jalur GERAK kini digambar JS per-frame dari BEATS lewat satu jam rAF -
+  // CSS tidak lagi memegang jeda jalur itu. Yang tersisa di CSS adalah jalur
+  // kurangi-gerak: empat keadaan (F, batang, wordmark, tagline) memudar pada ketukan
+  // b1/b6/b7/b12, dan keempatnya WAJIB membaca var(--fz-bN) - bukan angka.
+  for (const v of ['--fz-b1', '--fz-b6', '--fz-b7', '--fz-b12']) {
+    assert.ok(new RegExp('var\\(' + v + '\\b').test(css),
+      v + ' tidak pernah dipakai di style.css - jeda kurangi-gerak ini pasti masih berupa angka');
   }
-  assert.ok(/var\(--fz-b8\b/.test(css), '--fz-b8 harus dipakai untuk tagline');
-  // Tidak boleh ada lagi jeda animasi berupa angka pada elemen splash.
-  // Hanya aturan yang BERANIMASI yang dinilai; .fz-f/.fz-bar juga dipakai untuk
-  // transform-box dan tidak punya jeda apa pun untuk digeser.
-  const splashRules = (css.match(/\.fiezel-logo \.fz-[a-z0-9]+\{[^}]*\}/g) || [])
-    .filter(r => /animation:/.test(r));
-  assert.strictEqual(splashRules.length, 5, 'harus ada lima bagian logo yang beranimasi');
-  for (const rule of splashRules) {
-    assert.ok(/var\(--fz-b/.test(rule),
+  // Setiap ketukan tetap diterbitkan sebagai custom property (index.html menyalinnya,
+  // dan applyTo() menulisnya ke elemen): tidak ada ketukan yang hilang dari kontrak.
+  const defaults = choreo.cssDefaults();
+  for (const b of choreo.BEATS) {
+    assert.ok(defaults.includes(b.css + ':' + b.at + 'ms'), b.css + ' hilang dari cssDefaults()');
+  }
+  // Jalur gerak membaca TABELNYA, bukan menulis ulang angkanya.
+  const orch = fs.readFileSync(path.join(root, 'features/brand/fiezel-splash.js'), 'utf8');
+  assert.ok(/CHOREO\.BEATS/.test(orch),
+    'orkestrator splash harus menjadwalkan dari CHOREO.BEATS, bukan dari angka lokal');
+  // Tidak boleh ada jeda animasi berupa angka pada aturan kurangi-gerak splash.
+  // animation:none (bintang yang dihentikan) bukan animasi - yang dinilai hanya yang memudar.
+  const stillRules = (css.match(/\.fiezel-splash-still[^{]*\{[^}]*animation:[^}]*\}/g) || [])
+    .filter(r => !/animation:none/.test(r));
+  assert.ok(stillRules.length >= 4, 'empat keadaan kurangi-gerak yang beranimasi tidak ditemukan');
+  for (const rule of stillRules) {
+    assert.ok(/var\(--fz-b\d+/.test(rule),
       'jeda masih ditulis sebagai angka, jadi bisa bergeser lepas dari bunyinya: ' + rule.slice(0, 90));
   }
 });
@@ -85,7 +96,9 @@ test('CSS membaca jeda dari jam bersama, bukan dari angka yang ditulis ulang', (
 test('durasi animasi di CSS sama dengan durasi di jam bersama', () => {
   const want = Object.fromEntries(choreo.BEATS.map(b => [b.css, b.dur]));
   const rules = css.match(/[^{}]+\{[^}]*var\(--fz-b\d+[^}]*\}/g) || [];
-  assert.ok(rules.length >= 6, 'aturan beranimasi yang memakai ketukan tidak ditemukan');
+  // v4: hanya jalur kurangi-gerak yang beranimasi lewat CSS (empat keadaan);
+  // jalur gerak dihitung JS per-frame dari tabel yang sama.
+  assert.ok(rules.length >= 4, 'aturan beranimasi yang memakai ketukan tidak ditemukan');
   for (const rule of rules) {
     const beat = rule.match(/var\((--fz-b\d+)/)[1];
     const dur = rule.match(/animation:[^;}]*?\s(\.?\d+(?:\.\d+)?)s\s/);
@@ -137,13 +150,22 @@ test('terts besar jatuh TEPAT saat batang emas naik - warna layar dan warna akor
   assert.strictEqual(gold.role, 'colour');
 });
 
-test('SFX transisi semuanya nada dari akor pembuka yang sama', () => {
-  const chord = new Set(Object.values(choreo.PITCH));
+test('SFX satu palet: 27 sampel semuanya nyata di assets/audio/sfx dan setiap alias lama tersambung', () => {
+  // m029 (OA-7): jaminan "satu akor" tidak lagi bisa dibaca dari tabel osilator - palet
+  // kini dipaku di master produksi (motif Ascent & Crown di dalam berkas, 20-sfx-system.md
+  // §5-6). Yang BISA dan HARUS dijaga secara struktural sekarang: (1) setiap nama di
+  // manifest menunjuk berkas yang benar-benar ada - nama tanpa berkas berarti murid
+  // mendengar senyap plus 404; (2) setiap kosakata lama (tap/nav/celebrate/...) masih
+  // tersambung ke bunyi baru - alias yang putus berarti pemanggil lama diam tanpa suara.
+  assert.strictEqual(sfx.names().length, 27, 'pustaka harus tepat 27 bunyi');
   for (const name of sfx.names()) {
-    for (const note of sfx.VOICES[name]) {
-      assert.ok(chord.has(note[0]),
-        `${name} memakai ${note[0]} Hz yang bukan nada akor pembuka - bunyinya jadi produk lain`);
-    }
+    const rel = sfx.urlFor(name).replace(/^\.\//, '');
+    assert.ok(fs.existsSync(path.join(root, rel)),
+      `${name} ada di manifest tapi berkas ${rel} tidak ada - bunyi hantu`);
+  }
+  for (const legacy of ['tap', 'toggle', 'nav', 'open', 'close', 'celebrate']) {
+    assert.ok(sfx.names().includes(sfx.ALIASES[legacy]),
+      `alias lama "${legacy}" tidak menunjuk bunyi yang ada - pemanggil lama jadi bisu`);
   }
 });
 
@@ -180,7 +202,7 @@ test('kurangi-gerak menyisakan sapaan yang memudar, bukan layar yang langsung ja
   const still = css.match(/\.fiezel-splash-still[^{]*\{[^}]*\}/g) || [];
   const logo = still.find(r => /\.fz-f,/.test(r) || /\.fz-f\b/.test(r));
   assert.ok(logo, 'aturan kurangi-gerak untuk bagian logo tidak ditemukan');
-  assert.ok(/animation-name:fz-fade-in/.test(logo),
+  assert.ok(/animation(?:-name)?:fz-fade-in/.test(logo),
     'bagian logo harus tetap muncul dengan memudar pada ketukan yang sama, bukan dimatikan');
   assert.ok(/transform:none/.test(logo), 'yang dibuang adalah gerakannya, bukan kemunculannya');
 });
@@ -203,9 +225,19 @@ test('AKAR KELUHAN: setiap bunyi yang dirancang benar-benar dipanggil dari antar
   // "Tekan tombol apapun di menu" karena itu memang menghasilkan senyap. Tes ini menolak
   // penambahan bunyi yang tidak punya pemanggil.
   const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-  const yatim = sfx.names().filter(n => !new RegExp("uiSfx\\(['\"]" + n + "['\"]").test(app));
+  // m029: manifest kini menuliskan siapa pemanggil sah tiap bunyi. Yang wajib punya
+  // pemanggil di app.js adalah caller 'app'; bunyi 'module'/'splash' dipanggil modulnya
+  // sendiri, dan 'preview'/'reserved'/'retired' memang sengaja tidak dipicu produk -
+  // memaksakan pemanggil untuk mereka berarti mengarang fitur. Alias dihitung: bunyi
+  // yang dipanggil lewat nama lamanya (nav → page_transition) bukan yatim.
+  // Pencocoknya menerima nama di mana pun DI DALAM tanda kurung uiSfx(...) - pemetaan
+  // seperti uiSfx(kind==='success'?'answer_correct':'answer_wrong') adalah pemanggil sah.
+  const calls = n => new RegExp("uiSfx\\((?:[^()]|\\([^()]*\\))*['\"]" + n + "['\"]").test(app);
+  const called = n => calls(n) ||
+    Object.keys(sfx.ALIASES).some(a => sfx.ALIASES[a] === n && calls(a));
+  const yatim = sfx.names().filter(n => sfx.MANIFEST[n].caller === 'app' && !called(n));
   assert.deepStrictEqual(yatim, [],
-    'bunyi berikut didefinisikan tapi tidak pernah dipanggil dari antarmuka');
+    'bunyi berikut ditandai milik app.js tapi tidak pernah dipanggil dari antarmuka');
 });
 
 test('tombol biasa berbunyi lewat delegasi, bukan lewat kabel satu per satu', () => {

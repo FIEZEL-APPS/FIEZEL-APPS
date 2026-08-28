@@ -207,6 +207,10 @@
       host.classList.remove('is-paw-born');
       void host.offsetWidth;
       host.classList.add('is-paw-born');
+      // [ADAPTASI] OA-7 §4: paw_appear menemani kelahiran maskot. Penjatahannya (≥8 dtk
+      // antar-bunyi, 14 §3.2) dijaga manifest SFX, bukan di sini - born() cukup jujur
+      // memanggil, mesinlah yang memutuskan pantas-tidaknya berbunyi.
+      try { if (typeof self !== 'undefined' && self.FiezelUiSfx) self.FiezelUiSfx.play('paw_appear', typeof window !== 'undefined' ? window : self); } catch (_) {}
       if (bornTimer) clearTimeout(bornTimer);
       bornTimer = setTimeout(function () { host.classList.remove('is-paw-born'); }, 960);
     }
