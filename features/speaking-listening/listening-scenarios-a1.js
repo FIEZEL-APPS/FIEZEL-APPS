@@ -272,7 +272,7 @@ module.exports = { level: 'A1', scenarios: [
  ['Apa yang pertama dilakukan dokter gigi?','Ia menjelaskan peralatannya satu per satu','Ia bertanya tentang tangannya yang dingin','Ia menyuruhnya pulang lagi','Ia memanggil ibunya masuk'],
  ['Mengapa dokter gigi menjelaskan alat-alatnya?','Agar pasiennya tidak terlalu takut','Karena pasiennya ingin menjadi dokter gigi','Karena ibunya yang memintanya','Agar pasiennya bisa membantunya'],
  ['Bagaimana perasaan Mira pada akhirnya?','Lebih tenang daripada sebelumnya','Lebih takut daripada sebelumnya','Marah kepada ibunya','Senang giginya sakit'],
- ['Kalimat mana yang maknanya sama dengan “My hands are cold because I am afraid”?','Her body shows her fear','She forgets her gloves at home','The clinic room is very cold','She holds her mother hand']],
+ ['Kalimat mana yang maknanya sama dengan “My hands are cold because I am afraid”?','Her body shows her fear','She forgets her gloves at home','The clinic room is very cold',"She holds her mother's hand"]],
 
 ['Naufal','mountain path in the morning','A bag that is too heavy',
  'I am Naufal. We walk up the mountain and my bag is very heavy. I put in four bottles of water, but two are enough. My friend Tomi carries less and he walks in front of me all day.',

@@ -2358,14 +2358,14 @@
         [
           "She works fast before dinner.",
           "She works with her brother.",
-          "She works quietly in her room.",
+          "She works at a small table in her room.",
           "She works in the front room."
         ],
         2,
         {
           "type": "how",
           "evidence": "She works at a small table in her room.",
-          "answer": "She works quietly in her room.",
+          "answer": "She works at a small table in her room.",
           "patternId": "how-025-3"
         }
       ],
@@ -10294,14 +10294,14 @@
         [
           "The shops outside sell drinks more cheaply",
           "The front of the queue is for young classes",
-          "Nothing chilled is sold after midday",
+          "No cold water is available there in the afternoon",
           "The soup pot is empty by the second break"
         ],
         2,
         {
           "type": "inference",
           "evidence": "The canteen still has no cold water in the afternoon, so many pupils buy sweet drinks outside the gate.",
-          "answer": "Nothing chilled is sold after midday",
+          "answer": "No cold water is available there in the afternoon",
           "patternId": "b1-r0111-4-inference",
           "why": "Kantin nggak menyediakan air dingin sore-sore, makanya murid cari minuman di luar gerbang.",
           "whyOthersFail": "Yang lebih murah di kantin justru sup dan buah, antrean depan cuma soal kelas kecil, dan sup habis nggak dikaitkan dengan minuman."
@@ -29641,16 +29641,16 @@
           "Wry and unsparing, though proud of the standard nineteen volunteers reach.",
           "Wry and indulgent, treating the tenors' early entries as charming.",
           "Wry and unsparing, though sharpest about the six who read a score.",
-          "Wry and unsparing, with no claim to competence anywhere in it."
+          "Wry and unsparing, denying that the singers could ever be called competent."
         ],
-        3,
+        0,
         {
           "type": "tone",
-          "evidence": "What happens in those forty minutes is not, by any external standard, good.",
-          "answer": "Wry and unsparing, with no claim to competence anywhere in it.",
+          "evidence": "an arduous piece performed adequately by nineteen unqualified volunteers is a genuine achievement, not a consolation prize",
+          "answer": "Wry and unsparing, though proud of the standard nineteen volunteers reach.",
           "patternId": "C2b-r0299-q3-tone",
-          "why": "Teks langsung bilang apa yang terjadi dalam empat puluh menit itu, menurut standar luar mana pun, nggak bagus, lalu penulis meledek dirinya sebagai bariton karena kepepet.",
-          "whyOthersFail": "Ketiga pengecoh memakai nada geli yang sama dengan kunci, jadi yang membedakan sasaran dan derajatnya. Opsi bangga pada standar yang dicapai dipatahkan “What happens in those forty minutes is not, by any external standard, good”; opsi memaklumi dengan lembut dipatahkan “I distrust the sentimental account of amateur music, which treats incompetence as charming”; opsi paling keras pada enam pembaca partitur salah sasaran, sebab ejekan paling tajam ditujukan penulis kepada dirinya sendiri."
+          "why": "Penulis memang nggak mengampuni kualitas nyanyiannya — “not, by any external standard, good” — tapi kamu bisa lihat dia tetap bangga: karya sulit yang dibawakan secara layak oleh sembilan belas relawan tanpa kualifikasi disebutnya “a genuine achievement, not a consolation prize”, dan dia sendiri menulis “We shall be, at best, competent”.",
+          "whyOthersFail": "Opsi yang menyangkal kompetensi sama sekali dipatahkan langsung oleh teksnya sendiri: “We shall be, at best, competent” adalah klaim kompetensi, dan “a genuine achievement, not a consolation prize” adalah klaim pencapaian. Opsi yang memaklumi tenor sebagai hal menawan bertabrakan dengan “I distrust the sentimental account of amateur music, which treats incompetence as charming”. Opsi paling tajam pada enam pembaca partitur salah sasaran, sebab ejekan paling keras diarahkan penulis ke dirinya sendiri."
         }
       ],
       [

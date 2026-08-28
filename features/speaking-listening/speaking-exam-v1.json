@@ -287,7 +287,7 @@
       "exam": "ielts_speaking_part3",
       "mode": "exam_response",
       "instruction": "Part 3. Diskusi lanjutan dari topik keputusan. Jawab tiga pertanyaan ini, masing-masing empat sampai enam kalimat: Should young people always follow their parents' advice about their future? How much should a person's career be shaped by what their country needs? Do people regret decisions more when others warned them?",
-      "sampleAnswer": "I would not say young people should always follow that advice, but I would not dismiss it either. Parents are usually judging from experience that the young person does not have yet, and the disagreement is often about risk rather than about the goal itself. On careers and national need, I think there is a reasonable case for incentives but not for direction; a country that pushes people into fields they resent tends to get the qualification without the work. And yes, I suspect people do regret warned-against decisions more, though that may say more about how memory works than about whether the decision was wrong.",
+      "sampleAnswer": "I would not say young people should always follow that advice, but I would not dismiss it either, because parents are usually judging from experience that the young person does not have yet, and the disagreement is often about risk rather than about the goal itself. On careers and national need, I think there is a reasonable case for incentives but not for direction; however, a country that pushes people into fields they resent tends to get the qualification without the work. And yes, I suspect people do regret warned-against decisions more, though that may say more about how memory works than about whether the decision was wrong.",
       "requiredKeywords": [
         "would not",
         "because",
@@ -317,7 +317,7 @@
       "exam": "toefl_speaking_task1",
       "mode": "exam_response",
       "instruction": "Task 1. 15 detik menyiapkan, 45 detik bicara. Some students prefer to take a year off before university; others prefer to start immediately. Which do you think is better, and why? Nyatakan pilihanmu di kalimat pertama.",
-      "sampleAnswer": "I think starting immediately is better for most students. The main reason is momentum: after twelve years of school you are already used to studying, and that habit is easy to lose in a year. My cousin took a year off to work, and when he came back he told me the hardest part was not the material but simply sitting down to read again. A second reason is that a year off usually costs money rather than earning it, unless you have a specific plan.",
+      "sampleAnswer": "I think starting immediately is better for most students. The main reason is momentum, because after twelve years of school you are already used to studying, and that habit is easy to lose in a year. For example, my cousin took a year off to work, and when he came back he told me the hardest part was not the material but simply sitting down to read again. A second reason is that a year off usually costs money rather than earning it, unless you have a specific plan.",
       "requiredKeywords": [
         "I think",
         "reason",
