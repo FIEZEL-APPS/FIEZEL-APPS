@@ -154,17 +154,34 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     // --- Grammar Hub terurut dan terkunci --------------------------------------------------
     await evaluate('setActiveLevel("A1"), go("grammar"), true');
-    await waitFor('document.querySelectorAll(".grammar-grid .card").length>0', 'kartu Grammar tergambar');
+    // m025-173: Grammar Hub default kini jalur bersimpul (.lesson-path .path-step); tampilan
+    // kartu lama tetap ada di balik toggle. Kontraknya SAMA (urut, terkunci beralasan, lesson
+    // pertama terbuka) - gerbang ini menguji kontrak itu pada tampilan mana pun yang tergambar.
+    // Catatan alasan kunci: di jalur, kalimat prasyarat penuh sengaja hanya di gerbang tertutup
+    // PERTAMA (kebisingan), node terkunci lain membawanya lewat title/aria pada tombolnya.
+    await waitFor('document.querySelectorAll(".grammar-grid .card, .lesson-path .path-step:not(.path-step-exam)").length>0', 'kartu Grammar tergambar');
     const hub = await evaluate(`(() => {
       const cards=[...document.querySelectorAll('.grammar-grid .card')];
-      const numbers=cards.map(c=>parseInt((c.querySelector('.row b')||{}).textContent||'0',10));
-      const locked=cards.filter(c=>c.querySelector('button[disabled]'));
+      if(cards.length){
+        const numbers=cards.map(c=>parseInt((c.querySelector('.row b')||{}).textContent||'0',10));
+        const locked=cards.filter(c=>c.querySelector('button[disabled]'));
+        return {
+          count: cards.length,
+          ordered: numbers.every((n,i)=>n===i+1),
+          lockedCount: locked.length,
+          lockedHaveReason: locked.every(c=>!!c.querySelector('.lesson-lock-note')),
+          firstOpen: !cards[0].querySelector('button[disabled]')
+        };
+      }
+      const steps=[...document.querySelectorAll('.lesson-path .path-step:not(.path-step-exam)')];
+      const numbers=steps.map(s=>parseInt(((s.querySelector('.path-label b')||{}).textContent||'0'),10));
+      const locked=steps.filter(s=>s.querySelector('button.path-node[disabled]'));
       return {
-        count: cards.length,
+        count: steps.length,
         ordered: numbers.every((n,i)=>n===i+1),
         lockedCount: locked.length,
-        lockedHaveReason: locked.every(c=>!!c.querySelector('.lesson-lock-note')),
-        firstOpen: !cards[0].querySelector('button[disabled]')
+        lockedHaveReason: locked.every(s=>!!s.querySelector('.lesson-lock-note')||!!(s.querySelector('button.path-node[disabled]')||{}).title),
+        firstOpen: !steps[0].querySelector('button.path-node[disabled]')
       };
     })()`);
     check('Grammar Hub renders the curriculum in order', hub.count > 0 && hub.ordered, hub);
@@ -184,8 +201,8 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     // --- Ganti level dari UI ---------------------------------------------------------------
     await evaluate('setActiveLevel("B1"), go("grammar"), true');
-    await waitFor('document.querySelectorAll(".grammar-grid .card").length>0', 'Grammar B1 tergambar');
-    const afterSwitch = await evaluate(`({level:getActiveLevel(), note:(document.querySelector('.grammar-level-note b')||{}).textContent||'', cards:document.querySelectorAll('.grammar-grid .card').length})`);
+    await waitFor('document.querySelectorAll(".grammar-grid .card, .lesson-path .path-step:not(.path-step-exam)").length>0', 'Grammar B1 tergambar');
+    const afterSwitch = await evaluate(`({level:getActiveLevel(), note:(document.querySelector('.grammar-level-note b')||{}).textContent||'', cards:document.querySelectorAll('.grammar-grid .card, .lesson-path .path-step:not(.path-step-exam)').length})`);
     check('Switching level switches the panel with it', afterSwitch.level === 'B1' && afterSwitch.note.includes('B1'), afterSwitch);
 
     // --- Progres bertahan lintas pindah level dan muat ulang -------------------------------
