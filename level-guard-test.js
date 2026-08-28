@@ -107,8 +107,10 @@ const sandbox = {
   // m025-166: teks gerbang masuk level dibangun dari copy yang sama seperti UI, jadi
   // sandbox menyuplai bloknya apa adanya dari app.js - bukan salinan yang bisa menua.
   LEVEL_GUARD_COPY: (() => {
-    const block = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
-    try { return block ? vm.runInNewContext(`${block[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '')}`) : {}; }
+    // v49-F1 2026-08-29: tabel kini dibungkus __fzI18nTable({},()=>({...})) agar terbangun
+    // ulang saat locale berganti; gate mengekstrak literal builder-nya \u2014 assertion tetap utuh.
+    const block = app.match(/const\s+LEVEL_GUARD_COPY=__fzI18nTable\(\{\},\(\)=>\((\{[\s\S]*?\n\})\)\);/) || app.match(/const\s+LEVEL_GUARD_COPY=(\{[\s\S]*?\n\});/);
+    try { return block ? vm.runInNewContext(`(${block[1]})`) : {}; }
     catch (_) { return {}; }
   })(),
   save: () => { saves++; },
@@ -131,8 +133,9 @@ try {
   // sebelum copy-map ada (runInNewContext tanpa FiezelI18n) sehingga menghasilkan {} —
   // di sini bloknya diselesaikan seperti yang dilihat murid.
   {
-    const lgBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\n\};/);
-    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[0].replace(/^const\s+LEVEL_GUARD_COPY=/, '').replace(/;\s*$/, '') + ')', sandbox, { timeout: 2000 });
+    /* v49-F1 2026-08-29: bentuk wrapper __fzI18nTable didukung (lihat komentar di atas). */
+    const lgBlock = app.match(/const\s+LEVEL_GUARD_COPY=__fzI18nTable\(\{\},\(\)=>\((\{[\s\S]*?\n\})\)\);/) || app.match(/const\s+LEVEL_GUARD_COPY=(\{[\s\S]*?\n\});/);
+    if (lgBlock) sandbox.LEVEL_GUARD_COPY = vm.runInContext('(' + lgBlock[1] + ')', sandbox, { timeout: 2000 });
   }
   vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
   sandboxReady = true;

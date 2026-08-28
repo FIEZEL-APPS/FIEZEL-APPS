@@ -22,9 +22,25 @@ const check = (name, ok, detail) => {
 
 console.log('bank-soal-audit-test');
 
+/* pasca-#242 2026-08-29: naskah stem/alasan pindah dari literal app.js ke copy-map i18n
+   (copy-id-*.js) dan PART_OF_SPEECH_ID kini berisi panggilan FiezelI18n.t(). Gate memuat
+   runtime i18n asli + seluruh copy-id agar cek menilai KONTRAK utuh (kunci terdaftar +
+   naskah Indonesia benar + app.js memakai kuncinya), bukan cara menulisnya. */
+const vm = require('vm');
+const i18nSandbox = { window: undefined, module: undefined, exports: undefined, console };
+i18nSandbox.globalThis = i18nSandbox;
+vm.createContext(i18nSandbox);
+vm.runInContext('this.self = this;', i18nSandbox); /* copy-id-*.js membaca self.FiezelI18n */
+vm.runInContext(fs.readFileSync(path.join(ROOT, 'features/i18n/fiezel-i18n.js'), 'utf8'), i18nSandbox);
+for (const f of fs.readdirSync(path.join(ROOT, 'features/i18n')).filter(x => /^copy-id-.*\.js$/.test(x)).sort()) {
+  vm.runInContext(fs.readFileSync(path.join(ROOT, 'features/i18n', f), 'utf8'), i18nSandbox);
+}
+const I18N = i18nSandbox.FiezelI18n || i18nSandbox.self.FiezelI18n;
+const tId = (k) => I18N.t(k);
+
 // --- 1. generator soal jenis kata wajib memakai kalimat contoh -------------
 check('soal jenis kata memakai kalimat contoh sebagai konteks',
-  /Dalam kalimat “\$\{v\.example\}”, kata “\$\{surface\}”\$\{asal\} berperan sebagai jenis kata apa\?/.test(app),
+  /Dalam kalimat “\{sample\}”, kata “\{bentuk\}”\{asal\} berperan sebagai jenis kata apa\?/.test(tId('quiz-vocab.dalam-kalimat-kata-berperan-sebagai')) && app.includes("'quiz-vocab.dalam-kalimat-kata-berperan-sebagai'"),
   'stem tanpa konteks membuat kata bermakna ganda tidak bisa dijawab');
 
 check('stem lama tanpa konteks sudah tidak ada',
@@ -36,12 +52,15 @@ check('ada penjaga partOfSpeechAskable',
 
 // --- 2. setiap label jenis kata punya padanan Bahasa Indonesia -------------
 const map = {};
-const block = app.match(/const PART_OF_SPEECH_ID=\{([^}]*)\}/);
+/* v49-F1 2026-08-29: tabel kini dibungkus __fzI18nTable({},()=>({...})) supaya terbangun ulang saat locale berganti; gate mengekstrak literal builder-nya. */
+const block = app.match(/const PART_OF_SPEECH_ID=__fzI18nTable\(\{\},\(\)=>\(\{([^}]*)\}\)\)/) || app.match(/const PART_OF_SPEECH_ID=\{([^}]*)\}/);
 check('PART_OF_SPEECH_ID terdefinisi', !!block);
 if (block) {
   for (const pair of block[1].split(',')) {
     const m = pair.match(/^\s*([a-z]+)\s*:\s*'([^']+)'\s*$/);
-    if (m) map[m[1]] = m[2];
+    if (m) { map[m[1]] = m[2]; continue; }
+    const mk = pair.match(/^\s*([a-z]+)\s*:\s*FiezelI18n\.t\('([a-z0-9.-]+)'\)\s*$/);
+    if (mk) { const v = tId(mk[2]); if (v && v !== mk[2]) map[mk[1]] = v; }
   }
 }
 const missing = [...new Set(V.map(v => String(v.partOfSpeech || '').toLowerCase()))].filter(p => p && !map[p]);
@@ -106,9 +125,9 @@ check('grammar-labels-id.js ikut di-precache service worker',
 
 // --- 5. cadangan alasan jawaban tidak boleh Bahasa Inggris -----------------
 check('cadangan alasan jawaban benar sudah Bahasa Indonesia',
-  !/Correct: \$\{String\(t\.explanation/.test(app) && /Bentuk ini cocok dengan aturan grammar/.test(app));
+  !/Correct: \$\{String\(t\.explanation/.test(app) && /Bentuk ini cocok dengan aturan grammar/.test(tId('grammar.alasan-benar-fallback')) && app.includes("'grammar.alasan-benar-fallback'"));
 check('cadangan alasan distraktor sudah Bahasa Indonesia',
-  !/does not satisfy the grammar rule tested here/.test(app) && /belum memenuhi aturan grammar yang sedang diuji/.test(app));
+  !/does not satisfy the grammar rule tested here/.test(app) && /belum memenuhi aturan grammar yang sedang diuji/.test(tId('grammar.alasan-salah-fallback')) && app.includes("'grammar.alasan-salah-fallback'"));
 check('penjelasan grammar mengutamakan field Bahasa Indonesia',
   /explanation\.ruleId/.test(app) && /explanation\.whyCorrectId/.test(app) && /explanation\.memoryCueId/.test(app),
   'grammarMeta harus membaca varian "...Id" lebih dulu');
