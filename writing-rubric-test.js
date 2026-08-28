@@ -88,6 +88,47 @@ check('AI prompt asks for the same rubric the learner sees', /writingRubricCrite
 const reviewBlock = sourceBlock('writingLocalReview');
 check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlock) && /bukan penilaian bahasa dan bukan skor/i.test(reviewBlock), 'cek offline hanya boleh mengaku memeriksa bentuk');
 
+// --- 4b. jalur Cloudflare (worker) --------------------------------------------------------
+// Jalur default saat transport task menyala adalah Worker (app.js:7223), bukan Puter — dan
+// gerbang lama hanya membaca app.js, jadi worker bisa melanggar kontrak tanpa ketahuan
+// (temuan A06: prompt worker membuang rubrik dan teks soal, meminta prosa sambil
+// jsonMode:true ⇒ 22/25 jawaban "{}"). Bagian ini menegakkan kontrak yang sama di worker.
+const AiTasks = require(path.join(root, 'workers/api/ai/ai-tasks.js'));
+const wfSpec = AiTasks.get('writing_feedback');
+const wfInput = {
+  text: 'I am very sorry about your book. I will replace it with a new copy this week. Please tell me which edition you prefer.',
+  promptId: String(bank.prompts[0].id),
+  promptText: 'You borrowed a book from a classmate and damaged it. Write a letter: apologise, explain what happened, and say how you will fix it.',
+  examBrief: 'IELTS GT Task 1 (surat). Minimal 150 kata, 20 menit.',
+  level: 'B1',
+  rubricId: String(bank.rubric.id)
+};
+check(
+  'Worker accepts the task text and exam brief as guarded input',
+  AiTasks.validate({ schema: AiTasks.REQUEST_SCHEMA, task: 'writing_feedback', input: wfInput, locale: 'id' }).ok === true &&
+    AiTasks.validate({ schema: AiTasks.REQUEST_SCHEMA, task: 'writing_feedback', input: { ...wfInput, promptText: 'x'.repeat(600) }, locale: 'id' }).ok === false,
+  'promptText/examBrief opsional, dibatasi maxLength'
+);
+const wfPrompt = AiTasks.buildPrompt('writing_feedback', wfInput, 'id');
+check('Worker prompt embeds the actual task text, not just the prompt id', wfPrompt.includes(wfInput.promptText) && wfPrompt.includes(wfInput.examBrief), 'model harus melihat apa yang soal minta');
+check(
+  'Worker prompt carries the same five criteria and 0-4 scale the learner sees',
+  criteria.length === 5 && criteria.every(c => wfPrompt.includes(c.label) && wfPrompt.includes(c.asks)) && /0-4/.test(wfPrompt),
+  'rubrik murid dan rubrik worker harus satu isi — kalau bank berubah, salinan di ai-tasks.js wajib ikut'
+);
+check('Worker prompt forbids band and score claims too', /jangan menyebut band IELTS atau skor TOEFL/i.test(wfPrompt) && /siap atau belum siap ujian/i.test(wfPrompt), 'aturan kejujuran berlaku di setiap transport');
+check('Worker output mode matches the prose the client renders', wfSpec.jsonMode === false, 'app.js:5096 renderMarkdown mengonsumsi prosa; response_format json_object bertentangan dengan prompt prosa');
+const wfSample = [
+  'Penuntasan tugas: 3/4 - permintaan maaf dan rencana ganti rugi ada, penjelasan kejadiannya masih tipis.',
+  'Keruntutan dan keterkaitan: 3/4 - urutan gagasannya mudah diikuti.',
+  'Kekayaan kosakata: 2/4 - kata "book" diulang terus, coba "copy" atau "edition".',
+  'Ragam dan ketepatan tata bahasa: 3/4 - kalimat majemukmu benar.',
+  'Nada dan kerapian: 3/4 - nadanya sopan dan pas untuk teman sekelas.',
+  'Satu langkah berikutnya: tambahkan satu kalimat yang menjelaskan bagaimana bukunya rusak supaya semua butir soal terjawab.',
+  'Sebelum / sesudah: "I very sorry about book." menjadi "I am very sorry about your book."'
+].join('\n');
+check('Feedback in the demanded format passes the worker output contract', AiTasks.checkOutputContract('writing_feedback', wfSample).ok === true, 'format yang diminta prompt harus lulus pemeriksa keluaran worker sendiri');
+
 // --- 5. fixture: jalankan penilai bentuk yang asli ---------------------------------------
 const blocks = ['countWords', 'writingExamTask', 'writingTargetWords', 'writingFormSignals', 'writingFormChecklist'].map(name => sourceBlock(name));
 check('Form checker is exposed as pure functions', blocks.every(Boolean), blocks.map((b, i) => (b ? '' : ['countWords', 'writingExamTask', 'writingTargetWords', 'writingFormSignals', 'writingFormChecklist'][i])).filter(Boolean).join(', ') || 'all found');

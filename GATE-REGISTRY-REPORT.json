@@ -1,13 +1,13 @@
 {
   "gate": "gate-registry",
-  "generatedAt": "2026-08-27T20:47:53.270Z",
+  "generatedAt": "2026-08-27T22:45:19.828Z",
   "status": "PASS",
   "source": "reports/add-a10-kepatuhan.md §5.1, §5.3",
   "workflow": ".github/workflows/quality.yml",
   "counts": {
-    "gateFilesInRepo": 149,
-    "nodeInvocationsInWorkflow": 153,
-    "evidenceGates": 151,
+    "gateFilesInRepo": 168,
+    "nodeInvocationsInWorkflow": 172,
+    "evidenceGates": 170,
     "liveGatesNotEvidence": 2,
     "exclusions": 1,
     "pass": 10,
@@ -41,7 +41,7 @@
     {
       "id": "setiap-gerbang-terdaftar-atau-dikecualikan",
       "status": "PASS",
-      "details": "149 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
+      "details": "168 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
     },
     {
       "id": "setiap-pengecualian-beralasan",
@@ -56,7 +56,7 @@
     {
       "id": "nol-gerbang-hantu",
       "status": "PASS",
-      "details": "153 invokasi node, semua berkasnya ada"
+      "details": "172 invokasi node, semua berkasnya ada"
     },
     {
       "id": "gerbang-live-terdaftar",
@@ -71,7 +71,7 @@
     {
       "id": "hitungan-bukti-tidak-memuat-gerbang-live",
       "status": "PASS",
-      "details": "evidenceGates=151, liveGatesNotEvidence=2 (total invokasi 153) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 151, BUKAN 153"
+      "details": "evidenceGates=170, liveGatesNotEvidence=2 (total invokasi 172) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 170, BUKAN 172"
     },
     {
       "id": "gerbang-live-merah-bila-env-diisi-tapi-rusak",

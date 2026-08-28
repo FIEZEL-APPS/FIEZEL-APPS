@@ -5,7 +5,7 @@
     "fail": 0,
     "sets": 6,
     "questions": 43,
-    "scriptWords": 3232
+    "scriptWords": 3230
   },
   "checks": [
     {
@@ -88,14 +88,14 @@
     {
       "name": "Every script is long enough to be exam listening",
       "status": "PASS",
-      "details": "lx-ielts-s1=522, lx-ielts-s2=523, lx-ielts-s3=545, lx-ielts-s4=552, lx-toefl-conv=465, lx-toefl-lecture=625"
+      "details": "lx-ielts-s1=522, lx-ielts-s2=521, lx-ielts-s3=545, lx-ielts-s4=552, lx-toefl-conv=465, lx-toefl-lecture=625"
     },
     {
       "name": "Declared word counts match the scripts",
       "status": "PASS",
       "details": [
         "lx-ielts-s1:522/522",
-        "lx-ielts-s2:523/523",
+        "lx-ielts-s2:521/521",
         "lx-ielts-s3:545/545",
         "lx-ielts-s4:552/552",
         "lx-toefl-conv:465/465",
