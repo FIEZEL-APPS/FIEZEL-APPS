@@ -66,3 +66,11 @@ SECRET-SCAN-REPORT.json
 # menambah permukaan konflik - malam ini satu di antaranya bahkan ter-commit BERISI penanda
 # konflik merge. Buktinya ada di keluaran gerbang, bukan di berkas yang tertinggal di worktree.
 *-REPORT.json
+
+# m025-180: keluaran `npm run core:proof` (core-proof-build.mjs) dan langkah "Prepare guarded
+# deploy source" di deploy-core-worker.yml. Ia adalah SALINAN fiezel-core-worker.js beserta
+# rute proof yang disisipkan - dihasilkan ulang setiap deploy, dan tidak pernah dibaca sebagai
+# masukan oleh apa pun. Perangkap yang ditutup baris ini nyata: siapa pun yang menjalankan
+# preflight lalu `git add -A` akan meng-commit salinan KEDUA dari worker, dan sejak saat itu
+# repo punya dua berkas yang terlihat sama-sama sah sementara hanya satu yang di-deploy.
+fiezel-core-worker-deploy.js
