@@ -20,6 +20,7 @@
  */
 
 import { ANALYTICS_TABLES as _tables } from './analytics-tables.js';
+import { initialPepperState, newPepper } from './analytics-core.js';
 
 export const ANALYTICS_TABLES = _tables;
 
@@ -72,6 +73,17 @@ export const SQL = Object.freeze({
     'DELETE FROM retention_daily WHERE cohort_day < ?1',
   readPepper:
     'SELECT rotated_at, current, previous FROM pepper_state WHERE id = 1',
+  // INISIALISASI MALAS. `DO NOTHING` adalah seluruh jaminannya: baris pepper
+  // hanya bisa lahir SEKALI. Dua permintaan bersamaan yang keduanya melihat
+  // tabel kosong akan sama-sama menjalankan pernyataan ini; SQLite/D1
+  // menyelesaikannya satu per satu pada kunci utama `id = 1`, jadi yang kedua
+  // TIDAK menulis apa pun dan TIDAK menyentuh `current`. Ini bukan
+  // cek-lalu-tulis: tidak ada jendela antara "belum ada" dan "tulis" yang bisa
+  // dibalap, karena keputusan menulis diambil oleh basis data, bukan oleh kode
+  // Worker. `previous` sengaja NULL: putaran pertama belum punya pendahulu.
+  initPepper:
+    'INSERT INTO pepper_state (id, rotated_at, current, previous) VALUES (1, ?1, ?2, NULL) ' +
+    'ON CONFLICT(id) DO NOTHING',
   writePepper:
     'INSERT INTO pepper_state (id, rotated_at, current, previous) VALUES (1, ?1, ?2, ?3) ' +
     'ON CONFLICT(id) DO UPDATE SET rotated_at = excluded.rotated_at, current = excluded.current, previous = excluded.previous'
@@ -205,6 +217,47 @@ export async function writePepperState(db, state) {
 }
 
 /**
+ * ensurePepperState(db, now, opts) -> { state, created }
+ *
+ * Satu-satunya jalan yang boleh dipakai jalur permintaan untuk MEMBACA pepper.
+ * Kalau `pepper_state` masih kosong (basis data baru), pepper putaran pertama
+ * dibuat di sini — supaya hari pertama tidak buta menunggu cron 00:05 WIB.
+ *
+ * KENAPA INI TIDAK BISA BALAPAN (urutan ini yang penting):
+ *   1. baca. Ada `current`? Kembalikan apa adanya. Tidak ada tulis sama sekali,
+ *      jadi jalur normal (99,99% permintaan) tidak bisa merusak apa pun.
+ *   2. susun calon (murni, `initialPepperState`).
+ *   3. `INSERT ... ON CONFLICT(id) DO NOTHING`. Baris hanya lahir sekali; kalau
+ *      sudah ada, pernyataan ini TIDAK menimpa — jadi ia juga tidak bisa
+ *      berubah menjadi rotasi tengah hari, bahkan kalau dipanggil ribuan kali.
+ *   4. BACA ULANG, dan kembalikan hasil bacaan itu — bukan calon langkah 2.
+ *      Inilah yang membuat pemanggil yang KALAH balapan tetap menyajikan pepper
+ *      PEMENANG. Kalau langkah ini dilewati dan calon sendiri dikembalikan, dua
+ *      perangkat bisa memakai dua pepper berbeda pada hari yang sama, satu
+ *      perangkat menghasilkan dua token, dan DAU menggelembung.
+ *
+ * `created` hanya penanda diagnostik untuk gerbang ("siapa yang menang"); ia
+ * TIDAK dipakai untuk melaporkan rotasi. Inisialisasi bukan rotasi.
+ *
+ * Baris rusak (ada, tapi `current` kosong) SENGAJA tidak diperbaiki di sini:
+ * DDL menyatakan `current TEXT NOT NULL`, dan satu-satunya penyembuhan yang
+ * aman adalah rotasi terjadwal (`rotatePepperDue` mengembalikan true untuk
+ * state rusak). Menulis paksa di jalur permintaan berarti membuka kembali
+ * kemungkinan menimpa pepper yang masih dipakai perangkat lain hari itu.
+ */
+export async function ensurePepperState(db, now = Date.now(), opts = {}) {
+  const existing = await readPepperState(db);
+  if (existing && existing.current) return { state: existing, created: false };
+
+  const candidate = initialPepperState(now, opts.pepper || newPepper());
+  await db.prepare(SQL.initPepper).bind(candidate.rotated_at, candidate.current).run();
+
+  const state = await readPepperState(db);
+  if (!state || !state.current) return { state: null, created: false };
+  return { state, created: state.current === candidate.current };
+}
+
+/**
  * Penjaga kontrak yang bisa dipanggil di runtime maupun di gerbang: kueri
  * analytics tidak boleh menyebut tabel kuota/identitas sama sekali.
  */
@@ -223,5 +276,5 @@ export default {
   aggregateStatements, runStatements, applyAggregate,
   countDauTokens, countUsageRows, setMetric, setMetricAtLeast, readMetricRange,
   purgeDauDedup, purgeDauDedupOlderThan, purgeUsageOlderThan, purgeRetentionOlderThan,
-  readPepperState, writePepperState, assertNoQuotaJoin
+  readPepperState, writePepperState, ensurePepperState, assertNoQuotaJoin
 };
