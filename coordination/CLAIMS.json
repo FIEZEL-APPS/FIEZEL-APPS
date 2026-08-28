@@ -50,8 +50,8 @@
       "paths": [
         "DESIGN-SYSTEM.md",
         "app.js",
+        "features/onboarding/fiezel-tour.js",
         "features/ui/fiezel-back-nav.js",
-        "features/ui/fiezel-tour.js",
         "index.html",
         "style.css"
       ],
