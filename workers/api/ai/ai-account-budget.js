@@ -63,6 +63,13 @@ export const ACCOUNT_SQL = Object.freeze({
   reserve:
     'UPDATE ai_account_day SET neurons = neurons + ?2, requests = requests + 1, touched_at = ?3 ' +
     'WHERE day = ?1 AND neurons + ?2 <= ?4 RETURNING neurons',
+  // S2 - PELEPASAN. Dipakai HANYA ketika panggilan model gagal sebelum model
+  // bekerja (lihat `model-call-gate.js#releasableFailure`). `MAX(0, ...)` supaya
+  // pelepasan ganda tidak bisa membuat penghitung negatif — penghitung negatif =
+  // plafon yang membuka sendiri.
+  release:
+    'UPDATE ai_account_day SET neurons = MAX(0, neurons - ?2), requests = MAX(0, requests - 1), ' +
+    'touched_at = ?3 WHERE day = ?1',
   // Hanya untuk laporan owner/gerbang. TIDAK dipakai jalur keputusan (keputusan
   // memakai `reserve` yang atomik).
   read: 'SELECT neurons, requests FROM ai_account_day WHERE day = ?1'
@@ -127,6 +134,36 @@ export async function reserveAccountNeurons(args) {
     // Tabel belum ada, D1 mati, SQL ditolak: kami tidak tahu berapa yang sudah
     // dibelanjakan. Tanpa hitungan, jalur berbayar tidak dibuka.
     return { allowed: false, reason: BUDGET_REASONS.unreadable, usedBefore: 0, cap: cap };
+  }
+}
+
+/**
+ * S2 - Lepas kembali `neurons` yang sudah dipesan hari ini.
+ *
+ * KENAPA INI ADA, padahal P3 sengaja TIDAK me-rollback penghitung akun: P3 benar
+ * untuk kegagalan SESUDAH model bekerja (jawaban kosong, jawaban ditolak kontrak
+ * mutu, timeout) — neuron itu memang sudah terbelanja. Yang tidak benar adalah
+ * menahan reservasi untuk panggilan yang TIDAK PERNAH SAMPAI ke model (binding
+ * hilang, provider menolak, galat jaringan). Menahannya berarti plafon 8.000
+ * habis oleh permintaan yang nol biaya, dan AI mati untuk murid tanpa satu neuron
+ * pun terpakai. Batas mana yang boleh dilepas ditentukan SATU tempat:
+ * `model-call-gate.js#releasableFailure()`.
+ *
+ * Fail-closed di sini berarti: kalau pelepasan GAGAL, kami tetap menghitung
+ * neuronnya sebagai terpakai (arah salah yang aman untuk dompet), dan pemanggil
+ * mendapat `false` supaya amplopnya tidak mengklaim pelepasan yang tidak terjadi.
+ */
+export async function releaseAccountNeurons(args) {
+  const a = args || {};
+  const db = a.db || null;
+  const want = Math.max(1, Math.ceil(Number(a.neurons) || 1));
+  const at = Number(a.now) || 0;
+  if (!db || typeof db.prepare !== 'function') return false;
+  try {
+    await db.prepare(ACCOUNT_SQL.release).bind(dayKeyUtc(at), want, at).run();
+    return true;
+  } catch (_) {
+    return false;
   }
 }
 
