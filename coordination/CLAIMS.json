@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T21:45:00+07:00",
+  "updated": "2026-08-28T21:35:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -38,6 +38,19 @@
       "catatan": "Penegak koordinasi, siaran, arbiter versi, nightwatch."
     },
     {
+      "sesi": "sesi-computer-086e9698/A6",
+      "peran": "worker MASTER",
+      "paths": [
+        "core-config.js",
+        "sw.js",
+        "cf-config-killswitch-test.js"
+      ],
+      "mulai": "2026-08-28T21:10:00+07:00",
+      "catatan": "Sakelar klien masih enabled:false base:'' usage:'off'. Perlu penyalaan BERTAHAP: analytics saja, AI tetap Puter. Harus memperhitungkan core-config.js ikut precache cache-first."
+    }
+  ],
+  "finished": [
+    {
       "sesi": "sesi-computer-ed18fcf2",
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
       "paths": [
@@ -51,22 +64,9 @@
         "reports/uiux-2026-08-28/",
         "style.css"
       ],
-      "mulai": "2026-08-28T16:55:00+07:00",
-      "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER. Dua gerbang (paw-mascot, r2-smoke) disesuaikan struktural ke kontrak m025-180: keluar kuis lewat konfirmasi; gerbang lewati materi = mode ukur (popup keyakinan pindah ke jalur latihan)."
+      "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER. Dua gerbang (paw-mascot, r2-smoke) disesuaikan struktural ke kontrak m025-180: keluar kuis lewat konfirmasi; gerbang lewati materi = mode ukur (popup keyakinan pindah ke jalur latihan). SELESAI: PR #237 merged (m025-182). Bonus: T-030 dieksekusi — regex CF_ENDPOINT_ROUTES usage disempitkan sesuai permintaan MASTER (activity/feedback/policy kembali ke jalur lama).",
+      "selesai": "2026-08-28T21:35:00+07:00"
     },
-    {
-      "sesi": "sesi-computer-086e9698/A6",
-      "peran": "worker MASTER",
-      "paths": [
-        "core-config.js",
-        "sw.js",
-        "cf-config-killswitch-test.js"
-      ],
-      "mulai": "2026-08-28T21:10:00+07:00",
-      "catatan": "Sakelar klien masih enabled:false base:'' usage:'off'. Perlu penyalaan BERTAHAP: analytics saja, AI tetap Puter. Harus memperhitungkan core-config.js ikut precache cache-first."
-    }
-  ],
-  "finished": [
     {
       "sesi": "sesi-computer-086e9698",
       "peran": "MASTER",
