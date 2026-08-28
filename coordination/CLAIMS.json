@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T21:35:00+07:00",
+  "updated": "2026-08-28T21:55:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -47,6 +47,24 @@
       ],
       "mulai": "2026-08-28T21:10:00+07:00",
       "catatan": "Sakelar klien masih enabled:false base:'' usage:'off'. Perlu penyalaan BERTAHAP: analytics saja, AI tetap Puter. Harus memperhitungkan core-config.js ikut precache cache-first."
+    },
+    {
+      "sesi": "sesi-computer-ed18fcf2",
+      "peran": "UIUX-OVERHAUL (perplexity computer, lanjutan audit m025-182)",
+      "paths": [
+        "app.js",
+        "style.css",
+        "index.html",
+        "DESIGN-SYSTEM.md",
+        "features/mascot/",
+        "features/speaking-listening/",
+        "features/ui/fiezel-ui-manager.js",
+        "features/ui/fiezel-coach-bubble.js",
+        "assets/marketing/mascot-poses/",
+        "tools/export-mascot.mjs"
+      ],
+      "mulai": "2026-08-28T21:55:00+07:00",
+      "catatan": "Overhaul pengalaman: mode lesson bebas distraksi (topbar+bottomnav global disembunyikan saat stage aktif), header lesson minimal, hirarki layar soal, dekluter Home, QA anatomi + skala/penempatan PAW, penyatuan kontrol state maskot, penyederhanaan shadow/border. TIDAK menyentuh: core-config.js/sw.js (klaim A6 — bump versi hanya via arbiter di akhir), coordination/, neural-voice, TASKS-LEDGER, bank soal. Identitas FIEZEL dipertahankan (bukan klon Duolingo)."
     }
   ],
   "finished": [
