@@ -81,13 +81,13 @@
     // --------------------------------------------------- articles_determiners
     first_vs_subsequent_mention: 'Penyebutan pertama dan penyebutan berikutnya: a dan the',
     much_many_little_few_countability: 'Benda terhitung dan tak terhitung: much, many, little, few',
-    zero_article_generic_plural_vs_the_specific: 'Tanpa kata sandang untuk hal umum, the untuk hal tertentu',
+    zero_article_generic_plural_vs_the_specific: 'Tanpa artikel untuk hal umum, the untuk hal tertentu',
     definite_article_with_unique_referents_and_superlatives: 'The untuk hal yang hanya satu dan untuk bentuk superlative',
     demonstrative_reference_distance_this_these_that_those: 'Jarak rujukan: this, these, that, those',
     possessive_determiner_vs_double_genitive_of_mine: 'Kepemilikan sebelum kata benda dan bentuk of mine',
-    article_with_institutions_school_prison_hospital: 'Kata sandang pada lembaga: school, prison, hospital',
+    article_with_institutions_school_prison_hospital: 'Artikel pada lembaga: school, prison, hospital',
     quantifier_of_before_object_pronoun: 'Kata jumlah + of sebelum kata ganti objek',
-    zero_article_with_proper_nouns_exceptions_the_netherlands: 'Nama diri tanpa kata sandang dan kekecualiannya',
+    zero_article_with_proper_nouns_exceptions_the_netherlands: 'Nama diri tanpa artikel dan pengecualiannya',
 
     // ---------------------------------------------------------- prepositions
     time_prepositions_in_on_at: 'Kata depan waktu: in, on, at',
@@ -122,7 +122,7 @@
     // ------------------------------------------------------------- comparison
     comparative_vs_superlative_scope: 'Membandingkan dua hal atau menyebut yang paling: comparative dan superlative',
     as_as_equality_vs_comparative: 'Menyatakan setara dengan as ... as',
-    double_comparative_progressive_change: 'Perubahan yang terus berlanjut: the more ... the more',
+    double_comparative_progressive_change: 'Perubahan yang terus berlanjut: busier and busier',
     less_vs_fewer_countability_agreement: 'Membandingkan jumlah: less dan fewer',
     comparative_intensifiers_much_far_a_lot_before_comparative: 'Penguat sebelum bentuk perbandingan: much, far, a lot',
     superlative_with_ever_present_perfect_combination: 'Bentuk superlative bersama ever dan present perfect',
@@ -139,7 +139,7 @@
     // ------------------------------------------------------- error_correction
     subject_verb_agreement_with_intervening_phrase: 'Kesesuaian subjek dan kata kerja saat ada sisipan',
     word_order_adverb_placement: 'Letak kata keterangan dalam kalimat',
-    article_omission_with_uncountable: 'Kata sandang yang tidak dipakai pada benda tak terhitung',
+    article_omission_with_uncountable: 'Artikel yang tidak dipakai pada benda tak terhitung',
     comma_splice_run_on_correction: 'Memperbaiki dua kalimat yang disambung hanya dengan koma',
     confusing_word_pair_affect_vs_effect: 'Pasangan kata yang mudah tertukar: affect dan effect',
     dangling_modifier_correction: 'Memperbaiki keterangan yang menggantung tanpa pelaku jelas',
@@ -176,7 +176,7 @@
     past_simple_regular_forms: 'Kata kerja lampau beraturan dan bentuk dasar sesudah did',
     past_be_was_were: 'Was dan were: bentuk lampau kata kerja be',
     plural_nouns_basic: 'Kata benda jamak dan perubahan ejaannya',
-    place_prepositions_basic: 'Preposisi tempat: in, on, dan at',
+    place_prepositions_basic: 'Kata depan tempat: in, on, dan at',
     present_continuous_basics: 'Present continuous: sedang berlangsung sekarang',
     question_words_basic: 'Kata tanya dasar: who, what, where, when, why',
     some_any_countable_uncountable: 'Some, any, many, dan much sesuai jenis kata benda',

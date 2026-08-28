@@ -22598,7 +22598,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is her attitude towards the head teacher announcement?",
+      "question": "What is her attitude towards the head teacher's announcement?",
       "options": [
         "It was accurate but not informative",
         "It was a deliberate attempt to mislead",
@@ -28179,7 +28179,7 @@
       },
       "question": "What does she say about the lost income?",
       "options": [
-        "It was the library main source of funds",
+        "It was the library's main source of funds",
         "It has already been recovered in full",
         "It was larger than the value of the books",
         "It would never have been collected"

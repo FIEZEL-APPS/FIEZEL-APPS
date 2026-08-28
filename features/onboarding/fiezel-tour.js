@@ -175,14 +175,14 @@
     Object.freeze({
       id: 'sekali-dengar',
       target: '#speakingListeningRoot .fsl-card',
-      title: 'Dengar sekali, jawab',
-      body: 'Di sini audionya cuma diputar sekali \u2014 kayak percakapan sungguhan. Pasang telinga baik-baik, baru pilih jawabanmu.'
+      title: 'Dengar dulu, baru jawab',
+      body: 'Putar audionya dan pasang telinga baik-baik. Kalau belum nangkep, ulang \u2014 ada jatah replay di tiap soal.'
     }),
     Object.freeze({
       id: 'meleset',
       target: '#speakingListeningRoot .fsl-privacy',
       title: 'Meleset? Nggak apa-apa',
-      body: 'Sekali-dengar memang menantang, dan salah itu bagian dari latihan. PAW nemenin kamu di tiap soalnya.'
+      body: 'Salah itu bagian dari latihan, bukan masalah. PAW nemenin kamu di tiap soalnya.'
     }),
     Object.freeze({
       id: 'terjemahan',
