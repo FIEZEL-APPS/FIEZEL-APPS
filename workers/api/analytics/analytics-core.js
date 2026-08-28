@@ -114,6 +114,78 @@ export function rotatePepper(state, now, pepper) {
   return { rotated_at: Number(now) || 0, current, previous: prior };
 }
 
+/* --------------------------------------------------------------------------
+ * INISIALISASI MALAS (COLD START) — pepper putaran PERTAMA
+ * --------------------------------------------------------------------------
+ * Cacat yang ditutup di sini: pepper HANYA pernah dibuat oleh rollup harian
+ * (cron `5 17 * * *`). Basis data analytics yang baru karena itu selalu buta di
+ * hari pertama: `pepper_state` nol baris -> `GET /api/usage/pepper` 503 ->
+ * klien tidak bisa menurunkan `visitor_token` -> `dau_dedup` kosong -> DAU 0.
+ * Bukan "belum ada data"; benar-benar tidak ada jalan mengumpulkan data sampai
+ * cron pertama lewat.
+ *
+ * Tiga bahaya yang HARUS tidak terjadi saat inisialisasi, dan bagaimana bentuk
+ * fungsi ini menutupnya:
+ *
+ * (a) DUA pepper berbeda dari dua permintaan bersamaan. Fungsi ini murni: ia
+ *     hanya MENYUSUN calon. Yang menjamin ketunggalan adalah penulisan
+ *     idempoten di lapisan D1 (`SQL.initPepper` = `INSERT ... ON CONFLICT(id)
+ *     DO NOTHING`) plus baca-ulang setelah tulis, sehingga pemanggil yang kalah
+ *     balapan memakai pepper pemenang, bukan calonnya sendiri. Lihat
+ *     `ensurePepperState()` di analytics-store-d1.js.
+ *
+ * (b) Inisialisasi TIDAK boleh berubah menjadi rotasi tengah hari. Rotasi
+ *     tengah hari membuat satu perangkat menghitung dua token pada `day` yang
+ *     sama -> DAU menggelembung. Karena itu `rotated_at` TIDAK diisi `now`,
+ *     melainkan AWAL JENDELA rotasi yang sedang berjalan
+ *     (`pepperWindowStart(now)`, yaitu batas cron terakhir yang sudah lewat).
+ *     Dua akibatnya keduanya benar:
+ *       - jam berikutnya (rollup manual, retry cron di jendela yang sama)
+ *         melihat umur < 24 jam -> TIDAK merotasi;
+ *       - cron BERIKUTNYA melihat umur tepat 24 jam -> merotasi tepat waktu.
+ *     Kalau `rotated_at` diisi `now`, pepper yang dibuat pukul 08:00 baru boleh
+ *     dirotasi 08:00 esok — cron 17:05 melewatkannya, dan pepper itu hidup
+ *     sampai ~48 jam. Token hari-1 lalu bisa disambungkan ke hari-2, yaitu
+ *     tepat janji privasi yang ditulis dashboard ke owner.
+ *
+ * (c) `previous` = null. Belum ada pepper sebelumnya; mengisinya dengan
+ *     `current` (atau nilai karangan) akan membuat jendela toleransi berbohong
+ *     dan membuat gerbang "rotasi pertama tidak menyimpan previous palsu"
+ *     kehilangan artinya.
+ */
+
+/**
+ * Menit UTC tempat cron rollup berjalan: `5 17 * * *` = 17:05 UTC = 00:05 WIB.
+ * Angka ini WAJIB sama dengan cron di `wrangler.toml`; kalau cron digeser,
+ * geser juga di sini, karena inilah batas jendela pepper.
+ */
+export const PEPPER_WINDOW_ANCHOR_UTC_MINUTES = 17 * 60 + 5;
+
+/**
+ * pepperWindowStart(now) -> epoch ms batas cron TERAKHIR yang sudah lewat.
+ * Fungsi murni, tanpa zona waktu lokal: dihitung dari epoch UTC saja.
+ */
+export function pepperWindowStart(now, anchorMinutes = PEPPER_WINDOW_ANCHOR_UTC_MINUTES) {
+  const t = Number(now);
+  if (!Number.isFinite(t)) return 0;
+  const dayStart = Math.floor(t / PEPPER_ROTATION_MS) * PEPPER_ROTATION_MS; // tengah malam UTC
+  const candidate = dayStart + Math.trunc(anchorMinutes) * 60000;
+  return candidate <= t ? candidate : candidate - PEPPER_ROTATION_MS;
+}
+
+/**
+ * initialPepperState(now, pepper?) -> state putaran pertama.
+ * Bentuk kembaliannya SAMA dengan `rotatePepper()` (tiga kolom, tidak lebih),
+ * supaya `writePepperState()` tidak perlu tahu bedanya. Yang membedakan
+ * "inisialisasi" dari "rotasi" bukan bentuk state, melainkan: `previous` null,
+ * `rotated_at` di awal jendela (bukan `now`), dan tidak ada satu pun pemanggil
+ * yang melaporkannya sebagai `pepperRotated`.
+ */
+export function initialPepperState(now, pepper) {
+  const current = typeof pepper === 'string' && pepper.length >= 32 ? pepper : newPepper();
+  return { rotated_at: pepperWindowStart(now), current, previous: null };
+}
+
 /* ==========================================================================
  * 2. DAFTAR EVENT + ALLOWLIST FIELD (KETAT)
  * ========================================================================== */
@@ -325,6 +397,15 @@ export function aggregate(events) {
   const M = day => (metrics[day] || (metrics[day] = {}));
   const U = day => (usage[day] || (usage[day] = {}));
 
+  /** Catat satu token DAU, tepat sekali per (hari, token). */
+  const noteDau = (day, token) => {
+    if (!token) return;
+    const key = `${day}|${token}`;
+    if (dauSeen.has(key)) return;
+    dauSeen.add(key);
+    dau.push({ day, token });
+  };
+
   for (const e of Array.isArray(events) ? events : []) {
     if (!e || typeof e !== 'object' || !e.name || !e.day) continue;
     const day = e.day;
@@ -333,18 +414,36 @@ export function aggregate(events) {
     bump(m, 'events_total');
 
     switch (e.name) {
+      // `app_open` DAN `day_active` sama-sama menyumbang DAU.
+      //
+      // Sebelumnya hanya `day_active` yang dicatat, padahal `app_open` tetap
+      // MEWAJIBKAN dan MENGIRIM `visitor_token` (lihat normalizeEvent:
+      // `missing_visitor_token`). Token yang dikumpulkan tapi tidak pernah
+      // dipakai adalah biaya privasi tanpa manfaat — dan lebih buruk: angkanya
+      // salah nama. `day_active` hanya dikirim klien setelah jawaban ke-5 hari
+      // itu, jadi "DAU" lama sebenarnya berarti "perangkat yang menjawab >= 5
+      // soal" — sebuah angka KETERLIBATAN, bukan kehadiran. Dashboard dan
+      // PRIVACY.md menyebutnya "perangkat aktif harian". Yang diperbaiki di
+      // sini adalah maknanya: DAU = perangkat yang MEMBUKA aplikasi hari itu
+      // (app_open ∪ day_active), sementara angka keterlibatan tetap utuh dan
+      // terpisah sebagai `day_active_reports`. Tidak ada angka yang hilang;
+      // satu angka berhenti salah nama.
+      //
+      // Menggabung dua sumber TIDAK menggandakan siapa pun: dedup terjadi di
+      // sini per (day, token) dan sekali lagi di basis data (`dau_dedup`
+      // PRIMARY KEY (day, token) + `INSERT OR IGNORE`).
       case 'app_open':
         bump(m, 'app_open');
         if (e.platform) bump(u, `platform:${e.platform}`);
         if (e.has_identity === true) bump(m, 'app_open_with_identity');
+        noteDau(day, e.visitor_token);
         break;
 
       case 'day_active': {
         bump(m, 'day_active_reports');
         if (e.attempts_bucket) bump(u, `attempts:${e.attempts_bucket}`);
         if (e.platform) bump(u, `platform:${e.platform}`);
-        const key = `${day}|${e.visitor_token}`;
-        if (!dauSeen.has(key)) { dauSeen.add(key); dau.push({ day, token: e.visitor_token }); }
+        noteDau(day, e.visitor_token);
         break;
       }
 
@@ -479,6 +578,7 @@ export function mergeAggregate(a, b) {
 
 export default {
   visitorToken, newPepper, rotatePepperDue, rotatePepper, PEPPER_ROTATION_MS,
+  pepperWindowStart, initialPepperState, PEPPER_WINDOW_ANCHOR_UTC_MINUTES,
   normalizeEvent, aggregate, mergeAggregate, dayKeyFromMs,
   EVENT_SPEC, KNOWN_EVENTS, CLIENT_EVENTS, SERVER_ONLY_EVENTS, isServerOnly,
   VISITOR_TOKEN_PATTERN

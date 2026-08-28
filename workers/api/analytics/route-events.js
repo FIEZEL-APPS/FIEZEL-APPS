@@ -260,7 +260,16 @@ export async function handlePepper(request, env, ctx, now = Date.now()) {
   const db = analyticsDb(env);
   if (!db) return json({ ok: false, error: 'unavailable' }, 503);
   const store = await import('./analytics-store-d1.js');
-  const state = await store.readPepperState(db);
+  // COLD START: `ensurePepperState` membuat pepper putaran pertama bila
+  // `pepper_state` masih kosong. Tanpa ini, basis data analytics yang baru
+  // menjawab 503 sampai cron 00:05 WIB pertama lewat — dan karena klien butuh
+  // pepper untuk menurunkan `visitor_token`, hari pertama SELALU nol DAU.
+  // Penulisannya idempoten di level D1 (`ON CONFLICT(id) DO NOTHING`) dan hasil
+  // yang disajikan adalah hasil BACA ULANG, jadi dua permintaan bersamaan tidak
+  // mungkin menyajikan dua pepper berbeda. Lihat catatan panjang di
+  // analytics-store-d1.js.
+  const ensured = await store.ensurePepperState(db, now);
+  const state = ensured && ensured.state;
   if (!state || !state.current) return json({ ok: false, error: 'unavailable' }, 503);
   return json({
     ok: true,
