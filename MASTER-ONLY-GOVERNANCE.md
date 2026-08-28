@@ -2,6 +2,10 @@
 
 Status: ENFORCED POLICY
 Owner identity: `FIEZEL-APPS`
+Owner identity history: renamed from `FIEZEL-APPS` on 2026-08-28 (same GitHub account, id
+315542995). The rename is recorded rather than erased because every actor gate in
+`.github/workflows/` compares against this login by literal string, and a reader auditing an
+older run needs to know which login was in force at the time.
 Control model: single MASTER executor; all other internal/external helpers are advisory-only.
 
 ## 1. Sole write authority

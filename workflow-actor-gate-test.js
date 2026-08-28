@@ -50,12 +50,48 @@ const root = __dirname;
 const WORKFLOW_DIR = path.join(root, '.github', 'workflows');
 
 /**
- * Login owner. Bukan pilihan gerbang ini — ini yang SUDAH dipakai empat workflow di repo
- * (deploy-core-worker.yml:17, configure-core.yml:12, push-reminders.yml:15,
- * audio-prerender-cf.yml:55) dan cocok dengan subdomain produksi `fitrajft.workers.dev`
- * (audio/manifest.json:5). Governance-nya di MASTER-ONLY-GOVERNANCE.md.
+ * Login owner. Bukan pilihan gerbang ini — ini yang SUDAH dipakai workflow di repo
+ * (deploy-core-worker.yml, configure-core.yml, push-reminders.yml, audio-prerender-cf.yml,
+ * master-authority-guard.yml). Governance-nya di MASTER-ONLY-GOVERNANCE.md.
+ *
+ * m025-180: akun GitHub di-rename `FIEZEL-APPS` -> `FIEZEL-APPS`. Rename itu MEMATIKAN setiap
+ * gerbang ini tanpa satu pun gejala di CI: job yang `if`-nya tidak lagi cocok TIDAK gagal, ia
+ * di-SKIP, dan workflow-nya tetap hijau — jadi owner menekan "Run workflow", melihat centang
+ * hijau, dan tidak ada yang ter-deploy. Satu-satunya yang gagal keras adalah
+ * master-authority-guard.yml, karena ia membandingkan di bash (`!=`), bukan di ekspresi
+ * GitHub: setiap push ke `main` oleh owner berubah jadi exit 1.
+ *
+ * `subdomain produksi fitrajft.workers.dev` di catatan lama SENGAJA tidak ikut diganti: itu
+ * subdomain akun CLOUDFLARE (audio/manifest.json:5), bukan login GitHub, dan rename GitHub
+ * tidak menyentuhnya.
  */
 const OWNER_LOGIN = 'FIEZEL-APPS';
+
+/**
+ * Login owner WAJIB cocok dengan pemilik repo yang sebenarnya.
+ *
+ * Ini penjaga kelas cacat, bukan penjaga satu nilai: rename akun berikutnya akan MEMATIKAN
+ * setiap gerbang aktor secara diam-diam (job di-SKIP, workflow tetap hijau), dan tanpa
+ * pemeriksaan ini tidak ada satu pun gerbang yang akan mengatakannya. Pemiliknya dibaca dari
+ * remote git, bukan diketik ulang — sumber yang ikut berubah sendiri saat repo berpindah.
+ *
+ * Perbandingannya case-insensitive: GitHub memperlakukan login sebagai case-insensitive dan
+ * URL remote bisa membawa kapitalisasi berbeda dari yang ditulis di workflow. Yang dijaga di
+ * sini adalah IDENTITASNYA, bukan kapitalisasinya — kapitalisasi dijaga di tempat yang memang
+ * peka: perbandingan bash di master-authority-guard.yml, yang diuji terpisah di bawah.
+ *
+ * Kalau remote tidak ada (klon tanpa remote, sandbox), pemeriksaan ini MELAPOR dan dilewati,
+ * bukan gagal: ketiadaan remote bukan cacat repo.
+ */
+const ownerFromRemote = (() => {
+  try {
+    const url = require('child_process')
+      .execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] })
+      .trim();
+    const m = /github\.com[/:]([^/]+)\//.exec(url);
+    return m ? m[1] : null;
+  } catch { return null; }
+})();
 
 /** Kata kunci yang menandai "workflow ini bisa mengubah infrastruktur". */
 const DEPLOY_PATTERNS = [
@@ -262,6 +298,19 @@ const ACTOR_COMPARE = /github\.actor\s*==\s*'([^']+)'/;
 
   const files = fs.readdirSync(WORKFLOW_DIR).filter((f) => f.endsWith('.yml')).sort();
   check('ada workflow untuk dipindai', files.length > 0, files.length + ' berkas .yml');
+
+  /* Penjaga rename akun. Lihat blok komentar di atas ownerFromRemote: rename mematikan setiap
+   * gerbang aktor tanpa gejala, karena job yang `if`-nya tidak cocok di-SKIP dan workflow-nya
+   * tetap hijau. */
+  if (ownerFromRemote === null) {
+    check('H login owner cocok dengan pemilik repo (dilewati: remote git tidak ada)', true,
+      'tidak ada remote origin - ketiadaan remote bukan cacat repo');
+  } else {
+    check('H login owner cocok dengan pemilik repo di remote git',
+      ownerFromRemote.toLowerCase() === OWNER_LOGIN.toLowerCase(),
+      'remote=' + ownerFromRemote + ' OWNER_LOGIN=' + OWNER_LOGIN +
+      ' — kalau berbeda, akun di-rename dan SETIAP gerbang aktor kini di-SKIP diam-diam');
+  }
 
   const rows = [];
 

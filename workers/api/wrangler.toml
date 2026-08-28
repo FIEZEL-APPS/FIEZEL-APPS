@@ -42,7 +42,14 @@ AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
 # Catatan jujur: `fiezel-apps.github.io` ada di public suffix list => cross-site,
 # jadi cookie identitas TIDAK akan terkirim dari sana. Cermin GitHub Pages tetap
 # bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
-ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
+#
+# m025-180: akun GitHub di-rename `FIEZEL-APPS` -> `FIEZEL-APPS`, jadi origin Pages ikut
+# berpindah ke `https://fiezel-apps.github.io`. Origin LAMA sengaja DITAHAN di daftar ini,
+# tidak dihapus: GitHub memasang redirect dari nama lama, jadi murid yang sudah memasang PWA
+# dari alamat lama masih membuka aplikasi di origin lama sampai ia memasang ulang. Menghapus
+# origin lama hari ini berarti memutus mereka dari AI/TTS tanpa mereka pernah melakukan apa
+# pun. Hapus setelah owner memastikan nol lalu lintas dari origin lama.
+ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io,https://fiezel-apps.github.io"
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
 # Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
 # jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).

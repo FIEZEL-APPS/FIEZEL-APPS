@@ -1,6 +1,7 @@
 # FIEZEL-APPS — working agreement
 
-This is FIEZEL-APPS's personal repo (FIEZEL, a personal English-learning PWA). Owner has
+This is FIEZEL-APPS's personal repo (FIEZEL, a personal English-learning PWA; the GitHub
+account was renamed from `FIEZEL-APPS` on 2026-08-28). Owner has
 pre-authorized the following so Claude can work without stopping to ask each time:
 
 - **Git/GitHub actions on this repo are pre-authorized**: commit, push to feature branches,
