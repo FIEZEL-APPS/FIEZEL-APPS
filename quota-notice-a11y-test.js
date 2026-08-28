@@ -120,8 +120,42 @@ const APP_NOTICE_FUNCTIONS = ['presentQuotaNotice', 'maybePresentPuterCreditNoti
 // Komentar dibuang: penjelasan A8 di app.js MENYEBUT `<a>` dan `role="alert"` sebagai
 // pelanggaran yang diperbaiki, dan pemindai nggak boleh mengira kutipan itu kodenya.
 const appNoticeBlocks = APP_NOTICE_FUNCTIONS.map((n) => stripComments(functionBlock(appSource, n)));
-const K3_app = appNoticeBlocks.reduce((acc, b) => acc.concat(studentSentences(b)), []);
+const K3_app_inline = appNoticeBlocks.reduce((acc, b) => acc.concat(studentSentences(b)), []);
+
+/* SPLIT STRUKTURAL-vs-KANON (AI-20 F05/F06 — keputusan W1-TESTPLAN, eksemplar P0):
+ *  - Aturan STRUKTURAL locale-netral — istilah teknis (a), role="alert" (d), tanpa permukaan
+ *    bayar (c), precache — berlaku untuk SEMUA locale yang punya copy.
+ *  - Aturan KANON-ID — nggak/tidak/Anda (b), no-blame (b2), varian sunyi (f) — berjalan PENUH
+ *    dan verbatim atas korpus id: murid Indonesia nggak boleh melihat perubahan (Hukum Besi #1).
+ *  - Slot KANON-TH sengaja KOSONG dan FAIL-CLOSED: copy th yang terdeteksi tanpa kanon th
+ *    = MERAH (lihat pemeriksaan kanon-th di bawah). Gate ini nggak boleh di-disable — di-split.
+ *
+ * K3 UNION: begitu naskah notice pindah byte-identik dari app.js ke copy-map
+ * features/i18n/copy-id-quota.js (konvensi domain dari brief), kalimatnya WAJIB tetap ikut
+ * dihitung di sini — tanpa union ini hitungan 'nggak' bisa jatuh di bawah 5 dan gate merah
+ * justru karena ekstraksi yang benar (risiko urutan eksplisit W1-TESTPLAN). Glob yang belum
+ * ada hari ini = perilaku identik dengan sebelumnya, hijau dua arah. PERHATIAN W2-APP: kalau
+ * domain copy-map notice diberi nama lain, perbarui daftar ini lewat handoff. */
+const QUOTA_COPY_MAPS_ID = ['features/i18n/copy-id-quota.js', 'features/i18n/copy-id-notice.js'];
+const K3_copyMap = QUOTA_COPY_MAPS_ID
+  .filter((p) => fs.existsSync(path.join(root, p)))
+  .reduce((acc, p) => acc.concat(studentSentences(stripComments(read(p)))), []);
+const K3_app = K3_app_inline.concat(K3_copyMap);
 const CANON = K1_module.concat(K2_routes, K3_app).filter(Boolean);
+
+/* Slot kanon th — fail-closed. Kanon register th (padanan sopan-kasual untuk aturan
+ * nggak/kamu/no-blame) WAJIB ditulis penutur asli (keputusan orkestrator: terjemahan th
+ * adalah draft AI, dilarang jadi kanon). Selama CANON_TH_RULES masih null, keberadaan
+ * copy th quota = MERAH — mencegah th rilis tanpa penjaga register sama sekali. */
+const QUOTA_COPY_MAPS_TH = ['features/i18n/copy-th-quota.js', 'features/i18n/copy-th-notice.js'];
+const thQuotaCopyPaths = QUOTA_COPY_MAPS_TH.filter((p) => fs.existsSync(path.join(root, p)));
+const CANON_TH_RULES = null; // diisi bersama penutur asli setelah Wave 2 — JANGAN diisi draft AI
+// Kalimat murid th untuk aturan STRUKTURAL: literal yang kelihatan, cukup panjang, dan bukan
+// kunci copy-map (kunci = slug ASCII tanpa spasi — nggak boleh dihitung sebagai naskah).
+const K_TH = thQuotaCopyPaths.reduce((acc, p) => acc.concat(
+  stringLiterals(stripComments(read(p))).map(visibleText)
+    .filter((s) => s.length >= 12 && !/^[a-z0-9.\-_]+$/i.test(s))
+), []);
 
 /* ======================================== (a) istilah teknis terlarang =================== */
 
@@ -144,8 +178,11 @@ const FORBIDDEN_TERMS = [
 
 test('(a) nggak ada istilah teknis terlarang di seluruh naskah murid', () => {
   assert.ok(CANON.length >= 40, 'korpus naskah terlalu kecil (' + CANON.length + ') — pemindai kehilangan sasarannya');
+  // Aturan STRUKTURAL locale-netral: berjalan atas naskah SEMUA locale yang punya copy
+  // (id hari ini; th ikut terpindai otomatis begitu copy-nya ada).
+  const STRUCTURAL_CORPUS = CANON.concat(K_TH);
   const pelanggaran = [];
-  for (const sentence of CANON) {
+  for (const sentence of STRUCTURAL_CORPUS) {
     for (const [term, re] of FORBIDDEN_TERMS) {
       if (re.test(sentence)) pelanggaran.push(term + ' → "' + sentence.slice(0, 90) + '"');
     }
@@ -183,6 +220,17 @@ test('(b2) nggak ada janji hasil dan nggak ada tuduhan kepada murid', () => {
   // Sebaliknya, naskah keadaan gagal WAJIB punya kalimat yang membebaskan murid.
   assert.ok(CANON.some((s) => /bukan kesalahanmu|bukan kamu yang salah|bukan kamu/i.test(s)),
     'nggak ada satu pun kalimat yang menegaskan ini bukan kesalahan murid');
+});
+
+test('(kanon-th, fail-closed) copy th tanpa kanon register th = MERAH', () => {
+  // AI-20 F05: risiko terburuk gate ini adalah DI-DISABLE saat Thai datang — persona murid
+  // kehilangan satu-satunya penjaganya. Karena itu slotnya dipasang sekarang dan gagal
+  // tertutup: begitu copy th quota terdeteksi, kanon th harus sudah terdefinisi.
+  if (!thQuotaCopyPaths.length) return; // th belum ada — belum ada yang dijaga hari ini
+  assert.ok(CANON_TH_RULES,
+    'copy th terdeteksi (' + thQuotaCopyPaths.join(', ') + ') tapi CANON_TH_RULES belum ' +
+    'terdefinisi. Kanon register th wajib ditulis PENUTUR ASLI sebelum copy th boleh hidup. ' +
+    'Jangan menonaktifkan pemeriksaan ini — isi kanonnya.');
 });
 
 /* ======================================== (c) tanpa permukaan bayar ===================== */
@@ -401,7 +449,8 @@ const report = {
   schema: 'fiezel-quota-notice-a11y-v1',
   generatedAt: new Date().toISOString(),
   pass: failures === 0,
-  corpus: { module: K1_module.length, routes: K2_routes.length, app: K3_app.length },
+  corpus: { module: K1_module.length, routes: K2_routes.length, app: K3_app.length, appInline: K3_app_inline.length, copyMapId: K3_copyMap.length, th: K_TH.length },
+  thCopyDetected: thQuotaCopyPaths.slice(),
   urgentKeys: Copy.URGENT_KEYS.slice(),
   forbiddenTerms: FORBIDDEN_TERMS.map((f) => f[0]),
   forbiddenToastMs: Copy.FORBIDDEN_TOAST_MS,

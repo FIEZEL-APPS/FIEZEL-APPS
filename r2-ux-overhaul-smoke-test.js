@@ -39,6 +39,20 @@ const ctx={console,self:null,document,localStorage,fetch,location:{href:'http://
 ctx.Notification.permission='granted';ctx.Notification.requestPermission=async()=>'granted';
 ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(t){this.text=t};
 vm.createContext(ctx);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — index.html memuat fiezel-i18n.js +
+// copy-id-*.js SEBELUM modul fitur dan app.js. Begitu naskah home R2 pindah ke copy-map,
+// render memanggil FiezelI18n.t(); tanpa preload ini vm meledak. existsSync = hijau dua arah.
+// Asersi teks id di bawah TIDAK berubah (byte-identik, dijaga id-golden-snapshot-test.js).
+const i18nDir=path.join(root,'features','i18n');
+if(fs.existsSync(path.join(i18nDir,'fiezel-i18n.js'))){
+  vm.runInContext(fs.readFileSync(path.join(i18nDir,'fiezel-i18n.js'),'utf8'),ctx,{filename:'fiezel-i18n.js'});
+  for(const f of fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),ctx,{filename:f});
+}
+// AI-20 F06 (W1-TESTPLAN 2a): label hero adalah naskah murid yang dijaga di level SUMBER —
+// ia boleh pindah byte-identik ke copy-map, jadi cek source memakai UNION app.js + copy-id.
+const copyIdUnion=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const appCopyUnion=app+'\n'+copyIdUnion;
 vm.runInContext(gems,ctx,{filename:'gems-core.js'});
 vm.runInContext(app,ctx,{filename:'app.js'});
 setTimeout(()=>{
@@ -54,7 +68,7 @@ setTimeout(()=>{
   // adaptiveReady dihitung ulang oleh save() dari bukti diagnostik, jadi label hero untuk
   // murid siap-adaptif dijaga di level SUMBER; runtime memeriksa struktur yang berlaku
   // untuk semua keadaan (CTA tunggal + panel ramai hilang).
-  assert(/Sesi berikutnya · dipilih Paw/.test(app),'label hero "Sesi berikutnya · dipilih Paw" tidak ada di coach-strip');
+  assert(/Sesi berikutnya · dipilih Paw/.test(appCopyUnion),'label hero "Sesi berikutnya · dipilih Paw" tidak ada di coach-strip');
   ctx.go('home');
   const homeMarkup=elements.app.innerHTML;
   assert(/coach-strip-go/.test(homeMarkup),'CTA utama hero tidak ada');

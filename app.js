@@ -13,7 +13,7 @@ const APP_VERSION=self.FIEZEL_VERSION||'5.19.0';
 // sempit sebelum jawaban murid tiba (atau bila penyimpanan lokal ditolak peramban). Memilih
 // sapaan netral, bukan nama seseorang, adalah inti perbaikan ini.
 const DEFAULT_USER_NAME='';
-const FALLBACK_LEARNER_NAME='Sobat';
+const FALLBACK_LEARNER_NAME=FiezelI18n.t('common.sapaan-netral');
 function learnerName(){try{const name=String(state?.userName||'').trim();return name||FALLBACK_LEARNER_NAME}catch{return FALLBACK_LEARNER_NAME}}
 /** Benar bila murid belum pernah memberikan namanya - dipakai jalur boot untuk menanyakannya. */
 function learnerNameMissing(){try{return !String(state?.userName||'').trim()}catch{return true}}
@@ -111,23 +111,23 @@ const LEVEL_GUARD_COPY={
      label panjang ujian skip) dihapus dari alur pemilihan level; penggantinya dua tombol
      popup gerbang di bawah (entryExam/entryLater). Fungsi probation/demosi tetap ada
      sebagai backstop state lama - hanya pintu masuknya yang ditutup. */
-  probationTitle:'Level ini belum terverifikasi',
-  probationBody:'Lulusin Ujian Skip Level dulu, PAW temenin dari A1.',
-  entryChip:'Belum terverifikasi',
-  entryExam:'Ikuti ujian',
-  entryLater:'Nanti aja',
-  warn5:'Udah 5 yang meleset, dan itu nggak apa-apa \u2014 salah itu bagian dari belajar. Coba pelan-pelan: baca soalnya dua kali, atau pakai petunjuk kalau butuh. PAW nungguin, nggak ke mana-mana.',
-  warn8:'Level ini kayaknya masih lumayan berat buat sekarang, dan itu wajar banget. Saran PAW: mampir sebentar ke materi dasarnya, biar pas balik ke sini rasanya lebih enteng. Kalau meleset 2 kali lagi, kita turun bareng dulu buat nguatin fondasi, ya.',
-  demotionTitle:'Kita mundur selangkah dulu, ya',
-  demotionBody:'Sepuluh jawaban meleset di level ini \u2014 bukan karena kamu nggak mampu, tapi karena fondasinya belum kebentuk penuh, dan maksa lanjut cuma bikin capek. Makanya PAW ajak kamu balik ke A1 dulu, nguatin dasarnya bareng-bareng; fitur level atas dikunci sementara biar fokusmu nggak pecah. Kalau kamu merasa udah siap lebih cepat, jalannya ada: lulus Ujian Skip Level, dan pintunya kebuka lagi.',
-  demotionStart:'Mulai dari A1',
-  lockedFeature:'Fitur ini dikunci sementara kamu nguatin fondasi di A1. Selesaikan materinya pelan-pelan, atau buka lebih cepat lewat Ujian Skip Level.',
-  examTitle:'Ujian Skip Level',
-  examDesc:'Ujian singkat berisi soal campuran \u2014 grammar, kosakata, dan bacaan \u2014 dari level yang mau kamu lompati. Jawab benar minimal 80% tanpa petunjuk, dan level itu langsung terverifikasi buat kamu.',
-  examStart:'Mulai ujian',
-  examPass:'Lulus! Level ini sekarang terverifikasi buat kamu \u2014 PAW sampai lompat-lompat. Fondasimu terbukti kuat; semua fitur di level ini kebuka, lanjut!',
-  examFail:'Belum lulus kali ini, dan itu nggak apa-apa \u2014 ujiannya memang dibikin jujur, bukan dibikin gampang. Istirahat dulu, kuatin bagian yang tadi terasa berat, dan kamu boleh coba lagi besok.',
-  examBadge:'Terverifikasi'
+  probationTitle:FiezelI18n.t('level.probation-judul'),
+  probationBody:FiezelI18n.t('level.probation-isi'),
+  entryChip:FiezelI18n.t('level.entry-chip'),
+  entryExam:FiezelI18n.t('level.entry-ikuti-ujian'),
+  entryLater:FiezelI18n.t('level.entry-nanti-aja'),
+  warn5:FiezelI18n.t('level.peringatan-5'),
+  warn8:FiezelI18n.t('level.peringatan-8'),
+  demotionTitle:FiezelI18n.t('level.demosi-judul'),
+  demotionBody:FiezelI18n.t('level.demosi-isi'),
+  demotionStart:FiezelI18n.t('level.demosi-mulai-a1'),
+  lockedFeature:FiezelI18n.t('level.fitur-terkunci'),
+  examTitle:FiezelI18n.t('level.ujian-judul'),
+  examDesc:FiezelI18n.t('level.ujian-deskripsi'),
+  examStart:FiezelI18n.t('level.ujian-mulai'),
+  examPass:FiezelI18n.t('level.ujian-lulus'),
+  examFail:FiezelI18n.t('level.ujian-gagal'),
+  examBadge:FiezelI18n.t('level.ujian-badge')
 };
 const SUNRISE_MINUTE=6*60;
 const SUNSET_MINUTE=18*60;
@@ -157,132 +157,132 @@ function validTimeZone(value){const zone=String(value||'').slice(0,80);try{new I
 const defaultPreferences={haptics:true,feedbackSounds:true,motion:true,neuralVoice:'auto',reminders:null,reportConsent:false,reportEndpoint:DEFAULT_REPORT_ENDPOINT,selfAssessedLevel:'',activeLevel:'',levelMode:'placement',goalProfile:'general',timeZone:detectedTimeZone()};
 const defaultReportMeta={lastSentAnswered:0,lastSentAt:0,lastStatus:'not_configured',lastReceipt:'',lastAccessReportDay:'',queue:[]};
 const LOGIN_MESSAGES=[
-  {headline:'Oii {name}, target kuliah luar negeri lu keren. Tapi hari ini udah belajar belum? 👀',lead:'Beasiswa sama kampus IT impian nggak kebangun dari niat doang. Gas 10–15 menit dulu, kecil tapi nyata.'},
-  {headline:'Bro, mau kuliah IT di luar negeri? English itu bukan side quest 😭',lead:'IELTS/TOEFL bakal jadi salah satu pintunya. Mumpung masih kelas 1, cicil skill-nya biar kelas 2 nggak panik.'},
-  {headline:'{name}, masa 5 soal kalah sama scroll FYP? 💀',lead:'Nggak usah sok produktif satu jam. Lima jawaban yang bener-bener dipahami dulu, habis itu baru lanjut hidup.'},
-  {headline:'Plot twist: {name} kelas 2 bakal berterima kasih sama {name} hari ini.',lead:'Kalau fondasinya dibangun sekarang, nanti persiapan IELTS/TOEFL tinggal naik level—bukan mulai dari nol.'},
-  {headline:'Woy, beasiswa luar negeri nggak tiba-tiba jatuh dari langit 😭',lead:'Yang bisa lu kontrol sekarang simpel: hadir, latihan, ngerti salahnya, ulang lagi besok.'},
-  {headline:'Mager valid. Skip belajar tiap hari? Nah itu yang bahaya.',lead:'Kalau energi lagi tipis, kecilin targetnya. Satu review atau lima soal tetap dihitung sebagai progress.'},
-  {headline:'Lu pengin masuk IT di luar negeri kan? Yaudah, buktiin dikit hari ini.',lead:'English bakal kepake buat kuliah, dokumentasi, diskusi, internship, sampai interview. Jadi ini investasi, bukan tugas random.'},
-  {headline:'Oii {name}, jangan cuma punya “main character dream”, punya main character routine juga 😭',lead:'Target gede butuh rutinitas kecil yang konsisten. Hari ini cukup selesaikan satu sesi FIEZEL.'},
-  {headline:'Reminder santai: masa depan lu nggak butuh versi sempurna, butuh versi yang konsisten.',lead:'Nggak harus jago hari ini. Yang penting skill lu bergerak satu langkah dibanding kemarin.'},
-  {headline:'IELTS kelas 2 kedengerannya masih jauh? Itu jebakannya, bro.',lead:'Waktu kelas 1 ini justru enak buat bangun vocab, grammar, reading, dan kebiasaan tanpa dikejar deadline.'},
-  {headline:'{name}, “nanti aja” kalau dikumpulin bisa jadi satu semester 😭',lead:'Buka satu sesi sekarang. Biar nanti yang numpuk skill, bukan alasan.'},
-  {headline:'Hari ini lu nggak perlu jadi Einstein. Cukup jangan jadi ghost di FIEZEL 👻',lead:'Tinggalin minimal satu bukti belajar: soal selesai, vocab direview, atau reading dituntaskan.'},
-  {headline:'Bro, salah jawab tuh bukan malu. Itu data gratis.',lead:'Yang penting jangan cuma lihat jawabannya. Cari kenapa lu salah, karena di situ FIEZEL bisa bikin latihan berikutnya makin tepat.'},
-  {headline:'Mau beasiswa? Skill lu harus punya receipt, bukan cuma wishlist.',lead:'Progress yang tercatat hari ini jauh lebih berguna daripada janji “besok belajar serius”.'},
-  {headline:'Oii, otak juga butuh maintenance. Laptop aja di-update 😭',lead:'Review materi yang udah mulai lupa. Sedikit pengulangan sekarang bikin lu nggak perlu belajar ulang dari nol.'},
-  {headline:'{name}, kalau lagi males banget: deal, cuma 5 soal.',lead:'Kalau setelah lima soal masih capek, berhenti. Tapi jangan biarin hari ini benar-benar kosong.'},
-  {headline:'English lu nggak harus langsung keren. Yang penting grafiknya naik.',lead:'FIEZEL lebih peduli pola jangka panjang daripada satu sesi yang kelihatan hebat.'},
-  {headline:'Kuliah IT luar negeri = keren. Baca dokumentasi tanpa translate tiap 2 baris = lebih keren.',lead:'Vocabulary dan reading yang lu bangun sekarang bakal kepake jauh setelah ujian selesai.'},
-  {headline:'Bro, jangan nunggu mood belajar datang naik ojol.',lead:'Mulai dulu 10 menit. Biasanya otak baru ikut fokus setelah badan udah mulai.'},
-  {headline:'Hari ini mau jadi “gue nanti belajar” atau “gue tadi udah belajar”? 👀',lead:'Pilih yang kedua. Satu sesi kecil cukup buat ngejaga ritme.'},
-  {headline:'{name}, kelas 2 itu bakal datang tanpa nanya lu siap apa nggak 😭',lead:'Makanya kita nyicil sekarang, biar IELTS/TOEFL nanti terasa kayak level berikutnya, bukan boss fight dadakan.'},
-  {headline:'Kalau target lu luar negeri, jangan bikin English cuma pelajaran sekolah.',lead:'Bikin dia jadi skill sehari-hari: baca, ngerti pola, recall kata, dan berani salah.'},
-  {headline:'Woy, streak lu sayang kalau dibiarin mati gara-gara “nanti”.',lead:'Buka FIEZEL, selesaikan target minimum, terus bebas lanjut aktivitas lain.'},
-  {headline:'Lu nggak perlu belajar lama. Lu perlu belajar cukup sering.',lead:'15 menit konsisten bisa lebih ngaruh daripada maraton dua jam terus hilang seminggu.'},
-  {headline:'{name}, beasiswa suka bukti. Otak juga suka pengulangan.',lead:'Jadi hari ini kita kasih dua-duanya: progress tercatat dan materi yang makin nempel.'},
-  {headline:'No pressure, tapi ya… mimpi besar tetap perlu kerja kecil tiap hari 😭',lead:'Pilih satu fokus yang paling lemah dan beresin sedikit. Besok kita lanjut lagi.'},
-  {headline:'Bro, jangan takut sama bagian yang jelek di learning map.',lead:'Itu bukan rapor kegagalan. Itu GPS yang nunjukin jalan tercepat buat naik level.'},
-  {headline:'Grammar bikin pusing? Santai, kita cari polanya—bukan ngafalin kitab.',lead:'Perhatikan clue waktu, fungsi kalimat, dan alasan opsi lain salah. Pelan-pelan bakal kebaca otomatis.'},
-  {headline:'Reading jangan pake feeling doang, bestie 😭 cari buktinya.',lead:'Biasain nunjuk kalimat atau clue yang mendukung jawaban. Itu skill yang bakal kepake banget di tes nanti.'},
-  {headline:'Oii {name}, 10 menit sekarang bisa nyelametin 2 jam panik nanti.',lead:'Cicil review yang jatuh tempo sebelum materinya benar-benar kabur dari ingatan.'},
-  {headline:'Target lu bukan “kelihatan rajin”. Target lu beneran jago.',lead:'Jadi nggak usah ngejar jumlah doang. Pahami beberapa soal dengan serius, terus lanjut.'},
-  {headline:'Masuk FIEZEL doang belum dihitung belajar ya, bro 😭',lead:'Tinggalin minimal lima jawaban bermakna biar kunjungan hari ini benar-benar jadi progress.'},
-  {headline:'Future {name} lagi nunggu kiriman skill dari lu hari ini 📦',lead:'Kirim sedikit aja: beberapa vocab, satu grammar lesson, atau satu reading. Yang penting paketnya jalan.'},
-  {headline:'Lu punya target luar negeri. FIEZEL punya satu pertanyaan: hari ini ngapain buat mendekat?',lead:'Nggak perlu jawaban dramatis. Satu sesi fokus udah cukup.'},
-  {headline:'Oii {name}, santai boleh. Hilang dari latihan jangan kelamaan 😭',lead:'Consistency > intensity. Balik lagi sebelum jedanya berubah jadi kebiasaan.'},
-  {headline:'Satu hari kosong nggak bikin gagal. Tapi balik lagi hari ini bikin beda.',lead:'Nggak ada ceramah. Langsung pilih fokus, kerjain sedikit, selesai.'},
-  {headline:'Pagi, {name}. Otak lagi paling murah dipakai jam segini.',lead:'Sebelum notif rame dan hari jadi berisik, ambil satu sesi. Yang pagi biasanya yang beneran kelar.'},
-  {headline:'Udah malam, tapi satu sesi kecil masih muat kok.',lead:'Nggak usah yang berat. Review vocab sepuluh menit tetap ngunci apa yang tadi lu pelajari.'},
-  {headline:'Akhir pekan bukan alasan berhenti, tapi juga bukan alasan maksa.',lead:'Turunin targetnya jadi setengah. Yang penting rantainya nggak putus, bukan hari ini lu jadi rajin banget.'},
-  {headline:'Senin lagi. Nggak usah drama, buka satu sesi aja.',lead:'Minggu yang rapi biasanya dimulai dari hari pertama yang nggak di-skip. Lima soal cukup buat mulai.'},
-  {headline:'Tanggal makin jalan, semester nggak nunggu siapa-siapa.',lead:'Kelas 1 semester 1 itu waktu paling longgar yang bakal lu punya. Dipakai sekarang, bukan nanti.'},
-  {headline:'Kemarin bolos? Yaudah. Yang bego itu bolos dua kali berturut-turut.',lead:'Nggak ada hukuman di sini. Buka satu sesi, rantainya nyambung lagi, kita lanjut kayak nggak terjadi apa-apa.'},
-  {headline:'Streak lu lagi jalan. Sayang banget kalau putus gara-gara mager sepuluh menit.',lead:'Yang bikin skill naik bukan hari terbaik lu, tapi hari-hari biasa yang tetap lu isi.'},
-  {headline:'Balik lagi setelah lama ngilang? Selamat datang, nggak ada yang nyatet.',lead:'Mulai dari yang gampang biar percaya diri lu balik dulu. Level susahnya nyusul.'},
-  {headline:'Vocab itu bahan bakar. Tanpa itu grammar lu cuma rangka kosong.',lead:'Sepuluh kata yang bener-bener nempel lebih berguna dari seratus kata yang cuma lewat.'},
-  {headline:'Grammar bukan buat dihafal, tapi buat bikin lu didengerin.',lead:'Kalimat yang rapi bikin orang fokus ke isi omongan lu, bukan ke cara lu ngomongnya.'},
-  {headline:'Listening lu bakal diuji di kelas beneran, bukan cuma di soal.',lead:'Dosen luar ngomong cepat dan nggak ngulang. Latih kupingnya dari sekarang, bukan pas udah di sana.'},
-  {headline:'Speaking itu skill fisik. Mulut lu butuh latihan, bukan cuma otak lu.',lead:'Ngomong sendiri di kamar juga kehitung. Yang penting suara lu keluar, bukan cuma dibaca dalam hati.'},
-  {headline:'Reading cepat itu yang nyelametin lu pas kuliah nanti.',lead:'Bacaan kuliah IT numpuk dan nggak ada terjemahannya. Latih sekarang mumpung soalnya masih pendek.'},
-  {headline:'Salah itu data, bukan aib.',lead:'Setiap jawaban salah ngasih tahu FIEZEL persis lu lemah di mana. Itu justru yang bikin latihan lu jadi tepat sasaran.'},
-  {headline:'Nggak usah nunggu paham semua baru mulai. Nggak bakal kejadian.',lead:'Paham itu datang setelah latihan, bukan sebelum. Mulai aja dulu dari yang lu bisa.'},
-  {headline:'Bandingin sama {name} kemarin, bukan sama orang di TikTok.',lead:'Mereka nggak nunjukin proses yang gagal. Lu punya angka lu sendiri di Peta belajar, itu yang jujur.'},
-  {headline:'Perfeksionis itu mager yang pakai alasan bagus.',lead:'Sesi berantakan yang selesai selalu menang lawan sesi sempurna yang nggak pernah dimulai.'},
-  {headline:'Jangan nunggu semangat datang. Semangat itu munculnya belakangan.',lead:'Biasanya mood baik baru muncul setelah lima soal pertama. Jadi lewatin dulu bagian nggak enaknya.'},
-  {headline:'Progress sering nggak kerasa dari dalam.',lead:'Makanya ada Peta belajar. Percaya sama grafiknya, bukan sama perasaan lu hari ini.'},
-  {headline:'Review itu jauh lebih murah daripada belajar ulang dari nol.',lead:'Sepuluh menit sekarang nyelametin satu jam nanti. Itu bunga majemuk versi belajar.'},
-  {headline:'Ngerti kenapa salah lebih mahal nilainya daripada jawaban bener yang cuma nebak.',lead:'Baca penjelasannya sebentar. Yang lu bangun itu pemahaman, bukan skor.'},
-  {headline:'English di IT itu bahasa kerjanya, bukan mata pelajarannya.',lead:'Dokumentasi, error message, diskusi tim, semua Inggris. Lu lagi latihan buat kerja, bukan buat rapor.'},
-  {headline:'Nanti ada sesi wawancara beasiswa yang nggak bisa lu jawab pakai Google Translate.',lead:'Yang nolong lu di situ cuma jam latihan yang udah lu kumpulin diam-diam dari sekarang.'},
-  {headline:'{name} kelas 2 lagi nonton lu dari masa depan.',lead:'Dia nggak minta lu jadi jenius. Dia cuma minta lu jangan nunda setahun penuh.'},
-  {headline:'Rapor bagus itu bonus. Yang lu kejar skill yang kepakai.',lead:'Beda tipis, tapi arahnya jauh. Yang satu berhenti di kertas, yang satu ikut lu sampai luar negeri.'},
-  {headline:'Target gede itu cuma tumpukan hari kecil yang nggak di-skip.',lead:'Nggak ada satu hari heroik yang bikin lu lolos. Yang ada tiga ratus hari biasa.'},
-  {headline:'Jadi orang yang tetap muncul walaupun lagi nggak semangat. Itu aja.',lead:'Bukan soal jago hari ini. Soal jadi orang yang bisa diandelin sama diri sendiri.'},
-  {headline:'Hari lu berat? Boleh pelan. Tapi jangan nol.',lead:'Satu review doang tetap dihitung. FIEZEL nggak nuntut lu jadi mesin.'},
-  {headline:'Nggak ada yang lagi ngawasin lu. Justru itu ujiannya.',lead:'Yang lu bangun sekarang bukan cuma English, tapi kebiasaan ngerjain sesuatu tanpa disuruh.'},
-  {headline:'Sepuluh menit. Habis itu lu bebas ngapain aja.',lead:'Serius, cuma itu. Buka satu sesi, tuntasin, terus lanjut hidup tanpa rasa bersalah.'}
+  {headline:FiezelI18n.t('login.pesan-01-headline'),lead:FiezelI18n.t('login.pesan-01-lead')},
+  {headline:FiezelI18n.t('login.pesan-02-headline'),lead:FiezelI18n.t('login.pesan-02-lead')},
+  {headline:FiezelI18n.t('login.pesan-03-headline'),lead:FiezelI18n.t('login.pesan-03-lead')},
+  {headline:FiezelI18n.t('login.pesan-04-headline'),lead:FiezelI18n.t('login.pesan-04-lead')},
+  {headline:FiezelI18n.t('login.pesan-05-headline'),lead:FiezelI18n.t('login.pesan-05-lead')},
+  {headline:FiezelI18n.t('login.pesan-06-headline'),lead:FiezelI18n.t('login.pesan-06-lead')},
+  {headline:FiezelI18n.t('login.pesan-07-headline'),lead:FiezelI18n.t('login.pesan-07-lead')},
+  {headline:FiezelI18n.t('login.pesan-08-headline'),lead:FiezelI18n.t('login.pesan-08-lead')},
+  {headline:FiezelI18n.t('login.pesan-09-headline'),lead:FiezelI18n.t('login.pesan-09-lead')},
+  {headline:FiezelI18n.t('login.pesan-10-headline'),lead:FiezelI18n.t('login.pesan-10-lead')},
+  {headline:FiezelI18n.t('login.pesan-11-headline'),lead:FiezelI18n.t('login.pesan-11-lead')},
+  {headline:FiezelI18n.t('login.pesan-12-headline'),lead:FiezelI18n.t('login.pesan-12-lead')},
+  {headline:FiezelI18n.t('login.pesan-13-headline'),lead:FiezelI18n.t('login.pesan-13-lead')},
+  {headline:FiezelI18n.t('login.pesan-14-headline'),lead:FiezelI18n.t('login.pesan-14-lead')},
+  {headline:FiezelI18n.t('login.pesan-15-headline'),lead:FiezelI18n.t('login.pesan-15-lead')},
+  {headline:FiezelI18n.t('login.pesan-16-headline'),lead:FiezelI18n.t('login.pesan-16-lead')},
+  {headline:FiezelI18n.t('login.pesan-17-headline'),lead:FiezelI18n.t('login.pesan-17-lead')},
+  {headline:FiezelI18n.t('login.pesan-18-headline'),lead:FiezelI18n.t('login.pesan-18-lead')},
+  {headline:FiezelI18n.t('login.pesan-19-headline'),lead:FiezelI18n.t('login.pesan-19-lead')},
+  {headline:FiezelI18n.t('login.pesan-20-headline'),lead:FiezelI18n.t('login.pesan-20-lead')},
+  {headline:FiezelI18n.t('login.pesan-21-headline'),lead:FiezelI18n.t('login.pesan-21-lead')},
+  {headline:FiezelI18n.t('login.pesan-22-headline'),lead:FiezelI18n.t('login.pesan-22-lead')},
+  {headline:FiezelI18n.t('login.pesan-23-headline'),lead:FiezelI18n.t('login.pesan-23-lead')},
+  {headline:FiezelI18n.t('login.pesan-24-headline'),lead:FiezelI18n.t('login.pesan-24-lead')},
+  {headline:FiezelI18n.t('login.pesan-25-headline'),lead:FiezelI18n.t('login.pesan-25-lead')},
+  {headline:FiezelI18n.t('login.pesan-26-headline'),lead:FiezelI18n.t('login.pesan-26-lead')},
+  {headline:FiezelI18n.t('login.pesan-27-headline'),lead:FiezelI18n.t('login.pesan-27-lead')},
+  {headline:FiezelI18n.t('login.pesan-28-headline'),lead:FiezelI18n.t('login.pesan-28-lead')},
+  {headline:FiezelI18n.t('login.pesan-29-headline'),lead:FiezelI18n.t('login.pesan-29-lead')},
+  {headline:FiezelI18n.t('login.pesan-30-headline'),lead:FiezelI18n.t('login.pesan-30-lead')},
+  {headline:FiezelI18n.t('login.pesan-31-headline'),lead:FiezelI18n.t('login.pesan-31-lead')},
+  {headline:FiezelI18n.t('login.pesan-32-headline'),lead:FiezelI18n.t('login.pesan-32-lead')},
+  {headline:FiezelI18n.t('login.pesan-33-headline'),lead:FiezelI18n.t('login.pesan-33-lead')},
+  {headline:FiezelI18n.t('login.pesan-34-headline'),lead:FiezelI18n.t('login.pesan-34-lead')},
+  {headline:FiezelI18n.t('login.pesan-35-headline'),lead:FiezelI18n.t('login.pesan-35-lead')},
+  {headline:FiezelI18n.t('login.pesan-36-headline'),lead:FiezelI18n.t('login.pesan-36-lead')},
+  {headline:FiezelI18n.t('login.pesan-37-headline'),lead:FiezelI18n.t('login.pesan-37-lead')},
+  {headline:FiezelI18n.t('login.pesan-38-headline'),lead:FiezelI18n.t('login.pesan-38-lead')},
+  {headline:FiezelI18n.t('login.pesan-39-headline'),lead:FiezelI18n.t('login.pesan-39-lead')},
+  {headline:FiezelI18n.t('login.pesan-40-headline'),lead:FiezelI18n.t('login.pesan-40-lead')},
+  {headline:FiezelI18n.t('login.pesan-41-headline'),lead:FiezelI18n.t('login.pesan-41-lead')},
+  {headline:FiezelI18n.t('login.pesan-42-headline'),lead:FiezelI18n.t('login.pesan-42-lead')},
+  {headline:FiezelI18n.t('login.pesan-43-headline'),lead:FiezelI18n.t('login.pesan-43-lead')},
+  {headline:FiezelI18n.t('login.pesan-44-headline'),lead:FiezelI18n.t('login.pesan-44-lead')},
+  {headline:FiezelI18n.t('login.pesan-45-headline'),lead:FiezelI18n.t('login.pesan-45-lead')},
+  {headline:FiezelI18n.t('login.pesan-46-headline'),lead:FiezelI18n.t('login.pesan-46-lead')},
+  {headline:FiezelI18n.t('login.pesan-47-headline'),lead:FiezelI18n.t('login.pesan-47-lead')},
+  {headline:FiezelI18n.t('login.pesan-48-headline'),lead:FiezelI18n.t('login.pesan-48-lead')},
+  {headline:FiezelI18n.t('login.pesan-49-headline'),lead:FiezelI18n.t('login.pesan-49-lead')},
+  {headline:FiezelI18n.t('login.pesan-50-headline'),lead:FiezelI18n.t('login.pesan-50-lead')},
+  {headline:FiezelI18n.t('login.pesan-51-headline'),lead:FiezelI18n.t('login.pesan-51-lead')},
+  {headline:FiezelI18n.t('login.pesan-52-headline'),lead:FiezelI18n.t('login.pesan-52-lead')},
+  {headline:FiezelI18n.t('login.pesan-53-headline'),lead:FiezelI18n.t('login.pesan-53-lead')},
+  {headline:FiezelI18n.t('login.pesan-54-headline'),lead:FiezelI18n.t('login.pesan-54-lead')},
+  {headline:FiezelI18n.t('login.pesan-55-headline'),lead:FiezelI18n.t('login.pesan-55-lead')},
+  {headline:FiezelI18n.t('login.pesan-56-headline'),lead:FiezelI18n.t('login.pesan-56-lead')},
+  {headline:FiezelI18n.t('login.pesan-57-headline'),lead:FiezelI18n.t('login.pesan-57-lead')},
+  {headline:FiezelI18n.t('login.pesan-58-headline'),lead:FiezelI18n.t('login.pesan-58-lead')},
+  {headline:FiezelI18n.t('login.pesan-59-headline'),lead:FiezelI18n.t('login.pesan-59-lead')},
+  {headline:FiezelI18n.t('login.pesan-60-headline'),lead:FiezelI18n.t('login.pesan-60-lead')},
+  {headline:FiezelI18n.t('login.pesan-61-headline'),lead:FiezelI18n.t('login.pesan-61-lead')},
+  {headline:FiezelI18n.t('login.pesan-62-headline'),lead:FiezelI18n.t('login.pesan-62-lead')},
+  {headline:FiezelI18n.t('login.pesan-63-headline'),lead:FiezelI18n.t('login.pesan-63-lead')},
+  {headline:FiezelI18n.t('login.pesan-64-headline'),lead:FiezelI18n.t('login.pesan-64-lead')},
+  {headline:FiezelI18n.t('login.pesan-65-headline'),lead:FiezelI18n.t('login.pesan-65-lead')},
+  {headline:FiezelI18n.t('login.pesan-66-headline'),lead:FiezelI18n.t('login.pesan-66-lead')}
 ];
 const REMINDER_TITLES={
-  starter:['FIEZEL · Oii {name} 👀','FIEZEL · Gas dikit, bro','FIEZEL · Jangan ghosting 😭'],
-  struggling:['FIEZEL · Nyangkut di situ ya?','FIEZEL · Break dulu, terus balik','FIEZEL · Kita ulang pelan-pelan'],
-  inactivity_1:['FIEZEL · Bro, kemarin kosong 👀','FIEZEL · Balik tipis dulu','FIEZEL · Ritme jangan putus'],
-  inactivity_2:['FIEZEL · Dua hari nih 😭','FIEZEL · Comeback sekarang','FIEZEL · Jangan jadi pola'],
-  inactivity_3:['FIEZEL · Woy, 3 hari 😭','FIEZEL · Comeback time','FIEZEL · Ritme lu kangen'],
-  inactivity_7:['FIEZEL · Bro… seminggu 💀','FIEZEL · Reset ritme dulu','FIEZEL · Balik pelan-pelan'],
-  daily_goal:['FIEZEL · 5 soal dulu gas','FIEZEL · Target belum kelar 👀','FIEZEL · Sedikit lagi, bro'],
-  due_review:['FIEZEL · Otak minta refresh','FIEZEL · Review dulu, bro','FIEZEL · Jangan kasih lupa menang 😭'],
-  positive:['FIEZEL · W, bro 🔥','FIEZEL · Ritme lu bagus','FIEZEL · Keep it going']
+  starter:[FiezelI18n.t('push.judul-starter-1'),FiezelI18n.t('push.judul-starter-2'),FiezelI18n.t('push.judul-starter-3')],
+  struggling:[FiezelI18n.t('push.judul-struggling-1'),FiezelI18n.t('push.judul-struggling-2'),FiezelI18n.t('push.judul-struggling-3')],
+  inactivity_1:[FiezelI18n.t('push.judul-inactivity-1-1'),FiezelI18n.t('push.judul-inactivity-1-2'),FiezelI18n.t('push.judul-inactivity-1-3')],
+  inactivity_2:[FiezelI18n.t('push.judul-inactivity-2-1'),FiezelI18n.t('push.judul-inactivity-2-2'),FiezelI18n.t('push.judul-inactivity-2-3')],
+  inactivity_3:[FiezelI18n.t('push.judul-inactivity-3-1'),FiezelI18n.t('push.judul-inactivity-3-2'),FiezelI18n.t('push.judul-inactivity-3-3')],
+  inactivity_7:[FiezelI18n.t('push.judul-inactivity-7-1'),FiezelI18n.t('push.judul-inactivity-7-2'),FiezelI18n.t('push.judul-inactivity-7-3')],
+  daily_goal:[FiezelI18n.t('push.judul-daily-goal-1'),FiezelI18n.t('push.judul-daily-goal-2'),FiezelI18n.t('push.judul-daily-goal-3')],
+  due_review:[FiezelI18n.t('push.judul-due-review-1'),FiezelI18n.t('push.judul-due-review-2'),FiezelI18n.t('push.judul-due-review-3')],
+  positive:[FiezelI18n.t('push.judul-positive-1'),FiezelI18n.t('push.judul-positive-2'),FiezelI18n.t('push.judul-positive-3')]
 };
 const REMINDER_MESSAGES={
   struggling:[
-    'Salah beberapa kali berturut-turut itu tanda materinya belum nempel. Ulang topiknya pelan-pelan, jangan dikebut.',
-    '{name}, berhenti nebak. Balik ke penjelasan dulu, baru lanjut soal.',
-    'Pola salahnya keliatan di satu skill. Kita bedah topik itu dulu, jangan lanjut ngebut.'
+    FiezelI18n.t('push.pesan-struggling-1'),
+    FiezelI18n.t('push.pesan-struggling-2'),
+    FiezelI18n.t('push.pesan-struggling-3')
   ],
   starter:[
-    'Oii {name}, hari ini masih kosong 👀 Lima soal dulu, habis itu bebas.',
-    'Bro, FIEZEL belum dapet receipt belajar hari ini. Gas satu sesi pendek.',
-    '{name}, masuk bentar aja. Future lu butuh kiriman skill hari ini 📦',
-    'Mau kuliah IT di luar kan? English-nya dicicil dulu, bro 😭'
+    FiezelI18n.t('push.pesan-starter-1'),
+    FiezelI18n.t('push.pesan-starter-2'),
+    FiezelI18n.t('push.pesan-starter-3'),
+    FiezelI18n.t('push.pesan-starter-4')
   ],
   inactivity_1:[
-    'Bro, kemarin kosong. Santai, tapi jangan dua hari jadi tiga 😭 Lima soal buat nyambung ritme lagi.',
-    'Oii {name}, satu hari skip nggak masalah. Yang penting hari ini comeback tipis dulu.',
-    'Kemarin lewat tanpa latihan 👀 Sekarang bayar pakai 10 menit fokus, deal?'
+    FiezelI18n.t('push.pesan-inactivity-1-1'),
+    FiezelI18n.t('push.pesan-inactivity-1-2'),
+    FiezelI18n.t('push.pesan-inactivity-1-3')
   ],
   inactivity_2:[
-    'Dua hari nggak belajar nih 😭 Jangan kasih jedanya naik level. Balik satu sesi sekarang.',
-    'Bro, 2 hari kosong mulai kelihatan kayak pola. Putus polanya pakai 5 soal aja.',
-    'Target luar negeri masih sama kan? Yaudah, comeback hari ini biar jalurnya nggak makin jauh.'
+    FiezelI18n.t('push.pesan-inactivity-2-1'),
+    FiezelI18n.t('push.pesan-inactivity-2-2'),
+    FiezelI18n.t('push.pesan-inactivity-2-3')
   ],
   inactivity_3:[
-    'Woy {name}, 3 hari ngilang 😭 Comeback pakai 5 soal aja, nggak usah drama.',
-    'Bro, tiga hari cukup buat ritme turun. Balik satu sesi dulu biar break nggak berubah jadi kebiasaan.',
-    'Future {name} nelpon 📞 katanya jangan bikin dia mulai IELTS dari nol pas kelas 2.'
+    FiezelI18n.t('push.pesan-inactivity-3-1'),
+    FiezelI18n.t('push.pesan-inactivity-3-2'),
+    FiezelI18n.t('push.pesan-inactivity-3-3')
   ],
   inactivity_7:[
-    'Bro… udah seminggu 💀 Nggak usah balas dendam belajar 2 jam. Mulai ulang dari 5 soal hari ini.',
-    'Seminggu kosong bukan akhir dunia, tapi ini waktunya reset ritme. Satu sesi kecil dulu.',
-    'Oii {name}, kita nggak ngejar rasa bersalah. Kita ngejar comeback. 10 menit sekarang, gas.'
+    FiezelI18n.t('push.pesan-inactivity-7-1'),
+    FiezelI18n.t('push.pesan-inactivity-7-2'),
+    FiezelI18n.t('push.pesan-inactivity-7-3')
   ],
   daily_goal:[
-    'Oii, target minimum hari ini belum beres. Sedikit lagi, bro—5 jawaban bermakna.',
-    'Hari mau tutup 👀 jangan biarin progress lu ikut tutup. Gas beberapa soal lagi.',
-    'Bro, tinggal dikit buat jaga ritme. Beresin dulu sebelum lanjut rebahan.',
-    'No pressure, tapi streak lu sayang 😭 kelarin target kecil hari ini.'
+    FiezelI18n.t('push.pesan-daily-goal-1'),
+    FiezelI18n.t('push.pesan-daily-goal-2'),
+    FiezelI18n.t('push.pesan-daily-goal-3'),
+    FiezelI18n.t('push.pesan-daily-goal-4')
   ],
   due_review:[
-    'Otak lu mulai nge-blur beberapa materi 😭 Review bentar sebelum lupa menang.',
-    'Bro, ada materi minta refresh. Ulang sedikit sekarang biar nggak belajar dari nol nanti.',
-    'Review due nih 👀 Anggap aja maintenance biar skill lu nggak downgrade.',
-    'Ada materi dengan risiko lupa tinggi. Beresin review dulu sebelum nambah yang baru.'
+    FiezelI18n.t('push.pesan-due-review-1'),
+    FiezelI18n.t('push.pesan-due-review-2'),
+    FiezelI18n.t('push.pesan-due-review-3'),
+    FiezelI18n.t('push.pesan-due-review-4')
   ],
   positive:[
-    'W, bro 🔥 Target hari ini beres dan ritme lu jalan. Nggak perlu nambah lama—jaga konsistensinya.',
-    'Nice. Lu udah punya bukti belajar hari ini. Besok tinggal ulang pola yang sama.',
-    'Ritme bagus 👀 Ini yang bakal bikin kelas 2 lebih ringan: bukan maraton, tapi konsisten.'
+    FiezelI18n.t('push.pesan-positive-1'),
+    FiezelI18n.t('push.pesan-positive-2'),
+    FiezelI18n.t('push.pesan-positive-3')
   ]
 };
 const $=id=>document.getElementById(id);
@@ -462,7 +462,7 @@ function joinQuoteReason(quoted,tail){
   if(!q)return t;if(!t)return q;
   return/[.!?](?:[”"'’»])?$/.test(q)?`${q} — ${t}`:`${q} ${t}`;
 }
-function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),'pas di sini: bentuk sama maknanya cocok sama kalimatnya.');const named=grammarMisconceptionReason(misconception);if(named)return joinQuoteReason(quoteEmbedShort(option),named);const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'tidak cocok karena kalimat sudah menunjuk waktu lampau yang jelas dan selesai.');if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'akan memberi kesan kebiasaan atau fakta umum, padahal konteks kalimat meminta makna lain.');if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'menyatakan izin, sedangkan maksud kalimat bukan memberi izin.');if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum menyampaikan tingkat kewajiban yang diminta kalimat.');if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'berarti larangan, bukan kesimpulan atau kemungkinan.');if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum cocok dengan jumlah subjek, jadi subject dan verb tidak selaras.');if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk superlative, padahal cakupan perbandingannya tidak meminta bentuk itu.');if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum memakai bentuk perbandingan yang sesuai dengan jumlah hal yang dibandingkan.');if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'menempatkan kata dalam urutan yang tidak sesuai dengan pola kalimat ini.');if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk infinitive yang tidak cocok dengan kata kerja atau maksud kalimat.');if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai bentuk -ing dengan makna yang berbeda dari konteks kalimat.');if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'belum membentuk kalimat pasif yang tepat atau menambahkan pelaku yang tidak diperlukan.');if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'tidak cocok dengan apakah benda itu masih umum atau sudah jelas bagi pembaca.');if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),'memakai auxiliary yang tidak sama dengan tense atau struktur kalimat utama.');return joinQuoteReason(quoteEmbedShort(option),'belum cocok dengan waktu, fungsi, atau susunan yang dibutuhkan kalimat.')}
+function grammarOptionReason(option,isCorrect,rawReason='',misconception=''){if(isCorrect)return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-benar'));const named=grammarMisconceptionReason(misconception);if(named)return joinQuoteReason(quoteEmbedShort(option),named);const raw=String(rawReason).toLowerCase();if(/specific|definite past|dated past|finished point/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-waktu-lampau'));if(/habit|routine|general truth/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kebiasaan'));if(/permission/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-izin'));if(/obligation|requirement|rule/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-kewajiban'));if(/prohibition/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-larangan'));if(/singular|plural|agreement/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-agreement'));if(/superlative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-superlative'));if(/comparative/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-comparative'));if(/word order|order/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-urutan-kata'));if(/infinitive/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-infinitive'));if(/gerund/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-gerund'));if(/passive|agent/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-pasif'));if(/article|identif/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-artikel'));if(/auxiliary/.test(raw))return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-auxiliary'));return joinQuoteReason(quoteEmbedShort(option),FiezelI18n.t('grammar.alasan-opsi-umum'))}
 function grammarMeta(item){const explanation=item?.[12]||{};const p=(...v)=>String(v.find(x=>x)||'');return{stem:String(item?.[0]||''),options:Array.isArray(item?.[1])?item[1]:[],correctIndex:item?.[2],rule:p(explanation.ruleId,explanation.rule,item?.[3]),whyCorrect:p(explanation.whyCorrectId,explanation.whyCorrect,item?.[7]),objective:p(item?.[16]?.objectiveId,item?.[9]),misconception:p(item?.[16]?.misconceptionId,item?.[10]),reasoning:p(item?.[16]?.reasoningId,item?.[11]),whyOthers:p(explanation.whyOthersFailId,explanation.whyOthersFail),avoid:p(explanation.howToAvoidId,explanation.howToAvoid),memory:p(explanation.memoryCueId,explanation.memoryCue),id:String(item?.[8]||''),family:String(item?.[6]||'core_grammar')}}
 function stableGrammarHash(value){let h=2166136261;for(const c of String(value)){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
 // m025-149: pengecoh untuk mode "aturan/tujuan/penalaran mana yang cocok" diambil dari
@@ -501,7 +501,7 @@ function grammarAlternativeMeta(item,field,count=3,opts={}){const own=grammarMet
   }
   // m025-155: filler generik memakai sentinel 'fallback:generic', bukan sourceId kosong yang
   // dulu terstempel own:true + sourceId lesson di makeGrammarQuestion (klaim palsu).
-  const fallback=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];for(const value of fallback)if(out.length<count&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:'fallback:generic',sourceLevel:'',origin:'fallback'});return out.slice(0,count)}
+  const fallback=[FiezelI18n.t('grammar.distraktor-generik-1'),FiezelI18n.t('grammar.distraktor-generik-2'),FiezelI18n.t('grammar.distraktor-generik-3')];for(const value of fallback)if(out.length<count&&!excluded.has(norm(value))&&!out.some(x=>norm(x.value)===norm(value)))out.push({value,sourceId:'fallback:generic',sourceLevel:'',origin:'fallback'});return out.slice(0,count)}
 // m025-156 (D1): perangkai dua field jadi satu pilihan (teach_back/mastery_check).
 // Digabung spasi polos hasilnya kalimat run-on ("...dibayangkan sekarang Mixed conditional...").
 // Kalimat pertama ditutup '.' bila belum diakhiri tanda baca akhir. norm() (app.js dan
@@ -574,11 +574,11 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // m025-162 (S2/M5): alasan kunci tidak lagi menempel judul lesson (tautologi yang bahkan
   // bisa membantah kartunya sendiri, TA-002) - pakai whyCorrect kartu, yang menyebut isyarat stem.
   const causalKey=meta.whyCorrect?String(meta.whyCorrect).trim().replace(/^([A-ZÀ-Ü])/,m=>m.toLowerCase()):'';
-  if(variant===0)return direct(base,meta.options,meta.correctIndex,joinQuoteReason(quoteEmbedShort(correct),causalKey?`pas di sini — ${causalKey}`:`pas banget sama pola ${title.toLowerCase()}.`),reasons);
+  if(variant===0)return direct(base,meta.options,meta.correctIndex,joinQuoteReason(quoteEmbedShort(correct),causalKey?FiezelI18n.t('grammar.alasan-benar-kausal',{alasan:causalKey}):FiezelI18n.t('grammar.alasan-benar-pola',{judulLesson:title.toLowerCase()})),reasons);
   // m025-162 (S3/M3): alasan opsi complete_sentence dipetakan lewat INDEKS (kanal verbatim),
   // bukan pencocokan teks opsi terisi yang gagal senyap di stem multi-blank; jangkar kutipannya
   // isi opsi itu sendiri, bukan 8 kata pertama stem yang identik untuk keempat opsi.
-  if(variant===1)return direct(`Pilih versi lengkap yang pas sama pola ${title.toLowerCase()}:\n${base}`,meta.options.map(option=>completeGrammarStem(grammarOptionStem(base),option)),meta.correctIndex,joinQuoteReason(`Versi pakai ${quoteEmbedShort(correct)}`,causalKey?`pas — ${causalKey}`:'yang bentuk sama maknanya pas.'),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':(reasons[i]?joinQuoteReason(`Versi pakai ${quoteEmbedShort(option)}`,String(reasons[i])):'')));
+  if(variant===1)return direct(`Pilih versi lengkap yang pas sama pola ${title.toLowerCase()}:\n${base}`,meta.options.map(option=>completeGrammarStem(grammarOptionStem(base),option)),meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(correct)}),causalKey?`pas — ${causalKey}`:FiezelI18n.t('grammar.alasan-versi-pas')),reasons,[],meta.options.map((option,i)=>i===meta.correctIndex?'':(reasons[i]?joinQuoteReason(FiezelI18n.t('grammar.versi-pakai',{opsiDikutip:quoteEmbedShort(option)}),String(reasons[i])):'')));
   // m025-155: mode beropsi KALIMAT (justify/diagnose/label/contrast) tidak boleh jatuh ke
   // heuristik bentuk kata kerja di grammarOptionReason(); tiap opsi salah diberi penjelasan
   // verbatim yang menyebut peran sebenarnya dari kalimat itu.
@@ -596,7 +596,7 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
     const keyNorm=norm(meta.whyCorrect);
     const echoesKey=t=>{const k=norm(t);return !k||k===keyNorm||keyNorm.includes(k)};
     const kept=[],droppedCount={n:0};
-    for(const x of wrong){const text=String(x.reason||x.detail.whyFails||'');if(text&&!mentionsKey(text)&&!echoesKey(text))kept.push({value:text,src:ownSrc(),expl:`Ini nunjukin kenapa pilihan ${quoteEmbedShort(x.option)} meleset, bukan kenapa ${quoteEmbedShort(correct)} bener.`/* m025-160: santai, tetap tidak membocorkan kunci */});else droppedCount.n++}
+    for(const x of wrong){const text=String(x.reason||x.detail.whyFails||'');if(text&&!mentionsKey(text)&&!echoesKey(text))kept.push({value:text,src:ownSrc(),expl:FiezelI18n.t('grammar.expl-justify-distraktor',{opsiDikutip:quoteEmbedShort(x.option),kunciDikutip:quoteEmbedShort(correct)})/* m025-160: santai, tetap tidak membocorkan kunci */});else droppedCount.n++}
     let borrowed=[];
     if(droppedCount.n){
       const pool=grammarAlternativeMeta(item,'whyCorrect',droppedCount.n+5,{salt:'justify',exclude:[meta.whyCorrect,...kept.map(k=>k.value)]});
@@ -604,36 +604,36 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
         .map(a=>({value:a.value,src:{origin:a.origin,sourceId:a.sourceId,sourceLevel:a.sourceLevel},expl:''}));
       // Jaring pengaman terakhir: filler generik yang tidak pernah menyebut kunci, supaya
       // kartu tetap 4 opsi bila kolam peer kebetulan habis tersaring guard.
-      const generics=['Aturan ini tidak bergantung pada makna kalimat.','Semua bentuk dapat dipakai tanpa melihat konteks.','Urutan kata dan penanda waktu tidak memengaruhi jawaban.'];
+      const generics=[FiezelI18n.t('grammar.distraktor-generik-1'),FiezelI18n.t('grammar.distraktor-generik-2'),FiezelI18n.t('grammar.distraktor-generik-3')];
       for(const g of generics)if(borrowed.length<droppedCount.n&&!kept.some(k=>norm(k.value)===norm(g))&&!borrowed.some(b=>norm(b.value)===norm(g)))borrowed.push({value:g,src:{origin:'fallback',sourceId:'fallback:generic',sourceLevel:''},expl:''});
       borrowed=borrowed.slice(0,droppedCount.n);
     }
     const picks=[...kept,...borrowed];
-    return direct(`Kenapa ${quoteEmbed(correct)} jadi jawaban paling pas di contoh ini?\n${base}`/* m025-161 (F1-2) */,[meta.whyCorrect,...picks.map(p=>p.value)],0,'Alasan ini nyambungin jawabannya sama konteks kalimat dan aturannya.',[],[ownSrc(),...picks.map(p=>p.src)],['',...picks.map(p=>p.expl)]);
+    return direct(`Kenapa ${quoteEmbed(correct)} jadi jawaban paling pas di contoh ini?\n${base}`/* m025-161 (F1-2) */,[meta.whyCorrect,...picks.map(p=>p.value)],0,FiezelI18n.t('grammar.mode-justify-benar'),[],[ownSrc(),...picks.map(p=>p.src)],['',...picks.map(p=>p.expl)]);
   }
   // m025-160: wording final council - stem dan correctWhy mode meta dibawa ke register
   // sehari-hari (CJI mapan: pas/nyambung/bener/nggak), sudut pandang "kamu", satu gagasan
   // per kalimat. Makna soal tidak bergeser: pilihan, kunci, dan provenance tetap sama.
-  if(variant===3)return metaChoice(`Aturan mana yang paling pas jelasin jawaban di contoh ini?\n${base}`,'rule','Aturan ini pas jelasin bentuk yang diuji, tanpa keluar dari lesson ini.');
-  if(variant===4)return metaChoice(`Tujuan belajar mana yang paling nyambung sama soal ini?\n${base}`,'objective','Tujuan ini pas nunjukin kemampuan yang lagi diuji di sini.');
-  if(variant===5)return metaChoice(`Urutan mikir mana yang paling aman sebelum kamu jawab?\n${base}`,'reasoning','Urutan ini bawa kamu dari petunjuk kalimat ke bentuk yang bener.');
+  if(variant===3)return metaChoice(`Aturan mana yang paling pas jelasin jawaban di contoh ini?\n${base}`,'rule',FiezelI18n.t('grammar.mode-rule-benar'));
+  if(variant===4)return metaChoice(`Tujuan belajar mana yang paling nyambung sama soal ini?\n${base}`,'objective',FiezelI18n.t('grammar.mode-objective-benar'));
+  if(variant===5)return metaChoice(`Urutan mikir mana yang paling aman sebelum kamu jawab?\n${base}`,'reasoning',FiezelI18n.t('grammar.mode-reasoning-benar'));
   // m025-159: istilah internal (miskonsepsi, distraktor) dilarang tampil ke siswa;
   // naskah generator memakai bahasa sehari-hari sesuai aturan gaya persona (issue #75).
-  if(variant===6)return metaChoice(`Kesalahan mikir apa yang mau dicegah sama lesson ${title}?`,'misconception','Nah, ini kesalahan mikir utama yang dibidik lesson ini — bukan sekadar salah eja.');
-  if(variant===7)return metaChoice(`Pengingat singkat mana yang paling nyambung sama contoh ini?\n${base}`,'memory','Pengingat ini langsung nyambungin petunjuk soal sama pola yang bener.');
+  if(variant===6)return metaChoice(FiezelI18n.t('grammar.mode-misconception-stem',{judulLesson:title}),'misconception',FiezelI18n.t('grammar.mode-misconception-benar'));
+  if(variant===7)return metaChoice(`Pengingat singkat mana yang paling nyambung sama contoh ini?\n${base}`,'memory',FiezelI18n.t('grammar.mode-memory-benar'));
   // m025-149: satu-satunya mode yang teks soalnya TIDAK menyebut lesson mana pun. Selama
   // pengecohnya diambil dari seluruh bank, dua lesson hampir tidak mungkin menghasilkan
   // empat pilihan yang sama; setelah kolamnya dipersempit ke satu keluarga, itu jadi mungkin
   // dan dua lesson conditionals benar-benar menghasilkan soal yang identik. Menyebut nama
   // lesson-nya memulihkan identitas soal sekaligus memberi tahu murid strategi lesson mana
   // yang sedang ditanyakan.
-  if(variant===8)return metaChoice(`Strategi mana yang paling bantu biar kesalahan di lesson ${title} nggak keulang?`,'avoid','Strategi ini ngecek makna dan bentuk di titik yang paling sering nyesatin.');
+  if(variant===8)return metaChoice(`Strategi mana yang paling bantu biar kesalahan di lesson ${title} nggak keulang?`,'avoid',FiezelI18n.t('grammar.mode-avoid-benar'));
   // m025-161 (F1-3): narasi orang ketiga "Seorang siswa" (236× di 78 kartu) diganti skenario
   // teman — pembacanya tetap "kamu", dan yang milih di dalam soal bukan lagi "siswa".
   if(variant>=9&&variant<=11){const target=wrong[variant-9],others=wrong.filter(x=>x!==target);return direct(`Temanmu milih ${quoteEmbed(target.option)}. Alasan mana yang paling pas jelasin kenapa pilihan itu meleset?\n${base}`,[target.reason,meta.whyCorrect,...others.map(x=>x.reason)],0,grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey),[],[],['',`Ini alasan kenapa ${quoteEmbedShort(correct)} bener; padahal soal nanya kenapa ${quoteEmbedShort(target.option)} meleset.`,...others.map(x=>`Ini penjelasan buat pilihan ${quoteEmbedShort(x.option)}, bukan buat ${quoteEmbedShort(target.option)}.`)]);}
-  if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(`Label kesalahan mana yang paling pas buat pilihan ${quoteEmbed(target.option)}?\n${base}`,[String(target.detail.misconception||target.reason),'jawaban benar, nggak ada kesalahan mikir.',...labels],0,`Label itu pas sama pola salah di balik pilihan ${quoteEmbedShort(target.option)}.`,[],[],['',`${quoteEmbed(target.option)} memang keliru, jadi label “jawaban benar, nggak ada kesalahan mikir” jelas nggak berlaku buatnya.`,...others.map(x=>`Label ini nunjukin kesalahan mikir di balik pilihan ${quoteEmbedShort(x.option)}, bukan ${quoteEmbedShort(target.option)}.`)]);}
-  if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(`Jawaban ${quoteEmbed(target.option)} belum pas. Pilih perbaikan yang tetap jaga maksud kalimatnya:\n${base}`,meta.options,meta.correctIndex,joinQuoteReason(`Perbaikannya ${quoteEmbedShort(correct)};`,'bentuk itu yang cocok sama kalimat aslinya.'),reasons);}
-  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang pas antara ${quoteEmbed(correct)} dan ${quoteEmbed(target.option)}?\n${base}`,[joinQuoteReason(`${quoteEmbed(correct)} pas di sini;`,failure),`${quoteEmbed(target.option)} pas, dan ${quoteEmbed(correct)} malah ngubah maksud kalimatnya.`,`Dua-duanya bisa dipakai bolak-balik tanpa ngubah makna.`,`Dua-duanya salah karena lesson ini nggak nguji pilihan itu.`],0,`Perbandingan yang bener nunjukin ${quoteEmbed(correct)} jawabannya, terus nunjuk di mana ${quoteEmbed(target.option)} melesetnya.`/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',`Kebalik: justru ${quoteEmbed(correct)} yang jaga maksud kalimatnya, ${quoteEmbed(target.option)} yang meleset.`,`Dua-duanya nggak sepadan; cuma ${quoteEmbed(correct)} yang cocok sama kalimat ini.`,`Keliru: lesson ini memang nguji perbandingan itu, dan ${quoteEmbed(correct)} jawaban yang bener.`]);}
+  if(variant>=12&&variant<=14){const target=wrong[variant-12],others=wrong.filter(x=>x!==target),labels=others.map(x=>String(x.detail.misconception||x.reason));return direct(`Label kesalahan mana yang paling pas buat pilihan ${quoteEmbed(target.option)}?\n${base}`,[String(target.detail.misconception||target.reason),FiezelI18n.t('grammar.mode-label-opsi-benar'),...labels],0,`Label itu pas sama pola salah di balik pilihan ${quoteEmbedShort(target.option)}.`,[],[],['',`${quoteEmbed(target.option)} memang keliru, jadi label “jawaban benar, nggak ada kesalahan mikir” jelas nggak berlaku buatnya.`,...others.map(x=>`Label ini nunjukin kesalahan mikir di balik pilihan ${quoteEmbedShort(x.option)}, bukan ${quoteEmbedShort(target.option)}.`)]);}
+  if(variant>=15&&variant<=17){const target=wrong[variant-15];return direct(`Jawaban ${quoteEmbed(target.option)} belum pas. Pilih perbaikan yang tetap jaga maksud kalimatnya:\n${base}`,meta.options,meta.correctIndex,joinQuoteReason(FiezelI18n.t('grammar.mode-repair-benar-head',{kunciDikutip:quoteEmbedShort(correct)}),FiezelI18n.t('grammar.mode-repair-benar-tail')),reasons);}
+  if(variant>=18&&variant<=20){const target=wrong[variant-18],failure=grammarOptionReason(target.option,false,target.reason,target.detail?.misconceptionKey);return direct(`Perbandingan mana yang pas antara ${quoteEmbed(correct)} dan ${quoteEmbed(target.option)}?\n${base}`,[joinQuoteReason(FiezelI18n.t('grammar.mode-contrast-opsi-benar-head',{kunciDikutip:quoteEmbed(correct)}),failure),`${quoteEmbed(target.option)} pas, dan ${quoteEmbed(correct)} malah ngubah maksud kalimatnya.`,FiezelI18n.t('grammar.mode-contrast-opsi-bolak-balik'),FiezelI18n.t('grammar.mode-contrast-opsi-none')],0,`Perbandingan yang bener nunjukin ${quoteEmbed(correct)} jawabannya, terus nunjuk di mana ${quoteEmbed(target.option)} melesetnya.`/* m025-156 (D5): rumusan bebas-posisi - opsi diacak, "pertama" tidak menunjuk apa pun; m025-161 (F1-2): registernya disantaikan tanpa mengubah posisi */,[],[],['',`Kebalik: justru ${quoteEmbed(correct)} yang jaga maksud kalimatnya, ${quoteEmbed(target.option)} yang meleset.`,`Dua-duanya nggak sepadan; cuma ${quoteEmbed(correct)} yang cocok sama kalimat ini.`,`Keliru: lesson ini memang nguji perbandingan itu, dan ${quoteEmbed(correct)} jawaban yang bener.`]);}
   // m025-155: label keluarga pengecoh adalah taksonomi global, bukan konten lesson mana pun -
   // stempel origin 'taxonomy' plus penjelasan verbatim yang jujur, supaya murid tidak lagi
   // membaca heuristik bentuk kata kerja untuk sebuah label keluarga.
@@ -641,19 +641,19 @@ function grammarExercise(skill,item,variant){const meta=grammarMeta(item),correc
   // keluarga yang justru BENAR secara linguistik sebagai "distraktor" (C2-004 menolak
   // "penekanan dan inversi" untuk kalimat inversi buku teks). Label yang cocok dengan isyarat
   // judul/stem kartu dikeluarkan dari kolam label salah.
-  if(variant===21){const hintText=`${title} ${base}`;const genericFam=meta.family==='advanced_grammar'||meta.family==='core_grammar';const FAMILY_HINTS={emphasis_inversion:/inversi|dibalik|penekanan|\bonly (after|when)\b|no sooner|not until|little did/i,conditionals:/andai|pengandaian|\bif\b|\bunless\b|were i|had i/i,reported_speech:/tidak langsung|reported|\bsaid\b/i,relative_clauses:/relatif|\bwho\b|\bwhich\b|\bwhose\b/i,passive:/pasif/i,comparison:/perbandingan|superlativ|komparativ|\bpaling\b/i,gerunds_infinitives:/gerund|infinitiv|\bregret\b|go on|-ing/i,linking_devices:/penghubung|however|although|despite|much as/i,tense_aspect:/perfect|past simple|present simple|continuous|tense/i,modals:/\bmust\b|\bshould\b|\bmight\b|\bcould\b|modal/i,prepositions:/kata depan|preposisi/i,articles_determiners:/artikel|kata sandang/i,question_negation:/question tag|negatif|pertanyaan/i};const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family&&!(genericFam&&FAMILY_HINTS[key]&&FAMILY_HINTS[key].test(hintText))).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;const familyLabel=grammarFamilyLabel(item),wrongLabels=[labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]];return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[familyLabel,...wrongLabels],0,`Fokus ${title.toLowerCase()} masuk keluarga ${familyLabel}.`,[],[ownSrc(),...wrongLabels.map(()=>({origin:'taxonomy',sourceId:'taxonomy:family',sourceLevel:''}))],['',...wrongLabels.map(label=>`Label ${quoteEmbed(label)} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga ${quoteEmbed(familyLabel)}.`)]);}
+  if(variant===21){const hintText=`${title} ${base}`;const genericFam=meta.family==='advanced_grammar'||meta.family==='core_grammar';const FAMILY_HINTS={emphasis_inversion:/inversi|dibalik|penekanan|\bonly (after|when)\b|no sooner|not until|little did/i,conditionals:/andai|pengandaian|\bif\b|\bunless\b|were i|had i/i,reported_speech:/tidak langsung|reported|\bsaid\b/i,relative_clauses:/relatif|\bwho\b|\bwhich\b|\bwhose\b/i,passive:/pasif/i,comparison:/perbandingan|superlativ|komparativ|\bpaling\b/i,gerunds_infinitives:/gerund|infinitiv|\bregret\b|go on|-ing/i,linking_devices:/penghubung|however|although|despite|much as/i,tense_aspect:/perfect|past simple|present simple|continuous|tense/i,modals:/\bmust\b|\bshould\b|\bmight\b|\bcould\b|modal/i,prepositions:/kata depan|preposisi/i,articles_determiners:/artikel|kata sandang/i,question_negation:/question tag|negatif|pertanyaan/i};const labels=Object.entries(GRAMMAR_FAMILY_LABELS).filter(([key])=>key!==meta.family&&!(genericFam&&FAMILY_HINTS[key]&&FAMILY_HINTS[key].test(hintText))).map(([,label])=>label);const start=stableGrammarHash(meta.id)%labels.length;const familyLabel=grammarFamilyLabel(item),wrongLabels=[labels[start],labels[(start+5)%labels.length],labels[(start+9)%labels.length]];return direct(`Contoh ini terutama termasuk keluarga grammar yang mana?\n${base}`,[familyLabel,...wrongLabels],0,FiezelI18n.t('grammar.mode-family-benar',{judulLesson:title.toLowerCase(),labelKeluarga:familyLabel}),[],[ownSrc(),...wrongLabels.map(()=>({origin:'taxonomy',sourceId:'taxonomy:family',sourceLevel:''}))],['',...wrongLabels.map(label=>`Label ${quoteEmbed(label)} itu keluarga grammar lain. Contoh ini lagi nguji pola keluarga ${quoteEmbed(familyLabel)}.`)]);}
   // m025-155: v22 dulu kembar dengan v5 - field 'reasoning' dan seed `${own.id}:reasoning`
   // yang sama menghasilkan set opsi identik, hanya stem yang beda. Sekarang seed diberi salt
   // 'cue', distraktor v5 (dihitung dengan seed lama) dilarang terpilih ulang, dan stem
   // menegaskan fokus "petunjuk keputusan pertama".
   // m025-160: stem tetap menegaskan fokus "petunjuk keputusan pertama", hanya bahasanya santai.
-  if(variant===22){const priorAlts=grammarAlternativeMeta(item,'reasoning',3);return metaChoice(`Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n${base}`,'reasoning','Petunjuk ini yang nentuin bentuk jawabannya pas atau nggak.'/* m025-161 (F1-2) */,{salt:'cue',exclude:priorAlts.map(a=>a.value)});}
+  if(variant===22){const priorAlts=grammarAlternativeMeta(item,'reasoning',3);return metaChoice(`Petunjuk pertama apa yang harus kamu temuin sebelum nimbang pilihan di contoh ini?\n${base}`,'reasoning',FiezelI18n.t('grammar.mode-cue-benar')/* m025-161 (F1-2) */,{salt:'cue',exclude:priorAlts.map(a=>a.value)});}
   // m025-155: v23/v24 memakai entry pairs baru - sourceLevel dan origin ikut dibawa.
-  if(variant===23){const correctSummary=joinSentences(meta.objective,meta.rule),alts=grammarAlternativePairs(item,'objective','rule',3);/* m025-156 (D1) */return direct(`Ringkasan ajar mana yang paling pas buat jelasin lesson ${title} ke temanmu?`/* m025-161 (F1-3): "siswa lain" diganti "temanmu" - nol sebutan siswa di stem */,[correctSummary,...alts.map(x=>x.value)],0,'Ringkasan itu nyatuin tujuan lesson sama aturan yang bener.',[],[ownSrc(),...alts.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);}
-  const correctPlan=joinSentences(meta.avoid,meta.memory),plans=grammarAlternativePairs(item,'avoid','memory',3);/* m025-156 (D1) */return direct(`Rencana cek mandiri mana yang paling pas sebelum kamu nuntasin lesson ${title}?`,[correctPlan,...plans.map(x=>x.value)],0,'Rencana ini gabungin cara nyegah salah sama pengingat khusus lesson ini.',[],[ownSrc(),...plans.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);
+  if(variant===23){const correctSummary=joinSentences(meta.objective,meta.rule),alts=grammarAlternativePairs(item,'objective','rule',3);/* m025-156 (D1) */return direct(`Ringkasan ajar mana yang paling pas buat jelasin lesson ${title} ke temanmu?`/* m025-161 (F1-3): "siswa lain" diganti "temanmu" - nol sebutan siswa di stem */,[correctSummary,...alts.map(x=>x.value)],0,FiezelI18n.t('grammar.mode-teach-benar'),[],[ownSrc(),...alts.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);}
+  const correctPlan=joinSentences(meta.avoid,meta.memory),plans=grammarAlternativePairs(item,'avoid','memory',3);/* m025-156 (D1) */return direct(`Rencana cek mandiri mana yang paling pas sebelum kamu nuntasin lesson ${title}?`,[correctPlan,...plans.map(x=>x.value)],0,FiezelI18n.t('grammar.mode-mastery-benar'),[],[ownSrc(),...plans.map(x=>({origin:x.origin,sourceId:x.sourceId,sourceLevel:x.sourceLevel}))]);
 }
-const PART_OF_SPEECH_ID={noun:'kata benda',verb:'kata kerja',adjective:'kata sifat',adverb:'kata keterangan',preposition:'kata depan',conjunction:'kata penghubung',pronoun:'kata ganti',determiner:'kata penentu',interjection:'kata seru',prefix:'awalan',number:'kata bilangan',article:'kata sandang'};
-function indonesianPartOfSpeech(value){return PART_OF_SPEECH_ID[String(value||'').toLowerCase()]||'jenis kata'}
+const PART_OF_SPEECH_ID={noun:FiezelI18n.t('vocab.jenis-kata-noun'),verb:FiezelI18n.t('vocab.jenis-kata-verb'),adjective:FiezelI18n.t('vocab.jenis-kata-adjective'),adverb:FiezelI18n.t('vocab.jenis-kata-adverb'),preposition:FiezelI18n.t('vocab.jenis-kata-preposition'),conjunction:FiezelI18n.t('vocab.jenis-kata-conjunction'),pronoun:FiezelI18n.t('vocab.jenis-kata-pronoun'),determiner:FiezelI18n.t('vocab.jenis-kata-determiner'),interjection:FiezelI18n.t('vocab.jenis-kata-interjection'),prefix:FiezelI18n.t('vocab.jenis-kata-prefix'),number:FiezelI18n.t('vocab.jenis-kata-number'),article:FiezelI18n.t('vocab.jenis-kata-article')};
+function indonesianPartOfSpeech(value){return PART_OF_SPEECH_ID[String(value||'').toLowerCase()]||FiezelI18n.t('vocab.jenis-kata-fallback')}
 // m025-149: dipulihkan setelah hilang saat penyelesaian konflik merge m025-148.
 // Soal jenis kata hanya jujur kalau siswa bisa melihat kata itu bekerja di dalam satu
 // kalimat. "dance" sendirian bisa kata benda atau kata kerja, jadi tanpa kalimat contoh
@@ -688,7 +688,7 @@ function partOfSpeechAskable(v){
   if(!v||!PART_OF_SPEECH_ID[String(v.partOfSpeech||'').toLowerCase()])return false;
   return !!vocabSurfaceForm(v);
 }
-function readingFocusLabel(type){return({main_idea:'gagasan utama',detail:'detail langsung',inference:'kesimpulan dari petunjuk',vocabulary:'arti kata dalam konteks',vocabulary_context:'arti ungkapan dalam konteks',purpose:'tujuan penulis',sequence:'urutan kejadian',cause_effect:'sebab dan akibat',comparison:'perbandingan',evidence:'bukti pendukung',tone:'nada penulis',paraphrase:'parafrasa',conclusion:'kesimpulan',reference:'rujukan kata',true_false_not_stated:'benar / salah / tidak disebutkan'/* m025-163: label lama sengaja kabur utk menutupi ketiadaan NS */,why:'alasan',how:'cara atau proses',likely:'kemungkinan berikutnya',relationship:'hubungan antargagasan',detail2:'detail pendukung',location:'tempat',time:'waktu',people:'orang yang terlibat',quantity:'jumlah',process:'proses',action:'tindakan',record:'informasi yang dicatat'}[type]||'detail bacaan')}
+function readingFocusLabel(type){return({main_idea:FiezelI18n.t('reading.fokus-main-idea'),detail:FiezelI18n.t('reading.fokus-detail'),inference:FiezelI18n.t('reading.fokus-inference'),vocabulary:FiezelI18n.t('reading.fokus-vocabulary'),vocabulary_context:FiezelI18n.t('reading.fokus-vocabulary-context'),purpose:FiezelI18n.t('reading.fokus-purpose'),sequence:FiezelI18n.t('reading.fokus-sequence'),cause_effect:FiezelI18n.t('reading.fokus-cause-effect'),comparison:FiezelI18n.t('reading.fokus-comparison'),evidence:FiezelI18n.t('reading.fokus-evidence'),tone:FiezelI18n.t('reading.fokus-tone'),paraphrase:FiezelI18n.t('reading.fokus-paraphrase'),conclusion:FiezelI18n.t('reading.fokus-conclusion'),reference:FiezelI18n.t('reading.fokus-reference'),true_false_not_stated:FiezelI18n.t('reading.fokus-true-false-not-stated')/* m025-163: label lama sengaja kabur utk menutupi ketiadaan NS */,why:FiezelI18n.t('reading.fokus-why'),how:FiezelI18n.t('reading.fokus-how'),likely:FiezelI18n.t('reading.fokus-likely'),relationship:FiezelI18n.t('reading.fokus-relationship'),detail2:FiezelI18n.t('reading.fokus-detail2'),location:FiezelI18n.t('reading.fokus-location'),time:FiezelI18n.t('reading.fokus-time'),people:FiezelI18n.t('reading.fokus-people'),quantity:FiezelI18n.t('reading.fokus-quantity'),process:FiezelI18n.t('reading.fokus-process'),action:FiezelI18n.t('reading.fokus-action'),record:FiezelI18n.t('reading.fokus-record')}[type]||FiezelI18n.t('reading.fokus-fallback'))}
 /* ---------------------------------------------------------------------------
  * m025-149: GERBANG INTEGRITAS KONTEN TERPUSAT.
  *
@@ -805,8 +805,8 @@ stateReady=true;
 function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
 function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
 function activeLevelIsManual(sourceState=state){return LEVELS.includes(String(sourceState?.preferences?.activeLevel||''))}
-function activeLevelLabel(sourceState=state){return `${getActiveLevel(sourceState)}${activeLevelIsManual(sourceState)?' · pilihanmu':''}`}
-function levelDescriptor(level){return({A1:'Pemula · fondasi kalimat sederhana',A2:'Dasar · percakapan sehari-hari',B1:'Menengah · komunikasi mandiri',B2:'Menengah atas · ide yang lebih kompleks',C1:'Mahir · akademik dan profesional',C2:'Penguasaan · nuansa dan struktur lanjut'}[level]||'Level belajar aktif')}
+function activeLevelLabel(sourceState=state){return `${getActiveLevel(sourceState)}${activeLevelIsManual(sourceState)?FiezelI18n.t('level.sufiks-pilihanmu'):''}`}
+function levelDescriptor(level){return({A1:FiezelI18n.t('level.deskripsi-a1'),A2:FiezelI18n.t('level.deskripsi-a2'),B1:FiezelI18n.t('level.deskripsi-b1'),B2:FiezelI18n.t('level.deskripsi-b2'),C1:FiezelI18n.t('level.deskripsi-c1'),C2:FiezelI18n.t('level.deskripsi-c2')}[level]||FiezelI18n.t('level.deskripsi-fallback'))}
 // m025-161 (F1-1): indeks kurikulum dibangun oleh satu fungsi yang dipakai load() MAUPUN
 // pembaca pertama. Sebelumnya indeksnya hanya diisi di dalam load(), jadi setiap pemakai yang
 // jalan sebelum load selesai (mis. friendlySkillName di harness render) melihat indeks kosong
@@ -848,7 +848,7 @@ function lessonUnlockState(skill,sourceState=state){
   const missing=prerequisites.filter(x=>grammarMastery(x,sourceState)<threshold&&!skipVerified(x)).map(x=>({skill:x,mastery:grammarMastery(x,sourceState)}));
   return{skill:key,locked:missing.length>0,threshold,missing,reason:missing.length?'prerequisite_not_mastered':'prerequisite_mastered'}
 }
-function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unlock.missing.map(x=>friendlySkillName(x.skill)).join(', ');return `Selesaikan dulu ${names} sampai mastery ${unlock.threshold}%.`}
+function lessonLockMessage(unlock){if(!unlock?.locked)return'';const names=unlock.missing.map(x=>friendlySkillName(x.skill)).join(', ');return FiezelI18n.t('grammar.lesson-terkunci',{daftarLesson:names,ambang:unlock.threshold})}
 /* ---- m028-06 LEVEL TRUST: bukti per level, bukan klaim ---------------------------------
  *
  * Semua fungsi di blok ini MURNI terhadap state yang dikirimkan (pola lessonUnlockState dan
@@ -913,7 +913,7 @@ function levelEntryChoiceCopy(chosen,requiredExam){
   const target=String(chosen||'').toUpperCase(),exam=String(requiredExam||'').toUpperCase();
   return{
     title:`Mau belajar di ${target}? Sedikit lagi.`,
-    line:`Buat buka ${target}, lulusin dulu ${LEVEL_GUARD_COPY.examTitle} ${exam} \u2014 satu ujian, satu anak tangga.`,
+    line:FiezelI18n.t('level.entry-pilih-isi',{level:target,judulUjian:LEVEL_GUARD_COPY.examTitle,ujian:exam}),
     deferToast:`Oke, kita mulai dari ${levelEntryDeferLevel()} dulu. ${target} nungguin kamu abis lulus ujian ${exam}.`
   };
 }
@@ -1004,7 +1004,7 @@ function levelTrustAdoptPlacement(level,s=state){
   return true;
 }
 function levelTrustCopy(text,level){const target=String(level||'A1');return target==='A1'?String(text||''):String(text||'').split('A1').join(target)}
-function levelExamCooldownLabel(ms){const hours=Math.ceil(Math.max(0,Number(ms)||0)/3600000);return hours>1?`${hours} jam lagi`:'kurang dari sejam lagi'}
+function levelExamCooldownLabel(ms){const hours=Math.ceil(Math.max(0,Number(ms)||0)/3600000);return hours>1?FiezelI18n.t('level.cooldown-jam',{jam:hours}):FiezelI18n.t('level.cooldown-sejam')}
 // m025-140 (B-04): level SESI, bukan level yang kebetulan aktif saat outcome dihitung.
 // Sesi yang dimulai di A1 lalu murid pindah ke B1 sebelum menutupnya harus tetap dinilai
 // sebagai A1 - kalau tidak, satu kali ganti level menulis ulang arti bukti yang sudah ada.
@@ -1111,7 +1111,7 @@ function loadState(key=activeStateStorageKey){try{const raw=JSON.parse(localStor
    SEKALI supaya murid tahu progresnya tidak tersimpan, tanpa menghentikan sesi berjalan. */
 var saveWriteQueued=false;
 let saveStorageWarned=false;
-function saveFlushWrite(){saveWriteQueued=false;state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;if(activeAccountUuid)state.ownerUuid=activeAccountUuid;try{localStorage.setItem(activeStateStorageKey,JSON.stringify(state))}catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast('Penyimpanan perangkat penuh - progresmu tidak ikut tersimpan. Kosongkan ruang, lalu lanjutkan.')}catch{}}}}
+function saveFlushWrite(){saveWriteQueued=false;state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;if(activeAccountUuid)state.ownerUuid=activeAccountUuid;try{localStorage.setItem(activeStateStorageKey,JSON.stringify(state))}catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast(FiezelI18n.t('common.toast-penyimpanan-penuh'))}catch{}}}}
 function save(){const readiness=diagnosticReadinessMap(state);state.adaptiveReadyByLevel=readiness;state.adaptiveReady=!!readiness[getActiveLevel(state)];recomputeMeaningfulDays(state);if(saveWriteQueued)return;saveWriteQueued=true;if(typeof queueMicrotask==='function')queueMicrotask(saveFlushWrite);else saveFlushWrite()}
 /**
  * Memindahkan aplikasi ke kemajuan milik akun yang sedang masuk.
@@ -1344,7 +1344,7 @@ function openConfidencePop(ok){
   const pop=document.createElement('div');
   pop.id='confidencePop';pop.className='confidence-pop';
   pop.setAttribute('role','dialog');pop.setAttribute('aria-modal','true');
-  pop.setAttribute('aria-label','Tadi seberapa yakin');
+  pop.setAttribute('aria-label',FiezelI18n.t('quiz.keyakinan-aria'));
   pop.innerHTML=`<div class="confidence-card">
     <div class="confidence-verdict ${ok?'is-ok':'is-no'}"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, nggak apa-apa.'}</b></div>
     <div id="confidenceAsk">
@@ -1367,9 +1367,9 @@ function openConfidencePop(ok){
 /** Pilihan diambil: skalanya diganti tombol Lanjut, di popup yang sama. */
 function confidencePopAnswered(value){
   const ask=$('confidenceAsk');if(!ask)return;
-  const label=value===1?'Masih ragu':value===2?'Lumayan yakin':'Yakin sekali';
-  ask.innerHTML=`<p class="confidence-saved"><i data-lucide="check"></i> ${esc(label)} — kecatat</p>
-    <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">Lihat pembahasan <i data-lucide="arrow-right"></i></button>`;
+  const label=value===1?FiezelI18n.t('quiz.keyakinan-skala-1'):value===2?FiezelI18n.t('quiz.keyakinan-skala-2'):FiezelI18n.t('quiz.keyakinan-skala-3');
+  ask.innerHTML=`<p class="confidence-saved"><i data-lucide="check"></i> ${FiezelI18n.t('quiz.keyakinan-kecatat',{label:esc(label)})}</p>
+    <button type="button" class="primary luxe confidence-go" onclick="confidencePopNext()">${FiezelI18n.t('quiz.keyakinan-lihat-pembahasan')} <i data-lucide="arrow-right"></i></button>`;
   enhanceUI();
   setTimeout(()=>{$('confidencePop')?.querySelector('.confidence-go')?.focus()},60)
 }
@@ -1480,7 +1480,7 @@ function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now(
   state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
   if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};state[bucket][key]=b;save()}
 function markMastered(bucket,key){if(!key)return;const b=state[bucket][key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;state[bucket][key]=b;save()}
-function dailyBrief(){const due=dueItems();const profile=getDiagnosticProfile();const weak=Object.entries(profile.weakSkills).sort((a,b)=>b[1].score-a[1].score)[0]?.[0];return {review:due.length,weak:weak||'Belum ada pola',goal:state.adaptiveReady?'12 soal adaptif':'Mulai tes awal'} }
+function dailyBrief(){const due=dueItems();const profile=getDiagnosticProfile();const weak=Object.entries(profile.weakSkills).sort((a,b)=>b[1].score-a[1].score)[0]?.[0];return {review:due.length,weak:weak||FiezelI18n.t('home.brief-belum-pola'),goal:state.adaptiveReady?FiezelI18n.t('home.brief-goal-adaptif'):FiezelI18n.t('home.brief-goal-tes-awal')} }
 function getDiagnosticProfile(){
  const active=getActiveLevel(),history=(state.history||[]).filter(h=>historyMatchesActive(h,active)),profile={weakSkills:{},weakTypes:{},weakTargets:{},total:history.length,accuracy:history.length?history.filter(h=>h.ok).length/history.length:0};
  const rows={};for(const h of history){const k=h.skill||'general';rows[k]??={total:0,wrong:0,time:0};rows[k].total++;rows[k].wrong+=h.ok?0:1;rows[k].time+=h.ms||0;if(!h.ok){profile.weakSkills[k]??={wrong:0,attempts:0,score:0};profile.weakSkills[k].wrong++;profile.weakTypes[h.type]=(profile.weakTypes[h.type]||0)+1;if(h.target)profile.weakTargets[h.target]=(profile.weakTargets[h.target]||0)+1}}
@@ -1559,8 +1559,8 @@ function deriveAdaptivePolicy(input={}){
   const levelIndex=Math.max(0,levels.indexOf(String(snapshot.estimatedLevel||'A1'))),offset=difficultyBand==='foundation'?-1:difficultyBand==='stretch'?1:0;let targetDifficulty=Math.max(1,Math.min(6,levelIndex+1+offset));
   let reviewShare=mode==='review'?.65:mode==='repair'?.45:mode==='recovery'?.40:mode==='diagnostic'?0:.25,avoidNewContent=['review','repair','recovery'].includes(mode)||maxRisk>=75,confidenceCheck=confidenceEvidence>=5&&confidenceGap!=null&&confidenceGap>=25,pace=(medianResponse>=16000||abandonment>=25)?'calm':'normal';
   const rationaleCodes=[];if(dueReviews)rationaleCodes.push('due_reviews');if(maxRisk>=60)rationaleCodes.push('forgetting_risk');if(weak&&weak.errorRate>=40)rationaleCodes.push('weak_skill');if(weak&&weak.recurringErrors>=2)rationaleCodes.push('recurring_error');if(abandonment>=25)rationaleCodes.push('abandonment_risk');if(consistency<30)rationaleCodes.push('consistency_risk');if(confidenceCheck)rationaleCodes.push('confidence_gap');if(medianResponse>=16000)rationaleCodes.push('calm_pacing');const relevantOutcomes=outcomes.filter(o=>(targetSkill&&o.targetSkill===targetSkill)||(!targetSkill&&o.primaryDomain===primaryDomain)),latestOutcome=relevantOutcomes.at(-1)||outcomes.at(-1)||null,positiveRun=relevantOutcomes.slice(-2).length===2&&relevantOutcomes.slice(-2).every(o=>o.status==='positive');if(latestOutcome?.status==='negative'){sessionSize=Math.max(5,Math.min(sessionSize,Math.round(sessionSize*.75)));targetDifficulty=Math.max(1,targetDifficulty-1);pace='calm';avoidNewContent=true;rationaleCodes.push('recent_policy_outcome_negative')}else if(latestOutcome?.status==='mixed'){sessionSize=Math.max(5,Math.min(sessionSize,10));rationaleCodes.push('recent_policy_outcome_mixed')}else if(positiveRun&&mode==='balance'){targetDifficulty=Math.min(6,targetDifficulty+1);avoidNewContent=false;rationaleCodes.push('recent_policy_outcome_positive')}if(!rationaleCodes.length)rationaleCodes.push('balanced_progression');
-  const labels={diagnostic:['Bangun bukti dulu, bro','FIEZEL butuh bukti lintas skill sebelum ngatur latihan secara presisi.','Cari tahu level kamu'],recovery:['Comeback pendek dulu','Ritme lagi rapuh, jadi Core Brain sengaja bikin sesi lebih pendek biar gampang dituntaskan.','Mulai comeback'],review:['Review dulu sebelum nambah','Ada materi yang mulai rawan lupa. Core Brain tahan materi baru dan prioritaskan recall.','Mulai Smart Review'],repair:['Benerin titik bocor dulu','Ada pola salah yang berulang. Sesi berikutnya difokuskan ke skill itu sebelum pindah jauh.','Perbaiki skill ini'],balance:['Naik level dengan ritme aman','Bukti belajar cukup stabil. Core Brain menyeimbangkan fokus lemah, review, dan transfer lintas skill.','Mulai rencana Core']},label=labels[mode];
-  const targetLabel=targetSkill?targetSkill.replace(/_/g,' '):primaryDomain,steps=[];if(mode==='review')steps.push(`Mulai dari review berisiko tinggi (${Math.round(reviewShare*100)}% sesi).`);else if(mode==='repair')steps.push(`Fokus utama: ${targetLabel}.`);else if(mode==='recovery')steps.push('Sesi pendek dulu supaya selesai tanpa bikin beban terasa gede.');else if(mode==='diagnostic')steps.push('Kumpulkan bukti vocabulary, grammar, dan reading secara seimbang.');else steps.push(`Prioritaskan ${targetLabel}, lalu jaga variasi lintas skill.`);steps.push(`Target ${sessionSize} soal · difficulty ${difficultyBand} · pace ${pace}.`);if(confidenceCheck)steps.push('Aktifkan cek keyakinan karena rasa yakin dan hasil nyata masih cukup berjauhan.');else steps.push(avoidNewContent?'Tahan materi baru sampai area prioritas lebih stabil.':'Boleh sisipkan sedikit transfer atau materi baru bila pool aman.');
+  const labels={diagnostic:[FiezelI18n.t('policy.diagnostic-judul'),FiezelI18n.t('policy.diagnostic-ringkas'),FiezelI18n.t('policy.diagnostic-cta')],recovery:[FiezelI18n.t('policy.recovery-judul'),FiezelI18n.t('policy.recovery-ringkas'),FiezelI18n.t('policy.recovery-cta')],review:[FiezelI18n.t('policy.review-judul'),FiezelI18n.t('policy.review-ringkas'),FiezelI18n.t('policy.review-cta')],repair:[FiezelI18n.t('policy.repair-judul'),FiezelI18n.t('policy.repair-ringkas'),FiezelI18n.t('policy.repair-cta')],balance:[FiezelI18n.t('policy.balance-judul'),FiezelI18n.t('policy.balance-ringkas'),FiezelI18n.t('policy.balance-cta')]},label=labels[mode];
+  const targetLabel=targetSkill?targetSkill.replace(/_/g,' '):primaryDomain,steps=[];if(mode==='review')steps.push(`Mulai dari review berisiko tinggi (${Math.round(reviewShare*100)}% sesi).`);else if(mode==='repair')steps.push(FiezelI18n.t('policy.langkah-fokus',{fokus:targetLabel}));else if(mode==='recovery')steps.push(FiezelI18n.t('policy.langkah-recovery'));else if(mode==='diagnostic')steps.push(FiezelI18n.t('policy.langkah-diagnostic'));else steps.push(FiezelI18n.t('policy.langkah-balance',{fokus:targetLabel}));steps.push(`Target ${sessionSize} soal · difficulty ${difficultyBand} · pace ${pace}.`);if(confidenceCheck)steps.push(FiezelI18n.t('policy.langkah-keyakinan'));else steps.push(avoidNewContent?FiezelI18n.t('policy.langkah-tahan-baru'):FiezelI18n.t('policy.langkah-boleh-baru'));
   const day=new Date(now).toISOString().slice(0,10),safeTarget=(targetSkill||primaryDomain).replace(/[^a-z0-9_-]+/gi,'-').slice(0,32)||'general';
   return{schema:ADAPTIVE_POLICY_SCHEMA,policyId:`${day}-${mode}-${safeTarget}`,generatedAt:new Date(now).toISOString(),mode,title:label[0],summary:label[1],cta:label[2],sessionSize,estimatedMinutes:Math.max(5,Math.round(sessionSize*(pace==='calm'?1.25:1))),primaryDomain,secondaryDomain,targetSkill,targetDifficulty,difficultyBand,reviewShare,pace,confidenceCheck,avoidNewContent,domainMix:{primary:55,secondary:25,other:20},rationaleCodes,steps,outcomeContext:latestOutcome?{status:latestOutcome.status,score:latestOutcome.score,recommendation:latestOutcome.recommendation,policyId:latestOutcome.policyId}:null,source:'deterministic-policy-v1'}
 }
@@ -1958,11 +1958,11 @@ function makeClozeQuestion(item){
   const skill=String(item.skill||''),level=LEVELS.includes(item.level)?item.level:getActiveLevel();
   const q={id:`cloze-${item.id}-${Date.now()}-${Math.random()}`,type:'cloze',level,skill,lessonSkill:skill,
     sourceId:String(item.templateId||item.id||''),conceptId:String(item.templateId||item.id||''),practiceMode:'cloze_production',
-    question:`Lengkapi kalimatnya (ketik jawabanmu): ${item.sentence}`,
+    question:FiezelI18n.t('quiz.cloze-stem',{kalimat:item.sentence}),
     clozeAnswer:String(item.blank.answer),clozeAlternates:(item.blank.alternates||[]).map(x=>String(x)),
     clozeDistractors:(item.distractors||[]).filter(d=>d&&d.text).map(d=>({text:String(d.text),misconception:String(d.misconception||'')})),
     options:[],answerIndex:-1,difficulty:LEVELS.indexOf(level)+1,
-    explain:{why:`Kalimatnya menuntut bentuk "${String(item.blank.answer)}".`,rule:`Jawaban yang tepat: "${String(item.blank.answer)}".`,memory:'Baca petunjuk waktunya dulu, baru bentuk katanya.',avoid:'Tulis bentuk lengkapnya, jangan hanya kata dasarnya.'}};
+    explain:{why:FiezelI18n.t('quiz.cloze-why',{isian:String(item.blank.answer)}),rule:`Jawaban yang tepat: "${String(item.blank.answer)}".`,memory:FiezelI18n.t('quiz.cloze-memory'),avoid:FiezelI18n.t('quiz.cloze-avoid')}};
   try{const prior=Number(self.FiezelItemPrior?.difficultyFor?.({level,mode:'complete_sentence',domain:'grammar'}));if(Number.isFinite(prior)&&prior>0)q.difficulty=prior}catch{}
   q.__priorDifficulty=q.difficulty;
   try{const eff=itemCalibrationEffective(q,q.difficulty);if(eff)q.difficulty=eff}catch{}

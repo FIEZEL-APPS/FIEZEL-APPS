@@ -28,6 +28,18 @@
 (function (global) {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
+  // keluaran render tetap byte-identik dengan sebelumnya.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var doc = global.document;
   if (!doc) return;
 
@@ -297,17 +309,17 @@
     sheet.className = 'fz-coach-sheet';
     sheet.hidden = true;
     sheet.innerHTML =
-      '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="Pembimbing FIEZEL">' +
+      '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="' + T('coach.panel-aria') + '">' +
         '<div class="fz-coach-head">' +
           '<span class="' + pawHost('fz-coach-avatar') + '">' + pawFace('fz-coach-face') + '</span>' +
           '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>' +
-          '<button type="button" class="fz-coach-close" aria-label="Tutup">✕</button>' +
+          '<button type="button" class="fz-coach-close" aria-label="' + T('coach.close-aria') + '">✕</button>' +
         '</div>' +
         '<div class="fz-coach-log" aria-live="polite"></div>' +
         '<div class="fz-coach-chips"></div>' +
         '<form class="fz-coach-form">' +
-          '<textarea rows="1" placeholder="Tanya apa aja…" aria-label="Tanya FIEZEL"></textarea>' +
-          '<button type="submit" class="fz-coach-send" aria-label="Kirim">→</button>' +
+          '<textarea rows="1" placeholder="' + T('coach.input-placeholder') + '" aria-label="' + T('coach.input-aria') + '"></textarea>' +
+          '<button type="submit" class="fz-coach-send" aria-label="' + T('coach.send-aria') + '">→</button>' +
         '</form>' +
       '</div>';
 

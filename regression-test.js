@@ -40,7 +40,14 @@ assert(/sessionAttempts:coreBrainSessionAttempts\(\)/.test(app)&&/state\.activeS
 // The all-caps kicker was removed as a design decision; the ring, the target and the
 // function are the feature. This is a stricter marker than the label it replaces.
 assert(/function dailyBrief/.test(app)&&/mission-ring/.test(app)&&/MEANINGFUL_ATTEMPTS/.test(app),'daily learning brief missing');
-assert(/Peta Belajar & Lab/.test(app)&&/Lab Kesalahan/.test(app)&&/Linimasa Kelemahan/.test(app),'learning map/labs missing');
+// AI-20 F06 (W1-TESTPLAN 2a): naskah murid boleh PINDAH byte-identik dari app.js ke copy-map
+// features/i18n/copy-id-*.js (himpunan literal dijaga id-golden-snapshot-test.js), jadi HANYA
+// baris peta-belajar ini mencari di UNION app.js + copy-id — glob kosong = perilaku lama.
+// Semua invarian keamanan lain di berkas ini tetap memeriksa app.js langsung (DO-NOT-TOUCH).
+const i18nDir=path.join(root,'features','i18n');
+const copyIdUnion=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(f=>/^copy-id-.*\.js$/.test(f)).sort().map(f=>fs.readFileSync(path.join(i18nDir,f),'utf8')).join('\n'):'';
+const appCopyUnion=app+'\n'+copyIdUnion;
+assert(/Peta Belajar & Lab/.test(appCopyUnion)&&/Lab Kesalahan/.test(appCopyUnion)&&/Linimasa Kelemahan/.test(appCopyUnion),'learning map/labs missing');
 assert(/Jaringan Kekeliruan Kosakata/.test(app)&&/Peta Skill Reading/.test(app),'skill/confusion maps missing');
 assert(/Laporan Diagnostik/.test(app)&&/Dibuat oleh Fitrarustqi/.test(app),'diagnostic/creator product surface missing');
 assert(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/buildGrammarLessonQuestions/.test(app),'25-question grammar lesson contract missing');

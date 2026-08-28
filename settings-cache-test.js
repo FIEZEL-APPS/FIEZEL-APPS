@@ -21,6 +21,16 @@ const vm = require('vm');
 const root = __dirname;
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 
+// AI-20 F06 (W1-TESTPLAN 2a): subteks copy §5 boleh PINDAH byte-identik dari openSettings()
+// ke copy-map features/i18n/copy-id-*.js (id-golden-snapshot-test.js menjaga byte-nya).
+// Karena itu S1c mencari di UNION blok settings + copy-id; glob kosong = perilaku lama.
+// S2–S5 (daftar hitam kunci progres, perilaku clearAppCache) TIDAK memakai union — tetap app.js.
+const i18nDir = path.join(root, 'features', 'i18n');
+const copyIdUnion = fs.existsSync(i18nDir)
+  ? fs.readdirSync(i18nDir).filter(f => /^copy-id-.*\.js$/.test(f)).sort()
+      .map(f => fs.readFileSync(path.join(i18nDir, f), 'utf8')).join('\n')
+  : '';
+
 let failed = false;
 const checks = [];
 function check(name, ok, details) {
@@ -49,8 +59,8 @@ if (!sourceBlock('openSettings')) {
     /\$\('settingClearCache'\)[\s\S]{0,120}(confirmClearAppCache|clearAppCache)/.test(settingsBlock),
     'tidak ada binding dari #settingClearCache ke clearAppCache dalam openSettings()');
   check('S1c subteks tombol menjanjikan progres tidak terhapus',
-    /progres belajarmu nggak ikut terhapus/i.test(settingsBlock),
-    'subteks copy §5 tidak ditemukan di kartu cache');
+    /progres belajarmu nggak ikut terhapus/i.test(settingsBlock + '\n' + copyIdUnion),
+    'subteks copy §5 tidak ditemukan di kartu cache maupun copy-id');
 }
 
 // Lima kelompok accordion: struktur inilah yang membuat panel muat di bawah 900 px, dan

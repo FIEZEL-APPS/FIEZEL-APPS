@@ -19,8 +19,28 @@ const css = fs.readFileSync('./style.css', 'utf8');
 const html = fs.readFileSync('./index.html', 'utf8');
 const app = fs.readFileSync('./app.js', 'utf8');
 
+// AI-20 F06 (kategori 2a, UNION-CORPUS): naskah Indonesia boleh PINDAH ke copy-map
+// features/i18n/copy-id-*.js tanpa berubah satu byte pun (dijaga id-golden-snapshot-test.js).
+// Karena itu pencarian literal dilakukan atas GABUNGAN app.js + seluruh copy-map id.
+// Selama domain terkait belum diekstrak, gabungan ini identik dengan app.js — hijau dua arah.
+const I18N_DIR = './features/i18n';
+const copyIdCorpus = fs.existsSync(I18N_DIR)
+  ? fs.readdirSync(I18N_DIR).filter(n => /^copy-id-.*\.js$/.test(n)).sort()
+      .map(n => fs.readFileSync(I18N_DIR + '/' + n, 'utf8')).join('\n')
+  : '';
+const idCorpus = app + '\n' + copyIdCorpus;
+
+// AI-20 F04 (lang-pin -> konstanta): hari ini 'id' adalah satu-satunya locale murid, jadi
+// default statis index.html tetap lang="id". Setelah Wave 2 (dukungan th) app.js menyetel
+// documentElement.lang = FiezelI18n.getBcp47() saat boot — saat itu TAMBAHKAN asersi untuk
+// mekanisme dinamisnya; asersi default statis ini JANGAN dihapus.
+const SUPPORTED_LOCALES = ['id'];
+
 test('halaman menyatakan bahasanya, supaya pembaca layar memakai suara yang benar', () => {
-  assert.ok(/<html[^>]+lang="id"/.test(html), 'lang="id" wajib ada di <html>');
+  const lang = (/<html[^>]+lang="([a-zA-Z-]+)"/.exec(html) || [])[1];
+  assert.ok(lang, 'atribut lang wajib ada di <html>');
+  assert.ok(SUPPORTED_LOCALES.includes(lang),
+    'lang="' + lang + '" bukan locale murid yang didukung (' + SUPPORTED_LOCALES.join(', ') + ')');
 });
 
 test('cincin fokus ada untuk semua kontrol, bukan hanya tombol', () => {
@@ -103,9 +123,12 @@ test('teks sekunder tetap cukup kontras terhadap latarnya', () => {
 
 test('kartu roadmap baru memakai teks, bukan hanya warna, untuk menyampaikan status', () => {
   // Status yang hanya dibedakan warna tidak sampai ke pengguna buta warna maupun pembaca layar.
-  assert.ok(/HEALTH_SEVERITY_LABELS=\{ok:'Aman'/.test(app), 'kesehatan instalasi punya label teks');
-  assert.ok(/READINESS_STATUS_LABELS=\{met:'Sudah terpenuhi'/.test(app), 'kesiapan akademik punya label teks');
-  assert.ok(/Belum terhubung/.test(app) && /Belum diukur/.test(app), 'peta skill menyatakan statusnya dengan kata');
+  // AI-20 F06: identifier peta label TETAP dicek di app.js (identifier tidak diekstrak —
+  // larangan rename ada di handoff W2-APP); nilai teksnya dicek di union-corpus karena
+  // kalimatnya boleh pindah ke copy-map tanpa berubah byte.
+  assert.ok(/HEALTH_SEVERITY_LABELS/.test(app) && /'Aman'/.test(idCorpus), 'kesehatan instalasi punya label teks');
+  assert.ok(/READINESS_STATUS_LABELS/.test(app) && /'Sudah terpenuhi'/.test(idCorpus), 'kesiapan akademik punya label teks');
+  assert.ok(/Belum terhubung/.test(idCorpus) && /Belum diukur/.test(idCorpus), 'peta skill menyatakan statusnya dengan kata');
 });
 
 console.log('');

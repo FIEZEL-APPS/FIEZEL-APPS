@@ -22,7 +22,19 @@ const fetch=async u=>{const file=String(u).split('/').pop();return{ok:true,json:
 const noopTimer=()=>({unref(){}});
 const navigator={vibrate(){return true}};
 const context={console,document,localStorage,Notification,navigator,fetch,location:{href:'http://localhost/'},window:null,self:null,Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:noopTimer,clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},FIEZEL_REQUIRE_NOTIFICATIONS:false};context.window=context;context.self=context;context.window.scrollTo=()=>{};context.window.focus=()=>{};
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — meniru urutan <script> index.html
+// (fiezel-i18n.js lalu copy-id-*.js SEBELUM app.js). Begitu naskah pengingat pindah ke
+// copy-map, app.js memanggil FiezelI18n.t() saat boot; tanpa harness ini vm meledak.
+// existsSync menjaga tes tetap hijau dua arah (pra & pasca ekstraksi). Asersi id di bawah
+// TIDAK berubah — keluaran id wajib byte-identik (id-golden-snapshot-test.js).
+const i18nDir=path.join(root,'features','i18n');
+if(fs.existsSync(path.join(i18nDir,'fiezel-i18n.js'))){
+  vm.runInContext(fs.readFileSync(path.join(i18nDir,'fiezel-i18n.js'),'utf8'),context,{filename:'fiezel-i18n.js'});
+  for(const f of fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),context,{filename:f});
+}
+vm.runInContext(app,context,{filename:'app.js'});
 setTimeout(async()=>{
   try{
     // WAJIB -> DIUNDANG, TIDAK DIPAKSA: izin 'denied' tidak boleh mengunci apa pun.

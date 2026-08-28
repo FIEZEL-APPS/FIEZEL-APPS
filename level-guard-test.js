@@ -416,14 +416,29 @@ const homeBlock = sourceBlock('home');
 check('S13 · Home menampilkan banner mode percobaan / terkunci', /activeLevelTrustMarkup\(\)/.test(homeBlock),
   'murid harus tahu statusnya tanpa harus membuka panel level');
 
-const copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
+// AI-20 F06 (kategori 2a, UNION repoint): blok LEVEL_GUARD_COPY boleh PINDAH ke copy-map
+// features/i18n/copy-id-level.js dengan nilai byte-identik (dijaga id-golden-snapshot-test.js).
+// Kalau bloknya tidak lagi ditemukan di app.js, blok registrasi copy-map dipakai sebagai
+// sumber teks — SEMUA sub-cek S14/S14b/S15 (kunci wajib, nilai id verbatim, sinkron angka)
+// tetap berjalan utuh atas teks itu. Syarat untuk W2-APP (lihat impl/handoff/W2-APP.md):
+// slug kunci di copy-map WAJIB mempertahankan nama anggota LEVEL_GUARD_COPY (warn5, warn8,
+// demotionBody, lockedFeature, examDesc, entryChip, entryExam, entryLater, probationBody)
+// supaya ikatan cek ini tidak putus. Regex kunci di bawah menoleransi bentuk keduanya
+// (warn5: di app.js maupun 'level.warn5': di copy-map).
+let copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
+if (!copyBlock) {
+  const levelCopyPath = path.join(root, 'features', 'i18n', 'copy-id-level.js');
+  if (fs.existsSync(levelCopyPath)) {
+    copyBlock = fs.readFileSync(levelCopyPath, 'utf8').match(/registerCopy\(\s*'id'\s*,\s*\{[\s\S]*?\}\s*\)/);
+  }
+}
 const copyText = copyBlock ? copyBlock[0] : '';
-check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5:/.test(copyText) && /warn8:/.test(copyText) && /demotionBody:/.test(copyText) && /lockedFeature:/.test(copyText) && /examDesc:/.test(copyText),
+check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5['"]?:/.test(copyText) && /warn8['"]?:/.test(copyText) && /demotionBody['"]?:/.test(copyText) && /lockedFeature['"]?:/.test(copyText) && /examDesc['"]?:/.test(copyText),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
 check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
-  /entryChip:/.test(copyText) && /entryExam:'Ikuti ujian'/.test(copyText) && /entryLater:'Nanti aja'/.test(copyText) &&
-  (copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length <= 90,
-  `panjang probationBody sekarang ${(copyText.match(/probationBody:'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
+  /entryChip['"]?:/.test(copyText) && /entryExam['"]?:\s*'Ikuti ujian'/.test(copyText) && /entryLater['"]?:\s*'Nanti aja'/.test(copyText) &&
+  (copyText.match(/probationBody['"]?:\s*'([^']*)'/)?.[1] || '').length <= 90,
+  `panjang probationBody sekarang ${(copyText.match(/probationBody['"]?:\s*'([^']*)'/)?.[1] || '').length} karakter — satu kalimat, bukan artikel`);
 check('S15 · angka di copy ujian sinkron dengan LEVEL_EXAM_PASS', new RegExp(`minimal\\s+${EXAM_PASS}%`).test(copyText),
   `teks harus menulis ${EXAM_PASS}% supaya tidak menjanjikan ambang yang berbeda dari kode`);
 
