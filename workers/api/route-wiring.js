@@ -63,7 +63,8 @@ import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
 // P3 - penegakan flag server DI JALUR PERMINTAAN, bukan sekadar dilaporkan ke klien.
 import { checkAiEnabled } from './feature-gate.js';
 // P3 - pagar neuron tingkat AKUN (jatah vendor), berbeda dari kuota per-murid.
-import { reserveAccountNeurons } from './ai/ai-account-budget.js';
+import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
+import { QUOTA_CONFIG } from './quota/quota-config.js';
 import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/route-quota.js';
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
@@ -84,6 +85,11 @@ import './tts/tts-key.js';
 // A12/1: registry nama parameter provider TTS (`speaker`) + voice bawaan korpus. Sama-sama UMD
 // dan sama-sama dipakai `route-tts.js` lewat `globalThis`, jadi ia WAJIB disebut sebelum rutenya.
 import './tts/tts-provider-params.js';
+// S2 - CHOKEPOINT MODEL. Sama-sama UMD dan dipakai `route-ai.js` + `route-tts.js`
+// lewat `globalThis`, jadi ia WAJIB disebut SEBELUM kedua rute itu. Membalik urutan
+// ini = `ModelCallGate is undefined` di jalur permintaan, dan itu berarti setiap
+// panggilan model melempar - berisik, bukan senyap. Itu memang arah yang benar.
+import * as modelGateNs from './ai/model-call-gate.js';
 import * as routeAiNs from './ai/route-ai.js';
 import * as routeTtsNs from './tts/route-tts.js';
 
@@ -99,6 +105,7 @@ function umd(ns, globalName) {
   return ns || null;
 }
 
+const ModelCallGate = umd(modelGateNs, 'FiezelModelCallGate');
 const RouteAi = umd(routeAiNs, 'FiezelRouteAi');
 const RouteTts = umd(routeTtsNs, 'FiezelRouteTts');
 
@@ -317,9 +324,34 @@ function rollbackQuotaBridgeFactory() {
 }
 
 /**
- * P3 - JEMBATAN PAGAR NEURON AKUN. Fail-CLOSED di setiap cabang: tanpa ctx, tanpa D1,
- * atau saat modul anggaran melempar, jawabannya TOLAK. Pipa biaya yang tidak bisa
- * diukur tidak boleh dibuka - murid tetap menerima jawaban deterministik.
+ * P3/S2 - JEMBATAN PAGAR NEURON AKUN: SATU-SATUNYA TEMPAT PERAKITAN.
+ *
+ * Fail-CLOSED di setiap cabang: tanpa ctx, tanpa D1, atau saat modul anggaran
+ * melempar, jawabannya TOLAK. Pipa biaya yang tidak bisa diukur tidak boleh dibuka -
+ * murid tetap menerima jawaban deterministik dari materi.
+ *
+ * S2 - TIGA HAL BARU, dan ketiganya ada supaya plafon tidak bisa hilang diam-diam:
+ *
+ * 1. Yang dikembalikan bukan `{allowed:true}` biasa lagi, tetapi TANDA TERIMA dari
+ *    `ModelCallGate.makeReservation()`. `runReservedModel()` MENOLAK dipanggil tanpa
+ *    tanda terima yang sah, jadi rute yang lupa memesan tidak bisa memanggil model
+ *    sama sekali - ia melempar. Perakitan yang lupa = merah, bukan gratis.
+ * 2. Tanda terima membawa `release()`: kalau panggilan model gagal SEBELUM model
+ *    bekerja, neuronnya dikembalikan ke jatah hari ini. Tanpa ini, plafon 8.000 bisa
+ *    habis oleh permintaan yang nol biaya dan mematikan AI tanpa satu neuron terpakai.
+ * 3. Biaya TTS diturunkan DI SINI, bukan di `route-tts.js`. `route-tts.js` hanya
+ *    melaporkan `chars` + `freeCharsPerDay` mesinnya; konversi ke neuron memakai
+ *    `QUOTA_CONFIG.ACCOUNT_DAILY_NEURON_BUDGET` (10.000 neuron = jatah gratis akun),
+ *    yaitu angka yang SUDAH menjadi dasar `freeCharsPerDay` tiap mesin. Jadi tidak ada
+ *    konstanta harga baru yang dikarang: aura-1 = 10000/7333 = 1,364 neuron/karakter,
+ *    melotts = 10000/500000 = 0,02 neuron/karakter.
+ *
+ * CATATAN YANG DIKOREKSI DARI P3: komentar lama di sini menulis "TTS tidak memakai
+ * neuron Workers AI (ia memanggil penyedia suara terpisah)". Itu SALAH, dan salahnya
+ * mahal: `route-tts.js` memanggil `env.AI.run('@cf/deepgram/aura-1', ...)` - binding
+ * Workers AI yang sama, kolam neuron yang sama. Berkas itu bahkan mencatat sendiri
+ * "jatah gratis 10.000 neuron/hari ≈ 7.333 karakter/hari untuk SELURUH akun". Jadi
+ * plafon akun sekarang mengikat DI KEDUA jalur.
  */
 function accountBudgetBridgeFactory() {
   return async function accountBudgetBridge(args) {
@@ -327,10 +359,35 @@ function accountBudgetBridgeFactory() {
     const ctx = a.request ? CTX_BY_REQUEST.get(a.request) : null;
     const env = (ctx && ctx.env) || a.env || {};
     if (!ctx) return { allowed: false, reason: 'ai_budget_context_missing', usedBefore: 0 };
-    return reserveAccountNeurons({
-      db: quotaDb(env), env, neurons: a.neurons, now: a.now
+    const db = quotaDb(env);
+    const neurons = accountNeuronsFor(a);
+    const out = await reserveAccountNeurons({ db, env, neurons, now: a.now });
+    if (!out || out.allowed !== true) return out || { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
+    return ModelCallGate.makeReservation({
+      neurons,
+      cap: out.cap,
+      usedBefore: out.usedBefore,
+      release: () => releaseAccountNeurons({ db, env, neurons, now: a.now })
     });
   };
+}
+
+/**
+ * Berapa neuron yang dipesan satu permintaan. Dua jalur, satu tempat:
+ *   - AI  : `neurons` dari `spec.model.neuronsPerRequest` (angka terukur cf-a10 §2).
+ *   - TTS : diturunkan dari `chars` + `freeCharsPerDay` mesin yang benar-benar dipakai.
+ * Nilai yang tidak bisa dibaca menjadi PLAFON PERMINTAAN (`ACCOUNT_DAILY_NEURON_BUDGET`),
+ * bukan 1: permintaan yang biayanya tidak diketahui harus terasa mahal, bukan gratis.
+ */
+function accountNeuronsFor(a) {
+  const direct = Number(a && a.neurons);
+  if (Number.isFinite(direct) && direct > 0) return Math.ceil(direct);
+  const chars = Number(a && a.chars);
+  const freeChars = Number(a && a.freeCharsPerDay);
+  if (Number.isFinite(chars) && chars > 0 && Number.isFinite(freeChars) && freeChars > 0) {
+    return Math.max(1, Math.ceil((chars * QUOTA_CONFIG.ACCOUNT_DAILY_NEURON_BUDGET) / freeChars));
+  }
+  return QUOTA_CONFIG.ACCOUNT_DAILY_NEURON_BUDGET;
 }
 
 /**
@@ -454,12 +511,14 @@ export function buildExtraRoutes() {
   const bridge = enforceQuotaBridgeFactory();
   const rollbackBridge = rollbackQuotaBridgeFactory();
   const accountBudget = accountBudgetBridgeFactory();
-  // P3 - `rollbackQuota` dan `accountBudget` sekarang BENAR-BENAR disuntikkan. Keduanya
-  // hanya untuk jalur AI: TTS tidak memakai neuron Workers AI (ia memanggil penyedia
-  // suara terpisah), jadi memasang pagar neuron di sana akan menolak permintaan dengan
-  // alasan yang tidak berlaku untuknya.
+  // P3/S2 - `rollbackQuota` dan `accountBudget` disuntikkan ke KEDUA jalur. P3 hanya
+  // menyuntikkan `accountBudget` ke AI dengan alasan "TTS tidak memakai neuron Workers
+  // AI" - alasan itu terbukti salah (lihat `accountBudgetBridgeFactory`): `route-tts.js`
+  // memanggil binding `env.AI` yang sama dan menghabiskan kolam neuron yang sama.
+  // Keduanya kini WAJIB: rutenya menolak jalan (503) kalau dep ini absen, jadi
+  // perakitan yang lupa terlihat seketika alih-alih membuka plafon diam-diam.
   const aiDeps = { enforceQuota: bridge, rollbackQuota: rollbackBridge, accountBudget };
-  const ttsDeps = { enforceQuota: bridge, rollbackQuota: rollbackBridge };
+  const ttsDeps = { enforceQuota: bridge, rollbackQuota: rollbackBridge, accountBudget };
   RouteAi.registerAiRoutes(collector(aiSink, (h) => h), aiDeps);
   RouteTts.registerTtsRoutes(collector(ttsSink, (h) => h), ttsDeps);
 
