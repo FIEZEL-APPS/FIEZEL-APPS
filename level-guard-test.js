@@ -119,6 +119,13 @@ const sandbox = {
 let sandboxReady = false;
 try {
   vm.createContext(sandbox);
+vm.runInContext("if(typeof globalThis.self==='undefined')globalThis.self=globalThis;if(typeof globalThis.window==='undefined')globalThis.window=globalThis;",sandbox);
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),sandbox,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),sandbox,{filename:__n});}}
+
   vm.runInContext(NEEDED.map(name => blocks[name]).join('\n'), sandbox, { timeout: 4000 });
   sandboxReady = true;
 } catch (error) {
@@ -425,6 +432,22 @@ check('S13 · Home menampilkan banner mode percobaan / terkunci', /activeLevelTr
 // demotionBody, lockedFeature, examDesc, entryChip, entryExam, entryLater, probationBody)
 // supaya ikatan cek ini tidak putus. Regex kunci di bawah menoleransi bentuk keduanya
 // (warn5: di app.js maupun 'level.warn5': di copy-map).
+
+/* Hotfix CI pasca-#242 (lanjutan AI-20 F06 kategori 2a): nilai LEVEL_GUARD_COPY kini hidup di
+   copy-map sebagai FiezelI18n.t('kunci'). Resolver ini mengganti referensi t() dengan nilai id
+   VERBATIM dari features/i18n/copy-id-*.js sehingga semua asersi kunci->nilai di bawah tetap
+   menguji teks yang benar-benar dilihat murid (byte-identik, dijaga id-golden-snapshot). */
+function resolveI18nRefs(text){
+  const dir=path.join(root,'features','i18n');
+  if(!fs.existsSync(dir))return text;
+  const map={};
+  for(const n of fs.readdirSync(dir).filter(n=>/^copy-id-.*\.js$/.test(n))){
+    const src=fs.readFileSync(path.join(dir,n),'utf8');
+    const re=/'((?:[^'\\]|\\.)+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;let m;
+    while((m=re.exec(src)))map[m[1]]=m[2];
+  }
+  return text.replace(/FiezelI18n\.t\('((?:[^'\\]|\\.)+)'\)/g,(w,k)=>Object.prototype.hasOwnProperty.call(map,k)?"'"+map[k]+"'":w);
+}
 let copyBlock = app.match(/const\s+LEVEL_GUARD_COPY=\{[\s\S]*?\};/);
 if (!copyBlock) {
   const levelCopyPath = path.join(root, 'features', 'i18n', 'copy-id-level.js');
@@ -432,7 +455,7 @@ if (!copyBlock) {
     copyBlock = fs.readFileSync(levelCopyPath, 'utf8').match(/registerCopy\(\s*'id'\s*,\s*\{[\s\S]*?\}\s*\)/);
   }
 }
-const copyText = copyBlock ? copyBlock[0] : '';
+const copyText = resolveI18nRefs(copyBlock ? copyBlock[0] : '');
 check('S14 · copy guard memuat teks peringatan 5, 8, demosi, kunci, dan ujian', /warn5['"]?:/.test(copyText) && /warn8['"]?:/.test(copyText) && /demotionBody['"]?:/.test(copyText) && /lockedFeature['"]?:/.test(copyText) && /examDesc['"]?:/.test(copyText),
   'teks §3 dan §4 reports/copy-fitur-baru.md tersimpan di satu tempat, bukan tersebar');
 check('S14b · copy gerbang baru ada dan penjelasan "belum terverifikasi" sudah jadi microcopy',
