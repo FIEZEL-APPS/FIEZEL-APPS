@@ -758,15 +758,15 @@
    "memoryCue": "Suggest + -ing (ไม่มี 'suggested me/us to...')",
    "distractors": {
     "told us": {
-     "misconception": "uses a direct-instruction verb for what was actually a suggestion",
+     "misconception": "ใช้คำกริยาสั่งการโดยตรงกับสิ่งที่จริง ๆ แล้วเป็นเพียงคำแนะนำ",
      "whyFails": "'Why don't we...?' เป็นข้อเสนอแนะ ไม่ใช่คำสั่ง 'told' จึงบิดเจตนาของคำพูด แถมยังต้องตามด้วย to-infinitive ไม่ใช่รูป -ing"
     },
     "ordered us": {
-     "misconception": "escalates a mild suggestion into a forceful command",
+     "misconception": "ยกระดับคำแนะนำเบา ๆ ให้กลายเป็นคำสั่งที่รุนแรง",
      "whyFails": "ประโยคเดิมเป็นข้อเสนอแนะเบา ๆ 'ordered' ทั้งผิดน้ำเสียงและยังต้องตามด้วย to-infinitive ไม่ใช่รูป -ing"
     },
     "suggested us": {
-     "misconception": "copies the object pattern of 'tell/ask' (verb + object) onto 'suggest', which doesn't take a direct personal object this way",
+     "misconception": "ลอกแพตเทิร์นกรรมของ 'tell/ask' (กริยา + กรรม) มาใช้กับ 'suggest' ซึ่งไม่รับกรรมบุคคลโดยตรงแบบนี้",
      "whyFails": "'Suggest' ไม่รับกรรมบุคคลตรง ๆ แบบ 'suggested us' มันต้องตามด้วยรูป -ing อนุประโยค that หรือ 'to someone that...'"
     }
    }
@@ -782,15 +782,15 @@
    "memoryCue": "ความจริงทั่วไปของทั้งหมวดหมู่ → ไม่ต้องมี article หน้าคำนามพหูพจน์",
    "distractors": {
     "The": {
-     "misconception": "adds a definite article to a generic plural statement about the species as a whole",
+     "misconception": "เติมคำนำหน้านามชี้เฉพาะให้ประโยคพหูพจน์ที่พูดถึงสายพันธุ์โดยรวมแบบทั่วไป",
      "whyFails": "'The elephants' จะหมายถึงช้างกลุ่มเฉพาะที่รู้กันอยู่แล้วว่าตัวไหน ไม่ใช่ช้างทั้งชนิดแบบทั่วไป"
     },
     "A": {
-     "misconception": "applies a singular indefinite article to a plural noun",
+     "misconception": "ใช้คำนำหน้านามไม่ชี้เฉพาะรูปเอกพจน์กับคำนามพหูพจน์",
      "whyFails": "'A' ใช้คู่กับคำนามพหูพจน์อย่าง 'elephants' ไม่ได้เลย"
     },
     "An": {
-     "misconception": "applies a singular indefinite article to a plural noun and ignores the consonant sound",
+     "misconception": "ใช้คำนำหน้านามไม่ชี้เฉพาะรูปเอกพจน์กับคำนามพหูพจน์ แถมมองข้ามเสียงพยัญชนะต้นคำ",
      "whyFails": "'An' เป็น article เอกพจน์ จึงนำหน้าคำนามพหูพจน์ 'elephants' ไม่ได้"
     }
    }
@@ -806,15 +806,15 @@
    "memoryCue": "นับได้ = many/few นับไม่ได้ = much/little",
    "distractors": {
     "much": {
-     "misconception": "applies the uncountable-noun quantifier to a countable plural noun",
+     "misconception": "ใช้คำบอกปริมาณสำหรับคำนามนับไม่ได้กับคำนามพหูพจน์ที่นับได้",
      "whyFails": "'Much' ใช้กับคำนามนับไม่ได้ แต่ 'chairs' เป็นของที่นับทีละตัวได้ คู่นี้จึงไปด้วยกันไม่ได้"
     },
     "little": {
-     "misconception": "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type",
+     "misconception": "ใช้คำบอกปริมาณสำหรับคำนามนับไม่ได้ ('little') กับคำนามพหูพจน์ที่นับได้ แถมสับสนชนิดของความขาดแคลน",
      "whyFails": "'Little' จับคู่กับคำนามนับไม่ได้ (little water) ไม่ใช่คำนามนับได้พหูพจน์อย่าง 'chairs' ซึ่งต้องใช้ 'few'"
     },
     "much of": {
-     "misconception": "adds an unnecessary partitive 'of' without a following determiner, and still misapplies 'much' to a countable noun",
+     "misconception": "เติม 'of' แบบแบ่งส่วนโดยไม่จำเป็นทั้งที่ไม่มี determiner ตามหลัง และยังใช้ 'much' ผิดกับคำนามนับได้อยู่ดี",
      "whyFails": "'Much of' ต้องตามด้วยนามวลีชี้เฉพาะ (much of the furniture) และถึงใส่ไปก็ยังแก้ปัญหานับได้/นับไม่ได้ไม่ได้อยู่ดี"
     }
    }
@@ -830,15 +830,15 @@
    "memoryCue": "ไฟจราจร = จุด → at ชื่อถนน = เส้น → on",
    "distractors": {
     "in / at": {
-     "misconception": "swaps the point-preposition and surface/line-preposition roles",
+     "misconception": "สลับบทบาทระหว่างคำบุพบทบอกจุดกับคำบุพบทบอกพื้นผิว/เส้นทาง",
      "whyFails": "'In the second traffic light' มองไฟจราจรเป็นพื้นที่ปิดล้อม ส่วน 'at Baker Street' ย่อถนนทั้งสายให้เหลือแค่จุดเดียว ทั้งสองช่องอ่านชนิดของสถานที่ผิด"
     },
     "on / in": {
-     "misconception": "treats a route point as a surface in the first slot",
+     "misconception": "มองจุดหนึ่งบนเส้นทางเป็นพื้นผิวในช่องแรก",
      "whyFails": "'On the second traffic light' มองจุดบนเส้นทางเป็นพื้นผิว ช่องแรกก็พลาดแล้วก่อนจะไปถึงวลีชื่อถนนด้วยซ้ำ"
     },
     "at / to": {
-     "misconception": "movement preposition used for a static location",
+     "misconception": "ใช้คำบุพบทบอกการเคลื่อนที่กับตำแหน่งที่อยู่นิ่ง",
      "whyFails": "'To' บอกการเคลื่อนที่ไปหาจุดหมาย แต่ประโยคนี้บอกว่าโรงแรมตั้งอยู่ที่ไหน"
     }
    }
@@ -854,15 +854,15 @@
    "memoryCue": "Proud OF ไม่ใช่ proud about/for/with",
    "distractors": {
     "about": {
-     "misconception": "over-generalizes 'about' as the default preposition after emotion adjectives",
+     "misconception": "เหมารวมว่า 'about' เป็นคำบุพบทมาตรฐานหลังคำคุณศัพท์บอกอารมณ์เสมอ",
      "whyFails": "'Proud' ไม่จับคู่กับ 'about' มันมีคู่ตายตัวคือ 'of' ซึ่งต้องจำ ไม่ใช่เดาเอา"
     },
     "for": {
-     "misconception": "confuses 'proud of' with other emotion collocations that do take 'for' (e.g., 'happy for someone')",
+     "misconception": "สับสน 'proud of' กับคู่คำอารมณ์อื่นที่ใช้ 'for' ได้จริง (เช่น 'happy for someone')",
      "whyFails": "'For' เป็นคำบุพบทประจำของคำคุณศัพท์บางคำอย่าง 'happy for' แต่ไม่ใช่ของ 'proud' ที่ใช้ 'of' ตายตัว"
     },
     "with": {
-     "misconception": "confuses 'proud of' with adjectives that pair with 'with' (e.g., 'pleased with')",
+     "misconception": "สับสน 'proud of' กับคำคุณศัพท์ที่จับคู่กับ 'with' (เช่น 'pleased with')",
      "whyFails": "'With' จับคู่กับคำคุณศัพท์คำอื่นอย่าง 'satisfied with' หรือ 'pleased with' ไม่ใช่กับ 'proud'"
     }
    }
@@ -878,15 +878,15 @@
    "memoryCue": "Remember doing (ความทรงจำในอดีต) vs. remember to do (หน้าที่ในอนาคต)",
    "distractors": {
     "to lock": {
-     "misconception": "applies the 'future duty' pattern ('remember to do') to a sentence that is actually recalling a completed past action",
+     "misconception": "เอาแพตเทิร์น 'หน้าที่ในอนาคต' ('remember to do') มาใช้กับประโยคที่จริง ๆ กำลังนึกถึงการกระทำในอดีตที่ทำไปแล้ว",
      "whyFails": "'Remember to lock' จะแปลว่าอย่าลืมไปล็อกทีหลัง แต่ประโยคนี้กำลังนึกถึงสิ่งที่เกิดขึ้นไปแล้วเมื่อเช้า"
     },
     "lock": {
-     "misconception": "uses the bare infinitive, which isn't a valid pattern after 'remember' in either meaning",
+     "misconception": "ใช้ infinitive เปล่า ซึ่งไม่ใช่แพตเทิร์นที่ถูกต้องหลัง 'remember' ไม่ว่าความหมายไหน",
      "whyFails": "'Remember' ตามด้วย gerund หรือ to-infinitive เท่านั้น ไม่เคยตามด้วยกริยารูปเปล่า"
     },
     "to have locked": {
-     "misconception": "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action",
+     "misconception": "ใช้ perfect to-infinitive หลัง 'remember' ซึ่งภาษาอังกฤษไม่ใช้สำหรับการนึกถึงการกระทำในอดีต",
      "whyFails": "'Remember to have locked' ไม่มีอยู่จริงในโครงสร้างภาษาอังกฤษ การนึกถึงการล็อกประตูที่ผ่านไปแล้วต้องใช้ gerund 'locking'"
     }
    }
@@ -902,15 +902,15 @@
    "memoryCue": "จุดประสงค์ = 'to' + กริยา เพียว ๆ ไม่ต้องมีคำบุพบท",
    "distractors": {
     "for having": {
-     "misconception": "misreads the sentence as needing a preposition + gerund structure instead of an infinitive of purpose",
+     "misconception": "อ่านประโยคผิดว่าต้องใช้โครงสร้างคำบุพบท + gerund แทนที่จะเป็น infinitive บอกจุดประสงค์",
      "whyFails": "ประโยคนี้บอกว่าทำไมเธอถึงออกก่อนเวลา (จุดประสงค์) ซึ่งต้องใช้ to-infinitive ไม่ใช่โครงสร้างคำบุพบท + gerund"
     },
     "for to have": {
-     "misconception": "mixes a preposition with a to-infinitive, a combination that isn't standard in English",
+     "misconception": "ผสมคำบุพบทกับ to-infinitive ซึ่งไม่ใช่รูปแบบมาตรฐานในภาษาอังกฤษ",
      "whyFails": "ภาษาอังกฤษไม่ใช้ 'for to' หน้ากริยาเพื่อบอกจุดประสงค์ to-infinitive บอกจุดประสงค์ยืนเดี่ยว ๆ กับ 'to' ได้เลย"
     },
     "having": {
-     "misconception": "drops the purpose marker entirely, leaving a bare gerund with no clear grammatical link to the main clause",
+     "misconception": "ตัดตัวบอกจุดประสงค์ทิ้งไปเลย เหลือ gerund เปล่าที่ไม่มีตัวเชื่อมทางไวยากรณ์กับประโยคหลัก",
      "whyFails": "พอไม่มี 'to' ประโยคก็เสียความหมายบอกจุดประสงค์ไป และช่องนี้ก็ไม่สมบูรณ์ทางไวยากรณ์ด้วย"
     }
    }
@@ -926,15 +926,15 @@
    "memoryCue": "ผู้ทำ + กริยา active → ตัด 'who' กับกริยาช่วยออก แล้วเติม -ing",
    "distractors": {
     "who developed": {
-     "misconception": "keeps the unreduced full relative clause when a reduced participle phrase is the target structure being tested",
+     "misconception": "คงอนุประโยคขยายเต็มรูปไว้ ทั้งที่โจทย์ต้องการรูปย่อแบบ participle",
      "whyFails": "นี่เป็นภาษาอังกฤษที่ถูกต้อง แต่เป็นอนุประโยคเต็ม แถมยังเปลี่ยนความหมายเป็นการกระทำที่จบแล้ว โจทย์ขอรูปลดของอนุประโยคที่กำลังดำเนินอยู่ตามที่ให้มา"
     },
     "which they developed": {
-     "misconception": "wrongly treats the vaccine as the head noun modified by the clause instead of the scientists",
+     "misconception": "เข้าใจผิดว่าอนุประโยคขยายวัคซีน ทั้งที่จริงขยายนักวิทยาศาสตร์",
      "whyFails": "แบบนี้ปรับประโยคไปขยาย 'the vaccine' แทน ทำให้เปลี่ยนตัวที่อนุประโยคควรบรรยาย (the scientists)"
     },
     "developed by": {
-     "misconception": "applies passive reduction when the scientists are actually the active agents, not the recipients of the action",
+     "misconception": "ใช้การย่อแบบ passive ทั้งที่นักวิทยาศาสตร์เป็นผู้กระทำเอง ไม่ใช่ผู้ถูกกระทำ",
      "whyFails": "'Developed by' เหมาะกับ 'the vaccine developed by scientists' ไม่ใช่อนุประโยคที่บรรยายตัวนักวิทยาศาสตร์ในฐานะผู้ลงมือทำเอง"
     }
    }
@@ -950,15 +950,15 @@
    "memoryCue": "Whose = ความเป็นเจ้าของ who's = who is/has",
    "distractors": {
     "who's": {
-     "misconception": "confuses the contraction 'who's' (who is / who has) with the possessive relative pronoun 'whose'",
+     "misconception": "สับสนรูปย่อ 'who's' (who is / who has) กับสรรพนามแสดงความเป็นเจ้าของ 'whose'",
      "whyFails": "'Who's' แปลว่า 'who is' หรือ 'who has' ซึ่งวางหน้าคำนามที่ถูกครอบครองอย่าง 'latest novel' ไม่ได้"
     },
     "who": {
-     "misconception": "uses the subject relative pronoun without showing the required possessive relationship",
+     "misconception": "ใช้สรรพนามเชื่อมที่ทำหน้าที่ประธาน โดยไม่แสดงความสัมพันธ์เชิงเจ้าของที่โจทย์ต้องการ",
      "whyFails": "'Who' เดี่ยว ๆ บอกไม่ได้ว่านิยายเป็นของนักเขียน ประโยคนี้ต้องใช้รูปแสดงความเป็นเจ้าของ"
     },
     "which": {
-     "misconception": "uses the non-personal relative pronoun for a person (the author)",
+     "misconception": "ใช้สรรพนามเชื่อมสำหรับสิ่งของกับบุคคล (ผู้เขียน)",
      "whyFails": "'Which' ใช้กับสิ่งของ ไม่ใช่คน จึงอ้างกลับไปหา 'the author' ไม่ได้"
     }
    }
@@ -974,15 +974,15 @@
    "memoryCue": "ไม่มีเครื่องไหนเหนือกว่า = ไม่มีความต่างจริง = as...as",
    "distractors": {
     "faster than": {
-     "misconception": "defaults to the comparative form even though the context implies equality, not difference",
+     "misconception": "เผลอใช้รูปเปรียบเทียบขั้นกว่า ทั้งที่บริบทสื่อถึงความเท่ากัน ไม่ใช่ความต่าง",
      "whyFails": "ประโยคบอกว่าทั้งสองเครื่องใช้เวลาเท่ากันเป๊ะ รูปขั้นกว่าที่อ้างว่าเครื่องหนึ่งเร็วกว่าจึงขัดกับข้อเท็จจริงที่ให้มา"
     },
     "the fastest": {
-     "misconception": "confuses a two-item comparison with a superlative among three or more items",
+     "misconception": "สับสนการเปรียบเทียบของสองสิ่งกับขั้นสูงสุดที่ใช้เมื่อมีสามสิ่งขึ้นไป",
      "whyFails": "มีแล็ปท็อปแค่สองเครื่องที่ถูกเทียบกัน ขั้นสูงสุดจะสื่อผิดว่ากำลังเทียบในกลุ่มที่ใหญ่กว่านั้น"
     },
     "more fast than": {
-     "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'",
+     "misconception": "ใช้แพตเทิร์น 'more + คำคุณศัพท์' กับคำคุณศัพท์พยางค์เดียวสั้น ๆ ที่ต้องเติม '-er'",
      "whyFails": "'Fast' เป็นคำคุณศัพท์สั้นที่สร้างรูปขั้นกว่าด้วย '-er' (faster) ไม่ใช่ด้วย 'more'"
     }
    }
@@ -998,15 +998,15 @@
    "memoryCue": "การเปลี่ยนแปลงต่อเนื่องตามเวลา ใช้รูปขั้นกว่าซ้ำสอง",
    "distractors": {
     "busier than before": {
-     "misconception": "treats a continuous, ongoing change as a single fixed-point comparison",
+     "misconception": "มองการเปลี่ยนแปลงที่ต่อเนื่องเป็นการเปรียบเทียบจุดเดียวแบบตายตัว",
      "whyFails": "นี่เป็นภาษาอังกฤษที่ถูกต้อง แต่มันเทียบกับจุดเดียวก่อนหน้า โจทย์ขอรูปที่แสดงว่าความยุ่งเพิ่มขึ้นทีละขั้นต่อเนื่อง"
     },
     "the busiest": {
-     "misconception": "confuses a progressive change over time with a superlative ranking among multiple items",
+     "misconception": "สับสนการเปลี่ยนแปลงต่อเนื่องตามเวลากับการจัดอันดับขั้นสูงสุดในหลายสิ่ง",
      "whyFails": "ประโยคนี้ไม่ได้จัดอันดับตารางงานนี้กับตารางอื่น มันบรรยายการเปลี่ยนแปลงต่อเนื่องตามเวลา"
     },
     "more busy than usual": {
-     "misconception": "uses a single comparative with 'more' for a short adjective, and frames it as a comparison to a norm rather than ongoing change",
+     "misconception": "ใช้ 'more' กับคำคุณศัพท์สั้นที่ควรเติม '-er' แถมตีกรอบเป็นการเทียบกับค่าปกติแทนการเปลี่ยนแปลงต่อเนื่อง",
      "whyFails": "'Busy' ปกติใช้ '-er' (busier) และประโยคนี้ต้องใช้รูปซ้ำสองเพื่อแสดงการเพิ่มขึ้นต่อเนื่อง ไม่ใช่การเทียบกับระดับปกติ"
     }
    }
@@ -1022,15 +1022,15 @@
    "memoryCue": "หน้าตาเหนื่อย + 'last night' = คำถามแบบ didn't ไม่ใช่ do",
    "distractors": {
     "Do": {
-     "misconception": "uses a neutral positive question form, missing the speaker's implied surprise/assumption",
+     "misconception": "ใช้รูปคำถามบอกเล่าธรรมดา จนพลาดน้ำเสียงประหลาดใจ/การคาดเดาของผู้พูด",
      "whyFails": "'Do you sleep...' แบบธรรมดาทำให้ความแปลกใจที่แฝงอยู่ใน 'You look exhausted' หายไป ซึ่งคำถามปฏิเสธสื่อได้ตรงกว่า"
     },
     "Don't": {
-     "misconception": "uses present-tense negative auxiliary in a context that requires the past tense to match 'last night'",
+     "misconception": "ใช้กริยาช่วยปฏิเสธรูปปัจจุบัน ทั้งที่บริบท 'last night' ต้องการรูปอดีต",
      "whyFails": "'Last night' ตรึงคำถามไว้ในอดีต กริยาช่วยจึงต้องเป็นรูปอดีต ('didn't') ไม่ใช่ปัจจุบัน ('don't')"
     },
     "Aren't": {
-     "misconception": "uses the 'be' auxiliary instead of the 'do' auxiliary needed for the main verb 'sleep'",
+     "misconception": "ใช้กริยาช่วยกลุ่ม 'be' แทนกริยาช่วยกลุ่ม 'do' ที่กริยาหลัก 'sleep' ต้องการ",
      "whyFails": "'Sleep' เป็นกริยาหลักธรรมดา ต้องใช้ 'do/did' ช่วยตั้งคำถาม ไม่ใช่กริยาช่วย 'be'"
     }
    }
@@ -1046,15 +1046,15 @@
    "memoryCue": "คำถามฝังแบบสุภาพอ่านเหมือนประโยคบอกเล่า ประธานมาก่อน กริยาตามหลัง",
    "distractors": {
     "where is the nearest pharmacy": {
-     "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause",
+     "misconception": "คงการสลับตำแหน่งแบบคำถามตรง (กริยานำหน้าประธาน) ไว้ในอนุประโยคที่ฝังอยู่",
      "whyFails": "คำถามอ้อมหรือคำถามฝังใช้ลำดับคำแบบประโยคบอกเล่า 'is' ต้องมาหลังประธาน 'the nearest pharmacy' ไม่ใช่มาก่อน"
     },
     "is where the nearest pharmacy": {
-     "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order",
+     "misconception": "ย้ายกริยาช่วยไปหน้าสุดของอนุประโยคฝัง ทำให้ลำดับคำผิดรูป",
      "whyFails": "การเรียงแบบนี้ไม่ถูกไวยากรณ์ทั้งในรูปคำถามตรงและคำถามฝัง"
     },
     "where the nearest pharmacy was": {
-     "misconception": "unnecessarily backshifts to past tense when the pharmacy's existence is a current, general fact",
+     "misconception": "ถอยรูปกาลเป็นอดีตโดยไม่จำเป็น ทั้งที่ที่ตั้งร้านยาเป็นข้อเท็จจริงปัจจุบัน",
      "whyFails": "ไม่มีบริบทการรายงานอดีตที่ต้องถอยรูปกาลตรงนี้ ที่ตั้งของร้านขายยาเป็นข้อเท็จจริงปัจจุบัน 'is' จึงต้องคงรูปปัจจุบัน"
     }
    }
@@ -1070,15 +1070,15 @@
    "memoryCue": "คำวิเศษณ์บอกความถี่กระโดดไปอยู่หลัง 'be' แต่อยู่หน้ากริยาหลักตัวอื่น",
    "distractors": {
     "Always she is late for our Monday meetings.": {
-     "misconception": "moves the adverb to the front of the sentence, a position frequency adverbs don't naturally take in a simple statement like this",
+     "misconception": "ย้ายคำวิเศษณ์ไปหน้าประโยค ซึ่งไม่ใช่ตำแหน่งธรรมชาติของคำวิเศษณ์บอกความถี่ในประโยคบอกเล่าง่าย ๆ แบบนี้",
      "whyFails": "การวางคำวิเศษณ์บอกความถี่ไว้ต้นประโยคไม่เป็นธรรมชาติตรงนี้ ประโยคบอกเล่าเรียบ ๆ แบบนี้ ภาษาอังกฤษคาดหวังตำแหน่งกลางประโยค"
     },
     "She is late always for our Monday meetings.": {
-     "misconception": "moves the adverb to the end instead of its standard mid-position with 'be'",
+     "misconception": "ย้ายคำวิเศษณ์ไปท้ายประโยค แทนตำแหน่งกลางมาตรฐานคู่กับ 'be'",
      "whyFails": "การวางไว้ท้ายประโยคแบบนี้ไม่ใช่ตำแหน่งธรรมชาติของคำวิเศษณ์บอกความถี่ที่ขยาย 'is late' ในประโยคบอกเล่ากลาง ๆ"
     },
     "She always late is for our Monday meetings.": {
-     "misconception": "keeps the adverb in the wrong place while incorrectly reordering 'late' and 'is'",
+     "misconception": "วางคำวิเศษณ์ผิดที่ แถมสลับลำดับ 'late' กับ 'is' อย่างไม่ถูกต้อง",
      "whyFails": "แบบนี้ทำลายลำดับคำที่ต้องเป็นประธาน + be + คำคุณศัพท์ไปเลย ยิ่งซ้ำเติมข้อผิดพลาดเดิม"
     }
    }
@@ -1094,15 +1094,15 @@
    "memoryCue": "Advice, information, furniture: ไม่มี 'a' ไม่มี '-s'",
    "distractors": {
     "My manager gave me a very useful advices before the client call.": {
-     "misconception": "keeps the indefinite article and also incorrectly pluralizes an uncountable noun",
+     "misconception": "คงคำนำหน้านามไม่ชี้เฉพาะไว้ แถมเติมพหูพจน์ให้คำนามนับไม่ได้",
      "whyFails": "แบบนี้ผิดซ้ำสองจุด: 'advice' นับไม่ได้ จึงไม่รับทั้ง 'a' และ '-s' พหูพจน์"
     },
     "My manager gave me the very useful advice before the client call.": {
-     "misconception": "replaces the indefinite article with a definite one instead of removing the article altogether",
+     "misconception": "เปลี่ยนเป็นคำนำหน้านามชี้เฉพาะ แทนที่จะตัดคำนำหน้านามออกไปเลย",
      "whyFails": "ไม่มีคำแนะนำชิ้นเฉพาะที่พูดถึงมาก่อน 'the' จึงไม่มีเหตุผลรองรับเช่นกัน วิธีแก้ที่ง่ายที่สุดคือตัด article ทิ้งไปเลย"
     },
     "My manager gave me very useful advices before the client call.": {
-     "misconception": "removes the article correctly but incorrectly pluralizes the uncountable noun",
+     "misconception": "ตัดคำนำหน้านามถูกแล้ว แต่ยังเติมพหูพจน์ให้คำนามนับไม่ได้",
      "whyFails": "ตัด article ถูกแล้ว แต่ 'advice' ไม่เติม '-s' พหูพจน์ในภาษาอังกฤษมาตรฐาน"
     }
    }
@@ -1118,15 +1118,15 @@
    "memoryCue": "จุดในอดีต + 'would' = อนาคตที่ตอนนี้เกิดขึ้นไปแล้ว",
    "distractors": {
     "was transforming": {
-     "misconception": "confusing future-in-the-past with past continuous background action",
+     "misconception": "สับสน future-in-the-past กับ past continuous ที่ใช้เล่าฉากหลัง",
      "whyFails": "Past continuous บรรยายการกระทำที่กำลังดำเนินอยู่ ณ ขณะนั้นในอดีต ไม่ใช่ผลลัพธ์ที่มาทีหลังเมื่อมองจากอดีต"
     },
     "will transform": {
-     "misconception": "using present-tense future modal inside a past narrative frame",
+     "misconception": "ใช้ modal อนาคตรูปปัจจุบันในกรอบการเล่าเรื่องอดีต",
      "whyFails": "ทั้งประโยคตรึงอยู่ในเวลาอดีต ('In 2010') modal อนาคตที่ผูกกับปัจจุบันจึงขัดกันเอง"
     },
     "transformed": {
-     "misconception": "collapsing future-in-the-past into simple past",
+     "misconception": "ยุบ future-in-the-past ให้เหลือแค่ simple past",
      "whyFails": "Simple past จะประกาศการเปลี่ยนแปลงเป็นข้อเท็จจริงอดีตที่เกิดแล้ว ทำให้เสียความหมาย 'มองจากจุดที่มาก่อน' ที่ประโยคนี้ต้องการ"
     }
    }
@@ -1142,15 +1142,15 @@
    "memoryCue": "ตาแดงต้องการเหตุผลที่มีระยะเวลา: 'had been -ing'",
    "distractors": {
     "had studied": {
-     "misconception": "treating past perfect simple as sufficient for any earlier past event",
+     "misconception": "คิดว่า past perfect รูปธรรมดาเพียงพอสำหรับทุกเหตุการณ์ที่เกิดก่อนในอดีต",
      "whyFails": "นี่เป็นภาษาอังกฤษที่ถูกต้องและบอกเวลาที่มาก่อนได้จริง แต่มันเน้นว่าการอ่านหนังสือจบไปแล้ว มากกว่าจะเน้นว่าสะสมมานานแค่ไหน"
     },
     "studied": {
-     "misconception": "using simple past for a state that must be shown as prior to another past moment",
+     "misconception": "ใช้ simple past กับสภาวะที่ต้องแสดงว่าเกิดก่อนอีกจุดหนึ่งในอดีต",
      "whyFails": "นี่เป็นภาษาอังกฤษที่ถูกต้อง — 'because' บอกสาเหตุอยู่แล้ว — แต่มันรายงานข้อเท็จจริงเฉย ๆ แทนที่จะชูให้เห็นว่าอ่านมานานแค่ไหน"
     },
     "was studying": {
-     "misconception": "confusing past continuous with past perfect continuous",
+     "misconception": "สับสน past continuous กับ past perfect continuous",
      "whyFails": "Past continuous วางการกระทำไว้พร้อมกับเหตุการณ์อดีตอีกเหตุการณ์หนึ่ง ไม่ได้บอกชัดว่ามันมาก่อนและเป็นสาเหตุของผลลัพธ์ที่ตามมา"
     }
    }
@@ -1166,15 +1166,15 @@
    "memoryCue": "ตกรถไฟแล้วต้องรอถึงพรุ่งนี้ = วันนี้ต้อง 'had better'",
    "distractors": {
     "should": {
-     "misconception": "treating general advice modal as equally strong as urgent-consequence modal",
+     "misconception": "มอง modal คำแนะนำทั่วไปว่าหนักแน่นเท่า modal เร่งด่วนที่มีผลตามมา",
      "whyFails": "'Should' ให้คำแนะนำทั่วไป แต่ไม่มีน้ำหนักแบบถ้าไม่ทำแล้วจะเกิดผลเสียเฉพาะเจาะจง อย่างที่อนุประโยค 'if you miss...' ส่งสัญญาณไว้"
     },
     "could": {
-     "misconception": "using a possibility modal where obligation/urgency is meant",
+     "misconception": "ใช้ modal บอกความเป็นไปได้ ในที่ที่ต้องการภาระหน้าที่/ความเร่งด่วน",
      "whyFails": "'Could' แค่เสนอทางเลือกหนึ่ง ไม่ได้สื่อความเร่งด่วนหนักแน่นที่ผลเสียที่ระบุไว้บอกเป็นนัย"
     },
     "might": {
-     "misconception": "using a modal of weak possibility for a directive",
+     "misconception": "ใช้ modal ความเป็นไปได้แบบอ่อนกับประโยคเชิงสั่งการ",
      "whyFails": "'Might' สื่อความไม่แน่ใจเกี่ยวกับเหตุการณ์อนาคต ไม่ใช่คำแนะนำที่มีผลเสียเร่งด่วน"
     }
    }
@@ -1190,15 +1190,15 @@
    "memoryCue": "'Not sure' จับคู่กับ 'might' ไม่ใช่ 'will'",
    "distractors": {
     "will": {
-     "misconception": "using the confident future/prediction modal for uncertain present speculation",
+     "misconception": "ใช้ modal ทำนายอนาคตแบบมั่นใจกับการคาดเดาปัจจุบันที่ไม่แน่นอน",
      "whyFails": "'Will' ยืนยันอย่างมั่นใจ ซึ่งขัดกับ 'I'm not sure' ที่บอกไว้ในประโยค"
     },
     "must": {
-     "misconception": "using the strong-deduction modal where only weak possibility is intended",
+     "misconception": "ใช้ modal สรุปแบบหนักแน่น ในที่ที่ตั้งใจสื่อแค่ความเป็นไปได้อ่อน ๆ",
      "whyFails": "'Must' ส่งสัญญาณการสรุปเชิงเหตุผลจากหลักฐานอย่างมั่นใจ แรงกว่าการเดาแบบลังเลที่ประโยคนี้สื่อ"
     },
     "can": {
-     "misconception": "using 'can' for a specific present possibility about one situation",
+     "misconception": "ใช้ 'can' กับความเป็นไปได้เฉพาะเจาะจงของสถานการณ์เดียวในปัจจุบัน",
      "whyFails": "'Can' บอกความเป็นไปได้หรือความสามารถแบบทั่วไป ไม่ใช่การเดาแบบลังเลว่าตอนนี้กำลังเกิดอะไรขึ้น"
     }
    }
@@ -1214,15 +1214,15 @@
    "memoryCue": "วันนี้เหนื่อย = เมื่อคืนนอนดึกจริง = 'shouldn't have'",
    "distractors": {
     "should have stayed": {
-     "misconception": "missing the negation needed for criticizing a completed unwise action",
+     "misconception": "ขาดการปฏิเสธที่จำเป็นสำหรับการตำหนิการกระทำที่ไม่ฉลาดซึ่งทำไปแล้ว",
      "whyFails": "แบบนี้สื่อผิดว่าเขาไม่ได้นอนดึก ทั้งที่บริบทบอกว่าเขานอนดึกจริงและนั่นแหละคือความผิดพลาด"
     },
     "should stay": {
-     "misconception": "using present-form advice modal instead of past-regret structure",
+     "misconception": "ใช้ modal แนะนำรูปปัจจุบัน แทนโครงสร้างเสียใจกับอดีต",
      "whyFails": "เหตุการณ์ (การนอนดึก) จบไปแล้วและกำลังถูกตัดสินย้อนหลัง จึงต้องใช้ 'should have + past participle' ไม่ใช่ 'should' รูปปัจจุบัน"
     },
     "wouldn't have stayed": {
-     "misconception": "confusing third conditional result clause with a past-regret judgement",
+     "misconception": "สับสนอนุประโยคผลของ third conditional กับการตัดสินเชิงเสียใจต่ออดีต",
      "whyFails": "'Wouldn't have' อยู่ในอนุประโยคผลของเงื่อนไขสมมุติ ไม่ใช่การตำหนิการกระทำจริงในอดีตตรง ๆ"
     }
    }
@@ -1238,15 +1238,15 @@
    "memoryCue": "ตัด 'if' แล้วสลับที่: 'Had I known' = 'If I had known'",
    "distractors": {
     "If had I": {
-     "misconception": "mixing formal inversion with the conjunction 'if' at the same time",
+     "misconception": "ผสมการสลับตำแหน่งแบบทางการเข้ากับคำเชื่อม 'if' พร้อมกัน",
      "whyFails": "การสลับที่แบบทางการมาแทนที่ 'if' ไปเลย การใส่ทั้ง 'if' และลำดับคำสลับที่พร้อมกันจึงซ้ำซ้อนและผิดไวยากรณ์"
     },
     "I had": {
-     "misconception": "using normal subject-verb order, missing the inversion signal",
+     "misconception": "ใช้ลำดับประธาน-กริยาปกติ จนพลาดสัญญาณการสลับตำแหน่ง",
      "whyFails": "พอไม่มี 'if' ลำดับคำปกติ 'I had known' ทำหน้าที่เป็นอนุประโยคเงื่อนไขด้วยตัวเองไม่ได้"
     },
     "Would I have": {
-     "misconception": "using the result-clause auxiliary structure at the start of the if-clause",
+     "misconception": "เอาโครงสร้างกริยาช่วยของอนุประโยคผลมาขึ้นต้นอนุประโยค if",
      "whyFails": "'Would' อยู่ในอนุประโยคผล ('I would have booked') ไม่ใช่อนุประโยคเงื่อนไขซึ่งต้องใช้ 'had'"
     }
    }
@@ -1262,15 +1262,15 @@
    "memoryCue": "'Otherwise' = 'if not' ที่ซ่อนอยู่ จึงมักต้องใช้ 'would have + past participle'",
    "distractors": {
     "will be": {
-     "misconception": "reading 'otherwise' as a simple future contrast marker",
+     "misconception": "อ่าน 'otherwise' เป็นแค่ตัวบอกความต่างในอนาคตธรรมดา",
      "whyFails": "ประโยคนี้บรรยายผลลัพธ์สมมุติในอดีต (ทริปที่ไม่ได้สั้นลงจริง) ไม่ใช่เหตุการณ์อนาคตจริง"
     },
     "was": {
-     "misconception": "treating the implied condition as a real past fact rather than a hypothetical one",
+     "misconception": "มองเงื่อนไขที่ซ่อนอยู่เป็นข้อเท็จจริงอดีตจริง ๆ แทนที่จะเป็นสมมุติ",
      "whyFails": "Simple past จะอ้างว่าทริปสั้นกว่าจริง ๆ ซึ่งขัดกับข้อเท็จจริงที่ว่าสะพานถูกปิด"
     },
     "is": {
-     "misconception": "ignoring the past time frame set by 'was closed'",
+     "misconception": "มองข้ามกรอบเวลาอดีตที่ 'was closed' กำหนดไว้",
      "whyFails": "รูปปัจจุบันไม่เข้ากับสถานการณ์สมมุติในอดีตที่ประโยคกำลังบรรยาย"
     }
    }
@@ -1286,15 +1286,15 @@
    "memoryCue": "ไม่มีแหล่งที่มาระบุชื่อ + ข้อกล่าวอ้างแบบทางการ = 'It is believed that...'",
    "distractors": {
     "They are believing": {
-     "misconception": "using active voice with a vague 'they' plus an incorrect continuous form for a general belief",
+     "misconception": "ใช้รูป active กับ 'they' ที่คลุมเครือ แถมใช้รูป continuous ผิดกับความเชื่อทั่วไป",
      "whyFails": "'Believe' ปกติไม่ใช้รูป continuous กับความเชื่อทั่วไปที่คงอยู่ต่อเนื่อง และ 'they' ก็ไม่ได้ถูกระบุไว้ที่ไหนในบริบทเลย"
     },
     "It believes": {
-     "misconception": "treating 'it' as an active subject capable of believing",
+     "misconception": "มอง 'it' เป็นประธานที่เชื่ออะไรเองได้",
      "whyFails": "'It' ตรงนี้เป็นประธานสมมุติ มันเชื่ออะไรเองไม่ได้ ทำได้แค่เป็นประธานของโครงสร้าง passive เท่านั้น"
     },
     "Is believed": {
-     "misconception": "dropping the required dummy subject 'it' from the impersonal passive pattern",
+     "misconception": "ตัดประธานหุ่น 'it' ที่จำเป็นออกจากแพตเทิร์น passive แบบไม่ระบุผู้กระทำ",
      "whyFails": "โครงสร้าง impersonal passive ต้องเป็น 'It is believed that...' ถ้าไม่มี 'it' ประโยคก็ไม่มีประธานทางไวยากรณ์"
     }
    }
@@ -1310,15 +1310,15 @@
    "memoryCue": "นโยบายถูกประกาศ ไม่ได้ประกาศเอง: 'to be announced'",
    "distractors": {
     "to announce": {
-     "misconception": "using active infinitive when the subject (the policy) cannot perform the announcing itself",
+     "misconception": "ใช้ infinitive รูป active ทั้งที่ประธาน (นโยบาย) ประกาศเองไม่ได้",
      "whyFails": "'To announce' ทำให้นโยบายกลายเป็นผู้ประกาศ ทั้งที่นโยบายคือสิ่งที่ถูกประกาศ"
     },
     "announcing": {
-     "misconception": "using a gerund where an infinitive pattern after 'expected' is required",
+     "misconception": "ใช้ gerund ในที่ที่ต้องใช้แพตเทิร์น infinitive หลัง 'expected'",
      "whyFails": "'Expected' ตามด้วย to-infinitive ไม่ใช่ gerund ไม่ว่าจะเป็นรูป active หรือ passive"
     },
     "to be announcing": {
-     "misconception": "adding continuous aspect to the passive infinitive unnecessarily",
+     "misconception": "เติม continuous ให้ passive infinitive โดยไม่จำเป็น",
      "whyFails": "'To be announcing' ยืดการประกาศครั้งเดียวให้กลายเป็นกระบวนการต่อเนื่องที่ประโยคไม่เคยพูดถึง"
     }
    }
@@ -1334,15 +1334,15 @@
    "memoryCue": "กริยาถอยหลัง 'today' ก็ถอยเป็น 'that day' ด้วย",
    "distractors": {
     "today": {
-     "misconception": "leaving the original deictic time word unchanged despite the shift in reporting time",
+     "misconception": "คงคำบอกเวลาเดิมไว้ ทั้งที่เวลารายงานเปลี่ยนไปแล้ว",
      "whyFails": "'Today' สมเหตุสมผลเฉพาะวันจันทร์ที่เธอพูดจริง ๆ พอผ่านไปหนึ่งสัปดาห์ 'today' จะชี้ผิดไปที่วันที่กำลังรายงานแทน"
     },
     "tomorrow": {
-     "misconception": "misreading the original 'today' as if it referred to the day after speaking",
+     "misconception": "อ่าน 'today' ต้นฉบับผิด ราวกับหมายถึงวันถัดจากวันพูด",
      "whyFails": "Maria พูดว่า 'today' หมายถึงวันเดียวกับที่เธอกำลังพูด (วันจันทร์) ไม่ใช่วันถัดไป"
     },
     "the day": {
-     "misconception": "producing an incomplete deictic shift missing the demonstrative",
+     "misconception": "เลื่อนคำบอกเวลาไม่ครบ ขาดคำชี้เฉพาะที่ต้องมี",
      "whyFails": "'The day' เดี่ยว ๆ ไม่ใช่การอ้างเวลาที่ถูกไวยากรณ์ตรงนี้ รูปเลื่อนที่ถูกต้องต้องเป็น 'that day' เพื่อชี้กลับไปหาวันจันทร์วันนั้น"
     }
    }
@@ -1358,15 +1358,15 @@
    "memoryCue": "รายงาน first conditional = สองอนุประโยคถอยหลังหนึ่งก้าวพร้อมกัน",
    "distractors": {
     "rains / will cancel": {
-     "misconception": "leaving the first conditional entirely unbackshifted in reported speech",
+     "misconception": "ปล่อย first conditional ไว้โดยไม่ถอยรูปกาลเลยในประโยครายงาน",
      "whyFails": "'Rains / will cancel' ทวนคำพูดตรงแบบไม่เปลี่ยนอะไรเลย ทั้งที่กรอบการรายงานเลื่อนช่วงเวลาที่พูดไปเป็นอดีตแล้ว"
     },
     "had rained / would have cancelled": {
-     "misconception": "over-backshifting a first conditional into third-conditional (hypothetical past) forms",
+     "misconception": "ถอยรูปกาลเกินไปจน first conditional กลายเป็นรูป third conditional (อดีตสมมุติ)",
      "whyFails": "ต้นฉบับเป็น first conditional จริงเกี่ยวกับอนาคต ไม่ใช่สถานการณ์สมมุติในอดีต จึงไม่ควรกลายเป็น 'had rained / would have cancelled'"
     },
     "rained / will cancel": {
-     "misconception": "backshifting only the if-clause and leaving the result clause unshifted",
+     "misconception": "ถอยรูปกาลแค่อนุประโยค if แต่ปล่อยอนุประโยคผลไว้เหมือนเดิม",
      "whyFails": "สองอนุประโยคของ first conditional ที่ถูกรายงานปกติถอยรูปกาลไปพร้อมกัน เลื่อนแค่ฝั่งเดียวสร้างรูปกาลที่ไม่สอดคล้องกัน"
     }
    }
@@ -1382,15 +1382,15 @@
    "memoryCue": "ขั้นสูงสุด = มีแค่หนึ่งเดียว เลยได้ 'the'",
    "distractors": {
     "a": {
-     "misconception": "treating a superlative noun phrase as an ordinary indefinite first mention",
+     "misconception": "มองวลีคำนามขั้นสูงสุดเป็นการกล่าวถึงครั้งแรกแบบไม่ชี้เฉพาะธรรมดา",
      "whyFails": "'A' แนะนำของชิ้นหนึ่งแบบไม่เจาะจงจากหลายชิ้น แต่ขั้นสูงสุด 'tallest' ชี้สมาชิกเพียงหนึ่งเดียวของหมวดหมู่ จะเสนอเป็นแค่หนึ่งในหลาย ๆ อันไม่ได้"
     },
     "an": {
-     "misconception": "same indefinite-article error as 'a', plus a vowel-sound trigger confusion",
+     "misconception": "ผิดแบบเดียวกับ 'a' แถมสับสนตัวกระตุ้นเรื่องเสียงสระ",
      "whyFails": "'An' ผิดสองต่อ: มันเป็น article ไม่เจาะจงจึงชี้สมาชิกหนึ่งเดียวของหมวดหมู่ไม่ได้ และมันถูกเลือกตามเสียงสระที่ตามมาเท่านั้น ไม่ใช่ตามความหมายของวลี"
     },
     "(no article)": {
-     "misconception": "assuming proper-noun-adjacent phrases never take an article",
+     "misconception": "เหมาว่าวลีที่คล้ายชื่อเฉพาะไม่ต้องมีคำนำหน้านามเสมอ",
      "whyFails": "การตัด article ทิ้งคือมอง 'tallest mountain' เหมือนชื่อเฉพาะ แต่มันเป็นนามวลีธรรมดาที่ต้องกำกับความมีหนึ่งเดียว ปล่อยโล่งไว้ความหมายนั้นก็ไม่ถูกสื่อออกมา"
     }
    }
@@ -1406,15 +1406,15 @@
    "memoryCue": "พหูพจน์ + ไกล = 'those'",
    "distractors": {
     "this": {
-     "misconception": "using a singular near demonstrative with a plural, distant noun",
+     "misconception": "ใช้คำชี้เฉพาะใกล้รูปเอกพจน์กับคำนามพหูพจน์ที่อยู่ไกล",
      "whyFails": "'Books' เป็นพหูพจน์และ 'over there' ส่งสัญญาณระยะไกล แต่ 'this' เป็นเอกพจน์และใช้กับของใกล้"
     },
     "that": {
-     "misconception": "correctly matching distance but ignoring plural agreement",
+     "misconception": "จับระยะทางถูกแล้ว แต่มองข้ามความสอดคล้องเรื่องพหูพจน์",
      "whyFails": "'That' บอกระยะไกลถูกต้อง แต่เป็นเอกพจน์ ขณะที่ 'books' ต้องใช้คำกำกับแบบพหูพจน์"
     },
     "these": {
-     "misconception": "correctly matching plural but ignoring the distance cue",
+     "misconception": "จับพหูพจน์ถูกแล้ว แต่มองข้ามสัญญาณบอกระยะทาง",
      "whyFails": "'These' ตรงกับคำนามพหูพจน์ก็จริง แต่ส่งสัญญาณผิดว่าอยู่ใกล้ ขัดกับ 'over there'"
     }
    }
@@ -1430,15 +1430,15 @@
    "memoryCue": "'Put off' การประชุม = ผลักมันออกไปไกลขึ้นในเวลา",
    "distractors": {
     "down": {
-     "misconception": "confusing 'put down' (to set something down / write something / criticize) with 'put off' (postpone)",
+     "misconception": "สับสน 'put down' (วางลง / จดบันทึก / พูดเหยียด) กับ 'put off' (เลื่อนออกไป)",
      "whyFails": "'Put down' แปลว่าวางของลง จดบันทึก หรือพูดจาดูถูกใคร ไม่มีความหมายไหนเข้ากับ 'until next Thursday' เลย"
     },
     "up": {
-     "misconception": "confusing 'put up' (to erect / accommodate / tolerate) with 'put off' (postpone)",
+     "misconception": "สับสน 'put up' (ติดตั้ง / ให้ที่พัก / อดทน) กับ 'put off' (เลื่อนออกไป)",
      "whyFails": "'Put up' แปลว่าสร้างหรือติดตั้งอะไรสักอย่าง ให้ที่พัก หรืออดทนกับสถานการณ์ ไม่ใช่เลื่อนการประชุมไปวันหลัง"
     },
     "away": {
-     "misconception": "confusing 'put away' (to store something) with 'put off' (postpone)",
+     "misconception": "สับสน 'put away' (เก็บเข้าที่) กับ 'put off' (เลื่อนออกไป)",
      "whyFails": "'Put away' แปลว่าเก็บของเข้าที่ ซึ่งไม่ตรงกับการเลื่อนนัดประชุมไปวันข้างหน้า"
     }
    }
@@ -1454,15 +1454,15 @@
    "memoryCue": "ช่องหรือรูมีข้างใน — คุณบีบตัว 'through' มัน",
    "distractors": {
     "across": {
-     "misconception": "using the flat-open-surface preposition for an enclosed three-dimensional space",
+     "misconception": "ใช้คำบุพบทสำหรับพื้นผิวเปิดโล่งกับพื้นที่ปิดสามมิติ",
      "whyFails": "'Across' คือเคลื่อนข้ามพื้นผิวเปิดแบน ๆ อย่างถนนหรือทุ่ง แต่ช่องแคบไม่มีพื้นผิวให้ข้าม"
     },
     "along": {
-     "misconception": "using the linear-edge preposition (following a line such as a river or street) for movement inside an enclosed space",
+     "misconception": "ใช้คำบุพบทแนวเส้น (เลียบแม่น้ำหรือถนน) กับการเคลื่อนที่ภายในพื้นที่ปิด",
      "whyFails": "'Along' คือเลาะตามความยาวของอะไรสักอย่าง เช่น ทางเดินหรือแม่น้ำ บีบตัว 'along' ช่องจะแปลว่าเดินทางตามยาวอยู่ข้างในมัน ไม่ใช่ลอดออกไปอีกฝั่ง"
     },
     "over": {
-     "misconception": "using the above-and-across preposition for movement inside a space, not above it",
+     "misconception": "ใช้คำบุพบทแบบข้ามด้านบนกับการเคลื่อนที่ภายในพื้นที่ ไม่ใช่เหนือพื้นที่",
      "whyFails": "'Over' จะแปลว่าปีนข้ามรั้วไปทางด้านบน แต่ประโยคบรรยายการใช้ช่องที่อยู่ในรั้วเอง"
     }
    }
@@ -1478,15 +1478,15 @@
    "memoryCue": "เคล็ดลับแก้ปัญหา = 'try -ing'",
    "distractors": {
     "to restart": {
-     "misconception": "using 'try to' (make a difficult effort) where 'try -ing' (experiment with a solution) is meant",
+     "misconception": "ใช้ 'try to' (พยายามทำสิ่งยาก) ในที่ที่หมายถึง 'try -ing' (ทดลองวิธีแก้)",
      "whyFails": "'Try to restart' จะสื่อว่าการรีสตาร์ตเองเป็นเรื่องท้าทาย แต่ประโยคนี้กำลังเสนอวิธีแก้ง่าย ๆ ให้ลองดู"
     },
     "restart": {
-     "misconception": "using the bare infinitive after 'try', which isn't a valid pattern",
+     "misconception": "ใช้ infinitive เปล่าหลัง 'try' ซึ่งไม่ใช่แพตเทิร์นที่ถูกต้อง",
      "whyFails": "'Try' ต้องตามด้วย gerund หรือ to-infinitive เท่านั้น ไม่เคยตามด้วยกริยารูปเปล่า"
     },
     "having restarted": {
-     "misconception": "using a perfect gerund, implying the action is already completed",
+     "misconception": "ใช้ perfect gerund ซึ่งสื่อว่าการกระทำเสร็จไปแล้ว",
      "whyFails": "ประโยคกำลังเสนอสิ่งที่ให้ลองทำตอนนี้ ไม่ได้ย้อนกลับไปถึงสิ่งที่ทำเสร็จไปแล้ว"
     }
    }
