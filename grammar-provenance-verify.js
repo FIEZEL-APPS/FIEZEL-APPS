@@ -33,7 +33,7 @@ const store = {};
 const fileIndex = new Map();
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes:true })) {
-    if (['node_modules','.git','vendor','assets','docs'].includes(e.name)) continue;
+    if (['node_modules','.git','vendor','assets','docs','.audit-tmp'].includes(e.name)) continue; /* .audit-tmp: sisa mkdtemp release-audit.py (TMPDIR=ROOT/.audit-tmp) berisi snapshot grammar-templates.json basi — tanpa pengecualian ini, indeks basename memuat snapshot itu alih-alih file kanonik root (preseden: level-grammar-contract-test.js) */
     const full = path.join(dir,e.name);
     if (e.isDirectory()) walk(full); else if (!fileIndex.has(e.name)) fileIndex.set(e.name,full);
   }
