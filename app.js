@@ -1149,7 +1149,7 @@ function policyTargetMastery(policy){
 }
 function recentSkillAccuracy(skill,before=Infinity,limit=20,level=getActiveLevel()){const key=String(skill||'');if(!key)return null;const xs=(state.history||[]).filter(h=>Number(h?.at||0)<before&&historyMatchesActive(h,level)&&(String(h.skill||'')===key||String(h.target||'')===key)).slice(-limit);return xs.length?Math.round(xs.filter(h=>h.ok).length/xs.length*100):null}
 function beginLearningSession(cfg,total){
-  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};save();return state.activeSession
+  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};save();anSessionStarted(state.activeSession);/*A1-EMIT*/return state.activeSession
 }
 function abandonActiveSession(reason='exit'){
   const a=state.activeSession;if(!a)return false;const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};
@@ -1160,7 +1160,7 @@ function abandonActiveSession(reason='exit'){
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
   if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);return true
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
@@ -3076,6 +3076,184 @@ self.FiezelCfKillSwitch=Object.freeze({
 });
 cfConfigBootOnce();
 /* CF-KILLSWITCH-END */
+/* A1-ANALYTICS-EMITTER-BEGIN — pemancar analytics sisi klien.
+ *
+ * MASALAH YANG DITUTUP BLOK INI. Sisi Worker analytics lengkap dan dijaga tiga gerbang
+ * (`analytics-privacy-test.js`, `analytics-aggregate-test.js`, `analytics-server-only-test.js`),
+ * dan modul klien `features/analytics/fiezel-analytics-client.js` juga lengkap dan dijaga
+ * `analytics-client-test.js`. Yang tidak ada sampai blok ini: SATU PUN PEMANGGIL. ~1.960
+ * baris kode analytics hijau sementara nol event murid pernah terkirim, jadi DAU dan retensi
+ * mustahil dihitung dan dashboard owner cuma cangkang. Blok ini adalah pemanggilnya.
+ *
+ * OTORITAS PRIVASI: `EXEC-BRIEF-CF.md` bagian KONTRAK ANALYTICS PRIVASI-MAKSIMAL
+ * (+ `reports/cf-b5-analytics.md`). Blok ini tidak mendesain ulang apa pun di sana; ia
+ * hanya memanggil modul yang sudah patuh, dari titik-titik yang aman.
+ *
+ * TIGA PERTANYAAN OWNER YANG DIJAWAB, dan HANYA itu:
+ *   berapa pengguna aktif harian  -> `day_active` (ambang MEANINGFUL_ATTEMPTS=5 yang SAMA
+ *                                    dengan cincin misi murid, jadi angka owner tidak akan
+ *                                    pernah membantah angka yang dilihat murid)
+ *   berapa yang kembali           -> `retention_ping{cohort_day,day_index}` (dihitung KLIEN,
+ *                                    server cuma menaikkan penghitung agregat)
+ *   fitur apa yang dipakai        -> `session_started/session_ended{mode,level}`
+ *
+ * EMPAT EVENT, TITIK. `question_answered` dan `lesson_started/lesson_completed` SENGAJA
+ * TIDAK dipancarkan walau modul mengizinkannya. Alasannya bukan hemat: satu-satunya tempat
+ * untuk memancarkan `question_answered` adalah `record()`/`answer()`/`answerCloze()`, yaitu
+ * persis fungsi yang memegang `q.options`, `correctAnswer`, dan `selectedAnswer`. Menaruh
+ * pemancar di sana berarti menaruh pemancar satu baris dari isi belajar murid, dan jaminan
+ * "nol isi belajar terkirim" berhenti menjadi sifat struktur dan mulai bergantung pada
+ * kehati-hatian penyunting berikutnya. `session_ended.answered` (bilangan bulat yang SUDAH
+ * diagregasi aplikasi) menjawab "seberapa banyak dipakai" tanpa pernah menyentuh satu soal.
+ *
+ * GERBANG DUA LAPIS, DUA ARAH. `anGateOpen()` menuntut KEDUANYA hidup:
+ *   lapis statis  `FIEZEL_CF_CONFIG.endpoints.usage === 'on'` (core-config.js)
+ *   lapis server  `cfServerAllows('usage')` = `cfAnalyticsEnabled === true` DAN
+ *                 `enabled.analytics !== false` DAN protokol cocok
+ * Salah satu mati = NOL permintaan, NOL akses penyimpanan, NOL `installId` dibuat. Gerbang
+ * itu tidak dibaca sekali lalu di-cache: ia diberikan ke modul sebagai OBJEK BER-GETTER
+ * (`AN_CONFIG_VIEW`), jadi kalau kill switch server berbalik di tengah sesi, permintaan
+ * berikutnya berhenti tanpa reload.
+ *
+ * TIDAK MENAHAN BOOT, DAN TIDAK BERBIAYA SAAT MATI. Modul analytics TIDAK ada di
+ * index.html dan TIDAK di-precache: ia disuntik sebagai <script async> hanya kalau gerbang
+ * sudah terbuka. Selama `usage:'off'` (keadaan hari ini) blok ini tidak menjadwalkan timer,
+ * tidak mengunduh satu byte, dan tidak menulis satu kunci penyimpanan. Semua pengiriman
+ * fire-and-forget: tidak ada satu pun `await` di jalur belajar, dan setiap kegagalan
+ * (jaringan mati, modul gagal dimuat, penyimpanan penuh) berhenti di dalam blok ini —
+ * senyap bagi murid, apa pun yang terjadi.
+ */
+const AN_MODULE_URL='./features/analytics/fiezel-analytics-client.js';
+/* Peta tertutup: tipe sesi internal -> enum `mode` kontrak Worker. Nilai yang tidak dikenal
+ * jatuh ke 'practice', BUKAN diteruskan apa adanya — nama tipe internal baru tidak boleh
+ * bisa menjadi teks bebas yang keluar dari perangkat. `placement`/`level-exam`/`grammar-skip`
+ * semuanya alat UKUR, jadi ketiganya jadi 'exam'. */
+const AN_SESSION_MODES=Object.freeze({adaptive:'adaptive',lesson:'lesson',grammar:'lesson',library:'library',listening:'listening',placement:'exam','level-exam':'exam','grammar-skip':'exam'});
+const AN_DEFAULT_MODE='practice';
+/* Ember durasi, bukan detik mentah: durasi presisi adalah pola kehadiran (bab 29). */
+const AN_DURATION_STEPS=Object.freeze([[120000,'<2m'],[600000,'2-10m'],[1800000,'10-30m']]);
+const AN_LAST_BUCKET='30m+';
+/* Allowlist STRUKTURAL lapis pemanggil. Modul sudah punya allowlist sendiri; ini lapis
+ * KEDUA, di sisi kita, supaya penyunting app.js berikutnya tidak bisa menambahkan field
+ * tanpa melewati dua pagar. Kunci di luar daftar ini dibuang di sini, sebelum modul. */
+const AN_FIELD_ALLOWLIST=Object.freeze({session_started:Object.freeze(['mode','level']),session_ended:Object.freeze(['mode','level','completed','answered','duration_bucket'])});
+let anLoadPromise=null,anClient=null,anStarted=false,anLastError='';
+function anGateOpen(){
+  try{
+    if(cfStaticMode('usage')!=='on')return false;   // lapis statis: mati di berkas = mati selamanya sampai rilis
+    if(!cfServerAllows('usage'))return false;       // lapis server: cfAnalyticsEnabled + enabled.analytics
+    return true;
+  }catch{return false}
+}
+/* Pandangan config untuk modul. Ber-getter dengan sengaja: modul memanggil `gateOpen()` di
+ * awal SETIAP jalur publiknya, jadi getter membuat kill switch berlaku seketika. */
+const AN_CONFIG_VIEW=Object.freeze({
+  get enabled(){return anGateOpen()},
+  get base(){try{return String(cfStaticConfig().base||'')}catch{return ''}},
+  endpoints:Object.freeze({get usage(){return anGateOpen()?'on':'off'}})
+});
+/* Muat modul HANYA kalau gerbang terbuka. Gagal muat = null, bukan lemparan. */
+function anLoad(){
+  if(!anGateOpen())return Promise.resolve(null);
+  if(anClient)return Promise.resolve(anClient);
+  if(anLoadPromise)return anLoadPromise;
+  anLoadPromise=new Promise(resolve=>{
+    try{
+      if(self.FiezelAnalytics)return resolve(self.FiezelAnalytics);
+      if(typeof document!=='object'||!document||typeof document.createElement!=='function')return resolve(null);
+      const el=document.createElement('script');
+      el.src=AN_MODULE_URL;el.async=true;el.defer=false;
+      el.onload=()=>resolve(self.FiezelAnalytics||null);
+      el.onerror=()=>{anLastError='module_unavailable';resolve(null)};
+      (document.head||document.body||document.documentElement).appendChild(el);
+    }catch{resolve(null)}
+  }).then(api=>{
+    if(!api||typeof api.createClient!=='function'){anLastError='module_shape';return null}
+    anClient=api.createClient({config:AN_CONFIG_VIEW});
+    return anClient;
+  }).catch(()=>null);
+  return anLoadPromise;
+}
+/* Satu-satunya jalan keluar. Fire-and-forget: pemanggil TIDAK PERNAH menerima Promise yang
+ * bisa ia await, dan TIDAK PERNAH menerima lemparan. Nilai kembali hanya "terjadwal atau
+ * tidak" — dipakai gerbang, bukan UI. */
+function anEmit(fn){
+  if(!anGateOpen())return false;
+  try{anLoad().then(c=>{if(!c)return;try{fn(c)}catch{anLastError='emit_threw'}}).catch(()=>{anLastError='emit_rejected'})}catch{return false}
+  return true;
+}
+/* Modul mengembalikan Promise dari `start()`, `flush()`, dan `sendRetention()`. Janji itu
+ * SENGAJA tidak kita tunggu (fire-and-forget), tapi janji yang tidak ditunggu DAN tidak
+ * ditangkap akan menjadi `unhandledRejection` — di browser itu galat konsol yang terlihat
+ * murid, dan di Node ia bisa mematikan proses. `anSwallow()` menutup mulut setiap janji
+ * yang keluar dari modul, tanpa membuatnya bisa di-await pemanggil. */
+function anSwallow(p){try{if(p&&typeof p.then==='function')p.then(()=>{},()=>{anLastError='module_rejected'})}catch{}return undefined}
+function anMode(type){const t=String(type||'');return Object.prototype.hasOwnProperty.call(AN_SESSION_MODES,t)?AN_SESSION_MODES[t]:AN_DEFAULT_MODE}
+function anLevel(level){const l=String(level||'');return LEVELS.includes(l)?l:''}
+function anBucket(ms){const n=Number(ms);if(!isFinite(n)||n<0)return AN_DURATION_STEPS[0][1];for(const [limit,label] of AN_DURATION_STEPS)if(n<limit)return label;return AN_LAST_BUCKET}
+function anAnswered(n){const v=Math.trunc(Number(n));return isFinite(v)&&v>0?Math.min(200,v):0}
+/* Pagar terakhir sebelum field masuk modul: buang kunci di luar allowlist DAN buang nilai
+ * bukan-primitif. String panjang tidak punya jalan masuk ke sini (semua nilai berenum atau
+ * angka), dan pagar ini yang membuat pernyataan itu bisa DIUJI, bukan cuma dijanjikan. */
+function anFields(name,fields){
+  const allow=AN_FIELD_ALLOWLIST[name]||[],out={};
+  for(const key of allow){
+    const v=fields?fields[key]:undefined;
+    if(v===undefined||v===null||v==='')continue;
+    if(typeof v==='string'&&v.length>16)continue;
+    if(typeof v!=='string'&&typeof v!=='number'&&typeof v!=='boolean')continue;
+    out[key]=v;
+  }
+  return out;
+}
+/* DAU. Angkanya diambil dari `state.daily.attempts` — bilangan yang SUDAH diagregasi
+ * `recomputeMeaningfulDays()`, bukan dari satu jawaban. Modul sendiri yang menahan
+ * ambang 5 dan sekali-per-hari; di sini tidak ada logika hari kedua yang bisa berbeda. */
+function anMarkActive(){return anEmit(c=>{anSwallow(c.markActive(Number(state&&state.daily?state.daily.attempts:0)||0))})}
+function anSessionStarted(session){
+  try{return anEmit(c=>{anSwallow(c.track('session_started',anFields('session_started',{mode:anMode(session&&session.type),level:anLevel(session&&session.level)})))})}catch{return false}
+}
+function anSessionEnded(session){
+  try{
+    return anEmit(c=>{
+      anSwallow(c.track('session_ended',anFields('session_ended',{mode:anMode(session&&session.type),level:anLevel(session&&session.level),completed:Boolean(session&&session.completed),answered:anAnswered(session&&session.answered),duration_bucket:anBucket(session&&session.durationMs)})));
+      anSwallow(c.markActive(Number(state&&state.daily?state.daily.attempts:0)||0));
+      anSwallow(c.flush());
+    });
+  }catch{return false}
+}
+/* app_open + retention_ping + pelampung pagehide, sekali per pemuatan halaman. */
+function anBoot(){
+  if(anStarted)return false;
+  if(!anGateOpen())return false;
+  anStarted=true;
+  return anEmit(c=>{anSwallow(c.attachLifecycle());anSwallow(c.start({}));anMarkActive()});
+}
+/* Dijadwalkan SESUDAH jawaban `/api/config` (kalau ada), di idle, tanpa retry. Jendela
+ * sebelum jawaban itu berjalan dengan gerbang TERTUTUP — arah yang aman. */
+function anBootSchedule(){
+  const run=()=>{try{Promise.resolve(cfConfigInFlight||null).then(()=>{anBoot()}).catch(()=>{})}catch{}};
+  if(typeof requestIdleCallback==='function')requestIdleCallback(run,{timeout:5000});
+  else setTimeout(run,2000);
+  return 'scheduled';
+}
+self.FiezelAnalyticsEmitter=Object.freeze({
+  boot:anBoot,
+  sessionStarted:anSessionStarted,
+  sessionEnded:anSessionEnded,
+  markActive:anMarkActive,
+  gateOpen:anGateOpen,
+  fields:anFields,
+  mode:anMode,
+  schedule:anBootSchedule,
+  stats:()=>({loaded:Boolean(anClient),started:anStarted,lastError:anLastError,gateOpen:anGateOpen()}),
+  // Hanya untuk gerbang: kosongkan cache instance tanpa menyentuh apa pun milik murid.
+  _resetForGate:()=>{anLoadPromise=null;anClient=null;anStarted=false;anLastError=''}
+});
+/* Kalau lapis statis mati, tidak ada yang bisa dinyalakan server (aturan AND), jadi bahkan
+ * TIMER-nya tidak dipasang. Keadaan hari ini: nol timer, nol permintaan, nol penyimpanan. */
+if(cfStaticMode('usage')!=='off')anBootSchedule();
+/* A1-ANALYTICS-EMITTER-END */
 /* CF-TRANSPORT-BEGIN — sakelar transport Cloudflare (core-config.js: FIEZEL_CF_CONFIG).
  * Blok ini adalah PRA-CABANG di depan jalur Puter, bukan penulisan ulang jalur itu:
  * `corePuterExec` di bawah memuat badan `coreWorkerExec` HARI INI apa adanya (termasuk
@@ -6623,7 +6801,7 @@ function finishQuiz(cfg,score,total,tutorReport){
     else{const b=state.grammar[cfg.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};b.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[cfg.skipGateSkill]=b}
     skipVerdict={passed,message:passed?`Bukti diterima: ${score}/${total} benar. “${judul}” ditandai selesai — lesson berikutnya terbuka.`:`Baru ${score}/${total} benar — gerbang ini butuh minimal ${LESSON_SKIP_GATE_PASS}. Progresmu aman, dan gerbangnya bisa dicoba lagi setelah 24 jam — materinya tetap menunggumu di jalur.`};
   }
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);haptic(accuracy>=70?'success':'confirm');
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);const outcome=recordPolicyOutcomeFromSession(session);save();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/haptic(accuracy>=70?'success':'confirm');
   // m025-118: laporan tutor dibaca dalam bahasa GURU, bukan bahasa penilai. "12 dari 16"
   // tidak memberi tahu apa yang berubah; "kamu melewati dua hal yang tadinya bikin keliru"
   // memberi tahu, dan itu yang membuat murid tahu sesi ini ada gunanya.
