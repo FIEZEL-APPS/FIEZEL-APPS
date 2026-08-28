@@ -769,7 +769,10 @@ const OWNER_QUERIES = path.join(REPO, 'workers', 'owner', 'queries.js');
 // Lima tabel yang benar-benar ada di fiezel-stats. Dikunci di sini SEBAGAI ANGKA, bukan sebagai
 // daftar yang diambil dari kode owner, supaya menambah tabel tidak bisa lolos hanya karena kode
 // owner ikut diubah. `analytics-privacy-test.js` mengunci sisi database; ini mengunci sisi kueri.
-const STATS_TABLES_EXPECTED = ['dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
+// [INFRA-0006-20260828] batch_dedup masuk daftar: tabel dedup idempoten batch (0006,
+// PR brain-learning-infra) — dua kolom (batch_id acak, day), TTL 48 jam, BUKAN bacaan
+// owner (dilarang seperti dau_dedup/pepper_state), tidak bisa di-join ke identitas.
+const STATS_TABLES_EXPECTED = ['batch_dedup', 'dau_dedup', 'metrics_daily', 'pepper_state', 'retention_daily', 'usage_daily'];
 
 // Tabel yang boleh DIBACA dashboard owner: hanya yang agregat. `dau_dedup` (token per-perangkat)
 // dan `pepper_state` (bahan rahasia HMAC) ada di database yang sama dan justru karena itu harus
@@ -975,11 +978,16 @@ function ownerQuerySql() {
   {
     const idx = [...statsSchema.indexes.values()].map((i) => ({ nama: i.name, tabel: i.table, kolom: i.columns, berkas: i.file }));
     const fileIdx = [...new Set(idx.map((i) => i.berkas))];
+    // [INFRA-0006-20260828] 0006 diizinkan di sini dengan syarat sempit: satu-satunya
+    // indeksnya (idx_batch_dedup_day) dipakai purge rollup — BUKAN kueri owner — dan
+    // rollup fail-soft (try/catch) di DB yang belum bermigrasi, jadi tidak ada kueri
+    // owner yang bergantung pada migrasi yang belum diterapkan.
     check('indeks_stats_berasal_dari_migrasi_yang_sudah_jalan',
-      fileIdx.every((f) => /000[12]_/.test(f)), {
+      fileIdx.every((f) => /000[126]_/.test(f)), {
         indeks: idx, berkas: fileIdx,
         catatan: '0004_indexes.sql adalah migrasi fiezel-core dan BELUM diterapkan; kueri owner '
-          + 'tidak boleh bergantung padanya. Nol prasyarat indeks baru.'
+          + 'tidak boleh bergantung padanya. 0006 hanya menyumbang indeks purge rollup '
+          + '(fail-soft), bukan prasyarat kueri owner. Nol prasyarat indeks baru.'
       });
   }
 }
