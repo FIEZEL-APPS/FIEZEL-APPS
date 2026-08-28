@@ -448,6 +448,287 @@ function makeRequest(url, opts) {
   }
   assert(!new RegExp(OWNER_TOKEN).test(readmeSource), 'README tidak boleh memuat contoh token yang dipakai produksi');
 
+  /* ================= (f) "belum ada pengukuran" ≠ "nol terukur" ========================== */
+  // KENAPA INI ADA (bab 28): owner mengambil keputusan KUOTA dari halaman ini. Dashboard yang
+  // menulis "0 perangkat aktif" padahal yang benar "belum ada pengukuran" memberi owner fakta
+  // palsu untuk dipangkas. Tiga keadaan wajib dirender BERBEDA:
+  //   no-data     → nol baris hari di tabel agregat (pemancar klien belum ada).
+  //   measured    → ada baris hari, nilainya benar-benar nol.
+  //   unavailable → pembacaan D1 gagal; kegagalan tidak boleh menyamar jadi nol.
+  section('(f) keadaan kosong: "belum ada pengukuran" WAJIB ≠ "nol terukur"');
+
+  const ZERO_DAY = LAST_DAY;
+  const zeroRow = Object.assign({}, metricsDaily[metricsDaily.length - 1]);
+  for (const k of Object.keys(zeroRow)) if (k !== 'day') zeroRow[k] = 0;
+  zeroRow.day = ZERO_DAY;
+  zeroRow.collection_ok = 1;            // hari INI terkumpul; hasilnya yang nol.
+
+  // D1 palsu yang meniru perilaku SQL sungguhan pada nol baris:
+  //   COUNT(*) → 0, SUM(...) → NULL yang di-COALESCE jadi 0, MAX(...) → NULL, LIMIT 1 → null.
+  // Justru karena COALESCE mengubah "tidak ada" menjadi 0, keadaan TIDAK BOLEH disimpulkan dari
+  // nilai metrik — dan itulah yang gerbang ini kunci.
+  function fakeD1Rows(rows, opts) {
+    const o = opts || {};
+    const log = [];
+    const norm = (sql) => sql.replace(/\s+/g, ' ').trim();
+    const flowSum = () => {
+      const out = {};
+      for (const col of FLOW) out[col] = rows.reduce((a, r) => a + (Number(r[col]) || 0), 0);
+      return out;
+    };
+    const handlers = [
+      [/^SELECT day, visitors,.*ORDER BY day DESC LIMIT 1$/, () => (rows.length ? [rows[rows.length - 1]] : [])],
+      [/^SELECT COUNT\(\*\) AS days_counted, COALESCE\(SUM\(tts_chars_rendered\)/, () => [{
+        days_counted: rows.length, tts_chars_rendered: 0, ai_tokens_in: 0, ai_tokens_out: 0,
+        infra_usd: 0, tts_usd: 0, llm_usd: 0, total_usd: 0, tokens_are_estimated: null,
+      }]],
+      [/^SELECT COUNT\(\*\) AS days_counted, MIN\(day\)/, () => [Object.assign({
+        days_counted: rows.length,
+        day_from: rows.length ? rows[0].day : null,
+        day_to: rows.length ? rows[rows.length - 1].day : null,
+        days_broken: rows.filter((r) => Number(r.collection_ok) === 0).length,
+      }, flowSum())]],
+      [/^SELECT MAX\(dau\) AS dau_peak/, () => [rows.length
+        ? {
+          dau_peak: Math.max(...rows.map((r) => Number(r.dau) || 0)),
+          wau_peak: Math.max(...rows.map((r) => Number(r.wau) || 0)),
+          mau_peak: Math.max(...rows.map((r) => Number(r.mau) || 0)),
+          dau_avg: rows.reduce((a, r) => a + (Number(r.dau) || 0), 0) / rows.length,
+        }
+        : { dau_peak: null, wau_peak: null, mau_peak: null, dau_avg: null }]],
+      [/^SELECT day, dau, wau, mau, new_users/, () => rows],
+      [/^SELECT day, registered_total/, () => (rows.length ? [rows[rows.length - 1]] : [])],
+      [/^SELECT cohort_day, day_offset/, () => []],
+      [/^SELECT day_offset, COALESCE\(SUM\(cohort_size\)/, () => []],
+      [/^SELECT day, tts_provider/, () => []],
+      [/^SELECT MIN\(day\) AS day_first_collected/, () => [{
+        day_first_collected: rows.length ? rows[0].day : null, days_total: rows.length,
+      }]],
+    ];
+    function run(sql, binds) {
+      const key = norm(sql);
+      log.push(key);
+      if (o.throwAll) throw new Error('D1_ERROR: no such column: visitors (skema tidak cocok)');
+      for (const [re, fn] of handlers) if (re.test(key)) return (fn(binds) || []).map((r) => Object.assign({}, r, o.extraFields || {}));
+      throw new Error('D1 fixture tidak mengenal query ini: ' + key);
+    }
+    return {
+      _log: log,
+      prepare(sql) {
+        let binds = [];
+        const stmt = {
+          bind(...args) { binds = args; return stmt; },
+          async first() { return run(sql, binds)[0] || null; },
+          async all() { return { success: true, results: run(sql, binds) }; },
+          async run() { return { success: true, meta: { changes: 0 } }; },
+        };
+        return stmt;
+      },
+      async batch(list) { const out = []; for (const s of list) out.push(await s.run()); return out; },
+    };
+  }
+
+  async function pageWith(db) {
+    const e = makeEnv({ ANALYTICS: db });
+    const ck = mod.SESSION_COOKIE + '=' + (await mod.issueSession(e, NOW));
+    const res = await mod.handle(makeRequest('/?period=7d', { headers: { cookie: ck } }), e, {}, NOW);
+    return { res, html: await res.text(), env: e, cookie: ck };
+  }
+  async function summaryWith(db) {
+    const e = makeEnv({ ANALYTICS: db });
+    const ck = mod.SESSION_COOKIE + '=' + (await mod.issueSession(e, NOW));
+    const res = await mod.handle(makeRequest('/api/summary?period=7d', { headers: { cookie: ck } }), e, {}, NOW);
+    return JSON.parse(await res.text());
+  }
+  // Potongan satu panel, supaya assert menunjuk kartu tertentu dan bukan "ada di halaman".
+  function panel(htmlText, title) {
+    const parts = String(htmlText).split('<section>');
+    return parts.find((p) => p.toLowerCase().includes(title.toLowerCase())) || '';
+  }
+
+  const empty = await pageWith(fakeD1Rows([]));
+  const zeroPage = await pageWith(fakeD1Rows([zeroRow]));
+  const broken = await pageWith(fakeD1Rows([], { throwAll: true }));
+
+  assert(empty.res.status === 200, 'keadaan kosong harus tetap 200 untuk owner sah, dapat ' + empty.res.status);
+  assert(zeroPage.res.status === 200, 'keadaan nol-terukur harus 200, dapat ' + zeroPage.res.status);
+  assert(broken.res.status === 200, 'kegagalan baca D1 harus tetap merender halaman jujur (200), dapat ' + broken.res.status);
+
+  // INTI: dua keadaan itu tidak boleh menghasilkan halaman yang sama.
+  assert(empty.html !== zeroPage.html, '"belum ada pengukuran" dan "nol terukur" merender HTML IDENTIK');
+  assert(empty.html !== broken.html, '"belum ada pengukuran" dan "pengukuran tidak tersedia" merender HTML identik');
+
+  const activeEmpty = panel(empty.html, 'Active users');
+  const activeZero = panel(zeroPage.html, 'Active users');
+  assert(activeEmpty.includes(mod.NO_DATA_TEXT),
+    'panel Active users pada keadaan kosong harus berbunyi "' + mod.NO_DATA_TEXT + '"');
+  assert(!activeEmpty.includes(mod.MEASURED_ZERO_TEXT),
+    'keadaan kosong tidak boleh mengaku "' + mod.MEASURED_ZERO_TEXT + '"');
+  assert(activeZero.includes(mod.MEASURED_ZERO_TEXT),
+    'nol yang terukur harus ditandai "' + mod.MEASURED_ZERO_TEXT + '", bukan angka 0 telanjang');
+  assert(!activeZero.includes(mod.NO_DATA_TEXT),
+    'nol terukur tidak boleh berbunyi "' + mod.NO_DATA_TEXT + '" (itu meremehkan pengukuran yang nyata)');
+  assert(!/<b>0<\/b>/.test(empty.html),
+    'keadaan kosong merender angka 0 telanjang — owner akan membacanya sebagai fakta');
+  assert(new RegExp('<b>0 \\(' + mod.MEASURED_ZERO_TEXT + '\\)</b>').test(zeroPage.html),
+    'nol terukur harus dirender sebagai "0 (' + mod.MEASURED_ZERO_TEXT + ')"');
+
+  // Spanduk keadaan wajib DI ATAS panel, bukan catatan kaki, dan menyebut sebab yang benar.
+  assert(empty.html.includes(mod.NO_DATA_BANNER), 'spanduk "belum ada pengukuran" tidak dirender');
+  assert(/cfAnalyticsEnabled/.test(empty.html) && /pemancar/i.test(empty.html),
+    'spanduk kosong wajib menyebut sebabnya: pemancar klien belum ada + cfAnalyticsEnabled false');
+  assert(empty.html.indexOf('class="empty"') < empty.html.indexOf('<main>'),
+    'spanduk keadaan harus di ATAS panel, bukan di bawah');
+  assert(/keputusan kuota/i.test(empty.html), 'halaman kosong wajib melarang keputusan kuota di atasnya');
+
+  // Kegagalan baca ≠ nol, dan sebabnya disebut.
+  assert(broken.html.includes(mod.UNAVAILABLE_TEXT), 'kegagalan baca D1 harus berbunyi "' + mod.UNAVAILABLE_TEXT + '"');
+  assert(!broken.html.includes(mod.MEASURED_ZERO_TEXT), 'kegagalan baca D1 tidak boleh digambar sebagai nol terukur');
+  assert(/LATEST_DAY|PERIOD_TOTALS/.test(broken.html), 'halaman "tidak tersedia" wajib menyebut query yang gagal');
+
+  // Sparkline: nol hari = tidak ada grafik. Garis datar di nol adalah pengukuran palsu.
+  assert(!/<polyline/.test(empty.html), 'keadaan kosong tidak boleh menggambar garis grafik');
+
+  // JSON membawa keadaan yang SAMA — dua permukaan tidak boleh bercerita beda.
+  const sEmpty = await summaryWith(fakeD1Rows([]));
+  const sZero = await summaryWith(fakeD1Rows([zeroRow]));
+  const sBroken = await summaryWith(fakeD1Rows([], { throwAll: true }));
+  assert(sEmpty.measurement && sEmpty.measurement.state === mod.STATE_NO_DATA,
+    'JSON keadaan kosong harus state=' + mod.STATE_NO_DATA + ', dapat ' + JSON.stringify(sEmpty.measurement && sEmpty.measurement.state));
+  assert(sZero.measurement.state === mod.STATE_MEASURED, 'JSON nol-terukur harus state=' + mod.STATE_MEASURED);
+  assert(sBroken.measurement.state === mod.STATE_UNAVAILABLE, 'JSON gagal-baca harus state=' + mod.STATE_UNAVAILABLE);
+  assert(sEmpty.measurement.zeroMeansMeasured === false && sZero.measurement.zeroMeansMeasured === true,
+    'JSON wajib menyatakan apakah nol berarti terukur');
+  assert(sEmpty.measurement.daysTotal === 0 && sZero.measurement.daysTotal === 1,
+    'jumlah hari terrollup wajib ikut di JSON (dasar keputusan keadaan)');
+  assert(sBroken.measurement.readErrors.length > 0, 'JSON gagal-baca wajib menyebut query yang gagal');
+  assert(sEmpty.dataHonesty === mod.NO_DATA_BANNER, 'JSON kosong wajib membawa kalimat kejujuran yang sama dengan HTML');
+
+  // Periode di luar rentang data yang ADA: keadaan sendiri, bukan "nol".
+  const oldRow = Object.assign({}, zeroRow, { day: '2026-01-01', dau: 5, collection_ok: 1 });
+  const outOfRange = await pageWith(fakeD1Rows([oldRow]));
+  const sOut = await summaryWith(fakeD1Rows([oldRow]));
+  assert(sOut.measurement.state === mod.STATE_MEASURED || sOut.measurement.state === mod.STATE_NO_DATA_IN_PERIOD,
+    'periode tanpa hari harus punya keadaan sendiri, dapat ' + sOut.measurement.state);
+  assert(outOfRange.html.includes(mod.NO_DATA_TEXT) || outOfRange.html.includes('123') === false,
+    'periode tanpa hari tidak boleh menampilkan angka dari hari lain sebagai fakta periode ini');
+
+  /* ================= (g) default-deny rute + (h) nol rute owner tanpa gerbang ============= */
+  section('(g)+(h) default deny rute & nol rute owner yang bisa diakses tanpa gerbang');
+
+  // Rute yang belum ada HARI INI adalah rute yang paling mudah lupa dipagari besok.
+  const UNKNOWN_ROUTES = [
+    '/api', '/api/', '/api/summary2', '/api/owner', '/api/owner/summary', '/api/cost/detail',
+    '/api/students', '/api/murid', '/api/export', '/api/debug', '/admin', '/admin/', '/dashboard',
+    '/owner', '/metrics', '/health', '/healthz', '/status', '/.env', '/.git/config',
+    '/wrangler.toml', '/queries.js', '/index.js', '/favicon.ico', '/robots.txt', '/sitemap.xml',
+    '/LOGIN', '/Login', '/logout/x', '/api/summary.json', '/api//summary',
+  ];
+  // Jalur yang DINORMALISASI oleh URL/handler menjadi rute yang memang ada ('/api/summary/../summary'
+  // → '/api/summary', '/%2e%2e/' → '/', '/login/' → '/login'). Ia bukan rute baru, jadi yang
+  // diuji hanya bahwa TANPA sesi ia tetap 403 — bukan bahwa ia 403 untuk owner yang sah.
+  const NORMALIZING_ROUTES = ['/api/summary/../summary', '/%2e%2e/', '/login/', '/api/cost/'];
+  const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'];
+  const reachableWithoutGate = [];
+  for (const route of UNKNOWN_ROUTES.concat(NORMALIZING_ROUTES.filter((r) => !/login/i.test(r)))) {
+    for (const m2 of METHODS) {
+      const e = makeEnv();
+      const res = await mod.handle(makeRequest(route, { method: m2 }), e, {}, NOW);
+      if (res.status !== 403) reachableWithoutGate.push(m2 + ' ' + route + ' → ' + res.status);
+      assert(e.ANALYTICS._log.length === 0, m2 + ' ' + route + ' menyentuh D1 sebelum gate lulus');
+    }
+  }
+  assert(reachableWithoutGate.length === 0,
+    'ada rute yang bisa diakses tanpa gerbang owner: ' + reachableWithoutGate.join(', '));
+
+  // Default deny berlaku JUGA untuk owner yang sudah masuk: sesi sah bukan surat izin universal.
+  const withSessionNot403 = [];
+  for (const route of UNKNOWN_ROUTES) {
+    if (route.toLowerCase() === '/login') continue;
+    const e = makeEnv();
+    const ck = mod.SESSION_COOKIE + '=' + (await mod.issueSession(e, NOW));
+    const res = await mod.handle(makeRequest(route, { headers: { cookie: ck } }), e, {}, NOW);
+    if (res.status !== 403) withSessionNot403.push(route + ' → ' + res.status);
+  }
+  assert(withSessionNot403.length === 0,
+    'rute tak dikenal harus 403 bahkan untuk sesi owner yang sah (default deny): ' + withSessionNot403.join(', '));
+
+  // Semua rute ber-gate wajib terdaftar, dan hanya /login yang publik.
+  for (const route of mod.OWNER_ROUTES) {
+    assert(!mod.PUBLIC_ROUTES.includes(route), 'rute owner ' + route + ' bocor ke daftar publik');
+    const e = makeEnv();
+    const res = await mod.handle(makeRequest(route), e, {}, NOW);
+    assert(res.status === 403, 'rute owner ' + route + ' tanpa sesi → ' + res.status + ', harus 403');
+  }
+  assert(mod.PUBLIC_ROUTES.length === 1, 'jumlah rute publik harus tepat satu, dapat ' + mod.PUBLIC_ROUTES.length);
+  // Rute publik pun tidak boleh menyentuh D1 (halaman masuk bukan pintu data).
+  for (const m2 of ['GET', 'POST']) {
+    const e = makeEnv();
+    await mod.handle(makeRequest('/login', m2 === 'POST'
+      ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ t: 'salah' }) }
+      : {}), e, {}, NOW);
+    assert(e.ANALYTICS._log.length === 0, 'halaman masuk (' + m2 + ') menyentuh D1');
+  }
+  // Tidak ada satu pun rute owner yang dilewatkan penjaga edge (daftar bebas-header harus kosong).
+  assert(Array.isArray(mod.EDGE_FREE_PATHS) && mod.EDGE_FREE_PATHS.length === 0,
+    'nol rute boleh bebas dari penjaga edge di Worker owner');
+
+  /* ================= (i) kontrak privasi: nol identitas murid perorangan ================= */
+  section('(i) KONTRAK PRIVASI: dashboard tidak pernah menampilkan identitas murid perorangan');
+
+  // Skenario terburuk yang realistis: suatu hari tabel agregat mendapat kolom asing (mis. karena
+  // migrasi salah atau JOIN yang lolos). Dashboard TETAP tidak boleh menampilkannya — penyaringan
+  // ada di sisi PEMBACA, bukan cuma di sisi penulis.
+  const LEAK_FIELDS = {
+    user_id: 'murid-0042',
+    install_id: 'inst-8f3c9a',
+    learner_name: 'Aisyah Putri',
+    email: 'aisyah@example.test',
+    provider_uuid: '11111111-2222-3333-4444-555555555555',
+    answer_text: 'She go to school every day',
+    ai_transcript: 'tolong jelaskan present simple',
+    ip: '203.0.113.7',
+    user_agent: 'Mozilla/5.0 (Linux; Android 13)',
+  };
+  const leakDb = () => fakeD1Rows([Object.assign({}, metricsDaily[metricsDaily.length - 1])], { extraFields: LEAK_FIELDS });
+  const leakPage = await pageWith(leakDb());
+  const leakSurfaces = [['HTML /', leakPage.html]];
+  for (const route of ['/api/summary', '/api/series', '/api/retention', '/api/cost']) {
+    const e = makeEnv({ ANALYTICS: leakDb() });
+    const ck = mod.SESSION_COOKIE + '=' + (await mod.issueSession(e, NOW));
+    const res = await mod.handle(makeRequest(route + '?period=7d', { headers: { cookie: ck } }), e, {}, NOW);
+    leakSurfaces.push([route, await res.text()]);
+  }
+  for (const [label, body] of leakSurfaces) {
+    for (const [field, value] of Object.entries(LEAK_FIELDS)) {
+      assert(!body.includes(value), label + ' menampilkan NILAI identitas murid (' + field + ')');
+      assert(!new RegExp('\\b' + field + '\\b').test(body),
+        label + ' menampilkan NAMA kolom identitas murid (' + field + ')');
+    }
+    assert(!/\b(nama murid|learner|siswa ke-|top user|per murid|drill.?down)\b/i.test(body),
+      label + ' memuat istilah per-murid (daftar/urutan/drill-down individu)');
+  }
+  // Bukti penyaringan benar-benar berjalan (bukan fixture yang kebetulan tidak terpakai).
+  const leakSummary = await summaryWith(leakDb());
+  assert(leakSummary.measurement.droppedFieldCount >= Object.keys(LEAK_FIELDS).length,
+    'kolom asing tidak tercatat dibuang — penyaring pembaca tidak berjalan (dapat '
+    + leakSummary.measurement.droppedFieldCount + ')');
+  assert(!('droppedFields' in leakSummary.measurement),
+    'JSON tidak boleh mengulang NAMA kolom asing keluar (nama kolom pun bisa jadi petunjuk)');
+  for (const field of Object.keys(LEAK_FIELDS)) {
+    const dropped = [];
+    mod.sanitizeRow(Object.assign({ dau: 1 }, { [field]: LEAK_FIELDS[field] }), dropped);
+    assert(dropped.includes(field), 'sanitizeRow() tidak membuang kolom "' + field + '"');
+  }
+  assert(!mod.ALLOWED_ROW_FIELDS.has('user_id') && !mod.ALLOWED_ROW_FIELDS.has('learner_name'),
+    'daftar putih field tidak boleh memuat kolom per-orang');
+  assert(Object.keys(mod.sanitizeRow(Object.assign({ dau: 1 }, LEAK_FIELDS), [])).join(',') === 'dau',
+    'sanitizeRow() harus menyisakan HANYA field agregat');
+  // Dashboard tidak boleh punya rute yang secara konsep per-murid.
+  for (const route of mod.OWNER_ROUTES) {
+    assert(!/(student|murid|learner|user)s?\b/i.test(route), 'ada rute owner yang berorientasi per-murid: ' + route);
+  }
+
   if (failures) {
     console.error('\nowner-dashboard-test: GAGAL (' + failures + ' assert)');
     process.exit(1);
