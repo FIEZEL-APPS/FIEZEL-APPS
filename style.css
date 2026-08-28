@@ -1004,7 +1004,8 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .practice-contract{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-6);margin:var(--sp-3) 0;padding:var(--sp-5);border-radius:var(--radius-md);background:rgba(var(--surface-rgb),.9);color:var(--text)}.practice-contract h3{margin:0 0 5px}.practice-contract p{margin:0;max-width:600px;color:var(--muted);font-size:.8rem;line-height:1.55}.practice-contract button{flex:0 0 auto}
 
 @keyframes signalPulse{0%,100%{opacity:.7;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
-.reduce-motion *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+.reduce-motion *{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+html:has(body.reduce-motion){scroll-behavior:auto!important}/* v30 2026-08-29: toggle in-app harus setara jalur OS \u2014 riseIn delay dinolkan + smooth-scroll dimatikan (html di luar jangkauan selektor ber-scope body). */
 
 @media(min-width:900px){.topbar{padding-top:14px}.section-head{padding-top:22px}}
 @media(max-width:860px){
@@ -2910,7 +2911,7 @@ html.fiezel-ui-v6 .nav.active::after{
 /* i12/C3 2026-08-28: keping strip kini bisa <button> (LEVEL, REVIEW) \u2014 warisi tampilan chip. */
 button.hero-stat{font:inherit;text-align:left;cursor:pointer}
 button.hero-stat:active{transform:translateY(1px)}
-@media(max-width:640px){.hero-stats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}.hero-stats .hero-stat{flex:0 0 auto}}/* q16-P2-1: keping tidak boleh menciut — biarkan strip menggulir di 320px */
+@media(max-width:640px){.launcher-copy{min-width:0}.hero-stats{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%;min-width:0}.hero-stats .hero-stat{flex:0 0 auto}}/* v05 2026-08-29: jebakan min-content grid — .launcher-copy menolak menciut di bawah lebar keping, membuat strip bocor 29px keluar viewport 320 dan keping REVIEW tak tergapai; min-width:0 membuat kolom mengalah dan strip menggulir penuh. *//* q16-P2-1: keping tidak boleh menciut — biarkan strip menggulir di 320px */
 /* i12/C4: baris trust satu-baris pengganti banner 200px. */
 .trust-line{display:flex;gap:var(--sp-2);align-items:baseline;font-size:var(--fs-small);color:var(--accent-strong);margin:var(--sp-2) 0 0}
 .hero-stat b{
@@ -3405,7 +3406,9 @@ html.fiezel-ui-v6 .launcher-shell{
 body.fz-stage-quiz .fz-coach-peek,
 body.fz-stage-sl .fz-coach-peek,
 body.fz-stage-hub .fz-coach-peek,/* q16-P2-2: hub punya CTA dekat dasar layar juga */
-body.fz-stage-map .fz-coach-peek{display:none}
+body.fz-stage-map .fz-coach-peek,
+body.fz-stage-writing .fz-coach-peek{display:none}
+body.fz-stage-writing .fz-coach-bubble{display:none}/* v24-F2 2026-08-29: FAB 58px menutupi textarea Writing di 390 (42x58px) \u2014 layar mengarang bebas gangguan, coach tetap ada di view lain. */
 /* i12/C5 2026-08-28 (O6 "satu Pau di Home"): di Home, Pau hero coach-strip adalah satu-satunya
    Pau; gelembung FAB + peek disembunyikan penuh (bukan diciutkan seperti sl/map). */
 body.fz-stage-home .fz-coach-peek,
@@ -3421,7 +3424,7 @@ body.fz-stage-home .fz-coach-bubble{display:none}
 body.fz-stage-quiz .fz-coach-bubble,
 body.fz-stage-sl .fz-coach-bubble,
 body.fz-stage-hub .fz-coach-bubble,
-body.fz-stage-map .fz-coach-bubble{width:46px;height:46px;bottom:calc(88px + env(safe-area-inset-bottom))}
+body.fz-stage-map .fz-coach-bubble{width:46px;height:46px;bottom:calc(92px + env(safe-area-inset-bottom))}/* v24-F1 2026-08-29: 88px membuat FAB menyerempet tab Peta 1px di 390 \u2014 dinaikkan 4px. */
 body.fz-stage-quiz .fz-coach-bubble .fz-coach-face,
 body.fz-stage-sl .fz-coach-bubble .fz-coach-face,
 body.fz-stage-hub .fz-coach-bubble .fz-coach-face,
@@ -3444,11 +3447,13 @@ body.fz-stage-quiz .quiz-shell{padding-bottom:96px}
    .quiz-topbar sticky), jadi memindahkannya ke atas di kuis hanya menukar satu tabrakan
    dengan tabrakan baru. Yang dianimasikan hanya transform+opacity - top/bottom tidak pernah
    ikut, supaya perpindahannya tidak memaksa layout ulang tiap frame. */
+@media (max-width:767px){/* v24-F3 2026-08-29: relokasi kanan-atas hanya untuk layar sempit \u2014 di >=768 top:88px justru menimpa kontrol "Level belajar" (terukur 40x13/40x22px), sedangkan lajur kanan-bawah di 768 terbukti bersih (gutter nav 74px). */
 body.fz-stage-sl .fz-coach-bubble,
 body.fz-stage-map .fz-coach-bubble{
   bottom:auto;
   top:calc(88px + env(safe-area-inset-top,0px));
   animation:fzCoachRelocate .28s var(--ease-spring) both;
+}
 }
 @keyframes fzCoachRelocate{
   from{opacity:0;transform:translateY(-10px) scale(.9)}

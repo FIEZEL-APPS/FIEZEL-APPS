@@ -83,14 +83,19 @@
   function gemsI18nOverlay(g){
     if(!g||!I18N||typeof I18N.getLocale!=='function'||I18N.getLocale()==='id')return g;
     const kunci=k=>'gems.'+String(k).replace(/([A-Z])/g,'-$1').toLowerCase();
+    /* v49-F2 2026-08-29: FiezelGems dibekukan (Object.freeze) \u2014 assignment biasa pada objek
+       ber-prototype beku melempar TypeError di 'use strict' dan gemsApi() menelan errornya,
+       mematikan ekonomi gem diam-diam untuk locale th. defineProperty tidak terpengaruh
+       writable prototype, jadi overlay tetap hidup. */
     const w=Object.create(g);
+    const pasang=(k,v)=>{Object.defineProperty(w,k,{value:v,enumerable:true,configurable:true})};
     if(g.GEMS_COPY){
       const peta={};
       Object.keys(g.GEMS_COPY).forEach(k=>{peta[k]=I18N.t(kunci(k))});
-      w.GEMS_COPY=Object.freeze(peta);
+      pasang('GEMS_COPY',Object.freeze(peta));
     }
-    if(typeof g.chipAria==='function')w.chipAria=b=>I18N.t('gems.chip-aria',{saldo:b});
-    if(typeof g.streakToast==='function')w.streakToast=(s,n)=>I18N.t('gems.streak-toast',{s:s,n:n});
+    if(typeof g.chipAria==='function')pasang('chipAria',b=>I18N.t('gems.chip-aria',{saldo:b}));
+    if(typeof g.streakToast==='function')pasang('streakToast',(s,n)=>I18N.t('gems.streak-toast',{s:s,n:n}));
     return w;
   }
   function gemsApi(){try{return gemsI18nOverlay(hostScope().FiezelGems||null)}catch(_){return null}}
@@ -484,8 +489,8 @@
       if(this.root.querySelector('[data-fsl-confirm]'))return;
       const wrap=document.createElement('div');
       wrap.setAttribute('data-fsl-confirm','');
-      wrap.style.cssText='position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:rgba(27,20,24,.45)';
-      wrap.innerHTML='<div role="dialog" aria-modal="true" aria-label="Konfirmasi keluar" style="background:var(--panel,#fffdf6);border-radius:16px;padding:20px;max-width:320px;margin:16px;box-shadow:0 12px 32px rgba(27,20,24,.25)"><h3 style="margin:0 0 8px;font-size:1.05rem">Yakin mau keluar?</h3><p style="margin:0 0 14px;font-size:.9rem;color:var(--muted,#6b5a60)">Sesi ini berhenti di item '+(this.index+1)+'/'+Math.max(1,this.items.length)+'. Kemajuan item yang sudah dinilai tetap tersimpan.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button data-fsl-confirm-yes>Tetap keluar</button><button class="fsl-primary" data-fsl-confirm-no>Lanjut belajar</button></div></div>';
+      wrap.style.cssText='position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:var(--fsl-scrim,rgba(27,20,24,.45))';
+      wrap.innerHTML='<div role="dialog" aria-modal="true" aria-label="Konfirmasi keluar" style="background:var(--panel,#fffdf6);border-radius:var(--radius-md,16px);padding:20px;max-width:320px;margin:16px;box-shadow:var(--shadow-lg,0 12px 32px rgba(27,20,24,.25))"><h3 style="margin:0 0 8px;font-size:1.05rem">Yakin mau keluar?</h3><p style="margin:0 0 14px;font-size:.9rem;color:var(--muted,#6b5a60)">Sesi ini berhenti di item '+(this.index+1)+'/'+Math.max(1,this.items.length)+'. Kemajuan item yang sudah dinilai tetap tersimpan.</p><div style="display:flex;gap:8px;justify-content:flex-end"><button data-fsl-confirm-yes>Tetap keluar</button><button class="fsl-primary" data-fsl-confirm-no>Lanjut belajar</button></div></div>';
       this.root.appendChild(wrap);
       const yes=wrap.querySelector('[data-fsl-confirm-yes]'),no=wrap.querySelector('[data-fsl-confirm-no]');
       yes.addEventListener('click',()=>{try{wrap.remove()}catch{}this.exit()});
