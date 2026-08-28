@@ -61,7 +61,7 @@
 
 import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
 // P3 - penegakan flag server DI JALUR PERMINTAAN, bukan sekadar dilaporkan ke klien.
-import { checkAiEnabled } from './feature-gate.js';
+import { checkAiEnabled, checkTtsEnabled } from './feature-gate.js';
 // P3 - pagar neuron tingkat AKUN (jatah vendor), berbeda dari kuota per-murid.
 import { reserveAccountNeurons, releaseAccountNeurons } from './ai/ai-account-budget.js';
 import { QUOTA_CONFIG } from './quota/quota-config.js';
@@ -395,11 +395,23 @@ function accountNeuronsFor(a) {
  * cadangan (bab 12: jangan pernah galat mentah ke murid), jadi status HTTP
  * tidak bisa dipakai — yang dipakai adalah `source`/`degraded` miliknya.
  */
-function providerFailed(body) {
+export function providerFailed(body) {
   if (!body || typeof body !== 'object') return false;
   if (body.source === 'deterministic-fallback') return true;
   if (body.source === 'unavailable') return true;
   return body.degraded === true && body.source !== 'cache';
+}
+
+/**
+ * S3 - PUTUSAN PENYELESAIAN, DIEKSPOR SUPAYA GERBANG TIDAK MENYALINNYA.
+ *
+ * `quotaCharged` di amplop TTS/AI hanya jujur kalau ia setuju dengan fungsi INI, karena
+ * fungsi inilah yang benar-benar menggerakkan (atau membatalkan) buku jatah. Gerbang
+ * `tts-provider-contract-test.js` mengimpornya untuk menjalankan buku jatah palsu, jadi
+ * tidak ada versi kedua dari aturan ini yang bisa hanyut dari yang dipakai produksi.
+ */
+export function quotaSettlementFailed(response, body, rollbackRequested) {
+  return response === null || providerFailed(body) || rollbackRequested === true;
 }
 
 /**
@@ -419,7 +431,7 @@ async function settleQuota(ctx, response) {
   // `route-ai.js` lewat `rollbackQuotaBridge`. Menambahkannya di sini (bukan membatalkan
   // di jembatan) menjaga pembatalan tetap idempoten: satu tiket dibatalkan satu kali,
   // di satu tempat, walau handler melempar.
-  const failed = response === null || providerFailed(body) || ctx.quotaRollbackRequested === true;
+  const failed = quotaSettlementFailed(response, body, ctx.quotaRollbackRequested === true);
   ctx.quotaRollbackRequested = false;
 
   for (const ticket of tickets) {
@@ -565,7 +577,51 @@ export function buildExtraRoutes() {
     // tidak memuat apa pun milik pengguna), jadi ia tidak menuntut identitas.
     const metered = path === '/api/tts/render';
     routes.push([method, path, wrapMetered(
-      (request, env, executionCtx) => handler(request, env, executionCtx),
+      /**
+       * S3 - GERBANG FLAG TTS. LUBANG BIAYA KEDUA, DITEMUKAN DENGAN MENEMBAK PRODUKSI
+       * HIDUP SESUDAH DEPLOY P3 (28 Agu 2026):
+       *
+       *   KV `cfg:flags` = { flags:{cfTtsEnabled:false}, enabled:{tts:false} }
+       *   POST https://api.fiezel.my.id/api/ai/task   -> 403 `ai_disabled`, 141 ms, nol token
+       *   POST https://api.fiezel.my.id/api/tts/render -> 200, DAN amplopnya memuat
+       *      `accountNeuronsReleased` - artinya jalur render benar-benar berjalan: ia
+       *      MEMESAN neuron akun lalu melepasnya.
+       *
+       * Jadi pagar P3 dipasang di jalur AI dan TIDAK di jalur TTS, padahal keduanya
+       * membelanjakan kolam neuron yang SAMA lewat binding `env.AI` yang sama. "TTS mati"
+       * hanya berlaku bagi klien yang sopan; siapa pun bisa `POST /api/auth/anon` lalu
+       * membelanjakan jatah akun owner lewat `/api/tts/render`.
+       *
+       * DITUTUP DENGAN POLA YANG SAMA, BUKAN POLA BARU: `checkTtsEnabled()` adalah
+       * `checkAiEnabled()` dengan satu baris tabel berbeda (`PAID_FEATURES` di
+       * `feature-gate.js`). Dua mekanisme untuk satu maksud adalah cara celah berikutnya
+       * lahir.
+       *
+       * URUTANNYA PENTING, dan bisa dibaca dari posisinya di sini: gerbang ini dipanggil
+       * di dalam `wrapMetered` (jadi identitas sudah diperiksa - 401 tetap mendahului 403)
+       * tetapi SEBELUM `handler`. Karena `route-tts.js` baru membaca badan permintaan,
+       * memanggil `deps.enforceQuota`, memesan neuron akun, lalu menyentuh `env.AI` DI
+       * DALAM handler, penolakan ini terjadi sebelum keempatnya. `quotaCharged:false`-nya
+       * benar secara STRUKTUR, bukan karena dieja begitu.
+       *
+       * `GET /api/tts/manifest` SENGAJA tidak digerbangi: katalog suara tidak memanggil
+       * model, tidak menyentuh kuota, dan tidak memesan neuron. Menutupnya hanya membuat
+       * klien tidak bisa tahu suara apa yang ADA saat flag mati, tanpa menghemat sepeser
+       * pun. Yang digerbangi adalah yang berbiaya.
+       */
+      async (request, env, executionCtx) => {
+        if (metered) {
+          const gate = await checkTtsEnabled(env);
+          if (!gate.allowed) {
+            const ctx = CTX_BY_REQUEST.get(request);
+            return RouteTts.ttsDisabledResponse({
+              reason: gate.reason,
+              headers: (ctx && ctx.corsHeaders) || null
+            });
+          }
+        }
+        return handler(request, env, executionCtx);
+      },
       metered
     )]);
   }
