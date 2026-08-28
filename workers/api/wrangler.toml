@@ -49,6 +49,10 @@ COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
 FEATURE_AI        = "on"
 FEATURE_TTS       = "off"
 FEATURE_COACH     = "off"
+# SLOT 7 lapisan sosial (route-social.js): LAHIR MATI sesuai aturan produksi.
+# Menyalakannya butuh TIGA sakelar AND: var ini "on" + KV cfg:flags
+# enabled.social=true + flags.cfSocialEnabled=true. Fail-closed bila KV tak terbaca.
+FEATURE_SOCIAL    = "on"
 # Angka limit hanya untuk NASKAH UX (bab 12); penegakan tetap di server.
 #
 # 🔄 TEMUAN LAPANGAN 28 Agu 2026 — DUA ANGKA UNTUK HAL YANG SAMA, SUDAH DISELARASKAN.

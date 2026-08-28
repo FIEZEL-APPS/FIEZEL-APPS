@@ -396,6 +396,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/speaking-listening/gems-core.js"></script>
   <!-- P1 Prasasti: inti murni lencana bukti (pola gems-core) - dideklarasikan sebelum app.js. -->
   <script defer src="./features/prasasti/fiezel-prasasti-core.js"></script>
+  <!-- SOSIAL (SLOT 7): inti online/teman/papan (pola gems-core: mandiri, tanpa import).
+       Dimuat sebelum app.js supaya kait bukti finishQuiz menemukannya sejak sesi pertama;
+       kalau gagal dimuat, seluruh pengaitnya di app.js guarded dan fitur online diam. -->
+  <script defer src="./features/social/fiezel-social.js"></script>
   <script defer src="./features/speaking-listening/fiezel-speaking-listening-addon.js"></script>
   <script defer src="./fiezel-lazy-loader.js"></script>
 
