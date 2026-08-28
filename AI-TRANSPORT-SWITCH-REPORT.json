@@ -11,7 +11,7 @@
     {
       "name": "Blok transport AI bisa dipotong lewat sentinel AI-TASK-TRANSPORT-BEGIN/END",
       "status": "PASS",
-      "details": "begin=638224 end=655679"
+      "details": "begin=638664 end=656119"
     },
     {
       "name": "Fungsi render AI bisa dipotong dari app.js",

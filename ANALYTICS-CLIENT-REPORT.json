@@ -190,12 +190,12 @@
     {
       "name": "installId dibuat dan disimpan LOKAL",
       "status": "PASS",
-      "details": "a2fb5ca4-c185-4747-954c-984defafa269"
+      "details": "5eceb291-3524-4e26-a13f-e98d247df052"
     },
     {
       "name": "installId berbentuk UUID acak (crypto.randomUUID)",
       "status": "PASS",
-      "details": "a2fb5ca4-c185-4747-954c-984defafa269"
+      "details": "5eceb291-3524-4e26-a13f-e98d247df052"
     },
     {
       "name": "Ada payload yang benar-benar terkirim",
@@ -235,7 +235,7 @@
     {
       "name": "`visitor_token` = 32 hex (128 bit)",
       "status": "PASS",
-      "details": "96070aa572bb1f5072e39277e6737d8c"
+      "details": "96b6619bff76647dee7e7f5cf3c918d4"
     },
     {
       "name": "Payload retensi ada",
@@ -325,27 +325,27 @@
     {
       "name": "Token stabil selama pepper sama (dedup DAU tidak pecah di tengah hari)",
       "status": "PASS",
-      "details": "4075ca0ef415a847dcc09b6b9a8fcf96 / 4075ca0ef415a847dcc09b6b9a8fcf96"
+      "details": "58cfe93a6a982f9ccb91a61f641eb99a / 58cfe93a6a982f9ccb91a61f641eb99a"
     },
     {
       "name": "Token BERUBAH saat pepper berubah (hari-1 tidak bisa disambung ke hari-2)",
       "status": "PASS",
-      "details": "4075ca0ef415a847dcc09b6b9a8fcf96 -> ef7f54d676ec0e71e4a35fb97f82c31b"
+      "details": "58cfe93a6a982f9ccb91a61f641eb99a -> 4a128d82d84dc1b67e24ebb87a94c535"
     },
     {
       "name": "installId tidak berubah antar hari (perbedaan token murni dari pepper)",
       "status": "PASS",
-      "details": "cec9fa84-dbfb-4a2d-ab56-f67bb2c627cc"
+      "details": "f0ca92dd-a1c5-45e0-8dea-402138434fd0"
     },
     {
       "name": "Token = HMAC-SHA256(pepper, installId) dipotong 128 bit",
       "status": "PASS",
-      "details": "ef7f54d676ec0e71e4a35fb97f82c31b vs ef7f54d676ec0e71e4a35fb97f82c31b"
+      "details": "4a128d82d84dc1b67e24ebb87a94c535 vs 4a128d82d84dc1b67e24ebb87a94c535"
     },
     {
       "name": "Token klien identik dengan `visitorToken()` sisi Worker",
       "status": "PASS",
-      "details": "ef7f54d676ec0e71e4a35fb97f82c31b vs ef7f54d676ec0e71e4a35fb97f82c31b"
+      "details": "4a128d82d84dc1b67e24ebb87a94c535 vs 4a128d82d84dc1b67e24ebb87a94c535"
     },
     {
       "name": "Pepper tidak tersedia => token null dan event DAU ditahan (bukan dikirim tanpa token)",
