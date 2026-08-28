@@ -44,8 +44,23 @@ AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
 # bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
 ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
-# Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
-# jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).
+# Entitlement fase ini: AI HIDUP, TTS dan COACH masih mati. Aturannya tetap: fitur baru
+# wajib di belakang flag OFF sampai jalurnya terbukti hidup ujung-ke-ujung.
+#
+# KOREKSI GANDA (audit rilis m025-179, 28 Agu 2026).
+#
+# (a) Baris ini dulu berbunyi "SEMUA MATI" — sudah tidak benar sejak FEATURE_AI dinyalakan.
+#
+# (b) Baris ini juga menjadikan "main auto-deploy ke produksi tiap 5 menit" DASAR aturan
+#     flag-OFF. Audit menyisir seluruh `.github/workflows/` dan menemukan NOL mekanisme yang
+#     menerbitkan aplikasi ke `fiezel.my.id/app/` — nol scp, nol rsync, nol FTP, nol
+#     deploy-pages; yang ada hanya deploy Worker Cloudflare. Premisnya tidak bisa
+#     ditunjukkan, dan aturan yang menumpu pada mekanisme yang tidak ada bukan aturan.
+#
+# Sejak audit itu mekanismenya BENAR-BENAR ADA: `.github/workflows/deploy-site.yml` (dipicu
+# HANYA sesudah Quality Gate hijau) dan `.cpanel.yml` untuk jalur cPanel Git. Keduanya
+# mengunggah aset lebih dulu dan `sw.js` paling akhir, lalu MEMBUKTIKAN penandanya lewat
+# `tools/deploy-site-verify.mjs`. Aturan flag-OFF kini punya alasan yang bisa diperiksa.
 FEATURE_AI        = "on"
 FEATURE_TTS       = "off"
 FEATURE_COACH     = "off"
