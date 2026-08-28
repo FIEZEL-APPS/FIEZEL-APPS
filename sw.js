@@ -32,7 +32,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // sama TANPA precache (lihat catatan di bawah ASSETS). Semua berkas shell berubah dalam
 // satu gelombang rilis, jadi revisi naik SEKALI - DIAG_BUILD + FIEZEL_PAGE_BUILD ikut ke
 // m025-177 (kontrak install-health/classroom-test: awalan SW_REV = build halaman).
-const SW_REV='m025-181-paw-character-system-20260828';
+const SW_REV='m025-182-uiux-audit-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini

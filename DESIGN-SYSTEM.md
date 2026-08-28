@@ -1,7 +1,10 @@
-# FIEZEL — Design System
+# FIEZEL — Design System · "Warm Paper, Bright Mind"
 
 Dokumen ini adalah jawaban atas Audit UX **Bagian 5** dan **Roadmap Jangka Menengah**
-("bangun design system terdokumentasi supaya semua fitur baru konsisten").
+("bangun design system terdokumentasi supaya semua fitur baru konsisten"). Ditulis ulang
+pada audit UI/UX 2026-08 (temuan 03-001) karena versi lama masih mendokumentasikan palet
+marun v5 dan mode gelap yang sudah dihapus — dokumen kanonis yang menyesatkan lebih
+berbahaya daripada tidak ada dokumen.
 
 Aturannya satu: **jangan pernah menulis nilai mentah.** Setiap warna, radius, bayangan,
 durasi, dan font di produk ini punya token. Nilai mentah di dalam komponen adalah cara
@@ -11,133 +14,169 @@ paling umum sebuah aplikasi perlahan-lahan terlihat "campur aduk".
 
 ## 1. Warna
 
-Sumber kebenaran: blok `:root` **kedua** di `style.css` (bertanda `FIEZEL Design System v6.0`).
-Blok `:root` pertama di kepala berkas adalah generasi v5 dan **ditimpa** oleh v6 — jangan
-menambah token baru di sana.
+Sumber kebenaran: blok `:root` **kedua** di `style.css` (bertanda `FIEZEL Design System
+v6.0`, ±baris 652–790). Blok `:root` pertama di kepala berkas adalah generasi lama dan
+**ditimpa** oleh v6 — jangan menambah token baru di sana. (`--yellow`/`--yellow-deep` di
+blok pertama adalah alias lawas yang nilainya sudah disamakan dengan `--sun`/`--sun-deep`;
+pemakaian baru harus memakai keluarga `--sun`.)
 
-### Peran, bukan nama warna
+### Kuning adalah warna BIDANG, bukan warna teks
 
-| Token | Terang | Gelap | Dipakai untuk |
-|---|---|---|---|
-| `--accent` | `#8C2233` | `#e0708a` | Warna merek. Aksen, tautan, sorotan. |
-| `--accent-strong` | `#6D1926` | `#f093a8` | Keadaan tekan/hover dari aksen. |
-| `--accent-soft` | `#f7e8eb` | `#3a1f27` | Latar lembut bernuansa aksen. |
-| `--gold` | `#d8b36b` | `#e3c07d` | **Aksen kedua**: streak, hadiah, lencana. |
-| `--bg` | `#faf7f6` | `#150c11` | Latar halaman. |
-| `--panel` | `#fffdfc` | `#1e1418` | Permukaan kartu, modal, gerbang. |
-| `--panel-soft` | `#f6eef0` | `#281a20` | Permukaan sekunder, kolom isian. |
-| `--line` / `--line-soft` | `#e9dfe1` / `#f2ebec` | `#3a2a30` / `#2e2027` | Garis rambut, pemisah. |
-| `--text` | `#1d1114` | `#fdf4f6` | Teks utama. |
-| `--muted` / `--muted-soft` | `#6b5a60` / `#8a757c` | `#c3aeb5` / `#a38f96` | Teks pendukung. |
-| `--green` / `--green-soft` | `#278268` / `#e8f4ef` | `#4fc79b` / `#16302a` | Berhasil. |
-| `--red` / `--red-soft` | `#bd4f63` / `#faecef` | `#f08098` / `#3a1c24` | Gagal, bahaya. |
-| `--black` | `#1b1418` | `#8C2233` | **Permukaan tombol utama** (teksnya dipaku `#fff`). |
+Ini aturan warna terpenting seluruh produk (komentar style.css di blok v6): `--sun` di
+atas `--bg` hanya 1,5:1. Kuning boleh mengisi tombol, kapsul, dan latar — teks di atasnya
+selalu tinta (`--text` di atas `--sun` ≈ 10,9:1). Satu-satunya "kuning" yang boleh menjadi
+teks adalah `--info` `#7A5F1B` (≈5,9:1 di atas cream). Chip yang melanggar aturan ini
+(`.level-trust-chip`) sudah dikoreksi pada audit 02-003.
 
-> **Jebakan `--black`.** Token ini memikul dua peran: permukaan tombol utama *dan* warna
-> teks pada beberapa label. Di mode gelap satu nilai tidak bisa melayani keduanya, jadi
-> nilainya dipilih untuk **tombol** (marun, kontras 7,3:1 dengan teks putih) dan dua
-> pemakaian teks (`.nav.active`, `.welcome-mark`/`.modal-mark`) dialihkan ke aksen terang
-> lewat penimpaan khusus. Kalau menambah pemakaian `--black` sebagai warna teks, tambahkan
-> penimpaannya juga.
+### Keluarga merek (bidang kuning)
 
-### Mode gelap
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--sun` | `#FFC700` | Bidang merek: tombol utama (`.primary`), kapsul nav aktif, isian ikon. |
+| `--sun-deep` | `#E6A800` | Garis/tepi di atas bidang kuning; border `.primary`. |
+| `--sun-press` | `#CC9600` | Keadaan tekan bidang kuning. |
+| `--sun-soft` | `#FFF3C4` | Latar kuning lembut (kapsul tab aktif, hover). |
+| `--sun-grad` | `linear-gradient(180deg,#FFDE59,#FFA500)` | Gradien splash/hero. |
 
-Ditulis **tepat setelah** blok `:root` v6, dengan dua selektor yang wajib ada berdua:
+### Netral "kertas hangat"
 
-```css
-@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){ … } }  /* preferensi sistem */
-:root[data-theme="dark"]{ … }                                               /* sakelar manual */
-```
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--bg` | `#FFF9EE` | Latar halaman (cream). |
+| `--panel` | `#FFFFFF` | Permukaan kartu, modal, gerbang. |
+| `--panel-soft` | `#FFF3DC` | Permukaan sekunder, kolom isian. |
+| `--line` / `--line-soft` | `#F0E4CF` / `#F7EFDF` | Garis rambut, pemisah. |
+| `--text` (= `--black`) | `#241A11` | Tinta utama. |
+| `--muted` / `--muted-soft` | `#6E5E47` / `#7E6C4B` | Teks pendukung. `--muted` di atas cream ≈5,7:1 — **jangan** diturunkan lagi dengan `opacity` (pelajaran audit 14-002). |
 
-Sakelar manual disimpan di `localStorage` oleh `features/ui/fiezel-dark-mode.js` dan
-disuntikkan ke modal Pengaturan.
+### Aksen dan emas
 
-**Jangan** memberi warna satu-satunya definisi di dalam blok gelap — setiap token harus
-punya nilai terang di `:root` polos lebih dulu.
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--accent` | `#C2402C` | **Terracotta — BUKAN marun.** Aksen, tautan, sorotan. |
+| `--accent-strong` | `#A33422` | Keadaan tekan/hover aksen; tinta aksen di teks kecil. |
+| `--accent-soft` | `#FDE3DE` | Latar lembut bernuansa aksen. |
+| `--gold` | `#C9A24B` | Aksen kedua dekoratif: garis jalur, hadiah. Hanya 1,9:1 di atas cream — dekorasi saja, bukan teks/fokus. |
+
+### Semantik
+
+| Token | Nilai | Dipakai untuk |
+|---|---|---|
+| `--good` / `--good-bright` / `--good-soft` | `#1F6B4E` / `#2E8B69` / `#E9F7F0` | Berhasil (tinta / bidang terang / latar). |
+| `--bad` / `--bad-bright` / `--bad-soft` | `#AC3E2A` / `#B8432D` / `#FDE3DE` | Gagal, bahaya. `--bad-bright` untuk garis/bidang, bukan teks kecil. |
+| `--info` / `--info-soft` | `#7A5F1B` / `#FFF3C4` | Satu-satunya kuning-teks yang sah + latarnya. |
+| `--focus-ring` | `#A67A00` | Cincin fokus tunggal seluruh aplikasi. |
+| `--scrim` / `--scrim-soft` | `rgba(36,26,17,.45)` / `rgba(36,26,17,.28)` | Backdrop modal (turunan tinta, bukan kabut terang). |
+
+### Permukaan gelap "core"
+
+Satu-satunya keluarga gelap yang tersisa — panggung splash, kartu highlight, toast:
+`--core #1B1418`, `--core-soft #2A2126`, `--core-line #3A3038`, `--on-core #FDFAF3`,
+`--on-core-muted rgba(253,250,243,.68)`. Teks di atas core memakai `--on-core*`, bukan
+`--text`.
 
 ### Empat fase suasana
 
 `body` membawa salah satu dari `scene-day` / `scene-dawn` / `scene-dusk` / `scene-night`.
 Fase ini menimpa token *ambient* dan *glass* (`--ambient-text`, `--chrome-bg`, `--glass-*`)
-mengikuti waktu setempat. Ini **terpisah** dari mode gelap dan keduanya harus tetap terbaca
-saat digabung.
+mengikuti waktu setempat. Ini **bukan** mode gelap — keempat fase tetap keluarga terang, dan
+`theme-color` runtime ikut kroma fase (chrome boot tetap `#FFF9EE`).
 
 ---
 
-## 2. Tipografi
+## 2. Mode gelap: DIHAPUS
 
-Dua keluarga, dua peran, dua token — berlaku **global**, termasuk di dialog sistem:
+Mode gelap **dihapus seluruhnya pada m025-134** (lihat `FIEZEL-M025134-HAPUS-MODE-GELAP-HANDOFF.md`).
+Fakta yang berlaku sekarang:
+
+- Tidak ada `@media (prefers-color-scheme:dark)` dan tidak ada blok `:root[data-theme="dark"]`
+  di `style.css`. `features/ui/fiezel-dark-mode.js` tidak pernah ada lagi.
+- `index.html` memasang `<meta name="color-scheme" content="light">` dan
+  `<meta name="theme-color" content="#FFF9EE">` supaya kontrol bawaan peramban ikut terang.
+- `features/ui/fiezel-ui-manager.js` memaku `data-theme='light'` sebagai shim defensif —
+  atribut itu **bukan** sakelar; nilainya tidak boleh dibaca sebagai fitur.
+
+**Jangan** menambahkan token yang hanya punya nilai "gelap", dan jangan menghidupkan kembali
+tabel dua kolom terang/gelap di dokumen ini. Aplikasi ini terang, selalu.
+
+---
+
+## 3. Tipografi
+
+Tiga wajah, tiga peran, semuanya *self-host* dari `assets/fonts/` lewat `@font-face` —
+**tidak boleh** kembali ke Google Fonts CDN, karena aplikasi ini offline-first dan gate
+`onboarding-test.js` menahannya.
 
 | Token | Font | Peran |
 |---|---|---|
-| `--fz-heading` | FZ Fredoka (500/600/700) | Judul, wordmark, tanda merek. |
-| `--fz-body` | FZ Plus Jakarta Sans (400–700) | Seluruh teks tubuh, tombol, label. |
+| `--fz-display` | FZ Instrument Serif (400) | **Display besar saja**: `.section-head h1`, `.welcome-panel h2`, `.modal-panel h2`, `.fiezel-title`, wordmark splash. Selalu `font-weight:400` — serif ini **tidak boleh di-faux-bold** (temuan 02-004). |
+| `--fz-heading` | FZ Plus Jakarta Sans (700) | Bawaan `h1–h4`, `.welcome-mark`, `.modal-mark`, judul kartu/UI. |
+| `--fz-body` | FZ Plus Jakarta Sans (400–700) | Seluruh teks tubuh, tombol, label. Tombol mewarisi lewat `font:inherit`. |
+| `--fz-display-round` | FZ Fredoka (variabel) | **Terbatas**: hanya `.word` dan `.lesson-title` (kata target di kuis dan judul materi). Jangan meluas tanpa keputusan merek. |
 
-Keduanya di-*self-host* dari `assets/fonts/` lewat `@font-face` — **tidak boleh** kembali ke
-Google Fonts CDN, karena aplikasi ini offline-first dan gate `onboarding-test.js` menahannya.
-
-`body` memakai `--fz-body`; `h1–h4`, `.brand`, `.welcome-mark`, `.modal-mark` memakai
-`--fz-heading`. Tombol mewarisi lewat `font:inherit`.
+Serif display dipakai HANYA di ukuran besar dengan `letter-spacing:-.015em`; di ukuran kecil
+serif kontras-tinggi kehilangan keterbacaan di ponsel, jadi judul kecil tetap Jakarta.
 
 ---
 
-## 3. Bentuk dan kedalaman
+## 4. Bentuk dan kedalaman
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--radius-lg` | `22px` | Kartu, panel besar. |
+| `--radius-lg` | `24px` | Kartu, panel besar. |
 | `--radius-md` | `16px` | Kotak sekunder, kolom isian. |
 | `--radius-sm` | `12px` | Chip, lencana. |
-| `--shadow-sm` | `0 8px 24px` | Kartu diam. |
-| `--shadow-md` | `0 20px 50px` | Elemen terangkat. |
-| `--shadow-lg` | `0 34px 90px` | Modal, gerbang. |
+| `--radius-pill` | `999px` | Tombol pil, kapsul. |
+| `--shadow-sm` | `0 2px 10px rgba(36,26,17,.06)` | Kartu diam. |
+| `--shadow-md` | `0 10px 30px rgba(36,26,17,.09)` | Elemen terangkat. |
+| `--shadow-lg` | `0 24px 60px rgba(36,26,17,.15)` | Modal, gerbang. |
 
-Tombol berbentuk pil memakai `border-radius:999px`, bukan token — itu bentuk, bukan skala.
-
-**Liquid glass**: tiga bobot saja (`--glass-thin/regular/thick`) plus `--glass-edge` dan
-`--glass-blur`. Kedalaman datang dari blur dan satu garis rambut, **bukan** dari kotak
-bertumpuk di atas kotak.
+**Tanda tangan taktil FIEZEL**: permukaan interaktif utama memakai *hard offset* pekat —
+`box-shadow:0 4px 0 var(--sun-deep)` (tombol utama), `0 3px 0 var(--surface-edge)` (kartu
+tombol), `0 2px 0 var(--surface-edge)` (bottom nav) — lalu bayangan ambient lembut di
+belakangnya. Offset keras + ambient halus itulah yang membuat UI terasa "bisa ditekan";
+jangan menggantinya dengan drop-shadow biasa.
 
 ---
 
-## 4. Gerak
+## 5. Gerak
 
 | Token | Nilai | Dipakai untuk |
 |---|---|---|
-| `--ease` | `cubic-bezier(.22,.8,.28,1)` | Transisi tenang: halaman, warna, opasitas. |
-| `--ease-spring` | `cubic-bezier(.34,1.4,.4,1)` | Interaksi bertenaga: tekan tombol, modal masuk. |
+| `--ease` (= `--fz-out`) | `cubic-bezier(.22,.8,.28,1)` | Transisi tenang: halaman, warna, opasitas. |
+| `--ease-spring` (= `--fz-spring`) | `cubic-bezier(.34,1.4,.4,1)` | Interaksi bertenaga: tekan tombol, modal masuk. |
 | `--dur-s` / `--dur-m` / `--dur-l` | `.18s` / `.32s` / `.5s` | Pendek / sedang / panjang. |
 
+Aturan: animasi hanya `transform` dan `opacity`; splash punya **satu jam koreografi**
+(`splash-choreography-test.js` menjaganya); nama `@keyframes` harus unik seberkas penuh
+(tabrakan nama pernah mematikan animasi diam-diam, temuan 12-003).
+
 **Kurangi-gerak wajib dihormati.** Ada blok global `@media (prefers-reduced-motion:reduce)`
-yang memangkas semua animasi, ditambah penimpaan lokal untuk sekuens splash dan onboarding.
-Modul SFX transisi juga diam total di modus ini.
+yang memangkas semua animasi, ditambah penimpaan lokal untuk sekuens splash dan onboarding,
+plus kelas `.is-static` dari sakelar Pengaturan. Modul SFX transisi juga diam total di modus ini.
 
 ---
 
-## 5. Ikon
+## 6. Ikon — dua keluarga, dua peran
 
-Satu keluarga: **Lucide**, gaya garis, semuanya `stroke`. Bundle di `lucide.min.js` adalah
-**subset** — hanya ikon yang benar-benar dipakai yang disertakan.
+1. **`fz-i` duotone** (`features/ui/fiezel-icons.js`) — ikon identitas: garis coklat
+   (`--fz-i-line`) + isian pastel (`--fz-i-fill`). Untuk *chrome* aplikasi: bottom nav,
+   kartu modul/skill, ritual harian.
+2. **Lucide** (garis, `stroke`) — glyph di dalam konten: tombol, baris pengaturan, panah.
+   Bundle `lucide.min.js` adalah **subset**; setiap `data-lucide="…"` baru **harus** ada di
+   dalam subset. Ikon yang tidak ada merender kotak kosong tanpa galat ("■", temuan m025-80).
 
-> **Aturan wajib:** setiap `data-lucide="…"` baru **harus** ada di dalam subset. Ikon yang
-> tidak ada tidak gagal dengan berisik — ia merender kotak kosong, dan itulah "■" yang
-> ditandai audit sebagai terasa belum matang. Audit m025-80 menemukan 22 ikon hilang seperti
-> ini, termasuk `bell-ring` di gerbang notifikasi.
+> **Aturan ukuran wajib (pelajaran 20-002 dan m025-166):** setiap konteks pemakaian `.fz-i`
+> **harus** mendeklarasikan `width`/`height`-nya sendiri, dan kelas dasar `.fz-i` membawa
+> pagar `max-width:48px;max-height:48px`. Tanpa ukuran eksplisit SVG-nya mekar ke ukuran
+> intrinsik 300px — bug ini sudah terjadi dua kali (ikon Peta, api ritual harian).
 
-Cara menambah ikon:
-
-```bash
-npm pack lucide-static@latest          # ambil paket resmi
-# ekstrak path data dari package/icons/<nama>.svg,
-# lalu sisipkan ke map `const icons={…}` di lucide.min.js
-```
-
-Jangan pernah menggambar ulang path ikon dengan tangan, dan jangan mencampur emoji dengan
-ikon garis di permukaan yang sama.
+Jangan menggambar ulang path ikon dengan tangan, dan jangan mencampur emoji dengan ikon
+garis di permukaan yang sama.
 
 ---
 
-## 6. Keadaan yang wajib didesain
+## 7. Keadaan yang wajib didesain
 
 Setiap layar yang memuat data **harus** punya ketiganya. Ini bagian dari definisi selesai,
 bukan tambahan.
@@ -152,7 +191,7 @@ Bantuannya ada di `features/ui/skeleton-helpers.js`.
 
 ---
 
-## 7. Bunyi
+## 8. Bunyi
 
 Seluruh bunyi lahir dari satu DNA supaya aplikasi terdengar seperti satu alat:
 
@@ -173,20 +212,23 @@ jangan menambah sakelar baru untuk hal sejenis.
 
 ---
 
-## 8. Identitas merek
+## 9. Identitas merek
 
-| Aset | Berkas | Catatan |
+| Aset | Berkas | Status |
 |---|---|---|
-| Ikon aplikasi | `assets/brand/fiezel-icon.svg` (sumber) | Huruf F gading + dua batang emas: inisial merek sekaligus gelombang suara. |
+| Ikon aplikasi | `assets/brand/fiezel-icon.svg` (sumber) | Huruf F + dua batang: inisial merek sekaligus gelombang suara. |
 | Ikon ter-render | `favicon-64`, `apple-touch-icon` (180), `fiezel-icon-192`, `fiezel-icon-512` | Di-render dari SVG, diperkecil dengan LANCZOS. |
+| Wordmark | `assets/brand/fiezel-wordmark.svg` / `-mono.svg` | Topbar: tinta coklat + dua balok terracotta (token `--wordmark-*`). |
+| **Maskot PAW — HIDUP** | `assets/brand/paw-mascot-full.svg` / `-head.svg` (+ PNG 512) | Kucing maskot produk. Bukan konsep — dipakai di ritual harian, kuis, gerbang level. |
+| Motion maskot — HIDUP | `features/mascot/fiezel-mascot.js` + `fiezel-motion.css` | Custom element `<fiezel-mascot>`, 14 state. Panggil lewat `pawReact`/`pawFaceMarkup` di `app.js` (pembungkus itu yang menghormati kurangi-gerak), jangan lewat elemennya langsung. |
 
-**Zona aman maskable.** `fiezel-icon-512.png` didaftarkan dengan `purpose:"maskable"`, dan
-Android memotongnya menjadi lingkaran/squircle. Seluruh isi ikon karena itu harus berada di
-dalam lingkaran berjari-jari **204,8 px** dari pusat kanvas 512. Lockup saat ini berada di
-161,4 px — ada ruang, tapi periksa ulang setiap kali bentuknya diubah.
+**Zona aman maskable.** `fiezel-icon-512.png` didaftarkan dengan `purpose:"maskable"`;
+seluruh isi ikon harus berada di dalam lingkaran berjari-jari **204,8 px** dari pusat kanvas
+512. Periksa ulang setiap kali bentuknya diubah.
 
-`background_color` di `manifest.json` (`#120C0F`) sengaja disamakan dengan bidang ikon dan
-splash, supaya layar peluncuran PWA menyambung mulus ke sapaan pembuka.
+**Warna chrome PWA**: `manifest.json` memakai `background_color:#FFF9EE` (menyambung mulus
+ke splash cream) dan `theme_color:#FFC700`; meta `theme-color` statis di `index.html`
+adalah `#FFF9EE` dan boleh ditimpa runtime oleh fase suasana (§1).
 
 > **Maskot.** [PAW 2026-08] Koreksi catatan lama: m025-80 menghapus maskot **dari layar
 > splash saja** (lihat `features/brand/fiezel-splash.js`), bukan dari produk. Produk punya
@@ -199,30 +241,32 @@ splash, supaya layar peluncuran PWA menyambung mulus ke sapaan pembuka.
 
 ---
 
-## 9. Aturan alur masuk
+## 10. Aturan alur masuk
 
 Ini bukan soal gaya, tapi soal urutan — dan urutannya sudah pernah salah sekali.
 
 1. **Splash bermerek adalah layar pertama, selalu.** Untuk setiap murid, setiap peluncuran.
+   Markup statisnya di `index.html` harus **identik byte demi byte** dengan
+   `FiezelSplash.markup()`, dan setiap aturan CSS di `<style id="fiezelBootCritical">` harus
+   ada apa adanya di `style.css` (kecuali aturan khusus-boot) — `splash-first-paint-test.js`
+   menjaganya.
 2. **Perkenalan menyusul** bila belum pernah selesai.
 3. **Baru gerbang** — notifikasi, lalu akun Puter, lalu paket suara.
 
-Gerbang **tidak boleh** membuka dirinya sendiri hanya untuk menutup lagi: memanggil
-`setNotificationGateState('granted')` pada gerbang yang sedang tersembunyi menyebabkan
-kedipan panel di setiap peluncuran. Kedua gerbang kini menjaga hal ini.
-
-Gerbang juga **tidak boleh** menumpuk di atas splash atau perkenalan; gerbang paket suara
-memeriksanya lewat `.fiezel-splash` / `.fiezel-ob` / `auth-locked` sebelum tampil.
+Gerbang **tidak boleh** membuka dirinya sendiri hanya untuk menutup lagi, dan **tidak
+boleh** menumpuk di atas splash atau perkenalan; gerbang paket suara memeriksanya lewat
+`.fiezel-splash` / `.fiezel-ob` / `auth-locked` sebelum tampil.
 
 ---
 
-## 10. Sebelum menambah komponen baru
+## 11. Sebelum menambah komponen baru
 
-- [ ] Semua warna dari token; tidak ada heksadesimal mentah di komponen.
-- [ ] Terbaca di terang **dan** gelap, di keempat fase suasana.
-- [ ] Sasaran sentuh ≥ 44 px; cincin fokus terlihat.
+- [ ] Semua warna dari token **v6**; tidak ada heksadesimal mentah di komponen.
+- [ ] Kuning hanya bidang; teks kuning satu-satunya adalah `--info`.
+- [ ] Terbaca di keempat fase suasana (tidak ada mode gelap yang perlu diuji).
+- [ ] Sasaran sentuh ≥ 44 px; cincin fokus `--focus-ring` terlihat.
 - [ ] Punya keadaan memuat, kosong, dan gagal.
-- [ ] Ikon baru sudah masuk subset `lucide.min.js`.
-- [ ] Animasi tunduk pada kurangi-gerak.
-- [ ] Naskah bernada suportif — tanpa "wajib", tanpa "tidak bisa dibuka", tanpa menyapa nama
-      murid di layar sistem.
+- [ ] Ikon baru: Lucide sudah masuk subset; `.fz-i` baru punya `width`/`height` eksplisit.
+- [ ] Animasi tunduk pada kurangi-gerak; hanya `transform`/`opacity`; nama keyframes unik.
+- [ ] Naskah kamu/aku bernada suportif — tanpa "wajib", tanpa "tidak bisa dibuka", tanpa
+      menyapa nama murid di layar sistem.
