@@ -37,7 +37,7 @@
     {
       "name": "Level metadata counts",
       "status": "PASS",
-      "details": "{\"A1\":17,\"A2\":17,\"B1\":47,\"B2\":32,\"C1\":19,\"C2\":7}"
+      "details": "{\"A1\":17,\"A2\":16,\"B1\":48,\"B2\":32,\"C1\":19,\"C2\":7}"
     },
     {
       "name": "Lesson and template field completeness",

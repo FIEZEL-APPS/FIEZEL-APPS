@@ -99,7 +99,14 @@ blueprint={l:{'vocab':10,'grammar':7,'reading':8} for l in ['A1','A2','B1','B2',
 check('Placement blueprint defined',blueprint=={l:{'vocab':10,'grammar':7,'reading':8} for l in blueprint},'25 questions/level: 10 vocab + 7 grammar + 8 reading')
 # Integrity guard / adaptive
 app=open(ROOT/'app.js',encoding='utf8').read()
-for name,needle in [('Central question integrity guard','function validateQuestion'),('Render-time integrity gate','if(!validateQuestion(q).ok)continue'),('Evidence adaptive gate','hs.length>=24&&skills.size>=3&&types.size>=2'),('No hardcoded adaptive 150 gate','state.totalAnswered>=150')]:
+# Render-time integrity gate: terima kedua bentuk guard yang sah — bentuk lama
+# `if(!validateQuestion(q).ok)continue` maupun bentuk wave-D yang lebih ketat
+# `if(!q||!validateQuestion(q).ok)continue` (tambahan null-check `!q`). Regex sengaja
+# longgar hanya pada null-check opsional itu: keberadaan gate integritas render tetap
+# WAJIB dibuktikan, refactor penambahan guard tidak boleh memerahkan audit (temuan D1).
+render_gate_re=re.compile(r'if\(!(?:q\|\|!)?validateQuestion\(q\)\.ok\)\s*continue')
+check('Render-time integrity gate',bool(render_gate_re.search(app)),render_gate_re.pattern)
+for name,needle in [('Central question integrity guard','function validateQuestion'),('Evidence adaptive gate','hs.length>=24&&skills.size>=3&&types.size>=2'),('No hardcoded adaptive 150 gate','state.totalAnswered>=150')]:
  check(name, (needle in app) if name!='No hardcoded adaptive 150 gate' else (needle not in app), needle)
 # Security and optional AI integration
 runtime_names=['index.html','app.js','style.css','sw.js','version.js','manifest.json','report-config.js','core-config.js','fiezel-report-worker.js','fiezel-core-worker.js','creator-report-setup.html','creator-report-dashboard.html']; alltxt='\n'.join((ROOT/f).read_text(errors='ignore') for f in runtime_names)
