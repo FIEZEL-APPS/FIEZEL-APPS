@@ -312,9 +312,12 @@ test('splash membunyikan splash_intro lewat fasad, dengan nama dari tabel koreog
     'splash harus meminta tepat satu bunyi pembuka, dan namanya splash_intro');
 });
 
-test('adopsi yang terlambat memilih SENYAP, bukan nada pembuka yang menyusul', () => {
-  // Pagar pengganti windowMs lama: nada pembuka hanya pantas di ketukan pertamanya.
-  // Splash yang diadopsi jauh setelah ketukan itu lewat tidak boleh membunyikannya telat.
+test('adopsi terlambat TETAP meminta nada pembuka - tenggat kini milik fasad, bukan startOffset', () => {
+  // Audit 2026-08-28: pagar lama (startOffset <= 120ms) membuat splash_intro TIDAK PERNAH
+  // diminta di boot nyata (load() mengunduh ~2,7 MB dulu), bahkan di lingkungan yang
+  // MENGIZINKAN autoplay seperti PWA terpasang. Kontrak baru: splash SELALU meminta tepat
+  // satu kali per tayangan; fasadlah yang memutuskan bunyi-sekarang / siaga-dengan-tenggat
+  // / buang - dan close() -> cancelChime() tetap pagar bunyi liarnya (m025-84).
   const seen = [];
   const env = fakeEnv({
     bootSplash: true,
@@ -322,8 +325,43 @@ test('adopsi yang terlambat memilih SENYAP, bukan nada pembuka yang menyusul', (
     FiezelUiSfx: { play: name => { seen.push(name); return true; }, cancelPending: () => true }
   });
   splash.show(env, { now: NOW, force: true });
-  assert.deepStrictEqual(seen, [],
-    'ketukan pertama sudah lewat ' + 800 + 'ms saat splash diadopsi - bunyinya harus dibuang, bukan diantre');
+  assert.deepStrictEqual(seen, ['splash_intro'],
+    'adopsi terlambat pun harus meminta nada pembuka TEPAT SATU KALI - dulu jalur ini senyap selamanya');
+});
+
+test('splash memakai playOnce() bila fasad memilikinya, dengan tenggat = sisa umur tayang', () => {
+  const calls = [];
+  const env = fakeEnv({
+    bootSplash: true,
+    bootElapsedMs: 400,
+    FiezelUiSfx: {
+      playOnce: (name, e, o) => { calls.push([name, o && o.windowMs]); return false; },
+      play: () => { throw new Error('fasad ber-playOnce tidak boleh jatuh ke play() lama'); },
+      prepare: () => true,
+      cancelPending: () => true
+    }
+  });
+  const shown = splash.show(env, { now: NOW, force: true });
+  assert.strictEqual(calls.length, 1, 'tepat satu permintaan playOnce per tayangan');
+  assert.strictEqual(calls[0][0], 'splash_intro');
+  assert.strictEqual(calls[0][1], shown.visibleMs,
+    'tenggat siaga harus = sisa umur tayang splash, supaya bunyi mati bersama splash-nya');
+});
+
+test('show() menyiapkan audio lebih dulu lewat prepare() - dekode berjalan paralel dengan DOM', () => {
+  const prepared = [];
+  const env = fakeEnv({
+    bootSplash: true,
+    bootElapsedMs: 0,
+    FiezelUiSfx: {
+      prepare: name => { prepared.push(name); return true; },
+      play: () => true,
+      cancelPending: () => true
+    }
+  });
+  splash.show(env, { now: NOW, force: true });
+  assert.deepStrictEqual(prepared, ['splash_intro'],
+    'persiapan konteks + dekode harus diminta splash sedini mungkin');
 });
 
 /* ------------------------------------------------------------------ *
@@ -419,6 +457,111 @@ test('preferensi murid tetap berkuasa penuh di atas seluruh mekanisme siaga', ()
   env.__getFiezelState = () => ({ preferences: { feedbackSounds: false } });
   assert.strictEqual(sfx.playMotif(env, { windowMs: 2600 }), false);
   assert.strictEqual(sfx.pendingMotif(), null, 'suara yang dimatikan murid tidak boleh disiagakan diam-diam');
+});
+
+/* ------------------------------------------------------------------ *
+ * 3. Zero-gesture-first (audit splash-SFX 2026-08-28)
+ * ------------------------------------------------------------------ */
+
+// Lingkungan yang BENAR-BENAR memblokir autoplay: resume() tidak mengubah state
+// sampai gestur asli terjadi (fake audioEnv standar meniru izin yang langsung
+// turun - itu justru kasus PWA terpasang).
+function blockedAudioEnv() {
+  const env = audioEnv('suspended');
+  env._userTouched = false;
+  const makeCtx = env.AudioContext;
+  env.AudioContext = function () {
+    const ctx = new makeCtx();
+    ctx.resume = () => { if (env._userTouched) ctx.state = 'running'; return Promise.resolve(); };
+    return ctx;
+  };
+  return env;
+}
+
+test('ZERO-GESTURE: playOnce membunyikan splash_intro SEKARANG bila konteks lahir running (PWA terpasang)', () => {
+  sfx.__reset();
+  const env = audioEnv('running');
+  const ok = sfx.playOnce('splash_intro', env, { windowMs: 3560 });
+  assert.strictEqual(ok, true, 'lingkungan yang mengizinkan autoplay harus berbunyi TANPA gestur');
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.ok(env._ctx._scheduled.length >= 1, 'sampel harus benar-benar dijadwalkan tanpa satu pun gestur');
+  });
+});
+
+test('IZIN TERLAMBAT: resume() yang berhasil tanpa gestur tetap membunyikan bunyi yang disiagakan', () => {
+  // audioEnv('suspended') standar meniru peramban yang MENGABULKAN resume() tanpa
+  // gestur (izin autoplay turun terlambat). playOnce harus menangkap izin itu.
+  sfx.__reset();
+  const env = audioEnv('suspended');
+  const ok = sfx.playOnce('splash_intro', env, { windowMs: 3560 });
+  assert.strictEqual(ok, false, 'jawaban sinkronnya jujur: belum berbunyi saat itu juga');
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.strictEqual(sfx.pendingMotif(), null, 'izin yang turun harus melepas siaga');
+    assert.ok(env._ctx._scheduled.length >= 1, 'bunyinya harus keluar TANPA gestur begitu izin turun');
+  });
+});
+
+test('AUTOPLAY_BLOCKED: playOnce menyiagakan splash_intro, lalu berbunyi pada gestur asli pertama', () => {
+  sfx.__reset();
+  const env = blockedAudioEnv();
+  const ok = sfx.playOnce('splash_intro', env, { windowMs: 3560 });
+  assert.strictEqual(ok, false);
+  const armed = sfx.pendingMotif();
+  assert.ok(armed && armed.key === 'splash_intro',
+    'yang disiagakan harus splash_intro ITU SENDIRI - slot lama terpatri ke paw_greet, itulah bugnya');
+  assert.strictEqual(env._ctx._scheduled.length, 0,
+    'm025-84: tidak ada nada dijadwalkan ke konteks terkunci');
+  env._userTouched = true; // gestur asli: peramban baru mengabulkan resume()
+  env._fire('pointerdown');
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.strictEqual(sfx.pendingMotif(), null, 'siaga harus dilepas begitu berbunyi');
+    assert.ok(env._ctx._scheduled.length >= 1, 'gestur pertama harus membunyikan splash_intro itu sendiri');
+  });
+});
+
+test('SATU TAYANGAN = SATU BUNYI: playOnce kedua dalam jendela hidup diabaikan', () => {
+  sfx.__reset();
+  const env = audioEnv('running');
+  assert.strictEqual(sfx.playOnce('splash_intro', env, { windowMs: 3560 }), true);
+  assert.strictEqual(sfx.playOnce('splash_intro', env, { windowMs: 3560 }), false,
+    'permintaan kedua tidak boleh menggandakan bunyi - autoplay + ketukan bukan dua bunyi');
+});
+
+test('prepare() mendekode sampel pada konteks suspended TANPA menjadwalkan nada (izin \u2260 persiapan)', () => {
+  sfx.__reset();
+  const env = blockedAudioEnv();
+  assert.strictEqual(sfx.prepare('splash_intro', env), true);
+  assert.ok(env._ctx,
+    'konteks harus dibuat dini - di PWA terpasang ia lahir running, itulah jalur zero-gesture');
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.strictEqual(env._ctx._scheduled.length, 0, 'prepare tidak boleh membunyikan apa pun');
+    assert.ok(sfx.diagnostics(env).sampelSiap >= 1, 'sampelnya harus sudah didekode selagi menunggu izin');
+  });
+});
+
+test('percobaan yang GAGAL tidak membakar jatah: gestur berikutnya masih berhak membunyikannya', () => {
+  sfx.__reset();
+  const env = blockedAudioEnv();
+  sfx.playOnce('splash_intro', env, { windowMs: 3560 });
+  // Dulu trigger() mencatat cooldown 3 dtk DI MUKA: percobaan terblokir membuat
+  // ulang-main pada gestur < 3 dtk kemudian ditolak rationAllows. Kini jatah
+  // dicatat setelah start() sungguhan.
+  env._userTouched = true;
+  env._fire('pointerdown');
+  return new Promise(r => setTimeout(r, 25)).then(() => {
+    assert.ok(env._ctx._scheduled.length >= 1,
+      'gestur 0-3 dtk setelah percobaan terblokir harus tetap membunyikan nada pembuka');
+  });
+});
+
+test('preferensi murid berkuasa juga atas playOnce/prepare', () => {
+  sfx.__reset();
+  const env = blockedAudioEnv();
+  env.__getFiezelState = () => ({ preferences: { feedbackSounds: false } });
+  assert.strictEqual(sfx.prepare('splash_intro', env), false);
+  assert.strictEqual(sfx.playOnce('splash_intro', env, { windowMs: 3560 }), false);
+  assert.strictEqual(sfx.pendingMotif(), null, 'suara yang dimatikan murid tidak boleh disiagakan');
+  assert.strictEqual(env._ctx, null, 'suara yang dimatikan murid tidak boleh membuat konteks diam-diam');
 });
 
 process.on('exit', () => {
