@@ -90,6 +90,13 @@ AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
 # lewat `{skipped:'flag_off'}`. Owner menyalakannya dengan:
 #   wrangler deploy   (setelah mengubah nilai ini)  ATAU  var override di dashboard.
 ANALYTICS_ENABLED = "on"
+# Kill switch lane telemetri BELAJAR (fiezel-learning-event-v1). Default "off"
+# DENGAN SENGAJA: kontrak BRAIN-TELEMETRY-SCHEMA.md §5 mensyaratkan dedup
+# idempoten sebelum emitter pertama, jadi lane ini baru boleh menyala setelah
+# migrasi 0007_learning.sql diterapkan dan database_id LEARNING_DB terisi.
+# "off" = `POST /api/learning/events` tetap TERDAFTAR (menjawab 202
+# `{disabled:true}`, bukan 404) tetapi tidak satu baris pun ditulis.
+LEARNING_ENABLED = "off"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
@@ -125,6 +132,19 @@ database_id   = "<isi setelah: wrangler d1 create fiezel-stats>"
 # BUKAN dengan binding kedua ke database yang sama: dua binding ke satu database
 # membuat pembaca berikutnya mengira ada dua database, dan itu justru kebalikan
 # dari yang mau dijamin (pemisahan fisik kuota vs analytics).
+
+# D1 KETIGA untuk lane telemetri belajar (BRAIN-TELEMETRY-SCHEMA.md). Terpisah
+# dari fiezel-core (identitas) DAN fiezel-stats (kehadiran perangkat) dengan
+# alasan yang sama kerasnya: D1 tidak bisa JOIN lintas database, jadi "hasil
+# kebijakan Brain tidak bisa digabungkan dengan identitas atau token kehadiran"
+# menjadi sifat struktur, bukan disiplin orang. Tabelnya HANYA agregat harian
+# (learning_daily) + dedup UUID sekali-pakai ber-TTL (learning_dedup) — migrasi
+# 0007_learning.sql. Modul learning membaca `env.LEARNING_DB` TANPA fallback ke
+# binding lain (route-wiring.js:learningEnv).
+[[d1_databases]]
+binding       = "LEARNING_DB"
+database_name = "fiezel-learning"
+database_id   = "<isi setelah: wrangler d1 create fiezel-learning>"
 
 # --- KV: HANYA config/flag/state breaker + penanda anti-replay ber-TTL -------
 # PLAN GRATIS: 1.000 TULIS/HARI. Karena itu jalur panas DILARANG menulis ke KV.

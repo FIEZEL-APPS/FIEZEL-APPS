@@ -40,7 +40,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
 // diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
 // pernah membayar byte Thai.
-const SW_REV='m025-186-i18n-locale-layer-20260828';
+const SW_REV='m025-187-i18n-locale-layer-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -96,6 +96,12 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
   // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
   './features/i18n/fiezel-th-loader.js',
+  // brain-learning-infra: lima modul infrastruktur belajar + lane telemetri (config, events,
+  // queue, transport). Aturan sama dengan modul brain lain - masuk precache HANYA setelah
+  // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404, dan
+  // kesembilan berkas ini sudah ada. (Ingat: tanpa titik-koma di komentar blok ASSETS.)
+  './features/brain/fiezel-stat-gate.js','./features/brain/fiezel-brain-manifest.js','./features/brain/fiezel-brain-config.js','./features/brain/fiezel-learning-metrics.js','./features/brain/fiezel-metrics-digest.js',
+  './features/telemetry/fiezel-telemetry-config.js','./features/telemetry/fiezel-learning-events.js','./features/telemetry/fiezel-learning-queue.js','./features/telemetry/fiezel-learning-transport.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.
