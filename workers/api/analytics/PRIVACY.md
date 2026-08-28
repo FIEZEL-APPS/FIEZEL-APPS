@@ -29,8 +29,16 @@ perangkat aktif, 1.204 pertanyaan dijawab, 87 permintaan AI. Titik.
    menghitung sendiri:
    `visitor_token = HMAC-SHA256(pepper_hari_ini, installId)` dipotong 128 bit.
 3. Yang dikirim ke server **hanya token 32 karakter** itu. Server menghitung
-   token unik per hari → itulah angka pengguna aktif harian (DAU).
+   token unik per hari → itulah angka pengguna aktif harian (DAU). Token dicatat
+   dari perangkat yang **membuka aplikasi** (`app_open`) maupun yang mencapai
+   ambang aktif (`day_active`); keduanya di-dedup, jadi satu perangkat tetap
+   satu hitungan.
 4. Setiap 24 jam pepper diganti, dan **pepper lama dihapus permanen**.
+5. Pepper hari itu **dibuat saat pertama kali dibutuhkan** kalau belum ada
+   (mis. hari pertama basis data hidup), memakai penulisan idempoten di D1
+   sehingga dua permintaan bersamaan tidak mungkin menghasilkan dua pepper
+   berbeda. Pembuatan pertama ini **bukan rotasi**: ia tidak menyentuh
+   `previous` dan tidak menggeser irama rotasi harian.
 
 Akibatnya: token hari Senin dan token hari Selasa dari perangkat yang sama
 terlihat sebagai dua nilai acak yang tidak berhubungan. Server tidak bisa
@@ -171,7 +179,14 @@ maksimal:
    dan jawaban dilaporkan perangkat karena server tidak melihatnya. Angkanya
    bisa lebih rendah kalau aplikasi ditutup sebelum data terkirim, atau saat
    perangkat lama offline. Dashboard menandainya `self-reported`.
-6. **Angka historis dimulai dari nol.** Sebelum fitur ini menyala, tidak ada
+6. **Perangkat yang aktif melewati batas rotasi bisa terhitung dua kali pada
+   hari yang sama.** Rotasi pepper terjadi pukul 00:05 WIB (17:05 UTC),
+   sedangkan tanggal (`day`) dihitung dalam UTC. Perangkat yang aktif sebelum
+   dan sesudah 17:05 UTC menghasilkan dua token untuk `day` UTC yang sama, dan
+   keduanya terhitung. Ini menaikkan DAU sedikit pada hari-hari sibuk. Ini
+   keadaan yang ada sekarang, bukan yang diinginkan; memperbaikinya menuntut
+   menyelaraskan batas hari dengan batas rotasi.
+7. **Angka historis dimulai dari nol.** Sebelum fitur ini menyala, tidak ada
    event yang pernah dikumpulkan. Dashboard menampilkan tanggal mulai
    pengumpulan agar tidak terlihat seperti "penggunanya baru sedikit".
 

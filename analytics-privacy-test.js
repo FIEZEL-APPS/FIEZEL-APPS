@@ -13,6 +13,11 @@
  *  4. Pepper lama benar-benar dihapus (rotasi dua kali → pepper pertama hilang).
  *  5. NOL tabel per-orang: tidak ada kolom `user_id`/`install_id` di tabel
  *     analytics mana pun, dan tidak ada kueri yang menyebut tabel kuota.
+ *  6. COLD START (A5): pepper ADA pada permintaan PERTAMA di basis data KOSONG,
+ *     dua permintaan bersamaan menghasilkan SATU pepper yang sama, inisialisasi
+ *     bukan rotasi, rotasi harian tetap tepat waktu sesudahnya, pepper tidak
+ *     pernah muncul di log/amplop galat, dan `dau_dedup` bertambah tepat satu
+ *     per perangkat unik per hari.
  *
  * Otoritas kontrak: `EXEC-BRIEF-CF.md` bagian KONTRAK ANALYTICS PRIVASI-MAKSIMAL.
  */
@@ -293,6 +298,355 @@ const PER_PERSON_COLUMNS = ['user_id', 'install_id', 'installid', 'account_id', 
     [/wau_lower|rentang/i, 'kejujuran WAU/MAU sebagai rentang']
   ];
   for (const [re, label] of wajibAda) check(`PRIVACY.md memuat ${label}`, re.test(priv));
+
+  /* =====================================================================
+   * 8. COLD START PEPPER (A5)
+   * ---------------------------------------------------------------------
+   * Kasus yang tidak pernah diuji siapa pun: basis data analytics BARU.
+   * Sebelum perbaikan A5, pepper hanya dibuat rollup harian, jadi
+   * `GET /api/usage/pepper` menjawab 503 sampai cron 00:05 WIB pertama lewat.
+   * Klien butuh pepper untuk menurunkan `visitor_token`; tanpa token,
+   * `dau_dedup` kosong dan DAU hari pertama SELALU nol. Bagian ini menuntut
+   * enam hal, dan setiap assert di sini sudah dibuktikan bisa MERAH lewat
+   * mutasi terarah (`_a5_redproof.sh`).
+   * ===================================================================== */
+  const routes = await import('./workers/api/analytics/route-events.js');
+  const rollup = await import('./workers/api/analytics/rollup.js');
+
+  /**
+   * Tiruan D1 seminimal mungkin, TAPI dengan dua sifat yang menentukan:
+   *  - `initPepper` menghormati `ON CONFLICT(id) DO NOTHING`: baris pepper hanya
+   *    bisa lahir sekali. Kalau kode berubah jadi cek-lalu-tulis (`writePepper`),
+   *    tiruan ini akan MENCATAT tulis kedua yang mengubah baris.
+   *  - `stats.pepperRowWrites` hanya naik saat baris pepper benar-benar BERUBAH,
+   *    bukan saat pernyataan dijalankan. Inilah pembeda "idempoten" dari
+   *    "kebetulan hasilnya sama".
+   * `raceOn` menahan DUA pembacaan pepper pertama sampai keduanya tiba, supaya
+   * balapan yang di produksi butuh dua isolate bisa dipaksa terjadi di sini.
+   */
+  function makeDb(SQL, opts = {}) {
+    const t = { metrics: new Map(), usage: new Map(), retention: new Map(), dau: new Set(), pepper: null };
+    const stats = { pepperRowWrites: 0, initAttempts: 0, unconditionalPepperWrites: 0 };
+    let arrivals = 0;
+    let release = null;
+    const barrier = new Promise(r => { release = r; });
+
+    async function gateReads(sql) {
+      if (!opts.raceOn || sql !== SQL.readPepper || arrivals >= 2) return;
+      arrivals += 1;
+      if (arrivals >= 2) release();
+      await barrier;
+    }
+
+    function setPepper(row) {
+      const before = t.pepper ? JSON.stringify(t.pepper) : '';
+      t.pepper = row;
+      if (JSON.stringify(row) !== before) stats.pepperRowWrites += 1;
+    }
+
+    function exec(sql, params) {
+      switch (sql) {
+        case SQL.upsertMetric: {
+          const k = `${params[0]}|${params[1]}`;
+          t.metrics.set(k, (t.metrics.get(k) || 0) + params[2]);
+          return { results: [] };
+        }
+        case SQL.setMetric:
+          t.metrics.set(`${params[0]}|${params[1]}`, params[2]);
+          return { results: [] };
+        case SQL.setMetricMax: {
+          const k = `${params[0]}|${params[1]}`;
+          t.metrics.set(k, Math.max(t.metrics.get(k) ?? -Infinity, params[2]));
+          return { results: [] };
+        }
+        case SQL.upsertUsage: {
+          const k = `${params[0]}|${params[1]}`;
+          t.usage.set(k, (t.usage.get(k) || 0) + params[2]);
+          return { results: [] };
+        }
+        case SQL.upsertRetention: {
+          const k = `${params[0]}|${params[1]}`;
+          t.retention.set(k, (t.retention.get(k) || 0) + params[2]);
+          return { results: [] };
+        }
+        case SQL.insertDauToken:
+          t.dau.add(`${params[0]}|${params[1]}`); // INSERT OR IGNORE = himpunan
+          return { results: [] };
+        case SQL.countDauTokens:
+          return { results: [{ n: [...t.dau].filter(k => k.startsWith(`${params[0]}|`)).length }] };
+        case SQL.countUsageRows:
+          return { results: [{ n: [...t.usage.keys()].filter(k => k.startsWith(`${params[0]}|`)).length }] };
+        case SQL.purgeDauDay:
+          for (const k of [...t.dau]) if (k.startsWith(`${params[0]}|`)) t.dau.delete(k);
+          return { results: [] };
+        case SQL.purgeDauOlderThan:
+          for (const k of [...t.dau]) if (k.split('|')[0] <= params[0]) t.dau.delete(k);
+          return { results: [] };
+        case SQL.readMetricRange: {
+          const out = [];
+          for (const [k, v] of t.metrics) {
+            const [day, metric] = k.split('|');
+            if (metric === params[0] && day >= params[1] && day <= params[2]) out.push({ day, value: v });
+          }
+          out.sort((a, b) => (a.day < b.day ? -1 : 1));
+          return { results: out };
+        }
+        case SQL.purgeUsageOlderThan:
+          for (const k of [...t.usage.keys()]) if (k.split('|')[0] < params[0]) t.usage.delete(k);
+          return { results: [] };
+        case SQL.purgeRetentionOlderThan:
+          for (const k of [...t.retention.keys()]) if (k.split('|')[0] < params[0]) t.retention.delete(k);
+          return { results: [] };
+        case SQL.readPepper:
+          return { results: t.pepper ? [{ ...t.pepper }] : [] };
+        case SQL.initPepper:
+          // ON CONFLICT(id) DO NOTHING: baris yang sudah ada TIDAK disentuh.
+          stats.initAttempts += 1;
+          if (t.pepper) return { results: [] };
+          setPepper({ rotated_at: params[0], current: params[1], previous: null });
+          return { results: [] };
+        case SQL.writePepper:
+          // Tulis tanpa syarat (dipakai rollup saat rotasi). Kalau jalur
+          // permintaan memakai ini, penghitung di bawah membuka kedoknya.
+          stats.unconditionalPepperWrites += 1;
+          setPepper({ rotated_at: params[0], current: params[1], previous: params[2] });
+          return { results: [] };
+        default:
+          throw new Error(`SQL tak dikenal oleh tiruan D1:\n${sql}`);
+      }
+    }
+
+    return {
+      tables: t,
+      stats,
+      prepare(sql) {
+        const mk = params => ({
+          async run() { await gateReads(sql); return exec(sql, params); },
+          async all() { await gateReads(sql); return exec(sql, params); },
+          async first() { await gateReads(sql); return exec(sql, params).results[0] || null; }
+        });
+        return Object.assign({ bind: (...params) => mk(params) }, mk([]));
+      },
+      async batch(stmts) { for (const s of stmts) await s.run(); }
+    };
+  }
+
+  const HARI_MS = 24 * 60 * 60 * 1000;
+  const pepperReq = () => new Request('https://api.fiezel.my.id/api/usage/pepper', {
+    method: 'GET',
+    headers: { 'cf-connecting-ip': `198.51.100.${Math.floor(Math.random() * 200) + 1}` }
+  });
+  const envOn = db => ({ ANALYTICS_ENABLED: 'on', ANALYTICS_DB: db });
+
+  /* --- (a) pepper ADA pada permintaan pertama di basis data KOSONG --------- */
+  const tInit = Date.parse('2026-08-26T03:00:00Z'); // 10:00 WIB, jauh dari cron
+  const dbCold = makeDb(store.SQL);
+  check('(a) basis data benar-benar kosong sebelum permintaan pertama',
+    dbCold.tables.pepper === null, JSON.stringify(dbCold.tables.pepper));
+
+  const res1 = await routes.handlePepper(pepperReq(), envOn(dbCold), null, tInit);
+  const body1 = await res1.clone().json();
+  check('(a) permintaan pepper PERTAMA di basis data kosong menjawab 200 (bukan 503)',
+    res1.status === 200, `${res1.status} ${JSON.stringify(body1)}`);
+  check('(a) permintaan pertama benar-benar menyajikan pepper yang bisa dipakai klien',
+    typeof body1.pepper === 'string' && /^[0-9a-f]{64}$/.test(body1.pepper),
+    String(body1.pepper && body1.pepper.length));
+  const pepperHari1 = typeof body1.pepper === 'string' ? body1.pepper : '';
+  // `safe` dipakai untuk semua turunan di bawah: kalau (a) sudah merah, sisa
+  // bagian ini harus IKUT merah dengan nama assert-nya sendiri, bukan meledak
+  // dan meninggalkan laporan lama (yang membuat mutasi terlihat hijau).
+  const safe = async fn => { try { return await fn(); } catch { return null; } };
+  check('(a) pepper hari-1 bisa menurunkan visitor_token yang sah',
+    core.VISITOR_TOKEN_PATTERN.test(String(await safe(() => core.visitorToken(pepperHari1, installA)))));
+
+  /* --- (b) dua permintaan bersamaan => SATU pepper yang sama -------------- */
+  const dbRace = makeDb(store.SQL, { raceOn: true });
+  const [rA, rB] = await Promise.all([
+    routes.handlePepper(pepperReq(), envOn(dbRace), null, tInit),
+    routes.handlePepper(pepperReq(), envOn(dbRace), null, tInit)
+  ]);
+  const [bA, bB] = [await rA.json(), await rB.json()];
+  check('(b) dua permintaan bersamaan keduanya berhasil', rA.status === 200 && rB.status === 200,
+    `${rA.status}/${rB.status}`);
+  check('(b) dua permintaan bersamaan menyajikan SATU pepper yang SAMA',
+    typeof bA.pepper === 'string' && bA.pepper === bB.pepper,
+    `${String(bA.pepper).slice(0, 6)}… vs ${String(bB.pepper).slice(0, 6)}…`);
+  check('(b) pepper yang disajikan = pepper yang benar-benar tersimpan (bukan calon lokal)',
+    !!dbRace.tables.pepper && bA.pepper === dbRace.tables.pepper.current && bB.pepper === dbRace.tables.pepper.current,
+    'setidaknya satu penyaji tidak membaca ulang');
+  check('(b) baris pepper hanya BERUBAH sekali walau dua penulis mencoba bersamaan',
+    dbRace.stats.pepperRowWrites === 1 && dbRace.stats.initAttempts === 2,
+    JSON.stringify(dbRace.stats));
+  check('(b) jalur permintaan tidak pernah memakai tulis tanpa syarat (writePepper)',
+    dbRace.stats.unconditionalPepperWrites === 0, String(dbRace.stats.unconditionalPepperWrites));
+  const initSql = String(store.SQL.initPepper || '').toLowerCase();
+  check('(b) inisialisasi memakai penulisan idempoten yang DIJAMIN D1 (ON CONFLICT DO NOTHING)',
+    /insert into pepper_state/.test(initSql) && /on conflict\s*\(\s*id\s*\)\s*do nothing/.test(initSql),
+    initSql);
+  const storeSrc = stripJsComments(read('analytics-store-d1.js'));
+  const ensureBody = (storeSrc.match(/export async function ensurePepperState[\s\S]*?\n}/) || [''])[0];
+  check('(b) ensurePepperState tidak memanggil writePepper (cek-lalu-tulis yang balapan)',
+    ensureBody.length > 0 && !/writePepper/.test(ensureBody), ensureBody.slice(0, 160));
+  check('(b) ensurePepperState MEMBACA ULANG sesudah menulis',
+    (ensureBody.match(/readPepperState\s*\(/g) || []).length >= 2, ensureBody.slice(0, 200));
+
+  /* --- (c) inisialisasi BUKAN rotasi -------------------------------------- */
+  const stateInit = dbCold.tables.pepper || { rotated_at: -1, current: null, previous: 'TIDAK ADA BARIS' };
+  check('(c) inisialisasi tidak mengarang `previous` (belum ada pendahulu)',
+    stateInit.previous === null, String(stateInit.previous));
+  // Dua lapis, karena satu lapis saja bisa menutupi mutasi: fungsi murninya
+  // TIDAK boleh mengarang `previous`, DAN pernyataan SQL-nya menulis NULL apa
+  // pun yang dikirim pemanggil.
+  check('(c) initialPepperState() murni: `previous` null dan `rotated_at` = awal jendela',
+    (() => {
+      const s = core.initialPepperState(tInit, 'z'.repeat(64));
+      return s.previous === null && s.rotated_at === core.pepperWindowStart(tInit) && s.current === 'z'.repeat(64);
+    })(), JSON.stringify(core.initialPepperState(tInit, 'z'.repeat(64)).previous));
+  check('(c) SQL inisialisasi menulis `previous` sebagai NULL literal (bukan parameter)',
+    /values\s*\(\s*1\s*,\s*\?1\s*,\s*\?2\s*,\s*null\s*\)/i.test(String(store.SQL.initPepper)),
+    String(store.SQL.initPepper));
+  // Batas jendela ditulis sebagai KONSTANTA LITERAL, bukan diambil dari
+  // implementasi. Kalau jangkar jendela digeser (mis. jadi tengah malam UTC),
+  // assert di bawah dan seluruh bagian (d) WAJIB merah — bukan ikut bergeser.
+  const windowStart = Date.parse('2026-08-25T17:05:00Z'); // cron `5 17 * * *` terakhir
+  check('(c) `rotated_at` inisialisasi = awal jendela cron, BUKAN `now`',
+    stateInit.rotated_at === windowStart && stateInit.rotated_at < tInit,
+    `${stateInit.rotated_at} vs window ${windowStart} vs now ${tInit}`);
+  check('(c) pepperWindowStart() memang batas cron 17:05 UTC (00:05 WIB) terakhir',
+    core.pepperWindowStart(tInit) === windowStart, new Date(core.pepperWindowStart(tInit)).toISOString());
+  // Rollup di TENGAH jendela yang sama tidak boleh merotasi: rotasi tengah hari
+  // membuat satu perangkat menghitung dua token pada `day` yang sama.
+  const midRollup = await rollup.runDailyRollup(dbCold, { now: tInit + 6 * 3600000, day: '2026-08-26' });
+  check('(c) rollup di tengah jendela TIDAK merotasi pepper hasil inisialisasi',
+    midRollup.pepperRotated === false, JSON.stringify(midRollup.pepperRotated));
+  check('(c) rollup tengah jendela tidak mengubah `rotated_at` maupun `current`',
+    dbCold.tables.pepper.rotated_at === windowStart && dbCold.tables.pepper.current === pepperHari1,
+    JSON.stringify({ rotated_at: dbCold.tables.pepper.rotated_at, sama: dbCold.tables.pepper.current === pepperHari1 }));
+  check('(c) permintaan pepper berikutnya tidak menambah tulis (inisialisasi sekali saja)',
+    (await (await routes.handlePepper(pepperReq(), envOn(dbCold), null, tInit + 3600000)).json()).pepper === pepperHari1 &&
+      dbCold.stats.pepperRowWrites === 1,
+    JSON.stringify(dbCold.stats));
+
+  /* --- (d) rotasi harian tetap tepat waktu sesudah inisialisasi malas ----- */
+  const cron1 = Date.parse('2026-08-26T17:05:00Z'); // jalan cron berikutnya
+  check('(d) umur pepper hasil inisialisasi tepat 24 jam pada cron BERIKUTNYA',
+    core.rotatePepperDue(cron1, stateInit.rotated_at) === true &&
+      core.rotatePepperDue(cron1 - 60000, stateInit.rotated_at) === false,
+    `${cron1 - stateInit.rotated_at}`);
+  const roll1 = await rollup.runDailyRollup(dbCold, { now: cron1, day: '2026-08-26' });
+  const stateHari2 = dbCold.tables.pepper || {};
+  check('(d) cron berikutnya MEROTASI pepper (tidak ada hari yang terlewat)',
+    roll1.pepperRotated === true, JSON.stringify(roll1.pepperRotated));
+  check('(d) sesudah rotasi, pepper hari-1 pindah ke `previous` dan `current` berganti',
+    !!pepperHari1 && stateHari2.previous === pepperHari1 && stateHari2.current !== pepperHari1,
+    'rotasi tidak mengganti current');
+  check('(d) `rotated_at` maju tepat ke batas cron',
+    stateHari2.rotated_at === cron1, `${stateHari2.rotated_at} vs ${cron1}`);
+  const tokenHari1 = await safe(() => core.visitorToken(pepperHari1, installA));
+  const tokenHari2 = await safe(() => core.visitorToken(stateHari2.current, installA));
+  check('(d) token hari-1 TIDAK bisa disambungkan ke token hari-2 (perangkat sama, token beda)',
+    !!tokenHari1 && !!tokenHari2 && tokenHari1 !== tokenHari2, 'token bertahan lintas rotasi');
+  const roll2 = await rollup.runDailyRollup(dbCold, { now: cron1 + HARI_MS, day: '2026-08-27' });
+  check('(d) rotasi berikutnya juga terjadi tepat waktu (irama harian pulih penuh)',
+    roll2.pepperRotated === true, JSON.stringify(roll2.pepperRotated));
+  check('(d) pepper hari-1 HILANG PERMANEN dua putaran kemudian',
+    !JSON.stringify(dbCold.tables.pepper).includes(pepperHari1), 'pepper hari-1 masih ada di state');
+
+  /* --- (e) pepper tidak pernah muncul di log / amplop galat --------------- */
+  // Pindai SUMBER, bukan hanya jalankan: satu `console.log(state)` yang tidak
+  // pernah dieksekusi di jalur uji tetap membocorkan rahasia di produksi.
+  const logHits = [];
+  const envelopeHits = [];
+  const responseFieldHits = [];
+  for (const rel of modules) {
+    const src = stripJsComments(read(rel));
+    for (const m of src.matchAll(/console\.[a-z]+\s*\(([\s\S]{0,200}?)\)\s*;/g)) {
+      if (/pepper|\.current\b/i.test(m[1])) logHits.push(`${rel}: ${m[0].slice(0, 80)}`);
+    }
+    for (const m of src.matchAll(/\{[^{}]*\berror\s*:[^{}]*\}/g)) {
+      if (/pepper/i.test(m[0])) envelopeHits.push(`${rel}: ${m[0].slice(0, 80)}`);
+    }
+    // `pepper:` sebagai KUNCI objek (tanpa spasi sebelum titik dua), supaya
+    // ternary `? pepper : newPepper()` tidak ikut terhitung.
+    for (const m of src.matchAll(/(^|[^\w.])pepper:/gm)) responseFieldHits.push(`${rel}:${m.index}`);
+  }
+  check('(e) tidak ada satu pun panggilan console yang menyebut pepper/state.current',
+    logHits.length === 0, logHits.join(' | '));
+  check('(e) tidak ada amplop galat yang memuat field pepper',
+    envelopeHits.length === 0, envelopeHits.join(' | '));
+  const pepperHandler = (stripJsComments(read('route-events.js')).match(/export async function handlePepper[\s\S]*?\n}/) || [''])[0];
+  check('(e) field `pepper:` hanya muncul SEKALI di seluruh kode analytics, di handlePepper',
+    responseFieldHits.length === 1 && /pepper\s*:\s*state\.current/.test(pepperHandler),
+    responseFieldHits.join(','));
+
+  // Bukti runtime: sadap console selama seluruh jalur (inisialisasi, sukses,
+  // galat, rate-limit, rollup+rotasi) dan tuntut pepper tidak pernah tercetak.
+  const sadap = [];
+  const aslinya = {};
+  for (const k of ['log', 'info', 'warn', 'error', 'debug', 'trace']) {
+    aslinya[k] = console[k];
+    console[k] = (...args) => { sadap.push(args.map(a => { try { return typeof a === 'string' ? a : JSON.stringify(a); } catch { return String(a); } }).join(' ')); };
+  }
+  let amplopGalat = [];
+  try {
+    const dbLog = makeDb(store.SQL);
+    const r200 = await routes.handlePepper(pepperReq(), envOn(dbLog), null, tInit);
+    const p = (await r200.json()).pepper || '\u0000tidak-ada-pepper';
+    // amplop galat dari SEMUA jalur yang bisa gagal sesudah pepper ada
+    amplopGalat.push(await (await routes.handlePepper(pepperReq(), { ANALYTICS_ENABLED: 'on' }, null, tInit)).text());
+    amplopGalat.push(await (await routes.handlePepper(pepperReq(), { ANALYTICS_ENABLED: 'off' }, null, tInit)).text());
+    amplopGalat.push(await (await routes.handleEvents(
+      new Request('https://api.fiezel.my.id/api/usage/events', { method: 'POST', headers: { 'cf-connecting-ip': '198.51.100.7' }, body: '{"schema":"salah"}' }),
+      envOn(dbLog), null, tInit)).text());
+    await rollup.runDailyRollup(dbLog, { now: tInit + HARI_MS, day: '2026-08-26' });
+    const bocorLog = sadap.filter(line => line.includes(p));
+    const bocorAmplop = amplopGalat.filter(text => text.includes(p));
+    check('(e) pepper tidak pernah tercetak ke log di jalur mana pun (bukti runtime)',
+      bocorLog.length === 0, bocorLog.join(' | ').slice(0, 200));
+    check('(e) pepper tidak pernah muncul di amplop galat (503/404/400)',
+      bocorAmplop.length === 0, amplopGalat.join(' | ').slice(0, 200));
+  } finally {
+    for (const k of Object.keys(aslinya)) console[k] = aslinya[k];
+  }
+
+  /* --- (f) dau_dedup: tepat satu baris per perangkat unik per hari -------- */
+  const HARI_DAU = '2026-08-26';
+  const tokA = 'a1'.repeat(16);
+  const tokB = 'b2'.repeat(16);
+  const ev = (name, token, extra = {}) => {
+    const r = core.normalizeEvent(Object.assign({ name, day: HARI_DAU, visitor_token: token }, extra), { origin: 'client' });
+    if (!r.ok) throw new Error(`event uji tidak sah: ${name} ${r.reason}`);
+    return r.event;
+  };
+
+  const dbDau = makeDb(store.SQL);
+  await store.applyAggregate(dbDau, core.aggregate([ev('app_open', tokA, { platform: 'android' })]));
+  check('(f) satu perangkat yang HANYA mengirim app_open tetap terhitung DAU',
+    (await store.countDauTokens(dbDau, HARI_DAU)) === 1, String(await store.countDauTokens(dbDau, HARI_DAU)));
+
+  await store.applyAggregate(dbDau, core.aggregate([
+    ev('app_open', tokA, { platform: 'android' }),
+    ev('day_active', tokA, { attempts_bucket: '10-29' }),
+    ev('app_open', tokA, { platform: 'android' })
+  ]));
+  check('(f) perangkat yang SAMA tidak bertambah dua kali (app_open + day_active + kirim ulang)',
+    (await store.countDauTokens(dbDau, HARI_DAU)) === 1, String(await store.countDauTokens(dbDau, HARI_DAU)));
+
+  await store.applyAggregate(dbDau, core.aggregate([ev('day_active', tokB, { attempts_bucket: '5-9' })]));
+  check('(f) perangkat UNIK kedua menambah tepat satu',
+    (await store.countDauTokens(dbDau, HARI_DAU)) === 2, String(await store.countDauTokens(dbDau, HARI_DAU)));
+
+  const aggDua = core.aggregate([ev('app_open', tokA), ev('day_active', tokA)]);
+  check('(f) aggregate() sendiri sudah men-dedup (day, token) sebelum menyentuh D1',
+    aggDua.dau.length === 1, JSON.stringify(aggDua.dau));
+  check('(f) angka keterlibatan tidak hilang: `day_active_reports` tetap terpisah dari DAU',
+    (aggDua.metrics[HARI_DAU] || {}).day_active_reports === 1 && (aggDua.metrics[HARI_DAU] || {}).app_open === 1,
+    JSON.stringify(aggDua.metrics[HARI_DAU]));
+
+  const rollDau = await rollup.runDailyRollup(dbDau, { now: Date.parse('2026-08-27T17:05:00Z'), day: HARI_DAU });
+  check('(f) rollup menulis DAU = jumlah perangkat unik, lalu token dihapus',
+    rollDau.dau === 2 && dbDau.tables.dau.size === 0 && dbDau.tables.metrics.get(`${HARI_DAU}|dau`) === 2,
+    JSON.stringify({ dau: rollDau.dau, sisaToken: dbDau.tables.dau.size }));
 
   finish();
 

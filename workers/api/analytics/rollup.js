@@ -206,6 +206,19 @@ export async function runDailyRollup(db, opts = {}) {
   summary.purged.push('dau_dedup');
 
   // 4. Rotasi pepper bila jatuh tempo.
+  //
+  // Sesudah inisialisasi malas (`ensurePepperState`, dipakai jalur
+  // `GET /api/usage/pepper`), state di sini biasanya SUDAH ada dengan
+  // `rotated_at` = awal jendela cron terakhir. Umurnya pada cron berikutnya
+  // karena itu tepat 24 jam -> `rotatePepperDue` true -> rotasi terjadi tepat
+  // waktu, tanpa hari yang terlewat dan tanpa rotasi tengah hari. Rollup TETAP
+  // satu-satunya tempat rotasi terjadi; inisialisasi tidak pernah dilaporkan
+  // sebagai `pepperRotated`.
+  //
+  // Kalau state masih benar-benar kosong saat cron jalan (mis. tidak ada satu
+  // pun murid membuka aplikasi sebelum 00:05 WIB), jalur di bawah tetap membuat
+  // pepper pertama. Pada kasus itu "membuat" dan "merotasi" jatuh di instan yang
+  // sama (batas jendela), jadi pelaporannya tidak menyesatkan.
   const state = await readPepperState(db);
   if (rotatePepperDue(now, state && state.rotated_at)) {
     const next = rotatePepper(state, now, opts.pepper || newPepper());
