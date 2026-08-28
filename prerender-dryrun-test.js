@@ -163,8 +163,8 @@ try {
   check('Hanya workflow_dispatch (tidak ada push/schedule yang bisa membelanjakan uang sendiri)',
     /^on:\s*$/m.test(wf) && /workflow_dispatch:/.test(wf) && !/^\s{2}(push|schedule|pull_request):/m.test(wf),
     'hanya manual');
-  check('Gate aktor github.actor == fitrajft-ux terpasang',
-    /github\.actor\s*==\s*'fitrajft-ux'/.test(wf), 'owner saja');
+  check('Gate aktor github.actor == FIEZEL-APPS terpasang',
+    /github\.actor\s*==\s*'FIEZEL-APPS'/.test(wf), 'owner saja');
   check('Input apply bawaan KOSONG (dry-run adalah keadaan bawaan)',
     /apply:[\s\S]{0,220}default:\s*''/.test(wf), "default ''");
   check('Produksi hanya jalan bila apply == APPLY',

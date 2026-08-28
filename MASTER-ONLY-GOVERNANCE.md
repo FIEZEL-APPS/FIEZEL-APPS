@@ -1,7 +1,7 @@
 # FIEZEL MASTER-ONLY WRITE AUTHORITY
 
 Status: ENFORCED POLICY
-Owner identity: `fitrajft-ux`
+Owner identity: `FIEZEL-APPS`
 Control model: single MASTER executor; all other internal/external helpers are advisory-only.
 
 ## 1. Sole write authority
@@ -28,7 +28,7 @@ They must not mutate repository contents, branches, PR state, releases, deployme
 Their output is evidence for the MASTER; it is never an autonomous approval or execution authority.
 
 ## 4. Sensitive workflow boundary
-Deployment/configuration workflows must be manual-only and fail closed unless the GitHub actor is the owner identity `fitrajft-ux`.
+Deployment/configuration workflows must be manual-only and fail closed unless the GitHub actor is the owner identity `FIEZEL-APPS`.
 No push-triggered autonomous deployment/configuration is permitted.
 Product runtime automation that is not a repository/deployment decision (for example scheduled end-user reminder delivery) may continue only within its bounded runtime contract and must not mutate repository state.
 
@@ -44,13 +44,13 @@ Required flow for any material change:
 No helper may skip from step 1/5 to execution.
 
 ## 6. Identity limitation
-GitHub sees owner-authenticated writes as the account `fitrajft-ux`. GitHub cannot cryptographically distinguish a MASTER action from another process that has stolen or reused the same owner credential. Therefore credential custody remains a hard security boundary: owner credentials/tokens must not be shared with helpers or external agents.
+GitHub sees owner-authenticated writes as the account `FIEZEL-APPS`. GitHub cannot cryptographically distinguish a MASTER action from another process that has stolen or reused the same owner credential. Therefore credential custody remains a hard security boundary: owner credentials/tokens must not be shared with helpers or external agents.
 
 ## 7. Enforcement checks
 - Direct collaborator inventory must remain owner-only unless the MASTER explicitly changes policy.
 - CI/verifier workflows must use read-only GitHub permissions.
 - Sensitive deploy/configure workflows must be manual-only and owner-actor gated.
-- `MASTER Authority Guard` must fail any observed `main` push whose `github.actor` is not `fitrajft-ux`.
-- CODEOWNERS designates `@fitrajft-ux` as sole code owner.
+- `MASTER Authority Guard` must fail any observed `main` push whose `github.actor` is not `FIEZEL-APPS`.
+- CODEOWNERS designates `@FIEZEL-APPS` as sole code owner.
 
 Any violation is a BLOCKER and invalidates autonomous promotion until reviewed by the MASTER.
