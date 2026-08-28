@@ -33,6 +33,24 @@
  *   - exam_score_tick menaiki playbackRate lewat opsi {rate} - satu aset, bukan tangga berkas.
  *   - Nama asing: console.warn sekali per nama, lalu diam - antarmuka tidak pernah rusak
  *     hanya karena bunyinya tidak dikenal.
+ *
+ * AUDIT SPLASH-SFX 2026-08-28 (zero-gesture-first):
+ *   Temuan: splash_intro TIDAK PERNAH diminta di boot nyata (ketukan t=0 dibuang penjaga
+ *   basi karena jam splash mulai pada offset waktu boot), dan kalaupun diminta, play()
+ *   membuang bunyi terblokir tanpa jalur ulang-main - slot siaga lama terpatri ke
+ *   paw_greet. Bunyi "setelah dua ketukan" yang dilaporkan OWNER adalah paw_greet, bukan
+ *   splash_intro. Perbaikan di berkas ini SELURUHNYA ADITIF:
+ *   - prepare(name): konteks + dekode disiapkan SEDINI mungkin. Di lingkungan yang
+ *     mengizinkan autoplay (PWA terpasang Android/desktop, MEI tinggi) konteks lahir
+ *     'running' - itulah jalur zero-gesture. decodeAudioData bekerja pada konteks
+ *     suspended: IZIN dan PERSIAPAN adalah dua hal terpisah. Tidak ada nada yang
+ *     dijadwalkan dari sini (m025-84 utuh).
+ *   - playOnce(name, env, {windowMs}): coba TANPA GESTUR lebih dulu; bila terblokir,
+ *     disiagakan dengan tenggat lalu berbunyi pada resume() yang berhasil, statechange →
+ *     'running', ATAU gestur asli pertama - mana yang lebih dulu. TANPA gestur sintetis.
+ *   - Slot siaga digeneralisasi (armPending berkunci nama); jalur terkonfirmasi mencatat
+ *     jatah SETELAH sumber benar-benar start, supaya percobaan gagal tidak membakar
+ *     cooldown. play()/playMotif()/unlock() lama tidak berubah perilaku.
  */
 (function (root, factory) {
   var api = factory();
@@ -184,6 +202,14 @@
   // Berapa lama sebuah SFX transisi masih relevan setelah diminta (resume() asinkron).
   var GESTURE_GRACE_MS = 350;
   var DEFAULT_MOTIF_WINDOW_MS = 2600;
+  // Fase nada pembuka splash, untuk panel Diagnostics (audit 2026-08-28): IDLE →
+  // AUDIO_PREPARING → SFX_READY → AUTOPLAY_ATTEMPT → PLAYED, atau AUTOPLAY_BLOCKED →
+  // (izin/gestur) → PLAYED; jalur keluar lain: EXPIRED / CANCELLED / DISABLED.
+  var introPhase = 'IDLE', introPhaseAt = 0;
+  function noteIntroPhase(p) { introPhase = p; introPhaseAt = Date.now(); }
+  // Pagar sekali-per-jendela playOnce: satu tayangan splash = maksimal satu bunyi.
+  var onceGate = {};
+  var stateWatchBound = false;
 
   function preferencesAllow(env) {
     try {
@@ -356,6 +382,35 @@
   }
 
   /**
+   * Varian trigger() untuk bunyi sekali-per-tayangan (nada pembuka splash + bunyi yang
+   * disiagakan): jatah (cooldown/kuota sesi) dicatat SETELAH sumbernya benar-benar
+   * start, bukan saat mencoba. Percobaan yang gagal - konteks belum boleh berbunyi,
+   * unduhan telat - tidak membakar cooldown, jadi izin/gestur berikutnya masih berhak
+   * membunyikannya (temuan audit: percobaan terblokir membakar cooldown 3 dtk
+   * splash_intro dan jatah sesi paw_greet). trigger() lama TIDAK diubah: SFX transisi
+   * memang buang-bila-telat dan mencatat jatah di muka.
+   */
+  function triggerConfirmed(env, name, opts, windowMs) {
+    if (!rationAllows(name)) return false;
+    var deadline = Date.now() + (isFinite(windowMs) ? windowMs : GESTURE_GRACE_MS);
+    if (buffers[name]) {
+      try {
+        var ok = startBuffer(name, opts);
+        if (ok) { noteRation(name); if (name === 'splash_intro') noteIntroPhase('PLAYED'); }
+        return ok;
+      } catch (_) { return false; }
+    }
+    loadBuffer(env, name).then(function () {
+      if (!running() || Date.now() > deadline) return;
+      if (!rationAllows(name)) return;
+      try {
+        if (startBuffer(name, opts)) { noteRation(name); if (name === 'splash_intro') noteIntroPhase('PLAYED'); }
+      } catch (_) {}
+    }, function () { /* unduhan gagal = senyap, bukan antarmuka rusak */ });
+    return true;
+  }
+
+  /**
    * Keadaan nyata modul ini di perangkat, untuk dibaca lewat panel Diagnostics (m025-90:
    * yang bisa dilihat, sekarang bisa dilihat).
    */
@@ -368,6 +423,8 @@
       pernahDisentuh: userActivated(target),
       konteks: ctx ? String(ctx.state) : 'belum dibuat',
       motifDisiagakan: !!pending,
+      bunyiDisiagakan: pending ? String(pending.key || ALIASES.motif) : null,
+      faseIntroSplash: introPhase,
       webAudioTersedia: !!(target.AudioContext || target.webkitAudioContext),
       // Tidak bisa dideteksi dari web sama sekali; ditulis eksplisit supaya pembacanya tahu
       // ini titik buta, bukan sesuatu yang lupa diperiksa.
@@ -417,26 +474,128 @@
 
   function now() { return Date.now(); }
 
-  /** Menyiagakan sapaan signature dengan TENGGAT. Lewat tenggat, ia dibuang (m025-84). */
-  function armMotif(env, windowMs) {
-    pending = { env: env, expiresAt: now() + windowMs };
-    bindUnlock(env);
+  /**
+   * Izin autoplay bisa turun TERLAMBAT tanpa gestur (mis. PWA terpasang yang resume()-nya
+   * baru selesai setelah percobaan pertama). Perubahan statechange → 'running' membunyikan
+   * bunyi yang masih disiagakan - selama tenggatnya hidup. Ini BUKAN gestur sintetis:
+   * yang didengarkan hanya keputusan peramban sendiri atas konteksnya.
+   */
+  function bindStateWatch(env) {
+    if (stateWatchBound || !ctx || typeof ctx.addEventListener !== 'function') return;
+    stateWatchBound = true;
+    try {
+      ctx.addEventListener('statechange', function () { if (running()) firePending(env); });
+    } catch (_) { stateWatchBound = false; }
   }
+
+  /**
+   * Menyiagakan SATU bunyi BERNAMA dengan TENGGAT (m025-84: lewat tenggat, dibuang).
+   * Digeneralisasi dari slot motif lama (audit 2026-08-28): dulu slot ini terpatri ke
+   * paw_greet, sehingga splash_intro yang terblokir HILANG tanpa jalur ulang-main.
+   */
+  function armPending(env, key, windowMs) {
+    pending = { key: key, env: env, expiresAt: now() + windowMs };
+    bindUnlock(env);
+    bindStateWatch(env);
+  }
+
+  /** Kompatibilitas: sapaan signature lama tetap lewat slot yang sama. */
+  function armMotif(env, windowMs) { armPending(env, ALIASES.motif, windowMs); }
 
   function firePending(env) {
     if (!pending) return false;
-    if (now() > pending.expiresAt) { pending = null; return false; }
+    var key = pending.key || ALIASES.motif;
+    if (now() > pending.expiresAt) {
+      pending = null;
+      if (key === 'splash_intro') noteIntroPhase('EXPIRED');
+      return false;
+    }
     if (!ensureContext(env)) { pending = null; return false; }
     if (!running()) { resumeContext(); return false; }
     var armed = pending;
     pending = null;
     var msLeft = Math.max(200, armed.expiresAt - now());
-    try { return trigger(env, ALIASES.motif, null, msLeft); }
+    try { return triggerConfirmed(env, key, null, msLeft); }
     catch (_) { return false; }
   }
 
-  /** Membuang sapaan yang disiagakan. Dipanggil splash saat menutup. */
-  function cancelPending() { pending = null; return true; }
+  /** Membuang bunyi yang disiagakan. Dipanggil splash saat menutup. */
+  function cancelPending() {
+    if (pending && pending.key === 'splash_intro') noteIntroPhase('CANCELLED');
+    pending = null;
+    return true;
+  }
+
+  /**
+   * Menyiapkan audio SEDINI mungkin TANPA membunyikan apa pun: konteks dibuat (di
+   * lingkungan yang mengizinkan autoplay ia lahir 'running' - itulah jalur zero-gesture),
+   * lalu sampelnya diunduh dan didekode. decodeAudioData bekerja pada konteks suspended:
+   * IZIN dan PERSIAPAN adalah dua hal terpisah. m025-84 utuh - tidak ada satu nada pun
+   * yang dijadwalkan dari sini.
+   */
+  function prepare(name, env) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var key = resolve(name);
+    if (!key) return false;
+    if (!enabled || !preferencesAllow(target)) return false;
+    if (!ensureContext(target)) return false;
+    if (key === 'splash_intro' && introPhase === 'IDLE') noteIntroPhase('AUDIO_PREPARING');
+    try {
+      loadBuffer(target, key).then(function () {
+        if (key === 'splash_intro' && introPhase === 'AUDIO_PREPARING') noteIntroPhase('SFX_READY');
+      }, function () {});
+    } catch (_) { return false; }
+    return true;
+  }
+
+  /**
+   * Bunyi SEKALI-PER-TAYANGAN dengan percobaan TANPA-GESTUR LEBIH DULU (nada pembuka
+   * splash). Urutan sesuai audit 2026-08-28:
+   *   1. konteks + buffer disiapkan (prepare() boleh sudah berjalan lebih dulu);
+   *   2. konteks 'running' (autoplay diizinkan: PWA terpasang, MEI tinggi, atau sudah
+   *      pernah disentuh) → bunyikan SEKARANG, tanpa menunggu gestur;
+   *   3. konteks masih terkunci → DISIAGAKAN dengan tenggat = windowMs (umur splash),
+   *      lalu berbunyi pada resume() yang berhasil, statechange → 'running', ATAU
+   *      gestur asli pertama - mana yang lebih dulu.
+   * TANPA gestur sintetis. Pagar sekali-per-jendela + tenggat + cancelPending() (splash
+   * memanggilnya saat menutup) menjaga invarian: satu tayangan = maksimal satu bunyi,
+   * dan tidak ada bunyi liar setelah splash tertutup (m025-84).
+   */
+  function playOnce(name, env, options) {
+    var target = env || (typeof globalThis !== 'undefined' ? globalThis : {});
+    var key = resolve(name);
+    if (!key) {
+      if (!warned[name]) {
+        warned[name] = true;
+        try { console.warn('[FiezelUiSfx] bunyi tidak dikenal: "' + name + '" - tidak ada di manifest 27 SFX'); } catch (_) {}
+      }
+      return false;
+    }
+    var opts = options || {};
+    var windowMs = Number(opts.windowMs);
+    if (!isFinite(windowMs) || windowMs <= 0) windowMs = DEFAULT_MOTIF_WINDOW_MS;
+    if (!enabled || !preferencesAllow(target)) {
+      if (key === 'splash_intro') noteIntroPhase('DISABLED');
+      return false;
+    }
+    // Satu jendela hidup = satu permintaan. Autoplay + ketukan, remount, atau jalur
+    // ganda pemanggil tidak bisa menggandakan bunyinya.
+    if (now() < (onceGate[key] || 0)) return false;
+    onceGate[key] = now() + windowMs;
+    if (!ensureContext(target)) return false;
+    try { loadBuffer(target, key).catch(function () {}); } catch (_) {}
+    if (key === 'splash_intro') noteIntroPhase('AUTOPLAY_ATTEMPT');
+    if (running()) {
+      preloadHot(target);
+      try { return triggerConfirmed(target, key, null, windowMs); }
+      catch (_) { return false; }
+    }
+    if (key === 'splash_intro') noteIntroPhase('AUTOPLAY_BLOCKED');
+    armPending(target, key, windowMs);
+    var resumed = resumeContext();
+    if (resumed && typeof resumed.then === 'function') resumed.then(function () { firePending(target); }, function () {});
+    return false;
+  }
 
   /**
    * Membunyikan satu SFX. Selalu aman dipanggil: nama asing (warn sekali + diam), audio
@@ -527,10 +686,13 @@
     names: function () { return Object.keys(MANIFEST); },
     play: play,
     playMotif: playMotif,
+    playOnce: playOnce,
+    prepare: prepare,
     unlock: unlock,
     cancelPending: cancelPending,
     diagnostics: diagnostics,
-    pendingMotif: function () { return pending ? { expiresAt: pending.expiresAt } : null; },
+    introSplashState: function () { return { fase: introPhase, at: introPhaseAt }; },
+    pendingMotif: function () { return pending ? { key: pending.key || ALIASES.motif, expiresAt: pending.expiresAt } : null; },
     contextState: function () { return ctx ? String(ctx.state) : 'none'; },
     setEnabled: setEnabled,
     isEnabled: function () { return enabled; },
@@ -539,6 +701,7 @@
       ctx = null; master = null; pending = null; unlockBound = false; enabled = true;
       audioSessionClaimed = false; buffers = {}; loading = {}; lastPlayedAt = {};
       sessionCount = {}; warned = {}; preloaded = false;
+      introPhase = 'IDLE'; introPhaseAt = 0; onceGate = {}; stateWatchBound = false;
     }
   };
 });
