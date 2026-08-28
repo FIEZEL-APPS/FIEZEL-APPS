@@ -69,6 +69,9 @@ import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/rou
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
 import { scheduledAnalytics } from './analytics/rollup.js';
+// Lane telemetri BELAJAR (BRAIN-TELEMETRY-SCHEMA.md) — SENGAJA modul terpisah
+// dari analytics: skema lain, database lain (LEARNING_DB), kill switch lain.
+import { registerLearningRoutes } from './learning/route-learning-events.js';
 import { jsonResponse, jsonError, unauthenticated, ERR } from './errors.js';
 // A3: pencatat hasil cron. Satu-satunya alasan berkas ini diubah paket kerja A3.
 import { withCronRun, CRON_JOBS } from './cron-status.js';
@@ -137,6 +140,19 @@ export function analyticsEnv(env) {
   if (!env) return { ANALYTICS_DB: null };
   if (env.ANALYTICS_DB === db) return env;
   return Object.assign(Object.create(null), env, { ANALYTICS_DB: db || null });
+}
+
+/**
+ * D1 lane telemetri belajar. Berbeda sadar dari `analyticsEnv`: TIDAK ADA
+ * daftar alias/fallback. `route-learning-events.js` membaca `env.LEARNING_DB`
+ * persis seperti nama binding di `wrangler.toml`, jadi env diteruskan apa
+ * adanya. Salah pasang binding harus terlihat sebagai "lane diam" (202 tanpa
+ * tulis), bukan sebagai data learning yang diam-diam mendarat di database
+ * kuota atau analytics — fallback lintas binding adalah cara pemisahan fisik
+ * tiga database dikhianati satu typo.
+ */
+export function learningEnv(env) {
+  return env || { LEARNING_DB: null };
 }
 
 /* ============================================================ ctx adapters ========= */
@@ -472,6 +488,13 @@ function wrapAnalytics(handler) {
     handler({ request: requestFor(ctx), env: analyticsEnv(ctx.env), ctx: ctx.executionCtx });
 }
 
+// Konvensi handler lane learning = konvensi analytics ({request, env, ctx});
+// adapter `wrap` di dalam registerLearningRoutes yang membongkarnya.
+function wrapLearning(handler) {
+  return async (ctx) =>
+    handler({ request: requestFor(ctx), env: learningEnv(ctx.env), ctx: ctx.executionCtx });
+}
+
 /**
  * AI/TTS: identitas WAJIB (tanpa subjek tidak ada kuota yang bisa ditagih, dan
  * tanpa kuota jalur ini adalah pintu biaya terbuka), lalu handler dipanggil
@@ -516,6 +539,14 @@ export function buildExtraRoutes() {
   //      modul E4 sendiri yang menjawab 202 `{disabled:true}`, dan itu penting
   //      supaya klien lama tidak melihat 404 lalu mengulang tanpa henti.
   registerAnalyticsRoutes(collector(routes, wrapAnalytics));
+
+  // [BRAIN] LANE TELEMETRI BELAJAR — POST /api/learning/events. Tetap
+  //      terdaftar walau `LEARNING_ENABLED=off` (default): modul learning
+  //      sendiri yang menjawab 202 `{disabled:true}`, alasan yang sama dengan
+  //      analytics — 404 membuat klien retry tanpa henti, 202 membuatnya
+  //      berhenti sopan. Identitas SENGAJA tidak dituntut: payload-nya memang
+  //      tidak boleh punya identitas (BRAIN-TELEMETRY-SCHEMA.md §1.3).
+  registerLearningRoutes(collector(routes, wrapLearning));
 
   // [E5] AI + TTS. `deps.enforceQuota` diselesaikan PER PERMINTAAN.
   const aiSink = [];

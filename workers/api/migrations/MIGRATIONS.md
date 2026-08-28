@@ -16,6 +16,7 @@ sini yang menjadi urutan resmi.
 | `0004_indexes.sql` | `fiezel-core` (binding `CORE_DB`) | *(nol tabel baru — hanya indeks)* |
 | `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
 | `0006_analytics_batch_dedup.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `batch_dedup` |
+| `0007_learning.sql` | `fiezel-learning` (binding `LEARNING_DB`) | `learning_daily`, `learning_dedup` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -59,6 +60,7 @@ cd workers/api
 # sekali saja, kalau database belum ada
 wrangler d1 create fiezel-core
 wrangler d1 create fiezel-stats
+wrangler d1 create fiezel-learning
 # lalu tempelkan database_id yang keluar ke wrangler.toml
 
 # --- fiezel-core: identitas + kuota ---
@@ -76,7 +78,21 @@ wrangler d1 execute fiezel-core --remote --file=migrations/0005_ai_account_budge
 
 # --- fiezel-stats: dedup idempoten batch telemetry (wave brain-learning-infra) ---
 wrangler d1 execute fiezel-stats --remote --file=migrations/0006_analytics_batch_dedup.sql
+
+# --- fiezel-learning: lane telemetri belajar agregat (wave brain-learning-infra, server lane) ---
+wrangler d1 execute fiezel-learning --remote --file=migrations/0007_learning.sql
 ```
+
+`0007_learning.sql` masuk database KETIGA (`fiezel-learning`), bukan
+`fiezel-stats`, karena dua alasan yang sama kerasnya dengan penempatan
+`0003_cron.sql`: (1) `analytics-privacy-test.js` menuntut database analytics
+memuat **tepat lima tabel** — menaruh `learning_daily` di sana membuat gerbang
+analytics merah selamanya atau, lebih buruk, tergoda dilonggarkan; (2) kontrak
+`BRAIN-TELEMETRY-SCHEMA.md` memisahkan lane kehadiran perangkat (analytics)
+dari lane hasil kebijakan Brain (learning) — pemisahan fisik membuat JOIN
+lintas lane tidak bisa ditulis, bukan sekadar dilarang. Rutenya juga fail-soft:
+sebelum migrasi ini diterapkan (atau bila `LEARNING_ENABLED != "on"`), `POST
+/api/learning/events` menjawab `202 {disabled:true}` dan tidak menulis apa pun.
 
 `0005_ai_account_budget.sql` WAJIB diterapkan SEBELUM `cfAiEnabled` dinyalakan.
 Pagar neuron tingkat akun di `ai/ai-account-budget.js` FAIL-CLOSED: kalau tabel
@@ -104,6 +120,16 @@ wrangler d1 execute fiezel-core --remote \
 # HARUS kosong: tidak boleh ada tabel kuota/identitas di database analytics
 wrangler d1 execute fiezel-stats --remote \
   --command "SELECT name FROM sqlite_master WHERE name IN ('quota_daily','quota_reservation','identity','session')"
+
+# HARUS kosong: database learning tidak boleh memuat tabel identitas/kuota/analytics
+wrangler d1 execute fiezel-learning --remote \
+  --command "SELECT name FROM sqlite_master WHERE name IN ('identity','session','quota_daily','quota_reservation','metrics_daily','usage_daily','retention_daily','dau_dedup','batch_dedup')"
+
+# HARUS kosong: tabel learning tidak boleh muncul di database lain
+wrangler d1 execute fiezel-core --remote \
+  --command "SELECT name FROM sqlite_master WHERE name IN ('learning_daily','learning_dedup')"
+wrangler d1 execute fiezel-stats --remote \
+  --command "SELECT name FROM sqlite_master WHERE name IN ('learning_daily','learning_dedup')"
 ```
 
 Gerbang `cf-wiring-test.js` memeriksa hal yang sama di tingkat berkas: tidak ada
@@ -125,6 +151,13 @@ aslinya hidup di `analytics/migrations/` (dibaca gerbang `analytics-dedup-test.j
 salinan di direktori ini wajib **byte-identik**. Catatan jujur: pasangan `0006`
 belum terdaftar di cek byte-identik `cf-wiring-test.js` — penambahan pasangan itu
 milik pemilik gerbang wiring.
+
+`learning/migrations/0007_learning.sql` mengikuti pola yang sama lagi: aslinya
+hidup di `learning/migrations/` (dibaca gerbang `learning-lane-test.js` untuk
+membangun D1 palsu dari DDL nyata), salinan di direktori ini wajib
+**byte-identik**. Catatan jujur yang sama: pasangan `0007` juga belum terdaftar
+di cek byte-identik `cf-wiring-test.js`; `learning-lane-test.js` yang saat ini
+membandingkan kedua salinan byte demi byte.
 
 ## 0004_indexes.sql — hanya `fiezel-core` (A6/D1)
 

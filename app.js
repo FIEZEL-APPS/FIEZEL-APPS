@@ -1290,6 +1290,139 @@ function abandonActiveSession(reason='exit'){
 function completeActiveSession(cfg,score,total){
   const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
 }
+/* ---- Gelombang 4 (Lane B): emisi telemetri belajar — OBSERVASI MURNI ---------------------
+ * KENAPA di sini: record() adalah satu-satunya pintu commit jawaban ternilai, jadi emisi yang
+ * digantung padanya tidak mungkin melewatkan jalur latihan mana pun. KONTRAK KERAS:
+ * (1) mode 'off' (default rilis ini, fiezel-telemetry-config.js) keluar di baris PERTAMA —
+ *     nol alokasi, nol operasi storage, nol penalti latensi pada jalur menjawab soal;
+ * (2) semua modul diperiksa ketersediaannya dulu (pola coreBrainAvailable) — modul absen =
+ *     fungsi diam = perilaku aplikasi hari ini, persis;
+ * (3) TANPA installId/ID stabil/timestamp presisi di payload: builder
+ *     fiezel-learning-events.js menolaknya secara konstruksi, dan pembangun payload di bawah
+ *     memang tidak pernah membaca identitas apa pun;
+ * (4) emisi TIDAK PERNAH mengubah keputusan belajar — nilainya tidak dibaca pemanggil, dan
+ *     setiap kegagalan ditelan senyap (telemetri hilang < belajar terganggu). */
+const LEARNING_TELEMETRY_DB='fiezel-learning-queue-v1',LEARNING_TELEMETRY_STORE='events',LEARNING_TELEMETRY_DAY0_KEY='fiezel-lt-day0-v1';
+let __learningTelemetryDbPromise=null,__learningTelemetryQueue=null;
+/** Mode lane dari konfigurasi BEKU (fiezel-telemetry-config.js). Nilai tak dikenal atau modul
+ *  absen dibaca 'off' — lane ini selalu gagal ke arah diam, tidak pernah ke arah mengirim. */
+function learningTelemetryMode(){
+  try{const m=self.FiezelTelemetryConfig?.CONFIG?.mode;return m==='local'||m==='shadow'||m==='on'?m:'off'}catch{return 'off'}
+}
+/** Buka database antrean SEKALI lalu pakai ulang; kegagalan membuka mengosongkan cache supaya
+ *  percobaan berikutnya bisa mencoba lagi (mis. setelah kuota storage lega). */
+function learningTelemetryDb(){
+  if(__learningTelemetryDbPromise)return __learningTelemetryDbPromise;
+  __learningTelemetryDbPromise=new Promise((resolve,reject)=>{
+    let req;
+    try{req=indexedDB.open(LEARNING_TELEMETRY_DB,1)}catch(e){reject(e);return}
+    req.onupgradeneeded=()=>{try{req.result.createObjectStore(LEARNING_TELEMETRY_STORE,{keyPath:'eventId'})}catch{}};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('idb-open'));
+    req.onblocked=()=>reject(new Error('idb-blocked'));
+  });
+  __learningTelemetryDbPromise.catch(()=>{__learningTelemetryDbPromise=null});
+  return __learningTelemetryDbPromise;
+}
+/** Adaptor idbLike TIPIS di atas IndexedDB nyata — memenuhi kontrak persis yang didefinisikan
+ *  createMemoryIdb() di features/telemetry/fiezel-learning-queue.js: getAll/put/delete/clear,
+ *  semuanya Promise. `delete` mengembalikan boolean "tadinya ada" karena ack() antrean
+ *  menghitung berapa record yang benar-benar terhapus. */
+function learningTelemetryIdb(){
+  const tx=(mode,run)=>learningTelemetryDb().then(db=>new Promise((resolve,reject)=>{
+    let r;
+    try{r=run(db.transaction(LEARNING_TELEMETRY_STORE,mode).objectStore(LEARNING_TELEMETRY_STORE),resolve,reject)}catch(e){reject(e);return}
+    if(r){r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}
+  }));
+  return{
+    kind:'indexeddb',
+    getAll:()=>tx('readonly',s=>s.getAll()),
+    put:rec=>tx('readwrite',s=>s.put(rec)).then(()=>undefined),
+    // getKey dulu supaya nilai kembalinya jujur — IDBObjectStore.delete sendiri selalu
+    // "sukses" walau kuncinya tidak pernah ada, dan itu akan membohongi hitungan ack.
+    'delete':id=>tx('readwrite',(s,resolve,reject)=>{
+      const g=s.getKey(id);
+      g.onsuccess=()=>{const had=g.result!==undefined;const d=s.delete(id);d.onsuccess=()=>resolve(had);d.onerror=()=>reject(d.error)};
+      g.onerror=()=>reject(g.error);
+    }),
+    clear:()=>tx('readwrite',s=>s.clear()).then(()=>undefined)
+  };
+}
+/** Antrean Lane B, dibuat malas dan sekali saja. null bila modul antrean/IndexedDB absen —
+ *  pemanggil memperlakukan null sebagai "lane tidak tersedia", bukan sebagai kesalahan. */
+function learningTelemetryQueue(){
+  if(__learningTelemetryQueue)return __learningTelemetryQueue;
+  const Q=self.FiezelLearningQueue;
+  if(!Q||typeof Q.makeQueue!=='function')return null;
+  if(typeof indexedDB==='undefined'||!indexedDB)return null;
+  try{__learningTelemetryQueue=Q.makeQueue({idb:learningTelemetryIdb()})}catch{__learningTelemetryQueue=null}
+  return __learningTelemetryQueue;
+}
+/** studyDay RELATIF (hari ke-berapa sejak mulai belajar), BUKAN tanggal absolut: hari epoch
+ *  mentah akan membocorkan tanggal nyata ke event — persis yang dilarang kontrak privasi
+ *  Lane B. Jangkar hari-0 hidup di kunci localStorage BARU (fiezel-sl-v1-state TIDAK
+ *  disentuh), di-seed dari baris riwayat tertua yang masih ada supaya murid lama tidak
+ *  tampak seperti murid baru. */
+function learningTelemetryStudyDay(nowMs){
+  const today=Math.floor(Number(nowMs)/86400000);
+  if(!Number.isFinite(today)||today<0)return 0;
+  let day0=today;
+  try{
+    const saved=Number(localStorage.getItem(LEARNING_TELEMETRY_DAY0_KEY));
+    if(Number.isFinite(saved)&&saved>0&&saved<=today)day0=saved;
+    else{
+      const first=Number(state?.history?.[0]?.at);
+      if(Number.isFinite(first)&&first>0)day0=Math.min(today,Math.floor(first/86400000));
+      localStorage.setItem(LEARNING_TELEMETRY_DAY0_KEY,String(day0));
+    }
+  }catch{}
+  return Math.max(0,Math.min(100000,today-day0));
+}
+/** SATU jawaban grammar ternilai -> paling banyak SATU event answer_outcome di antrean LOKAL.
+ *  Observasi murni: pemanggil tidak membaca nilai kembaliannya dan tidak ada state belajar
+ *  yang tersentuh. Payload hanya enum/bucket/ID konten yang divalidasi builder — TANPA
+ *  installId, TANPA ID stabil, TANPA timestamp presisi (studyDay relatif satu-satunya waktu). */
+function learningTelemetryEmitAnswer(q,ok,h){
+  // Cabang 'off' PALING DULU dan PALING MURAH: default rilis ini 'off', jadi jalur panas
+  // menjawab soal hanya membayar satu pembacaan properti beku — tanpa alokasi apa pun.
+  if(learningTelemetryMode()==='off')return;
+  // Availability check (pola coreBrainAvailable): builder DAN antrean wajib hadir. Modul
+  // absen berarti index.html belum memuat lane ini — diam adalah jawaban yang benar.
+  const E=self.FiezelLearningEvents;
+  if(!E||typeof E.buildEvent!=='function')return;
+  if(!self.FiezelLearningQueue||typeof self.FiezelLearningQueue.makeQueue!=='function')return;
+  // Domain GRAMMAR saja — keputusan council: konten domain lain belum lolos QA sehingga
+  // telemetrinya adalah input rusak. Cloze (type 'cloze') sengaja ikut tertolak di sini.
+  if(String(q?.type||'')!=='grammar')return;
+  try{
+    const queue=learningTelemetryQueue();
+    if(!queue)return;
+    const nowMs=Date.now();
+    const payload={
+      domain:'grammar',
+      lessonId:String(q?.sourceId||q?.conceptId||q?.lessonSkill||q?.skill||''),
+      // Identitas item yang SAMA dengan kalibrasi (template:mode) — dua sistem yang
+      // menyebut item dengan nama berbeda tidak akan pernah bisa dicocokkan lagi.
+      itemId:calibrationItemId(q),
+      mode:String(q?.practiceMode||''),
+      correct:!!ok,
+      responseTimeBucket:E.bucketResponseTime(Math.max(0,Number(h?.ms)||0))
+    };
+    // Prediksi disalin dari baris riwayat yang SAMA (ditulis record) — bukan taksiran kedua.
+    const predicted=E.bucketPrediction(Number(h?.predicted));
+    if(predicted)payload.predictedBucket=predicted;
+    const ctx={studyDay:learningTelemetryStudyDay(nowMs)};
+    // Atribusi bundle Brain: opsional — tanpa manifest, event tetap sah tanpa field ini.
+    const bundle=self.FiezelBrainManifest?.bundleVersion;
+    if(typeof bundle==='string'&&bundle)ctx.brainBundle=bundle;
+    const built=E.buildEvent('answer_outcome',payload,ctx);
+    // Payload yang ditolak builder dibuang DIAM-DIAM di jalur murid (mis. practiceMode di
+    // luar enum telemetri): kegagalan pelaporan tidak boleh terasa. Auditnya di test Node.
+    if(!built||built.ok!==true)return;
+    const putP=queue.put(built.event,nowMs);
+    if(putP&&typeof putP.catch==='function')putP.catch(()=>{});
+  }catch{}
+}
 function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
   /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
@@ -1330,6 +1463,10 @@ function record(q,ok,ms,selectedIndex){
     // Fase 3 (C5 butir 1): jawaban yang sama juga bukti KALIBRASI ITEM - seberapa sulit
     // soal ini sebenarnya, diukur dari murid nyata. Guarded di dalam helper-nya.
     try{itemCalibrationObserve(q,ok,h.kappa)}catch{}
+    // Gelombang 4 (Lane B): jawaban ternilai yang sama juga menjadi (paling banyak) SATU
+    // event answer_outcome di antrean telemetri LOKAL — observasi murni, guarded penuh,
+    // dan mode 'off' (default) keluar sebelum kerja apa pun di dalam helper-nya.
+    try{learningTelemetryEmitAnswer(q,ok,h)}catch{}
   }
   /* Fase 3 (C5 butir 2): jawaban cloze (produksi ketik) = bukti BKT berbobot 1.5 (produksi
      lebih kuat daripada recognition) + bukti kalibrasi item, di pintu yang sama dengan
@@ -7633,6 +7770,26 @@ function bktShadowMarkup(){
     return card(`<h3>${FiezelI18n.t('progress.mastery-bkt')} <span class="muted">${FiezelI18n.t('progress.bayangan-tanpa-otoritas-unlock')}</span></h3>${frontierHtml}${rootHtml}<p class="muted">${FiezelI18n.t('progress.lesson-terlacak-fiezel-mastery-bkt',{tracked:tracked})}</p>`)
   }catch{return ''}
 }
+/* Gelombang 4: identitas bundle Brain di area diagnostik yang sama dengan BKT "bayangan".
+ * TAMPILAN SAJA — manifest deskriptif murni (peta otoritasnya sendiri menyebut dirinya
+ * 'shadow'); tanpa modul, panel diagnostik persis seperti sebelum gelombang ini. Pola guard
+ * identik bktShadowMarkup: availability check dulu, try/catch mengembalikan string kosong. */
+function brainManifestMarkup(){
+  const M=self.FiezelBrainManifest;
+  if(!M||typeof M.describe!=='function')return '';
+  try{
+    const d=M.describe();
+    const map=M.authorityMap||{};
+    // Ringkas authorityMap per status supaya panel menjawab pertanyaan yang sebenarnya:
+    // "siapa yang MEMUTUSKAN untukku, dan siapa yang cuma menonton?" — bukan daftar file.
+    const names={active:[],shadow:[],off:[]};
+    for(const k of Object.keys(map)){const v=String(map[k]);if(names[v])names[v].push(k)}
+    const row=(label,list)=>list.length?`<p><b>${label} (${list.length}):</b> ${list.map(x=>esc(x)).join(', ')}</p>`:'';
+    return card(`<h3>Brain Bundle ${esc(String(d?.bundleVersion||M.bundleVersion||''))} <span class="muted">(manifest — deskriptif, tanpa otoritas)</span></h3>
+    ${row('Aktif',names.active)}${row('Bayangan',names.shadow)}${row('Off',names.off)}
+    <p class="muted">${esc(String(d?.summary||''))} Peta ini mencatat siapa yang memutuskan — ia sendiri tidak ikut memutuskan apa pun.</p>`)
+  }catch{return ''}
+}
 /* Fase 2 (B3 butir 7): seksi Open Learner Model - ringkasan yang bisa dibaca murid tentang
  * apa yang sistem yakini soal dirinya. TAMPILAN SAJA: summarize() murni membaca, tidak ada
  * keputusan yang berubah karena panel ini ada atau tidak. */
@@ -7696,12 +7853,12 @@ function affectSuggestionMarkup(){
 }
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
-  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">'+FiezelI18n.t('progress.lapisan-penalaran-belum-termuat-perangkat')+'</p>')+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   const ability=snapshot.ability||{},plan=snapshot.plan||{},move=snapshot.momentum||{},load=snapshot.fatigue||{},memory=snapshot.memory||{},chrono=snapshot.chronotype||{};
   const moveLabel={improving:FiezelI18n.t('progress.sedang-naik'),plateau:FiezelI18n.t('progress.mendatar'),declining:FiezelI18n.t('progress.sedang-turun'),unknown:FiezelI18n.t('diag.belum-terbaca')}[move.state]||FiezelI18n.t('diag.belum-terbaca');
   const loadLabel={fresh:FiezelI18n.t('progress.masih-segar'),tiring:FiezelI18n.t('progress.mulai-lelah'),fatigued:FiezelI18n.t('progress.sudah-lelah'),unknown:FiezelI18n.t('diag.belum-terbaca')}[load.state]||FiezelI18n.t('diag.belum-terbaca');
   if(!plan||Number(plan.confidence||0)<0.25){
-    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
+    return card(`<h3>Core Brain v2</h3><p>${FiezelI18n.t('progress.still-mengumpulkan-bukti-answer-terbaca',{evidence:ability.evidence||0})}</p><p class="muted">${FiezelI18n.t('progress.sampai-saat-kebijakan-adaptif-deterministik')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
     ? `<p><b>${FiezelI18n.t('progress.akar-masalah')}</b> ${FiezelI18n.t('progress.kesulitan-kemungkinan-besar-berasal-jadi',{skillName:esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily)),skillName:esc(friendlySkillName(snapshot.rootCause.skill))})}</p>`
@@ -7717,7 +7874,7 @@ function coreBrainPanelMarkup(){
       ${bestWindow}
     </div>
     ${rootCause}
-    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
+    <p class="muted">${FiezelI18n.t('progress.kesulitan-dipilih-model-kemampuan-peluang')}</p>`)+bktShadowMarkup()+brainManifestMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
 }
 const PROGRESS_TABS=[['overview',FiezelI18n.t('progress.ringkasan')],['analysis',FiezelI18n.t('progress.analisis')],['adaptive','Adaptive Engine'],['readiness',FiezelI18n.t('progress.kesiapan-skills')]];
 let progressTab='overview';
@@ -8547,7 +8704,7 @@ prefetchPlacementListening();
 // baru tiba setelah layar pertama tercat. Tanpa pengulangan ini, ketukan pertama murid
 // akan menanggung seluruh ongkos inisialisasi yang justru ingin dipindahkan ke waktu idle.
 document.addEventListener?.('fiezel:lazy-group',event=>{if(event?.detail?.group==='voice')warmNeuralVoice()});
-window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
+window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,record,quizLoop,startAdaptive};
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM
 // load() supaya navigasi pertama pun sudah terekam di riwayat.
