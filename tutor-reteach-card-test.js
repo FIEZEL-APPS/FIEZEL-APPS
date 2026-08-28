@@ -158,14 +158,20 @@ test('murid boleh menolak berhenti, dan penolakannya tidak menghukum apa pun', (
 });
 
 test('kedua naskah baru berbahasa Indonesia', () => {
-  const strings = [
-    ...(APP.match(/Oke, aku siap coba lagi/g) || []),
-    ...(APP.match(/Sudahi sesi ini/g) || []),
-    ...(APP.match(/Lanjut, aku masih kuat/g) || []),
-    ...(APP.match(/Yang bikin tadi keliru/g) || []),
-    ...(APP.match(/Jeda mengajar/g) || [])
-  ];
-  assert.strictEqual(strings.length, 5, 'ada naskah baru yang hilang atau berubah: ' + strings.join(' | '));
+  // AI-20 F06 (W1-TESTPLAN 2a, de-dup): hitungan TEPAT 5 rapuh saat naskah pindah ke copy-map —
+  // selama transisi literal bisa hidup di call-site DAN di features/i18n/copy-id-*.js sekaligus
+  // (total 6 = merah palsu). Yang sebenarnya dijaga tidak berubah: ke-5 naskah LENGKAP dan
+  // masing-masing hadir verbatim (byte-identik, dijaga id-golden-snapshot-test.js) di UNION
+  // app.js ∪ copy-id. Glob kosong hari ini = perilaku sama dengan sebelum ekstraksi.
+  const i18nDir = path.join(root, 'features', 'i18n');
+  const copyIdUnion = fs.existsSync(i18nDir)
+    ? fs.readdirSync(i18nDir).filter(f => /^copy-id-.*\.js$/.test(f)).sort()
+        .map(f => fs.readFileSync(path.join(i18nDir, f), 'utf8')).join('\n')
+    : '';
+  const union = APP + '\n' + copyIdUnion;
+  const NASKAH = ['Oke, aku siap coba lagi', 'Sudahi sesi ini', 'Lanjut, aku masih kuat', 'Yang bikin tadi keliru', 'Jeda mengajar'];
+  const hilang = NASKAH.filter(s => !union.includes(s));
+  assert.strictEqual(hilang.length, 0, 'ada naskah baru yang hilang atau berubah: ' + hilang.join(' | '));
 });
 
 test('gaya kartu memakai bidang yang punya pasangan gelap', () => {

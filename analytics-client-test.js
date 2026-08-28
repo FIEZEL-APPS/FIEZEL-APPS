@@ -942,6 +942,216 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
         blockSrc.includes('AN_CONFIG_VIEW') && source.includes('memory.token = null'), 'ok');
     }
 
+    /* =====================================================================
+     * T-031 — TABRAKAN NAMA GLOBAL: PEMUAT TIDAK BOLEH MEMPERCAYAI NAMA
+     * =====================================================================
+     * Cacat yang diuji di sini pernah HIDUP di produksi dan LULUS setiap gerbang:
+     * `features/ui/fiezel-ab-testing.js` memasang objek A/B (tanpa `createClient`)
+     * ke `window.FiezelAnalytics` lewat `<script defer>`, jadi nama itu SELALU sudah
+     * terisi sebelum pemuat analytics berjalan di idle. Pemuat lama mempercayai nama
+     * yang sudah ada, gagal cek bentuk sesudahnya, mencatat `module_shape`, lalu
+     * MENYERAH — modul asli tidak pernah diunduh. `stats()` waktu itu:
+     * {loaded:false,started:true,lastError:'module_shape',gateOpen:true}; nol
+     * permintaan ke /api/usage; nol galat merah di konsol.
+     *
+     * Yang dibuktikan di bawah DIJALANKAN, bukan dipindai: blok pemancar NYATA
+     * dipotong dari app.js (variabel `blockSrc` di atas) dan dieksekusi di `vm`
+     * dengan objek asing sudah bertengger di nama global, dan `<script>` yang
+     * disuntik benar-benar MENJALANKAN modul analytics nyata (UMD-nya menimpa nama
+     * itu), persis seperti di peramban.
+     * ===================================================================== */
+    {
+      // Objek asing = tiruan bentuk objek A/B lama: nol `createClient`, nol penanda
+      // modul analytics. Inilah yang dulu diterima pemuat.
+      const objekAsing = () => ({
+        EVENTS_LOG: 'fiezel_ab_events',
+        variant: 'control',
+        logEvent() { },
+        trackViewTransition() { },
+        flushEvents() { }
+      });
+      // Objek yang MEMANG modul analytics tapi rusak: penandanya ada, `createClient` hilang.
+      const modulRusak = () => ({ SCHEMA_ID: 'fiezel.usage.v1', STORAGE_KEYS: {}, track() { } });
+
+      /* Dunia T-031. Bedanya dari makeWorld(): `<script>` yang disuntik BENAR-BENAR
+       * dieksekusi (menjalankan modul nyata di sandbox yang sama), dan nama global bisa
+       * diisi lebih dulu oleh objek asing. `injeksiGagal` mensimulasikan unduhan gagal. */
+      function duniaT31(o) {
+        const opsi = o || {};
+        const storage = makeStorage();
+        const transport = makeTransport({});
+        const jejak = { createElement: 0, dieksekusi: 0 };
+        const sandbox = {
+          console, TextEncoder, TextDecoder,
+          crypto: nodeCrypto.webcrypto,
+          localStorage: storage,
+          navigator: { userAgent: 'Mozilla/5.0 (Linux; Android 13)', sendBeacon: transport.sendBeacon },
+          fetch: transport.http,
+          FIEZEL_VERSION: '5.19.0',
+          LEVELS: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+          setTimeout: (fn) => setTimeout(fn, 0),
+          clearTimeout,
+          state: { daily: { attempts: 12 } },
+          cfStaticConfig: () => ({ enabled: true, base: 'https://api.fiezel.my.id', endpoints: { usage: 'on' } }),
+          cfStaticMode: () => 'on',
+          cfServerAllows: () => true
+        };
+        if (opsi.tanpaDocument !== true) {
+          sandbox.document = {
+            head: {
+              appendChild(el) {
+                // Peramban: mengunduh lalu MENJALANKAN skripnya. Modul nyata (UMD) menimpa
+                // `self.FiezelAnalytics` di titik ini — tepat perilaku yang harus dipakai
+                // pemuat setelah menolak objek asing.
+                setTimeout(() => {
+                  if (opsi.injeksiGagal) { if (el.onerror) el.onerror(new Error('404')); return; }
+                  jejak.dieksekusi += 1;
+                  vm.runInContext(moduleSource, sandbox, { filename: MODULE_REL });
+                  if (opsi.createClientRusak) {
+                    sandbox.FiezelAnalytics = Object.assign({}, sandbox.FiezelAnalytics, { createClient: () => ({}) });
+                  }
+                  if (el.onload) el.onload();
+                }, 0);
+              }
+            },
+            createElement() {
+              jejak.createElement += 1;
+              const el = {};
+              Object.defineProperty(el, 'onload', { set(v) { el._onload = v; }, get() { return el._onload; } });
+              Object.defineProperty(el, 'onerror', { set(v) { el._onerror = v; }, get() { return el._onerror; } });
+              return el;
+            }
+          };
+        }
+        sandbox.self = sandbox;
+        sandbox.globalThis = sandbox;
+        sandbox.module = { exports: {} };
+        vm.createContext(sandbox);
+        vm.runInContext('var cfConfigInFlight=null;', sandbox, { filename: 'prelude' });
+        if (opsi.preGlobal) sandbox.FiezelAnalytics = opsi.preGlobal;
+        vm.runInContext(blockSrc, sandbox, { filename: 'app.js#A1-ANALYTICS-EMITTER' });
+        return { sandbox, storage, transport, jejak, emitter: sandbox.FiezelAnalyticsEmitter };
+      }
+
+      /* Menunggu di dunia T-031 harus memakai TIMER, bukan setImmediate: pemuat memakai
+       * `setTimeout` (dan harness ini juga), dan loop setImmediate yang selesai di bawah 1ms
+       * bisa menyelesaikan dirinya sendiri SEBELUM fase timer sempat jalan — itu membuat
+       * gerbang hijau/merah bergantung kecepatan mesin, bukan perilaku kode. */
+      const tunggu = async (ms) => { for (let i = 0; i < (ms || 30); i++) await new Promise(r => setTimeout(r, 1)); };
+
+      /* --- (T1) SIMULASI TABRAKAN: objek asing merebut nama, modul asli TETAP dimuat --- */
+      {
+        const w = duniaT31({ preGlobal: objekAsing() });
+        const E = w.emitter;
+        const rBoot = E.boot();
+        E.sessionEnded({ type: 'adaptive', level: 'B1', completed: true, answered: 9, durationMs: 400000 });
+        await tunggu(40);
+        const s = E.stats();
+        check('(T1) objek asing di nama global: <script> modul TETAP disuntik (pemuat tidak menyerah)',
+          w.jejak.createElement === 1 && w.jejak.dieksekusi === 1, `${w.jejak.createElement}/${w.jejak.dieksekusi}`);
+        check('(T1) klien analytics NYATA tetap terbentuk (`stats().loaded === true`)',
+          s.loaded === true && rBoot === true, JSON.stringify(s));
+        check('(T1) nama global akhirnya dipegang modul asli (punya `createClient`)',
+          w.sandbox.FiezelAnalytics && typeof w.sandbox.FiezelAnalytics.createClient === 'function',
+          typeof (w.sandbox.FiezelAnalytics || {}).createClient);
+        check('(T1) event benar-benar terkirim walau ada tabrakan (nol data hilang senyap)',
+          w.transport.beacons.length + w.transport.posts.length >= 1,
+          `${w.transport.beacons.length}/${w.transport.posts.length}`);
+        check('(T1) tabrakan tercatat jujur di `stats().nameConflict` walau pemuatan berhasil',
+          s.nameConflict === true && s.lastError === '', JSON.stringify(s));
+        check('(T1) modul dipatok di slot khas milik pemuat, bukan dipercayai dari nama umum',
+          w.sandbox.__fiezelAnalyticsModule && typeof w.sandbox.__fiezelAnalyticsModule.createClient === 'function',
+          typeof w.sandbox.__fiezelAnalyticsModule);
+      }
+
+      /* --- (T2) `lastError` MEMBEDAKAN SEBAB ------------------------------------ */
+      {
+        // Tanpa document: pemuat tidak bisa mengunduh, jadi sebab yang tersisa adalah
+        // keadaan nama global itu sendiri — dua keadaan berbeda, dua kode berbeda.
+        const asing = duniaT31({ preGlobal: objekAsing(), tanpaDocument: true });
+        asing.emitter.boot(); await tunggu(20);
+        const sAsing = asing.emitter.stats();
+
+        const rusak = duniaT31({ preGlobal: modulRusak(), tanpaDocument: true });
+        rusak.emitter.boot(); await tunggu(20);
+        const sRusak = rusak.emitter.stats();
+
+        const gagalUnduh = duniaT31({ injeksiGagal: true });
+        gagalUnduh.emitter.boot(); await tunggu(30);
+        const sGagal = gagalUnduh.emitter.stats();
+
+        const klienRusak = duniaT31({ createClientRusak: true });
+        klienRusak.emitter.boot(); await tunggu(40);
+        const sKlien = klienRusak.emitter.stats();
+
+        check('(T2) objek ASING merebut nama => `global_name_conflict`',
+          sAsing.lastError === 'global_name_conflict' && sAsing.nameConflict === true && sAsing.loaded === false,
+          JSON.stringify(sAsing));
+        check('(T2) modul ASLI bentuknya salah => `module_shape_invalid` (dan BUKAN conflict)',
+          sRusak.lastError === 'module_shape_invalid' && sRusak.nameConflict === false,
+          JSON.stringify(sRusak));
+        check('(T2) unduhan modul gagal => `module_unavailable`',
+          sGagal.lastError === 'module_unavailable', JSON.stringify(sGagal));
+        check('(T2) `createClient()` mengembalikan objek tak terpakai => `client_shape_invalid`',
+          sKlien.lastError === 'client_shape_invalid' && sKlien.loaded === false, JSON.stringify(sKlien));
+        const kode = [sAsing.lastError, sRusak.lastError, sGagal.lastError, sKlien.lastError];
+        check('(T2) empat sebab => empat kode BERBEDA (satu kode untuk semua sebab adalah cacatnya)',
+          new Set(kode).size === 4, kode.join(','));
+        check('(T2) kode lama `module_shape` yang ambigu sudah tidak dipakai blok pemancar',
+          !/'module_shape'/.test(stripComments(blockSrc)), 'blok');
+        check('(T2) semua kegagalan tetap SENYAP bagi murid: pemancar mengembalikan boolean, nol lemparan',
+          [sAsing, sRusak, sGagal, sKlien].every(x => typeof x.lastError === 'string'), 'senyap');
+      }
+
+      /* --- (T4) SLOT PATOK: perebutan nama DI TENGAH SESI tidak bisa menyusup ---
+       * Skenario nyata yang tidak bisa dijaga pemeriksaan bentuk saja: modul asli sudah
+       * dimuat, lalu berkas lain (fitur baru, ekstensi, skrip pihak ketiga) menimpa
+       * `window.FiezelAnalytics` sesudahnya. Pemuat membaca slot patoknya sendiri lebih
+       * dulu, jadi ia memakai modul yang SUDAH terverifikasi bentuknya dan tidak mengunduh
+       * apa pun lagi. */
+      {
+        const w = duniaT31({});
+        const E = w.emitter;
+        E.boot();
+        await tunggu(40);
+        const sebelum = E.stats();
+        check('(T4) pemuatan normal berhasil dan menyuntik tepat satu <script>',
+          sebelum.loaded === true && w.jejak.createElement === 1 && sebelum.nameConflict === false,
+          `${JSON.stringify(sebelum)} el=${w.jejak.createElement}`);
+
+        // Nama global direbut SESUDAH modul termuat, lalu cache instance dikosongkan.
+        w.sandbox.FiezelAnalytics = objekAsing();
+        E._resetForGate();
+        E.boot();
+        await tunggu(40);
+        const sesudah = E.stats();
+        check('(T4) sesudah nama direbut di tengah sesi, klien tetap terbentuk dari slot patok',
+          sesudah.loaded === true, JSON.stringify(sesudah));
+        check('(T4) nol unduhan tambahan (patok dibaca sebelum nama umum)',
+          w.jejak.createElement === 1 && w.jejak.dieksekusi === 1,
+          `${w.jejak.createElement}/${w.jejak.dieksekusi}`);
+        check('(T4) objek asing tidak pernah dipakai sebagai modul (nol galat bentuk)',
+          sesudah.lastError === '' && sesudah.nameConflict === false, JSON.stringify(sesudah));
+      }
+
+      /* --- (T3) SUMBER: pemilik nama tunggal, pemakai sudah diperbarui ---------- */
+      {
+        const abKode = stripComments(fs.readFileSync(path.join(root, 'features', 'ui', 'fiezel-ab-testing.js'), 'utf8'));
+        const uiKode = stripComments(fs.readFileSync(path.join(root, 'features', 'ui', 'fiezel-ui-manager.js'), 'utf8'));
+        check('(T3) modul A/B memakai nama sendiri `window.FiezelABAnalytics`',
+          /window\.FiezelABAnalytics\s*=\s*new FiezelABAnalytics\(\)/.test(abKode), 'ab');
+        check('(T3) modul A/B nol penugasan `FiezelAnalytics` (termasuk baris `module.exports`)',
+          !/\bFiezelAnalytics\b/.test(abKode), (abKode.match(/\bFiezelAnalytics\b/g) || []).join(','));
+        check('(T3) `fiezel-ui-manager.js` memanggil nama BARU, bukan nama lama',
+          /window\.FiezelABAnalytics\b/.test(uiKode) && !/\bFiezelAnalytics\b/.test(uiKode), 'ui-manager');
+        check('(T3) kunci `fiezel_ab_events` tetap sama (event murid yang sudah ada tidak dibuang)',
+          abKode.includes("'fiezel_ab_events'"), 'EVENTS_LOG');
+        check('(T3) gerbang nama global umum ada dan terdaftar di CI',
+          fs.existsSync(path.join(root, 'global-name-collision-test.js'))
+          && workflow.includes('node global-name-collision-test.js'), 'global-name-collision-test.js');
+      }
+    }
+
     /* --- notes + registrasi CI ----------------------------------------- */
     const notes = path.join(root, 'reports', 'work-a1-analytics-emitter.md');
     check('Notes A1 ada', fs.existsSync(notes), notes);
@@ -952,9 +1162,26 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
         check(`Notes A1 menyebut "${frasa}"`, n.includes(frasa), 'notes');
       }
     }
-    check('Pemancar TIDAK menyalakan flag apa pun sendiri',
-      !/endpoints\s*:\s*Object\.freeze\(\{[^}]*usage\s*:\s*'on'/.test(fs.readFileSync(path.join(root, 'core-config.js'), 'utf8')),
-      'core-config.js tetap usage:off');
+    /* A6 (28 Agu 2026) MENGGANTI ASSERT INI, dan penggantiannya bukan pelunakan.
+     *
+     * Bentuk lama: "core-config.js tetap usage:off". Itu benar selama A1, karena A1 memang
+     * hanya memasang PEMANCAR dan bukan keputusan menyalakannya. Sejak paket A6, `usage:'on'`
+     * ADALAH keputusan rilis yang sah dan tercatat (reports/work-a6-client-switch.md), jadi
+     * assert lama akan memerahkan gerbang untuk sesuatu yang sengaja dan benar.
+     *
+     * Yang sesungguhnya dijaga A1 tetap dijaga di sini, dan sekarang lebih tepat sasaran:
+     * pemancar TIDAK BOLEH menyalakan dirinya sendiri. Ia hanya boleh MEMBACA gerbang; satu
+     * baris yang menulis `FIEZEL_CF_CONFIG` (atau mengarang mode 'on' di dalam blok) berarti
+     * sakelar owner bisa dilangkahi kode aplikasi, dan itulah yang harus merah.
+     * Sakelar berbiaya (ai/tts) tetap dijaga di sini juga: analytics tidak boleh menjadi
+     * pintu masuk penyalaan neuron. */
+    const cfgSrc = fs.readFileSync(path.join(root, 'core-config.js'), 'utf8');
+    check('Pemancar TIDAK menyalakan flag apa pun sendiri (hanya membaca gerbang)',
+      !/FIEZEL_CF_CONFIG\s*=/.test(blockSrc) && !/endpoints\s*[:.]\s*\{?[^}]*usage\s*=\s*'on'/.test(blockSrc),
+      'blok pemancar app.js tidak menulis FIEZEL_CF_CONFIG');
+    check('core-config.js: ai dan tts tetap off (analytics tidak membuka jalur berbiaya)',
+      /ai:'off'/.test(cfgSrc) && /tts:'off'/.test(cfgSrc) && !/ai:'(?:on|shadow)'/.test(cfgSrc) && !/tts:'(?:on|shadow)'/.test(cfgSrc),
+      'core-config.js ai/tts');
   }
 
   finish();

@@ -397,6 +397,17 @@
       "request": "Ubah [/^\\/api\\/(?:usage|activity|feedback|policy)(?:\\/|$)/,'usage'] menjadi [/^\\/api\\/usage(?:\\/|$)/,'usage']. Path tak terpetakan otomatis 'off' (cfEndpointKey mengembalikan '' -> 'off'), jadi tiga rute itu tetap di jalur lama tanpa perubahan lain.",
       "risk": "Nol untuk pekerjaan maskot/tampilan. Commit app.js terakhir wilayah itu soal PAW Character System, tidak menyentuh tabel rute CF.",
       "alternatif_yang_ditolak": "Menambah tiga rute itu ke Worker: /api/feedback butuh penyimpanan nyata, dan menjawab 200 palsu akan MENELAN masukan murid diam-diam. SLOT 5 memang ditandai BELUM."
+    },
+    {
+      "id": "T-031",
+      "title": "TABRAKAN NAMA GLOBAL: fiezel-ab-testing.js merebut window.FiezelAnalytics",
+      "owner": "MASTER (sesi-computer-086e9698) -> memberi tahu UIUX-AUDIT-REPAIR (sesi-computer-ed18fcf2)",
+      "status": "in_progress",
+      "bukti": "features/ui/fiezel-ab-testing.js:194 menjalankan window.FiezelAnalytics = new FiezelABAnalytics(). Objek itu TIDAK punya createClient. index.html:428 memuatnya lewat <script defer>, jadi ia SELALU terisi sebelum pemuat analytics jalan di idle. app.js:3287 keluar lebih awal kalau self.FiezelAnalytics truthy, sehingga modul analytics asli TIDAK PERNAH diunduh dan gagal dengan lastError module_shape.",
+      "diukur": "Dua sesi peramban terpisah di produksi: stats() {loaded:false,started:true,lastError:'module_shape',gateOpen:true}; nol resource analytics terunduh; nol permintaan /api/usage; NOL galat merah di konsol. Sesudah _resetForGate()+boot(), gagal identik - jadi bukan gangguan sementara.",
+      "akibat": "Analytics murid MATI TOTAL dan SENYAP. Owner akan menunggu angka yang tidak akan pernah datang, sementara semua flag hijau dan semua gerbang lulus.",
+      "risiko_arah_lain": "features/ui/fiezel-ui-manager.js:54 memanggil window.FiezelAnalytics.track(payload). Kalau suatu saat modul analytics asli yang menang, muatan eksperimen UI akan masuk ke pipa analytics yang diatur kontrak privasi.",
+      "izin": "Owner sudah memberi otoritas eksplisit untuk menyunting wilayah sesi lain pada T-030 dengan kalimat 'Kerjakan sekarang, aku yang menanggung'. Cacat ini lebih berat: ia membutakan owner sepenuhnya."
     }
   ],
   "last_report": {

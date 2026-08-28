@@ -32,6 +32,16 @@ const ctx={console,self:null,document,localStorage,fetch,location:{href:'http://
 ctx.Notification.permission='granted';ctx.Notification.requestPermission=async()=>'granted';
 ctx.window=ctx;ctx.self=ctx;ctx.window.scrollTo=()=>{};ctx.window.speechSynthesis={cancel(){},speak(){}};ctx.window.SpeechSynthesisUtterance=function(t){this.text=t};
 vm.createContext(ctx);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — index.html memuat fiezel-i18n.js +
+// copy-id-*.js SEBELUM modul fitur dan app.js. Begitu naskah ritual/home (mis. 'RENCANA HARI
+// INI') pindah ke copy-map, render memanggil FiezelI18n.t(); tanpa preload ini vm meledak.
+// existsSync = hijau dua arah. Asersi teks id di bawah TETAP byte-identik (id-golden-snapshot).
+const i18nDir=path.join(root,'features','i18n');
+if(fs.existsSync(path.join(i18nDir,'fiezel-i18n.js'))){
+  vm.runInContext(fs.readFileSync(path.join(i18nDir,'fiezel-i18n.js'),'utf8'),ctx,{filename:'fiezel-i18n.js'});
+  for(const f of fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir,f),'utf8'),ctx,{filename:f});
+}
 vm.runInContext(gems,ctx,{filename:'gems-core.js'});
 vm.runInContext(prasasti,ctx,{filename:'fiezel-prasasti-core.js'});
 vm.runInContext(app,ctx,{filename:'app.js'});

@@ -110,10 +110,46 @@ check('core-config.js: FIEZEL_CF_REMOTE terpasang dan beku (parameter pengambil,
   Boolean(REPO_REMOTE) && Object.isFrozen(REPO_REMOTE) && REPO_REMOTE.path === '/api/config'
   && REPO_REMOTE.protocol === '1.7' && Number(REPO_REMOTE.timeoutMs) > 0,
   JSON.stringify(REPO_REMOTE));
-check('core-config.js: flag statis repo MASIH semua off (paket ini tidak menyalakan apa pun)',
-  Boolean(REPO_CF) && REPO_CF.enabled === false && String(REPO_CF.base || '') === ''
-  && Object.values(REPO_CF.endpoints || {}).every(v => v === 'off'),
+/* =======================================================================================
+ * (b) BERKAS YANG BENAR-BENAR TERPASANG — bukan harness sintetis
+ * =====================================================================================
+ * Assert lama di titik ini: "flag statis repo MASIH semua off (paket ini tidak menyalakan
+ * apa pun)". Itu kontrak paket kill switch, dan sudah kedaluwarsa: paket A6 (28 Agu 2026)
+ * MEMANG menyalakan, dan penyalaan itu yang sekarang harus dijaga bentuknya. Yang berubah
+ * bukan ketegasannya melainkan sasarannya — dari "nol yang hidup" menjadi "hanya dua yang
+ * hidup, dan dua yang menghabiskan uang wajib mati".
+ *
+ * Assert ini sengaja dua lapis: NILAI hasil evaluasi berkas (yang benar-benar dibaca app.js)
+ * DAN TEKS berkasnya (menangkap perubahan yang tersembunyi di balik cabang atau komentar).
+ * Berkas inilah yang ikut precache service worker dan dilayani cache-first, jadi salah di
+ * sini artinya salah di perangkat murid selama satu generasi shell penuh. */
+const A6_LIVE = ['config', 'usage'];
+const A6_MUST_OFF = ['health', 'auth', 'quota', 'ai', 'tts'];
+const repoLive = Object.entries(REPO_CF?.endpoints || {}).filter(([, v]) => v !== 'off').map(([k]) => k);
+check('(b) core-config.js terpasang: enabled:true + base api.fiezel.my.id (jalur CF benar-benar hidup)',
+  Boolean(REPO_CF) && REPO_CF.enabled === true && REPO_CF.base === CF_BASE
+  && Object.isFrozen(REPO_CF) && Object.isFrozen(REPO_CF.endpoints),
   JSON.stringify(REPO_CF));
+check('(b) core-config.js terpasang: ai dan tts BENAR-BENAR off — nol neuron, nol rupiah',
+  REPO_CF?.endpoints?.ai === 'off' && REPO_CF?.endpoints?.tts === 'off',
+  `ai=${REPO_CF?.endpoints?.ai} tts=${REPO_CF?.endpoints?.tts}`);
+check('(b) core-config.js terpasang: yang hidup HANYA config+usage (tahap rilis tidak dilampaui)',
+  repoLive.length === A6_LIVE.length && A6_LIVE.every(k => REPO_CF?.endpoints?.[k] === 'on')
+  && A6_MUST_OFF.every(k => REPO_CF?.endpoints?.[k] === 'off'),
+  `hidup=${repoLive.join(',') || '0'}`);
+{
+  // Lapis TEKS: dibaca dari berkas apa adanya, jadi mutasi sekecil satu kata pun merah.
+  const cfgText = stripComments(config);
+  const blok = (cfgText.match(/FIEZEL_CF_CONFIG\s*=\s*Object\.freeze\(\{[\s\S]*?\}\);/) || [])[0] || '';
+  check('(b) teks core-config.js: blok FIEZEL_CF_CONFIG ada, dan ai/tts tertulis off di dalamnya',
+    /ai:'off'/.test(blok) && /tts:'off'/.test(blok)
+    && !/ai:'(?:on|shadow)'/.test(blok) && !/tts:'(?:on|shadow)'/.test(blok),
+    blok.replace(/\s+/g, ' ').slice(0, 200) || 'blok tidak ditemukan');
+  check('(b) teks core-config.js: NOL endpoint hidup selain config dan usage',
+    (blok.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || [])
+      .map(s => s.split(':')[0]).every(k => A6_LIVE.includes(k)),
+    (blok.match(/(health|config|auth|quota|ai|tts|usage):'(?:on|shadow)'/g) || []).join(','));
+}
 
 const RUNNABLE = killBlock + '\n' + transportBlock + `
 ;globalThis.__cf={
@@ -192,6 +228,9 @@ function makeHarness(options = {}) {
   return {
     api: sandbox.__cf,
     gate: sandbox.FiezelCfKillSwitch,
+    // Konteks vm-nya dibuka supaya blok LAIN dari app.js (mis. pemancar analytics) bisa
+    // dijalankan di atas fungsi gerbang yang SAMA, bukan atas tiruan.
+    sandboxRef: sandbox,
     log,
     sessionData,
     puterResponse,
@@ -208,9 +247,12 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   /* ===================================================================================
    * (a) SERVER TIDAK BISA MENYALAKAN apa pun yang statisnya off
    * ================================================================================= */
-  // Flag statis = nilai NYATA repo (semua off). Server menjawab semua true, dengan protokol
-  // yang cocok — jawaban paling "mengundang" yang mungkin.
-  const staticOff = makeHarness({ cfConfig: REPO_CF, configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE }, ttlSeconds: 60 } });
+  // Server menjawab semua true, dengan protokol yang cocok — jawaban paling "mengundang"
+  // yang mungkin. Flag statis di sini ditulis EKSPLISIT semua-off. Sebelum A6 nilainya dipinjam dari repo
+  // (yang memang seluruhnya off); sesudah A6 pinjaman itu akan menguji hal lain dan assert
+  // "semua gabungan tetap off" jadi bohong. Keadaan repo yang sebenarnya diuji terpisah di
+  // bagian A6 di bawah.
+  const staticOff = makeHarness({ cfConfig: { enabled: false, base: '', endpoints: { ...ALL_OFF } }, configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE }, ttlSeconds: 60 } });
   // Suntikkan jawaban server itu langsung supaya (a) diuji pada keadaan server = ok,
   // bukan pada keadaan "belum dijawab" yang mati karena alasan lain.
   staticOff.api.cfApplyServerConfig({ protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE } }, 'server');
@@ -520,12 +562,21 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
   check('(g) diukur: kelanjutan boot selesai jauh sebelum jawaban /api/config tiba',
     bootContinuationMs >= 0 && bootContinuationMs < 100 && configMs >= 300 && configState.status === 'ok',
     `boot=${bootContinuationMs}ms config=${configMs}ms`);
-  // Keadaan hari ini: semua flag statis off ⇒ tidak ada yang bisa dimatikan ⇒ NOL permintaan.
+  /* Keadaan repo hari ini. Bentuk lama assert ini: "semua statis off ⇒ NOL permintaan dan
+   * NOL tugas terjadwal". Sejak A6 justru KEBALIKANNYA yang harus benar, dan ini inti
+   * paketnya: karena ada endpoint hidup, pengambil kill switch WAJIB terjadwal — kalau tidak,
+   * jalur CF hidup tanpa sakelar mati dari server. Yang tetap dijaga: satu permintaan saja,
+   * dan tidak ada permintaan DATA yang jalan sebelum ada pemanggil. */
   const hariIni = makeHarness({ cfConfig: REPO_CF });
-  check('(g) keadaan repo hari ini (semua statis off): NOL permintaan dan NOL tugas terjadwal',
-    hariIni.log.fetches.length === 0 && hariIni.log.idle.length === 0
-    && hariIni.api.state().status === 'not_needed',
+  check('(g) keadaan repo hari ini: pengambil kill switch terjadwal (jalur hidup = sakelar wajib terpasang)',
+    hariIni.log.idle.length === 1 && hariIni.log.fetches.length === 0
+    && hariIni.api.state().status === 'idle',
     `fetch=${hariIni.log.fetches.length} idle=${hariIni.log.idle.length} status=${hariIni.api.state().status}`);
+  await boot(hariIni);
+  check('(g) keadaan repo hari ini: TEPAT satu permintaan, dan itu /api/config — nol permintaan data',
+    hariIni.log.fetches.length === 1 && hariIni.configCalls().length === 1
+    && hariIni.cfDataCalls().length === 0 && hariIni.api.state().status === 'ok',
+    `fetch=${hariIni.log.fetches.map(f => f.url).join(',')} status=${hariIni.api.state().status}`);
   // Boot dipanggil dua kali (mis. modul dimuat ulang) tetap satu permintaan.
   const duaKali = makeHarness({ cfConfig: { enabled: true, base: CF_BASE, endpoints: { ...ALL_ON } } });
   check('(g) cfConfigBootOnce() hanya sekali per boot walau dipanggil lagi',
@@ -555,6 +606,211 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
     'cari cfKillSwitch di features/neural-voice/fiezel-diag-panel.js');
   check('panel: keadaan sebelum modul termuat dijawab kalimat, bukan galat',
     /kill switch CF belum dimuat/.test(diagPanel), 'cari kalimat cadangan di panel diagnostik');
+
+  /* ===================================================================================
+   * A6. PENYALAAN KLIEN TAHAP 1 — analytics saja, dan buktinya dengan MENJALANKAN
+   * =================================================================================
+   * Bagian ini menjawab lima pertanyaan yang tidak boleh dijawab dengan klaim:
+   *   (a) `enabled:false` mengalahkan SETIAP endpoint 'on' dan menghasilkan NOL fetch CF;
+   *   (c) dua endpoint yang dinyalakan benar-benar CUKUP untuk membuat pemancar analytics
+   *       jalan — diuji dengan MENJALANKAN blok pemancar app.js atas config repo, bukan
+   *       dengan membacanya;
+   *   (d) `base` kosong diperlakukan sama dengan off;
+   *   (e) invarian precache sw.js yang menjadi dasar jawaban latensi di laporan;
+   *   + kill switch server tetap bisa mematikan jalur ini TANPA deploy klien. */
+
+  /* --- (a) rollback klien: satu nilai mengalahkan tujuh endpoint, dan NOL fetch --------- */
+  {
+    const mati = makeHarness({ cfConfig: { enabled: false, base: CF_BASE, endpoints: { ...ALL_ON } } });
+    mati.api.cfApplyServerConfig({ protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE } }, 'server');
+    for (const p of PATHS) await mati.api.coreWorkerExec(p, { method: 'POST' });
+    check('(a-A6) enabled:false + ketujuh endpoint on + server semua true ⇒ ketujuh gabungan off',
+      ENDPOINT_KEYS.every(key => mati.api.cfMergedMode(key) === 'off'),
+      ENDPOINT_KEYS.map(key => `${key}=${mati.api.cfMergedMode(key)}`).join(', '));
+    check('(a-A6) enabled:false ⇒ NOL fetch ke CF sama sekali (termasuk /api/config), semua ke Puter',
+      mati.log.fetches.length === 0 && mati.log.puter.length === PATHS.length && mati.log.idle.length === 0,
+      `fetch=${mati.log.fetches.length} puter=${mati.log.puter.length} idle=${mati.log.idle.length}`);
+  }
+
+  /* --- (d) base kosong = off, walau enabled:true dan semua endpoint 'on' --------------- */
+  for (const [nama, baseValue] of [['base kosong', ''], ['base spasi', '   '], ['base hilang', undefined]]) {
+    const tanpaBase = makeHarness({ cfConfig: { enabled: true, base: baseValue, endpoints: { ...ALL_ON } } });
+    tanpaBase.api.cfApplyServerConfig({ protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE } }, 'server');
+    for (const p of PATHS) await tanpaBase.api.coreWorkerExec(p, { method: 'POST' });
+    check(`(d-A6) ${nama} diperlakukan sama dengan off: ketujuh gabungan off, NOL fetch`,
+      ENDPOINT_KEYS.every(key => tanpaBase.api.cfMergedMode(key) === 'off')
+      && tanpaBase.log.fetches.length === 0 && tanpaBase.log.puter.length === PATHS.length,
+      `fetch=${tanpaBase.log.fetches.length} puter=${tanpaBase.log.puter.length} modes=${ENDPOINT_KEYS.map(k => tanpaBase.api.cfMergedMode(k)).join(',')}`);
+  }
+
+  /* --- kill switch server masih menjangkau jalur baru TANPA deploy klien --------------- */
+  {
+    const dimatikanServer = makeHarness({
+      cfConfig: REPO_CF,
+      configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE, cfAnalyticsEnabled: false }, enabled: { ...KILL_ALL_TRUE }, ttlSeconds: 60 }
+    });
+    await boot(dimatikanServer);
+    await dimatikanServer.api.coreWorkerExec('/api/usage/events', { method: 'POST' });
+    check('(A6) cfAnalyticsEnabled:false mematikan usage yang statisnya on — tanpa deploy klien',
+      dimatikanServer.api.cfMergedMode('usage') === 'off'
+      && dimatikanServer.cfDataCalls().length === 0 && dimatikanServer.log.puter.length === 1,
+      `usage=${dimatikanServer.api.cfMergedMode('usage')} cf=${dimatikanServer.cfDataCalls().length}`);
+    const matiFitur = makeHarness({
+      cfConfig: REPO_CF,
+      configBody: { protocol: '1.7', flags: { ...ALL_FLAGS_TRUE }, enabled: { ...KILL_ALL_TRUE, analytics: false }, ttlSeconds: 60 }
+    });
+    await boot(matiFitur);
+    check('(A6) enabled:{analytics:false} juga mematikan jalur usage (dua tuas server, bukan satu)',
+      matiFitur.api.cfMergedMode('usage') === 'off', `usage=${matiFitur.api.cfMergedMode('usage')}`);
+  }
+
+  /* --- kopling rute 'usage' SUDAH DIPUTUS (T-030) ---------------------------------------
+   *
+   * Bentuk lama assert ini menuntut koplingnya TETAP ADA: ia lulus bila keempat path pergi
+   * ke Cloudflare. Maksudnya baik — mendokumentasikan cacat yang diketahui — tetapi akibatnya
+   * ia berubah menjadi PENJAGA CACAT: merah pada perbaikan, hijau pada kerusakan. Ini kejadian
+   * KETIGA dari pola yang sama dalam satu hari (dua sebelumnya: gerbang analytics yang menuntut
+   * app.js TIDAK memuat pemancar, dan rate-anon-test yang menuntut celah tarif tetap ada).
+   *
+   * Yang benar diassert adalah AKIBATNYA ke murid: hanya /api/usage/* yang pindah ke Cloudflare,
+   * dan tiga path yang Worker-nya belum ada (SLOT 5 = BELUM; diuji ke produksi: 404, 404, 404)
+   * TETAP di jalur lama. Kalau seseorang menggabungkan lagi keempatnya sebelum SLOT 5 ada,
+   * assert ini merah — dan itulah gunanya, karena /api/feedback yang 404 TERLIHAT MURID sebagai
+   * toast "Gagal mengirim".
+   */
+  {
+    const repoHidup = makeHarness({ cfConfig: REPO_CF });
+    await boot(repoHidup);
+    await repoHidup.api.coreWorkerExec('/api/usage/events', { method: 'POST' });
+    check('(A6) hanya /api/usage/* pindah ke CF',
+      repoHidup.cfDataCalls().length === 1 && repoHidup.log.puter.length === 0,
+      repoHidup.cfDataCalls().map(f => f.url.replace(CF_BASE, '')).join(','));
+
+    const takTerpetakan = makeHarness({ cfConfig: REPO_CF });
+    await boot(takTerpetakan);
+    for (const p of ['/api/activity', '/api/feedback', '/api/policy/next']) {
+      await takTerpetakan.api.coreWorkerExec(p, { method: 'POST' });
+    }
+    check('(A6/T-030) activity, feedback, policy TETAP di jalur lama — nol permintaan CF',
+      takTerpetakan.cfDataCalls().length === 0 && takTerpetakan.log.puter.length === 3,
+      `cf=${takTerpetakan.cfDataCalls().length} puter=${takTerpetakan.log.puter.length}`);
+    const puterTetap = makeHarness({ cfConfig: REPO_CF });
+    await boot(puterTetap);
+    for (const p of ['/api/ai/chat', '/api/tts/say', '/api/auth/session', '/api/quota/state', '/health']) {
+      await puterTetap.api.coreWorkerExec(p, { method: 'POST' });
+    }
+    check('(A6) murid TETAP memakai Puter untuk ai, tts, auth, quota, health — nol permintaan CF',
+      puterTetap.cfDataCalls().length === 0 && puterTetap.log.puter.length === 5,
+      `cf=${puterTetap.cfDataCalls().length} puter=${puterTetap.log.puter.length}`);
+  }
+
+  /* --- (c) PEMANCAR ANALYTICS DIJALANKAN atas config repo ------------------------------ */
+  {
+    const EMIT_BEGIN = '/* A1-ANALYTICS-EMITTER-BEGIN';
+    const EMIT_END = '/* A1-ANALYTICS-EMITTER-END */';
+    const emitAt = app.indexOf(EMIT_BEGIN);
+    const emitEndAt = app.indexOf(EMIT_END);
+    check('(c-A6) blok pemancar analytics bisa dipotong dari app.js lewat sentinelnya',
+      emitAt > 0 && emitEndAt > emitAt, `begin=${emitAt} end=${emitEndAt}`);
+    const emitBlock = emitAt > 0 && emitEndAt > emitAt ? app.slice(emitAt, emitEndAt) : '';
+
+    // Harness pemancar: blok kill switch + transport + pemancar, dijalankan bersama supaya
+    // `cfStaticMode`/`cfServerAllows` yang dipakai pemancar adalah yang ASLI, bukan tiruan.
+    const runEmitter = (cfConfig, flags, killed) => {
+      const h = makeHarness({
+        cfConfig,
+        configBody: { protocol: '1.7', flags, enabled: killed, ttlSeconds: 60 }
+      });
+      // Timer yang dipasang SEBELUM blok pemancar (milik pengambil kill switch) dicatat dulu,
+      // supaya yang diukur adalah timer pemancar itu sendiri — bukan warisan tetangganya.
+      const idleSebelum = h.log.idle.length;
+      // Blok pemancar dijalankan di konteks yang SAMA supaya ia memakai fungsi gerbang asli.
+      vm.runInContext(
+        'const LEVELS=' + JSON.stringify(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) + ';'
+        + 'var state={daily:{attempts:3}};'
+        + emitBlock
+        + '\n;globalThis.__an=self.FiezelAnalyticsEmitter;',
+        h.sandboxRef, { filename: 'app.js#a1-analytics-emitter' });
+      return { h, an: h.sandboxRef.__an, timerPemancar: h.log.idle.length - idleSebelum };
+    };
+
+    // 1. Config REPO + server mengizinkan analytics ⇒ gerbang pemancar TERBUKA.
+    const hidupPemancar = runEmitter(REPO_CF, { ...ALL_FLAGS_TRUE }, { ...KILL_ALL_TRUE });
+    await boot(hidupPemancar.h);
+    check('(c-A6) config repo + server izin ⇒ anGateOpen() BENAR-BENAR true (dijalankan, bukan dibaca)',
+      hidupPemancar.an && hidupPemancar.an.gateOpen() === true,
+      `gateOpen=${hidupPemancar.an && hidupPemancar.an.gateOpen()}`);
+    check('(c-A6) config repo ⇒ pemancar memasang TEPAT satu timernya sendiri saat blok dimuat',
+      hidupPemancar.timerPemancar === 1, `timer pemancar=${hidupPemancar.timerPemancar}`);
+    check('(c-A6) pemancar memakai base yang sama dengan core-config.js (satu alamat, bukan dua)',
+      hidupPemancar.h.api.cfEndpointMode('/api/usage/events') === 'on',
+      `mode=${hidupPemancar.h.api.cfEndpointMode('/api/usage/events')}`);
+
+    // 2. Anti-vakum: kalau `usage` statis off, pemancar mati walau server mengizinkan semua.
+    const matiPemancar = runEmitter({ enabled: true, base: CF_BASE, endpoints: { ...ALL_ON, usage: 'off' } },
+      { ...ALL_FLAGS_TRUE }, { ...KILL_ALL_TRUE });
+    await boot(matiPemancar.h);
+    check('(c-A6) anti-vakum: usage statis off ⇒ gerbang pemancar TERTUTUP dan NOL timer dipasang',
+      matiPemancar.an && matiPemancar.an.gateOpen() === false && matiPemancar.timerPemancar === 0,
+      `gateOpen=${matiPemancar.an && matiPemancar.an.gateOpen()} timer pemancar=${matiPemancar.timerPemancar}`);
+
+    // 3. Anti-vakum kedua: config repo tapi server MEMATIKAN analytics ⇒ gerbang tertutup.
+    const serverMatikan = runEmitter(REPO_CF, { ...ALL_FLAGS_TRUE, cfAnalyticsEnabled: false }, { ...KILL_ALL_TRUE });
+    await boot(serverMatikan.h);
+    check('(c-A6) config repo tapi server mematikan analytics ⇒ pemancar ikut mati',
+      serverMatikan.an && serverMatikan.an.gateOpen() === false,
+      `gateOpen=${serverMatikan.an && serverMatikan.an.gateOpen()}`);
+
+    // 4. Anti-vakum ketiga: sebelum jawaban server tiba, gerbang WAJIB tertutup (arah aman).
+    const belumDijawab = runEmitter(REPO_CF, { ...ALL_FLAGS_TRUE }, { ...KILL_ALL_TRUE });
+    check('(c-A6) sebelum jawaban /api/config tiba, gerbang pemancar tertutup (fail-closed)',
+      belumDijawab.an && belumDijawab.an.gateOpen() === false,
+      `gateOpen=${belumDijawab.an && belumDijawab.an.gateOpen()}`);
+  }
+
+  /* --- (e) INVARIAN PRECACHE sw.js yang menjadi dasar jawaban latensi ------------------ */
+  {
+    const sw = read('sw.js');
+    const swCode = stripComments(sw);
+    const swRev = (swCode.match(/SW_REV\s*=\s*'([^']+)'/) || [])[1] || '';
+    check('(e) sw.js: core-config.js memang ikut precache (jadi flag baru TIDAK instan)',
+      /['"]\.?\/?core-config\.js['"]/.test(swCode) && /ASSETS\s*=/.test(swCode),
+      'daftar ASSETS sw.js');
+    check('(e) sw.js: nama cache shell diturunkan dari SW_REV (generasi baru = SW_REV baru)',
+      Boolean(swRev) && /SHELL_CACHE\s*=\s*`fiezel-shell-\$\{SW_REV\}`/.test(swCode),
+      `SW_REV=${swRev}`);
+    /* Assert ini pernah LOLOS dari mutasi terarah: bentuk pertamanya hanya mencari
+     * `new Request(..., {cache:'reload'})` di mana pun di sw.js, dan sw.js punya DUA tempat
+     * memakai pola itu (precache shell + revalidasi navigasi). Mengubah yang precache jadi
+     * 'default' tetap hijau karena yang navigasi masih cocok. Sekarang yang dipatok adalah
+     * jalur PRECACHE-nya sendiri: `shellRequests()` memetakan ASSETS dengan cache:'reload',
+     * dan install memakai fungsi itu lewat addAll. */
+    check('(e) sw.js: precache shell mengunduh ulang ASSETS dengan cache:\'reload\' (bukan cache HTTP)',
+      /shellRequests\s*=\s*\(\)\s*=>\s*ASSETS\.map\(\s*\w+\s*=>\s*new Request\(\s*\w+\s*,\s*\{\s*cache:\s*'reload'\s*\}\s*\)\s*\)/.test(swCode)
+      && /addAll\(\s*shellRequests\(\)\s*\)/.test(swCode)
+      && /caches\.open\(\s*SHELL_CACHE\s*\)/.test(swCode),
+      "cari shellRequests()=ASSETS.map(...cache:'reload') + addAll(shellRequests()) di sw.js");
+    check('(e) sw.js: activate MENGHAPUS generasi shell lama (fiezel-shell-*)',
+      /caches\.keys\(\)/.test(swCode) && /fiezel-shell-/.test(swCode) && /caches\.delete\(/.test(swCode),
+      'pembersihan cache lama di activate');
+    /* Assert ini juga pernah lolos mutasi: bentuk pertamanya menuntut tanda kurung
+     * (`skipWaiting(`), jadi penyisipan `self.skipWaiting;` — atau `const f=self.skipWaiting`
+     * yang dipanggil belakangan lewat alias — tetap hijau. Sekarang SETIAP penyebutan nama
+     * itu di kode (komentar sudah dibuang) merah. */
+    check('(e) sw.js: NOL penyebutan skipWaiting/clients.claim — inilah sebabnya config baru menunggu',
+      !/skipWaiting/.test(swCode) && !/clients\s*\.\s*claim/.test(swCode),
+      'sw.js tidak mengambil alih klien yang sedang jalan');
+    check('(e) sw.js: ada jalur pemeriksaan pembaruan (registration.update) supaya SW_REV baru terdeteksi',
+      /registration\.update\(\)/.test(swCode), 'cari registration.update() di sw.js');
+    // Invarian penanda versi: config baru hanya sampai kalau SW_REV naik, dan yang menaikkan
+    // adalah tools/bump-build.mjs (bukan tangan). Keberadaan arbiter itu ikut dijaga.
+    check('(e) arbiter versi ada dan menyentuh ketiga penanda (SW_REV, PAGE_BUILD, DIAG_BUILD)',
+      fs.existsSync(path.join(root, 'tools', 'bump-build.mjs'))
+      && /SW_REV/.test(read('tools/bump-build.mjs'))
+      && /FIEZEL_PAGE_BUILD/.test(read('tools/bump-build.mjs'))
+      && /DIAG_BUILD/.test(read('tools/bump-build.mjs')),
+      'tools/bump-build.mjs');
+  }
 
   /* ===================================================================================
    * 6. Invarian build tidak ikut naik (wewenang MASTER saat merge)

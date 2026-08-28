@@ -1,5 +1,10 @@
 /* FIEZEL UI: A/B Testing + Skeleton/Empty-state utilities (tema tunggal: terang) */
 
+/* AI-02 F01: naskah murid tidak lagi literal di titik pakai - diambil dari FiezelI18n
+   (copy-id-feat-b.js), dimuat lebih dulu lewat <script defer> di index.html. Guard typeof
+   menjaga berkas ini tetap aman diurai di luar browser. */
+const FZ_UI_T = (key) => (typeof FiezelI18n !== 'undefined' && FiezelI18n && FiezelI18n.t) ? FiezelI18n.t(key) : String(key);
+
 class FiezelUIManager {
   constructor() {
     /* Kunci lama dari era mode gelap; dipertahankan hanya untuk dibersihkan di initTheme. */
@@ -49,9 +54,15 @@ class FiezelUIManager {
     this.logABEvent(payload);
   }
 
+  /* T-031: event eksperimen UI pergi ke pipa A/B (`window.FiezelABAnalytics`), BUKAN ke
+   * `window.FiezelAnalytics` — nama itu milik modul analytics privasi-maksimal, yang
+   * allowlist field-nya tidak mengizinkan muatan eksperimen dan yang kontraknya tidak
+   * boleh menerima teks bebas dari UI. Bentuknya diperiksa sebelum dipakai supaya nama
+   * yang terisi objek asing tidak menjadi TypeError di jalur murid. */
   logABEvent(payload) {
-    if (window.FiezelAnalytics) {
-      window.FiezelAnalytics.track(payload);
+    const ab = window.FiezelABAnalytics;
+    if (ab && typeof ab.track === 'function') {
+      ab.track(payload);
     } else {
       console.debug('[AB Test Event]', payload);
     }
@@ -85,9 +96,9 @@ class FiezelUIManager {
   createEmptyState(options = {}) {
     const {
       icon = '📚',
-      title = 'Belum ada konten',
-      description = 'Mulai belajar untuk melihat progres',
-      actionText = 'Mulai',
+      title = FZ_UI_T('ui.empty-title'),
+      description = FZ_UI_T('ui.empty-desc'),
+      actionText = FZ_UI_T('ui.empty-action'),
       actionHandler = null,
       minimal = false
     } = options;

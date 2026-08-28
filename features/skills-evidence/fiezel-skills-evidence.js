@@ -23,6 +23,19 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: label terminologi diambil dari lapisan i18n (copy-id-feat-b.js), bukan
+  // literal di titik pakai. Di browser runtime-nya sudah dimuat lebih dulu (index.html);
+  // di Node (gate print-only me-require berkas ini langsung) modul memuatnya sendiri
+  // supaya nilai yang dihasilkan tetap byte-identik dengan naskah hari ini.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var SCHEMA = 'fiezel-skills-evidence-v1';
   var VERSION = 1;
   var SOURCE_SCHEMA = 'fiezel-sl-v1';
@@ -174,8 +187,8 @@
       },
       // Dashboard tidak boleh menyebut coverage produksi lisan sebagai skor pengucapan.
       terminology: {
-        practiceScore: 'skor latihan',
-        targetCoverage: 'cakupan target',
+        practiceScore: T('skills.practice-score-label'),
+        targetCoverage: T('skills.target-coverage-label'),
         pronunciationScore: false
       }
     };

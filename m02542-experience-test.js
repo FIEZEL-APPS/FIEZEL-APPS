@@ -10,6 +10,16 @@ const fs = require('fs');
 const zoom = require('./features/ui/fiezel-zoom-lock.js');
 // m025-96: gerbang unduhan dipensiunkan seluruhnya - berkasnya tidak ada lagi.
 const daily = require('./features/daily-target/fiezel-daily-target.js');
+// W4-QA — harness i18n, teknik union W2 (pola regression-test/tours-test W2-INT §1):
+// naskah tutor-dialog PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01, W2-FEAT-B).
+// require modul di ATAS ini sudah menyeret runtime FiezelI18n ke globalThis TANPA copy-map
+// feat-b, sehingga jalur muat-mandiri di fiezel-tutor-dialog.js (yang hanya aktif saat
+// global kosong) terlewati dan T() mengembalikan kunci mentah — merah 'the live topic is
+// named' yang dicatat W2-TEST-B/W3-STT. Perbaikannya di harness, bukan di asersi: daftarkan
+// copy-id-feat-b ke instans global yang sama SEBELUM dialog dimuat. Nilai yang di-assert
+// di bawah tetap byte-identik dengan naskah id lama (Hukum Besi #1) — union = kalimatnya
+// sah dirender lewat t() selama bytenya sama persis.
+require('./features/i18n/copy-id-feat-b.js');
 const dialog = require('./features/tutor-classroom/fiezel-tutor-dialog.js');
 
 const index = fs.readFileSync('index.html', 'utf8');
@@ -271,7 +281,12 @@ test('Fiezel AI answers anything, and says plainly when it cannot', () => {
     'the lesson-locked persona is gone');
   // Offline honesty: an off-topic question without the gateway says why.
   assert.match(chatSrc, /function unavailableReason/, 'the reason is surfaced to the learner');
-  assert.match(chatSrc, /login Puter dulu/, 'and it names the actual fix');
+  // W4-QA — union W2: kalimatnya PINDAH byte-identik ke copy-id-feat-b.js (AI-02 F01);
+  // sah bila masih inline ATAU dirender lewat kunci i18n yang nilainya memuat kalimat sama.
+  const featBCopySrc = fs.readFileSync('features/i18n/copy-id-feat-b.js', 'utf8');
+  assert.ok(/login Puter dulu/.test(chatSrc) ||
+    (/T\('tutor\.ai-need-login'\)/.test(chatSrc) && /login Puter dulu/.test(featBCopySrc)),
+    'and it names the actual fix');
 });
 
 test('Speaking and Listening no longer carries an optional voice setup', () => {

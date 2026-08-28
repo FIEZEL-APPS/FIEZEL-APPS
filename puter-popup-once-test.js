@@ -265,10 +265,20 @@ check(
        ia nggak pernah memanggil requestUpgrade, dan ia tetap mengatakan aplikasinya jalan
        penuh tanpa bayar apa pun.
    Naskah lengkapnya sekarang punya gerbangnya sendiri: quota-notice-a11y-test.js. */
+/* AI-20 F06 (W1-TESTPLAN 2a): tombol 'Oke, lanjut belajar' adalah naskah murid — ia boleh
+   PINDAH byte-identik dari app.js ke copy-map features/i18n/copy-id-*.js (id-golden-snapshot
+   menjaga byte-nya). Literal itu dicari di UNION app.js + copy-id; glob kosong hari ini =
+   perilaku persis seperti sebelum ekstraksi. Call-site presentQuotaNotice dan larangan
+   permukaan bayar tetap diperiksa pada app.js. */
+const i18nDir = path.join(root, 'features', 'i18n');
+const copyIdUnion = fs.existsSync(i18nDir)
+  ? fs.readdirSync(i18nDir).filter((f) => /^copy-id-.*\.js$/.test(f)).sort()
+      .map((f) => fs.readFileSync(path.join(i18nDir, f), 'utf8')).join('\n')
+  : '';
 check(
   'Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK, dan tanpa permukaan bayar',
   /presentQuotaNotice\(\{copyKey:'quota\.ai\.exhausted'/.test(app) &&
-  /Oke, lanjut belajar/.test(app) &&
+  /Oke, lanjut belajar/.test(app + '\n' + copyIdUnion) &&
   !/Pelajari opsi upgrade/.test(app) && !/puter\.com\/settings\/usage/.test(app) &&
   !/puter\.ui\.requestUpgrade/.test(app),
   'FIEZEL tetap jalan penuh tanpa bayar - naskahnya mengatakan itu, dan tautan berbayarnya hilang'
