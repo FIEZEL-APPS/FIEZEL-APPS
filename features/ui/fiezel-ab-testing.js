@@ -1,7 +1,28 @@
-/* FIEZEL A/B Testing & Analytics Framework */
+/* FIEZEL A/B Testing & Analytics Framework
+ *
+ * NAMA GLOBAL: `window.FiezelABAnalytics` — DAN HANYA ITU.
+ *
+ * T-031: berkas ini dulu memasang dirinya sebagai `window.FiezelAnalytics`, nama yang
+ * dimiliki modul analytics privasi-maksimal (`features/analytics/fiezel-analytics-client.js`).
+ * Karena berkas ini dimuat `<script defer>` dari index.html, nama itu SELALU sudah terisi
+ * sebelum pemuat analytics di app.js berjalan di idle; pemuat itu mempercayai nama yang
+ * sudah ada, menerima objek A/B ini, gagal cek bentuk, dan modul analytics ASLI tidak
+ * pernah diunduh. Akibatnya: analytics murid mati total dan SENYAP (nol permintaan ke
+ * /api/usage, nol galat konsol). Arah sebaliknya sama berbahaya: kalau modul analytics
+ * yang menang balapan, muatan eksperimen UI di sini akan masuk ke pipa yang diatur
+ * kontrak privasi-maksimal.
+ *
+ * Dua pipa ini TIDAK BOLEH berbagi nama. Yang menjaganya: `global-name-collision-test.js`
+ * (memindai SUMBER seluruh repo secara programatik) dan `analytics-client-test.js`.
+ *
+ * DATA MURID: kunci penyimpanan `fiezel_ab_events` TIDAK berganti nama walau global-nya
+ * berganti. Event A/B yang sudah ada di perangkat murid tetap terbaca dan tetap ikut
+ * di-flush; tidak ada satu baris pun yang dibuang diam-diam.
+ */
 
 class FiezelABAnalytics {
   constructor() {
+    /* JANGAN ganti nama kunci ini tanpa migrasi: ia sudah berisi event di perangkat murid. */
     this.EVENTS_LOG = 'fiezel_ab_events';
     this.MAX_EVENTS = 500;
     this.variant = window.FiezelUI?.getABVariant() || 'control';
@@ -78,6 +99,16 @@ class FiezelABAnalytics {
       variant: this.variant,
       ...metadata
     });
+  }
+
+  /* Jalan masuk untuk pemanggil UI (`fiezel-ui-manager.js#logABEvent`), yang mengirim satu
+   * objek payload berisi `event`. Sebelum T-031 pemanggil itu memanggil `.track()` pada
+   * global yang direbut berkas ini — padahal kelas ini TIDAK PERNAH punya `track()`, jadi
+   * jalur itu akan melempar TypeError begitu benar-benar dipakai. Metode ini menutup lubang
+   * itu di sisi pemilik nama, bukan di sisi pemanggil. */
+  track(payload = {}) {
+    const { event, ...rest } = payload || {};
+    return this.logEvent(String(event || 'ab_event'), rest);
   }
 
   /* Generic event logging */
@@ -190,15 +221,15 @@ class FiezelABAnalytics {
   }
 }
 
-// Global instance
-window.FiezelAnalytics = new FiezelABAnalytics();
+// Instance global — nama sendiri, tidak ambigu, tidak berbagi dengan modul analytics.
+window.FiezelABAnalytics = new FiezelABAnalytics();
 
 // Flush events on page unload
 window.addEventListener('beforeunload', () => {
-  window.FiezelAnalytics?.flushEvents();
+  window.FiezelABAnalytics?.flushEvents();
 });
 
 // Export for modules
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = window.FiezelAnalytics;
+  module.exports = window.FiezelABAnalytics;
 }

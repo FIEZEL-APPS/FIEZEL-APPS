@@ -22,7 +22,7 @@ Skeleton shimmer animation yang sama seperti Spotify saat data dimuat.
 ```javascript
 // Saat komponen mulai load data
 SkeletonHelpers.renderSkeleton('vocabulary-container', SkeletonHelpers.vocabularySkeleton());
-window.FiezelAnalytics?.trackSkeletonShown('vocabulary', 0);
+window.FiezelABAnalytics?.trackSkeletonShown('vocabulary', 0);
 
 // Setelah data tersedia
 await fetchVocabularyData();
@@ -78,7 +78,7 @@ window.FiezelUI?.toggleDarkMode();
 const isDark = window.FiezelUI?.getCurrentTheme() === 'dark';
 
 // Track for A/B testing
-window.FiezelAnalytics?.trackDarkModeToggle('dark');
+window.FiezelABAnalytics?.trackDarkModeToggle('dark');
 ```
 
 ---
@@ -123,19 +123,19 @@ File: `features/ui/fiezel-ab-testing.js`
 **Tracking APIs:**
 ```javascript
 // Track view changes
-FiezelAnalytics?.trackViewTransition('home', 'vocabulary');
+FiezelABAnalytics?.trackViewTransition('home', 'vocabulary');
 
 // Track skeleton usage (measure loading time)
-FiezelAnalytics?.trackSkeletonShown('vocabulary', durationMs);
+FiezelABAnalytics?.trackSkeletonShown('vocabulary', durationMs);
 
 // Track empty states
-FiezelAnalytics?.trackEmptyStateShown('reading', 'no_data');
+FiezelABAnalytics?.trackEmptyStateShown('reading', 'no_data');
 
 // Track dark mode
-FiezelAnalytics?.trackDarkModeToggle('dark');
+FiezelABAnalytics?.trackDarkModeToggle('dark');
 
 // Export session report
-FiezelAnalytics?.exportReport();
+FiezelABAnalytics?.exportReport();
 ```
 
 ---
@@ -147,7 +147,7 @@ FiezelAnalytics?.exportReport();
 - [ ] **Add skeleton loading state**
   - Render skeleton saat fetch dimulai
   - Hide skeleton saat data ready
-  - Track dengan `FiezelAnalytics.trackSkeletonShown()`
+  - Track dengan `FiezelABAnalytics.trackSkeletonShown()`
 
 - [ ] **Add empty state handling**
   - Check jika data array kosong
@@ -240,7 +240,7 @@ async function loadVocabulary() {
 
   // Show skeleton
   container.innerHTML = SkeletonHelpers.vocabularySkeleton();
-  FiezelAnalytics?.trackSkeletonShown('vocabulary');
+  FiezelABAnalytics?.trackSkeletonShown('vocabulary');
 
   try {
     const data = await api.fetchVocabulary();
@@ -254,7 +254,7 @@ async function loadVocabulary() {
         actionText: 'Browse categories',
         actionHandler: 'go("vocabulary-categories")'
       });
-      FiezelAnalytics?.trackEmptyStateShown('vocabulary', 'no_data');
+      FiezelABAnalytics?.trackEmptyStateShown('vocabulary', 'no_data');
       return;
     }
 
@@ -285,7 +285,7 @@ async function loadVocabulary() {
 
 function toggleDarkModeViaButton() {
   const newTheme = window.FiezelUI?.toggleDarkMode();
-  window.FiezelAnalytics?.trackDarkModeToggle(newTheme);
+  window.FiezelABAnalytics?.trackDarkModeToggle(newTheme);
   showToast(`Mode gelap ${newTheme === 'dark' ? 'aktif' : 'nonaktif'}`);
 }
 ```
@@ -297,7 +297,7 @@ let screenStartTime = Date.now();
 
 // When leaving screen
 const screenDuration = Date.now() - screenStartTime;
-FiezelAnalytics?.trackScreenTime('vocabulary_lesson', screenDuration);
+FiezelABAnalytics?.trackScreenTime('vocabulary_lesson', screenDuration);
 ```
 
 ---
