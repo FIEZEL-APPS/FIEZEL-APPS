@@ -45,6 +45,11 @@
 name = "fiezel-owner"
 main = "index.js"
 compatibility_date = "2025-06-01"
+# *.workers.dev DIMATIKAN. Alasannya bukan kerapian: Cloudflare Access dipasang PER HOSTNAME,
+# jadi selama fiezel-owner.<akun>.workers.dev hidup, ia adalah pintu kedua ke dashboard yang
+# TIDAK dilewati Access sama sekali. Sejak zona fiezel.my.id aktif, custom domain di bawah
+# sudah cukup; satu pintu, satu tempat memasang MFA. Lihat DEPLOY.md langkah 4.
+workers_dev = false
 
 # Hostname khusus owner. Zona fiezel.my.id sudah di Cloudflare (plan GRATIS).
 # custom_domain = true → Cloudflare yang mengurus record + sertifikatnya.
@@ -59,9 +64,15 @@ custom_domain = true
 # tidak boleh melebihi apa yang benar-benar dipaksakan — lihat README §Batas.
 # Database ini TERPISAH dari database kuota (cf-a11 risiko 5: D1 single-threaded per database)
 # dan tabel kuota DILARANG di-join dengan tabel analytics (KONTRAK ANALYTICS).
+# PENTING (diperbaiki 28 Agu 2026): nama database sebelumnya tertulis "fiezel-analytics" dan
+# database_id-nya tidak ada. Database itu TIDAK PERNAH ADA. Yang ada di akun adalah
+# `fiezel-stats` (binding STATS_DB di workers/api/wrangler.toml), tempat 0002_analytics.sql
+# sudah dijalankan. Nama yang salah = deploy yang gagal atau, lebih buruk, database baru kosong
+# yang dibuat tanpa sengaja lalu dianggap "belum ada data".
 [[d1_databases]]
 binding = "ANALYTICS"
-database_name = "fiezel-analytics"
+database_name = "fiezel-stats"
+database_id = "c712000c-aab9-4a1d-b43d-e6d4c9b36ee8"
 
 # Jejak audit akses owner (tanpa IP, tanpa identitas). Opsional: bila binding tidak ada,
 # index.js tetap jalan — audit hanya dilewati.
@@ -78,6 +89,11 @@ enabled = true
 #   OWNER_TOKEN_HASH   — sha256 HEX dari token owner. HASH, bukan token. Repo tidak pernah
 #                        memuat token maupun hash-nya.
 #   OWNER_SESSION_KEY  — kunci HMAC untuk menandatangani cookie sesi owner.
+#   EDGE_SHARED_SECRET — WAJIB sejak audit D3 HIGH-3: penjaga edge kini FAIL-CLOSED. Tanpa
+#                        secret ini, SEMUA permintaan ditolak (bukan lagi "terbuka selama
+#                        transisi"). Pasang nilai yang SAMA di jembatan PHP owner. Pembuka
+#                        darurat: var ALLOW_NO_EDGE_SECRET = "true" (string persis) — sengaja
+#                        TIDAK ditaruh di blok vars supaya membukanya butuh tindakan sadar.
 # Bila salah satu belum dipasang, Worker FAIL-CLOSED: semua rute 403, termasuk halaman masuk.
 # Itu sekaligus perwujudan "fitur baru wajib di belakang flag OFF": tanpa Secret, dashboard mati.
 # ============================================================================================

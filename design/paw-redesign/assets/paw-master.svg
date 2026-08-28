@@ -1,0 +1,280 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 320 300" role="img"
+     aria-label="PAW — maskot FIEZEL (master rig, neutral state)">
+  <!-- ============================================================
+       FIEZEL PAW — CANONICAL ANIMATION-READY MASTER (neutral state)
+       Generated from directions/direction-c.svg final geometry.
+       Rulings applied: 17 R-3 (literal SVG sign convention documented
+       in assets/README.md), 17 R-6 (feet = pill capsules 48x22 rx11,
+       grouped fz-legs, in front of chest), Direction A structural
+       repairs (head group, ear-base fillets, blink-lid layer hidden
+       via inline transform, namespaced mask/clip ids, stable ids).
+       Left-arm 4%-black stain removed (selected-direction.md cleanup).
+       OWNER REVISION (2026-08-27): the fiezel-paw glyph instance
+       appears ONLY on the chest emblem; hand-pad instances retired —
+       arms are plain yellow capsules with no pad markings.
+       Reserved outfit layer: fz-outfit-back (first child of fz-all,
+       behind everything) + fz-outfit > fz-outfit-head/-front (last
+       child of fz-all, above everything). Empty anchors; see README.
+       Neutral face = today's default: smile mouth, brows hidden,
+       lids retracted, no limb/ear/tail/head transforms.
+       Palette (closed): #FFD94F #EDB93A #FFF4DA #8C2233 #33201F
+                         #F0A0AC #D8B36B #D9536A (+#9CC7E8 sweat/tear,
+                         hidden; #fff highlights; #000 @ .08 shadow).
+       No gradients, no outlines. Circles / capsules / triangles only.
+       Production integration replaces svgMarkup() in
+       features/mascot/fiezel-mascot.js per implementation/code-plan.md
+       Phase 1; all mask/clip/def ids must then be per-instance-uid'd
+       ([P0-1] rule): fz-pawprint-<uid>, fzcEyeL-<uid>, fzcTailTip-<uid>.
+       ============================================================ -->
+  <defs>
+    <!-- fz-pawprint: EXACT geometry of assets/brand/fiezel-paw.svg (viewBox 0 0 24 24).
+         Binding rule (systems/15-pawprint-alignment.md, as amended by OWNER revision):
+         the chest emblem — and ONLY the chest emblem — is a uniformly scaled instance
+         of this group, anchored at ink center (12.6,12.45). Hand-pad instances retired.
+         Canonical geometry SHA-256:
+         e52cf2302bdae8b790e633c8cf549228002b8214a081142b08f3f5bf0df86d22 -->
+    <g id="fz-pawprint-master" fill="#8C2233">
+      <rect x="4.6" y="7.5" width="3.1" height="4.6" rx="1.55"/>
+      <rect x="8.9" y="5.1" width="3.1" height="7" rx="1.55"/>
+      <rect x="13.2" y="3.4" width="3.1" height="8.7" rx="1.55"/>
+      <rect x="17.5" y="6.2" width="3.1" height="5.9" rx="1.55"/>
+      <path d="M12.6 14c3.5 0 5.9 1.9 5.9 4.1 0 2-2 3.4-5.9 3.4s-5.9-1.4-5.9-3.4c0-2.2 2.4-4.1 5.9-4.1Z"/>
+    </g>
+    <!-- per-eye clips so lids/pupils can never escape the eye disc -->
+    <clipPath id="fzcEyeL-master"><circle cx="126" cy="98" r="16"/></clipPath>
+    <clipPath id="fzcEyeR-master"><circle cx="194" cy="98" r="16"/></clipPath>
+    <!-- tail tip mask (local coords of fz-tail-tip, rotates with it) -->
+    <mask id="fzcTailTip-master" maskUnits="userSpaceOnUse" x="230" y="120" width="110" height="120">
+      <path d="M296 200 C 295 180 284 164 268 158" stroke="#fff" stroke-width="25"
+            fill="none" stroke-linecap="round"/>
+    </mask>
+  </defs>
+
+  <ellipse id="paw-shadow" class="fz-shadow" cx="160" cy="284" rx="86" ry="10" fill="#000" opacity=".08"/>
+
+  <g id="paw-all" class="fz-all"><!-- P1 breath: scale 1<->(1.015,.985) -->
+    <!-- OUTFIT ANCHOR (behind): backpack-class items; first child of fz-all so it
+         renders behind tail/body. Empty by design — reserved, OWNER-approved. -->
+    <g id="fz-outfit-back" class="fz-outfit-back"></g>
+
+    <!-- ================= TAIL: 2-bone secondary emotion channel ========= -->
+    <g id="paw-tail" class="fz-tail">
+      <g id="paw-tail-base" class="fz-tail-base"><!-- P14: rotate -8..+8 deg @ (212,244); neutral 0 -->
+        <path d="M212 244 C 266 258 298 238 296 200" stroke="#EDB93A"
+              stroke-width="25" fill="none" stroke-linecap="round"/>
+      </g>
+      <g id="paw-tail-tip" class="fz-tail-tip"><!-- P15: rotate -20..+20 deg @ joint (296,200); neutral 0 -->
+        <path d="M296 200 C 295 180 284 164 268 158" stroke="#EDB93A"
+              stroke-width="25" fill="none" stroke-linecap="round"/>
+        <g mask="url(#fzcTailTip-master)">
+          <circle id="paw-tail-ring" class="fz-ring" cx="268" cy="158" r="15" fill="#8C2233"/>
+        </g>
+      </g>
+    </g>
+
+    <!-- ================= BODY (never rotated, never mirrored) =========== -->
+    <g id="paw-body" class="fz-body">
+      <g id="paw-torso" class="fz-torso">
+        <rect id="paw-torso-shape" x="102" y="164" width="116" height="96" rx="42" fill="#FFD94F"/>
+        <!-- chest patch + paw emblem (identity lock) -->
+        <g id="paw-chest" class="fz-chest"><!-- P19: scale 1..1.06 (proud puff) -->
+          <ellipse id="paw-chest-patch" cx="160" cy="226" rx="36" ry="28" fill="#FFF4DA"/>
+          <!-- chest emblem = fz-pawprint instance: ink-center (160,225), s=1.75 (F7, locked) -->
+          <g id="paw-emblem" class="fz-emblem" transform="translate(160,225) scale(1.75) translate(-12.6,-12.45)">
+            <use xlink:href="#fz-pawprint-master" href="#fz-pawprint-master"/>
+          </g>
+        </g>
+        <!-- feet: pill capsules 48x22 rx11 (17 R-6), in front of chest -->
+        <g id="paw-legs" class="fz-legs">
+          <rect id="paw-foot-l" class="fz-foot fz-foot-l" x="108" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+          <rect id="paw-foot-r" class="fz-foot fz-foot-r" x="164" y="246" width="48" height="22" rx="11" fill="#EDB93A"/>
+        </g>
+      </g>
+
+      <!-- ============ HEAD GROUP: lean by translate only ========== -->
+      <g id="paw-head" class="fz-head"><!-- P2: tx -6..6, ty -4..4; neutral 0,0 -->
+        <!-- ears: independent L/R rotation, overlap-safe filleted bases (Direction A C1) -->
+        <g id="paw-ear-l" class="fz-ear fz-ear-l"><!-- P3: rotate @ (108,52); literal - = perk, + = droop; -14..+18; neutral 0 -->
+          <path id="paw-ear-l-outer" d="M76 66 L95 0 L140 34 Q104 66 76 66 Z" fill="#FFD94F"/>
+          <path id="paw-ear-l-inner" d="M90 52 L 101 17 L 125 35 Z" fill="#8C2233"/>
+        </g>
+        <g id="paw-ear-r" class="fz-ear fz-ear-r"><!-- P4: rotate @ (212,52); literal + = perk, - = droop; -18..+14; neutral 0 -->
+          <path id="paw-ear-r-outer" d="M244 66 L225 0 L180 34 Q216 66 244 66 Z" fill="#FFD94F"/>
+          <path id="paw-ear-r-inner" d="M230 52 L 219 17 L 195 35 Z" fill="#8C2233"/>
+        </g>
+        <circle id="paw-skull" cx="160" cy="106" r="88" fill="#FFD94F"/>
+
+        <!-- ============ FACE RIG ============ -->
+        <g id="paw-face" class="fz-face">
+          <ellipse id="paw-muzzle" cx="160" cy="140" rx="36" ry="25" fill="#FFF4DA"/>
+          <path id="paw-nose" d="M153 126 L 167 126 L 160 136 Z" fill="#8C2233"/>
+          <circle id="paw-blush-l" class="fz-blush" cx="102" cy="126" r="11" fill="#F0A0AC"/>
+          <circle id="paw-blush-r" class="fz-blush" cx="218" cy="126" r="11" fill="#F0A0AC"/>
+
+          <g id="paw-eyes" class="fz-eyes"><!-- P9 gaze: translate ±7/±5 (existing lookAt contract) -->
+            <g id="paw-eye-open" class="fz-eye-open"><!-- P10 eye pop: scale .95..1.12 -->
+              <!-- LEFT eye: disc r16 + separated pupil cluster + parametric lids -->
+              <g id="paw-eye-l" class="fz-eye fz-eye-l">
+                <circle id="paw-eye-l-disc" cx="126" cy="98" r="16" fill="#33201F"/>
+                <g id="paw-pupil-l" class="fz-pupil" clip-path="url(#fzcEyeL-master)"><!-- P8: tx ±6, ty ±5 inside clip -->
+                  <circle cx="130.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="121.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+                <g id="paw-lid-up-l" class="fz-lid-up" clip-path="url(#fzcEyeL-master)"><!-- P5: ty 0..34 (0=open, 34=closed) -->
+                  <circle cx="126" cy="62" r="17" fill="#FFD94F"/>
+                </g>
+                <g id="paw-lid-low-l" class="fz-lid-low" clip-path="url(#fzcEyeL-master)"><!-- P7: ty 0..-14 (smile squint) -->
+                  <circle cx="126" cy="134" r="17" fill="#FFD94F"/>
+                </g>
+              </g>
+              <!-- RIGHT eye -->
+              <g id="paw-eye-r" class="fz-eye fz-eye-r">
+                <circle id="paw-eye-r-disc" cx="194" cy="98" r="16" fill="#33201F"/>
+                <g id="paw-pupil-r" class="fz-pupil" clip-path="url(#fzcEyeR-master)"><!-- P8 -->
+                  <circle cx="198.5" cy="92.5" r="5.5" fill="#fff"/>
+                  <circle cx="189.5" cy="104" r="2.8" fill="#fff" opacity=".7"/>
+                </g>
+                <g id="paw-lid-up-r" class="fz-lid-up" clip-path="url(#fzcEyeR-master)"><!-- P6 -->
+                  <circle cx="194" cy="62" r="17" fill="#FFD94F"/>
+                </g>
+                <g id="paw-lid-low-r" class="fz-lid-low" clip-path="url(#fzcEyeR-master)"><!-- P7 -->
+                  <circle cx="194" cy="134" r="17" fill="#FFD94F"/>
+                </g>
+              </g>
+            </g>
+            <!-- variant eye sets kept from current rig (identity continuity) -->
+            <g id="paw-eye-happy" class="fz-eye-happy" opacity="0">
+              <path d="M112 101 C 119 90 133 90 140 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+              <path d="M180 101 C 187 90 201 90 208 101" stroke="#33201F" stroke-width="7"
+                    stroke-linecap="round" fill="none"/>
+            </g>
+            <g id="paw-eye-love" class="fz-eye-love" opacity="0" fill="#D9536A">
+              <g transform="translate(126,98)"><g class="fz-heart-eye">
+                <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+                <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+              </g></g>
+              <g transform="translate(194,98)"><g class="fz-heart-eye">
+                <path d="M0 13 C -8.5 5.5 -15 1 -15 -5.5 C -15 -11.5 -10.6 -15 -6.8 -15 C -3.4 -15 -0.9 -12.8 0 -10.2 C 0.9 -12.8 3.4 -15 6.8 -15 C 10.6 -15 15 -11.5 15 -5.5 C 15 1 8.5 5.5 0 13 Z"/>
+                <circle cx="-5" cy="-8" r="3" fill="#fff" opacity=".85"/>
+              </g></g>
+            </g>
+            <!-- fast blink layer (P20, scale-based). Hidden at rest by the inline
+                 transform (static equivalent of .fz-lid{transform:scale(1,0);
+                 transform-origin:50% 0%} in fiezel-motion.css); runtime CSS overrides it. -->
+            <g id="paw-lids" class="fz-lids">
+              <g id="paw-lid-l" class="fz-lid" transform="translate(0,80) scale(1,0)">
+                <circle cx="126" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M114 99 C 120 105 132 105 138 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+              </g>
+              <g id="paw-lid-r" class="fz-lid fz-lid-r" transform="translate(0,80) scale(1,0)">
+                <circle cx="194" cy="98" r="18" fill="#FFD94F"/>
+                <path d="M182 99 C 188 105 200 105 206 99" stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+              </g>
+            </g>
+          </g>
+
+          <!-- BROWS: first-class curved capsules; HIDDEN at neutral (today's default face) -->
+          <g id="paw-brows" class="fz-brows" opacity="0" stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none">
+            <path id="paw-brow-l" class="fz-brow-l" d="M115 70 Q 125 63.5 135 66.5" stroke-width="5"/><!-- P11: ty -8..6, rot -14..14 -->
+            <path id="paw-brow-r" class="fz-brow-r" d="M185 66.5 Q 195 63.5 205 70" stroke-width="5"/><!-- P12 -->
+          </g>
+
+          <!-- MOUTH SET (display-toggled fz-m-* shapes; neutral = smile) -->
+          <g id="paw-mouth" class="fz-mouth"><!-- P13: exactly one shape visible -->
+            <path id="paw-m-smile" class="fz-m fz-m-smile" d="M148 148 C 154 155 166 155 172 148"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path id="paw-m-soft" class="fz-m fz-m-soft" style="display:none" d="M152 149 C 156 153 164 153 168 149"
+                  stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path id="paw-m-open" class="fz-m fz-m-open" style="display:none"
+                  d="M145 146 C 148 162 172 162 175 146 C 165 150 155 150 145 146 Z" fill="#33201F"/>
+            <circle id="paw-m-o" class="fz-m fz-m-o" style="display:none" cx="160" cy="151" r="6.5" fill="#33201F"/>
+            <ellipse id="paw-m-sp1" class="fz-m fz-m-sp1" style="display:none" cx="160" cy="151" rx="5" ry="3.4" fill="#33201F"/>
+            <ellipse id="paw-m-sp2" class="fz-m fz-m-sp2" style="display:none" cx="160" cy="151" rx="7.5" ry="6" fill="#33201F"/>
+            <path id="paw-m-wave" class="fz-m fz-m-wave" style="display:none" d="M147 150 Q 153 145 160 150 Q 167 155 173 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path id="paw-m-flat" class="fz-m fz-m-flat" style="display:none" d="M150 150 L 170 150"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+            <path id="paw-m-concern" class="fz-m fz-m-concern" style="display:none" d="M150 152 C 155 148.5 165 148.5 170 152"
+                  stroke="#33201F" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <path id="paw-m-sad" class="fz-m fz-m-sad" style="display:none" d="M148 154 C 154 147 166 147 172 154"
+                  stroke="#33201F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+          </g>
+
+          <g id="paw-sweat" class="fz-acc fz-sweat" opacity="0">
+            <path d="M80 72 C 88 84 90 92 90 98 A 10 10 0 1 1 70 98 C 70 92 72 84 80 72 Z" fill="#9CC7E8"/>
+          </g>
+        </g><!-- /fz-face -->
+      </g><!-- /fz-head -->
+
+      <!-- ================= ARMS: both pivot at shoulder; neutral = rest === -->
+      <!-- Arms are plain yellow capsules — no pad markings of any kind
+           (OWNER revision: the paw glyph is chest-only; hand-pad instances retired). -->
+      <g id="paw-arm-l" class="fz-arm fz-arm-l"><!-- P16: rotate @ shoulder (115,185); literal -115..+130 (+ = out/up-raise); neutral 0 -->
+        <ellipse id="paw-arm-l-shape" cx="115" cy="211" rx="14" ry="30" fill="#FFD94F"/>
+      </g>
+      <g id="paw-arm-r" class="fz-arm fz-arm-r"><!-- P17: rotate @ shoulder (198,182); literal -130..+115 (- = out/up-raise); neutral 0 -->
+        <ellipse id="paw-arm-r-shape" cx="198" cy="206" rx="14" ry="30" fill="#FFD94F"/>
+      </g>
+
+      <!-- headphones inside body so they follow the listening groove -->
+      <g id="paw-headphones" class="fz-acc fz-headphones" opacity="0">
+        <path d="M76 70 C 92 10 228 10 244 70" stroke="#D8B36B" stroke-width="14" fill="none"
+              stroke-linecap="round"/>
+        <rect x="52" y="66" width="38" height="54" rx="18" fill="#8C2233"/>
+        <rect x="230" y="66" width="38" height="54" rx="18" fill="#8C2233"/>
+      </g>
+    </g><!-- /fz-body -->
+
+    <!-- ============ contextual accessories (hidden at neutral) ============ -->
+    <g id="paw-notes" class="fz-acc fz-notes" fill="#D8B36B" opacity="0">
+      <g class="fz-note n1">
+        <circle cx="0" cy="10" r="7"/><rect x="5" y="-18" width="4.5" height="28" rx="2"/>
+        <rect x="5" y="-18" width="16" height="5" rx="2.5"/></g>
+      <g class="fz-note n2">
+        <circle cx="0" cy="8" r="6"/><rect x="4" y="-14" width="4" height="22" rx="2"/></g>
+    </g>
+    <g id="paw-dots" class="fz-acc fz-dots" fill="#8C2233" opacity="0">
+      <circle class="d1" cx="252" cy="54" r="7"/>
+      <circle class="d2" cx="262" cy="32" r="8.5"/>
+      <circle class="d3" cx="286" cy="18" r="10"/>
+    </g>
+    <g id="paw-bulb" class="fz-acc fz-bulb" opacity="0">
+      <circle cx="262" cy="34" r="20" fill="#D8B36B"/>
+      <circle cx="262" cy="34" r="20" fill="#fff" opacity=".25"/>
+      <rect x="254" y="50" width="16" height="10" rx="4" fill="#8C2233"/>
+      <g stroke="#D8B36B" stroke-width="5" stroke-linecap="round">
+        <path d="M232 16 L 224 10"/><path d="M292 16 L 300 10"/><path d="M262 6 L 262 -4"/>
+      </g>
+    </g>
+    <g id="paw-stars" class="fz-acc fz-stars" fill="#D8B36B" opacity="0">
+      <path class="s1" d="M42 46 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z"/>
+      <path class="s2" d="M282 78 l3.5 9 9 3.5 -9 3.5 -3.5 9 -3.5 -9 -9 -3.5 9 -3.5 Z"/>
+      <path class="s3" d="M258 6 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3 Z" fill="#D9536A"/>
+    </g>
+    <g id="paw-zzz" class="fz-acc fz-zzz" opacity="0" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path class="fz-z z1" d="M246 40 L 268 40 L 246 62 L 268 62" stroke="#8C2233" stroke-width="6"/>
+      <path class="fz-z z2" d="M274 18 L 290 18 L 274 34 L 290 34" stroke="#D8B36B" stroke-width="5"/>
+    </g>
+    <g id="paw-tear" class="fz-acc fz-tear" opacity="0">
+      <path d="M120 114 C 126 123 127 128 127 132.5 A 7 7 0 1 1 113 132.5 C 113 128 114 123 120 114 Z"
+            fill="#9CC7E8"/>
+    </g>
+    <g id="paw-hearts" class="fz-acc fz-hearts" opacity="0" fill="#D9536A">
+      <g transform="translate(58,78)">
+        <path class="fz-heart hh1" d="M0 6.5 C -4.2 2.7 -7.5 .5 -7.5 -2.8 C -7.5 -5.8 -5.3 -7.5 -3.4 -7.5 C -1.7 -7.5 -.5 -6.4 0 -5.1 C .5 -6.4 1.7 -7.5 3.4 -7.5 C 5.3 -7.5 7.5 -5.8 7.5 -2.8 C 7.5 .5 4.2 2.7 0 6.5 Z"/>
+      </g>
+      <g transform="translate(266,64)">
+        <path class="fz-heart hh2" fill="#F0A0AC" d="M0 6.5 C -4.2 2.7 -7.5 .5 -7.5 -2.8 C -7.5 -5.8 -5.3 -7.5 -3.4 -7.5 C -1.7 -7.5 -.5 -6.4 0 -5.1 C .5 -6.4 1.7 -7.5 3.4 -7.5 C 5.3 -7.5 7.5 -5.8 7.5 -2.8 C 7.5 .5 4.2 2.7 0 6.5 Z"/>
+      </g>
+    </g>
+
+    <!-- OUTFIT ANCHORS (above): last child of fz-all so outfit items render above
+         everything. Empty by design — reserved, OWNER-approved (backpack/hat/flower).
+         Anchor contract in assets/README.md §7. -->
+    <g id="fz-outfit" class="fz-outfit">
+      <g id="fz-outfit-head" class="fz-outfit-head"></g><!-- hats/flowers; must track fz-head (mirror P2 translate) -->
+      <g id="fz-outfit-front" class="fz-outfit-front"></g><!-- chest-level items; mirror P19 chest puff if chest-attached -->
+    </g>
+  </g><!-- /fz-all -->
+</svg>

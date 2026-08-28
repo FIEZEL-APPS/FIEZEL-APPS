@@ -236,11 +236,29 @@ crons = ["*/5 * * * *", "5 17 * * *"]
 # Tanpa `PUTER_CLAIM_SECRET_CURRENT`, `/api/auth/claim` selalu 401 — juga benar:
 # fitur tanpa penerbit tiket tidak boleh mengikat identitas.
 #
-# `EDGE_SHARED_SECRET` berbeda sifatnya: tanpa dia Worker TETAP JALAN, tapi
-# alamat `https://fiezel-api.fitrajft.workers.dev` terbuka tanpa syarat dan siapa
-# pun bisa menerbitkan identitas anonim tanpa lewat jembatan `api.fiezel.my.id`
-# (tulis D1 + kuras jatah gratis). `/health` melaporkan `edgeGuard:"off"` selama
-# itu. Keadaan `off` HANYA sah selama masa transisi; nilainya harus IDENTIK
-# dengan yang disuntik ke `deploy/edge/api-index.php` di origin. Lihat
-# `workers/api/mw-edge.js` dan `deploy/edge/README.md`.
+# `EDGE_SHARED_SECRET` kini WAJIB SEBELUM deploy pertama (m0261-d17, audit D3
+# HIGH-3): tanpa dia gerbang edge FAIL-CLOSED — semua rute kecuali `/healthz`
+# menjawab 403. Itu default aman yang disengaja: deploy yang lupa memasang
+# secret menghasilkan API yang diam, bukan alamat `*.workers.dev` yang terbuka
+# untuk menerbitkan identitas anonim tanpa batas (tulis D1 + kuras jatah
+# gratis). Nilainya harus IDENTIK dengan yang disuntik ke
+# `deploy/edge/api-index.php` di origin.
+# Pengecualian eksplisit untuk dev/masa transisi SAJA: var (bukan secret)
+# `ALLOW_NO_EDGE_SECRET = "true"` membuka mode `off` lama — Worker jalan tanpa
+# gerbang dan `/health` melaporkan `edgeGuard:"off"`. Var itu SENGAJA tidak
+# ditulis di [vars] berkas ini; kalau dibutuhkan, pasang sadar-sadar dan hapus
+# lagi. Lihat `workers/api/mw-edge.js` dan `deploy/edge/README.md`.
+#
+# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17 audit D3 HIGH-2, direvisi
+# paket S1 28 Agu 2026 — lihat `workers/api/rate-anon.js`; default dipakai bila
+# tidak disetel). Cabang tarif dipilih dari `ctx.edgePath` (jalur yang BENAR-BENAR
+# dipakai permintaan), bukan dari ada/tidaknya `EDGE_SHARED_SECRET`:
+#   ANON_ISSUE_LIMIT_PER_HOUR          = "15"  # per IP, JENDELA BERGULIR 1 jam (jalur langsung)
+#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR   = "30"  # TOTAL/jam, HANYA saat edgePath="header" (proxy PHP: satu IP bersama)
+#   ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR = "5"   # saat D1 tak terbaca; otomatis dijepit <= batas normal
+#   ANON_JITTER_MAX_MS                 = "150" # jitter respons /api/auth/anon; "0" mematikan
+# Satu kelas (30-40 murid) yang onboarding serentak di SATU wifi sekolah akan kena
+# 429 mulai murid ke-16. Untuk sesi kelas terjadwal, setel sementara
+# ANON_ISSUE_LIMIT_PER_HOUR = "60" lalu hapus lagi; penutup permanennya Turnstile
+# atau WAF rate-rule per ASN (lihat reports/work-s1-auth-anon.md).
 # ============================================================================

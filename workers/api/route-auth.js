@@ -31,12 +31,22 @@ import {
   issueAnonIdentity, attachIdentityCookie, ensureIdentityRow, readIdentityRow
 } from './mw-identity.js';
 import { readJsonFromCtx } from './mw-guard.js';
+import { anonIssueGate, anonJitter } from './rate-anon.js';
 
 /* ==========================================================================
  * POST /api/auth/anon
  * ======================================================================== */
 
 export async function routeAuthAnon(ctx) {
+  // m0261-d17 (audit D3 HIGH-2): SEMUA respons rute ini diberi jitter kecil
+  // (lihat rate-anon.js) supaya waktu respons tidak menjadi oracle terbit /
+  // stabil / tolak, dan supaya loop pemanen identitas kehilangan ritme.
+  const response = await routeAuthAnonInner(ctx);
+  await anonJitter(ctx.env);
+  return response;
+}
+
+async function routeAuthAnonInner(ctx) {
   const opt = { headers: ctx.corsHeaders };
   const body = await readJsonFromCtx(ctx, opt);
   if (!body.ok) return body.response;
@@ -55,10 +65,16 @@ export async function routeAuthAnon(ctx) {
     if (!row) await ensureIdentityRow(ctx.env, ctx.identity.sub, ctx.now);
     if (row && row.revoked_at) {
       // "Lupakan perangkat ini" sudah dipakai: terbitkan identitas baru.
+      // Penerbitan (bukan panggilan ber-cookie stabil) yang dibatasi laju —
+      // audit D3 HIGH-2; detail tarif & kunci di rate-anon.js.
+      const limited = await anonIssueGate(ctx);
+      if (limited) return limited;
       await issueAnonIdentity(ctx);
       issuedNow = true;
     }
   } else {
+    const limited = await anonIssueGate(ctx);
+    if (limited) return limited;
     await issueAnonIdentity(ctx);
     issuedNow = true;
   }

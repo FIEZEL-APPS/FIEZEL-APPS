@@ -128,10 +128,22 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
       `${s.model.id} (${s.model.neuronsPerRequest} neuron)`);
   }
 
-  // Frekuensi tinggi ⇒ model termurah. translate_subtitle adalah task paling sering dipanggil.
-  check('Task frekuensi tertinggi memakai model termurah',
-    AiTasks.get('translate_subtitle').model.id === AiTasks.MODELS.cheap.id,
-    AiTasks.get('translate_subtitle').model.id);
+  // P3 (28 Agu 2026) — ASSERT INI DIBALIK OLEH PENGUKURAN, BUKAN OLEH SELERA.
+  // Dulu ia berbunyi "task frekuensi tertinggi memakai model termurah" dan mengunci
+  // `translate_subtitle` ke granite. Yang terukur di produksi (`api.fiezel.my.id`):
+  // task itu mengembalikan KELUARAN KOSONG setiap kali, jadi "termurah" mengunci kami ke
+  // biaya per JAWABAN YANG SAMPAI yang tak terhingga. Aturan yang bertahan bukan "pakai
+  // yang termurah", tetapi "pakai model yang TERBUKTI MENJAWAB, lalu ambil yang termurah
+  // di antara yang menjawab". Granite tetap terdaftar (`usedByTasks:false`) sebagai bukti.
+  check('Task frekuensi tertinggi memakai model yang TERBUKTI MENJAWAB, bukan yang sekadar termurah',
+    AiTasks.get('translate_subtitle').model.id !== AiTasks.MODELS.cheap.id &&
+    AiTasks.MODELS.cheap.usedByTasks === false,
+    `${AiTasks.get('translate_subtitle').model.id} / cheap.usedByTasks=${AiTasks.MODELS.cheap.usedByTasks}`);
+  // Model yang pernah terukur mengembalikan keluaran kosong TIDAK boleh kembali lewat pintu
+  // mana pun — termasuk pintu degradasi (`cheapModel`) yang tidak terlihat di jalur normal.
+  check('Model dengan riwayat keluaran kosong tidak dipakai task mana pun, termasuk sebagai tier degradasi',
+    EXPECTED_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.cheap.id)),
+    EXPECTED_TASKS.map((t) => `${t}=${AiTasks.modelsUsedBy(t).map((m) => m.id).join('+')}`).join(' '));
   // DIPERBARUI OLEH BUKTI PENGUJIAN LANGSUNG (bukan lagi asumsi harga). Assert ini dulu berbunyi
   // "model penalaran hanya untuk dua task 4/jam" — pembagian yang murni ekonomis. Benchmark hari
   // ini membalik pertimbangannya: granite (US$0,017/M) SALAH FAKTA pada analisa murid (present
@@ -144,10 +156,52 @@ const req = (task, input, extra) => ({ schema: 'fiezel-ai-task-v2', task, input,
     AiTasks.TRUTH_TASKS.every((t) => AiTasks.get(t).model.id === AiTasks.MODELS.reasoning.id) &&
     AiTasks.MODELS.reasoning.id === '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
     AiTasks.TRUTH_TASKS.map((t) => `${t}=${AiTasks.get(t).model.id}`).join(' '));
-  check('Task ringan tanpa kebenaran pedagogis boleh memakai model murah',
-    AiTasks.get('translate_subtitle').model.id === AiTasks.MODELS.cheap.id &&
+  // Task ringan tetap tidak boleh memakai model TERMAHAL: 70b (60 neuron) untuk
+  // menerjemahkan satu kalimat bank adalah pemborosan 4,8x tanpa manfaat pedagogis.
+  // Yang dituntut: bukan model kebenaran, dan bukan model yang pernah kosong.
+  check('Task ringan memakai model menengah: bukan model kebenaran, bukan model yang pernah kosong',
+    AiTasks.get('translate_subtitle').model.id === AiTasks.MODELS.standard.id &&
     !AiTasks.isTruthTask('translate_subtitle'),
     AiTasks.get('translate_subtitle').model.id);
+  // P3 — JSON MODE HANYA KE MODEL YANG MENDUKUNGNYA.
+  // Daftar dukungan Workers AI tertutup (https://developers.cloudflare.com/workers-ai/features/json-mode/)
+  // dan tidak memuat tier degradasi kami. Mengirim `response_format` ke model di luar
+  // daftar = keluaran kosong yang dibayar penuh, dan itu sebab terukur dari dua task
+  // yang tidak menyampaikan jawaban.
+  for (const task of EXPECTED_TASKS) {
+    const spec = AiTasks.get(task);
+    if (spec.jsonMode !== true) continue;
+    check(`[${task}] jsonMode punya SKEMA, bukan hanya {type:'json_object'}`,
+      !!spec.jsonSchema && spec.jsonSchema.type === 'object' &&
+      !!spec.jsonSchema.properties && Array.isArray(spec.jsonSchema.required),
+      JSON.stringify(spec.jsonSchema || null));
+    const capable = AiTasks.buildPayload(task, { input: null, locale: 'id', model: spec.model });
+    check(`[${task}] response_format hanya dikirim kalau model mendukung JSON Mode`,
+      spec.model.jsonModeCapable === true
+        ? (capable.payload.response_format && capable.payload.response_format.type === 'json_schema')
+        : !capable.payload.response_format,
+      `${spec.model.id} capable=${spec.model.jsonModeCapable} sent=${!!capable.payload.response_format}`);
+    const degraded = AiTasks.buildPayload(task, { input: null, locale: 'id', model: spec.cheapModel });
+    check(`[${task}] tier degradasi tidak dikirim JSON Mode kalau ia tidak mendukungnya`,
+      spec.cheapModel.jsonModeCapable === true || !degraded.payload.response_format,
+      `${spec.cheapModel.id} sent=${!!degraded.payload.response_format} skipped=${degraded.jsonModeSkipped}`);
+  }
+  // P3 — POTONG KALIMAT: hanya task prosa, NEVER task JSON. Memotong "kalimat ke-4" dari
+  // objek JSON menghasilkan JSON rusak, bukan jawaban yang lebih pendek.
+  for (const task of EXPECTED_TASKS) {
+    const spec = AiTasks.get(task);
+    if (spec.jsonMode !== true) continue;
+    check(`[${task}] keluaran JSON TIDAK boleh dipotong di batas kalimat`,
+      AiTasks.isClampable(task) === false, `clampable=${spec.clampable}`);
+  }
+  check('Potongan kalimat menghormati batas dan tidak memotong kalimat separuh',
+    (() => {
+      const out = AiTasks.clampSentences('Satu. Dua. Tiga. Empat. Lima. Enam. Tujuh. Delapan.', 6);
+      return out.clamped === true && out.sentencesAfter === 6 && /Enam\.$/.test(out.text) &&
+        !/Tujuh/.test(out.text);
+    })(), 'clampSentences');
+  check('Teks di dalam batas TIDAK disentuh potongan',
+    AiTasks.clampSentences('Satu. Dua.', 6).clamped === false, 'clampSentences no-op');
   // Granite tidak boleh masuk tugas analisa lewat pintu mana pun — termasuk pintu degradasi.
   check('Granite TIDAK dipakai tugas analisa, baik sebagai model maupun tier degradasi',
     AiTasks.TRUTH_TASKS.every((t) => AiTasks.modelsUsedBy(t).every((m) => m.id !== AiTasks.MODELS.cheap.id)),

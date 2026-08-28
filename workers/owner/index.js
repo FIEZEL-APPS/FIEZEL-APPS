@@ -24,14 +24,16 @@
 // = perangkat baru. Label itu bukan catatan kaki opsional — ia dirender di setiap panel
 // pengguna dan diassert gerbang test. Owner harus tahu ini, jangan dipoles.
 
-import { QUERIES } from './queries.js';
+import { QUERIES, UNMEASURABLE } from './queries.js';
 
 /* ============================ Konstanta yang boleh dilihat ================================= */
 
 // Rate card biaya — SUMBER: reports/cf-a10-cost-model.json + reports/cf-a10-cost.md.
-// Ini nilai seed/fallback untuk menampilkan asumsi. Angka yang DIPAKAI untuk hari tertentu
-// selalu tarif yang tersimpan bersama baris biaya hari itu, supaya angka lama tetap bisa
-// diaudit setelah tarif berubah.
+// KOREKSI D2: versi sebelumnya menjanjikan "tarif yang tersimpan bersama baris biaya hari itu".
+// Tabel `cost_daily` yang menyimpannya TIDAK ADA dan TIDAK BOLEH ada (analytics-privacy-test.js
+// mengunci database analytics pada lima tabel). Jadi tarif SELALU dibaca dari kartu di bawah,
+// dan konsekuensinya dicetak apa adanya di panel biaya: mengubah tarif di sini mengubah angka
+// bulan lalu juga, sehingga angka biaya adalah ESTIMASI SEKARANG, bukan jejak audit.
 const RATE_CARD = {
   ttsUsdPer1MChars: {
     'workers-ai aura-1': 15.0,
@@ -50,6 +52,56 @@ const PERIODS = { today: 1, '7d': 7, '30d': 30, '90d': 90 };
 const SESSION_COOKIE = 'fz_owner';
 const SESSION_TTL_MS = 30 * 60 * 1000;   // sesi owner berumur PENDEK: 30 menit, diperbarui tiap akses
 const RETENTION_MIN_COHORT = 30;         // di bawah ini persentase tidak dicetak (derau, bukan sinyal)
+
+/* ============================ "Belum ada pengukuran" ≠ "nol terukur" ====================== */
+// KENAPA INI BUKAN KOSMETIK (bab 28: dilarang mengambil keputusan di atas asumsi).
+// Owner memakai halaman ini untuk memutuskan KUOTA. "0 perangkat aktif" dan "belum ada
+// pengukuran" adalah dua pernyataan yang sangat berbeda:
+//   · nol terukur      = rollup berjalan, harinya ada, hasilnya benar-benar nol.
+//   · belum ada data   = tidak ada satu pun baris hari di tabel agregat. Bisa karena pemancar
+//                        analytics di klien belum ada / `cfAnalyticsEnabled` masih false /
+//                        rollup belum pernah jalan. Angka apa pun di sini adalah dugaan.
+//   · tidak tersedia   = pembacaan D1 GAGAL (tabel atau kolom tidak cocok dengan skema).
+//                        Ini kerusakan konfigurasi, dan ia TIDAK BOLEH menyamar sebagai nol.
+// SQL memakai COALESCE(SUM(...), 0), jadi rentang tanpa satu baris pun mengembalikan 0 —
+// karena itu keadaan diputuskan dari `days_counted`/`days_total`, BUKAN dari nilai metriknya.
+const STATE_MEASURED = 'measured';
+const STATE_NO_DATA = 'no-data';
+const STATE_NO_DATA_IN_PERIOD = 'no-data-in-period';
+const STATE_UNAVAILABLE = 'unavailable';
+
+const NO_DATA_TEXT = 'belum ada pengukuran';
+const MEASURED_ZERO_TEXT = 'nol terukur';
+const UNAVAILABLE_TEXT = 'pengukuran tidak tersedia';
+
+const NO_DATA_BANNER = 'BELUM ADA PENGUKURAN. Tidak ada satu pun hari yang terrollup di tabel '
+  + 'agregat. Ini BUKAN nol pengguna: pemancar analytics di klien belum terpasang dan '
+  + 'cfAnalyticsEnabled masih false, jadi tidak ada satu event pun yang pernah tiba. Jangan '
+  + 'mengambil keputusan kuota, biaya, atau kapasitas dari halaman ini sampai angka pertama muncul.';
+const NO_DATA_PERIOD_BANNER = 'BELUM ADA PENGUKURAN PADA PERIODE INI. Tabel agregat memuat hari '
+  + 'lain, tetapi nol hari di rentang yang dipilih. Angka nol di bawah adalah akibat rentang, '
+  + 'bukan hasil pengukuran.';
+const UNAVAILABLE_BANNER = 'PENGUKURAN TIDAK TERSEDIA. Pembacaan D1 gagal, jadi halaman ini tidak '
+  + 'tahu angkanya. Kegagalan baca TIDAK PERNAH digambar sebagai nol. Periksa binding ANALYTICS '
+  + 'dan skema tabel agregat (workers/owner/DEPLOY.md §Blokir).';
+
+// Field yang boleh keluar dari D1 menuju HTML/JSON. Apa pun di luar daftar ini DIBUANG sebelum
+// dirender — jadi kalaupun suatu hari ada kolom identitas per-murid menyelinap ke tabel agregat,
+// dashboard tetap tidak bisa menampilkannya. Kontrak privasi ditegakkan di sisi PEMBACA juga,
+// bukan hanya dengan berharap penulisnya sopan.
+// Daftarnya PENDEK karena skemanya bentuk PANJANG: yang keluar dari D1 hanyalah pasangan
+// (hari, nama-metrik, nilai) plus hitungan agregat — bukan puluhan kolom lebar.
+const ALLOWED_ROW_FIELDS = Object.freeze(new Set([
+  // metrics_daily bentuk panjang + hasil agregasinya
+  'day', 'metric', 'value', 'total', 'days',
+  // PERIOD_DAYS / COLLECTION_START / BROKEN_DAYS / METRIC_PEAK
+  'days_counted', 'day_from', 'day_to', 'days_broken', 'days_total', 'day_first_collected',
+  'peak', 'avg',
+  // usage_daily
+  'bucket', 'count',
+  // retention_daily
+  'cohort_day', 'day_index',
+]));
 
 // Inventaris rute. Semua rute di daftar ini WAJIB lewat ownerGate(). Rute yang tidak dikenal
 // juga 403 (default deny), sehingga menambah rute tanpa gate tidak mungkin lolos diam-diam.
@@ -195,7 +247,8 @@ function edgeSecret(env) {
 
 // Dua nilai saja, dan keduanya jujur:
 //   'on'  = setiap permintaan wajib membawa header jembatan yang benar.
-//   'off' = secret belum dipasang; Worker berjalan seperti sebelum penjaga ini ada.
+//   'off' = secret belum dipasang; hanya mungkin bila ALLOW_NO_EDGE_SECRET === 'true'
+//           dipasang secara eksplisit (tanpa itu, guard menolak semua — FAIL-CLOSED).
 // Nilai ini TIDAK pernah dikirim ke klien mana pun (dashboard owner tidak punya `/health`), jadi
 // ia bukan oracle publik. Ia hanya untuk gerbang dan untuk log.
 function edgeGuardStatus(env) {
@@ -209,17 +262,42 @@ let edgeWarnedThisIsolate = false;
 
 function resetEdgeWarningForTests() {
   edgeWarnedThisIsolate = false;
+  edgeWarnedClosedThisIsolate = false;
 }
 
 function warnEdgeGuardOff() {
   if (edgeWarnedThisIsolate) return;
   edgeWarnedThisIsolate = true;
   console.warn(
-    'fiezel-owner edgeGuard=off — EDGE_SHARED_SECRET belum dipasang. Alamat *.workers.dev TERBUKA: '
-    + 'halaman masuk owner bisa ditembak langsung tanpa lewat jembatan owner.fiezel.my.id, dan '
-    + 'Cloudflare Access tidak berlaku di sana. Jalankan: wrangler secret put EDGE_SHARED_SECRET. '
+    'fiezel-owner edgeGuard=off — EDGE_SHARED_SECRET belum dipasang dan ALLOW_NO_EDGE_SECRET=true '
+    + 'memaksa gerbang terbuka. Alamat *.workers.dev TERBUKA: halaman masuk owner bisa ditembak '
+    + 'langsung tanpa lewat jembatan owner.fiezel.my.id, dan Cloudflare Access tidak berlaku di '
+    + 'sana. Jalankan: wrangler secret put EDGE_SHARED_SECRET lalu hapus var ALLOW_NO_EDGE_SECRET. '
     + 'Keadaan ini hanya sah selama masa transisi.'
   );
+}
+
+// Peringatan fail-closed juga sekali per isolate, dan lewat console.error: keadaan ini berarti
+// dashboard MATI TOTAL sampai secret dipasang — itu bukan warning, itu insiden konfigurasi.
+let edgeWarnedClosedThisIsolate = false;
+
+function warnEdgeGuardClosed() {
+  if (edgeWarnedClosedThisIsolate) return;
+  edgeWarnedClosedThisIsolate = true;
+  console.error(
+    'fiezel-owner edgeGuard=FAIL-CLOSED — EDGE_SHARED_SECRET belum dipasang, SEMUA permintaan '
+    + 'ditolak. Jalankan: wrangler secret put EDGE_SHARED_SECRET (dan pasang nilai yang sama di '
+    + 'jembatan PHP owner). Kalau memang sedang masa transisi tanpa jembatan, pasang var '
+    + 'ALLOW_NO_EDGE_SECRET=true secara sadar — itu membuka *.workers.dev.'
+  );
+}
+
+// Pembuka darurat, HARUS string persis 'true' — bukan truthy. '1', 'yes', atau true boolean
+// dari kesalahan wrangler.toml TIDAK membuka gerbang; salah ketik gagal ke arah aman.
+function allowNoSecretOverride(env) {
+  const raw = env ? env.ALLOW_NO_EDGE_SECRET : null;
+  const norm = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  return norm === 'true';
 }
 
 // FAIL-CLOSED dengan cara yang SAMA seperti mw-edge.js:
@@ -233,17 +311,27 @@ function warnEdgeGuardOff() {
 //  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
 //    yang memicunya, dan tidak boleh membakar anggaran plan gratis.
 //
-// `off` BUKAN mode produksi. Ia ada semata supaya `wrangler deploy` yang dijalankan sebelum
-// `wrangler secret put EDGE_SHARED_SECRET` tidak mematikan dashboard di jendela antara dua
-// perintah itu. Selama `off`, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
-// (i) segera setelah secret dipasang, dan (ii) selamanya setelah nameserver pindah ke Cloudflare
-// dan custom domain menggantikan jembatan PHP (saat itu `workers_dev = false` menutup lubangnya
-// secara struktural, dan penjaga ini boleh menolak tanpa syarat atau dihapus).
+// FAIL-CLOSED sejak audit D3 HIGH-3 (selaras dengan mw-edge.js — dua penjaga ini disalin dan
+// HARUS bergerak bersama): tanpa secret, SEMUA permintaan ditolak. `off` BUKAN mode produksi;
+// ia hanya bisa terjadi bila owner memasang var ALLOW_NO_EDGE_SECRET='true' secara eksplisit
+// (mis. masa transisi sebelum jembatan PHP owner terpasang). Konsekuensi fail-closed: deploy
+// SEBELUM `wrangler secret put EDGE_SHARED_SECRET` membuat dashboard mati sampai secret
+// dipasang — itu disengaja; yang terdampak satu orang, dan orang itu memegang kuncinya.
+// Selama `off` dipaksa, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
+// (i) segera setelah secret dipasang (hapus juga var pembukanya), dan (ii) selamanya setelah
+// nameserver pindah ke Cloudflare dan custom domain menggantikan jembatan PHP (saat itu
+// `workers_dev = false` menutup lubangnya secara struktural, dan penjaga ini boleh menolak
+// tanpa syarat atau dihapus).
 function edgeGuard(request, env, pathname) {
   const configuredEdge = edgeSecret(env);
   if (!configuredEdge) {
-    warnEdgeGuardOff();
-    return null;
+    if (allowNoSecretOverride(env)) {
+      warnEdgeGuardOff();
+      return null;
+    }
+    warnEdgeGuardClosed();
+    // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
+    return deny();
   }
   if (EDGE_FREE_PATHS.includes(pathname)) return null;
   const presentedEdge = request && request.headers && request.headers.get
@@ -318,67 +406,220 @@ function wibDay(nowMs) {
   return new Date(Number(nowMs) + 7 * 3600000).toISOString().slice(0, 10);
 }
 
+// Selisih hari kalender antara dua tanggal 'YYYY-MM-DD'. Dipakai untuk mengukur KEBASIAN data:
+// berapa hari sejak rollup terakhir. Tanggal tak valid menghasilkan null, bukan angka palsu.
+function daysBetween(fromDay, toDay) {
+  const a = Date.parse(String(fromDay) + 'T00:00:00Z');
+  const b = Date.parse(String(toDay) + 'T00:00:00Z');
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+  return Math.round((b - a) / 86400000);
+}
+
 function periodRange(period, anchorDay) {
   const span = PERIODS[period] || PERIODS['7d'];
   return { from: dayShift(anchorDay, -(span - 1)), to: anchorDay, span };
 }
 
+// Buang field yang tidak ada di daftar putih agregat. Yang dibuang DICATAT (bukan didiamkan),
+// supaya gerbang bisa membuktikan penyaringan benar-benar terjadi dan owner bisa melihat
+// bahwa ada kolom asing di tabelnya.
+function sanitizeRow(row, droppedInto) {
+  if (!row || typeof row !== 'object') return row === undefined ? null : row;
+  const out = {};
+  for (const [k, v] of Object.entries(row)) {
+    if (ALLOWED_ROW_FIELDS.has(k)) out[k] = v;
+    else if (droppedInto && !droppedInto.includes(k)) droppedInto.push(k);
+  }
+  return out;
+}
+
+function sanitizeRows(rows, droppedInto) {
+  return (Array.isArray(rows) ? rows : []).map((r) => sanitizeRow(r, droppedInto));
+}
+
 async function readModel(env, period, nowMs) {
-  const db = env.ANALYTICS;
-  const one = async (sql, ...binds) => {
-    const stmt = db.prepare(sql);
-    return (binds.length ? stmt.bind(...binds) : stmt).first();
+  const db = env && env.ANALYTICS;
+  // Kegagalan baca dicatat per-query dan TIDAK diubah menjadi nol. "Tidak tahu" adalah jawaban
+  // yang sah; "nol" adalah klaim, dan klaim itu butuh pengukuran.
+  const readErrors = [];
+  const droppedFields = [];
+  const one = async (label, sql, ...binds) => {
+    try {
+      if (!db || typeof db.prepare !== 'function') throw new Error('binding ANALYTICS tidak ada');
+      const stmt = db.prepare(sql);
+      return sanitizeRow(await (binds.length ? stmt.bind(...binds) : stmt).first(), droppedFields);
+    } catch (err) {
+      if (!readErrors.includes(label)) readErrors.push(label);
+      return null;
+    }
   };
-  const many = async (sql, ...binds) => {
-    const stmt = db.prepare(sql);
-    const res = await (binds.length ? stmt.bind(...binds) : stmt).all();
-    return (res && res.results) || [];
+  const many = async (label, sql, ...binds) => {
+    try {
+      if (!db || typeof db.prepare !== 'function') throw new Error('binding ANALYTICS tidak ada');
+      const stmt = db.prepare(sql);
+      const res = await (binds.length ? stmt.bind(...binds) : stmt).all();
+      return sanitizeRows((res && res.results) || [], droppedFields);
+    } catch (err) {
+      if (!readErrors.includes(label)) readErrors.push(label);
+      return [];
+    }
   };
 
-  const latest = (await one(QUERIES.LATEST_DAY)) || null;
-  const anchorDay = (latest && latest.day) || wibDay(nowMs);
-  const { from, to, span } = periodRange(period, anchorDay);
+  const latestDay = (await one('LATEST_DAY', QUERIES.LATEST_DAY)) || null;
+  // `day = null` berarti nol baris rollup, BUKAN sebuah hari.
+  //
+  // DUA JANGKAR, dan bedanya penting:
+  //  - Rentang periode dijangkarkan pada HARI WIB SEKARANG. Kalau dijangkarkan pada hari rollup
+  //    terakhir, "30 hari terakhir" diam-diam berarti "30 hari terakhir yang PUNYA data", jadi
+  //    cron rollup yang mati sebulan lalu tetap merender halaman yang tampak mutakhir dan penuh.
+  //    Itu juga membuat keadaan `no-data-in-period` mustahil terjadi secara struktural — keadaan
+  //    yang tidak bisa terjadi bukan pembeda, hanya hiasan.
+  //  - Nilai keadaan (kartu "hari terakhir") dijangkarkan pada hari rollup TERAKHIR, karena itu
+  //    memang angka terukur terbaru yang kita punya. Tanggalnya dicetak apa adanya.
+  const today = wibDay(nowMs);
+  const anchorDay = (latestDay && latestDay.day) || today;
+  const { from, to, span } = periodRange(period, today);
 
-  const [totals, peak, series, retention, retentionRollup, costPeriod, costRates, start, growth] =
-    await Promise.all([
-      one(QUERIES.PERIOD_TOTALS, from, to),
-      one(QUERIES.ACTIVE_PEAK, from, to),
-      many(QUERIES.SERIES, from, to),
-      many(QUERIES.RETENTION, from, to),
-      many(QUERIES.RETENTION_ROLLUP, from, to),
-      one(QUERIES.COST_PERIOD, from, to),
-      one(QUERIES.COST_RATES, from, to),
-      one(QUERIES.COLLECTION_START),
-      one(QUERIES.GROWTH_STOCK, from, to),
-    ]);
+  const [
+    totalRows, dayRows, seriesRows, retention, usageRows,
+    start, periodDays, dauPeak, broken,
+  ] = await Promise.all([
+    many('PERIOD_TOTALS', QUERIES.PERIOD_TOTALS, from, to),
+    many('DAY_METRICS', QUERIES.DAY_METRICS, anchorDay),
+    many('SERIES', QUERIES.SERIES, from, to),
+    many('RETENTION', QUERIES.RETENTION, from, to),
+    many('USAGE_TOTALS', QUERIES.USAGE_TOTALS, from, to),
+    one('COLLECTION_START', QUERIES.COLLECTION_START),
+    one('PERIOD_DAYS', QUERIES.PERIOD_DAYS, from, to),
+    one('METRIC_PEAK', QUERIES.METRIC_PEAK, 'dau', from, to),
+    one('BROKEN_DAYS', QUERIES.BROKEN_DAYS, 'collection_ok', from, to),
+  ]);
 
-  const rates = costRates || {};
+  // --- Pemutaran bentuk PANJANG → objek yang enak dipakai UI ---------------------------------
+  // Ini bukan kosmetik: bentuk panjang berarti sebuah metrik bisa TIDAK PUNYA BARIS sama sekali.
+  // Karena itu `totals`/`latest` sengaja TIDAK diberi nilai bawaan nol; metrik tanpa baris tetap
+  // `undefined` dan pembungkus fmt* akan mencetak "belum ada pengukuran", bukan "0".
+  const totals = {};        // nama metrik -> jumlah dalam periode
+  const totalDays = {};     // nama metrik -> jumlah hari yang punya baris untuk metrik itu
+  for (const r of totalRows) {
+    if (!r || r.metric == null) continue;
+    totals[r.metric] = Number(r.total);
+    totalDays[r.metric] = Number(r.days);
+  }
+  const latest = { day: (latestDay && latestDay.day) || null };
+  for (const r of dayRows) {
+    if (!r || r.metric == null) continue;
+    latest[r.metric] = Number(r.value);
+  }
+  // Seri: satu baris per hari, kolomnya nama metrik. Hari yang tidak punya baris `collection_ok`
+  // diperlakukan sebagai TIDAK OK (default 0) supaya sparkline memutus garisnya — bukan
+  // menyambungnya dengan asumsi bahwa hari itu baik-baik saja.
+  const seriesByDay = new Map();
+  for (const r of seriesRows) {
+    if (!r || !r.day || r.metric == null) continue;
+    if (!seriesByDay.has(r.day)) seriesByDay.set(r.day, { day: r.day, collection_ok: 0 });
+    seriesByDay.get(r.day)[r.metric] = Number(r.value);
+  }
+  const series = [...seriesByDay.values()].sort((a, b) => (a.day < b.day ? -1 : 1));
+  // Dimensi pemakaian: bucket -> jumlah. Bucket tanpa baris tetap `undefined`, alasan sama.
+  const usage = {};
+  for (const r of usageRows) {
+    if (!r || r.bucket == null) continue;
+    usage[r.bucket] = Number(r.total);
+  }
+  // Retensi: `retention_daily` tidak punya kolom ukuran kohor, jadi n= diturunkan dari baris
+  // offset 0 kohor YANG SAMA — satu-satunya sumbernya di skema ini.
+  // Penyebut per offset dijumlahkan HANYA dari kohor yang punya pengamatan di offset itu. Kalau
+  // seluruh kohor dijumlahkan (yang akan terjadi bila ini dikerjakan `GROUP BY` di SQL), kohor
+  // berumur 3 hari ikut jadi penyebut D30 padahal ia belum mungkin punya baris D30, dan retensi
+  // tampak lebih buruk daripada kenyataan.
+  const cohortSize = new Map();
+  for (const r of retention) {
+    if (Number(r.day_index) === 0) cohortSize.set(r.cohort_day, Number(r.count));
+  }
+  const byOffset = new Map();
+  for (const r of retention) {
+    const idx = Number(r.day_index);
+    if (!Number.isFinite(idx) || idx === 0) continue;
+    const base = cohortSize.get(r.cohort_day);
+    // Kohor tanpa baris D0 TIDAK dipakai: tanpa ukuran kohor, persentase apa pun adalah karangan.
+    if (!Number.isFinite(base)) continue;
+    const acc = byOffset.get(idx) || { day_index: idx, retained: 0, base: 0, cohorts: 0 };
+    acc.retained += Number(r.count) || 0;
+    acc.base += base;
+    acc.cohorts += 1;
+    byOffset.set(idx, acc);
+  }
+  const retentionRollup = [...byOffset.values()].sort((a, b) => a.day_index - b.day_index);
+
+  // Keadaan pengukuran diputuskan dari JUMLAH HARI, bukan dari nilai metrik (COALESCE menutupi
+  // ketiadaan baris dengan nol — lihat komentar di kepala berkas).
+  const daysTotal = Number(start && start.days_total);
+  const daysCounted = Number(periodDays && periodDays.days_counted);
+  let state = STATE_MEASURED;
+  if (readErrors.length > 0) state = STATE_UNAVAILABLE;
+  else if (!Number.isFinite(daysTotal) || daysTotal <= 0) state = STATE_NO_DATA;
+  else if (!Number.isFinite(daysCounted) || daysCounted <= 0) state = STATE_NO_DATA_IN_PERIOD;
+
+  const measurement = {
+    state,
+    daysTotal: Number.isFinite(daysTotal) ? daysTotal : null,
+    daysCounted: Number.isFinite(daysCounted) ? daysCounted : null,
+    firstCollectedDay: (start && start.day_first_collected) || null,
+    readErrors,
+    // Nama kolom asing TIDAK diulang keluar (nama kolom pun bisa menjadi petunjuk identitas).
+    // Yang keluar hanya JUMLAHNYA; daftarnya tetap ada di dalam model untuk log/gerbang.
+    droppedFieldCount: droppedFields.length,
+    // Kalimat yang sama dipakai HTML dan JSON, supaya dua permukaan tidak pernah berbeda cerita.
+    notice: state === STATE_MEASURED ? null
+      : state === STATE_UNAVAILABLE ? UNAVAILABLE_BANNER
+        : state === STATE_NO_DATA_IN_PERIOD ? NO_DATA_PERIOD_BANNER : NO_DATA_BANNER,
+    zeroMeansMeasured: state === STATE_MEASURED,
+  };
+  // Daftar nama kolom asing sengaja TIDAK ikut ke `measurement` (lihat di atas); ia hanya
+  // dilaporkan sebagai jumlah, dan dicatat sekali ke log supaya owner bisa menyelidikinya.
+  if (droppedFields.length > 0) {
+    try { console.warn('fiezel-owner kolom di luar daftar putih agregat dibuang: ' + droppedFields.length); } catch { /* noop */ }
+  }
+
+  // BIAYA: volume dari `metrics_daily` (terukur), tarif dari kartu di repo (TIDAK tersimpan per
+  // hari, dan tidak boleh — tidak ada tabel biaya di database ini). `infraUsd` dan kredit gratis
+  // dipaksa 0 karena keduanya tidak pernah masuk D1; keduanya terdaftar di UNMEASURABLE dan
+  // dicetak sebagai "tidak bisa diukur", bukan sebagai US$0,00 yang menyesatkan.
   const cost = estimateCost({
-    ttsCharsRendered: (costPeriod && costPeriod.tts_chars_rendered) || 0,
-    aiTokensIn: (costPeriod && costPeriod.ai_tokens_in) || 0,
-    aiTokensOut: (costPeriod && costPeriod.ai_tokens_out) || 0,
-    ttsUsdPer1MChars: rates.tts_usd_per_1m_chars,
-    llmUsdPer1MIn: rates.llm_usd_per_1m_in,
-    llmUsdPer1MOut: rates.llm_usd_per_1m_out,
-    infraUsd: (costPeriod && costPeriod.infra_usd) || 0,
-    freeAiCreditUsd: 0,   // kredit gratis sudah diperhitungkan job rollup harian di infra_usd
-    ttsProvider: rates.tts_provider,
-    llmModel: rates.llm_model,
-    tokensAreEstimated: !!(costPeriod && costPeriod.tokens_are_estimated),
-    activeDevices: (latest && latest.dau) || 0,
-    registeredDevices: (growth && growth.registered_total) || 0,
+    ttsCharsRendered: totals.tts_chars_rendered || 0,
+    aiTokensIn: totals.ai_tokens_in || 0,
+    aiTokensOut: totals.ai_tokens_out || 0,
+    infraUsd: 0,
+    freeAiCreditUsd: 0,
+    activeDevices: latest.dau || 0,
+    // Perangkat terdaftar hidup di database KUOTA dan dilarang disambungkan ke analytics, jadi
+    // biaya per perangkat terdaftar TIDAK dihitung (bukan dihitung lalu disembunyikan).
+    registeredDevices: 0,
   });
 
   return {
-    period, span, from, to, anchorDay,
-    latest: latest || {},
-    totals: totals || {},
-    peak: peak || {},
+    period, span, from, to, anchorDay, today,
+    // Selisih hari antara hari ini dan hari rollup terakhir. > 1 berarti data basi, dan itu harus
+    // terbaca di permukaan, bukan tersembunyi di balik rentang yang menyesuaikan diri.
+    staleDays: latestDay && latestDay.day ? daysBetween(anchorDay, today) : null,
+    measurement,
+    latest,
+    totals,
+    totalDays,
+    usage,
+    peak: {
+      dau_days: Number(dauPeak && dauPeak.days),
+      dau_peak: Number(dauPeak && dauPeak.peak),
+      dau_avg: Number(dauPeak && dauPeak.avg),
+    },
     series, retention, retentionRollup,
-    costStored: costPeriod || {},
+    broken: { days_broken: Number(broken && broken.days_broken) },
+    periodDays: periodDays || {},
     cost,
-    growth: growth || {},
     collection: start || {},
+    // Batas pengukuran ikut ke model — jadi HTML dan JSON menceritakan batas yang SAMA.
+    unmeasurable: UNMEASURABLE,
     generatedAtIso: new Date(Number(nowMs)).toISOString(),
   };
 }
@@ -411,6 +652,9 @@ section h2{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacin
 .warn{margin-top:10px;font-size:12px;color:var(--warn);background:#FFF4D6;border:1px solid var(--yellow);border-radius:9px;padding:8px 9px}
 .assume{margin-top:10px;font-size:12px;color:var(--muted);background:var(--cream);border:1px dashed var(--line);border-radius:9px;padding:8px 9px}
 .assume code{font-size:11px}
+.nodata{margin-top:10px;font-size:12px;color:#4A3A22;background:#F2ECE0;border:1px dashed var(--muted);border-radius:9px;padding:8px 9px}
+.empty{margin:0 16px 14px;padding:12px 13px;border:2px solid var(--ink);border-radius:12px;background:#FFF4D6;font-size:13px;line-height:1.45}
+.empty b{display:block;font-size:14px;margin-bottom:4px}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{text-align:right;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
 th:first-child,td:first-child{text-align:left}
@@ -453,14 +697,64 @@ function fmtPct(part, whole, digits) {
   return fmtNum((p / w) * 100, digits == null ? 1 : digits) + '%';
 }
 
+/* --- Pembungkus keadaan: satu-satunya tempat angka boleh menjadi teks -------------------- */
+// ATURAN: nilai metrik TIDAK PERNAH dicetak lewat fmtInt/fmtUsd langsung di panel. Semua lewat
+// pembungkus di bawah, supaya "belum ada pengukuran" tidak mungkin tersamar menjadi "0".
+
+function stateText(m) {
+  return (m && m.measurement && m.measurement.state) === STATE_UNAVAILABLE
+    ? UNAVAILABLE_TEXT : NO_DATA_TEXT;
+}
+
+function isMeasured(m) {
+  return !!(m && m.measurement && m.measurement.state === STATE_MEASURED);
+}
+
+// Nol yang BENAR-BENAR terukur dicetak dengan penanda eksplisit "nol terukur", supaya ia tidak
+// bisa dibaca sebagai "kosong", dan kekosongan tidak bisa dibaca sebagai nol.
+function fmtCount(m, v) {
+  if (!isMeasured(m)) return stateText(m);
+  const n = Number(v);
+  if (!Number.isFinite(n)) return NO_DATA_TEXT;
+  return n === 0 ? '0 (' + MEASURED_ZERO_TEXT + ')' : fmtInt(n);
+}
+
+// Rata-rata/rasio berdesimal (mis. DAU rata-rata, permintaan per perangkat).
+function fmtAvg(m, v, digits) {
+  if (!isMeasured(m)) return stateText(m);
+  const n = Number(v);
+  if (!Number.isFinite(n)) return NO_DATA_TEXT;
+  return n === 0 ? '0 (' + MEASURED_ZERO_TEXT + ')' : fmtNum(n, digits == null ? 1 : digits);
+}
+
+function fmtRate(m, part, whole, digits) {
+  if (!isMeasured(m)) return stateText(m);
+  return fmtPct(part, whole, digits);
+}
+
+function fmtMoney(m, v, digits) {
+  if (!isMeasured(m)) return stateText(m);
+  return fmtUsd(v, digits);
+}
+
+function fmtDay(m, v) {
+  if (!isMeasured(m)) return stateText(m);
+  return v || NO_DATA_TEXT;
+}
+
 function row(label, value, hint) {
   return `<div class="kv"><span>${esc(label)}${hint ? ` <small style="color:var(--muted)">${esc(hint)}</small>` : ''}</span><b>${esc(value)}</b></div>`;
 }
 
 // Sparkline: hari dengan collection_ok=0 digambar PUTUS, tidak diinterpolasi. Grafik yang
 // mulus di atas hari yang gagal dikumpulkan adalah kebohongan visual.
+// Nol hari = TIDAK ADA GRAFIK, bukan garis datar di angka nol: garis datar adalah pengukuran,
+// dan pengukuran itu tidak pernah terjadi.
 function sparkline(series, key) {
   const points = (series || []).map((r) => Number(r[key]) || 0);
+  if (points.length === 0) {
+    return `<div class="nodata">Tidak ada grafik: ${esc(NO_DATA_TEXT)}. Garis datar di nol akan menyiratkan pengukuran yang belum pernah terjadi.</div>`;
+  }
   if (points.length < 2) return '<div class="note">Belum cukup hari untuk digambar.</div>';
   const max = Math.max(...points, 1);
   const stepX = 100 / (points.length - 1);
@@ -477,22 +771,74 @@ function sparkline(series, key) {
     <rect x="0" y="0" width="100" height="50" fill="#FFF8ED"/>${paths}</svg>`;
 }
 
+// Baris "tidak bisa diukur": panel yang MUSTAHIL dijawab dari lima tabel yang ada tidak diberi
+// kueri karangan dan tidak dibiarkan kosong. Ia dicetak dengan alasannya, karena owner lebih
+// butuh tahu batas datanya daripada menatap kotak kosong yang ia salah tafsirkan sebagai nol.
+const UNMEASURABLE_TEXT = 'tidak bisa diukur dari data yang kita simpan';
+
+function limitRows(m, panel) {
+  return (m.unmeasurable || []).filter((u) => u.panel === panel).map((u) => (
+    `<div class="kv"><span>${esc(u.hal)}</span><b>${esc(UNMEASURABLE_TEXT)}</b></div>`
+    + `<div class="nodata">Kenapa: ${esc(u.sebab)}</div>`
+  )).join('');
+}
+
+// Rentang batas-bawah–batas-atas. WAU/MAU disimpan sepasang karena dedup lintas hari mustahil;
+// mencetaknya sebagai satu angka akan mengarang presisi yang datanya tidak punya.
+function fmtRange(m, lo, hi) {
+  if (!isMeasured(m)) return stateText(m);
+  const a = Number(lo), b = Number(hi);
+  if (!Number.isFinite(a) || !Number.isFinite(b)) return NO_DATA_TEXT;
+  if (a === 0 && b === 0) return '0 (' + MEASURED_ZERO_TEXT + ')';
+  return fmtInt(a) + '–' + fmtInt(b);
+}
+
+function fmtRateRange(m, part, wholeLo, wholeHi) {
+  if (!isMeasured(m)) return stateText(m);
+  const lo = fmtPct(part, wholeHi), hi = fmtPct(part, wholeLo);
+  if (lo === '—' || hi === '—') return '—';
+  return lo + '–' + hi;
+}
+
 const DEVICE_TRUTH = 'Angka ini ESTIMASI PERANGKAT, bukan orang. Satu orang dengan dua perangkat = dua hitungan; menghapus data browser = perangkat baru; dua orang satu perangkat = satu hitungan.';
 
 function renderDashboard(m) {
   const t = m.totals || {}, l = m.latest || {}, c = m.cost || {}, a = (c.assumptions || {});
   const periodLabel = { today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[m.period] || m.period;
   const nav = Object.keys(PERIODS).map((p) => `<a href="/?period=${esc(p)}"${p === m.period ? ' aria-current="page"' : ''}>${esc({ today: 'Hari ini', '7d': '7 hari', '30d': '30 hari', '90d': '90 hari' }[p])}</a>`).join('');
-  const brokenDays = Number(t.days_broken) || 0;
+  const u = m.usage || {};
+  const brokenDays = Number(m.broken && m.broken.days_broken) || 0;
   const ttsTotal = (Number(t.tts_cache_hits) || 0) + (Number(t.tts_cache_misses) || 0);
-  const aiErr = (Number(t.ai_err_429) || 0) + (Number(t.ai_err_timeout) || 0) + (Number(t.ai_err_5xx) || 0);
+  // Error AI dipecah dari `usage_daily` (bucket `ai_err:<kode>`), bukan dari metrik lebar yang
+  // tidak pernah ada penulisnya. Totalnya tetap dari metrik `ai_failure` supaya dua sumber bisa
+  // dibandingkan; kalau berbeda, itu sinyal nyata, bukan bug tampilan.
+  const aiErrBuckets = ['ai_err:429', 'ai_err:timeout', 'ai_err:4xx', 'ai_err:5xx', 'ai_err:other'];
+  const aiErrBucketSum = aiErrBuckets.reduce((s, k) => s + (Number(u[k]) || 0), 0);
 
+  // n= kohor berasal dari baris offset D0 kohor yang sama — tidak ada kolom ukuran kohor di skema.
   const retentionRows = (m.retentionRollup || []).map((r) => {
-    const n = Number(r.cohort_total) || 0;
-    const kept = Number(r.retained_total) || 0;
-    const pct = n >= RETENTION_MIN_COHORT ? fmtPct(kept, n) : 'belum cukup data';
-    return `<tr><td>D${esc(r.day_offset)}</td><td>${esc(fmtInt(kept))}</td><td>n=${esc(fmtInt(n))}</td><td>${esc(pct)}</td></tr>`;
-  }).join('') || '<tr><td colspan="4">Belum ada cohort dalam rentang ini.</td></tr>';
+    const pct = r.base >= RETENTION_MIN_COHORT ? fmtPct(r.retained, r.base) : 'belum cukup data';
+    return `<tr><td>D${esc(r.day_index)}</td><td>${esc(fmtInt(r.retained))}</td><td>n=${esc(fmtInt(r.base))}</td><td>${esc(pct)}</td><td>${esc(fmtInt(r.cohorts))}</td></tr>`;
+  }).join('') || `<tr><td colspan="5">Nol cohort dalam rentang ini — ${esc(NO_DATA_TEXT)}, bukan retensi 0%.</td></tr>`;
+
+  // Spanduk keadaan: dicetak DI ATAS semua panel, bukan sebagai catatan kaki. Kalau halaman ini
+  // belum punya pengukuran, itu berita utamanya.
+  const emptyBanner = m.measurement && m.measurement.notice
+    ? `<div class="empty"><b>⚠️ ${esc(m.measurement.state === STATE_UNAVAILABLE ? UNAVAILABLE_TEXT.toUpperCase() : NO_DATA_TEXT.toUpperCase())}</b>${esc(m.measurement.notice)}`
+      + `<br><br>Hari terrollup di seluruh tabel: <b>${esc(m.measurement.daysTotal == null ? stateText(m) : fmtInt(m.measurement.daysTotal) + ' hari')}</b> · `
+      + `hari terrollup di periode ini: <b>${esc(m.measurement.daysCounted == null ? stateText(m) : fmtInt(m.measurement.daysCounted) + ' hari')}</b>.`
+      + `${(m.measurement.readErrors || []).length ? `<br>Query yang gagal dibaca: <code>${esc((m.measurement.readErrors || []).join(', '))}</code>.` : ''}`
+      + `<br>Semua angka di bawah bertanda “${esc(stateText(m))}”.`
+      + `${m.measurement.state === STATE_UNAVAILABLE ? ' Kegagalan baca TIDAK PERNAH dirender sebagai angka nol.' : ` Angka yang benar-benar nol akan bertanda “${esc(MEASURED_ZERO_TEXT)}” — dua hal itu sengaja dibedakan.`}</div>`
+    : '';
+
+  // Spanduk KEBASIAN, terpisah dari spanduk keadaan. Halaman bisa "terukur" dan tetap basi, dan
+  // itu keadaan paling berbahaya: angkanya nyata, hanya saja bukan angka hari ini.
+  const staleBanner = Number.isFinite(m.staleDays) && m.staleDays > 1
+    ? `<div class="warn"><b>⚠️ DATA BASI ${esc(fmtInt(m.staleDays))} HARI.</b> Rollup terakhir ${esc(m.anchorDay)}, sedangkan hari ini ${esc(m.today)}.
+       Rentang periode di halaman ini dihitung dari HARI INI, bukan dari hari rollup terakhir, jadi hari-hari yang hilang ikut terlihat
+       sebagai hari tanpa data. Periksa cron rollup sebelum menyimpulkan pemakaian turun.</div>`
+    : '';
 
   return `<!doctype html><html lang="id"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -504,135 +850,160 @@ function renderDashboard(m) {
   rollup terakhir ${esc(l.day || '—')} · dirender ${esc(m.generatedAtIso)}</div>
 </header>
 <nav>${nav}<a href="/logout" style="margin-left:auto">Keluar</a></nav>
+${emptyBanner}${staleBanner}
 <main>
 
   <section>
     <h2>👥 User growth</h2>
-    <div class="big">${esc(fmtInt(m.growth.registered_total))}</div>
-    ${row('Perangkat terdaftar (kumulatif)', fmtInt(m.growth.registered_total))}
-    ${row('Perangkat baru (periode)', fmtInt(t.new_users))}
-    ${row('Pengunjung tercatat', fmtInt(t.visitors), 'batas bawah')}
-    ${row('Perangkat kembali (hari terakhir)', fmtInt(l.returning_users))}
+    <div class="big">${esc(fmtCount(m, t.new_users))}</div>
+    ${row('Perangkat baru (periode)', fmtCount(m, t.new_users))}
+    ${row('Aplikasi dibuka (periode)', fmtCount(m, t.app_open), 'pembukaan, bukan orang unik')}
+    ${row('Pembukaan dengan akun tertaut', fmtCount(m, t.app_open_with_identity))}
+    ${row('Laporan hari-aktif', fmtCount(m, t.day_active_reports))}
     ${sparkline(m.series, 'new_users')}
     <div class="warn">${esc(DEVICE_TRUTH)}</div>
-    <div class="note">Pengunjung adalah BATAS BAWAH: PWA yang dibuka dari precache tanpa jaringan tidak terhitung.</div>
+    <div class="note">"Aplikasi dibuka" adalah BATAS BAWAH: PWA yang dibuka dari precache tanpa jaringan tidak pernah mengirim event, jadi ia tidak terhitung.</div>
+    ${limitRows(m, 'User growth')}
   </section>
 
   <section>
     <h2>🔥 Active users (DAU / WAU / MAU)</h2>
-    <div class="big">${esc(fmtInt(l.dau))}</div>
-    ${row('DAU (hari rollup terakhir)', fmtInt(l.dau))}
-    ${row('WAU', fmtInt(l.wau))}
-    ${row('MAU', fmtInt(l.mau))}
-    ${row('Stickiness DAU/MAU', fmtPct(l.dau, l.mau))}
-    ${row('Puncak DAU pada periode', fmtInt(m.peak.dau_peak))}
-    ${row('Rata-rata DAU pada periode', fmtNum(m.peak.dau_avg, 1))}
+    <div class="big">${esc(fmtCount(m, l.dau))}</div>
+    ${row('DAU (hari rollup terakhir)', fmtCount(m, l.dau))}
+    ${row('WAU', fmtRange(m, l.wau_lower, l.wau_upper), 'rentang batas bawah–atas')}
+    ${row('MAU', fmtRange(m, l.mau_lower, l.mau_upper), 'rentang batas bawah–atas')}
+    ${row('Stickiness DAU/MAU', fmtRateRange(m, l.dau, l.mau_lower, l.mau_upper))}
+    ${row('Puncak DAU pada periode', fmtCount(m, m.peak.dau_peak))}
+    ${row('Rata-rata DAU pada periode', fmtAvg(m, m.peak.dau_avg, 1))}
+    ${row('Hari DAU terrollup pada periode', fmtCount(m, m.peak.dau_days), `dari ${esc(m.span)}`)}
     ${sparkline(m.series, 'dau')}
     <div class="warn">${esc(DEVICE_TRUTH)} "Aktif" = hari dengan ≥5 jawaban (ambang yang sama dengan cincin misi murid).</div>
-    <div class="note">DAU/WAU/MAU dibaca dari tabel agregat harian yang dibekukan job rollup — dashboard tidak pernah memindai baris per-perangkat.</div>
+    <div class="warn">WAU dan MAU sengaja RENTANG, bukan satu angka${Number(l.wau_mau_is_estimate) ? ' (penanda estimasi dari job rollup menyala)' : ''}: token perangkat dirotasi tiap 24 jam dan pepper lama dihapus, jadi menyambungkan perangkat lintas hari mustahil. Batas bawah = perangkat harian terbanyak, batas atas = jumlah seluruh hari.</div>
+    <div class="note">DAU/WAU/MAU dibaca dari baris agregat harian yang dibekukan job rollup — dashboard tidak pernah menyentuh tabel token per-perangkat.</div>
+    ${limitRows(m, 'Active users')}
   </section>
 
   <section>
     <h2>↩️ Retention (observed)</h2>
-    <table><thead><tr><th>Offset</th><th>Kembali</th><th>Cohort</th><th>%</th></tr></thead>
+    <table><thead><tr><th>Offset</th><th>Kembali</th><th>Cohort</th><th>%</th><th>Kohor</th></tr></thead>
     <tbody>${retentionRows}</tbody></table>
+    <div class="note">Kolom Cohort (n=) diturunkan dari baris offset D0 kohor yang sama; skema retensi tidak menyimpan ukuran kohor sebagai kolom sendiri. Penyebut tiap baris hanya menjumlahkan kohor yang BENAR-BENAR punya pengamatan di offset itu — kohor yang belum cukup tua tidak diseret masuk sebagai "hilang". Kolom terakhir = jumlah kohor yang menyumbang, supaya "0%" tidak tertukar dengan "nol kohor".</div>
     <div class="warn">PERINGATAN ESTIMASI PERANGKAT: cohort dibangun dari perangkat, bukan orang.
     Ganti perangkat atau hapus data browser terlihat sebagai "berhenti" walau muridnya tetap belajar.
     Belajar offline berhari-hari juga menurunkan retensi tanpa ada murid yang hilang.
     Safari membatasi storage skrip 7 hari → cohort iOS bisa tampak berhenti di D7.</div>
     <div class="note">Persentase disembunyikan bila cohort &lt; ${esc(RETENTION_MIN_COHORT)}: angka presisi di atas cohort kecil adalah derau, bukan sinyal.</div>
+    ${limitRows(m, 'Retention')}
   </section>
 
   <section>
     <h2>📚 Learning activity</h2>
-    ${row('Jawaban', fmtInt(t.answers))}
-    ${row('Sesi', fmtInt(t.sessions))}
-    ${row('Pelajaran dimulai', fmtInt(t.lessons_started))}
-    ${row('Pelajaran tuntas', fmtInt(t.lessons_completed))}
-    ${row('Rasio tuntas', fmtPct(t.lessons_completed, t.lessons_started))}
+    ${row('Jawaban', fmtCount(m, t.answers))}
+    ${row('Jawaban benar', fmtCount(m, t.answers_ok))}
+    ${row('Akurasi', fmtRate(m, t.answers_ok, t.answers))}
+    ${row('Sesi dimulai', fmtCount(m, t.sessions))}
+    ${row('Sesi tuntas', fmtCount(m, t.sessions_completed))}
+    ${row('Pelajaran dimulai', fmtCount(m, t.lessons_started))}
+    ${row('Pelajaran tuntas', fmtCount(m, t.lessons_completed))}
+    ${row('Rasio tuntas', fmtRate(m, t.lessons_completed, t.lessons_started))}
     ${sparkline(m.series, 'answers')}
     <div class="note">Dilaporkan sendiri oleh klien (self-reported): bisa kurang (murid offline) dan bisa lebih (klien dimodifikasi). Angka biaya TIDAK pernah memakai kanal ini.</div>
   </section>
 
   <section>
     <h2>🤖 AI usage</h2>
-    ${row('Permintaan AI', fmtInt(t.ai_calls))}
-    ${row('Permintaan / perangkat aktif', fmtNum((Number(t.ai_calls) || 0) / Math.max(1, Number(l.dau) || 0), 2))}
-    ${row('Token keluaran', fmtInt(t.ai_tokens_out))}
-    ${row('Error 429', fmtInt(t.ai_err_429))}
-    ${row('Timeout', fmtInt(t.ai_err_timeout))}
-    ${row('Error 5xx', fmtInt(t.ai_err_5xx))}
-    ${row('Error rate', fmtPct(aiErr, t.ai_calls))}
+    ${row('Permintaan AI', fmtCount(m, t.ai_calls))}
+    ${row('Berhasil', fmtCount(m, t.ai_success))}
+    ${row('Gagal', fmtCount(m, t.ai_failure))}
+    ${row('Permintaan / perangkat aktif', fmtAvg(m, (Number(t.ai_calls) || 0) / Math.max(1, Number(l.dau) || 0), 2))}
+    ${row('Token masuk', fmtCount(m, t.ai_tokens_in))}
+    ${row('Token keluaran', fmtCount(m, t.ai_tokens_out))}
+    ${row('Error 429', fmtCount(m, u['ai_err:429']))}
+    ${row('Timeout', fmtCount(m, u['ai_err:timeout']))}
+    ${row('Error 4xx', fmtCount(m, u['ai_err:4xx']))}
+    ${row('Error 5xx', fmtCount(m, u['ai_err:5xx']))}
+    ${row('Error lain', fmtCount(m, u['ai_err:other']))}
+    ${row('Error rate', fmtRate(m, t.ai_failure, t.ai_calls))}
     ${sparkline(m.series, 'ai_calls')}
-    ${a.tokensAreEstimated ? '<div class="warn">Token = PROKSI (karakter ÷ 4): penyedia tidak mengembalikan objek usage untuk hari-hari ini.</div>' : ''}
-    <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir.</div>
+    ${aiErrBucketSum !== (Number(t.ai_failure) || 0) ? `<div class="warn">Rincian error berjumlah ${esc(fmtInt(aiErrBucketSum))} sedangkan metrik gagal berbunyi ${esc(fmtCount(m, t.ai_failure))}. Selisih ini nyata (event tanpa kode error tidak masuk rincian), bukan salah tampil — pakai metrik gagal sebagai angka resmi.</div>` : ''}
+    <div class="warn">Token = bisa PROKSI (karakter ÷ 4). Jalur server tidak menandai hari mana yang memakai proksi, jadi peringatan ini dicetak tanpa syarat: perlakukan biaya LLM sebagai estimasi kasar.</div>
+    <div class="note">Semua angka AI lahir di Worker (server-side), bukan dari klien — di situlah biaya lahir. Rincian kode error dibaca dari tabel dimensi pemakaian (bucket <code>ai_err:*</code>), bukan dari metrik terpisah per kode.</div>
+    ${limitRows(m, 'AI usage')}
   </section>
 
   <section>
     <h2>🗣️ TTS usage</h2>
-    ${row('Permintaan TTS', fmtInt(t.tts_calls))}
-    ${row('Cache hit', fmtInt(t.tts_cache_hits))}
-    ${row('Cache miss (berbayar)', fmtInt(t.tts_cache_misses))}
-    ${row('Cache hit rate', fmtPct(t.tts_cache_hits, ttsTotal))}
-    ${row('Karakter dirender', fmtInt(t.tts_chars_rendered))}
-    ${row('≈ Menit audio', fmtNum((Number(t.tts_chars_rendered) || 0) / RATE_CARD.charsPerAudioMin, 1), `${fmtInt(RATE_CARD.charsPerAudioMin)} char/menit`)}
-    ${row('Gagal', fmtInt(t.tts_failures))}
+    ${row('Permintaan TTS', fmtCount(m, t.tts_calls))}
+    ${row('Cache hit', fmtCount(m, t.tts_cache_hits))}
+    ${row('Cache miss (berbayar)', fmtCount(m, t.tts_cache_misses))}
+    ${row('Cache hit rate', fmtRate(m, t.tts_cache_hits, ttsTotal))}
+    ${row('Karakter dirender', fmtCount(m, t.tts_chars_rendered))}
+    ${row('≈ Menit audio', fmtAvg(m, (Number(t.tts_chars_rendered) || 0) / RATE_CARD.charsPerAudioMin, 1), `${fmtInt(RATE_CARD.charsPerAudioMin)} char/menit`)}
+    ${row('Berhasil', fmtCount(m, t.tts_success))}
+    ${row('Gagal', fmtCount(m, t.tts_failure))}
+    ${row('Gagal 429', fmtCount(m, u['tts_err:429']))}
+    ${row('Gagal timeout', fmtCount(m, u['tts_err:timeout']))}
+    ${row('Gagal 5xx', fmtCount(m, u['tts_err:5xx']))}
     <div class="note">Hanya cache MISS yang berbiaya. Mesin suara on-device dihitung terpisah dan tidak masuk biaya; bandwidth model on-device (±152 MB/perangkat) TIDAK terukur skema ini.</div>
   </section>
 
   <section>
     <h2>🏗️ Infrastructure</h2>
-    ${row('Permintaan Worker', fmtInt(t.worker_requests))}
-    ${row('Objek R2', fmtInt(l.r2_objects))}
-    ${row('Byte R2', fmtInt(l.r2_bytes))}
-    ${row('Breaker terbuka', fmtInt(t.breaker_trips))}
-    ${row('Error backend', fmtInt(t.backend_errors))}
-    <div class="note">Permintaan Worker dan angka R2 diisi job rollup dari Analytics API Cloudflare, bukan hitungan-sendiri di Worker: hitungan-sendiri tidak melihat permintaan yang ditolak di tepi. Panel latensi p50/p95 belum ada — membacanya butuh SQL API Analytics Engine (token akun), lihat README §Batas.</div>
+    ${row('Breaker terbuka', fmtCount(m, t.breaker_trips))}
+    ${row('Breaker pulih', fmtCount(m, t.breaker_recoveries))}
+    ${row('Event analytics diterima', fmtCount(m, t.events_total))}
+    <div class="note">Hanya tiga baris di atas yang benar-benar ada di tabel agregat. Permintaan Worker, objek/byte R2, error backend, dan latensi p50/p95 hidup di Analytics API Cloudflare (butuh token akun) — lihat baris "tidak bisa diukur" di bawah.</div>
+    ${limitRows(m, 'Infrastructure')}
   </section>
 
   <section>
     <h2>💰 Cost estimation</h2>
-    <div class="big">${esc(fmtUsd(c.totalUsd))}</div>
-    ${row('TTS', fmtUsd(c.ttsUsd))}
-    ${row('LLM', fmtUsd(c.llmUsd))}
-    ${row('Infrastruktur', fmtUsd(c.infraUsd))}
-    ${row('Kredit gratis', c.creditUsd ? '−' + fmtUsd(c.creditUsd) : fmtUsd(0))}
-    ${row('Biaya / perangkat aktif', c.usdPerActiveDevice == null ? '—' : fmtUsd(c.usdPerActiveDevice, 4))}
-    ${row('Biaya / perangkat terdaftar', c.usdPerRegisteredDevice == null ? '—' : fmtUsd(c.usdPerRegisteredDevice, 4))}
+    <div class="big">${esc(fmtMoney(m, c.totalUsd))}</div>
+    ${row('TTS', fmtMoney(m, c.ttsUsd))}
+    ${row('LLM', fmtMoney(m, c.llmUsd))}
+    ${row('Biaya / perangkat aktif', !isMeasured(m) ? stateText(m) : (c.usdPerActiveDevice == null ? '—' : fmtUsd(c.usdPerActiveDevice, 4)))}
     <div class="assume">ASUMSI YANG DIPAKAI (bukan angka ajaib — sumber: reports/cf-a10-cost.md + cf-a10-cost-model.json):<br>
       · TTS <code>${esc(a.ttsProvider)}</code> = <code>${esc(fmtUsd(a.ttsUsdPer1MChars))}</code> per 1 juta karakter<br>
       · <code>chars_per_audio_min = ${esc(fmtInt(a.charsPerAudioMin))}</code> (kalibrasi 273 aset audio nyata)<br>
       · LLM <code>${esc(a.llmModel)}</code> = <code>${esc(fmtUsd(a.llmUsdPer1MIn, 3))}</code> masuk / <code>${esc(fmtUsd(a.llmUsdPer1MOut, 3))}</code> keluar per 1 juta token<br>
       · Rumus: <code>tts = char_dirender/1e6 × tarif</code>; <code>llm = tok_in/1e6 × tarif_in + tok_out/1e6 × tarif_out</code>; <code>total = tts + llm + infra − kredit</code><br>
-      · Hanya cache MISS yang ditagih; tarif yang dipakai disimpan bersama baris hari itu sehingga angka lama tetap bisa diaudit.
+      · Hanya cache MISS yang ditagih. TARIF TIDAK DISIMPAN PER HARI: tidak ada tabel biaya di database ini dan tidak boleh ada, jadi tarif di atas dipakai ulang untuk SEMUA hari. Mengubahnya mengubah angka bulan lalu juga — ini estimasi sekarang, bukan jejak audit.
     </div>
+    ${limitRows(m, 'Cost estimation')}
     <div class="warn">Penyebut "perangkat aktif" adalah UNDER-COUNT (murid offline tidak terlihat), jadi biaya/perangkat aktif adalah BATAS ATAS, bukan angka pasti.${a.tokensAreEstimated ? ' Token keluaran = proksi char/4 → biaya LLM adalah estimasi kasar.' : ''} Bila TTS berjalan on-device, biaya TTS nyata NOL dan yang perlu dipantau justru bandwidth model.</div>
   </section>
 
   <section>
     <h2>⚠️ Quota exhaustion</h2>
-    <div class="big">${esc(fmtInt(t.quota_hit_users))}</div>
-    ${row('Perangkat kena batas kuota', fmtInt(t.quota_hit_users))}
-    ${row('Porsi dari perangkat aktif', fmtPct(t.quota_hit_users, (Number(l.dau) || 0) * (Number(t.days_counted) || 1)))}
-    ${row('429 dari AI', fmtInt(t.ai_err_429))}
-    ${row('Breaker terbuka', fmtInt(t.breaker_trips))}
+    <div class="big">${esc(fmtCount(m, t.quota_exhausted))}</div>
+    ${row('Penolakan karena kuota habis', fmtCount(m, t.quota_exhausted), 'penolakan, bukan perangkat')}
+    ${row('· kuota AI', fmtCount(m, u['quota:ai']))}
+    ${row('· kuota TTS', fmtCount(m, u['quota:tts']))}
+    ${row('· kuota terjemahan', fmtCount(m, u['quota:translate']))}
+    ${row('429 dari AI', fmtCount(m, u['ai_err:429']))}
+    ${row('Breaker terbuka', fmtCount(m, t.breaker_trips))}
+    ${limitRows(m, 'Quota exhaustion')}
+    <div class="note">KEPUTUSAN KUOTA: kalau baris di atas berbunyi "${esc(NO_DATA_TEXT)}", tidak ada satu pun angka di halaman ini yang boleh dipakai untuk menaikkan atau menurunkan kuota. Yang belum diukur tidak bisa dipangkas.</div>
     <div class="note">Dicatat server-side tepat di cabang yang mengembalikan 429. Angka naik = murid ditolak; itu keputusan biaya yang terlihat, bukan bug yang disembunyikan.</div>
   </section>
 
   <section>
     <h2>🔎 Data quality</h2>
-    ${row('Pengumpulan dimulai', m.collection.day_first_collected || '—')}
-    ${row('Hari terkumpul', fmtInt(m.collection.days_total))}
-    ${row('Hari dalam periode', fmtInt(t.days_counted), `dari ${esc(m.span)}`)}
-    ${row('Hari rollup GAGAL', fmtInt(brokenDays))}
-    ${row('Event terlambat (>24 jam)', fmtInt(t.offline_late_events))}
+    ${row('Keadaan pengukuran', isMeasured(m) ? 'terukur' : stateText(m))}
+    ${row('Pengumpulan dimulai', m.collection.day_first_collected || NO_DATA_TEXT)}
+    ${row('Hari terkumpul', m.measurement.daysTotal == null ? stateText(m) : fmtInt(m.measurement.daysTotal) + ' hari')}
+    ${row('Hari dalam periode', m.measurement.daysCounted == null ? stateText(m) : fmtInt(m.measurement.daysCounted) + ' hari', `dari ${esc(m.span)}`)}
+    ${row('Hari rollup GAGAL', fmtCount(m, brokenDays))}
+    ${row('Rentang hari yang terbaca', isMeasured(m) ? `${esc(m.periodDays.day_from || '—')} → ${esc(m.periodDays.day_to || '—')}` : stateText(m))}
     ${brokenDays > 0 ? `<div class="warn">${esc(brokenDays)} hari punya collection_ok=0. Grafik digambar PUTUS di hari itu — tidak diinterpolasi. Jangan bandingkan periode yang memuat hari rusak.</div>` : ''}
     <div class="note">Semua angka historis dimulai dari tanggal pengumpulan di atas. Sebelum tanggal itu tidak ada data — bukan nol, tetapi tidak diketahui.</div>
+    ${limitRows(m, 'Data quality')}
   </section>
 
 </main>
-<footer>Sumber: hanya tabel AGREGAT (metrik harian, cohort retensi, biaya harian). Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan nama, surel, isi jawaban, maupun percakapan AI.
-Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · desain panel: reports/cf-b5-analytics.md §5 · rumus biaya: reports/cf-a10-cost.md.</footer>
+<footer>Sumber: TIGA tabel agregat saja — metrik harian (bentuk panjang: hari × nama metrik × nilai), dimensi pemakaian berenum tertutup, dan retensi kohor. Tabel token perangkat dan bahan rahasia rotasi ADA di database yang sama tetapi TIDAK PERNAH dibaca halaman ini. Dashboard ini tidak punya jalan untuk membaca baris per-orang, dan tidak menampilkan identitas, surel, isi jawaban, maupun percakapan AI.
+Baris bertanda “${esc(UNMEASURABLE_TEXT)}” adalah batas nyata skema, bukan kerusakan: menambah tabel untuk menutupnya melanggar kunci lima tabel yang menjaga privasi murid.
+Kontrak: EXEC-BRIEF-CF.md "KONTRAK ANALYTICS PRIVASI-MAKSIMAL" · bentuk tabel: workers/api/migrations/0002_analytics.sql · rumus biaya: reports/cf-a10-cost.md.</footer>
 </body></html>`;
 }
 
@@ -772,29 +1143,55 @@ async function handle(request, env, ctx, nowMs) {
     const model = await readModel(env, period, now);
     return json({
       schema: 'fiezel-owner-summary-v1', period: model.period, from: model.from, to: model.to,
-      measurementBasis: 'perangkat-estimasi', latest: model.latest, totals: model.totals,
-      peak: model.peak, growth: model.growth, collection: model.collection,
+      measurementBasis: 'perangkat-estimasi',
+      // Keadaan pengukuran ikut di JSON, bukan hanya di HTML: pembaca mesin juga tidak boleh
+      // menyimpulkan "nol" dari ketiadaan baris.
+      measurement: model.measurement,
+      latest: model.latest, totals: model.totals, totalDays: model.totalDays,
+      usage: model.usage,
+      peak: model.peak, broken: model.broken, collection: model.collection,
+      // Batas pengukuran ikut di JSON juga: pembaca mesin tidak boleh menyimpulkan "nol" dari
+      // panel yang memang tidak pernah bisa diisi.
+      unmeasurable: model.unmeasurable,
       honesty: DEVICE_TRUTH,
+      dataHonesty: model.measurement.state === STATE_MEASURED
+        ? 'Angka di bawah TERUKUR; nol berarti nol yang terukur.'
+        : model.measurement.notice,
     });
   }
   if (path === '/api/series') {
     const model = await readModel(env, period, now);
-    return json({ schema: 'fiezel-owner-series-v1', period: model.period, series: model.series });
+    return json({
+      schema: 'fiezel-owner-series-v1', period: model.period,
+      measurement: model.measurement, series: model.series,
+      dataHonesty: model.measurement.notice || 'Seri di bawah TERUKUR.',
+    });
   }
   if (path === '/api/retention') {
     const model = await readModel(env, period, now);
     return json({
       schema: 'fiezel-owner-retention-v1', period: model.period,
+      measurement: model.measurement,
+      dataHonesty: model.measurement.notice || 'Cohort di bawah TERUKUR.',
       cohorts: model.retention, rollup: model.retentionRollup,
       minCohortForPercent: RETENTION_MIN_COHORT, honesty: DEVICE_TRUTH,
+      cohortSizeNote: 'Ukuran kohor (n=) diturunkan dari baris offset 0 kohor yang sama; skema '
+        + 'retensi tidak menyimpannya sebagai kolom sendiri. Penyebut per offset hanya '
+        + 'menjumlahkan kohor yang punya pengamatan di offset itu.',
     });
   }
   if (path === '/api/cost') {
     const model = await readModel(env, period, now);
     return json({
-      schema: 'fiezel-owner-cost-v1', period: model.period,
-      stored: model.costStored, computed: model.cost, assumptions: model.cost.assumptions,
-      honesty: 'Penyebut perangkat aktif adalah under-count; biaya per perangkat aktif adalah batas atas.',
+      schema: 'fiezel-owner-cost-v1', period: model.period, from: model.from, to: model.to,
+      measurement: model.measurement,
+      dataHonesty: model.measurement.notice
+        || 'Biaya di bawah dihitung dari hari yang TERUKUR.',
+      computed: model.cost, assumptions: model.cost.assumptions,
+      unmeasurable: (model.unmeasurable || []).filter((x) => x.panel === 'Cost estimation'),
+      honesty: 'Penyebut perangkat aktif adalah under-count; biaya per perangkat aktif adalah '
+        + 'batas atas. Tarif TIDAK tersimpan per hari (tidak ada tabel biaya di database ini), '
+        + 'jadi angka historis ikut berubah bila tarif diubah: ini estimasi, bukan tagihan.',
     });
   }
 
@@ -818,4 +1215,13 @@ export {
   renderDashboard, renderLogin, readModel, periodRange, wibDay, dayShift,
   RATE_CARD, PERIODS, OWNER_ROUTES, PUBLIC_ROUTES, SESSION_COOKIE, SESSION_TTL_MS,
   RETENTION_MIN_COHORT, DEVICE_TRUTH,
+  // Keadaan pengukuran + penyaring field: diekspor supaya gerbang bisa mengassert perbedaan
+  // "belum ada pengukuran" vs "nol terukur" sebagai kontrak, bukan sebagai kebetulan teks.
+  STATE_MEASURED, STATE_NO_DATA, STATE_NO_DATA_IN_PERIOD, STATE_UNAVAILABLE,
+  NO_DATA_TEXT, MEASURED_ZERO_TEXT, UNAVAILABLE_TEXT,
+  NO_DATA_BANNER, NO_DATA_PERIOD_BANNER, UNAVAILABLE_BANNER,
+  ALLOWED_ROW_FIELDS, sanitizeRow, fmtCount, isMeasured,
+  // Batas pengukuran: diekspor supaya gerbang bisa mengassert bahwa panel yang mustahil
+  // benar-benar DITANDAI, bukan dibiarkan kosong dan bukan diisi kueri karangan.
+  UNMEASURABLE_TEXT, limitRows, fmtRange,
 };

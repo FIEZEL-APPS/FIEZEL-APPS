@@ -144,7 +144,9 @@ test('tawaran berhenti benar-benar menutup sesi dan menghitung soal yang barusan
 });
 
 test('tawaran berhenti hanya sekali per sesi', () => {
-  assert.ok(/if\(answer\.breathe&&!breatheOffered&&!cfg\.placement\)\{\s*breatheOffered=true;answer\.breathe=false;/.test(APP),
+  // m025-177 (audit skip): breathe juga dikecualikan dari level-exam dan grammar-skip —
+  // alat ukur tidak boleh ter-settle dari sampel parsial. Penjaga sekali-tawar tetap sama.
+  assert.ok(/if\(answer\.breathe&&!breatheOffered&&!cfg\.placement&&cfg\.type!=='level-exam'&&cfg\.type!=='grammar-skip'\)\{\s*breatheOffered=true;answer\.breathe=false;/.test(APP),
     'penjaga sekali-tawar tidak dipasang sebelum tawaran digambar');
   assert.ok(/let pendingCard=null,breatheOffered=false;/.test(APP),
     'breatheOffered tidak direset per sesi kuis');

@@ -248,7 +248,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
    dan tab-nya kehilangan garisnya sendiri, jadi yang terbaca adalah satu kontrol
    dengan satu bagian terpilih. Tab aktif = bidang tinta (resep components.css §6). */
 .progress-tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0 18px;padding:4px;background:var(--panel-soft);border-radius:var(--radius-pill);-webkit-overflow-scrolling:touch}
-.progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:36px;white-space:nowrap}
+.progress-tab{flex:0 0 auto;padding:9px 16px;border-radius:var(--radius-pill);border:0;background:transparent;color:var(--muted);font-size:.82rem;font-weight:600;min-height:44px;white-space:nowrap}
 .progress-tab.active{background:var(--text);border-color:var(--text);color:var(--on-core)}
 
 .topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
@@ -537,8 +537,11 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
   .quiz-topbar{top:-1px}
 }
 
+/* D15 (audit D5-S7): scroll-behavior ikut dimatikan di blok OS ini, bukan hanya di
+   preferensi in-app (.reduce-motion) - murid yang menyetel kurangi-gerak di OS tidak
+   boleh tetap mendapat smooth-scroll dari html{scroll-behavior:smooth}. */
 @media(prefers-reduced-motion:reduce){
-  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 
 /* ---------- misc feature blocks (progress / diagnostics) ---------- */
@@ -595,7 +598,7 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .confidence-scale button:nth-child(3){background:var(--sun);color:var(--text)}
 
 .confidence-skip{
-  display:block;width:100%;margin-top:10px;min-height:0;padding:6px;
+  display:block;width:100%;margin-top:10px;padding:12px 6px;
   background:none;border:0;box-shadow:none;
   color:var(--muted);font-size:.78rem;font-weight:600;text-decoration:underline;
 }
@@ -800,7 +803,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
    ikut fase langit. Permukaan bertema di dalam kroma sadar-fase itulah cara lama bug
    kontras kembali: pukul 22.00 kromanya gelap, lingkaran ini tetap putih. Keduanya kini
    satu keluarga. */
-.icon-button{width:42px;height:42px;padding:0;border-radius:50%;background:var(--glass-thin);color:var(--glass-text)}
+.icon-button{width:44px;height:44px;padding:0;border-radius:50%;background:var(--glass-thin);color:var(--glass-text)}
 .icon-button.active{color:var(--accent-strong);border-color:#cfc8f6;background:var(--accent-soft)}
 .version{min-width:40px;text-align:right}
 
@@ -924,7 +927,7 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 }
 @media(max-width:640px){
   .app{padding:12px 14px calc(116px + env(safe-area-inset-bottom))}.topbar{margin:0 -2px 16px;padding:9px 2px}.brand-edition{display:none}.version{display:none}
-  .icon-button{width:39px;height:39px}.launcher-shell{padding:24px 18px 30px;border-radius:24px;gap:24px}.celestial-status{width:100%;margin-left:17px;justify-content:flex-start}.launcher-copy h1{font-size:2.65rem}.launcher-copy h1.login-message{font-size:2.25rem}.launcher-lead{font-size:.88rem}.launcher-actions{display:grid}.launcher-actions button{width:100%}.launcher-trust{gap:10px}
+  .icon-button{width:44px;height:44px}.launcher-shell{padding:24px 18px 30px;border-radius:24px;gap:24px}.celestial-status{width:100%;margin-left:17px;justify-content:flex-start}.launcher-copy h1{font-size:2.65rem}.launcher-copy h1.login-message{font-size:2.25rem}.launcher-lead{font-size:.88rem}.launcher-actions{display:grid}.launcher-actions button{width:100%}.launcher-trust{gap:10px}
   .coach-preview{padding:20px}.home-stats{grid-template-columns:1fr 1fr}.home-stats>div:nth-child(2){border-right:0}.home-stats>div:nth-child(-n+2){border-bottom:1px solid var(--line)}
   /* m025-98 (brief redesign 3.7). Hero diukur 966px di 375x812 - lebih tinggi dari satu
      layar penuh, untuk satu sapaan. Yang dipotong di sini RUANG dan pengulangan, bukan kata:
@@ -1541,14 +1544,19 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
   border-bottom:1px solid var(--fz-line)}
 
 /* ==========================================================================
-   Sapaan pembuka bermerek (m025-80 OWNER)
-   Maskot dilepas dari layar ini; yang tampil hanya logo yang dianimasikan di atas
-   bidang gelap - bidang yang sama dengan ikon aplikasi, jadi ikon di home screen dan
-   layar pertama terbaca sebagai satu benda.
-   Sekuensnya sengaja disamakan dengan nada pembuka di fiezel-splash.js: huruf F masuk
-   pada nada pertama (0ms), dua batang emas naik pada nada kedua (150ms), wordmark
-   menyusul setelah keduanya berdiri. Semuanya selesai di ~1,3 detik, jauh sebelum splash
-   menutup diri di 2,6 detik.
+   Sapaan pembuka bermerek v4 (ruling OWNER 2026-08-28 / OA-6)
+   Splash lama (F tumbuh + sheen emas) DIGANTI: logo kini TERBENTUK DARI AWAN
+   PARTIKEL di kanvas (features/brand/fiezel-splash-particles.js), dua batang
+   emas hidup sebagai EQUALIZER sinkron tabel ketukan, wordmark kecil naik di
+   bawah, lalu CAP PAW menghentak otomatis sebagai transisi penutup
+   (features/brand/fiezel-splash-pawstamp.js, CSS-nya disuntik modul itu).
+   ATURAN blok ini:
+   1. TANPA sheen/halo/glow (ruling OWNER) - seluruh lapisan kilau lama dihapus.
+   2. Gerak utama digerakkan JS per-frame dari satu jam rAF (m025-86); CSS di
+      sini hanya menata LETAK dan KEADAAN. @keyframes hanya untuk jalur
+      kurangi-gerak (pudar-masuk pada ketukan yang sama).
+   3. Hanya transform + opacity antar-frame; tanpa filter, tanpa blur.
+   4. Palet TERKUNCI: medan #1B1418, emas #F0C241/#FFD94F, krem #FFF4DA.
    ========================================================================== */
 .fiezel-splash-dark{background:#1B1418;padding-top:0}
 .fiezel-splash-brand{
@@ -1561,89 +1569,48 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
   display:grid;grid-template-rows:1fr auto auto;justify-items:center;align-items:center;
   gap:0;padding:24px 24px 17vh;
 }
-/* Cahaya emas di belakang logo, berdenyut pelan supaya layar tidak terasa beku. */
-@keyframes fz-splash-halo{
-  0%,100%{opacity:.22;transform:translate(-50%,-50%) scale(1)}
-  50%{opacity:.42;transform:translate(-50%,-50%) scale(1.12)}
-}
-.fiezel-splash-brand::before{
-  content:"";position:absolute;left:50%;top:38%;width:min(78vw,440px);aspect-ratio:1;
-  border-radius:50%;pointer-events:none;z-index:0;
-  background:radial-gradient(circle,rgba(255,199,0,.34) 0%,rgba(255,199,0,0) 68%);
-  animation:fz-splash-halo 3.4s ease-in-out infinite;
-}
-.fiezel-splash-brand>*{position:relative;z-index:1}
-/* inline-grid supaya lebar kotak ini persis selebar logo - kilau di bawah memakai inset:0,
-   dan kalau kotaknya selebar layar sapuannya ikut melebar ke seluruh layar. */
-.fiezel-logo-stage{display:inline-grid;place-items:center;overflow:hidden}
+/* 1. Kanvas partikel - memenuhi bidang splash; bitmap-nya diukur particles.init. */
+.fz-splash-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 2. SVG logo tajam. Posisi awal dari grid (masih dipakai jalur statis);
+      pada jalur gerak JS menimpanya dengan px persis (rumus identik
+      particles.init: kotak 512 terpusat, 62% sisi terpendek) supaya SVG
+      menumpuk piksel-persis di atas target partikel. Grup F & batang mulai
+      tak terlihat; JS meng-crossfade-nya per timing partikel. */
 .fiezel-logo{width:min(46vw,190px);height:auto;display:block;overflow:visible}
-
-/* Huruf F: tiga batang yang masing-masing tumbuh dari titik jangkarnya, bukan sekadar
-   muncul - batang tegak memanjang ke bawah, dua lengan memanjang ke kanan. */
-@keyframes fz-logo-stem{from{opacity:0;transform:scaleY(0)}to{opacity:1;transform:scaleY(1)}}
-@keyframes fz-logo-arm{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
-/* Batang emas naik seperti gelombang suara yang bereaksi pada nada. */
-@keyframes fz-logo-bar{
-  0%{opacity:0;transform:scaleY(.08)}
-  70%{opacity:1;transform:scaleY(1.035)}
-  100%{opacity:1;transform:scaleY(1)}
-}
+.fz-fgroup,.fz-barsgroup{opacity:0;will-change:opacity}
 .fiezel-logo .fz-f,.fiezel-logo .fz-bar{transform-box:fill-box}
-/* m025-82: jeda di bawah TIDAK boleh diubah tanpa mengubah MOTIF di
-   features/audio/fiezel-ui-sfx.js juga - keduanya satu koreografi.
-   Motif berbunyi di 0 / 105 / 210 ms, dan setiap ketukan visual mendarat di nadanya:
-     nada 1 (F4, 0ms)   -> batang tegak huruf F tumbuh
-     nada 2 (A4, 105ms) -> dua lengan huruf F memanjang
-     nada 3 (D5, 210ms) -> dua batang emas naik; inilah gelombang suara yang bereaksi
-   Sebelum perbaikan ini batang emas baru bergerak di 520/620 ms - melodinya sudah habis
-   sebelum bagian yang menggambarkan bunyi itu sempat bergerak sama sekali. */
-.fiezel-logo .fz-f1{transform-origin:top center;animation:fz-logo-stem .7s cubic-bezier(.22,.8,.28,1) var(--fz-b1,0ms) both}
-.fiezel-logo .fz-f2{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b2,190ms) both}
-.fiezel-logo .fz-f3{transform-origin:left center;animation:fz-logo-arm .56s cubic-bezier(.22,.8,.28,1) var(--fz-b3,285ms) both}
-.fiezel-logo .fz-bar1{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b4,430ms) both}
-.fiezel-logo .fz-bar2{transform-origin:center bottom;animation:fz-logo-bar .76s cubic-bezier(.2,.9,.3,1) var(--fz-b5,530ms) both}
-
-/* Kilau emas menyapu logo sekali, tepat setelah kedua batang berdiri. */
-@keyframes fz-logo-sheen{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
-.fiezel-logo-stage{position:relative}
-.fiezel-logo-stage::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(74deg,transparent 38%,rgba(255,222,89,.30) 50%,transparent 62%);
-  animation:fz-logo-sheen 1.2s cubic-bezier(.3,.7,.3,1) var(--fz-b6,820ms) both;
-}
-
-@keyframes fz-splash-rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
-@keyframes fz-splash-settle{
-  from{opacity:0;transform:translateY(15px) scaleX(1.045)}
-  to{opacity:1;transform:none}
-}
+/* 3. Wordmark KECIL di bawah - ruang kosong yang lapang adalah bagian desain.
+      Dipusatkan lewat margin auto (BUKAN transform): jalur statis memakai
+      transform:none, dan JS jalur gerak hanya menambah translateY. */
 .fiezel-splash-brand .fiezel-splash-word{
-  width:min(52vw,238px);margin:0 auto;display:block;
-  animation:fz-splash-settle .82s cubic-bezier(.22,.8,.28,1) var(--fz-b7,1060ms) both;
+  /* Aturan dasar .fiezel-splash-word adalah flex-baris; di splash brand wordmark
+     dan tagline harus BERTUMPUK - display:block mengembalikannya. */
+  position:absolute;display:block;left:0;right:0;margin:0 auto;
+  bottom:calc(7vh + env(safe-area-inset-bottom,0px));
+  width:min(52vw,238px);text-align:center;opacity:0;
+  transform:translateY(14px);will-change:transform,opacity;pointer-events:none;
 }
+.fiezel-splash-brand .fiezel-wordmark{display:block;width:min(30vw,132px);height:auto;margin:0 auto}
 .fiezel-splash-brand .fiezel-splash-tag{
   font-family:var(--fz-body);font-size:12px;letter-spacing:.30em;
-  text-transform:uppercase;color:#FFC700;margin:14px 0 0;
-  animation:fz-splash-rise .82s cubic-bezier(.22,.8,.28,1) var(--fz-b8,1360ms) both;
+  text-transform:uppercase;color:#FFC700;margin:14px 0 0;white-space:nowrap;
 }
-/* Kurangi-gerak: seluruh sekuens dimatikan, logo langsung utuh dan diam. */
-/* Kurangi-gerak dulu berarti animation:none - dan hasilnya seluruh sapaan pembuka lenyap:
-   logo langsung utuh, tidak ada yang tersusun, tidak ada yang mendarat. OWNER melaporkannya
-   sebagai "animasinya terlalu cepat dan singkat", dan memang begitulah rasanya ketika tidak
-   ada animasi sama sekali.
-   Kurangi-gerak meminta lebih sedikit GERAKAN, bukan lebih sedikit pengalaman. Jadi
-   perpindahan, penskalaan, dan sapuan dibuang - yang tersisa muncul dengan memudar, pada
-   KETUKAN YANG SAMA. Susunannya tetap terbaca, tanpa satu piksel pun yang bergerak. */
+/* Kurangi-gerak: lebih sedikit GERAKAN, bukan lebih sedikit pengalaman.
+   Partikel dan hentakan dibuang; yang tersisa muncul dengan MEMUDAR pada
+   KETUKAN YANG SAMA (--fz-b* dari fiezel-choreography.js) dan durasi yang
+   sama dengan ketukannya - susunannya tetap terbaca, tanpa satu piksel pun
+   yang bergerak. Cap PAW memakai jalur reduced modul pawstamp sendiri. */
 @keyframes fz-fade-in{from{opacity:0}to{opacity:1}}
-.fiezel-splash-still .fiezel-logo .fz-f,.fiezel-splash-still .fiezel-logo .fz-bar{
-  transform:none!important;animation-name:fz-fade-in!important}
+.fiezel-splash-still .fz-splash-canvas{display:none}
+.fiezel-splash-still .fz-fgroup,.fiezel-splash-still .fz-barsgroup{opacity:1}
+.fiezel-splash-still .fiezel-logo .fz-f{
+  transform:none!important;animation:fz-fade-in .95s ease var(--fz-b1,0ms) both}
+.fiezel-splash-still .fiezel-logo .fz-bar{
+  transform:none!important;animation:fz-fade-in .3s ease var(--fz-b6,1060ms) both}
 .fiezel-splash-still .fiezel-splash-word{
-  transform:none!important;animation-name:fz-fade-in!important}
-.fiezel-splash-still .fiezel-splash-tag{transform:none!important;animation-name:fz-fade-in!important}
-/* Denyut halo dan sapuan kilau memang gerakan tanpa isi - keduanya tetap dimatikan. */
-.fiezel-splash-still .fiezel-splash-brand::before,
-.fiezel-splash-still .fiezel-logo-stage::after{animation:none}
-.fiezel-splash-still .fiezel-logo-stage::after{opacity:0}
+  transform:none!important;animation:fz-fade-in .3s ease var(--fz-b7,1150ms) both}
+.fiezel-splash-still .fiezel-splash-tag{
+  transform:none!important;animation:fz-fade-in .24s ease var(--fz-b12,1900ms) both;opacity:0}
 
 /* ---------- Feature Carousel (Step 1) ---------- */
 .fiezel-carousel-track{display:flex;flex-direction:column;gap:8px;width:100%;text-align:left}
@@ -3407,7 +3374,13 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    TEKS di sistem ini; di sini ia bidang, dan itu memang perannya. */
 .core-cta{background:linear-gradient(135deg,var(--sun),var(--sun-deep));color:var(--text);border:1.5px solid var(--sun-deep)}
 .core-ghost{background:var(--core-soft);border:1.5px solid var(--core-line);color:var(--on-core)}
-.core-cta:focus-visible,.core-ghost:focus-visible{outline:2px solid var(--focus-ring-on-core);outline-offset:2px}
+/* D15 (audit D5-T4): --focus-ring-on-core didesain untuk permukaan gelap --core, tetapi
+   tombol sanggah OLM (.core-ghost.olm-dispute) dirender di dalam card() PUTIH - #FFC700
+   di atas #FFFFFF hanya 1,56:1, gagal WCAG 1.4.11. Default kini --focus-ring (#A67A00 =
+   3,89:1 di putih, 3,53:1 di panel-soft, tetap >=3:1); varian on-core (11,57:1 di --core)
+   di-scope ke .core-panel, satu-satunya konteks yang memang membutuhkannya. */
+.core-cta:focus-visible,.core-ghost:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.core-panel .core-cta:focus-visible,.core-panel .core-ghost:focus-visible{outline-color:var(--focus-ring-on-core)}
 
 /* ---------- §6 layar selesai ----------
    Skor berhenti berwarna hijau: hijau adalah warna BENAR di sistem ini (banner, opsi),
@@ -3624,7 +3597,7 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 /* Latar dan tinta SAMA-SAMA token bertema (aturan kontras m025-85: jangan memaku salah
    satunya sebagai literal) — pasangan sun/text yang sudah diaudit di .primary. */
 .exam-entry-chip{
-  display:inline-flex;align-items:center;gap:10px;min-height:0;
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;
   padding:9px 14px;border-radius:16px;text-align:left;
   background:var(--sun);
   border:1.5px solid var(--sun-deep);box-shadow:0 2px 0 var(--sun-deep);
@@ -3714,3 +3687,65 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
   background:var(--panel,#FFFFFF);color:var(--ink,#241A11);border:1px solid var(--line,#F0E4CF);text-align:left}
 .fz-plan-title{margin:0;font-size:1.02rem;line-height:1.3}
 .fz-plan-line{margin:0;font-size:.88rem;line-height:1.55;color:var(--ink,#241A11)}
+
+/* ==========================================================================
+   D15 (audit D5-S9/S10) — input cloze & tuntunan step-tutor (Fase 3, C5)
+   ==========================================================================
+   Dua komponen Fase 3 ini dirender app.js (mode cloze butir 2, step-tutor butir 6)
+   tetapi belum punya satu aturan pun di sini - input cloze tampil dengan gaya bawaan
+   peramban (font ±13px, border native) dan langkah tuntunan terbaca sebagai paragraf
+   polos. Semuanya memakai token existing; tidak ada warna baru.
+   -------------------------------------------------------------------------- */
+
+/* Input cloze: satu-satunya kontrol ketik di layar kuis, jadi ia mengikuti resep
+   .ask-box/.fiezel-field - font 16px (iOS tidak memperbesar layar saat fokus),
+   tinggi >=48px nyaman di ponsel, border --line, cincin fokus --focus-ring. */
+.cloze-entry{display:flex;align-items:stretch;gap:9px;margin:4px 0 2px}
+.cloze-entry .primary{flex:0 0 auto}
+.cloze-input{
+  flex:1 1 auto;min-width:0;min-height:48px;padding:11px 14px;
+  border:1.5px solid var(--line);border-radius:var(--radius-md);
+  background:var(--panel);color:var(--text);
+  font:inherit;font-size:16px;font-weight:600;letter-spacing:.01em;
+}
+.cloze-input::placeholder{color:var(--muted-soft);font-weight:500}
+.cloze-input:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
+/* Setelah dinilai, revealCloze menonaktifkan input - state terkunci dibedakan dari
+   state kosong supaya murid tahu jawabannya sudah diterima, bukan hilang. */
+.cloze-input:disabled{background:var(--panel-soft);border-color:var(--line);color:var(--muted)}
+/* Hook state benar/salah - resep warna SAMA dengan .option.correct/.option.wrong
+   supaya bahasa visualnya satu: hijau=benar, marun=salah. */
+.cloze-input.correct{border-color:var(--good-bright);background:var(--good-soft);color:var(--text)}
+.cloze-input.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--text)}
+@media(max-width:420px){
+  .cloze-entry{flex-wrap:wrap}
+  .cloze-entry .primary{flex:1 1 100%}
+}
+
+/* Tuntunan step-tutor: 2-3 pertanyaan penuntun di anak tangga 'worked'. Latar lembut
+   --surface-warm memisahkannya dari giliran tutor biasa, dan penomoran via CSS counter
+   membuat 3 paragraf terbaca sebagai LANGKAH berurut, bukan esai. Nomor memakai pasangan
+   sun-soft/info (5,42:1) dan teks langkah --ink di surface-warm (15,65:1). */
+.tutor-steps{
+  margin:12px 0 2px;padding:12px 14px;border-radius:12px;
+  background:var(--surface-warm);border:1px solid var(--line);
+  counter-reset:tutor-step;
+}
+.tutor-steps .eyebrow{display:block;margin-bottom:9px}
+.tutor-step{
+  counter-increment:tutor-step;
+  position:relative;margin:0 0 9px;padding-left:33px;
+  font-size:.9rem;line-height:1.6;color:var(--ink);
+}
+.tutor-step:last-of-type{margin-bottom:0}
+.tutor-step::before{
+  content:counter(tutor-step);
+  position:absolute;left:0;top:1px;
+  display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+  background:var(--sun-soft);border:1px solid var(--sun-deep);
+  color:var(--info);font-size:.72rem;font-weight:700;font-variant-numeric:tabular-nums;
+}
+.tutor-step-final{
+  margin:11px 0 0;padding-top:10px;border-top:1px dashed var(--line);
+  font-size:.94rem;line-height:1.6;font-weight:700;color:var(--info);
+}

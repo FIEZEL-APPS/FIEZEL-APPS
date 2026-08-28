@@ -294,7 +294,41 @@ function proxyForward(workerHeaders, list) {
     assert(res.status === 200, 'nama header edge tidak peka huruf besar/kecil, dapat ' + res.status);
   }
 
-  // Secret berisi spasi saja = dianggap tidak terpasang (bukan gerbang yang mustahil dilewati).
+  // Secret berisi spasi saja = dianggap tidak terpasang. Sejak audit D3 HIGH-3: tidak terpasang
+  // = FAIL-CLOSED (semua ditolak), KECUALI ALLOW_NO_EDGE_SECRET === 'true' dipasang eksplisit.
+  {
+    const errors = [];
+    const realError = console.error;
+    console.error = (...a) => errors.push(a.join(' '));
+    let res;
+    let res2;
+    let resHalfOpen;
+    try {
+      mod.resetEdgeWarningForTests();
+      res = await mod.handle(makeRequest('/login'), makeEnv({ EDGE_SHARED_SECRET: '   ' }), {}, NOW);
+      res2 = await mod.handle(makeRequest('/login'), makeEnv({ EDGE_SHARED_SECRET: '   ' }), {}, NOW);
+      // Nilai selain string persis 'true' TIDAK membuka gerbang — salah ketik gagal ke arah aman.
+      resHalfOpen = await mod.handle(makeRequest('/login'),
+        makeEnv({ EDGE_SHARED_SECRET: '   ', ALLOW_NO_EDGE_SECRET: '1' }), {}, NOW);
+    } finally { console.error = realError; }
+    assert(res.status === 403, 'FAIL-CLOSED: secret belum terpasang → 403, dapat ' + res.status);
+    assert(res2.status === 403, 'FAIL-CLOSED: permintaan kedua juga ditolak, dapat ' + res2.status);
+    assert(resHalfOpen.status === 403, "ALLOW_NO_EDGE_SECRET='1' TIDAK membuka gerbang (hanya string 'true'), dapat " + resHalfOpen.status);
+    const closedBody = await res.text();
+    const wrongHeaderRes = await mod.handle(makeRequest('/login', { headers: { 'x-fiezel-edge': 'salah' } }), makeEnv(), {}, NOW);
+    assert(closedBody === await wrongHeaderRes.text(),
+      'badan penolakan fail-closed IDENTIK dengan penolakan header salah (bukan oracle konfigurasi)');
+    assert(!/EDGE_SHARED_SECRET|ALLOW_NO_EDGE_SECRET|x-fiezel-edge/i.test(closedBody),
+      'penolakan fail-closed tidak membocorkan nama secret/var/header');
+    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: '  ' }) === 'off', 'edgeGuardStatus() jujur: off untuk secret kosong');
+    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: EDGE_SECRET }) === 'on', 'edgeGuardStatus() jujur: on saat terpasang');
+    assert(errors.some((e) => /FAIL-CLOSED/i.test(e) && /EDGE_SHARED_SECRET/.test(e)),
+      'fail-closed dicatat via console.error dan menyebut secret yang harus dipasang');
+    assert(errors.length === 1, 'log fail-closed sekali per isolate, bukan per permintaan, dapat ' + errors.length);
+  }
+
+  // Pembuka darurat masa transisi: ALLOW_NO_EDGE_SECRET='true' (persis) → perilaku off lama,
+  // lengkap dengan peringatan console.warn sekali per isolate.
   {
     const warns = [];
     const realWarn = console.warn;
@@ -303,16 +337,15 @@ function proxyForward(workerHeaders, list) {
     let res2;
     try {
       mod.resetEdgeWarningForTests();
-      res = await mod.handle(makeRequest('/login'), makeEnv({ EDGE_SHARED_SECRET: '   ' }), {}, NOW);
-      res2 = await mod.handle(makeRequest('/login'), makeEnv({ EDGE_SHARED_SECRET: '   ' }), {}, NOW);
+      const envOff = { EDGE_SHARED_SECRET: '   ', ALLOW_NO_EDGE_SECRET: 'true' };
+      res = await mod.handle(makeRequest('/login'), makeEnv(envOff), {}, NOW);
+      res2 = await mod.handle(makeRequest('/login'), makeEnv(envOff), {}, NOW);
     } finally { console.warn = realWarn; }
-    assert(res.status === 200, 'secret berisi spasi saja dianggap tidak terpasang, dapat ' + res.status);
-    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: '  ' }) === 'off', 'edgeGuardStatus() jujur: off untuk secret kosong');
-    assert(mod.edgeGuardStatus({ EDGE_SHARED_SECRET: EDGE_SECRET }) === 'on', 'edgeGuardStatus() jujur: on saat terpasang');
+    assert(res.status === 200, "ALLOW_NO_EDGE_SECRET='true' membuka mode transisi, dapat " + res.status);
+    assert(res2.status === 200, 'permintaan kedua saat off tetap dilayani');
     assert(warns.some((w) => /edgeGuard=off/.test(w) && /EDGE_SHARED_SECRET/.test(w) && /transisi/i.test(w)),
       'mode off mencatat peringatan yang menyebut secret + sifat transisinya');
     assert(warns.length === 1, 'peringatan off sekali per isolate, bukan per permintaan, dapat ' + warns.length);
-    assert(res2.status === 200, 'permintaan kedua saat off tetap dilayani');
     assert(mod.EDGE_FREE_PATHS.length === 0,
       'owner TIDAK punya path bebas header (nol permukaan terbuka di workers.dev), dapat ' + mod.EDGE_FREE_PATHS.length);
   }
@@ -530,6 +563,46 @@ function proxyForward(workerHeaders, list) {
       '(e) index.js menuliskan KENAPA penjaga disalin dari workers/api/mw-edge.js, bukan diimpor');
     assert(/masa transisi/i.test(indexSource) && /BUKAN mode produksi/i.test(indexSource),
       '(e) index.js menyatakan mode off hanya sah selama masa transisi dan bukan mode produksi');
+  }
+
+  /* ==================================================================================
+   * (f) 🔄 TEMUAN LAPANGAN 28 Agu 2026 — ASIMETRI API vs OWNER (BAGIAN INI BARU).
+   *
+   * `api.fiezel.my.id` SUDAH terikat sebagai custom domain Worker, sehingga
+   * `workers/api/mw-edge.js` kini meloloskan HOSTNAME TEPERCAYA tanpa header.
+   * `owner.fiezel.my.id` BELUM: ia masih subdomain cPanel + `owner-index.php`.
+   * Karena itu penjaga owner TIDAK BOLEH ikut-ikutan meloloskan hostname — kalau
+   * ikut, dashboard owner terbuka di sebuah hostname yang belum pernah berdiri di
+   * Cloudflare dan belum dilindungi Cloudflare Access. Asimetri ini disengaja,
+   * dan gerbang inilah yang menjaganya tetap disengaja.
+   * ================================================================================ */
+  {
+    assert(!/TRUSTED_EDGE_HOSTS|isTrustedEdgeHost/.test(indexSource),
+      '(f) penjaga owner TIDAK punya jalur hostname-tepercaya (owner belum custom domain)');
+
+    // Permintaan yang tiba di hostname owner "resmi" TANPA header tetap 403:
+    // satu-satunya jalur sah owner hari ini adalah proxy PHP + header.
+    for (const host of ['https://owner.fiezel.my.id', 'https://fiezel-owner.fitrajft.workers.dev']) {
+      const res = await mod.handle(new Request(host + '/login'), makeEnv(), {}, NOW);
+      assert(res.status === 403,
+        '(f) ' + host + '/login tanpa header edge tetap 403 (owner belum punya jalur hostname), dapat ' + res.status);
+      const body = await res.clone().text();
+      assert(/forbidden_edge|Permintaan ini harus lewat/.test(body) || res.status === 403,
+        '(f) penolakan owner tetap satu bentuk galat');
+    }
+
+    // Dan header sah tetap SATU-SATUNYA pembuka lapis pertama owner.
+    const viaHeader = await mod.handle(
+      makeRequest('/login', { headers: { 'x-fiezel-edge': EDGE_SECRET } }), makeEnv(), {}, NOW);
+    assert(viaHeader.status === 200,
+      '(f) jalur header sah tetap membuka lapis pertama owner, dapat ' + viaHeader.status);
+
+    // Dokumen wajib menyatakan asimetrinya, supaya orang berikutnya tidak
+    // "menyelaraskan" kedua penjaga tanpa tahu owner belum punya hostname.
+    assert(/CADANGAN|cadangan/.test(readmeSource),
+      '(f) README menyatakan jembatan PHP kini jalur CADANGAN untuk `api`');
+    assert(/owner[^\n]*belum[^\n]*custom domain|belum menjadi custom domain/i.test(readmeSource),
+      '(f) README menyatakan `owner` BELUM custom domain (asimetri dengan `api`)');
   }
 
   /* ---------- README pemasangan + pembongkaran ---------------------------------------- */

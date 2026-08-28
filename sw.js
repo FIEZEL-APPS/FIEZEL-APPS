@@ -25,7 +25,14 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // m025-174, angka yang juga dipakai jalur rollout Cloudflare. Tabrakan versi berarti satu
 // revisi memayungi dua daftar precache berbeda, jadi revisi dinaikkan ke m025-175. Daftar
 // ASSETS tetap UNION nyata kedua sisi; nol entri dibuang.
-const SW_REV='m025-176-assessment-qa-repairs-20260828';
+// m025-177: identitas rupa-bunyi FIEZEL - splash v4 (partikel + equalizer + cap PAW, OA-9)
+// menambah tiga modul brand ke shell, pustaka SFX terproduksi menambah 27 sampel OGG ke
+// shell (fiezel-ui-sfx.js kini pemutar sampel, bukan sintesis), dan fallback MP3 (OI-1,
+// Safari/iOS tidak bisa mendekode Ogg Vorbis) menambah 27 kembaran .mp3 di direktori yang
+// sama TANPA precache (lihat catatan di bawah ASSETS). Semua berkas shell berubah dalam
+// satu gelombang rilis, jadi revisi naik SEKALI - DIAG_BUILD + FIEZEL_PAGE_BUILD ikut ke
+// m025-177 (kontrak install-health/classroom-test: awalan SW_REV = build halaman).
+const SW_REV='m025-180-wave-d-audit-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -41,7 +48,13 @@ self.addEventListener('message',event=>{
 // (vendor/supertonic-3, 152 MB) sengaja TIDAK ada di daftar ini - ia punya cache sendiri
 // yang diisi pengunduh latar dan bertahan lintas rilis; memasukkannya ke shell berarti
 // setiap kenaikan SW_REV mengunduh ulang seluruh 152 MB itu.
-const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion.css','./features/mascot/fiezel-mascot.js','./version.js','./report-config.js','./core-config.js','./fiezel-puter-ready.js','./fiezel-lazy-loader.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./grammar-labels-id.js','./grammar-explanations-id.json','./grammar-curriculum-v1.json','./writing-prompts-v1.json','./reading-exam-v1.json','./grammar-misconception-id.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./audio/manifest.json','./features/audio-assets/fiezel-audio-key.js','./features/audio-assets/fiezel-audio-manifest.js','./features/audio-assets/fiezel-audio-resolver.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-diag-panel.js','./features/diagnostics/fiezel-diagnostic-targets.js','./features/diagnostics/fiezel-diagnostic-bus.js','./features/diagnostics/fiezel-module-selftests.js','./features/diagnostics/fiezel-diagnostic-register.js','./features/classroom/fiezel-classroom.js','./features/classroom/classroom-lessons-v1.json','./features/tutor-classroom/fiezel-tutor-v3.js','./features/tutor-classroom/tutor-v3.css','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/gems-core.js','./features/prasasti/fiezel-prasasti-core.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json','./features/speaking-listening/speaking-exam-v1.json','./features/speaking-listening/listening-exam-v1.json','./features/neural-voice/fiezel-prosody.js','./features/neural-voice/fiezel-puter-voice.js','./features/neural-voice/fiezel-subtitle.js','./features/neural-voice/fiezel-subtitle-translate.js','./features/neural-voice/fiezel-voice-say.js','./features/neural-voice/fiezel-voice-diagnostics.js','./features/neural-voice/fiezel-voice-persona.js','./features/neural-voice/fiezel-sherpa-vits-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-voice-offline-autoload.js','./features/ui/fiezel-zoom-lock.js','./features/ui/fiezel-back-nav.js','./features/brain/fiezel-core-brain.js','./features/ui/fiezel-icons.js','./features/ui/fiezel-coach-bubble.js','./features/ui/fiezel-report-gesture-isolation.js','./features/ui/fiezel-boot-tail.js','./features/ui/fiezel-ui-manager.js','./features/ui/fiezel-ab-testing.js','./features/ui/skeleton-helpers.js','./features/brand/fiezel-choreography.js','./features/audio/fiezel-ui-sfx.js','./features/daily-target/fiezel-daily-target.js','./features/personal-journey/fiezel-personal-journey.js','./features/skills-evidence/fiezel-skills-evidence.js','./features/academic-readiness/fiezel-academic-readiness.js','./features/continuity/fiezel-continuity.js','./features/health/fiezel-install-health.js','./features/brand/fiezel-splash.js','./features/onboarding/fiezel-onboarding.js','./features/onboarding/fiezel-tour.js','./assets/brand/fiezel-wordmark.svg','./assets/brand/fiezel-paw.svg','./assets/brand/fiezel-wordmark-mono.svg','./assets/brand/fiezel-icon-512.png','./assets/brand/fiezel-icon-192.png','./assets/brand/fiezel-icon.svg','./assets/fonts/InstrumentSerif-400.woff2','./assets/fonts/PlusJakartaSans-400.woff2','./assets/fonts/PlusJakartaSans-500.woff2','./assets/fonts/PlusJakartaSans-600.woff2','./assets/fonts/PlusJakartaSans-700.woff2',
+const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion.css','./features/mascot/fiezel-mascot.js','./version.js','./report-config.js','./core-config.js','./fiezel-puter-ready.js','./fiezel-lazy-loader.js','./content-canary.js','./content-promotion.js','./content-canary-config.js','./lucide.min.js','./app.js','./validator.js','./manifest.json','./vocabulary-master.json','./reading-bank.json','./grammar-templates.json','./grammar-labels-id.js','./grammar-curriculum-v1.json','./writing-prompts-v1.json','./reading-exam-v1.json','./grammar-misconception-id.json','./favicon-64.png','./apple-touch-icon.png','./instagram.svg','./creator-report-setup.html','./creator-report-dashboard.html','./fiezel-report-worker.js','./audio/manifest.json','./features/audio-assets/fiezel-audio-key.js','./features/audio-assets/fiezel-audio-manifest.js','./features/audio-assets/fiezel-audio-resolver.js','./features/neural-voice/fiezel-neural-voice-config.js','./features/neural-voice/fiezel-diag-panel.js','./features/diagnostics/fiezel-diagnostic-targets.js','./features/diagnostics/fiezel-diagnostic-bus.js','./features/diagnostics/fiezel-module-selftests.js','./features/diagnostics/fiezel-diagnostic-register.js','./features/classroom/fiezel-classroom.js','./features/classroom/classroom-lessons-v1.json','./features/tutor-classroom/fiezel-tutor-v3.js','./features/tutor-classroom/tutor-v3.css','./features/speaking-listening/speaking-listening-config.js','./features/speaking-listening/gems-core.js','./features/prasasti/fiezel-prasasti-core.js','./features/speaking-listening/fiezel-speaking-listening-addon.js','./features/speaking-listening/speaking-listening-addon.css','./features/speaking-listening/listening-bank-v1.json','./features/speaking-listening/speaking-bank-v1.json','./features/speaking-listening/speaking-exam-v1.json','./features/speaking-listening/listening-exam-v1.json','./features/neural-voice/fiezel-prosody.js','./features/neural-voice/fiezel-puter-voice.js','./features/neural-voice/fiezel-subtitle.js','./features/neural-voice/fiezel-subtitle-translate.js','./features/neural-voice/fiezel-voice-say.js','./features/neural-voice/fiezel-voice-diagnostics.js','./features/neural-voice/fiezel-voice-persona.js','./features/neural-voice/fiezel-sherpa-vits-adapter.js','./features/neural-voice/fiezel-neural-voice.js','./features/neural-voice/fiezel-web-audio-player.js','./features/neural-voice/fiezel-m0281-prebootstrap-hotfix.js','./features/neural-voice/fiezel-neural-voice-bootstrap.js','./features/neural-voice/fiezel-neural-voice-ios-cache-fix.js','./features/neural-voice/fiezel-neural-voice-cache-integrity-repair.js','./features/neural-voice/fiezel-neural-voice-audibility-fix.js','./features/neural-voice/fiezel-voice-offline-autoload.js','./features/ui/fiezel-zoom-lock.js','./features/search/fiezel-search.js','./features/ui/fiezel-back-nav.js','./features/brain/fiezel-core-brain.js','./features/ui/fiezel-icons.js','./features/ui/fiezel-coach-bubble.js','./features/ui/fiezel-report-gesture-isolation.js','./features/ui/fiezel-boot-tail.js','./features/ui/fiezel-ui-manager.js','./features/ui/fiezel-ab-testing.js','./features/ui/skeleton-helpers.js','./features/brand/fiezel-choreography.js','./features/audio/fiezel-ui-sfx.js','./features/daily-target/fiezel-daily-target.js','./features/personal-journey/fiezel-personal-journey.js','./features/skills-evidence/fiezel-skills-evidence.js','./features/academic-readiness/fiezel-academic-readiness.js','./features/continuity/fiezel-continuity.js','./features/health/fiezel-install-health.js',
+  // Splash v4 (m025-177 / OA-9): tiga modul lapisan splash baru - partikel canvas,
+  // equalizer emas, dan cap PAW - dimuat <script defer> oleh index.html SEBELUM
+  // orkestrator fiezel-splash.js, jadi ketiganya berkas shell dan wajib precache
+  // (splash offline tanpa salah satu lapisan = boot pincang tanpa suara kesalahan apa pun).
+  './features/brand/fiezel-splash-particles.js','./features/brand/fiezel-splash-equalizer.js','./features/brand/fiezel-splash-pawstamp.js',
+  './features/brand/fiezel-splash.js','./features/onboarding/fiezel-onboarding.js','./features/onboarding/fiezel-tour.js','./assets/brand/fiezel-wordmark.svg','./assets/brand/fiezel-paw.svg','./assets/brand/fiezel-wordmark-mono.svg','./assets/brand/fiezel-icon-512.png','./assets/brand/fiezel-icon-192.png','./assets/brand/fiezel-icon.svg','./assets/fonts/InstrumentSerif-400.woff2','./assets/fonts/PlusJakartaSans-400.woff2','./assets/fonts/PlusJakartaSans-500.woff2','./assets/fonts/PlusJakartaSans-600.woff2','./assets/fonts/PlusJakartaSans-700.woff2',
   './assets/fonts/Fredoka-var.woff2','./features/tutor-classroom/fiezel-tutor-dialog.js','./features/tutor-classroom/fiezel-tutor-voice-chat.js','./features/library/fiezel-library.js','./features/library/fiezel-library-ui.js','./features/library/library-books-v1.json','./features/brain/fiezel-tutor-brain.js',
   // Braincore v3: sembilan modul penalaran baru ikut precache shell - PWA ini offline-first,
   // dan modul brain yang tidak ter-cache berarti murid offline kehilangan lapisan adaptifnya
@@ -58,7 +71,24 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404. Berkas-berkas
   // ini dijanjikan kontrak Fase 3 dan wajib mendarat bersama rilis ini.
   './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
-  './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js'];
+  './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
+  // [ADAPTASI] OA-7 / gelombang SFX m025-177: 27 sampel OGG pustaka bunyi FIEZEL ikut
+  // precache shell - PWA offline-first, dan total ~370 KB lebih kecil dari satu foto: murid
+  // offline yang jawabannya benar tetap berhak mendengarnya. (Catatan: jangan menulis
+  // titik-koma di komentar blok ASSETS - pwa-cache-test memotong daftar di situ.)
+  // Termasuk aset RESERVED/RETIRED
+  // (splash_paw_appear, stamp_thud) supaya cache dan direktori tidak pernah berbeda isi.
+  './assets/audio/sfx/answer_correct.ogg','./assets/audio/sfx/answer_correct_perfect.ogg','./assets/audio/sfx/answer_wrong.ogg','./assets/audio/sfx/answer_wrong_retry.ogg','./assets/audio/sfx/button_tap.ogg','./assets/audio/sfx/error_system.ogg','./assets/audio/sfx/exam_complete.ogg','./assets/audio/sfx/exam_pass.ogg','./assets/audio/sfx/exam_result_reveal.ogg','./assets/audio/sfx/exam_score_tick.ogg','./assets/audio/sfx/lesson_complete.ogg','./assets/audio/sfx/lesson_start.ogg','./assets/audio/sfx/level_up.ogg','./assets/audio/sfx/notif_achievement.ogg','./assets/audio/sfx/notif_general.ogg','./assets/audio/sfx/notif_streak_reminder.ogg','./assets/audio/sfx/page_transition.ogg','./assets/audio/sfx/paw_appear.ogg','./assets/audio/sfx/paw_celebrate.ogg','./assets/audio/sfx/paw_encourage.ogg','./assets/audio/sfx/paw_greet.ogg','./assets/audio/sfx/splash_intro.ogg','./assets/audio/sfx/splash_paw_appear.ogg','./assets/audio/sfx/stamp_thud.ogg','./assets/audio/sfx/streak_5.ogg','./assets/audio/sfx/streak_10.ogg','./assets/audio/sfx/xp_gain.ogg'];
+// Fallback MP3 (OI-1): Safari/iOS tidak bisa mendekode Ogg Vorbis, jadi ke-27 bunyi
+// dikirim kembar .mp3 di assets/audio/sfx/ dan fiezel-ui-sfx.js memilih ekstensinya
+// lewat canPlayType. Kembaran MP3 itu SENGAJA TIDAK masuk ASSETS di atas: konvensi repo
+// (audio-asset-pipeline-test) melarang berkas .mp3 apa pun di precache shell supaya
+// shell tidak menggemuk di tiap kenaikan SW_REV. MP3 sfx diambil malas (lazy) saat
+// pertama diputar dan mendarat di cache runtime stabil lewat cabang terakhir fetch
+// handler - murid iOS yang pernah mendengar sebuah bunyi tetap memilikinya luring.
+// Konsekuensi yang diterima: mp3 di cache runtime tidak ikut invalidasi rilis, jadi
+// kalau sebuah sampel dirender ulang, klien iOS lama memutar render lama sampai cache
+// runtime-nya dibersihkan. Dicatat sebagai keterbatasan yang disadari, bukan bug.
 // m025-142 (B-11): pencocok ini SEMPAT dimatikan jadi `()=>false` dengan alasan "model lokal
 // sudah dihapus". Modelnya tidak dihapus - vendor/supertonic-3 masih 152 MB dan masih disajikan
 // dari origin yang sama. Selama pencocoknya mati, setiap permintaan ke berkas itu jatuh ke
@@ -110,7 +140,21 @@ const shellRequests=()=>ASSETS.map(asset=>new Request(asset,{cache:'reload'}));
 self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>c.addAll(shellRequests()))));
 // Because activation is no longer forced over live old clients, stale dedicated
 // shell caches can be removed here. The stable neural/runtime CACHE is preserved.
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE).map(k=>caches.delete(k))))));
+// D16 (D7 T-5): activate membersihkan cache fiezel-v* basi yang bukan revisi aktif,
+// dengan DUA pengecualian keras: (1) CACHE aktif tidak pernah disentuh; (2) cache basi
+// yang masih menyimpan bita model neural (path /vendor/) DIPERTAHANKAN - model 152 MB
+// itu mahal diunduh ulang dan siklus hidupnya milik lapisan neural, bukan SW ini.
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(async k=>{
+  if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)return caches.delete(k);
+  if(k.startsWith('fiezel-v')&&k!==CACHE){
+    try{
+      const stale=await caches.open(k);
+      const entries=await stale.keys();
+      const holdsNeural=entries.some(req=>{try{return new URL(req.url||req).pathname.includes('/vendor/')}catch{return false}});
+      if(!holdsNeural)return caches.delete(k);
+    }catch{}
+  }
+})))));
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
   const requestUrl=new URL(e.request.url);

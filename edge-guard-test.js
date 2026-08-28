@@ -25,12 +25,40 @@
  *     header/secret. Operator biasa berhenti pada byte pertama yang beda, jadi
  *     waktunya membocorkan panjang prefiks yang cocok — dan header ini bisa dicoba
  *     tanpa batas.
- * (e) TANPA secret, Worker tetap jalan (deploy owner tidak mati mendadak) dan
- *     `/health` melaporkan `edgeGuard:"off"` — jujur, bukan diam.
+ * (e) TANPA secret gerbang FAIL-CLOSED (audit D3 HIGH-3): semua rute kecuali
+ *     `/healthz` ditolak 403 dengan bentuk galat IDENTIK dengan (a)/(b) — deploy
+ *     yang lupa memasang secret menghasilkan API yang diam, bukan yang terbuka.
+ *     Pengecualian eksplisit `ALLOW_NO_EDGE_SECRET="true"` (dan HANYA string
+ *     persis itu) membuka mode `off` lama untuk dev/masa transisi, dengan
+ *     peringatan di log dan `/health` melaporkan `edgeGuard:"off"` — jujur,
+ *     bukan diam.
  * (f) Jalur bebas-header yang diputuskan (`/healthz`) TIDAK membocorkan
  *     `capabilities` (atau nama layanan/versi/mode gateway/waktu server).
  *     Keputusan yang dijaga di sini: `/health` TETAP DILINDUNGI justru karena ia
  *     mengumumkan `capabilities`, dan daftar itu adalah peta permukaan serang.
+ * (h) 🔄 TEMUAN LAPANGAN 28 Agu 2026 — MATRIKS DUA JALUR (BUTIR INI BARU).
+ *     Custom domain `api.fiezel.my.id` sudah terikat ke Worker, jadi permintaan
+ *     murid tiba LANGSUNG dari browser tanpa `X-Fiezel-Edge`. Yang diassert:
+ *       (h1) HOSTNAME TEPERCAYA (`TRUSTED_EDGE_HOSTS`) lolos TANPA header, dan
+ *            `/health` melaporkan `edgeGuardPath:"custom-domain"`;
+ *       (h2) hostname tepercaya tetap lolos walau `EDGE_SHARED_SECRET` SUDAH
+ *            DIHAPUS (langkah pembongkaran tidak boleh memadamkan produksi),
+ *            sementara `*.workers.dev` di env yang sama tetap 403;
+ *       (h3) `*.workers.dev` TETAP DITOLAK tanpa header untuk semua path selain
+ *            `/healthz` — lubang lama tidak dibuka oleh jalur baru;
+ *       (h4) hostname ASING ditolak, bahkan dengan header sah (default-deny),
+ *            dengan bentuk galat IDENTIK — gerbang bukan pemetaan hostname;
+ *       (h5) jalur header MASIH hidup (`edgeGuardPath:"header"`) karena selama
+ *            zona `pending` sebagian permintaan masih lewat jembatan PHP;
+ *       (h6) `/health` TIDAK PERNAH bebas: ia tidak ada di `EDGE_FREE_PATHS`
+ *            dan tetap 403 di `*.workers.dev` tanpa header;
+ *       (h7) daftar hostname tepercaya SATU SUMBER KEBENARAN: identik dengan
+ *            `custom_domain` di `workers/api/wrangler.toml`, dan TIDAK diambil
+ *            dari header yang bisa dipalsukan klien (`X-Forwarded-Host` dsb.);
+ *       (h8) normalisasi hostname tidak bisa ditipu kapitalisasi/titik akhir/
+ *            sufiks (`api.fiezel.my.id.jahat.example` bukan hostname tepercaya);
+ *       (h9) alasan + syarat penghapusan jalur header tertulis di kode, termasuk
+ *            SIAPA yang memutuskan.
  * (g) `deploy/edge/api-index.php` TIDAK memuat nilai secret sungguhan — hanya
  *     placeholder `__EDGE_SECRET__`. Dipindai dengan pola panjang-acak, bukan
  *     dengan mencari satu string yang sudah diketahui (yang sudah diketahui tidak
@@ -100,6 +128,10 @@ function inlineModule(rawName) {
 
 const ORIGIN = 'https://fiezel.my.id';
 const WORKERS_DEV = 'https://fiezel-api.fitrajft.workers.dev';
+/** Hostname custom domain yang SUDAH terikat ke Worker (28 Agu 2026). */
+const TRUSTED_BASE = 'https://api.fiezel.my.id';
+/** Hostname yang tidak pernah didaftarkan di mana pun — harus default-deny. */
+const ALIEN_BASE = 'https://api-fiezel.jahat.example';
 const EDGE_SECRET = 'uji-edge-secret-jembatan-0123456789abcdef';
 
 /**
@@ -222,6 +254,8 @@ async function call(worker, env, method, pathname, opt) {
     assert(health.status === 200, '(c) header benar diteruskan: /health 200, dapat ' + health.status);
     assert(health.json && health.json.protocol === '1.7', '(c) protokol tetap 1.7 lewat gerbang');
     assert(health.json && health.json.edgeGuard === 'on', '(c) /health melaporkan edgeGuard:"on" saat secret terpasang');
+    assert(health.json && health.json.edgeGuardPath === 'header',
+      '(c) /health melaporkan edgeGuardPath:"header" saat lolos lewat jembatan PHP, dapat ' + (health.json && health.json.edgeGuardPath));
     assert(Array.isArray(health.json && health.json.capabilities) && health.json.capabilities.length > 0,
       '(c) /health yang lolos tetap memuat capabilities (jadi ia memang layak dilindungi)');
 
@@ -297,34 +331,81 @@ async function call(worker, env, method, pathname, opt) {
       '(d) daftar path bebas-header tetap satu: /healthz (' + mod.EDGE_FREE_PATHS.join(',') + ')');
   }
 
-  /* ---------- (e) tanpa secret: Worker tetap jalan, edgeGuard:"off" ------- */
+  /* ---------- (e) tanpa secret: FAIL-CLOSED, kecuali pengecualian eksplisit */
   {
+    /* (e1) Default AMAN (audit D3 HIGH-3): tanpa secret DAN tanpa
+     * ALLOW_NO_EDGE_SECRET, semua rute ditolak 403 — kecuali /healthz, supaya
+     * monitor tetap bisa melihat "hidup tapi tertutup". */
+    const closedLogs = [];
+    const realError = console.error;
+    console.error = (...args) => { closedLogs.push(args.join(' ')); };
+    let closedHealth; let closedAnon; let closedHealthz; let closedBuilt; let closedBlank;
+    try {
+      const { env, built } = makeEnv({});
+      assert(env.EDGE_SHARED_SECRET === undefined, '(e) env uji benar-benar tanpa EDGE_SHARED_SECRET');
+      closedBuilt = built;
+      closedHealth = await call(worker, env, 'GET', '/health', { origin: ORIGIN });
+      closedAnon = await call(worker, env, 'POST', '/api/auth/anon', { origin: ORIGIN, body: '{}' });
+      closedHealthz = await call(worker, env, 'GET', '/healthz');
+      // Secret kosong/spasi = tidak terpasang, dan arah amannya kini TERTUTUP:
+      // `wrangler secret put` yang salah tempel menghasilkan API yang diam,
+      // bukan API yang terbuka diam-diam.
+      const blank = makeEnv({ EDGE_SHARED_SECRET: '   ' });
+      closedBlank = await call(worker, blank.env, 'GET', '/health', { origin: ORIGIN });
+      // Nilai selain string persis 'true' TIDAK membuka gerbang — salinan
+      // setengah jadi ('1', 'TRUE') tidak boleh diam-diam mematikan pengaman.
+      const half = makeEnv({ ALLOW_NO_EDGE_SECRET: '1' });
+      const halfHealth = await call(worker, half.env, 'GET', '/health', { origin: ORIGIN });
+      assert(halfHealth.status === 403, '(e) ALLOW_NO_EDGE_SECRET="1" TIDAK membuka gerbang (tetap 403), dapat ' + halfHealth.status);
+    } finally {
+      console.error = realError;
+    }
+    assert(closedHealth.status === 403, '(e) tanpa secret /health FAIL-CLOSED 403, dapat ' + closedHealth.status);
+    assert(closedHealth.json && closedHealth.json.error === 'forbidden_edge', '(e) penolakan fail-closed bernama forbidden_edge');
+    assert(closedAnon.status === 403, '(e) tanpa secret POST /api/auth/anon ditolak 403, dapat ' + closedAnon.status);
+    assert(!closedAnon.response.headers.get('set-cookie'), '(e) penolakan fail-closed tidak pernah menerbitkan cookie identitas');
+    assert(closedBlank.status === 403, '(e) secret berisi spasi saja = tidak terpasang = FAIL-CLOSED 403, dapat ' + closedBlank.status);
+    const closedWrites = closedBuilt.d1 && closedBuilt.d1._log
+      ? closedBuilt.d1._log.filter((entry) => /^(INSERT|UPDATE|DELETE)/i.test(String(entry.sql || '')))
+      : [];
+    assert(closedWrites.length === 0, '(e) penolakan fail-closed nol tulis D1, dapat ' + closedWrites.length);
+    assert(closedHealthz.status === 200 && closedHealthz.json && closedHealthz.json.ok === true,
+      '(e) /healthz tetap hidup saat fail-closed (monitor melihat "hidup tapi tertutup"), dapat ' + closedHealthz.status);
+    assert(!/EDGE_SHARED_SECRET|ALLOW_NO_EDGE_SECRET|X-Fiezel-Edge/i.test(closedHealth.text),
+      '(e) penolakan fail-closed tidak menyebut nama secret, nama var pengecualian, atau nama header');
+    assert(closedLogs.some((w) => /FAIL-CLOSED/.test(w) && /EDGE_SHARED_SECRET/.test(w)),
+      '(e) fail-closed dicatat di log dengan instruksi memasang secret (bukan mati diam-diam)');
+    assert(closedLogs.length <= 2, '(e) peringatan fail-closed tidak satu baris per permintaan, dapat ' + closedLogs.length);
+
+    // Anti-oracle lintas mode: penolakan "secret belum dipasang" harus TIDAK BISA
+    // DIBEDAKAN dari penolakan "secret terpasang, headermu salah".
+    {
+      const withSecret = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      const onReject = await call(worker, withSecret.env, 'GET', '/health', { origin: ORIGIN });
+      assert(onReject.text === closedHealth.text,
+        '(e) bentuk galat fail-closed IDENTIK dengan penolakan header-salah (anti-oracle)');
+    }
+
+    /* (e2) Pengecualian eksplisit: ALLOW_NO_EDGE_SECRET="true" membuka mode
+     * `off` lama — untuk dev/masa transisi SAJA, dengan peringatan di log. */
     const warnings = [];
     const realWarn = console.warn;
     console.warn = (...args) => { warnings.push(args.join(' ')); };
     let health;
     let missing;
     try {
-      const { env } = makeEnv({});
-      assert(env.EDGE_SHARED_SECRET === undefined, '(e) env uji benar-benar tanpa EDGE_SHARED_SECRET');
+      const { env } = makeEnv({ ALLOW_NO_EDGE_SECRET: 'true' });
       health = await call(worker, env, 'GET', '/health', { origin: ORIGIN });
       missing = await call(worker, env, 'GET', '/api/config', { origin: ORIGIN });
-      // Secret kosong/spasi diperlakukan sama dengan tidak terpasang — kalau
-      // tidak, `wrangler secret put` yang salah tempel akan mengunci semua murid
-      // di balik secret yang tak seorang pun tahu.
-      const blank = makeEnv({ EDGE_SHARED_SECRET: '   ' });
-      const blankHealth = await call(worker, blank.env, 'GET', '/health', { origin: ORIGIN });
-      assert(blankHealth.status === 200 && blankHealth.json.edgeGuard === 'off',
-        '(e) secret berisi spasi saja dianggap tidak terpasang, bukan gerbang yang mustahil dilewati');
     } finally {
       console.warn = realWarn;
     }
-    assert(health.status === 200, '(e) tanpa secret /health tetap 200, dapat ' + health.status);
-    assert(health.json && health.json.edgeGuard === 'off', '(e) /health melaporkan edgeGuard:"off"');
+    assert(health.status === 200, '(e) mode transisi eksplisit: /health tetap 200, dapat ' + health.status);
+    assert(health.json && health.json.edgeGuard === 'off', '(e) /health melaporkan edgeGuard:"off" di mode transisi');
     assert(health.json && health.json.protocol === '1.7', '(e) protokol tetap 1.7 saat guard off');
-    assert(missing.status !== 403, '(e) rute lain tetap jalan tanpa secret (tidak 403), dapat ' + missing.status);
+    assert(missing.status !== 403, '(e) rute lain tetap jalan di mode transisi (tidak 403), dapat ' + missing.status);
     assert(warnings.some((w) => /edgeGuard=off/.test(w)),
-      '(e) peringatan dicatat lewat jalur log Worker yang sudah ada');
+      '(e) peringatan mode transisi dicatat lewat jalur log Worker yang sudah ada');
     assert(warnings.some((w) => /EDGE_SHARED_SECRET/.test(w) && /transisi/i.test(w)),
       '(e) peringatan menyebut secret yang harus dipasang DAN bahwa keadaan ini hanya transisi');
     assert(warnings.length <= 2, '(e) peringatan tidak satu baris per permintaan (banjir log), dapat ' + warnings.length);
@@ -335,6 +416,8 @@ async function call(worker, env, method, pathname, opt) {
     assert(/masa transisi/i.test(src), '(e) mw-edge.js menyatakan `off` hanya sah selama masa transisi');
     assert(/off.*BUKAN mode produksi|BUKAN mode produksi/i.test(src), '(e) mw-edge.js menegaskan `off` bukan mode produksi');
     assert(/workers_dev\s*=\s*false|workers\.dev/i.test(src), '(e) mw-edge.js menyebut kapan `off` harus berakhir selamanya');
+    assert(/FAIL-CLOSED|fail-closed/i.test(src) && /ALLOW_NO_EDGE_SECRET/.test(src),
+      '(e) mw-edge.js mendokumentasikan default fail-closed DAN var pengecualiannya');
   }
 
   /* ---------- (f) jalur bebas-header tidak membocorkan capabilities ------- */
@@ -372,6 +455,217 @@ async function call(worker, env, method, pathname, opt) {
     const freeList = /EDGE_FREE_PATHS\s*=\s*Object\.freeze\(\[([^\]]*)\]/.exec(edgeSrc);
     assert(!!freeList && (freeList[1].match(/'/g) || []).length === 2,
       '(f) EDGE_FREE_PATHS memuat tepat SATU path di kode');
+  }
+
+  /* ==========================================================================
+   * (h) MATRIKS DUA JALUR: hostname tepercaya ATAU header. Default-deny.
+   * 🔄 TEMUAN LAPANGAN 28 Agu 2026 — BAGIAN INI BARU.
+   * ======================================================================== */
+  {
+    const mod = await import(inlineModule('mw-edge.js'));
+
+    /* ---- (h7) SATU SUMBER KEBENARAN daftar hostname ---------------------- */
+    assert(Array.isArray(mod.TRUSTED_EDGE_HOSTS) && mod.TRUSTED_EDGE_HOSTS.length > 0,
+      '(h7) mw-edge.js mengekspor TRUSTED_EDGE_HOSTS yang bisa dibaca gerbang');
+    assert(Object.isFrozen(mod.TRUSTED_EDGE_HOSTS),
+      '(h7) TRUSTED_EDGE_HOSTS dibekukan (tidak bisa ditambah saat runtime)');
+    assert(mod.TRUSTED_EDGE_HOSTS.every((h) => h === String(h).toLowerCase().trim()),
+      '(h7) semua hostname tepercaya sudah ternormalisasi huruf kecil');
+    assert(!mod.TRUSTED_EDGE_HOSTS.some((h) => /workers\.dev$/i.test(h)),
+      '(h7) TIDAK ADA hostname *.workers.dev di daftar tepercaya');
+
+    // Konfigurasi dan kode tidak boleh menyimpang: setiap `custom_domain = true`
+    // di wrangler.toml WAJIB ada di daftar, dan sebaliknya. Kalau hostname baru
+    // dipasang tanpa dimasukkan ke daftar, gerbang ini merah — bukan lolos.
+    const toml = mustRead(path.join(API_DIR, 'wrangler.toml'), 'workers/api/wrangler.toml');
+    const customDomains = (toml.match(/pattern\s*=\s*"([^"]+)"\s*,\s*custom_domain\s*=\s*true/g) || [])
+      .map((line) => /pattern\s*=\s*"([^"]+)"/.exec(line)[1].toLowerCase());
+    assert(customDomains.length > 0, '(h7) wrangler.toml memuat minimal satu custom_domain');
+    assert(customDomains.slice().sort().join(',') === mod.TRUSTED_EDGE_HOSTS.slice().sort().join(','),
+      '(h7) TRUSTED_EDGE_HOSTS == custom_domain di wrangler.toml: kode=['
+      + mod.TRUSTED_EDGE_HOSTS.join(',') + '] toml=[' + customDomains.join(',') + ']');
+
+    // Hostname TIDAK BOLEH diambil dari header yang bisa dipalsukan klien.
+    const src = mustRead(path.join(API_DIR, 'mw-edge.js'), 'workers/api/mw-edge.js');
+    const codeOnly = src
+      .replace(/\/\*[\s\S]*?\*\//g, ' ')
+      .replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+    assert(!/x-forwarded-host|x-host|x-original-host|:authority/i.test(codeOnly),
+      '(h7) gerbang tidak pernah membaca hostname dari header yang bisa dipalsukan klien');
+    assert(/ctx\.url\.hostname/.test(codeOnly),
+      '(h7) hostname dibaca dari ctx.url (dirakit index.js dari request.url), satu jalur saja');
+
+    /* ---- (h8) normalisasi tidak bisa ditipu ------------------------------ */
+    const trusted = mod.TRUSTED_EDGE_HOSTS[0];
+    assert(mod.isTrustedEdgeHost(trusted) === true, '(h8) hostname tepercaya dikenali');
+    assert(mod.isTrustedEdgeHost(trusted.toUpperCase()) === true, '(h8) kapitalisasi tidak mengubah keputusan');
+    assert(mod.isTrustedEdgeHost(trusted + '.') === true, '(h8) titik akhir FQDN tidak mengubah keputusan');
+    assert(mod.isTrustedEdgeHost(trusted + '.jahat.example') === false,
+      '(h8) sufiks jahat (' + trusted + '.jahat.example) BUKAN hostname tepercaya');
+    assert(mod.isTrustedEdgeHost('jahat' + trusted) === false, '(h8) prefiks jahat bukan hostname tepercaya');
+    assert(mod.isTrustedEdgeHost('') === false && mod.isTrustedEdgeHost(null) === false,
+      '(h8) hostname kosong/tidak ada tidak pernah tepercaya');
+    assert(mod.isWorkersDevHost('fiezel-api.fitrajft.workers.dev') === true,
+      '(h8) alamat asal Worker dikenali sebagai workers.dev');
+    assert(mod.isTrustedEdgeHost('fiezel-api.fitrajft.workers.dev') === false,
+      '(h8) alamat workers.dev tidak pernah lolos sebagai hostname tepercaya');
+    assert(mod.isWorkersDevHost('workers.dev.jahat.example') === false,
+      '(h8) `workers.dev` di TENGAH nama bukan akhiran workers.dev (pencocokan akhiran, bukan substring)');
+
+    /* ---- (h1) hostname tepercaya lolos TANPA header ---------------------- */
+    {
+      const { env, built } = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      const health = await call(worker, env, 'GET', '/health', { base: TRUSTED_BASE, origin: ORIGIN });
+      assert(health.status === 200,
+        '(h1) hostname tepercaya LOLOS tanpa header X-Fiezel-Edge: /health 200, dapat ' + health.status);
+      assert(health.json && health.json.edgeGuardPath === 'custom-domain',
+        '(h1) /health melaporkan edgeGuardPath:"custom-domain", dapat ' + (health.json && health.json.edgeGuardPath));
+      assert(health.json && health.json.edgeGuard === 'on',
+        '(h1) edgeGuard TETAP "on" di jalur custom domain (probe hidup membaca field ini)');
+      assert(health.json && health.json.protocol === '1.7', '(h1) protokol tetap 1.7 lewat custom domain');
+
+      // Jalur yang paling mahal harus benar-benar SAMPAI ke handler, bukan
+      // dihentikan [M-1]. Catatan jujur: stub D1 harness tidak melayani INSERT
+      // penerbitan identitas, jadi yang benar diassert di sini BUKAN 200,
+      // melainkan "bukan lagi forbidden_edge dan bukan lagi 403" — itulah satu
+      // hal yang gerbang ini memang tentukan.
+      const anon = await call(worker, env, 'POST', '/api/auth/anon',
+        { base: TRUSTED_BASE, origin: ORIGIN, body: '{}' });
+      assert(anon.status !== 403 && !(anon.json && anon.json.error === 'forbidden_edge'),
+        '(h1) POST /api/auth/anon di hostname tepercaya melewati [M-1] (bukan forbidden_edge), dapat ' + anon.status);
+
+      // Gerbang lain TIDAK digantikan: origin asing tetap ditolak origin gate.
+      const alienOrigin = await call(worker, env, 'GET', '/api/config',
+        { base: TRUSTED_BASE, origin: 'https://jahat.example' });
+      assert(alienOrigin.status === 403 && alienOrigin.json && alienOrigin.json.error === 'forbidden_origin',
+        '(h1) origin asing tetap forbidden_origin di hostname tepercaya (lapisan tetap dua)');
+      void built;
+    }
+
+    /* ---- (h2) hostname tepercaya hidup tanpa secret; workers.dev tidak --- */
+    {
+      const realError = console.error;
+      const logs = [];
+      console.error = (...args) => { logs.push(args.join(' ')); };
+      let trustedHealth; let devHealth;
+      try {
+        mod.resetEdgeWarningForTests();
+        const { env } = makeEnv({});
+        trustedHealth = await call(worker, env, 'GET', '/health', { base: TRUSTED_BASE, origin: ORIGIN });
+        devHealth = await call(worker, env, 'GET', '/health', { base: WORKERS_DEV, origin: ORIGIN });
+      } finally {
+        console.error = realError;
+      }
+      assert(trustedHealth.status === 200,
+        '(h2) hostname tepercaya tetap lolos SETELAH EDGE_SHARED_SECRET dihapus (pembongkaran tidak memadamkan produksi), dapat '
+        + trustedHealth.status);
+      assert(trustedHealth.json && trustedHealth.json.edgeGuardPath === 'custom-domain',
+        '(h2) jalurnya tetap dilaporkan "custom-domain" tanpa secret');
+      assert(devHealth.status === 403 && devHealth.json && devHealth.json.error === 'forbidden_edge',
+        '(h2) *.workers.dev di env yang sama TETAP fail-closed 403, dapat ' + devHealth.status);
+    }
+
+    /* ---- (h3) *.workers.dev TETAP ditolak tanpa header ------------------- */
+    {
+      const { env, built } = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      for (const [method, route] of [
+        ['GET', '/health'], ['GET', '/api/config'], ['GET', '/api/user/me'],
+        ['POST', '/api/auth/anon'], ['GET', '/rute-yang-tidak-ada']
+      ]) {
+        const r = await call(worker, env, method, route,
+          method === 'GET' ? { base: WORKERS_DEV, origin: ORIGIN } : { base: WORKERS_DEV, origin: ORIGIN, body: '{}' });
+        assert(r.status === 403 && r.json && r.json.error === 'forbidden_edge',
+          '(h3) ' + method + ' ' + route + ' di *.workers.dev tanpa header TETAP 403 forbidden_edge, dapat ' + r.status);
+      }
+      const wrong = await call(worker, env, 'GET', '/health',
+        { base: WORKERS_DEV, origin: ORIGIN, edge: 'salah-sekali' });
+      assert(wrong.status === 403, '(h3) header salah di *.workers.dev tetap 403, dapat ' + wrong.status);
+      // SATU-SATUNYA yang boleh: /healthz. Tidak lebih.
+      const z = await call(worker, env, 'GET', '/healthz', { base: WORKERS_DEV });
+      assert(z.status === 200, '(h3) /healthz tetap satu-satunya jalur bebas di *.workers.dev, dapat ' + z.status);
+      const writes = built.d1 && built.d1._log
+        ? built.d1._log.filter((e) => /^(INSERT|UPDATE|DELETE)/i.test(String(e.sql || '')))
+        : [];
+      assert(writes.length === 0, '(h3) penolakan workers.dev tetap nol tulis D1, dapat ' + writes.length);
+    }
+
+    /* ---- (h4) hostname ASING ditolak, bahkan dengan header sah ----------- */
+    {
+      const { env, built } = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      const bare = await call(worker, env, 'GET', '/health', { base: ALIEN_BASE, origin: ORIGIN });
+      assert(bare.status === 403 && bare.json && bare.json.error === 'forbidden_edge',
+        '(h4) hostname asing tanpa header ditolak 403 forbidden_edge, dapat ' + bare.status);
+      const withHeader = await call(worker, env, 'GET', '/health',
+        { base: ALIEN_BASE, origin: ORIGIN, edge: EDGE_SECRET });
+      assert(withHeader.status === 403,
+        '(h4) DEFAULT-DENY: hostname asing ditolak WALAU header sah, dapat ' + withHeader.status);
+      assert(withHeader.text === bare.text,
+        '(h4) bentuk galat hostname-asing-berheader IDENTIK dengan hostname-asing-tanpa-header (anti-oracle)');
+      const devReject = await call(worker, env, 'GET', '/health', { base: WORKERS_DEV, origin: ORIGIN });
+      assert(bare.text === devReject.text,
+        '(h4) bentuk galat hostname asing IDENTIK dengan penolakan workers.dev — gerbang tidak memetakan hostname');
+      const anon = await call(worker, env, 'POST', '/api/auth/anon',
+        { base: ALIEN_BASE, origin: ORIGIN, body: '{}', edge: EDGE_SECRET });
+      assert(anon.status === 403 && !anon.response.headers.get('set-cookie'),
+        '(h4) hostname asing tidak pernah menerbitkan cookie identitas, dapat ' + anon.status);
+      const writes = built.d1 && built.d1._log
+        ? built.d1._log.filter((e) => /^(INSERT|UPDATE|DELETE)/i.test(String(e.sql || '')))
+        : [];
+      assert(writes.length === 0, '(h4) penolakan hostname asing nol tulis D1, dapat ' + writes.length);
+    }
+
+    /* ---- (h5) jalur header MASIH hidup (dua jalur berdampingan) ---------- */
+    {
+      const { env } = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      const viaHeader = await call(worker, env, 'GET', '/health',
+        { base: WORKERS_DEV, origin: ORIGIN, edge: EDGE_SECRET });
+      assert(viaHeader.status === 200,
+        '(h5) jalur header SAH tetap lolos selama zona pending (jembatan PHP masih mungkin dipakai), dapat ' + viaHeader.status);
+      assert(viaHeader.json && viaHeader.json.edgeGuardPath === 'header',
+        '(h5) /health membedakan jalur header dari custom domain, dapat ' + (viaHeader.json && viaHeader.json.edgeGuardPath));
+      const viaHost = await call(worker, env, 'GET', '/health', { base: TRUSTED_BASE, origin: ORIGIN });
+      assert(viaHost.json && viaHost.json.edgeGuardPath === 'custom-domain',
+        '(h5) DUA jalur hidup berdampingan dan bisa dibedakan dari /health');
+    }
+
+    /* ---- (h6) `/health` tidak pernah bebas ------------------------------- */
+    {
+      assert(mod.EDGE_FREE_PATHS.length === 1 && mod.EDGE_FREE_PATHS[0] === '/healthz',
+        '(h6) EDGE_FREE_PATHS tetap satu path: /healthz, dapat [' + mod.EDGE_FREE_PATHS.join(',') + ']');
+      assert(!mod.EDGE_FREE_PATHS.includes('/health'),
+        '(h6) /health TIDAK pernah masuk daftar bebas-header (peta permukaan serang)');
+      const { env } = makeEnv({ EDGE_SHARED_SECRET: EDGE_SECRET });
+      const dev = await call(worker, env, 'GET', '/health', { base: WORKERS_DEV, origin: ORIGIN });
+      assert(dev.status === 403, '(h6) /health tetap 403 di *.workers.dev tanpa header, dapat ' + dev.status);
+      const alien = await call(worker, env, 'GET', '/health', { base: ALIEN_BASE, origin: ORIGIN });
+      assert(alien.status === 403, '(h6) /health tetap 403 di hostname asing, dapat ' + alien.status);
+      const z = await call(worker, env, 'GET', '/healthz', { base: ALIEN_BASE });
+      assert(z.status === 200 && Object.keys(z.json || {}).sort().join(',') === 'ok,protocol',
+        '(h6) /healthz tetap satu-satunya yang bebas, dan isinya tetap ok+protocol');
+      assert(!/edgeGuardPath/i.test(z.text), '(h6) /healthz tidak membocorkan jalur gerbang (itu oracle)');
+    }
+
+    /* ---- (h9) syarat + pemegang keputusan penghapusan jalur header ------- */
+    {
+      assert(/custom domain/i.test(src) && /hostname tepercaya/i.test(src),
+        '(h9) mw-edge.js menjelaskan jalur hostname tepercaya / custom domain');
+      assert(/TRUSTED_EDGE_HOSTS/.test(src) && /SATU SUMBER KEBENARAN/i.test(src),
+        '(h9) mw-edge.js menyatakan daftar hostname adalah satu sumber kebenaran');
+      assert(/dipalsukan/i.test(src),
+        '(h9) mw-edge.js menjelaskan APA ADANYA kenapa keputusan berbasis hostname tetap aman walau Host bisa dipalsukan');
+      assert(/rate-anon\.js|ANON_ISSUE_LIMIT_PER_HOUR/.test(src),
+        '(h9) mw-edge.js menunjuk penahan yang menggantikan jembatan (pembatas per-IP), bukan berpura-pura tidak ada yang berubah');
+      assert(/KAPAN JALUR HEADER BOLEH DIHAPUS/i.test(src),
+        '(h9) mw-edge.js menulis KAPAN jalur header boleh dihapus');
+      assert(/OWNER/.test(src) && /MASTER/.test(src),
+        '(h9) mw-edge.js menyebut SIAPA yang memutuskan penghapusan (owner) dan siapa yang mengeksekusi (master)');
+      assert(/ALLOW_NO_EDGE_SECRET/.test(src) && /DIHAPUS/.test(src),
+        '(h9) mw-edge.js menyatakan var ALLOW_NO_EDGE_SECRET ikut DIHAPUS saat pembongkaran');
+      assert(/CADANGAN/i.test(src), '(h9) mw-edge.js menyebut jalur header sebagai jalur CADANGAN');
+      const health = mustRead(path.join(API_DIR, 'route-health.js'), 'workers/api/route-health.js');
+      assert(/edgeGuardPath/.test(health) && /custom-domain/.test(health),
+        '(h9) route-health.js melaporkan jalur gerbang yang dipakai');
+    }
   }
 
   /* ---------- (g) artefak deployment bebas nilai secret ------------------- */
@@ -527,6 +821,9 @@ async function call(worker, env, method, pathname, opt) {
     decision: {
       healthProtected: true,
       freeHeaderPath: '/healthz',
+      trustedHosts: ['api.fiezel.my.id'],
+      paths: { primary: 'custom-domain', fallback: 'header', transitional: 'off' },
+      defaultDeny: 'hostname yang tidak dikenal ditolak walau header sah',
       reason: '/health mengumumkan capabilities (peta permukaan serang); monitor hanya butuh satu bit hidup/mati'
     },
     checks: results
