@@ -2,7 +2,7 @@
 //
 // Dua hal dijaga di sini, dan keduanya soal uang nyata.
 //
-// PERTAMA, angka korpus. Seluruh keputusan pra-render bersandar pada satu bilangan: 604.962
+// PERTAMA, angka korpus. Seluruh keputusan pra-render bersandar pada satu bilangan: 605.071
 // karakter kanonik ⇒ US$9,07 sekali bayar untuk menghapus ~99% biaya TTS runtime. cf-b4 dan
 // cf-a10 mewarisi angka lama 591.898 dari draf awal; cf-c1 §K1 mengoreksinya. Kalau angka itu
 // bergeser tanpa ada yang sadar, keputusan "bayar sekali" dibuat di atas anggaran yang salah.
@@ -42,13 +42,13 @@ try {
   const mod = await import('./tools/prerender-tts.mjs');
   const TtsKey = require(path.join(root, 'workers/api/tts/tts-key.js'));
 
-  // --- 1. ANGKA KANONIK 604.962 -------------------------------------------------------
+  // --- 1. ANGKA KANONIK 605.071 -------------------------------------------------------
   const CANON = mod.CANONICAL;
-  check('Konstanta korpus kanonik = 604.962 karakter', CANON.totalChars === 604962, String(CANON.totalChars));
+  check('Konstanta korpus kanonik = 605.071 karakter', CANON.totalChars === 605071, String(CANON.totalChars));
 
   const census = mod.censusCorpus({ content: 'all' });
-  const drift = Math.abs(census.totalChars - 604962) / 604962;
-  check('Korpus terukur dari bank cocok 604.962 ±1%',
+  const drift = Math.abs(census.totalChars - 605071) / 605071;
+  check('Korpus terukur dari bank cocok 605.071 ±1%',
     drift <= 0.01, `${census.totalChars} karakter (selisih ${(drift * 100).toFixed(3)}%)`);
   check('Korpus terukur cocok EKSAK dengan konstanta (bukan sekadar dalam toleransi)',
     census.totalChars === CANON.totalChars, `${census.totalChars} vs ${CANON.totalChars}`);
