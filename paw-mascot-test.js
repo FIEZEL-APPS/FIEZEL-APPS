@@ -334,10 +334,14 @@ test('pertanyaan yakin muncul sebagai popup, dan membawa tombol Lanjutnya sendir
   if (!answered || !/confidence-go/.test(answered[0])) {
     throw new Error('tombol Lanjut tidak muncul setelah pilihan diambil');
   }
-  // m025-176: jendela 900 -> 2000 karakter. Braincore fase 3 (srlCaptureConfidence + basis
-  // scheduleNext) menggelembungkan setConfidence secara sah; kontraknya TIDAK berubah -
-  // confidencePopAnswered(value) tetap dipanggil di dalam setConfidence setelah save().
-  if (!/setConfidence\(value\)\{[\s\S]{0,2000}?confidencePopAnswered\(value\)/.test(app)) {
+  // setConfidence() grew as the confidence signal gained SRL and scheduling hooks.
+  // Bound the assertion to that function's source range, not an arbitrary character count,
+  // so the gate keeps checking the real callback without going stale as the function grows.
+  const confidenceStart = app.indexOf('function setConfidence(value){');
+  const confidenceEnd = app.indexOf('\n/* ==========================================================================', confidenceStart);
+  const confidenceFn = confidenceStart >= 0 && confidenceEnd > confidenceStart
+    ? app.slice(confidenceStart, confidenceEnd) : '';
+  if (!/confidencePopAnswered\(value\)/.test(confidenceFn)) {
     throw new Error('popup tidak pernah tahu pilihannya sudah diambil');
   }
 });
