@@ -3249,6 +3249,61 @@ cfConfigBootOnce();
  * senyap bagi murid, apa pun yang terjadi.
  */
 const AN_MODULE_URL='./features/analytics/fiezel-analytics-client.js';
+/* T-031 — PEMUAT TIDAK MEMPERCAYAI NAMA GLOBAL, IA MEMERIKSA BENTUK.
+ *
+ * Cacat yang diperbaiki di sini: pemuat dulu berbunyi `if(self.FiezelAnalytics)return
+ * resolve(self.FiezelAnalytics)`. Itu mempercayai nama global apa pun yang sudah terisi.
+ * `features/ui/fiezel-ab-testing.js` (dimuat `<script defer>` dari index.html, jadi SELALU
+ * lebih awal daripada pemuat ini yang jalan di idle) mengisi nama itu dengan objek A/B
+ * tanpa `createClient`. Pemuat menerimanya, gagal cek bentuk SESUDAHNYA, mencatat
+ * `module_shape`, lalu MENYERAH — modul analytics asli tidak pernah diunduh. Terukur di
+ * produksi: `stats()` = {loaded:false,started:true,lastError:'module_shape',gateOpen:true},
+ * nol permintaan ke /api/usage, nol galat konsol.
+ *
+ * Tiga perubahan struktural, bukan tambalan pada satu nama:
+ *  1. BENTUK DIPERIKSA SEBELUM DIPAKAI (`anIsModule`), bukan sesudah di-resolve.
+ *  2. BENTUK SALAH => LANJUT MEMUAT, bukan menyerah. Objek asing di nama global tidak lagi
+ *     bisa membatalkan pemuatan; UMD modul menimpa nama itu saat skripnya selesai.
+ *  3. NAMA KHAS MILIK PEMUAT INI (`AN_PINNED`). Begitu modul terverifikasi bentuknya, ia
+ *     dipatok di slot privat yang tidak dipakai siapa pun; pemuatan berikutnya membaca slot
+ *     itu lebih dulu, jadi berkas lain yang merebut `FiezelAnalytics` di tengah sesi tidak
+ *     bisa lagi menyusup ke jalur ini.
+ *
+ * KODE GALAT DIBEDAKAN PER SEBAB (dulu `module_shape` untuk semuanya — itulah kenapa cacat
+ * ini butuh dua sesi peramban untuk dibedakan dari "modul rusak"):
+ *   global_name_conflict  objek ASING (nol penanda modul analytics) merebut nama global dan
+ *                         tidak ada modul asli yang bisa dipakai.
+ *   module_shape_invalid  objek di nama itu MEMANG modul analytics (ada penandanya) tetapi
+ *                         bentuknya salah — `createClient` hilang/bukan fungsi.
+ *   module_unavailable    <script> modul gagal diunduh.
+ *   client_shape_invalid  `createClient()` mengembalikan sesuatu yang tidak bisa dipakai.
+ * Fakta "nama pernah direbut" TIDAK hilang walau pemuatan akhirnya berhasil: ia terbaca di
+ * `stats().nameConflict`, supaya pemilik bisa melihat tabrakan yang sudah dipulihkan.
+ *
+ * Sifat fire-and-forget TIDAK berubah: nol `await`, nol lemparan ke pemanggil, dan setiap
+ * kegagalan tetap senyap bagi murid.
+ * Dijaga: `analytics-client-test.js` (§T-031) + `global-name-collision-test.js`. */
+const AN_GLOBAL='FiezelAnalytics';
+const AN_PINNED='__fiezelAnalyticsModule';
+/* Penanda "ini modul analytics, mungkin rusak" vs "ini objek asing". Dipakai HANYA untuk
+ * memilih kode galat yang jujur, tidak pernah untuk memutuskan boleh-dipakai. */
+const AN_MODULE_MARKS=Object.freeze(['createClient','track','SCHEMA_ID','STORAGE_KEYS','CLIENT_EVENTS','SERVER_ONLY_EVENTS','scanForPii']);
+function anIsModule(o){return Boolean(o)&&(typeof o==='object'||typeof o==='function')&&typeof o.createClient==='function'}
+function anLooksLikeModule(o){if(!o||(typeof o!=='object'&&typeof o!=='function'))return false;for(const k of AN_MODULE_MARKS){try{if(k in o)return true}catch{}}return false}
+/* Ambil modul dari slot patok dulu, lalu dari nama global — keduanya dengan cek bentuk.
+ * Kalau nama global terisi sesuatu yang bukan modul, catat SEBABNYA dan kembalikan null;
+ * pemanggil TETAP melanjutkan pemuatan. */
+function anTakeModule(){
+  const pinned=self[AN_PINNED];
+  if(anIsModule(pinned))return pinned;
+  const g=self[AN_GLOBAL];
+  if(anIsModule(g)){try{self[AN_PINNED]=g}catch{}return g}
+  if(g!==undefined&&g!==null){
+    if(anLooksLikeModule(g)){anLastError='module_shape_invalid'}
+    else{anNameConflict=true;anLastError='global_name_conflict'}
+  }
+  return null;
+}
 /* Peta tertutup: tipe sesi internal -> enum `mode` kontrak Worker. Nilai yang tidak dikenal
  * jatuh ke 'practice', BUKAN diteruskan apa adanya — nama tipe internal baru tidak boleh
  * bisa menjadi teks bebas yang keluar dari perangkat. `placement`/`level-exam`/`grammar-skip`
@@ -3262,7 +3317,7 @@ const AN_LAST_BUCKET='30m+';
  * KEDUA, di sisi kita, supaya penyunting app.js berikutnya tidak bisa menambahkan field
  * tanpa melewati dua pagar. Kunci di luar daftar ini dibuang di sini, sebelum modul. */
 const AN_FIELD_ALLOWLIST=Object.freeze({session_started:Object.freeze(['mode','level']),session_ended:Object.freeze(['mode','level','completed','answered','duration_bucket'])});
-let anLoadPromise=null,anClient=null,anStarted=false,anLastError='';
+let anLoadPromise=null,anClient=null,anStarted=false,anLastError='',anNameConflict=false;
 function anGateOpen(){
   try{
     if(cfStaticMode('usage')!=='on')return false;   // lapis statis: mati di berkas = mati selamanya sampai rilis
@@ -3284,17 +3339,26 @@ function anLoad(){
   if(anLoadPromise)return anLoadPromise;
   anLoadPromise=new Promise(resolve=>{
     try{
-      if(self.FiezelAnalytics)return resolve(self.FiezelAnalytics);
+      const siap=anTakeModule();
+      if(siap)return resolve(siap);
+      // Bentuk salah di nama global BUKAN alasan berhenti: unduh modul aslinya.
       if(typeof document!=='object'||!document||typeof document.createElement!=='function')return resolve(null);
       const el=document.createElement('script');
       el.src=AN_MODULE_URL;el.async=true;el.defer=false;
-      el.onload=()=>resolve(self.FiezelAnalytics||null);
+      el.onload=()=>resolve(anTakeModule());
       el.onerror=()=>{anLastError='module_unavailable';resolve(null)};
       (document.head||document.body||document.documentElement).appendChild(el);
     }catch{resolve(null)}
   }).then(api=>{
-    if(!api||typeof api.createClient!=='function'){anLastError='module_shape';return null}
-    anClient=api.createClient({config:AN_CONFIG_VIEW});
+    if(!anIsModule(api)){
+      // Sebab spesifik sudah dicatat anTakeModule()/onerror; jangan menimpanya dengan
+      // kode umum, karena kode umum itulah yang menyembunyikan cacat ini berhari-hari.
+      if(anLastError!=='module_unavailable'&&anLastError!=='global_name_conflict'&&anLastError!=='module_shape_invalid')anLastError=api===null||api===undefined?'module_unavailable':'module_shape_invalid';
+      return null;
+    }
+    const c=api.createClient({config:AN_CONFIG_VIEW});
+    if(!c||typeof c.track!=='function'){anLastError='client_shape_invalid';return null}
+    anClient=c;anLastError='';   // berhasil: galat lama tidak boleh ikut menghantui laporan
     return anClient;
   }).catch(()=>null);
   return anLoadPromise;
@@ -3371,9 +3435,15 @@ self.FiezelAnalyticsEmitter=Object.freeze({
   fields:anFields,
   mode:anMode,
   schedule:anBootSchedule,
-  stats:()=>({loaded:Boolean(anClient),started:anStarted,lastError:anLastError,gateOpen:anGateOpen()}),
+  // `nameConflict` adalah fakta yang bertahan walau pemuatan akhirnya berhasil: nama global
+  // pernah direbut objek asing. Ia satu-satunya jejak tabrakan yang sudah dipulihkan.
+  stats:()=>({loaded:Boolean(anClient),started:anStarted,lastError:anLastError,gateOpen:anGateOpen(),nameConflict:anNameConflict}),
   // Hanya untuk gerbang: kosongkan cache instance tanpa menyentuh apa pun milik murid.
-  _resetForGate:()=>{anLoadPromise=null;anClient=null;anStarted=false;anLastError=''}
+  // Slot patok SENGAJA TIDAK dikosongkan: ia identitas modul yang sudah terverifikasi
+  // bentuknya, bukan keadaan sesi. Justru karena itu reset di sini membuktikan patoknya
+  // bekerja — sesudah reset, modul dipulihkan dari patok tanpa unduhan baru, walau nama
+  // global sudah direbut objek asing di tengah sesi.
+  _resetForGate:()=>{anLoadPromise=null;anClient=null;anStarted=false;anLastError='';anNameConflict=false}
 });
 /* Kalau lapis statis mati, tidak ada yang bisa dinyalakan server (aturan AND), jadi bahkan
  * TIMER-nya tidak dipasang. Keadaan hari ini: nol timer, nol permintaan, nol penyimpanan. */
