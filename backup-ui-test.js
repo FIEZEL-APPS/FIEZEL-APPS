@@ -42,6 +42,9 @@ const context = {
 context.window = context; context.self = context; context.window.scrollTo = () => {};
 vm.createContext(context);
 for (const file of [
+  /* m025-186 merge-fix: kontrak index.html FIEZEL_I18N_BEGIN — i18n + copy-id sebelum modul features/app. */
+  'features/i18n/fiezel-i18n.js',
+  ...fs.readdirSync(path.join(root, 'features/i18n')).filter((n) => /^copy-id-.*\.js$/.test(n)).sort().map((n) => 'features/i18n/' + n),
   'features/speaking-listening/speaking-listening-config.js',
   'features/skills-evidence/fiezel-skills-evidence.js',
   'features/academic-readiness/fiezel-academic-readiness.js',
