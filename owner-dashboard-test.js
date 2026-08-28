@@ -341,6 +341,28 @@ function makeRequest(url, opts) {
   return new Request('https://owner.fiezel.my.id' + url, opts || {});
 }
 
+/* ==========================================================================================
+ * PENANDA BUKU (D4). `GET /` tanpa sesi menjawab 303 ke `/login`, bukan 403
+ * `{"error":"forbidden"}`. Alasannya di `workers/owner/README.md` §1: yang membuka
+ * `https://owner.fiezel.my.id` tanpa sesi — atau sesudah sesi 30 menitnya habis, jadi ini
+ * kejadian HARIAN — adalah owner, dan JSON galat untuk pemilik pintu itu cacat, bukan keamanan.
+ * Yang TIDAK boleh melemah, dan itu yang diassert di sini: pengalihan tidak membawa data, tidak
+ * menyentuh cookie, dan bentuknya tidak bergantung pada apakah Secret sudah dipasang.
+ * ======================================================================================== */
+async function assertLoginRedirect(res, label) {
+  assert(res.status === 303, label + ': GET / tanpa sesi → 303, dapat ' + res.status);
+  assert((res.headers.get('location') || '') === '/login',
+    label + ": Location tepat '/login', dapat " + JSON.stringify(res.headers.get('location')));
+  const body = await res.text();
+  assert(body === '', label + ': pengalihan nol byte badan, dapat ' + body.length);
+  assert(!res.headers.get('set-cookie'), label + ': pengalihan tidak menyentuh cookie');
+  const shape = [...res.headers].map(([k, v]) => k + ':' + v).sort().join('|');
+  assert(!METRIC_KEYS.test(body + shape), label + ': pengalihan tidak memuat kunci metrik');
+  assert(!/OWNER_TOKEN_HASH|OWNER_SESSION_KEY|belum dikonfigurasi/i.test(body + shape),
+    label + ': pengalihan tidak menyebut Secret atau keadaan konfigurasi');
+  return res.status + '|' + shape + '|' + body;
+}
+
 (async () => {
   // Rewrite impor relatif → data: URL, lalu muat modul Worker ESM tanpa bundler.
   const mod = await import(dataUrl(indexSource.replace("'./queries.js'", `'${dataUrl(queriesSource)}'`)));
@@ -386,7 +408,11 @@ function makeRequest(url, opts) {
     for (const [label, opts] of attempts) {
       const env = makeEnv();
       const res = await mod.handle(makeRequest(route, opts), env, {}, NOW);
-      assert(res.status === 403, `${route} [${label}] → ${res.status}, seharusnya 403`);
+      if (route === '/') {
+        await assertLoginRedirect(res.clone(), `${route} [${label}]`);
+      } else {
+        assert(res.status === 403, `${route} [${label}] → ${res.status}, seharusnya 403`);
+      }
       const body = await res.text();
       assert(!METRIC_KEYS.test(body), `${route} [${label}] membocorkan kunci metrik di respons yang gagal gate`);
       assert(env.ANALYTICS._log.length === 0, `${route} [${label}] menyentuh D1 SEBELUM gate lulus`);
@@ -401,9 +427,20 @@ function makeRequest(url, opts) {
   }
 
   // Fail-closed: Secret belum dipasang → bahkan halaman masuk 403 (fitur baru default OFF).
+  const configuredRootShape = await assertLoginRedirect(
+    await mod.handle(makeRequest('/'), makeEnv(), {}, NOW), '/ dengan Secret lengkap');
   for (const route of ['/login', '/', '/api/summary']) {
     const res = await mod.handle(makeRequest(route), { ANALYTICS: fakeD1() }, {}, NOW);
-    assert(res.status === 403, `tanpa Secret, ${route} → ${res.status}, seharusnya 403 (fail-closed)`);
+    if (route === '/') {
+      // Fail-closed TIDAK berarti "403 di semua tempat": `GET /` mengalihkan ke halaman masuk.
+      // Syaratnya jawabannya BYTE-IDENTIK dengan saat Secret lengkap, kalau tidak `curl -I /`
+      // menjadi cara memeriksa apakah dashboard sudah dikonfigurasi.
+      const shape = await assertLoginRedirect(res, 'tanpa Secret, /');
+      assert(shape === configuredRootShape,
+        'pengalihan / identik dengan/tanpa Secret (bukan oracle konfigurasi)');
+    } else {
+      assert(res.status === 403, `tanpa Secret, ${route} → ${res.status}, seharusnya 403 (fail-closed)`);
+    }
   }
 
   // Token salah tidak pernah menerbitkan cookie sesi.
@@ -431,7 +468,10 @@ function makeRequest(url, opts) {
   // Sesi milik kunci lain tidak diterima (tanda tangan diverifikasi, bukan dipercaya).
   const foreign = await mod.issueSession({ OWNER_SESSION_KEY: 'kunci-penyerang' }, NOW);
   const foreignRes = await mod.handle(makeRequest('/', { headers: { cookie: mod.SESSION_COOKIE + '=' + foreign } }), makeEnv(), {}, NOW);
-  assert(foreignRes.status === 403, 'cookie yang ditandatangani kunci lain harus 403');
+  await assertLoginRedirect(foreignRes, 'cookie yang ditandatangani kunci lain');
+  const foreignApi = await mod.handle(makeRequest('/api/summary', { headers: { cookie: mod.SESSION_COOKIE + '=' + foreign } }), makeEnv(), {}, NOW);
+  assert(foreignApi.status === 403,
+    'cookie yang ditandatangani kunci lain tetap 403 di rute data, dapat ' + foreignApi.status);
 
   /* ================= (e) DAU/WAU/MAU dari tabel agregat ================================== */
   section('(e) bab 32 #22: DAU/WAU/MAU dari tabel agregat');
@@ -744,7 +784,10 @@ function makeRequest(url, opts) {
     for (const m2 of METHODS) {
       const e = makeEnv();
       const res = await mod.handle(makeRequest(route, { method: m2 }), e, {}, NOW);
-      if (res.status !== 403) reachableWithoutGate.push(m2 + ' ' + route + ' → ' + res.status);
+      // `/%2e%2e/` dinormalkan menjadi `/`; untuk GET, jawaban yang benar kini pengalihan ke
+      // halaman masuk (tetap nol data, nol cookie), bukan 403.
+      if (m2 === 'GET' && route === '/%2e%2e/') await assertLoginRedirect(res.clone(), 'GET ' + route);
+      else if (res.status !== 403) reachableWithoutGate.push(m2 + ' ' + route + ' → ' + res.status);
       assert(e.ANALYTICS._log.length === 0, m2 + ' ' + route + ' menyentuh D1 sebelum gate lulus');
     }
   }
@@ -768,7 +811,8 @@ function makeRequest(url, opts) {
     assert(!mod.PUBLIC_ROUTES.includes(route), 'rute owner ' + route + ' bocor ke daftar publik');
     const e = makeEnv();
     const res = await mod.handle(makeRequest(route), e, {}, NOW);
-    assert(res.status === 403, 'rute owner ' + route + ' tanpa sesi → ' + res.status + ', harus 403');
+    if (route === '/') await assertLoginRedirect(res, 'rute owner / tanpa sesi');
+    else assert(res.status === 403, 'rute owner ' + route + ' tanpa sesi → ' + res.status + ', harus 403');
   }
   assert(mod.PUBLIC_ROUTES.length === 1, 'jumlah rute publik harus tepat satu, dapat ' + mod.PUBLIC_ROUTES.length);
   // Rute publik pun tidak boleh menyentuh D1 (halaman masuk bukan pintu data).
@@ -848,7 +892,8 @@ function makeRequest(url, opts) {
     process.exit(1);
   }
   console.log('\nowner-dashboard-test: LULUS — ' +
-    'semua rute 403 tanpa sesi owner, SQL agregat-saja, perbandingan waktu-konstan, ' +
+    'rute data 403 tanpa sesi owner (GET / 303 ke /login, nol data, nol cookie), ' +
+    'SQL agregat-saja, perbandingan waktu-konstan, ' +
     'rumus biaya cf-a10 terkalibrasi, DAU/WAU/MAU dari tabel agregat.');
 })().catch((err) => {
   console.error('owner-dashboard-test: GAGAL keras — ' + (err && err.stack || err));

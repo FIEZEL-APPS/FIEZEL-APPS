@@ -173,22 +173,38 @@ if (!hasCfFlags) {
     check('setiap endpoint bernilai "off" | "shadow" | "on" (kosakata cf-b6 P1)',
       badModes.length === 0, badModes.map(([k, v]) => `${k}=${v}`).join(', ') || '0');
 
-    /* ---- (1b) DEFAULT OFF — assert yang dulu SKIP ------------------------------------- */
-    // main auto-deploy ke fiezel.my.id tiap ≤5 menit tanpa gerbang di antaranya (K12), jadi
-    // "default off" bukan gaya penulisan: ia yang membuat push ini aman untuk murid.
-    const defaultOff = cf.enabled === false
-      && String(cf.base || '') === ''
-      && liveEndpoints.length === 0
-      && booleansOn.length === 0;
-    check('Semua nilai flag CF default OFF', defaultOff,
-      `enabled=${cf.enabled} base="${cf.base}" hidup=${liveEndpoints.map(([k, v]) => k + '=' + v).join(',') || '0'}`);
-    check('enabled === false (sakelar induk mati)', cf.enabled === false, String(cf.enabled));
-    check('base kosong — alamat CF belum diaktifkan (api.fiezel.my.id menunggu nameserver)',
-      String(cf.base || '') === '', `base="${cf.base}"`);
-    check('NOL endpoint bernilai shadow/on', liveEndpoints.length === 0,
-      liveEndpoints.map(([k, v]) => `${k}=${v}`).join(', ') || '0');
-    check('Tidak ada bendera boolean yang default true', booleansOn.length === 0,
-      booleansOn.map(([k]) => k).join(', ') || '0');
+    /* ---- (1b) TAHAP RILIS A6: ANALYTICS SAJA ------------------------------------------
+     * Bentuk lama assert ini: "semua nilai flag CF default OFF" (enabled=false, base='',
+     * nol endpoint hidup). Itu benar sampai 28 Agu 2026, ketika `base` memang belum ada
+     * alamatnya. Sejak paket A6 alamat Worker `api.fiezel.my.id` hidup dan owner memutuskan
+     * penyalaan BERTAHAP: analytics saja (reports/work-a6-client-switch.md).
+     *
+     * Assert lama TIDAK dihapus melainkan DIPERSEMPIT ke hal yang sebenarnya melindungi
+     * murid: main auto-deploy ke fiezel.my.id tiap <=5 menit tanpa gerbang di antaranya
+     * (K12), jadi yang tidak boleh menyala diam-diam adalah endpoint BERBIAYA dan endpoint
+     * beridentitas — bukan setiap endpoint tanpa kecuali. Daftar putih di bawah ditulis
+     * eksplisit: menambah nama ke sana harus keputusan sadar, bukan efek samping. */
+    const ALLOWED_LIVE = ['config', 'usage'];   // A6 tahap 1: analytics + kill switch server
+    const MUST_STAY_OFF = ['ai', 'tts', 'auth', 'quota', 'health'];
+    const liveNames = liveEndpoints.map(([k]) => k);
+    const liarHidup = liveNames.filter(k => !ALLOWED_LIVE.includes(k));
+    const berbiayaHidup = MUST_STAY_OFF.filter(k => String(endpoints[k]) !== 'off');
+    check('Endpoint yang hidup TERBATAS pada tahap rilis yang disetujui (config, usage)',
+      liarHidup.length === 0, `hidup=${liveNames.join(',') || '0'} liar=${liarHidup.join(',') || '0'}`);
+    check('ai/tts tetap off: NOL neuron dibelanjakan tanpa keputusan owner terpisah',
+      String(endpoints.ai) === 'off' && String(endpoints.tts) === 'off',
+      `ai=${endpoints.ai} tts=${endpoints.tts}`);
+    check('auth/quota/health tetap off (tidak diperlukan analytics, jadi tidak dibuka)',
+      berbiayaHidup.filter(k => k !== 'ai' && k !== 'tts').length === 0,
+      MUST_STAY_OFF.map(k => `${k}=${endpoints[k]}`).join(', '));
+    check('base terisi HANYA kalau ada endpoint hidup (alamat tanpa jalur = permukaan sia-sia)',
+      liveEndpoints.length === 0 ? String(cf.base || '') === '' : String(cf.base || '') !== '',
+      `base="${cf.base}" hidup=${liveNames.join(',') || '0'}`);
+    check('enabled:true HANYA kalau memang ada endpoint hidup, dan sebaliknya',
+      (cf.enabled === true) === (liveEndpoints.length > 0),
+      `enabled=${cf.enabled} hidup=${liveNames.join(',') || '0'}`);
+    check('tidak ada bendera boolean lain yang true selain `enabled`',
+      booleansOn.every(([k]) => k === 'enabled'), booleansOn.map(([k]) => k).join(', ') || '0');
     check('base, kalau diisi, https dan di bawah fiezel.my.id (bukan workers.dev)',
       String(cf.base || '') === '' || /^https:\/\/[a-z0-9-]+\.fiezel\.my\.id$/i.test(String(cf.base)), String(cf.base));
 

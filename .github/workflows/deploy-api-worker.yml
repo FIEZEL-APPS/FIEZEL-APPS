@@ -45,12 +45,15 @@ jobs:
         run: |
           node --check index.js
           # wrangler.toml di repo SENGAJA template: database_id/namespace id asli tidak
-          # dicatat di repo. ID bukan rahasia, tetapi sumber kebenarannya akun Cloudflare -
-          # jadi ambil saat deploy BERDASARKAN NAMA (fiezel-core, fiezel-stats, CFG) lewat
-          # API resmi, isi ke salinan kerja, dan gagal keras kalau salah satu tidak ada.
-          CORE_ID=$(npx --yes wrangler@3 d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(d=>d.name==='fiezel-core');if(!x)process.exit(1);console.log(x.uuid)})")
-          STATS_ID=$(npx --yes wrangler@3 d1 list --json | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(d=>d.name==='fiezel-stats');if(!x)process.exit(1);console.log(x.uuid)})")
-          KV_ID=$(npx --yes wrangler@3 kv namespace list | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s).find(n=>n.title.endsWith('CFG')||n.title==='CFG');if(!x)process.exit(1);console.log(x.id)})")
+          # dicatat di repo. Token CI hanya berizin Workers (bukan D1 list), jadi sumber
+          # ID-nya adalah worker fiezel-api yang SEDANG live: endpoint settings script
+          # mengembalikan binding produksi hari ini (CORE_DB, STATS_DB, CFG). Deploy ulang
+          # dengan ID yang sama persis = perilaku data tidak berubah, hanya kode+vars.
+          SETTINGS=$(curl -sf -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/fiezel-api/settings")
+          CORE_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='CORE_DB');if(!b)process.exit(1);console.log(b.id||b.database_id)})")
+          STATS_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='STATS_DB');if(!b)process.exit(1);console.log(b.id||b.database_id)})")
+          KV_ID=$(echo "$SETTINGS" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const b=JSON.parse(s).result.bindings.find(b=>b.name==='CFG');if(!b)process.exit(1);console.log(b.namespace_id||b.id)})")
           test -n "$CORE_ID" && test -n "$STATS_ID" && test -n "$KV_ID"
           sed -i "s|<isi setelah: wrangler d1 create fiezel-core>|$CORE_ID|" wrangler.toml
           sed -i "s|<isi setelah: wrangler d1 create fiezel-stats>|$STATS_ID|" wrangler.toml

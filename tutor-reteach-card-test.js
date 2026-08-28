@@ -128,10 +128,7 @@ test('kartu menahan alur SEBELUM soal berikutnya digambar', () => {
 });
 
 test('tombol lanjut di kartu membuang kartunya, jadi ia tidak bisa muncul dua kali', () => {
-  // Invariannya: pendingCard dinolkan LEBIH DULU, lalu draw() dipanggil di handler yang sama.
-  // Pola dilonggarkan dari kecocokan huruf-demi-huruf karena handler kini juga mereset
-  // pewaktu soal (start=Date.now()) - penambahan yang benar, bukan pelanggaran invarian.
-  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;[^}]*draw\(\)\}/.test(APP),
+  assert.ok(/\$\('teachNext'\)\.onclick=\(\)=>\{pendingCard=null;(?:start=Date\.now\(\);)?draw\(\)\}/.test(APP),
     'tombol lanjut tidak mengosongkan pendingCard sebelum menggambar');
 });
 

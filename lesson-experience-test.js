@@ -27,7 +27,7 @@ const signature=q=>String(q.question).toLowerCase().replace(/\s+/g,' ').trim()+'
 
 setTimeout(()=>{try{
   const skills=grammar.templates.map(x=>x.subskill);
-  assert(new Set(skills).size===153,'grammar skill fixture changed unexpectedly');
+  assert(new Set(skills).size===grammar.count,'grammar skill fixture contains duplicate or undeclared lessons');
   const runtimeState=context.__getFiezelState();
   const previousActiveLevel=runtimeState.preferences.activeLevel||'';
   const previousLevelMode=runtimeState.preferences.levelMode||'placement';

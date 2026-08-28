@@ -208,18 +208,85 @@ function deny() {
   });
 }
 
-/* ============================ Penjaga jembatan edge (X-Fiezel-Edge) ====================== */
-// MASALAH NYATA. Worker ini minta `owner.fiezel.my.id` sebagai custom domain, tapi zona
-// `fiezel.my.id` belum ada di Cloudflare (nameserver di reseller; zona subdomain butuh
-// Enterprise). Jadi selama blokade itu, dashboard dijangkau lewat pola yang sudah terbukti untuk
+/* ============================ Penjaga tepi (hostname kanonik ATAU X-Fiezel-Edge) ========= */
+//
+// ==========================================================================================
+// 🔄 TEMUAN LAPANGAN 28 Agu 2026 — CUSTOM DOMAIN OWNER SUDAH AKTIF (BAGIAN INI BARU)
+// ==========================================================================================
+// Keadaan yang diasumsikan bab di bawah SUDAH BERUBAH, dan gejalanya diukur langsung:
+// `https://owner.fiezel.my.id/` menjawab **403 `{"error":"forbidden"}`** pada tiga percobaan
+// (~75 ms). Sebabnya bukan sesi owner dan bukan Secret yang kurang:
+//   - Worker `fiezel-owner` sudah dideploy (etag 9ad135402f65).
+//   - `owner.fiezel.my.id` sudah AKTIF sebagai **custom domain** Worker ini
+//     (id aa153ad81fbc2aee3855441900cc7bc9696f3d0c, cert 767db56f-…, enabled true) —
+//     persis seperti yang sudah lama tertulis di `wrangler.toml`
+//     (`routes = [{ pattern = "owner.fiezel.my.id", custom_domain = true }]`).
+//   - Ketiga Secret (`OWNER_TOKEN_HASH`, `OWNER_SESSION_KEY`, `EDGE_SHARED_SECRET`) terpasang.
+// Artinya permintaan owner tiba **LANGSUNG dari peramban**, dan proxy PHP owner TIDAK berada di
+// jalur permintaan. Tidak ada yang menyuntikkan `X-Fiezel-Edge`, jadi penjaga versi sebelumnya
+// menolak SEMUA permintaan — termasuk halaman masuk. Penjaga itu menilai keadaan yang sudah
+// tidak berlaku (kelas bug yang sama dengan dua bug lain yang ditambal hari yang sama).
+//
+// YANG **TIDAK** DIPAKAI SEBAGAI TAMBALAN: `ALLOW_NO_EDGE_SECRET="true"`. Bab di bawah sudah
+// memperingatkannya sendiri — pembuka itu membuka gerbang untuk SEMUA hostname, termasuk
+// `*.workers.dev`, tempat Cloudflare Access (yang dipasang PER HOSTNAME) tidak berlaku. Itu
+// menukar 403 dengan lubang: halaman masuk owner bisa ditembak langsung, dan rem login
+// per-isolate bisa diputar dengan meminta isolate baru.
+//
+// YANG DIPAKAI: **JALUR SAH KEDUA — hostname kanonik**, ditiru dari `workers/api/mw-edge.js`
+// (di sana konsepnya `edgeGuardPath` bernilai `custom-domain`), berdampingan dengan jalur
+// header dan dengan DEFAULT-DENY untuk hostname lain. Lihat bab "SINYAL HOSTNAME" di bawah.
+//
+// ==========================================================================================
+// SINYAL HOSTNAME: KENAPA `new URL(request.url).hostname` DAN BUKAN `headers.get('host')`
+// ==========================================================================================
+// Syaratnya keras: hostname yang dipercaya WAJIB berasal dari sesuatu yang tidak bisa disetel
+// peramban penyerang. Ini hasil pemeriksaannya, apa adanya:
+//
+// 1. `request.headers.get('host')` adalah nilai header MENTAH dari klien. Di Workers ia memang
+//    berasal dari sumber yang sama dengan `request.url`, tetapi ia TIDAK dinormalkan: ia boleh
+//    membawa port (`owner.fiezel.my.id:8443`), titik akhir (`owner.fiezel.my.id.`), huruf besar,
+//    bentuk punycode/unicode yang berbeda, dan bila header dikirim GANDA `Headers.get()`
+//    menggabungkan nilainya dengan `', '`. Sebuah gerbang otorisasi tidak boleh menanggung
+//    beban menalar semua bentuk itu. Karena itu ia DITOLAK sebagai sumber di sini.
+// 2. `new URL(request.url).hostname` adalah hostname yang sudah DIRAKIT DAN DINORMALKAN runtime,
+//    dan — ini intinya — ia adalah nilai yang SAMA yang dipakai lapisan perutean Cloudflare
+//    untuk memutuskan bahwa Worker ini yang dijalankan. Custom Domain mencocokkan hostname
+//    secara PERSIS, tanpa wildcard, dan seluruh path-nya menuju Worker ini
+//    (developers.cloudflare.com/workers/configuration/routing/custom-domains/). Jadi permintaan
+//    tidak mungkin tiba di sini dengan hostname `owner.fiezel.my.id` tanpa Cloudflare sendiri
+//    yang mencocokkannya ke rute milik akun ini. Yang dipercaya bukan "header yang sopan",
+//    melainkan KEPUTUSAN PERUTEAN yang tidak dipegang klien.
+// 3. Yang JUGA menutup jalur pemalsuan dari arah Worker lain: `Host` adalah forbidden header di
+//    Fetch API, sehingga Worker mana pun (di akun mana pun) TIDAK BISA menyetel `Host` pada
+//    subrequest — begitu pula Transform Rules menolak operasi `set` pada `Host`. Jadi tidak ada
+//    cara mengirim `Host: owner.fiezel.my.id` ke alamat `*.workers.dev` lewat Cloudflare.
+// 4. YANG TIDAK DIPERCAYA sama sekali, dan tidak pernah dibaca penjaga ini: `X-Forwarded-Host`,
+//    `X-Host`, `Origin`, `Referer`. Semuanya murni masukan klien.
+//
+// RISIKO SISA, DITULIS SUPAYA TIDAK HILANG: kalau suatu hari sebuah lapisan di depan Worker
+// meneruskan `Host` pilihan klien (mis. jembatan PHP yang diubah supaya meneruskan Host, atau
+// `workers_dev` dinyalakan lagi lalu Host/SNI tidak lagi dipaksa cocok), maka `url.hostname`
+// ikut berpindah dan pemeriksaan akhiran `.workers.dev` TIDAK akan menyala. Karena itu jalur
+// hostname ini SAH hanya bersama tiga hal di luar kode: `workers_dev = false`, Preview URL
+// mati, dan Cloudflare Access di depan `owner.fiezel.my.id`. Ketiganya pekerjaan owner dan
+// tertulis di `DEPLOY.md`; kode tidak bisa memaksakannya, jadi kode tidak berpura-pura bisa.
+//
+// ==========================================================================================
+// KEADAAN LAMA (tetap ditulis: jalur header masih dipertahankan sebagai CADANGAN)
+// ==========================================================================================
+// Sebelum zona `fiezel.my.id` aktif, dashboard dijangkau lewat pola yang sudah terbukti untuk
 // `api.fiezel.my.id`: subdomain cPanel di origin ArenHost + proxy PHP
 // (`deploy/edge/owner-index.php`) yang meneruskan ke `fiezel-owner.fitrajft.workers.dev`.
 //
-// Akibatnya Worker ini hidup di DUA alamat, dan alamat `*.workers.dev` tidak bisa dimatikan
-// (proxy memanggilnya). Selama ia terbuka tanpa syarat, halaman masuk owner bisa ditembak
-// langsung tanpa lewat jembatan: rem login per-isolate bisa diputar dengan meminta isolate baru,
-// dan Cloudflare Access (yang dipasang PER HOSTNAME) sama sekali tidak berlaku di alamat
-// `workers.dev`. Artinya lapis kedua yang dijanjikan README §2 hanya nyata di jembatan.
+// Jalur itu TIDAK dihapus, dan ini alasannya (bukan kemalasan):
+//   (i)  cache DNS lama + kemungkinan owner mengembalikan jembatan bila custom domain bermasalah;
+//   (ii) `deploy/edge/owner-index.php` dan .htaccess-nya masih ada di repo dan masih dijaga
+//        gerbang ini — menghapus jalurnya di kode akan membuat artefak itu mati diam-diam;
+//   (iii) sabuk dan bretel: header sah TIDAK cukup di hostname yang tidak dikenal, sehingga
+//        hostname yang tersalah-pasang di masa depan tidak menjadi pintu kedua.
+// Selama alamat `*.workers.dev` hidup, ia adalah pintu yang TIDAK dilewati Cloudflare Access.
+// Karena itu jalur header hanya berlaku DI SANA, dan hanya dengan secret yang benar.
 //
 // KENAPA DISALIN, BUKAN DIIMPOR. Penjaga yang sama sudah ada di `workers/api/mw-edge.js`. Impor
 // tidak mungkin: `workers/api` dan `workers/owner` adalah DUA Worker dengan graf modul, bundling,
@@ -229,6 +296,58 @@ function deny() {
 // `edge-guard-test.js` (sisi api) dan `owner-edge-guard-test.js` (sisi owner).
 
 const EDGE_HEADER = 'x-fiezel-edge';
+
+// SATU SUMBER KEBENARAN hostname yang boleh lolos TANPA header jembatan: hostname yang benar-benar
+// terikat ke Worker ini sebagai CUSTOM DOMAIN. Harus identik dengan
+// `routes = [{ pattern = ..., custom_domain = true }]` di `workers/owner/wrangler.toml` —
+// `owner-edge-guard-test.js` butir (g-a) memaksa keduanya sama, supaya daftar ini tidak bisa
+// tumbuh diam-diam menjadi hostname yang tidak pernah berdiri di Cloudflare.
+// Huruf kecil semua; pembanding menormalkan masukan.
+const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id']);
+
+// Akhiran alamat asal Worker. Ia BUKAN jalur owner: Cloudflare Access dipasang per hostname dan
+// tidak berlaku di sini, jadi hostname ini tidak boleh pernah lolos tanpa secret jembatan.
+const WORKERS_DEV_SUFFIX = '.workers.dev';
+
+// Normalisasi hostname: huruf kecil, tanpa spasi, tanpa titik akhir.
+function normalizeHost(value) {
+  return String(value == null ? '' : value).trim().toLowerCase().replace(/\.$/, '');
+}
+
+// Hostname permintaan, DARI `request.url` (dirakit + dinormalkan runtime, dan nilai yang sama
+// yang dipakai perutean Cloudflare memilih Worker ini). SENGAJA BUKAN dari `headers.get('host')`
+// maupun `X-Forwarded-Host` — alasannya panjang dan ada di bab "SINYAL HOSTNAME" di atas.
+// URL yang tidak bisa diurai mengembalikan string kosong, dan string kosong tidak pernah
+// tepercaya (gagal ke arah aman).
+function requestHostname(request) {
+  try {
+    return normalizeHost(new URL(request.url).hostname);
+  } catch (_) {
+    return '';
+  }
+}
+
+// Alamat asal Worker (`*.workers.dev`, termasuk Preview URL `<versi>-fiezel-owner.<sub>.workers.dev`
+// yang berakhiran sama). Dicek dengan AKHIRAN, bukan substring: `workers.dev.penyerang.com`
+// tidak boleh ikut terhitung.
+function isWorkersDevHost(host) {
+  const h = normalizeHost(host);
+  return h === 'workers.dev' || h.endsWith(WORKERS_DEV_SUFFIX);
+}
+
+// Hostname kanonik tepercaya. `*.workers.dev` tidak pernah masuk, apa pun isi daftar di atas.
+// Pencocokan PERSIS (bukan substring/akhiran): `owner.fiezel.my.id.penyerang.com` bukan owner.
+function isTrustedEdgeHost(host) {
+  const h = normalizeHost(host);
+  if (!h || isWorkersDevHost(h)) return false;
+  return TRUSTED_EDGE_HOSTS.includes(h);
+}
+
+// Nilai jalur yang mungkin. Satu sumber kebenaran untuk penjaga DAN gerbang test. Meniru
+// `EDGE_PATHS` di `workers/api/mw-edge.js`; `'denied'` ada di sini (dan tidak ada di sisi api)
+// karena owner tidak punya `/health` untuk melaporkan jalurnya, jadi satu-satunya pembaca nilai
+// ini adalah gerbang test — dan gerbang harus bisa membedakan "lolos lewat apa" dari "ditolak".
+const EDGE_PATHS = Object.freeze(['custom-domain', 'header', 'off', 'free-path', 'denied']);
 
 // Owner TIDAK punya path bebas header. `workers/api` membebaskan `/healthz` karena monitor
 // eksternal harus bisa melihat API murid hidup tanpa mengirim rahasia. Dashboard owner tidak
@@ -246,13 +365,20 @@ function edgeSecret(env) {
 }
 
 // Dua nilai saja, dan keduanya jujur:
-//   'on'  = setiap permintaan wajib membawa header jembatan yang benar.
-//   'off' = secret belum dipasang; hanya mungkin bila ALLOW_NO_EDGE_SECRET === 'true'
-//           dipasang secara eksplisit (tanpa itu, guard menolak semua — FAIL-CLOSED).
+//   'on'  = penjaga MENEGAKKAN: setiap permintaan harus tiba di hostname kanonik ATAU membawa
+//           header jembatan yang benar.
+//   'off' = tidak ada penegakan sama sekali; HANYA mungkin bila secret belum dipasang DAN
+//           ALLOW_NO_EDGE_SECRET === 'true' dipasang secara eksplisit.
 // Nilai ini TIDAK pernah dikirim ke klien mana pun (dashboard owner tidak punya `/health`), jadi
 // ia bukan oracle publik. Ia hanya untuk gerbang dan untuk log.
+//
+// KOREKSI 28 Agu 2026: rumusnya dulu `edgeSecret(env) ? 'on' : 'off'`, yang sejak jalur hostname
+// ada menjadi BOHONG — tanpa secret pun penegakan hostname tetap jalan dan hostname asing tetap
+// ditolak. Rumus di bawah disamakan dengan `edgeGuardStatus()` di `workers/api/mw-edge.js`
+// (dua penjaga yang disalin HARUS bergerak bersama): 'off' hanya kalau memang tidak ada yang
+// ditegakkan.
 function edgeGuardStatus(env) {
-  return edgeSecret(env) ? 'on' : 'off';
+  return edgeSecret(env) || !allowNoSecretOverride(env) ? 'on' : 'off';
 }
 
 // Peringatan `off` dicatat SEKALI per isolate, bukan sekali per permintaan: satu baris log per
@@ -294,51 +420,96 @@ function warnEdgeGuardClosed() {
 
 // Pembuka darurat, HARUS string persis 'true' — bukan truthy. '1', 'yes', atau true boolean
 // dari kesalahan wrangler.toml TIDAK membuka gerbang; salah ketik gagal ke arah aman.
+//
+// KOREKSI 28 Agu 2026 (lubang yang ditemukan saat menambah jalur hostname): versi sebelumnya
+// memakai `.toLowerCase()`, sehingga `"TRUE"` DAN `"True"` ikut membuka gerbang — padahal
+// kembarannya `allowNoSecretOverride()` di `workers/api/mw-edge.js` sengaja TIDAK melakukan itu
+// dan komentar di berkas ini sendiri berjanji "string persis 'true'". Janji yang tidak ditegakkan
+// adalah lubang: `ALLOW_NO_EDGE_SECRET="TRUE"` yang tersalin dari catatan owner akan membuka
+// `*.workers.dev` tanpa ada yang menyadarinya. `.toLowerCase()` DIHAPUS; hanya `'true'` (setelah
+// trim) yang dihitung, sama seperti sisi api.
 function allowNoSecretOverride(env) {
   const raw = env ? env.ALLOW_NO_EDGE_SECRET : null;
-  const norm = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  const norm = typeof raw === 'string' ? raw.trim() : '';
+  // Perbandingan biasa di sini AMAN dan disengaja: 'true' bukan nilai rahasia.
   return norm === 'true';
 }
 
-// FAIL-CLOSED dengan cara yang SAMA seperti mw-edge.js:
-//  - begitu secret terpasang, SETIAP rute (termasuk halaman masuk) wajib berheader benar;
-//  - perbandingannya waktu-konstan (ctEq), karena header ini bisa dicoba tanpa batas dan
-//    operator kesetaraan biasa berhenti pada byte pertama yang berbeda -> waktunya membocorkan
-//    panjang prefiks yang cocok;
-//  - penolakannya memakai deny() yang SAMA dengan gate owner, sehingga bentuknya identik untuk
-//    header hilang, header salah, dan sesi owner tidak ada. Penyerang tidak bisa menyimpulkan
-//    apakah secret terpasang, header mana yang diperiksa, atau lapis mana yang menolaknya;
-//  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
-//    yang memicunya, dan tidak boleh membakar anggaran plan gratis.
+// DUA JALUR SAH, satu penolakan. Urutannya disamakan dengan `edgeGuardMiddleware()` di
+// `workers/api/mw-edge.js` (dua penjaga ini disalin dan HARUS bergerak bersama):
 //
-// FAIL-CLOSED sejak audit D3 HIGH-3 (selaras dengan mw-edge.js — dua penjaga ini disalin dan
-// HARUS bergerak bersama): tanpa secret, SEMUA permintaan ditolak. `off` BUKAN mode produksi;
-// ia hanya bisa terjadi bila owner memasang var ALLOW_NO_EDGE_SECRET='true' secara eksplisit
-// (mis. masa transisi sebelum jembatan PHP owner terpasang). Konsekuensi fail-closed: deploy
-// SEBELUM `wrangler secret put EDGE_SHARED_SECRET` membuat dashboard mati sampai secret
-// dipasang — itu disengaja; yang terdampak satu orang, dan orang itu memegang kuncinya.
-// Selama `off` dipaksa, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
-// (i) segera setelah secret dipasang (hapus juga var pembukanya), dan (ii) selamanya setelah
-// nameserver pindah ke Cloudflare dan custom domain menggantikan jembatan PHP (saat itu
-// `workers_dev = false` menutup lubangnya secara struktural, dan penjaga ini boleh menolak
-// tanpa syarat atau dihapus).
-function edgeGuard(request, env, pathname) {
+//  [0] `EDGE_FREE_PATHS` — kosong di owner. Nol permukaan terbuka di `*.workers.dev`.
+//  [*] mode transisi eksplisit (`ALLOW_NO_EDGE_SECRET === 'true'` tanpa secret): tidak menolak
+//      apa pun, DAN itu diumumkan lewat console.warn + `edgeGuardStatus()` bernilai `off`.
+//      Var ini hanya sah selama masa transisi; ia BUKAN mode produksi. Sejak custom domain
+//      aktif ia TIDAK LAGI DIBUTUHKAN untuk operasi normal — jalur [1] sudah menyelesaikan
+//      masalah yang dulu dipaksa dibuka dengan var ini, tanpa membuka `*.workers.dev`.
+//  [1] JALUR UTAMA: hostname kanonik (`TRUSTED_EDGE_HOSTS`) lolos TANPA header. Diperiksa
+//      SEBELUM `configuredEdge` supaya dashboard TIDAK ikut mati pada langkah pembongkaran
+//      jembatan (yaitu saat owner menghapus `EDGE_SHARED_SECRET`).
+//  [2] JALUR CADANGAN: proxy PHP -> `*.workers.dev` dengan `X-Fiezel-Edge` yang benar.
+//      Perbandingannya waktu-konstan (ctEq): header ini bisa dicoba tanpa batas, dan operator
+//      kesetaraan biasa berhenti pada byte pertama yang berbeda sehingga waktunya membocorkan
+//      panjang prefiks yang cocok.
+//  [3] DEFAULT-DENY: hostname asing/karangan ditolak APA PUN headernya.
+//
+// YANG SENGAJA TIDAK TERJADI: header `X-Fiezel-Edge` TIDAK menaikkan hak apa pun di hostname
+// kanonik. Di sana ia sudah lolos lewat jalur [1] dan headernya tidak pernah dibaca — jadi
+// header palsu maupun header benar sama-sama tidak mengubah apa pun, dan tetap tidak
+// menggantikan sesi owner (lapis 2).
+//
+// Sifat lain yang dipertahankan utuh:
+//  - penolakannya memakai deny() yang SAMA dengan gate owner, sehingga bentuknya identik untuk
+//    header hilang, header salah, hostname asing, fail-closed, dan sesi owner tidak ada.
+//    Penyerang tidak bisa menyimpulkan apakah secret terpasang, hostname mana yang dikenal,
+//    atau lapis mana yang menolaknya;
+//  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
+//    yang memicunya, dan tidak boleh membakar anggaran plan gratis;
+//  - FAIL-CLOSED (audit D3 HIGH-3) tetap berlaku untuk jalur CADANGAN: tanpa secret, hostname
+//    `*.workers.dev` dan hostname asing ditolak semuanya.
+function edgeGuardDecision(request, env, pathname) {
+  if (EDGE_FREE_PATHS.includes(pathname)) return { allowed: true, edgePath: 'free-path' };
+
   const configuredEdge = edgeSecret(env);
-  if (!configuredEdge) {
-    if (allowNoSecretOverride(env)) {
-      warnEdgeGuardOff();
-      return null;
-    }
-    warnEdgeGuardClosed();
-    // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
-    return deny();
+
+  if (!configuredEdge && allowNoSecretOverride(env)) {
+    warnEdgeGuardOff();
+    return { allowed: true, edgePath: 'off' };
   }
-  if (EDGE_FREE_PATHS.includes(pathname)) return null;
-  const presentedEdge = request && request.headers && request.headers.get
-    ? request.headers.get(EDGE_HEADER)
-    : null;
-  if (ctEq(presentedEdge, configuredEdge)) return null;
-  return deny();
+
+  const host = requestHostname(request);
+
+  // [1] JALUR UTAMA — hostname kanonik. Tidak membaca satu header pun.
+  if (isTrustedEdgeHost(host)) return { allowed: true, edgePath: 'custom-domain' };
+
+  // [2] JALUR CADANGAN — hanya di alamat asal Worker, hanya dengan secret yang benar.
+  if (!configuredEdge) {
+    warnEdgeGuardClosed();
+    return { allowed: false, edgePath: 'denied' };
+  }
+  if (isWorkersDevHost(host)) {
+    const presentedEdge = request && request.headers && request.headers.get
+      ? request.headers.get(EDGE_HEADER)
+      : null;
+    if (ctEq(presentedEdge, configuredEdge)) return { allowed: true, edgePath: 'header' };
+    return { allowed: false, edgePath: 'denied' };
+  }
+
+  // [3] DEFAULT-DENY untuk hostname asing.
+  return { allowed: false, edgePath: 'denied' };
+}
+
+// JALUR yang benar-benar dipakai permintaan ini. Cermin `edgeGuardPath()` di
+// `workers/api/mw-edge.js`; di owner ia tidak pernah dikirim ke klien (tidak ada `/health`),
+// jadi ia bukan oracle publik — ia untuk gerbang test dan untuk penalaran manusia.
+function edgeGuardPath(request, env, pathname) {
+  const decision = edgeGuardDecision(request, env, pathname);
+  return EDGE_PATHS.includes(decision.edgePath) ? decision.edgePath : 'unknown';
+}
+
+function edgeGuard(request, env, pathname) {
+  // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
+  return edgeGuardDecision(request, env, pathname).allowed ? null : deny();
 }
 
 /* ============================ Rumus biaya (cf-a10) ======================================== */
@@ -1043,22 +1214,396 @@ function json(payload, status) {
   });
 }
 
-/* ============================ Rem sederhana untuk halaman masuk =========================== */
-// Per-isolate, dalam memori: nol tulis KV (free-tier-safe). Kejujuran: rem ini hanya
-// menyulitkan penebakan cepat pada satu isolate, bukan akuntansi global. Pertahanan
-// sebenarnya adalah token 32 byte acak + Cloudflare Access di depan hostname (README).
-const loginAttempts = new Map();
-const LOGIN_MAX = 8;
-const LOGIN_WINDOW_MS = 10 * 60 * 1000;
+/* ============================ Rem penebakan halaman masuk ================================= */
+//
+// ==========================================================================================
+// 🔄 TEMUAN LAPANGAN 28 Agu 2026 (D4) — REM VERSI LAMA DEKORATIF, DIUKUR KE PRODUKSI HIDUP
+// ==========================================================================================
+// Versi sebelum commit ini:
+//
+//     const loginAttempts = new Map();                  // <-- lingkup MODUL = per ISOLATE
+//     const LOGIN_MAX = 8;
+//     if (loginThrottled('login', now)) ...             // <-- KUNCI KONSTAN = satu ember global
+//
+// Dua cacat, dan keduanya diukur, bukan ditebak:
+//
+// CACAT 1 — REM TIDAK PERNAH TERKUMPUL. `Map` di lingkup modul hidup di dalam SATU isolate.
+//   Cloudflare menjalankan banyak isolate per colo dan mendaur ulangnya sesuka runtime, jadi
+//   penghitungnya tidak pernah menumpuk. Bukti lapangan: **12 percobaan token salah berturut-
+//   turut** ke `POST https://owner.fiezel.my.id/login` menghasilkan **403 dua belas kali, NOL
+//   429**, padahal `LOGIN_MAX` = 8. Remnya tidak pernah menyentuh sekali pun. Ini kelas cacat
+//   yang sama dengan `rate-anon.js` sebelum ia memakai D1: "jatuh ke Map per isolate" adalah
+//   fail-open yang dinamai lain, karena batas efektifnya = batas x jumlah isolate.
+//
+// CACAT 2 — KUNCI REM KONSTAN. `loginThrottled('login', now)` memakai string tetap, jadi SATU
+//   ember untuk seluruh dunia. Kalau remnya benar-benar bekerja, penyerang cukup delapan kali
+//   gagal untuk MENGUNCI OWNER keluar dari dashboardnya sendiri. Salah dua arah sekaligus:
+//   tidak menahan penyerang, tetapi sanggup menahan pemilik.
+//
+// ==========================================================================================
+// PENYIMPANAN YANG DIPILIH: KV `fiezel-CFG` (binding `CFG`) — BUKAN D1 `fiezel-stats`
+// ==========================================================================================
+// D1 `fiezel-stats` sudah terikat di Worker ini sebagai `ANALYTICS`, jadi memakainya "gratis"
+// dari sisi konfigurasi. Ia tetap DITOLAK, dan alasannya bisa diperiksa:
+//   1. Ia database ANALYTICS. `DEPLOY.md` + `analytics-privacy-test.js` mengunci database itu
+//      pada LIMA tabel agregat; tabel rem login adalah data AUTH, dan menaruhnya di sana
+//      melanggar pemisahan yang justru menjadi alasan Worker ini berdiri sendiri (README §1
+//      "radius ledakan").
+//   2. Worker ini HANYA-BACA terhadap `fiezel-stats`, dan sifat itu ditegakkan gerbang
+//      (`queries.js` menolak memuat kata tulis; `owner-dashboard-test.js` gagal bila ada
+//      pernyataan tulis). Rem yang menulis akan mengubah pembaca menjadi penulis — satu
+//      invarian hilang untuk satu penghitung.
+//   3. D1 single-threaded per database (cf-a11 risiko 5): tulis rem login akan berebut dengan
+//      rollup analytics. Rem auth tidak boleh menjadi tetangga sibuk pekerjaan agregat.
+//
+// KV `fiezel-CFG` dipilih dengan HARGA YANG DIHITUNG, bukan diasumsikan:
+//
+// (a) KUOTA TULIS. Plan gratis: **1.000 tulis/hari** untuk kunci berbeda dan **1 tulis/detik**
+//     untuk kunci yang sama (developers.cloudflare.com/kv/platform/limits/). Karena itu:
+//       · yang menulis HANYA percobaan yang GAGAL. Login berhasil = NOL tulis; owner yang
+//         menempel token dengan benar tidak pernah membebani kuota.
+//       · percobaan yang DITOLAK 429 = NOL tulis (pola yang sama dengan `rate-anon.js`:
+//         "penolakan: 1 SELECT saja, NOL tulis"). Ember yang sudah penuh tidak bisa dipakai
+//         penyerang untuk membakar kuota tulis.
+//       · konsekuensinya batas atas tulis dari SATU sumber yang menyerang tanpa henti =
+//         LOGIN_MAX per jendela = 5 per 10 menit = 30/jam = **720/hari**, yaitu 72% dari
+//         1.000/hari, menyisakan ~280 tulis untuk `PUT /api/owner/flags` dan penanda anti-replay
+//         `claim:jti:*` yang juga hidup di namespace ini. Angka 8 (nilai lama) akan memberi
+//         8 x 6 x 24 = 1.152 tulis/hari, yaitu MELEBIHI kuota harian dari satu penyerang saja.
+//         Itu salah satu dari dua alasan LOGIN_MAX diturunkan ke 5; lihat bab ANGKA JENDELA.
+//       · serangan TERSEBAR (banyak IP) memang bisa menghabiskan kuota tulis: 200 IP x 5 = 1.000.
+//         Yang terjadi kemudian BUKAN owner terkunci — lihat bab KEPUTUSAN KEGAGALAN
+//         PENYIMPANAN. Ini ditulis di sini supaya tidak ada yang mengira KV membuat rem ini
+//         kebal.
+//
+// (b) KONSISTENSI EVENTUAL — INI HARGA SEBENARNYA, DAN ANGKANYA JUJUR. KV menyimpan pusat lalu
+//     men-cache per lokasi; perubahan bisa butuh **60 detik atau lebih** untuk terlihat di
+//     lokasi lain, dan lebih lama di lokasi yang baru saja membaca versi sebelumnya —
+//     termasuk pembacaan yang menyatakan kunci TIDAK ADA
+//     (developers.cloudflare.com/kv/concepts/how-kv-works/). Nilai `cacheTtl` default 60 detik
+//     dan MINIMUM yang diizinkan 30 detik
+//     (developers.cloudflare.com/kv/api/read-key-value-pairs/), jadi rem ini memakai **30**:
+//     jendela lag paling sempit yang boleh diminta.
+//     BERAPA PERCOBAAN BISA LOLOS DI JENDELA LAG: selama satu jendela cache (≤30 detik) sebuah
+//     lokasi bisa membaca hitungan yang basi (paling buruk: "kunci tidak ada"), jadi pada
+//     jendela itu yang menegakkan batas hanyalah lapis memori per-isolate — yaitu
+//     LOGIN_MAX (5) percobaan per isolate per 30 detik. Praktisnya satu klien yang menembak
+//     lewat satu koneksi dilayani isolate yang sama, jadi ~5 percobaan/30 detik ≈ 10/menit;
+//     penyerang yang benar-benar mendapat isolate baru setiap permintaan bisa melewatinya lebih
+//     banyak selama 30 detik pertama. Sesudah jendela lag itu, hitungan terkumpul menjadi
+//     terlihat dan sumber itu terkunci untuk sisa jendela 10 menit. Bandingkan dengan keadaan
+//     HARI INI (12 dari 12 percobaan lolos, tanpa batas apa pun): remnya berubah dari nol
+//     menjadi ratusan kali lebih rapat. Itu sebabnya harga konsistensi eventual DITERIMA di
+//     sini — yang dilindungi bukan invarian akuntansi, ini rem banjir.
+//     Kunci ember juga SENGAJA berputar per 2 menit (`LOGIN_BUCKET_MS`): nama kunci yang baru
+//     belum punya entri cache, jadi kerusakan akibat cache basi terbatas kira-kira selebar SATU
+//     ember, bukan selebar seluruh jendela.
+//
+// (c) KUOTA BACA. 100.000 baca/hari (plan gratis). Satu percobaan = `LOGIN_WINDOW_BUCKETS` (5)
+//     baca. Sumber yang sudah diketahui terkunci di isolate ini ditolak dengan **NOL** operasi
+//     KV (lapis memori jadi cache-negatif), jadi banjir berkepanjangan tidak menguras kuota
+//     baca sebesar 5x jumlah permintaan.
+//
+// (d) NOL binding baru ke `fiezel-core`. Binding yang ditambahkan HANYA `CFG` -> `fiezel-CFG`
+//     (namespace flag/config yang sudah ada, id 6386fc9752e14afd8a8f76a8d45e47d1). Database
+//     `fiezel-core` (identity/session/quota_daily = data per-orang) TIDAK pernah terikat di
+//     Worker ini, dan `owner-edge-guard-test.js` butir (g-g) tetap memaksanya.
+//     Klaim "nol tulis KV" di `wrangler.toml`/README SUDAH DIPERBAIKI, bukan dibiarkan bohong.
+//
+// ==========================================================================================
+// KUNCI EMBER: PER-SUMBER, DAN IP TIDAK PERNAH DISIMPAN MENTAH
+// ==========================================================================================
+// Sumbernya `CF-Connecting-IP` — header yang DITULIS Cloudflare, bukan klien: apa pun yang
+// dikirim klien dengan nama itu ditimpa sebelum Worker melihatnya. Ia dipakai HANYA sebagai
+// kunci ember, TIDAK PERNAH sebagai pemilih tarif atau pemberi hak (pola yang sama, dan alasan
+// yang sama, seperti `workers/api/rate-anon.js`).
+//
+// IP MENTAH TIDAK PERNAH DISIMPAN DAN TIDAK PERNAH DICATAT. Yang menjadi kunci adalah
+// HMAC-SHA256(salt, 'owner-login|v1|<indeks-hari>|<lingkup>|<ip>') dipotong 128 bit — persis
+// pendekatan `rate-anon.js:ipHmacOf()` (indeks hari ikut ditandatangani supaya hash tidak bisa
+// dipakai melacak satu jaringan antar hari). Salt: `RATE_SALT` (nama yang sama dengan rem laju
+// lain), lalu `OWNER_SESSION_KEY` sebagai lantai kedua supaya kunci tetap ber-secret walau owner
+// belum memasang `RATE_SALT` (keluarannya satu arah + terpotong, jadi ia tidak membocorkan kunci
+// sesi; memutar kunci itu hanya mengosongkan ember, dan itu tidak berbahaya), lalu konstanta
+// sebagai lantai terakhir — masih hash satu arah, hanya tidak ber-secret. Pasang `RATE_SALT`.
+//
+// KENAPA PER-SUMBER ITU SYARAT, BUKAN PENYEMPURNAAN: dengan satu ember global, delapan
+// percobaan gagal dari siapa pun akan MENGUNCI OWNER keluar dari satu-satunya pintunya. Rem
+// yang bisa dipakai menyerang ketersediaan owner lebih buruk daripada rem yang tidak ada.
+//
+// JALUR JEMBATAN (`edgePath === 'header'`, proxy PHP -> *.workers.dev) TIDAK punya IP murid:
+// `deploy/edge/*.php` sengaja tidak meneruskannya (keputusan privasi di berkas itu). Di jalur
+// itu semua permintaan tampak dari satu IP, jadi embernya memang BERSAMA — dan karena ember
+// bersama bisa dipakai mengunci owner, batasnya dipisah dan dilonggarkan (`LOGIN_MAX_SHARED`),
+// sama seperti cabang jembatan di `rate-anon.js` yang menjadi anggaran GLOBAL, bukan per-orang.
+// Granularitas per-sumber di belakang jembatan MUSTAHIL tanpa meneruskan IP; itu batas nyata,
+// bukan kelalaian. Jalur jembatan tetap cadangan; jalur hidup hari ini adalah custom domain.
+//
+// ==========================================================================================
+// ANGKA JENDELA, UNTUK SATU MANUSIA YANG KADANG SALAH TEMPEL TOKEN
+// ==========================================================================================
+// LOGIN_MAX = 5 percobaan GAGAL per sumber per 10 menit BERGULIR (5 ember x 2 menit).
+//   · satu manusia yang salah tempel: 1-2 kali (token terpotong, spasi ikut tersalin, salah
+//     entri di password manager). 3 kali sudah hari yang buruk. 5 = ~2x hari terburuk itu.
+//   · sisi penyerang: 5 per 10 menit = 720 percobaan/hari/sumber terhadap token 32 byte acak.
+//     Peluang menebaknya tetap nol untuk semua maksud praktis (lihat bab KEJUJURAN).
+//   · sisi kuota: 720 tulis KV/hari (bab PENYIMPANAN (a)) — di bawah 1.000/hari. Angka 8 lama
+//     akan melewatinya sendirian.
+// JENDELA BERGULIR, bukan reset di menit ke-0 (pelajaran `rate-anon.js`): dengan ember tetap,
+// penyerang cukup MENUNGGU pergantian jendela untuk mendapat kuota penuh, dan dua ember
+// berdampingan memberi 2x batas dalam dua menit.
+// OWNER TIDAK BISA TERKUNCI SELAMANYA OLEH KESALAHANNYA SENDIRI:
+//   · ember tertua keluar dari jendela setiap 2 menit, jadi owner yang kehabisan percobaan
+//     mendapat satu percobaan lagi setelah **2 menit** — bukan "tunggu 10 menit", dan bukan
+//     "tunggu sampai jam berganti";
+//   · seluruh jendela pulih setelah **10 menit** tanpa percobaan gagal baru;
+//   · kunci KV berumur `LOGIN_KV_TTL_S` (jendela + satu ember) lalu HILANG SENDIRI — tidak ada
+//     baris yang menumpuk, tidak ada cron pembersih, tidak ada keadaan yang bisa "macet"
+//     terkunci karena sesuatu lupa dihapus;
+//   · login BERHASIL tidak pernah menambah hitungan, dan kegagalan lama tidak pernah menghalangi
+//     percobaan setelah jendelanya bergulir habis.
+//
+// ==========================================================================================
+// KEPUTUSAN: KALAU PENYIMPANAN GAGAL (KV galat / kuota habis / binding belum dipasang)
+// ==========================================================================================
+// YANG DIPILIH: **FAIL-OPEN terhadap PENGUNCIAN** — galat penyimpanan TIDAK PERNAH, dengan
+// sendirinya, menghasilkan 429. Remnya tidak menghilang: ia jatuh ke lapis memori per-isolate
+// dengan batas YANG SAMA (bukan diperketat), jadi banjir di dalam satu isolate tetap tertahan.
+//
+// INI SENGAJA KEBALIKAN dari `workers/api/rate-anon.js`, yang memilih "fail-closed terhadap
+// pembatas" (pembatas tetap jalan DAN batasnya diperketat ke 5). Kenapa berbeda:
+//   · YANG DILINDUNGI BERBEDA. Di jalur murid, yang di belakang pintu adalah UANG: setiap
+//     identitas baru membawa jatah AI/TTS, jadi penyerang yang membuat penyimpanan gagal
+//     MENDAPAT sesuatu. Di sini yang di belakang pintu adalah token acak 32 byte; penyerang
+//     yang membuat KV gagal tidak mendapat apa pun yang bisa ia pakai — ia masih harus menebak
+//     yang tak bisa ditebak.
+//   · SIAPA YANG MENANGGUNG SALAH-KETAT BERBEDA. Di jalur murid, batas yang terlalu rapat
+//     menunda AI/TTS satu murid dan pelajarannya tetap jalan (semua lokal). Di sini pintunya
+//     SATU dan penggunanya SATU: kalau rem mengunci owner karena KV sedang tersendat, orang
+//     yang terkunci adalah satu-satunya orang yang bisa memperbaiki apa pun — dan ia tidak
+//     punya cara mengosongkan ember dari luar. Kegagalan penyimpanan tidak boleh menjadi
+//     kunci gembok.
+//   · ARAH PENYALAHGUNAANNYA BERBEDA. Membuat rem ini gagal ke arah "terbuka" memberi penyerang
+//     paling banyak beberapa percobaan tambahan per isolate; membuat rem murid gagal ke arah
+//     "terbuka" memberi penyerang identitas tak terbatas, dan itu tagihan.
+// Yang TIDAK dilakukan di sini, dan itu penting: rem tidak pernah mengembalikan 429 karena
+// pembacaan penyimpanan GAGAL, dan tidak pernah menaikkan hitungan siapa pun karena galat.
+//
+// ==========================================================================================
+// KEJUJURAN: APA YANG REM INI TIDAK MENCEGAH
+// ==========================================================================================
+// Rem ini menahan PENEBAKAN dan credential stuffing berlaju tinggi dari satu sumber. Ia TIDAK
+// menolong sedikit pun terhadap ancaman yang sebenarnya: **token yang BOCOR**. Token owner
+// dibuat `openssl rand -base64 32` (32 byte acak); menebaknya di luar jangkauan siapa pun,
+// dengan atau tanpa rem. Penyerang yang MEMEGANG tokennya masuk pada percobaan PERTAMA, dan
+// rem apa pun akan meloloskannya karena satu percobaan yang benar tidak pernah tampak seperti
+// serangan. Yang menutup jalur itu bukan rem, melainkan: (1) ROTASI token yang bocor, (2)
+// Cloudflare Access + MFA di depan `owner.fiezel.my.id` (lapis kedua yang dijanjikan README §2,
+// belum aktif — butuh satu tindakan owner di dashboard Zero Trust), (3) umur sesi 30 menit.
+// Jangan membaca 429 di halaman ini sebagai "dashboard sudah aman".
 
-function loginThrottled(bucketKey, nowMs) {
-  const entry = loginAttempts.get(bucketKey);
-  if (!entry || nowMs - entry.start > LOGIN_WINDOW_MS) {
-    loginAttempts.set(bucketKey, { start: nowMs, count: 1 });
-    return false;
+const LOGIN_MAX = 5;                        // percobaan GAGAL per sumber per jendela
+const LOGIN_MAX_SHARED = 20;                // jalur jembatan: SATU ember untuk semua, jadi lebih longgar
+const LOGIN_BUCKET_MS = 2 * 60 * 1000;      // lebar satu ember; juga granularitas pemulihan
+const LOGIN_WINDOW_BUCKETS = 5;             // 5 x 2 menit = jendela 10 menit BERGULIR
+const LOGIN_WINDOW_MS = LOGIN_BUCKET_MS * LOGIN_WINDOW_BUCKETS;
+// `Retry-After` KONSTANTA = lebar satu ember. Keputusan anti-oracle (pola `rate-anon.js`):
+// nilai yang dihitung dari ember tertua akan memberi tahu penyerang kapan ia terakhir mencoba.
+const LOGIN_RETRY_AFTER_S = LOGIN_BUCKET_MS / 1000;
+const LOGIN_KV_PREFIX = 'ownerlogin:v1:';
+const LOGIN_KV_CACHE_TTL_S = 30;            // MINIMUM yang diizinkan KV; jendela lag tersempit
+const LOGIN_KV_TTL_S = (LOGIN_WINDOW_MS + LOGIN_BUCKET_MS) / 1000;  // kunci hilang sendiri
+const LOGIN_DAY_MS = 86400000;
+// BUKAN secret — hanya memastikan IP tidak pernah menjadi kunci mentah bahkan tanpa secret.
+const LOGIN_SALT_FALLBACK = 'fiezel-owner-login-brake-v1';
+const LOGIN_THROTTLE_TEXT = 'Terlalu banyak percobaan token yang gagal dari jaringan ini. '
+  + 'Tunggu beberapa menit, lalu coba lagi.';
+
+// Salt kunci rem. Urutan sengaja; lihat bab KUNCI EMBER.
+function loginRateSalt(env) {
+  const rate = env && typeof env.RATE_SALT === 'string' ? env.RATE_SALT.trim() : '';
+  if (rate) return rate;
+  const sessionKey = env && typeof env.OWNER_SESSION_KEY === 'string' ? env.OWNER_SESSION_KEY.trim() : '';
+  if (sessionKey) return sessionKey;
+  return LOGIN_SALT_FALLBACK;
+}
+
+// Kunci ember: `YYYY-MM-DDThh:mm` UTC dengan menit dibulatkan ke bawah ke kelipatan lebar ember.
+// Lebar tetap + berawalan tanggal (bentuk yang sama dengan `rate-anon.js:bucketKey`).
+function loginBucketKey(nowMs) {
+  const floored = Math.floor(Number(nowMs) / LOGIN_BUCKET_MS) * LOGIN_BUCKET_MS;
+  return new Date(floored).toISOString().slice(0, 16);
+}
+
+// Ember jendela BERGULIR: ember sekarang + (LOGIN_WINDOW_BUCKETS-1) sebelumnya. Tidak ada titik
+// reset yang bisa ditunggu penyerang.
+function loginWindowKeys(nowMs) {
+  const keys = [];
+  for (let i = 0; i < LOGIN_WINDOW_BUCKETS; i += 1) keys.push(loginBucketKey(Number(nowMs) - i * LOGIN_BUCKET_MS));
+  return keys;
+}
+
+// IP pemanggil sebagaimana terlihat Cloudflare. Nilai ini HANYA masuk `loginSourceKey()`; ia
+// tidak pernah dicatat, tidak pernah dikembalikan ke klien, dan tidak pernah menjadi kunci
+// penyimpanan apa adanya. `x-real-ip` hanya lantai untuk harness (pola `rate-anon.js`), dan
+// `cf-connecting-ip` SELALU menang bila ada — jadi klien tidak bisa memecah embernya sendiri.
+function loginClientIp(request) {
+  const headers = request && request.headers && request.headers.get ? request.headers : null;
+  const cf = headers ? headers.get('cf-connecting-ip') : '';
+  const real = headers ? headers.get('x-real-ip') : '';
+  return String(cf || real || '').trim() || 'noip';
+}
+
+// Lingkup ember. 'shared' HANYA untuk jalur jembatan yang tidak membawa IP pemanggil.
+function loginBrakeScope(edgePath) {
+  return edgePath === 'header' ? 'shared' : 'ip';
+}
+
+function loginBrakeLimit(scope) {
+  return scope === 'shared' ? LOGIN_MAX_SHARED : LOGIN_MAX;
+}
+
+// Kunci per-sumber: HMAC bersalt + indeks hari + lingkup, dipotong 128 bit. Tidak ada IP mentah
+// yang pernah keluar dari fungsi ini.
+async function loginSourceKey(env, request, edgePath, nowMs) {
+  const scope = loginBrakeScope(edgePath);
+  const source = scope === 'shared' ? 'bridge' : loginClientIp(request);
+  const digest = await hmacHex(
+    loginRateSalt(env),
+    'owner-login|v1|' + Math.floor(Number(nowMs) / LOGIN_DAY_MS) + '|' + scope + '|' + source
+  );
+  return digest.slice(0, 32);   // 128 bit
+}
+
+/* Lapis kedua: ember per-isolate. Tiga tugas — (i) menahan banjir di dalam satu isolate lebih
+ * cepat dan lebih murah daripada KV, (ii) cache-negatif supaya sumber yang sudah diketahui
+ * terkunci ditolak dengan NOL operasi KV, (iii) satu-satunya rem yang tersisa bila KV gagal. */
+const loginMemory = new Map();
+
+function resetLoginBrakeForTests() {
+  loginMemory.clear();
+}
+
+function loginMemoryPrune(nowMs) {
+  const alive = new Set(loginWindowKeys(nowMs));
+  for (const key of loginMemory.keys()) {
+    if (!alive.has(key.slice(0, key.indexOf('|')))) loginMemory.delete(key);
   }
-  entry.count += 1;
-  return entry.count > LOGIN_MAX;
+}
+
+function loginMemoryCount(keys, source) {
+  let seen = 0;
+  for (const key of keys) seen += loginMemory.get(key + '|' + source) || 0;
+  return seen;
+}
+
+/**
+ * Periksa rem SEBELUM token dibandingkan. Mengembalikan keadaan yang dipakai
+ * `loginBrakeRecordFailure()`; `throttled === true` berarti tolak 429.
+ * Galat penyimpanan TIDAK PERNAH menghasilkan `throttled` (bab KEPUTUSAN).
+ */
+async function loginBrakeCheck(env, request, edgePath, nowMs) {
+  const scope = loginBrakeScope(edgePath);
+  const keys = loginWindowKeys(nowMs);
+  const source = await loginSourceKey(env, request, edgePath, nowMs);
+  const state = {
+    scope, keys, source, limit: loginBrakeLimit(scope),
+    throttled: false, headCount: 0, storage: 'memory',
+  };
+
+  loginMemoryPrune(nowMs);
+  if (loginMemoryCount(keys, source) >= state.limit) {
+    state.throttled = true;         // NOL operasi KV: cache-negatif melindungi kuota baca
+    return state;
+  }
+
+  const kv = env && env.CFG;
+  if (!kv || typeof kv.get !== 'function') return state;   // binding belum dipasang: memori saja
+
+  let raw = null;
+  try {
+    raw = await Promise.all(keys.map((key) => kv.get(
+      LOGIN_KV_PREFIX + key + ':' + source, { cacheTtl: LOGIN_KV_CACHE_TTL_S }
+    )));
+  } catch (_) {
+    // FAIL-OPEN terhadap PENGUNCIAN: galat penyimpanan tidak pernah menolak owner. Remnya tetap
+    // ada di lapis memori. Sebabnya tidak dicatat dengan nilai apa pun yang berasal dari IP.
+    state.storage = 'error';
+    return state;
+  }
+
+  state.storage = 'kv';
+  let total = 0;
+  for (const value of raw) {
+    const n = Math.floor(Number(value));
+    if (Number.isFinite(n) && n > 0) total += n;
+  }
+  const head = Math.floor(Number(raw[0]));
+  state.headCount = Number.isFinite(head) && head > 0 ? head : 0;
+  if (total >= state.limit) {
+    // Keputusan disimpan di isolate ini supaya percobaan berikutnya dari sumber yang sama
+    // ditolak tanpa menyentuh KV sama sekali.
+    loginMemory.set(keys[0] + '|' + source, state.limit);
+    state.throttled = true;
+  }
+  return state;
+}
+
+/**
+ * Catat SATU percobaan GAGAL. Login berhasil tidak pernah memanggil ini (nol tulis untuk owner
+ * yang benar), dan percobaan yang sudah ditolak 429 juga tidak (nol tulis untuk ember penuh).
+ * Bukan compare-and-swap: dua permintaan serentak bisa kehilangan satu hitungan — rem banjir,
+ * bukan invarian akuntansi (pernyataan yang sama ada di `rate-anon.js`).
+ */
+async function loginBrakeRecordFailure(env, state, nowMs) {
+  const head = state.keys[0] + '|' + state.source;
+  loginMemory.set(head, (loginMemory.get(head) || 0) + 1);
+  loginMemoryPrune(nowMs);
+  const kv = env && env.CFG;
+  if (state.storage === 'error' || !kv || typeof kv.put !== 'function') return;
+  try {
+    await kv.put(LOGIN_KV_PREFIX + state.keys[0] + ':' + state.source, String(state.headCount + 1), {
+      expirationTtl: LOGIN_KV_TTL_S,
+    });
+  } catch (_) {
+    // Kuota tulis habis atau KV tersendat: rem TIDAK hilang (lapis memori sudah dinaikkan di
+    // atas), dan owner TIDAK dikunci karena kegagalan itu.
+  }
+}
+
+// Amplop 429. Bentuknya tidak bergantung pada riwayat sumber: tidak ada `remaining`, tidak ada
+// `limit`, tidak ada `resetAt`, dan `Retry-After` KONSTANTA.
+function loginThrottleResponse() {
+  return html(renderLogin(LOGIN_THROTTLE_TEXT), 429, { 'retry-after': String(LOGIN_RETRY_AFTER_S) });
+}
+
+/* ============================ Penanda buku owner: `GET /` tanpa sesi ====================== */
+// CACAT KETIGA (D4): `GET /` tanpa sesi menjawab 403 `{"error":"forbidden"}`. Owner yang membuka
+// penanda buku — atau yang sesinya baru kedaluwarsa (30 menit, jadi ini kejadian HARIAN) —
+// melihat JSON galat dan menyangka dashboardnya rusak. Yang benar: arahkan ke halaman masuk.
+//
+// Yang TIDAK dilemahkan oleh perbaikan ini:
+//   · LAPIS 1 (penjaga tepi) tetap di depan: pengalihan ini hanya bisa dicapai permintaan yang
+//     SUDAH lolos hostname kanonik / header jembatan. Di hostname asing dan di `*.workers.dev`
+//     tanpa secret, jawabannya tetap 403 yang sama seperti sebelumnya;
+//   · LAPIS 2 tetap default-deny: HANYA `GET /` (satu rute, satu metode) yang dialihkan. Semua
+//     rute JSON, semua metode lain, dan semua rute yang belum ada tetap 403 — pembaca mesin
+//     tidak pernah dijawab dengan HTML/pengalihan;
+//   · NOL kebocoran keadaan konfigurasi: respons ini dibentuk SEBELUM apa pun tentang Secret
+//     diperiksa, jadi ia BYTE-IDENTIK baik `OWNER_TOKEN_HASH`/`OWNER_SESSION_KEY` sudah
+//     terpasang maupun belum. Tidak ada badan, tidak ada `Set-Cookie` (cookie basi tidak
+//     dihapus di sini: menghapusnya membuat respons berbeda antara "punya cookie" dan "tidak",
+//     dan itu oracle gratis), tidak ada satu pun nama Secret/metrik.
+function loginRedirect() {
+  return new Response(null, {
+    status: 303,
+    headers: {
+      location: '/login',
+      'cache-control': 'no-store',
+      'x-robots-tag': 'noindex, nofollow',
+      'referrer-policy': 'no-referrer',
+    },
+  });
 }
 
 /* ============================ Handler ===================================================== */
@@ -1081,8 +1626,10 @@ async function handle(request, env, ctx, nowMs) {
     if (!configured(env)) return deny();
     if (method === 'GET') return html(renderLogin(url.searchParams.has('gagal') ? 'Token tidak cocok.' : ''));
     if (method === 'POST') {
-      // Rem penebakan: kunci rem dibuang segera, IP tidak pernah disimpan.
-      if (loginThrottled('login', now)) return html(renderLogin('Terlalu banyak percobaan. Tunggu.'), 429);
+      // Rem penebakan LINTAS ISOLATE dan PER-SUMBER. Jalur tepi dibaca dari penjaga yang sama
+      // yang sudah meloloskan permintaan ini (nol I/O) — bukan dari header klien.
+      const brake = await loginBrakeCheck(env, request, edgeGuardPath(request, env, path), now);
+      if (brake.throttled) return loginThrottleResponse();
       let presented = '';
       try {
         const ctype = request.headers.get('content-type') || '';
@@ -1093,6 +1640,8 @@ async function handle(request, env, ctx, nowMs) {
       const presentedDigest = await sha256Hex(presented);
       const accepted = ctEq(presentedDigest, String(env.OWNER_TOKEN_HASH || '').trim().toLowerCase());
       if (!accepted) {
+        // HANYA kegagalan yang dihitung: login berhasil = nol tulis penyimpanan.
+        await loginBrakeRecordFailure(env, brake, now);
         return html(renderLogin('Token tidak cocok.'), 403, {
           // Cookie apa pun yang tersisa dimatikan pada percobaan gagal.
           'set-cookie': sessionCookieHeader('', 0),
@@ -1114,7 +1663,12 @@ async function handle(request, env, ctx, nowMs) {
   // --- [LAPIS 2] Default deny untuk SEMUA sisa rute, termasuk rute yang belum ada.
   //     Tidak satu byte data pun dibentuk sebelum baris ini lulus (bab 20, bab 32 #20).
   const session = await ownerSession(request, env, now);
-  if (!session) return deny();
+  if (!session) {
+    // Penanda buku / sesi kedaluwarsa: satu rute, satu metode, dialihkan ke halaman masuk.
+    // Bentuknya tidak bergantung pada keadaan Secret (lihat bab PENANDA BUKU di atas).
+    if (path === '/' && method === 'GET') return loginRedirect();
+    return deny();
+  }
 
   // Jejak audit akses owner: tanpa IP, tanpa identitas, hanya rute.
   try {
@@ -1211,8 +1765,19 @@ export default {
 
 export {
   handle, ctEq, edgeGuard, edgeGuardStatus, edgeSecret, resetEdgeWarningForTests,
+  // Jalur tepi: diekspor supaya gerbang bisa mengassert JALUR yang dipakai (bukan hanya status
+  // HTTP), sehingga "lolos karena hostname" tidak bisa tertukar dengan "lolos karena header".
+  edgeGuardDecision, edgeGuardPath, EDGE_PATHS,
+  TRUSTED_EDGE_HOSTS, WORKERS_DEV_SUFFIX, isTrustedEdgeHost, isWorkersDevHost, requestHostname,
+  allowNoSecretOverride,
   EDGE_HEADER, EDGE_FREE_PATHS, sha256Hex, hmacHex, issueSession, verifySession, estimateCost,
   renderDashboard, renderLogin, readModel, periodRange, wibDay, dayShift,
+  // Rem penebakan halaman masuk: diekspor supaya gerbang bisa memodelkan ISOLATE BARU per
+  // permintaan (cacat yang tidak pernah diuji) dan mengassert angka jendelanya sebagai kontrak.
+  LOGIN_MAX, LOGIN_MAX_SHARED, LOGIN_BUCKET_MS, LOGIN_WINDOW_BUCKETS, LOGIN_WINDOW_MS,
+  LOGIN_RETRY_AFTER_S, LOGIN_KV_PREFIX, LOGIN_KV_CACHE_TTL_S, LOGIN_KV_TTL_S,
+  loginBucketKey, loginWindowKeys, loginSourceKey, loginBrakeCheck, loginBrakeScope,
+  loginBrakeLimit, resetLoginBrakeForTests, loginRedirect,
   RATE_CARD, PERIODS, OWNER_ROUTES, PUBLIC_ROUTES, SESSION_COOKIE, SESSION_TTL_MS,
   RETENTION_MIN_COHORT, DEVICE_TRUTH,
   // Keadaan pengukuran + penyaring field: diekspor supaya gerbang bisa mengassert perbedaan
