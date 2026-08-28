@@ -48,7 +48,9 @@ check('Grammar dangerous unnatural regression absent',not any('to disappear by t
 check('Grammar schema contract',GM.get('version')==version and GM.get('schemaVersion')=='2.0.0' and GM.get('practiceBlueprintVersion')=='focused-25-v1',f"version={GM.get('version')} schema={GM.get('schemaVersion')} blueprint={GM.get('practiceBlueprintVersion')}")
 # Reading
 rq=[(r,q) for r in R for q in r.get('qs',[])]
-check('Reading inventory',len(R)==300 and len(rq)==1500,f'passages={len(R)} questions={len(rq)}')
+# m025-190: kontrak DIPERKETAT dari angka mati ke properti — lantai baseline 300 (tidak
+# boleh menyusut), id unik, dan rasio turunan soal = 5x passage (dulu 300/1500 hardcoded).
+check('Reading inventory',len(R)>=300 and len({r.get('id') for r in R})==len(R) and len(rq)==5*len(R),f'passages={len(R)} questions={len(rq)}')
 miss_pass=[]; bad=[]; dupopts=[]; exactq=[]; sigs=[]; types=collections.Counter()
 for r,q in rq:
  if not r.get('id') or not r.get('text') or not isinstance(q,list) or len(q)<4 or not q[0] or not isinstance(q[1],list) or not isinstance(q[2],int) or not 0<=q[2]<len(q[1]) or not isinstance(q[3],dict) or not q[3].get('evidence'): bad.append(r['id'])
