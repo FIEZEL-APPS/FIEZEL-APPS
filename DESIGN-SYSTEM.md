@@ -188,8 +188,13 @@ dalam lingkaran berjari-jari **204,8 px** dari pusat kanvas 512. Lockup saat ini
 `background_color` di `manifest.json` (`#120C0F`) sengaja disamakan dengan bidang ikon dan
 splash, supaya layar peluncuran PWA menyambung mulus ke sapaan pembuka.
 
-> **Maskot.** Karakter "Percik" **dihapus** pada m025-80 atas permintaan pemilik. Lambang
-> pengganti di onboarding adalah ikon Lucide di atas piringan lembut (`.fiezel-step-art`).
+> **Maskot.** [PAW 2026-08] Koreksi catatan lama: m025-80 menghapus maskot **dari layar
+> splash saja** (lihat `features/brand/fiezel-splash.js`), bukan dari produk. Produk punya
+> maskot resmi — **PAW**, dengan SATU rig kanonik di `features/mascot/fiezel-mascot.js`
+> (aturan E5/G11); semua berkas statisnya di `assets/brand/` dan
+> `assets/marketing/mascot-poses/` adalah ekspor hasil generate
+> (`node tools/export-mascot.mjs`, dijaga `e5-checksum-gate-test.js`). Ikon Lucide di
+> onboarding (`.fiezel-step-art`) adalah lambang langkah, bukan pengganti maskot.
 > Jangan memperkenalkan gaya ilustrasi baru tanpa keputusan merek yang eksplisit.
 
 ---

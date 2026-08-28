@@ -1440,6 +1440,30 @@ button.primary:hover,.primary.luxe:hover{background:var(--sun-deep);color:var(--
   from{transform:scale(.88) translateY(8px);opacity:.55}
   to{transform:none;opacity:1}
 }
+/* Fase 6 - serah terima ke gelembung pembimbing (spesifikasi 11 §2.3): saat perkenalan
+   ditutup lewat "Mulai Belajar", PAW menyusut ke pusat dok gelembung. Transform + opacity
+   SAJA - tanpa layout, tanpa rotasi - sasarannya dikirim JS lewat --fz-ob-hx/--fz-ob-hy
+   (fiezel-onboarding.js beginHandoff). Opacity bertahan sampai ~68% jalan supaya yang
+   terbaca adalah karakter PINDAH ke pojok, bukan lenyap di tempat. Kurangi-gerak tidak
+   perlu aturan sendiri di sini: blok .fiezel-ob-still di bawah sudah mematikan SEMUA
+   animasi maskot perkenalan, jadi jalur itu keluar lewat fade is-leaving saja. */
+.fiezel-ob-mascot.is-handoff{
+  /* Nilai bawaan arah pojok kanan-bawah; beginHandoff() menimpanya dengan sasaran piksel
+     yang diukur dari dok gelembung sungguhan (gaya inline menang atas aturan kelas ini). */
+  --fz-ob-hx:30vw;
+  --fz-ob-hy:40vh;
+  animation:fzm-ob-paw-handoff 320ms var(--ease) both;
+  will-change:transform,opacity;
+}
+@keyframes fzm-ob-paw-handoff{
+  0%{transform:none;opacity:1}
+  68%{opacity:.9}
+  100%{transform:translate(var(--fz-ob-hx,30vw),var(--fz-ob-hy,40vh)) scale(.2);opacity:0}
+}
+/* Kail rig untuk tunjukan lengan langkah 4 (is-pointing): hari ini cukup condong tipis ke
+   arah CTA di bawahnya; rig Direction C boleh menimpanya dengan pose lengan sungguhan.
+   Transform saja, dan ikut mati bersama animasi lain pada jalur kurangi-gerak. */
+.fiezel-ob-mascot.is-pointing{transform:translateY(2px) scale(1.02);transition:transform .28s var(--ease)}
 /* Cadangan bila custom element tidak terdaftar: ikon paw, tetap satu bentuk yang sama. */
 .fiezel-ob-paw-fallback{display:grid;place-items:center;width:64%;height:64%;color:var(--fz-ink)}
 .fiezel-ob-paw-fallback svg{width:100%;height:100%}
@@ -3749,3 +3773,206 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
   margin:11px 0 0;padding-top:10px;border-top:1px dashed var(--line);
   font-size:.94rem;line-height:1.6;font-weight:700;color:var(--info);
 }
+
+/* ============================================================
+   [FASE 7] SLOT PAW PANEL — lapisan penempatan karakter di layar pelajaran.
+   Sumber: pau-redesign/systems/12-lesson-layer.md (nama resmi fz-paw-* per
+   errata code-plan §7.1). Markup datang dari features/mascot/fiezel-paw-slot.js.
+   Invarian keras:
+   C1  tembus-pointer mutlak — ketukan di atas PAW selalu tembus ke UI;
+   C2  tidak ada piksel PAW di kotak konten terlindungi (peek dipotong kotak
+       slotnya sendiri, above/side hidup di luar kartu);
+   C3  nol CLS — ruang dipesan saat render (tinggi eksplisit / margin-top /
+       kolom grid), reaksi & enter/exit tinggal di transform+opacity;
+   C4  headroom reaksi ada DI DALAM kotak slot;
+   C5  z-index <= 5, di bawah semua UI fixed: topbar kuis z30, gelembung
+       pembimbing z41, subtitle z70, toast z80 — #quizNext selalu terjangkau;
+   C7  slot hanya dipasang templat di permukaan krem/putih, bukan --sun.
+   Ukuran tier milik CSS (media query 640/860/980 + landscape pendek), supaya
+   rotasi di antara dua render tidak membuat ruang pesanan berubah-ubah.
+   ============================================================ */
+.fz-paw-slot{
+  position:relative;pointer-events:none;z-index:1;
+  display:flex;justify-content:center;align-items:flex-end;
+  --fz-paw-size:88px;--fz-paw-headroom:20px;
+}
+.fz-paw-slot,.fz-paw-slot *{pointer-events:none!important}/* C1 mutlak */
+.fz-paw-slot fiezel-mascot{
+  flex:none;width:var(--fz-paw-size);
+  height:calc(var(--fz-paw-size)*.9375);/* rasio viewBox rig 320x300 */
+}
+
+/* A — di atas panel: tinggi dipesan eksplisit saat render (C3/C4).
+   88 di ponsel-lebar/tablet, 108 dari 860, 120 desktop (tangga §2e). */
+.fz-paw-above{height:calc(var(--fz-paw-size)*.9375 + var(--fz-paw-headroom));margin-bottom:-2px}
+@media (min-width:860px){.fz-paw-above{--fz-paw-size:108px}}
+@media (min-width:980px){.fz-paw-above{--fz-paw-size:120px;--fz-paw-headroom:32px}}
+
+/* P — peek: hanya puncak kepala+telinga muncul dari balik tepi atas kartu.
+   Kotak slot MEMOTONG badan (overflow hidden) => tidak pernah ada piksel di
+   atas isi kartu (C2), dan fzMEnterPeek "naik dari balik tepi" gratis.
+   z-index 0: saat topbar sticky lewat di atasnya, kepala PAW yang mengalah. */
+.fz-paw-peek{
+  position:absolute;right:18px;top:calc(var(--fz-paw-size)*-.44);
+  z-index:0;overflow:hidden;display:block;
+  width:calc(var(--fz-paw-size)*1.25);height:calc(var(--fz-paw-size)*.44);
+  --fz-paw-size:56px;--fz-paw-headroom:0px;
+}
+.fz-paw-peek fiezel-mascot{position:absolute;left:50%;top:0;transform:translate(-50%,0)}
+/* ruang telinga dipesan di kartu, bukan didorong setelah cat (C3) */
+.card.has-paw-peek{position:relative;margin-top:calc(56px*.44 + 8px)}
+/* tier 48 di ponsel sempit & landscape pendek (tabel §2d) */
+@media (max-width:420px){
+  .fz-paw-peek{--fz-paw-size:48px}
+  .card.has-paw-peek{margin-top:calc(48px*.44 + 8px)}
+}
+@media (orientation:landscape) and (max-height:479px){
+  .fz-paw-peek{--fz-paw-size:48px}
+  .card.has-paw-peek{margin-top:calc(48px*.44 + 8px)}
+}
+
+/* S — kolom samping desktop >=980: grid MEMESAN kolomnya (nol CLS). Topbar
+   membentang dua kolom; kartu tetap di kolom isi; slot menempel sticky di
+   bawah topbar (top:96px menjauhi zona topbar, C5). */
+@media (min-width:980px){
+  .quiz-shell.has-paw-side{display:grid;grid-template-columns:minmax(0,1fr) 164px;column-gap:16px;align-items:start}
+  .quiz-shell.has-paw-side>*{grid-column:1}
+  .quiz-shell.has-paw-side>.quiz-topbar{grid-column:1/-1}
+  .quiz-shell.has-paw-side>.fz-paw-side{
+    grid-column:2;grid-row:2/span 8;position:sticky;top:96px;
+    --fz-paw-size:148px;--fz-paw-headroom:32px;
+    align-items:flex-start;justify-content:center;height:auto;
+  }
+}
+/* Rotasi/resize di tengah soal: anchor baru menunggu render berikutnya
+   (§2d baris terakhir). Di bawah 980 grid-nya bubar sendiri; slot samping
+   disembunyikan supaya tidak jatuh ke aliran blok di bawah kartu. */
+@media (max-width:979px){.fz-paw-side{display:none}}
+
+/* Kurangi-gerak, tiga lapis (OS / body.reduce-motion / .is-static dari
+   preferensi in-app): maskot slot diam pada pose st-<pose> yang dicap markup;
+   fiezel-paw-slot.js membekukannya via setState(pose,{hold:0}). */
+@media (prefers-reduced-motion:reduce){.fz-paw-slot fiezel-mascot{animation:none}}
+body.reduce-motion .fz-paw-slot fiezel-mascot,
+.fz-paw-slot.is-static fiezel-mascot{animation:none}
+
+/* Bayangan lantai & confetti tidak bermakna pada tier kecil yang terpotong
+   (perluasan aturan crop lama fiezel-motion.css) — juga menjaga C4: tidak ada
+   partikel yang lolos dari kotak peek. */
+.fz-paw-peek fiezel-mascot .fz-shadow,
+.fz-paw-peek fiezel-mascot .fz-confetti-layer{display:none}
+
+/* ============================================================
+   LAPISAN OUTFIT PAW (G5' — pau-redesign/systems/19-outfit-system.md).
+   Milik subagent Outfit Layer. Item = geometri STATIS di grup jangkar
+   fz-outfit-*; TANPA keyframe milik sendiri (gerak-mikro opsional 19 §4.2
+   SENGAJA tidak dipakai -> aman-statis by construction, G9/19 §6.4).
+   Warna item hidup di markup SVG (palet tertutup G1); tidak ada hex
+   karakter baru di blok CSS ini. Kill switch: localStorage fzPawOutfits.
+   ============================================================ */
+/* pompom topi tidur (cy=8, r=11) menjulur 3px melewati tepi atas viewBox;
+   saat berpakaian, svg dibiarkan meluap — crop tier kecil tetap milik
+   wadahnya (fz-paw-peek dkk memotong di level container, bukan svg). */
+fiezel-mascot.fz-has-outfit .fz-svg{overflow:visible}
+/* pagar 3 lapis kurangi-gerak (OS / preferensi in-app / slot statis):
+   apa pun yang kelak menempel di item outfit tidak boleh bergerak —
+   item tetap TAMPIL dan statis (19 §6.4), tidak pernah disembunyikan. */
+@media (prefers-reduced-motion:reduce){
+  .fz-outfit-back *,.fz-outfit-head *,.fz-outfit-front *{animation:none!important;transition:none!important}
+}
+body.reduce-motion .fz-outfit-back *,body.reduce-motion .fz-outfit-head *,body.reduce-motion .fz-outfit-front *,
+.fz-paw-slot.is-static .fz-outfit-back *,.fz-paw-slot.is-static .fz-outfit-head *,.fz-paw-slot.is-static .fz-outfit-front *{
+  animation:none!important;transition:none!important}
+
+/* ==================================================================== *
+ * FASE-9 PERMUKAAN (impl-09): kelahiran gelembung + degradasi ukuran kecil
+ * -------------------------------------------------------------------- *
+ * Dua urusan yang sama-sama milik permukaan pemakai maskot:
+ *   1. Kelahiran pop gelembung pembimbing pasca-onboarding (impl-04).
+ *   2. Saringan parameter ekspresi untuk potongan kepala kecil (07 §5) -
+ *      degradasi adalah saringan saat render, BUKAN artwork terpisah.
+ * Semua transform di sini hanya scale/opacity - aman untuk gerbang G1.
+ * ==================================================================== */
+
+/* --- 1. Kelahiran gelembung (penerima 'fiezel-onboarding-paw-handoff') --
+   is-prebirth dipasang JS BEGITU event serah terima tiba: gelembungnya
+   disembunyikan dulu supaya yang dilihat murid adalah kelahiran, bukan
+   gelembung yang ternyata sudah menunggu. transition:none mematikan
+   transisi transform bawaan tombol agar scale(.2) terpasang seketika. */
+.fz-coach-bubble.is-prebirth{opacity:0;transform:scale(.2);pointer-events:none;transition:none}
+@keyframes fzBubbleBirth{
+  0%{opacity:0;transform:scale(.2)}
+  62%{opacity:1;transform:scale(1.08)}   /* overshoot pegas kecil - pop, bukan ledakan */
+  100%{opacity:1;transform:scale(1)}
+}
+.fz-coach-bubble.is-paw-birth{animation:fzBubbleBirth .42s cubic-bezier(.34,1.56,.64,1) both}
+/* Kurangi-gerak: kemunculan minimal fade (10 §2) - JS sudah memilih kelas fade,
+   dua aturan di bawah adalah sabuk pengaman kalau kelas pop tetap terpasang. */
+@keyframes fzBubbleBirthFade{from{opacity:0}to{opacity:1}}
+.fz-coach-bubble.is-paw-birth-fade{animation:fzBubbleBirthFade .24s ease-out both}
+@media (prefers-reduced-motion:reduce){
+  .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24s ease-out both}
+}
+body.reduce-motion .fz-coach-bubble.is-paw-birth{animation:fzBubbleBirthFade .24s ease-out both}
+
+/* --- 2a. Baris dengar/ucap 38px: potongan kepala 178%/-8% (12 §Small) ---
+   Addon speaking-listening menampilkan BADAN PENUH 38px - pada ukuran itu
+   wajah tidak terbaca dan melanggar tangga merek "head-first di bawah 58px".
+   Addon bukan milik fase ini, jadi potongannya dipasang dari sini dengan
+   selektor berspesifisitas lebih tinggi (menang tanpa peduli urutan muat).
+   Angka 178%/-8% identik dengan pola kanonik di fiezel-motion.css. */
+.fsl-mascot-slot{position:relative}
+.fsl-mascot-slot:has(fiezel-mascot){overflow:hidden;background:var(--cream,#FDFAF3)}
+.fsl-mascot-slot fiezel-mascot.fsl-mascot{
+  position:absolute;left:50%;top:-8%;width:178%;height:auto;
+  transform:translateX(-50%);
+  pointer-events:none; /* klik harus jatuh ke kontrol pemutar, bukan maskot */
+}
+.fsl-mascot-slot fiezel-mascot .fz-svg{width:100%;height:100%}
+.fsl-mascot-slot fiezel-mascot .fz-shadow,
+.fsl-mascot-slot fiezel-mascot .fz-confetti-layer{display:none}
+
+/* --- 2b. Set terkuantisasi 42px (07 §5) - semua potongan kepala kecil ----
+   Wadah milik fase ini: strip "Kata FIEZEL" 42, cincin hasil 52, modal level
+   56, catatan peta 28, gelembung 58/46, kepala panel 38, baris dengar 38/46.
+   Yang DIBUANG di bawah 58px: kelopak bawah, condong kepala (lengan/ekor
+   sudah di luar potongan). CSS `transform:none!important` menang atas atribut
+   transform yang dipasang _applyTuple - itulah mekanisme saringannya. */
+.coach-strip .coach-strip-face fiezel-mascot .fz-lid-low,
+.ring-row .coach-strip-face fiezel-mascot .fz-lid-low,
+.level-entry-face .coach-strip-face fiezel-mascot .fz-lid-low,
+.map-note .coach-strip-face fiezel-mascot .fz-lid-low,
+.fz-coach-bubble fiezel-mascot .fz-lid-low,
+.fz-coach-avatar fiezel-mascot .fz-lid-low,
+.fsl-mascot-slot fiezel-mascot .fz-lid-low{transform:none!important}
+.coach-strip .coach-strip-face fiezel-mascot .fz-head,
+.ring-row .coach-strip-face fiezel-mascot .fz-head,
+.level-entry-face .coach-strip-face fiezel-mascot .fz-head,
+.map-note .coach-strip-face fiezel-mascot .fz-head,
+.fz-coach-bubble fiezel-mascot .fz-head,
+.fz-coach-avatar fiezel-mascot .fz-head,
+.fsl-mascot-slot fiezel-mascot .fz-head{transform:none!important;animation:none!important}
+/* Alis fokus-rendah (thinking) dilewati pada set 42 - pada bingkai statis
+   applyFace tidak ada kelas state, jadi aproksimasinya lewat st-thinking. */
+.coach-strip .coach-strip-face fiezel-mascot.st-thinking .fz-brows,
+.ring-row .coach-strip-face fiezel-mascot.st-thinking .fz-brows,
+.level-entry-face .coach-strip-face fiezel-mascot.st-thinking .fz-brows,
+.fz-coach-bubble fiezel-mascot.st-thinking .fz-brows,
+.fz-coach-avatar fiezel-mascot.st-thinking .fz-brows,
+.fsl-mascot-slot fiezel-mascot.st-thinking .fz-brows{opacity:0!important}
+
+/* --- 2c. Set terkuantisasi 28px (07 §5) - HANYA catatan peta --------------
+   Di 28px cuma lima bacaan jujur yang bertahan: content, excited/celebrating,
+   surprised, calm/sleepy, attentive. Salurannya tinggal telinga + kelopak
+   atas + mulut {smile, open, o} + blush; sisanya netral. Confused dan
+   gentle-concern TIDAK PERNAH tampil di 28px - lihat pemetaan mulutnya. */
+.map-note .coach-strip-face fiezel-mascot .fz-brows{opacity:0!important}
+.map-note .coach-strip-face fiezel-mascot .fz-pupil{transform:none!important}
+.map-note .coach-strip-face fiezel-mascot .fz-eyes{transform:none!important} /* gaze mati */
+.map-note .coach-strip-face fiezel-mascot .fz-eye-open{transform:none!important} /* eye pop mati; swap happy-eye (opacity) tetap hidup */
+.map-note .coach-strip-face fiezel-mascot .fz-acc{opacity:0!important;animation:none!important} /* keringat/air mata/zzz = bintik tak terbaca */
+/* Mulut dikuantisasi ke {smile, open, o}. Mulut terlarang disembunyikan;
+   bila justru mulut terlarang itulah yang aktif (style inline BUKAN "none"),
+   smile dinaikkan sebagai bacaan pengganti. !important menang atas inline. */
+.map-note .coach-strip-face fiezel-mascot :is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad){display:none!important}
+.map-note .coach-strip-face fiezel-mascot:has(:is(.fz-m-wave,.fz-m-flat,.fz-m-concern,.fz-m-sad):not([style*="none"])) .fz-m-smile{display:block!important}
