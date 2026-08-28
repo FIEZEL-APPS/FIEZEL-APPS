@@ -107,8 +107,8 @@
     },
     {
       "templateId": "b4_018",
-      "reason": "answer_not_typable",
-      "detail": "jawaban \"[no word needed]\" adalah placeholder meta — jawaban sebenarnya \"tidak ada kata\", mustahil diketik di mode produksi"
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "b4_021",
@@ -575,7 +575,7 @@
       "templateId": "TA-006",
       "skill": "past_perfect_sequencing_two_past_events",
       "level": "B1",
-      "sentence": "By the time the ambulance arrived, the neighbors ___ first aid, so the paramedics only had to check the bandages.",
+      "sentence": "By the time the ambulance arrived, the neighbors ___ first aid.",
       "blank": {
         "answer": "had already given",
         "alternates": [
@@ -593,8 +593,8 @@
           "misconception": "uses past simple for the earlier event, flattening the sequence"
         },
         {
-          "text": "were already giving",
-          "misconception": "confuses completed prior action with an action still in progress at the reference point"
+          "text": "are already giving",
+          "misconception": "keeps the action in progress at 'now' instead of marking it completed before the past reference point"
         },
         {
           "text": "already give",
@@ -991,8 +991,8 @@
           "misconception": "uses the bare infinitive, which isn't a valid pattern after 'remember' in either meaning"
         },
         {
-          "text": "having to lock",
-          "misconception": "adds an unnecessary obligation phrase not supported by the sentence's meaning"
+          "text": "to have locked",
+          "misconception": "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action"
         }
       ]
     },
@@ -1768,8 +1768,8 @@
           "misconception": "Assumes present time always requires present continuous."
         },
         {
-          "text": "belonged",
-          "misconception": "Shifts to past tense despite the present-relevance context."
+          "text": "belonging",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense"
         },
         {
           "text": "is being belonged",

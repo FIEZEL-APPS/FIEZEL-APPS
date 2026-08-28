@@ -152,6 +152,21 @@ function ttsCapableAi(clock) {
   };
 }
 
+/**
+ * P3 — FLAG SERVER YANG MENYALAKAN AI, DALAM BENTUK YANG DIBACA JALUR PERMINTAAN.
+ *
+ * Sejak `route-wiring.js` menegakkan `cfAiEnabled` (bukan hanya melaporkannya), setiap
+ * permintaan `/api/ai/task` dengan KV kosong dijawab 403 — dan itu BENAR: fail-closed.
+ * Harness ini menguji wiring kuota/rute AI, jadi ia harus menyalakan flagnya secara
+ * eksplisit, dengan bentuk KV yang sama yang owner tulis di produksi. Kalau bentuk ini
+ * berubah tanpa `feature-gate.js` ikut berubah, seluruh blok AI di berkas ini merah —
+ * dan itulah gunanya menuliskannya di sini, bukan menyuntik pintu belakang uji.
+ */
+const AI_FLAGS_ON = JSON.stringify({
+  flags: { cfAiEnabled: true, cfTtsEnabled: true },
+  enabled: { ai: true, tts: true }
+});
+
 function boot(worker, options = {}) {
   const clock = H.fakeClock(CLOCK_ISO);
   const core = H.fakeD1();
@@ -160,7 +175,12 @@ function boot(worker, options = {}) {
   const r2 = H.fakeR2({ objects: audioObjects, writable: true });
   const ai = ttsCapableAi(clock);
   const analytics = H.fakeAnalyticsEngine();
-  const kv = H.fakeKV({ clock });
+  // `options.kvEntries` = null berarti "KV memang kosong" (dipakai blok yang MEMBUKTIKAN
+  // penolakan fail-closed). Tanpa argumen: flag AI menyala.
+  const kv = H.fakeKV({
+    clock,
+    entries: options.kvEntries === null ? {} : (options.kvEntries || { 'cfg:flags': AI_FLAGS_ON })
+  });
 
   const env = {
     SERVICE_NAME: 'fiezel-api',
@@ -172,7 +192,15 @@ function boot(worker, options = {}) {
     FEATURE_TTS: 'on',
     FEATURE_COACH: 'off',
     ANALYTICS_ENABLED: 'on',
+    // m0261-d17: gerbang edge kini fail-closed tanpa EDGE_SHARED_SECRET; harness
+    // ini menguji wiring rute, bukan gerbang jembatan, jadi mode transisi dibuka.
+    // Jitter anon dimatikan demi determinisme waktu.
+    ALLOW_NO_EDGE_SECRET: 'true',
+    ANON_JITTER_MAX_MS: '0',
     AI_LIMIT_PER_DAY: '25',
+    // P3 — pagar neuron tingkat akun sekarang MENGIKAT. 8.000 = nilai wrangler.toml;
+    // harness memakai angka yang sama supaya perilaku uji = perilaku produksi.
+    GLOBAL_NEURON_CAP: '8000',
     AI_LIMIT_PER_HOUR: '40',
     TTS_CHARS_PER_DAY: '12000',
     SESSION_HMAC_KEY_CURRENT: 'uji-secret-cookie-current-0123456789',
@@ -329,6 +357,7 @@ function scanForPii(value, trail, hits) {
     const app = boot(worker);
     await applyMigration(app.core, 'migrations/0001_identity.sql');
     await applyMigration(app.core, 'migrations/0001_quota.sql');
+    await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
     await applyMigration(app.stats, 'migrations/0002_analytics.sql');
     const user = await app.newUser();
 
@@ -390,6 +419,7 @@ function scanForPii(value, trail, hits) {
     const app = boot(worker);
     await applyMigration(app.core, 'migrations/0001_identity.sql');
     await applyMigration(app.core, 'migrations/0001_quota.sql');
+    await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
     await applyMigration(app.stats, 'migrations/0002_analytics.sql');
     const user = await app.newUser();
 
@@ -429,6 +459,7 @@ function scanForPii(value, trail, hits) {
     const app = boot(worker);
     await applyMigration(app.core, 'migrations/0001_identity.sql');
     await applyMigration(app.core, 'migrations/0001_quota.sql');
+    await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
     await applyMigration(app.stats, 'migrations/0002_analytics.sql');
     const user = await app.newUser();
     const text = 'hello cache';
@@ -474,6 +505,7 @@ function scanForPii(value, trail, hits) {
     const app = boot(worker);
     await applyMigration(app.core, 'migrations/0001_identity.sql');
     await applyMigration(app.core, 'migrations/0001_quota.sql');
+    await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
     await applyMigration(app.stats, 'migrations/0002_analytics.sql');
     const user = await app.newUser();
     const now = app.clock.now();
@@ -546,6 +578,7 @@ function scanForPii(value, trail, hits) {
     const app = boot(worker);
     await applyMigration(app.core, 'migrations/0001_identity.sql');
     await applyMigration(app.core, 'migrations/0001_quota.sql');
+    await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
     await applyMigration(app.stats, 'migrations/0002_analytics.sql');
     const alice = await app.newUser();
     const bob = await app.newUser();
@@ -663,6 +696,120 @@ function scanForPii(value, trail, hits) {
       check('F kontrak privasi di EXEC-BRIEF-CF.md masih menyebut larangan menghubungkan analytics ke identitas',
         /analytics/i.test(briefText), 'EXEC-BRIEF-CF.md terbaca');
     }
+  }
+
+  /* ---------- G. P3: FLAG DITEGAKKAN, PAGAR AKUN MENGIKAT, ROLLBACK JUJUR -- */
+  /*
+   * Tiga cacat yang blok ini jaga, semuanya terukur hidup di `api.fiezel.my.id`
+   * (28 Agu 2026) dan ditutup di paket kerja P3:
+   *   1. `cfAiEnabled` NOL kali dirujuk di jalur permintaan — flag hanya dilaporkan ke
+   *      klien, jadi "AI mati" hanya berlaku bagi klien yang sopan;
+   *   2. `GLOBAL_NEURON_CAP` ada di var tetapi tidak mengikat apa pun;
+   *   3. `quotaRolledBack` melaporkan `false` padahal reservasi SUNGGUH dibatalkan.
+   * Assert di bawah dirancang supaya MERAH kalau salah satu penegakan dicabut.
+   */
+  {
+    const gateFor = async (opts) => {
+      const app = boot(worker, opts);
+      await applyMigration(app.core, 'migrations/0001_identity.sql');
+      await applyMigration(app.core, 'migrations/0001_quota.sql');
+      if (opts.skipBudgetMigration !== true) {
+        await applyMigration(app.core, 'migrations/0005_ai_account_budget.sql');
+      }
+      await applyMigration(app.stats, 'migrations/0002_analytics.sql');
+      const user = await app.newUser();
+      const r = await app.call('POST', '/api/ai/task', { body: aiBody('apa itu present simple'), cookie: user.cookie });
+      const modelCalls = app.ai.calls.filter((c) => !/aura|melotts|tts/i.test(String(c.model))).length;
+      return { app, user, r, modelCalls };
+    };
+
+    // --- 1. KV KOSONG = FLAG TIDAK TERBACA = TOLAK. Fail-closed, bukan izin-lolos.
+    const empty = await gateFor({ kvEntries: null });
+    check('G KV flag kosong ⇒ 403 dan bukan 200 (flag yang tidak terbaca bukan izin)',
+      empty.r.status === 403, String(empty.r.status));
+    check('G penolakan flag memakai error ai_disabled + copyKey, bukan kalimat kuota',
+      empty.r.json && empty.r.json.error === 'ai_disabled' && empty.r.json.copyKey === 'ai.disabled',
+      empty.r.json && `${empty.r.json.error}/${empty.r.json.copyKey}`);
+    check('G penolakan flag TIDAK menagih dan TIDAK menjanjikan retryAfter (bukan soal waktu)',
+      empty.r.json && empty.r.json.quotaCharged === false && empty.r.json.retryAfter === undefined,
+      empty.r.json && `charged=${empty.r.json.quotaCharged} retryAfter=${empty.r.json.retryAfter}`);
+    check('G penolakan flag NOL panggilan model (pertahanan biaya, bukan sekadar kesopanan)',
+      empty.modelCalls === 0, String(empty.modelCalls));
+    check('G penolakan flag tidak menyentuh kuota murid sama sekali',
+      !empty.app.quotaRow(empty.user.userId) ||
+      empty.app.quotaRow(empty.user.userId).ai_used === 0,
+      JSON.stringify(empty.app.quotaRow(empty.user.userId)));
+    check('G amplop penolakan flag tetap skema respons AI (klien tidak butuh jalur galat baru)',
+      empty.r.json && empty.r.json.schema === 'fiezel-ai-response-v2', empty.r.json && empty.r.json.schema);
+
+    // --- 2. KV MELEMPAR = sama saja: tidak tahu isi flag ⇒ tolak.
+    const throwingKv = {
+      calls: { get: [], put: [], delete: [], list: 0 },
+      async get() { throw new Error('KV_DOWN'); },
+      async put() { throw new Error('KV_DOWN'); },
+      async delete() {}, async list() { return { keys: [], list_complete: true }; }
+    };
+    const kvDown = await gateFor({ vars: { CFG: throwingKv } });
+    check('G KV melempar ⇒ 403 (galat penyimpanan flag tidak boleh membuka jalur berbayar)',
+      kvDown.r.status === 403 && kvDown.modelCalls === 0,
+      `${kvDown.r.status} calls=${kvDown.modelCalls}`);
+
+    // --- 3. FEATURE_AI=off (var deploy) menolak walau KV menyala. AND, bukan OR.
+    const varOff = await gateFor({ vars: { FEATURE_AI: 'off' } });
+    check('G FEATURE_AI=off menolak walau flag KV menyala (tiga sakelar di-AND)',
+      varOff.r.status === 403 && varOff.r.json.reason === 'ai_feature_var_off',
+      `${varOff.r.status} ${varOff.r.json && varOff.r.json.reason}`);
+
+    // --- 4. KILL SWITCH KV: enabled.ai=false menolak walau cfAiEnabled true.
+    const killed = await gateFor({
+      kvEntries: { 'cfg:flags': JSON.stringify({ flags: { cfAiEnabled: true }, enabled: { ai: false } }) }
+    });
+    check('G kill switch KV (enabled.ai=false) menolak dalam detik tanpa deploy',
+      killed.r.status === 403 && killed.r.json.reason === 'ai_kill_switch',
+      `${killed.r.status} ${killed.r.json && killed.r.json.reason}`);
+
+    // --- 5. PAGAR AKUN MENGIKAT. Plafon 10 neuron < biaya tutor_turn (60) ⇒ ditolak
+    //        SEBELUM kuota murid disentuh. Inilah `GLOBAL_NEURON_CAP` yang akhirnya hidup.
+    const capped = await gateFor({ vars: { GLOBAL_NEURON_CAP: '10' } });
+    check('G plafon neuron akun MENGIKAT: permintaan di atas plafon ditolak 503',
+      capped.r.status === 503 && capped.r.json.reason === 'ai_account_cap',
+      `${capped.r.status} ${capped.r.json && capped.r.json.reason}`);
+    check('G penolakan plafon akun tidak memakan jatah murid (bukan urusannya)',
+      capped.r.json.quotaChecked === false && capped.r.json.quotaCharged === false &&
+      (!capped.app.quotaRow(capped.user.userId) || capped.app.quotaRow(capped.user.userId).ai_used === 0),
+      JSON.stringify(capped.app.quotaRow(capped.user.userId)));
+    check('G penolakan plafon akun NOL panggilan model tetapi murid tetap dapat jawaban materi',
+      capped.modelCalls === 0 && typeof capped.r.json.text === 'string' && capped.r.json.text.length > 20,
+      `calls=${capped.modelCalls} text=${(capped.r.json.text || '').slice(0, 24)}`);
+
+    // --- 6. FAIL-CLOSED tanpa tabel anggaran (migrasi 0005 belum diterapkan).
+    const noTable = await gateFor({ skipBudgetMigration: true });
+    check('G tabel anggaran belum ada ⇒ 503 fail-closed, bukan lolos tanpa hitungan',
+      noTable.r.status === 503 && noTable.r.json.reason === 'ai_budget_unreadable' &&
+      noTable.modelCalls === 0,
+      `${noTable.r.status} ${noTable.r.json && noTable.r.json.reason} calls=${noTable.modelCalls}`);
+
+    // --- 7. JALUR SEHAT: pemakaian neuron akun BENAR-BENAR dicatat.
+    const ok = await gateFor({});
+    check('G permintaan sehat lolos 200 saat flag menyala dan plafon longgar',
+      ok.r.status === 200 && ok.r.json.source === 'provider',
+      `${ok.r.status} ${ok.r.json && ok.r.json.source}`);
+    const budgetRow = ok.app.core._rows('ai_account_day')[0] || null;
+    check('G pemakaian neuron akun dicatat satu baris per hari UTC (dasar plafon yang mengikat)',
+      budgetRow && Number(budgetRow.neurons) > 0 && Number(budgetRow.requests) === 1,
+      budgetRow ? JSON.stringify(budgetRow) : 'baris tidak ada');
+
+    // --- 8. ROLLBACK DILAPORKAN JUJUR. Provider yang melempar ⇒ reservasi dibatalkan,
+    //        dan amplop WAJIB mengatakannya. Sebelum P3 nilainya selalu false di jalur nyata.
+    const brokenAi = { async run() { throw new Error('provider_meledak'); } };
+    const failed = await gateFor({ vars: { AI: brokenAi } });
+    check('G provider gagal ⇒ amplop melaporkan quotaRolledBack:true (laporan = kenyataan)',
+      failed.r.json && failed.r.json.quotaRolledBack === true && failed.r.json.quotaCharged === false,
+      `rolledBack=${failed.r.json && failed.r.json.quotaRolledBack} charged=${failed.r.json && failed.r.json.quotaCharged}`);
+    const failedRow = failed.app.quotaRow(failed.user.userId);
+    check('G rollback yang dilaporkan benar-benar terjadi di D1 (used 0, held 0)',
+      failedRow && Number(failedRow.ai_used) === 0 && Number(failedRow.ai_held) === 0,
+      failedRow ? JSON.stringify({ used: failedRow.ai_used, held: failedRow.ai_held }) : 'baris tidak ada');
   }
 
   /* ---------- pendaftaran gerbang ---------------------------------------- */

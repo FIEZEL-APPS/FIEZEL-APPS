@@ -86,11 +86,12 @@ const ALLOWLIST = {
     'aktor justru MERUSAK fungsinya: verifier PR harus jalan untuk PR siapa pun — kalau ia ' +
     'hanya jalan untuk owner, kontribusi luar tidak pernah diverifikasi.',
   'quality.yml':
-    'Terjaring karena F5 menambahkan workflow_dispatch beserta dua langkah live yang membaca ' +
-    'secrets.FIEZEL_STAGING_EDGE. Penjaga aktor tingkat JOB dilarang di sini: quality.yml ' +
+    'Terjaring karena F5 menambahkan workflow_dispatch beserta langkah-langkah live yang ' +
+    'membaca secrets.FIEZEL_STAGING_EDGE. Penjaga aktor tingkat JOB dilarang di sini: quality.yml ' +
     'adalah gerbang mutu untuk SETIAP push dan SETIAP PR, jadi menggerbanginya ke satu aktor ' +
     'akan mematikan 150+ gerbang untuk kontributor lain - obatnya lebih buruk dari ' +
-    'penyakitnya. Yang dijaga adalah DUA langkah live-nya, masing-masing dengan penjaga ' +
+    'penyakitnya. Yang dijaga adalah TIGA langkah live-nya (cf-live, staging-live, dan ' +
+    'ai-live-verify yang membelanjakan jatah neuron akun), masing-masing dengan penjaga ' +
     'aktor pada tingkat LANGKAH, dan itu TIDAK dipercaya dari alasan ini: cek (H) ' +
     'memverifikasinya di sumber, jadi mencabut penjaga langkah tetap memerahkan gerbang ini.',
   'a9-a14-autonomous-guardians.yml':
@@ -114,7 +115,11 @@ function periksaPenjagaLangkah(file, source, checkFn) {
   for (const blok of blokLangkah) {
     const nama = (blok.split('\n')[0] || '').replace(/^'|'$/g, '').slice(0, 70);
     const sentuhSecret = /secrets\./.test(blok);
-    const sentuhLive = /(cf-live-contract-test|staging-live-test)\.js/.test(blok);
+    // `ai-live-verify.mjs` masuk daftar ini karena ia bukan hanya menembak sistem hidup, ia
+    // MEMBELANJAKAN jatah neuron akun: satu panggilan model per tipe task. Tanpa namanya di
+    // sini, langkah termahal di seluruh workflow justru satu-satunya yang penjaganya tidak
+    // pernah diverifikasi.
+    const sentuhLive = /(cf-live-contract-test|staging-live-test)\.js|ai-live-verify\.mjs/.test(blok);
     if (!sentuhSecret && !sentuhLive) continue;
     const berpenjaga = /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==/.test(blok);
     perluPenjaga.push({ nama, berpenjaga });

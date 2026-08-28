@@ -337,7 +337,7 @@
           ],
           "answerIndex": 3,
           "explain": {
-            "evidence": "It requires a species that produces one clear ring per year... a beam with thirty rings may match the reference sequence in several places by chance... It requires that the outermost ring be present",
+            "evidence": "It requires a species that produces one clear ring per year, which excludes most tropical trees, where growth is not interrupted by a cold season. It requires enough rings in the sample to produce a distinctive pattern; a beam with thirty rings may match the reference sequence in several places by chance. It requires that the outermost ring be present",
             "why": "Tiga batasan pertama disebut eksplisit di paragraf 4. Kesulitan MENGUKUR pada kayu sangat tua tidak pernah disebut.",
             "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti begitu menemukan satu pilihan yang benar - di sini yang dicari justru yang TIDAK ada."
           }
@@ -371,7 +371,7 @@
           ],
           "answerIndex": 1,
           "explain": {
-            "evidence": "the date obtained is the date of some year before felling rather than the felling itself... always too early",
+            "evidence": "A date reported without this qualification can be wrong by decades in a direction that is not random: always too early.",
             "why": "Kalau cincin terluar sudah diserut tukang kayu, tanggal yang didapat adalah tahun SEBELUM penebangan - jadi selalu terlalu awal.",
             "whyOthersFail": "'Too late' membalik arahnya; teks justru menekankan galatnya TIDAK acak, sehingga 'akurat' dan 'tidak bisa dibandingkan' keduanya meleset."
           }
@@ -996,7 +996,7 @@
           ],
           "answerIndex": 3,
           "explain": {
-            "evidence": "Cut off from the surface, it receives no new oxygen from the atmosphere... decomposition consumes oxygen... the deep water can be stripped of oxygen entirely by late summer",
+            "evidence": "Cut off from the surface, it receives no new oxygen from the atmosphere. Meanwhile, organic material — dead algae, mostly — sinks continuously from above and decomposes, and decomposition consumes oxygen. In a lake with abundant nutrients, and therefore abundant algae, the deep water can be stripped of oxygen entirely by late summer.",
             "why": "Tiga yang pertama disebut eksplisit. Kenaikan suhu air dalam sepanjang musim panas tidak pernah dinyatakan - teks justru menyebut air dalam sering tidak berubah.",
             "whyOthersFail": "Soal EXCEPT menghukum pembaca yang berhenti setelah menemukan satu pilihan yang benar."
           }
@@ -1047,7 +1047,7 @@
           ],
           "answerIndex": 0,
           "explain": {
-            "evidence": "Turnover recharges the deep water with oxygen... But it also lifts nutrients",
+            "evidence": "Turnover recharges the deep water with oxygen, which is essential to the lake's recovery. But it also lifts nutrients that had accumulated at the bottom back into the sunlit upper layers",
             "why": "Dua akibat sekaligus, satu memulihkan dan satu memicu - itu inti kalimatnya.",
             "whyOthersFail": "Pilihan lain melampaui teks: nutriennya tidak dibuang, penulis tidak menimbang untung-rugi, dan turnover tidak terbatas pada danau berlimpasan pupuk."
           }

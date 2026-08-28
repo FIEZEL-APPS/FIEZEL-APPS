@@ -305,7 +305,7 @@ const UNPAIRED_LIMIT_VARS = [
   },
   {
     varName: 'GLOBAL_NEURON_CAP',
-    reason: 'plafon jatah AKUN Cloudflare (bukan per murid); pasangannya ACCOUNT_DAILY_NEURON_BUDGET=10000 SENGAJA lebih besar — 8.000 disetel DI BAWAH plafon sebagai margin, jadi "cocok" justru salah.'
+    reason: 'plafon jatah AKUN Cloudflare (bukan per murid); pasangannya ACCOUNT_DAILY_NEURON_BUDGET=10000 SENGAJA lebih besar — 8.000 disetel DI BAWAH plafon sebagai margin, jadi "cocok" justru salah. P3 (28 Agu 2026): var ini AKHIRNYA MENGIKAT — workers/api/ai/ai-account-budget.js memakainya sebagai plafon reservasi neuron harian, dijepit oleh ACCOUNT_DAILY_NEURON_BUDGET supaya var yang salah tulis tidak bisa membuka plafon di atas jatah akun. Sebelum P3 ia nol kali dirujuk kode.'
   },
   {
     varName: 'MAX_USERS',

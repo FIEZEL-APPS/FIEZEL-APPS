@@ -111,7 +111,15 @@
     breaker_open: 'Bantuan AI sedang istirahat sebentar. FIEZEL tetap menjawab dari materi, dan itu nggak pakai jatah.',
     degraded: 'Jawaban ini aku susun dari materi, bukan dari AI. Isinya tetap boleh kamu pakai.',
     body_too_big: 'Kirimanmu kebesaran untuk sekali kirim. Coba potong sebagian dulu.',
-    bad_json: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.'
+    bad_json: 'Aku belum paham kirimanmu. Muat ulang halaman lalu coba lagi, ya.',
+    // P3 - dua keadaan BARU, dan keduanya bukan salah murid, jadi kalimatnya nggak
+    // boleh terdengar seperti tuduhan atau seperti jatah yang habis.
+    // `ai_disabled`: pemilik aplikasi memang belum menyalakan bantuan AI. Nggak ada
+    // yang bisa murid lakukan, jadi jangan menyuruhnya menunggu atau mencoba lagi.
+    ai_disabled: 'Bantuan AI belum dinyalakan di aplikasi ini. Penjelasan dari materi tetap muncul, dan jatahmu utuh.',
+    // `ai_account_budget`: jatah AI SEAPLIKASI hari ini sudah penuh, bukan jatah murid
+    // ini. Karena itu kalimatnya menegaskan jatah pribadinya nggak berkurang.
+    ai_account_budget: 'Bantuan AI sedang penuh untuk hari ini, bukan karena jatahmu. Jawaban dari materi tetap muncul, dan jatahmu nggak berkurang.'
   });
 
   var MAX_BODY_BYTES = 16000; // di atas payload terbesar (context_coach 8.000 B) dengan margin
@@ -135,8 +143,22 @@
    *
    * `deps.rollbackQuota` opsional: pemanggil yang TIDAK lewat wiring (uji, worker lain) bisa
    * menyuntikkan pembatal eksplisit. Kalau tidak ada, rollback tetap terjadi lewat amplop.
+   *
+   * P3 - NILAI BALIKNYA SEKARANG LAPORAN, BUKAN BASA-BASI.
+   * Versi lama mengembalikan `true` HANYA KARENA ada fungsi yang bisa dipanggil, tanpa
+   * pernah melihat hasilnya. Akibat terukur di produksi: amplop melaporkan
+   * `quotaRolledBack:false` di jalur nyata (karena `deps.rollbackQuota` memang tidak
+   * pernah disuntikkan wiring) sementara reservasinya SUNGGUH dibatalkan lewat
+   * `settleQuota()`. Laporan yang tidak cocok dengan kenyataan lebih buruk daripada
+   * tidak ada laporan: ia membuat sisa kuota di klien salah, dan membuat audit percaya
+   * murid kehilangan jatah yang sebenarnya kembali.
+   * Aturan sekarang: `false` HANYA kalau pembatal memang mengatakan tidak ada yang
+   * dibatalkan (`return false`), atau tidak ada pembatal sama sekali. Pembatal lama yang
+   * tidak mengembalikan apa pun tetap dianggap membatalkan - itu perilaku lamanya, dan
+   * mengubahnya menjadi "false" akan menciptakan kebohongan ke arah yang berlawanan.
+   * Fungsi ini menjadi async karena pembatal nyata (bridge wiring) menyentuh D1.
    */
-  function releaseQuota(deps, info) {
+  async function releaseQuota(deps, info) {
     var d = deps || {};
     var fn = typeof d.rollbackQuota === 'function' ? d.rollbackQuota : null;
     if (!fn) {
@@ -146,15 +168,62 @@
     if (!fn) return false;
     try {
       var out = fn(info);
-      if (out && typeof out.catch === 'function') out.catch(function () {});
-    } catch (_) { /* pembatal yang meledak tidak boleh menggagalkan jawaban murid */ }
-    return true;
+      if (out && typeof out.then === 'function') out = await out;
+      return out !== false;
+    } catch (_) {
+      // Pembatal yang meledak tidak boleh menggagalkan jawaban murid - tetapi ia juga
+      // tidak boleh dilaporkan sebagai rollback yang berhasil.
+      return false;
+    }
+  }
+
+  /**
+   * P3 - AMPLOP PENOLAKAN FLAG, DIRAKIT DI SINI SUPAYA BENTUKNYA SATU.
+   *
+   * Dipakai `route-wiring.js` yang menggerbang rute AI SEBELUM badan permintaan dibaca.
+   * Ia tinggal di berkas ini, bukan di wiring, karena `baseResponse()` dan `RESPONSE_SCHEMA`
+   * tinggal di sini: amplop kedua yang dirakit tangan di tempat lain adalah cara paling
+   * pasti membuat kontrak jawaban bercabang.
+   *
+   * KENAPA 403, BUKAN 429 - DAN INI PERBEDAAN YANG SENGAJA:
+   *   - 429 (penolakan KUOTA) berarti "nanti bisa": jatahnya habis, ada `retryAfter`, dan
+   *     ia soal MURID INI. Klien wajar menampilkan hitungan mundur.
+   *   - 403 (penolakan FLAG) berarti "tidak untukmu, dan bukan soal waktu": pemilik
+   *     aplikasi belum menyalakan AI. Tidak ada `retryAfter` karena tidak ada saat yang
+   *     bisa dijanjikan, dan mencoba lagi tidak akan mengubah apa pun. Klien yang
+   *     menampilkan hitungan mundur di sini akan berbohong ke murid.
+   * `quotaCharged:false` WAJIB: penolakan ini terjadi sebelum satu byte badan permintaan
+   * dibaca, jadi tidak ada reservasi, tidak ada tagihan, dan jatah murid utuh.
+   */
+  function aiDisabledResponse(args) {
+    var a = args || {};
+    var body = baseResponse(a.task || '', {
+      text: '',
+      source: 'unavailable',
+      degraded: true,
+      error: 'ai_disabled',
+      copyKey: 'ai.disabled',
+      reason: String(a.reason || 'ai_flag_off'),
+      message: POLITE.ai_disabled,
+      quotaChecked: false,
+      quotaCharged: false,
+      usage: { inputTokens: 0, outputTokens: 0, ms: 0 }
+    });
+    return json(body, 403, a.headers || null);
   }
 
   function json(payload, status, headers) {
     var h = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' };
     if (headers) Object.keys(headers).forEach(function (k) { h[k] = headers[k]; });
     return new Response(JSON.stringify(payload), { status: status || 200, headers: h });
+  }
+
+  /** Detik sampai 00:00 UTC berikutnya - jam berganti jatah neuron akun. */
+  function secondsToUtcMidnight(nowMs) {
+    var ms = Number(nowMs) || 0;
+    var day = 86400000;
+    var remaining = day - (((ms % day) + day) % day);
+    return Math.max(1, Math.ceil(remaining / 1000));
   }
 
   function firstErrorCode(errors) {
@@ -295,6 +364,56 @@
       }), 200);
     }
 
+    // --- PAGAR NEURON TINGKAT AKUN. Sesudah breaker, SEBELUM kuota murid.
+    //
+    // Urutannya bukan selera. Kuota murid menjawab "apakah MURID ini masih punya jatah";
+    // pagar ini menjawab "apakah AKUN masih punya jatah", dan yang ditagih Cloudflare
+    // adalah yang kedua. Kalau pagar akun diletakkan SESUDAH kuota murid, permintaan yang
+    // akhirnya ditolak karena jatah akun penuh sudah lebih dulu memakan jatah murid -
+    // murid dihukum untuk sesuatu yang bukan urusannya. Karena itu ia lebih dulu, dan
+    // karena itu penolakannya `quotaCharged:false` DAN `quotaChecked:false`.
+    //
+    // Yang dipesan adalah biaya MODEL UTAMA task (`spec.model`), bukan model hasil
+    // `pickModel()`, karena `pickModel()` justru butuh hasil pemesanan ini
+    // (`neuronsUsedToday`). Arah salahnya sengaja: kalau nanti model yang dipakai lebih
+    // murah, kami sudah memesan LEBIH BANYAK dari yang terpakai. Untuk dompet, memesan
+    // kelebihan aman; memesan kekurangan tidak.
+    var accountUsedBefore = 0;
+    if (typeof deps.accountBudget === 'function') {
+      var budget;
+      try {
+        budget = await deps.accountBudget({
+          env: env, ctx: a.ctx, request: a.request,
+          task: taskName,
+          neurons: Number((spec.model && spec.model.neuronsPerRequest) || 0) || 1,
+          now: started
+        });
+      } catch (_) {
+        // Modul anggaran yang meledak = anggaran yang tidak terukur. FAIL-CLOSED.
+        budget = { allowed: false, reason: 'ai_budget_unreadable', usedBefore: 0 };
+      }
+      if (!budget || budget.allowed !== true) {
+        var breach = String((budget && budget.reason) || 'ai_account_cap');
+        return json(baseResponse(taskName, {
+          text: fallbackText,
+          source: 'deterministic-fallback',
+          degraded: true,
+          breaker: gate.phase,
+          error: 'service_degraded',
+          copyKey: 'ai.accountBudget',
+          reason: breach,
+          message: POLITE.ai_account_budget,
+          // Sampai 00:00 UTC: jatah neuron akun berganti menurut UTC, bukan menurut
+          // reset jatah murid (Asia/Jakarta). Menjanjikan jam yang salah = janji palsu.
+          retryAfter: secondsToUtcMidnight(started),
+          quotaChecked: false,
+          quotaCharged: false,
+          usage: { inputTokens: 0, outputTokens: 0, ms: now() - started }
+        }), 503, { 'retry-after': String(secondsToUtcMidnight(started)) });
+      }
+      accountUsedBefore = Number(budget.usedBefore) || 0;
+    }
+
     // --- KUOTA. Satu-satunya titik pemeriksaan, dan hanya untuk permintaan yang benar-benar
     // akan memanggil provider.
     var enforceQuota = resolveEnforceQuota(deps);
@@ -340,18 +459,32 @@
     }
 
     // --- PROVIDER
+    // P3 - `neuronsUsedToday` AKHIRNYA TERISI. Sebelum ini dep-nya tidak pernah
+    // disuntikkan siapa pun, jadi nilainya selalu 0 dan `NEURONS.softLimit` (8.000) tidak
+    // pernah bisa memicu degradasi model - satu-satunya pengaman biaya yang otomatis di
+    // dalam `pickModel()` mati sejak hari pertama. Sumbernya sekarang bacaan NYATA dari
+    // pagar akun di atas; `deps.neuronsUsedToday` tetap dihormati sebagai jalur suntikan
+    // uji, dan yang dipakai adalah yang LEBIH BESAR (lebih hemat).
     var model = AiTasks.pickModel(taskName, {
       breaker: gate.phase,
-      neuronsUsedToday: Number(deps.neuronsUsedToday || 0)
+      neuronsUsedToday: Math.max(Number(deps.neuronsUsedToday || 0), accountUsedBefore)
     });
-    var prompt = AiTasks.buildPrompt(taskName, verdict.input, verdict.locale);
-    var payload = { prompt: prompt, max_tokens: spec.maxOutputTokens };
-    if (spec.jsonMode) payload.response_format = { type: 'json_object' };
+    // P3 - payload dirakit `AiTasks.buildPayload()`, BUKAN di sini. Baris lama
+    // (`response_format = {type:'json_object'}` tanpa skema, dikirim tanpa memeriksa apakah
+    // model yang dipakai mendukung JSON Mode) adalah sebab terukur dua dari tiga task yang
+    // mengembalikan keluaran kosong berbayar. Alasan lengkapnya di `ai-tasks.js`.
+    var built = AiTasks.buildPayload(taskName, {
+      input: verdict.input, locale: verdict.locale, model: model
+    });
+    var prompt = built.prompt;
+    var payload = built.payload;
 
     var text = '';
     var failureKind = '';   // kosakata breaker (daftar tertutup FAILURE_KINDS)
     var failureReason = ''; // kosakata KAMI: sebab spesifik yang dicatat dan boleh dikirim klien
     var qualityRejected = false;
+    var clamped = false;     // P3: jawaban dipotong di batas kalimat sebelum dikirim
+    var clampedFrom = 0;     // jumlah kalimat SEBELUM dipotong (untuk audit prompt)
     try {
       var result = await callProvider(env, model.id, payload, spec.timeoutMs);
       // DUA BENTUK JAWABAN dibaca sekaligus; `reasoning` hanya untuk klasifikasi sebab dan
@@ -374,7 +507,33 @@
         // karena satu jawaban terlalu panjang akan mematikan AI untuk semua murid tanpa sebab
         // transport. Yang terjadi: jawaban dibuang, fallback deterministik dipakai, sebab dicatat.
         var verdictOut = AiTasks.checkOutputContract(taskName, text);
-        if (!verdictOut.ok) {
+        if (!verdictOut.ok && verdictOut.reason === 'sentence_limit_exceeded' &&
+            AiTasks.isClampable(taskName)) {
+          // P3 - PELANGGARAN BATAS KALIMAT: DIPOTONG, BUKAN DIBUANG, BUKAN DILONGGARKAN.
+          //
+          // Terukur hidup: `tutor_turn` ditolak `sentence_limit_exceeded` SETIAP kali, jadi
+          // murid tidak pernah menerima jawaban AI padahal neuronnya sudah dibelanjakan.
+          // Tiga pilihan, dan dua di antaranya salah:
+          //   - melonggarkan batas: membuang alasan batas itu ada (murid nggak boleh
+          //     dibanjiri teks). DITOLAK;
+          //   - membuang seluruh jawaban: batas ditegakkan pada tempat yang tidak dilihat
+          //     murid, dan murid tidak menerima apa pun. Itu keadaan sekarang;
+          //   - memotong di batas kalimat: batas ditegakkan PADA YANG DILIHAT MURID.
+          // Hanya berlaku kalau `sentence_limit_exceeded` adalah SATU-SATUNYA pelanggaran,
+          // dan hasil potongan DIPERIKSA ULANG dengan pemeriksa yang sama - potongan yang
+          // malah melanggar hal lain tetap ditolak.
+          var clamp = AiTasks.clampSentences(text, spec.maxSentences);
+          var reCheck = clamp.clamped ? AiTasks.checkOutputContract(taskName, clamp.text) : null;
+          if (reCheck && reCheck.ok) {
+            text = clamp.text;
+            clamped = true;
+            clampedFrom = clamp.sentencesBefore;
+          } else {
+            qualityRejected = true;
+            failureReason = verdictOut.reason;
+            text = '';
+          }
+        } else if (!verdictOut.ok) {
           qualityRejected = true;
           failureReason = verdictOut.reason;
           text = '';
@@ -403,7 +562,7 @@
       // A12/3 — jawaban yang tidak layak tampil (termasuk `"{}"`, kosong, whitespace, JSON
       // kosong) TIDAK menagih. Reservasi dibatalkan, bukan di-commit: murid tidak boleh
       // kehilangan jatah untuk jawaban yang tidak berisi apa pun.
-      var rolledBackQ = quotaChecked && releaseQuota(deps, {
+      var rolledBackQ = quotaChecked && await releaseQuota(deps, {
         kind: 'ai', task: taskName, reason: failureReason, request: a.request, env: env, ctx: a.ctx
       });
       // Provider dinyatakan sehat (jawabannya datang, hanya tidak layak tampil).
@@ -426,7 +585,7 @@
     if (failureKind) {
       // Provider gagal/timeout/senyap: reservasi dibatalkan (`quota-core.js` §"Kegagalan
       // provider = rollback(), BUKAN 429").
-      var rolledBackF = quotaChecked && releaseQuota(deps, {
+      var rolledBackF = quotaChecked && await releaseQuota(deps, {
         kind: 'ai', task: taskName, reason: failureReason || failureKind,
         request: a.request, env: env, ctx: a.ctx
       });
@@ -465,7 +624,7 @@
       })).catch(function () { /* telemetri gagal bukan alasan menggagalkan jawaban */ }));
     }
 
-    return json(baseResponse(taskName, {
+    var okBody = baseResponse(taskName, {
       text: text,
       source: 'provider',
       degraded: false,
@@ -476,7 +635,16 @@
       // false) — jejaknya tetap terlihat, tidak disamarkan menjadi "tertagih".
       quotaCharged: quotaChecked === true,
       usage: { inputTokens: inTokens, outputTokens: outTokens, ms: now() - started }
-    }), 200);
+    });
+    if (clamped) {
+      // Jawaban NYATA dari provider dan MENAGIH - model bekerja, jawabannya dipakai, hanya
+      // ekornya dipotong. Ditandai supaya potongan yang sering terjadi terlihat di telemetri
+      // sebagai utang perbaikan prompt, bukan tersembunyi sebagai jawaban sempurna.
+      okBody.clamped = true;
+      okBody.reason = 'sentence_limit_clamped';
+      okBody.sentencesBefore = clampedFrom;
+    }
+    return json(okBody, 200);
   }
 
   /** Adapter: menerima Hono (`c.req.raw`, `c.env`) maupun router manual `(request, env, ctx)`. */
@@ -508,6 +676,8 @@
     handleAiTask: handleAiTask,
     resolveEnforceQuota: resolveEnforceQuota,
     releaseQuota: releaseQuota,
+    aiDisabledResponse: aiDisabledResponse,
+    secondsToUtcMidnight: secondsToUtcMidnight,
     readProviderText: readProviderText,
     signalFromError: signalFromError
   });

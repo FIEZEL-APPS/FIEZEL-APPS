@@ -16,7 +16,7 @@ self.FIEZEL_REQUIRE_NOTIFICATIONS=false;
 // m025-61: penanda build halaman, dipakai health check untuk membandingkan versi yang
 // benar-benar dimuat dengan shell yang dipegang service worker. Nilainya dijaga gate agar
 // selalu sama dengan DIAG_BUILD; kalau keduanya berbeda, install-health-test gagal.
-self.FIEZEL_PAGE_BUILD='m025-176';
+self.FIEZEL_PAGE_BUILD='m025-180';
 // m025-150 profil suara ElevenLabs untuk sisi klien.
 //
 // Isinya sengaja hanya penanda, BUKAN rahasia apa pun: kunci API ElevenLabs hidup di
@@ -120,6 +120,32 @@ self.FIEZEL_CF_CONFIG=Object.freeze({
 // Menaikkan angka ini TIDAK menahan boot: `cfConfigBootOnce()` menjadwalkan permintaan lewat
 // `requestIdleCallback`/`setTimeout` dan tidak pernah di-await; kegagalan apa pun (termasuk
 // batas waktu ini) jatuh ke `cfConfigFailed()` -> semua jalur CF MATI.
+// PENGUKURAN ULANG 28 Agu 2026, 14:35 — JEMBATAN PHP TIDAK LAGI DI JALUR PERMINTAAN.
+// Nameserver `fiezel.my.id` pindah ke Cloudflare, zona berstatus `active` (07:24 UTC), dan
+// `api.fiezel.my.id` kini custom domain Worker. Semua angka di blok di atas diukur terhadap
+// jembatan reverse-proxy PHP di cPanel dan SUDAH BASI. Yang terukur pada jalur langsung, 20
+// sampel `GET /api/config` lewat edge Cloudflare:
+//     min 61 ms | median 70 ms | p95 97 ms | maks 129 ms
+// Jadi p95 turun dari 1410 ms ke 97 ms, sekitar 14x.
+//
+// ANGKA 8000 ms SENGAJA TIDAK DITURUNKAN, dan alasannya perlu dibaca sebelum ada yang
+// "merapikannya":
+//   1) 97 ms itu diukur dari sandbox di pusat data, bukan dari ponsel murid di jaringan
+//      seluler Indonesia. Menurunkan anggaran ke kelipatan angka pusat data berarti memakai
+//      pengukuran yang TIDAK mewakili pengguna sebenarnya — persis kesalahan yang membuat
+//      `timeoutMs:2500` membatalkan permintaan sehat.
+//   2) Biaya anggaran besar di sini mendekati nol: permintaan config TIDAK menahan boot
+//      (dijadwalkan lewat requestIdleCallback dan tidak pernah di-await), jadi murid tidak
+//      menunggu. Yang ditukar hanya seberapa cepat kita menyerah ke jalur aman.
+//   3) Biaya anggaran terlalu kecil justru nyata: murid di jaringan buruk kehilangan seluruh
+//      jalur CF untuk sisa sesinya karena satu paket hilang.
+// Yang boleh menurunkan angka ini hanyalah pengukuran dari perangkat murid sungguhan
+// (jaringan seluler, bukan wifi kantor). Sampai bukti itu ada, 8000 ms tetap.
+//
+// Satu konsekuensi yang perlu dicatat: alasan (2) dan (3) di blok F6 di atas merujuk
+// `TIMEOUT_FAST_S=6` dan `CLIENT_ABANDON_S=8` milik proksi PHP. Proksi itu sekarang jalur
+// CADANGAN, bukan jalur utama, jadi kedua pengait itu tidak lagi mengikat — tetapi juga tidak
+// bertentangan. Kalau proksi PHP dibongkar nanti, hapus rujukannya, bukan angkanya.
 self.FIEZEL_CF_REMOTE=Object.freeze({
   path:'/api/config',
   protocol:'1.7',

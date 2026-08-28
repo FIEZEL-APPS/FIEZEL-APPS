@@ -36,6 +36,15 @@ on:
           Kosongkan untuk tetap SKIP.
         required: false
         default: ''
+      ai_live_base:
+        description: >-
+          Base URL Worker fiezel-api untuk tools/ai-live-verify.mjs (mis.
+          https://api.fiezel.my.id). BERBAYAR: satu panggilan model SUNGGUHAN per
+          tipe task (hari ini 5 = ±US$0.002, ±244 neuron dari 10.000/hari jatah
+          AKUN) dan MENGHABISKAN 1-5 kuota AI harian sebuah identitas anon.
+          Kosongkan untuk tetap SKIP.
+        required: false
+        default: ''
 permissions:
   contents: read
 jobs:
@@ -234,6 +243,16 @@ jobs:
           # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
           # memuat nilai secret sungguhan.
           node edge-guard-test.js
+          # S1: pembatas laju PENERBITAN identitas anonim (`POST /api/auth/anon`).
+          # Dijalankan tepat sesudah `edge-guard-test.js` karena keduanya membaca sinyal yang
+          # SAMA dari dua sisi: gerbang di atas menulis `ctx.edgePath` (jalur mana yang dipakai
+          # permintaan), gerbang ini menuntut tarif pembatas dipilih dari sinyal itu dan BUKAN
+          # dari header klien atau dari ada/tidaknya `EDGE_SHARED_SECRET` — bug lapangan 28 Agu
+          # 2026 (52 tembakan dari satu IP, 28 lolos: tarif jembatan 30/jam terpakai di jalur
+          # langsung). Ia juga menjaga jendela BERGULIR (tidak reset di menit ke-0), amplop 429
+          # yang tidak membocorkan riwayat IP, jitter anti-oracle, perilaku saat D1 galat, dan
+          # nol IP mentah di bind D1 / log.
+          node rate-anon-test.js
           # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
           # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
           # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
@@ -415,6 +434,7 @@ jobs:
           # ALASAN TERTULIS di dalam gerbang itu. Ia juga meng-assert bahwa dua gerbang
           # live tidak boleh dihitung sebagai bukti.
           node gate-registry-test.js
+          node coordination-guard-test.js
 
       # =================================================================================
       # F5 — GERBANG LIVE: SKIP YANG TERLIHAT, DAN CARA MENJALANKANNYA DENGAN SENGAJA
@@ -488,6 +508,38 @@ jobs:
             echo "### staging-live-test.js — dijalankan terhadap \`${FIEZEL_STAGING_BASE}\`" >> "$GITHUB_STEP_SUMMARY"
           fi
           node staging-live-test.js
+      - name: 'AI live verify (SKIP kecuali workflow_dispatch dengan ai_live_base)'
+        # Penjaga aktor per-LANGKAH, alasannya sama dengan dua langkah live di atas —
+        # dengan satu tambahan yang khas langkah ini: ia MEMBELANJAKAN UANG. Setiap
+        # tipe task adalah satu panggilan Workers AI sungguhan, dan jatah neuron itu
+        # milik AKUN, bukan per-pemicu. Kalau langkah ini pernah jalan tiap push, satu
+        # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
+        # `no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
+        # ada dalam bentuk bergerbang aktor + workflow_dispatch.
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+        env:
+          # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
+          FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
+        run: |
+          if [ -z "${FIEZEL_AI_LIVE_BASE}" ]; then
+            echo '::notice title=ai-live-verify SKIP::FIEZEL_AI_LIVE_BASE kosong — kontrak AI Cloudflare TIDAK diuji terhadap model sungguhan pada jalan ini dan TIDAK boleh dikutip sebagai bukti runtime.'
+            {
+              echo '### tools/ai-live-verify.mjs — **SKIP** (bukan PASS)'
+              echo ''
+              echo 'Alasan: `FIEZEL_AI_LIVE_BASE` tidak diset. Langkah ini berbayar, jadi ia mati secara bawaan.'
+              echo 'Yang BELUM terbukti pada jalan ini: model Workers AI sungguhan menjawab, jawabannya LOLOS'
+              echo 'kontrak mutu kami dan sampai ke murid (bukan diganti fallback), kedua bentuk jawaban provider'
+              echo 'terbaca di runtime nyata, dan `quotaCharged` benar sebagai FAKTA — jatah di `/api/quota` naik'
+              echo 'tepat sebanyak jawaban provider yang sukses. Semua itu saat ini hanya diuji di atas stub.'
+              echo ''
+              echo 'Cara menjalankannya: Actions → FIEZEL Quality Gate → Run workflow → isi `ai_live_base`.'
+              echo 'Biaya sekali jalan: ±US$0.002 dan ±244 neuron; batasi dengan `FIEZEL_AI_LIVE_TASKS`.'
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Menjalankan pembukti AI live SUNGGUHAN terhadap ${FIEZEL_AI_LIVE_BASE} (dipilih manual lewat workflow_dispatch)."
+            echo "### tools/ai-live-verify.mjs — dijalankan terhadap \`${FIEZEL_AI_LIVE_BASE}\` (BERBAYAR)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          node tools/ai-live-verify.mjs --report
       - name: 'Gerbang hulu yang sempat tidak terdaftar (braincore fase 2 + lapisan game/UX)'
         # Ditemukan gate-registry-test.js saat merge 28 Agu 2026: lima belas berkas uji
         # mendarat bersama braincore fase 2 dan lapisan game/UX tanpa pernah dipanggil CI.
@@ -514,3 +566,10 @@ jobs:
           node item-calibration-test.js
           node speaking-adaptive-test.js
           node srl-coach-test.js
+      - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
+        # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
+        # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
+        # GATE_NAME_RE gate-registry-test.js (*-test/-audit/-selftest) sehingga tidak
+        # pernah dipanggil CI (temuan D1 gate-sweep, 28 Agu 2026). Didaftarkan di sini
+        # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
+        run: node adaptivity-simulation-v3.js

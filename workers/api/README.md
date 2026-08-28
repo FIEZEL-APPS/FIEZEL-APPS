@@ -114,9 +114,30 @@ Tanpa secret ini, siapa pun bisa memanggilnya langsung, melewati jembatan, dan
 menerbitkan identitas anonim tanpa batas — tiap penerbitan menulis baris D1 dan
 membawa jatah gratisnya sendiri. Dengan secret terpasang, `mw-edge.js` menolak
 403 setiap permintaan tanpa header yang cocok (perbandingan waktu-konstan),
-kecuali `/healthz`. Tanpa secret, Worker tetap jalan dan `/health` melaporkan
-`edgeGuard:"off"` — keadaan itu hanya sah selama masa transisi. Nilainya harus
-sama dengan yang disuntik ke proxy; lihat `deploy/edge/README.md`.
+kecuali `/healthz`.
+
+Sejak audit D3 (HIGH-3), secret ini WAJIB dipasang SEBELUM deploy pertama:
+tanpa secret gerbang FAIL-CLOSED dan semua rute kecuali `/healthz` menjawab
+403 — API diam sampai `wrangler secret put EDGE_SHARED_SECRET` dijalankan.
+Untuk dev/masa transisi SAJA, var `ALLOW_NO_EDGE_SECRET = "true"` (string
+persis itu) membuka mode lama tanpa gerbang; `/health` lalu melaporkan
+`edgeGuard:"off"` dan log Worker mencatat peringatan. Hapus var itu begitu
+secret terpasang. Nilai secret harus sama dengan yang disuntik ke proxy; lihat
+`deploy/edge/README.md`.
+
+Penerbitan identitas di `POST /api/auth/anon` juga dibatasi laju (audit D3
+HIGH-2, `rate-anon.js`; angkanya direvisi paket S1, 28 Agu 2026): **15 per IP
+per JENDELA BERGULIR 1 jam** di jalur langsung (custom domain), dan 30/jam TOTAL
+hanya kalau permintaan benar-benar datang lewat jembatan PHP (`edgePath="header"`;
+proxy itu sengaja tidak meneruskan IP murid, jadi semua lalu lintasnya berbagi
+satu ember). Cabang tarif dipilih dari `ctx.edgePath` yang ditulis `mw-edge.js`,
+BUKAN dari ada/tidaknya `EDGE_SHARED_SECRET` — kesalahan itulah yang membuat
+jalur langsung sempat memakai 30/jam di produksi. Kalau D1 tidak terbaca,
+pembatas tidak hilang: ia pindah ke memori isolate dengan batas DIPERKETAT (5).
+Var `ANON_ISSUE_LIMIT_PER_HOUR`, `ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR`,
+`ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR`, dan `ANON_JITTER_MAX_MS` mengatur angkanya;
+panggilan ber-cookie sah tidak pernah kena batas ini. Gerbangnya:
+`rate-anon-test.js`.
 
 Cara membuat nilainya:
 

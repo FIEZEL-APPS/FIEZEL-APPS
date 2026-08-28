@@ -661,6 +661,22 @@ di berkasnya sudah membuat `audio-asset-pipeline-test.js` merah
 
 ## Bagian 2A — 🔄 JEMBATAN SEMENTARA `api.fiezel.my.id` LEWAT ORIGIN PHP
 
+> **🔄 TEMUAN LAPANGAN 28 Agu 2026 — BAGIAN 2A TURUN PANGKAT MENJADI JALUR CADANGAN.**
+> Nameserver `fiezel.my.id` **sudah** menjawab `sydney`/`syeef.ns.cloudflare.com`, dan Worker
+> `fiezel-api` **sudah terikat sebagai custom domain** ke `api.fiezel.my.id` (record `AAAA 100::`
+> proxied). Status zona di dashboard **masih `pending`** dan token yang tersedia tidak punya izin
+> memicu verifikasinya, jadi tanggal "Active" **belum boleh diklaim**. Konsekuensi teknis yang
+> harus dipahami: begitu zona aktif, permintaan tiba di Worker **langsung dari browser, TANPA
+> header `X-Fiezel-Edge`** — proxy PHP tidak lagi di jalur permintaan. Karena itu
+> `workers/api/mw-edge.js` kini menerima **DUA jalur sah**: hostname tepercaya
+> (`TRUSTED_EDGE_HOSTS`, sinkron dengan `custom_domain` di `workers/api/wrangler.toml`) **ATAU**
+> header edge yang benar. `*.workers.dev` **tetap 403**, hostname tak dikenal **ditolak walau
+> headernya benar** (default-deny), dan `EDGE_FREE_PATHS` **tetap** hanya `/healthz` (`/health`
+> tetap dilindungi karena ia memetakan permukaan serang). Jalur mana yang benar-benar dipakai
+> dibaca dari `/health` → `edgeGuardPath`: `"custom-domain"` (utama) vs `"header"` (cadangan) vs
+> `"off"` (transisi). Sisi `owner` **belum** custom domain dan masih 100% lewat proxy PHP.
+> Syarat + pemilik keputusan untuk mencabut jalur header ada di `deploy/edge/README.md` §6.
+
 > **🔄 TEMUAN LAPANGAN 27 Agu 2026 — BAGIAN INI BARU.** Ia mencatat apa yang **sudah hidup hari
 > ini**, bukan rencana. Bagian 2 di atas (custom domain Worker) tetap **terblokir** sampai
 > nameserver pindah; bagian ini adalah jalan yang benar-benar dipakai murid selama blokade itu, dan

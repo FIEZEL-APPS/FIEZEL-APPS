@@ -1,0 +1,161 @@
+{
+  "protocol": "coordination-claims-v1",
+  "updated": "2026-08-28T17:10:00+07:00",
+  "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
+  "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
+  "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
+  "active": [
+    {
+      "sesi": "ses_0034e69d3ffes3kjiFLNDzYXUZ",
+      "peran": "coordinator-1 / observer (opencode)",
+      "paths": [
+        "TASKS-LEDGER.json",
+        "AGENTS-COORDINATION.md"
+      ],
+      "mulai": "2026-08-28T06:40:00+07:00",
+      "catatan": "Koordinator opencode: memetakan tugas, memantau CI dan ledger. Didaftarkan master dari ledger T-028."
+    },
+    {
+      "sesi": "ses_0027db319ffeiu7OrUF1qbWBH8",
+      "peran": "executor-1 / implementer (opencode)",
+      "paths": [
+        "features/neural-voice/"
+      ],
+      "mulai": "2026-08-28T05:30:00+07:00",
+      "catatan": "T-026 neural voice: PCM A/B diagnostic untuk crackle/static di device. Area ini DIKLAIM; master tidak menyentuhnya. Didaftarkan master dari ledger."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/MASTER",
+      "peran": "MASTER",
+      "paths": [
+        "coordination/",
+        "tools/bump-build.mjs",
+        "tools/nightwatch.mjs",
+        "coordination-guard-test.js",
+        "MASTER-BROADCAST.md"
+      ],
+      "mulai": "2026-08-28T06:30:00+07:00",
+      "catatan": "Penegak koordinasi, siaran, arbiter versi, nightwatch."
+    },
+    {
+      "sesi": "sesi-computer-ed18fcf2",
+      "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
+      "paths": [
+        "app.js",
+        "style.css",
+        "index.html",
+        "DESIGN-SYSTEM.md",
+        "features/ui/fiezel-back-nav.js"
+      ],
+      "mulai": "2026-08-28T16:55:00+07:00",
+      "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/S2",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/ai/ai-account-budget.js",
+        "workers/api/ai/route-ai.js",
+        "workers/api/route-wiring.js"
+      ],
+      "mulai": "2026-08-28T17:10:00+07:00",
+      "catatan": "Tutup celah S1: penegakan plafon neuron akun opsional per pemanggil, pemanggil yang lupa menyuntikkan dep melewati plafon tanpa galat."
+    }
+  ],
+  "finished": [
+    {
+      "sesi": "sesi-computer-086e9698",
+      "peran": "MASTER",
+      "paths": [
+        "workers/api/",
+        "deploy/edge/",
+        "features/quota/",
+        "release-audit.py",
+        "paw-mascot-test.js"
+      ],
+      "selesai": "2026-08-28T07:00:00+07:00",
+      "catatan": "Rollout Cloudflare (18 paket kerja, jembatan edge, rotasi kunci sesi 2x, E2E 24/24) + P10 atas PR #227/#228. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/P2",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/ai/",
+        "workers/api/wrangler.toml"
+      ],
+      "catatan": "Ambil alih AI oleh Cloudflare: verifikasi jalur /api/ai/task hidup, selaraskan batas kuota terpasang. [SELESAI, sudah di main]",
+      "selesai": "2026-08-28T16:00:00+07:00"
+    },
+    {
+      "sesi": "sesi-computer-086e9698/D1",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/owner/"
+      ],
+      "catatan": "Deploy dashboard owner + custom domain owner.fiezel.my.id. [SELESAI, sudah di main]",
+      "selesai": "2026-08-28T16:00:00+07:00"
+    },
+    {
+      "sesi": "sesi-computer-086e9698/V7",
+      "peran": "worker MASTER",
+      "paths": [
+        "features/library/fiezel-library-ui.js",
+        "voice-callsite-prefetch-test.js"
+      ],
+      "selesai": "2026-08-28T17:00:00+07:00",
+      "catatan": "Anggaran blok narasi adaptif. Jeda terburuk -35,3%, porsi sunyi -20,0%, suara pertama tidak tertunda. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/A1",
+      "peran": "worker MASTER",
+      "paths": [
+        "features/analytics/",
+        "analytics-client-test.js",
+        "app.js"
+      ],
+      "selesai": "2026-08-28T17:00:00+07:00",
+      "catatan": "Pemancar analytics dipasang; gerbang yang MENGUNCI bug dibalik; bug kirim-ganda yang menggembungkan DAU ditutup. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/P3",
+      "peran": "worker MASTER",
+      "paths": [
+        "(lihat commit)"
+      ],
+      "selesai": "2026-08-28T17:45:00+07:00",
+      "catatan": "Penegakan flag AI + plafon neuron akun + 3 tipe task diperbaiki + quotaRolledBack jujur. Sudah di main; migrasi 0005 sudah diterapkan; 403 ai_disabled terbukti dari luar."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/D2",
+      "peran": "worker MASTER",
+      "paths": [
+        "(lihat commit)"
+      ],
+      "selesai": "2026-08-28T17:45:00+07:00",
+      "catatan": "Kueri dashboard diselaraskan ke skema nyata; 20 nama metrik yang tidak pernah ditulis siapa pun dibuang; 10 panel ditandai tidak-terukur. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/S1",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/rate-anon.js",
+        "workers/api/route-auth.js",
+        "rate-anon-test.js"
+      ],
+      "selesai": "2026-08-28T17:10:00+07:00",
+      "catatan": "Cabang batas dibaca dari jalur permintaan (ctx.edgePath), bukan dari keberadaan secret. Terukur di lapangan: 14 lolos, penolakan mulai di ke-15."
+    }
+  ],
+  "menunggu_izin": [
+    {
+      "sesi": "sesi-computer-086e9698/MASTER",
+      "paths": [
+        "features/neural-voice/fiezel-neural-voice.js",
+        "features/neural-voice/fiezel-web-audio-player.js"
+      ],
+      "diminta": "2026-08-28T17:00:00+07:00",
+      "pemilik_sekarang": "ses_0027db319ffeiu7OrUF1qbWBH8 (executor-1, T-026)",
+      "catatan": "Permintaan resmi ada di TASKS-LEDGER.json T-029. TIDAK ditulis sebelum izin. Nilai yang tertahan: ~745 ms senyap tepi PCM per batas, lebih besar daripada seluruh perolehan V7."
+    }
+  ]
+}
