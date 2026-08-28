@@ -1,7 +1,7 @@
 {
-  "version": "m025-181",
+  "version": "m025-182",
   "claimedBy": "perplexity-computer (braincore session, T-027)",
-  "claimedAt": "2026-08-28T10:52:16.293Z",
-  "reason": "assessment QA merge: perbaikan bank soal 20-agen + 14 template baru + cloze alternates",
+  "claimedAt": "2026-08-28T13:08:58.310Z",
+  "reason": "m025-180: perbaikan blocker audit UI/UX 20-agen — integritas mode ukur, kebijakan abandon simetris, timeout boot, auto-scroll pembahasan, perbaikan CSS + DESIGN-SYSTEM.md",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

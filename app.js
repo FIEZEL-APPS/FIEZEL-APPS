@@ -788,7 +788,7 @@ function gemsCore(){try{return self.FiezelGems||null}catch(_){return null}}
 function defaultGems(){const g=gemsCore();return g?g.freshGems():{schema:'fiezel-gems-v1',balance:0,earnedTotal:0,spentTotal:0,ledger:[]}}
 function sanitizeGemsState(raw){const g=gemsCore();return g?g.sanitizeGems(raw):defaultGems()}
 function gemsBalance(){return Math.max(0,Math.floor(Number(state?.gems?.balance)||0))}
-const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
+const defaultState={version:APP_VERSION,stateRevision:0,ownerUuid:'',userName:DEFAULT_USER_NAME,view:'home',level:1,placementDone:false,placementBandLevel:1,placementBands:null,totalAnswered:0,totalCorrect:0,totalTimeMs:0,history:[],wrongAnswers:[],vocab:{},grammar:{},reading:{},daily:{date:'',count:0,attempts:0,meaningful:false},streak:0,adaptiveReady:false,adaptiveReadyByLevel:{},confidenceHistory:[],learningDays:[],sessionHistory:[],activeSession:null,inflightAttempt:null,pendingInterruptNotice:'',preferences:defaultPreferences,levelTrust:{schema:'fiezel-level-trust-v1',verified:'A1',locked:false,probation:{level:'',mistakesByLevel:{},startedAt:0,lastMistakeAt:0},exams:{},demotions:[],pendingNotice:null},reportMeta:defaultReportMeta,reminderMeta:{lastNotificationAt:0,lastNotificationDay:'',lastNotificationKind:'',lastMessageIndex:-1,lastPositiveDay:'',evidenceLog:[]},adaptivePolicyMeta:{lastPolicy:null,lastSource:'',lastAt:0,history:[]},policyOutcomeMeta:{last:null,history:[],queue:[]},contentCanaryMeta:{schema:'fiezel-content-canary-evidence-v1',canaryId:'',exposureSessions:0,targetAttempts:0,targetCorrect:0,targetIncorrect:0,controlAttempts:0,controlCorrect:0,controlIncorrect:0,canaryAttempts:0,canaryCorrect:0,canaryIncorrect:0,promotedAttempts:0,promotedCorrect:0,promotedIncorrect:0,promotionLedger:[],lastExposureAt:'',lastOutcomeAt:'',rollbackCount:0,lastRollbackReason:'',privacy:{rawAnswersIncluded:false,rawHistoryIncluded:false}},coachCache:null,gems:defaultGems(),prasasti:{schema:'fiezel-prasasti-v1',earned:{}},ritualMeta:{lastDay:''},
 // m026-03: bendera tur BERSESI. Sebelumnya keputusan "sudah pernah lihat tur" tinggal di
 // localStorage['fiezel-tour-v1'] - satu kunci untuk seluruh aplikasi, di luar state, jadi ia
 // tidak ikut backup/restore DAN dibagi antar akun Puter di perangkat yang sama. Sekarang tiap
@@ -1046,6 +1046,24 @@ function sanitizeState(raw){
   if(!Number.isFinite(next.totalTimeMs)||next.totalTimeMs<0)next.totalTimeMs=0;
   if(!next.totalAnswered){next.vocab={};next.grammar={};next.reading={};next.history=[];next.wrongAnswers=[];next.confidenceHistory=[];next.sessionHistory=[];next.learningDays=[];next.activeSession=null;next.policyOutcomeMeta={last:null,history:[],queue:[]};next.daily={date:'',count:0,attempts:0,meaningful:false};next.adaptiveReady=false;next.placementDone=false;next.level=1}
   if(next.totalAnswered&&next.activeSession?.startedAt){const a=next.activeSession,now=Date.now(),started=Math.max(0,Number(a.startedAt||now));next.sessionHistory=[...(next.sessionHistory||[]),{id:String(a.id||`session-${started}`),at:new Date(now).toISOString(),startedAt:new Date(started||now).toISOString(),level:LEVELS.includes(String(a.level||''))?String(a.level):'',type:String(a.type||'practice'),planned:Math.max(0,Number(a.planned||0)),answered:Math.max(0,Number(a.answered||0)),score:null,total:Math.max(0,Number(a.planned||0)),accuracy:null,completed:false,abandoned:true,abandonReason:'interrupted',durationMs:Math.max(0,now-started),policyId:String(a.policyId||'').slice(0,120),policyMode:String(a.policyMode||'').slice(0,30),targetSkill:String(a.targetSkill||'').slice(0,80),primaryDomain:String(a.primaryDomain||'').slice(0,20),policySource:String(a.policySource||'').slice(0,40),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null}].slice(-100);next.activeSession=null}
+  /* W1 P1-2 (10-002, 09-003): SETTLE penanda percobaan-berjalan. Reload/kill PWA di tengah
+     ujian kini mendarat di aturan yang SAMA dengan tombol Keluar: sudah menjawab >=1 soal =
+     percobaan terpakai (level-exam: gagal + jeda 24 jam; gerbang lewati materi: gerbang
+     ditutup 24 jam). answered==0 tetap gratis \u2014 rahmat anti-kecelakaan yang sama dengan
+     abandonActiveSession. Satu kabar jujur disimpan untuk ditampilkan di beranda berikutnya,
+     bukan penalti diam-diam. */
+  const inflight=raw?.inflightAttempt&&typeof raw.inflightAttempt==='object'?raw.inflightAttempt:null;
+  if(next.totalAnswered&&inflight){
+    const iType=String(inflight.type||''),iAnswered=Math.max(0,Number(inflight.answered||0));
+    if(iAnswered>0&&iType==='level-exam'){
+      try{recordSkipExamFail(next,String(inflight.levelScope||''),{score:0,total:Math.max(0,Number(inflight.planned||LEVEL_EXAM_SIZE)),accuracy:0,weakSkill:'ujian terputus sebelum selesai'});next.pendingInterruptNotice=`Ujianmu kemarin terputus di soal ${iAnswered} \u2014 percobaan terpakai, bisa diulang 24 jam lagi.`}catch(_){}
+    }
+    if(iAnswered>0&&iType==='grammar-skip'&&inflight.skipGateSkill){
+      try{const key=String(inflight.skipGateSkill),g=next.grammar[key]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;next.grammar[key]=g;next.pendingInterruptNotice=`Gerbang lewati materimu kemarin terputus di soal ${iAnswered} \u2014 percobaan terpakai, bisa dicoba lagi 24 jam lagi.`}catch(_){}
+    }
+  }
+  next.inflightAttempt=null;
+  next.pendingInterruptNotice=String(next.pendingInterruptNotice||raw?.pendingInterruptNotice||'').slice(0,200);
   next.version=APP_VERSION;
   next.stateRevision=Math.max(0,Math.floor(Number(next.stateRevision)||0));
   /* m025-135: dulu baris di sini MENGHAPUS jadwal setiap materi yang sudah dikuasai
@@ -1173,7 +1191,16 @@ function policyTargetMastery(policy){
 }
 function recentSkillAccuracy(skill,before=Infinity,limit=20,level=getActiveLevel()){const key=String(skill||'');if(!key)return null;const xs=(state.history||[]).filter(h=>Number(h?.at||0)<before&&historyMatchesActive(h,level)&&(String(h.skill||'')===key||String(h.target||'')===key)).slice(-limit);return xs.length?Math.round(xs.filter(h=>h.ok).length/xs.length*100):null}
 function beginLearningSession(cfg,total){
-  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};save();anSessionStarted(state.activeSession);/*A1-EMIT*/return state.activeSession
+  const now=Date.now(),policy=cfg?.policy||null;state.activeSession={id:`session-${now}-${Math.random().toString(36).slice(2,8)}`,startedAt:now,level:getActiveLevel(),type:String(cfg?.type||'practice'),levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),planned:Math.max(0,Number(total)||0),answered:0,policyId:String(policy?.policyId||'').slice(0,120),policyMode:String(policy?.mode||'').slice(0,30),targetSkill:String(policy?.targetSkill||'').slice(0,80),primaryDomain:String(policy?.primaryDomain||'').slice(0,20),policySource:String(policy?.source||'').slice(0,40),baselineTargetMastery:policyTargetMastery(policy),baselineTargetAccuracy:recentSkillAccuracy(policy?.targetSkill,now,20)};
+  /* W1 P1-2 (10-002, 09-003): penanda percobaan-berjalan untuk alat ukur berpenalti.
+     Di-settle di TIGA pintu yang sama: selesai bersih (completeActiveSession), keluar sadar
+     (abandonActiveSession), dan boot berikutnya (sanitizeState) \u2014 sehingga reload/kill
+     PWA dihukum PERSIS sama dengan tombol Keluar, bukan jadi jalan reroll gratis. answered
+     dicermin dari record() supaya rahmat answered==0 (buka lalu keluar tanpa menjawab) tetap
+     berlaku di semua pintu. */
+  const sType=String(cfg?.type||'');
+  if(sType==='level-exam'||sType==='grammar-skip')state.inflightAttempt={type:sType,levelScope:String(cfg?.levelScope||''),skipGateSkill:String(cfg?.skipGateSkill||''),startedAt:now,planned:Math.max(0,Number(total)||0),answered:0};
+  save();anSessionStarted(state.activeSession);/*A1-EMIT*/return state.activeSession
 }
 function abandonActiveSession(reason='exit'){
   const a=state.activeSession;if(!a)return false;const now=Date.now(),answered=Math.max(0,Number(a.answered||0)),session={id:a.id,at:new Date(now).toISOString(),startedAt:new Date(Number(a.startedAt||now)).toISOString(),level:sessionLevel(a),type:a.type||'practice',planned:Number(a.planned||0),answered,score:null,total:Number(a.planned||0),accuracy:null,completed:false,abandoned:true,abandonReason:String(reason).slice(0,40),durationMs:Math.max(0,now-Number(a.startedAt||now)),policyId:String(a.policyId||''),policyMode:String(a.policyMode||''),targetSkill:String(a.targetSkill||''),primaryDomain:String(a.primaryDomain||''),policySource:String(a.policySource||''),baselineTargetMastery:a.baselineTargetMastery??null,baselineTargetAccuracy:a.baselineTargetAccuracy??null};
@@ -1184,13 +1211,15 @@ function abandonActiveSession(reason='exit'){
      menutup gerbang lesson itu 24 jam. Membuka lalu keluar sebelum menjawab tetap gratis. */
   if(String(a.type||'')==='level-exam'&&answered>0){try{recordSkipExamFail(state,String(a.levelScope||''),{score:0,total:Number(a.planned||LEVEL_EXAM_SIZE),accuracy:0,weakSkill:'ujian ditinggalkan sebelum selesai'})}catch(_){}}
   if(String(a.type||'')==='grammar-skip'&&answered>0&&a.skipGateSkill){try{const g=state.grammar[a.skipGateSkill]||{correct:0,total:0,streak:0,mastery:0};g.skipGateCooldownUntil=Date.now()+LEVEL_EXAM_COOLDOWN_MS;state.grammar[a.skipGateSkill]=g}catch(_){}}
-  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/return true
+  state.sessionHistory=[...(state.sessionHistory||[]),session].slice(-100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: penalti sudah diputuskan di atas \u2014 penandanya selesai. */const outcome=recordPolicyOutcomeFromSession(session,now);save();queueRemoteActivitySync();if(outcome)queuePolicyOutcomeSync(outcome);anSessionEnded(session);/*A1-EMIT*/return true
 }
 function completeActiveSession(cfg,score,total){
-  const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
+  const now=Date.now(),a=state.activeSession,started=Number(a?.startedAt||now),accuracy=Math.round(score/Math.max(1,total)*100);state.activeSession=null;state.inflightAttempt=null;/* W1 P1-2: selesai bersih = penanda dilepas. */return{id:a?.id||`session-${now}`,at:new Date(now).toISOString(),startedAt:new Date(started).toISOString(),level:sessionLevel(a),type:cfg?.type||a?.type||'practice',planned:Number(a?.planned||total),answered:Number(a?.answered||total),score,total,accuracy,completed:true,abandoned:false,durationMs:Math.max(0,now-started),policyId:String(a?.policyId||cfg?.policy?.policyId||''),policyMode:String(a?.policyMode||cfg?.policy?.mode||''),targetSkill:String(a?.targetSkill||cfg?.policy?.targetSkill||''),primaryDomain:String(a?.primaryDomain||cfg?.policy?.primaryDomain||''),policySource:String(a?.policySource||cfg?.policy?.source||''),baselineTargetMastery:a?.baselineTargetMastery??null,baselineTargetAccuracy:a?.baselineTargetAccuracy??null}
 }
 function record(q,ok,ms,selectedIndex){
   const now=Date.now();state.totalAnswered++;if(ok)state.totalCorrect++;state.totalTimeMs+=ms||0;if(state.activeSession)state.activeSession.answered=Math.min(Number(state.activeSession.planned||10000),Number(state.activeSession.answered||0)+1);
+  /* W1 P1-2: cermin answered ke penanda percobaan-berjalan (lihat beginLearningSession). */
+  if(state.inflightAttempt&&state.activeSession)state.inflightAttempt.answered=Number(state.activeSession.answered||0);
   const selected=q.options?.[selectedIndex];
   /* Ember dan kunci ulangan DITULIS di riwayat, tidak ditebak ulang belakangan. Dulu
      setConfidence menebaknya dengan "kalau bukan vocab dan bukan grammar, berarti reading" -
@@ -1279,6 +1308,24 @@ function setConfidence(value){const h=state.history[state.history.length-1];if(!
    jawab -> popup keyakinan -> BARU panel analyzing + pembahasan, lewat kelanjutan yang
    dititipkan di confidencePopThen. Analyzing tidak pernah lagi berbagi layar dengan popup.
    -------------------------------------------------------------------------- */
+/* W1 P1-2 (06-002, 09-002, 10-001, 16-005): konfirmasi keluar kuis. Sesi dengan >=1 jawaban
+   tidak boleh hilang karena satu ketukan meleset di pojok kiri atas \u2014 apalagi ujian,
+   yang keluarnya MEMBAKAR percobaan + jeda 24 jam (abandonActiveSession). Dialognya memakai
+   sistem modal existing, jadi otomatis menjadi lapisan back-nav: tombol kembali Android di
+   atas dialog = batal. answered==0 tetap keluar bebas (aturan bebas-intip m025-177). */
+function confirmQuizExit(){
+  const a=state.activeSession,answered=Math.max(0,Number(a?.answered||0));
+  const doExit=()=>{try{closeConfidencePop()}catch(_){}try{audio.stop()}catch(_){}go('home')};
+  if(!a||answered<1){doExit();return}
+  const type=String(a.type||''),measure=type==='level-exam'||type==='grammar-skip',placement=type==='placement',planned=Math.max(1,Number(a.planned||0));
+  const line=measure?'Keluar sekarang dihitung gagal dan ujiannya terkunci 24 jam. Tetap keluar?'
+   :placement?'Keluar? Tes penempatannya mulai dari awal lagi kalau kamu balik nanti.'
+   :`Keluar? ${answered}/${planned} jawaban sesi ini nggak dilanjutkan.`;
+  openModal(`<div class="modal-mark">FIEZEL</div><h2>${measure?'Yakin keluar dari ujian?':'Yakin mau keluar?'}</h2><p>${esc(line)}</p><div class="modal-actions"><button type="button" id="quizExitConfirm">Tetap keluar</button><button type="button" class="primary" id="quizExitStay">Lanjut belajar</button></div>`);
+  $('quizExitStay').onclick=closeModal;
+  $('quizExitConfirm').onclick=()=>{closeModal();doExit();if(measure)setTimeout(()=>{try{showToast('Percobaan terpakai. Bisa diulang 24 jam lagi.')}catch(_){}},600)};
+}
+window.confirmQuizExit=confirmQuizExit;
 let confidencePopThen=null;
 function closeConfidencePop(){
   // Menutup popup MEMBATALKAN kelanjutan yang belum diambil (keluar kuis / pindah soal):
@@ -2473,7 +2520,12 @@ function buildAdaptivePool(count,policy=buildAdaptivePolicy(),reservoirMultiplie
  if(policy?.mode==='balance'&&limit>=6)for(const d of ['vocabulary','grammar','reading'])if(!result.some(q=>normalizePolicyDomain(q.type)===d))take(x=>x.domain===d,1);
  take(()=>true,limit-result.length);return result.slice(0,limit)
 }
-async function load(){const root=document.baseURI;const get=async f=>{const r=await fetch(new URL(f,root));if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
+async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch bank WAJIB punya batas waktu. Respons yang menggantung (umum di
+   koneksi seluler yang payah) dulu tidak pernah reject, jadi jalur load().catch tidak pernah
+   berjalan dan #app kosong selamanya di balik chrome yang terlihat hidup. 20 detik cukup
+   longgar untuk 3G nyata; lewat itu murid berhak diberi kartu galat + tombol Coba lagi. */
+ const bankTimeout=()=>{try{return typeof AbortSignal!=='undefined'&&typeof AbortSignal.timeout==='function'?{signal:AbortSignal.timeout(20000)}:{}}catch(_){return{}}};
+ const get=async f=>{const r=await fetch(new URL(f,root),bankTimeout());if(!r.ok)throw Error(`${f}: ${r.status}`);return r.json()};const optional=async(f,fallback)=>{try{return await get(f)}catch{return fallback}};let grammarMaster;[V,R,grammarMaster,GRAMMAR_CURRICULUM,WRITING_BANK,READING_EXAM]=await Promise.all([...DATA.map(get),optional('grammar-curriculum-v1.json',{schema:'fiezel-grammar-curriculum-v1',lessons:[]}),optional('writing-prompts-v1.json',null),optional('reading-exam-v1.json',null),loadMisconceptionDiagnoses(root)]);GRAMMAR_CURRICULUM_INDEX=buildGrammarCurriculumIndex(GRAMMAR_CURRICULUM);/* m025-161 (F1-1): satu pembangun indeks, dipakai load() dan pembaca pertama */// m025-143 (B-06): graph prasyarat Core Brain disuntik dari kurikulum yang SAMA dengan yang
   // dipakai Grammar Hub. Sebelumnya Core Brain hanya punya graph keluarga - lima keluarga
   // bahkan hilang darinya - jadi diagnosis akar masalah tidak pernah bisa menunjuk lesson.
   try{self.FiezelCoreBrain?.setCurriculumGraph?.(GRAMMAR_CURRICULUM)}catch{}
@@ -4216,6 +4268,16 @@ function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}
  * bisa membedakan ketiganya.
  */
 let stageSeq=0;const stageStack=[];
+/* W1 P1-3 (06-001): senjata satu-tembakan untuk enterStage \u2014 stage berikutnya MENUKAR
+   entri lapisan teratas (modal yang baru saja ditutup visual lewat closeModalNow) alih-alih
+   mendorong entri baru. Pola lama closeModal()+pushLayer memasangkan history.go(-1) asinkron
+   dengan pushState sinkron; penunjuk riwayat nyata tertinggal satu entri dan SATU tekanan
+   kembali di tengah ujian meng-unload dokumen (verifikasi agen 06: url jadi about:blank,
+   leave hook tak berjalan, penalti terlompati). Diaktifkan tepat sebelum quizLoop dan
+   dilucuti tepat sesudahnya, jadi jalur gagal quizLoop tidak meninggalkan senjata terkokang. */
+let stageSwapArmed=false;
+function armStageLayerSwap(){stageSwapArmed=true}
+function disarmStageLayerSwap(){stageSwapArmed=false}
 /**
  * Mendaftarkan satu sub-layar. `spec.draw` menggambar layar INI (bukan induknya), dan
  * `spec.leave` - kalau ada - membereskan apa pun yang layar ini hidupkan (audio, timer).
@@ -4232,11 +4294,19 @@ function enterStage(kind,spec){
   const entry={id:`stage:${String(kind||'screen')}:${++stageSeq}`,draw,leave:typeof spec?.leave==='function'?spec.leave:null};
   stageStack.push(entry);
   let pushed=false;
-  try{pushed=self.FiezelBackNav?.pushLayer?.({id:entry.id,close:()=>closeStage(entry)})===true}catch{}
+  const wantSwap=stageSwapArmed;stageSwapArmed=false;
+  try{
+   if(wantSwap)pushed=self.FiezelBackNav?.replaceTopLayer?.({id:entry.id,close:()=>closeStage(entry)})===true;
+   if(!pushed)pushed=self.FiezelBackNav?.pushLayer?.({id:entry.id,close:()=>closeStage(entry)})===true;
+  }catch{}
   // Entri riwayat yang gagal didorong (gerbang wajib sedang menutupi layar) tidak boleh
   // meninggalkan stage yatim di tumpukan ini - stage tanpa entri riwayat berarti tekanan
   // kembali berikutnya jatuh pada layar yang salah.
   if(!pushed)stageStack.pop();
+  /* W1 (02-002): sub-layar baru selalu mulai dari atas. Tanpa ini, lesson yang dibuka dari
+     tengah halaman hub mewarisi posisi gulir induknya dan judulnya terkubur di bawah topbar
+     lengket. Dipasang di SATU pintu masuk stage, bukan per-pemanggil. */
+  if(pushed)try{window.scrollTo(0,0)}catch(_){}
   return pushed
 }
 /** Menggambar layar yang SEKARANG berada di puncak: stage teratas, atau view-nya sendiri. */
@@ -4379,7 +4449,9 @@ function openLevelEntryGate(chosen){
   const motion=(typeof pawMotionAllowed==='function'&&pawMotionAllowed())?'':' is-static';
   openModal(`<div class="level-entry-pop${motion}" data-level-entry="${esc(decision.chosen)}"><div class="level-entry-face">${pawFaceMarkup()}</div><div class="modal-mark">FIEZEL LEVEL</div><em class="level-entry-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(decision.chosen)}</em><h2>${esc(copy.title)}</h2><p class="level-entry-line">${esc(copy.line)}</p><div class="modal-actions"><button type="button" id="levelEntryLater">${esc(LEVEL_GUARD_COPY.entryLater)}</button><button type="button" class="primary" id="levelEntryExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(decision.requiredExam)}</button></div></div>`);
   $('levelEntryLater')?.addEventListener('click',()=>levelEntryDefer(decision.chosen,decision.requiredExam));
-  $('levelEntryExam')?.addEventListener('click',()=>{closeModal();startLevelExam(decision.requiredExam)});
+  /* W1 P1-3 (06-001): closeModal() TIDAK dipanggil di sini \u2014 startLevelExam menutup
+     modalnya secara visual (closeModalNow) lalu MENUKAR entri riwayatnya dengan stage kuis. */
+  $('levelEntryExam')?.addEventListener('click',()=>{startLevelExam(decision.requiredExam)});
   // [ADAPTASI] putusan OWNER 2026-08-28: paw_greet adalah bunyi tanda tangan FIEZEL -
   // menyapa bersama reaksi onboard Paw. Jatah 2×/sesi dijaga manifest, bukan di sini.
   try{pawReact('onboard');uiSfx('paw_greet')}catch(_){}
@@ -4492,9 +4564,14 @@ function startLevelExam(level){
   }
   let questions=[];
   try{questions=buildLevelExamQuestions(target)}catch(error){return showToast(String(error?.message||error))}
-  closeModal();
+  /* W1 P1-3 (06-001): tutup modal secara VISUAL saja (tanpa history.go asinkron), lalu
+     persenjatai enterStage untuk menukar entri modal dengan entri stage kuis di tempat.
+     Riwayat dan tumpukan tidak pernah berpisah, dan tekanan kembali di tengah ujian jatuh
+     ke penutup stage (leave -> abandonActiveSession), bukan keluar dari dokumen. */
+  if(closeModalNow())armStageLayerSwap();
   showToast(`${LEVEL_GUARD_COPY.examTitle} ${target} · ${LEVEL_EXAM_SIZE} soal tanpa petunjuk`);
   quizLoop({type:'level-exam',count:LEVEL_EXAM_SIZE,pool:questions,factory:x=>x,levelScope:target,noHints:true,preserveOrder:false});
+  disarmStageLayerSwap();
 }
 function levelExamWeakSkill(){
   const rows=(state.wrongAnswers||[]).slice(-LEVEL_EXAM_SIZE),tally={};
@@ -4524,7 +4601,7 @@ function openActiveLevelExamPanel(level){
   const history=entry.lastAt?`<p class="muted">Percobaan terakhir: ${entry.lastScore||0}/${entry.lastTotal||LEVEL_EXAM_SIZE} (${entry.lastAccuracy||0}%)${entry.weakSkill?` · yang menjatuhkan: ${esc(entry.weakSkill)}`:''}.</p>`:'';
   const chain=`<p class="muted">Ujiannya berantai: level terverifikasimu sekarang <b>${esc(verified)}</b>, jadi yang boleh diuji adalah <b>${esc(nextVerifiableLevel(state)||verified)}</b>. Satu ujian, satu anak tangga.</p>`;
   const action=availability.ok?`<button type="button" class="primary" id="levelExamStart">${esc(LEVEL_GUARD_COPY.examStart)} ${esc(target)}</button>`:availability.reason==='cooldown'?`<button type="button" class="primary" disabled aria-disabled="true">Bisa diulang ${esc(levelExamCooldownLabel(availability.waitMs))}</button>`:`<button type="button" class="primary" disabled aria-disabled="true">Buka ujian ${esc(availability.next||verified)} dulu</button>`;
-  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${LEVEL_EXAM_SIZE} soal: grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading}</li><li>Soal diacak dari bank level ${esc(target)} setiap percobaan</li><li>Lulus mulai ${LEVEL_EXAM_PASS}% · tanpa petunjuk, tanpa percobaan kedua</li><li>Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">Nanti dulu</button>${action}</div>`);
+  openModal(`<div class="modal-mark">FIEZEL SKIP LEVEL</div><h2>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(target)}</h2><p>${esc(LEVEL_GUARD_COPY.examDesc)}</p><ul class="level-exam-facts"><li>${LEVEL_EXAM_SIZE} soal: grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading}</li><li>Soal diacak dari bank level ${esc(target)} setiap percobaan</li><li>Lulus mulai ${LEVEL_EXAM_PASS}% · tanpa petunjuk, tanpa percobaan kedua</li><li>Keluar di tengah ujian (atau menutup aplikasinya) sesudah menjawab = percobaan terpakai, jeda 24 jamnya berlaku</li><li>Kalau belum lulus, jeda 24 jam untuk level ini — progres dan streak tetap utuh</li></ul>${chain}${history}<div class="modal-actions"><button type="button" id="levelExamCancel">Nanti dulu</button>${action}</div>`);
   $('levelExamCancel').onclick=closeModal;
   $('levelExamStart')?.addEventListener('click',()=>startLevelExam(target));
   enhanceUI();
@@ -4651,7 +4728,7 @@ function homeStatStripMarkup(level,streak,attempts,review){
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
-function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
+function home(){pawStreakWatch();/* m028-06: kabar demosi yang tertahan selama kuis dibuka di sini, bukan di tengah soal. */if(!state.activeSession&&levelTrustState(state).pendingNotice)setTimeout(()=>{try{flushLevelGuardNotice()}catch(_){}},280);/* W1 P1-2: kabar percobaan-terputus dari boot (sanitizeState) diumumkan SEKALI di beranda. */if(state.pendingInterruptNotice){const iNotice=state.pendingInterruptNotice;state.pendingInterruptNotice='';save();setTimeout(()=>{try{showToast(iNotice)}catch(_){}},900)}/* m025-166: gerbang level yang dipasang di perkenalan muncul di sini - saat murid sudah
    benar-benar berada di dalam aplikasi, bukan di atas layar perkenalan. */if(!state.activeSession&&levelEntryGatePending)setTimeout(()=>{try{maybeShowLevelEntryGate()}catch(_){}},360);const activeLevel=getActiveLevel(),activeV=V.filter(v=>v.level===activeLevel),activeR=R.filter(r=>r.level===activeLevel),activeGrammar=grammarItemsForLevel(activeLevel),snapshot=buildLearningSnapshot(),policy=buildAdaptivePolicy(),signal=localCoachSignal(),loginMessage=selectLoginMessage(),review=snapshot.dueReviews,level=activeLevel,primaryAction=state.adaptiveReady?'startAdaptive()':"go('test')";setApp(`<section class="fade home-page">
 <div class="launcher-shell">
   <div class="launcher-copy">
@@ -5788,7 +5865,24 @@ function prasastiGalleryMarkup(){
   const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'';return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(b.title)}: ${at?`terukir ${when}`:'belum terukir. '+b.hint}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><span class="prasasti-hint">${esc(at?when:b.hint)}</span></div>`}).join('');
   return `<div class="prasasti-grid">${cells}</div><p class="map-note"><span>Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.</span></p>`;
 }
-async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbuka setelah tes awal selesai.');return}const policy=await resolveAdaptivePolicy();const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy,4);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');
+/* W1 P0-2 (20-001): CTA utama tidak boleh menggantung menunggu popup sign-in. Dua pagar:
+   (1) umpan balik seketika pada ketukan \u2014 tombol pemicunya dimatikan + aria-busy, dan
+   ketukan beruntun ditolak lewat kunci pending; (2) resolveAdaptivePolicy dibalap dengan
+   batas 4 detik \u2014 lewat itu sesi berjalan dengan kebijakan kolam lokal (jalur fallback
+   yang sudah ada dan teruji) plus satu toast jujur. Render soal pertama tidak pernah lagi
+   digerbangi jaringan/auth. */
+async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbuka setelah tes awal selesai.');return}
+ if(startAdaptive.pending)return;startAdaptive.pending=true;
+ const busyBtns=[...document.querySelectorAll('button')].filter(b=>String(b.getAttribute('onclick')||'').includes('startAdaptive'));
+ busyBtns.forEach(b=>{b.disabled=true;b.setAttribute('aria-busy','true')});
+ let policy=null;
+ try{
+  policy=await Promise.race([resolveAdaptivePolicy(),new Promise(res=>{const t=setTimeout(()=>res(null),4000);t?.unref?.()})]);
+  /* Toast fallback ditunda sedikit: toast judul sesi (di bawah) menimpa elemen toast yang
+     sama, jadi tanpa jeda pesan kejujuran ini tidak sempat terbaca. */
+  if(!policy){policy={...buildAdaptivePolicy(),source:'local-policy-timeout'};setTimeout(()=>showToast('Servernya lambat merespons \u2014 sesi ini pakai profil lokalmu dulu.'),2800)}
+ }finally{startAdaptive.pending=false;busyBtns.forEach(b=>{try{b.disabled=false;b.removeAttribute('aria-busy')}catch(_){}})}
+ const count=Math.max(5,Math.min(16,Number(policy.sessionSize||12))),pool=buildAdaptivePool(count,policy,4);if(!pool.length)return showToast('Profil adaptif belum memiliki area yang cukup terukur. Lanjutkan latihan level terlebih dahulu.');
  /* Fase 3 (C5 butir 2): sesi adaptif menyisipkan 1-2 soal cloze PRODUKSI bila bank tersedia
     dan skill-nya lolos gerbang BKT L>=0.6 - recall produksi hanya untuk materi yang
     recognition-nya sudah stabil. Disisipkan di posisi 2 dan 5 (bukan soal pembuka: sesi
@@ -6121,7 +6215,9 @@ function openLessonSkipGate(skill){
   if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid — gerbangnya belum bisa dibuka.`);
   openModal(`<div class="modal-mark">FIEZEL LEWATI MATERI</div><h2>Lewati “${esc(title)}”?</h2><p>Sudah menguasai materi ini dari tempat lain? Buktikan dulu — tidak ada lompatan gratis, sama seperti Ujian Skip Level.</p><ul class="level-exam-facts"><li>${LESSON_SKIP_GATE_SIZE} soal dari materi ini, diacak dari templat lessonnya</li><li>Tanpa petunjuk · keluar di tengah jalan = percobaannya terpakai</li><li>Benar minimal ${LESSON_SKIP_GATE_PASS} → materi ditandai selesai, lesson berikutnya terbuka</li><li>Belum lulus? Progresmu aman — gerbangnya membuka lagi setelah 24 jam, materinya tetap menunggumu di jalur</li></ul><div class="modal-actions"><button type="button" id="lessonSkipCancel">Nanti dulu</button><button type="button" class="primary" id="lessonSkipStart">Mulai gerbang bukti</button></div>`);
   $('lessonSkipCancel').onclick=closeModal;
-  $('lessonSkipStart').onclick=()=>{closeModal();startLessonSkipGate(skill)};
+  /* W1 P1-3 (06-001): sama dengan startLevelExam \u2014 modal ditutup visual di dalam
+     startLessonSkipGate dan entri riwayatnya ditukar dengan stage, tanpa go(-1) asinkron. */
+  $('lessonSkipStart').onclick=()=>startLessonSkipGate(skill);
   enhanceUI();
 }
 function startLessonSkipGate(skill){
@@ -6129,7 +6225,10 @@ function startLessonSkipGate(skill){
   if(gateWait>0)return showToast(`Gerbang materi ini bisa dicoba lagi ${levelExamCooldownLabel(gateWait)}.`);
   const questions=buildLessonSkipGateQuestions(skill);
   if(questions.length<LESSON_SKIP_GATE_SIZE)return showToast(`Materi ini baru memiliki ${questions.length} soal valid.`);
+  /* W1 P1-3 (06-001): tukar entri modal dengan stage \u2014 lihat catatan di startLevelExam. */
+  if(closeModalNow())armStageLayerSwap();
   quizLoop({type:'grammar-skip',count:LESSON_SKIP_GATE_SIZE,pool:questions,factory:x=>x,preserveOrder:true,noHints:true,skipGateSkill:skill});
+  disarmStageLayerSwap();
 }
 window.openLessonSkipGate=openLessonSkipGate;window.startLessonSkipGate=startLessonSkipGate;
 // m025-150: pilihan yang DIPINJAM dari lesson lain butuh alasannya sendiri. Melewatkannya
@@ -6598,6 +6697,13 @@ function startLevelPractice(level){
  *    daripada yang sebenarnya, dan seluruh model kemampuan di atasnya ikut keliru.
  */
 function quizLoop(cfg){
+ /* W1 P1-1 (09-001, 10-005, 09-010): mode UKUR. Ujian Skip Level, gerbang lewati materi,
+    dan tes penempatan adalah alat ukur \u2014 vonis benar/salah, kunci jawaban, pembahasan,
+    popup keyakinan, dan teater analyzing per-soal MEMBOCORKAN kunci ke percobaan berikutnya
+    (bank per level terbatas, ulang cuma 24 jam). Di bawah bendera ini jawaban hanya diakui
+    netral ("Tersimpan"), dan seluruh pembahasan per-soal pindah ke layar hasil. Sesi BELAJAR
+    tidak tersentuh: semua jalur umpan balik lama tetap berjalan bila MEASURE false. */
+ const MEASURE=!!cfg.placement||['level-exam','grammar-skip','placement'].includes(String(cfg.type||''));
  let questions=cfg.pool.map(item=>cfg.factory?cfg.factory(item):item).filter(q=>cfg.placement||!q?.level||q.level===(cfg.levelScope||getActiveLevel()));
  const unique=[],seen=new Set();
  /* Fase 3 (C5 butir 2): soal cloze memang tanpa opsi (murid mengetik), jadi validator
@@ -6654,7 +6760,7 @@ function quizLoop(cfg){
   */
  const teach=info=>{
   setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked}</span><em>/ ${planned}</em></div><span class="quiz-teach-flag">Jeda mengajar</span></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${card(`<div class="tutor-card"><div class="tutor-card-head"><span class="tutor-turn-face"><i data-lucide="graduation-cap"></i></span><div><small>AJAR ULANG</small><b>${esc(info.concept)}</b></div></div>${info.why?`<p class="tutor-card-why">Yang bikin tadi keliru: ${esc(String(info.why).replace(/[.\s]+$/,''))}.</p>`:''}${info.rule?`<p class="tutor-card-rule">${esc(info.rule)}</p>`:''}${info.cue?`<p class="tutor-card-cue"><i data-lucide="lightbulb"></i> ${esc(info.cue)}</p>`:''}<button class="primary wide" id="teachNext">Oke, aku siap coba lagi <i data-lucide="arrow-right"></i></button></div>`)}</section>`);
-  $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
+  $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   /* R6 perbaikan-14: kartu ajar-ulang dibuka lewat quizNext yang sudah menyetel start, jadi
      lama MEMBACA kartu ikut terhitung sebagai waktu jawab soal berikutnya - mencemari bukti
      response-time (evidenceKappa, kalibrasi item). Timer dimulai ulang saat murid benar-benar
@@ -6710,7 +6816,7 @@ function quizLoop(cfg){
      skala panel per layar (§2b-4); saat komponen belum siap, semuanya persis seperti dulu. */
   const pawSlot=(self.FiezelPawSlot&&typeof self.FiezelPawSlot.plan==='function')?self.FiezelPawSlot.plan('quiz-question',{motion:pawMotionAllowed()}):null;
   setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${pawSlot?pawSlot.above:''}${card(`${pawSlot?pawSlot.peek:''}<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question" id="quizStem">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
-  $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
+  $('quizExit').onclick=()=>confirmQuizExit();/* W1 P1-2: keluar lewat konfirmasi, bukan seketika. */
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
   /* [FASE 7] m-audit-03 Tugas D: tiga event pelajaran yang didukung maskot tapi tak pernah
      dipanggil (question-shown / hover-answer / answer-picked). Pengawinannya milik modul slot;
@@ -6796,6 +6902,18 @@ function quizLoop(cfg){
  /** Membuka jawaban dan seluruh penjelasannya. Jalur akhir untuk satu soal. */
  const reveal=(q,j,ok,{forced=false}={})=>{
   document.querySelectorAll('.option').forEach(b=>b.disabled=true);
+  /* W1 P1-1: di mode ukur TIDAK ADA yang dibuka \u2014 tidak ada sorotan kunci, tidak ada
+     vonis, tidak ada pembahasan, tidak ada tombol AI. Hanya tanda terima netral; murid
+     lanjut, dan pembahasan lengkap menunggunya di layar hasil (finishQuiz). */
+  if(MEASURE){
+   const f=$('feedback');f.classList.remove('hidden');
+   f.innerHTML=`<div class="feedback-title"><i data-lucide="check"></i><b>Tersimpan.</b></div><p class="muted">Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ${cfg.placement?'tes':'ujian'} ini selesai.</p>`;
+   answer.locked=true;
+   $('quizNext').disabled=false;
+   try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+   enhanceUI();
+   return;
+  }
   document.querySelectorAll('.option')[q.answerIndex]?.classList.add('correct');
   const turn=tutorCompose(q,j,ok,answer.scaffold||'tell',forced?'reteach':answer.move,answer.timing);
   const f=$('feedback');f.classList.remove('hidden');f.classList.add(ok?'feedback-success':'feedback-error');
@@ -6806,6 +6924,11 @@ function quizLoop(cfg){
   // R2-5: popup keyakinan TIDAK lagi dibuka di sini - ia sudah selesai SEBELUM panel
   // analyzing berjalan (lihat answer()), jadi pembahasan ini tercat di layar yang bersih.
   $('aiExplainBtn').onclick=()=>explainWithAI(q,j);
+  /* W1 P1-4 (11-001, 08-003): muatan belajar WAJIB tampil di layar. Panel pembahasan tercat
+     923-1159px dari atas pada viewport 844px \u2014 nol piksel terlihat, dan Lanjut sudah
+     menyala, jadi seluruh penjelasan bisa terlewat tanpa pernah terlihat. Pola scroll +
+     gerbang kurangi-gerak DISALIN dari giliran retry tutor di atas, bukan varian baru. */
+  try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
   // m025-126: `breathe` berhenti menjadi kalimat dan menjadi PILIHAN.
   //
   // decideMove menaruh lelah di urutan paling atas justru karena latihan di atas kelelahan
@@ -6845,8 +6968,18 @@ function quizLoop(cfg){
   if(answer.locked)return;
   const ok=j===q.answerIndex,ms=Date.now()-start,firstTry=answer.retryOf!==q.id;
   answer.lastPick=j;
-  button.classList.add(ok?'correct':'wrong');
-  answerFeedbackSignal(ok);
+  /* W1 P1-1: mode ukur menandai pilihan secara NETRAL (tanpa warna vonis) dan berbunyi
+     netral \u2014 umpan balik taktil/bunyi tetap hidup, verdiknya yang tidak bocor.
+     Literal answerFeedbackSignal/showAnswerBurst tetap dipakai jalur latihan (release-audit). */
+  if(MEASURE){
+   button.classList.add('picked');
+   button.setAttribute('aria-pressed','true');
+   try{button.style.outline='3px solid var(--ink)';button.style.outlineOffset='2px'}catch(_){}
+   haptic('tap');uiSfx('button_tap');
+  }else{
+   button.classList.add(ok?'correct':'wrong');
+   answerFeedbackSignal(ok);
+  }
 
   // PENILAIAN HANYA PADA PERCOBAAN PERTAMA. Percobaan kedua ada untuk belajar; menghitungnya
   // sebagai benar membuat penguasaan yang dilaporkan lebih tinggi daripada yang sebenarnya,
@@ -6860,6 +6993,8 @@ function quizLoop(cfg){
    // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
    // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
    if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
+   /* W1 P1-1: bahan review per-soal untuk layar hasil mode ukur. */
+   if(MEASURE)(cfg.__measureReview??=[]).push({q,chosen:j});
    record(q,ok,ms,j);
    const h=state.history[state.history.length-1];
    if(q.type==='vocab')updateMastery('vocab',q.target,ok,h.ms,h.confidence,h.at);
@@ -6871,7 +7006,7 @@ function quizLoop(cfg){
    // BARU SAJA keliru dan ditahan sampai murid menekan Lanjut, jadi urutannya menjadi
    // "buka jawaban ini -> ajarkan konsepnya -> soal berikutnya dengan konsep yang sama",
    // bukan langsung melempar soal serupa kepada orang yang keyakinannya belum tersentuh.
-   if(decision.move==='reteach'&&!cfg.noHints){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
+   if(decision.move==='reteach'&&!cfg.noHints&&!MEASURE){forceConcept=quizConcept(q);pendingCard=tutorConceptCard(q,j)}
    if(decision.move==='breathe')answer.breathe=true;
   }else{
    // Percobaan kedua tidak menaikkan skor atau penguasaan, tetapi tetap menutup episode
@@ -6888,7 +7023,7 @@ function quizLoop(cfg){
   // ulang yang sama.
   /* m028-06: Ujian Skip Level berjalan TANPA petunjuk dan tanpa percobaan kedua
      (cfg.noHints) - kalau tidak, "terverifikasi" hanya berarti dituntun sampai benar. */
-  if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints){
+  if(!ok&&firstTry&&answer.scaffold!=='tell'&&!cfg.noHints&&!MEASURE){
    answer.retryOf=q.id;
    button.disabled=true;
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
@@ -6906,6 +7041,9 @@ function quizLoop(cfg){
   // dan scrim popup menutupinya. Pilihan dimatikan sekarang juga supaya tidak ada jendela
   // ketukan kedua selama popup hidup (answer.locked baru true di dalam reveal()).
   document.querySelectorAll('.option').forEach(b=>{b.disabled=true});
+  /* W1 P1-1: mode ukur melompati popup keyakinan (verdiknya tertulis di popup itu) DAN
+     teater analyzing 700ms \u2014 langsung ke tanda terima netral. */
+  if(MEASURE){reveal(q,j,ok);return}
   confidencePopThen=()=>showCoreAnalyzing(()=>reveal(q,j,ok));
   openConfidencePop(ok);
  }
@@ -6961,8 +7099,10 @@ function quizLoop(cfg){
     }
   }catch{}
   const ok=!!res.ok;
-  answerFeedbackSignal(ok);
+  /* W1 P1-1: jalur cloze di mode ukur juga netral \u2014 bunyi/haptic tanpa vonis. */
+  if(MEASURE){haptic('tap');uiSfx('button_tap')}else answerFeedbackSignal(ok);
   if(ok)score++;
+  if(MEASURE)(cfg.__measureReview??=[]).push({q,typed});
   record(q,ok,ms,-1);
   // Efek grader: distraktor cocok -> ledger miskonsepsi (guarded di helper).
   try{clozeProductionRecord(state.activeSession,q,res,ok)}catch{}
@@ -6970,7 +7110,7 @@ function quizLoop(cfg){
   // tidak memilih opsi, ia menulis. Kartu ajar-ulang morfem menimpa keputusan reteach
   // generik karena diagnosis grader lebih spesifik: yang salah BENTUKNYA.
   try{const d=tutorObserve(tutor,q,-1,ok,ms,{remaining:remaining.length,scored:true});answer.move=d.move;answer.timing=d.diagnosis?.timing||''}catch{}
-  if(!ok&&String(res.rationale||'')==='brain3_production_morpheme_miss'&&!cfg.noHints){
+  if(!ok&&String(res.rationale||'')==='brain3_production_morpheme_miss'&&!cfg.noHints&&!MEASURE){
    forceConcept=quizConcept(q);
    pendingCard={concept:friendlySkillName(quizConcept(q)),why:`kamu menulis "${typed}" - kata dasarnya sudah benar, bentuknya yang belum`,rule:q.explain?.rule||`Bentuk yang tepat: "${q.clozeAnswer}".`,cue:q.explain?.memory||''};
   }
@@ -6982,6 +7122,17 @@ function quizLoop(cfg){
  const revealCloze=(q,typed,ok,res,input,btn)=>{
   if(input)input.disabled=true;
   if(btn)btn.disabled=true;
+  /* W1 P1-1: tanda terima netral untuk cloze di mode ukur \u2014 tanpa vonis, tanpa kunci,
+     tanpa popup keyakinan. */
+  if(MEASURE){
+   const f=$('feedback');f.classList.remove('hidden');
+   f.innerHTML=`<div class="feedback-title"><i data-lucide="check"></i><b>Tersimpan.</b></div><p class="muted">Jawabanmu kecatat. Pembahasan lengkap muncul di layar hasil setelah ${cfg.placement?'tes':'ujian'} ini selesai.</p>`;
+   answer.locked=true;
+   $('quizNext').disabled=false;
+   try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
+   enhanceUI();
+   return;
+  }
   const rationale=String(res?.rationale||'');
   const detail=ok&&rationale==='brain3_production_near_match'
    ?`Hampir persis - aku hitung benar, cek lagi ejaannya: <strong>${esc(q.clozeAnswer)}</strong>.`
@@ -6993,6 +7144,8 @@ function quizLoop(cfg){
   f.innerHTML=`<div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${ok?'Benar, mantap!':'Belum tepat, tidak apa-apa.'}</b></div><p>Kamu menulis <strong>${esc(typed)}</strong>. ${detail}</p><p><strong>Intinya:</strong> ${esc(q.explain?.why||'Perhatikan petunjuk waktu dan bentuk kata dalam kalimat.')} ${q.explain?.rule?esc(q.explain.rule):''}</p><p class="memory-tip"><i data-lucide="lightbulb"></i><span>${esc(q.explain?.memory||'Baca petunjuk waktunya dulu, baru bentuk katanya.')}</span></p>`;
   answer.locked=true;
   $('quizNext').disabled=false;
+  /* W1 P1-4 (11-001 saudara cloze): pembahasan cloze juga harus terlihat, aturan yang sama. */
+  try{f.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
   openConfidencePop(ok);
   enhanceUI();
  };
@@ -7126,7 +7279,12 @@ function finishQuiz(cfg,score,total,tutorReport){
   // beserta band mana yang menjadi dasarnya.
   const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">LEVEL KAMU</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span></div>${placementBands?`<div class="result-bands"><small>Bukti per band (benar / ditanyakan pada percobaan pertama):</small><div class="result-band-row">${placementBandChips(placementBands)}</div><small>Level naik satu band hanya kalau band itu lulus, mulai dari A1. Menebak tidak cukup.</small></div>`:''}${placementAdopted?`<p class="muted">Level belajarmu diikutkan ke hasil tes ini, menggantikan perkiraan yang kamu pilih di awal. Kamu tetap bisa menggantinya sendiri kapan saja dari panel level.</p>`:''}${placementManualLevel?`<p class="muted">Level aktifmu sekarang <b>${esc(placementManualLevel)}</b> karena kamu memilihnya sendiri. Hasil tes ini menunjukkan <b>${esc(placementLevelName)}</b>.</p>`:''}`:'';
   const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&amp;&amp;go('home')">Ikuti hasil tes (${esc(placementLevelName)}) <i data-lucide="arrow-right"></i></button>`:'';
-  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':cfg.type==='level-exam'?`${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai`:cfg.type==='grammar-skip'?'Gerbang lewati materi selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${outcomeLine}${srlLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
+  /* W1 P1-1 (09-001): pembahasan per-soal mode ukur HIDUP DI SINI \u2014 setelah pengukuran
+     selesai, bukan di tengahnya. Nilai belajarnya utuh (jawabanmu vs kunci + intinya +
+     pembandingnya), integritas ujiannya juga: tidak ada kunci yang tampil sebelum skor final. */
+  const measureRows=Array.isArray(cfg.__measureReview)?cfg.__measureReview:[];
+  const measureReviewBlock=measureRows.length?`<details class="acc measure-review"><summary>Lihat pembahasan (${measureRows.length})</summary><div class="measure-review-list">${measureRows.map((r,i)=>{const q=r.q||{};const isCloze=q.type==='cloze';const ok=isCloze?norm(String(r.typed||''))===norm(String(q.clozeAnswer||'')):r.chosen===q.answerIndex;const yours=isCloze?String(r.typed||'\u2014'):String(q.options?.[r.chosen]??'\u2014');const key=isCloze?String(q.clozeAnswer||''):String(q.options?.[q.answerIndex]??'');return `<div class="feedback ${ok?'feedback-success':'feedback-error'}"><div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${i+1}. ${esc(q.question||'')}</b></div><p>Jawabanmu <strong>${esc(yours)}</strong>${ok?' \u2014 benar.':`. Jawaban yang paling tepat adalah <strong>${esc(key)}</strong>.`}</p>${q.explain?.why||q.explain?.rule?`<p class="muted"><strong>Intinya:</strong> ${esc(q.explain?.why||'')} ${esc(q.explain?.rule||'')}</p>`:''}</div>`}).join('')}</div></details>`:'';
+  setApp(`<section class="fade center result-stage">${card(`<div class="result-icon"><i data-lucide="trophy"></i></div><div class="modal-mark">SESSION COMPLETE</div><h2>${cfg.placement?'Tes level selesai':cfg.type==='level-exam'?`${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(cfg.levelScope||'')} selesai`:cfg.type==='grammar-skip'?'Gerbang lewati materi selesai':'Latihan selesai'}</h2><div class="ring-row"><div class="score" aria-label="${accuracy}%"><span id="quizScoreCount" aria-hidden="true">${accuracy}%</span></div>${pawFaceMarkup()}</div><p>${score} dari ${total} jawaban benar pada percobaan pertama.</p>${placementLevelBlock}${tutorLine}${examVerdict?`<p class=\"level-exam-verdict ${examVerdict.passed?'is-pass':'is-fail'}\">${esc(examVerdict.message)}</p>`:''}${skipVerdict?`<p class=\"level-exam-verdict ${skipVerdict.passed?'is-pass':'is-fail'}\">${esc(skipVerdict.message)}</p>`:''}${measureReviewBlock}${outcomeLine}${srlLine}${placementAdoptButton?`<div class="result-actions">${placementAdoptButton}<button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:nextDomain?`<div class="result-actions"><button class="primary" onclick="go('${nextDomain}')">Lanjut latihan berikutnya <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="go('home')">Kembali ke Home</button></div>`:`<button class="primary" onclick="go('home')">Kembali ke Home <i data-lucide="arrow-right"></i></button>`}`,'hero result-card')}</section>`);
   // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
   // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
   try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}
@@ -8138,4 +8296,18 @@ installBackNav();
 // m025-84: boot yang gagal harus MENYINGKIRKAN splash frame-pertama sebelum menulis pesan
 // galat - kalau tidak, pesannya ditulis ke #app yang tertutup penuh oleh splash dan murid
 // hanya melihat layar sambutan yang menggantung selamanya.
-load().catch(e=>{dismissBootSplash();setApp(`<div class="error">Gagal memuat FIEZEL: ${esc(e.message)}. Jalankan melalui server lokal/GitHub Pages, bukan file://.</div>`)});
+/* W1 P0-1 (16-002): kartu galat boot berbahasa murid, bukan berbahasa fetch. Pesannya
+   bercabang menurut penyebab yang bisa diperiksa (offline / file:// / server-jaringan),
+   isi galat mentah ("Failed to fetch") dibuang ke console.debug, dan ada tombol "Coba lagi"
+   yang menjalankan ulang load() tanpa memaksa murid me-reload halaman sendiri. */
+function bootFiezel(){return load().catch(e=>{dismissBootSplash();
+  try{console.debug('FIEZEL boot error:',e)}catch(_){}
+  const offline=typeof navigator!=='undefined'&&navigator.onLine===false,fileProto=typeof location!=='undefined'&&location.protocol==='file:';
+  const msg=offline?'Kamu lagi offline. Sambungkan internet dulu, ya \u2014 materi belajarnya diambil dari server.'
+   :fileProto?'Jalankan melalui server lokal/GitHub Pages, bukan file://.'
+   :'Materi belum bisa dimuat. Servernya lagi bermasalah atau koneksimu putus-putus. Coba sekali lagi, ya.';
+  setApp(`<div class="error"><p>${esc(msg)}</p><div class="modal-actions"><button type="button" id="bootRetry" class="primary">Coba lagi</button></div></div>`);
+  const btn=$('bootRetry');
+  if(btn)btn.onclick=()=>{btn.disabled=true;btn.setAttribute('aria-busy','true');btn.textContent='Memuat\u2026';bootFiezel()};
+})}
+bootFiezel();
