@@ -505,6 +505,10 @@ input[type="checkbox"],input[type="radio"]{min-width:24px;min-height:24px}
 .welcome-panel .primary,.modal-actions{margin-top:16px}
 .modal-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .modal-actions button{flex:1;min-width:120px}
+/* Audit 04-001: di 320px "Simpan pengaturan" tidak muat di tombol 122px - teksnya
+   menerobos keluar kotak dan menimpa "Batal". Di layar sesempit itu tombolnya
+   dibiarkan membungkus jadi baris penuh (flex-wrap sudah ada di .modal-actions). */
+@media (max-width:340px){.modal-actions button{flex-basis:100%}}
 
 /* ---------- FIEZEL AI ---------- */
 .ai-btn{
@@ -798,7 +802,9 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .brand-button{display:flex;align-items:center;gap:12px;border:0;background:transparent;padding:6px 2px;box-shadow:none;color:var(--ambient-text)}
 .brand-button:hover{transform:none;border-color:transparent;box-shadow:none}
 .brand{width:112px}.brand-edition{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ambient-muted);font-weight:700;border-left:1px solid rgba(255,255,255,.24);padding-left:12px}
-.topbar-actions{display:flex;align-items:center;gap:8px}
+/* Audit 20-003: di 280px topbar-actions menolak menyusut dan mendorong scroll horizontal.
+   min-width:0 mengizinkan flex item ini mengecil di bawah lebar konten minimumnya. */
+.topbar-actions{display:flex;align-items:center;gap:8px;min-width:0}
 /* m025-113: tombol ikon duduk DI DALAM topbar, dan topbar kini memakai --chrome-bg yang
    ikut fase langit. Permukaan bertema di dalam kroma sadar-fase itulah cara lama bug
    kontras kembali: pukul 22.00 kromanya gelap, lingkaran ini tetap putih. Keduanya kini
@@ -886,7 +892,10 @@ button svg,.creator-link svg{width:17px;height:17px;flex:0 0 auto}
 .setting-row input,.consent-row input{accent-color:var(--text);width:20px;height:20px}
 .report-settings{margin:4px 0 18px;padding:18px;text-align:left;background:var(--surface-warm);border:1px solid var(--line);border-radius:18px}.report-settings .row{align-items:start}.report-settings .row p{margin:3px 0 0}
 .endpoint-label{display:grid;gap:7px;margin:16px 0 12px;font-size:.72rem;font-weight:700;color:var(--muted)}
-.setup-link{display:inline-flex;align-items:center;gap:8px;margin-top:14px;color:var(--accent-strong);font-size:.74rem;font-weight:700;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
+/* Audit 04-005: tautan ini cuma setinggi 16px - jauh di bawah sasaran sentuh 44px.
+   Padding vertikal 14px menaikkan kotak sentuhnya jadi 44px; margin negatif menelan
+   pertumbuhannya supaya tata letak fold Lanjutan tidak bergeser satu piksel pun. */
+.setup-link{display:inline-flex;align-items:center;gap:8px;margin:0 -10px -14px;padding:14px 10px;color:var(--accent-strong);font-size:.74rem;font-weight:700;text-decoration:none}.setup-link:hover{text-decoration:underline}.setup-link svg{width:16px;height:16px}
 .endpoint-label input{width:100%;min-height:48px;padding:13px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);font:inherit;color:var(--text)}
 .endpoint-label input:focus{outline:2px solid var(--focus-ring);outline-offset:2px;border-color:var(--focus-ring)}
 .consent-row{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;font-size:.72rem;line-height:1.5;color:var(--muted);cursor:pointer}
@@ -2003,8 +2012,11 @@ button:active {
    Yang diambil karena itu maksudnya: label yang mengecil sampai batas masih terbaca, dan
    tidak lagi bersaing dengan baloknya. Kapital, tebal, dan jarak huruf dicabut; ketiganya
    itulah yang menyumbang lebar, bukan tinggi hurufnya. */
+/* Audit 14-002 (satu-satunya pelanggaran axe): opacity .75 menurunkan --muted jadi
+   #928673 efektif - 3,4:1 di atas krem topbar, di bawah ambang 4,5:1. --muted penuh
+   (#6E5E47) sudah cukup kalem; kontrasnya ±5,7:1 tanpa mengubah kesan visualnya. */
 .ask-button .ask-label{font-size:12px;font-weight:500;letter-spacing:0;
-  color:var(--muted);white-space:nowrap;opacity:.75}
+  color:var(--muted);white-space:nowrap}
 
 .ask-box{display:flex;gap:8px;align-items:center;margin:4px 0 16px}
 .ask-box input{flex:1;min-width:0;min-height:48px;padding:12px 14px;border:1px solid var(--line);
@@ -2278,7 +2290,12 @@ html.fiezel-ui-v6 body button:not(.primary):not(.nav):not(.icon-button):not(.tex
    Ini titik ungkit termurah dari "template" ke "eksklusif", persis seperti yang
    ditulis brief: garis coklat + isian pastel, sudut membulat, satu keluarga.
    -------------------------------------------------------------------------- */
-.fz-i{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0}
+/* Audit 20-002: setiap konteks .fz-i WAJIB mendeklarasikan ukurannya sendiri, dan kelas
+   dasarnya membawa pagar maksimum. Tanpa pagar ini, satu konteks yang lupa (seperti
+   ritual harian) membuat SVG-nya mekar ke ukuran intrinsik 300px - kelas cacat yang
+   sama dengan bug "ikon Peta 300px" di m025-166. Ukuran .fz-i terbesar yang disengaja
+   hari ini 26px (.nav), jadi 48px aman untuk semua pemakaian sah. */
+.fz-i{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;line-height:0;max-width:48px;max-height:48px}
 .fz-i svg{width:100%;height:100%;display:block}
 .fz-i .fz-fill{fill:var(--fz-i-fill,var(--yellow));transition:fill .2s var(--ease)}
 .fz-i .fz-line{fill:none;stroke:var(--fz-i-line,var(--ink));stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -3178,6 +3195,11 @@ html.fiezel-ui-v6 .launcher-shell{
   padding:0 12px;font-size:.86rem;line-height:1.2;white-space:nowrap;
   border-radius:14px
 }
+/* Audit 04-001: di 320px "Simpan pengaturan" (nowrap, tombol 122px) mencat teksnya KELUAR
+   kotak dan menimpa "Batal". Di layar sesempit itu labelnya diizinkan membungkus DI DALAM
+   tombolnya sendiri: dua baris .86rem masih muat di sasaran 44px, jadi kontrak m025-165
+   (bar satu baris setinggi 58px) tetap utuh - teksnya saja yang tidak lagi kabur. */
+@media (max-width:340px){.modal-actions.settings-actions button{white-space:normal;height:auto}}
 /* Panel diberi dasar rata supaya bar benar-benar duduk di dasar modal, dan scroll-padding
    sebesar bar supaya elemen yang di-fokus/di-scroll-into-view tidak berhenti di baliknya. */
 .modal-panel:has(.modal-actions.settings-actions){padding-bottom:0;scroll-padding-bottom:58px}
@@ -3480,7 +3502,11 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .level-entry-pop .modal-actions{width:100%;animation-delay:.24s}
 .level-entry-face{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:var(--panel-soft,#f8f1e7);border:1px solid var(--line,#eadfce)}
 .level-entry-chip,.level-trust-chip{display:inline-block;padding:4px 10px;border-radius:999px;border:1px solid color-mix(in srgb,var(--yellow-deep,#b8862b) 40%,transparent);background:color-mix(in srgb,var(--yellow-deep,#b8862b) 14%,transparent);color:var(--yellow-deep,#b8862b);font-style:normal;font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.level-trust-chip{justify-self:start}
+/* Audit 02-003: teks chip 10,56px memakai --yellow-deep di atas krem (±2:1) - melanggar
+   aturan berkas ini sendiri: kuning adalah warna BIDANG, bukan warna teks. --info adalah
+   SATU-SATUNYA kuning-tinta yang boleh jadi teks (lihat komentar token v6), dan ukurannya
+   dinaikkan ke lantai 12px. Bidang chip (border/latar kuning tipis) tidak berubah. */
+.level-trust-chip{justify-self:start;color:var(--info,#7A5F1B);font-size:.75rem}
 .level-trust-chip-cta{justify-self:start;margin-top:4px;padding:7px 13px;border-radius:999px;border:1px solid color-mix(in srgb,var(--accent,#c2402c) 42%,transparent);background:transparent;color:var(--accent,#c2402c);font-size:.76rem;font-weight:700}
 @keyframes fzLevelEntryPop{from{opacity:0;transform:scale(.9) translate3d(0,10px,0)}60%{opacity:1;transform:scale(1.01) translate3d(0,0,0)}to{opacity:1;transform:scale(1) translate3d(0,0,0)}}
 @keyframes fzLevelEntryRise{from{opacity:0;transform:translate3d(0,7px,0)}to{opacity:1;transform:none}}
@@ -3506,7 +3532,10 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .path-step{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 0 22px}
 /* Garis penghubung antar simpul: satu kolom di tengah cincin. Selesai = tinta hangat,
    terkunci = putus-putus redup — jalur terbaca bahkan tanpa warna (aksesibilitas). */
-.path-step::after{content:'';position:absolute;left:31px;top:66px;bottom:-6px;width:3px;border-radius:2px;background:var(--gold);opacity:.55}
+/* Audit 04-004: garis dekoratif ini menangkap hit-test dan membuat strip mati 3px di
+   tengah setiap simpul (tap tepat di pusat node tidak membuka materi). pointer-events:none
+   mengembalikan seluruh area ke tombolnya; ini murni dekorasi. */
+.path-step::after{content:'';position:absolute;left:31px;top:66px;bottom:-6px;width:3px;border-radius:2px;background:var(--gold);opacity:.55;pointer-events:none}
 .path-step.is-locked::after{background:none;border-left:3px dashed rgba(36,26,17,.18)}
 .path-step:last-child::after{display:none}
 .path-node{display:grid;place-items:center;width:64px;height:64px;padding:0;border:none;border-radius:50%;background:transparent;box-shadow:none}
@@ -3569,6 +3598,9 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
 .fz-ritual-paw :is(svg,img,canvas){width:48px;height:48px}
 .fz-ritual-hi{margin:0;font-size:1.16rem;font-weight:700}
 .fz-ritual-streak{margin:0;display:flex;align-items:center;gap:6px;font-size:.84rem;color:var(--accent-strong)}
+/* Audit 20-002: ikon api runtun tidak pernah diberi ukuran, jadi ia mekar ke 300px dan
+   kartu ritualnya menggelembung. 20px sejajar dengan teks .84rem di sampingnya. */
+.fz-ritual-streak .fz-i{width:20px;height:20px}
 .fz-ritual-mark{letter-spacing:.14em;font-size:.66rem;color:rgba(36,26,17,.5);margin-top:4px}
 .fz-ritual-blocks{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .fz-ritual-block{display:grid;gap:2px;padding:9px 12px;border-radius:12px;background:#FFFDF6;box-shadow:inset 0 0 0 1px rgba(36,26,17,.07)}
@@ -3617,10 +3649,16 @@ body.reduce-motion.fz-stage-map .fz-coach-bubble{animation:none}
    jalur normal tetap terbaca sebagai jalan utama. */
 .lesson-skip-link{
   display:inline-flex;align-items:center;gap:5px;min-height:0;width:max-content;
+  position:relative;
   margin-top:5px;padding:4px 8px;border-radius:10px;
   background:none;border:1px dashed rgba(36,26,17,.35);box-shadow:none;
   color:var(--muted);font-size:.7rem;font-weight:700;
 }
+/* Audit 04-003: tautan ini setinggi 24px - 45% di bawah sasaran sentuh 44px - dan
+   berulang 16x per jalur. Perpanjangan hit-area transparan menaikkan kotak sentuh
+   efektifnya ke 44px tanpa membesarkan tampilannya; ruang di atas (label) dan di bawah
+   (padding 22px .path-step) tidak berisi target lain. */
+.lesson-skip-link::before{content:'';position:absolute;left:0;right:0;top:-10px;bottom:-10px}
 .lesson-skip-link svg{width:12px;height:12px}
 .lesson-skip-link:hover{background:var(--sun-soft);color:var(--text);transform:none;box-shadow:none}
 /* Node terkunci: tombol node-nya disabled, tetapi tautan lewati TIDAK ikut redup -
