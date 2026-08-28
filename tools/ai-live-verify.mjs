@@ -311,6 +311,34 @@ async function main() {
     input: MINIMAL_INPUT[probeTask]
   });
   requests.push({ step: 'forbidden-prompt-top', status: forbidTop.status, ms: forbidTop.ms });
+
+  /* --- P3: FLAG SERVER DIPERIKSA LEBIH DULU, DAN DIKATAKAN TERUS TERANG ---------------
+   *
+   * Sejak P3, `route-wiring.js` MENEGAKKAN `cfAiEnabled` sebelum badan permintaan dibaca,
+   * jadi ketika AI mati SEMUA permintaan `/api/ai/task` dijawab 403 — termasuk probe
+   * validasi di atas yang seharusnya 400. Itu perilaku yang benar (penolakan flag lebih
+   * murah dan lebih dulu daripada validasi), tetapi tanpa cabang ini alat akan melaporkan
+   * belasan assert merah yang menyesatkan, seolah kontraknya patah.
+   *
+   * Yang dilakukan di sini: berhenti dengan SATU kalimat yang benar plus perintah persis
+   * yang harus owner jalankan. Ia tetap MERAH (bukan SKIP): "AI mati di server" berarti
+   * kontrak ujung-ke-ujung memang belum terbukti, dan itu tidak boleh terbaca hijau.
+   */
+  if (forbidTop.status === 403 && forbidTop.json && forbidTop.json.error === 'ai_disabled') {
+    check('flag-ai-menyala',
+      'PRA-SYARAT: bantuan AI dinyalakan di server (FEATURE_AI + KV cfg:flags)',
+      false,
+      `403 ai_disabled reason=${forbidTop.json.reason} — Worker MENOLAK semua /api/ai/task, `
+      + 'jadi tidak ada yang bisa diukur. Nyalakan dulu (owner, satu kali): '
+      + '1) wrangler.toml FEATURE_AI="on" lalu `cd workers/api && npx wrangler deploy`; '
+      + '2) `npx wrangler kv key put --binding=CFG cfg:flags '
+      + "'{\"flags\":{\"cfAiEnabled\":true},\"enabled\":{\"ai\":true}}' --remote`; "
+      + '3) terapkan migrasi `npx wrangler d1 execute fiezel-core --remote --file=migrations/0005_ai_account_budget.sql`. '
+      + 'Alat ini SENGAJA tidak menyentuh KV sendiri.');
+    console.log('\n  Berhenti di sini: nol panggilan model dibelanjakan.');
+    writeReport({ base, verdict: 'BLOCKED_AI_DISABLED', checks, requests });
+    process.exit(1);
+  }
   check('prompt-terlarang-400', '(c) `prompt` di badan permintaan dijawab 400 (bukan diabaikan diam-diam)',
     forbidTop.status === 400 && forbidTop.json && String(forbidTop.json.error || '').startsWith('client_prompt_forbidden'),
     `status=${forbidTop.status} error=${forbidTop.json && forbidTop.json.error}`);
@@ -416,11 +444,39 @@ async function main() {
   }
 
   /* --- (d) kedua bentuk provider tercakup ------------------------------------------- */
+  //
+  // P3 (28 Agu 2026) — ASSERT INI BERUBAH KARENA KENYATAANNYA BERUBAH, BUKAN SUPAYA HIJAU.
+  //
+  // Dulu ia menuntut task yang ditembak mencakup bentuk `llama` DAN `openai`. Yang membuat
+  // `openai` tercakup hanyalah `translate_subtitle` yang memakai granite. Di produksi task
+  // itu terukur mengembalikan KELUARAN KOSONG setiap kali, jadi P3 memindahkannya ke
+  // llama-3.1-8b — dan sesudah itu TIDAK ADA task yang memakai bentuk `openai`.
+  //
+  // Menahan model yang tidak menjawab hanya supaya satu assert cakupan tetap hijau adalah
+  // membayar neuron untuk kepuasan gerbang. Yang benar: pisahkan dua hal yang assert lama
+  // mencampur.
+  //   1. Bentuk yang BENAR-BENAR DIPAKAI wajib terbukti hidup (biaya: nol tambahan).
+  //   2. Pembaca bentuk `openai` wajib tetap terbukti bekerja — tetapi itu murni logika
+  //      pembacaan, jadi ia dibuktikan pada payload sintetis, TANPA panggilan model.
+  // Kalau suatu hari ada task yang memakai `openai` lagi, cabang (1) otomatis menuntutnya
+  // terbukti hidup.
   const shapes = new Set(taskResults.map(r => r.responseShape).filter(Boolean));
+  const usedShapes = new Set(AiTasks.list().map(t => AiTasks.get(t).model.responseShape));
   check('bentuk-provider-tercakup',
-    '(d) Task yang ditembak mencakup KEDUA bentuk jawaban provider (llama + openai)',
-    shapes.has('llama') && shapes.has('openai'),
-    `bentuk tercakup: ${[...shapes].join(', ') || '(tidak ada)'} — llama=result.response, openai=choices[0].message.content`);
+    '(d) Semua bentuk jawaban yang BENAR-BENAR dipakai registry terbukti hidup',
+    [...usedShapes].every(s => shapes.has(s)),
+    `dipakai: ${[...usedShapes].join(', ')} | terbukti hidup: ${[...shapes].join(', ') || '(tidak ada)'}`);
+  // Pembaca bentuk `openai` diuji pada payload sintetis: NOL panggilan model, NOL neuron.
+  // Bentuk ini tetap dipertahankan di kode karena model katalog Cloudflare berpindah-pindah
+  // bentuk, dan pembaca yang hanya mengenal satu bentuk mengembalikan string kosong secara
+  // senyap — murid melihat kotak kosong sementara tokennya dibayar.
+  const synthetic = AiTasks.readModelText({
+    choices: [{ message: { content: 'Jawaban bentuk openai.' }, finish_reason: 'stop' }]
+  });
+  check('pembaca-bentuk-openai',
+    '(d) Pembaca bentuk `openai` (choices[0].message.content) bekerja — dibuktikan tanpa biaya',
+    String(synthetic.text || '').trim() === 'Jawaban bentuk openai.',
+    `terbaca="${String(synthetic.text || '')}"`);
   const silentEmpty = taskResults.filter(r => r.source === 'provider' && String(r.textHead || '').trim() === '');
   check('nol-sukses-kosong-senyap',
     '(d) NOL sukses provider berteks kosong di kedua bentuk (kelas cacat "kotak kosong, token dibayar")',
