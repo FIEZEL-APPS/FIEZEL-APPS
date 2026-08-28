@@ -21,6 +21,16 @@ const vm = require('vm');
 const root = __dirname;
 const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 
+// AI-20 F06 (W1-TESTPLAN 2a): subteks copy §5 boleh PINDAH byte-identik dari openSettings()
+// ke copy-map features/i18n/copy-id-*.js (id-golden-snapshot-test.js menjaga byte-nya).
+// Karena itu S1c mencari di UNION blok settings + copy-id; glob kosong = perilaku lama.
+// S2–S5 (daftar hitam kunci progres, perilaku clearAppCache) TIDAK memakai union — tetap app.js.
+const i18nDir = path.join(root, 'features', 'i18n');
+const copyIdUnion = fs.existsSync(i18nDir)
+  ? fs.readdirSync(i18nDir).filter(f => /^copy-id-.*\.js$/.test(f)).sort()
+      .map(f => fs.readFileSync(path.join(i18nDir, f), 'utf8')).join('\n')
+  : '';
+
 let failed = false;
 const checks = [];
 function check(name, ok, details) {
@@ -49,8 +59,8 @@ if (!sourceBlock('openSettings')) {
     /\$\('settingClearCache'\)[\s\S]{0,120}(confirmClearAppCache|clearAppCache)/.test(settingsBlock),
     'tidak ada binding dari #settingClearCache ke clearAppCache dalam openSettings()');
   check('S1c subteks tombol menjanjikan progres tidak terhapus',
-    /progres belajarmu nggak ikut terhapus/i.test(settingsBlock),
-    'subteks copy §5 tidak ditemukan di kartu cache');
+    /progres belajarmu nggak ikut terhapus/i.test(settingsBlock + '\n' + copyIdUnion),
+    'subteks copy §5 tidak ditemukan di kartu cache maupun copy-id');
 }
 
 // Lima kelompok accordion: struktur inilah yang membuat panel muat di bawah 900 px, dan
@@ -82,6 +92,16 @@ if (!clearBlock) {
 }
 
 // ------------------------------------------------- S4: fixture behavioral (vm, hermetis) -
+// m025-182 (W2-STATE, pola W1-TESTPLAN 2b — HARNESS kondisional): blok clearAppCache kini
+// memanggil FiezelI18n.t(...) (kalimatnya dipindah Wave 2 ke copy-map byte-identik), jadi
+// runtime i18n + union copy-id dimuat ke vm SEBELUM blok. Kalau berkasnya belum ada,
+// harness kosong dan sandbox berjalan persis seperti sebelumnya. Asersi Indonesia S4e
+// TIDAK berubah: kalimat toast tetap byte-identik, hanya sumbernya kini copy-map.
+const i18nRuntimePath = path.join(i18nDir, 'fiezel-i18n.js');
+const i18nHarness = fs.existsSync(i18nRuntimePath)
+  ? fs.readFileSync(i18nRuntimePath, 'utf8') + '\n' + copyIdUnion
+  : '';
+
 if (clearBlock) {
   const store = {
     'fiezel-v4-state': '{"level":"B1","xp":1200}',
@@ -123,6 +143,7 @@ if (clearBlock) {
   sandbox.window = sandbox;
   sandbox.globalThis = sandbox;
   vm.createContext(sandbox);
+  if (i18nHarness) vm.runInContext(i18nHarness, sandbox, { timeout: 2000 });
   vm.runInContext(clearBlock, sandbox, { timeout: 2000 });
   vm.runInContext('globalThis.__result=clearAppCache()', sandbox, { timeout: 2000 });
   sandbox.__result.then(result => {
@@ -157,6 +178,7 @@ if (clearBlock) {
     };
     sandbox2.self = sandbox2; sandbox2.window = sandbox2; sandbox2.globalThis = sandbox2;
     vm.createContext(sandbox2);
+    if (i18nHarness) vm.runInContext(i18nHarness, sandbox2, { timeout: 2000 });
     vm.runInContext(clearBlock, sandbox2, { timeout: 2000 });
     vm.runInContext('globalThis.__result=clearAppCache()', sandbox2, { timeout: 2000 });
     return sandbox2.__result.then(() => {

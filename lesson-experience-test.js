@@ -1,6 +1,14 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+// AI-20 F06 (kategori 2a, UNION-CORPUS): kontrak naskah alami ('Hindari gaya buku teks',
+// 'Gunakan Bahasa Indonesia yang jernih') boleh PINDAH byte-identik ke copy-map
+// features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js), jadi literalnya dicari
+// di gabungan app.js + copy-map id. Sinkron dengan release-audit.py check
+// 'Natural Indonesian explanations' yang memakai corpus gabungan yang sama.
+const i18nDir=path.join(root,'features','i18n');
+const copyIdCorpus=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const idCorpus=app+'\n'+copyIdCorpus;
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const grammar=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));
@@ -76,7 +84,7 @@ setTimeout(()=>{try{
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
-  assert(app.includes('Hindari gaya buku teks')&&app.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
+  assert(idCorpus.includes('Hindari gaya buku teks')&&idCorpus.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
   // Unduh+dekode sampel berjalan asinkron; beri satu putaran event loop sebelum menagih
   // bunyinya benar-benar DIBUNYIKAN (AudioBufferSourceNode.start), bukan hanya diminta.
   setTimeout(()=>{try{

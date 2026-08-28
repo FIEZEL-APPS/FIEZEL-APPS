@@ -194,7 +194,14 @@ test('markup statis identik dengan FiezelSplash.markup(), bukan salinan yang bis
 test('latar boot gelap, jadi frame sebelum CSS pun bukan putih', () => {
   // m025-134: <html> kini juga membawa data-theme="light", jadi yang diperiksa adalah
   // kelasnya - bukan seluruh tag persis - supaya atribut lain boleh menumpang di sana.
-  assert.ok(/<html lang="id"[^>]*class="fz-booting"/.test(html), 'dokumen harus menandai dirinya sedang boot');
+  // AI-20 F04 (lang-pin -> konstanta): 'id' hari ini satu-satunya locale murid. Default boot
+  // statis di index.html TETAP lang="id" bahkan setelah lang dinamis Wave 2 (runtime menyetel
+  // ulang atributnya lewat FiezelI18n.getBcp47() saat boot), jadi asersi ini tetap sah —
+  // saat itu tambahkan asersi mekanisme dinamisnya, jangan hapus yang ini.
+  const SUPPORTED_LOCALES = ['id'];
+  const bootLang = (/<html lang="([a-zA-Z-]+)"[^>]*class="fz-booting"/.exec(html) || [])[1];
+  assert.ok(bootLang && SUPPORTED_LOCALES.includes(bootLang),
+    'dokumen harus menandai dirinya sedang boot dengan lang dari locale yang didukung (' + SUPPORTED_LOCALES.join(', ') + ')');
   const critical = /<style id="fiezelBootCritical">([\s\S]*?)<\/style>/.exec(html);
   assert.ok(critical, 'CSS kritis splash harus disisipkan di <head>');
   assert.ok(/html\.fz-booting,html\.fz-booting body\{background:#1B1418\}/.test(critical[1]),

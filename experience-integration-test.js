@@ -3,6 +3,13 @@ const fs=require('fs'),path=require('path');
 const root=__dirname;
 const read=name=>fs.readFileSync(path.join(root,name),'utf8');
 const app=read('app.js'),css=read('style.css'),html=read('index.html'),worker=read('fiezel-report-worker.js'),setup=read('creator-report-setup.html'),dashboard=read('creator-report-dashboard.html');
+// AI-20 F06 (kategori 2a, UNION-CORPUS): naskah Indonesia boleh PINDAH byte-identik ke
+// copy-map features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js). Literal naskah
+// karena itu dicari di gabungan app.js + copy-map id; identifier kode tetap dicek di app.js.
+// Glob yang kosong = perilaku lama, jadi cek ini hijau sebelum maupun sesudah ekstraksi.
+const i18nDir=path.join(root,'features','i18n');
+const copyIdCorpus=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const idCorpus=app+'\n'+copyIdCorpus;
 const failures=[];
 const check=(condition,message)=>{if(!condition)failures.push(message)};
 
@@ -14,7 +21,7 @@ check(/id="answerBurst"/.test(html)&&/\.answer-burst/.test(css)&&/circle-check-b
 check(/document\.startViewTransition/.test(app)&&/\.reduce-motion \*/.test(css),'Motion system or reduced-motion control missing');
 check(/launcher-shell/.test(app)&&/launcher-shell/.test(css)&&/coach-preview/.test(css),'Premium launcher surface missing');
 check(/VALID_VIEWS=new Set\(\['home','vocab','grammar','reading','skills'/.test(app)&&/FiezelSLAddon\.create/.test(app)&&/speakingListeningController\.destroy/.test(app),'Skills Lab route or lifecycle cleanup missing');
-check(/FiezelVoiceSay/.test(app)&&/Simpan untuk offline/.test(app)&&/Tidak ada yang perlu diunduh/.test(app),'m025-96: suara harus lewat pintu bersama, dan unduhan lokal hanya tambahan opsional');
+check(/FiezelVoiceSay/.test(app)&&/Simpan untuk offline/.test(idCorpus)&&/Tidak ada yang perlu diunduh/.test(idCorpus),'m025-96: suara harus lewat pintu bersama, dan unduhan lokal hanya tambahan opsional');
 check(html.includes('./features/speaking-listening/speaking-listening-addon.css')&&html.includes('./features/neural-voice/fiezel-voice-say.js'),'Feature assets are not wired into the document');
 check(/LOGIN_MESSAGES=\[/.test(app)&&/selectLoginMessage/.test(app)&&/fiezel-last-login-message/.test(app)&&/LEARNER_STAGE/.test(app),'Rotating learner-stage login reminders missing');
 // OWNER MEMBALIK m025-34: notifikasi DIUNDANG, tidak diwajibkan. Yang diperiksa sekarang
@@ -27,7 +34,7 @@ check(/\.notification-locked/.test(css),'kelas kunci lama sengaja dibiarkan di s
 check(/checkStudyReminders/.test(app)&&/showStudyNotification/.test(app)&&/NOTIFICATION_REMINDER_INTERVAL_MS/.test(app)&&/notificationclick/.test(read('sw.js')),'Study reminder notification engine missing');
 check(/function getCelestialState/.test(app)&&/function getScenePalette/.test(app)&&/SUNRISE_MINUTE/.test(app)&&/global-sky/.test(css)&&/sky-light/.test(css)&&/id="globalSky"/.test(html),'Full-screen real-time sun/moon cycle missing');
 check(/GRAMMAR_SESSION_SIZE=25/.test(app)&&/function buildGrammarLessonQuestions/.test(app)&&/count:GRAMMAR_SESSION_SIZE/.test(app),'Grammar lesson contract is not fixed at 25 questions');
-check(/NATURAL_AI_STYLE/.test(app)&&/Hindari gaya buku teks/.test(app)&&/readingFocusLabel/.test(app),'Natural Indonesian explanation contract missing');
+check(/NATURAL_AI_STYLE/.test(app)&&/Hindari gaya buku teks/.test(idCorpus)&&/readingFocusLabel/.test(app),'Natural Indonesian explanation contract missing');
 check(/function buildCreatorReport/.test(app)&&/session_complete/.test(app)&&/daily_access/.test(app),'Automatic access/session reporting missing');
 check(/queueCreatorReport/.test(app)&&/flushReportQueue/.test(app),'Report retry queue missing');
 check(/reportConsent:false/.test(app)&&/openReportPreview/.test(app),'Explicit reporting consent/privacy preview missing');
