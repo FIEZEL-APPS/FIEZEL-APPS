@@ -222,7 +222,16 @@
     if (!Ctor) { openTypeSheet(); return; }
     stopSpeaking();
     try { recognition = new Ctor(); } catch (_) { openTypeSheet(); return; }
-    recognition.lang = 'id-ID';
+    // AI-17 F03 (audit v2): ini SATU-SATUNYA permukaan STT berbahasa MURID di seluruh
+    // aplikasi — murid bertanya ke tutor dalam bahasa ibunya. Locale dibaca dari atribut
+    // <html lang> yang diset app.js lewat FiezelI18n.onChange (m025-182 W2-STATE), BUKAN
+    // dengan mengimpor modul i18n: pola tak-langsung ini menjaga jarak dari plumbing
+    // locale UI yang dilarang keras menyentuh opsi audio (AI-17 F02). Fallback ke id-ID
+    // menjaga perilaku lama byte-demi-byte saat atributnya belum/tidak terisi.
+    // Recognizer latihan SPEAKING tetap en-US (bahasa yang DIPELAJARI) — jangan disamakan.
+    var learnerLang = '';
+    try { learnerLang = String(doc.documentElement.lang || ''); } catch (_) {}
+    recognition.lang = /^th(-|$)/i.test(learnerLang) ? 'th-TH' : 'id-ID';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = function (event) {

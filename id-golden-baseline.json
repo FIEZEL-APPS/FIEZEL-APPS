@@ -1,6 +1,6 @@
 {
   "schema": "id-golden-baseline/1",
-  "generatedAt": "2026-08-28T17:24:23.584Z",
+  "generatedAt": "2026-08-28T18:23:17.044Z",
   "root": "/home/user/workspace/fiezel-work",
   "files": {
     "grammar-explanations-id.json": "78bd2a8c8fb8cc91c3d7a5cfdb44e89924e6437256163bccb151e312546c017b",
@@ -18,8 +18,8 @@
     "features/audio-assets/fiezel-audio-key.js": "11624e303917fe0df881ac3f410911587766fd6f4d2491ca6687ec42de8d457d"
   },
   "literals": {
-    "count": 1842,
-    "sha256": "73ca1ff493bddd95db8f6b28d019ca769955467449b761101beb54d7f87503d3",
+    "count": 1843,
+    "sha256": "85061039cc70cf1ac0b1e980b1a082c0c778124aaf9c0405c06aaf9f8df77e67",
     "list": [
       "\n      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:\n      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */\n   setTimeout(()=>{try{pawReact(",
       "\n      case 'silent':                        // L5: kalau mulut sempat mulai (taksiran L3 kandas), tutup SEKARANG\n        degradedLatch = false;\n        closeTurn(false);\n        break;\n      case 'interrupt':                     // stop(): snap tutup\n        degradedLatch = false;\n        closeTurn(true);\n        break;\n      default:\n        break;                              // fase asing dari versi fasad lebih baru: diabaikan tanpa suara\n    }\n  }\n\n  try { doc.addEventListener('fiezel-speech', onSpeech); } catch (_) {}\n\n  /* Suara terdegradasi (audibility-fix): mulut mati SEKETIKA dan tidak boleh\n     hidup lagi untuk sisa giliran — apa pun yang masih dikirim lapisan bawah. */\n  try {\n    root.addEventListener('fiezel-neural-voice-degraded', function () {\n      if (turn) closeTurn(true);\n      degradedLatch = true;                 // dilepas oleh end/silent/interrupt fasad berikutnya\n    });\n  } catch (_) {}\n\n  /* Permukaan kecil untuk Diagnostics/tes — bukan API pemanggil biasa:\n     satu-satunya pintu bicara tetap FiezelVoiceSay.say(). */\n  root.FiezelSpeechBridge = Object.freeze({\n    SCHEMA: SCHEMA,\n    speaking: function () { return !!turn; },\n    degraded: function () { return !!degradedLatch; },\n    motionAllowed: motionAllowed\n  });\n})(typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));\n",
@@ -1858,6 +1858,7 @@
       "}}\n  /* R6 perbaikan-08 (P0): grader menerima jarak-edit 1 SEBELUM melihat distraktor, jadi\n     mengetik distraktor berlabel verbatim (mis. \"these\" saat jawabannya \"those\") dinilai\n     BENAR sebagai \"typo\". Di sini kecocokan PERSIS ke jawaban/alternates tetap menang\n     (jalur alternates dipertahankan apa adanya); selain itu, input yang persis sama dengan\n     teks distraktor = SALAH + matchedDistractor supaya ledger miskonsepsi terisi. Near-match\n     sufiks-vs-sufiks terhadap target utama (arrives/arrived) juga ditolak sebagai salah\n     morfem, bukan typo. */\n  try{\n    const P=self.FiezelProductionGrader;\n    const nz=P&&typeof P.normalize===",
       "}}\n  // F1 placement: layar hasil MENYEBUT levelnya. Sebelum perbaikan ini layar \"Tes level selesai\"\n  // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip\n  // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,\n  // beserta band mana yang menjadi dasarnya.\n  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class=\"result-level\"><span class=\"result-level-mark\">${FiezelI18n.t(",
       "· skor {skor}/100. {berikutnya}",
+      "· คะแนน {skor}/100 {berikutnya}",
       "“{pilihan}” belum memenuhi aturan grammar yang sedang diuji pada kalimat ini.",
       "“{sinonim}” paling dekat maknanya dengan “{word}”. Keduanya bisa terasa mirip, walaupun nuansa pemakaiannya dapat berbeda.",
       "“{word}” berfungsi sebagai {jenisKata}. Jenis kata dilihat dari tugasnya di dalam kalimat, bukan hanya dari bentuk katanya.",
