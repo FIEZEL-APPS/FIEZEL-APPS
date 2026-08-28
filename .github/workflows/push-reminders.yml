@@ -12,7 +12,7 @@ jobs:
   dispatch:
     # Scheduled product delivery may continue within its bounded runtime contract.
     # Manual execution is MASTER-only. Repository pushes never dispatch reminders.
-    if: (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux')
+    if: (github.event_name == 'schedule' && vars.FIEZEL_REMOTE_PUSH_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

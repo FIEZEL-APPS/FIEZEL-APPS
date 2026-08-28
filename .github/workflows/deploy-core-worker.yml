@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

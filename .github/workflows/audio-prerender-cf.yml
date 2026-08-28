@@ -54,14 +54,14 @@ jobs:
     # membelanjakan anggaran AI owner.
     #
     # Polanya disamakan HURUF DEMI HURUF dengan deploy-core-worker.yml:17 —
-    # `github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'`. Syarat
+    # `github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'`. Syarat
     # event_name itu bukan hiasan meski `on:` hari ini hanya berisi workflow_dispatch: begitu
     # seseorang menambahkan satu pemicu lain (schedule untuk "melanjutkan batch", atau
     # workflow_run sesudah konten diperbarui), `github.actor` pada pemicu otomatis menjadi aktor
     # commit terakhir — dan gate berbasis aktor sendirian akan lolos untuk jalan yang tidak pernah
     # ditekan siapa pun. Menuliskan keduanya membuat penambahan pemicu itu gagal tertutup, bukan
     # membelanjakan dolar sendiri.
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
