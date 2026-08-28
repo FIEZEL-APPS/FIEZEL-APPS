@@ -48,11 +48,12 @@
       "sesi": "sesi-computer-ed18fcf2",
       "peran": "UIUX-AUDIT-REPAIR (perplexity computer)",
       "paths": [
-        "app.js",
-        "style.css",
-        "index.html",
         "DESIGN-SYSTEM.md",
-        "features/ui/fiezel-back-nav.js"
+        "app.js",
+        "features/ui/fiezel-back-nav.js",
+        "features/ui/fiezel-tour.js",
+        "index.html",
+        "style.css"
       ],
       "mulai": "2026-08-28T16:55:00+07:00",
       "catatan": "Audit forensik UI/UX 20 agen selesai (145 temuan, 12 P1). Perbaikan blocker: integritas ujian (reveal mid-test), kebijakan abandon simetris + konfirmasi keluar, race modal->stage, timeout bank JSON + kartu error, CTA hang, auto-scroll pembahasan, ikon flame 300px, kontras chip, rewrite DESIGN-SYSTEM.md. Tidak menyentuh features/neural-voice/, coordination tooling, TASKS-LEDGER."
