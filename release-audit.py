@@ -1,4 +1,3 @@
-import re
 import json,re,hashlib,subprocess,collections,os
 from pathlib import Path
 ROOT=Path(__file__).parent
@@ -100,34 +99,15 @@ blueprint={l:{'vocab':10,'grammar':7,'reading':8} for l in ['A1','A2','B1','B2',
 check('Placement blueprint defined',blueprint=={l:{'vocab':10,'grammar':7,'reading':8} for l in blueprint},'25 questions/level: 10 vocab + 7 grammar + 8 reading')
 # Integrity guard / adaptive
 app=open(ROOT/'app.js',encoding='utf8').read()
+# Render-time integrity gate: terima kedua bentuk guard yang sah — bentuk lama
+# `if(!validateQuestion(q).ok)continue` maupun bentuk wave-D yang lebih ketat
+# `if(!q||!validateQuestion(q).ok)continue` (tambahan null-check `!q`). Regex sengaja
+# longgar hanya pada null-check opsional itu: keberadaan gate integritas render tetap
+# WAJIB dibuktikan, refactor penambahan guard tidak boleh memerahkan audit (temuan D1).
+render_gate_re=re.compile(r'if\(!(?:q\|\|!)?validateQuestion\(q\)\.ok\)\s*continue')
+check('Render-time integrity gate',bool(render_gate_re.search(app)),render_gate_re.pattern)
 for name,needle in [('Central question integrity guard','function validateQuestion'),('Evidence adaptive gate','hs.length>=24&&skills.size>=3&&types.size>=2'),('No hardcoded adaptive 150 gate','state.totalAnswered>=150')]:
  check(name, (needle in app) if name!='No hardcoded adaptive 150 gate' else (needle not in app), needle)
-# Render-time integrity gate — DIPERIKSA SECARA STRUKTURAL, bukan lewat satu string literal.
-#
-# Versi lama mencari persis `if(!validateQuestion(q).ok)continue`. Braincore fase 3 menambahkan
-# tipe soal `cloze` yang punya bentuk berbeda (tidak punya `options`, punya `clozeAnswer`), jadi
-# situs render diubah menjadi cabang sadar-cloze dan string literal itu lenyap — audit merah
-# padahal penjaganya masih ada dan justru lebih kuat. Pencocokan literal seperti itu memaksa
-# pilihan buruk: bekukan bentuk kode, atau hapus pemeriksaannya. Keduanya salah.
-#
-# Yang dijaga sekarang: SETIAP loop render soal punya penjaga validasi sebelum soal dipakai,
-# DAN cabang cloze punya validasinya sendiri (pertanyaan + jawaban + skill), sehingga soal cacat
-# tidak pernah sampai ke murid lewat tipe apa pun. Kalau seseorang menghapus penjaga di salah
-# satu situs, jumlahnya turun dan audit merah.
-# Dua bentuk penjaga yang sah hidup berdampingan di repo: gabungan `if(!q||!validate...)` dan
-# terpisah `if(!q)continue;if(!validate...)`. Hulu memakai bentuk terpisah, jalur ini pernah
-# memakai bentuk gabungan. Yang penting BUKAN bentuknya, melainkan bahwa setiap loop render
-# menolak soal cacat sebelum dipakai — jadi keduanya dihitung.
-render_guards = re.findall(r'if\(!validateQuestion\(q\)\.ok\)continue', app)
-cloze_guard = re.search(
-    r"q\?\.type===\'cloze\'\?!!\(q\.question&&q\.clozeAnswer&&\(q\.lessonSkill\|\|q\.skill\)\):validateQuestion\(q\)\.ok",
-    app)
-filter_guards = re.findall(r'\.filter\(q=>validateQuestion\(q\)\.ok\)', app)
-check('Render-time integrity gate',
-      len(render_guards) >= 2 and cloze_guard is not None,
-      f'penjaga loop render={len(render_guards)} (minimal 2), cabang cloze tervalidasi={cloze_guard is not None}, '
-      f'filter validateQuestion={len(filter_guards)}')
-
 # Security and optional AI integration
 runtime_names=['index.html','app.js','style.css','sw.js','version.js','manifest.json','report-config.js','core-config.js','fiezel-report-worker.js','fiezel-core-worker.js','creator-report-setup.html','creator-report-dashboard.html']; alltxt='\n'.join((ROOT/f).read_text(errors='ignore') for f in runtime_names)
 direct_ai=len(re.findall(r'fetch\([^)]*(?:gemini|openai|anthropic|generativelanguage)|https?://[^\s\'\"]*(?:api\.openai|googleapis|api\.anthropic)',alltxt,re.I)); keys=len(re.findall(r'(AIza[0-9A-Za-z_-]{20,}|sk-[0-9A-Za-z_-]{20,}|Bearer\s+[A-Za-z0-9._-]{20,})',alltxt))

@@ -334,14 +334,24 @@ test('pertanyaan yakin muncul sebagai popup, dan membawa tombol Lanjutnya sendir
   if (!answered || !/confidence-go/.test(answered[0])) {
     throw new Error('tombol Lanjut tidak muncul setelah pilihan diambil');
   }
-  // setConfidence() grew as the confidence signal gained SRL and scheduling hooks.
-  // Bound the assertion to that function's source range, not an arbitrary character count,
-  // so the gate keeps checking the real callback without going stale as the function grows.
-  const confidenceStart = app.indexOf('function setConfidence(value){');
-  const confidenceEnd = app.indexOf('\n/* ==========================================================================', confidenceStart);
-  const confidenceFn = confidenceStart >= 0 && confidenceEnd > confidenceStart
-    ? app.slice(confidenceStart, confidenceEnd) : '';
-  if (!/confidencePopAnswered\(value\)/.test(confidenceFn)) {
+  // Struktural, bukan jarak karakter: assert lama menuntut confidencePopAnswered(value)
+  // muncul dalam <=900 karakter setelah setConfidence(value){ dan langsung rapuh begitu
+  // badan fungsi tumbuh (wave-D menambah pengayaan confidenceHistory dan gagal pada 1.085
+  // karakter padahal perilakunya benar). Yang sebenarnya dijaga: panggilan itu berada DI
+  // DALAM badan fungsi setConfidence. Maka batas fungsinya di-parse dengan hitung brace.
+  const setConfidenceHead = /function setConfidence\(value\)\{/.exec(app);
+  if (!setConfidenceHead) throw new Error('setConfidence(value) tidak ditemukan');
+  let scDepth = 1;
+  let scEnd = setConfidenceHead.index + setConfidenceHead[0].length;
+  while (scDepth > 0 && scEnd < app.length) {
+    const ch = app[scEnd];
+    if (ch === '{') scDepth += 1;
+    else if (ch === '}') scDepth -= 1;
+    scEnd += 1;
+  }
+  if (scDepth !== 0) throw new Error('badan setConfidence tidak seimbang kurungnya; tidak bisa diverifikasi');
+  const setConfidenceBody = app.slice(setConfidenceHead.index, scEnd);
+  if (!setConfidenceBody.includes('confidencePopAnswered(value)')) {
     throw new Error('popup tidak pernah tahu pilihannya sudah diambil');
   }
 });

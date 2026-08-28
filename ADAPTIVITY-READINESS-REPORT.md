@@ -110,19 +110,46 @@ sini supaya tidak ada yang mengulangi kesalahan yang sama dan menyimpulkan ada b
 
 ## 7. Batas yang masih berdiri
 
-| Hal | Jumlah | Dampak |
+> **Pembaruan Wave D (2026-08-28):** tabel asli di bawah (ditulis pada build m025-148,
+> 2026-08-24) **BASI** dan dipertahankan hanya sebagai konteks sejarah — angka yang berlaku
+> ada di §7.1. Diverifikasi ulang penuh oleh audit D2
+> (`/home/user/workspace/d-findings/D2-content-contamination.md`).
+
+| Hal | Jumlah (2026-08-24, basi) | Dampak |
 |---|---|---|
-| Soal listening masih Inggris | 842 | Sedang — murid bingung pada pertanyaannya |
-| Pilihan listening masih Inggris | 1.091 | Sedang |
-| Pilihan reading masih Inggris | 1.050 | Sedang |
-| Reading `evidence_mismatch` | 170 | Rendah — pra-ada, terdokumentasi |
+| Soal listening masih Inggris | ~~842~~ → lihat §7.1 (nyatanya 100% MCQ) | Sedang — murid bingung pada pertanyaannya |
+| Pilihan listening masih Inggris | ~~1.091~~ → lihat §7.1 (satuan keliru) | Sedang |
+| Pilihan reading masih Inggris | ~~1.050~~ → lihat §7.1 (kini 1.024) | Sedang |
+| Reading `evidence_mismatch` | ~~170~~ → **0 hari ini**, lihat §7.1 | Rendah — pra-ada, terdokumentasi |
+
+### 7.1 Pembaruan Wave D — hitung ulang 2026-08-28 (audit D2)
+
+**Metode hitung:** logika resmi `audit/bank-audit.js` dijalankan ulang pada 2026-08-28 di
+branch `audit-wave-d` (salinan skrip di luar repo, repo tidak tersentuh), direplikasi
+independen dengan Python (hasil identik), plus `content-qa-agent.js` dipanggil via
+`auditContent()` (murni baca). Artefak mesin: `/home/user/workspace/d2-recount-results.json`
+dan `/home/user/workspace/d2-BANK-SOAL-AUDIT-today.json` (daftar id lengkap per temuan).
+Laporan penuh: `/home/user/workspace/d-findings/D2-content-contamination.md`.
+
+| Hal | Angka lama (§7) | Angka 2026-08-28 | Catatan |
+|---|---|---|---|
+| Soal listening berbahasa Inggris | 842 | **1.200 dari 1.200 MCQ (100%)** | 842 tereproduksi persis, tapi itu batas bawah detektor: `looksEnglish()` menuntut ≥2 kata fungsi Inggris, sehingga 240 soal gist (`"What is X mainly talking about?"`, hanya 1 marker) lolos. Dengan detektor yang dikoreksi, seluruh MCQ listening berbahasa Inggris; satu-satunya yang Indonesia adalah instruksi dictation (207 item) |
+| "Opsi" listening Inggris | 1.091 | **1.091 item** dengan ≥1 opsi EN (**2.772 string opsi**) | Angka tereproduksi persis; satuan di tabel lama menyesatkan — itu jumlah ITEM, bukan jumlah string opsi |
+| Pilihan reading Inggris | 1.050 | **1.024 soal** dengan ≥1 opsi EN (3.011 string opsi) | Turun 26 sejak laporan lama karena bank berubah. Sebagian opsi EN adalah kutipan verbatim teks (materi target yang sah) — lihat pemilahan di laporan D2 |
+| Reading `evidence_mismatch` | 170 | **0** | Nol menurut ketiga definisi kanonik: `content-qa-agent.auditContent()` (PASS, 0 blocker), logika `bank-audit.js`, dan replikasi independen. Angka 170 adalah blocker pra-ada (m025-125) yang sudah diperbaiki (`audit/repair-reading-bank.js`); butir ini SELESAI, bukan batas lagi — jangan lagi menerapkan diskon κ pada item yang sudah sehat |
+| Listening tanpa penjelasan | (tidak tercatat) | **1.407 (semua item)** | Batas baru yang tidak ada di tabel lama: tidak satu pun item listening punya `explain` — murid salah tidak pernah tahu kenapa |
+
+Angka 2026-08-28 di atas adalah potret **pagi hari sebelum perbaikan Wave D** — fixer
+listening (D13) dan reading (D12) sedang mengeksekusi perbaikannya paralel dengan penulisan
+pembaruan ini; angka pasca-perbaikan diverifikasi pada gate integrasi, bukan di sini.
 
 **Konsekuensinya untuk adaptivitas:** model kesulitan hanya sebaik label kesulitan soalnya.
 Selama sebagian soal masih berbahasa Inggris, sebagian "salah" yang terekam adalah salah
 karena tidak paham pertanyaannya, bukan karena tidak paham materinya — dan itu masuk ke
 estimasi kemampuan sebagai bukti yang menyesatkan.
 
-**Karena itu:** grammar (100% Indonesia, 129 template) adalah domain yang paling layak
+**Karena itu:** grammar (100% Indonesia, ~~129~~ 139 template per audit D9 2026-08-28,
+`/home/user/workspace/d-findings/D9-grammar-quality.md`) adalah domain yang paling layak
 dipercaya sekarang. Listening dan reading masih perlu penyelesaian terjemahan.
 
 ---
@@ -146,9 +173,11 @@ window.FiezelCoreBrain.curriculumGraphSize()
 
 ## 9. Langkah berikutnya, berurut manfaat
 
-1. **Selesaikan terjemahan listening** (842 pertanyaan + 1.091 pilihan) — ini yang paling
-   merusak kualitas bukti belajar.
-2. **Perbaiki 170 `evidence_mismatch` reading** — jawaban yang tidak ada di bacaan.
+1. **Selesaikan terjemahan listening** (~~842 pertanyaan + 1.091 pilihan~~ — per hitung ulang
+   2026-08-28 di §7.1: nyatanya 1.200/1.200 soal MCQ; sedang dikerjakan fixer Wave D untuk
+   A1/A2 lebih dulu) — ini yang paling merusak kualitas bukti belajar.
+2. ~~**Perbaiki 170 `evidence_mismatch` reading** — jawaban yang tidak ada di bacaan.~~
+   **Selesai** — 0 mismatch per hitung ulang 2026-08-28 (lihat §7.1).
 3. **Pakai sendiri 2 minggu di grammar saja**, lalu baca `__fiezelCoreBrainSnapshot()`:
    apakah ability naik, apakah momentum terbaca, apakah kesulitan bergerak.
 4. Baru setelah itu bandingkan dengan v2 dimatikan, kalau memang ingin angka pembanding.

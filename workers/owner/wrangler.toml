@@ -78,6 +78,11 @@ enabled = true
 #   OWNER_TOKEN_HASH   — sha256 HEX dari token owner. HASH, bukan token. Repo tidak pernah
 #                        memuat token maupun hash-nya.
 #   OWNER_SESSION_KEY  — kunci HMAC untuk menandatangani cookie sesi owner.
+#   EDGE_SHARED_SECRET — WAJIB sejak audit D3 HIGH-3: penjaga edge kini FAIL-CLOSED. Tanpa
+#                        secret ini, SEMUA permintaan ditolak (bukan lagi "terbuka selama
+#                        transisi"). Pasang nilai yang SAMA di jembatan PHP owner. Pembuka
+#                        darurat: var ALLOW_NO_EDGE_SECRET = "true" (string persis) — sengaja
+#                        TIDAK ditaruh di blok vars supaya membukanya butuh tindakan sadar.
 # Bila salah satu belum dipasang, Worker FAIL-CLOSED: semua rute 403, termasuk halaman masuk.
 # Itu sekaligus perwujudan "fitur baru wajib di belakang flag OFF": tanpa Secret, dashboard mati.
 # ============================================================================================

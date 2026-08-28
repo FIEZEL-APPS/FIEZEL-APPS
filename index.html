@@ -2,7 +2,18 @@
 <html lang="id" class="fz-booting" data-theme="light">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <!-- D16 (D5 T1): kunci zoom dicabut - WCAG 1.4.4/1.4.10. maximum-scale naik ke 5 dan
+       user-scalable=no dihapus supaya murid low-vision bisa pinch-zoom; blok double-tap
+       tetap ditangani touch-action:manipulation di style.css + fiezel-zoom-lock.js. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover">
+  <!-- D16 (D3 HIGH-1): CSP mode longgar via meta - GitHub Pages tidak bisa set header.
+       'unsafe-inline' dipertahankan karena skrip boot splash inline + handler onclick
+       memang masih dipakai; pagar utamanya adalah script-src yang membatasi skrip eksternal
+       ke js.puter.com saja dan default-src 'self'. frame-ancestors tidak bisa via meta.
+       'wasm-unsafe-eval' WAJIB ada: mesin suara neural mengompilasi sherpa-onnx .wasm
+       (vendor/supertonic-3, 13 MB) di klien, dan tanpa token itu Chromium menolak
+       WebAssembly.instantiate - model 152 MB yang sudah diunduh jadi tidak terpakai. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://js.puter.com; connect-src 'self' https: wss:; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; media-src 'self' blob: data:; worker-src 'self' blob:">
   <meta name="theme-color" content="#FFF9EE">
   <!-- m025-134: mode gelap dihapus. color-scheme:light membuat kontrol bawaan peramban
        (scrollbar, input, tombol form) ikut terang di ponsel yang disetel gelap. -->
@@ -153,7 +164,13 @@ html.fz-booting body{overflow:hidden}
         <div class="version" id="version"></div>
       </div>
     </header>
-    <div id="app" aria-live="polite"></div>
+    <!-- D16 (D5 T3): aria-live dicabut dari #app - live region seluruh layar membuat pembaca
+         layar mencoba mengumumkan SETIAP render penuh. Pengumuman status pindah ke #liveStatus
+         di bawah; app.js menyusul mengisinya di wave berikutnya (D14 memegang app.js). -->
+    <div id="app"></div>
+    <!-- Live region kecil khusus status. Gaya sr-only ditulis inline karena style.css milik
+         pemilik lain di wave ini; kelasnya tetap dipasang untuk dipindahkan ke CSS nanti. -->
+    <div id="liveStatus" aria-live="polite" class="sr-only" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0"></div>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>

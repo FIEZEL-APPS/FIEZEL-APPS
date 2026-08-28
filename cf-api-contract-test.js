@@ -108,6 +108,7 @@ function fakeClock(startIso) {
  */
 function fakeD1() {
   const rows = new Map(); // sub -> baris identity
+  const anonIssue = new Map(); // 'bucket\0ip_hmac' -> issued (rem penerbitan, rate-anon.js)
   const log = [];
   const norm = (sql) => sql.replace(/\s+/g, ' ').trim();
   const handlers = [
@@ -140,6 +141,18 @@ function fakeD1() {
         return { changes: 1 };
       }
       return { changes: 0 };
+    }],
+    // m0261-d17: penghitung penerbitan identitas (audit D3 HIGH-2) memakai tabel
+    // D1 `anon_issue` dari migrasi 0001 — BUKAN KV, supaya invarian "penerbitan
+    // nol tulis KV" (§3 di bawah) tetap berlaku apa adanya.
+    [/^SELECT issued FROM anon_issue WHERE day/i, (b) => {
+      const stored = anonIssue.get(b[0] + '\u0000' + b[1]);
+      return { rows: stored === undefined ? [] : [{ issued: stored }] };
+    }],
+    [/^INSERT INTO anon_issue/i, (b) => {
+      const key = b[0] + '\u0000' + b[1];
+      anonIssue.set(key, (anonIssue.get(key) || 0) + 1);
+      return { changes: 1 };
     }]
   ];
   function execute(sql, binds) {
@@ -256,6 +269,17 @@ function makeEnv(clock, extra = {}) {
     SESSION_HMAC_KEY_CURRENT: SECRET_CURRENT,
     SESSION_HMAC_KEY_PREVIOUS: SECRET_PREVIOUS,
     PUTER_CLAIM_SECRET_CURRENT: CLAIM_SECRET,
+    // m0261-d17: gerbang edge kini FAIL-CLOSED saat EDGE_SHARED_SECRET absen.
+    // Harness ini menguji kontrak rute, bukan gerbang jembatan (itu tugas
+    // edge-guard-test.js), jadi mode transisi dibuka eksplisit.
+    ALLOW_NO_EDGE_SECRET: 'true',
+    // m0261-d17: penerbitan /api/auth/anon kini dibatasi laju (rate-anon.js).
+    // Harness memakai jam TEST_CLOCK_MS yang beku (semua panggilan jatuh di satu
+    // ember jam) dan banyak bagian menerbitkan identitas berulang, jadi batasnya
+    // dilonggarkan; pengujian batas yang sebenarnya ada di bagian khususnya
+    // sendiri (dengan var yang ketat) di bawah. Jitter dimatikan demi determinisme.
+    ANON_ISSUE_LIMIT_PER_HOUR: '1000',
+    ANON_JITTER_MAX_MS: '0',
     TEST_CLOCK_MS: String(clock.now()),
     CORE_DB: extra.db || fakeD1(),
     CFG: extra.kv || fakeKV(),
@@ -719,6 +743,30 @@ function scanForPii(value, trail, hits) {
     assert(/1\.000 tulis|1000 tulis/.test(readme), 'README menyebut batas KV 1.000 tulis/hari');
     assert(/50\s*subrequest|subrequest.*50/i.test(readme), 'README menyebut batas 50 subrequest');
     assert(/gejala|Gejala/.test(readme), 'README menjelaskan GEJALA kalau batas gratis tidak cukup');
+  }
+
+  /* ---------- 15. Rate limit penerbitan /api/auth/anon (D3 HIGH-2) --------- */
+  {
+    // Var ketat KHUSUS bagian ini; makeEnv default memakai batas longgar supaya
+    // bagian-bagian lain (yang menerbitkan identitas berulang kali pada jam
+    // TEST_CLOCK_MS yang beku) tidak saling menjatuhkan.
+    const env = makeEnv(clock, { vars: { ANON_ISSUE_LIMIT_PER_HOUR: '3' } });
+    let lastCookie = null;
+    for (let i = 0; i < 3; i += 1) {
+      const r = await call(worker, env, 'POST', '/api/auth/anon', { body: '{}' });
+      assert(r.response.status === 200, 'penerbitan ke-' + (i + 1) + ' (di bawah batas) lolos 200, dapat ' + r.response.status);
+      if (r.cookie) lastCookie = r.cookie;
+    }
+    const blocked = await call(worker, env, 'POST', '/api/auth/anon', { body: '{}' });
+    assert(blocked.response.status === 429, 'penerbitan di atas batas ditolak 429, dapat ' + blocked.response.status);
+    assert(blocked.json && blocked.json.error === 'rate_limited', '429 memakai galat baku rate_limited dari errors.js');
+    assert(!blocked.cookie, 'penolakan TIDAK menerbitkan cookie identitas');
+    assert(Number(blocked.json && blocked.json.retryAfter) > 0, '429 membawa retryAfter > 0 (bukan PII)');
+    assert(!!blocked.response.headers.get('retry-after'), '429 membawa header Retry-After untuk klien yang patuh HTTP');
+    // Invarian identitas STABIL tidak boleh ikut terkunci: cookie sah bukan penerbitan.
+    const stable = await call(worker, env, 'POST', '/api/auth/anon', { body: '{}', cookie: cookieHeaderFor(lastCookie) });
+    assert(stable.response.status === 200, 'panggilan ber-cookie sah tetap 200 walau ember penerbitan penuh, dapat ' + stable.response.status);
+    assert(stable.json && stable.json.issued === false, 'panggilan ber-cookie sah tidak menerbitkan identitas baru (issued:false)');
   }
 
   /* ---------- Laporan ------------------------------------------------------ */

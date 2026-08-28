@@ -1,0 +1,348 @@
+{
+  "gate": "voice-callsite-prefetch",
+  "generatedAt": "2026-08-28T01:38:36.465Z",
+  "status": "PASS",
+  "sources": [
+    "reports/voice-v1-audit.md#1",
+    "reports/voice-v5-prefetch.md#3",
+    "reports/voice-v3-chunk.md#3",
+    "reports/voice-v2-player.md#1"
+  ],
+  "metrics": {
+    "catatan": "DUA metrik berbeda, jangan dirangkai jadi satu tren. jedaTerdengar = keheningan yang didengar murid (batas ATAS: memuat keheningan kepala/ekor PCM yang dipangkas pemutar). jedaPenjadwalan = selisih bunyi-selesai ke bunyi-berikutnya-dijadwalkan.",
+    "v5MesinPrefetch": {
+      "metrik": "jedaTerdengar (meanAudibleGapMs)",
+      "diukurBagaimana": "reports/voice-v5-data/harness-door.html + measure_door.py, mesin supertonic-3 lokal",
+      "data": "reports/voice-v5-data/door-measurements.json",
+      "pola": "pintu suara per kalimat",
+      "sebelumMs": 4510.7,
+      "sesudahMs": 797.2,
+      "mengukurPekerjaan": "V5 - prefetch() sampai ke mesin neural lokal. BUKAN pekerjaan sisi pemanggil yang dijaga gerbang ini.",
+      "berlakuUntukProduksi": false
+    },
+    "v6SisiPemanggil": {
+      "metrik": "jedaPenjadwalan (meanSchedulingGapMs)",
+      "diukurBagaimana": "reports/voice-v6-data/harness-callers.html + measure_callers.py",
+      "data": "reports/voice-v6-data/caller-measurements.json",
+      "pola": "satu kalimat per panggilan - classroom, tutor, flashcards, kuis",
+      "sebelumMs": 3750.6,
+      "sesudahMs": 449.1,
+      "porsiSunyiSebelum": 0.4769,
+      "porsiSunyiSesudah": 0.0969,
+      "mengukurPekerjaan": "V6 - pemanggil menghangatkan item BERIKUTNYA. Inilah metrik gerbang ini.",
+      "berlakuUntukProduksi": "ya untuk classroom/tutor/flashcards/kuis; TIDAK untuk narasi Library"
+    },
+    "v6NarasiLibraryTerkirim": {
+      "metrik": "jedaPenjadwalan + jedaTerdengar",
+      "diukurBagaimana": "reports/voice-v6-data/measure_blocks.py pada library-books-v1.json, 18 kalimat pertama",
+      "data": "reports/voice-v6-data/block-measurements.json",
+      "pola": "blok bertangga LEAD_BLOCK_CHARS 80, RAMP_COVER_FACTOR 1.15 - konfigurasi yang BENAR-BENAR dikirim",
+      "jedaPenjadwalanMs": 560.6,
+      "jedaTerdengarMs": 1286,
+      "porsiSunyi": 0.126,
+      "suaraPertamaMs": 2816.8,
+      "mengukurPekerjaan": "V6 pada pola yang dipakai Library di produksi - lebih mahal daripada 449,1 ms, dan itu angka yang berlaku.",
+      "berlakuUntukProduksi": true
+    }
+  },
+  "measured": {
+    "contohBlokAudiobook": {
+      "buku": "The Three Little Pigs",
+      "kalimat": 12,
+      "chars": 399,
+      "chunksTeksUtuh": 2,
+      "chunksSatuKalimatPerPanggilan": 12
+    }
+  },
+  "counts": {
+    "pass": 57,
+    "fail": 0
+  },
+  "checks": [
+    {
+      "name": "a1 app.js punya satu pintu hangat prefetchNextVoice() yang memanggil say.prefetch",
+      "status": "PASS",
+      "details": "prefetchNextVoice harus memanggil say.prefetch dan memeriksa generation"
+    },
+    {
+      "name": "a2 classroomSpeak menghangatkan kalimat berikutnya",
+      "status": "PASS",
+      "details": "pola prefetchNextVoice(next===undefined?classroomPeekNextText():next, ...) tidak ditemukan"
+    },
+    {
+      "name": "a3 classroomSpeak mengajukan hangat SEBELUM menunggu bunyi sekarang",
+      "status": "PASS",
+      "details": "warm@425 vs await@501"
+    },
+    {
+      "name": "a4 classroomPeekNextText mengintip kursor sesi tanpa memindahkannya",
+      "status": "PASS",
+      "details": "harus lewat peekSegment(), bukan nextSegment() yang memindahkan kursor"
+    },
+    {
+      "name": "a5 sesi Classroom mengekspor peekSegment() yang murni",
+      "status": "PASS",
+      "details": "peekSegment harus membaca segmentIndex+1 dan tidak menulis state"
+    },
+    {
+      "name": "a6 tutor v3 punya prefetchNextBeat() yang membaca beat berikutnya dari snapshot",
+      "status": "PASS",
+      "details": "harus mengambil beats()[beatIndex+1] lalu say.prefetch"
+    },
+    {
+      "name": "a7 tutor v3 speak() memanggil prefetchNextBeat",
+      "status": "PASS",
+      "details": "prefetchNextBeat(speedFactor) tidak dipanggil dari speak()"
+    },
+    {
+      "name": "a8 tutor v3 mengajukan hangat SEBELUM menunggu bunyi sekarang",
+      "status": "PASS",
+      "details": "warm@1331 vs await@1370"
+    },
+    {
+      "name": "a9 stopVoice tutor v3 membatalkan pengajuan yang menganggur",
+      "status": "PASS",
+      "details": "stopVoice harus menaikkan prefetchGeneration"
+    },
+    {
+      "name": "a10 TTSService addon punya pipa prefetch ke pintu suara",
+      "status": "PASS",
+      "details": "TTSService.prefetch harus meneruskan ke FiezelVoiceSay.prefetch"
+    },
+    {
+      "name": "a11 Controller addon menghangatkan naskah item BERIKUTNYA",
+      "status": "PASS",
+      "details": "harus items[index+1] lalu tts.prefetch(script, ...)"
+    },
+    {
+      "name": "a12 renderListening memanggil prefetchNextScript sesudah play diajukan, sebelum ditunggu",
+      "status": "PASS",
+      "details": "urutan harus: play() -> prefetchNextScript() -> await Promise.race([playing, ...])"
+    },
+    {
+      "name": "a13 adaptor tts di app.js meneruskan prefetch addon ke pintu suara",
+      "status": "PASS",
+      "details": "adaptor tts skillsLab harus punya prefetch yang memanggil prefetchNextVoice"
+    },
+    {
+      "name": "a14 AudioService.play menghormati options.next",
+      "status": "PASS",
+      "details": "options.next tidak dihangatkan"
+    },
+    {
+      "name": "a15 AudioService mengajukan hangat sesudah pemutaran diajukan",
+      "status": "PASS",
+      "details": "warm@658 vs await@807"
+    },
+    {
+      "name": "a16 AudioService.stop membatalkan pengajuan yang menganggur",
+      "status": "PASS",
+      "details": "stop() harus memanggil cancelVoicePrefetch()"
+    },
+    {
+      "name": "a17 flashcards menghangatkan kartu berikutnya (kata dan contoh)",
+      "status": "PASS",
+      "details": "pool[i+1] harus dioper sebagai options.next untuk word dan example"
+    },
+    {
+      "name": "a18 kuis listening menghangatkan soal listening berikutnya di kolam sisa",
+      "status": "PASS",
+      "details": "soal listening berikutnya harus dicari dari remaining lalu dioper sebagai options.next"
+    },
+    {
+      "name": "a19 penghenti global membatalkan prefetch (silenceNeuralVoice + keluar Classroom)",
+      "status": "PASS",
+      "details": "cancelVoicePrefetch harus dipasang di penghenti, minimal 5 titik"
+    },
+    {
+      "name": "a20 Library menghangatkan BLOK berikutnya, bukan kalimat berikutnya",
+      "status": "PASS",
+      "details": "warmNext harus menghangatkan blockAt(...).text"
+    },
+    {
+      "name": "a22 anggaran yang dihangatkan sama dengan anggaran yang nanti dikirim",
+      "status": "PASS",
+      "details": "kalau anggaran hangat berbeda dari anggaran kirim, kunci dedup pintu suara tidak cocok"
+    },
+    {
+      "name": "a21 Library tetap menunda pengajuan satu task (pagar inversi antrean m025-47)",
+      "status": "PASS",
+      "details": "penundaan satu task dan catatannya harus dipertahankan"
+    },
+    {
+      "name": "b1 listening_exam: TIDAK menghangatkan item berikutnya",
+      "status": "PASS",
+      "details": "hasil=false dihangatkan=[]"
+    },
+    {
+      "name": "b1 speaking_exam: TIDAK menghangatkan item berikutnya",
+      "status": "PASS",
+      "details": "hasil=false dihangatkan=[]"
+    },
+    {
+      "name": "b1 speaking: TIDAK menghangatkan item berikutnya",
+      "status": "PASS",
+      "details": "hasil=false dihangatkan=[]"
+    },
+    {
+      "name": "b2 listening biasa: item berikutnya dihangatkan",
+      "status": "PASS",
+      "details": "hasil=true dihangatkan=[\"Item berikutnya yang belum boleh didengar.\"]"
+    },
+    {
+      "name": "b3 penjaganya berbentuk daftar-putih satu domain, bukan daftar-hitam",
+      "status": "PASS",
+      "details": "harus menolak semua domain kecuali listening"
+    },
+    {
+      "name": "b4 renderListeningExam tidak menyebut prefetch sama sekali",
+      "status": "PASS",
+      "details": "jalur ujian tidak boleh memanggil prefetch"
+    },
+    {
+      "name": "b5 pindah domain dan keluar sesi membatalkan pengajuan yang menganggur",
+      "status": "PASS",
+      "details": "open(), exit(), destroy() harus memanggil cancelPrefetch()"
+    },
+    {
+      "name": "b6 pengajuan yang menganggur tidak berbunyi belakangan setelah penghenti",
+      "status": "PASS",
+      "details": "dihangatkan=[]"
+    },
+    {
+      "name": "c1 narasi Library mengirim teks blok utuh dalam SATU say()",
+      "status": "PASS",
+      "details": "narrate harus mengirim block.text, bukan session.current() per kalimat"
+    },
+    {
+      "name": "c2 narasi Library memakai planUtterance untuk teks utuh",
+      "status": "PASS",
+      "details": "planBlock harus memanggil FiezelProsody.planUtterance dan dipakai di narrate"
+    },
+    {
+      "name": "c3 blok pertama audiobook menggabungkan beberapa kalimat dalam satu bab",
+      "status": "PASS",
+      "details": "kalimat=12"
+    },
+    {
+      "name": "c4 teks utuh blok NYATA menghasilkan lebih dari satu potongan (chunks.length > 1)",
+      "status": "PASS",
+      "details": "buku=\"The Three Little Pigs\" chars=399 chunks=2"
+    },
+    {
+      "name": "c5 setiap potongan membawa penanda batas",
+      "status": "PASS",
+      "details": "[\"sentence\",\"paragraph\"]"
+    },
+    {
+      "name": "c6 satu blok utuh membayar lebih sedikit batas generasi daripada satu-kalimat-per-panggilan",
+      "status": "PASS",
+      "details": "blok utuh=2 potongan vs per kalimat=12 potongan"
+    },
+    {
+      "name": "c8 blok pembuka kecil, jadi suara pertama tidak menunggu generasi panjang",
+      "status": "PASS",
+      "details": "LEAD_BLOCK_CHARS=80 blok pembuka=47 char"
+    },
+    {
+      "name": "c9 pertumbuhan anggaran tidak melewati batas penutup terukur (1,15x)",
+      "status": "PASS",
+      "details": "[[0,80],[60,80],[120,138],[200,230],[223,256],[224,900],[500,900]]"
+    },
+    {
+      "name": "c7 blok tidak pernah melewati batas bab",
+      "status": "PASS",
+      "details": "setiap blok harus satu bab dan menghormati anggaran karakter"
+    },
+    {
+      "name": "d1 sorotan dijadwalkan untuk SETIAP kalimat di dalam blok",
+      "status": "PASS",
+      "details": "dijadwalkan=11 untuk 12 kalimat, sorotan awal=0"
+    },
+    {
+      "name": "d2 setiap kalimat blok benar-benar tersorot, berurutan",
+      "status": "PASS",
+      "details": "tersorot=[0,1,2,3,4,5,6,7,8,9,10,11]"
+    },
+    {
+      "name": "d3 jadwal sorotan naik monoton dan memperhitungkan jeda batas potongan",
+      "status": "PASS",
+      "details": "delay=[3117,5844,7792,9805,11558,14636,15999,18337,20415,21973,23856]"
+    },
+    {
+      "name": "d4 sorotan berhenti begitu narasi dihentikan (token berubah)",
+      "status": "PASS",
+      "details": "tersorot setelah stop=[0]"
+    },
+    {
+      "name": "d5 stopNarration membatalkan semua timer sorotan",
+      "status": "PASS",
+      "details": "stopNarration harus memanggil clearHighlightTimers()"
+    },
+    {
+      "name": "d6 terjemahan blok dioper ke pita subtitle, jadi penerjemah tidak dipanggil",
+      "status": "PASS",
+      "details": "block.translation harus dibangun dari pasangan {en,id} lalu dioper ke say()"
+    },
+    {
+      "name": "e1 app.js prefetchNextVoice tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 app.js cancelVoicePrefetch tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 app.js classroomPeekNextText tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 app.js AudioService.prefetch tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 tutor-v3 prefetchNextBeat tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 addon TTSService.prefetch tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 addon Controller.prefetchNextScript tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 library warmNext tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 library blockAt tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 library planBlock tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e1 library scheduleBlockHighlight tidak menyentuh prepare()/ensureReady()/prewarm()",
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "name": "e2 berkas mesin suara tidak diubah dari sisi pemanggil (kontraknya sudah selesai)",
+      "status": "PASS",
+      "details": "kontrak prefetch() dan planUtterance() harus tetap ada"
+    }
+  ]
+}

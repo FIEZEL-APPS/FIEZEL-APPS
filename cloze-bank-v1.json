@@ -3,11 +3,11 @@
   "generatedFrom": "grammar-templates.json",
   "counts": {
     "templates": 139,
-    "items": 112,
-    "rejected": 27,
+    "items": 111,
+    "rejected": 28,
     "byLevel": {
       "A2": 12,
-      "B1": 39,
+      "B1": 38,
       "B2": 25,
       "C1": 16,
       "A1": 13,
@@ -99,6 +99,11 @@
       "templateId": "b4_017",
       "reason": "answer_too_short",
       "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "b4_018",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
     },
     {
       "templateId": "b4_021",
@@ -533,8 +538,8 @@
           "misconception": "uses past simple for the earlier event, flattening the sequence"
         },
         {
-          "text": "were already giving",
-          "misconception": "confuses completed prior action with an action still in progress at the reference point"
+          "text": "are already giving",
+          "misconception": "keeps the action in progress at 'now' instead of marking it completed before the past reference point"
         },
         {
           "text": "already give",
@@ -927,8 +932,8 @@
           "misconception": "uses the bare infinitive, which isn't a valid pattern after 'remember' in either meaning"
         },
         {
-          "text": "having to lock",
-          "misconception": "adds an unnecessary obligation phrase not supported by the sentence's meaning"
+          "text": "to have locked",
+          "misconception": "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action"
         }
       ]
     },
@@ -1651,8 +1656,8 @@
           "misconception": "Assumes present time always requires present continuous."
         },
         {
-          "text": "belonged",
-          "misconception": "Shifts to past tense despite the present-relevance context."
+          "text": "belonging",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense"
         },
         {
           "text": "is being belonged",
@@ -1969,32 +1974,6 @@
         {
           "text": "For exercise",
           "misconception": "Uses 'for' as if introducing purpose rather than a subject."
-        }
-      ]
-    },
-    {
-      "id": "b4_018-cz0",
-      "templateId": "b4_018",
-      "skill": "relative_clause_omitting_object_pronoun",
-      "level": "B1",
-      "sentence": "The book ____ I borrowed from the library was due back yesterday.",
-      "blank": {
-        "answer": "[no word needed]",
-        "alternates": [],
-        "position": 9
-      },
-      "distractors": [
-        {
-          "text": "who",
-          "misconception": "Uses a personal relative pronoun for a non-human antecedent."
-        },
-        {
-          "text": "whom, which",
-          "misconception": "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things."
-        },
-        {
-          "text": "what",
-          "misconception": "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error."
         }
       ]
     },

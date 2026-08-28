@@ -75,7 +75,11 @@ const WORKFLOW = path.join('.github', 'workflows', 'quality.yml');
  * hal yang pasti ia ikuti; mendeteksi "berkas ini punya assert" lewat heuristik isi akan
  * meleset ke dua arah sekaligus.
  */
-const GATE_NAME_RE = /(?:-test|-audit|-selftest)\.(?:js|mjs)$/;
+// `-simulation` masuk pola sejak temuan D1 §5.3: `adaptivity-simulation-v3.js` adalah
+// gerbang sungguhan (exit code dari main(), gate residual + kalibrasi yang bisa merah)
+// tetapi namanya tidak berakhiran -test/-audit/-selftest sehingga lolos dari meta-gate
+// ini selama setahun pola lamanya berlaku. Sufiks versi opsional (`-v3`) ikut ditangkap.
+const GATE_NAME_RE = /(?:-test|-audit|-selftest|-simulation(?:-v\d+)?)\.(?:js|mjs)$/;
 
 /* =======================================================================================
  * PENGECUALIAN — setiap entri WAJIB punya alasan tertulis
@@ -104,6 +108,17 @@ const EXCLUSIONS = new Map([
       'bank soal dijaga oleh bank-soal-audit-test.js (terdaftar) dan grammar-quality-audit.js ' +
       '(terdaftar). Cara menjalankan alat ini: `node audit/bank-audit.js` (lihat ' +
       'FIEZEL-M025125-SIDAK-BANK-SOAL-HANDOFF.md).'
+  }],
+  ['adaptivity-simulation.js', {
+    class: 'alat-pelaporan',
+    reason:
+      'BUKAN gerbang: simulasi adaptivity v1 (legacy) adalah penghasil narasi/laporan yang ' +
+      'mencetak analisis panjang ke konsol dan SELALU exit 0 — nol assert, nol process.exit, ' +
+      'nol process.exitCode di seluruh berkasnya. Mendaftarkannya di CI menambah satu langkah ' +
+      'hijau abadi. Ia sudah digantikan oleh adaptivity-simulation-v3.js, yang MEMANG gerbang ' +
+      '(exit code dari main(), gate residual + gate kalibrasi yang bisa merah) dan karena itu ' +
+      'WAJIB terdaftar di quality.yml, bukan dikecualikan. Cara menjalankan alat v1 secara ' +
+      'manual: `node adaptivity-simulation.js`.'
   }]
 ]);
 
