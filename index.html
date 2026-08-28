@@ -425,6 +425,10 @@ html.fz-booting body{overflow:hidden}
   <script defer src="./features/personal-journey/fiezel-personal-journey.js"></script>
   <script defer src="./features/ui/fiezel-report-gesture-isolation.js"></script>
   <script defer src="./features/ui/fiezel-ui-manager.js"></script>
+  <!-- T-031: berkas ini memasang `window.FiezelABAnalytics` (pipa eksperimen UI). Ia TIDAK
+       BOLEH menyentuh `window.FiezelAnalytics` — nama itu milik modul analytics
+       privasi-maksimal yang disuntik app.js di idle, dan `<script defer>` di sini selalu
+       menang balapan terhadap idle. Dijaga `global-name-collision-test.js`. -->
   <script defer src="./features/ui/fiezel-ab-testing.js"></script>
   <script defer src="./features/ui/skeleton-helpers.js"></script>
   <script defer src="./features/ui/fiezel-boot-tail.js"></script>
