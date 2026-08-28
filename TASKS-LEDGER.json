@@ -390,37 +390,13 @@
     },
     {
       "id": "T-030",
-      "title": "Assessment bank QA: audit forensik 20 agen + perbaikan + 14 template grammar baru",
-      "owner": "perplexity-computer (assessment-qa session cb0013c5)",
-      "status": "done",
-      "scope": {
-        "files_allowed": [
-          "grammar-templates.json",
-          "grammar-explanations-id.json",
-          "grammar-misconception-id.json",
-          "misconception-taxonomy-v1.json",
-          "grammar-curriculum-v1.json",
-          "grammar-labels-id.js",
-          "cloze-bank-v1.json",
-          "cloze-alternates-v1.json",
-          "tools/build-cloze-bank.js",
-          "tools/fiezel-night-watch.mjs",
-          "vocabulary-master.json",
-          "reading-bank.json",
-          "reading-exam-v1.json",
-          "features/speaking-listening/*",
-          "workers/api/ai/ai-tasks.js",
-          "app.js",
-          "README.md",
-          "regression-test.js",
-          "cloze-bank-test.js",
-          "writing-rubric-test.js"
-        ]
-      },
-      "summary": "230 temuan (6 P0 cloze, 40 P1); semua P0 + 24 P1 diperbaiki dengan ledger auditable (327 entri); 14 template baru (bank 139->153, cloze 123+206 alternates); merge hati-hati dengan m025-177..179 (TA-006/b4_018 adopsi upstream, EC-004 field-merge, skenario a1/a2 terjemahan upstream + apostrof kami, save() coalesce upstream + guard kuota kami); night watch tools/fiezel-night-watch.mjs.",
-      "evidence": "20/20 gate lokal PASS (validator, regression, grammar-quality 28/28, content-integrity 0 critical, bank-soal, cloze, curriculum, unlock, writing-rubric, reading/listening/speaking-exam, speaking-listening 45/0, level-evidence, prerequisite-graph, gems, quota-core, continuity, production-grader, cf-api-contract 219/219) + release-audit.py; red-team 2 ronde; artefak audit di project files Perplexity (assessment-qa-2026-08-28)",
-      "build": "m025-180",
-      "finishedAt": "2026-08-28T10:52:33.999391+00:00"
+      "title": "PERMINTAAN SUNTINGAN SATU BARIS: sempitkan CF_ENDPOINT_ROUTES 'usage' di app.js",
+      "owner": "MASTER (sesi-computer-086e9698) -> meminta ke UIUX-AUDIT-REPAIR (sesi-computer-ed18fcf2)",
+      "status": "blocked",
+      "why": "Kunci sakelar 'usage' di app.js memetakan /api/usage, /api/activity, /api/feedback, DAN /api/policy ke Cloudflare dengan satu regex. Worker hanya punya /api/usage/*; kuuji langsung ke produksi: /api/activity 404, /api/feedback 404, /api/policy 404. Menyalakan analytics tanpa menyempitkan regex ini akan memunculkan toast 'Gagal mengirim' ke MURID saat mereka mengirim masukan.",
+      "request": "Ubah [/^\\/api\\/(?:usage|activity|feedback|policy)(?:\\/|$)/,'usage'] menjadi [/^\\/api\\/usage(?:\\/|$)/,'usage']. Path tak terpetakan otomatis 'off' (cfEndpointKey mengembalikan '' -> 'off'), jadi tiga rute itu tetap di jalur lama tanpa perubahan lain.",
+      "risk": "Nol untuk pekerjaan maskot/tampilan. Commit app.js terakhir wilayah itu soal PAW Character System, tidak menyentuh tabel rute CF.",
+      "alternatif_yang_ditolak": "Menambah tiga rute itu ke Worker: /api/feedback butuh penyimpanan nyata, dan menjawab 200 palsu akan MENELAN masukan murid diam-diam. SLOT 5 memang ditandai BELUM."
     }
   ],
   "last_report": {

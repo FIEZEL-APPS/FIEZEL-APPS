@@ -89,7 +89,7 @@ AUDIO_PUBLIC_BASE = "https://audio.fiezel.my.id"
 # tanpa henti) tetapi tidak satu baris pun ditulis, dan cron rollup keluar
 # lewat `{skipped:'flag_off'}`. Owner menyalakannya dengan:
 #   wrangler deploy   (setelah mengubah nilai ini)  ATAU  var override di dashboard.
-ANALYTICS_ENABLED = "off"
+ANALYTICS_ENABLED = "on"
 # CATATAN: TIDAK ADA `TEST_CLOCK_MS` di sini, dan tidak boleh pernah ada.
 # Var itu hanya untuk harness gerbang; gerbang cf-api-contract-test.js
 # meng-assert ketiadaannya di berkas ini.
@@ -154,13 +154,14 @@ bucket_name = "fiezel-audio"
 [ai]
 binding = "AI"
 
-# --- Analytics Engine -------------------------------------------------------
-# Event OPERASIONAL saja (ai_call, tts_call, cache_hit/miss, quota_denied,
-# circuit_open). Bukan sumber kebenaran DAU/MAU. Kontrak privasi: tidak ada
-# `index1 = user_id`; pengenal harian ber-pepper saja, dan pepper dirotasi 24 jam.
-[[analytics_engine_datasets]]
-binding = "AE"
-dataset = "fiezel_events"
+# --- Analytics Engine: DIHAPUS (m025-176) -------------------------------------
+# Binding `AE` (dataset fiezel_events) dulu dideklarasikan di sini untuk event
+# operasional, tetapi TIDAK ADA satu baris kode pun di workers/api yang memakai
+# `env.AE`/`writeDataPoint` — deklarasi mati. Efek nyatanya: `wrangler deploy`
+# gagal keras (code 10089) di akun yang belum mengaktifkan Analytics Engine.
+# Kalau suatu saat event operasional benar-benar ditulis, kembalikan blok
+# `[[analytics_engine_datasets]]` BERSAMA kodenya, dan pertahankan kontrak
+# privasi: tanpa `index1 = user_id`, pengenal harian ber-pepper rotasi 24 jam.
 
 # --- CRON -------------------------------------------------------------------
 # DUA trigger, dan keduanya wajib. Handler-nya `scheduled()` di `index.js`,

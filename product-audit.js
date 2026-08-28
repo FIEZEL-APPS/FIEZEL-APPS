@@ -58,7 +58,7 @@ check('Creator report privacy',app.includes('validReportEndpoint')&&app.includes
 check('Runtime syntax',true,'Validated separately with node --check.');
 const data=JSON.parse(fs.readFileSync(path.join(root,'vocabulary-master.json')));check('Vocabulary data readable',Array.isArray(data)&&data.length>0,`records=${data.length}`);
 const r=JSON.parse(fs.readFileSync(path.join(root,'reading-bank.json')));check('Reading data readable',Array.isArray(r)&&r.length>0,`passages=${r.length}`);
-const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===153&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
+const g=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json')));check('Grammar data readable',Array.isArray(g?.templates)&&g.templates.length===g.count&&g.templates.length>=139&&new Set(g.templates.map(t=>t.id)).size===g.templates.length&&g.version===report.version&&g.practiceBlueprintVersion==='focused-25-v1',`items=${g.templates?.length||0} declared=${g.count} version=${g.version} blueprint=${g.practiceBlueprintVersion}`);
 fs.writeFileSync(path.join(root,'STAGE8-PRODUCT-AUDIT.json'),JSON.stringify(report,null,2));
 console.log(JSON.stringify(report,null,2));
 process.exitCode=report.counts.fail?1:0;

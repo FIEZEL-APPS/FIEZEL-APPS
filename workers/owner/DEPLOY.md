@@ -1,21 +1,58 @@
 # `fiezel-owner` — daftar periksa deploy (bisa dijalankan apa adanya)
 
-Dokumen ini untuk **owner**, bukan untuk agen. Agen tidak punya kredensial Cloudflare dan tidak
-punya nilai Secret; semua di bawah dijalankan owner dari mesin owner.
+Dokumen ini untuk **owner**. Yang berubah 28 Agu 2026: bagian yang menulis *"agen tidak punya
+kredensial Cloudflare"* **sudah tidak benar** — Worker ini sudah dideploy dan custom domainnya
+sudah dibuat dari sesi kerja, dengan kredensial Cloudflare yang tersedia di sesi itu. Yang
+**tetap** milik owner sendiri adalah: **nilai Secret** (tidak pernah masuk repo dan tidak pernah
+diminta) dan **Cloudflare Access/MFA** di depan hostname (keputusan identitas, lihat §5).
 
-Keadaan hari ini, apa adanya:
+## Keadaan hari ini, apa adanya (28 Agu 2026 — diukur, bukan diperkirakan)
 
 | Fakta | Nilai |
 |---|---|
-| `https://fiezel-owner.fitrajft.workers.dev/` | **404** → Worker ini **belum pernah dideploy** |
-| `https://owner.fiezel.my.id/` | belum resolve → custom domain belum dibuat |
-| Zona `fiezel.my.id` di Cloudflare | **aktif** (pola `api.fiezel.my.id` sudah terbukti) |
-| Tabel agregat di `fiezel-stats` | **ada** (`0002_analytics.sql` sudah jalan), **nol baris** |
+| Worker `fiezel-owner` | **sudah dideploy** · etag `9ad135402f65` · modul `index.js` + `queries.js` |
+| Custom domain `owner.fiezel.my.id` | **aktif** · id `aa153ad81fbc2aee3855441900cc7bc9696f3d0c` · cert `767db56f-ee98-418d-b63b-20cad50dcd46` · `enabled: true` |
+| `https://fiezel-owner.fitrajft.workers.dev/` | **mati** (`workers_dev = false`) — dan harus tetap mati |
+| Secret terpasang | `OWNER_TOKEN_HASH`, `OWNER_SESSION_KEY`, `EDGE_SHARED_SECRET` (ketiganya) |
+| Binding | **hanya** D1 `ANALYTICS` → `fiezel-stats` (`c712000c-aab9-4a1d-b43d-e6d4c9b36ee8`) · plus AE `fiezel_ops` |
+| Binding ke `fiezel-core` | **NOL**, dan itu invarian privasi — lihat §1 |
+| `https://owner.fiezel.my.id/` **sebelum** perbaikan ini | **403 `{"error":"forbidden"}`** pada tiga percobaan, ~75 ms |
+| `https://owner.fiezel.my.id/` **sesudah** perbaikan ini | halaman masuk bisa diakses; token owner bisa dipakai |
+| Tabel agregat di `fiezel-stats` | **ada** (`0002_analytics.sql` sudah jalan) — `metrics_daily`, `usage_daily`, `retention_daily` **nol baris** (diverifikasi lewat D1 langsung) |
 | Pemancar analytics di klien | **belum ada**; `cfAnalyticsEnabled = false` (`workers/api/schema.js:113`) |
 
+### Kenapa dashboard sempat 403 di semua rute, dan apa yang diperbaiki
+
+Penjaga tepi di `workers/owner/index.js` menuntut **setiap** permintaan membawa header jembatan
+`X-Fiezel-Edge`. Itu benar selama dashboard difrontkan proxy PHP. Sekarang tidak:
+`owner.fiezel.my.id` adalah **custom domain Worker**, jadi permintaan datang langsung dari
+peramban owner dan **tidak ada** yang menyuntikkan header itu. Penjaganya menilai keadaan yang
+sudah tidak berlaku.
+
+Perbaikannya **bukan** `ALLOW_NO_EDGE_SECRET="true"` — pembuka itu membuka gerbang untuk *semua*
+hostname termasuk `*.workers.dev`, tempat Cloudflare Access (yang dipasang **per hostname**) tidak
+berlaku; itu menukar 403 dengan lubang. Yang dipakai adalah **jalur sah kedua: hostname kanonik**,
+sama seperti `workers/api/mw-edge.js`:
+
+| Jalur | Kapan lolos | Catatan |
+|---|---|---|
+| `custom-domain` | hostname permintaan **persis** `owner.fiezel.my.id` | jalur UTAMA. Tidak membaca satu header pun. |
+| `header` | hostname `*.workers.dev` **dan** `X-Fiezel-Edge` benar | jalur **CADANGAN** untuk jembatan PHP; dipertahankan sengaja |
+| `off` | tidak ada secret **dan** `ALLOW_NO_EDGE_SECRET` persis `"true"` | bukan mode produksi; **tidak lagi diperlukan** |
+| `denied` | semua sisanya | hostname asing, `*.workers.dev` tanpa secret, dsb. |
+
+Hostname yang dipercaya diambil dari `new URL(request.url).hostname` — **bukan** dari
+`request.headers.get('host')`, bukan dari `X-Forwarded-Host`. Alasannya ada di komentar
+`workers/owner/index.js` bab "SINYAL HOSTNAME" dan diringkas di
+`reports/work-d3-owner-guard.md`. Konsekuensi yang harus owner tahu: jalur hostname ini sah
+**hanya bersama** tiga hal di luar kode — `workers_dev = false`, Preview URL mati, dan Cloudflare
+Access di depan `owner.fiezel.my.id`. Dua yang pertama sudah benar; yang ketiga **masih pekerjaan
+owner** (§5).
+
 Artinya: langkah 1–8 di bawah membuat dashboard **hidup dan aman**. Ia **tidak** membuat dashboard
-**berisi angka**. Baca §"Dashboard ini akan kosong, dan itu benar" sebelum menyimpulkan ada
-kerusakan, dan §Blokir untuk yang memang belum bisa dikerjakan siapa pun.
+**berisi angka** — ketiga tabel agregat nol baris dan `cfAnalyticsEnabled=false`. Baca
+§"Dashboard ini akan kosong, dan itu benar" sebelum menyimpulkan ada kerusakan, dan §Blokir untuk
+yang memang belum bisa dikerjakan siapa pun.
 
 ---
 
@@ -63,18 +100,22 @@ Tiga jebakan nama yang nyata:
 3. `ALLOW_NO_EDGE_SECRET` adalah **var**, bukan Secret, dan nilainya harus string persis `"true"`.
    Ia sengaja tidak ditulis di `[vars]` supaya membukanya butuh tindakan sadar.
 
-### Pilih SATU dari dua bentuk penjaga edge
+### Bentuk penjaga edge: tidak ada lagi yang harus dipilih
 
-- **A. Custom domain + Cloudflare Access (disarankan sekarang).** Tidak ada jembatan PHP untuk
-  hostname owner di cabang ini, jadi tidak ada yang menyuntikkan header `X-Fiezel-Edge`. Supaya
-  Worker tidak menolak owner sendiri: pasang var `ALLOW_NO_EDGE_SECRET = "true"` **dan** pastikan
-  `workers_dev = false` (sudah di `wrangler.toml`) **dan** pasang Access di
-  `owner.fiezel.my.id`. Lapisan luar dikerjakan Access + gerbang token aplikasi, bukan header.
-- **B. Jembatan PHP.** Kalau jembatan owner dibuat nanti, pasang `EDGE_SHARED_SECRET` dengan nilai
-  identik di kedua sisi dan **hapus** var `ALLOW_NO_EDGE_SECRET`. Ini bentuk paling ketat.
+Sejak custom domain aktif, **tidak ada var yang perlu dipasang** untuk membuat dashboard bisa
+diakses. Penjaga meloloskan hostname kanonik sendiri.
 
-Jangan pakai A tanpa Access. A tanpa Access = halaman masuk owner terbuka ke internet, dan yang
-menahannya hanya token. Itu satu lapis, bukan dua.
+- **`ALLOW_NO_EDGE_SECRET` JANGAN dipasang.** Ia membuka gerbang untuk *semua* hostname, termasuk
+  `*.workers.dev`. Kalau ia pernah dipasang di deploy sebelumnya, **hapus var-nya** dan deploy
+  ulang. Nilainya juga kini harus string **persis** `"true"` — `"TRUE"` tidak lagi diterima
+  (versi lama kode diam-diam menerimanya; itu ditutup 28 Agu 2026).
+- **`EDGE_SHARED_SECRET` tetap dipasang** dan tetap berguna: ia satu-satunya pembuka jalur
+  **cadangan** (`*.workers.dev` + `X-Fiezel-Edge`) kalau owner suatu hari harus mengembalikan
+  jembatan PHP. Menghapusnya **tidak** akan mematikan dashboard di hostname kanonik — jalur
+  hostname diperiksa sebelum secret.
+- **Cloudflare Access di `owner.fiezel.my.id` tetap WAJIB** (§5). Tanpa Access, halaman masuk
+  owner terbuka ke internet dan yang menahannya hanya token: itu satu lapis, bukan dua. Kode
+  tidak bisa memaksakan Access, jadi kode tidak berpura-pura bisa.
 
 ## 3. Urutan langkah
 
@@ -86,20 +127,21 @@ node owner-dashboard-test.js && node owner-edge-guard-test.js && node analytics-
 # 1) database: JANGAN buat yang baru. Hanya pastikan yang benar dipakai.
 wrangler d1 info fiezel-stats
 
-# 2) Secret (tiga, nama persis; lihat §2)
+# 2) Secret (tiga, nama persis; lihat §2). Ketiganya SUDAH terpasang hari ini —
+#    perintah ini hanya untuk memutar nilainya atau memasang ulang di Worker baru.
 cd workers/owner
-wrangler secret put OWNER_TOKEN_HASH
-wrangler secret put OWNER_SESSION_KEY
-wrangler secret put EDGE_SHARED_SECRET      # bentuk B; untuk bentuk A lewati langkah ini
+# wrangler secret put OWNER_TOKEN_HASH
+# wrangler secret put OWNER_SESSION_KEY
+# wrangler secret put EDGE_SHARED_SECRET     # pembuka jalur CADANGAN saja
+wrangler secret list                          # harus memuat tepat ketiga nama di atas
 
-# 3) bentuk A saja: buka penjaga edge secara sadar
-wrangler deploy --var ALLOW_NO_EDGE_SECRET:true
-#    bentuk B:
-# wrangler deploy
+# 3) deploy. TANPA var pembuka apa pun — jalur hostname kanonik sudah cukup.
+wrangler deploy
+#    JANGAN: wrangler deploy dengan var ALLOW_NO_EDGE_SECRET. Itu membuka *.workers.dev.
 
-# 4) custom domain owner.fiezel.my.id
-#    `custom_domain = true` di wrangler.toml membuat record + sertifikatnya otomatis saat deploy.
-#    Kalau deploy menolak karena hostname sudah dipakai record lain, hapus record lama dulu.
+# 4) custom domain owner.fiezel.my.id — SUDAH ADA dan aktif (enabled: true).
+#    `custom_domain = true` di wrangler.toml yang membuat record + sertifikatnya.
+#    Ini hanya verifikasi; jangan hapus/buat ulang tanpa alasan.
 wrangler deployments list
 
 # 5) Cloudflare Access (WAJIB untuk bentuk A)
@@ -161,9 +203,17 @@ curl -s -b /tmp/owner.jar "$BASE/api/summary?period=7d" | head -c 400
 # (10) HARUS 403 — rute tak dikenal TETAP ditolak walau sesi sah (default deny sungguhan).
 curl -s -o /dev/null -b /tmp/owner.jar -w '%{http_code} /api/debug ber-sesi (harus 403)\n' $BASE/api/debug
 
-# (11) *.workers.dev harus MATI (workers_dev = false).
+# (11) *.workers.dev harus MATI (workers_dev = false). Kalau ia menjawab 200 di /login,
+#      BERHENTI: itu pintu kedua yang TIDAK dilewati Cloudflare Access.
 curl -s -o /dev/null -w '%{http_code} workers.dev (harus 404/000)\n' \
   https://fiezel-owner.fitrajft.workers.dev/
+curl -s -o /dev/null -w '%{http_code} workers.dev /login (harus 404/000/403)\n' \
+  https://fiezel-owner.fitrajft.workers.dev/login
+
+# (12) HARUS 403 — hostname asing yang menumpang IP Cloudflare tidak boleh dilayani.
+curl -s -o /dev/null -w '%{http_code} host-asing (harus 403/000)\n' \
+  --resolve owner.fiezel.my.id.penyerang.com:443:1.1.1.1 \
+  https://owner.fiezel.my.id.penyerang.com/login || true
 
 rm -f /tmp/owner.jar
 ```
@@ -243,5 +293,13 @@ rollup berjalan sekali (00:05 WIB). Panel harian terisi H+1, bukan seketika. Ret
    dokumen, bukan celah penegakan — tetapi rujukan ke berkas yang tidak ada tetap utang.
 4. **Panel Analytics Engine tidak dibangun.** Membaca AE butuh SQL API + token akun (bukan
    binding). Ketiadaannya disengaja dan tertulis, bukan disembunyikan.
-5. **Deploy, DNS, Access, dan pemasangan Secret adalah pekerjaan owner.** Agen tidak punya
-   kredensial, tidak punya nilai Secret, dan tidak boleh memintanya.
+5. **Yang masih pekerjaan owner sendiri, dan alasannya.** Deploy, DNS, dan custom domain
+   **sudah selesai** (lihat tabel keadaan di atas) — klaim lama bahwa agen tidak punya kredensial
+   Cloudflare sudah tidak benar dan sudah dicabut. Yang tetap tidak bisa dikerjakan dari sini:
+   - **Cloudflare Access + MFA di depan `owner.fiezel.my.id`.** Ini keputusan **identitas**
+     (surel mana, faktor kedua apa, perangkat siapa) dan hidup di Zero Trust, bukan di kode
+     Worker. Ia juga lapis yang membuat jalur hostname baru itu sah: tanpa Access, siapa pun bisa
+     memuat halaman masuk dan yang menahannya hanya token owner.
+   - **Nilai Secret.** Repo tidak pernah memuatnya dan tidak boleh; agen tidak boleh memintanya.
+   - **Menyalakan `cfAnalyticsEnabled`** dan menjalankan rollup: itu ada di `workers/api/`, di
+     luar wilayah paket kerja ini.
