@@ -819,6 +819,59 @@ try{
   self.FiezelI18n?.onChange?.(()=>{try{document.documentElement.lang=FiezelI18n.getBcp47()}catch(_){/* VM test tanpa DOM */}});
   self.FiezelI18n?.setLocale?.(state?.preferences?.learnerLocale);
 }catch(_){/* i18n absen (harness lama) = perilaku hari ini, bukan boot gagal */}
+// W4-MERGE (AI-06 F04/F10 + AI-07 F04): data th mendarat ASINKRON dari fiezel-th-loader.js,
+// dan locale bisa berganti di Pengaturan — dua-duanya menuntut hidrasi ulang bank dari sumber
+// mentah + invalidasi indeks pencarian (indeks dibangun dari fetch terpisah, F10). Callback
+// idempoten; render ulang hanya bila layar pernah dicat (jangan mencat sebelum openApp).
+// Murid id: FiezelThData tidak pernah ada, listener ini praktis no-op yang murah.
+try{
+  self.FiezelI18n?.onChange?.(()=>{try{searchIndexCache=null;applyContentLocale()}catch(_){}});
+  self.FiezelOnThDataReady=()=>{try{searchIndexCache=null;applyContentLocale();if(window.__fiezelLastRenderMs!==undefined)render()}catch(_){}};
+}catch(_){/* harness tanpa i18n */}
+// ============================== W4-MERGE: OVERLAY DATA LOCALE TH ==============================
+// (AI-06 F04/F10 + AI-07 F02/F04) Dua dataset sidecar Thai (grammar-explanations-th.json,
+// vocabulary-th.json) difetch ASINKRON oleh features/i18n/fiezel-th-loader.js — hanya saat
+// locale th; murid id nol fetch dan nol overlay. Datanya bisa mendarat SETELAH load() usai
+// (atau locale berganti di Pengaturan), jadi overlay bekerja di ATAS hasil hidrasi yang
+// disimpan apa adanya di CONTENT_BASE: jalur id mengembalikan referensi asli byte-identik,
+// jalur th mengembalikan SALINAN dengan nilai Thai dituliskan ke slot ...Id — seluruh pembaca
+// lama (grammarMeta, grammarExercise, pembangun reasons) otomatis menampilkan Thai dengan
+// rantai fallback th->id->en yang memang sudah ada (...Id||...). Kunci join: id template +
+// teks opsi distraktor persis (AI-07 F03).
+let CONTENT_BASE=null;
+function grammarItemForTh(item,thMap){
+  const x=thMap[String(item?.[8]||'')];if(!x)return item;
+  const it=item.slice();
+  it[12]=Object.assign({},item[12]||{},x.rule?{ruleId:x.rule}:{},x.whyCorrect?{whyCorrectId:x.whyCorrect}:{},x.whyOthersFail?{whyOthersFailId:x.whyOthersFail}:{},x.howToAvoid?{howToAvoidId:x.howToAvoid}:{},x.memoryCue?{memoryCueId:x.memoryCue}:{});
+  it[16]={objectiveId:String(x.objective||item[16]?.objectiveId||''),misconceptionId:String(x.misconception||item[16]?.misconceptionId||''),reasoningId:String(x.reasoning||item[16]?.reasoningId||'')};
+  it[17]=(Array.isArray(item[17])?item[17]:[]).map(d=>{const dx=x.distractors?.[String(d?.option||'')];return dx?Object.assign({},d,dx.whyFails?{whyFails:dx.whyFails}:{},dx.misconception?{misconception:dx.misconception}:{}):d});
+  it[4]=(Array.isArray(item[1])?item[1]:[]).map((o,i)=>{if(i===item[2])return String(x.whyCorrect||item[4]?.[i]||'');const dx=x.distractors?.[String(o)];return String(dx?.whyFails||item[4]?.[i]||'')});
+  return it;
+}
+// Helper BERSAMA load() dan ensureSearchIndex() (dua jalur fetch terpisah; overlay di satu
+// jalur saja = campuran id/th antara kuis dan pencarian — AI-06 F10). meaning th menimpa
+// gloss id; example th masuk exampleTranslation (terjemahan kalimat contoh) — kalimat Inggris
+// TIDAK disentuh dan pola examples[].id sengaja dihindari (jebakan overload, AI-06 F03).
+// Entri tanpa padanan th memakai gloss id (fallback th->id) supaya filter v.meaning tidak
+// menghapus kata diam-diam (F04). Jalur id: list dikembalikan APA ADANYA.
+function vocabForLocale(list){
+  if(self.FiezelI18n?.getLocale?.()!=='th')return list;
+  const th=self.FiezelThData?.vocab?.entries;
+  if(!th||!Array.isArray(list))return list;
+  return list.map(v=>{const x=th[String(v?.id||'')];if(!x)return v;
+    return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.example?{exampleTranslation:x.example}:{})});
+}
+// Terapkan locale ke bank runtime. id: kembalikan referensi hasil hidrasi (byte-identik).
+// th + sidecar siap: bangun ulang GRAMMAR_ITEMS/G/V dari salinan ber-overlay. Idempoten —
+// aman dipanggil berulang dari FiezelOnThDataReady/onChange di atas.
+function applyContentLocale(){
+  if(!CONTENT_BASE)return;
+  const thReady=self.FiezelI18n?.getLocale?.()==='th'?self.FiezelThData:null;
+  const gTh=thReady?.grammar?.templates||null;
+  if(!gTh||!CONTENT_BASE.items.length){GRAMMAR_ITEMS=CONTENT_BASE.items;G=CONTENT_BASE.g}
+  else{GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForTh(e.item,gTh)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
+  V=vocabForLocale(CONTENT_BASE.v);
+}
 function placementLevel(sourceState=state){const raw=Math.max(1,Math.min(6,Math.floor(Number(sourceState?.level)||1)));return LEVELS[raw-1]||'A1'}
 function getActiveLevel(sourceState=state){const prefs=sourceState?.preferences||{};if(LEVELS.includes(String(prefs.activeLevel||'')))return String(prefs.activeLevel);if(!sourceState?.placementDone&&LEVELS.includes(String(prefs.selfAssessedLevel||'')))return String(prefs.selfAssessedLevel);return sourceState?.placementDone?placementLevel(sourceState):'A1'}
 function activeLevelIsManual(sourceState=state){return LEVELS.includes(String(sourceState?.preferences?.activeLevel||''))}
@@ -2681,6 +2734,8 @@ async function load(){const root=document.baseURI;/* W1 P0-1 (16-001): fetch ban
     G=buckets;
   }
   V=V.map(v=>{const rawTranslation=v.exampleTranslation||v.examples?.[0]?.translation||v.examples?.[0]?.id||'';const exampleTranslation=/^[a-z]\d?[a-z]?_\d+$/i.test(rawTranslation)?'':rawTranslation;return{id:v.id,word:v.word,phonetic:v.phonetic||'',partOfSpeech:v.partOfSpeech||'',level:v.level||v.cefr||'',meaning:v.meaning||v.meanings?.[0]?.meaning||'',example:v.example||v.examples?.[0]?.en||'',exampleTranslation,topic:v.topic||'general',difficulty:v.difficulty||({A1:1,A2:2,B1:3,B2:4,C1:5,C2:6}[v.level]||3),synonyms:v.synonyms||[],antonyms:v.antonyms||[],collocations:v.collocations||[],commonMistakes:v.commonMistakes||[],relatedWords:v.relatedWords||[],usageNotes:v.usageNotes||'',status:v.status||'needs_review',canary:v.__fiezelCanary||null}}).filter(v=>v.status==='complete'&&LEVELS.includes(v.level)&&v.word&&v.meaning);
+  // W4-MERGE: simpan hasil hidrasi id lalu terapkan locale aktif (id = no-op referensial).
+  CONTENT_BASE={g:G,items:GRAMMAR_ITEMS,v:V};applyContentLocale();
   backfillPolicyOutcomes();$('version').textContent=`v${APP_VERSION}`;startCelestialClock();startWelcomeExperience();startUpdateWatcher()}
 // m025-115: dua sistem ikon hidup berdampingan dengan sengaja. Set duotone FIEZEL
 // (features/ui/fiezel-icons.js) memegang kroma yang dilihat murid tiap hari - tab bar,
@@ -4154,7 +4209,7 @@ async function ensureSearchIndex(){
       fetch('./vocabulary-master.json',{credentials:'same-origin'}).then(x=>x.json()),
       fetch('./reading-bank.json',{credentials:'same-origin'}).then(x=>x.json())
     ]);
-    searchIndexCache=self.FiezelSearch.buildIndex({grammar:g,vocabulary:v,reading:r});
+    searchIndexCache=self.FiezelSearch.buildIndex({grammar:g,vocabulary:vocabForLocale(v),reading:r});/* W4-MERGE AI-06 F10: fetch mentah ini melewati normalisasi load(), jadi overlay th harus lewat helper BERSAMA yang sama */
     return searchIndexCache;
   }catch{return null}
 }
