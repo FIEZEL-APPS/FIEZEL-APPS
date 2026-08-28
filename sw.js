@@ -32,7 +32,15 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // sama TANPA precache (lihat catatan di bawah ASSETS). Semua berkas shell berubah dalam
 // satu gelombang rilis, jadi revisi naik SEKALI - DIAG_BUILD + FIEZEL_PAGE_BUILD ikut ke
 // m025-177 (kontrak install-health/classroom-test: awalan SW_REV = build halaman).
-const SW_REV='m025-186-feedback-gaps-bahasa-20260829';
+// m025-186 (Wave 1 i18n, AI-13 F02/F06, direbase di atas m025-185 splash-sfx): daftar ASSETS
+// bertambah - runtime i18n (features/i18n/fiezel-i18n.js) dan copy-map Indonesia (copy-id-*.js)
+// masuk shell supaya murid Indonesia offline tetap membaca kalimat byte-identik begitu literal
+// pindah ke copy-map. Konsekuensi yang disadari dan diterima: kenaikan revisi ini memaksa SEMUA
+// perangkat terpasang mengunduh ulang cangkang ±9,7 MB (AI-13 F03). Aset Thai SENGAJA
+// TIDAK ikut ASSETS - ia hidup di cache locale terpisah (LOCALE_TH_CACHE di bawah) yang
+// diisi halaman on-demand, meniru pola neural-prepare, sehingga murid Indonesia tidak
+// pernah membayar byte Thai.
+const SW_REV='m025-187-i18n-locale-layer-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
@@ -71,6 +79,23 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   // berkasnya ada di repo, karena cache.addAll gagal total bila satu saja 404. Berkas-berkas
   // ini dijanjikan kontrak Fase 3 dan wajib mendarat bersama rilis ini.
   './features/brain/fiezel-item-calibration.js','./features/brain/fiezel-speaking-adaptive.js','./features/brain/fiezel-srl-coach.js',
+  // Wave 1 i18n (AI-02 / AI-13 F02): runtime i18n + copy-map Indonesia ikut shell - PWA ini
+  // offline-first dan copy-map yang tidak ter-precache berarti murid id offline kehilangan
+  // seluruh naskah antarmukanya. Daftar domain copy-id di bawah adalah daftar FINAL Wave 2
+  // (W2-INT merekonsiliasi nama provisional lama copy-id-login/home/dst yang tidak pernah
+  // dibuat — handoff W2-APP-B §2 / W2-FEAT-B §1, koordinasi impl/handoff/W1-SW.md) dan
+  // setiap path sudah diverifikasi ada di disk oleh skrip W2-INT. Aturan lama tetap
+  // berlaku keras di sini: cache.addAll gagal total bila satu saja 404, jadi gelombang ini
+  // baru boleh dirilis setelah SEMUA berkas ini benar-benar ada di repo. Aset Thai
+  // (copy-th-*, grammar-explanations-th, font Thai) SENGAJA tidak di sini - lihat
+  // LOCALE_TH_CACHE di bawah. (Catatan alat yang sama dengan blok lain: jangan menaruh
+  // titik koma di dalam komentar array ini - pwa-cache-test memotong daftar di situ.)
+  './features/i18n/fiezel-i18n.js','./features/i18n/copy-id-core.js','./features/i18n/copy-id-app-a.js','./features/i18n/copy-id-app-b.js','./features/i18n/copy-id-app-c.js','./features/i18n/copy-id-app-d.js','./features/i18n/copy-id-feat-a.js','./features/i18n/copy-id-feat-b.js','./features/i18n/copy-id-gems.js','./features/i18n/copy-id-quota.js','./features/i18n/copy-id-settings-locale.js',
+  // W4-QA (handoff W4-MERGE butir 3): loader th dimuat SEMUA locale dari index.html (guard
+  // locale ada DI DALAM berkasnya, ia baru bertindak saat getLocale()==='th') — jadi ia
+  // bagian shell dan wajib precache, BUKAN anggota isLocaleThAsset. Tanpa entri ini murid
+  // offline yang beralih ke th kehilangan satu-satunya pemuat aset th-nya.
+  './features/i18n/fiezel-th-loader.js',
   './features/neural-voice/fiezel-cf-tts-transport.js','./features/neural-voice/fiezel-cf-voice-notice.js','./features/quota/quota-copy.js',
   // FASE 11: jembatan bicara→maskot ikut precache - ia anggota grup malas 'voice',
   // dan boot-order-test menagih setiap berkas malas ada di ASSETS agar offline utuh.
@@ -105,6 +130,39 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
 const isNeuralAsset=request=>{
   if(!request?.url)return false;
   try{return new URL(request.url).pathname.includes('/vendor/')}catch{return false}
+};
+// Wave 1 i18n (AI-13 F06): lapisan cache per-locale Thai, meniru pola neural-prepare yang
+// sudah terbukti di SW ini. SW TIDAK pernah mengunduh isi cache ini saat install - halaman
+// (runtime i18n) yang mengisinya on-demand saat murid memilih th, dengan membaca daftar
+// asetnya dari features/i18n/locale-assets-th.json. Dengan begitu murid Indonesia tidak
+// pernah mengunduh maupun menyimpan satu byte Thai pun (AI-13 F05), dan aset Thai tidak
+// pernah mendarat diam-diam di cache runtime stabil yang bebas invalidasi (AI-13 F04).
+// Nama cache stabil ber-versi KONTEN: angka v-nya naik hanya ketika kontrak isi locale th
+// berubah (bukan tiap rilis shell) - activate di bawah membersihkan generasi basi.
+const LOCALE_TH_CACHE='fiezel-locale-th-v1';
+// Pencocok aset locale th. WAJIB sejalan dengan isi features/i18n/locale-assets-th.json
+// (koordinasi path lintas gelombang: impl/handoff/W1-SW.md). Sengaja berbasis pola path,
+// bukan daftar literal, supaya Wave 3 bisa menambah domain copy-th baru cukup lewat
+// manifest tanpa menyunting SW - pola yang sama dengan pencocok vendor/ di atas.
+const isLocaleThAsset=request=>{
+  if(!request?.url)return false;
+  try{
+    const p=new URL(request.url).pathname;
+    // W4-QA (handoff impl/handoff/W4-MERGE.md): regex dataset diperluas grammar→
+    // (grammar|vocabulary) supaya /vocabulary-th.json root ikut tercakup — tanpa ini murid
+    // th offline kehilangan arti kosakata (temuan W4-MERGE §3 butir 2). CATATAN: bentuk
+    // persis usulan handoff (`(?:grammar|vocabulary)-[a-z0-9-]*-th`) TIDAK cocok dengan
+    // /vocabulary-th.json — ia menuntut segmen ekstra di antara nama dan -th — jadi segmen
+    // tengahnya dibuat opsional per-kata: (?:-[a-z0-9]+)*?-th (diverifikasi replika matcher
+    // atas 17 entri manifest locale-assets-th.json, semua tercakup). naskah-th-brain.js
+    // (tabel naskah Thai modul brain, W3-BRAIN-TH) juga belum cocok pola mana pun, jadi
+    // ditambah pencocok prefix naskah-th- — pola prefix, bukan nama literal, mengikuti
+    // konvensi copy-th- di atasnya agar berkas naskah th berikutnya otomatis tercakup.
+    return p.includes('/features/i18n/copy-th-')
+      ||p.includes('/features/i18n/naskah-th-')
+      ||/\/(?:grammar|vocabulary)(?:-[a-z0-9]+)*?-th\.(?:js|json)$/.test(p)
+      ||p.includes('/assets/fonts/NotoSansThaiLooped');
+  }catch{return false}
 };
 const shellScope=String(self.registration?.scope||`${self.location.origin}/`);
 const shellUrls=new Set(ASSETS.map(asset=>new URL(asset,shellScope).href));
@@ -149,6 +207,11 @@ self.addEventListener('install',e=>e.waitUntil(caches.open(SHELL_CACHE).then(c=>
 // itu mahal diunduh ulang dan siklus hidupnya milik lapisan neural, bukan SW ini.
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(async k=>{
   if(k.startsWith('fiezel-shell-')&&k!==SHELL_CACHE)return caches.delete(k);
+  // Wave 1 i18n: generasi cache locale th yang basi ikut dibersihkan di sini - kalau kontrak
+  // konten th naik (v1 -> v2), byte generasi lama tidak boleh menumpuk di kuota perangkat
+  // (tekanan kuota iOS, AI-13 F07). Awalannya sengaja spesifik 'fiezel-locale-th-' supaya
+  // cache stabil lain (fiezel-v*, fiezel-r2-audio-v1, dst) tidak pernah tersentuh aturan ini.
+  if(k.startsWith('fiezel-locale-th-')&&k!==LOCALE_TH_CACHE)return caches.delete(k);
   if(k.startsWith('fiezel-v')&&k!==CACHE){
     try{
       const stale=await caches.open(k);
@@ -170,6 +233,12 @@ self.addEventListener('fetch',e=>{
   // sampai ada rilis yang sama sekali tidak berhubungan. Jaringan didahulukan, salinan shell
   // tetap jadi jaring pengaman luring. Polanya sama persis dengan version.json di atas.
   if(requestUrl.pathname.toLowerCase().endsWith('/audio/manifest.json')){e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(SHELL_CACHE).then(cache=>cache.put(e.request,copy));return r}return caches.match(e.request,{cacheName:SHELL_CACHE}).then(c=>c||r)}).catch(()=>caches.match(e.request,{cacheName:SHELL_CACHE})));return}
+  // Wave 1 i18n: manifest aset locale th mengikuti pola version.json / audio/manifest.json -
+  // jaringan dulu, salinan di cache locale jadi jaring pengaman luring. Ia SENGAJA tidak masuk
+  // ASSETS: daftar aset th akan bertambah antar-gelombang konten, dan memversikannya bersama
+  // shell berarti tiap perubahan daftar th memaksa SEMUA murid (termasuk Indonesia) mengunduh
+  // ulang cangkang ±9,7 MB (AI-13 F03) - persis yang lapisan ini hindari.
+  if(requestUrl.pathname.toLowerCase().endsWith('/features/i18n/locale-assets-th.json')){e.respondWith(fetch(e.request).then(r=>{if(r&&r.ok){const copy=r.clone();caches.open(LOCALE_TH_CACHE).then(cache=>cache.put(e.request,copy));return r}return caches.match(e.request,{cacheName:LOCALE_TH_CACHE}).then(c=>c||r)}).catch(()=>caches.match(e.request,{cacheName:LOCALE_TH_CACHE})));return}
   if(requestUrl.origin!==self.location.origin){
     // Third-party SDK/API traffic is deliberately left to the browser. The
     // document uses COEP: credentialless, so no-cors resources such as Puter.js
@@ -195,6 +264,13 @@ self.addEventListener('fetch',e=>{
     // Neural runtime/model/voice assets are owned by the neural prepare layer and
     // stay in the stable runtime cache. A shell release never precaches/rewrites them.
     responsePromise=caches.match(e.request,{cacheName:CACHE}).then(c=>c||fetch(e.request));
+  }else if(isLocaleThAsset(e.request)){
+    // Aset locale th dimiliki lapisan locale (diisi halaman on-demand) dan dilayani cache-first
+    // dari cache locale-nya, jatuh ke jaringan bila belum terisi. Seperti cabang neural di atas,
+    // SW sengaja TIDAK menulis apa pun di sini: pengisian adalah keputusan halaman (opt-in murid
+    // th), dan tanpa cabang ini aset th akan jatuh ke cabang terakhir lalu menetap selamanya di
+    // cache runtime stabil yang bebas invalidasi rilis (AI-13 F04 - konten pedagogi basi).
+    responsePromise=caches.match(e.request,{cacheName:LOCALE_TH_CACHE}).then(c=>c||fetch(e.request));
   }else if(isShellRequest(e.request)){
     // Non-navigation shell assets remain cache-first within this exact generation.
     // Missing shell bytes are refetched into this generation, never borrowed from

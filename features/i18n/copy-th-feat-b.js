@@ -1,0 +1,304 @@
+/**
+ * FIEZEL · features/i18n/copy-th-feat-b.js — COPY-MAP THAI, domain features N–Z (W3-COPY-C)
+ * (onboarding, tour, personal-journey, coach-bubble, skills-lab addon, tutor-dialog/v3/
+ * voice-chat, ui-manager, skills-evidence). Pasangan: copy-id-feat-b.js.
+ *
+ * ⚠ DRAFT AI — seluruh nilai Thai di berkas ini adalah terjemahan draft AI dan WAJIB
+ * direview penutur asli sebelum rilis (keputusan provisional orkestrator, IMPL-BRIEF).
+ *
+ * ATURAN (penjelasan penuh: copy-id-core.js + copy-id-feat-b.js + impl/TH-STYLE.md):
+ * 1. Kunci 1:1 byte-identik dengan copy-id-feat-b.js; nilai th boleh string polos —
+ *    escape \uXXXX pada berkas id hanyalah kamuflase lexer untuk kalimat Indonesia,
+ *    tidak relevan untuk nilai Thai (aksara Thai bukan literal Indonesia).
+ * 2. Placeholder BERNAMA dan markup HTML/atribut dipertahankan persis; spasi awal/akhir
+ *    fragmen sambungan (coach.streak-you, onboarding.upcoming, dst.) dipertahankan.
+ * 3. Persona TH-STYLE: murid = คุณ; "aku/gue" PAW/tutor = เรา; suara murid pada contoh
+ *    pertanyaan coach.* = ฉัน; tanpa ครับ/ค่ะ; angka Arab; istilah Inggris yang diajarkan
+ *    (grammar, tense, structure, listening) tetap Inggris.
+ * 4. Nilai tour.* th TIDAK diikat tours-test.js (tes itu membekukan naskah id); dua kunci
+ *    terjemahan (tour.lib-translate-body, tour.listen-translate-*) menyebut target bahasa
+ *    mengikuti locale murid (Thai) karena permintaan AI memakai FiezelI18n.getLocale() —
+ *    tandai untuk review produk + penutur asli.
+ */
+(function () {
+  'use strict';
+  var g = (typeof self !== 'undefined') ? self
+    : (typeof globalThis !== 'undefined') ? globalThis : this;
+  var I18N = g && g.FiezelI18n;
+  if (!I18N && typeof require === 'function') {
+    // Node (gate print-only): runtime dimuat sendiri supaya require langsung tetap jalan.
+    try { I18N = require('./fiezel-i18n.js'); } catch (loadError) { I18N = null; }
+  }
+  if (!I18N) return; // urutan script salah — fiezel-i18n.js wajib dimuat lebih dulu
+
+  I18N.registerCopy('th', {
+    // ---------- ui.* ----------
+    'ui.empty-title': 'ยังไม่มีเนื้อหา',
+    'ui.empty-desc': 'เริ่มเรียนเพื่อดูความก้าวหน้า',
+    'ui.empty-action': 'เริ่ม',
+
+    // ---------- skills.* ----------
+    'skills.practice-score-label': 'คะแนนแบบฝึกหัด',
+    'skills.target-coverage-label': 'ความครอบคลุมเป้าหมาย',
+
+    // ---------- journey.* ----------
+    'journey.goal-school-label': 'โรงเรียน',
+    'journey.goal-school-p1': 'Grammar พื้นฐานที่นิ่ง',
+    'journey.goal-school-p2': 'คำศัพท์ชีวิตประจำวันและในห้องเรียน',
+    'journey.goal-school-p3': 'Reading บทความสั้น',
+    'journey.goal-it-label': 'IT และเทคโนโลยี',
+    'journey.goal-it-p1': 'คำศัพท์เทคนิคพื้นฐาน',
+    'journey.goal-it-p2': 'อ่านคู่มือเชิงเทคนิค',
+    'journey.goal-it-p3': 'Grammar สำหรับขั้นตอนการทำงาน',
+    'journey.goal-scholarship-label': 'ทุนการศึกษา',
+    'journey.goal-scholarship-p1': 'เขียนอีเมลทางการ',
+    'journey.goal-scholarship-p2': 'แนะนำตัวเอง',
+    'journey.goal-scholarship-p3': 'อ่านประกาศทางการ',
+    'journey.goal-exam-label': 'เตรียมสอบ IELTS/TOEFL',
+    'journey.goal-exam-p1': 'อ่านบทความแนววิชาการ',
+    'journey.goal-exam-p2': 'จดโน้ตไปพร้อมกับฟัง',
+    'journey.goal-exam-p3': 'Grammar ที่เรียบร้อย',
+    'journey.goal-exam-note': 'FIEZEL ไม่เดาคะแนน IELTS/TOEFL ของคุณ สิ่งที่แสดงมีแค่ทักษะที่ต้องทำได้ก่อนเท่านั้น',
+    'journey.goal-note-default': 'นี่คือรายการที่คุณต้องทำได้ก่อน ไม่ใช่การเดาคะแนนสอบ',
+    'journey.rat-due-reviews': 'มีบทเรียนที่ต้องทบทวน',
+    'journey.rat-forgetting-risk': 'มีบทเรียนที่คุณเริ่มลืม',
+    'journey.rat-weak-skill': 'มีบางส่วนที่ยังพลาดบ่อย',
+    'journey.rat-recurring-error': 'ความพลาดเดิมโผล่มาซ้ำ ๆ',
+    'journey.rat-abandonment-risk': 'แบบฝึกหัดมักถูกทิ้งไว้ไม่จบ',
+    'journey.rat-consistency-risk': 'สองสัปดาห์นี้คุณแทบไม่ได้ฝึกเลย',
+    'journey.rat-confidence-gap': 'คุณรู้สึกว่าทำได้ แต่ผลลัพธ์ยังไม่ตาม',
+    'journey.rat-calm-pacing': 'คุณยังใช้เวลาคิดนานอยู่',
+    'journey.rat-session-interrupted': 'มีแบบฝึกหัดที่ยังทำไม่เสร็จ',
+    'journey.rat-balanced-progression': 'ทุกอย่างกำลังไปได้ดี',
+    'journey.rat-evidence-thin': 'บันทึกการฝึกของคุณยังไม่พอ',
+    'journey.rat-all-clear': 'ทุกอย่างเรียบร้อยดี สัปดาห์นี้ผ่อนสบาย ๆ ก่อนได้เลย',
+    'journey.rat-reasons': 'เพราะ{reasons}',
+    'journey.basis-sl-practice': 'บันทึกการฝึกไว้ {n} ครั้งในทักษะนี้',
+    'journey.basis-sl-pending': 'การฝึก Speaking และ Listening ถูกบันทึกแยกไว้ ยังไม่เข้ามาในแผนที่นี้',
+    'journey.basis-answers': 'บันทึกคำตอบไว้ {n} ข้อในทักษะนี้',
+    'journey.basis-none': 'ยังไม่มีคำตอบในส่วนนี้',
+    'journey.why-review': 'สิ่งที่คุณเกือบลืมถูกจัดให้มาก่อน',
+    'journey.why-focus-skill': 'โฟกัสสัปดาห์นี้: {skill}',
+    'journey.why-focus-domain': 'โฟกัสที่โดเมน {domain}',
+    'journey.why-transfer': 'โจทย์คละกันเพื่อไม่ให้ติดรูปแบบเดิม',
+
+    // ---------- tour.* ----------
+    'tour.menu-home-title': 'เริ่มจาก Home',
+    'tour.menu-home-body': 'นี่คือหน้าแรกของคุณ: ความก้าวหน้ารายวัน สตรีค และแบบฝึกหัดที่ PAW แนะนำ ทุกการเดินทางของคุณออกตัวจากตรงนี้',
+    'tour.menu-vocab-title': 'Vocab และ Grammar',
+    'tour.menu-vocab-body': 'แท็บ Vocab ไว้เพิ่มคำศัพท์ แท็บ Grammar ไว้เรียนไวยากรณ์ — สองฐานรากที่คอยเสริมกันและกัน',
+    'tour.menu-reading-title': 'Reading และแผนที่',
+    'tour.menu-reading-body': 'Reading รวมบทอ่านแบบไล่ระดับพร้อมคำถาม ส่วนแผนที่โชว์เส้นทางเรียนของคุณจาก A1 ถึง C2 — ให้ทิศทางชัดเจน',
+    'tour.menu-ask-title': 'ถาม FIEZEL?',
+    'tour.menu-ask-body': 'ปุ่มด้านขวานี้คือประตูไปหา PAW ผู้ช่วยสอนของคุณ สงสัยอะไรก็ถามได้ที่นี่ (ต้องต่ออินเทอร์เน็ต)',
+    'tour.menu-level-title': 'ชิประดับของคุณ',
+    'tour.menu-level-body': 'ชิปนี้บอกระดับที่ใช้งานอยู่ แตะเพื่อย้ายระดับ — เนื้อหาและแบบฝึกหัดจะตามตัวเลือกของคุณทันที',
+    'tour.menu-settings-title': 'ปุ่มการตั้งค่า',
+    'tour.menu-settings-body': 'นี่คือประตูสู่ FIEZEL Control Room: เสียง การเคลื่อนไหว หน้าตา ไปจนถึงข้อมูลการเรียนของคุณ — ทั้งหมดอยู่ในมือคุณ',
+    'tour.menu-end-title': 'ทัวร์เมนูเสร็จแล้ว!',
+    'tour.menu-end-body': 'คุณรู้จักเมนูครบหมดแล้ว ทัวร์ต่อไปจะโผล่มาเองทุกครั้งที่คุณเข้าฟีเจอร์ใหม่ — สบาย ๆ ได้เลย',
+    'tour.lib-play-title': 'แตะเพื่อเริ่ม',
+    'tour.lib-play-body': 'ปุ่มเล่นนี้คือตัวปลุกเรื่องราวให้มีชีวิต แตะครั้งหนึ่งเพื่อเล่น แตะอีกครั้งเพื่อพัก — เมื่อไหร่ก็ได้ที่คุณต้องการ',
+    'tour.lib-subtitle-title': 'ซับไตเติลวิ่งตามเสียง',
+    'tour.lib-subtitle-body': 'ตัวหนังสือเดินไปพร้อมเสียง ทีละประโยค ฟังไปอ่านไป — หูกับตาได้เรียนพร้อมกัน',
+    'tour.lib-translate-title': 'คำแปลอัตโนมัติ',
+    'tour.lib-translate-body': 'เปิดสวิตช์นี้ แล้วซับไตเติลทุกประโยคจะถูกแปลเป็นภาษาไทยทันที ราคา 1 เพชรคำแปลต่อเซสชัน และต้องต่ออินเทอร์เน็ตนะ',
+    'tour.lib-speed-title': 'อยากให้ช้าลงอีกไหม?',
+    'tour.lib-speed-body': 'ความเร็วเสียงปรับได้ใน FIEZEL Control Room ผ่านปุ่มการตั้งค่า ตั้งครั้งเดียวใช้กับทุกเซสชันถัดไปเลย',
+    'tour.listen-once-title': 'ฟังครั้งเดียว แล้วตอบ',
+    'tour.listen-once-body': 'เปิดเสียงแล้วตั้งใจฟัง ถ้ายังฟังไม่ทัน เปิดซ้ำได้ — แต่ละข้อมีโควตาการเปิดซ้ำ',
+    'tour.listen-miss-title': 'พลาดไป? ไม่เป็นไรเลย',
+    'tour.listen-miss-body': 'ตอบผิดเป็นส่วนหนึ่งของการฝึก ไม่ใช่เรื่องใหญ่ PAW อยู่เป็นเพื่อนคุณทุกข้อ',
+    'tour.listen-translate-title': 'คำแปลภาษาไทย',
+    'tour.listen-translate-body': 'สวิตช์นี้แสดงคำแปลของทุกข้อ ราคา 1 เพชรคำแปลต่อเซสชัน เพชรได้มาฟรีจากสตรีคตอบถูกของคุณ',
+    'tour.listen-speed-title': 'ปรับความเร็วเสียง',
+    'tour.listen-speed-body': 'เร็วเกินไปหรือเปล่า? ความเร็วเสียงปรับได้ใน FIEZEL Control Room — เปิดผ่านปุ่มการตั้งค่าได้ตลอดเวลา',
+
+    // ---------- onboarding.* ----------
+    'onboarding.carousel-title': 'ฝึกอะไรได้บ้าง?',
+    'onboarding.carousel-1-body': 'ที่นี่เราจะฝึกไปด้วยกัน ทีละนิดทุกวัน',
+    'onboarding.carousel-2-body': 'เสียง neural ไม่ใช่หุ่นยนต์ — ฟังเหมือนคนจริงพูดเลย',
+    'onboarding.stepper-eyebrow': 'ขั้นที่ {current} จาก {total}',
+    'onboarding.stepper-aria': 'ความคืบหน้าการแนะนำตัว',
+    'onboarding.btn-back': 'ย้อนกลับ',
+    'onboarding.name-field-label': 'ชื่อเล่น',
+    'onboarding.name-placeholder': 'พิมพ์ชื่อของคุณ',
+    'onboarding.name-aria': 'ชื่อเล่นของคุณ',
+    'onboarding.greet-schedule': 'เรื่องตัวเตือน: เราหาเวลาให้เอง คุณแค่มาเรียนก็พอ',
+    'onboarding.schedule-title': 'อยากเรียนตอนไหน?',
+    'onboarding.schedule-body': 'เราจะคอยเตือนให้คุณมาเรียนนะ สตรีคจะได้ไม่ขาด',
+    'onboarding.schedule-note': 'การแจ้งเตือนการเรียน: เปิด เวลาเราเลือกให้อัตโนมัติจากนิสัยการเรียนของคุณเอง ไม่ใช่ตารางตายตัวที่ต้องตั้งเองด้วยมือ - ตัวเตือนจึงพอดีกับวิธีเรียนของคุณเสมอ ไม่ใช่เวลาที่เลือกครั้งเดียวแล้วถูกลืม',
+    'onboarding.summary-bubble': 'เรียบร้อยหมดแล้ว นี่คือสรุปของคุณ',
+    'onboarding.summary-ready-named': '{name} พร้อมเรียนไปกับ FIEZEL แล้ว!',
+    'onboarding.summary-ready': 'พร้อมเรียนไปกับ FIEZEL แล้ว!',
+    'onboarding.not-set': 'ยังไม่ได้เลือก',
+    'onboarding.summary-name-label': 'ชื่อ',
+    'onboarding.summary-goal-label': 'เป้าหมาย',
+    'onboarding.summary-level-label': 'ระดับโดยประมาณ',
+    'onboarding.summary-reminder-label': 'ตัวเตือน',
+    'onboarding.reminder-on': 'เปิด',
+    'onboarding.summary-streak-zero': '0 วัน · เริ่มเลยตอนนี้!',
+    'onboarding.btn-start': 'เริ่มเรียน',
+    'onboarding.btn-skip': 'ข้าม',
+
+    // ---------- coach.* (panel) ----------
+    'coach.panel-aria': 'ผู้ช่วยสอน FIEZEL',
+    'coach.close-aria': 'ปิด',
+    'coach.input-placeholder': 'ถามได้ทุกเรื่อง…',
+    'coach.input-aria': 'ถาม FIEZEL',
+    'coach.send-aria': 'ส่ง',
+
+    // ---------- skillslab.* ----------
+    'skillslab.replay-limit': 'โควตาการเปิดข้อนี้หมดแล้ว',
+    'skillslab.exam-audio-once': 'โควตาการเปิดเสียงหมดแล้ว ตอบจากความจำ — และโน๊ตของคุณถ้าได้จดไว้',
+    'skillslab.audio-done-exam': 'เสียงจบแล้ว ไม่มีการเล่นซ้ำ - เหมือนในสนามสอบจริงเป๊ะ',
+    'skillslab.audio-done': 'เสียงจบแล้ว',
+    'skillslab.rec-listening': 'กำลังฟัง…',
+    'skillslab.rec-received': 'รับคำตอบแล้ว transcript ถูกใช้ชั่วคราวเพื่อการให้คะแนนเท่านั้น',
+    'skillslab.record-btn': 'อัดเสียงเพื่อฟังซ้ำ',
+    'skillslab.mic-unavailable': 'การอัดเสียงด้วยไมโครโฟนใช้ไม่ได้ หรือสิทธิ์ถูกปฏิเสธ',
+    'skillslab.target-pass': 'ผ่านเป้าของข้อนี้',
+    'skillslab.target-fail': 'ยังไม่ถึงเป้าของข้อนี้',
+    'skillslab.not-played': 'ยังไม่ได้เล่น',
+    'skillslab.btn-back': 'ย้อนกลับ',
+
+    // ---------- tutor.* (tabel ANSWERS + fallback) ----------
+    'tutor.ans-meaning-1': 'โอเค แก่นของ {topic} เป็นแบบนี้: {formula} ดังนั้นเมื่อคุณเห็นแพตเทิร์นนั้น คุณกำลังมอง {topic} อยู่',
+    'tutor.ans-meaning-2': 'พูดง่าย ๆ แบบนี้ {topic} ใช้กับแพตเทิร์น {formula} ตัวอย่างที่ชัดที่สุด: {firstExample}',
+    'tutor.ans-meaning-3': 'เราอธิบายจากอีกมุมนะ สิ่งเดียวที่ต้องจับไว้จาก {topic} คือ {formula} ที่เหลือเป็นแค่รูปแปร',
+    'tutor.ans-why-1': 'เหตุผลอยู่ที่แพตเทิร์น {topic} เรียกร้องรูป {formula} ถ้ารูปเปลี่ยน ประโยคก็ไม่ถูกต้อง',
+    'tutor.ans-why-2': 'ไม่ใช่การท่องจำ นี่คือเรื่องหน้าที่ {topic} ถูกใช้เพื่อให้ความหมายชัด และรูป {formula} คือสิ่งที่รักษาความชัดนั้นไว้',
+    'tutor.ans-why-3': 'ลองเทียบกับตัวอย่าง: {firstExample} ถ้าแพตเทิร์นถูกเปลี่ยน ความหมายก็เปลี่ยนตาม และนั่นคือเหตุผลที่กฎนี้มีอยู่',
+    'tutor.ans-example-1': 'ตัวอย่าง: {firstExample} ทีนี้ลองเปลี่ยนประธานดู แพตเทิร์นยังเป็น {formula} เหมือนเดิม',
+    'tutor.ans-example-2': 'อีกหนึ่งตัวอย่างให้ชัดขึ้น: {secondExample} สังเกตส่วนที่เดินตามแพตเทิร์นนะ',
+    'tutor.ans-example-3': 'หยิบจากประโยคที่เราคุยกันเมื่อกี้: {beatEn} นั่นคือตัวอย่าง {topic} ที่มีชีวิตจริง ไม่ใช่ตัวอย่างที่แต่งขึ้น',
+    'tutor.ans-difference-1': 'ความต่างอยู่ที่หน้าที่ ไม่ใช่ที่ตัวคำ ตัวหนึ่งเดินตามแพตเทิร์น {formula} อีกตัวไม่ ความหมายจึงเคลื่อน',
+    'tutor.ans-difference-2': 'วิธีแยก: ดูแพตเทิร์นก่อน ถ้าเข้ากับ {formula} นั่นคือ {topic} ถ้าไม่ นั่นคือรูปอื่น',
+    'tutor.ans-difference-3': 'ใช้ตัวอย่างนี้แยกสองตัวออกจากกัน: {firstExample} เปลี่ยนแค่ส่วนเดียว แล้วคุณจะได้ยินความต่างทันที',
+    'tutor.ans-translate-1': 'ในภาษาอังกฤษ ประโยคแบบนั้นเดินตามแพตเทิร์น {formula} รูปประโยคจึงเป็นแบบนี้: {firstExample}',
+    'tutor.ans-translate-2': 'อย่าแปลคำต่อคำ วางแพตเทิร์นก่อน {formula} แล้วค่อยเติมคำ ผลลัพธ์: {firstExample}',
+    'tutor.ans-translate-3': 'ถ้าแปลด้วยแพตเทิร์นที่ถูกต้อง จะได้ {firstExample} สังเกตลำดับคำนะ เพราะภาษาอังกฤษเข้มงวดเรื่องลำดับ',
+    'tutor.ans-pronounce-1': 'ฟังเราก่อน แล้วค่อยพูดตาม: {firstExample} ออกเสียงช้า ๆ ไม่ต้องรีบ',
+    'tutor.ans-pronounce-2': 'กุญแจอยู่ที่การเน้นคำ เราพูดอีกครั้งนะ: {firstExample} พูดตามด้วยจังหวะเดียวกัน',
+    'tutor.ans-pronounce-3': 'พูดทีละท่อนก่อน แล้วค่อยพูดทั้งประโยค: {firstExample}',
+    'tutor.ans-when-1': '{topic} ถูกใช้เมื่อความหมายเรียกร้องแพตเทิร์น {formula} ถ้าสถานการณ์เป็นอย่างอื่น รูปก็เป็นอย่างอื่น',
+    'tutor.ans-when-2': 'หลักง่าย ๆ: ถ้าประโยคของคุณเข้ากับ {firstExample} นั่นแหละเวลาใช้ {topic}',
+    'tutor.ans-when-3': 'อย่ามองแค่เวลา มองที่เจตนาของคุณด้วย นั่นคือสิ่งที่ตัดสินว่าเมื่อไหร่ {topic} ถูกใช้',
+    'tutor.ans-repeat-1': 'ได้ เราพูดซ้ำนะ {beatId}',
+    'tutor.ans-repeat-2': 'อีกครั้ง ช้า ๆ นะ {beatId}',
+    'tutor.ans-repeat-3': 'เราพูดซ้ำด้วยประโยคเดิม คุณจะได้ตามทัน {beatId}',
+    'tutor.ans-slower-1': 'โอเค เราพูดช้าลงนะ {beatId}',
+    'tutor.ans-slower-2': 'เราลดความเร็วลงให้นะ ฟังอีกครั้ง: {beatId}',
+    'tutor.ans-slower-3': 'ช้า ๆ ได้เลย ไม่ต้องรีบ {beatId}',
+    'tutor.ans-confused-1': 'ไม่เป็นไร เราถอยหนึ่งก้าวกัน ลืมชื่อเรียกไปก่อน จับแพตเทิร์นให้ได้ก่อน: {formula}',
+    'tutor.ans-confused-2': 'งงตรงนี้เป็นเรื่องปกติ เราใช้ตัวอย่างจริงตัวเดียวพอ: {firstExample} จากตรงนั้นกฎจะซึมเข้ามาเอง',
+    'tutor.ans-confused-3': 'ถ้ารู้สึกหนัก แปลว่ามันเยอะเกินไปในทีเดียว หยิบทีละอย่างก่อน: {formula} ที่เหลือไว้ทีหลัง',
+    'tutor.ans-exam-1': 'อันนี้เกี่ยวกับ TOEFL และ IELTS โดยตรง {topic} โผล่ในพาร์ต structure และ writing ดังนั้นแพตเทิร์นต้องออกมาอัตโนมัติ ไม่ใช่ต้องนั่งคิด',
+    'tutor.ans-exam-2': 'ในสนามสอบ สิ่งที่ถูกวัดไม่ใช่การท่องกฎ แต่คือความเร็วที่คุณจำแพตเทิร์น {formula} ได้ในประโยคยาว ๆ',
+    'tutor.ans-exam-3': 'สำหรับเป้า TOEFL และ IELTS เนื้อหาอย่าง {topic} คือฐานราก ถ้าตรงนี้คลอน ส่วนที่ยากจะคลอนตาม',
+    'tutor.ans-greeting-1': 'สวัสดี {name} เราพร้อมแล้ว อยากให้อธิบายส่วนไหนของ {topic}?',
+    'tutor.ans-greeting-2': 'ไง ตอนนี้เราอยู่ที่ {topic} ถามอะไรก็ได้ เราตอบ',
+    'tutor.ans-greeting-3': 'สวัสดี ถ้ามีอะไรค้างคาใจใน {topic} ตอนนี้แหละเวลาถาม',
+    'tutor.ans-open-1': 'เราขอโยงคำถามของคุณเข้ากับเนื้อหานี้ก่อน แก่นของ {topic} คือ {formula} จากตรงนั้นเราค่อยทดสอบประโยคของคุณ',
+    'tutor.ans-open-2': 'ได้เลย เราตอบผ่านตัวอย่างจะได้ไม่ลอย: {firstExample} ถ้าคุณหมายถึงอย่างอื่น บอกมาได้ว่าส่วนไหน',
+    'tutor.ans-open-3': 'เราพอจับทิศคำถามของคุณได้ ที่เกี่ยวตรงนี้คือแพตเทิร์น {formula} ลองพูดประโยคของคุณเองมาหนึ่งประโยค เดี๋ยวเราช่วยแก้ให้',
+    'tutor.ans-empty-1': 'เรายังไม่ได้ยินเสียงเลย กดปุ่มอีกครั้งแล้วพูดใกล้ขึ้นอีกนิดนะ',
+    'tutor.ans-empty-2': 'เสียงยังไม่เข้ามา ลองอีกครั้งนะ ช้าและชัดขึ้นอีกหน่อย',
+    'tutor.ans-empty-3': 'ยังไม่มีเสียงเข้ามา กดแล้วพูดหลังจากปุ่มติดสว่างนะ',
+    'tutor.topic-fallback': 'เนื้อหานี้',
+    'tutor.ask-kicker': 'ถาม FIEZEL',
+
+    // ---------- tutor.* (voice chat) ----------
+    'tutor.module-missing': 'โมดูลติวเตอร์ยังไม่ถูกโหลด',
+    'tutor.ai-need-internet': 'สำหรับคำถามอิสระนอกบทเรียน FIEZEL AI ต้องต่ออินเทอร์เน็ต',
+    'tutor.ai-need-login': 'สำหรับคำถามอิสระนอกบทเรียน เข้าสู่ระบบ Puter ก่อนผ่านเมนูการตั้งค่า',
+    'tutor.talk-aria': 'กดแล้วพูดกับ Fiezel',
+    'tutor.talk-hint': 'กดแล้วพูด',
+    'tutor.no-voice-captured': 'ยังไม่มีเสียงที่จับได้',
+    'tutor.answering': 'Fiezel กำลังตอบ…',
+    'tutor.answered-by-ai': 'ตอบโดย FIEZEL AI',
+    'tutor.ask-retry': 'ลองถามอีกครั้งนะ',
+    'tutor.mic-blocked': 'ไมโครโฟนใช้ไม่ได้ พิมพ์มาได้เลย',
+    'tutor.listening-now': 'กำลังฟัง… พูดได้เลย',
+    'tutor.sheet-title': 'ถามได้ทุกเรื่อง',
+    'tutor.sheet-body': 'อุปกรณ์นี้ยังไม่อนุญาตให้ป้อนเสียง พิมพ์คำถามของคุณมาได้เลย Fiezel ยังตอบด้วยเสียงเหมือนเดิม',
+    'tutor.sheet-placeholder': 'ตัวอย่าง: ทำไมถึงไม่ใช่ I have went?',
+    'tutor.btn-cancel': 'ยกเลิก',
+    'tutor.btn-ask': 'ถาม',
+
+    // ---------- tutorv3.* (skrip pelajaran) ----------
+    'tutorv3.script-4': 'เราวางมันบนเส้นเวลากัน การกระทำเริ่มก่อนตอนนี้ แต่ผลของมันมาถึงปัจจุบัน ความเชื่อมโยงนั้นแหละคือประเด็น',
+    'tutorv3.script-6': 'ทำให้จับต้องได้กัน ลองนึกว่ากุญแจยังหายอยู่จนถึงตอนนี้ Present perfect ช่วยเชื่อมเหตุการณ์ก่อนหน้าเข้ากับสถานการณ์ที่ยังเป็นอยู่ตอนนี้',
+    'tutorv3.script-7': 'คุณกำลังแยกหน้าที่สองอย่างของกริยาตัวเดียวกัน Went คือรูปอดีตธรรมดา หลัง have หรือ has ภาษาอังกฤษต้องการรูปที่สาม เราจึงพูดว่า I have gone ไม่ใช่ I have went',
+    'tutorv3.script-8': 'ใช้ has กับ he, she และ it ใช้ have กับ I, you, we และ they ความหมายเหมือนเดิม ประธานคือตัวกำหนดกริยาช่วยตัวนั้น',
+    'tutorv3.script-9': 'คำถามที่มีประโยชน์ไม่ใช่แค่เกิดขึ้นเมื่อไหร่ ให้ถามด้วยว่าผลของมันยังเชื่อมกับตอนนี้อยู่ไหม ถ้าใช่ present perfect มักเป็นตัวเลือกที่ตรงกว่า',
+
+    // ---------- W2-REGEN: pasangan entri tunda gelombang regen baseline ----------
+    'coach.choose-topik-yg-paling-bikin': 'เลือกหัวข้อที่ชวนสงสัยที่สุดเลย',
+    'coach.day-jangan-putus-day-this': ' วัน อย่าให้ขาดวันนี้นะ',
+    'coach.day-lima-answer-bermakna-udah': ' วัน แค่ 5 คำตอบที่ตั้งใจก็พอรักษาวันนี้ไว้แล้ว',
+    'coach.day-this-paling-enak-start': 'วันนี้เริ่มสบาย ๆ ได้จาก ',
+    'coach.fiezel-pembimbing-you': '<span><b>FIEZEL</b><small class="fz-coach-status">ผู้ช่วยสอนของคุณ</small></span>',
+    'coach.ga-ada-yang-dengerin-selain': 'ไม่มีใครฟังอยู่นอกจากคุณกับเรา',
+    'coach.gimana-cara-cepat-inget-vocab': 'มีวิธีจำคำศัพท์ใหม่ให้เร็วไหม?',
+    'coach.gue-again-ga-can-nyambung': 'ตอนนี้เรายังต่อกับสมอง AI ไม่ได้ (ต้องเข้าสู่ระบบ Puter + อินเทอร์เน็ต) แต่แบบฝึกหัดยังเดินต่อได้ปกตินะ — อยากให้เราเป็นเพื่อนเริ่มจากตรงไหนดี?',
+    'coach.gue-udah-siapin-rencana-hari': 'เราวางแผนของวันนี้ไว้ให้แล้ว เหลือแค่ลงมือ',
+    'coach.kata-new-that-kayak-koin': 'คำใหม่ก็เหมือนเหรียญ — สะสมทีละนิดทีละหน่อย',
+    'coach.kenapa-me-sering-wrong-at': 'ทำไมฉันพลาดที่ grammar บ่อย? ช่วยอธิบายสั้น ๆ',
+    'coach.kenapa-me-wrong-terus-at': 'ทำไมฉันตอบตรงนี้ไม่ถูกตลอดเลย?',
+    'coach.level-estimasi-you-sekarang': 'ระดับโดยประมาณของคุณตอนนี้คือ ',
+    'coach.level-kemampuan-me-sekarang-at': 'ตอนนี้ระดับความสามารถของฉันอยู่ตรงไหน?',
+    'coach.level-me-sekarang': 'ตอนนี้ฉันระดับไหน?',
+    'coach.materi-nunggu-review-that-yg': ' บทเรียนรอการทบทวนอยู่ — นั่นคือทางที่เพิ่มคะแนนได้เร็วที่สุด',
+    'coach.mau-start-from-mana-day': 'วันนี้อยากเริ่มจากตรงไหนดี?',
+    'coach.me-harus-start-from-mana': 'ฉันควรเริ่มจากตรงไหน?',
+    'coach.me-harus-start-study-from': 'วันนี้ฉันควรเริ่มเรียนจากตรงไหน?',
+    'coach.ngomong-aja-dulu-wrong-that': 'พูดออกมาก่อนเลย การพลาดคือส่วนหนึ่งของการฝึก',
+    'coach.pembimbing-you': 'ผู้ช่วยสอนของคุณ',
+    'coach.practice-singkat': 'แบบฝึกหัดสั้น ๆ',
+    'coach.review-dulu-yang-hampir-lupa': 'ทบทวนสิ่งที่เกือบลืมก่อน แล้วค่อยเพิ่มของใหม่',
+    'coach.streak-you': 'สตรีคของคุณ ',
+    'coach.tap-kalimat-yg-bikin-bingung': 'แตะประโยคที่ทำให้งง เดี๋ยวเราอธิบายให้',
+    'coach.tap-kalimatnya-if-mau-lihat': 'แตะประโยคถ้าอยากเห็นความหมาย',
+    'coach.tolong-cek-tulisan-lang-inggrisku': 'ช่วยเช็กงานเขียนภาษาอังกฤษของฉัน แล้วให้คำแนะนำที่สำคัญที่สุดหนึ่งข้อ',
+    'coach.wrong-at-grammar-that-wajar': 'พลาดที่ grammar เป็นเรื่องธรรมดา ที่สำคัญคือเข้าใจว่าทำไม',
+    'coach.yg-merah-bukan-aib-that': 'ที่เป็นสีแดงไม่ใช่เรื่องน่าอาย นั่นคือสิ่งที่เราจะทำไปด้วยกัน',
+    'onboarding.apa-level-lang-you': '<h2 class="fiezel-title">ระดับภาษาของคุณอยู่ตรงไหน?</h2>',
+    'onboarding.apa-tujuan-you-study': '<h2 class="fiezel-title">คุณเรียนเพื่อเป้าหมายอะไร?</h2>',
+    'onboarding.berapa-perkiraan-level-lang-inggrismu': '<p class="fiezel-note">ตอนนี้คุณประเมินระดับภาษาอังกฤษของตัวเองไว้ประมาณไหน?</p>',
+    'onboarding.halo-me-fiezel-nama-you': '<h2 class="fiezel-title">สวัสดี! เราคือ Fiezel คุณชื่ออะไร?</h2>',
+    'onboarding.ini-cuma-perkiraan-awal-darimu': '<p class="fiezel-note">นี่เป็นแค่การประเมินเริ่มต้นจากตัวคุณเอง ระบบจะปรับให้อัตโนมัติหลังคุณทำแบบฝึกหัด - ไม่ใช่ผลสอบ</p>',
+    'onboarding.isinya-item-listening-grammar-and': '<p class="fiezel-note">ข้างในมี 25 ข้อ listening, grammar และ vocabulary - ไม่มีบทอ่าน - และหยุดเมื่อไหร่ก็ได้ ผลลัพธ์จะกลายเป็นระดับที่แท้จริงของคุณใน FIEZEL แทนการประเมินเริ่มต้นเมื่อกี้</p>',
+    'onboarding.kerjakan-santai-aja-ini-bukan': '<p class="fiezel-body">ทำแบบสบาย ๆ ได้เลย นี่ไม่ใช่การสอบ — แค่ให้เรารู้จักความสามารถของคุณ</p>',
+    'onboarding.me-pakai-namamu-buat-nyapa': '<p class="fiezel-body">เราใช้ชื่อของคุณไว้ทักทายทุกวัน การเรียนจะได้รู้สึกเป็นของคุณเอง</p>',
+    'onboarding.nama-this-disimpan-at-hp': '<p class="fiezel-note">ชื่อนี้ถูกเก็บไว้ในมือถือของคุณ และไปกับบัญชี FIEZEL ของคุณเองเท่านั้น เพื่อให้ตัวเตือนการเรียนทักทายคุณได้ ไม่ถูกแชร์ให้ใครทั้งนั้น</p>',
+    'onboarding.next': 'ต่อไป',
+    'onboarding.next-l523': 'ต่อไป',
+    'onboarding.next-l554': 'ต่อไป',
+    'onboarding.next-l591': 'ต่อไป',
+    'onboarding.santai-this-bukan-ujian-can': 'สบาย ๆ นะ นี่ไม่ใช่การสอบ หยุดเมื่อไหร่ก็ได้',
+    'onboarding.senang-ketemu-you-kita-start': 'ดีใจที่ได้เจอคุณ! เราเริ่มจากอะไรที่ง่ายที่สุดกัน',
+    'onboarding.tujuanmu-yang-menentukan-materi-mana': 'เป้าหมายของคุณคือตัวกำหนดว่าเนื้อหาไหนมาก่อน',
+    'onboarding.upcoming': ' · ถัดไป: ',
+    'skillslab.audio-hanya-berada-di-memory': '<audio class="fsl-audio" controls src="{url}"></audio><p class="fsl-privacy">เสียงอยู่แค่ในหน่วยความจำของเบราว์เซอร์และ URL blob ชั่วคราวเท่านั้น ไม่ถูกบันทึกลง state</p>',
+    'skillslab.audio-tidak-can-diputar-item': 'เล่นเสียงไม่ได้: {message} ข้อนี้ยังถูกล็อกไว้เหมือนเดิม',
+    'skillslab.from-right-this-skor-practice': '<div class="fsl-exam-result"><b>ถูกต้อง {correct} จาก {total} ข้อ</b><p class="fsl-privacy">นี่คือคะแนนแบบฝึกหัด ไม่ใช่ band IELTS หรือคะแนน TOEFL - การแปลงต่างกันทุกรอบสอบ และการเลียนแบบตรงนี้เท่ากับกุตัวเลขขึ้นมา</p></div>',
+    'skillslab.practice-ujian-audio-diputar-saja': `<section class="fsl-shell"><div class="fsl-progress"><span style="width:{progress}%"></span></div><article class="fsl-card">
+<span class="fsl-kicker">แบบฝึกหัดสอบ · {level}</span>
+{slMascotStripMarkup}
+<p class="fsl-timing"><b>{label}</b><span>เสียงเล่นแค่ {allowedReplays} ครั้ง · {length} ข้อ</span><small>{note}</small></p>
+<h2>{title}</h2>
+<p class="fsl-privacy">สคริปต์ถูกซ่อนไว้จนกว่าคำตอบจะถูกตรวจ {listeningHonesty}</p>
+<div class="fsl-actions"><button class="fsl-primary" data-play>เล่นเสียง</button><button data-exit>ออก</button></div>
+<div data-rec-status class="fsl-status">ยังไม่ได้เล่นเสียง</div>
+{label2}
+<fieldset class="fsl-work" data-work disabled{hidden}><ol class="fsl-exam-list">{questionMarkup}</ol>
+<div class="fsl-actions"><button class="fsl-primary" data-submit>ตรวจคำตอบ</button></div></fieldset>
+<div data-feedback class="fsl-feedback"></div></article></section>`,
+    'skillslab.practice-ujian-penilaian-otomatis-hanya': '<section class="fsl-shell"><div class="fsl-progress"><span style="width:{progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">แบบฝึกหัดสอบ · {level}</span>{slMascotStripMarkup}{timing}<h2>{instruction}</h2>{questions}{bullets}{source}{adapted}{followUps}<p class="fsl-privacy">การตรวจอัตโนมัติวัดเฉพาะความครอบคลุมของใจความจาก transcript เท่านั้น FIEZEL ไม่ตัดสินการออกเสียง และไม่ทำนาย band IELTS หรือคะแนน TOEFL</p><div class="fsl-actions">{button}{button2}<button data-exit>ออก</button></div><div data-rec-status class="fsl-status">{mandiri}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>',
+    'skillslab.session-complete-selesai-evidence-sidecar': '<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">Session complete</span><h2>{Speaking} เสร็จแล้ว</h2><p>Evidence sidecar ตอนนี้: {attempts} attempt · average {averageScore}% · pass rate {passRate}%</p><p class="fsl-privacy">ไม่มี raw audio, transcript หรือคำตอบ dictation ถูกบันทึกลง state</p><div class="fsl-actions"><button class="fsl-primary" data-home>กลับไปที่แล็บ</button></div></article></section>',
+    'tour.next': 'ต่อไป',
+    'tutor.v3-siap-for-pertanyaan-upcoming': 'พร้อมสำหรับคำถามถัดไปแล้ว',
+    'tutor.v3-suara-pending-siap-teks-lesson': 'เสียงยังไม่พร้อม แต่ตัวหนังสือบทเรียนยังใช้ได้ตามปกติ'
+  });
+}());

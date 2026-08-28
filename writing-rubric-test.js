@@ -86,7 +86,11 @@ const feedbackBlock = sourceBlock('requestWritingFeedback');
 check('AI prompt forbids band and score claims', /jangan menyebut band IELTS atau skor TOEFL/i.test(feedbackBlock), 'AI tidak boleh mengarang band');
 check('AI prompt asks for the same rubric the learner sees', /writingRubricCriteria\s*\(/.test(feedbackBlock) && /0-4/.test(feedbackBlock), 'rubrik murid dan rubrik AI harus satu sumber');
 const reviewBlock = sourceBlock('writingLocalReview');
-check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlock) && /bukan penilaian bahasa dan bukan skor/i.test(reviewBlock), 'cek offline hanya boleh mengaku memeriksa bentuk');
+/* m025-186 merge-fix: pernyataan kejujuran offline pindah ke copy-map ('tulis.cek-keterangan').
+   Pagar yang sama, dua sisi: blok tidak mengarang skor, dan teks jujurnya masih hidup — di blok
+   (dunia lama) ATAU di gabungan copy-id (dunia i18n) yang memang dirujuk blok itu. */
+const copyIdCorpusWr = fs.readdirSync(path.join(root, 'features', 'i18n')).filter((n) => /^copy-id-.*\.js$/.test(n)).sort().map((n) => fs.readFileSync(path.join(root, 'features', 'i18n', n), 'utf8')).join('\n');
+check('Offline review does not invent a score', Boolean(reviewBlock) && !/\d\s*\/\s*4/.test(reviewBlock) && (/bukan penilaian bahasa dan bukan skor/i.test(reviewBlock) || /bukan penilaian bahasa dan bukan skor/i.test(copyIdCorpusWr)), 'cek offline hanya boleh mengaku memeriksa bentuk');
 
 // --- 4b. jalur Cloudflare (worker) --------------------------------------------------------
 // Jalur default saat transport task menyala adalah Worker (app.js:7223), bukan Puter — dan
@@ -136,6 +140,11 @@ check('Form checker is exposed as pure functions', blocks.every(Boolean), blocks
 function runChecklist(prompt, text) {
   const sandbox = { WRITING_BANK: bank };
   vm.createContext(sandbox);
+  /* m025-186 merge-fix: blok app.js kini memanggil FiezelI18n.t — muat runtime + copy-id. */
+  sandbox.self = sandbox; sandbox.window = sandbox; sandbox.globalThis = sandbox;
+  for (const __f of ['features/i18n/fiezel-i18n.js'].concat(fs.readdirSync(path.join(__dirname,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>'features/i18n/'+n))) {
+    vm.runInContext(fs.readFileSync(path.join(__dirname, __f), 'utf8'), sandbox, { filename: __f });
+  }
   vm.runInContext(blocks.join('\n'), sandbox, { timeout: 2000 });
   sandbox.__prompt = prompt;
   sandbox.__text = text;

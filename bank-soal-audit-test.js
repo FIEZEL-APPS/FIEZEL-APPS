@@ -23,8 +23,12 @@ const check = (name, ok, detail) => {
 console.log('bank-soal-audit-test');
 
 // --- 1. generator soal jenis kata wajib memakai kalimat contoh -------------
+/* m025-186 merge-fix: stem POS kini kunci i18n. Pagar yang sama, dua sisi:
+   (1) app.js memanggil kunci stem-berkonteks, (2) nilai copy-nya benar-benar
+   menyisipkan kalimat contoh {sample} sebelum bertanya jenis kata. */
 check('soal jenis kata memakai kalimat contoh sebagai konteks',
-  /Dalam kalimat “\$\{v\.example\}”, kata “\$\{surface\}”\$\{asal\} berperan sebagai jenis kata apa\?/.test(app),
+  /FiezelI18n\.t\('quiz-vocab\.dalam-kalimat-kata-berperan-sebagai'/.test(app) &&
+  /'quiz-vocab\.dalam-kalimat-kata-berperan-sebagai':\s*'Dalam kalimat “\{sample\}”.*berperan sebagai jenis kata apa\?'/.test(fs.readdirSync(path.join(ROOT,'features/i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(ROOT,'features/i18n',n),'utf8')).join('\n')),
   'stem tanpa konteks membuat kata bermakna ganda tidak bisa dijawab');
 
 check('stem lama tanpa konteks sudah tidak ada',
@@ -38,10 +42,24 @@ check('ada penjaga partOfSpeechAskable',
 const map = {};
 const block = app.match(/const PART_OF_SPEECH_ID=\{([^}]*)\}/);
 check('PART_OF_SPEECH_ID terdefinisi', !!block);
+/* m025-186 merge-fix: label POS kini hidup di copy-map i18n (kontrak index.html
+   FIEZEL_I18N_BEGIN), jadi nilainya di-resolve lewat runtime FiezelI18n — bukan
+   regex literal. Maksud pagarnya tetap sama: setiap POS punya label Indonesia. */
+const vm = require('vm');
+const i18nCtx = { self: {}, window: {}, globalThis: {} };
+i18nCtx.self = i18nCtx; i18nCtx.window = i18nCtx; i18nCtx.globalThis = i18nCtx;
+vm.createContext(i18nCtx);
+const i18nDirPos = path.join(ROOT, 'features/i18n');
+for (const f of ['fiezel-i18n.js'].concat(fs.readdirSync(i18nDirPos).filter(n => /^copy-id-.*\.js$/.test(n)).sort())) {
+  vm.runInContext(fs.readFileSync(path.join(i18nDirPos, f), 'utf8'), i18nCtx, { filename: f });
+}
+const tId = (k) => i18nCtx.FiezelI18n.t(k);
 if (block) {
   for (const pair of block[1].split(',')) {
-    const m = pair.match(/^\s*([a-z]+)\s*:\s*'([^']+)'\s*$/);
-    if (m) map[m[1]] = m[2];
+    const lit = pair.match(/^\s*([a-z]+)\s*:\s*'([^']+)'\s*$/);
+    if (lit) { map[lit[1]] = lit[2]; continue; }
+    const viaT = pair.match(/^\s*([a-z]+)\s*:\s*FiezelI18n\.t\('([^']+)'\)\s*$/);
+    if (viaT) map[viaT[1]] = tId(viaT[2]);
   }
 }
 const missing = [...new Set(V.map(v => String(v.partOfSpeech || '').toLowerCase()))].filter(p => p && !map[p]);
@@ -105,10 +123,14 @@ check('grammar-labels-id.js ikut di-precache service worker',
   fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8').includes("'./grammar-labels-id.js'"));
 
 // --- 5. cadangan alasan jawaban tidak boleh Bahasa Inggris -----------------
+/* m025-186 merge-fix: literal fallback pindah ke copy-map i18n — pagar dicek pada
+   gabungan app.js + copy-id-*.js, sama seperti lesson-experience-test. */
+const copyIdCorpusPos = fs.readdirSync(i18nDirPos).filter(n => /^copy-id-.*\.js$/.test(n)).sort().map(n => fs.readFileSync(path.join(i18nDirPos, n), 'utf8')).join('\n');
+const appPlusCopy = app + '\n' + copyIdCorpusPos;
 check('cadangan alasan jawaban benar sudah Bahasa Indonesia',
-  !/Correct: \$\{String\(t\.explanation/.test(app) && /Bentuk ini cocok dengan aturan grammar/.test(app));
+  !/Correct: \$\{String\(t\.explanation/.test(app) && /Bentuk ini cocok dengan aturan grammar/.test(appPlusCopy));
 check('cadangan alasan distraktor sudah Bahasa Indonesia',
-  !/does not satisfy the grammar rule tested here/.test(app) && /belum memenuhi aturan grammar yang sedang diuji/.test(app));
+  !/does not satisfy the grammar rule tested here/.test(app) && /belum memenuhi aturan grammar yang sedang diuji/.test(appPlusCopy));
 check('penjelasan grammar mengutamakan field Bahasa Indonesia',
   /explanation\.ruleId/.test(app) && /explanation\.whyCorrectId/.test(app) && /explanation\.memoryCueId/.test(app),
   'grammarMeta harus membaca varian "...Id" lebih dulu');

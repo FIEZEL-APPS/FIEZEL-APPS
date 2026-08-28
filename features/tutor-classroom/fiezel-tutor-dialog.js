@@ -24,6 +24,18 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
+  // keluaran render tetap byte-identik dengan sebelumnya.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var SCHEMA = 'fiezel-tutor-dialog-v1';
 
   // Indonesian first, because the learner speaks Indonesian to the tutor. English cues are
@@ -82,7 +94,7 @@
     var examples = Array.isArray(board.examples) ? board.examples : [];
     return {
       name: learnerName(),
-      topic: String(l.topic || 'materi ini'),
+      topic: String(l.topic || T('tutor.topic-fallback')),
       level: String(l.level || ''),
       formula: String(board.formula || ''),
       examples: examples,
@@ -97,104 +109,104 @@
   // teaching content. Placeholders are filled from the live lesson.
   var ANSWERS = {
     meaning: [
-      { id: 'Oke. {topic} intinya begini: {formula}. Jadi kalau kamu lihat pola itu, kamu sedang melihat {topic}.',
+      { id: T('tutor.ans-meaning-1'),
         en: 'Core idea: {formula}' },
-      { id: 'Gampangnya begini. {topic} dipakai untuk pola {formula}. Contoh yang paling jelas: {firstExample}',
+      { id: T('tutor.ans-meaning-2'),
         en: '{firstExample}' },
-      { id: 'Aku jelaskan dari sisi lain ya. Yang perlu kamu pegang dari {topic} cuma satu, yaitu {formula}. Sisanya hanya variasi.',
+      { id: T('tutor.ans-meaning-3'),
         en: '{formula}' }
     ],
     why: [
-      { id: 'Alasannya ada di polanya. {topic} menuntut bentuk {formula}, jadi kalau bentuknya berubah, kalimatnya jadi salah.',
+      { id: T('tutor.ans-why-1'),
         en: '{formula}' },
-      { id: 'Bukan hafalan, ini soal fungsi. {topic} dipakai supaya maknanya jelas, dan bentuk {formula} yang menjaga kejelasan itu.',
+      { id: T('tutor.ans-why-2'),
         en: '{formula}' },
-      { id: 'Coba bandingkan dengan contohnya: {firstExample}. Kalau polanya diubah, maknanya ikut berubah, dan itulah kenapa aturannya ada.',
+      { id: T('tutor.ans-why-3'),
         en: '{firstExample}' }
     ],
     example: [
-      { id: 'Contohnya: {firstExample}. Sekarang coba kamu ganti subjeknya, polanya tetap {formula}.',
+      { id: T('tutor.ans-example-1'),
         en: '{firstExample}' },
-      { id: 'Ini satu lagi supaya makin jelas: {secondExample}. Perhatikan bagian yang mengikuti polanya.',
+      { id: T('tutor.ans-example-2'),
         en: '{secondExample}' },
-      { id: 'Ambil dari kalimat yang tadi kita bahas: {beatEn}. Itu contoh {topic} yang hidup, bukan contoh buatan.',
+      { id: T('tutor.ans-example-3'),
         en: '{beatEn}' }
     ],
     difference: [
-      { id: 'Bedanya ada di fungsi, bukan di kata. Yang satu mengikuti pola {formula}, yang lain tidak, jadi maknanya bergeser.',
+      { id: T('tutor.ans-difference-1'),
         en: '{formula}' },
-      { id: 'Cara membedakannya: lihat polanya dulu. Kalau cocok dengan {formula}, itu {topic}. Kalau tidak, itu bentuk lain.',
+      { id: T('tutor.ans-difference-2'),
         en: '{formula}' },
-      { id: 'Pakai contoh ini untuk memisahkan keduanya: {firstExample}. Ganti satu bagian saja, dan kamu langsung dengar bedanya.',
+      { id: T('tutor.ans-difference-3'),
         en: '{firstExample}' }
     ],
     translate: [
-      { id: 'Dalam bahasa Inggris, kalimat seperti itu mengikuti pola {formula}. Jadi bentuknya seperti ini: {firstExample}',
+      { id: T('tutor.ans-translate-1'),
         en: '{firstExample}' },
-      { id: 'Terjemahannya jangan kata per kata. Susun dulu polanya, {formula}, baru isi katanya. Hasilnya: {firstExample}',
+      { id: T('tutor.ans-translate-2'),
         en: '{firstExample}' },
-      { id: 'Kalau diterjemahkan dengan pola yang benar, jadinya {firstExample}. Perhatikan urutannya, karena bahasa Inggris ketat soal urutan.',
+      { id: T('tutor.ans-translate-3'),
         en: '{firstExample}' }
     ],
     pronounce: [
-      { id: 'Dengarkan aku dulu, lalu tiru: {firstExample}. Ucapkan pelan, jangan dikejar cepat.',
+      { id: T('tutor.ans-pronounce-1'),
         en: '{firstExample}' },
-      { id: 'Kuncinya di tekanan kata. Aku ucapkan sekali lagi: {firstExample}. Tirukan dengan ritme yang sama.',
+      { id: T('tutor.ans-pronounce-2'),
         en: '{firstExample}' },
-      { id: 'Ucapkan per potongan dulu, baru satu kalimat penuh: {firstExample}',
+      { id: T('tutor.ans-pronounce-3'),
         en: '{firstExample}' }
     ],
     when: [
-      { id: '{topic} dipakai saat maknanya menuntut pola {formula}. Kalau situasinya lain, bentuknya juga lain.',
+      { id: T('tutor.ans-when-1'),
         en: '{formula}' },
-      { id: 'Patokannya sederhana: kalau kalimatmu cocok dengan {firstExample}, berarti ini waktunya memakai {topic}.',
+      { id: T('tutor.ans-when-2'),
         en: '{firstExample}' },
-      { id: 'Jangan lihat waktunya saja, lihat maksudmu. Itu yang menentukan kapan {topic} dipakai.',
+      { id: T('tutor.ans-when-3'),
         en: '{formula}' }
     ],
     repeat: [
-      { id: 'Baik, aku ulangi. {beatId}', en: '{beatEn}' },
-      { id: 'Sekali lagi, pelan-pelan. {beatId}', en: '{beatEn}' },
-      { id: 'Aku ulang dengan kalimat yang sama supaya kamu bisa mengikuti. {beatId}', en: '{beatEn}' }
+      { id: T('tutor.ans-repeat-1'), en: '{beatEn}' },
+      { id: T('tutor.ans-repeat-2'), en: '{beatEn}' },
+      { id: T('tutor.ans-repeat-3'), en: '{beatEn}' }
     ],
     slower: [
-      { id: 'Oke, aku pelankan. {beatId}', en: '{beatEn}' },
-      { id: 'Aku turunkan kecepatannya ya. Dengarkan lagi: {beatId}', en: '{beatEn}' },
-      { id: 'Pelan saja, tidak usah buru-buru. {beatId}', en: '{beatEn}' }
+      { id: T('tutor.ans-slower-1'), en: '{beatEn}' },
+      { id: T('tutor.ans-slower-2'), en: '{beatEn}' },
+      { id: T('tutor.ans-slower-3'), en: '{beatEn}' }
     ],
     confused: [
-      { id: 'Tidak apa-apa, kita mundur satu langkah. Lupakan istilahnya, pegang polanya dulu: {formula}.',
+      { id: T('tutor.ans-confused-1'),
         en: '{formula}' },
-      { id: 'Wajar bingung di bagian ini. Kita pakai satu contoh konkret saja: {firstExample}. Dari situ aturannya akan masuk sendiri.',
+      { id: T('tutor.ans-confused-2'),
         en: '{firstExample}' },
-      { id: 'Kalau terasa berat, berarti terlalu banyak sekaligus. Ambil satu hal dulu: {formula}. Sisanya nanti.',
+      { id: T('tutor.ans-confused-3'),
         en: '{formula}' }
     ],
     exam: [
-      { id: 'Ini relevan untuk TOEFL dan IELTS. {topic} muncul di bagian structure dan writing, jadi polanya harus otomatis, bukan dipikir.',
+      { id: T('tutor.ans-exam-1'),
         en: '{formula}' },
-      { id: 'Di ujian, yang diuji bukan hafalan aturannya, tetapi kecepatanmu mengenali pola {formula} di dalam kalimat panjang.',
+      { id: T('tutor.ans-exam-2'),
         en: '{formula}' },
-      { id: 'Untuk target TOEFL dan IELTS, materi seperti {topic} adalah fondasi. Kalau ini goyah, bagian sulitnya akan ikut goyah.',
+      { id: T('tutor.ans-exam-3'),
         en: '{formula}' }
     ],
     greeting: [
-      { id: 'Halo {name}. Aku siap. Mau aku jelaskan bagian mana dari {topic}?', en: 'Hello! Ready when you are.' },
-      { id: 'Hai. Kita sedang di {topic}. Tanyakan apa saja, aku jawab.', en: 'Hi! We are on {topic}.' },
-      { id: 'Halo. Kalau ada yang mengganjal di {topic}, sekarang waktunya bertanya.', en: 'Hello! Ask me anything about {topic}.' }
+      { id: T('tutor.ans-greeting-1'), en: 'Hello! Ready when you are.' },
+      { id: T('tutor.ans-greeting-2'), en: 'Hi! We are on {topic}.' },
+      { id: T('tutor.ans-greeting-3'), en: 'Hello! Ask me anything about {topic}.' }
     ],
     open: [
-      { id: 'Pertanyaanmu aku hubungkan ke materi ini dulu. Inti {topic} adalah {formula}, dan dari situ kita bisa uji kalimatmu.',
+      { id: T('tutor.ans-open-1'),
         en: '{formula}' },
-      { id: 'Boleh. Aku jawab lewat contoh supaya tidak abstrak: {firstExample}. Kalau maksudmu berbeda, katakan bagian mana yang kamu maksud.',
+      { id: T('tutor.ans-open-2'),
         en: '{firstExample}' },
-      { id: 'Aku tangkap arah pertanyaanmu. Yang relevan di sini pola {formula}. Coba sebutkan satu kalimatmu sendiri, nanti aku koreksi.',
+      { id: T('tutor.ans-open-3'),
         en: '{formula}' }
     ],
     empty: [
-      { id: 'Aku belum menangkap suaranya. Tekan tombolnya lagi lalu bicara sedikit lebih dekat ya.', en: 'I did not catch that.' },
-      { id: 'Suaranya belum masuk. Coba sekali lagi, agak pelan dan jelas.', en: 'Try once more, a little slower.' },
-      { id: 'Belum ada yang terdengar. Tekan dan bicara setelah tombolnya menyala.', en: 'Nothing came through yet.' }
+      { id: T('tutor.ans-empty-1'), en: 'I did not catch that.' },
+      { id: T('tutor.ans-empty-2'), en: 'Try once more, a little slower.' },
+      { id: T('tutor.ans-empty-3'), en: 'Nothing came through yet.' }
     ]
   };
 
@@ -248,7 +260,7 @@
       id: idText,
       en: enText || ctx.firstExample || ctx.formula,
       board: Object.freeze({
-        kicker: 'TANYA FIEZEL',
+        kicker: T('tutor.ask-kicker'),
         title: ctx.topic,
         formula: ctx.formula,
         examples: ctx.examples.slice(0, 3)
