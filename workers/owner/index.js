@@ -208,18 +208,85 @@ function deny() {
   });
 }
 
-/* ============================ Penjaga jembatan edge (X-Fiezel-Edge) ====================== */
-// MASALAH NYATA. Worker ini minta `owner.fiezel.my.id` sebagai custom domain, tapi zona
-// `fiezel.my.id` belum ada di Cloudflare (nameserver di reseller; zona subdomain butuh
-// Enterprise). Jadi selama blokade itu, dashboard dijangkau lewat pola yang sudah terbukti untuk
+/* ============================ Penjaga tepi (hostname kanonik ATAU X-Fiezel-Edge) ========= */
+//
+// ==========================================================================================
+// 🔄 TEMUAN LAPANGAN 28 Agu 2026 — CUSTOM DOMAIN OWNER SUDAH AKTIF (BAGIAN INI BARU)
+// ==========================================================================================
+// Keadaan yang diasumsikan bab di bawah SUDAH BERUBAH, dan gejalanya diukur langsung:
+// `https://owner.fiezel.my.id/` menjawab **403 `{"error":"forbidden"}`** pada tiga percobaan
+// (~75 ms). Sebabnya bukan sesi owner dan bukan Secret yang kurang:
+//   - Worker `fiezel-owner` sudah dideploy (etag 9ad135402f65).
+//   - `owner.fiezel.my.id` sudah AKTIF sebagai **custom domain** Worker ini
+//     (id aa153ad81fbc2aee3855441900cc7bc9696f3d0c, cert 767db56f-…, enabled true) —
+//     persis seperti yang sudah lama tertulis di `wrangler.toml`
+//     (`routes = [{ pattern = "owner.fiezel.my.id", custom_domain = true }]`).
+//   - Ketiga Secret (`OWNER_TOKEN_HASH`, `OWNER_SESSION_KEY`, `EDGE_SHARED_SECRET`) terpasang.
+// Artinya permintaan owner tiba **LANGSUNG dari peramban**, dan proxy PHP owner TIDAK berada di
+// jalur permintaan. Tidak ada yang menyuntikkan `X-Fiezel-Edge`, jadi penjaga versi sebelumnya
+// menolak SEMUA permintaan — termasuk halaman masuk. Penjaga itu menilai keadaan yang sudah
+// tidak berlaku (kelas bug yang sama dengan dua bug lain yang ditambal hari yang sama).
+//
+// YANG **TIDAK** DIPAKAI SEBAGAI TAMBALAN: `ALLOW_NO_EDGE_SECRET="true"`. Bab di bawah sudah
+// memperingatkannya sendiri — pembuka itu membuka gerbang untuk SEMUA hostname, termasuk
+// `*.workers.dev`, tempat Cloudflare Access (yang dipasang PER HOSTNAME) tidak berlaku. Itu
+// menukar 403 dengan lubang: halaman masuk owner bisa ditembak langsung, dan rem login
+// per-isolate bisa diputar dengan meminta isolate baru.
+//
+// YANG DIPAKAI: **JALUR SAH KEDUA — hostname kanonik**, ditiru dari `workers/api/mw-edge.js`
+// (di sana konsepnya `edgeGuardPath` bernilai `custom-domain`), berdampingan dengan jalur
+// header dan dengan DEFAULT-DENY untuk hostname lain. Lihat bab "SINYAL HOSTNAME" di bawah.
+//
+// ==========================================================================================
+// SINYAL HOSTNAME: KENAPA `new URL(request.url).hostname` DAN BUKAN `headers.get('host')`
+// ==========================================================================================
+// Syaratnya keras: hostname yang dipercaya WAJIB berasal dari sesuatu yang tidak bisa disetel
+// peramban penyerang. Ini hasil pemeriksaannya, apa adanya:
+//
+// 1. `request.headers.get('host')` adalah nilai header MENTAH dari klien. Di Workers ia memang
+//    berasal dari sumber yang sama dengan `request.url`, tetapi ia TIDAK dinormalkan: ia boleh
+//    membawa port (`owner.fiezel.my.id:8443`), titik akhir (`owner.fiezel.my.id.`), huruf besar,
+//    bentuk punycode/unicode yang berbeda, dan bila header dikirim GANDA `Headers.get()`
+//    menggabungkan nilainya dengan `', '`. Sebuah gerbang otorisasi tidak boleh menanggung
+//    beban menalar semua bentuk itu. Karena itu ia DITOLAK sebagai sumber di sini.
+// 2. `new URL(request.url).hostname` adalah hostname yang sudah DIRAKIT DAN DINORMALKAN runtime,
+//    dan — ini intinya — ia adalah nilai yang SAMA yang dipakai lapisan perutean Cloudflare
+//    untuk memutuskan bahwa Worker ini yang dijalankan. Custom Domain mencocokkan hostname
+//    secara PERSIS, tanpa wildcard, dan seluruh path-nya menuju Worker ini
+//    (developers.cloudflare.com/workers/configuration/routing/custom-domains/). Jadi permintaan
+//    tidak mungkin tiba di sini dengan hostname `owner.fiezel.my.id` tanpa Cloudflare sendiri
+//    yang mencocokkannya ke rute milik akun ini. Yang dipercaya bukan "header yang sopan",
+//    melainkan KEPUTUSAN PERUTEAN yang tidak dipegang klien.
+// 3. Yang JUGA menutup jalur pemalsuan dari arah Worker lain: `Host` adalah forbidden header di
+//    Fetch API, sehingga Worker mana pun (di akun mana pun) TIDAK BISA menyetel `Host` pada
+//    subrequest — begitu pula Transform Rules menolak operasi `set` pada `Host`. Jadi tidak ada
+//    cara mengirim `Host: owner.fiezel.my.id` ke alamat `*.workers.dev` lewat Cloudflare.
+// 4. YANG TIDAK DIPERCAYA sama sekali, dan tidak pernah dibaca penjaga ini: `X-Forwarded-Host`,
+//    `X-Host`, `Origin`, `Referer`. Semuanya murni masukan klien.
+//
+// RISIKO SISA, DITULIS SUPAYA TIDAK HILANG: kalau suatu hari sebuah lapisan di depan Worker
+// meneruskan `Host` pilihan klien (mis. jembatan PHP yang diubah supaya meneruskan Host, atau
+// `workers_dev` dinyalakan lagi lalu Host/SNI tidak lagi dipaksa cocok), maka `url.hostname`
+// ikut berpindah dan pemeriksaan akhiran `.workers.dev` TIDAK akan menyala. Karena itu jalur
+// hostname ini SAH hanya bersama tiga hal di luar kode: `workers_dev = false`, Preview URL
+// mati, dan Cloudflare Access di depan `owner.fiezel.my.id`. Ketiganya pekerjaan owner dan
+// tertulis di `DEPLOY.md`; kode tidak bisa memaksakannya, jadi kode tidak berpura-pura bisa.
+//
+// ==========================================================================================
+// KEADAAN LAMA (tetap ditulis: jalur header masih dipertahankan sebagai CADANGAN)
+// ==========================================================================================
+// Sebelum zona `fiezel.my.id` aktif, dashboard dijangkau lewat pola yang sudah terbukti untuk
 // `api.fiezel.my.id`: subdomain cPanel di origin ArenHost + proxy PHP
 // (`deploy/edge/owner-index.php`) yang meneruskan ke `fiezel-owner.fitrajft.workers.dev`.
 //
-// Akibatnya Worker ini hidup di DUA alamat, dan alamat `*.workers.dev` tidak bisa dimatikan
-// (proxy memanggilnya). Selama ia terbuka tanpa syarat, halaman masuk owner bisa ditembak
-// langsung tanpa lewat jembatan: rem login per-isolate bisa diputar dengan meminta isolate baru,
-// dan Cloudflare Access (yang dipasang PER HOSTNAME) sama sekali tidak berlaku di alamat
-// `workers.dev`. Artinya lapis kedua yang dijanjikan README §2 hanya nyata di jembatan.
+// Jalur itu TIDAK dihapus, dan ini alasannya (bukan kemalasan):
+//   (i)  cache DNS lama + kemungkinan owner mengembalikan jembatan bila custom domain bermasalah;
+//   (ii) `deploy/edge/owner-index.php` dan .htaccess-nya masih ada di repo dan masih dijaga
+//        gerbang ini — menghapus jalurnya di kode akan membuat artefak itu mati diam-diam;
+//   (iii) sabuk dan bretel: header sah TIDAK cukup di hostname yang tidak dikenal, sehingga
+//        hostname yang tersalah-pasang di masa depan tidak menjadi pintu kedua.
+// Selama alamat `*.workers.dev` hidup, ia adalah pintu yang TIDAK dilewati Cloudflare Access.
+// Karena itu jalur header hanya berlaku DI SANA, dan hanya dengan secret yang benar.
 //
 // KENAPA DISALIN, BUKAN DIIMPOR. Penjaga yang sama sudah ada di `workers/api/mw-edge.js`. Impor
 // tidak mungkin: `workers/api` dan `workers/owner` adalah DUA Worker dengan graf modul, bundling,
@@ -229,6 +296,58 @@ function deny() {
 // `edge-guard-test.js` (sisi api) dan `owner-edge-guard-test.js` (sisi owner).
 
 const EDGE_HEADER = 'x-fiezel-edge';
+
+// SATU SUMBER KEBENARAN hostname yang boleh lolos TANPA header jembatan: hostname yang benar-benar
+// terikat ke Worker ini sebagai CUSTOM DOMAIN. Harus identik dengan
+// `routes = [{ pattern = ..., custom_domain = true }]` di `workers/owner/wrangler.toml` —
+// `owner-edge-guard-test.js` butir (g-a) memaksa keduanya sama, supaya daftar ini tidak bisa
+// tumbuh diam-diam menjadi hostname yang tidak pernah berdiri di Cloudflare.
+// Huruf kecil semua; pembanding menormalkan masukan.
+const TRUSTED_EDGE_HOSTS = Object.freeze(['owner.fiezel.my.id']);
+
+// Akhiran alamat asal Worker. Ia BUKAN jalur owner: Cloudflare Access dipasang per hostname dan
+// tidak berlaku di sini, jadi hostname ini tidak boleh pernah lolos tanpa secret jembatan.
+const WORKERS_DEV_SUFFIX = '.workers.dev';
+
+// Normalisasi hostname: huruf kecil, tanpa spasi, tanpa titik akhir.
+function normalizeHost(value) {
+  return String(value == null ? '' : value).trim().toLowerCase().replace(/\.$/, '');
+}
+
+// Hostname permintaan, DARI `request.url` (dirakit + dinormalkan runtime, dan nilai yang sama
+// yang dipakai perutean Cloudflare memilih Worker ini). SENGAJA BUKAN dari `headers.get('host')`
+// maupun `X-Forwarded-Host` — alasannya panjang dan ada di bab "SINYAL HOSTNAME" di atas.
+// URL yang tidak bisa diurai mengembalikan string kosong, dan string kosong tidak pernah
+// tepercaya (gagal ke arah aman).
+function requestHostname(request) {
+  try {
+    return normalizeHost(new URL(request.url).hostname);
+  } catch (_) {
+    return '';
+  }
+}
+
+// Alamat asal Worker (`*.workers.dev`, termasuk Preview URL `<versi>-fiezel-owner.<sub>.workers.dev`
+// yang berakhiran sama). Dicek dengan AKHIRAN, bukan substring: `workers.dev.penyerang.com`
+// tidak boleh ikut terhitung.
+function isWorkersDevHost(host) {
+  const h = normalizeHost(host);
+  return h === 'workers.dev' || h.endsWith(WORKERS_DEV_SUFFIX);
+}
+
+// Hostname kanonik tepercaya. `*.workers.dev` tidak pernah masuk, apa pun isi daftar di atas.
+// Pencocokan PERSIS (bukan substring/akhiran): `owner.fiezel.my.id.penyerang.com` bukan owner.
+function isTrustedEdgeHost(host) {
+  const h = normalizeHost(host);
+  if (!h || isWorkersDevHost(h)) return false;
+  return TRUSTED_EDGE_HOSTS.includes(h);
+}
+
+// Nilai jalur yang mungkin. Satu sumber kebenaran untuk penjaga DAN gerbang test. Meniru
+// `EDGE_PATHS` di `workers/api/mw-edge.js`; `'denied'` ada di sini (dan tidak ada di sisi api)
+// karena owner tidak punya `/health` untuk melaporkan jalurnya, jadi satu-satunya pembaca nilai
+// ini adalah gerbang test — dan gerbang harus bisa membedakan "lolos lewat apa" dari "ditolak".
+const EDGE_PATHS = Object.freeze(['custom-domain', 'header', 'off', 'free-path', 'denied']);
 
 // Owner TIDAK punya path bebas header. `workers/api` membebaskan `/healthz` karena monitor
 // eksternal harus bisa melihat API murid hidup tanpa mengirim rahasia. Dashboard owner tidak
@@ -246,13 +365,20 @@ function edgeSecret(env) {
 }
 
 // Dua nilai saja, dan keduanya jujur:
-//   'on'  = setiap permintaan wajib membawa header jembatan yang benar.
-//   'off' = secret belum dipasang; hanya mungkin bila ALLOW_NO_EDGE_SECRET === 'true'
-//           dipasang secara eksplisit (tanpa itu, guard menolak semua — FAIL-CLOSED).
+//   'on'  = penjaga MENEGAKKAN: setiap permintaan harus tiba di hostname kanonik ATAU membawa
+//           header jembatan yang benar.
+//   'off' = tidak ada penegakan sama sekali; HANYA mungkin bila secret belum dipasang DAN
+//           ALLOW_NO_EDGE_SECRET === 'true' dipasang secara eksplisit.
 // Nilai ini TIDAK pernah dikirim ke klien mana pun (dashboard owner tidak punya `/health`), jadi
 // ia bukan oracle publik. Ia hanya untuk gerbang dan untuk log.
+//
+// KOREKSI 28 Agu 2026: rumusnya dulu `edgeSecret(env) ? 'on' : 'off'`, yang sejak jalur hostname
+// ada menjadi BOHONG — tanpa secret pun penegakan hostname tetap jalan dan hostname asing tetap
+// ditolak. Rumus di bawah disamakan dengan `edgeGuardStatus()` di `workers/api/mw-edge.js`
+// (dua penjaga yang disalin HARUS bergerak bersama): 'off' hanya kalau memang tidak ada yang
+// ditegakkan.
 function edgeGuardStatus(env) {
-  return edgeSecret(env) ? 'on' : 'off';
+  return edgeSecret(env) || !allowNoSecretOverride(env) ? 'on' : 'off';
 }
 
 // Peringatan `off` dicatat SEKALI per isolate, bukan sekali per permintaan: satu baris log per
@@ -294,51 +420,96 @@ function warnEdgeGuardClosed() {
 
 // Pembuka darurat, HARUS string persis 'true' — bukan truthy. '1', 'yes', atau true boolean
 // dari kesalahan wrangler.toml TIDAK membuka gerbang; salah ketik gagal ke arah aman.
+//
+// KOREKSI 28 Agu 2026 (lubang yang ditemukan saat menambah jalur hostname): versi sebelumnya
+// memakai `.toLowerCase()`, sehingga `"TRUE"` DAN `"True"` ikut membuka gerbang — padahal
+// kembarannya `allowNoSecretOverride()` di `workers/api/mw-edge.js` sengaja TIDAK melakukan itu
+// dan komentar di berkas ini sendiri berjanji "string persis 'true'". Janji yang tidak ditegakkan
+// adalah lubang: `ALLOW_NO_EDGE_SECRET="TRUE"` yang tersalin dari catatan owner akan membuka
+// `*.workers.dev` tanpa ada yang menyadarinya. `.toLowerCase()` DIHAPUS; hanya `'true'` (setelah
+// trim) yang dihitung, sama seperti sisi api.
 function allowNoSecretOverride(env) {
   const raw = env ? env.ALLOW_NO_EDGE_SECRET : null;
-  const norm = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  const norm = typeof raw === 'string' ? raw.trim() : '';
+  // Perbandingan biasa di sini AMAN dan disengaja: 'true' bukan nilai rahasia.
   return norm === 'true';
 }
 
-// FAIL-CLOSED dengan cara yang SAMA seperti mw-edge.js:
-//  - begitu secret terpasang, SETIAP rute (termasuk halaman masuk) wajib berheader benar;
-//  - perbandingannya waktu-konstan (ctEq), karena header ini bisa dicoba tanpa batas dan
-//    operator kesetaraan biasa berhenti pada byte pertama yang berbeda -> waktunya membocorkan
-//    panjang prefiks yang cocok;
-//  - penolakannya memakai deny() yang SAMA dengan gate owner, sehingga bentuknya identik untuk
-//    header hilang, header salah, dan sesi owner tidak ada. Penyerang tidak bisa menyimpulkan
-//    apakah secret terpasang, header mana yang diperiksa, atau lapis mana yang menolaknya;
-//  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
-//    yang memicunya, dan tidak boleh membakar anggaran plan gratis.
+// DUA JALUR SAH, satu penolakan. Urutannya disamakan dengan `edgeGuardMiddleware()` di
+// `workers/api/mw-edge.js` (dua penjaga ini disalin dan HARUS bergerak bersama):
 //
-// FAIL-CLOSED sejak audit D3 HIGH-3 (selaras dengan mw-edge.js — dua penjaga ini disalin dan
-// HARUS bergerak bersama): tanpa secret, SEMUA permintaan ditolak. `off` BUKAN mode produksi;
-// ia hanya bisa terjadi bila owner memasang var ALLOW_NO_EDGE_SECRET='true' secara eksplisit
-// (mis. masa transisi sebelum jembatan PHP owner terpasang). Konsekuensi fail-closed: deploy
-// SEBELUM `wrangler secret put EDGE_SHARED_SECRET` membuat dashboard mati sampai secret
-// dipasang — itu disengaja; yang terdampak satu orang, dan orang itu memegang kuncinya.
-// Selama `off` dipaksa, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
-// (i) segera setelah secret dipasang (hapus juga var pembukanya), dan (ii) selamanya setelah
-// nameserver pindah ke Cloudflare dan custom domain menggantikan jembatan PHP (saat itu
-// `workers_dev = false` menutup lubangnya secara struktural, dan penjaga ini boleh menolak
-// tanpa syarat atau dihapus).
-function edgeGuard(request, env, pathname) {
+//  [0] `EDGE_FREE_PATHS` — kosong di owner. Nol permukaan terbuka di `*.workers.dev`.
+//  [*] mode transisi eksplisit (`ALLOW_NO_EDGE_SECRET === 'true'` tanpa secret): tidak menolak
+//      apa pun, DAN itu diumumkan lewat console.warn + `edgeGuardStatus()` bernilai `off`.
+//      Var ini hanya sah selama masa transisi; ia BUKAN mode produksi. Sejak custom domain
+//      aktif ia TIDAK LAGI DIBUTUHKAN untuk operasi normal — jalur [1] sudah menyelesaikan
+//      masalah yang dulu dipaksa dibuka dengan var ini, tanpa membuka `*.workers.dev`.
+//  [1] JALUR UTAMA: hostname kanonik (`TRUSTED_EDGE_HOSTS`) lolos TANPA header. Diperiksa
+//      SEBELUM `configuredEdge` supaya dashboard TIDAK ikut mati pada langkah pembongkaran
+//      jembatan (yaitu saat owner menghapus `EDGE_SHARED_SECRET`).
+//  [2] JALUR CADANGAN: proxy PHP -> `*.workers.dev` dengan `X-Fiezel-Edge` yang benar.
+//      Perbandingannya waktu-konstan (ctEq): header ini bisa dicoba tanpa batas, dan operator
+//      kesetaraan biasa berhenti pada byte pertama yang berbeda sehingga waktunya membocorkan
+//      panjang prefiks yang cocok.
+//  [3] DEFAULT-DENY: hostname asing/karangan ditolak APA PUN headernya.
+//
+// YANG SENGAJA TIDAK TERJADI: header `X-Fiezel-Edge` TIDAK menaikkan hak apa pun di hostname
+// kanonik. Di sana ia sudah lolos lewat jalur [1] dan headernya tidak pernah dibaca — jadi
+// header palsu maupun header benar sama-sama tidak mengubah apa pun, dan tetap tidak
+// menggantikan sesi owner (lapis 2).
+//
+// Sifat lain yang dipertahankan utuh:
+//  - penolakannya memakai deny() yang SAMA dengan gate owner, sehingga bentuknya identik untuk
+//    header hilang, header salah, hostname asing, fail-closed, dan sesi owner tidak ada.
+//    Penyerang tidak bisa menyimpulkan apakah secret terpasang, hostname mana yang dikenal,
+//    atau lapis mana yang menolaknya;
+//  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
+//    yang memicunya, dan tidak boleh membakar anggaran plan gratis;
+//  - FAIL-CLOSED (audit D3 HIGH-3) tetap berlaku untuk jalur CADANGAN: tanpa secret, hostname
+//    `*.workers.dev` dan hostname asing ditolak semuanya.
+function edgeGuardDecision(request, env, pathname) {
+  if (EDGE_FREE_PATHS.includes(pathname)) return { allowed: true, edgePath: 'free-path' };
+
   const configuredEdge = edgeSecret(env);
-  if (!configuredEdge) {
-    if (allowNoSecretOverride(env)) {
-      warnEdgeGuardOff();
-      return null;
-    }
-    warnEdgeGuardClosed();
-    // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
-    return deny();
+
+  if (!configuredEdge && allowNoSecretOverride(env)) {
+    warnEdgeGuardOff();
+    return { allowed: true, edgePath: 'off' };
   }
-  if (EDGE_FREE_PATHS.includes(pathname)) return null;
-  const presentedEdge = request && request.headers && request.headers.get
-    ? request.headers.get(EDGE_HEADER)
-    : null;
-  if (ctEq(presentedEdge, configuredEdge)) return null;
-  return deny();
+
+  const host = requestHostname(request);
+
+  // [1] JALUR UTAMA — hostname kanonik. Tidak membaca satu header pun.
+  if (isTrustedEdgeHost(host)) return { allowed: true, edgePath: 'custom-domain' };
+
+  // [2] JALUR CADANGAN — hanya di alamat asal Worker, hanya dengan secret yang benar.
+  if (!configuredEdge) {
+    warnEdgeGuardClosed();
+    return { allowed: false, edgePath: 'denied' };
+  }
+  if (isWorkersDevHost(host)) {
+    const presentedEdge = request && request.headers && request.headers.get
+      ? request.headers.get(EDGE_HEADER)
+      : null;
+    if (ctEq(presentedEdge, configuredEdge)) return { allowed: true, edgePath: 'header' };
+    return { allowed: false, edgePath: 'denied' };
+  }
+
+  // [3] DEFAULT-DENY untuk hostname asing.
+  return { allowed: false, edgePath: 'denied' };
+}
+
+// JALUR yang benar-benar dipakai permintaan ini. Cermin `edgeGuardPath()` di
+// `workers/api/mw-edge.js`; di owner ia tidak pernah dikirim ke klien (tidak ada `/health`),
+// jadi ia bukan oracle publik — ia untuk gerbang test dan untuk penalaran manusia.
+function edgeGuardPath(request, env, pathname) {
+  const decision = edgeGuardDecision(request, env, pathname);
+  return EDGE_PATHS.includes(decision.edgePath) ? decision.edgePath : 'unknown';
+}
+
+function edgeGuard(request, env, pathname) {
+  // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
+  return edgeGuardDecision(request, env, pathname).allowed ? null : deny();
 }
 
 /* ============================ Rumus biaya (cf-a10) ======================================== */
@@ -1211,6 +1382,11 @@ export default {
 
 export {
   handle, ctEq, edgeGuard, edgeGuardStatus, edgeSecret, resetEdgeWarningForTests,
+  // Jalur tepi: diekspor supaya gerbang bisa mengassert JALUR yang dipakai (bukan hanya status
+  // HTTP), sehingga "lolos karena hostname" tidak bisa tertukar dengan "lolos karena header".
+  edgeGuardDecision, edgeGuardPath, EDGE_PATHS,
+  TRUSTED_EDGE_HOSTS, WORKERS_DEV_SUFFIX, isTrustedEdgeHost, isWorkersDevHost, requestHostname,
+  allowNoSecretOverride,
   EDGE_HEADER, EDGE_FREE_PATHS, sha256Hex, hmacHex, issueSession, verifySession, estimateCost,
   renderDashboard, renderLogin, readModel, periodRange, wibDay, dayShift,
   RATE_CARD, PERIODS, OWNER_ROUTES, PUBLIC_ROUTES, SESSION_COOKIE, SESSION_TTL_MS,
