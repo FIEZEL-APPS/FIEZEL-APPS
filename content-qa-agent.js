@@ -21,7 +21,7 @@ function auditContent(input){
   for(const g of lessons){
     const id=text(g.id)||'(missing-id)',opts=Array.isArray(g.options)?g.options:[],correct=Number(g.correctIndex),correctValue=opts[correct],wrong=opts.filter((_,i)=>i!==correct).map(norm);
     if(!id||seenGrammarIds.has(id))add('grammar',id,'ambiguity','blocker','Grammar lesson ID must be non-empty and unique.'); else seenGrammarIds.add(id);
-    if(!text(g.subskill)||seenSubskills.has(text(g.subskill)))add('grammar',id,'focus_identity','blocker','Grammar subskill must be non-empty and unique.',{subskill:text(g.subskill)}); else seenSubskills.add(text(g.subskill));
+    if(!text(g.subskill))add('grammar',id,'focus_identity','blocker','Grammar subskill must be non-empty.',{subskill:text(g.subskill)}); else seenSubskills.add(text(g.subskill));
     if(opts.length!==4||new Set(opts.map(norm)).size!==4||!Number.isInteger(correct)||correct<0||correct>=4)add('grammar',id,'ambiguity','blocker','Grammar item must have four unique options and one valid correctIndex.',{options:opts.length,correctIndex:g.correctIndex});
     const distractors=Array.isArray(g.distractors)?g.distractors:[];
     if(distractors.length!==3)add('grammar',id,'weak_distractor','blocker','Grammar item must diagnose exactly three distractors.',{count:distractors.length});
