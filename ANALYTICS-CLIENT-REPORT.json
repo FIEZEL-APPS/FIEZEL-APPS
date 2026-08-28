@@ -190,12 +190,12 @@
     {
       "name": "installId dibuat dan disimpan LOKAL",
       "status": "PASS",
-      "details": "899ea0ad-9d97-4793-a333-e49c588ee2d4"
+      "details": "a2fb5ca4-c185-4747-954c-984defafa269"
     },
     {
       "name": "installId berbentuk UUID acak (crypto.randomUUID)",
       "status": "PASS",
-      "details": "899ea0ad-9d97-4793-a333-e49c588ee2d4"
+      "details": "a2fb5ca4-c185-4747-954c-984defafa269"
     },
     {
       "name": "Ada payload yang benar-benar terkirim",
@@ -235,7 +235,7 @@
     {
       "name": "`visitor_token` = 32 hex (128 bit)",
       "status": "PASS",
-      "details": "4495ee208b1c86e48f35101338a0f795"
+      "details": "96070aa572bb1f5072e39277e6737d8c"
     },
     {
       "name": "Payload retensi ada",
@@ -325,27 +325,27 @@
     {
       "name": "Token stabil selama pepper sama (dedup DAU tidak pecah di tengah hari)",
       "status": "PASS",
-      "details": "e49601f3c0d45e5db07b5e07b4ba477c / e49601f3c0d45e5db07b5e07b4ba477c"
+      "details": "4075ca0ef415a847dcc09b6b9a8fcf96 / 4075ca0ef415a847dcc09b6b9a8fcf96"
     },
     {
       "name": "Token BERUBAH saat pepper berubah (hari-1 tidak bisa disambung ke hari-2)",
       "status": "PASS",
-      "details": "e49601f3c0d45e5db07b5e07b4ba477c -> b1631262916b19a900323abe2afcc15c"
+      "details": "4075ca0ef415a847dcc09b6b9a8fcf96 -> ef7f54d676ec0e71e4a35fb97f82c31b"
     },
     {
       "name": "installId tidak berubah antar hari (perbedaan token murni dari pepper)",
       "status": "PASS",
-      "details": "93701d27-6b54-43ec-b566-68f5613a3624"
+      "details": "cec9fa84-dbfb-4a2d-ab56-f67bb2c627cc"
     },
     {
       "name": "Token = HMAC-SHA256(pepper, installId) dipotong 128 bit",
       "status": "PASS",
-      "details": "b1631262916b19a900323abe2afcc15c vs b1631262916b19a900323abe2afcc15c"
+      "details": "ef7f54d676ec0e71e4a35fb97f82c31b vs ef7f54d676ec0e71e4a35fb97f82c31b"
     },
     {
       "name": "Token klien identik dengan `visitorToken()` sisi Worker",
       "status": "PASS",
-      "details": "b1631262916b19a900323abe2afcc15c vs b1631262916b19a900323abe2afcc15c"
+      "details": "ef7f54d676ec0e71e4a35fb97f82c31b vs ef7f54d676ec0e71e4a35fb97f82c31b"
     },
     {
       "name": "Pepper tidak tersedia => token null dan event DAU ditahan (bukan dikirim tanpa token)",
@@ -455,7 +455,7 @@
     {
       "name": "Notes ada dan mendaftarkan titik pemanggil",
       "status": "PASS",
-      "details": "/home/user/workspace/FIEZEL-APPS/reports/add-a2-analytics-client.md"
+      "details": "/home/user/workspace/fiezel-repo/reports/add-a2-analytics-client.md"
     }
   ]
 }

@@ -140,6 +140,10 @@ function boot(worker, options = {}) {
     FEATURE_AI: 'off',
     FEATURE_TTS: 'off',
     ANALYTICS_ENABLED: 'on',
+    // m0261-d17: gerbang edge kini fail-closed tanpa EDGE_SHARED_SECRET; harness
+    // ini menguji kontrak cron, bukan gerbang jembatan. Jitter anon dimatikan.
+    ALLOW_NO_EDGE_SECRET: 'true',
+    ANON_JITTER_MAX_MS: '0',
     SESSION_HMAC_KEY_CURRENT: 'uji-secret-cookie-current-0123456789',
     ANALYTICS_PEPPER_CURRENT: 'uji-pepper-analytics-0123456789',
     OWNER_TOKEN_HASH,

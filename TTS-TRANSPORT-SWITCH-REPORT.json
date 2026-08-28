@@ -107,7 +107,7 @@
     {
       "name": "(f) tanpa suara sama sekali: naskahnya JUJUR (bukan \"pakai suara perangkat\") dan tetap tidak mengunci",
       "status": "PASS",
-      "details": "{\"schema\":\"fiezel-cf-voice-notice-v1\",\"copyKey\":\"quota.tts.exhausted\",\"resolvedKey\":\"quota.tts.exhausted\",\"tone\":\"quota\",\"spoken\":false,\"layer\":\"\",\"title\":\"Jatah suara hari ini sudah habis\",\"body\":\"Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam. Jatah berikutnya mulai jam 03.54 WIB.\",\"reassurance\":\"Item ini tidak dinilai dan tidak dikunci.\",\"severity\":\"advisory\",\"locksItem\":false,\"countsReplay\":false}"
+      "details": "{\"schema\":\"fiezel-cf-voice-notice-v1\",\"copyKey\":\"quota.tts.exhausted\",\"resolvedKey\":\"quota.tts.exhausted\",\"tone\":\"quota\",\"spoken\":false,\"layer\":\"\",\"title\":\"Jatah suara hari ini sudah habis\",\"body\":\"Perangkat ini juga belum punya suara cadangan, jadi kalimat ini belum bisa dibunyikan. Teksnya tetap bisa kamu baca, dan jatahnya kembali setelah tengah malam. Jatah berikutnya mulai jam 07.43 WIB.\",\"reassurance\":\"Item ini tidak dinilai dan tidak dikunci.\",\"severity\":\"advisory\",\"locksItem\":false,\"countsReplay\":false}"
     },
     {
       "name": "(g) prefetch ikut memakai jalur CF saat flag on",

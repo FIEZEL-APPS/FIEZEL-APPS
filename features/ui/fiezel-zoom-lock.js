@@ -1,20 +1,20 @@
 /**
- * m025-42 zoom lock.
+ * m025-42 zoom lock — D16 (audit wave D, D5 T1): dilonggarkan menjadi double-tap lock.
  *
- * OWNER: the layout must stay at exactly one scale, whatever the fingers do.
+ * Versi lama menolak SEMUA gesture zoom (pinch WebKit via gesturestart/gesturechange/
+ * gestureend, touchmove multi-jari, ctrl+wheel, dan Cmd/Ctrl +/-/0). Itu melanggar
+ * WCAG 1.4.4 & 1.4.10: murid low-vision tidak bisa memperbesar teks sama sekali.
+ * Viewport meta kini mengizinkan zoom sampai 5x, dan modul ini TIDAK lagi memblok pinch,
+ * wheel, maupun keyboard zoom.
  *
- * `user-scalable=no` in the viewport tag is necessary but NOT sufficient: iOS Safari has
- * ignored it since iOS 10, which is precisely the platform this app ships on. So the
- * gestures are refused at the event level as well:
+ * Yang dipertahankan adalah tujuan asli yang sah: double-tap-zoom yang tidak disengaja
+ * saat mengetuk tombol jawaban cepat-cepat. Dua ketukan di dalam DOUBLE_TAP_MS pada titik
+ * yang sama tetap dibatalkan (cadangan untuk mesin yang mengabaikan
+ * touch-action:manipulation di style.css).
  *
- *   - `gesturestart` / `gesturechange` / `gestureend` are the WebKit pinch events.
- *   - a `touchmove` carrying more than one touch point is a pinch in progress.
- *   - two taps inside DOUBLE_TAP_MS at the same spot is the double-tap zoom.
- *   - ctrl + wheel is the desktop pinch-zoom that a trackpad emits.
- *
- * Every listener is passive:false, because a passive listener cannot preventDefault and
- * would leave the gesture running. Single-finger touches are never touched, or scrolling
- * and every button in the app would die with the zoom.
+ * Listener touchend memakai passive: false karena listener pasif tidak bisa
+ * preventDefault. Sentuhan satu jari selain double-tap tidak pernah disentuh, atau
+ * scrolling dan semua tombol ikut mati.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -70,32 +70,15 @@
     var guard = createGuard(target.Date && target.Date.now ? function () { return target.Date.now(); } : null);
     var stop = function (event) { if (event && typeof event.preventDefault === 'function') event.preventDefault(); };
 
-    ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (name) {
-      doc.addEventListener(name, stop, { passive: false });
-    });
-
-    doc.addEventListener('touchmove', function (event) {
-      if (guard.isPinch(event && event.touches && event.touches.length)) stop(event);
-    }, { passive: false });
-
-    doc.addEventListener('touchstart', function (event) {
-      if (guard.isPinch(event && event.touches && event.touches.length)) stop(event);
-    }, { passive: false });
-
+    // D16: pinch (gesturestart/gesturechange/gestureend + touchmove multi-jari),
+    // ctrl+wheel, dan Cmd/Ctrl +/-/0 TIDAK diblok lagi - pinch-zoom adalah hak murid
+    // (WCAG 1.4.4). Hanya double-tap-zoom yang masih dibatalkan. Sebuah touchend yang
+    // merupakan bagian pinch (masih ada jari lain menempel) dibiarkan lewat, dinilai
+    // lewat guard.isPinch pada event.touches yang tersisa.
     doc.addEventListener('touchend', function (event) {
+      if (guard.isPinch(event && event.touches && event.touches.length)) return;
       var touch = (event && event.changedTouches && event.changedTouches[0]) || null;
       if (guard.isDoubleTap(touch ? touch.clientX : 0, touch ? touch.clientY : 0)) stop(event);
-    }, { passive: false });
-
-    // Trackpad and ctrl+wheel zoom on desktop.
-    doc.addEventListener('wheel', function (event) {
-      if (event && event.ctrlKey) stop(event);
-    }, { passive: false });
-
-    // Cmd/Ctrl +, -, 0 keyboard zoom.
-    doc.addEventListener('keydown', function (event) {
-      if (!event || !(event.ctrlKey || event.metaKey)) return;
-      if (['+', '=', '-', '_', '0'].indexOf(String(event.key)) !== -1) stop(event);
     }, { passive: false });
 
     return true;

@@ -49,6 +49,32 @@ var FOCUS = {
 };
 
 /**
+ * Penjelasan Indonesia pasca-jawab, satu kalimat, deterministik.
+ *
+ * Runtime lama mengabaikan field tak dikenal, dan fiezel-speaking-listening-addon.js
+ * sudah menampilkan question.explain di kartu hasil - jadi field ini backward-compatible
+ * dan langsung terpakai. Templatnya mengutip jawaban benar dan merujuk isi audio supaya
+ * pelajar tahu KENAPA benar, bukan sekadar APA yang benar.
+ */
+var EXPLAIN = {
+  gist: function (character, answer) {
+    return 'Sepanjang audio, ' + character + ' terutama membicarakan hal ini — jadi jawaban yang benar: “' + answer + '”.';
+  },
+  detail: function (character, answer) {
+    return 'Detail ini disebutkan langsung di audio: “' + answer + '”.';
+  },
+  inference: function (character, answer) {
+    return 'Jawaban ini tidak diucapkan langsung, tetapi petunjuk dalam audio mengarah ke kesimpulan: “' + answer + '”.';
+  },
+  attitude: function (character, answer) {
+    return 'Pilihan kata dan nada ' + character + ' di audio menunjukkan: “' + answer + '”.';
+  },
+  paraphrase: function (character, answer) {
+    return 'Dalam audio, kalimat yang dikutip pada soal menyampaikan makna yang sama dengan “' + answer + '”.';
+  }
+};
+
+/**
  * Memutar array sebanyak n langkah.
  *
  * Dipakai menggantikan pengacakan supaya posisi jawaban benar berpindah-pindah tanpa
@@ -136,6 +162,7 @@ function buildLevel(level, source) {
         privacy: { rawLearnerResponseRequiredForPersistence: false },
         question: 'Ketik kalimat yang kamu dengar. Teks jawaban tidak disimpan setelah penilaian.',
         answerText: sentence,
+        explain: 'Kalimat yang diucapkan di audio persis: “' + sentence + '”.',
         scoring: { metric: 'token_f1' }
       });
     }
@@ -160,6 +187,7 @@ function buildLevel(level, source) {
         question: q.question,
         options: options,
         answerIndex: options.indexOf(q.answer),
+        explain: EXPLAIN[q.mode](scene.character, q.answer),
         scoring: { metric: 'exact_choice' }
       });
     });

@@ -33,27 +33,36 @@
  * menyentuh D1/KV — supaya biaya penolakan tetap nol tulis, nol baca.
  *
  * ==========================================================================
- * KEADAAN `off` — SAH HANYA SELAMA MASA TRANSISI
+ * SECRET BELUM TERPASANG = FAIL-CLOSED (audit D3 HIGH-3)
  * ==========================================================================
- * Kalau Secret `EDGE_SHARED_SECRET` TIDAK terpasang, gerbang ini TIDAK menolak
- * apa pun; ia hanya mencatat peringatan dan `/health` melaporkan
- * `edgeGuard:"off"`.
+ * Kalau Secret `EDGE_SHARED_SECRET` TIDAK terpasang, gerbang ini MENOLAK semua
+ * permintaan (403, bentuk galat identik dengan header-salah) kecuali
+ * `EDGE_FREE_PATHS` (`/healthz`). Default-nya AMAN: deploy yang lupa memasang
+ * secret menghasilkan API yang diam, bukan API yang terbuka lebar di
+ * `*.workers.dev`. Versi lama justru fail-open ("supaya deploy pertama tidak
+ * terlihat rusak") — audit D3 menilai itu HIGH: satu langkah deploy yang
+ * terlewat membuka penerbitan identitas tanpa batas, dan tidak ada yang
+ * menyadarinya karena semuanya "berfungsi".
  *
- * Itu keputusan sadar, dan batasnya harus dibaca sebagai batas keras:
- *   - `off` ada SEMATA supaya `wrangler deploy` yang dijalankan owner sebelum
- *     `wrangler secret put EDGE_SHARED_SECRET` tidak langsung mematikan seluruh
- *     API murid dengan 403 di setiap rute. Fail-closed pada deploy pertama akan
- *     membuat orang berikutnya mengira Worker-nya rusak, lalu ia akan mencabut
- *     gerbang ini — hasil akhirnya lebih tidak aman, bukan lebih aman.
- *   - `off` BUKAN mode produksi. Selama `off`, alamat `*.workers.dev` masih
- *     terbuka lebar dan kerentanan yang dijelaskan di atas MASIH ADA.
- *   - `off` HARUS berakhir di dua titik: (i) segera setelah secret dipasang, dan
- *     (ii) selamanya setelah nameserver `fiezel.my.id` pindah ke Cloudflare, saat
- *     custom domain menggantikan jembatan PHP dan `workers_dev = false`
- *     mematikan alamat (2). Sesudah titik (ii), MODE `off` TIDAK PUNYA ALASAN
- *     HIDUP LAGI dan berkas ini boleh menolak tanpa syarat.
+ * PENGECUALIAN EKSPLISIT — `ALLOW_NO_EDGE_SECRET = "true"` (var, bukan secret):
+ *   - Hanya nilai string persis 'true' yang membuka mode `off` lama: gerbang
+ *     meloloskan semua permintaan sambil mencatat peringatan, dan `/health`
+ *     melaporkan `edgeGuard:"off"`.
+ *   - Mode itu SAH HANYA SELAMA MASA TRANSISI (dev lokal, harness test, atau
+ *     jendela singkat sebelum `wrangler secret put EDGE_SHARED_SECRET`).
+ *     `off` BUKAN mode produksi: selama `off`, alamat `*.workers.dev` masih
+ *     terbuka dan kerentanan di atas MASIH ADA.
+ *   - Mode itu HARUS berakhir di dua titik: (i) segera setelah secret
+ *     dipasang, dan (ii) selamanya setelah nameserver `fiezel.my.id` pindah ke
+ *     Cloudflare, saat custom domain menggantikan jembatan PHP dan
+ *     `workers_dev = false` mematikan alamat `*.workers.dev`. Sesudah titik
+ *     (ii), var ini harus DIHAPUS dari konfigurasi, bukan disetel 'false'.
  * Jangan menormalkan `off`. Kalau `/health` masih menjawab `edgeGuard:"off"`
  * seminggu setelah deploy, itu temuan, bukan konfigurasi.
+ *
+ * Kenapa keduanya (fail-closed DAN penolakan header-salah) memakai bentuk galat
+ * yang SAMA: penyerang tidak boleh bisa membedakan "secret belum dipasang" dari
+ * "secret terpasang tapi headermu salah" — keduanya cuma `forbidden_edge`.
  *
  * ==========================================================================
  * JALUR BEBAS-HEADER: `/healthz` SAJA — `/health` TETAP DILINDUNGI
@@ -137,6 +146,20 @@ export function edgeGuardStatus(env) {
 }
 
 /**
+ * Pengecualian eksplisit fail-closed (lihat bab header). HANYA string persis
+ * 'true' (setelah trim) yang dihitung — angka, boolean JSON, atau 'TRUE'
+ * dengan kapital tidak, supaya nilai yang tersalin setengah jadi tidak diam-diam
+ * membuka gerbang.
+ */
+export function allowNoSecretOverride(env) {
+  const raw = env && env.ALLOW_NO_EDGE_SECRET;
+  const norm = typeof raw === 'string' ? raw.trim() : '';
+  // Perbandingan biasa di sini AMAN dan disengaja: 'true' bukan nilai rahasia
+  // (pemindaian anti-oracle butir (d) hanya melarang kesetaraan pada SECRET).
+  return norm === 'true';
+}
+
+/**
  * Peringatan `off` dicatat lewat jalur log Worker yang sudah dipakai
  * `index.js` (`console.warn`/`console.error` -> `wrangler tail` /
  * Workers Observability). Sekali per isolate, BUKAN sekali per permintaan:
@@ -148,15 +171,29 @@ let warnedThisIsolate = false;
 
 export function resetEdgeWarningForTests() {
   warnedThisIsolate = false;
+  warnedClosedThisIsolate = false;
 }
 
 function warnGuardOff() {
   if (warnedThisIsolate) return;
   warnedThisIsolate = true;
   console.warn(
-    'fiezel-api edgeGuard=off — EDGE_SHARED_SECRET belum dipasang. ' +
+    'fiezel-api edgeGuard=off — EDGE_SHARED_SECRET belum dipasang dan ALLOW_NO_EDGE_SECRET=true memaksa gerbang terbuka. ' +
     'Alamat *.workers.dev TERBUKA dan bisa dipakai menerbitkan identitas anonim tanpa lewat jembatan. ' +
-    'Jalankan: wrangler secret put EDGE_SHARED_SECRET. Keadaan ini hanya sah selama masa transisi.'
+    'Jalankan: wrangler secret put EDGE_SHARED_SECRET lalu hapus var ALLOW_NO_EDGE_SECRET. ' +
+    'Keadaan ini hanya sah selama masa transisi.'
+  );
+}
+
+let warnedClosedThisIsolate = false;
+
+function warnGuardClosed() {
+  if (warnedClosedThisIsolate) return;
+  warnedClosedThisIsolate = true;
+  console.error(
+    'fiezel-api edgeGuard=FAIL-CLOSED — EDGE_SHARED_SECRET belum dipasang, semua rute (kecuali /healthz) menjawab 403. ' +
+    'Ini default aman, bukan kerusakan. Jalankan: wrangler secret put EDGE_SHARED_SECRET. ' +
+    'Untuk dev/masa transisi SAJA, var ALLOW_NO_EDGE_SECRET="true" membuka mode lama yang tidak menolak apa pun.'
   );
 }
 
@@ -187,19 +224,33 @@ export const ERR_EDGE = 'forbidden_edge';
  * di plan gratis harus lebih murah daripada serangan yang memicunya.
  */
 export function edgeGuardMiddleware(ctx) {
+  // Jalur bebas-header dievaluasi lebih dulu supaya /healthz tetap hidup di
+  // SEMUA mode, termasuk fail-closed — monitor eksternal harus tetap bisa
+  // melihat "Worker hidup tapi tertutup" saat secret belum terpasang.
+  if (EDGE_FREE_PATHS.includes(ctx.pathname)) return null;
+
   const configured = edgeSecret(ctx.env);
   if (!configured) {
-    warnGuardOff();
-    return null;
+    if (allowNoSecretOverride(ctx.env)) {
+      warnGuardOff();
+      return null;
+    }
+    // FAIL-CLOSED (audit D3 HIGH-3): tanpa secret dan tanpa pengecualian
+    // eksplisit, semuanya ditolak dengan bentuk yang sama seperti header salah.
+    warnGuardClosed();
+    return rejectEdge(ctx);
   }
-  if (EDGE_FREE_PATHS.includes(ctx.pathname)) return null;
 
   const presented = ctx.request.headers.get(EDGE_HEADER);
   if (ctEq(presented, configured)) return null;
+  return rejectEdge(ctx);
+}
 
+function rejectEdge(ctx) {
   // Bentuk galat sopan + header CORS: klien yang salah alamat tetap harus bisa
   // membaca body-nya, kalau tidak browser menampilkan "network error" alih-alih
-  // pesan FIEZEL (aturan bab 12 yang sama seperti `mw-guard.js`).
+  // pesan FIEZEL (aturan bab 12 yang sama seperti `mw-guard.js`). SATU fungsi
+  // untuk fail-closed maupun header-salah = bentuk identik terjamin (anti-oracle).
   const headers = Object.assign({ vary: 'Origin' }, ctx.corsHeaders || {});
   return jsonError(403, ERR_EDGE, { message: 'Permintaan ini harus lewat alamat resmi FIEZEL.' }, { headers });
 }

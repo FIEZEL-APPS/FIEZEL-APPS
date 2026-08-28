@@ -155,7 +155,7 @@
     {
       "name": "e identitas uji berhasil diterbitkan (prasyarat pemindaian)",
       "status": "PASS",
-      "details": "{\"userId\":\"4410b9bb-383e-4a97-915e-3d4563f3962c\",\"plan\":\"free\",\"class\":\"visitor\",\"issued\":true,\"issuedAt\":\"2026-08-27T17:05:00.000Z\",\"expiresAt\":\"2027-02-23T17:"
+      "details": "{\"userId\":\"fd1fc39a-a787-4ad0-9bfa-9aa787073b60\",\"plan\":\"free\",\"class\":\"visitor\",\"issued\":true,\"issuedAt\":\"2026-08-27T17:05:00.000Z\",\"expiresAt\":\"2027-02-23T17:"
     },
     {
       "name": "e cron_run hanya punya tujuh kolom operasional",

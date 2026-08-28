@@ -1,11 +1,11 @@
 {
   "schema": "fiezel-edge-guard-report-v1",
-  "generatedAt": "2026-08-27T20:45:23.497Z",
+  "generatedAt": "2026-08-28T00:42:07.713Z",
   "pass": true,
   "counts": {
-    "pass": 119,
+    "pass": 131,
     "fail": 0,
-    "total": 119
+    "total": 131
   },
   "decision": {
     "healthProtected": true,
@@ -207,15 +207,59 @@
     },
     {
       "ok": true,
-      "message": "(e) secret berisi spasi saja dianggap tidak terpasang, bukan gerbang yang mustahil dilewati"
+      "message": "(e) ALLOW_NO_EDGE_SECRET=\"1\" TIDAK membuka gerbang (tetap 403), dapat 403"
     },
     {
       "ok": true,
-      "message": "(e) tanpa secret /health tetap 200, dapat 200"
+      "message": "(e) tanpa secret /health FAIL-CLOSED 403, dapat 403"
     },
     {
       "ok": true,
-      "message": "(e) /health melaporkan edgeGuard:\"off\""
+      "message": "(e) penolakan fail-closed bernama forbidden_edge"
+    },
+    {
+      "ok": true,
+      "message": "(e) tanpa secret POST /api/auth/anon ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed tidak pernah menerbitkan cookie identitas"
+    },
+    {
+      "ok": true,
+      "message": "(e) secret berisi spasi saja = tidak terpasang = FAIL-CLOSED 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed nol tulis D1, dapat 0"
+    },
+    {
+      "ok": true,
+      "message": "(e) /healthz tetap hidup saat fail-closed (monitor melihat \"hidup tapi tertutup\"), dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed tidak menyebut nama secret, nama var pengecualian, atau nama header"
+    },
+    {
+      "ok": true,
+      "message": "(e) fail-closed dicatat di log dengan instruksi memasang secret (bukan mati diam-diam)"
+    },
+    {
+      "ok": true,
+      "message": "(e) peringatan fail-closed tidak satu baris per permintaan, dapat 1"
+    },
+    {
+      "ok": true,
+      "message": "(e) bentuk galat fail-closed IDENTIK dengan penolakan header-salah (anti-oracle)"
+    },
+    {
+      "ok": true,
+      "message": "(e) mode transisi eksplisit: /health tetap 200, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(e) /health melaporkan edgeGuard:\"off\" di mode transisi"
     },
     {
       "ok": true,
@@ -223,11 +267,11 @@
     },
     {
       "ok": true,
-      "message": "(e) rute lain tetap jalan tanpa secret (tidak 403), dapat 200"
+      "message": "(e) rute lain tetap jalan di mode transisi (tidak 403), dapat 200"
     },
     {
       "ok": true,
-      "message": "(e) peringatan dicatat lewat jalur log Worker yang sudah ada"
+      "message": "(e) peringatan mode transisi dicatat lewat jalur log Worker yang sudah ada"
     },
     {
       "ok": true,
@@ -248,6 +292,10 @@
     {
       "ok": true,
       "message": "(e) mw-edge.js menyebut kapan `off` harus berakhir selamanya"
+    },
+    {
+      "ok": true,
+      "message": "(e) mw-edge.js mendokumentasikan default fail-closed DAN var pengecualiannya"
     },
     {
       "ok": true,

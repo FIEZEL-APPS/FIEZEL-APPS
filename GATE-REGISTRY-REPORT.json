@@ -1,15 +1,15 @@
 {
   "gate": "gate-registry",
-  "generatedAt": "2026-08-27T20:47:53.270Z",
+  "generatedAt": "2026-08-28T00:42:08.124Z",
   "status": "PASS",
   "source": "reports/add-a10-kepatuhan.md §5.1, §5.3",
   "workflow": ".github/workflows/quality.yml",
   "counts": {
-    "gateFilesInRepo": 149,
-    "nodeInvocationsInWorkflow": 153,
-    "evidenceGates": 151,
+    "gateFilesInRepo": 170,
+    "nodeInvocationsInWorkflow": 173,
+    "evidenceGates": 171,
     "liveGatesNotEvidence": 2,
-    "exclusions": 1,
+    "exclusions": 2,
     "pass": 10,
     "fail": 0
   },
@@ -30,6 +30,11 @@
       "file": "audit/bank-audit.js",
       "class": "alat-pelaporan",
       "reason": "BUKAN gerbang: ia penghasil laporan. Ia menyisir empat bank soal, menulis audit/BANK-SOAL-AUDIT.json, mencetak ringkasan temuan, lalu SELALU exit 0 — nol assert, nol process.exitCode. Temuan yang ia hasilkan hari ini pun tidak nol (mis. field \"rule\" yang masih Inggris), jadi mendaftarkannya di CI akan menambahkan satu langkah yang hijau selamanya tanpa memandang apa yang ia temukan — tepat jenis langkah yang membuat hitungan \"gerbang hijau\" berbohong. Sisi yang HARUS merah dari bank soal dijaga oleh bank-soal-audit-test.js (terdaftar) dan grammar-quality-audit.js (terdaftar). Cara menjalankan alat ini: `node audit/bank-audit.js` (lihat FIEZEL-M025125-SIDAK-BANK-SOAL-HANDOFF.md)."
+    },
+    {
+      "file": "adaptivity-simulation.js",
+      "class": "alat-pelaporan",
+      "reason": "BUKAN gerbang: simulasi adaptivity v1 (legacy) adalah penghasil narasi/laporan yang mencetak analisis panjang ke konsol dan SELALU exit 0 — nol assert, nol process.exit, nol process.exitCode di seluruh berkasnya. Mendaftarkannya di CI menambah satu langkah hijau abadi. Ia sudah digantikan oleh adaptivity-simulation-v3.js, yang MEMANG gerbang (exit code dari main(), gate residual + gate kalibrasi yang bisa merah) dan karena itu WAJIB terdaftar di quality.yml, bukan dikecualikan. Cara menjalankan alat v1 secara manual: `node adaptivity-simulation.js`."
     }
   ],
   "checks": [
@@ -41,12 +46,12 @@
     {
       "id": "setiap-gerbang-terdaftar-atau-dikecualikan",
       "status": "PASS",
-      "details": "149 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
+      "details": "170 berkas uji, semuanya terdaftar di .github/workflows/quality.yml atau punya entri pengecualian beralasan"
     },
     {
       "id": "setiap-pengecualian-beralasan",
       "status": "PASS",
-      "details": "1 pengecualian, semuanya berkelas dan beralasan"
+      "details": "2 pengecualian, semuanya berkelas dan beralasan"
     },
     {
       "id": "nol-pengecualian-basi",
@@ -56,7 +61,7 @@
     {
       "id": "nol-gerbang-hantu",
       "status": "PASS",
-      "details": "153 invokasi node, semua berkasnya ada"
+      "details": "173 invokasi node, semua berkasnya ada"
     },
     {
       "id": "gerbang-live-terdaftar",
@@ -71,7 +76,7 @@
     {
       "id": "hitungan-bukti-tidak-memuat-gerbang-live",
       "status": "PASS",
-      "details": "evidenceGates=151, liveGatesNotEvidence=2 (total invokasi 153) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 151, BUKAN 153"
+      "details": "evidenceGates=171, liveGatesNotEvidence=2 (total invokasi 173) — angka gerbang hijau yang boleh dikutip sebagai bukti adalah 171, BUKAN 173"
     },
     {
       "id": "gerbang-live-merah-bila-env-diisi-tapi-rusak",

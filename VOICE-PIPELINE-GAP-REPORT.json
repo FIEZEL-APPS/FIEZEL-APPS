@@ -1,12 +1,12 @@
 {
   "schema": "fiezel-voice-pipeline-gap-v1",
-  "generatedAt": "2026-08-27T19:38:22.117Z",
+  "generatedAt": "2026-08-28T00:43:48.488Z",
   "generateLatencyMs": 120,
   "chunkCount": 4,
   "audioContexts": 1,
   "endedEvents": 0,
   "gapsBeforeSeconds": [
-    0.126,
+    0.127,
     0.126,
     0.126
   ],
@@ -16,7 +16,7 @@
     0.45
   ],
   "unintendedSilenceBeforeSeconds": [
-    0.286,
+    0.287,
     0.286,
     0.286
   ],
@@ -25,15 +25,15 @@
     0,
     0
   ],
-  "averageUnintendedSilenceBeforeSeconds": 0.286,
+  "averageUnintendedSilenceBeforeSeconds": 0.286333,
   "averageUnintendedSilenceAfterSeconds": 0,
   "productionPattern": {
     "awaitingCallerGapsSeconds": [
       0.125,
-      0.126,
-      0.127
+      0.125,
+      0.124
     ],
-    "awaitingCallerAverageSeconds": 0.126,
+    "awaitingCallerAverageSeconds": 0.124667,
     "prefetchingCallerGapsSeconds": [
       0.22,
       0.09,
@@ -49,10 +49,10 @@
     0.09,
     0.45
   ],
-  "averageGapBeforeSeconds": 0.126,
+  "averageGapBeforeSeconds": 0.126333,
   "averageGapAfterSeconds": 0.253333,
   "pipelineStats": {
-    "cursor": 3.566,
+    "cursor": 3.5669999999999997,
     "generation": 0,
     "scheduledCount": 5,
     "underruns": 0,
@@ -70,7 +70,7 @@
     {
       "name": "(a) generate potongan N+1 dimulai sebelum potongan N selesai digenerasi/berbunyi",
       "status": "PASS",
-      "details": "genStart={\"0\":1787859490119,\"1\":1787859490119,\"2\":1787859490249,\"3\":1787859490254} genEnd={\"0\":1787859490240,\"1\":1787859490249,\"2\":1787859490370,\"3\":1787859490374}"
+      "details": "genStart={\"0\":1787877816497,\"1\":1787877816497,\"2\":1787877816626,\"3\":1787877816631} genEnd={\"0\":1787877816618,\"1\":1787877816626,\"2\":1787877816746,\"3\":1787877816752}"
     },
     {
       "name": "(a2) pipa mengisi diri lebih dulu: generate potongan kedua mulai sebelum potongan pertama dijadwalkan",
@@ -90,7 +90,7 @@
     {
       "name": "(b2) setiap potongan dijadwalkan dengan start(when) pada waktu masa depan yang naik",
       "status": "PASS",
-      "details": "[0.16,0.704,1.118,1.892]"
+      "details": "[0.159,0.703,1.117,1.891]"
     },
     {
       "name": "(b3) celah antar potongan TEPAT sebesar jeda prosodi, tanpa sisa waktu generate",
@@ -100,7 +100,7 @@
     {
       "name": "(b4) tidak ada satu pun underrun pada latensi generate tetap 120 ms",
       "status": "PASS",
-      "details": "{\"cursor\":2.216,\"generation\":0,\"scheduledCount\":4,\"underruns\":0,\"lookahead\":2,\"maxQueued\":3,\"gaps\":{\"none\":0,\"clause\":0.09,\"sentence\":0.22,\"paragraph\":0.45},\"pending\":0}"
+      "details": "{\"cursor\":2.215,\"generation\":0,\"scheduledCount\":4,\"underruns\":0,\"lookahead\":2,\"maxQueued\":3,\"gaps\":{\"none\":0,\"clause\":0.09,\"sentence\":0.22,\"paragraph\":0.45},\"pending\":0}"
     },
     {
       "name": "(b5) sumber jalur pipa memakai start(startAt) dan tidak memasang onended",
@@ -210,7 +210,7 @@
     {
       "name": "(h2) antrean MENYAMBUNG lintas panggilan play(): potongan berikutnya masuk garis waktu yang sama",
       "status": "PASS",
-      "details": "[{\"i\":0,\"joined\":false,\"startsAt\":0.125,\"endsAt\":0.449},{\"i\":1,\"joined\":true,\"startsAt\":0.669,\"endsAt\":0.993},{\"i\":2,\"joined\":true,\"startsAt\":1.083,\"endsAt\":1.407},{\"i\":3,\"joined\":true,\"startsAt\":1.857,\"endsAt\":2.181}]"
+      "details": "[{\"i\":0,\"joined\":false,\"startsAt\":0.126,\"endsAt\":0.45},{\"i\":1,\"joined\":true,\"startsAt\":0.67,\"endsAt\":0.994},{\"i\":2,\"joined\":true,\"startsAt\":1.084,\"endsAt\":1.408},{\"i\":3,\"joined\":true,\"startsAt\":1.858,\"endsAt\":2.182}]"
     },
     {
       "name": "(h3) mesin gapless AKTIF pada pola produksi: menyambung meski pemanggil mengirim continuous:false",
@@ -240,7 +240,7 @@
     {
       "name": "(g) pengukuran: keheningan tak sengaja hilang sepenuhnya di jalur berpipa",
       "status": "PASS",
-      "details": "sebelumTakSengaja=0.286s sesudahTakSengaja=0s"
+      "details": "sebelumTakSengaja=0.286333s sesudahTakSengaja=0s"
     },
     {
       "name": "(g2) pengukuran: jeda yang tersisa persis jeda prosodi yang disengaja",

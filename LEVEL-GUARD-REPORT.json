@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-level-guard-report-v1",
-  "generatedAt": "2026-08-27T19:31:21.069Z",
+  "generatedAt": "2026-08-28T00:42:58.185Z",
   "status": "PASS",
   "contract": {
     "wrongLimit": 10,
@@ -72,7 +72,7 @@
     {
       "name": "L3 · lulus Ujian Skip Level menaikkan verified, membuka kunci, dan menaikkan level aktif",
       "status": "PASS",
-      "details": "verified=B1 aktif=B1 terkunci=false ujian={\"attempts\":1,\"passed\":true,\"lastAt\":1787859081055,\"lastScore\":21,\"lastTotal\":25,\"lastAccuracy\":84,\"cooldownUntil\":0,\"weakSkill\":\"\"}"
+      "details": "verified=B1 aktif=B1 terkunci=false ujian={\"attempts\":1,\"passed\":true,\"lastAt\":1787877778173,\"lastScore\":21,\"lastTotal\":25,\"lastAccuracy\":84,\"cooldownUntil\":0,\"weakSkill\":\"\"}"
     },
     {
       "name": "L3b · setelah lulus B1, level di atas verified tetap belum otomatis terbuka sebagai terverifikasi",

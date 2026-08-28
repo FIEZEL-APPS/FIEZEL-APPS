@@ -6,7 +6,7 @@
     "pass": 38,
     "fail": 0
   },
-  "scanned": 15,
+  "scanned": 16,
   "ungated": [],
   "workflows": [
     {
@@ -263,6 +263,22 @@
       "decision": "tidak terjaring — tidak butuh gate"
     },
     {
+      "file": "nightwatch.yml",
+      "usesSecrets": false,
+      "secretNames": [],
+      "looksLikeDeploy": false,
+      "needsGate": false,
+      "hasGate": false,
+      "gateLogins": [],
+      "gateLines": [],
+      "jobs": [
+        "nightwatch"
+      ],
+      "jobCount": 1,
+      "allowlisted": false,
+      "decision": "tidak terjaring — tidak butuh gate"
+    },
+    {
       "file": "push-reminders.yml",
       "usesSecrets": true,
       "secretNames": [
@@ -311,7 +327,7 @@
     {
       "name": "ada workflow untuk dipindai",
       "status": "PASS",
-      "details": "15 berkas .yml"
+      "details": "16 berkas .yml"
     },
     {
       "name": "A a6-a7-verifiers.yml punya penjaga aktor atau ada di allowlist",

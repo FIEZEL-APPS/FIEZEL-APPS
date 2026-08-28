@@ -2,7 +2,7 @@
   "schema": "fiezel-cf-wiring-v1",
   "pass": true,
   "counts": {
-    "pass": 101,
+    "pass": 100,
     "fail": 0
   },
   "aiStatuses": [
@@ -245,7 +245,7 @@
     {
       "name": "A rute TERPASANG dan menjawab (bukan 404): GET /api/usage/pepper",
       "status": "PASS",
-      "details": "200 {\"ok\":true,\"day\":\"2026-08-27\",\"pepper\":\"ee637b276c4afc6773ee77fdd71ca2bbaba5912ba11137c1a0467ff3f744955f\",\"rotatesAtMs\":"
+      "details": "200 {\"ok\":true,\"day\":\"2026-08-28\",\"pepper\":\"be7b6c3633854259a3bc8344774774a63c3ce2664b3dfd1cb5d296db912e227f\",\"rotatesAtMs\":"
     },
     {
       "name": "A rute kuota menjawab 200 dengan amplop fiezel-quota-v1",
@@ -335,7 +335,7 @@
     {
       "name": "B penolakan tercatat di kolom denied atau tidak menaikkan used",
       "status": "PASS",
-      "details": "{\"user_id\":\"02ae27c6-9879-4f0b-a7f4-95c754fc8efa\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
+      "details": "{\"user_id\":\"5bddce4b-9437-4d59-9ba9-42c9bf5b7df6\",\"day\":\"2026-08-27\",\"ai_used\":25,\"ai_held\":0,\"ai_translate_used\":0,\"ai_translate_held\":0,\"tts_calls_used\":0,\"tts_calls_held\":0,\"tts_chars_used\":0,\"tts_chars_held\":0,\"seq\":0,\"committed\":25,\"denied\":0,\"rolled_back\":0,\"reaped\":0,\"touched_at\":1787799600000}"
     },
     {
       "name": "C render pertama (cache MISS) berhasil",
@@ -460,7 +460,7 @@
     {
       "name": "E dua identitas uji berbeda",
       "status": "PASS",
-      "details": "ce9f3a22-e385-448d-bcc6-2894136b88b3 vs a20dc1a8-fde4-48c2-9d8e-01603c2241c2"
+      "details": "58cbcce0-dbe7-473b-bc00-27772483fc4c vs 01cbfbb8-34e7-4d9e-91e0-19b1de538e80"
     },
     {
       "name": "E kuota Alice mencerminkan pemakaiannya sendiri (5 AI)",
@@ -541,11 +541,6 @@
       "name": "F MIGRATIONS.md menerangkan penerapan per-database (bukan migrations apply)",
       "status": "PASS",
       "details": "MIGRATIONS.md"
-    },
-    {
-      "name": "F kontrak privasi di EXEC-BRIEF-CF.md masih menyebut larangan menghubungkan analytics ke identitas",
-      "status": "PASS",
-      "details": "EXEC-BRIEF-CF.md terbaca"
     },
     {
       "name": "quality.yml memanggil node cf-wiring-test.js",

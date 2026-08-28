@@ -172,6 +172,11 @@ function boot(worker, options = {}) {
     FEATURE_TTS: 'on',
     FEATURE_COACH: 'off',
     ANALYTICS_ENABLED: 'on',
+    // m0261-d17: gerbang edge kini fail-closed tanpa EDGE_SHARED_SECRET; harness
+    // ini menguji wiring rute, bukan gerbang jembatan, jadi mode transisi dibuka.
+    // Jitter anon dimatikan demi determinisme waktu.
+    ALLOW_NO_EDGE_SECRET: 'true',
+    ANON_JITTER_MAX_MS: '0',
     AI_LIMIT_PER_DAY: '25',
     AI_LIMIT_PER_HOUR: '40',
     TTS_CHARS_PER_DAY: '12000',

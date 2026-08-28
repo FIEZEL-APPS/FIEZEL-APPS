@@ -1,6 +1,6 @@
 {
   "schema": "fiezel-puter-popup-once-v1",
-  "generatedAt": "2026-08-27T19:31:44.454Z",
+  "generatedAt": "2026-08-28T00:43:22.333Z",
   "pass": true,
   "periodMs": 86400000,
   "storageKey": "fiezel-puter-popup-last",
@@ -132,9 +132,9 @@
       "details": "renderComplete()/exit() adalah dua satu-satunya cara sesi berakhir"
     },
     {
-      "name": "Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK",
+      "name": "Pemberitahuan memakai copy FIEZEL sendiri, bukan dialog SDK, dan tanpa permukaan bayar",
       "status": "PASS",
-      "details": "FIEZEL tetap jalan penuh tanpa upgrade - naskahnya harus mengatakan itu"
+      "details": "FIEZEL tetap jalan penuh tanpa bayar - naskahnya mengatakan itu, dan tautan berbayarnya hilang"
     }
   ]
 }
