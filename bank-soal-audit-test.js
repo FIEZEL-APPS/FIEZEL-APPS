@@ -11,6 +11,15 @@ const path = require('path');
 
 const ROOT = __dirname;
 const app = fs.readFileSync(path.join(ROOT, 'app.js'), 'utf8');
+// Pasca-i18n (PR #242): naskah Indonesia pindah dari literal app.js ke peta copy-id.
+// Mengikuti preseden 4448d14: kontrak dinilai utuh app.js + copy-map, bukan ejaan literal
+// di satu berkas. copyId = gabungan seluruh peta copy-id; copyPair = kamus key->naskah.
+const copyId = fs.readdirSync(path.join(ROOT, 'features', 'i18n'))
+  .filter(f => /^copy-id-.*\.js$/.test(f))
+  .map(f => fs.readFileSync(path.join(ROOT, 'features', 'i18n', f), 'utf8')).join('\n');
+const copyPair = {};
+for (const m of copyId.matchAll(/'([a-z0-9.-]+)'\s*:\s*'((?:[^'\\]|\\.)*)'/g)) copyPair[m[1]] = m[2];
+const sumber = app + '\n' + copyId; // untuk cek literal yang boleh hidup di salah satunya
 const V = JSON.parse(fs.readFileSync(path.join(ROOT, 'vocabulary-master.json'), 'utf8'));
 
 let failed = 0;
@@ -24,7 +33,8 @@ console.log('bank-soal-audit-test');
 
 // --- 1. generator soal jenis kata wajib memakai kalimat contoh -------------
 check('soal jenis kata memakai kalimat contoh sebagai konteks',
-  /Dalam kalimat “\$\{v\.example\}”, kata “\$\{surface\}”\$\{asal\} berperan sebagai jenis kata apa\?/.test(app),
+  app.includes('quiz-vocab.dalam-kalimat-kata-berperan-sebagai')
+    && /Dalam kalimat “\{sample\}”, kata “\{bentuk\}”\{asal\} berperan sebagai jenis kata apa\?/.test(String(copyPair['quiz-vocab.dalam-kalimat-kata-berperan-sebagai'] || '')),
   'stem tanpa konteks membuat kata bermakna ganda tidak bisa dijawab');
 
 check('stem lama tanpa konteks sudah tidak ada',
@@ -40,8 +50,12 @@ const block = app.match(/const PART_OF_SPEECH_ID=\{([^}]*)\}/);
 check('PART_OF_SPEECH_ID terdefinisi', !!block);
 if (block) {
   for (const pair of block[1].split(',')) {
-    const m = pair.match(/^\s*([a-z]+)\s*:\s*'([^']+)'\s*$/);
-    if (m) map[m[1]] = m[2];
+    // Bentuk lama: noun:'kata benda'. Bentuk i18n: noun:FiezelI18n.t('vocab.jenis-kata-noun')
+    // — label diambil dari peta copy-id, kontraknya tetap: tiap PoS berlabel Indonesia.
+    const lit = pair.match(/^\s*([a-z]+)\s*:\s*'([^']+)'\s*$/);
+    if (lit) { map[lit[1]] = lit[2]; continue; }
+    const t = pair.match(/^\s*([a-z]+)\s*:\s*FiezelI18n\.t\('([a-z0-9.-]+)'\)\s*$/);
+    if (t && copyPair[t[2]]) map[t[1]] = copyPair[t[2]];
   }
 }
 const missing = [...new Set(V.map(v => String(v.partOfSpeech || '').toLowerCase()))].filter(p => p && !map[p]);
@@ -106,9 +120,9 @@ check('grammar-labels-id.js ikut di-precache service worker',
 
 // --- 5. cadangan alasan jawaban tidak boleh Bahasa Inggris -----------------
 check('cadangan alasan jawaban benar sudah Bahasa Indonesia',
-  !/Correct: \$\{String\(t\.explanation/.test(app) && /Bentuk ini cocok dengan aturan grammar/.test(app));
+  !/Correct: \$\{String\(t\.explanation/.test(sumber) && /Bentuk ini cocok dengan aturan grammar/.test(sumber));
 check('cadangan alasan distraktor sudah Bahasa Indonesia',
-  !/does not satisfy the grammar rule tested here/.test(app) && /belum memenuhi aturan grammar yang sedang diuji/.test(app));
+  !/does not satisfy the grammar rule tested here/.test(sumber) && /belum memenuhi aturan grammar yang sedang diuji/.test(sumber));
 check('penjelasan grammar mengutamakan field Bahasa Indonesia',
   /explanation\.ruleId/.test(app) && /explanation\.whyCorrectId/.test(app) && /explanation\.memoryCueId/.test(app),
   'grammarMeta harus membaca varian "...Id" lebih dulu');
