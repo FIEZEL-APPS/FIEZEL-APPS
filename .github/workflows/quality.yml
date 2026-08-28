@@ -124,6 +124,14 @@ jobs:
           # Diletakkan tepat sesudah gerbang server-only supaya kedua sisi kontrak yang sama
           # gagal bersebelahan di UI Actions, bukan terpisah 60 baris.
           node analytics-client-test.js
+          # T-031: gerbang NAMA GLOBAL. Ia memindai SUMBER seluruh repo (bukan daftar tangan)
+          # dan menuntut satu pemilik per nama global: `FiezelAnalytics` hanya boleh ditugaskan
+          # modul analytics, `FiezelABAnalytics` hanya oleh modul A/B. Cacat yang melahirkannya:
+          # modul A/B merebut `window.FiezelAnalytics` lewat <script defer>, jadi pemuat analytics
+          # di idle menerima objek asing dan modul asli tidak pernah diunduh — analytics murid
+          # mati total tanpa satu pun galat konsol. Diletakkan bersebelahan dengan gerbang klien
+          # analytics supaya kedua sisi cacat yang sama gagal berdampingan.
+          node global-name-collision-test.js
           node a11y-test.js
           node contrast-test.js
           node pastel-field-contrast-test.js

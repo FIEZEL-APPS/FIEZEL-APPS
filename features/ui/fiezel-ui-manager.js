@@ -49,9 +49,15 @@ class FiezelUIManager {
     this.logABEvent(payload);
   }
 
+  /* T-031: event eksperimen UI pergi ke pipa A/B (`window.FiezelABAnalytics`), BUKAN ke
+   * `window.FiezelAnalytics` — nama itu milik modul analytics privasi-maksimal, yang
+   * allowlist field-nya tidak mengizinkan muatan eksperimen dan yang kontraknya tidak
+   * boleh menerima teks bebas dari UI. Bentuknya diperiksa sebelum dipakai supaya nama
+   * yang terisi objek asing tidak menjadi TypeError di jalur murid. */
   logABEvent(payload) {
-    if (window.FiezelAnalytics) {
-      window.FiezelAnalytics.track(payload);
+    const ab = window.FiezelABAnalytics;
+    if (ab && typeof ab.track === 'function') {
+      ab.track(payload);
     } else {
       console.debug('[AB Test Event]', payload);
     }
