@@ -206,7 +206,7 @@ const results = {};
    * ================================================================================= */
   const shadow = makeHarness({ enabled: true, base: CF_BASE_SYNTHETIC, endpoints: { ...ALL_ON, usage: 'shadow' } });
   const shadowOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"outcome":1}' };
-  const shadowAnswer = await shadow.api.coreWorkerExec('/api/policy/outcome', shadowOptions);
+  const shadowAnswer = await shadow.api.coreWorkerExec('/api/usage/event', shadowOptions);
   await tick();
 
   check('(b) mode shadow: jawaban yang dikembalikan adalah objek respons PUTER, bukan CF',
@@ -214,10 +214,10 @@ const results = {};
   check('(b) mode shadow: body respons CF tidak pernah dibaca (hasilnya benar-benar dibuang)',
     shadow.log.bodyReads.filter(x => x.startsWith('cf.')).length === 0, shadow.log.bodyReads.join(',') || '0');
   check('(b) mode shadow: salinan permintaan memang terkirim ke CF (bayangan bukan omong kosong)',
-    shadow.log.cfCalls.length === 1 && shadow.log.cfCalls[0].url === `${CF_BASE_SYNTHETIC}/api/policy/outcome`,
+    shadow.log.cfCalls.length === 1 && shadow.log.cfCalls[0].url === `${CF_BASE_SYNTHETIC}/api/usage/event`,
     shadow.log.cfCalls.map(f => f.url).join(', ') || '0');
   check('(b) mode shadow: perbandingan hanya dicatat ke konsol diagnostik',
-    shadow.log.debug.some(line => line.includes('[cf-shadow]') && line.includes('/api/policy/outcome')),
+    shadow.log.debug.some(line => line.includes('[cf-shadow]') && line.includes('/api/usage/event')),
     shadow.log.debug.join(' | ') || '(kosong)');
 
   /* ===================================================================================
