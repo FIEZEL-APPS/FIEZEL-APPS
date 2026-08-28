@@ -249,9 +249,16 @@ crons = ["*/5 * * * *", "5 17 * * *"]
 # ditulis di [vars] berkas ini; kalau dibutuhkan, pasang sadar-sadar dan hapus
 # lagi. Lihat `workers/api/mw-edge.js` dan `deploy/edge/README.md`.
 #
-# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17, audit D3 HIGH-2 —
-# lihat `workers/api/rate-anon.js`; default dipakai bila tidak disetel):
-#   ANON_ISSUE_LIMIT_PER_HOUR        = "5"   # per IP, saat gerbang edge off/dev
-#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR = "30"  # TOTAL/jam di belakang jembatan (satu IP bersama)
-#   ANON_JITTER_MAX_MS               = "150" # jitter respons /api/auth/anon; "0" mematikan
+# VAR OPSIONAL pembatas penerbitan identitas (m0261-d17 audit D3 HIGH-2, direvisi
+# paket S1 28 Agu 2026 — lihat `workers/api/rate-anon.js`; default dipakai bila
+# tidak disetel). Cabang tarif dipilih dari `ctx.edgePath` (jalur yang BENAR-BENAR
+# dipakai permintaan), bukan dari ada/tidaknya `EDGE_SHARED_SECRET`:
+#   ANON_ISSUE_LIMIT_PER_HOUR          = "15"  # per IP, JENDELA BERGULIR 1 jam (jalur langsung)
+#   ANON_ISSUE_LIMIT_BRIDGE_PER_HOUR   = "30"  # TOTAL/jam, HANYA saat edgePath="header" (proxy PHP: satu IP bersama)
+#   ANON_ISSUE_LIMIT_DEGRADED_PER_HOUR = "5"   # saat D1 tak terbaca; otomatis dijepit <= batas normal
+#   ANON_JITTER_MAX_MS                 = "150" # jitter respons /api/auth/anon; "0" mematikan
+# Satu kelas (30-40 murid) yang onboarding serentak di SATU wifi sekolah akan kena
+# 429 mulai murid ke-16. Untuk sesi kelas terjadwal, setel sementara
+# ANON_ISSUE_LIMIT_PER_HOUR = "60" lalu hapus lagi; penutup permanennya Turnstile
+# atau WAF rate-rule per ASN (lihat reports/work-s1-auth-anon.md).
 # ============================================================================

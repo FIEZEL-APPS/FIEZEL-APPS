@@ -145,9 +145,17 @@ function fakeD1() {
     // m0261-d17: penghitung penerbitan identitas (audit D3 HIGH-2) memakai tabel
     // D1 `anon_issue` dari migrasi 0001 — BUKAN KV, supaya invarian "penerbitan
     // nol tulis KV" (§3 di bawah) tetap berlaku apa adanya.
+    // S1 (28 Agu 2026): jendelanya BERGULIR — satu SELECT membaca 6 ember 10 menit
+    // (`ANON_SQL.windowRead`: 6 kunci hari + 1 ip_hmac), jadi fixture ini menjumlahkan
+    // ember yang ada alih-alih membaca satu baris.
     [/^SELECT issued FROM anon_issue WHERE day/i, (b) => {
-      const stored = anonIssue.get(b[0] + '\u0000' + b[1]);
-      return { rows: stored === undefined ? [] : [{ issued: stored }] };
+      const ip = b[b.length - 1];
+      const rows = [];
+      for (let i = 0; i < b.length - 1; i += 1) {
+        const stored = anonIssue.get(b[i] + '\u0000' + ip);
+        if (stored !== undefined) rows.push({ issued: stored });
+      }
+      return { rows };
     }],
     [/^INSERT INTO anon_issue/i, (b) => {
       const key = b[0] + '\u0000' + b[1];
