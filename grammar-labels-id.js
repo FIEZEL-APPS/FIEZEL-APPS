@@ -195,8 +195,34 @@
     perfect_passive_infinitive_anteriority_reported_events: 'Pasif yang lebih dulu terjadi: to have been + past participle',
     mandative_subjunctive_after_demand_insist: 'Subjunctive bentuk dasar: demand that he resign',
     sentential_which_whole_clause_antecedent: 'Komentar untuk satu klausa utuh: koma + which',
-    generic_the_species_class_predicates: 'The generik untuk spesies: the Sumatran tiger'
-  };
+    generic_the_species_class_predicates: 'The generik untuk spesies: the Sumatran tiger',
+  'comparative_formation_er_vs_more_no_double_marking': 'Membentuk komparatif: -er atau more, tanpa penanda ganda',
+  'adverb_of_manner_ly_vs_adjective_after_verb': 'Kata sifat atau adverbia -ly?',
+  'how_much_vs_how_many_quantity_questions': 'How much atau how many?',
+  'indefinite_compounds_something_anything_nothing': 'Something, anything, atau nothing?',
+  'cause_result_connectors_because_vs_so': 'Because atau so: sebab atau akibat?',
+  'present_perfect_just_already_yet_placement': 'Just, already, yet: penempatan yang tepat',
+  'reflexive_pronouns_myself_vs_each_other': 'Myself atau each other?',
+  'substitution_one_ones_avoid_repetition': 'One dan ones untuk menghindari pengulangan kata',
+  'wish_would_annoyance_at_others_behaviour': 'Wish + would: keluhan kebiasaan orang lain',
+  'be_get_used_to_gerund_vs_used_to_infinitive': 'Be/get used to + -ing vs used to + kata dasar',
+  'would_rather_bare_infinitive_vs_prefer_to': 'Would rather + kata dasar vs prefer to',
+  'be_supposed_to_expectation_vs_obligation': 'Be supposed to: ekspektasi dan jadwal yang bisa meleset',
+  'its_high_time_past_simple_unreal': 'It\'s high time + past simple: desakan buat sekarang',
+  'as_if_as_though_unreal_past_form': 'As if / as though + past: perbandingan tak nyata',
+  'neednt_have_vs_didnt_need_to': 'Needn\'t have vs didn\'t need to: perlu-tidaknya di masa lampau',
+  'no_sooner_hardly_inversion_paired_correlatives': 'No sooner ... than / hardly ... when: inversi berpasangan',
+  'concessive_whatever_however_no_matter': 'However + adjektiva, whatever, no matter: klausa konsesif',
+  'verb_phrase_ellipsis_after_auxiliary': 'Elipsis frasa kerja: kata bantu yang menggantikan',
+  'but_for_noun_phrase_unreal_condition': 'But for: pengandaian padat dalam satu frasa',
+  'semi_modal_dare_bare_infinitive_negative': 'Daren\'t: semi-modal untuk \'tidak berani\'',
+  'possessive_subject_of_gerund_formal': 'His resigning: posesif di depan gerund',
+  'marginal_prepositions_notwithstanding_pending_barring': 'Barring: preposisi formal untuk pengecualian',
+  'all_the_more_intensified_comparative_with_cause': 'All the more: makin terasa karena ada alasannya',
+  'negated_participle_clause_not_wishing_to': 'Not wanting: negasi di depan klausa -ing',
+  'albeit_reduced_concession_phrase': 'Albeit: konsesi ringkas tanpa klausa',
+  'who_whom_hypercorrection_embedded_subject': 'Who vs whom: whom yang kelihatan formal tapi salah',
+};
 
   root.GRAMMAR_SKILL_TITLES_ID = GRAMMAR_SKILL_TITLES_ID;
   if (typeof module !== 'undefined' && module.exports) module.exports = { GRAMMAR_SKILL_TITLES_ID: GRAMMAR_SKILL_TITLES_ID };

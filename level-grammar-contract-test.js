@@ -285,7 +285,10 @@ if (setterBlocks.length) {
       save: () => { saves++; },
       closeModal: () => {},
       render: () => {},
-      showToast: () => {}
+      showToast: () => {},
+      // Hotfix i18n pasca-#242 (pola bac8b8d): setter kini memanggil FiezelI18n.t untuk
+      // naskah toast — stub resolver cukup, fixture menguji transisi level, bukan copy.
+      FiezelI18n: { t: (k, v) => String(k) }
     };
     const setter = vm.runInNewContext(`(${setterBlocks[0]})`, sandbox, { timeout: 1000 });
     const result = setter('B1');

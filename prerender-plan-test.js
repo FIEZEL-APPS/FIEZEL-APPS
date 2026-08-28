@@ -9,8 +9,8 @@
 //      604.962 (cf-c1 §K1). Selisih 13.064 karakter itu kecil di layar dan bukan apa-apa dalam
 //      dolar (US$0,20), tetapi ia menular: setiap laporan yang mengutipnya menjadi salah, dan
 //      keputusan "bayar sekali" ditandatangani di atas anggaran yang bukan anggarannya. Sesudah
-//      dedup kunci v2, yang benar-benar akan dibayar pada jalan pertama adalah 5.657 objek unik
-//      / 286.851 karakter — juga dipaku di sini, karena itulah bilangan yang muncul di tagihan.
+//      dedup kunci v2, yang benar-benar akan dibayar pada jalan pertama adalah 5.857 objek unik
+//      / 295.860 karakter — juga dipaku di sini, karena itulah bilangan yang muncul di tagihan.
 //
 //   2. SATU HARGA DIPAKAI UNTUK DUA MODEL. aura-1 US$0,015 per 1.000 karakter, aura-2-en
 //      US$0,030 — persis dua kali. Skrip yang menghitung anggaran dengan tarif bawaan sementara
@@ -64,22 +64,22 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   const census = mod.censusCorpus({ content: 'all' });
   const plan = mod.buildPlan({ content: 'all' });
 
-  // --- 1. KORPUS 604.962 dan 5.657 OBJEK UNIK ------------------------------------------
+  // --- 1. KORPUS 604.962 dan 5.857 OBJEK UNIK ------------------------------------------
   check('Korpus terukur dari bank = 604.962 karakter ±1%',
-    near(census.totalChars, 605071, 0.01),
-    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 605071) / 605071 * 100).toFixed(3)}%)`);
+    near(census.totalChars, 614055, 0.01),
+    `${census.totalChars} karakter (selisih ${(Math.abs(census.totalChars - 614055) / 614055 * 100).toFixed(3)}%)`);
   check('Angka lama 591.898 tidak dipakai di mana pun (konstanta maupun hasil hitung)',
     census.totalChars !== 591898 && mod.CANONICAL.totalChars !== 591898 && !src.includes('591898'),
     'cf-c1 §K1 yang berlaku');
-  check('Objek unik yang belum ada di R2 = 5.657 ±1%',
-    near(plan.pending.length, 5657, 0.01), `${plan.pending.length} objek`);
-  check('Karakter yang akan dibayar = 286.851 ±1%',
-    near(plan.plannedChars, 286876, 0.01), `${plan.plannedChars} karakter`);
+  check('Objek unik yang belum ada di R2 = 5.857 ±1%',
+    near(plan.pending.length, 5857, 0.01), `${plan.pending.length} objek`);
+  check('Karakter yang akan dibayar = 295.860 ±1%',
+    near(plan.plannedChars, 295860, 0.01), `${plan.plannedChars} karakter`);
   check('Dedup nyata: baris bank > objek unik, dan sisanya dihitung sebagai duplikat',
     plan.rows > plan.uniqueKeys && plan.duplicates === plan.rows - plan.uniqueKeys && plan.duplicates > 0,
     `${plan.rows} baris ⇒ ${plan.uniqueKeys} objek (${plan.duplicates} duplikat)`);
-  check('Konstanta dedup dipaku sesuai ukuran nyata (5.657 / 286.851)',
-    mod.CANONICAL.uniqueObjectsPending === 5657 && mod.CANONICAL.pendingChars === 286876,
+  check('Konstanta dedup dipaku sesuai ukuran nyata (5.857 / 295.860)',
+    mod.CANONICAL.uniqueObjectsPending === 5857 && mod.CANONICAL.pendingChars === 295860,
     `${mod.CANONICAL.uniqueObjectsPending} objek / ${mod.CANONICAL.pendingChars} karakter`);
 
   // --- 2. BIAYA aura-1 UNTUK MASUKAN CONTOH --------------------------------------------
@@ -96,21 +96,21 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   const samples = [
     [84, 0.00126],       // uji nyata 84 karakter
     [1000, 0.015],       // satu unit harga
-    [286876, 4.30314],   // batch pertama
-    [605071, 9.076065]   // seluruh korpus
+    [295860, 4.4379],   // batch pertama (m025-188)
+    [614055, 9.210825]   // seluruh korpus (m025-188)
   ];
   for (const [chars, want] of samples) {
     const got = (chars / 1000) * aura1.usdPer1kChars;
     check(`Biaya aura-1 untuk ${chars} karakter = US$${want}`,
       Math.abs(got - want) < 1e-9, `US$${got}`);
   }
-  check('Biaya korpus di aura-1 ≈US$9,07 dan di aura-2-en ≈US$18,15, keduanya dilaporkan',
-    Math.abs(census.costByModel[aura1.id] - 9.07) < 0.05 &&
-    Math.abs(census.costByModel[aura2.id] - 18.15) < 0.05,
+  check('Biaya korpus di aura-1 ≈US$9,21 dan di aura-2-en ≈US$18,42, keduanya dilaporkan',
+    Math.abs(census.costByModel[aura1.id] - 9.21) < 0.05 &&
+    Math.abs(census.costByModel[aura2.id] - 18.42) < 0.05,
     `US$${census.costByModel[aura1.id].toFixed(2)} / US$${census.costByModel[aura2.id].toFixed(2)}`);
-  check('Batch pertama: US$4,30 di aura-1, US$8,61 di aura-2-en',
-    Math.abs(plan.plannedCostAllAura1Usd - 4.30) < 0.02 &&
-    Math.abs(plan.plannedCostAllAura2Usd - 8.61) < 0.02,
+  check('Batch pertama: US$4,44 di aura-1, US$8,88 di aura-2-en',
+    Math.abs(plan.plannedCostAllAura1Usd - 4.44) < 0.02 &&
+    Math.abs(plan.plannedCostAllAura2Usd - 8.88) < 0.02,
     `US$${plan.plannedCostAllAura1Usd.toFixed(2)} / US$${plan.plannedCostAllAura2Usd.toFixed(2)}`);
   check('Biaya campuran = jumlah biaya per item (bukan total karakter × tarif bawaan)',
     Math.abs(plan.plannedCostUsd - plan.pending.reduce((a, e) => a + e.costUsd, 0)) < 1e-9,
@@ -133,7 +133,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Seluruh estimasi penyimpanan tetap di dalam free tier R2 10 GB',
     census.estimatedBytes / 1e9 < 10, `${(census.estimatedBytes / 1e9).toFixed(2)} GB`);
   check('Kebutuhan neuron ≈825.000 dan jatah gratis 10.000/hari dipaku',
-    mod.CANONICAL.freeNeuronsPerDay === 10000 && near(census.estimatedNeurons, 825000, 0.01) &&
+    mod.CANONICAL.freeNeuronsPerDay === 10000 && near(census.estimatedNeurons, 837400, 0.01) /* m025-188: korpus 614.055 x rate 825000/604962 */ &&
     census.freeDaysNeeded > 30,
     `${census.estimatedNeurons} neuron = ${census.freeDaysNeeded} hari jatah gratis`);
 
@@ -280,7 +280,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
   check('Dry-run tidak pernah memanggil fetch/http/net/dns — nol panggilan',
     netCalls.length === 0, netCalls.length ? netCalls.join(' | ') : 'nol panggilan');
   check('Laporan mencetak jumlah objek dan jumlah karakter',
-    /belum ada\s+:\s*5657/.test(output) && /286876 karakter/.test(output), 'objek + karakter');
+    /belum ada\s+:\s*5857/.test(output) && /295860 karakter/.test(output), 'objek + karakter');
   check('Laporan mencetak biaya untuk aura-1 DAN aura-2-en',
     /@cf\/deepgram\/aura-1\s+US\$0\.015/.test(output) && /@cf\/deepgram\/aura-2-en\s+US\$0\.030/.test(output),
     'dua harga berdampingan');
@@ -288,7 +288,7 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
     /durasi audio/.test(output) && /jam/.test(output) && /ukuran R2/.test(output) && /GB/.test(output),
     'durasi + penyimpanan');
   check('Laporan memuat peringatan jatah gratis 10.000 neuron/hari tidak cukup (~825.000 dibutuhkan)',
-    /10000 neuron\/hari/.test(output) && /825149/.test(output) &&
+    /10000 neuron\/hari/.test(output) && /837400/.test(output) /* m025-188 */ &&
     /JATAH GRATIS TIDAK CUKUP/.test(output) && /WAJIB dibayar sekali/.test(output),
     'pra-render dibelanjakan, bukan ditunggu');
   check('Laporan menyebut model yang ditolak beserta buktinya',

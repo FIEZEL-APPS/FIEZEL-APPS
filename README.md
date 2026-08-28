@@ -16,10 +16,10 @@ Handoff berikutnya memakai master prompt v2.0 dan roadmap berbasis gerbang bukti
 
 ## Baseline content
 
-- Vocabulary: 1.765 entri.
-- Grammar: 153 lesson × 25 mode = 3.825 runtime questions (139 lesson lama + 14 lesson baru hasil audit gap coverage).
-- Reading: 300 passages / 1.500 questions.
-- Cloze: 123 item + 201 alternates (cloze-alternates-v1.json).
+- Vocabulary: 1.865 entri (+100 C1 kurasi gen2).
+- Grammar: 179 lesson × 25 mode = 4.475 runtime questions (gen2 m025-188: +26 lesson penutup gap CEFR).
+- Reading: 312 passages / 1.560 questions.
+- Cloze: 148 item + 293 alternates (cloze-alternates-v1.json).
 - Listening: 1.407 item bank + 36 latihan Skills Lab.
 - Speaking: 36 item.
 - Grammar schema: `2.0.0`.

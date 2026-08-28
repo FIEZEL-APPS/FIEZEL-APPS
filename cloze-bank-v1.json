@@ -2,16 +2,16 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 153,
-    "items": 123,
-    "rejected": 30,
+    "templates": 179,
+    "items": 148,
+    "rejected": 31,
     "byLevel": {
-      "A2": 19,
-      "B1": 38,
-      "B2": 26,
-      "C1": 16,
+      "A2": 24,
+      "B1": 41,
+      "B2": 32,
+      "C1": 20,
       "A1": 13,
-      "C2": 11
+      "C2": 18
     }
   },
   "rejected": [
@@ -164,6 +164,11 @@
       "templateId": "AR-006",
       "reason": "answer_ambiguous",
       "detail": "jawaban \"The\" muncul 3x sebagai frasa utuh di kalimat target"
+    },
+    {
+      "templateId": "EC-006",
+      "reason": "no_blank_marker",
+      "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
     }
   ],
   "items": [
@@ -3649,6 +3654,761 @@
         {
           "text": "it",
           "misconception": "starting a fresh pronoun clause and splicing two sentences together in a non-standard join"
+        }
+      ]
+    },
+    {
+      "id": "CM-005-cz0",
+      "templateId": "CM-005",
+      "skill": "comparative_formation_er_vs_more_no_double_marking",
+      "level": "A2",
+      "sentence": "The bus to Bandung is ___ (cheap) than the train, so Andi always takes the bus.",
+      "blank": {
+        "answer": "cheaper",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "more cheap",
+          "misconception": "applies the periphrastic 'more + adjective' pattern to a short one-syllable adjective that takes '-er'"
+        },
+        {
+          "text": "more cheaper",
+          "misconception": "doubles the comparative marking by putting 'more' before an adjective already ending in '-er'"
+        },
+        {
+          "text": "cheapest",
+          "misconception": "superlative used for a two-item comparison"
+        }
+      ]
+    },
+    {
+      "id": "A1-022-cz0",
+      "templateId": "A1-022",
+      "skill": "adverb_of_manner_ly_vs_adjective_after_verb",
+      "level": "A2",
+      "sentence": "Please carry the glasses ___ — they break easily.",
+      "blank": {
+        "answer": "carefully",
+        "alternates": [
+          "gently",
+          "slowly",
+          "with care",
+          "safely"
+        ],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "careful",
+          "misconception": "uses the bare adjective after an action verb where a manner adverb in '-ly' is required"
+        },
+        {
+          "text": "with careful",
+          "misconception": "builds the manner phrase as 'with' plus a bare adjective, copying Indonesian 'dengan hati-hati'"
+        },
+        {
+          "text": "more careful",
+          "misconception": "switches to a comparative adjective although nothing is being compared and the slot needs an adverb"
+        }
+      ]
+    },
+    {
+      "id": "A1-023-cz0",
+      "templateId": "A1-023",
+      "skill": "how_much_vs_how_many_quantity_questions",
+      "level": "A2",
+      "sentence": "___ water do you drink every day?",
+      "blank": {
+        "answer": "How much",
+        "alternates": [],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "How many",
+          "misconception": "asks about an uncountable noun with 'how many'"
+        },
+        {
+          "text": "How",
+          "misconception": "asks quantity with bare 'how' and drops the quantity word entirely"
+        },
+        {
+          "text": "How much of",
+          "misconception": "adds a partitive 'of' straight after 'how much' before a bare noun"
+        }
+      ]
+    },
+    {
+      "id": "A1-024-cz0",
+      "templateId": "A1-024",
+      "skill": "indefinite_compounds_something_anything_nothing",
+      "level": "A2",
+      "sentence": "The fridge was empty — there was ___ inside at all, so we went out to eat.",
+      "blank": {
+        "answer": "nothing",
+        "alternates": [
+          "no food",
+          "not a thing"
+        ],
+        "position": 33
+      },
+      "distractors": [
+        {
+          "text": "anything",
+          "misconception": "uses 'anything' in a positive clause that has no negative word to license it"
+        },
+        {
+          "text": "something",
+          "misconception": "using a positive indefinite pronoun that contradicts the negative context"
+        },
+        {
+          "text": "any",
+          "misconception": "leaves bare 'any' without a noun in a positive clause"
+        }
+      ]
+    },
+    {
+      "id": "A1-025-cz0",
+      "templateId": "A1-025",
+      "skill": "cause_result_connectors_because_vs_so",
+      "level": "A2",
+      "sentence": "Dewi went to bed early last night ___ she was very tired after work.",
+      "blank": {
+        "answer": "because",
+        "alternates": [
+          "since",
+          "as"
+        ],
+        "position": 34
+      },
+      "distractors": [
+        {
+          "text": "so",
+          "misconception": "introduces the reason clause with the result connector 'so'"
+        },
+        {
+          "text": "because of",
+          "misconception": "puts 'because of' before a full clause although it only takes a noun phrase"
+        },
+        {
+          "text": "so that",
+          "misconception": "uses the purpose connector 'so that' where a plain reason connector is needed"
+        }
+      ]
+    },
+    {
+      "id": "TA-014-cz0",
+      "templateId": "TA-014",
+      "skill": "present_perfect_just_already_yet_placement",
+      "level": "B1",
+      "sentence": "It's almost midnight, but Dina hasn't finished her homework ___.",
+      "blank": {
+        "answer": "yet",
+        "alternates": [],
+        "position": 60
+      },
+      "distractors": [
+        {
+          "text": "already",
+          "misconception": "puts 'already' at the end of a negative statement where 'yet' belongs"
+        },
+        {
+          "text": "just",
+          "misconception": "drags 'just' to the end of the clause instead of mid-position between the auxiliary and the participle"
+        },
+        {
+          "text": "still",
+          "misconception": "parks 'still' at the end of a negative clause instead of before the auxiliary"
+        }
+      ]
+    },
+    {
+      "id": "b6_001-cz0",
+      "templateId": "b6_001",
+      "skill": "reflexive_pronouns_myself_vs_each_other",
+      "level": "B1",
+      "sentence": "Nobody helped me — I taught ___ to swim by watching videos.",
+      "blank": {
+        "answer": "myself",
+        "alternates": [],
+        "position": 28
+      },
+      "distractors": [
+        {
+          "text": "me",
+          "misconception": "uses the plain object pronoun although subject and object are the same person"
+        },
+        {
+          "text": "each other",
+          "misconception": "uses the reciprocal 'each other' with a singular subject"
+        },
+        {
+          "text": "himself",
+          "misconception": "picks a reflexive that does not match the person of the subject"
+        }
+      ]
+    },
+    {
+      "id": "b6_002-cz0",
+      "templateId": "b6_002",
+      "skill": "substitution_one_ones_avoid_repetition",
+      "level": "B1",
+      "sentence": "My old camera broke last month, so yesterday I bought a new ___ at the mall.",
+      "blank": {
+        "answer": "one",
+        "alternates": [],
+        "position": 60
+      },
+      "distractors": [
+        {
+          "text": "it",
+          "misconception": "uses definite 'it' after 'a new' where the indefinite substitute 'one' is needed"
+        },
+        {
+          "text": "ones",
+          "misconception": "picks plural 'ones' to replace a single noun"
+        },
+        {
+          "text": "camera one",
+          "misconception": "repeats the replaced noun and stacks the substitute 'one' after it"
+        }
+      ]
+    },
+    {
+      "id": "CO-010-cz0",
+      "templateId": "CO-010",
+      "skill": "wish_would_annoyance_at_others_behaviour",
+      "level": "B2",
+      "sentence": "My flatmate keeps borrowing my charger without asking, and it drives me crazy. I really wish he ___ doing that.",
+      "blank": {
+        "answer": "would stop",
+        "alternates": [
+          "'d stop",
+          "would quit",
+          "'d quit",
+          "would give up",
+          "'d give up"
+        ],
+        "position": 96
+      },
+      "distractors": [
+        {
+          "text": "stopped",
+          "misconception": "treats a complaint about repeated behaviour as a wished-for state with wish + past simple"
+        },
+        {
+          "text": "stops",
+          "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact"
+        },
+        {
+          "text": "will stop",
+          "misconception": "puts future 'will' after 'wish', calquing Indonesian 'akan'"
+        }
+      ]
+    },
+    {
+      "id": "GI-007-cz0",
+      "templateId": "GI-007",
+      "skill": "be_get_used_to_gerund_vs_used_to_infinitive",
+      "level": "B2",
+      "sentence": "After two years in Medan, Laras is finally used to ___ her motorbike through the rush-hour traffic.",
+      "blank": {
+        "answer": "riding",
+        "alternates": [],
+        "position": 51
+      },
+      "distractors": [
+        {
+          "text": "ride",
+          "misconception": "reads the 'to' in 'be used to' as an infinitive marker, copying the past-habit pattern"
+        },
+        {
+          "text": "rode",
+          "misconception": "slots a finite past form after the preposition 'to' in 'be used to'"
+        },
+        {
+          "text": "be riding",
+          "misconception": "inserts infinitive 'be' after 'used to' although this 'to' is a preposition needing -ing"
+        }
+      ]
+    },
+    {
+      "id": "GI-008-cz0",
+      "templateId": "GI-008",
+      "skill": "would_rather_bare_infinitive_vs_prefer_to",
+      "level": "B2",
+      "sentence": "It's been an exhausting week, so I'd rather ___ home tonight than join the office dinner.",
+      "blank": {
+        "answer": "stay",
+        "alternates": [
+          "be"
+        ],
+        "position": 44
+      },
+      "distractors": [
+        {
+          "text": "to stay",
+          "misconception": "generalizes the to-infinitive to 'would rather' on the model of 'prefer to'"
+        },
+        {
+          "text": "staying",
+          "misconception": "imports the gerund complement of 'prefer' into the 'would rather' pattern"
+        },
+        {
+          "text": "stayed",
+          "misconception": "backshifts to a past form after 'would rather' although no second subject intervenes"
+        }
+      ]
+    },
+    {
+      "id": "MO-009-cz0",
+      "templateId": "MO-009",
+      "skill": "be_supposed_to_expectation_vs_obligation",
+      "level": "B2",
+      "sentence": "The ferry ___ leave in ten minutes, but the crew hasn't even arrived yet.",
+      "blank": {
+        "answer": "is supposed to",
+        "alternates": [
+          "was supposed to",
+          "is due to",
+          "is scheduled to",
+          "should",
+          "is meant to",
+          "is set to",
+          "is to",
+          "will",
+          "is going to",
+          "was due to",
+          "was scheduled to",
+          "was meant to",
+          "was set to",
+          "was to"
+        ],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "supposed to",
+          "misconception": "drops the obligatory 'be' before 'supposed to'"
+        },
+        {
+          "text": "supposes to",
+          "misconception": "treats 'suppose' as an ordinary present-tense verb instead of the passive pattern 'be supposed to'"
+        },
+        {
+          "text": "is supposing to",
+          "misconception": "forces a progressive onto the fixed passive participle 'supposed'"
+        }
+      ]
+    },
+    {
+      "id": "CO-011-cz0",
+      "templateId": "CO-011",
+      "skill": "its_high_time_past_simple_unreal",
+      "level": "B2",
+      "sentence": "Residents have been complaining for months, so it's high time the city council ___ the potholes on Jalan Kenanga.",
+      "blank": {
+        "answer": "repaired",
+        "alternates": [
+          "fixed",
+          "mended",
+          "patched",
+          "filled",
+          "filled in"
+        ],
+        "position": 79
+      },
+      "distractors": [
+        {
+          "text": "repairs",
+          "misconception": "keeps a present-tense verb after 'it's high time', calquing 'sudah waktunya' plus a present verb"
+        },
+        {
+          "text": "will repair",
+          "misconception": "marks the clause after 'it's high time' with future 'will' because the action is still to come"
+        },
+        {
+          "text": "is repairing",
+          "misconception": "uses the present progressive after 'it's high time' as if the action were already under way"
+        }
+      ]
+    },
+    {
+      "id": "CM-006-cz0",
+      "templateId": "CM-006",
+      "skill": "as_if_as_though_unreal_past_form",
+      "level": "B2",
+      "sentence": "Rian spends money as if he ___ a millionaire, but his bank balance tells a very different story.",
+      "blank": {
+        "answer": "were",
+        "alternates": [
+          "was"
+        ],
+        "position": 27
+      },
+      "distractors": [
+        {
+          "text": "is",
+          "misconception": "keeps the real-possibility present after 'as if' although the sentence denies the comparison"
+        },
+        {
+          "text": "has been",
+          "misconception": "reads 'as if' as reporting genuine experience with the present perfect"
+        },
+        {
+          "text": "would be",
+          "misconception": "puts conditional 'would' inside the 'as if' clause as if it were a result clause"
+        }
+      ]
+    },
+    {
+      "id": "MO-010-cz0",
+      "templateId": "MO-010",
+      "skill": "neednt_have_vs_didnt_need_to",
+      "level": "C1",
+      "sentence": "You ___ printed the whole report — the committee reads everything on screen these days.",
+      "blank": {
+        "answer": "needn't have",
+        "alternates": [
+          "need not have",
+          "shouldn't have",
+          "should not have",
+          "ought not to have",
+          "oughtn't to have"
+        ],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "didn't need to",
+          "misconception": "uses 'didn't need to' where the sentence shows the unnecessary action was actually done"
+        },
+        {
+          "text": "mustn't have",
+          "misconception": "swaps absent past necessity for a negative deduction with 'mustn't have'"
+        },
+        {
+          "text": "needn't",
+          "misconception": "uses present 'needn't' with a past participle, leaving the finished act unmarked"
+        }
+      ]
+    },
+    {
+      "id": "b6_003-cz0",
+      "templateId": "b6_003",
+      "skill": "no_sooner_hardly_inversion_paired_correlatives",
+      "level": "C1",
+      "sentence": "No sooner ___ the presentation than the projector broke down.",
+      "blank": {
+        "answer": "had we begun",
+        "alternates": [
+          "had we started",
+          "did we begin",
+          "did we start"
+        ],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "we had begun",
+          "misconception": "fronts 'no sooner' but keeps ordinary subject-auxiliary order"
+        },
+        {
+          "text": "had we begin",
+          "misconception": "inverts correctly but leaves a bare verb after 'had'"
+        },
+        {
+          "text": "we began",
+          "misconception": "uses plain past-simple statement order, ignoring both the inversion and the past perfect"
+        }
+      ]
+    },
+    {
+      "id": "b6_004-cz0",
+      "templateId": "b6_004",
+      "skill": "concessive_whatever_however_no_matter",
+      "level": "C1",
+      "sentence": "___ carefully you word the email, someone in the office will still find a reason to complain.",
+      "blank": {
+        "answer": "However",
+        "alternates": [
+          "No matter how",
+          "Regardless of how"
+        ],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Whatever",
+          "misconception": "equates 'whatever' with 'however' and attaches it to an adverb it cannot modify"
+        },
+        {
+          "text": "Although",
+          "misconception": "opens the concession with 'although' but keeps the fronted-adverb pattern that only '-ever' openers allow"
+        },
+        {
+          "text": "No matter",
+          "misconception": "drops the obligatory 'how' after 'no matter' before an adverb"
+        }
+      ]
+    },
+    {
+      "id": "b6_005-cz0",
+      "templateId": "b6_005",
+      "skill": "verb_phrase_ellipsis_after_auxiliary",
+      "level": "C1",
+      "sentence": "Dewi hasn't submitted her thesis draft yet, but most of her classmates already ___.",
+      "blank": {
+        "answer": "have",
+        "alternates": [
+          "did"
+        ],
+        "position": 79
+      },
+      "distractors": [
+        {
+          "text": "are",
+          "misconception": "echoes a perfect-built clause with 'be' instead of its own auxiliary 'have'"
+        },
+        {
+          "text": "do",
+          "misconception": "falls back on default 'do' although the antecedent clause is present perfect"
+        },
+        {
+          "text": "had",
+          "misconception": "shifts the stranded auxiliary into the past perfect although the sentence is anchored in the present"
+        }
+      ]
+    },
+    {
+      "id": "CO-012-cz0",
+      "templateId": "CO-012",
+      "skill": "but_for_noun_phrase_unreal_condition",
+      "level": "C2",
+      "sentence": "___ the surgeon's quick thinking, the patient would not have survived the night.",
+      "blank": {
+        "answer": "But for",
+        "alternates": [
+          "Without",
+          "Were it not for",
+          "Had it not been for",
+          "If it had not been for",
+          "If it hadn't been for",
+          "If not for",
+          "Absent"
+        ],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Unless",
+          "misconception": "treats the conjunction 'unless' as if it could govern a bare noun phrase"
+        },
+        {
+          "text": "If not",
+          "misconception": "truncates the fixed frame 'if it had not been for' down to a bare 'if not'"
+        },
+        {
+          "text": "Except",
+          "misconception": "uses the exclusion preposition 'except' to build an unreal condition"
+        }
+      ]
+    },
+    {
+      "id": "MO-011-cz0",
+      "templateId": "MO-011",
+      "skill": "semi_modal_dare_bare_infinitive_negative",
+      "level": "C2",
+      "sentence": "She ___ tell her manager the real reason for the delay, so she keeps blaming the traffic instead.",
+      "blank": {
+        "answer": "daren't",
+        "alternates": [
+          "dare not",
+          "doesn't dare",
+          "does not dare",
+          "doesn't dare to",
+          "does not dare to",
+          "wouldn't dare",
+          "wouldn't dare to",
+          "would not dare",
+          "would not dare to"
+        ],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "daren't to",
+          "misconception": "keeps modal 'daren't' but still adds 'to' before the verb"
+        },
+        {
+          "text": "not dare",
+          "misconception": "negates 'dare' with bare 'not' and no operator, copying Indonesian 'tidak berani'"
+        },
+        {
+          "text": "isn't dare",
+          "misconception": "treats 'dare' as an adjective and negates it with 'be'"
+        }
+      ]
+    },
+    {
+      "id": "GI-009-cz0",
+      "templateId": "GI-009",
+      "skill": "possessive_subject_of_gerund_formal",
+      "level": "C2",
+      "sentence": "The committee objected to ___ the findings before the external audit was complete.",
+      "blank": {
+        "answer": "his releasing",
+        "alternates": [
+          "him releasing",
+          "releasing",
+          "the release of",
+          "her releasing",
+          "their releasing",
+          "them releasing",
+          "its releasing",
+          "my releasing",
+          "our releasing"
+        ],
+        "position": 26
+      },
+      "distractors": [
+        {
+          "text": "him to release",
+          "misconception": "inserts an infinitive after the preposition 'to' of 'object to'"
+        },
+        {
+          "text": "he releasing",
+          "misconception": "places subject-case 'he' before a gerund"
+        },
+        {
+          "text": "him release",
+          "misconception": "leaves a bare verb after a preposition instead of a gerund"
+        }
+      ]
+    },
+    {
+      "id": "PR-006-cz0",
+      "templateId": "PR-006",
+      "skill": "marginal_prepositions_notwithstanding_pending_barring",
+      "level": "C2",
+      "sentence": "___ any further objections from the regulator, the takeover will be completed on Friday; if objections do come in, the deal will slip to March.",
+      "blank": {
+        "answer": "Barring",
+        "alternates": [
+          "Absent",
+          "Failing",
+          "In the absence of",
+          "Without"
+        ],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Despite",
+          "misconception": "picks concessive 'despite' although the follow-up says objections would delay the deal"
+        },
+        {
+          "text": "Unless",
+          "misconception": "chooses clause-taking 'unless' although only a noun phrase follows"
+        },
+        {
+          "text": "Except",
+          "misconception": "reads 'except' as if it meant 'provided none arise'"
+        }
+      ]
+    },
+    {
+      "id": "CM-007-cz0",
+      "templateId": "CM-007",
+      "skill": "all_the_more_intensified_comparative_with_cause",
+      "level": "C2",
+      "sentence": "Her win at the national final is all the ___ impressive because she trained for two years without a coach.",
+      "blank": {
+        "answer": "more",
+        "alternates": [],
+        "position": 41
+      },
+      "distractors": [
+        {
+          "text": "most",
+          "misconception": "reads the 'all the' frame as a superlative and picks 'most'"
+        },
+        {
+          "text": "much",
+          "misconception": "drops quantifier 'much' into 'all the' as if it were an intensifier"
+        },
+        {
+          "text": "very",
+          "misconception": "forces everyday 'very' into the 'all the + comparative' frame"
+        }
+      ]
+    },
+    {
+      "id": "QN-006-cz0",
+      "templateId": "QN-006",
+      "skill": "negated_participle_clause_not_wishing_to",
+      "level": "C2",
+      "sentence": "___ to cause a scene in front of the clients, Maya quietly slipped out of the meeting room.",
+      "blank": {
+        "answer": "Not wanting",
+        "alternates": [
+          "Not wishing",
+          "So as not",
+          "In order not",
+          "Unwilling",
+          "Reluctant",
+          "Trying not",
+          "Hoping not",
+          "Careful not"
+        ],
+        "position": 0
+      },
+      "distractors": [
+        {
+          "text": "Not want",
+          "misconception": "leaves the participle as a bare verb after 'not'"
+        },
+        {
+          "text": "No wanting",
+          "misconception": "translates Indonesian 'tidak' as 'no' to negate a participle"
+        },
+        {
+          "text": "Didn't want",
+          "misconception": "lets a finite 'didn't want' head a subjectless adjunct"
+        }
+      ]
+    },
+    {
+      "id": "C2-008-cz0",
+      "templateId": "C2-008",
+      "skill": "albeit_reduced_concession_phrase",
+      "level": "C2",
+      "sentence": "The trial results look promising, ___ preliminary, so the lab plans to repeat the study with a larger sample.",
+      "blank": {
+        "answer": "albeit",
+        "alternates": [
+          "though",
+          "if",
+          "but",
+          "yet",
+          "although"
+        ],
+        "position": 34
+      },
+      "distractors": [
+        {
+          "text": "despite",
+          "misconception": "attaches the preposition 'despite' directly to an adjective"
+        },
+        {
+          "text": "whereas",
+          "misconception": "puts clause conjunction 'whereas' before a lone adjective"
+        },
+        {
+          "text": "even",
+          "misconception": "confuses focus particle 'even' with concessive 'even if' or 'even though'"
         }
       ]
     }
