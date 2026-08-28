@@ -35,15 +35,28 @@
  * lucide.min.js. Peta posenya:
  *
  *   Langkah 1 nama        -> greeting   (melambai sekali, lalu tenang)
- *   Langkah 2 slide 1     -> curious    (isi latihan: menengok ke pilihan)
+ *   Langkah 2 slide 1     -> lesson-start (jatuh ke curious; isi latihan: menengok ke pilihan)
  *   Langkah 2 slide 2     -> listening  (suara neural: headphone + not + groove)
  *   Langkah 3 tanpa tujuan-> curious ; setelah tujuan dipilih -> observing (jatuh ke thinking)
- *   Langkah 4 tes         -> encouraging
- *   Langkah 5 pengingat   -> sleepy     (pose paling tenang, bukan yang paling ramai)
+ *   Langkah 4 tes         -> encouraging (varian menunjuk ke CTA tes; kelas is-pointing)
+ *   Langkah 5 pengingat   -> calm       (jatuh ke sleepy; pose paling tenang, bukan ramai)
  *   Langkah 6 ringkasan   -> celebrating lalu MENETAP proud
  *
+ * Fase 6 desain-ulang PAW (spesifikasi 11-splash-onboarding.md §2.2-§2.3): maskotnya bukan
+ * lagi potret per langkah melainkan PENDAMPING - ia menatap apa yang murid tatap (lookAt ke
+ * elemen kunci tiap langkah), bereaksi kecil pada apa yang murid lakukan (ketikan nama,
+ * ketukan tujuan, chip level - dijeda ≥1,2 dtk antar-reaksi, selalu kembali ke pose dasar
+ * langkahnya), menunjuk CTA tes penempatan dengan pose encouraging, dan menanggapi "Lewati"
+ * dengan calm - TIDAK PERNAH sedih, melewati adalah jalan yang sah (audit 02 §2). Di ujung,
+ * penyelesaian menyerahkan tongkat: PAW menyusut ke sudut dok gelembung pembimbing (§2.3)
+ * dan memancarkan event 'fiezel-onboarding-paw-handoff' supaya kelahiran gelembung bisa
+ * menyambungnya - kontrak eventnya didokumentasikan di emitHandoff() di bawah.
+ *
  * Maskotnya adalah komponen yang sudah ada (features/mascot, <fiezel-mascot>); berkas ini
- * tidak menggambar maskot sendiri dan tidak menambah state baru ke sistem gerak.
+ * tidak menggambar maskot sendiri dan tidak menambah state baru ke sistem gerak. Nama state
+ * baru (lesson-start, calm, excited, pointing, welcoming, welcome-back) ditulis sebagai NIAT
+ * lewat MASCOT_CHAIN: begitu rig Direction C mendaratkan statenya, niat itu otomatis dipakai;
+ * sebelum itu, penggantinya adalah state yang komponen benar-benar punya hari ini.
  *
  * m025-117 OWNER: "saat masuk tanya dulu nama mereka di onboarding (WAJIB)". Step 1 sekarang
  * menanyakan nama murid, dan nama itulah satu-satunya sumber sapaan di seluruh aplikasi -
@@ -127,7 +140,7 @@
   // `paw` adalah state maskot yang dimaksudkan untuk slide itu - bukan nama ikon lagi.
   var CAROUSEL_SLIDES = Object.freeze([
     Object.freeze({
-      paw: 'curious',
+      paw: 'lesson-start',
       title: 'Apa aja yang bisa kamu latih?',
       body: 'Di sini kita akan latihan bareng, sedikit demi sedikit tiap hari.',
       items: Object.freeze([
@@ -329,13 +342,22 @@
     encouraging: Object.freeze(['encouraging']),
     sleepy: Object.freeze(['sleepy']),
     celebrating: Object.freeze(['celebrating']),
-    proud: Object.freeze(['proud'])
+    proud: Object.freeze(['proud']),
+    // Fase 6 (spesifikasi 11 §2.2 + §4.1 A6): niat dari pustaka state master ditulis apa
+    // adanya, penggantinya state yang sudah dikapalkan. Rantai inilah jembatan menuju rig
+    // Direction C yang sedang dikerjakan paralel - bukan menunggu rignya selesai.
+    'lesson-start': Object.freeze(['lesson-start', 'curious']),   // pembuka sesi (09 §1.2 #17)
+    calm: Object.freeze(['calm', 'sleepy']),                      // langkah pengingat + respons "Lewati"
+    excited: Object.freeze(['excited', 'encouraging']),           // letupan saat CTA tes ditekan (§2.2 langkah 4)
+    pointing: Object.freeze(['pointing', 'encouraging']),         // varian encouraging yang menunjuk (§4.1 A7)
+    welcoming: Object.freeze(['welcoming', 'greeting']),          // A6 - dipakai rig baru untuk sapaan langkah 1
+    'welcome-back': Object.freeze(['welcome-back', 'greeting'])   // A6 - jalur wake/pengguna kembali (§3)
   });
 
   // Pose per slide carousel. Panjangnya MENGIKUTI jumlah slide yang benar-benar ada (dua):
   // slide isi latihan = curious, slide suara neural = listening. Slide "adaptif" yang
   // disebut brief tidak ada di produk ini, jadi tidak ada pose yang dipaksa untuknya.
-  var MASCOT_SLIDES = Object.freeze(['curious', 'listening']);
+  var MASCOT_SLIDES = Object.freeze(['lesson-start', 'listening']);
 
   /** State yang komponen maskot benar-benar punya, atau [] bila komponennya tidak ada. */
   function mascotStates(env) {
@@ -559,9 +581,10 @@
     return reveal(env)
       + topbar(true)
       + stepper(5)
-      // Langkah pengingat bicara soal waktu istirahat dan kembali lagi; posenya yang paling
-      // tenang di seluruh sistem (sleepy: napas lambat 3,4s), bukan yang paling ramai.
-      + greet(env, 'sleepy', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
+      // Langkah pengingat bicara soal waktu istirahat dan kembali lagi; posenya calm - "at
+      // ease", bukan bosan (spesifikasi 11 §2.2 langkah 5). Sebelum rig Direction C mendarat,
+      // rantainya jatuh ke sleepy: state paling tenang yang komponen punya hari ini.
+      + greet(env, 'calm', 'Soal pengingat: aku yang cari waktunya, kamu tinggal belajar.')
       + '<div class="fiezel-sheet" data-ob-step="5">'
       + '<h2 class="fiezel-title">Kapan kamu ingin belajar?</h2>'
       + '<p class="fiezel-body">Aku ingetin kamu belajar ya, biar streak-nya nggak putus.</p>'
@@ -659,15 +682,39 @@
      * --------------------------------------------------------------------------------- */
     var settleT = null;
     var entranceT = null;
+    /* [ADAPTASI] OA-7 §4: dua bunyi karakter perkenalan, masing-masing SEKALI se-mount —
+       applyMascot berjalan tiap paint() langkah, dan langkah bukanlah entrance. */
+    var pawAppearSoundDone = false;
+    var pawCelebrateSoundDone = false;
+    function pawSound(name) {
+      try {
+        if (target.FiezelUiSfx && typeof target.FiezelUiSfx.play === 'function') {
+          target.FiezelUiSfx.play(name, target);
+        }
+      } catch (_) { }
+    }
+    // Fase 6 - perkakas pendamping (spesifikasi 11 §2.1-§2.2):
+    var microT = null;        // pengembali reaksi-mikro ke pose dasar langkah
+    var pointT = null;        // pelepas kelas is-pointing (tunjukan lengan langkah 4)
+    var slideGazeT = null;    // tatapan "memimpin lalu mengikuti" saat slide carousel berganti
+    var lastMicroAt = 0;      // jeda antar reaksi-mikro; tugasnya menaikkan ambang spesifikasi 600ms -> 1200ms
+    var MICRO_GAP_MS = 1200;
+    var nameReacted = false;  // reaksi ketikan nama: sekali per sesi fokus, bukan per huruf
+    var ackGoal = '';         // tujuan yang sudah diangguki, supaya cat ulang tidak mengangguk lagi
+    var pendingChip = '';     // 'select' | 'deselect' - dicatat handler chip, dikonsumsi companion()
+    var pendingSlideDir = 0;  // -1 mundur / +1 maju - arah tatapan pemimpin saat slide berganti
 
     function clearMascotTimers() {
       try {
         if (typeof target.clearTimeout === 'function') {
           if (settleT != null) target.clearTimeout(settleT);
           if (entranceT != null) target.clearTimeout(entranceT);
+          if (microT != null) target.clearTimeout(microT);
+          if (pointT != null) target.clearTimeout(pointT);
+          if (slideGazeT != null) target.clearTimeout(slideGazeT);
         }
       } catch (_) {}
-      settleT = null; entranceT = null;
+      settleT = null; entranceT = null; microT = null; pointT = null; slideGazeT = null;
     }
 
     function mascotBox() {
@@ -696,6 +743,142 @@
       return resolved;
     }
 
+    function mascotEl() {
+      var box = mascotBox();
+      if (!box) return null;
+      try { return box.querySelector('[data-ob-mascot-el]'); } catch (_) { return null; }
+    }
+
+    /**
+     * Menatap elemen kunci langkah yang sedang dibuka. Pendamping memperhatikan apa yang
+     * murid perhatikan - kolom nama, kartu tujuan, tombol tes - bukan menatap kamera terus.
+     * Komponen maskot sendiri yang membatasi geser pupilnya (±7px) dan mengembalikannya ke
+     * tengah 2,2 dtk kemudian, jadi tatapan ini melirik lalu rileks, bukan melotot.
+     */
+    function gazeAt(selector) {
+      if (reduceMotion || closed) return;
+      var el = mascotEl();
+      if (!el || typeof el.lookAt !== 'function') return;
+      var focusEl = null;
+      try { focusEl = host.querySelector(selector); } catch (_) {}
+      if (!focusEl) return;
+      try { el.lookAt(focusEl); } catch (_) {}
+    }
+
+    /** Tatapan ke arah datangnya slide berikutnya - memimpin gerak halaman, bukan mengekor. */
+    function gazeToward(dx) {
+      if (reduceMotion || closed) return;
+      var el = mascotEl();
+      if (!el || typeof el.lookAt !== 'function') return;
+      try {
+        var rect = typeof el.getBoundingClientRect === 'function' ? el.getBoundingClientRect() : null;
+        if (!rect || !rect.width) return;
+        el.lookAt({ x: rect.left + rect.width / 2 + dx, y: rect.top + rect.height * 0.6 });
+      } catch (_) {}
+    }
+
+    /**
+     * Reaksi-mikro: satu pose singkat sebagai pengakuan atas apa yang murid lakukan, lalu
+     * kembali ke pose dasar langkahnya. Aturannya dari spesifikasi 11 §2.1: dijeda (di sini
+     * ≥1,2 dtk antar-reaksi, satu ambang bersama untuk semua sumber), dibatasi timer (tidak
+     * ada reaksi yang menetap), langsung ke elemen (pose() memang tidak memakai corong
+     * global), dan NOL reaksi saat kurangi-gerak - pose statis per langkah saja.
+     */
+    function microReact(wanted, holdMs, backTo) {
+      if (reduceMotion || closed) return false;
+      var box = mascotBox();
+      if (!box) return false;
+      var t = 0;
+      try { t = Date.now(); } catch (_) {}
+      if (t && lastMicroAt && t - lastMicroAt < MICRO_GAP_MS) return false;
+      lastMicroAt = t;
+      pose(wanted);
+      try { if (microT != null && typeof target.clearTimeout === 'function') target.clearTimeout(microT); } catch (_) {}
+      if (typeof target.setTimeout !== 'function') return true;
+      microT = target.setTimeout(function () {
+        microT = null;
+        if (closed) return;
+        var live = mascotBox();
+        if (!live) return;
+        // Kembali ke pose dasar langkah - niat yang tertulis di DOM, bukan tebakan.
+        pose(backTo || live.getAttribute('data-ob-mascot-intent') || 'idle');
+      }, holdMs || 700);
+      return true;
+    }
+
+    /**
+     * Perilaku pendamping per langkah: tatapan ke elemen kunci + reaksi yang tertunda dari
+     * handler input. Dipanggil dari applyMascot() SETELAH pose dasar terpasang, hanya pada
+     * jalur gerak penuh - saat kurangi-gerak seluruh fungsi ini tidak pernah dipanggil.
+     */
+    function companion() {
+      if (reduceMotion || closed) return;
+      if (step === 1) {
+        // Menatap kolom nama - memperhatikan yang murid isi, bukan kamera (storyboard P9).
+        gazeAt('[data-ob-name]');
+      } else if (step === 2) {
+        if (pendingSlideDir) {
+          // Tatapan memimpin ke arah datangnya slide, lalu turun ke daftar isinya.
+          gazeToward(pendingSlideDir * 72);
+          pendingSlideDir = 0;
+          if (typeof target.setTimeout === 'function') {
+            slideGazeT = target.setTimeout(function () {
+              slideGazeT = null;
+              if (!closed && step === 2) gazeAt('.fiezel-carousel-item');
+            }, 280);
+          }
+        } else {
+          gazeAt('.fiezel-carousel-item');
+        }
+      } else if (step === 3) {
+        if (selectedGoal) {
+          gazeAt('.fiezel-goal-card.is-selected');
+          if (selectedGoal !== ackGoal) {
+            // Anggukan pengakuan sekali per tujuan - BUKAN perayaan; celebrating disimpan
+            // untuk penyelesaian (spesifikasi 11 §2.2 langkah 3).
+            ackGoal = selectedGoal;
+            microReact('encouraging', 620);
+          } else if (pendingChip) {
+            microReact(pendingChip === 'select' ? 'encouraging' : 'curious', 560);
+          }
+        } else {
+          gazeAt('.fiezel-goal-grid');
+          if (pendingChip) microReact(pendingChip === 'select' ? 'encouraging' : 'curious', 560);
+        }
+        pendingChip = '';
+      } else if (step === 4) {
+        // Dorongan yang menunjuk: mata ke CTA tes, niat pose 'pointing' (hari ini luruh ke
+        // encouraging - varian menunjuknya milik rig Direction C), dan kelas is-pointing
+        // sebagai kail CSS/rig. Ditahan 900ms lalu kembali rehat, tatapan tetap di tombol.
+        gazeAt('[data-ob-primary]');
+        var box = mascotBox();
+        if (box) {
+          pose('pointing');
+          try { box.classList.add('is-pointing'); } catch (_) {}
+          if (typeof target.setTimeout === 'function') {
+            pointT = target.setTimeout(function () {
+              pointT = null;
+              if (closed) return;
+              var live = mascotBox();
+              if (!live) return;
+              try { live.classList.remove('is-pointing'); } catch (_) {}
+              if (step === PLACEMENT_STEP) {
+                pose(live.getAttribute('data-ob-mascot-intent') || 'encouraging');
+                gazeAt('[data-ob-primary]');
+              }
+            }, 900);
+          }
+        }
+      } else if (step === 5) {
+        // Calm menatap lembut ke lembar pengaturan - hadir menemani, tidak menuntut apa-apa.
+        gazeAt('[data-ob-step="5"]');
+      } else {
+        // Langkah 6: perayaan menatap kartu ringkasan; tatapan ke "Mulai Belajar" menyusul
+        // saat proud menetap (lihat timer settle di applyMascot).
+        gazeAt('.fiezel-summary-card');
+      }
+    }
+
     function applyMascot() {
       clearMascotTimers();
       var box = mascotBox();
@@ -704,6 +887,13 @@
       pose(intent);
       if (reduceMotion) return;
       // Micro-entrance: scale settle 240ms dengan --ease-spring (dipasang di style.css).
+      // [ADAPTASI] OA-7 §4 baris ENTRANCE: paw_appear menemani kelahiran PERTAMA maskot
+      // perkenalan saja. Jalur kurangi-gerak sudah keluar di atas — pop tanpa animasi
+      // kelahiran adalah bunyi yatim (14 §3.1 aturan 3).
+      if (!pawAppearSoundDone) {
+        pawAppearSoundDone = true;
+        pawSound('paw_appear');
+      }
       try {
         box.classList.add('is-entering');
         entranceT = target.setTimeout(function () {
@@ -715,6 +905,15 @@
       // opts.then komponen - `then` memakai hold bawaannya sendiri dan proud akan luruh
       // ke idle 2,2 detik kemudian, jadi langkah terakhir berakhir dengan wajah kosong.
       if (intent === 'celebrating') {
+        // [ADAPTASI] Perintah wiring + 20 §4: penyelesaian perkenalan (lompatan langkah 6)
+        // dirayakan paw_celebrate SEKALI. Catatan 14 §4: yang default-DIKECUALIKAN dari
+        // perkenalan adalah slot signature Spark/paw_greet — bukan vokalisasi perayaan
+        // ini. Kurangi-gerak merender proud statis dan sudah keluar lebih awal, jadi di
+        // jalur itu momen ini memang tanpa bunyi.
+        if (!pawCelebrateSoundDone) {
+          pawCelebrateSoundDone = true;
+          pawSound('paw_celebrate');
+        }
         try {
           settleT = target.setTimeout(function () {
             settleT = null;
@@ -723,9 +922,12 @@
             if (!live || live.getAttribute('data-ob-mascot-intent') !== 'celebrating') return;
             live.setAttribute('data-ob-mascot-intent', 'proud');
             pose('proud');
+            // Proud yang menetap mengarahkan mata ke pintu berikutnya: tombol "Mulai Belajar".
+            gazeAt('[data-ob-primary]');
           }, 1900);
         } catch (_) {}
       }
+      companion();
     }
 
     function paint() {
@@ -753,14 +955,83 @@
      *
      * Karena itu pemberitahuan sekarang menjadi tanggung jawab finish() sendiri: selama setiap
      * jalan keluar lewat sini, tidak ada lagi jalan keluar yang bisa lupa memanggilnya.
+     * (finish() sendiri ada di bawah, setelah dua pembantu serah terimanya.)
      */
+    /**
+     * Serah terima ke gelembung pembimbing (spesifikasi 11 §2.3): PAW menyusut ke sudut dok
+     * gelembung - transform + opacity saja, 320ms - supaya karakternya terbaca PINDAH ke
+     * pojok, bukan mati lalu lahir kembar di tempat lain. Sasarannya pusat dok gelembung:
+     * right 16px + jari-jari 29, bottom 104px + jari-jari 29 (style.css .fiezel-coach-bubble;
+     * safe-area-inset diabaikan sadar - gerakannya kiasan arah, bukan penjajaran piksel).
+     * Mengembalikan true hanya bila animasinya benar-benar terpasang; saat kurangi-gerak
+     * atau ukuran layar tidak terbaca, jalan keluarnya tetap fade is-leaving yang lama.
+     */
+    function beginHandoff() {
+      if (reduceMotion) return false;
+      var box = mascotBox();
+      if (!box) return false;
+      try {
+        var vw = Number(target.innerWidth);
+        var vh = Number(target.innerHeight);
+        var rect = typeof box.getBoundingClientRect === 'function' ? box.getBoundingClientRect() : null;
+        if (!vw || !vh || !rect || !rect.width) return false;
+        var dx = Math.round(vw - 45 - (rect.left + rect.width / 2));
+        var dy = Math.round(vh - 133 - (rect.top + rect.height / 2));
+        box.style.setProperty('--fz-ob-hx', dx + 'px');
+        box.style.setProperty('--fz-ob-hy', dy + 'px');
+        box.classList.add('is-handoff');
+        return true;
+      } catch (_) { return false; }
+    }
+
+    /**
+     * KONTRAK EVENT SERAH TERIMA - satu-satunya jalur koordinasi dengan pemilik gelembung
+     * pembimbing (berkas gelembung TIDAK disentuh dari sini):
+     *   nama    : 'fiezel-onboarding-paw-handoff'
+     *   dipancar: pada document, bubbles:true, tepat saat perkenalan mulai menutup lewat
+     *             "Mulai Belajar" (via 'finish' SAJA - bukan skip/placement/close/name).
+     *   detail  : { via:'finish',
+     *               animated  : boolean  - true bila PAW benar-benar menyusut ke sudut,
+     *               reduceMotion: boolean - preferensi murid saat itu,
+     *               durationMs: 320|0    - lama animasi penyusutan (0 = fade saja),
+     *               bubbleDelayMs: 120 } - saran jeda kelahiran gelembung (pop) setelah
+     *                                      penyusutan dimulai, sesuai §2.3.
+     * Pendengarnya (kelak: fiezel-coach-bubble) memutuskan sendiri bagaimana lahir; saat
+     * belum ada pendengar, event ini tidak mengubah apa pun - alurnya tetap utuh.
+     */
+    function emitHandoff(animated) {
+      try {
+        var detail = {
+          via: 'finish',
+          animated: animated === true,
+          reduceMotion: reduceMotion,
+          durationMs: animated === true ? 320 : 0,
+          bubbleDelayMs: 120
+        };
+        var evt = null;
+        if (typeof target.CustomEvent === 'function') {
+          evt = new target.CustomEvent('fiezel-onboarding-paw-handoff', { bubbles: true, detail: detail });
+        } else if (typeof doc.createEvent === 'function') {
+          evt = doc.createEvent('CustomEvent');
+          evt.initCustomEvent('fiezel-onboarding-paw-handoff', true, false, detail);
+        }
+        if (evt && typeof doc.dispatchEvent === 'function') doc.dispatchEvent(evt);
+      } catch (_) { /* tanpa pendengar atau tanpa CustomEvent, serah terima visual tetap jalan */ }
+    }
+
     function finish(via) {
       if (closed) return;
       closed = true;
       clearMascotTimers();
       markCompleted(target, { at: now, via: via, name: typedName, goal: selectedGoal, level: selectedLevel });
+      // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
+      // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
+      var handedOff = via === 'finish' ? beginHandoff() : false;
       try { host.classList.add('is-leaving'); } catch (_) {}
-      if (typeof target.setTimeout === 'function') target.setTimeout(remove, 260);
+      if (via === 'finish') emitHandoff(handedOff);
+      // Penyusutan 320ms sedikit lebih panjang dari fade 260ms - pencabutan host menunggu
+      // yang paling lambat selesai, supaya PAW tidak lenyap di tengah jalan ke sudut.
+      if (typeof target.setTimeout === 'function') target.setTimeout(remove, handedOff ? 360 : 260);
       else remove();
       // Tes penempatan mengambil alih seluruh layar, jadi ia punya jalur lanjutannya sendiri;
       // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
@@ -830,7 +1101,18 @@
             if (normalizeName(typedName)) next.removeAttribute('disabled');
             else next.setAttribute('disabled', 'disabled');
           };
-          nameInput.addEventListener('input', sync);
+          nameInput.addEventListener('input', function () {
+            sync();
+            // Kuping tegak pada huruf PERTAMA tiap sesi fokus - bukan pada tiap ketukan;
+            // maskot yang bereaksi per huruf bukan pendamping, itu gangguan (§2.2 langkah 1).
+            // Kembalinya ke 'idle', bukan 'greeting': murid sedang menulis, lambaiannya
+            // sudah lewat dan tidak perlu diputar ulang.
+            if (!nameReacted && normalizeName(typedName)) {
+              nameReacted = true;
+              microReact('curious', 820, 'idle');
+            }
+          });
+          nameInput.addEventListener('focus', function () { nameReacted = false; });
           nameInput.addEventListener('change', sync);
           nameInput.addEventListener('keydown', function (event) {
             if (event && (event.key === 'Enter' || event.keyCode === 13)) {
@@ -844,7 +1126,13 @@
         var backBtn = host.querySelector('[data-ob-back]');
         if (backBtn) backBtn.addEventListener('click', back);
         var skipAll = host.querySelector('[data-ob-skip]');
-        if (skipAll) skipAll.addEventListener('click', function () { finish('skip'); });
+        if (skipAll) skipAll.addEventListener('click', function () {
+          // Calm, BUKAN sedih: melewati perkenalan adalah jalan yang sah, dan wajah terakhir
+          // yang murid lihat tidak boleh menghukumnya (spesifikasi 11 §2.2, audit 02 §2).
+          // Wajah tenangnya menumpang fade 260ms milik is-leaving.
+          pose('calm');
+          finish('skip');
+        });
         var stepSkip = host.querySelector('[data-ob-step-skip]');
         if (stepSkip) stepSkip.addEventListener('click', function () {
           // Di langkah terakhir tidak ada langkah berikutnya untuk dilewati: goStep(6) dijepit
@@ -867,11 +1155,24 @@
         // ditambahkan, dan angka yang tertinggal di sini akan membuat tombol "Mulai tes
         // penempatan" diam-diam berubah menjadi tombol "Lanjut" biasa.
         var primary = host.querySelector('[data-ob-primary]');
-        if (primary) primary.addEventListener('click', step === PLACEMENT_STEP ? startPlacementNow : advance);
+        if (primary) primary.addEventListener('click', step === PLACEMENT_STEP
+          ? function () {
+            // Letupan semangat mengantar murid masuk ke tes (§2.2 langkah 4): excited
+            // menumpang fade keluar; hari ini ia luruh ke encouraging lewat MASCOT_CHAIN.
+            pose('excited');
+            startPlacementNow();
+          }
+          : advance);
         var prev = host.querySelector('[data-ob-carousel-prev]');
-        if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', back);
+        if (prev && !prev.hasAttribute('disabled')) prev.addEventListener('click', function () {
+          pendingSlideDir = -1; // tatapan memimpin ke kiri sebelum turun ke isi slide
+          back();
+        });
         var nxt = host.querySelector('[data-ob-carousel-next]');
-        if (nxt && !nxt.hasAttribute('disabled')) nxt.addEventListener('click', advance);
+        if (nxt && !nxt.hasAttribute('disabled')) nxt.addEventListener('click', function () {
+          pendingSlideDir = 1; // tatapan memimpin ke kanan sebelum turun ke isi slide
+          advance();
+        });
         var goalButtons = host.querySelectorAll('[data-ob-goal]');
         for (var i = 0; i < goalButtons.length; i++) {
           (function (button) {
@@ -887,6 +1188,9 @@
             button.addEventListener('click', function () {
               var value = button.getAttribute('data-ob-level') || '';
               selectedLevel = selectedLevel === value ? '' : value;
+              // Reaksinya dicatat di sini, dimainkan companion() SETELAH cat ulang - anggukan
+              // untuk memilih, penasaran untuk membatalkan; keduanya kecil dan dijeda.
+              pendingChip = selectedLevel === value ? 'select' : 'deselect';
               paint();
             });
           })(levelButtons[j]);

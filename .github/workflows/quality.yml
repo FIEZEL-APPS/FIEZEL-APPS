@@ -129,6 +129,15 @@ jobs:
           node pastel-field-contrast-test.js
           node topbar-logo-contrast-test.js
           node paw-mascot-test.js
+          # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
+          # Ditaruh tepat sesudah paw-mascot-test.js karena kelimanya memperluas kontrak
+          # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),
+          # palet karakter tertutup G1, tubuh bebas rotasi, dan kosakata event react().
+          node e5-checksum-gate-test.js
+          node pawprint-geometry-gate-test.js
+          node palette-gate-test.js
+          node keyframe-rotation-gate-test.js
+          node event-vocabulary-gate-test.js
           node voice-offline-fallback-test.js
           node voice-fallback-chain-test.js
           node voice-pipeline-gap-test.js

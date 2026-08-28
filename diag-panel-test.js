@@ -50,7 +50,7 @@ function makeSandbox(options) {
       createElement: makeElement,
       addEventListener() {}
     },
-    location: { origin: 'https://fitrajft-ux.github.io', href: 'https://fitrajft-ux.github.io/FIEZEL-APPS/' },
+    location: { origin: 'https://fiezel-apps.github.io', href: 'https://fiezel-apps.github.io/FIEZEL-APPS/' },
     navigator: options.navigator !== undefined ? options.navigator : { userAgent: 'test-ua' },
     localStorage: {
       getItem(key) { return Object.prototype.hasOwnProperty.call(store, key) ? store[key] : null; }
