@@ -2609,7 +2609,14 @@ function showAnswerBurst(ok){const burst=$('answerBurst');if(!burst)return;clear
 // m026-01: reaksi maskot dititipkan DI SINI, bukan di answer() atau record(). Fungsi ini
 // sudah menjadi corong tunggal untuk getar + suara + kilas jawaban, jadi setiap tempat
 // yang menilai jawaban otomatis ikut - tanpa menambah pemanggilan di tiap penilai.
-function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok);pawReact(ok?'correct':'wrong')}
+// [ADAPTASI] 13 §4 beat khawatir: dua salah BERUNTUN atau lebih → paw_encourage menyusul
+// ±1,1 dtk SETELAH answer_wrong (vonisnya sudah selesai, bunyinya tidak menumpuk) dan
+// HANYA saat suara tutor sedang diam (14 §3.1 aturan 2). Jatah 2×/sesi · jeda ≥20 dtk
+// tetap dijaga manifest mesin SFX, jadi penghitung ini tidak perlu menjatah sendiri.
+let wrongRunCount=0;
+function answerFeedbackSignal(ok){const kind=ok?'success':'error';haptic(kind);playFeedbackSound(kind);showAnswerBurst(ok);pawReact(ok?'correct':'wrong');
+  if(ok){wrongRunCount=0}
+  else{wrongRunCount++;if(wrongRunCount>=2)setTimeout(()=>{if(!voiceIsSpeaking())uiSfx('paw_encourage')},1100)}}
 // m028 fase3 (PATCH-PLAN §1/§9.1): jeda "FIEZEL membaca jawabanmu".
 //
 // Sampai rilis ini penilaian jatuh SEKETIKA: satu ketukan, dan seluruh pembahasan
@@ -4024,7 +4031,7 @@ function openFeedback(prefill){
   };
   enhanceUI();
 }
-function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt}}
+function render(){const __renderStartedAt=Date.now();try{return renderInner()}finally{window.__fiezelLastRenderMs=Date.now()-__renderStartedAt;/* [FASE-4] pasang ulang timer kantuk 90 dtk tiap layar dicat (mati sendiri di luar layar santai). */try{pawIdleArm()}catch(_){}/* [OUTFIT G5'] konteks layar untuk resolver outfit (19 §6.1) */try{self.FiezelPawOutfit?.screen?.(state.view)}catch(_){}}}
 // m025-41: render duration is recorded so the diagnostic scanner can see a slow screen,
 // which is how OWNER experienced the Classroom regression before any error was logged.
 function renderInner(){speakingListeningMountToken++;if(speakingListeningController){speakingListeningController.destroy();speakingListeningController=null;/* m026-01: satu-satunya tempat sesi dengar benar-benar bubar. Di dalam if, bukan di luar - kalau tidak, tiap navigasi biasa akan memaksa maskot kembali idle dan memotong selebrasi yang sedang jalan. */pawReact('listening-stop')}document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));setApp('');if(state.view==='home')home();if(state.view==='vocab')vocab();if(state.view==='grammar')grammar();if(state.view==='reading')reading();if(state.view==='skills')skillsLab();if(state.view==='listening')skillsLab('listening');if(state.view==='speaking')skillsLab('speaking');if(state.view==='writing')writing();if(state.view==='classroom')classroom();if(state.view==='library')library();if(state.view==='ask'||state.view==='search')askView();if(state.view==='test')placement();if(state.view==='progress')progress();document.querySelector(`[data-view="${state.view}"]`)?.classList.add('active');/* m028 fase3: bendera panggung Skills Lab. Addon listening memaku blok tombolnya ke dasar layar (speaking-listening-addon.css), jadi ia panggung kedua yang bisa ditutupi gelembung. */document.body?.classList?.toggle?.('fz-stage-sl',['skills','listening','speaking'].includes(state.view));/* m028 fase3 (QA §9): Peta Belajar ikut jadi panggung ber-kontrol sejak panel NEXT SESSION punya tombol "Mulai sesi" di dekat dasar layar - screenshot QA menunjukkan gelembung PAW menutupinya utuh. Aturannya sama dengan kuis: peek dilarang, dok mengecil, layar diberi ruang bawah. */document.body?.classList?.toggle?.('fz-stage-map',state.view==='progress');enhanceUI();syncCoachBubble();window.scrollTo(0,0)}
@@ -4075,8 +4082,73 @@ function prefersReducedMotion(){try{return !!(self.matchMedia&&self.matchMedia('
 // 3. Kalau motion system-nya tidak ada (cache lama, berkas gagal dimuat), semuanya
 //    diam tanpa suara. Tidak ada cabang darurat, tidak ada log yang menakuti murid.
 function pawMotionAllowed(){if(prefersReducedMotion())return false;return state.preferences?.motion!==false}
-function pawReact(evt,detail){if(!pawMotionAllowed())return false;try{return !!self.FiezelPaw?.react?.(evt,detail)}catch(_){return false}}
+/* [OUTFIT G5'] Lapisan outfit kontekstual (features/mascot/fiezel-paw-outfit.js)
+   diberi tahu SEBELUM gerbang gerak: outfit adalah geometri statis yang tetap sah
+   tampil saat kurangi-gerak (19 §6.4). Optional-chaining: tanpa berkasnya, senyap. */
+function pawReact(evt,detail){try{self.FiezelPawOutfit?.context?.(evt,{motion:pawMotionAllowed()})}catch(_){}if(!pawMotionAllowed())return false;try{return !!self.FiezelPaw?.react?.(evt,detail)}catch(_){return false}}
 function pawSetState(name,opts){if(!pawMotionAllowed())return false;try{return !!self.FiezelPaw?.setState?.(name,opts)}catch(_){return false}}
+/* [FASE-4] 09 §2.15: milestone SEKALI SEUMUR HIDUP per kunci — gerbangnya di storage
+   app (state.pawMilestones), bukan di memori komponen yang hangus tiap muat ulang.
+   Kunci resmi: placement-complete, streak-7/30/100, level-c2. Daftar blok 13 §4.4
+   (streak jawaban, gem, sesi selesai, lencana) TIDAK pernah lewat sini. */
+function pawMilestone(key){
+  const k=String(key||'');if(!k)return false;
+  const done=Array.isArray(state.pawMilestones)?state.pawMilestones:[];
+  if(done.includes(k))return false;
+  state.pawMilestones=done.concat(k);save();
+  const reacted=pawReact('milestone',{key:k});
+  // [ADAPTASI] OA-7 §4 baris MILESTONE: kunci selain streak-* dan placement-complete
+  // (level-c2 dan penerus once-ever lain) dibunyikan level_up di sini. streak-7/30/100
+  // sudah dibunyikan streak_10 oleh pawStreakWatch dan placement-complete dibunyikan
+  // exam_complete di finishQuiz — satu momen satu bunyi, tidak menumpuk lapisan.
+  if(reacted&&!k.startsWith('streak-')&&k!=='placement-complete')uiSfx('level_up');
+  return reacted
+}
+/* [FASE-4] 09 §3.3: pisah 'wake' vs 'welcome-back'. Stempel kunjungan terakhir
+   DIPERSISTEN (state.pawLastSeenAt); kembali setelah ≥4 jam atau hari kalender baru
+   → welcome-back (otomatis maks 1×/4 jam karena stempelnya ikut maju). Sisanya wake. */
+function pawGreetReturn(now=Date.now()){
+  const last=Number(state.pawLastSeenAt)||0;
+  state.pawLastSeenAt=now;save();
+  if(last&&(now-last>=4*3600*1000||studyDayKey(now)!==studyDayKey(last))){
+    // [ADAPTASI] OA-7 §4 baris SAPAAN: welcome-back = slot sapaan → paw_greet (bunyi
+    // tanda tangan). Berbunyi HANYA bila reaksinya benar-benar menyala — saat gerak
+    // ditekan, sapaan tanpa maskot yang menyapa adalah bunyi yatim (14 §3.1 aturan 3).
+    // 'wake' tetap senyap: bangun dari layar yang sama bukan momen sapaan.
+    if(pawReact('welcome-back'))uiSfx('paw_greet');
+    return 'welcome-back'
+  }
+  pawReact('wake');return 'wake'
+}
+/* [FASE-4] 09 §3.3 idle-timeout: 90 detik tanpa sentuhan DI LAYAR SANTAI (home,
+   progress) → maskot mengantuk; sentuhan pertama sesudahnya → 'wake'. Tidak pernah
+   berjalan di tengah soal/dengar/bicara — daftar view-nya yang menjaga itu. */
+let pawIdleT=null,pawAsleep=false,pawIdleArmedAt=0;
+const PAW_AMBIENT_VIEWS=new Set(['home','progress']);
+function pawIdleArm(){
+  clearTimeout(pawIdleT);pawIdleT=null;
+  if(!PAW_AMBIENT_VIEWS.has(state.view))return;
+  pawIdleT=setTimeout(()=>{pawIdleT=null;
+    if(PAW_AMBIENT_VIEWS.has(state.view)){pawAsleep=true;try{pawReact('idle-timeout')}catch(_){}}
+  },90000);
+  // [FASE-8] Di lingkungan uji Node/jsdom, timer 90 dtk ini menahan event loop
+  // sehingga tes tidak pernah keluar. unref() tidak ada di browser — aman dicoba.
+  if(pawIdleT&&typeof pawIdleT.unref==='function')pawIdleT.unref()
+}
+function pawIdlePoke(){
+  const now=Date.now();
+  if(pawAsleep){pawAsleep=false;try{pawReact('wake')}catch(_){}}
+  if(now-pawIdleArmedAt<1000)return; // peredam: pointermove tidak menjadi metronom
+  pawIdleArmedAt=now;pawIdleArm()
+}
+try{['pointerdown','pointermove','keydown','scroll','touchstart'].forEach(ev=>
+  addEventListener(ev,pawIdlePoke,{passive:true,capture:true}))}catch(_){}
+/* [FASE-4] 09 §3.1 APP_RETURN: kembali ke tab setelah lama pergi → sambutan; saat
+   pergi, stempel kunjungan dimajukan supaya hitungan 4 jamnya jujur. */
+try{document.addEventListener('visibilitychange',()=>{try{
+  if(document.visibilityState==='hidden'){state.pawLastSeenAt=Date.now();save()}
+  else{pawGreetReturn()}
+}catch(_){}})}catch(_){}
 // Wajah panel "Kata FIEZEL". Cadangannya ikon paw yang sama seperti sebelum m026-01:
 // bentuk paw tetap satu sumber di features/ui/fiezel-icons.js lewat atribut data-fz-icon,
 // berkas ini tidak menggambar path apa pun.
@@ -4092,11 +4164,25 @@ function pawFaceMarkup(){try{if(self.FiezelPaw?.ready?.())
 // berjalan saat tidak ada layar yang tampil, dan reaksi gerak dari sana akan
 // menyala di waktu yang salah. Ambangnya <=1 supaya hanya kejatuhan sungguhan
 // (rantai hilang) yang memicunya, bukan koreksi angka biasa.
+// [ADAPTASI] 14 §3.1 aturan 2: SFX karakter tidak boleh menimpa suara tutor yang sedang
+// bicara. FiezelVoiceSay tidak mengekspor isSpeaking — yang jujur adalah status().speaking
+// milik FiezelPuterVoice dan speechSynthesis.speaking milik cadangan browser.
+function voiceIsSpeaking(){
+  try{if(self.FiezelPuterVoice?.status?.().speaking)return true}catch(_){}
+  try{if(self.speechSynthesis?.speaking)return true}catch(_){}
+  return false
+}
 let pawLastSeenStreak=null;
 function pawStreakWatch(){const now=Number(state.streak)||0;
   // [ADAPTASI] OA-7 §4: paw_encourage menemani momen streak putus - vokalisasi "tidak
   // apa-apa", bukan bunyi kalah. Jatah 2×/sesi · jeda ≥20 dtk dijaga manifest (14 §3.2).
-  if(pawLastSeenStreak!==null&&now<pawLastSeenStreak&&now<=1){pawReact('streak-lost');uiSfx('paw_encourage')}
+  if(pawLastSeenStreak!==null&&now<pawLastSeenStreak&&now<=1){pawReact('streak-lost');if(!voiceIsSpeaking())uiSfx('paw_encourage')}
+  // [FASE-4] 09 §2.15: runtun hari 7/30/100 adalah milestone once-ever. Dibaca di
+  // perbandingan dua cat Home yang sama — hanya KENAIKAN yang menyeberangi ambang.
+  // Bunyinya streak_10 (20 §4: motif streak lengkap dengan mahkota), bukan fanfare baru.
+  if(pawLastSeenStreak!==null&&now>pawLastSeenStreak&&[7,30,100].includes(now)){
+    if(pawMilestone('streak-'+now))uiSfx('streak_10')
+  }
   pawLastSeenStreak=now}
 // m025-84: sampai rilis ini go() tidak pernah menyentuh History API sama sekali, jadi
 // seluruh aplikasi hidup di SATU entri riwayat - gestur swipe-back tidak punya tujuan dan
@@ -4322,7 +4408,9 @@ function levelTrustNoteMistake(q){
 }
 function levelGuardWarn(level,count){
   const message=count>=8?LEVEL_GUARD_COPY.warn8:LEVEL_GUARD_COPY.warn5;
-  try{pawReact(count>=8?'wrong':'question-shown')}catch(_){}
+  // [FASE-8] 13 §2: peringatan level bukan hukuman — ambang berat ditemani
+  // encouraging (bukan 'wrong' yang mengulang beat concern di luar konteks soal).
+  try{if(count>=8)pawSetState('encouraging');else pawReact('question-shown')}catch(_){}
   try{showToast(`Salah ${count} dari ${LEVEL_GUARD_WRONG_LIMIT} di ${level}. PAW menemani.`)}catch(_){}
   try{openModal(`<div class="modal-mark">PAW MENEMANI</div><h2>Level ${esc(level)} · salah ${count}/${LEVEL_GUARD_WRONG_LIMIT}</h2><p>${esc(message)}</p><div class="modal-actions"><button type="button" id="levelWarnExam">${esc(LEVEL_GUARD_COPY.entryExam)}</button><button type="button" class="primary" id="levelWarnGo">Lanjut latihan</button></div>`);
     $('levelWarnGo').onclick=closeModal;
@@ -4350,7 +4438,9 @@ function flushLevelGuardNotice(){
 }
 function openDemotionModal(fromLevel,toLevel){
   const verified=LEVELS.includes(String(toLevel||''))?String(toLevel):verifiedLevel(state);
-  try{pawReact('wrong')}catch(_){}
+  // [FASE-8] 09 §3.1: turun level = kehilangan pencapaian → 'streak-lost'
+  // (sad yang dibawakan lembut), bukan 'wrong' milik jawaban salah.
+  try{pawReact('streak-lost')}catch(_){}
   openModal(`<div class="modal-mark">FIEZEL LEVEL GUARD</div><h2>${esc(LEVEL_GUARD_COPY.demotionTitle)}</h2><p>${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionBody,verified))}</p><p class="muted">Level ${esc(String(fromLevel||''))} dan semua level di atas ${esc(verified)} terkunci sampai kamu lulus ${esc(LEVEL_GUARD_COPY.examTitle)}.</p><div class="modal-actions"><button type="button" class="primary" id="demotionStart">${esc(levelTrustCopy(LEVEL_GUARD_COPY.demotionStart,verified))}</button><button type="button" id="demotionExam">${esc(LEVEL_GUARD_COPY.entryExam)}</button></div>`);
   $('demotionStart').onclick=()=>{closeModal();go('home')};
   $('demotionExam')?.addEventListener('click',()=>openActiveLevelExamPanel(nextVerifiableLevel(state)));
@@ -4647,8 +4737,9 @@ function maybeShowDailyRitual(now=Date.now()){
   host.addEventListener('click',e=>{if(e.target===host)dismissDailyRitual()});
   document.body.appendChild(host);enhanceUI();
   try{host.querySelector('button.primary')?.focus()}catch(_){}
-  // Maskot menyapa lewat corong pawReact (gerbang reduced-motion tunggal): 'wake' → greeting.
-  try{pawReact('wake')}catch(_){}
+  // [FASE-4] Maskot menyapa lewat corong pawGreetReturn (gerbang reduced-motion tetap
+  // satu di pawReact): hari baru / ≥4 jam pergi → 'welcome-back', selain itu 'wake'.
+  try{pawGreetReturn()}catch(_){}
   // ±3 detik lalu pamit sendiri — ritual tidak pernah menjadi pintu yang harus dibuka.
   host._fzAutoClose=setTimeout(()=>{try{dismissDailyRitual()}catch(_){}},3200);
   return true;
@@ -5349,16 +5440,20 @@ function gemsHook(){
       try{celebrate()}catch(_){}
       // [ADAPTASI] OA-7 §4: streak_5 pada momen streak beruntun yang sama dengan pawReact.
       uiSfx('streak_5');
-      // P0-3 bugfix (hulu): 'correct-streak' bukan event maskot yang dikenal (daftar resmi
-      // di fiezel-mascot.js react()), jadi maskot diam justru pada momen gem terbit.
-      // 'badge-earned' → proud adalah event resmi untuk pengakuan seperti ini.
-      pawReact('badge-earned');
+      // [FASE-8] 17 R-1 / 13 §1.3: momen gem terbit adalah event 'reward' resmi
+      // (celebrating lv2 + dada busung, TIDAK menyentuh streak jawaban maskot).
+      // Menggantikan tambalan 'badge-earned' P0-3 yang lama.
+      pawReact('reward',{kind:'gems'});
       return n;
     },
     spend:(cost,reason)=>{
       const r=g.gemsSpend(state.gems,cost,reason||'translation_session',Date.now(),sessionId);
       if(!r.ok)return false;
-      state.gems=r.gems;save();return true;
+      state.gems=r.gems;save();
+      // [FASE-8] 09 §3.1 GEMS_SPEND: membelanjakan gem = memberi hadiah pada diri
+      // sendiri → love singkat, tanpa bunyi (uang keluar tidak difanfarekan).
+      try{pawReact('favorite')}catch(_){}
+      return true;
     }
   };
 }
@@ -5412,7 +5507,10 @@ function writingSaveDraft(text){state.writing={...(state.writing||{}),draft:Stri
 function writing(){
   const prompt=writingPromptFor(state.writing?.promptIndex),draft=String(state.writing?.draft||''),done=writingThisWeek();
   const exam=prompt?writingExamTask(prompt):null,target=prompt?writingTargetWords(prompt):0,criteria=writingRubricCriteria();
-  if(!prompt){setApp(`<section class="fade writing-page"><div class="section-head"><div><h1>Writing</h1><p>Belum ada topik writing untuk level ${esc(getActiveLevel())}.</p></div>${levelControlMarkup()}</div></section>`);return}
+  /* [FASE 7] Layar buntu tanpa materi — penempatan baru bernilai tertinggi per 12-lesson
+     tabel §4 (empty state: HADIR, anchor A, pose menyemangati): kehangatan di tempat yang
+     tadinya jalan buntu. Keputusan tetap pra-cat (C3); tanpa komponen, layarnya seperti dulu. */
+  if(!prompt){const pawEmpty=(self.FiezelPawSlot&&typeof self.FiezelPawSlot.plan==='function')?self.FiezelPawSlot.plan('empty-state',{motion:pawMotionAllowed()}):null;setApp(`<section class="fade writing-page">${pawEmpty?pawEmpty.above:''}<div class="section-head"><div><h1>Writing</h1><p>Belum ada topik writing untuk level ${esc(getActiveLevel())}.</p></div>${levelControlMarkup()}</div></section>`);if(pawEmpty)try{self.FiezelPawSlot.wire({emit:pawReact,motion:pawMotionAllowed()})}catch(_){}return}
   setApp(`<section class="fade writing-page">
 <div class="skill-page-hero skill-writing"><span class="skill-badge">SKILL INTI TES · ${esc(getActiveLevel())}</span><h1>Writing</h1><p>Tulis dulu apa adanya. Rapihnya urusan nanti - yang penting jadi.</p><button type="button" class="active-level-control" onclick="openLevelPanel()"><span>Level belajar</span><strong>${esc(getActiveLevel())}</strong><small>Ganti</small></button></div>
 <div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>
@@ -5481,7 +5579,9 @@ Aturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan 
     celebrate();
     // [ADAPTASI] OA-7 §4: xp_gain menandai progres tercatat (tulisan tersimpan + dinilai).
     uiSfx('xp_gain');
-    pawReact('lesson-complete');
+    // [FASE-8] 09 §3.1: umpan balik tulisan = pengakuan karya (proud), bukan busur
+    // completion 2600ms yang khusus akhir sesi kuis.
+    pawReact('badge-earned');
     showToast('Tulisan tercatat. Mantap.');
   }catch(error){
     saveWritingEntry(prompt,words);
@@ -5601,7 +5701,12 @@ function awardQuizGems(streak,awardsThisSession,sessionId){
   save();
   try{showToast(g.toastFor(streak,amount))}catch(_){}
   try{quizMajorCelebrate()}catch(_){}
-  pawReact('badge-earned');
+  // [ADAPTASI] OA-7 §4: gem terbit di kuis adalah momen reward yang SAMA dengan jalur
+  // Skills Lab (gemsHook) — bunyinya juga harus sama: streak_5. Sebelumnya jalur ini
+  // bisu padahal konfeti dan toast-nya menyala; paritas antar-domain (P0-3).
+  uiSfx('streak_5');
+  // [FASE-8] 17 R-1: gem terbit di kuis juga momen 'reward' (GEMS_AWARD 09 §3.1).
+  pawReact('reward',{kind:'gems'});
   return amount;
 }
 /* P1 PRASASTI (audit §9/§14): lencana berbasis bukti. Aturannya hidup di modul murni
@@ -5652,10 +5757,14 @@ function showPrasastiMoment(fresh){
   host.addEventListener('click',e=>{if(e.target===host)dismissPrasastiMoment()});
   document.body.appendChild(host);enhanceUI();
   try{host.querySelector('button.primary')?.focus()}catch(_){}
-  // Resep momen dari spek: kartu + maskot proud + konfeti + akor penuh. Konfeti dan
+  // Resep momen dari spek: kartu + maskot proud + konfeti + bunyi pencapaian. Konfeti dan
   // maskot lewat gerbang reduced-motion yang sudah ada (celebrate()/pawReact); bunyi
   // lewat uiSfx yang menghormati preferensi feedbackSounds.
-  uiSfx('celebrate');
+  // [ADAPTASI] OA-7 §4 baris PENCAPAIAN: lencana → notif_achievement, BUKAN alias
+  // celebrate→lesson_complete — prasasti sering terbit tepat setelah finishQuiz yang
+  // baru saja membunyikan lesson_complete, dan bunyi yang sama dua kali beruntun
+  // terbaca sebagai gagap, bukan dua peristiwa.
+  uiSfx('notif_achievement');
   try{celebrate()}catch(_){}
   pawReact('badge-earned');
   return true;
@@ -5798,7 +5907,7 @@ function flashcards(level){
     const nextCard=pool[i+1]||null;
     $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
     $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast('Progres tersimpan')};
-    $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast('Ditandai dikuasai');i++;draw()};
+    $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast('Ditandai dikuasai');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
   };
   enterStage('vocab-flashcards',{draw:()=>draw(),leave:()=>audio.stop()});
@@ -5816,7 +5925,7 @@ function reviewVocab(){
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
     $('reviewLearning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();i++;draw()};
-    $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');i++;draw()};
+    $('reviewMastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');/* [FASE-4] 09 §3.3: dikuasai dari ulangan juga pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('reviewCard'),()=>{i++;draw()},()=>{i=Math.max(0,i-1);draw()})
   };
   enterStage('vocab-review',()=>draw());
@@ -6524,6 +6633,9 @@ function quizLoop(cfg){
  // [ADAPTASI] OA-7 §4: penanda mulai sesi - berbunyi saat soal pertama benar-benar akan
  // tampil (setelah semua validasi kolam soal lolos), bukan saat tombolnya diketuk.
  uiSfx('lesson_start');
+ // [FASE-4] 09 §2.17: maskot mengarahkan perhatian ke soal pertama — menempel pada
+ // bunyi mulai sesi di atas (momen yang sama, tanpa bunyi kedua).
+ try{pawReact('lesson-start')}catch(_){}
 
  // Kolam sisa, bukan antrean. Inilah yang membuat pemilihan berikutnya bisa hidup.
  const remaining=questions.slice();
@@ -6591,9 +6703,20 @@ function quizLoop(cfg){
   }catch{}
   answer.locked=false;answer.retryOf='';answer.scaffold='';answer.timing='';
   const opts=q.options||[];
-  setApp(`<section class="fade quiz-shell"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div><div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${card(`<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`)} </section>`);
+  /* [FASE 7] Slot PAW panel (12-lesson-layer.md tabel §4: kartu soal HADIR — peek di
+     ponsel, above di tablet, kolom samping desktop). Keputusan hadir/absen dibuat DI SINI,
+     SEBELUM cat, di string templat yang sama (C3 — nol CLS, tanpa sisip/cabut di layar
+     hidup). Saat slot hadir, wajah quiz-mascot lama tidak ikut dicat — maksimal satu PAW
+     skala panel per layar (§2b-4); saat komponen belum siap, semuanya persis seperti dulu. */
+  const pawSlot=(self.FiezelPawSlot&&typeof self.FiezelPawSlot.plan==='function')?self.FiezelPawSlot.plan('quiz-question',{motion:pawMotionAllowed()}):null;
+  setApp(`<section class="fade quiz-shell${pawSlot?pawSlot.shellClass:''}"><div class="quiz-topbar"><button id="quizExit"><i data-lucide="x"></i> Keluar</button><div class="quiz-progress"><span>${asked+1}</span><em>/ ${planned}</em></div><button id="quizNext" class="quiz-next" disabled>Lanjut <i data-lucide="arrow-right"></i></button></div>${pawSlot?'':`<div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>`}${q.passage?card(`<div class="passage"><div class="eyebrow">TEKS BACAAN</div><h3>${esc(q.passage.title)}</h3><p>${esc(q.passage.text)}</p></div>`):(cfg.context?card(`<div class="passage"><b>${esc(cfg.context.title)}</b><p>${esc(cfg.context.text)}</p></div>`):'')}${pawSlot?pawSlot.above:''}${card(`${pawSlot?pawSlot.peek:''}<div class="eyebrow">${esc(friendlySkillName(q.skill||q.type))} · ${esc(q.difficulty||'adaptif')}</div><h2 class="question" id="quizStem">${esc(q.question)}</h2>${q.type==='listening'?`<div class="quiz-listen"><button id="quizListen" class="quiz-listen-btn"><i data-lucide="volume-2"></i> Dengarkan</button><span id="quizListenNote" class="muted">Pilihan terbuka setelah rekaman diputar.</span></div>`:''}<div id="options" class="options"></div><div id="tutorTurn" class="tutor-turn hidden"></div><div id="feedback" class="feedback hidden"></div>`,pawSlot?pawSlot.cardClass:'')}${pawSlot?pawSlot.side:''} </section>`);
   $('quizExit').onclick=()=>{closeConfidencePop();audio.stop();go('home')};
   $('options').append(...opts.map((o,j)=>{const b=document.createElement('button');b.className='option';b.textContent=o;b.onclick=()=>answer(q,j,b);return b}));
+  /* [FASE 7] m-audit-03 Tugas D: tiga event pelajaran yang didukung maskot tapi tak pernah
+     dipanggil (question-shown / hover-answer / answer-picked). Pengawinannya milik modul slot;
+     emit = pawReact supaya gerbang kurangi-gerak & preferensi animasi tetap SATU pintu, dan
+     isLocked membaca kunci teardown kuis yang sama dengan answer() (12 §3b). */
+  if(pawSlot)try{self.FiezelPawSlot.wire({stem:$('quizStem'),options:$('options'),emit:pawReact,isLocked:()=>answer.locked,motion:pawMotionAllowed()})}catch(_){}
   /* Fase 3 (C5 butir 2): soal cloze tidak punya opsi - murid MENGETIK jawabannya. Satu
      percobaan (produksi dinilai grader, bukan tebak-ulang), Enter atau tombol Periksa. */
   if(q.type==='cloze'){
@@ -6769,6 +6892,10 @@ function quizLoop(cfg){
    answer.retryOf=q.id;
    button.disabled=true;
    speak(tutorCompose(q,j,false,answer.scaffold,answer.move,answer.timing),{retry:true});
+   /* [FASE-4] 09 §3.3: pijakan retry ADALAH momen petunjuk — maskot ikut 'hint'
+      SETELAH beat concern ≤1000ms selesai (13 §2.2), bukan menimpanya. Tanpa bunyi:
+      SFX hint sudah dipensiunkan (20 §4); cooldown 8 detiknya dijaga komponen. */
+   setTimeout(()=>{try{pawReact('hint')}catch(_){}},1100);
    enhanceUI();
    return;
   }
@@ -6967,7 +7094,15 @@ function finishQuiz(cfg,score,total,tutorReport){
   else uiSfx('lesson_complete');
   // m026-01: menempel pada bunyi penutup di atas dengan sengaja - keduanya perayaan yang
   // sama, dan keduanya hanya berjalan pada penutupan sesi yang MEMANG tampil di layar.
-  pawReact('lesson-complete');
+  // [FASE-4/8] 09 §3.1 + 13 §4: ujian level LULUS = 'level-up' (P4, TIDAK ditumpuk di
+  // atas lesson-complete); ujian gagal = encouraging (bukan berkabung); tes penempatan
+  // selesai = milestone once-ever 'placement-complete' (jatuh ke completion bila sudah
+  // pernah). Bunyinya TIDAK ditambah — exam_pass+paw_celebrate di atas sudah dua lapis,
+  // dan 20 §4 melarang lapis ketiga.
+  if(cfg&&cfg.type==='level-exam'&&examVerdict?.passed)pawReact('level-up');
+  else if(cfg&&cfg.type==='level-exam')pawSetState('encouraging');
+  else if(cfg?.placement){if(!pawMilestone('placement-complete'))pawReact('lesson-complete')}
+  else pawReact('lesson-complete');
   // P0-1 (audit §5/§13): penyelesaian sesi adalah momen Major — konfeti ringan untuk
   // penyelesaian yang kuat (ambang 70% yang sama dengan haptic 'success' di atas), lewat
   // pintu beranggaran quizMajorCelebrate(): kalau gem sudah menghujani konfeti di tengah
@@ -6995,6 +7130,21 @@ function finishQuiz(cfg,score,total,tutorReport){
   // P0-1: skor count-up 0→n% (audit §5: angka tidak pernah melompat). Markup sudah memuat
   // nilai final, jadi lingkungan tanpa animasi tetap benar tanpa satu frame pun berjalan.
   try{countUpScore($('quizScoreCount'),accuracy)}catch(_){}
+  // [FASE-9 permukaan] Wajah di cincin skor: pawReact('level-up'/'lesson-complete') di atas
+  // berjalan SEBELUM setApp menggambar maskot layar hasil, jadi instans baru itu lahir idle
+  // padahal copy-nya menjanjikan perayaan (LEVEL_GUARD_COPY.examPass: "PAW sampai
+  // lompat-lompat"). Yang disetel HANYA instans layar hasil — bukan siaran FiezelPaw,
+  // karena gelembung pembimbing sudah menerima reaksinya di atas dan siaran kedua berarti
+  // perayaan ganda. hold:0 = tanpa revert; koreo level-up sendiri yang mendarat di bingkai
+  // proud pada 2000ms. Kurangi-gerak: bingkai statis lewat applyFace — nol animasi (10 §2).
+  try{
+    const rsPaw=document.querySelector('.result-stage fiezel-mascot');
+    if(rsPaw&&typeof rsPaw.setState==='function'){
+      const wajahHasil=(cfg&&cfg.type==='level-exam'&&examVerdict?.passed)?'level-up':accuracy>=70?'proud':'encouraging';
+      if(pawMotionAllowed())rsPaw.setState(wajahHasil,{hold:0});
+      else if(typeof rsPaw.applyFace==='function')rsPaw.applyFace(wajahHasil==='encouraging'?'encouraging':'proud');
+    }
+  }catch(_){}
   // P1 Prasasti: bukti baru saja bertambah (sesi masuk sessionHistory, mastery ter-update,
   // examVerdict sudah dinilai) — inilah titik ukir utama. Jeda pendek supaya layar hasil
   // sempat tercat dan momen lencana tidak bertabrakan dengan konfeti penyelesaian.
