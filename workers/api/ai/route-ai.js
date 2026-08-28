@@ -415,7 +415,9 @@
 
     var spec = verdict.spec;
     var taskName = verdict.task;
-    var fallbackText = AiTasks.fallbackFor(taskName, verdict.input);
+    // Wave 3: fallback dipilih per-locale (murid th menerima fallback Thai, bukan Indonesia).
+    // `verdict.locale` sudah hasil enum tertutup canonicalLearnerLocale() — hanya 'id'/'th'.
+    var fallbackText = AiTasks.fallbackFor(taskName, verdict.input, verdict.locale);
 
     // --- BREAKER SEBELUM KUOTA. Provider yang sudah terbukti mati tidak boleh memakan satu pun
     // jatah murid: OPEN artinya jawabannya sudah diketahui tanpa memanggil apa pun.
@@ -581,7 +583,9 @@
         // gagal adalah jawabannya — jadi ini TIDAK menghitung kegagalan breaker: membuka breaker
         // karena satu jawaban terlalu panjang akan mematikan AI untuk semua murid tanpa sebab
         // transport. Yang terjadi: jawaban dibuang, fallback deterministik dipakai, sebab dicatat.
-        var verdictOut = AiTasks.checkOutputContract(taskName, text);
+        // Wave 3: gate mutu dipilih per-locale — tanpa ini jawaban th diperiksa gate 'id'
+        // yang vakum untuk aksara Thai (AI-09 F02). Pemanggilan tanpa locale = jalur 'id' lama.
+        var verdictOut = AiTasks.checkOutputContract(taskName, text, { locale: verdict.locale });
         if (!verdictOut.ok && verdictOut.reason === 'sentence_limit_exceeded' &&
             AiTasks.isClampable(taskName)) {
           // P3 - PELANGGARAN BATAS KALIMAT: DIPOTONG, BUKAN DIBUANG, BUKAN DILONGGARKAN.
@@ -598,7 +602,10 @@
           // dan hasil potongan DIPERIKSA ULANG dengan pemeriksa yang sama - potongan yang
           // malah melanggar hal lain tetap ditolak.
           var clamp = AiTasks.clampSentences(text, spec.maxSentences);
-          var reCheck = clamp.clamped ? AiTasks.checkOutputContract(taskName, clamp.text) : null;
+          // Catatan th: `clampSentences` bekerja atas kalimat Latin, jadi untuk teks Thai ia
+          // mengembalikan `clamped:false` (tidak ada tanda titik yang bisa dipotong) dan jalur
+          // ini jatuh ke fallback th — fail-safe yang disengaja, bukan potongan Thai yang ganjil.
+          var reCheck = clamp.clamped ? AiTasks.checkOutputContract(taskName, clamp.text, { locale: verdict.locale }) : null;
           if (reCheck && reCheck.ok) {
             text = clamp.text;
             clamped = true;

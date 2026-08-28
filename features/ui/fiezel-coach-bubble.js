@@ -28,6 +28,18 @@
 (function (global) {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
+  // keluaran render tetap byte-identik dengan sebelumnya.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var doc = global.document;
   if (!doc) return;
 
@@ -142,24 +154,24 @@
   };
 
   var PAGE_LINES = {
-    home: ['Mau mulai dari mana hari ini?', 'Gue udah siapin rencana hari ini, tinggal jalan.'],
-    vocab: ['Kata baru itu kayak koin — dikumpulin dikit-dikit.', 'Review dulu yang hampir lupa, baru tambah baru.'],
-    grammar: ['Salah di grammar itu wajar, yang penting ngerti kenapanya.', 'Satu pola dulu, jangan borong semua.'],
-    reading: ['Baca pelan-pelan, ga usah kejar cepet.', 'Ketuk kalimat yang bikin bingung, gue jelasin.'],
+    home: [T('coach.mau-start-from-mana-day'), T('coach.gue-udah-siapin-rencana-hari')],
+    vocab: [T('coach.kata-new-that-kayak-koin'), T('coach.review-dulu-yang-hampir-lupa')],
+    grammar: [T('coach.wrong-at-grammar-that-wajar'), 'Satu pola dulu, jangan borong semua.'],
+    reading: ['Baca pelan-pelan, ga usah kejar cepet.', T('coach.tap-kalimat-yg-bikin-bingung')],
     listening: ['Dengerin dua kali sebelum lihat teksnya, ya.', 'Ga nangkep? Wajar. Ulang sekali lagi.'],
-    speaking: ['Ngomong aja dulu, salah itu bagian dari latihan.', 'Ga ada yang dengerin selain kamu dan gue.'],
+    speaking: [T('coach.ngomong-aja-dulu-wrong-that'), T('coach.ga-ada-yang-dengerin-selain')],
     writing: ['Tulis dulu apa adanya, rapihnya belakangan.', 'Dikit tapi jadi, lebih baik daripada panjang tapi ga selesai.'],
     skills: ['Speaking sama Listening paling cepat naik kalau rutin.', 'Lima menit di sini udah kehitung, kok.'],
-    library: ['Cerita pendek dulu aja, biar ga kebanyakan mikir.', 'Ketuk kalimatnya kalau mau lihat artinya.'],
-    classroom: ['Materi ini ada subtitle Indonesianya, tenang.', 'Pilih topik yang paling bikin penasaran.'],
-    progress: ['Ini peta kemampuanmu — bukan rapor.', 'Yang merah bukan aib, itu yang bakal kita kerjain.'],
+    library: ['Cerita pendek dulu aja, biar ga kebanyakan mikir.', T('coach.tap-kalimatnya-if-mau-lihat')],
+    classroom: ['Materi ini ada subtitle Indonesianya, tenang.', T('coach.choose-topik-yg-paling-bikin')],
+    progress: ['Ini peta kemampuanmu — bukan rapor.', T('coach.yg-merah-bukan-aib-that')],
     test: ['Jawab apa adanya, ini buat ngukur, bukan buat nilai.', 'Ga usah tegang, ga ada yang lihat.']
   };
 
   function localGreeting(ctx) {
     var c = ctx || {};
-    if (c.streak && c.streak >= 3) return 'Runtun ' + c.streak + ' hari. Jangan putus hari ini ya.';
-    if (c.dueReviews) return c.dueReviews + ' materi nunggu review — itu yang paling cepat naikin skor.';
+    if (c.streak && c.streak >= 3) return 'Runtun ' + c.streak + T('coach.day-jangan-putus-day-this');
+    if (c.dueReviews) return c.dueReviews + T('coach.materi-nunggu-review-that-yg');
     var lines = PAGE_LINES[c.view] || PAGE_LINES.home;
     return lines[Math.floor(Math.random() * lines.length)];
   }
@@ -168,15 +180,15 @@
     var c = ctx || {};
     var q = String(question || '').toLowerCase();
     if (/level|kemampuan|skor|nilai/.test(q)) {
-      return 'Level estimasi kamu sekarang ' + (c.level || 'A1') + '. Itu dari bukti latihan yang udah masuk, bukan tebakan — makin sering latihan, makin akurat.';
+      return T('coach.level-estimasi-you-sekarang') + (c.level || 'A1') + '. Itu dari bukti latihan yang udah masuk, bukan tebakan — makin sering latihan, makin akurat.';
     }
     if (/mulai|belajar apa|hari ini|rencana/.test(q)) {
-      return 'Hari ini paling enak mulai dari ' + (c.focusLabel || 'latihan singkat') + '. Sepuluh soal aja, ga usah lama.';
+      return T('coach.day-this-paling-enak-start') + (c.focusLabel || T('coach.practice-singkat')) + '. Sepuluh soal aja, ga usah lama.';
     }
     if (/streak|runtun/.test(q)) {
-      return 'Runtun kamu ' + (c.streak || 0) + ' hari. Lima jawaban bermakna udah cukup buat jaga hari ini.';
+      return T('coach.streak-you') + (c.streak || 0) + T('coach.day-lima-answer-bermakna-udah');
     }
-    return 'Gue lagi ga bisa nyambung ke otak AI-nya (butuh login Puter + internet). Tapi latihannya jalan terus kok — mau gue temenin mulai dari mana?';
+    return T('coach.gue-again-ga-can-nyambung');
   }
 
   /* ------------------------------------------------------------------ *
@@ -297,17 +309,17 @@
     sheet.className = 'fz-coach-sheet';
     sheet.hidden = true;
     sheet.innerHTML =
-      '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="Pembimbing FIEZEL">' +
+      '<div class="fz-coach-panel" role="dialog" aria-modal="true" aria-label="' + T('coach.panel-aria') + '">' +
         '<div class="fz-coach-head">' +
           '<span class="' + pawHost('fz-coach-avatar') + '">' + pawFace('fz-coach-face') + '</span>' +
-          '<span><b>FIEZEL</b><small class="fz-coach-status">pembimbing kamu</small></span>' +
-          '<button type="button" class="fz-coach-close" aria-label="Tutup">✕</button>' +
+          T('coach.fiezel-pembimbing-you') +
+          '<button type="button" class="fz-coach-close" aria-label="' + T('coach.close-aria') + '">✕</button>' +
         '</div>' +
         '<div class="fz-coach-log" aria-live="polite"></div>' +
         '<div class="fz-coach-chips"></div>' +
         '<form class="fz-coach-form">' +
-          '<textarea rows="1" placeholder="Tanya apa aja…" aria-label="Tanya FIEZEL"></textarea>' +
-          '<button type="submit" class="fz-coach-send" aria-label="Kirim">→</button>' +
+          '<textarea rows="1" placeholder="' + T('coach.input-placeholder') + '" aria-label="' + T('coach.input-aria') + '"></textarea>' +
+          '<button type="submit" class="fz-coach-send" aria-label="' + T('coach.send-aria') + '">→</button>' +
         '</form>' +
       '</div>';
 
@@ -343,12 +355,12 @@
     function chips() {
       var view = context.view || 'home';
       var list = [
-        { label: 'Aku harus mulai dari mana?', q: 'Aku harus mulai belajar dari mana hari ini?' },
-        { label: 'Level aku sekarang?', q: 'Level kemampuan aku sekarang di mana?' }
+        { label: T('coach.me-harus-start-from-mana'), q: T('coach.me-harus-start-study-from') },
+        { label: T('coach.level-me-sekarang'), q: T('coach.level-kemampuan-me-sekarang-at') }
       ];
-      if (view === 'grammar') list.unshift({ label: 'Kenapa aku salah terus di sini?', q: 'Kenapa aku sering salah di grammar? Jelaskan singkat.' });
-      if (view === 'vocab') list.unshift({ label: 'Cara inget kata baru?', q: 'Gimana cara cepat inget kosakata baru?' });
-      if (view === 'writing') list.unshift({ label: 'Cek tulisanku dong', q: 'Tolong cek tulisan bahasa Inggrisku dan kasih satu perbaikan paling penting.' });
+      if (view === 'grammar') list.unshift({ label: T('coach.kenapa-me-wrong-terus-at'), q: T('coach.kenapa-me-sering-wrong-at') });
+      if (view === 'vocab') list.unshift({ label: 'Cara inget kata baru?', q: T('coach.gimana-cara-cepat-inget-vocab') });
+      if (view === 'writing') list.unshift({ label: 'Cek tulisanku dong', q: T('coach.tolong-cek-tulisan-lang-inggrisku') });
       if (view === 'speaking' || view === 'listening' || view === 'skills') {
         list.unshift({ label: 'Tips biar cepat lancar?', q: 'Kasih satu tips singkat biar speaking dan listening cepat lancar.' });
       }
@@ -411,7 +423,7 @@
       } catch (error) {
         push('coach', localAnswer(context, text));
       } finally {
-        statusEl.textContent = 'pembimbing kamu';
+        statusEl.textContent = T('coach.pembimbing-you');
         busy = false;
         // Baik jawabannya dari AI atau dari jalur lokal, murid tetap dapat jawaban.
         // Sengaja transient supaya maskot kembali idle sendiri.

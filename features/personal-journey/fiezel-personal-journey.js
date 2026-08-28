@@ -21,6 +21,19 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js), bukan literal
+  // di titik pakai. Di browser runtime-nya dimuat lebih dulu (index.html); di Node (gate
+  // print-only me-require modul ini langsung) modul memuatnya sendiri supaya keluaran id
+  // tetap byte-identik. Modul tetap PURE: T() deterministik untuk locale yang sama.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
+
   var SCHEMA = 'fiezel-personal-journey-v1';
   var DAY_MS = 86400000;
   // Produk ini dipakai di Indonesia dan "hari belajar" harus sama untuk pengguna dan untuk test.
@@ -37,24 +50,26 @@
   // (proyeksi aggregate-only dari fiezel-sl-v1-state), jadi di R2 statusnya belum terukur.
   var MEASURED_SKILLS = ['vocabulary', 'grammar', 'reading'];
 
+  // Nilai tabel dipetakan ke kunci i18n; buildGoalProfile me-resolve lewat T() pada saat
+  // dipanggil supaya profilnya mengikuti locale aktif (AI-14 F03: render ulang pasca ganti).
   var GOALS = {
     school: {
-      id: 'school', label: 'Sekolah',
-      prerequisites: ['Grammar dasar stabil', 'Kosakata harian dan kelas', 'Reading teks pendek']
+      id: 'school', label: 'journey.goal-school-label',
+      prerequisites: ['journey.goal-school-p1', 'journey.goal-school-p2', 'journey.goal-school-p3']
     },
     it: {
-      id: 'it', label: 'IT dan teknologi',
-      prerequisites: ['Kosakata teknis dasar', 'Baca panduan teknis', 'Grammar buat langkah-langkah']
+      id: 'it', label: 'journey.goal-it-label',
+      prerequisites: ['journey.goal-it-p1', 'journey.goal-it-p2', 'journey.goal-it-p3']
     },
     scholarship: {
-      id: 'scholarship', label: 'Beasiswa',
-      prerequisites: ['Nulis email resmi', 'Perkenalan diri', 'Baca pengumuman resmi']
+      id: 'scholarship', label: 'journey.goal-scholarship-label',
+      prerequisites: ['journey.goal-scholarship-p1', 'journey.goal-scholarship-p2', 'journey.goal-scholarship-p3']
     },
     exam_foundation: {
-      id: 'exam_foundation', label: 'Persiapan IELTS/TOEFL',
+      id: 'exam_foundation', label: 'journey.goal-exam-label',
       // Roadmap melarang prediksi skor. Yang boleh disebut hanya prasyarat.
-      prerequisites: ['Baca teks sekolah', 'Nyatet sambil dengerin', 'Grammar yang rapi'],
-      note: 'FIEZEL nggak menebak skor IELTS/TOEFL kamu. Yang ditampilkan cuma apa yang harus bisa dulu.'
+      prerequisites: ['journey.goal-exam-p1', 'journey.goal-exam-p2', 'journey.goal-exam-p3'],
+      note: 'journey.goal-exam-note'
     }
   };
   var DEFAULT_GOAL = 'school';
@@ -72,17 +87,17 @@
    * Jadi yang diperbaiki penulisnya, bukan penerjemahnya.
    */
   var RATIONALE_TEXT = {
-    due_reviews: 'ada materi yang harus diulang',
-    forgetting_risk: 'ada materi yang mulai kamu lupa',
-    weak_skill: 'ada bagian yang masih sering salah',
-    recurring_error: 'kesalahan yang sama muncul terus',
-    abandonment_risk: 'latihan sering nggak kamu selesaikan',
-    consistency_risk: 'dua minggu ini kamu jarang latihan',
-    confidence_gap: 'kamu ngerasa bisa, tapi hasilnya belum',
-    calm_pacing: 'kamu masih lama mikirnya',
-    session_interrupted: 'ada latihan yang belum kamu selesaikan',
-    balanced_progression: 'semuanya lagi aman',
-    evidence_thin: 'catatan latihanmu belum cukup'
+    due_reviews: 'journey.rat-due-reviews',
+    forgetting_risk: 'journey.rat-forgetting-risk',
+    weak_skill: 'journey.rat-weak-skill',
+    recurring_error: 'journey.rat-recurring-error',
+    abandonment_risk: 'journey.rat-abandonment-risk',
+    consistency_risk: 'journey.rat-consistency-risk',
+    confidence_gap: 'journey.rat-confidence-gap',
+    calm_pacing: 'journey.rat-calm-pacing',
+    session_interrupted: 'journey.rat-session-interrupted',
+    balanced_progression: 'journey.rat-balanced-progression',
+    evidence_thin: 'journey.rat-evidence-thin'
   };
 
   function clamp(value, min, max) {
@@ -116,9 +131,9 @@
     var row = GOALS[normalizeGoal(goal)];
     return {
       id: row.id,
-      label: row.label,
-      prerequisites: row.prerequisites.slice(),
-      note: row.note || 'Ini daftar yang harus kamu bisa dulu, bukan tebakan nilai ujian.',
+      label: T(row.label),
+      prerequisites: row.prerequisites.map(T),
+      note: row.note ? T(row.note) : T('journey.goal-note-default'),
       scorePrediction: false
     };
   }
@@ -157,13 +172,13 @@
             mastery: row.completionRate == null ? null : clamp(row.completionRate, 0, 100),
             riskCount: 0,
             targetCoverage: row.targetCoverage || null,
-            basis: row.attempts + ' latihan tercatat pada skill ini.'
+            basis: T('journey.basis-sl-practice', { n: row.attempts })
           };
         }
         return {
           skill: skill, label: SKILL_LABELS[skill], status: 'pending_r3',
           attempts: null, accuracy: null, mastery: null, riskCount: 0,
-          basis: 'Latihan Speaking dan Listening dicatat terpisah, belum masuk peta ini.'
+          basis: T('journey.basis-sl-pending')
         };
       }
       // Snapshot memakai nama `vocabulary`, riwayat jawaban memakai type `vocab`.
@@ -187,8 +202,8 @@
         riskCount: risks,
         weakSkillCount: weakHere,
         basis: attempts > 0
-          ? attempts + ' jawaban tercatat pada skill ini.'
-          : 'Belum ada jawaban di bagian ini.'
+          ? T('journey.basis-answers', { n: attempts })
+          : T('journey.basis-none')
       };
     });
   }
@@ -210,9 +225,9 @@
 
   function rationaleText(codes) {
     var known = codes.filter(function (c) { return RATIONALE_TEXT[c]; });
-    if (!known.length) return 'Semuanya aman, jadi minggu ini santai dulu.';
-    var reasons = known.slice(0, 3).map(function (c) { return RATIONALE_TEXT[c]; });
-    return 'Soalnya ' + reasons.join(', ') + '.';
+    if (!known.length) return T('journey.rat-all-clear');
+    var reasons = known.slice(0, 3).map(function (c) { return T(RATIONALE_TEXT[c]); });
+    return T('journey.rat-reasons', { reasons: reasons.join(', ') });
   }
 
   /**
@@ -353,14 +368,14 @@
     if (!recovery.needed && !policy.avoidNewContent && focus > 4) { transfer = 1; focus -= 1; }
 
     var blocks = [];
-    if (review > 0) blocks.push({ kind: 'review', questions: review, mandatory: true, why: 'Yang hampir kamu lupa didulukan.' });
+    if (review > 0) blocks.push({ kind: 'review', questions: review, mandatory: true, why: T('journey.why-review') });
     blocks.push({
       kind: 'focus', questions: focus, mandatory: true,
       why: mission.focusSkill
-        ? 'Fokus minggu ini: ' + String(mission.focusSkill).replace(/_/g, ' ') + '.'
-        : 'Fokus pada domain ' + String(mission.focusDomain || policy.primaryDomain || 'grammar') + '.'
+        ? T('journey.why-focus-skill', { skill: String(mission.focusSkill).replace(/_/g, ' ') })
+        : T('journey.why-focus-domain', { domain: String(mission.focusDomain || policy.primaryDomain || 'grammar') })
     });
-    if (transfer > 0) blocks.push({ kind: 'transfer', questions: transfer, mandatory: false, why: 'Soal campur biar nggak kaku.' });
+    if (transfer > 0) blocks.push({ kind: 'transfer', questions: transfer, mandatory: false, why: T('journey.why-transfer') });
 
     var codes = recovery.needed
       ? recovery.rationale.codes

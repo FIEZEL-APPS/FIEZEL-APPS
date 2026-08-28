@@ -89,6 +89,13 @@ mengizinkan pembundelan dan redistribusi selama pemberitahuan lisensinya diperta
   Proyek: https://github.com/Instrument/instrument-serif
 - **Plus Jakarta Sans** — dipakai untuk teks tubuh dan judul kecil.
   Proyek: https://github.com/tokotype/PlusJakartaSans
+- **Noto Sans Thai Looped** — wajah Thai untuk locale th (Wave 3), subset
+  Thai + Latin dasar (4 berat statis diinstansiasi dari font variabel resmi),
+  aktif hanya lewat `:lang(th)` + `unicode-range` di `style.css`.
+  Proyek: https://github.com/notofonts/thai (didistribusikan via
+  https://github.com/google/fonts, `ofl/notosansthailooped`).
+  Hak cipta: 2022 The Noto Project Authors. Lisensi: SIL OFL 1.1 —
+  salinan penuh di `assets/fonts/OFL-NotoSansThaiLooped.txt`.
 
 Teks lisensi OFL 1.1: https://openfontlicense.org/
 

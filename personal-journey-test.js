@@ -5,6 +5,29 @@
  * tidak menebak skill yang belum diukur, dan tidak pernah menjanjikan skor ujian.
  */
 const assert = require('assert');
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — index.html memuat fiezel-i18n.js +
+// copy-id-*.js SEBELUM modul fitur. Begitu modul journey memakai FiezelI18n.t() untuk naskah
+// penjelasannya (mekanisme rationale code → kalimat tetap diuji), require di bawah butuh
+// global FiezelI18n + copy terdaftar. existsSync = hijau dua arah (pra & pasca ekstraksi).
+// Asersi teks id (mis. /harus diulang/) TIDAK berubah — byte-identik (id-golden-snapshot).
+(function bootI18nHarness() {
+  const fs = require('fs');
+  const path = require('path');
+  const i18nDir = path.join(__dirname, 'features', 'i18n');
+  const runtime = path.join(i18nDir, 'fiezel-i18n.js');
+  if (!fs.existsSync(runtime)) return;
+  global.FiezelI18n = require(runtime);
+  // Copy-map UMD-lite membaca (typeof self!=='undefined'?self:this).FiezelI18n; Node tidak
+  // punya `self`, jadi sediakan sementara supaya registerCopy benar-benar berjalan.
+  const hadSelf = Object.prototype.hasOwnProperty.call(global, 'self');
+  const prevSelf = hadSelf ? global.self : undefined;
+  global.self = global;
+  try {
+    for (const f of fs.readdirSync(i18nDir).filter(n => /^copy-id-.*\.js$/.test(n)).sort()) require(path.join(i18nDir, f));
+  } finally {
+    if (hadSelf) global.self = prevSelf; else delete global.self;
+  }
+}());
 const journey = require('./features/personal-journey/fiezel-personal-journey.js');
 
 let failures = 0;

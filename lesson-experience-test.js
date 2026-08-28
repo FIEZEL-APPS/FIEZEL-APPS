@@ -1,6 +1,14 @@
 const fs=require('fs'),path=require('path'),vm=require('vm');
 const root=__dirname;
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
+// AI-20 F06 (kategori 2a, UNION-CORPUS): kontrak naskah alami ('Hindari gaya buku teks',
+// 'Gunakan Bahasa Indonesia yang jernih') boleh PINDAH byte-identik ke copy-map
+// features/i18n/copy-id-*.js (dijaga id-golden-snapshot-test.js), jadi literalnya dicari
+// di gabungan app.js + copy-map id. Sinkron dengan release-audit.py check
+// 'Natural Indonesian explanations' yang memakai corpus gabungan yang sama.
+const i18nDir=path.join(root,'features','i18n');
+const copyIdCorpus=fs.existsSync(i18nDir)?fs.readdirSync(i18nDir).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(i18nDir,n),'utf8')).join('\n'):'';
+const idCorpus=app+'\n'+copyIdCorpus;
 const css=fs.readFileSync(path.join(root,'style.css'),'utf8');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const grammar=JSON.parse(fs.readFileSync(path.join(root,'grammar-templates.json'),'utf8'));
@@ -19,6 +27,12 @@ class FakeAudioContext{constructor(){this.currentTime=0;this.state='running';thi
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,navigator:{vibrate(){return true}},Date,Intl,Math,URL,Error,Promise,setTimeout,clearTimeout,setInterval:()=>({unref(){}}),clearInterval(){},SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}},AudioContext:FakeAudioContext};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
 vm.createContext(context);
+/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242): muat runtime i18n + copy-id sebelum kode app dievaluasi. existsSync = hijau dua arah. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
+
 // m029: mesin SFX dimuat lebih dulu, persis urutan <script defer> di index.html - app.js
 // mendelegasikan playFeedbackSound ke FiezelUiSfx, jadi tanpa modul ini tesnya menguji udara.
 vm.runInContext(fs.readFileSync(path.join(root,'features/audio/fiezel-ui-sfx.js'),'utf8'),context,{filename:'features/audio/fiezel-ui-sfx.js'});
@@ -76,7 +90,7 @@ setTimeout(()=>{try{
   assert(html.includes('id="answerBurst"')&&css.includes('.answer-burst.show'),'answer popup surface is missing');
   assert(html.includes('id="globalSky"')&&html.includes('id="globalCelestial"'),'full-screen celestial layer is missing');
   assert(css.includes('.global-sky')&&css.includes('.sky-light')&&css.includes('.scene-night'),'day/night full-screen visual phases are incomplete');
-  assert(app.includes('Hindari gaya buku teks')&&app.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
+  assert(idCorpus.includes('Hindari gaya buku teks')&&idCorpus.includes('Gunakan Bahasa Indonesia yang jernih'),'AI natural-language contract is missing');
   // Unduh+dekode sampel berjalan asinkron; beri satu putaran event loop sebelum menagih
   // bunyinya benar-benar DIBUNYIKAN (AudioBufferSourceNode.start), bukan hanya diminta.
   setTimeout(()=>{try{

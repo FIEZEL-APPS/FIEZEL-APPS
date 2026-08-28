@@ -52,7 +52,7 @@ const context = {
 context.window=context;context.self=context;
 context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;
 context.window.scrollTo=()=>{};context.window.requestAnimationFrame=fn=>fn();
-vm.createContext(context);
+vm.createContext(context);/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242 lanjutan: tiga harness terlewat bac8b8d): app.js kini memanggil FiezelI18n.t saat evaluasi, jadi runtime i18n + copy-id dimuat dulu. existsSync = hijau dua arah. */const __i18n=path.join(root,'features','i18n','fiezel-i18n.js');if(fs.existsSync(__i18n)){vm.runInContext(fs.readFileSync(__i18n,'utf8'),context,{filename:'fiezel-i18n.js'});for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
 try {
   vm.runInContext(fs.readFileSync(path.join(root,'app.js'),'utf8'),context,{filename:'app.js'});
 } catch (e) {

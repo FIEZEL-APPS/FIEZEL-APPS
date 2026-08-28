@@ -53,6 +53,14 @@ export const SQL = Object.freeze({
     'ON CONFLICT(cohort_day, day_index) DO UPDATE SET count = count + excluded.count',
   insertDauToken:
     'INSERT OR IGNORE INTO dau_dedup (day, token) VALUES (?1, ?2)',
+  // Dedup batch (temuan council gpt_5_6_sol §4.3 / opus §1.3): pola yang sama
+  // dengan dau_dedup — INSERT OR IGNORE, hidup pendek, dihapus rutin.
+  insertBatchId:
+    'INSERT OR IGNORE INTO batch_dedup (batch_id, day) VALUES (?1, ?2)',
+  selectBatchId:
+    'SELECT day FROM batch_dedup WHERE batch_id = ?1',
+  purgeBatchDedupOlderThan:
+    'DELETE FROM batch_dedup WHERE day < ?1',
   countDauTokens:
     'SELECT COUNT(*) AS n FROM dau_dedup WHERE day = ?1',
   // Pagar kewarasan rollup (A3): apakah hari itu ADA pemakaian yang tercatat?
@@ -193,6 +201,40 @@ export async function purgeRetentionOlderThan(db, day) {
 }
 
 /* --------------------------------------------------------------------------
+ * Dedup batch — kunci idempotensi berumur pendek
+ * -------------------------------------------------------------------------- */
+
+/**
+ * markBatchSeen(db, batchId, day) -> true bila batch BARU (boleh diagregasi),
+ * false bila sudah pernah terlihat (retry klien: JANGAN agregasi ulang).
+ *
+ * Kenapa SELECT dulu baru INSERT OR IGNORE, bukan INSERT saja:
+ * beberapa driver/tiruan D1 tidak melaporkan `meta.changes`, dan tanpa angka
+ * itu INSERT OR IGNORE tunggal tidak bisa membedakan "baru" dari "diabaikan".
+ * SELECT-dulu benar untuk semua driver; `meta.changes` (bila ada) tetap
+ * dipakai sebagai penutup balapan dua retry paralel: yang kalah balapan
+ * mendapat changes = 0 dan diperlakukan sebagai duplikat.
+ */
+export async function markBatchSeen(db, batchId, day) {
+  const id = String(batchId);
+  const seen = await db.prepare(SQL.selectBatchId).bind(id).first();
+  if (seen) return false;
+  const res = await db.prepare(SQL.insertBatchId).bind(id, String(day)).run();
+  const changes = res && res.meta ? Number(res.meta.changes) : NaN;
+  if (Number.isFinite(changes)) return changes > 0;
+  return true;
+}
+
+/**
+ * HAPUS kunci dedup yang jendela retry-nya sudah lewat. Ini bagian dari
+ * kontrak privasi: batch_id memang acak (bukan identitas), tetapi janji
+ * "tidak menyimpan lebih lama dari jendela retry" tetap harus ditepati.
+ */
+export async function purgeBatchDedupOlderThan(db, day) {
+  await db.prepare(SQL.purgeBatchDedupOlderThan).bind(day).run();
+}
+
+/* --------------------------------------------------------------------------
  * Pepper
  * -------------------------------------------------------------------------- */
 
@@ -276,5 +318,6 @@ export default {
   aggregateStatements, runStatements, applyAggregate,
   countDauTokens, countUsageRows, setMetric, setMetricAtLeast, readMetricRange,
   purgeDauDedup, purgeDauDedupOlderThan, purgeUsageOlderThan, purgeRetentionOlderThan,
+  markBatchSeen, purgeBatchDedupOlderThan,
   readPepperState, writePepperState, ensurePepperState, assertNoQuotaJoin
 };

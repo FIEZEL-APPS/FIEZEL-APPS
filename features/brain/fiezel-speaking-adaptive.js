@@ -430,14 +430,19 @@
    * Terjemahkan kode rationale ke kalimat Indonesia untuk layar "kenapa".
    * Menerima satu kode string ATAU keluaran policy()/evidence() utuh.
    */
-  function explain(codeOrDecision) {
+  // Parameter kedua OPSIONAL (W2-FEAT-A, desain W1-FEAT-A): tabel naskah pengganti
+  // per-kode (mis. th yang dirakit app dari copy-map i18n). Fallback per-kunci ke
+  // EXPLANATIONS beku — modul tetap murni, tidak menyentuh lapisan i18n (AI-08 F01).
+  function explain(codeOrDecision, naskah) {
+    var T = (naskah && typeof naskah === 'object') ? naskah : null;
     if (typeof codeOrDecision === 'string') {
-      return EXPLANATIONS[codeOrDecision] || 'Keputusan speaking adaptif tanpa penjelasan terdaftar (' + codeOrDecision + ').';
+      var line = (T && typeof T[codeOrDecision] === 'string') ? T[codeOrDecision] : EXPLANATIONS[codeOrDecision];
+      return line || 'Keputusan speaking adaptif tanpa penjelasan terdaftar (' + codeOrDecision + ').';
     }
     if (codeOrDecision && Array.isArray(codeOrDecision.rationale)) {
-      return codeOrDecision.rationale.map(function (code) { return explain(code); }).join(' ');
+      return codeOrDecision.rationale.map(function (code) { return explain(code, T); }).join(' ');
     }
-    return EXPLANATIONS.brain3_speaking_default;
+    return (T && typeof T.brain3_speaking_default === 'string') ? T.brain3_speaking_default : EXPLANATIONS.brain3_speaking_default;
   }
 
   return {

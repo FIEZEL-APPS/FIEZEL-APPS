@@ -43,13 +43,15 @@ import { rotatePepperDue, rotatePepper, newPepper } from './analytics-core.js';
 import {
   countDauTokens, countUsageRows, setMetric, setMetricAtLeast, readMetricRange,
   purgeDauDedup, purgeDauDedupOlderThan, purgeUsageOlderThan, purgeRetentionOlderThan,
+  purgeBatchDedupOlderThan,
   readPepperState, writePepperState
 } from './analytics-store-d1.js';
 
 export const RETENTION_DAYS = Object.freeze({
   USAGE_DAILY: 90,      // dimensi pemakaian: cukup untuk D30, tidak lebih
   RETENTION_DAILY: 400, // kohor: cukup untuk satu tahun penuh + margin
-  DAU_DEDUP: 1          // token harian: satu hari, itu saja
+  DAU_DEDUP: 1,         // token harian: satu hari, itu saja
+  BATCH_DEDUP: 2        // kunci idempotensi batch: hanya selama jendela retry (48 jam)
 });
 
 const DAY_MS = 86400000;
@@ -237,6 +239,21 @@ export async function runDailyRollup(db, opts = {}) {
   summary.purged.push('usage_daily');
   await purgeRetentionOlderThan(db, shiftDay(day, -RETENTION_DAYS.RETENTION_DAILY));
   summary.purged.push('retention_daily');
+
+  // 6. Purge kunci dedup batch yang jendela retry-nya (48 jam) sudah lewat.
+  //    batch_id memang acak (bukan identitas), tapi janji "tidak disimpan
+  //    lebih lama dari jendela retry" tetap ditepati di sini — pola yang sama
+  //    dengan purge dau_dedup. Dibungkus try/catch karena tabel `batch_dedup`
+  //    lahir di migrasi 0003: pada database yang belum menjalankan migrasi itu
+  //    (atau tiruan D1 lama di gerbang), kegagalan purge dedup TIDAK boleh
+  //    ikut mematikan rollup metrik — DAU yang gagal ditulis jauh lebih mahal
+  //    daripada purge yang tertunda satu hari.
+  try {
+    await purgeBatchDedupOlderThan(db, shiftDay(day, -RETENTION_DAYS.BATCH_DEDUP));
+    summary.purged.push('batch_dedup');
+  } catch (err) {
+    summary.batchDedupPurgeError = String((err && err.message) || err);
+  }
 
   return summary;
 }

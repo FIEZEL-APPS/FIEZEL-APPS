@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- AI-15-F03/F04 (W3-WEB): sitemap pertama fiezel.my.id — 4 URL marketing (id + th) dengan
+     anotasi hreflang timbal-balik (redundan dengan <link> di head tiap halaman, disengaja).
+     x-default = halaman id yang sudah terindeks. Deploy: file ini harus berada di root
+     public_html/ ArenHost agar terlayani di https://fiezel.my.id/sitemap.xml. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://fiezel.my.id/</loc>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/th/</loc>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/install/</loc>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/install/"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/install/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/install/"/>
+  </url>
+  <url>
+    <loc>https://fiezel.my.id/th/install/</loc>
+    <xhtml:link rel="alternate" hreflang="id" href="https://fiezel.my.id/install/"/>
+    <xhtml:link rel="alternate" hreflang="th" href="https://fiezel.my.id/th/install/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fiezel.my.id/install/"/>
+  </url>
+</urlset>

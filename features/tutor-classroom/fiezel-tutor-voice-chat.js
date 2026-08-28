@@ -18,6 +18,18 @@
  */
 (function (root) {
   'use strict';
+
+  // AI-02 F01: naskah murid diambil dari lapisan i18n (copy-id-feat-b.js). Di browser
+  // runtime-nya dimuat lebih dulu (index.html); di Node modul memuatnya sendiri supaya
+  // keluaran render tetap byte-identik dengan sebelumnya.
+  var I18N = (typeof globalThis !== 'undefined' && globalThis.FiezelI18n) || null;
+  if (!I18N && typeof require === 'function') {
+    try {
+      I18N = require('../i18n/fiezel-i18n.js');
+      require('../i18n/copy-id-feat-b.js');
+    } catch (loadError) { I18N = null; }
+  }
+  function T(key, params) { return I18N ? I18N.t(key, params) : String(key); }
   if (!root || !root.document || root.__fiezelTutorVoiceChatInstalled) return;
   root.__fiezelTutorVoiceChatInstalled = true;
 
@@ -73,7 +85,7 @@
 
   function localAnswer(question) {
     var dialog = root.FiezelTutorDialog;
-    if (!dialog) return { id: 'Modul tutor belum termuat.', en: '', intent: 'error' };
+    if (!dialog) return { id: T('tutor.module-missing'), en: '', intent: 'error' };
     return dialog.respond(question, lessonContext(), memory);
   }
 
@@ -112,11 +124,11 @@
   /** Why the full model did not answer, in one sentence the learner can act on. */
   function unavailableReason() {
     try {
-      if (typeof root.puter === 'undefined') return 'Untuk pertanyaan bebas di luar materi, FIEZEL AI perlu koneksi internet.';
+      if (typeof root.puter === 'undefined') return T('tutor.ai-need-internet');
       var signedIn = root.puter && root.puter.auth && root.puter.auth.isSignedIn && root.puter.auth.isSignedIn();
-      if (!signedIn) return 'Untuk pertanyaan bebas di luar materi, login Puter dulu lewat menu pengaturan.';
+      if (!signedIn) return T('tutor.ai-need-login');
     } catch (_) {}
-    return 'Untuk pertanyaan bebas di luar materi, FIEZEL AI perlu koneksi internet.';
+    return T('tutor.ai-need-internet');
   }
 
   // ---- UI ----------------------------------------------------------------------
@@ -130,9 +142,9 @@
     // line and nothing else - the answer is spoken, and its text goes to the tutor's own
     // subtitle line, which is already part of the lesson layout.
     dock.innerHTML =
-      '<button type="button" id="tutorTalkButton" class="tutor-talk-button" aria-label="Tekan lalu bicara ke Fiezel">' +
+      '<button type="button" id="tutorTalkButton" class="tutor-talk-button" aria-label="' + T('tutor.talk-aria') + '">' +
       '<span class="tutor-talk-ring"></span><i data-lucide="mic"></i></button>' +
-      '<p class="tutor-talk-hint" id="tutorTalkHint">Tekan lalu bicara</p>';
+      '<p class="tutor-talk-hint" id="tutorTalkHint">' + T('tutor.talk-hint') + '</p>';
     doc.body.appendChild(dock);
     doc.getElementById('tutorTalkButton').addEventListener('click', onPress);
     try { if (root.lucide && root.lucide.createIcons) root.lucide.createIcons(); } catch (_) {}
@@ -188,20 +200,20 @@
 
   function handleQuestion(question) {
     var text = String(question || '').trim();
-    if (!text) { setHint('Belum ada suara yang tertangkap'); return; }
+    if (!text) { setHint(T('tutor.no-voice-captured')); return; }
     busy = true;
     setState('is-thinking');
-    setHint('Fiezel sedang menjawab…');
+    setHint(T('tutor.answering'));
     answer(text).then(function (reply) {
       busy = false;
       setState('');
       showAnswer(reply.id);
-      setHint(reply.source === 'core-ai' ? 'Dijawab FIEZEL AI' : 'Tekan lalu bicara');
+      setHint(reply.source === 'core-ai' ? T('tutor.answered-by-ai') : T('tutor.talk-hint'));
       return speak(reply);
     }).catch(function () {
       busy = false;
       setState('');
-      setHint('Coba tanyakan sekali lagi');
+      setHint(T('tutor.ask-retry'));
     });
   }
 
@@ -210,7 +222,16 @@
     if (!Ctor) { openTypeSheet(); return; }
     stopSpeaking();
     try { recognition = new Ctor(); } catch (_) { openTypeSheet(); return; }
-    recognition.lang = 'id-ID';
+    // AI-17 F03 (audit v2): ini SATU-SATUNYA permukaan STT berbahasa MURID di seluruh
+    // aplikasi — murid bertanya ke tutor dalam bahasa ibunya. Locale dibaca dari atribut
+    // <html lang> yang diset app.js lewat FiezelI18n.onChange (m025-182 W2-STATE), BUKAN
+    // dengan mengimpor modul i18n: pola tak-langsung ini menjaga jarak dari plumbing
+    // locale UI yang dilarang keras menyentuh opsi audio (AI-17 F02). Fallback ke id-ID
+    // menjaga perilaku lama byte-demi-byte saat atributnya belum/tidak terisi.
+    // Recognizer latihan SPEAKING tetap en-US (bahasa yang DIPELAJARI) — jangan disamakan.
+    var learnerLang = '';
+    try { learnerLang = String(doc.documentElement.lang || ''); } catch (_) {}
+    recognition.lang = /^th(-|$)/i.test(learnerLang) ? 'th-TH' : 'id-ID';
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = function (event) {
@@ -222,11 +243,11 @@
       listening = false;
       setState('');
       // A refused or unavailable microphone must not dead-end the feature.
-      setHint('Mikrofon tidak bisa dipakai. Ketik saja.');
+      setHint(T('tutor.mic-blocked'));
       openTypeSheet();
     };
-    recognition.onend = function () { listening = false; if (!busy) { setState(''); setHint('Tekan lalu bicara'); } };
-    try { recognition.start(); listening = true; setState('is-listening'); setHint('Mendengarkan… bicara sekarang'); }
+    recognition.onend = function () { listening = false; if (!busy) { setState(''); setHint(T('tutor.talk-hint')); } };
+    try { recognition.start(); listening = true; setState('is-listening'); setHint(T('tutor.listening-now')); }
     catch (_) { listening = false; openTypeSheet(); }
   }
 
@@ -237,7 +258,7 @@
   }
 
   function onPress() {
-    if (busy) { stopSpeaking(); busy = false; setState(''); setHint('Tekan lalu bicara'); return; }
+    if (busy) { stopSpeaking(); busy = false; setState(''); setHint(T('tutor.talk-hint')); return; }
     if (listening) { stopListening(); return; }
     startListening();
   }
@@ -249,12 +270,12 @@
     sheet.className = 'tutor-talk-sheet';
     sheet.innerHTML =
       '<form class="tutor-talk-panel">' +
-      '<span class="tutor-talk-mark">TANYA FIEZEL</span>' +
-      '<h2>Tanya apa saja</h2>' +
-      '<p>Perangkat ini belum mengizinkan input suara, jadi ketik pertanyaanmu. Fiezel tetap menjawab dengan suara.</p>' +
-      '<textarea name="question" rows="3" maxlength="240" placeholder="Contoh: kenapa bukan I have went?" required></textarea>' +
-      '<div class="tutor-talk-actions"><button type="button" data-talk-cancel>Batal</button>' +
-      '<button type="submit" class="primary">Tanya</button></div></form>';
+      '<span class="tutor-talk-mark">' + T('tutor.ask-kicker') + '</span>' +
+      '<h2>' + T('tutor.sheet-title') + '</h2>' +
+      '<p>' + T('tutor.sheet-body') + '</p>' +
+      '<textarea name="question" rows="3" maxlength="240" placeholder="' + T('tutor.sheet-placeholder') + '" required></textarea>' +
+      '<div class="tutor-talk-actions"><button type="button" data-talk-cancel>' + T('tutor.btn-cancel') + '</button>' +
+      '<button type="submit" class="primary">' + T('tutor.btn-ask') + '</button></div></form>';
     doc.body.appendChild(sheet);
     sheet.querySelector('[data-talk-cancel]').addEventListener('click', function () { sheet.remove(); });
     sheet.querySelector('form').addEventListener('submit', function (event) {
