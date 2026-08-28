@@ -24,11 +24,11 @@ jobs:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           set -euo pipefail
-          # m025-176: identitas eksekusi tunggal -> allowlist eksplisit. Push otomatis yang
-          # diminta MASTER berjalan sebagai akun organisasi 'FIEZEL-APPS', dan memblokirnya
-          # hanya membuat CI merah permanen tanpa menambah keamanan (aktor itu tetap butuh
-          # kredensial tulis repo). Aktor di luar daftar ini tetap diblokir.
-          ALLOWED=('FIEZEL-APPS' 'FIEZEL-APPS')
+          # m025-176: 'FIEZEL-APPS' adalah username LAMA pemilik yang sudah diganti menjadi
+          # 'FIEZEL-APPS' — penjaga ini menunjuk identitas mati sehingga semua push sah
+          # ditandai merah. Identitas MASTER yang berlaku sekarang hanya 'FIEZEL-APPS';
+          # aktor lain tetap diblokir, baik push langsung maupun sebagai penulis PR.
+          ALLOWED=('FIEZEL-APPS')
           is_allowed() { local a; for a in "${ALLOWED[@]}"; do [[ "$1" == "$a" ]] && return 0; done; return 1; }
 
           if [[ "$EVENT_NAME" == 'push' ]]; then
