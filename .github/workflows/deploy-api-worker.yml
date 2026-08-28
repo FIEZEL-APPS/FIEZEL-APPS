@@ -1,0 +1,165 @@
+# m025-180 deploy Worker gateway `fiezel-api` (Cloudflare).
+#
+# ===========================================================================
+# KENAPA BERKAS INI ADA
+# ===========================================================================
+# Sampai commit ini, `workers/api/` TIDAK PUNYA JALUR DEPLOY sama sekali —
+# temuan yang sudah tercatat di BRAINCORE-V3-REPORT.md (D8) dan tidak pernah
+# ditutup. Worker audio punya `audio-deploy-worker.yml`, Core Worker Puter
+# punya `deploy-core-worker.yml`, dan gateway API — yang memegang identitas
+# murid, kuota, jalur AI/TTS, dan allowlist CORS — hanya bisa di-deploy dari
+# mesin seseorang secara manual.
+#
+# Biayanya bukan teoretis. `wrangler.toml [vars]` adalah SATU-SATUNYA tempat
+# `ALLOWED_ORIGINS` didefinisikan, dan nilainya baru berlaku setelah Worker
+# di-deploy ulang. Jadi mengubah allowlist di repo — persis yang dilakukan
+# rilis ini setelah alamat GitHub Pages berpindah — menghasilkan repo yang
+# tampak benar, gerbang yang hijau, dan produksi yang masih menolak origin
+# yang baru. Perubahan konfigurasi yang tidak punya jalur ke produksi adalah
+# perubahan yang belum terjadi.
+#
+# ===========================================================================
+# POSTUR KEAMANAN
+# ===========================================================================
+# Sama dengan tiga workflow deploy lain di repo ini, tidak dikurangi:
+#   - HANYA `workflow_dispatch`. Tidak ada pemicu otomatis apa pun.
+#   - Gerbang aktor owner. Pemeriksaan `github.event_name` ikut disertakan
+#     meski hari ini satu-satunya pemicu adalah workflow_dispatch: kalau nanti
+#     seseorang menambahkan `push:` atau `schedule:`, gerbang gagal TERTUTUP
+#     alih-alih diam-diam lolos lewat aktor pemicu otomatis.
+#   - `permissions: contents: read`. Berbeda dari audio-deploy-worker.yml yang
+#     butuh `write` untuk mencatat alamat Worker di manifest, deploy ini tidak
+#     menulis apa pun ke repo, jadi ia tidak diberi hak untuk itu.
+#   - Konfirmasi diketik tangan. Langkah ini menimpa gateway PRODUKSI yang
+#     melayani murid; tombol yang bisa ditekan tidak sengaja bukan tombol yang
+#     pantas dipasang di depan produksi.
+#
+# ===========================================================================
+# GERBANG DULU, DEPLOY KEMUDIAN
+# ===========================================================================
+# Enam gerbang yang menjaga persis berkas-berkas yang akan diunggah dijalankan
+# LEBIH DULU dan wajib hijau. Repo ini sudah memiliki semuanya; yang belum ada
+# adalah keharusan menjalankannya sebelum menyentuh produksi. Men-deploy Worker
+# yang belum lewat gerbangnya sendiri adalah tepat keadaan yang gerbang itu
+# dibangun untuk mencegahnya.
+name: FIEZEL API Worker Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: >-
+          Ketik DEPLOY (huruf besar) untuk mengonfirmasi. Langkah ini MENIMPA
+          Worker produksi `fiezel-api` yang melayani identitas, kuota, dan
+          jalur AI/TTS murid.
+        required: true
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fiezel-api-worker-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Konfirmasi eksplisit
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: |
+          set -euo pipefail
+          if [ "$CONFIRM" != 'DEPLOY' ]; then
+            echo "Konfirmasi tidak cocok. Ketik DEPLOY untuk melanjutkan." >&2
+            exit 1
+          fi
+          echo 'Konfirmasi diterima.'
+
+      - name: Gerbang yang menjaga berkas yang akan diunggah
+        run: |
+          set -euo pipefail
+          node tools/cf-test-harness.js
+          node cf-api-contract-test.js
+          node cf-wiring-test.js
+          node d1-schema-contract-test.js
+          node edge-guard-test.js
+          node cron-contract-test.js
+          node config-consistency-test.js
+          node secret-scan-test.js
+
+      - name: Deploy Worker
+        working-directory: workers/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Tanpa pipefail, status pipa ini adalah status tee - yang selalu sukses,
+          # sehingga deploy yang gagal lolos sebagai hijau.
+          set -euo pipefail
+          set -o pipefail
+          npx --yes wrangler@3 deploy 2>&1 | tee deploy.log
+
+      - name: Verifikasi protokol dan identitas layanan
+        run: |
+          set -euo pipefail
+          # `workers_dev = false`, jadi Worker ini hanya dijangkau lewat custom domain.
+          # Perambatan konfigurasi butuh waktu; percobaan ulang di sini mencegah gerbang
+          # merah justru saat deploy-nya SUDAH berhasil.
+          body="$(curl --retry 12 --retry-all-errors --retry-delay 5 -fsS \
+            https://api.fiezel.my.id/health)"
+          echo "$body"
+          node -e '
+            const d = JSON.parse(process.argv[1]);
+            if (d.protocol !== "1.7") throw new Error("protocol bukan 1.7: " + d.protocol);
+            if (d.service !== "fiezel-api") throw new Error("service bukan fiezel-api: " + d.service);
+            console.log("protocol dan service cocok.");
+          ' "$body"
+
+      - name: Verifikasi allowlist CORS benar-benar mendarat
+        run: |
+          set -euo pipefail
+          # Inti dari keberadaan workflow ini. `ALLOWED_ORIGINS` hanya hidup di
+          # wrangler.toml [vars], jadi ia HANYA berubah lewat deploy - dan satu-satunya
+          # cara membuktikannya berubah adalah menanyakannya kepada produksi.
+          #
+          # Nilai yang diuji dibaca DARI wrangler.toml, bukan diketik ulang di sini:
+          # allowlist yang diketik dua kali adalah allowlist yang akan berpisah.
+          allowed="$(node -e '
+            const fs = require("fs");
+            const src = fs.readFileSync("workers/api/wrangler.toml", "utf8");
+            const m = /^ALLOWED_ORIGINS\s*=\s*"([^"]+)"/m.exec(src);
+            if (!m) throw new Error("ALLOWED_ORIGINS tidak terbaca dari wrangler.toml");
+            const list = m[1].split(",").map(s => s.trim()).filter(Boolean);
+            const pages = list.find(o => o.includes("github.io")) || list[0];
+            console.log(pages);
+          ')"
+          echo "Origin yang diuji: $allowed"
+
+          got="$(curl -s -o /dev/null -w '%{http_code}' -D /tmp/h.txt \
+            -H "Origin: $allowed" https://api.fiezel.my.id/health)"
+          echo "HTTP $got"
+          if ! grep -iq "^access-control-allow-origin: *$allowed" /tmp/h.txt; then
+            echo "Origin yang SEHARUSNYA diizinkan tidak dipantulkan. Allowlist belum mendarat." >&2
+            grep -i '^access-control-allow-origin' /tmp/h.txt || echo '(header tidak ada sama sekali)'
+            exit 1
+          fi
+          echo 'Origin yang diizinkan: dipantulkan seperti seharusnya.'
+
+          # Sisi sebaliknya, dan ini yang membuat pemeriksaan di atas berarti: allowlist
+          # yang memantulkan APA PUN akan lulus separuh pertama tanpa menjaga apa-apa.
+          curl -s -o /dev/null -D /tmp/h2.txt \
+            -H 'Origin: https://origin-yang-tidak-pernah-terdaftar.example' \
+            https://api.fiezel.my.id/health
+          if grep -iq '^access-control-allow-origin: *https://origin-yang-tidak-pernah-terdaftar\.example' /tmp/h2.txt; then
+            echo 'Origin asing DIPANTULKAN. Ini pantulan Origin, bukan allowlist. Deploy dihentikan.' >&2
+            exit 1
+          fi
+          echo 'Origin asing: ditolak seperti seharusnya.'
