@@ -1053,7 +1053,18 @@ function diagnosticEvidenceReady(s,level=getActiveLevel(s)){
 function diagnosticReadinessMap(s){return Object.fromEntries(LEVELS.map(level=>[level,diagnosticEvidenceReady(s,level)]))}
 function accountStateKey(uuid){const id=String(uuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);return id?ACCOUNT_STATE_PREFIX+id:''}
 function loadState(key=activeStateStorageKey){try{const raw=JSON.parse(localStorage.getItem(key));return sanitizeState(raw||defaultState)}catch{return sanitizeState(defaultState)}}
-function save(){const readiness=diagnosticReadinessMap(state);state.adaptiveReadyByLevel=readiness;state.adaptiveReady=!!readiness[getActiveLevel(state)];recomputeMeaningfulDays(state);state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;if(activeAccountUuid)state.ownerUuid=activeAccountUuid;localStorage.setItem(activeStateStorageKey,JSON.stringify(state))}
+/* D4 bottleneck #2: satu jawaban memicu save() tiga kali (record -> updateMastery -> lalu
+   setConfidence pada klik keyakinan). Field turunan (readiness/daily/streak) TETAP dihitung
+   sinkron di save() - pembacanya (home, paw, snapshot, sesi) mengandalkannya segar di task
+   yang sama - tetapi stringify state ±716 KB + setItem sinkron dikoales lewat microtask:
+   beberapa save() dalam satu task = SATU penulisan localStorage. Idempoten: flush selalu
+   men-serialize `state` TERKINI, jadi hasil satu flush identik dengan penulisan terakhir
+   dari pola lama. Microtask selalu selesai sebelum task-nya kembali ke event loop, jadi
+   tidak ada jendela unload yang bisa kehilangan data. stateRevision kini naik per flush,
+   bukan per panggilan - itu justru membuat cache coreBrainSnapshot lebih sering hit (D4 #4). */
+var saveWriteQueued=false;
+function saveFlushWrite(){saveWriteQueued=false;state.stateRevision=Math.max(0,Math.floor(Number(state.stateRevision)||0))+1;if(activeAccountUuid)state.ownerUuid=activeAccountUuid;localStorage.setItem(activeStateStorageKey,JSON.stringify(state))}
+function save(){const readiness=diagnosticReadinessMap(state);state.adaptiveReadyByLevel=readiness;state.adaptiveReady=!!readiness[getActiveLevel(state)];recomputeMeaningfulDays(state);if(saveWriteQueued)return;saveWriteQueued=true;if(typeof queueMicrotask==='function')queueMicrotask(saveFlushWrite);else saveFlushWrite()}
 /**
  * Memindahkan aplikasi ke kemajuan milik akun yang sedang masuk.
  *
@@ -1085,8 +1096,32 @@ async function activateAccountStateFromPuter(sdk=self.puter){
 }
 function dayKey(ts){return new Date(ts).toISOString().slice(0,10)}
 function studyTimeZone(sourceState=null){const prefs=sourceState?.preferences||(stateReady?state?.preferences:null)||defaultPreferences;return validTimeZone(prefs?.timeZone||detectedTimeZone())}
-function jakartaStudyParts(ts=Date.now(),sourceState=null){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:studyTimeZone(sourceState),hour:'2-digit',year:'numeric',month:'2-digit',day:'2-digit',hourCycle:'h23'}).formatToParts(new Date(ts));const g=t=>Number(parts.find(x=>x.type===t)?.value||0);return{year:g('year'),month:g('month'),day:g('day'),hour:g('hour')}}
-function studyDayKey(ts=Date.now(),sourceState=null){const p=jakartaStudyParts(ts,sourceState);return `${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}`}
+/* D4 bottleneck #1: formatter Intl di-CACHE per timeZone di level modul. Sebelumnya
+   jakartaStudyParts membuat `new Intl.DateTimeFormat` BARU untuk setiap baris riwayat pada
+   setiap save() - terukur 159 ms vs 16 ms per 1.000 baris (10x). Zona waktu murid praktis
+   tidak berubah dalam satu sesi, jadi cache kecil aman; cap 8 menjaga dari input zona aneh
+   supaya map tidak tumbuh tanpa batas. */
+// `var` + lazy-init, BUKAN const: loadState() di baris ~803 sudah memanggil rantai ini
+// saat skrip masih dieksekusi top-level - const di bawahnya masih TDZ dan akan melempar.
+var STUDY_PARTS_FMT=null;
+function studyPartsFormatter(tz){if(!STUDY_PARTS_FMT)STUDY_PARTS_FMT=new Map();let f=STUDY_PARTS_FMT.get(tz);if(!f){if(STUDY_PARTS_FMT.size>=8)STUDY_PARTS_FMT.clear();f=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',year:'numeric',month:'2-digit',day:'2-digit',hourCycle:'h23'});STUDY_PARTS_FMT.set(tz,f)}return f}
+function jakartaStudyParts(ts=Date.now(),sourceState=null){const parts=studyPartsFormatter(studyTimeZone(sourceState)).formatToParts(new Date(ts));const g=t=>Number(parts.find(x=>x.type===t)?.value||0);return{year:g('year'),month:g('month'),day:g('day'),hour:g('hour')}}
+/* D4 bottleneck #1 (lanjutan): kunci hari per stempel waktu di-MEMO - h.at tidak pernah
+   berubah, jadi hasilnya juga tidak. Kunci memo menyertakan zona waktu supaya murid yang
+   mengganti zona di Pengaturan tidak membaca kunci basi. Cap 4096 = 4x cap history (1.000);
+   saat penuh, map dikosongkan sekali alih-alih tumbuh selamanya. */
+var STUDY_DAY_KEY_MEMO=null;
+function studyDayKey(ts=Date.now(),sourceState=null){
+  if(!STUDY_DAY_KEY_MEMO)STUDY_DAY_KEY_MEMO=new Map();
+  const memoKey=studyTimeZone(sourceState)+'|'+ts;
+  const hit=STUDY_DAY_KEY_MEMO.get(memoKey);
+  if(hit)return hit;
+  const p=jakartaStudyParts(ts,sourceState);
+  const key=`${p.year}-${String(p.month).padStart(2,'0')}-${String(p.day).padStart(2,'0')}`;
+  if(STUDY_DAY_KEY_MEMO.size>=4096)STUDY_DAY_KEY_MEMO.clear();
+  STUDY_DAY_KEY_MEMO.set(memoKey,key);
+  return key;
+}
 function studyHour(ts=Date.now(),sourceState=null){return jakartaStudyParts(ts,sourceState).hour}
 function recomputeMeaningfulDays(s){
   const byDay={};
@@ -1713,10 +1748,10 @@ function confusionMatrixRecord(q,selectedIndex){
 /* Keadaan afek per SESI, di memori saja (bukan localStorage): afek adalah cuaca sesi, bukan
  * sifat murid. changed=true setelah perubahan pertama - modul lalu menahan keadaan itu
  * (histeresis) supaya tutor tidak berganti mood tiap dua soal. */
-let AFFECT_STATE={sessionKey:'',rows:[],state:'neutral',confidence:0,changed:false,lastMissAt:0};
+let AFFECT_STATE={sessionKey:'',rows:[],state:'neutral',confidence:0,changed:false,lastMissAt:0,suggestion:null};
 function affectSessionSync(){
   const key=String(state.activeSession?.startedAt||'');
-  if(key!==AFFECT_STATE.sessionKey)AFFECT_STATE={sessionKey:key,rows:[],state:'neutral',confidence:0,changed:false,lastMissAt:0};
+  if(key!==AFFECT_STATE.sessionKey)AFFECT_STATE={sessionKey:key,rows:[],state:'neutral',confidence:0,changed:false,lastMissAt:0,suggestion:null};
   return AFFECT_STATE;
 }
 /** Satu jawaban (termasuk retry - kesulitan justru paling terlihat di sana) menjadi bukti
@@ -1735,6 +1770,9 @@ function affectObserve(q,ok,ms,timing){
     // sehingga cabang ini tidak berjalan dan 'changed' tidak pernah di-reset dalam sesi.
     if(nextState!==st.state){st.state=nextState;st.changed=true}
     st.confidence=Math.max(0,Math.min(1,Number(res?.confidence)||0));
+    // D6 §3.5: suggestion modul disimpan supaya panel diagnostik bisa MENAMPILKAN alasan
+    // intervensinya (affectSuggestionMarkup) - sebelumnya field ini tidak pernah dibaca.
+    st.suggestion=res?.suggestion&&typeof res.suggestion==='object'?res.suggestion:null;
     return res||null;
   }catch{return null}
 }
@@ -1932,6 +1970,10 @@ function olmDispute(claimId){
     }
     olmNegotiationWrite(neg);
     try{if(state.view==='progress')progress()}catch{}
+    // D5 S5: progress() menghancurkan tombol "Menurutku ini salah" yang barusan diklik -
+    // fokus jatuh diam-diam ke <body>. Fokus dikembalikan ke panel OLM (konteks terdekat
+    // dari aksi tadi). 60ms = setelah fokus default setApp, jadi jangkar inilah yang menang.
+    setTimeout(()=>{try{const el=document.querySelector('.olm-panel');if(el){if(!el.hasAttribute('tabindex'))el.setAttribute('tabindex','-1');el.focus()}}catch{}},60);
   }catch{}
 }
 /** Skill probe berikutnya dari antrean dispute (untuk memaksa konsep di sesi latihan). */
@@ -1970,14 +2012,14 @@ function srlRead(){
 function srlWrite(st){if(!st)return;try{localStorage.setItem(SRL_KEY,JSON.stringify(st))}catch{}}
 /* Keadaan SRL per sesi, di memori: prediksi keyakinan sesi ini dan apakah prompt sudah
  * dipakai (MAKSIMAL 1 per sesi - modul juga menegakkannya, ini sabuk kedua). */
-let SRL_SESSION={sessionKey:'',prompted:false,pendingAt:0,ask:'',predictions:[]};
+let SRL_SESSION={sessionKey:'',prompted:false,pendingAt:0,ask:'',predictions:[],goal:null};
 function srlSessionSync(){
   const key=String(state.activeSession?.startedAt||'');
-  if(key!==SRL_SESSION.sessionKey)SRL_SESSION={sessionKey:key,prompted:false,pendingAt:0,ask:'',predictions:[]};
+  if(key!==SRL_SESSION.sessionKey)SRL_SESSION={sessionKey:key,prompted:false,pendingAt:0,ask:'',predictions:[],goal:null};
   return SRL_SESSION;
 }
-/** Rencana tujuan saat sesi adaptif dimulai. Tampil sebagai satu kalimat ajakan - bukan
- *  layar baru; pilihan tujuan penuh menunggu desain UI-nya sendiri (dicatat di c5-notes). */
+/** Rencana tujuan saat sesi adaptif dimulai. D5 T5: kini tampil sebagai popup pilihan
+ *  yang bisa dijawab (srlGoalPopShow), bukan lagi sekadar satu kalimat toast. */
 function srlSessionPlan(policy,sessionSize){
   if(!srlAvailable()||typeof self.FiezelSrlCoach.sessionPlan!=='function')return null;
   try{
@@ -2020,6 +2062,52 @@ function srlReflect(sessionAccuracy){
     return String(out?.message||'');
   }catch{return ''}
 }
+/* D5 T5: prompt tujuan SRL dulu berupa toast 2,6 detik - pertanyaan ("Apa tujuanmu sesi
+ * ini?") yang lenyap sebelum sempat dijawab, dan memang TIDAK bisa dijawab. Kini pertanyaan
+ * itu memakai pola popup keyakinan yang sudah benar (dialog aria-modal + tombol pilihan +
+ * fokus diantar 60ms) sehingga murid sungguh memilih tujuan. Pilihan dicatat di SRL_SESSION
+ * (in-memory, per sesi) + state.activeSession.srlGoal supaya ikut riwayat sesi. */
+let SRL_GOAL_OPTIONS=[];
+function closeSrlGoalPop(){try{document.getElementById('srlGoalPop')?.remove()}catch{}}
+function srlGoalReturnFocus(){try{(document.querySelector('#options .option')||document.getElementById('clozeInput')||document.querySelector('#app h2'))?.focus()}catch{}}
+function srlGoalPopShow(gp){
+  const options=Array.isArray(gp?.options)?gp.options.filter(o=>o&&o.label):[];
+  // Popup hanya relevan bila kuisnya masih di layar - jeda 1,2 dtk cukup untuk murid
+  // keburu keluar, dan dialog tujuan di atas layar Home hanya membingungkan.
+  if(!options.length||!state.activeSession||!document.querySelector('.quiz-shell'))return;
+  closeSrlGoalPop();
+  SRL_GOAL_OPTIONS=options;
+  const pop=document.createElement('div');
+  pop.id='srlGoalPop';pop.className='confidence-pop';
+  pop.setAttribute('role','dialog');pop.setAttribute('aria-modal','true');
+  pop.setAttribute('aria-label',String(gp.ask||'Apa tujuanmu sesi ini?'));
+  // grid 1 kolom + latar seragam inline: label tujuan jauh lebih panjang dari angka 1/2/3
+  // milik skala keyakinan, dan warna nth-child skala tidak bermakna di sini.
+  pop.innerHTML=`<div class="confidence-card">
+    <p class="confidence-q">${esc(String(gp.ask||'Apa tujuanmu sesi ini?'))}</p>
+    <div class="confidence-scale" style="grid-template-columns:1fr">
+      ${options.map((o,i)=>`<button type="button" style="background:var(--sun-soft)" onclick="srlGoalChoose(${i})">${esc(String(o.label||''))}</button>`).join('')}
+    </div>
+    <button type="button" class="confidence-skip" onclick="srlGoalDismiss()">Lewati</button>
+  </div>`;
+  document.body.appendChild(pop);
+  enhanceUI();
+  setTimeout(()=>{try{pop.querySelector('.confidence-scale button')?.focus()}catch(_){}},60);
+}
+function srlGoalChoose(i){
+  const o=SRL_GOAL_OPTIONS[Number(i)]||null;
+  closeSrlGoalPop();
+  if(o){
+    try{
+      const ses=srlSessionSync();
+      ses.goal={id:String(o.id||''),label:String(o.label||''),target:String(o.target||''),at:Date.now()};
+      if(state.activeSession){state.activeSession.srlGoal=String(o.id||'');save()}
+      showToast('Oke, tujuan sesinya kepegang.');
+    }catch{}
+  }
+  srlGoalReturnFocus();
+}
+function srlGoalDismiss(){closeSrlGoalPop();srlGoalReturnFocus()}
 /* ---- C5 butir 5: speaking adaptif dari agregat coverage existing ----
  * TANPA audio, TANPA transkrip: yang dibaca dari sidecar fiezel-sl-v1-state hanya angka
  * agregat (skor coverage, latency) - observability-privacy-test menjaga janji ini. */
@@ -2407,6 +2495,18 @@ function setApp(html){
   // alasan sebuah layar gagal digambar.
   document.body?.classList?.toggle?.('fz-stage-quiz',String(html).includes('quiz-shell'));
   enhanceUI();
+  // D5 T2: setiap ganti layar SPA, fokus keyboard/pembaca layar tertinggal di elemen yang
+  // baru saja dihancurkan (jatuh diam-diam ke <body>) - pengguna harus Tab dari nol.
+  // Fokus diantar ke heading/pertanyaan layar baru memakai pola popup keyakinan yang sudah
+  // benar (tabindex=-1 + focus). preventScroll: yang pindah cukup fokusnya, bukan viewport.
+  // Dilewati saat html kosong (renderInner mengosongkan dulu sebelum menggambar), dan
+  // try/catch karena harness tes memakai DOM tiruan tanpa querySelector penuh.
+  if(String(html).trim()){
+    try{
+      const target=document.querySelector('#app h1, #app h2, #app .question')||$('app');
+      if(target){if(!target.hasAttribute('tabindex'))target.setAttribute('tabindex','-1');target.focus({preventScroll:true})}
+    }catch{}
+  }
 }
 // m025-43 OWNER: "tidak bergetar". Two real causes, both handled here.
 // 1. The patterns were far too short to feel through a case - a wrong answer buzzed
@@ -3365,7 +3465,14 @@ function openApp(){
 // m025-96: gerbang unduhan suara dipensiunkan - tidak ada lagi bundel yang diunduh.
 bindAudioUnlockGestures();// m025-42: the mandatory daily target arms itself only once the learner qualifies
 // (notifications granted + assessed), which is checked inside the module.
-try{self.FiezelDailyTarget?.start?.()}catch{}const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();
+// D6 §5 (P2): nudge `FiezelDailyTarget.start()` dari sini DIHAPUS. Modulnya sudah
+// self-arm 1,2 dtk setelah DOM siap (fiezel-daily-target.js, catatan m025-43 di sana),
+// dan setiap panggilan start() memasang listener visibilitychange BARU tanpa guard -
+// "calling start() again is harmless" hanya benar untuk interval-nya, listenernya
+// menumpuk. Menghapus nudge = tepat satu listener; satu-satunya biaya adalah kunci
+// target bisa telat maksimal 1,2 dtk setelah openApp, dan refresh() poll 4 dtk
+// menutupinya. Guard sisi modul milik pemilik fiezel-daily-target.js.
+const reports=setTimeout(async()=>{await flushReportQueue();await maybeSendAccessReport()},1200);reports?.unref?.();
 // m025-78: an onboarding shortcut ("Mulai tes penempatan" di langkah 3) can ask to jump
 // straight into the real placement quiz once the gate clears - see afterOnboardingExit().
 if(pendingAfterGate==='placement'){pendingAfterGate=null;startPlacement()}
@@ -4873,10 +4980,19 @@ async function classroom(){
   setApp('<section class="fade classroom-page"><div class="card">Memuat Classroom…</div></section>');
   try{await self.FiezelLazy?.load?.('classroom')}catch{}
   const current=self.classroom;
-  if(typeof current==='function'&&current!==classroomBaseRenderer)return current();
+  /* D6 P1-1: pembanding rekursi harus PEMBUNGKUS ini sendiri (classroom), bukan hanya
+     classroomBaseRenderer. Bila lazy-load tutor-v3 gagal, global `classroom` tidak pernah
+     diganti dan `current` adalah pembungkus ini - memanggilnya lagi = rekursi async tak
+     berujung ("Memuat Classroom…" selamanya). Jalur gagal kini jatuh ke renderer bawaan. */
+  if(typeof current==='function'&&current!==classroom&&current!==classroomBaseRenderer)return current();
   return classroomBaseRenderer()
 }
-const classroomBaseRenderer=classroom;
+/* D6 P1-1 (bug wiring terbesar): dulu baris ini menangkap `classroom` - PEMBUNGKUSNYA
+   SENDIRI - sehingga classroomBase (renderer Classroom bawaan lengkap, ±90 baris) tidak
+   pernah bisa dipanggil, dan fallback saat lazy-load gagal berubah menjadi rekursi.
+   Yang benar: tangkap renderer ASLI classroomBase (deklarasi fungsi ter-hoist, jadi
+   referensi ini sah walau deklarasinya di bawah). */
+const classroomBaseRenderer=classroomBase;
 async function classroomBase(){
   let pack;try{pack=await loadClassroomPack()}catch(e){setApp(`<section class="fade classroom-page"><div class="card"><b>Classroom belum dapat dimuat.</b><p class="muted">${esc(e?.message||e)}</p></div></section>`);return}
   if(!self.FiezelClassroom){setApp('<section class="fade classroom-page"><div class="card"><b>Classroom runtime tidak tersedia.</b></div></section>');return}
@@ -5313,7 +5429,8 @@ async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbu
  quizLoop({type:'adaptive',count,pool,factory:x=>x,preserveOrder:true,dynamicPool:true,policy});
  /* Fase 3 (C5 butir 4): rencana tujuan SRL SETELAH sesi dibuat (session key sudah ada).
     Satu kalimat ajakan via toast - bukan layar baru. Guarded: tanpa modul, tidak ada apa-apa. */
- try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{const hint=gp.options?.[0]?.label?` Saran: ${gp.options[0].label}.`:'';showToast(`${gp.ask}${hint}`)}catch{}},1200)}catch{}}
+ // D5 T5: dulu toast 2,6 dtk yang bertanya tanpa bisa dijawab; kini popup pilihan tujuan.
+ try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{srlGoalPopShow(gp)}catch{}},1200)}catch{}}
 function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length;shell('Vocabulary Hub',`${active.length.toLocaleString()} kata level ${level}. Semua latihan mengikuti level belajar aktif.`,`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>Ganti level dari tombol di atas.</span></div><div class="toolbar"><button class="primary" onclick="startVocabQuiz()"><i data-lucide="circle-play"></i> Uji Vocabulary ${esc(level)}</button><button onclick="reviewVocab()"><i data-lucide="history"></i> Review Due (${due})</button></div><div class="grid"><div class="card"><div class="row"><b>${esc(level)} vocabulary</b><span>${active.length} kata</span></div><p class="muted">${mastered} mastered · bank level lain tetap tersimpan, tetapi tidak ditampilkan.</p>${active.length?`<button onclick="flashcards('${level}')">Buka flashcards <i data-lucide="arrow-right"></i></button>`:'<p class="muted">Belum tersedia untuk level ini.</p>'}</div></div>`)}
 // m025-96 jalur suara materi pelajaran: Reading, Vocabulary, Grammar.
 //
@@ -6152,7 +6269,7 @@ function quizLoop(cfg){
      percobaan (produksi dinilai grader, bukan tebak-ulang), Enter atau tombol Periksa. */
   if(q.type==='cloze'){
    const host=$('options');
-   host.innerHTML=`<div class="cloze-entry"><input id="clozeInput" class="cloze-input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Ketik jawabanmu di sini"><button id="clozeSubmit" class="primary">Periksa</button></div>`;
+   host.innerHTML=`<div class="cloze-entry"><input id="clozeInput" class="cloze-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" lang="en" enterkeyhint="done" aria-label="Ketik jawabanmu dalam bahasa Inggris" placeholder="Ketik jawabanmu di sini"><button id="clozeSubmit" class="primary">Periksa</button></div>`;
    const input=$('clozeInput'),btn=$('clozeSubmit');
    const submit=()=>{if(answer.locked)return;const typed=String(input.value||'').trim();if(!typed)return;answerCloze(q,typed,input,btn)};
    btn.onclick=submit;
@@ -6216,6 +6333,11 @@ function quizLoop(cfg){
    answer.scaffold=tutorEscalate(answer.scaffold);
    reveal(q,answer.lastPick,false,{forced:true});
   };
+  // D5 S10: #tutorTurn duduk DI BAWAH #options - di layar HP, giliran tutor yang menahan
+  // jawaban bisa muncul di luar viewport dan murid tidak tahu tutor sedang bicara. Scroll
+  // hanya pada giliran retry (saat tutor benar-benar menahan); gerak halus dihormati lewat
+  // gerbang ganda prefers-reduced-motion + preferensi app (pola yang sama dengan quizLoop).
+  if(retry)try{host.scrollIntoView({block:'nearest',behavior:(prefersReducedMotion()||state.preferences?.motion===false)?'auto':'smooth'})}catch{}
   enhanceUI();
  };
 
@@ -6590,22 +6712,55 @@ function olmPanelMarkup(){
     const review=s.review||{};
     const reviewTop=(review.top||[]).slice(0,3).map(r=>esc(friendlySkillName(String(r.id||'').replace(/^\w+:/,'')))).join(', ');
     const cal=s.calibration||{};
+    // D5 S5: kelas 'olm-panel' menjadi jangkar fokus setelah sanggahan (olmDispute
+    // menggambar ulang seluruh layar Progress, tombol yang tadi diklik ikut musnah).
     return card(`<h3>Yang sistem yakini tentangmu <span class="muted">(OLM)</span></h3>
       ${mastery?`<p><b>Penguasaan terkuat:</b> ${mastery}</p>`:''}
       <p><b>Miskonsepsi:</b> ${Number(mis.active?.length??mis.activeCount??0)} aktif · ${Number(mis.resolved?.length??mis.resolvedCount??0)} teratasi</p>
       <p><b>Rawan lupa:</b> ${Number(review.atRiskCount||0)} materi${reviewTop?` - paling mendesak: ${reviewTop}`:''}</p>
       ${cal.status?`<p><b>Kalibrasi keyakinan:</b> ${esc(cal.message||cal.status)}</p>`:''}
-      <p class="muted">Ringkasan ini dibaca dari model yang sama yang memilih soalmu - bukan penilaian tambahan.</p>`)
+      <p class="muted">Ringkasan ini dibaca dari model yang sama yang memilih soalmu - bukan penilaian tambahan.</p>`,'olm-panel')
+  }catch{return ''}
+}
+/* D6 P1-2: PEMBACA confusion matrix. Sel kebingungan direkam pada setiap jawaban grammar
+ * salah (confusionMatrixRecord) tetapi topConfusions tidak pernah dipanggil runtime -
+ * data dikumpulkan tiap hari tanpa satu pun konsumen. Seksi kecil ini merender temuan
+ * terkuat modul (ambang bukti >=3 ditegakkan modulnya sendiri); tanpa temuan, seksi ini
+ * tidak dirender sama sekali supaya panel tidak berisik di atas bukti tipis. */
+function confusionInsightMarkup(){
+  const M=self.FiezelConfusionMatrix;
+  if(!M||typeof M.topConfusions!=='function')return '';
+  try{
+    const rows=(M.topConfusions(confusionMatrixRead())||[]).slice(0,3);
+    if(!rows.length)return '';
+    const items=rows.map(c=>`<p><b>${esc(friendlySkillName(String(c.from||'')))}</b> sering dijawab memakai aturan <b>${esc(friendlySkillName(String(c.to||'')))}</b> · ${Math.max(0,Math.round(Number(c.count)||0))}×${Number.isFinite(Number(c.share))?` (${Math.round(Number(c.share)*100)}% dari salah pinjaman lesson itu)`:''}</p>`).join('');
+    return card(`<h3>Kebingungan antar-lesson</h3>${items}<p class="muted">Dihitung dari jawaban salah yang memilih opsi pinjaman lesson lain - substitusi terarah, bukan salah acak. Latihan pada pasangan ini yang paling cepat membongkar kebingungannya.</p>`)
+  }catch{return ''}
+}
+/* D6 §3.5: suggestion afek akhirnya punya layar. assess() selalu mengembalikan suggestion
+ * (dibangun suggestionFor - "supaya layar kenapa tidak mengarang ulang alasannya"), tetapi
+ * app hanya membaca state/confidence. Ditampilkan hanya saat afek sesi TERAKHIR bukan
+ * netral: intervensi tanpa alasan adalah osilasi (komentar modulnya sendiri). Sumbernya
+ * AFFECT_STATE di memori - afek adalah cuaca sesi, bukan sifat murid, jadi hilang saat
+ * muat ulang memang benar. */
+function affectSuggestionMarkup(){
+  try{
+    const st=AFFECT_STATE;
+    if(!st||!Array.isArray(st.rows)||!st.rows.length||st.state==='neutral')return '';
+    const stateLabel={frustrated:'Terlihat frustrasi',bored:'Terlihat bosan',gaming:'Jawaban terlalu cepat untuk jadi bukti',fatigued:'Terlihat lelah'}[st.state]||'';
+    if(!stateLabel)return '';
+    const actionLabel={turunkan_target:'soal diringankan dulu supaya kamu dapat bukti bahwa kamu bisa',naikkan_tantangan:'tantangan dinaikkan supaya sesi tidak membosankan',mode_tak_tertebak:'latihan dialihkan ke bentuk yang tidak bisa dijawab dengan menebak',perpendek_sesi:'sesi diperpendek dan diisi review ringan'}[String(st.suggestion?.action||'')]||'';
+    return card(`<h3>Cuaca sesi terakhir</h3><p><b>${esc(stateLabel)}</b> · keyakinan ${Math.round((Number(st.confidence)||0)*100)}%</p>${actionLabel?`<p><b>Respons sistem:</b> ${esc(actionLabel)}.</p>`:''}<p class="muted">Afek dinilai per sesi dan hanya di memori perangkat - cuaca sesi, bukan penilaian tentang dirimu.</p>`)
   }catch{return ''}
 }
 function coreBrainPanelMarkup(){
   const snapshot=coreBrainSnapshot();
-  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">Lapisan penalaran belum termuat di perangkat ini. Kebijakan adaptif tetap berjalan dengan mesin deterministik di bawahnya.</p>')+bktShadowMarkup()+olmPanelMarkup();
+  if(!snapshot)return card('<h3>Core Brain v2</h3><p class="muted">Lapisan penalaran belum termuat di perangkat ini. Kebijakan adaptif tetap berjalan dengan mesin deterministik di bawahnya.</p>')+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   const ability=snapshot.ability||{},plan=snapshot.plan||{},move=snapshot.momentum||{},load=snapshot.fatigue||{},memory=snapshot.memory||{},chrono=snapshot.chronotype||{};
   const moveLabel={improving:'Sedang naik',plateau:'Mendatar',declining:'Sedang turun',unknown:'Belum terbaca'}[move.state]||'Belum terbaca';
   const loadLabel={fresh:'Masih segar',tiring:'Mulai lelah',fatigued:'Sudah lelah',unknown:'Belum terbaca'}[load.state]||'Belum terbaca';
   if(!plan||Number(plan.confidence||0)<0.25){
-    return card(`<h3>Core Brain v2</h3><p>Masih mengumpulkan bukti. ${ability.evidence||0} jawaban terbaca; lapisan ini baru ikut memutuskan setelah polanya cukup jelas.</p><p class="muted">Sampai saat itu, kebijakan adaptif deterministik yang memilih soalmu - persis seperti sebelumnya, tidak ada yang hilang.</p>`)+bktShadowMarkup()+olmPanelMarkup();
+    return card(`<h3>Core Brain v2</h3><p>Masih mengumpulkan bukti. ${ability.evidence||0} jawaban terbaca; lapisan ini baru ikut memutuskan setelah polanya cukup jelas.</p><p class="muted">Sampai saat itu, kebijakan adaptif deterministik yang memilih soalmu - persis seperti sebelumnya, tidak ada yang hilang.</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup();
   }
   const rootCause=snapshot.rootCause&&snapshot.rootCause.isRoot===false
     ? `<p><b>Akar masalah:</b> kesulitan di ${esc(friendlySkillName(snapshot.rootCause.symptomSkill||snapshot.rootCause.symptomFamily))} kemungkinan besar berasal dari ${esc(friendlySkillName(snapshot.rootCause.skill))}, jadi itu yang dilatih lebih dulu.</p>`
@@ -6621,7 +6776,7 @@ function coreBrainPanelMarkup(){
       ${bestWindow}
     </div>
     ${rootCause}
-    <p class="muted">Kesulitan dipilih dari model kemampuan (peluang benar ~80% adalah titik belajar paling efisien), jadwal ulang dari model paruh-waktu ingatan, dan fokus dari graf prasyarat skill. Semua dihitung di perangkat ini; yang dikirim ke Core hanya ringkasan keputusannya.</p>`)+bktShadowMarkup()+olmPanelMarkup()
+    <p class="muted">Kesulitan dipilih dari model kemampuan (peluang benar ~80% adalah titik belajar paling efisien), jadwal ulang dari model paruh-waktu ingatan, dan fokus dari graf prasyarat skill. Semua dihitung di perangkat ini; yang dikirim ke Core hanya ringkasan keputusannya.</p>`)+bktShadowMarkup()+olmPanelMarkup()+confusionInsightMarkup()+affectSuggestionMarkup()
 }
 const PROGRESS_TABS=[['overview','Ringkasan'],['analysis','Analisis'],['adaptive','Adaptive Engine'],['readiness','Kesiapan & Skills']];
 let progressTab='overview';
