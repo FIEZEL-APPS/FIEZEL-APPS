@@ -74,10 +74,10 @@ const COPY = {
       'Kecepatan suara bisa kamu atur di FIEZEL Control Room, lewat tombol Pengaturan. Setelannya nempel buat semua sesi berikutnya.']
   ],
   listening: [
-    ['Dengar sekali, jawab',
-      'Di sini audionya cuma diputar sekali \u2014 kayak percakapan sungguhan. Pasang telinga baik-baik, baru pilih jawabanmu.'],
+    ['Dengar dulu, baru jawab',
+      'Putar audionya dan pasang telinga baik-baik. Kalau belum nangkep, ulang \u2014 ada jatah replay di tiap soal.'],
     ['Meleset? Nggak apa-apa',
-      'Sekali-dengar memang menantang, dan salah itu bagian dari latihan. PAW nemenin kamu di tiap soalnya.'],
+      'Salah itu bagian dari latihan, bukan masalah. PAW nemenin kamu di tiap soalnya.'],
     ['Terjemahan Indonesia',
       'Toggle ini nampilin terjemahan tiap soal, seharga 1 Gem Terjemahan per sesi. Gem-nya kamu dapat gratis dari streak jawaban benar.'],
     ['Atur kecepatan suara',

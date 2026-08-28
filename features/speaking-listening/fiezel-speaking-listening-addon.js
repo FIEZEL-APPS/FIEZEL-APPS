@@ -404,7 +404,7 @@
   function mergeConfig(input){const cfg={...DEFAULT_CONFIG,...(global.FIEZEL_SPEAKING_LISTENING_CONFIG||{}),...(input||{})};cfg.persistRawAudio=false;cfg.persistRawTranscript=false;cfg.aggregateEventLimit=Math.max(20,Math.min(300,Number(cfg.aggregateEventLimit)||120));return cfg}
 
   class Controller{
-    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.ephemeralTranscript='';this.noAudio=false;this.noAudioItems=[];this.prefetchGeneration=0;this.resetGemSession()}
+    constructor(options){this.options=options||{};this.config=mergeConfig(this.options.config);this.levelContract=createLevelContract(this.options,this.config);this.root=this.options.root||null;this.repo=new DataRepository(this.options.baseUrl||'./features/speaking-listening/');this.store=new StateStore(this.config);this.tts=this.options.tts&&typeof this.options.tts.play==='function'&&typeof this.options.tts.stop==='function'?this.options.tts:new TTSService(this.config);this.recognition=new RecognitionService(this.config);this.recorder=new RecorderService();this.domain='listening';this.activeLevel=this.levelContract.level;this.level=this.activeLevel;this.items=[];this.index=0;this.startedAt=0;this.replays=0;this.played=false;this.ephemeralTranscript='';this.noAudio=false;this.noAudioItems=[];this.prefetchGeneration=0;this.resetGemSession()}
     /* =============================== V6 anti-kebocoran ===============================
        Menghangatkan naskah item BERIKUTNYA supaya murid tidak membayar ~4,5 detik generasi
        tiap kali menekan Dengarkan (reports/voice-v1-audit.md §1, voice-v5-prefetch.md §3
@@ -455,13 +455,16 @@
     }
     renderLevelPicker(domain){if(this.levelContract.external){return this.open(domain)}if(!this.root)return;this.root.innerHTML=`<section class="fsl-shell"><article class="fsl-card"><span class="fsl-kicker">${esc(domain)}</span><h2>Pilih level</h2><div class="fsl-levels">${LEVELS.map(l=>`<button data-level="${l}" aria-pressed="${String(l===this.level)}">${l}</button>`).join('')}</div><div class="fsl-actions"><button data-back>Kembali</button></div></article></section>`;this.root.querySelectorAll?.('[data-level]').forEach(b=>b.addEventListener('click',()=>this.open(domain,b.getAttribute('data-level'))));this.root.querySelector?.('[data-back]')?.addEventListener('click',()=>this.renderHub())}
     current(){return this.items[this.index]||null}
-    renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.ephemeralTranscript='';this.noAudio=false;const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
+    renderSession(){if(!this.root)return;const item=this.current();if(!item){this.renderComplete();return}this.startedAt=now();this.replays=0;this.played=false;this.ephemeralTranscript='';this.noAudio=false;const progress=Math.round(this.index/Math.max(1,this.items.length)*100);if(this.domain==='listening_exam')this.renderListeningExam(item,progress);else if(this.domain==='listening')this.renderListening(item,progress);else if(this.domain==='speaking_exam')this.renderSpeakingExam(item,progress);else this.renderSpeaking(item,progress)}
     renderListening(item,progress){const isDict=item.mode==='dictation';this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Listening · ${esc(item.level)} · ${esc(item.mode)}</span>${this.gemBarMarkup()}<h2>${esc(item.question)}</h2><p class="fsl-privacy">Script disembunyikan sampai jawaban dinilai. Jawaban terkunci sampai audio berhasil diputar.</p>${slPlayerMarkup()}<div class="fsl-actions"><button class="fsl-primary" data-play>Dengarkan</button><button data-exit>Keluar</button></div><fieldset class="fsl-work" data-work disabled>${isDict?'<input class="fsl-input" data-dictation autocomplete="off" spellcheck="false" placeholder="Ketik yang kamu dengar…"><div class="fsl-actions"><button class="fsl-primary" data-submit>Nilai jawaban</button></div>':`<div class="fsl-options">${item.options.map((o,i)=>`<button class="fsl-option" data-choice="${i}">${esc(o)}</button>`).join('')}</div>`}</fieldset><div data-feedback></div></article></section>`;
       this.root.querySelector('[data-play]').addEventListener('click',async event=>{
         const limit=Number(item.maxReplays||this.config.maxListeningReplays);
-        if(this.replays>=limit){this.setFeedback('Batas replay untuk item ini sudah tercapai.');return}
+        /* LG-02: putaran PERTAMA bukan replay - sama seperti pemain harian app.js yang
+           menghitung __replayCount = plays-1. maxReplays=2 berarti 1 putaran awal + 2 ulangan. */
+        if(this.played&&this.replays>=limit){this.setFeedback('Jatah replay item ini sudah habis.');return}
         const button=event.currentTarget;
-        button.disabled=true;this.replays++;
+        const isReplay=this.played;
+        button.disabled=true;if(isReplay)this.replays++;
         try{
           const playing=this.tts.play(item.script,{voice:item.voice,rate:this.config.ttsRate,suppressSubtitles:true});
           /* V6: diajukan sesudah pemutaran berangkat dan SEBELUM ditunggu. Menunggu dulu
@@ -478,8 +481,10 @@
           this.noAudio=false;
           this.root.querySelector('[data-work]').disabled=false;
           this.store.noteCapability('tts',String(result?.provider||'ok'));
-          /* m028 fase3: chip pemutar diikat ke this.replays yang MEMANG dihitung addon - bukan angka hiasan. */
-          const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays}\u00d7`;
+          this.played=true;
+          /* m028 fase3: chip pemutar diikat ke hitungan yang MEMANG dihitung addon - bukan angka hiasan.
+             Chip menghitung total pemutaran (replay + putaran pertama). */
+          const chip=this.root.querySelector('[data-replays]');if(chip)chip.textContent=`Diputar ${this.replays+1}\u00d7`;
           this.setFeedback(`Audio siap \u00b7 replay ${this.replays}/${limit}.`);
         }catch(_){
           /* m026-BUG1 (cf-b4 §5.2, CF-MIGRATION §Ringkasan). Kegagalan pemutaran BUKAN
@@ -489,8 +494,9 @@
              [data-work] tetap disabled - item listening itu MATI di layar, permanen, tanpa
              jalan keluar selain keluar dari sesi. Jalur ujian di renderListeningExam()
              sudah melakukan hal yang benar sejak awal (this.replays-- di catch); ini
-             menirunya persis. */
-          this.replays--;
+             menirunya persis. Putaran pertama tidak menambah this.replays, jadi hanya
+             replay yang dikembalikan. */
+          if(isReplay)this.replays--;
           this.store.noteCapability('tts','unavailable');
           this.noteNoAudio(item);
         /* Penutup handler ditulis rapat (`}finally{...}});`) karena gems-test.js:420
@@ -645,7 +651,7 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
       const play=this.root.querySelector('[data-play]');
       play.addEventListener('click',async event=>{
         const button=event.currentTarget;
-        if(this.replays>=allowedReplays){status.textContent='Audio ujian hanya diputar sekali. Jawab dari catatan dan ingatanmu.';return}
+        if(this.replays>=allowedReplays){status.textContent=visibleDuringAudio?'Jatah putar audionya sudah habis. Jawab dari ingatanmu - soalnya sudah terbuka sejak audio jalan.':'Jatah putar audionya sudah habis. Jawab dari catatan dan ingatanmu.';return}
         button.disabled=true;this.replays++;
         status.textContent='Memutar…';
         try{
@@ -687,8 +693,12 @@ ${visibleDuringAudio?'':'<label class="fsl-notes-label">Catatanmu (tidak disimpa
       const followUps=Array.isArray(item.followUps)&&item.followUps.length?`<ol class="fsl-cue">${item.followUps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`:'';
       const source=item.sourceText?`<pre class="fsl-source">${esc(item.sourceText)}</pre>`:'';
       const adapted=item.sourceNote?`<p class="fsl-adapted">${esc(item.sourceNote)}</p>`:'';
-      const timing=format?`<p class="fsl-timing"><b>${esc(format.label)}</b><span>Menyiapkan ${format.prepSeconds} detik · bicara ${format.speakSeconds} detik</span><small>${esc(format.note)}</small></p>`:'';
-      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · ${esc(item.level)}</span>${slMascotStripMarkup()}${timing}<h2>${esc(item.instruction)}</h2>${questions}${bullets}${source}${adapted}${followUps}<p class="fsl-privacy">Penilaian otomatis hanya cakupan gagasan dari transkrip. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>`;
+      /* A06-003: durasi format adalah fakta ujian aslinya, tetapi pengenal suara browser
+         menangkap SATU ucapan pendek (segmen pertama, maksimal ~12 detik). Menjanjikan
+         penilaian bicara ${speakSeconds} detik penuh berarti bohong pada murid - jadi
+         kartu ini menyebut dua-duanya dengan jujur. */
+      const timing=format?`<p class="fsl-timing"><b>${esc(format.label)}</b><span>Format aslinya: menyiapkan ${format.prepSeconds} detik · bicara ${format.speakSeconds} detik</span><small>${esc(format.note)}</small><small>Penilaian otomatis FIEZEL hanya mendengar satu ucapan pendek, bukan rekaman ${format.speakSeconds} detik penuh.</small></p>`:'';
+      this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Latihan ujian · ${esc(item.level)}</span>${slMascotStripMarkup()}${timing}<h2>${esc(item.instruction)}</h2>${questions}${bullets}${source}${adapted}${followUps}<p class="fsl-privacy">Penilaian otomatis menilai transkrip singkat: ucapkan inti jawabanmu dalam satu-dua kalimat. Yang dinilai hanya cakupan gagasan. FIEZEL TIDAK menilai pelafalan dan tidak memprediksi band IELTS atau skor TOEFL. Mau latihan bicara panjang sesuai durasi aslinya? Pakai tombol rekam-dengar ulang.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar. Ucapkan inti jawabanmu dalam satu-dua kalimat.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri.'}</div><div data-feedback class="fsl-feedback"></div><div data-playback></div></article></section>`;
       this.bindSpeakingControls(item);
     }
     renderSpeaking(item,progress){const c=capabilities();this.root.innerHTML=`<section class="fsl-shell"><div class="fsl-progress"><span style="width:${progress}%"></span></div><article class="fsl-card"><span class="fsl-kicker">Speaking · ${esc(item.level)} · ${esc(item.mode)}</span>${slMascotStripMarkup()}<h2>${esc(item.instruction)}</h2>${item.targetText?`<p class="fsl-prompt">${esc(item.targetText)}</p>`:''}<p class="fsl-privacy">Penilaian otomatis hanya spoken production / target coverage. Ini bukan pengukuran phoneme/pronunciation.</p><div class="fsl-actions">${c.speechRecognition?'<button class="fsl-primary" data-recognize>Mulai bicara</button>':''}${c.mediaRecorder?'<button data-record>Rekam untuk dengar ulang</button>':''}<button data-exit>Keluar</button></div><div data-rec-status class="fsl-status">${c.speechRecognition?'Siap mendengar respons.':'Speech recognition tidak tersedia; gunakan rekam-dengar mandiri tanpa skor otomatis.'}</div><div data-feedback></div><div data-playback></div></article></section>`;
