@@ -4135,12 +4135,12 @@ async function askFiezel(query){
 async function sendFeedback(payload){
   const body={kind:payload?.kind||'note',query:String(payload?.query||'').slice(0,80),
     message:String(payload?.message||'').slice(0,600),build:String(self.FIEZEL_PAGE_BUILD||'')};
-  if(!body.query&&!body.message){showToast('Tulis dulu pesannya.');return false}
+  if(!body.query&&!body.message){showToast(FiezelI18n.t('masukan.tulis-dulu'));return false}
   try{
     const response=await coreWorkerExec('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(response&&response.ok===false)throw new Error('feedback_rejected');
-    showToast('Terkirim. Terima kasih!');haptic('success');return true;
-  }catch(error){showToast('Gagal mengirim. Coba lagi nanti.');return false}
+    showToast(FiezelI18n.t('masukan.terkirim'));haptic('success');return true;
+  }catch(error){showToast(FiezelI18n.t('masukan.gagal'));return false}
 }
 function openFeedback(prefill){
   openModal(`<div class="modal-mark">FIEZEL</div><h2>Kirim masukan</h2><p>Materi yang belum ada, soal yang keliru, atau apa pun yang mengganggu. Tidak ada data belajarmu yang ikut terkirim.</p><label class="endpoint-label">Pesan<textarea id="feedbackText" rows="5" placeholder="Contoh: belum ada materi tentang passive voice bentuk lampau.">${esc(prefill||'')}</textarea></label><div class="modal-actions"><button id="feedbackCancel">Batal</button><button class="primary" id="feedbackSend">Kirim</button></div>`);
@@ -4314,7 +4314,7 @@ function pawStreakWatch(){const now=Number(state.streak)||0;
 // fungsi yang sama dengan {viaHistory:true}: transisi, uiSfx('nav'), preferensi motion, dan
 // prefers-reduced-motion di bawah ini berlaku persis sama, tetapi TIDAK ada entri kedua
 // yang didorong - itulah yang mencegah gelung back->push->back.
-function go(v,opts){if(!VALID_VIEWS.has(v)){showToast('Halaman tujuan tidak tersedia.');return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
+function go(v,opts){if(!VALID_VIEWS.has(v)){showToast(FiezelI18n.t('nav.halaman-tak-tersedia'));return false}uiSfx('nav');dropStages();if(opts?.viaHistory!==true)pushBackNavView(v);const swap=()=>{state.view=v;save();render()};if(document.startViewTransition&&state.preferences?.motion!==false&&!prefersReducedMotion())document.startViewTransition(swap);else swap();return true} window.go=go;
 function pushBackNavView(v){try{return self.FiezelBackNav?.pushView?.(v)===true}catch{return false}}
 /* ---- m025-117 lapisan layar-di-dalam-view (stage) ---------------------------------
  * OWNER: "misalnya sudah masuk ke dalam folder, dan ingin kembali, ketika swipe back malah
@@ -4433,8 +4433,8 @@ function levelControlMarkup(){const level=getActiveLevel();return `<button type=
 function setActiveLevel(level){const next=String(level||'').toUpperCase();if(!LEVELS.includes(next))return false;/* m028-06: DEFAULT-ALLOW. Guard hanya menolak level yang benar-benar TERKUNCI akibat
      demosi; state lama tanpa levelTrust, atau murid yang belum pernah didemosi, tetap bebas
      pindah ke atas (mode percobaan). Dibungkus typeof+try supaya fixture kontrak level yang
-     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(`Level ${next} kebuka lewat Ujian Skip Level ${nextVerifiableLevel(state)}.`);openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(`Level belajar aktif: ${next}`);return true}
-function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(`Mengikuti level hasil tes: ${getActiveLevel()}`);return true}
+     hanya menyuplai state/LEVELS/save/render tetap lolos. */try{if(typeof isLevelLocked==='function'&&isLevelLocked(state,next)){showToast(FiezelI18n.t('level.toast-terkunci',{level:next,ujian:nextVerifiableLevel(state)}));openActiveLevelExamPanel(nextVerifiableLevel(state));return false}}catch(_){}if(next===getActiveLevel()&&activeLevelIsManual())return true;try{if(state.activeSession)abandonActiveSession('level_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(next);state.preferences={...state.preferences,activeLevel:next,levelMode:'manual'};state.adaptivePolicyMeta={...state.adaptivePolicyMeta,lastPolicy:null,lastSource:'',lastAt:0};coreBrainCache=null;save();closeModal();render();showToast(`Level belajar aktif: ${next}`);return true}
+function usePlacementLevel(){try{if(state.activeSession)abandonActiveSession('level_mode_change')}catch{}try{leaveAllStages()}catch{}if(typeof classroomSession!=='undefined')classroomSession=null;if(typeof classroomSessionLevel!=='undefined')classroomSessionLevel='';if(typeof speakingListeningController!=='undefined')speakingListeningController?.setActiveLevel?.(placementLevel());state.preferences={...state.preferences,activeLevel:'',levelMode:'placement'};coreBrainCache=null;save();closeModal();render();showToast(FiezelI18n.t('level.toast-ikut-tes',{level:getActiveLevel()}));return true}
 /* m028-06: panel level sekarang JUJUR - tiap kartu membawa statusnya (terverifikasi, mode
    percobaan dengan hitungan salah, atau terkunci setelah demosi) dan level terkunci benar-
    benar disabled. Penolakannya tetap ada di setActiveLevel(), jadi menyembunyikan tombol
@@ -4448,7 +4448,7 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
      "Belum terverifikasi"; hitungan salah hanya muncul kalau state lama memang menyimpannya,
      supaya murid yang masih menyandang percobaan warisan tetap melihat sisa jatahnya. */
   const mistakes=probationMistakes(level);
-  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">Terkunci · lewat ujian</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?` · salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT}`:''}</em>`;
+  const badge=position<=0?`<em class="level-trust-badge is-verified">${esc(LEVEL_GUARD_COPY.examBadge)}</em>`:locked?'<em class="level-trust-badge is-locked">'+FiezelI18n.t('level.badge-terkunci')+'</em>':`<em class="level-trust-badge is-probation">${esc(LEVEL_GUARD_COPY.entryChip)}${mistakes>0?FiezelI18n.t('level.badge-salah',{miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT}):''}</em>`;
   return `<button type="button" class="level-picker-card${level===current?' is-active':''}${locked?' is-locked':''}" data-active-level="${level}" aria-pressed="${level===current}"${locked?' disabled aria-disabled="true" title="'+esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))+'"':''}><strong>${level}</strong><span>${esc(levelDescriptor(level))}</span>${badge}</button>`;
  }).join('');
  /* m025-166: penjelasan "belum terverifikasi" dulu satu paragraf panjang bergaya artikel.
@@ -4456,7 +4456,7 @@ function openLevelPanel(){const current=getActiveLevel(),estimated=placementLeve
     modal-mark/eyebrow kartu lain. */
  const lockNote=trust.locked?`<div class="level-lock-note"><b>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</b></div>`:probationActive(state)?`<div class="level-lock-note is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(current)}</em><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span><button type="button" class="level-trust-chip-cta" id="levelNoteExam">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button></div>`:'';
  const examCta=examLevel?`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examTitle)} ${esc(examLevel)}</b><span>${LEVEL_EXAM_SIZE} soal · grammar ${LEVEL_EXAM_BLUEPRINT.grammar}, kosakata ${LEVEL_EXAM_BLUEPRINT.vocab}, bacaan ${LEVEL_EXAM_BLUEPRINT.reading} · lulus ${LEVEL_EXAM_PASS}%</span></div><button type="button" class="primary" id="openLevelExam"${examWait>0?' disabled aria-disabled="true"':''}>${examWait>0?`Bisa diulang ${esc(levelExamCooldownLabel(examWait))}`:esc(LEVEL_GUARD_COPY.examStart)}</button></div>`:`<div class="level-exam-cta"><div><b>${esc(LEVEL_GUARD_COPY.examBadge)} sampai C2</b><span>Semua level sudah kamu buktikan.</span></div></div>`;
- openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>Pilih level belajar</h2><p>Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level aktif pilihanmu: <b>${esc(current)}</b>. Hasil placement tersimpan sebagai ${esc(estimated)}. Level terverifikasi: <b>${esc(verified)}</b>.`:`Saat ini mengikuti hasil placement: <b>${esc(estimated)}</b>. Level terverifikasi: <b>${esc(verified)}</b>.`}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">Gunakan hasil tes (${esc(estimated)})</button>`:''}<button type="button" class="primary" id="levelPanelClose">Selesai</button></div>`);
+ openModal(`<div class="modal-mark">FIEZEL LEVEL CONTROL</div><h2>Pilih level belajar</h2><p>Semua materi, latihan, tutor AI, dan rekomendasi akan mengikuti level yang kamu pilih.</p><div class="level-picker-grid">${cards}</div>${lockNote}${examCta}<div class="level-source-note">${manual?`Level ${FiezelI18n.t('level.sumber-manual',{aktif:esc(current),placement:esc(estimated),verif:esc(verified)})}`:`Saat ini mengikuti hasil placement: <b>${esc(estimated)}</b>. Level terverifikasi: <b>${esc(verified)}</b>.`}</div><div class="modal-actions">${manual?`<button type="button" id="usePlacementLevel">${FiezelI18n.t('level.pakai-hasil-tes',{level:esc(estimated)})}</button>`:''}<button type="button" class="primary" id="levelPanelClose">${FiezelI18n.t('level.selesai')}</button></div>`);
  /* m025-166: pintu pemilihan level sekarang lewat gerbang keputusan. Level yang belum
     terverifikasi TIDAK langsung aktif - popup gerbang yang memutuskan (ikuti ujian, atau
     nanti aja dan dialihkan ke A1). setActiveLevel() sendiri tidak diubah: ia tetap
@@ -4592,7 +4592,7 @@ function openDemotionModal(fromLevel,toLevel){
 /* ---- m028-06 Ujian Skip Level: satu level, 25 soal, acak tiap percobaan --------------- */
 function buildLevelExamQuestions(examLevel){
   const target=String(examLevel||'').toUpperCase();
-  if(!LEVELS.includes(target))throw new Error('Level ujian tidak dikenal.');
+  if(!LEVELS.includes(target))throw new Error(FiezelI18n.t('level.err-ujian-asing'));
   /* Bank besar + acak tiap percobaan (rekomendasi 8 riset): grammar memakai seluruh mode
      latihan dari tiap template level itu, jadi kolamnya jauh lebih besar dari 25. */
   const grammarEntries=grammarItemsForLevel(target),grammarPool=[];
@@ -4629,8 +4629,8 @@ function startLevelExam(level){
   const availability=levelExamAvailability(target,state);
   if(!availability.ok){
     if(availability.reason==='cooldown')return showToast(`${LEVEL_GUARD_COPY.examTitle} ${target} bisa diulang ${levelExamCooldownLabel(availability.waitMs)}.`);
-    if(availability.reason==='not_next')return showToast(`Ujiannya berantai: yang kebuka sekarang ${availability.next||verifiedLevel(state)}.`);
-    return showToast('Level ujian belum bisa dibuka.');
+    if(availability.reason==='not_next')return showToast(FiezelI18n.t('level.toast-berantai',{level:availability.next||verifiedLevel(state)}));
+    return showToast(FiezelI18n.t('level.toast-tak-bisa'));
   }
   let questions=[];
   try{questions=buildLevelExamQuestions(target)}catch(error){return showToast(String(error?.message||error))}
@@ -4688,12 +4688,12 @@ function activeLevelTrustMarkup(){
     let ladder='';
     for(let i=0;i<=goalIndex&&i<LEVELS.length;i++){
       const step=LEVELS[i],done=i<=LEVELS.indexOf(verified),open=step===examLevel;
-      ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(step)}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?'Ujian kebuka':'Menunggu'}</span></li>`;
+      ladder+=`<li class="${done?'is-done':open?'is-open':'is-wait'}"><b>${esc(step)}</b><span>${done?esc(LEVEL_GUARD_COPY.examBadge):open?FiezelI18n.t('level.tangga-kebuka'):FiezelI18n.t('level.tangga-menunggu')}</span></li>`;
     }
-    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
+    return `<div class="level-trust-banner is-locked"><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.demotionTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.lockedFeature,verified))}</span></div><ol class="level-trust-ladder">${ladder}</ol><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">${FiezelI18n.t('level.lihat-level')}</button></div></div>`;
   }
   const mistakes=probationMistakes(active);
-  return `<div class="level-trust-banner is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(active)}</em><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span></div><p class="level-trust-count">Level ${esc(active)} \u00b7 salah ${mistakes}/${LEVEL_GUARD_WRONG_LIMIT} \u00b7 terverifikasi sampai ${esc(verified)}</p><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
+  return `<div class="level-trust-banner is-probation"><em class="level-trust-chip">${esc(LEVEL_GUARD_COPY.entryChip)} \u00b7 ${esc(active)}</em><div class="level-trust-head"><b>${esc(LEVEL_GUARD_COPY.probationTitle)}</b><span>${esc(levelTrustCopy(LEVEL_GUARD_COPY.probationBody,verified))}</span></div><p class="level-trust-count">${FiezelI18n.t('level.probation-hitung',{level:esc(active),miss:mistakes,batas:LEVEL_GUARD_WRONG_LIMIT,verif:esc(verified)})}</p><div class="level-trust-actions"><button type="button" class="primary" onclick="openActiveLevelExamPanel('${esc(examLevel||verified)}')">${esc(LEVEL_GUARD_COPY.entryExam)} ${esc(examLevel||verified)}</button><button type="button" onclick="openLevelPanel()">Lihat level</button></div></div>`;
 }
 function shell(title,sub,body){setApp(`<section class="fade"><div class="section-head"><div><h1>${esc(title)}</h1><p>${esc(sub)}</p></div>${levelControlMarkup()}</div>${body}</section>`)}
 function card(html,cls=''){return `<div class="card ${cls}">${html}</div>`}
@@ -4744,10 +4744,10 @@ function skillHubModel(){
   };
   const written=writingThisWeek();
   return[
-    {id:'listening',view:'listening',label:'Listening',icon:'listening',note:'Dengar lalu jawab',ring:fromRow('listening',null)},
-    {id:'speaking',view:'speaking',label:'Speaking',icon:'speaking',note:'Ngomong, direkam lokal',ring:fromRow('speaking',null)},
-    {id:'reading',view:'reading',label:'Reading',icon:'reading_skill',note:`${R.filter(r=>r.level===active).length} bacaan ${active}`,ring:fromRow('reading',snapshot.domains?.reading?.accuracy)},
-    {id:'writing',view:'writing',label:'Writing',icon:'writing',note:`${written}/${WRITING_WEEKLY_TARGET} tulisan minggu ini`,ring:written?Math.round(Math.min(1,written/WRITING_WEEKLY_TARGET)*100):null}
+    {id:'listening',view:'listening',label:'Listening',icon:'listening',note:FiezelI18n.t('home.skill-listening'),ring:fromRow('listening',null)},
+    {id:'speaking',view:'speaking',label:'Speaking',icon:'speaking',note:FiezelI18n.t('home.skill-speaking'),ring:fromRow('speaking',null)},
+    {id:'reading',view:'reading',label:'Reading',icon:'reading_skill',note:FiezelI18n.t('home.skill-reading',{jumlah:R.filter(r=>r.level===active).length,level:active}),ring:fromRow('reading',snapshot.domains?.reading?.accuracy)},
+    {id:'writing',view:'writing',label:'Writing',icon:'writing',note:FiezelI18n.t('home.skill-writing',{done:written,goal:WRITING_WEEKLY_TARGET}),ring:written?Math.round(Math.min(1,written/WRITING_WEEKLY_TARGET)*100):null}
   ];
 }
 function skillHubMarkup(){
@@ -4761,7 +4761,7 @@ function skillHubMarkup(){
   <span><b>${esc(s.label)}</b><small>${measured?esc(s.note):'Belum diukur · mulai di sini'}</small></span>
 </button>`;
   }).join('');
-  return `<div class="home-section-head"><div><h2>Empat skill inti tes</h2></div><span class="journey-week">Listening · Speaking · Reading · Writing</span></div>
+  return `<div class="home-section-head"><div><h2>${FiezelI18n.t('home.judul-skill')}</h2></div><span class="journey-week">Listening · Speaking · Reading · Writing</span></div>
 <div class="skill-hub">${cards}</div>`;
 }
 /**
@@ -4790,11 +4790,11 @@ function homeStatStripMarkup(level,streak,attempts,review){
   // syarat yang sama dengan keping lain. Nol gem tidak diberi keping (aturan runtun nol).
   const gems=gemsBalance();
   const chips=[
-    `<span class="hero-stat is-level"><b>${esc(level)}</b><small>Level</small></span>`,
+    `<span class="hero-stat is-level"><b>${esc(level)}</b><small>${FiezelI18n.t('home.keping-level')}</small></span>`,
     Number(streak)>0?`<span class="hero-stat is-streak"><b><i data-lucide="flame"></i>${Number(streak)}</b><small>Runtun</small></span>`:'',
     `<span class="hero-stat is-daily"><b><span class="hero-ring" style="--v:${pct}"></span>${done}/${MEANINGFUL_ATTEMPTS}</b><small>Hari ini</small></span>`,
-    gems>0?`<span class="hero-stat is-gems"><b><i data-lucide="gem"></i>${gems}</b><small>Gem</small></span>`:'',
-    Number(review)>0?`<span class="hero-stat is-review"><b>${Number(review)}</b><small>Review</small></span>`:''
+    gems>0?`<span class="hero-stat is-gems"><b><i data-lucide="gem"></i>${gems}</b><small>${FiezelI18n.t('home.keping-gem')}</small></span>`:'',
+    Number(review)>0?`<span class="hero-stat is-review"><b>${Number(review)}</b><small>${FiezelI18n.t('home.keping-review')}</small></span>`:''
   ].filter(Boolean).join('');
   return `<div class="hero-stats">${chips}</div>`
 }
@@ -4878,8 +4878,8 @@ function maybeShowDailyRitual(now=Date.now()){
   state.ritualMeta={lastDay:today};save();
   let blocks='';try{const built=buildPersonalJourney(now);blocks=(built?.plan?.blocks||[]).slice(0,3).map((b,i)=>`<li class="fz-ritual-block" style="--ri:${i}"><b>${b.questions} ${esc(JOURNEY_BLOCK_LABELS[b.kind]||b.kind)}</b><span>${esc(b.why)}</span></li>`).join('')}catch(_){blocks=''}
   const streak=Number(state.streak)||0;
-  const host=document.createElement('div');host.id='fzRitual';host.className='fz-ritual';host.setAttribute('role','dialog');host.setAttribute('aria-label','Rencana hari ini');
-  host.innerHTML=`<div class="fz-ritual-card"><div class="fz-ritual-paw">${pawFaceMarkup()}</div><p class="fz-ritual-hi">Halo, ${esc(learnerName())}.</p>${streak>0?`<p class="fz-ritual-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> Runtun ${streak} hari — jaga nyalanya.</p>`:''}<small class="fz-ritual-mark">RENCANA HARI INI</small>${blocks?`<ul class="fz-ritual-blocks">${blocks}</ul>`:`<p class="fz-ritual-empty">${state.placementDone?'Rencana harimu menyesuaikan begitu kamu mulai berlatih.':'Mulai dari tes penempatan biar rencananya pas untukmu.'}</p>`}<div class="fz-ritual-actions"><button class="primary" onclick="startFromRitual()">Mulai <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="dismissDailyRitual()">Nanti dulu</button></div></div>`;
+  const host=document.createElement('div');host.id='fzRitual';host.className='fz-ritual';host.setAttribute('role','dialog');host.setAttribute('aria-label',FiezelI18n.t('ritual.aria-rencana'));
+  host.innerHTML=`<div class="fz-ritual-card"><div class="fz-ritual-paw">${pawFaceMarkup()}</div><p class="fz-ritual-hi">${FiezelI18n.t('ritual.halo',{nama:esc(learnerName())})}</p>${streak>0?`<p class="fz-ritual-streak"><i class="fz-i" data-fz-icon="flame" aria-hidden="true"></i> Runtun ${streak} hari — jaga nyalanya.</p>`:''}<small class="fz-ritual-mark">RENCANA HARI INI</small>${blocks?`<ul class="fz-ritual-blocks">${blocks}</ul>`:`<p class="fz-ritual-empty">${state.placementDone?FiezelI18n.t('ritual.kosong-placement'):FiezelI18n.t('ritual.kosong-belum-tes')}</p>`}<div class="fz-ritual-actions"><button class="primary" onclick="startFromRitual()">${FiezelI18n.t('ritual.mulai')} <i data-lucide="arrow-right"></i></button><button class="ghost" onclick="dismissDailyRitual()">Nanti dulu</button></div></div>`;
   // Tap di luar kartu = lewati. Kartu tidak pernah menahan murid.
   host.addEventListener('click',e=>{if(e.target===host)dismissDailyRitual()});
   document.body.appendChild(host);enhanceUI();
@@ -4917,20 +4917,20 @@ window.setGoalProfile=setGoalProfile;
  * pernah dimaksudkan untuk dibaca murid. Mesinnya tetap memutuskan APA yang dilatih;
  * yang berubah hanya siapa yang menulis kalimatnya.
  */
-const JOURNEY_BLOCK_LABELS={review:'soal ulang',focus:'soal fokus',transfer:'soal campur'};
+const JOURNEY_BLOCK_LABELS={get review(){return FiezelI18n.t('journey.blok-ulang')},get focus(){return FiezelI18n.t('journey.blok-fokus')},get transfer(){return FiezelI18n.t('journey.blok-campur')}};
 
 function journeySkillRowMarkup(row){
   // Tiga keadaan, bukan dua. Menampilkan 0% untuk skill yang belum pernah diukur terbaca
   // sebagai "kamu payah" padahal FIEZEL memang belum mengukurnya; dan Speaking/Listening
   // bukan "belum diukur" - latihannya sudah tercatat, hanya belum masuk peta ini (R3).
-  const value=row.status==='pending_r3'?'Belum terhubung'
-    :row.status==='not_measured'?'Belum diukur'
+  const value=row.status==='pending_r3'?FiezelI18n.t('journey.belum-terhubung')
+    :row.status==='not_measured'?FiezelI18n.t('journey.belum-diukur')
     :`${row.accuracy==null?'—':row.accuracy+'%'}`;
   // Cakupan target ditampilkan terpisah dari nilai, dan hanya kalau penyebutnya diketahui.
   // Menggabungkan keduanya jadi satu angka adalah cara tercepat membuat murid mengira
   // "baru 6% materi disentuh" berarti "nilaimu 6".
   const coverage=row.targetCoverage&&row.targetCoverage.measured
-    ? `<small>cakupan ${row.targetCoverage.percent}%</small>` : '';
+    ? `<small>${FiezelI18n.t('journey.cakupan',{persen:row.targetCoverage.percent})}</small>` : '';
   return `<div class="journey-skill ${row.status==='measured'?'':'is-unmeasured'}"><b>${esc(row.label)}</b><span>${esc(value)}</span>${coverage}</div>`;
 }
 // m025-131: journeyWhy() di app.js DIHAPUS. Percobaan pertama menyusun alasannya sendiri
@@ -4985,34 +4985,34 @@ function journeyMarkup(now=Date.now()){
 // R3 dashboard. Tugasnya satu: memisahkan tiga hal yang mudah tertukar dan berbahaya kalau
 // tertukar - skor latihan, cakupan target, dan yang memang belum dapat diukur. Ketiganya
 // ditulis sebagai kolom terpisah dengan label sendiri, bukan diringkas jadi satu angka.
-const UNMEASURABLE_LABELS={replayCount:'jumlah pengulangan audio',targetCoverage:'cakupan target'};
+const UNMEASURABLE_LABELS={get replayCount(){return FiezelI18n.t('diag.label-replay')},get targetCoverage(){return FiezelI18n.t('diag.label-cakupan')}};
 function unifiedSkillsMarkup(now=Date.now()){
   const spoken=buildLearnerEvidenceModel(now)?.skills?.spoken;
   if(!spoken)return '<p class="muted">Bukti Speaking dan Listening belum tersambung ke peta ini.</p>';
   const rows=[['Listening',spoken.listening],['Speaking',spoken.speaking]].map(([label,row])=>{
     if(!row||!row.attempts)return `<div class="row"><span>${esc(label)}</span><span class="muted">Belum ada latihan tercatat</span></div>`;
     const coverage=row.targetCoverage&&row.targetCoverage.measured
-      ? `${row.targetCoverage.percent}% (${row.targetCoverage.itemsAttempted} dari ${row.targetCoverage.itemsAvailable} materi)`
-      : 'Belum dapat diukur';
-    const latency=row.medianResponseMs==null?'Belum terbaca':Math.round(row.medianResponseMs/100)/10+' detik median';
+      ? FiezelI18n.t('diag.cakupan-detail',{persen:row.targetCoverage.percent,dicoba:row.targetCoverage.itemsAttempted,tersedia:row.targetCoverage.itemsAvailable})
+      : FiezelI18n.t('diag.belum-dapat-diukur');
+    const latency=row.medianResponseMs==null?FiezelI18n.t('diag.belum-terbaca'):Math.round(row.medianResponseMs/100)/10+FiezelI18n.t('diag.detik-median');
     // Yang tidak bisa dijawab dari bukti yang ada disebut namanya, bukan disembunyikan.
     const unknown=(row.unmeasurable||[]).map(k=>UNMEASURABLE_LABELS[k]||k).join(', ');
     return `<div class="diag-grid"><div><b>${esc(label)} · skor latihan</b><br>${row.practiceScore==null?'—':row.practiceScore+'%'}</div>`+
-      `<div><b>Kelengkapan</b><br>${row.completionRate==null?'—':row.completionRate+'% selesai'}</div>`+
-      `<div><b>Cakupan target</b><br>${esc(coverage)}</div>`+
+      `<div><b>${FiezelI18n.t('diag.kelengkapan')}</b><br>${row.completionRate==null?'—':row.completionRate+FiezelI18n.t('diag.persen-selesai')}</div>`+
+      `<div><b>${FiezelI18n.t('diag.cakupan-target')}</b><br>${esc(coverage)}</div>`+
       `<div><b>Latihan tercatat</b><br>${row.attempts}</div>`+
-      `<div><b>Kecepatan respons</b><br>${esc(latency)}</div>`+
-      `<div><b>Pengulangan audio</b><br>${row.replayCount==null?'Belum terukur':`${row.replayCount}x total · rata-rata ${row.replayAverage}x`}</div>`+
-      `<div><b>Belum dapat diukur</b><br>${unknown?esc(unknown):'—'}</div></div>`;
+      `<div><b>${FiezelI18n.t('diag.kecepatan-respons')}</b><br>${esc(latency)}</div>`+
+      `<div><b>${FiezelI18n.t('diag.pengulangan-audio')}</b><br>${row.replayCount==null?FiezelI18n.t('diag.belum-terukur'):FiezelI18n.t('diag.replay-nilai',{total:row.replayCount,rata:row.replayAverage})}</div>`+
+      `<div><b>${FiezelI18n.t('diag.belum-dapat-diukur')}</b><br>${unknown?esc(unknown):'—'}</div></div>`;
   }).join('<hr>');
   return rows+'<p class="muted">Skor latihan dan cakupan target adalah dua hal berbeda: yang satu seberapa baik hasilnya, yang lain seberapa banyak materinya sudah disentuh. FIEZEL tidak menilai pengucapan, dan tidak menyimpan rekaman suara atau transkrip.</p>';
 }
 // R4 Academic and Scholarship Readiness. Semua status berasal dari bukti belajar yang sudah
 // ada; modulnya yang memutuskan, app.js hanya menyediakan bukti dan merendernya.
-const READINESS_STATUS_LABELS={met:'Sudah terpenuhi',not_met:'Belum terpenuhi',unknown:'Belum terukur'};
+const READINESS_STATUS_LABELS={get met(){return FiezelI18n.t('siap.terpenuhi')},get not_met(){return FiezelI18n.t('siap.belum-terpenuhi')},get unknown(){return FiezelI18n.t('siap.belum-terukur')}};
 function academicReadinessMarkup(now=Date.now()){
   const academic=self.FiezelAcademicReadiness;
-  if(!academic)return '<p class="muted">Peta kesiapan akademik belum tersedia.</p>';
+  if(!academic)return '<p class="muted">'+FiezelI18n.t('siap.belum-tersedia')+'</p>';
   try{
     const active=getActiveLevel(),snapshot=buildLearningSnapshot(),evidence=buildLearnerEvidenceModel(now),activeReading=R.filter(r=>r.level===active),activeVocabulary=V.filter(v=>v.level===active);
     const foundation=academic.buildFoundationMap({snapshot,evidence,now});
@@ -5022,12 +5022,12 @@ function academicReadinessMarkup(now=Date.now()){
     // "Belum terukur" ditulis berbeda dari "belum terpenuhi", karena keduanya memang berbeda:
     // yang satu berarti FIEZEL belum pernah mengukur, yang lain berarti buktinya sudah ada.
     const reqs=foundation.requirements.map(r=>`<div class="row"><span>${esc(r.label)}</span><b class="readiness-${esc(r.status)}">${esc(READINESS_STATUS_LABELS[r.status]||r.status)}</b></div><p class="muted">${esc(r.basis)}</p>`).join('');
-    const stages=path.stages.map(s=>`<div class="row"><span>${esc(s.level)}</span><span>${s.items?`${s.items} bacaan · ${esc(s.topics.join(', '))}`:'Menunggu konten'}</span></div>`).join('');
+    const stages=path.stages.map(s=>`<div class="row"><span>${esc(s.level)}</span><span>${s.items?FiezelI18n.t('siap.baris-jalur',{jumlah:s.items,topik:esc(s.topics.join(', '))}):FiezelI18n.t('siap.menunggu-konten')}</span></div>`).join('');
     const tasks=lab.tasks.map(t=>`<div class="row"><span>${esc(t.label)}</span><span class="muted">${esc(t.practises.join(' · '))}</span></div>`).join('');
-    return `<div class="readiness-block"><h4>Prasyarat fondasi akademik</h4>${reqs}`+
+    return `<div class="readiness-block"><h4>${FiezelI18n.t('siap.h-fondasi')}</h4>${reqs}`+
       `<p class="muted">${esc(foundation.note)}</p></div>`+
       `<div class="readiness-block"><h4>Jalur reading akademik</h4>${stages}<p class="muted">${path.totalItems} bacaan bertema sains, lingkungan, dan teknologi dari bank yang sudah ada.</p></div>`+
-      `<div class="readiness-block"><h4>Lab komunikasi beasiswa</h4>${tasks}</div>`+
+      `<div class="readiness-block"><h4>${FiezelI18n.t('siap.h-beasiswa')}</h4>${tasks}</div>`+
       `<div class="readiness-block"><h4>Jalur kosakata IT dan kampus</h4><p class="muted">${esc(vocabPathway.note)}</p></div>`;
   }catch(_){return '<p class="muted">Peta kesiapan akademik belum bisa ditampilkan.</p>'}
 }
@@ -5058,16 +5058,16 @@ function continuitySettingsMarkup(){
   return `<div class="report-settings backup-settings"><div class="row"><div><b>Backup dan pemulihan</b><p class="muted">Berkas terenkripsi yang kamu simpan sendiri. FIEZEL tidak mengirimnya ke mana pun.</p></div></div>`+
     `<label class="endpoint-label">Kata sandi backup (minimal 8 karakter)<input id="backupPassphrase" type="password" autocomplete="new-password" placeholder="Kata sandi untuk membuka berkas ini"></label>`+
     `<p class="muted">Kalau kata sandi ini hilang, backup tidak bisa dibuka lagi. FIEZEL tidak menyimpan salinannya.</p>`+
-    `<div class="modal-actions backup-actions"><button id="backupExport" type="button">Buat berkas backup</button><button id="backupPick" type="button">Pilih berkas backup</button></div>`+
+    `<div class="modal-actions backup-actions"><button id="backupExport" type="button">${FiezelI18n.t('backup.buat')}</button><button id="backupPick" type="button">${FiezelI18n.t('backup.pilih')}</button></div>`+
     `<input id="backupFile" type="file" accept="application/json,.json" style="display:none">`+
-    `<p id="backupState" class="report-state">Status: belum ada berkas dipilih.</p>`+
+    `<p id="backupState" class="report-state">${FiezelI18n.t('backup.status-awal')}</p>`+
     `<div id="backupPreview"></div></div>`;
 }
-function setBackupState(message){const el=$('backupState');if(el)el.textContent='Status: '+message}
+function setBackupState(message){const el=$('backupState');if(el)el.textContent=FiezelI18n.t('backup.prefix-status')+message}
 async function runBackupExport(){
   const c=continuityModule(),pass=$('backupPassphrase')?.value||'';
   if(!c)return;
-  if(pass.length<8){setBackupState('kata sandi minimal 8 karakter.');return}
+  if(pass.length<8){setBackupState(FiezelI18n.t('backup.sandi-pendek'));return}
   try{
     const file=buildBackupFile();
     const envelope=await c.encryptBackup(file.payload,pass);
@@ -5076,7 +5076,7 @@ async function runBackupExport(){
     a.href=url;a.download=file.filename;document.body.appendChild(a);a.click();
     setTimeout(()=>{URL.revokeObjectURL(url);a.remove()},0);
     setBackupState(`berkas ${file.filename} dibuat. Simpan di tempat yang kamu percaya.`);
-  }catch(e){setBackupState(`gagal membuat backup (${e.message}).`)}
+  }catch(e){setBackupState(FiezelI18n.t('backup.gagal-buat',{galat:e.message}))}
 }
 async function runBackupImport(file){
   const c=continuityModule(),pass=$('backupPassphrase')?.value||'';
@@ -5087,34 +5087,34 @@ async function runBackupImport(file){
     pendingRestorePayload=payload;
     const preview=previewRestoreForState(payload);
     const el=$('backupPreview');
-    if(el)el.innerHTML=`<div class="diag-grid"><div><b>Dibuat</b><br>${esc(String(preview.createdAt).slice(0,10))}</div>`+
+    if(el)el.innerHTML=`<div class="diag-grid"><div><b>${FiezelI18n.t('backup.pv-dibuat')}</b><br>${esc(String(preview.createdAt).slice(0,10))}</div>`+
       `<div><b>Jawaban baru</b><br>${preview.historyRowsNew}</div>`+
-      `<div><b>Sudah ada</b><br>${preview.historyRowsAlreadyPresent}</div>`+
-      `<div><b>Materi bentrok</b><br>${preview.itemsShared}</div>`+
+      `<div><b>${FiezelI18n.t('backup.pv-sudah-ada')}</b><br>${preview.historyRowsAlreadyPresent}</div>`+
+      `<div><b>${FiezelI18n.t('backup.pv-bentrok')}</b><br>${preview.itemsShared}</div>`+
       `<div><b>Hanya di perangkat ini</b><br>${preview.itemsOnlyLocal}</div>`+
-      `<div><b>Hanya di backup</b><br>${preview.itemsOnlyBackup}</div></div>`+
+      `<div><b>${FiezelI18n.t('backup.pv-backup')}</b><br>${preview.itemsOnlyBackup}</div></div>`+
       `<p class="muted">Progres di perangkat ini tidak dibuang. Materi yang ada di kedua sisi diambil yang paling maju.</p>`+
-      `<div class="modal-actions"><button class="primary" id="backupConfirm" type="button">Gabungkan sekarang</button></div>`;
+      `<div class="modal-actions"><button class="primary" id="backupConfirm" type="button">${FiezelI18n.t('backup.gabung')}</button></div>`;
     $('backupConfirm')?.addEventListener('click',confirmRestore);
-    setBackupState('berkas terbaca. Periksa ringkasan sebelum menggabungkan.');
+    setBackupState(FiezelI18n.t('backup.terbaca'));
   }catch(e){
     pendingRestorePayload=null;
-    setBackupState(e.message==='wrong_passphrase_or_corrupt'?'kata sandi salah atau berkas rusak.':`berkas tidak bisa dibaca (${e.message}).`);
+    setBackupState(e.message==='wrong_passphrase_or_corrupt'?FiezelI18n.t('backup.sandi-salah'):FiezelI18n.t('backup.gagal-baca',{galat:e.message}));
   }
 }
 function confirmRestore(){
   const result=applyRestore(pendingRestorePayload);
-  if(!result.ok){setBackupState('pemulihan dibatalkan: berkas tidak sah.');return}
+  if(!result.ok){setBackupState(FiezelI18n.t('backup.batal-tak-sah'));return}
   pendingRestorePayload=null;
   const el=$('backupPreview');if(el)el.innerHTML='';
   setBackupState(`selesai. Riwayat ${result.before.history} menjadi ${result.after.history} jawaban.`);
-  showToast('Progres digabungkan.');
+  showToast(FiezelI18n.t('backup.toast-gabung'));
   render();
 }
 // R6 install/update health check. Pertanyaan yang dijawabnya sederhana tetapi selama ini
 // hanya bisa ditebak: apakah yang berjalan benar-benar build yang sudah dirilis, atau shell
 // lama yang masih dipegang service worker. Penilaiannya ada di features/health.
-const HEALTH_SEVERITY_LABELS={ok:'Aman',info:'Catatan',warn:'Perlu perhatian',blocker:'Harus ditangani'};
+const HEALTH_SEVERITY_LABELS={get ok(){return FiezelI18n.t('sehat.aman')},get info(){return FiezelI18n.t('sehat.catatan')},get warn(){return FiezelI18n.t('sehat.perlu-perhatian')},get blocker(){return FiezelI18n.t('sehat.harus-ditangani')}};
 function installHealthModule(){return self.FiezelInstallHealth||null}
 async function readInstallHealth(now=Date.now()){
   const mod=installHealthModule();if(!mod)return null;
@@ -5139,9 +5139,9 @@ function askServiceWorkerRevision(timeoutMs=1500){
   });
 }
 function installHealthReportMarkup(report){
-  if(!report)return '<p class="muted">Pemeriksaan instalasi belum tersedia.</p>';
+  if(!report)return '<p class="muted">'+FiezelI18n.t('sehat.belum-tersedia')+'</p>';
   const rows=report.findings.map(f=>`<div class="row health-${esc(f.severity)}"><span><b>${esc(f.label)}</b><br><small class="muted">${esc(f.detail)}</small>${f.remedy?`<br><small>${esc(f.remedy)}</small>`:''}</span><b>${esc(HEALTH_SEVERITY_LABELS[f.severity]||f.severity)}</b></div>`).join('');
-  const status=report.status==='healthy'?'Instalasi sehat':report.status==='degraded'?'Ada yang perlu diperhatikan':'Ada yang harus ditangani';
+  const status=report.status==='healthy'?FiezelI18n.t('sehat.status-sehat'):report.status==='degraded'?FiezelI18n.t('sehat.status-degraded'):FiezelI18n.t('sehat.status-blocker');
   return `<p><b>${esc(status)}</b></p>${rows}<p class="muted">Pemeriksaan ini hanya melihat keadaan pemasangan aplikasi. Tidak ada riwayat jawaban atau isi belajar yang dibaca.</p>`;
 }
 async function refreshInstallHealth(){
@@ -5258,7 +5258,7 @@ async function ensureVoiceRuntime(){
 function neuralVoiceCatalog(){const catalog=self.FiezelNeuralVoiceConfig?.voices?.catalog;return Array.isArray(catalog)?catalog:[]}
 function selectedNeuralVoice(){const value=String(state.preferences?.neuralVoice||'auto');return value==='auto'||neuralVoiceCatalog().some(item=>item.id===value)?value:'auto'}
 function neuralVoiceFor(options={}){const preferred=selectedNeuralVoice();return preferred==='auto'?(options.voice||self.FiezelNeuralVoiceConfig?.voices?.fiezelPrimary||'af_bella'):preferred}
-function setNeuralVoicePreference(value){const next=String(value||'auto');state.preferences={...state.preferences,neuralVoice:next==='auto'||neuralVoiceCatalog().some(item=>item.id===next)?next:'auto'};save();const label=neuralVoiceCatalog().find(item=>item.id===state.preferences.neuralVoice)?.label||'Otomatis';showToast(`Voice neural: ${label}`)}
+function setNeuralVoicePreference(value){const next=String(value||'auto');state.preferences={...state.preferences,neuralVoice:next==='auto'||neuralVoiceCatalog().some(item=>item.id===next)?next:'auto'};save();const label=neuralVoiceCatalog().find(item=>item.id===state.preferences.neuralVoice)?.label||FiezelI18n.t('suara.otomatis');showToast(FiezelI18n.t('suara.toast-voice',{label:label}))}
 // m025-30: learner-facing speaking-rate control. 1 means the engine's calibrated
 // natural pace; the adapter scales this relative to NATURAL_SPEED and clamps it, so
 // this slider can never request an unintelligible delivery.
@@ -5269,7 +5269,7 @@ function selectedNeuralRate(){const v=Number(state.preferences?.neuralRate);retu
 // wajib lewat sini: slider disamakan nilainya, lalu satu peristiwa disiarkan agar pemakai
 // lain (dok Library) memperbarui labelnya tanpa perlu tahu siapa yang mengubah.
 function setNeuralRatePreference(value){const v=Math.min(NEURAL_RATE_MAX,Math.max(NEURAL_RATE_MIN,Number(value)||1));state.preferences={...state.preferences,neuralRate:v};save();const el=$('neuralRateValue');if(el)el.textContent=neuralRateLabel(v);const slider=$('neuralRateInput');if(slider&&Number(slider.value)!==v)slider.value=String(v);try{document.dispatchEvent(new CustomEvent('fiezel-neural-rate',{detail:{rate:v}}))}catch(_){}}
-function neuralRateLabel(v){return v<0.9?`${v.toFixed(2)}x · lebih pelan`:v>1.1?`${v.toFixed(2)}x · lebih cepat`:`${v.toFixed(2)}x · natural`}
+function neuralRateLabel(v){return v<0.9?FiezelI18n.t('suara.lebih-pelan',{nilai:v.toFixed(2)}):v>1.1?FiezelI18n.t('suara.lebih-cepat',{nilai:v.toFixed(2)}):FiezelI18n.t('suara.natural',{nilai:v.toFixed(2)})}
 // m025-42: Indonesian is NO LONGER a separate bundle. One Supertonic model speaks both
 // languages, so preparing the voice prepares both at once; this helper now reports the
 // shared bundle's readiness. The UI copy below was corrected to match, because telling a
@@ -5299,7 +5299,7 @@ function neuralRateLabel(v){return v<0.9?`${v.toFixed(2)}x · lebih pelan`:v>1.1
 let puterAccountCache=null;
 function puterAccountLabel(){
   const user=puterAccountCache;
-  if(!user)return puterSignedIn()?'Akun tersambung':'Belum tersambung';
+  if(!user)return puterSignedIn()?FiezelI18n.t('akun.tersambung'):FiezelI18n.t('akun.belum-tersambung');
   return String(user.username||user.email||'Akun tersambung');
 }
 async function refreshPuterAccountCard(){
@@ -5315,13 +5315,13 @@ async function refreshPuterAccountCard(){
  *  menyalinnya ke sini berarti dua tempat yang bisa menyimpang. */
 async function signOutPuterAccount(){
   const sdk=await awaitPuter(6000);
-  if(!sdk?.auth?.signOut)throw new Error('Layanan akun Puter belum bisa dihubungi.');
+  if(!sdk?.auth?.signOut)throw new Error(FiezelI18n.t('akun.err-layanan'));
   await sdk.auth.signOut();
   puterAccountCache=null;
 }
 async function runPuterSignOut(){
   const button=$('accountSignOut');if(button)button.disabled=true;
-  try{await signOutPuterAccount();showToast('Keluar dari akun. FIEZEL dimuat ulang.');setTimeout(()=>location.reload(),700)}
+  try{await signOutPuterAccount();showToast(FiezelI18n.t('akun.toast-keluar'));setTimeout(()=>location.reload(),700)}
   catch(error){showToast(aiErrorMessage(error));if(button)button.disabled=false}
 }
 async function runPuterSwitchAccount(){
@@ -5332,7 +5332,7 @@ async function runPuterSwitchAccount(){
     if(!sdk?.auth?.signIn)throw new Error('Layanan akun Puter belum bisa dihubungi.');
     await sdk.auth.signIn();
     await activateAccountStateFromPuter(sdk);
-    showToast('Akun diganti. FIEZEL dimuat ulang.');
+    showToast(FiezelI18n.t('akun.toast-ganti'));
     setTimeout(()=>location.reload(),700);
   }catch(error){
     // Login yang dibatalkan meninggalkan perangkat dalam keadaan SUDAH keluar, dan
@@ -5361,11 +5361,11 @@ function accountSettingsMarkup(){
   // Tanpa akun, tombol "Ganti akun"/"Keluar" tidak punya apa pun untuk digantikan; yang
   // dibutuhkan murid yang tadi memilih "Lanjut tanpa akun" adalah satu pintu masuk.
   const actions=connected
-    ?`<button type="button" id="accountSwitch"><i data-lucide="user-round"></i> Ganti akun</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="arrow-up-right"></i> Keluar</button>`
-    :`<button type="button" id="accountSignIn" class="primary"><i data-lucide="user-round"></i> Masuk ke akun Puter</button>`;
+    ?`<button type="button" id="accountSwitch"><i data-lucide="user-round"></i> ${FiezelI18n.t('akun.ganti')}</button><button type="button" id="accountSignOut" class="danger"><i data-lucide="arrow-up-right"></i> ${FiezelI18n.t('akun.keluar')}</button>`
+    :`<button type="button" id="accountSignIn" class="primary"><i data-lucide="user-round"></i> ${FiezelI18n.t('akun.masuk')}</button>`;
   const note=connected
-    ?'Ganti akun akan keluar dulu, lalu membuka login Puter - tanpa itu Puter langsung memakai sesi lama dan akunnya tidak pernah benar-benar berganti.'
-    :'Belajar tetap jalan penuh tanpa akun. Masuk hanya menambahkan tutor AI, suara neural, dan sinkron progres antar perangkat.';
+    ?FiezelI18n.t('akun.catatan-tersambung')
+    :FiezelI18n.t('akun.catatan-tanpa');
   return `<div class="card account-card"><h3>Akun Puter</h3><p class="muted">Progres belajar, streak, dan tutor AI tersimpan di akun ini.</p><div class="setting-row"><span class="setting-icon"><i data-lucide="user-round"></i></span><span><b id="accountName">${esc(puterAccountLabel())}</b><small>${connected?'Tersambung di perangkat ini':'Belum ada akun tersambung'}</small></span></div><div class="actions">${actions}</div><p class="muted">${esc(note)}</p></div>`
 }
 function bindAccountSettingControls(){
@@ -5374,14 +5374,14 @@ function bindAccountSettingControls(){
   $('accountSignOut')?.addEventListener('click',runPuterSignOut);
   refreshPuterAccountCard();
 }
-function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const offline=self.FiezelVoiceOfflineAutoload?.status?.()||{done:false,armed:false};const label=online.ready?'Suara siap, tanpa unduhan':'Menyiapkan suara…';
+function neuralVoiceStatusMarkup(){const say=self.FiezelPuterVoice,online=say?.status?.()||{ready:false,sdkPresent:false,error:''};const runtime=self.FiezelVoiceRuntime,status=runtime?.status?.()||{prepared:false,ready:false,phase:'unavailable',totalBytes:0};const offline=self.FiezelVoiceOfflineAutoload?.status?.()||{done:false,armed:false};const label=online.ready?FiezelI18n.t('suara.siap'):FiezelI18n.t('suara.menyiapkan');
   // m025-121: kartu ini TIDAK menjual unduhan apa pun, dan itu keputusan yang sama dengan
   // m025-100. Cadangan perangkat menyiapkan dirinya sendiri di latar; yang ditampilkan di
   // sini hanyalah kenyataan sesudahnya, satu baris, tanpa tombol dan tanpa angka megabita.
-  const backupLine=offline.done?'Cadangan suara sudah tersimpan di perangkat ini. Kalau suatu saat jatah suara online habis, pelajaran tetap bersuara.':'';return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">Setiap kalimat Inggris dibacakan dan diberi subtitle Indonesia di bawahnya. Tidak ada yang perlu diunduh.</p>${online.error?`<p class="muted">Status: ${esc(online.error)}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>Kecepatan bicara</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> Tes suara</button></div></article>`}
+  const backupLine=offline.done?FiezelI18n.t('suara.cadangan'):'';return `<article class="voice-setup-card"><div class="voice-setup-copy"><h2>${esc(label)}</h2><p id="neuralVoiceProgress">Setiap kalimat Inggris dibacakan dan diberi subtitle Indonesia di bawahnya. Tidak ada yang perlu diunduh.</p>${online.error?`<p class="muted">${FiezelI18n.t('suara.status-error',{galat:esc(online.error)})}</p>`:''}<label class="neural-voice-choice" for="neuralRateInput"><span>${FiezelI18n.t('suara.kecepatan-bicara')}</span><input id="neuralRateInput" type="range" min="${NEURAL_RATE_MIN}" max="${NEURAL_RATE_MAX}" step="${NEURAL_RATE_STEP}" value="${selectedNeuralRate()}"><small id="neuralRateValue">${esc(neuralRateLabel(selectedNeuralRate()))}</small></label>${backupLine?`<p class="muted">${esc(backupLine)}</p>`:''}</div><div class="voice-setup-actions"><button id="testNeuralVoice" type="button"><i data-lucide="volume-2"></i> ${FiezelI18n.t('suara.tes')}</button></div></article>`}
 // m025-96: menguji mesin yang benar-benar dipakai murid. Menguji mesin lokal di sini
 // akan melaporkan 'suara siap' padahal jalur yang dipakai pelajaran adalah yang lain.
-async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?'Tes selesai. Subtitle Indonesia muncul di bawah saat pelajaran berjalan.':'Suara tidak berbunyi. Periksa koneksi lalu coba lagi.';showToast(ok?'Suara terdengar.':'Suara belum berbunyi.')}catch(error){if(hint)hint.textContent=`Tes suara gagal: ${String(error?.message||error)}.`;showToast('Tes suara gagal. Buka Diagnostics untuk detail.')}finally{button.disabled=false;enhanceUI()}}
+async function testNeuralVoice(){const button=$('testNeuralVoice'),say=self.FiezelVoiceSay;if(!button||!say?.say)return;button.disabled=true;const hint=$('neuralVoiceProgress');try{const ok=await say.say(`Hello ${learnerName()}. This is your FIEZEL voice.`,{speed:selectedNeuralRate()});if(hint)hint.textContent=ok?FiezelI18n.t('suara.tes-selesai'):FiezelI18n.t('suara.tak-berbunyi');showToast(ok?FiezelI18n.t('suara.terdengar'):FiezelI18n.t('suara.belum-berbunyi'))}catch(error){if(hint)hint.textContent=FiezelI18n.t('suara.tes-gagal-detail',{galat:String(error?.message||error)});showToast(FiezelI18n.t('suara.tes-gagal'))}finally{button.disabled=false;enhanceUI()}}
 
 /* =====================================================================================
    V6 SISI PEMANGGIL - menghangatkan kalimat BERIKUTNYA (reports/voice-v6-callers.md)
@@ -5470,7 +5470,7 @@ async function classroomSpeak(en,id,next){classroomSubtitle(id);const say=self.F
   // Diajukan SESUDAH say() berangkat, bukan sebelum: yang dihangatkan adalah kalimat
   // berikutnya, dan yang harus lebih dulu memesan mesin adalah kalimat yang sedang didengar.
   prefetchNextVoice(next===undefined?classroomPeekNextText():next,{speed});
-  await speaking}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=`Suara belum siap: ${String(e?.message||e)}. Subtitle tetap jalan.`}finally{classroomSpeaking=false}}
+  await speaking}catch(e){const el=$('classroomVoiceNote');if(el)el.textContent=FiezelI18n.t('kelas.suara-belum-siap',{galat:String(e?.message||e)})}finally{classroomSpeaking=false}}
 // Tumpukan tutor/Classroom (81 KB) juga dimuat malas. Pembungkus ini yang menjembatani
 // dua kenyataan: ./features/tutor-classroom/fiezel-tutor-v3.js MENGGANTI global
 // `classroom` dengan renderernya sendiri saat ia dieksekusi, dan sekarang ia bisa saja
@@ -5478,7 +5478,7 @@ async function classroomSpeak(en,id,next){classroomSubtitle(id);const say=self.F
 // classroomBaseRenderer supaya penyerahan ke renderer tutor tidak pernah berubah menjadi
 // rekursi tak terbatas ke diri sendiri.
 async function classroom(){
-  setApp('<section class="fade classroom-page"><div class="card">Memuat Classroom…</div></section>');
+  setApp('<section class="fade classroom-page"><div class="card">'+FiezelI18n.t('kelas.memuat')+'</div></section>');
   try{await self.FiezelLazy?.load?.('classroom')}catch{}
   const current=self.classroom;
   /* D6 P1-1: pembanding rekursi harus PEMBUNGKUS ini sendiri (classroom), bukan hanya
@@ -5495,8 +5495,8 @@ async function classroom(){
    referensi ini sah walau deklarasinya di bawah). */
 const classroomBaseRenderer=classroomBase;
 async function classroomBase(){
-  let pack;try{pack=await loadClassroomPack()}catch(e){setApp(`<section class="fade classroom-page"><div class="card"><b>Classroom belum dapat dimuat.</b><p class="muted">${esc(e?.message||e)}</p></div></section>`);return}
-  if(!self.FiezelClassroom){setApp('<section class="fade classroom-page"><div class="card"><b>Classroom runtime tidak tersedia.</b></div></section>');return}
+  let pack;try{pack=await loadClassroomPack()}catch(e){setApp(`<section class="fade classroom-page"><div class="card"><b>${FiezelI18n.t('kelas.gagal-muat')}</b><p class="muted">${esc(e?.message||e)}</p></div></section>`);return}
+  if(!self.FiezelClassroom){setApp('<section class="fade classroom-page"><div class="card"><b>'+FiezelI18n.t('kelas.runtime-hilang')+'</b></div></section>');return}
   const level=getActiveLevel();
   if(!classroomSession||classroomSessionLevel!==level){classroomSession=self.FiezelClassroom.createSession(pack,{getActiveLevel});classroomSessionLevel=level}
   renderClassroom();
@@ -5509,7 +5509,7 @@ function renderClassroom(){
   }else if(snap.phase==='topic'){
     const list=s.lessonsIn(snap.categoryId);
     body=list.length?`<div class="classroom-grid">${list.map(l=>`<button class="classroom-cat" data-lesson="${esc(l.id)}"><b>${esc(l.topic)}</b><small>${esc(l.level)}</small></button>`).join('')}</div>`:'<div class="card">Topik untuk kategori ini belum tersedia.</div>';
-    body+='<div class="classroom-actions"><button data-back="category">Kembali</button></div>';
+    body+='<div class="classroom-actions"><button data-back="category">'+FiezelI18n.t('umum.kembali')+'</button></div>';
   }else if(snap.phase==='teach'){
     const seg=s.currentSegment();
     body=`<article class="classroom-board"><h2>${esc(snap.board.title)}</h2><p class="classroom-formula">${esc(snap.board.formula)}</p><ul>${snap.board.examples.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></article>
@@ -5564,8 +5564,8 @@ function wireClassroom(){
 // kedua yang harus dirawat terpisah.
 const SKILLS_LAB_VIEWS=new Set(['skills','listening','speaking']);
 const SKILL_PAGE_COPY={
-  listening:{title:'Listening',lead:'Dengar dulu, baru jawab. Kalau belum nangkep, ulang - itu bagian dari latihannya.'},
-  speaking:{title:'Speaking',lead:'Ngomong aja dulu. Rekamannya tidak pernah dikirim ke mana pun, cuma dinilai di perangkatmu.'}
+  listening:{title:'Listening',get lead(){return FiezelI18n.t('skills.lead-listening')}},
+  speaking:{title:'Speaking',get lead(){return FiezelI18n.t('skills.lead-speaking')}}
 };
 /* Kait dompet Gem Terjemahan untuk addon Skills Lab (reports/recon-listening-gems.md §B.3).
    Polanya sama dengan getActiveLevel/onSessionEnd: sidecar TIDAK pernah menyentuh state
@@ -5604,7 +5604,7 @@ function gemsHook(){
     }
   };
 }
-async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error('Speaking + Listening runtime tidak tersedia');const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>Skills Lab belum dapat dimuat.</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
+async function skillsLab(domain){const token=speakingListeningMountToken;const copy=SKILL_PAGE_COPY[domain];const head=copy?`<div class="skill-page-hero skill-${esc(domain)}"><span class="skill-badge">SKILL INTI TES</span><h1>${esc(copy.title)}</h1><p>${esc(copy.lead)}</p><div class="skill-level-note">Level aktif: <b>${esc(getActiveLevel())}</b> · atur dari tombol Level belajar</div></div>`:`<div class="section-head"><div><h1>Skills Lab</h1><p>Speaking dan Listening dengan evidence terisolasi dan privasi ketat. Suara berjalan langsung tanpa unduhan, jadi tidak ada setup di sini.</p></div>${levelControlMarkup()}</div>`;setApp(`<section class="fade skills-page">${head}<div id="speakingListeningRoot"><div class="card skills-loading">Memuat bank latihan…</div></div></section>`);enhanceUI();await ensureVoiceRuntime();try{if(!self.FiezelSLAddon)throw new Error(FiezelI18n.t('skills.runtime-hilang'));const tts={play:(text,options={})=>self.FiezelVoiceSay?.say?.(text,{speed:options.speed??selectedNeuralRate(),suppressSubtitles:!!options.suppressSubtitles})||Promise.reject(new Error('tts_unavailable')),/* V6: adaptor ini hanya meneruskan (voice-v5-prefetch.md §3 baris 10); keputusan APA yang dihangatkan - dan larangan menghangatkan item ujian - tetap milik addon. */prefetch:(text,options={})=>prefetchNextVoice(text,{speed:options.speed??selectedNeuralRate()}),stop:()=>{cancelVoicePrefetch();self.FiezelVoiceSay?.stop?.()}};const controller=await self.FiezelSLAddon.create({root:$('speakingListeningRoot'),baseUrl:'./features/speaking-listening/',config:self.FIEZEL_SPEAKING_LISTENING_CONFIG,getActiveLevel,activeLevel:getActiveLevel(),tts,/* m026-02: satu-satunya titik pemberitahuan Puter boleh muncul - sesi dengar sudah bubar (renderComplete/exit di addon). */onSessionEnd:()=>{try{maybePresentPuterCreditNotice()}catch{}},/* R2-4: ekspresi maskot dalam sesi Skills Lab — lewat pawReact host supaya gerbang reduced-motion/preferensi animasinya SATU. */onAnswerFeedback:ok=>{try{pawReact(ok?'correct':'wrong')}catch(_){}},/* Fase 3 (C5 butir 5): kait kebijakan speaking adaptif untuk addon - addon yang memutuskan kapan memakainya; kunci asing diabaikan addon lama, jadi ini aman untuk versi mana pun. */speakingAdaptive:speakingAdaptiveAvailable()?{evidence:speakingAdaptiveEvidence,policy:speakingAdaptivePolicy}:null,gems:gemsHook()});if(token!==speakingListeningMountToken||!SKILLS_LAB_VIEWS.has(state.view)){controller.destroy();return}speakingListeningController=controller;/* m026-03: kait tur listening. Addon-nya TIDAK diubah - renderListening dibungkus dari luar, pola yang sama dengan hook lain milik host. Tur diberi tahu setelah kartu soal tercat. */try{const baseRenderListening=controller.renderListening?.bind(controller);if(baseRenderListening)controller.renderListening=(...args)=>{const out=baseRenderListening(...args);notifyFeatureTour('listening');return out}}catch(_){}controller.mount($('speakingListeningRoot'));if(SKILL_PAGE_COPY[domain]){try{controller.open(domain)}catch(_){}}/* m026-01: hanya Listening yang memicu state dengar; Speaking dan lainnya cukup penasaran. */pawReact(domain==='listening'?'listening-start':'question-shown');enhanceUI()}catch(error){const root=$('speakingListeningRoot');if(root)root.innerHTML=`<div class="card"><b>${FiezelI18n.t('skills.gagal-muat')}</b><p class="muted">${esc(error?.message||error)}</p></div>`;/* [ADAPTASI] OA-7 §4: error_system hanya untuk kegagalan sistem, bukan jawaban salah. */uiSfx('error_system')}}// m025-115 - Writing: satu-satunya dari empat skill inti tes yang belum punya mesin sama
 // sekali. Yang dibangun di sini sengaja yang paling kecil tapi utuh: satu topik sesuai
 // level, satu kotak tulis, satu masukan yang bisa dipakai. Bukan editor esai.
 //
@@ -5663,20 +5663,20 @@ function writing(){
 <div class="quiz-mascot" aria-hidden="true">${pawFaceMarkup()}</div>
 <div class="card writing-prompt">
   <span class="skill-badge">TOPIK ${esc(prompt.level)} · ${done}/${WRITING_WEEKLY_TARGET} minggu ini</span>
-  ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>Minimal ${exam.minWords} kata · ${exam.minutes} menit</span><small>${esc(exam.note)}</small></p>`:''}
+  ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>${FiezelI18n.t('tulis.meta-ujian',{kata:exam.minWords,menit:exam.minutes})}</span><small>${esc(exam.note)}</small></p>`:''}
   <b>${esc(prompt.en)}</b>
   <p class="muted">${esc(prompt.id_hint)}</p>
-  ${prompt.focus?`<p class="writing-focus">Yang dilatih: ${esc(prompt.focus)}</p>`:''}
-  <textarea id="writingBox" placeholder="Start writing here…" aria-label="Kotak menulis">${esc(draft)}</textarea>
-  <div class="writing-meta"><span id="writingCount">0 kata</span><span>${exam?`Minimal ${target} kata`:`Target sekitar ${target} kata`}</span></div>
-  <button class="primary wide" id="writingAsk"><i data-lucide="sparkles"></i> Minta masukan FIEZEL</button>
-  <button id="writingSwap">Ganti topik</button>
+  ${prompt.focus?`<p class="writing-focus">${FiezelI18n.t('tulis.fokus',{fokus:esc(prompt.focus)})}</p>`:''}
+  <textarea id="writingBox" placeholder="Start writing here…" aria-label="${FiezelI18n.t('tulis.aria-kotak')}">${esc(draft)}</textarea>
+  <div class="writing-meta"><span id="writingCount">${FiezelI18n.t('tulis.nol-kata')}</span><span>${exam?FiezelI18n.t('tulis.min-kata',{kata:target}):FiezelI18n.t('tulis.target-kata',{kata:target})}</span></div>
+  <button class="primary wide" id="writingAsk"><i data-lucide="sparkles"></i> ${FiezelI18n.t('tulis.minta-masukan')}</button>
+  <button id="writingSwap">${FiezelI18n.t('tulis.ganti-topik')}</button>
 </div>
 <div id="writingFeedback" class="writing-feedback"></div>
-${criteria.length?`<div class="card writing-rubric"><b>Yang dinilai</b><p class="muted">Lima kriteria, masing-masing 0-4. Empat yang pertama mengikuti keluarga kriteria IELTS Writing.</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div>`:''}
+${criteria.length?`<div class="card writing-rubric"><b>${FiezelI18n.t('tulis.judul-rubrik')}</b><p class="muted">${FiezelI18n.t('tulis.ket-rubrik')}</p><ul>${criteria.map(c=>`<li><b>${esc(c.label)}</b><span>${esc(c.asks)}</span></li>`).join('')}</ul><p class="muted">${esc(WRITING_BANK?.honesty||'')}</p></div>`:''}
 </section>`);
   const box=$('writingBox'),counter=$('writingCount');
-  const sync=()=>{const n=countWords(box.value);counter.textContent=`${n} kata`;counter.classList.toggle('is-hit',n>=target)};
+  const sync=()=>{const n=countWords(box.value);counter.textContent=FiezelI18n.t('tulis.n-kata',{jumlah:n});counter.classList.toggle('is-hit',n>=target)};
   box.addEventListener('input',sync);
   box.addEventListener('blur',()=>writingSaveDraft(box.value));
   sync();
@@ -5687,9 +5687,9 @@ ${criteria.length?`<div class="card writing-rubric"><b>Yang dinilai</b><p class=
 async function requestWritingFeedback(prompt){
   const box=$('writingBox'),host=$('writingFeedback');if(!box||!host)return;
   const text=String(box.value||'').trim(),words=countWords(text);
-  if(words<15){showToast('Tulis minimal 15 kata dulu, biar ada yang bisa dibaca FIEZEL.');return}
+  if(words<15){showToast(FiezelI18n.t('tulis.toast-min15'));return}
   writingSaveDraft(text);
-  host.innerHTML=`<div class="card"><b>FIEZEL lagi baca tulisanmu…</b><p class="muted">Sebentar ya.</p></div>`;
+  host.innerHTML=`<div class="card"><b>${FiezelI18n.t('tulis.menunggu')}</b><p class="muted">${FiezelI18n.t('tulis.sebentar')}</p></div>`;
   // R2-4: maskot ikut "membaca" — lewat corong pawSetState (gerbang reduced-motion tunggal).
   pawSetState('thinking',{hold:2400});
   const exam=writingExamTask(prompt),criteria=writingRubricCriteria();
@@ -5719,7 +5719,7 @@ Aturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan 
       // R6 perbaikan-11 (spek R5): kirim teks tugas + ringkasan kontrak ujian supaya grader
       // CF benar-benar bisa menilai ketercapaian tugas, bukan cuma bahasa jawabannya.
       askFiezelAI(ai,'writing_feedback',{text,promptId:String(prompt.id||prompt.promptId||''),level:prompt.level,rubricId:String(WRITING_BANK?.rubric?.id||''),promptText:String(prompt.en||''),examBrief:exam?`${exam.label}. Minimal ${exam.minWords} kata, ${exam.minutes} menit.`:''}),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Koneksi AI tidak menjawab dalam 25 detik.')),25000))
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error(FiezelI18n.t('tulis.timeout'))),25000))
     ]);
     host.innerHTML=`<div class="card">${renderMarkdown(String(answer))}<p class="ai-disclosure"><i data-lucide="shield-check"></i> Tulisan dan konteks tugas yang kamu kirim diproses oleh Core AI. Jangan masukkan data pribadi.</p></div>`;
     saveWritingEntry(prompt,words);
@@ -5729,12 +5729,12 @@ Aturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan 
     // [FASE-8] 09 §3.1: umpan balik tulisan = pengakuan karya (proud), bukan busur
     // completion 2600ms yang khusus akhir sesi kuis.
     pawReact('badge-earned');
-    showToast('Tulisan tercatat. Mantap.');
+    showToast(FiezelI18n.t('tulis.toast-tercatat'));
   }catch(error){
     saveWritingEntry(prompt,words);
     host.innerHTML=`<div class="card"><b>Masukan AI belum bisa diambil.</b><p class="muted">${esc(error?.message||error)}</p></div>
 ${writingLocalReview(prompt,text)}`;
-    showToast('Tulisan tercatat. Masukan AI menyusul kalau koneksi balik.');
+    showToast(FiezelI18n.t('tulis.toast-offline'));
   }
   enhanceUI();
 }
@@ -5783,8 +5783,8 @@ function writingFormChecklist(prompt,text){
     s.paragraphs>=3?`${s.paragraphs} paragraf - strukturnya sudah terbaca.`
       :`Baru ${s.paragraphs} paragraf. Esai ujian biasanya butuh pembuka, isi yang terbagi, dan penutup.`);
   push('lexical_resource',s.repeated.length?'perhatikan':'ok',
-    s.repeated.length?`Kata yang diulang: ${s.repeated.map(x=>`${x.word} (${x.n}x)`).join(', ')}.`
-      :`Tidak ada kata isi yang menumpuk berlebihan.`);
+    s.repeated.length?FiezelI18n.t('tulis.cek-diulang',{daftar:s.repeated.map(x=>`${x.word} (${x.n}x)`).join(', ')})
+      :FiezelI18n.t('tulis.cek-tak-menumpuk'));
   push('grammatical_range_accuracy','ai',
     `Terhitung ${s.complexClauses} penanda klausa kompleks dan kalimat terpanjang ${s.longestSentence} kata. Ketepatannya hanya bisa dinilai dengan membaca - itu bagian AI.`);
   push('register_mechanics','ai',
@@ -5899,7 +5899,7 @@ window.dismissPrasastiMoment=dismissPrasastiMoment;
 function showPrasastiMoment(fresh){
   if(!Array.isArray(fresh)||!fresh.length)return false;
   if(document.getElementById('fzPrasasti'))return false;
-  const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-label','Prasasti baru terukir');
+  const host=document.createElement('div');host.id='fzPrasasti';host.className='fz-prasasti-moment';host.setAttribute('role','dialog');host.setAttribute('aria-label',FiezelI18n.t('prasasti.aria-baru'));
   host.innerHTML=`<div class="fz-prasasti-card"><div class="modal-mark">PRASASTI BARU</div>${fresh.map(b=>`<div class="fz-prasasti-hero"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><p>${esc(b.desc)}</p></div>`).join('')}<p class="fz-prasasti-note">Terukir dari bukti belajarmu. Lihat semuanya di Peta Belajar.</p><button class="primary" onclick="dismissPrasastiMoment()">Simpan di galeri <i data-lucide="arrow-right"></i></button></div>`;
   host.addEventListener('click',e=>{if(e.target===host)dismissPrasastiMoment()});
   document.body.appendChild(host);enhanceUI();
@@ -5930,9 +5930,9 @@ function checkPrasasti(origin='app'){
 // Galeri untuk Peta Belajar: yang terukir tampil penuh, yang belum tampil sebagai
 // siluet + petunjuk cara mendapatkannya — tujuan berikutnya terlihat, bukan disembunyikan.
 function prasastiGalleryMarkup(){
-  const core=prasastiCore();if(!core)return '<p class="muted">Galeri prasasti belum dapat dimuat.</p>';
+  const core=prasastiCore();if(!core)return '<p class="muted">'+FiezelI18n.t('prasasti.gagal-muat')+'</p>';
   const earned=prasastiState().earned||{};
-  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'';return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(b.title)}: ${at?`terukir ${when}`:'belum terukir. '+b.hint}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><span class="prasasti-hint">${esc(at?when:b.hint)}</span></div>`}).join('');
+  const cells=core.BADGES.map(b=>{const at=earned[b.id];const when=at?new Date(at).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'';return `<div class="prasasti-badge ${at?'is-earned':'is-locked'}" role="img" aria-label="${esc(b.title)}: ${at?FiezelI18n.t('prasasti.aria-terukir',{kapan:when}):FiezelI18n.t('prasasti.aria-belum',{hint:b.hint})}"><span class="prasasti-icon">${prasastiIconSvg(b.id)}</span><b>${esc(b.title)}</b><span class="prasasti-hint">${esc(at?when:b.hint)}</span></div>`}).join('');
   return `<div class="prasasti-grid">${cells}</div><p class="map-note"><span>Prasasti hanya terukir dari hal yang benar-benar kamu kerjakan — tidak dijual, tidak bisa dipalsukan.</span></p>`;
 }
 /* W1 P0-2 (20-001): CTA utama tidak boleh menggantung menunggu popup sign-in. Dua pagar:
@@ -5969,7 +5969,7 @@ async function startAdaptive(){if(!state.adaptiveReady){showToast('Latihan terbu
     Satu kalimat ajakan via toast - bukan layar baru. Guarded: tanpa modul, tidak ada apa-apa. */
  // D5 T5: dulu toast 2,6 dtk yang bertanya tanpa bisa dijawab; kini popup pilihan tujuan.
  try{const plan=srlSessionPlan(policy,count);srlSessionSync();const gp=plan?.goalPrompt;if(gp?.ask)setTimeout(()=>{try{srlGoalPopShow(gp)}catch{}},1200)}catch{}}
-function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length;shell('Vocabulary Hub',`${active.length.toLocaleString()} kata level ${level}. Semua latihan mengikuti level belajar aktif.`,`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>Ganti level dari tombol di atas.</span></div><div class="toolbar"><button class="primary" onclick="startVocabQuiz()"><i data-lucide="circle-play"></i> Uji Vocabulary ${esc(level)}</button><button onclick="reviewVocab()"><i data-lucide="history"></i> Review Due (${due})</button></div><div class="grid"><div class="card"><div class="row"><b>${esc(level)} vocabulary</b><span>${active.length} kata</span></div><p class="muted">${mastered} mastered · bank level lain tetap tersimpan, tetapi tidak ditampilkan.</p>${active.length?`<button onclick="flashcards('${level}')">Buka flashcards <i data-lucide="arrow-right"></i></button>`:'<p class="muted">Belum tersedia untuk level ini.</p>'}</div></div>`)}
+function vocab(){const level=getActiveLevel(),active=V.filter(v=>v.level===level),mastered=Object.entries(state.vocab).filter(([id,x])=>x?.mastery>=80&&V.find(v=>v.id===id)?.level===level).length,due=active.filter(v=>state.vocab[v.id]?.nextReview&&state.vocab[v.id].nextReview<=Date.now()).length;shell('Vocabulary Hub',`${active.length.toLocaleString()} kata level ${level}. Semua latihan mengikuti level belajar aktif.`,`<div class="level-scope-note"><b>${esc(level)}</b> · ${esc(levelDescriptor(level))}<span>Ganti level dari tombol di atas.</span></div><div class="toolbar"><button class="primary" onclick="startVocabQuiz()"><i data-lucide="circle-play"></i> Uji Vocabulary ${esc(level)}</button><button onclick="reviewVocab()"><i data-lucide="history"></i> Review Due (${due})</button></div><div class="grid"><div class="card"><div class="row"><b>${esc(level)} vocabulary</b><span>${active.length} kata</span></div><p class="muted">${mastered} mastered · bank level lain tetap tersimpan, tetapi tidak ditampilkan.</p>${active.length?`<button onclick="flashcards('${level}')">${FiezelI18n.t('vocab.buka-flashcards')} <i data-lucide="arrow-right"></i></button>`:'<p class="muted">Belum tersedia untuk level ini.</p>'}</div></div>`)}
 // m025-96 jalur suara materi pelajaran: Reading, Vocabulary, Grammar.
 //
 // Semuanya lewat pintu bersama, jadi tiap kalimat Inggris otomatis membawa subtitle
@@ -6061,7 +6061,7 @@ function flashcards(level){
   let i=0,flipped=false;
   const draw=()=>{
     const v=pool[i];if(!v){audio.stop();return exitStage()}flipped=false;
-    setApp(`<section class="fade"><div class="topline"><button id="backVocab"><i data-lucide="arrow-left"></i> Vocabulary</button><b>${i+1}/${pool.length}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="flashcard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">Kelas kata · <b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><h2 class="word">${esc(v.word)}</h2><div class="phonetic">${esc(v.phonetic||'Pelafalan belum tersedia')}</div><p class="muted">Ketuk untuk melihat arti</p></div><div class="flash-face flash-back"><div class="eyebrow">ARTI</div><h3>${esc(v.meaning)}</h3><p>${esc(v.example)}</p>${v.exampleTranslation?`<p class="muted">${esc(v.exampleTranslation)}</p>`:''}<div class="flash-actions"><button id="learning">Masih belajar</button><button class="primary" id="mastered">Sudah dikuasai</button></div><p class="muted">Ketuk untuk kembali ke kata</p></div></div></div><div class="actions"><button id="speakWord"><i data-lucide="volume-2"></i> Dengar kata</button><button id="speakSentence"><i data-lucide="audio-lines"></i> Dengar kalimat</button><button id="aiWord"><i data-lucide="sparkles"></i> Tanya AI</button></div><div class="swipe-hint">Geser ke kiri atau kanan untuk berpindah kartu</div><div class="notice">Status: ${esc(state.vocab[v.id]?.mastery>=80?'Dikuasai':state.vocab[v.id]?.total?'Sedang dipelajari':'Baru')}</div>`)} </section>`);
+    setApp(`<section class="fade"><div class="topline"><button id="backVocab"><i data-lucide="arrow-left"></i> Vocabulary</button><b>${i+1}/${pool.length}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="flashcard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="chips-row"><span class="chip chip-level">${esc(v.level)}</span><span class="chip chip-cat">${FiezelI18n.t('flash.kelas-kata')}<b>${esc(indonesianPartOfSpeech(v.partOfSpeech||'kata'))}</b></span></div><h2 class="word">${esc(v.word)}</h2><div class="phonetic">${esc(v.phonetic||'Pelafalan belum tersedia')}</div><p class="muted">Ketuk untuk melihat arti</p></div><div class="flash-face flash-back"><div class="eyebrow">ARTI</div><h3>${esc(v.meaning)}</h3><p>${esc(v.example)}</p>${v.exampleTranslation?`<p class="muted">${esc(v.exampleTranslation)}</p>`:''}<div class="flash-actions"><button id="learning">Masih belajar</button><button class="primary" id="mastered">Sudah dikuasai</button></div><p class="muted">Ketuk untuk kembali ke kata</p></div></div></div><div class="actions"><button id="speakWord"><i data-lucide="volume-2"></i> Dengar kata</button><button id="speakSentence"><i data-lucide="audio-lines"></i> Dengar kalimat</button><button id="aiWord"><i data-lucide="sparkles"></i> Tanya AI</button></div><div class="swipe-hint">Geser ke kiri atau kanan untuk berpindah kartu</div><div class="notice">Status: ${esc(state.vocab[v.id]?.mastery>=80?'Dikuasai':state.vocab[v.id]?.total?'Sedang dipelajari':'Baru')}</div>`)} </section>`);
     $('backVocab').onclick=()=>{audio.stop();exitStage()};
     const flip=()=>{flipped=!flipped;$('flashcard').classList.toggle('flipped',flipped);haptic('tap')};
     $('flashcard').onclick=flip;$('flashcard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
@@ -6070,8 +6070,8 @@ function flashcards(level){
     // gratis secara UX; kalau ia menggeser kartu, stop() membatalkan yang masih menganggur.
     const nextCard=pool[i+1]||null;
     $('speakWord').onclick=e=>{e.stopPropagation();audio.play(v.word,{contentType:'word',next:nextCard?nextCard.word:''})};$('speakSentence').onclick=e=>{e.stopPropagation();audio.play(v.example,{contentType:'sentence',next:nextCard?nextCard.example:''})};$('aiWord').onclick=e=>{e.stopPropagation();explainWordWithAI(v)};
-    $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast('Progres tersimpan')};
-    $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast('Ditandai dikuasai');/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
+    $('learning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();showToast(FiezelI18n.t('flash.toast-progres'))};
+    $('mastered').onclick=e=>{e.stopPropagation();markMastered('vocab',v.id);haptic('success');showToast(FiezelI18n.t('flash.toast-dikuasai'));/* [FASE-4] 09 §3.3: kartu dikuasai = pengakuan → proud. */try{pawReact('badge-earned')}catch(_){}i++;draw()};
     bindSwipe($('flashcard'),()=>{audio.stop();i++;draw()},()=>{audio.stop();i=Math.max(0,i-1);draw()})
   };
   enterStage('vocab-flashcards',{draw:()=>draw(),leave:()=>audio.stop()});
@@ -6085,7 +6085,7 @@ function reviewVocab(){
   let i=0,flipped=false;
   const draw=()=>{
     const v=due[i];if(!v)return exitStage();flipped=false;
-    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> Vocabulary</button><b>Ulangan ${i+1}/${due.length}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">ULANGAN · ${esc(v.level)}</div><h2 class="word">${esc(v.word)}</h2><div class="phonetic">${esc(v.phonetic||'Pelafalan belum tersedia')}</div><p class="muted">Ketuk untuk melihat arti</p></div><div class="flash-face flash-back"><div class="eyebrow">ARTI</div><h3>${esc(v.meaning)}</h3><p>${esc(v.example)}</p><div class="flash-actions"><button id="reviewLearning">Masih belajar</button><button class="primary" id="reviewMastered">Sudah dikuasai</button></div><p class="muted">Ketuk untuk kembali ke kata</p></div></div></div><div class="swipe-hint">Geser ke kiri atau kanan untuk berpindah kartu</div>`)} </section>`);
+    setApp(`<section class="fade"><div class="topline"><button id="backReview"><i data-lucide="arrow-left"></i> Vocabulary</button><b>${FiezelI18n.t('ulangan.topline',{idx:i+1,total:due.length})}</b></div>${card(`<div class="flashcard ${flipped?'flipped':''}" id="reviewCard" role="button" tabindex="0"><div class="flash-inner"><div class="flash-face flash-front"><div class="eyebrow">${FiezelI18n.t('ulangan.eyebrow',{level:esc(v.level)})}</div><h2 class="word">${esc(v.word)}</h2><div class="phonetic">${esc(v.phonetic||'Pelafalan belum tersedia')}</div><p class="muted">Ketuk untuk melihat arti</p></div><div class="flash-face flash-back"><div class="eyebrow">ARTI</div><h3>${esc(v.meaning)}</h3><p>${esc(v.example)}</p><div class="flash-actions"><button id="reviewLearning">Masih belajar</button><button class="primary" id="reviewMastered">Sudah dikuasai</button></div><p class="muted">Ketuk untuk kembali ke kata</p></div></div></div><div class="swipe-hint">Geser ke kiri atau kanan untuk berpindah kartu</div>`)} </section>`);
     $('backReview').onclick=()=>exitStage();const flip=()=>{flipped=!flipped;$('reviewCard').classList.toggle('flipped',flipped);haptic('tap')};
     $('reviewCard').onclick=flip;$('reviewCard').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}};
     $('reviewLearning').onclick=e=>{e.stopPropagation();updateMastery('vocab',v.id,false);save();i++;draw()};
@@ -6096,7 +6096,7 @@ function reviewVocab(){
   draw()
 }
 
-function startVocabQuiz(){const level=getActiveLevel(),pool=shuffle(V.filter(v=>v.level===level));if(!pool.length)return showToast(`Vocabulary ${level} belum tersedia.`);quizLoop({type:'vocab',count:12,pool,factory:makeVocabQuestion})}
+function startVocabQuiz(){const level=getActiveLevel(),pool=shuffle(V.filter(v=>v.level===level));if(!pool.length)return showToast(FiezelI18n.t('vocab.quiz-kosong',{level:level}));quizLoop({type:'vocab',count:12,pool,factory:makeVocabQuestion})}
 function makeVocabQuestion(v,preferType){
   const same=V.filter(x=>x.id!==v.id&&x.meaning&&x.level===v.level);
   // F1 placement: `allMeaning` dulu adalah filter KEDUA yang identik persis dengan `same`
