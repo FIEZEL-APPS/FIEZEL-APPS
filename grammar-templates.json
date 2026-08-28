@@ -2916,7 +2916,7 @@
     },
     {
       "id": "CO-007",
-      "family": "conditionals",
+      "family": "linking_devices",
       "subskill": "implied_conditional_otherwise",
       "cefr": "C1",
       "questionType": "multiple_choice",
@@ -5212,7 +5212,7 @@
     },
     {
       "id": "b4_024",
-      "family": "emphasis_inversion",
+      "family": "advanced_grammar",
       "subskill": "cleft_sentences_it_was_x_that_emphasis",
       "cefr": "C1",
       "questionType": "multiple_choice",
@@ -5548,7 +5548,7 @@
     },
     {
       "id": "b5_006",
-      "family": "conditionals",
+      "family": "linking_devices",
       "subskill": "conditional_with_unless_provided_that_as_long_as_distinction",
       "cefr": "B2",
       "questionType": "multiple_choice",
@@ -6500,7 +6500,7 @@
     },
     {
       "id": "b5_023",
-      "family": "emphasis_inversion",
+      "family": "advanced_grammar",
       "subskill": "negative_adverbial_inversion_never_rarely_not_only",
       "cefr": "C1",
       "questionType": "multiple_choice",
@@ -6556,7 +6556,7 @@
     },
     {
       "id": "b5_024",
-      "family": "emphasis_inversion",
+      "family": "advanced_grammar",
       "subskill": "fronting_for_emphasis_such_was_the_impact",
       "cefr": "C2",
       "questionType": "multiple_choice",
@@ -7172,7 +7172,7 @@
     },
     {
       "id": "C2-007",
-      "family": "advanced_grammar",
+      "family": "linking_devices",
       "subskill": "concession_linking",
       "cefr": "C2",
       "questionType": "multiple_choice",
@@ -7284,7 +7284,7 @@
     },
     {
       "id": "A1-009",
-      "family": "possession",
+      "family": "core_grammar",
       "subskill": "have_got_has_got",
       "cefr": "A1",
       "questionType": "multiple_choice",
@@ -7452,7 +7452,7 @@
     },
     {
       "id": "A1-012",
-      "family": "nouns",
+      "family": "core_grammar",
       "subskill": "plural_nouns_basic",
       "cefr": "A1",
       "questionType": "multiple_choice",
@@ -7620,7 +7620,7 @@
     },
     {
       "id": "A1-015",
-      "family": "question_formation",
+      "family": "question_negation",
       "subskill": "question_words_basic",
       "cefr": "A1",
       "questionType": "multiple_choice",
@@ -7676,7 +7676,7 @@
     },
     {
       "id": "A1-016",
-      "family": "quantifiers",
+      "family": "articles_determiners",
       "subskill": "some_any_countable_uncountable",
       "cefr": "A1",
       "questionType": "multiple_choice",
@@ -7732,7 +7732,7 @@
     },
     {
       "id": "A1-017",
-      "family": "pronouns_determiners",
+      "family": "core_grammar",
       "subskill": "subject_object_pronouns_and_possessives",
       "cefr": "A1",
       "questionType": "multiple_choice",
@@ -7900,7 +7900,7 @@
     },
     {
       "id": "A1-020",
-      "family": "possession",
+      "family": "articles_determiners",
       "subskill": "possessive_s_noun_ownership",
       "cefr": "A2",
       "questionType": "multiple_choice",
