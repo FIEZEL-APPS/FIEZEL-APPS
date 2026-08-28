@@ -194,7 +194,7 @@ test('rootCause jujur bilang null saat semua prasyarat sehat', () => {
 });
 
 // ---------------------------------------------------------------------------------
-// Ketahanan input korup + graf kurikulum asli 139 lesson.
+// Ketahanan input korup + graf kurikulum asli (153 lesson sejak m025-179).
 // ---------------------------------------------------------------------------------
 test('tahan input korup: state sampah, observasi sampah, graf sampah', () => {
   for (const junk of [null, undefined, 42, 'rusak', { lessons: 'bukan-objek' }, { lessons: { a: { L: 'NaN', n: -3 } } }]) {
@@ -210,9 +210,9 @@ test('tahan input korup: state sampah, observasi sampah, graf sampah', () => {
   assert.strictEqual(bkt.rootCause(null, 'graf-rusak', 'x'), null);
 });
 
-test('frontier bekerja pada grammar-curriculum-v1.json asli (139 lesson)', () => {
+test('frontier bekerja pada grammar-curriculum-v1.json asli (153 lesson)', () => {
   const graph = JSON.parse(fs.readFileSync('./grammar-curriculum-v1.json', 'utf8'));
-  assert.strictEqual(graph.lessons.length, 139);
+  assert.strictEqual(graph.lessons.length, 153);
   // Murid baru: hanya lesson TANPA prasyarat yang layak saji (gerbang vacuous).
   const roots = graph.lessons.filter(l => !(l.prerequisites || []).length).map(l => l.lessonId);
   const served = bkt.frontier(null, graph, () => 0.7).map(r => r.lesson);
