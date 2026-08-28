@@ -118,3 +118,19 @@ Ini urutannya, dan urutannya penting. Jangan lompat ke langkah 4.
 4. Menghapus `vendor/supertonic-3` atau melonggarkan pagar 152 MB-nya.
 5. Meng-commit nilai cookie/token nyata ke repo. Malam ini itu terjadi dua kali dan memaksa dua
    kali rotasi kunci sesi. Redaksi dengan `tools/redact-live-cookies.mjs` sebelum commit.
+
+## Keadaan 28 Ags 18:20 — AI Cloudflare HIDUP, TTS masih mati
+
+- `flags.cfAiEnabled=true`, `enabled.ai=true`, `FEATURE_AI="on"`. Terverifikasi lima tipe task:
+  47 assert lulus, 0 gagal, 5 panggilan model, ±US$0,0017, ±252,5 neuron dari 10.000/hari.
+- `cfTtsEnabled` TETAP `false` dan `FEATURE_TTS="off"`. Jangan nyalakan tanpa owner: korpus
+  penuh ±US$9,07 dan penghapusan Puter belum diputuskan.
+- Penerbitan sesi anon dibatasi 15/IP/jam bergulir (terukur: penolakan mulai permintaan ke-15).
+- Plafon neuron akun WAJIB; `model-call-gate.js` satu-satunya tempat `env.AI.run` dieja.
+- UTANG TERBUKA: `writing_feedback` masih jatuh ke cadangan dengan `reason:prompt_scaffold_echo`
+  (134 token masuk, 0 keluar) — biaya dibayar, murid dapat cadangan jujur, tetapi provider gagal.
+- UTANG TERBUKA: kontrak mutu tidak menegakkan REGISTER bahasa. `session_recap` lulus kontrak
+  sambil memakai nada buku teks dan jargon "tense" — bukan Indonesia sehari-hari nada Gen Z.
+- BELUM DIPASANG (butuh keputusan owner, dari dashboard bukan kode): aturan rate limit WAF
+  per-ASN/JA4 di `/api/ai/*`, atau Turnstile di `POST /api/auth/anon`. Tanpa itu, serangan
+  tersebar dari banyak IP masih bisa membakar 8.000 neuron dan mematikan AI untuk murid.

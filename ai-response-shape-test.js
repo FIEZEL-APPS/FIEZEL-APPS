@@ -40,6 +40,18 @@ const check = (name, ok, details) => {
 
 const AiTasks = require(path.join(root, 'workers/api/ai/ai-tasks.js'));
 const RouteAi = require(path.join(root, 'workers/api/ai/route-ai.js'));
+const ModelCallGate = require(path.join(root, 'workers/api/ai/model-call-gate.js'));
+
+/**
+ * S2 - `deps.accountBudget` WAJIB sekarang: tanpa dep itu `/api/ai/task` menjawab 503
+ * dan tidak menyentuh provider (celah S1 §6 ditutup). Berkas ini menguji BENTUK JAWABAN
+ * model, jadi ia harus lewat pagar itu dengan reservasi tiruan yang sah - bukan dengan
+ * melonggarkan pagarnya.
+ */
+const capBudget = async () => ModelCallGate.makeReservation({
+  neurons: 1, cap: 8000, usedBefore: 0, release: async () => true
+});
+const capDeps = (extra) => Object.assign({ accountBudget: capBudget }, extra || {});
 
 const VALID_INPUT = {
   tutor_turn: { question: 'Apa beda "in" dan "on"?', surface: 'ask', level: 'A2', focusLabel: 'Preposisi tempat' },
@@ -71,7 +83,7 @@ async function run(task, rawAnswer, extraDeps) {
     method: 'POST', body: JSON.stringify(req(task)), headers: { 'content-type': 'application/json' }
   });
   const response = await RouteAi.handleAiTask({
-    request, env: built.env, ctx: built.ctx, deps: extraDeps || {}
+    request, env: built.env, ctx: built.ctx, deps: capDeps(extraDeps)
   });
   return { status: response.status, body: await response.json(), ai: built.ai, model: modelId };
 }
@@ -196,11 +208,37 @@ const F = AiTasks.OUTPUT_FAILURES;
     const limit = AiTasks.sentenceLimitFor('tutor_turn');
     const tooMany = Array.from({ length: limit + 2 }, (_, i) => `Ini kalimat nomor ${i + 1} yang panjangnya wajar.`).join(' ');
     const rejected = await run('tutor_turn', { response: tooMany });
-    check(`Jawaban ${limit + 2} kalimat melebihi batas ${limit} ⇒ DITOLAK, fallback dipakai`,
-      rejected.status === 200 && rejected.body.degraded === true &&
-      rejected.body.source === 'deterministic-fallback' && rejected.body.reason === F.sentenceLimit &&
-      !rejected.body.text.includes('kalimat nomor 7'),
-      `${rejected.body.reason} (${AiTasks.countSentences(tooMany)} kalimat)`);
+    // P3 — PERILAKUNYA BERUBAH, DAN INI PERUBAHAN YANG SENGAJA.
+    // Sebelumnya jawaban yang melewati batas DIBUANG seluruhnya. Yang terukur di produksi:
+    // `tutor_turn` melanggar batas SETIAP kali, jadi murid tidak pernah menerima jawaban AI
+    // sekali pun — padahal neuronnya sudah dibelanjakan. Sekarang jawaban DIPOTONG di batas
+    // kalimat: batas tetap 6 (tidak dilonggarkan), yang sampai ke murid tetap ≤6 kalimat
+    // utuh, dan ekornya dibuang di server. Yang assert ini jaga: batas benar-benar mengikat
+    // pada teks yang dikirim, dan kalimat ke-7 TIDAK pernah sampai.
+    check(`Jawaban ${limit + 2} kalimat DIPOTONG ke ${limit}, bukan dibuang, dan kalimat ke-${limit + 1} tidak sampai`,
+      rejected.status === 200 && rejected.body.source === 'provider' &&
+      rejected.body.degraded === false && rejected.body.clamped === true &&
+      rejected.body.reason === 'sentence_limit_clamped' &&
+      AiTasks.countSentences(rejected.body.text) === limit &&
+      !rejected.body.text.includes(`kalimat nomor ${limit + 1}`),
+      `${rejected.body.reason} ${AiTasks.countSentences(rejected.body.text)}/${limit} kalimat`);
+    check('Jawaban yang dipotong TETAP menagih kuota (model bekerja dan jawabannya dipakai)',
+      rejected.body.quotaCharged === true || rejected.body.quotaChecked === false,
+      `charged=${rejected.body.quotaCharged} checked=${rejected.body.quotaChecked}`);
+    // Potongan bukan pintu belakang untuk pelanggaran LAIN: hasil potongan diperiksa ulang
+    // dengan pemeriksa yang sama, dan potongan yang masih melanggar tetap ditolak.
+    const clampThenBanned = Array.from({ length: limit + 2 },
+      (_, i) => `Kalimat ${i + 1} ini tidak boleh lolos.`).join(' ');
+    const stillRejected = await run('tutor_turn', { response: clampThenBanned });
+    check('Potongan yang masih melanggar aturan lain TETAP ditolak (potong bukan pintu belakang)',
+      stillRejected.body.source === 'deterministic-fallback' &&
+      stillRejected.body.degraded === true && stillRejected.body.clamped !== true &&
+      !stillRejected.body.text.includes('tidak boleh lolos'),
+      `${stillRejected.body.source} reason=${stillRejected.body.reason}`);
+    // Task JSON tidak boleh dipotong: potongan JSON adalah JSON rusak.
+    check('Task berkeluaran JSON tidak pernah dipotong di batas kalimat',
+      AiTasks.isClampable('session_recap') === false && AiTasks.isClampable('tutor_turn') === true,
+      `session_recap=${AiTasks.isClampable('session_recap')} tutor_turn=${AiTasks.isClampable('tutor_turn')}`);
 
     const atLimit = Array.from({ length: limit }, (_, i) => `Ini kalimat nomor ${i + 1} yang nggak panjang.`).join(' ');
     const accepted = await run('tutor_turn', { response: atLimit });
@@ -332,7 +370,7 @@ const F = AiTasks.OUTPUT_FAILURES;
       const request = new Request('https://api.fiezel.my.id/api/ai/task', {
         method: 'POST', body: bodyText, headers: headers || { 'content-type': 'application/json' }
       });
-      const response = await RouteAi.handleAiTask({ request, env: built.env, ctx: built.ctx, deps: deps || {} });
+      const response = await RouteAi.handleAiTask({ request, env: built.env, ctx: built.ctx, deps: capDeps(deps) });
       return { status: response.status, body: await response.json() };
     };
 
@@ -437,6 +475,29 @@ const F = AiTasks.OUTPUT_FAILURES;
       wrong.length === 0, wrong.join(' | ') || EMPTY_SHAPES.length + ' bentuk diperiksa');
     check('SETIAP bentuk kosong MENGEMBALIKAN kuota (rollback dipanggil tepat sekali)',
       notRolled.length === 0, notRolled.join(' | ') || 'rollback di semua bentuk');
+
+    // P3 — `quotaRolledBack` HARUS LAPORAN, BUKAN BASA-BASI.
+    // Cacat yang ditutup: `releaseQuota()` dulu mengembalikan `true` semata-mata karena ADA
+    // fungsi yang bisa dipanggil, tanpa pernah melihat hasilnya. Di jalur nyata wiring bahkan
+    // tidak menyuntikkan pembatal apa pun, jadi amplop melaporkan `false` sementara reservasi
+    // SUNGGUH dibatalkan — laporan yang tidak cocok dengan kenyataan, ke dua arah sekaligus.
+    // Dua assert di bawah menjepitnya dari dua sisi: pembatal yang mengatakan "tidak ada yang
+    // dibatalkan" wajib dilaporkan `false`, dan pembatal yang meledak juga `false`.
+    const rollbackSaysNo = await run('writing_feedback', { response: '{}' }, {
+      enforceQuota: async () => ({ allowed: true }),
+      rollbackQuota: () => false
+    });
+    check('Pembatal yang melaporkan "tidak ada yang dibatalkan" TIDAK boleh dilaporkan sebagai rollback',
+      rollbackSaysNo.body.quotaRolledBack === false && rollbackSaysNo.body.quotaCharged === false,
+      `rolledBack=${rollbackSaysNo.body.quotaRolledBack} charged=${rollbackSaysNo.body.quotaCharged}`);
+    const rollbackThrows = await run('writing_feedback', { response: '{}' }, {
+      enforceQuota: async () => ({ allowed: true }),
+      rollbackQuota: () => { throw new Error('pembatal_meledak'); }
+    });
+    check('Pembatal yang meledak tidak menggagalkan jawaban murid TETAPI juga tidak diklaim berhasil',
+      rollbackThrows.status === 200 && rollbackThrows.body.quotaRolledBack === false &&
+      rollbackThrows.body.text.length > 30,
+      `${rollbackThrows.status} rolledBack=${rollbackThrows.body.quotaRolledBack}`);
 
     // Sisi sebaliknya, dan ini yang menjaga gerbang tetap berguna: isi yang sah TIDAK boleh
     // dianggap kosong. Pemeriksa yang menolak segalanya sama merusaknya dengan yang meloloskan.

@@ -1,7 +1,7 @@
 {
-  "version": "m025-180",
+  "version": "m025-182",
   "claimedBy": "claude-code (core-brain-server-mirror session, branch claude/core-brain-fiezel-check-vrakga)",
-  "claimedAt": "2026-08-28T10:16:59.986Z",
-  "reason": "cermin penalaran Core Brain di sisi server: kebijakan tidak lagi jatuh ke lapisan v1 polos saat ringkasan otak klien tidak terkirim",
+  "claimedAt": "2026-08-28T12:27:19.335Z",
+  "reason": "Core Brain bernalar di sisi server: cermin penalaran + tren efektivitas kebijakan, digabung di atas m025-181",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-28T07:00:00+07:00",
+  "updated": "2026-08-28T10:52:33.999414+00:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -364,6 +364,63 @@
       },
       "evidence": "HEAD main eb5152df239219e496fc3b5231c96878e2d117a6; Pages latest built pada commit yang sama; live core-config.js menyajikan FIEZEL_PAGE_BUILD m025-176; regression-test.js, core-brain-v2-test.js, tutor-brain-v3-test.js, validator.js semuanya PASS. Quality Gate run 33126880941 masih in_progress; MASTER Authority Guard run 33126880951 gagal karena actor push FIEZEL-APPS bukan owner MASTER FIEZEL-APPS. PR #227 mergeable CONFLICTING meskipun quality check-nya SUCCESS; PR #226 MERGEABLE tetapi quality/authority checks gagal.",
       "note": "BLOCKED oleh kebijakan otoritas repository dan antrean PR stale, bukan kegagalan gate kode lokal atau Pages. Opsi owner: lakukan push/merge ulang dengan identitas MASTER FIEZEL-APPS setelah PR yang stale direkonsiliasi; jangan bypass guard. T-026 neural voice dan T-027 Wave D tetap tidak disentuh."
+    },
+    {
+      "id": "T-029",
+      "title": "PERMINTAAN SERAH WILAYAH: features/neural-voice/ untuk memangkas senyap tepi PCM",
+      "owner": "MASTER (sesi-computer-086e9698) -> meminta ke executor-1 (ses_0027db319ffeiu7OrUF1qbWBH8)",
+      "status": "blocked",
+      "scope": {
+        "files_requested": [
+          "features/neural-voice/fiezel-neural-voice.js",
+          "features/neural-voice/fiezel-web-audio-player.js"
+        ],
+        "objective": "Owner meminta jeda suara neural supertonic dibuat lebih mulus. Paket V7 sudah menghabiskan yang bisa dikerjakan dari sisi PEMANGGIL: jeda terburuk turun 35,3% (3.203,7 -> 2.072,2 ms), porsi sunyi turun 20,0% (13,44% -> 10,76%), suara pertama tidak tertunda. Sisa perbaikan TERBESAR ada di wilayah yang kamu klaim dan mustahil dari luar.",
+        "bukti": "Selisih jeda penjadwalan 533,5 ms vs jeda terdengar 1.278,6 ms = ~745 ms senyap tepi PCM per batas yang tidak dipangkas. Itu LEBIH BESAR daripada seluruh perolehan V7. Empat titik yang menghalangi, semuanya di wilayahmu: fiezel-neural-voice.js:461 (satu slot hangat -> prefetch dua blok mustahil); :485 (chunks.length !== 1 -> blok >260 char tidak bisa diprefetch); :544 (generation counter global -> overlap terkendali mustahil); :735 (trim: joined false untuk ucapan satu-potongan) + :763 (await drainScheduled) -> timelineJoinable() di fiezel-web-audio-player.js:816 tidak pernah bisa benar antar blok. Bukti dan harness lengkap: reports/work-v7-library-gap.md dan reports/voice-v7-data/.",
+        "kenapa_tidak_kukerjakan_sendiri": "Wilayah itu terdaftar milikmu di coordination/CLAIMS.json untuk T-026 (diagnostik PCM crackle di perangkat). Menulis di sana adalah tabrakan yang sistem koordinasi ini justru dibangun untuk mencegah, dan aku tidak akan melanggar aturan yang kupaksakan ke sesi lain. Agenku dilarang menyentuhnya dan tidak menyentuhnya.",
+        "opsi": [
+          "A. Kamu kerjakan sendiri — kamu sudah di dalam berkas itu untuk T-026, jadi biayanya paling murah. Bukti dan titik barisnya sudah lengkap di laporan V7.",
+          "B. Serahkan wilayah ke MASTER sementara: pindahkan klaimmu ke `finished` di coordination/CLAIMS.json (atau catat di sini), lalu aku kerjakan dengan gerbang dan bukti merah per assert.",
+          "C. Tolak dengan alasan: kalau T-026 sedang menyentuh persis empat titik itu, katakan — aku tunggu dan tidak akan menulis di sana."
+        ],
+        "catatan_privasi_dan_mutu": "Pagar 152 MB vendor/supertonic-3 TIDAK boleh dilonggarkan apa pun opsinya, dan inversi antrean (blok N+1 mendahului N) lebih buruk daripada jeda apa pun — murid mendengar kalimat berurutan salah. Pagar urutan V7 (dispatchBlock) sudah ada dan 18 dari 18 sesi pengukuran nol guardHits."
+      },
+      "evidence": "V7 diukur ulang mandiri dengan harness V6 di mesin yang sama; ambang 560,6 ms yang tercatat sebelumnya TIDAK tereproduksi di mesin ini (aturan V6 terukur 603,6 ms hari ini, derau per batas +/-500 ms), jadi hanya perbandingan berpasangan dalam satu sesi peramban yang sah. 68 assert hijau, 11 assert baru dibuktikan bisa merah lalu pulih.",
+      "note": "Dicatat oleh MASTER 28 Agu 2026. Balas lewat ledger ini atau lewat komentar PR; tidak ada obrolan langsung antar sesi. Keputusan akhir milik owner kalau kita tidak sepakat — aturan emas butir 7."
+    },
+    {
+      "id": "T-030",
+      "title": "Assessment bank QA: audit forensik 20 agen + perbaikan + 14 template grammar baru",
+      "owner": "perplexity-computer (assessment-qa session cb0013c5)",
+      "status": "done",
+      "scope": {
+        "files_allowed": [
+          "grammar-templates.json",
+          "grammar-explanations-id.json",
+          "grammar-misconception-id.json",
+          "misconception-taxonomy-v1.json",
+          "grammar-curriculum-v1.json",
+          "grammar-labels-id.js",
+          "cloze-bank-v1.json",
+          "cloze-alternates-v1.json",
+          "tools/build-cloze-bank.js",
+          "tools/fiezel-night-watch.mjs",
+          "vocabulary-master.json",
+          "reading-bank.json",
+          "reading-exam-v1.json",
+          "features/speaking-listening/*",
+          "workers/api/ai/ai-tasks.js",
+          "app.js",
+          "README.md",
+          "regression-test.js",
+          "cloze-bank-test.js",
+          "writing-rubric-test.js"
+        ]
+      },
+      "summary": "230 temuan (6 P0 cloze, 40 P1); semua P0 + 24 P1 diperbaiki dengan ledger auditable (327 entri); 14 template baru (bank 139->153, cloze 123+206 alternates); merge hati-hati dengan m025-177..179 (TA-006/b4_018 adopsi upstream, EC-004 field-merge, skenario a1/a2 terjemahan upstream + apostrof kami, save() coalesce upstream + guard kuota kami); night watch tools/fiezel-night-watch.mjs.",
+      "evidence": "20/20 gate lokal PASS (validator, regression, grammar-quality 28/28, content-integrity 0 critical, bank-soal, cloze, curriculum, unlock, writing-rubric, reading/listening/speaking-exam, speaking-listening 45/0, level-evidence, prerequisite-graph, gems, quota-core, continuity, production-grader, cf-api-contract 219/219) + release-audit.py; red-team 2 ronde; artefak audit di project files Perplexity (assessment-qa-2026-08-28)",
+      "build": "m025-180",
+      "finishedAt": "2026-08-28T10:52:33.999391+00:00"
     }
   ],
   "last_report": {

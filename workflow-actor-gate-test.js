@@ -9,7 +9,7 @@
  * ────────────────────────────────────────────────────────────────────────────────────────
  * `reports/cf-a2-cf-existing.md` §(d) menemukan asimetri: workflow yang menyentuh Puter
  * (`deploy-core-worker.yml:17`, `configure-core.yml:12`, `push-reminders.yml:15`) bergerbang
- * `github.actor == '<login owner>'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
+ * `github.actor == 'FIEZEL-APPS'`, sedangkan workflow yang men-deploy Worker CLOUDFLARE dan
  * yang memegang kunci ElevenLabs TIDAK. Rekomendasi #2 laporan itu: pasang gate yang sama.
  * `reports/cf-a7-security.md` §2 dan §6 menaikkan urgensinya: token-token itu punya blast
  * radius akun penuh, dan workflow pemegangnya juga `git push` ke branch produksi.
