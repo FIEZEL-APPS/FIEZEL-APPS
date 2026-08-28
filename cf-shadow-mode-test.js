@@ -161,12 +161,24 @@ const results = {};
     vm.runInContext(config, box, { filename: 'core-config.js' });
     return box.self.FIEZEL_CF_CONFIG || null;
   })();
-  check('core-config.js repo: FIEZEL_CF_CONFIG terbaca dan SEMUA mode masih off',
-    Boolean(realCf) && realCf.enabled === false && String(realCf.base || '') === ''
-      && Object.values(realCf.endpoints || {}).every(v => v === 'off'),
+  /* A6 (28 Agu 2026): bentuk lama assert ini menuntut SEMUA mode repo masih 'off'. Sejak
+   * penyalaan bertahap tahap 1 (analytics saja), yang benar adalah: yang hidup HANYA
+   * config+usage, dan lima sisanya — termasuk dua yang membelanjakan neuron — wajib off.
+   * Rinciannya di reports/work-a6-client-switch.md. */
+  const HIDUP_SAH_A6 = ['config', 'usage'];
+  const modeRepo = Object.entries(realCf?.endpoints || {});
+  check('core-config.js repo: FIEZEL_CF_CONFIG terbaca dan yang hidup HANYA config+usage (A6 tahap 1)',
+    Boolean(realCf) && typeof realCf.enabled === 'boolean'
+      && modeRepo.length === 7
+      && modeRepo.filter(([, v]) => v !== 'off').every(([k]) => HIDUP_SAH_A6.includes(k))
+      && realCf.endpoints.ai === 'off' && realCf.endpoints.tts === 'off',
     JSON.stringify(realCf));
 
-  const off = makeHarness(realCf);
+  /* Skenario (a) menguji SEMANTIK mode 'off', jadi flagnya ditulis eksplisit di sini.
+   * Sebelum A6 ia meminjam flag repo karena repo memang seluruhnya off; setelah A6 pinjaman
+   * itu akan menguji hal lain (usage sudah on) dan assertnya jadi bohong. */
+  const ALL_OFF = { health: 'off', config: 'off', auth: 'off', quota: 'off', ai: 'off', tts: 'off', usage: 'off' };
+  const off = makeHarness({ enabled: false, base: '', endpoints: ALL_OFF });
   const options = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"a":1}' };
   const offAnswer = await off.api.coreWorkerExec('/api/feedback', options);
 
