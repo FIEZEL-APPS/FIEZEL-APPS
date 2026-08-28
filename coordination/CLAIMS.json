@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T16:00:00+07:00",
+  "updated": "2026-08-28T17:00:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -23,26 +23,6 @@
       ],
       "mulai": "2026-08-28T05:30:00+07:00",
       "catatan": "T-026 neural voice: PCM A/B diagnostic untuk crackle/static di device. Area ini DIKLAIM; master tidak menyentuhnya. Didaftarkan master dari ledger."
-    },
-    {
-      "sesi": "sesi-computer-086e9698/V7",
-      "peran": "worker MASTER",
-      "paths": [
-        "features/library/fiezel-library-ui.js",
-        "voice-callsite-prefetch-test.js"
-      ],
-      "mulai": "2026-08-28T15:30:00+07:00",
-      "catatan": "Haluskan jeda narasi sisi PEMANGGIL (anggaran blok Library 560,6 ms). SENGAJA tidak menyentuh features/neural-voice/ karena diklaim executor-1 untuk T-026."
-    },
-    {
-      "sesi": "sesi-computer-086e9698/A1",
-      "peran": "worker MASTER",
-      "paths": [
-        "features/analytics/",
-        "analytics-client-test.js"
-      ],
-      "mulai": "2026-08-28T15:30:00+07:00",
-      "catatan": "Pemancar analytics di klien sesuai kontrak privasi-maksimal, supaya dashboard punya data."
     },
     {
       "sesi": "sesi-computer-086e9698/MASTER",
@@ -109,6 +89,39 @@
       ],
       "catatan": "Deploy dashboard owner + custom domain owner.fiezel.my.id. [SELESAI, sudah di main]",
       "selesai": "2026-08-28T16:00:00+07:00"
+    },
+    {
+      "sesi": "sesi-computer-086e9698/V7",
+      "peran": "worker MASTER",
+      "paths": [
+        "features/library/fiezel-library-ui.js",
+        "voice-callsite-prefetch-test.js"
+      ],
+      "selesai": "2026-08-28T17:00:00+07:00",
+      "catatan": "Anggaran blok narasi adaptif. Jeda terburuk -35,3%, porsi sunyi -20,0%, suara pertama tidak tertunda. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/A1",
+      "peran": "worker MASTER",
+      "paths": [
+        "features/analytics/",
+        "analytics-client-test.js",
+        "app.js"
+      ],
+      "selesai": "2026-08-28T17:00:00+07:00",
+      "catatan": "Pemancar analytics dipasang; gerbang yang MENGUNCI bug dibalik; bug kirim-ganda yang menggembungkan DAU ditutup. Sudah di main."
+    }
+  ],
+  "menunggu_izin": [
+    {
+      "sesi": "sesi-computer-086e9698/MASTER",
+      "paths": [
+        "features/neural-voice/fiezel-neural-voice.js",
+        "features/neural-voice/fiezel-web-audio-player.js"
+      ],
+      "diminta": "2026-08-28T17:00:00+07:00",
+      "pemilik_sekarang": "ses_0027db319ffeiu7OrUF1qbWBH8 (executor-1, T-026)",
+      "catatan": "Permintaan resmi ada di TASKS-LEDGER.json T-029. TIDAK ditulis sebelum izin. Nilai yang tertahan: ~745 ms senyap tepi PCM per batas, lebih besar daripada seluruh perolehan V7."
     }
   ]
 }
