@@ -10,13 +10,20 @@
  * verdict pedagogis simulator (PASS/FAIL kebijakan adalah temuan, bukan bug);
  * yang dihakimi adalah apakah mesin verdict-nya bekerja sesuai kontrak.
  *
+ * WAVE 5c — semantik gate dipisah dua dan test ini mengawal keduanya:
+ *   exit code = HANYA determinisme + gate keselamatan kebijakan SHIPPED
+ *   (nilaiShipped/nilaiKebijakanShipped); temuan riset (inconclusive/terbantah/
+ *   censoring kandidat non-shipped) = research_hold di researchVerdicts + blok
+ *   stderr 'TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER)' — TIDAK
+ *   menyentuh exit code, dan TIDAK BOLEH ada temuan yang hilang dari JSON.
+ *
  * Kontrak (BRAINCORE-V3-CONTRACTS.md): Node mandiri di root, tanpa DOM/network/
  * storage, mencetak `ok - ...` per asersi, diakhiri `AdaptivitySimHardened: PASS`.
  */
 'use strict';
 
 var path = require('path');
-var execFileSync = require('child_process').execFileSync;
+var spawnSync = require('child_process').spawnSync;
 
 var SIM_FILE = path.join(__dirname, 'adaptivity-simulation-v3.js');
 var sim = require('./adaptivity-simulation-v3.js');
@@ -34,13 +41,14 @@ function ok(cond, msg) {
 //    ketahuan di sini. Exit code ikut dibandingkan (verdict harus reproducible).
 // ===================================================================================
 function jalanCLI() {
-  try {
-    var out = execFileSync(process.execPath, [SIM_FILE, '42'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
-    return { stdout: out, code: 0 };
-  } catch (e) {
-    // exit non-zero (verdict FAIL yang jujur) bukan crash — stdout tetap dipakai.
-    return { stdout: e.stdout ? String(e.stdout) : '', code: typeof e.status === 'number' ? e.status : -1 };
-  }
+  // spawnSync (bukan execFileSync) supaya stderr ikut tertangkap — WAVE 5c
+  // mensyaratkan blok TEMUAN RISET tercetak ke stderr dan itu harus diasersikan.
+  var r = spawnSync(process.execPath, [SIM_FILE, '42'], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
+  return {
+    stdout: r.stdout ? String(r.stdout) : '',
+    stderr: r.stderr ? String(r.stderr) : '',
+    code: typeof r.status === 'number' ? r.status : -1
+  };
 }
 
 var r1 = jalanCLI();
@@ -121,8 +129,10 @@ var ag = sim.agregatMultiSeed(unitsSintetis, 'u');
 ok(ag.timeToMasteryDaysUncensoredMean === 15, 'agregat: mean timeToMastery HANYA dari run tak-tersensor (15, bukan tercemar 35/null)');
 ok(ag.uncensoredRuns === 2 && ag.censoredRuns === 2, 'agregat: hitungan censored/uncensored benar (2/2)');
 
-// 3b. Censoring sintetis WAJIB mem-FAIL-kan gate: varian yang tak pernah mastery
-//     di mayoritas seed (di sini: 3 dari 4 seed) harus memicu FAIL MUTLAK.
+// 3b. Detektor censoring sintetis WAJIB menyala: varian yang tak pernah mastery
+//     di mayoritas seed (di sini: 3 dari 4 seed) harus memicu temuan MUTLAK.
+//     (WAVE 5c: detektor gateCensoringMulti tidak berubah; konsumennya kini
+//      memutuskan gate-keras vs research_hold — diuji di seksi 6.)
 function unitCensor(semuaCensored) {
   return { runs: { vX: [{ censored: semuaCensored }, { censored: semuaCensored }, { censored: true }] } };
 }
@@ -195,8 +205,10 @@ ok(vonis.verdict === 'kandidat_lebih_buruk' && vonis.nPasangan === 11 && vonis.d
 // ===================================================================================
 // 5. OUTPUT/GATE FASE 3 LAMA TETAP UTUH (extend, bukan rewrite)
 // ===================================================================================
-ok(j.residualGate && ['PASS', 'FAIL', 'SKIPPED'].indexOf(j.residualGate.status) !== -1, 'residualGate fase 2 tetap ada (status: ' + j.residualGate.status + ')');
-ok(j.calibrationGate && ['PASS', 'FAIL', 'SKIPPED'].indexOf(j.calibrationGate.status) !== -1, 'calibrationGate fase 3 tetap ada (status: ' + j.calibrationGate.status + ')');
+// WAVE 5c: status buruk single-seed kini 'RESEARCH_HOLD' (bukan 'FAIL') — klaim
+// nilai tambah kandidat adalah temuan riset, bukan blocker rilis.
+ok(j.residualGate && ['PASS', 'RESEARCH_HOLD', 'SKIPPED'].indexOf(j.residualGate.status) !== -1, 'residualGate fase 2 tetap ada (status: ' + j.residualGate.status + ')');
+ok(j.calibrationGate && ['PASS', 'RESEARCH_HOLD', 'SKIPPED'].indexOf(j.calibrationGate.status) !== -1, 'calibrationGate fase 3 tetap ada (status: ' + j.calibrationGate.status + ')');
 ok(Array.isArray(j.calibrationTable) && j.calibrationTable.length > 0, 'calibrationTable fase 3 (C6) tetap ada');
 ok(j.bank && j.bank.items === 108, 'bank item C6 tetap 108 item (aktual: ' + j.bank.items + ')');
 ok(j.results && j.results.v1.length === 3 && j.results.v3TanpaKalibrasi.length === 3, 'suite single-seed tetap 3 profil asli per varian');
@@ -204,6 +216,122 @@ ok(typeof j.gate.rationale === 'string' && j.gate.rationale.indexOf('brain3_') =
   'gate akhir membawa rationale brain3_* + confidence (kontrak Braincore v3)');
 ok(j.multiSeedGate && typeof j.multiSeedGate.rationale === 'string' && j.multiSeedGate.rationale.indexOf('brain3_') === 0,
   'multiSeedGate membawa rationale brain3_* (aktual: ' + j.multiSeedGate.rationale + ')');
+
+// ===================================================================================
+// 6. WAVE 5c — SEMANTIK GATE SHIPPED vs TEMUAN RISET
+// ===================================================================================
+// 6a. Exit code HANYA dari determinisme + gate shipped — kontrak baru, diasersikan
+//     terhadap output nyata (bukan sintetis) supaya drift semantik ketahuan.
+ok(j.shippedGate && Array.isArray(j.shippedGate.policies) && j.shippedGate.policies.length === 2,
+  'shippedGate hadir dengan 2 kebijakan (v2_residual, item_calibration)');
+ok(j.shippedGate.policies[0].policy === 'v2_residual' && j.shippedGate.policies[1].policy === 'item_calibration',
+  'shippedGate menilai persis kebijakan yang DI-SHIP (v2_residual produksi; itemCalibration authorityMap active)');
+ok(typeof j.shippedGate.rationale === 'string' && j.shippedGate.rationale.indexOf('brain3_') === 0,
+  'shippedGate membawa rationale brain3_* (aktual: ' + j.shippedGate.rationale + ')');
+var exitEkspektasi = (j.deterministic && j.deterministicMultiSeed) ? (j.shippedGate.pass ? 0 : 1) : 2;
+ok(r1.code === exitEkspektasi,
+  'exit code mengikuti semantik shipped: determinisme+shippedGate.pass=' + j.shippedGate.pass + ' \u2192 expect ' + exitEkspektasi + ', aktual ' + r1.code);
+ok(j.gate.pass === (j.deterministic && j.deterministicMultiSeed && j.shippedGate.pass),
+  'gate.pass = determinisme && shippedGate.pass (temuan riset tidak ikut menentukan)');
+
+// 6b. Sintetis: censoring pada kebijakan SHIPPED (baseline tidak) → gate keras FAIL.
+function blokSintetis(override) {
+  var b = {
+    policy: 'sintetis', authority: 'test', baselineKeselamatan: 'v1', baselineAblation: 'vAbl',
+    metrics: [{ metric: 'brier', verdict: 'inconclusive', meanDiff: 0, ciLo: -0.01, ciHi: 0.01, praktis: 0.01 }],
+    censoringShipped: { variant: 'vS', seedsTanpaMastery: 1, seedCount: 4, censoredRate: 0.2, tanpaMasteryMayoritas: false },
+    censoringBaseline: { variant: 'vB', seedsTanpaMastery: 0, seedCount: 4, censoredRate: 0.1, tanpaMasteryMayoritas: false },
+    censoringAblationCI: { pair: 'vAbl\u2192vS', insufficient: false, ciLo: -0.02, ciHi: 0.02 },
+    shrinkage: null
+  };
+  for (var k in override) if (Object.prototype.hasOwnProperty.call(override, k)) b[k] = override[k];
+  return b;
+}
+var vCensorShipped = sim.nilaiKebijakanShipped('sintetis', blokSintetis({
+  censoringShipped: { variant: 'vS', seedsTanpaMastery: 3, seedCount: 4, censoredRate: 0.95, tanpaMasteryMayoritas: true }
+}));
+ok(vCensorShipped.pass === false && vCensorShipped.rationale === 'brain3_sim_shipped_censoring_absolute' && vCensorShipped.censoringMutlakAtributable === true,
+  'sintetis: censoring mayoritas pada kebijakan SHIPPED (baseline sehat) \u2192 gate keras FAIL (brain3_sim_shipped_censoring_absolute \u2192 exit 1)');
+
+// 6c. Sintetis: censoring level-SKENARIO (shipped DAN baseline sama-sama mayoritas)
+//     → BUKAN gate keras; hanya flag scenarioLevel (dieskalasi sebagai research_hold).
+var vCensorScenario = sim.nilaiKebijakanShipped('sintetis', blokSintetis({
+  censoringShipped: { variant: 'vS', seedsTanpaMastery: 3, seedCount: 4, censoredRate: 0.95, tanpaMasteryMayoritas: true },
+  censoringBaseline: { variant: 'vB', seedsTanpaMastery: 3, seedCount: 4, censoredRate: 0.95, tanpaMasteryMayoritas: true }
+}));
+ok(vCensorScenario.pass === true && vCensorScenario.censoringScenarioLevel === true && vCensorScenario.rationale === 'brain3_sim_shipped_ok',
+  'sintetis: censoring identik shipped+baseline (level skenario/kandidat non-shipped) \u2192 research_hold, TIDAK exit 1');
+
+// 6d. Sintetis: regresi terbukti pada metrik keselamatan shipped → gate keras FAIL.
+var vRegresi = sim.nilaiKebijakanShipped('sintetis', blokSintetis({
+  metrics: [{ metric: 'retentionDay90', verdict: 'kandidat_lebih_buruk', meanDiff: -0.08, ciLo: -0.1, ciHi: -0.06, praktis: 0.02 }]
+}));
+ok(vRegresi.pass === false && vRegresi.rationale === 'brain3_sim_shipped_regression' && vRegresi.regresiTerbukti[0] === 'retentionDay90',
+  'sintetis: regresi terbukti (CI ekslusif nol + praktis) pada kebijakan shipped \u2192 brain3_sim_shipped_regression \u2192 exit 1');
+
+// 6e. Sintetis: shipped TERBUKTI menyensor lebih sering dari ablation-nya → FAIL.
+var vCensorRelatif = sim.nilaiKebijakanShipped('sintetis', blokSintetis({
+  censoringAblationCI: { pair: 'vAbl\u2192vS', insufficient: false, ciLo: 0.12, ciHi: 0.2 }
+}));
+ok(vCensorRelatif.pass === false && vCensorRelatif.rationale === 'brain3_sim_shipped_censoring_excess',
+  'sintetis: CI censoring ablation seluruhnya di atas margin \u2192 brain3_sim_shipped_censoring_excess \u2192 exit 1');
+
+// 6f. Sintetis: kebijakan dinyatakan shipped tapi tak terverifikasi harness → FAIL
+//     (gate tak boleh hijau untuk kebijakan yang tak bisa diukur).
+var vNull = sim.nilaiKebijakanShipped('hilang', null);
+ok(vNull.pass === false && vNull.rationale === 'brain3_sim_shipped_unverifiable' && vNull.status === 'UNVERIFIED',
+  'sintetis: blok shipped null \u2192 brain3_sim_shipped_unverifiable \u2192 exit 1');
+
+// 6g. TEMUAN RISET UTUH DI JSON — tidak ada temuan yang dibuang.
+ok(Array.isArray(j.researchVerdicts) && j.researchVerdicts.length > 0,
+  'researchVerdicts hadir dan tidak kosong (' + (j.researchVerdicts ? j.researchVerdicts.length : 0) + ' temuan)');
+var rvUtuh = true;
+for (var rv = 0; rv < j.researchVerdicts.length; rv++) {
+  var tRv = j.researchVerdicts[rv];
+  if (!(tRv.status === 'research_hold' && typeof tRv.rationale === 'string' && tRv.rationale.indexOf('brain3_') === 0 &&
+    typeof tRv.confidence === 'number' && typeof tRv.claim === 'string' && ('ci' in tRv) && ('detail' in tRv))) rvUtuh = false;
+}
+ok(rvUtuh, 'setiap temuan riset: status research_hold + rationale brain3_* + confidence + claim + ci/detail');
+function cariRV(id) { for (var q = 0; q < j.researchVerdicts.length; q++) if (j.researchVerdicts[q].id === id) return j.researchVerdicts[q]; return null; }
+// Temuan wave-3 yang dulu memblokir rilis WAJIB tetap ada, lengkap dengan CI-nya:
+if (j.calibrationSupported) {
+  var rmseRow = j.multiSeed.kalibrasi.metrics[0];
+  if (rmseRow.verdict !== 'kandidat_lebih_baik') {
+    var rvRmse = cariRV('multiseed_kalibrasi_itemBiasRMSE');
+    ok(!!rvRmse && rvRmse.ci && rvRmse.ci.ciLo === rmseRow.ciLo && rvRmse.ci.ciHi === rmseRow.ciHi,
+      'temuan kalibrasi inconclusive (CI [' + rmseRow.ciLo + ', ' + rmseRow.ciHi + ']) UTUH di researchVerdicts');
+  }
+}
+if (j.residualSupported) {
+  var oscRow = j.multiSeed.residual.metrics[0];
+  if (oscRow.verdict !== 'kandidat_lebih_baik') {
+    var rvOsc = cariRV('multiseed_residual_difficultyOscillationPer10');
+    ok(!!rvOsc && rvOsc.ci && rvOsc.ci.ciLo === oscRow.ciLo && rvOsc.ci.ciHi === oscRow.ciHi,
+      'temuan osilasi residual (CI [' + oscRow.ciLo + ', ' + oscRow.ciHi + ']) UTUH di researchVerdicts');
+  }
+}
+var adaBankMayoritas = false;
+for (var pv2 = 0; pv2 < j.multiSeed.censoring.perVariant.length; pv2++) {
+  var pvx = j.multiSeed.censoring.perVariant[pv2];
+  if ((pvx.variant === 'v3TanpaKalibrasi' || pvx.variant === 'v3Kalibrasi') && pvx.tanpaMasteryMayoritas) adaBankMayoritas = true;
+}
+ok(adaBankMayoritas === !!cariRV('censoring_scenario_bank'),
+  'temuan censoring bank fase-3 ada di researchVerdicts tepat ketika varian bank tersensor mayoritas (' + adaBankMayoritas + ')');
+
+// 6h. Blok stderr TEMUAN RISET tercetak dengan label kontrak.
+ok(r1.stderr.indexOf('TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER)') !== -1,
+  "stderr memuat blok 'TEMUAN RISET (tidak memblokir rilis; keputusan di MASTER)'");
+// stderr penuh memuat baris runtime-ms (sengaja non-deterministik); yang wajib
+// deterministik adalah BLOK TEMUAN RISET (turunan murni JSON stdout).
+function blokTemuan(s) {
+  var awal = s.indexOf('=== TEMUAN RISET');
+  var akhir = s.indexOf('=== AKHIR TEMUAN RISET');
+  return (awal === -1 || akhir === -1) ? null : s.slice(awal, akhir);
+}
+ok(blokTemuan(r1.stderr) !== null && blokTemuan(r1.stderr) === blokTemuan(r2.stderr),
+  'blok TEMUAN RISET di stderr deterministik antar 2 run');
+ok(j.gate.researchHolds === j.researchVerdicts.length,
+  'gate.researchHolds = jumlah temuan riset (' + j.gate.researchHolds + ')');
 
 // ===================================================================================
 // HASIL

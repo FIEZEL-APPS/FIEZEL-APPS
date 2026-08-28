@@ -170,8 +170,13 @@ check('The renderer takes its replay limit from the exam format, not the daily c
 check('The renderer honours the TOEFL hidden-questions rule',
   /questionsVisibleDuringAudio/.test(renderer) && /data-notes/.test(renderer),
   'soal disembunyikan sampai audio habis, dan murid diberi tempat mencatat');
+/* Pasca-#242: naskah "Soal tetap terkunci" pindah ke copy-map i18n
+   (skillslab.audio-tidak-can-diputar-item di copy-id-feat-b.js). Cek kini menilai
+   kontrak utuh: renderer memanggil kunci i18n-nya + naskah persis ada di copy-map
+   (pola product-audit 4448d14). */
+const copyFeatB = require('fs').readFileSync(require('path').join(__dirname,'features','i18n','copy-id-feat-b.js'),'utf8');
 check('Failed audio keeps the questions locked',
-  /Soal tetap terkunci/.test(renderer) && /this\.replays--/.test(renderer),
+  /audio-tidak-can-diputar-item/.test(renderer) && /this\.replays--/.test(renderer) && /Soal tetap terkunci/.test(copyFeatB),
   'menjawab tanpa mendengar bukan latihan, dan percobaan yang gagal tidak boleh menghabiskan jatah putar');
 check('Exam sessions are level-scoped like everything else',
   /listeningExamFor\(level\)\{const target=normalizeLevel\(level\)/.test(addon), 'kontrak level m025-136 berlaku di sini juga');
