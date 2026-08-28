@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   configure:
-    if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+    if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
     runs-on: ubuntu-latest
     env:
       FIEZEL_CORE_WORKER_URL: https://fiezel-core.puter.work

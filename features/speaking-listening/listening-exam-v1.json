@@ -114,12 +114,12 @@
           "answerType": "choice",
           "prompt": "Which programme does the woman join?",
           "options": [
+            "Fitness",
             "Beginners",
             "Improvers",
-            "Fitness",
             "She has not decided"
           ],
-          "answerIndex": 1,
+          "answerIndex": 2,
           "explain": "Ia bisa berenang tetapi tekniknya buruk dan lelah setelah dua lintasan - itu definisi Improvers yang diberikan petugas."
         },
         {
@@ -188,7 +188,7 @@
       "exam": "ielts_listening_s2",
       "level": "B2",
       "title": "Pengarahan relawan kebun raya",
-      "script": "You will hear a talk given to new volunteers at a city botanical garden. First, look at the map on your screen.\n\nGood afternoon, and thank you all for giving up your Saturday. I'm going to walk you through the layout of the garden, because in your first few weeks the commonest question you'll be asked is simply \"where is the toilet\", and the second commonest is \"where can I get a cup of tea\".\n\nSo. You're standing at the main entrance, which is at the bottom of your map. Directly ahead of you, running north, is the Central Avenue. Almost everything is reached from it.\n\nTake the first turning on your left, and you come to the Glasshouse. It's the large building on the western edge — you can't miss it, it's made of glass. That's where the tropical collection lives, and it's the warmest place in the garden, which matters in February. The Glasshouse is open every day, but the upper walkway inside it closes when it rains, because the metal gets slippery.\n\nNow, opposite the Glasshouse, on the other side of the Central Avenue, is the Rose Garden. It's the square area on the eastern side. It's at its best in June and it's essentially bare in January, so don't be surprised if visitors seem disappointed in winter.\n\nCarry on north up the Central Avenue and you'll reach a crossing point where four paths meet. The café is on the north-west corner of that crossing — so, on your left as you're walking up. It does hot drinks and sandwiches until four o'clock, and only hot drinks after that. The toilets are in the same building, round the back.\n\nFrom that same crossing, if you take the path heading east, you arrive at the Pond. It's the irregular shape on the right-hand side of your map. There's a wooden platform over part of it. That platform has a weight limit and we don't allow school groups of more than fifteen onto it at once.\n\nFinally, at the very top of the map, at the northern end of the Central Avenue, is the Woodland Walk. That's the largest single area in the garden and it's deliberately left rough. There's no lighting along it, so in winter we close it at half past three, well before the rest of the garden.\n\nA few practical things. You'll each be given a radio. Please carry it, and please turn it on — a radio in a pocket that's switched off is worse than no radio, because we'll assume we can reach you. If you find a visitor who is unwell, don't move them; radio for help and stay where you are.\n\nYou'll also be asked about plants you don't recognise, constantly, and by people who assume that a volunteer knows everything. You won't, and it's absolutely fine to say so. What is not fine is guessing. Last summer a volunteer told a family that a berry was edible. It wasn't dangerous, as it turned out, but it very easily could have been. If you don't know, say you don't know and find someone who does.",
+      "script": "You will hear a talk given to new volunteers at a city botanical garden. As you listen, picture the layout of the garden as the speaker describes it.\n\nGood afternoon, and thank you all for giving up your Saturday. I'm going to walk you through the layout of the garden, because in your first few weeks the commonest question you'll be asked is simply \"where is the toilet\", and the second commonest is \"where can I get a cup of tea\".\n\nSo. You're standing at the main entrance, at the southern end of the garden. Directly ahead of you, running north, is the Central Avenue. Almost everything is reached from it.\n\nTake the first turning on your left, and you come to the Glasshouse. It's the large building on the western edge — you can't miss it, it's made of glass. That's where the tropical collection lives, and it's the warmest place in the garden, which matters in February. The Glasshouse is open every day, but the upper walkway inside it closes when it rains, because the metal gets slippery.\n\nNow, opposite the Glasshouse, on the other side of the Central Avenue, is the Rose Garden. It's the square area on the eastern side. It's at its best in June and it's essentially bare in January, so don't be surprised if visitors seem disappointed in winter.\n\nCarry on north up the Central Avenue and you'll reach a crossing point where four paths meet. The café is on the north-west corner of that crossing — so, on your left as you're walking up. It does hot drinks and sandwiches until four o'clock, and only hot drinks after that. The toilets are in the same building, round the back.\n\nFrom that same crossing, if you take the path heading east, you arrive at the Pond. It's the irregular-shaped area on the eastern side of the garden. There's a wooden platform over part of it. That platform has a weight limit and we don't allow school groups of more than fifteen onto it at once.\n\nFinally, at the northern end of the Central Avenue, is the Woodland Walk. That's the largest single area in the garden and it's deliberately left rough. There's no lighting along it, so in winter we close it at half past three, well before the rest of the garden.\n\nA few practical things. You'll each be given a radio. Please carry it, and please turn it on — a radio in a pocket that's switched off is worse than no radio, because we'll assume we can reach you. If you find a visitor who is unwell, don't move them; radio for help and stay where you are.\n\nYou'll also be asked about plants you don't recognise, constantly, and by people who assume that a volunteer knows everything. You won't, and it's absolutely fine to say so. What is not fine is guessing. Last summer a volunteer told a family that a berry was edible. It wasn't dangerous, as it turned out, but it very easily could have been. If you don't know, say you don't know and find someone who does.",
       "questions": [
         {
           "id": "lx-s2-1",
@@ -196,12 +196,12 @@
           "answerType": "choice",
           "prompt": "Where is the Glasshouse?",
           "options": [
-            "On the western edge",
             "On the eastern side",
+            "On the western edge",
             "At the northern end",
             "Beside the main entrance"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "\"The large building on the western edge.\" Rose Garden yang di sisi timur."
         },
         {
@@ -210,12 +210,12 @@
           "answerType": "choice",
           "prompt": "What closes when it rains?",
           "options": [
-            "The whole Glasshouse",
             "The upper walkway inside the Glasshouse",
             "The Rose Garden",
+            "The whole Glasshouse",
             "The café"
           ],
-          "answerIndex": 1,
+          "answerIndex": 0,
           "explain": "Yang tutup hanya jalur atasnya, karena logamnya jadi licin - bukan seluruh Glasshouse."
         },
         {
@@ -224,12 +224,12 @@
           "answerType": "choice",
           "prompt": "Where is the café?",
           "options": [
-            "On the north-west corner of the crossing",
             "On the north-east corner of the crossing",
-            "Next to the Pond",
-            "At the entrance"
+            "On the north-west corner of the crossing",
+            "At the entrance",
+            "Next to the Pond"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "\"On your left as you're walking up\" - dan ia berjalan ke utara, jadi kiri = barat laut. Toilet ada di gedung yang sama."
         },
         {
@@ -238,12 +238,12 @@
           "answerType": "choice",
           "prompt": "What restriction applies to the platform over the Pond?",
           "options": [
+            "It is for staff only",
             "It closes in winter",
             "No school group larger than fifteen at once",
-            "It is for staff only",
             "Photography is not allowed"
           ],
-          "answerIndex": 1,
+          "answerIndex": 2,
           "explain": "Ada batas beban, dan aturannya maksimal lima belas anak sekaligus."
         },
         {
@@ -252,12 +252,12 @@
           "answerType": "choice",
           "prompt": "Why does the Woodland Walk close at 3.30 in winter?",
           "options": [
-            "It floods",
             "There is no lighting along it",
+            "It floods",
             "It is being replanted",
             "Volunteers finish at that time"
           ],
-          "answerIndex": 1,
+          "answerIndex": 0,
           "explain": "Sebabnya disebut langsung: tidak ada penerangan."
         },
         {
@@ -266,16 +266,16 @@
           "answerType": "choice",
           "prompt": "What does the speaker say volunteers must never do?",
           "options": [
-            "Guess when they do not know a plant",
             "Carry a radio",
             "Admit they are new",
+            "Guess when they do not know a plant",
             "Talk to school groups"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": "\"It's absolutely fine to say so. What is not fine is guessing.\" Contoh buah beri itu dipakai untuk menegaskannya."
         }
       ],
-      "wordCount": 523,
+      "wordCount": 521,
       "questionCount": 6
     },
     {
@@ -292,11 +292,11 @@
           "prompt": "Why does the park sensor read four degrees cooler?",
           "options": [
             "It is shaded by trees",
-            "It is partly in the spray from a water feature",
             "It is faulty and reads randomly",
+            "It is partly in the spray from a water feature",
             "It was installed at the wrong height"
           ],
-          "answerIndex": 1,
+          "answerIndex": 2,
           "explain": "Awalnya mereka mengira itu efek pepohonan - tetapi selisihnya tetap ada pukul tiga pagi, jadi bukan naungan."
         },
         {
@@ -319,12 +319,12 @@
           "answerType": "choice",
           "prompt": "Why does Tom want to keep them?",
           "options": [
-            "Ten sensors is thin, and the park one still shows a microclimate",
             "He installed them himself",
             "The tutor asked him to",
+            "Ten sensors is thin, and the park one still shows a microclimate",
             "Removing data is against the rules"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": "Dua alasan, dan keduanya harus tertangkap - jumlah sensor DAN nilai datanya yang berbeda jenis."
         },
         {
@@ -335,10 +335,10 @@
           "options": [
             "Dropping the data",
             "Keeping the data",
-            "Doing either without saying so in the method",
-            "Missing the deadline"
+            "Missing the deadline",
+            "Doing either without saying so in the method"
           ],
-          "answerIndex": 2,
+          "answerIndex": 3,
           "explain": "\"The failure mode here isn't dropping data or keeping it. It's doing either quietly.\""
         },
         {
@@ -347,12 +347,12 @@
           "answerType": "choice",
           "prompt": "What makes the comparison with the 2015 survey difficult?",
           "options": [
-            "It used a different measurement height",
             "It covered fewer districts",
-            "Its data was lost",
-            "It measured at night only"
+            "It used a different measurement height",
+            "It measured at night only",
+            "Its data was lost"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Tiga meter versus dua meter, dan selisihnya terukur terutama di atas permukaan beraspal."
         },
         {
@@ -361,12 +361,12 @@
           "answerType": "choice",
           "prompt": "What does the tutor advise about the half-to-one degree range?",
           "options": [
+            "Ask the 2015 team for their data",
             "Narrow it with an estimate",
-            "Report the range as it stands",
             "Leave it out entirely",
-            "Ask the 2015 team for their data"
+            "Report the range as it stands"
           ],
-          "answerIndex": 1,
+          "answerIndex": 3,
           "explain": "\"A wide honest interval is worth more than a narrow invented one.\""
         },
         {
@@ -435,12 +435,12 @@
           "answerType": "choice",
           "prompt": "Why was the time discrepancy dangerous on the railways?",
           "options": [
-            "Signalmen could disagree about the time on a single track",
             "Passengers arrived late for trains",
             "Clocks were expensive to maintain",
+            "Signalmen could disagree about the time on a single track",
             "Timetables were printed incorrectly"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": "Penumpang telat itu merepotkan; dua kereta di satu rel dengan awak yang berbeda pendapat soal waktu itu tabrakan."
         },
         {
@@ -460,12 +460,12 @@
           "answerType": "choice",
           "prompt": "What point does the court case in Dorset illustrate?",
           "options": [
-            "Those harmed first are the people who followed the old rule correctly",
             "Judges resisted the railways",
-            "Courts kept the most accurate clocks",
-            "Local time was more reliable"
+            "Those harmed first are the people who followed the old rule correctly",
+            "Local time was more reliable",
+            "Courts kept the most accurate clocks"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Terdakwa datang tepat waktu menurut waktu setempat - ia benar menurut aturan lama, dan justru itu yang merugikannya."
         },
         {
@@ -510,12 +510,12 @@
           "answerType": "choice",
           "prompt": "Why does the student go to the librarian?",
           "options": [
-            "To ask about getting a book the library does not hold",
             "To renew an overdue book",
+            "To ask about getting a book the library does not hold",
             "To complain about the catalogue",
             "To book a study room"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Soal gist-purpose menanyakan ALASAN datang, bukan hal paling menarik yang muncul belakangan."
         },
         {
@@ -524,12 +524,12 @@
           "answerType": "choice",
           "prompt": "Why will the interlibrary loan not solve the student's problem?",
           "options": [
-            "It takes about a week and the draft is due Friday",
             "The book is not in the consortium",
             "The student has unpaid fines",
+            "It takes about a week and the draft is due Friday",
             "The book cannot be loaned"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": "Bukunya tersedia di tiga perpustakaan - masalahnya waktu, bukan ketersediaan."
         },
         {
@@ -538,12 +538,12 @@
           "answerType": "choice",
           "prompt": "What limit applies to scanned chapters?",
           "options": [
-            "One chapter or about ten percent, whichever is smaller",
             "Two chapters per book",
             "Ten pages per request",
-            "One request per semester"
+            "One request per semester",
+            "One chapter or about ten percent, whichever is smaller"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": "Karena itulah ia harus memilih satu esai dulu dan meminta yang kedua bulan depan."
         },
         {
@@ -552,12 +552,12 @@
           "answerType": "choice",
           "prompt": "What can be inferred about the special collections?",
           "options": [
-            "Material relevant to the student is effectively undiscoverable by searching",
+            "They have been fully digitised",
             "They contain only manuscripts",
             "They are closed to undergraduates",
-            "They have been fully digitised"
+            "Material relevant to the student is effectively undiscoverable by searching"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": "Buku besarnya terdaftar atas nama penyumbang, bukan subjek - jadi pencarian apa pun tidak akan menemukannya."
         },
         {
@@ -566,12 +566,12 @@
           "answerType": "choice",
           "prompt": "What must the student do to consult the ledgers?",
           "options": [
-            "Book a reading room slot and bring pencils only",
             "Request them through interlibrary loan",
+            "Book a reading room slot and bring pencils only",
             "Get a letter from a supervisor",
             "Pay a handling fee"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Tidak boleh keluar gedung, pensil saja, boleh difoto tanpa lampu kilat."
         },
         {
@@ -581,8 +581,8 @@
           "prompt": "Why does the librarian say \"Belt and braces\"?",
           "options": [
             "To say the scan is worth requesting even though the ledgers may be better",
-            "To warn the student the ledgers are fragile",
             "To signal the conversation is over",
+            "To warn the student the ledgers are fragile",
             "To suggest the student is being careless"
           ],
           "answerIndex": 0,
@@ -605,12 +605,12 @@
           "answerType": "choice",
           "prompt": "What is the lecture mainly about?",
           "options": [
-            "Why some animals advertise rather than hide, and how mimicry exploits or supports it",
             "How poison dart frogs produce toxins",
-            "Why camouflage is the dominant strategy",
-            "The history of research in the Amazon"
+            "Why some animals advertise rather than hide, and how mimicry exploits or supports it",
+            "The history of research in the Amazon",
+            "Why camouflage is the dominant strategy"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Kamuflase dan sejarah Bates hanya disinggung; tulang punggung kuliahnya tiga mekanisme itu."
         },
         {
@@ -619,12 +619,12 @@
           "answerType": "choice",
           "prompt": "Why must the toxin usually NOT be fatal?",
           "options": [
-            "A predator that dies learns nothing and passes nothing on",
+            "Predators would avoid the whole forest",
             "Fatal toxins are metabolically expensive",
             "Prey would also be poisoned",
-            "Predators would avoid the whole forest"
+            "A predator that dies learns nothing and passes nothing on"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": "Seluruh sistemnya bergantung pada predator yang selamat lalu MENGINGAT - itu sebabnya warnanya bukan peringatan bagi penyerang saat itu."
         },
         {
@@ -633,12 +633,12 @@
           "answerType": "choice",
           "prompt": "Why is Batesian mimicry self-limiting?",
           "options": [
-            "As mimics become common the warning becomes unreliable and stops protecting them",
             "Mimics eventually develop real toxins",
+            "As mimics become common the warning becomes unreliable and stops protecting them",
             "Predators evolve better eyesight",
             "The models change colour"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": "Ada langit-langit alami: peniru hanya aman selama jumlahnya tetap sedikit dibanding yang beracun."
         },
         {
@@ -648,8 +648,8 @@
           "prompt": "What is the benefit of Müllerian mimicry?",
           "options": [
             "Two defended species share the cost of teaching predators one lesson",
-            "One species avoids producing toxin",
             "It makes both species harder to see",
+            "One species avoids producing toxin",
             "It confuses predators into attacking neither"
           ],
           "answerIndex": 0,
@@ -661,12 +661,12 @@
           "answerType": "choice",
           "prompt": "What does the professor mean by \"the teaching cost is divided\"?",
           "options": [
-            "Fewer individuals die while predators learn, because one lesson covers both species",
             "The two species take turns being eaten",
             "Predators learn twice as fast",
-            "The toxin is produced jointly"
+            "The toxin is produced jointly",
+            "Fewer individuals die while predators learn, because one lesson covers both species"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": "Setiap pelajaran dibayar dengan nyawa individu; satu pelajaran untuk dua spesies berarti korbannya lebih sedikit."
         },
         {
@@ -675,12 +675,12 @@
           "answerType": "choice",
           "prompt": "What is the current view of the line between the two kinds of mimicry?",
           "options": [
-            "They are ends of a continuum, though this is not universally accepted",
-            "They are entirely separate phenomena",
             "Batesian mimicry does not really exist",
+            "They are entirely separate phenomena",
+            "They are ends of a continuum, though this is not universally accepted",
             "Müllerian mimicry only occurs in butterflies"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": "Dosen menutup dengan meminta mahasiswa siap MEMPERDEBATKAN klaim kontinuum itu - tandanya belum disepakati."
         }
       ],

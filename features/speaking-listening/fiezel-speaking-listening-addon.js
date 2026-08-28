@@ -141,7 +141,15 @@
       return out
     })
   };
-  const normalizeText=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[’']/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+  // R4: kontraksi baku diekspansi di KEDUA sisi sebelum perbandingan token, supaya transkripsi
+  // setia yang memakai kontraksi ("I'm ten and I can't swim.") tidak dinilai salah terhadap naskah
+  // bentuk penuh ("I am ten and I cannot swim."). Hanya bentuk TAK-AMBIGU yang diekspansi:
+  // bentuk 'd (would/had), he's/she's ('s bisa is atau has), ain't, "its" tanpa apostrof (posesif),
+  // dan kata nyata seperti were/ill/well/shell/hell/lets/id/wed/shed sengaja TIDAK diekspansi.
+  // Bentuk tanpa apostrof (im, cant, dont, ...) ikut diekspansi karena pelajar sering mengetik tanpa apostrof.
+  const CONTRACTION_MAP={"i'm":'i am',im:'i am',"can't":'cannot',cant:'cannot',"won't":'will not',wont:'will not',"don't":'do not',dont:'do not',"doesn't":'does not',doesnt:'does not',"didn't":'did not',didnt:'did not',"isn't":'is not',isnt:'is not',"aren't":'are not',arent:'are not',"wasn't":'was not',wasnt:'was not',"weren't":'were not',werent:'were not',"haven't":'have not',havent:'have not',"hasn't":'has not',hasnt:'has not',"hadn't":'had not',hadnt:'had not',"couldn't":'could not',couldnt:'could not',"shouldn't":'should not',shouldnt:'should not',"wouldn't":'would not',wouldnt:'would not',"mustn't":'must not',mustnt:'must not',"needn't":'need not',neednt:'need not',"shan't":'shall not',shant:'shall not',"mightn't":'might not',mightnt:'might not',"oughtn't":'ought not',oughtnt:'ought not',"it's":'it is',"that's":'that is',thats:'that is',"there's":'there is',theres:'there is',"here's":'here is',heres:'here is',"what's":'what is',whats:'what is',"who's":'who is',whos:'who is',"where's":'where is',wheres:'where is',"how's":'how is',hows:'how is',"when's":'when is',whens:'when is',"let's":'let us',"you're":'you are',youre:'you are',"we're":'we are',"they're":'they are',theyre:'they are',"i've":'i have',ive:'i have',"you've":'you have',youve:'you have',"we've":'we have',weve:'we have',"they've":'they have',theyve:'they have',"i'll":'i will',"you'll":'you will',youll:'you will',"he'll":'he will',"she'll":'she will',"it'll":'it will',itll:'it will',"we'll":'we will',"they'll":'they will',theyll:'they will'};
+  const CONTRACTION_RE=new RegExp('\\b(?:'+Object.keys(CONTRACTION_MAP).sort((a,b)=>b.length-a.length).join('|').replace(/'/g,"'")+')\\b','g');
+  const normalizeText=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/’/g,"'").replace(CONTRACTION_RE,m=>CONTRACTION_MAP[m]).replace(/'/g,'').replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
   const tokens=s=>normalizeText(s).split(' ').filter(Boolean);
   const median=xs=>{const a=xs.map(Number).filter(Number.isFinite).sort((x,y)=>x-y);if(!a.length)return null;const m=Math.floor(a.length/2);return a.length%2?a[m]:Math.round((a[m-1]+a[m])/2)};
   function tokenF1(actual,expected){
@@ -190,13 +198,21 @@
   function scoreListeningExamAnswer(question,response){
     if(!question)return{correct:false,given:''};
     if(question.answerType==='choice'){
-      const selected=Number(response);
+      // R4: jawaban kosong bukan jawaban. Number('')===0, jadi tanpa penjagaan ini respons
+      // kosong akan dihitung benar untuk soal yang kuncinya di posisi 0.
+      const selected=(response==null||String(response).trim()==='')?NaN:Number(response);
       return{correct:Number.isInteger(selected)&&selected===Number(question.answerIndex),
         given:Number.isInteger(selected)?String(question.options?.[selected]??''):''};
     }
     const given=normalizeText(response);
     const accepted=(Array.isArray(question.accept)?question.accept:[]).map(normalizeText).filter(Boolean);
-    return{correct:!!given&&accepted.includes(given),given:String(response||'').trim()};
+    // R4 (lx-s1-4): jawaban isian berupa DERETAN DIGIT (nomor telepon dsb.) dibandingkan tanpa
+    // spasi/tanda hubung, karena pengelompokan "07911 340 628" sama benarnya dengan "079 11 340 628".
+    // Terbatas pada kunci yang seluruhnya digit; jawaban alfanumerik tetap dibandingkan apa adanya.
+    const digitKey=v=>/^[0-9][0-9\s]*$/.test(v)?v.replace(/\s+/g,''):null;
+    const givenDigits=digitKey(given);
+    const correct=!!given&&(accepted.includes(given)||(givenDigits!==null&&accepted.some(a=>digitKey(a)===givenDigits)));
+    return{correct,given:String(response||'').trim()};
   }
   function scoreListeningExamSet(set,responses){
     const questions=Array.isArray(set&&set.questions)?set.questions:[];

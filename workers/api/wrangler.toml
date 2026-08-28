@@ -39,10 +39,10 @@ SERVICE_NAME      = "fiezel-api"
 API_VERSION       = "cf-api-1"
 AI_GATEWAY_MODE   = "core-only"    # cermin core-config.js aiGateway
 # Allowlist CORS eksplisit. BUKAN pantulan Origin, BUKAN "*".
-# Catatan jujur: `fitrajft-ux.github.io` ada di public suffix list => cross-site,
+# Catatan jujur: `fiezel-apps.github.io` ada di public suffix list => cross-site,
 # jadi cookie identitas TIDAK akan terkirim dari sana. Cermin GitHub Pages tetap
 # bisa belajar penuh (semua pelajaran lokal), tanpa AI/TTS. Keputusan owner.
-ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fitrajft-ux.github.io"
+ALLOWED_ORIGINS   = "https://fiezel.my.id,https://www.fiezel.my.id,https://fiezel-apps.github.io"
 COOKIE_DOMAIN     = "fiezel.my.id" # cookie ikut terkirim ke api.fiezel.my.id
 # Entitlement fase ini: SEMUA MATI. main auto-deploy ke produksi tiap 5 menit,
 # jadi fitur baru wajib di belakang flag OFF (aturan produksi owner).

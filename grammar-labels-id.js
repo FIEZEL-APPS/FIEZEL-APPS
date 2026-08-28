@@ -180,7 +180,22 @@
     present_continuous_basics: 'Present continuous: sedang berlangsung sekarang',
     question_words_basic: 'Kata tanya dasar: who, what, where, when, why',
     some_any_countable_uncountable: 'Some, any, many, dan much sesuai jenis kata benda',
-    subject_object_pronouns_and_possessives: 'Kata ganti subjek, objek, dan bentuk kepemilikan'
+    subject_object_pronouns_and_possessives: 'Kata ganti subjek, objek, dan bentuk kepemilikan',
+    // ------------------------------------------ 14 lesson baru (G1, R6 perbaikan-10)
+    imperative_commands_base_form: 'Kalimat perintah: mulai dari kata kerja dasar',
+    adverbs_of_frequency_mid_position: 'Posisi kata frekuensi: always, usually, never',
+    possessive_s_noun_ownership: "Kepemilikan dengan apostrof + s: Sinta's bag",
+    would_like_polite_requests: 'Minta dengan sopan: would like',
+    like_love_hate_plus_gerund_preferences: 'Kesukaan dengan -ing: like, love, hate + gerund',
+    present_perfect_experience_ever_never: 'Pengalaman hidup: present perfect dengan ever dan never',
+    present_perfect_with_for_since_duration: 'Dari dulu sampai sekarang: present perfect dengan for dan since',
+    wish_unreal_present_past_simple: 'Harapan soal sekarang: wish + past simple',
+    if_only_past_regret_past_perfect: 'Penyesalan masa lalu: if only + past perfect',
+    future_perfect_epistemic_past_assumption: 'Dugaan yakin yang sudah kejadian: will have + past participle',
+    perfect_passive_infinitive_anteriority_reported_events: 'Pasif yang lebih dulu terjadi: to have been + past participle',
+    mandative_subjunctive_after_demand_insist: 'Subjunctive bentuk dasar: demand that he resign',
+    sentential_which_whole_clause_antecedent: 'Komentar untuk satu klausa utuh: koma + which',
+    generic_the_species_class_predicates: 'The generik untuk spesies: the Sumatran tiger'
   };
 
   root.GRAMMAR_SKILL_TITLES_ID = GRAMMAR_SKILL_TITLES_ID;

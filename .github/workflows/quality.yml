@@ -465,7 +465,7 @@ jobs:
         # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
         # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
         # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
@@ -497,7 +497,7 @@ jobs:
         # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
         # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
         # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
           # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
@@ -528,7 +528,7 @@ jobs:
         # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
         # `no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
         # ada dalam bentuk bergerbang aktor + workflow_dispatch.
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}
