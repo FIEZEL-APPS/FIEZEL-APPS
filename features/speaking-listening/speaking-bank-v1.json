@@ -206,7 +206,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "A2",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan intonasi natural.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "I missed the bus because I left home too late.",
       "requiredKeywords": [
         "missed",
@@ -233,7 +233,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "A2",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan intonasi natural.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "We are planning to visit the museum this weekend.",
       "requiredKeywords": [
         "planning",
@@ -418,7 +418,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "B1",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan ritme yang stabil.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "Although I was nervous, I answered the question in front of the class.",
       "requiredKeywords": [
         "although",
@@ -445,7 +445,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "B1",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan ritme yang stabil.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "The new study routine helps me remember difficult words for longer.",
       "requiredKeywords": [
         "routine",
@@ -874,7 +874,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C1",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan penekanan logis pada bagian kontras.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "The result is encouraging, but it should not be treated as conclusive evidence.",
       "requiredKeywords": [
         "encouraging",
@@ -901,7 +901,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C1",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini dengan penekanan logis pada bagian kontras.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "A strong average can still conceal substantial differences between individual groups.",
       "requiredKeywords": [
         "average",
@@ -1109,7 +1109,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini sambil mempertahankan phrasing yang jelas.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "Urgency may justify immediate attention without justifying absolute confidence in the proposed solution.",
       "requiredKeywords": [
         "urgency",
@@ -1136,7 +1136,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "repeat_target",
-      "instruction": "Baca kalimat ini sambil mempertahankan phrasing yang jelas.",
+      "instruction": "Baca kalimat ini dengan suara jelas.",
       "sampleAnswer": "The apparent contradiction disappears once the claims are evaluated at different levels of analysis.",
       "requiredKeywords": [
         "contradiction",
@@ -1164,7 +1164,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "guided_response",
-      "instruction": "Jawab dalam bahasa Inggris: jelaskan kapan argumen yang persuasif secara retoris tetap lemah secara evidensial.",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan kapan argumen yang persuasif tetap lemah karena kurang bukti.",
       "sampleAnswer": "An argument can be rhetorically persuasive when it uses vivid framing or urgency, yet remain evidentially weak if its central claims rely on selective or insufficient data.",
       "requiredKeywords": [
         "persuasive",
@@ -1207,7 +1207,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "guided_response",
-      "instruction": "Jawab dalam bahasa Inggris: jelaskan bagaimana kamu akan mengevaluasi kebijakan yang terlihat berhasil berdasarkan satu metrik rata-rata.",
+      "instruction": "Jawab dalam bahasa Inggris: jelaskan cara kamu menilai kebijakan yang terlihat berhasil dari satu angka rata-rata saja.",
       "sampleAnswer": "I would examine the distribution behind the average, compare outcomes across relevant subgroups, and test whether the result remains robust under alternative specifications.",
       "requiredKeywords": [
         "average",
@@ -1250,7 +1250,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "roleplay",
-      "instruction": "Sebagai reviewer, sampaikan bahwa kesimpulan penulis masuk akal tetapi terlalu pasti dibanding kekuatan buktinya.",
+      "instruction": "Sebagai reviewer, sampaikan bahwa kesimpulan penulis masuk akal, tapi terlalu yakin dibanding kekuatan buktinya.",
       "sampleAnswer": "The conclusion is plausible, but the current evidence does not support the level of certainty used in the manuscript. I suggest narrowing the claim or adding stronger validation.",
       "requiredKeywords": [
         "plausible",
@@ -1296,7 +1296,7 @@
       "schema": "fiezel-speaking-item-v1",
       "level": "C2",
       "mode": "roleplay",
-      "instruction": "Dalam rapat, bedakan dengan jelas antara kebutuhan bertindak cepat dan kepastian bahwa satu solusi tertentu pasti benar.",
+      "instruction": "Dalam rapat, bedakan antara perlunya bertindak cepat dan keyakinan bahwa satu solusi pasti benar.",
       "sampleAnswer": "I agree that the issue requires prompt action, but urgency does not prove that this particular solution is correct. We should act while preserving room to revise the decision as evidence improves.",
       "requiredKeywords": [
         "urgency",

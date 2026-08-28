@@ -1646,7 +1646,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What will Nando probably do next Sunday?",
+      "question": "What will Nando probably do next time?",
       "options": [
         "Teach another boy",
         "Practice again with his father",
@@ -3071,7 +3071,7 @@
       "question": "What does Wawan think about counting again?",
       "options": [
         "It made his father angry",
-        "It is his father job only",
+        "It is his father's job only",
         "It was the right thing to do",
         "It was a waste of time"
       ],
@@ -4958,7 +4958,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is his father advice based on?",
+      "question": "What is his father's advice based on?",
       "options": [
         "Maths is not important now",
         "The teacher will not check",
@@ -5512,7 +5512,7 @@
       },
       "question": "Which sentence means the same as “My hands are cold because I am afraid”?",
       "options": [
-        "She holds her mother hand",
+        "She holds her mother's hand",
         "Her body shows her fear",
         "She forgets her gloves at home",
         "The clinic room is very cold"
@@ -6524,7 +6524,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is the teacher attitude?",
+      "question": "What is the teacher's attitude?",
       "options": [
         "He is angry about the rope",
         "He tells Tegar to rest",
@@ -7046,7 +7046,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is the owner attitude towards Anisa?",
+      "question": "What is the owner's attitude towards Anisa?",
       "options": [
         "She is angry about the machine",
         "She wants Anisa to leave the shop",
@@ -7370,7 +7370,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is the coach main concern?",
+      "question": "What is the coach's main concern?",
       "options": [
         "Making training shorter",
         "Keeping Cahya healthy",
@@ -8216,7 +8216,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Halim describe the grandfather stories?",
+      "question": "How does Halim describe the grandfather's stories?",
       "options": [
         "As a kind of reward",
         "As a waste of time",
@@ -8365,7 +8365,7 @@
         "The room was too small for two",
         "His parents told him to complain",
         "He must be ready for his exams",
-        "He does not like his brother games"
+        "He does not like his brother's games"
       ],
       "answerIndex": 2,
       "scoring": {
@@ -8637,7 +8637,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "gist",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -8667,7 +8667,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "detail",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -8697,7 +8697,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "inference",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -8727,7 +8727,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "attitude",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -8757,7 +8757,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "paraphrase",
-      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
+      "script": "My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle's house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9159,7 +9159,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "gist",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9189,7 +9189,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "detail",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9202,7 +9202,7 @@
       },
       "question": "What is missing from her application?",
       "options": [
-        "The letter about her parents income",
+        "The letter about her parents' income",
         "Her school report from last year",
         "Her photograph and signature",
         "The email address of the office"
@@ -9219,7 +9219,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "inference",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9249,7 +9249,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "attitude",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -9279,7 +9279,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "A2",
       "mode": "paraphrase",
-      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.",
+      "script": "I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents' income letter before Friday, or my application will not be read.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -10285,7 +10285,7 @@
         "It was short and organized",
         "It was long and painful",
         "It was confusing for him",
-        "It was cancelled by the nurse"
+        "It was canceled by the nurse"
       ],
       "answerIndex": 0,
       "scoring": {
@@ -10454,7 +10454,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Ulya feel about the head teacher decision?",
+      "question": "How does Ulya feel about the head teacher's decision?",
       "options": [
         "She thinks it is very unfair",
         "She is angry about the delay",
@@ -11150,7 +11150,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does the mother action show?",
+      "question": "What does the mother's action show?",
       "options": [
         "She wanted to make more money",
         "She was angry with the neighbors",
@@ -11473,7 +11473,7 @@
         "Rest helps the memory work",
         "Mathematics is not important",
         "Her sister wants the room quiet",
-        "The exam will be cancelled"
+        "The exam will be canceled"
       ],
       "answerIndex": 0,
       "scoring": {
@@ -11672,7 +11672,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is his father attitude to learning?",
+      "question": "What is his father's attitude to learning?",
       "options": [
         "It takes time and more practice",
         "It should be quick and easy to learn",
@@ -12170,7 +12170,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does the coach solution show?",
+      "question": "What does the coach's solution show?",
       "options": [
         "He plans to close the club",
         "He wants to keep the players",
@@ -13538,7 +13538,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is his attitude towards the captain decision?",
+      "question": "What is his attitude towards the captain's decision?",
       "options": [
         "He does not trust the captain",
         "He believes it was the safe choice",
@@ -13573,7 +13573,7 @@
         "They returned to the first port",
         "They crossed before the strong wind started",
         "They reached the other side without harm",
-        "They cancelled the whole journey"
+        "They canceled the whole journey"
       ],
       "answerIndex": 2,
       "scoring": {
@@ -13856,7 +13856,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What can we understand about the interviewer reaction?",
+      "question": "What can we understand about the interviewer's reaction?",
       "options": [
         "She had already decided to refuse Aisyah",
         "She wanted to see the certificates first",
@@ -15878,7 +15878,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does her behaviour show about her?",
+      "question": "What does her behavior show about her?",
       "options": [
         "She was mainly worried about the rules",
         "She wanted to finish the shift quickly",
@@ -16232,7 +16232,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "Which sentence means the same as “arriving exhausted would have been worse”?",
+      "question": "Which sentence means the same as “arriving exhausted for a job interview would have been worse”?",
       "options": [
         "Arriving late was the worst possible outcome",
         "She preferred to travel through the night",
@@ -17246,9 +17246,9 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Ulil describe the landlord earlier behaviour?",
+      "question": "How does Ulil describe the landlord's earlier behavior?",
       "options": [
-        "As helpful but rather slow to organise",
+        "As helpful but rather slow to organize",
         "As reasonable given the cost of repairs",
         "As careful and always well documented",
         "As a long series of empty promises"
@@ -17830,7 +17830,7 @@
       },
       "question": "What is Yasmin mainly talking about?",
       "options": [
-        "Weighing her grandmother recipes into a notebook before they are lost",
+        "Weighing her grandmother's recipes into a notebook before they are lost",
         "A grandmother who has written down all of her own recipes",
         "A notebook that she bought for her grandmother as a small gift",
         "A cooking scale that she sold to her family after using it once"
@@ -17888,7 +17888,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What does her grandmother request show?",
+      "question": "What does her grandmother's request show?",
       "options": [
         "She wants to sell the recipes",
         "She has forgotten the recipes",
@@ -18007,7 +18007,7 @@
         "A job that his family found for him near their own house",
         "A bus company that raised its fares for the longer journey",
         "An office that agreed to move much closer to where he lives",
-        "Turning down a higher salary because of the travelling time"
+        "Turning down a higher salary because of the traveling time"
       ],
       "answerIndex": 3,
       "scoring": {
@@ -18127,7 +18127,7 @@
         "The working day lasts only three hours",
         "He would arrive three whole hours early",
         "The journey takes three days a week",
-        "The travelling would consume a large part of it"
+        "The traveling would consume a large part of it"
       ],
       "answerIndex": 3,
       "scoring": {
@@ -18588,7 +18588,7 @@
       "options": [
         "A weak internet connection",
         "The tablet being far too old to use",
-        "His father fear of doing damage",
+        "His father's fear of doing damage",
         "His father poor eyesight"
       ],
       "answerIndex": 2,
@@ -18788,7 +18788,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Deva treat the coach comment?",
+      "question": "How does Deva treat the coach's comment?",
       "options": [
         "As proof that the trial was unfair",
         "As a reason to stop playing",
@@ -19225,7 +19225,7 @@
         "Filling sandbags a week early and what the rainy season did",
         "A youth group that he joined during the last rainy season",
         "Eleven houses that were rebuilt after the water damaged them",
-        "Neighbours who filled the street with water on a Tuesday"
+        "Neighbors who filled the street with water on a Tuesday"
       ],
       "answerIndex": 0,
       "scoring": {
@@ -19832,7 +19832,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What did the other students reaction show?",
+      "question": "What did the other students' reaction show?",
       "options": [
         "His difficulty was widely shared",
         "He was the only one struggling",
@@ -21848,7 +21848,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "What is her attitude towards the head teacher announcement?",
+      "question": "What is her attitude towards the head teacher's announcement?",
       "options": [
         "It was accurate but not informative",
         "It was a deliberate attempt to mislead",
@@ -27244,7 +27244,7 @@
       },
       "question": "What does she say about the lost income?",
       "options": [
-        "It was the library main source of funds",
+        "It was the library's main source of funds",
         "It has already been recovered in full",
         "It was larger than the value of the books",
         "It would never have been collected"
@@ -28873,7 +28873,7 @@
         "His hesitation had a different source",
         "He was frightened of the consequences",
         "He felt no hesitation whatsoever",
-        "He was afraid of the editor reaction"
+        "He was afraid of the editor's reaction"
       ],
       "answerIndex": 0,
       "scoring": {
@@ -30064,7 +30064,7 @@
       },
       "question": "Which sentence means the same as “narrower than the headline will suggest”?",
       "options": [
-        "Headlines usually understate a trial findings",
+        "Headlines usually understate a trial's findings",
         "The finding applies to fewer people than reports imply",
         "The result will be reported to doctors very cautiously",
         "The trial covers more patients than expected"
@@ -30603,7 +30603,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "gist",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -30633,7 +30633,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "detail",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -30663,7 +30663,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "inference",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -30674,7 +30674,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does she answer the parent question?",
+      "question": "How does she answer the parent's question?",
       "options": [
         "She argues it will improve job prospects",
         "She refuses to discuss the matter with the parent",
@@ -30693,7 +30693,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "attitude",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -30723,7 +30723,7 @@
       "schema": "fiezel-listening-item-v1",
       "level": "C1",
       "mode": "paraphrase",
-      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.",
+      "script": "I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother's letters without a translator, and I am not going to pretend that is an economic argument.",
       "voiceLang": "en-US",
       "maxReplays": 2,
       "pedagogy": {
@@ -31990,7 +31990,7 @@
       },
       "question": "What happened after the signals were removed?",
       "options": [
-        "Drivers began travelling faster",
+        "Drivers began traveling faster",
         "The junction had to be closed completely",
         "The number of collisions went down",
         "Congestion increased considerably"
@@ -32222,7 +32222,7 @@
       "privacy": {
         "rawLearnerResponseRequiredForPersistence": false
       },
-      "question": "How does Camila describe the company motives?",
+      "question": "How does Camila describe the company's motives?",
       "options": [
         "As entirely driven by environmental concern",
         "As a long planned part of the whole brand strategy",
@@ -35568,7 +35568,7 @@
       "options": [
         "Two accurate versions of one life and which she owed her readers",
         "A daughter who asked her to publish something she knew was untrue",
-        "A period of a man life that is entirely undocumented",
+        "A period of a man's life that is entirely undocumented",
         "An obituary that she agreed not to publish at all"
       ],
       "answerIndex": 0,

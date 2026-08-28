@@ -82,7 +82,7 @@ module.exports = { level: 'B2', scenarios: [
  ['What is Hanan mainly talking about?','An average that concealed two very different class results','A head teacher who invented the science results','A science examination that her whole school canceled','Eleven points that her own science class lost this year'],
  ['What happened when she split the results?','One class rose sharply and another fell','Both classes had risen by the same amount','Every class had fallen slightly','The results could not be separated'],
  ['Why does she call the average useless?','It hid what each group actually needed','It was calculated in the wrong way','It was announced to the staff far too late','It included the wrong subject'],
- ['What is her attitude towards the head teacher announcement?','It was accurate but not informative','It was a deliberate attempt to mislead','It was the best possible summary','It should never have been made public'],
+ ['What is her attitude towards the head teacher\'s announcement?','It was accurate but not informative','It was a deliberate attempt to mislead','It was the best possible summary','It should never have been made public'],
  ["Which sentence means the same as “The average was true and also useless”?",'It was correct yet gave no useful guidance','It was both wrong and deliberately misleading','It was useful but slightly inaccurate','It was neither correct nor helpful'],
 ],
 
@@ -370,7 +370,7 @@ module.exports = { level: 'B2', scenarios: [
  'I am Oona. We canceled all outstanding fines for one month and asked only for the books, and more than four hundred volumes came back, including some that had been missing for a decade. We lost the fine income, which we were never going to collect anyway. What we gained was four hundred books and a number of readers who had been avoiding the building out of embarrassment.',
  ['What is Oona mainly talking about?','A month without fines that brought back four hundred books and their readers','A library that raised its fines for the first time in a decade','Volumes that the library bought during that one month','Readers who were banned from the building because of their fines'],
  ['How many books were returned?','More than four hundred','Fewer than fifty','About four thousand','The number was not counted'],
- ['What does she say about the lost income?','It would never have been collected','It was the library main source of funds','It has already been recovered in full','It was larger than the value of the books'],
+ ['What does she say about the lost income?','It would never have been collected','It was the library\'s main source of funds','It has already been recovered in full','It was larger than the value of the books'],
  ['Why had some readers stayed away?','They were embarrassed about their fines','The library had been closed for repairs','They had been formally banned from it','They lived too far from the building'],
  ["Which sentence means the same as “including some that had been missing for a decade”?",'Among them were books gone for ten years','Every returned book was recently borrowed','A decade of records was returned as well','Some books were returned ten times over'],
 ]

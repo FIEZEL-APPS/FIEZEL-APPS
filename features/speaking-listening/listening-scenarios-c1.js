@@ -94,7 +94,7 @@ module.exports = { level: 'C1', scenarios: [
  ['What did he add in the comments to the editor?','That the flaw could be repaired','That the paper should be rejected','That he knew the author personally','That he could not review it fairly'],
  ['Why was he tempted to soften the review?','He did not want to hurt the author','He was afraid of professional retaliation','He was uncertain about the flaw','The editor had asked him to be gentle'],
  ['What does his final decision reveal?','He separates kindness from accuracy','He values the friendship above the work','He has no confidence in his own judgment','He wanted the paper rejected quickly'],
- ["Which sentence means the same as “is not about fear”?",'His hesitation had a different source','He was frightened of the consequences','He felt no hesitation whatsoever','He was afraid of the editor reaction'],
+ ["Which sentence means the same as “is not about fear”?",'His hesitation had a different source','He was frightened of the consequences','He felt no hesitation whatsoever','He was afraid of the editor\'s reaction'],
 ],
 
 ['Joana','editing suite with a consent form','A subject who withdrew consent',
@@ -157,7 +157,7 @@ module.exports = { level: 'C1', scenarios: [
  ['Who is excluded from the trial?','Patients with kidney impairment','Patients over a certain age','Anybody already taking the drug','Participants from other countries'],
  ['What proportion of eventual users have that condition?','About one third','Almost none','Roughly a half','The figure is unknown'],
  ['What is her attitude towards the exclusion?','She accepts its purpose while noting its consequence','She regards the exclusion as unethical and improper','She believes the whole trial should be abandoned','She thinks the exclusion criterion is far too narrow'],
- ["Which sentence means the same as “narrower than the headline will suggest”?",'The finding applies to fewer people than reports imply','The result will be reported to doctors very cautiously','The trial covers more patients than expected','Headlines usually understate a trial findings'],
+ ["Which sentence means the same as “narrower than the headline will suggest”?",'The finding applies to fewer people than reports imply','The result will be reported to doctors very cautiously','The trial covers more patients than expected','Headlines usually understate a trial\'s findings'],
 ],
 
 ['Quentin','tasting room with two labels','Renaming a region',
@@ -188,10 +188,10 @@ module.exports = { level: 'C1', scenarios: [
 ],
 
 ['Thandi','community hall with a language class register','Reviving a language nobody needs',
- 'I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother letters without a translator, and I am not going to pretend that is an economic argument.',
+ 'I am Thandi. We teach a language with about four hundred remaining speakers, and a parent asked me directly why her daughter should spend Saturday mornings on something that will never earn her anything. It is a fair question and the honest answer is that it will not. What it will do is let her read her grandmother\'s letters without a translator, and I am not going to pretend that is an economic argument.',
  ['What is Thandi mainly talking about?','Why she defends the Saturday language classes without an economic reason','A grandmother who taught four hundred other people how to read','A parent who refused to let her daughter attend the Saturday morning classes','Letters that she translates for the whole community every week'],
  ['How many speakers does the language have?','About four hundred people','Around four thousand people','Fewer than fifty remaining speakers','The number is not known at all'],
- ['How does she answer the parent question?','She agrees that it brings no financial return','She argues it will improve job prospects','She refuses to discuss the matter with the parent','She claims the language is growing'],
+ ['How does she answer the parent\'s question?','She agrees that it brings no financial return','She argues it will improve job prospects','She refuses to discuss the matter with the parent','She claims the language is growing'],
  ['What value does she offer instead?','Direct access to her own family writing','The chance to teach the language later','Improved performance in other subjects','A qualification recognized by employers'],
  ["Which sentence means the same as “I am not going to pretend that is an economic argument”?",'She declines to dress the reason up as financial','She insists the reason is purely financial','She refuses to give the parent any reason at all','She believes the argument is about money alone'],
 ]
@@ -263,7 +263,7 @@ module.exports = { level: 'C1', scenarios: [
 ['Belen','junction where the signals were removed','Traffic that behaves better without rules',
  'I am Belen. We removed the signals and markings from this junction and collisions fell, which sounds like an argument against traffic control until you look at why. Drivers slowed down because they no longer knew who had priority, so they had to negotiate with each other. The lesson is not that rules are bad. It is that a rule which tells you that you are safe can make you less careful than uncertainty does.',
  ['What is Belen mainly talking about?','Why uncertainty at a junction made drivers more careful','A junction where collisions rose sharply after a redesign','Traffic signals that she installed at a dangerous junction','Drivers who ignored every marking at the junction'],
- ['What happened after the signals were removed?','The number of collisions went down','Congestion increased considerably','Drivers began travelling faster','The junction had to be closed completely'],
+ ['What happened after the signals were removed?','The number of collisions went down','Congestion increased considerably','Drivers began traveling faster','The junction had to be closed completely'],
  ['Why did drivers slow down?','They were unsure who had priority','New speed limits were introduced','The road surface had been changed','Cameras were installed at the junction'],
  ['What conclusion does she reject?','That rules in general are harmful','That drivers negotiated with each other','That collisions fell after the change','That uncertainty affected driver behavior'],
  ["Which sentence means the same as “a rule which tells you that you are safe”?",'Guidance that reassures you about the risk','A rule that warns you of serious danger','An instruction that nobody chooses to follow','A regulation that applies only to drivers'],
@@ -274,7 +274,7 @@ module.exports = { level: 'C1', scenarios: [
  ['What is Camila mainly talking about?','A repair counter that raised sales instead of costing them','A regulator who fined the company for refusing to offer repairs','Customers who stopped buying once the counter opened','A repair counter that the company closed after one year'],
  ['Why did the company start the service?','A regulator was about to require it','Customers had demanded it for years','It was expected to increase sales','A competitor had already done so'],
  ['What did they discover about repair customers?','They spend more than other customers','They rarely buy anything new','They complain more than others','They come only once and never return'],
- ['How does Camila describe the company motives?','Honestly, without claiming credit it did not earn','As entirely driven by environmental concern','As a long planned part of the whole brand strategy','As something forced on them by customers'],
+ ['How does Camila describe the company\'s motives?','Honestly, without claiming credit it did not earn','As entirely driven by environmental concern','As a long planned part of the whole brand strategy','As something forced on them by customers'],
  ["Which sentence means the same as “we should have found ourselves years earlier”?",'The commercial case had been available all along','Nobody could have identified the argument before','The regulator discovered the argument for them','The company found it as early as possible'],
 ],
 

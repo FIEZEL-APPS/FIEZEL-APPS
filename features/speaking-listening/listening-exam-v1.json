@@ -43,7 +43,7 @@
       "replays": 1,
       "questionsVisibleDuringAudio": false,
       "minutes": 5,
-      "note": "Percakapan kampus. Audio SEKALI, dan soal baru muncul SETELAH audio selesai - jadi mencatat bukan pilihan, melainkan keharusan."
+      "note": "Percakapan kampus. Audio SEKALI, dan soal baru muncul SETELAH audio selesai - jadi mencatat itu wajib, bukan pilihan."
     },
     "toefl_listening_lecture": {
       "label": "TOEFL iBT Listening - Lecture",
@@ -69,7 +69,7 @@
           "accept": [
             "marsh"
           ],
-          "explain": "Dieja langsung olehnya: M-A-R-S-H."
+          "explain": "Dia mengeja namanya langsung: M-A-R-S-H."
         },
         {
           "id": "lx-s1-2",
@@ -92,7 +92,7 @@
             "ls9 4tp",
             "ls94tp"
           ],
-          "explain": "\"L S nine, four T P.\" Kode pos selalu dibaca huruf demi huruf - tulis rapat tanpa ragu.",
+          "explain": "\"L S nine, four T P.\" Kode pos selalu dieja huruf demi huruf. Tulis persis seperti yang kamu dengar.",
           "spokenAs": "L S nine, four T P"
         },
         {
@@ -105,7 +105,7 @@
             "079 11 340 628",
             "0791 1340 628"
           ],
-          "explain": "\"Oh-seven-nine, one-one, three-four-oh, six-two-eight.\" Petugasnya mengulang - pengulangan itu memang disediakan ujian untuk mengoreksi.",
+          "explain": "\"Oh-seven-nine, one-one, three-four-oh, six-two-eight.\" Petugasnya mengulang nomornya. Manfaatkan pengulangan itu buat mengecek jawabanmu.",
           "spokenAs": "Oh-seven-nine, one-one, three-four-oh, six-two-eight"
         },
         {
@@ -120,7 +120,7 @@
             "She has not decided"
           ],
           "answerIndex": 1,
-          "explain": "Ia bisa berenang tetapi tekniknya buruk dan lelah setelah dua lintasan - itu definisi Improvers yang diberikan petugas."
+          "explain": "Dia bisa berenang, tapi tekniknya buruk dan cepat lelah setelah dua lintasan. Itu persis definisi Improvers dari petugasnya."
         },
         {
           "id": "lx-s1-6",
@@ -130,7 +130,7 @@
           "accept": [
             "thursday"
           ],
-          "explain": "Ia memilih Kamis karena Selasa baru selesai kerja pukul tujuh."
+          "explain": "Dia memilih Kamis karena hari Selasa dia baru selesai kerja pukul tujuh."
         },
         {
           "id": "lx-s1-7",
@@ -142,7 +142,7 @@
             "32 pounds",
             "thirty two"
           ],
-          "explain": "Satu sesi per minggu = 32 pound sebulan. Jebakan di sini adalah 48, yang untuk DUA sesi."
+          "explain": "Satu sesi per minggu = 32 pound sebulan. Jebakannya angka 48 - itu harga untuk DUA sesi."
         },
         {
           "id": "lx-s1-8",
@@ -154,7 +154,7 @@
             "15 pounds",
             "fifteen"
           ],
-          "explain": "Biaya sekali bayar 15 pound; ia tidak dapat pembebasan karena bukan pelajar maupun di atas 65."
+          "explain": "Biaya sekali bayar 15 pound. Dia nggak dapat pembebasan biaya karena bukan pelajar dan belum di atas 65."
         },
         {
           "id": "lx-s1-9",
@@ -188,7 +188,7 @@
       "exam": "ielts_listening_s2",
       "level": "B2",
       "title": "Pengarahan relawan kebun raya",
-      "script": "You will hear a talk given to new volunteers at a city botanical garden. First, look at the map on your screen.\n\nGood afternoon, and thank you all for giving up your Saturday. I'm going to walk you through the layout of the garden, because in your first few weeks the commonest question you'll be asked is simply \"where is the toilet\", and the second commonest is \"where can I get a cup of tea\".\n\nSo. You're standing at the main entrance, which is at the bottom of your map. Directly ahead of you, running north, is the Central Avenue. Almost everything is reached from it.\n\nTake the first turning on your left, and you come to the Glasshouse. It's the large building on the western edge — you can't miss it, it's made of glass. That's where the tropical collection lives, and it's the warmest place in the garden, which matters in February. The Glasshouse is open every day, but the upper walkway inside it closes when it rains, because the metal gets slippery.\n\nNow, opposite the Glasshouse, on the other side of the Central Avenue, is the Rose Garden. It's the square area on the eastern side. It's at its best in June and it's essentially bare in January, so don't be surprised if visitors seem disappointed in winter.\n\nCarry on north up the Central Avenue and you'll reach a crossing point where four paths meet. The café is on the north-west corner of that crossing — so, on your left as you're walking up. It does hot drinks and sandwiches until four o'clock, and only hot drinks after that. The toilets are in the same building, round the back.\n\nFrom that same crossing, if you take the path heading east, you arrive at the Pond. It's the irregular shape on the right-hand side of your map. There's a wooden platform over part of it. That platform has a weight limit and we don't allow school groups of more than fifteen onto it at once.\n\nFinally, at the very top of the map, at the northern end of the Central Avenue, is the Woodland Walk. That's the largest single area in the garden and it's deliberately left rough. There's no lighting along it, so in winter we close it at half past three, well before the rest of the garden.\n\nA few practical things. You'll each be given a radio. Please carry it, and please turn it on — a radio in a pocket that's switched off is worse than no radio, because we'll assume we can reach you. If you find a visitor who is unwell, don't move them; radio for help and stay where you are.\n\nYou'll also be asked about plants you don't recognise, constantly, and by people who assume that a volunteer knows everything. You won't, and it's absolutely fine to say so. What is not fine is guessing. Last summer a volunteer told a family that a berry was edible. It wasn't dangerous, as it turned out, but it very easily could have been. If you don't know, say you don't know and find someone who does.",
+      "script": "You will hear a talk given to new volunteers at a city botanical garden. As I describe the layout, try to picture the garden from above.\n\nGood afternoon, and thank you all for giving up your Saturday. I'm going to walk you through the layout of the garden, because in your first few weeks the commonest question you'll be asked is simply \"where is the toilet\", and the second commonest is \"where can I get a cup of tea\".\n\nSo. You're standing at the main entrance, at the southern end of the garden. Directly ahead of you, running north, is the Central Avenue. Almost everything is reached from it.\n\nTake the first turning on your left, and you come to the Glasshouse. It's the large building on the western edge — you can't miss it, it's made of glass. That's where the tropical collection lives, and it's the warmest place in the garden, which matters in February. The Glasshouse is open every day, but the upper walkway inside it closes when it rains, because the metal gets slippery.\n\nNow, opposite the Glasshouse, on the other side of the Central Avenue, is the Rose Garden. It's the square area on the eastern side. It's at its best in June and it's essentially bare in January, so don't be surprised if visitors seem disappointed in winter.\n\nCarry on north up the Central Avenue and you'll reach a crossing point where four paths meet. The café is on the north-west corner of that crossing — so, on your left as you're walking up. It does hot drinks and sandwiches until four o'clock, and only hot drinks after that. The toilets are in the same building, round the back.\n\nFrom that same crossing, if you take the path heading east, you arrive at the Pond. It's the irregularly shaped area on the eastern side of the garden. There's a wooden platform over part of it. That platform has a weight limit and we don't allow school groups of more than fifteen onto it at once.\n\nFinally, at the far northern end of the Central Avenue is the Woodland Walk. That's the largest single area in the garden and it's deliberately left rough. There's no lighting along it, so in winter we close it at half past three, well before the rest of the garden.\n\nA few practical things. You'll each be given a radio. Please carry it, and please turn it on — a radio in a pocket that's switched off is worse than no radio, because we'll assume we can reach you. If you find a visitor who is unwell, don't move them; radio for help and stay where you are.\n\nYou'll also be asked about plants you don't recognise, constantly, and by people who assume that a volunteer knows everything. You won't, and it's absolutely fine to say so. What is not fine is guessing. Last summer a volunteer told a family that a berry was edible. It wasn't dangerous, as it turned out, but it very easily could have been. If you don't know, say you don't know and find someone who does.",
       "questions": [
         {
           "id": "lx-s2-1",
@@ -230,7 +230,7 @@
             "At the entrance"
           ],
           "answerIndex": 0,
-          "explain": "\"On your left as you're walking up\" - dan ia berjalan ke utara, jadi kiri = barat laut. Toilet ada di gedung yang sama."
+          "explain": "\"On your left as you're walking up\" - dan kamu sedang berjalan ke utara, jadi kiri = barat laut. Toilet ada di gedung yang sama."
         },
         {
           "id": "lx-s2-4",
@@ -272,10 +272,10 @@
             "Talk to school groups"
           ],
           "answerIndex": 0,
-          "explain": "\"It's absolutely fine to say so. What is not fine is guessing.\" Contoh buah beri itu dipakai untuk menegaskannya."
+          "explain": "\"It's absolutely fine to say so. What is not fine is guessing.\" Contoh buah beri dipakai buat menegaskan itu."
         }
       ],
-      "wordCount": 523,
+      "wordCount": 520,
       "questionCount": 6
     },
     {
@@ -297,7 +297,7 @@
             "It was installed at the wrong height"
           ],
           "answerIndex": 1,
-          "explain": "Awalnya mereka mengira itu efek pepohonan - tetapi selisihnya tetap ada pukul tiga pagi, jadi bukan naungan."
+          "explain": "Awalnya mereka mengira itu efek pepohonan - tapi selisihnya tetap ada pukul tiga pagi, jadi bukan naungan."
         },
         {
           "id": "lx-s3-2",
@@ -466,7 +466,7 @@
             "Local time was more reliable"
           ],
           "answerIndex": 0,
-          "explain": "Terdakwa datang tepat waktu menurut waktu setempat - ia benar menurut aturan lama, dan justru itu yang merugikannya."
+          "explain": "Terdakwa datang tepat waktu menurut waktu setempat. Dia benar menurut aturan lama, dan justru itu yang merugikannya."
         },
         {
           "id": "lx-s4-6",
@@ -544,7 +544,7 @@
             "One request per semester"
           ],
           "answerIndex": 0,
-          "explain": "Karena itulah ia harus memilih satu esai dulu dan meminta yang kedua bulan depan."
+          "explain": "Karena itulah dia harus memilih satu esai dulu dan meminta yang kedua bulan depan."
         },
         {
           "id": "lx-tc-4",
@@ -586,7 +586,7 @@
             "To suggest the student is being careless"
           ],
           "answerIndex": 0,
-          "explain": "Ungkapan itu berarti memakai dua pengaman sekaligus - ia menyarankan tetap meminta scan sebagai cadangan."
+          "explain": "Ungkapan itu berarti memakai dua pengaman sekaligus - dia menyarankan tetap meminta scan sebagai cadangan."
         }
       ],
       "wordCount": 465,
