@@ -4,7 +4,7 @@
     "pass": 13,
     "fail": 0,
     "families": 21,
-    "lessons": 139
+    "lessons": 153
   },
   "checks": [
     {
@@ -25,17 +25,17 @@
     {
       "name": "The curriculum graph maps every lesson",
       "status": "PASS",
-      "details": "graph=139 curriculum=139"
+      "details": "graph=153 curriculum=153"
     },
     {
       "name": "Graph size is reported honestly",
       "status": "PASS",
-      "details": "139"
+      "details": "153"
     },
     {
       "name": "A gated lesson resolves its declared prerequisites",
       "status": "PASS",
-      "details": "gated=16"
+      "details": "gated=30"
     },
     {
       "name": "Lesson chains are transitive, not just one level up",

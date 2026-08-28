@@ -217,7 +217,7 @@
   var OUTPUT_CONTRACT = Object.freeze({
     sentenceLimits: Object.freeze({
       tutor_turn: 6,          // penjelasan soal — batas terukur pada benchmark hari ini
-      writing_feedback: 8,    // 2 kekuatan + 2 perbaikan + contoh ⇒ 8 kalimat cukup
+      writing_feedback: 12,   // 5 skor kriteria + 1 langkah berikutnya + sebelum/sesudah ⇒ 12 kalimat cukup
       context_coach: 4,       // analisa murid — batas terukur pada benchmark hari ini
       session_recap: 3,       // maksimal 3 poin, satu kalimat per poin
       translate_subtitle: 0   // 0 = tidak dibatasi
@@ -503,12 +503,49 @@
       '\nBahasa jawaban: ' + s(locale || 'id') + '\n---DATA---\nPertanyaan: ' + s(input.question);
   }
 
+  /**
+   * Rubrik penilaian Writing DIEJA DI SINI karena Worker tidak bisa membaca
+   * writing-prompts-v1.json saat runtime — dan penilai yang hanya menerima id rubrik akan
+   * mengarang rubriknya sendiri. Salinan ini WAJIB identik dengan rubrik yang dilihat murid
+   * di bank (label, labelEn, asks per kriteria); writing-rubric-test.js membandingkan
+   * keduanya, jadi perubahan bank yang tidak diikuti di sini menggagalkan gerbang.
+   */
+  var WRITING_RUBRICS = Object.freeze({
+    'fiezel-writing-rubric-v1': Object.freeze([
+      Object.freeze({ label: 'Penuntasan tugas', labelEn: 'Task achievement / response', asks: 'Apakah semua yang diminta soal benar-benar dijawab, dan posisinya jelas?' }),
+      Object.freeze({ label: 'Keruntutan dan keterkaitan', labelEn: 'Coherence and cohesion', asks: 'Apakah alurnya bisa diikuti tanpa membaca ulang?' }),
+      Object.freeze({ label: 'Kekayaan kosakata', labelEn: 'Lexical resource', asks: 'Apakah katanya cukup tepat dan bervariasi untuk topiknya?' }),
+      Object.freeze({ label: 'Ragam dan ketepatan tata bahasa', labelEn: 'Grammatical range and accuracy', asks: 'Apakah struktur kalimatnya bervariasi dan benar?' }),
+      Object.freeze({ label: 'Nada dan kerapian', labelEn: 'Register and mechanics', asks: 'Apakah nadanya cocok dengan pembacanya, dan tanda bacanya rapi?' })
+    ])
+  });
+
+  /**
+   * Satu kontrak umpan balik untuk KEDUA transport: kartu murid dan jalur Puter
+   * (app.js requestWritingFeedback) menjanjikan lima kriteria berskala 0-4, jadi jalur CF
+   * meminta format yang sama — bukan format "tanpa skor" yang dulu bertentangan dengan
+   * kartu rubrik. Soal dan bentuk ujian ikut sebagai DATA (dipasok klien, dibatasi
+   * maxLength di schema) supaya kriteria pertama (penuntasan tugas) benar-benar bisa
+   * dinilai, bukan dikarang dari id seperti "w-b1-3".
+   */
   function promptWritingFeedback(input, locale) {
+    var criteria = WRITING_RUBRICS[s(input.rubricId)] || WRITING_RUBRICS['fiezel-writing-rubric-v1'];
+    var rubricLines = criteria.map(function (c) {
+      return '- ' + c.label + ' (' + c.labelEn + '): ' + c.asks;
+    }).join('\n');
     return GUARD + styleClause() + ' Maksimal ' + sentenceLimitFor('writing_feedback') + ' kalimat.' +
-      '\nTugas: beri umpan balik tulisan menurut rubrik ' + s(input.rubricId) +
-      '. Sebutkan 2 kekuatan dan 2 perbaikan konkret dengan contoh perbaikannya. ' +
-      'JANGAN memberi skor angka.\nLevel: ' + s(input.level) + '\nPrompt: ' + s(input.promptId) +
-      '\nBahasa: ' + s(locale || 'id') + '\n---DATA---\n' + s(input.text);
+      '\nTugas: nilai tulisan murid menurut rubrik ' + s(input.rubricId) +
+      ' berikut. Skala 0-4 untuk SETIAP kriteria:\n' + rubricLines +
+      '\nJawab dengan format ini, tanpa tambahan lain:' +
+      '\n1. Skor per kriteria, satu baris per kriteria: "Nama kriteria: n/4 - satu kalimat alasan yang menunjuk bukti di tulisannya".' +
+      '\n2. "Satu langkah berikutnya:" - SATU perbaikan paling berdampak dengan contoh perbaikannya.' +
+      '\n3. "Sebelum / sesudah:" - kutip satu kalimat murid, lalu tulis ulang versi yang lebih baik.' +
+      '\nAturan keras: jangan menyebut band IELTS atau skor TOEFL, dan jangan menyatakan murid siap atau belum siap ujian. Skor rubrik ini alat latihan, bukan prediksi nilai ujian.' +
+      '\nLevel: ' + s(input.level) + '\nPrompt: ' + s(input.promptId) +
+      '\nBahasa: ' + s(locale || 'id') + '\n---DATA---' +
+      (s(input.promptText).trim() ? '\nSoal: ' + s(input.promptText) : '') +
+      (s(input.examBrief).trim() ? '\nBentuk ujian: ' + s(input.examBrief) : '') +
+      '\nTulisan murid:\n' + s(input.text);
   }
 
   function promptContextCoach(input, locale) {
@@ -584,6 +621,12 @@
       input: Object.freeze({
         text: { type: 'string', required: true, maxLength: 1800 },
         promptId: { type: 'string', required: true, maxLength: 80 },
+        // Teks soal + ringkasan kontrak ujian, OPSIONAL supaya klien lama tetap sah.
+        // Tanpa keduanya model tidak pernah tahu apa yang soal minta (dulu ia hanya
+        // menerima id seperti "w-b1-3") — kriteria penuntasan tugas jadi karangan.
+        // Panjangnya dipagari maxLength karena nilainya dipasok klien.
+        promptText: { type: 'string', maxLength: 500 },
+        examBrief: { type: 'string', maxLength: 300 },
         level: { type: 'enum', required: true, values: LEVELS },
         rubricId: { type: 'string', required: true, maxLength: 80 }
       }),
@@ -602,7 +645,11 @@
       cheapModel: MODELS.standard,
       maxSentences: OUTPUT_CONTRACT.sentenceLimits.writing_feedback,
       enforceStyleWords: true,
-      jsonMode: true,
+      // jsonMode SENGAJA false: klien merender jawaban ini sebagai prosa markdown
+      // (app.js:5096 renderMarkdown), dan promptnya meminta format baris skor — bukan JSON.
+      // Kombinasi lama (prompt prosa + response_format json_object) terukur menghasilkan
+      // 22/25 jawaban `"{}"` kosong di staging (lihat A12/3 di atas).
+      jsonMode: false,
       prompt: promptWritingFeedback,
       fallback: fallbackWritingFeedback
     }),

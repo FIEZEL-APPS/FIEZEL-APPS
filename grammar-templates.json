@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 139,
+  "count": 153,
   "templates": [
     {
       "id": "TA-001",
@@ -9,7 +9,7 @@
       "cefr": "A2",
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Distinguish habitual routine (present simple) from action-in-progress-now (present continuous)",
-      "misconceptionTargeted": "Learner treats 'right now' as always requiring -ing regardless of habituality markers",
+      "misconceptionTargeted": "Learner applies the habitual present simple to an action visibly in progress at the moment of speaking",
       "reasoningOperation": "identify time-frame marker -> select aspect",
       "stem": "Look! The chef ___ a new dish right now — you can smell it.",
       "options": [
@@ -55,7 +55,7 @@
         "memoryCueId": "Ada “Look!”, berarti lihat bentuk -ing-nya."
       },
       "pedagogicalObjectiveId": "Bedain kebiasaan yang berulang dari kejadian yang lagi jalan sekarang. Pilih present simple atau present continuous.",
-      "misconceptionTargetedId": "Kamu ngira setiap kalimat soal sekarang wajib pakai bentuk -ing.",
+      "misconceptionTargetedId": "Kamu pakai present simple yang buat kebiasaan, padahal kejadiannya lagi jalan di depan mata.",
       "reasoningOperationId": "cari kata kunci waktunya → tentuin bentuk kata kerjanya"
     },
     {
@@ -121,7 +121,7 @@
       "cefr": "B1",
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Differentiate a pre-arranged plan (present continuous / going to) from a spontaneous decision (will)",
-      "misconceptionTargeted": "Learner uses 'will' for any future reference, ignoring the plan-vs-spontaneous-decision distinction",
+      "misconceptionTargeted": "Learner treats a spontaneous offer made at the moment of speaking as a pre-arranged plan, reaching for present continuous instead of 'will'",
       "reasoningOperation": "detect prior arrangement vs on-the-spot decision -> select future form",
       "stem": "Which completion shows a decision made only at the moment of speaking? A: 'The phone's ringing.' B: 'Don't worry, I ___ it.'",
       "options": [
@@ -167,7 +167,7 @@
         "memoryCueId": "Keputusan yang seketika, pakai “will” seketika."
       },
       "pedagogicalObjectiveId": "Bedain rencana yang udah diatur dari keputusan yang baru muncul pas kamu ngomong.",
-      "misconceptionTargetedId": "Kamu pakai “will” buat semua hal yang belum kejadian. Rencana lama dan keputusan mendadak jadi ketuker.",
+      "misconceptionTargetedId": "Kamu nganggep tawaran yang baru muncul pas ngomong sebagai rencana yang udah diatur, jadi milih present continuous, bukan “will”.",
       "reasoningOperationId": "cek udah direncanain dari tadi atau baru diputusin pas ngomong → pilih bentuk masa depannya"
     },
     {
@@ -513,7 +513,7 @@
       "cefr": "A2",
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use indefinite article for first mention and definite article for subsequent, already-identified mention",
-      "misconceptionTargeted": "Learner uses 'the' for every noun, ignoring whether it has been previously identified",
+      "misconceptionTargeted": "Learner reuses the indefinite article for a noun that has already been identified, treating every mention as a first mention",
       "reasoningOperation": "track discourse identifiability -> select article",
       "stem": "I saw a dog in the park. ___ dog was chasing a ball.",
       "options": [
@@ -559,7 +559,7 @@
         "memoryCueId": "Baru muncul pakai a atau an, udah dikenal pakai the."
       },
       "pedagogicalObjectiveId": "Pakai a atau an waktu benda baru disebut. Pakai the waktu bendanya udah dikenal.",
-      "misconceptionTargetedId": "Kamu pakai “the” buat semua kata benda tanpa cek udah disebut atau belum.",
+      "misconceptionTargetedId": "Kamu ngulang “a” buat benda yang udah disebut, seolah tiap penyebutan itu penyebutan pertama.",
       "reasoningOperationId": "cek bendanya udah dikenal pembaca atau belum → pilih a, an, atau the"
     },
     {
@@ -1019,7 +1019,7 @@
       "pedagogicalObjective": "Use past perfect to mark the earlier of two past events when sequence must be made explicit",
       "misconceptionTargeted": "Learner uses past simple for both events and relies on 'before/after' alone to signal order, even when clarity requires past perfect",
       "reasoningOperation": "find the 'by the time' marker that sets the past reference point -> mark the event already completed before that point with had + past participle",
-      "stem": "By the time the ambulance arrived, the neighbors ___ first aid.",
+      "stem": "By the time the ambulance arrived, the neighbors ___ first aid, so the paramedics only had to check the bandages.",
       "options": [
         "already gave",
         "had already given",
@@ -1038,8 +1038,8 @@
         {
           "option": "were already giving",
           "misconception": "confuses completed prior action with an action still in progress at the reference point",
-          "whyFails": "The first aid was already completed before the ambulance arrived, not still ongoing.",
-          "whyFailsId": "pertolongannya udah kelar sebelum ambulans nyampe, bukan masih jalan.",
+          "whyFails": "The continuous form says the first aid was still in progress when the ambulance arrived, but 'so the paramedics only had to check the bandages' shows it had already been completed.",
+          "whyFailsId": "bentuk continuous bilang pertolongannya masih jalan pas ambulans dateng, padahal “only had to check the bandages” nunjukin udah kelar.",
           "misconceptionId": "kejadian yang udah kelar ketuker sama yang masih jalan di titik acuan."
         },
         {
@@ -1051,14 +1051,14 @@
         }
       ],
       "explanation": {
-        "whyCorrect": "'By the time' + a past-simple event signals a reference point; the action completed before that point needs past perfect.",
+        "whyCorrect": "'By the time' + a past-simple event signals a reference point, and 'the paramedics only had to check the bandages' shows the first aid was already finished before that point — the earlier, completed action needs past perfect.",
         "rule": "Past perfect (had + past participle) marks the earlier of two past actions when the order needs to be unambiguous.",
-        "whyOthersFail": "Past simple for both actions leaves the order ambiguous or wrong; the continuous form wrongly implies the action was unfinished.",
+        "whyOthersFail": "Past simple for both actions leaves the order ambiguous or wrong; the continuous form implies the first aid was still unfinished, which 'only had to check the bandages' rules out; the bare present clashes with the past narrative.",
         "howToAvoid": "When you see 'by the time X happened', make X the reference point, then ask what had already finished before X — that verb takes the past perfect.",
         "memoryCue": "'By the time X happened' -> the other action needs 'had' first.",
         "ruleId": "Past perfect pakai had + bentuk ketiga kata kerja (past participle). Bentuk ini nandain kejadian yang lebih dulu di antara dua kejadian lampau.",
-        "whyCorrectId": "“By the time” plus kejadian past simple bikin titik acuan. Kejadian yang kelar sebelum titik itu pakai past perfect.",
-        "whyOthersFailId": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk continuous malah bilang kejadiannya belum kelar.",
+        "whyCorrectId": "“By the time” plus kejadian past simple bikin titik acuan. “Only had to check the bandages” nunjukin pertolongannya udah kelar sebelum titik itu, jadi pakai past perfect.",
+        "whyOthersFailId": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk continuous bilang pertolongannya belum kelar, padahal petugasnya tinggal meriksa perbannya. Bentuk dasar present nabrak cerita lampaunya.",
         "howToAvoidId": "Begitu lihat “by the time X happened”, jadiin X titik acuannya. Terus tanya apa yang udah kelar sebelum X.",
         "memoryCueId": "Ada “by the time X happened”, kejadian satunya butuh “had” di depan."
       },
@@ -1185,7 +1185,7 @@
       "cefr": "B2",
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Select the correct past modal of deduction based on whether the evidence supports a confident positive or negative conclusion about a past event",
-      "misconceptionTargeted": "Learner uses 'must have' for both confident positive and confident negative deductions, not realizing 'can't have' is the negative counterpart",
+      "misconceptionTargeted": "Learner reverses the polarity of a past deduction, reaching for 'can't have' even though the evidence confidently supports that the event did happen",
       "reasoningOperation": "evaluate evidence polarity -> match to must have (positive certainty) or can't have (negative certainty)",
       "stem": "Which option expresses the strongest positive past deduction supported by the evidence? The lights are still off and his car isn't here — he ___ left for work already.",
       "options": [
@@ -1231,7 +1231,7 @@
         "memoryCueId": "Bukti kuat mendukung: “must have”. Bukti kuat nyangkal: “can’t have”."
       },
       "pedagogicalObjectiveId": "Kamu pilih modal (kata kayak must, might) buat nyimpulin kejadian lampau sesuai arah buktinya.",
-      "misconceptionTargetedId": "Kamu pakai “must have” buat kesimpulan positif maupun negatif. Kamu belum sadar pasangan negatifnya “can’t have”.",
+      "misconceptionTargetedId": "Kamu mbalik arah kesimpulan lampaunya: milih “can’t have” padahal buktinya yakin kejadiannya memang terjadi.",
       "reasoningOperationId": "nilai arah buktinya → pasangin sama “must have” buat yakin iya, atau “can’t have” buat yakin nggak"
     },
     {
@@ -3797,7 +3797,7 @@
       "explanation": {
         "whyCorrect": "Adding the coordinating conjunction 'so' after the comma properly joins the two independent clauses and expresses the cause-effect relationship.",
         "rule": "Two independent clauses cannot be joined by a comma alone (a comma splice); use a coordinating conjunction after the comma, a semicolon, or split into two sentences.",
-        "whyOthersFail": "Removing the comma creates a run-on; adding stray commas elsewhere doesn't fix the core problem of joining two full sentences without a connector.",
+        "whyOthersFail": "'Decide' slips into the present tense although the decision already happened; putting 'therefore' after 'stop' with only a comma is not valid punctuation; and adding 'therefore' inside the second clause still leaves the two full sentences joined by a comma alone.",
         "howToAvoid": "Check each side of a comma: if both sides could stand alone as a full sentence, you need more than just a comma to join them.",
         "memoryCue": "Comma alone can't join two full sentences — add 'so/and/but' or use a semicolon.",
         "ruleId": "Dua kalimat utuh nggak boleh disambung cuma pakai koma. Tambahin kata sambung setara sesudah komanya. Bisa juga pakai titik koma atau pisahin jadi dua kalimat.",
@@ -4887,7 +4887,7 @@
       "options": [
         "[no word needed]",
         "who",
-        "whom, which",
+        "whom",
         "what"
       ],
       "correctIndex": 0,
@@ -4900,11 +4900,11 @@
           "misconceptionId": "kata penghubung buat orang dipakai pada kata benda yang bukan orang."
         },
         {
-          "option": "whom, which",
-          "misconception": "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things.",
-          "whyFails": "This is over-inserted: since the relative pronoun is the object of 'borrowed', it can be dropped entirely, and 'whom' wouldn't apply to a book regardless.",
-          "whyFailsId": "“Which” sendiri sebenarnya sah di kalimat ini, tetapi pilihan ini menawarkan dua kata sekaligus dan “whom” tidak dipakai untuk sebuah buku.",
-          "misconceptionId": "dua kata penghubung ditawarin seolah dua-duanya cocok di posisi ini."
+          "option": "whom",
+          "misconception": "Inserts the person-only object pronoun 'whom' for a non-human antecedent instead of omitting the omissible object pronoun.",
+          "whyFails": "'Whom' only refers to people, so it cannot stand for 'the book' — and since the relative pronoun is the object of 'borrowed', the natural choice here is to omit it entirely.",
+          "whyFailsId": "“whom” cuma buat orang, jadi nggak bisa gantiin “the book”. Lagipula kata penghubungnya berkedudukan objek, jadi paling wajar dihilangin aja.",
+          "misconceptionId": "“whom”, kata ganti objek khusus orang, malah disisipin buat benda, padahal kata penghubung objeknya boleh dihilangin."
         },
         {
           "option": "what",
@@ -4917,12 +4917,12 @@
       "explanation": {
         "whyCorrect": "Because the relative pronoun would be the object of 'borrowed' (I borrowed [it]), it can be omitted, forming a contact clause.",
         "rule": "Object relative pronouns (that/which/who(m)) can be omitted in defining relative clauses.",
-        "whyOthersFail": "'Who' misapplies a personal pronoun to a thing; the double option over-inserts an unnecessary word; 'what' is never a relative pronoun here.",
+        "whyOthersFail": "'Who' misapplies a personal subject pronoun to a thing; 'whom' is also person-only and inserts a word the object position lets you drop; 'what' is never a relative pronoun here.",
         "howToAvoid": "Test if the pronoun is the object of the clause's verb; if so, omission is grammatically correct and common.",
         "memoryCue": "If you could say 'I borrowed it', the pronoun can disappear.",
         "ruleId": "Kata penghubung yang berkedudukan objek boleh dihilangin di anak kalimat penjelas yang wajib. Kata itu bisa “that”, “which”, “who”, atau “whom”.",
         "whyCorrectId": "Kata penghubungnya berkedudukan objek dari “borrowed”, yaitu “I borrowed it”. Jadi kata itu boleh menghilang.",
-        "whyOthersFailId": "“Who” nunjuk orang, bukan benda. Pilihan dua kata sekaligus nyisipin kata yang nggak perlu. “What” nggak pernah jadi kata penghubung di posisi ini.",
+        "whyOthersFailId": "“Who” nunjuk orang, bukan benda. “Whom” juga khusus orang dan nyisipin kata yang harusnya boleh dihilangin. “What” nggak pernah jadi kata penghubung di posisi ini.",
         "howToAvoidId": "Uji kata penghubungnya berkedudukan objek dari kata kerja anak kalimatnya atau bukan.",
         "memoryCueId": "Kalau bisa diucapin “I borrowed it”, kata penghubungnya boleh menghilang."
       },
@@ -5343,7 +5343,7 @@
         {
           "option": "sent",
           "misconception": "Uses past simple because a specific number of emails is mentioned.",
-          "whyFails": "'Sent' closes the time frame as finished, but 'this week' is still in progress (it's only Tuesday), so the frame it needs does not exist here.",
+          "whyFails": "'Sent' closes the time frame as finished, but 'so far this week' shows the week is still in progress — two emails are still to be written before Friday — so the finished frame it needs does not exist here.",
           "whyFailsId": "“so far” nandain rentang yang masih jalan, jadi bentuk lampau nggak pas.",
           "misconceptionId": "past simple dipakai padahal rentang waktunya belum tutup."
         },
@@ -7785,13 +7785,797 @@
       "pedagogicalObjectiveId": "Bedain kata ganti subjek, kata ganti objek, dan dua bentuk kepemilikan",
       "misconceptionTargetedId": "Kamu gampang ketuker antara her, hers, dan she. Bahasa Indonesia cuma punya satu kata “dia”.",
       "reasoningOperationId": "lihat kata sesudah bagian kosongnya → tentuin bentuk kata gantinya"
+    },
+    {
+      "id": "A1-018",
+      "family": "core_grammar",
+      "subskill": "imperative_commands_base_form",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Give direct commands and instructions using the bare base form of the verb",
+      "misconceptionTargeted": "Learner dresses a command up like a statement, adding -s, -ing, or 'to' because Indonesian verbs never change shape and extra marking feels safer",
+      "reasoningOperation": "detect a sentence that tells the listener directly to act -> select the bare base form with no subject",
+      "stem": "The teacher walks in and says: “___ your books to page 40, everyone.”",
+      "options": [
+        "Opens",
+        "Opening",
+        "To open",
+        "Open"
+      ],
+      "correctIndex": 3,
+      "distractors": [
+        {
+          "option": "Opens",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject",
+          "whyFails": "An imperative speaks directly to 'you', so the verb never takes third-person -s; 'Opens your books' has no subject to agree with.",
+          "whyFailsId": "perintah ngomong langsung ke “you”, jadi nggak ada subjek yang butuh akhiran -s.",
+          "misconceptionId": "nambah -s seolah perintahnya harus nyocokin subjek tunggal."
+        },
+        {
+          "option": "Opening",
+          "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act",
+          "whyFails": "'Opening your books' merely names an activity; nobody has actually been told to do anything yet.",
+          "whyFailsId": "“Opening your books” cuma ngasih nama kegiatan, belum ada yang disuruh apa-apa.",
+          "misconceptionId": "bentuk -ing dipakai sendirian, jadinya cuma nyebut kegiatan."
+        },
+        {
+          "option": "To open",
+          "misconception": "using a to-infinitive where a direct command is required",
+          "whyFails": "'To open your books' announces a purpose; it does not instruct the class to act right now.",
+          "whyFailsId": "“To open” kesannya nyatain tujuan, bukan nyuruh kelas bertindak sekarang.",
+          "misconceptionId": "pakai “to” + kata kerja buat perintah langsung."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The teacher is telling the whole class to act right now, so the command starts with the bare verb: 'Open your books.'",
+        "rule": "Imperatives use the base form of the verb alone: no subject, no -s, no -ing, and no 'to' in front.",
+        "whyOthersFail": "'Opens' adds third-person -s although a command has no stated subject; 'Opening' only names an activity without telling anyone to act; 'To open' expresses a purpose rather than an instruction.",
+        "howToAvoid": "When a sentence tells someone directly to do something, start it with the bare verb and nothing else.",
+        "memoryCue": "Commands come bare: 'Open', 'Sit', 'Listen'.",
+        "ruleId": "Kalimat perintah pakai kata kerja bentuk dasar aja: tanpa subjek, tanpa -s, tanpa -ing, dan tanpa “to” di depan.",
+        "whyCorrectId": "Gurunya lagi nyuruh seisi kelas buat buka buku sekarang, jadi perintahnya mulai dari bentuk dasar: “Open your books.”",
+        "whyOthersFailId": "“Opens” nambah -s padahal perintah nggak punya subjek; “Opening” cuma nyebut kegiatan tanpa nyuruh siapa-siapa; “To open” malah nyatain tujuan, bukan instruksi.",
+        "howToAvoidId": "Kalau kalimatnya nyuruh orang ngelakuin sesuatu, mulai dari kata kerja polos tanpa embel-embel.",
+        "memoryCueId": "Perintah itu polosan: “Open”, “Sit”, “Listen”."
+      },
+      "pedagogicalObjectiveId": "Kasih perintah atau instruksi langsung pakai kata kerja bentuk dasar.",
+      "misconceptionTargetedId": "Kamu ngedandanin kalimat perintah kayak kalimat berita: ditambah -s, -ing, atau “to”, padahal perintah mulai dari bentuk dasar polos.",
+      "reasoningOperationId": "kenali kalimat yang nyuruh langsung → pilih kata kerja bentuk dasar tanpa subjek"
+    },
+    {
+      "id": "A1-019",
+      "family": "core_grammar",
+      "subskill": "adverbs_of_frequency_mid_position",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Place adverbs of frequency in mid position before the main verb while keeping subject-verb agreement intact",
+      "misconceptionTargeted": "Learner drops the adverb after the verb or between verb and object, mirroring the Indonesian order 'minum selalu', or loses the third-person -s while juggling the adverb",
+      "reasoningOperation": "locate the frequency adverb and the main verb -> place the adverb before the verb that agrees with the subject",
+      "stem": "My sister ___ tea after dinner; she never skips it.",
+      "options": [
+        "always drinks",
+        "drinks always",
+        "always drink",
+        "is always drink"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "drinks always",
+          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order",
+          "whyFails": "English rejects an adverb of frequency between the verb and its object; 'drinks always tea' mirrors 'minum selalu teh', not English order.",
+          "whyFailsId": "“drinks always tea” niru pola “minum selalu teh”, bukan urutan bahasa Inggris.",
+          "misconceptionId": "kata frekuensinya diselipin antara kata kerja dan objek, niru urutan bahasa Indonesia."
+        },
+        {
+          "option": "always drink",
+          "misconception": "leaving the bare verb with no third-person marking after a singular subject",
+          "whyFails": "The subject 'my sister' is third-person singular, so the verb must be 'drinks'; the bare form drops obligatory agreement.",
+          "whyFailsId": "subjeknya “my sister”, jadi kata kerjanya wajib “drinks” pakai -s.",
+          "misconceptionId": "kata kerja dasar dibiarin polos padahal subjeknya orang ketiga tunggal."
+        },
+        {
+          "option": "is always drink",
+          "misconception": "inserting 'is' before a main verb, blending the 'be' pattern with the present simple",
+          "whyFails": "'Is' cannot sit directly before the bare main verb 'drink'; the sentence needs one pattern, not a mix of two.",
+          "whyFailsId": "“is” nggak bisa duduk langsung di depan kata kerja dasar “drink”; polanya jadi campur aduk.",
+          "misconceptionId": "nyelipin “is” di depan kata kerja utama."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Always' sits in mid position before the main verb, and 'drinks' keeps the third-person -s: 'My sister always drinks tea.'",
+        "rule": "Adverbs of frequency (always, usually, often, never) go before the main verb, and the verb still agrees with the subject.",
+        "whyOthersFail": "'Drinks always' pushes the adverb between verb and object, an order English rejects; 'always drink' loses the third-person -s; 'is always drink' mixes 'be' with a bare main verb.",
+        "howToAvoid": "Slot the frequency word just before the main verb, then check the verb ending against the subject.",
+        "memoryCue": "Frequency first, verb second: 'She always drinks'.",
+        "ruleId": "Kata frekuensi (“always”, “usually”, “often”, “never”) duduk sebelum kata kerja utama, dan kata kerjanya tetap nyocokin subjek.",
+        "whyCorrectId": "“Always” duduk sebelum kata kerja utama, dan “drinks” tetap pakai -s buat orang ketiga tunggal: “My sister always drinks tea.”",
+        "whyOthersFailId": "“Drinks always” nyelipin kata frekuensi di antara kata kerja dan objek, urutan yang ditolak bahasa Inggris; “always drink” kehilangan -s; “is always drink” nyampur “be” sama kata kerja utama.",
+        "howToAvoidId": "Selipkan kata frekuensi pas sebelum kata kerja utama, terus cek akhiran kata kerjanya ke subjek.",
+        "memoryCueId": "Frekuensi dulu, kata kerja belakangan: “She always drinks”."
+      },
+      "pedagogicalObjectiveId": "Naruh kata keterangan frekuensi kayak “always” di posisi tengah, sebelum kata kerja utama.",
+      "misconceptionTargetedId": "Kamu naruh “always” sesudah kata kerja kayak urutan “minum selalu”, atau akhiran -s kata kerjanya malah hilang.",
+      "reasoningOperationId": "cari kata frekuensi dan kata kerja utamanya → taruh kata frekuensi sebelum kata kerja yang udah cocok sama subjek"
+    },
+    {
+      "id": "A1-020",
+      "family": "possession",
+      "subskill": "possessive_s_noun_ownership",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Mark ownership with apostrophe + s attached to the owner's name",
+      "misconceptionTargeted": "Learner shows possession by putting two nouns side by side as in 'tas Sinta', or writes a plural-looking -s without the apostrophe",
+      "reasoningOperation": "identify the owner and the thing owned -> attach 's to the owner's name and place it before the noun",
+      "stem": "Is this ___ bag? She was sitting here a minute ago.",
+      "options": [
+        "Sinta",
+        "Sinta's",
+        "Sintas",
+        "Sinta her"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "Sinta",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does",
+          "whyFails": "'Sinta bag' lines up a name and a noun with nothing to signal ownership; English needs 's on the owner.",
+          "whyFailsId": "“Sinta bag” nggak punya tanda kepemilikan apa pun; bahasa Inggris butuh apostrof + s.",
+          "misconceptionId": "dua kata benda ditempel langsung kayak bahasa Indonesia."
+        },
+        {
+          "option": "Sintas",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe",
+          "whyFails": "Without the apostrophe, 'Sintas' reads as a plural of Sinta rather than something that belongs to her.",
+          "whyFailsId": "tanpa apostrof, “Sintas” kebaca kayak bentuk jamak, bukan punya Sinta.",
+          "misconceptionId": "nulis -s polos tanpa apostrof."
+        },
+        {
+          "option": "Sinta her",
+          "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice",
+          "whyFails": "'Sinta her bag' stacks a name and a possessive word for the same owner; English marks possession only once.",
+          "whyFailsId": "“Sinta her bag” nandain pemilik dua kali buat orang yang sama.",
+          "misconceptionId": "nambahin kata ganti milik sesudah nama."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Ownership is marked on the owner's name with apostrophe + s: 'Sinta's bag' means the bag belongs to Sinta.",
+        "rule": "To say something belongs to a person, add 's to their name and put it before the thing: 'Sinta's bag'.",
+        "whyOthersFail": "'Sinta bag' lines up two nouns with no ownership marker; 'Sintas' looks like a plural because the apostrophe is missing; 'Sinta her bag' marks possession twice.",
+        "howToAvoid": "Ask who owns it, add 's to that name, and drop any extra pronoun.",
+        "memoryCue": "Owner + 's + thing: 'Sinta's bag'.",
+        "ruleId": "Buat bilang sesuatu punya seseorang, tambahin apostrof + s ke namanya dan taruh sebelum barangnya: “Sinta's bag”.",
+        "whyCorrectId": "Tanda kepemilikan nempel di nama pemiliknya: “Sinta's bag” artinya tas itu punya Sinta.",
+        "whyOthersFailId": "“Sinta bag” cuma nempelin dua kata benda tanpa tanda kepemilikan; “Sintas” kebaca jamak karena apostrofnya hilang; “Sinta her bag” nandain kepemilikan dua kali.",
+        "howToAvoidId": "Tanya siapa pemiliknya, tambahin apostrof + s ke nama itu, dan buang kata ganti tambahan.",
+        "memoryCueId": "Pemilik + apostrof s + barang: “Sinta's bag”."
+      },
+      "pedagogicalObjectiveId": "Nandain kepemilikan pakai apostrof + s yang nempel di nama pemiliknya.",
+      "misconceptionTargetedId": "Kamu nempelin dua kata benda langsung kayak “tas Sinta”, atau nulis -s tanpa apostrof.",
+      "reasoningOperationId": "tentuin siapa pemilik dan apa barangnya → tempelin apostrof + s ke nama pemilik, taruh sebelum barangnya"
+    },
+    {
+      "id": "A1-021",
+      "family": "modals",
+      "subskill": "would_like_polite_requests",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Make polite requests and orders with 'would like' plus a noun",
+      "misconceptionTargeted": "Learner answers a request situation with plain 'like' or squeezes the desire verb into -ing, because Indonesian 'mau' never changes shape",
+      "reasoningOperation": "detect a polite here-and-now request -> select 'would like' with a bare verb after 'would'",
+      "stem": "At the café counter, the barista asks what you want. You say: “I ___ a glass of orange juice, please.”",
+      "options": [
+        "like",
+        "would like",
+        "am wanting",
+        "would liking"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "like",
+          "misconception": "stating a general preference in casual flat form instead of the polite request formula",
+          "whyFails": "'I like a glass of orange juice' only reports a general taste; ordering something now takes 'would like'.",
+          "whyFailsId": "“I like a glass of orange juice” cuma cerita selera; buat mesen sekarang butuh “would like”.",
+          "misconceptionId": "selera umum ketuker sama permintaan sopan."
+        },
+        {
+          "option": "am wanting",
+          "misconception": "forcing a stative desire verb into the progressive to sound ongoing",
+          "whyFails": "'Want' is a stative verb that resists -ing in its ordinary sense, so 'am wanting' does not work for a simple order.",
+          "whyFailsId": "“want” itu kata kerja statif yang nolak -ing di makna biasanya, jadi nggak cocok buat mesen.",
+          "misconceptionId": "kata kerja keinginan dipaksa jadi bentuk -ing."
+        },
+        {
+          "option": "would liking",
+          "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns",
+          "whyFails": "After 'would', the verb must stay in its base form; 'would liking' fits no English pattern.",
+          "whyFailsId": "sesudah “would” kata kerjanya wajib bentuk dasar; “would liking” nggak ada polanya.",
+          "misconceptionId": "nempelin -ing sesudah “would”."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Ordering politely uses 'would like': 'I would like a glass of orange juice, please.'",
+        "rule": "'Would like' + noun makes a polite request for something you want now; 'like' alone only states a general preference.",
+        "whyOthersFail": "'Like' states a general preference rather than ordering; 'am wanting' forces a stative verb into -ing; 'would liking' breaks the rule that 'would' takes the base form.",
+        "howToAvoid": "When asking for something politely, reach for 'would like' and keep the verb after 'would' bare.",
+        "memoryCue": "Polite orders: 'I would like ..., please.'",
+        "ruleId": "“Would like” + kata benda dipakai buat minta sesuatu dengan sopan saat ini; “like” polos cuma nyatain selera umum.",
+        "whyCorrectId": "Mesen dengan sopan pakai “would like”: “I would like a glass of orange juice, please.”",
+        "whyOthersFailId": "“Like” cuma cerita selera umum, bukan mesen; “am wanting” maksa kata kerja statif jadi -ing; “would liking” ngelanggar aturan bentuk dasar sesudah “would”.",
+        "howToAvoidId": "Kalau minta sesuatu dengan sopan, pakai “would like” dan biarin kata kerja sesudah “would” tetap dasar.",
+        "memoryCueId": "Pesenan sopan: “I would like ..., please.”"
+      },
+      "pedagogicalObjectiveId": "Minta sesuatu dengan sopan pakai “would like” + kata benda.",
+      "misconceptionTargetedId": "Kamu jawab situasi pesen-memesan pakai “like” polos atau maksa -ing, karena “mau” di bahasa Indonesia nggak pernah berubah bentuk.",
+      "reasoningOperationId": "kenali permintaan sopan di situasi sekarang → pilih “would like” dengan kata kerja dasar sesudah “would”"
+    },
+    {
+      "id": "GI-006",
+      "family": "gerunds_infinitives",
+      "subskill": "like_love_hate_plus_gerund_preferences",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use the -ing form after the preference verbs like, love, and hate",
+      "misconceptionTargeted": "Learner chains a bare verb straight after like/love/hate or glues 'to' and -ing together, copying Indonesian verb strings like 'benci bangun'",
+      "reasoningOperation": "spot a preference verb such as like, love, or hate -> select the -ing form for the activity that follows",
+      "stem": "My brother ___ up early on Sundays, so he never sets an alarm before the weekend.",
+      "options": [
+        "hates get",
+        "hates to getting",
+        "hates getting",
+        "is hate getting"
+      ],
+      "correctIndex": 2,
+      "distractors": [
+        {
+          "option": "hates get",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does",
+          "whyFails": "'Hates get' chains two verbs with no connector, mirroring 'benci bangun'; after 'hates' the activity needs -ing.",
+          "whyFailsId": "“hates get” niru pola “benci bangun”; sesudah “hates” kegiatannya butuh -ing.",
+          "misconceptionId": "kata kerja perasaan disambung kata kerja dasar langsung."
+        },
+        {
+          "option": "hates to getting",
+          "misconception": "mixes the to-infinitive and the -ing ending into one broken shape",
+          "whyFails": "'To getting' welds two different patterns together and belongs to neither; pick 'to get' or 'getting', never both.",
+          "whyFailsId": "“to getting” ngelas dua pola beda; pilih “to get” atau “getting”, jangan dua-duanya.",
+          "misconceptionId": "“to” dan -ing dicampur jadi satu bentuk."
+        },
+        {
+          "option": "is hate getting",
+          "misconception": "inserting 'is' before the feeling verb, a hybrid of the adjective pattern and a normal verb",
+          "whyFails": "'Hate' is a full main verb, so it takes no 'is' in front; 'is hate' crosses the adjective pattern with the verb pattern.",
+          "whyFailsId": "“hate” itu kata kerja utama penuh, jadi nggak butuh “is” di depannya.",
+          "misconceptionId": "nyelipin “is” di depan kata kerja perasaan."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "After preference verbs like 'hate', the following activity takes -ing: 'hates getting up early'.",
+        "rule": "Like, love, hate, and enjoy are followed by verb + -ing when talking about activities in general.",
+        "whyOthersFail": "'Hates get' chains a bare verb straight after 'hates'; 'hates to getting' welds 'to' onto an -ing form; 'is hate getting' plants 'is' before a normal main verb.",
+        "howToAvoid": "After like, love, or hate, turn the next activity into its -ing form.",
+        "memoryCue": "Feelings feed on -ing: 'love swimming', 'hate waiting'.",
+        "ruleId": "“Like”, “love”, “hate”, dan “enjoy” diikuti kata kerja + -ing kalau ngomongin kegiatan secara umum.",
+        "whyCorrectId": "Sesudah kata kerja perasaan kayak “hates”, kegiatannya pakai -ing: “hates getting up early”.",
+        "whyOthersFailId": "“Hates get” nyambung kata kerja dasar langsung; “hates to getting” ngelas “to” ke bentuk -ing; “is hate getting” naruh “is” di depan kata kerja utama.",
+        "howToAvoidId": "Sesudah “like”, “love”, atau “hate”, ubah kegiatan berikutnya jadi bentuk -ing.",
+        "memoryCueId": "Perasaan doyan -ing: “love swimming”, “hate waiting”."
+      },
+      "pedagogicalObjectiveId": "Pakai bentuk -ing sesudah kata kerja perasaan “like”, “love”, dan “hate”.",
+      "misconceptionTargetedId": "Kamu nyambung kata kerja dasar langsung sesudah “hate” kayak “benci bangun”, atau nempelin “to” dan -ing barengan.",
+      "reasoningOperationId": "temuin kata kerja perasaan → ubah kegiatan sesudahnya jadi bentuk -ing"
+    },
+    {
+      "id": "TA-011",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_experience_ever_never",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Ask and answer about life experience with the present perfect and ever/never",
+      "misconceptionTargeted": "Learner slots a finished-past or bare form after 'have', flattening the experience question into an ordinary past story",
+      "reasoningOperation": "spot the experience frame 'Have you ever' -> select the past participle after 'have'",
+      "stem": "“Have you ever ___ to Japan?” “No, never, but I really want to go.”",
+      "options": [
+        "went",
+        "be",
+        "was",
+        "been"
+      ],
+      "correctIndex": 3,
+      "distractors": [
+        {
+          "option": "went",
+          "misconception": "using the past-simple form inside a present perfect question frame",
+          "whyFails": "'Have you ever went' pairs 'have' with a finished-past form; the frame requires the participle 'been'.",
+          "whyFailsId": "“Have you ever went” masangin “have” sama bentuk lampau selesai; kerangkanya minta “been”.",
+          "misconceptionId": "bentuk past simple dimasukin ke kerangka present perfect."
+        },
+        {
+          "option": "be",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it",
+          "whyFails": "'Have you ever be' leaves the verb unchanged; after 'have' the verb must appear as 'been'.",
+          "whyFailsId": "“Have you ever be” ninggalin kata kerjanya polos; sesudah “have” harus “been”.",
+          "misconceptionId": "kata kerja dibiarin dasar sesudah “have”."
+        },
+        {
+          "option": "was",
+          "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle",
+          "whyFails": "'Have you ever was' doubles up two finite forms; 'have' can only be followed by the participle 'been'.",
+          "whyFailsId": "“Have you ever was” numpuk dua bentuk berubah; “have” cuma bisa diikuti participle “been”.",
+          "misconceptionId": "“have” dicampur sama bentuk lampau “was”."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Have you ever' asks about life experience, and after 'have' the verb must be the past participle: 'been'.",
+        "rule": "The present perfect with 'ever' and 'never' talks about experience up to now: have/has + past participle.",
+        "whyOthersFail": "'Went' is a finished-past form that cannot follow 'have'; 'be' stays bare where a participle is needed; 'was' mixes a second finite past form into the perfect frame.",
+        "howToAvoid": "After 'have' or 'has', always reach for the third form of the verb, never the past simple.",
+        "memoryCue": "'Ever' rides with 'have been', 'have seen', 'have done'.",
+        "ruleId": "Present perfect dengan “ever” dan “never” ngomongin pengalaman sampai sekarang: “have/has” + past participle.",
+        "whyCorrectId": "“Have you ever” nanyain pengalaman hidup, dan sesudah “have” kata kerjanya wajib past participle: “been”.",
+        "whyOthersFailId": "“Went” itu bentuk lampau selesai yang nggak bisa ngikutin “have”; “be” masih polos padahal butuh participle; “was” nyelipin bentuk lampau kedua ke kerangka perfect.",
+        "howToAvoidId": "Sesudah “have” atau “has”, selalu ambil bentuk ketiga kata kerjanya, jangan past simple.",
+        "memoryCueId": "“Ever” jalannya bareng “have been”, “have seen”, “have done”."
+      },
+      "pedagogicalObjectiveId": "Nanya dan jawab soal pengalaman hidup pakai present perfect plus “ever” atau “never”.",
+      "misconceptionTargetedId": "Kamu naruh bentuk lampau selesai atau bentuk dasar sesudah “have”, jadi pertanyaan pengalamannya berubah kayak cerita lampau biasa.",
+      "reasoningOperationId": "kenali kerangka “Have you ever” → pilih past participle sesudah “have”"
+    },
+    {
+      "id": "TA-012",
+      "family": "tense_aspect",
+      "subskill": "present_perfect_with_for_since_duration",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Describe unfinished states with the present perfect plus for and since",
+      "misconceptionTargeted": "Learner reads a since-phrase as a plain present habit or as a closed past chapter, missing that the state runs from a past start point up to now",
+      "reasoningOperation": "find a since/for duration that is still true now -> select have/has + past participle",
+      "stem": "We ___ in this flat since 2019, and we still love it here.",
+      "options": [
+        "live",
+        "are living",
+        "have lived",
+        "lived"
+      ],
+      "correctIndex": 2,
+      "distractors": [
+        {
+          "option": "live",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past",
+          "whyFails": "'We live in this flat since 2019' treats the sentence as a bare habit; 'since 2019' demands a form that links past to present.",
+          "whyFailsId": "“We live in this flat since 2019” anggep kalimatnya kebiasaan doang; “since 2019” minta bentuk penyambung masa lalu ke sekarang.",
+          "misconceptionId": "present polos dipakai kayak kebiasaan, durasi dari dulunya keabaikan."
+        },
+        {
+          "option": "are living",
+          "misconception": "choosing the present progressive for right now, though the span from 2019 needs a past-to-present link",
+          "whyFails": "'Are living' only covers the current moment and cannot pair with 'since 2019', which reaches back into the past.",
+          "whyFailsId": "“are living” cuma nutup momen sekarang dan nggak bisa gandeng “since 2019” yang nunjuk ke belakang.",
+          "misconceptionId": "bentuk lagi-berlangsung dipilih buat rentang yang narik dari 2019."
+        },
+        {
+          "option": "lived",
+          "misconception": "sealing the period off as a completed event, though the family still lives there",
+          "whyFails": "'Lived' closes the stay as finished, but 'we still love it here' says the family has not moved out.",
+          "whyFailsId": "“lived” bikin tinggalnya kesan udahan, padahal “we still love it here” bilang mereka belum pindah.",
+          "misconceptionId": "periodenya ditutup seolah udah kelar."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Since 2019' plus 'we still love it' means the stay started in the past and continues, so 'have lived' fits.",
+        "rule": "For a state that began in the past and is still true, use the present perfect with 'for' (length of time) or 'since' (starting point).",
+        "whyOthersFail": "'Live' reports a bare habit and ignores the running duration; 'are living' cannot pair with 'since 2019'; 'lived' closes the stay as finished although the family is still there.",
+        "howToAvoid": "See 'since' or 'for' with something still true? Link past to present with have/has + participle.",
+        "memoryCue": "'Since 2019' pulls the verb into 'have lived'.",
+        "ruleId": "Buat keadaan yang mulai di masa lalu dan masih bener, pakai present perfect dengan “for” (lama waktu) atau “since” (titik mulai).",
+        "whyCorrectId": "“Since 2019” plus “we still love it” artinya tinggalnya mulai dulu dan masih lanjut, jadi “have lived” yang pas.",
+        "whyOthersFailId": "“Live” cuma laporan kebiasaan dan ngabaikan durasi yang lagi jalan; “are living” nggak bisa gandeng “since 2019”; “lived” nutup masa tinggalnya padahal keluarganya masih di situ.",
+        "howToAvoidId": "Lihat “since” atau “for” dengan sesuatu yang masih bener? Sambungin masa lalu ke sekarang pakai “have/has” + participle.",
+        "memoryCueId": "“Since 2019” narik kata kerjanya jadi “have lived”."
+      },
+      "pedagogicalObjectiveId": "Ceritain keadaan yang belum kelar pakai present perfect plus “for” dan “since”.",
+      "misconceptionTargetedId": "Kamu baca frasa “since” kayak kebiasaan sekarang atau bab masa lalu yang udah ketutup, padahal keadaannya jalan dari dulu sampai sekarang.",
+      "reasoningOperationId": "temuin durasi “since/for” yang masih bener sekarang → pilih “have/has” + past participle"
+    },
+    {
+      "id": "CO-008",
+      "family": "conditionals",
+      "subskill": "wish_unreal_present_past_simple",
+      "cefr": "B1",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Express wishes about the unreal present with wish + past simple",
+      "misconceptionTargeted": "Learner keeps the real-present tense after 'wish' or borrows 'would' and the past perfect from other unreal patterns",
+      "reasoningOperation": "identify a wish about the present situation -> shift the verb one step back to the past simple",
+      "stem": "I wish I ___ closer to the office; the commute eats two hours of my day.",
+      "options": [
+        "would live",
+        "lived",
+        "live",
+        "had lived"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "live",
+          "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact",
+          "whyFails": "'I wish I live closer' keeps the verb in the real present, so the sentence loses its unreal, wishful meaning.",
+          "whyFailsId": "“I wish I live closer” tetep di bentuk nyata, makna pengandaiannya hilang.",
+          "misconceptionId": "bentuk sekarang dipertahanin sesudah “wish”."
+        },
+        {
+          "option": "would live",
+          "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause",
+          "whyFails": "'Would' after 'wish' is reserved for other people's irritating behaviour or for result clauses; for your own state, use the past simple.",
+          "whyFailsId": "“would” sesudah “wish” jatahnya keluhan soal orang lain atau klausa hasil; buat keadaan sendiri pakai past simple.",
+          "misconceptionId": "“would” diselipin buat keadaan diri sendiri."
+        },
+        {
+          "option": "had lived",
+          "misconception": "reaching two steps back with the past perfect, aiming the wish at a finished past moment",
+          "whyFails": "'Had lived' points the regret at a past that is over, but this wish is about the speaker's present commute.",
+          "whyFailsId": "“had lived” ngarahin penyesalan ke masa lalu, padahal keluhannya soal perjalanan tiap hari yang sekarang.",
+          "misconceptionId": "past perfect dipakai padahal harapannya soal sekarang."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "A wish about the present uses the past simple to mark unreality: 'I wish I lived closer.'",
+        "rule": "Wish/if only + past simple expresses a present situation you would like to be different.",
+        "whyOthersFail": "'Live' keeps the real present and kills the unreal meaning; 'would live' belongs in result clauses or complaints about others; 'had lived' pushes the regret into the finished past.",
+        "howToAvoid": "Wishing about now? Move the verb one step back, so the present becomes past simple.",
+        "memoryCue": "Wish about now = one step back: 'wish I lived'.",
+        "ruleId": "“Wish/if only” + past simple nyatain keadaan sekarang yang pengin kamu ubah.",
+        "whyCorrectId": "Harapan soal sekarang pakai past simple buat nandain ketidaknyataan: “I wish I lived closer.”",
+        "whyOthersFailId": "“Live” ngejaga bentuk sekarang dan ngilangin makna pengandaian; “would live” jatahnya klausa hasil atau keluhan soal orang lain; “had lived” ndorong penyesalannya ke masa lalu yang udah kelar.",
+        "howToAvoidId": "Berharap soal sekarang? Mundurin kata kerjanya satu langkah: bentuk sekarang jadi past simple.",
+        "memoryCueId": "Harapan soal sekarang = mundur satu langkah: “wish I lived”."
+      },
+      "pedagogicalObjectiveId": "Nyatain harapan soal keadaan sekarang yang nggak nyata pakai “wish” + past simple.",
+      "misconceptionTargetedId": "Kamu ngejaga bentuk sekarang sesudah “wish”, atau minjem “would” dan past perfect dari pola pengandaian lain.",
+      "reasoningOperationId": "kenali harapan soal situasi sekarang → mundurin kata kerjanya satu langkah ke past simple"
+    },
+    {
+      "id": "CO-009",
+      "family": "conditionals",
+      "subskill": "if_only_past_regret_past_perfect",
+      "cefr": "B2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Voice regret about the finished past with if only + past perfect",
+      "misconceptionTargeted": "Learner stops at the past simple or drags 'would have' into the wish clause when regretting a completed past action",
+      "reasoningOperation": "identify regret about a completed past event -> select the past perfect inside the wish clause",
+      "stem": "If only I ___ the contract more carefully before signing it last year.",
+      "options": [
+        "read",
+        "would have read",
+        "have read",
+        "had read"
+      ],
+      "correctIndex": 3,
+      "distractors": [
+        {
+          "option": "read",
+          "misconception": "staying with the past simple, which cannot mark the unreal past that regret needs",
+          "whyFails": "With 'last year' anchoring the event, plain 'read' reports rather than regrets; the unreal past needs 'had read'.",
+          "whyFailsId": "“last year” udah ngunci kejadiannya; “read” polos jadi laporan, bukan penyesalan.",
+          "misconceptionId": "past simple dipertahanin buat penyesalan lampau."
+        },
+        {
+          "option": "would have read",
+          "misconception": "moving the 'would have' shape of the result clause into the wish clause itself",
+          "whyFails": "'Would have read' expresses an imagined result; inside the 'if only' clause itself the verb must be 'had read'.",
+          "whyFailsId": "“would have read” nyatain hasil khayalan; di dalam klausa “if only” kata kerjanya harus “had read”.",
+          "misconceptionId": "bentuk klausa hasil dipindah ke klausa harapan."
+        },
+        {
+          "option": "have read",
+          "misconception": "choosing the present perfect, which ties the missed reading to the present moment",
+          "whyFails": "'Have read' connects the action to now, but the signing closed that chapter last year; the regret looks further back.",
+          "whyFailsId": "“have read” nyambungin kejadiannya ke sekarang, padahal babnya ketutup tahun lalu.",
+          "misconceptionId": "present perfect dipilih buat kejadian yang udah ketutup."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Regret about a finished past action takes the past perfect: 'If only I had read the contract.'",
+        "rule": "Wish/if only + past perfect looks back at a past event you cannot change anymore.",
+        "whyOthersFail": "'Read' stays one step short and reads like a plain past report; 'would have read' belongs in the result clause of a third conditional; 'have read' ties the action to the present.",
+        "howToAvoid": "Regretting something already over? Go two steps back: past perfect after 'if only'.",
+        "memoryCue": "Past regret = 'if only I had ...'.",
+        "ruleId": "“Wish/if only” + past perfect nengok ke kejadian lampau yang udah nggak bisa diubah.",
+        "whyCorrectId": "Penyesalan soal kejadian lampau yang selesai pakai past perfect: “If only I had read the contract.”",
+        "whyOthersFailId": "“Read” kurang satu langkah dan kebaca kayak laporan lampau biasa; “would have read” jatahnya klausa hasil di pengandaian tipe tiga; “have read” ngiket kejadiannya ke sekarang.",
+        "howToAvoidId": "Nyeselin sesuatu yang udah lewat? Mundur dua langkah: past perfect sesudah “if only”.",
+        "memoryCueId": "Penyesalan lampau = “if only I had ...”."
+      },
+      "pedagogicalObjectiveId": "Nyatain penyesalan soal masa lalu yang udah kelar pakai “if only” + past perfect.",
+      "misconceptionTargetedId": "Kamu berhenti di past simple atau narik “would have” ke dalam klausa harapan pas nyeselin kejadian lampau.",
+      "reasoningOperationId": "kenali penyesalan soal kejadian lampau yang selesai → pilih past perfect di dalam klausa harapannya"
+    },
+    {
+      "id": "TA-013",
+      "family": "tense_aspect",
+      "subskill": "future_perfect_epistemic_past_assumption",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use the future perfect epistemically for confident assumptions about what has already happened",
+      "misconceptionTargeted": "Learner treats 'will' as pure futurity, so an assumption about an already-completed event gets recast as a prediction still to come",
+      "reasoningOperation": "detect 'by now' anchoring an assumed completed event -> select will have + past participle for the epistemic reading",
+      "stem": "You ___ the news by now — the memo about the merger went to every department on Monday morning.",
+      "options": [
+        "will hear",
+        "are hearing",
+        "will have heard",
+        "will be hearing"
+      ],
+      "correctIndex": 2,
+      "distractors": [
+        {
+          "option": "will hear",
+          "misconception": "reading 'by now' as a point still ahead and choosing a plain prediction about the future",
+          "whyFails": "The memo circulated days ago, so 'by now' demands an inference about a done deal, not a forecast of a coming event.",
+          "whyFailsId": "memonya udah nyebar dari Senin; “by now” minta simpulan soal hal yang udah beres, bukan ramalan.",
+          "misconceptionId": "“by now” dibaca kayak titik yang masih di depan."
+        },
+        {
+          "option": "are hearing",
+          "misconception": "forcing the verb into the present progressive although 'by now' asks for an accumulated result",
+          "whyFails": "'Are hearing the news by now' paints an unfolding scene, but the anchor 'by now' measures what has already accumulated.",
+          "whyFailsId": "“are hearing the news by now” ngelukisin adegan berjalan, padahal “by now” ngukur hasil yang udah kekumpul.",
+          "misconceptionId": "bentuk lagi-berlangsung dipaksa buat hasil yang udah numpuk."
+        },
+        {
+          "option": "will be hearing",
+          "misconception": "picking the future continuous for an event the timeline treats as already delivered",
+          "whyFails": "'Will be hearing' projects the event forward as an activity, clashing with a timeline on which the news already landed.",
+          "whyFailsId": "“will be hearing” ndorong kejadiannya jadi aktivitas ke depan, tabrakan sama garis waktu yang udah nganter kabarnya.",
+          "misconceptionId": "future continuous dipilih buat kejadian yang udah lewat."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'By now' anchors the assumption to the present: 'will have heard' confidently asserts that the hearing has already taken place.",
+        "rule": "Will have + past participle can express a confident assumption that something is already complete, especially with anchors like 'by now'.",
+        "whyOthersFail": "'Will hear' points at a future event although the memo already circulated; 'are hearing' casts it as an ongoing scene; 'will be hearing' stretches it into future activity, clashing with 'by now'.",
+        "howToAvoid": "When 'will' meets an anchor like 'by now', test whether the sentence is inferring a completed fact rather than forecasting one.",
+        "memoryCue": "'You'll have heard by now' = I'm sure it already reached you.",
+        "ruleId": "“Will have” + past participle bisa nyatain dugaan yakin kalau sesuatu udah selesai, apalagi ada penanda kayak “by now”.",
+        "whyCorrectId": "“By now” ngiket dugaannya ke saat ini: “will have heard” yakin banget kabar itu udah sampai.",
+        "whyOthersFailId": "“Will hear” nunjuk kejadian masa depan padahal memonya udah nyebar; “are hearing” bikin adegannya kayak lagi berlangsung; “will be hearing” malah manjangin kejadiannya ke depan, tabrakan sama “by now”.",
+        "howToAvoidId": "Pas “will” ketemu penanda kayak “by now”, cek dulu: ini nebak fakta yang udah selesai, atau ngeramal?",
+        "memoryCueId": "“You'll have heard by now” = aku yakin kabarnya udah sampai."
+      },
+      "pedagogicalObjectiveId": "Pakai future perfect buat dugaan yakin soal sesuatu yang mestinya udah kejadian.",
+      "misconceptionTargetedId": "Kamu anggep “will” murni soal masa depan, jadi dugaan soal kejadian yang udah selesai malah kebaca kayak ramalan yang belum terjadi.",
+      "reasoningOperationId": "deteksi “by now” yang nunjuk kejadian yang diduga udah selesai → pilih “will have” + past participle"
+    },
+    {
+      "id": "PA-007",
+      "family": "passive",
+      "subskill": "perfect_passive_infinitive_anteriority_reported_events",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Mark anteriority in passive reporting structures with the perfect passive infinitive",
+      "misconceptionTargeted": "Learner reports an earlier event with a present or active infinitive, losing both the time gap and the victim role of the subject",
+      "reasoningOperation": "check whether the reported event precedes the report and whether the subject receives the action -> select to have been + past participle",
+      "stem": "The painting is believed ___ from the gallery during the postwar chaos, decades before it resurfaced in Vienna.",
+      "options": [
+        "to be stolen",
+        "to have stolen",
+        "to have been stolen",
+        "having been stolen"
+      ],
+      "correctIndex": 2,
+      "distractors": [
+        {
+          "option": "to be stolen",
+          "misconception": "using the simple passive shape, hiding that the theft was a prior event seen from the report",
+          "whyFails": "'To be stolen' makes the theft simultaneous with today's belief, but the sentence dates it decades earlier.",
+          "whyFailsId": "“to be stolen” bikin pencuriannya sezaman sama keyakinan hari ini, padahal kalimatnya naruh kejadiannya puluhan tahun lebih awal.",
+          "misconceptionId": "bentuk pasif sekarang dipakai buat kejadian lampau."
+        },
+        {
+          "option": "to have stolen",
+          "misconception": "choosing the active infinitive, which would make the painting the one who stole",
+          "whyFails": "'To have stolen' casts the painting as the thief; the painting underwent the theft, so the infinitive must be passive.",
+          "whyFailsId": "“to have stolen” bikin lukisannya jadi si pencuri; lukisannya kena pencurian, jadi bentuknya harus pasif.",
+          "misconceptionId": "bentuk aktif dipilih, subjeknya jadi pelaku."
+        },
+        {
+          "option": "having been stolen",
+          "misconception": "attaching a gerund where the reporting verb 'believe' takes the to-infinitive pattern",
+          "whyFails": "'Is believed having been stolen' breaks the complementation of 'believe', which requires a to-infinitive after the passive report.",
+          "whyFailsId": "“is believed having been stolen” ngerusak pola “believe” yang sesudah laporan pasif minta to-infinitive.",
+          "misconceptionId": "gerund ditempel padahal polanya minta to-infinitive."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The theft happened decades before today's belief, and the painting was its target, so the perfect passive infinitive 'to have been stolen' carries both signals.",
+        "rule": "After reporting verbs like 'is believed/said/thought', use 'to have been + past participle' for an earlier event that happened to the subject.",
+        "whyOthersFail": "'To be stolen' erases the time gap between theft and report; 'to have stolen' makes the painting the thief; 'having been stolen' swaps in a gerund where 'believe' takes a to-infinitive.",
+        "howToAvoid": "Ask two questions: did it happen earlier, and did it happen to the subject? Yes and yes means 'to have been done'.",
+        "memoryCue": "Earlier + passive = 'to have been stolen'.",
+        "ruleId": "Sesudah kata pelaporan kayak “is believed/said/thought”, pakai “to have been” + past participle buat kejadian lebih awal yang menimpa subjeknya.",
+        "whyCorrectId": "Pencuriannya kejadian puluhan tahun sebelum keyakinan hari ini, dan lukisannya jadi sasarannya, jadi “to have been stolen” bawa dua sinyal itu sekaligus.",
+        "whyOthersFailId": "“To be stolen” ngehapus jarak waktu antara pencurian dan laporan; “to have stolen” bikin lukisannya jadi pencurinya; “having been stolen” nuker pola “believe” yang minta to-infinitive.",
+        "howToAvoidId": "Tanya dua hal: kejadiannya lebih dulu? subjeknya yang kena? Dua-duanya iya berarti “to have been done”.",
+        "memoryCueId": "Lebih dulu + pasif = “to have been stolen”."
+      },
+      "pedagogicalObjectiveId": "Nandain kejadian yang lebih dulu di struktur pelaporan pasif pakai perfect passive infinitive.",
+      "misconceptionTargetedId": "Kamu laporin kejadian yang lebih dulu pakai bentuk sekarang atau bentuk aktif, jadi jarak waktunya dan peran korbannya sama-sama hilang.",
+      "reasoningOperationId": "cek apakah kejadiannya lebih dulu dari laporannya dan apakah subjeknya kena tindakan → pilih “to have been” + past participle"
+    },
+    {
+      "id": "RS-007",
+      "family": "reported_speech",
+      "subskill": "mandative_subjunctive_after_demand_insist",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Keep the base-form subjunctive in that-clauses after demand, insist, and similar verbs",
+      "misconceptionTargeted": "Learner runs normal agreement or backshift inside the that-clause, because Indonesian complement clauses never change the verb's shape",
+      "reasoningOperation": "spot a demand or insist verb introducing a that-clause -> keep the embedded verb in the bare base form",
+      "stem": "The board formally demanded that the director ___ before the audit results were made public.",
+      "options": [
+        "resign",
+        "resigned",
+        "resigns",
+        "would resign"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "resigns",
+          "misconception": "applying ordinary subject-verb agreement with a singular subject inside the demand clause",
+          "whyFails": "The mandative clause suspends ordinary agreement, so 'the director resigns' is exactly the pattern 'demanded that' blocks.",
+          "whyFailsId": "klausa tuntutan nangguhin kesesuaian biasa; “the director resigns” justru pola yang diblokir “demanded that”.",
+          "misconceptionId": "kesesuaian subjek biasa dipaksain di klausa tuntutan."
+        },
+        {
+          "option": "resigned",
+          "misconception": "backshifting the verb as ordinary reported speech instead of keeping the base subjunctive",
+          "whyFails": "Backshift suits neutral reports; a demand freezes its embedded verb in the base form regardless of the past reporting verb.",
+          "whyFailsId": "mundurin kata kerja cocoknya buat laporan netral; tuntutan ngunci bentuk dasar walau kata pelaporannya lampau.",
+          "misconceptionId": "kata kerjanya dimundurin kayak laporan netral."
+        },
+        {
+          "option": "would resign",
+          "misconception": "softening the demand with a conditional 'would', as if the clause reported a hypothetical",
+          "whyFails": "'Would resign' turns the demand into a mused possibility; the board issued an instruction, not a speculation.",
+          "whyFailsId": "“would resign” ngubah tuntutannya jadi angan-angan; dewannya ngasih perintah, bukan spekulasi.",
+          "misconceptionId": "tuntutan dilembutin pakai “would”."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "After 'demanded that', the embedded verb stays in the bare subjunctive regardless of subject or time: 'that the director resign'.",
+        "rule": "Verbs of demand and proposal (demand, insist, suggest, require) take a that-clause with the base form: 'demand that she resign'.",
+        "whyOthersFail": "'Resigns' applies ordinary third-person agreement that the mandative clause suspends; 'resigned' backshifts like neutral reported speech; 'would resign' softens the demand into a hypothetical.",
+        "howToAvoid": "After demand/insist/suggest + that, freeze the verb in its dictionary form, whatever the subject and tense around it.",
+        "memoryCue": "Demands strip the verb bare: 'demand that he resign'.",
+        "ruleId": "Kata kerja tuntutan dan usulan (“demand”, “insist”, “suggest”, “require”) bawa klausa “that” dengan bentuk dasar: “demand that she resign”.",
+        "whyCorrectId": "Sesudah “demanded that”, kata kerja di dalamnya tetap subjunctive dasar apa pun subjek dan waktunya: “that the director resign”.",
+        "whyOthersFailId": "“Resigns” nerapin kesesuaian orang ketiga yang justru ditangguhkan klausa tuntutan; “resigned” mundur kayak laporan netral; “would resign” ngelembutin tuntutannya jadi kemungkinan.",
+        "howToAvoidId": "Sesudah “demand/insist/suggest” + “that”, bekuin kata kerjanya di bentuk kamus, apa pun subjek dan waktu di sekitarnya.",
+        "memoryCueId": "Tuntutan nelanjangin kata kerja: “demand that he resign”."
+      },
+      "pedagogicalObjectiveId": "Ngejaga subjunctive bentuk dasar di klausa “that” sesudah “demand”, “insist”, dan kawan-kawannya.",
+      "misconceptionTargetedId": "Kamu nerapin kesesuaian subjek biasa atau mundurin kata kerjanya kayak laporan biasa, karena klausa pelengkap di bahasa Indonesia nggak pernah ngubah bentuk kata kerja.",
+      "reasoningOperationId": "temuin kata tuntutan yang buka klausa “that” → kunci kata kerja di dalamnya di bentuk dasar"
+    },
+    {
+      "id": "RC-005",
+      "family": "relative_clauses",
+      "subskill": "sentential_which_whole_clause_antecedent",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use sentential 'which' after a comma to comment on a whole preceding clause",
+      "misconceptionTargeted": "Learner reaches for 'what', 'that', or a fresh pronoun to refer back to a whole clause, mapping Indonesian 'yang' onto the wrong English word",
+      "reasoningOperation": "check what the relative points back to, a noun or the whole previous clause -> after a comma, select 'which' for a clause antecedent",
+      "stem": "The shipment arrived nine days late, ___ forced the plant to halt its assembly line.",
+      "options": [
+        "what",
+        "which",
+        "that",
+        "it"
+      ],
+      "correctIndex": 1,
+      "distractors": [
+        {
+          "option": "what",
+          "misconception": "using 'what' as a relative pronoun, though it cannot point back to an antecedent",
+          "whyFails": "'What' packages its own meaning ('the thing that') and cannot look back at the clause before the comma.",
+          "whyFailsId": "“what” bawa maknanya sendiri, artinya “the thing that”, dan nggak bisa nengok ke belakang.",
+          "misconceptionId": "“what” dipakai buat nunjuk balik ke klausa sebelumnya."
+        },
+        {
+          "option": "that",
+          "misconception": "using 'that' to add extra detail after a comma, though it only opens essential clauses",
+          "whyFails": "After a comma, a commenting clause refuses 'that'; only 'which' can carry a non-restrictive comment.",
+          "whyFailsId": "sesudah koma, klausa komentar nolak “that”; cuma “which” yang boleh bawa komentar nonrestriktif.",
+          "misconceptionId": "“that” dipakai sesudah koma buat komentar tambahan."
+        },
+        {
+          "option": "it",
+          "misconception": "starting a fresh pronoun clause and splicing two sentences together in a non-standard join",
+          "whyFails": "'It forced the plant...' begins a second independent sentence, leaving two full clauses fused by a bare comma.",
+          "whyFailsId": "“It forced the plant...” mulai kalimat merdeka kedua, jadi dua klausa utuh cuma dilem koma.",
+          "misconceptionId": "kata ganti baru dipakai, dua kalimat ketempel koma."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "The delay itself, the whole first clause, is what forced the halt, and only 'which' can pick up a full clause after a comma.",
+        "rule": "Sentential relative clauses use ', which' to comment on the entire preceding statement, not just a noun.",
+        "whyOthersFail": "'What' cannot look back at an antecedent; 'that' never follows a comma in a non-restrictive clause; 'it' starts a second independent sentence and leaves a comma splice.",
+        "howToAvoid": "If the comment is about the whole previous statement, put a comma and 'which'; nothing else fits that slot.",
+        "memoryCue": "Comment on the whole thing? Comma + which.",
+        "ruleId": "Klausa relatif sentensial pakai “, which” buat komentarin seluruh pernyataan sebelumnya, bukan cuma satu kata benda.",
+        "whyCorrectId": "Yang maksa pabrik berhenti itu keterlambatannya, alias seluruh klausa pertama, dan cuma “which” yang bisa mungut klausa utuh sesudah koma.",
+        "whyOthersFailId": "“What” nggak bisa nengok ke anteseden; “that” nggak pernah ngikutin koma di klausa komentar; “it” malah buka kalimat kedua dan ninggalin dua kalimat ketempel koma.",
+        "howToAvoidId": "Kalau komentarnya soal seluruh pernyataan sebelumnya, taruh koma plus “which”; nggak ada kata lain yang muat di slot itu.",
+        "memoryCueId": "Komentarin semuanya? Koma + “which”."
+      },
+      "pedagogicalObjectiveId": "Pakai “which” sesudah koma buat komentarin satu klausa utuh sebelumnya.",
+      "misconceptionTargetedId": "Kamu ngambil “what”, “that”, atau kata ganti baru buat nunjuk balik ke klausa utuh, karena semuanya kerasa kayak “yang”.",
+      "reasoningOperationId": "cek yang ditunjuk balik itu kata benda atau klausa utuh → sesudah koma, pilih “which” buat anteseden klausa"
+    },
+    {
+      "id": "AR-006",
+      "family": "articles_determiners",
+      "subskill": "generic_the_species_class_predicates",
+      "cefr": "C2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Use generic 'the' with a singular noun for statements about a species or class as a whole",
+      "misconceptionTargeted": "Learner picks an article or determiner that quantifies individual animals, although extinction is a property of the class itself",
+      "reasoningOperation": "test whether the predicate applies to individuals or to the class as one unit -> select generic 'the' for class-level statements",
+      "stem": "___ Sumatran tiger is now on the brink of extinction, with fewer than four hundred individuals left in the wild.",
+      "options": [
+        "A",
+        "Every",
+        "The",
+        "Any"
+      ],
+      "correctIndex": 2,
+      "distractors": [
+        {
+          "option": "A",
+          "misconception": "using the indefinite article for a claim about the whole species, which only fits one-member-at-a-time statements",
+          "whyFails": "'A Sumatran tiger' introduces one unspecified animal, but no single animal can be 'on the brink of extinction'; only the species can.",
+          "whyFailsId": "“A Sumatran tiger” ngenalin satu ekor nggak jelas, padahal satu ekor nggak bisa dibilang nyaris punah.",
+          "misconceptionId": "artikel tak tentu dipakai buat klaim soal spesies utuh."
+        },
+        {
+          "option": "Every",
+          "misconception": "spreading the claim over each countable member, though dying out can only be true of the class",
+          "whyFails": "'Every Sumatran tiger' distributes the predicate to each animal one by one, yet extinction cannot be true of individuals.",
+          "whyFailsId": "“Every Sumatran tiger” bagi-bagi predikatnya per ekor, padahal kepunahan cuma bener buat kelasnya.",
+          "misconceptionId": "klaimnya disebar ke tiap ekor satu-satu."
+        },
+        {
+          "option": "Any",
+          "misconception": "picking the free-choice quantifier, which selects random members rather than naming the species",
+          "whyFails": "'Any Sumatran tiger' invites you to pick an arbitrary animal, while the sentence makes a claim about the species as a unit.",
+          "whyFailsId": "“Any Sumatran tiger” nyuruh milih ekor sembarang, padahal kalimatnya ngeklaim spesiesnya sebagai unit.",
+          "misconceptionId": "kata pemilih bebas dipakai, anggotanya jadi acak."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "Being on the brink of extinction is true of the species as a single unit, and generic 'the' + singular noun names exactly that class.",
+        "rule": "'The' + singular countable noun can denote a whole species or class, and is required when the predicate (die out, be extinct, evolve) holds only at class level.",
+        "whyOthersFail": "'A' fits one-member-at-a-time properties, not class-level facts; 'Every' distributes the claim over each animal, which extinction cannot do; 'Any' picks random members instead of naming the species.",
+        "howToAvoid": "Ask whether one single animal could make the sentence true; if only the whole class can, reach for generic 'the'.",
+        "memoryCue": "Species talk wears 'the': 'The tiger is endangered.'",
+        "ruleId": "“The” + kata benda tunggal bisa nunjuk satu spesies utuh, dan wajib dipakai kalau predikatnya (punah, berevolusi) cuma bener di level kelas.",
+        "whyCorrectId": "Nyaris punah itu bener buat spesiesnya sebagai satu unit, dan “the” generik + kata benda tunggal persis namain kelas itu.",
+        "whyOthersFailId": "“A” cocoknya buat sifat satu-ekor-satu-waktu, bukan fakta level kelas; “Every” nyebarin klaim ke tiap ekor, padahal kepunahan nggak bisa gitu; “Any” mungut anggota acak, bukan namain spesiesnya.",
+        "howToAvoidId": "Tanya: satu ekor doang bisa bikin kalimatnya bener nggak? Kalau cuma kelas utuh yang bisa, ambil “the” generik.",
+        "memoryCueId": "Ngomongin spesies pakai “the”: “The tiger is endangered.”"
+      },
+      "pedagogicalObjectiveId": "Pakai “the” generik dengan kata benda tunggal buat pernyataan soal spesies atau kelas secara utuh.",
+      "misconceptionTargetedId": "Kamu milih artikel atau penentu yang ngitung ekor per ekor, padahal kepunahan itu sifat kelasnya sendiri.",
+      "reasoningOperationId": "uji predikatnya berlaku buat individu atau buat kelas sebagai satu unit → pilih “the” generik buat pernyataan level kelas"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 139,
-    "total": 139,
-    "updatedAt": "2026-08-24"
+    "translated": 153,
+    "total": 153,
+    "updatedAt": "2026-08-27"
   }
 }
