@@ -311,10 +311,12 @@ check('b6 pengajuan yang menganggur tidak berbunyi belakangan setelah penghenti'
 // =======================================================================================
 
 const narrate = block(LIB, /async function narrate\(\)/);
+const dispatchSource = block(LIB, /function dispatchBlock\(block, token\)/);
 check('c1 narasi Library mengirim teks blok utuh dalam SATU say()',
-  /speak\(\{ en: block\.text, id: block\.translation \}\)/.test(narrate) &&
+  /speak\(\{ en: block\.text, id: block\.translation \}\)/.test(dispatchSource) &&
+  /dispatchBlock\(block, token\)/.test(narrate) &&
   !/session\.current\(\)/.test(narrate),
-  'narrate harus mengirim block.text, bukan session.current() per kalimat');
+  'satu-satunya jalan teks blok ke say() adalah dispatchBlock(block, token)');
 check('c2 narasi Library memakai planUtterance untuk teks utuh',
   /planUtterance\(text\)/.test(block(LIB, /function planBlock\(/)) && /planBlock\(block\.text\)/.test(narrate),
   'planBlock harus memanggil FiezelProsody.planUtterance dan dipakai di narrate');
@@ -327,9 +329,12 @@ const blockAtSource = block(LIB, /function blockAt\(startIndex, budget\)/);
 const scheduleSource = block(LIB, /function scheduleBlockHighlight\(block, plan, token\)/);
 const constants = LIB.match(/var BLOCK_MAX_CHARS = \d+;/)[0] +
   LIB.match(/var LEAD_BLOCK_CHARS = \d+;/)[0] +
-  LIB.match(/var RAMP_COVER_FACTOR = [\d.]+;/)[0] +
+  LIB.match(/var GEN_S_PER_CHAR = [\d.]+;/)[0] +
+  LIB.match(/var SPEAK_S_PER_CHAR = [\d.]+;/)[0] +
+  LIB.match(/var BOUNDARY_SLACK_S = [\d.]+;/)[0] +
   LIB.match(/var RAMP_SETTLED_CHARS = \d+;/)[0] +
   block(LIB, /function nextBlockBudget\(previousChars\)/) +
+  block(LIB, /function blockCoverMs\(previousChars\)/) +
   LIB.match(/var NARRATION_CHARS_PER_SECOND = [\d.]+;/)[0] +
   LIB.match(/var BOUNDARY_GAP_S = \{[^}]+\};/)[0];
 
@@ -395,17 +400,88 @@ check('c8 blok pembuka kecil, jadi suara pertama tidak menunggu generasi panjang
   `LEAD_BLOCK_CHARS=${sandbox.LEAD_BLOCK_CHARS} blok pembuka=${leadBlock.text.length} char`);
 
 /**
- * Tangga anggaran harus TETAP di bawah batas penutup terukur: sebuah blok hanya boleh
- * tumbuh sampai ~1,15x panjang blok sebelumnya, karena itulah rasio antara laju bicara
- * (0,065 s/char) dan laju generasi (0,056 s/char) yang diukur di
- * reports/voice-v6-data/. Tangga yang melampaui rasio ini terukur membayar 7.351 ms di
- * batas pertama - itu bukan hipotesis, itu hasil percobaan yang ditolak.
+ * V7: anggaran tidak boleh MENJANJIKAN generasi lebih panjang daripada tutupan terukur
+ * ditambah kelonggaran yang DIDEKLARASIKAN. Bentuk lamanya (`next <= max(80, prev*1,15)`)
+ * lulus untuk tangga V6 yang justru sedang bocor: lantai 80 char-nya membuat anggaran
+ * sesudah blok 35 char berjanji 80 char padahal tutupannya cuma 40 - dan itulah batas yang
+ * terukur 2.453,2 ms di reports/voice-v7-data/block-measurements-v7.json. Jadi penjaganya
+ * sekarang membandingkan anggaran dengan TUTUPAN, bukan dengan pengali.
+ *
+ * Kelonggaran diizinkan tapi dibatasi di DUA tempat, karena satu angka saja bisa dipermainkan:
+ *   - kelonggaran yang DIDEKLARASIKAN di dalam rumus (BOUNDARY_SLACK_S) maksimal 800 ms, dan
+ *     angka 800 itu sendiri berasal dari ukuran: satu batas blok yang dihilangkan menghemat
+ *     ~530 ms senyap penjadwalan plus senyap tepi satu render (~250-535 ms per sisi);
+ *   - utang yang BENAR-BENAR terjadi pada buku nyata (termasuk utang dari kalimat tunggal yang
+ *     lebih panjang daripada anggaran) maksimal 1.000 ms per batas.
+ * Yang mengikat adalah lubang TERBESAR, bukan totalnya. Sebab totalnya bisa turun sambil
+ * lubang tunggal 2,4 detik tetap ada, dan lubang tunggal itulah yang didengar murid. Pada
+ * seluruh "The Three Little Pigs" (32 kalimat): aturan V6 lubang terbesar 2.206 ms / total
+ * 4.356 ms; aturan yang terkirim sekarang lubang terbesar 852 ms / total 3.813 ms. Totalnya
+ * cuma turun 12,5% dan itu memang diakui lemah - gerbang totalnya karena itu ditaruh di 90%
+ * sebagai penjaga kemunduran saja, bukan sebagai klaim perbaikan.
  */
-const budgets = [0, 60, 120, 200, 223, 224, 500].map((prev) => [prev, sandbox.nextBlockBudget(prev)]);
-check('c9 pertumbuhan anggaran tidak melewati batas penutup terukur (1,15x)',
-  budgets.every(([prev, next]) => (prev >= 224 ? next === 900 : next <= Math.max(80, Math.ceil(prev * 1.15)))) &&
-  sandbox.nextBlockBudget(224) === 900 && sandbox.nextBlockBudget(0) === sandbox.LEAD_BLOCK_CHARS,
-  JSON.stringify(budgets));
+const SLACK_CEILING_MS = 800;
+const HOLE_CEILING_MS = 1000;
+/** Aturan V6 yang dulu terkirim, disimpan sebagai PEMBANDING - bukan untuk dipakai lagi. */
+const budgetV6Reference = (prev) => (prev >= 224 ? 900 : Math.max(80, Math.round(prev * 1.15)));
+/** Utang tak tertutup di setiap batas, dihitung dari blok yang BENAR-BENAR dihasilkan. */
+function uncoveredDebt(budgetFn) {
+  const rows = [];
+  let cursor = 0;
+  let budget = sandbox.LEAD_BLOCK_CHARS;
+  let prevChars = null;
+  while (cursor < sentences.length) {
+    const b = sandbox.blockAt(cursor, budget);
+    if (!b) break;
+    const chars = b.text.length;
+    if (prevChars != null) {
+      rows.push({ prev: prevChars, chars,
+        lebihMs: Math.max(0, Math.round(chars * sandbox.GEN_S_PER_CHAR * 1000 - sandbox.blockCoverMs(prevChars))) });
+    }
+    prevChars = chars;
+    budget = budgetFn(chars);
+    cursor = b.to + 1;
+  }
+  return { rows, total: rows.reduce((a, r) => a + r.lebihMs, 0), max: Math.max(0, ...rows.map((r) => r.lebihMs)) };
+}
+const debtNow = uncoveredDebt(sandbox.nextBlockBudget);
+const debtV6 = uncoveredDebt(budgetV6Reference);
+check('c9 utang generasi tak tertutup di tiap batas jauh di bawah aturan V6',
+  sandbox.BOUNDARY_SLACK_S * 1000 <= SLACK_CEILING_MS &&
+  sandbox.nextBlockBudget(226) === sandbox.BLOCK_MAX_CHARS &&
+  debtNow.max <= HOLE_CEILING_MS &&
+  debtNow.total <= debtV6.total * 0.9,
+  `sekarang total=${debtNow.total} max=${debtNow.max} ms; aturan V6 total=${debtV6.total} max=${debtV6.max} ms; ` +
+  `kelonggaran dideklarasikan=${sandbox.BOUNDARY_SLACK_S * 1000} ms`);
+
+/**
+ * Tangga HARUS benar-benar naik pada buku NYATA. Ini gerbang yang tidak ada di V6, dan
+ * ketiadaannya itulah yang membuat cacatnya lolos: tangga V6 dihitung dari panjang blok yang
+ * TERCAPAI (selalu <= anggaran, karena blok pecah di batas kalimat), jadi ia punya titik
+ * tetap di sekitar 80 char dan tidak pernah menyentuh 224 apalagi 900. Narasi Library
+ * berperilaku seperti V5 sepanjang buku sementara komentarnya menjanjikan blok menyatu.
+ */
+const rampSizes = [];
+(function () {
+  let cursor = 0;
+  let budget = sandbox.LEAD_BLOCK_CHARS;
+  while (cursor < sentences.length && rampSizes.length < 40) {
+    const b = sandbox.blockAt(cursor, budget);
+    if (!b) break;
+    rampSizes.push(b.text.length);
+    budget = sandbox.nextBlockBudget(b.text.length);
+    cursor = b.to + 1;
+  }
+}());
+const rampMax = Math.max(...rampSizes);
+// Yang TIDAK boleh dituntut di sini: "blok terakhir >= blok pertama". Tangga memang turun lagi
+// di batas bab dan sesudah kalimat pendek, dan itu benar - blok tidak pernah melewati bab (c7).
+// Yang dituntut: tangga pernah benar-benar melewati blok pembuka, dan narasi tidak merosot
+// jadi satu kalimat per blok.
+check('c10 tangga anggaran benar-benar naik pada buku nyata, bukan macet di lantai',
+  rampMax > sandbox.LEAD_BLOCK_CHARS &&
+  rampSizes.length <= Math.ceil(sentences.length * 0.7),
+  `buku="${book.title}" blok=${rampSizes.length} ukuran=${JSON.stringify(rampSizes)}`);
 
 check('c7 blok tidak pernah melewati batas bab',
   (function () {
@@ -457,8 +533,132 @@ check('d5 stopNarration membatalkan semua timer sorotan',
   'stopNarration harus memanggil clearHighlightTimers()');
 
 check('d6 terjemahan blok dioper ke pita subtitle, jadi penerjemah tidak dipanggil',
-  /translation: picked\.map/.test(blockAtSource) && /id: block\.translation/.test(narrate),
+  /translation: picked\.map/.test(blockAtSource) && /id: block\.translation/.test(dispatchSource),
   'block.translation harus dibangun dari pasangan {en,id} lalu dioper ke say()');
+
+// =======================================================================================
+// (f) PAGAR URUTAN V7 — dijalankan, bukan dibaca
+// =======================================================================================
+//
+// Aturan anggaran V7 memperbesar blok dan membuat prefetch lebih sering benar-benar terpakai.
+// Itu menaikkan satu risiko yang jauh lebih buruk daripada jeda: blok N+1 berbunyi mendahului
+// N. Inversi antrean seperti itu pernah terjadi di repo ini (m025-47). Karena itu SEMUA teks
+// narasi harus lewat satu pintu, dispatchBlock(), dan pintu itu diuji dengan MENJALANKANNYA.
+
+const guardSaid = [];
+const guardPrefetched = [];
+const guardTimers = [];
+const guardSandbox = {
+  console,
+  narrating: true,
+  narrationToken: 3,
+  session: { sentences: () => sentences, snapshot: () => ({ sentenceIndex: 0 }) },
+  speak: (payload) => { guardSaid.push(payload.en); return Promise.resolve(); },
+  setTimeout: (fn) => { guardTimers.push(fn); return guardTimers.length; },
+  narrationOptions: () => ({ speed: 1 }),
+  root: {
+    FiezelVoiceSay: { prefetch: (text) => { guardPrefetched.push(text); } },
+    setTimeout: (fn) => { guardTimers.push(fn); return guardTimers.length; },
+    clearTimeout: () => {}
+  }
+};
+vm.createContext(guardSandbox);
+vm.runInContext([
+  constants,
+  blockAtSource,
+  LIB.match(/var dispatchedThrough = -?\d+;/)[0],
+  LIB.match(/var dispatchRejects = \{[^}]+\};/)[0],
+  block(LIB, /function resetDispatchCursor\(startIndex\)/),
+  dispatchSource,
+  block(LIB, /function warmNext\(token, index, budget\)/)
+].join('\n'), guardSandbox);
+
+const runGuardTimers = () => { while (guardTimers.length) guardTimers.shift()(); };
+
+// f1: urutan normal - tiga blok berurutan semuanya terkirim, kursor maju ke block.to.
+guardSandbox.resetDispatchCursor(0);
+const seq = [];
+(function () {
+  let cursor = 0;
+  let budget = guardSandbox.LEAD_BLOCK_CHARS;
+  for (let i = 0; i < 3; i++) {
+    const b = guardSandbox.blockAt(cursor, budget);
+    seq.push(b);
+    guardSandbox.dispatchBlock(b, guardSandbox.narrationToken);
+    budget = guardSandbox.nextBlockBudget(b.text.length);
+    cursor = b.to + 1;
+  }
+}());
+check('f1 tiga blok berurutan terkirim berurutan dan kursor kirim maju ke block.to',
+  JSON.stringify(guardSaid) === JSON.stringify(seq.map((b) => b.text)) &&
+  guardSandbox.dispatchedThrough === seq[2].to &&
+  guardSandbox.dispatchRejects.order === 0 && guardSandbox.dispatchRejects.replay === 0,
+  `terkirim=${guardSaid.length} kursor=${guardSandbox.dispatchedThrough} tolak=${JSON.stringify(guardSandbox.dispatchRejects)}`);
+
+// f2: blok yang MELOMPAT (N+2 sebelum N+1) harus ditolak, bukan dibunyikan.
+const beforeJump = guardSaid.length;
+const jumped = guardSandbox.blockAt(guardSandbox.dispatchedThrough + 3, 200);
+const jumpResult = guardSandbox.dispatchBlock(jumped, guardSandbox.narrationToken);
+check('f2 blok yang melompat di depan urutannya ditolak, tidak ada yang berbunyi',
+  jumpResult === null && guardSaid.length === beforeJump && guardSandbox.dispatchRejects.order === 1,
+  `hasil=${jumpResult} terkirim=${guardSaid.length - beforeJump} tolak=${JSON.stringify(guardSandbox.dispatchRejects)}`);
+
+// f3: blok yang SUDAH pernah dikirim tidak boleh berbunyi dua kali.
+const beforeReplay = guardSaid.length;
+const replayResult = guardSandbox.dispatchBlock(seq[0], guardSandbox.narrationToken);
+check('f3 blok yang sudah pernah dikirim ditolak sebagai replay',
+  replayResult === null && guardSaid.length === beforeReplay && guardSandbox.dispatchRejects.replay === 1,
+  `hasil=${replayResult} tolak=${JSON.stringify(guardSandbox.dispatchRejects)}`);
+
+// f4: murid menekan jeda - narrating false. Blok yang sudah diantre tidak boleh berbunyi.
+const nextInOrder = guardSandbox.blockAt(guardSandbox.dispatchedThrough + 1, 200);
+guardSandbox.narrating = false;
+const beforeStop = guardSaid.length;
+const stopResult = guardSandbox.dispatchBlock(nextInOrder, guardSandbox.narrationToken);
+check('f4 penghenti bekerja: narasi dihentikan berarti blok berikutnya tidak berbunyi',
+  stopResult === null && guardSaid.length === beforeStop && guardSandbox.dispatchRejects.stopped === 1,
+  `hasil=${stopResult} tolak=${JSON.stringify(guardSandbox.dispatchRejects)}`);
+
+// f5: murid pindah halaman - stopNarration menaikkan token. Token lama tidak boleh lolos.
+guardSandbox.narrating = true;
+guardSandbox.narrationToken = 4; // stopNarration() menaikkan token
+const staleResult = guardSandbox.dispatchBlock(nextInOrder, 3);
+check('f5 penghenti bekerja: token kedaluwarsa (pindah halaman) tidak boleh berbunyi',
+  staleResult === null && guardSandbox.dispatchRejects.stopped === 2,
+  `hasil=${staleResult} tolak=${JSON.stringify(guardSandbox.dispatchRejects)}`);
+
+// f6: prefetch tidak boleh berbunyi belakangan - blok di BELAKANG kursor kirim tidak dihangatkan.
+guardPrefetched.length = 0;
+guardSandbox.warmNext(4, 0, 200);
+runGuardTimers();
+const lateCount = guardSandbox.dispatchRejects.prefetchLate;
+guardSandbox.warmNext(4, guardSandbox.dispatchedThrough + 1, 200);
+runGuardTimers();
+check('f6 prefetch untuk blok di belakang kursor kirim ditolak, yang di depan tetap jalan',
+  lateCount === 1 && guardPrefetched.length === 1 &&
+  guardPrefetched[0] === guardSandbox.blockAt(guardSandbox.dispatchedThrough + 1, 200).text,
+  `tolakTerlambat=${lateCount} dihangatkan=${guardPrefetched.length}`);
+
+// f7: prefetch yang sudah diantre tidak boleh menyentuh mesin sesudah penghenti.
+guardPrefetched.length = 0;
+guardSandbox.warmNext(4, guardSandbox.dispatchedThrough + 1, 200);
+guardSandbox.narrationToken = 5; // murid menekan jeda sebelum timer jalan
+runGuardTimers();
+check('f7 pengajuan prefetch yang menganggur mati sesudah penghenti',
+  guardPrefetched.length === 0,
+  `dihangatkan setelah stop=${guardPrefetched.length}`);
+
+// f8: tidak ada jalan pintas. narrate() sendiri tidak boleh memanggil speak() langsung.
+check('f8 narrate() tidak punya jalur say() selain lewat dispatchBlock',
+  !/\bspeak\(/.test(narrate) && /dispatchBlock\(block, token\)/.test(narrate) &&
+  /if \(!speaking\) \{ clearHighlightTimers\(\); return; \}/.test(narrate),
+  'narrate harus menolak lanjut kalau dispatchBlock menolak');
+
+// f9: dua penghenti produksi benar-benar mereset kursor kirim dan narrate menyetelnya ulang.
+check('f9 stopNarration mereset kursor kirim, narrate menyetelnya dari posisi murid',
+  /resetDispatchCursor\(null\)/.test(block(LIB, /function stopNarration\(\)/)) &&
+  /resetDispatchCursor\(session\.snapshot\(\)\.sentenceIndex\)/.test(narrate),
+  'kursor kirim harus disetel ulang di kedua tempat, kalau tidak putar-ulang ditolak sebagai replay');
 
 // =======================================================================================
 // (e) TIDAK ADA prepare()/ensureReady()/prewarm() BARU di jalur pemanggil
@@ -474,6 +674,7 @@ const warmPaths = [
   ['addon TTSService.prefetch', slPrefetchMethod],
   ['addon Controller.prefetchNextScript', nextScript],
   ['library warmNext', warmNext],
+  ['library dispatchBlock', dispatchSource],
   ['library blockAt', blockAtSource],
   ['library planBlock', block(LIB, /function planBlock\(/)],
   ['library scheduleBlockHighlight', scheduleSource]
@@ -546,6 +747,38 @@ const report = {
       porsiSunyi: 0.126,
       suaraPertamaMs: 2816.8,
       mengukurPekerjaan: 'V6 pada pola yang dipakai Library di produksi - lebih mahal daripada 449,1 ms, dan itu angka yang berlaku.',
+      berlakuUntukProduksi: true
+    },
+    v7NarasiLibraryTerkirim: {
+      metrik: 'jedaPenjadwalan + jedaTerdengar + porsiSunyi, ketiganya terpisah',
+      diukurBagaimana: 'reports/voice-v7-data/measure_v7.py - harness yang SAMA (measure_callers.py + '
+        + 'harness-callers.html dari reports/voice-v6-data/), 18 kalimat pertama library-books-v1.json',
+      data: 'reports/voice-v7-data/block-measurements-v7.json, -v7b.json, -v7c.json',
+      pola: 'anggaran = (prevChars * SPEAK + 0,80 s) / GEN, TANPA lantai minimum - 9 blok. '
+        + 'INI konfigurasi yang benar-benar dikirim ke murid sesudah V7.',
+      ulangan: 5,
+      blok: 9,
+      jedaPenjadwalanMs: 533.5,
+      jedaTerdengarMs: 1278.6,
+      jedaTerdengarTerburukMs: 2072.2,
+      porsiSunyi: 0.1076,
+      suaraPertamaMs: 2659.5,
+      totalSenyapPenjadwalanS: 4.27,
+      pembandingDiSesiPeramban_YANG_SAMA: {
+        pola: 'aturan V6 terkirim (lantai 80, pengali 1,15) - 10 blok',
+        ulangan: 7,
+        jedaPenjadwalanMs: 603.6,
+        jedaTerdengarMs: 1318.8,
+        jedaTerdengarTerburukMs: 3203.7,
+        porsiSunyi: 0.1344,
+        suaraPertamaMs: 2677.7,
+        totalSenyapPenjadwalanS: 5.43
+      },
+      mengukurPekerjaan: 'Perbandingan hanya sah di dalam sesi peramban yang sama: mesin ini '
+        + 'mengukur aturan V6 di 603,6 ms, BUKAN 560,6 ms seperti yang tercatat di '
+        + 'block-measurements.json, jadi "di bawah 560,6 ms" tidak bisa dipakai sebagai lulus/gagal. '
+        + 'Yang sah: -11,6% jeda penjadwalan, -20,0% porsi sunyi, -35,3% jeda terdengar TERBURUK, '
+        + 'suara pertama tidak tertunda (-18,2 ms, di dalam derau).',
       berlakuUntukProduksi: true
     }
   },

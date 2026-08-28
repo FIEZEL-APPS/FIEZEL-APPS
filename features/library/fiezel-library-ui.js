@@ -72,18 +72,78 @@
      menyatu mendekati 0,22 detik ketika bloknya sudah tumbuh. Itu memang harga yang dipilih:
      suara pertama 3,4 detik lebih penting daripada batas kalimat kedua.
 
+     KOREKSI V7 ATAS PARAGRAF DI ATAS: kalimat "baru menyatu ketika bloknya sudah tumbuh"
+     TIDAK TERBUKTI pada buku nyata. Bloknya tidak pernah tumbuh; lihat alasannya di komentar
+     nextBlockBudget() di bawah. Rumus 1,15 x panjang(blok N) tetap benar sebagai batas fisika
+     tutupan - yang keliru adalah cara V6 memakainya bersama lantai 80 char.
+
      SOROTAN TETAP PER KALIMAT. Ia tidak dibuang - ia digerakkan penanda batas dari
      planUtterance, lihat scheduleBlockHighlight(). */
   var BLOCK_MAX_CHARS = 900;
   var LEAD_BLOCK_CHARS = 80;
-  /* 1,15 = 0,065/0,056 dari pengukuran di atas. 224 = 260/1,15, yaitu panjang blok terkecil
-     yang sudah menutupi potongan terpanjang yang mungkin. */
-  var RAMP_COVER_FACTOR = 1.15;
-  var RAMP_SETTLED_CHARS = 224;
+
+  /* V7: ANGGARAN BLOK DARI DUA LAJU TERUKUR, BUKAN DARI SATU PENGALI TETAP.
+
+     Yang salah pada tangga V6 (Math.max(80, prev * 1,15)) bukan pengalinya, tapi LANTAI 80
+     char-nya. Anggaran dihitung dari panjang blok yang BENAR-BENAR TERCAPAI, dan panjang itu
+     selalu <= anggaran karena blok hanya boleh pecah di batas kalimat. Akibatnya tangga V6
+     punya titik tetap di sekitar 80 char: pada buku nyata (features/library/library-books-v1.json,
+     "The Three Little Pigs") ia menghasilkan 47, 71, 57, 64, 67, 52, 35, 78, 75, 80, 60, 65...
+     dan TIDAK PERNAH mencapai 224 apalagi 900. Narasi Library berperilaku seperti V5
+     sepanjang buku, bukan hanya di beberapa kalimat pertama seperti yang ditulis di atas.
+
+     Lebih buruk: lantai 80 itulah yang membuat dua batas termahal. Sesudah blok 47 char,
+     tutupan jujurnya 54 char, tapi lantai memaksa 80 -> jeda penjadwalan terukur 1.437,5 ms.
+     Sesudah blok 35 char, tutupan jujurnya 40 char, lantai memaksa 80 -> 2.453,2 ms. Batas
+     yang tutupannya terpenuhi hanya membayar 3-25 ms. Jadi jedanya bukan sifat mesin, tapi
+     akibat anggaran yang berjanji lebih besar daripada yang bisa ditutupi audio blok
+     sebelumnya.
+
+     Aturan V7 memakai dua laju yang diukur di reports/voice-v6-data/block-measurements.json:
+       GEN   = 36.494 ms generasi / 626 char = 0,0583 s per char
+       SPEAK = 41,86 s PCM       / 626 char = 0,0669 s per char (sudah termasuk senyap tepi)
+     Blok berikutnya boleh sepanjang apa pun yang generasinya masih selesai selama audio blok
+     sekarang diputar:  anggaran = (prev * SPEAK + KELONGGARAN) / GEN.
+
+     BOUNDARY_SLACK_S = 0,80 s adalah kelonggaran yang DISENGAJA, dan harganya diukur bukan
+     dikarang: menambah satu batas blok pada bacaan yang sama memasukkan ~530 ms senyap
+     penjadwalan (rata-rata jeda penjadwalan di rezim tertutup, reports/voice-v7-data/) DITAMBAH
+     senyap kepala+ekor PCM satu render lagi (~250-535 ms per sisi, lihat headSilenceMs/
+     tailSilenceMs di block-measurements.json). Jadi membayar sampai 0,80 s generasi yang tak
+     tertutup demi MENGHILANGKAN satu batas masih untung; di atas itu tidak lagi.
+
+     TIDAK ADA LANTAI MINIMUM. Lantai adalah justru sumber cacat V6, dan lantai versi lebih
+     rendah pun tetap cacat: dengan lantai 70 char, sesudah blok 31 char anggaran menjanjikan
+     generasi 1.774 ms di luar tutupan - lubang yang sama kelasnya, cuma lebih kecil. Satu
+     kelonggaran yang diberi alasan lebih jujur daripada lantai yang kelihatan aman.
+
+     Ketiga varian ini benar-benar diukur di harness yang sama (18 kalimat, 2-5 ulangan,
+     reports/voice-v7-data/block-measurements-v7.json dan -v7b.json):
+       aturan V6 terkirim   10 blok  jeda penjadwalan 614,4 ms  porsi sunyi 13,64%
+       lantai 70 + 0,30 s   10 blok  jeda penjadwalan 526,8 ms  porsi sunyi 11,92%
+       tanpa lantai, 0,80 s  9 blok  jeda penjadwalan 533,2 ms  porsi sunyi 10,66%  <- terkirim
+     Yang dipilih BUKAN yang rata-rata jedanya paling kecil, karena rata-rata jeda bisa
+     diperbaiki cuma dengan menambah batas: v7_pure_cover (tanpa lantai, 0,30 s) mencapai
+     rata-rata 497,4 ms dengan 18 blok, tapi porsi sunyi yang DIDENGAR murid justru melonjak
+     ke 20,3%. Yang dipilih adalah yang total senyapnya paling kecil.
+
+     RAMP_SETTLED_CHARS = 226 = 260/1,15: panjang blok terkecil yang tutupannya sudah melebihi
+     potongan terpanjang yang mungkin (CHUNK_CHARS.max di fiezel-prosody.js), jadi di atas itu
+     anggaran boleh langsung penuh. */
+  var GEN_S_PER_CHAR = 0.0583;
+  var SPEAK_S_PER_CHAR = 0.0669;
+  var BOUNDARY_SLACK_S = 0.80;
+  var RAMP_SETTLED_CHARS = 226;
   function nextBlockBudget(previousChars) {
     var prev = Math.max(0, Number(previousChars) || 0);
-    if (prev >= RAMP_SETTLED_CHARS) return BLOCK_MAX_CHARS;
-    return Math.max(LEAD_BLOCK_CHARS, Math.round(prev * RAMP_COVER_FACTOR));
+    var coverSeconds = prev * SPEAK_S_PER_CHAR + BOUNDARY_SLACK_S;
+    var budget = Math.round(coverSeconds / GEN_S_PER_CHAR);
+    if (budget >= RAMP_SETTLED_CHARS) return BLOCK_MAX_CHARS;
+    return Math.min(BLOCK_MAX_CHARS, budget);
+  }
+  /** Tutupan yang benar-benar tersedia di satu batas, dalam ms. Dipakai uji, bukan produksi. */
+  function blockCoverMs(previousChars) {
+    return Math.max(0, Number(previousChars) || 0) * SPEAK_S_PER_CHAR * 1000;
   }
   /* Laju bicara terukur, bukan angka karangan: 384 karakter teks uji menghasilkan 24,90 s
      audio bersih pada speed 1 (reports/voice-v5-data/, dipakai juga di
@@ -310,6 +370,40 @@
     return scheduled;
   }
 
+  /* ---- PAGAR URUTAN (V7) ---------------------------------------------------------
+
+     Aturan anggaran V7 membuat blok lebih panjang dan prefetch lebih sering benar-benar
+     terpakai, jadi risiko yang harus dijaga bukan lagi jedanya tapi URUTANNYA. Inversi
+     antrean pernah terjadi di repo ini (m025-47): blok N+1 memesan mesin satu giliran lebih
+     dulu daripada N, dan murid mendengar kalimat dengan urutan salah. Itu jauh lebih buruk
+     daripada jeda.
+
+     Pagarnya satu pintu: TIDAK ADA teks yang boleh sampai ke say() selain lewat
+     dispatchBlock(). Pintu itu menolak tiga hal, dan setiap penolakan dihitung supaya uji
+     bisa melihatnya:
+       1. narasi sudah dihentikan atau tokennya kedaluwarsa (murid menekan jeda / pindah
+          halaman) -> 'stopped';
+       2. blok yang tidak persis menyambung dari yang terakhir dikirim -> 'order';
+       3. blok yang awalnya sudah pernah dikirim -> 'replay'.
+     dispatchedThrough menyimpan indeks kalimat terakhir yang SUDAH dikirim ke suara, bukan
+     yang sudah didengar; ia satu-satunya sumber kebenaran urutan. */
+  var dispatchedThrough = -1;
+  var dispatchRejects = { stopped: 0, order: 0, replay: 0, prefetchLate: 0 };
+
+  function resetDispatchCursor(startIndex) {
+    var at = Number(startIndex);
+    dispatchedThrough = startIndex == null || !isFinite(at) ? -1 : at - 1;
+  }
+
+  function dispatchBlock(block, token) {
+    if (!narrating || token !== narrationToken) { dispatchRejects.stopped++; return null; }
+    if (!block || !block.text) { dispatchRejects.order++; return null; }
+    if (block.from <= dispatchedThrough) { dispatchRejects.replay++; return null; }
+    if (block.from !== dispatchedThrough + 1) { dispatchRejects.order++; return null; }
+    dispatchedThrough = block.to;
+    return speak({ en: block.text, id: block.translation });
+  }
+
   /**
    * m025-47: prefetch is intentionally deferred by one task. The public runtime has
    * readiness/audibility wrappers around the core service; issuing N+1 in the same JS
@@ -319,6 +413,10 @@
   function warmNext(token, index, budget) {
     setTimeout(function () {
       if (!narrating || token !== narrationToken || !session) return;
+      // Prefetch tidak boleh berbunyi belakangan: kalau blok yang akan dihangatkan sudah
+      // berada DI BELAKANG kursor kirim, ia bukan blok berikutnya lagi - menghangatkannya
+      // hanya mengisi satu-satunya slot hangat mesin dengan teks yang salah.
+      if (index != null && Number(index) <= dispatchedThrough) { dispatchRejects.prefetchLate++; return; }
       var say = root.FiezelVoiceSay;
       if (!say || typeof say.prefetch !== 'function') return;
       // V6: yang dihangatkan adalah BLOK berikutnya, bukan kalimat berikutnya. Bentuknya
@@ -333,6 +431,7 @@
   function stopNarration() {
     narrationToken++;
     narrating = false;
+    resetDispatchCursor(null);
     clearHighlightTimers();
     if (session) session.pause();
     try { root.FiezelVoiceSay && root.FiezelVoiceSay.stop && root.FiezelVoiceSay.stop(); } catch (_) {}
@@ -354,6 +453,7 @@
   async function narrate() {
     var token = ++narrationToken;
     narrating = true;
+    resetDispatchCursor(session.snapshot().sentenceIndex);
     session.play();
     updatePlayButton();
     // Anggaran dihitung dari blok SEBELUMNYA, bukan dari posisi di buku: yang mahal adalah
@@ -366,7 +466,8 @@
       if (!block || !block.text) break;
       var plan = planBlock(block.text);
       scheduleBlockHighlight(block, plan, token);
-      var speaking = speak({ en: block.text, id: block.translation });
+      var speaking = dispatchBlock(block, token);
+      if (!speaking) { clearHighlightTimers(); return; }
       // Anggaran yang dioper ke warmNext HARUS anggaran yang nanti benar-benar dipakai,
       // kalau tidak teks yang dihangatkan berbeda dari teks yang dikirim dan kunci dedup
       // di pintu suara tidak cocok.
@@ -788,7 +889,18 @@
     schema: 'fiezel-library-ui-v1',
     open: library,
     stop: stopNarration,
-    isNarrating: function () { return narrating; }
+    isNarrating: function () { return narrating; },
+    /* Dibuka untuk uji dan diagnostik saja: tidak ada jalur produksi yang membacanya.
+       orderViolations menjumlahkan penolakan yang benar-benar berarti urutan salah
+       (bukan penolakan karena murid menekan jeda). */
+    narrationDiagnostics: function () {
+      return {
+        dispatchedThrough: dispatchedThrough,
+        rejects: { stopped: dispatchRejects.stopped, order: dispatchRejects.order,
+          replay: dispatchRejects.replay, prefetchLate: dispatchRejects.prefetchLate },
+        orderViolations: dispatchRejects.order + dispatchRejects.replay
+      };
+    }
   });
   schedulePackWarm();
 }(typeof globalThis !== 'undefined' ? globalThis : this));

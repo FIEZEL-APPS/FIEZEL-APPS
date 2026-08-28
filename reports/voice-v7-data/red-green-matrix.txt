@@ -1,0 +1,14 @@
+=== MATRIKS MERAH/HIJAU assert baru V7 ===
+c9     | mutasi: kelonggaran dinaikkan ke 1,20 s                      | gagal: c9                     | MERAH SESUAI HARAPAN
+c10    | mutasi: anggaran dipaku di blok pembuka (tangga mati)        | gagal: c9 c10                 | MERAH SESUAI HARAPAN
+f1     | mutasi: kursor kirim maju ke block.from, bukan .to           | gagal: f1                     | MERAH SESUAI HARAPAN
+f2     | mutasi: penjaga lompatan urutan dihapus                      | gagal: f2                     | MERAH SESUAI HARAPAN
+f3     | mutasi: penjaga replay dihapus                               | gagal: f3                     | MERAH SESUAI HARAPAN
+f4     | mutasi: penjaga penghenti dihapus (narrating/token)          | gagal: f4 f5                  | MERAH SESUAI HARAPAN
+f5     | mutasi: penjaga penghenti dihapus (token lama lolos)         | gagal: f4 f5                  | MERAH SESUAI HARAPAN
+f6     | mutasi: penjaga prefetch-terlambat dihapus                   | gagal: f6                     | MERAH SESUAI HARAPAN
+f7     | mutasi: prefetch menganggur tidak cek token lagi             | gagal: f7                     | MERAH SESUAI HARAPAN
+f8     | mutasi: narrate() memanggil speak() langsung                 | gagal: f8                     | MERAH SESUAI HARAPAN
+f9     | mutasi: stopNarration tidak mereset kursor kirim             | gagal: f9                     | MERAH SESUAI HARAPAN
+--- pulih: seluruh tes harus hijau lagi ---
+FIEZEL callsite prefetch: PASS (68 pass, 0 fail)
