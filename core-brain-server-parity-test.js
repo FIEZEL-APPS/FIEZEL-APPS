@@ -558,6 +558,36 @@ test('P8 pelatih menjelaskan kebijakan yang SAMA - DENGAN ringkasan klien', asyn
   assert.strictEqual(coachPolicy.targetSkill, 'past_perfect', 'akar masalah milik klien harus sampai ke pelatih juga');
 });
 
+test('P8 batas kode alasan klien tidak lebih kecil daripada batas worker', () => {
+  /* Kalau klien memotong lebih pendek daripada worker, yang terbuang SELALU kode terakhir -
+   * dan kode terakhir selalu milik Core Brain, karena lapisan v1 mengisi daftar lebih dulu.
+   * Akibatnya bukan keputusan yang salah (semuanya sudah terpanggang di field kebijakan)
+   * melainkan penjelasan yang hilang tepat pada murid yang paling banyak masalahnya. */
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const clientCap = /const POLICY_RATIONALE_CODE_CAP=(\d+)/.exec(app);
+  assert.ok(clientCap, 'batas kode alasan klien tidak ditemukan sebagai konstanta bernama');
+  const workerCaps = [...WORKER_SOURCE.matchAll(/rationaleCodes=codes\.slice\(0,(\d+)\)/g)].map(m => Number(m[1]));
+  assert.ok(workerCaps.length >= 2, 'batas kode alasan worker tidak ditemukan');
+  const workerCap = Math.max(...workerCaps);
+  assert.ok(Number(clientCap[1]) >= workerCap,
+    `klien memotong kode alasan di ${clientCap[1]} sementara worker mengirim sampai ${workerCap} - selisihnya membuang alasan Core Brain diam-diam`);
+  assert.ok(new Set(workerCaps).size === 1, 'dua tempat di worker memakai batas berbeda: ' + JSON.stringify(workerCaps));
+});
+
+test('P8 jalur penuh: kebijakan tersibuk pun tidak kehilangan alasan Core Brain di klien', () => {
+  const now = Date.parse('2026-08-28T03:00:00Z');
+  const busySnapshot = { adaptiveReady: true, totalAttempts: 300, estimatedLevel: 'B1', dueReviews: 40, domains: { grammar: { attempts: 120, recentAccuracy: 35 }, reading: { attempts: 60, recentAccuracy: 40 }, vocabulary: { attempts: 60, recentAccuracy: 45 } } };
+  const busyEvidence = { behavior: { consistency14d: 12, abandonmentRate: 40, medianResponseMs: 24000 }, memory: { dueReviews: 40, maxForgettingRisk: 90, highRiskCount: 20 }, confidence: { evidence: 30, gap: 60 }, skills: { measured: 20, weakest: [{ skill: 'present_perfect', type: 'grammar', attempts: 20, accuracy: 30, errorRate: 70, recurringErrors: 5 }] } };
+  const busyOutcomes = [95, 85, 72, 58].map((a, i) => ({ schema: 'fiezel-policy-outcome-v1', outcomeId: 'busy' + i, sessionId: 'busys' + i, accuracy: a, targetAccuracy: 80, status: i === 3 ? 'negative' : 'mixed', recommendation: i === 3 ? 'reduce_load' : 'adjust' }));
+  const r = W.resolveAdaptivePolicyServerSide({ snapshot: busySnapshot, evidence: busyEvidence, outcomes: busyOutcomes, clientBrain: null, now });
+  const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+  const cap = Number(/const POLICY_RATIONALE_CODE_CAP=(\d+)/.exec(app)[1]);
+  const survivors = r.policy.rationaleCodes.slice(0, cap);
+  assert.ok(r.policy.rationaleCodes.length >= 10, 'kasus ini memang harus menghasilkan daftar kode yang panjang');
+  assert.ok(survivors.some(c => c.startsWith('brain_')), 'alasan Core Brain terbuang oleh batas klien');
+  assert.deepStrictEqual(survivors, r.policy.rationaleCodes, 'batas klien masih memotong kebijakan tersibuk');
+});
+
 test('P8 klien BENAR-BENAR mengirim ringkasan otak ke jalur pelatih', () => {
   /* Dua uji di atas membuktikan worker konsisten SELAMA kedua rute menerima masukan yang
    * sama. Yang membuat masukannya sama adalah app.js - dan sampai m025-180 ia hanya

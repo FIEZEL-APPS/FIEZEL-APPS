@@ -164,7 +164,7 @@ seperti sebelumnya, tetapi worker **tidak** memercayainya: ia menghitung ulang.
 
 ---
 
-## 3. Gerbang: `core-brain-server-parity-test.js` (45 uji)
+## 3. Gerbang: `core-brain-server-parity-test.js` (48 uji)
 
 Duplikasi tanpa gerbang paritas adalah dua sistem yang berpisah diam-diam — seseorang menyetel
 `DISCRIMINATION` di modul klien enam bulan dari sekarang, semua gerbang klien tetap hijau, dan
@@ -208,6 +208,42 @@ mendarat tepat di target 80%, **tanpa** ringkasan klien:
 Sembilan materi yang benar-benar rawan lupa akhirnya menggerakkan porsi review dari 0.25 ke
 0.55, dan lima sesi yang mandek terbaca sebagai kemandekan yang perlu dipecah — bukan sebagai
 lima sesi "mixed" yang masing-masing dilupakan begitu sesi berikutnya datang.
+
+---
+
+## 4a. Cacat keempat: penjelasan Core Brain terpotong sebelum sampai ke layar
+
+Ditemukan saat menjawab pertanyaan "sudah clear semua atau belum" — bukan oleh gerbang, tapi
+oleh menjalankan jalur kebijakan terhadap murid yang banyak masalahnya sekaligus (ritme
+rapuh + materi rawan lupa + skill bocor + hasil sesi terakhir negatif):
+
+```
+worker menghasilkan 12 kode:
+  due_reviews, forgetting_risk, weak_skill, recurring_error, abandonment_risk,
+  consistency_risk, confidence_gap, calm_pacing,
+  recent_policy_outcome_negative, brain_optimal_challenge, brain_trend_declining,
+  brain_cognitive_load
+
+sanitizeAdaptivePolicy() menyimpan 8 pertama.
+yang terbuang: keempat kode terakhir - SELURUHNYA milik Core Brain.
+```
+
+Bukan kebetulan: lapisan v1 mengisi daftar lebih dulu, Core Brain menambah miliknya di ekor,
+jadi pemotongan di angka manapun di bawah 12 **selalu** membuang Core Brain lebih dulu.
+
+Ini **pra-ada** sejak m025-117 (kode `brain_*` sudah ada sejak itu), bukan lahir dari rilis
+ini — tetapi rilis ini menambah dua kode lagi di ekor, jadi ia memperburuk cacat yang sudah
+ada, dan itu membuatnya jadi urusan rilis ini.
+
+Efeknya **bukan pada keputusan**: ukuran sesi, kesulitan, tempo, dan porsi review sudah
+terpanggang di field kebijakan sebelum kode dipotong. Efeknya pada **penjelasan** — dan justru
+pada murid yang paling butuh dijelaskan kenapa sesinya dipendekkan dan diturunkan, layar
+diagnostik kehilangan seluruh alasan Core Brain dan hanya menyisakan alasan v1.
+
+Diperbaiki dengan menyamakan batas klien ke batas worker (`POLICY_RATIONALE_CODE_CAP = 12`),
+dan dijaga dua gerbang baru: satu menuntut batas klien tidak lebih kecil daripada batas worker
+(dibaca dari sumber kedua berkas, bukan dari komentar), satu menjalankan kasus tersibuk
+ujung-ke-ujung dan menuntut nol kode terbuang.
 
 ---
 
@@ -284,7 +320,7 @@ mengulanginya.
 ## 6. Cara memverifikasi
 
 ```bash
-node core-brain-server-parity-test.js     # 45 uji, termasuk bukti-bisa-merah
+node core-brain-server-parity-test.js     # 48 uji, termasuk bukti-bisa-merah
 node core-worker-contract-test.js
 node core-brain-test.js core-brain-v2-test.js core-brain-v3-upgrade-test.js
 node gate-registry-test.js                # gerbang baru terdaftar di quality.yml
