@@ -195,7 +195,8 @@ function edgeSecret(env) {
 
 // Dua nilai saja, dan keduanya jujur:
 //   'on'  = setiap permintaan wajib membawa header jembatan yang benar.
-//   'off' = secret belum dipasang; Worker berjalan seperti sebelum penjaga ini ada.
+//   'off' = secret belum dipasang; hanya mungkin bila ALLOW_NO_EDGE_SECRET === 'true'
+//           dipasang secara eksplisit (tanpa itu, guard menolak semua — FAIL-CLOSED).
 // Nilai ini TIDAK pernah dikirim ke klien mana pun (dashboard owner tidak punya `/health`), jadi
 // ia bukan oracle publik. Ia hanya untuk gerbang dan untuk log.
 function edgeGuardStatus(env) {
@@ -209,17 +210,42 @@ let edgeWarnedThisIsolate = false;
 
 function resetEdgeWarningForTests() {
   edgeWarnedThisIsolate = false;
+  edgeWarnedClosedThisIsolate = false;
 }
 
 function warnEdgeGuardOff() {
   if (edgeWarnedThisIsolate) return;
   edgeWarnedThisIsolate = true;
   console.warn(
-    'fiezel-owner edgeGuard=off — EDGE_SHARED_SECRET belum dipasang. Alamat *.workers.dev TERBUKA: '
-    + 'halaman masuk owner bisa ditembak langsung tanpa lewat jembatan owner.fiezel.my.id, dan '
-    + 'Cloudflare Access tidak berlaku di sana. Jalankan: wrangler secret put EDGE_SHARED_SECRET. '
+    'fiezel-owner edgeGuard=off — EDGE_SHARED_SECRET belum dipasang dan ALLOW_NO_EDGE_SECRET=true '
+    + 'memaksa gerbang terbuka. Alamat *.workers.dev TERBUKA: halaman masuk owner bisa ditembak '
+    + 'langsung tanpa lewat jembatan owner.fiezel.my.id, dan Cloudflare Access tidak berlaku di '
+    + 'sana. Jalankan: wrangler secret put EDGE_SHARED_SECRET lalu hapus var ALLOW_NO_EDGE_SECRET. '
     + 'Keadaan ini hanya sah selama masa transisi.'
   );
+}
+
+// Peringatan fail-closed juga sekali per isolate, dan lewat console.error: keadaan ini berarti
+// dashboard MATI TOTAL sampai secret dipasang — itu bukan warning, itu insiden konfigurasi.
+let edgeWarnedClosedThisIsolate = false;
+
+function warnEdgeGuardClosed() {
+  if (edgeWarnedClosedThisIsolate) return;
+  edgeWarnedClosedThisIsolate = true;
+  console.error(
+    'fiezel-owner edgeGuard=FAIL-CLOSED — EDGE_SHARED_SECRET belum dipasang, SEMUA permintaan '
+    + 'ditolak. Jalankan: wrangler secret put EDGE_SHARED_SECRET (dan pasang nilai yang sama di '
+    + 'jembatan PHP owner). Kalau memang sedang masa transisi tanpa jembatan, pasang var '
+    + 'ALLOW_NO_EDGE_SECRET=true secara sadar — itu membuka *.workers.dev.'
+  );
+}
+
+// Pembuka darurat, HARUS string persis 'true' — bukan truthy. '1', 'yes', atau true boolean
+// dari kesalahan wrangler.toml TIDAK membuka gerbang; salah ketik gagal ke arah aman.
+function allowNoSecretOverride(env) {
+  const raw = env ? env.ALLOW_NO_EDGE_SECRET : null;
+  const norm = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  return norm === 'true';
 }
 
 // FAIL-CLOSED dengan cara yang SAMA seperti mw-edge.js:
@@ -233,17 +259,27 @@ function warnEdgeGuardOff() {
 //  - nol I/O: tidak ada baca D1, tidak ada await. Penolakan harus lebih murah daripada serangan
 //    yang memicunya, dan tidak boleh membakar anggaran plan gratis.
 //
-// `off` BUKAN mode produksi. Ia ada semata supaya `wrangler deploy` yang dijalankan sebelum
-// `wrangler secret put EDGE_SHARED_SECRET` tidak mematikan dashboard di jendela antara dua
-// perintah itu. Selama `off`, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
-// (i) segera setelah secret dipasang, dan (ii) selamanya setelah nameserver pindah ke Cloudflare
-// dan custom domain menggantikan jembatan PHP (saat itu `workers_dev = false` menutup lubangnya
-// secara struktural, dan penjaga ini boleh menolak tanpa syarat atau dihapus).
+// FAIL-CLOSED sejak audit D3 HIGH-3 (selaras dengan mw-edge.js — dua penjaga ini disalin dan
+// HARUS bergerak bersama): tanpa secret, SEMUA permintaan ditolak. `off` BUKAN mode produksi;
+// ia hanya bisa terjadi bila owner memasang var ALLOW_NO_EDGE_SECRET='true' secara eksplisit
+// (mis. masa transisi sebelum jembatan PHP owner terpasang). Konsekuensi fail-closed: deploy
+// SEBELUM `wrangler secret put EDGE_SHARED_SECRET` membuat dashboard mati sampai secret
+// dipasang — itu disengaja; yang terdampak satu orang, dan orang itu memegang kuncinya.
+// Selama `off` dipaksa, lubang di atas MASIH ADA. `off` harus berakhir di dua titik:
+// (i) segera setelah secret dipasang (hapus juga var pembukanya), dan (ii) selamanya setelah
+// nameserver pindah ke Cloudflare dan custom domain menggantikan jembatan PHP (saat itu
+// `workers_dev = false` menutup lubangnya secara struktural, dan penjaga ini boleh menolak
+// tanpa syarat atau dihapus).
 function edgeGuard(request, env, pathname) {
   const configuredEdge = edgeSecret(env);
   if (!configuredEdge) {
-    warnEdgeGuardOff();
-    return null;
+    if (allowNoSecretOverride(env)) {
+      warnEdgeGuardOff();
+      return null;
+    }
+    warnEdgeGuardClosed();
+    // deny() yang SAMA dengan header salah dan sesi tidak ada: fail-closed pun bukan oracle.
+    return deny();
   }
   if (EDGE_FREE_PATHS.includes(pathname)) return null;
   const presentedEdge = request && request.headers && request.headers.get

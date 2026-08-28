@@ -1,11 +1,11 @@
 {
   "schema": "fiezel-owner-edge-guard-report-v1",
-  "generatedAt": "2026-08-27T20:48:41.689Z",
+  "generatedAt": "2026-08-28T00:43:08.028Z",
   "pass": true,
   "counts": {
-    "pass": 576,
+    "pass": 583,
     "fail": 0,
-    "total": 576
+    "total": 583
   },
   "decision": {
     "layers": [
@@ -1702,7 +1702,23 @@
     },
     {
       "ok": true,
-      "message": "secret berisi spasi saja dianggap tidak terpasang, dapat 200"
+      "message": "FAIL-CLOSED: secret belum terpasang → 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "FAIL-CLOSED: permintaan kedua juga ditolak, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "ALLOW_NO_EDGE_SECRET='1' TIDAK membuka gerbang (hanya string 'true'), dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "badan penolakan fail-closed IDENTIK dengan penolakan header salah (bukan oracle konfigurasi)"
+    },
+    {
+      "ok": true,
+      "message": "penolakan fail-closed tidak membocorkan nama secret/var/header"
     },
     {
       "ok": true,
@@ -1714,15 +1730,27 @@
     },
     {
       "ok": true,
+      "message": "fail-closed dicatat via console.error dan menyebut secret yang harus dipasang"
+    },
+    {
+      "ok": true,
+      "message": "log fail-closed sekali per isolate, bukan per permintaan, dapat 1"
+    },
+    {
+      "ok": true,
+      "message": "ALLOW_NO_EDGE_SECRET='true' membuka mode transisi, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "permintaan kedua saat off tetap dilayani"
+    },
+    {
+      "ok": true,
       "message": "mode off mencatat peringatan yang menyebut secret + sifat transisinya"
     },
     {
       "ok": true,
       "message": "peringatan off sekali per isolate, bukan per permintaan, dapat 1"
-    },
-    {
-      "ok": true,
-      "message": "permintaan kedua saat off tetap dilayani"
     },
     {
       "ok": true,

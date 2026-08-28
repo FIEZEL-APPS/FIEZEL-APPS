@@ -15,8 +15,8 @@
   "lessonCount": 139,
   "levelCounts": {
     "A1": 17,
-    "A2": 17,
-    "B1": 47,
+    "A2": 16,
+    "B1": 48,
     "B2": 32,
     "C1": 19,
     "C2": 7
@@ -445,7 +445,7 @@
     },
     {
       "lessonId": "reported_speech_pronoun_and_possessive_shift",
-      "level": "A2",
+      "level": "B1",
       "sequence": 33,
       "unit": "A2.2",
       "title": "Reported speech: kata ganti ikut pindah",

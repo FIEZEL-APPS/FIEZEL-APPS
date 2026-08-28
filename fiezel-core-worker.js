@@ -19,10 +19,13 @@ const FEEDBACK_KEY=PFX+'feedback';
 const FEEDBACK_MAX=200;
 const FEEDBACK_MAX_TEXT=600;
 const FEEDBACK_MAX_QUERY=80;
-// OWNER memilih feedback terbuka tanpa login. Tanpa identitas pengirim, satu-satunya
-// rem yang tersisa adalah rem global - jadi ia dipasang ketat, dan penyimpanannya
-// berupa cincin: yang terlama terdorong keluar alih-alih tumbuh tanpa batas.
+// m0261-d17 (audit D3 MED-2): feedback dulu terbuka tanpa login (pilihan OWNER lama).
+// Diperketat: sesi Puter valid WAJIB + jatah per identitas per jam, karena saluran
+// terbuka bisa dihabiskan satu pengirim (429 sepanjang jam untuk murid asli) dan
+// cincin 200 entri bisa diusir penuh sebelum OWNER membacanya. Rem global tetap ada
+// sebagai lapis kedua, dan penyimpanannya tetap cincin: yang terlama terdorong keluar.
 const FEEDBACK_RATE_PER_HOUR=60;
+const FEEDBACK_RATE_PER_USER_PER_HOUR=5;
 const FEEDBACK_RATE_KEY=PFX+'feedback_rate';
 const FEEDBACK_NOTIFIED_KEY=PFX+'feedback_notified';
 const FEEDBACK_NOTIFY_KIND='owner_feedback';
@@ -481,6 +484,20 @@ async function allowFeedback(){
     await me.puter.kv.set(FEEDBACK_RATE_KEY,{windowStart,count:count+1},Math.floor((windowStart+2*60*60*1000)/1000));return true
   })
 }
+// m0261-d17 (audit D3 MED-2): jatah PER IDENTITAS. Rem global saja bisa dihabiskan satu
+// pengirim bertekad; jatah per-uuid membuat satu akun paling banyak mengambil 5 slot/jam
+// dari 60 slot global. Kunci lock per-uuid: dua kiriman pengirim BERBEDA tidak saling
+// menunggu, hanya kiriman pengirim yang sama yang diserialkan.
+async function allowFeedbackFor(uuid){
+  const key=FEEDBACK_RATE_KEY+':'+uuid;
+  return withKvMutationLock(key,async()=>{
+    const now=Date.now(),cur=(await me.puter.kv.get(key))||{};
+    const windowStart=Number(cur.windowStart||0),count=Number(cur.count||0);
+    if(!windowStart||now-windowStart>=60*60*1000){await me.puter.kv.set(key,{windowStart:now,count:1},Math.floor((now+2*60*60*1000)/1000));return true}
+    if(count>=FEEDBACK_RATE_PER_USER_PER_HOUR)return false;
+    await me.puter.kv.set(key,{windowStart,count:count+1},Math.floor((windowStart+2*60*60*1000)/1000));return true
+  })
+}
 /**
  * Membersihkan teks kiriman anonim.
  *
@@ -492,10 +509,11 @@ async function allowFeedback(){
 function feedbackText(value,limit){
   return String(value==null?'':value).replace(/[<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,limit)
 }
-router.post('/api/feedback',async({request})=>{
-  // OWNER memilih terbuka: tidak ada pemeriksaan login di sini, dengan sengaja.
+router.post('/api/feedback',async({request,user})=>{
+  // D3 MED-2: wajib sesi + jatah per identitas; rem global lapis kedua.
   if(requestExceedsLimit(request,8192))return json({error:'feedback payload too large'},413);
-  if(!(await allowFeedback()))return json({error:'feedback rate limit reached; try again later'},429);
+  const info=await callerInfo(user);if(!info?.uuid)return json({error:'Puter authentication required'},401);
+  if(!(await allowFeedbackFor(info.uuid))||!(await allowFeedback()))return json({error:'feedback rate limit reached; try again later'},429);
   const body=await request.json().catch(()=>({}));
   const kind=body.kind==='missing_material'?'missing_material':'note';
   const message=feedbackText(body.message,FEEDBACK_MAX_TEXT);

@@ -143,7 +143,6 @@
     "substituting an unrelated noun ('affection') that only superficially resembles the needed verb": "milih kata yang cuma mirip bunyi, padahal makna dan jenisnya beda jauh.",
     "tense inconsistency after a past event": "pakai bentuk sekarang, padahal keputusannya udah selesai di masa lampau.",
     "This is the original unedited sentence, left unchanged.": "kalimatnya dibiarkan apa adanya, jadi kesalahan yang mau diperbaiki masih ada.",
-    "adds an unnecessary obligation phrase not supported by the sentence's meaning": "nambah makna kewajiban, padahal yang diingat tindakannya, bukan kewajibannya.",
     "applies the 'future duty' pattern ('remember to do') to a sentence that is actually recalling a completed past action": "pakai pola tugas belum dikerjakan, padahal kalimatnya mengingat kejadian yang udah lewat.",
     "Applies the to-infinitive pattern used after 'allow' to the different verb 'let'.": "pinjam pola kata kerja lain, padahal kata kerja ini diikuti bentuk dasar.",
     "bare infinitive used instead of the required to-infinitive": "pakai bentuk dasar tanpa 'to', padahal makna tujuan di sini minta 'to'.",
@@ -301,7 +300,6 @@
     "ignores that 'only' already uniquely identifies the noun": "mengabaikan 'only' yang udah bikin bendanya unik, jadi keterangannya cuma tambahan.",
     "keeps the unreduced full relative clause when a reduced participle phrase is the target structure being tested": "mempertahankan klausa relatif lengkapnya yang sebenarnya sah, padahal soal ini menguji bentuk ringkasnya.",
     "reverses the preposition-pronoun order, putting 'with' directly after 'who' mid-clause": "membalik urutannya, jadi kata depannya jatuh setelah 'who', susunan yang nggak pernah sah.",
-    "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things.": "nawarin dua kata ganti sekaligus, padahal posisi ini boleh dikosongkan.",
     "Reverses the order of quantifier and relative pronoun.": "membalik urutannya, padahal pola bakunya kata jumlah dulu, dan 'which' nggak bisa menunjuk orang.",
     "Scrambles the word order of the fixed quantifier + of + whom structure.": "mengacak urutan pola yang sebenarnya udah baku.",
     "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error.": "pakai kata tanya sebagai penghubung, padahal setelah kata benda bentuknya beda.",
@@ -349,7 +347,6 @@
     "bare present form in a past narrative": "pakai bentuk sekarang telanjang, padahal seluruh kalimatnya berlatar masa lampau.",
     "bare present form used for a past narrative": "pakai bentuk sekarang buat cerita masa lampau.",
     "collapsing future-in-the-past into simple past": "meratakannya jadi fakta lampau biasa, sudut pandang dari waktu itu pun hilang.",
-    "confuses completed prior action with an action still in progress at the reference point": "menandainya masih berlangsung, padahal tindakannya udah selesai sebelum kejadian berikutnya.",
     "Confuses future continuous (in-progress at a moment) with future perfect continuous (duration up to a point).": "menandai kejadian yang lagi berlangsung, padahal yang disorot lamanya sampai titik itu.",
     "Confuses future perfect simple (completion/result) with future perfect continuous (ongoing duration emphasis).": "menekankan selesainya, padahal keterangan di kalimatnya menyorot lamanya.",
     "confuses interrupted past action with present perfect result": "pakai bentuk yang nggak bisa jalan bareng penanda waktu lampau tegas.",
@@ -365,7 +362,6 @@
     "present simple used for a one-off future act": "pakai bentuk buat rutinitas atau jadwal, padahal ini keputusan spontan saat itu.",
     "present-perfect-for-any-past-event": "pakai bentuk penghubung ke masa kini, padahal tahunnya mengunci kejadian lampau.",
     "shifts to a fixed past narrative tense": "memindahkannya ke bentuk lampau terkunci, padahal rentang waktunya masih jalan.",
-    "Shifts to past tense despite the present-relevance context.": "pakai bentuk lampau buat keadaan yang masih berlaku sampai sekarang.",
     "structural error: double -ing after 'going to'": "pakai bentuk '-ing' setelah penanda rencana, padahal sesudahnya kata kerja bentuk dasar.",
     "tense-timeline mismatch": "pakai bentuk sekarang buat kejadian yang bertanggal di masa lampau.",
     "treating past perfect simple as sufficient for any earlier past event": "menekankan selesainya kejadian, padahal yang menjelaskan akibatnya justru lamanya.",
@@ -418,6 +414,10 @@
     "stand-alone-possessive-before-noun": "pakai bentuk milik yang berdiri sendiri tepat sebelum kata benda.",
     "object-pronoun-substitution": "pakai kata ganti objek di posisi yang butuh penanda kepemilikan.",
     "movement preposition used for a static location": "pakai kata depan gerak buat posisi yang diam.",
-    "treats a route point as a surface in the first slot": "memperlakukan titik di rute sebagai permukaan, jadi celah pertamanya udah keliru."
+    "treats a route point as a surface in the first slot": "memperlakukan titik di rute sebagai permukaan, jadi celah pertamanya udah keliru.",
+    "keeps the action in progress at 'now' instead of marking it completed before the past reference point": "kejadiannya dibiarin masih jalan di 'sekarang', padahal harusnya udah kelar sebelum titik acuan lampaunya.",
+    "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action": "bentuk to sempurna dipasang sesudah 'remember', padahal buat ingatan lampau pola itu nggak dipakai.",
+    "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense": "kalimatnya cuma disisain bentuk -ing tanpa kata kerja utama, jadi nggak ada yang megang waktunya.",
+    "uses possessive 'whose' where the clause needs an object relative pronoun or nothing at all": "kata 'whose' dipakai padahal nggak ada makna kepemilikan; kata penghubung objeknya malah bisa dihilangin aja."
   }
 }

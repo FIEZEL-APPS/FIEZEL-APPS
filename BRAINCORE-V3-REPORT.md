@@ -285,3 +285,48 @@ simulator A11. Yang TIDAK bisa dijamin dari sini: bahwa implementasi paralel mem
 kontraknya. Itu tugas gate di §5, §6.2, dan §7.2 — dan sampai semuanya dijalankan pada
 integrasi akhir dan PASS, status v3 yang jujur adalah **"dikontrak dan sedang dibangun"**,
 bukan "selesai".
+
+---
+
+## 10. Wave D — audit menyeluruh & perbaikan (2026-08-28)
+
+Setelah gelombang A/B/C, sepuluh auditor READ-ONLY menyisir seluruh repo pada branch
+`audit-wave-d` (HEAD `f3d8659`), lalu sepuluh fixer mengeksekusi perbaikannya. Laporan
+lengkap tiap audit ada di `/home/user/workspace/d-findings/` — ringkasan di bawah hanya
+penunjuk, angkanya milik laporan sumber.
+
+**Sepuluh audit (D1–D10), satu baris per temuan terpenting:**
+
+| Audit | Temuan kunci | Sumber |
+|---|---|---|
+| D1 gate sweep | 168 gate dijalankan: 165 PASS, 3 FAIL dari SATU akar (needle literal `release-audit.py` basi terhadap `app.js` wave-D + domino + jendela proximity `paw-mascot-test.js`); 1 gate yatim CI (`adaptivity-simulation-v3.js`) | `d-findings/D1-gate-sweep.md` |
+| D2 kontaminasi konten | Angka §7 readiness report basi: listening MCQ nyatanya 100% EN (bukan 842), reading 1.024 soal ber-opsi EN, `evidence_mismatch` = 0 hari ini; 1.407 item listening tanpa penjelasan | `d-findings/D2-content-contamination.md` |
+| D3 keamanan & privasi | 0 CRITICAL; 3 HIGH: tanpa CSP, `/api/auth/anon` tanpa rate limit, edge guard fail-open saat secret belum terpasang; nol secret hardcode | `d-findings/D3-security-privacy.md` |
+| D4 performa | `app.js` 669 KB monolitik; `Intl.DateTimeFormat` dibuat per baris riwayat; 3× `save()` per jawaban | `d-findings/D4-performance.md` |
+| D5 aksesibilitas & UX | Zoom dikunci total (gagal WCAG 1.4.4/1.4.10); `setApp()` tidak memindahkan fokus; `#app` live-region seluruh aplikasi; tap target 27–39 px | `d-findings/D5-a11y-ux.md` |
+| D6 kode mati & wiring | 15 modul brain semua punya jalur runtime; beberapa ekspor layak di-wire (`topConfusions`, saran afek); bug `classroomBaseRenderer` menangkap pembungkusnya sendiri | `d-findings/D6-dead-code-wiring.md` |
+| D7 PWA & offline | `fiezel-search.js` dimuat index.html tapi tidak dipre-cache (membeku lintas rilis); jendela campuran versi index-baru/app-lama; cache lama tak pernah dibersihkan (±152 MB/bump) | `d-findings/D7-pwa-offline.md` |
+| D8 deploy Cloudflare/Puter | Core Worker deploy ke PUTER, bukan Cloudflare; `fiezel-api`/`fiezel-owner` TIDAK punya CI deploy — manual owner; semua workflow digerbang aktor `FIEZEL-APPS` | `d-findings/D8-cloudflare-deploy.md` |
+| D9 kualitas grammar | 139 template: integritas referensial 100% bersih, tapi 4 item FATAL berjawaban ambigu (TA-006, GI-002, b4_003, b4_018) + tier distraktor tipis-penjaga | `d-findings/D9-grammar-quality.md` |
+| D10 peta tabrakan | Kunci T-026 neural-voice (agent lain) tetap berlaku; `sw.js` disentuh 8 PR terbuka, `quality.yml` 5 — file panas yang hanya boleh diubah additive | `d-findings/D10-collision-map.md` |
+
+**Sepuluh perbaikan (D11–D20), kepemilikan file eksklusif per fixer:**
+
+| Fixer | Area (file yang dimiliki) | Perbaikan dari temuan |
+|---|---|---|
+| D11 | `grammar-templates.json`, `grammar-misconception-id.json`, `cloze-bank-v1.json` | 4 item fatal D9 + metadata + register `whyFailsId` |
+| D12 | `reading-bank.json`, `reading-exam-v1.json` | 4 evidence ber-elipsis + kerangka item A1/A2 per rekomendasi D2 |
+| D13 | `listening-bank-v1.json`, `listening-exam-v1.json` | Stem A1/A2 ke Indonesia + `explain` Indonesia (P0 D2) |
+| D14 | `app.js` | Perf P0 D4, bug wiring D6, fokus & popup a11y D5 |
+| D15 | `style.css` | Cincin fokus kontras, tap target ≥44 px, PRM, styling cloze/step-tutor (D5) |
+| D16 | `index.html`, `sw.js`, zoom-lock | Precache `fiezel-search.js`, pembersihan cache lama, buka pinch-zoom, live region, CSP hati-hati (D7/D5/D3) |
+| D17 | `workers/api/**`, `workers/owner/**` | Rate limit auth, edge guard fail-closed, hardening feedback (D3 HIGH-2/HIGH-3/MED-2) |
+| D18 | Dokumen (laporan ini, readiness report, release notes) | Koreksi angka basi §7 + bagian ini + `WAVE-D-RELEASE-NOTES.md` |
+| D19 | `.github/workflows/nightwatch.yml` (baru), `quality.yml` (additive) | Gate yatim masuk CI + suite malam berjadwal dengan pelaporan issue |
+| D20 | `release-audit.py`, gate rapuh, `tools/release-check.js` (baru) | Needle basi → regex sah, assert proximity → struktural, registry blind spot, satu perintah cek rilis |
+
+**Status jujur, dengan aturan yang sama seperti §5–§7:** perbaikan dieksekusi **paralel**
+(bagian ini ditulis saat fixer lain masih bekerja), **gate final pada integrasi** — tidak
+satu pun hasil PASS/FAIL pasca-perbaikan diklaim di sini. Ringkasan untuk owner, termasuk
+risiko sisa dan daftar tindak lanjut yang ditunda, ada di
+[WAVE-D-RELEASE-NOTES.md](WAVE-D-RELEASE-NOTES.md).
