@@ -596,6 +596,27 @@ jobs:
           node speaking-adaptive-test.js
           node srl-coach-test.js
           node cors-envelope-test.js
+      - name: 'Gerbang warisan merge main 28 Agu yang belum terdaftar (temuan E5, wave E)'
+        # Ditemukan gate-registry-test.js saat pengerjaan E5 (29 Agu 2026): lima belas berkas
+        # uji dari merge main (analytics, telemetry, brain manifest, locale, baseline emas,
+        # cakupan Thai, dst.) tidak pernah dipanggil CI. Semuanya dijalankan lokal lebih dulu
+        # dan lima belas-nya exit 0 — yang kurang pendaftarannya, bukan mutunya.
+        run: |
+          node adaptivity-simulation-v3-hardened-test.js
+          node analytics-dedup-test.js
+          node analytics-stable-id-guard-test.js
+          node app-telemetry-wiring-test.js
+          node audio-locale-guard-test.js
+          node brain-config-test.js
+          node brain-manifest-test.js
+          node fiezel-stat-gate-test.js
+          node id-golden-snapshot-test.js
+          node learning-lane-test.js
+          node learning-metrics-test.js
+          node learning-telemetry-test.js
+          node locale-enum-test.js
+          node metrics-digest-test.js
+          node th-coverage-test.js
       - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
         # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
         # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola

@@ -277,6 +277,9 @@ if (setterBlocks.length) {
     const sandbox = {
       state: progress,
       LEVELS,
+      // Refactor i18n memindahkan literal toast ke FiezelI18n.t; fixture hermetis harus
+      // menyediakan global yang sama seperti runtime, bukan menguji keberadaannya.
+      FiezelI18n: { t: (key) => String(key) },
       coreBrainCache: { stale: true },
       getActiveLevel: () => progress.preferences.activeLevel || 'A1',
       activeLevelIsManual: () => LEVELS.includes(String(progress.preferences.activeLevel || '')),
