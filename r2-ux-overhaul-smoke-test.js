@@ -101,16 +101,15 @@ setTimeout(()=>{
     element('feedback').innerHTML='';
     // Jawab benar (indeks dari generator deterministik yang sama).
     captured[q.answerIndex].onclick();
-    // R2-5: popup keyakinan tampil DULU; pembahasan belum tercat.
-    assert(bodyChildren.some(e=>e.id==='confidencePop'),'popup keyakinan tidak tampil setelah menjawab');
-    assert(element('feedback').innerHTML==='','pembahasan tercat sebelum popup keyakinan selesai — urutan R2-5 rusak');
-    ctx.setConfidence(2);
-    ctx.confidencePopNext();
-    assert(element('feedback').innerHTML!=='','pembahasan tidak tercat setelah popup selesai');
-    assert(element('quizNext').disabled===false,'tombol Lanjut tidak hidup setelah pembahasan');
+    // m025-180 (audit UI/UX 09-001): gerbang lewati materi adalah MODE UKUR. Popup keyakinan,
+    // vonis, dan pembahasan TIDAK BOLEH tampil di tengah tes — bocoran jawaban membuat gerbang
+    // 5-soal bisa di-farm. Yang tampil hanya tanda terima netral; pembahasan menunggu di hasil.
+    assert(!bodyChildren.some(e=>e.id==='confidencePop'),'popup keyakinan bocor di mode ukur — gerbang harus netral');
+    assert(/Tersimpan/.test(element('feedback').innerHTML),'tanda terima netral tidak tampil setelah menjawab');
+    assert(!/Jawaban yang paling tepat/.test(element('feedback').innerHTML),'pembahasan bocor di tengah gerbang — urutan mode ukur rusak');
+    assert(element('quizNext').disabled===false,'tombol Lanjut tidak hidup setelah jawaban tersimpan');
     const h=st.history[st.history.length-1];
     assert(h&&h.ok===true,'jawaban dari generator deterministik ternyata salah — smoke tidak sinkron');
-    assert(h.confidence===2,'keyakinan tidak tercatat pada jawaban');
     element('quizNext').onclick();
   }
   const result=elements.app.innerHTML;
@@ -122,6 +121,31 @@ setTimeout(()=>{
   ctx.go('grammar');
   const hub2=elements.app.innerHTML;
   assert(!/openLessonSkipGate\('articles_a_an_the'\)/.test(hub2),'lesson yang sudah lulus gerbang masih menawarkan lewati');
+
+  // ---- R2-5 (kontrak popup keyakinan) kini diperiksa di jalur LATIHAN ----
+  // m025-180: mode ukur sengaja bisu, jadi urutan popup->analyzing->pembahasan diuji pada
+  // kuis latihan (practiceSkill) — jalur yang memang memakai popup. Dipakai lesson PERTAMA
+  // kurikulum (tanpa prasyarat, selalu terbuka); lesson yang lulus gerbang lewati tetap
+  // terkunci untuk latihan karena prasyaratnya sendiri belum dipenuhi. Generator sama-sama
+  // deterministik di bawah Math.random beku, jadi jawaban benarnya bisa dihitung di muka.
+  const practiceSkillId='subject_object_pronouns_and_possessives';
+  const practiceExpected=ctx.buildGrammarLessonQuestions(practiceSkillId,25);
+  assert(practiceExpected.length===25,'pool latihan lesson pertama kurang dari 25 soal valid');
+  element('feedback').innerHTML='';
+  ctx.practiceSkill(practiceSkillId);
+  assert(String((st.activeSession||{}).type||'')==='grammar','kuis latihan tidak dimulai (practiceSkill menolak)');
+  const pq=practiceExpected[0];
+  assert(captured.length>=2,'pilihan jawaban latihan tidak tercat');
+  captured[pq.answerIndex].onclick();
+  assert(bodyChildren.some(e=>e.id==='confidencePop'),'popup keyakinan tidak tampil setelah menjawab (latihan)');
+  assert(element('feedback').innerHTML==='','pembahasan tercat sebelum popup keyakinan selesai — urutan R2-5 rusak');
+  ctx.setConfidence(2);
+  ctx.confidencePopNext();
+  assert(element('feedback').innerHTML!=='','pembahasan tidak tercat setelah popup selesai');
+  assert(element('quizNext').disabled===false,'tombol Lanjut tidak hidup setelah pembahasan');
+  const hp=st.history[st.history.length-1];
+  assert(hp&&hp.ok===true,'jawaban latihan dari generator deterministik ternyata salah — smoke tidak sinkron');
+  assert(hp.confidence===2,'keyakinan tidak tercatat pada jawaban latihan');
 
   console.log('R2 SMOKE: PASS');
   process.exit(0);
