@@ -201,6 +201,29 @@ function makeRequest(url, opts) {
 }
 
 /* ==========================================================================================
+ * PENANDA BUKU (D4 butir e). `GET /` tanpa sesi kini 303 ke `/login`, bukan 403. Yang diperiksa
+ * bukan hanya statusnya: respons itu harus TIDAK bisa dipakai memeriksa apakah dashboard sudah
+ * dikonfigurasi, dan tidak boleh membawa data. Semua tempat yang dulu mengassert "403 di `/`"
+ * memakai fungsi ini, supaya pengalihan itu punya SATU definisi dan tidak bisa dilonggarkan
+ * diam-diam di satu tempat saja.
+ * ======================================================================================== */
+async function assertLoginRedirect(res, label) {
+  assert(res.status === 303, label + ': GET / tanpa sesi → 303, dapat ' + res.status);
+  assert((res.headers.get('location') || '') === '/login',
+    label + ": Location tepat '/login', dapat " + JSON.stringify(res.headers.get('location')));
+  const body = await res.text();
+  assert(body === '', label + ': pengalihan tidak membawa badan sama sekali, dapat ' + body.length + ' byte');
+  assert(!res.headers.get('set-cookie'),
+    label + ': pengalihan tidak menyentuh cookie (menghapus cookie basi = oracle "punya cookie")');
+  assert(!/dau|wau|mau|totalUsd|visitors/i.test(body + JSON.stringify([...res.headers])),
+    label + ': pengalihan tidak memuat satu pun kunci metrik');
+  assert(!/OWNER_TOKEN_HASH|OWNER_SESSION_KEY|EDGE_SHARED_SECRET|belum dikonfigurasi|not configured/i
+    .test(body + JSON.stringify([...res.headers])),
+    label + ': pengalihan tidak menyebut nama Secret maupun keadaan konfigurasi');
+  return { status: res.status, headers: [...res.headers].map(([k, v]) => k + ':' + v).sort().join('|'), body };
+}
+
+/* ==========================================================================================
  * Tiruan filter pass-through proxy PHP — dibaca DARI berkas PHP, bukan diketik ulang di sini.
  * Kalau daftar di PHP berubah, tiruan ini berubah bersamanya; itu inti butir (c).
  * ======================================================================================== */
@@ -386,8 +409,13 @@ function proxyForward(workerHeaders, list) {
     ]) {
       const env = makeEnv();
       const res = await mod.handle(makeRequest(route + '?admin=true', { headers }), env, {}, NOW);
-      assert(res.status === 403,
-        '(b) ' + route + ' [' + label + '] dengan header edge BENAR → ' + res.status + ', seharusnya 403');
+      if (route === '/') {
+        // Penanda buku: satu rute, satu metode. Ia dialihkan, TIDAK dilayani — lapis dua utuh.
+        await assertLoginRedirect(res, '(b) / [' + label + ']');
+      } else {
+        assert(res.status === 403,
+          '(b) ' + route + ' [' + label + '] dengan header edge BENAR → ' + res.status + ', seharusnya 403');
+      }
       assert(env.ANALYTICS._log.length === 0, '(b) ' + route + ' [' + label + '] menyentuh D1 tanpa sesi owner');
     }
   }
@@ -671,8 +699,12 @@ function proxyForward(workerHeaders, list) {
     for (const route of ownerRoutes) {
       const e2 = makeEnv();
       const res = await mod.handle(reqAt('owner.fiezel.my.id', route + '?admin=true'), e2, {}, NOW);
-      assert(res.status === 403,
-        '(g-a) ' + route + ' di hostname kanonik TANPA sesi owner tetap 403, dapat ' + res.status);
+      if (route === '/') {
+        await assertLoginRedirect(res, '(g-a) / di hostname kanonik tanpa sesi');
+      } else {
+        assert(res.status === 403,
+          '(g-a) ' + route + ' di hostname kanonik TANPA sesi owner tetap 403, dapat ' + res.status);
+      }
       assert(e2.ANALYTICS._log.length === 0, '(g-a) ' + route + ' menyentuh D1 tanpa sesi owner');
     }
     // Token owner tetap bisa dipakai sesudah gerbang lewat: sha256 HEX + waktu-konstan, utuh.
@@ -843,6 +875,13 @@ function proxyForward(workerHeaders, list) {
 
   /* ---------- (g-f) tanpa Secret gate owner, SEMUA rute tetap 403 --------------------- */
   {
+    // Sidik jari respons `GET /` SAAT Secret lengkap. Butir (e) D4: pengalihan penanda buku harus
+    // BYTE-IDENTIK entah Secret sudah dipasang atau belum — kalau tidak, siapa pun bisa memakai
+    // `curl -I https://owner.fiezel.my.id/` untuk mengetahui apakah dashboard sudah hidup.
+    const configuredRedirect = await assertLoginRedirect(
+      await mod.handle(reqAt('owner.fiezel.my.id', '/'), makeEnv(), {}, NOW),
+      '(g-f) / dengan Secret lengkap');
+
     for (const [label, override] of [
       ['tanpa OWNER_TOKEN_HASH', { OWNER_TOKEN_HASH: undefined }],
       ['tanpa OWNER_SESSION_KEY', { OWNER_SESSION_KEY: undefined }],
@@ -856,8 +895,17 @@ function proxyForward(workerHeaders, list) {
             ? { cookie: goodCookie }
             : { 'x-fiezel-edge': EDGE_SECRET, cookie: goodCookie };
           const res = await mod.handle(reqAt(host, route, { headers }), env, {}, NOW);
-          assert(res.status === 403,
-            '(g-f) ' + host + route + ' [' + label + '] → ' + res.status + ', seharusnya 403 (fail-closed Secret)');
+          if (route === '/') {
+            const shape = await assertLoginRedirect(res, '(g-f) / [' + label + ']');
+            assert(shape.status === configuredRedirect.status
+              && shape.headers === configuredRedirect.headers
+              && shape.body === configuredRedirect.body,
+              '(g-f) pengalihan / [' + label + '] BYTE-IDENTIK dengan saat Secret lengkap '
+              + '(kalau berbeda, ia menjadi oracle keadaan konfigurasi)');
+          } else {
+            assert(res.status === 403,
+              '(g-f) ' + host + route + ' [' + label + '] → ' + res.status + ', seharusnya 403 (fail-closed Secret)');
+          }
           assert(env.ANALYTICS._log.length === 0, '(g-f) fail-closed Secret tidak menyentuh D1');
         }
       }
@@ -881,6 +929,7 @@ function proxyForward(workerHeaders, list) {
     // dijalankan atas BERKAS wrangler.toml, karena binding lahir dari berkas itu, bukan dari kode.
     const CORE_ID = '7bc356dc-8aff-41e1-b682-ae2039c58c55';
     const STATS_ID = 'c712000c-aab9-4a1d-b43d-e6d4c9b36ee8';
+    const CFG_KV_ID = '6386fc9752e14afd8a8f76a8d45e47d1';
     const stripComments = (toml) => toml.split('\n').filter((l) => !/^\s*#/.test(l)).join('\n');
     const live = stripComments(wranglerSource);
 
@@ -899,12 +948,31 @@ function proxyForward(workerHeaders, list) {
     assert(!new RegExp(CORE_ID).test(live),
       '(g-g) uuid fiezel-core tidak muncul di baris aktif wrangler.toml mana pun');
     assert(!/fiezel-core/.test(live), '(g-g) nama fiezel-core tidak muncul di baris aktif wrangler.toml');
-    // Jenis binding lain yang bisa menjadi pintu belakang ke data per-orang juga harus NOL.
-    for (const kind of ['kv_namespaces', 'durable_objects', 'services', 'queues', 'hyperdrive',
+    // Jenis binding lain yang bisa menjadi pintu belakang ke data per-orang tetap harus NOL.
+    // `kv_namespaces` DIKELUARKAN dari daftar ini pada 28 Agu 2026 (D4) karena rem penebakan
+    // halaman masuk butuh penyimpanan yang terkumpul lintas isolate; ia dibatasi ketat di blok
+    // berikutnya, bukan dibiarkan bebas.
+    for (const kind of ['durable_objects', 'services', 'queues', 'hyperdrive',
       'r2_buckets', 'vectorize', 'mtls_certificates']) {
       assert(!new RegExp('\\[\\[?' + kind).test(live),
         '(g-g) NOL binding ' + kind + ' di Worker owner (radius ledakan tetap satu database agregat)');
     }
+    // KV: TEPAT SATU, dan hanya `fiezel-CFG`. Kalau blok ini melebar, rem berubah menjadi pintu.
+    const kvBlocks = live.split(/\[\[kv_namespaces\]\]/).slice(1).map((b) => b.split(/\n\s*\[/)[0]);
+    assert(kvBlocks.length === 1,
+      '(g-g) TEPAT satu binding KV di Worker owner (untuk rem login), dapat ' + kvBlocks.length);
+    const kvBinding = (/binding\s*=\s*"([^"]+)"/.exec(kvBlocks[0]) || [, ''])[1];
+    const kvId = (/\bid\s*=\s*"([^"]+)"/.exec(kvBlocks[0]) || [, ''])[1];
+    assert(kvBinding === 'CFG', '(g-g) binding KV bernama CFG (nama yang sama dengan workers/api), dapat ' + kvBinding);
+    assert(kvId === CFG_KV_ID, '(g-g) namespace KV-nya fiezel-CFG yang benar, dapat ' + kvId);
+    // Alasan berangka WAJIB tertulis di berkas yang membuat binding itu ada. Klaim lama
+    // "Nol tulis KV" di berkas ini pernah BENAR dan sekarang tidak; kalau ia kembali, ia bohong.
+    assert(!/Nol tulis KV/.test(wranglerSource),
+      '(g-g) klaim usang "Nol tulis KV" tidak boleh kembali ke wrangler.toml: rem login menulis KV');
+    assert(/1\.000 tulis\/hari|1\.000\/hari/.test(wranglerSource) && /720\/hari|720 tulis/.test(wranglerSource),
+      '(g-g) anggaran tulis KV rem login tertulis berangka di wrangler.toml (720 dari 1.000 per hari)');
+    assert(!/Nol tulis KV\/D1/.test(readmeSource),
+      '(g-g) README tidak boleh lagi mengklaim "Nol tulis KV/D1" sesudah rem login menulis KV');
     assert(/workers_dev\s*=\s*false/.test(live),
       '(g-g) workers_dev = false tetap terpasang (satu pintu, satu tempat memasang Access)');
     // Pemeriksa ini harus BISA merah: daftar yang disuntik binding core wajib tertangkap.
@@ -938,6 +1006,422 @@ function proxyForward(workerHeaders, list) {
       '(g-*) DEPLOY.md membahas custom domain owner.fiezel.my.id');
   }
 
+
+  /* ==========================================================================================
+   * (b-a)…(b-g) REM PENEBAKAN HALAMAN MASUK — LINTAS ISOLATE, PER-SUMBER, BERGULIR
+   * ==========================================================================================
+   * Bukti lapangan 28 Agu 2026: 12 percobaan token salah berturut-turut ke
+   * `POST https://owner.fiezel.my.id/login` menghasilkan 403 dua belas kali dan NOL 429, padahal
+   * batasnya 8. Sebabnya `loginAttempts = new Map()` di lingkup modul = memori PER-ISOLATE.
+   * Karena itu harness di bawah TIDAK memakai satu modul untuk banyak permintaan: setiap
+   * permintaan dilayani modul yang BARU DIIMPOR (`freshIsolate()`), yang berarti setiap Map di
+   * lingkup modul mulai KOSONG — persis keadaan yang membuat rem lama tidak pernah menyentuh.
+   * Satu-satunya yang bertahan antar permintaan adalah stub KV, yang hidup di LUAR modul.
+   * ======================================================================================== */
+  {
+    const post = (host, token, headers) => new Request('https://' + host + '/login', {
+      method: 'POST',
+      headers: Object.assign({ 'content-type': 'application/json' }, headers || {}),
+      body: JSON.stringify({ t: token }),
+    });
+    const ATTACKER_IP = '203.0.113.77';
+    const OWNER_IP = '198.51.100.9';
+    const HOST = 'owner.fiezel.my.id';
+    const WRONG = 'token-yang-salah-sekali-0000';
+
+    /* --- Stub KV. Hidup di luar modul (itu intinya), menghormati expirationTtl terhadap jam
+     *     palsu, dan MENCATAT setiap operasi supaya butir (b-d) bisa memindai apa yang benar-
+     *     benar ditulis, bukan apa yang kita kira ditulis. */
+    function makeKv(clock) {
+      const store = new Map();
+      const ops = [];
+      return {
+        _store: store, _ops: ops, fail: false,
+        async get(key, opts) {
+          ops.push({ op: 'get', key, opts });
+          if (this.fail) throw new Error('KV get gagal (disuntikkan gerbang)');
+          const entry = store.get(key);
+          if (!entry) return null;
+          if (entry.expiresAt <= clock.now) { store.delete(key); return null; }
+          return entry.value;
+        },
+        async put(key, value, opts) {
+          ops.push({ op: 'put', key, value: String(value), opts });
+          if (this.fail) throw new Error('KV put gagal (disuntikkan gerbang)');
+          const ttl = Number(opts && opts.expirationTtl);
+          if (!Number.isFinite(ttl) || ttl <= 0) {
+            throw new Error('put TANPA expirationTtl: kunci rem akan menumpuk selamanya');
+          }
+          store.set(key, { value: String(value), expiresAt: clock.now + ttl * 1000 });
+        },
+      };
+    }
+
+    let isolateSeq = 0;
+    const freshIsolate = async () => {
+      isolateSeq += 1;
+      // Komentar unik = URL data: unik = modul BARU dengan lingkup modul yang kosong.
+      const src = indexSource.replace("'./queries.js'", `'${dataUrl(queriesSource)}'`)
+        + '\n// isolate-uji-' + isolateSeq + '\n';
+      return import(dataUrl(src));
+    };
+
+    // Harness-nya harus TERBUKTI memodelkan isolate baru, bukan hanya mengaku.
+    {
+      const a = await freshIsolate();
+      const b = await freshIsolate();
+      assert(a !== b, '(b-a/harness) freshIsolate() mengembalikan modul BERBEDA per permintaan');
+      const kvA = makeKv({ now: NOW });
+      const envA = makeEnv({ CFG: kvA, RATE_SALT: 'garam-uji-rem-owner' });
+      await a.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), envA, {}, NOW);
+      // Modul b belum pernah melihat permintaan: lapis memorinya kosong. Kalau `freshIsolate()`
+      // ternyata memakai ulang modul, hitungan memori akan terbawa dan assert ini merah.
+      const memB = b.loginBrakeCheck
+        ? await b.loginBrakeCheck(makeEnv({ RATE_SALT: 'garam-uji-rem-owner' }),
+          post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), 'custom-domain', NOW)
+        : null;
+      assert(memB && memB.throttled === false && memB.storage === 'memory',
+        '(b-a/harness) isolate baru benar-benar mulai dengan lapis memori KOSONG');
+    }
+
+    // Kontrak angka. Kalau angka-angka ini digeser, laporan D4 dan wrangler.toml jadi bohong.
+    assert(mod.LOGIN_MAX === 5, '(b-c) LOGIN_MAX = 5 percobaan gagal per sumber, dapat ' + mod.LOGIN_MAX);
+    assert(mod.LOGIN_BUCKET_MS === 120000, '(b-c) lebar ember 2 menit, dapat ' + mod.LOGIN_BUCKET_MS);
+    assert(mod.LOGIN_WINDOW_BUCKETS === 5, '(b-c) 5 ember = jendela bergulir 10 menit, dapat ' + mod.LOGIN_WINDOW_BUCKETS);
+    assert(mod.loginWindowKeys(NOW).length === 5 && new Set(mod.loginWindowKeys(NOW)).size === 5,
+      '(b-c) jendela bergulir = 5 kunci ember BERBEDA');
+    assert(mod.loginWindowKeys(NOW)[0] === mod.loginBucketKey(NOW),
+      '(b-c) kunci pertama adalah ember SEKARANG (yang ditulis saat gagal)');
+    assert(mod.loginBucketKey(NOW) === mod.loginBucketKey(NOW + 119999)
+      && mod.loginBucketKey(NOW) !== mod.loginBucketKey(NOW + 120001),
+      '(b-c) ember berganti tepat di batas 2 menit');
+    assert(mod.loginBrakeLimit(mod.loginBrakeScope('custom-domain')) === 5
+      && mod.loginBrakeLimit(mod.loginBrakeScope('header')) === 20,
+      '(b-b) jalur jembatan (satu ember bersama, tanpa IP) punya batas TERPISAH dan lebih longgar');
+
+    /* --- (b-a) percobaan ke-N+1 dari sumber yang SAMA ditolak 429 walau setiap permintaan
+     *     dilayani isolate berbeda. Ini assert yang membuktikan rem tidak lagi dekoratif. --- */
+    const clock = { now: NOW };
+    const kv = makeKv(clock);
+    const statuses = [];
+    const throttleBodies = [];
+    for (let i = 0; i < mod.LOGIN_MAX + 3; i += 1) {
+      const iso = await freshIsolate();
+      const env = makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' });
+      const res = await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), env, {}, clock.now);
+      statuses.push(res.status);
+      if (res.status === 429) {
+        assert(res.headers.get('retry-after') === String(mod.LOGIN_RETRY_AFTER_S),
+          '(b-a) 429 memuat Retry-After KONSTANTA ' + mod.LOGIN_RETRY_AFTER_S + ', dapat ' + res.headers.get('retry-after'));
+        const body = await res.text();
+        // Anti-oracle: teks yang dilihat manusia tidak boleh memuat sisa kuota, hitungan
+        // percobaan, atau waktu buka yang dihitung dari ember tertua.
+        const visible = body.replace(/<script[\s\S]*?<\/script>/gi, '')
+          .replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]*>/g, ' ');
+        assert(!/remaining|resetAt|sisa\s*\d|percobaan\s+ke|\d+\s*(?:dari|\/)\s*\d+/i.test(visible),
+          '(b-a) badan 429 tidak membocorkan sisa kuota/riwayat sumber (anti-oracle): ' + visible.slice(0, 120));
+        throttleBodies.push(body);
+      }
+    }
+    assert(statuses.slice(0, mod.LOGIN_MAX).every((st) => st === 403),
+      '(b-a) ' + mod.LOGIN_MAX + ' percobaan pertama tetap 403 (rem tidak menghukum lebih awal), dapat ' + statuses.join(','));
+    assert(statuses.slice(mod.LOGIN_MAX).every((st) => st === 429),
+      '(b-a) percobaan ke-' + (mod.LOGIN_MAX + 1) + ' dan seterusnya = 429 MESKIPUN setiap permintaan '
+      + 'dilayani isolate baru, dapat ' + statuses.join(','));
+    assert(throttleBodies.length === 3 && new Set(throttleBodies).size === 1,
+      '(b-a) badan 429 IDENTIK di setiap penolakan (tidak berubah mengikuti riwayat sumber), dapat '
+      + new Set(throttleBodies).size + ' bentuk');
+    // Dan ember yang sudah penuh tidak boleh dipakai membakar kuota tulis KV.
+    const putsAfterLock = kv._ops.filter((o) => o.op === 'put').length;
+    assert(putsAfterLock === mod.LOGIN_MAX,
+      '(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat ' + putsAfterLock);
+    assert(kv._ops.filter((o) => o.op === 'put').every((o) => Number(o.opts && o.opts.expirationTtl) > 0),
+      '(b-a) setiap tulis rem ber-TTL (kunci hilang sendiri, tanpa cron pembersih)');
+    assert(kv._ops.filter((o) => o.op === 'get').every((o) => Number(o.opts && o.opts.cacheTtl) === 30),
+      '(b-a) baca rem memakai cacheTtl 30 detik = jendela lag tersempit yang diizinkan KV');
+
+    // Regresi terhadap cacat aslinya: TANPA penyimpanan bersama, rem memang tidak pernah bekerja.
+    // Assert ini mengunci ALASAN blok ini ada — kalau seseorang membuang binding KV, ia merah.
+    {
+      const only403 = [];
+      for (let i = 0; i < mod.LOGIN_MAX + 3; i += 1) {
+        const iso = await freshIsolate();
+        const res = await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+          makeEnv({ RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);   // TANPA CFG
+        only403.push(res.status);
+      }
+      assert(only403.every((st) => st === 403),
+        '(b-a) tanpa penyimpanan bersama, rem per-isolate memang NOL 429 — cacat lapangan '
+        + 'direproduksi, jadi 429 di atas benar-benar datang dari penyimpanan bersama, dapat ' + only403.join(','));
+    }
+
+    /* --- (b-b) sumber BERBEDA = ember TERPISAH, dan penyerang tidak bisa mengunci owner --- */
+    {
+      const iso = await freshIsolate();
+      const res = await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': OWNER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now);
+      assert(res.status === 403,
+        '(b-b) sumber lain TIDAK terkena kunci sumber pertama (ember per-sumber), dapat ' + res.status);
+      // Yang paling penting: owner masih bisa MASUK saat penyerang sedang terkunci.
+      const iso2 = await freshIsolate();
+      const ok = await iso2.handle(post(HOST, OWNER_TOKEN, { 'cf-connecting-ip': OWNER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now);
+      assert(ok.status === 303 && /fz_owner=[A-Za-z0-9]/.test(ok.headers.get('set-cookie') || ''),
+        '(b-b) owner tetap bisa masuk dari sumbernya sendiri saat sumber lain terkunci, dapat ' + ok.status);
+      // Dan penyerang yang terkunci tetap terkunci sesudah owner masuk.
+      const iso3 = await freshIsolate();
+      const still = await iso3.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now);
+      assert(still.status === 429, '(b-b) kunci sumber penyerang tidak ikut terhapus, dapat ' + still.status);
+      // Login BERHASIL = nol tulis. Kalau ini merah, kuota 1.000 tulis/hari dihitung salah.
+      const putsBefore = kv._ops.filter((o) => o.op === 'put').length;
+      const iso4 = await freshIsolate();
+      await iso4.handle(post(HOST, OWNER_TOKEN, { 'cf-connecting-ip': OWNER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now);
+      assert(kv._ops.filter((o) => o.op === 'put').length === putsBefore,
+        '(b-b) login BERHASIL nol tulis KV (dasar anggaran 720/hari)');
+      // Kunci ember dua sumber tidak boleh sama, dan tidak boleh bisa dipalsukan klien: header
+      // `x-forwarded-for` palsu TIDAK boleh memecah ember bila CF-Connecting-IP ada.
+      const kA = await mod.loginSourceKey(makeEnv({ RATE_SALT: 'g' }), post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), 'custom-domain', NOW);
+      const kB = await mod.loginSourceKey(makeEnv({ RATE_SALT: 'g' }), post(HOST, WRONG, { 'cf-connecting-ip': OWNER_IP }), 'custom-domain', NOW);
+      const kSpoof = await mod.loginSourceKey(makeEnv({ RATE_SALT: 'g' }),
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP, 'x-forwarded-for': '9.9.9.9', 'x-real-ip': '9.9.9.9' }),
+        'custom-domain', NOW);
+      assert(kA !== kB, '(b-b) dua IP → dua kunci ember');
+      assert(kA === kSpoof,
+        '(b-b) header yang BISA dipalsukan klien (x-forwarded-for/x-real-ip) tidak boleh memecah ember '
+        + 'saat CF-Connecting-IP ada');
+      assert(/^[0-9a-f]{32}$/.test(kA), '(b-b) kunci sumber = 128 bit hex hasil HMAC, dapat ' + kA);
+      assert(kA !== await mod.loginSourceKey(makeEnv({ RATE_SALT: 'garam-lain' }),
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), 'custom-domain', NOW),
+        '(b-b) kunci bergantung pada salt (memutar RATE_SALT mengosongkan ember, bukan tidak berpengaruh)');
+      assert(kA !== await mod.loginSourceKey(makeEnv({ RATE_SALT: 'g' }),
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), 'custom-domain', NOW + 86400000),
+        '(b-b) indeks hari ikut ditandatangani: hash yang sama tidak bisa melacak jaringan antar hari');
+    }
+
+    /* --- (b-c) jendela BERGULIR benar-benar pulih (dan pulih BERTAHAP, tiap 2 menit) ------ */
+    {
+      // Sumber penyerang terkunci pada `clock.now`. Jendela = 5 ember x 2 menit.
+      const stillLocked = await (await freshIsolate()).handle(
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now + 8 * 60 * 1000);
+      assert(stillLocked.status === 429,
+        '(b-c) 8 menit sesudah lima kegagalan, ember pertama masih di dalam jendela → tetap 429, dapat ' + stillLocked.status);
+
+      clock.now = NOW + 10 * 60 * 1000 + 1000;    // jam stub KV ikut maju: TTL benar-benar berlaku
+      const recovered = await (await freshIsolate()).handle(
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+        makeEnv({ CFG: kv, RATE_SALT: 'garam-uji-rem-owner' }), {}, clock.now);
+      assert(recovered.status === 403,
+        '(b-c) sesudah 10 menit tanpa kegagalan baru, jendela PULIH (403, bukan 429), dapat ' + recovered.status);
+      // Owner yang salah tempel token tidak boleh butuh 10 menit penuh untuk satu percobaan lagi:
+      // ember tertua keluar setiap 2 menit. Lima kegagalan tersebar satu-per-ember, lalu +2 menit.
+      const kv2 = makeKv(clock);
+      const env2 = () => makeEnv({ CFG: kv2, RATE_SALT: 'garam-uji-rem-owner' });
+      const t0 = NOW + 60 * 60 * 1000;
+      for (let i = 0; i < 5; i += 1) {
+        clock.now = t0 + i * mod.LOGIN_BUCKET_MS;
+        const r = await (await freshIsolate()).handle(
+          post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), env2(), {}, clock.now);
+        assert(r.status === 403, '(b-c) kegagalan tersebar ke-' + (i + 1) + ' masih 403, dapat ' + r.status);
+      }
+      clock.now = t0 + 4 * mod.LOGIN_BUCKET_MS + 1000;
+      const full = await (await freshIsolate()).handle(
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), env2(), {}, clock.now);
+      assert(full.status === 429, '(b-c) lima kegagalan tersebar tetap mengunci, dapat ' + full.status);
+      clock.now = t0 + 5 * mod.LOGIN_BUCKET_MS + 1000;   // ember tertua keluar dari jendela
+      const oneBack = await (await freshIsolate()).handle(
+        post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }), env2(), {}, clock.now);
+      assert(oneBack.status === 403,
+        '(b-c) satu percobaan kembali setiap 2 menit (owner tidak terkunci selamanya), dapat ' + oneBack.status);
+    }
+
+    /* --- (b-d) NOL IP mentah di penyimpanan maupun log — dipindai, bukan diasumsikan ------ */
+    {
+      const haystack = JSON.stringify(kv._ops) + '|' + JSON.stringify([...kv._store.entries()]);
+      for (const ip of [ATTACKER_IP, OWNER_IP, '9.9.9.9']) {
+        assert(!haystack.includes(ip),
+          '(b-d) IP mentah ' + ip + ' NOL kali muncul di kunci/nilai/opsi penyimpanan');
+      }
+      const kvKeys = kv._ops.map((o) => o.key);
+      assert(kvKeys.length > 0 && kvKeys.every((k) => /^ownerlogin:v1:\d{4}-\d\d-\d\dT\d\d:\d\d:[0-9a-f]{32}$/.test(k)),
+        '(b-d) bentuk kunci KV = prefiks + ember waktu + HMAC 128 bit, tanpa ruang untuk IP: '
+        + JSON.stringify(kvKeys.slice(0, 2)));
+      assert(kv._ops.filter((o) => o.op === 'put').every((o) => /^\d+$/.test(o.value)),
+        '(b-d) nilai yang ditulis hanya bilangan hitungan — bukan IP, bukan token, bukan cap waktu');
+
+      // Log: setiap permintaan rem dijalankan ulang dengan console dibajak. Nol keluaran yang
+      // memuat IP, dan (karena rem bukan tempat mencatat) nol keluaran sama sekali.
+      const captured = [];
+      const real = { log: console.log, warn: console.warn, error: console.error, debug: console.debug, info: console.info };
+      const kv3 = makeKv({ now: NOW });
+      try {
+        for (const k of Object.keys(real)) console[k] = (...a) => captured.push(a.join(' '));
+        for (let i = 0; i < mod.LOGIN_MAX + 2; i += 1) {
+          const iso = await freshIsolate();
+          await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+            makeEnv({ CFG: kv3, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+        }
+        const isoBad = await freshIsolate();
+        kv3.fail = true;
+        await isoBad.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+          makeEnv({ CFG: kv3, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+        kv3.fail = false;
+      } finally {
+        for (const k of Object.keys(real)) console[k] = real[k];
+      }
+      assert(!captured.join('\n').includes(ATTACKER_IP),
+        '(b-d) IP mentah NOL kali tercatat ke console, termasuk pada jalur galat penyimpanan');
+      assert(captured.length === 0,
+        '(b-d) jalur rem tidak mencatat apa pun (tidak ada tempat IP bisa bocor nanti), dapat: '
+        + JSON.stringify(captured.slice(0, 3)));
+
+      // PINDAI SUMBER, bukan hanya perilaku: IP hanya boleh mengalir ke pembuat kunci HMAC.
+      const ipCalls = (indexSource.match(/loginClientIp\(/g) || []).length;
+      assert(ipCalls === 2,
+        '(b-d) `loginClientIp(` muncul TEPAT dua kali (definisi + satu pemanggil), dapat ' + ipCalls);
+      const sourceKeyFn = /async function loginSourceKey\([\s\S]*?\n\}/.exec(indexSource);
+      assert(!!sourceKeyFn && /loginClientIp\(/.test(sourceKeyFn[0]),
+        '(b-d) satu-satunya pemanggil `loginClientIp()` adalah pembuat kunci HMAC');
+      assert(/hmacHex\(/.test(sourceKeyFn[0]) && /slice\(0, 32\)/.test(sourceKeyFn[0]),
+        '(b-d) kunci sumber = HMAC yang dipotong, bukan IP yang di-hash apa adanya');
+      const brakeRegion = indexSource.slice(indexSource.indexOf('function loginRateSalt'),
+        indexSource.indexOf('function loginThrottleResponse'));
+      assert(!/console\.(log|warn|error|info|debug)/.test(brakeRegion),
+        '(b-d) NOL pernyataan console di seluruh jalur rem (sumber, bukan hanya jalannya)');
+      const ipHeaderReads = (indexSource.replace(/\/\/[^\n]*/g, '').match(/cf-connecting-ip/g) || []).length;
+      assert(ipHeaderReads === 1,
+        '(b-d) `cf-connecting-ip` dibaca di TEPAT satu tempat di kode aktif, dapat ' + ipHeaderReads);
+    }
+
+    /* --- (b-e) `GET /` tanpa sesi → /login, tanpa membocorkan keadaan konfigurasi -------- */
+    {
+      const iso = await freshIsolate();
+      await assertLoginRedirect(
+        await iso.handle(new Request('https://' + HOST + '/'), makeEnv({ CFG: kv }), {}, NOW),
+        '(b-e) GET / tanpa sesi');
+      // Rem TIDAK boleh menyentuh jalur ini: halaman masuk harus tetap bisa dibuka orang yang
+      // sumbernya sedang terkunci, kalau tidak 429 di `/` menjadi oracle riwayat sumber.
+      const kvLocked = makeKv({ now: NOW });
+      for (let i = 0; i < mod.LOGIN_MAX + 1; i += 1) {
+        const it = await freshIsolate();
+        await it.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+          makeEnv({ CFG: kvLocked, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+      }
+      const opsBefore = kvLocked._ops.length;
+      const isoL = await freshIsolate();
+      const rootLocked = await isoL.handle(
+        new Request('https://' + HOST + '/', { headers: { 'cf-connecting-ip': ATTACKER_IP } }),
+        makeEnv({ CFG: kvLocked, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+      await assertLoginRedirect(rootLocked, '(b-e) GET / dari sumber yang sedang terkunci');
+      const isoG = await freshIsolate();
+      const loginPage = await isoG.handle(
+        new Request('https://' + HOST + '/login', { headers: { 'cf-connecting-ip': ATTACKER_IP } }),
+        makeEnv({ CFG: kvLocked, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+      assert(loginPage.status === 200,
+        '(b-e) GET /login tetap 200 untuk sumber terkunci (rem hanya di POST), dapat ' + loginPage.status);
+      assert(kvLocked._ops.length === opsBefore,
+        '(b-e) jalur GET tidak melakukan satu pun operasi penyimpanan rem, dapat +' + (kvLocked._ops.length - opsBefore));
+    }
+
+    /* --- (b-f) penjaga tepi LAPIS 1 tetap menolak *.workers.dev, rem tidak melemahkannya - */
+    {
+      for (const host of ['fiezel-owner.fitrajft.workers.dev', '9ad13540-fiezel-owner.fitrajft.workers.dev']) {
+        const kvEdge = makeKv({ now: NOW });
+        const iso = await freshIsolate();
+        const res = await iso.handle(post(host, OWNER_TOKEN, { 'cf-connecting-ip': ATTACKER_IP }),
+          makeEnv({ CFG: kvEdge, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+        assert(res.status === 403,
+          '(b-f) POST /login di ' + host + ' tanpa header jembatan tetap 403, dapat ' + res.status);
+        assert(!/fz_owner=[A-Za-z0-9]/.test(res.headers.get('set-cookie') || ''),
+          '(b-f) ' + host + ' tidak menerbitkan sesi walau tokennya benar');
+        assert(kvEdge._ops.length === 0,
+          '(b-f) permintaan yang ditolak lapis 1 tidak pernah mencapai rem (nol operasi KV), dapat ' + kvEdge._ops.length);
+        const iso2 = await freshIsolate();
+        const root = await iso2.handle(new Request('https://' + host + '/'), makeEnv({ CFG: kvEdge }), {}, NOW);
+        assert(root.status === 403,
+          '(b-f) GET / di ' + host + ' TIDAK dialihkan ke /login (pengalihan hanya di belakang lapis 1), dapat ' + root.status);
+      }
+      // Urutan di kode, bukan hanya perilaku: penjaga tepi harus dipanggil SEBELUM rem.
+      const posEdge = indexSource.indexOf('edgeGuard(request, env, path)');
+      const posBrake = indexSource.indexOf('await loginBrakeCheck(');
+      assert(posEdge > 0 && posBrake > posEdge,
+        '(b-f) di `handle()`, edgeGuard() dipanggil SEBELUM loginBrakeCheck()');
+    }
+
+    /* --- (b-g) galat penyimpanan TIDAK mengunci owner (FAIL-OPEN, sengaja beda dari murid) */
+    {
+      const kvBroken = makeKv({ now: NOW });
+      kvBroken.fail = true;
+      const codes = [];
+      for (let i = 0; i < mod.LOGIN_MAX + 4; i += 1) {
+        const iso = await freshIsolate();
+        const res = await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+          makeEnv({ CFG: kvBroken, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+        codes.push(res.status);
+      }
+      assert(codes.every((st) => st === 403),
+        '(b-g) KV galat: rem TIDAK PERNAH menghasilkan 429 karena kegagalan penyimpanan itu '
+        + 'sendiri (fail-open terhadap PENGUNCIAN), dapat ' + codes.join(','));
+      const isoOwner = await freshIsolate();
+      const ok = await isoOwner.handle(post(HOST, OWNER_TOKEN, { 'cf-connecting-ip': OWNER_IP }),
+        makeEnv({ CFG: kvBroken, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+      assert(ok.status === 303 && /fz_owner=[A-Za-z0-9]/.test(ok.headers.get('set-cookie') || ''),
+        '(b-g) owner tetap BISA MASUK saat KV rusak — kegagalan penyimpanan bukan kunci gembok, dapat ' + ok.status);
+      // Binding hilang sama sekali = kasus yang sama (deploy sebelum binding dipasang).
+      const isoNoBind = await freshIsolate();
+      const okNoBind = await isoNoBind.handle(post(HOST, OWNER_TOKEN, { 'cf-connecting-ip': OWNER_IP }),
+        makeEnv({ RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+      assert(okNoBind.status === 303,
+        '(b-g) binding KV belum dipasang: halaman masuk tetap berfungsi, dapat ' + okNoBind.status);
+      // Tetapi remnya TIDAK hilang: di dalam SATU isolate, lapis memori tetap menahan banjir.
+      {
+        const iso = await freshIsolate();
+        const kvB = makeKv({ now: NOW });
+        kvB.fail = true;
+        const inIsolate = [];
+        for (let i = 0; i < mod.LOGIN_MAX + 2; i += 1) {
+          const res = await iso.handle(post(HOST, WRONG, { 'cf-connecting-ip': ATTACKER_IP }),
+            makeEnv({ CFG: kvB, RATE_SALT: 'garam-uji-rem-owner' }), {}, NOW);
+          inIsolate.push(res.status);
+        }
+        assert(inIsolate.slice(mod.LOGIN_MAX).every((st) => st === 429),
+          '(b-g) saat KV galat, lapis memori TETAP mengerem di dalam satu isolate (batas SAMA, '
+          + 'tidak diperketat), dapat ' + inIsolate.join(','));
+      }
+      // Keputusan fail-open dan alasan perbedaannya dari jalur murid WAJIB tertulis di kode — dan
+      // WAJIB tertulis DI DUA TEMPAT YANG BERBEDA, masing-masing diikat ke wilayahnya:
+      //   (i)  bab keputusan, tempat orang mencari ALASANNYA;
+      //   (ii) baris `catch` yang benar-benar melakukannya, tempat orang membacanya saat menyunting.
+      // Bukti merah D4 menemukan lubang di sini: assert lama hanya mencari frasa di SELURUH
+      // berkas, jadi menghapus salah satu dari dua kemunculan tetap hijau (M23/M24 di
+      // `reports/d4-owner-brake-red-proof.mjs`). Itu diperbaiki dengan mengunci per wilayah.
+      const decisionChapter = indexSource.slice(
+        indexSource.indexOf('KEPUTUSAN: KALAU PENYIMPANAN GAGAL'),
+        indexSource.indexOf('KEJUJURAN: APA YANG REM INI TIDAK MENCEGAH'));
+      const honestyChapter = indexSource.slice(
+        indexSource.indexOf('KEJUJURAN: APA YANG REM INI TIDAK MENCEGAH'),
+        indexSource.indexOf('\nconst LOGIN_MAX = '));
+      const catchRegion = /} catch \(_\) \{[\s\S]{0,400}?state\.storage = 'error';/.exec(indexSource);
+      assert(decisionChapter.length > 500 && honestyChapter.length > 500,
+        '(b-g) bab KEPUTUSAN dan bab KEJUJURAN dua-duanya masih ada di index.js');
+      assert(/FAIL-OPEN terhadap PENGUNCIAN/.test(decisionChapter),
+        '(b-g) keputusan fail-open dinamai eksplisit DI BAB KEPUTUSAN');
+      assert(!!catchRegion && /FAIL-OPEN terhadap PENGUNCIAN/.test(catchRegion[0]),
+        '(b-g) baris yang MELAKUKAN fail-open ikut menyebut keputusannya (bukan hanya babnya)');
+      assert(/rate-anon\.js/.test(decisionChapter) && /KEBALIKAN|kebalikan/.test(decisionChapter),
+        '(b-g) bab KEPUTUSAN menyatakan ini KEBALIKAN dari rate-anon.js dan menyebut berkasnya');
+      assert(/YANG DILINDUNGI BERBEDA/.test(decisionChapter) && /SIAPA YANG MENANGGUNG/.test(decisionChapter),
+        '(b-g) alasan MENGAPA berbeda dari jalur murid tertulis, bukan hanya pernyataan bahwa ia berbeda');
+      assert(/token yang BOCOR/.test(honestyChapter),
+        '(b-g) bab KEJUJURAN mengakui apa yang rem ini TIDAK cegah (token bocor), bukan mengklaim aman');
+      assert(/ROTASI token/.test(honestyChapter) && /Cloudflare Access/.test(honestyChapter),
+        '(b-g) bab KEJUJURAN menyebut apa yang BENAR-BENAR menutup jalur itu (rotasi + Access)');
+      assert(/1\.000|1000/.test(indexSource) && /720/.test(indexSource),
+        '(b-g) alasan penyimpanan ditulis BERANGKA di kode (kuota tulis KV), bukan sebagai selera');
+    }
+  }
 
   /* ---------- README pemasangan + pembongkaran ---------------------------------------- */
   {

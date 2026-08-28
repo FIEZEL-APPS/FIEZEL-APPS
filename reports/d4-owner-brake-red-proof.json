@@ -1,0 +1,541 @@
+{
+  "schema": "fiezel-d4-owner-brake-red-proof-v1",
+  "generatedAt": "2026-08-28T15:43:53.089Z",
+  "gate": "owner-edge-guard-test.js",
+  "mutations": [
+    {
+      "id": "M1-rem-kembali-per-isolate",
+      "kenapaIniLubang": "CACAT ASLINYA: tanpa penyimpanan bersama, hitungan hidup di satu isolate → nol 429",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)",
+        "(b-b)",
+        "(b-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) percobaan ke-6 dan seterusnya = 429 MESKIPUN setiap permintaan dilayani isolate baru, dapat 403,403,403,403,403,403,403,403",
+        "(b-a) badan 429 IDENTIK di setiap penolakan (tidak berubah mengikuti riwayat sumber), dapat 0 bentuk",
+        "(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat 8"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M2-kunci-rem-jadi-konstanta-global",
+      "kenapaIniLubang": "CACAT 2: satu ember untuk seluruh dunia → penyerang bisa mengunci owner keluar",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-b)",
+        "(b-d)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-b)"
+      ],
+      "contohAssertMerah": [
+        "(b-b) sumber lain TIDAK terkena kunci sumber pertama (ember per-sumber), dapat 429",
+        "(b-b) owner tetap bisa masuk dari sumbernya sendiri saat sumber lain terkunci, dapat 429",
+        "(b-b) dua IP → dua kunci ember"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M3-batas-rem-dinaikkan-diam-diam",
+      "kenapaIniLubang": "rem yang batasnya tidak pernah tercapai = rem dekoratif dengan bentuk lain",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)",
+        "(b-b)",
+        "(b-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) percobaan ke-6 dan seterusnya = 429 MESKIPUN setiap permintaan dilayani isolate baru, dapat 403,403,403,403,403,403,403,403",
+        "(b-a) badan 429 IDENTIK di setiap penolakan (tidak berubah mengikuti riwayat sumber), dapat 0 bentuk",
+        "(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat 8"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M4-jendela-berhenti-bergulir",
+      "kenapaIniLubang": "jendela tetap = penyerang cukup menunggu pergantian jendela untuk kuota penuh",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-c)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-c)"
+      ],
+      "contohAssertMerah": [
+        "(b-c) jendela bergulir = 5 kunci ember BERBEDA"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M5-tulis-rem-tanpa-TTL",
+      "kenapaIniLubang": "kunci rem tanpa TTL menumpuk dan keadaan terkunci bisa macet tanpa cara membersihkan",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)",
+        "(b-b)",
+        "(b-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) percobaan ke-6 dan seterusnya = 429 MESKIPUN setiap permintaan dilayani isolate baru, dapat 403,403,403,403,403,403,403,403",
+        "(b-a) badan 429 IDENTIK di setiap penolakan (tidak berubah mengikuti riwayat sumber), dapat 0 bentuk",
+        "(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat 8"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M6-baca-rem-tanpa-batas-cache",
+      "kenapaIniLubang": "cacheTtl default 60 detik menggandakan jendela lag konsistensi eventual",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) baca rem memakai cacheTtl 30 detik = jendela lag tersempit yang diizinkan KV"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M7-IP-mentah-jadi-kunci-penyimpanan",
+      "kenapaIniLubang": "IP mentah di kunci KV = data lokasi per-orang tersimpan di penyimpanan bersama",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-b)",
+        "(b-d)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-d)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-d)"
+      ],
+      "contohAssertMerah": [
+        "(b-b) kunci sumber = 128 bit hex hasil HMAC, dapat 203.0.113.77",
+        "(b-b) kunci bergantung pada salt (memutar RATE_SALT mengosongkan ember, bukan tidak berpengaruh)",
+        "(b-b) indeks hari ikut ditandatangani: hash yang sama tidak bisa melacak jaringan antar hari"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M8-IP-mentah-dicatat-ke-log",
+      "kenapaIniLubang": "log Cloudflare menjadi tempat IP murid/owner mengendap tanpa pernah diputuskan",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-d)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-d)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-d)"
+      ],
+      "contohAssertMerah": [
+        "(b-d) IP mentah NOL kali tercatat ke console, termasuk pada jalur galat penyimpanan",
+        "(b-d) jalur rem tidak mencatat apa pun (tidak ada tempat IP bisa bocor nanti), dapat: [\"rem login dari 203.0.113.77\",\"rem login dari 203.0.113.77\",\"rem login dari 203.0.113.77\"]",
+        "(b-d) `loginClientIp(` muncul TEPAT dua kali (definisi + satu pemanggil), dapat 3"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M9-header-yang-bisa-dipalsukan-memecah-ember",
+      "kenapaIniLubang": "kalau X-Forwarded-For menang, penyerang memecah embernya sendiri tanpa batas",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-b)"
+      ],
+      "contohAssertMerah": [
+        "(b-b) header yang BISA dipalsukan klien (x-forwarded-for/x-real-ip) tidak boleh memecah ember saat CF-Connecting-IP ada"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M10-penanda-buku-kembali-403",
+      "kenapaIniLubang": "CACAT 3: owner yang membuka bookmark disambut {\"error\":\"forbidden\"}",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b)",
+        "(b-e)",
+        "(g-a)",
+        "(g-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-e)"
+      ],
+      "contohAssertMerah": [
+        "(b) / [tanpa cookie]: GET / tanpa sesi → 303, dapat 403",
+        "(b) / [tanpa cookie]: Location tepat '/login', dapat null",
+        "(b) / [tanpa cookie]: pengalihan tidak membawa badan sama sekali, dapat 21 byte"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M11-pengalihan-membocorkan-keadaan-konfigurasi",
+      "kenapaIniLubang": "`curl -I /` menjadi cara mengetahui apakah dashboard sudah dikonfigurasi",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-f)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-f)"
+      ],
+      "contohAssertMerah": [
+        "(g-f) / [tanpa OWNER_TOKEN_HASH]: GET / tanpa sesi → 303, dapat 403",
+        "(g-f) / [tanpa OWNER_TOKEN_HASH]: Location tepat '/login', dapat null",
+        "(g-f) / [tanpa OWNER_TOKEN_HASH]: pengalihan tidak membawa badan sama sekali, dapat 21 byte"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M12-pengalihan-membawa-badan-dan-cookie",
+      "kenapaIniLubang": "pengalihan yang membawa badan/cookie mengubah bentuknya menurut keadaan klien",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b)",
+        "(b-e)",
+        "(g-a)",
+        "(g-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-e)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-e)"
+      ],
+      "contohAssertMerah": [
+        "(b) / [tanpa cookie]: pengalihan tidak membawa badan sama sekali, dapat 21 byte",
+        "(b) / [tanpa cookie]: pengalihan tidak menyentuh cookie (menghapus cookie basi = oracle \"punya cookie\")",
+        "(b) / [cookie sampah]: pengalihan tidak membawa badan sama sekali, dapat 21 byte"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M13-penjaga-tepi-lapis-1-dimatikan",
+      "kenapaIniLubang": "*.workers.dev kembali menjadi pintu kedua yang tidak dilewati Cloudflare Access",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(?)",
+        "(a)",
+        "(b-f)",
+        "(e)",
+        "(g-b)",
+        "(g-c)",
+        "(g-e)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-f)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-f)"
+      ],
+      "contohAssertMerah": [
+        "(a) / [tanpa header edge] → 303, seharusnya 403",
+        "(a) / [header edge salah] → 303, seharusnya 403",
+        "(a) / [header edge kosong] → 303, seharusnya 403"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M14-rem-dipanggil-sebelum-penjaga-tepi",
+      "kenapaIniLubang": "urutan terbalik = permintaan dari hostname asing ikut menulis ke penyimpanan rem",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-e)",
+        "(b-f)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-f)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-f)"
+      ],
+      "contohAssertMerah": [
+        "(b-e) jalur GET tidak melakukan satu pun operasi penyimpanan rem, dapat +10",
+        "(b-f) permintaan yang ditolak lapis 1 tidak pernah mencapai rem (nol operasi KV), dapat 5",
+        "(b-f) permintaan yang ditolak lapis 1 tidak pernah mencapai rem (nol operasi KV), dapat 5"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M15-galat-penyimpanan-mengunci-owner",
+      "kenapaIniLubang": "KEBALIKAN dari keputusan yang diambil: KV tersendat tidak boleh mengunci satu-satunya pengguna",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-g)"
+      ],
+      "contohAssertMerah": [
+        "(b-g) KV galat: rem TIDAK PERNAH menghasilkan 429 karena kegagalan penyimpanan itu sendiri (fail-open terhadap PENGUNCIAN), dapat 429,429,429,429,429,429,429,429,429",
+        "(b-g) owner tetap BISA MASUK saat KV rusak — kegagalan penyimpanan bukan kunci gembok, dapat 429"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M16-login-berhasil-ikut-menulis",
+      "kenapaIniLubang": "anggaran 720 tulis/hari dihitung dari \"hanya kegagalan yang menulis\"",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)",
+        "(b-b)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-b)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat 10",
+        "(b-b) login BERHASIL nol tulis KV (dasar anggaran 720/hari)"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M17-permintaan-yang-sudah-429-ikut-menulis",
+      "kenapaIniLubang": "ember penuh yang tetap menulis = penyerang membakar kuota tulis KV harian",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)",
+        "(b-c)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) TEPAT satu tulis KV per percobaan GAGAL, nol tulis sesudah terkunci, dapat 8",
+        "(b-c) satu percobaan kembali setiap 2 menit (owner tidak terkunci selamanya), dapat 429"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M18-batas-jembatan-disamakan-dengan-per-IP",
+      "kenapaIniLubang": "ember BERSAMA dengan batas per-IP = satu penyerang mengunci semua lewat jembatan",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-b)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-b)"
+      ],
+      "contohAssertMerah": [
+        "(b-b) jalur jembatan (satu ember bersama, tanpa IP) punya batas TERPISAH dan lebih longgar"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M19-Retry-After-dihitung-dari-riwayat",
+      "kenapaIniLubang": "nilai yang dihitung memberi tahu penyerang kapan ia terakhir mencoba (oracle)",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-a)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-a)"
+      ],
+      "contohAssertMerah": [
+        "(b-a) 429 memuat Retry-After KONSTANTA 120, dapat 86",
+        "(b-a) 429 memuat Retry-After KONSTANTA 120, dapat 86",
+        "(b-a) 429 memuat Retry-After KONSTANTA 120, dapat 86"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M20-binding-KV-dicabut-dari-wrangler",
+      "kenapaIniLubang": "tanpa binding, rem lintas isolate tidak pernah ada di produksi meski kodenya benar",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) TEPAT satu binding KV di Worker owner (untuk rem login), dapat 0",
+        "(g-g) binding KV bernama CFG (nama yang sama dengan workers/api), dapat ",
+        "(g-g) namespace KV-nya fiezel-CFG yang benar, dapat "
+      ],
+      "ok": true
+    },
+    {
+      "id": "M21-binding-KV-kedua-diselundupkan",
+      "kenapaIniLubang": "satu binding untuk rem sudah dijelaskan; binding kedua adalah pelebaran tanpa alasan",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) TEPAT satu binding KV di Worker owner (untuk rem login), dapat 2"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M22-klaim-nol-tulis-KV-dikembalikan",
+      "kenapaIniLubang": "dokumen yang mengklaim \"Nol tulis KV\" sesudah rem menulis KV adalah dokumen yang bohong",
+      "berkas": "workers/owner/wrangler.toml",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(g-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(g-g)"
+      ],
+      "contohAssertMerah": [
+        "(g-g) klaim usang \"Nol tulis KV\" tidak boleh kembali ke wrangler.toml: rem login menulis KV"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M23-alasan-fail-open-dihapus-dari-kode",
+      "kenapaIniLubang": "keputusan fail-open tanpa alasan tertulis akan dibalik orang berikutnya tanpa tahu harganya",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-g)"
+      ],
+      "contohAssertMerah": [
+        "(b-g) keputusan fail-open dinamai eksplisit DI BAB KEPUTUSAN"
+      ],
+      "ok": true
+    },
+    {
+      "id": "M24-kejujuran-token-bocor-dihapus",
+      "kenapaIniLubang": "rem ini tidak menolong terhadap token yang bocor; menghapus kalimat itu menjual rasa aman palsu",
+      "berkas": "workers/owner/index.js",
+      "exit": 1,
+      "merah": true,
+      "butirYangJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanJatuh": [
+        "(b-g)"
+      ],
+      "butirDiharapkanYangBenarJatuh": [
+        "(b-g)"
+      ],
+      "contohAssertMerah": [
+        "(b-g) bab KEJUJURAN mengakui apa yang rem ini TIDAK cegah (token bocor), bukan mengklaim aman"
+      ],
+      "ok": true
+    }
+  ],
+  "pulihSesudahSemuaMutasi": 0,
+  "pass": true
+}
