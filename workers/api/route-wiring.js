@@ -60,6 +60,10 @@
  */
 
 import { FREE_BUCKET_LIMITS } from './quota/quota-config.js';
+// P3 - penegakan flag server DI JALUR PERMINTAAN, bukan sekadar dilaporkan ke klien.
+import { checkAiEnabled } from './feature-gate.js';
+// P3 - pagar neuron tingkat AKUN (jatah vendor), berbeda dari kuota per-murid.
+import { reserveAccountNeurons } from './ai/ai-account-budget.js';
 import { registerQuotaRoutes, enforceQuota, NO_STORE_HEADERS } from './quota/route-quota.js';
 import { sweepExpiredReservations, reconcileHeld } from './quota/quota-store-d1.js';
 import { registerAnalyticsRoutes } from './analytics/route-events.js';
@@ -284,6 +288,52 @@ function enforceQuotaBridgeFactory() {
 }
 
 /**
+ * P3 - JEMBATAN PEMBATAL KUOTA.
+ *
+ * CACAT YANG DIPERBAIKI: `route-ai.js` melaporkan `quotaRolledBack` dengan memanggil
+ * `deps.rollbackQuota`, tetapi wiring ini NGGAK pernah menyuntikkannya. Jadi di jalur
+ * nyata amplop selalu mengatakan `quotaRolledBack:false` sementara reservasinya SUNGGUH
+ * dibatalkan oleh `settleQuota()` di bawah. Laporan yang tidak cocok dengan kenyataan
+ * membuat sisa kuota di klien salah dan membuat audit percaya murid kehilangan jatah
+ * yang sebenarnya kembali.
+ *
+ * KENAPA JEMBATAN, BUKAN ROLLBACK LANGSUNG: pembatalan sebenarnya harus tetap terjadi
+ * di satu tempat (`settleQuota`, di `finally`), karena hanya di sana ia dijamin jalan
+ * walau handler melempar. Jembatan ini TIDAK membatalkan apa pun sendiri - ia menandai
+ * niat, dan mengembalikan `true` HANYA kalau memang ada reservasi nyata yang akan
+ * dibatalkan. Tanpa tiket, ia jujur mengembalikan `false`.
+ */
+function rollbackQuotaBridgeFactory() {
+  return function rollbackQuotaBridge(info) {
+    const request = info && info.request ? info.request : null;
+    const ctx = request ? CTX_BY_REQUEST.get(request) : null;
+    if (!ctx) return false;
+    const tickets = ctx.quotaTickets;
+    if (!tickets || !tickets.length) return false;
+    ctx.quotaRollbackRequested = true;
+    ctx.quotaRollbackReason = String((info && info.reason) || '');
+    return true;
+  };
+}
+
+/**
+ * P3 - JEMBATAN PAGAR NEURON AKUN. Fail-CLOSED di setiap cabang: tanpa ctx, tanpa D1,
+ * atau saat modul anggaran melempar, jawabannya TOLAK. Pipa biaya yang tidak bisa
+ * diukur tidak boleh dibuka - murid tetap menerima jawaban deterministik.
+ */
+function accountBudgetBridgeFactory() {
+  return async function accountBudgetBridge(args) {
+    const a = args || {};
+    const ctx = a.request ? CTX_BY_REQUEST.get(a.request) : null;
+    const env = (ctx && ctx.env) || a.env || {};
+    if (!ctx) return { allowed: false, reason: 'ai_budget_context_missing', usedBefore: 0 };
+    return reserveAccountNeurons({
+      db: quotaDb(env), env, neurons: a.neurons, now: a.now
+    });
+  };
+}
+
+/**
  * Tanda kegagalan provider di respons E5. Keduanya menjawab 200 dengan teks
  * cadangan (bab 12: jangan pernah galat mentah ke murid), jadi status HTTP
  * tidak bisa dipakai — yang dipakai adalah `source`/`degraded` miliknya.
@@ -308,7 +358,12 @@ async function settleQuota(ctx, response) {
   if (response && typeof response.clone === 'function') {
     try { body = await response.clone().json(); } catch (_) { body = null; }
   }
-  const failed = response === null || providerFailed(body);
+  // P3 - tiga sebab pembatalan, dan yang ketiga BARU: permintaan rollback eksplisit dari
+  // `route-ai.js` lewat `rollbackQuotaBridge`. Menambahkannya di sini (bukan membatalkan
+  // di jembatan) menjaga pembatalan tetap idempoten: satu tiket dibatalkan satu kali,
+  // di satu tempat, walau handler melempar.
+  const failed = response === null || providerFailed(body) || ctx.quotaRollbackRequested === true;
+  ctx.quotaRollbackRequested = false;
 
   for (const ticket of tickets) {
     if (failed) ticket.release.reject(new Error('provider_error'));
@@ -397,14 +452,52 @@ export function buildExtraRoutes() {
   const aiSink = [];
   const ttsSink = [];
   const bridge = enforceQuotaBridgeFactory();
-  const aiDeps = { enforceQuota: bridge };
-  const ttsDeps = { enforceQuota: bridge };
+  const rollbackBridge = rollbackQuotaBridgeFactory();
+  const accountBudget = accountBudgetBridgeFactory();
+  // P3 - `rollbackQuota` dan `accountBudget` sekarang BENAR-BENAR disuntikkan. Keduanya
+  // hanya untuk jalur AI: TTS tidak memakai neuron Workers AI (ia memanggil penyedia
+  // suara terpisah), jadi memasang pagar neuron di sana akan menolak permintaan dengan
+  // alasan yang tidak berlaku untuknya.
+  const aiDeps = { enforceQuota: bridge, rollbackQuota: rollbackBridge, accountBudget };
+  const ttsDeps = { enforceQuota: bridge, rollbackQuota: rollbackBridge };
   RouteAi.registerAiRoutes(collector(aiSink, (h) => h), aiDeps);
   RouteTts.registerTtsRoutes(collector(ttsSink, (h) => h), ttsDeps);
 
   for (const [method, path, handler] of aiSink) {
     routes.push([method, path, wrapMetered(
-      (request, env, executionCtx) => handler(request, env, executionCtx),
+      /**
+       * P3 - GERBANG FLAG SERVER. INI LUBANG BIAYA YANG DITUTUP.
+       *
+       * Sebelum ini `cfAiEnabled` NOL kali dirujuk di jalur permintaan: ia hanya
+       * DILAPORKAN ke klien oleh `route-config.js`. Artinya "AI mati" hanya berlaku bagi
+       * klien yang sopan. Siapa pun di internet bisa `POST /api/auth/anon` (berhasil
+       * tanpa syarat), lalu memanggil `/api/ai/task` dan membelanjakan jatah neuron akun
+       * owner. Kuota per-pengguna tidak menolongnya: penyerang cukup menerbitkan banyak
+       * sesi anon, karena kuota mengikat SESI, bukan biaya akun.
+       *
+       * Diletakkan DI SINI, di dalam `wrapMetered` tetapi SEBELUM handler, dengan sengaja:
+       *   - sesudah identitas diperiksa (`requiresIdentity=true`), jadi urutan penolakan
+       *     tetap 401 sebelum 403 - keadaan otentikasi tidak boleh terbaca dari perbedaan
+       *     ini;
+       *   - SEBELUM satu byte badan permintaan dibaca dan sebelum reservasi kuota apa pun,
+       *     jadi penolakan ini murah dan `quotaCharged:false`-nya benar secara struktur,
+       *     bukan sekadar dieja;
+       *   - hanya membungkus rute AI. TTS punya flag dan biayanya sendiri.
+       *
+       * FAIL-CLOSED: `checkAiEnabled()` menolak juga ketika flag TIDAK TERBACA (KV galat,
+       * binding hilang, kunci absen). Flag yang tidak bisa dibaca bukan izin.
+       */
+      async (request, env, executionCtx) => {
+        const gate = await checkAiEnabled(env);
+        if (!gate.allowed) {
+          const ctx = CTX_BY_REQUEST.get(request);
+          return RouteAi.aiDisabledResponse({
+            reason: gate.reason,
+            headers: (ctx && ctx.corsHeaders) || null
+          });
+        }
+        return handler(request, env, executionCtx);
+      },
       true
     )]);
   }
