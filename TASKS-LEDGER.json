@@ -1,6 +1,6 @@
 {
   "protocol_version": "v1.2",
-  "updated": "2026-08-19T15:16:00+07:00",
+  "updated": "2026-08-28T07:00:00+07:00",
   "agents": [
     {
       "id": "coordinator-1",
@@ -321,6 +321,78 @@
       "status": "in_progress",
       "evidence": "Branch agent/m026-raw-pcm-ab-diagnostic dibuat dari main d27046c (merge m025-48). Scope dikunci ke diagnostik A/B; belum ada klaim perbaikan device.",
       "note": "root_cause_context status SUSPECTED: m025-48 sudah memperbaiki diagnostics storage starvation, AudioContext playback buffer, request 44.1kHz, dan PCM conditioning, tetapi device gate masih pending dan owner masih mendengar crackle/static seperti radio tanpa sinyal. Tahap ini hanya membedakan raw vocoder PCM vs conditioning/playback pipeline. DILARANG mengubah model, generationSteps, source lock, FiezelVoiceRuntime contract, atau mengimplementasikan true streaming sebelum bukti A/B masuk."
+    },
+    {
+      "id": "T-027",
+      "title": "Nightwatch: perbaiki deteksi render-time integrity pada release audit",
+      "owner": "nightwatch",
+      "status": "blocked",
+      "scope": {
+        "files_allowed": [
+          "release-audit.py",
+          "paw-mascot-test.js",
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js"
+        ],
+        "objective": "Pulihkan quality gate yang gagal karena deteksi render-time integrity dan assertion mascot popup yang stale, tanpa mengubah runtime behavior.",
+        "forbidden_actions": [
+          "Jangan mengubah area neural voice yang dikunci T-026.",
+          "Jangan melonggarkan gate konten atau mengubah ambang kualitas.",
+          "Jangan mengubah workflow audio."
+        ],
+        "done_when": [
+          "Pemeriksaan regex mendeteksi guard validateQuestion(...).ok sebelum continue.",
+          "Mascot gate menemukan callback confidencePopAnswered dalam fungsi setConfidence.",
+          "Semua gate lokal yang relevan hijau dan CI Quality Gate pada head main hijau.",
+          "Pages live menyajikan commit merge terbaru."
+        ],
+        "evidence_required": [
+          "hasil gate lokal nyata",
+          "hasil CI Quality Gate",
+          "Pages build dan live marker setelah merge"
+        ]
+      },
+      "evidence": "Root cause confirmed and both scoped gates fixed. Local required gates PASS; CI release-audit and core validation PASS on ee079b2. CI MASTER Authority Guard FAILS because PR author FIEZEL-APPS is not the required MASTER owner FIEZEL-APPS; no merge performed.",
+      "note": "BLOCKED at repository authority policy, not code quality. PR #227 remains open. Do not bypass the MASTER-only authority guard; owner/main coordinator must re-authenticate or decide how to land the fix."
+    },
+    {
+      "id": "T-028",
+      "title": "FIEZEL Nightwatch: authority guard dan PR stale pada produksi",
+      "owner": "nightwatch",
+      "status": "blocked",
+      "scope": {
+        "files_allowed": [
+          "TASKS-LEDGER.json"
+        ],
+        "files_forbidden": [
+          "features/neural-voice/**",
+          ".github/workflows/audio-*.yml",
+          "sw.js",
+          "app.js"
+        ],
+        "objective": "Catat blocker produksi tanpa menyentuh area T-026 atau Wave D T-027 yang sedang diklaim agent lain.",
+        "forbidden_actions": [
+          "Jangan bypass MASTER-only authority guard.",
+          "Jangan rebase/merge PR agent lain.",
+          "Jangan mengubah area neural voice, audio workflow, atau runtime app."
+        ],
+        "done_when": [
+          "Bukti Pages/live/local gates/CI/PR tercatat.",
+          "Owner dapat melihat opsi pemulihan yang konkret."
+        ],
+        "evidence_required": [
+          "status Pages build dan live marker",
+          "hasil empat gate lokal",
+          "hasil CI authority/quality",
+          "status PR terbuka"
+        ]
+      },
+      "evidence": "HEAD main eb5152df239219e496fc3b5231c96878e2d117a6; Pages latest built pada commit yang sama; live core-config.js menyajikan FIEZEL_PAGE_BUILD m025-176; regression-test.js, core-brain-v2-test.js, tutor-brain-v3-test.js, validator.js semuanya PASS. Quality Gate run 33126880941 masih in_progress; MASTER Authority Guard run 33126880951 gagal karena actor push FIEZEL-APPS bukan owner MASTER FIEZEL-APPS. PR #227 mergeable CONFLICTING meskipun quality check-nya SUCCESS; PR #226 MERGEABLE tetapi quality/authority checks gagal.",
+      "note": "BLOCKED oleh kebijakan otoritas repository dan antrean PR stale, bukan kegagalan gate kode lokal atau Pages. Opsi owner: lakukan push/merge ulang dengan identitas MASTER FIEZEL-APPS setelah PR yang stale direkonsiliasi; jangan bypass guard. T-026 neural voice dan T-027 Wave D tetap tidak disentuh."
     }
   ],
   "last_report": {
@@ -425,5 +497,6 @@
       "title": "Handoff neural voice 5.19.0 + rekonsiliasi ledger (T-021/M-019 dari branch)",
       "note": "FIEZEL-5.19.0-NEURAL-VOICE-HANDOFF.md v1.0 di-commit ke main + ledger T-021/M-019 (yang hanya ada di branch) dicatat + T-022. Verifier VERIFY-HANDOFF-001. Permintaan owner yang sama (08:06) tidak selesai di sesi lain - difinalisasi di sini."
     }
-  ]
+  ],
+  "master_note": "Digabung oleh sesi MASTER 28 Agu 2026 dalam prosedur P10. Entri T-027 diambil dari PR #227 dan T-028 dari PR #228 supaya laporan blocker kedua nightwatch tidak hilang ketika PR-nya ditutup. Perubahan release-audit.py di #227 DITOLAK: regex-nya lebih longgar daripada pemeriksaan struktural yang sudah ada di main (hitung minimal 2 situs penjaga + tuntut cabang cloze tervalidasi). Perbaikan paw-mascot-test.js di #227 DITERIMA karena mengikat assert ke rentang sumber fungsi, bukan ke jumlah karakter yang pasti jadi basi lagi."
 }
