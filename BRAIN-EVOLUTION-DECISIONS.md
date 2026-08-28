@@ -192,6 +192,65 @@ ada adversary bernama DAN delivery parameter remote benar-benar diaktifkan.
 | 8b | Tanda tangan Ed25519 atas dokumen parameter | Ditunda sampai adversary bernama + kanal remote aktif | `research` |
 | 9 | Karantina `features/ui/fiezel-ab-testing.js` | Kode mati yang menyaru infrastruktur (audit §4.2) | `candidate` |
 | 10 | Ambang 8-attempt di `content-promotion.js` | Direlabel "ambang keselamatan runtime"; tidak pernah bukti belajar | `candidate` |
+| 11 | Temuan pengerasan simulator (adendum 2026-08-29, §10) | Bukti untuk MASTER; gate TIDAK boleh dilonggarkan supaya hijau | `research` |
+| 12 | Wiring wave 4: 9 modul infra ke shell + saklar telemetri `'off'` (§11) | Menunggu merge PR #226; emitter `app.js` + lane server kini SUDAH di tree (sinkronisasi 2026-08-29) — tetap nol efek runtime karena mode klien `'off'`, `LEARNING_ENABLED="off"`, dan worker belum deploy | `candidate` |
 
 Tidak ada satu pun butir `rejected` di tabel ini yang boleh dibuka kembali tanpa bukti baru yang
 membatalkan angka-angka di §1–8 — dan untuk butir 8, tidak ada bukti yang bisa membatalkannya.
+
+---
+
+## ADENDUM 2026-08-29 (wave 4) — dua entri ledger baru
+
+## 10. Temuan pengerasan simulator — status `research`, menunggu keputusan MASTER
+
+**Status ledger: `research`.** Bukan proposal perubahan kode; ini temuan empiris yang menunggu
+keputusan MASTER atas klaim kalibrasi fase 3 sebelum jalur mana pun dikontrak.
+
+Setelah simulator dikeraskan sesuai jalur pengganti butir #1b (50 seed berpasangan × 9 profil
++3 profil bank, deteksi censoring, ambang praktis per metrik, CI bootstrap 95% via
+`FiezelStatGate.pairedBootstrap`), empat klaim yang tadinya PASS pada 1 seed tidak bertahan
+(`node adaptivity-simulation-v3.js` → exit 1, dieksekusi ulang 2026-08-29):
+
+1. **Kalibrasi item C6 fase 3 belum membuktikan nilai praktisnya**: perbaikan itemBiasRMSE
+   single-seed 0.2694→0.2622 (delta 0.0072) di bawah ambang praktis 0.02; di 50 seed meanDiff
+   −0.0028 dengan CI [−0.0120, +0.0064] melintasi nol — inconclusive, bukan terbukti.
+2. **Censoring parah dan sekarang terlihat**: varian bank tak pernah mencapai mastery pada
+   43/50 seed (rate tersensor 95,3%); v1→v2 rate 55,6%→89,8%, CI selisih [0.298, 0.387] —
+   trade-off "akurasi di target vs kecepatan mastery" yang dulu tersamar jadi angka rata-rata.
+3. **Klaim residual "menurunkan osilasi" adalah keberuntungan seed**: antar-seed meanDiff
+   +0.167, CI [+0.054, +0.275] — residual justru sedikit menambah osilasi; falseDecline-nya
+   tetap menang telak (−0.0415, CI [−0.0463, −0.0371]).
+4. Yang tetap terbukti kuat untuk v2: accuracyGap, retention, brier — CI bersih melewati
+   ambang praktis.
+
+Aturan yang mengikat sampai MASTER memutus: verdict FAIL ini TIDAK boleh "diperbaiki" dengan
+melonggarkan ambang praktis atau mengecilkan seed; opsi yang sah adalah menerima trade-off
+secara tertulis, merevisi kebijakan yang disimulasikan, atau merevisi ambang DENGAN argumen
+pedagogis tertulis — tiga-tiganya keputusan MASTER, bukan keputusan wave.
+
+## 11. Wiring wave 4 — status `candidate`, menunggu merge
+
+**Status ledger: `candidate` (menunggu merge PR #226).**
+
+Yang di-wire: 5 modul infra brain (stat-gate, manifest, config, learning-metrics,
+metrics-digest — memenuhi prasyarat butir #3b) + 4 modul lane telemetri (config, events,
+queue, transport) masuk shell — script tag `index.html:344–348,354–357`, precache `sw.js:78–79`,
+triple-bump build ke m025-186 (`core-config.js:19`, `sw.js:35`, `fiezel-diag-panel.js:18`).
+Saklar telemetri lahir BEKU pada `mode:'off'` + `endpoint:''`
+(`features/telemetry/fiezel-telemetry-config.js:25–28`) dan hanya bisa berubah lewat release
+train — konsisten dengan larangan permanen butir #8 (server tidak boleh bisa menyalakan
+pengumpulan data di klien).
+
+Batas kejujuran entri ini (diperbarui saat sinkronisasi 2026-08-29): wiring = modul TERANGKUT,
+bukan modul BEKERJA — tetapi dua celah yang dulu dicatat "belum ada di tree" kini sudah
+mendarat di branch yang sama: pemanggil di `app.js` ADA (emitter `learningTelemetryEmitAnswer`,
+`app.js:1311`, dipanggil dari cabang grammar `record()` di `app.js:1395`; gate
+`app-telemetry-wiring-test.js` PASS) dan lane ingest server `/api/learning/events` + flag
+`LEARNING_ENABLED="off"` ADA (`workers/api/route-wiring.js:74,549`,
+`workers/api/wrangler.toml:99`; gate `learning-lane-test.js` 44/44 PASS). Nol efek runtime
+tetap benar — bukan karena kodenya absen, melainkan karena mode klien `'off'`, flag server
+`"off"`, dan worker belum pernah deploy. Urutan aktivasi lengkap, termasuk kriteria consent
+sebelum mode `'on'`, ada di [BRAIN-ACTIVATION-RUNBOOK.md](BRAIN-ACTIVATION-RUNBOOK.md).
+Naik status ke `approved` hanya lewat merge + verifikasi Pages deploy + install-health di
+perangkat (runbook Langkah 1–2) — status entri ini tetap `candidate` menunggu merge.
