@@ -3352,7 +3352,7 @@ const CF_ENABLED=CF_CONFIG.enabled===true&&CF_BASE!=='';
 // Peta path -> nama flag endpoint. Path yang TIDAK terpetakan (mis. /api/push/subscribe,
 // yang terikat VAPID dan MAX_USERS) selamanya 'off': menambah jalur CF harus keputusan
 // eksplisit di peta ini, bukan efek samping dari pencocokan longgar.
-const CF_ENDPOINT_ROUTES=[[/^\/health$/,'health'],[/^\/api\/config(?:\/|$)/,'config'],[/^\/api\/auth(?:\/|$)/,'auth'],[/^\/api\/quota(?:\/|$)/,'quota'],[/^\/api\/(?:ai|coach)(?:\/|$)/,'ai'],[/^\/api\/tts(?:\/|$)/,'tts'],[/^\/api\/(?:usage|activity|feedback|policy)(?:\/|$)/,'usage']];
+const CF_ENDPOINT_ROUTES=[[/^\/health$/,'health'],[/^\/api\/config(?:\/|$)/,'config'],[/^\/api\/auth(?:\/|$)/,'auth'],[/^\/api\/quota(?:\/|$)/,'quota'],[/^\/api\/(?:ai|coach)(?:\/|$)/,'ai'],[/^\/api\/tts(?:\/|$)/,'tts'],[/^\/api\/usage(?:\/|$)/,'usage'] /* T-030 (izin owner 28 Ags): dulu regex ini juga memetakan /api/activity, /api/feedback, dan /api/policy ke Cloudflare lewat SATU kunci. Worker hanya punya /api/usage/*; diuji langsung ke produksi ketiganya 404. Yang terlihat MURID adalah /api/feedback: toast 'Gagal mengirim' saat mengirim masukan. Path tak terpetakan otomatis 'off' (cfEndpointKey -> '' -> 'off'), jadi ketiganya tetap di jalur lama. JANGAN gabungkan lagi keempatnya sampai SLOT 5 Worker benar-benar ada. */];
 function cfEndpointKey(path){const p=String(path||'');for(const [pattern,key] of CF_ENDPOINT_ROUTES)if(pattern.test(p))return key;return ''}
 function cfEndpointMode(path){
   if(!CF_ENABLED)return 'off';

@@ -664,16 +664,36 @@ async function boot(harness) { harness.runIdle(); await harness.api.cfConfigRefr
       matiFitur.api.cfMergedMode('usage') === 'off', `usage=${matiFitur.api.cfMergedMode('usage')}`);
   }
 
-  /* --- kopling rute 'usage': dicatat sebagai assert, bukan disembunyikan --------------- */
+  /* --- kopling rute 'usage' SUDAH DIPUTUS (T-030) ---------------------------------------
+   *
+   * Bentuk lama assert ini menuntut koplingnya TETAP ADA: ia lulus bila keempat path pergi
+   * ke Cloudflare. Maksudnya baik — mendokumentasikan cacat yang diketahui — tetapi akibatnya
+   * ia berubah menjadi PENJAGA CACAT: merah pada perbaikan, hijau pada kerusakan. Ini kejadian
+   * KETIGA dari pola yang sama dalam satu hari (dua sebelumnya: gerbang analytics yang menuntut
+   * app.js TIDAK memuat pemancar, dan rate-anon-test yang menuntut celah tarif tetap ada).
+   *
+   * Yang benar diassert adalah AKIBATNYA ke murid: hanya /api/usage/* yang pindah ke Cloudflare,
+   * dan tiga path yang Worker-nya belum ada (SLOT 5 = BELUM; diuji ke produksi: 404, 404, 404)
+   * TETAP di jalur lama. Kalau seseorang menggabungkan lagi keempatnya sebelum SLOT 5 ada,
+   * assert ini merah — dan itulah gunanya, karena /api/feedback yang 404 TERLIHAT MURID sebagai
+   * toast "Gagal mengirim".
+   */
   {
     const repoHidup = makeHarness({ cfConfig: REPO_CF });
     await boot(repoHidup);
-    for (const p of ['/api/usage/events', '/api/activity', '/api/feedback', '/api/policy/next']) {
-      await repoHidup.api.coreWorkerExec(p, { method: 'POST' });
-    }
-    check('(A6) kopling DIKETAHUI: kunci "usage" juga memindahkan activity/feedback/policy ke CF',
-      repoHidup.cfDataCalls().length === 4 && repoHidup.log.puter.length === 0,
+    await repoHidup.api.coreWorkerExec('/api/usage/events', { method: 'POST' });
+    check('(A6) hanya /api/usage/* pindah ke CF',
+      repoHidup.cfDataCalls().length === 1 && repoHidup.log.puter.length === 0,
       repoHidup.cfDataCalls().map(f => f.url.replace(CF_BASE, '')).join(','));
+
+    const takTerpetakan = makeHarness({ cfConfig: REPO_CF });
+    await boot(takTerpetakan);
+    for (const p of ['/api/activity', '/api/feedback', '/api/policy/next']) {
+      await takTerpetakan.api.coreWorkerExec(p, { method: 'POST' });
+    }
+    check('(A6/T-030) activity, feedback, policy TETAP di jalur lama — nol permintaan CF',
+      takTerpetakan.cfDataCalls().length === 0 && takTerpetakan.log.puter.length === 3,
+      `cf=${takTerpetakan.cfDataCalls().length} puter=${takTerpetakan.log.puter.length}`);
     const puterTetap = makeHarness({ cfConfig: REPO_CF });
     await boot(puterTetap);
     for (const p of ['/api/ai/chat', '/api/tts/say', '/api/auth/session', '/api/quota/state', '/health']) {
