@@ -129,6 +129,15 @@ jobs:
           node pastel-field-contrast-test.js
           node topbar-logo-contrast-test.js
           node paw-mascot-test.js
+          # Lima gerbang redesign maskot PAW (spec §35 "New regression nets" + A-10).
+          # Ditaruh tepat sesudah paw-mascot-test.js karena kelimanya memperluas kontrak
+          # yang gerbang itu mulai jaga: satu sumber bentuk (geometri + checksum ekspor),
+          # palet karakter tertutup G1, tubuh bebas rotasi, dan kosakata event react().
+          node e5-checksum-gate-test.js
+          node pawprint-geometry-gate-test.js
+          node palette-gate-test.js
+          node keyframe-rotation-gate-test.js
+          node event-vocabulary-gate-test.js
           node voice-offline-fallback-test.js
           node voice-fallback-chain-test.js
           node voice-pipeline-gap-test.js
@@ -243,6 +252,28 @@ jobs:
           # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
           # memuat nilai secret sungguhan.
           node edge-guard-test.js
+          # S1: pembatas laju PENERBITAN identitas anonim (`POST /api/auth/anon`).
+          # Dijalankan tepat sesudah `edge-guard-test.js` karena keduanya membaca sinyal yang
+          # SAMA dari dua sisi: gerbang di atas menulis `ctx.edgePath` (jalur mana yang dipakai
+          # permintaan), gerbang ini menuntut tarif pembatas dipilih dari sinyal itu dan BUKAN
+          # dari header klien atau dari ada/tidaknya `EDGE_SHARED_SECRET` — bug lapangan 28 Agu
+          # 2026 (52 tembakan dari satu IP, 28 lolos: tarif jembatan 30/jam terpakai di jalur
+          # langsung). Ia juga menjaga jendela BERGULIR (tidak reset di menit ke-0), amplop 429
+          # yang tidak membocorkan riwayat IP, jitter anti-oracle, perilaku saat D1 galat, dan
+          # nol IP mentah di bind D1 / log.
+          node rate-anon-test.js
+          # S2: PLAFON NEURON TINGKAT AKUN ITU WAJIB. Dijalankan tepat sesudah
+          # `rate-anon-test.js` karena keduanya menjaga dua sisi dari ancaman yang sama:
+          # gerbang di atas membatasi PENERBITAN identitas per IP, gerbang ini menjaga satu-
+          # satunya hal yang masih menahan penyerang dari BANYAK IP - plafon biaya akun. Yang
+          # di-assert: `env.AI.run` hanya dieja di satu chokepoint yang menolak jalan tanpa
+          # tanda terima reservasi; setiap rute yang bisa memanggil model ditemukan PROGRAMATIK
+          # dari graf impor (bukan dari daftar tangan, karena daftar tangan basi begitu rute
+          # baru lahir - itu persis cara celah ini muncul) dan wajib memesan neuron SEBELUM
+          # memanggil model; dep `accountBudget` tidak lagi opsional (hilang = 503 dengan
+          # `quotaCharged:false`); reservasi atomik; D1 galat = fail-closed; dan reservasi
+          # dilepas kembali kalau panggilan model gagal sebelum model bekerja.
+          node ai-account-cap-gate-test.js
           # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
           # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
           # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
@@ -443,7 +474,7 @@ jobs:
         # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
         # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
         # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           # TIDAK ADA nilai bawaan berupa URL di sini, dan itu diperiksa oleh
@@ -475,7 +506,7 @@ jobs:
         # membaca secret jembatan. Menggerbangi seluruh workflow ke satu aktor akan
         # mematikan 150+ gerbang untuk kontributor lain: obatnya lebih buruk dari
         # penyakitnya. (Temuan workflow-actor-gate-test.js, 28 Agu 2026.)
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           FIEZEL_STAGING_BASE: ${{ github.event.inputs.staging_base }}
           # Rahasia header jembatan HANYA boleh datang dari repository secret, tidak
@@ -506,7 +537,7 @@ jobs:
         # PR ramai bisa menghabiskan jatah harian akun dan mematikan AI untuk murid.
         # `no-network-test.js` blok 2d memeriksa dari sisi lain bahwa langkah ini hanya
         # ada dalam bentuk bergerbang aktor + workflow_dispatch.
-        if: github.event_name == 'workflow_dispatch' && github.actor == 'fitrajft-ux'
+        if: github.event_name == 'workflow_dispatch' && github.actor == 'FIEZEL-APPS'
         env:
           # Pada push/PR `inputs` tidak ada, jadi nilainya string kosong = SKIP.
           FIEZEL_AI_LIVE_BASE: ${{ github.event.inputs.ai_live_base }}

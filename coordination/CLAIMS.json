@@ -1,6 +1,6 @@
 {
   "protocol": "coordination-claims-v1",
-  "updated": "2026-08-28T16:55:00+07:00",
+  "updated": "2026-08-28T20:10:00+07:00",
   "cara_pakai": "Sebelum menulis berkas apa pun, tambahkan satu entri di `active` dengan daftar path yang akan kamu sentuh. Setelah selesai (sudah merge/push), PINDAHKAN entrimu ke `finished`. Gerbang coordination-guard-test.js akan MERAH kalau dua entri `active` dari sesi berbeda mengklaim path yang sama, jadi tabrakan terlihat sebelum kode ditulis, bukan sesudah merge.",
   "aturan_path": "Tulis path relatif dari akar repo. Direktori diakhiri `/` dan berlaku rekursif (mis. `workers/api/` mencakup semua isinya). Klaim `.` atau `/` dilarang: mengklaim seluruh repo sama dengan tidak berkoordinasi.",
   "catatan_master": "Entri untuk sesi opencode di bawah DIDAFTARKAN OLEH MASTER berdasarkan `scope.files_allowed` di TASKS-LEDGER.json, bukan oleh sesi itu sendiri. Kalau kamu salah satu sesi itu: periksa entrimu, perbaiki kalau wilayahnya salah, dan mulai memeliharanya sendiri. Klaim yang didaftarkan orang lain lebih baik daripada nol klaim, tetapi ia hanya akurat sampai kamu berpindah tugas.",
@@ -124,6 +124,51 @@
       ],
       "selesai": "2026-08-28T17:45:00+07:00",
       "catatan": "Kueri dashboard diselaraskan ke skema nyata; 20 nama metrik yang tidak pernah ditulis siapa pun dibuang; 10 panel ditandai tidak-terukur. Sudah di main."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/S1",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/rate-anon.js",
+        "workers/api/route-auth.js",
+        "rate-anon-test.js"
+      ],
+      "selesai": "2026-08-28T17:10:00+07:00",
+      "catatan": "Cabang batas dibaca dari jalur permintaan (ctx.edgePath), bukan dari keberadaan secret. Terukur di lapangan: 14 lolos, penolakan mulai di ke-15."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/S2",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/ai/model-call-gate.js",
+        "workers/api/ai/ai-account-budget.js",
+        "workers/api/route-wiring.js",
+        "ai-account-cap-gate-test.js"
+      ],
+      "selesai": "2026-08-28T17:35:00+07:00",
+      "catatan": "Plafon neuron akun jadi WAJIB. Celah ternyata sudah dilanggar: rute TTS memanggil model tanpa plafon. Terverifikasi: 403 ai_disabled, nol token."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/S3",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/api/feature-gate.js",
+        "workers/api/tts/route-tts.js",
+        "tts-provider-contract-test.js"
+      ],
+      "selesai": "2026-08-28T18:20:00+07:00",
+      "catatan": "Flag TTS ditegakkan (403 tts_disabled terbukti), quotaCharged berhenti bohong, penggabungan permintaan kembar dipindah ke depan pagar kuota."
+    },
+    {
+      "sesi": "sesi-computer-086e9698/D3",
+      "peran": "worker MASTER",
+      "paths": [
+        "workers/owner/index.js",
+        "owner-edge-guard-test.js",
+        "workers/owner/DEPLOY.md"
+      ],
+      "selesai": "2026-08-28T20:10:00+07:00",
+      "catatan": "Dashboard owner HIDUP di https://owner.fiezel.my.id (login 303 -> dashboard 200). Penjaga tepi mengenali hostname kanonik; workers.dev tetap ditolak. Klaim D3 soal metrics_daily bentuk LEBAR TERBUKTI SALAH: kueri dan D1 produksi dua-duanya bentuk PANJANG."
     }
   ],
   "menunggu_izin": [

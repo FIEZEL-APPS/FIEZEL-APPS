@@ -230,8 +230,14 @@ seluruh isi ikon harus berada di dalam lingkaran berjari-jari **204,8 px** dari 
 ke splash cream) dan `theme_color:#FFC700`; meta `theme-color` statis di `index.html`
 adalah `#FFF9EE` dan boleh ditimpa runtime oleh fase suasana (§1).
 
-> Karakter lama "Percik" dihapus pada m025-80; PAW adalah penggantinya yang sah. Jangan
-> memperkenalkan gaya ilustrasi ketiga tanpa keputusan merek yang eksplisit.
+> **Maskot.** [PAW 2026-08] Koreksi catatan lama: m025-80 menghapus maskot **dari layar
+> splash saja** (lihat `features/brand/fiezel-splash.js`), bukan dari produk. Produk punya
+> maskot resmi — **PAW**, dengan SATU rig kanonik di `features/mascot/fiezel-mascot.js`
+> (aturan E5/G11); semua berkas statisnya di `assets/brand/` dan
+> `assets/marketing/mascot-poses/` adalah ekspor hasil generate
+> (`node tools/export-mascot.mjs`, dijaga `e5-checksum-gate-test.js`). Ikon Lucide di
+> onboarding (`.fiezel-step-art`) adalah lambang langkah, bukan pengganti maskot.
+> Jangan memperkenalkan gaya ilustrasi baru tanpa keputusan merek yang eksplisit.
 
 ---
 

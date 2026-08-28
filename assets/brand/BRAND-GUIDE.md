@@ -43,13 +43,15 @@ Satu sumber bentuk paw: `features/ui/fiezel-icons.js`. Jangan menyalin path SVG 
 | Marun gelap | `#6D1926` | bayangan tombol, tekan |
 | Emas | `#D8B36B` | aksen, cincin ekor, tindakan sekunder |
 | Kuning | `#FFD94F` | badan maskot |
-| Kuning tua | `#F8CF4D` | bayangan badan maskot, confetti |
+| Kuning tua | `#EDB93A` | bayangan badan maskot, kaki, ekor |
 | Krem | `#FDFAF3` | latar halaman |
 | Krem hangat | `#FFF4DA` | perut, dalam telinga, bidang lembut |
 | Gelap | `#1B1418` | tinta paling gelap, garis mata |
 | Cokelat | `#33201F` | garis wajah, kumis, hidung |
 | Blush | `#F0A0AC` | pipi, dalam telinga |
 | Merah | `#D9536A` | salah, hati, peringatan lembut |
+
+> **[PAW 2026-08]** Koreksi: baris "Kuning tua" dulu menulis `#F8CF4D` — itu drift dokumen; nilai seni sebenarnya `#EDB93A` (`YEL_D` di `features/mascot/fiezel-mascot.js`), dan confetti kini memakai palet tertutup G1 (marun/emas/merah/kuning/blush), tanpa `#F8CF4D`.
 
 ### Peringatan tabrakan token
 
