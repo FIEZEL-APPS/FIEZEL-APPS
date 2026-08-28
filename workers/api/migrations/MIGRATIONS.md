@@ -17,6 +17,7 @@ sini yang menjadi urutan resmi.
 | `0005_ai_account_budget.sql` | `fiezel-core` (binding `CORE_DB`) | `ai_account_day` |
 | `0006_analytics_batch_dedup.sql` | `fiezel-stats` (binding `STATS_DB`, dibaca kode sebagai `ANALYTICS_DB`) | `batch_dedup` |
 | `0007_learning.sql` | `fiezel-learning` (binding `LEARNING_DB`) | `learning_daily`, `learning_dedup` |
+| `0006_social.sql` | `fiezel-core` (binding `CORE_DB`) | `social_profile`, `social_handle`, `social_invite`, `social_friend`, `social_counter`, `rank_week`, `social_cohort`, `milestone_feed`, `cheer_feed`, `rank_jti` |
 
 Tabel di atas adalah **satu-satunya** daftar berkas→database yang ditulis manusia.
 `tools/d1-schema-check.mjs` dan `d1-schema-contract-test.js` **menurunkan** peta itu
@@ -81,6 +82,8 @@ wrangler d1 execute fiezel-stats --remote --file=migrations/0006_analytics_batch
 
 # --- fiezel-learning: lane telemetri belajar agregat (wave brain-learning-infra, server lane) ---
 wrangler d1 execute fiezel-learning --remote --file=migrations/0007_learning.sql
+# --- fiezel-core: lapisan sosial (SLOT 7) ---
+wrangler d1 execute fiezel-core --remote --file=migrations/0006_social.sql
 ```
 
 `0007_learning.sql` masuk database KETIGA (`fiezel-learning`), bukan
@@ -109,6 +112,37 @@ sengaja (observabilitas tidak boleh menjatuhkan job yang diobservasinya) dan
 
 Ganti `--remote` dengan `--local` untuk `wrangler dev`. Semua berkas memakai
 `CREATE TABLE IF NOT EXISTS`, jadi menjalankannya ulang aman (idempoten).
+
+## 0006_social.sql — fiezel-core, DAN diterapkan runtime (kejujuran operasional)
+
+`0006_social.sql` masuk `fiezel-core` dan BUKAN database D1 baru karena **token
+CI yang men-deploy Worker tidak punya izin `wrangler d1 create`** — membuat
+database ketiga adalah keputusan + kredensial owner. Data sosial per-user halal
+di `fiezel-core` (seperti kuota); tetap HARAM di `fiezel-stats` (analytics wall).
+
+Token CI juga **tidak bisa menjalankan `wrangler d1 execute --remote`**, jadi
+migrasi ini punya pasangan runtime: `ensureSocialSchema()` di
+`workers/api/social-schema.js` menerapkan **DDL yang sama** secara idempoten
+lewat binding `CORE_DB` pada permintaan sosial pertama per isolate. Dua pagar
+supaya ini tidak menjadi migrasi bayangan:
+
+1. Berkas `.sql` ini tetap **sumber resmi** skema; gerbang
+   `social-schema-contract-test.js` MEMERAH kalau `SOCIAL_DDL` runtime tidak
+   setara pernyataan-per-pernyataan (ternormalisasi) dengan berkas ini.
+2. Perintah `wrangler d1 execute` di atas tetap dianjurkan dijalankan owner —
+   `CREATE TABLE IF NOT EXISTS` membuat urutan mana pun aman.
+
+Retensi (SQL ber-`WHERE` + `LIMIT`, pola `docs/D1-RETENTION.md`; belum ada cron
+khusus — kandidat perluasan `runScheduled` milik paket kerja cron):
+
+```sql
+DELETE FROM milestone_feed WHERE day < :day_minus_14 LIMIT 500;
+DELETE FROM social_invite  WHERE expires_day < :day_minus_7 LIMIT 500;
+DELETE FROM rank_jti       WHERE day < :day_minus_7 LIMIT 500;
+DELETE FROM social_counter WHERE period < :day_minus_14 LIMIT 500;
+DELETE FROM rank_week      WHERE week < :week_minus_8 LIMIT 500;
+DELETE FROM cheer_feed     WHERE day < :day_minus_7 LIMIT 500;
+```
 
 ## Verifikasi kontrak privasi setelah menerapkan
 

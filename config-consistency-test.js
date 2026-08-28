@@ -78,11 +78,15 @@ function readFrozenKeys(src, constName) {
 
 const clientFlagKeys = readFrozenKeys(schema, 'CLIENT_FLAG_DEFAULTS');
 const killSwitchKeys = readFrozenKeys(schema, 'KILL_SWITCH_DEFAULTS');
+// 7 & 5 sejak SLOT 7 sosial (28-29 Agu 2026): schema.js menambah `cfSocialEnabled`
+// (CLIENT_FLAG_DEFAULTS) dan `social` (KILL_SWITCH_DEFAULTS) — keduanya default false,
+// fail-closed di route-social.js. Sesuai komentar di atas: daftar berubah, angka di sini
+// ikut berubah SADAR, bukan otomatis.
 check('CLIENT_FLAG_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 6,
+  Array.isArray(clientFlagKeys) && clientFlagKeys.length === 7,
   clientFlagKeys ? clientFlagKeys.join(',') : 'TIDAK TERBACA');
 check('KILL_SWITCH_DEFAULTS terbaca dari workers/api/schema.js',
-  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 4,
+  Array.isArray(killSwitchKeys) && killSwitchKeys.length === 5,
   killSwitchKeys ? killSwitchKeys.join(',') : 'TIDAK TERBACA');
 
 const FLAG_KEYS = new Set(clientFlagKeys || []);
