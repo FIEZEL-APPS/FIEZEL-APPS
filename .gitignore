@@ -60,3 +60,9 @@ CF-CONFIG-KILLSWITCH-REPORT.json
 CF-SHADOW-LEDGER-REPORT.json
 NO-NETWORK-REPORT.json
 SECRET-SCAN-REPORT.json
+
+# Artefak gerbang: DIHASILKAN ULANG setiap gerbang jalan, nol gerbang membacanya sebagai
+# masukan (diverifikasi 28 Agu 2026: 50 berkas menulis, 0 membaca). Melacaknya di git hanya
+# menambah permukaan konflik - malam ini satu di antaranya bahkan ter-commit BERISI penanda
+# konflik merge. Buktinya ada di keluaran gerbang, bukan di berkas yang tertinggal di worktree.
+*-REPORT.json
