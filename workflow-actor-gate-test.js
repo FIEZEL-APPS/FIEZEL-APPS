@@ -55,6 +55,7 @@ const WORKFLOW_DIR = path.join(root, '.github', 'workflows');
  * audio-prerender-cf.yml:55) dan cocok dengan subdomain produksi `fitrajft.workers.dev`
  * (audio/manifest.json:5). Governance-nya di MASTER-ONLY-GOVERNANCE.md.
  */
+// m025-176: username lama 'FIEZEL-APPS' sudah diganti menjadi 'FIEZEL-APPS' oleh pemilik.
 const OWNER_LOGIN = 'FIEZEL-APPS';
 
 /** Kata kunci yang menandai "workflow ini bisa mengubah infrastruktur". */

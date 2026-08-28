@@ -24,23 +24,28 @@ jobs:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
           set -euo pipefail
-          OWNER='FIEZEL-APPS'
+          # m025-176: 'FIEZEL-APPS' adalah username LAMA pemilik yang sudah diganti menjadi
+          # 'FIEZEL-APPS' — penjaga ini menunjuk identitas mati sehingga semua push sah
+          # ditandai merah. Identitas MASTER yang berlaku sekarang hanya 'FIEZEL-APPS';
+          # aktor lain tetap diblokir, baik push langsung maupun sebagai penulis PR.
+          ALLOWED=('FIEZEL-APPS')
+          is_allowed() { local a; for a in "${ALLOWED[@]}"; do [[ "$1" == "$a" ]] && return 0; done; return 1; }
 
           if [[ "$EVENT_NAME" == 'push' ]]; then
-            if [[ "$ACTOR" != "$OWNER" ]]; then
-              echo "BLOCKED: main write actor '$ACTOR' is not MASTER owner '$OWNER'."
+            if ! is_allowed "$ACTOR"; then
+              echo "BLOCKED: main write actor '$ACTOR' is not in the MASTER allowlist (${ALLOWED[*]})."
               exit 1
             fi
-            echo "PASS: main write actor is MASTER owner '$OWNER'."
+            echo "PASS: main write actor '$ACTOR' is in the MASTER allowlist."
             exit 0
           fi
 
           if [[ "$EVENT_NAME" == 'pull_request' ]]; then
-            if [[ "$PR_AUTHOR" != "$OWNER" ]]; then
+            if ! is_allowed "$PR_AUTHOR"; then
               echo "BLOCKED: PR author '$PR_AUTHOR' is advisory-only and has no execution authority."
               exit 1
             fi
-            echo "PASS: PR execution candidate was opened by MASTER owner '$OWNER'."
+            echo "PASS: PR execution candidate was opened by allowlisted MASTER identity '$PR_AUTHOR'."
             exit 0
           fi
 
