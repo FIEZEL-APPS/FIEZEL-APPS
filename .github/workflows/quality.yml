@@ -253,6 +253,18 @@ jobs:
           # yang tidak membocorkan riwayat IP, jitter anti-oracle, perilaku saat D1 galat, dan
           # nol IP mentah di bind D1 / log.
           node rate-anon-test.js
+          # S2: PLAFON NEURON TINGKAT AKUN ITU WAJIB. Dijalankan tepat sesudah
+          # `rate-anon-test.js` karena keduanya menjaga dua sisi dari ancaman yang sama:
+          # gerbang di atas membatasi PENERBITAN identitas per IP, gerbang ini menjaga satu-
+          # satunya hal yang masih menahan penyerang dari BANYAK IP - plafon biaya akun. Yang
+          # di-assert: `env.AI.run` hanya dieja di satu chokepoint yang menolak jalan tanpa
+          # tanda terima reservasi; setiap rute yang bisa memanggil model ditemukan PROGRAMATIK
+          # dari graf impor (bukan dari daftar tangan, karena daftar tangan basi begitu rute
+          # baru lahir - itu persis cara celah ini muncul) dan wajib memesan neuron SEBELUM
+          # memanggil model; dep `accountBudget` tidak lagi opsional (hilang = 503 dengan
+          # `quotaCharged:false`); reservasi atomik; D1 galat = fail-closed; dan reservasi
+          # dilepas kembali kalau panggilan model gagal sebelum model bekerja.
+          node ai-account-cap-gate-test.js
           # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
           # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
           # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
