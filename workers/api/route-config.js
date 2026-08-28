@@ -21,37 +21,30 @@
 
 import { PROTOCOL, CLIENT_FLAG_DEFAULTS, KILL_SWITCH_DEFAULTS } from './schema.js';
 import { jsonResponse } from './errors.js';
+// P3: pembaca KV + `mergeFlags` PINDAH ke `feature-gate.js` supaya endpoint yang
+// MELAPORKAN flag dan jalur permintaan yang MENEGAKKANNYA membaca kunci yang sama
+// lewat kode yang sama. Selama tiga paket kerja, komentar di bawah ("penegakannya
+// tetap di server") adalah satu-satunya penegakan yang pernah ada — yaitu tidak
+// ada. Dua pembaca terpisah adalah cara cacat itu kembali tanpa terlihat.
+import { readServerFlags, mergeFlags, FLAGS_KV_CACHE_TTL_S } from './feature-gate.js';
 
-const KV_KEY = 'cfg:flags';
-const KV_CACHE_TTL_S = 60;
+const KV_CACHE_TTL_S = FLAGS_KV_CACHE_TTL_S;
 
-/**
- * Gabung nilai dari KV ke default. Hanya kunci yang SUDAH dikenal yang dipakai,
- * dan hanya bertipe boolean: satu nilai sampah di KV tidak boleh bisa
- * menyuntikkan flag baru yang tidak pernah didesain klien.
- */
-export function mergeFlags(defaults, override) {
-  const out = {};
-  for (const [key, value] of Object.entries(defaults)) {
-    const candidate = override && typeof override === 'object' ? override[key] : undefined;
-    out[key] = typeof candidate === 'boolean' ? candidate : value;
-  }
-  return out;
-}
+// Re-ekspor: pemanggil lama (termasuk gerbang) mengimpor `mergeFlags` dari sini.
+export { mergeFlags };
 
 export async function routeConfig(ctx) {
-  let stored = null;
-  if (ctx.env.CFG) {
-    try {
-      stored = await ctx.env.CFG.get(KV_KEY, { type: 'json', cacheTtl: KV_CACHE_TTL_S });
-    } catch {
-      // KV gagal = pakai default (semua off). Diam-diam menyalakan fitur karena
-      // KV error adalah kegagalan ke arah mahal; dilarang.
-      stored = null;
-    }
-  }
-  const flags = mergeFlags(CLIENT_FLAG_DEFAULTS, stored && stored.flags);
-  const kill = mergeFlags(KILL_SWITCH_DEFAULTS, stored && stored.enabled);
+  // KEBIJAKAN PELAPORAN: `ok:false` (KV mati, kunci belum ada, binding absen)
+  // dipakai apa adanya = semua flag off. Endpoint ini hanya MEMBERI TAHU; yang
+  // MENOLAK permintaan berbayar adalah `feature-gate.js` di jalur AI, dan di
+  // sana `ok:false` berarti TOLAK (fail-closed). Dua arti berbeda untuk satu
+  // bacaan, keduanya sengaja, keduanya tertulis.
+  const snapshot = await readServerFlags(ctx.env, {
+    clientDefaults: CLIENT_FLAG_DEFAULTS,
+    killDefaults: KILL_SWITCH_DEFAULTS
+  });
+  const flags = snapshot.flags;
+  const kill = snapshot.enabled;
 
   return jsonResponse(
     {
@@ -62,6 +55,9 @@ export async function routeConfig(ctx) {
       flags,
       // Kill switch tingkat server: klien boleh memakainya untuk menyembunyikan
       // tombol, tapi penegakannya tetap di server (klien tidak dipercaya).
+      // PENEGAKAN NYATANYA: `feature-gate.js:aiAllowedFrom()` dipanggil
+      // `route-wiring.js` untuk setiap `POST /api/ai/task`. Sebelum P3 kalimat
+      // ini tidak punya kode di belakangnya.
       enabled: kill,
       // Angka yang boleh diketahui klien untuk merakit naskah UX kuota
       // (bab 12: pesan jujur + jalur alternatif), bukan untuk menegakkan kuota.
