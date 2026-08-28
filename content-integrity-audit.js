@@ -482,7 +482,7 @@ function bootApp() {
   const index = new Map();
   (function walk(dir) {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (['node_modules', '.git', 'vendor', 'assets', 'docs'].includes(e.name)) continue;
+      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: level-grammar-contract-test.js)
       const full = path.join(dir, e.name);
       if (e.isDirectory()) walk(full); else if (!index.has(e.name)) index.set(e.name, full);
     }
@@ -506,17 +506,7 @@ function bootApp() {
   context.window = context; context.self = context;
   context.FIEZEL_VERSION = readJson('VERSION.json').version;
   context.window.scrollTo = () => {}; context.window.requestAnimationFrame = fn => fn();
-  vm.createContext(context);
-  /* 2026-08-29 adaptasi i18n m025-186: index.html memuat fiezel-i18n.js + copy-id-*.js SEBELUM
-     app.js, dan app.js kini memanggil FiezelI18n.t() saat parse. Harness meniru urutan itu -
-     tanpa preload ini boot VM meledak (BOOT_FAILED) dan audit tidak mengukur apa pun.
-     Pola sama dengan r2-ux-overhaul-smoke-test.js (AI-20 F06). */
-  const i18nDir = path.join(root, 'features', 'i18n');
-  if (fs.existsSync(path.join(i18nDir, 'fiezel-i18n.js'))) {
-    vm.runInContext(fs.readFileSync(path.join(i18nDir, 'fiezel-i18n.js'), 'utf8'), context, { filename: 'fiezel-i18n.js' });
-    for (const f of fs.readdirSync(i18nDir).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
-      vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), context, { filename: f });
-  }
+  vm.createContext(context);/* Harness i18n (pola W1-TESTPLAN 2b, hotfix CI pasca-#242 lanjutan: tiga harness terlewat bac8b8d): app.js kini memanggil FiezelI18n.t saat evaluasi, jadi runtime i18n + copy-id dimuat dulu. existsSync = hijau dua arah. */const __i18n=path.join(root,'features','i18n','fiezel-i18n.js');if(fs.existsSync(__i18n)){vm.runInContext(fs.readFileSync(__i18n,'utf8'),context,{filename:'fiezel-i18n.js'});for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
   vm.runInContext(app, context, { filename: 'app.js' });
   return context;
 }
