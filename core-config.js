@@ -72,10 +72,78 @@ self.FIEZEL_CORE_CONFIG=Object.freeze({
 // statis di bawah kalau gagal. Flag statis ini lapis KEDUA, bukan yang pertama.
 //
 // Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
+// -- A6 (28 Agu 2026): PENYALAAN BERTAHAP TAHAP 1 - ANALYTICS SAJA --------------------
+//
+// Sampai commit ini blok di bawah bernilai `enabled:false` + `base:''` + semua endpoint
+// 'off'. Akibatnya bukan "analytics belum ramai", melainkan NOL: `cfStaticMode('usage')`
+// menjawab 'off', jadi app.js bahkan tidak memasang timer pemancar
+// (`if(cfStaticMode('usage')!=='off')anBootSchedule();`), tidak ada satu pun murid yang
+// pernah menembak Cloudflare, dan `/api/usage/events` yang SUDAH terbukti hidup di server
+// (202 `accepted:1` tanpa cookie sesi, `dau_dedup`/`metrics_daily`/`usage_daily` terisi,
+// dashboard owner menampilkan angkanya) tidak pernah menerima satu event pun dari produksi.
+// Yang dinyalakan di sini adalah SATU jalur itu, bukan lebih.
+//
+// `base` = 'https://api.fiezel.my.id': custom domain Worker `fiezel-api` yang sudah aktif
+// (zona Cloudflare `active`, p95 `GET /api/config` 97 ms pada 20 sampel). BUKAN workers.dev
+// (sengaja dimatikan) dan BUKAN `FIEZEL_CORE_CONFIG.workerUrl` di atas - yang itu tetap
+// `*.puter.work` karena `remote-push-test.js:6` mengunci polanya dan jalur pengingat push
+// hari ini bergantung padanya.
+//
+// DUA endpoint 'on', dan HANYA dua. Alasan tiap satu, bukan selera:
+//
+//   usage:'on'  - WAJIB, ini sakelar analytics itu sendiri. Dua tempat membacanya:
+//                 (1) `anGateOpen()` di app.js menuntut `cfStaticMode('usage')==='on'`, dan
+//                     `if(cfStaticMode('usage')!=='off')anBootSchedule()` di ekor blok
+//                     pemancar hanya memasang timernya kalau nilai ini bukan 'off';
+//                 (2) modul `features/analytics/fiezel-analytics-client.js` menuntut
+//                     `endpoints.usage==='on'` sebelum ia mau membuat `installId`, menulis
+//                     antrean, atau mengirim apa pun. Tanpa nilai ini seluruh paket
+//                     analytics tetap kode mati. Yang dibelanjakannya: tulisan D1 - GRATIS
+//                     pada batas pemakaian ini, NOL neuron.
+//   config:'on' - WAJIB menurut arbiter rencana repo, `tools/flag-plan-check.mjs` aturan 4
+//                 (`KILL_SWITCH_TAK_TERBACA`): endpoint hidup apa pun sementara `config`
+//                 mati dinilai DANGER, karena rencana itu berarti "ada jalur CF hidup yang
+//                 kill switch server-nya tidak diakui klien". Menyalakannya berbiaya NOL
+//                 permintaan tambahan: tidak ada satu pun pemanggil `coreWorkerExec()` yang
+//                 memakai path `/api/config` (pengambil kill switch memakai `fetch` langsung
+//                 di `cfFetchServerConfig()`), jadi nilai ini pengakuan eksplisit bahwa
+//                 jalur `GET /api/config` memang jalur yang kita pakai - dan ia yang membuat
+//                 pemanggil masa depan ke path itu tidak diam-diam jatuh ke Puter.
+//
+// LIMA yang TIDAK dinyalakan, dan kenapa:
+//   ai:'off'    - WAJIB tetap mati. `/api/ai/*` di Worker membelanjakan NEURON akun (plafon
+//   tts:'off'     10.000/hari untuk SEMUA murid sekaligus) dan `/api/tts/*` memanggil
+//                 binding `env.AI` yang sama. Itu keputusan owner terpisah dan BUKAN bagian
+//                 paket ini. Selama keduanya 'off', murid tetap memakai Puter untuk suara
+//                 dan AI persis seperti hari ini - dan analytics tidak butuh keduanya sama
+//                 sekali. Dijaga assert (b) cf-config-killswitch-test.js ATAS BERKAS INI,
+//                 bukan atas harness sintetis.
+//   quota:'off' - plafon per murid hanya relevan untuk jalur berbiaya (ai/tts). Analytics
+//                 tidak menagih apa pun, jadi menyalakannya hanya menambah permukaan.
+//   auth:'off'  - analytics privasi-maksimal SENGAJA tidak beridentitas: yang dikirim adalah
+//                 `visitor_token = HMAC(pepper_harian, installId)`, dan server memang
+//                 menerima `/api/usage/events` TANPA cookie sesi (terbukti 202). Menyalakan
+//                 `auth` memindahkan sesi murid ke jalur baru tanpa alasan analytics.
+//   health:'off'- `coreBrainHealth()` menembak `CORE_WORKER_URL` (Puter) langsung, bukan
+//                 lewat transport CF, jadi nilai ini tidak dibaca siapa pun di jalur ini.
+//
+// SATU AKIBAT YANG HARUS DIBACA SEBELUM PERCAYA "analytics saja": peta rute di app.js
+// (`CF_ENDPOINT_ROUTES`) menyatukan `/api/usage`, `/api/activity`, `/api/feedback`, dan
+// `/api/policy` di bawah SATU kunci 'usage'. Jadi `usage:'on'` juga memindahkan empat
+// pemanggil `coreWorkerExec` itu ke Cloudflare, sementara SLOT 5 Worker (`route-legacy.js`)
+// masih [BELUM] terpasang, jadi keempatnya menjawab 404. Tiga di antaranya jatuh lunak
+// (`/api/policy/next` -> kebijakan lokal, `/api/policy/outcome` -> tetap di antrean,
+// `/api/activity` -> `false` senyap) dan SATU terlihat murid (`/api/feedback` -> toast
+// "Gagal mengirim"). Kopling itu TIDAK bisa dipisahkan dari core-config.js: kunci yang sama
+// dibaca `cfStaticMode('usage')` dan `cfEndpointMode()`. Rincian + jalan keluarnya di
+// reports/work-a6-client-switch.md; sampai salah satunya dikerjakan, ini biaya yang
+// DIKETAHUI, bukan kejutan.
+//
+// Tidak ada rahasia di blok ini (syarat `release-audit.py:105,130` untuk core-config.js).
 self.FIEZEL_CF_CONFIG=Object.freeze({
-  enabled:false,
-  base:'',
-  endpoints:Object.freeze({health:'off',config:'off',auth:'off',quota:'off',ai:'off',tts:'off',usage:'off'})
+  enabled:true,
+  base:'https://api.fiezel.my.id',
+  endpoints:Object.freeze({health:'off',config:'on',auth:'off',quota:'off',ai:'off',tts:'off',usage:'on'})
 });
 // ── KILL SWITCH SERVER: parameter pengambil `GET /api/config` (m031-killswitch) ────────
 //
