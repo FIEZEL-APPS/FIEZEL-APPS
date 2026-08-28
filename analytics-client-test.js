@@ -952,9 +952,26 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
         check(`Notes A1 menyebut "${frasa}"`, n.includes(frasa), 'notes');
       }
     }
-    check('Pemancar TIDAK menyalakan flag apa pun sendiri',
-      !/endpoints\s*:\s*Object\.freeze\(\{[^}]*usage\s*:\s*'on'/.test(fs.readFileSync(path.join(root, 'core-config.js'), 'utf8')),
-      'core-config.js tetap usage:off');
+    /* A6 (28 Agu 2026) MENGGANTI ASSERT INI, dan penggantiannya bukan pelunakan.
+     *
+     * Bentuk lama: "core-config.js tetap usage:off". Itu benar selama A1, karena A1 memang
+     * hanya memasang PEMANCAR dan bukan keputusan menyalakannya. Sejak paket A6, `usage:'on'`
+     * ADALAH keputusan rilis yang sah dan tercatat (reports/work-a6-client-switch.md), jadi
+     * assert lama akan memerahkan gerbang untuk sesuatu yang sengaja dan benar.
+     *
+     * Yang sesungguhnya dijaga A1 tetap dijaga di sini, dan sekarang lebih tepat sasaran:
+     * pemancar TIDAK BOLEH menyalakan dirinya sendiri. Ia hanya boleh MEMBACA gerbang; satu
+     * baris yang menulis `FIEZEL_CF_CONFIG` (atau mengarang mode 'on' di dalam blok) berarti
+     * sakelar owner bisa dilangkahi kode aplikasi, dan itulah yang harus merah.
+     * Sakelar berbiaya (ai/tts) tetap dijaga di sini juga: analytics tidak boleh menjadi
+     * pintu masuk penyalaan neuron. */
+    const cfgSrc = fs.readFileSync(path.join(root, 'core-config.js'), 'utf8');
+    check('Pemancar TIDAK menyalakan flag apa pun sendiri (hanya membaca gerbang)',
+      !/FIEZEL_CF_CONFIG\s*=/.test(blockSrc) && !/endpoints\s*[:.]\s*\{?[^}]*usage\s*=\s*'on'/.test(blockSrc),
+      'blok pemancar app.js tidak menulis FIEZEL_CF_CONFIG');
+    check('core-config.js: ai dan tts tetap off (analytics tidak membuka jalur berbiaya)',
+      /ai:'off'/.test(cfgSrc) && /tts:'off'/.test(cfgSrc) && !/ai:'(?:on|shadow)'/.test(cfgSrc) && !/tts:'(?:on|shadow)'/.test(cfgSrc),
+      'core-config.js ai/tts');
   }
 
   finish();
