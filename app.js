@@ -306,7 +306,10 @@ const norm=s=>{
   const key=typeof s==='string'?s:String(s??'');
   const hit=NORM_MEMO.get(key);
   if(hit!==undefined)return hit;
-  const value=key.toLowerCase().replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+  /* Hotfix th (akar bug tes-25, audit AI-03/AI-10: norm() Latin-only mengosongkan teks Thai
+     sehingga uniqueByNorm membuang SEMUA arti Thai dan pengecoh vocab placement kolaps).
+     Rentang \u0e00-\u0e7f dipertahankan; untuk teks id/en hasilnya byte-identik. */
+  const value=key.toLowerCase().replace(/[^a-z0-9\u0e00-\u0e7f ]+/g,' ').replace(/\s+/g,' ').trim();
   if(NORM_MEMO.size<NORM_MEMO_LIMIT)NORM_MEMO.set(key,value);
   return value;
 };
