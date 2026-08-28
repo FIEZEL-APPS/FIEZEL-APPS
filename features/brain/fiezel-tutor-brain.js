@@ -596,7 +596,9 @@
             : 'Petunjuknya ada di kata yang menunjukkan kapan kejadiannya. Coba lagi.';
       } else if (level === 'worked') {
         say += ' Aku kerjakan satu yang mirip dulu ya, biar kelihatan langkahnya.';
-        ask = workedExample(ex, it, rotated, concept);
+        // A11-03: anak tangga `worked` BUKAN pembuka jawaban - ia diakhiri ajakan mencoba
+        // lagi, supaya murid dapat satu percobaan sungguhan sebelum tangga naik ke `tell`.
+        ask = workedExample(ex, it, rotated, concept) + ' Sekarang giliranmu: coba jawab lagi.';
       } else {
         say += ' Oke, aku buka sekarang.';
         ask = rotated || str(ex.whyCorrect) || str(ex.rule) || '';
@@ -606,7 +608,13 @@
       // yang sama yang memutuskan nasibnya: murid tetap salah = penjelasan ini gagal.
       if (s && expKey) s.lastExplanation = { concept: conceptKey, scaffold: level, key: expKey };
     } else if (move === 'celebrate') {
-      say = 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.';
+      // A09-F2: klaim "bukan tebakan" hanya jujur bila kecepatan jawabnya memang
+      // menunjukkan murid berpikir. Jawaban secepat kilat tetap dirayakan - tanpa
+      // mengarang alasan yang tidak bisa dibuktikan dari timing-nya.
+      var deliberate = it.timing === 'retrieved' || it.timing === 'reasoned' || it.timing === 'struggled';
+      say = deliberate
+        ? 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati - dan kamu melewatinya dengan alasan yang benar, bukan tebakan.'
+        : 'Nah, itu dia. Yang tadi bikin kamu keliru, barusan kamu lewati. Coba ucapkan alasannya ke dirimu sendiri, biar makin nempel.';
     } else if (move === 'consolidate') {
       say = 'Benar. Tapi tadi kamu perlu waktu lumayan, jadi kita mantapkan dulu di sini sebentar sebelum naik.';
     } else if (move === 'stretch') {
@@ -619,6 +627,30 @@
       say = '';
     }
     return { say: say, ask: ask, reveal: reveal, scaffold: level, move: move };
+  }
+
+  /**
+   * A11-03 — Eskalasi "Aku masih belum paham" yang menghormati tangganya sendiri.
+   *
+   * Kontrak probe→hint→worked→tell berarti: naik SATU anak tangga per permintaan, dan
+   * jawaban baru boleh terbuka di `tell`. Pemanggil yang langsung membuka jawaban pada
+   * anak tangga `worked` melanggar kontrak itu. Helper ini mengembalikan keputusan yang
+   * benar sekali jalan: scaffold barunya, giliran tutur yang sudah dikomposisi, dan flag
+   * `reveal` yang WAJIB dipatuhi — false berarti beri murid satu percobaan lagi dengan
+   * contoh yang dikerjakan, true (hanya di `tell`) berarti jawaban boleh dibuka.
+   */
+  function escalate(current, input, session) {
+    var at = LADDER.indexOf(str(current) || 'hint');
+    var next = LADDER[Math.min(LADDER.length - 1, (at < 0 ? 1 : at) + 1)];
+    var it = input || {};
+    var merged = {};
+    for (var k in it) {
+      if (Object.prototype.hasOwnProperty.call(it, k)) merged[k] = it[k];
+    }
+    merged.scaffold = next;
+    if (!merged.move) merged.move = 'hint';
+    var turn = composeTurn(merged, session);
+    return { scaffold: next, reveal: next === 'tell' && turn.reveal, turn: turn };
   }
 
   // =====================================================================================
@@ -760,6 +792,7 @@
     record: record,
     decideMove: decideMove,
     composeTurn: composeTurn,
+    escalate: escalate,
     selectNext: selectNext,
     summarize: summarize
   };
