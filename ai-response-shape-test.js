@@ -40,6 +40,18 @@ const check = (name, ok, details) => {
 
 const AiTasks = require(path.join(root, 'workers/api/ai/ai-tasks.js'));
 const RouteAi = require(path.join(root, 'workers/api/ai/route-ai.js'));
+const ModelCallGate = require(path.join(root, 'workers/api/ai/model-call-gate.js'));
+
+/**
+ * S2 - `deps.accountBudget` WAJIB sekarang: tanpa dep itu `/api/ai/task` menjawab 503
+ * dan tidak menyentuh provider (celah S1 §6 ditutup). Berkas ini menguji BENTUK JAWABAN
+ * model, jadi ia harus lewat pagar itu dengan reservasi tiruan yang sah - bukan dengan
+ * melonggarkan pagarnya.
+ */
+const capBudget = async () => ModelCallGate.makeReservation({
+  neurons: 1, cap: 8000, usedBefore: 0, release: async () => true
+});
+const capDeps = (extra) => Object.assign({ accountBudget: capBudget }, extra || {});
 
 const VALID_INPUT = {
   tutor_turn: { question: 'Apa beda "in" dan "on"?', surface: 'ask', level: 'A2', focusLabel: 'Preposisi tempat' },
@@ -71,7 +83,7 @@ async function run(task, rawAnswer, extraDeps) {
     method: 'POST', body: JSON.stringify(req(task)), headers: { 'content-type': 'application/json' }
   });
   const response = await RouteAi.handleAiTask({
-    request, env: built.env, ctx: built.ctx, deps: extraDeps || {}
+    request, env: built.env, ctx: built.ctx, deps: capDeps(extraDeps)
   });
   return { status: response.status, body: await response.json(), ai: built.ai, model: modelId };
 }
@@ -358,7 +370,7 @@ const F = AiTasks.OUTPUT_FAILURES;
       const request = new Request('https://api.fiezel.my.id/api/ai/task', {
         method: 'POST', body: bodyText, headers: headers || { 'content-type': 'application/json' }
       });
-      const response = await RouteAi.handleAiTask({ request, env: built.env, ctx: built.ctx, deps: deps || {} });
+      const response = await RouteAi.handleAiTask({ request, env: built.env, ctx: built.ctx, deps: capDeps(deps) });
       return { status: response.status, body: await response.json() };
     };
 

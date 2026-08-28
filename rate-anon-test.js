@@ -535,14 +535,20 @@ async function captureConsole(fn) {
     assert(/if \(!budget \|\| budget\.allowed !== true\)/.test(routeAi),
       '(g5) route-ai.js MENOLAK ketika pagar akun menjawab tidak-boleh');
 
-    // CELAH YANG DITEMUKAN (tidak diperbaiki di sini — berkas ai/ milik paket lain):
-    // pagar itu OPSIONAL per pemanggil (`typeof deps.accountBudget === 'function'`),
-    // jadi pemanggil yang lupa menyuntikkannya melewati plafon TANPA satu pun galat.
-    // Gerbang ini menahannya dengan cara yang sah: temuannya WAJIB tertulis di laporan.
-    assert(/typeof deps\.accountBudget === 'function'/.test(routeAi),
-      '(g6) celah terkonfirmasi apa adanya: pagar akun aktif HANYA kalau dep-nya disuntikkan (opsional per pemanggil)');
+    // CELAH YANG DULU DITEMUKAN DI SINI SUDAH DITAMBAL PAKET S2: pagar akun tidak lagi
+    // opsional per pemanggil. Assert-nya DIBALIK arah sengaja — assert lama menuntut
+    // literal `typeof deps.accountBudget === 'function'` TETAP ADA, jadi begitu celahnya
+    // ditambal assert itu berubah fungsi menjadi PENJAGA CELAH: ia akan merah pada
+    // perbaikannya dan hijau pada kerusakannya. Itu gerbang yang bekerja untuk lawan.
+    assert(/if \(!budgetFn\) return budgetDenied\([^)]*'ai_budget_dep_missing'/.test(routeAi),
+      '(g6) pagar akun WAJIB: dep hilang = TOLAK 503 (ai_budget_dep_missing), bukan dilayani diam-diam');
+    assert(/quotaCharged: false/.test(routeAi),
+      '(g6) penolakan plafon tidak menagih jatah murid (quotaCharged:false)');
     const report = mustRead(path.join(ROOT, 'reports', 'work-s1-auth-anon.md'), 'reports/work-s1-auth-anon.md');
     assert(/deps\.accountBudget/.test(report), '(g6) celah dep-opsional itu tertulis di reports/work-s1-auth-anon.md');
+    const s2report = mustRead(path.join(ROOT, 'reports', 'work-s2-account-cap.md'), 'reports/work-s2-account-cap.md');
+    assert(/ai-account-cap-gate-test\.js/.test(s2report),
+      '(g6) penambalannya punya gerbang sendiri yang disebut di reports/work-s2-account-cap.md');
     assert(/Turnstile/i.test(report) && /WAF/i.test(report),
       '(g7) laporan menyebut apa yang MASIH tidak tertutup (serangan tersebar) dan alatnya (WAF rate-rule / Turnstile)');
   }
