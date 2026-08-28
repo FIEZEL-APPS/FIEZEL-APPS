@@ -87,16 +87,24 @@ Ini urutannya, dan urutannya penting. Jangan lompat ke langkah 4.
 ## Keadaan terkini yang perlu kamu tahu
 
 - **Build:** lihat `coordination/BUILD-VERSION.json` (jangan hafalkan angkanya).
-- **Cloudflare:** Worker `fiezel-api` hidup di belakang jembatan `https://api.fiezel.my.id`
-  (reverse proxy PHP di cPanel, karena pemindahan DNS diblokir registrar).
+- **Cloudflare:** nameserver `fiezel.my.id` SUDAH pindah, zona `active` sejak 28 Agu 2026
+  07:24 UTC. `api.fiezel.my.id` kini **custom domain Worker `fiezel-api`** — jembatan reverse
+  proxy PHP di cPanel (`deploy/edge/`) TIDAK lagi di jalur permintaan dan berstatus CADANGAN.
+  Terukur pada jalur langsung: p95 `GET /api/config` **97 ms** (dulu 1410 ms lewat jembatan).
+  Pagar `X-Fiezel-Edge` masih ada dan masih perlu: hostname tepercaya lolos tanpa header,
+  `*.workers.dev` tetap ditolak, hostname asing ditolak walau headernya sah. `/health`
+  melaporkan jalur mana yang dipakai lewat `edgeGuardPath`.
   Flag server di KV `cfg:flags`: `cfApiEnabled`/`cfIdentityEnabled`/`cfQuotaEnabled` **hidup**;
   `cfAiEnabled`/`cfTtsEnabled`/`cfAnalyticsEnabled` **mati**.
 - **Murid produksi masih memakai Puter.** Konfigurasi statis klien `enabled:false`, jadi flag
   server hanya MENGIZINKAN, tidak menyalakan. Jangan menyalakan transport klien tanpa owner.
 - **Analytics benar-benar nol event** (tidak ada pemancar di klien + flag mati). Jangan mengambil
   keputusan kuota di atas angka pengguna; angkanya belum ada.
-- **Jembatan lambat:** ~1,4–1,7 s hangat. Batas waktu klien jalur CF = 8000 ms dan itu diukur,
-  bukan dikarang. Jangan menurunkannya tanpa mengukur ulang.
+- **Batas waktu klien jalur CF = 8000 ms.** JANGAN menurunkannya karena jalur langsung sekarang
+  cepat (p95 97 ms): angka itu diukur dari pusat data, bukan dari ponsel murid di jaringan
+  seluler. Permintaan config tidak menahan boot, jadi anggaran besar hampir nol biaya,
+  sementara anggaran terlalu kecil membuat murid di jaringan buruk kehilangan seluruh jalur CF
+  untuk sisa sesinya. Alasan lengkap ada di komentar `core-config.js`.
 - **Nightwatch aktif** (pemeriksaan otomatis tiap jam, milik sesi master): CI `main`, keselarasan
   versi, penanda konflik, gerbang tak terdaftar, kesehatan jembatan. Perbaikan mekanis dikerjakan
   langsung; sisanya dilaporkan ke owner.
