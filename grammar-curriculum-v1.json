@@ -15,8 +15,8 @@
   "lessonCount": 153,
   "levelCounts": {
     "A1": 17,
-    "A2": 24,
-    "B1": 48,
+    "A2": 23,
+    "B1": 49,
     "B2": 33,
     "C1": 19,
     "C2": 12
@@ -509,20 +509,9 @@
       "titleEn": "preposition of time duration for vs since vs during"
     },
     {
-      "lessonId": "reported_speech_pronoun_and_possessive_shift",
-      "level": "A2",
-      "sequence": 38,
-      "unit": "A2.2",
-      "title": "Reported speech: kata ganti ikut pindah",
-      "prerequisites": [],
-      "source": "grammar-templates.json",
-      "templateId": "b5_009",
-      "titleEn": "reported speech pronoun and possessive shift"
-    },
-    {
       "lessonId": "subject_vs_object_questions_word_order",
       "level": "A2",
-      "sequence": 39,
+      "sequence": 38,
       "unit": "A2.3",
       "title": "Pertanyaan subjek vs objek: perlu “do” atau nggak",
       "prerequisites": [],
@@ -533,7 +522,7 @@
     {
       "lessonId": "present_perfect_experience_ever_never",
       "level": "A2",
-      "sequence": 40,
+      "sequence": 39,
       "unit": "A2.3",
       "title": "Present perfect: pengalaman dengan ever dan never",
       "prerequisites": [
@@ -546,7 +535,7 @@
     {
       "lessonId": "present_perfect_with_for_since_duration",
       "level": "A2",
-      "sequence": 41,
+      "sequence": 40,
       "unit": "A2.3",
       "title": "Present perfect + for/since: dari dulu sampai sekarang",
       "prerequisites": [
@@ -560,7 +549,7 @@
     {
       "lessonId": "past_simple_vs_present_perfect",
       "level": "B1",
-      "sequence": 42,
+      "sequence": 41,
       "unit": "B1.1",
       "title": "Present perfect vs past simple: rentang yang belum tutup",
       "prerequisites": [],
@@ -571,7 +560,7 @@
     {
       "lessonId": "future_forms_plan_vs_prediction",
       "level": "B1",
-      "sequence": 43,
+      "sequence": 42,
       "unit": "B1.1",
       "title": "Bentuk masa depan: rencana atau perkiraan",
       "prerequisites": [],
@@ -582,7 +571,7 @@
     {
       "lessonId": "deduction_present",
       "level": "B1",
-      "sequence": 44,
+      "sequence": 43,
       "unit": "B1.1",
       "title": "Must, might, can’t: menyimpulkan keadaan sekarang",
       "prerequisites": [],
@@ -593,7 +582,7 @@
     {
       "lessonId": "second_conditional_unreal_present",
       "level": "B1",
-      "sequence": 45,
+      "sequence": 44,
       "unit": "B1.1",
       "title": "Second conditional: pengandaian yang nggak nyata",
       "prerequisites": [],
@@ -604,7 +593,7 @@
     {
       "lessonId": "wish_unreal_present_past_simple",
       "level": "B1",
-      "sequence": 46,
+      "sequence": 45,
       "unit": "B1.1",
       "title": "Wish + past simple: harapan soal sekarang",
       "prerequisites": [
@@ -617,13 +606,24 @@
     {
       "lessonId": "agent_omission_when_irrelevant",
       "level": "B1",
-      "sequence": 47,
+      "sequence": 46,
       "unit": "B1.1",
       "title": "Kalimat pasif: kapan pelaku boleh hilang",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "PA-001",
       "titleEn": "agent omission when irrelevant"
+    },
+    {
+      "lessonId": "reported_speech_pronoun_and_possessive_shift",
+      "level": "B1",
+      "sequence": 47,
+      "unit": "B1.1",
+      "title": "Reported speech: kata ganti ikut pindah",
+      "prerequisites": [],
+      "source": "grammar-templates.json",
+      "templateId": "b5_009",
+      "titleEn": "reported speech pronoun and possessive shift"
     },
     {
       "lessonId": "backshift_statement",

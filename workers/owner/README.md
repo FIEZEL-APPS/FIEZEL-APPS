@@ -45,16 +45,24 @@ keberadaan halaman tidak hilang karena ia berada di hostname terpisah dan `noind
 ```bash
 cd FIEZEL-APPS/workers/owner
 
-# 1) Buat database analytics sekali saja (kalau belum ada). Skema: reports/cf-b5-analytics.md §2.1
-wrangler d1 create fiezel-analytics
+# 1) JANGAN buat database baru. Database agregat sudah ada: `fiezel-stats`
+#    (0001/0002 sudah dijalankan di produksi). Binding-nya sudah tertulis di wrangler.toml.
+#    Perintah `wrangler d1 create fiezel-analytics` yang dulu tertulis di sini SALAH: ia membuat
+#    database KOSONG kedua, dan dashboard lalu melaporkan "belum ada data" untuk selamanya.
+wrangler d1 info fiezel-stats     # hanya memastikan database yang benar yang dipakai
 
 # 2) Pasang Secret (lihat §3) — WAJIB sebelum deploy pertama, kalau tidak Worker fail-closed
 wrangler secret put OWNER_TOKEN_HASH
 wrangler secret put OWNER_SESSION_KEY
+wrangler secret put EDGE_SHARED_SECRET   # atau var ALLOW_NO_EDGE_SECRET="true" secara sadar
 
 # 3) Deploy
 wrangler deploy
 ```
+
+**Daftar periksa deploy yang lengkap, berurutan, dan bisa diverifikasi dengan `curl` ada di
+[`DEPLOY.md`](DEPLOY.md)** — termasuk perintah yang HARUS menjawab 403 dan bagian
+"Dashboard ini akan kosong, dan itu benar".
 
 `wrangler.toml` hanya memuat **nama** binding — nol nilai rahasia, nol `[vars]`.
 Bila `OWNER_TOKEN_HASH` atau `OWNER_SESSION_KEY` belum dipasang, **setiap** rute (termasuk
