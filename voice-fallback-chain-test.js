@@ -37,6 +37,10 @@ const ADDON = fs.readFileSync(ADDON_PATH, 'utf8');
 const SAY_PATH = 'features/neural-voice/fiezel-voice-say.js';
 const SAY = read(SAY_PATH);
 const APP = read('app.js');
+
+/* Hotfix CI pasca-#242 (AI-20 F06 kategori 2a UNION): kalimat murid boleh pindah ke copy-map
+   dengan nilai byte-identik; korpus gabungan = sumber + features/i18n/copy-id-*.js. */
+const ID_COPY_CORPUS=(()=>{try{const d=path.join(root,'features','i18n');if(!fs.existsSync(d))return '';return fs.readdirSync(d).filter(n=>/^copy-id-.*\.js$/.test(n)).sort().map(n=>fs.readFileSync(path.join(d,n),'utf8')).join('\n');}catch(e){return ''}})();
 const SW = read('sw.js');
 
 const checks = [];
@@ -235,7 +239,7 @@ function failingController(reason) {
       'renderListeningExam() masih membuka soal saat say() menjawab false');
 
     check('addon: jalur ujian yang sudah benar tidak diubah',
-      /this\.replays--/.test(ADDON) && /Soal tetap terkunci/.test(ADDON),
+      /this\.replays--/.test(ADDON) && (/Soal tetap terkunci/.test(ADDON) || ID_COPY_CORPUS.includes('Soal tetap terkunci')),
       'renderListeningExam() adalah acuan perbaikan ini; ia harus tetap utuh');
     const timeout = /const\s+TTS_TIMEOUT_MS\s*=\s*(\d+)/.exec(ADDON);
     check('addon: ambang tunggu audio adalah konstanta bernama, bukan angka di dalam handler',
@@ -464,7 +468,7 @@ function audioHarness(options) {
     first === null,
     `hasil=${JSON.stringify(first)}`);
   check('app.js: pemanggil listening membaca hasil pemutaran sebelum berkata "putar ulang"',
-    /const played=await audio\.play\(q\.script/.test(APP) && /played\?'Putar ulang bila perlu\.'/.test(APP),
+    /const played=await audio\.play\(q\.script/.test(APP) && (/played\?'Putar ulang bila perlu\.'/.test(APP) || (/played\?FiezelI18n\.t\('quiz\.putar-ulang-bila-perlu'\)/.test(APP) && ID_COPY_CORPUS.includes('Putar ulang bila perlu.'))),
     'catatan "Putar ulang bila perlu" untuk rekaman yang tidak berbunyi adalah pesan yang bohong');
 })().catch((error) => { check('app.js: harness berjalan tanpa galat', false, error.stack || String(error)); });
 

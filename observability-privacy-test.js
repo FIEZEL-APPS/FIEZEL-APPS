@@ -73,6 +73,12 @@ const context = {
 };
 context.window = context; context.self = context; context.window.scrollTo = () => {};
 vm.createContext(context);
+/* Harness i18n (hotfix CI pasca-#242): runtime i18n + copy-id dimuat sebelum modul features/app.js. */
+const __i18nRt=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(__i18nRt)){vm.runInContext(fs.readFileSync(__i18nRt,'utf8'),context,{filename:'fiezel-i18n.js'});
+for(const __n of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',__n),'utf8'),context,{filename:__n});}}
+
 for (const file of [
   'core-config.js',
   'features/speaking-listening/speaking-listening-config.js',

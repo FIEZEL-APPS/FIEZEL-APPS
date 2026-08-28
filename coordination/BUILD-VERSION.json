@@ -1,7 +1,7 @@
 {
-  "version": "m025-185",
-  "claimedBy": "perplexity-computer (braincore session, T-027)",
-  "claimedAt": "2026-08-28T17:07:29.263Z",
-  "reason": "T-031: pisahkan nama global FiezelAnalytics dari modul A/B testing",
+  "version": "m025-187",
+  "claimedBy": "perplexity-computer (multilingual i18n wave, direbase atas m025-185)",
+  "claimedAt": "2026-08-28T20:02:21.004Z",
+  "reason": "brain-learning-infra: wiring loop belajar (rebase atas i18n m025-186)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

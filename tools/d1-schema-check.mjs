@@ -49,9 +49,14 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, '..');
 
-/** Nama database yang dikenal skrip ini. */
-const DB_NAMES = ['core', 'stats'];
-const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats' };
+/** Nama database yang dikenal skrip ini.
+ *  [INFRA-0007-20260829] `learning` ditambahkan bersama migrasi
+ *  `0007_learning.sql` (database ketiga `fiezel-learning`, binding
+ *  `LEARNING_DB`). Tanpa entri ini, `filesByDbFromDoc` menganggap 0007 "tidak
+ *  terpetakan" dan KELUAR 2 — arah gagal yang benar, tapi yang diminta di sini
+ *  adalah memperluas gerbang dengan jujur, bukan membiarkannya merah. */
+const DB_NAMES = ['core', 'stats', 'learning'];
+const DB_ALIAS = { 'fiezel-core': 'core', 'fiezel-stats': 'stats', 'fiezel-learning': 'learning' };
 
 /**
  * Berkas migrasi per database — DITURUNKAN, bukan ditulis tangan.
@@ -93,7 +98,7 @@ export function filesByDbFromDoc(dir) {
   if (!inDir.length) throw new Error('tidak ada berkas .sql di ' + dir);
   if (unmapped.length) {
     throw new Error('berkas migrasi tanpa database tujuan di MIGRATIONS.md: ' + unmapped.join(', ') +
-      ' — tambahkan perintah `wrangler d1 execute <fiezel-core|fiezel-stats> --remote --file=migrations/<berkas>`');
+      ' — tambahkan perintah `wrangler d1 execute <fiezel-core|fiezel-stats|fiezel-learning> --remote --file=migrations/<berkas>`');
   }
   if (missing.length) {
     throw new Error('MIGRATIONS.md menyebut berkas yang tidak ada di ' + dir + ': ' + missing.join(', '));
@@ -104,10 +109,19 @@ export function filesByDbFromDoc(dir) {
   return byDb;
 }
 
-/** Tabel yang HARAM ada di masing-masing database (kontrak privasi). */
+/** Tabel yang HARAM ada di masing-masing database (kontrak privasi).
+ *  [INFRA-0007-20260829] Lane learning menambah dua arah larangan baru:
+ *  tabel learning tidak boleh nyasar ke core/stats, dan database learning
+ *  tidak boleh memuat tabel identitas/kuota/analytics. Pemisahan tiga domain
+ *  (identitas · kehadiran perangkat · hasil kebijakan Brain) hanya bermakna
+ *  kalau ketiga arahnya dijaga, bukan dua. */
 const FORBIDDEN_BY_DB = {
-  core: ['metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state'],
-  stats: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation']
+  core: ['metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state',
+    'learning_daily', 'learning_dedup'],
+  stats: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
+    'learning_daily', 'learning_dedup'],
+  learning: ['identity', 'session', 'anon_issue', 'quota_daily', 'quota_reservation',
+    'metrics_daily', 'usage_daily', 'retention_daily', 'dau_dedup', 'pepper_state', 'batch_dedup']
 };
 
 /** Kolom penghubung yang tidak boleh muncul di database analytics. */
@@ -355,7 +369,10 @@ export function compare(expected, actual, db) {
       add('pelanggaran_privasi_tabel', { tabel: forbidden, database: db });
     }
   }
-  if (db === 'stats') {
+  // [INFRA-0007-20260829] pemeriksaan kolom penghubung kini berlaku untuk KEDUA
+  // database agregat: stats (analytics) dan learning. Keduanya sama-sama haram
+  // memuat kolom yang bisa menautkan baris ke orang/perangkat.
+  if (db === 'stats' || db === 'learning') {
     for (const [name, t] of actual.tables) {
       const leaks = t.columns.filter((c) => LINKING_COLUMNS.includes(c));
       if (leaks.length) add('pelanggaran_privasi_kolom', { tabel: name, kolom: leaks });

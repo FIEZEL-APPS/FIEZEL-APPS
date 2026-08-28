@@ -215,6 +215,18 @@ function makeSandbox({ aiMode = 'off', enabled = true, respond, puterExec, onlin
   sandbox.FIEZEL_VERSION = '5.19.0';
 
   vm.createContext(sandbox);
+  // HARNESS i18n kondisional (AI-20 F06 kategori 2b): blok transport/render hasil ekstraksi
+  // copy boleh memanggil FiezelI18n.t — muat fiezel-i18n.js + copy-id-*.js ke sandbox lebih
+  // dulu, meniru urutan <script defer> index.html. existsSync = hijau dua arah: tanpa berkas
+  // i18n perilaku sandbox identik dengan sebelumnya. Asersi naskah id (termasuk fixture
+  // respons server di bagian (c)/(d) — itu BUKAN copy produk) tidak disentuh sama sekali.
+  const i18nRuntimePath = path.join(root, 'features', 'i18n', 'fiezel-i18n.js');
+  if (fs.existsSync(i18nRuntimePath)) {
+    vm.runInContext(read('features/i18n/fiezel-i18n.js'), sandbox, { filename: 'features/i18n/fiezel-i18n.js' });
+    for (const name of fs.readdirSync(path.join(root, 'features', 'i18n')).filter(n => /^copy-id-.*\.js$/.test(n)).sort()) {
+      vm.runInContext(read('features/i18n/' + name), sandbox, { filename: 'features/i18n/' + name });
+    }
+  }
   // `const` di top-level skrip tidak menempel ke objek global, jadi konstanta yang perlu
   // dibaca gerbang ini dijembatani secara eksplisit — bukan diketik ulang di sini.
   vm.runInContext(
