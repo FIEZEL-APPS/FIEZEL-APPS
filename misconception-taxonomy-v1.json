@@ -351,8 +351,8 @@
     "applies the uncountable-noun quantifier ('little') to a countable plural noun, and also confuses scarcity type": "articles.countability_quantifier",
     "adds an unnecessary partitive 'of' without a following determiner, and still misapplies 'much' to a countable noun": "articles.countability_quantifier",
     "swaps the point-preposition and surface/line-preposition roles": "prepositions.semantic_category",
-    "treats a route point as a surface in the first slot": "prepositions.semantic_category",
-    "movement preposition used for a static location": "prepositions.semantic_category",
+    "reads the turn point as an enclosed space and the static location as a destination": "prepositions.semantic_category",
+    "turns the landmark of the turn into a destination of movement": "prepositions.semantic_category",
     "over-generalizes 'about' as the default preposition after emotion adjectives": "prepositions.collocation",
     "confuses 'proud of' with other emotion collocations that do take 'for' (e.g., 'happy for someone')": "prepositions.collocation",
     "confuses 'proud of' with adjectives that pair with 'with' (e.g., 'pleased with')": "prepositions.collocation",
@@ -705,6 +705,9 @@
     "starting a fresh pronoun clause and splicing two sentences together in a non-standard join": "structure.malformed_blend",
     "using the indefinite article for a claim about the whole species, which only fits one-member-at-a-time statements": "articles.definiteness_mismatch",
     "spreading the claim over each countable member, though dying out can only be true of the class": "articles.countability_quantifier",
-    "picking the free-choice quantifier, which selects random members rather than naming the species": "articles.countability_quantifier"
+    "picking the free-choice quantifier, which selects random members rather than naming the species": "articles.countability_quantifier",
+    "regular 'more + adjective' pattern applied to an irregular adjective": "comparison.form_intensifier",
+    "regular -er ending forced onto an irregular adjective": "comparison.form_intensifier",
+    "superlative 'best' used where 'than' demands a comparative": "comparison.degree_scope"
   }
 }
