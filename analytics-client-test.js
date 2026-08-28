@@ -594,18 +594,367 @@ const PENANDA = ['Jahran', 'jahran@example.com', '0f8fad5b', 'u_123', '203.0.113
   }
 
   /* =======================================================================
-   * 10. Titik pemanggil disarankan TERDAFTAR, tapi TIDAK dipasang
+   * 10. PEMANCAR A1 — titik pemanggil di app.js, dijalankan sungguhan
+   *
+   * Sembilan bagian di atas membuktikan MODUL-nya benar. Bagian ini membuktikan
+   * PEMANCAR-nya ada dan benar: sampai A1, seluruh lapisan analytics hijau
+   * dengan NOL pemanggil, jadi nol event murid pernah terkirim. Enam tuntutan
+   * mandat diuji di sini, semuanya dieksekusi di dalam `vm`:
+   *   (a) flag mati  => NOL permintaan (dua arah: statis mati, dan server mati)
+   *   (b) flag hidup => event terkirim dengan bentuk yang DITERIMA server
+   *                     (dibandingkan ke `processClientBatch`, bukan diketik dua kali)
+   *   (c) NOL isi belajar: daftar kata terlarang DAN allowlist struktural
+   *   (d) kegagalan jaringan tidak pernah melempar ke pemanggil
+   *   (e) pemancar tidak pernah dipanggil di jalur ujian/latihan (jalur jawaban)
+   *   (f) identitas tidak bisa ditautkan lintas periode pepper
    * ===================================================================== */
   {
-    const sites = FiezelAnalytics.RECOMMENDED_CALL_SITES;
-    check('RECOMMENDED_CALL_SITES mencakup delapan event klien',
-      Array.isArray(sites) && sites.length === 8 && sites.every(s => FiezelAnalytics.CLIENT_EVENTS.includes(s.event)),
-      Array.isArray(sites) ? sites.map(s => s.event).join(',') : typeof sites);
     const appSrc = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
-    check('app.js TIDAK disentuh paket kerja ini (belum ada pemanggil)',
-      !appSrc.includes('FiezelAnalytics'), 'app.js');
-    const notes = path.join(root, 'reports', 'add-a2-analytics-client.md');
-    check('Notes ada dan mendaftarkan titik pemanggil', fs.existsSync(notes) && fs.readFileSync(notes, 'utf8').includes('question_answered'), notes);
+    const AWAL = '/* A1-ANALYTICS-EMITTER-BEGIN';
+    const AKHIR = '/* A1-ANALYTICS-EMITTER-END */';
+    const iAwal = appSrc.indexOf(AWAL);
+    const iAkhir = appSrc.indexOf(AKHIR);
+    check('Blok pemancar A1 ada di app.js (penanda BEGIN/END)', iAwal > 0 && iAkhir > iAwal, `${iAwal}/${iAkhir}`);
+    const blockSrc = iAwal > 0 && iAkhir > iAwal ? appSrc.slice(iAwal, iAkhir + AKHIR.length) : '';
+    const luarBlok = iAwal > 0 && iAkhir > iAwal ? appSrc.slice(0, iAwal) + appSrc.slice(iAkhir + AKHIR.length) : appSrc;
+
+    // Dokumentasi blok adalah bagian kontrak: pemancar yang tidak menjelaskan
+    // gerbangnya akan dinyalakan orang lain tanpa tahu apa yang menyala.
+    for (const frasa of ['cfAnalyticsEnabled', 'enabled.analytics', 'question_answered', 'MEANINGFUL_ATTEMPTS']) {
+      check(`Blok pemancar mendokumentasikan "${frasa}"`, blockSrc.includes(frasa), 'blok');
+    }
+    check('Blok pemancar tidak pernah `await` apa pun (tidak bisa menahan jalur belajar)',
+      !/\bawait\b/.test(stripComments(blockSrc)), 'blok');
+
+    /* --- (e) KEBERSIHAN JALUR JAWABAN ---------------------------------- */
+    // Semua pemanggil pemancar di luar blok WAJIB bertanda `/*A1-EMIT*/`, dan
+    // jumlahnya tetap. Pemanggil baru tanpa tanda = gerbang merah, jadi tidak
+    // ada cara menyelipkan pemancar ke jalur soal tanpa melewati gerbang ini.
+    const IDENT = /\b(?:anSessionStarted|anSessionEnded|anMarkActive|anBoot|anEmit|anLoad|FiezelAnalyticsEmitter|FiezelAnalytics)\b/g;
+    const barisLuar = luarBlok.split('\n');
+    const pemanggil = barisLuar.filter(l => IDENT.test(l) && (IDENT.lastIndex = 0, true));
+    check('Tepat tiga titik pemanggil pemancar di luar blok', pemanggil.length === 3, String(pemanggil.length));
+    const tanpaTanda = pemanggil.filter(l => !l.includes('/*A1-EMIT*/'));
+    check('Setiap titik pemanggil ditandai `/*A1-EMIT*/`', tanpaTanda.length === 0, String(tanpaTanda.length));
+
+    // Ketiga penanda harus berada di fungsi siklus-hidup SESI, bukan di jalur jawaban.
+    check('Titik pemanggil ada di beginLearningSession (session_started)',
+      /beginLearningSession[\s\S]{0,2600}?anSessionStarted\(state\.activeSession\);\/\*A1-EMIT\*\//.test(appSrc), 'anchor');
+    const jumlahEnded = (appSrc.match(/anSessionEnded\(session\);\/\*A1-EMIT\*\//g) || []).length;
+    check('Dua titik session_ended: sesi ditinggalkan DAN sesi tuntas', jumlahEnded === 2, String(jumlahEnded));
+
+    // Dan pembuktian langsung: badan fungsi jalur jawaban NOL pemancar.
+    const badan = (nama) => {
+      const i = appSrc.indexOf(nama);
+      if (i < 0) return '';
+      let depth = 0, mulai = appSrc.indexOf('{', i);
+      for (let j = mulai; j < appSrc.length; j++) {
+        if (appSrc[j] === '{') depth++;
+        else if (appSrc[j] === '}') { depth--; if (depth === 0) return appSrc.slice(mulai, j + 1); }
+      }
+      return appSrc.slice(mulai);
+    };
+    const jalurJawaban = ['function record(q,ok,ms,selectedIndex)', 'function answer(q,j,button)', 'function answerCloze(q,typed,input,btn)'];
+    const kotor = [];
+    for (const nama of jalurJawaban) {
+      const b = badan(nama);
+      check(`Jalur jawaban \`${nama.slice(9, 30)}...\` ditemukan`, b.length > 40, String(b.length));
+      IDENT.lastIndex = 0;
+      if (IDENT.test(b)) kotor.push(nama);
+    }
+    check('NOL pemancar di record()/answer()/answerCloze() — jawaban murid tidak punya jalan keluar',
+      kotor.length === 0, kotor.join(' | '));
+    // Sebaliknya: pembuktian bahwa pemindainya HIDUP (anti-vakum).
+    IDENT.lastIndex = 0;
+    check('Pemindai jalur jawaban terbukti bisa merah (anti-vakum)',
+      IDENT.test('  const h={...};anSessionEnded(session);'), 'ok');
+    // Baris pemanggil sendiri tidak boleh menyentuh objek soal.
+    const BAU_SOAL = ['q.options', 'correctAnswer', 'selectedAnswer', 'answerIndex', 'transcript', 'prompt', 'q.id', 'questions['];
+    const bauKena = [];
+    for (const l of pemanggil) for (const b of BAU_SOAL) if (l.includes(b)) bauKena.push(b);
+    check('Baris pemanggil tidak menyentuh objek soal/jawaban', bauKena.length === 0, bauKena.join(','));
+
+    /* --- Harness vm: modul NYATA + blok NYATA, mock hanya di tepi luar --- */
+    const moduleSource = source;
+    function makeWorld(opts) {
+      const o = opts || {};
+      const storage = makeStorage(o.initialStorage);
+      const transport = makeTransport(o.transportOpts);
+      const jejak = { createElement: 0, timers: 0 };
+      const sandbox = {
+        console,
+        TextEncoder,
+        TextDecoder,
+        crypto: nodeCrypto.webcrypto,
+        localStorage: storage,
+        navigator: { userAgent: 'Mozilla/5.0 (Linux; Android 13)', sendBeacon: transport.sendBeacon },
+        fetch: o.fetchImpl || transport.http,
+        FIEZEL_VERSION: '5.19.0',
+        LEVELS: ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'],
+        setTimeout: (fn) => { jejak.timers += 1; return o.runTimers === false ? 0 : setTimeout(fn, 0); },
+        clearTimeout,
+        document: {
+          head: { appendChild() { } },
+          createElement() { jejak.createElement += 1; return { set onload(v) { }, set onerror(v) { } }; }
+        },
+        state: { daily: { attempts: o.attempts === undefined ? 12 : o.attempts } },
+        cfStaticConfig: () => ({ enabled: true, base: 'https://api.fiezel.my.id', endpoints: { usage: o.staticMode || 'on' } }),
+        cfStaticMode: () => o.staticMode || 'on',
+        cfServerAllows: () => o.serverAllows !== false
+      };
+      sandbox.self = sandbox;
+      sandbox.globalThis = sandbox;
+      sandbox.module = { exports: {} };
+      vm.createContext(sandbox);
+      vm.runInContext('var cfConfigInFlight=null;', sandbox, { filename: 'prelude' });
+      // Modul analytics SUNGGUHAN, di sandbox yang sama: `self.FiezelAnalytics`
+      // sudah ada, jadi blok memakainya tanpa perlu <script> nyata.
+      vm.runInContext(moduleSource, sandbox, { filename: MODULE_REL });
+      if (o.tanpaModul) delete sandbox.FiezelAnalytics;
+      if (o.modulMelempar || o.modulMenolak) {
+        // Modul rusak/bermutasi. Pemancar TIDAK boleh meneruskan galatnya ke
+        // pemanggil, dan tidak boleh meninggalkan unhandledRejection.
+        const asli = sandbox.FiezelAnalytics;
+        sandbox.FiezelAnalytics = {
+          createClient: () => ({
+            track: () => { if (o.modulMelempar) throw new Error('modul rusak'); },
+            markActive: () => { if (o.modulMelempar) throw new Error('modul rusak'); return false; },
+            flush: () => o.modulMenolak ? Promise.reject(new Error('flush menolak')) : Promise.resolve(true),
+            start: () => o.modulMenolak ? Promise.reject(new Error('start menolak')) : Promise.resolve(true),
+            attachLifecycle: () => { if (o.modulMelempar) throw new Error('modul rusak'); },
+            sendRetention: () => Promise.resolve(true)
+          }),
+          STORAGE_KEYS: asli.STORAGE_KEYS
+        };
+      }
+      vm.runInContext(blockSrc, sandbox, { filename: 'app.js#A1-ANALYTICS-EMITTER' });
+      return { sandbox, storage, transport, jejak, emitter: sandbox.FiezelAnalyticsEmitter };
+    }
+    const settle = async (n) => { for (let i = 0; i < (n || 60); i++) await new Promise(r => setImmediate(r)); };
+
+    check('Blok mengekspor `self.FiezelAnalyticsEmitter`', typeof makeWorld({}).emitter === 'object', 'ok');
+
+    /* --- (a) DUA ARAH: statis mati, dan server mati ---------------------- */
+    for (const [nama, opts] of [
+      ['lapis STATIS mati (endpoints.usage!==\'on\') walau server mengizinkan', { staticMode: 'off', serverAllows: true }],
+      ['lapis SERVER mati (cfAnalyticsEnabled/enabled.analytics) walau statis \'on\'', { staticMode: 'on', serverAllows: false }],
+      ['lapis statis \'shadow\' (bukan \'on\') — shadow bukan izin mengirim', { staticMode: 'shadow', serverAllows: true }]
+    ]) {
+      const w = makeWorld(opts);
+      const E = w.emitter;
+      const hasil = [E.gateOpen(), E.boot(), E.sessionStarted({ type: 'adaptive', level: 'B1' }), E.sessionEnded({ type: 'adaptive', level: 'B1', completed: true, answered: 9, durationMs: 400000 }), E.markActive()];
+      await settle(20);
+      check(`(a) ${nama}: gerbang tertutup dan semua pemancar menjawab false`,
+        hasil.every(x => x === false), JSON.stringify(hasil));
+      check(`(a) ${nama}: NOL permintaan keluar`,
+        w.transport.beacons.length === 0 && w.transport.posts.length === 0 && w.transport.pepperCalls === 0,
+        `${w.transport.beacons.length}/${w.transport.posts.length}/${w.transport.pepperCalls}`);
+      check(`(a) ${nama}: NOL akses penyimpanan (installId tidak pernah dibuat)`,
+        w.storage.calls.length === 0 && Object.keys(w.storage.data).length === 0, w.storage.calls.join(','));
+      check(`(a) ${nama}: NOL <script> analytics disuntik`, w.jejak.createElement === 0, String(w.jejak.createElement));
+    }
+    {
+      // Lapis statis mati berarti tidak ada yang bisa dinyalakan server, jadi
+      // bahkan TIMER-nya tidak dipasang. Statis 'on' memasang satu timer idle.
+      const mati = makeWorld({ staticMode: 'off', runTimers: false });
+      const hidup = makeWorld({ staticMode: 'on', runTimers: false });
+      check('(a) statis mati => NOL timer dipasang; statis on => tepat satu',
+        mati.jejak.timers === 0 && hidup.jejak.timers === 1, `${mati.jejak.timers}/${hidup.jejak.timers}`);
+    }
+
+    /* --- (b) flag hidup => event terkirim, bentuknya DITERIMA server ----- */
+    let payloadA1 = [];
+    {
+      const w = makeWorld({ staticMode: 'on', serverAllows: true, attempts: 14 });
+      const E = w.emitter;
+      const rBoot = E.boot();
+      const rStart = E.sessionStarted({ type: 'level-exam', level: 'B1' });
+      const rEnd = E.sessionEnded({ type: 'adaptive', level: 'B1', completed: true, answered: 14, durationMs: 700000 });
+      check('(b) pemancar mengembalikan boolean (bukan Promise yang bisa di-await pemanggil)',
+        [rBoot, rStart, rEnd].every(x => x === true), JSON.stringify([rBoot, rStart, rEnd]));
+      await settle(120);
+      payloadA1 = w.transport.bodies();
+      check('(b) ada permintaan keluar saat kedua flag hidup', payloadA1.length >= 2, String(payloadA1.length));
+      check('(b) pepper diambil dari server (token dihitung di perangkat)', w.transport.pepperCalls >= 1, String(w.transport.pepperCalls));
+
+      const route = await import('./workers/api/analytics/route-events.js');
+      const batches = payloadA1.map(b => JSON.parse(b)).filter(p => Array.isArray(p.events));
+      const pings = payloadA1.map(b => JSON.parse(b)).filter(p => Array.isArray(p.pings));
+      check('(b) ada batch event dari pemancar', batches.length >= 1, String(batches.length));
+      const tolakan = [];
+      for (const b of batches) {
+        const hasil = route.processClientBatch(b, Date.now());
+        if (hasil.status !== 202) tolakan.push(`${hasil.status} ${JSON.stringify(hasil.payload)}`);
+      }
+      check('(b) SEMUA batch pemancar diterima server (202) — dibandingkan ke skema server, bukan diketik ulang',
+        tolakan.length === 0, tolakan.join(' | '));
+      for (const p of pings) {
+        const hasil = route.processRetentionPing(p, Date.now());
+        if (hasil.status !== 202) tolakan.push(`retensi ${hasil.status}`);
+      }
+      check('(b) retention_ping pemancar diterima server (202)', pings.length === 1 && tolakan.length === 0,
+        `${pings.length} ${tolakan.join('|')}`);
+
+      const namaEvent = [].concat(...batches.map(b => b.events.map(e => e.name))).sort();
+      check('(b) Empat event yang dijanjikan benar-benar terkirim: app_open, day_active, session_started, session_ended',
+        ['app_open', 'day_active', 'session_ended', 'session_started'].every(n => namaEvent.includes(n)), namaEvent.join(','));
+      check('(b) `question_answered`/`lesson_*` TIDAK dipancarkan (pilihan sadar, lihat blok)',
+        !namaEvent.includes('question_answered') && !namaEvent.some(n => n.startsWith('lesson_')), namaEvent.join(','));
+      const ended = [].concat(...batches.map(b => b.events)).find(e => e.name === 'session_ended');
+      check('(b) session_ended membawa ember durasi, bukan detik mentah',
+        ended && ended.duration_bucket === '10-30m' && ended.answered === 14 && ended.completed === true, JSON.stringify(ended));
+      const started = [].concat(...batches.map(b => b.events)).find(e => e.name === 'session_started');
+      check('(b) tipe internal `level-exam` dipetakan ke enum tertutup `exam`',
+        started && started.mode === 'exam' && started.level === 'B1', JSON.stringify(started));
+      check('(b) tipe internal tak dikenal jatuh ke `practice`, tidak diteruskan apa adanya',
+        E.mode('mode-rahasia-baru') === 'practice' && E.mode('level-exam') === 'exam', E.mode('mode-rahasia-baru'));
+
+      // Perkiraan byte per sesi (dicatat di notes, bukan ditebak).
+      // TEMUAN A1 (regresi): sebelum kunci single-flight di `flush()`, batch yang
+      // sama terkirim DUA KALI karena `start()` dan flush akhir-sesi tumpang-
+      // tindih di jendela `await visitorToken()`. Server akan menghitung satu
+      // sesi dua kali. Assert ini menjaga perbaikannya.
+      const unik = new Set(payloadA1);
+      check('(b) NOL batch ganda: tidak ada badan permintaan yang identik terkirim dua kali',
+        unik.size === payloadA1.length, `${payloadA1.length} kirim, ${unik.size} unik`);
+      check('(b) satu hari penuh = tepat dua permintaan (satu retensi, satu batch event)',
+        payloadA1.length === 2, String(payloadA1.length));
+
+      const totalByte = payloadA1.reduce((n, b) => n + Buffer.byteLength(b, 'utf8'), 0);
+      check(`(b) hemat: ${totalByte} byte untuk satu hari penuh (boot + retensi + satu sesi)`,
+        totalByte < 1024, String(totalByte));
+      fs.writeFileSync(path.join(root, 'ANALYTICS-EMITTER-BYTES-REPORT.json'), JSON.stringify({
+        catatan: 'Byte badan permintaan yang benar-benar keluar dari pemancar A1 di gerbang ini.',
+        permintaan: payloadA1.length,
+        totalByteBadan: totalByte,
+        rincian: payloadA1.map(b => ({ byte: Buffer.byteLength(b, 'utf8'), badan: b }))
+      }, null, 2) + '\n');
+    }
+
+    /* --- (c) NOL isi belajar: kata terlarang DAN allowlist struktural ---- */
+    {
+      const gabung = payloadA1.join('\n');
+      // `answered` (bilangan agregat) sengaja BUKAN kata terlarang: ia jumlah,
+      // bukan isi. Yang dilarang adalah apa pun yang membawa teks murid.
+      const TERLARANG = ['answerText', 'answer_text', 'selectedAnswer', 'correctAnswer', 'question', 'prompt',
+        'transcript', 'options', 'correct', 'selected', 'sentence', 'kalimat', 'jawaban', 'soal',
+        'learnerName', 'email', 'itemId', 'lessonId', 'skill', 'target', 'puter', 'uuid'];
+      const kena = TERLARANG.filter(w => gabung.toLowerCase().includes(w.toLowerCase()));
+      check('(c) NOL kata terlarang di payload pemancar', kena.length === 0, kena.join(','));
+      check('(c) daftar kata terlarang terbukti bisa merah (anti-vakum)',
+        TERLARANG.some(w => 'jawaban: dia menulis kalimat itu'.includes(w)) &&
+        TERLARANG.some(w => '{"correctAnswer":2,"selectedAnswer":3}'.includes(w)), 'ok');
+
+      // Assert STRUKTURAL: hanya field yang di-allowlist boleh ada. Allowlist-nya
+      // dibaca dari KONTRAK MODUL, bukan diketik ulang di sini.
+      const spec = FiezelAnalytics.CLIENT_EVENT_SPEC;
+      const pelanggar = [];
+      for (const p of payloadA1.map(b => JSON.parse(b))) {
+        for (const e of (p.events || [])) {
+          const izin = ['name', 'day'].concat(Object.keys(spec[e.name] || {}));
+          for (const k of Object.keys(e)) if (!izin.includes(k)) pelanggar.push(`${e.name}.${k}`);
+        }
+        for (const g of (p.pings || [])) {
+          for (const k of Object.keys(g)) if (!['day', 'cohort_day', 'day_index'].includes(k)) pelanggar.push(`ping.${k}`);
+        }
+      }
+      check('(c) hanya field allowlist kontrak yang ada di payload pemancar', pelanggar.length === 0, pelanggar.join(','));
+
+      // Lapis allowlist milik PEMANCAR sendiri (pagar kedua, di sisi app.js).
+      const w = makeWorld({});
+      const kotorField = w.emitter.fields('session_ended', {
+        mode: 'adaptive', level: 'B1', completed: true, answered: 3, duration_bucket: '<2m',
+        jawaban: 'She goes to school', learnerName: 'Jahran', prompt: 'Isilah', itemId: 'g-114', extra: { a: 1 }
+      });
+      check('(c) allowlist pemancar membuang setiap field asing sebelum menyentuh modul',
+        Object.keys(kotorField).sort().join(',') === 'answered,completed,duration_bucket,level,mode', Object.keys(kotorField).join(','));
+      const panjang = w.emitter.fields('session_started', { mode: 'adaptive', level: 'kalimat panjang yang tidak boleh lewat' });
+      check('(c) allowlist pemancar membuang string panjang walau kuncinya sah',
+        panjang.level === undefined, JSON.stringify(panjang));
+    }
+
+    /* --- (d) kegagalan jaringan tidak pernah melempar ke pemanggil ------- */
+    {
+      const rejeksi = [];
+      const onUnhandled = (e) => rejeksi.push(String(e && e.message || e));
+      process.on('unhandledRejection', onUnhandled);
+      const skenario = [
+        ['fetch menolak (offline)', { fetchImpl: () => Promise.reject(new Error('offline')) }],
+        ['fetch melempar sinkron', { fetchImpl: () => { throw new Error('boom'); } }],
+        ['server menjawab 500', { transportOpts: { beaconAvailable: false, postOk: false } }],
+        ['sendBeacon menolak & POST gagal', { transportOpts: { beaconOk: false, postOk: false } }],
+        ['modul analytics gagal dimuat', { tanpaModul: true }],
+        ['penyimpanan penuh (setItem melempar)', { initialStorage: {} }],
+        ['modul melempar sinkron di track()/markActive()', { modulMelempar: true }],
+        ['modul menolak asinkron di flush()', { modulMenolak: true }]
+      ];
+      for (const [nama, opts] of skenario) {
+        const w = makeWorld(opts);
+        if (nama.startsWith('penyimpanan')) w.storage.setItem = () => { throw new Error('QuotaExceededError'); };
+        let lempar = null, hasil = null;
+        try {
+          hasil = [w.emitter.boot(), w.emitter.sessionStarted({ type: 'adaptive', level: 'B1' }),
+            w.emitter.sessionEnded({ type: 'adaptive', level: 'B1', completed: false, answered: 2, durationMs: 60000 }), w.emitter.markActive()];
+        } catch (e) { lempar = e; }
+        await settle(60);
+        check(`(d) ${nama}: pemancar TIDAK melempar ke pemanggil`, lempar === null, lempar ? String(lempar.message) : 'ok');
+        check(`(d) ${nama}: pemanggil menerima boolean, bukan galat`,
+          Array.isArray(hasil) && hasil.every(x => typeof x === 'boolean'), JSON.stringify(hasil));
+      }
+      await settle(30);
+      process.removeListener('unhandledRejection', onUnhandled);
+      check('(d) NOL unhandledRejection dari seluruh skenario kegagalan', rejeksi.length === 0, rejeksi.join(' | '));
+    }
+
+    /* --- (f) identitas tidak bisa ditautkan lintas periode pepper -------- */
+    {
+      // Satu perangkat (penyimpanan yang SAMA), tiga periode pepper. Token wajib
+      // berbeda tiga-tiganya, dan tidak boleh ada satu pun field lain yang sama
+      // dan unik-per-perangkat yang bisa dipakai menyambungnya.
+      const bersama = makeStorage();
+      const token = [], badan = [];
+      for (const pepper of ['a'.repeat(64), 'b'.repeat(64), 'c'.repeat(64)]) {
+        const w = makeWorld({ initialStorage: bersama.data, transportOpts: { pepper } });
+        // Pakai penyimpanan yang sama secara harfiah supaya installId tidak berubah.
+        w.sandbox.localStorage = bersama;
+        w.emitter._resetForGate();
+        w.emitter.boot();
+        await settle(80);
+        const semua = w.transport.bodies().map(b => JSON.parse(b));
+        const ev = [].concat(...semua.filter(p => p.events).map(p => p.events));
+        const app = ev.find(e => e.name === 'app_open');
+        if (app) { token.push(app.visitor_token); badan.push(app); }
+      }
+      check('(f) tiga periode pepper menghasilkan tiga token', token.length === 3, token.join(','));
+      check('(f) token BERBEDA di setiap periode pepper (penautan lintas periode mustahil dari token)',
+        new Set(token).size === 3 && token.every(t => /^[0-9a-f]{32}$/.test(t)), token.join(','));
+      const installId = bersama.data[FiezelAnalytics.STORAGE_KEYS.install];
+      check('(f) installId perangkat TETAP SAMA — jadi perbedaan token murni dari rotasi pepper',
+        typeof installId === 'string' && installId.length >= 8, String(installId));
+      const bocor = token.filter(t => String(installId).includes(t) || t.includes(String(installId).slice(0, 8)));
+      check('(f) tidak ada potongan installId di dalam token', bocor.length === 0, bocor.join(','));
+      const sisaField = new Set();
+      for (const e of badan) for (const k of Object.keys(e)) if (k !== 'visitor_token') sisaField.add(k);
+      const unikPerangkat = [...sisaField].filter(k => !['name', 'day', 'platform', 'app_version'].includes(k));
+      check('(f) field selain token semuanya kasar/bersama (platform, app_version) — nol pengenal per-perangkat',
+        unikPerangkat.length === 0, unikPerangkat.join(','));
+      check('(f) pepper lama tidak dipakai lagi: setiap periode memaksa hitung ulang HMAC',
+        blockSrc.includes('AN_CONFIG_VIEW') && source.includes('memory.token = null'), 'ok');
+    }
+
+    /* --- notes + registrasi CI ----------------------------------------- */
+    const notes = path.join(root, 'reports', 'work-a1-analytics-emitter.md');
+    check('Notes A1 ada', fs.existsSync(notes), notes);
+    if (fs.existsSync(notes)) {
+      const n = fs.readFileSync(notes, 'utf8').toLowerCase();
+      for (const frasa of ['byte per sesi', 'cfanalyticsenabled', 'analytics_enabled', 'belum terbukti',
+        'tidak bisa jawab', 'single-flight']) {
+        check(`Notes A1 menyebut "${frasa}"`, n.includes(frasa), 'notes');
+      }
+    }
+    check('Pemancar TIDAK menyalakan flag apa pun sendiri',
+      !/endpoints\s*:\s*Object\.freeze\(\{[^}]*usage\s*:\s*'on'/.test(fs.readFileSync(path.join(root, 'core-config.js'), 'utf8')),
+      'core-config.js tetap usage:off');
   }
 
   finish();
