@@ -125,6 +125,39 @@
   }
 
   /**
+   * m025-180 — KEBALIKAN successProbability: kemampuan yang PALING MASUK AKAL bagi seorang
+   * murid yang mencetak akurasi `observed` pada soal berkesulitan `difficulty`.
+   *
+   *   θ = b + logit((p - c) / (1 - c)) / a
+   *
+   * Kenapa ia perlu ada, padahal estimateAbility() sudah ada dan lebih baik: estimateAbility
+   * butuh RIWAYAT PER JAWABAN ({at, ok, difficulty}), dan riwayat itu tidak pernah keluar
+   * dari perangkat murid — batas privasi yang dijaga observability-privacy-test.js dan tidak
+   * dilonggarkan rilis ini. Yang sampai ke server hanyalah AGREGAT (akurasi per domain,
+   * level taksiran). Fungsi ini adalah satu-satunya cara jujur membaca kemampuan dari
+   * agregat itu, dan ia sengaja hidup DI SINI, bukan di worker: satu rumus, satu berkas,
+   * satu sumber kebenaran, dan gerbang paritas (`core-brain-server-parity-test.js`) yang
+   * membuktikan cermin server menjawab angka yang sama persis.
+   *
+   * DUA BATAS YANG DITEGAKKAN, bukan disembunyikan:
+   *
+   *   1. AKURASI DI BAWAH LANTAI TEBAKAN TIDAK PUNYA ARTI. Empat opsi berarti 25% benar
+   *      adalah nol pengetahuan; 20% bukan "lebih buruk dari nol", itu derau sampel kecil.
+   *      p dijepit ke [c + 0.02, 0.98] sebelum di-logit — tanpa jepitan itu p=0.25 menghasilkan
+   *      log(0) = -Infinity dan SELURUH keputusan turunan menjadi NaN.
+   *   2. HASILNYA TETAP TAKSIRAN TITIK, BUKAN PENGETAHUAN. Ia tidak membawa confidence
+   *      sendiri karena ia tidak tahu berapa banyak bukti yang melahirkannya; pemanggil yang
+   *      memegang jumlah percobaan WAJIB menghitung keyakinannya sendiri. Model yang percaya
+   *      diri di atas tiga jawaban lebih berbahaya daripada tidak ada model sama sekali.
+   */
+  function abilityFromAccuracy(observed, difficulty, discrimination) {
+    var a = num(discrimination, DISCRIMINATION) || DISCRIMINATION;
+    var p = clamp(num(observed), GUESS_FLOOR + 0.02, 0.98);
+    var latent = clamp((p - GUESS_FLOOR) / (1 - GUESS_FLOOR), 0.01, 0.99);
+    return round(num(difficulty) + Math.log(latent / (1 - latent)) / a, 3);
+  }
+
+  /**
    * Kemampuan laten dari riwayat jawaban, dengan dua sifat yang disengaja:
    *
    *   - PEMBARUAN DARING (gaya Elo). Setiap jawaban menggeser taksiran sebesar kejutannya:
@@ -558,6 +591,18 @@
   var MOMENTUM_RESIDUAL_DECLINE_SLOPE = -0.06; // asimetris: kemunduran harus curam...
   var MOMENTUM_RESIDUAL_DECLINE_R2 = 0.4;      // ...DAN konsisten, bukan derau blok.
   var MOMENTUM_PREDICTED_SHARE = 0.6;
+  /**
+   * m025-180: ambang basis akurasi DINAIKKAN dari angka telanjang `0.04` di dalam badan
+   * momentum() menjadi konstanta bernama, dan ikut diekspor bersama trio residual di atas.
+   *
+   * Alasannya bukan kerapian. Mulai rilis ini cermin Core Brain sisi server
+   * (`fiezel-core-worker.js`) membaca deret EFEKTIVITAS KEBIJAKAN dengan aturan arah yang
+   * sama persis, dan satu-satunya cara menjaga dua sisi tidak berpisah diam-diam adalah
+   * membuat angkanya bisa DIBACA gerbang paritas — bukan diketik dua kali di dua berkas.
+   * Nilainya TIDAK berubah (0.04 = 4 poin akurasi per blok lima soal); yang berubah hanya
+   * dari mana ia dibaca.
+   */
+  var MOMENTUM_ACCURACY_SLOPE = 0.04;
   function momentum(attempts, options) {
     var opts = options || {};
     var block = Math.max(3, Math.round(num(opts.block, MOMENTUM_BLOCK)));
@@ -608,7 +653,7 @@
         : 'plateau';
     } else {
       // Ambang basis akurasi ±0.04 per blok ≈ 4 poin akurasi per lima soal (tidak berubah).
-      state = fit.slope >= 0.04 ? 'improving' : fit.slope <= -0.04 ? 'declining' : 'plateau';
+      state = fit.slope >= MOMENTUM_ACCURACY_SLOPE ? 'improving' : fit.slope <= -MOMENTUM_ACCURACY_SLOPE ? 'declining' : 'plateau';
     }
     var out = {
       state: state,
@@ -1060,10 +1105,18 @@
     var reviews = reviewPriority(data.memory || [], { now: now, targetRetention: data.targetRetention });
     var atRisk = reviews.filter(function (row) { return row.retrievability <= 0.85 && row.retrievability >= 0.35; });
     var relearn = reviews.filter(function (row) { return row.retrievability < 0.35; });
+    // m025-180: keduanya dihitung SEKALI lalu dipakai ulang. Sebelum ini momentum() dan
+    // fatigue() dipanggil dua kali dengan argumen yang sama persis — sekali untuk perencana,
+    // sekali lagi untuk potret yang dikembalikan — jadi setiap snapshot menjalankan dua
+    // regresi kuadrat terkecil dan dua pemindaian sesi yang hasilnya dijamin identik.
+    // analyze() dipanggil pada tiap render Home (lewat coreBrainSnapshot), jadi ini bukan
+    // kerapian: itu pekerjaan ganda pada jalur yang paling sering dilalui perangkat murid.
+    var overallMomentum = momentum(attempts);
+    var sessionFatigue = fatigue(data.sessionAttempts || attempts.slice(-16));
     var plan = planSession({
       ability: ability,
-      momentum: momentum(attempts),
-      fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
+      momentum: overallMomentum,
+      fatigue: sessionFatigue,
       dueReviews: reviews.length,
       atRiskReviews: atRisk.length + relearn.length,
       abandonmentRate: data.abandonmentRate,
@@ -1074,8 +1127,8 @@
       generatedAt: new Date(now).toISOString(),
       ability: ability,
       domains: byDomain,
-      momentum: momentum(attempts),
-      fatigue: fatigue(data.sessionAttempts || attempts.slice(-16)),
+      momentum: overallMomentum,
+      fatigue: sessionFatigue,
       challenge: challengeWindow(ability.ability, { targetSuccess: data.targetSuccess }),
       memory: { total: reviews.length, atRisk: atRisk.length, relearn: relearn.length, top: reviews.slice(0, 8) },
       chronotype: studyWindows(attempts, { hourOf: data.hourOf }),
@@ -1177,8 +1230,15 @@
     TARGET_SUCCESS: TARGET_SUCCESS,
     PREREQUISITES: PREREQUISITES,
     MOMENTUM_BLOCK: MOMENTUM_BLOCK,
+    // m025-180: keempat ambang arah belajar diekspor supaya cermin sisi server tidak boleh
+    // mengetik ulang angkanya — gerbang paritas membaca dari sini, bukan dari komentar.
+    MOMENTUM_ACCURACY_SLOPE: MOMENTUM_ACCURACY_SLOPE,
+    MOMENTUM_RESIDUAL_SLOPE: MOMENTUM_RESIDUAL_SLOPE,
+    MOMENTUM_RESIDUAL_DECLINE_SLOPE: MOMENTUM_RESIDUAL_DECLINE_SLOPE,
+    MOMENTUM_RESIDUAL_DECLINE_R2: MOMENTUM_RESIDUAL_DECLINE_R2,
     levelIndex: levelIndex,
     successProbability: successProbability,
+    abilityFromAccuracy: abilityFromAccuracy,
     estimateAbility: estimateAbility,
     optimalDifficulty: optimalDifficulty,
     challengeWindow: challengeWindow,

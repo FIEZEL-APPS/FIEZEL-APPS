@@ -191,6 +191,19 @@ jobs:
           node fiezel-self-refine-test.js
           node fiezel-evolution-loop-test.js
           node core-worker-contract-test.js
+          # m025-180: gerbang paritas Core Brain klien <-> cermin sisi server. Diletakkan TEPAT
+          # sesudah gerbang kontrak Worker karena keduanya menjalankan `fiezel-core-worker.js` di
+          # dalam vm, tetapi menjaga hal yang berbeda: yang di atas menjaga BENTUK jawaban
+          # rute-rutenya, yang ini menjaga ANGKA di balik keputusannya - bahwa matematika 3PL,
+          # kesulitan optimal, pita tantangan, dan regresi tren di worker menjawab persis sama
+          # dengan `features/brain/fiezel-core-brain.js`. Worker di-deploy sebagai satu berkas
+          # tanpa bundler, jadi angkanya memang ditulis dua kali; duplikasi tanpa gerbang paritas
+          # adalah dua sistem yang berpisah diam-diam tanpa gejala. Ia juga membuktikan dirinya
+          # bisa MERAH (satu konstanta worker diracun di memori) dan menjaga tiga jaminan jalur
+          # kebijakan: ringkasan klien yang yakin tidak pernah dikalahkan cermin, permintaan
+          # tanpa ringkasan tidak jatuh ke lapisan v1 polos, dan pelatih AI menjelaskan
+          # kebijakan yang SAMA dengan yang diterima murid.
+          node core-brain-server-parity-test.js
           node learner-evidence-test.js
           node alrs-behavior-test.js
           node adaptive-policy-test.js

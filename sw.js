@@ -32,7 +32,15 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // sama TANPA precache (lihat catatan di bawah ASSETS). Semua berkas shell berubah dalam
 // satu gelombang rilis, jadi revisi naik SEKALI - DIAG_BUILD + FIEZEL_PAGE_BUILD ikut ke
 // m025-177 (kontrak install-health/classroom-test: awalan SW_REV = build halaman).
-const SW_REV='m025-179-wave-d-audit-20260828';
+// m025-180: DAFTAR ASSETS TIDAK BERUBAH satu entri pun - yang berubah adalah ISI dua berkas
+// yang sudah ada di dalamnya (`app.js`, `features/brain/fiezel-core-brain.js`) plus
+// `core-config.js`. Justru karena itu revisi ini WAJIB naik: tanpa kenaikan, PWA yang sudah
+// terpasang terus menyajikan salinan shell lama, dan perangkat itu tidak akan pernah
+// mengirim ringkasan otak ke jalur pelatih maupun memakai konstanta momentum yang kini
+// dicermin server. Perubahan yang tidak mengubah daftar berkas adalah perubahan yang paling
+// mudah lupa dinaikkan revisinya, dan gejalanya persis nol sampai ada yang membandingkan
+// perilaku dua perangkat.
+const SW_REV='m025-180-core-brain-server-mirror-20260828';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 // m025-61: health check menanyakan revisi shell langsung ke worker yang sedang aktif.
 // Menebaknya dari nama cache tidak cukup: cache lama bisa tertinggal, sedangkan jawaban ini
