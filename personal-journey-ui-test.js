@@ -43,6 +43,16 @@ const context = {
 };
 context.window = context; context.self = context; context.window.scrollTo = () => {};
 vm.createContext(context);
+// AI-20 F06 (W1-TESTPLAN 2b): harness i18n KONDISIONAL — index.html memuat fiezel-i18n.js +
+// copy-id-*.js SEBELUM modul fitur dan app.js. Begitu naskah home/journey pindah ke copy-map,
+// render memanggil FiezelI18n.t(); tanpa preload ini vm meledak. existsSync = hijau dua arah.
+// Asersi teks id di bawah TIDAK berubah (byte-identik, dijaga id-golden-snapshot-test.js).
+const i18nDir = path.join(root, 'features', 'i18n');
+if (fs.existsSync(path.join(i18nDir, 'fiezel-i18n.js'))) {
+  vm.runInContext(fs.readFileSync(path.join(i18nDir, 'fiezel-i18n.js'), 'utf8'), context, { filename: 'fiezel-i18n.js' });
+  for (const f of fs.readdirSync(i18nDir).filter(n => /^copy-id-.*\.js$/.test(n)).sort())
+    vm.runInContext(fs.readFileSync(path.join(i18nDir, f), 'utf8'), context, { filename: f });
+}
 // Urutan pemuatan sama dengan index.html: modul journey lebih dulu tersedia sebagai global,
 // lalu app.js memakainya. Kalau urutannya terbalik, Home harus tetap hidup - diuji di bawah.
 vm.runInContext(fs.readFileSync(path.join(root, 'features/personal-journey/fiezel-personal-journey.js'), 'utf8'), context);

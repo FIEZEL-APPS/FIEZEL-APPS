@@ -20,6 +20,15 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
+
   var SCHEMA = 'fiezel-install-health-v1';
   // Di bawah ambang ini, aset neural dan bank soal bisa gagal tersimpan tanpa pesan yang jelas.
   var LOW_STORAGE_BYTES = 60 * 1024 * 1024;
@@ -54,45 +63,45 @@
 
     // 1. Build yang berjalan vs shell yang dipegang service worker.
     if (diag == null || shell == null) {
-      findings.push(finding('build_unreadable', 'warn', 'Penanda build tidak terbaca',
-        'Salah satu dari Diagnostics build atau revisi service worker tidak mengikuti format m025-N.',
-        'Buka Diagnostics dan salin ringkasannya saat melapor.'));
+      findings.push(finding('build_unreadable', 'warn', t('health.build-unreadable-title'),
+        t('health.build-unreadable-detail'),
+        t('health.build-unreadable-remedy')));
     } else if (diag === shell) {
-      findings.push(finding('build_current', 'ok', 'Build aktif dan shell cocok',
-        'Aplikasi berjalan pada m025-' + diag + ', dan service worker memegang shell yang sama.', ''));
+      findings.push(finding('build_current', 'ok', t('health.build-current-title'),
+        t('health.build-current-detail', { build: diag }), ''));
     } else if (shell < diag) {
       // Inilah bentuk kegagalan yang paling menyesatkan: pengguna sudah menerima rilis baru,
       // tetapi yang tampil masih shell lama, sehingga perbaikan terlihat "tidak berpengaruh".
-      findings.push(finding('shell_stale', 'blocker', 'Shell lama masih dipakai',
-        'Aplikasi memuat m025-' + diag + ', tetapi service worker masih memegang shell m025-' + shell + '.',
-        'Tutup FIEZEL sepenuhnya lalu buka lagi. Kalau masih sama, jalankan pembaruan dari Diagnostics.'));
+      findings.push(finding('shell_stale', 'blocker', t('health.shell-stale-title'),
+        t('health.shell-stale-detail', { page: diag, shell: shell }),
+        t('health.shell-stale-remedy')));
     } else {
-      findings.push(finding('shell_ahead', 'warn', 'Shell lebih baru dari halaman',
-        'Service worker memegang m025-' + shell + ' sementara halaman ini masih m025-' + diag + '.',
-        'Muat ulang halaman untuk memakai versi terbaru.'));
+      findings.push(finding('shell_ahead', 'warn', t('health.shell-ahead-title'),
+        t('health.shell-ahead-detail', { shell: shell, page: diag }),
+        t('health.shell-ahead-remedy')));
     }
 
     // 2. Keadaan service worker.
     var state = String(options.swState || '');
     if (!state) {
-      findings.push(finding('sw_absent', 'warn', 'Service worker tidak terdaftar',
-        'Mode offline dan pembaruan otomatis tidak aktif tanpa service worker.',
-        'Pasang FIEZEL ke layar utama, lalu buka dari sana.'));
+      findings.push(finding('sw_absent', 'warn', t('health.sw-absent-title'),
+        t('health.sw-absent-detail'),
+        t('health.sw-absent-remedy')));
     } else if (state !== 'activated') {
-      findings.push(finding('sw_not_active', 'warn', 'Service worker belum aktif',
-        'Statusnya sekarang "' + state + '".', 'Tunggu beberapa detik lalu muat ulang.'));
+      findings.push(finding('sw_not_active', 'warn', t('health.sw-not-active-title'),
+        t('health.sw-not-active-detail', { state: state }), t('health.sw-not-active-remedy')));
     } else if (options.controlled === false) {
-      findings.push(finding('sw_uncontrolled', 'info', 'Halaman belum dikendalikan service worker',
-        'Ini normal pada pemuatan pertama setelah pemasangan.', 'Muat ulang sekali untuk mengaktifkan mode offline.'));
+      findings.push(finding('sw_uncontrolled', 'info', t('health.sw-uncontrolled-title'),
+        t('health.sw-uncontrolled-detail'), t('health.sw-uncontrolled-remedy')));
     } else {
-      findings.push(finding('sw_active', 'ok', 'Service worker aktif', 'Mode offline dan pembaruan berjalan.', ''));
+      findings.push(finding('sw_active', 'ok', t('health.sw-active-title'), t('health.sw-active-detail'), ''));
     }
 
     // 3. Pembaruan yang sudah diunduh tetapi tertahan.
     if (options.waitingWorker === true) {
-      findings.push(finding('update_waiting', 'warn', 'Pembaruan siap tetapi tertahan',
-        'Versi baru sudah diunduh dan menunggu semua tab FIEZEL ditutup.',
-        'Tutup FIEZEL sepenuhnya, lalu buka lagi.'));
+      findings.push(finding('update_waiting', 'warn', t('health.update-waiting-title'),
+        t('health.update-waiting-detail'),
+        t('health.update-waiting-remedy')));
     }
 
     // 4. Ruang penyimpanan.
@@ -100,19 +109,19 @@
     var usage = Number(options.storageUsage);
     if (isFinite(quota) && quota > 0 && isFinite(usage)) {
       var free = Math.max(0, quota - usage);
-      var label = Math.round(free / 1048576) + ' MB tersisa';
+      var label = t('health.storage-free-label', { mb: Math.round(free / 1048576) });
       if (free <= CRITICAL_STORAGE_BYTES) {
-        findings.push(finding('storage_critical', 'blocker', 'Ruang penyimpanan hampir habis', label,
-          'Hapus aset suara dari Diagnostics atau kosongkan ruang di perangkat sebelum melanjutkan.'));
+        findings.push(finding('storage_critical', 'blocker', t('health.storage-critical-title'), label,
+          t('health.storage-critical-remedy')));
       } else if (free <= LOW_STORAGE_BYTES) {
-        findings.push(finding('storage_low', 'warn', 'Ruang penyimpanan menipis', label,
-          'Aset suara berukuran besar bisa gagal tersimpan. Kosongkan sebagian ruang.'));
+        findings.push(finding('storage_low', 'warn', t('health.storage-low-title'), label,
+          t('health.storage-low-remedy')));
       } else {
-        findings.push(finding('storage_ok', 'ok', 'Ruang penyimpanan cukup', label, ''));
+        findings.push(finding('storage_ok', 'ok', t('health.storage-ok-title'), label, ''));
       }
     } else {
-      findings.push(finding('storage_unknown', 'info', 'Ruang penyimpanan tidak terbaca',
-        'Perangkat ini tidak melaporkan kuota penyimpanan.', ''));
+      findings.push(finding('storage_unknown', 'info', t('health.storage-unknown-title'),
+        t('health.storage-unknown-detail'), ''));
     }
 
     // 5. Cache shell yang menumpuk dari rilis lama.
@@ -120,25 +129,25 @@
     if (caches) {
       var shells = caches.filter(function (name) { return /^fiezel-shell-/.test(String(name)); });
       if (shells.length > 2) {
-        findings.push(finding('shell_cache_buildup', 'warn', 'Cache shell lama menumpuk',
-          shells.length + ' shell tersimpan sekaligus.',
-          'Jalankan pembaruan dari Diagnostics supaya shell lama dibersihkan.'));
+        findings.push(finding('shell_cache_buildup', 'warn', t('health.shell-cache-buildup-title'),
+          t('health.shell-cache-buildup-detail', { count: shells.length }),
+          t('health.shell-cache-buildup-remedy')));
       } else {
-        findings.push(finding('shell_cache_ok', 'ok', 'Cache shell rapi', shells.length + ' shell tersimpan.', ''));
+        findings.push(finding('shell_cache_ok', 'ok', t('health.shell-cache-ok-title'), t('health.shell-cache-ok-detail', { count: shells.length }), ''));
       }
     }
 
     // 6. Notifikasi - syarat pemakaian produk ini, jadi statusnya bagian dari kesehatan instalasi.
     var permission = String(options.notificationPermission || '');
     if (permission === 'granted') {
-      findings.push(finding('notifications_ok', 'ok', 'Notifikasi aktif', 'Pengingat belajar dapat berjalan.', ''));
+      findings.push(finding('notifications_ok', 'ok', t('health.notifications-ok-title'), t('health.notifications-ok-detail'), ''));
     } else if (permission === 'denied') {
-      findings.push(finding('notifications_denied', 'blocker', 'Notifikasi ditolak',
-        'FIEZEL mewajibkan notifikasi, dan izinnya sedang ditolak.',
-        'Aktifkan notifikasi untuk FIEZEL di pengaturan perangkat.'));
+      findings.push(finding('notifications_denied', 'blocker', t('health.notifications-denied-title'),
+        t('health.notifications-denied-detail'),
+        t('health.notifications-denied-remedy')));
     } else if (permission) {
-      findings.push(finding('notifications_pending', 'warn', 'Notifikasi belum diizinkan',
-        'Izin notifikasi masih "' + permission + '".', 'Izinkan notifikasi saat diminta.'));
+      findings.push(finding('notifications_pending', 'warn', t('health.notifications-pending-title'),
+        t('health.notifications-pending-detail', { permission: permission }), t('health.notifications-pending-remedy')));
     }
 
     var worst = findings.reduce(function (acc, f) {

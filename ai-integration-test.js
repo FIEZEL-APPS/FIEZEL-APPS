@@ -7,7 +7,20 @@ const localStorage={getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=String(v),
 const fetch=async url=>{if(String(url).includes('/health'))return{ok:true,json:async()=>({status:'ok',protocol:'1.7'})};const file=String(url).split('/').pop();return{ok:true,json:async()=>JSON.parse(fs.readFileSync(path.join(root,file),'utf8'))}};
 const context={console,Notification,document,localStorage,fetch,window:null,self:null,Date,Math,URL,Error,Promise,setTimeout,clearTimeout,SpeechSynthesisUtterance:function(){},speechSynthesis:{cancel(){},speak(){}}};
 context.window=context;context.self=context;context.FIEZEL_VERSION=JSON.parse(fs.readFileSync(path.join(root,'VERSION.json'),'utf8')).version;context.FIEZEL_CORE_CONFIG={workerUrl:'https://fiezel-core-test.puter.work',protocolVersion:'1.7',aiGateway:'core-only',remotePushRequired:true};context.window.scrollTo=()=>{};
-vm.createContext(context);vm.runInContext(app,context,{filename:'app.js'});
+vm.createContext(context);
+// HARNESS i18n kondisional (AI-20 F06 kategori 2b): meniru urutan <script defer> index.html —
+// fiezel-i18n.js lalu copy-id-*.js dimuat SEBELUM app.js, supaya app.js hasil ekstraksi copy
+// (yang memanggil FiezelI18n.t) tetap bisa boot di vm ini. existsSync = hijau dua arah:
+// tanpa berkas i18n, perilaku tes identik dengan sebelumnya. Asersi teks id di bawah TIDAK
+// diubah satu byte pun — keluaran id wajib tetap byte-identik (dijaga id-golden-snapshot).
+const i18nRuntime=path.join(root,'features','i18n','fiezel-i18n.js');
+if(fs.existsSync(i18nRuntime)){
+  vm.runInContext(fs.readFileSync(i18nRuntime,'utf8'),context,{filename:'features/i18n/fiezel-i18n.js'});
+  for(const name of fs.readdirSync(path.join(root,'features','i18n')).filter(n=>/^copy-id-.*\.js$/.test(n)).sort()){
+    vm.runInContext(fs.readFileSync(path.join(root,'features','i18n',name),'utf8'),context,{filename:'features/i18n/'+name});
+  }
+}
+vm.runInContext(app,context,{filename:'app.js'});
 const response=text=>({ok:true,status:200,json:async()=>({text,model:'gpt-5.4-nano',via:'fiezel-core-worker',protocol:'1.7'})});
 setTimeout(async()=>{try{
   assert(html.indexOf('https://js.puter.com/v2/')>=0&&html.indexOf('https://js.puter.com/v2/')<html.indexOf('./version.js'),'Puter.js script order is invalid');

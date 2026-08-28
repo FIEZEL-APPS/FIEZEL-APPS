@@ -41,6 +41,15 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
+  // i18n (AI-02 F01): naskah murid modul ini pindah ke features/i18n/copy-id-feat-a.js.
+  // Di browser, fiezel-i18n.js + copy-map dimuat lebih dulu lewat urutan <script defer>
+  // di index.html (AI-01 F02), jadi FiezelI18n dipakai langsung tanpa guard. Di Node
+  // (tes print-only me-require modul ini), copy-map dimuat lewat require supaya nilai
+  // 'id' tetap SATU sumber yang byte-identik dengan naskah beku gerbang emas.
+  var I18N = (typeof FiezelI18n !== 'undefined') ? FiezelI18n
+    : ((typeof module === 'object' && module.exports) ? require('../i18n/copy-id-feat-a.js') : null);
+  function t(key, params) { return I18N.t(key, params); }
+
   var STORAGE_KEY = 'fiezel-splash-seen-v1';
   // v4: gerak selesai 2140, cap mulai 2200, cap rampung 2200+1360=3560 —
   // umur tayang = tepat akhir koreografi cap; tidak ada detik mati.
@@ -652,7 +661,7 @@
       host.className = 'fiezel-splash fiezel-splash-dark';
       if (still) host.className += ' fiezel-splash-still';
       host.setAttribute('role', 'dialog');
-      host.setAttribute('aria-label', 'Selamat datang di FIEZEL');
+      host.setAttribute('aria-label', t('splash.welcome-aria'));
       host.innerHTML = markup();
     }
 

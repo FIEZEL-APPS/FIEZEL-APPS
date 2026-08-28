@@ -102,6 +102,31 @@
   var MAX_BODY_BYTES = 12000;
 
   /**
+   * AI-19 F05 (patch pendamping ai-tasks.js) + AI-17 F02 — enum TERTUTUP untuk locale TTS,
+   * ditegakkan DI ROUTE sebelum nilai apa pun menyentuh TtsKey.build. `locale` ikut di-hash ke
+   * kunci cache (tts-key.js, terkunci sha256 — JANGAN disentuh): string bebas dari klien berarti
+   * setiap nilai baru = kunci baru = render berbayar baru, dan korpus yang sudah dibayar
+   * (1.170 aset ElevenLabs + 604.962 karakter Deepgram) diam-diam yatim. Seluruh korpus dan
+   * semua klien hari ini memakai 'en-US' (bahasa TARGET pembelajaran, bukan bahasa UI murid) —
+   * locale UI dilarang masuk zona audio (audio-locale-guard-test.js).
+   * Nilai kosong TIDAK diisi di sini: default 'en-US' tetap milik tts-key.js (canonicalLocale),
+   * supaya tidak ada default kedua yang bisa menyimpang. Nilai di luar enum jatuh ke '' →
+   * default yang sama — fail-open ke baseline, konsisten dengan ai-tasks.js.
+   */
+  var TTS_LOCALES = Object.freeze(['en-US']);
+
+  function canonicalTtsLocale(raw) {
+    var v = String(raw == null ? '' : raw).trim().slice(0, 10); // potong dulu, baru cek
+    if (!v) return '';
+    var parts = v.replace('_', '-').split('-');
+    var lang = parts[0].toLowerCase();
+    var norm = parts[1] ? lang + '-' + parts[1].toUpperCase() : lang;
+    if (TTS_LOCALES.indexOf(norm) >= 0) return norm;
+    if (TTS_LOCALES.indexOf(norm + '-US') >= 0) return norm + '-US'; // 'en' → 'en-US'
+    return '';
+  }
+
+  /**
    * A8 · Naskah murid, satu kanon dengan `features/quota/quota-copy.js`: bahasa sehari-hari,
    * "nggak" bukan "tidak", tanpa nama mesin, tanpa menyalahkan murid. Dijaga
    * `quota-notice-a11y-test.js`.
@@ -450,7 +475,9 @@
     try {
       identity = TtsKey.build({
         text: body.text,
-        locale: body.locale,
+        // AI-19 F05/AI-17 F02: hanya nilai enum yang boleh masuk kunci; sisanya '' → default
+        // 'en-US' milik tts-key.js. Lihat komentar TTS_LOCALES di atas.
+        locale: canonicalTtsLocale(body.locale),
         // A12/1 — voice bawaan datang dari registry bersama, BUKAN dari string di berkas ini.
         // Nilainya wajib sama dengan yang dipakai pra-render (`aura-asteria-en`), sebab kunci
         // cache mem-hash `voiceId`: bawaan yang berbeda = seluruh korpus dianggap belum ada.
