@@ -2,11 +2,11 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 153,
-    "items": 123,
+    "templates": 154,
+    "items": 124,
     "rejected": 30,
     "byLevel": {
-      "A2": 19,
+      "A2": 20,
       "B1": 38,
       "B2": 26,
       "C1": 16,
@@ -3649,6 +3649,32 @@
         {
           "text": "it",
           "misconception": "starting a fresh pronoun clause and splicing two sentences together in a non-standard join"
+        }
+      ]
+    },
+    {
+      "id": "CM-005-cz0",
+      "templateId": "CM-005",
+      "skill": "irregular_comparative_better_worse_forms",
+      "level": "A2",
+      "sentence": "I think basketball is ___ than volleyball because the game never slows down.",
+      "blank": {
+        "answer": "better",
+        "alternates": [],
+        "position": 22
+      },
+      "distractors": [
+        {
+          "text": "more good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective"
+        },
+        {
+          "text": "gooder",
+          "misconception": "regular -er ending forced onto an irregular adjective"
+        },
+        {
+          "text": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative"
         }
       ]
     }

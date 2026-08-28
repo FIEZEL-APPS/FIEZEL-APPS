@@ -1,6 +1,6 @@
 {
   "version": "5.19.0",
-  "count": 153,
+  "count": 154,
   "templates": [
     {
       "id": "TA-001",
@@ -8569,13 +8569,69 @@
       "pedagogicalObjectiveId": "Pakai “the” generik dengan kata benda tunggal buat pernyataan soal spesies atau kelas secara utuh.",
       "misconceptionTargetedId": "Kamu milih artikel atau penentu yang ngitung ekor per ekor, padahal kepunahan itu sifat kelasnya sendiri.",
       "reasoningOperationId": "uji predikatnya berlaku buat individu atau buat kelas sebagai satu unit → pilih “the” generik buat pernyataan level kelas"
+    },
+    {
+      "id": "CM-005",
+      "family": "comparison",
+      "subskill": "irregular_comparative_better_worse_forms",
+      "cefr": "A2",
+      "questionType": "multiple_choice",
+      "pedagogicalObjective": "Recall that good and bad take the irregular comparatives better and worse instead of regular -er or more patterns",
+      "misconceptionTargeted": "Learner builds comparatives of good and bad with regular patterns such as more good or gooder",
+      "reasoningOperation": "spot an irregular adjective -> retrieve its memorized comparative form",
+      "stem": "I think basketball is ___ than volleyball because the game never slows down.",
+      "options": [
+        "better",
+        "more good",
+        "gooder",
+        "best"
+      ],
+      "correctIndex": 0,
+      "distractors": [
+        {
+          "option": "more good",
+          "misconception": "regular 'more + adjective' pattern applied to an irregular adjective",
+          "whyFails": "'Good' never pairs with 'more'; its comparative is the single irregular word 'better'.",
+          "whyFailsId": "“good” nggak pernah digandeng “more”, bentuk bandingnya memang kata khusus “better”.",
+          "misconceptionId": "pola “more + kata sifat” dipakai padahal kata sifatnya punya bentuk banding khusus."
+        },
+        {
+          "option": "gooder",
+          "misconception": "regular -er ending forced onto an irregular adjective",
+          "whyFails": "'Gooder' does not exist in English; 'good' changes its whole form to 'better'.",
+          "whyFailsId": "kata “gooder” nggak ada di bahasa Inggris, “good” berubah total jadi “better”.",
+          "misconceptionId": "akhiran -er dipaksakan ke kata sifat yang bentuk bandingnya khusus."
+        },
+        {
+          "option": "best",
+          "misconception": "superlative 'best' used where 'than' demands a comparative",
+          "whyFails": "'Best' names the champion of a whole group and cannot pair with 'than' between two items.",
+          "whyFailsId": "“best” nunjuk juara satu kelompok, nggak bisa digandeng “than” buat dua hal.",
+          "misconceptionId": "bentuk juara kelompok dipakai padahal “than” minta bentuk banding dua hal."
+        }
+      ],
+      "explanation": {
+        "whyCorrect": "'Better ... than' is the memorized irregular comparative of 'good', built exactly for comparing two things.",
+        "rule": "A few adjectives have irregular comparatives: good -> better, bad -> worse, far -> farther; they refuse -er and 'more'.",
+        "whyOthersFail": "'More good' and 'gooder' force regular patterns onto an irregular adjective, while 'best' picks a group champion instead of comparing two items.",
+        "howToAvoid": "Before adding -er or 'more', check whether the adjective is on the short irregular list; if it is, retrieve its special form.",
+        "memoryCue": "Good-better, bad-worse: memorize them as pairs, like opposites.",
+        "ruleId": "Beberapa kata sifat punya bentuk banding khusus: good jadi better, bad jadi worse, far jadi farther. Kata-kata ini nolak akhiran -er dan kata “more”.",
+        "whyCorrectId": "“Better ... than” itu bentuk banding khusus dari “good”, pas banget buat mbandingin dua olahraga.",
+        "whyOthersFailId": "“More good” dan “gooder” maksa pola biasa ke kata yang bentuknya khusus. “Best” malah nunjuk juara kelompok, bukan mbandingin dua hal.",
+        "howToAvoidId": "Sebelum nambah -er atau “more”, cek dulu: kata sifatnya masuk daftar bentuk khusus atau nggak. Kalau iya, panggil bentuk hafalannya.",
+        "memoryCueId": "Good jadi better, bad jadi worse. Hafalin pasangannya kayak hafal lawan kata."
+      },
+      "pedagogicalObjectiveId": "Ingat kalau good dan bad punya bentuk banding khusus: better dan worse, bukan pola -er atau “more” biasa.",
+      "misconceptionTargetedId": "Kamu bikin bentuk banding good dan bad pakai pola biasa kayak “more good” atau “gooder”.",
+      "reasoningOperationId": "kenali kata sifat yang bentuk bandingnya khusus → panggil bentuk banding hafalannya"
     }
   ],
   "schemaVersion": "2.0.0",
   "practiceBlueprintVersion": "focused-25-v1",
   "indonesianCoverage": {
-    "translated": 153,
-    "total": 153,
-    "updatedAt": "2026-08-28"
+    "translated": 154,
+    "total": 154,
+    "updatedAt": "2026-08-29"
   }
 }
