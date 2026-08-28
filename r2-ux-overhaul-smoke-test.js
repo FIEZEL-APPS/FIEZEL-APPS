@@ -81,7 +81,11 @@ setTimeout(()=>{
 
   // ---- R2-2 + R2-4 + R2-5: gerbang bukti 5 soal dengan urutan popup baru ----
   const skill='articles_a_an_the';
-  const expected=ctx.buildGrammarLessonQuestions(skill,5);
+  // m025-177: gerbang kini MENGACAK 5 soal dari seluruh pool valid lesson (perbaikan audit
+  // skip — set deterministik lama bisa dihafal lalu diulang). Math.random beku membuat
+  // shuffle tetap deterministik di smoke ini, jadi expected dihitung dari builder gerbang
+  // yang sama persis dengan yang dipakai startLessonSkipGate.
+  const expected=ctx.buildLessonSkipGateQuestions(skill);
   assert(expected.length===5,'gerbang butuh 5 soal valid');
   const captured=[];
   element('options').append=(...btns)=>{captured.length=0;captured.push(...btns)};
