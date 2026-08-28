@@ -260,6 +260,33 @@
     }
 
     /**
+     * W1 P1-3 (06-001): tukar lapisan TERATAS dengan lapisan lain DI TEMPAT.
+     *
+     * Dipakai ketika sebuah modal langsung digantikan oleh stage (mulai ujian dari modal
+     * instruksinya). Pola lama — dismiss() lalu pushLayer() — memanggil history.go(-1)
+     * yang ASINKRON tepat sebelum pushState yang sinkron, jadi penunjuk riwayat nyata
+     * mendarat SATU entri di bawah yang dicatat tumpukan: satu tekanan kembali di tengah
+     * ujian meng-unload seluruh dokumen (about:blank), hook leave stage tidak pernah
+     * berjalan, dan penalti ujian bisa dilompati. Menukar entri di tempat tidak menyentuh
+     * riwayat sama sekali (jumlah entri tidak berubah), jadi tidak ada balapan yang mungkin.
+     * Hanya sah bila entri teratas memang lapisan; selain itu pemanggil harus memakai
+     * pushLayer biasa.
+     */
+    function replaceTopLayer(layer) {
+      var spec = layer || {};
+      var id = str(spec.id);
+      if (!id) return false;
+      if (locked()) return false;
+      var top = stack[stack.length - 1];
+      if (!top || top.kind !== 'layer') return false;
+      stack[stack.length - 1] = {
+        kind: 'layer', id: id, view: top.view, fromView: top.fromView,
+        close: typeof spec.close === 'function' ? spec.close : null
+      };
+      return true;
+    }
+
+    /**
      * Lapisan ditutup oleh aplikasi sendiri (tombol "Batal", "← Rak buku", tombol Escape).
      * Layarnya sudah berubah seketika; yang tersisa hanyalah membuang entri riwayatnya,
      * supaya tekanan kembali berikutnya tidak jatuh pada layar yang sudah tidak ada.
@@ -302,6 +329,7 @@
     return {
       pushView: pushView,
       pushLayer: pushLayer,
+      replaceTopLayer: replaceTopLayer,
       handlePop: handlePop,
       dismiss: dismiss,
       back: back,
@@ -558,6 +586,7 @@
     controller: function () { return controller; },
     pushView: forward('pushView'),
     pushLayer: forward('pushLayer'),
+    replaceTopLayer: forward('replaceTopLayer'),
     dismiss: forward('dismiss'),
     back: function () { return controller ? controller.back() : false; },
     depth: function () { return controller ? controller.depth() : 0; }

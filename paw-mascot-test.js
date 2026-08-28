@@ -365,8 +365,16 @@ test('popup keyakinan bukan kurungan', () => {
   }
   // Dan ia harus ikut tertutup saat murid pindah soal atau keluar kuis - popup yang
   // tertinggal akan menutupi layar berikutnya.
-  if (!/quizExit'\)\.onclick=\(\)=>\{closeConfidencePop\(\)/.test(app)) {
-    throw new Error('popup tidak ditutup saat keluar kuis');
+  // m025-180: Keluar kini lewat dialog konfirmasi (audit UI/UX 09-002/10-001), jadi
+  // kontraknya diperiksa STRUKTURAL, bukan cocok-string pada handler: (1) handler Keluar
+  // memanggil confirmQuizExit, dan (2) jalur keluar yang dikonfirmasi (doExit) menutup
+  // popup sebelum meninggalkan layar. Menutup popup pada TAP pertama salah: kalau murid
+  // memilih "Lanjut belajar", kelanjutan popup yang dibatalkan membuat tombol Lanjut mati.
+  if (!/quizExit'\)\.onclick=\(\)=>confirmQuizExit\(\)/.test(app)) {
+    throw new Error('Keluar kuis harus lewat confirmQuizExit \u2014 dialog konfirmasi m025-180');
+  }
+  if (!/const doExit=\(\)=>\{try\{closeConfidencePop\(\)\}/.test(app)) {
+    throw new Error('popup tidak ditutup saat keluar kuis (doExit wajib menutup popup)');
   }
   if (!/quizNext'\)\.onclick=\(\)=>\{if\(answer\.locked\)\{closeConfidencePop\(\)/.test(app)) {
     throw new Error('popup tidak ditutup saat pindah soal');
