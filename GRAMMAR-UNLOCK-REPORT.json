@@ -4,8 +4,8 @@
   "counts": {
     "pass": 16,
     "fail": 0,
-    "lessons": 139,
-    "gatedLessons": 16,
+    "lessons": 153,
+    "gatedLessons": 30,
     "openEntryPoints": 123
   },
   "checks": [
@@ -37,7 +37,7 @@
     {
       "name": "A lesson with unmet prerequisites is locked",
       "status": "PASS",
-      "details": "gated lessons=16"
+      "details": "gated lessons=30"
     },
     {
       "name": "Locking names every prerequisite that is still missing",
@@ -57,7 +57,7 @@
     {
       "name": "Walking the curriculum in order never hits a locked lesson",
       "status": "PASS",
-      "details": "139 lessons reachable in sequence order"
+      "details": "153 lessons reachable in sequence order"
     },
     {
       "name": "openGrammarLesson() refuses a locked lesson",

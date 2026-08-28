@@ -12,14 +12,14 @@
     "C1",
     "C2"
   ],
-  "lessonCount": 139,
+  "lessonCount": 153,
   "levelCounts": {
     "A1": 17,
-    "A2": 17,
-    "B1": 47,
-    "B2": 32,
+    "A2": 24,
+    "B1": 48,
+    "B2": 33,
     "C1": 19,
-    "C2": 7
+    "C2": 12
   },
   "classroomA1SourceLessons": [
     "grammar_a1_articles",
@@ -85,7 +85,7 @@
       "level": "A1",
       "sequence": 3,
       "unit": "A1.1",
-      "title": "Kata sandang \u201ca\u201d, \u201can\u201d, \u201cthe\u201d: memilih yang pas",
+      "title": "Kata sandang “a”, “an”, “the”: memilih yang pas",
       "prerequisites": [
         "be_subject_agreement"
       ],
@@ -204,7 +204,7 @@
       "level": "A1",
       "sequence": 12,
       "unit": "A1.2",
-      "title": "Can: cara bilang \u201caku bisa\u201d",
+      "title": "Can: cara bilang “aku bisa”",
       "prerequisites": [
         "be_subject_agreement"
       ],
@@ -279,9 +279,74 @@
       "titleEn": "Prepositions of time"
     },
     {
-      "lessonId": "present_simple_vs_continuous",
+      "lessonId": "imperative_commands_base_form",
       "level": "A2",
       "sequence": 18,
+      "unit": "A2.1",
+      "title": "Kalimat perintah: mulai dari kata kerja dasar",
+      "prerequisites": [
+        "present_simple_basics"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-018",
+      "titleEn": "imperatives with the base form"
+    },
+    {
+      "lessonId": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sequence": 19,
+      "unit": "A2.1",
+      "title": "Always, usually, never: posisi kata frekuensi",
+      "prerequisites": [
+        "present_simple_basics"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-019",
+      "titleEn": "adverbs of frequency in mid position"
+    },
+    {
+      "lessonId": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sequence": 20,
+      "unit": "A2.1",
+      "title": "Apostrof + s: dari tas Sinta ke Sinta's bag",
+      "prerequisites": [
+        "possessive_adjectives"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-020",
+      "titleEn": "possessive 's for ownership"
+    },
+    {
+      "lessonId": "would_like_polite_requests",
+      "level": "A2",
+      "sequence": 21,
+      "unit": "A2.1",
+      "title": "Would like: mesen dengan sopan",
+      "prerequisites": [
+        "can_ability"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "A1-021",
+      "titleEn": "polite requests with would like"
+    },
+    {
+      "lessonId": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sequence": 22,
+      "unit": "A2.1",
+      "title": "Like, love, hate + -ing: ngomongin kesukaan",
+      "prerequisites": [
+        "present_simple_basics"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "GI-006",
+      "titleEn": "like, love, hate + -ing"
+    },
+    {
+      "lessonId": "present_simple_vs_continuous",
+      "level": "A2",
+      "sequence": 23,
       "unit": "A2.1",
       "title": "Present simple vs present continuous: kebiasaan atau sekarang",
       "prerequisites": [],
@@ -292,7 +357,7 @@
     {
       "lessonId": "obligation_vs_permission",
       "level": "A2",
-      "sequence": 19,
+      "sequence": 24,
       "unit": "A2.1",
       "title": "Must dan can: wajib atau boleh",
       "prerequisites": [],
@@ -303,7 +368,7 @@
     {
       "lessonId": "zero_vs_first_conditional",
       "level": "A2",
-      "sequence": 20,
+      "sequence": 25,
       "unit": "A2.1",
       "title": "Zero vs first conditional: fakta atau kemungkinan nyata",
       "prerequisites": [],
@@ -314,9 +379,9 @@
     {
       "lessonId": "first_vs_subsequent_mention",
       "level": "A2",
-      "sequence": 21,
+      "sequence": 26,
       "unit": "A2.1",
-      "title": "\u201cA\u201d untuk baru, \u201cthe\u201d untuk yang sudah disebut",
+      "title": "“A” untuk baru, “the” untuk yang sudah disebut",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "AR-001",
@@ -325,7 +390,7 @@
     {
       "lessonId": "comparative_vs_superlative_scope",
       "level": "A2",
-      "sequence": 22,
+      "sequence": 27,
       "unit": "A2.1",
       "title": "Comparative vs superlative: dua hal atau satu kelompok",
       "prerequisites": [],
@@ -336,7 +401,7 @@
     {
       "lessonId": "past_continuous_vs_past_simple_interrupted_action",
       "level": "A2",
-      "sequence": 23,
+      "sequence": 28,
       "unit": "A2.1",
       "title": "Past continuous vs past simple: kejadian yang terpotong",
       "prerequisites": [],
@@ -347,7 +412,7 @@
     {
       "lessonId": "much_many_little_few_countability",
       "level": "A2",
-      "sequence": 24,
+      "sequence": 29,
       "unit": "A2.1",
       "title": "Much, many, little, few: pilih sesuai bendanya",
       "prerequisites": [],
@@ -358,7 +423,7 @@
     {
       "lessonId": "place_prepositions_at_in_on",
       "level": "A2",
-      "sequence": 25,
+      "sequence": 30,
       "unit": "A2.1",
       "title": "At, in, on untuk tempat: titik, ruang, permukaan",
       "prerequisites": [],
@@ -369,7 +434,7 @@
     {
       "lessonId": "as_as_equality_vs_comparative",
       "level": "A2",
-      "sequence": 26,
+      "sequence": 31,
       "unit": "A2.2",
       "title": "As ... as: sama rata, bukan lebih",
       "prerequisites": [],
@@ -380,9 +445,9 @@
     {
       "lessonId": "article_omission_with_uncountable",
       "level": "A2",
-      "sequence": 27,
+      "sequence": 32,
       "unit": "A2.2",
-      "title": "Benda tak terhitung: tanpa \u201ca\u201d dan \u201can\u201d",
+      "title": "Benda tak terhitung: tanpa “a” dan “an”",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "EC-003",
@@ -391,9 +456,9 @@
     {
       "lessonId": "definite_article_with_unique_referents_and_superlatives",
       "level": "A2",
-      "sequence": 28,
+      "sequence": 33,
       "unit": "A2.2",
-      "title": "\u201cThe\u201d buat benda satu-satunya dan bentuk superlative",
+      "title": "“The” buat benda satu-satunya dan bentuk superlative",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "AR-004",
@@ -402,7 +467,7 @@
     {
       "lessonId": "movement_prepositions_through_across_along_over",
       "level": "A2",
-      "sequence": 29,
+      "sequence": 34,
       "unit": "A2.2",
       "title": "Through, across, along, over: arah gerakan",
       "prerequisites": [],
@@ -413,7 +478,7 @@
     {
       "lessonId": "double_negative_avoidance_single_negation_rule",
       "level": "A2",
-      "sequence": 30,
+      "sequence": 35,
       "unit": "A2.2",
       "title": "Satu kalimat cukup satu kata negatif",
       "prerequisites": [],
@@ -424,7 +489,7 @@
     {
       "lessonId": "state_verbs_resist_continuous_form",
       "level": "A2",
-      "sequence": 31,
+      "sequence": 36,
       "unit": "A2.2",
       "title": "Kata kerja keadaan: nggak dipakai bentuk -ing",
       "prerequisites": [],
@@ -435,7 +500,7 @@
     {
       "lessonId": "preposition_of_time_duration_for_vs_since_vs_during",
       "level": "A2",
-      "sequence": 32,
+      "sequence": 37,
       "unit": "A2.2",
       "title": "For, since, during: cara menyebut lamanya",
       "prerequisites": [],
@@ -446,7 +511,7 @@
     {
       "lessonId": "reported_speech_pronoun_and_possessive_shift",
       "level": "A2",
-      "sequence": 33,
+      "sequence": 38,
       "unit": "A2.2",
       "title": "Reported speech: kata ganti ikut pindah",
       "prerequisites": [],
@@ -457,18 +522,45 @@
     {
       "lessonId": "subject_vs_object_questions_word_order",
       "level": "A2",
-      "sequence": 34,
+      "sequence": 39,
       "unit": "A2.3",
-      "title": "Pertanyaan subjek vs objek: perlu \u201cdo\u201d atau nggak",
+      "title": "Pertanyaan subjek vs objek: perlu “do” atau nggak",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "b5_019",
       "titleEn": "subject vs object questions word order"
     },
     {
+      "lessonId": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sequence": 40,
+      "unit": "A2.3",
+      "title": "Present perfect: pengalaman dengan ever dan never",
+      "prerequisites": [
+        "past_simple_regular_forms"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "TA-011",
+      "titleEn": "present perfect for experience with ever/never"
+    },
+    {
+      "lessonId": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sequence": 41,
+      "unit": "A2.3",
+      "title": "Present perfect + for/since: dari dulu sampai sekarang",
+      "prerequisites": [
+        "present_perfect_experience_ever_never",
+        "preposition_of_time_duration_for_vs_since_vs_during"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "TA-012",
+      "titleEn": "present perfect with for and since"
+    },
+    {
       "lessonId": "past_simple_vs_present_perfect",
       "level": "B1",
-      "sequence": 35,
+      "sequence": 42,
       "unit": "B1.1",
       "title": "Present perfect vs past simple: rentang yang belum tutup",
       "prerequisites": [],
@@ -479,7 +571,7 @@
     {
       "lessonId": "future_forms_plan_vs_prediction",
       "level": "B1",
-      "sequence": 36,
+      "sequence": 43,
       "unit": "B1.1",
       "title": "Bentuk masa depan: rencana atau perkiraan",
       "prerequisites": [],
@@ -490,9 +582,9 @@
     {
       "lessonId": "deduction_present",
       "level": "B1",
-      "sequence": 37,
+      "sequence": 44,
       "unit": "B1.1",
-      "title": "Must, might, can\u2019t: menyimpulkan keadaan sekarang",
+      "title": "Must, might, can’t: menyimpulkan keadaan sekarang",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "MO-002",
@@ -501,7 +593,7 @@
     {
       "lessonId": "second_conditional_unreal_present",
       "level": "B1",
-      "sequence": 38,
+      "sequence": 45,
       "unit": "B1.1",
       "title": "Second conditional: pengandaian yang nggak nyata",
       "prerequisites": [],
@@ -510,9 +602,22 @@
       "titleEn": "second conditional unreal present"
     },
     {
+      "lessonId": "wish_unreal_present_past_simple",
+      "level": "B1",
+      "sequence": 46,
+      "unit": "B1.1",
+      "title": "Wish + past simple: harapan soal sekarang",
+      "prerequisites": [
+        "second_conditional_unreal_present"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "CO-008",
+      "titleEn": "wish + past simple for unreal present"
+    },
+    {
       "lessonId": "agent_omission_when_irrelevant",
       "level": "B1",
-      "sequence": 39,
+      "sequence": 47,
       "unit": "B1.1",
       "title": "Kalimat pasif: kapan pelaku boleh hilang",
       "prerequisites": [],
@@ -523,7 +628,7 @@
     {
       "lessonId": "backshift_statement",
       "level": "B1",
-      "sequence": 40,
+      "sequence": 48,
       "unit": "B1.1",
       "title": "Reported speech: tense mundur satu langkah",
       "prerequisites": [],
@@ -534,7 +639,7 @@
     {
       "lessonId": "question_tag_polarity",
       "level": "B1",
-      "sequence": 41,
+      "sequence": 49,
       "unit": "B1.1",
       "title": "Question tag: negatif ketemu positif",
       "prerequisites": [],
@@ -545,7 +650,7 @@
     {
       "lessonId": "subject_verb_agreement_with_intervening_phrase",
       "level": "B1",
-      "sequence": 42,
+      "sequence": 50,
       "unit": "B1.1",
       "title": "Subjek dan kata kerja: jangan terkecoh sisipan",
       "prerequisites": [],
@@ -556,7 +661,7 @@
     {
       "lessonId": "past_perfect_sequencing_two_past_events",
       "level": "B1",
-      "sequence": 43,
+      "sequence": 51,
       "unit": "B1.2",
       "title": "Past perfect: mengurutkan dua kejadian lampau",
       "prerequisites": [],
@@ -567,7 +672,7 @@
     {
       "lessonId": "ability_past_could_vs_was_able_to",
       "level": "B1",
-      "sequence": 44,
+      "sequence": 52,
       "unit": "B1.2",
       "title": "Could vs was able to: kemampuan masa lalu",
       "prerequisites": [],
@@ -578,9 +683,9 @@
     {
       "lessonId": "necessity_absence_neednt_vs_mustnt",
       "level": "B1",
-      "sequence": 45,
+      "sequence": 53,
       "unit": "B1.2",
-      "title": "Needn\u2019t vs mustn\u2019t: nggak perlu atau nggak boleh",
+      "title": "Needn’t vs mustn’t: nggak perlu atau nggak boleh",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "MO-005",
@@ -589,7 +694,7 @@
     {
       "lessonId": "unless_vs_if_not",
       "level": "B1",
-      "sequence": 46,
+      "sequence": 54,
       "unit": "B1.2",
       "title": "Unless vs if not: negatifnya sudah di dalam",
       "prerequisites": [],
@@ -600,7 +705,7 @@
     {
       "lessonId": "reported_questions_word_order",
       "level": "B1",
-      "sequence": 47,
+      "sequence": 55,
       "unit": "B1.2",
       "title": "Melaporkan pertanyaan: susunan kata jadi kalimat berita",
       "prerequisites": [],
@@ -611,7 +716,7 @@
     {
       "lessonId": "reported_commands_infinitive",
       "level": "B1",
-      "sequence": 48,
+      "sequence": 56,
       "unit": "B1.2",
       "title": "Melaporkan perintah: pakai to sebelum kata kerja",
       "prerequisites": [],
@@ -622,9 +727,9 @@
     {
       "lessonId": "zero_article_generic_plural_vs_the_specific",
       "level": "B1",
-      "sequence": 49,
+      "sequence": 57,
       "unit": "B1.2",
-      "title": "Jamak umum tanpa \u201cthe\u201d, spesifik pakai \u201cthe\u201d",
+      "title": "Jamak umum tanpa “the”, spesifik pakai “the”",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "AR-002",
@@ -633,7 +738,7 @@
     {
       "lessonId": "dependent_prepositions_after_adjectives",
       "level": "B1",
-      "sequence": 50,
+      "sequence": 58,
       "unit": "B1.2",
       "title": "Pasangan tetap kata sifat: interested in, good at",
       "prerequisites": [],
@@ -644,7 +749,7 @@
     {
       "lessonId": "gerund_after_preposition_vs_infinitive_of_purpose",
       "level": "B1",
-      "sequence": 51,
+      "sequence": 59,
       "unit": "B1.3",
       "title": "Gerund setelah kata depan, infinitive untuk tujuan",
       "prerequisites": [],
@@ -655,7 +760,7 @@
     {
       "lessonId": "negative_questions_expecting_agreement",
       "level": "B1",
-      "sequence": 52,
+      "sequence": 60,
       "unit": "B1.3",
       "title": "Pertanyaan negatif yang mengharap persetujuan",
       "prerequisites": [],
@@ -666,7 +771,7 @@
     {
       "lessonId": "indirect_questions_embedded_word_order",
       "level": "B1",
-      "sequence": 53,
+      "sequence": 61,
       "unit": "B1.3",
       "title": "Indirect questions: bertanya sopan tanpa membalik urutan",
       "prerequisites": [],
@@ -677,7 +782,7 @@
     {
       "lessonId": "word_order_adverb_placement",
       "level": "B1",
-      "sequence": 54,
+      "sequence": 62,
       "unit": "B1.3",
       "title": "Posisi kata keterangan dalam kalimat",
       "prerequisites": [],
@@ -688,7 +793,7 @@
     {
       "lessonId": "advice_should_vs_ought_to_vs_had_better",
       "level": "B1",
-      "sequence": 55,
+      "sequence": 63,
       "unit": "B1.3",
       "title": "Should, ought to, had better: memberi saran",
       "prerequisites": [],
@@ -699,7 +804,7 @@
     {
       "lessonId": "speculation_scale_may_might_could_vs_will",
       "level": "B1",
-      "sequence": 56,
+      "sequence": 64,
       "unit": "B1.3",
       "title": "May, might, could vs will: tingkat keyakinan",
       "prerequisites": [],
@@ -710,7 +815,7 @@
     {
       "lessonId": "time_and_place_reference_shift",
       "level": "B1",
-      "sequence": 57,
+      "sequence": 65,
       "unit": "B1.3",
       "title": "Reported speech: here jadi there, now jadi then",
       "prerequisites": [],
@@ -721,7 +826,7 @@
     {
       "lessonId": "phrasal_verb_particle_changes_meaning",
       "level": "B1",
-      "sequence": 58,
+      "sequence": 66,
       "unit": "B1.3",
       "title": "Phrasal verb: kata kecilnya mengubah makna",
       "prerequisites": [],
@@ -732,7 +837,7 @@
     {
       "lessonId": "infinitive_after_too_enough_adjective",
       "level": "B1",
-      "sequence": 59,
+      "sequence": 67,
       "unit": "B1.4",
       "title": "Infinitive setelah too dan enough",
       "prerequisites": [],
@@ -743,7 +848,7 @@
     {
       "lessonId": "less_vs_fewer_countability_agreement",
       "level": "B1",
-      "sequence": 60,
+      "sequence": 68,
       "unit": "B1.4",
       "title": "Less vs fewer: sesuai bisa dihitung atau nggak",
       "prerequisites": [],
@@ -754,7 +859,7 @@
     {
       "lessonId": "agreement_structures_so_do_i_neither_do_i",
       "level": "B1",
-      "sequence": 61,
+      "sequence": 69,
       "unit": "B1.4",
       "title": "So do I dan neither do I: ikut setuju",
       "prerequisites": [],
@@ -765,7 +870,7 @@
     {
       "lessonId": "comma_splice_run_on_correction",
       "level": "B1",
-      "sequence": 62,
+      "sequence": 70,
       "unit": "B1.4",
       "title": "Comma splice: koma saja nggak cukup",
       "prerequisites": [],
@@ -776,7 +881,7 @@
     {
       "lessonId": "confusing_word_pair_affect_vs_effect",
       "level": "B1",
-      "sequence": 63,
+      "sequence": 71,
       "unit": "B1.4",
       "title": "Affect vs effect: kata kerja atau kata benda",
       "prerequisites": [],
@@ -787,7 +892,7 @@
     {
       "lessonId": "present_simple_for_fixed_schedules_not_personal_plans",
       "level": "B1",
-      "sequence": 64,
+      "sequence": 72,
       "unit": "B1.4",
       "title": "Present simple untuk jadwal tetap, bukan rencana pribadi",
       "prerequisites": [],
@@ -798,7 +903,7 @@
     {
       "lessonId": "possibility_vs_permission_can_vs_may_formal_register",
       "level": "B1",
-      "sequence": 65,
+      "sequence": 73,
       "unit": "B1.4",
       "title": "Can vs may: izin di situasi formal",
       "prerequisites": [],
@@ -809,7 +914,7 @@
     {
       "lessonId": "future_time_clauses_present_after_when_as_soon_as",
       "level": "B1",
-      "sequence": 66,
+      "sequence": 74,
       "unit": "B1.4",
       "title": "Setelah when dan as soon as: pakai present",
       "prerequisites": [],
@@ -820,7 +925,7 @@
     {
       "lessonId": "reported_speech_modal_shift_can_to_could",
       "level": "B1",
-      "sequence": 67,
+      "sequence": 75,
       "unit": "B1.5",
       "title": "Reported speech: can berubah jadi could",
       "prerequisites": [],
@@ -831,7 +936,7 @@
     {
       "lessonId": "reported_yes_no_questions_if_whether",
       "level": "B1",
-      "sequence": 68,
+      "sequence": 76,
       "unit": "B1.5",
       "title": "Melaporkan pertanyaan yes-no: pakai if atau whether",
       "prerequisites": [],
@@ -842,9 +947,9 @@
     {
       "lessonId": "article_with_institutions_school_prison_hospital",
       "level": "B1",
-      "sequence": 69,
+      "sequence": 77,
       "unit": "B1.5",
-      "title": "School, prison, hospital: kapan tanpa \u201cthe\u201d",
+      "title": "School, prison, hospital: kapan tanpa “the”",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "b4_012",
@@ -853,7 +958,7 @@
     {
       "lessonId": "possessive_determiner_vs_double_genitive_of_mine",
       "level": "B1",
-      "sequence": 70,
+      "sequence": 78,
       "unit": "B1.5",
       "title": "Kata milik ganda: a friend of mine",
       "prerequisites": [],
@@ -864,7 +969,7 @@
     {
       "lessonId": "preposition_after_adjective_of_emotion_pleased_with_vs_about",
       "level": "B1",
-      "sequence": 71,
+      "sequence": 79,
       "unit": "B1.5",
       "title": "Pleased with vs about: kata depan setelah emosi",
       "prerequisites": [],
@@ -875,7 +980,7 @@
     {
       "lessonId": "bare_infinitive_after_modal_and_causative_make_let",
       "level": "B1",
-      "sequence": 72,
+      "sequence": 80,
       "unit": "B1.5",
       "title": "Bare infinitive setelah modal, make, dan let",
       "prerequisites": [],
@@ -886,7 +991,7 @@
     {
       "lessonId": "relative_clause_omitting_object_pronoun",
       "level": "B1",
-      "sequence": 73,
+      "sequence": 81,
       "unit": "B1.5",
       "title": "Relative clause: kata ganti objek boleh hilang",
       "prerequisites": [],
@@ -897,7 +1002,7 @@
     {
       "lessonId": "comparative_intensifiers_much_far_a_lot_before_comparative",
       "level": "B1",
-      "sequence": 74,
+      "sequence": 82,
       "unit": "B1.5",
       "title": "Much, far, a lot: menguatkan comparative",
       "prerequisites": [],
@@ -908,7 +1013,7 @@
     {
       "lessonId": "echo_questions_for_clarification",
       "level": "B1",
-      "sequence": 75,
+      "sequence": 83,
       "unit": "B1.6",
       "title": "Echo question: mengulang untuk memastikan",
       "prerequisites": [],
@@ -919,7 +1024,7 @@
     {
       "lessonId": "past_habitual_used_to_vs_would_vs_past_simple",
       "level": "B1",
-      "sequence": 76,
+      "sequence": 84,
       "unit": "B1.6",
       "title": "Used to, would, past simple: kebiasaan lama",
       "prerequisites": [],
@@ -930,9 +1035,9 @@
     {
       "lessonId": "present_perfect_for_unfinished_time_period_this_week",
       "level": "B1",
-      "sequence": 77,
+      "sequence": 85,
       "unit": "B1.6",
-      "title": "Present perfect dengan \u201cthis week\u201d: periodenya masih jalan",
+      "title": "Present perfect dengan “this week”: periodenya masih jalan",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "b5_002",
@@ -941,7 +1046,7 @@
     {
       "lessonId": "ability_nonfinite_forms_be_able_to",
       "level": "B1",
-      "sequence": 78,
+      "sequence": 86,
       "unit": "B1.6",
       "title": "Be able to: saat can nggak bisa dipakai",
       "prerequisites": [],
@@ -952,9 +1057,9 @@
     {
       "lessonId": "quantifier_of_before_object_pronoun",
       "level": "B1",
-      "sequence": 79,
+      "sequence": 87,
       "unit": "B1.6",
-      "title": "Some of them: \u201cof\u201d sebelum kata ganti",
+      "title": "Some of them: “of” sebelum kata ganti",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "b5_012",
@@ -963,7 +1068,7 @@
     {
       "lessonId": "preposition_of_means_by_vs_with_vs_on",
       "level": "B1",
-      "sequence": 80,
+      "sequence": 88,
       "unit": "B1.6",
       "title": "By, with, on: menyebut alat dan cara",
       "prerequisites": [],
@@ -974,7 +1079,7 @@
     {
       "lessonId": "purpose_connectors_so_that_in_order_to_distinction",
       "level": "B1",
-      "sequence": 81,
+      "sequence": 89,
       "unit": "B1.6",
       "title": "So that vs in order to: menyatakan tujuan",
       "prerequisites": [],
@@ -985,7 +1090,7 @@
     {
       "lessonId": "verb_pattern_meaning_change_stop",
       "level": "B2",
-      "sequence": 82,
+      "sequence": 90,
       "unit": "B2.1",
       "title": "Stop doing vs stop to do: makna berubah",
       "prerequisites": [],
@@ -996,7 +1101,7 @@
     {
       "lessonId": "defining_vs_nondefining",
       "level": "B2",
-      "sequence": 83,
+      "sequence": 91,
       "unit": "B2.1",
       "title": "Defining vs non-defining relative clause: peran koma",
       "prerequisites": [],
@@ -1007,7 +1112,7 @@
     {
       "lessonId": "present_perfect_continuous_vs_present_perfect_simple",
       "level": "B2",
-      "sequence": 84,
+      "sequence": 92,
       "unit": "B2.1",
       "title": "Present perfect continuous vs simple: proses atau hasil",
       "prerequisites": [],
@@ -1018,7 +1123,7 @@
     {
       "lessonId": "future_continuous_vs_future_perfect",
       "level": "B2",
-      "sequence": 85,
+      "sequence": 93,
       "unit": "B2.1",
       "title": "Future continuous vs future perfect: sedang atau tuntas",
       "prerequisites": [],
@@ -1029,9 +1134,9 @@
     {
       "lessonId": "deduction_past_must_have_vs_cant_have",
       "level": "B2",
-      "sequence": 86,
+      "sequence": 94,
       "unit": "B2.1",
-      "title": "Must have vs can\u2019t have: menyimpulkan masa lalu",
+      "title": "Must have vs can’t have: menyimpulkan masa lalu",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "MO-004",
@@ -1040,7 +1145,7 @@
     {
       "lessonId": "third_conditional_unreal_past",
       "level": "B2",
-      "sequence": 87,
+      "sequence": 95,
       "unit": "B2.1",
       "title": "Third conditional: andai masa lalu berbeda",
       "prerequisites": [],
@@ -1049,9 +1154,23 @@
       "titleEn": "third conditional unreal past"
     },
     {
+      "lessonId": "if_only_past_regret_past_perfect",
+      "level": "B2",
+      "sequence": 96,
+      "unit": "B2.1",
+      "title": "If only + past perfect: penyesalan masa lalu",
+      "prerequisites": [
+        "third_conditional_unreal_past",
+        "wish_unreal_present_past_simple"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "CO-009",
+      "titleEn": "if only + past perfect for past regret"
+    },
+    {
       "lessonId": "passive_with_modal_verbs",
       "level": "B2",
-      "sequence": 88,
+      "sequence": 97,
       "unit": "B2.1",
       "title": "Kalimat pasif dengan modal: must be done",
       "prerequisites": [],
@@ -1062,7 +1181,7 @@
     {
       "lessonId": "get_passive_informal_vs_be_passive",
       "level": "B2",
-      "sequence": 89,
+      "sequence": 98,
       "unit": "B2.1",
       "title": "Get passive vs be passive: santai atau baku",
       "prerequisites": [],
@@ -1073,7 +1192,7 @@
     {
       "lessonId": "causative_have_get_something_done",
       "level": "B2",
-      "sequence": 90,
+      "sequence": 99,
       "unit": "B2.2",
       "title": "Have/get something done: menyuruh orang lain mengerjakan",
       "prerequisites": [],
@@ -1084,7 +1203,7 @@
     {
       "lessonId": "reporting_verb_choice_suggest_vs_tell",
       "level": "B2",
-      "sequence": 91,
+      "sequence": 100,
       "unit": "B2.2",
       "title": "Memilih kata pelapor: suggest vs tell",
       "prerequisites": [],
@@ -1095,7 +1214,7 @@
     {
       "lessonId": "verb_pattern_remember_forget_meaning_change",
       "level": "B2",
-      "sequence": 92,
+      "sequence": 101,
       "unit": "B2.2",
       "title": "Remember dan forget: -ing atau to beda makna",
       "prerequisites": [],
@@ -1106,7 +1225,7 @@
     {
       "lessonId": "relative_pronoun_whose_possession",
       "level": "B2",
-      "sequence": 93,
+      "sequence": 102,
       "unit": "B2.2",
       "title": "Whose: kepemilikan dalam relative clause",
       "prerequisites": [],
@@ -1117,7 +1236,7 @@
     {
       "lessonId": "double_comparative_progressive_change",
       "level": "B2",
-      "sequence": 94,
+      "sequence": 103,
       "unit": "B2.2",
       "title": "More and more: perubahan yang terus bertambah",
       "prerequisites": [],
@@ -1128,7 +1247,7 @@
     {
       "lessonId": "future_in_the_past_would_vs_was_going_to",
       "level": "B2",
-      "sequence": 95,
+      "sequence": 104,
       "unit": "B2.2",
       "title": "Would vs was going to: rencana dari lampau",
       "prerequisites": [],
@@ -1139,9 +1258,9 @@
     {
       "lessonId": "past_regret_should_have_vs_shouldnt_have",
       "level": "B2",
-      "sequence": 96,
+      "sequence": 105,
       "unit": "B2.2",
-      "title": "Should have vs shouldn\u2019t have: menyesali masa lalu",
+      "title": "Should have vs shouldn’t have: menyesali masa lalu",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "MO-008",
@@ -1150,7 +1269,7 @@
     {
       "lessonId": "impersonal_reporting_it_is_said_that",
       "level": "B2",
-      "sequence": 97,
+      "sequence": 106,
       "unit": "B2.2",
       "title": "It is said that: melaporkan tanpa menyebut sumber",
       "prerequisites": [],
@@ -1161,7 +1280,7 @@
     {
       "lessonId": "passive_infinitive_after_modal_expectation",
       "level": "B2",
-      "sequence": 98,
+      "sequence": 107,
       "unit": "B2.3",
       "title": "Passive infinitive: expected to be done",
       "prerequisites": [],
@@ -1172,7 +1291,7 @@
     {
       "lessonId": "verb_pattern_try_meaning_change",
       "level": "B2",
-      "sequence": 99,
+      "sequence": 108,
       "unit": "B2.3",
       "title": "Try doing vs try to do: beda maksud",
       "prerequisites": [],
@@ -1183,7 +1302,7 @@
     {
       "lessonId": "narrative_past_perfect_flashback_vs_past_simple_sequence",
       "level": "B2",
-      "sequence": 100,
+      "sequence": 109,
       "unit": "B2.3",
       "title": "Past perfect vs past simple: kilas balik cerita",
       "prerequisites": [],
@@ -1194,7 +1313,7 @@
     {
       "lessonId": "modal_perfect_could_have_missed_opportunity",
       "level": "B2",
-      "sequence": 101,
+      "sequence": 110,
       "unit": "B2.3",
       "title": "Could have: peluang yang terlewat",
       "prerequisites": [],
@@ -1205,7 +1324,7 @@
     {
       "lessonId": "passive_causative_vs_passive_simple_confusion",
       "level": "B2",
-      "sequence": 102,
+      "sequence": 111,
       "unit": "B2.3",
       "title": "Pasif causative vs pasif biasa: siapa yang mengerjakan",
       "prerequisites": [],
@@ -1216,7 +1335,7 @@
     {
       "lessonId": "gerund_as_subject_vs_infinitive_as_subject_formality",
       "level": "B2",
-      "sequence": 103,
+      "sequence": 112,
       "unit": "B2.3",
       "title": "Subjek kalimat: gerund santai, infinitive formal",
       "prerequisites": [],
@@ -1227,7 +1346,7 @@
     {
       "lessonId": "contrast_connectors_although_despite_however_distinction",
       "level": "B2",
-      "sequence": 104,
+      "sequence": 113,
       "unit": "B2.3",
       "title": "Although, despite, however: memilih penanda kontras",
       "prerequisites": [],
@@ -1238,7 +1357,7 @@
     {
       "lessonId": "result_connectors_so_such_that_therefore_distinction",
       "level": "B2",
-      "sequence": 105,
+      "sequence": 114,
       "unit": "B2.3",
       "title": "So, such, therefore: merangkai sebab jadi akibat",
       "prerequisites": [],
@@ -1249,7 +1368,7 @@
     {
       "lessonId": "modal_of_criticism_should_have_vs_could_have_contrast",
       "level": "B2",
-      "sequence": 106,
+      "sequence": 115,
       "unit": "B2.4",
       "title": "Should have vs could have: teguran atau peluang",
       "prerequisites": [],
@@ -1260,7 +1379,7 @@
     {
       "lessonId": "conditional_with_unless_provided_that_as_long_as_distinction",
       "level": "B2",
-      "sequence": 107,
+      "sequence": 116,
       "unit": "B2.4",
       "title": "Unless, provided that, as long as: memasang syarat",
       "prerequisites": [],
@@ -1271,7 +1390,7 @@
     {
       "lessonId": "passive_with_two_objects_verb_give_send_choice_of_subject",
       "level": "B2",
-      "sequence": 108,
+      "sequence": 117,
       "unit": "B2.4",
       "title": "Pasif give dan send: memilih subjeknya",
       "prerequisites": [],
@@ -1282,7 +1401,7 @@
     {
       "lessonId": "reporting_verb_pattern_deny_admit_apologize_for",
       "level": "B2",
-      "sequence": 109,
+      "sequence": 118,
       "unit": "B2.4",
       "title": "Deny, admit, apologize for: pola kata pelapor",
       "prerequisites": [],
@@ -1293,9 +1412,9 @@
     {
       "lessonId": "zero_article_with_proper_nouns_exceptions_the_netherlands",
       "level": "B2",
-      "sequence": 110,
+      "sequence": 119,
       "unit": "B2.4",
-      "title": "Nama tempat dengan \u201cthe\u201d: the Netherlands dan kawannya",
+      "title": "Nama tempat dengan “the”: the Netherlands dan kawannya",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "b5_011",
@@ -1304,7 +1423,7 @@
     {
       "lessonId": "dependent_preposition_after_noun_reason_for_solution_to",
       "level": "B2",
-      "sequence": 111,
+      "sequence": 120,
       "unit": "B2.4",
       "title": "Reason for, solution to: pasangan kata benda",
       "prerequisites": [],
@@ -1315,7 +1434,7 @@
     {
       "lessonId": "superlative_with_ever_present_perfect_combination",
       "level": "B2",
-      "sequence": 112,
+      "sequence": 121,
       "unit": "B2.4",
       "title": "Superlative dengan ever dan present perfect",
       "prerequisites": [],
@@ -1326,7 +1445,7 @@
     {
       "lessonId": "parallel_structure_error_correction",
       "level": "B2",
-      "sequence": 113,
+      "sequence": 122,
       "unit": "B2.4",
       "title": "Struktur paralel: menyamakan bentuk dalam daftar",
       "prerequisites": [],
@@ -1337,7 +1456,7 @@
     {
       "lessonId": "mixed_conditional_past_cause_present_result",
       "level": "C1",
-      "sequence": 114,
+      "sequence": 123,
       "unit": "C1.1",
       "title": "Mixed conditional: sebab lampau, akibat sekarang",
       "prerequisites": [],
@@ -1348,7 +1467,7 @@
     {
       "lessonId": "reduced_relative_clauses_participle",
       "level": "C1",
-      "sequence": 115,
+      "sequence": 124,
       "unit": "C1.1",
       "title": "Relative clause diringkas jadi participle",
       "prerequisites": [],
@@ -1359,7 +1478,7 @@
     {
       "lessonId": "past_perfect_continuous_background_cause",
       "level": "C1",
-      "sequence": 116,
+      "sequence": 125,
       "unit": "C1.1",
       "title": "Past perfect continuous: sebab lama di belakang cerita",
       "prerequisites": [],
@@ -1370,7 +1489,7 @@
     {
       "lessonId": "formal_inversion_had_i_known",
       "level": "C1",
-      "sequence": 117,
+      "sequence": 126,
       "unit": "C1.1",
       "title": "Had I known: pengandaian lampau tanpa if",
       "prerequisites": [],
@@ -1381,7 +1500,7 @@
     {
       "lessonId": "implied_conditional_otherwise",
       "level": "C1",
-      "sequence": 118,
+      "sequence": 127,
       "unit": "C1.1",
       "title": "Otherwise: syarat yang tersirat",
       "prerequisites": [],
@@ -1392,7 +1511,7 @@
     {
       "lessonId": "reporting_first_conditional_sentences",
       "level": "C1",
-      "sequence": 119,
+      "sequence": 128,
       "unit": "C1.1",
       "title": "Melaporkan kalimat first conditional",
       "prerequisites": [],
@@ -1403,7 +1522,7 @@
     {
       "lessonId": "preposition_placement_formal_vs_informal_relative_clause",
       "level": "C1",
-      "sequence": 120,
+      "sequence": 129,
       "unit": "C1.1",
       "title": "Kata depan di relative clause: formal atau santai",
       "prerequisites": [],
@@ -1414,7 +1533,7 @@
     {
       "lessonId": "future_perfect_continuous_duration_before_deadline",
       "level": "C1",
-      "sequence": 121,
+      "sequence": 130,
       "unit": "C1.1",
       "title": "Future perfect continuous: durasi sampai batas waktu",
       "prerequisites": [],
@@ -1425,7 +1544,7 @@
     {
       "lessonId": "conditional_inversion_were_i_to",
       "level": "C1",
-      "sequence": 122,
+      "sequence": 131,
       "unit": "C1.2",
       "title": "Were I to: pengandaian formal tanpa if",
       "prerequisites": [],
@@ -1436,7 +1555,7 @@
     {
       "lessonId": "impersonal_passive_reporting_believed_thought",
       "level": "C1",
-      "sequence": 123,
+      "sequence": 132,
       "unit": "C1.2",
       "title": "Is believed to, is thought to: pelaporan pasif",
       "prerequisites": [],
@@ -1447,7 +1566,7 @@
     {
       "lessonId": "dangling_modifier_correction",
       "level": "C1",
-      "sequence": 124,
+      "sequence": 133,
       "unit": "C1.2",
       "title": "Dangling modifier: keterangan yang kehilangan pemilik",
       "prerequisites": [],
@@ -1458,7 +1577,7 @@
     {
       "lessonId": "cleft_sentences_it_was_x_that_emphasis",
       "level": "C1",
-      "sequence": 125,
+      "sequence": 134,
       "unit": "C1.2",
       "title": "Cleft sentence: it was X that untuk penekanan",
       "prerequisites": [],
@@ -1469,7 +1588,7 @@
     {
       "lessonId": "mixed_conditional_present_cause_past_result",
       "level": "C1",
-      "sequence": 126,
+      "sequence": 135,
       "unit": "C1.2",
       "title": "Mixed conditional: sebab sekarang, akibat lampau",
       "prerequisites": [],
@@ -1480,7 +1599,7 @@
     {
       "lessonId": "passive_gerund_vs_passive_infinitive_after_verb",
       "level": "C1",
-      "sequence": 127,
+      "sequence": 136,
       "unit": "C1.2",
       "title": "Passive gerund vs passive infinitive setelah kata kerja",
       "prerequisites": [],
@@ -1491,7 +1610,7 @@
     {
       "lessonId": "verb_pattern_regret_mean_go_on_meaning_change",
       "level": "C1",
-      "sequence": 128,
+      "sequence": 137,
       "unit": "C1.2",
       "title": "Regret, mean, go on: -ing atau to",
       "prerequisites": [],
@@ -1502,7 +1621,7 @@
     {
       "lessonId": "perfect_gerund_vs_simple_gerund_time_reference",
       "level": "C1",
-      "sequence": 129,
+      "sequence": 138,
       "unit": "C1.2",
       "title": "Having done vs doing: urutan waktunya beda",
       "prerequisites": [],
@@ -1513,7 +1632,7 @@
     {
       "lessonId": "relative_clause_with_quantifier_some_of_which_many_of_whom",
       "level": "C1",
-      "sequence": 130,
+      "sequence": 139,
       "unit": "C1.3",
       "title": "Relative clause dengan jumlah: some of which",
       "prerequisites": [],
@@ -1524,7 +1643,7 @@
     {
       "lessonId": "addition_connectors_furthermore_in_addition_moreover_register",
       "level": "C1",
-      "sequence": 131,
+      "sequence": 140,
       "unit": "C1.3",
       "title": "Furthermore, in addition, moreover: penambah bernada formal",
       "prerequisites": [],
@@ -1535,7 +1654,7 @@
     {
       "lessonId": "negative_adverbial_inversion_never_rarely_not_only",
       "level": "C1",
-      "sequence": 132,
+      "sequence": 141,
       "unit": "C1.3",
       "title": "Never, rarely, not only di depan: susunan dibalik",
       "prerequisites": [],
@@ -1546,7 +1665,7 @@
     {
       "lessonId": "fronting_for_emphasis_such_was_the_impact",
       "level": "C2",
-      "sequence": 133,
+      "sequence": 142,
       "unit": "C2.1",
       "title": "Fronting: membawa such was the impact ke depan",
       "prerequisites": [],
@@ -1557,7 +1676,7 @@
     {
       "lessonId": "mixed_conditional_past_cause_future_result",
       "level": "C2",
-      "sequence": 134,
+      "sequence": 143,
       "unit": "C2.1",
       "title": "Mixed conditional: sebab lampau, akibat masa depan",
       "prerequisites": [],
@@ -1568,7 +1687,7 @@
     {
       "lessonId": "modal_deduction_past_progressive",
       "level": "C2",
-      "sequence": 135,
+      "sequence": 144,
       "unit": "C2.1",
       "title": "Must have been doing: menyimpulkan proses lampau",
       "prerequisites": [],
@@ -1579,7 +1698,7 @@
     {
       "lessonId": "inversion_after_only_restrictive_phrase",
       "level": "C2",
-      "sequence": 136,
+      "sequence": 145,
       "unit": "C2.1",
       "title": "Only after, only when: susunan kalimat dibalik",
       "prerequisites": [],
@@ -1590,7 +1709,7 @@
     {
       "lessonId": "pseudo_cleft_what_clause_emphasis",
       "level": "C2",
-      "sequence": 137,
+      "sequence": 146,
       "unit": "C2.1",
       "title": "Pseudo-cleft: what clause untuk penekanan",
       "prerequisites": [],
@@ -1601,7 +1720,7 @@
     {
       "lessonId": "participle_clause",
       "level": "C2",
-      "sequence": 138,
+      "sequence": 147,
       "unit": "C2.1",
       "title": "Participle clause: meringkas kalimat dengan -ing dan -ed",
       "prerequisites": [],
@@ -1612,13 +1731,78 @@
     {
       "lessonId": "concession_linking",
       "level": "C2",
-      "sequence": 139,
+      "sequence": 148,
       "unit": "C2.1",
       "title": "Penghubung konsesi: mengakui lawan, menegaskan pendapat",
       "prerequisites": [],
       "source": "grammar-templates.json",
       "templateId": "C2-007",
       "titleEn": "concession linking"
+    },
+    {
+      "lessonId": "future_perfect_epistemic_past_assumption",
+      "level": "C2",
+      "sequence": 149,
+      "unit": "C2.1",
+      "title": "Will have + participle: dugaan yakin soal yang udah kejadian",
+      "prerequisites": [
+        "future_continuous_vs_future_perfect"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "TA-013",
+      "titleEn": "epistemic future perfect for confident assumptions"
+    },
+    {
+      "lessonId": "perfect_passive_infinitive_anteriority_reported_events",
+      "level": "C2",
+      "sequence": 150,
+      "unit": "C2.2",
+      "title": "To have been done: pasif yang kejadiannya lebih dulu",
+      "prerequisites": [
+        "impersonal_passive_reporting_believed_thought"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "PA-007",
+      "titleEn": "perfect passive infinitive for anteriority"
+    },
+    {
+      "lessonId": "mandative_subjunctive_after_demand_insist",
+      "level": "C2",
+      "sequence": 151,
+      "unit": "C2.2",
+      "title": "Demand that he resign: subjunctive bentuk dasar",
+      "prerequisites": [
+        "reporting_verb_choice_suggest_vs_tell"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "RS-007",
+      "titleEn": "mandative subjunctive after demand and insist"
+    },
+    {
+      "lessonId": "sentential_which_whole_clause_antecedent",
+      "level": "C2",
+      "sequence": 152,
+      "unit": "C2.2",
+      "title": "Koma + which: komentar buat satu klausa utuh",
+      "prerequisites": [
+        "defining_vs_nondefining"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "RC-005",
+      "titleEn": "sentential which with a clause antecedent"
+    },
+    {
+      "lessonId": "generic_the_species_class_predicates",
+      "level": "C2",
+      "sequence": 153,
+      "unit": "C2.2",
+      "title": "The generik: ngomongin spesies sebagai kelas",
+      "prerequisites": [
+        "zero_article_generic_plural_vs_the_specific"
+      ],
+      "source": "grammar-templates.json",
+      "templateId": "AR-006",
+      "titleEn": "generic the for species and classes"
     }
   ]
 }

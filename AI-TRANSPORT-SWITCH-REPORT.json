@@ -11,7 +11,7 @@
     {
       "name": "Blok transport AI bisa dipotong lewat sentinel AI-TASK-TRANSPORT-BEGIN/END",
       "status": "PASS",
-      "details": "begin=539526 end=556981"
+      "details": "begin=626360 end=643815"
     },
     {
       "name": "Fungsi render AI bisa dipotong dari app.js",
@@ -26,7 +26,7 @@
     {
       "name": "Kelima schema task terbaca dari workers/api/ai/ai-tasks.js",
       "status": "PASS",
-      "details": "tutor_turn=6, writing_feedback=4, context_coach=6, translate_subtitle=3, session_recap=4"
+      "details": "tutor_turn=6, writing_feedback=6, context_coach=6, translate_subtitle=3, session_recap=4"
     },
     {
       "name": "Daftar field terlarang terbaca dari registry Worker",
@@ -201,7 +201,7 @@
     {
       "name": "(b) writing_feedback: semua field dikenali schema writing_feedback",
       "status": "PASS",
-      "details": "dikirim=text,promptId,level,rubricId diizinkan=text,promptId,level,rubricId"
+      "details": "dikirim=text,promptId,level,rubricId diizinkan=text,promptId,promptText,examBrief,level,rubricId"
     },
     {
       "name": "(b) writing_feedback: field wajib writing_feedback lengkap",

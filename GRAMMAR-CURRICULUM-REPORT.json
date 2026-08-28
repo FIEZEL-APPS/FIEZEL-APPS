@@ -4,7 +4,7 @@
   "counts": {
     "pass": 12,
     "fail": 0,
-    "lessons": 139,
+    "lessons": 153,
     "a1Lessons": 17,
     "classroomA1Lessons": 15
   },
@@ -17,12 +17,12 @@
     {
       "name": "Curriculum inventory matches grammar master",
       "status": "PASS",
-      "details": "curriculum=139 templates=139"
+      "details": "curriculum=153 templates=153"
     },
     {
       "name": "Unique lesson identities",
       "status": "PASS",
-      "details": "lessons=139 templates=139"
+      "details": "lessons=153 templates=153"
     },
     {
       "name": "Contiguous ordered sequence",
@@ -37,7 +37,7 @@
     {
       "name": "Level metadata counts",
       "status": "PASS",
-      "details": "{\"A1\":17,\"A2\":17,\"B1\":47,\"B2\":32,\"C1\":19,\"C2\":7}"
+      "details": "{\"A1\":17,\"A2\":24,\"B1\":48,\"B2\":33,\"C1\":19,\"C2\":12}"
     },
     {
       "name": "Lesson and template field completeness",

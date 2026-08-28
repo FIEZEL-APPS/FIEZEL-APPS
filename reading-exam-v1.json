@@ -216,12 +216,12 @@
           "type": "multiple_choice",
           "stem": "Mengapa penulis menyatakan bahwa waktunya 'does not fit neatly'?",
           "options": [
-            "Karena sebagian jaringan ditutup sebelum kepemilikan mobil meluas",
+            "Karena catatan tarif dari masa itu tidak lengkap",
             "Karena mobil ternyata lebih lambat daripada trem",
             "Karena penumpang trem tidak pernah berkurang di kota mana pun",
-            "Karena catatan tarif dari masa itu tidak lengkap"
+            "Karena sebagian jaringan ditutup sebelum kepemilikan mobil meluas"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "In several cities the tram network was closed years before car ownership became widespread",
             "why": "Kalau mobil yang mengalahkan trem, penutupannya mestinya terjadi SETELAH mobil meluas - dan di beberapa kota urutannya terbalik.",
@@ -267,12 +267,12 @@
           "type": "multiple_choice",
           "stem": "Ciri apa yang dimiliki bersama oleh kota yang berhasil membangun kembali tremnya?",
           "options": [
-            "Rutenya ditentukan dari pola perjalanan yang sudah ada",
+            "Mereka melarang mobil pribadi di pusat kota",
             "Mereka membangun jalur terpanjang yang mampu dibiayai",
             "Mereka memakai kembali rel dari sebelum perang",
-            "Mereka melarang mobil pribadi di pusat kota"
+            "Rutenya ditentukan dari pola perjalanan yang sudah ada"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "they decided the route on the basis of where people already travelled, rather than where planners hoped development would follow",
             "why": "Cirinya justru tidak megah: rute mengikuti ke mana orang memang sudah bepergian, bukan ke mana pembangunan diharapkan menyusul.",
@@ -289,7 +289,7 @@
       "level": "C1",
       "title": "Reading the Rings of Trees",
       "topic": "dendrochronology",
-      "text": "In temperate climates a tree adds one layer of wood each year, and the layers are visible in cross-section as rings. Wide rings correspond to favourable growing seasons and narrow rings to poor ones. Because every tree in a region experiences the same weather, trees of the same species growing near one another produce the same pattern of wide and narrow rings. That shared pattern is what makes the rings useful as a record. A single tree tells you about one organism; a pattern repeated across many trees tells you about a climate.\n\nThe technique that exploits this is called crossdating. An investigator measures the ring widths of a living tree whose outer ring corresponds to a known year, then looks for the same sequence of wide and narrow rings in a beam taken from an older structure. Where the sequences overlap, the beam can be dated exactly. The overlapping beam then extends the reference sequence further back, and the process repeats. Chronologies assembled in this way now reach back more than eight thousand years in some regions, and each year in them is a calendar year rather than an estimate.\n\nThe precision is the point. Radiocarbon dating, the other main technique available to archaeologists, returns a range rather than a date, and the width of that range is rarely less than several decades. For many questions a range is sufficient. For others it is not. If the question is whether a particular roof beam was cut before or after a documented siege, a range that spans the siege answers nothing. Tree rings, where the wood survives, can settle it.\n\nThe method has strict limits, and they are worth stating plainly. It requires a species that produces one clear ring per year, which excludes most tropical trees, where growth is not interrupted by a cold season. It requires enough rings in the sample to produce a distinctive pattern; a beam with thirty rings may match the reference sequence in several places by chance. It requires that the outermost ring be present, or the date obtained is the date of some year before felling rather than the felling itself, and carpenters routinely trimmed away the outer wood. A date reported without this qualification can be wrong by decades in a direction that is not random: always too early.\n\nBeyond dating, the rings carry environmental information. A ring formed during a drought is narrow, and a sequence of narrow rings across many trees over a wide area indicates a regional drought rather than a local misfortune. Reconstructions built this way have identified severe multi-year droughts in the American Southwest that coincide with the abandonment of settlements, and comparable episodes elsewhere. The correspondence is suggestive, and it has often been reported as though it settled the matter. It does not. A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it, and the archaeological record in several of these cases shows movement beginning before the drought did.\n\nRings also record events other than weather. A frost severe enough to damage growing cells leaves a distinctive damaged layer, and such frost rings appear in the same year across widely separated regions after some large volcanic eruptions, which inject material into the upper atmosphere and cool the surface. Because the ring gives an exact year, these layers have been used to date eruptions whose historical records are vague or contradictory. Scars from fire are preserved in the same way, and a fire history assembled from scarred trees can show how frequently a particular forest burned before modern suppression policies began.\n\nNone of this makes the rings a transparent window. Interpretation involves judgement about which trees to sample, how to combine sequences that disagree, and how to separate the effects of climate from the effects of a tree's own ageing, since rings tend to narrow as a trunk widens regardless of conditions. Different laboratories processing the same raw measurements have produced reconstructions that differ in their details. What the rings offer is not certainty but an unusually well-anchored starting point: a set of dates that are exact, from which the arguments can proceed.",
+      "text": "In temperate climates a tree adds one layer of wood each year, and the layers are visible in cross-section as rings. Wide rings correspond to favourable growing seasons and narrow rings to poor ones. Because every tree in a region experiences the same weather, trees of the same species growing near one another produce the same pattern of wide and narrow rings. That shared pattern is what makes the rings useful as a record. A single tree tells you about one organism; a pattern repeated across many trees tells you about a climate.\n\nThe technique that exploits this is called crossdating. An investigator measures the ring widths of a living tree whose outer ring corresponds to a known year, then looks for the same sequence of wide and narrow rings in a beam taken from an older structure. Where the sequences overlap, the beam can be dated exactly. The overlapping beam then extends the reference sequence further back, and the process repeats. Chronologies assembled in this way now reach back more than eight thousand years in some regions, and each year in them is a calendar year rather than an estimate.\n\nThe precision is the point. Radiocarbon dating, the other main technique available to archaeologists, returns a range rather than a date, and the width of that range is rarely less than several decades. For many questions a range is sufficient. For others it is not. If the question is whether a particular roof beam was cut before or after a documented siege, a range that spans the siege answers nothing. Tree rings, where the wood survives, can settle it.\n\nThe method has strict limits, and they are worth stating plainly. It requires a species that produces one clear ring per year, which excludes most tropical trees, where growth is not interrupted by a cold season. It requires enough rings in the sample to produce a distinctive pattern; a beam with thirty rings may match the reference sequence in several places by chance. It requires that the outermost ring be present, or the date obtained is the date of some year before felling rather than the felling itself, and carpenters routinely trimmed away the outer wood. A date reported without this qualification can be wrong by decades in a direction that is not random: always too early.\n\nBeyond dating, the rings carry environmental information. A ring formed during a drought is narrow, and a sequence of narrow rings across many trees over a wide area indicates a regional drought rather than a local misfortune. Reconstructions built this way have identified severe multi-year droughts in the American Southwest that coincide with the abandonment of settlements, and comparable episodes elsewhere. The correspondence is suggestive, and it has often been reported as though it settled the matter. It does not. A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it, and the archaeological record in several of these cases shows movement beginning before the drought did.\n\nRings also record events other than weather. A frost severe enough to damage growing cells leaves a distinctive damaged layer, and such frost rings appear in the same year across widely separated regions after some large volcanic eruptions, which inject material into the upper atmosphere and cool the surface. Because the ring gives an exact year, these layers have been used to date eruptions whose historical records are vague or contradictory. Scars from fire are preserved in the same way, and a fire history assembled from scarred trees can show how frequently a particular forest burned before modern suppression policies began.\n\nNone of this makes the rings a transparent window. Interpretation involves judgement about which trees to sample, how to combine sequences that disagree, and how to separate the effects of climate from the effects of a tree's own ageing, since rings tend to narrow as a trunk widens regardless of conditions: the same annual increment of wood is spread over a longer circumference. Different laboratories processing the same raw measurements have produced reconstructions that differ in their details. What the rings offer is not certainty but an unusually well-anchored starting point: a set of dates that are exact, from which the arguments can proceed.",
       "questions": [
         {
           "id": "rx-rings-1",
@@ -314,11 +314,11 @@
           "stem": "According to paragraph 2, how is a reference sequence extended further back in time?",
           "options": [
             "By counting rings on the oldest living tree available",
-            "By overlapping an older beam with a sequence that is already dated",
             "By comparing rings with radiocarbon results",
+            "By overlapping an older beam with a sequence that is already dated",
             "By sampling trees from several different regions"
           ],
-          "answerIndex": 1,
+          "answerIndex": 2,
           "explain": {
             "evidence": "The overlapping beam then extends the reference sequence further back, and the process repeats",
             "why": "Crossdating menyambung: balok yang lebih tua ditumpangkan pada urutan yang sudah bertanggal, lalu jadi dasar sambungan berikutnya.",
@@ -364,12 +364,12 @@
           "type": "inference",
           "stem": "It can be inferred from paragraph 4 that a felling date reported without noting a missing outer ring will most likely be",
           "options": [
-            "too early",
             "too late",
+            "too early",
             "accurate within one year",
             "impossible to compare with other dates"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "the date obtained is the date of some year before felling rather than the felling itself... always too early",
             "why": "Kalau cincin terluar sudah diserut tukang kayu, tanggal yang didapat adalah tahun SEBELUM penebangan - jadi selalu terlalu awal.",
@@ -381,12 +381,12 @@
           "type": "sentence_simplification",
           "stem": "Which sentence best expresses the essential information in: \"A drought that coincides with an abandonment establishes that the two happened together; it does not establish that people left because of it\"?",
           "options": [
-            "Timing alone does not prove that the drought caused the departure",
+            "Abandonments can only be explained by studying rainfall",
             "Droughts and abandonments were never connected in any way",
             "People always left their settlements before a drought started",
-            "Abandonments can only be explained by studying rainfall"
+            "Timing alone does not prove that the drought caused the departure"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "it does not establish that people left because of it",
             "why": "Bersamaan waktu membuktikan kebersamaan, bukan sebab-akibat. Itu inti kalimatnya.",
@@ -398,12 +398,12 @@
           "type": "rhetorical_purpose",
           "stem": "Why does the author mention frost rings after volcanic eruptions?",
           "options": [
-            "To give an example of information in the rings that is not about weather patterns alone",
-            "To argue that volcanic dating is more reliable than crossdating",
             "To explain why tropical trees lack clear rings",
+            "To argue that volcanic dating is more reliable than crossdating",
+            "To give an example of information in the rings that is not about weather patterns alone",
             "To show that historical records of eruptions are usually accurate"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": {
             "evidence": "Rings also record events other than weather",
             "why": "Paragraf itu dibuka dengan pernyataan bahwa cincin merekam peristiwa selain cuaca; frost ring adalah contohnya.",
@@ -422,7 +422,7 @@
           ],
           "answerIndex": 0,
           "explain": {
-            "evidence": "rings tend to narrow as a trunk widens regardless of conditions",
+            "evidence": "rings tend to narrow as a trunk widens regardless of conditions: the same annual increment of wood is spread over a longer circumference",
             "why": "Teks menyatakan penyempitan itu terjadi TERLEPAS dari kondisi - efek geometri batang yang melebar, bukan efek iklim.",
             "whyOthersFail": "Curah hujan, perbedaan laboratorium, dan bekas kebakaran memang disebut di tempat lain, tetapi bukan sebagai sebab penyempitan ini."
           }
@@ -462,7 +462,7 @@
           }
         }
       ],
-      "wordCount": 702,
+      "wordCount": 714,
       "paragraphs": 7
     },
     {
@@ -612,12 +612,12 @@
           "type": "multiple_choice",
           "stem": "Menurut bacaan, apa sebenarnya isi sebuah kode bangunan?",
           "options": [
-            "Catatan kegagalan masa lalu yang ditulis sebagai instruksi",
             "Daftar bahan yang disetujui pemerintah",
+            "Catatan kegagalan masa lalu yang ditulis sebagai instruksi",
             "Perhitungan yang harus diulang setiap proyek",
             "Kesepakatan harga antara insinyur dan klien"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "a code is, in substance, a record of past failures written in the form of instructions",
             "why": "Tiap klausul biasanya ada karena suatu ketika bangunan yang dibangun di bawah standar itu runtuh.",
@@ -629,12 +629,12 @@
           "type": "multiple_choice",
           "stem": "Mengapa penulis menyebut kegagalan berkumpul di sekitar kebaruan?",
           "options": [
-            "Karena kode belum punya apa pun untuk dikatakan tentang hal yang belum pernah gagal",
+            "Karena proyek baru selalu terburu-buru",
             "Karena bahan baru selalu lebih lemah",
             "Karena insinyur muda mengerjakan proyek baru",
-            "Karena proyek baru selalu terburu-buru"
+            "Karena kode belum punya apa pun untuk dikatakan tentang hal yang belum pernah gagal"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "the code has nothing to say, because nothing has yet gone wrong in that particular way",
             "why": "Kehati-hatian yang menumpuk melindungi yang sudah dikenal; di tepi kebaruan perlindungan itu belum terbentuk.",
@@ -663,12 +663,12 @@
           "type": "multiple_choice",
           "stem": "Apa yang penulis catat tentang kasus itu, yang sering dilupakan?",
           "options": [
-            "Kasusnya baru terbuka bertahun-tahun kemudian, dan insentif saat itu mendorong ke arah diam",
             "Perbaikannya gagal dan harus diulang",
+            "Kasusnya baru terbuka bertahun-tahun kemudian, dan insentif saat itu mendorong ke arah diam",
             "Mahasiswa yang bertanya itu tidak pernah diakui",
             "Angin sudut ternyata tidak berbahaya"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "it became public only years afterwards, and that the incentives at the time pointed strongly towards silence",
             "why": "Penulis memuji hasilnya tetapi menolak merapikan ceritanya - itu yang membuat paragraf terakhir tetap terbuka.",
@@ -680,12 +680,12 @@
           "type": "multiple_choice",
           "stem": "Apa yang menurut penulis BELUM selesai?",
           "options": [
-            "Tekanan hukum dan komersial yang melawan keterbukaan belum melemah",
+            "Insinyur belum sepakat soal faktor keamanan",
             "Kode bangunan belum ada di sebagian negara",
             "Perhitungan angin masih belum bisa dilakukan",
-            "Insinyur belum sepakat soal faktor keamanan"
+            "Tekanan hukum dan komersial yang melawan keterbukaan belum melemah"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "the pressures against sharing — legal, commercial, reputational — have not weakened",
             "why": "Yang berubah hanya normanya: menyembunyikan kini dianggap memalukan. Apakah norma itu bertahan saat mahal, diuji tiap tahun.",
@@ -841,12 +841,12 @@
           "type": "multiple_choice",
           "stem": "Apa keunggulan utama ukuran absolut menurut bacaan?",
           "options": [
-            "Ia menghasilkan garis yang bisa dibandingkan antarnegara dan antardekade",
+            "Ia bergerak mengikuti pendapatan menengah",
             "Ia tidak memerlukan data rumah tangga",
             "Ia memasukkan akses layanan",
-            "Ia bergerak mengikuti pendapatan menengah"
+            "Ia menghasilkan garis yang bisa dibandingkan antarnegara dan antardekade"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "it produces a line that can be compared across countries and across decades",
             "why": "Karena itulah angka utama penurunan kemiskinan global sejak 1990 memakai ambang jenis ini.",
@@ -875,12 +875,12 @@
           "type": "multiple_choice",
           "stem": "Menurut penulis, pertanyaan apa yang berguna saat membaca angka kemiskinan?",
           "options": [
-            "Ukuran mana yang dipakai, dan apa yang dianggapnya penting",
             "Berapa banyak orang yang miskin",
+            "Ukuran mana yang dipakai, dan apa yang dianggapnya penting",
             "Siapa yang membiayai surveinya",
             "Kapan data terakhir dikumpulkan"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "The useful question is not \"how many people are poor\", which cannot be answered without a prior choice",
             "why": "Pertanyaan jumlah tidak bisa dijawab tanpa pilihan definisi lebih dulu.",
@@ -892,12 +892,12 @@
           "type": "multiple_choice",
           "stem": "Apa yang penulis katakan bisa terjadi pada ketiga ukuran dalam periode yang sama?",
           "options": [
-            "Ketiganya bisa bergerak ke arah berlawanan di negara yang sama",
+            "Hanya satu yang bisa dihitung tiap tahun",
             "Ketiganya selalu bergerak bersamaan",
             "Dua di antaranya selalu identik",
-            "Hanya satu yang bisa dihitung tiap tahun"
+            "Ketiganya bisa bergerak ke arah berlawanan di negara yang sama"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "they can move in opposite directions over the same period in the same country",
             "why": "Contohnya diberikan: kemiskinan absolut turun sementara relatif naik, atau multidimensi membaik saat keduanya memburuk.",
@@ -909,12 +909,12 @@
           "type": "multiple_choice",
           "stem": "Beban asimetri biaya itu paling berat menimpa siapa?",
           "options": [
-            "Negara yang justru paling membutuhkan jawabannya",
             "Kota besar di negara kaya",
+            "Negara yang justru paling membutuhkan jawabannya",
             "Lembaga statistik internasional",
             "Rumah tangga yang disurvei"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "that constraint bears hardest on exactly the countries where the question matters most",
             "why": "Di mana anggaran ketat, ukuran yang dipilih kadang yang terjangkau - bukan yang paling informatif.",
@@ -955,12 +955,12 @@
           "type": "factual",
           "stem": "According to paragraph 2, why does ice float?",
           "options": [
-            "Water is densest at about four degrees Celsius",
-            "Ice contains trapped air",
             "Cold water sinks continuously",
+            "Ice contains trapped air",
+            "Water is densest at about four degrees Celsius",
             "Wind pushes ice to the surface"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": {
             "evidence": "Water is densest at about four degrees Celsius, and becomes less dense both above and below that temperature",
             "why": "Sifat itulah yang menjelaskan es mengapung DAN susunan danau di pertengahan musim panas.",
@@ -972,12 +972,12 @@
           "type": "factual",
           "stem": "According to paragraph 3, what prevents wind from mixing the whole lake in midsummer?",
           "options": [
-            "A narrow zone in which temperature drops sharply",
             "The depth of the lake alone",
+            "A narrow zone in which temperature drops sharply",
             "Ice remaining at the bottom",
             "The absence of wind in summer"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "Between the warm surface layer and the cold deep water lies a narrow zone in which temperature drops sharply",
             "why": "Zona itu bertindak sebagai penghalang: angin bisa mengaduk lapisan atas, tetapi jarang cukup kuat menembusnya.",
@@ -1023,12 +1023,12 @@
           "type": "factual",
           "stem": "According to paragraph 5, what causes turnover?",
           "options": [
-            "The surface cools until the density difference vanishes",
+            "Ice forming on the surface",
             "Heavy autumn rainfall",
             "Fish moving to deeper water",
-            "Ice forming on the surface"
+            "The surface cools until the density difference vanishes"
           ],
-          "answerIndex": 0,
+          "answerIndex": 3,
           "explain": {
             "evidence": "Once it reaches the temperature of the water below, the density difference vanishes, the barrier disappears",
             "why": "Setelah itu angin sedang saja cukup mengaduk danau dari atas ke bawah, dalam hitungan hari.",
@@ -1057,12 +1057,12 @@
           "type": "rhetorical_purpose",
           "stem": "Why does the author mention tropical and shallow lakes?",
           "options": [
-            "To show that the twice-yearly pattern is not universal",
             "To argue that tropical lakes are healthier",
+            "To show that the twice-yearly pattern is not universal",
             "To explain why textbooks are unreliable",
             "To introduce a new method of measuring oxygen"
           ],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explain": {
             "evidence": "It is not, however, universal, and the exceptions are informative",
             "why": "Keduanya disajikan sebagai dua ujung pengecualian: yang tak pernah mengaduk dan yang mengaduk terus-menerus.",
@@ -1074,12 +1074,12 @@
           "type": "factual",
           "stem": "According to paragraph 9, why do reservoir managers sometimes install aerators?",
           "options": [
-            "To avoid treating water degraded by the lake's own layering",
-            "To raise the temperature of the deep water",
             "To increase algal growth",
+            "To raise the temperature of the deep water",
+            "To avoid treating water degraded by the lake's own layering",
             "To speed up autumn turnover for fish"
           ],
-          "answerIndex": 0,
+          "answerIndex": 2,
           "explain": {
             "evidence": "Managers of such reservoirs sometimes install aerators to break the layering artificially, at considerable running cost",
             "why": "Air dari lapisan tanpa oksigen membawa besi dan mangan terlarut yang harus dibuang sebelum dipakai.",

@@ -85,7 +85,7 @@
       "status": "PASS",
       "details": [
         "rx-tram=736 (700-1000)",
-        "rx-rings=702 (650-750)",
+        "rx-rings=714 (650-750)",
         "rx-fall=735 (700-1000)",
         "rx-poverty=752 (700-1000)",
         "rx-lakes=700 (650-750)"
@@ -96,7 +96,7 @@
       "status": "PASS",
       "details": [
         "rx-tram:736/736",
-        "rx-rings:702/702",
+        "rx-rings:714/714",
         "rx-fall:735/735",
         "rx-poverty:752/752",
         "rx-lakes:700/700"

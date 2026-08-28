@@ -2,16 +2,16 @@
   "schema": "fiezel-cloze-bank-v1",
   "generatedFrom": "grammar-templates.json",
   "counts": {
-    "templates": 139,
-    "items": 112,
-    "rejected": 27,
+    "templates": 153,
+    "items": 123,
+    "rejected": 30,
     "byLevel": {
-      "A2": 12,
-      "B1": 39,
-      "B2": 25,
+      "A2": 19,
+      "B1": 38,
+      "B2": 26,
       "C1": 16,
       "A1": 13,
-      "C2": 7
+      "C2": 11
     }
   },
   "rejected": [
@@ -39,6 +39,11 @@
       "templateId": "PA-004",
       "reason": "multi_blank",
       "detail": "stem memuat 2 blank dengan jawaban gabungan \"have / repaired\" — pemecahan per posisi tidak mekanis"
+    },
+    {
+      "templateId": "AR-002",
+      "reason": "answer_not_typable",
+      "detail": "jawaban \"(no article)\" adalah placeholder meta — jawaban sebenarnya \"tidak ada kata\", mustahil diketik di mode produksi"
     },
     {
       "templateId": "PR-002",
@@ -101,6 +106,11 @@
       "detail": "jawaban \"go\" <3 karakter — grading edit-distance tidak andal"
     },
     {
+      "templateId": "b4_018",
+      "reason": "answer_not_typable",
+      "detail": "jawaban \"[no word needed]\" adalah placeholder meta — jawaban sebenarnya \"tidak ada kata\", mustahil diketik di mode produksi"
+    },
+    {
       "templateId": "b4_021",
       "reason": "no_blank_marker",
       "detail": "stem tidak memuat ___ — jawaban template bukan token/frasa di dalam kalimat target"
@@ -149,6 +159,11 @@
       "templateId": "A1-013",
       "reason": "answer_too_short",
       "detail": "jawaban \"on\" <3 karakter — grading edit-distance tidak andal"
+    },
+    {
+      "templateId": "AR-006",
+      "reason": "answer_ambiguous",
+      "detail": "jawaban \"The\" muncul 3x sebagai frasa utuh di kalimat target"
     }
   ],
   "items": [
@@ -160,7 +175,11 @@
       "sentence": "Look! The chef ___ a new dish right now — you can smell it.",
       "blank": {
         "answer": "is preparing",
-        "alternates": [],
+        "alternates": [
+          "'s preparing",
+          "is making",
+          "is cooking"
+        ],
         "position": 15
       },
       "distractors": [
@@ -186,7 +205,11 @@
       "sentence": "She ___ to Lisbon exactly once, in 2019, before the pandemic changed everything.",
       "blank": {
         "answer": "traveled",
-        "alternates": [],
+        "alternates": [
+          "travelled",
+          "went",
+          "flew"
+        ],
         "position": 4
       },
       "distractors": [
@@ -212,7 +235,11 @@
       "sentence": "Which completion shows a decision made only at the moment of speaking? A: 'The phone's ringing.' B: 'Don't worry, I ___ it.'",
       "blank": {
         "answer": "will get",
-        "alternates": [],
+        "alternates": [
+          "'ll get",
+          "will answer",
+          "'ll answer"
+        ],
         "position": 116
       },
       "distractors": [
@@ -238,7 +265,11 @@
       "sentence": "Visitors ___ leave their bags at the front desk; it's a museum rule, not a choice.",
       "blank": {
         "answer": "must",
-        "alternates": [],
+        "alternates": [
+          "have to",
+          "need to",
+          "are required to"
+        ],
         "position": 9
       },
       "distractors": [
@@ -264,7 +295,9 @@
       "sentence": "Which option expresses the strongest negative deduction supported by the evidence? The lights are off and the car isn't in the driveway, so they ___ be home.",
       "blank": {
         "answer": "can't",
-        "alternates": [],
+        "alternates": [
+          "cannot"
+        ],
         "position": 145
       },
       "distractors": [
@@ -316,7 +349,9 @@
       "sentence": "If I ___ the lottery, I would travel the world — but let's be honest, it's not going to happen.",
       "blank": {
         "answer": "won",
-        "alternates": [],
+        "alternates": [
+          "were to win"
+        ],
         "position": 5
       },
       "distractors": [
@@ -342,7 +377,10 @@
       "sentence": "Which completion most explicitly leaves the unknown builder out of the sentence? The bridge ___ in 1932; nobody today remembers who built it.",
       "blank": {
         "answer": "was constructed",
-        "alternates": [],
+        "alternates": [
+          "was built",
+          "was erected"
+        ],
         "position": 92
       },
       "distractors": [
@@ -394,7 +432,10 @@
       "sentence": "On the way home, she stopped ___ some bread because the bakery was still open.",
       "blank": {
         "answer": "to buy",
-        "alternates": [],
+        "alternates": [
+          "to get",
+          "to pick up"
+        ],
         "position": 29
       },
       "distractors": [
@@ -420,7 +461,11 @@
       "sentence": "Between these two routes, the coastal road is ___ than the mountain pass.",
       "blank": {
         "answer": "more scenic",
-        "alternates": [],
+        "alternates": [
+          "prettier",
+          "more beautiful",
+          "more picturesque"
+        ],
         "position": 46
       },
       "distractors": [
@@ -472,7 +517,12 @@
       "sentence": "I ___ dinner when the power suddenly went out.",
       "blank": {
         "answer": "was cooking",
-        "alternates": [],
+        "alternates": [
+          "was making",
+          "was preparing",
+          "was having",
+          "was eating"
+        ],
         "position": 2
       },
       "distractors": [
@@ -498,7 +548,11 @@
       "sentence": "She ___ three novels this year, and she's already working on a fourth.",
       "blank": {
         "answer": "has written",
-        "alternates": [],
+        "alternates": [
+          "has completed",
+          "has finished",
+          "has published"
+        ],
         "position": 4
       },
       "distractors": [
@@ -521,10 +575,16 @@
       "templateId": "TA-006",
       "skill": "past_perfect_sequencing_two_past_events",
       "level": "B1",
-      "sentence": "By the time the ambulance arrived, the neighbors ___ first aid.",
+      "sentence": "By the time the ambulance arrived, the neighbors ___ first aid, so the paramedics only had to check the bandages.",
       "blank": {
         "answer": "had already given",
-        "alternates": [],
+        "alternates": [
+          "had given",
+          "had provided",
+          "had already provided",
+          "had administered",
+          "had already administered"
+        ],
         "position": 49
       },
       "distractors": [
@@ -550,7 +610,11 @@
       "sentence": "Which completion shows the action already in progress at that exact moment? Don't call at 8pm — I ___ dinner with my in-laws then.",
       "blank": {
         "answer": "will be having",
-        "alternates": [],
+        "alternates": [
+          "'ll be having",
+          "will be eating",
+          "'ll be eating"
+        ],
         "position": 98
       },
       "distractors": [
@@ -576,7 +640,10 @@
       "sentence": "The fire was spreading fast, but the firefighters ___ everyone out of the building.",
       "blank": {
         "answer": "were able to get",
-        "alternates": [],
+        "alternates": [
+          "managed to get",
+          "got"
+        ],
         "position": 50
       },
       "distractors": [
@@ -602,7 +669,9 @@
       "sentence": "Which option expresses the strongest positive past deduction supported by the evidence? The lights are still off and his car isn't here — he ___ left for work already.",
       "blank": {
         "answer": "must have",
-        "alternates": [],
+        "alternates": [
+          "must've"
+        ],
         "position": 141
       },
       "distractors": [
@@ -628,7 +697,13 @@
       "sentence": "You ___ bring your passport to the local gym — a membership card is enough.",
       "blank": {
         "answer": "needn't",
-        "alternates": [],
+        "alternates": [
+          "need not",
+          "don't need to",
+          "do not need to",
+          "don't have to",
+          "do not have to"
+        ],
         "position": 4
       },
       "distractors": [
@@ -654,7 +729,10 @@
       "sentence": "If she ___ earlier, she wouldn't have missed the flight.",
       "blank": {
         "answer": "had left",
-        "alternates": [],
+        "alternates": [
+          "'d left",
+          "had departed"
+        ],
         "position": 7
       },
       "distractors": [
@@ -680,7 +758,9 @@
       "sentence": "If I hadn't taken that job in Berlin, I ___ fluent in German now.",
       "blank": {
         "answer": "wouldn't be",
-        "alternates": [],
+        "alternates": [
+          "would not be"
+        ],
         "position": 40
       },
       "distractors": [
@@ -732,7 +812,10 @@
       "sentence": "This form ___ by a licensed doctor before submission.",
       "blank": {
         "answer": "must be signed",
-        "alternates": [],
+        "alternates": [
+          "has to be signed",
+          "needs to be signed"
+        ],
         "position": 10
       },
       "distractors": [
@@ -781,24 +864,22 @@
       "templateId": "RS-002",
       "skill": "reported_questions_word_order",
       "level": "B1",
-      "sentence": "She asked me ___.",
+      "sentence": "She asked me where I ___.",
       "blank": {
-        "answer": "where I lived",
-        "alternates": [],
-        "position": 13
+        "answer": "lived",
+        "alternates": [
+          "was living",
+          "worked",
+          "was",
+          "stayed",
+          "was staying"
+        ],
+        "position": 21
       },
       "distractors": [
         {
-          "text": "where did I live",
-          "misconception": "keeps the question-form inversion (auxiliary before subject) inside the reported clause"
-        },
-        {
-          "text": "where I did live",
+          "text": "did live",
           "misconception": "keeps 'did' as an unnecessary emphatic auxiliary instead of a simple backshifted past verb"
-        },
-        {
-          "text": "where lived I",
-          "misconception": "produces an ungrammatical inversion not used in either direct or reported questions in this pattern"
         }
       ]
     },
@@ -810,7 +891,9 @@
       "sentence": "The coach said, \"Stop talking and listen!\" -> The coach told the players ___.",
       "blank": {
         "answer": "to stop talking and listen",
-        "alternates": [],
+        "alternates": [
+          "to stop talking and to listen"
+        ],
         "position": 73
       },
       "distractors": [
@@ -836,7 +919,10 @@
       "sentence": "\"Why don't we take the train instead?\" she said. -> She ___ taking the train instead.",
       "blank": {
         "answer": "suggested",
-        "alternates": [],
+        "alternates": [
+          "proposed",
+          "recommended"
+        ],
         "position": 56
       },
       "distractors": [
@@ -855,32 +941,6 @@
       ]
     },
     {
-      "id": "AR-002-cz0",
-      "templateId": "AR-002",
-      "skill": "zero_article_generic_plural_vs_the_specific",
-      "level": "B1",
-      "sentence": "___ Elephants are the largest land animals on Earth.",
-      "blank": {
-        "answer": "(no article)",
-        "alternates": [],
-        "position": 0
-      },
-      "distractors": [
-        {
-          "text": "The",
-          "misconception": "adds a definite article to a generic plural statement about the species as a whole"
-        },
-        {
-          "text": "A",
-          "misconception": "applies a singular indefinite article to a plural noun"
-        },
-        {
-          "text": "An",
-          "misconception": "applies a singular indefinite article to a plural noun and ignores the consonant sound"
-        }
-      ]
-    },
-    {
       "id": "AR-003-cz0",
       "templateId": "AR-003",
       "skill": "much_many_little_few_countability",
@@ -888,7 +948,9 @@
       "sentence": "We don't have ___ chairs for all the guests.",
       "blank": {
         "answer": "many",
-        "alternates": [],
+        "alternates": [
+          "enough"
+        ],
         "position": 14
       },
       "distractors": [
@@ -914,7 +976,9 @@
       "sentence": "I clearly remember ___ the front door before we left this morning.",
       "blank": {
         "answer": "locking",
-        "alternates": [],
+        "alternates": [
+          "having locked"
+        ],
         "position": 19
       },
       "distractors": [
@@ -940,7 +1004,10 @@
       "sentence": "She left work early ___ time to prepare for the interview.",
       "blank": {
         "answer": "to have",
-        "alternates": [],
+        "alternates": [
+          "in order to have",
+          "so as to have"
+        ],
         "position": 20
       },
       "distractors": [
@@ -992,7 +1059,9 @@
       "sentence": "This laptop is ___ the one I had before — both take exactly ten seconds to start up.",
       "blank": {
         "answer": "as fast as",
-        "alternates": [],
+        "alternates": [
+          "as quick as"
+        ],
         "position": 15
       },
       "distractors": [
@@ -1018,7 +1087,9 @@
       "sentence": "Which completion best expresses a gradual increase that keeps continuing? As the deadline approached, the team's schedule became ___.",
       "blank": {
         "answer": "busier and busier",
-        "alternates": [],
+        "alternates": [
+          "increasingly busy"
+        ],
         "position": 129
       },
       "distractors": [
@@ -1044,7 +1115,9 @@
       "sentence": "You look exhausted. ___ you sleep at all last night?",
       "blank": {
         "answer": "Didn't",
-        "alternates": [],
+        "alternates": [
+          "Couldn't"
+        ],
         "position": 20
       },
       "distractors": [
@@ -1067,23 +1140,19 @@
       "templateId": "QN-003",
       "skill": "indirect_questions_embedded_word_order",
       "level": "B1",
-      "sentence": "Excuse me, could you tell me ___?",
+      "sentence": "Excuse me, could you tell me where the nearest ___?",
       "blank": {
-        "answer": "where the nearest pharmacy is",
-        "alternates": [],
-        "position": 29
+        "answer": "pharmacy is",
+        "alternates": [
+          "pharmacy is located",
+          "chemist is",
+          "drugstore is"
+        ],
+        "position": 47
       },
       "distractors": [
         {
-          "text": "where is the nearest pharmacy",
-          "misconception": "keeps direct-question inversion (verb before subject) inside the embedded clause"
-        },
-        {
-          "text": "is where the nearest pharmacy",
-          "misconception": "moves the auxiliary to the very front of the embedded clause, producing an invalid word order"
-        },
-        {
-          "text": "where the nearest pharmacy was",
+          "text": "pharmacy was",
           "misconception": "unnecessarily backshifts to past tense when the pharmacy's existence is a current, general fact"
         }
       ]
@@ -1096,7 +1165,10 @@
       "sentence": "In 2010, nobody guessed that the small startup ___ the entire industry within a decade.",
       "blank": {
         "answer": "would transform",
-        "alternates": [],
+        "alternates": [
+          "was going to transform",
+          "would revolutionize"
+        ],
         "position": 47
       },
       "distractors": [
@@ -1122,7 +1194,10 @@
       "sentence": "Which completion foregrounds the accumulated duration of the studying as the cause of his red eyes? His eyes were red because he ___ all night for the exam.",
       "blank": {
         "answer": "had been studying",
-        "alternates": [],
+        "alternates": [
+          "had been revising",
+          "had been cramming"
+        ],
         "position": 129
       },
       "distractors": [
@@ -1148,7 +1223,9 @@
       "sentence": "Which completion gives the strongest urgent warning tied to the stated consequence? You ___ leave now — if you miss this train, there isn't another one until tomorrow.",
       "blank": {
         "answer": "had better",
-        "alternates": [],
+        "alternates": [
+          "'d better"
+        ],
         "position": 88
       },
       "distractors": [
@@ -1174,7 +1251,10 @@
       "sentence": "I'm not sure where Sam is, and I have no idea what the roads are like — he ___ still be stuck in traffic.",
       "blank": {
         "answer": "might",
-        "alternates": [],
+        "alternates": [
+          "may",
+          "could"
+        ],
         "position": 75
       },
       "distractors": [
@@ -1200,7 +1280,9 @@
       "sentence": "He's exhausted today — he ___ up so late watching movies last night.",
       "blank": {
         "answer": "shouldn't have stayed",
-        "alternates": [],
+        "alternates": [
+          "should not have stayed"
+        ],
         "position": 26
       },
       "distractors": [
@@ -1252,7 +1334,9 @@
       "sentence": "The bridge was closed for repairs; otherwise, the trip ___ much shorter.",
       "blank": {
         "answer": "would have been",
-        "alternates": [],
+        "alternates": [
+          "would've been"
+        ],
         "position": 55
       },
       "distractors": [
@@ -1278,7 +1362,13 @@
       "sentence": "___ that the ancient city was destroyed by an earthquake, though no written records survive.",
       "blank": {
         "answer": "It is believed",
-        "alternates": [],
+        "alternates": [
+          "It is said",
+          "It is thought",
+          "It's believed",
+          "It's said",
+          "It's thought"
+        ],
         "position": 0
       },
       "distractors": [
@@ -1304,7 +1394,11 @@
       "sentence": "The new policy is expected ___ next month, though the exact date hasn't been confirmed.",
       "blank": {
         "answer": "to be announced",
-        "alternates": [],
+        "alternates": [
+          "to be unveiled",
+          "to be introduced",
+          "to be launched"
+        ],
         "position": 27
       },
       "distractors": [
@@ -1330,7 +1424,10 @@
       "sentence": "On Monday, Maria said, 'I'll finish the report today.' A week later, reporting this, you'd say: Maria said she would finish the report ___.",
       "blank": {
         "answer": "that day",
-        "alternates": [],
+        "alternates": [
+          "on that day",
+          "that same day"
+        ],
         "position": 135
       },
       "distractors": [
@@ -1356,7 +1453,9 @@
       "sentence": "Can you pass me ___ books on the shelf over there?",
       "blank": {
         "answer": "those",
-        "alternates": [],
+        "alternates": [
+          "the"
+        ],
         "position": 16
       },
       "distractors": [
@@ -1382,7 +1481,9 @@
       "sentence": "The meeting has been put ___ until next Thursday because two directors are traveling.",
       "blank": {
         "answer": "off",
-        "alternates": [],
+        "alternates": [
+          "back"
+        ],
         "position": 25
       },
       "distractors": [
@@ -1460,7 +1561,9 @@
       "sentence": "This is the colleague ___ I was speaking earlier — a very formal way to phrase it.",
       "blank": {
         "answer": "with whom",
-        "alternates": [],
+        "alternates": [
+          "to whom"
+        ],
         "position": 22
       },
       "distractors": [
@@ -1512,7 +1615,9 @@
       "sentence": "I looked everywhere, but I didn't find ___ in the drawer.",
       "blank": {
         "answer": "anything",
-        "alternates": [],
+        "alternates": [
+          "a thing"
+        ],
         "position": 39
       },
       "distractors": [
@@ -1538,7 +1643,9 @@
       "sentence": "A: 'I don't really enjoy horror movies.' B: '___ I. They give me nightmares.'",
       "blank": {
         "answer": "Neither do",
-        "alternates": [],
+        "alternates": [
+          "Nor do"
+        ],
         "position": 45
       },
       "distractors": [
@@ -1564,7 +1671,9 @@
       "sentence": "According to the timetable, the train ___ at 6:45, so we should leave home by 6:15.",
       "blank": {
         "answer": "leaves",
-        "alternates": [],
+        "alternates": [
+          "departs"
+        ],
         "position": 38
       },
       "distractors": [
@@ -1590,7 +1699,9 @@
       "sentence": "Which completion emphasizes the duration accumulating up to the deadline rather than merely the fact of completion? By the time she retires next year, Maria ____ at this company for over two decades.",
       "blank": {
         "answer": "will have been working",
-        "alternates": [],
+        "alternates": [
+          "'ll have been working"
+        ],
         "position": 157
       },
       "distractors": [
@@ -1616,7 +1727,11 @@
       "sentence": "When I arrived at the station, the train ____ already, so I had to wait for the next one.",
       "blank": {
         "answer": "had left",
-        "alternates": [],
+        "alternates": [
+          "'d left",
+          "had departed",
+          "had gone"
+        ],
         "position": 41
       },
       "distractors": [
@@ -1642,7 +1757,9 @@
       "sentence": "This house ____ to my grandparents; it has been in the family for fifty years.",
       "blank": {
         "answer": "belongs",
-        "alternates": [],
+        "alternates": [
+          "has belonged"
+        ],
         "position": 11
       },
       "distractors": [
@@ -1668,7 +1785,11 @@
       "sentence": "Which completion neutrally states an available past opportunity without criticizing the decision? You ____ the job — they offered it to you, but you turned it down.",
       "blank": {
         "answer": "could have taken",
-        "alternates": [],
+        "alternates": [
+          "could've taken",
+          "could have accepted",
+          "could've accepted"
+        ],
         "position": 102
       },
       "distractors": [
@@ -1746,7 +1867,11 @@
       "sentence": "I'll call you as soon as the train ___.",
       "blank": {
         "answer": "arrives",
-        "alternates": [],
+        "alternates": [
+          "has arrived",
+          "gets in",
+          "comes"
+        ],
         "position": 35
       },
       "distractors": [
@@ -1772,7 +1897,9 @@
       "sentence": "We ___ our roof repaired last week after the storm damaged it.",
       "blank": {
         "answer": "had",
-        "alternates": [],
+        "alternates": [
+          "got"
+        ],
         "position": 3
       },
       "distractors": [
@@ -1798,7 +1925,11 @@
       "sentence": "The suspect ____ have left the country before the investigation began.",
       "blank": {
         "answer": "is believed to",
-        "alternates": [],
+        "alternates": [
+          "is thought to",
+          "is said to",
+          "is alleged to"
+        ],
         "position": 12
       },
       "distractors": [
@@ -1824,7 +1955,11 @@
       "sentence": "He asked me, “Did you lock the door?” -> He asked me ___ the door.",
       "blank": {
         "answer": "whether I had locked",
-        "alternates": [],
+        "alternates": [
+          "if I had locked",
+          "if I'd locked",
+          "whether I'd locked"
+        ],
         "position": 53
       },
       "distractors": [
@@ -1850,7 +1985,9 @@
       "sentence": "To express attendance for the institution's normal purpose, not movement to a building: During term time, the children go to ____ every weekday to study.",
       "blank": {
         "answer": "school",
-        "alternates": [],
+        "alternates": [
+          "class"
+        ],
         "position": 125
       },
       "distractors": [
@@ -1876,7 +2013,10 @@
       "sentence": "I bumped into ____ at the airport yesterday.",
       "blank": {
         "answer": "a friend of mine",
-        "alternates": [],
+        "alternates": [
+          "a friend",
+          "my friend"
+        ],
         "position": 14
       },
       "distractors": [
@@ -1902,7 +2042,10 @@
       "sentence": "The fire alarm went off ____ the meeting, so everyone had to leave the building.",
       "blank": {
         "answer": "during",
-        "alternates": [],
+        "alternates": [
+          "in the middle of",
+          "halfway through"
+        ],
         "position": 24
       },
       "distractors": [
@@ -1954,7 +2097,10 @@
       "sentence": "____ regularly is one of the best things you can do for your long-term health.",
       "blank": {
         "answer": "Exercising",
-        "alternates": [],
+        "alternates": [
+          "To exercise",
+          "Working out"
+        ],
         "position": 0
       },
       "distractors": [
@@ -1973,32 +2119,6 @@
       ]
     },
     {
-      "id": "b4_018-cz0",
-      "templateId": "b4_018",
-      "skill": "relative_clause_omitting_object_pronoun",
-      "level": "B1",
-      "sentence": "The book ____ I borrowed from the library was due back yesterday.",
-      "blank": {
-        "answer": "[no word needed]",
-        "alternates": [],
-        "position": 9
-      },
-      "distractors": [
-        {
-          "text": "who",
-          "misconception": "Uses a personal relative pronoun for a non-human antecedent."
-        },
-        {
-          "text": "whom, which",
-          "misconception": "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things."
-        },
-        {
-          "text": "what",
-          "misconception": "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error."
-        }
-      ]
-    },
-    {
       "id": "b4_019-cz0",
       "templateId": "b4_019",
       "skill": "comparative_intensifiers_much_far_a_lot_before_comparative",
@@ -2006,7 +2126,13 @@
       "sentence": "This new laptop is ____ faster than my old one.",
       "blank": {
         "answer": "much",
-        "alternates": [],
+        "alternates": [
+          "far",
+          "a lot",
+          "considerably",
+          "significantly",
+          "way"
+        ],
         "position": 19
       },
       "distractors": [
@@ -2058,7 +2184,10 @@
       "sentence": "____ the heavy rain, the outdoor concert went ahead as planned.",
       "blank": {
         "answer": "Despite",
-        "alternates": [],
+        "alternates": [
+          "In spite of",
+          "Notwithstanding"
+        ],
         "position": 0
       },
       "distractors": [
@@ -2084,7 +2213,9 @@
       "sentence": "Original: Sarah broke the vase, not her brother. Cleft emphasis: ____ broke the vase, not her brother.",
       "blank": {
         "answer": "It was Sarah that",
-        "alternates": [],
+        "alternates": [
+          "It was Sarah who"
+        ],
         "position": 65
       },
       "distractors": [
@@ -2110,7 +2241,10 @@
       "sentence": "When I was a child, I ____ a small village near the mountains.",
       "blank": {
         "answer": "used to live in",
-        "alternates": [],
+        "alternates": [
+          "lived in",
+          "was living in"
+        ],
         "position": 22
       },
       "distractors": [
@@ -2136,7 +2270,11 @@
       "sentence": "So far this week I ___ three important emails, and there are two more to write before Friday.",
       "blank": {
         "answer": "have sent",
-        "alternates": [],
+        "alternates": [
+          "'ve sent",
+          "have written",
+          "'ve written"
+        ],
         "position": 19
       },
       "distractors": [
@@ -2162,7 +2300,10 @@
       "sentence": "Which completion explicitly criticizes the past decision rather than merely noting a possibility? You ____ more carefully before signing the contract — now we're stuck with these terms.",
       "blank": {
         "answer": "should have read",
-        "alternates": [],
+        "alternates": [
+          "should've read",
+          "ought to have read"
+        ],
         "position": 102
       },
       "distractors": [
@@ -2214,7 +2355,9 @@
       "sentence": "In formal written English, which completion presents his fear as an ongoing trait he still has, rather than only a past state? If he ____ so afraid of flying, he would have joined us on the trip to Japan last year.",
       "blank": {
         "answer": "weren't",
-        "alternates": [],
+        "alternates": [
+          "were not"
+        ],
         "position": 133
       },
       "distractors": [
@@ -2240,7 +2383,14 @@
       "sentence": "You can borrow my car ____ you bring it back before six o'clock.",
       "blank": {
         "answer": "provided that",
-        "alternates": [],
+        "alternates": [
+          "as long as",
+          "so long as",
+          "provided",
+          "providing",
+          "providing that",
+          "on condition that"
+        ],
         "position": 22
       },
       "distractors": [
@@ -2318,7 +2468,10 @@
       "sentence": "He apologized ____ late to the meeting.",
       "blank": {
         "answer": "for being",
-        "alternates": [],
+        "alternates": [
+          "for arriving",
+          "for coming"
+        ],
         "position": 14
       },
       "distractors": [
@@ -2370,7 +2523,9 @@
       "sentence": "I have exactly two close friends. ____ them live in different countries now, so we rarely meet in person.",
       "blank": {
         "answer": "Both of",
-        "alternates": [],
+        "alternates": [
+          "The two of"
+        ],
         "position": 34
       },
       "distractors": [
@@ -2396,7 +2551,10 @@
       "sentence": "We regret ___ you that your application has been unsuccessful.",
       "blank": {
         "answer": "to inform",
-        "alternates": [],
+        "alternates": [
+          "to tell",
+          "to advise"
+        ],
         "position": 10
       },
       "distractors": [
@@ -2422,7 +2580,9 @@
       "sentence": "Which completion most explicitly marks the breaking as earlier than the later admission? He admitted ____ the vase.",
       "blank": {
         "answer": "having broken",
-        "alternates": [],
+        "alternates": [
+          "to having broken"
+        ],
         "position": 101
       },
       "distractors": [
@@ -2448,7 +2608,10 @@
       "sentence": "The charity has over two hundred volunteers, ____ are retired teachers.",
       "blank": {
         "answer": "many of whom",
-        "alternates": [],
+        "alternates": [
+          "some of whom",
+          "most of whom"
+        ],
         "position": 45
       },
       "distractors": [
@@ -2474,7 +2637,10 @@
       "sentence": "____ the window during the storm last night?",
       "blank": {
         "answer": "Who broke",
-        "alternates": [],
+        "alternates": [
+          "What broke",
+          "Who smashed"
+        ],
         "position": 0
       },
       "distractors": [
@@ -2500,7 +2666,10 @@
       "sentence": "She whispered the instructions ____ the other students wouldn't hear.",
       "blank": {
         "answer": "so that",
-        "alternates": [],
+        "alternates": [
+          "so",
+          "in order that"
+        ],
         "position": 31
       },
       "distractors": [
@@ -2526,7 +2695,11 @@
       "sentence": "Which formal conjunctive adverb best completes this academic passage? The study's sample size was too small to generalize the findings. ____, the participants were not randomly selected, further weakening the results.",
       "blank": {
         "answer": "Furthermore",
-        "alternates": [],
+        "alternates": [
+          "Moreover",
+          "In addition",
+          "Additionally"
+        ],
         "position": 136
       },
       "distractors": [
@@ -2552,7 +2725,10 @@
       "sentence": "____ such a disorganized meeting before — nothing was decided at all.",
       "blank": {
         "answer": "Never have I attended",
-        "alternates": [],
+        "alternates": [
+          "Never have I been to",
+          "Never have I seen"
+        ],
         "position": 0
       },
       "distractors": [
@@ -2578,7 +2754,10 @@
       "sentence": "____ of the earthquake that entire buildings collapsed within seconds.",
       "blank": {
         "answer": "Such was the impact",
-        "alternates": [],
+        "alternates": [
+          "Such was the force",
+          "Such was the power"
+        ],
         "position": 0
       },
       "distractors": [
@@ -2604,7 +2783,10 @@
       "sentence": "These days my brother ___ coffee every morning.",
       "blank": {
         "answer": "drinks",
-        "alternates": [],
+        "alternates": [
+          "has",
+          "makes"
+        ],
         "position": 22
       },
       "distractors": [
@@ -2630,7 +2812,10 @@
       "sentence": "They ___ at home today.",
       "blank": {
         "answer": "are",
-        "alternates": [],
+        "alternates": [
+          "'re",
+          "were"
+        ],
         "position": 5
       },
       "distractors": [
@@ -2656,7 +2841,9 @@
       "sentence": "There ___ two books on the table.",
       "blank": {
         "answer": "are",
-        "alternates": [],
+        "alternates": [
+          "were"
+        ],
         "position": 6
       },
       "distractors": [
@@ -2708,7 +2895,9 @@
       "sentence": "My sister ___ swim, but she cannot drive.",
       "blank": {
         "answer": "can",
-        "alternates": [],
+        "alternates": [
+          "is able to"
+        ],
         "position": 10
       },
       "distractors": [
@@ -2760,7 +2949,9 @@
       "sentence": "At 9 p.m. the office lights were on and keyboards could be heard, so the team ___ late at that moment.",
       "blank": {
         "answer": "must have been working",
-        "alternates": [],
+        "alternates": [
+          "must've been working"
+        ],
         "position": 78
       },
       "distractors": [
@@ -2786,7 +2977,10 @@
       "sentence": "Only after the second audit ___ the scale of the error.",
       "blank": {
         "answer": "did the board understand",
-        "alternates": [],
+        "alternates": [
+          "did the board realize",
+          "did the board grasp"
+        ],
         "position": 28
       },
       "distractors": [
@@ -2838,7 +3032,11 @@
       "sentence": "___ the evidence twice, the committee reopened the investigation.",
       "blank": {
         "answer": "Having reviewed",
-        "alternates": [],
+        "alternates": [
+          "Having examined",
+          "Having checked",
+          "After reviewing"
+        ],
         "position": 0
       },
       "distractors": [
@@ -2890,7 +3088,9 @@
       "sentence": "She ___ got a new phone.",
       "blank": {
         "answer": "has",
-        "alternates": [],
+        "alternates": [
+          "'s"
+        ],
         "position": 4
       },
       "distractors": [
@@ -2916,7 +3116,9 @@
       "sentence": "They ___ football yesterday.",
       "blank": {
         "answer": "played",
-        "alternates": [],
+        "alternates": [
+          "watched"
+        ],
         "position": 5
       },
       "distractors": [
@@ -2968,7 +3170,14 @@
       "sentence": "She ___ dinner right now.",
       "blank": {
         "answer": "is cooking",
-        "alternates": [],
+        "alternates": [
+          "'s cooking",
+          "is making",
+          "'s making",
+          "is preparing",
+          "is having",
+          "is eating"
+        ],
         "position": 4
       },
       "distractors": [
@@ -3020,7 +3229,11 @@
       "sentence": "I don't have ___ money.",
       "blank": {
         "answer": "any",
-        "alternates": [],
+        "alternates": [
+          "much",
+          "enough",
+          "a lot of"
+        ],
         "position": 13
       },
       "distractors": [
@@ -3046,7 +3259,9 @@
       "sentence": "___ name is Sari.",
       "blank": {
         "answer": "Her",
-        "alternates": [],
+        "alternates": [
+          "My"
+        ],
         "position": 0
       },
       "distractors": [
@@ -3061,6 +3276,379 @@
         {
           "text": "Me",
           "misconception": "object-pronoun-substitution"
+        }
+      ]
+    },
+    {
+      "id": "A1-018-cz0",
+      "templateId": "A1-018",
+      "skill": "imperative_commands_base_form",
+      "level": "A2",
+      "sentence": "The teacher walks in and says: “___ your books to page 40, everyone.”",
+      "blank": {
+        "answer": "Open",
+        "alternates": [],
+        "position": 32
+      },
+      "distractors": [
+        {
+          "text": "Opens",
+          "misconception": "adding -s as if the command needed subject-verb agreement with a singular subject"
+        },
+        {
+          "text": "Opening",
+          "misconception": "using the -ing form on its own, which describes an activity instead of telling someone to act"
+        },
+        {
+          "text": "To open",
+          "misconception": "using a to-infinitive where a direct command is required"
+        }
+      ]
+    },
+    {
+      "id": "A1-019-cz0",
+      "templateId": "A1-019",
+      "skill": "adverbs_of_frequency_mid_position",
+      "level": "A2",
+      "sentence": "My sister ___ tea after dinner; she never skips it.",
+      "blank": {
+        "answer": "always drinks",
+        "alternates": [
+          "always has"
+        ],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "drinks always",
+          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order"
+        },
+        {
+          "text": "always drink",
+          "misconception": "leaving the bare verb with no third-person marking after a singular subject"
+        },
+        {
+          "text": "is always drink",
+          "misconception": "inserting 'is' before a main verb, blending the 'be' pattern with the present simple"
+        }
+      ]
+    },
+    {
+      "id": "A1-020-cz0",
+      "templateId": "A1-020",
+      "skill": "possessive_s_noun_ownership",
+      "level": "A2",
+      "sentence": "Is this ___ bag? She was sitting here a minute ago.",
+      "blank": {
+        "answer": "Sinta's",
+        "alternates": [
+          "her"
+        ],
+        "position": 8
+      },
+      "distractors": [
+        {
+          "text": "Sinta",
+          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+        },
+        {
+          "text": "Sintas",
+          "misconception": "writes a plain -s ending that superficially resembles the possessive but loses the apostrophe"
+        },
+        {
+          "text": "Sinta her",
+          "misconception": "inserting a duplicate owner pronoun after the name, marking possession twice"
+        }
+      ]
+    },
+    {
+      "id": "A1-021-cz0",
+      "templateId": "A1-021",
+      "skill": "would_like_polite_requests",
+      "level": "A2",
+      "sentence": "At the café counter, the barista asks what you want. You say: “I ___ a glass of orange juice, please.”",
+      "blank": {
+        "answer": "would like",
+        "alternates": [
+          "'d like",
+          "'ll have",
+          "will have",
+          "would love"
+        ],
+        "position": 65
+      },
+      "distractors": [
+        {
+          "text": "like",
+          "misconception": "stating a general preference in casual flat form instead of the polite request formula"
+        },
+        {
+          "text": "am wanting",
+          "misconception": "forcing a stative desire verb into the progressive to sound ongoing"
+        },
+        {
+          "text": "would liking",
+          "misconception": "gluing an -ing onto the verb after 'would', a blend of two separate patterns"
+        }
+      ]
+    },
+    {
+      "id": "GI-006-cz0",
+      "templateId": "GI-006",
+      "skill": "like_love_hate_plus_gerund_preferences",
+      "level": "A2",
+      "sentence": "My brother ___ up early on Sundays, so he never sets an alarm before the weekend.",
+      "blank": {
+        "answer": "hates getting",
+        "alternates": [
+          "hates to get",
+          "hates waking",
+          "hates to wake",
+          "dislikes getting"
+        ],
+        "position": 11
+      },
+      "distractors": [
+        {
+          "text": "hates get",
+          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+        },
+        {
+          "text": "hates to getting",
+          "misconception": "mixes the to-infinitive and the -ing ending into one broken shape"
+        },
+        {
+          "text": "is hate getting",
+          "misconception": "inserting 'is' before the feeling verb, a hybrid of the adjective pattern and a normal verb"
+        }
+      ]
+    },
+    {
+      "id": "TA-011-cz0",
+      "templateId": "TA-011",
+      "skill": "present_perfect_experience_ever_never",
+      "level": "A2",
+      "sentence": "“Have you ever ___ to Japan?” “No, never, but I really want to go.”",
+      "blank": {
+        "answer": "been",
+        "alternates": [
+          "traveled",
+          "travelled"
+        ],
+        "position": 15
+      },
+      "distractors": [
+        {
+          "text": "went",
+          "misconception": "using the past-simple form inside a present perfect question frame"
+        },
+        {
+          "text": "be",
+          "misconception": "leaving the bare verb although 'have' needs the past participle after it"
+        },
+        {
+          "text": "was",
+          "misconception": "mixes 'have' with a finite past form of 'be' instead of the participle"
+        }
+      ]
+    },
+    {
+      "id": "TA-012-cz0",
+      "templateId": "TA-012",
+      "skill": "present_perfect_with_for_since_duration",
+      "level": "A2",
+      "sentence": "We ___ in this flat since 2019, and we still love it here.",
+      "blank": {
+        "answer": "have lived",
+        "alternates": [
+          "'ve lived",
+          "have been living",
+          "'ve been living"
+        ],
+        "position": 3
+      },
+      "distractors": [
+        {
+          "text": "live",
+          "misconception": "using the plain present as a habit statement, ignoring the stretch of time that began in the past"
+        },
+        {
+          "text": "are living",
+          "misconception": "choosing the present progressive for right now, though the span from 2019 needs a past-to-present link"
+        },
+        {
+          "text": "lived",
+          "misconception": "sealing the period off as a completed event, though the family still lives there"
+        }
+      ]
+    },
+    {
+      "id": "CO-008-cz0",
+      "templateId": "CO-008",
+      "skill": "wish_unreal_present_past_simple",
+      "level": "B1",
+      "sentence": "I wish I ___ closer to the office; the commute eats two hours of my day.",
+      "blank": {
+        "answer": "lived",
+        "alternates": [
+          "were living"
+        ],
+        "position": 9
+      },
+      "distractors": [
+        {
+          "text": "live",
+          "misconception": "keeping the present tense after 'wish', reading the situation as a real current fact"
+        },
+        {
+          "text": "would live",
+          "misconception": "inserting 'would' for the speaker's own situation, as if the sentence were a result clause"
+        },
+        {
+          "text": "had lived",
+          "misconception": "reaching two steps back with the past perfect, aiming the wish at a finished past moment"
+        }
+      ]
+    },
+    {
+      "id": "CO-009-cz0",
+      "templateId": "CO-009",
+      "skill": "if_only_past_regret_past_perfect",
+      "level": "B2",
+      "sentence": "If only I ___ the contract more carefully before signing it last year.",
+      "blank": {
+        "answer": "had read",
+        "alternates": [
+          "'d read"
+        ],
+        "position": 10
+      },
+      "distractors": [
+        {
+          "text": "read",
+          "misconception": "staying with the past simple, which cannot mark the unreal past that regret needs"
+        },
+        {
+          "text": "would have read",
+          "misconception": "moving the 'would have' shape of the result clause into the wish clause itself"
+        },
+        {
+          "text": "have read",
+          "misconception": "choosing the present perfect, which ties the missed reading to the present moment"
+        }
+      ]
+    },
+    {
+      "id": "TA-013-cz0",
+      "templateId": "TA-013",
+      "skill": "future_perfect_epistemic_past_assumption",
+      "level": "C2",
+      "sentence": "You ___ the news by now — the memo about the merger went to every department on Monday morning.",
+      "blank": {
+        "answer": "will have heard",
+        "alternates": [
+          "'ll have heard",
+          "must have heard",
+          "must've heard"
+        ],
+        "position": 4
+      },
+      "distractors": [
+        {
+          "text": "will hear",
+          "misconception": "reading 'by now' as a point still ahead and choosing a plain prediction about the future"
+        },
+        {
+          "text": "are hearing",
+          "misconception": "forcing the verb into the present progressive although 'by now' asks for an accumulated result"
+        },
+        {
+          "text": "will be hearing",
+          "misconception": "picking the future continuous for an event the timeline treats as already delivered"
+        }
+      ]
+    },
+    {
+      "id": "PA-007-cz0",
+      "templateId": "PA-007",
+      "skill": "perfect_passive_infinitive_anteriority_reported_events",
+      "level": "C2",
+      "sentence": "The painting is believed ___ from the gallery during the postwar chaos, decades before it resurfaced in Vienna.",
+      "blank": {
+        "answer": "to have been stolen",
+        "alternates": [
+          "to have been taken",
+          "to have been looted"
+        ],
+        "position": 25
+      },
+      "distractors": [
+        {
+          "text": "to be stolen",
+          "misconception": "using the simple passive shape, hiding that the theft was a prior event seen from the report"
+        },
+        {
+          "text": "to have stolen",
+          "misconception": "choosing the active infinitive, which would make the painting the one who stole"
+        },
+        {
+          "text": "having been stolen",
+          "misconception": "attaching a gerund where the reporting verb 'believe' takes the to-infinitive pattern"
+        }
+      ]
+    },
+    {
+      "id": "RS-007-cz0",
+      "templateId": "RS-007",
+      "skill": "mandative_subjunctive_after_demand_insist",
+      "level": "C2",
+      "sentence": "The board formally demanded that the director ___ before the audit results were made public.",
+      "blank": {
+        "answer": "resign",
+        "alternates": [
+          "should resign",
+          "step down"
+        ],
+        "position": 46
+      },
+      "distractors": [
+        {
+          "text": "resigns",
+          "misconception": "applying ordinary subject-verb agreement with a singular subject inside the demand clause"
+        },
+        {
+          "text": "resigned",
+          "misconception": "backshifting the verb as ordinary reported speech instead of keeping the base subjunctive"
+        },
+        {
+          "text": "would resign",
+          "misconception": "softening the demand with a conditional 'would', as if the clause reported a hypothetical"
+        }
+      ]
+    },
+    {
+      "id": "RC-005-cz0",
+      "templateId": "RC-005",
+      "skill": "sentential_which_whole_clause_antecedent",
+      "level": "C2",
+      "sentence": "The shipment arrived nine days late, ___ forced the plant to halt its assembly line.",
+      "blank": {
+        "answer": "which",
+        "alternates": [],
+        "position": 37
+      },
+      "distractors": [
+        {
+          "text": "what",
+          "misconception": "using 'what' as a relative pronoun, though it cannot point back to an antecedent"
+        },
+        {
+          "text": "that",
+          "misconception": "using 'that' to add extra detail after a comma, though it only opens essential clauses"
+        },
+        {
+          "text": "it",
+          "misconception": "starting a fresh pronoun clause and splicing two sentences together in a non-standard join"
         }
       ]
     }

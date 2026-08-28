@@ -160,7 +160,7 @@ module.exports = { level: 'A1', scenarios: [
  ['What is Wawan mainly talking about?','Finding boxes that were missing from the count','A soap shop that his father opens late every night','A book about soap that he reads at home','A door that his father closes after work'],
  ['How many boxes do they find behind the door?','Ten','Eighty','Ninety','No extra boxes'],
  ['What was the first problem?','The number did not match the book','The shop closed too early that night','The soap boxes were old and wet','His father could not count them alone'],
- ['What does Wawan think about counting again?','It was the right thing to do','It was a waste of time','It made his father angry','It is his father job only'],
+ ['What does Wawan think about counting again?','It was the right thing to do','It was a waste of time','It made his father angry','It is his father\'s job only'],
  ["Which sentence means the same as “the book says ninety”?",'The record shows a bigger number','They read a book about ninety','His father writes a new book','Ninety people come to the shop']],
 
 ['Yoga','city park on Sunday morning','Running with a dog',
@@ -250,7 +250,7 @@ module.exports = { level: 'A1', scenarios: [
  ['What is Jamal mainly talking about?','Being too tired to finish his maths at night','Two pages of maths that he writes at school','A father who does maths with him every evening','Numbers that he cannot read in his book'],
  ['How much work does Jamal have left?','Two pages of maths','Ten pages of maths','One page of maths','All of his homework'],
  ['What will Jamal probably do?','Go to bed and work in the morning','Finish everything before eleven','Ask his father for the answers','Leave the homework undone'],
- ['What is his father advice based on?','Rest helps him work better','Maths is not important now','The teacher will not check','Jamal always sleeps early'],
+ ['What is his father\'s advice based on?','Rest helps him work better','Maths is not important now','The teacher will not check','Jamal always sleeps early'],
  ["Which sentence means the same as “the numbers are moving”?",'He can no longer read clearly','His book falls off the desk','He writes the numbers again','The maths problem is difficult']],
 
 ['Kirana','school bus in the morning','Sitting with a new student',
@@ -275,7 +275,7 @@ module.exports = { level: 'A1', scenarios: [
  ['What does the dentist do first?','He explains his tools to her','He asks about her cold hands','He sends her home again','He calls her mother inside'],
  ['Why does the dentist explain the tools?','So that Mira is less afraid','Because Mira wants to be a dentist','Because her mother asks him to','So that Mira can help him'],
  ['How does Mira feel at the end?','Calmer than before','More afraid than before','Angry with her mother','Happy about her bad tooth'],
- ["Which sentence means the same as “My hands are cold because I am afraid”?",'Her body shows her fear','She forgets her gloves at home','The clinic room is very cold','She holds her mother hand']],
+ ["Which sentence means the same as “My hands are cold because I am afraid”?",'Her body shows her fear','She forgets her gloves at home','The clinic room is very cold','She holds her mother\'s hand']],
 
 ['Naufal','mountain path in the morning','A bag that is too heavy',
  'I am Naufal. We walk up the mountain and my bag is very heavy. I put in four bottles of water, but two are enough. My friend Tomi carries less and he walks in front of me all day.',
@@ -322,7 +322,7 @@ module.exports = { level: 'A1', scenarios: [
  ['What is Tegar mainly talking about?','Not being able to climb the whole rope','A gym class that he misses on Monday','A rope that he buys for his school','Arms that hurt after a football game'],
  ['How far does Tegar climb?','To the middle','To the top','Only one meter','He does not climb'],
  ['What will Tegar do this week?','Train on the low bar','Climb the rope again today','Stop going to gym class','Ask for an easier class'],
- ['What is the teacher attitude?','He wants Tegar to keep trying','He thinks Tegar is too weak','He is angry about the rope','He tells Tegar to rest'],
+ ['What is the teacher\'s attitude?','He wants Tegar to keep trying','He thinks Tegar is too weak','He is angry about the rope','He tells Tegar to rest'],
  ["Which sentence means the same as “My arms are not strong yet”?",'He still needs more power','His arms hurt very much','He cannot use his arms','His arms are already strong']],
 
 ['Ulfa','flower shop before the last lesson','Flowers for a teacher',

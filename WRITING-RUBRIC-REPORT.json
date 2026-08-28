@@ -2,7 +2,7 @@
   "status": "PASS",
   "bank": "1.0.0",
   "counts": {
-    "pass": 29,
+    "pass": 35,
     "fail": 0,
     "prompts": 36,
     "perLevel": {
@@ -169,6 +169,36 @@
       "name": "Offline review does not invent a score",
       "status": "PASS",
       "details": "cek offline hanya boleh mengaku memeriksa bentuk"
+    },
+    {
+      "name": "Worker accepts the task text and exam brief as guarded input",
+      "status": "PASS",
+      "details": "promptText/examBrief opsional, dibatasi maxLength"
+    },
+    {
+      "name": "Worker prompt embeds the actual task text, not just the prompt id",
+      "status": "PASS",
+      "details": "model harus melihat apa yang soal minta"
+    },
+    {
+      "name": "Worker prompt carries the same five criteria and 0-4 scale the learner sees",
+      "status": "PASS",
+      "details": "rubrik murid dan rubrik worker harus satu isi — kalau bank berubah, salinan di ai-tasks.js wajib ikut"
+    },
+    {
+      "name": "Worker prompt forbids band and score claims too",
+      "status": "PASS",
+      "details": "aturan kejujuran berlaku di setiap transport"
+    },
+    {
+      "name": "Worker output mode matches the prose the client renders",
+      "status": "PASS",
+      "details": "app.js:5096 renderMarkdown mengonsumsi prosa; response_format json_object bertentangan dengan prompt prosa"
+    },
+    {
+      "name": "Feedback in the demanded format passes the worker output contract",
+      "status": "PASS",
+      "details": "format yang diminta prompt harus lulus pemeriksa keluaran worker sendiri"
     },
     {
       "name": "Form checker is exposed as pure functions",

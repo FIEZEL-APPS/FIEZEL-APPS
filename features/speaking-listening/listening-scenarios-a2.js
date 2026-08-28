@@ -18,7 +18,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Anisa mainly talking about?','A part-time job she started last month','A shop that she wants to open near school','Books that she copies for her friends','A machine that she repaired at the shop'],
  ['How often does Anisa work?','Three afternoons a week','Every afternoon after school','Three days each month','Only at the weekend'],
  ['What does the owner want Anisa to improve?','Her speed with the machine','Her way of talking to customers','The number of days she works','The way she counts the money'],
- ['What is the owner attitude towards Anisa?','She is patient but expects more','She is angry about the machine','She wants Anisa to leave the shop','She never speaks to Anisa'],
+ ['What is the owner\'s attitude towards Anisa?','She is patient but expects more','She is angry about the machine','She wants Anisa to leave the shop','She never speaks to Anisa'],
  ["Which sentence means the same as “I earn enough for my transport and my books”?",'The pay covers what she needs','She spends all her money on books','Her parents pay for her transport','She saves the money for later'],
 ],
 
@@ -36,7 +36,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Cahya mainly talking about?','How far she can run now compared with June','A running club that she started herself','A race that she lost by five kilometers','A coach who runs beside her every day'],
  ['How far can Cahya run now?','Five kilometers without stopping','Two kilometers at most','Ten kilometers on a good day','She does not give a distance'],
  ['Why does the coach warn her?','Adding distance too fast causes injuries','She trains at the wrong time','The club is too big for her','She runs much faster than the others in the club'],
- ['What is the coach main concern?','Keeping Cahya healthy','Winning the next race','Getting more club members','Making training shorter'],
+ ['What is the coach\'s main concern?','Keeping Cahya healthy','Winning the next race','Getting more club members','Making training shorter'],
  ["Which sentence means the same as “without stopping”?",'She keeps going all the way','She stops only one time','She runs very slowly','She finishes before the others'],
 ],
 
@@ -81,7 +81,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Halim mainly talking about?','A weekly service for older people in his street','A shop that his older neighbors opened on Sunday morning','Stories that a grandfather wrote in a book','Bags that he carries to his own house'],
  ['How long does the work take?','About two hours','The whole Sunday','Only a few minutes','Two mornings each week'],
  ['Why do the older people need help?','Heavy bags are difficult for them','The shops are closed on Sunday','They do not know the street','They have no money for food'],
- ['How does Halim describe the grandfather stories?','As a kind of reward','As a waste of time','As payment he refuses','As something he dislikes'],
+ ['How does Halim describe the grandfather\'s stories?','As a kind of reward','As a waste of time','As payment he refuses','As something he dislikes'],
  ["Which sentence means the same as “cannot carry heavy bags any more”?",'They were able to do it before','They never carried bags at all','They prefer lighter shopping','They ask for smaller bags'],
 ],
 
@@ -89,7 +89,7 @@ module.exports = { level: 'A2', scenarios: [
  'My name is Iqbal. I share a room with my younger brother and he plays games until midnight. I have exams next week, so I need to sleep early. We agreed that he can play with headphones, and now the room is quiet.',
  ['What is Iqbal mainly talking about?','How he and his brother made the room quiet','Exams that he must take next week','Video games that he buys for his younger brother','A room that he wants to leave soon'],
  ['What is the agreement between them?','His brother plays with headphones on','His brother gives up his evening games','Iqbal moves to a different bedroom','Iqbal goes to bed after midnight too'],
- ['Why did Iqbal want a change?','He must be ready for his exams','He does not like his brother games','The room was too small for two','His parents told him to complain'],
+ ['Why did Iqbal want a change?','He must be ready for his exams','He does not like his brother\'s games','The room was too small for two','His parents told him to complain'],
  ['How was the problem solved?','Both of them accepted the answer','One of them left the room','Their parents decided for them','The problem is still there'],
  ["Which sentence means the same as “now the room is quiet”?",'The noise has stopped','His brother sleeps early','They no longer share a room','The games are more interesting'],
 ],
@@ -103,8 +103,8 @@ module.exports = { level: 'A2', scenarios: [
  ["Which sentence means the same as “I still arrive on time”?",'She is not late for her lessons','She arrives before everybody','She arrives later than before','She misses the first lesson'],
 ],
 
-['Krisna','online class from his uncle house','A weak internet connection',
- 'My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.',
+['Krisna','online class from his uncle\'s house','A weak internet connection',
+ 'My name is Krisna. My internet at home is weak, so during online lessons I go to my uncle\'s house. His connection is much better and he lets me use the small back room. I only have to be there before eight, because he locks the gate at that time.',
  ['What is Krisna mainly talking about?','Where he goes to join his online lessons','An uncle who teaches him every morning','A gate that he repaired at his house','A small room that he rents in the city'],
  ['When must Krisna arrive?','Before eight','After his first lesson','Before his uncle leaves','At any time in the morning'],
  ['Why does Krisna not stay at home?','His own connection is not strong','His house is too noisy','His uncle asked him to come before eight','He has no computer at home'],
@@ -131,9 +131,9 @@ module.exports = { level: 'A2', scenarios: [
 ],
 
 ['Nabila','school office about a scholarship','Missing one document',
- 'I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents income letter before Friday, or my application will not be read.',
+ 'I am Nabila. I applied for a scholarship and I sent everything by email last Monday. This morning the office called me because one paper was missing. I have to bring my parents\' income letter before Friday, or my application will not be read.',
  ['What is Nabila mainly talking about?','A missing paper she must bring before Friday','A scholarship that she already received this year','An email that the office never opened','A letter that she wrote to her parents'],
- ['What is missing from her application?','The letter about her parents income','Her school report from last year','Her photograph and signature','The email address of the office'],
+ ['What is missing from her application?','The letter about her parents\' income','Her school report from last year','Her photograph and signature','The email address of the office'],
  ['What happens if she is late?','Her application will be ignored','She will pay a small fine','The office will call her again','She can send it by email'],
  ['How urgent is the situation?','She has only a few days','She has several months','There is no time limit','The deadline has passed'],
  ["Which sentence means the same as “I sent everything by email”?",'She used the internet to apply','She went to the office in person','She posted the papers by mail','She gave the papers to a teacher'],
@@ -235,7 +235,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Zulfa mainly talking about?','A bad night of selling because of the rain','A night market that her mother opened','Bananas that she grows behind her house','Neighbors who sell food at the market'],
  ['How much did they sell?','Half of what they usually sell','More bananas than they usually sell','Every fried banana they brought','Nothing at all on that rainy night'],
  ['Why did few people come?','The weather was bad','The market was closed','The price was too high','The bananas were finished'],
- ['What does the mother action show?','She does not like waste','She wanted to make more money','She was angry with the neighbors','She never sells at the market'],
+ ['What does the mother\'s action show?','She does not like waste','She wanted to make more money','She was angry with the neighbors','She never sells at the market'],
  ["Which sentence means the same as “instead of throwing it away”?",'Rather than putting it in the bin','After she had sold everything at the stall','Because the food was bad','Before the market closed'],
 ],
 
@@ -262,7 +262,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Candra mainly talking about?','Learning to drive and finding parking hard','A road that his father repairs on Sunday','A car that he bought with his father','A driving test that he failed three times'],
  ['What does Candra find most difficult?','Putting the car in a parking space','Driving the car at a high speed','Turning the car on a narrow road','Starting the engine of the car'],
  ['How does his father respond to mistakes?','He stays patient and plans more practice','He shouts at Candra in the car','He stops the driving lessons completely','He asks another person to teach'],
- ['What is his father attitude to learning?','It takes time and more practice','It should be quick and easy to learn','It is not worth the trouble at all','It needs many weeks of parking practice'],
+ ['What is his father\'s attitude to learning?','It takes time and more practice','It should be quick and easy to learn','It is not worth the trouble at all','It needs many weeks of parking practice'],
  ["Which sentence means the same as “we would try again next week”?",'The lessons will continue','The lessons are finished','He must drive alone now','His father will drive instead'],
 ],
 
@@ -289,7 +289,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Ferry mainly talking about?','A higher club fee and how the coach answered it','A field that his club bought this year','Three friends who joined the club last month','A coach who left the football club'],
  ['What is the new monthly fee?','Eighty thousand','Fifty thousand','Thirty thousand','The fee did not change'],
  ['What did the coach offer?','Work at the club instead of paying','A free place for every club member','A smaller field for practice','Money for the three friends'],
- ['What does the coach solution show?','He wants to keep the players','He does not need the money','He is angry with the players','He plans to close the club'],
+ ['What does the coach\'s solution show?','He wants to keep the players','He does not need the money','He is angry with the players','He plans to close the club'],
  ["Which sentence means the same as “the field rent went up”?",'The club has to pay more for the ground','The field became much bigger','The club moved to another field','The players stopped using the club field'],
 ],
 
@@ -361,7 +361,7 @@ module.exports = { level: 'A2', scenarios: [
  ['What is Omar mainly talking about?','A ferry delay caused by strong wind','A desk where he works at the port','Passengers who missed the ferry completely','A captain who refused to cross the sea'],
  ['How long was the delay?','Five hours','Five days','Less than one hour','It is not mentioned'],
  ['Why does Omar not blame the staff?','The weather is outside their control','The staff paid for his ferry ticket','He did not notice the delay','He is a friend of the captain'],
- ['What is his attitude towards the captain decision?','He believes it was the safe choice','He thinks the captain waited too long','He wanted the ferry to leave earlier','He does not trust the captain'],
+ ['What is his attitude towards the captain\'s decision?','He believes it was the safe choice','He thinks the captain waited too long','He wanted the ferry to leave earlier','He does not trust the captain'],
  ["Which sentence means the same as “we crossed safely”?",'They reached the other side without harm','They cancelled the whole journey','They returned to the first port','They crossed before the strong wind started'],
 ],
 
