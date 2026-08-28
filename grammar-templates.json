@@ -1023,7 +1023,7 @@
       "options": [
         "already gave",
         "had already given",
-        "were already giving",
+        "are already giving",
         "already give"
       ],
       "correctIndex": 1,
@@ -1036,11 +1036,11 @@
           "misconceptionId": "past simple dipakai buat kejadian yang lebih dulu, jadi urutannya rata."
         },
         {
-          "option": "were already giving",
-          "misconception": "confuses completed prior action with an action still in progress at the reference point",
-          "whyFails": "The first aid was already completed before the ambulance arrived, not still ongoing.",
-          "whyFailsId": "pertolongannya udah kelar sebelum ambulans nyampe, bukan masih jalan.",
-          "misconceptionId": "kejadian yang udah kelar ketuker sama yang masih jalan di titik acuan."
+          "option": "are already giving",
+          "misconception": "keeps the action in progress at 'now' instead of marking it completed before the past reference point",
+          "whyFails": "The past reference point set by 'the ambulance arrived' rules out a present form; the first aid had to be finished before that moment.",
+          "whyFailsId": "“arrived” udah naruh ceritanya di masa lalu, jadi bentuk sekarang nggak nyambung; pertolongannya harus udah kelar sebelum titik itu.",
+          "misconceptionId": "kejadiannya dibiarin jalan di “sekarang”, padahal harusnya udah kelar sebelum titik acuan lampau."
         },
         {
           "option": "already give",
@@ -1053,12 +1053,12 @@
       "explanation": {
         "whyCorrect": "'By the time' + a past-simple event signals a reference point; the action completed before that point needs past perfect.",
         "rule": "Past perfect (had + past participle) marks the earlier of two past actions when the order needs to be unambiguous.",
-        "whyOthersFail": "Past simple for both actions leaves the order ambiguous or wrong; the continuous form wrongly implies the action was unfinished.",
+        "whyOthersFail": "Past simple for both actions leaves the order ambiguous, and the present forms clash with the past reference point set by 'arrived'.",
         "howToAvoid": "When you see 'by the time X happened', make X the reference point, then ask what had already finished before X — that verb takes the past perfect.",
         "memoryCue": "'By the time X happened' -> the other action needs 'had' first.",
         "ruleId": "Past perfect pakai had + bentuk ketiga kata kerja (past participle). Bentuk ini nandain kejadian yang lebih dulu di antara dua kejadian lampau.",
         "whyCorrectId": "“By the time” plus kejadian past simple bikin titik acuan. Kejadian yang kelar sebelum titik itu pakai past perfect.",
-        "whyOthersFailId": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk continuous malah bilang kejadiannya belum kelar.",
+        "whyOthersFailId": "Past simple buat dua-duanya bikin urutannya rancu. Bentuk present malah tabrakan sama titik acuan lampau yang dipasang “arrived”.",
         "howToAvoidId": "Begitu lihat “by the time X happened”, jadiin X titik acuannya. Terus tanya apa yang udah kelar sebelum X.",
         "memoryCueId": "Ada “by the time X happened”, kejadian satunya butuh “had” di depan."
       },
@@ -1830,7 +1830,7 @@
           "option": "An",
           "misconception": "applies a singular indefinite article to a plural noun and ignores the consonant sound",
           "whyFails": "'An' is a singular article and cannot precede the plural noun 'elephants'.",
-          "whyFailsId": "“An” adalah artikel tunggal dan tidak bisa berdiri di depan kata benda jamak “elephants”.",
+          "whyFailsId": "“an” itu artikel tunggal, nggak bisa berdiri di depan kata benda jamak “elephants”.",
           "misconceptionId": "artikel tunggal dipakai untuk kata benda jamak sekaligus mengabaikan bunyi awalnya."
         }
       ],
@@ -2032,7 +2032,7 @@
         "to lock",
         "locking",
         "lock",
-        "having to lock"
+        "to have locked"
       ],
       "correctIndex": 1,
       "distractors": [
@@ -2051,22 +2051,22 @@
           "misconceptionId": "bentuk dasar dipakai padahal bukan pola yang sah sesudah “remember”."
         },
         {
-          "option": "having to lock",
-          "misconception": "adds an unnecessary obligation phrase not supported by the sentence's meaning",
-          "whyFails": "The sentence is about recalling the act of locking, not about recalling an obligation to lock.",
-          "whyFailsId": "kalimatnya inget tindakan nguncinya, bukan inget adanya kewajiban ngunci.",
-          "misconceptionId": "nambahin makna kewajiban yang nggak diminta kalimatnya."
+          "option": "to have locked",
+          "misconception": "applies a perfect to-infinitive after 'remember', which English does not use for recalling a past action",
+          "whyFails": "'Remember to have locked' does not exist as an English pattern; recalling the past act of locking needs the gerund 'locking'.",
+          "whyFailsId": "“remember to have locked” bukan pola yang dipakai bahasa Inggris; buat inget tindakan yang udah lewat, bentuknya “locking”.",
+          "misconceptionId": "bentuk to sempurna dipasang ke “remember”, padahal buat ingatan lampau pola itu nggak dipakai."
         }
       ],
       "explanation": {
         "whyCorrect": "The gerund 'locking' correctly expresses recalling a past completed action, matching 'this morning' and 'clearly remember'.",
         "rule": "'Remember + -ing' = recall something that already happened; 'remember + to-infinitive' = not forget to do something in the future.",
-        "whyOthersFail": "The to-infinitive would reverse the time reference to a future duty; the bare infinitive and 'having to lock' aren't valid patterns for this meaning.",
+        "whyOthersFail": "The to-infinitive would reverse the time reference to a future duty; the bare infinitive and the perfect form 'to have locked' are not used after 'remember'.",
         "howToAvoid": "Ask: is this about a memory of the past, or a reminder for the future?",
         "memoryCue": "Remember doing (past memory) vs. remember to do (future duty).",
         "ruleId": "“Remember” + -ing berarti inget sesuatu yang udah kejadian. “Remember” + to berarti nggak lupa ngerjain sesuatu nanti.",
         "whyCorrectId": "Bentuk -ing “locking” nyatain ingatan atas tindakan yang udah kelar, dan itu pas sama “this morning”.",
-        "whyOthersFailId": "Bentuk to mbalik acuan waktunya jadi kewajiban nanti. Bentuk dasar dan “having to lock” bukan pola yang sah buat makna ini.",
+        "whyOthersFailId": "Bentuk to mbalik acuan waktunya jadi kewajiban nanti. Bentuk dasar dan “to have locked” nggak dipakai sesudah “remember”.",
         "howToAvoidId": "Tanya: ini ingatan soal masa lalu, atau pengingat buat nanti?",
         "memoryCueId": "“Remember doing” itu ingatan lampau; “remember to do” itu tugas nanti."
       },
@@ -2082,7 +2082,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Use the gerund after a preposition and the to-infinitive to express purpose, without confusing the two structures",
       "misconceptionTargeted": "Learner inserts 'to' directly after a preposition instead of switching to the gerund form required after prepositions",
-      "reasoningOperation": "identify the word directly before the blank as a preposition -> apply the gerund rule (verb after preposition = -ing)",
+      "reasoningOperation": "decide whether the phrase answers 'why' (purpose -> to-infinitive) or follows a preposition (-> gerund) -> choose the form",
       "stem": "She left work early ___ time to prepare for the interview.",
       "options": [
         "for having",
@@ -3759,7 +3759,7 @@
       "family": "error_correction",
       "subskill": "comma_splice_run_on_correction",
       "cefr": "B1",
-      "questionType": "multiple_choice",
+      "questionType": "error_correction",
       "pedagogicalObjective": "Identify and correct a comma splice by joining two independent clauses with a coordinating conjunction",
       "misconceptionTargeted": "Learner believes a comma alone is sufficient to join two complete independent clauses",
       "reasoningOperation": "detect two independent clauses joined only by a comma -> select correction with proper conjunction/punctuation",
@@ -3815,7 +3815,7 @@
       "family": "error_correction",
       "subskill": "confusing_word_pair_affect_vs_effect",
       "cefr": "B1",
-      "questionType": "multiple_choice",
+      "questionType": "error_correction",
       "pedagogicalObjective": "Distinguish 'affect' (verb, to influence) from 'effect' (noun, a result) in context",
       "misconceptionTargeted": "Learner treats 'affect' and 'effect' as interchangeable spellings of the same word rather than distinct parts of speech",
       "reasoningOperation": "identify grammatical role needed (verb vs noun) -> select the word matching that role",
@@ -4047,7 +4047,7 @@
       "options": [
         "belongs",
         "is belonging",
-        "belonged",
+        "belonging",
         "is being belonged"
       ],
       "correctIndex": 0,
@@ -4060,11 +4060,11 @@
           "misconceptionId": "waktu sekarang dianggap selalu nuntut bentuk -ing."
         },
         {
-          "option": "belonged",
-          "misconception": "Shifts to past tense despite the present-relevance context.",
-          "whyFails": "The house still belongs to them now, so past tense contradicts the ongoing state described.",
-          "whyFailsId": "rumahnya masih milik mereka sampai sekarang.",
-          "misconceptionId": "pindah ke bentuk lampau padahal konteksnya sekarang."
+          "option": "belonging",
+          "misconception": "reduces the sentence to a fragment: an -ing form with no finite verb to carry the tense",
+          "whyFails": "'This house belonging to my grandparents' has no finite verb, so the sentence is left incomplete.",
+          "whyFailsId": "“belonging” doang bikin kalimatnya nggak punya kata kerja utama, jadi kalimatnya nggak utuh.",
+          "misconceptionId": "kalimatnya cuma dikasih bentuk -ing tanpa kata kerja utama yang megang waktunya."
         },
         {
           "option": "is being belonged",
@@ -4077,12 +4077,12 @@
       "explanation": {
         "whyCorrect": "'Belong' describes a permanent state of possession, so present simple is required regardless of the 'now' context.",
         "rule": "Stative verbs (belong, own, believe, know, prefer) are not normally used in continuous forms.",
-        "whyOthersFail": "Continuous forms suit dynamic actions in progress; 'belong' has no such progression, and it also has no passive use.",
+        "whyOthersFail": "Continuous forms suit dynamic actions in progress; a lone -ing form leaves the sentence without a finite verb, and 'belong' has no passive use.",
         "howToAvoid": "Before adding -ing, check if the verb describes a state (feeling, possession, opinion) rather than an action.",
         "memoryCue": "States don't progress — no -ing for belong/own/believe.",
         "ruleId": "Kata kerja keadaan kayak belong, own, believe, dan know biasanya nggak pakai bentuk -ing.",
         "whyCorrectId": "“Belong” bilang keadaan kepemilikan yang menetap. Jadi present simple yang dibutuhin, walaupun konteksnya sekarang.",
-        "whyOthersFailId": "Bentuk -ing buat tindakan yang lagi berproses. “Belong” nggak punya proses, dan nggak dipakai bentuk pasif.",
+        "whyOthersFailId": "Bentuk -ing buat tindakan yang lagi berproses. Bentuk -ing doang bikin kalimatnya kehilangan kata kerja utama, dan “belong” nggak dipakai bentuk pasif.",
         "howToAvoidId": "Sebelum nambah -ing, cek dulu kata kerjanya soal perasaan, kepemilikan, atau pendapat.",
         "memoryCueId": "Keadaan nggak berproses: belong, own, dan believe tanpa -ing."
       },
@@ -4560,7 +4560,7 @@
           "option": "the school",
           "misconception": "focuses on a particular building instead of institutional attendance",
           "whyFails": "The prompt explicitly asks for the institutional-purpose reading, which uses zero article in 'go to school'.",
-          "whyFailsId": "Soalnya secara tegas meminta pembacaan fungsi lembaganya, dan itu memakai bentuk tanpa artikel pada “go to school”.",
+          "whyFailsId": "soalnya udah tegas minta makna lembaganya, dan itu pakainya bentuk tanpa artikel: “go to school”.",
           "misconceptionId": "perhatian dialihin ke satu gedung tertentu, bukan ke kegiatan belajarnya."
         },
         {
@@ -4630,7 +4630,7 @@
           "option": "the friend of mine",
           "misconception": "Uses definite article 'the' where the indefinite 'a' is required for introducing one of several friends.",
           "whyFails": "The double genitive with 'the' would wrongly imply this is the only friend the speaker has, whereas 'a friend of mine' means one among several.",
-          "whyFailsId": "Pola kepemilikan ganda tidak memakai “the”, dan “the” di sini juga menyiratkan pembicaranya hanya punya satu teman.",
+          "whyFailsId": "pola kepemilikan ganda nggak pakai “the”, dan “the” di sini malah bikin kesannya temannya cuma satu.",
           "misconceptionId": "artikel tertentu dipakai padahal yang diminta artikel tak tentu untuk memperkenalkan salah satu dari beberapa teman."
         }
       ],
@@ -4883,46 +4883,46 @@
       "pedagogicalObjective": "Learner recognizes when the relative pronoun can be omitted because it functions as the object of the relative clause (contact clause).",
       "misconceptionTargeted": "Learners insist the relative pronoun must always be included, even when it is grammatically optional as the clause's object.",
       "reasoningOperation": "Identify whether the relative pronoun would be the subject (must keep) or object (may omit) of its own clause.",
-      "stem": "The book ____ I borrowed from the library was due back yesterday.",
+      "stem": "Which sentence about the library book is written correctly?",
       "options": [
-        "[no word needed]",
-        "who",
-        "whom, which",
-        "what"
+        "The book I borrowed from the library was due back yesterday.",
+        "The book who I borrowed from the library was due back yesterday.",
+        "The book whose I borrowed from the library was due back yesterday.",
+        "The book what I borrowed from the library was due back yesterday."
       ],
       "correctIndex": 0,
       "distractors": [
         {
-          "option": "who",
+          "option": "The book who I borrowed from the library was due back yesterday.",
           "misconception": "Uses a personal relative pronoun for a non-human antecedent.",
-          "whyFails": "'Who' refers to people, but 'the book' is a thing, and here the pronoun is optional anyway since it's the object of 'borrowed'.",
-          "whyFailsId": "“Who” merujuk pada orang, sedangkan “the book” adalah benda.",
+          "whyFails": "'Who' refers to people, but 'the book' is a thing; the object pronoun here can simply be left out.",
+          "whyFailsId": "“who” buat orang, padahal “the book” itu benda; kata penghubungnya di sini malah bisa dihilangin.",
           "misconceptionId": "kata penghubung buat orang dipakai pada kata benda yang bukan orang."
         },
         {
-          "option": "whom, which",
-          "misconception": "Offers two pronouns as if either fits, ignoring that the pronoun is omissible here and that 'whom' doesn't refer to things.",
-          "whyFails": "This is over-inserted: since the relative pronoun is the object of 'borrowed', it can be dropped entirely, and 'whom' wouldn't apply to a book regardless.",
-          "whyFailsId": "“Which” sendiri sebenarnya sah di kalimat ini, tetapi pilihan ini menawarkan dua kata sekaligus dan “whom” tidak dipakai untuk sebuah buku.",
-          "misconceptionId": "dua kata penghubung ditawarin seolah dua-duanya cocok di posisi ini."
+          "option": "The book whose I borrowed from the library was due back yesterday.",
+          "misconception": "uses possessive 'whose' where the clause needs an object relative pronoun or nothing at all",
+          "whyFails": "'Whose' signals possession and must be followed by a noun; 'I borrowed' needs an object relative pronoun, which can simply be dropped.",
+          "whyFailsId": "“whose” nandain kepemilikan dan harus diikuti kata benda; di sini nggak ada makna punya-punyaan sama sekali.",
+          "misconceptionId": "kata kepemilikan “whose” dipasang padahal nggak ada makna punya-punyaan di kalimatnya."
         },
         {
-          "option": "what",
+          "option": "The book what I borrowed from the library was due back yesterday.",
           "misconception": "Uses 'what' as a relative pronoun, a common cross-linguistic transfer error.",
-          "whyFails": "'What' is not used as a relative pronoun after an antecedent like 'the book' in standard English; 'that/which' or omission is required.",
-          "whyFailsId": "“what” bukan kata penghubung sesudah kata benda dalam Bahasa Inggris baku.",
+          "whyFails": "'What' is not used as a relative pronoun after an antecedent like 'the book'; 'that', 'which', or omission is required.",
+          "whyFailsId": "“what” nggak dipakai sebagai kata penghubung sesudah kata benda kayak “the book”.",
           "misconceptionId": "“what” dipakai sebagai kata penghubung, kekeliruan yang lazim kebawa dari bahasa lain."
         }
       ],
       "explanation": {
-        "whyCorrect": "Because the relative pronoun would be the object of 'borrowed' (I borrowed [it]), it can be omitted, forming a contact clause.",
+        "whyCorrect": "The relative pronoun would be the object of 'borrowed' (I borrowed [it]), so it can be omitted entirely, forming a contact clause.",
         "rule": "Object relative pronouns (that/which/who(m)) can be omitted in defining relative clauses.",
-        "whyOthersFail": "'Who' misapplies a personal pronoun to a thing; the double option over-inserts an unnecessary word; 'what' is never a relative pronoun here.",
+        "whyOthersFail": "'Who' misapplies a personal pronoun to a thing; 'whose' wrongly signals possession; 'what' is never a relative pronoun after a noun.",
         "howToAvoid": "Test if the pronoun is the object of the clause's verb; if so, omission is grammatically correct and common.",
         "memoryCue": "If you could say 'I borrowed it', the pronoun can disappear.",
         "ruleId": "Kata penghubung yang berkedudukan objek boleh dihilangin di anak kalimat penjelas yang wajib. Kata itu bisa “that”, “which”, “who”, atau “whom”.",
         "whyCorrectId": "Kata penghubungnya berkedudukan objek dari “borrowed”, yaitu “I borrowed it”. Jadi kata itu boleh menghilang.",
-        "whyOthersFailId": "“Who” nunjuk orang, bukan benda. Pilihan dua kata sekaligus nyisipin kata yang nggak perlu. “What” nggak pernah jadi kata penghubung di posisi ini.",
+        "whyOthersFailId": "“Who” nunjuk orang, bukan benda. “Whose” malah nandain kepemilikan yang nggak ada di kalimatnya. “What” nggak pernah jadi kata penghubung sesudah kata benda.",
         "howToAvoidId": "Uji kata penghubungnya berkedudukan objek dari kata kerja anak kalimatnya atau bukan.",
         "memoryCueId": "Kalau bisa diucapin “I borrowed it”, kata penghubungnya boleh menghilang."
       },
@@ -5047,7 +5047,7 @@
       "family": "error_correction",
       "subskill": "dangling_modifier_correction",
       "cefr": "C1",
-      "questionType": "multiple_choice",
+      "questionType": "error_correction",
       "pedagogicalObjective": "Learner identifies and corrects a dangling modifier by ensuring the introductory phrase logically attaches to the sentence's actual subject.",
       "misconceptionTargeted": "Learners treat a grammatically fluent sentence as correct without checking whether the introductory phrase's implied subject matches the main clause's subject.",
       "reasoningOperation": "Identify who/what logically performs the action in the introductory phrase, then check whether the main clause's subject is that same entity.",
@@ -5718,7 +5718,7 @@
       "id": "b5_009",
       "family": "reported_speech",
       "subskill": "reported_speech_pronoun_and_possessive_shift",
-      "cefr": "A2",
+      "cefr": "B1",
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Learner shifts first/second-person pronouns and possessives to third person when reporting speech from a different speaker's perspective.",
       "misconceptionTargeted": "Learners backshift the verb tense correctly but leave the original speaker's pronouns unchanged, producing a perspective mismatch.",
@@ -5848,14 +5848,14 @@
           "option": "a",
           "misconception": "Treats the country name as an ordinary countable noun needing an indefinite article.",
           "whyFails": "Country names are proper nouns and don't take indefinite articles; 'the Netherlands' is a fixed exception requiring the definite article specifically.",
-          "whyFailsId": "Nama negara adalah nama diri dan tidak memakai artikel tak tentu; “the Netherlands” adalah kekecualian tetap yang khusus menuntut artikel tertentu.",
+          "whyFailsId": "nama negara itu nama diri, jadi nggak pakai artikel tak tentu; “the Netherlands” kekecualian tetap yang emang minta “the”.",
           "misconceptionId": "nama negara diperlakukan sebagai kata benda terhitung biasa yang butuh artikel tak tentu."
         },
         {
           "option": "an",
           "misconception": "Applies the indefinite article rule based on the following vowel sound, ignoring that country names don't take indefinite articles at all.",
           "whyFails": "Country names do not take the indefinite article 'an'; this fixed name requires the definite article in 'the Netherlands'.",
-          "whyFailsId": "Nama negara tidak memakai artikel tak tentu “an”; nama tetap ini menuntut artikel tertentu dalam bentuk “the Netherlands”.",
+          "whyFailsId": "nama negara nggak pakai artikel tak tentu “an”; nama tetap ini mintanya artikel tentu: “the Netherlands”.",
           "misconceptionId": "aturan artikel tak tentu diterapkan berdasarkan bunyi vokal, tanpa melihat bahwa nama negara memang tidak memakainya."
         },
         {
@@ -5967,7 +5967,7 @@
           "option": "on; in",
           "misconception": "Confuses the fixed 'by + transport' collocation with literal physical position prepositions (on a bus vs in a taxi).",
           "whyFails": "'On the bus' and 'in the taxi' describe physical location inside the vehicle, not the general method of travel, which uses 'by bus'/'by taxi' without an article.",
-          "whyFailsId": "“On the bus” dan “in the taxi” menggambarkan posisi di dalam kendaraannya, bukan cara bepergian secara umum yang memakai “by bus” dan “by taxi” tanpa artikel.",
+          "whyFailsId": "“on the bus” dan “in the taxi” ngomongin posisi di dalam kendaraannya, bukan cara bepergian umum yang pakai “by bus” dan “by taxi” tanpa artikel.",
           "misconceptionId": "pasangan tetap buat cara bepergian ketuker sama kata depan posisi fisik."
         },
         {
@@ -6335,7 +6335,7 @@
       "family": "error_correction",
       "subskill": "parallel_structure_error_correction",
       "cefr": "B2",
-      "questionType": "multiple_choice",
+      "questionType": "error_correction",
       "pedagogicalObjective": "Learner identifies and corrects a parallel structure error in a list joined by 'and', ensuring all items share the same grammatical form.",
       "misconceptionTargeted": "Learners overlook grammatical form mismatches in a list as long as each individual item sounds acceptable on its own.",
       "reasoningOperation": "Check that every item in the coordinated list shares the same grammatical form (all gerunds, all infinitives, etc.).",
@@ -6583,7 +6583,7 @@
           "option": "The impact such was",
           "misconception": "Keeps normal subject-first order and misplaces 'such' mid-sentence.",
           "whyFails": "This word order doesn't match any grammatical English pattern; the fixed emphatic structure requires 'Such' to start the sentence, followed immediately by the verb.",
-          "whyFailsId": "“The impact such was” mempertahankan subjek di depan dan menyelipkan “such” di tengah, sehingga tidak ada pemajuan maupun pembalikan sama sekali.",
+          "whyFailsId": "pilihan ini tetep naruh subjek di depan dan cuma nyelipin “such” di tengah, jadi nggak ada pemajuan maupun pembalikan sama sekali.",
           "misconceptionId": "urutan biasa dengan subjek di depan dipertahanin dan “such” ditaruh di tengah."
         },
         {
@@ -7080,7 +7080,7 @@
           "option": "were",
           "misconception": "makes the verb agree with the nearby plural noun team",
           "whyFails": "The subject is the entire singular idea 'What the team needed most', so singular 'was' is required.",
-          "whyFailsId": "Pilihan “were” menyesuaikan kata kerjanya dengan “team”, padahal subjeknya seluruh anak kalimat “What the team needed most”.",
+          "whyFailsId": "“were” nyamain kata kerjanya sama “team”, padahal subjek sebenarnya seluruh anak kalimat “What the team needed most”.",
           "misconceptionId": "kata kerjanya dicocokin sama kata benda jamak terdekat, yaitu team."
         },
         {
@@ -7402,7 +7402,7 @@
       "questionType": "multiple_choice",
       "pedagogicalObjective": "Match was or were to the subject in a basic past-tense be sentence.",
       "misconceptionTargeted": "Learner uses was with a plural subject or adds did before was or were in a question.",
-      "reasoningOperation": "identify subject number -> match it to was or were -> place be before the subject in a question",
+      "reasoningOperation": "identify subject number -> match it to was or were",
       "stem": "They ___ at school yesterday.",
       "options": [
         "was",

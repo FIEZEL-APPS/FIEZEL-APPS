@@ -515,3 +515,10 @@ jobs:
           node item-calibration-test.js
           node speaking-adaptive-test.js
           node srl-coach-test.js
+      - name: 'Gerbang simulasi adaptivitas v3 (gate yatim CI — temuan D1, wave D)'
+        # adaptivity-simulation-v3.js adalah gate sungguhan (exit code dari main();
+        # gate residual + gate kalibrasi bisa merah), tetapi namanya lolos dari pola
+        # GATE_NAME_RE gate-registry-test.js (*-test/-audit/-selftest) sehingga tidak
+        # pernah dipanggil CI (temuan D1 gate-sweep, 28 Agu 2026). Didaftarkan di sini
+        # secara ADDITIVE per peta koordinasi D10 (quality.yml disentuh 5 PR terbuka).
+        run: node adaptivity-simulation-v3.js

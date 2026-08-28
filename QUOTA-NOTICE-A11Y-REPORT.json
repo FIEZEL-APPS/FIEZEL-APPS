@@ -1,0 +1,79 @@
+{
+  "schema": "fiezel-quota-notice-a11y-v1",
+  "generatedAt": "2026-08-28T01:38:22.391Z",
+  "pass": true,
+  "corpus": {
+    "module": 77,
+    "routes": 21,
+    "app": 5
+  },
+  "urgentKeys": [
+    "session.expired"
+  ],
+  "forbiddenTerms": [
+    "quota",
+    "endpoint",
+    "server",
+    "worker",
+    "429",
+    "Puter",
+    "Cloudflare",
+    "cache",
+    "token"
+  ],
+  "forbiddenToastMs": 2600,
+  "checks": [
+    {
+      "name": "(a) nggak ada istilah teknis terlarang di seluruh naskah murid",
+      "pass": true
+    },
+    {
+      "name": "(a2) galat provider mentah nggak pernah sampai ke layar murid",
+      "pass": true
+    },
+    {
+      "name": "(b) \"nggak\" dipakai dan \"tidak\" nggak dipakai di naskah yang diatur kanon",
+      "pass": true
+    },
+    {
+      "name": "(b2) nggak ada janji hasil dan nggak ada tuduhan kepada murid",
+      "pass": true
+    },
+    {
+      "name": "(c) panel jatah nggak punya elemen <a>/<button> pembayaran sama sekali",
+      "pass": true
+    },
+    {
+      "name": "(d) role=\"alert\" hanya pada kelas pesan mendesak yang terdaftar",
+      "pass": true
+    },
+    {
+      "name": "(d2) fokus nggak dirampas dan urutan bacanya benar",
+      "pass": true
+    },
+    {
+      "name": "(d3) kontras 4,5:1 dan target sentuh 44px ditegakkan, bukan kebetulan",
+      "pass": true
+    },
+    {
+      "name": "(e) nggak ada pemberitahuan jatah yang memakai jalur toast berdurasi pendek",
+      "pass": true
+    },
+    {
+      "name": "(f) setiap pesan punya varian jujur untuk keadaan benar-benar tanpa suara",
+      "pass": true
+    },
+    {
+      "name": "(f2) TEMUAN BOHONG ditutup: penghitung jatah yang rusak nggak dilaporkan sebagai jatah habis",
+      "pass": true
+    },
+    {
+      "name": "(g) aturan senyap saat sesi listening berjalan diterapkan, tanpa pengecualian",
+      "pass": true
+    },
+    {
+      "name": "modul naskah terpasang di halaman dan ikut di-precache",
+      "pass": true
+    }
+  ]
+}

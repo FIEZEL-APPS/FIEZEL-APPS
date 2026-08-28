@@ -230,6 +230,10 @@ function makeEnv(overrides) {
     AE: { writeDataPoint: (p) => AE_WRITES.push(p) },
     OWNER_TOKEN_HASH: sha256Hex(OWNER_TOKEN),
     OWNER_SESSION_KEY: 'kunci-hmac-sesi-uji-hanya-untuk-test',
+    // Wave D (D17): edge guard kini fail-closed tanpa EDGE_SHARED_SECRET. Test ini menguji
+    // logika dashboard, bukan edge guard (guard punya suite sendiri 583 assert), jadi
+    // escape hatch eksplisit dipakai di sini agar request uji sampai ke handler.
+    ALLOW_NO_EDGE_SECRET: 'true',
   }, overrides || {});
 }
 

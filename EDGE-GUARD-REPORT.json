@@ -1,0 +1,541 @@
+{
+  "schema": "fiezel-edge-guard-report-v1",
+  "generatedAt": "2026-08-28T01:37:06.793Z",
+  "pass": true,
+  "counts": {
+    "pass": 131,
+    "fail": 0,
+    "total": 131
+  },
+  "decision": {
+    "healthProtected": true,
+    "freeHeaderPath": "/healthz",
+    "reason": "/health mengumumkan capabilities (peta permukaan serang); monitor hanya butuh satu bit hidup/mati"
+  },
+  "checks": [
+    {
+      "ok": true,
+      "message": "workers/api/mw-edge.js ada"
+    },
+    {
+      "ok": true,
+      "message": "deploy/edge/api-index.php ada"
+    },
+    {
+      "ok": true,
+      "message": "deploy/edge/README.md ada"
+    },
+    {
+      "ok": true,
+      "message": "Worker mengekspor default.fetch"
+    },
+    {
+      "ok": true,
+      "message": "(a) GET /health tanpa header X-Fiezel-Edge ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) galat bernama forbidden_edge"
+    },
+    {
+      "ok": true,
+      "message": "(a) penolakan tidak membocorkan capabilities"
+    },
+    {
+      "ok": true,
+      "message": "(a) penolakan tidak menyebut nama secret, nama header, atau alamat jembatan"
+    },
+    {
+      "ok": true,
+      "message": "(a) POST /api/auth/anon tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) penolakan tidak pernah menerbitkan cookie identitas"
+    },
+    {
+      "ok": true,
+      "message": "(a) penolakan tidak menulis satu baris pun ke D1, dapat 0"
+    },
+    {
+      "ok": true,
+      "message": "(a) penolakan tidak menulis ke KV, dapat 0"
+    },
+    {
+      "ok": true,
+      "message": "(a) GET /api/config tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) GET /api/user/me tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) GET /api/quota tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) POST /api/auth/claim tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) POST /api/ai/task tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) POST /api/tts/render tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) GET /api/tts/manifest tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(a) POST /api/usage/events tanpa header ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(b) header salah ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(b) header kosong ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(b) header berprefiks benar tapi terpotong ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(b) header lebih panjang dari secret ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(b) bentuk galat IDENTIK untuk header tidak ada / salah / kosong / prefiks (anti-oracle)"
+    },
+    {
+      "ok": true,
+      "message": "(c) header benar diteruskan: /health 200, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(c) protokol tetap 1.7 lewat gerbang"
+    },
+    {
+      "ok": true,
+      "message": "(c) /health melaporkan edgeGuard:\"on\" saat secret terpasang"
+    },
+    {
+      "ok": true,
+      "message": "(c) /health yang lolos tetap memuat capabilities (jadi ia memang layak dilindungi)"
+    },
+    {
+      "ok": true,
+      "message": "(c) path tak dikenal dengan header benar = 404 (bukan 403), dapat 404"
+    },
+    {
+      "ok": true,
+      "message": "(c) metode salah dengan header benar = 405, dapat 405"
+    },
+    {
+      "ok": true,
+      "message": "(c) origin asing tetap ditolak forbidden_origin walau header jembatan benar"
+    },
+    {
+      "ok": true,
+      "message": "(c) nama header tidak peka huruf besar/kecil, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(d) mw-edge.js mendefinisikan ctEq()"
+    },
+    {
+      "ok": true,
+      "message": "(d) header rahasia dibandingkan lewat ctEq(presented, ...)"
+    },
+    {
+      "ok": true,
+      "message": "(d) tidak ada operator kesetaraan langsung pada nilai rahasia di mw-edge.js: 0"
+    },
+    {
+      "ok": true,
+      "message": "(d) hasil headers.get() tidak pernah dibandingkan dengan operator kesetaraan"
+    },
+    {
+      "ok": true,
+      "message": "(d) badan ctEq bisa dibaca gerbang"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq mengiterasi panjang MAKSIMUM kedua masukan"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq mengakumulasi selisih dengan XOR/OR, bukan keluar dini"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq tidak keluar dari loop pada byte pertama yang berbeda"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq cocok untuk nilai identik"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq menolak nilai berbeda pada byte terakhir"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq menolak panjang berbeda"
+    },
+    {
+      "ok": true,
+      "message": "(d) ctEq tidak melempar untuk header tidak ada"
+    },
+    {
+      "ok": true,
+      "message": "(d) header tidak ada tidak pernah cocok dengan secret"
+    },
+    {
+      "ok": true,
+      "message": "(d) daftar path bebas-header tetap satu: /healthz (/healthz)"
+    },
+    {
+      "ok": true,
+      "message": "(e) env uji benar-benar tanpa EDGE_SHARED_SECRET"
+    },
+    {
+      "ok": true,
+      "message": "(e) ALLOW_NO_EDGE_SECRET=\"1\" TIDAK membuka gerbang (tetap 403), dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) tanpa secret /health FAIL-CLOSED 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed bernama forbidden_edge"
+    },
+    {
+      "ok": true,
+      "message": "(e) tanpa secret POST /api/auth/anon ditolak 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed tidak pernah menerbitkan cookie identitas"
+    },
+    {
+      "ok": true,
+      "message": "(e) secret berisi spasi saja = tidak terpasang = FAIL-CLOSED 403, dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed nol tulis D1, dapat 0"
+    },
+    {
+      "ok": true,
+      "message": "(e) /healthz tetap hidup saat fail-closed (monitor melihat \"hidup tapi tertutup\"), dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(e) penolakan fail-closed tidak menyebut nama secret, nama var pengecualian, atau nama header"
+    },
+    {
+      "ok": true,
+      "message": "(e) fail-closed dicatat di log dengan instruksi memasang secret (bukan mati diam-diam)"
+    },
+    {
+      "ok": true,
+      "message": "(e) peringatan fail-closed tidak satu baris per permintaan, dapat 1"
+    },
+    {
+      "ok": true,
+      "message": "(e) bentuk galat fail-closed IDENTIK dengan penolakan header-salah (anti-oracle)"
+    },
+    {
+      "ok": true,
+      "message": "(e) mode transisi eksplisit: /health tetap 200, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(e) /health melaporkan edgeGuard:\"off\" di mode transisi"
+    },
+    {
+      "ok": true,
+      "message": "(e) protokol tetap 1.7 saat guard off"
+    },
+    {
+      "ok": true,
+      "message": "(e) rute lain tetap jalan di mode transisi (tidak 403), dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(e) peringatan mode transisi dicatat lewat jalur log Worker yang sudah ada"
+    },
+    {
+      "ok": true,
+      "message": "(e) peringatan menyebut secret yang harus dipasang DAN bahwa keadaan ini hanya transisi"
+    },
+    {
+      "ok": true,
+      "message": "(e) peringatan tidak satu baris per permintaan (banjir log), dapat 1"
+    },
+    {
+      "ok": true,
+      "message": "(e) mw-edge.js menyatakan `off` hanya sah selama masa transisi"
+    },
+    {
+      "ok": true,
+      "message": "(e) mw-edge.js menegaskan `off` bukan mode produksi"
+    },
+    {
+      "ok": true,
+      "message": "(e) mw-edge.js menyebut kapan `off` harus berakhir selamanya"
+    },
+    {
+      "ok": true,
+      "message": "(e) mw-edge.js mendokumentasikan default fail-closed DAN var pengecualiannya"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz boleh diakses tanpa header jembatan, dapat 200"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz menjawab {ok:true,protocol:\"1.7\"}"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz HANYA memuat ok+protocol, dapat: ok,protocol"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz tidak membocorkan capabilities"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz tidak membocorkan nama layanan, versi, mode gateway, atau plan"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz tidak membocorkan status gerbang (itu oracle)"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz nol tulis KV"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz nol baca KV"
+    },
+    {
+      "ok": true,
+      "message": "(f) /healthz nol query D1"
+    },
+    {
+      "ok": true,
+      "message": "(f) KEPUTUSAN: /health TETAP dilindungi gerbang (403 tanpa header), dapat 403"
+    },
+    {
+      "ok": true,
+      "message": "(f) route-health.js menuliskan alasan /health dilindungi dan /healthz ada"
+    },
+    {
+      "ok": true,
+      "message": "(f) EDGE_FREE_PATHS memuat tepat SATU path di kode"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php memakai placeholder __EDGE_SECRET__"
+    },
+    {
+      "ok": true,
+      "message": "(g) konstanta EDGE_SECRET berisi placeholder, bukan nilai"
+    },
+    {
+      "ok": true,
+      "message": "(g) placeholder muncul tepat sekali (tidak ada salinan yang lupa diganti)"
+    },
+    {
+      "ok": true,
+      "message": "(g) proxy benar-benar mengirim header X-Fiezel-Edge"
+    },
+    {
+      "ok": true,
+      "message": "(g) proxy menunjuk Worker upstream yang benar"
+    },
+    {
+      "ok": true,
+      "message": "(g) proxy memakai allowlist endpoint dengan default TOLAK"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php menyatakan sifat sementaranya"
+    },
+    {
+      "ok": true,
+      "message": "(g) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk kZ8vQ2..."
+    },
+    {
+      "ok": true,
+      "message": "(g) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk 3f9a1c..."
+    },
+    {
+      "ok": true,
+      "message": "(g) pemindai TERBUKTI menangkap nilai secret sungguhan berbentuk aGVsbG..."
+    },
+    {
+      "ok": true,
+      "message": "(g) tidak ada nilai berpola acak (kemungkinan secret sungguhan) di api-index.php: 0"
+    },
+    {
+      "ok": true,
+      "message": "(g) EDGE_SECRET tidak pernah berisi literal panjang"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php tidak memuat private key PEM"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php tidak memuat kunci gaya sk-"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php tidak memuat JWT"
+    },
+    {
+      "ok": true,
+      "message": "(g) api-index.php tidak memuat hex panjang"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan sifat sementara"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan alasan cookie pihak pertama"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan cara memasang (scp)"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan izin berkas (chmod)"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan .htaccess"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan allowlist endpoint"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan LANGKAH PEMBONGKARAN"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan matikan workers.dev saat pembongkaran"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan pasang custom domain saat pembongkaran"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan hapus secret saat pembongkaran"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan angka latensi terukur"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan kejujuran soal titik gagal tunggal"
+    },
+    {
+      "ok": true,
+      "message": "(g) deploy/edge/README.md menjelaskan kenapa audio tidak lewat jembatan"
+    },
+    {
+      "ok": true,
+      "message": "(g) README tidak menempelkan nilai ke placeholder"
+    },
+    {
+      "ok": true,
+      "message": "(g) README tidak memuat nilai berpola acak"
+    },
+    {
+      "ok": true,
+      "message": "runbook memuat bagian jembatan"
+    },
+    {
+      "ok": true,
+      "message": "bagian jembatan memakai penanda temuan lapangan yang sama dengan bagian lain"
+    },
+    {
+      "ok": true,
+      "message": "runbook memuat angka latensi dingin 2.214 ms"
+    },
+    {
+      "ok": true,
+      "message": "runbook memuat rentang latensi hangat 1.051-1.163 ms"
+    },
+    {
+      "ok": true,
+      "message": "runbook jujur bahwa origin PHP menjadi titik gagal tunggal"
+    },
+    {
+      "ok": true,
+      "message": "runbook menyatakan aset audio TIDAK lewat jembatan"
+    },
+    {
+      "ok": true,
+      "message": "runbook menjelaskan edgeGuard dan jalur /healthz"
+    },
+    {
+      "ok": true,
+      "message": "runbook mendaftar Secret EDGE_SHARED_SECRET"
+    },
+    {
+      "ok": true,
+      "message": "runbook menunjuk artefak yang bisa diaudit"
+    },
+    {
+      "ok": true,
+      "message": "bagian jembatan runbook tidak memuat nilai berpola acak"
+    },
+    {
+      "ok": true,
+      "message": "index.js mengimpor mw-edge.js"
+    },
+    {
+      "ok": true,
+      "message": "rantai MIDDLEWARE bisa dibaca gerbang"
+    },
+    {
+      "ok": true,
+      "message": "edgeGuardMiddleware terpasang di rantai MIDDLEWARE"
+    },
+    {
+      "ok": true,
+      "message": "edgeGuardMiddleware berjalan PALING LUAR (sebelum cors/origin dan identitas)"
+    },
+    {
+      "ok": true,
+      "message": "index.js mendaftarkan rute /healthz"
+    },
+    {
+      "ok": true,
+      "message": "rute /healthz terdaftar sebagai GET literal"
+    },
+    {
+      "ok": true,
+      "message": "quality.yml memanggil node edge-guard-test.js"
+    }
+  ]
+}

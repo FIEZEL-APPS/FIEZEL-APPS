@@ -34,12 +34,16 @@ const BEAT = { en: 'We use it when the result still matters now.', idText: 'Kita
 
 // ---- 3. zoom lock ------------------------------------------------------------------
 
-test('the viewport is pinned to one scale', () => {
+test('the viewport allows accessible zoom while double-tap stays tamed', () => {
+  // Wave D (D5 Tinggi-1): kuncian zoom total melanggar WCAG 1.4.4 (resize text sampai
+  // 200% tanpa kehilangan fungsi). Kebijakan baru: pinch-zoom DIIZINKAN sampai 5x,
+  // user-scalable tidak boleh dilarang; yang tetap dijinakkan hanya double-tap-zoom
+  // (touch-action) supaya ketukan cepat kuis tidak memicu lompatan zoom.
   const meta = (index.match(/<meta name="viewport"[^>]*>/) || [''])[0];
-  assert.match(meta, /user-scalable=no/, 'user scaling must be refused');
-  assert.match(meta, /maximum-scale=1/, 'no zoom in');
-  assert.match(meta, /minimum-scale=1/, 'no zoom out');
-  assert.match(css, /touch-action:manipulation/, 'double-tap zoom is removed in CSS too');
+  assert.ok(!/user-scalable=no/.test(meta), 'user scaling must NOT be refused (WCAG 1.4.4)');
+  assert.match(meta, /maximum-scale=5/, 'zoom in up to 5x is allowed');
+  assert.ok(!/maximum-scale=1\b/.test(meta), 'the old 1x zoom pin must be gone');
+  assert.match(css, /touch-action:manipulation/, 'double-tap zoom is still removed in CSS');
   assert.match(css, /text-size-adjust:100%/, 'the OS must not rescale text either');
 });
 
@@ -131,7 +135,12 @@ test('every in-app exit is blocked while the lock is armed', () => {
     'the OS-level limit must be documented where the next maintainer will read it');
   assert.ok(index.includes('./features/daily-target/fiezel-daily-target.js'), 'loaded by the document');
   assert.ok(sw.includes('./features/daily-target/fiezel-daily-target.js'), 'precached');
-  assert.match(app, /FiezelDailyTarget\?\.start/, 'armed once the app unlocks');
+  // Wave D (D6 §5): nudge start() dari app.js DIHAPUS — tiap panggilan menumpuk listener
+  // visibilitychange tanpa guard. Modulnya self-arm (DOMContentLoaded/setTimeout 1200 ms,
+  // lihat komentar m025-43 di modul), jadi yang di-assert kini self-arm itu sendiri dan
+  // ketiadaan nudge ganda di app.js.
+  assert.match(dailySrc, /setTimeout\(start, 1200\)/, 'the module arms itself once the page settles');
+  assert.ok(!/FiezelDailyTarget\?\.start\(\)/.test(app), 'app.js must not stack a second arm (leaky listener)');
   assert.match(app, /window\.__fiezelDueReviews=/, 'the module reads real review evidence, not a guess');
 });
 

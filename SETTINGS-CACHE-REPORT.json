@@ -1,0 +1,115 @@
+{
+  "gate": "settings-cache-test",
+  "spec": "reports/desain-test-baru.md §4",
+  "generatedAt": "2026-08-28T01:38:30.762Z",
+  "pass": true,
+  "total": 21,
+  "failedCount": 0,
+  "checks": [
+    {
+      "name": "S1a markup Pengaturan memuat tombol id=\"settingClearCache\"",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S1b tombolnya terikat ke clearAppCache",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S1c subteks tombol menjanjikan progres tidak terhapus",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S1d Pengaturan memakai lima kelompok <details class=\"settings-fold\">",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S2 clearAppCache() tidak menyentuh satu pun jalur progres (daftar hitam)",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S3 clearAppCache() memakai caches.keys( dan caches.delete(",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S3b cache neural stabil dilindungi dari penghapusan",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4a keempat kunci localStorage utuh byte-per-byte setelah clearAppCache()",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4b kunci progres \"fiezel-v4-state\" tetap ada dengan nilai sama",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4b kunci progres \"fiezel-v5-state:uuid-123\" tetap ada dengan nilai sama",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4b kunci progres \"fiezel-v5-legacy-owner\" tetap ada dengan nilai sama",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4c caches.delete terpanggil untuk kedua nama cache fiezel-*",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4d registration.update() dipanggil, service worker TIDAK di-unregister",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4e murid diberi kabar dan halaman dijadwalkan muat ulang",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4f cache neural stabil fiezel-v5.19.0 TIDAK dihapus",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4g cache milik pihak lain (tanpa prefix fiezel-) tidak disentuh",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4h tanpa service worker / saat offline, pesannya jujur bukan diam",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S4i progres di fixture kedua juga utuh",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S5 LEGACY_STATE_KEY masih 'fiezel-v4-state' (kalau berubah, daftar hitam S2/S4 harus ikut sadar)",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S5 ACCOUNT_STATE_PREFIX masih 'fiezel-v5-state:' (kalau berubah, daftar hitam S2/S4 harus ikut sadar)",
+      "ok": true,
+      "details": ""
+    },
+    {
+      "name": "S5 LEGACY_STATE_OWNER_KEY masih 'fiezel-v5-legacy-owner' (kalau berubah, daftar hitam S2/S4 harus ikut sadar)",
+      "ok": true,
+      "details": ""
+    }
+  ]
+}
