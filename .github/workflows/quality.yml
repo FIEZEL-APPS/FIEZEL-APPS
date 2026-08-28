@@ -243,6 +243,16 @@ jobs:
           # membocorkan `capabilities`, dan bahwa `deploy/edge/api-index.php` tidak pernah
           # memuat nilai secret sungguhan.
           node edge-guard-test.js
+          # S1: pembatas laju PENERBITAN identitas anonim (`POST /api/auth/anon`).
+          # Dijalankan tepat sesudah `edge-guard-test.js` karena keduanya membaca sinyal yang
+          # SAMA dari dua sisi: gerbang di atas menulis `ctx.edgePath` (jalur mana yang dipakai
+          # permintaan), gerbang ini menuntut tarif pembatas dipilih dari sinyal itu dan BUKAN
+          # dari header klien atau dari ada/tidaknya `EDGE_SHARED_SECRET` — bug lapangan 28 Agu
+          # 2026 (52 tembakan dari satu IP, 28 lolos: tarif jembatan 30/jam terpakai di jalur
+          # langsung). Ia juga menjaga jendela BERGULIR (tidak reset di menit ke-0), amplop 429
+          # yang tidak membocorkan riwayat IP, jitter anti-oracle, perilaku saat D1 galat, dan
+          # nol IP mentah di bind D1 / log.
+          node rate-anon-test.js
           # S7: pemantauan produksi. DUA langkah, dan pembagiannya sengaja:
           # `health-probe-test.js` adalah gerbangnya (ia yang membuktikan probe menilai
           # `workers.dev` 200 sebagai KRITIS — bukan OK — dan bahwa exit code hanya merah
