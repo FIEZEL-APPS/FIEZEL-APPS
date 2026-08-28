@@ -300,8 +300,8 @@ const near = (got, want, tolerance) => Math.abs(got - want) / want <= tolerance;
 
   // --- 9. WORKFLOW: gate aktor pola repo, APPLY, anggaran, dry-run bawaan -------------
   const wf = fs.readFileSync(path.join(root, '.github/workflows/audio-prerender-cf.yml'), 'utf8');
-  check('Gate aktor memakai pola repo: event_name == workflow_dispatch DAN actor == fitrajft-ux',
-    /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==\s*'fitrajft-ux'/.test(wf),
+  check('Gate aktor memakai pola repo: event_name == workflow_dispatch DAN actor == FIEZEL-APPS',
+    /if:\s*github\.event_name\s*==\s*'workflow_dispatch'\s*&&\s*github\.actor\s*==\s*'FIEZEL-APPS'/.test(wf),
     'pola deploy-core-worker.yml:17');
   check('Input APPLY ada, bawaannya kosong, dan produksi hanya jalan bila APPLY',
     /apply:[\s\S]{0,220}default:\s*''/.test(wf) &&
