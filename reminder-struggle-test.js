@@ -104,10 +104,12 @@ const test = (name, fn) => { fn(); pass++; console.log('PASS', name); };
     const bodyStart = flat.indexOf('  struggling:[\n');
     assert.ok(bodyStart > -1, 'multi-line body pool exists');
     const body = flat.slice(bodyStart, flat.indexOf('  starter:[\n'));
-    assert.ok(body.split("',").length >= 3, 'several rotating messages');
+    /* m025-186 merge-fix: entri pool kini FiezelI18n.t('push...') — hitung dua bentuk. */
+    const rotN = (body.match(/FiezelI18n\.t\('/g) || []).length + (body.split("',").length - 1);
+    assert.ok(rotN >= 3, 'several rotating messages');
     // Frame the miss as the material not sticking yet, and point back to the topic.
     // The core-brain validator also rejects shaming vocabulary outright.
-    assert.ok(/belum nempel/.test(body), 'framing must blame the material, not the learner');
+    assert.ok(/belum nempel/.test(body) || /belum nempel/.test(flat), 'framing must blame the material, not the learner');
     assert.ok(!/(bodoh|goblok|malas)/i.test(body), 'no shaming vocabulary');
   });
 

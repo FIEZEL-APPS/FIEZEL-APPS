@@ -285,7 +285,10 @@ if (setterBlocks.length) {
       save: () => { saves++; },
       closeModal: () => {},
       render: () => {},
-      showToast: () => {}
+      showToast: () => {},
+      /* m025-186 merge-fix: blok setter kini memanggil FiezelI18n.t untuk teks toast;
+         fixture ini tidak menguji teksnya, jadi stub kunci-mentah sudah jujur. */
+      FiezelI18n: { t: (k) => String(k) }
     };
     const setter = vm.runInNewContext(`(${setterBlocks[0]})`, sandbox, { timeout: 1000 });
     const result = setter('B1');

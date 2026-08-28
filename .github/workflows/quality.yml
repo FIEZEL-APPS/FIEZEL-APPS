@@ -107,6 +107,10 @@ jobs:
           node onboarding-test.js
           node tour-test.js
           node tours-test.js
+          node audio-locale-guard-test.js
+          node id-golden-snapshot-test.js
+          node locale-enum-test.js
+          node th-coverage-test.js
           node boot-order-test.js
           node splash-first-paint-test.js
           node splash-choreography-test.js
